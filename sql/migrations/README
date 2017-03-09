@@ -1,0 +1,20 @@
+# SQL Migration File Format
+
+SQL Migration is an ordinary SQL file.
+
+File name must have the following format:
+
+    YYYYmmddHHMMSS_database.sql
+
+'YYYYmmddHHMMSS' should be the current date in UTC.
+'database' must be one of 'characters', 'world' or 'logon'.
+
+For example:
+
+    20140320193109_world.sql
+
+First line in the file must be the following:
+
+    INSERT INTO `migrations` VALUES ('YYYYmmddHHMMSS');
+
+The date must be the same as in the file name.
