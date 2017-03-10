@@ -39,7 +39,7 @@ enum
     SAY_HALFLIFE                = -1469029,
     SAY_KILLTARGET              = -1469030,
     SAY_NEFARIUS_CORRUPT_1      = -1469006,                 // When he corrupts Vaelastrasz
-    SAY_NEFARIUS_CORRUPT_2      = -1469037,                 
+    SAY_NEFARIUS_CORRUPT_2      = -1469037,
     // Spells
     // ------
 
@@ -59,20 +59,20 @@ enum
     // Inflicts 925 to 1075 (600 à 700) damage on enemies in a cone behind the caster, knocking them back.
     SPELL_TAIL_SWEEP            = 15847,
 
-    // TO FIX : explo a la fin.
+    // TO FIX : explode at the end
     // Damage done increased by 100%. Attack speed increased by 100%. Spells become instant cast. Reduces max health by 5% every second; eventually causes player to die. Vael only casts Burning Adrenaline in two scenarios: He will cast it on random mana users every 15 seconds and he will cast it on the current tank every 45 seconds. When mana-using raid members are afflicted, they must move away to a designated area or bomb the raid with a 4376 to 5624 AoE blast. Non mana users will not be afflicted unless they are currently tanking Vaelastrasz. Note that ice blocks or divine shield will not prevent this debuff from killing the player.
     SPELL_BURNING_ADRENALINE    = 23620, // 18173 ?
     SPELL_BURNING_ADRENALINE2   = 23478, // AOE
     SPELL_BURNING_ADRENALINE3   = 23644, // instakill
     SPELL_BURNING_ADRENALINE4   = 24701, // -75% threat : easy mode ???
-    // voir le heal de KazzaK
+    // See the heal of Kazzak
 
-    // TO FIX : l'effet chaine.
+    // TO FIX : The chain effect
     // DB : spell_effect_mod.effectChainTarget = 25;
     // Cleave attack that hits for 2k. This is a chain cleave, so if positioning is poor it can chain to the entire raid, even to behind him. It is critical that nobody be within approximately 10 yards of the main tank for this reason. Offtanks should be generating threat far enough from the MT to avoid chaining the cleave, but close enough to slide into place when BA hits the MT.
-    SPELL_CLEAVE                = 22540, // 22540 Chain Cleave hardcodé via la BD (Ustaag) // 19983 // 20684  ? // Chain cleave is most likely named something different and contains a dummy effect
-    // changer spell.cpp à "//FIXME: This very like horrible hack and wrong for most spells"
-    // chercher quelles créatures utilisent les deux spells dans la DB ?
+    SPELL_CLEAVE                = 22540, // 22540 Chain Cleave hardcoded via the BD (Ustaag) // 19983 // 20684  ? // Chain cleave is most likely named something different and contains a dummy effect
+    // change spell.cpp "//FIXME: This very like horrible hack and wrong for most spells"
+    // Find out which creatures use both spells in the DB?
 
     SPELL_BANISHEMENT_OF_SCALE  = 16404,
     SPELL_NEFARIUS_CORRUPTION   = 23642,
@@ -321,7 +321,7 @@ struct boss_vaelAI : public ScriptedAI
                         break;
                     case 1:
                         // This one is actually 16 seconds but we only go to 10 seconds because he starts attacking after he says "I must fight this!"
-                        // 12 sec. French version
+                        // 12 sec. French version (TODO: Change back to 10 seconds since we use the English version?)
                         DoScriptText(SAY_LINE_3, m_creature);
                         m_uiSpeachTimer = 12000;
                         ++m_uiSpeachNum;
@@ -591,7 +591,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         }
         else
             m_uiMarkFlamesTimer -= uiDiff;
-        
+
         if (m_uiMarkDetonationTimer < uiDiff)
         {
             if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))

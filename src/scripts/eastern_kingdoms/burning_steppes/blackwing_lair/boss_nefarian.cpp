@@ -255,15 +255,15 @@ struct boss_nefarianAI : ScriptedAI
                         break;
                     case CLASS_WARLOCK:
                         pPlayer->CastSpell(pPlayer, SPELL_WARLOCK, true); // OK
-                        m_creature->SummonCreature(14668, 
-                            pPlayer->GetPositionX(), 
-                            pPlayer->GetPositionY(), 
-                            pPlayer->GetPositionZ(), 
+                        m_creature->SummonCreature(14668,
+                            pPlayer->GetPositionX(),
+                            pPlayer->GetPositionY(),
+                            pPlayer->GetPositionZ(),
                             pPlayer->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
-                        m_creature->SummonCreature(14668, 
-                            pPlayer->GetPositionX(), 
-                            pPlayer->GetPositionY(), 
-                            pPlayer->GetPositionZ(), 
+                        m_creature->SummonCreature(14668,
+                            pPlayer->GetPositionX(),
+                            pPlayer->GetPositionY(),
+                            pPlayer->GetPositionZ(),
                             pPlayer->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                         break;
                     case CLASS_DRUID:
@@ -291,7 +291,7 @@ struct boss_nefarianAI : ScriptedAI
                         m_creature->SetInCombatWithZone();
                         m_creature->SetFly(true);
 
-                        m_creature->CastSpell(m_creature, SPELL_SHADOWFLAME_INITIAL, true); // test a vitesse 17 / degats feu sur l'initial ??? Oo
+                        m_creature->CastSpell(m_creature, SPELL_SHADOWFLAME_INITIAL, true); // Test speed 17 / fire damage on the initial ??? Oo
 
                         DoScriptText(SAY_AGGRO, m_creature);
 
@@ -451,10 +451,10 @@ struct boss_nefarianAI : ScriptedAI
 
             for (auto itr = GOListe.begin(); itr != GOListe.end(); ++itr)
             {
-                m_creature->SummonCreature(NPC_BONE_CONSTRUCT, 
-                    (*itr)->GetPositionX(), 
-                    (*itr)->GetPositionY(), 
-                    (*itr)->GetPositionZ(), 
+                m_creature->SummonCreature(NPC_BONE_CONSTRUCT,
+                    (*itr)->GetPositionX(),
+                    (*itr)->GetPositionY(),
+                    (*itr)->GetPositionZ(),
                     (*itr)->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10000);
                 (*itr)->DeleteLater();
             }
@@ -510,7 +510,7 @@ struct npc_corrupted_totemAI : ScriptedAI
         if (!m_creature->HasAura(SPELL_ROOT_SELF))
             m_creature->AddAura(SPELL_ROOT_SELF);
 
-        m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance : pas touché par les AOE
+        m_creature->AddAura(23198, ADD_AURA_PERMANENT); // Avoidance: not affected by AoE
         m_uiCheckTimer = 1000;
     }
 
@@ -635,7 +635,7 @@ struct npc_corrupted_totemAI : ScriptedAI
 
         if (m_uiCheckTimer < uiDiff)
         {
-            m_uiCheckTimer = 1000; // ajouter immune AOE + fear
+            m_uiCheckTimer = 1000; // Add immune to AoE + fear
             SetAura(true, addAuraEntry);    // Stoneskin -30 dmg really ???
         }
         else

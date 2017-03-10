@@ -47,7 +47,7 @@ enum
     SPELL_FROST_BURN            = 23187,                    // Frost burn 23187, 23189
 
     // Brood Affliction 23173 - Scripted Spell that cycles through all targets within 100 yards and has a chance to cast one of the afflictions on them
-    // Since Scripted spells arn't coded I'll just write a function that does the same thing
+    // Since Scripted spells aren't coded I'll just write a function that does the same thing
     SPELL_BROODAF_BLUE          = 23153,                    // Blue affliction 23153
     SPELL_BROODAF_BLACK         = 23154,                    // Black affliction 23154
     SPELL_BROODAF_RED           = 23155,                    // Red affliction 23155 (23168 on death)
@@ -143,7 +143,7 @@ struct boss_chromaggusAI : public ScriptedAI
 
         if (GameObject* pGO = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_DOOR_CHROMAGGUS_SIDE)))
         {
-            if (pGO->GetGoState() == GO_STATE_ACTIVE) // Porte OUVERTE
+            if (pGO->GetGoState() == GO_STATE_ACTIVE) // Door open
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             else
                 m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
@@ -230,10 +230,10 @@ struct boss_chromaggusAI : public ScriptedAI
         {
             if (GameObject* pGO = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_DOOR_CHROMAGGUS_SIDE)))
             {
-                if (pGO->GetGoState() == GO_STATE_ACTIVE) // Porte OUVERTE
+                if (pGO->GetGoState() == GO_STATE_ACTIVE) // Door open
                 {
                     if (m_uiMovetoLeverTimer < uiDiff)
-                    { 
+                    {
                         float x = -7484.609385f;
                         float y = -1075.678101f;
                         float z =   477.144623f;
@@ -400,7 +400,7 @@ struct boss_chromaggusAI : public ScriptedAI
         else
             m_uiAfflictionTimer -= uiDiff;
 
-        // si joueur meurt d'un coup direct ou d'un dot alors qu'il avait l'Aura SPELL_BROODAF_RED
+        // If player dies from a direct hit or dot while he had the aura SPELL_BROODAF_RED
         for (AfflictionGuids::iterator itr = m_lRedAfflictionPlayerGUID.begin(); itr != m_lRedAfflictionPlayerGUID.end();)
         {
             Player* pTarget = m_creature->GetMap()->GetPlayer(*itr);
@@ -419,7 +419,7 @@ struct boss_chromaggusAI : public ScriptedAI
             ++itr;
         }
 
-        // si joueur meurt d'un coup direct ou d'un dot alors qu'il avait l'Aura SPELL_CHROMATIC_MUT_1
+        // If player dies from a direct hit or dot while he had the aura SPELL_CHROMATIC_MUT_1
         for (AfflictionGuids::iterator itr = m_lChromaticPlayerGUID.begin(); itr != m_lChromaticPlayerGUID.end();)
         {
             if (Player* pTarget = m_creature->GetMap()->GetPlayer(*itr))

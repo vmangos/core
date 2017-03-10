@@ -73,7 +73,7 @@ enum
 #define SPAWN_X3_BIS -7623.4433f
 #define SPAWN_Y3_BIS -1094.6033f
 #define SPAWN_Z3_BIS 407.206f
-// West 
+// West
 #define SPAWN_X4_BIS -7567.9516f
 #define SPAWN_Y4_BIS -1012.5256f
 #define SPAWN_Z4_BIS 407.206f
@@ -226,12 +226,12 @@ struct boss_razorgoreAI : public ScriptedAI
             if (GameObject* pOrb = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_ORB_DOMINATION_GUID)))
                 pOrb->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         }
-        // TP au bon endroit
+        // TP to the right place
         float x, y, z, o;
         m_creature->GetRespawnCoord(x, y, z, &o);
         m_creature->NearTeleportTo(x, y, z, o);
 
-        DEBUG_RAZOR("Situation initiale");
+        DEBUG_RAZOR("Initial situation");
     }
 
     void EvadeTroops()
@@ -262,7 +262,7 @@ struct boss_razorgoreAI : public ScriptedAI
                 SituationInitiale();
             else
                 m_uiInitTimer -= uiDiff;
-            // Pas d'AI sans situation initiale.
+            // No AI without initial situation
             return;
         }
 
@@ -355,12 +355,12 @@ struct trigger_orb_of_commandAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiPopTimer = 45000; //timer confirmé par BigWigs
+        m_uiPopTimer = 45000; // Timer confirmed by BigWigs
         m_uiCheckTimer = 5000;
         m_uiRazorgorePhase = true;
         m_uiCombatStarted = false;
         m_uiPossesseurGuid.Clear();
-        DEBUG_RAZOR("Reset PNJ orbe");
+        DEBUG_RAZOR("Reset NPC orb");
     }
 
     void PhaseSwitch()
@@ -392,7 +392,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         if (GameObject* pOrb = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(DATA_ORB_DOMINATION_GUID)))
             pOrb->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
 
-        // Restaurer Razor.
+        // Restore Razorgore
         if (Creature* pRazorgore = m_creature->GetMap()->GetCreature(m_pInstance->GetData64(DATA_RAZORGORE_GUID)))
         {
             ((ScriptedAI*)pRazorgore->AI())->DoResetThreat();
@@ -401,7 +401,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
             {
                 pRazorgore->AI()->AttackStart(pPossesser);
                 pRazorgore->GetMotionMaster()->MoveChase(pPossesser);
-                pRazorgore->AddThreat(pPossesser, 1000000); // (menace infinie)
+                pRazorgore->AddThreat(pPossesser, 1000000); // Endless threat
             }
             pRazorgore->SetInCombatWithZone();
         }
@@ -423,7 +423,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
         float z_bis = 0;
         bool bSpawnTwo = false;
 
-        // Compter les mobs deja pop
+        // Counting spawned mobs
         std::list<Creature*> lDrake;
         std::list<Creature*> lOrc;
         uint32 uiType = 0;
@@ -569,7 +569,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                 }
             }
             else
-                sLog.outError("[MC/Razor] Razor introuvable (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
+                sLog.outError("[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
         }
 
         if (m_uiRazorgorePhase && m_uiCombatStarted)
@@ -586,7 +586,7 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                     if (!m_uiPossesseurGuid)
                     {
                         m_uiPossesseurGuid = pRazorgore->GetCharmerGuid();
-                        DEBUG_RAZOR("Possess by %s", pRazorgore->GetCharmerGuid().GetString().c_str());
+                        DEBUG_RAZOR("Possessed by %s", pRazorgore->GetCharmerGuid().GetString().c_str());
                         ((ScriptedAI*)pRazorgore->AI())->SetCombatMovement(false);
                         pRazorgore->GetMotionMaster()->Initialize();
                         pRazorgore->StopMoving();
@@ -636,21 +636,21 @@ struct trigger_orb_of_commandAI : public ScriptedAI
                         for (std::list<Creature*>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
                             (*itr)->getThreatManager().modifyThreatPercent(pRazorgore, -100);
 
-                        // Razorgore doit attaquer le possesseur.
+                        // Razorgore must attack the possessor
                         ((ScriptedAI*)pRazorgore->AI())->DoResetThreat();
                         ((ScriptedAI*)pRazorgore->AI())->SetCombatMovement(true);
                         pRazorgore->AI()->AttackStart(pPossesser);
                         pRazorgore->GetMotionMaster()->MoveChase(pPossesser);
-                        pRazorgore->AddThreat(pPossesser, 1000000); // (menace infinie)
+                        pRazorgore->AddThreat(pPossesser, 1000000); // Endless threat
                         pRazorgore->SetInCombatWithZone();
                         m_uiPossesseurGuid.Clear();
                     }
                     else
-                        sLog.outError("[MC/Razor] Impossible de trouver le controller (%s)", m_uiPossesseurGuid.GetString().c_str());
+                        sLog.outError("[MC/Razor] Unable to find the controller (%s)", m_uiPossesseurGuid.GetString().c_str());
                 }
             }
             else
-                sLog.outError("[MC/Razor] Razor introuvable (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
+                sLog.outError("[MC/Razor] Razorgore not found (GUID %lu)", m_pInstance->GetData64(DATA_RAZORGORE_GUID));
             if (m_uiPopTimer < uiDiff)
             {
                 for (uint8 i = 0; i < 4; ++i)

@@ -278,15 +278,15 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Add spawning mechanism
         if (m_uiAddSpawnTimer < uiDiff)
         {
-            m_creature->SummonCreature(m_uiDrakeTypeOne, 
-                aNefarianLocs[0].m_fX, 
-                aNefarianLocs[0].m_fY, 
-                aNefarianLocs[0].m_fZ, 
+            m_creature->SummonCreature(m_uiDrakeTypeOne,
+                aNefarianLocs[0].m_fX,
+                aNefarianLocs[0].m_fY,
+                aNefarianLocs[0].m_fZ,
                 5.000f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS);
-            m_creature->SummonCreature(m_uiDrakeTypeTwo, 
-                aNefarianLocs[1].m_fX, 
-                aNefarianLocs[1].m_fY, 
-                aNefarianLocs[1].m_fZ, 
+            m_creature->SummonCreature(m_uiDrakeTypeTwo,
+                aNefarianLocs[1].m_fX,
+                aNefarianLocs[1].m_fY,
+                aNefarianLocs[1].m_fZ,
                 5.000f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS);
 
             m_uiAddSpawnTimer = urand(6000, 7000);
@@ -296,15 +296,15 @@ struct boss_victor_nefariusAI : ScriptedAI
 
         if (m_uiAddChromaSpawnTimer < uiDiff)
         {
-            m_creature->SummonCreature(NPC_CHROMATIC_DRAKANOID, 
-                aNefarianLocs[0].m_fX, 
-                aNefarianLocs[0].m_fY, 
-                aNefarianLocs[0].m_fZ, 
+            m_creature->SummonCreature(NPC_CHROMATIC_DRAKANOID,
+                aNefarianLocs[0].m_fX,
+                aNefarianLocs[0].m_fY,
+                aNefarianLocs[0].m_fZ,
                 5.000f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS);
-            m_creature->SummonCreature(NPC_CHROMATIC_DRAKANOID, 
-                aNefarianLocs[1].m_fX, 
-                aNefarianLocs[1].m_fY, 
-                aNefarianLocs[1].m_fZ, 
+            m_creature->SummonCreature(NPC_CHROMATIC_DRAKANOID,
+                aNefarianLocs[1].m_fX,
+                aNefarianLocs[1].m_fY,
+                aNefarianLocs[1].m_fZ,
                 5.000f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS);
             m_uiAddChromaSpawnTimer = 35000;
         }
@@ -329,20 +329,20 @@ struct boss_victor_nefariusAI : ScriptedAI
 
             // Spawn Nefarian
             // Summon as active, to be able to work proper!
-            if (Creature* pNefarian = m_creature->SummonCreature(NPC_NEFARIAN, 
-                aNefarianLocs[2].m_fX, 
-                aNefarianLocs[2].m_fY, 
-                aNefarianLocs[2].m_fZ, 
+            if (Creature* pNefarian = m_creature->SummonCreature(NPC_NEFARIAN,
+                aNefarianLocs[2].m_fX,
+                aNefarianLocs[2].m_fY,
+                aNefarianLocs[2].m_fZ,
                 0, TEMPSUMMON_MANUAL_DESPAWN, 0, true))
             {
                 pNefarian->CastSpell(pNefarian, SPELL_HOVER, true);
                 pNefarian->SetFly(true);
             }
 
-            // 40 tués il pop
-            // 42 tués fin de pop des adds
-            // il vole puis arrivé son spawn point crie et reste en l'air
-            // 10 sec plus tard : se pose puis cast shadow flame
+            // Nefarian spawn when 40 drakes are killed
+            // Adds will stop spawning when 42 are killed
+            // He flies then arrives at his spawn point staying in the air
+            // 10 seconds later: arise and cast shadow flame
             phase2 = true;
             return;
         }
@@ -463,7 +463,7 @@ CreatureAI* GetAI_boss_victor_nefarius(Creature* creature)
 bool GossipHello_boss_victor_nefarius(Player* pPlayer, Creature* pCreature)
 {
     auto m_pInstance = static_cast<ScriptedInstance*>(pCreature->GetInstanceData());
-    
+
     if (m_pInstance && m_pInstance->GetData(TYPE_CHROMAGGUS) == DONE)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I've made no mistakes." ,GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 

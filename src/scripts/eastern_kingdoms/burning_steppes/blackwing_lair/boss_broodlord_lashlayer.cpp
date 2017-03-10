@@ -111,10 +111,10 @@ struct boss_broodlordAI : public ScriptedAI
 
         std::vector<uint32> mobsEntries;
         std::vector<uint32>::iterator entriesIt;
-        mobsEntries.push_back(12459); // Démoniste de l'aile noire
-        mobsEntries.push_back(13996); // Technicien de l'aile noire
-        mobsEntries.push_back(12457); // Lieur de sort de l'aile noire
-        mobsEntries.push_back(12461); // Surveillant Griffemort
+        mobsEntries.push_back(12459); // Blackwing Warlock
+        mobsEntries.push_back(13996); // Blackwing Technician
+        mobsEntries.push_back(12457); // Blackwing Spellbinder
+        mobsEntries.push_back(12461); // Death Talon Overseer
 
         for (entriesIt = mobsEntries.begin(); entriesIt != mobsEntries.end(); ++entriesIt)
         {
@@ -124,7 +124,7 @@ struct boss_broodlordAI : public ScriptedAI
             {
                 Creature* curr = tmpMobsList.front();
                 tmpMobsList.pop_front();
-                // Creature invoquee
+                // Creature summoned
                 /*
                 if (!curr->GetDBTableGUIDLow())
                     continue;
