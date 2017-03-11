@@ -4259,7 +4259,10 @@ void SpellMgr::LoadSpells()
         {
             SpellEntry* newSpell = new SpellEntry();
             if (!newSpell->Load(spellEntry))
+            {
+                delete newSpell;
                 continue;
+            }
             mSpellEntryMap[i] = newSpell;
         }
     }
