@@ -348,6 +348,9 @@ void DragonsOfNightmare::CheckNightmareDragonsVariables(uint32 &aliveCount, uint
 
 void DragonsOfNightmare::UpdateRespawnTimeForDeadDragons(std::vector<ObjectGuid> &dragons, time_t respawnTime)
 {
+    if (dragons.empty())
+        return;
+
     for (uint8 i = 0; i < 4; ++i)
     {
         auto cData = sObjectMgr.GetCreatureData(dragons[i].GetCounter());
