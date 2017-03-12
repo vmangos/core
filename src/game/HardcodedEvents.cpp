@@ -348,16 +348,13 @@ void DragonsOfNightmare::CheckNightmareDragonsVariables(uint32 &aliveCount, uint
 
 void DragonsOfNightmare::UpdateRespawnTimeForDeadDragons(std::vector<ObjectGuid> &dragons, time_t respawnTime)
 {
-    if (dragons.empty())
-        return;
-
-    for (uint8 i = 0; i < 4; ++i)
+    for (auto& guid : dragons)
     {
-        auto cData = sObjectMgr.GetCreatureData(dragons[i].GetCounter());
+        auto cData = sObjectMgr.GetCreatureData(guid.GetCounter());
 
         if (!cData)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature data %u not found!", dragons[i].GetCounter());
+            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature data %u not found!", guid.GetCounter());
             continue;
         }
 
@@ -372,16 +369,16 @@ void DragonsOfNightmare::UpdateRespawnTimeForDeadDragons(std::vector<ObjectGuid>
             continue;
         }
 
-        auto pCreature = map->GetCreature(dragons[i]);
+        auto pCreature = map->GetCreature(guid);
 
         if (!pCreature)
         {
-            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found!", dragons[i].GetCounter());
+            sLog.outError("GameEventMgr: [Dragons of Nightmare] creature %u not found!", guid.GetCounter());
             continue;
         }
 
         if (pCreature->isDead())
-            map->GetPersistentState()->SaveCreatureRespawnTime(dragons[i].GetCounter(), respawnTime);
+            map->GetPersistentState()->SaveCreatureRespawnTime(guid.GetCounter(), respawnTime);
     }
 }
 
