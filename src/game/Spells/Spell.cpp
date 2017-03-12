@@ -6117,21 +6117,18 @@ SpellCastResult Spell::CheckRange(bool strict)
             {
                 if (target == m_caster || IsNextMeleeSwingSpell())
                     return SPELL_CAST_OK;
-                // Nostalrius : requiert cible devant pour ces sorts !
+
+                // Requires target forward for these spells
                 if (!m_caster->HasInArc(M_PI_F, target))
                     return SPELL_FAILED_UNIT_NOT_INFRONT;
-                float range_mod = strict ? 1.25f : 6.25f;
-                // Mouvements -> desync
-                if (m_caster->IsPlayer())
-                    if (m_caster->IsMoving())
-                        range_mod += 1.5f;
-                if (target->IsPlayer())
-                    if (target->IsMoving())
-                        range_mod += 1.5f;
 
-                float base = ATTACK_DISTANCE;
+                float range_mod = 1.0f;
+
                 if (Player* modOwner = m_caster->GetSpellModOwner())
+                {
+                    float base = ATTACK_DISTANCE;
                     range_mod += modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_RANGE, base, this);
+                }
 
                 // with additional 5 dist for non stricted case (some melee spells have delay in apply
                 return m_caster->CanReachWithMeleeSpellAttack(target, range_mod) ? SPELL_CAST_OK : SPELL_FAILED_OUT_OF_RANGE;

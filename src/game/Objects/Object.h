@@ -172,12 +172,16 @@ enum MovementFlags
     MOVEFLAG_HOVER              = 0x40000000,
     MOVEFLAG_INTERNAL           = 0x80000000,
 
-    // Nostalrius : ne peut etre present avec MOVEFLAG_ROOT (freez client sinon)
+    // Can not be present with MOVEFLAG_ROOT (otherwise client freeze)
     MOVEFLAG_MASK_MOVING        =
         MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT |
         MOVEFLAG_PITCH_UP | MOVEFLAG_PITCH_DOWN | MOVEFLAG_JUMPING | MOVEFLAG_FALLINGFAR |
         MOVEFLAG_SPLINE_ELEVATION,
     MOVEFLAG_MASK_MOVING_OR_TURN= MOVEFLAG_MASK_MOVING | MOVEFLAG_TURN_LEFT | MOVEFLAG_TURN_RIGHT,
+
+    // MovementFlags mask that only contains flags for x/z translations
+    // this is to avoid that a jumping character that stands still triggers melee-leeway
+    MOVEFLAG_MASK_XZ = MOVEFLAG_FORWARD | MOVEFLAG_BACKWARD | MOVEFLAG_STRAFE_LEFT | MOVEFLAG_STRAFE_RIGHT
 };
 
 // used in SMSG_MONSTER_MOVE
@@ -784,10 +788,11 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         uint32 GetUnitMovementFlags() const { return m_movementInfo.moveFlags; }
         void SetUnitMovementFlags(uint32 f) { m_movementInfo.moveFlags = f; }
 
-        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING);}
-        bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING);}
-        bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE);}
-        bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING);}
+        bool IsLevitating() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_LEVITATING); }
+        bool IsFlying() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_FLYING); }
+        bool IsWalking() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_WALK_MODE); }
+        bool IsMoving() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING); }
+        bool IsSwimming() const { return m_movementInfo.HasMovementFlag(MOVEFLAG_SWIMMING); }
 
         MovementInfo m_movementInfo;
         Transport * m_transport;

@@ -7699,6 +7699,32 @@ float Unit::GetSpeed(UnitMoveType mtype) const
     return m_speed_rate[mtype] * baseMoveSpeed[mtype];
 }
 
+float Unit::GetXZFlagBasedSpeed(const Unit *unit) const
+{
+    if (!unit->HasUnitMovementFlag(MOVEFLAG_MASK_XZ))
+        return 0.0f;
+
+    if (unit->IsSwimming())
+    {
+        if (unit->HasUnitMovementFlag(MOVEFLAG_BACKWARD)) 
+            return unit->GetSpeed(MOVE_SWIM_BACK);
+
+        return unit->GetSpeed(MOVE_SWIM);
+    }
+
+    if (unit->IsWalking())
+    {
+        // Seems to always be same speed forward and backward when walking
+        return unit->GetSpeed(MOVE_WALK);
+    }
+
+    // Presumably only running left when IsMoving is true
+    if (unit->HasUnitMovementFlag(MOVEFLAG_BACKWARD)) 
+        return unit->GetSpeed(MOVE_RUN_BACK);
+
+    return unit->GetSpeed(MOVE_RUN);
+}
+
 struct SetSpeedRateHelper
 {
     explicit SetSpeedRateHelper(UnitMoveType _mtype, bool _forced) : mtype(_mtype), forced(_forced) {}
@@ -10405,20 +10431,30 @@ float Unit::GetCombatReach(bool forMeleeRange /*=true*/) const
 
 float Unit::GetCombatReach(Unit const* pVictim, bool forMeleeRange /*=true*/, float flat_mod /*=0.0f*/) const
 {
-	float victimReach = (pVictim && pVictim->IsInWorld())
-		? pVictim->GetCombatReach(forMeleeRange)
-		: 0.0f;
+    float victimReach = (pVictim && pVictim->IsInWorld())
+        ? pVictim->GetCombatReach(forMeleeRange)
+        : 0.0f;
 
-	float reach = GetCombatReach(forMeleeRange) + victimReach + flat_mod;
+    float reach = GetCombatReach(forMeleeRange) + victimReach + flat_mod;
 
-	if (forMeleeRange)
-	{
-		reach += BASE_MELEERANGE_OFFSET;
-		if (reach < ATTACK_DISTANCE)
-			reach = ATTACK_DISTANCE;
-	}
+    if (forMeleeRange)
+    {
+        reach += BASE_MELEERANGE_OFFSET;
+        if (reach < ATTACK_DISTANCE)
+            reach = ATTACK_DISTANCE;
+    }
+    
+    // Melee leeway mechanic.
+    // When both player and target has > 70% of normal runspeed, and are moving,
+    // the player gains an additional 2.5yd of melee range.
+    if (IsPlayer()) 
+    {
+        static const float leewayMinSpeed = 4.97f;
+        if (GetXZFlagBasedSpeed(this) > leewayMinSpeed && GetXZFlagBasedSpeed(pVictim) > leewayMinSpeed) 
+            reach += 2.5f;
+    }
 
-	return reach;
+    return reach;
 }
 
 bool Unit::CanReachWithMeleeAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const

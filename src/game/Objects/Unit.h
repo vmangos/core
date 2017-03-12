@@ -1718,8 +1718,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
 
         void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
-        float GetSpeed( UnitMoveType mtype ) const;
-        float GetSpeedRate( UnitMoveType mtype ) const { return m_speed_rate[mtype]; }
+        float GetSpeed(UnitMoveType mtype) const;
+        float GetXZFlagBasedSpeed(const Unit *unit) const;
+        float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
         void SetSpeedRate(UnitMoveType mtype, float rate, bool forced = false);
 
         void SetHover(bool on);
