@@ -127,7 +127,7 @@ struct cthunAI : public ScriptedAI
         FleshTentaclesKilled = 0;
         GiantClawTentacleTimer = 0;
         GiantEyeTentacleTimer = 30000;
-        StomachAcidTimer = 4000;
+        StomachAcidTimer = 5000;
         StomachEnterTimer = 5000;
         StomachEnterVisTimer = 0;
         StomachEnterTarget = 0;
