@@ -123,7 +123,7 @@ struct cthunAI : public ScriptedAI
         HoldPlayer = 0;
         EjectorTimer = 5000;
         EjectorCast = 3000;
-        EyeTentacleTimer = 20000;
+        EyeTentacleTimer = 30000;
         FleshTentaclesKilled = 0;
         GiantClawTentacleTimer = 0;
         GiantEyeTentacleTimer = 30000;
