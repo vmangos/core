@@ -212,6 +212,21 @@ struct cthunAI : public ScriptedAI
         }
     }
 
+    void SpawnFleshTentacles() {
+        //Spawn 2 flesh tentacles in C'thun stomach
+        FleshTentaclesKilled = 0;
+
+        //Spawn flesh tentacle
+        Creature* pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS1_X, TENTACLE_POS1_Y, TENTACLE_POS1_Z, TENTACLE_POS1_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        if (!pSpawned)
+            ++FleshTentaclesKilled;
+
+        //Spawn flesh tentacle
+        pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS2_X, TENTACLE_POS2_Y, TENTACLE_POS2_Z, TENTACLE_POS2_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
+        if (!pSpawned)
+            ++FleshTentaclesKilled;
+    }
+
     void EndWeaknessPhase()
     {
         // Reset these cooldowns
@@ -228,25 +243,7 @@ struct cthunAI : public ScriptedAI
         m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
         m_creature->SetVisibility(VISIBILITY_ON);
 
-        //Spawn 2 flesh tentacles
-        FleshTentaclesKilled = 0;
-
-        //Spawn flesh tentacle
-        Creature* pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS1_X, TENTACLE_POS1_Y, TENTACLE_POS1_Z, TENTACLE_POS1_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
-
-        if (!pSpawned)
-            ++FleshTentaclesKilled;
-
-        //Spawn flesh tentacle
-        pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS2_X, TENTACLE_POS2_Y, TENTACLE_POS2_Z, TENTACLE_POS2_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
-
-        if (!pSpawned)
-            ++FleshTentaclesKilled;
-    }
-
-    void BeginEmergePhase()
-    {
-        AnimTimer = 5000;
+        SpawnFleshTentacles();
     }
 
     void DoSpells(uint32 diff)
@@ -578,19 +575,7 @@ struct cthunAI : public ScriptedAI
         //Emerging phase
         m_creature->SetInCombatWithZone();
 
-        FleshTentaclesKilled = 0;
-
-        //Spawn flesh tentacle
-        Creature* pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS1_X, TENTACLE_POS1_Y, TENTACLE_POS1_Z, TENTACLE_POS1_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
-
-        if (!pSpawned)
-            ++FleshTentaclesKilled;
-
-        // Spawn flesh tentacle
-        pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS2_X, TENTACLE_POS2_Y, TENTACLE_POS2_Z, TENTACLE_POS2_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
-
-        if (!pSpawned)
-            ++FleshTentaclesKilled;
+        SpawnFleshTentacles();
     }
 
     void JustDied(Unit* pKiller)
