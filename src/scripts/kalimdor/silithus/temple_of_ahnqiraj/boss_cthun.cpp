@@ -115,30 +115,39 @@ struct cthunAI : public ScriptedAI
     uint64 StomachEnterTarget;
     uint64 HoldPlayer;
 
-    int32 AnimTimer;
+    int32 EyeDeathAnimTimer;
     int32 EjectorTimer;
     int32 EjectorCast;
-    int32 PhaseTimer;
+    int32 CthunEmergeTimer;
 
     std::vector<uint64> m_FleshTentGUIDs;
+
+    enum PhaseTransitionState {
+        EYE_DYING,
+        CTHUN_EMERGING,
+        TRANSITION_FINISHED
+    };
+    PhaseTransitionState transitionState;
 
     void Reset()
     {
         WisperTimer = 90000; // One random wisper every 90 - 300 seconds
 
-        AnimTimer = 0;
-        PhaseTimer = 0;
+        EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
+        CthunEmergeTimer = 8000;
         HoldPlayer = 0;
         EjectorTimer = 5000;
         EjectorCast = 3000;
         EyeTentacleTimer = 30000;
         FleshTentaclesKilled = 0;
         GiantClawTentacleTimer = 0;
-        GiantEyeTentacleTimer = 30000;
-        StomachAcidTimer = 5000;
+        GiantEyeTentacleTimer = 30000;	// 30 seconds after initial GiantClawTentacleTimer
+        StomachAcidTimer = 5000; // stomach debuff stacks every 5 seconds
         StomachEnterTimer = 5000;
         StomachEnterVisTimer = 0;
         StomachEnterTarget = 0;
+
+        transitionState = EYE_DYING;
 
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
@@ -299,7 +308,7 @@ struct cthunAI : public ScriptedAI
         if (StomachAcidTimer < diff)
         {
             DebuffStomachPlayers();
-            StomachAcidTimer = 4000;
+            StomachAcidTimer = 5000;
         }
         else
             StomachAcidTimer -= diff;
@@ -538,32 +547,34 @@ struct cthunAI : public ScriptedAI
 
     bool TransitionLogic(uint32 diff)
     {
+        // This function should return false for ~12 seconds
+        // 4 seconds of eye death animation
+        // 1 second overlap between final eye death animation and start of c'thun emerge animation
+        // 7 more seconds of c'thun emerge animation/idling before the phase starts
+
         int32 SignedDiff = diff;
-        if (AnimTimer > SignedDiff)
-        {
-            AnimTimer -= SignedDiff;
 
-            if (AnimTimer <= SignedDiff)
-                PhaseTimer = 10000;
+        if (transitionState == PhaseTransitionState::EYE_DYING) {
+            EyeDeathAnimTimer -= SignedDiff;
 
-            if (AnimTimer < 1000)
-            {
+            if (EyeDeathAnimTimer < SignedDiff) {
+                CthunEmergeTimer = 8000;
                 m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
                 m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                transitionState = PhaseTransitionState::CTHUN_EMERGING;
             }
-
             return true;
         }
-
-        if (PhaseTimer > SignedDiff)
-        {
-            PhaseTimer -= SignedDiff;
-            if (PhaseTimer <= SignedDiff)
+        else if (transitionState == PhaseTransitionState::CTHUN_EMERGING) {
+            CthunEmergeTimer -= SignedDiff;
+            if (CthunEmergeTimer < SignedDiff) {
                 Emerge();
-
+                transitionState = PhaseTransitionState::TRANSITION_FINISHED;
+            }
             return true;
         }
 
+        // transitionState == PhaseTransitionState::TRANSITION_FINISHED
         return false;
     }
 
@@ -915,7 +926,6 @@ struct eye_of_cthunAI : public ScriptedAI
         Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
         if (b_Cthun)
         {
-            ((cthunAI*)(b_Cthun->AI()))->BeginEmergePhase();
             m_pInstance->SetData(TYPE_CTHUN_PHASE, 2);
         }
     }
