@@ -588,6 +588,30 @@ bool ChatHandler::HandleGonameCommand(char* args)
     return true;
 }
 
+// Teleport to player corpse
+// NOTE: If the corpse is in a dungeon / BG you will teleport to the right place
+// but you will not be able to see the corpse if you are not in the player's group
+bool ChatHandler::HandleGocorpseCommand(char* args)
+{
+    ObjectGuid target_guid;
+    if (!ExtractPlayerTarget(&args, NULL, &target_guid, NULL))
+        return false;
+
+    Corpse* corpse = sObjectAccessor.GetCorpseForPlayerGUID(target_guid);
+    if (!corpse)
+    {
+        PSendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    float x = corpse->GetPositionX();
+    float y = corpse->GetPositionY();
+    float z = corpse->GetPositionZ();
+
+    return HandleGoHelper(m_session->GetPlayer(), corpse->GetMapId(), x, y, &z, NULL);
+}
+
 // Teleport player to last position
 bool ChatHandler::HandleRecallCommand(char* args)
 {

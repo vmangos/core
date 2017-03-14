@@ -714,6 +714,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNamegoCommand(char* args);
         bool HandleGonameCommand(char* args);
         bool HandleGroupgoCommand(char* args);
+        bool HandleGocorpseCommand(char* args);
         bool HandleRecallCommand(char* args);
         bool HandleAnnounceCommand(char* args);
         bool HandleNotifyCommand(char* args);
