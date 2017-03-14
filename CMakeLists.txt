@@ -160,7 +160,7 @@ if(NOT USE_STD_MALLOC)
   find_package(TBB COMPONENTS tbbmalloc)
   if(NOT TBB_FOUND)
     message(FATAL_ERROR
-      "This project requires TBB installed. Please download the TBB Stable Release from http://www.threadingbuildingblocks.org/ and install it. If this script didn't find TBB and it was correctly installed please set TBB_ROOT to the correct path."
+      "This project requires TBB installed. Please download the TBB Stable Release from http://www.threadingbuildingblocks.org/ and install it. If this script didn't find TBB and it was correctly installed please set TBB_ROOT_DIR to the correct path."
     )
   endif()
   
