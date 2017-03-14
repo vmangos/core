@@ -77,6 +77,14 @@
 #define KICK_Y                              1989.3f
 #define KICK_Z                              -96.0f
 
+bool UnitInStomach(Unit *unit)
+{
+    if (unit->GetPositionZ() < -30.0f)
+        return true;
+
+    return false;
+}
+
 struct cthunAI : public ScriptedAI
 {
     cthunAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -467,14 +475,6 @@ struct cthunAI : public ScriptedAI
             Spawned->SetInCombatWithZone();
             Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
         }
-    }
-
-    bool UnitInStomach(Unit *unit)
-    {
-        if (unit->GetPositionZ() < -30.0f)
-            return true;
-
-        return false;
     }
 
     Unit* SelectRandomNotStomach()
@@ -1319,12 +1319,14 @@ struct giant_eye_tentacleAI : public ScriptedAI
         {
             Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
-            if (target && !target->HasAura(SPELL_DIGESTIVE_ACID, EFFECT_INDEX_0))
+            if (target && !UnitInStomach(target))
             {
-                if (DoCastSpellIfCan(target, SPELL_GREEN_BEAM) != CAST_OK)
+                if (DoCastSpellIfCan(target, SPELL_GREEN_BEAM) != CAST_OK) {
                     DoResetThreat();
-                else
+                }
+                else {
                     BeamTimer = 2100;
+                }
             }
         }
         else
