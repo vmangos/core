@@ -388,7 +388,7 @@ struct cthunAI : public ScriptedAI
         EjectorCast = 5000;
         // Start cast visual
         if (Creature *pCreature = m_creature->SummonCreature(7444, KICK_X, KICK_Y,
-                                  KICK_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
+            KICK_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
         {
             pCreature->SetFactionTemporary(35);
             pCreature->SetDisplayId(11686);
@@ -499,7 +499,7 @@ struct cthunAI : public ScriptedAI
 
         //Get random but only if we have more than one unit on threat list
         if (temp.size() > 1)
-            advance(j , rand() % (temp.size() - 1));
+            advance(j, rand() % (temp.size() - 1));
 
         return (*j);
     }
@@ -880,7 +880,7 @@ struct eye_of_cthunAI : public ScriptedAI
                 if (abs(pPlayer->GetPositionZ() - 100.0f) < 10.0f) // If we're at the same Z axis of cthun
                 {
                     if (pPlayer->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f || // Anyone is near my door
-                            pPlayer->GetDistance(m_creature) < 50.0f) // If anyone is within 50 units of me
+                        pPlayer->GetDistance(m_creature) < 50.0f) // If anyone is within 50 units of me
                     {
                         m_creature->SetFactionTemporary(14);
                         m_creature->SetInCombatWithZone();
