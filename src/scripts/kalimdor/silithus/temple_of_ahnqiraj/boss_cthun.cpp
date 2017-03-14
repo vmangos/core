@@ -495,7 +495,7 @@ struct cthunAI : public ScriptedAI
             {
                 if (Player* player = itr->getSource())
                 {
-                    if (!UnitInStomach(player) && !player->isGameMaster() && !player->HasMovementFlag(MOVEFLAG_JUMPING) && !player->isDead())
+                    if (!UnitInStomach(player) && !player->isGameMaster() && !player->isDead())
                         temp.push_back(player);
                 }
             }
