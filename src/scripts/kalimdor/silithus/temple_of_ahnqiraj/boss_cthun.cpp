@@ -646,6 +646,7 @@ struct eye_of_cthunAI : public ScriptedAI
     uint32 DarkGlareTickTimer;
     float DarkGlareAngle;
     bool ClockWise;
+    bool IsAlreadyPulled;
 
     void Reset()
     {
@@ -662,6 +663,7 @@ struct eye_of_cthunAI : public ScriptedAI
         DarkGlareTickTimer = 1000;
         DarkGlareAngle = 0;
         ClockWise = false;
+        IsAlreadyPulled = false;
 
         //Reset flags
         m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
@@ -682,7 +684,7 @@ struct eye_of_cthunAI : public ScriptedAI
             return;
 
         //Check if we have a target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!IsAlreadyPulled)
         {
             AggroRadius();
             return;
@@ -878,6 +880,8 @@ struct eye_of_cthunAI : public ScriptedAI
 
     void AggroRadius()
     {
+        if (IsAlreadyPulled) return;
+
         if (m_creature->getFaction() != 7 && !m_creature->isInCombat())
             m_creature->setFaction(7); // This prevents strange, uncontrolled aggro's through the walls
 
@@ -913,6 +917,7 @@ struct eye_of_cthunAI : public ScriptedAI
                             b_Portal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                             b_Portal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         }
+                        IsAlreadyPulled = true;
                         return;
                     }
                 }
