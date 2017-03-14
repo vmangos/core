@@ -2038,6 +2038,34 @@ bool ChatHandler::HandleGoXYZCommand(char* args)
     return HandleGoHelper(_player, mapid, x, y, &z);
 }
 
+//teleport at coordinates, including Z and orientation
+bool ChatHandler::HandleGoXYZOCommand(char* args)
+{
+    Player* _player = m_session->GetPlayer();
+
+    float x;
+    if (!ExtractFloat(&args, x))
+        return false;
+
+    float y;
+    if (!ExtractFloat(&args, y))
+        return false;
+
+    float z;
+    if (!ExtractFloat(&args, z))
+        return false;
+
+    float ort;
+    if (!ExtractFloat(&args, ort))
+        return false;
+
+    uint32 mapid;
+    if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+        return false;
+
+    return HandleGoHelper(_player, mapid, x, y, &z, &ort);
+}
+
 //teleport at coordinates
 bool ChatHandler::HandleGoZoneXYCommand(char* args)
 {
