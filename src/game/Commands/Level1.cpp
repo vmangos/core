@@ -1,6 +1,8 @@
 /*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+ * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+ * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -586,6 +588,30 @@ bool ChatHandler::HandleGonameCommand(char* args)
     }
 
     return true;
+}
+
+// Teleport to player corpse
+// NOTE: If the corpse is in a dungeon / BG you will teleport to the right place
+// but you will not be able to see the corpse if you are not in the player's group
+bool ChatHandler::HandleGocorpseCommand(char* args)
+{
+    ObjectGuid target_guid;
+    if (!ExtractPlayerTarget(&args, NULL, &target_guid, NULL))
+        return false;
+
+    Corpse* corpse = sObjectAccessor.GetCorpseForPlayerGUID(target_guid);
+    if (!corpse)
+    {
+        PSendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    float x = corpse->GetPositionX();
+    float y = corpse->GetPositionY();
+    float z = corpse->GetPositionZ();
+
+    return HandleGoHelper(m_session->GetPlayer(), corpse->GetMapId(), x, y, &z, NULL);
 }
 
 // Teleport player to last position
@@ -2012,6 +2038,34 @@ bool ChatHandler::HandleGoXYZCommand(char* args)
         return false;
 
     return HandleGoHelper(_player, mapid, x, y, &z);
+}
+
+//teleport at coordinates, including Z and orientation
+bool ChatHandler::HandleGoXYZOCommand(char* args)
+{
+    Player* _player = m_session->GetPlayer();
+
+    float x;
+    if (!ExtractFloat(&args, x))
+        return false;
+
+    float y;
+    if (!ExtractFloat(&args, y))
+        return false;
+
+    float z;
+    if (!ExtractFloat(&args, z))
+        return false;
+
+    float ort;
+    if (!ExtractFloat(&args, ort))
+        return false;
+
+    uint32 mapid;
+    if (!ExtractOptUInt32(&args, mapid, _player->GetMapId()))
+        return false;
+
+    return HandleGoHelper(_player, mapid, x, y, &z, &ort);
 }
 
 //teleport at coordinates
