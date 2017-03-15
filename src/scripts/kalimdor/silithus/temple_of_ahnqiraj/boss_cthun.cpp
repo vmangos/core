@@ -97,6 +97,7 @@ struct cthunAI : public ScriptedAI
             sLog.outError("SD0: No Instance eye_of_cthunAI");
 
         Reset();
+        DoSpawnCreature(MOB_CTHUN_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
     ScriptedInstance* m_pInstance;
@@ -156,6 +157,7 @@ struct cthunAI : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
+            m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
             Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
             if (b_Eye)
                 b_Eye->Respawn();
@@ -593,7 +595,10 @@ struct cthunAI : public ScriptedAI
     {
         //Switch
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, DONE);
+            m_pInstance->SetData(TYPE_CTHUN, DONE);
+        }
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage)
@@ -670,7 +675,10 @@ struct eye_of_cthunAI : public ScriptedAI
 
         //Reset Phase
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
+            m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+        }
 
         m_creature->SetVisibility(VISIBILITY_OFF);
         m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
@@ -705,18 +713,25 @@ struct eye_of_cthunAI : public ScriptedAI
         {
             if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
-                m_creature->InterruptNonMeleeSpells(false);
-                DoCastSpellIfCan(target, SPELL_GREEN_BEAM);
+                float mx, my, mz;
+                float tx, ty, tz;
+                target->GetPosition(tx, ty, tz);
+                m_creature->GetPosition(mx, my, mz);
+                if (m_creature->GetMap()->isInLineOfSight(mx, my, mz, tx, ty, tz))
+                {
+                    m_creature->InterruptNonMeleeSpells(false);
+                    DoCastSpellIfCan(target, SPELL_GREEN_BEAM);
 
-                //Correctly update our target
-                m_creature->SetTargetGuid(target->GetObjectGuid());
+                    //Correctly update our target
+                    m_creature->SetTargetGuid(target->GetObjectGuid());
 
-                if (m_creature->HasAura(16245))
-                    m_creature->RemoveAurasDueToSpell(16245);
+                    if (m_creature->HasAura(16245))
+                        m_creature->RemoveAurasDueToSpell(16245);
+
+                    //Beam every 3 seconds
+                    BeamTimer = 3000;
+                }
             }
-
-            //Beam every 3 seconds
-            BeamTimer = 3000;
         }
         else
             BeamTimer -= diff;
@@ -727,6 +742,7 @@ struct eye_of_cthunAI : public ScriptedAI
         else
             PhaseTimer -= diff;
     }
+
 
     void TentacleTimers(uint32 diff)
     {
@@ -1473,4 +1489,3 @@ void AddSC_boss_cthun()
     newscript->GetAI = &GetAI_flesh_tentacle;
     newscript->RegisterSelf();
 }
-
