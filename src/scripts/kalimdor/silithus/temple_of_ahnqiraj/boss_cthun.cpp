@@ -1160,7 +1160,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         HamstringTimer = 1000;
         EvadeTimer = 5000;
         GroundStunTimer = urand(6000, 12000);
-
+        ThrashTimer = urand(6000, 12000);
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
 
@@ -1263,14 +1263,16 @@ struct giant_claw_tentacleAI : public ScriptedAI
 
         if (ThrashTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THRASH) == CAST_OK)
-                HamstringTimer = urand(6000, 12000);
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THRASH) == CAST_OK) {
+                ThrashTimer = urand(6000, 12000);
+            }
         }
         else
             ThrashTimer -= diff;
 
-        if (GroundRuptureTimer > 500 && GroundRuptureTimer < 3000000 - 1000)
+        if (GroundRuptureTimer > 500 && GroundRuptureTimer < 3000000 - 1000) {
             DoMeleeAttackIfReady();
+        }
     }
 };
 
