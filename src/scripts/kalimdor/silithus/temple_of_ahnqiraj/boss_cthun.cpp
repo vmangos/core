@@ -77,14 +77,6 @@
 #define KICK_Y                              1989.3f
 #define KICK_Z                              -96.0f
 
-bool UnitInStomach(Unit *unit)
-{
-    if (unit->GetPositionZ() < -30.0f)
-        return true;
-
-    return false;
-}
-
 struct cthunAI : public ScriptedAI
 {
     cthunAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -122,6 +114,8 @@ struct cthunAI : public ScriptedAI
 
     std::vector<uint64> m_FleshTentGUIDs;
 
+    std::vector<std::pair<Player*,int32>> playersInStomach;
+
     enum PhaseTransitionState {
         EYE_DYING,
         CTHUN_EMERGING,
@@ -152,6 +146,8 @@ struct cthunAI : public ScriptedAI
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
         m_creature->SetVisibility(VISIBILITY_ON);
+        
+        playersInStomach.clear();
 
         if (m_pInstance)
         {
@@ -173,7 +169,7 @@ struct cthunAI : public ScriptedAI
         if (TransitionLogic(diff))
             return;
 
-        StomachEjector(diff);
+        UpdatePlayersInStomach(diff);
 
         // Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -186,8 +182,9 @@ struct cthunAI : public ScriptedAI
             m_creature->SetTargetGuid(m_creature->GetObjectGuid());
 
         // Body phase or weakend
-        if (!m_creature->HasAura(SPELL_PURPLE_COLORATION))
+        if (!m_creature->HasAura(SPELL_PURPLE_COLORATION)) {
             DoSpells(diff);
+        }
         else
         {
             if (WeaknessTimer < diff) // If weakend runs out
@@ -200,6 +197,15 @@ struct cthunAI : public ScriptedAI
         }
     }
 
+    bool PlayerInStomach(Unit *unit)
+    {
+        auto it = std::find_if(playersInStomach.begin(), playersInStomach.end(),
+            [unit](const std::pair<Player*,int32>& e) {
+                return e.first == unit;
+            });
+
+        return it != playersInStomach.end();
+    }
     void JustSummoned(Creature *pCreature)
     {
         if (pCreature->GetEntry() == MOB_FLESH_TENTACLE)
@@ -270,7 +276,7 @@ struct cthunAI : public ScriptedAI
         //Stomach Enter Timer
         if (StomachEnterTimer < diff)
         {
-            if (Unit* target = SelectRandomNotStomach())
+            if (Player* target = SelectRandomNotStomach())
             {
                 // Set target in stomach
                 target->InterruptNonMeleeSpells(false);
@@ -288,10 +294,13 @@ struct cthunAI : public ScriptedAI
         {
             if (StomachEnterVisTimer <= diff)
             {
-                if (Unit* pUnit = m_creature->GetMap()->GetUnit(StomachEnterTarget))
+                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTarget))
                 {
-                    DoTeleportPlayer(pUnit, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
-                    pUnit->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
+                    DoTeleportPlayer(pPlayer, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
+                    pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
+                    
+                    playersInStomach.push_back(std::make_pair(pPlayer, 5000));
+                    m_creature->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID, true);
                 }
 
                 StomachEnterTarget = 0;
@@ -302,17 +311,10 @@ struct cthunAI : public ScriptedAI
         }
     }
 
+    
+
     void TentacleTimers(uint32 diff)
     {
-        // Stomach acid
-        if (StomachAcidTimer < diff)
-        {
-            DebuffStomachPlayers();
-            StomachAcidTimer = 5000;
-        }
-        else
-            StomachAcidTimer -= diff;
-
         // GientClawTentacleTimer
         if (GiantClawTentacleTimer < diff)
         {
@@ -368,6 +370,23 @@ struct cthunAI : public ScriptedAI
             EyeTentacleTimer -= diff;
     }
 
+    void UpdatePlayersInStomach(uint32 diff)
+    {
+        int32 sDiff = static_cast<int32>(diff);
+        //updating Digestive Acid debuff
+        for (auto it = playersInStomach.begin(); it != playersInStomach.end(); it++) {
+            it->second -= sDiff;
+            if (it->second < sDiff) {
+                m_creature->CastSpell(it->first, SPELL_DIGESTIVE_ACID, true);
+                it->second += 5000;
+            }
+        }
+
+        StomachEjector(diff);
+
+        EjectStomachIfShould();
+    }
+
     void StomachEjector(uint32 diff)
     {
         int SignedDiff = static_cast <int> (diff);
@@ -409,67 +428,36 @@ struct cthunAI : public ScriptedAI
 
     void TriggerStomachEjector()
     {
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty())
-        {
-            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
+            if (it->first->GetDistance(KICK_X, KICK_Y, KICK_Z) < 5.0f)
             {
-                if (Player* player = itr->getSource())
-                {
-                    if (UnitInStomach(player))
-                    {
-                        if (player->GetDistance(KICK_X, KICK_Y, KICK_Z) < 5.0f)
-                        {
-                            player->CastSpell(player, SPELL_PUNT_UPWARD, true);
-                            player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
-                        }
-                    }
-                }
+                it->first->CastSpell(it->first, SPELL_PUNT_UPWARD, true);
+                it->first->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
             }
         }
     }
 
     void EjectStomachIfShould()
     {
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty())
-        {
-            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        //todo: should dead players be ported out of stomach?
+        for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
+            // If we're at the top of the stomach and have jumping state
+            if (it->first->GetPositionZ() > -40.0f && it->first->HasMovementFlag(MOVEFLAG_JUMPING))
             {
-                if (Player* player = itr->getSource())
-                {
-                    if (player->GetPositionZ() < -35.0f)
-                    {
-                        // If we're at the top of the stomach and have falling state
-                        if (player->GetPositionZ() > -40.0f && player->HasMovementFlag(MOVEFLAG_JUMPING))
-                        {
-                            //Teleport player out
-                            DoTeleportPlayer(player, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, player->GetOrientation());
+                //Teleport player out
+                DoTeleportPlayer(it->first, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, it->first->GetOrientation());
 
-                            //Cast knockback on them
-                            player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
+                //Cast knockback on them
+                it->first->CastSpell(it->first, SPELL_EXIT_STOMACH_KNOCKBACK, true);
 
-                            //Remove the acid debuff
-                            player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                        }
-                    }
-                }
+                //Remove the acid debuff
+                it->first->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                
+                //Remove player from stomach list
+                it = playersInStomach.erase(it);
             }
-        }
-    }
-
-    void DebuffStomachPlayers()
-    {
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty())
-        {
-            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-            {
-                if (Player* player = itr->getSource())
-                {
-                    if (UnitInStomach(player))
-                        player->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
-                }
+            else {
+                ++it;
             }
         }
     }
@@ -483,10 +471,10 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    Unit* SelectRandomNotStomach()
+    Player* SelectRandomNotStomach()
     {
-        std::list<Unit*> temp;
-        std::list<Unit*>::iterator j;
+        std::list<Player*> temp;
+        std::list<Player*>::iterator j;
 
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
         if (!PlayerList.isEmpty())
@@ -495,7 +483,7 @@ struct cthunAI : public ScriptedAI
             {
                 if (Player* player = itr->getSource())
                 {
-                    if (!UnitInStomach(player) && !player->isGameMaster() && !player->isDead())
+                    if (!PlayerInStomach(player) && !player->isGameMaster() && !player->isDead())
                         temp.push_back(player);
                 }
             }
@@ -1321,7 +1309,9 @@ struct giant_eye_tentacleAI : public ScriptedAI
         {
             Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
 
-            if (target && !UnitInStomach(target))
+            //hacky check to not target players in stomach.
+            //todo: access c'thuns AI script instance and call PlayerInStomach()
+            if (target && target->GetPositionZ() > -30)
             {
                 if (DoCastSpellIfCan(target, SPELL_GREEN_BEAM) != CAST_OK) {
                     DoResetThreat();
