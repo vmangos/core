@@ -56,7 +56,7 @@ int WorldSocket::ProcessIncoming(WorldPacket* new_pct)
     new_pct->FillPacketTime(WorldTimer::getMSTime());
 
     // Dump received packet.
-    sLog.outWorldPacketDump(reinterpret_cast <uint64> (get_handle()), new_pct->GetOpcode(), LookupOpcodeName(new_pct->GetOpcode()), new_pct, true);
+    sLog.outWorldPacketDump(uint64(get_handle()), new_pct->GetOpcode(), LookupOpcodeName(new_pct->GetOpcode()), new_pct, true);
 
     try
     {
