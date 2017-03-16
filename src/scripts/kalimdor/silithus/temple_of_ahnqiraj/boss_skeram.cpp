@@ -104,8 +104,8 @@ struct boss_skeramAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
-		if (IsImage)
-			return;
+        if (IsImage)
+            return;
 
         if (m_pInstance && m_pInstance->GetData(TYPE_SKERAM) == IN_PROGRESS)
             return;
@@ -169,7 +169,7 @@ struct boss_skeramAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_TRUE_FULFILLMENT, CAST_AURA_NOT_PRESENT) == CAST_OK)
                 {
-                    pTarget->CastSpell(pTarget, SPELL_TF_HASTE, true);		
+                    pTarget->CastSpell(pTarget, SPELL_TF_HASTE, true);        
                     pTarget->CastSpell(pTarget, SPELL_TF_MOD_HEAL, true);
                     pTarget->CastSpell(pTarget, SPELL_TF_IMMUNITY, true);
                     FullFillment_Timer = urand(20000, 25000);

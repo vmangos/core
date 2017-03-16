@@ -142,7 +142,7 @@ struct cthunAI : public ScriptedAI
         EyeTentacleTimer = 30000;
         FleshTentaclesKilled = 0;
         GiantClawTentacleTimer = 0;
-        GiantEyeTentacleTimer = 30000;	// 30 seconds after initial GiantClawTentacleTimer
+        GiantEyeTentacleTimer = 30000;    // 30 seconds after initial GiantClawTentacleTimer
         StomachAcidTimer = 5000; // stomach debuff stacks every 5 seconds
         StomachEnterTimer = 5000;
         StomachEnterVisTimer = 0;

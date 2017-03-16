@@ -58,8 +58,8 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_TWINS_ENTER_DOOR:
-			if (m_auiEncounter[TYPE_HUHURAN] == DONE)
-				pGo->SetGoState(GO_STATE_ACTIVE);
+            if (m_auiEncounter[TYPE_HUHURAN] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_TWINS_EXIT_DOOR:
             if (m_auiEncounter[TYPE_TWINS] == DONE)
@@ -70,7 +70,7 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
             return;
     }
 
-	m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
+    m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
 
 void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
@@ -78,7 +78,7 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
     switch (pCreature->GetEntry())
     {
         case NPC_ANUBISATH_SENTINEL:
-		case NPC_OBSIDIAN_ERADICATOR:
+        case NPC_OBSIDIAN_ERADICATOR:
             if (m_auiEncounter[TYPE_SKERAM] == DONE)
                 pCreature->AddObjectToRemoveList();
             break;
@@ -96,7 +96,7 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
             break;
         case NPC_VEKNISS_HIVE_CRAWLER:
         case NPC_VEKNISS_WASP:
-		case NPC_QIRAJI_LASHER:
+        case NPC_QIRAJI_LASHER:
         case NPC_VEKNISS_STINGER:
             if (m_auiEncounter[TYPE_HUHURAN] == DONE)
                 pCreature->AddObjectToRemoveList();
@@ -107,7 +107,7 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
             if (m_auiEncounter[TYPE_TWINS] == DONE)
                 pCreature->AddObjectToRemoveList();
             break;
-		case NPC_QIRAJI_MINDSLAYER:
+        case NPC_QIRAJI_MINDSLAYER:
         case NPC_QIRAJI_SLAYER:
         case NPC_QIRAJI_CHAMPION:
         case NPC_ANUBISATH_WARDER:
@@ -125,7 +125,7 @@ void instance_temple_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
         case NPC_PRINCESS_YAUJ:
         case NPC_VEM:
         case NPC_KRI:
-		case NPC_BATTLEGUARD_SARTURA:
+        case NPC_BATTLEGUARD_SARTURA:
         case NPC_VEKLOR:
         case NPC_VEKNILASH:
         case NPC_EYE_OF_C_THUN:
@@ -133,24 +133,24 @@ void instance_temple_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
         case NPC_CTHUN_PORTAL:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
-		// Randomize C'thun trash packs
-		case NPC_QIRAJI_SLAYER:
-			if (urand(0, 1))
-			{
-				pCreature->SetEntry(15246);
-				pCreature->UpdateEntry(15246);
-				pCreature->AIM_Initialize();
-			}
-			break;
-		case NPC_QIRAJI_MINDSLAYER:
-			if (urand(0, 1))
-			{
-				pCreature->SetEntry(15250);
-				pCreature->UpdateEntry(15250);
-				pCreature->AIM_Initialize();
-			}
-			break;
-		case NPC_SARTURA_S_ROYAL_GUARD: m_lRoyalGuardGUIDList.push_back(pCreature->GetObjectGuid()); break;
+        // Randomize C'thun trash packs
+        case NPC_QIRAJI_SLAYER:
+            if (urand(0, 1))
+            {
+                pCreature->SetEntry(15246);
+                pCreature->UpdateEntry(15246);
+                pCreature->AIM_Initialize();
+            }
+            break;
+        case NPC_QIRAJI_MINDSLAYER:
+            if (urand(0, 1))
+            {
+                pCreature->SetEntry(15250);
+                pCreature->UpdateEntry(15250);
+                pCreature->AIM_Initialize();
+            }
+            break;
+        case NPC_SARTURA_S_ROYAL_GUARD: m_lRoyalGuardGUIDList.push_back(pCreature->GetObjectGuid()); break;
     }
     // Delete some creatures
     OnCreatureRespawn(pCreature);
@@ -164,28 +164,28 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
             if (uiData == DONE)
                 DoUseDoorOrButton(GO_SKERAM_GATE);
-			break;
-		case TYPE_BUG_TRIO:
-			if (uiData == SPECIAL)
-			{
-				++m_uiBugTrioDeathCount;
-				if (m_uiBugTrioDeathCount == 2)
-					SetData(TYPE_BUG_TRIO, DONE);
-				// don't store any special data
-				break;
-			}
-			if (uiData == FAIL)
-				m_uiBugTrioDeathCount = 0;
-			m_auiEncounter[uiType] = uiData;
-			break;
-		case TYPE_HUHURAN:
-			m_auiEncounter[uiType] = uiData;
-			if (uiData == DONE)
-				DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
-			break;
-		case TYPE_SARTURA:
-		case TYPE_FANKRISS:
-		case TYPE_VISCIDUS:
+            break;
+        case TYPE_BUG_TRIO:
+            if (uiData == SPECIAL)
+            {
+                ++m_uiBugTrioDeathCount;
+                if (m_uiBugTrioDeathCount == 2)
+                    SetData(TYPE_BUG_TRIO, DONE);
+                // don't store any special data
+                break;
+            }
+            if (uiData == FAIL)
+                m_uiBugTrioDeathCount = 0;
+            m_auiEncounter[uiType] = uiData;
+            break;
+        case TYPE_HUHURAN:
+            m_auiEncounter[uiType] = uiData;
+            if (uiData == DONE)
+                DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+            break;
+        case TYPE_SARTURA:
+        case TYPE_FANKRISS:
+        case TYPE_VISCIDUS:
         case TYPE_CTHUN_PHASE:
             m_auiEncounter[uiType] = uiData;
             break;
@@ -207,7 +207,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-		for (int i = 0; i < MAX_ENCOUNTER; ++i)
+        for (int i = 0; i < MAX_ENCOUNTER; ++i)
             saveStream << m_auiEncounter[i] << " ";
 
         m_strInstData = saveStream.str();
@@ -228,7 +228,7 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-	for (int i = 0; i < MAX_ENCOUNTER; ++i)
+    for (int i = 0; i < MAX_ENCOUNTER; ++i)
     {
         loadStream >> m_auiEncounter[i];
         if (m_auiEncounter[i] == IN_PROGRESS)
@@ -251,30 +251,30 @@ InstanceData* GetInstanceData_instance_temple_of_ahnqiraj(Map* pMap)
 
 bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-	if (!pPlayer->isAlive() || pPlayer->isGameMaster())
-		return false;
+    if (!pPlayer->isAlive() || pPlayer->isGameMaster())
+        return false;
 
-	switch (pAt->id)
-	{
-	case AREATRIGGER_SARTURA:
-		if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
-		{
-			if (pInstance->GetData(TYPE_SARTURA) == NOT_STARTED || pInstance->GetData(TYPE_SARTURA) == FAIL)
-			{
-				if (Creature* pSartura = pInstance->GetSingleCreatureFromStorage(NPC_BATTLEGUARD_SARTURA))
-					pSartura->SetInCombatWithZone();
-			}
-		}
-		break;
-	case AREATRIGGER_TWIN_EMPERORS:
-		if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
-		{
-			if (Creature* pEye = pInstance->GetSingleCreatureFromStorage(NPC_THE_MASTERS_EYE))
-				pEye->ForcedDespawn(1000);
-		}
-		break;
-	}
-	return false;
+    switch (pAt->id)
+    {
+    case AREATRIGGER_SARTURA:
+        if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
+        {
+            if (pInstance->GetData(TYPE_SARTURA) == NOT_STARTED || pInstance->GetData(TYPE_SARTURA) == FAIL)
+            {
+                if (Creature* pSartura = pInstance->GetSingleCreatureFromStorage(NPC_BATTLEGUARD_SARTURA))
+                    pSartura->SetInCombatWithZone();
+            }
+        }
+        break;
+    case AREATRIGGER_TWIN_EMPERORS:
+        if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
+        {
+            if (Creature* pEye = pInstance->GetSingleCreatureFromStorage(NPC_THE_MASTERS_EYE))
+                pEye->ForcedDespawn(1000);
+        }
+        break;
+    }
+    return false;
 }
 
 void AddSC_instance_temple_of_ahnqiraj()
@@ -286,8 +286,8 @@ void AddSC_instance_temple_of_ahnqiraj()
     pNewScript->GetInstanceData = &GetInstanceData_instance_temple_of_ahnqiraj;
     pNewScript->RegisterSelf();
 
-	pNewScript = new Script;
-	pNewScript->Name = "at_temple_ahnqiraj";
-	pNewScript->pAreaTrigger = &AreaTrigger_at_temple_ahnqiraj;
-	pNewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "at_temple_ahnqiraj";
+    pNewScript->pAreaTrigger = &AreaTrigger_at_temple_ahnqiraj;
+    pNewScript->RegisterSelf();
 }
