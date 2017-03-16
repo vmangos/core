@@ -15,7 +15,6 @@ enum
     SAY_ARRIVAL1_RAG            = -1409009,
     SAY_ARRIVAL2_MAJ            = -1409010,
     SAY_ARRIVAL3_RAG            = -1409011,
-    SAY_ARRIVAL5_RAG            = -1409012,
 
     SPELL_MAGIC_REFLECTION      = 20619,
     SPELL_DAMAGE_REFLECTION     = 21075,
@@ -190,7 +189,7 @@ struct boss_majordomoAI : public ScriptedAI
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
             m_creature->setFaction(35);
             EnterEvadeMode();
-            DoScriptText(-1409007, m_creature);
+            DoScriptText(SAY_DEFEAT, m_creature);
             if (m_pInstance)
             {
                 if (m_pInstance->GetData(TYPE_MAJORDOMO) != DONE)
