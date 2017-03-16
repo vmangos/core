@@ -41,6 +41,7 @@
 #define MOB_GIANT_EYE_TENTACLE              15334
 #define MOB_FLESH_TENTACLE                  15802
 #define MOB_GIANT_PORTAL                    15910
+#define MOB_CTHUN_PORTAL                    15896
 
 #define PUNT_CREATURE                       15922 //invisible viscidus trigger
 
