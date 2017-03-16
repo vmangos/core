@@ -562,6 +562,8 @@ enum MangosStrings
     LANG_PINFO_LEVEL                    = 549,
     LANG_PINFO_NO_REP                   = 550,
 
+    LANG_GROUP_INFO                     = 640,
+
     LANG_YOU_SET_EXPLORE_ALL            = 551,
     LANG_YOU_SET_EXPLORE_NOTHING        = 552,
     LANG_YOURS_EXPLORE_SET_ALL          = 553,
