@@ -75,10 +75,17 @@ static const float puntPosition[3] =
     -8545.9f, 1987.25f, -96.0f
 };
 
+enum CThunPhase
+{
+    PHASE_EYE_NORMAL = 0,
+    PHASE_EYE_DARK_GLARE = 1,
+    PHASE_TRANSITION = 2,
+    PHASE_CTHUN = 3,
+    PHASE_CTHUN_WEAKENED = 4,
+    PHASE_CTHUN_DONE = 5,
+};
 
-//todo 
-// replace control that player still exist in instance when getting players from stomachlist
-//use if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
+
 struct cthunAI : public ScriptedAI
 {
     /* 
@@ -185,14 +192,15 @@ struct cthunAI : public ScriptedAI
     std::vector<ObjectGuid> fleshTentacles;
 
     struct StomachTimers {
-        int32 acidDebuff;
-        int32 puntCastTime;
+        uint32 acidDebuff;
+        uint32 puntCastTime;
 
         static const int32 ACID_REFRESH_RATE = 5000;
         static const int32 PUNT_CAST_TIME = 3000;
     };
     std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
 
+    /*
     enum PhaseState {
         EYE_DYING,
         PRE_INVULNERABLE_PHASE,
@@ -201,6 +209,7 @@ struct cthunAI : public ScriptedAI
         BOSS_DEAD
     };
     PhaseState currentPhaseState;
+    */
 
     void Reset()
     {
@@ -209,7 +218,7 @@ struct cthunAI : public ScriptedAI
         EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
         CthunEmergeTimer = 8000;
 
-        currentPhaseState = EYE_DYING;
+        //currentPhaseState = EYE_DYING;
 
         //ResetartUnvulnerablePhase();
 
@@ -249,7 +258,13 @@ struct cthunAI : public ScriptedAI
             Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
             if (b_Eye)
                 b_Eye->Respawn();
+
+            //todo: how do we lower cthun back down?
         }
+
+        //todo: do this?
+        //if (Creature* pPortal = GetClosestCreatureWithEntry(m_creature, MOB_SMALL_PORTAL, 5.0f))
+        //    pPortal->ForcedDespawn();
     }
 
     // this is called ~2 seconds after P1 eye dies,
@@ -272,20 +287,18 @@ struct cthunAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < 2)
+        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
             return;
 
-        /*
         // Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
             WhisperIfShould(diff);
             return;
         }
-        */
-
-        // whats the point of this?
+        
         m_creature->SetTargetGuid(0);
+        
         /*
         if (m_creature->GetTargetGuid() != m_creature->GetObjectGuid())
             m_creature->SetTargetGuid(m_creature->GetObjectGuid());
@@ -294,37 +307,36 @@ struct cthunAI : public ScriptedAI
 
         UpdatePlayersInStomach(diff);
 
-        switch (currentPhaseState) {
-        case BOSS_DEAD:
-            return;
-        case EYE_DYING: {
-            if (EyeDeathAnimTimer < diff) {
-                CthunEmergeTimer = 8000;
-                m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                currentPhaseState = PhaseState::PRE_INVULNERABLE_PHASE;
-                sLog.outBasic("Entering PRE_INVULNERABLE_STATE");
-                ResetartUnvulnerablePhase();
+        switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
+        case PHASE_TRANSITION: {
+            if (EyeDeathAnimTimer > 0) {
+                if (EyeDeathAnimTimer < diff) {
+                    EyeDeathAnimTimer = 0;
+                    CthunEmergeTimer = 8000;
+                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    sLog.outBasic("Entering PRE_INVULNERABLE_STATE");
+                    ResetartUnvulnerablePhase();
+                }
+                else {
+                    EyeDeathAnimTimer -= diff;
+                }
             }
             else {
-                EyeDeathAnimTimer -= diff;
-            }
-            break;
-        case PRE_INVULNERABLE_PHASE:
-            //tentacle and grab timers start running as soon as C'thun starts emerging
-            TentacleTimers(diff);
-            UpdateStomachGrab(diff);
+                TentacleTimers(diff);
+                UpdateStomachGrab(diff);
 
-            if (CthunEmergeTimer < diff) {
-                Emerge();
-                currentPhaseState = PhaseState::INVULNERABLE_PHASE;
-                sLog.outBasic("Entering INVULNERABLE_STATE");
-            }
-            else {
-                CthunEmergeTimer -= diff;
+                if (CthunEmergeTimer < diff) {
+                    Emerge();
+                    m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN);
+                    sLog.outBasic("Entering INVULNERABLE_STATE");
+                }
+                else {
+                    CthunEmergeTimer -= diff;
+                }
             }
             break;
-        case INVULNERABLE_PHASE:
+        case PHASE_CTHUN:
             // Weaken if both Flesh Tentacles are killed
             // Should be fair to skip InvulnerablePhase update if both
             // tentacles area already killed.
@@ -333,8 +345,7 @@ struct cthunAI : public ScriptedAI
 
                 DoScriptText(EMOTE_WEAKENED, m_creature);
                 m_creature->CastSpell(m_creature, SPELL_PURPLE_COLORATION, true);
-                currentPhaseState = VULNERABLE_PHASE;
-
+                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_WEAKENED);
                 // If there is a grabbed player, release him.
                 if (!StomachEnterTargetGUID.IsEmpty()) {
                     if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
@@ -349,23 +360,24 @@ struct cthunAI : public ScriptedAI
                 UpdateStomachGrab(diff);
             }
             break;
-        case VULNERABLE_PHASE:
+        case PHASE_CTHUN_WEAKENED:
             // If weakend runs out
-            WeaknessTimer -= diff;
             if (WeaknessTimer < diff) {
                 ResetartUnvulnerablePhase();
                 m_creature->SetVisibility(VISIBILITY_OFF);
                 m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
                 m_creature->SetVisibility(VISIBILITY_ON);
-                currentPhaseState = INVULNERABLE_PHASE;
+                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN);
                 sLog.outBasic("Entering INVULNERABLE_STATE");
+            }
+            else {
+                WeaknessTimer -= diff;
             }
             break;
         default:
-            sLog.outError("C'Thun in bugged state: %i", currentPhaseState);
+            sLog.outError("C'Thun in bugged state: %i", m_pInstance->GetData(TYPE_CTHUN_PHASE));
         }
         }
-
     }
     void SpawnFleshTentacles() {
 
@@ -429,6 +441,9 @@ struct cthunAI : public ScriptedAI
         if (GiantClawTentacleTimer < diff) {
             if (Unit* target = SelectRandomNotStomach())
             {
+                if (target->GetPositionZ() < -30.0f) {
+                    sLog.outBasic("Trying to spawn giant claw <-30.0f");
+                }
                 if (Creature* Spawned = m_creature->SummonCreature(MOB_GIANT_CLAW_TENTACLE, target->GetPositionX(),
                     target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
                 {
@@ -445,6 +460,9 @@ struct cthunAI : public ScriptedAI
         
         if (GiantEyeTentacleTimer < diff) {
             if (Unit* target = SelectRandomNotStomach()) {
+                if (target->GetPositionZ() < -30.0f) {
+                    sLog.outBasic("Trying to spawn giant eye <-30.0f");
+                }
                 if (Creature *Spawned = m_creature->SummonCreature(MOB_GIANT_EYE_TENTACLE, target->GetPositionX(),
                     target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500)) 
                 {
@@ -485,8 +503,6 @@ struct cthunAI : public ScriptedAI
 
     void UpdatePlayersInStomach(uint32 diff)
     {
-        int32 sDiff = static_cast<int32>(diff);
-
         for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
             Player* player = m_creature->GetMap()->GetPlayer(it->first);
             if (!player) {
@@ -508,25 +524,29 @@ struct cthunAI : public ScriptedAI
             StomachTimers& timers = it->second;
             
             // Update acid debuff
-            timers.acidDebuff -= sDiff;
-            if (timers.acidDebuff < sDiff) {
+            if (timers.acidDebuff < diff) {
                 m_creature->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
                 timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
+            }
+            else {
+                timers.acidDebuff -= diff;
             }
 
             // update punt timer while player is in the punt area. Otherwise reset timer.
             if (player->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) < 5.0f) {
-                timers.puntCastTime -= sDiff;
-
-                // Punt the player if he has been in the area aproximately PUNT_CAST_TIME ms
-                if (timers.puntCastTime < sDiff) {
+                if (timers.puntCastTime < diff) {
+                    // Punt the player if he has been in the area aproximately PUNT_CAST_TIME ms
                     sLog.outBasic("Player in stomach getting punted");
                     player->CastSpell(player, SPELL_PUNT_UPWARD, true);
                     player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
                     timers.puntCastTime = StomachTimers::PUNT_CAST_TIME;
                 }
+                else {
+                    timers.puntCastTime -= diff;
+                }
+
                 // Player just arrived at punt area. Start cast visual
-                else if (timers.puntCastTime == (timers.PUNT_CAST_TIME-sDiff)) {
+                if (timers.puntCastTime == (timers.PUNT_CAST_TIME - diff)) {
                     if (Creature *pCreature = m_creature->SummonCreature(PUNT_CREATURE,
                         puntPosition[0], puntPosition[1], puntPosition[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
                     {
@@ -603,12 +623,21 @@ struct cthunAI : public ScriptedAI
 
     bool PlayerInStomach(Unit *unit)
     {
+        return unit->GetPositionZ() < -30.0f;
+        /*
+        currently not good enough because player is removed from list as DoTeleportPlayer is called,
+        but player position is still the old one during the same update, apparently.
         auto it = std::find_if(playersInStomach.begin(), playersInStomach.end(),
             [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
+            if (unit->GetObjectGuid() == e.first) {
+
+            }
+            return false;
             return e.first == unit->GetObjectGuid();
         });
 
         return it != playersInStomach.end();
+        */
     }
 
     void WhisperIfShould(uint32 diff)
@@ -644,6 +673,7 @@ struct cthunAI : public ScriptedAI
 
     void Emerge()
     {
+        //XXX: why double SetInCombatWithZone()? Was like this in nost core
         m_creature->SetInCombatWithZone();
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
 
@@ -651,18 +681,11 @@ struct cthunAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void JustSummoned(Creature *pCreature)
-    {
-        
-    }
-
     void JustDied(Unit* pKiller)
     {
         //Switch
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CTHUN_PHASE, DONE);
-
-        currentPhaseState = BOSS_DEAD;
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage)
@@ -752,24 +775,57 @@ struct eye_of_cthunAI : public ScriptedAI
         m_creature->SetVisibility(VISIBILITY_ON);
     }
 
+    // Custom threat management
+    bool SelectHostileTarget()
+    {
+        Unit* pTarget = nullptr;
+        Unit* pOldTarget = m_creature->getVictim();
+
+        if (!m_creature->getThreatManager().isThreatListEmpty())
+            pTarget = m_creature->getThreatManager().getHostileTarget();
+
+        if (pTarget)
+        {
+            if (pOldTarget != pTarget && m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL)
+                AttackStart(pTarget);
+
+            // Set victim to old target (if not while Dark Glare)
+            if (pOldTarget && pOldTarget->isAlive() && m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL)
+            {
+                m_creature->SetTargetGuid(pOldTarget->GetObjectGuid());
+                m_creature->SetInFront(pOldTarget);
+            }
+
+            return true;
+        }
+
+        // Will call EnterEvadeMode if fit
+        return m_creature->SelectHostileTarget();
+    }
+
     void UpdateAI(const uint32 diff)
     {
         //No instance
         if (!m_pInstance)
             return;
+        if (!m_creature->SelectHostileTarget()) {
+            AggroRadius();
+            return;
+        }
 
+        /*
         //Check if we have a target
         if (!IsAlreadyPulled)
         {
             AggroRadius();
             return;
         }
-
+        */
         TentacleTimers(diff);
 
-        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == 0)
+        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL)
             FightPhase(diff);
-        else
+        else if(m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_DARK_GLARE)
             GlarePhase(diff);
     }
 
@@ -904,7 +960,7 @@ struct eye_of_cthunAI : public ScriptedAI
         }
 
         // Switch to Dark Beam
-        m_pInstance->SetData(TYPE_CTHUN_PHASE, 1);
+        m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_DARK_GLARE);
     }
 
     void EndBeamPhase()
@@ -918,7 +974,7 @@ struct eye_of_cthunAI : public ScriptedAI
         PhaseTimer = 50000;
 
         // Switch to fight phase
-        m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
+        m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_NORMAL);
 
         if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
         {
@@ -953,9 +1009,9 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
-    void AggroRadius()
+    bool AggroRadius()
     {
-        if (IsAlreadyPulled) return;
+        //if (IsAlreadyPulled) false;
 
         if (m_creature->getFaction() != 7 && !m_creature->isInCombat())
             m_creature->setFaction(7); // This prevents strange, uncontrolled aggro's through the walls
@@ -993,7 +1049,7 @@ struct eye_of_cthunAI : public ScriptedAI
                             b_Portal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                         }
                         IsAlreadyPulled = true;
-                        return;
+                        return true;
                     }
                 }
             }
@@ -1006,7 +1062,7 @@ struct eye_of_cthunAI : public ScriptedAI
         Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
         if (b_Cthun)
         {
-            m_pInstance->SetData(TYPE_CTHUN_PHASE, 2);
+            m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_TRANSITION);
         }
     }
 };
