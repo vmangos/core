@@ -109,6 +109,11 @@ ConfVersion=2010062001
 #        Default: 0 (Ban IP)
 #                 1 (Ban Account)
 #
+#    ReqEmailVerification
+#        Required that the user has verified their email address before allowing logins
+#        Default: 0 (No verification required)
+#                 1 (Verification required)
+#
 ###################################################################################################################
 
 LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
@@ -131,3 +136,4 @@ RealmsStateUpdateDelay = 20
 WrongPass.MaxCount = 0
 WrongPass.BanTime = 600
 WrongPass.BanType = 0
+ReqEmailVerification = 0
