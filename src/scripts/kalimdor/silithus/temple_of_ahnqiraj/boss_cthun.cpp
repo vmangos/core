@@ -42,6 +42,8 @@
 #define MOB_FLESH_TENTACLE                  15802
 #define MOB_GIANT_PORTAL                    15910
 
+#define PUNT_CREATURE                       15922 //invisible viscidus trigger
+
 #define SPELL_GREEN_BEAM                    26134
 #define SPELL_DARK_GLARE                    26029
 #define SPELL_RED_COLORATION                23537           //Probably not the right spell but looks similar
@@ -59,26 +61,86 @@
 #define SPELL_EXIT_STOMACH_KNOCKBACK        25383
 #define SPELL_DIGESTIVE_ACID                26476
 
-#define STOMACH_X                           -8562.0f
-#define STOMACH_Y                           2037.0f
-#define STOMACH_Z                           -70.0f
-#define STOMACH_O                           5.05f
+static const float stomachPortPosition[4] = 
+{
+    -8562.0f, 2037.0f, -70.0f, 5.05f
+};
+static const float fleshTentaclePositions[2][4] = 
+{
+    { -8571.0f, 1990.0f, -98.0f, 1.22f },
+    { -8525.0f, 1994.0f, -98.0f, 2.12f }
+};
+static const float puntPosition[3] =
+{
+    -8545.9f, 1987.25f, -96.0f
+};
 
-#define TENTACLE_POS1_X                     -8571.0f
-#define TENTACLE_POS1_Y                     1990.0f
-#define TENTACLE_POS1_Z                     -98.0f
-#define TENTACLE_POS1_O                     1.22f
-#define TENTACLE_POS2_X                     -8525.0f
-#define TENTACLE_POS2_Y                     1994.0f
-#define TENTACLE_POS2_Z                     -98.0f
-#define TENTACLE_POS2_O                     2.12f
 
-#define KICK_X                              -8546.9f
-#define KICK_Y                              1989.3f
-#define KICK_Z                              -96.0f
-
+//todo 
+// replace control that player still exist in instance when getting players from stomachlist
+//use if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
 struct cthunAI : public ScriptedAI
 {
+    /* 
+    ==== SUMMARY OF C'THUN AI ====
+    ==============================
+    A few timestamps taken from retail vanilla videos (with sources): http://pastebin.com/PKKVEPqm
+
+    Stomach:
+    Players get first stomach debuff exactly when they are teleported,
+    then every 5 seconds after that. A global refresh timer would be possible,
+    but it seems easier and just as likely that each player in stomach have their
+    own refresh timer.
+
+    Players that die in stomach should not be ported out, but still need to remove from list
+
+    Ejector:
+    As soon as someone steps on the ejector, a 2-3 sec timer starts (the animation) before
+    the player is thrown out.
+    I dont know if more than one can be kicked at the same time.
+    I'm assuming it should be a personal timer and not a global timer for when u get kicked.
+
+    Timers:
+    C'thuns timers start "a few seconds" after p1 eye dies. They also restart after
+    vulnerability phase.
+    Stomach teleport:   10 seconds
+    Stomach debuff:     5 seconds
+    Giant claw:         1 min
+    Giant eye:          1 min
+    Small eyes:         30 seconds
+
+    -00:02 C'thuns eye dies
+    00:02 C'thun has "emerged", or at least started his timers
+    00:10 First Giant Claw (8 seconds after c'thun has emerged)
+    00:20 player eaten
+    00:25 debuff refresh
+    00:30 player eaten & debuff refresh
+    00:35 debuff refresh
+    00:40 player eaten & small + big eyes & debuff refresh
+    00:45 debuff refresh
+    00:50 player eaten & debuff refresh
+    00:55 debuff refresh
+    01:00 player eaten & debuff refresh
+    01:05 debuff refresh
+    01:10 player eaten & small eyes + giant claw & debuff refresh
+
+    01:15 ==== VULNERABILITY PHASE START====
+    02:00 ==== VULNERABILITY PHASE END ====
+
+    00:08 First giant claw (again, 8 seconds after c'thun has "emerged" aka become invulnerable)
+    00:18 first player eaten
+    00:23 debuff refresh
+    00:28 debuff refresh and player eaten
+    00:33 debuff refresh
+    00:38 debuff refresh and player eaten and giant+small eyes
+    00:43 debuff refresh
+    00:48 debuff refresh and player eaten
+    00:53 debuff refresh
+    00:58 debuff refresh and player eaten
+    01:03 debuff refresh
+    01:08 debuff refresh and player eaten and giant claw and small eyes
+    */
+
     cthunAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
@@ -93,35 +155,52 @@ struct cthunAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    uint8 FleshTentaclesKilled;
-
     uint32 WisperTimer;
+
     uint32 EyeTentacleTimer;
+    static const uint32 EYE_RESPAWN_TIMER = 30000;
+    
     uint32 GiantClawTentacleTimer;
+    static const uint32 GIANT_CLAW_RESPAWN_TIMER = 60000;
+    
     uint32 GiantEyeTentacleTimer;
-    uint32 StomachAcidTimer;
-    uint32 StomachEnterTimer;
-    uint32 StomachEnterVisTimer;
+    static const uint32 GIANT_EYE_RESPAWN_TIMER = 60000;
+
+    uint32 NextStomachEnterGrab;
+    static const uint32 STOMACH_GRAB_COOLDOWN = 10000;
+
+    uint32 StomachEnterPortTimer;
+    static const uint32 STOMACH_GRAB_DURATION = 3500;
+
+    ObjectGuid StomachEnterTargetGUID;
+
     uint32 WeaknessTimer;
+    static const uint32 WEAKNESS_DURATION = 45000;
 
-    uint64 StomachEnterTarget;
-    uint64 HoldPlayer;
+    static const uint32 MAX_FLESH_TENTACLES = 2;
 
-    int32 EyeDeathAnimTimer;
-    int32 EjectorTimer;
-    int32 EjectorCast;
-    int32 CthunEmergeTimer;
+    uint32 EyeDeathAnimTimer;
+    uint32 CthunEmergeTimer;
 
-    std::vector<uint64> m_FleshTentGUIDs;
+    std::vector<ObjectGuid> fleshTentacles;
 
-    std::vector<std::pair<Player*,int32>> playersInStomach;
+    struct StomachTimers {
+        int32 acidDebuff;
+        int32 puntCastTime;
 
-    enum PhaseTransitionState {
-        EYE_DYING,
-        CTHUN_EMERGING,
-        TRANSITION_FINISHED
+        static const int32 ACID_REFRESH_RATE = 5000;
+        static const int32 PUNT_CAST_TIME = 3000;
     };
-    PhaseTransitionState transitionState;
+    std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
+
+    enum PhaseState {
+        EYE_DYING,
+        PRE_INVULNERABLE_PHASE,
+        INVULNERABLE_PHASE,
+        VULNERABLE_PHASE,
+        BOSS_DEAD
+    };
+    PhaseState currentPhaseState;
 
     void Reset()
     {
@@ -129,24 +208,39 @@ struct cthunAI : public ScriptedAI
 
         EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
         CthunEmergeTimer = 8000;
-        HoldPlayer = 0;
-        EjectorTimer = 5000;
-        EjectorCast = 3000;
-        EyeTentacleTimer = 30000;
-        FleshTentaclesKilled = 0;
-        GiantClawTentacleTimer = 0;
-        GiantEyeTentacleTimer = 30000;	// 30 seconds after initial GiantClawTentacleTimer
-        StomachAcidTimer = 5000; // stomach debuff stacks every 5 seconds
-        StomachEnterTimer = 5000;
-        StomachEnterVisTimer = 0;
-        StomachEnterTarget = 0;
 
-        transitionState = EYE_DYING;
+        currentPhaseState = EYE_DYING;
+
+        //ResetartUnvulnerablePhase();
 
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
         m_creature->SetVisibility(VISIBILITY_ON);
         
+        while(fleshTentacles.size() > 0) {
+            if (Creature* tentacle = m_creature->GetMap()->GetCreature(fleshTentacles[0])) {
+                tentacle->ForcedDespawn();
+            }
+            fleshTentacles.erase(fleshTentacles.begin());
+        }
+        
+        /*        //making sure to clear all players debuff
+        for (auto it = playersInStomach.begin(); it != playersInStomach.end(); it++) {
+            if (Player* pPlayer = m_creature->GetMap()->GetPlayer(it->first)) {
+                pPlayer->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+            }
+        }*/
+
+        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+        if (!PlayerList.isEmpty()) {
+            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr) {
+                if (Player* player = itr->getSource())
+                {
+                    player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                }
+            }
+        }
+
         playersInStomach.clear();
 
         if (m_pInstance)
@@ -158,6 +252,21 @@ struct cthunAI : public ScriptedAI
         }
     }
 
+    // this is called ~2 seconds after P1 eye dies,
+    // and every time vulnerable phase ends.
+    void ResetartUnvulnerablePhase() {
+        GiantClawTentacleTimer  = 8000;
+        EyeTentacleTimer        = 38000;
+        GiantEyeTentacleTimer   = 38000;
+        
+        StomachEnterTargetGUID  = 0;
+        StomachEnterPortTimer   = 0;
+        NextStomachEnterGrab    = 18000 - STOMACH_GRAB_DURATION;
+
+        WeaknessTimer           = 0;
+        SpawnFleshTentacles();
+    }
+
     void UpdateAI(const uint32 diff)
     {
         if (!m_pInstance)
@@ -166,188 +275,192 @@ struct cthunAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < 2)
             return;
 
-        if (TransitionLogic(diff))
-            return;
-
-        UpdatePlayersInStomach(diff);
-
+        /*
         // Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
             WhisperIfShould(diff);
             return;
         }
+        */
 
+        // whats the point of this?
+        m_creature->SetTargetGuid(0);
+        /*
         if (m_creature->GetTargetGuid() != m_creature->GetObjectGuid())
             m_creature->SetTargetGuid(m_creature->GetObjectGuid());
+        */
 
-        // Body phase or weakend
-        if (!m_creature->HasAura(SPELL_PURPLE_COLORATION)) {
-            DoSpells(diff);
-        }
-        else
-        {
-            if (WeaknessTimer < diff) // If weakend runs out
-            {
-                EndWeaknessPhase();
-                WeaknessTimer = 0;
+
+        UpdatePlayersInStomach(diff);
+
+        switch (currentPhaseState) {
+        case BOSS_DEAD:
+            return;
+        case EYE_DYING: {
+            if (EyeDeathAnimTimer < diff) {
+                CthunEmergeTimer = 8000;
+                m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                currentPhaseState = PhaseState::PRE_INVULNERABLE_PHASE;
+                sLog.outBasic("Entering PRE_INVULNERABLE_STATE");
+                ResetartUnvulnerablePhase();
             }
-            else
-                WeaknessTimer -= diff;
-        }
-    }
+            else {
+                EyeDeathAnimTimer -= diff;
+            }
+            break;
+        case PRE_INVULNERABLE_PHASE:
+            //tentacle and grab timers start running as soon as C'thun starts emerging
+            TentacleTimers(diff);
+            UpdateStomachGrab(diff);
 
-    bool PlayerInStomach(Unit *unit)
-    {
-        auto it = std::find_if(playersInStomach.begin(), playersInStomach.end(),
-            [unit](const std::pair<Player*,int32>& e) {
-                return e.first == unit;
-            });
+            if (CthunEmergeTimer < diff) {
+                Emerge();
+                currentPhaseState = PhaseState::INVULNERABLE_PHASE;
+                sLog.outBasic("Entering INVULNERABLE_STATE");
+            }
+            else {
+                CthunEmergeTimer -= diff;
+            }
+            break;
+        case INVULNERABLE_PHASE:
+            // Weaken if both Flesh Tentacles are killed
+            // Should be fair to skip InvulnerablePhase update if both
+            // tentacles area already killed.
+            if(fleshTentacles.size() == 0) {
+                WeaknessTimer = WEAKNESS_DURATION;
 
-        return it != playersInStomach.end();
-    }
-    void JustSummoned(Creature *pCreature)
-    {
-        if (pCreature->GetEntry() == MOB_FLESH_TENTACLE)
-            m_FleshTentGUIDs.push_back(pCreature->GetObjectGuid());
+                DoScriptText(EMOTE_WEAKENED, m_creature);
+                m_creature->CastSpell(m_creature, SPELL_PURPLE_COLORATION, true);
+                currentPhaseState = VULNERABLE_PHASE;
 
-        int numFleshTents = 0;
-        for (int i = 0; i < m_FleshTentGUIDs.size(); i++)
-        {
-            if (Creature *m_Tent = m_creature->GetMap()->GetCreature(m_FleshTentGUIDs[i]))
-            {
-                if (m_Tent->isAlive())
-                {
-                    if (numFleshTents >= 2)
-                        m_Tent->ForcedDespawn();
-                    else
-                        numFleshTents++;
+                // If there is a grabbed player, release him.
+                if (!StomachEnterTargetGUID.IsEmpty()) {
+                    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
+                        pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
+                    }
                 }
+                sLog.outBasic("Entering VULNERABLE_STATE");
             }
-        }
-    }
+            else {
+                TentacleTimers(diff);
 
+                UpdateStomachGrab(diff);
+            }
+            break;
+        case VULNERABLE_PHASE:
+            // If weakend runs out
+            WeaknessTimer -= diff;
+            if (WeaknessTimer < diff) {
+                ResetartUnvulnerablePhase();
+                m_creature->SetVisibility(VISIBILITY_OFF);
+                m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
+                m_creature->SetVisibility(VISIBILITY_ON);
+                currentPhaseState = INVULNERABLE_PHASE;
+                sLog.outBasic("Entering INVULNERABLE_STATE");
+            }
+            break;
+        default:
+            sLog.outError("C'Thun in bugged state: %i", currentPhaseState);
+        }
+        }
+
+    }
     void SpawnFleshTentacles() {
+
+        if (fleshTentacles.size() != 0) {
+            sLog.outBasic("SpawnFleshTentacles() called, but there are already %i tentacles up.", fleshTentacles.size());
+        }
+        sLog.outBasic("Spawning flesh tentacles");
         //Spawn 2 flesh tentacles in C'thun stomach
-        FleshTentaclesKilled = 0;
+        for (uint32 i = 0; i < MAX_FLESH_TENTACLES; i++) {
+            Creature* pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE,
+                fleshTentaclePositions[i][0],
+                fleshTentaclePositions[i][1],
+                fleshTentaclePositions[i][2],
+                fleshTentaclePositions[i][3],
+                TEMPSUMMON_CORPSE_DESPAWN, 0);
 
-        //Spawn flesh tentacle
-        Creature* pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS1_X, TENTACLE_POS1_Y, TENTACLE_POS1_Z, TENTACLE_POS1_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
-        if (!pSpawned)
-            ++FleshTentaclesKilled;
-
-        //Spawn flesh tentacle
-        pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE, TENTACLE_POS2_X, TENTACLE_POS2_Y, TENTACLE_POS2_Z, TENTACLE_POS2_O, TEMPSUMMON_CORPSE_DESPAWN, 0);
-        if (!pSpawned)
-            ++FleshTentaclesKilled;
-    }
-
-    void EndWeaknessPhase()
-    {
-        // Reset these cooldowns
-        GiantClawTentacleTimer = 10000;                     //10 seconds into body phase (1 min repeat)
-        GiantEyeTentacleTimer = 40000;                      //40 seconds into body phase (1 min repeat)
-        StomachEnterTimer = 10000;                          //Every 10 seconds
-
-        // Clear eaten guys
-        StomachEnterTarget = 0;
-        StomachEnterVisTimer = 0;
-
-        //Remove red coloration
-        m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
-        m_creature->SetVisibility(VISIBILITY_ON);
-
-        SpawnFleshTentacles();
-    }
-
-    void DoSpells(uint32 diff)
-    {
-        TentacleTimers(diff);
-
-        // Weaken
-        if (FleshTentaclesKilled > 1)
-        {
-            WeaknessTimer = 45000;
-            DoScriptText(EMOTE_WEAKENED, m_creature);
-            m_creature->CastSpell(m_creature, SPELL_PURPLE_COLORATION, true);
-        }
-
-        //Stomach Enter Timer
-        if (StomachEnterTimer < diff)
-        {
-            if (Player* target = SelectRandomNotStomach())
-            {
-                // Set target in stomach
-                target->InterruptNonMeleeSpells(false);
-                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, NULL, NULL, m_creature->GetObjectGuid());
-                StomachEnterTarget = target->GetObjectGuid();
-                StomachEnterVisTimer = 3500;
+            if (pSpawned) {
+                fleshTentacles.push_back(pSpawned->GetGUID());
             }
-
-            StomachEnterTimer = 10000 + StomachEnterVisTimer;
         }
-        else
-            StomachEnterTimer -= diff;
+    }
 
-        if (StomachEnterVisTimer && StomachEnterTarget)
-        {
-            if (StomachEnterVisTimer <= diff)
-            {
-                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTarget))
-                {
-                    DoTeleportPlayer(pPlayer, STOMACH_X, STOMACH_Y, STOMACH_Z, STOMACH_O);
+    void UpdateStomachGrab(uint32 diff) {
+        if (!StomachEnterTargetGUID.IsEmpty()) {
+            if (StomachEnterPortTimer < diff) {
+                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
+                    DoTeleportPlayer(pPlayer, stomachPortPosition[0], stomachPortPosition[1], stomachPortPosition[2], stomachPortPosition[3]);
                     pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
-                    
-                    playersInStomach.push_back(std::make_pair(pPlayer, 5000));
+
+                    playersInStomach.push_back(std::make_pair(StomachEnterTargetGUID,
+                        StomachTimers{ StomachTimers::PUNT_CAST_TIME, StomachTimers::ACID_REFRESH_RATE }));
+
                     m_creature->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID, true);
                 }
 
-                StomachEnterTarget = 0;
-                StomachEnterVisTimer = 0;
+                StomachEnterTargetGUID = 0;
+                StomachEnterPortTimer = 0;
             }
-            else
-                StomachEnterVisTimer -= diff;
+            else {
+                StomachEnterPortTimer -= diff;
+            }
         }
-    }
 
-    
+        if (NextStomachEnterGrab < diff) {
+            if (Player* target = SelectRandomNotStomach()) {
+                target->InterruptNonMeleeSpells(false);
+                target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, NULL, NULL, m_creature->GetObjectGuid());
+                StomachEnterPortTimer = STOMACH_GRAB_DURATION;
+                StomachEnterTargetGUID = target->GetGUID();
+            }
+            NextStomachEnterGrab = STOMACH_GRAB_COOLDOWN;
+        }
+        else {
+            NextStomachEnterGrab -= diff;
+        }
+
+    }
 
     void TentacleTimers(uint32 diff)
     {
-        // GientClawTentacleTimer
-        if (GiantClawTentacleTimer < diff)
-        {
+        if (GiantClawTentacleTimer < diff) {
             if (Unit* target = SelectRandomNotStomach())
             {
-                if (Creature* Spawned = m_creature->SummonCreature(MOB_GIANT_CLAW_TENTACLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+                if (Creature* Spawned = m_creature->SummonCreature(MOB_GIANT_CLAW_TENTACLE, target->GetPositionX(),
+                    target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+                {
                     Spawned->AI()->AttackStart(target);
+                }
 
                 // One giant claw tentacle every minute
-                GiantClawTentacleTimer = 60000;
+                GiantClawTentacleTimer = GIANT_CLAW_RESPAWN_TIMER;
             }
         }
-        else
+        else {
             GiantClawTentacleTimer -= diff;
+        }
+        
+        if (GiantEyeTentacleTimer < diff) {
+            if (Unit* target = SelectRandomNotStomach()) {
+                if (Creature *Spawned = m_creature->SummonCreature(MOB_GIANT_EYE_TENTACLE, target->GetPositionX(),
+                    target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500)) 
+                {
 
-        // GiantEyeTentacleTimer
-        if (GiantEyeTentacleTimer < diff)
-        {
-            if (Unit* target = SelectRandomNotStomach())
-            {
-                if (Creature *Spawned = m_creature->SummonCreature(MOB_GIANT_EYE_TENTACLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
                     Spawned->AI()->AttackStart(target);
+                }
 
                 // One giant eye tentacle every minute
-                GiantEyeTentacleTimer = 60000;
+                GiantEyeTentacleTimer = GIANT_EYE_RESPAWN_TIMER;
             }
         }
-        else
+        else {
             GiantEyeTentacleTimer -= diff;
+        }
 
-        // EyeTentacleTimer
-        if (EyeTentacleTimer < diff)
-        {
+        if (EyeTentacleTimer < diff) {
             // Spawn the 8 Eye Tentacles in the corret spots
             float centerX = m_creature->GetPositionX();
             float centerY = m_creature->GetPositionY();
@@ -355,8 +468,7 @@ struct cthunAI : public ScriptedAI
             float angle = 360.0f / 8.0f;
 
             // Summon 8 of them them in a circle centered around centerX and centerY
-            for (uint8 i = 0; i < 8; i++)
-            {
+            for (uint8 i = 0; i < 8; i++) {
                 float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
                 float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
 
@@ -364,101 +476,89 @@ struct cthunAI : public ScriptedAI
             }
 
             //These spawn at every 30 seconds
-            EyeTentacleTimer = 30000;
+            EyeTentacleTimer = EYE_RESPAWN_TIMER;
         }
-        else
+        else {
             EyeTentacleTimer -= diff;
+        }
     }
 
     void UpdatePlayersInStomach(uint32 diff)
     {
         int32 sDiff = static_cast<int32>(diff);
-        //updating Digestive Acid debuff
-        for (auto it = playersInStomach.begin(); it != playersInStomach.end(); it++) {
-            it->second -= sDiff;
-            if (it->second < sDiff) {
-                m_creature->CastSpell(it->first, SPELL_DIGESTIVE_ACID, true);
-                it->second += 5000;
-            }
-        }
 
-        StomachEjector(diff);
-
-        EjectStomachIfShould();
-    }
-
-    void StomachEjector(uint32 diff)
-    {
-        int SignedDiff = static_cast <int> (diff);
-        if (EjectorTimer < SignedDiff)
-        {
-            BeginEjectorAnimation();
-            EjectorTimer = 999999; // Don't start this until the punt happens
-        }
-        else
-            EjectorTimer -= SignedDiff;
-
-        if (EjectorCast > SignedDiff)
-        {
-            EjectorCast -= SignedDiff;
-            if (EjectorCast <= SignedDiff)
-            {
-                TriggerStomachEjector();
-                EjectorTimer = 3000; // Started
-            }
-        }
-
-        EjectStomachIfShould();
-    }
-
-    void BeginEjectorAnimation()
-    {
-        EjectorCast = 5000;
-        // Start cast visual
-        if (Creature *pCreature = m_creature->SummonCreature(7444, KICK_X, KICK_Y,
-            KICK_Z, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
-        {
-            pCreature->SetFactionTemporary(35);
-            pCreature->SetDisplayId(11686);
-            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            pCreature->CastSpell(pCreature, 26092, false);
-        }
-    }
-
-    void TriggerStomachEjector()
-    {
         for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
-            if (it->first->GetDistance(KICK_X, KICK_Y, KICK_Z) < 5.0f)
-            {
-                it->first->CastSpell(it->first, SPELL_PUNT_UPWARD, true);
-                it->first->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
+            Player* player = m_creature->GetMap()->GetPlayer(it->first);
+            if (!player) {
+                continue;
             }
-        }
-    }
-
-    void EjectStomachIfShould()
-    {
-        //todo: should dead players be ported out of stomach?
-        for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
-            // If we're at the top of the stomach and have jumping state
-            if (it->first->GetPositionZ() > -40.0f && it->first->HasMovementFlag(MOVEFLAG_JUMPING))
-            {
-                //Teleport player out
-                DoTeleportPlayer(it->first, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, it->first->GetOrientation());
-
-                //Cast knockback on them
-                it->first->CastSpell(it->first, SPELL_EXIT_STOMACH_KNOCKBACK, true);
-
-                //Remove the acid debuff
-                it->first->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                
-                //Remove player from stomach list
+            // player has left the instance or something and is presumably no longer in stomach
+            if (!m_creature->GetMap()->GetPlayer(player->GetGUID())) {
+                sLog.outBasic("Player no longer in instance. Removed from stomach list");
                 it = playersInStomach.erase(it);
+                continue;
+            }
+
+            if (player->isDead()) {
+                sLog.outBasic("Player in stomach dead. Skipping update");
+                ++it;
+                continue;
+            }
+
+            StomachTimers& timers = it->second;
+            
+            // Update acid debuff
+            timers.acidDebuff -= sDiff;
+            if (timers.acidDebuff < sDiff) {
+                m_creature->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
+                timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
+            }
+
+            // update punt timer while player is in the punt area. Otherwise reset timer.
+            if (player->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) < 5.0f) {
+                timers.puntCastTime -= sDiff;
+
+                // Punt the player if he has been in the area aproximately PUNT_CAST_TIME ms
+                if (timers.puntCastTime < sDiff) {
+                    sLog.outBasic("Player in stomach getting punted");
+                    player->CastSpell(player, SPELL_PUNT_UPWARD, true);
+                    player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
+                    timers.puntCastTime = StomachTimers::PUNT_CAST_TIME;
+                }
+                // Player just arrived at punt area. Start cast visual
+                else if (timers.puntCastTime == (timers.PUNT_CAST_TIME-sDiff)) {
+                    if (Creature *pCreature = m_creature->SummonCreature(PUNT_CREATURE,
+                        puntPosition[0], puntPosition[1], puntPosition[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
+                    {
+                        sLog.outBasic("Player in stomach arrived at punt area. Starting punt countdown");
+                        pCreature->CastSpell(pCreature, 26092, false);
+                    }
+                }
             }
             else {
-                ++it;
+                if (timers.puntCastTime != StomachTimers::PUNT_CAST_TIME) {
+                    sLog.outBasic("Player in stomach left punt area. Resetting punt countdown");
+                }
+                timers.puntCastTime = StomachTimers::PUNT_CAST_TIME;
             }
+
+            // check if we should throw the player out of stomach
+            if (player->GetPositionZ() > -40.0f && player->HasMovementFlag(MOVEFLAG_JUMPING)) {
+                //Teleport player out
+                DoTeleportPlayer(player, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, player->GetOrientation());
+
+                //Cast knockback on them
+                player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
+
+                //Remove the acid debuff
+                player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+
+                //Remove player from stomach list
+                it = playersInStomach.erase(it);
+                sLog.outBasic("Player left stomach");
+                continue;
+            }
+            ++it;
         }
     }
 
@@ -501,6 +601,15 @@ struct cthunAI : public ScriptedAI
         return (*j);
     }
 
+    bool PlayerInStomach(Unit *unit)
+    {
+        auto it = std::find_if(playersInStomach.begin(), playersInStomach.end(),
+            [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
+            return e.first == unit->GetObjectGuid();
+        });
+
+        return it != playersInStomach.end();
+    }
 
     void WhisperIfShould(uint32 diff)
     {
@@ -533,39 +642,6 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    bool TransitionLogic(uint32 diff)
-    {
-        // This function should return false for ~12 seconds
-        // 4 seconds of eye death animation
-        // 1 second overlap between final eye death animation and start of c'thun emerge animation
-        // 7 more seconds of c'thun emerge animation/idling before the phase starts
-
-        int32 SignedDiff = diff;
-
-        if (transitionState == PhaseTransitionState::EYE_DYING) {
-            EyeDeathAnimTimer -= SignedDiff;
-
-            if (EyeDeathAnimTimer < SignedDiff) {
-                CthunEmergeTimer = 8000;
-                m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                transitionState = PhaseTransitionState::CTHUN_EMERGING;
-            }
-            return true;
-        }
-        else if (transitionState == PhaseTransitionState::CTHUN_EMERGING) {
-            CthunEmergeTimer -= SignedDiff;
-            if (CthunEmergeTimer < SignedDiff) {
-                Emerge();
-                transitionState = PhaseTransitionState::TRANSITION_FINISHED;
-            }
-            return true;
-        }
-
-        // transitionState == PhaseTransitionState::TRANSITION_FINISHED
-        return false;
-    }
-
     void Emerge()
     {
         m_creature->SetInCombatWithZone();
@@ -573,8 +649,11 @@ struct cthunAI : public ScriptedAI
 
         //Emerging phase
         m_creature->SetInCombatWithZone();
+    }
 
-        SpawnFleshTentacles();
+    void JustSummoned(Creature *pCreature)
+    {
+        
     }
 
     void JustDied(Unit* pKiller)
@@ -582,6 +661,8 @@ struct cthunAI : public ScriptedAI
         //Switch
         if (m_pInstance)
             m_pInstance->SetData(TYPE_CTHUN_PHASE, DONE);
+
+        currentPhaseState = BOSS_DEAD;
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage)
@@ -593,6 +674,7 @@ struct cthunAI : public ScriptedAI
             else damage = 1;
 
             //Prevent death in non-weakened state
+            //todo: should this really be a thing?
             if (damage >= m_creature->GetHealth())
                 damage = 0;
         }
@@ -600,9 +682,14 @@ struct cthunAI : public ScriptedAI
             DoCastSpellIfCan(m_creature, 27880, CAST_AURA_NOT_PRESENT);
     }
 
-    void FleshTentcleKilled()
+    void FleshTentcleKilled(ObjectGuid guid)
     {
-        ++FleshTentaclesKilled;
+        for (size_t i = 0; i < fleshTentacles.size(); i++) {
+            if (fleshTentacles.at(i) == guid) {
+                fleshTentacles.erase(fleshTentacles.begin() + i);
+                return;
+            }
+        }
     }
 };
 
@@ -1194,7 +1281,8 @@ struct giant_claw_tentacleAI : public ScriptedAI
             {
                 if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    if (target->GetPositionZ() >= 100.0f && target->GetTypeId() == TYPEID_PLAYER && !((Player*)target)->HasMovementFlag(MOVEFLAG_JUMPING)) // If the target is on same level as C'thun
+                    // If the target is on same level as C'thun
+                    if (target->GetPositionZ() >= 100.0f && target->GetTypeId() == TYPEID_PLAYER && !((Player*)target)->HasMovementFlag(MOVEFLAG_JUMPING)) 
                     {
                         //Dissapear and reappear at new position
                         m_creature->SetVisibility(VISIBILITY_OFF);
@@ -1382,7 +1470,7 @@ struct flesh_tentacleAI : public ScriptedAI
         {
             Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
             if (b_Cthun)
-                ((cthunAI*)(b_Cthun->AI()))->FleshTentcleKilled();
+                ((cthunAI*)(b_Cthun->AI()))->FleshTentcleKilled(m_creature->GetGUID());
         }
     }
 };
