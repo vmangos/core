@@ -59,8 +59,8 @@ struct boss_fankrissAI : public ScriptedAI
     uint32 m_uiEntangle2Timer;
     uint32 m_uiEntangle3Timer;
     uint32 m_uiEntangleSummonTimer;
-	uint32 m_uiEvadeCheckTimer;
-	uint32 m_uiEntangleAttackTimer;
+    uint32 m_uiEvadeCheckTimer;
+    uint32 m_uiEntangleAttackTimer;
 
     ObjectGuid m_EntangleTargetGUID;
     GuidList m_lHatchlingsGUIDs;
@@ -75,8 +75,8 @@ struct boss_fankrissAI : public ScriptedAI
         m_uiEntangle2Timer      = 0;
         m_uiEntangle3Timer      = 0;
         m_uiEntangleSummonTimer = 0;
-		m_uiEntangleAttackTimer = 0;
-		m_uiEvadeCheckTimer     = 2500;
+        m_uiEntangleAttackTimer = 0;
+        m_uiEvadeCheckTimer     = 2500;
         m_lHatchlingsGUIDs.clear();
     }
 
@@ -246,8 +246,8 @@ struct boss_fankrissAI : public ScriptedAI
         // Spawn 4 Hatchlings on top of players who have been entangled
         if (m_uiEntangleSummonTimer)
         {
-			if (m_uiEntangleSummonTimer < uiDiff)
-			{
+            if (m_uiEntangleSummonTimer < uiDiff)
+            {
                 if (m_lHatchlingsGUIDs.size() < (MAX_HATCHLINGS + 4))                               // If there are already more than MAX_HATCHLINGS - 4 up, prevent spawn
                 {
                     if (Player* pTarget = m_creature->GetMap()->GetPlayer(m_EntangleTargetGUID))
@@ -260,39 +260,39 @@ struct boss_fankrissAI : public ScriptedAI
                         }
                     }
                 }
-				m_uiEntangleAttackTimer = 1500;
+                m_uiEntangleAttackTimer = 1500;
                 m_uiEntangleSummonTimer = 0;
             }
             else
                 m_uiEntangleSummonTimer -= uiDiff;
         }
 
-		// Summoned Hatchlings should be set in combat with Zone after meleeing the person they've spawned next to once (if not picked up by a tank)
-		if (m_uiEntangleAttackTimer)
-		{
-			if (m_uiEntangleAttackTimer < uiDiff)
-			{
-				for (GuidList::const_iterator itr = m_lHatchlingsGUIDs.begin(); itr != m_lHatchlingsGUIDs.end(); itr++)
-				{
-					if (Creature* pSummoned = m_creature->GetMap()->GetCreature(*itr))
-						pSummoned->SetInCombatWithZone();
-				}
-			}
-			else
-				m_uiEntangleAttackTimer -= uiDiff;
-		}
+        // Summoned Hatchlings should be set in combat with Zone after meleeing the person they've spawned next to once (if not picked up by a tank)
+        if (m_uiEntangleAttackTimer)
+        {
+            if (m_uiEntangleAttackTimer < uiDiff)
+            {
+                for (GuidList::const_iterator itr = m_lHatchlingsGUIDs.begin(); itr != m_lHatchlingsGUIDs.end(); itr++)
+                {
+                    if (Creature* pSummoned = m_creature->GetMap()->GetCreature(*itr))
+                        pSummoned->SetInCombatWithZone();
+                }
+            }
+            else
+                m_uiEntangleAttackTimer -= uiDiff;
+        }
 
         DoMeleeAttackIfReady();
 
-		// Evade in case Fankriss starts running after someone at zone in
-		if (m_uiEvadeCheckTimer < uiDiff)
-		{
-			m_uiEvadeCheckTimer = 2500;
-			if (m_creature->GetPositionY() > 1400)
-				EnterEvadeMode();
-		}
-		else
-			m_uiEvadeCheckTimer -= uiDiff;
+        // Evade in case Fankriss starts running after someone at zone in
+        if (m_uiEvadeCheckTimer < uiDiff)
+        {
+            m_uiEvadeCheckTimer = 2500;
+            if (m_creature->GetPositionY() > 1400)
+                EnterEvadeMode();
+        }
+        else
+            m_uiEvadeCheckTimer -= uiDiff;
     }
 };
 

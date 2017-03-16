@@ -8,7 +8,7 @@
 enum
 {
     MAX_ENCOUNTER               = 10,
-    
+
     TYPE_SKERAM                 = 0,
     TYPE_SARTURA                = 1,
     TYPE_FANKRISS               = 2,
@@ -76,43 +76,43 @@ enum
     //GO_TWINS_ENTER_DOOR         = 180634,
     //GO_TWINS_EXIT_DOOR          = 180635,
 
-	GO_SKERAM_GATE				= 21785,
-	GO_TWINS_ENTER_DOOR			= 21783,
-	GO_TWINS_EXIT_DOOR			= 21784,
+    GO_SKERAM_GATE                = 21785,
+    GO_TWINS_ENTER_DOOR            = 21783,
+    GO_TWINS_EXIT_DOOR            = 21784,
 
-	AREATRIGGER_TWIN_EMPERORS	= 4047,
-	AREATRIGGER_SARTURA			= 4052,
+    AREATRIGGER_TWIN_EMPERORS    = 4047,
+    AREATRIGGER_SARTURA            = 4052,
 };
 
 class instance_temple_of_ahnqiraj : public ScriptedInstance_PTR
 {
-    public:
-        instance_temple_of_ahnqiraj(Map* pMap);
+public:
+    instance_temple_of_ahnqiraj(Map* pMap);
 
-        void Initialize();
-        
-        bool IsEncounterInProgress() const override;
+    void Initialize();
 
-        void OnCreatureRespawn(Creature* pCreature);
-        void OnCreatureCreate(Creature* pCreature);
-        void OnObjectCreate(GameObject* pGo);
+    bool IsEncounterInProgress() const override;
 
-        void SetData(uint32 uiType, uint32 uiData);
-        uint32 GetData(uint32 uiType);
+    void OnCreatureRespawn(Creature* pCreature);
+    void OnCreatureCreate(Creature* pCreature);
+    void OnObjectCreate(GameObject* pGo);
 
-		void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
+    void SetData(uint32 uiType, uint32 uiData);
+    uint32 GetData(uint32 uiType);
 
-        const char* Save() { return m_strInstData.c_str(); }
-        void Load(const char* chrIn);
+    void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
+
+    const char* Save() { return m_strInstData.c_str(); }
+    void Load(const char* chrIn);
 
     private:
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        std::string m_strInstData;
+    uint32 m_auiEncounter[MAX_ENCOUNTER];
+    std::string m_strInstData;
 
-        uint32 m_uiBugTrioDeathCount;
-        uint32 m_uiCthunPhase;
+    uint32 m_uiBugTrioDeathCount;
+    uint32 m_uiCthunPhase;
 
-		GuidList m_lRoyalGuardGUIDList;
+    GuidList m_lRoyalGuardGUIDList;
 };
 
 #endif
