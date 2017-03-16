@@ -1,112 +1,105 @@
-/* Copyright (C) 2006 - 2009 ScriptDev2 <https://scriptdev2.svn.sourceforge.net/>
- * This program is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
+/*
+ *  Copyright (C) 2017 - Elysium Project <http://elysium-project.org/>
  *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
+ *  Script rewritten by Zerix.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ *  Notes: This is a proof of concept that writing scripts for SD2 can look, and feel better.
+ *      Event based timers not only look cleaner, but they are easier to read and write for new/inexperienced
+ *      developers.
+ *  
  */
-
-/* ScriptData
-SDName: Boss_Lucifron
-SD%Complete: 100
-SDComment:
-SDCategory: Molten Core
-EndScriptData */
 
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-#define SPELL_IMPENDINGDOOM 19702
-#define SPELL_LUCIFRONCURSE 19703
-#define SPELL_SHADOWSHOCK   19460
+enum eSpells
+{
+    SpellImpendingDoom = 19702,             // Inflicts 2000 Shadow damage to nearby enemies after 10 sec. Radius: 40 yards.
+    SpellCurse         = 19703,             // Curses nearby enemies, increasing the costs of their spells and abilities by 100% for 5 min. Radius: 40 yards.
+    SpellShadowShock   = 19460              // Instantly lashes nearby enemies with dark magic, inflicting Shadow damage. Radius: 20 yards.
+};
+
+enum eEvents
+{
+    EventImpendingDoom,
+    EventCurse,
+    EventShadowShock
+};
 
 struct boss_lucifronAI : public ScriptedAI
 {
-    boss_lucifronAI(Creature* pCreature) : ScriptedAI(pCreature)
+    explicit boss_lucifronAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
+        m_Instance = static_cast<ScriptedInstance*>(pCreature->GetInstanceData());
+        boss_lucifronAI::Reset();
     }
 
-    uint32 ImpendingDoom_Timer;
-    uint32 LucifronCurse_Timer;
-    uint32 ShadowShock_Timer;
-
-    ScriptedInstance* m_pInstance;
-
-    void Reset()
+    void Reset() override
     {
-        ImpendingDoom_Timer = 10000;                        //Initial cast after 10 seconds so the debuffs alternate
-        LucifronCurse_Timer = 20000;                        //Initial cast after 20 seconds
-        ShadowShock_Timer = 6000;                           //6 seconds
+        m_Events.ScheduleEvent(eEvents::EventImpendingDoom, Seconds(10));       // Zerix: 10s Initial Cast, Repeats every 20s.
+        m_Events.ScheduleEvent(eEvents::EventCurse, Seconds(20));               // Zerix: 20s Initial Cast, Repeats every 15s.
+        m_Events.ScheduleEvent(eEvents::EventShadowShock, Seconds(6));          // Zerix: 6s Initial Cast, Repeats every 6s.
 
-        if (m_pInstance && m_creature->isAlive())
-            m_pInstance->SetData(TYPE_LUCIFRON, NOT_STARTED);
+        if (m_Instance && m_creature->isAlive())
+            m_Instance->SetData(TYPE_LUCIFRON, NOT_STARTED);
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* /*p_Who*/) override
     {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_LUCIFRON, IN_PROGRESS);
+        if (m_Instance)
+            m_Instance->SetData(TYPE_LUCIFRON, IN_PROGRESS);
+
         m_creature->SetInCombatWithZone();
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* /*p_Killer*/) override
     {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_LUCIFRON, DONE);
+        if (m_Instance)
+            m_Instance->SetData(TYPE_LUCIFRON, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 p_Diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //Impending doom timer
-        if (ImpendingDoom_Timer < diff)
+        m_Events.Update(p_Diff);
+        while (auto l_EventId = m_Events.ExecuteEvent())
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            switch (l_EventId)
             {
-                if (DoCastSpellIfCan(pTarget, SPELL_IMPENDINGDOOM) == CAST_OK)
-                    ImpendingDoom_Timer = 20000;
-                else
-                    ImpendingDoom_Timer = 100;
+                case eEvents::EventImpendingDoom:
+                {
+                    if (DoCastSpellIfCan(m_creature, eSpells::SpellImpendingDoom) == CAST_OK)
+                        m_Events.Repeat(Seconds(20));
+                    else
+                        m_Events.Repeat(Milliseconds(100));
+                }
+                case eEvents::EventCurse:
+                {
+                    if (DoCastSpellIfCan(m_creature, eSpells::SpellCurse) == CAST_OK)
+                        m_Events.Repeat(Seconds(15));
+                    else
+                        m_Events.Repeat(Milliseconds(100));
+                }
+                case eEvents::EventShadowShock:
+                {
+                    if (auto l_Target = SELECT_RANDOM_TARGET_POS_0)
+                        if (DoCastSpellIfCan(l_Target, eSpells::SpellShadowShock) == CAST_OK)
+                            m_Events.Repeat(Seconds(6));
+                }
+                default: break;
             }
         }
-        else ImpendingDoom_Timer -= diff;
-
-        //Lucifron's curse timer
-        if (LucifronCurse_Timer < diff)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_LUCIFRONCURSE) == CAST_OK)
-                    LucifronCurse_Timer = 15000;
-                else
-                    LucifronCurse_Timer = 100;
-            }
-        }
-        else LucifronCurse_Timer -= diff;
-
-        //Shadowshock
-        if (ShadowShock_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWSHOCK) == CAST_OK)
-                ShadowShock_Timer = 2000 + rand() % 4000;
-        }
-        else ShadowShock_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }
+
+private:
+    EventMap m_Events;
+    ScriptedInstance* m_Instance;
 };
+
 CreatureAI* GetAI_boss_lucifron(Creature* pCreature)
 {
     return new boss_lucifronAI(pCreature);

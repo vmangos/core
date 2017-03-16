@@ -23,6 +23,9 @@
 #define _UTIL_H
 
 #include "Common.h"
+#include "Duration.h"
+#include "Errors.h"
+#include "Log.h" // Zerix: Again, here we are asking for MANGOS_ASSERT to work. What's up?
 
 #include <string>
 #include <vector>
@@ -99,6 +102,8 @@ MANGOS_DLL_SPEC float rand_norm_f(void);
 MANGOS_DLL_SPEC double rand_chance(void);
 
 MANGOS_DLL_SPEC float rand_chance_f(void);
+
+Milliseconds randtime(Milliseconds const& min, Milliseconds const& max);
 
 /* Return true if a random roll fits in the specified chance (range 0-100). */
 inline bool roll_chance_f(float chance)

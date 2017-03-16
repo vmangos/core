@@ -10240,9 +10240,9 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
         if (!killDelayed)
             continue;
         // 2/ Interruption des sorts qui ne sont plus reference, mais dont il reste un event (ceux en parcours par exemple)
-        EventList::iterator it = (*iter)->m_Events.m_events.begin();
-        for (; it != (*iter)->m_Events.m_events.end(); ++it)
-            if (SpellEvent* event = dynamic_cast<SpellEvent*>(it->second))
+        auto i_Events = (*iter)->m_Events.GetEvents().begin();
+        for (; i_Events != (*iter)->m_Events.GetEvents().end(); ++i_Events)
+            if (SpellEvent* event = dynamic_cast<SpellEvent*>(i_Events->second))
                 if (event && event->GetSpell()->m_targets.getUnitTargetGuid() == GetObjectGuid())
                     if (event->GetSpell()->getState() != SPELL_STATE_FINISHED)
                         event->GetSpell()->cancel();

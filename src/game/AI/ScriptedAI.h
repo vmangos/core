@@ -15,6 +15,9 @@
 #define CAST_PET(a)     (dynamic_cast<Pet*>(a))
 #define CAST_AI(a,b)    (dynamic_cast<a*>(b))
 
+// Zerix: Select a random target (used in many scripts) at position 0.
+#define SELECT_RANDOM_TARGET_POS_0 me->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0)
+
 enum SCEquip
 {
     EQUIP_NO_CHANGE = -1,

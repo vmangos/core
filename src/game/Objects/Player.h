@@ -2111,7 +2111,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
             m_DelayedOperations &= ~operation;
         }
 
-        inline bool HasScheduledEvent() const { return m_Events.m_events.size(); }
+        inline bool HasScheduledEvent() const { return m_Events.HasScheduledEvent(); }
         void SetAutoInstanceSwitch(bool v) { m_enableInstanceSwitch = v; }
     protected:
         bool   m_enableInstanceSwitch;

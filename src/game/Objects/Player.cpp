@@ -19759,9 +19759,9 @@ void Player::InterruptSpellsWithCastItem(Item* item)
             }
 
     // Interrupt eventually delayed spells
-    EventList::iterator it = m_Events.m_events.begin();
-    for (; it != m_Events.m_events.end(); ++it)
-        if (SpellEvent* event = dynamic_cast<SpellEvent*>(it->second))
+    auto i_Events = m_Events.GetEvents().begin();
+    for (; i_Events != m_Events.GetEvents().end(); ++i_Events)
+        if (SpellEvent* event = dynamic_cast<SpellEvent*>(i_Events->second))
             if (event && event->GetSpell()->m_CastItem == item)
             {
                 event->GetSpell()->ClearCastItem();

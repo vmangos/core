@@ -43,6 +43,7 @@ set (framework_SRCS
 	Utilities/ByteConverter.h
 	Utilities/Callback.h
 	Utilities/EventProcessor.h
+	Utilities/EventMap.h
 	Utilities/LinkedList.h
 	Utilities/TypeList.h
 	Utilities/UnorderedMapSet.h
@@ -51,6 +52,7 @@ set (framework_SRCS
 	Policies/MemoryManagement.cpp
 	Policies/ObjectLifeTime.cpp
 	Utilities/EventProcessor.cpp
+	Utilities/EventMap.cpp
 
 )
 

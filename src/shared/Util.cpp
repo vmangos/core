@@ -147,6 +147,14 @@ float rand_chance_f(void)
     return (float)mtRand->randExc (100.0);
 }
 
+Milliseconds randtime(Milliseconds const& min, Milliseconds const& max)
+{
+    long long diff = max.count() - min.count();
+    MANGOS_ASSERT(diff >= 0);
+    MANGOS_ASSERT(diff <= (uint32)-1);
+    return min + Milliseconds(urand(0, diff));
+}
+
 Tokens StrSplit(const std::string &src, const std::string &sep)
 {
     Tokens r;
