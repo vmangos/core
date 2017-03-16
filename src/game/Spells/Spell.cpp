@@ -4691,8 +4691,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (targetOwner && casterOwner != targetOwner && targetOwner->duel && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
-                    return SPELL_FAILED_BAD_TARGETS;
+
+                if (m_spellInfo->Id == 7266 && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
+                {
+                    return SPELL_FAILED_TARGET_DUELING;
+                }
+
+                if (targetOwner && casterOwner != targetOwner && targetOwner->duel && targetOwner->duel->startTime && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
+                    return SPELL_FAILED_TARGET_DUELING;
             }
         }
         else if (m_caster == target)

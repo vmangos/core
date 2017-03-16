@@ -4581,8 +4581,35 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
     Player *caster = (Player*)m_caster;
     Player *target = (Player*)unitTarget;
 
+    // if the caster is already in a duel or has issued a challenge
+    if (caster->duel && caster->duel->opponent != target)
+    {
+        if (caster->duel->startTime)
+            caster->DuelComplete(DUEL_WON);
+        else
+            caster->DuelComplete(DUEL_INTERUPTED);
+
+       delete caster->duel;
+       delete target->duel;
+       caster->duel = target->duel = nullptr;
+    }
+
+    // if the caster attempts to duel somebody they're already in a duel with
+    if (caster->duel && caster->duel->opponent == target && caster->duel->startTime)
+    {
+        SendCastResult(SPELL_FAILED_TARGET_ENEMY);
+        return;
+    }
+
+    // if the target already has a pending duel/is dueling, reject the request
+    if (target->duel)
+    {
+        SendCastResult(SPELL_FAILED_TARGET_DUELING);
+        return;
+    }
+
     // caster or target already have requested duel
-    if (caster->duel || target->duel || !target->GetSocial() || target->GetSocial()->HasIgnore(caster->GetObjectGuid()) || target->FindMap() != caster->FindMap())
+    if (caster->duel || !target->GetSocial() || target->GetSocial()->HasIgnore(caster->GetObjectGuid()) || target->FindMap() != caster->FindMap())
         return;
 
     // Players can only fight a duel with each other outside (=not inside dungeons and not in capital cities)
@@ -4606,10 +4633,11 @@ void Spell::EffectDuel(SpellEffectIndex eff_idx)
     uint32 gameobject_id = m_spellInfo->EffectMiscValue[eff_idx];
 
     Map *map = m_caster->GetMap();
-    if (!pGameObj->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), gameobject_id, map,
-                          m_caster->GetPositionX() + (unitTarget->GetPositionX() - m_caster->GetPositionX()) / 2 ,
-                          m_caster->GetPositionY() + (unitTarget->GetPositionY() - m_caster->GetPositionY()) / 2 ,
-                          m_caster->GetPositionZ(),
+    float x = (m_caster->GetPositionX() + unitTarget->GetPositionX()) * 0.5f;
+    float y = (m_caster->GetPositionY() + unitTarget->GetPositionY()) * 0.5f;
+    float z = m_caster->GetPositionZ();
+
+    if (!pGameObj->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), gameobject_id, map, x, y, z,
                           m_caster->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
     {
         delete pGameObj;
