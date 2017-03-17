@@ -33,6 +33,7 @@
 
 #define BOSS_EYE_OF_CTHUN                   15589
 
+
 #define MOB_CLAW_TENTACLE                   15725
 #define MOB_EYE_TENTACLE                    15726
 #define MOB_SMALL_PORTAL                    15904
@@ -48,7 +49,7 @@
 #define SPELL_GREEN_BEAM                    26134
 #define SPELL_DARK_GLARE                    26029
 #define SPELL_RED_COLORATION                23537           //Probably not the right spell but looks similar
-#define SPELL_PURPLE_COLORATION             22581           //Probably not the right spell but looks similar
+#define SPELL_CTHUN_VULNERABLE              26235           
 #define SPELL_MIND_FLAY                     26143
 #define SPELL_GROUND_RUPTURE                26139
 #define SPELL_HAMSTRING                     26141
@@ -69,7 +70,6 @@
 #define SPELL_TRANSFORM                     26232
 
 #define CTHUN_TRANSFORMATION_VISUAL         15809
-#define SPELL_CTHUN_VULNERABLE = 26235
 
 static const float stomachPortPosition[4] = 
 {
@@ -173,8 +173,6 @@ struct cthunAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    CThunPhase prevUpdatePhase;
-
     uint32 WisperTimer;
 
     uint32 EyeTentacleTimer;
@@ -215,7 +213,6 @@ struct cthunAI : public ScriptedAI
 
     void Reset()
     {
-        prevUpdatePhase = PHASE_EYE_NORMAL;
         WisperTimer = 90000; // One random wisper every 90 - 300 seconds
 
         EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
@@ -225,8 +222,8 @@ struct cthunAI : public ScriptedAI
 
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
-        if (m_creature->HasAura(SPELL_PURPLE_COLORATION)) {
-            m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
+        if (m_creature->HasAura(SPELL_CTHUN_VULNERABLE)) {
+            m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
         }
         m_creature->SetVisibility(VISIBILITY_ON);
         
@@ -265,16 +262,18 @@ struct cthunAI : public ScriptedAI
                 //these two shouldnt be needed with Respawn imo, but respawn dosent seem to do it?
                 //Does respawn just call this same function or whut
                 b_Cthun->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                
+                // Demorph should set C'thuns modelId back to burrowed. 
+                // Also removing SPELL_TRANSFORM in case of reset just as he was casting that.
                 m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
                 m_creature->DeMorph();
+                
                 b_Cthun->Respawn();
             }
 
             Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
             if (b_Eye)
                 b_Eye->Respawn();
-
-            //todo: how do we lower cthun back down?
         }
 
         //todo: do this?
@@ -307,7 +306,7 @@ struct cthunAI : public ScriptedAI
         //is it needed for proper resetting? Shouldnt be 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
-            WhisperIfShould(diff);
+            WhisperIfShould(diff); //moved to instance script
             return;
         }
         */
@@ -316,21 +315,15 @@ struct cthunAI : public ScriptedAI
 
         
         m_creature->SetTargetGuid(0);
-        
+
         /*
         if (m_creature->GetTargetGuid() != m_creature->GetObjectGuid())
             m_creature->SetTargetGuid(m_creature->GetObjectGuid());
         */
-        auto currentPhase = m_pInstance->GetData(TYPE_CTHUN_PHASE);
-        if (prevUpdatePhase != PHASE_TRANSITION && currentPhase == PHASE_TRANSITION) {
-            //this seems to be instantly make him p2 
-            //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-        }
-        prevUpdatePhase = static_cast<CThunPhase>(m_pInstance->GetData(TYPE_CTHUN_PHASE));
-
+        
         UpdatePlayersInStomach(diff);
 
-        switch (currentPhase) {
+        switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
         case PHASE_TRANSITION: {
             if (EyeDeathAnimTimer > 0) {
 
@@ -338,6 +331,12 @@ struct cthunAI : public ScriptedAI
                     EyeDeathAnimTimer = 0;
                     CthunEmergeTimer = 8000;
                     
+                    m_creature->SetVisibility(VISIBILITY_OFF);
+                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    m_creature->SetVisibility(VISIBILITY_ON);
+
                     // Note: we need to set the display id before casting the transform spell, 
                     // in order to get the proper animation
                     m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
@@ -347,7 +346,7 @@ struct cthunAI : public ScriptedAI
                     {
                         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     }
-                    sLog.outBasic("Entering PRE_INVULNERABLE_STATE");
+                    sLog.outBasic("Starting C'thun emerge animation");
                     ResetartUnvulnerablePhase();
                 }
                 else {
@@ -359,7 +358,8 @@ struct cthunAI : public ScriptedAI
                 UpdateStomachGrab(diff);
 
                 if (CthunEmergeTimer < diff) {
-                    Emerge();
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    m_creature->SetInCombatWithZone();
                     m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN);
                     sLog.outBasic("Entering INVULNERABLE_STATE");
                 }
@@ -376,7 +376,7 @@ struct cthunAI : public ScriptedAI
                 WeaknessTimer = WEAKNESS_DURATION;
 
                 DoScriptText(EMOTE_WEAKENED, m_creature);
-                m_creature->CastSpell(m_creature, SPELL_PURPLE_COLORATION, true);
+                m_creature->CastSpell(m_creature, SPELL_CTHUN_VULNERABLE, true);
                 m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_WEAKENED);
                 // If there is a grabbed player, release him.
                 if (!StomachEnterTargetGUID.IsEmpty()) {
@@ -397,7 +397,7 @@ struct cthunAI : public ScriptedAI
             if (WeaknessTimer < diff) {
                 ResetartUnvulnerablePhase();
                 m_creature->SetVisibility(VISIBILITY_OFF);
-                m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
+                m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
                 m_creature->SetVisibility(VISIBILITY_ON);
                 m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN);
                 sLog.outBasic("Entering INVULNERABLE_STATE");
@@ -411,6 +411,7 @@ struct cthunAI : public ScriptedAI
         }
         }
     }
+    
     void SpawnFleshTentacles() {
 
         if (fleshTentacles.size() != 0) {
@@ -704,16 +705,6 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    void Emerge()
-    {
-        //XXX: why double SetInCombatWithZone()? Was like this in nost core
-        m_creature->SetInCombatWithZone();
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-
-        //Emerging phase
-        m_creature->SetInCombatWithZone();
-    }
-
     void JustDied(Unit* pKiller)
     {
         //Switch
@@ -726,7 +717,7 @@ struct cthunAI : public ScriptedAI
 
     void DamageTaken(Unit *done_by, uint32 &damage)
     {
-        if (!m_creature->HasAura(SPELL_PURPLE_COLORATION))
+        if (!m_creature->HasAura(SPELL_CTHUN_VULNERABLE))
         {
             //Not weakened so reduce damage by 99%
             if (damage / 99 > 0) damage /= 99;
@@ -1142,18 +1133,22 @@ struct eye_tentacleAI : public ScriptedAI
     uint32 MindflayTimer;
     uint64 Portal;
 
-    void JustDied(Unit*)
-    {
+    void DoDespawnPortal() {
+        if (!Portal) return;
+
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
+    }
+    void JustDied(Unit*)
+    {
+        DoDespawnPortal();
     }
 
     void Reset()
     {
         MindflayTimer = urand(1000, 2000);
 
-        if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
-            pCreature->ForcedDespawn();
+        DoDespawnPortal();
 
         m_creature->SetInCombatWithZone();
         m_creature->CastSpell(m_creature, SPELL_GROUND_RUPTURE, true);
@@ -1167,8 +1162,9 @@ struct eye_tentacleAI : public ScriptedAI
     void UpdateAI(const uint32 diff)
     {
         //Check if we have a target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
             return;
+        }
 
         //MindflayTimer
         if (MindflayTimer < diff)

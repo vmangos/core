@@ -168,6 +168,8 @@ void instance_temple_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
     case NPC_VEKNILASH:
     case NPC_EYE_OF_C_THUN:
     case NPC_CTHUN:
+
+        break;
     case NPC_MASTERS_EYE:
     case NPC_OURO_SPAWNER:
     case NPC_CTHUN_PORTAL:
@@ -310,6 +312,7 @@ void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
         {
             if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
             {
+                // ToDo: this should whisper all players, not just one?
                 // ToDo: also cast the C'thun Whispering charm spell - requires additional research
                 switch (urand(0, 7))
                 {
