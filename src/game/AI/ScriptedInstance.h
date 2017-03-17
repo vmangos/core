@@ -49,13 +49,15 @@ class MANGOS_DLL_DECL ScriptedInstance : public InstanceData
         std::string GenSaveData(uint32* encounters, uint32 maxIndex);
         void LoadSaveData(const char* pStr, uint32* encounters, uint32 maxIndex);
 
-        /// Wrapper for simulating map-wide text in this instance. It is expected that the Creature is stored in m_mNpcEntryGuidStore if loaded.
-        void DoOrSimulateScriptTextForThisInstance(int32 iTextEntry, uint32 uiCreatureEntry)
-        {
-            // Prevent debug output in GetSingleCreatureFromStorage
-            DoOrSimulateScriptTextForMap(iTextEntry, uiCreatureEntry, instance, GetSingleCreatureFromStorage(uiCreatureEntry, true));
-        }
+        // Get a Player from map
+        Player* GetPlayerInMap(bool bOnlyAlive = false, bool bCanBeGamemaster = true);
 
+	/// Wrapper for simulating map-wide text in this instance. It is expected that the Creature is stored in m_mNpcEntryGuidStore if loaded.
+	void DoOrSimulateScriptTextForThisInstance(int32 iTextEntry, uint32 uiCreatureEntry)
+	{
+	  // Prevent debug output in GetSingleCreatureFromStorage
+	  DoOrSimulateScriptTextForMap(iTextEntry, uiCreatureEntry, instance, GetSingleCreatureFromStorage(uiCreatureEntry, true));
+	}
     protected:
         // Storage for GO-Guids and NPC-Guids
         typedef std::map<uint32, ObjectGuid> EntryGuidMap;
@@ -73,19 +75,9 @@ protected:
     std::map<ObjectGuid, time_t> boss_expirations; // For PTR testes
 };
 
-class MANGOS_DLL_DECL ScriptedInstance_PTR : public ScriptedInstance
-{
-public:
-    explicit ScriptedInstance_PTR(Map* pMap) : ScriptedInstance(pMap) {}
-    void OnCreatureEnterCombat(Creature* creature) override;
-    void Update(uint32 diff) override;
-protected:
-    std::map<ObjectGuid, time_t> boss_expirations; // For PTR testes
-};
-
 
 /// A static const array of this structure must be handled to DialogueHelper
-struct DialogueEntry
+struct SIDialogueEntry
 {
     int32 iTextEntry;                                       ///< To be said text entry
     uint32 uiSayerEntry;                                    ///< Entry of the mob who should say
@@ -93,7 +85,7 @@ struct DialogueEntry
 };
 
 /// A static const array of this structure must be handled to DialogueHelper
-struct DialogueEntryTwoSide
+struct SIDialogueEntryTwoSide
 {
     int32 iTextEntry;                                       ///< To be said text entry (first side)
     uint32 uiSayerEntry;                                    ///< Entry of the mob who should say (first side)
@@ -107,9 +99,9 @@ class DialogueHelper
 {
 public:
     // The array MUST be terminated by {0,0,0}
-    DialogueHelper(DialogueEntry const* pDialogueArray);
+    DialogueHelper(SIDialogueEntry const* pDialogueArray);
     // The array MUST be terminated by {0,0,0,0,0}
-    DialogueHelper(DialogueEntryTwoSide const* aDialogueTwoSide);
+    DialogueHelper(SIDialogueEntryTwoSide const* aDialogueTwoSide);
 
     /// Function to initialize the dialogue helper for instances. If not used with instances, GetSpeakerByEntry MUST be overwritten to obtain the speakers
     void InitializeDialogueHelper(ScriptedInstance* pInstance, bool bCanSimulateText = false) { m_pInstance = pInstance; m_bCanSimulate = bCanSimulateText; }
@@ -131,10 +123,10 @@ private:
 
     ScriptedInstance* m_pInstance;
 
-    DialogueEntry const* m_pDialogueArray;
-    DialogueEntry const* m_pCurrentEntry;
-    DialogueEntryTwoSide const* m_pDialogueTwoSideArray;
-    DialogueEntryTwoSide const* m_pCurrentEntryTwoSide;
+    SIDialogueEntry const* m_pDialogueArray;
+    SIDialogueEntry const* m_pCurrentEntry;
+    SIDialogueEntryTwoSide const* m_pDialogueTwoSideArray;
+    SIDialogueEntryTwoSide const* m_pCurrentEntryTwoSide;
 
     uint32 m_uiTimer;
     bool m_bIsFirstSide;

@@ -123,6 +123,22 @@ void ScriptedInstance::LoadSaveData(const char* pStr, uint32* encounters, uint32
     }
 }
 
+
+/// Get the first found Player* (with requested properties) in the map. Can return nullptr.
+Player* ScriptedInstance::GetPlayerInMap(bool bOnlyAlive /*=false*/, bool bCanBeGamemaster /*=true*/)
+{
+    Map::PlayerList const& lPlayers = instance->GetPlayers();
+
+    for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
+    {
+        Player* pPlayer = itr->getSource();
+        if (pPlayer && (!bOnlyAlive || pPlayer->isAlive()) && (bCanBeGamemaster || !pPlayer->isGameMaster()))
+            return pPlayer;
+    }
+
+    return nullptr;
+}
+
 /// Returns a pointer to a loaded GameObject that was stored in m_mGoEntryGuidStore. Can return NULL
 GameObject* ScriptedInstance::GetSingleGameObjectFromStorage(uint32 uiEntry)
 {
@@ -183,12 +199,11 @@ void ScriptedInstance_PTR::Update(uint32 diff)
     ScriptedInstance::Update(diff);
 }
 
-
 /**
-Constructor for DialogueHelper
-@param   pDialogueArray The static const array of DialogueEntry holding the information about the dialogue. This array MUST be terminated by {0,0,0}
+   Constructor for DialogueHelper
+   @param   pDialogueArray The static const array of DialogueEntry holding the information about the dialogue. This array MUST be terminated by {0,0,0}
 */
-DialogueHelper::DialogueHelper(DialogueEntry const* pDialogueArray) :
+DialogueHelper::DialogueHelper(SIDialogueEntry const* pDialogueArray) :
     m_pInstance(nullptr),
     m_pDialogueArray(pDialogueArray),
     m_pCurrentEntry(nullptr),
@@ -200,10 +215,10 @@ DialogueHelper::DialogueHelper(DialogueEntry const* pDialogueArray) :
 {}
 
 /**
-Constructor for DialogueHelper (Two Sides)
-@param   pDialogueTwoSideArray The static const array of DialogueEntryTwoSide holding the information about the dialogue. This array MUST be terminated by {0,0,0,0,0}
+   Constructor for DialogueHelper (Two Sides)
+   @param   pDialogueTwoSideArray The static const array of DialogueEntryTwoSide holding the information about the dialogue. This array MUST be terminated by {0,0,0,0,0}
 */
-DialogueHelper::DialogueHelper(DialogueEntryTwoSide const* pDialogueTwoSideArray) :
+DialogueHelper::DialogueHelper(SIDialogueEntryTwoSide const* pDialogueTwoSideArray) :
     m_pInstance(nullptr),
     m_pDialogueArray(nullptr),
     m_pCurrentEntry(nullptr),
@@ -215,8 +230,8 @@ DialogueHelper::DialogueHelper(DialogueEntryTwoSide const* pDialogueTwoSideArray
 {}
 
 /**
-Function to start a (part of a) dialogue
-@param   iTextEntry The TextEntry of the dialogue that will be started (must be always the entry of first side)
+   Function to start a (part of a) dialogue
+   @param   iTextEntry The TextEntry of the dialogue that will be started (must be always the entry of first side)
 */
 void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
 {
@@ -225,7 +240,7 @@ void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
 
     if (m_pDialogueArray)                                   // One Side
     {
-        for (DialogueEntry const* pEntry = m_pDialogueArray; pEntry->iTextEntry; ++pEntry)
+        for (SIDialogueEntry const* pEntry = m_pDialogueArray; pEntry->iTextEntry; ++pEntry)
         {
             if (pEntry->iTextEntry == iTextEntry)
             {
@@ -237,7 +252,7 @@ void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
     }
     else                                                    // Two Sides
     {
-        for (DialogueEntryTwoSide const* pEntry = m_pDialogueTwoSideArray; pEntry->iTextEntry; ++pEntry)
+        for (SIDialogueEntryTwoSide const* pEntry = m_pDialogueTwoSideArray; pEntry->iTextEntry; ++pEntry)
         {
             if (pEntry->iTextEntry == iTextEntry)
             {
@@ -246,11 +261,11 @@ void DialogueHelper::StartNextDialogueText(int32 iTextEntry)
                 break;
             }
         }
-    }
+   }
 
     if (!bFound)
     {
-        script_error_log("Script call DialogueHelper::StartNextDialogueText, but textEntry %i is not in provided dialogue (on map id %u)", iTextEntry, m_pInstance ? m_pInstance->instance->GetId() : 0);
+        sLog.outError("Script call DialogueHelper::StartNextDialogueText, but textEntry %i is not in provided dialogue (on map id %u)", iTextEntry, m_pInstance ? m_pInstance->instance->GetId() : 0);
         return;
     }
 
@@ -304,7 +319,7 @@ void DialogueHelper::DoNextDialogueStep()
             DoScriptText(iTextEntry, pSpeaker);
     }
 
-    JustDidDialogueStep(m_pDialogueArray ? m_pCurrentEntry->iTextEntry : m_pCurrentEntryTwoSide->iTextEntry);
+    JustDidDialogueStep(m_pDialogueArray ?  m_pCurrentEntry->iTextEntry : m_pCurrentEntryTwoSide->iTextEntry);
 
     // Increment position
     if (m_pDialogueArray)
