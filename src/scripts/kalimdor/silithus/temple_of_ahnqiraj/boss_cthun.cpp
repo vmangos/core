@@ -62,6 +62,10 @@
 #define SPELL_EXIT_STOMACH_KNOCKBACK        25383
 #define SPELL_DIGESTIVE_ACID                26476
 
+// Helper display id; This is needed in order to have the proper transform animation. 
+// ToDo: remove this when auras are fixed in core.
+#define DISPLAY_ID_CTHUN_BODY               15786
+
 static const float stomachPortPosition[4] = 
 {
     -8562.0f, 2037.0f, -70.0f, 5.05f
@@ -164,6 +168,8 @@ struct cthunAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
+    CThunPhase prevUpdatePhase;
+
     uint32 WisperTimer;
 
     uint32 EyeTentacleTimer;
@@ -202,31 +208,21 @@ struct cthunAI : public ScriptedAI
     };
     std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
 
-    /*
-    enum PhaseState {
-        EYE_DYING,
-        PRE_INVULNERABLE_PHASE,
-        INVULNERABLE_PHASE,
-        VULNERABLE_PHASE,
-        BOSS_DEAD
-    };
-    PhaseState currentPhaseState;
-    */
-
     void Reset()
     {
+        prevUpdatePhase = PHASE_EYE_NORMAL;
         WisperTimer = 90000; // One random wisper every 90 - 300 seconds
 
         EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
         CthunEmergeTimer = 8000;
 
-
-        //currentPhaseState = EYE_DYING;
-
         //ResetartUnvulnerablePhase();
 
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
+        if (m_creature->HasAura(SPELL_PURPLE_COLORATION)) {
+            m_creature->RemoveAurasDueToSpell(SPELL_PURPLE_COLORATION);
+        }
         m_creature->SetVisibility(VISIBILITY_ON);
         
         while(fleshTentacles.size() > 0) {
@@ -259,6 +255,15 @@ struct cthunAI : public ScriptedAI
         {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
             m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+            Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+            if (b_Cthun) {
+                //these two shouldnt be needed with Respawn imo, but respawn dosent seem to do it?
+                //Does respawn just call this same function or whut
+                b_Cthun->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                b_Cthun->Respawn();
+            }
+
             Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
             if (b_Eye)
                 b_Eye->Respawn();
@@ -291,15 +296,16 @@ struct cthunAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
-            return;
-
         // Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
             WhisperIfShould(diff);
             return;
         }
+
+        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
+            return;
+
         
         m_creature->SetTargetGuid(0);
         
@@ -307,18 +313,31 @@ struct cthunAI : public ScriptedAI
         if (m_creature->GetTargetGuid() != m_creature->GetObjectGuid())
             m_creature->SetTargetGuid(m_creature->GetObjectGuid());
         */
-
+        auto currentPhase = m_pInstance->GetData(TYPE_CTHUN_PHASE);
+        if (prevUpdatePhase != PHASE_TRANSITION && currentPhase == PHASE_TRANSITION) {
+            //this seems to be instantly make him p2 
+            //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+        }
+        prevUpdatePhase = static_cast<CThunPhase>(m_pInstance->GetData(TYPE_CTHUN_PHASE));
 
         UpdatePlayersInStomach(diff);
 
-        switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
+        switch (currentPhase) {
         case PHASE_TRANSITION: {
             if (EyeDeathAnimTimer > 0) {
+
                 if (EyeDeathAnimTimer < diff) {
                     EyeDeathAnimTimer = 0;
                     CthunEmergeTimer = 8000;
-                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    
+                    // Note: we need to set the display id before casting the transform spell, 
+                    // in order to get the proper animation
+                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
+                    // Transform and start C'thun phase
+                    if (DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) == CAST_OK)
+                    {
+                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    }
                     sLog.outBasic("Entering PRE_INVULNERABLE_STATE");
                     ResetartUnvulnerablePhase();
                 }
@@ -644,6 +663,7 @@ struct cthunAI : public ScriptedAI
         */
     }
 
+    //todo: can we remove this with the new additions in instance_temple_of_ahnqiraj.cpp L300
     void WhisperIfShould(uint32 diff)
     {
         //No target so we'll use this section to do our random wispers instance wide
@@ -776,7 +796,7 @@ struct eye_of_cthunAI : public ScriptedAI
         //Reset Phase
         if (m_pInstance)
         {
-            m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
+            m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_NORMAL);
             m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
         }
 
