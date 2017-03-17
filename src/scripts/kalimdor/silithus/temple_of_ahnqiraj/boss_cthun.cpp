@@ -296,13 +296,15 @@ struct cthunAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        // Check if we have a target
+        /*
+        //running this code in p1 makes lower body rotate after target.
+        //is it needed for proper resetting? Shouldnt be 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         {
             WhisperIfShould(diff);
             return;
         }
-
+        */
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
             return;
 
@@ -838,11 +840,21 @@ struct eye_of_cthunAI : public ScriptedAI
         //No instance
         if (!m_pInstance)
             return;
+        
+        if (!IsAlreadyPulled) {
+            AggroRadius();
+        }
+
+        //does this alone cast green beam?
+        if (!m_creature->SelectHostileTarget()) {
+            return;
+        }
+        /*
         if (!m_creature->SelectHostileTarget()) {
             AggroRadius();
             return;
         }
-
+        */
         /*
         //Check if we have a target
         if (!IsAlreadyPulled)
@@ -895,7 +907,6 @@ struct eye_of_cthunAI : public ScriptedAI
         else
             PhaseTimer -= diff;
     }
-
 
     void TentacleTimers(uint32 diff)
     {
