@@ -96,8 +96,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         if (m_pInstance)
             return m_pInstance->GetSingleCreatureFromStorage(IAmVeklor() ? NPC_VEKNILASH : NPC_VEKLOR);
-        else
-            return NULL;
+        return NULL;
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage)
@@ -253,7 +252,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             if (!pUnit)
                 continue;
 
-            float pudist = pUnit->GetDistance((const Creature *)m_creature);
+            float pudist = pUnit->GetDistance(m_creature);
             if (!nearp || (neardist > pudist))
             {
                 nearp = pUnit;
@@ -282,10 +281,12 @@ struct boss_twinemperorsAI : public ScriptedAI
             float other_z = pOtherBoss->GetPositionZ();
             float other_o = pOtherBoss->GetOrientation();
 
-            Map *thismap = m_creature->GetMap();
-            thismap->CreatureRelocation(pOtherBoss, m_creature->GetPositionX(),
-                                        m_creature->GetPositionY(),    m_creature->GetPositionZ(), m_creature->GetOrientation());
-            thismap->CreatureRelocation(m_creature, other_x, other_y, other_z, other_o);
+ 	    pOtherBoss->NearTeleportTo(m_creature->GetPositionX(),
+ 				       m_creature->GetPositionY(),
+ 				       m_creature->GetPositionZ(),
+                                        m_creature->GetOrientation());
+ 	    m_creature->NearTeleportTo(other_x, other_y, other_z, other_o);
+
 
             SetAfterTeleport();
 
@@ -326,7 +327,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 Unit *nearu = PickNearestPlayer();
                 //DoYell(nearu->GetName(), LANG_UNIVERSAL, 0);
                 AttackStart(nearu);
-                m_creature->getThreatManager().addThreat(nearu, 10000);
+                m_creature->getThreatManager().addThreat(nearu, 100000);
                 return true;
             }
             else
@@ -366,8 +367,8 @@ struct boss_twinemperorsAI : public ScriptedAI
     Creature *RespawnNearbyBugsAndGetOne()
     {
         std::list<Creature*> lUnitList;
-        GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15316, 150.0f);
-        GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15317, 150.0f);
+        GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15316, ABUSE_BUG_RANGE);
+        GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15317, ABUSE_BUG_RANGE);
 
         if (lUnitList.empty())
             return NULL;
@@ -376,18 +377,15 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         for (std::list<Creature*>::iterator iter = lUnitList.begin(); iter != lUnitList.end(); ++iter)
         {
-            Creature *c = (Creature *)(*iter);
+            Creature *c = *iter;
             if (c->isDead())
             {
                 c->Respawn();
                 c->setFaction(7);
                 c->RemoveAllAuras();
             }
-            if (c->IsWithinDistInMap(m_creature, ABUSE_BUG_RANGE))
-            {
-                if (!nearb || !urand(0, 3))
-                    nearb = c;
-            }
+            if (!nearb || !urand(0, 3))
+                nearb = c;
         }
         return nearb;
     }
@@ -467,8 +465,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
     void CastSpellOnBug(Creature *target)
     {
         target->setFaction(14);
-
-        DoCastSpellIfCan(target, SPELL_MUTATE_BUG, CAST_TRIGGERED);
+        target->AddAura(SPELL_MUTATE_BUG);
     }
 
     void UpdateAI(const uint32 diff)
@@ -553,8 +550,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
     void CastSpellOnBug(Creature *target)
     {
         target->setFaction(14);
-
-        DoCastSpellIfCan(target, SPELL_EXPLODEBUG, CAST_TRIGGERED);
+        target->AddAura(SPELL_EXPLODEBUG);
     }
 
     void UpdateAI(const uint32 diff)
