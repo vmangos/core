@@ -54,7 +54,7 @@
 #define SPELL_HAMSTRING                     26141
 #define SPELL_GIANT_GROUND_RUPTURE          26478
 #define SPELL_GROUND_STUN                   6524
-#define SPELL_TRANSFORM                     26232
+
 #define SPELL_MASSIVE_GROUND_RUPTURE        26100
 #define SPELL_THRASH                        3391
 #define SPELL_PUNT_UPWARD                   16716
@@ -65,6 +65,11 @@
 // Helper display id; This is needed in order to have the proper transform animation. 
 // ToDo: remove this when auras are fixed in core.
 #define DISPLAY_ID_CTHUN_BODY               15786
+#define DISPLAY_ID_CTHUN_BURROW             15787
+#define SPELL_TRANSFORM                     26232
+
+#define CTHUN_TRANSFORMATION_VISUAL         15809
+#define SPELL_CTHUN_VULNERABLE = 26235
 
 static const float stomachPortPosition[4] = 
 {
@@ -261,6 +266,7 @@ struct cthunAI : public ScriptedAI
                 //Does respawn just call this same function or whut
                 b_Cthun->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
                 m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                m_creature->DeMorph();
                 b_Cthun->Respawn();
             }
 
@@ -334,6 +340,7 @@ struct cthunAI : public ScriptedAI
                     
                     // Note: we need to set the display id before casting the transform spell, 
                     // in order to get the proper animation
+                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
                     m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
                     // Transform and start C'thun phase
                     if (DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) == CAST_OK)
