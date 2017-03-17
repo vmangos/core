@@ -79,6 +79,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     uint32 m_uiSandBlastTimer;
     uint32 m_uiSubmergeTimer;
     uint32 m_uiSummonBaseTimer;
+    uint32 m_uiNoMeleeTimer;
 
     uint32 m_uiSummonMoundTimer;
 
@@ -87,12 +88,17 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     ObjectGuid m_ouroTriggerGuid;
 
+    WorldLocation m_StartingLoc;
+
     void Reset()
     {
         m_uiSweepTimer        = urand(35000, 40000);
         m_uiSandBlastTimer    = urand(30000, 45000);
         m_uiSubmergeTimer     = 90000;
         m_uiSummonBaseTimer   = 2000;
+        // Source : http://wowwiki.wikia.com/wiki/Ouro
+        // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
+        m_uiNoMeleeTimer      = 10000;
 
         m_uiSummonMoundTimer  = 10000;
 
@@ -104,12 +110,20 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OURO, IN_PROGRESS);
+
+        m_creature->GetPosition(m_StartingLoc);
     }
 
     void JustReachedHome()
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OURO, FAIL);
+
+        // Clear dirt mounds
+        std::list<Creature *> lCreature;
+        m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_DIRT_MOUND, 250.0f);
+        for (std::list<Creature *>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
+            (*itr)->ForcedDespawn();
 
         m_creature->ForcedDespawn();
     }
@@ -129,11 +143,31 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             float ry;
             float rz;
             m_ouroTriggerGuid = pSummoned->GetObjectGuid();
-            pSummoned->GetRandomPoint(pSummoned->GetPositionX(),
-                                      pSummoned->GetPositionY(),
-                                      pSummoned->GetPositionZ(),
+            pSummoned->GetRandomPoint(m_StartingLoc.coord_x,
+                                      m_StartingLoc.coord_y,
+                                      m_StartingLoc.coord_z,
                                       100.0f, rx, ry, rz);
             pSummoned->NearTeleportTo(rx, ry, rz, 0);
+        }
+    }
+
+    void Submerge()
+    {
+        // Source : http://wowwiki.wikia.com/wiki/Ouro
+        // "Ouro has a chance to submerge every 1.5minutes.
+        // He will not submerge if he is busy casting a Sand Blast or Sweep, else he will submerge
+        // (ie. the chance of submerging is totally random)"
+        m_uiSubmergeTimer = 90000;
+        if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL) == CAST_OK)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
+
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+            m_bSubmerged      = true;
+            m_uiSubmergeTimer = 30000;
+            m_uiNoMeleeTimer  = 10000;
         }
     }
 
@@ -191,16 +225,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                 // Submerge
                 if (m_uiSubmergeTimer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL) == CAST_OK)
-                    {
-                        DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
-                        DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
-
-                        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
-                        m_bSubmerged      = true;
-                        m_uiSubmergeTimer = 30000;
-                    }
+                    Submerge();
                 }
                 else
                     m_uiSubmergeTimer -= uiDiff;
@@ -219,7 +244,10 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
             // If we are within range melee the target
             if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            {
+                m_uiNoMeleeTimer = 5000;
                 DoMeleeAttackIfReady();
+            }
             // Spam Boulder spell when enraged and not tanked
             else if (m_bEnraged)
             {
@@ -229,6 +257,13 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                         DoCastSpellIfCan(pTarget, SPELL_BOULDER);
                 }
             }
+            // Submerge if no melee and not enraged
+            else if (m_uiNoMeleeTimer < uiDiff)
+            {
+                Submerge();
+            }
+            else
+                m_uiNoMeleeTimer -= uiDiff;
         }
         else
         {
