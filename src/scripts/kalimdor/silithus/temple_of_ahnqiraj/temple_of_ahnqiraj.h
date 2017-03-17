@@ -14,7 +14,7 @@ enum
     TYPE_FANKRISS               = 2,
     TYPE_HUHURAN                = 3,
     TYPE_TWINS                  = 4,
-    TYPE_C_THUN                 = 5,
+    TYPE_CTHUN                  = 5,
     TYPE_BUG_TRIO               = 6,
     TYPE_VISCIDUS               = 7,
     TYPE_OURO                   = 8,
@@ -66,25 +66,53 @@ enum
     NPC_VEKNISS_BORER           = 15622,
     NPC_SPAWN_OF_FANKRISS       = 15630,
     NPC_OURO_SCARAB             = 15718,
+    NPC_OURO_SPAWNER            = 15957,
     NPC_CTHUN                   = 15727,
     NPC_CTHUN_PORTAL            = 15896,
     NPC_VEKNISS_HATCHLING       = 15962,
-    NPC_THE_MASTERS_EYE         = 15963,
+    NPC_MASTERS_EYE             = 15963,
     NPC_SARTURA_S_ROYAL_GUARD   = 15984,
 
     //GO_SKERAM_GATE              = 180636,
     //GO_TWINS_ENTER_DOOR         = 180634,
     //GO_TWINS_EXIT_DOOR          = 180635,
+    GO_SANDWORM_BASE            = 180795,
 
-    GO_SKERAM_GATE                = 21785,
-    GO_TWINS_ENTER_DOOR            = 21783,
-    GO_TWINS_EXIT_DOOR            = 21784,
+    GO_SKERAM_GATE		= 21785,
+    GO_TWINS_ENTER_DOOR		= 21783,
+    GO_TWINS_EXIT_DOOR		= 21784,
 
-    AREATRIGGER_TWIN_EMPERORS    = 4047,
-    AREATRIGGER_SARTURA            = 4052,
+    AREATRIGGER_TWIN_EMPERORS	= 4047,
+    AREATRIGGER_SARTURA		= 4052,
+
+    EMOTE_EYE_INTRO             = -1531012,
+    SAY_EMPERORS_INTRO_1        = -1531013,
+    SAY_EMPERORS_INTRO_2        = -1531014,
+    SAY_EMPERORS_INTRO_3        = -1531015,
+    SAY_EMPERORS_INTRO_4        = -1531016,
+    SAY_EMPERORS_INTRO_5        = -1531017,
+    SAY_EMPERORS_INTRO_6        = -1531018,
+
+    // Whispered on players around the map
+    SAY_CTHUN_WHISPER_1         = -1531033,
+    SAY_CTHUN_WHISPER_2         = -1531034,
+    SAY_CTHUN_WHISPER_3         = -1531035,
+    SAY_CTHUN_WHISPER_4         = -1531036,
+    SAY_CTHUN_WHISPER_5         = -1531037,
+    SAY_CTHUN_WHISPER_6         = -1531038,
+    SAY_CTHUN_WHISPER_7         = -1531039,
+    SAY_CTHUN_WHISPER_8         = -1531040,
+    SPELL_SUMMON_PLAYER         = 20477,
+
+    // Cast periodically on players around the instance
+    SPELL_WHISPERINGS_CTHUN_1   = 26195,
+    SPELL_WHISPERINGS_CTHUN_2   = 26197,
+    SPELL_WHISPERINGS_CTHUN_3   = 26198,
+    SPELL_WHISPERINGS_CTHUN_4   = 26258,
+    SPELL_WHISPERINGS_CTHUN_5   = 26259,
 };
 
-class instance_temple_of_ahnqiraj : public ScriptedInstance_PTR
+class instance_temple_of_ahnqiraj : public ScriptedInstance
 {
 public:
     instance_temple_of_ahnqiraj(Map* pMap);
@@ -105,14 +133,23 @@ public:
     const char* Save() { return m_strInstData.c_str(); }
     void Load(const char* chrIn);
 
-    private:
+    void Update(uint32 uiDiff);
+
+    void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
+
+private:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string m_strInstData;
 
     uint32 m_uiBugTrioDeathCount;
     uint32 m_uiCthunPhase;
+    uint32 m_uiCthunWhisperTimer;
 
     GuidList m_lRoyalGuardGUIDList;
+
+    bool m_bIsEmperorsIntroDone;
+
+    DialogueHelper m_dialogueHelper;
 };
 
 #endif
