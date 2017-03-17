@@ -114,16 +114,20 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_creature->GetPosition(m_StartingLoc);
     }
 
+    void DespawnDirtMounds()
+    {
+        std::list<Creature *> lCreature;
+        m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_DIRT_MOUND, 250.0f);
+        for (std::list<Creature *>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
+            (*itr)->ForcedDespawn();
+    }
+
     void JustReachedHome()
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_OURO, FAIL);
 
-        // Clear dirt mounds
-        std::list<Creature *> lCreature;
-        m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_DIRT_MOUND, 250.0f);
-        for (std::list<Creature *>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
-            (*itr)->ForcedDespawn();
+        DespawnDirtMounds();
 
         m_creature->ForcedDespawn();
     }
@@ -282,6 +286,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_bSubmerged        = false;
                     m_uiSummonBaseTimer = 2000;
                     m_uiSubmergeTimer   = 90000;
+
+                    DespawnDirtMounds();
                 }
             }
             else
