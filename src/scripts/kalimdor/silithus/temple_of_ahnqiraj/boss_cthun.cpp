@@ -63,6 +63,9 @@
 #define SPELL_EXIT_STOMACH_KNOCKBACK        25383
 #define SPELL_DIGESTIVE_ACID                26476
 
+
+#define SPELL_PORT_OUT_STOMACH              26648 // Used by cthun in p2 if there are noone alive out of stomach
+
 // Helper display id; This is needed in order to have the proper transform animation. 
 // ToDo: remove this when auras are fixed in core.
 #define DISPLAY_ID_CTHUN_BODY               15786
