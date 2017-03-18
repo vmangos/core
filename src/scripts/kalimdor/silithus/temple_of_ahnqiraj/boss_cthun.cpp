@@ -19,20 +19,19 @@
 
 /* Nostalrius (inital version Scriptcraft)
 ** Name: Boss_Cthun
-** Complete: 95%
-** Comment: Aggro mechanism
+** Complete: who knows
+** Comment: so many things
 ** Category: Temple of Ahn'Qiraj
+** C'thun phase 2 and partially p1 completely rewritten by Gemt
 */
 
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
+#include "g3dlite/G3D/Vector2.h" // Used by polygon functionality
 
 #define EMOTE_WEAKENED                      -1531011
 #define PI                                  3.14
 #define RANDOM_SOUND_WHISPER                8663
-
-#define BOSS_EYE_OF_CTHUN                   15589
-
 
 #define MOB_CLAW_TENTACLE                   15725
 #define MOB_EYE_TENTACLE                    15726
@@ -48,7 +47,7 @@
 
 #define SPELL_GREEN_BEAM                    26134
 #define SPELL_DARK_GLARE                    26029
-#define SPELL_RED_COLORATION                23537           //Probably not the right spell but looks similar
+#define SPELL_RED_COLORATION                23537 //Probably not the right spell but looks similar
 #define SPELL_CTHUN_VULNERABLE              26235           
 #define SPELL_MIND_FLAY                     26143
 #define SPELL_GROUND_RUPTURE                26139
@@ -78,15 +77,18 @@ static const float stomachPortPosition[4] =
 {
     -8562.0f, 2037.0f, -70.0f, 5.05f
 };
+
 static const float fleshTentaclePositions[2][4] = 
 {
     { -8571.0f, 1990.0f, -98.0f, 1.22f },
     { -8525.0f, 1994.0f, -98.0f, 2.12f }
 };
+
 static const float puntPosition[3] =
 {
     -8545.9f, 1987.25f, -96.0f
 };
+
 
 enum CThunPhase
 {
@@ -98,70 +100,43 @@ enum CThunPhase
     PHASE_CTHUN_DONE = 5,
 };
 
+// How many times will c'thun target the initial puller with green beam before random target.
+static const int MAX_INITIAL_PULLER_HITS = 3;
 
-#include "g3dlite/G3D/Vector2.h"
+// Green beam has a 2 sec cast time. This adds additional cooldown to the ability
+static const int GREEN_BEAM_COOLDOWN = 2000;
+
 
 namespace PolyCheck {
-
     using namespace G3D;
-    static const Vector2 RoomCenterPos(-8570.3f, 1991.26f);
-    /*
-    static const std::vector<Vector2> polygon2 = {
-    Vector2(-8540.892578f, 2077.470947f), //north-west
-    Vector2()
 
-    }*/
-    /*
-    static const std::vector<Vector2> polygon = {
-        Vector2(-8665.906f, 1962.258f), //left entrance
-        Vector2(-8650.617f, 1996.51f), //wall with npcs
-
-        Vector2(-8633.80f, 2018.435f),
-        Vector2(-8595.788f, 2053.5957f),
-
-        Vector2(-8541.91f, 2076.5f), //north-west corner outside cthun
-
-        Vector2(-8571.196f, 2060.849f), //corner northwest inside cthun where player cant get
-
-        Vector2(-8498.618f, 2026.499f), //back of cthun west
-
-        Vector2(-8495.249f, 2017.95f), //back of cthun east
-        Vector2(-8506.636f, 1952.551f), //north-east
-        Vector2(-8555.203f, 1926.76f), //east outside
-        Vector2(-8626.79f, 1936.226f), //south-east outside
-        Vector2(-8660.562f, 1951.174f) //entrance east
-    };
-    */
-    static const std::vector<Vector2> polygon = {
-        Vector2(-8665.73, 1963.21),
-        Vector2(-8647.89, 1990.35),
-        Vector2(-8635.87, 2012.05),
-        Vector2(-8625.09, 2025.99),
-        Vector2(-8614.13, 2039.52),
-        Vector2(-8602.02, 2046.36),
-        Vector2(-8582.55, 2057.31),
-        Vector2(-8574.95, 2059.83),
-        Vector2(-8569.61, 2061.66),
-        Vector2(-8551.4, 2067.35),
-        Vector2(-8533.71, 2047.26),
-        Vector2(-8515.55, 2035.06),
-        Vector2(-8498.17, 2027.1),
-        Vector2(-8494.54, 2017.73),
-        Vector2(-8501.85, 2000.21),
-        Vector2(-8506.76, 1979.18),
-        Vector2(-8505.93, 1952.25),
-        Vector2(-8527.78, 1941.78),
-        Vector2(-8535.94, 1938.05),
-        Vector2(-8569.88, 1929.68),
-        Vector2(-8601.73, 1933.88),
-        Vector2(-8605.73, 1934.96),
-        Vector2(-8628.49, 1942.31),
-        Vector2(-8660.64, 1950.26)
+    static const std::vector<Vector2> roomPolygon = {
+        Vector2(-8665.73f, 1963.21f),
+        Vector2(-8647.89f, 1990.35f),
+        Vector2(-8635.87f, 2012.05f),
+        Vector2(-8625.09f, 2025.99f),
+        Vector2(-8614.13f, 2039.52f),
+        Vector2(-8602.02f, 2046.36f),
+        Vector2(-8582.55f, 2057.31f),
+        Vector2(-8574.95f, 2059.83f),
+        Vector2(-8569.61f, 2061.66f),
+        Vector2(-8551.4f, 2067.35f),
+        Vector2(-8533.71f, 2047.26f),
+        Vector2(-8515.55f, 2035.06f),
+        Vector2(-8498.17f, 2027.1f),
+        Vector2(-8494.54f, 2017.73f),
+        Vector2(-8501.85f, 2000.21f),
+        Vector2(-8506.76f, 1979.18f),
+        Vector2(-8505.93f, 1952.25f),
+        Vector2(-8527.78f, 1941.78f),
+        Vector2(-8535.94f, 1938.05f),
+        Vector2(-8569.88f, 1929.68f),
+        Vector2(-8601.73f, 1933.88f),
+        Vector2(-8605.73f, 1934.96f),
+        Vector2(-8628.49f, 1942.31f),
+        Vector2(-8660.64f, 1950.26f)
     };
 
-    const float minZ = 95.0f;
-    const float maxZ = 115.0f;
-    
     const float maxX = -8494.54004f;
     const float minX = -8665.73047f;
     const float maxY = 2067.35010f;
@@ -172,24 +147,29 @@ namespace PolyCheck {
         Vector2 p(unit->GetPositionX(), unit->GetPositionY());
         float uZ = unit->GetPositionZ();
         
+        // we can never be inside the room if z < ~100. 
+        if (uZ < 99.0f) return false;
+
+        // cheap check against bounding circle of roomPolygon
         if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) {
             return false;
         }
 
         // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
         bool inside = false;
-        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++)
+        for (int i = 0, j = roomPolygon.size() - 1; i < roomPolygon.size(); j = i++)
         {
-            if ((polygon[i].y > p.y) != (polygon[j].y > p.y) &&
-                p.x < (polygon[j].x - polygon[i].x) * (p.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)
+            if ((roomPolygon[i].y > p.y) != (roomPolygon[j].y > p.y) &&
+                p.x < (roomPolygon[j].x - roomPolygon[i].x) * (p.y - roomPolygon[i].y) / (roomPolygon[j].y - roomPolygon[i].y) + roomPolygon[i].x)
             {
                 inside = !inside;
             }
         }
 
-        //highest point in the back of the room is aproximately 106.0f
-        //outside door is aproximately 108f. So if we are higher than 106.0f
-        //we can see if we are close to door before returning true
+        // Highest point in the back of the room is a bit lower than 108.0f.
+        // Outside door is a bit higher than 108f. So if we are higher than 108.0f
+        // we can see if we are close to door before returning true. 
+        // Note: If this check is removed there are some false positives outside room.
         if (inside && uZ > 108.0f ) {
             //distance to door
             if (unit->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f) { 
@@ -199,16 +179,13 @@ namespace PolyCheck {
                 return false;
             }
         }
-        //we can never be inside the room if z < ~100. 
-        else if (uZ < 99.0f) {
-            return false;
-        }
         else {
             return inside;
         }
     }
 
 };
+
 struct cthunAI : public ScriptedAI
 {
     /* 
@@ -274,46 +251,44 @@ struct cthunAI : public ScriptedAI
     cthunAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
-
+        
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
+        
         if (!m_pInstance)
             sLog.outError("SD0: No Instance eye_of_cthunAI");
+        
+        pCreature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+        pCreature->DeMorph();
 
         Reset();
         DoSpawnCreature(MOB_CTHUN_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
+    static const uint32 EYE_RESPAWN_TIMER           = 30000;
+    static const uint32 GIANT_CLAW_RESPAWN_TIMER    = 60000;
+    static const uint32 STOMACH_GRAB_COOLDOWN       = 10000;
+    static const uint32 GIANT_EYE_RESPAWN_TIMER     = 60000;
+    static const uint32 STOMACH_GRAB_DURATION       = 3500;
+    static const uint32 WEAKNESS_DURATION           = 45000;
+    static const uint32 MAX_FLESH_TENTACLES         = 2;
+    
     ScriptedInstance* m_pInstance;
 
-    uint32 WisperTimer;
-
     uint32 EyeTentacleTimer;
-    static const uint32 EYE_RESPAWN_TIMER = 30000;
-    
     uint32 GiantClawTentacleTimer;
-    static const uint32 GIANT_CLAW_RESPAWN_TIMER = 60000;
-    
     uint32 GiantEyeTentacleTimer;
-    static const uint32 GIANT_EYE_RESPAWN_TIMER = 60000;
-
     uint32 NextStomachEnterGrab;
-    static const uint32 STOMACH_GRAB_COOLDOWN = 10000;
-
     uint32 StomachEnterPortTimer;
-    static const uint32 STOMACH_GRAB_DURATION = 3500;
-
     ObjectGuid StomachEnterTargetGUID;
-
     uint32 WeaknessTimer;
-    static const uint32 WEAKNESS_DURATION = 45000;
 
-    static const uint32 MAX_FLESH_TENTACLES = 2;
 
     uint32 EyeDeathAnimTimer;
     uint32 CthunEmergeTimer;
 
     std::vector<ObjectGuid> fleshTentacles;
+    
+    std::vector<ObjectGuid> playersInRoom;
 
     struct StomachTimers {
         uint32 acidDebuff;
@@ -324,12 +299,47 @@ struct cthunAI : public ScriptedAI
     };
     std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
 
+    bool IsInRange(Unit* unit) {
+        float pZ = unit->GetPositionZ();
+        if (pZ < 99) return false;
+
+        if (m_creature->GetDistance(unit) < 100.0f) {
+            if (pZ > 105) {
+                if (unit->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f) { //distance to door
+                    return true;
+                }
+            }
+            else {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    
+    void CheckPlayersInRoom() {
+        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+        if (!PlayerList.isEmpty())
+        {
+            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+            {
+                if (Player* player = itr->getSource())
+                {
+                    //if (IsInRange(player)) {
+                    if(PolyCheck::IsPointInPolygon(player)){
+                        sLog.outBasic("%i: Player: %s is in room.", GetCurrentTime(), player->GetName());
+                    }
+                }
+            }
+        }
+    }
+
     void Reset()
     {
-        WisperTimer = 90000; // One random wisper every 90 - 300 seconds
-
         EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
         CthunEmergeTimer = 8000;
+
+        playersInRoom.clear();
 
         //ResetartUnvulnerablePhase();
 
@@ -347,13 +357,6 @@ struct cthunAI : public ScriptedAI
             fleshTentacles.erase(fleshTentacles.begin());
         }
         
-        /*        //making sure to clear all players debuff
-        for (auto it = playersInStomach.begin(); it != playersInStomach.end(); it++) {
-            if (Player* pPlayer = m_creature->GetMap()->GetPlayer(it->first)) {
-                pPlayer->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-            }
-        }*/
-
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
         if (!PlayerList.isEmpty()) {
             for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr) {
@@ -363,13 +366,13 @@ struct cthunAI : public ScriptedAI
                 }
             }
         }
-
         playersInStomach.clear();
 
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
             m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+
             Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
             if (b_Cthun) {
                 //these two shouldnt be needed with Respawn imo, but respawn dosent seem to do it?
@@ -378,20 +381,25 @@ struct cthunAI : public ScriptedAI
                 
                 // Demorph should set C'thuns modelId back to burrowed. 
                 // Also removing SPELL_TRANSFORM in case of reset just as he was casting that.
-                m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                m_creature->DeMorph();
+                b_Cthun->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                b_Cthun->DeMorph();
                 
                 b_Cthun->Respawn();
             }
 
             Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
-            if (b_Eye)
+            if (b_Eye) {
                 b_Eye->Respawn();
+            }
         }
 
-        //todo: do this?
-        //if (Creature* pPortal = GetClosestCreatureWithEntry(m_creature, MOB_SMALL_PORTAL, 5.0f))
-        //    pPortal->ForcedDespawn();
+        //todo: do this? Need to make sure the tentacle portals despawn on bad reset 
+        while (Creature* pPortal = GetClosestCreatureWithEntry(m_creature, MOB_SMALL_PORTAL, 50.0f)) {
+            pPortal->ForcedDespawn();
+        }
+        while (Creature* pPortal = GetClosestCreatureWithEntry(m_creature, MOB_GIANT_PORTAL, 50.0f)) {
+            pPortal->ForcedDespawn();
+        }
     }
 
     // this is called ~2 seconds after P1 eye dies,
@@ -409,24 +417,38 @@ struct cthunAI : public ScriptedAI
         SpawnFleshTentacles();
     }
 
+    bool HandleReset()
+    {
+        if (!m_creature->isInCombat()) return true;
+
+        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+        if (!PlayerList.isEmpty()) {
+            
+        }
+
+        for (std::set<Unit*>::const_iterator itr = m_creature->getAttackers().begin(); itr != m_creature->getAttackers().end(); ++itr)
+        {
+            if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack())
+                return false;
+        }
+       
+        m_creature->OnLeaveCombat();
+        return true;
+    }
+    
     void UpdateAI(const uint32 diff)
     {
         if (!m_pInstance)
             return;
 
-        /*
-        //running this code in p1 makes lower body rotate after target.
-        //is it needed for proper resetting? Shouldnt be 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-        {
-            WhisperIfShould(diff); //moved to instance script
-            return;
-        }
-        */
+       
+        //todo: do we need a call to SelectHostileTarget for evade handling?
+        //      It will cause the body to rotate after its target, which is annoying.
+        
+
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
             return;
 
-        
         m_creature->SetTargetGuid(0);
 
         /*
@@ -443,22 +465,24 @@ struct cthunAI : public ScriptedAI
                 if (EyeDeathAnimTimer < diff) {
                     EyeDeathAnimTimer = 0;
                     CthunEmergeTimer = 8000;
-                    
+                    /*
                     m_creature->SetVisibility(VISIBILITY_OFF);
                     m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
                     m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
                     m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
                     m_creature->SetVisibility(VISIBILITY_ON);
-
+                    */
+                    
+                    
                     // Note: we need to set the display id before casting the transform spell, 
                     // in order to get the proper animation
                     m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
                     m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
                     // Transform and start C'thun phase
-                    if (DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) == CAST_OK)
-                    {
-                        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    }
+                    CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM);
+                    sLog.outBasic("Casted TRANSFORM, result: %i", result);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
                     sLog.outBasic("Starting C'thun emerge animation");
                     ResetartUnvulnerablePhase();
                 }
@@ -582,47 +606,33 @@ struct cthunAI : public ScriptedAI
 
     }
 
-    void TentacleTimers(uint32 diff)
+    void SpawnTentacleIfReady(uint32 diff, uint32& timer, uint32 resetTo, uint32 id)
     {
-        if (GiantClawTentacleTimer < diff) {
+
+        if (timer < diff) {
             if (Unit* target = SelectRandomNotStomach())
             {
                 if (target->GetPositionZ() < -30.0f) {
-                    sLog.outBasic("Trying to spawn giant claw <-30.0f");
+                    sLog.outBasic("Trying to spawn %i <-30.0f", id);
                 }
-                if (Creature* Spawned = m_creature->SummonCreature(MOB_GIANT_CLAW_TENTACLE, target->GetPositionX(),
-                    target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+                if (Creature* Spawned = m_creature->SummonCreature(id,
+                    target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, 
+                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
                 {
                     Spawned->AI()->AttackStart(target);
                 }
-
-                // One giant claw tentacle every minute
-                GiantClawTentacleTimer = GIANT_CLAW_RESPAWN_TIMER;
+                timer = resetTo;
             }
         }
         else {
-            GiantClawTentacleTimer -= diff;
+            timer -= diff;
         }
-        
-        if (GiantEyeTentacleTimer < diff) {
-            if (Unit* target = SelectRandomNotStomach()) {
-                if (target->GetPositionZ() < -30.0f) {
-                    sLog.outBasic("Trying to spawn giant eye <-30.0f");
-                }
-                if (Creature *Spawned = m_creature->SummonCreature(MOB_GIANT_EYE_TENTACLE, target->GetPositionX(),
-                    target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500)) 
-                {
+    }
 
-                    Spawned->AI()->AttackStart(target);
-                }
-
-                // One giant eye tentacle every minute
-                GiantEyeTentacleTimer = GIANT_EYE_RESPAWN_TIMER;
-            }
-        }
-        else {
-            GiantEyeTentacleTimer -= diff;
-        }
+    void TentacleTimers(uint32 diff)
+    {
+        SpawnTentacleIfReady(diff, GiantClawTentacleTimer, GIANT_CLAW_RESPAWN_TIMER, MOB_GIANT_CLAW_TENTACLE);
+        SpawnTentacleIfReady(diff, GiantEyeTentacleTimer, GIANT_EYE_RESPAWN_TIMER, MOB_GIANT_EYE_TENTACLE);
 
         if (EyeTentacleTimer < diff) {
             // Spawn the 8 Eye Tentacles in the corret spots
@@ -636,7 +646,12 @@ struct cthunAI : public ScriptedAI
                 float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
                 float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
 
-                SpawnEyeTentacle(x, y);
+                if (Creature* Spawned = m_creature->SummonCreature(MOB_EYE_TENTACLE, x, y, m_creature->GetPositionZ(), 0, 
+                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+                {
+                    Spawned->SetInCombatWithZone();
+                    Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
+                }
             }
 
             //These spawn at every 30 seconds
@@ -720,20 +735,12 @@ struct cthunAI : public ScriptedAI
                 player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
 
                 //Remove player from stomach list
+                //todo: delay removal until player has landed outside. Maybe just a set number of seconds
                 it = playersInStomach.erase(it);
                 sLog.outBasic("Player left stomach");
                 continue;
             }
             ++it;
-        }
-    }
-
-    void SpawnEyeTentacle(float x, float y)
-    {
-        if (Creature* Spawned = m_creature->SummonCreature(MOB_EYE_TENTACLE, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
-        {
-            Spawned->SetInCombatWithZone();
-            Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
         }
     }
 
@@ -785,46 +792,14 @@ struct cthunAI : public ScriptedAI
         return it != playersInStomach.end();
         */
     }
-
-    //todo: can we remove this with the new additions in instance_temple_of_ahnqiraj.cpp L300
-    void WhisperIfShould(uint32 diff)
-    {
-        //No target so we'll use this section to do our random wispers instance wide
-        if (!m_creature->isInCombat())
-        {
-            //WisperTimer
-            if (WisperTimer < diff)
-            {
-                Map *map = m_creature->GetMap();
-                if (!map->IsDungeon())
-                    return;
-
-                //Play random sound to the zone
-                Map::PlayerList const &PlayerList = map->GetPlayers();
-
-                if (!PlayerList.isEmpty())
-                {
-                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                    {
-                        if (Player* pPlr = itr->getSource())
-                            pPlr->PlayDirectSound(RANDOM_SOUND_WHISPER, pPlr);
-                    }
-                }
-
-                //One random wisper every 90 - 300 seconds
-                WisperTimer = urand(90000, 300000);
-            }
-            else WisperTimer -= diff;
-        }
-    }
-
+    
     void JustDied(Unit* pKiller)
     {
-        //Switch
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, DONE);
             m_pInstance->SetData(TYPE_CTHUN, DONE);
+            sLog.outBasic("C'thun died. Enetered DONE phase");
         }
     }
 
@@ -865,7 +840,7 @@ struct eye_of_cthunAI : public ScriptedAI
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         if (!m_pInstance)
             sLog.outError("SD0: No Instance eye_of_cthunAI");
-
+        
         Reset();
     }
 
@@ -886,13 +861,20 @@ struct eye_of_cthunAI : public ScriptedAI
     bool ClockWise;
     bool IsAlreadyPulled;
 
+    ObjectGuid initialPuller;
+    uint8 initialPullerHitCount;
+    
+
     void Reset()
     {
-        //Phase information
-        PhaseTimer = 50000;
+        initialPuller = 0;
+        initialPullerHitCount = 0;
 
         //Eye beam phase 50 seconds
-        BeamTimer = 3000;
+        PhaseTimer = 50000;
+
+        BeamTimer = 0;
+
         EyeTentacleTimer = 45000;
         ClawTentacleTimer = urand(6000, 12000);
 
@@ -903,47 +885,25 @@ struct eye_of_cthunAI : public ScriptedAI
         ClockWise = false;
         IsAlreadyPulled = false;
 
-        //Reset flags
-        m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
-
         //Reset Phase
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_NORMAL);
             m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
         }
-
-        m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
-        m_creature->SetVisibility(VISIBILITY_ON);
-    }
-
-    // Custom threat management
-    bool SelectHostileTarget()
-    {
-        Unit* pTarget = nullptr;
-        Unit* pOldTarget = m_creature->getVictim();
-
-        if (!m_creature->getThreatManager().isThreatListEmpty())
-            pTarget = m_creature->getThreatManager().getHostileTarget();
-
-        if (pTarget)
-        {
-            if (pOldTarget != pTarget && m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL)
-                AttackStart(pTarget);
-
-            // Set victim to old target (if not while Dark Glare)
-            if (pOldTarget && pOldTarget->isAlive() && m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL)
-            {
-                m_creature->SetTargetGuid(pOldTarget->GetObjectGuid());
-                m_creature->SetInFront(pOldTarget);
-            }
-
-            return true;
+        else {
+            sLog.outBasic("eye_of_cthunAI: Reset called, but m_pInstance does not exist.");
         }
 
-        // Will call EnterEvadeMode if fit
-        return m_creature->SelectHostileTarget();
+        if (m_creature) {
+            m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
+            m_creature->SetVisibility(VISIBILITY_OFF);
+            m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
+            m_creature->SetVisibility(VISIBILITY_ON);
+        }
+        else {
+            sLog.outBasic("eye_of_cthunAI: Reset called, but m_creature does not exist.");
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -956,24 +916,14 @@ struct eye_of_cthunAI : public ScriptedAI
             AggroRadius();
         }
 
-        //does this alone cast green beam?
+
+        // This is only needed for evade mechanic as far as I can tell.
+        // Is there a more clean way to handle evade without all the extras
+        // from SelectHostileTarget() ? 
         if (!m_creature->SelectHostileTarget()) {
             return;
         }
-        /*
-        if (!m_creature->SelectHostileTarget()) {
-            AggroRadius();
-            return;
-        }
-        */
-        /*
-        //Check if we have a target
-        if (!IsAlreadyPulled)
-        {
-            AggroRadius();
-            return;
-        }
-        */
+
         TentacleTimers(diff);
 
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL)
@@ -984,29 +934,31 @@ struct eye_of_cthunAI : public ScriptedAI
 
     void FightPhase(uint32 diff)
     {
+        
         // Green lazer
         if (BeamTimer < diff)
         {
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            Unit* target = nullptr;
+            if (initialPullerHitCount < MAX_INITIAL_PULLER_HITS) {
+                target = m_pInstance->GetMap()->GetPlayer(initialPuller);
+                ++initialPullerHitCount;
+            }
+            else {
+                target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+            }
+            if (target)
             {
-                float mx, my, mz;
-                float tx, ty, tz;
-                target->GetPosition(tx, ty, tz);
-                m_creature->GetPosition(mx, my, mz);
-                if (m_creature->GetMap()->isInLineOfSight(mx, my, mz, tx, ty, tz))
-                {
-                    m_creature->InterruptNonMeleeSpells(false);
-                    DoCastSpellIfCan(target, SPELL_GREEN_BEAM);
+                // There should not be any LOS check
+                m_creature->InterruptNonMeleeSpells(false);
+                DoCastSpellIfCan(target, SPELL_GREEN_BEAM);
 
-                    //Correctly update our target
-                    m_creature->SetTargetGuid(target->GetObjectGuid());
+                //Correctly update our target
+                m_creature->SetTargetGuid(target->GetObjectGuid());
 
-                    if (m_creature->HasAura(16245))
-                        m_creature->RemoveAurasDueToSpell(16245);
+                if (m_creature->HasAura(16245))
+                    m_creature->RemoveAurasDueToSpell(16245);
 
-                    //Beam every 3 seconds
-                    BeamTimer = 3000;
-                }
+                BeamTimer = GREEN_BEAM_COOLDOWN;
             }
         }
         else
@@ -1125,7 +1077,7 @@ struct eye_of_cthunAI : public ScriptedAI
 
     void EndBeamPhase()
     {
-        BeamTimer = 3000;
+        BeamTimer = GREEN_BEAM_COOLDOWN;
 
         // Remove Red coloration from c'thun
         m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
@@ -1169,7 +1121,7 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
-    bool AggroRadius()
+    bool AggroRadius()  
     {
         //if (IsAlreadyPulled) false;
 
@@ -1186,12 +1138,15 @@ struct eye_of_cthunAI : public ScriptedAI
                 if (abs(pPlayer->GetPositionZ() - 100.0f) < 10.0f) // If we're at the same Z axis of cthun
                 {
                     if (pPlayer->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f || // Anyone is near my door
-                        pPlayer->GetDistance(m_creature) < 50.0f) // If anyone is within 50 units of me
+                        pPlayer->GetDistance(m_creature) < 50.0f) // If anyone is within 50 units of me. This is not enough.
                     {
                         m_creature->SetFactionTemporary(14);
                         m_creature->SetInCombatWithZone();
                         m_creature->CastSpell(pPlayer, SPELL_GREEN_BEAM, true);
-                        BeamTimer = 3000;
+                        BeamTimer = GREEN_BEAM_COOLDOWN;
+
+                        initialPuller = pPlayer->GetObjectGuid();
+                        ++initialPullerHitCount;
 
                         Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
                         if (b_Cthun)
@@ -1228,14 +1183,13 @@ struct eye_of_cthunAI : public ScriptedAI
     }
 };
 
-
 struct eye_tentacleAI : public ScriptedAI
 {
     eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
         Reset();
-
+        
         if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
         {
             Portal = pPortal->GetObjectGuid();

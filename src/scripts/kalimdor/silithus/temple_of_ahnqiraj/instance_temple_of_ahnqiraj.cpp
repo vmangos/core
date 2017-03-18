@@ -167,8 +167,10 @@ void instance_temple_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
     case NPC_VEKLOR:
     case NPC_VEKNILASH:
     case NPC_EYE_OF_C_THUN:
+        m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
+        break;
     case NPC_CTHUN:
-
+        m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
         break;
     case NPC_MASTERS_EYE:
     case NPC_OURO_SPAWNER:
