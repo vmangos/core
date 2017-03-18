@@ -57,6 +57,8 @@
 
 #define SPELL_MASSIVE_GROUND_RUPTURE        26100
 #define SPELL_THRASH                        3391
+
+#define SPELL_DIGESTIVE_ACID_TELEPORT       26220
 #define SPELL_PUNT_UPWARD                   16716
 #define SPELL_MOUTH_TENTACLE                26332
 #define SPELL_EXIT_STOMACH_KNOCKBACK        25383
@@ -450,7 +452,6 @@ struct cthunAI : public ScriptedAI
        
         //todo: do we need a call to SelectHostileTarget for evade handling?
         //      It will cause the body to rotate after its target, which is annoying.
-        
 
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
             return;
@@ -465,6 +466,9 @@ struct cthunAI : public ScriptedAI
             m_creature->SetTargetGuid(m_creature->GetObjectGuid());
         */
         
+        
+
+        VerifyAnyPlayerAliveOutside();
         UpdatePlayersInStomach(diff);
 
         switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
@@ -485,13 +489,21 @@ struct cthunAI : public ScriptedAI
                     
                     // Note: we need to set the display id before casting the transform spell, 
                     // in order to get the proper animation
-                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
-                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
+                    //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
+                    //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
                     // Transform and start C'thun phase
-                    CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM);
-                    sLog.outBasic("Casted TRANSFORM, result: %i", result);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-
+                    
+                    //CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
+                    //sLog.outBasic("Casted TRANSFORM, result: %i", result);
+                    
+                    //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
+                    
+                    //result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
+                    //sLog.outBasic("Casted TRANSFORM, result: %i", result);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
                     sLog.outBasic("Starting C'thun emerge animation");
                     ResetartUnvulnerablePhase();
                 }
@@ -518,7 +530,7 @@ struct cthunAI : public ScriptedAI
             // Weaken if both Flesh Tentacles are killed
             // Should be fair to skip InvulnerablePhase update if both
             // tentacles area already killed.
-            if(fleshTentacles.size() == 0) {
+            if (fleshTentacles.size() == 0) {
                 WeaknessTimer = WEAKNESS_DURATION;
 
                 DoScriptText(EMOTE_WEAKENED, m_creature);
@@ -557,7 +569,20 @@ struct cthunAI : public ScriptedAI
         }
         }
     }
-    
+
+    void VerifyAnyPlayerAliveOutside()
+    {
+        if (!SelectRandomAliveNotStomach()) {
+            for (auto iter = playersInStomach.begin(); iter != playersInStomach.end(); iter++) {
+                if (Player* p = m_creature->GetMap()->GetPlayer(iter->first)) {
+                    if (p->isAlive()) {
+                        p->KillPlayer();
+                        //m_creature->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
+                    }
+                }
+            }
+        }
+    }
     void SpawnFleshTentacles() {
 
         if (fleshTentacles.size() != 0) {
@@ -601,7 +626,7 @@ struct cthunAI : public ScriptedAI
         }
 
         if (NextStomachEnterGrab < diff) {
-            if (Player* target = SelectRandomNotStomach()) {
+            if (Player* target = SelectRandomAliveNotStomach()) {
                 target->InterruptNonMeleeSpells(false);
                 target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, NULL, NULL, m_creature->GetObjectGuid());
                 StomachEnterPortTimer = STOMACH_GRAB_DURATION;
@@ -619,7 +644,7 @@ struct cthunAI : public ScriptedAI
     {
 
         if (timer < diff) {
-            if (Unit* target = SelectRandomNotStomach())
+            if (Unit* target = SelectRandomAliveNotStomach())
             {
                 if (target->GetPositionZ() < -30.0f) {
                     sLog.outBasic("Trying to spawn %i <-30.0f", id);
@@ -753,7 +778,7 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    Player* SelectRandomNotStomach()
+    Player* SelectRandomAliveNotStomach()
     {
         std::list<Player*> temp;
         std::list<Player*>::iterator j;
