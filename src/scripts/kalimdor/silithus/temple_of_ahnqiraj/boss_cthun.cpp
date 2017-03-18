@@ -96,6 +96,116 @@ enum CThunPhase
 };
 
 
+#include "g3dlite/G3D/Vector2.h"
+
+namespace PolyCheck {
+
+    using namespace G3D;
+    static const Vector2 RoomCenterPos(-8570.3f, 1991.26f);
+    /*
+    static const std::vector<Vector2> polygon2 = {
+    Vector2(-8540.892578f, 2077.470947f), //north-west
+    Vector2()
+
+    }*/
+    /*
+    static const std::vector<Vector2> polygon = {
+        Vector2(-8665.906f, 1962.258f), //left entrance
+        Vector2(-8650.617f, 1996.51f), //wall with npcs
+
+        Vector2(-8633.80f, 2018.435f),
+        Vector2(-8595.788f, 2053.5957f),
+
+        Vector2(-8541.91f, 2076.5f), //north-west corner outside cthun
+
+        Vector2(-8571.196f, 2060.849f), //corner northwest inside cthun where player cant get
+
+        Vector2(-8498.618f, 2026.499f), //back of cthun west
+
+        Vector2(-8495.249f, 2017.95f), //back of cthun east
+        Vector2(-8506.636f, 1952.551f), //north-east
+        Vector2(-8555.203f, 1926.76f), //east outside
+        Vector2(-8626.79f, 1936.226f), //south-east outside
+        Vector2(-8660.562f, 1951.174f) //entrance east
+    };
+    */
+    static const std::vector<Vector2> polygon = {
+        Vector2(-8665.73, 1963.21),
+        Vector2(-8647.89, 1990.35),
+        Vector2(-8635.87, 2012.05),
+        Vector2(-8625.09, 2025.99),
+        Vector2(-8614.13, 2039.52),
+        Vector2(-8602.02, 2046.36),
+        Vector2(-8582.55, 2057.31),
+        Vector2(-8574.95, 2059.83),
+        Vector2(-8569.61, 2061.66),
+        Vector2(-8551.4, 2067.35),
+        Vector2(-8533.71, 2047.26),
+        Vector2(-8515.55, 2035.06),
+        Vector2(-8498.17, 2027.1),
+        Vector2(-8494.54, 2017.73),
+        Vector2(-8501.85, 2000.21),
+        Vector2(-8506.76, 1979.18),
+        Vector2(-8505.93, 1952.25),
+        Vector2(-8527.78, 1941.78),
+        Vector2(-8535.94, 1938.05),
+        Vector2(-8569.88, 1929.68),
+        Vector2(-8601.73, 1933.88),
+        Vector2(-8605.73, 1934.96),
+        Vector2(-8628.49, 1942.31),
+        Vector2(-8660.64, 1950.26)
+    };
+
+    const float minZ = 95.0f;
+    const float maxZ = 115.0f;
+    
+    const float maxX = -8494.54004f;
+    const float minX = -8665.73047f;
+    const float maxY = 2067.35010f;
+    const float minY = 1929.68005;
+    
+    bool IsPointInPolygon(Unit* unit)
+    {
+        Vector2 p(unit->GetPositionX(), unit->GetPositionY());
+        float uZ = unit->GetPositionZ();
+        
+        if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) {
+            return false;
+        }
+
+        // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
+        bool inside = false;
+        for (int i = 0, j = polygon.size() - 1; i < polygon.size(); j = i++)
+        {
+            if ((polygon[i].y > p.y) != (polygon[j].y > p.y) &&
+                p.x < (polygon[j].x - polygon[i].x) * (p.y - polygon[i].y) / (polygon[j].y - polygon[i].y) + polygon[i].x)
+            {
+                inside = !inside;
+            }
+        }
+
+        //highest point in the back of the room is aproximately 106.0f
+        //outside door is aproximately 108f. So if we are higher than 106.0f
+        //we can see if we are close to door before returning true
+        if (inside && uZ > 108.0f ) {
+            //distance to door
+            if (unit->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f) { 
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        //we can never be inside the room if z < ~100. 
+        else if (uZ < 99.0f) {
+            return false;
+        }
+        else {
+            return inside;
+        }
+    }
+
+};
 struct cthunAI : public ScriptedAI
 {
     /* 
