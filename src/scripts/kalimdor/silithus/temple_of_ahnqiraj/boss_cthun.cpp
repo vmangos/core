@@ -419,20 +419,26 @@ struct cthunAI : public ScriptedAI
 
     bool HandleReset()
     {
-        if (!m_creature->isInCombat()) return true;
-
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty()) {
-            
-        }
-
-        for (std::set<Unit*>::const_iterator itr = m_creature->getAttackers().begin(); itr != m_creature->getAttackers().end(); ++itr)
-        {
-            if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack())
-                return false;
+        if (PlayerList.isEmpty()) {
+            m_creature->SelectHostileTarget();
+            return false;
         }
        
-        m_creature->OnLeaveCombat();
+        bool anyPlayerInCombat = false;
+        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        {
+            if (Player* player = itr->getSource())
+            {
+                if (player->isInCombat()) {
+                    anyPlayerInCombat = true;
+                    break;
+                }
+            }
+        }
+        if (!anyPlayerInCombat) {
+            m_creature->OnLeaveCombat();
+        }
         return true;
     }
     
@@ -447,6 +453,9 @@ struct cthunAI : public ScriptedAI
         
 
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
+            return;
+
+        if (!HandleReset())
             return;
 
         m_creature->SetTargetGuid(0);
