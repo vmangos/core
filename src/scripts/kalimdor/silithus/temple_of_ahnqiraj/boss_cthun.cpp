@@ -97,7 +97,7 @@ enum CThunPhase
     PHASE_EYE_NORMAL = 0,
     PHASE_EYE_DARK_GLARE = 1,
     PHASE_TRANSITION = 2,
-    PHASE_CTHUN = 3,
+    PHASE_CTHUN_INVULNERABLE = 3,
     PHASE_CTHUN_WEAKENED = 4,
     PHASE_CTHUN_DONE = 5,
 };
@@ -106,7 +106,9 @@ enum CThunPhase
 static const int MAX_INITIAL_PULLER_HITS = 3;
 
 // Green beam has a 2 sec cast time. This adds additional cooldown to the ability
-static const int GREEN_BEAM_COOLDOWN = 2000;
+static const int GREEN_BEAM_COOLDOWN = 3000;
+
+
 
 // If defined, each player in stomach has his own punt timer.
 // Otherwise the punt timer starts each time a player goes in range,
@@ -299,14 +301,29 @@ struct cthunAI : public ScriptedAI
     
     std::vector<ObjectGuid> playersInRoom;
 
+    std::vector<ObjectGuid> tankableMobs;
+
     struct StomachTimers {
         uint32 acidDebuff;
         uint32 puntCastTime;
+        uint32 removeFromListIn;
+        bool playerHasLeftStomach;
+        StomachTimers() : 
+            acidDebuff(StomachTimers::ACID_REFRESH_RATE),
+            puntCastTime(StomachTimers::PUNT_CAST_TIME),
+            removeFromListIn(REMOVE_FROM_STOMACH_LIST_DELAY),
+            playerHasLeftStomach(false)
+        {}
 
         static const int32 ACID_REFRESH_RATE = 5000;
         static const int32 PUNT_CAST_TIME = 3000;
+        // Player is removed from players in stomach list after a delay of this
+        // length after the teleport has found place.
+        // If set to 0, the player is instantly removed from the list.
+        static const uint32 REMOVE_FROM_STOMACH_LIST_DELAY = 3000;
     };
     std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
+
 
     bool IsInRange(Unit* unit) {
         float pZ = unit->GetPositionZ();
@@ -511,9 +528,9 @@ struct cthunAI : public ScriptedAI
                     
                     //result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
                     //sLog.outBasic("Casted TRANSFORM, result: %i", result);
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    //m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, false);
                     sLog.outBasic("Starting C'thun emerge animation");
                     ResetartUnvulnerablePhase();
                 }
@@ -528,7 +545,7 @@ struct cthunAI : public ScriptedAI
                 if (CthunEmergeTimer < diff) {
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_creature->SetInCombatWithZone();
-                    m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN);
+                    m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
                     sLog.outBasic("Entering INVULNERABLE_STATE");
                 }
                 else {
@@ -536,7 +553,7 @@ struct cthunAI : public ScriptedAI
                 }
             }
             break;
-        case PHASE_CTHUN:
+        case PHASE_CTHUN_INVULNERABLE:
             // Weaken if both Flesh Tentacles are killed
             // Should be fair to skip InvulnerablePhase update if both
             // tentacles area already killed.
@@ -564,10 +581,12 @@ struct cthunAI : public ScriptedAI
             // If weakend runs out
             if (WeaknessTimer < diff) {
                 ResetartUnvulnerablePhase();
+                // visibility on/off is sadly needed to update him to do animation again
+                // it looks stupid though, so if there is a way to avoid it, pls find.
                 m_creature->SetVisibility(VISIBILITY_OFF);
                 m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
                 m_creature->SetVisibility(VISIBILITY_ON);
-                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN);
+                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
                 sLog.outBasic("Entering INVULNERABLE_STATE");
             }
             else {
@@ -609,7 +628,7 @@ struct cthunAI : public ScriptedAI
                 TEMPSUMMON_CORPSE_DESPAWN, 0);
 
             if (pSpawned) {
-                fleshTentacles.push_back(pSpawned->GetGUID());
+                fleshTentacles.push_back(pSpawned->GetObjectGuid());
             }
         }
     }
@@ -624,8 +643,7 @@ struct cthunAI : public ScriptedAI
 
                     //pPlayer->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID_TELEPORT, true);
 
-                    playersInStomach.push_back(std::make_pair(StomachEnterTargetGUID,
-                        StomachTimers{ StomachTimers::PUNT_CAST_TIME, StomachTimers::ACID_REFRESH_RATE }));
+                    playersInStomach.push_back(std::make_pair(StomachEnterTargetGUID, StomachTimers()));
 
                     m_creature->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID, true);
                 }
@@ -639,11 +657,11 @@ struct cthunAI : public ScriptedAI
         }
 
         if (NextStomachEnterGrab < diff) {
-            if (Player* target = SelectRandomAliveNotStomach()) {
+            if (Player* target = SelectRandomAliveNotStomach(true)) {
                 target->InterruptNonMeleeSpells(false);
                 target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, NULL, NULL, m_creature->GetObjectGuid());
                 StomachEnterPortTimer = STOMACH_GRAB_DURATION;
-                StomachEnterTargetGUID = target->GetGUID();
+                StomachEnterTargetGUID = target->GetObjectGuid();
             }
             NextStomachEnterGrab = STOMACH_GRAB_COOLDOWN;
         }
@@ -722,6 +740,17 @@ struct cthunAI : public ScriptedAI
 
     void UpdatePlayersInStomach(uint32 diff)
     {
+        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_CTHUN_DONE) {
+            while (playersInStomach.size() > 0) {
+                Player* player = m_creature->GetMap()->GetPlayer(playersInStomach.at(0).first);
+                if (player) {
+                    PortPlayerOutOfStomach(player);
+                }
+                playersInStomach.erase(playersInStomach.begin());
+            }
+            return;
+        }
+
         for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
             Player* player = m_creature->GetMap()->GetPlayer(it->first);
             // player has left the instance or something and is presumably no longer in stomach
@@ -738,6 +767,16 @@ struct cthunAI : public ScriptedAI
 
             StomachTimers& timers = it->second;
             
+            if (timers.playerHasLeftStomach) {
+                if (timers.removeFromListIn < diff) {
+                    it = playersInStomach.erase(it);
+                }
+                else {
+                    timers.removeFromListIn -= diff;
+                    ++it;
+                }
+                continue;
+            }
             // Update acid debuff
             if (timers.acidDebuff < diff) {
                 m_creature->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
@@ -794,10 +833,15 @@ struct cthunAI : public ScriptedAI
             if (player->GetPositionZ() > -40.0f && player->HasMovementFlag(MOVEFLAG_JUMPING)) {
                 
                 PortPlayerOutOfStomach(player);
-                //Remove player from stomach list
-                //todo: delay removal until player has landed outside. Maybe just a set number of seconds
-                it = playersInStomach.erase(it);
-                sLog.outBasic("Player left stomach");
+                if (StomachTimers::REMOVE_FROM_STOMACH_LIST_DELAY == 0) {
+                    //Remove player from stomach list
+                    it = playersInStomach.erase(it);
+                }
+                else {
+                    it->second.playerHasLeftStomach = true;
+                    sLog.outBasic("Player ported out of stomach");
+                    ++it;
+                }
                 continue;
             }
 
@@ -824,7 +868,7 @@ struct cthunAI : public ScriptedAI
                     if (Creature *pCreature = m_creature->SummonCreature(PUNT_CREATURE,
                         puntPosition[0], puntPosition[1], puntPosition[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
                     {
-                        puntCreatureGuid = pCreature->GetGUID();
+                        puntCreatureGuid = pCreature->GetObjectGuid();
                         sLog.outBasic("Player in stomach arrived at punt area. Starting punt countdown");
                         pCreature->CastSpell(pCreature, 26092, false);
                         stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
@@ -861,7 +905,7 @@ struct cthunAI : public ScriptedAI
 #endif
     }
 
-    Player* SelectRandomAliveNotStomach()
+    Player* SelectRandomAliveNotStomach(bool ignoreCurrentTanks = false)
     {
         std::list<Player*> temp;
         std::list<Player*>::iterator j;
@@ -873,8 +917,26 @@ struct cthunAI : public ScriptedAI
             {
                 if (Player* player = itr->getSource())
                 {
-                    if (!PlayerInStomach(player) && !player->isGameMaster() && !player->isDead())
-                        temp.push_back(player);
+                    if (!PlayerInStomach(player) && !player->isGameMaster() && !player->isDead()) {
+                        bool playerIsTanking = false;
+                        if (ignoreCurrentTanks) {
+                            for (auto tmIt = tankableMobs.begin(); tmIt != tankableMobs.end(); ++tmIt) {
+                                if (Creature* tankableMob = m_pInstance->GetMap()->GetCreature(*tmIt)) {
+                                    if (tankableMob->GetTargetGuid() == player->GetObjectGuid()) {
+                                        playerIsTanking = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+
+                        if (!playerIsTanking) {
+                            temp.push_back(player);
+                        }
+                        else {
+                            sLog.outBasic("SelectRandomAliveNotStomach ignored %s as he was tanking.", player->GetName());
+                        }
+                    }
                 }
             }
         }
@@ -894,21 +956,19 @@ struct cthunAI : public ScriptedAI
 
     bool PlayerInStomach(Unit *unit)
     {
-        return unit->GetPositionZ() < -30.0f;
-        /*
-        currently not good enough because player is removed from list as DoTeleportPlayer is called,
-        but player position is still the old one during the same update, apparently.
+        //return unit->GetPositionZ() < -30.0f;
+        
         auto it = std::find_if(playersInStomach.begin(), playersInStomach.end(),
             [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
             if (unit->GetObjectGuid() == e.first) {
-
+                return true;
             }
             return false;
+
             return e.first == unit->GetObjectGuid();
         });
 
         return it != playersInStomach.end();
-        */
     }
     
     void JustDied(Unit* pKiller)
@@ -1303,7 +1363,7 @@ struct eye_of_cthunAI : public ScriptedAI
 
 struct eye_tentacleAI : public ScriptedAI
 {
-    eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature), m_cthunAi(nullptr)
     {
         SetCombatMovement(false);
         Reset();
@@ -1313,10 +1373,19 @@ struct eye_tentacleAI : public ScriptedAI
             Portal = pPortal->GetObjectGuid();
             pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.075f);
         }
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("SD0: No Instance eye_tentacleAI");
+        Creature* cthunCreature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+        if (cthunCreature) {
+            m_cthunAi = static_cast<cthunAI*>(cthunCreature->AI());
+        }
     }
 
     uint32 MindflayTimer;
     uint64 Portal;
+    ScriptedInstance* m_pInstance;
+    cthunAI* m_cthunAi;
 
     void DoDespawnPortal() {
         if (!Portal) return;
@@ -1351,6 +1420,15 @@ struct eye_tentacleAI : public ScriptedAI
             return;
         }
 
+
+        if (m_cthunAi) {
+            if (m_cthunAi->PlayerInStomach(m_creature->getVictim())) {
+                m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                MindflayTimer = 0;
+            }
+
+        }
+        
         //MindflayTimer
         if (MindflayTimer < diff)
         {
@@ -1505,6 +1583,10 @@ struct giant_claw_tentacleAI : public ScriptedAI
         SetCombatMovement(false);
         Reset();
 
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("SD0: No Instance giant_claw_tentacleAI");
+
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
             Portal = pPortal->GetObjectGuid();
     }
@@ -1515,11 +1597,32 @@ struct giant_claw_tentacleAI : public ScriptedAI
     uint32 EvadeTimer;
     uint64 Portal;
     uint32 GroundStunTimer;
+    
+    ScriptedInstance* m_pInstance;
 
+    void JustRespawned() override {
+        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+        if (creature) {
+            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
+            ctai->tankableMobs.push_back(m_creature->GetObjectGuid());
+        }
+
+        ScriptedAI::JustRespawned();
+
+    }
     void JustDied(Unit*)
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
+        
+        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+        if (creature) {
+            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
+            auto it = std::find(ctai->tankableMobs.begin(), ctai->tankableMobs.end(), m_creature->GetObjectGuid());
+            if (it != ctai->tankableMobs.end()) {
+                ctai->tankableMobs.erase(it);
+            }
+        }
     }
 
     void Reset()
@@ -1653,17 +1756,41 @@ struct giant_eye_tentacleAI : public ScriptedAI
         SetCombatMovement(false);
         Reset();
 
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("SD0: No Instance giant_eye_tentacleAI");
+
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0))
             Portal = pPortal->GetObjectGuid();
     }
 
     uint32 BeamTimer;
     uint64 Portal;
+    ScriptedInstance* m_pInstance;
+
+    void JustRespawned() override{
+        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+        if (creature) {
+            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
+            ctai->tankableMobs.push_back(m_creature->GetObjectGuid());
+        }
+
+        ScriptedAI::JustRespawned();
+    }
 
     void JustDied(Unit*)
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
+
+        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+        if (creature) {
+            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
+            auto it = std::find(ctai->tankableMobs.begin(), ctai->tankableMobs.end(), m_creature->GetObjectGuid());
+            if (it != ctai->tankableMobs.end()) {
+                ctai->tankableMobs.erase(it);
+            }
+        }
     }
 
     void Reset()
@@ -1764,7 +1891,7 @@ struct flesh_tentacleAI : public ScriptedAI
         {
             Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
             if (b_Cthun)
-                ((cthunAI*)(b_Cthun->AI()))->FleshTentcleKilled(m_creature->GetGUID());
+                ((cthunAI*)(b_Cthun->AI()))->FleshTentcleKilled(m_creature->GetObjectGuid());
         }
     }
 };
