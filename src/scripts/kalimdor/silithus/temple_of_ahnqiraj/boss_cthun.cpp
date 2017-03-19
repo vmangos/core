@@ -1007,6 +1007,27 @@ struct cthunAI : public ScriptedAI
             }
         }
     }
+
+    void JustSummoned(Creature* creature) override
+    {
+        
+        if (creature->GetEntry() == MOB_GIANT_CLAW_TENTACLE
+            || creature->GetEntry() == MOB_GIANT_EYE_TENTACLE) {
+            tankableMobs.push_back(creature->GetObjectGuid());    
+        }
+    }
+
+    void SummonedCreatureDespawn(Creature* creature) override
+    {
+        if (creature->GetEntry() == MOB_GIANT_CLAW_TENTACLE
+            || creature->GetEntry() == MOB_GIANT_EYE_TENTACLE) {
+            auto it = std::find(tankableMobs.begin(), tankableMobs.end(), creature->GetObjectGuid());
+            if (it != tankableMobs.end()) {
+                tankableMobs.erase(it);
+            }
+        }
+    }
+
 };
 
 struct eye_of_cthunAI : public ScriptedAI
@@ -1583,10 +1604,6 @@ struct giant_claw_tentacleAI : public ScriptedAI
         SetCombatMovement(false);
         Reset();
 
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        if (!m_pInstance)
-            sLog.outError("SD0: No Instance giant_claw_tentacleAI");
-
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
             Portal = pPortal->GetObjectGuid();
     }
@@ -1597,32 +1614,11 @@ struct giant_claw_tentacleAI : public ScriptedAI
     uint32 EvadeTimer;
     uint64 Portal;
     uint32 GroundStunTimer;
-    
-    ScriptedInstance* m_pInstance;
 
-    void JustRespawned() override {
-        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-        if (creature) {
-            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
-            ctai->tankableMobs.push_back(m_creature->GetObjectGuid());
-        }
-
-        ScriptedAI::JustRespawned();
-
-    }
     void JustDied(Unit*)
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
-        
-        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-        if (creature) {
-            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
-            auto it = std::find(ctai->tankableMobs.begin(), ctai->tankableMobs.end(), m_creature->GetObjectGuid());
-            if (it != ctai->tankableMobs.end()) {
-                ctai->tankableMobs.erase(it);
-            }
-        }
     }
 
     void Reset()
@@ -1756,41 +1752,17 @@ struct giant_eye_tentacleAI : public ScriptedAI
         SetCombatMovement(false);
         Reset();
 
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        if (!m_pInstance)
-            sLog.outError("SD0: No Instance giant_eye_tentacleAI");
-
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0))
             Portal = pPortal->GetObjectGuid();
     }
 
     uint32 BeamTimer;
     uint64 Portal;
-    ScriptedInstance* m_pInstance;
-
-    void JustRespawned() override{
-        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-        if (creature) {
-            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
-            ctai->tankableMobs.push_back(m_creature->GetObjectGuid());
-        }
-
-        ScriptedAI::JustRespawned();
-    }
 
     void JustDied(Unit*)
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
-
-        Creature* creature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-        if (creature) {
-            cthunAI* ctai = static_cast<cthunAI*>(creature->AI());
-            auto it = std::find(ctai->tankableMobs.begin(), ctai->tankableMobs.end(), m_creature->GetObjectGuid());
-            if (it != ctai->tankableMobs.end()) {
-                ctai->tankableMobs.erase(it);
-            }
-        }
     }
 
     void Reset()
@@ -1820,7 +1792,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
             //hacky check to not target players in stomach.
             //todo: access c'thuns AI script instance and call PlayerInStomach()
-            if (target && target->GetPositionZ() > -30)
+            if (target && target->GetPositionZ() > -30.0f)
             {
                 if (DoCastSpellIfCan(target, SPELL_GREEN_BEAM) != CAST_OK) {
                     DoResetThreat();
