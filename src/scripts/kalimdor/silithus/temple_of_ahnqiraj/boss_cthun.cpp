@@ -703,19 +703,15 @@ struct cthunAI : public ScriptedAI
     {
         for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
             Player* player = m_creature->GetMap()->GetPlayer(it->first);
-            if (!player) {
-                continue;
-            }
             // player has left the instance or something and is presumably no longer in stomach
-            if (!m_creature->GetMap()->GetPlayer(player->GetGUID())) {
+            if (!player) {
                 sLog.outBasic("Player no longer in instance. Removed from stomach list");
                 it = playersInStomach.erase(it);
                 continue;
-            }
-
-            if (player->isDead()) {
-                sLog.outBasic("Player in stomach dead. Skipping update");
-                ++it;
+            }else if (player->isDead()) {
+                sLog.outBasic("Player in stomach dead. Removing from list");
+                player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                it = playersInStomach.erase(it);
                 continue;
             }
 
