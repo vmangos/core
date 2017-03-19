@@ -19,8 +19,8 @@
 
 /* ScriptData
 SDName: Boss_Ouro
-SD%Complete: 50
-SDComment: script needs to be reworked
+SD%Complete: 90
+SDComment: Some minor adjustments may be required
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
@@ -29,58 +29,150 @@ EndScriptData */
 
 enum
 {
+    // ground spells
     SPELL_SWEEP             = 26103,
     SPELL_SANDBLAST         = 26102,
-    SPELL_GROUND_RUPTURE    = 26100,
-    SPELL_BIRTH             = 26262,                        //The Birth Animation
     SPELL_BOULDER           = 26616,
     SPELL_BERSERK           = 26615,
 
-    SPELL_SUMMON_SCARABS    = 26060,
-    SPELL_SUMMON_OURO_MOUND = 26058,
-    SPELL_SUMMON_OURO       = 26642,
+    // emerge spells
+    SPELL_BIRTH             = 26262,                        // The Birth Animation
+    SPELL_GROUND_RUPTURE    = 26100,                        // spell not confirmed
+    SPELL_SUMMON_BASE       = 26133,                        // summons gameobject 180795
 
-    SPELL_DIRTMOUND_PASSIVE = 26092,
+    // submerge spells
     SPELL_SUBMERGE_VISUAL   = 26063,
+    SPELL_SUMMON_OURO_MOUNDS = 26058,                       // summons 5 dirt mounds
+    SPELL_SUMMON_TRIGGER    = 26284,
 
-    NPC_OURO_SPAWNER        = 15957,
-    NPC_OURO_TRIGGER        = 15717
+    // SPELL_SUMMON_OURO_TRIGG = 26642,
+    SPELL_SUMMON_OURO       = 26061,                        // used by the script to summon the boss directly
+    //SPELL_QUAKE             = 26093,
+
+    // other spells - not used
+    // SPELL_SUMMON_SCARABS    = 26060,                     // triggered after 30 secs - cast by the Dirt Mounds
+    SPELL_DIRTMOUND_PASSIVE = 26092,                        // casts 26093 every 1 sec
+    // SPELL_SET_OURO_HEALTH   = 26075,                     // removed from DBC
+    // SPELL_SAVE_OURO_HEALTH  = 26076,                     // removed from DBC
+    // SPELL_TELEPORT_TRIGGER  = 26285,                     // removed from DBC
+    // SPELL_SUBMERGE_TRIGGER  = 26104,                     // removed from DBC
+    SPELL_SUMMON_OURO_MOUND = 26617,
+    // SPELL_SCARABS_PERIODIC  = 26619,                     // cast by the Dirt Mounds in order to spawn the scarabs - removed from DBC
+
+    // summoned npcs
+    // NPC_OURO_SCARAB       = 15718,                       // summoned by Dirt Mounds
+    NPC_OURO_TRIGGER        = 15717,
+    NPC_DIRT_MOUND          = 15712,
 };
 
-struct boss_ouroAI : public ScriptedAI
+struct boss_ouroAI : public Scripted_NoMovementAI
 {
-    boss_ouroAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_ouroAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
-        SetCombatMovement(false);
     }
+
+    ScriptedInstance* m_pInstance;
 
     uint32 m_uiSweepTimer;
     uint32 m_uiSandBlastTimer;
     uint32 m_uiSubmergeTimer;
-    uint32 m_uiBackTimer;
-    uint32 m_uiChangeTargetTimer;
-    uint32 m_uiSpawnTimer;
+    uint32 m_uiSummonBaseTimer;
+    uint32 m_uiNoMeleeTimer;
+
+    uint32 m_uiSummonMoundTimer;
 
     bool m_bEnraged;
     bool m_bSubmerged;
 
+    ObjectGuid m_ouroTriggerGuid;
+
+    WorldLocation m_StartingLoc;
+
     void Reset()
     {
-        m_uiSweepTimer = urand(5000, 10000);
-        m_uiSandBlastTimer = urand(20000, 35000);
-        m_uiSubmergeTimer = urand(90000, 150000);
-        m_uiBackTimer = urand(30000, 45000);
-        m_uiChangeTargetTimer = urand(5000, 8000);
-        m_uiSpawnTimer = urand(10000, 20000);
+        m_uiSweepTimer        = urand(35000, 40000);
+        m_uiSandBlastTimer    = urand(30000, 45000);
+        m_uiSubmergeTimer     = 90000;
+        m_uiSummonBaseTimer   = 2000;
+        // Source : http://wowwiki.wikia.com/wiki/Ouro
+        // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
+        m_uiNoMeleeTimer      = 10000;
 
-        m_bEnraged = false;
-        m_bSubmerged = false;
+        m_uiSummonMoundTimer  = 10000;
+
+        m_bEnraged            = false;
+        m_bSubmerged          = false;
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* /*pWho*/)
     {
-        DoCastSpellIfCan(m_creature, SPELL_BIRTH);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_OURO, IN_PROGRESS);
+
+        m_creature->GetPosition(m_StartingLoc);
+    }
+
+    void DespawnDirtMounds()
+    {
+        std::list<Creature *> lCreature;
+        m_creature->GetCreatureListWithEntryInGrid(lCreature, NPC_DIRT_MOUND, 250.0f);
+        for (std::list<Creature *>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
+            (*itr)->ForcedDespawn();
+    }
+
+    void JustReachedHome()
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_OURO, FAIL);
+
+        DespawnDirtMounds();
+
+        m_creature->ForcedDespawn();
+    }
+
+    void JustDied(Unit* /*pKiller*/)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_OURO, DONE);
+    }
+
+    void JustSummoned(Creature* pSummoned)
+    {
+        switch (pSummoned->GetEntry())
+        {
+        case NPC_OURO_TRIGGER:
+            float rx;
+            float ry;
+            float rz;
+            m_ouroTriggerGuid = pSummoned->GetObjectGuid();
+            pSummoned->GetRandomPoint(m_StartingLoc.coord_x,
+                                      m_StartingLoc.coord_y,
+                                      m_StartingLoc.coord_z,
+                                      100.0f, rx, ry, rz);
+            pSummoned->NearTeleportTo(rx, ry, rz, 0);
+        }
+    }
+
+    void Submerge()
+    {
+        // Source : http://wowwiki.wikia.com/wiki/Ouro
+        // "Ouro has a chance to submerge every 1.5minutes.
+        // He will not submerge if he is busy casting a Sand Blast or Sweep, else he will submerge
+        // (ie. the chance of submerging is totally random)"
+        m_uiSubmergeTimer = 90000;
+        if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL) == CAST_OK)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
+
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+
+            m_bSubmerged      = true;
+            m_uiSubmergeTimer = 30000;
+            m_uiNoMeleeTimer  = 10000;
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -91,83 +183,115 @@ struct boss_ouroAI : public ScriptedAI
 
         if (!m_bSubmerged)
         {
+            // Summon sandworm base
+            if (m_uiSummonBaseTimer)
+            {
+                if (m_uiSummonBaseTimer <= uiDiff)
+                {
+                    // Note: server side spells should be cast directly
+                    m_creature->CastSpell(m_creature, SPELL_SUMMON_BASE, true);
+                    m_uiSummonBaseTimer = 0;
+                }
+                else
+                    m_uiSummonBaseTimer -= uiDiff;
+            }
+
             // Sweep
             if (m_uiSweepTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SWEEP) == CAST_OK)
-                    m_uiSweepTimer = urand(15000, 30000);
+                if (DoCastSpellIfCan(m_creature, SPELL_SWEEP) == CAST_OK)
+                    m_uiSweepTimer = 20000;
             }
             else
                 m_uiSweepTimer -= uiDiff;
 
             // Sand Blast
             if (m_uiSandBlastTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SANDBLAST) == CAST_OK)
-                    m_uiSandBlastTimer = urand(20000, 35000);
+	    {
+                if (DoCastSpellIfCan(m_creature, SPELL_SANDBLAST) == CAST_OK)
+                    m_uiSandBlastTimer = 22000;
             }
             else
                 m_uiSandBlastTimer -= uiDiff;
 
             if (!m_bEnraged)
             {
+                // Enrage at 20% HP
                 if (m_creature->GetHealthPercent() < 20.0f)
                 {
-                    m_bEnraged = true;
-                    return;
+                    if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
+                    {
+                        m_bEnraged = true;
+                        return;
+                    }
                 }
 
                 // Submerge
                 if (m_uiSubmergeTimer < uiDiff)
                 {
-                    //Cast
-                    m_creature->HandleEmote(EMOTE_ONESHOT_SUBMERGE);
-                    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    m_creature->setFaction(35);
-                    if (DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE) == CAST_OK)
-                    {
-                        m_bSubmerged = true;
-                        m_uiBackTimer = urand(30000, 45000);
-                    }
+                    Submerge();
                 }
                 else
                     m_uiSubmergeTimer -= uiDiff;
             }
             else
-                DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT);
+            {
+                // Summon 1 mound every 10 secs when enraged
+                if (m_uiSummonMoundTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUND) == CAST_OK)
+                        m_uiSummonMoundTimer = 10000;
+                }
+                else
+                    m_uiSummonMoundTimer -= uiDiff;
+            }
 
-            DoMeleeAttackIfReady();
+            // If we are within range melee the target
+            if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            {
+                m_uiNoMeleeTimer = 5000;
+                DoMeleeAttackIfReady();
+            }
+            // Spam Boulder spell when enraged and not tanked
+            else if (m_bEnraged)
+            {
+                if (!m_creature->IsNonMeleeSpellCasted(false))
+                {
+                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                        DoCastSpellIfCan(pTarget, SPELL_BOULDER);
+                }
+            }
+            // Submerge if no melee and not enraged
+            else if (m_uiNoMeleeTimer < uiDiff)
+            {
+                Submerge();
+            }
+            else
+                m_uiNoMeleeTimer -= uiDiff;
         }
         else
         {
-            // Change Target
-            if (m_uiChangeTargetTimer < uiDiff)
+            // Resume combat
+            if (m_uiSubmergeTimer < uiDiff)
             {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                // Teleport to the trigger in order to get a new location
+                if (Creature* pTrigger = m_creature->GetMap()->GetCreature(m_ouroTriggerGuid))
+                    m_creature->NearTeleportTo(pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ(), 0);
+
+                if (DoCastSpellIfCan(m_creature, SPELL_BIRTH) == CAST_OK)
                 {
-                    m_creature->GetMap()->CreatureRelocation(m_creature, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f);
-                    m_creature->MonsterMove(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
-                }
+                    m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-                m_uiChangeTargetTimer = urand(10000, 20000);
-            }
-            else
-                m_uiChangeTargetTimer -= uiDiff;
+                    m_bSubmerged        = false;
+                    m_uiSummonBaseTimer = 2000;
+                    m_uiSubmergeTimer   = 90000;
 
-            // Back
-            if (m_uiBackTimer < uiDiff)
-            {
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                m_creature->setFaction(14);
-
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GROUND_RUPTURE) == CAST_OK)
-                {
-                    m_bSubmerged = false;
-                    m_uiSubmergeTimer = urand(60000, 120000);
+                    DespawnDirtMounds();
                 }
             }
             else
-                m_uiBackTimer -= uiDiff;
+                m_uiSubmergeTimer -= uiDiff;
         }
     }
 };
@@ -177,11 +301,112 @@ CreatureAI* GetAI_boss_ouro(Creature* pCreature)
     return new boss_ouroAI(pCreature);
 }
 
+struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
+{
+    npc_ouro_spawnerAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature) {Reset();}
+
+    bool m_bHasSummoned;
+
+    void Reset()
+    {
+        m_bHasSummoned = false;
+
+        DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
+    }
+
+    void Aggro(Unit* /*pWho*/)
+    {
+        if (!m_bHasSummoned)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO, CAST_TRIGGERED);
+            m_bHasSummoned = true;
+        }
+    }
+
+    void JustSummoned(Creature* pSummoned)
+    {
+        // Despawn when Ouro is spawned
+        if (pSummoned->GetEntry() == NPC_OURO)
+        {
+            pSummoned->CastSpell(pSummoned, SPELL_BIRTH, false);
+            pSummoned->SetInCombatWithZone();
+            m_creature->ForcedDespawn();
+        }
+    }
+
+    void UpdateAI(const uint32 /*uiDiff*/) { }
+};
+
+CreatureAI* GetAI_npc_ouro_spawner(Creature* pCreature)
+{
+    return new npc_ouro_spawnerAI(pCreature);
+}
+
+struct npc_dirt_moundAI : public Scripted_NoMovementAI
+{
+    npc_dirt_moundAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature) {Reset();}
+
+    uint32 m_uiChangeTargetTimer;
+    ObjectGuid TargetGUID;
+
+    void Reset()
+    {
+        m_uiChangeTargetTimer = 5000;
+	TargetGUID.Clear();
+
+        DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
+    }
+
+    void MoveInLineOfSight(Unit *who)
+    {
+        if (!TargetGUID && who->GetTypeId() == TYPEID_PLAYER)
+	{
+  	    TargetGUID = who->GetGUID();
+	}
+    }
+
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiChangeTargetTimer < uiDiff)
+	{
+	    if (Unit* pTarget = m_creature->GetMap()->GetUnit(TargetGUID))
+	    {
+                m_creature->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+                TargetGUID.Clear();
+	    }
+	    else
+	    {
+	        m_creature->GetMotionMaster()->MoveRandom();
+	    }
+	    m_uiChangeTargetTimer = 5000;
+	}
+	else
+	  m_uiChangeTargetTimer -= uiDiff;
+    }
+};
+
+CreatureAI* GetAI_npc_dirt_mound(Creature* pCreature)
+{
+    return new npc_dirt_moundAI(pCreature);
+}
+
 void AddSC_boss_ouro()
 {
-    Script* newscript;
-    newscript = new Script;
-    newscript->Name = "boss_ouro";
-    newscript->GetAI = &GetAI_boss_ouro;
-    newscript->RegisterSelf();
+    Script* pNewScript;
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_ouro";
+    pNewScript->GetAI = &GetAI_boss_ouro;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_ouro_spawner";
+    pNewScript->GetAI = &GetAI_npc_ouro_spawner;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_dirt_mound";
+    pNewScript->GetAI = &GetAI_npc_dirt_mound;
+    pNewScript->RegisterSelf();
 }

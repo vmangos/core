@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -682,7 +680,7 @@ void ScriptMgr::LoadCreatureMovementScripts()
 
 void ScriptMgr::LoadDbScriptStrings()
 {
-    sObjectMgr.LoadMangosStrings(WorldDatabase, "db_script_string", MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID);
+    sObjectMgr.LoadMangosStrings(WorldDatabase, "db_script_string", MIN_DB_SCRIPT_STRING_ID, MAX_DB_SCRIPT_STRING_ID, false);
 
     std::set<int32> ids;
 
@@ -790,7 +788,7 @@ void ScriptMgr::LoadEventIdScripts()
     BarGoLink bar(result->GetRowCount());
 
     std::set<uint32> eventIds;                              // Store possible event ids
-    
+
     CollectPossibleEventIds(eventIds);
 
     do
@@ -1241,7 +1239,7 @@ void ScriptMgr::LoadDatabase()
 void ScriptMgr::LoadScriptTexts()
 {
     sLog.outString("Loading Script Texts...");
-    LoadMangosStrings(WorldDatabase, "script_texts", TEXT_SOURCE_TEXT_START, TEXT_SOURCE_TEXT_END);
+    LoadMangosStrings(WorldDatabase, "script_texts", TEXT_SOURCE_TEXT_START, TEXT_SOURCE_TEXT_END, true);
 
     QueryResult* result = WorldDatabase.PQuery("SELECT entry, sound, type, language, emote FROM script_texts WHERE entry BETWEEN %i AND %i", TEXT_SOURCE_GOSSIP_END, TEXT_SOURCE_TEXT_START);
 
@@ -1303,7 +1301,7 @@ void ScriptMgr::LoadScriptTexts()
 void ScriptMgr::LoadScriptTextsCustom()
 {
     sLog.outString("Loading Custom Texts...");
-    LoadMangosStrings(WorldDatabase, "custom_texts", TEXT_SOURCE_CUSTOM_START, TEXT_SOURCE_CUSTOM_END);
+    LoadMangosStrings(WorldDatabase, "custom_texts", TEXT_SOURCE_CUSTOM_START, TEXT_SOURCE_CUSTOM_END, true);
 
     QueryResult* result = WorldDatabase.PQuery("SELECT entry, sound, type, language, emote FROM custom_texts WHERE entry BETWEEN %i AND %i", TEXT_SOURCE_CUSTOM_END, TEXT_SOURCE_CUSTOM_START);
 
@@ -1624,6 +1622,62 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
     }
 }
 
+
+/**
+ * Function that either simulates or does script text for a map
+ *
+ * @param iTextEntry Entry of the text, stored in SD2-database, only type CHAT_TYPE_ZONE_YELL supported
+ * @param uiCreatureEntry Id of the creature of whom saying will be simulated
+ * @param pMap Given Map on which the map-wide text is displayed
+ * @param pCreatureSource Can be nullptr. If pointer to Creature is given, then the creature does the map-wide text
+ * @param pTarget Can be nullptr. Possible target for the text
+ */
+void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource /*=nullptr*/, Unit* pTarget /*=nullptr*/)
+{
+    if (!pMap)
+    {
+	sLog.outError("DoOrSimulateScriptTextForMap entry %i, invalid Map pointer.", iTextEntry);
+	return;
+    }
+
+    if (iTextEntry >= 0)
+    {
+	sLog.outError("DoOrSimulateScriptTextForMap with source entry %u for map %u attempts to process text entry %i, but text entry must be negative.", uiCreatureEntry, pMap->GetId(), iTextEntry);
+	return;
+    }
+
+    CreatureInfo const* pInfo = GetCreatureTemplateStore(uiCreatureEntry);
+    if (!pInfo)
+    {
+	sLog.outError("DoOrSimulateScriptTextForMap has invalid source entry %u for map %u.", uiCreatureEntry, pMap->GetId());
+	return;
+    }
+
+    MangosStringLocale const* pData = sObjectMgr.GetMangosStringLocale(iTextEntry);
+    if (!pData)
+    {
+	sLog.outError("DoOrSimulateScriptTextForMap with source entry %u for map %u could not find text entry %i.", uiCreatureEntry, pMap->GetId(), iTextEntry);
+	return;
+    }
+
+    sLog.outDebug("SD2: DoOrSimulateScriptTextForMap: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u",
+	      iTextEntry, pData->SoundId, pData->Type, pData->LanguageId, pData->Emote);
+
+    if (pData->Type != CHAT_TYPE_ZONE_YELL)
+    {
+	sLog.outError("DoSimulateScriptTextForMap entry %i has not supported chat type %u.", iTextEntry, pData->Type);
+	return;
+    }
+
+    if (pData->SoundId)
+	pMap->PlayDirectSoundToMap(pData->SoundId);
+
+    if (pCreatureSource)                                // If provided pointer for sayer, use direct version
+	pMap->MonsterYellToMap(pCreatureSource->GetObjectGuid(), iTextEntry, pData->LanguageId, pTarget);
+    else                                                // Simulate yell
+	pMap->MonsterYellToMap(pInfo, iTextEntry, pData->LanguageId, pTarget);
+}
+
 void Script::RegisterSelf(bool bReportError)
 {
     if (uint32 id = sScriptMgr.GetScriptId(Name.c_str()))
@@ -1724,4 +1778,3 @@ void ScriptMgr::FillSpellSummary()
         }
     }
 }
-
