@@ -4662,6 +4662,32 @@ bool ChatHandler::HandleLookupPlayerEmailCommand(char* args)
     return LookupPlayerSearchCommand(result, &limit);
 }
 
+bool ChatHandler::HandleLookupPlayerNameCommand(char* args)
+{
+    char* nameStr = ExtractQuotedOrLiteralArg(&args);
+    if (!nameStr)
+        return false;
+
+    uint32 limit;
+    if (!ExtractOptUInt32(&args, limit, 100))
+        return false;
+
+    uint32 limit_original = limit;
+    std::string name = nameStr;
+    LoginDatabase.escape_string(name);
+
+    QueryResult* chars = CharacterDatabase.PQuery("SELECT guid, name, race, class, level FROM characters WHERE name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
+    if (chars)
+    {
+        if (chars->GetRowCount())
+            ShowPlayerListHelper(chars, &limit, true, true);
+        else
+            delete chars;
+    }
+
+    return true;
+}
+
 bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)
 {
     if (!result)
