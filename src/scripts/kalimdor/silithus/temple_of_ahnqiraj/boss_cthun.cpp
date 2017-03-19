@@ -1709,6 +1709,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         else
             GroundRuptureTimer -= diff;
 
+        /*
         //HamstringTimer
         if (HamstringTimer < diff)
         {
@@ -1717,6 +1718,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         }
         else
             HamstringTimer -= diff;
+        */
 
         if (ThrashTimer < diff)
         {
