@@ -85,7 +85,7 @@ class EventProcessor
 
         // Zerix: Nostalrius compatibility. Figure a better way to handle this.
         bool HasScheduledEvent() const { return m_events.empty() ? false : true; }
-        EventList GetEvents() const { return m_events; }
+        EventList const& GetEvents() const { return m_events; }
 
     protected:
         uint64 m_time;
