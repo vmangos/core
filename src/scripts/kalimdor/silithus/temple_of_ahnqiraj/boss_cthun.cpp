@@ -1384,7 +1384,7 @@ struct eye_of_cthunAI : public ScriptedAI
 
 struct eye_tentacleAI : public ScriptedAI
 {
-    eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature), m_cthunAi(nullptr)
+    eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         SetCombatMovement(false);
         Reset();
@@ -1394,19 +1394,10 @@ struct eye_tentacleAI : public ScriptedAI
             Portal = pPortal->GetObjectGuid();
             pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.075f);
         }
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        if (!m_pInstance)
-            sLog.outError("SD0: No Instance eye_tentacleAI");
-        Creature* cthunCreature = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-        if (cthunCreature) {
-            m_cthunAi = static_cast<cthunAI*>(cthunCreature->AI());
-        }
     }
 
     uint32 MindflayTimer;
     uint64 Portal;
-    ScriptedInstance* m_pInstance;
-    cthunAI* m_cthunAi;
 
     void DoDespawnPortal() {
         if (!Portal) return;
@@ -1441,13 +1432,10 @@ struct eye_tentacleAI : public ScriptedAI
             return;
         }
 
-
-        if (m_cthunAi) {
-            if (m_cthunAi->PlayerInStomach(m_creature->getVictim())) {
-                m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
-                MindflayTimer = 0;
-            }
-
+        // Cancel the channel of mindflay if target has been ported to stomach
+        if (m_creature->getVictim()->GetPositionZ() < -30.0f) {
+            m_creature->InterruptSpell(CURRENT_CHANNELED_SPELL);
+            MindflayTimer = 0;
         }
         
         //MindflayTimer
@@ -1784,6 +1772,12 @@ struct giant_eye_tentacleAI : public ScriptedAI
         //Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        // Stop casting on current target if it's been ported to stomach
+        if (m_creature->getVictim()->GetPositionZ() < -30.0f) {
+            m_creature->CastStop();
+            BeamTimer = 0;
+        }
 
         //BeamTimer
         if (BeamTimer < diff)
