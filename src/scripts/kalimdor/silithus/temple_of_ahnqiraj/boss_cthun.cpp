@@ -108,6 +108,11 @@ static const int MAX_INITIAL_PULLER_HITS = 3;
 // Green beam has a 2 sec cast time. This adds additional cooldown to the ability
 static const int GREEN_BEAM_COOLDOWN = 2000;
 
+// If defined, each player in stomach has his own punt timer.
+// Otherwise the punt timer starts each time a player goes in range,
+// and all players in range once the timer finishes, gets punted.
+// #define USE_INDIVIDUAL_PUNT_TIMER
+
 
 namespace PolyCheck {
     using namespace G3D;
@@ -284,6 +289,8 @@ struct cthunAI : public ScriptedAI
     ObjectGuid StomachEnterTargetGUID;
     uint32 WeaknessTimer;
 
+    uint32 stomachPuntTimer;
+    ObjectGuid puntCreatureGuid;
 
     uint32 EyeDeathAnimTimer;
     uint32 CthunEmergeTimer;
@@ -342,6 +349,9 @@ struct cthunAI : public ScriptedAI
         CthunEmergeTimer = 8000;
 
         playersInRoom.clear();
+
+        stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
+        puntCreatureGuid = 0;
 
         //ResetartUnvulnerablePhase();
 
@@ -699,6 +709,17 @@ struct cthunAI : public ScriptedAI
         }
     }
 
+    void PortPlayerOutOfStomach(Player* player) {
+        //Teleport player out
+        DoTeleportPlayer(player, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, player->GetOrientation());
+
+        //Cast knockback on them
+        player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
+
+        //Remove the acid debuff
+        player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+    }
+
     void UpdatePlayersInStomach(uint32 diff)
     {
         for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
@@ -726,8 +747,21 @@ struct cthunAI : public ScriptedAI
                 timers.acidDebuff -= diff;
             }
 
+#ifdef USE_INDIVIDUAL_PUNT_TIMER
             // update punt timer while player is in the punt area. Otherwise reset timer.
             if (player->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) < 5.0f) {
+                if (stomachPuntTimer == StomachTimers::PUNT_CAST_TIME) {
+                    stomachPuntTimer -= diff;
+                }
+                
+                if (stomachPuntTimer < diff) {
+
+                }
+                else {
+                    stomachPuntTimer -= diff;
+                }
+
+
                 if (timers.puntCastTime < diff) {
                     // Punt the player if he has been in the area aproximately PUNT_CAST_TIME ms
                     sLog.outBasic("Player in stomach getting punted");
@@ -755,26 +789,76 @@ struct cthunAI : public ScriptedAI
                 }
                 timers.puntCastTime = StomachTimers::PUNT_CAST_TIME;
             }
-
+#endif
             // check if we should throw the player out of stomach
             if (player->GetPositionZ() > -40.0f && player->HasMovementFlag(MOVEFLAG_JUMPING)) {
-                //Teleport player out
-                DoTeleportPlayer(player, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, player->GetOrientation());
-
-                //Cast knockback on them
-                player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
-
-                //Remove the acid debuff
-                player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-
+                
+                PortPlayerOutOfStomach(player);
                 //Remove player from stomach list
                 //todo: delay removal until player has landed outside. Maybe just a set number of seconds
                 it = playersInStomach.erase(it);
                 sLog.outBasic("Player left stomach");
                 continue;
             }
+
             ++it;
         }
+#ifndef USE_INDIVIDUAL_PUNT_TIMER
+        //Punt creature despawn timer (4450 vs cast time of 3sec) should be enough to avoid
+        //player that has just been punted to retrigger punting
+        Creature* testPuntCreature = m_pInstance->GetMap()->GetCreature(puntCreatureGuid);
+        if (!testPuntCreature){
+            puntCreatureGuid = 0;
+        }
+
+        if (!puntCreatureGuid) {
+            for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
+                Player* player = m_creature->GetMap()->GetPlayer(it->first);
+                // this should not be needed afaik as it's already done in loop above. But just in case.
+                if (!player) {
+                    ++it;
+                    continue;
+                }
+                //starting a punt timer
+                if (player->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) < 6.0f) {
+                    if (Creature *pCreature = m_creature->SummonCreature(PUNT_CREATURE,
+                        puntPosition[0], puntPosition[1], puntPosition[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
+                    {
+                        puntCreatureGuid = pCreature->GetGUID();
+                        sLog.outBasic("Player in stomach arrived at punt area. Starting punt countdown");
+                        pCreature->CastSpell(pCreature, 26092, false);
+                        stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
+                    }
+                    break;
+                }
+
+                ++it;
+            }
+        }
+        else if(stomachPuntTimer < diff){
+            for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
+                Player* player = m_creature->GetMap()->GetPlayer(it->first);
+                // this should not be needed afaik as it's already done in loop above. But just in case.
+                if (!player) {
+                    ++it;
+                    continue;
+                }
+                if (Creature* puntCreature = m_pInstance->GetMap()->GetCreature(puntCreatureGuid)) {
+                    if (player->GetDistance(puntCreature) < 6) {
+                        player->CastSpell(player, SPELL_PUNT_UPWARD, true);
+                        player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
+                    }
+                }
+                ++it;
+            }
+            // just setting it high so no continous punting happens until punt creature despawns
+            // and timer is re-initialized 
+            stomachPuntTimer = std::numeric_limits<uint32>::max();
+        }
+        else {
+            stomachPuntTimer -= diff;
+        }  
+#endif
     }
 
     Player* SelectRandomAliveNotStomach()
