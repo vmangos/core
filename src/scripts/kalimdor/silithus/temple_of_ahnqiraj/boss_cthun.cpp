@@ -77,7 +77,7 @@
 
 static const float stomachPortPosition[4] = 
 {
-    -8562.0f, 2037.0f, -70.0f, 5.05f
+    -8562.0f, 2037.0f, -96.0f, 5.05f
 };
 
 static const float fleshTentaclePositions[2][4] = 
@@ -608,8 +608,11 @@ struct cthunAI : public ScriptedAI
         if (!StomachEnterTargetGUID.IsEmpty()) {
             if (StomachEnterPortTimer < diff) {
                 if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
+
                     DoTeleportPlayer(pPlayer, stomachPortPosition[0], stomachPortPosition[1], stomachPortPosition[2], stomachPortPosition[3]);
                     pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
+
+                    //pPlayer->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID_TELEPORT, true);
 
                     playersInStomach.push_back(std::make_pair(StomachEnterTargetGUID,
                         StomachTimers{ StomachTimers::PUNT_CAST_TIME, StomachTimers::ACID_REFRESH_RATE }));
