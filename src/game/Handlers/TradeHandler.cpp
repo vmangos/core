@@ -256,11 +256,14 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
     TradeData* my_trade = _player->m_trade;
     if (!my_trade)
         return;
-    if (time(NULL) - my_trade->GetLastModificationTime() <= 2) // 3 seconds delay, after last modification
+    double lastModificationTimeInMS = difftime(time(NULL), my_trade->GetLastModificationTime()) * 1000;
+    if (lastModificationTimeInMS < my_trade->GetScamPreventionDelay()) // if we are not outside the delay period since last modification
     {
-        SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+	    SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
         return;
     }
+
+    my_trade->SetLastModificationTime(time(NULL)); // Update it
 
     Player* trader = my_trade->GetTrader();
 
@@ -638,6 +641,10 @@ void WorldSession::HandleInitiateTradeOpcode(WorldPacket& recvPacket)
     // OK start trade
     _player->m_trade = new TradeData(_player, pOther);
     pOther->m_trade = new TradeData(pOther, _player);
+    
+    // Set the scam prevention, a delay  of 200 ms should suffice
+    _player->m_trade->SetScamPreventionDelay(200);
+    pOther->m_trade->SetScamPreventionDelay(200);
 
     WorldPacket data(SMSG_TRADE_STATUS, 12);
     data << uint32(TRADE_STATUS_BEGIN_TRADE);
@@ -663,6 +670,7 @@ void WorldSession::HandleSetTradeGoldOpcode(WorldPacket& recvPacket)
     // gold can be incorrect, but this is checked at trade finished.
     his_trade->SetAccepted(false);
     his_trade->SetLastModificationTime(time(NULL));
+    my_trade->SetLastModificationTime(time(NULL));
     my_trade->SetMoney(gold);
 }
 
@@ -709,6 +717,7 @@ void WorldSession::HandleSetTradeItemOpcode(WorldPacket& recvPacket)
 
     his_trade->SetAccepted(false);
     his_trade->SetLastModificationTime(time(NULL));
+    my_trade->SetLastModificationTime(time(NULL));
     my_trade->SetItem(TradeSlots(tradeSlot), item);
 }
 
@@ -730,5 +739,6 @@ void WorldSession::HandleClearTradeItemOpcode(WorldPacket& recvPacket)
 
     his_trade->SetAccepted(false);
     his_trade->SetLastModificationTime(time(NULL));
+    my_trade->SetLastModificationTime(time(NULL));
     my_trade->SetItem(TradeSlots(tradeSlot), NULL);
 }
