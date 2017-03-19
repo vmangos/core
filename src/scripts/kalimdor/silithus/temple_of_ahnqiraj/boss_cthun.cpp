@@ -805,8 +805,9 @@ struct cthunAI : public ScriptedAI
         j = temp.begin();
 
         //Get random but only if we have more than one unit on threat list
-        if (temp.size() > 1)
-            advance(j, rand() % (temp.size() - 1));
+        if (temp.size() > 1) {
+            advance(j, rand() % temp.size());
+        }
 
         return (*j);
     }
