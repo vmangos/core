@@ -195,6 +195,30 @@ namespace PolyCheck {
 
 };
 
+void SpawnEyeTentacles(Creature* relToThisCreature)
+{
+    float centerX = relToThisCreature->GetPositionX();
+    float centerY = relToThisCreature->GetPositionY();
+    float radius = 30.0f;
+    float angle = 360.0f / 8.0f;
+
+    // Summon 8 of them them in a circle centered around centerX and centerY
+    for (uint8 i = 0; i < 8; i++)
+    {
+        float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
+        float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
+
+        //SpawnEyeTentacle(x + frand(-2, 2), y + frand(-2, 2));
+
+        if (Creature* Spawned = relToThisCreature->SummonCreature(MOB_EYE_TENTACLE, x, y,
+            relToThisCreature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+        {
+            Spawned->SetInCombatWithZone();
+            //Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
+        }
+    }
+}
+
 struct cthunAI : public ScriptedAI
 {
     /* 
@@ -273,7 +297,7 @@ struct cthunAI : public ScriptedAI
         DoSpawnCreature(MOB_CTHUN_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
-    static const uint32 EYE_RESPAWN_TIMER           = 30000;
+    static const uint32 P2_EYE_TENTACLE_RESPAWN_TIMER = 30000;
     static const uint32 GIANT_CLAW_RESPAWN_TIMER    = 60000;
     static const uint32 STOMACH_GRAB_COOLDOWN       = 10000;
     static const uint32 GIANT_EYE_RESPAWN_TIMER     = 60000;
@@ -700,27 +724,9 @@ struct cthunAI : public ScriptedAI
         SpawnTentacleIfReady(diff, GiantEyeTentacleTimer, GIANT_EYE_RESPAWN_TIMER, MOB_GIANT_EYE_TENTACLE);
 
         if (EyeTentacleTimer < diff) {
-            // Spawn the 8 Eye Tentacles in the corret spots
-            float centerX = m_creature->GetPositionX();
-            float centerY = m_creature->GetPositionY();
-            float radius = 30.0f;
-            float angle = 360.0f / 8.0f;
-
-            // Summon 8 of them them in a circle centered around centerX and centerY
-            for (uint8 i = 0; i < 8; i++) {
-                float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
-                float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
-
-                if (Creature* Spawned = m_creature->SummonCreature(MOB_EYE_TENTACLE, x, y, m_creature->GetPositionZ(), 0, 
-                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
-                {
-                    Spawned->SetInCombatWithZone();
-                    Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
-                }
-            }
-
+            SpawnEyeTentacles(m_creature);
             //These spawn at every 30 seconds
-            EyeTentacleTimer = EYE_RESPAWN_TIMER;
+            EyeTentacleTimer = P2_EYE_TENTACLE_RESPAWN_TIMER;
         }
         else {
             EyeTentacleTimer -= diff;
@@ -1190,20 +1196,7 @@ struct eye_of_cthunAI : public ScriptedAI
         // EyeTentacleTimer
         if (EyeTentacleTimer < diff)
         {
-            float centerX = m_creature->GetPositionX();
-            float centerY = m_creature->GetPositionY();
-            float radius = 30.0f;
-            float angle = 360.0f / 8.0f;
-
-            // Summon 8 of them them in a circle centered around centerX and centerY
-            for (uint8 i = 0; i < 8; i++)
-            {
-                float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
-                float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
-
-                SpawnEyeTentacle(x + frand(-2, 2), y + frand(-2, 2));
-            }
-
+            SpawnEyeTentacles(m_creature);
             EyeTentacleTimer = 45000;
         }
         else
@@ -1309,15 +1302,6 @@ struct eye_of_cthunAI : public ScriptedAI
 
         if (!m_creature->HasAura(16245)) // Freeze animation
             m_creature->CastSpell(m_creature, 16245, true);
-    }
-
-    void SpawnEyeTentacle(float x, float y)
-    {
-        if (Creature* Spawned = m_creature->SummonCreature(MOB_EYE_TENTACLE, x, y, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
-        {
-            Spawned->SetInCombatWithZone();
-            Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
-        }
     }
 
     bool AggroRadius()  
