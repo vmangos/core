@@ -4484,24 +4484,12 @@ bool ChatHandler::HandleLookupAccountEmailCommand(char* args)
 
 bool ChatHandler::HandleLookupAccountIpCommand(char* args)
 {
-    char* ipStr = ExtractQuotedOrLiteralArg(&args);
-    if (!ipStr)
-        return false;
+    return ShowAccountIpListHelper(args, false);
+}
 
-    uint32 limit;
-    if (!ExtractOptUInt32(&args, limit, 100))
-        return false;
-
-    std::string ip = ipStr;
-    LoginDatabase.escape_string(ip);
-
-    //                                                 0   1         2        3        4
-    uint32 minId = 100; // Don't show GM accounts
-    if (!m_session || m_session->GetSecurity() >= SEC_ADMINISTRATOR)
-        minId = 0;
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, 0, expansion FROM account WHERE id >= %u AND last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), minId, ip.c_str());
-
-    return ShowAccountListHelper(result, &limit);
+bool ChatHandler::HandleLookupAccountIponlineCommand(char* args)
+{
+    return ShowAccountIpListHelper(args, true);
 }
 
 bool ChatHandler::HandleLookupAccountNameCommand(char* args)
@@ -4521,6 +4509,32 @@ bool ChatHandler::HandleLookupAccountNameCommand(char* args)
     LoginDatabase.escape_string(account);
     //                                                 0   1         2        3        4
     QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, 0, expansion FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
+
+    return ShowAccountListHelper(result, &limit);
+}
+
+bool ChatHandler::ShowAccountIpListHelper(char* args, bool onlineonly)
+{
+    char* ipStr = ExtractQuotedOrLiteralArg(&args);
+    if (!ipStr)
+        return false;
+
+    uint32 limit;
+    if (!ExtractOptUInt32(&args, limit, 100))
+        return false;
+
+    std::string ip = ipStr;
+    LoginDatabase.escape_string(ip);
+
+    uint32 minId = 100; // Don't show GM accounts
+    if (!m_session || m_session->GetSecurity() >= SEC_ADMINISTRATOR)
+        minId = 0;
+
+    const char *query = onlineonly
+        ? "SELECT id, username, last_ip, 0, expansion FROM account WHERE id >= %u AND online = 1 AND last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'")
+        : "SELECT id, username, last_ip, 0, expansion FROM account WHERE id >= %u AND                last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'");
+
+    QueryResult *result = LoginDatabase.PQuery(query, minId, ip.c_str());
 
     return ShowAccountListHelper(result, &limit);
 }
