@@ -257,7 +257,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                         }
                     }
 
-                    chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), channel.c_str(), lang);
+                    chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang);
 
                     if (lang != LANG_ADDON && chn->HasFlag(Channel::ChannelFlags::CHANNEL_FLAG_GENERAL))
                         if (AntispamInterface *a = sAnticheatLib->GetAntispam())
