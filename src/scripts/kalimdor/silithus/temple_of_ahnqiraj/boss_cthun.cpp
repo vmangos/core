@@ -108,7 +108,40 @@ static const int MAX_INITIAL_PULLER_HITS = 3;
 // Green beam has a 2 sec cast time. This adds additional cooldown to the ability
 static const int GREEN_BEAM_COOLDOWN = 3000;
 
+struct EyeTentacleGroundRupture {
+    EyeTentacleGroundRupture(Creature* creature) : 
+        m_creature(creature),
+        groundRuptureTimer(250), //small delay from spawn. Not sure if it should be there
+        didGroundRupture(false)
+    {}
 
+    void Reset() {
+        groundRuptureTimer = 500;
+        didGroundRupture = false;
+    }
+
+    bool Update(uint32 diff) {
+        if (!didGroundRupture) {
+            if (groundRuptureTimer < diff) {
+                m_creature->CastSpell(m_creature->getVictim(), SPELL_GIANT_GROUND_RUPTURE, true);
+                didGroundRupture = true;
+            }
+            else {
+                groundRuptureTimer -= diff;
+            }
+        }
+
+        return didGroundRupture;
+    }
+
+private:
+    // Should be safe to keep a creature ptr here 
+    // as the class should only be instantiated and
+    // used by CreatureAI
+    Creature* m_creature;
+    uint32 groundRuptureTimer;
+    bool didGroundRupture;
+};
 
 // If defined, each player in stomach has his own punt timer.
 // Otherwise the punt timer starts each time a player goes in range,
@@ -1103,7 +1136,7 @@ struct eye_of_cthunAI : public ScriptedAI
         if (m_creature) {
             m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
             m_creature->SetVisibility(VISIBILITY_OFF);
-            m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
+            //m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
             m_creature->SetVisibility(VISIBILITY_ON);
         }
         else {
@@ -1232,6 +1265,7 @@ struct eye_of_cthunAI : public ScriptedAI
                 DarkGlareTickTimer -= diff;
         }
     }
+
 
     void StartBeamPhase()
     {
@@ -1368,20 +1402,22 @@ struct eye_of_cthunAI : public ScriptedAI
 
 struct eye_tentacleAI : public ScriptedAI
 {
-    eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    eye_tentacleAI(Creature* pCreature) : 
+        ScriptedAI(pCreature), 
+        groundRuptureTimer(pCreature)
     {
         SetCombatMovement(false);
         Reset();
-        
         if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
         {
             Portal = pPortal->GetObjectGuid();
-            pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.075f);
+            //pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.075f);
         }
     }
 
     uint32 MindflayTimer;
     uint64 Portal;
+    EyeTentacleGroundRupture groundRuptureTimer;
 
     void DoDespawnPortal() {
         if (!Portal) return;
@@ -1396,12 +1432,13 @@ struct eye_tentacleAI : public ScriptedAI
 
     void Reset()
     {
-        MindflayTimer = urand(1000, 2000);
+        MindflayTimer = 2000;// urand(1000, 2000);
 
         DoDespawnPortal();
 
         m_creature->SetInCombatWithZone();
-        m_creature->CastSpell(m_creature, SPELL_GROUND_RUPTURE, true);
+        
+        groundRuptureTimer.Reset();
     }
 
     void Aggro(Unit* pWho)
@@ -1422,20 +1459,26 @@ struct eye_tentacleAI : public ScriptedAI
             MindflayTimer = 0;
         }
         
-        //MindflayTimer
-        if (MindflayTimer < diff)
+        if (groundRuptureTimer.Update(diff))
         {
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            //MindflayTimer
+            //if (MindflayTimer < diff)
             {
-                if (target->GetPositionZ() >= 100.0f)
+                //todo: select new target if current target was ported to stomach?
+                if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    DoCastSpellIfCan(target, SPELL_MIND_FLAY);
-                    MindflayTimer = 5000;
+                    if (target->GetPositionZ() >= 100.0f)
+                    {
+                        if (!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL)) {
+                            DoCastSpellIfCan(target, SPELL_MIND_FLAY);
+                        }
+                        //MindflayTimer = 5000;
+                    }
                 }
             }
+            //else
+            //    MindflayTimer -= diff;
         }
-        else
-            MindflayTimer -= diff;
     }
 };
 
@@ -1449,7 +1492,7 @@ struct claw_tentacleAI : public ScriptedAI
         if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
         {
             Portal = pPortal->GetObjectGuid();
-            pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.075f);
+            //pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X,0.075f);
         }
     }
 
@@ -1721,7 +1764,9 @@ struct giant_claw_tentacleAI : public ScriptedAI
 
 struct giant_eye_tentacleAI : public ScriptedAI
 {
-    giant_eye_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    giant_eye_tentacleAI(Creature* pCreature) : 
+        ScriptedAI(pCreature),
+        groundRuptureTimer(pCreature)
     {
         SetCombatMovement(false);
         Reset();
@@ -1733,6 +1778,8 @@ struct giant_eye_tentacleAI : public ScriptedAI
     uint32 BeamTimer;
     uint64 Portal;
 
+    EyeTentacleGroundRupture groundRuptureTimer;
+
     void JustDied(Unit*)
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
@@ -1741,8 +1788,11 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
     void Reset()
     {
-        //Green Beam half a second after we spawn
-        BeamTimer = 500;
+        // todo: how long should it wait after ground rupture to do first beam?
+        // maybe no wait, maybe some wait
+        BeamTimer = 0;
+
+        groundRuptureTimer.Reset();
 
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
@@ -1765,25 +1815,30 @@ struct giant_eye_tentacleAI : public ScriptedAI
             BeamTimer = 0;
         }
 
-        //BeamTimer
-        if (BeamTimer < diff)
-        {
-            Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-
-            //hacky check to not target players in stomach.
-            //todo: access c'thuns AI script instance and call PlayerInStomach()
-            if (target && target->GetPositionZ() > -30.0f)
+        if(groundRuptureTimer.Update(diff)) {
+            //BeamTimer
+            if (BeamTimer < diff)
             {
-                if (DoCastSpellIfCan(target, SPELL_GREEN_BEAM) != CAST_OK) {
-                    DoResetThreat();
-                }
-                else {
-                    BeamTimer = 2100;
+                Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+
+                //hacky, cheap check to not target players in stomach.
+                if (target && target->GetPositionZ() > -30.0f)
+                {
+                    if (DoCastSpellIfCan(target, SPELL_GREEN_BEAM) != CAST_OK) {
+                        //I cant imagine this is a good idea? It will be untankable, and it should be tanked
+                        //DoResetThreat();
+
+                        //todo: is it needed to manually set highest threat target?
+                        DoMeleeAttackIfReady();
+                    }
+                    else {
+                        BeamTimer = 2100;
+                    }
                 }
             }
+            else
+                BeamTimer -= diff;
         }
-        else
-            BeamTimer -= diff;
     }
 };
 
