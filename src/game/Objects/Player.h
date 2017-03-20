@@ -1679,6 +1679,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         HonorMgr&       GetHonorMgr()       { return m_honorMgr; }
         HonorMgr const& GetHonorMgr() const { return m_honorMgr; }
+        HonorRankInfo GetHonorRankInfo() const { return m_honorMgr.GetRank(); }
 
         void UpdateSkillsForLevel();
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup

@@ -42,6 +42,7 @@ void MasterPlayer::LoadPlayer(Player* player)
     name = player->GetName();
     zoneId = player->GetCachedZoneId();
     areaId = player->GetCachedAreaId();
+    m_honorRank = player->GetHonorRankInfo();
     raceId = player->getRace();
     classId = player->getClass();
     level = player->getLevel();

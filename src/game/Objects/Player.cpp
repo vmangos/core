@@ -4699,9 +4699,9 @@ void Player::CleanupChannels()
     {
         Channel* ch = *m_channels.begin();
         m_channels.erase(m_channels.begin());               // remove from player's channel list
-        ch->Leave(GetObjectGuid(), false);                  // not send to client, not remove from player's channel list
+        ch->Leave(GetObjectGuid(), ch->GetName().c_str(), false);   // not send to client, not remove from player's channel list
         if (ChannelMgr* cMgr = channelMgr(GetTeam()))
-            cMgr->LeftChannel(ch->GetName());               // deleted channel if empty
+            cMgr->LeftChannel(ch->GetName(), nullptr);      // deleted channel if empty
 
     }
     DEBUG_LOG("Player: channels cleaned up!");
@@ -4718,7 +4718,7 @@ void Player::LeaveLFGChannel()
     {
         if ((*i)->IsLFG())
         {
-            (*i)->Leave(GetObjectGuid());
+            (*i)->Leave(GetObjectGuid(), (*i)->GetName().c_str());
             break;
         }
     }

@@ -112,6 +112,8 @@ public:
     const char* GetName() const { return name.c_str(); }
     uint32 GetZoneId() const { return zoneId; }
     uint32 GetAreaId() const { return areaId; }
+    uint32 GetCachedZoneId() const { return zoneId; }
+    HonorRankInfo GetHonorRankInfo() const { return m_honorRank; }
     uint8 getClass() const { return classId; }
     uint8 getRace() const { return raceId; }
     uint32 getLevel() const { return level; }
@@ -127,6 +129,7 @@ public:
     uint8 classId;
     uint32 level;
     Team m_team;
+    HonorRankInfo m_honorRank;
     // Guild system variables
     uint32 guildId;
     uint32 guildRank;
