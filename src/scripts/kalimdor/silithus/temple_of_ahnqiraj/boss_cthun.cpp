@@ -149,7 +149,7 @@ namespace PolyCheck {
     const float maxX = -8494.54004f;
     const float minX = -8665.73047f;
     const float maxY = 2067.35010f;
-    const float minY = 1929.68005;
+    const float minY = 1929.68005f;
     
     bool IsPointInPolygon(Unit* unit)
     {
