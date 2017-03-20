@@ -1407,6 +1407,9 @@ struct eye_tentacleAI : public ScriptedAI
         ScriptedAI(pCreature), 
         groundRuptureTimer(pCreature)
     {
+        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 4);
+        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 4);
+
         SetCombatMovement(false);
         Reset();
         if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
@@ -1619,7 +1622,8 @@ struct giant_claw_tentacleAI : public ScriptedAI
     {
         SetCombatMovement(false);
         Reset();
-
+        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
+        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
             Portal = pPortal->GetObjectGuid();
     }
@@ -1771,6 +1775,8 @@ struct giant_eye_tentacleAI : public ScriptedAI
     {
         SetCombatMovement(false);
         Reset();
+        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 8);
+        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 8);
 
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0))
             Portal = pPortal->GetObjectGuid();
@@ -1821,7 +1827,6 @@ struct giant_eye_tentacleAI : public ScriptedAI
             if (BeamTimer < diff)
             {
                 Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-
                 //hacky, cheap check to not target players in stomach.
                 if (target && target->GetPositionZ() > -30.0f)
                 {
