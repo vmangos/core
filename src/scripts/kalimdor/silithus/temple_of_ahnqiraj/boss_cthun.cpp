@@ -35,11 +35,12 @@
 
 #define MOB_CLAW_TENTACLE                   15725
 #define MOB_EYE_TENTACLE                    15726
-#define MOB_SMALL_PORTAL                    15904
 #define MOB_BODY_OF_CTHUN                   15809
 #define MOB_GIANT_CLAW_TENTACLE             15728
 #define MOB_GIANT_EYE_TENTACLE              15334
 #define MOB_FLESH_TENTACLE                  15802
+
+#define MOB_SMALL_PORTAL                    15904
 #define MOB_GIANT_PORTAL                    15910
 #define MOB_CTHUN_PORTAL                    15896
 
