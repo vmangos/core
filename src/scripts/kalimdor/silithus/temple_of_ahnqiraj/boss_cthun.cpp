@@ -156,7 +156,7 @@ struct EyeBeam {
     {}
 
     void Reset() {
-        cooldown = RESET_TO;
+        cooldown = GREEN_BEAM_COOLDOWN;
     }
 
     // if target is given, we won't select a random one
@@ -186,7 +186,7 @@ struct EyeBeam {
         m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false); //todo: triggered needed?
         //m_creature->SetTargetGuid(ObjectGuid());
 
-        cooldown = RESET_TO;
+        cooldown = GREEN_BEAM_COOLDOWN;
         return true;
     }
 
@@ -197,93 +197,13 @@ struct EyeBeam {
 private:
     Creature* m_creature;
     uint32 cooldown;
-    static const uint32 RESET_TO = GREEN_BEAM_COOLDOWN;
-
 };
+
 // If defined, each player in stomach has his own punt timer.
 // Otherwise the punt timer starts each time a player goes in range,
 // and all players in range once the timer finishes, gets punted.
 // #define USE_INDIVIDUAL_PUNT_TIMER
 
-
-namespace PolyCheck {
-    using namespace G3D;
-
-    static const std::vector<Vector2> roomPolygon = {
-        Vector2(-8665.73f, 1963.21f),
-        Vector2(-8647.89f, 1990.35f),
-        Vector2(-8635.87f, 2012.05f),
-        Vector2(-8625.09f, 2025.99f),
-        Vector2(-8614.13f, 2039.52f),
-        Vector2(-8602.02f, 2046.36f),
-        Vector2(-8582.55f, 2057.31f),
-        Vector2(-8574.95f, 2059.83f),
-        Vector2(-8569.61f, 2061.66f),
-        Vector2(-8551.4f, 2067.35f),
-        Vector2(-8533.71f, 2047.26f),
-        Vector2(-8515.55f, 2035.06f),
-        Vector2(-8498.17f, 2027.1f),
-        Vector2(-8494.54f, 2017.73f),
-        Vector2(-8501.85f, 2000.21f),
-        Vector2(-8506.76f, 1979.18f),
-        Vector2(-8505.93f, 1952.25f),
-        Vector2(-8527.78f, 1941.78f),
-        Vector2(-8535.94f, 1938.05f),
-        Vector2(-8569.88f, 1929.68f),
-        Vector2(-8601.73f, 1933.88f),
-        Vector2(-8605.73f, 1934.96f),
-        Vector2(-8628.49f, 1942.31f),
-        Vector2(-8660.64f, 1950.26f)
-    };
-
-    const float maxX = -8494.54004f;
-    const float minX = -8665.73047f;
-    const float maxY = 2067.35010f;
-    const float minY = 1929.68005f;
-    
-    bool IsPointInPolygon(Unit* unit)
-    {
-        Vector2 p(unit->GetPositionX(), unit->GetPositionY());
-        float uZ = unit->GetPositionZ();
-        
-        // we can never be inside the room if z < ~100. 
-        if (uZ < 99.0f) return false;
-
-        // cheap check against bounding circle of roomPolygon
-        if (p.x < minX || p.x > maxX || p.y < minY || p.y > maxY) {
-            return false;
-        }
-
-        // http://www.ecse.rpi.edu/Homepages/wrf/Research/Short_Notes/pnpoly.html
-        bool inside = false;
-        for (int i = 0, j = roomPolygon.size() - 1; i < roomPolygon.size(); j = i++)
-        {
-            if ((roomPolygon[i].y > p.y) != (roomPolygon[j].y > p.y) &&
-                p.x < (roomPolygon[j].x - roomPolygon[i].x) * (p.y - roomPolygon[i].y) / (roomPolygon[j].y - roomPolygon[i].y) + roomPolygon[i].x)
-            {
-                inside = !inside;
-            }
-        }
-
-        // Highest point in the back of the room is a bit lower than 108.0f.
-        // Outside door is a bit higher than 108f. So if we are higher than 108.0f
-        // we can see if we are close to door before returning true. 
-        // Note: If this check is removed there are some false positives outside room.
-        if (inside && uZ > 108.0f ) {
-            //distance to door
-            if (unit->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f) { 
-                return true;
-            }
-            else {
-                return false;
-            }
-        }
-        else {
-            return inside;
-        }
-    }
-
-};  
 
 bool PlayerInStomach(Unit *unit, instance_temple_of_ahnqiraj* m_pInstance)
 {
@@ -358,8 +278,6 @@ void SpawnEyeTentacles(Creature* relToThisCreature)
     }
 }
 
-
-
 struct cthunAI : public ScriptedAI
 {
 
@@ -404,40 +322,6 @@ struct cthunAI : public ScriptedAI
     uint32 CthunEmergeTimer;
 
     std::vector<ObjectGuid> fleshTentacles;
-    
-    bool IsInRange(Unit* unit) {
-        float pZ = unit->GetPositionZ();
-        if (pZ < 99) return false;
-
-        if (m_creature->GetDistance(unit) < 100.0f) {
-            if (pZ > 105) {
-                if (unit->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f) { //distance to door
-                    return true;
-                }
-            }
-            else {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    void CheckPlayersInRoom() {
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty())
-        {
-            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-            {
-                if (Player* player = itr->getSource())
-                {
-                    //if (IsInRange(player)) {
-                    if(PolyCheck::IsPointInPolygon(player)){
-                        sLog.outBasic("%i: Player: %s is in room.", GetCurrentTime(), player->GetName());
-                    }
-                }
-            }
-        }
-    }
 
     void Reset()
     {
@@ -569,11 +453,11 @@ struct cthunAI : public ScriptedAI
         if (!m_pInstance->GetPlayerInMap(true, false)) {
             m_creature->SelectHostileTarget();
         }
+        m_creature->SetTargetGuid(0);
         /*
         if (!HandleReset())
             return;
 
-        m_creature->SetTargetGuid(0);
         */
 
         /*
@@ -1597,7 +1481,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         else
             GroundRuptureTimer -= diff;
 
-        /*
+        
         //HamstringTimer
         if (HamstringTimer < diff)
         {
@@ -1606,7 +1490,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         }
         else
             HamstringTimer -= diff;
-        */
+        
 
         if (ThrashTimer < diff)
         {
