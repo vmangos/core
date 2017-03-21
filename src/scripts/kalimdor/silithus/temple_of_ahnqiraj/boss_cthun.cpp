@@ -444,16 +444,18 @@ struct cthunAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
             return;
 
-        m_creature->SetInCombatWithZone();
+        //m_creature->SetInCombatWithZone();
 
         //Calling SelectHostileTarget() makes the eye
         //turn to it's attacker. So instead of using that for evade check
         //we do a simple check if there are alive players in instance before
         //calling SelectHostileTarget() to handle evading.
         if (!m_pInstance->GetPlayerInMap(true, false)) {
-            m_creature->SelectHostileTarget();
+            //m_creature->SelectHostileTarget();
+            m_creature->OnLeaveCombat();
         }
-        m_creature->SetTargetGuid(0);
+        //m_creature->SetTargetGuid(0);
+        
         /*
         if (!HandleReset())
             return;
@@ -984,6 +986,7 @@ struct eye_of_cthunAI : public ScriptedAI
         
         if (!IsAlreadyPulled) {
             AggroRadius();
+            return;
         }
         
         m_creature->SetInCombatWithZone();
