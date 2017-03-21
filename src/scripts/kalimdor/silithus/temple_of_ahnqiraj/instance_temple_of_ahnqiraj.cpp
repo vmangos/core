@@ -87,6 +87,11 @@ void instance_temple_of_ahnqiraj::DoHandleTempleAreaTrigger(uint32 uiTriggerId)
     }
 }
 
+std::vector<std::pair<ObjectGuid, StomachTimers>>& instance_temple_of_ahnqiraj::GetPlayersInStomach()
+{
+    return playersInStomach;
+}
+
 void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
 {
     switch (pGo->GetEntry())

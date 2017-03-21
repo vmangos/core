@@ -108,6 +108,28 @@ enum
     SPELL_WHISPERINGS_CTHUN_5   = 26259,
 };
 
+
+// Used for C'thun only, but needed by multiple mobs so putting in instance
+struct StomachTimers {
+    uint32 acidDebuff;
+    uint32 puntCastTime;
+    uint32 removeFromListIn;
+    bool playerHasLeftStomach;
+    StomachTimers() :
+        acidDebuff(StomachTimers::ACID_REFRESH_RATE),
+        puntCastTime(StomachTimers::PUNT_CAST_TIME),
+        removeFromListIn(REMOVE_FROM_STOMACH_LIST_DELAY),
+        playerHasLeftStomach(false)
+    {}
+
+    static const int32 ACID_REFRESH_RATE = 5000;
+    static const int32 PUNT_CAST_TIME = 3000;
+    // Player is removed from players in stomach list after a delay of this
+    // length after the teleport has found place.
+    // If set to 0, the player is instantly removed from the list.
+    static const uint32 REMOVE_FROM_STOMACH_LIST_DELAY = 3000;
+};
+
 class instance_temple_of_ahnqiraj : public ScriptedInstance
 {
 public:
@@ -133,6 +155,8 @@ public:
 
     void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
 
+    std::vector<std::pair<ObjectGuid, StomachTimers>>& GetPlayersInStomach();
+
 private:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string m_strInstData;
@@ -146,6 +170,9 @@ private:
     bool m_bIsEmperorsIntroDone;
 
     DialogueHelper m_dialogueHelper;
+
+    // Used for C'thun only, but needed by multiple mobs so putting in instance
+    std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
 };
 
 #endif
