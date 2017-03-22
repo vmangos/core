@@ -157,6 +157,7 @@ enum
     SPELL_FIREBALL = 9053,
     SPELL_FROST_NOVA = 11831,
     SPELL_IDOL_SHUTDOWN = 12774,
+    SPELL_ROOT_SELF = 23973,
 
     // summon spells only exist in 1.x
     //SPELL_SUMMON_1 = 12694, // NPC_WITHERED_BATTLE_BOAR
@@ -272,6 +273,7 @@ struct npc_belnistraszAI : public npc_escortAI
                 switch (m_uiRitualPhase)
                 {
                     case 0:
+                        DoCast(m_creature, SPELL_ROOT_SELF, true); // roots self so he stays put while channeling
                         DoCastSpellIfCan(m_creature, SPELL_IDOL_SHUTDOWN);
                         m_uiRitualTimer = 1000;
                         break;
@@ -317,16 +319,9 @@ struct npc_belnistraszAI : public npc_escortAI
                         if (Player* pPlayer = GetPlayerForEscort())
                         {
                             pPlayer->GroupEventHappens(QUEST_EXTINGUISHING_THE_IDOL, m_creature);
-                            if (GameObject* pGo = GetClosestGameObjectWithEntry(m_creature, GO_BELNISTRASZ_BRAZIER, 10.0f))
-                            {
-                                if (!pGo->isSpawned())
-                                {
-                                    pGo->SetRespawnTime(HOUR * IN_MILLISECONDS);
-                                    pGo->Refresh();
-                                }
-                            }
                         }
                         m_creature->RemoveAurasDueToSpell(SPELL_IDOL_SHUTDOWN);
+                        m_creature->SummonGameObject(GO_BELNISTRASZ_BRAZIER, 2577.196f, 947.0781f, 53.16757f, 2.356195f, 0, 0, 0.9238796f, 0.3826832f, 3600);
                         SetEscortPaused(false);
                         break;
                     }
@@ -357,7 +352,8 @@ struct npc_belnistraszAI : public npc_escortAI
         else
             m_uiFrostNovaTimer -= uiDiff;
 
-        DoMeleeAttackIfReady();
+        if (!HasEscortState(STATE_ESCORT_PAUSED))
+            DoMeleeAttackIfReady();
     }
 
 };
