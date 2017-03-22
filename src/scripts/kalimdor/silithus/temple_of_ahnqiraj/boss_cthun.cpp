@@ -445,7 +445,7 @@ struct cthunAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
             return;
 
-        //m_creature->SetInCombatWithZone();
+        m_creature->SetInCombatWithZone();
 
         //Calling SelectHostileTarget() makes the eye
         //turn to it's attacker. So instead of using that for evade check
@@ -470,8 +470,8 @@ struct cthunAI : public ScriptedAI
         
         
 
-        //VerifyAnyPlayerAliveOutside();
-        //UpdatePlayersInStomach(diff);
+        VerifyAnyPlayerAliveOutside();
+        UpdatePlayersInStomach(diff);
 
         switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
         case PHASE_TRANSITION: {
@@ -480,68 +480,26 @@ struct cthunAI : public ScriptedAI
                 if (EyeDeathAnimTimer < diff) {
                     EyeDeathAnimTimer = 0;
                     CthunEmergeTimer = 8000;
-                    /*
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                    m_creature->SetVisibility(VISIBILITY_ON);
-                    */
-                    
-                    
-                    // Note: we need to set the display id before casting the transform spell, 
-                    // in order to get the proper animation
-                    //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
-                    //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
-                    // Transform and start C'thun phase
-                   
-                    //m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    
-                    //CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
-                    //sLog.outBasic("Casted TRANSFORM, result: %i", result);
-                    
-                    //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
-                    
-                    //result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
-                    //sLog.outBasic("Casted TRANSFORM, result: %i", result);
-                    //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                    //m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                    
-                    //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+
                     sLog.outBasic("Starting C'thun emerge animation");
-                    //ResetartUnvulnerablePhase();
-                    // Note: we need to set the display id before casting the transform spell, in order to get the proper animation
-                    /*
-                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
-
-                    // Transform and start C'thun phase
-                    if (DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) != CAST_OK) {
-                        sLog.outBasic("Failed casting SPELL_TRANSFORM");
-                    }
-                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    ResetartUnvulnerablePhase();
+                    
+                    m_creature->SetVisibility(VISIBILITY_OFF);
                     m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                    */
-
-                    if (Creature* tc = m_creature->SummonCreature(PUNT_CREATURE, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 100)) {
-                        tc->CastSpell(m_creature, SPELL_TRANSFORM, false);
-                    }
-
-                    if(DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) != CAST_OK) {
-                        sLog.outBasic("Failed casting SPELL_TRANSFORM");
-                    }
-                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    
+                    m_creature->SetVisibility(VISIBILITY_ON);
+                    
                     m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-
                 }
                 else {
                     EyeDeathAnimTimer -= diff;
                 }
             }
             else {
-                /*
+                
                 TentacleTimers(diff);
                 UpdateStomachGrab(diff);
-                */
+                
 
                 if (CthunEmergeTimer < diff) {
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -554,7 +512,7 @@ struct cthunAI : public ScriptedAI
                 }
             }
             break;
-        /*case PHASE_CTHUN_INVULNERABLE:
+        case PHASE_CTHUN_INVULNERABLE:
             // Weaken if both Flesh Tentacles are killed
             // Should be fair to skip InvulnerablePhase update if both
             // tentacles are already killed.
@@ -576,7 +534,7 @@ struct cthunAI : public ScriptedAI
             else {
                 TentacleTimers(diff);
 
-                //UpdateStomachGrab(diff);
+                UpdateStomachGrab(diff);
             }
             break;
         case PHASE_CTHUN_WEAKENED:
@@ -596,7 +554,6 @@ struct cthunAI : public ScriptedAI
                 WeaknessTimer -= diff;
             }
             break;
-            */
         default:
             sLog.outError("C'Thun in bugged state: %i", m_pInstance->GetData(TYPE_CTHUN_PHASE));
         }
