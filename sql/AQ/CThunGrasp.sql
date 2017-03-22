@@ -14,4 +14,4 @@ INSERT INTO gameobject (guid, id, map, position_x, position_y, position_z, orien
 (21799, 180745, 531, -8663.34, 2029.9, 108.577, 4.45059, 0, 0, -0.793353, 0.608762, 7200, 100, 1, 0);
 
 -- Set Grasps untargettables
-UPDATE gameobject_template SET flags = 32 WHERE entry = 180745;
+UPDATE gameobject_template SET data1 = 0 WHERE entry = 180745;
