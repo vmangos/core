@@ -20,8 +20,8 @@ UPDATE creature_template SET unit_flags = unit_flags | 32768 WHERE entry IN (153
   UPDATE creature_model_info set `combat_reach` = 10, `bounding_radius` = 10  where `modelid` = 15790;	
   
   -- moved c'thun eye and body slightly towards entrance
-UPDATE creature SET `position_x`='-8572.290', `position_y`='1990.410' WHERE `guid`='87560';
-UPDATE creature SET `position_x`='-8572.290', `position_y`='1990.410' WHERE `guid`='87559';
+UPDATE creature SET `position_x`='-8577.270', `position_y`='1986.942' WHERE `guid`='87560';
+UPDATE creature SET `position_x`='-8577.270', `position_y`='1986.942' WHERE `guid`='87559';
 
 -- Set Giant claw dmg to around 2500 dmg per hit on a full t2 geared tank, with demo shout up. ~3200 without demo shout.
 UPDATE creature_template SET `mindmg`='8500', `maxdmg`='9500' WHERE `entry`='15728';
@@ -34,5 +34,3 @@ UPDATE creature_template SET `scale`='2' WHERE `entry`='15725';
 
 -- Setting correct scale of Eye Tentacle
 UPDATE creature_template SET `scale`='1' WHERE `entry`='15726';
-
-SELECT * from creature_template where entry = 15334;
