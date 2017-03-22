@@ -54,7 +54,6 @@
 #define SPELL_GREEN_EYE_BEAM                26134
 #define SPELL_DARK_GLARE                    26029
 #define SPELL_RED_COLORATION                23537 //Probably not the right spell but looks similar
-#define SPELL_CTHUN_VULNERABLE              26235           
 #define SPELL_MIND_FLAY                     26143
 #define SPELL_GROUND_RUPTURE                26139
 #define SPELL_HAMSTRING                     26141
@@ -65,13 +64,12 @@
 #define SPELL_MASSIVE_GROUND_RUPTURE        26100
 #define SPELL_THRASH                        3391
 #define SPELL_FREEZE_ANIMATION              16245
-#define SPELL_DIGESTIVE_ACID_TELEPORT       26220
+#define SPELL_DIGESTIVE_ACID_TELEPORT       26220 // ports c'thun as well, not ok. Maybe a correct way to use it?
 #define SPELL_PUNT_UPWARD                   16716
 #define SPELL_MOUTH_TENTACLE                26332
 #define SPELL_EXIT_STOMACH_KNOCKBACK        25383
 #define SPELL_DIGESTIVE_ACID                26476
 
-#define SPELL_CARAPACE_OF_CTHUN             26156
 
 #define SPELL_PORT_OUT_STOMACH              26648 // Used by cthun in p2 if there are noone alive out of stomach
 
@@ -79,8 +77,11 @@
 // ToDo: remove this when auras are fixed in core.
 #define DISPLAY_ID_CTHUN_BODY               15786
 #define DISPLAY_ID_CTHUN_BURROW             15787
-#define SPELL_TRANSFORM                     26232
 
+
+#define SPELL_CTHUN_VULNERABLE              26235           
+#define SPELL_CARAPACE_OF_CTHUN             26156
+#define SPELL_TRANSFORM                     26232
 #define CTHUN_TRANSFORMATION_VISUAL         15809
 
 static const float stomachPortPosition[4] = 
@@ -455,7 +456,7 @@ struct cthunAI : public ScriptedAI
             //m_creature->SelectHostileTarget();
             m_creature->OnLeaveCombat();
         }
-        //m_creature->SetTargetGuid(0);
+        m_creature->SetTargetGuid(0);
         
         /*
         if (!HandleReset())
@@ -483,7 +484,8 @@ struct cthunAI : public ScriptedAI
 
                     sLog.outBasic("Starting C'thun emerge animation");
                     ResetartUnvulnerablePhase();
-                    
+
+                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     m_creature->SetVisibility(VISIBILITY_OFF);
                     m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
                     
@@ -543,7 +545,7 @@ struct cthunAI : public ScriptedAI
                 ResetartUnvulnerablePhase();
                 // visibility on/off is sadly needed to update him to do animation again
                 // it looks stupid though, so if there is a way to avoid it, pls find.
-                m_creature->SetVisibility(VISIBILITY_OFF);
+                //m_creature->SetVisibility(VISIBILITY_OFF);
                 m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
                 m_creature->SetVisibility(VISIBILITY_ON);
                 m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
@@ -603,10 +605,7 @@ struct cthunAI : public ScriptedAI
                     DoTeleportPlayer(pPlayer, stomachPortPosition[0], stomachPortPosition[1], stomachPortPosition[2], stomachPortPosition[3]);
                     pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
 
-                    //pPlayer->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID_TELEPORT, true);
-
                     m_pInstance->GetPlayersInStomach().push_back(std::make_pair(StomachEnterTargetGUID, StomachTimers()));
-
                     m_creature->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID, true);
                 }
 
@@ -1044,7 +1043,7 @@ struct eye_of_cthunAI : public ScriptedAI
                 darkGlarePhaseDuration -= diff;
             }
         }
-        /*
+        
         if (ClawTentacleTimer < diff)
         {
             if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -1058,7 +1057,7 @@ struct eye_of_cthunAI : public ScriptedAI
         else
             ClawTentacleTimer -= diff;
 
-        */
+        
         if (eyeTentaclesCooldown < diff) {
             SpawnEyeTentacles(m_creature);
             eyeTentaclesCooldown = EYE_TENTACLES_COOLDOWN;
