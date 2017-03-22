@@ -71,6 +71,7 @@
 #define SPELL_EXIT_STOMACH_KNOCKBACK        25383
 #define SPELL_DIGESTIVE_ACID                26476
 
+#define SPELL_CARAPACE_OF_CTHUN             26156
 
 #define SPELL_PORT_OUT_STOMACH              26648 // Used by cthun in p2 if there are noone alive out of stomach
 
@@ -469,8 +470,8 @@ struct cthunAI : public ScriptedAI
         
         
 
-        VerifyAnyPlayerAliveOutside();
-        UpdatePlayersInStomach(diff);
+        //VerifyAnyPlayerAliveOutside();
+        //UpdatePlayersInStomach(diff);
 
         switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
         case PHASE_TRANSITION: {
@@ -493,7 +494,8 @@ struct cthunAI : public ScriptedAI
                     //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BURROW);
                     //m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
                     // Transform and start C'thun phase
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                   
+                    //m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     
                     //CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_TRANSFORM, CAST_TRIGGERED);
                     //sLog.outBasic("Casted TRANSFORM, result: %i", result);
@@ -504,17 +506,42 @@ struct cthunAI : public ScriptedAI
                     //sLog.outBasic("Casted TRANSFORM, result: %i", result);
                     //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
                     //m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, false);
+                    
+                    //m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
                     sLog.outBasic("Starting C'thun emerge animation");
-                    ResetartUnvulnerablePhase();
+                    //ResetartUnvulnerablePhase();
+                    // Note: we need to set the display id before casting the transform spell, in order to get the proper animation
+                    /*
+                    m_creature->SetDisplayId(DISPLAY_ID_CTHUN_BODY);
+
+                    // Transform and start C'thun phase
+                    if (DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) != CAST_OK) {
+                        sLog.outBasic("Failed casting SPELL_TRANSFORM");
+                    }
+                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                    */
+
+                    if (Creature* tc = m_creature->SummonCreature(PUNT_CREATURE, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN, 100)) {
+                        tc->CastSpell(m_creature, SPELL_TRANSFORM, false);
+                    }
+
+                    if(DoCastSpellIfCan(m_creature, SPELL_TRANSFORM) != CAST_OK) {
+                        sLog.outBasic("Failed casting SPELL_TRANSFORM");
+                    }
+                    m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+
                 }
                 else {
                     EyeDeathAnimTimer -= diff;
                 }
             }
             else {
+                /*
                 TentacleTimers(diff);
                 UpdateStomachGrab(diff);
+                */
 
                 if (CthunEmergeTimer < diff) {
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -527,10 +554,10 @@ struct cthunAI : public ScriptedAI
                 }
             }
             break;
-        case PHASE_CTHUN_INVULNERABLE:
+        /*case PHASE_CTHUN_INVULNERABLE:
             // Weaken if both Flesh Tentacles are killed
             // Should be fair to skip InvulnerablePhase update if both
-            // tentacles area already killed.
+            // tentacles are already killed.
             if (fleshTentacles.size() == 0) {
                 WeaknessTimer = WEAKNESS_DURATION;
 
@@ -543,12 +570,13 @@ struct cthunAI : public ScriptedAI
                         pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
                     }
                 }
+                m_creature->RemoveAurasDueToSpell(SPELL_CARAPACE_OF_CTHUN);
                 sLog.outBasic("Entering VULNERABLE_STATE");
             }
             else {
                 TentacleTimers(diff);
 
-                UpdateStomachGrab(diff);
+                //UpdateStomachGrab(diff);
             }
             break;
         case PHASE_CTHUN_WEAKENED:
@@ -561,12 +589,14 @@ struct cthunAI : public ScriptedAI
                 m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
                 m_creature->SetVisibility(VISIBILITY_ON);
                 m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
+                m_creature->CastSpell(m_creature, SPELL_CARAPACE_OF_CTHUN, true);
                 sLog.outBasic("Entering INVULNERABLE_STATE");
             }
             else {
                 WeaknessTimer -= diff;
             }
             break;
+            */
         default:
             sLog.outError("C'Thun in bugged state: %i", m_pInstance->GetData(TYPE_CTHUN_PHASE));
         }
@@ -872,7 +902,7 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    void DamageTaken(Unit *done_by, uint32 &damage)
+    /*void DamageTaken(Unit *done_by, uint32 &damage)
     {
         if (!m_creature->HasAura(SPELL_CTHUN_VULNERABLE))
         {
@@ -889,6 +919,7 @@ struct cthunAI : public ScriptedAI
             DoCastSpellIfCan(m_creature, 27880, CAST_AURA_NOT_PRESENT);
         }
     }
+    */
 
     void FleshTentcleKilled(ObjectGuid guid)
     {
@@ -965,6 +996,9 @@ struct eye_of_cthunAI : public ScriptedAI
         }
 
         if (m_creature) {
+            //not sure why its not attackable by default, but its not.
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
             m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
             m_creature->SetVisibility(VISIBILITY_OFF);
             m_creature->SetVisibility(VISIBILITY_ON);
@@ -1143,8 +1177,9 @@ struct eye_of_cthunAI : public ScriptedAI
         Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
         if (b_Cthun)
         {
-            m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_TRANSITION);
+           
         }
+        m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_TRANSITION);
     }
 
 };
