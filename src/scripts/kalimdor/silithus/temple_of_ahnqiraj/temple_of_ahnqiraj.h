@@ -155,7 +155,8 @@ public:
 
     void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
 
-    std::vector<std::pair<ObjectGuid, StomachTimers>>& GetPlayersInStomach();
+    using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
+    CThunStomachList& GetPlayersInStomach();
 
 private:
     uint32 m_auiEncounter[MAX_ENCOUNTER];

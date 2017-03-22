@@ -63,26 +63,27 @@
 
 #define SPELL_MASSIVE_GROUND_RUPTURE        26100
 #define SPELL_THRASH                        3391
-#define SPELL_FREEZE_ANIMATION              16245
-#define SPELL_DIGESTIVE_ACID_TELEPORT       26220 // ports c'thun as well, not ok. Maybe a correct way to use it?
-#define SPELL_PUNT_UPWARD                   16716
-#define SPELL_MOUTH_TENTACLE                26332
-#define SPELL_EXIT_STOMACH_KNOCKBACK        25383
-#define SPELL_DIGESTIVE_ACID                26476
 
 
-#define SPELL_PORT_OUT_STOMACH              26648 // Used by cthun in p2 if there are noone alive out of stomach
+enum eyeOfCthunSpells {
+SPELL_FREEZE_ANIMATION = 16245, // Dummy spell to avoid the eye gazing around during dark glare
 
-// Helper display id; This is needed in order to have the proper transform animation. 
-// ToDo: remove this when auras are fixed in core.
-#define DISPLAY_ID_CTHUN_BODY               15786
-#define DISPLAY_ID_CTHUN_BURROW             15787
+};
 
+enum cthunSpells {
+SPELL_PUNT_UPWARD = 16716,
+SPELL_MOUTH_TENTACLE = 26332,
+SPELL_EXIT_STOMACH_KNOCKBACK = 25383,
 
-#define SPELL_CTHUN_VULNERABLE              26235           
-#define SPELL_CARAPACE_OF_CTHUN             26156
-#define SPELL_TRANSFORM                     26232
-#define CTHUN_TRANSFORMATION_VISUAL         15809
+SPELL_DIGESTIVE_ACID = 26476,
+SPELL_DIGESTIVE_ACID_TELEPORT = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
+SPELL_PORT_OUT_STOMACH = 26648, // Not yet used, had problems with not killing c'thun too.
+
+SPELL_CTHUN_VULNERABLE = 26235,
+SPELL_CARAPACE_OF_CTHUN = 26156,
+SPELL_TRANSFORM = 26232,
+CTHUN_TRANSFORMATION_VISUAL = 15809,
+};
 
 static const float stomachPortPosition[4] = 
 {
@@ -98,6 +99,18 @@ static const float fleshTentaclePositions[2][4] =
 static const float puntPosition[3] =
 {
     -8545.9f, 1987.25f, -96.0f
+};
+
+static const float eyeTentaclePositions[8][3] =
+{
+    { -8547.269531f, 1986.939941f, 100.490351f },
+    { -8556.047852f, 2008.144653f, 100.598129f },
+    { -8577.246094f, 2016.939941f, 100.320351f },
+    { -8598.457031f, 2008.178467f, 100.320351f },
+    { -8607.269531f, 1986.987671f, 100.490351f },
+    { -8598.525391f, 1965.769043f, 100.490351f },
+    { -8577.340820f, 1956.940063f, 100.536636f },
+    { -8556.115234f, 1965.667725f, 100.598129f }
 };
 
 enum CThunPhase
@@ -206,12 +219,13 @@ private:
 // and all players in range once the timer finishes, gets punted.
 // #define USE_INDIVIDUAL_PUNT_TIMER
 
+using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
 
-bool PlayerInStomach(Unit *unit, instance_temple_of_ahnqiraj* m_pInstance)
+bool PlayerInStomach(Unit *unit, const CThunStomachList& stomachList)
 {
     //return unit->GetPositionZ() < -30.0f;
 
-    auto it = std::find_if(m_pInstance->GetPlayersInStomach().begin(), m_pInstance->GetPlayersInStomach().end(),
+    auto it = std::find_if(stomachList.begin(), stomachList.end(),
         [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
         if (unit->GetObjectGuid() == e.first) {
             return true;
@@ -221,23 +235,23 @@ bool PlayerInStomach(Unit *unit, instance_temple_of_ahnqiraj* m_pInstance)
         return e.first == unit->GetObjectGuid();
     });
 
-    return it != m_pInstance->GetPlayersInStomach().end();
+    return it != stomachList.end();
 }
 
-Player* SelectRandomAliveNotStomach(Creature* m_creature,
-    instance_temple_of_ahnqiraj* m_pInstance)
+Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
 {
     std::list<Player*> temp;
     std::list<Player*>::iterator j;
-    
-    Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+    const Map::PlayerList& PlayerList = instance->GetMap()->GetPlayers();
+    const CThunStomachList& stomachList = instance->GetPlayersInStomach();
+
     if (!PlayerList.isEmpty())
     {
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
         {
             if (Player* player = itr->getSource())
             {
-                if (!PlayerInStomach(player, m_pInstance) && !player->isGameMaster() && !player->isDead()) {
+                if (!player->isDead() && !player->isGameMaster() && !PlayerInStomach(player, stomachList)) {
                     temp.push_back(player);
                 }
             }
@@ -258,26 +272,57 @@ Player* SelectRandomAliveNotStomach(Creature* m_creature,
 
 void SpawnEyeTentacles(Creature* relToThisCreature)
 {
-    float centerX = relToThisCreature->GetPositionX();
-    float centerY = relToThisCreature->GetPositionY();
-    float radius = 30.0f;
-    float angle = 360.0f / 8.0f;
 
-    // Summon 8 of them them in a circle centered around centerX and centerY
+    //float centerX = relToThisCreature->GetPositionX();
+    //float centerY = relToThisCreature->GetPositionY();
+    //float radius = 30.0f;
+    //float angle = 360.0f / 8.0f;
+
     for (uint8 i = 0; i < 8; i++)
     {
-        float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
-        float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
+        //float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
+        //float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
+        //float z = relToThisCreature->GetMap()->GetHeight(x, y, relToThisCreature->GetPositionZ()) + 0.1f;
+        //sLog.outBasic("{%.6f, %.6f, %.6f},", x, y, z);
 
-        //SpawnEyeTentacle(x + frand(-2, 2), y + frand(-2, 2));
-
-        if (Creature* Spawned = relToThisCreature->SummonCreature(MOB_EYE_TENTACLE, x, y,
-            relToThisCreature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+        float x = eyeTentaclePositions[i][0];
+        float y = eyeTentaclePositions[i][1];
+        float z = eyeTentaclePositions[i][2];
+        if (Creature* Spawned = relToThisCreature->SummonCreature(MOB_EYE_TENTACLE, x, y, z, 0,
+            TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
         {
             Spawned->SetInCombatWithZone();
-            //Spawned->SetFloatValue(OBJECT_FIELD_SCALE_X, 0.75f);
         }
     }
+}
+
+bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, uint32 resetTo, uint32 id)
+{
+
+    if (timer < diff) {
+        instance_temple_of_ahnqiraj* instance = (instance_temple_of_ahnqiraj*)relToCreature->GetInstanceData();
+        if (Unit* target = SelectRandomAliveNotStomach(instance))
+        {
+            if (target->GetPositionZ() < -30.0f) {
+                sLog.outBasic("Trying to spawn %i <-30.0f", id);
+            }
+            if (Creature* Spawned = relToCreature->SummonCreature(id,
+                target->GetPositionX() + frand(-1.0f, 1.0f),
+                target->GetPositionY() + frand(-1.0f, 1.0f),
+                target->GetPositionZ(),
+                0,
+                TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
+            {
+                Spawned->AI()->AttackStart(target);
+            }
+            timer = resetTo;
+            return true;
+        }
+    }
+    else {
+        timer -= diff;
+    }
+    return false;
 }
 
 struct cthunAI : public ScriptedAI
@@ -308,7 +353,7 @@ struct cthunAI : public ScriptedAI
     static const uint32 MAX_FLESH_TENTACLES         = 2;
     
     instance_temple_of_ahnqiraj* m_pInstance;
-
+        
     uint32 EyeTentacleTimer;
     uint32 GiantClawTentacleTimer;
     uint32 GiantEyeTentacleTimer;
@@ -333,7 +378,7 @@ struct cthunAI : public ScriptedAI
         stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
         puntCreatureGuid = 0;
 
-        //ResetartUnvulnerablePhase();
+        ResetartUnvulnerablePhase();
 
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
@@ -564,7 +609,7 @@ struct cthunAI : public ScriptedAI
 
     void VerifyAnyPlayerAliveOutside()
     {
-        if (!SelectRandomAliveNotStomach(m_creature, m_pInstance)) {
+        if (!SelectRandomAliveNotStomach(m_pInstance)) {
             for (auto iter = m_pInstance->GetPlayersInStomach().begin(); iter != m_pInstance->GetPlayersInStomach().end(); iter++) {
                 if (Player* p = m_creature->GetMap()->GetPlayer(iter->first)) {
                     if (p->isAlive()) {
@@ -618,7 +663,7 @@ struct cthunAI : public ScriptedAI
         }
 
         if (NextStomachEnterGrab < diff) {
-            if (Player* target = SelectRandomAliveNotStomach(m_creature, m_pInstance)) {
+            if (Player* target = SelectRandomAliveNotStomach(m_pInstance)) {
                 target->InterruptNonMeleeSpells(false);
                 target->CastSpell(target, SPELL_MOUTH_TENTACLE, true, NULL, NULL, m_creature->GetObjectGuid());
                 StomachEnterPortTimer = STOMACH_GRAB_DURATION;
@@ -632,34 +677,11 @@ struct cthunAI : public ScriptedAI
 
     }
 
-    void SpawnTentacleIfReady(uint32 diff, uint32& timer, uint32 resetTo, uint32 id)
-    {
-
-        if (timer < diff) {
-            if (Unit* target = SelectRandomAliveNotStomach(m_creature, m_pInstance))
-            {
-                if (target->GetPositionZ() < -30.0f) {
-                    sLog.outBasic("Trying to spawn %i <-30.0f", id);
-                }
-                if (Creature* Spawned = m_creature->SummonCreature(id,
-                    target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, 
-                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
-                {
-                    Spawned->AI()->AttackStart(target);
-                }
-                timer = resetTo;
-            }
-        }
-        else {
-            timer -= diff;
-        }
-    }
-
     void TentacleTimers(uint32 diff)
     {
-        SpawnTentacleIfReady(diff, GiantClawTentacleTimer, GIANT_CLAW_RESPAWN_TIMER, MOB_GIANT_CLAW_TENTACLE);
-        SpawnTentacleIfReady(diff, GiantEyeTentacleTimer, GIANT_EYE_RESPAWN_TIMER, MOB_GIANT_EYE_TENTACLE);
-
+        SpawnTentacleIfReady(m_creature, diff, GiantClawTentacleTimer, GIANT_CLAW_RESPAWN_TIMER, MOB_GIANT_CLAW_TENTACLE);
+        SpawnTentacleIfReady(m_creature, diff, GiantEyeTentacleTimer, GIANT_EYE_RESPAWN_TIMER, MOB_GIANT_EYE_TENTACLE);
+        
         if (EyeTentacleTimer < diff) {
             SpawnEyeTentacles(m_creature);
             //These spawn at every 30 seconds
@@ -858,25 +880,6 @@ struct cthunAI : public ScriptedAI
         }
     }
 
-    /*void DamageTaken(Unit *done_by, uint32 &damage)
-    {
-        if (!m_creature->HasAura(SPELL_CTHUN_VULNERABLE))
-        {
-            //Not weakened so reduce damage by 99%
-            if (damage / 99 > 0) damage /= 99;
-            else damage = 1;
-
-            //Prevent death in non-weakened state
-            //todo: should this really be a thing?
-            if (damage >= m_creature->GetHealth())
-                damage = 0;
-        }
-        else {
-            DoCastSpellIfCan(m_creature, 27880, CAST_AURA_NOT_PRESENT);
-        }
-    }
-    */
-
     void FleshTentcleKilled(ObjectGuid guid)
     {
         for (size_t i = 0; i < fleshTentacles.size(); i++) {
@@ -1043,20 +1046,10 @@ struct eye_of_cthunAI : public ScriptedAI
                 darkGlarePhaseDuration -= diff;
             }
         }
-        
-        if (ClawTentacleTimer < diff)
-        {
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (Creature* Spawned = m_creature->SummonCreature(MOB_CLAW_TENTACLE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
-                    Spawned->AI()->AttackStart(target);
-            }
+        if (SpawnTentacleIfReady(m_creature, diff, ClawTentacleTimer, 0, MOB_CLAW_TENTACLE)) {
             //todo: is random correct?
             ClawTentacleTimer = urand(6000, 12000);
         }
-        else
-            ClawTentacleTimer -= diff;
-
         
         if (eyeTentaclesCooldown < diff) {
             SpawnEyeTentacles(m_creature);
@@ -1151,8 +1144,10 @@ struct eye_tentacleAI : public ScriptedAI
 
         SetCombatMovement(false);
         Reset();
-        if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
+        float rZ = std::max(100.52f, m_creature->GetPositionZ()) - m_creature->GetPositionZ();
+        if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, rZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
         {
+            pPortal->addUnitState(UNIT_STAT_ROOT);
             Portal = pPortal->GetObjectGuid();
         }
     }
@@ -1226,11 +1221,11 @@ struct claw_tentacleAI : public ScriptedAI
     {
         SetCombatMovement(false);
         Reset();
-
-        if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
+        std::fabsf(100.52f - m_creature->GetPositionX());
+        float rZ = std::max(100.52f, m_creature->GetPositionZ()) - m_creature->GetPositionZ();
+        if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, rZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
         {
             Portal = pPortal->GetObjectGuid();
-            //pPortal->SetFloatValue(OBJECT_FIELD_SCALE_X,0.075f);
         }
     }
 
@@ -1303,7 +1298,11 @@ struct claw_tentacleAI : public ScriptedAI
                         //Dissapear and reappear at new position
                         m_creature->SetVisibility(VISIBILITY_OFF);
 
-                        m_creature->NearTeleportTo(target->GetPositionX() + frand(-5, 5), target->GetPositionY() + frand(-5, 5), target->GetPositionZ(), 0);
+                        m_creature->NearTeleportTo(
+                            target->GetPositionX() + frand(-1.0f, 1.0f),
+                            target->GetPositionY() + frand(-1.0f, 1.0f),
+                            target->GetPositionZ(),
+                            0);
 
                         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
                         {
@@ -1434,7 +1433,11 @@ struct giant_claw_tentacleAI : public ScriptedAI
                         //Dissapear and reappear at new position
                         m_creature->SetVisibility(VISIBILITY_OFF);
 
-                        m_creature->NearTeleportTo(target->GetPositionX() + frand(-5, 5), target->GetPositionY() + frand(-5, 5), target->GetPositionZ(), 0);
+                        m_creature->NearTeleportTo(
+                            target->GetPositionX() + frand(-1.0f, 1.0f),
+                            target->GetPositionY() + frand(-1.0f, 1.0f),
+                            target->GetPositionZ(),
+                            0);
 
                         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
                         {
@@ -1565,7 +1568,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
             if (BeamTimer < diff)
             {
                 //Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-                Player* target = SelectRandomAliveNotStomach(m_creature, m_pInstance);
+                Player* target = SelectRandomAliveNotStomach(m_pInstance);
                 //hacky, cheap check to not target players in stomach.
                 if (target)// && target->GetPositionZ() > -30.0f)
                 {
