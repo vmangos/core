@@ -25,3 +25,6 @@ UPDATE creature_template SET unit_flags = unit_flags | 33587200 WHERE entry = 15
 
 -- Ouro trigger is not targettable
 UPDATE creature_template SET unit_flags = unit_flags | 33554432 WHERE entry = 15717;
+
+-- Ouro sandblast should be a debuff
+INSERT INTO spell_mod (Id, Custom, Comment) VALUES (26102, 2, "Ouro's sandblast should be negative");
