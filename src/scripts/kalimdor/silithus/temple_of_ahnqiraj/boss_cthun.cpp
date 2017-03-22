@@ -1147,7 +1147,8 @@ struct eye_tentacleAI : public ScriptedAI
         float rZ = std::max(100.52f, m_creature->GetPositionZ()) - m_creature->GetPositionZ();
         if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, rZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
         {
-            pPortal->addUnitState(UNIT_STAT_ROOT);
+            pPortal->addUnitState(UNIT_STAT_CAN_NOT_MOVE);
+            sLog.outBasic("%.3f", pPortal->GetPositionZ());
             Portal = pPortal->GetObjectGuid();
         }
     }
