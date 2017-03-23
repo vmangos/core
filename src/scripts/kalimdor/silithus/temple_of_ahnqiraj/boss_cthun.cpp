@@ -29,13 +29,10 @@
 #include "temple_of_ahnqiraj.h"
 
 #define EMOTE_WEAKENED                  -1531011
-#define PI                              3.14
-#define RANDOM_SOUND_WHISPER            8663
 
 enum eCreatures {
     MOB_CLAW_TENTACLE               = 15725,
     MOB_EYE_TENTACLE                = 15726,
-    MOB_BODY_OF_CTHUN               = 15809,
     MOB_GIANT_CLAW_TENTACLE         = 15728,
     MOB_GIANT_EYE_TENTACLE          = 15334,
     MOB_FLESH_TENTACLE              = 15802,
@@ -44,7 +41,7 @@ enum eCreatures {
     MOB_GIANT_PORTAL                = 15910,
     MOB_CTHUN_PORTAL                = 15896,
 
-    PUNT_CREATURE                   = 15922, //invisible viscidus trigger
+    PUNT_CREATURE                   = 15922, //invisible viscidus trigger, used in stomach
 };
 
 
@@ -56,7 +53,6 @@ enum eSpells {
     SPELL_ROTATE_POSITIVE_360       = 26009,
     SPELL_DARK_GLARE                = 26029,
     SPELL_GREEN_EYE_BEAM            = 26134,
-    SPELL_RED_COLORATION            = 23537, //Probably not the right spell but looks similar
 
     SPELL_MIND_FLAY                 = 26143,
     SPELL_GROUND_RUPTURE            = 26139,
@@ -919,10 +915,6 @@ struct eye_of_cthunAI : public ScriptedAI
         if (m_creature) {
             //not sure why its not attackable by default, but its not.
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-            m_creature->RemoveAurasDueToSpell(SPELL_RED_COLORATION);
-            m_creature->SetVisibility(VISIBILITY_OFF);
-            m_creature->SetVisibility(VISIBILITY_ON);
 
             // need to reset it in case of wipe during glare phase
             m_creature->SetOrientation(3.44f);
