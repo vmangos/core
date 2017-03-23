@@ -22,7 +22,7 @@
 ** Complete: who knows
 ** Comment: so many things
 ** Category: Temple of Ahn'Qiraj
-** C'thun phase 2 and partially p1 completely rewritten by Gemt
+** Rewrtten by Gemt
 */
 
 #include "scriptPCH.h"
@@ -451,32 +451,7 @@ struct cthunAI : public ScriptedAI
         WeaknessTimer           = 0;
         SpawnFleshTentacles();
     }
-
-    bool HandleReset()
-    {
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (PlayerList.isEmpty()) {
-            m_creature->SelectHostileTarget();
-            return false;
-        }
-       
-        bool anyPlayerInCombat = false;
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-        {
-            if (Player* player = itr->getSource())
-            {
-                if (player->isInCombat()) {
-                    anyPlayerInCombat = true;
-                    break;
-                }
-            }
-        }
-        if (!anyPlayerInCombat) {
-            m_creature->OnLeaveCombat();
-        }
-        return true;
-    }
-    
+   
     void UpdateAI(const uint32 diff)
     {
         if (!m_pInstance)
@@ -496,23 +471,12 @@ struct cthunAI : public ScriptedAI
         //we do a simple check if there are alive players in instance before
         //calling SelectHostileTarget() to handle evading.
         if (!m_pInstance->GetPlayerInMap(true, false)) {
-            //m_creature->SelectHostileTarget();
             m_creature->OnLeaveCombat();
-        }
-        m_creature->SetTargetGuid(0);
-        
-        /*
-        if (!HandleReset())
+            Reset();
             return;
-
-        */
-
-        /*
-        if (m_creature->GetTargetGuid() != m_creature->GetObjectGuid())
-            m_creature->SetTargetGuid(m_creature->GetObjectGuid());
-        */
+        }
         
-        
+        m_creature->SetTargetGuid(0);
 
         VerifyAnyPlayerAliveOutside();
         UpdatePlayersInStomach(diff);
@@ -987,7 +951,9 @@ struct eye_of_cthunAI : public ScriptedAI
         //we do a simple check if there are alive players in instance before
         //calling SelectHostileTarget() to handle evading.
         if (!m_pInstance->GetPlayerInMap(true, false)) {
-            m_creature->SelectHostileTarget();
+            m_creature->OnLeaveCombat();
+            Reset();
+            return;
         }
 
         if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL) {
