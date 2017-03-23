@@ -127,15 +127,16 @@ using SpellTarSelectFunction = std::function<Unit*(Creature*)>;
 
 class SpellTimer {
 public:
-    SpellTimer(Creature* creature, uint32 spellID, uint32 initialCD, uint32 resetCD, 
-        bool triggeredSpell, SpellTarSelectFunction targetSelectFunc) :
+    SpellTimer(Creature* creature, uint32 spellID, uint32 initialCD, std::function<uint32()> resetCD,
+        bool triggeredSpell, SpellTarSelectFunction targetSelectFunc, bool retryOnFail = false) :
         m_creature(creature),
         spellID(spellID),
         cooldown(initialCD),
         resetCD(resetCD),
         triggered(triggeredSpell),
         targetSelectFunc(targetSelectFunc),
-        timeSinceLast(std::numeric_limits<uint32>::max())
+        timeSinceLast(std::numeric_limits<uint32>::max()),
+        retryOnFail(retryOnFail)
     {}
 
     virtual void Reset(int custom = -1) {
@@ -143,7 +144,10 @@ public:
             cooldown = static_cast<uint32>(custom);
         }
         else {
-            cooldown = resetCD;
+            if (!resetCD)
+                cooldown = 0;
+            else
+                cooldown = resetCD();
         }
     }
 
@@ -151,12 +155,23 @@ public:
     virtual bool Update(uint32 diff) {
         if (cooldown < diff) {
             Unit* target = targetSelectFunc(m_creature);
+            bool didCast = false;
             if (target) {
-                m_creature->CastSpell(target, spellID, triggered);
+                if(m_creature->AI()->DoCastSpellIfCan(target, spellID, triggered ? CAST_TRIGGERED : 0) == CAST_OK) {
+                    didCast = true;
+                }
             }
-            cooldown = resetCD;
-            timeSinceLast = 0;
-            return true;
+            if (retryOnFail && !didCast) {
+                return false;
+            }
+            else {
+                if (!resetCD)
+                    cooldown = 0;
+                else
+                    cooldown = resetCD();
+                timeSinceLast = 0;
+                return true;
+            }
         }
         else {
             cooldown -= diff;
@@ -173,9 +188,10 @@ protected:
     Creature* m_creature;
     uint32 spellID;
     uint32 cooldown;
-    uint32 resetCD;
+    std::function<uint32()> resetCD;
     bool triggered;
     bool onlyOnce;
+    bool retryOnFail;
     uint32 timeSinceLast;
     SpellTarSelectFunction targetSelectFunc;
 
@@ -183,9 +199,9 @@ protected:
 
 class OnlyOnceSpellTimer : public SpellTimer {
 public:
-    OnlyOnceSpellTimer(Creature* creature, uint32 spellID, uint32 initialCD, uint32 resetCD,
-        bool triggeredSpell, SpellTarSelectFunction targetSelectFunc) :
-        SpellTimer(creature, spellID, initialCD, resetCD, triggeredSpell, targetSelectFunc),
+    OnlyOnceSpellTimer(Creature* creature, uint32 spellID, uint32 initialCD, std::function<uint32()> resetCD,
+        bool triggeredSpell, SpellTarSelectFunction targetSelectFunc, bool retryOnFail=false) :
+        SpellTimer(creature, spellID, initialCD, resetCD, triggeredSpell, targetSelectFunc, retryOnFail),
         didOnce(false)
         {}
 
@@ -1274,7 +1290,7 @@ struct eye_tentacleAI : public ScriptedAI
 struct claw_tentacleAI : public ScriptedAI
 {
     //uint32 GroundRuptureTimer;
-    uint32 HamstringTimer;
+    //uint32 HamstringTimer;
     uint32 EvadeTimer;
     uint64 Portal;
     OnlyOnceSpellTimer groundRuptureTimer;
@@ -1284,7 +1300,7 @@ struct claw_tentacleAI : public ScriptedAI
     claw_tentacleAI(Creature* pCreature) : 
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, 0, 0, true, [](Creature* c) {return c; }),
-        hamstringTimer(pCreature, SPELL_HAMSTRING, 1000, 5000, false, [](Creature* c) {return c->getVictim(); })
+        hamstringTimer(pCreature, SPELL_HAMSTRING, 1000, []() {return 5000; }, false, [](Creature* c) {return c->getVictim(); }, true)
     {
         m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
         if (!m_pInstance)
@@ -1380,7 +1396,6 @@ struct claw_tentacleAI : public ScriptedAI
                     }
                         
                     groundRuptureTimer.Reset();
-                    //GroundRuptureTimer = 500;
                     
                     hamstringTimer.Reset(2000);
                     //HamstringTimer = 2000;
@@ -1398,43 +1413,29 @@ struct claw_tentacleAI : public ScriptedAI
             EvadeTimer = 5000;
 
         groundRuptureTimer.Update(diff);
-        /*
-        //GroundRuptureTimer
-        if (GroundRuptureTimer < diff)
-        {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_RUPTURE_PHYSICAL, true);
-            GroundRuptureTimer = 3000000;
-        }
-        else
-            GroundRuptureTimer -= diff;
-        */
 
         hamstringTimer.Update(diff);
-        /*
-        //HamstringTimer
-        if (HamstringTimer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HAMSTRING) == CAST_OK)
-                HamstringTimer = 5000;
-        }
-        else
-            HamstringTimer -= diff;
-        */
         
         // Only attack if we already did ground rupture, and it's more than 1s ago
         if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > 1000) {
             DoMeleeAttackIfReady();
         }
-        /* 
-        if (GroundRuptureTimer > 500 && GroundRuptureTimer < 3000000 - 1000)
-            DoMeleeAttackIfReady();
-        */
     }
 };
 
 struct giant_claw_tentacleAI : public ScriptedAI
 {
-    giant_claw_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    OnlyOnceSpellTimer groundRuptureTimer;
+    SpellTimer hamstringTimer;
+    SpellTimer groundTremorTimer;
+    SpellTimer trashTimer;
+
+    giant_claw_tentacleAI(Creature* pCreature) : 
+        ScriptedAI(pCreature),
+        groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_NATURE, 0, 0, true, [](Creature* c) {return c; }),
+        hamstringTimer(pCreature, SPELL_HAMSTRING, 1000, []() {return 5000; }, false, [](Creature* c) {return c->getVictim(); }, true),
+        groundTremorTimer(pCreature, SPELL_GROUND_TREMOR, urand(6000, 12000), []() {return urand(6000, 12000); }, true, [](Creature* c) {return c->getVictim(); }, true),
+        trashTimer(pCreature, eSpells::SPELL_THRASH, urand(6000, 12000), []() {return urand(6000, 12000); }, false, [](Creature* c) {return c->getVictim(); }, true)
     {
         SetCombatMovement(false);
         Reset();
@@ -1444,12 +1445,12 @@ struct giant_claw_tentacleAI : public ScriptedAI
             Portal = pPortal->GetObjectGuid();
     }
 
-    uint32 ThrashTimer;
-    uint32 GroundRuptureTimer;
-    uint32 HamstringTimer;
+    //uint32 ThrashTimer;
+    //uint32 GroundRuptureTimer;
+    //uint32 HamstringTimer;
     uint32 EvadeTimer;
     uint64 Portal;
-    uint32 GroundStunTimer;
+    //uint32 GroundStunTimer;
 
     void JustDied(Unit*)
     {
@@ -1459,12 +1460,20 @@ struct giant_claw_tentacleAI : public ScriptedAI
 
     void Reset()
     {
-        //First rupture should happen half a second after we spawn
-        GroundRuptureTimer = 500;
-        HamstringTimer = 1000;
+        groundRuptureTimer.Reset();
+        //GroundRuptureTimer = 500;
+
+        hamstringTimer.Reset(1000);
+        //HamstringTimer = 1000;
+
+        groundTremorTimer.Reset();
+        //GroundStunTimer = urand(6000, 12000);
+        
+        trashTimer.Reset();
+        //ThrashTimer = urand(6000, 12000);
+        
         EvadeTimer = 5000;
-        GroundStunTimer = urand(6000, 12000);
-        ThrashTimer = urand(6000, 12000);
+
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
 
@@ -1529,8 +1538,11 @@ struct giant_claw_tentacleAI : public ScriptedAI
                             pCreature->SetVisibility(VISIBILITY_ON);
                         }
 
-                        GroundRuptureTimer = 500;
-                        HamstringTimer = 2000;
+                        groundRuptureTimer.Reset();
+
+                        hamstringTimer.Reset(2000);
+                        //HamstringTimer = 2000;
+
                         EvadeTimer = 5000;
                         AttackStart(target);
 
@@ -1544,44 +1556,13 @@ struct giant_claw_tentacleAI : public ScriptedAI
         else
             EvadeTimer = 5000;
 
-        if (GroundStunTimer < diff)
-        {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_TREMOR, true);
-            GroundStunTimer = urand(6000, 12000);
-        }
-        else
-            GroundStunTimer -= diff;
+        groundTremorTimer.Update(diff);
+        groundRuptureTimer.Update(diff);
+        hamstringTimer.Update(diff);
+        trashTimer.Update(diff);
 
-        //GroundRuptureTimer
-        if (GroundRuptureTimer < diff)
-        {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_RUPTURE_NATURE, true);
-            GroundRuptureTimer = 3000000;
-        }
-        else
-            GroundRuptureTimer -= diff;
-
-        
-        //HamstringTimer
-        if (HamstringTimer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HAMSTRING) == CAST_OK)
-                HamstringTimer = 5000;
-        }
-        else
-            HamstringTimer -= diff;
-        
-
-        if (ThrashTimer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THRASH) == CAST_OK) {
-                ThrashTimer = urand(6000, 12000);
-            }
-        }
-        else
-            ThrashTimer -= diff;
-
-        if (GroundRuptureTimer > 500 && GroundRuptureTimer < 3000000 - 1000) {
+        // Only attack if we already did ground rupture, and it's more than 1s ago
+        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > 1000) {
             DoMeleeAttackIfReady();
         }
     }
