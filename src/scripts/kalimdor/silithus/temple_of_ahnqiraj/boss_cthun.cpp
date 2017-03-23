@@ -31,15 +31,15 @@
 #define EMOTE_WEAKENED                  -1531011
 
 enum eCreatures {
-    MOB_CLAW_TENTACLE               = 15725,
     MOB_EYE_TENTACLE                = 15726,
+    MOB_CLAW_TENTACLE               = 15725,
     MOB_GIANT_CLAW_TENTACLE         = 15728,
     MOB_GIANT_EYE_TENTACLE          = 15334,
     MOB_FLESH_TENTACLE              = 15802,
 
+    MOB_CTHUN_PORTAL                = 15896,
     MOB_SMALL_PORTAL                = 15904,
     MOB_GIANT_PORTAL                = 15910,
-    MOB_CTHUN_PORTAL                = 15896,
 
     PUNT_CREATURE                   = 15922, //invisible viscidus trigger, used in stomach
 };
@@ -47,36 +47,38 @@ enum eCreatures {
 
 
 enum eSpells {
+    // Phase 1 spells
     SPELL_FREEZE_ANIMATION          = 16245, // Dummy spell to avoid the eye gazing around during dark glare
     SPELL_ROTATE_TRIGGER            = 26137,
     SPELL_ROTATE_NEGATIVE_360       = 26136,
     SPELL_ROTATE_POSITIVE_360       = 26009,
     SPELL_DARK_GLARE                = 26029,
+    
+    // Shared spells
     SPELL_GREEN_EYE_BEAM            = 26134,
 
-    SPELL_MIND_FLAY                 = 26143,
+    // Mob spells
+    SPELL_THRASH                    = 3391,
+    SPELL_GROUND_TREMOR             = 6524,
+    SPELL_PUNT_UPWARD               = 16716,
+    SPELL_MASSIVE_GROUND_RUPTURE    = 26100,
     SPELL_GROUND_RUPTURE            = 26139,
     SPELL_HAMSTRING                 = 26141,
-
+    SPELL_MIND_FLAY                 = 26143,
     SPELL_GIANT_GROUND_RUPTURE      = 26478,
-    SPELL_MASSIVE_GROUND_RUPTURE    = 26100,
-
-    SPELL_GROUND_TREMOR             = 6524,
-
-    SPELL_THRASH                    = 3391,
-
-    SPELL_PUNT_UPWARD               = 16716,
-    SPELL_MOUTH_TENTACLE            = 26332,
+    
+    //C'thun spells
     SPELL_EXIT_STOMACH_KNOCKBACK    = 25383,
-
-    SPELL_DIGESTIVE_ACID            = 26476,
-    SPELL_DIGESTIVE_ACID_TELEPORT   = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
-    SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, had problems with not killing c'thun too.
-
-    SPELL_CTHUN_VULNERABLE          = 26235,
     SPELL_CARAPACE_OF_CTHUN         = 26156,
+    SPELL_DIGESTIVE_ACID_TELEPORT   = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
     SPELL_TRANSFORM                 = 26232,
-    CTHUN_TRANSFORMATION_VISUAL     = 15809,
+    SPELL_CTHUN_VULNERABLE          = 26235,
+    SPELL_MOUTH_TENTACLE            = 26332,
+    SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, was killing c'thun too. Maybe that's intended => a respawn?
+    SPELL_DIGESTIVE_ACID            = 26476,
+
+
+
 };
 
 static const float stomachPortPosition[4] = 
