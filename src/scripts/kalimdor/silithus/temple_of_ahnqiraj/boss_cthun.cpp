@@ -44,8 +44,6 @@ enum eCreatures {
     PUNT_CREATURE                   = 15922, //invisible viscidus trigger, used in stomach
 };
 
-
-
 enum eSpells {
     // Phase 1 spells
     SPELL_FREEZE_ANIMATION          = 16245, // Dummy spell to avoid the eye gazing around during dark glare
@@ -61,11 +59,11 @@ enum eSpells {
     SPELL_THRASH                    = 3391,
     SPELL_GROUND_TREMOR             = 6524,
     SPELL_PUNT_UPWARD               = 16716,
-    SPELL_MASSIVE_GROUND_RUPTURE    = 26100,
-    SPELL_GROUND_RUPTURE            = 26139,
+    SPELL_MASSIVE_GROUND_RUPTURE    = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
+    SPELL_GROUND_RUPTURE_PHYSICAL   = 26139, // used by small tentacles
     SPELL_HAMSTRING                 = 26141,
     SPELL_MIND_FLAY                 = 26143,
-    SPELL_GIANT_GROUND_RUPTURE      = 26478,
+    SPELL_GROUND_RUPTURE_NATURE     = 26478, //used by giant tentacles
     
     //C'thun spells
     SPELL_EXIT_STOMACH_KNOCKBACK    = 25383,
@@ -125,6 +123,97 @@ static const int MAX_INITIAL_PULLER_HITS = 3;
 // Green beam has a 2 sec cast time. This adds additional cooldown to the ability
 static const int GREEN_BEAM_COOLDOWN = 3000;
 
+using SpellTarSelectFunction = std::function<Unit*(Creature*)>;
+
+class SpellTimer {
+public:
+    SpellTimer(Creature* creature, uint32 spellID, uint32 initialCD, uint32 resetCD, 
+        bool triggeredSpell, SpellTarSelectFunction targetSelectFunc) :
+        m_creature(creature),
+        spellID(spellID),
+        cooldown(initialCD),
+        resetCD(resetCD),
+        triggered(triggeredSpell),
+        targetSelectFunc(targetSelectFunc),
+        timeSinceLast(std::numeric_limits<uint32>::max())
+    {}
+
+    virtual void Reset(int custom = -1) {
+        if (custom >= 0) {
+            cooldown = static_cast<uint32>(custom);
+        }
+        else {
+            cooldown = resetCD;
+        }
+    }
+
+    // Returns true when the cooldown reaches < diff, a cast is attempted, and cooldown is reset
+    virtual bool Update(uint32 diff) {
+        if (cooldown < diff) {
+            Unit* target = targetSelectFunc(m_creature);
+            if (target) {
+                m_creature->CastSpell(target, spellID, triggered);
+            }
+            cooldown = resetCD;
+            timeSinceLast = 0;
+            return true;
+        }
+        else {
+            cooldown -= diff;
+            timeSinceLast += diff;
+        }
+        return false;
+    }
+
+    uint32 TimeSinceLast() {
+        return timeSinceLast;
+    }
+
+protected:
+    Creature* m_creature;
+    uint32 spellID;
+    uint32 cooldown;
+    uint32 resetCD;
+    bool triggered;
+    bool onlyOnce;
+    uint32 timeSinceLast;
+    SpellTarSelectFunction targetSelectFunc;
+
+};
+
+class OnlyOnceSpellTimer : public SpellTimer {
+public:
+    OnlyOnceSpellTimer(Creature* creature, uint32 spellID, uint32 initialCD, uint32 resetCD,
+        bool triggeredSpell, SpellTarSelectFunction targetSelectFunc) :
+        SpellTimer(creature, spellID, initialCD, resetCD, triggeredSpell, targetSelectFunc),
+        didOnce(false)
+        {}
+
+    void Reset(int custom = -1) override {
+        SpellTimer::Reset(custom);
+        didOnce = false;
+    }
+
+    bool Update(uint32 diff) override {
+        if (!didOnce) {
+            if (SpellTimer::Update(diff)) {
+                didOnce = true;
+            }
+        }
+        else {
+            timeSinceLast += diff;
+        }
+        return didOnce;
+    }
+
+    bool DidCast() {
+        return didOnce;
+    }
+private:
+    bool didOnce;
+    
+};
+
 struct EyeTentacleGroundRupture {
     EyeTentacleGroundRupture(Creature* creature) : 
         m_creature(creature),
@@ -140,7 +229,7 @@ struct EyeTentacleGroundRupture {
     bool Update(uint32 diff) {
         if (!didGroundRupture) {
             if (groundRuptureTimer < diff) {
-                m_creature->CastSpell(m_creature->getVictim(), SPELL_GIANT_GROUND_RUPTURE, true);
+                m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_RUPTURE_NATURE, true);
                 didGroundRupture = true;
             }
             else {
@@ -294,7 +383,6 @@ void SpawnEyeTentacles(Creature* relToThisCreature)
 
 bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, uint32 resetTo, uint32 id)
 {
-
     if (timer < diff) {
         instance_temple_of_ahnqiraj* instance = (instance_temple_of_ahnqiraj*)relToCreature->GetInstanceData();
         if (Unit* target = SelectRandomAliveNotStomach(instance))
@@ -882,8 +970,8 @@ struct eye_of_cthunAI : public ScriptedAI
     uint32 eyeTentaclesCooldown;
     
     static const uint32 SPELL_ROTATE_TRIGGER_CASTTIME = 3000;
-    static const uint32 EYE_BEAM_PHASE_DURATION = 50000 - SPELL_ROTATE_TRIGGER_CASTTIME;
-    static const uint32 DARK_GLARE_DURATION = 40000 + SPELL_ROTATE_TRIGGER_CASTTIME;
+    static const uint32 EYE_BEAM_PHASE_DURATION = 50000;// -SPELL_ROTATE_TRIGGER_CASTTIME;
+    static const uint32 DARK_GLARE_DURATION = 40000;// +SPELL_ROTATE_TRIGGER_CASTTIME;
     static const uint32 EYE_TENTACLES_COOLDOWN = 45000;
 
     EyeBeam eyeBeam;
@@ -1099,9 +1187,13 @@ struct eye_of_cthunAI : public ScriptedAI
 
 struct eye_tentacleAI : public ScriptedAI
 {
-    eye_tentacleAI(Creature* pCreature) : 
-        ScriptedAI(pCreature), 
-        groundRuptureTimer(pCreature)
+    uint64 Portal;
+    //EyeTentacleGroundRupture groundRuptureTimer;
+    OnlyOnceSpellTimer groundRuptureTimer;
+
+    eye_tentacleAI(Creature* pCreature) :
+        ScriptedAI(pCreature),
+        groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, 0, 0, true, [](Creature* c) {return c; })
     {
         m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 4);
         m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 4);
@@ -1117,15 +1209,14 @@ struct eye_tentacleAI : public ScriptedAI
         }
     }
 
-    uint64 Portal;
-    EyeTentacleGroundRupture groundRuptureTimer;
-
+    
     void DoDespawnPortal() {
         if (!Portal) return;
 
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
     }
+
     void JustDied(Unit*)
     {
         DoDespawnPortal();
@@ -1182,8 +1273,23 @@ struct eye_tentacleAI : public ScriptedAI
 
 struct claw_tentacleAI : public ScriptedAI
 {
-    claw_tentacleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    //uint32 GroundRuptureTimer;
+    uint32 HamstringTimer;
+    uint32 EvadeTimer;
+    uint64 Portal;
+    OnlyOnceSpellTimer groundRuptureTimer;
+    SpellTimer hamstringTimer;
+    instance_temple_of_ahnqiraj* m_pInstance;
+
+    claw_tentacleAI(Creature* pCreature) : 
+        ScriptedAI(pCreature),
+        groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, 0, 0, true, [](Creature* c) {return c; }),
+        hamstringTimer(pCreature, SPELL_HAMSTRING, 1000, 5000, false, [](Creature* c) {return c->getVictim(); })
     {
+        m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("SD0: No Instance eye_of_cthunAI");
+
         SetCombatMovement(false);
         Reset();
         std::fabsf(100.52f - m_creature->GetPositionX());
@@ -1194,10 +1300,6 @@ struct claw_tentacleAI : public ScriptedAI
         }
     }
 
-    uint32 GroundRuptureTimer;
-    uint32 HamstringTimer;
-    uint32 EvadeTimer;
-    uint64 Portal;
 
     void JustDied(Unit*)
     {
@@ -1207,9 +1309,12 @@ struct claw_tentacleAI : public ScriptedAI
 
     void Reset()
     {
-        //First rupture should happen half a second after we spawn
-        GroundRuptureTimer = 500;
-        HamstringTimer = 1000;
+        groundRuptureTimer.Reset();
+        //GroundRuptureTimer = 500;
+        
+        hamstringTimer.Reset(1000);
+        //HamstringTimer = 1000;
+
         EvadeTimer = 5000;
 
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
@@ -1256,33 +1361,34 @@ struct claw_tentacleAI : public ScriptedAI
             AttackClosestTarget();
             if (EvadeTimer < diff)
             {
-                if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
                 {
-                    if (target->GetPositionZ() >= 100.0f && target->GetTypeId() == TYPEID_PLAYER && !((Player*)target)->HasMovementFlag(MOVEFLAG_JUMPING)) // If the target is on same level as C'thun
+                    //Dissapear and reappear at new position
+                    m_creature->SetVisibility(VISIBILITY_OFF);
+
+                    m_creature->NearTeleportTo(
+                        target->GetPositionX() + frand(-1.0f, 1.0f),
+                        target->GetPositionY() + frand(-1.0f, 1.0f),
+                        target->GetPositionZ(),
+                        0);
+
+                    if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
                     {
-                        //Dissapear and reappear at new position
-                        m_creature->SetVisibility(VISIBILITY_OFF);
-
-                        m_creature->NearTeleportTo(
-                            target->GetPositionX() + frand(-1.0f, 1.0f),
-                            target->GetPositionY() + frand(-1.0f, 1.0f),
-                            target->GetPositionZ(),
-                            0);
-
-                        if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
-                        {
-                            pCreature->SetVisibility(VISIBILITY_OFF);
-                            pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
-                            pCreature->SetVisibility(VISIBILITY_ON);
-                        }
-
-                        GroundRuptureTimer = 500;
-                        HamstringTimer = 2000;
-                        EvadeTimer = 5000;
-                        AttackStart(target);
-
-                        m_creature->SetVisibility(VISIBILITY_ON);
+                        pCreature->SetVisibility(VISIBILITY_OFF);
+                        pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
+                        pCreature->SetVisibility(VISIBILITY_ON);
                     }
+                        
+                    groundRuptureTimer.Reset();
+                    //GroundRuptureTimer = 500;
+                    
+                    hamstringTimer.Reset(2000);
+                    //HamstringTimer = 2000;
+                    
+                    EvadeTimer = 5000;
+                    AttackStart(target);
+
+                    m_creature->SetVisibility(VISIBILITY_ON);
                 }
             }
             else
@@ -1291,15 +1397,20 @@ struct claw_tentacleAI : public ScriptedAI
         else
             EvadeTimer = 5000;
 
+        groundRuptureTimer.Update(diff);
+        /*
         //GroundRuptureTimer
         if (GroundRuptureTimer < diff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_RUPTURE, true);
+            m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_RUPTURE_PHYSICAL, true);
             GroundRuptureTimer = 3000000;
         }
         else
             GroundRuptureTimer -= diff;
+        */
 
+        hamstringTimer.Update(diff);
+        /*
         //HamstringTimer
         if (HamstringTimer < diff)
         {
@@ -1308,9 +1419,16 @@ struct claw_tentacleAI : public ScriptedAI
         }
         else
             HamstringTimer -= diff;
-
+        */
+        
+        // Only attack if we already did ground rupture, and it's more than 1s ago
+        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > 1000) {
+            DoMeleeAttackIfReady();
+        }
+        /* 
         if (GroundRuptureTimer > 500 && GroundRuptureTimer < 3000000 - 1000)
             DoMeleeAttackIfReady();
+        */
     }
 };
 
@@ -1437,7 +1555,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         //GroundRuptureTimer
         if (GroundRuptureTimer < diff)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_GIANT_GROUND_RUPTURE, true);
+            m_creature->CastSpell(m_creature->getVictim(), SPELL_GROUND_RUPTURE_NATURE, true);
             GroundRuptureTimer = 3000000;
         }
         else
@@ -1569,7 +1687,6 @@ struct flesh_tentacleAI : public ScriptedAI
 
     void Reset()
     {
-
     }
 
     void AttackClosestTarget()
