@@ -27,62 +27,62 @@
 
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
-#include "g3dlite/G3D/Vector2.h" // Used by polygon functionality
+#include "g3dlite/G3D/Vector3.h"
+#include "g3dlite/G3D/AABox.h"
 
-#define EMOTE_WEAKENED                      -1531011
-#define PI                                  3.14
-#define RANDOM_SOUND_WHISPER                8663
+#define EMOTE_WEAKENED                  -1531011
+#define PI                              3.14
+#define RANDOM_SOUND_WHISPER            8663
 
-#define MOB_CLAW_TENTACLE                   15725
-#define MOB_EYE_TENTACLE                    15726
-#define MOB_BODY_OF_CTHUN                   15809
-#define MOB_GIANT_CLAW_TENTACLE             15728
-#define MOB_GIANT_EYE_TENTACLE              15334
-#define MOB_FLESH_TENTACLE                  15802
+enum eCreatures {
+    MOB_CLAW_TENTACLE               = 15725,
+    MOB_EYE_TENTACLE                = 15726,
+    MOB_BODY_OF_CTHUN               = 15809,
+    MOB_GIANT_CLAW_TENTACLE         = 15728,
+    MOB_GIANT_EYE_TENTACLE          = 15334,
+    MOB_FLESH_TENTACLE              = 15802,
 
-#define MOB_SMALL_PORTAL                    15904
-#define MOB_GIANT_PORTAL                    15910
-#define MOB_CTHUN_PORTAL                    15896
+    MOB_SMALL_PORTAL                = 15904,
+    MOB_GIANT_PORTAL                = 15910,
+    MOB_CTHUN_PORTAL                = 15896,
 
-#define PUNT_CREATURE                       15922 //invisible viscidus trigger
-
-
-#define SPELL_ROTATE_TRIGGER                26137 
-#define SPELL_ROTATE_NEGATIVE_360           26136
-#define SPELL_ROTATE_POSITIVE_360           26009
-
-#define SPELL_GREEN_EYE_BEAM                26134
-#define SPELL_DARK_GLARE                    26029
-#define SPELL_RED_COLORATION                23537 //Probably not the right spell but looks similar
-#define SPELL_MIND_FLAY                     26143
-#define SPELL_GROUND_RUPTURE                26139
-#define SPELL_HAMSTRING                     26141
-#define SPELL_GIANT_GROUND_RUPTURE          26478
-
-#define SPELL_GROUND_TREMOR                 6524
-
-#define SPELL_MASSIVE_GROUND_RUPTURE        26100
-#define SPELL_THRASH                        3391
-
-
-enum eyeOfCthunSpells {
-SPELL_FREEZE_ANIMATION = 16245, // Dummy spell to avoid the eye gazing around during dark glare
-
+    PUNT_CREATURE                   = 15922, //invisible viscidus trigger
 };
 
-enum cthunSpells {
-SPELL_PUNT_UPWARD = 16716,
-SPELL_MOUTH_TENTACLE = 26332,
-SPELL_EXIT_STOMACH_KNOCKBACK = 25383,
 
-SPELL_DIGESTIVE_ACID = 26476,
-SPELL_DIGESTIVE_ACID_TELEPORT = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
-SPELL_PORT_OUT_STOMACH = 26648, // Not yet used, had problems with not killing c'thun too.
 
-SPELL_CTHUN_VULNERABLE = 26235,
-SPELL_CARAPACE_OF_CTHUN = 26156,
-SPELL_TRANSFORM = 26232,
-CTHUN_TRANSFORMATION_VISUAL = 15809,
+enum eSpells {
+    SPELL_FREEZE_ANIMATION          = 16245, // Dummy spell to avoid the eye gazing around during dark glare
+    SPELL_ROTATE_TRIGGER            = 26137,
+    SPELL_ROTATE_NEGATIVE_360       = 26136,
+    SPELL_ROTATE_POSITIVE_360       = 26009,
+    SPELL_DARK_GLARE                = 26029,
+    SPELL_GREEN_EYE_BEAM            = 26134,
+    SPELL_RED_COLORATION            = 23537, //Probably not the right spell but looks similar
+
+    SPELL_MIND_FLAY                 = 26143,
+    SPELL_GROUND_RUPTURE            = 26139,
+    SPELL_HAMSTRING                 = 26141,
+
+    SPELL_GIANT_GROUND_RUPTURE      = 26478,
+    SPELL_MASSIVE_GROUND_RUPTURE    = 26100,
+
+    SPELL_GROUND_TREMOR             = 6524,
+
+    SPELL_THRASH                    = 3391,
+
+    SPELL_PUNT_UPWARD               = 16716,
+    SPELL_MOUTH_TENTACLE            = 26332,
+    SPELL_EXIT_STOMACH_KNOCKBACK    = 25383,
+
+    SPELL_DIGESTIVE_ACID            = 26476,
+    SPELL_DIGESTIVE_ACID_TELEPORT   = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
+    SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, had problems with not killing c'thun too.
+
+    SPELL_CTHUN_VULNERABLE          = 26235,
+    SPELL_CARAPACE_OF_CTHUN         = 26156,
+    SPELL_TRANSFORM                 = 26232,
+    CTHUN_TRANSFORMATION_VISUAL     = 15809,
 };
 
 static const float stomachPortPosition[4] = 
