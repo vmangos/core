@@ -27,8 +27,6 @@
 
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
-#include "g3dlite/G3D/Vector3.h"
-#include "g3dlite/G3D/AABox.h"
 
 #define EMOTE_WEAKENED                  -1531011
 #define PI                              3.14
@@ -1071,8 +1069,6 @@ struct eye_of_cthunAI : public ScriptedAI
 
     bool AggroRadius()  
     {
-        //if (IsAlreadyPulled) false;
-
         if (m_creature->getFaction() != 7 && !m_creature->isInCombat())
             m_creature->setFaction(7); // This prevents strange, uncontrolled aggro's through the walls
 
@@ -1083,10 +1079,18 @@ struct eye_of_cthunAI : public ScriptedAI
             Player* pPlayer = itr->getSource();
             if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
             {
-                if (abs(pPlayer->GetPositionZ() - 100.0f) < 10.0f) // If we're at the same Z axis of cthun
+                float distToCthun = pPlayer->GetDistanceToCenter(m_creature);
+                //float distToCthun = pPlayer->GetDistance(m_creature);
+                float zDist = abs(pPlayer->GetPositionZ() - 100.0f);
+                // If we're at the same Z axis of cthun, or within the maximum possible pull distance
+                if (zDist < 10.0f && distToCthun < 95.0f && pPlayer->IsWithinLOSInMap(m_creature))
                 {
-                    if (pPlayer->GetDistance(-8653.6f, 1960.3f, 106.5f) < 12.5f || // Anyone is near my door
-                        pPlayer->GetDistance(m_creature) < 50.0f) // If anyone is within 50 units of me. This is not enough.
+                    bool pull = true;
+                    
+                    //xxx: it will still be possible to hide behind one of the pillars in the room to avoid pulling, 
+                    //but I don't think it's really something to take advantage of anyway
+                    
+                    if(pull)
                     {
                         m_creature->SetFactionTemporary(14);
                         m_creature->SetInCombatWithZone();
