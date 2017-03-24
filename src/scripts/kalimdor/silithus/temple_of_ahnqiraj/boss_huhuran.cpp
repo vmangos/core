@@ -86,7 +86,7 @@ struct boss_huhuranAI : public ScriptedAI
         // Wyvern Timer
         if (Wyvern_Timer < diff)
         {
-            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_WYVERNSTING, SELECT_FLAG_IN_MELEE_RANGE))
             {
                 if (DoCastSpellIfCan(target, SPELL_WYVERNSTING) == CAST_OK)
                     Wyvern_Timer = urand(15000, 32000);
