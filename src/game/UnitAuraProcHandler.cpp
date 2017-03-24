@@ -481,6 +481,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     return SPELL_AURA_PROC_OK;
                 }
                 // Viscidus Frost Weakness
+	        // Disabled for now, handled on Viscidus script
+                /*
                 case 25926:
                 {
                     if (!procSpell)
@@ -501,6 +503,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
 
                     break;
                 }
+		*/
                 // Viscidus Freeze
                 case 25937:
                 {
@@ -509,8 +512,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                         if (GetSchoolMask(procSpell->School) != SPELL_SCHOOL_MASK_NORMAL)
                             return SPELL_AURA_PROC_FAILED;
                     }
-                    else
-                        return SPELL_AURA_PROC_FAILED;
 
                     ++triggeredByAura->GetModifier()->m_amount;
                     triggerAmount = triggeredByAura->GetModifier()->m_amount;
