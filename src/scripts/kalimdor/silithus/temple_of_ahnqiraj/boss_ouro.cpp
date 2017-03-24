@@ -50,7 +50,7 @@ enum
     //SPELL_QUAKE             = 26093,
 
     // other spells - not used
-    // SPELL_SUMMON_SCARABS    = 26060,                     // triggered after 30 secs - cast by the Dirt Mounds
+    SPELL_SUMMON_SCARABS    = 26060,                     // triggered after 30 secs - cast by the Dirt Mounds
     SPELL_DIRTMOUND_PASSIVE = 26092,                        // casts 26093 every 1 sec
     // SPELL_SET_OURO_HEALTH   = 26075,                     // removed from DBC
     // SPELL_SAVE_OURO_HEALTH  = 26076,                     // removed from DBC
@@ -150,9 +150,15 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             pSummoned->GetRandomPoint(m_StartingLoc.coord_x,
                                       m_StartingLoc.coord_y,
                                       m_StartingLoc.coord_z,
-                                      100.0f, rx, ry, rz);
+                                      50.0f, rx, ry, rz);
             pSummoned->NearTeleportTo(rx, ry, rz, 0);
         }
+    }
+
+    void SummonedCreatureDespawn(Creature* pSummoned)
+    {
+        if (pSummoned->GetEntry() == NPC_DIRT_MOUND)
+            pSummoned->CastSpell(m_creature, SPELL_SUMMON_SCARABS, true);
     }
 
     void Submerge()
@@ -168,11 +174,61 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
 
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            ClearTargetIcon();
 
             m_bSubmerged      = true;
             m_uiSubmergeTimer = 30000;
             m_uiNoMeleeTimer  = 10000;
         }
+    }
+
+    void GetNewTarget(Unit &pNewTarget)
+    {
+        const uint32 uiMaxThreat = m_creature->getThreatManager().getThreat(m_creature->getVictim());
+
+        // erase current target's threat as soon as we switch the target now
+        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+        // give the new target aggro
+        m_creature->getThreatManager().addThreat(&pNewTarget, uiMaxThreat);
+    }
+
+
+    bool CheckForMelee()
+    {
+        // at first we check for the current player-type target
+        Unit* pMainTarget = m_creature->getVictim();
+        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
+            m_creature->IsWithinMeleeRange(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
+        {
+            return true;
+        }
+
+        // at second we look for any melee player-type target (if current target is not reachable)
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+            SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+        {
+            GetNewTarget(*pTarget);
+            return true;
+        }
+
+        // reaching this point means there are no more reachable player-type targets in melee range
+
+        // at third we take any melee pet target just to punch in the face
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+            SELECT_FLAG_PET | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+        {
+            GetNewTarget(*pTarget);
+            return false;
+        }
+
+        // at fourth we take anything to wipe it out and log (whatever, just in case)
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+            SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+        {
+            GetNewTarget(*pTarget);
+        }
+        return false;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -246,10 +302,15 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_uiSummonMoundTimer -= uiDiff;
             }
 
+            // every tick we check for melee targets to attack
+            if (CheckForMelee())
+            {
+                m_uiNoMeleeTimer = 3000;
+            }
+
             // If we are within range melee the target
             if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
             {
-                m_uiNoMeleeTimer = 5000;
                 DoMeleeAttackIfReady();
             }
             // Spam Boulder spell when enraged and not tanked
@@ -280,6 +341,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
                 if (DoCastSpellIfCan(m_creature, SPELL_BIRTH) == CAST_OK)
                 {
+                    //DoCastSpellIfCan(m_creature, SPELL_SUMMON_SCARABS, CAST_TRIGGERED);
+
                     m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
@@ -342,16 +405,16 @@ CreatureAI* GetAI_npc_ouro_spawner(Creature* pCreature)
     return new npc_ouro_spawnerAI(pCreature);
 }
 
-struct npc_dirt_moundAI : public Scripted_NoMovementAI
+struct npc_dirt_moundAI : public ScriptedAI
 {
-    npc_dirt_moundAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature) {Reset();}
+    npc_dirt_moundAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
 
     uint32 m_uiChangeTargetTimer;
     ObjectGuid TargetGUID;
 
     void Reset()
     {
-        m_uiChangeTargetTimer = 5000;
+        m_uiChangeTargetTimer = urand(0, 5000);
 	TargetGUID.Clear();
 
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
@@ -364,7 +427,6 @@ struct npc_dirt_moundAI : public Scripted_NoMovementAI
   	    TargetGUID = who->GetGUID();
 	}
     }
-
 
     void UpdateAI(const uint32 uiDiff)
     {
@@ -379,7 +441,7 @@ struct npc_dirt_moundAI : public Scripted_NoMovementAI
 	    {
 	        m_creature->GetMotionMaster()->MoveRandom();
 	    }
-	    m_uiChangeTargetTimer = 5000;
+	    m_uiChangeTargetTimer = urand(0, 10000);
 	}
 	else
 	  m_uiChangeTargetTimer -= uiDiff;
@@ -409,4 +471,10 @@ void AddSC_boss_ouro()
     pNewScript->Name = "npc_dirt_mound";
     pNewScript->GetAI = &GetAI_npc_dirt_mound;
     pNewScript->RegisterSelf();
+/*
+    pNewScript = new Script;
+    pNewScript->Name = "npc_ouro_scarab";
+    pNewScript->GetAI = &GetAI_npc_ouro_scarab;
+    pNewScript->RegisterSelf();
+*/
 }
