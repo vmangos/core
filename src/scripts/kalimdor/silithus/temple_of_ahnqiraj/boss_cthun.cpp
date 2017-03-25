@@ -1593,39 +1593,55 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        if (m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
-            // Stop casting on current target if it's been ported to stomach
-            // and immediately start casting on a new target
-            if (m_creature->getVictim() && m_creature->getVictim()->GetPositionZ() < -30.0f) {
-                m_creature->InterruptNonMeleeSpells(false);
-                BeamTimer = 0;
-            }
-        }
-        else if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+        if (!groundRuptureTimer.Update(diff))
             return;
+        
+        if (!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
+            beamTargetGuid = 0;
         }
 
-        if(groundRuptureTimer.Update(diff)) {
-            if (BeamTimer < diff)
-            {
-                Player* target = SelectRandomAliveNotStomach(m_pInstance);
-                if (target) {
+        if (BeamTimer < diff ) {
+            if (Player* target = SelectRandomAliveNotStomach(m_pInstance)) {
+                //m_creature->InterruptNonMeleeSpells(false);
+                if (CanCastSpell(target, sSpellMgr.GetSpellEntry(SPELL_GREEN_EYE_BEAM), false) == CanCastResult::CAST_OK) {
                     beamTargetGuid = target->GetObjectGuid();
-                    // There should not be any LOS check
-                    m_creature->InterruptNonMeleeSpells(false);
                     m_creature->SetTargetGuid(target->GetObjectGuid());
+                    m_creature->SetFacingToObject(target);
                     m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
                     BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
                 }
+                else {
+                    if (Unit* meleeTarget = CheckForMelee(m_creature, true, false)) {
+                        m_creature->SetTargetGuid(meleeTarget->GetObjectGuid());
+                        m_creature->SetFacingToObject(meleeTarget);
+                    }
+                }
             }
-            else
-                BeamTimer -= diff;
         }
+        else {
+            BeamTimer -= diff;
+            if (m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
+                Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(beamTargetGuid);
+                if (currentCastTarget) {
+                    // Reinforce current target to override stuff I dont understand
+                    //m_creature->SetFacingToObject(m_pInstance->GetMap()->GetWorldObject(beamTargetGuid));
+                    //m_creature->SetTargetGuid(beamTargetGuid);
 
-        // Only attack if we already did ground rupture, and it's more than 1s ago
-        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
-            CheckForMelee(m_creature);
-            DoMeleeAttackIfReady();
+                    // Stop casting on current target if it's been ported to stomach
+                    // and immediately start casting on a new target
+                    const CThunStomachList& lst = m_pInstance->GetPlayersInStomach();
+                    if (PlayerInStomach(currentCastTarget, lst)) {
+                        m_creature->InterruptNonMeleeSpells(false);
+                        BeamTimer = 0;
+                    }
+                }
+            }
+            else {
+                if (Unit* meleeTarget = CheckForMelee(m_creature, true, false)) {
+                    m_creature->SetTargetGuid(meleeTarget->GetObjectGuid());
+                    m_creature->SetFacingToObject(meleeTarget);
+                }
+            }
         }
     }
 };
