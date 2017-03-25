@@ -1243,6 +1243,11 @@ struct eye_tentacleAI : public ScriptedAI
                 }
             }
         }
+
+        // Only attack if we already did ground rupture, and it's more than 1s ago
+        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
+            DoMeleeAttackIfReady();
+        }
     }
 };
 
@@ -1447,20 +1452,98 @@ struct giant_claw_tentacleAI : public ScriptedAI
             }
         }
     }
+    bool CheckForMelee()
+    {
+        // at first we check for the current player-type target
+        Unit* pMainTarget = m_creature->getVictim();
+        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
+            m_creature->IsWithinMeleeRange(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
+        {
+            if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+            {
+                m_creature->AttackerStateUpdate(pMainTarget);
+                m_creature->resetAttackTimer();
+            }
+
+            return true;
+        }
+
+        // at second we look for any melee player-type target (if current target is not reachable)
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+            SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+        {
+            // erase current target's threat as soon as we switch the target now
+            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+            // give the new target aggro
+            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+
+            if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+            {
+                m_creature->AttackerStateUpdate(pTarget);
+                m_creature->resetAttackTimer();
+            }
+
+            return true;
+        }
+
+        // at third we take any melee pet target just to punch in the face
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+            SELECT_FLAG_PET | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+        {
+            // erase current target's threat as soon as we switch the target now
+            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+            // give the new target aggro
+            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+
+            if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+            {
+                m_creature->AttackerStateUpdate(pTarget);
+                m_creature->resetAttackTimer();
+            }
+
+            return true;
+        }
+
+        // at fourth we take anything to wipe it out and log (whatever, just in case)
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+            SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+        {
+            // erase current target's threat as soon as we switch the target now
+            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+            // give the new target aggro
+            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+
+            if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+            {
+                m_creature->AttackerStateUpdate(pTarget);
+                m_creature->resetAttackTimer();
+            }
+            return true;
+            //sLog.outError("[MoltenCore.Ragnaros] Target type #4 reached with name <%s> and entry <%u>.", pTarget->GetName(), pTarget->GetEntry());
+        }
+        return false;
+        // nothing in melee at all
+        //sLog.outError("[MoltenCore.Ragnaros] CheckForMelee hits the end. Nothing in melee.");
+    }
 
     void UpdateAI(const uint32 diff)
     {
         //Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        //EvadeTimer
-        if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-        {
-            AttackClosestTarget();
+        //Unit* victim = m_creature->getVictim();
+        //ObjectGuid oldTarget = victim->GetGUID();
+        
+        //Evad eTimer
+        if (CheckForMelee()) {
+            EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+        }
+        else {
             if (EvadeTimer < diff)
             {
-                
                 if (Unit* target = SelectRandomAliveNotStomach(m_pInstance))
                 {
                     //Dissapear and reappear at new position
@@ -1488,11 +1571,59 @@ struct giant_claw_tentacleAI : public ScriptedAI
                     m_creature->SetVisibility(VISIBILITY_ON);
                 }
             }
-            else
+            else {
                 EvadeTimer -= diff;
+            }
+        }
+        /*
+        //if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+        if (!victim->IsWithinMeleeRange(m_creature))
+        {
+            m_creature->SetTargetGuid(ObjectGuid());
+            if (m_creature->SelectHostileTarget()) {
+                victim = m_creature->getVictim();
+                m_creature->SetTargetGuid(victim->GetGUID());
+            }
+            else {
+                m_creature->SetTargetGuid(oldTarget);
+                //AttackClosestTarget();
+                if (EvadeTimer < diff)
+                {
+                    if (Unit* target = SelectRandomAliveNotStomach(m_pInstance))
+                    {
+                        //Dissapear and reappear at new position
+                        m_creature->SetVisibility(VISIBILITY_OFF);
+
+                        m_creature->NearTeleportTo(
+                            target->GetPositionX() + frand(-1.0f, 1.0f),
+                            target->GetPositionY() + frand(-1.0f, 1.0f),
+                            target->GetPositionZ(),
+                            0);
+
+                        if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
+                        {
+                            pCreature->SetVisibility(VISIBILITY_OFF);
+                            pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
+                            pCreature->SetVisibility(VISIBILITY_ON);
+                        }
+
+                        groundRuptureTimer.Reset();
+                        hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
+
+                        EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+                        AttackStart(target);
+
+                        m_creature->SetVisibility(VISIBILITY_ON);
+                    }
+                }
+                else {
+                    EvadeTimer -= diff;
+                }
+            }
         }
         else
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+            */
 
         groundTremorTimer.Update(diff);
         groundRuptureTimer.Update(diff);
