@@ -1321,10 +1321,9 @@ struct eye_tentacleAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->addUnitState(UNIT_STAT_ROOT);
         DoDespawnPortal();
-
         m_creature->SetInCombatWithZone();
-        
         groundRuptureTimer.Reset();
     }
 
@@ -1422,7 +1421,7 @@ struct claw_tentacleAI : public ScriptedAI
         groundRuptureTimer.Reset();
         hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
         EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
-
+        m_creature->addUnitState(UNIT_STAT_ROOT);
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
 
@@ -1499,7 +1498,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
         groundTremorTimer.Reset();
         trashTimer.Reset();
         EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
-
+        m_creature->addUnitState(UNIT_STAT_ROOT);
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
 
@@ -1574,7 +1573,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
         // maybe no wait, maybe some wait
         BeamTimer = GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN;
         groundRuptureTimer.Reset();
-
+        m_creature->addUnitState(UNIT_STAT_ROOT);
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
     }
@@ -1637,6 +1636,7 @@ struct flesh_tentacleAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->addUnitState(UNIT_STAT_ROOT);
     }
 
     void UpdateAI(const uint32 diff)
