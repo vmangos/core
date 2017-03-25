@@ -348,6 +348,8 @@ bool CheckForMelee(Creature* m_creature)
 {
     // at first we check for the current player-type target
     Unit* pMainTarget = m_creature->getVictim();
+    if (!pMainTarget) return false;
+
     if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
         pMainTarget->IsWithinMeleeRange(m_creature) && m_creature->IsWithinLOSInMap(pMainTarget))
     {
