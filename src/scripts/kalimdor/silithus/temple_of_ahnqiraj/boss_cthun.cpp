@@ -79,6 +79,10 @@ enum eSpells {
 
 };
 
+enum eSilenceMask {
+    CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED | 
+                              UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING)
+};
 static const float stomachPortPosition[4] = 
 {
     -8562.0f, 2037.0f, -96.0f, 5.05f
@@ -338,100 +342,23 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
     return false;
 }
 
-// Rootet mob-type function for selecting attack target, taken from boss_ragnaros.cpp with
-// one small change. Using pMainTarget->IsWithinMeleeRange(m_creature) instead of the other
-// way around, to make sure the player and the creature always believe they can reach each other
-// at the same distance. IsWithinMeleeRange will return different values for player and creature
-// unless boundingradius and combatreach are very fine tuned it seems.
-// if recheckFirstTarget is true we always start by going for topaggro target
-// ToDo: Should we reset threat of TopAggro if he leaves melee and a target-swap happens?
+// Rootet mob-type function for selecting attack target
 Unit* CheckForMelee(Creature* m_creature, bool recheckFirstTarget=false, bool eraseThreat=false)
 {
-    // at first we check for the current player-type target
-    Unit* pMainTarget = m_creature->getVictim();
-    if (!pMainTarget) return nullptr;
-
-    if (!recheckFirstTarget) {
-        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
-            pMainTarget->IsWithinMeleeRange(m_creature) && m_creature->IsWithinLOSInMap(pMainTarget))
-        {
+    Unit* victim = nullptr;
+    if (m_creature->SelectHostileTarget()) {
+        victim = m_creature->getVictim();
+        if (victim) {
+            m_creature->SetFacingToObject(victim);
+            m_creature->SetTargetGuid(victim->GetObjectGuid());
             if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
             {
-                m_creature->AttackerStateUpdate(pMainTarget);
+                m_creature->AttackerStateUpdate(victim);
                 m_creature->resetAttackTimer();
             }
-
-            return pMainTarget;
         }
     }
-    // at second we look for any melee player-type target (if current target is not reachable)
-    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
-        SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
-    {
-        if (eraseThreat) {
-            // erase current target's threat as soon as we switch the target now
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
-
-            // give the new target aggro
-            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
-        }
-
-        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
-        {
-            m_creature->SetFacingToObject(pTarget);
-            m_creature->AttackerStateUpdate(pTarget);
-            m_creature->resetAttackTimer();
-        }
-
-        return pTarget;
-    }
-
-    // at third we take any melee pet target just to punch in the face
-    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
-        SELECT_FLAG_PET | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
-    {
-        if (eraseThreat) {
-            // erase current target's threat as soon as we switch the target now
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
-
-            // give the new target aggro
-            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
-        }
-
-        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
-        {
-            m_creature->SetFacingToObject(pTarget);
-            m_creature->AttackerStateUpdate(pTarget);
-            m_creature->resetAttackTimer();
-        }
-
-        return pTarget;
-    }
-
-    // at fourth we take anything to wipe it out and log (whatever, just in case)
-    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
-        SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
-    {
-        if (eraseThreat) {
-            // erase current target's threat as soon as we switch the target now
-            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
-
-            // give the new target aggro
-            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
-        }
-
-        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
-        {
-            m_creature->SetFacingToObject(pTarget);
-            m_creature->AttackerStateUpdate(pTarget);
-            m_creature->resetAttackTimer();
-        }
-        return pTarget;
-        //sLog.outError("[MoltenCore.Ragnaros] Target type #4 reached with name <%s> and entry <%u>.", pTarget->GetName(), pTarget->GetEntry());
-    }
-    return nullptr;
-    // nothing in melee at all
-    //sLog.outError("[MoltenCore.Ragnaros] CheckForMelee hits the end. Nothing in melee.");
+    return victim;
 }
 
 // Same logic for giant and regular claw tentacle, so avoid duplication. 
@@ -1248,8 +1175,10 @@ struct eye_of_cthunAI : public ScriptedAI
                     {
                         m_creature->SetFactionTemporary(14);
                         m_creature->SetInCombatWithZone();
-                        m_creature->CastSpell(pPlayer, SPELL_GREEN_EYE_BEAM, true);
                         initialPullerGuid = pPlayer->GetObjectGuid();
+                        m_creature->SetTargetGuid(initialPullerGuid);
+                        m_creature->SetFacingToObject(pPlayer);
+                        m_creature->CastSpell(pPlayer, SPELL_GREEN_EYE_BEAM, true);
                         ++eyeBeamCastCount;
 
                         Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
@@ -1294,13 +1223,10 @@ struct eye_tentacleAI : public ScriptedAI
     uint64 Portal;
     OnlyOnceSpellTimer groundRuptureTimer;
     instance_temple_of_ahnqiraj* m_pInstance;
-
     eye_tentacleAI(Creature* pCreature) :
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc)
     {
-        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 4);
-        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 4);
         m_pInstance = static_cast<instance_temple_of_ahnqiraj*>(pCreature->GetInstanceData());
 
         SetCombatMovement(false);
@@ -1341,52 +1267,49 @@ struct eye_tentacleAI : public ScriptedAI
     }
 
     void UpdateAI(const uint32 diff)
-    {
-        
-        //Check if we have a target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+    {  
+        if (!m_pInstance->GetPlayerInMap(true, false)) {
+            m_creature->OnLeaveCombat();
+            Reset();
             return;
         }
-        ObjectGuid victGuid = m_creature->getVictim()->GetGUID();
-        sLog.outBasic("victim: %llu - target: %llu", victGuid, currentMFTarget);
-        if (groundRuptureTimer.Update(diff))
+
+        if (!groundRuptureTimer.Update(diff))
+            return;
+
+        // If we are not already casting, try to start casting
+        if(!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL))
         {
-            // If we are not already casting, try to start casting
-            if(!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL))
-            {
+            currentMFTarget = 0;
+            bool didCast = false;
+            // Rough check against common auras that prevent the creature from casting,
+            // before getting a random target etc
+            if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, CANNOT_CAST_SPELL_MASK)) {
                 if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
                 {
-                    if (!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL)) {
-                        if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK) {
-                            //todo: cant get them to turn to a new target. They keep targeting initial target,
-                            // even though they cast on another (random, correct) target
-                            m_creature->SetFacingToObject(target);
-                            currentMFTarget = target->GetGUID();
-                            m_creature->SetTargetGuid(currentMFTarget);
-                        }
-                        else {
-                            CheckForMelee(m_creature);
-                        }
+                    if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK) {
+                        currentMFTarget = target->GetGUID();
+                        m_creature->SetFacingToObject(target);
+                        m_creature->SetTargetGuid(currentMFTarget);
+                        didCast = true;
                     }
                 }
             }
-            else {
-                // Cancel the channel of mindflay if target has been ported to stomach
-                if (m_creature->getVictim()->GetPositionZ() < -30.0f) {
+            if (!didCast) {
+                CheckForMelee(m_creature);
+            }
+
+        }
+        else {
+            Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(currentMFTarget);
+            if (currentCastTarget) {
+                // Stop casting on current target if it's been ported to stomach
+                const CThunStomachList& lst = m_pInstance->GetPlayersInStomach();
+                if (PlayerInStomach(currentCastTarget, lst)) {
                     m_creature->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
-                }
-                else {
-                    m_creature->SetFacingToObject(m_pInstance->GetMap()->GetWorldObject(currentMFTarget));
-                    m_creature->SetTargetGuid(currentMFTarget);
                 }
             }
         }
-        /*
-        // Only attack if we already did ground rupture, and it's more than 1s ago
-        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
-            DoMeleeAttackIfReady();
-        }
-        */
     }
 };
 
@@ -1443,11 +1366,13 @@ struct claw_tentacleAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        //Check if we have a target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance->GetPlayerInMap(true, false)) {
+            m_creature->OnLeaveCombat();
+            Reset();
             return;
+        }
 
-        if (CheckForMelee(m_creature)) {
+        if (CheckForMelee(m_creature, true, false)) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
@@ -1487,8 +1412,6 @@ struct giant_claw_tentacleAI : public ScriptedAI
 
         SetCombatMovement(false);
         Reset();
-        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 10);
-        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 10);
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
             Portal = pPortal->GetObjectGuid();
     }
@@ -1520,11 +1443,13 @@ struct giant_claw_tentacleAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        //Check if we have a target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_pInstance->GetPlayerInMap(true, false)) {
+            m_creature->OnLeaveCombat();
+            Reset();
             return;
+        }
 
-        if (CheckForMelee(m_creature)) {
+        if (CheckForMelee(m_creature, true, false)) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
@@ -1562,8 +1487,6 @@ struct giant_eye_tentacleAI : public ScriptedAI
         m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
 
         Reset();
-        m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 8);
-        m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 8);
 
         if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0))
             Portal = pPortal->GetObjectGuid();
@@ -1593,6 +1516,12 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
+        if (!m_pInstance->GetPlayerInMap(true, false)) {
+            m_creature->OnLeaveCombat();
+            Reset();
+            return;
+        }
+
         if (!groundRuptureTimer.Update(diff))
             return;
         
@@ -1601,21 +1530,25 @@ struct giant_eye_tentacleAI : public ScriptedAI
         }
 
         if (BeamTimer < diff ) {
-            if (Player* target = SelectRandomAliveNotStomach(m_pInstance)) {
-                //m_creature->InterruptNonMeleeSpells(false);
-                if (CanCastSpell(target, sSpellMgr.GetSpellEntry(SPELL_GREEN_EYE_BEAM), false) == CanCastResult::CAST_OK) {
-                    beamTargetGuid = target->GetObjectGuid();
-                    m_creature->SetTargetGuid(target->GetObjectGuid());
-                    m_creature->SetFacingToObject(target);
-                    m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
-                    BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
-                }
-                else {
-                    if (Unit* meleeTarget = CheckForMelee(m_creature, true, false)) {
-                        m_creature->SetTargetGuid(meleeTarget->GetObjectGuid());
-                        m_creature->SetFacingToObject(meleeTarget);
+            bool didCast = false;
+            // Rough check against common auras that prevent the creature from casting,
+            // before getting a random target etc
+            if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, CANNOT_CAST_SPELL_MASK)) {
+                if (Player* target = SelectRandomAliveNotStomach(m_pInstance)) {
+                    // need to check if we can cast before doing so, because if we update target
+                    // after initiating the cast, the cast animation dissapear for some reason
+                    if (CanCastSpell(target, sSpellMgr.GetSpellEntry(SPELL_GREEN_EYE_BEAM), false) == CanCastResult::CAST_OK) {
+                        beamTargetGuid = target->GetObjectGuid();
+                        m_creature->SetTargetGuid(target->GetObjectGuid());
+                        m_creature->SetFacingToObject(target);
+                        m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
+                        BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
+                        didCast = true;
                     }
                 }
+            }
+            if (!didCast) {
+                CheckForMelee(m_creature);
             }
         }
         else {
@@ -1623,10 +1556,6 @@ struct giant_eye_tentacleAI : public ScriptedAI
             if (m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
                 Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(beamTargetGuid);
                 if (currentCastTarget) {
-                    // Reinforce current target to override stuff I dont understand
-                    //m_creature->SetFacingToObject(m_pInstance->GetMap()->GetWorldObject(beamTargetGuid));
-                    //m_creature->SetTargetGuid(beamTargetGuid);
-
                     // Stop casting on current target if it's been ported to stomach
                     // and immediately start casting on a new target
                     const CThunStomachList& lst = m_pInstance->GetPlayersInStomach();
@@ -1637,10 +1566,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
                 }
             }
             else {
-                if (Unit* meleeTarget = CheckForMelee(m_creature, true, false)) {
-                    m_creature->SetTargetGuid(meleeTarget->GetObjectGuid());
-                    m_creature->SetFacingToObject(meleeTarget);
-                }
+                CheckForMelee(m_creature);
             }
         }
     }
@@ -1669,7 +1595,7 @@ struct flesh_tentacleAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        CheckForMelee(m_creature);
+        //CheckForMelee(m_creature);
     }
 
     void JustDied(Unit* killer)
