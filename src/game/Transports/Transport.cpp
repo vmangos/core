@@ -190,8 +190,8 @@ void Transport::AddPassenger(WorldObject* passenger)
         if (!passenger->m_movementInfo.t_pos.x)
         {
             passenger->m_movementInfo.t_pos.x = passenger->GetPositionX();
-            passenger->m_movementInfo.t_pos.y = passenger->GetPositionX();
-            passenger->m_movementInfo.t_pos.z = passenger->GetPositionX();
+            passenger->m_movementInfo.t_pos.y = passenger->GetPositionY();
+            passenger->m_movementInfo.t_pos.z = passenger->GetPositionZ();
             passenger->m_movementInfo.t_pos.o = passenger->GetOrientation();
             CalculatePassengerOffset(passenger->m_movementInfo.t_pos.x, passenger->m_movementInfo.t_pos.y, passenger->m_movementInfo.t_pos.z, &passenger->m_movementInfo.t_pos.o);
         }
@@ -288,10 +288,10 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
         WorldObject* obj = (*_passengerTeleportItr++);
 
         float destX, destY, destZ, destO;
-        destX = obj->m_movementInfo.GetTransportPos()->x;
-        destY = obj->m_movementInfo.GetTransportPos()->y;
-        destZ = obj->m_movementInfo.GetTransportPos()->z;
-        destO = obj->m_movementInfo.GetTransportPos()->o;
+        destX = obj->GetTransOffsetX();
+        destY = obj->GetTransOffsetY();
+        destZ = obj->GetTransOffsetZ();
+        destO = obj->GetTransOffsetO();
         CalculatePassengerPosition(destX, destY, destZ, &destO, x, y, z, o);
 
         switch (obj->GetTypeId())
@@ -318,43 +318,17 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                     RemovePassenger(player);
                     break;
                 }
+
                 if (!player->isAlive())
                     player->ResurrectPlayer(1.0f);
+
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_CONFUSE);
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_FEAR);
                 player->CombatStopWithPets(true);
-                // MacOS user ? Teleport to next boat stop position
-                uint32 teleOptions = TELE_TO_NOT_LEAVE_TRANSPORT;
-                if (player->GetSession()->GetOS() == CLIENT_OS_MAC)
-                {
-                    // Find next pause waypoint
-                    KeyFrameVec::const_iterator nextFrame = _nextFrame;
-                    bool looped = false;
-                    while (true)
-                    {
-                        if (nextFrame == GetKeyFrames().end())
-                        {
-                            if (looped)
-                                break;
-                            looped = true;
-                            nextFrame = GetKeyFrames().begin();
-                            continue;
-                        }
-                        if (nextFrame->IsStopFrame() && nextFrame->Node->mapid == newMapid)
-                        {
-                            destX = nextFrame->Node->x;
-                            destY = nextFrame->Node->y;
-                            destZ = nextFrame->Node->z;
-                            destZ = newMap->GetTerrain()->GetWaterOrGroundLevel(destX, destZ, MAX_HEIGHT) + 30.0f;
-                            player->AddAura(130); // Feather fall
-                            teleOptions = 0;
-                            break;
-                        }
-                        ++nextFrame;
-                    }
-                }
-                if (!player->TeleportTo(newMapid, destX, destY, destZ, destO, teleOptions))
-                    RemovePassenger(player);
+
+                player->TeleportTo(newMapid, destX, destY, destZ, destO,
+                                   TELE_TO_NOT_LEAVE_TRANSPORT);
+
                 break;
             }
             case TYPEID_DYNAMICOBJECT:
@@ -367,6 +341,7 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 
     Relocate(x, y, z, o);
     GetMap()->Add<Transport>(this);
+
     return newMap != oldMap;
 }
 
@@ -384,10 +359,10 @@ void Transport::UpdatePassengerPosition(WorldObject* passenger)
     // Do not use Unit::UpdatePosition here, we don't want to remove auras
     // as if regular movement occurred
     float x, y, z, o;
-    x = passenger->m_movementInfo.GetTransportPos()->x;
-    y = passenger->m_movementInfo.GetTransportPos()->y;
-    z = passenger->m_movementInfo.GetTransportPos()->z;
-    o = passenger->m_movementInfo.GetTransportPos()->o;
+    x = passenger->GetTransOffsetX();
+    y = passenger->GetTransOffsetY();
+    z = passenger->GetTransOffsetZ();
+    o = passenger->GetTransOffsetO();
     CalculatePassengerPosition(x, y, z, &o);
     if (!MaNGOS::IsValidMapCoord(x, y, z))
     {
@@ -406,6 +381,7 @@ void Transport::UpdatePassengerPosition(WorldObject* passenger)
             //relocate only passengers in world and skip any player that might be still logging in/teleporting
             if (passenger->IsInWorld())
                 GetMap()->PlayerRelocation(passenger->ToPlayer(), x, y, z, o);
+
             break;
         case TYPEID_GAMEOBJECT:
             //GetMap()->GameObjectRelocation(passenger->ToGameObject(), x, y, z, o, false);
