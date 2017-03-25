@@ -1596,18 +1596,6 @@ struct giant_eye_tentacleAI : public ScriptedAI
                     m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
                     BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
                 }
-                /*
-                if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) != CAST_OK) {
-                    //I cant imagine this is a good idea? It will be untankable, and it should be tanked
-                    //DoResetThreat();
-
-                    //todo: is it needed to manually set highest threat target?
-                    DoMeleeAttackIfReady();
-                }
-                else {
-                    BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
-                }
-                */
             }
             else
                 BeamTimer -= diff;
@@ -1637,37 +1625,13 @@ struct flesh_tentacleAI : public ScriptedAI
     {
     }
 
-    void AttackClosestTarget()
-    {
-        DoResetThreat();
-        // Large aggro radius
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
-            {
-                if (m_creature->IsWithinMeleeRange(pPlayer))
-                {
-                    m_creature->getThreatManager().addThreatDirectly(pPlayer, 500.0f);
-                    m_creature->AI()->AttackStart(pPlayer);
-                    return;
-                }
-            }
-        }
-    }
-
     void UpdateAI(const uint32 diff)
     {
         //Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //EvadeTimer
-        if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-            AttackClosestTarget();
-
-        DoMeleeAttackIfReady();
+        CheckForMelee(m_creature);
     }
 
     void JustDied(Unit* killer)
