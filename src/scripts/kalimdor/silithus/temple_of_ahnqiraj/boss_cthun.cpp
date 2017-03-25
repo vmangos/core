@@ -1306,7 +1306,7 @@ struct eye_tentacleAI : public ScriptedAI
         }
     }
 
-    
+    ObjectGuid currentMFTarget;
     void DoDespawnPortal() {
         if (!Portal) return;
 
@@ -1340,9 +1340,11 @@ struct eye_tentacleAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
             return;
         }
-       
+        ObjectGuid victGuid = m_creature->getVictim()->GetGUID();
+        sLog.outBasic("victim: %llu - target: %llu", victGuid, currentMFTarget);
         if (groundRuptureTimer.Update(diff))
         {
+            // If we are not already casting, try to start casting
             if(!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL))
             {
                 if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
@@ -1352,6 +1354,11 @@ struct eye_tentacleAI : public ScriptedAI
                             //todo: cant get them to turn to a new target. They keep targeting initial target,
                             // even though they cast on another (random, correct) target
                             m_creature->SetFacingToObject(target);
+                            currentMFTarget = target->GetGUID();
+                            m_creature->SetTargetGuid(currentMFTarget);
+                        }
+                        else {
+                            CheckForMelee(m_creature);
                         }
                     }
                 }
@@ -1361,13 +1368,18 @@ struct eye_tentacleAI : public ScriptedAI
                 if (m_creature->getVictim()->GetPositionZ() < -30.0f) {
                     m_creature->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
                 }
+                else {
+                    m_creature->SetFacingToObject(m_pInstance->GetMap()->GetWorldObject(currentMFTarget));
+                    m_creature->SetTargetGuid(currentMFTarget);
+                }
             }
         }
-
+        /*
         // Only attack if we already did ground rupture, and it's more than 1s ago
         if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
             DoMeleeAttackIfReady();
         }
+        */
     }
 };
 
