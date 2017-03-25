@@ -21,6 +21,7 @@ UPDATE creature_template SET unit_flags = unit_flags | 32768 WHERE entry IN (153
   
   -- moved c'thun eye and body slightly towards entrance
 UPDATE creature SET `position_x`='-8577.270', `position_y`='1986.942' WHERE `guid`='87560';
+
 UPDATE creature SET `position_x`='-8577.270', `position_y`='1986.942' WHERE `guid`='87559';
 
 -- Set Giant claw dmg to around 2500 dmg per hit on a full t2 geared tank, with demo shout up. ~3200 without demo shout.
@@ -28,6 +29,9 @@ UPDATE creature_template SET `mindmg`='8500', `maxdmg`='9500' WHERE `entry`='157
 
 -- Set Giant eye dmg to around 2500 dmg per hit on a full t2 geared tank, with demo shout up. ~3200 without demo shout.
 UPDATE creature_template SET `mindmg`='8500', `maxdmg`='9500', `baseattacktime`='2000' WHERE `entry`='15334';
+
+-- Set eye tentacle dmg to around 650-750 dmg per hit on 40% armor
+UPDATE creature_template SET `mindmg`='1000', `maxdmg`='1600', `baseattacktime`='2000' WHERE `entry`='15726';
 
 -- Setting correct scale of claw tentacle
 UPDATE creature_template SET `scale`='2' WHERE `entry`='15725';

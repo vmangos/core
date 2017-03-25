@@ -338,6 +338,124 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
     return false;
 }
 
+// Rootet mob-type function for selecting attack target, taken from boss_ragnaros.cpp with
+// one small change. Using pMainTarget->IsWithinMeleeRange(m_creature) instead of the other
+// way around, to make sure the player and the creature always believe they can reach each other
+// at the same distance. IsWithinMeleeRange will return different values for player and creature
+// unless boundingradius and combatreach are very fine tuned it seems.
+// ToDo: Should we reset threat of TopAggro if he leaves melee and a target-swap happens?
+bool CheckForMelee(Creature* m_creature)
+{
+    // at first we check for the current player-type target
+    Unit* pMainTarget = m_creature->getVictim();
+    if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
+        pMainTarget->IsWithinMeleeRange(m_creature) && m_creature->IsWithinLOSInMap(pMainTarget))
+    {
+        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+        {
+            m_creature->AttackerStateUpdate(pMainTarget);
+            m_creature->resetAttackTimer();
+        }
+
+        return true;
+    }
+
+    // at second we look for any melee player-type target (if current target is not reachable)
+    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+        SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+    {
+        // erase current target's threat as soon as we switch the target now
+        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+        // give the new target aggro
+        m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+
+        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+        {
+            m_creature->SetFacingToObject(pTarget);
+            m_creature->AttackerStateUpdate(pTarget);
+            m_creature->resetAttackTimer();
+        }
+
+        return true;
+    }
+
+    // at third we take any melee pet target just to punch in the face
+    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+        SELECT_FLAG_PET | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+    {
+        // erase current target's threat as soon as we switch the target now
+        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+        // give the new target aggro
+        m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+
+        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+        {
+            m_creature->SetFacingToObject(pTarget);
+            m_creature->AttackerStateUpdate(pTarget);
+            m_creature->resetAttackTimer();
+        }
+
+        return true;
+    }
+
+    // at fourth we take anything to wipe it out and log (whatever, just in case)
+    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
+        SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
+    {
+        // erase current target's threat as soon as we switch the target now
+        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+
+        // give the new target aggro
+        m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+
+        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+        {
+            m_creature->SetFacingToObject(pTarget);
+            m_creature->AttackerStateUpdate(pTarget);
+            m_creature->resetAttackTimer();
+        }
+        return true;
+        //sLog.outError("[MoltenCore.Ragnaros] Target type #4 reached with name <%s> and entry <%u>.", pTarget->GetName(), pTarget->GetEntry());
+    }
+    return false;
+    // nothing in melee at all
+    //sLog.outError("[MoltenCore.Ragnaros] CheckForMelee hits the end. Nothing in melee.");
+}
+
+// Same logic for giant and regular claw tentacle, so avoid duplication. 
+// Returns null until teleport takes place. Returns new target pointer on teleport
+Player* UpdateClawEvade(uint32 diff, uint32& EvadeTimer, Creature* m_creature, 
+    ObjectGuid& Portal, instance_temple_of_ahnqiraj* m_pInstance)
+{
+    if (EvadeTimer < diff)
+    {
+        if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
+        {
+            //Dissapear and reappear at new position
+            m_creature->SetVisibility(VISIBILITY_OFF);
+
+            m_creature->NearTeleportTo(
+                target->GetPositionX() + frand(-1.0f, 1.0f),
+                target->GetPositionY() + frand(-1.0f, 1.0f),
+                target->GetPositionZ(),
+                0);
+
+            if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
+            {
+                pCreature->SetVisibility(VISIBILITY_OFF);
+                pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
+                pCreature->SetVisibility(VISIBILITY_ON);
+            }
+            m_creature->SetVisibility(VISIBILITY_ON);
+            return target;
+        }
+    }
+    else
+        EvadeTimer -= diff;
+    return nullptr;
+}
 
 // Helper functions for SpellTimer users
 Unit* selectRandNotStomachFunc(Creature* c) {
@@ -1243,17 +1361,22 @@ struct eye_tentacleAI : public ScriptedAI
                 }
             }
         }
+
+        // Only attack if we already did ground rupture, and it's more than 1s ago
+        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
+            DoMeleeAttackIfReady();
+        }
     }
 };
 
 struct claw_tentacleAI : public ScriptedAI
 {
     uint32 EvadeTimer;
-    uint64 Portal;
+    ObjectGuid Portal;
     OnlyOnceSpellTimer groundRuptureTimer;
     SpellTimer hamstringTimer;
     instance_temple_of_ahnqiraj* m_pInstance;
-
+    
     claw_tentacleAI(Creature* pCreature) : 
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc),
@@ -1297,80 +1420,26 @@ struct claw_tentacleAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void AttackClosestTarget()
-    {
-        DoResetThreat();
-        // Large aggro radius
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
-            {
-                if (m_creature->IsWithinMeleeRange(pPlayer))
-                {
-                    m_creature->getThreatManager().addThreatDirectly(pPlayer, 500.0f);
-                    m_creature->AI()->AttackStart(pPlayer);
-                    return;
-                }
-            }
-        }
-    }
-
     void UpdateAI(const uint32 diff)
     {
         //Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //EvadeTimer
-        if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-        {
-            AttackClosestTarget();
-            if (EvadeTimer < diff)
-            {
-                if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
-                {
-                    //Dissapear and reappear at new position
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-
-                    m_creature->NearTeleportTo(
-                        target->GetPositionX() + frand(-1.0f, 1.0f),
-                        target->GetPositionY() + frand(-1.0f, 1.0f),
-                        target->GetPositionZ(),
-                        0);
-
-                    if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
-                    {
-                        pCreature->SetVisibility(VISIBILITY_OFF);
-                        pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
-                        pCreature->SetVisibility(VISIBILITY_ON);
-                    }
-                        
-                    groundRuptureTimer.Reset();
-                    
-                    hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
-                    
-                    EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
-                    AttackStart(target);
-
-                    m_creature->SetVisibility(VISIBILITY_ON);
-                }
-            }
-            else
-                EvadeTimer -= diff;
-        }
-        else
+        if (CheckForMelee(m_creature)) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+        }
+        else {
+            if (Player* target = UpdateClawEvade(diff, EvadeTimer, m_creature, Portal, m_pInstance)) {
+                m_creature->resetAttackTimer();
+                groundRuptureTimer.Reset();
+                hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
+                EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+            }
+        }
 
         groundRuptureTimer.Update(diff);
-
         hamstringTimer.Update(diff);
-        
-        // Only attack if we already did ground rupture, and more than CLAW_TENTACLE_FIRST_MELEE_DELAY time passed
-        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
-            DoMeleeAttackIfReady();
-        }
     }
 };
 
@@ -1381,6 +1450,9 @@ struct giant_claw_tentacleAI : public ScriptedAI
     SpellTimer groundTremorTimer;
     SpellTimer trashTimer;
     instance_temple_of_ahnqiraj* m_pInstance;
+    uint32 EvadeTimer;
+    ObjectGuid Portal;
+
     giant_claw_tentacleAI(Creature* pCreature) : 
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_NATURE, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc),
@@ -1400,9 +1472,6 @@ struct giant_claw_tentacleAI : public ScriptedAI
             Portal = pPortal->GetObjectGuid();
     }
 
-    uint32 EvadeTimer;
-    uint64 Portal;
-
     void JustDied(Unit*)
     {
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
@@ -1412,7 +1481,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
     void Reset()
     {
         groundRuptureTimer.Reset();
-        hamstringTimer.Reset();
+        hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
         groundTremorTimer.Reset();
         trashTimer.Reset();
         EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
@@ -1428,81 +1497,30 @@ struct giant_claw_tentacleAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
     }
 
-    void AttackClosestTarget()
-    {
-        DoResetThreat();
-        // Large aggro radius
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
-            {
-                if (m_creature->IsWithinMeleeRange(pPlayer))
-                {
-                    m_creature->getThreatManager().addThreatDirectly(pPlayer, 500.0f);
-                    m_creature->AI()->AttackStart(pPlayer);
-                    return;
-                }
-            }
-        }
-    }
-
     void UpdateAI(const uint32 diff)
     {
         //Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //EvadeTimer
-        if (!m_creature->IsWithinMeleeRange(m_creature->getVictim()))
-        {
-            AttackClosestTarget();
-            if (EvadeTimer < diff)
-            {
-                
-                if (Unit* target = SelectRandomAliveNotStomach(m_pInstance))
-                {
-                    //Dissapear and reappear at new position
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-
-                    m_creature->NearTeleportTo(
-                        target->GetPositionX() + frand(-1.0f, 1.0f),
-                        target->GetPositionY() + frand(-1.0f, 1.0f),
-                        target->GetPositionZ(),
-                        0);
-
-                    if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
-                    {
-                        pCreature->SetVisibility(VISIBILITY_OFF);
-                        pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
-                        pCreature->SetVisibility(VISIBILITY_ON);
-                    }
-
-                    groundRuptureTimer.Reset();
-                    hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
-
-                    EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
-                    AttackStart(target);
-
-                    m_creature->SetVisibility(VISIBILITY_ON);
-                }
-            }
-            else
-                EvadeTimer -= diff;
-        }
-        else
+        if (CheckForMelee(m_creature)) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+        }
+        else {
+            if (Player* target = UpdateClawEvade(diff, EvadeTimer, m_creature, Portal, m_pInstance)) {
+                m_creature->resetAttackTimer();
+                groundRuptureTimer.Reset();
+                hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
+                groundTremorTimer.Reset();
+                trashTimer.Reset();
+                EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+            }
+        }
 
         groundTremorTimer.Update(diff);
         groundRuptureTimer.Update(diff);
         hamstringTimer.Update(diff);
         trashTimer.Update(diff);
-
-        // Only attack if we already did ground rupture, and it's more than 1s ago
-        if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
-            DoMeleeAttackIfReady();
-        }
     }
 };
 
@@ -1597,6 +1615,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
         // Only attack if we already did ground rupture, and it's more than 1s ago
         if (groundRuptureTimer.DidCast() && groundRuptureTimer.TimeSinceLast() > CLAW_TENTACLE_FIRST_MELEE_DELAY) {
+            CheckForMelee(m_creature);
             DoMeleeAttackIfReady();
         }
     }
