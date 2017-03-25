@@ -343,34 +343,38 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
 // way around, to make sure the player and the creature always believe they can reach each other
 // at the same distance. IsWithinMeleeRange will return different values for player and creature
 // unless boundingradius and combatreach are very fine tuned it seems.
+// if recheckFirstTarget is true we always start by going for topaggro target
 // ToDo: Should we reset threat of TopAggro if he leaves melee and a target-swap happens?
-bool CheckForMelee(Creature* m_creature)
+Unit* CheckForMelee(Creature* m_creature, bool recheckFirstTarget=false, bool eraseThreat=false)
 {
     // at first we check for the current player-type target
     Unit* pMainTarget = m_creature->getVictim();
-    if (!pMainTarget) return false;
+    if (!pMainTarget) return nullptr;
 
-    if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
-        pMainTarget->IsWithinMeleeRange(m_creature) && m_creature->IsWithinLOSInMap(pMainTarget))
-    {
-        if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+    if (!recheckFirstTarget) {
+        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
+            pMainTarget->IsWithinMeleeRange(m_creature) && m_creature->IsWithinLOSInMap(pMainTarget))
         {
-            m_creature->AttackerStateUpdate(pMainTarget);
-            m_creature->resetAttackTimer();
+            if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+            {
+                m_creature->AttackerStateUpdate(pMainTarget);
+                m_creature->resetAttackTimer();
+            }
+
+            return pMainTarget;
         }
-
-        return true;
     }
-
     // at second we look for any melee player-type target (if current target is not reachable)
     if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
         SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
     {
-        // erase current target's threat as soon as we switch the target now
-        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        if (eraseThreat) {
+            // erase current target's threat as soon as we switch the target now
+            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
 
-        // give the new target aggro
-        m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+            // give the new target aggro
+            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+        }
 
         if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
         {
@@ -379,18 +383,20 @@ bool CheckForMelee(Creature* m_creature)
             m_creature->resetAttackTimer();
         }
 
-        return true;
+        return pTarget;
     }
 
     // at third we take any melee pet target just to punch in the face
     if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
         SELECT_FLAG_PET | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
     {
-        // erase current target's threat as soon as we switch the target now
-        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        if (eraseThreat) {
+            // erase current target's threat as soon as we switch the target now
+            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
 
-        // give the new target aggro
-        m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+            // give the new target aggro
+            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+        }
 
         if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
         {
@@ -399,18 +405,20 @@ bool CheckForMelee(Creature* m_creature)
             m_creature->resetAttackTimer();
         }
 
-        return true;
+        return pTarget;
     }
 
     // at fourth we take anything to wipe it out and log (whatever, just in case)
     if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0, nullptr,
         SELECT_FLAG_NOT_PLAYER | SELECT_FLAG_IN_LOS | SELECT_FLAG_IN_MELEE_RANGE))
     {
-        // erase current target's threat as soon as we switch the target now
-        m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        if (eraseThreat) {
+            // erase current target's threat as soon as we switch the target now
+            m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
 
-        // give the new target aggro
-        m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+            // give the new target aggro
+            m_creature->getThreatManager().modifyThreatPercent(pTarget, 100);
+        }
 
         if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
         {
@@ -418,10 +426,10 @@ bool CheckForMelee(Creature* m_creature)
             m_creature->AttackerStateUpdate(pTarget);
             m_creature->resetAttackTimer();
         }
-        return true;
+        return pTarget;
         //sLog.outError("[MoltenCore.Ragnaros] Target type #4 reached with name <%s> and entry <%u>.", pTarget->GetName(), pTarget->GetEntry());
     }
-    return false;
+    return nullptr;
     // nothing in melee at all
     //sLog.outError("[MoltenCore.Ragnaros] CheckForMelee hits the end. Nothing in melee.");
 }
