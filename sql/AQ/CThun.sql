@@ -6,6 +6,8 @@ UPDATE creature_template SET modelid_1 = 15788 WHERE entry = 15726;
 
 -- Correct giant eye tentacle scale
 UPDATE creature_template SET scale = 5 WHERE entry = 15334;
+-- Correct eye tentacle scale
+UPDATE creature_template SET `scale`='1' WHERE `entry`='15726';
 
 -- Correct giant claw tentacle scale
 UPDATE creature_template SET scale = 5 WHERE entry = 15728;
@@ -13,8 +15,7 @@ UPDATE creature_template SET scale = 5 WHERE entry = 15728;
 -- Setting correct scale of claw tentacle
 UPDATE creature_template SET `scale`='2' WHERE `entry`='15725';
 
--- Setting correct scale of Eye Tentacle
-UPDATE creature_template SET `scale`='1' WHERE `entry`='15726';
+
 
 
 -- cmangos unit flags C'Thun tentacles TOD : search flags name
@@ -29,15 +30,15 @@ UPDATE creature_template SET unit_flags = unit_flags | 32768 WHERE entry IN (153
   
   -- Giant claw tentacle fix melee range
   UPDATE creature_model_info set `combat_reach` = 10, `bounding_radius` = 1.2  where `modelid` = 15790;	
-
-  -- Giant Eye tentacle fix melee range
-  UPDATE creature_model_info set `combat_reach` = 10, `bounding_radius` = 1.2  where `modelid` = 15788;	
-  
   -- Claw tentacle fix melee range
   UPDATE creature_model_info set `combat_reach` = 3.5, `bounding_radius` = 1.89  where `modelid` = 15789;	
   
-  -- Eye tentacle fix melee range
-  UPDATE creature_model_info set `combat_reach` = 3.5, `bounding_radius` = 1.2  where `modelid` = 15788;	
+  -- combat reach fixes for eye tentacles. Since they use same modelId atm it may need to be overwritten in code
+   -- if 2 and 10 seems wrong.
+  -- Giant Eye tentacle fix melee range
+  UPDATE creature_model_info set `combat_reach` = 2, `bounding_radius` = 1.2  where `modelid` = 15788;	  
+  -- Eye tentacle
+  -- UPDATE creature_model_info set `combat_reach` = 3.5, `bounding_radius` = 1.2  where `modelid` = 15788;	
   
 
   
