@@ -4413,6 +4413,21 @@ void Unit::RemoveAuraHolderFromStack(uint32 spellId, uint32 stackAmount, ObjectG
     }
 }
 
+void Unit::RemoveSingleAuraDueToItemSet(uint32 spellId, AuraRemoveMode mode)
+{
+    SpellAuraHolderBounds bounds = GetSpellAuraHolderBounds(spellId);
+    for (SpellAuraHolderMap::iterator iter = bounds.first; iter != bounds.second;)
+    {
+        if (!iter->second->GetCastItemGuid())
+        {
+            RemoveSpellAuraHolder(iter->second, mode);
+            return;
+        }
+        else
+            ++iter;
+    }
+}
+
 void Unit::RemoveAurasDueToSpell(uint32 spellId, SpellAuraHolder* except, AuraRemoveMode mode)
 {
     SpellAuraHolderBounds bounds = GetSpellAuraHolderBounds(spellId);
