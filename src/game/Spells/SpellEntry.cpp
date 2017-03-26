@@ -169,8 +169,11 @@ void SpellEntry::ComputeBinary()
         }
     }
     _isBinary = foundNoDamageAura;
-    if (Id == 26143) {
+    if (Id == 26143) {              // SPELL_MIND_FLAY (C'Thuns Eye Tentacles)
         _isBinary = true;
+    }
+    else if (Id == 26478) {
+        _isBinary = true;           // SPELL_GROUND_RUPTURE_NATURE (C'thuns Giant tentacles ground rupture)
     }
 }
 
