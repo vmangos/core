@@ -340,7 +340,7 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
 }
 
 // Rootet mob-type function for selecting attack target
-Unit* CheckForMelee(Creature* m_creature, bool recheckFirstTarget=false, bool eraseThreat=false)
+Unit* CheckForMelee(Creature* m_creature)
 {
     Unit* victim = nullptr;
     
@@ -1396,7 +1396,7 @@ struct claw_tentacleAI : public ScriptedAI
             return;
         }
 
-        if (CheckForMelee(m_creature, true, false)) {
+        if (CheckForMelee(m_creature)) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
@@ -1473,7 +1473,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
             return;
         }
 
-        if (CheckForMelee(m_creature, true, false)) {
+        if (CheckForMelee(m_creature)) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
