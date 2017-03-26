@@ -340,7 +340,7 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
 }
 
 // Rootet mob-type function for selecting attack target
-Unit* CheckForMelee(Creature* m_creature)
+Unit* CheckForMelee(Creature* m_creature, ObjectGuid prevTarget)
 {
     Unit* victim = nullptr;
     
@@ -349,14 +349,19 @@ Unit* CheckForMelee(Creature* m_creature)
         
         
         if (victim) {
-            m_creature->SetFacingToObject(victim);
-            m_creature->SetTargetGuid(victim->GetObjectGuid());
-
+            if (prevTarget != victim->GetObjectGuid()) {
+                m_creature->SetFacingToObject(victim);
+                m_creature->SetTargetGuid(victim->GetObjectGuid());
+            }
             // this will get us the highest threat target in meleee range, but
             // if there is only one person on the threat list it will attack that 
             // target regardless, so we need to check the range manually as well
             if (!m_creature->CanReachWithMeleeAttack(victim)) {
-                m_creature->AttackStop();
+                if (m_creature->hasUnitState(UNIT_STAT_MELEE_ATTACKING)) {
+                    m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
+                    m_creature->InterruptSpell(CURRENT_MELEE_SPELL);
+                }
+                //m_creature->AttackStop();
                 return nullptr;
             }
             else if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
@@ -1233,7 +1238,7 @@ struct eye_tentacleAI : public ScriptedAI
     OnlyOnceSpellTimer groundRuptureTimer;
     instance_temple_of_ahnqiraj* m_pInstance;
     uint32 nextMFAttempt;
-
+    ObjectGuid previousTarget;
     eye_tentacleAI(Creature* pCreature) :
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc)
@@ -1266,6 +1271,8 @@ struct eye_tentacleAI : public ScriptedAI
 
     void Reset()
     {
+        //m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.2f);
+        //m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 3.5f);
         m_creature->addUnitState(UNIT_STAT_ROOT);
         DoDespawnPortal();
         m_creature->SetInCombatWithZone();
@@ -1310,6 +1317,7 @@ struct eye_tentacleAI : public ScriptedAI
                     {
                         if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK) {
                             currentMFTarget = target->GetGUID();
+                            previousTarget = currentMFTarget;
                             m_creature->SetFacingToObject(target);
                             m_creature->SetTargetGuid(currentMFTarget);
                             didCast = true;
@@ -1320,7 +1328,9 @@ struct eye_tentacleAI : public ScriptedAI
                 }
             }
             if (!didCast) {
-                CheckForMelee(m_creature);
+                if (Unit* pU = CheckForMelee(m_creature, previousTarget)) {
+                    previousTarget = pU->GetObjectGuid();
+                }
             }
 
         }
@@ -1344,7 +1354,8 @@ struct claw_tentacleAI : public ScriptedAI
     OnlyOnceSpellTimer groundRuptureTimer;
     SpellTimer hamstringTimer;
     instance_temple_of_ahnqiraj* m_pInstance;
-    
+    ObjectGuid previousTarget;
+
     claw_tentacleAI(Creature* pCreature) : 
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc),
@@ -1396,7 +1407,8 @@ struct claw_tentacleAI : public ScriptedAI
             return;
         }
 
-        if (CheckForMelee(m_creature)) {
+        if (Unit* uP = CheckForMelee(m_creature, previousTarget)) {
+            previousTarget = uP->GetObjectGuid();
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
@@ -1422,6 +1434,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
     instance_temple_of_ahnqiraj* m_pInstance;
     uint32 EvadeTimer;
     ObjectGuid Portal;
+    ObjectGuid previousTarget;
 
     giant_claw_tentacleAI(Creature* pCreature) : 
         ScriptedAI(pCreature),
@@ -1473,7 +1486,8 @@ struct giant_claw_tentacleAI : public ScriptedAI
             return;
         }
 
-        if (CheckForMelee(m_creature)) {
+        if (Unit* uP = CheckForMelee(m_creature, previousTarget)) {
+            previousTarget = uP->GetObjectGuid();
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
@@ -1501,6 +1515,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
     uint64 Portal;
     instance_temple_of_ahnqiraj* m_pInstance;
     ObjectGuid beamTargetGuid;
+    ObjectGuid previousTarget;
 
     giant_eye_tentacleAI(Creature* pCreature) : 
         ScriptedAI(pCreature),
@@ -1524,6 +1539,8 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
     void Reset()
     {
+        //m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.2f);
+        //m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 10.0f);
         // todo: how long should it wait after ground rupture to do first beam?
         // maybe no wait, maybe some wait
         BeamTimer = GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN;
@@ -1563,6 +1580,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
                     // after initiating the cast, the cast animation dissapear for some reason
                     if (CanCastSpell(target, sSpellMgr.GetSpellEntry(SPELL_GREEN_EYE_BEAM), false) == CanCastResult::CAST_OK) {
                         beamTargetGuid = target->GetObjectGuid();
+                        previousTarget = beamTargetGuid;
                         m_creature->SetTargetGuid(target->GetObjectGuid());
                         m_creature->SetFacingToObject(target);
                         m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
@@ -1572,7 +1590,9 @@ struct giant_eye_tentacleAI : public ScriptedAI
                 }
             }
             if (!didCast) {
-                CheckForMelee(m_creature);
+                if (Unit* pU = CheckForMelee(m_creature, previousTarget)) {
+                    previousTarget = pU->GetObjectGuid();
+                }
             }
         }
         else {
@@ -1590,7 +1610,9 @@ struct giant_eye_tentacleAI : public ScriptedAI
                 }
             }
             else {
-                CheckForMelee(m_creature);
+                if (Unit* pU = CheckForMelee(m_creature, previousTarget)) {
+                    previousTarget = pU->GetObjectGuid();
+                }
             }
         }
     }
