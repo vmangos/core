@@ -279,10 +279,7 @@ Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
     j = temp.begin();
 
     if (temp.size() > 1) {
-        
-        uint32 randval = urand(0, temp.size() - 1);
-        sLog.outBasic("%d, %d", randval);
-        advance(j, randval);
+        advance(j, urand(0, temp.size() - 1));
     }
 
     return (*j);
@@ -451,6 +448,7 @@ uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN            = 5000; // How long does a c
 
 uint32 GIANT_EYE_BEAM_COOLDOWN                      = 2100; // How often will giant eye tentacles cast green beam
 uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN        = 0;    // How long will giant eye wait after spawn before casting
+uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500;
 // =======================================================
 
 struct cthunAI : public ScriptedAI
@@ -1223,6 +1221,8 @@ struct eye_tentacleAI : public ScriptedAI
     uint64 Portal;
     OnlyOnceSpellTimer groundRuptureTimer;
     instance_temple_of_ahnqiraj* m_pInstance;
+    uint32 nextMFAttempt;
+
     eye_tentacleAI(Creature* pCreature) :
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc)
@@ -1259,6 +1259,7 @@ struct eye_tentacleAI : public ScriptedAI
         DoDespawnPortal();
         m_creature->SetInCombatWithZone();
         groundRuptureTimer.Reset();
+        nextMFAttempt = 0;
     }
 
     void Aggro(Unit* pWho)
@@ -1277,6 +1278,13 @@ struct eye_tentacleAI : public ScriptedAI
         if (!groundRuptureTimer.Update(diff))
             return;
 
+        if (nextMFAttempt > diff) {
+            nextMFAttempt -= diff;
+        }
+        else {
+            nextMFAttempt = 0;
+        }
+
         // If we are not already casting, try to start casting
         if(!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL))
         {
@@ -1285,14 +1293,19 @@ struct eye_tentacleAI : public ScriptedAI
             // Rough check against common auras that prevent the creature from casting,
             // before getting a random target etc
             if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, CANNOT_CAST_SPELL_MASK)) {
-                if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
-                {
-                    if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK) {
-                        currentMFTarget = target->GetGUID();
-                        m_creature->SetFacingToObject(target);
-                        m_creature->SetTargetGuid(currentMFTarget);
-                        didCast = true;
+                // nextMFAttempt acts as a fake gcd in case of resist
+                if (nextMFAttempt == 0) {
+                    if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
+                    {
+                        if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK) {
+                            currentMFTarget = target->GetGUID();
+                            m_creature->SetFacingToObject(target);
+                            m_creature->SetTargetGuid(currentMFTarget);
+                            didCast = true;
+                            nextMFAttempt = MIND_FLAY_COOLDOWN_ON_RESIST;
+                        }
                     }
+
                 }
             }
             if (!didCast) {

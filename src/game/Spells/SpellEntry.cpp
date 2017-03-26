@@ -169,6 +169,9 @@ void SpellEntry::ComputeBinary()
         }
     }
     _isBinary = foundNoDamageAura;
+    if (Id == 26143) {
+        _isBinary = true;
+    }
 }
 
 void SpellEntry::ComputeDispel()
