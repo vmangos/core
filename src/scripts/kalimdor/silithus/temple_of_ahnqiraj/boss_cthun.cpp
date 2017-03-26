@@ -343,12 +343,23 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
 Unit* CheckForMelee(Creature* m_creature, bool recheckFirstTarget=false, bool eraseThreat=false)
 {
     Unit* victim = nullptr;
+    
     if (m_creature->SelectHostileTarget()) {
         victim = m_creature->getVictim();
+        
+        
         if (victim) {
             m_creature->SetFacingToObject(victim);
             m_creature->SetTargetGuid(victim->GetObjectGuid());
-            if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
+
+            // this will get us the highest threat target in meleee range, but
+            // if there is only one person on the threat list it will attack that 
+            // target regardless, so we need to check the range manually as well
+            if (!m_creature->CanReachWithMeleeAttack(victim)) {
+                m_creature->AttackStop();
+                return nullptr;
+            }
+            else if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
             {
                 m_creature->AttackerStateUpdate(victim);
                 m_creature->resetAttackTimer();
