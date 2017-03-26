@@ -29,15 +29,17 @@ UPDATE creature_template SET unit_flags = unit_flags | 32768 WHERE entry IN (153
   
   -- Giant claw tentacle fix melee range
   UPDATE creature_model_info set `combat_reach` = 10, `bounding_radius` = 1.2  where `modelid` = 15790;	
+
+  -- Giant Eye tentacle fix melee range
+  UPDATE creature_model_info set `combat_reach` = 10, `bounding_radius` = 1.2  where `modelid` = 15788;	
   
   -- Claw tentacle fix melee range
-  UPDATE creature_model_info set `combat_reach` = 10, `bounding_radius` = 1.89  where `modelid` = 15789;	
+  UPDATE creature_model_info set `combat_reach` = 3.5, `bounding_radius` = 1.89  where `modelid` = 15789;	
   
   -- Eye tentacle fix melee range
   UPDATE creature_model_info set `combat_reach` = 3.5, `bounding_radius` = 1.2  where `modelid` = 15788;	
   
-  -- Giant Eye tentacle fix melee range
-  UPDATE creature_model_info set `combat_reach` = 3.5, `bounding_radius` = 1.2  where `modelid` = 15788;	
+
   
   
   -- moved c'thun eye and body slightly towards entrance
