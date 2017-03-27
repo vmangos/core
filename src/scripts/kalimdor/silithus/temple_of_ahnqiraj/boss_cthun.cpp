@@ -79,10 +79,9 @@ enum eSpells {
 
 };
 
-enum eSilenceMask {
-    CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED | 
-                              UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING)
-};
+uint32 CANNOT_CAST_SPELL_MASK = CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
+                                                        | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
+    
 static const float stomachPortPosition[4] = 
 {
     -8562.0f, 2037.0f, -96.0f, 5.05f
