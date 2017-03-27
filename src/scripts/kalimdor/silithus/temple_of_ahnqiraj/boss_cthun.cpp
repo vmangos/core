@@ -338,6 +338,52 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
     return false;
 }
 
+void FixPortalPosition(Creature* m_creature, Unit* pPortal, uint32 portalID) {
+    float radius;
+    switch (portalID) {
+    case MOB_SMALL_PORTAL: radius = 3.0f; break;
+    case MOB_GIANT_PORTAL: radius = 8.0f; break;
+    default:
+        radius = 3.0f;
+        sLog.outError("C'thun SpawnPortal unknown portalI %d", portalID);
+    }
+    //Searching for best z-coordinate to place the portal
+    float centerX = m_creature->GetPositionX();
+    float centerY = m_creature->GetPositionY();
+    float useZ = m_creature->GetPositionZ();
+    float angle = 360.0f / 8.0f;
+    float highZ = useZ;
+    float avg_height = 0.0f;
+    uint8 inliers = 0;
+    for (uint8 i = 0; i < 8; i++)
+    {
+        float x = centerX + cos(((float)i * angle) * (3.14f / 180.0f)) * radius;
+        float y = centerY + sin(((float)i * angle) * (3.14f / 180.0f)) * radius;
+        float z = m_creature->GetMap()->GetHeight(x, y, useZ);
+        float deviation = abs(useZ - z);
+        // Any deviation >= 0.5 we consider outliers as we dont want to handle sloped terrain
+        if (deviation < 0.5f) {
+            if (z > highZ)
+                highZ = z;
+            avg_height += z;
+            inliers++;
+        }
+    }
+    avg_height /= inliers;
+    // Only move portal up if the average height is higher than the creatures height
+    if (avg_height > useZ) {
+        useZ = highZ;
+    }
+    pPortal->NearLandTo(m_creature->GetPositionX(), m_creature->GetPositionY(), useZ, 0);
+}
+
+ObjectGuid SpawnPortal(Creature* m_creature, ScriptedAI* ai, uint32 portalID) {
+    Unit* pPortal = ai->DoSpawnCreature(portalID, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000);
+    if (!pPortal) return ObjectGuid();
+    FixPortalPosition(m_creature, pPortal, portalID);
+    return pPortal->GetObjectGuid();
+}
+
 // Rootet mob-type function for selecting attack target
 Unit* CheckForMelee(Creature* m_creature, ObjectGuid prevTarget)
 {
@@ -394,7 +440,8 @@ Player* UpdateClawEvade(uint32 diff, uint32& EvadeTimer, Creature* m_creature,
             if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             {
                 pCreature->SetVisibility(VISIBILITY_OFF);
-                pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
+                FixPortalPosition(m_creature, pCreature, pCreature->GetEntry());
+                //pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
                 pCreature->SetVisibility(VISIBILITY_ON);
             }
             m_creature->SetVisibility(VISIBILITY_ON);
@@ -463,7 +510,8 @@ uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN            = 5000; // How long does a c
 
 uint32 GIANT_EYE_BEAM_COOLDOWN                      = 2100; // How often will giant eye tentacles cast green beam
 uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN        = 0;    // How long will giant eye wait after spawn before casting
-uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500;
+uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500; // How long do we wait if Eye Tentacle MF resists before retrying cast
+uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 2000; // How long do we wait after Eye tentacle has spawned until first MF
 // =======================================================
 
 struct cthunAI : public ScriptedAI
@@ -1238,6 +1286,8 @@ struct eye_tentacleAI : public ScriptedAI
     instance_temple_of_ahnqiraj* m_pInstance;
     uint32 nextMFAttempt;
     ObjectGuid previousTarget;
+    ObjectGuid currentMFTarget;
+
     eye_tentacleAI(Creature* pCreature) :
         ScriptedAI(pCreature),
         groundRuptureTimer(pCreature, SPELL_GROUND_RUPTURE_PHYSICAL, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc)
@@ -1246,37 +1296,23 @@ struct eye_tentacleAI : public ScriptedAI
 
         SetCombatMovement(false);
         Reset();
-        float rZ = std::max(100.52f, m_creature->GetPositionZ()) - m_creature->GetPositionZ();
-        if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, rZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
-        {
-            pPortal->addUnitState(UNIT_STAT_CAN_NOT_MOVE);
-            sLog.outBasic("%.3f", pPortal->GetPositionZ());
-            Portal = pPortal->GetObjectGuid();
-        }
-    }
-
-    ObjectGuid currentMFTarget;
-    void DoDespawnPortal() {
-        if (!Portal) return;
-
-        if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
-            pCreature->ForcedDespawn();
+        Portal = SpawnPortal(m_creature, this, MOB_SMALL_PORTAL);
     }
 
     void JustDied(Unit*)
     {
-        DoDespawnPortal();
+        if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
+            pCreature->ForcedDespawn();
     }
 
     void Reset()
     {
-        //m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.2f);
-        //m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 3.5f);
         m_creature->addUnitState(UNIT_STAT_ROOT);
-        DoDespawnPortal();
         m_creature->SetInCombatWithZone();
         groundRuptureTimer.Reset();
-        nextMFAttempt = 0;
+        nextMFAttempt = MIND_FLAY_INITIAL_WAIT_DURATION;
+        if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
+            pCreature->ForcedDespawn();
     }
 
     void Aggro(Unit* pWho)
@@ -1366,12 +1402,8 @@ struct claw_tentacleAI : public ScriptedAI
 
         SetCombatMovement(false);
         Reset();
-        std::fabsf(100.52f - m_creature->GetPositionX());
-        float rZ = std::max(100.52f, m_creature->GetPositionZ()) - m_creature->GetPositionZ();
-        if (Unit* pPortal = DoSpawnCreature(MOB_SMALL_PORTAL, 0.0f, 0.0f, rZ, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
-        {
-            Portal = pPortal->GetObjectGuid();
-        }
+        
+        Portal = SpawnPortal(m_creature, this, MOB_SMALL_PORTAL);
     }
 
 
@@ -1387,10 +1419,9 @@ struct claw_tentacleAI : public ScriptedAI
         hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
         EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->SetInCombatWithZone();
         if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             pCreature->ForcedDespawn();
-
-        m_creature->SetInCombatWithZone();
     }
 
     void Aggro(Unit* pWho)
@@ -1448,8 +1479,7 @@ struct giant_claw_tentacleAI : public ScriptedAI
 
         SetCombatMovement(false);
         Reset();
-        if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000))
-            Portal = pPortal->GetObjectGuid();
+        Portal = SpawnPortal(m_creature, this, MOB_GIANT_PORTAL);
     }
 
     void JustDied(Unit*)
@@ -1526,8 +1556,7 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
         Reset();
 
-        if (Unit* pPortal = DoSpawnCreature(MOB_GIANT_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0))
-            Portal = pPortal->GetObjectGuid();
+        Portal = SpawnPortal(m_creature, this, MOB_GIANT_PORTAL);
     }
 
     void JustDied(Unit*)
