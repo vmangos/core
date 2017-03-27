@@ -78,8 +78,11 @@ enum
     GO_TWINS_EXIT_DOOR          = 180635,
     GO_SANDWORM_BASE            = 180795,
 
-    AREATRIGGER_TWIN_EMPERORS	= 4047,
-    AREATRIGGER_SARTURA		= 4052,
+    AREATRIGGER_TWIN_EMPERORS	  = 4047,
+    AREATRIGGER_SARTURA		       = 4052,
+    AREATRIGGER_STOMACH_GROUND  = 4033,
+    AREATRIGGER_STOMACH_AIR     = 4034,
+    AREATRIGGER_CTHUN_KNOCKBACK = 4036,
 
     EMOTE_EYE_INTRO             = -1531012,
     SAY_EMPERORS_INTRO_1        = -1531013,
@@ -130,6 +133,11 @@ struct StomachTimers {
     static const uint32 REMOVE_FROM_STOMACH_LIST_DELAY = 3000;
 };
 
+static const float puntPosition[3] =
+{
+    -8545.9f, 1987.25f, -96.0f
+};
+
 class instance_temple_of_ahnqiraj : public ScriptedInstance
 {
 public:
@@ -154,9 +162,11 @@ public:
     void Update(uint32 uiDiff);
 
     void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
+    void HandleStomachTriggers(Player* pPlayer, const AreaTriggerEntry* pAt);
 
     using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
     CThunStomachList& GetPlayersInStomach();
+    void AddPlayerToStomach(Unit* p);
 
 private:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
@@ -171,6 +181,20 @@ private:
     bool m_bIsEmperorsIntroDone;
 
     DialogueHelper m_dialogueHelper;
+
+    enum eStomachSpells {
+        SPELL_EXIT_STOMACH_KNOCKBACK    = 26230, //knocks well back, but must be cast probably an invisible trigger, if not by cthun outside
+        SPELL_PUNT_UPWARD               = 26224, //knocks up like craaayy everyone in range, maybe too big radius
+        SPELL_DIGESTIVE_ACID            = 26476, // Must be stacked and removed manually. 
+        PUNT_CREATURE                   = 15922, //invisible viscidus trigger, used in stomach
+        SPELL_QUAKE                     = 26093, //used for its visual only with SendSpellGo. It deals damage if cast normally
+    };
+    void UpdateStomachOfCthun(uint32 diff);
+    bool PlayerInStomach(Unit* p);
+    ObjectGuid puntCreatureGuid;
+    uint32 quakeTimer;
+    uint32 puntCountdown;
+    AreaTriggerEntry puntTrigger;
 
     // Used for C'thun only, but needed by multiple mobs so putting in instance
     std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;

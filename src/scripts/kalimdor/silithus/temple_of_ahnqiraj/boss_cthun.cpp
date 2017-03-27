@@ -58,22 +58,23 @@ enum eSpells {
     // Mob spells
     SPELL_THRASH                    = 3391,
     SPELL_GROUND_TREMOR             = 6524,
-    SPELL_PUNT_UPWARD               = 16716,
+   
+    //SPELL_PUNT_UPWARD               = 16716, // Used to knock people up from stomach. Remove manually after port as it's the wrong spell and applies slowfall
     SPELL_MASSIVE_GROUND_RUPTURE    = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
     SPELL_GROUND_RUPTURE_PHYSICAL   = 26139, // used by small tentacles
     SPELL_HAMSTRING                 = 26141,
-    SPELL_MIND_FLAY                 = 26143,
+    SPELL_MIND_FLAY                 = 26143, 
     SPELL_GROUND_RUPTURE_NATURE     = 26478, //used by giant tentacles
     
     //C'thun spells
-    SPELL_EXIT_STOMACH_KNOCKBACK    = 25383,
-    SPELL_CARAPACE_OF_CTHUN         = 26156,
+    
+    SPELL_CARAPACE_OF_CTHUN         = 26156, // Makes C'thun invulnerable
     SPELL_DIGESTIVE_ACID_TELEPORT   = 26220, // Not yet used, seems to port C'thun instead of player no matter what.
-    SPELL_TRANSFORM                 = 26232,
-    SPELL_CTHUN_VULNERABLE          = 26235,
-    SPELL_MOUTH_TENTACLE            = 26332,
+    SPELL_TRANSFORM                 = 26232, // Initiates the p1->p2 transform
+    SPELL_CTHUN_VULNERABLE          = 26235, // Adds the red color. Does not actually him vulnerable, need to remove carapace for that.
+    SPELL_MOUTH_TENTACLE            = 26332, // Spawns the tentacle that "eats" you to stomach and mounts the player on it.
     SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, was killing c'thun too. Maybe that's intended => a respawn?
-    SPELL_DIGESTIVE_ACID            = 26476,
+    
 
 
 
@@ -93,10 +94,6 @@ static const float fleshTentaclePositions[2][4] =
     { -8525.0f, 1994.0f, -98.0f, 2.12f }
 };
 
-static const float puntPosition[3] =
-{
-    -8545.9f, 1987.25f, -96.0f
-};
 
 static const float eyeTentaclePositions[8][3] =
 {
@@ -237,6 +234,10 @@ using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
 bool PlayerInStomach(Unit *unit, const CThunStomachList& stomachList)
 {
     //return unit->GetPositionZ() < -30.0f;
+    if (!unit->GetPositionZ() < -30.0f) return false;
+    if (unit->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) > 95.0f) return false;
+
+    return true;
 
     auto it = std::find_if(stomachList.begin(), stomachList.end(),
         [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
@@ -394,7 +395,6 @@ Unit* CheckForMelee(Creature* m_creature, ObjectGuid prevTarget)
         
         
         if (victim) {
-            //xxx: attempt to keep setTargetGuid on every update and see if it keeps the target properly then
             m_creature->SetTargetGuid(victim->GetObjectGuid());
             if (prevTarget != victim->GetObjectGuid()) {
                 m_creature->SetFacingToObject(victim);
@@ -512,7 +512,7 @@ uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN            = 5000; // How long does a c
 uint32 GIANT_EYE_BEAM_COOLDOWN                      = 2100; // How often will giant eye tentacles cast green beam
 uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN        = 0;    // How long will giant eye wait after spawn before casting
 uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500; // How long do we wait if Eye Tentacle MF resists before retrying cast
-uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 2000; // How long do we wait after Eye tentacle has spawned until first MF
+uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 3000; // How long do we wait after Eye tentacle has spawned until first MF
 // =======================================================
 
 struct cthunAI : public ScriptedAI
@@ -580,7 +580,7 @@ struct cthunAI : public ScriptedAI
             for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr) {
                 if (Player* player = itr->getSource())
                 {
-                    player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                    //player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
                 }
             }
         }
@@ -633,6 +633,7 @@ struct cthunAI : public ScriptedAI
 
         WeaknessTimer           = 0;
         SpawnFleshTentacles();
+        m_creature->CastSpell(m_creature, SPELL_CARAPACE_OF_CTHUN, true);
     }
    
     void UpdateAI(const uint32 diff)
@@ -674,7 +675,6 @@ struct cthunAI : public ScriptedAI
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     m_creature->SetVisibility(VISIBILITY_OFF);
                     m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                    
                     m_creature->SetVisibility(VISIBILITY_ON);
                     
                     m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
@@ -708,15 +708,18 @@ struct cthunAI : public ScriptedAI
                 WeaknessTimer = WEAKNESS_DURATION;
 
                 DoScriptText(EMOTE_WEAKENED, m_creature);
-                m_creature->CastSpell(m_creature, SPELL_CTHUN_VULNERABLE, true);
-                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_WEAKENED);
-                // If there is a grabbed player, release him.
+                // If there is a grabbed player, release him. 
                 if (!StomachEnterTargetGUID.IsEmpty()) {
                     if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
                         pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
                     }
                 }
+
+                m_creature->CastSpell(m_creature, SPELL_CTHUN_VULNERABLE, true);
+                //Remove the damage reduction aura
                 m_creature->RemoveAurasDueToSpell(SPELL_CARAPACE_OF_CTHUN);
+                //Make him glow all red and nice
+                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_WEAKENED);
                 sLog.outBasic("Entering VULNERABLE_STATE");
             }
             else {
@@ -729,13 +732,10 @@ struct cthunAI : public ScriptedAI
             // If weakend runs out
             if (WeaknessTimer < diff) {
                 ResetartUnvulnerablePhase();
-                // visibility on/off is sadly needed to update him to do animation again
-                // it looks stupid though, so if there is a way to avoid it, pls find.
-                //m_creature->SetVisibility(VISIBILITY_OFF);
+                //note: can set visibility off and on again after removing vulnerable spell, 
+                // if it does not visually dissapear
                 m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
-                m_creature->SetVisibility(VISIBILITY_ON);
                 m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
-                m_creature->CastSpell(m_creature, SPELL_CARAPACE_OF_CTHUN, true);
                 sLog.outBasic("Entering INVULNERABLE_STATE");
             }
             else {
@@ -790,9 +790,9 @@ struct cthunAI : public ScriptedAI
 
                     DoTeleportPlayer(pPlayer, stomachPortPosition[0], stomachPortPosition[1], stomachPortPosition[2], stomachPortPosition[3]);
                     pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
-
-                    m_pInstance->GetPlayersInStomach().push_back(std::make_pair(StomachEnterTargetGUID, StomachTimers()));
-                    m_creature->CastSpell(pPlayer, SPELL_DIGESTIVE_ACID, true);
+                    if (m_pInstance) {
+                        m_pInstance->AddPlayerToStomach(pPlayer);
+                    }
                 }
 
                 StomachEnterTargetGUID = 0;
@@ -838,10 +838,10 @@ struct cthunAI : public ScriptedAI
         DoTeleportPlayer(player, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 5, player->GetOrientation());
 
         //Cast knockback on them
-        player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
+        //player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
 
         //Remove the acid debuff
-        player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+        //player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
     }
 
     void UpdatePlayersInStomach(uint32 diff)
@@ -866,7 +866,7 @@ struct cthunAI : public ScriptedAI
                 continue;
             }else if (player->isDead()) {
                 sLog.outBasic("Player in stomach dead. Removing from list");
-                player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                //player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
                 it = m_pInstance->GetPlayersInStomach().erase(it);
                 continue;
             }
@@ -885,7 +885,7 @@ struct cthunAI : public ScriptedAI
             }
             // Update acid debuff
             if (timers.acidDebuff < diff) {
-                m_creature->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
+                //m_creature->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
                 timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
             }
             else {
@@ -977,6 +977,7 @@ struct cthunAI : public ScriptedAI
                         puntCreatureGuid = pCreature->GetObjectGuid();
                         sLog.outBasic("Player in stomach arrived at punt area. Starting punt countdown");
                         pCreature->CastSpell(pCreature, 26092, false);
+                        pCreature->SendSpellGo(pCreature, 26093); //only visual quake
                         stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
                     }
                     break;
@@ -995,8 +996,8 @@ struct cthunAI : public ScriptedAI
                 }
                 if (Creature* puntCreature = m_pInstance->GetMap()->GetCreature(puntCreatureGuid)) {
                     if (player->GetDistance(puntCreature) < 7.0f) {
-                        player->CastSpell(player, SPELL_PUNT_UPWARD, true);
-                        player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
+                        //player->CastSpell(player, SPELL_PUNT_UPWARD, true);
+                        //player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
                     }
                 }
                 ++it;
@@ -1150,19 +1151,25 @@ struct eye_of_cthunAI : public ScriptedAI
                 if(m_creature->HasAura(SPELL_FREEZE_ANIMATION))
                     m_creature->RemoveAurasDueToSpell(SPELL_FREEZE_ANIMATION);
 
-                Unit* target = nullptr;
-                if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
-                    target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
-                }
+                
                 
                 if (eyeBeamCooldown < diff) {
-                    Player* target = SelectRandomAliveNotStomach(m_pInstance);
-                    if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
-                        // There should not be any LOS check
-                        m_creature->InterruptNonMeleeSpells(false);
-                        m_creature->SetTargetGuid(target->GetObjectGuid());
-                        m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
-                        eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
+                    Unit* target = nullptr;
+                    if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
+                        target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
+                    }
+                    else {
+                        target = SelectRandomAliveNotStomach(m_pInstance);
+                    }
+                    if (target) {
+                        if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
+                            // There should not be any LOS check
+                            m_creature->InterruptNonMeleeSpells(false);
+                            m_creature->SetTargetGuid(target->GetObjectGuid());
+                            m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
+                            eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
+                            ++eyeBeamCastCount;
+                        }
                     }
                 }
                 else {

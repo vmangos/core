@@ -54,6 +54,7 @@ void instance_temple_of_ahnqiraj::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
     m_dialogueHelper.InitializeDialogueHelper(this);
+    sAreaTriggerStore.LookupEntry(4033);
 }
 
 bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
@@ -90,6 +91,12 @@ void instance_temple_of_ahnqiraj::DoHandleTempleAreaTrigger(uint32 uiTriggerId)
 instance_temple_of_ahnqiraj::CThunStomachList& instance_temple_of_ahnqiraj::GetPlayersInStomach()
 {
     return playersInStomach;
+}
+
+void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
+{
+    p->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
+    playersInStomach.push_back(std::make_pair(p->GetGUID(), StomachTimers()));
 }
 
 void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
@@ -306,6 +313,122 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     OUT_LOAD_INST_DATA_COMPLETE;
 }
 
+void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const AreaTriggerEntry * pAt)
+{
+    if (!pPlayer) return;
+    if (pPlayer->isGameMaster() || !pPlayer->isAlive())
+        return;
+
+    if (pAt->id == AREATRIGGER_STOMACH_GROUND) {
+        sLog.outBasic("AREATRIGGER_STOMACH_GROUND");
+        //pCreature->SendSpellGo(pCreature, 26093);
+        if (!puntCreatureGuid) {
+            if (Creature* pc = GetMap()->SummonCreature(15922, pAt->x, pAt->y, pAt->z, 0,
+                TEMPSUMMON_TIMED_DESPAWN, 4000)) {
+                pc->setFaction(14);
+                //pc->SetVisibility(VISIBILITY_OFF);
+                puntCreatureGuid = pc->GetGUID();
+                quakeTimer = 1000;
+                puntCountdown = StomachTimers::PUNT_CAST_TIME;
+                
+                pc->SendSpellGo(pc, SPELL_QUAKE);
+
+            }
+
+        }
+    }
+    else if (pAt->id == AREATRIGGER_STOMACH_AIR) {
+        sLog.outBasic("AREATRIGGER_STOMACH_AIR");
+        const AreaTriggerEntry* portOutTrigger = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
+        if (portOutTrigger) {
+            pPlayer->NearTeleportTo(portOutTrigger->x, portOutTrigger->y, portOutTrigger->z, pPlayer->GetOrientation());
+        }
+        else {
+            pPlayer->NearTeleportTo(-8577.27, 1987, 100.4f, pPlayer->GetOrientation());
+        }
+       
+        //Cast knockback on them
+        ///player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
+
+        //Remove the acid debuff
+        pPlayer->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+    }
+    else if (pAt->id == AREATRIGGER_CTHUN_KNOCKBACK) {
+        if (Creature* kbCreature = GetMap()->SummonCreature(PUNT_CREATURE, pAt->x, pAt->y, pAt->z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
+            kbCreature->setFaction(14);
+            kbCreature->CastSpell(kbCreature, SPELL_EXIT_STOMACH_KNOCKBACK, true);
+            kbCreature->ForcedDespawn();
+        }
+    }
+}
+
+bool instance_temple_of_ahnqiraj::PlayerInStomach(Unit* p)
+{
+    if (!p->GetPositionZ() > -30.0f) return false;
+    if (p->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) > 95.0f) return false;
+
+}
+
+void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
+{
+    // Update the punt creature
+    if (Creature* pc = GetMap()->GetCreature(puntCreatureGuid)) {
+        // Updating animation
+        if (quakeTimer < diff) {
+            pc->SendSpellGo(pc, SPELL_QUAKE);
+            quakeTimer = 1000;
+        }
+        else {
+            quakeTimer -= diff;
+        }
+        //Checking if it's time to punt
+        if (puntCountdown < diff) {
+            const AreaTriggerEntry * pat = sAreaTriggerStore.LookupEntry(AREATRIGGER_STOMACH_GROUND);
+            //pc->CastSpell(pat->x, pat->y, pat->z, SPELL_PUNT_UPWARD, true);
+            pc->CastSpell(pc, SPELL_PUNT_UPWARD, true);
+            puntCountdown = std::numeric_limits<uint32>::max();
+            //pc->ForcedDespawn();
+            puntCreatureGuid = 0;
+        }
+        else {
+            puntCountdown -= diff;
+        }
+    }
+    else {
+        puntCreatureGuid = 0;
+    }
+
+    // Update the players in the stomach
+    for (auto it = playersInStomach.begin(); it != playersInStomach.end(); it++) {
+        Player* player = GetMap()->GetPlayer(it->first);
+        //Player has left instance or something and we remove him from the list. 
+        if (!player) {
+            it = playersInStomach.erase(it);
+            continue;
+        }
+        //Updating debuff
+        StomachTimers& timers = it->second;
+        if (timers.acidDebuff < diff) {
+            player->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
+            timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
+        }
+        else {
+            timers.acidDebuff -= diff;
+        }
+
+        if (const AreaTriggerEntry* ate = sAreaTriggerStore.LookupEntry(AREATRIGGER_STOMACH_GROUND)) {
+            
+        }
+
+        // Checking if player should be removed from playersInStomach
+        if (!PlayerInStomach(player)) {
+            player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+            it = playersInStomach.erase(it);
+            continue;
+        }
+    }
+}
+
 void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
 {
     m_dialogueHelper.DialogueUpdate(uiDiff);
@@ -338,6 +461,8 @@ void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
     }
     else
         m_uiCthunWhisperTimer -= uiDiff;
+
+    UpdateStomachOfCthun(uiDiff);
 }
 
 uint32 instance_temple_of_ahnqiraj::GetData(uint32 uiType)
@@ -360,6 +485,8 @@ bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt
         if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
             pInstance->DoHandleTempleAreaTrigger(pAt->id);
     }
+    if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
+        pInstance->HandleStomachTriggers(pPlayer, pAt);
 
     return false;
 }
@@ -377,4 +504,5 @@ void AddSC_instance_temple_of_ahnqiraj()
     pNewScript->Name = "at_temple_ahnqiraj";
     pNewScript->pAreaTrigger = &AreaTrigger_at_temple_ahnqiraj;
     pNewScript->RegisterSelf();
+
 }
