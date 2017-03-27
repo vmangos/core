@@ -394,9 +394,10 @@ Unit* CheckForMelee(Creature* m_creature, ObjectGuid prevTarget)
         
         
         if (victim) {
+            //xxx: attempt to keep setTargetGuid on every update and see if it keeps the target properly then
+            m_creature->SetTargetGuid(victim->GetObjectGuid());
             if (prevTarget != victim->GetObjectGuid()) {
                 m_creature->SetFacingToObject(victim);
-                m_creature->SetTargetGuid(victim->GetObjectGuid());
             }
             // this will get us the highest threat target in meleee range, but
             // if there is only one person on the threat list it will attack that 
@@ -1567,10 +1568,6 @@ struct giant_eye_tentacleAI : public ScriptedAI
 
     void Reset()
     {
-        //m_creature->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, 1.2f);
-        //m_creature->SetFloatValue(UNIT_FIELD_COMBATREACH, 10.0f);
-        // todo: how long should it wait after ground rupture to do first beam?
-        // maybe no wait, maybe some wait
         BeamTimer = GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN;
         groundRuptureTimer.Reset();
         m_creature->addUnitState(UNIT_STAT_ROOT);
@@ -1668,8 +1665,6 @@ struct flesh_tentacleAI : public ScriptedAI
         //Check if we have a target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        //CheckForMelee(m_creature);
     }
 
     void JustDied(Unit* killer)
