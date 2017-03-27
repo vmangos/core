@@ -62,8 +62,9 @@ UPDATE creature_template SET `mindmg`='500', `maxdmg`='800', `baseattacktime`='2
 
 
 -- stomach of cthun area triggers
-DELETE FROM `mangos`.`scripted_areatrigger` WHERE entry BETWEEN 4033 AND 4034;
+DELETE FROM `mangos`.`scripted_areatrigger` WHERE entry IN (4033, 4034, 4036);
 INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4033', 'at_temple_ahnqiraj');
 INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4034', 'at_temple_ahnqiraj');
+INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4036', 'at_temple_ahnqiraj');
 
 -- UPDATE `mangos`.`creature_template` SET `ScriptName`='at_temple_ahnqiraj' WHERE `entry`='15800';
