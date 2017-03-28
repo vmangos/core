@@ -4290,6 +4290,7 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
+    m_movementInfo.AddMovementFlag(MOVEFLAG_WATERWALKING);
     SetMovement(MOVE_WATER_WALK);
     if (!GetSession()->isLogingOut())
         SetMovement(MOVE_UNROOT);
@@ -4319,6 +4320,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         RemoveAurasDueToSpell(20584);                       // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
+    m_movementInfo.RemoveMovementFlag(MOVEFLAG_WATERWALKING);
     SetMovement(MOVE_LAND_WALK);
     SetMovement(MOVE_UNROOT);
 
