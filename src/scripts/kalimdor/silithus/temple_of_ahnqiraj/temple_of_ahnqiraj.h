@@ -115,22 +115,21 @@ enum
 // Used for C'thun only, but needed by multiple mobs so putting in instance
 struct StomachTimers {
     uint32 acidDebuff;
-    uint32 puntCastTime;
-    uint32 removeFromListIn;
-    bool playerHasLeftStomach;
     StomachTimers() :
-        acidDebuff(StomachTimers::ACID_REFRESH_RATE),
-        puntCastTime(StomachTimers::PUNT_CAST_TIME),
-        removeFromListIn(REMOVE_FROM_STOMACH_LIST_DELAY),
-        playerHasLeftStomach(false)
+        acidDebuff(StomachTimers::ACID_REFRESH_RATE)
     {}
+    static const uint32 PUNT_CAST_TIME      = 3000;
+    static const uint32 ACID_REFRESH_RATE    = 5000;
+};
 
-    static const int32 ACID_REFRESH_RATE = 5000;
-    static const int32 PUNT_CAST_TIME = 3000;
-    // Player is removed from players in stomach list after a delay of this
-    // length after the teleport has found place.
-    // If set to 0, the player is instantly removed from the list.
-    static const uint32 REMOVE_FROM_STOMACH_LIST_DELAY = 3000;
+enum CThunPhase
+{
+    PHASE_EYE_NORMAL = 0,
+    PHASE_EYE_DARK_GLARE = 1,
+    PHASE_TRANSITION = 2,
+    PHASE_CTHUN_INVULNERABLE = 3,
+    PHASE_CTHUN_WEAKENED = 4,
+    PHASE_CTHUN_DONE = 5,
 };
 
 static const float puntPosition[3] =
@@ -161,13 +160,6 @@ public:
 
     void Update(uint32 uiDiff);
 
-    void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
-    void HandleStomachTriggers(Player* pPlayer, const AreaTriggerEntry* pAt);
-
-    using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
-    CThunStomachList& GetPlayersInStomach();
-    void AddPlayerToStomach(Unit* p);
-
 private:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string m_strInstData;
@@ -182,21 +174,36 @@ private:
 
     DialogueHelper m_dialogueHelper;
 
-    enum eStomachSpells {
-        SPELL_EXIT_STOMACH_KNOCKBACK    = 26230, //knocks well back, but must be cast probably an invisible trigger, if not by cthun outside
-        SPELL_PUNT_UPWARD               = 26224, //knocks up like craaayy everyone in range, maybe too big radius
-        SPELL_DIGESTIVE_ACID            = 26476, // Must be stacked and removed manually. 
-        PUNT_CREATURE                   = 15922, //invisible viscidus trigger, used in stomach
-        SPELL_QUAKE                     = 26093, //used for its visual only with SendSpellGo. It deals damage if cast normally
-    };
-    void UpdateStomachOfCthun(uint32 diff);
+    // The following functions, variables etc, are used to handle the C'thun stomach.
+    // One might argue if they should be in boss_cthun.cpp instead, but it makes it a whole
+    // lot easier to handle this logic if it's handled by the instance script.
+public:
+    void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
+    void HandleStomachTriggers(Player* pPlayer, const AreaTriggerEntry* pAt);
+    void AddPlayerToStomach(Unit* p);
     bool PlayerInStomach(Unit* p);
+    void KillPlayersInStomach();
+
+private:
+    enum eStomachSpells {
+        SPELL_PUNT_UPWARD               = 26224, //knocks up like craaayy everyone in range, maybe too big radius. Only works if thing is targeting player?
+        SPELL_EXIT_STOMACH_KNOCKBACK    = 26230, //knocks well back, but must be cast probably an invisible trigger, if not by cthun outside
+        
+        SPELL_DIGESTIVE_ACID            = 26476, // Must be stacked and removed manually. 
+        EXIT_KNOCKBACK_CREATURE         = 15800, // Exit trigger creature used for stomach and cthun knockups/knockbacks
+        PUNT_CREATURE                   = 15922, // Trigger for cthuns belly knockup spell
+        SPELL_QUAKE                     = 26093, //used for its visual only with SendSpellGo. It deals damage if cast normally
+        SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, was killing c'thun too. Maybe that's intended => a respawn?
+    };
+    using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
+    void UpdateStomachOfCthun(uint32 diff);
+    void RemovePlayerFromStomach(Unit* unit);
+    CThunStomachList::iterator PlayerInStomachIter(Unit* unit);
+
     ObjectGuid puntCreatureGuid;
     uint32 quakeTimer;
     uint32 puntCountdown;
-    AreaTriggerEntry puntTrigger;
 
-    // Used for C'thun only, but needed by multiple mobs so putting in instance
     std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
 };
 

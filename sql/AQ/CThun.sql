@@ -67,4 +67,5 @@ INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('403
 INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4034', 'at_temple_ahnqiraj');
 INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4036', 'at_temple_ahnqiraj');
 
--- UPDATE `mangos`.`creature_template` SET `ScriptName`='at_temple_ahnqiraj' WHERE `entry`='15800';
+-- flags update on trigger unit used to knock players out of cthuns body after being ported. Flags copied from viscidus trigger.
+UPDATE `mangos`.`creature_template` SET `unit_flags`='33587968', `ScriptName`='boss cthun knockback trigger' WHERE `entry`='15800';

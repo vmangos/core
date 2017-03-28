@@ -88,17 +88,6 @@ void instance_temple_of_ahnqiraj::DoHandleTempleAreaTrigger(uint32 uiTriggerId)
     }
 }
 
-instance_temple_of_ahnqiraj::CThunStomachList& instance_temple_of_ahnqiraj::GetPlayersInStomach()
-{
-    return playersInStomach;
-}
-
-void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
-{
-    p->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
-    playersInStomach.push_back(std::make_pair(p->GetGUID(), StomachTimers()));
-}
-
 void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
 {
     switch (pGo->GetEntry())
@@ -313,6 +302,49 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     OUT_LOAD_INST_DATA_COMPLETE;
 }
 
+void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
+{
+    p->CastSpell(p, SPELL_DIGESTIVE_ACID, true);
+    playersInStomach.push_back(std::make_pair(p->GetGUID(), StomachTimers()));
+}
+
+instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqiraj::PlayerInStomachIter(Unit * unit)
+{
+    if (!unit) return playersInStomach.end();
+
+    return std::find_if(playersInStomach.begin(), playersInStomach.end(),
+        [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
+        if (unit->GetObjectGuid() == e.first) {
+            return true;
+        }
+        return false;
+
+        return e.first == unit->GetObjectGuid();
+    });
+}
+
+void instance_temple_of_ahnqiraj::RemovePlayerFromStomach(Unit * unit)
+{
+    if (!unit) return;
+
+    if (unit->HasAura(SPELL_DIGESTIVE_ACID)) {
+        unit->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+    }
+    auto it = PlayerInStomachIter(unit);
+    if (it != playersInStomach.end()) {
+        playersInStomach.erase(it);
+    }
+}
+
+bool instance_temple_of_ahnqiraj::PlayerInStomach(Unit * unit)
+{
+    //if (!unit->GetPositionZ() > -30.0f) return false;
+    //if (p->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) > 95.0f) return false;
+    if (!unit) return false;
+
+    return PlayerInStomachIter(unit) != playersInStomach.end();
+}
+
 void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const AreaTriggerEntry * pAt)
 {
     if (!pPlayer) return;
@@ -320,53 +352,59 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         return;
 
     if (pAt->id == AREATRIGGER_STOMACH_GROUND) {
-        sLog.outBasic("AREATRIGGER_STOMACH_GROUND");
-        //pCreature->SendSpellGo(pCreature, 26093);
         if (!puntCreatureGuid) {
-            if (Creature* pc = GetMap()->SummonCreature(15922, pAt->x, pAt->y, pAt->z, 0,
+            if (Creature* pc = GetMap()->SummonCreature(PUNT_CREATURE, pAt->x, pAt->y, pAt->z, 0,
                 TEMPSUMMON_TIMED_DESPAWN, 4000)) {
-                pc->setFaction(14);
-                //pc->SetVisibility(VISIBILITY_OFF);
                 puntCreatureGuid = pc->GetGUID();
                 quakeTimer = 1000;
                 puntCountdown = StomachTimers::PUNT_CAST_TIME;
-                
+                // Since this is the wrong spell, and it deals damage, we send the visual only, instead of casting it.       
                 pc->SendSpellGo(pc, SPELL_QUAKE);
 
             }
-
         }
     }
     else if (pAt->id == AREATRIGGER_STOMACH_AIR) {
-        sLog.outBasic("AREATRIGGER_STOMACH_AIR");
         const AreaTriggerEntry* portOutTrigger = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
+
         if (portOutTrigger) {
-            pPlayer->NearTeleportTo(portOutTrigger->x, portOutTrigger->y, portOutTrigger->z, pPlayer->GetOrientation());
+            float x = portOutTrigger->x + cos((frand(0.0f,360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float y = portOutTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            pPlayer->NearTeleportTo(x, y, portOutTrigger->z, pPlayer->GetOrientation());
         }
         else {
-            pPlayer->NearTeleportTo(-8577.27, 1987, 100.4f, pPlayer->GetOrientation());
+            float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
+            sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.", 
+                AREATRIGGER_CTHUN_KNOCKBACK);
         }
-       
-        //Cast knockback on them
-        ///player->CastSpell(player, SPELL_EXIT_STOMACH_KNOCKBACK, true);
-
-        //Remove the acid debuff
-        pPlayer->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
     }
     else if (pAt->id == AREATRIGGER_CTHUN_KNOCKBACK) {
-        if (Creature* kbCreature = GetMap()->SummonCreature(PUNT_CREATURE, pAt->x, pAt->y, pAt->z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
-            kbCreature->setFaction(14);
-            kbCreature->CastSpell(kbCreature, SPELL_EXIT_STOMACH_KNOCKBACK, true);
-            kbCreature->ForcedDespawn();
+        RemovePlayerFromStomach(pPlayer);
+        
+        // "Disable" the knockback if c'thun is killed
+        if (GetData(TYPE_CTHUN_PHASE) != PHASE_CTHUN_DONE) {
+            if (Creature* kbCreature = GetMap()->SummonCreature(EXIT_KNOCKBACK_CREATURE, pAt->x, pAt->y, pAt->z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
+                kbCreature->CastSpell(kbCreature, SPELL_EXIT_STOMACH_KNOCKBACK, false);
+            }
         }
     }
 }
 
-bool instance_temple_of_ahnqiraj::PlayerInStomach(Unit* p)
+void instance_temple_of_ahnqiraj::KillPlayersInStomach()
 {
-    if (!p->GetPositionZ() > -30.0f) return false;
-    if (p->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) > 95.0f) return false;
-
+    for (auto iter = playersInStomach.begin(); iter != playersInStomach.end();) {
+        if (Player* p = GetMap()->GetPlayer(iter->first)) {
+            if (p->isAlive()) {
+                if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
+                    p->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                }
+                p->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
+                iter = playersInStomach.erase(iter);
+            }
+        }
+    }
 }
 
 void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
@@ -383,11 +421,8 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
         }
         //Checking if it's time to punt
         if (puntCountdown < diff) {
-            const AreaTriggerEntry * pat = sAreaTriggerStore.LookupEntry(AREATRIGGER_STOMACH_GROUND);
-            //pc->CastSpell(pat->x, pat->y, pat->z, SPELL_PUNT_UPWARD, true);
             pc->CastSpell(pc, SPELL_PUNT_UPWARD, true);
             puntCountdown = std::numeric_limits<uint32>::max();
-            //pc->ForcedDespawn();
             puntCreatureGuid = 0;
         }
         else {
@@ -399,7 +434,9 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
     }
 
     // Update the players in the stomach
-    for (auto it = playersInStomach.begin(); it != playersInStomach.end(); it++) {
+    if (playersInStomach.empty()) return; 
+
+    for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
         Player* player = GetMap()->GetPlayer(it->first);
         //Player has left instance or something and we remove him from the list. 
         if (!player) {
@@ -416,16 +453,7 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
             timers.acidDebuff -= diff;
         }
 
-        if (const AreaTriggerEntry* ate = sAreaTriggerStore.LookupEntry(AREATRIGGER_STOMACH_GROUND)) {
-            
-        }
-
-        // Checking if player should be removed from playersInStomach
-        if (!PlayerInStomach(player)) {
-            player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-            it = playersInStomach.erase(it);
-            continue;
-        }
+        ++it;
     }
 }
 

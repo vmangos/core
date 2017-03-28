@@ -73,11 +73,6 @@ enum eSpells {
     SPELL_TRANSFORM                 = 26232, // Initiates the p1->p2 transform
     SPELL_CTHUN_VULNERABLE          = 26235, // Adds the red color. Does not actually him vulnerable, need to remove carapace for that.
     SPELL_MOUTH_TENTACLE            = 26332, // Spawns the tentacle that "eats" you to stomach and mounts the player on it.
-    SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, was killing c'thun too. Maybe that's intended => a respawn?
-    
-
-
-
 };
 
 uint32 CANNOT_CAST_SPELL_MASK = CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
@@ -105,16 +100,6 @@ static const float eyeTentaclePositions[8][3] =
     { -8598.525391f, 1965.769043f, 100.490351f },
     { -8577.340820f, 1956.940063f, 100.536636f },
     { -8556.115234f, 1965.667725f, 100.598129f }
-};
-
-enum CThunPhase
-{
-    PHASE_EYE_NORMAL = 0,
-    PHASE_EYE_DARK_GLARE = 1,
-    PHASE_TRANSITION = 2,
-    PHASE_CTHUN_INVULNERABLE = 3,
-    PHASE_CTHUN_WEAKENED = 4,
-    PHASE_CTHUN_DONE = 5,
 };
 
 using SpellTarSelectFunction = std::function<Unit*(Creature*)>;
@@ -231,34 +216,12 @@ private:
 
 using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
 
-bool PlayerInStomach(Unit *unit, const CThunStomachList& stomachList)
-{
-    //return unit->GetPositionZ() < -30.0f;
-    if (!unit->GetPositionZ() < -30.0f) return false;
-    if (unit->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) > 95.0f) return false;
-
-    return true;
-
-    auto it = std::find_if(stomachList.begin(), stomachList.end(),
-        [unit](const std::pair<ObjectGuid, StomachTimers>& e) {
-        if (unit->GetObjectGuid() == e.first) {
-            return true;
-        }
-        return false;
-
-        return e.first == unit->GetObjectGuid();
-    });
-
-    return it != stomachList.end();
-}
-
 Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
 {
     if (!instance) return nullptr;
     std::list<Player*> temp;
     std::list<Player*>::iterator j;
     const Map::PlayerList& PlayerList = instance->GetMap()->GetPlayers();
-    const CThunStomachList& stomachList = instance->GetPlayersInStomach();
 
     if (!PlayerList.isEmpty())
     {
@@ -266,7 +229,7 @@ Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
         {
             if (Player* player = itr->getSource())
             {
-                if (!player->isDead() && !player->isGameMaster() && !PlayerInStomach(player, stomachList)) {
+                if (!player->isDead() && !player->isGameMaster() && !instance->PlayerInStomach(player)) {
                     temp.push_back(player);
                 }
             }
@@ -556,9 +519,6 @@ struct cthunAI : public ScriptedAI
         EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
         CthunEmergeTimer = 8000;
 
-        stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
-        puntCreatureGuid = 0;
-
         ResetartUnvulnerablePhase();
 
         // Reset visibility
@@ -587,7 +547,6 @@ struct cthunAI : public ScriptedAI
 
         if (m_pInstance)
         {
-            m_pInstance->GetPlayersInStomach().clear();
             m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
             m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
 
@@ -659,7 +618,6 @@ struct cthunAI : public ScriptedAI
         m_creature->SetTargetGuid(0);
 
         VerifyAnyPlayerAliveOutside();
-        UpdatePlayersInStomach(diff);
 
         switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
         case PHASE_TRANSITION: {
@@ -751,14 +709,7 @@ struct cthunAI : public ScriptedAI
     void VerifyAnyPlayerAliveOutside()
     {
         if (!SelectRandomAliveNotStomach(m_pInstance)) {
-            for (auto iter = m_pInstance->GetPlayersInStomach().begin(); iter != m_pInstance->GetPlayersInStomach().end(); iter++) {
-                if (Player* p = m_creature->GetMap()->GetPlayer(iter->first)) {
-                    if (p->isAlive()) {
-                        p->KillPlayer();
-                        //m_creature->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
-                    }
-                }
-            }
+            m_pInstance->KillPlayersInStomach();
         }
     }
     
@@ -844,174 +795,6 @@ struct cthunAI : public ScriptedAI
         //player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
     }
 
-    void UpdatePlayersInStomach(uint32 diff)
-    {
-        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_CTHUN_DONE) {
-            while (m_pInstance->GetPlayersInStomach().size() > 0) {
-                Player* player = m_creature->GetMap()->GetPlayer(m_pInstance->GetPlayersInStomach().at(0).first);
-                if (player) {
-                    PortPlayerOutOfStomach(player);
-                }
-                m_pInstance->GetPlayersInStomach().erase(m_pInstance->GetPlayersInStomach().begin());
-            }
-            return;
-        }
-
-        for (auto it = m_pInstance->GetPlayersInStomach().begin(); it != m_pInstance->GetPlayersInStomach().end();) {
-            Player* player = m_creature->GetMap()->GetPlayer(it->first);
-            // player has left the instance or something and is presumably no longer in stomach
-            if (!player) {
-                sLog.outBasic("Player no longer in instance. Removed from stomach list");
-                it = m_pInstance->GetPlayersInStomach().erase(it);
-                continue;
-            }else if (player->isDead()) {
-                sLog.outBasic("Player in stomach dead. Removing from list");
-                //player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                it = m_pInstance->GetPlayersInStomach().erase(it);
-                continue;
-            }
-
-            StomachTimers& timers = it->second;
-            
-            if (timers.playerHasLeftStomach) {
-                if (timers.removeFromListIn < diff) {
-                    it = m_pInstance->GetPlayersInStomach().erase(it);
-                }
-                else {
-                    timers.removeFromListIn -= diff;
-                    ++it;
-                }
-                continue;
-            }
-            // Update acid debuff
-            if (timers.acidDebuff < diff) {
-                //m_creature->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
-                timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
-            }
-            else {
-                timers.acidDebuff -= diff;
-            }
-
-#ifdef USE_INDIVIDUAL_PUNT_TIMER
-            // update punt timer while player is in the punt area. Otherwise reset timer.
-            if (player->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) < 5.0f) {
-                if (stomachPuntTimer == StomachTimers::PUNT_CAST_TIME) {
-                    stomachPuntTimer -= diff;
-                }
-                
-                if (stomachPuntTimer < diff) {
-
-                }
-                else {
-                    stomachPuntTimer -= diff;
-                }
-
-
-                if (timers.puntCastTime < diff) {
-                    // Punt the player if he has been in the area aproximately PUNT_CAST_TIME ms
-                    sLog.outBasic("Player in stomach getting punted");
-                    player->CastSpell(player, SPELL_PUNT_UPWARD, true);
-                    player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
-                    timers.puntCastTime = StomachTimers::PUNT_CAST_TIME;
-                }
-                else {
-                    timers.puntCastTime -= diff;
-                }
-
-                // Player just arrived at punt area. Start cast visual
-                if (timers.puntCastTime == (timers.PUNT_CAST_TIME - diff)) {
-                    if (Creature *pCreature = m_creature->SummonCreature(PUNT_CREATURE,
-                        puntPosition[0], puntPosition[1], puntPosition[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
-                    {
-                        sLog.outBasic("Player in stomach arrived at punt area. Starting punt countdown");
-                        pCreature->CastSpell(pCreature, 26092, false);
-                    }
-                }
-            }
-            else {
-                if (timers.puntCastTime != StomachTimers::PUNT_CAST_TIME) {
-                    sLog.outBasic("Player in stomach left punt area. Resetting punt countdown");
-                }
-                timers.puntCastTime = StomachTimers::PUNT_CAST_TIME;
-            }
-#endif
-            // check if we should throw the player out of stomach
-            if (player->GetPositionZ() > -40.0f && player->HasMovementFlag(MOVEFLAG_JUMPING)) {
-                
-                PortPlayerOutOfStomach(player);
-                if (StomachTimers::REMOVE_FROM_STOMACH_LIST_DELAY == 0) {
-                    //Remove player from stomach list
-                    it = m_pInstance->GetPlayersInStomach().erase(it);
-                }
-                else {
-                    it->second.playerHasLeftStomach = true;
-                    sLog.outBasic("Player ported out of stomach");
-                    ++it;
-                }
-                continue;
-            }
-
-            ++it;
-        }
-#ifndef USE_INDIVIDUAL_PUNT_TIMER
-        //Punt creature despawn timer (4450 vs cast time of 3sec) should be enough to avoid
-        //player that has just been punted to retrigger punting
-        Creature* testPuntCreature = m_pInstance->GetMap()->GetCreature(puntCreatureGuid);
-        if (!testPuntCreature){
-            puntCreatureGuid = 0;
-        }
-
-        if (!puntCreatureGuid) {
-            for (auto it = m_pInstance->GetPlayersInStomach().begin(); it != m_pInstance->GetPlayersInStomach().end();) {
-                Player* player = m_creature->GetMap()->GetPlayer(it->first);
-                // this should not be needed afaik as it's already done in loop above. But just in case.
-                if (!player) {
-                    ++it;
-                    continue;
-                }
-                //starting a punt timer
-                if (player->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) < 7.0f) {
-                    if (Creature *pCreature = m_creature->SummonCreature(PUNT_CREATURE,
-                        puntPosition[0], puntPosition[1], puntPosition[2], 0.0f, TEMPSUMMON_TIMED_DESPAWN, 4450))
-                    {
-                        puntCreatureGuid = pCreature->GetObjectGuid();
-                        sLog.outBasic("Player in stomach arrived at punt area. Starting punt countdown");
-                        pCreature->CastSpell(pCreature, 26092, false);
-                        pCreature->SendSpellGo(pCreature, 26093); //only visual quake
-                        stomachPuntTimer = StomachTimers::PUNT_CAST_TIME;
-                    }
-                    break;
-                }
-
-                ++it;
-            }
-        }
-        else if(stomachPuntTimer < diff){
-            for (auto it = m_pInstance->GetPlayersInStomach().begin(); it != m_pInstance->GetPlayersInStomach().end();) {
-                Player* player = m_creature->GetMap()->GetPlayer(it->first);
-                // this should not be needed afaik as it's already done in loop above. But just in case.
-                if (!player) {
-                    ++it;
-                    continue;
-                }
-                if (Creature* puntCreature = m_pInstance->GetMap()->GetCreature(puntCreatureGuid)) {
-                    if (player->GetDistance(puntCreature) < 7.0f) {
-                        //player->CastSpell(player, SPELL_PUNT_UPWARD, true);
-                        //player->RemoveAurasDueToSpell(SPELL_PUNT_UPWARD);
-                    }
-                }
-                ++it;
-            }
-            // just setting it high so no continous punting happens until punt creature despawns
-            // and timer is re-initialized 
-            stomachPuntTimer = std::numeric_limits<uint32>::max();
-        }
-        else {
-            stomachPuntTimer -= diff;
-        }  
-#endif
-    }
-
     void JustDied(Unit* pKiller)
     {
         if (m_pInstance)
@@ -1044,7 +827,7 @@ struct eye_of_cthunAI : public ScriptedAI
         m_pInstance = dynamic_cast<instance_temple_of_ahnqiraj*>(pCreature->GetInstanceData());
         if (!m_pInstance)
             sLog.outError("SD0: No Instance eye_of_cthunAI");
-        
+
         Reset();
     }
 
@@ -1378,11 +1161,9 @@ struct eye_tentacleAI : public ScriptedAI
 
         }
         else {
-            Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(currentMFTarget);
-            if (currentCastTarget) {
-                // Stop casting on current target if it's been ported to stomach
-                const CThunStomachList& lst = m_pInstance->GetPlayersInStomach();
-                if (PlayerInStomach(currentCastTarget, lst)) {
+            // Stop casting on current target if it's been ported to stomach
+            if (Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(currentMFTarget)) {
+                if (m_pInstance->PlayerInStomach(currentCastTarget)) {
                     m_creature->InterruptSpell(CurrentSpellTypes::CURRENT_CHANNELED_SPELL);
                 }
             }
@@ -1630,12 +1411,11 @@ struct giant_eye_tentacleAI : public ScriptedAI
         else {
             BeamTimer -= diff;
             if (m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
-                Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(beamTargetGuid);
-                if (currentCastTarget) {
-                    // Stop casting on current target if it's been ported to stomach
-                    // and immediately start casting on a new target
-                    const CThunStomachList& lst = m_pInstance->GetPlayersInStomach();
-                    if (PlayerInStomach(currentCastTarget, lst)) {
+                
+                // Stop casting on current target if it's been ported to stomach
+                // and immediately start casting on a new target
+                if (Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(beamTargetGuid)) {
+                    if (m_pInstance->PlayerInStomach(currentCastTarget)) {
                         m_creature->InterruptNonMeleeSpells(false);
                         BeamTimer = 0;
                     }
