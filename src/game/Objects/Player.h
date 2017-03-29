@@ -737,7 +737,7 @@ class TradeData
     public:                                                 // constructors
         TradeData(Player* player, Player* trader) :
             m_player(player),  m_trader(trader), m_accepted(false), m_acceptProccess(false),
-            m_money(0), m_spell(0), m_lastModificationTime(0){}
+            m_money(0), m_spell(0), m_lastModificationTime(0), m_scamPreventionDelay(0){}
 
     public:                                                 // access functions
 
@@ -762,6 +762,9 @@ class TradeData
 
         time_t GetLastModificationTime() const { return m_lastModificationTime; }
         void SetLastModificationTime(time_t t) { m_lastModificationTime = t; }
+		
+		time_t GetScamPreventionDelay() const { return m_scamPreventionDelay; }
+		void SetScamPreventionDelay(time_t t) { m_scamPreventionDelay = t; }
     public:                                                 // access functions
 
         void SetItem(TradeSlots slot, Item* item);
@@ -793,6 +796,7 @@ class TradeData
         ObjectGuid m_items[TRADE_SLOT_COUNT];               // traded itmes from m_player side including non-traded slot
 
         time_t     m_lastModificationTime;                  // to prevent scam (change gold before the other validates)
+		time_t	   m_scamPreventionDelay;					// to prevent scam, set a delay in milliseconds (CANNOT be less than or equal to 10ms) before accepting trade.
 };
 
 struct CinematicWaypointEntry

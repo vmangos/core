@@ -76,6 +76,7 @@ class MANGOS_DLL_SPEC MySQLConnection : public SqlConnection
         ~MySQLConnection();
 
         bool OpenConnection(bool reconnect);
+        bool Reconnect();
         bool HandleMySQLError(uint32 errNo);
 
         QueryResult* Query(const char *sql);

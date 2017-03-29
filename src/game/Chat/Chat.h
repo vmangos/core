@@ -259,6 +259,9 @@ class MANGOS_DLL_SPEC ChatHandler
         // Managing saved variables
         bool HandleVariableCommand(char* args);
         bool HandleReloadVariablesCommand(char* args);
+        //  AQ variables
+        bool HandleGetWarEffortResource(char* args);
+        bool HandleSetWarEffortResource(char* args);
         // Deplacement
         bool HandleGoForwardCommand(char* args);
         bool HandleGoUpCommand(char* args);
@@ -485,6 +488,7 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleLookupAccountEmailCommand(char* args);
         bool HandleLookupAccountIpCommand(char* args);
+        bool HandleLookupAccountIponlineCommand(char* args);
         bool HandleLookupAccountNameCommand(char* args);
         bool HandleLookupAreaCommand(char* args);
         bool HandleLookupCreatureCommand(char* args);
@@ -496,6 +500,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLookupPlayerIpCommand(char* args);
         bool HandleLookupPlayerAccountCommand(char* args);
         bool HandleLookupPlayerEmailCommand(char* args);
+        bool HandleLookupPlayerNameCommand(char* args);
         bool HandleLookupPoolCommand(char* args);
         bool HandleLookupQuestCommand(char* args);
         bool HandleLookupSkillCommand(char* args);
@@ -847,6 +852,7 @@ class MANGOS_DLL_SPEC ChatHandler
                                                             // select by arg (name/link) or in-game selection online/offline player
 
         // Utility methods for commands
+        bool ShowAccountIpListHelper(char* args, bool onlineonly);
         bool ShowAccountListHelper(QueryResult* result, uint32* limit = nullptr, bool title = true, bool error = true);
         void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player * target = nullptr );
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = nullptr);

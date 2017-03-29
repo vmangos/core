@@ -328,7 +328,7 @@ ByteBuffer& operator>> (ByteBuffer& buf, PackedGuidReader const& guid);
 
 inline PackedGuid ObjectGuid::WriteAsPacked() const { return PackedGuid(*this); }
 
-#if COMPILER == COMPILER_GNU
+#if COMPILER == COMPILER_GNU && __GNUC__ < 5
 HASH_NAMESPACE_START
 
     template<>

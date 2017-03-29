@@ -24,6 +24,7 @@
 #include <ace/OS_NS_unistd.h>
 #include <ace/Sched_Params.h>
 #include <vector>
+#include <chrono>
 
 using namespace ACE_Based;
 
@@ -188,6 +189,9 @@ void Thread::resume()
 
 ACE_THR_FUNC_RETURN Thread::ThreadTask(void * param)
 {
+    unsigned int seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    srand(seed);
+
     Runnable * _task = (Runnable*)param;
     _task->incReference();
     _task->run();

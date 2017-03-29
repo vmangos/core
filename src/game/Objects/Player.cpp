@@ -4290,6 +4290,7 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
+    m_movementInfo.AddMovementFlag(MOVEFLAG_WATERWALKING);
     SetMovement(MOVE_WATER_WALK);
     if (!GetSession()->isLogingOut())
         SetMovement(MOVE_UNROOT);
@@ -4319,6 +4320,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         RemoveAurasDueToSpell(20584);                       // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
+    m_movementInfo.RemoveMovementFlag(MOVEFLAG_WATERWALKING);
     SetMovement(MOVE_LAND_WALK);
     SetMovement(MOVE_UNROOT);
 
@@ -6740,7 +6742,7 @@ void Player::ApplyEquipSpell(SpellEntry const* spellInfo, Item* item, bool apply
         if (item)
             RemoveAurasDueToItemSpell(item, spellInfo->Id); // un-apply all spells , not only at-equipped
         else
-            RemoveAurasDueToSpell(spellInfo->Id);           // un-apply spell (item set case)
+            RemoveSingleAuraDueToItemSet(spellInfo->Id);    // un-apply spell (item set case)
     }
 }
 
@@ -11049,7 +11051,7 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
         Item* item = *itr;
         ++itr;                                              // current element can be erased in UpdateDuration
 
-        if ((realtimeonly && (item->GetProto()->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION)) || !realtimeonly)
+        if (!realtimeonly || (item->GetProto()->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION))
             item->UpdateDuration(this, time);
     }
 }

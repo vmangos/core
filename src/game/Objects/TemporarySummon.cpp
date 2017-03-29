@@ -143,6 +143,57 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
                 m_timer = m_lifetime;
             break;
         }
+        case TEMPSUMMON_TIMED_COMBAT_OR_CORPSE_DESPAWN:
+        {
+            if (isDead())
+            {
+                UnSummon();
+                return;
+            }
+            if (m_timer <= update_diff)
+            {
+                if (!isInCombat())
+                {
+                    UnSummon();
+                    return;
+                }
+                else
+                    m_timer = 0;
+            }
+            else
+                m_timer -= update_diff;
+            break;
+        }
+        case TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN:
+        {
+            if (IsDespawned())
+            {
+                UnSummon();
+                return;
+            }
+
+            // Reset timer when the mob dies
+            if (!isAlive() && !m_justDied)
+            {
+                m_justDied = true;
+                m_timer = m_lifetime;
+            }
+
+            if (m_timer <= update_diff)
+            {
+                // Prevent despawn while the mob is still in combat
+                if (!isInCombat())
+                {
+                    UnSummon();
+                    return;
+                }
+                else
+                    m_timer = 0;
+            }
+            else
+                m_timer -= update_diff;
+            break;
+        }
         default:
             UnSummon();
             sLog.outError("Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);

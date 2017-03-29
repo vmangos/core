@@ -384,10 +384,11 @@ ChatCommand * ChatHandler::getCommandTable()
 
     static ChatCommand lookupAccountCommandTable[] =
     {
-        { NODE, "email",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountEmailCommand,  "", nullptr },
-        { NODE, "ip",             SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountIpCommand,     "", nullptr },
-        { NODE, "name",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountNameCommand,   "", nullptr },
-        { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
+        { NODE, "email",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountEmailCommand,     "", nullptr },
+        { NODE, "ip",             SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountIpCommand,        "", nullptr },
+        { NODE, "iponline",       SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountIponlineCommand,  "", nullptr },
+        { NODE, "name",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupAccountNameCommand,      "", nullptr },
+        { MSTR, nullptr,          0,                  false, nullptr,                                           "", nullptr }
     };
 
     static ChatCommand lookupPlayerCommandTable[] =
@@ -395,6 +396,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "account",        SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupPlayerAccountCommand, "", nullptr },
         { NODE, "email",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupPlayerEmailCommand,   "", nullptr },
         { NODE, "ip",             SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupPlayerIpCommand,      "", nullptr },
+        { NODE, "name",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupPlayerNameCommand,    "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 
@@ -978,7 +980,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "cinematic",      SEC_GAMEMASTER,     false, nullptr,                                           "", cinematicCommandTable},
         { NODE, "escorte",        SEC_GAMEMASTER,     false, nullptr,                                           "", escortCommandTable},
         { NODE, "worldstate",     SEC_GAMEMASTER,     false, nullptr,                                           "", worldStateCommandTable},
-        { NODE, "bg",             SEC_PLAYER,         false, nullptr,                                           "", bgCommandTable},
+        { NODE, "bg",             SEC_GAMEMASTER,     false, nullptr,                                           "", bgCommandTable},
         { NODE, "spell",          SEC_GAMEMASTER,     true, nullptr,                                           "", spellCommandTable},
         { NODE, "variable",       SEC_GAMEMASTER,     true,  &ChatHandler::HandleVariableCommand,            "", nullptr},
         { NODE, "god",            SEC_GAMEMASTER,     false, &ChatHandler::HandleGodCommand,                 "", nullptr },
@@ -1004,6 +1006,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "distance",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleGetDistanceCommand,         "", nullptr },
         { NODE, "recall",         SEC_MODERATOR,      false, &ChatHandler::HandleRecallCommand,              "", nullptr },
         { NODE, "save",           SEC_PLAYER,         false, &ChatHandler::HandleSaveCommand,                "", nullptr },
+        { MSTR, "wareffortget",   SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleGetWarEffortResource,       "", nullptr },
+        { MSTR, "wareffortset",   SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleSetWarEffortResource,       "", nullptr },
         { MSTR, "saveall",        SEC_MODERATOR,      true,  &ChatHandler::HandleSaveAllCommand,             "", nullptr },
         { MSTR, "kick",           SEC_GAMEMASTER,     true,  &ChatHandler::HandleKickPlayerCommand,          "", nullptr },
         { MSTR, "ban",            SEC_ADMINISTRATOR,  true, nullptr,                                           "", banCommandTable      },

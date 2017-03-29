@@ -1979,8 +1979,7 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             modelid = 632;
             break;
         case FORM_AQUA:
-            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-                modelid = 2428;
+            modelid = 2428;
             break;
         case FORM_BEAR:
         {
