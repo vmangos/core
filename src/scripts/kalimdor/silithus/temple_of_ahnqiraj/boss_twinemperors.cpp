@@ -56,9 +56,42 @@ EndScriptData */
 #define SPELL_BLIZZARD              26607
 #define SPELL_ARCANEBURST           568
 
+enum eScriptTexts {
+    SAY_VEKLOR_AGGRO_1      = -1531019, // its too late to turn away
+    SAY_VEKLOR_AGGRO_2      = -1531020, // prepare to embrace oblivion
+    SAY_VEKLOR_AGGRO_3      = -1531021, // like a fly in a web
+    SAY_VEKLOR_AGGRO_4      = -1531022, // your brash arrogance
+    SAY_VEKLOR_SLAY         = -1531023, // you will not escape death
+    SAY_VEKLOR_SPECIAL      = -1531025, // to decorate our halls
+                                           
+    SAY_VEKNILASH_AGGRO_1   = -1531026, // ah, lambs to the slaughter
+    SAY_VEKNILASH_AGGRO_2   = -1531027, // let none survive
+    SAY_VEKNILASH_AGGRO_3   = -1531028, // join me brother, there is blood to be shed
+    SAY_VEKNILASH_AGGRO_4   = -1531029, // look brother, fresh bloood
+    SAY_VEKNILASH_SLAY      = -1531030, // your fate is sealed
+    SAY_VEKNILASH_SPECIAL   = -1531032, // Shall be your undoing (wipe?)
+                                        
+    //death is handled by instance_temple_of_ahnqiraj.cpp
+    //NOTE: according to wowwiki, the *_SLAY emotes are used during enrage,
+    //      while "Oblivion will engulf you", "Like a fly in a web" and "your brash arrogance" 
+    //      is used on killing player. Not been able to confirm this.
+};
+
+static const SIDialogueEntry pullDialogue[] =
+{
+    { EMOTE_EYE_INTRO,       NPC_MASTERS_EYE, 7000 },
+    { SAY_EMPERORS_INTRO_1,  NPC_VEKLOR,      6000 },
+    { SAY_EMPERORS_INTRO_2,  NPC_VEKNILASH,   8000 },
+    { SAY_EMPERORS_INTRO_3,  NPC_VEKLOR,      3000 },
+    { SAY_EMPERORS_INTRO_4,  NPC_VEKNILASH,   3000 },
+    { SAY_EMPERORS_INTRO_5,  NPC_VEKLOR,      3000 },
+    { SAY_EMPERORS_INTRO_6,  NPC_VEKNILASH,   0 },
+    { 0, 0, 0 }
+};
+
 struct boss_twinemperorsAI : public ScriptedAI
 {
-    ScriptedInstance* m_pInstance;
+    instance_temple_of_ahnqiraj* m_pInstance;
     uint32 Heal_Timer;
     uint32 Teleport_Timer;
     bool AfterTeleport;
@@ -67,14 +100,24 @@ struct boss_twinemperorsAI : public ScriptedAI
     uint32 Abuse_Bug_Timer, BugsTimer;
     bool tspellcasted;
     uint32 EnrageTimer;
+    
+    SIDialogueEntry pullScriptedText;
 
     virtual bool IAmVeklor() = 0;
     virtual void Reset() = 0;
     virtual void CastSpellOnBug(Creature *target) = 0;
 
-    boss_twinemperorsAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_twinemperorsAI(Creature* pCreature) : 
+        ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        instance_temple_of_ahnqiraj* tmpPTr = dynamic_cast<instance_temple_of_ahnqiraj*>(pCreature->GetInstanceData());
+        if (!tmpPTr) {
+            sLog.outError("boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
+            m_pInstance = nullptr;
+        }
+        else {
+            m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
+        }
         TwinReset();
     }
 
@@ -89,7 +132,8 @@ struct boss_twinemperorsAI : public ScriptedAI
         BugsTimer = 2000;
         m_creature->clearUnitState(UNIT_STAT_STUNNED);
         DontYellWhenDead = false;
-        EnrageTimer = 15 * 60000;
+        EnrageTimer = 15 * 60000; // todo: uncertain which dialogue should be used on enrage, wowwiki does not add up with db scripts
+
     }
 
     Creature* GetOtherBoss()
@@ -123,21 +167,11 @@ struct boss_twinemperorsAI : public ScriptedAI
             pOtherBoss->SetHealth(0);
             pOtherBoss->SetDeathState(JUST_DIED);
             pOtherBoss->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-
-            if (boss_twinemperorsAI* pOtherAI = dynamic_cast<boss_twinemperorsAI*>(pOtherBoss->AI()))
-                pOtherAI->DontYellWhenDead = true;
         }
 
-        if (!DontYellWhenDead)                              // I hope AI is not threaded
-            DoPlaySoundToSet(m_creature, IAmVeklor() ? SOUND_VL_DEATH : SOUND_VN_DEATH);
-
+        // Death text script is handled by instance upon receiving DONE data
         if (m_pInstance)
             m_pInstance->SetData(TYPE_TWINS, DONE);
-    }
-
-    void KilledUnit(Unit* victim)
-    {
-        DoPlaySoundToSet(m_creature, IAmVeklor() ? SOUND_VL_KILL : SOUND_VN_KILL);
     }
 
     void Aggro(Unit* pWho)
@@ -149,7 +183,6 @@ struct boss_twinemperorsAI : public ScriptedAI
             // is near I dont know how to do that
             if (!pOtherBoss->isInCombat())
             {
-                DoPlaySoundToSet(m_creature, IAmVeklor() ? SOUND_VL_AGGRO : SOUND_VN_AGGRO);
                 pOtherBoss->AI()->AttackStart(pWho);
             }
         }
@@ -429,6 +462,18 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         else EnrageTimer -= diff;
     }
+
+    void SharedUpdate(uint32 diff) 
+    {
+        // Update the pull dialogue
+        if (pullScriptedText.uiTimer < diff) {
+            DoScriptText(pullScriptedText.iTextEntry, m_creature);
+            pullScriptedText.uiTimer = std::numeric_limits<uint32>::max();
+        }
+        else {
+            pullScriptedText.uiTimer -= diff;
+        }
+    }
 };
 
 struct boss_veknilashAI : public boss_twinemperorsAI
@@ -460,6 +505,8 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         //Added. Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
+
+        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), NPC_VEKNILASH, 2000 };
     }
 
     void CastSpellOnBug(Creature *target)
@@ -473,6 +520,8 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        SharedUpdate(diff);
 
         if (!TryActivateAfterTTelep(diff))
             return;
@@ -510,6 +559,11 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
         DoMeleeAttackIfReady();
     }
+
+    void KilledUnit(Unit*) override
+    {
+        DoScriptText(SAY_VEKNILASH_SLAY, m_creature);
+    }
 };
 
 struct boss_veklorAI : public boss_twinemperorsAI
@@ -545,6 +599,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
         m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0);
         m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0);
+        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKLOR_AGGRO_4, SAY_VEKLOR_AGGRO_1), NPC_VEKLOR, 0 };
     }
 
     void CastSpellOnBug(Creature *target)
@@ -558,6 +613,8 @@ struct boss_veklorAI : public boss_twinemperorsAI
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        SharedUpdate(diff);
 
         // reset arcane burst after teleport - we need to do this because
         // when VL jumps to VN's location there will be a warrior who will get only 2s to run away
@@ -634,6 +691,11 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
             m_creature->GetMotionMaster()->MoveChase(who, VEKLOR_DIST, 0);
         }
+    }
+
+    void KilledUnit(Unit*)
+    {
+        DoScriptText(SAY_VEKLOR_SLAY, m_creature);
     }
 };
 
