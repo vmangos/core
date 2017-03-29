@@ -41,7 +41,7 @@ INSERT INTO script_texts (entry, content_default, sound, type, language, emote, 
 -- Vek'lor yells
 (-1531019,'It\'s too late to turn away.', 		                8623,1,0,0,'veklor SAY_AGGRO_1'),
 (-1531020,'Prepare to embrace oblivion!', 		                8626,1,0,0,'veklor SAY_AGGRO_2'),
-(-1531021,'Like a fly in a web.',         		                8624,1,0,0,'veklor SAY_AGGRO_3'),
+(-1531021,'Like a fly to the web.',         		            8624,1,0,0,'veklor SAY_AGGRO_3'),
 (-1531022,'Your brash arrogance!',        		                8628,1,0,0,'veklor SAY_AGGRO_4'),
 (-1531023,'You will not escape death!',                         8629,1,0,0,'veklor SAY_SLAY'),
 (-1531024,'My brother...NO!',                                   8625,1,0,0,'veklor SAY_DEATH'),
