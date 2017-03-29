@@ -259,6 +259,9 @@ class MANGOS_DLL_SPEC ChatHandler
         // Managing saved variables
         bool HandleVariableCommand(char* args);
         bool HandleReloadVariablesCommand(char* args);
+        //  AQ variables
+        bool HandleGetWarEffortResource(char* args);
+        bool HandleSetWarEffortResource(char* args);
         // Deplacement
         bool HandleGoForwardCommand(char* args);
         bool HandleGoUpCommand(char* args);

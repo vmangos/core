@@ -1706,6 +1706,93 @@ bool QuestComplete_npc_AQwar_collector(Player* pPlayer, Creature* pQuestGiver, Q
     return true;
 }
 
+const WarEffort* InternalGetResource(char* ResourceName, const WarEffort* InArray, int ArrSize)
+{
+    for (int i = 0; i < ArrSize; ++i)
+    {
+        const WarEffort* SharedRes = &InArray[i];
+        if (strcmp(ResourceName, SharedRes->itemName) == 0)
+        {
+            return SharedRes;
+        }
+    }
+
+    return nullptr;
+}
+
+const WarEffort* GetResourceIDFromString(char* ResourceName)
+{
+    if (ResourceName == nullptr) return nullptr;
+
+    const WarEffort* SharedWarEffortSup = InternalGetResource(ResourceName, SharedObjectives, sizeof(SharedObjectives) / sizeof(WarEffort));
+    if (SharedWarEffortSup != nullptr) return SharedWarEffortSup;
+
+    const WarEffort* AlliaceWarEffortSup = InternalGetResource(ResourceName, AllianceObjectives, sizeof(AllianceObjectives) / sizeof(WarEffort));
+    if (AlliaceWarEffortSup != nullptr) return AlliaceWarEffortSup;
+
+    const WarEffort* HordeWarEffortSup = InternalGetResource(ResourceName, HordeObjectives, sizeof(HordeObjectives) / sizeof(WarEffort));
+    if (HordeWarEffortSup != nullptr) return HordeWarEffortSup;
+
+    return nullptr;
+}
+
+
+bool ChatHandler::HandleGetWarEffortResource(char* args)
+{
+    char* pResourceName = ExtractQuotedArg(&args);
+
+    auto PrintResources = [this] (const WarEffort* Resource)
+    {
+        uint32 CurrentResourceCount = sObjectMgr.GetSavedVariable(Resource->saveVarID);
+        double Progress = (double)CurrentResourceCount / (double)Resource->reqCount;
+        PSendSysMessage("\"%s\"[%u] Current [%u] Required [%u] Completed: %.03f", Resource->itemName, Resource->itemID, CurrentResourceCount, Resource->reqCount, Progress);
+    };
+    
+    if (const WarEffort* pResource = GetResourceIDFromString(pResourceName))
+    {
+        PrintResources(pResource);
+        return true;
+    }
+    else
+    {
+        PSendSysMessage("Error: resource with name \"%s\" not found", pResourceName);
+    }
+    
+    return false;
+}
+
+bool ChatHandler::HandleSetWarEffortResource(char* args)
+{
+    char* pResourceName = ExtractQuotedArg(&args);
+    if (pResourceName == nullptr)
+    {
+        PSendSysMessage("Usage example .wareffortset \"Iron Bar\" 1245");
+        return false;
+    }
+    uint32 NewResourceCount = 0;
+    if (!ExtractUInt32(&args, NewResourceCount))
+    {
+        PSendSysMessage("Usage example .wareffortset \"Iron Bar\" 1245");
+        return false;
+    }
+
+    if (const WarEffort* pResource = GetResourceIDFromString(pResourceName))
+    {
+        uint32 PreviousResourceCount = sObjectMgr.GetSavedVariable(pResource->saveVarID);
+        sObjectMgr.SetSavedVariable(pResource->saveVarID, NewResourceCount, true);
+        double Progress = (double)NewResourceCount / (double)pResource->reqCount;
+        PSendSysMessage("\"%s\" Previous count [%u] New count [%u] Completed: %.03f", pResourceName, PreviousResourceCount, NewResourceCount, Progress);
+        return true;
+    }
+    else
+    {
+        PSendSysMessage("Error: resource with name \"%s\" not found", pResourceName);
+    }
+
+
+    return false;
+}
+
 
 /*###
  ## npc_Geologist_Larksbane
