@@ -283,11 +283,10 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
             if (target->GetPositionZ() < -30.0f) {
                 sLog.outBasic("Trying to spawn %i <-30.0f", id);
             }
+            float x = target->GetPositionX() + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float y = target->GetPositionY() + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
             if (Creature* Spawned = relToCreature->SummonCreature(id,
-                target->GetPositionX() + frand(-1.0f, 1.0f),
-                target->GetPositionY() + frand(-1.0f, 1.0f),
-                target->GetPositionZ(),
-                0,
+                x, y, target->GetPositionZ(), 0,
                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
             {
                 Spawned->AI()->AttackStart(target);
