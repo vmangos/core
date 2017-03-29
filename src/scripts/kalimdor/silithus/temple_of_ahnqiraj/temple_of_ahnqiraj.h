@@ -84,6 +84,7 @@ enum
     AREATRIGGER_STOMACH_AIR     = 4034,
     AREATRIGGER_CTHUN_KNOCKBACK = 4036,
 
+    // RP event when players enter the room, triggered by AREATRIGGER_TWIN_EMPERORS
     EMOTE_EYE_INTRO             = -1531012,
     SAY_EMPERORS_INTRO_1        = -1531013,
     SAY_EMPERORS_INTRO_2        = -1531014,
@@ -91,6 +92,7 @@ enum
     SAY_EMPERORS_INTRO_4        = -1531016,
     SAY_EMPERORS_INTRO_5        = -1531017,
     SAY_EMPERORS_INTRO_6        = -1531018,
+
 
     // Whispered on players around the map
     SAY_CTHUN_WHISPER_1         = -1531033,
@@ -101,6 +103,9 @@ enum
     SAY_CTHUN_WHISPER_6         = -1531038,
     SAY_CTHUN_WHISPER_7         = -1531039,
     SAY_CTHUN_WHISPER_8         = -1531040,
+
+
+
     SPELL_SUMMON_PLAYER         = 20477,
 
     // Cast periodically on players around the instance
@@ -152,6 +157,7 @@ private:
     bool m_bIsEmperorsIntroDone;
 
     DialogueHelper m_dialogueHelper;
+    DialogueHelper m_twinsDeadDialogue;
 
     // The following functions, variables etc, are used to handle the C'thun stomach.
     // One might argue if they should be in boss_cthun.cpp instead, but it makes it a whole

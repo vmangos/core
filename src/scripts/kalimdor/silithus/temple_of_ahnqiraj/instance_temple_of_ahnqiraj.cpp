@@ -39,12 +39,24 @@ static const SIDialogueEntry aIntroDialogue[] =
     {0, 0, 0}
 };
 
+enum eTwinsDeathTexts {
+    SAY_VEKLOR_DEATH    = -1531024, //my brother...nO!
+    SAY_VEKNILASH_DEATH = -1531031 // Vek'loor, i feel your pain! 
+};
+static const SIDialogueEntry twinsDeathDialogue[] =
+{
+    { SAY_VEKNILASH_DEATH,  NPC_VEKNILASH, 3000 }, //todo: 3000 is just a guess
+    { SAY_VEKLOR_DEATH,     NPC_VEKLOR,    0 }, 
+    { 0, 0, 0 }
+};
+
 instance_temple_of_ahnqiraj::instance_temple_of_ahnqiraj(Map* pMap) :
     ScriptedInstance(pMap),
     m_uiBugTrioDeathCount(0),
     m_uiCthunWhisperTimer(90000),
     m_bIsEmperorsIntroDone(false),
-    m_dialogueHelper(aIntroDialogue)
+    m_dialogueHelper(aIntroDialogue),
+    m_twinsDeadDialogue(twinsDeathDialogue)
 {
     Initialize();
 };
@@ -54,6 +66,8 @@ void instance_temple_of_ahnqiraj::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
     m_dialogueHelper.InitializeDialogueHelper(this);
+    m_twinsDeadDialogue.InitializeDialogueHelper(this);
+
     sAreaTriggerStore.LookupEntry(4033);
 }
 
@@ -265,7 +279,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         case DONE:
             //despawn blue circles around NPCs after c'thun
             for (size_t i = 21797; i <= 21799; i++) {
-                if (GameObject* obj = GetMap()->GetGameObject(i)) {
+                if (GameObject* obj = instance->GetGameObject(i)) {
                 //if (GameObject* obj = m_pInstance->GetSingleGameObjectFromStorage(i)) {
                     obj->SetActiveObjectState(false);
                 }
@@ -279,8 +293,10 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
 
         m_auiEncounter[uiType] = uiData;
         DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
-        if (uiData == DONE)
+        if (uiData == DONE) {
             DoUseDoorOrButton(GO_TWINS_EXIT_DOOR);
+            m_twinsDeadDialogue.StartNextDialogueText(SAY_VEKNILASH_DEATH);
+        }
         break;
 
     }
@@ -311,13 +327,22 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     OUT_LOAD_INST_DATA(chrIn);
 
     std::istringstream loadStream(chrIn);
-	for (int i = 0; i < MAX_ENCOUNTER; ++i)
+	   for (int i = 0; i < MAX_ENCOUNTER; ++i)
     {
         loadStream >> m_auiEncounter[i];
         if (m_auiEncounter[i] == IN_PROGRESS)
             m_auiEncounter[i] = NOT_STARTED;
     }
-    //m_auiEncounter[TYPE_CTHUN_PHASE] = m_auiEncounter[TYPE_CTHUN] == DONE ? PHASE_CTHUN_DONE : PHASE_EYE_NORMAL;
+    
+    // Immediately despawn the C'thun grasp objects if c'thun is dead.
+    if (m_auiEncounter[TYPE_CTHUN] != DONE) {
+        for (size_t i = 21797; i <= 21799; i++) {
+            if (GameObject* obj = instance->GetGameObject(i)) {
+                //if (GameObject* obj = m_pInstance->GetSingleGameObjectFromStorage(i)) {
+                obj->SetActiveObjectState(false);
+            }
+        }
+    }
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }
@@ -480,8 +505,9 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
 void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
 {
     m_dialogueHelper.DialogueUpdate(uiDiff);
+    m_twinsDeadDialogue.DialogueUpdate(uiDiff);
 
-    if (GetData(TYPE_CTHUN) != IN_PROGRESS && GetData(TYPE_CTHUN) == DONE) {
+    if (GetData(TYPE_CTHUN) != IN_PROGRESS && GetData(TYPE_CTHUN) != DONE) {
         if (m_uiCthunWhisperTimer < uiDiff)
         {
             if (Player* pPlayer = GetPlayerInMap())
@@ -490,17 +516,7 @@ void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
                 {
                     // ToDo: this should whisper all players, not just one?
                     // ToDo: also cast the C'thun Whispering charm spell - requires additional research
-                    switch (urand(0, 7))
-                    {
-                    case 0: DoScriptText(SAY_CTHUN_WHISPER_1, pCthun, pPlayer); break;
-                    case 1: DoScriptText(SAY_CTHUN_WHISPER_2, pCthun, pPlayer); break;
-                    case 2: DoScriptText(SAY_CTHUN_WHISPER_3, pCthun, pPlayer); break;
-                    case 3: DoScriptText(SAY_CTHUN_WHISPER_4, pCthun, pPlayer); break;
-                    case 4: DoScriptText(SAY_CTHUN_WHISPER_5, pCthun, pPlayer); break;
-                    case 5: DoScriptText(SAY_CTHUN_WHISPER_6, pCthun, pPlayer); break;
-                    case 6: DoScriptText(SAY_CTHUN_WHISPER_7, pCthun, pPlayer); break;
-                    case 7: DoScriptText(SAY_CTHUN_WHISPER_8, pCthun, pPlayer); break;
-                    }
+                    DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, pPlayer);
                 }
             }
             m_uiCthunWhisperTimer = urand(1.5 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS);
