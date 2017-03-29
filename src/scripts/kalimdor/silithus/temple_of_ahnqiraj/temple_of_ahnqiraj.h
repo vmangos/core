@@ -7,8 +7,6 @@
 
 enum
 {
-    MAX_ENCOUNTER               = 10,
-
     TYPE_SKERAM                 = 0,
     TYPE_SARTURA                = 1,
     TYPE_FANKRISS               = 2,
@@ -18,7 +16,8 @@ enum
     TYPE_BUG_TRIO               = 6,
     TYPE_VISCIDUS               = 7,
     TYPE_OURO                   = 8,
-    TYPE_CTHUN_PHASE            = 9,
+    
+    MAX_ENCOUNTER               = 10,
 };
 
 enum
@@ -77,6 +76,7 @@ enum
     GO_TWINS_ENTER_DOOR         = 180634,
     GO_TWINS_EXIT_DOOR          = 180635,
     GO_SANDWORM_BASE            = 180795,
+    GO_GRASP_OF_CTHUN           = 180745,
 
     AREATRIGGER_TWIN_EMPERORS	  = 4047,
     AREATRIGGER_SARTURA		       = 4052,
@@ -109,27 +109,6 @@ enum
     SPELL_WHISPERINGS_CTHUN_3   = 26198,
     SPELL_WHISPERINGS_CTHUN_4   = 26258,
     SPELL_WHISPERINGS_CTHUN_5   = 26259,
-};
-
-
-// Used for C'thun only, but needed by multiple mobs so putting in instance
-struct StomachTimers {
-    uint32 acidDebuff;
-    StomachTimers() :
-        acidDebuff(StomachTimers::ACID_REFRESH_RATE)
-    {}
-    static const uint32 PUNT_CAST_TIME      = 3000;
-    static const uint32 ACID_REFRESH_RATE    = 5000;
-};
-
-enum CThunPhase
-{
-    PHASE_EYE_NORMAL = 0,
-    PHASE_EYE_DARK_GLARE = 1,
-    PHASE_TRANSITION = 2,
-    PHASE_CTHUN_INVULNERABLE = 3,
-    PHASE_CTHUN_WEAKENED = 4,
-    PHASE_CTHUN_DONE = 5,
 };
 
 static const float puntPosition[3] =
@@ -194,6 +173,14 @@ private:
         PUNT_CREATURE                   = 15922, // Trigger for cthuns belly knockup spell
         SPELL_QUAKE                     = 26093, //used for its visual only with SendSpellGo. It deals damage if cast normally
         SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, was killing c'thun too. Maybe that's intended => a respawn?
+    };
+    struct StomachTimers {
+        uint32 acidDebuff;
+        StomachTimers() :
+            acidDebuff(StomachTimers::ACID_REFRESH_RATE)
+        {}
+        static const uint32 PUNT_CAST_TIME = 3000;
+        static const uint32 ACID_REFRESH_RATE = 5000;
     };
     using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
     void UpdateStomachOfCthun(uint32 diff);

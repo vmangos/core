@@ -92,21 +92,24 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
 {
     switch (pGo->GetEntry())
     {
-        case GO_SKERAM_GATE:
-            if (m_auiEncounter[TYPE_SKERAM] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            break;
-        case GO_TWINS_ENTER_DOOR:
-			if (m_auiEncounter[TYPE_HUHURAN] == DONE)
-				pGo->SetGoState(GO_STATE_ACTIVE);
-            break;
-        case GO_TWINS_EXIT_DOOR:
-            if (m_auiEncounter[TYPE_TWINS] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            break;
-
-        default:
-            return;
+    case GO_SKERAM_GATE:
+        if (m_auiEncounter[TYPE_SKERAM] == DONE)
+        pGo->SetGoState(GO_STATE_ACTIVE);
+    break;
+    case GO_TWINS_ENTER_DOOR:
+        if (m_auiEncounter[TYPE_HUHURAN] == DONE)
+            pGo->SetGoState(GO_STATE_ACTIVE);
+    break;
+    case GO_TWINS_EXIT_DOOR:
+        if (m_auiEncounter[TYPE_TWINS] == DONE)
+            pGo->SetGoState(GO_STATE_ACTIVE);
+        break;
+    case GO_GRASP_OF_CTHUN:
+        if (m_auiEncounter[TYPE_CTHUN] == DONE)
+            pGo->SetActiveObjectState(false);
+        break;
+    default:
+        return;
     }
 
     m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
@@ -249,9 +252,26 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         }
         m_auiEncounter[uiType] = uiData;
         break;
-    case TYPE_CTHUN_PHASE:
+    case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
+        switch (uiData)
+        {
+        case NOT_STARTED:
+            //if (Creature* pSpawner = GetSingleCreatureFromStorage(NPC_CTHUN))
+            //    pSpawner->Respawn();
+            //if(Creature* pSpawner = GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN))
+            //    pSpawner->Respawn();
         break;
+        case DONE:
+            //despawn blue circles around NPCs after c'thun
+            for (size_t i = 21797; i <= 21799; i++) {
+                if (GameObject* obj = GetMap()->GetGameObject(i)) {
+                //if (GameObject* obj = m_pInstance->GetSingleGameObjectFromStorage(i)) {
+                    obj->SetActiveObjectState(false);
+                }
+            }
+        break;
+        }
     case TYPE_TWINS:
         // Either of the twins can set data, so return to avoid double changing
         if (m_auiEncounter[uiType] ==  uiData)
@@ -297,7 +317,7 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
         if (m_auiEncounter[i] == IN_PROGRESS)
             m_auiEncounter[i] = NOT_STARTED;
     }
-    m_auiEncounter[TYPE_CTHUN_PHASE] = 0;
+    //m_auiEncounter[TYPE_CTHUN_PHASE] = m_auiEncounter[TYPE_CTHUN] == DONE ? PHASE_CTHUN_DONE : PHASE_EYE_NORMAL;
 
     OUT_LOAD_INST_DATA_COMPLETE;
 }
@@ -384,7 +404,7 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         RemovePlayerFromStomach(pPlayer);
         
         // "Disable" the knockback if c'thun is killed
-        if (GetData(TYPE_CTHUN_PHASE) != PHASE_CTHUN_DONE) {
+        if (GetData(TYPE_CTHUN) != DONE) {
             if (Creature* kbCreature = GetMap()->SummonCreature(EXIT_KNOCKBACK_CREATURE, pAt->x, pAt->y, pAt->z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
                 kbCreature->CastSpell(kbCreature, SPELL_EXIT_STOMACH_KNOCKBACK, false);
             }
@@ -461,34 +481,34 @@ void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
 {
     m_dialogueHelper.DialogueUpdate(uiDiff);
 
-    if (GetData(TYPE_CTHUN) == IN_PROGRESS || GetData(TYPE_CTHUN) == DONE)
-        return;
-
-    if (m_uiCthunWhisperTimer < uiDiff)
-    {
-        if (Player* pPlayer = GetPlayerInMap())
+    if (GetData(TYPE_CTHUN) != IN_PROGRESS && GetData(TYPE_CTHUN) == DONE) {
+        if (m_uiCthunWhisperTimer < uiDiff)
         {
-            if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
+            if (Player* pPlayer = GetPlayerInMap())
             {
-                // ToDo: this should whisper all players, not just one?
-                // ToDo: also cast the C'thun Whispering charm spell - requires additional research
-                switch (urand(0, 7))
+                if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
                 {
-                case 0: DoScriptText(SAY_CTHUN_WHISPER_1, pCthun, pPlayer); break;
-                case 1: DoScriptText(SAY_CTHUN_WHISPER_2, pCthun, pPlayer); break;
-                case 2: DoScriptText(SAY_CTHUN_WHISPER_3, pCthun, pPlayer); break;
-                case 3: DoScriptText(SAY_CTHUN_WHISPER_4, pCthun, pPlayer); break;
-                case 4: DoScriptText(SAY_CTHUN_WHISPER_5, pCthun, pPlayer); break;
-                case 5: DoScriptText(SAY_CTHUN_WHISPER_6, pCthun, pPlayer); break;
-                case 6: DoScriptText(SAY_CTHUN_WHISPER_7, pCthun, pPlayer); break;
-                case 7: DoScriptText(SAY_CTHUN_WHISPER_8, pCthun, pPlayer); break;
+                    // ToDo: this should whisper all players, not just one?
+                    // ToDo: also cast the C'thun Whispering charm spell - requires additional research
+                    switch (urand(0, 7))
+                    {
+                    case 0: DoScriptText(SAY_CTHUN_WHISPER_1, pCthun, pPlayer); break;
+                    case 1: DoScriptText(SAY_CTHUN_WHISPER_2, pCthun, pPlayer); break;
+                    case 2: DoScriptText(SAY_CTHUN_WHISPER_3, pCthun, pPlayer); break;
+                    case 3: DoScriptText(SAY_CTHUN_WHISPER_4, pCthun, pPlayer); break;
+                    case 4: DoScriptText(SAY_CTHUN_WHISPER_5, pCthun, pPlayer); break;
+                    case 5: DoScriptText(SAY_CTHUN_WHISPER_6, pCthun, pPlayer); break;
+                    case 6: DoScriptText(SAY_CTHUN_WHISPER_7, pCthun, pPlayer); break;
+                    case 7: DoScriptText(SAY_CTHUN_WHISPER_8, pCthun, pPlayer); break;
+                    }
                 }
             }
+            m_uiCthunWhisperTimer = urand(1.5 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS);
         }
-        m_uiCthunWhisperTimer = urand(1.5 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS);
+        else {
+            m_uiCthunWhisperTimer -= uiDiff;
+        }
     }
-    else
-        m_uiCthunWhisperTimer -= uiDiff;
 
     UpdateStomachOfCthun(uiDiff);
 }

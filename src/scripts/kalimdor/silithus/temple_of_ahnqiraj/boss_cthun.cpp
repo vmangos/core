@@ -214,8 +214,6 @@ private:
     
 };
 
-using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
-
 Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
 {
     if (!instance) return nullptr;
@@ -431,12 +429,6 @@ Unit* selectTargetFunc(Creature* c) {
     return c->getVictim();
 }
 
-// If defined, each player in stomach has his own punt timer.
-// Otherwise the punt timer starts each time a player goes in range,
-// and all players in range once the timer finishes, gets punted.
-// #define USE_INDIVIDUAL_PUNT_TIMER
-
-
 // ================== PHASE 1 CONSTANTS ==================
 static const uint32 P1_EYE_TENTACLE_RESPAWN_TIMER   = 45000;
 static const uint32 SPELL_ROTATE_TRIGGER_CASTTIME   = 3000;
@@ -477,6 +469,16 @@ uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500; // How long do we wa
 uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 3000; // How long do we wait after Eye tentacle has spawned until first MF
 // =======================================================
 
+enum CThunPhase
+{
+    PHASE_EYE_NORMAL = 0,
+    PHASE_EYE_DARK_GLARE = 1,
+    PHASE_TRANSITION = 2,
+    PHASE_CTHUN_INVULNERABLE = 3,
+    PHASE_CTHUN_WEAKENED = 4,
+    PHASE_CTHUN_DONE = 5,
+};
+
 struct cthunAI : public ScriptedAI
 {
     instance_temple_of_ahnqiraj* m_pInstance;
@@ -496,6 +498,8 @@ struct cthunAI : public ScriptedAI
     uint32 CthunEmergeTimer;
 
     std::vector<ObjectGuid> fleshTentacles;
+    
+    CThunPhase currentPhase;
 
     cthunAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -505,17 +509,44 @@ struct cthunAI : public ScriptedAI
         
         if (!m_pInstance)
             sLog.outError("SD0: No Instance eye_of_cthunAI");
-        
-        pCreature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-        pCreature->DeMorph();
 
         Reset();
         DoSpawnCreature(MOB_CTHUN_PORTAL, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
     }
 
+    void JustReachedHome() override
+    {
+        if (m_pInstance) {
+            m_pInstance->SetData(TYPE_CTHUN, FAIL);
+            if (Creature* eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN)) {
+                if (eye->isDead()) {
+                    eye->Respawn();
+                }
+            }
+        }
+    }
+
+    void Aggro(Unit*)
+    {
+        
+    }
+
     void Reset()
     {
-        EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in CthunEmergeTimer takes over the logic
+        currentPhase = PHASE_EYE_NORMAL;
+
+        //Reset Phase
+        if (m_pInstance)
+        {
+            //m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+            //m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_NORMAL);
+        }
+        else {
+            sLog.outBasic("eye_of_cthunAI: Reset called, but m_pInstance does not exist.");
+        }
+
+        //m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+        EyeDeathAnimTimer = 4000; // It's really 5 seconds, but 4 sec in the CthunEmergeTimer takes over the logic
         CthunEmergeTimer = 8000;
 
         ResetartUnvulnerablePhase();
@@ -533,40 +564,29 @@ struct cthunAI : public ScriptedAI
             }
             fleshTentacles.erase(fleshTentacles.begin());
         }
-        
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-        if (!PlayerList.isEmpty()) {
-            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr) {
-                if (Player* player = itr->getSource())
-                {
-                    //player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                }
-            }
-        }
-
+       
+        //these two shouldnt be needed with Respawn imo, but respawn dosent seem to do it?
+        //Does respawn just call this same function or whut
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                
+        // Demorph should set C'thuns modelId back to burrowed. 
+        // Also removing SPELL_TRANSFORM in case of reset just as he was casting that.
+        m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
+        m_creature->DeMorph();
+                
+        //m_creature->Respawn();
         if (m_pInstance)
         {
-            m_pInstance->SetData(TYPE_CTHUN_PHASE, 0);
-            m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+            //m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
 
-            Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-            if (b_Cthun) {
-                //these two shouldnt be needed with Respawn imo, but respawn dosent seem to do it?
-                //Does respawn just call this same function or whut
-                b_Cthun->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                
-                // Demorph should set C'thuns modelId back to burrowed. 
-                // Also removing SPELL_TRANSFORM in case of reset just as he was casting that.
-                b_Cthun->RemoveAurasDueToSpell(SPELL_TRANSFORM);
-                b_Cthun->DeMorph();
-                
-                b_Cthun->Respawn();
-            }
+            //Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
+            //if (b_Cthun) {
+            //}
 
-            Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
-            if (b_Eye) {
-                b_Eye->Respawn();
-            }
+            //Creature* b_Eye = m_pInstance->GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN);
+            //if (b_Eye) {
+            //    b_Eye->Respawn();
+            //}
         }
 
         //todo: do this? Need to make sure the tentacle portals despawn on bad reset 
@@ -599,116 +619,123 @@ struct cthunAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) < PHASE_TRANSITION)
+        if (currentPhase < PHASE_TRANSITION)
             return;
 
         m_creature->SetInCombatWithZone();
 
-        //Calling SelectHostileTarget() makes the eye
-        //turn to it's attacker. So instead of using that for evade check
-        //we do a simple check if there are alive players in instance before
-        //calling SelectHostileTarget() to handle evading.
-        if (!m_pInstance->GetPlayerInMap(true, false)) {
+        // If there are noone alive that are not in the stomach, the boss should kill 
+        // any players still in the stomach, and reset.
+        // Note: Calling SelectHostileTarget can make the body turn around towards its target,
+        //       hence we manually handle OnCombatLeave which SelectHostileTarget otherwise would have done for us.
+        if (!SelectRandomAliveNotStomach(m_pInstance)) {
+            m_pInstance->KillPlayersInStomach();
             m_creature->OnLeaveCombat();
-            Reset();
+            //Reset(); //XXX: is calling reset manually needed? shouldnt be, evade should do it yes?
             return;
         }
-        
+
         m_creature->SetTargetGuid(0);
 
-        VerifyAnyPlayerAliveOutside();
-
-        switch (m_pInstance->GetData(TYPE_CTHUN_PHASE)) {
+        switch (currentPhase) {
         case PHASE_TRANSITION: {
-            if (EyeDeathAnimTimer > 0) {
-
-                if (EyeDeathAnimTimer < diff) {
-                    EyeDeathAnimTimer = 0;
-                    CthunEmergeTimer = 8000;
-
-                    sLog.outBasic("Starting C'thun emerge animation");
-                    ResetartUnvulnerablePhase();
-
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                    m_creature->SetVisibility(VISIBILITY_ON);
-                    
-                    m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
-                }
-                else {
-                    EyeDeathAnimTimer -= diff;
-                }
-            }
-            else {
-                
-                TentacleTimers(diff);
-                UpdateStomachGrab(diff);
-                
-
-                if (CthunEmergeTimer < diff) {
-                    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    m_creature->SetInCombatWithZone();
-                    m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
-                    sLog.outBasic("Entering INVULNERABLE_STATE");
-                }
-                else {
-                    CthunEmergeTimer -= diff;
-                }
-            }
+            UpdateTransitionPhase(diff);
             break;
         case PHASE_CTHUN_INVULNERABLE:
-            // Weaken if both Flesh Tentacles are killed
-            // Should be fair to skip InvulnerablePhase update if both
-            // tentacles are already killed.
-            if (fleshTentacles.size() == 0) {
-                WeaknessTimer = WEAKNESS_DURATION;
-
-                DoScriptText(EMOTE_WEAKENED, m_creature);
-                // If there is a grabbed player, release him. 
-                if (!StomachEnterTargetGUID.IsEmpty()) {
-                    if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
-                        pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
-                    }
-                }
-
-                m_creature->CastSpell(m_creature, SPELL_CTHUN_VULNERABLE, true);
-                //Remove the damage reduction aura
-                m_creature->RemoveAurasDueToSpell(SPELL_CARAPACE_OF_CTHUN);
-                //Make him glow all red and nice
-                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_WEAKENED);
-                sLog.outBasic("Entering VULNERABLE_STATE");
-            }
-            else {
-                TentacleTimers(diff);
-
-                UpdateStomachGrab(diff);
-            }
+            UpdateInvulnerablePhase(diff);
             break;
         case PHASE_CTHUN_WEAKENED:
-            // If weakend runs out
-            if (WeaknessTimer < diff) {
-                ResetartUnvulnerablePhase();
-                //note: can set visibility off and on again after removing vulnerable spell, 
-                // if it does not visually dissapear
-                m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
-                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_CTHUN_INVULNERABLE);
-                sLog.outBasic("Entering INVULNERABLE_STATE");
-            }
-            else {
-                WeaknessTimer -= diff;
-            }
+            UpdateWeakenedPhase(diff);
             break;
         default:
-            sLog.outError("C'Thun in bugged state: %i", m_pInstance->GetData(TYPE_CTHUN_PHASE));
+            sLog.outError("C'Thun in bugged state: %i", currentPhase);
         }
         }
     }
 
-    void VerifyAnyPlayerAliveOutside()
+    void UpdateTransitionPhase(uint32 diff)
     {
-        if (!SelectRandomAliveNotStomach(m_pInstance)) {
-            m_pInstance->KillPlayersInStomach();
+        if (EyeDeathAnimTimer > 0) {
+            if (EyeDeathAnimTimer < diff) {
+                EyeDeathAnimTimer = 0;
+                CthunEmergeTimer = 8000;
+
+                sLog.outBasic("Starting C'thun emerge animation");
+                ResetartUnvulnerablePhase();
+
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                m_creature->SetVisibility(VISIBILITY_OFF);
+                m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+                m_creature->SetVisibility(VISIBILITY_ON);
+
+                m_creature->CastSpell(m_creature, SPELL_TRANSFORM, true);
+            }
+            else {
+                EyeDeathAnimTimer -= diff;
+            }
+        }
+        else {
+
+            TentacleTimers(diff);
+            UpdateStomachGrab(diff);
+
+
+            if (CthunEmergeTimer < diff) {
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                m_creature->SetInCombatWithZone();
+
+                sLog.outBasic("Entering INVULNERABLE_STATE");
+                currentPhase = PHASE_CTHUN_INVULNERABLE;
+            }
+            else {
+                CthunEmergeTimer -= diff;
+            }
+        }
+    }
+
+    void UpdateInvulnerablePhase(uint32 diff)
+    {
+        // Weaken if both Flesh Tentacles are killed
+        if (fleshTentacles.size() == 0) {
+            WeaknessTimer = WEAKNESS_DURATION;
+
+            DoScriptText(EMOTE_WEAKENED, m_creature);
+            // If there is a grabbed player, release him. 
+            if (!StomachEnterTargetGUID.IsEmpty()) {
+                if (Player* pPlayer = m_creature->GetMap()->GetPlayer(StomachEnterTargetGUID)) {
+                    pPlayer->RemoveAurasDueToSpell(SPELL_MOUTH_TENTACLE);
+                }
+            }
+
+            //Remove the damage reduction aura
+            m_creature->CastSpell(m_creature, SPELL_CTHUN_VULNERABLE, true);
+            //Make him glow all red and nice
+            m_creature->RemoveAurasDueToSpell(SPELL_CARAPACE_OF_CTHUN);
+            
+            sLog.outBasic("Entering VULNERABLE_STATE");
+            currentPhase = PHASE_CTHUN_WEAKENED;
+        }
+        else {
+            TentacleTimers(diff);
+
+            UpdateStomachGrab(diff);
+        }
+    }
+
+    void UpdateWeakenedPhase(uint32 diff)
+    {
+        // If weakend runs out
+        if (WeaknessTimer < diff) {
+            ResetartUnvulnerablePhase();
+            //note: can set visibility off and on again after removing vulnerable spell, 
+            // if it does not visually dissapear
+            m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
+            
+            sLog.outBasic("Entering INVULNERABLE_STATE");
+            currentPhase = PHASE_CTHUN_INVULNERABLE;
+        }
+        else {
+            WeaknessTimer -= diff;
         }
     }
     
@@ -796,12 +823,11 @@ struct cthunAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_CTHUN_PHASE, DONE);
+        if (m_pInstance) {
+            currentPhase = PHASE_CTHUN_DONE;
             m_pInstance->SetData(TYPE_CTHUN, DONE);
-            sLog.outBasic("C'thun died. Enetered DONE phase");
         }
+        sLog.outBasic("C'thun died. Enetered DONE phase");
     }
 
     void FleshTentcleKilled(ObjectGuid guid)
@@ -843,9 +869,24 @@ struct eye_of_cthunAI : public ScriptedAI
     uint32 eyeBeamPhaseDuration;
     uint32 eyeTentaclesCooldown;
     uint32 eyeBeamCooldown;
+    CThunPhase currentPhase;
+
+    void Aggro(Unit*)
+    {
+        if (m_pInstance) {
+            m_pInstance->SetData(TYPE_CTHUN, IN_PROGRESS);
+        }
+    }
 
     void Reset()
     {
+        currentPhase = PHASE_EYE_NORMAL;
+        
+        /*
+        if (m_pInstance->GetData(TYPE_CTHUN) != DONE) {
+            m_creature->Respawn();
+        }
+        */
         initialPullerGuid = 0;
         eyeBeamCastCount = 0;
         eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
@@ -859,21 +900,10 @@ struct eye_of_cthunAI : public ScriptedAI
         eyeBeamPhaseDuration = EYE_BEAM_PHASE_DURATION;
         eyeTentaclesCooldown = P1_EYE_TENTACLE_RESPAWN_TIMER;
 
-        //Reset Phase
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_NORMAL);
-            m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
-        }
-        else {
-            sLog.outBasic("eye_of_cthunAI: Reset called, but m_pInstance does not exist.");
-        }
-
         if (m_creature) {
             //not sure why its not attackable by default, but its not.
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-
-            // need to reset it in case of wipe during glare phase
+            // need to reset the orientation in case of wipe during glare phase
             m_creature->SetOrientation(3.44f);
             RemoveGlarePhaseSpells();
         }
@@ -905,79 +935,18 @@ struct eye_of_cthunAI : public ScriptedAI
             return;
         }
 
-        if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_NORMAL) {
-            if (eyeBeamPhaseDuration < diff) {
-                m_creature->InterruptNonMeleeSpells(false);
-
-                //Select random target for dark beam to start on and start the trigger
-                if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                {
-                    // Remove the target focus but allow the boss to face the current victim
-                    m_creature->SetFacingToObject(target);
-                    if (DoCastSpellIfCan(m_creature, SPELL_ROTATE_TRIGGER) == CAST_OK)
-                    {
-                        if (!m_creature->HasAura(SPELL_FREEZE_ANIMATION))
-                             m_creature->CastSpell(m_creature, SPELL_FREEZE_ANIMATION, true);
-                    }
-                    m_creature->SetTargetGuid(ObjectGuid());
-                }
-
-
-                // Switch to dark glare phase
-                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_DARK_GLARE);
-                darkGlarePhaseDuration = DARK_GLARE_PHASE_DURATION;
-            }
-            else {
-                eyeBeamPhaseDuration -= diff;
-
-                if(m_creature->HasAura(SPELL_FREEZE_ANIMATION))
-                    m_creature->RemoveAurasDueToSpell(SPELL_FREEZE_ANIMATION);
-
-                
-                
-                if (eyeBeamCooldown < diff) {
-                    Unit* target = nullptr;
-                    if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
-                        target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
-                    }
-                    else {
-                        target = SelectRandomAliveNotStomach(m_pInstance);
-                    }
-                    if (target) {
-                        if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
-                            // There should not be any LOS check
-                            m_creature->InterruptNonMeleeSpells(false);
-                            m_creature->SetTargetGuid(target->GetObjectGuid());
-                            m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
-                            eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
-                            ++eyeBeamCastCount;
-                        }
-                    }
-                }
-                else {
-                    eyeBeamCooldown -= diff;
-                }
-            }
+        switch (currentPhase) {
+        case PHASE_EYE_NORMAL:
+            UpdateEyePhase(diff);
+            break;
+        case PHASE_EYE_DARK_GLARE:
+            UpdateDarkGlarePhase(diff);
+            break;
+        default:
+            sLog.outError("CThun eye update called with incorrect state: %d", currentPhase);
         }
-        else if (m_pInstance->GetData(TYPE_CTHUN_PHASE) == PHASE_EYE_DARK_GLARE) {
-            if (darkGlarePhaseDuration < diff) {
-                m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_EYE_NORMAL);
-                eyeBeamPhaseDuration = EYE_BEAM_PHASE_DURATION;
-                eyeBeamCooldown = 0; // Should not be any cd now as we cancel dark glare 2 sec before phase end
-            }
-            else {
-                // We remove auras a bit before the phase "ends" to let the red beam "cool down" 
-                // and dissapear before first eyeBeam is cast. This will spam for a while but that should not matter
-                if (darkGlarePhaseDuration < 2000) {
-                    RemoveGlarePhaseSpells();
-                }
-                
-                darkGlarePhaseDuration -= diff;
-            }
-        }
-
+        
         if (SpawnTentacleIfReady(m_creature, diff, ClawTentacleTimer, 0, MOB_CLAW_TENTACLE)) {
-            //todo: is random correct?
             ClawTentacleTimer = clawTentacleSpanCooldownFunc();
         }
         
@@ -987,6 +956,78 @@ struct eye_of_cthunAI : public ScriptedAI
         }
         else {
             eyeTentaclesCooldown -= diff;
+        }
+    }
+
+    void UpdateEyePhase(uint32 diff) {
+
+        if (eyeBeamPhaseDuration < diff) {
+            m_creature->InterruptNonMeleeSpells(false);
+            //Select random target for dark beam to start on and start the trigger
+            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            {
+                // Remove the target focus but allow the boss to face the current victim
+                m_creature->SetFacingToObject(target);
+                if (DoCastSpellIfCan(m_creature, SPELL_ROTATE_TRIGGER) == CAST_OK)
+                {
+                    if (!m_creature->HasAura(SPELL_FREEZE_ANIMATION))
+                        m_creature->CastSpell(m_creature, SPELL_FREEZE_ANIMATION, true);
+                }
+                m_creature->SetTargetGuid(ObjectGuid());
+            }
+
+
+            // Switch to dark glare phase
+            currentPhase = PHASE_EYE_DARK_GLARE;
+            darkGlarePhaseDuration = DARK_GLARE_PHASE_DURATION;
+        }
+        else {
+            eyeBeamPhaseDuration -= diff;
+
+            if (m_creature->HasAura(SPELL_FREEZE_ANIMATION))
+                m_creature->RemoveAurasDueToSpell(SPELL_FREEZE_ANIMATION);
+
+            if (eyeBeamCooldown < diff) {
+                Unit* target = nullptr;
+
+                // We force the initial puller as the target for MAX_INITIAL_PULLER_HITS
+                if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
+                    target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
+                }
+                else {
+                    target = SelectRandomAliveNotStomach(m_pInstance);
+                }
+                if (target) {
+                    if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
+                        // There should not be any LOS check
+                        m_creature->InterruptNonMeleeSpells(false);
+                        m_creature->SetTargetGuid(target->GetObjectGuid());
+                        m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
+                        eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
+                        ++eyeBeamCastCount;
+                    }
+                }
+            }
+            else {
+                eyeBeamCooldown -= diff;
+            }
+        }
+    }
+    
+    void UpdateDarkGlarePhase(uint32 diff) {
+        if (darkGlarePhaseDuration < diff) {
+            currentPhase = PHASE_EYE_NORMAL;
+            eyeBeamPhaseDuration = EYE_BEAM_PHASE_DURATION;
+            eyeBeamCooldown = 0; // Should not be any cd here as we cancel dark glare 2 sec before phase end
+        }
+        else {
+            // We remove auras a bit before the phase "ends" to let the red beam "cool down" 
+            // and dissapear before first eyeBeam is cast. This will spam for a while but that should not matter
+            if (darkGlarePhaseDuration < 2000) {
+                RemoveGlarePhaseSpells();
+            }
+
+            darkGlarePhaseDuration -= diff;
         }
     }
 
@@ -1058,13 +1099,14 @@ struct eye_of_cthunAI : public ScriptedAI
 
     void JustDied(Unit *pKiller)
     {
-        //Death animation/respawning;
-        Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
-        if (b_Cthun)
+        // Passing on the current state to cthunAI which continues the fight.  
+        if (Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN))
         {
-           
+            cthunAI* ctAi = dynamic_cast<cthunAI*>(b_Cthun->AI());
+            if (ctAi) {
+                ctAi->currentPhase = PHASE_TRANSITION;
+            }
         }
-        m_pInstance->SetData(TYPE_CTHUN_PHASE, PHASE_TRANSITION);
     }
 
 };
