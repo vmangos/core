@@ -113,6 +113,9 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         else {
             m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
+            if (m_pInstance->GetData(TYPE_TWINS) == NOT_STARTED) {
+                m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
+            }
         }
         TwinReset();
     }
@@ -129,7 +132,6 @@ struct boss_twinemperorsAI : public ScriptedAI
         m_creature->clearUnitState(UNIT_STAT_STUNNED);
         DontYellWhenDead = false;
         EnrageTimer = 15 * 60000; // todo: uncertain which dialogue should be used on enrage, wowwiki does not add up with db scripts
-
     }
 
     Creature* GetOtherBoss()
@@ -503,7 +505,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         //Added. Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
 
-        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), NPC_VEKNILASH, 2000 };
+        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), NPC_VEKNILASH, 3000 };
     }
 
     void CastSpellOnBug(Creature *target)

@@ -88,8 +88,17 @@ void instance_temple_of_ahnqiraj::DoHandleTempleAreaTrigger(uint32 uiTriggerId)
     {
         m_dialogueHelper.StartNextDialogueText(EMOTE_EYE_INTRO);
         // Note: there may be more related to this; The emperors should kneel before the Eye and they stand up after it despawns
+        // https://www.youtube.com/watch?v=anDqSl-_y9Y
+        // https://www.youtube.com/watch?v=drIsWEJkkHs
+
+        // The eye should be turned away from the trigger, and emperors should be kneeling. 
+        // +0 emote happens
+        // +3 sec after entering trigger, the eye turns around and the emperors rise up to standing state.
+        // +8 the eye despawns and emperors begins the dialogue
         if (Creature* pEye = GetSingleCreatureFromStorage(NPC_MASTERS_EYE))
-            pEye->ForcedDespawn(1000);
+            pEye->ForcedDespawn(7000);
+
+
         m_bIsEmperorsIntroDone = true;
     }
     else if (uiTriggerId == AREATRIGGER_SARTURA)
