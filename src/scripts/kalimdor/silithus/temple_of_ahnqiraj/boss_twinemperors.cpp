@@ -27,34 +27,30 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
-#define SPELL_HEAL_BROTHER          7393
-#define SPELL_TWIN_TELEPORT         800                     // CTRA watches for this spell to start its teleport timer
-#define SPELL_TWIN_TELEPORT_VISUAL  26638                   // visual
 
-#define SPELL_EXPLODEBUG            804
-#define SPELL_MUTATE_BUG            802
+static const uint32 PULL_RANGE      = 50;
+static const uint32 ABUSE_BUG_RANGE = 20;
+static const uint32 TELEPORTTIME    = 30000;
+static const uint32 VEKLOR_DIST     = 20;// VL will not come to melee when attacking
 
-#define SOUND_VN_DEATH              8660                    //8660 - Death - Feel
-#define SOUND_VN_AGGRO              8661                    //8661 - Aggro - Let none
-#define SOUND_VN_KILL               8662                    //8661 - Kill - your fate
 
-#define SOUND_VL_AGGRO              8657                    //8657 - Aggro - To Late
-#define SOUND_VL_KILL               8658                    //8658 - Kill - You will not
-#define SOUND_VL_DEATH              8659                    //8659 - Death
-
-#define PULL_RANGE                  50
-#define ABUSE_BUG_RANGE             20
-#define SPELL_BERSERK               26662
-#define TELEPORTTIME                30000
-
-#define SPELL_UPPERCUT              26007
-#define SPELL_UNBALANCING_STRIKE    26613
-
-#define VEKLOR_DIST                 20                      // VL will not come to melee when attacking
-
-#define SPELL_SHADOWBOLT            26006
-#define SPELL_BLIZZARD              26607
-#define SPELL_ARCANEBURST           568
+enum eSpells {
+    SPELL_BERSERK               = 26662,
+    
+    SPELL_UPPERCUT              = 26007,
+    SPELL_UNBALANCING_STRIKE    = 26613,
+    
+    SPELL_HEAL_BROTHER          = 7393,
+    SPELL_TWIN_TELEPORT         = 800,   // CTRA watches for this spell to start its teleport timer
+    SPELL_TWIN_TELEPORT_VISUAL  = 26638, // visual
+    
+    SPELL_EXPLODEBUG            = 804,
+    SPELL_MUTATE_BUG            = 802,
+    
+    SPELL_SHADOWBOLT            = 26006,
+    SPELL_BLIZZARD              = 26607,
+    SPELL_ARCANEBURST           = 568,
+};
 
 enum eScriptTexts {
     SAY_VEKLOR_AGGRO_1      = -1531019, // its too late to turn away
@@ -302,8 +298,9 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         Teleport_Timer = TELEPORTTIME;
 
+        // mechanics handled by veknilash so they teleport exactly at the same time and to correct coordinates
         if (IAmVeklor())
-            return;                                         // mechanics handled by veknilash so they teleport exactly at the same time and to correct coordinates
+            return;  
 
         Creature *pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
@@ -314,11 +311,11 @@ struct boss_twinemperorsAI : public ScriptedAI
             float other_z = pOtherBoss->GetPositionZ();
             float other_o = pOtherBoss->GetOrientation();
 
- 	    pOtherBoss->NearTeleportTo(m_creature->GetPositionX(),
- 				       m_creature->GetPositionY(),
- 				       m_creature->GetPositionZ(),
-                                        m_creature->GetOrientation());
- 	    m_creature->NearTeleportTo(other_x, other_y, other_z, other_o);
+ 	          pOtherBoss->NearTeleportTo(m_creature->GetPositionX(),
+ 				           m_creature->GetPositionY(),
+ 				           m_creature->GetPositionZ(),
+                m_creature->GetOrientation());
+ 	          m_creature->NearTeleportTo(other_x, other_y, other_z, other_o);
 
 
             SetAfterTeleport();
