@@ -194,7 +194,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     void JustReachedHome()
     {
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_TWINS, DONE);
+            m_pInstance->SetData(TYPE_TWINS, FAIL);
     }
 
     void SpellHit(Unit *caster, const SpellEntry *entry)
