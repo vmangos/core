@@ -283,8 +283,9 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
             }
             float x = target->GetPositionX() + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
             float y = target->GetPositionY() + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float z = relToCreature->GetMap()->GetHeight(x, y, target->GetPositionZ()); //Manually finding the height in case player is jumping
             if (Creature* Spawned = relToCreature->SummonCreature(id,
-                x, y, target->GetPositionZ(), 0,
+                x, y, z, 0,
                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
             {
                 Spawned->AI()->AttackStart(target);
@@ -392,11 +393,11 @@ Player* UpdateClawEvade(uint32 diff, uint32& EvadeTimer, Creature* m_creature,
             //Dissapear and reappear at new position
             m_creature->SetVisibility(VISIBILITY_OFF);
 
-            m_creature->NearTeleportTo(
-                target->GetPositionX() + frand(-1.0f, 1.0f),
-                target->GetPositionY() + frand(-1.0f, 1.0f),
-                target->GetPositionZ(),
-                0);
+            float x = target->GetPositionX() + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float y = target->GetPositionY() + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float z = m_creature->GetMap()->GetHeight(x, y, target->GetPositionZ()); //Manually finding the height in case player is jumping
+
+            m_creature->NearTeleportTo(x, y, z, 0);
 
             if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
             {
