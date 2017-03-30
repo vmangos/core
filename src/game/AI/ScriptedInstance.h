@@ -118,10 +118,11 @@ protected:
     /// Will be called to get a speaker, MUST be implemented if not used in instances
     virtual Creature* GetSpeakerByEntry(uint32 /*uiEntry*/) { return nullptr; }
 
+    ScriptedInstance* m_pInstance;
+
 private:
     void DoNextDialogueStep();
 
-    ScriptedInstance* m_pInstance;
 
     SIDialogueEntry const* m_pDialogueArray;
     SIDialogueEntry const* m_pCurrentEntry;
