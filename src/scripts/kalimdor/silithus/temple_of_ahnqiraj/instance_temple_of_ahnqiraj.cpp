@@ -254,7 +254,7 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
         break;
     case NPC_MASTERS_EYE:
         // Despawn C'thun eye at twins if twins is already dead
-        m_auiEncounter[TYPE_TWINS] = NOT_STARTED;
+        //m_auiEncounter[TYPE_TWINS] = NOT_STARTED;
         if (GetData(TYPE_TWINS) == DONE) {
             pCreature->ForcedDespawn(0);
         }
