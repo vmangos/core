@@ -696,6 +696,7 @@ struct mob_mastersEye : public ScriptedAI {
     }
     
     instance_temple_of_ahnqiraj* m_pInstance;
+    uint32 flightUpdate;
 
     void Reset() override
     {
@@ -707,18 +708,21 @@ struct mob_mastersEye : public ScriptedAI {
         else {
             m_pInstance = (instance_temple_of_ahnqiraj*)m_creature->GetInstanceData();
         }
+        flightUpdate = 0;
     }
 
     void UpdateAI(uint32 diff) override
     {
         if (m_creature->IsDespawned() || m_pInstance->TwinsDialogueStartedOrDone())
             return;
-        //if (GetPlayerAtMinimumRange(200.0f)) {
-            m_creature->CastSpell(m_creature, 17131, true); /** Start flying */
-            ///m_creature->SetUnitMovementFlags(MOVEFLAG_FLYING);
+        if (flightUpdate < diff) {
+            m_creature->CastSpell(m_creature, 17131, true); // Start flying 
             m_creature->GetMotionMaster()->MovePoint(0, -8952.7f, 1235.39f, -102.0f, MOVE_FLY_MODE, 0.0f, 4.896f);
-            //m_creature->NearLandTo(m_creature->GetPositionX(), m_creature->GetPositionY(), -102.0f, 4.896f);
-        //}
+            flightUpdate = 5000;
+        }
+        else {
+            flightUpdate -= diff;
+        }
     }
 };
 
