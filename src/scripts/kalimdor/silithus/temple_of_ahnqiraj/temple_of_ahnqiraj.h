@@ -84,16 +84,6 @@ enum
     AREATRIGGER_STOMACH_AIR     = 4034,
     AREATRIGGER_CTHUN_KNOCKBACK = 4036,
 
-    // RP event when players enter the room, triggered by AREATRIGGER_TWIN_EMPERORS
-    EMOTE_EYE_INTRO             = -1531012,
-    SAY_EMPERORS_INTRO_1        = -1531013,
-    SAY_EMPERORS_INTRO_2        = -1531014,
-    SAY_EMPERORS_INTRO_3        = -1531015,
-    SAY_EMPERORS_INTRO_4        = -1531016,
-    SAY_EMPERORS_INTRO_5        = -1531017,
-    SAY_EMPERORS_INTRO_6        = -1531018,
-
-
     // Whispered on players around the map
     SAY_CTHUN_WHISPER_1         = -1531033,
     SAY_CTHUN_WHISPER_2         = -1531034,
@@ -116,9 +106,16 @@ enum
     SPELL_WHISPERINGS_CTHUN_5   = 26259,
 };
 
-static const float puntPosition[3] =
+class TwinsIntroDialogue : public DialogueHelper
 {
-    -8545.9f, 1987.25f, -96.0f
+public:
+    TwinsIntroDialogue();
+    void Start();
+    bool StartedOrDone();
+protected:
+    void JustDidDialogueStep(int32 iEntry) override;
+private:
+    bool m_StartedOrDone;
 };
 
 class instance_temple_of_ahnqiraj : public ScriptedInstance
@@ -134,8 +131,8 @@ public:
     void OnCreatureCreate(Creature* pCreature);
     void OnObjectCreate(GameObject* pGo);
 
-    void SetData(uint32 uiType, uint32 uiData);
-    uint32 GetData(uint32 uiType);
+    void SetData(uint32 uiType, uint32 uiData) override;
+    uint32 GetData(uint32 uiType) override;
 
     void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
 
@@ -143,6 +140,8 @@ public:
     void Load(const char* chrIn);
 
     void Update(uint32 uiDiff);
+
+    bool TwinsDialogueStartedOrDone();
 
 private:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
@@ -156,7 +155,7 @@ private:
 
     bool m_bIsEmperorsIntroDone;
 
-    DialogueHelper m_dialogueHelper;
+    TwinsIntroDialogue m_twinsIntroDialogue;
     DialogueHelper m_twinsDeadDialogue;
 
     // The following functions, variables etc, are used to handle the C'thun stomach.

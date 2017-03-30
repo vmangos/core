@@ -27,17 +27,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
-static const SIDialogueEntry aIntroDialogue[] =
-{
-    {EMOTE_EYE_INTRO,       NPC_MASTERS_EYE, 7000},
-    {SAY_EMPERORS_INTRO_1,  NPC_VEKLOR,      6000},
-    {SAY_EMPERORS_INTRO_2,  NPC_VEKNILASH,   8000},
-    {SAY_EMPERORS_INTRO_3,  NPC_VEKLOR,      3000},
-    {SAY_EMPERORS_INTRO_4,  NPC_VEKNILASH,   3000},
-    {SAY_EMPERORS_INTRO_5,  NPC_VEKLOR,      3000},
-    {SAY_EMPERORS_INTRO_6,  NPC_VEKNILASH,   0},
-    {0, 0, 0}
-};
+
 
 enum eTwinsDeathTexts {
     SAY_VEKLOR_DEATH    = -1531024, //my brother...nO!
@@ -50,12 +40,105 @@ static const SIDialogueEntry twinsDeathDialogue[] =
     { 0, 0, 0 }
 };
 
+
+enum eTwinsDialogueEntries
+{
+    EMOTE_EYE_INTRO         = -1531012,
+    EVENT_EYE_TURN_AROUND   = 1,
+    EVENT_EMPERORS_RISE     = 2,
+    SAY_EMPERORS_INTRO_1    = -1531013, // Only flesh and bone. .. 
+    SAY_EMPERORS_INTRO_2    = -1531014, // Where are your manners...
+    SAY_EMPERORS_INTRO_3    = -1531015, // There will be pain...
+    SAY_EMPERORS_INTRO_4    = -1531016, // Oh so much pain...
+    SAY_EMPERORS_INTRO_5    = -1531017, // Come, little ones...
+    SAY_EMPERORS_INTRO_6    = -1531018, // The feast of souls...
+};
+
+// Sources:
+// https://www.youtube.com/watch?v=anDqSl-_y9Y
+// https://www.youtube.com/watch?v=drIsWEJkkHs
+// Before start:  The eye should be turned away from the trigger, and emperors should be kneeling. 
+//           +0:  Trigger reached - emote happens
+//           +2:  The eye turns around and the emperors rise up to standing state.
+//           +7:  The eye despawns and emperors begins the dialogue
+static const SIDialogueEntry aIntroDialogue[] =
+{
+    { EMOTE_EYE_INTRO,       NPC_MASTERS_EYE, 2000 }, // Trigger reached, emote happens. last 2 seconds
+    { EVENT_EYE_TURN_AROUND, NPC_MASTERS_EYE, 1000 }, // Eye turns around, 
+    { EVENT_EMPERORS_RISE,   NPC_MASTERS_EYE, 5000 }, // emperors rise up one second later
+    { SAY_EMPERORS_INTRO_1,  NPC_VEKLOR,      7000 }, // Eye despawns, first line of dialogue 5 seconds later
+    { SAY_EMPERORS_INTRO_2,  NPC_VEKNILASH,   8000 },
+    { SAY_EMPERORS_INTRO_3,  NPC_VEKLOR,      3000 },
+    { SAY_EMPERORS_INTRO_4,  NPC_VEKNILASH,   3000 },
+    { SAY_EMPERORS_INTRO_5,  NPC_VEKLOR,      3000 },
+    { SAY_EMPERORS_INTRO_6,  NPC_VEKNILASH,   0 },
+    { 0, 0, 0 }
+};
+TwinsIntroDialogue::TwinsIntroDialogue() :
+    DialogueHelper(aIntroDialogue),
+    m_StartedOrDone(false)
+{
+
+}
+
+void TwinsIntroDialogue::Start()
+{
+    m_StartedOrDone = true;
+    if (!m_pInstance) {
+        sLog.outError("TwinsIntroDialogue missing instance. Cannot start.");
+        return;
+    }
+    Creature* pEye = m_pInstance->GetSingleCreatureFromStorage(NPC_MASTERS_EYE);
+    Creature* pVL = m_pInstance->GetSingleCreatureFromStorage(NPC_VEKLOR);
+    Creature* pVN = m_pInstance->GetSingleCreatureFromStorage(NPC_VEKNILASH);
+
+    // If we're missing one of the creatures needed in this little event, we just skip it.
+    if (!pEye || !pVL || !pVN) {
+        sLog.outError("Missing one or more of the required creatures to start TwinsIntroDialogue. Not starting.");
+        if (pEye)
+            pEye->ForcedDespawn(1000);
+        return;
+    }
+    StartNextDialogueText(EMOTE_EYE_INTRO);
+}
+
+bool TwinsIntroDialogue::StartedOrDone()
+{
+    return m_StartedOrDone;
+}
+
+void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
+{
+    Creature* pEye = m_pInstance->GetSingleCreatureFromStorage(NPC_MASTERS_EYE);
+    Creature* pVL = m_pInstance->GetSingleCreatureFromStorage(NPC_VEKLOR);
+    Creature* pVN = m_pInstance->GetSingleCreatureFromStorage(NPC_VEKNILASH);
+    // If we at any point are missing one of the creatures we skip to the end and stop.
+    if (!pEye || !pVL || !pVN) {
+        sLog.outError("Missing one or more of the required creatures in TwinsIntroDialogue::JustDidDialogueStep()");
+        return;
+    }
+    switch (iEntry) {
+    case EMOTE_EYE_INTRO:
+
+        break;
+    case EVENT_EYE_TURN_AROUND:
+        pEye->SetFacingTo(1.57f);
+        break;
+    case EVENT_EMPERORS_RISE:
+        pVL->SetStandState(UNIT_STAND_STATE_STAND);
+        pVN->SetStandState(UNIT_STAND_STATE_STAND);
+        break;
+    case SAY_EMPERORS_INTRO_1:
+        pEye->ForcedDespawn(1);
+        break;
+    }
+}
+
 instance_temple_of_ahnqiraj::instance_temple_of_ahnqiraj(Map* pMap) :
     ScriptedInstance(pMap),
     m_uiBugTrioDeathCount(0),
     m_uiCthunWhisperTimer(90000),
     m_bIsEmperorsIntroDone(false),
-    m_dialogueHelper(aIntroDialogue),
     m_twinsDeadDialogue(twinsDeathDialogue)
 {
     Initialize();
@@ -65,7 +148,7 @@ void instance_temple_of_ahnqiraj::Initialize()
 {
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
-    m_dialogueHelper.InitializeDialogueHelper(this);
+    m_twinsIntroDialogue.InitializeDialogueHelper(this);
     m_twinsDeadDialogue.InitializeDialogueHelper(this);
 
     sAreaTriggerStore.LookupEntry(4033);
@@ -84,22 +167,12 @@ bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
 
 void instance_temple_of_ahnqiraj::DoHandleTempleAreaTrigger(uint32 uiTriggerId)
 {
-    if (uiTriggerId == AREATRIGGER_TWIN_EMPERORS && !m_bIsEmperorsIntroDone)
+    if (uiTriggerId == AREATRIGGER_TWIN_EMPERORS && !m_bIsEmperorsIntroDone && GetData(TYPE_TWINS) != DONE)
     {
-        m_dialogueHelper.StartNextDialogueText(EMOTE_EYE_INTRO);
-        // Note: there may be more related to this; The emperors should kneel before the Eye and they stand up after it despawns
-        // https://www.youtube.com/watch?v=anDqSl-_y9Y
-        // https://www.youtube.com/watch?v=drIsWEJkkHs
-
-        // The eye should be turned away from the trigger, and emperors should be kneeling. 
-        // +0 emote happens
-        // +3 sec after entering trigger, the eye turns around and the emperors rise up to standing state.
-        // +8 the eye despawns and emperors begins the dialogue
-        if (Creature* pEye = GetSingleCreatureFromStorage(NPC_MASTERS_EYE))
-            pEye->ForcedDespawn(7000);
-
-
-        m_bIsEmperorsIntroDone = true;
+        // Current assumption is the event only start once every soft reset.
+        // May need to tweak if-statement to make sure this is the case.
+        //m_bIsEmperorsIntroDone = true;
+        m_twinsIntroDialogue.Start();
     }
     else if (uiTriggerId == AREATRIGGER_SARTURA)
     {
@@ -134,7 +207,6 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
     default:
         return;
     }
-
     m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
 }
 
@@ -180,6 +252,16 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
         if (m_auiEncounter[TYPE_CTHUN] == DONE)
             pCreature->AddObjectToRemoveList();
         break;
+    case NPC_MASTERS_EYE:
+        // Despawn C'thun eye at twins if twins is already dead
+        m_auiEncounter[TYPE_TWINS] = NOT_STARTED;
+        if (GetData(TYPE_TWINS) == DONE) {
+            pCreature->ForcedDespawn(0);
+        }
+        else {
+            pCreature->GetMotionMaster()->MovePoint(0, pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, MOVE_FLY_MODE, 0.0f, 4.896f);
+        }
+        break;
     }
 }
 
@@ -194,18 +276,14 @@ void instance_temple_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
     case NPC_VEKLOR:
     case NPC_VEKNILASH:
     case NPC_EYE_OF_C_THUN:
-        m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
-        break;
     case NPC_CTHUN:
-        m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
-        break;
     case NPC_MASTERS_EYE:
     case NPC_OURO_SPAWNER:
     case NPC_CTHUN_PORTAL:
         m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
         break;
-        // Randomize C'thun trash packs
-    case NPC_QIRAJI_SLAYER:
+    case NPC_QIRAJI_SLAYER: // Randomize C'thun trash packs
+        
         if (urand(0, 1))
         {
             pCreature->SetEntry(15246);
@@ -253,12 +331,18 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         break;
     case TYPE_HUHURAN:
         m_auiEncounter[uiType] = uiData;
-        if (uiData == DONE)
-				DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+        if (uiData == DONE) {
+				        DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+            if (Creature* pCreature = GetSingleCreatureFromStorage(NPC_MASTERS_EYE)) {
+                //pCreature->NearLandTo(pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, 4.896f);
+            }
+        }
+
         break;
     case TYPE_SARTURA:
     case TYPE_FANKRISS:
     case TYPE_VISCIDUS:
+        break;
     case TYPE_OURO:
         switch (uiData)
         {
@@ -295,6 +379,7 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             }
         break;
         }
+        break;
     case TYPE_TWINS:
         // Either of the twins can set data, so return to avoid double changing
         if (m_auiEncounter[uiType] ==  uiData)
@@ -307,7 +392,6 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             m_twinsDeadDialogue.StartNextDialogueText(SAY_VEKNILASH_DEATH);
         }
         break;
-
     }
 
     if (uiData == DONE)
@@ -344,7 +428,7 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     }
     
     // Immediately despawn the C'thun grasp objects if c'thun is dead.
-    if (m_auiEncounter[TYPE_CTHUN] != DONE) {
+    if (m_auiEncounter[TYPE_CTHUN] == DONE) {
         for (size_t i = 21797; i <= 21799; i++) {
             if (GameObject* obj = instance->GetGameObject(i)) {
                 //if (GameObject* obj = m_pInstance->GetSingleGameObjectFromStorage(i)) {
@@ -352,8 +436,62 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
             }
         }
     }
-
     OUT_LOAD_INST_DATA_COMPLETE;
+}
+
+void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
+{
+    m_twinsIntroDialogue.DialogueUpdate(uiDiff);
+    m_twinsDeadDialogue.DialogueUpdate(uiDiff);
+ 
+    if (GetData(TYPE_CTHUN) != IN_PROGRESS && GetData(TYPE_CTHUN) != DONE) {
+        if (m_uiCthunWhisperTimer < uiDiff)
+        {
+            if (Player* pPlayer = GetPlayerInMap())
+            {
+                if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
+                {
+                    // ToDo: this should whisper all players, not just one?
+                    // ToDo: also cast the C'thun Whispering charm spell - requires additional research
+                    DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, pPlayer);
+                }
+            }
+            m_uiCthunWhisperTimer = urand(1.5 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS);
+        }
+        else {
+            m_uiCthunWhisperTimer -= uiDiff;
+        }
+    }
+
+    UpdateStomachOfCthun(uiDiff);
+}
+
+bool instance_temple_of_ahnqiraj::TwinsDialogueStartedOrDone()
+{
+    return m_twinsIntroDialogue.StartedOrDone();
+}
+
+
+
+uint32 instance_temple_of_ahnqiraj::GetData(uint32 uiType)
+{
+    return m_auiEncounter[uiType];
+}
+
+bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt)
+{
+    if (pAt->id == AREATRIGGER_TWIN_EMPERORS || pAt->id == AREATRIGGER_SARTURA)
+    {
+        if (pPlayer->isGameMaster() || !pPlayer->isAlive())
+            return false;
+
+        if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
+            pInstance->DoHandleTempleAreaTrigger(pAt->id);
+    }
+    if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
+        pInstance->HandleStomachTriggers(pPlayer, pAt);
+
+    return false;
 }
 
 void instance_temple_of_ahnqiraj::AddPlayerToStomach(Unit * p)
@@ -422,7 +560,7 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         const AreaTriggerEntry* portOutTrigger = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
 
         if (portOutTrigger) {
-            float x = portOutTrigger->x + cos((frand(0.0f,360.0f)) * (3.14f / 180.0f)) * 0.1f;
+            float x = portOutTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
             float y = portOutTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
             pPlayer->NearTeleportTo(x, y, portOutTrigger->z, pPlayer->GetOrientation());
         }
@@ -430,13 +568,13 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
             float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
             float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
             pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
-            sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.", 
+            sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
                 AREATRIGGER_CTHUN_KNOCKBACK);
         }
     }
     else if (pAt->id == AREATRIGGER_CTHUN_KNOCKBACK) {
         RemovePlayerFromStomach(pPlayer);
-        
+
         // "Disable" the knockback if c'thun is killed
         if (GetData(TYPE_CTHUN) != DONE) {
             if (Creature* kbCreature = GetMap()->SummonCreature(EXIT_KNOCKBACK_CREATURE, pAt->x, pAt->y, pAt->z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
@@ -488,7 +626,7 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
     }
 
     // Update the players in the stomach
-    if (playersInStomach.empty()) return; 
+    if (playersInStomach.empty()) return;
 
     for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
         Player* player = GetMap()->GetPlayer(it->first);
@@ -511,57 +649,9 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
     }
 }
 
-void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
-{
-    m_dialogueHelper.DialogueUpdate(uiDiff);
-    m_twinsDeadDialogue.DialogueUpdate(uiDiff);
-
-    if (GetData(TYPE_CTHUN) != IN_PROGRESS && GetData(TYPE_CTHUN) != DONE) {
-        if (m_uiCthunWhisperTimer < uiDiff)
-        {
-            if (Player* pPlayer = GetPlayerInMap())
-            {
-                if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
-                {
-                    // ToDo: this should whisper all players, not just one?
-                    // ToDo: also cast the C'thun Whispering charm spell - requires additional research
-                    DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, pPlayer);
-                }
-            }
-            m_uiCthunWhisperTimer = urand(1.5 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS);
-        }
-        else {
-            m_uiCthunWhisperTimer -= uiDiff;
-        }
-    }
-
-    UpdateStomachOfCthun(uiDiff);
-}
-
-uint32 instance_temple_of_ahnqiraj::GetData(uint32 uiType)
-{
-    return m_auiEncounter[uiType];
-}
-
 InstanceData* GetInstanceData_instance_temple_of_ahnqiraj(Map* pMap)
 {
     return new instance_temple_of_ahnqiraj(pMap);
-}
-
-bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt)
-{
-    if (pAt->id == AREATRIGGER_TWIN_EMPERORS || pAt->id == AREATRIGGER_SARTURA)
-    {
-        if (pPlayer->isGameMaster() || !pPlayer->isAlive())
-            return false;
-
-        if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
-            pInstance->DoHandleTempleAreaTrigger(pAt->id);
-    }
-    if (instance_temple_of_ahnqiraj* pInstance = (instance_temple_of_ahnqiraj*)pPlayer->GetInstanceData())
-        pInstance->HandleStomachTriggers(pPlayer, pAt);
-
-    return false;
 }
 
 void AddSC_instance_temple_of_ahnqiraj()

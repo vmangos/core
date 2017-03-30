@@ -73,18 +73,6 @@ enum eScriptTexts {
     //      is used on killing player. Not been able to confirm this.
 };
 
-static const SIDialogueEntry pullDialogue[] =
-{
-    { EMOTE_EYE_INTRO,       NPC_MASTERS_EYE, 7000 },
-    { SAY_EMPERORS_INTRO_1,  NPC_VEKLOR,      6000 },
-    { SAY_EMPERORS_INTRO_2,  NPC_VEKNILASH,   8000 },
-    { SAY_EMPERORS_INTRO_3,  NPC_VEKLOR,      3000 },
-    { SAY_EMPERORS_INTRO_4,  NPC_VEKNILASH,   3000 },
-    { SAY_EMPERORS_INTRO_5,  NPC_VEKLOR,      3000 },
-    { SAY_EMPERORS_INTRO_6,  NPC_VEKNILASH,   0 },
-    { 0, 0, 0 }
-};
-
 struct boss_twinemperorsAI : public ScriptedAI
 {
     instance_temple_of_ahnqiraj* m_pInstance;
@@ -113,6 +101,8 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         else {
             m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
+
+            //If the encounter has not been started yet this ID they should be kneeling to the eye.
             if (m_pInstance->GetData(TYPE_TWINS) == NOT_STARTED) {
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
             }
@@ -505,7 +495,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         //Added. Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
 
-        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), NPC_VEKNILASH, 3000 };
+        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), NPC_VEKNILASH, 0};
     }
 
     void CastSpellOnBug(Creature *target)
@@ -598,7 +588,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
         m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0);
         m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0);
-        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKLOR_AGGRO_4, SAY_VEKLOR_AGGRO_1), NPC_VEKLOR, 0 };
+        pullScriptedText = SIDialogueEntry{ irand(SAY_VEKLOR_AGGRO_4, SAY_VEKLOR_AGGRO_1), NPC_VEKLOR, 3000 };
     }
 
     void CastSpellOnBug(Creature *target)
@@ -698,6 +688,40 @@ struct boss_veklorAI : public boss_twinemperorsAI
     }
 };
 
+struct mob_mastersEye : public ScriptedAI {
+    mob_mastersEye(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        sLog.outBasic("Masters Eye ctor!");
+        Reset();
+    }
+    
+    instance_temple_of_ahnqiraj* m_pInstance;
+
+    void Reset() override
+    {
+        instance_temple_of_ahnqiraj* tmpPTr = dynamic_cast<instance_temple_of_ahnqiraj*>(m_creature->GetInstanceData());
+        if (!tmpPTr) {
+            sLog.outError("boss_twinemperorsAI attempted to cast instance to type instance_temple_of_ahnqiraj, but failed.");
+            m_pInstance = nullptr;
+        }
+        else {
+            m_pInstance = (instance_temple_of_ahnqiraj*)m_creature->GetInstanceData();
+        }
+    }
+
+    void UpdateAI(uint32 diff) override
+    {
+        if (m_creature->IsDespawned() || m_pInstance->TwinsDialogueStartedOrDone())
+            return;
+        //if (GetPlayerAtMinimumRange(200.0f)) {
+            m_creature->CastSpell(m_creature, 17131, true); /** Start flying */
+            ///m_creature->SetUnitMovementFlags(MOVEFLAG_FLYING);
+            m_creature->GetMotionMaster()->MovePoint(0, -8952.7f, 1235.39f, -102.0f, MOVE_FLY_MODE, 0.0f, 4.896f);
+            //m_creature->NearLandTo(m_creature->GetPositionX(), m_creature->GetPositionY(), -102.0f, 4.896f);
+        //}
+    }
+};
+
 CreatureAI* GetAI_boss_veknilash(Creature* pCreature)
 {
     return new boss_veknilashAI(pCreature);
@@ -706,6 +730,11 @@ CreatureAI* GetAI_boss_veknilash(Creature* pCreature)
 CreatureAI* GetAI_boss_veklor(Creature* pCreature)
 {
     return new boss_veklorAI(pCreature);
+}
+
+CreatureAI* GetAI_masters_eye(Creature* pCreature)
+{
+    return new mob_mastersEye(pCreature);
 }
 
 void AddSC_boss_twinemperors()
@@ -720,5 +749,10 @@ void AddSC_boss_twinemperors()
     newscript = new Script;
     newscript->Name = "boss_veklor";
     newscript->GetAI = &GetAI_boss_veklor;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "mob_masters_eye";
+    newscript->GetAI = &GetAI_masters_eye;
     newscript->RegisterSelf();
 }
