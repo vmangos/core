@@ -25,6 +25,7 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "temple_of_ahnqiraj.h"
 
 #define EMOTE_GENERIC_FRENZY_KILL   -1000001
 #define EMOTE_GENERIC_BERSERK       -1000004
@@ -52,6 +53,11 @@ struct boss_huhuranAI : public ScriptedAI
 
     bool Frenzy;
     bool Berserk;
+
+    void JustDied(Unit*) override
+    {
+        m_creature->GetInstanceData()->SetData(TYPE_HUHURAN, DONE);
+    }
 
     void Reset()
     {
