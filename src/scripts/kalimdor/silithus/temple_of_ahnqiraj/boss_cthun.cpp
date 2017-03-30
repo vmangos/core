@@ -827,6 +827,18 @@ struct cthunAI : public ScriptedAI
         if (m_pInstance) {
             currentPhase = PHASE_CTHUN_DONE;
             m_pInstance->SetData(TYPE_CTHUN, DONE);
+            if (GameObject* go = m_pInstance->GetGameObject(21797))
+                go->Despawn();
+            if (GameObject* go = m_pInstance->GetGameObject(21798))
+                go->Despawn();
+            if (GameObject* go = m_pInstance->GetGameObject(21799))
+                go->Despawn();
+            /*
+            while (GameObject* goGrasp = m_creature->FindNearestGameObject(180745, 300)) {
+                goGrasp->Despawn();
+            }
+            */
+
         }
         sLog.outBasic("C'thun died. Enetered DONE phase");
     }
