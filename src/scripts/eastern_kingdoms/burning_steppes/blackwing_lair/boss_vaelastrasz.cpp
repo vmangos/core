@@ -107,8 +107,8 @@ struct boss_vaelAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    uint32 m_uiSpeachTimer;
-    uint32 m_uiSpeachNum;
+    uint32 m_uiSpeechTimer;
+    uint32 m_uiSpeechNum;
     uint32 m_uiCleaveTimer;
     uint32 m_uiFlameBreathTimer;
     uint32 m_uiFireNovaTimer;
@@ -121,7 +121,7 @@ struct boss_vaelAI : public ScriptedAI
     uint32 m_uiIntroPhase;
     bool m_bIntroEvent;
     bool m_bHasYelled;
-    bool m_bIsDoingSpeach;
+    bool m_bIsDoingSpeech;
     bool m_bCastedEssenceOfTheRed;
     bool m_bCastedbanishment;
     bool m_bFlagSet;
@@ -131,8 +131,8 @@ struct boss_vaelAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiSpeachTimer                  = 0;
-        m_uiSpeachNum                    = 0;
+        m_uiSpeechTimer                  = 0;
+        m_uiSpeechNum                    = 0;
         m_uiCleaveTimer                  = 6000;
         m_uiFlameBreathTimer             = 8000;
         m_uiBurningAdrenalineCasterTimer = 15000;
@@ -143,7 +143,7 @@ struct boss_vaelAI : public ScriptedAI
         m_uiIntroTimer = 0;
         m_uiIntroPhase = 0;
         m_bHasYelled = false;
-        m_bIsDoingSpeach = false;
+        m_bIsDoingSpeech = false;
         m_bCastedEssenceOfTheRed = false;
         m_bCastedbanishment = false;
         m_bFlagSet = false;
@@ -156,19 +156,19 @@ struct boss_vaelAI : public ScriptedAI
         m_creature->SetHealthPercent(30.0f);
     }
 
-    void BeginSpeach(Unit* target)
+    void BeginSpeech(Unit* target)
     {
         ASSERT(target);
-        // Stand up and begin speach
+        // Stand up and begin speech
         m_playerGuid = target->GetObjectGuid();
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
         // 10 seconds
         DoScriptText(SAY_LINE_1, m_creature);
 
-        m_uiSpeachTimer = 10000;
-        m_uiSpeachNum = 0;
-        m_bIsDoingSpeach = true;
+        m_uiSpeechTimer = 10000;
+        m_uiSpeechNum = 0;
+        m_bIsDoingSpeech = true;
     }
 
     void KilledUnit(Unit* pVictim)
@@ -306,25 +306,25 @@ struct boss_vaelAI : public ScriptedAI
                 m_uiSelectableTimer -= uiDiff;
         }
 
-        // Speach
-        if (m_bIsDoingSpeach)
+        // Speech
+        if (m_bIsDoingSpeech)
         {
-            if (m_uiSpeachTimer < uiDiff)
+            if (m_uiSpeechTimer < uiDiff)
             {
-                switch (m_uiSpeachNum)
+                switch (m_uiSpeechNum)
                 {
                     case 0:
                         // 16 seconds till next line
                         DoScriptText(SAY_LINE_2, m_creature);
-                        m_uiSpeachTimer = 16000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 16000;
+                        ++m_uiSpeechNum;
                         break;
                     case 1:
                         // This one is actually 16 seconds but we only go to 10 seconds because he starts attacking after he says "I must fight this!"
-                        // 12 sec. French version (TODO: Change back to 10 seconds since we use the English version?)
+                        // (French version should start attacking after 12 seconds)
                         DoScriptText(SAY_LINE_3, m_creature);
-                        m_uiSpeachTimer = 12000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 10000;
+                        ++m_uiSpeechNum;
                         break;
                     case 2:
                         m_creature->setFaction(FACTION_BLACK_DRAGON);
@@ -336,13 +336,13 @@ struct boss_vaelAI : public ScriptedAI
                             DoCastSpellIfCan(m_creature, SPELL_ESSENCE_OF_THE_RED);
                             m_bCastedEssenceOfTheRed = true;
                         }
-                        m_uiSpeachTimer = 0;
-                        m_bIsDoingSpeach = false;
+                        m_uiSpeechTimer = 0;
+                        m_bIsDoingSpeech = false;
                         break;
                 }
             }
             else
-                m_uiSpeachTimer -= uiDiff;
+                m_uiSpeechTimer -= uiDiff;
         }
 
         // Return since we have no target
@@ -443,7 +443,7 @@ bool GossipSelect_boss_vael(Player* pPlayer, Creature* pCreature, uint32 uiSende
         case GOSSIP_ACTION_INFO_DEF+2: // Fight Time
             pPlayer->CLOSE_GOSSIP_MENU();
             if (boss_vaelAI* pVaelAI = dynamic_cast<boss_vaelAI*>(pCreature->AI()))
-                pVaelAI->BeginSpeach((Unit*)pPlayer);
+                pVaelAI->BeginSpeech((Unit*)pPlayer);
             break;
     }
 
