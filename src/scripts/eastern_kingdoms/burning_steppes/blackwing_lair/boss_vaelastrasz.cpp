@@ -83,7 +83,9 @@ enum
     MODEL_INVISIBLE             = 11686,
 
     GOSSIP_TEXT_VAEL_1          = 7156,
-    GOSSIP_TEXT_VAEL_2          = 7256
+    GOSSIP_TEXT_VAEL_2          = 7256,
+
+    QUEST_NEFARIUS_CORRUPTION   = 8730
 };
 
 // Coords used to spawn Nefarius at the throne
@@ -169,6 +171,17 @@ struct boss_vaelAI : public ScriptedAI
         m_uiSpeechTimer = 10000;
         m_uiSpeechNum = 0;
         m_bIsDoingSpeech = true;
+        m_uiSpeachTimer = 10000;
+        m_uiSpeachNum = 0;
+        m_bIsDoingSpeach = true;
+
+        if (nullptr == m_pInstance)
+            return;
+
+        // If Nefarius's Corruption has not been accepted by this point, fail Scepter Run
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == NOT_STARTED)
+            m_pInstance->SetData(TYPE_SCEPTER_RUN, FAIL);
+
     }
 
     void KilledUnit(Unit* pVictim)
@@ -452,13 +465,47 @@ bool GossipSelect_boss_vael(Player* pPlayer, Creature* pCreature, uint32 uiSende
 
 bool GossipHello_boss_vael(Player* pPlayer, Creature* pCreature)
 {
+    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+
+    if (nullptr == m_pInstance)
+        return false;
+
+    if (m_pInstance->GetData(TYPE_RAZORGORE) != DONE && !pPlayer->isGameMaster())
+        return false;
+
     if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == NOT_STARTED)
+            pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_VAEL_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXT_VAEL_1, pCreature->GetObjectGuid());
 
     return true;
+}
+
+bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+{
+    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+
+    if (nullptr == m_pInstance)
+        return false;
+
+    if (pQuest->GetQuestId() == QUEST_NEFARIUS_CORRUPTION)
+    {
+            // Only one may accept
+            if (m_pInstance->GetData(TYPE_SCEPTER_RUN) != NOT_STARTED)
+            {
+                pPlayer->FailQuest(QUEST_NEFARIUS_CORRUPTION);
+                return false;
+            }
+
+            m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
+            m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
+
+            return true;
+    }
+
+    return false;
 }
 
 CreatureAI* GetAI_boss_vael(Creature* pCreature)
@@ -693,6 +740,7 @@ void AddSC_boss_vael()
     pNewScript->GetAI = &GetAI_boss_vael;
     pNewScript->pGossipHello = &GossipHello_boss_vael;
     pNewScript->pGossipSelect = &GossipSelect_boss_vael;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_vaelastrasz;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
