@@ -19,9 +19,10 @@
 
 /* ScriptData
 SDName: Boss_Twinemperors
-SD%Complete: 95
-SDComment:
+SD%Complete: 
+SDComment: 
 SDCategory: Temple of Ahn'Qiraj
+Rewrtten by Gemt
 EndScriptData */
 
 #include "scriptPCH.h"
@@ -29,7 +30,7 @@ EndScriptData */
 
 
 static const uint32 PULL_RANGE      = 50;
-static const uint32 ABUSE_BUG_RANGE = 20;
+//static const uint32 ABUSE_BUG_RANGE = 20;
 
 
 // todo: uncertain which dialogue should be used on enrage, wowwiki does not add up with db scripts
@@ -37,10 +38,11 @@ static const uint32 ABUSE_BUG_RANGE = 20;
 enum eSpells {
     SPELL_BERSERK               = 26662,
     
-    
-    SPELL_TWIN_TELEPORT         = 800,   // CTRA watches for this spell to start its teleport timer
+    SPELL_TWIN_TELEPORT_SCRIPT  = 799,   // should have a script effect, dosent seem to have one.
+    SPELL_TWIN_TELEPORT_MSG     = 800,   // CTRA watches for this spell to start its teleport timer
+    SPELL_TWIN_TELEPORT_VISUAL  = 26638, 
+
     SPELL_HEAL_BROTHER          = 7393,
-    SPELL_TWIN_TELEPORT_VISUAL  = 26638, // visual
 
 
     // Vek'nilash
@@ -86,14 +88,18 @@ static const uint32 ENRAGE_TIMER                = 60 * 60000;
 
 static const uint32 JUST_TELEPORTED_FREEZE      = 1500;     // Emperor is "frozen", aka not doing anything, for this long after TP
 static const uint32 AFTER_TELEPORT_THREAT       = 3000;     // Threat added to nearest player after TP. TODO: correct amount?
-static const uint32 TELEPORTTIME_MIN_CD         = 30000;    // Shortest possible cooldown on teleport
-static const uint32 TELEPORTTIME_MAX_CD         = 40000;    // Longest possible cooldown on teleport
+
+static const uint32 TELEPORTTIME_MIN_CD = 30000;    // Shortest possible cooldown on teleport
+static const uint32 TELEPORTTIME_MAX_CD = 40000;    // Longest possible cooldown on teleport
 
 static const uint32 TRY_HEAL_FREQUENCY          = 0;        // How ofthen will the emperors try to heal eachother, 0 for every update
-static const uint32 SUCCESS_HEAL_FREQUENCY      = 1000;     // How ofthen will the emperors heal when in range of each other
+static const uint32 SUCCESS_HEAL_FREQUENCY      = 1500;     // How ofthen will the emperors heal when in range of each other
 static const float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
+static const float  HEAL_BROTHER_RANGE          = 60.0f;
 
-
+static const uint32 RESPAWN_BUG_FREQUENCY       = 10000;    // How often do we try to respawn a dead bug
+static const float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
+static const float  BUG_SPELL_MAX_DIST          = 20.0f;    // Max distance a bug can be for the twin to choose it
 
 // Vek'nilash constants
 static const uint32 UPPERCUT_MIN_CD             = 14000;
@@ -142,12 +148,12 @@ struct boss_twinemperorsAI : public ScriptedAI
     bool justTeleported;
     bool didPullDialogue;
     
-    
-    uint32 Abuse_Bug_Timer;
-    uint32 BugsTimer;
+    uint32 bugMutationTimer;
+    uint32 respawnBugTimer;
 
-        
-    virtual void CastSpellOnBug(Creature *target) = 0;
+    virtual uint32 GetBugSpellCooldown() = 0;
+    virtual uint32 GetBugSpell() = 0;
+
     virtual void OnEndTeleportVirtual() = 0;
     virtual void UpdateEmperor(uint32) = 0;
 
@@ -171,13 +177,14 @@ struct boss_twinemperorsAI : public ScriptedAI
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
             }
         }
-        Reset();
+        //Reset(); reset is called by child class
     }
     
     virtual void Reset() override
     {
-        Abuse_Bug_Timer = urand(10000, 17000);
-        BugsTimer = 2000;
+        bugMutationTimer = GetBugSpellCooldown();
+        respawnBugTimer = RESPAWN_BUG_FREQUENCY;
+
         m_creature->clearUnitState(UNIT_STAT_STUNNED);
         EnrageTimer = ENRAGE_TIMER;
 
@@ -188,17 +195,22 @@ struct boss_twinemperorsAI : public ScriptedAI
     void DamageTaken(Unit *done_by, uint32 &damage) override
     {
         Creature *pOtherBoss = GetOtherBoss();
-        if (pOtherBoss)
+        if (pOtherBoss && !pOtherBoss->isDead())
         {
             float dPercent = ((float)damage) / ((float)m_creature->GetMaxHealth());
             int odmg = (int)(dPercent * ((float)pOtherBoss->GetMaxHealth()));
-            int ohealth = pOtherBoss->GetHealth() - odmg;
-            pOtherBoss->SetHealth(ohealth > 0 ? ohealth : 0);
+            //int ohealth = pOtherBoss->GetHealth() - odmg;
+            //pOtherBoss->SetHealth(ohealth > 0 ? ohealth : 0);
+
+            // Note: does not re-trigger DamageTaken for other target with these flags. 
+            m_creature->DealDamage(pOtherBoss, odmg, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+            /*
             if (ohealth <= 0)
             {
                 pOtherBoss->SetDeathState(JUST_DIED);
                 pOtherBoss->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
+            */
         }
     }
 
@@ -280,18 +292,11 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff) override
     {
-        //Return since we have no target
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
         // The rest of this script requires an instance, less managment and code duplication, and a bit of lazyness
         if (!m_pInstance)
             return;
 
-        // Stuff that should continue updating during teleport vacation goes here
-        CheckEnrage(diff);
-        UpdateTeleportToMyBrother(diff);
-
+        /*
         // If we just teleported the emperors won't do shit for a while
         // todo: do they reset cooldowns on teleport to something, or just keep on going once
         // the /afking is complete?
@@ -301,16 +306,41 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
             else {
                 justTeleportedTimer -= diff;
+                
+                // These must be called here as well, since selectHostileTarget || getVictim will
+                // fail during TP stun effect
+                CheckEnrage(diff);
+                UpdateTeleportToMyBrother(diff);
                 return;
             }
         }
+        */
 
-        // Stuff that does not get updated during teleport vacation goes here
-        HandleBugs(diff);
+        // Return since we have no target.
+        // Since it can be the case when TP stun is on as well, we let the condition pass if we just teleported
+        if ( (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) && !justTeleported) {
+            return;
+        }
+        
+        if (justTeleported) {
+            if (justTeleportedTimer <= diff) {
+                OnEndTeleport();
+            }
+            else {
+                justTeleportedTimer -= diff;
+            }
+        }
+
+        CheckEnrage(diff);
+        UpdateTeleportToMyBrother(diff);
+        HandleDeadBugs(diff);
+        HandleBugSpell(diff);
         TryHealBrother(diff);
-
-        // Finally update each specific emperor through the pure virtual function
-        UpdateEmperor(diff);
+        
+        // Don't want to update this if we're in the 1.5sec TP stun
+        if (!justTeleported) {
+            UpdateEmperor(diff);
+        }
     }
 
     Creature* GetOtherBoss()
@@ -365,14 +395,18 @@ struct boss_twinemperorsAI : public ScriptedAI
     }
 
     // Called as teleport happens
-    void OnStartTeleport()
+    void OnStartTeleport(float x, float y, float z, float o)
     {
-        justTeleported = true;
+        m_creature->NearTeleportTo(x, y, z, o);
 
+
+        justTeleported = true;
+        justTeleportedTimer = JUST_TELEPORTED_FREEZE;
         m_creature->InterruptNonMeleeSpells(false);
         DoStopAttack();
-        DoCastSpellIfCan(m_creature, SPELL_TWIN_TELEPORT_VISUAL);
-        m_creature->addUnitState(UNIT_STAT_STUNNED);
+        
+        m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_MSG, true);
+        m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_VISUAL, true);
     }
 
     // Called JUST_TELEPORTED_FREEZE after teleport happened
@@ -381,7 +415,6 @@ struct boss_twinemperorsAI : public ScriptedAI
         justTeleported = false;
 
         DoResetThreat();
-        m_creature->clearUnitState(UNIT_STAT_STUNNED);
 
         Unit* closestPlayer = PickNearestPlayer();
         AttackStart(closestPlayer);
@@ -390,66 +423,73 @@ struct boss_twinemperorsAI : public ScriptedAI
         OnEndTeleportVirtual();
     }
 
-    Creature *RespawnNearbyBugsAndGetOne()
+    void HandleDeadBugs(uint32 diff)
     {
-        std::list<Creature*> lUnitList;
-        GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15316, ABUSE_BUG_RANGE);
-        GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15317, ABUSE_BUG_RANGE);
+        // We try to respawn one random bug every RESPAWN_BUG_FREQUENCY
+        if (respawnBugTimer < diff) {
+            respawnBugTimer = RESPAWN_BUG_FREQUENCY;
 
-        if (lUnitList.empty())
-            return NULL;
-
-        Creature *nearb = NULL;
-
-        for (std::list<Creature*>::iterator iter = lUnitList.begin(); iter != lUnitList.end(); ++iter)
-        {
-            Creature *c = *iter;
-            if (c->isDead())
-            {
-                c->Respawn();
-                c->setFaction(7);
-                c->RemoveAllAuras();
-            }
-            
-            // todo: ....what?
-            if (!nearb || !urand(0, 3))
-                nearb = c;
-        }
-        return nearb;
-    }
-
-    void HandleBugs(uint32 diff)
-    {
-        if (BugsTimer < diff || Abuse_Bug_Timer < diff)
-        {
-            Creature *c = RespawnNearbyBugsAndGetOne();
-            if (Abuse_Bug_Timer < diff)
-            {
-                if (c)
-                {
-                    CastSpellOnBug(c);
-
-                    // anon-add:
-                    // Spell buff mob max hp's, set curr hp to max
-                    c->SetHealth(c->GetMaxHealth());
-                    c->SetInCombatWithZone();
-
-                    Abuse_Bug_Timer = urand(10000, 17000);
+            std::list<Creature*> lUnitList;
+            GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15316, RESPAWN_BUG_DISTANCE);
+            GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15317, RESPAWN_BUG_DISTANCE);
+            std::list<Creature*>::iterator iter;
+            for (iter = lUnitList.begin(); iter != lUnitList.end();) {
+                Creature *c = *iter;
+                if (!c->isDead()){
+                    iter = lUnitList.erase(iter);
                 }
-                else
-                    Abuse_Bug_Timer = 1000;
+                else {
+                    ++iter;
+                }
             }
-            else
-                Abuse_Bug_Timer -= diff;
-            BugsTimer = 2000;
+            if (lUnitList.size() == 0)
+                return;
+
+            std::advance(iter, urand(0, lUnitList.size() - 1));
+            Creature* c = *iter;
+            c->Respawn();
+            c->setFaction(7);
+            c->RemoveAllAuras();
         }
-        else
-        {
-            BugsTimer -= diff;
-            Abuse_Bug_Timer -= diff;
+        else {
+            respawnBugTimer -= diff;
         }
     }
 
+    void HandleBugSpell(uint32 diff)
+    {
+        if (bugMutationTimer < diff) {
+            // ToDo: not sure about this, but not seen a bug spell during teleport
+            if (justTeleported)
+                return;
+            std::list<Creature*> lUnitList;
+            GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15316, BUG_SPELL_MAX_DIST);
+            GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15317, BUG_SPELL_MAX_DIST);
+
+            std::list<Creature*>::iterator iter;
+            for (iter = lUnitList.begin(); iter != lUnitList.end();) {
+                if ((*iter)->isDead()) {
+                    iter = lUnitList.erase(iter);
+                }
+                else {
+                    ++iter;
+                }
+            }
+            if (iter != lUnitList.end()) {
+                std::advance(iter, urand(0, lUnitList.size() - 1));
+                Creature* c = *iter;
+                c->setFaction(14);
+                c->AddAura(GetBugSpell());
+                c->SetHealth(c->GetMaxHealth());
+                c->SetInCombatWithZone();
+                bugMutationTimer = GetBugSpellCooldown();
+            }
+        }
+        else {
+            bugMutationTimer -= diff;
+        }
+    }
+    
     void CheckEnrage(uint32 diff)
     {
         if (EnrageTimer < diff)
@@ -463,13 +503,14 @@ struct boss_twinemperorsAI : public ScriptedAI
         }
         else EnrageTimer -= diff;
     }
-
+   
 };
 
 struct boss_veklorAI : public boss_twinemperorsAI
 {
     boss_veklorAI(Creature* pCreature) : boss_twinemperorsAI(pCreature)
     {
+        Reset();
     }
 
     uint32 ShadowBolt_Timer;
@@ -497,15 +538,18 @@ struct boss_veklorAI : public boss_twinemperorsAI
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
 
         // todo: he should actually do some damage, but need sources for how much.
-        m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0);
-        m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0);
+        //m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0);
+        //m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0);
     }
 
-    void CastSpellOnBug(Creature *target)
+    uint32 GetBugSpellCooldown() override
     {
-        target->setFaction(14);
-        target->AddAura(SPELL_EXPLODEBUG);
-        //todo: does it automatically engage a player, and should it?
+        return urand(EXPLODE_BUG_MIN_CD, EXPLODE_BUG_MAX_CD);
+    }
+
+    uint32 GetBugSpell()
+    {
+        return SPELL_EXPLODEBUG;
     }
 
     virtual void UpdateTeleportToMyBrother(uint32 diff) override
@@ -517,8 +561,6 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
 
         teleportTimer = urand(TELEPORTTIME_MIN_CD, TELEPORTTIME_MAX_CD);
-        justTeleportedTimer = JUST_TELEPORTED_FREEZE;
-
 
         // If he is attacked during this periode he will instantly engage
         // If noone attacked during that periode, he start attacking after the period.
@@ -532,17 +574,35 @@ struct boss_veklorAI : public boss_twinemperorsAI
         float other_y = pOtherBoss->GetPositionY();
         float other_z = pOtherBoss->GetPositionZ();
         float other_o = pOtherBoss->GetOrientation();
+        float me_x = m_creature->GetPositionX();
+        float me_y = m_creature->GetPositionY();
+        float me_z = m_creature->GetPositionZ();
+        float me_o = m_creature->GetOrientation();
 
-        pOtherBoss->NearTeleportTo(m_creature->GetPositionX(),
-            m_creature->GetPositionY(),
-            m_creature->GetPositionZ(),
-            m_creature->GetOrientation());
-
-        m_creature->NearTeleportTo(other_x, other_y, other_z, other_o);
-
-        OnStartTeleport();
+        OnStartTeleport(other_x, other_y, other_z, me_o);
         if (boss_twinemperorsAI* pOtherAI = dynamic_cast<boss_twinemperorsAI*>(pOtherBoss->AI())) {
-            pOtherAI->OnStartTeleport();
+            pOtherAI->OnStartTeleport(me_x, me_y, me_z, other_o);
+        }
+    }
+
+    void TryHealBrother(uint32 diff) override
+    {
+        if (healTimer < diff)
+        {
+            Unit *pOtherBoss = GetOtherBoss();
+            if (pOtherBoss && pOtherBoss->IsWithinDist(m_creature, HEAL_BROTHER_RANGE))
+            {
+                //if (DoCastSpellIfCan(pOtherBoss, SPELL_HEAL_BROTHER) == CAST_OK)
+                healTimer = SUCCESS_HEAL_FREQUENCY;
+                m_creature->CastSpell(pOtherBoss, SPELL_HEAL_BROTHER, true);
+                pOtherBoss->CastSpell(m_creature, SPELL_HEAL_BROTHER, true);
+            }
+            else {
+                healTimer = TRY_HEAL_FREQUENCY;
+            }
+        }
+        else {
+            healTimer -= diff;
         }
     }
 
@@ -552,25 +612,6 @@ struct boss_veklorAI : public boss_twinemperorsAI
         // when VL jumps to VN's location there will be a warrior who will get only 2s to run away
         // which is almost impossible
         ArcaneBurst_Timer = ARCANE_BURST_COOLDOWN;
-    }
-
-    void TryHealBrother(uint32 diff) override
-    {
-        if (healTimer < diff)
-        {
-            Unit *pOtherBoss = GetOtherBoss();
-            if (pOtherBoss && pOtherBoss->IsWithinDist(m_creature, 60.0f))
-            {
-                if (DoCastSpellIfCan(pOtherBoss, SPELL_HEAL_BROTHER) == CAST_OK)
-                    healTimer = SUCCESS_HEAL_FREQUENCY;
-            }
-            else {
-                healTimer = TRY_HEAL_FREQUENCY;
-            }
-        }
-        else {
-            healTimer -= diff;
-        }
     }
 
     void UpdateEmperor(uint32 diff)
@@ -633,7 +674,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         // VL doesn't melee
         // XXX: this is not necessarily true. 
         // https://www.youtube.com/watch?v=SNOmg7kE68U&t=53s
-        // DoMeleeAttackIfReady();
+         DoMeleeAttackIfReady();
     }
 
     void AttackStart(Unit* who)
@@ -686,11 +727,14 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         //todo: anything that needs doing?
     }
 
-    void CastSpellOnBug(Creature *target)
+    uint32 GetBugSpellCooldown() override
     {
-        target->setFaction(14);
-        target->AddAura(SPELL_MUTATE_BUG);
-        //todo: does it automatically engage a player?
+        return urand(MUTATE_BUG_MIN_CD, MUTATE_BUG_MAX_CD);
+    }
+
+    uint32 GetBugSpell()
+    {
+        return SPELL_MUTATE_BUG;
     }
 
     void UpdateEmperor(uint32 diff)

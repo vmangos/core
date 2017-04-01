@@ -129,7 +129,7 @@ void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
         pVN->SetStandState(UNIT_STAND_STATE_STAND);
         break;
     case SAY_EMPERORS_INTRO_1:
-        pEye->ForcedDespawn(1);
+        pEye->ForcedDespawn(1); //1
         break;
     }
 }
@@ -256,7 +256,7 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
         // Despawn C'thun eye at twins if twins is already dead
         //m_auiEncounter[TYPE_TWINS] = NOT_STARTED;
         if (GetData(TYPE_TWINS) == DONE) {
-            pCreature->ForcedDespawn(0);
+            pCreature->ForcedDespawn(1);
         }
         else {
             pCreature->GetMotionMaster()->MovePoint(0, pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, MOVE_FLY_MODE, 0.0f, 4.896f);
