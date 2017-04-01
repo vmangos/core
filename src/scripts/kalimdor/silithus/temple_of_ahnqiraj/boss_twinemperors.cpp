@@ -444,7 +444,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
             if (lUnitList.size() == 0)
                 return;
-
+            iter = lUnitList.begin();
             std::advance(iter, urand(0, lUnitList.size() - 1));
             Creature* c = *iter;
             c->Respawn();
@@ -475,15 +475,17 @@ struct boss_twinemperorsAI : public ScriptedAI
                     ++iter;
                 }
             }
-            if (iter != lUnitList.end()) {
-                std::advance(iter, urand(0, lUnitList.size() - 1));
-                Creature* c = *iter;
-                c->setFaction(14);
-                c->AddAura(GetBugSpell());
-                c->SetHealth(c->GetMaxHealth());
-                c->SetInCombatWithZone();
-                bugMutationTimer = GetBugSpellCooldown();
-            }
+            if (lUnitList.size() == 0)
+                return;
+            iter = lUnitList.begin();
+
+            std::advance(iter, urand(0, lUnitList.size() - 1));
+            Creature* c = *iter;
+            c->setFaction(14);
+            c->AddAura(GetBugSpell());
+            c->SetHealth(c->GetMaxHealth());
+            c->SetInCombatWithZone();
+            bugMutationTimer = GetBugSpellCooldown();
         }
         else {
             bugMutationTimer -= diff;
