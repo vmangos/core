@@ -7,3 +7,6 @@ UPDATE `creature_template`  SET `unit_flags`=(2) , `AIName`='EventAI', `Movement
 
 DELETE FROM spell_mod WHERE Id = 800;
 INSERT INTO spell_mod (`Id`, `DurationIndex`,`Comment`) VALUES ('800', '65','Spell twins teleport stun 1.5sec');
+
+UPDATE creature_template SET speed_run=2.14286 WHERE entry=15275;
+UPDATE creature_template SET speed_run=2.14286 WHERE entry=15276;
