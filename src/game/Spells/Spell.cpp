@@ -1731,7 +1731,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 28796:                                 // Poison Bolt Volley (Naxx, Faerlina)
                     unMaxTargets = 10;
                     break;
-                case 25991:                                 // Poison Bolt Volley (AQ40, Pincess Huhuran)
+                case 25991:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
                     unMaxTargets = 15;
                     break;
             }
@@ -2019,7 +2019,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         targetUnitMap.erase(itr);
                 }
 	    }
-            if (SelectClosestTargets && targetUnitMpa.size() > unMaxTargets)
+            if (SelectClosestTargets && targetUnitMap.size() > unMaxTargets)
 	    {
                 targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
                 UnitList::iterator itr = targetUnitMap.begin();
