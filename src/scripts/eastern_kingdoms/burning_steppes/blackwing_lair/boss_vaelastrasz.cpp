@@ -171,9 +171,6 @@ struct boss_vaelAI : public ScriptedAI
         m_uiSpeechTimer = 10000;
         m_uiSpeechNum = 0;
         m_bIsDoingSpeech = true;
-        m_uiSpeachTimer = 10000;
-        m_uiSpeachNum = 0;
-        m_bIsDoingSpeach = true;
 
         if (nullptr == m_pInstance)
             return;
