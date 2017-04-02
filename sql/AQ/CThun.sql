@@ -62,10 +62,10 @@ UPDATE creature_template SET `mindmg`='500', `maxdmg`='800', `baseattacktime`='2
 
 
 -- stomach of cthun area triggers
-DELETE FROM `mangos`.`scripted_areatrigger` WHERE entry IN (4033, 4034, 4036);
-INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4033', 'at_temple_ahnqiraj');
-INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4034', 'at_temple_ahnqiraj');
-INSERT INTO `mangos`.`scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4036', 'at_temple_ahnqiraj');
+DELETE FROM scripted_areatrigger WHERE entry IN (4033, 4034, 4036);
+INSERT INTO scripted_areatrigger (`entry`, `ScriptName`) VALUES ('4033', 'at_temple_ahnqiraj');
+INSERT INTO scripted_areatrigger (`entry`, `ScriptName`) VALUES ('4034', 'at_temple_ahnqiraj');
+INSERT INTO scripted_areatrigger (`entry`, `ScriptName`) VALUES ('4036', 'at_temple_ahnqiraj');
 
 -- flags update on trigger unit used to knock players out of cthuns body after being ported. Flags copied from viscidus trigger.
-UPDATE `mangos`.`creature_template` SET `unit_flags`='33587968', `ScriptName`='boss cthun knockback trigger' WHERE `entry`='15800';
+-- UPDATE `mangos`.`creature_template` SET `unit_flags`='33587968', `ScriptName`='boss cthun knockback trigger' WHERE `entry`='15800';
