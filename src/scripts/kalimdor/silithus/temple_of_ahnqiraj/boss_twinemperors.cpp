@@ -411,9 +411,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         justTeleported = false;
 
         DoResetThreat();
-        //-1.0f because somehow the distance calc within GetNearestVictimInRange
-        // is able to get currRange=0, and checks currRange > min, soooo
-        Unit* closestPlayer = m_creature->GetNearestVictimInRange(-1.0f, 300.0f);
+        Unit* closestPlayer = m_creature->GetNearestVictimInRange(0, 300.0f);
         AttackStart(closestPlayer);
         m_creature->getThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
 

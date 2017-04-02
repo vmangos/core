@@ -2979,7 +2979,7 @@ Unit* Creature::GetNearestVictimInRange(float min, float max)
             continue;
 
         float currRange = GetDistance(pTarget);
-        if (currRange < bestRange && currRange > min)
+        if (currRange <= bestRange && currRange >= min)
         {
             bestRange = currRange;
             pUnit = pTarget;
