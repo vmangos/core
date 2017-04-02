@@ -87,11 +87,11 @@ enum eScriptTexts {
 // Shared constants
 static const uint32 ENRAGE_TIMER                = 60 * 60000;
 
-static const uint32 JUST_TELEPORTED_FREEZE      = 1500;     // Emperor is "frozen", aka not doing anything, for this long after TP
+static const uint32 JUST_TELEPORTED_FREEZE      = 2000;     // Emperor is "frozen", aka not doing anything, for this long after TP
 static const uint32 AFTER_TELEPORT_THREAT       = 3000;     // Threat added to nearest player after TP. TODO: correct amount?
 
-static const uint32 TELEPORTTIME_MIN_CD = 30000;    // Shortest possible cooldown on teleport
-static const uint32 TELEPORTTIME_MAX_CD = 40000;    // Longest possible cooldown on teleport
+static const uint32 TELEPORTTIME_MIN_CD         = 30000;    // Shortest possible cooldown on teleport
+static const uint32 TELEPORTTIME_MAX_CD         = 40000;    // Longest possible cooldown on teleport
 
 static const uint32 TRY_HEAL_FREQUENCY          = 0;        // How ofthen will the emperors TRY to heal eachother, 0 for every update
 static const uint32 SUCCESS_HEAL_FREQUENCY      = 1500;     // How ofthen will the emperors actually heal, when in range of each other
@@ -171,7 +171,7 @@ struct mob_TwinsBug : public ScriptedAI {
         m_creature->RemoveAllAuras();
     }
 
-    virtual void UpdateAI(uint32 diff) override
+    virtual void UpdateAI(const uint32 diff) override
     {
         ScriptedAI::UpdateAI(diff);
     }
@@ -183,11 +183,13 @@ struct boss_twinemperorsAI : public ScriptedAI
     uint32 EnrageTimer;
     
     uint32 justTeleportedTimer;
-    bool justTeleported;
+    bool justTeleported;    
     bool didPullDialogue;
     
     uint32 bugMutationTimer;
     uint32 respawnBugTimer;
+
+    uint32 killSayCooldown;
 
     virtual uint32 GetBugSpellCooldown() = 0;
     virtual uint32 GetBugSpell() = 0;
@@ -228,6 +230,8 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         justTeleported = false;
         didPullDialogue = false;
+
+        killSayCooldown = 0;
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage) override
@@ -297,13 +301,13 @@ struct boss_twinemperorsAI : public ScriptedAI
             m_pInstance->SetData(TYPE_TWINS, FAIL);
     }
 
-    void SpellHit(Unit *caster, const SpellEntry *entry) override
+    void OnHealHit(Unit* caster)
     {
         if (caster == m_creature)
             return;
 
         Creature *pOtherBoss = GetOtherBoss();
-        if (entry->Id != SPELL_HEAL_BROTHER || !pOtherBoss)
+        if (!pOtherBoss)
             return;
 
         // add health so we keep same percentage for both brothers
@@ -316,16 +320,28 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         uint32 myh = m_creature->GetHealth();
         uint32 hish = pOtherBoss->GetHealth();
-        if (mytotal > histotal)
-        {
+        if (mytotal > histotal) {
             uint32 h = m_creature->GetHealth() + largerAmount;
             m_creature->SetHealth(std::min(mytotal, h));
         }
-        else
-        {
+        else {
             uint32 h = pOtherBoss->GetHealth() + largerAmount;
             pOtherBoss->SetHealth(std::min(histotal, h));
         }
+    }
+
+    void SpellHit(Unit *caster, const SpellEntry *entry) override
+    {
+        switch (entry->Id)
+        {
+        case SPELL_HEAL_BROTHER:
+            OnHealHit(caster);
+            break;
+        case SPELL_BERSERK:
+            sLog.outBasic("%s received berserk from %s", m_creature->GetName(), caster->GetName());
+            break;
+        }
+        
     }
 
     void UpdateAI(const uint32 diff) override
@@ -355,11 +371,13 @@ struct boss_twinemperorsAI : public ScriptedAI
         */
 
         // Return since we have no target.
-        // Since it can be the case when TP stun is on as well, we let the condition pass
-        // if we just teleported, so we can update other timers as well
-        if ( (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) && !justTeleported) {
-            return;
+        // If we just teleported, selectHostileTarget should fail, so skip the check in that case
+        if (!justTeleported) {
+            if ( !m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+                return;
+            }
         }
+        
         
         if (justTeleported) {
             howLong += diff;
@@ -369,6 +387,10 @@ struct boss_twinemperorsAI : public ScriptedAI
             else {
                 justTeleportedTimer -= diff;
             }
+        }
+
+        if (killSayCooldown > 0) {
+            killSayCooldown -= diff;
         }
 
         CheckEnrage(diff);
@@ -407,7 +429,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     // Called JUST_TELEPORTED_FREEZE after teleport happened
     void OnEndTeleport()
     {
-        sLog.outBasic("End tp stun after %d ms", howLong);
+        sLog.outBasic("End tp stun after %lu ms", (unsigned long)howLong);
         justTeleported = false;
 
         DoResetThreat();
@@ -452,10 +474,11 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     void HandleBugSpell(uint32 diff)
     {
+        // Cant do stuff while stunned, but since stun effect isent really working properly we return manually
+        if (justTeleported)
+            return;
+
         if (bugMutationTimer < diff) {
-            // ToDo: not sure about this, but not seen a bug spell during teleport
-            if (justTeleported)
-                return;
             std::list<Creature*> lUnitList;
             GetCreatureListWithEntryInGrid(lUnitList, m_creature, BUG_TYPE_1, BUG_SPELL_MAX_DIST);
             GetCreatureListWithEntryInGrid(lUnitList, m_creature, BUG_TYPE_2, BUG_SPELL_MAX_DIST);
@@ -512,6 +535,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             // just force-apply berserk if it's time. No dilly-dally. 
             // todo: Does this always work?
             m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
+            EnrageTimer = 60000 * 5;
             /*
             if (!m_creature->IsNonMeleeSpellCasted(true))
             {
@@ -616,6 +640,10 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     void TryHealBrother(uint32 diff) override
     {
+        // Cant heal while stunned, but since stun effect isent really working properly we return manually
+        if (justTeleported)
+            return;
+
         // They cannot cast heal during teleport stun:
         // https://www.youtube.com/watch?v=8mGchbCF1Lw
         if (healTimer < diff) {
@@ -649,13 +677,17 @@ struct boss_veklorAI : public boss_twinemperorsAI
     Player* GetBlizzardTarget()
     {
         ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        // Blizzard cant be cast on top-aggro target
-        if (tList.size() <= 1)
+        
+        if (tList.size() == 0)
             return nullptr;
 
         std::list<HostileReference*> candidates;
         ThreatList::const_iterator i = tList.begin();
-        ++i; //skipping top-aggro
+        
+        // skipping top-aggro if there are more than 1 person on threat list
+        if(tList.size() > 1)
+            ++i; 
+
         for (i; i != tList.end(); ++i) {
             Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
             if (!pUnit) continue;
@@ -776,7 +808,10 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     void KilledUnit(Unit*)
     {
-        DoScriptText(SAY_VEKLOR_SLAY, m_creature);
+        if (killSayCooldown == 0) {
+            DoScriptText(SAY_VEKLOR_SLAY, m_creature);
+            killSayCooldown = urand(5000, 10000);
+        }
     }
 };
 
@@ -875,7 +910,15 @@ struct boss_veknilashAI : public boss_twinemperorsAI
 
     void KilledUnit(Unit*) override
     {
-        DoScriptText(SAY_VEKNILASH_SLAY, m_creature);
+        if (killSayCooldown == 0) {
+            DoScriptText(SAY_VEKNILASH_SLAY, m_creature);
+            killSayCooldown = urand(5000, 10000);
+        }
+    }
+
+    void AttackStart(Unit* who)
+    {
+        ScriptedAI::AttackStart(who);
     }
 };
 
