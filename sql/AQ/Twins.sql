@@ -5,8 +5,9 @@ UPDATE `creature` SET `position_z`='-102.44', `orientation`='4.896' WHERE `guid`
 -- Added ScriptName, made unit non-attackable and experimented with some other flags for floating, but they should be back to what they were.
 UPDATE `creature_template`  SET `unit_flags`=(2) , `AIName`='EventAI', `MovementType` = '0',`InhabitType` = '3', `ScriptName`='mob_masters_eye' WHERE `entry`='15963';
 
+
 DELETE FROM spell_mod WHERE Id = 800;
-INSERT INTO spell_mod (`Id`, `DurationIndex`,`Comment`) VALUES ('800', '65','Spell twins teleport stun 1.5sec');
+INSERT INTO spell_mod (`Id`, `DurationIndex`,`Comment`) VALUES ('800', '39','Spell twins teleport stun 2 sec');
 
 -- Increased their runspeed. No idea exactly what it should be, but absolutely more than their default one
 UPDATE creature_template SET speed_run=1.8 WHERE entry=15275;
