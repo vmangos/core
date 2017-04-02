@@ -420,6 +420,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 
+
     static ChatCommand modifyCommandTable[] =
     {
         { NODE, "hp",             SEC_MODERATOR,      false, &ChatHandler::HandleModifyHPCommand,            "", nullptr },
@@ -441,7 +442,9 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "standstate",     SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyStandStateCommand,    "", nullptr },
         { NODE, "morph",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyMorphCommand,         "", nullptr },
         { NODE, "gender",         SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyGenderCommand,        "", nullptr },
-        { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
+        { NODE, "cr",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyCrCommand,            "", nullptr },
+        { NODE, "br",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyBrCommand,            "", nullptr },
+        { MSTR, nullptr,       0,                     false, nullptr,                       "", nullptr }
     };
 
     static ChatCommand creatureGroupsCommandTable[] =
