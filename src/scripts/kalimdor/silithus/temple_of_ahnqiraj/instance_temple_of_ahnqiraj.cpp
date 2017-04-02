@@ -107,6 +107,11 @@ bool TwinsIntroDialogue::StartedOrDone()
     return m_StartedOrDone;
 }
 
+void TwinsIntroDialogue::SetDone()
+{
+    m_StartedOrDone = true;
+}
+
 void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
 {
     Creature* pEye = m_pInstance->GetSingleCreatureFromStorage(NPC_MASTERS_EYE);
@@ -138,7 +143,6 @@ instance_temple_of_ahnqiraj::instance_temple_of_ahnqiraj(Map* pMap) :
     ScriptedInstance(pMap),
     m_uiBugTrioDeathCount(0),
     m_uiCthunWhisperTimer(90000),
-    m_bIsEmperorsIntroDone(false),
     m_twinsDeadDialogue(twinsDeathDialogue)
 {
     Initialize();
@@ -167,11 +171,10 @@ bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
 
 void instance_temple_of_ahnqiraj::DoHandleTempleAreaTrigger(uint32 uiTriggerId)
 {
-    if (uiTriggerId == AREATRIGGER_TWIN_EMPERORS && !m_bIsEmperorsIntroDone && GetData(TYPE_TWINS) != DONE)
+    if (uiTriggerId == AREATRIGGER_TWIN_EMPERORS && !TwinsDialogueStartedOrDone())
     {
         // Current assumption is the event only start once every soft reset.
         // May need to tweak if-statement to make sure this is the case.
-        //m_bIsEmperorsIntroDone = true;
         m_twinsIntroDialogue.Start();
     }
     else if (uiTriggerId == AREATRIGGER_SARTURA)
@@ -255,7 +258,7 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
     case NPC_MASTERS_EYE:
         // Despawn C'thun eye at twins if twins is already dead
         //m_auiEncounter[TYPE_TWINS] = NOT_STARTED;
-        if (GetData(TYPE_TWINS) == DONE) {
+        if (TwinsDialogueStartedOrDone()) {
             pCreature->ForcedDespawn(1);
         }
         else {
@@ -435,6 +438,9 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
                 obj->SetActiveObjectState(false);
             }
         }
+    }
+    if (m_auiEncounter[TYPE_TWINS] == DONE) {
+        m_twinsIntroDialogue.SetDone();
     }
     OUT_LOAD_INST_DATA_COMPLETE;
 }
