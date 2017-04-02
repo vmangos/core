@@ -525,6 +525,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyRepCommand(char* args);
         bool HandleModifyGenderCommand(char* args);
 
+        bool HandleModifyCrCommand(char *args);
+        bool HandleModifyBrCommand(char *args);
+
+
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(char* args);
         bool HandleNpcSummonCommand(char* args);
@@ -590,6 +594,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadAllLocalesCommand(char* args);
 
         bool HandleReloadConfigCommand(char* args);
+
 
         bool HandleReloadAreaTriggerTavernCommand(char* args);
         bool HandleReloadAreaTriggerTeleportCommand(char* args);
