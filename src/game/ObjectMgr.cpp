@@ -8744,7 +8744,7 @@ bool PlayerCondition::Meets(Player const* player, Map const* map, WorldObject co
                 map = player ? player->GetMap() : source->GetMap();
 
             if (InstanceData const* data = map->GetInstanceData())
-                return data->CheckConditionCriteriaMeet(player, m_value1, source, conditionSourceType);
+                return data->CheckConditionCriteriaMeet(player, m_value1, source, m_value2);
             return false;
         }
         case CONDITION_QUESTAVAILABLE:

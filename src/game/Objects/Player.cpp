@@ -13157,7 +13157,7 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                 }
                 if (CanCompleteQuest(questid))
                     CompleteQuest(questid);
-                return;
+                break;
             }
         }
     }
@@ -13198,7 +13198,7 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
 
                     IncompleteQuest(questid);
                 }
-                return;
+                break;
             }
         }
     }
