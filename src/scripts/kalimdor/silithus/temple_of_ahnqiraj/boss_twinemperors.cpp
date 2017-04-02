@@ -117,7 +117,7 @@ static const uint32 ARCANE_BURST_MAX_CD         = 10000;
 static const uint32 BLIZZARD_MIN_CD             = 15000;    // todo: no source on blizzard cooldown. Duration is 10s
 static const uint32 BLIZZARD_MAX_CD             = 20000;
 static const uint32 VEKLOR_DIST                 = 20;       // Vek'lor chase to this distance
-static const uint32 SHADOWBOLT_RANGED_CD        = 1500;      // 1.5sec GCD on ranged use.
+static const uint32 SHADOWBOLT_RANGED_CD        = 2000;      // 1.5sec GCD on ranged use.
 static const uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;     // Min cd on SB for when VL is in melee range
 static const uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;    // Max cd on SB for when VL is in melee range 
 static const uint32 VEKLOR_PULL_YELL_DELAY      = 3000;     // Vek'lors pull yell happens after Vek'nilash
@@ -741,7 +741,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
             }
         }
         else {
-            // When not in melee range, there is only a 1.5sec "gcd" on shadowbolt
+            // When not in melee range, there is only a ~2 sec "gcd" on shadowbolt
             // https://www.youtube.com/watch?v=nHXfSDVX_ZA
             if (!m_creature->IsWithinDist(m_creature->getVictim(), shadowboltRange)) {
                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), VEKLOR_DIST, 0);
