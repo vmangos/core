@@ -1801,10 +1801,18 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             else
                 m_caster->CastSpell(unitTarget, 11637, true, m_CastItem, nullptr, m_originalCasterGUID);
             return;
-        // Linken's Boomerang: 3% chance proc
+        // Linken's Boomerang: 10% chance to proc stun, 3% chance to proc disarm (dubious numbers)
         case 15712:
-            if (urand(0, 30))
+            if (triggered_spell_id == 15753 && urand(0, 10))
+            {
                 return;
+            }
+
+            if (triggered_spell_id == 15752 && urand(0, 30))
+            {
+                return;
+            }
+
             break;
     }
     switch (triggered_spell_id)
