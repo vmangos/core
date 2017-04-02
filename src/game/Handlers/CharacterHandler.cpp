@@ -795,15 +795,6 @@ void WorldSession::HandleMeetingStoneInfoOpcode(WorldPacket & /*recv_data*/)
     WorldPacket data(SMSG_MEETINGSTONE_SETQUEUE, 5);
     data << uint32(0) << uint8(6);
     SendPacket(&data);
-
-    // Trigger a client camera reset by sending an `SMSG_STANDSTATE_UPDATE'
-    // event. See `WorldSession::HandleMoveWorldportAckOpcode'.
-    if (GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
-    {
-        WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
-        data << GetPlayer()->getStandState();
-        GetPlayer()->GetSession()->SendPacket(&data);
-    }
 }
 
 void WorldSession::HandleTutorialFlagOpcode(WorldPacket & recv_data)

@@ -212,8 +212,8 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // On a successful port, the camera of the MacOS client is facing south and
     // ignores any movement from the transport object. Triggering
     // `SMSG_STANDSTATE_UPDATE' with its current state resets the camera
-    // (implemented in `WorldSession::HandleMeetingStoneInfoOpcode').
-    GetPlayer()->SendHeartBeat(false);
+    // (implemented in `WorldSession::HandleZoneUpdateOpcode').
+    GetPlayer()->SendHeartBeat(true);
 }
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
