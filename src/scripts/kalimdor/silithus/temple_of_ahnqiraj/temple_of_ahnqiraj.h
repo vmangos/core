@@ -112,6 +112,8 @@ public:
     TwinsIntroDialogue();
     void Start();
     bool StartedOrDone();
+    void SetDone();
+
 protected:
     void JustDidDialogueStep(int32 iEntry) override;
 private:
@@ -152,8 +154,6 @@ private:
     uint32 m_uiCthunWhisperTimer;
 
     GuidList m_lRoyalGuardGUIDList;
-
-    bool m_bIsEmperorsIntroDone;
 
     TwinsIntroDialogue m_twinsIntroDialogue;
     DialogueHelper m_twinsDeadDialogue;
