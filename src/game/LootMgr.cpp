@@ -885,8 +885,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
     }
 
     // in next cases used same slot type for all items
-    //LootSlotType slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
-    LootSlotType slot_type = lv.permission == OWNER_PERMISSION ? LOOT_SLOT_TYPE_ALLOW_LOOT : LOOT_SLOT_TYPE_LOCKED;
+    LootSlotType slot_type = LOOT_SLOT_TYPE_ALLOW_LOOT;
 
     QuestItemMap const& lootPlayerQuestItems = l.GetPlayerQuestItems();
     QuestItemMap::const_iterator q_itr = lootPlayerQuestItems.find(lv.viewer->GetGUIDLow());
