@@ -3114,6 +3114,14 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     *m_selfContainer = nullptr;
                     m_caster->CastSpell(summon, m_spellInfo->EffectTriggerSpell[1], true);
                     break;
+                // Target Dummy
+                case 4071:
+                case 4072:
+                case 19805:
+                    summon->lootForCreator = true;
+                    summon->SetCreatorGuid(m_caster->GetObjectGuid());
+                    summon->SetLootRecipient(m_caster);
+                    break;
             }
 
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.

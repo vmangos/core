@@ -1893,39 +1893,71 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, con
 
 enum
 {
-    SPELL_AGGRO = 4507,
-    SPELL_PASSIVE = 4044,
+    TARGET_DUMMY_DURATION = 15000,
+};
+
+enum TargetDummySpells
+{
+    TARGET_DUMMY_PASSIVE = 4044,
+    ADVANCED_TARGET_DUMMY_PASSIVE = 4048,
+    MASTER_TARGET_DUMMY_PASSIVE = 19809,
+    TARGET_DUMMY_SPAWN_EFFECT = 4507,
+    ADVANCED_TARGET_DUMMY_SPAWN_EFFECT = 4092,
+};
+
+enum TargetDummyEntry
+{
+    TARGET_DUMMY = 2673,
+    ADVANCED_TARGET_DUMMY = 2674,
+    MASTER_TARGET_DUMMY = 12426
 };
 
 struct npc_target_dummyAI : ScriptedAI
 {
-    explicit npc_target_dummyAI(Creature* pCreature, uint32 delay = 15000) : ScriptedAI(pCreature)
-    {
-        m_uiStayTime = delay;
-        m_bActive = true;
-        m_bIsAggro = false;
-        m_uiAggroTimer = 0;
-        m_creature->addUnitState(UNIT_STAT_ROOT);
-
-        pCreature->CastSpell(pCreature, SPELL_AGGRO, false);
-    }
-
     uint32 m_uiStayTime;
     uint32 m_uiAggroTimer;
     bool m_bActive;
     bool m_bIsAggro;
+    TargetDummySpells m_spawnEffect;
+    TargetDummySpells m_passiveSpell;
+
+    explicit npc_target_dummyAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_bActive = true;
+        m_uiStayTime = TARGET_DUMMY_DURATION;
+        m_creature->addUnitState(UNIT_STAT_ROOT);
+
+        switch (m_creature->GetEntry())
+        {
+            case ADVANCED_TARGET_DUMMY:
+            {
+                m_spawnEffect = ADVANCED_TARGET_DUMMY_SPAWN_EFFECT;
+                m_passiveSpell = ADVANCED_TARGET_DUMMY_PASSIVE;
+                break;
+            }
+            case MASTER_TARGET_DUMMY:
+            {
+                m_spawnEffect = ADVANCED_TARGET_DUMMY_SPAWN_EFFECT;
+                m_passiveSpell = MASTER_TARGET_DUMMY_PASSIVE;
+                break;
+            }
+            case TARGET_DUMMY:
+            default:
+            {
+                m_spawnEffect = TARGET_DUMMY_SPAWN_EFFECT;
+                m_passiveSpell = TARGET_DUMMY_PASSIVE;
+                break;
+            }
+        }
+
+        DoCastSpellIfCan(m_creature, m_spawnEffect, false);
+    }
 
     void Reset() override
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
-
-        if (m_bIsAggro)
-        {
-            m_uiAggroTimer = 3000;
-            m_bIsAggro = false;
-        }
+        m_bIsAggro = false;
+        m_uiAggroTimer = 3000;
     }
-
 
     void Aggro(Unit* /*pWho*/) override
     {
@@ -1939,9 +1971,9 @@ struct npc_target_dummyAI : ScriptedAI
 
         if (m_uiStayTime < diff)
         {
-            // Despawn
+            // Dummy should leave a corpse after expiring
             m_creature->CombatStop();
-            m_creature->AddObjectToRemoveList();
+            m_creature->DoKillUnit(m_creature);
             m_bActive = false;
             return;
         }
@@ -1958,7 +1990,7 @@ struct npc_target_dummyAI : ScriptedAI
 
         if (m_uiAggroTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_PASSIVE, false) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), m_passiveSpell, false) == CAST_OK)
             {
                 m_uiAggroTimer = 3000;
                 m_bIsAggro = true;
@@ -1966,14 +1998,12 @@ struct npc_target_dummyAI : ScriptedAI
         }
         else
             m_uiAggroTimer -= diff;
-
-        DoMeleeAttackIfReady();
     }
 };
 
 CreatureAI* GetAI_npc_target_dummy(Creature* pCreature)
 {
-    return new npc_target_dummyAI(pCreature, 15000);
+    return new npc_target_dummyAI(pCreature);
 }
 
 /*########
