@@ -2496,7 +2496,8 @@ bool ChatHandler::HandleGroupInfoCommand(char* args)
 
     if (!group)
     {
-        PSendSysMessage(LANG_NOT_IN_GROUP);
+        std::string nameLink = GetNameLink(target);
+        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
         return false;
     }
 
