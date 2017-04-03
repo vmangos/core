@@ -4583,9 +4583,12 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && !IsAreaOfEffectSpell(AurSpellInfo) && caster)
-        if (caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL) && caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL)->m_spellInfo->Id == auraSpellId)
+    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && caster)
+    {
+        Spell *channeled = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+        if (channeled && channeled->m_spellInfo->Id == auraSpellId && channeled->m_targets.getUnitTarget() == this)
             caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    }
 }
 
 void Unit::RemoveSingleAuraFromSpellAuraHolder(SpellAuraHolder *holder, SpellEffectIndex index, AuraRemoveMode mode)
