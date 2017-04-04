@@ -1043,6 +1043,7 @@ struct cthunTentacle : public ScriptedAI
             Reset();
             return false;
         }
+        return true;
     }
 
     // Rootet mob-type function for selecting attack target
