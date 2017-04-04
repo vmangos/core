@@ -1372,7 +1372,7 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
     giant_eye_tentacleAI(Creature* pCreature) : 
         cthunPortalTentacle(pCreature, SPELL_GROUND_RUPTURE_NATURE, MOB_GIANT_PORTAL)
     {
-        cthunPortalTentacle::Reset();
+        giant_eye_tentacleAI::Reset();
     }
     void Reset()
     {
