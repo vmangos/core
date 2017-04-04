@@ -58,11 +58,15 @@ enum eSpells {
     // Mob spells
     SPELL_THRASH                    = 3391,
     SPELL_GROUND_TREMOR             = 6524,
-   
+    SPELL_TENTACLE_BIRTH            = 26262,
+    SPELL_SUBMERGE_VISUAL           = 26234,
+
+    // spellid 26100 has a more correct knockback effect for giant tentacles, but wrong dmg values
+
     //SPELL_PUNT_UPWARD               = 16716, // Used to knock people up from stomach. Remove manually after port as it's the wrong spell and applies slowfall
     SPELL_MASSIVE_GROUND_RUPTURE    = 26100, // currently unused, ~1k physical huge knockback, not sure who should do it, if any
     SPELL_GROUND_RUPTURE_PHYSICAL   = 26139, // used by small tentacles
-    SPELL_HAMSTRING                 = 26141,
+    SPELL_HAMSTRING                 = 26141, //26211 is in DBC with more correct ID?
     SPELL_MIND_FLAY                 = 26143, 
     SPELL_GROUND_RUPTURE_NATURE     = 26478, //used by giant tentacles
     
@@ -349,10 +353,13 @@ uint32 groundTremorResetCooldownFunc()              { return urand(6000, 12000);
 uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY              = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
 uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN            = 5000; // How long does a claw tentacle evade before TPing to new target
 
+uint32 TENTACLE_BIRTH_DURATION                      = 3000; // Duration of birth animation and /afk before tentacles start doing stuff
+
 uint32 GIANT_EYE_BEAM_COOLDOWN                      = 2100; // How often will giant eye tentacles cast green beam
-uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN        = 0;    // How long will giant eye wait after spawn before casting
+uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN        = 0;    // How long will giant eye wait after spawn before casting UPDATE: use TENTACLE_BIRTH_DURATION 
 uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500; // How long do we wait if Eye Tentacle MF resists before retrying cast
-uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 3000; // How long do we wait after Eye tentacle has spawned until first MF
+uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 0; // How long do we wait after Eye tentacle has spawned until first MF UPDATE: use TENTACLE_BIRTH_DURATION 
+
 // =======================================================
 
 enum CThunPhase
@@ -1085,6 +1092,9 @@ struct cthunTentacle : public ScriptedAI
 
 struct cthunPortalTentacle : public cthunTentacle
 {
+private:
+    uint32 birthTimer;
+public:
     ObjectGuid portalGuid;
     OnlyOnceSpellTimer groundRuptureTimer;
 
@@ -1104,8 +1114,11 @@ struct cthunPortalTentacle : public cthunTentacle
 
     virtual void Reset() override
     {
+        //m_creature->SetDeathState(DeathState::JUST_ALIVED);
         cthunTentacle::Reset();
         groundRuptureTimer.Reset();
+        birthTimer = TENTACLE_BIRTH_DURATION;
+        DoStopAttack();
     }
 
     void JustDied(Unit*) override
@@ -1119,8 +1132,20 @@ struct cthunPortalTentacle : public cthunTentacle
         if (!cthunTentacle::UpdateCthunTentacle(diff))
             return false;
 
-        groundRuptureTimer.Update(diff);
-        return true;
+        if (groundRuptureTimer.Update(diff) ) {
+            if (birthTimer > diff) {
+                // Only want to cast it once, and it cant be done in ctor because groundRupture interrupts the animation.
+                if (birthTimer == TENTACLE_BIRTH_DURATION) {
+                    if (DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH, CAST_FORCE_TARGET_SELF) != CAST_OK)
+                        sLog.outBasic("Could not run tentacle birth animation");
+                }
+                birthTimer -= diff;
+            }
+        }
+        if (birthTimer <= diff) {
+            return true;
+        }
+        return false;
     }
 
     void FixPortalPosition(Unit* pPortal, uint32 portalID) {
@@ -1212,9 +1237,9 @@ struct clawTentacle : public cthunPortalTentacle
         {
             if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
             {
-                m_creature->SetFeignDeath(true);
+                //m_creature->SetFeignDeath(true); //XXX use this, or a spell 
                 //Dissapear and reappear at new position
-                //m_creature->SetVisibility(VISIBILITY_OFF);
+                m_creature->SetVisibility(VISIBILITY_OFF);
                 return nullptr;
                 float x = target->GetPositionX() + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
                 float y = target->GetPositionY() + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
@@ -1226,7 +1251,7 @@ struct clawTentacle : public cthunPortalTentacle
                 {
                     pCreature->SetVisibility(VISIBILITY_OFF);
                     FixPortalPosition(pCreature, pCreature->GetEntry());
-                    //pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
+                    pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
                     pCreature->SetVisibility(VISIBILITY_ON);
                 }
                 m_creature->SetVisibility(VISIBILITY_ON);
