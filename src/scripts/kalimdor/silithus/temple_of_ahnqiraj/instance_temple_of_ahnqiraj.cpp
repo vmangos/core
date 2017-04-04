@@ -595,13 +595,14 @@ void instance_temple_of_ahnqiraj::KillPlayersInStomach()
     for (auto iter = playersInStomach.begin(); iter != playersInStomach.end();) {
         if (Player* p = GetMap()->GetPlayer(iter->first)) {
             if (p->isAlive()) {
-                if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
-                    p->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                }
-                p->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
-                iter = playersInStomach.erase(iter);
+                p->KillPlayer();
+                //p->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
+            }
+            if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
+                p->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
             }
         }
+        iter = playersInStomach.erase(iter);
     }
 }
 
