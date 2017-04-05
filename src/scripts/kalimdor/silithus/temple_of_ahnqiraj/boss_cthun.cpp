@@ -28,9 +28,8 @@
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
-#define EMOTE_WEAKENED                  -1531011
-
 enum eCreatures {
+    EMOTE_WEAKENED                  = -1531011,
     MOB_EYE_TENTACLE                = 15726,
     MOB_CLAW_TENTACLE               = 15725,
     MOB_GIANT_CLAW_TENTACLE         = 15728,
