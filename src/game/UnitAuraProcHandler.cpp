@@ -536,7 +536,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 {
                     if (procSpell)
                     {
-                        if (GetSchoolMask(procSpell->School) != SPELL_SCHOOL_MASK_NORMAL)
+                        // Wand spell entry marked as physical, we need to add an exception here
+                        if (GetSchoolMask(procSpell->School) != SPELL_SCHOOL_MASK_NORMAL || procSpell->Id == 5019)
                             return SPELL_AURA_PROC_FAILED;
                     }
 

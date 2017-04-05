@@ -63,6 +63,8 @@ enum
     SPELL_VISCIDUS_TELEPORT     = 25904,                    // teleport to room center
     SPELL_SUMMONT_TRIGGER       = 26564,                    // summons 15992
 
+    SPELL_GLOB_SPEED            = 26633,                    // apply aura 26634 each second
+    
     NPC_GLOB_OF_VISCIDUS        = 15667,
     NPC_VISCIDUS_TRIGGER        = 15922,                    // handles aura 26575
 
@@ -123,8 +125,6 @@ struct boss_viscidusAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/)
     {
-        DoCastSpellIfCan(m_creature, SPELL_TOXIN);
-
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VISCIDUS, IN_PROGRESS);
     }
@@ -151,6 +151,7 @@ struct boss_viscidusAI : public ScriptedAI
             m_creature->GetRespawnCoord(fX, fY, fZ);
             pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ);
             m_lGlobesGuidList.push_back(pSummoned->GetObjectGuid());
+            pSummoned->CastSpell(pSummoned, SPELL_GLOB_SPEED, true);
         }
         else if (pSummoned->GetEntry() == NPC_VISCIDUS_TRIGGER)
         {
