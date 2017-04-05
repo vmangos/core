@@ -284,9 +284,10 @@ static bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& t
             if (target->GetPositionZ() < -30.0f) {
                 sLog.outBasic("Trying to spawn %i <-30.0f", id);
             }
-            float x = target->GetPositionX() + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-            float y = target->GetPositionY() + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-            float z = relToCreature->GetMap()->GetHeight(x, y, target->GetPositionZ()); //Manually finding the height in case player is jumping
+            float x;
+            float y;
+            float z;
+            relToCreature->GetRandomPoint(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.5f, x, y, z);
             if (Creature* Spawned = relToCreature->SummonCreature(id,
                 x, y, z, 0,
                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500))
