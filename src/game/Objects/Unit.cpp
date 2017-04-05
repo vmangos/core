@@ -964,8 +964,12 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
             if (player_tap && !group_tap)
                 group_tap = player_tap->GetGroup();
         }
-        else if (creature->lootForCreator && creature->GetCreatorGuid())
-            player_tap = (Player*)GetUnit(*this, creature->GetCreatorGuid());
+        else if (creature->lootForCreator && creature->GetCreatorGuid()) 
+        {
+            Unit* creator = GetUnit(*this, creature->GetCreatorGuid());
+            if (creator->IsPlayer())
+                player_tap = (Player*)creator;
+        }
         else
             creature->SetLootRecipient(nullptr);
     }
