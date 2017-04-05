@@ -154,8 +154,6 @@ void instance_temple_of_ahnqiraj::Initialize()
 
     m_twinsIntroDialogue.InitializeDialogueHelper(this);
     m_twinsDeadDialogue.InitializeDialogueHelper(this);
-
-    sAreaTriggerStore.LookupEntry(4033);
 }
 
 bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
