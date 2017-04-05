@@ -59,6 +59,7 @@ enum eSpells {
     SPELL_GROUND_TREMOR             = 6524,
     SPELL_TENTACLE_BIRTH            = 26262,
     SPELL_SUBMERGE_VISUAL           = 26234,
+    SPELL_SUBMERGE_EFFECT           = 21859, // Must be removed after re-emerge after a submerge to remove immunity
 
     // spellid 26100 has a more correct knockback effect for giant tentacles, but wrong dmg values
 
@@ -358,8 +359,8 @@ static constexpr uint32 TENTACLE_BIRTH_DURATION                = 3000; // Durati
 static constexpr uint32 GIANT_EYE_BEAM_COOLDOWN                = 2100; // How often will giant eye tentacles cast green beam
 static constexpr uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN  = 0;    // How long will giant eye wait after spawn before casting UPDATE: use TENTACLE_BIRTH_DURATION 
 static constexpr uint32 MIND_FLAY_COOLDOWN_ON_RESIST           = 1500; // How long do we wait if Eye Tentacle MF resists before retrying cast
-static constexpr uint32 MIND_FLAY_INITIAL_WAIT_DURATION        = 0; // How long do we wait after Eye tentacle has spawned until first MF UPDATE: use TENTACLE_BIRTH_DURATION 
-static constexpr uint32 TELEPORT_DURATION                      = 3000;
+static constexpr uint32 MIND_FLAY_INITIAL_WAIT_DURATION        = 0;    // How long do we wait after Eye tentacle has spawned until first MF UPDATE: use TENTACLE_BIRTH_DURATION 
+static constexpr uint32 TELEPORT_BURIED_DURATION               = 1000; // How long will a claw tentacle say underground before re-emerging on teleport.
 // =======================================================
 
 enum CThunPhase
@@ -1105,7 +1106,7 @@ public:
         Unit* pPortal = DoSpawnCreature(portalId, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000);
         if (pPortal) {
             portalGuid = pPortal->GetGUID();
-            FixPortalPosition(pPortal, pPortal->GetEntry());
+            FixPortalPosition();
         }
         else {
             sLog.outError("cthunPortalTentacle failed to spawn portal with entry %d", portalId);
@@ -1114,7 +1115,6 @@ public:
 
     virtual void Reset() override
     {
-        //m_creature->SetDeathState(DeathState::JUST_ALIVED);
         cthunTentacle::Reset();
         groundRuptureTimer.Reset();
         birthTimer = TENTACLE_BIRTH_DURATION;
@@ -1148,14 +1148,20 @@ public:
         return false;
     }
 
-    void FixPortalPosition(Unit* pPortal, uint32 portalID) {
+    void FixPortalPosition() {
+        Unit* pPortal = nullptr;
+        if(portalGuid)
+            pPortal = m_pInstance->GetCreature(portalGuid);
+        if (!pPortal)
+            return;
+        uint32 portalEntry = pPortal->GetEntry();
         float radius;
-        switch (portalID) {
+        switch (portalEntry) {
         case MOB_SMALL_PORTAL: radius = 3.0f; break;
         case MOB_GIANT_PORTAL: radius = 8.0f; break;
         default:
             radius = 3.0f;
-            sLog.outError("C'thun FixPortalPosition unknown portalID %d", portalID);
+            sLog.outError("C'thun FixPortalPosition unknown portalID %d", portalEntry);
         }
         //Searching for best z-coordinate to place the portal
         float centerX = m_creature->GetPositionX();
@@ -1193,6 +1199,15 @@ struct clawTentacle : public cthunPortalTentacle
 {
     uint32 EvadeTimer;
     SpellTimer hamstringTimer;
+    uint32 teleportBuriedTimer;
+    uint32 feignDeathTimer;
+
+    enum eClawState {
+        NORMAL,
+        FEIGN_IN_PROCES,
+        BURRIED,
+    };
+    eClawState clawState;
 
     clawTentacle(Creature* pCreature, uint32 groundRuptSpellId, uint32 portalId) :
         cthunPortalTentacle(pCreature, groundRuptSpellId, portalId),
@@ -1206,6 +1221,14 @@ struct clawTentacle : public cthunPortalTentacle
         cthunPortalTentacle::Reset();
         hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
         EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+        teleportBuriedTimer = 0;
+        
+        // If reset is called after a teleport, it regains full HP.
+        // Todo: Should we also clear any debuffs?
+        m_creature->SetFullHealth(); 
+
+        clawState = eClawState::NORMAL;
+        feignDeathTimer = 0;
     }
 
     bool UpdateClawTentacle(uint32 diff)
@@ -1213,54 +1236,108 @@ struct clawTentacle : public cthunPortalTentacle
         if (!cthunPortalTentacle::UpdatePortalTentacle(diff))
             return false;
         
+        switch (clawState) {
+        case NORMAL:
+            updateNormal(diff);
+            return true;
+            break;
+        case FEIGN_IN_PROCES:
+            updateFeign(diff);
+            return false;
+            break;
+        case BURRIED:
+            updateBurried(diff);
+            return false;
+            break;
+        default:
+            sLog.outError("Unknown UpdateClawTentacle state.");
+            return false;
+        }
+    }
+
+private:
+    void updateNormal(uint32 diff) {
         hamstringTimer.Update(diff);
 
         if (Unit* uP = CheckForMelee()) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
-            if (Player* target = UpdateClawEvade(diff)) {
-                m_creature->resetAttackTimer();
-                groundRuptureTimer.Reset();
-                hamstringTimer.Reset(HAMSTRING_INITIAL_COOLDOWN);
-                EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+            // Initiate submerge->teleport->birth sequence if it's time
+            if (EvadeTimer < diff) {
+                clawState = eClawState::FEIGN_IN_PROCES;
+                feignDeathTimer = 1000;
+                //m_creature->SetFeignDeath(true); //todo: find a spell for it  if possible
+                //m_creature->InterruptNonMeleeSpells(false);
+                //m_creature->HandleEmote(EMOTE_ONESHOT_SUBMERGE); //
+                m_creature->CastSpell(m_creature, SPELL_SUBMERGE_VISUAL, false);
+                // m_creature->resetAttackTimer(); // any reason to do this anymore?
+            }
+            else {
+                EvadeTimer -= diff;
             }
         }
-
-        return true;
+    }
+    
+    void updateFeign(uint32 diff) {
+        if (feignDeathTimer < diff) {
+            clawState = eClawState::BURRIED;
+            teleportBuriedTimer = TELEPORT_BURIED_DURATION;
+            setVisibility(false);
+        }
+        else {
+            feignDeathTimer -= diff;
+        }
     }
 
-    // Returns null until teleport takes place. Returns new target pointer on teleport
-    Player* UpdateClawEvade(uint32 diff)
-    {
-        if (EvadeTimer < diff)
-        {
-            if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
-            {
-                //m_creature->SetFeignDeath(true); //XXX use this, or a spell 
-                //Dissapear and reappear at new position
-                m_creature->SetVisibility(VISIBILITY_OFF);
-                return nullptr;
-                float x = target->GetPositionX() + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-                float y = target->GetPositionY() + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-                float z = m_creature->GetMap()->GetHeight(x, y, target->GetPositionZ()); //Manually finding the height in case player is jumping
-
-                m_creature->NearTeleportTo(x, y, z, 0);
-
-                if (Creature* pCreature = m_creature->GetMap()->GetCreature(portalGuid))
-                {
-                    pCreature->SetVisibility(VISIBILITY_OFF);
-                    FixPortalPosition(pCreature, pCreature->GetEntry());
-                    pCreature->NearTeleportTo(m_creature->GetPositionX(), m_creature->GetPositionY(), target->GetPositionZ(), 0);
-                    pCreature->SetVisibility(VISIBILITY_ON);
-                }
-                m_creature->SetVisibility(VISIBILITY_ON);
-                return target;
+    void updateBurried(uint32 diff) {
+        if (teleportBuriedTimer < diff) {
+            // Done being burried, time to teleport on a new target.
+            // If we're successfull in selecting a new target, reset will reset
+            // all necessary cooldowns, including setting the correct clawState (NORMAL)
+            if (TeleportOnNewRandomTarget()) {
+                DoResetThreat();
+                m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
+                setVisibility(true);
+                m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_EFFECT);
+                Reset();
             }
         }
-        else
-            EvadeTimer -= diff;
-        return nullptr;
+        else {
+            teleportBuriedTimer -= diff;
+        }
+    }
+
+    bool TeleportOnNewRandomTarget()
+    {
+        if (Player* target = SelectRandomAliveNotStomach(m_pInstance))
+        {
+            float x;
+            float y;
+            float z;
+            m_creature->GetRandomPoint(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0.5f, x, y, z);
+            m_creature->NearTeleportTo(x, y, z, 0);
+
+            if (Creature* pCreature = m_creature->GetMap()->GetCreature(portalGuid)) {
+                FixPortalPosition();
+            }
+            return true;
+        }
+        return false;
+    }
+    
+    void setVisibility(bool visiblityOn) {
+        Creature* pCreature = m_creature->GetMap()->GetCreature(portalGuid);
+        if (visiblityOn) {
+            m_creature->SetVisibility(VISIBILITY_ON);
+            if (pCreature)
+                pCreature->SetVisibility(VISIBILITY_ON);
+        }
+        else {
+            m_creature->SetVisibility(VISIBILITY_OFF);
+            if (pCreature)
+                pCreature->SetVisibility(VISIBILITY_OFF);
+        }
     }
 };
 
