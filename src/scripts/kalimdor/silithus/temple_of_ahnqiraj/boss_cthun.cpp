@@ -78,22 +78,22 @@ enum eSpells {
     SPELL_MOUTH_TENTACLE            = 26332, // Spawns the tentacle that "eats" you to stomach and mounts the player on it.
 };
 
-uint32 CANNOT_CAST_SPELL_MASK = CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
-                                                        | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
+static constexpr uint32 CANNOT_CAST_SPELL_MASK = (UNIT_FLAG_SILENCED | UNIT_FLAG_PACIFIED | UNIT_FLAG_STUNNED
+                                                 | UNIT_FLAG_CONFUSED | UNIT_FLAG_FLEEING);
     
-static const float stomachPortPosition[4] = 
+static constexpr float stomachPortPosition[4] =
 {
     -8562.0f, 2037.0f, -96.0f, 5.05f
 };
 
-static const float fleshTentaclePositions[2][4] = 
+static constexpr float fleshTentaclePositions[2][4] =
 {
     { -8571.0f, 1990.0f, -98.0f, 1.22f },
     { -8525.0f, 1994.0f, -98.0f, 2.12f }
 };
 
 
-static const float eyeTentaclePositions[8][3] =
+static constexpr float eyeTentaclePositions[8][3] =
 {
     { -8547.269531f, 1986.939941f, 100.490351f },
     { -8556.047852f, 2008.144653f, 100.598129f },
@@ -217,7 +217,7 @@ private:
     
 };
 
-Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
+static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
 {
     if (!instance) return nullptr;
     std::list<Player*> temp;
@@ -249,7 +249,7 @@ Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance)
     return (*j);
 }
 
-void SpawnEyeTentacles(Creature* relToThisCreature)
+static void SpawnEyeTentacles(Creature* relToThisCreature)
 {
 
     //float centerX = relToThisCreature->GetPositionX();
@@ -275,7 +275,7 @@ void SpawnEyeTentacles(Creature* relToThisCreature)
     }
 }
 
-bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, uint32 resetTo, uint32 id)
+static bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, uint32 resetTo, uint32 id)
 {
     if (timer < diff) {
         instance_temple_of_ahnqiraj* instance = (instance_temple_of_ahnqiraj*)relToCreature->GetInstanceData();
@@ -304,61 +304,61 @@ bool SpawnTentacleIfReady(Creature* relToCreature, uint32 diff, uint32& timer, u
 }
 
 // Helper functions for SpellTimer users
-Unit* selectRandNotStomachFunc(Creature* c) {
+static Unit* selectRandNotStomachFunc(Creature* c) {
     instance_temple_of_ahnqiraj* inst = dynamic_cast<instance_temple_of_ahnqiraj*>(c->GetInstanceData());
     if (inst) {
         return SelectRandomAliveNotStomach(inst);
     }
     return nullptr;
 }
-Unit* selectSelfFunc(Creature* c) {
+static Unit* selectSelfFunc(Creature* c) {
     return c;
 }
-Unit* selectTargetFunc(Creature* c) {
+static Unit* selectTargetFunc(Creature* c) {
     return c->getVictim();
 }
 
 // ================== PHASE 1 CONSTANTS ==================
-static const uint32 P1_EYE_TENTACLE_RESPAWN_TIMER   = 45000;
-static const uint32 SPELL_ROTATE_TRIGGER_CASTTIME   = 3000;
-static const uint32 EYE_BEAM_PHASE_DURATION         = 50000;    // -SPELL_ROTATE_TRIGGER_CASTTIME;
-static const uint32 DARK_GLARE_PHASE_DURATION       = 40000;    // +SPELL_ROTATE_TRIGGER_CASTTIME;
-static const int32  MAX_INITIAL_PULLER_HITS         = 3;        // How many times will c'thun target the initial 
-                                                                // puller with green beam before random target.
-static const int32  P1_GREEN_BEAM_COOLDOWN          = 3000;     // Green beam has a 2 sec cast time. If this number is > 2000, 
-                                                                // the cooldown will be P1_GREEN_BEAM_COOLDOWN - 2000
-uint32 clawTentacleSpanCooldownFunc()               { return urand(6000, 12000); }
+static constexpr uint32 P1_EYE_TENTACLE_RESPAWN_TIMER   = 45000;
+static constexpr uint32 SPELL_ROTATE_TRIGGER_CASTTIME   = 3000;
+static constexpr uint32 EYE_BEAM_PHASE_DURATION         = 50000; // -SPELL_ROTATE_TRIGGER_CASTTIME;
+static constexpr uint32 DARK_GLARE_PHASE_DURATION       = 40000; // +SPELL_ROTATE_TRIGGER_CASTTIME;
+static constexpr int32  MAX_INITIAL_PULLER_HITS         = 3;     // How many times will c'thun target the initial 
+                                                                 // puller with green beam before random target.
+static constexpr int32  P1_GREEN_BEAM_COOLDOWN          = 3000;  // Green beam has a 2 sec cast time. If this number is > 2000, 
+                                                                 // the cooldown will be P1_GREEN_BEAM_COOLDOWN - 2000
+static const uint32 clawTentacleSpanCooldownFunc()      { return urand(6000, 12000); }
 // =======================================================
 
 // ================== PHASE 2 CONSTANTS ==================
-static const uint32 P2_EYE_TENTACLE_RESPAWN_TIMER   = 30000;
-static const uint32 GIANT_CLAW_RESPAWN_TIMER        = 60000;
-static const uint32 STOMACH_GRAB_COOLDOWN           = 10000;
-static const uint32 GIANT_EYE_RESPAWN_TIMER         = 60000;
-static const uint32 STOMACH_GRAB_DURATION           = 3500;
-static const uint32 WEAKNESS_DURATION               = 45000;
-static const uint32 P2_FIRST_GIANT_CLAW_SPAWN       = 8000;
-static const uint32 P2_FIRST_EYE_TENTACLE_SPAWN     = 38000;
-static const uint32 P2_FIRST_GIANT_EYE_SPAWN        = 38000;
-static const uint32 P2_FIRST_STOMACH_GRAB           = 18000 - STOMACH_GRAB_DURATION;
+static constexpr uint32 P2_EYE_TENTACLE_RESPAWN_TIMER   = 30000;
+static constexpr uint32 GIANT_CLAW_RESPAWN_TIMER        = 60000;
+static constexpr uint32 STOMACH_GRAB_COOLDOWN           = 10000;
+static constexpr uint32 GIANT_EYE_RESPAWN_TIMER         = 60000;
+static constexpr uint32 STOMACH_GRAB_DURATION           = 3500;
+static constexpr uint32 WEAKNESS_DURATION               = 45000;
+static constexpr uint32 P2_FIRST_GIANT_CLAW_SPAWN       = 8000;
+static constexpr uint32 P2_FIRST_EYE_TENTACLE_SPAWN     = 38000;
+static constexpr uint32 P2_FIRST_GIANT_EYE_SPAWN        = 38000;
+static constexpr uint32 P2_FIRST_STOMACH_GRAB           = 18000 - STOMACH_GRAB_DURATION;
 // =======================================================
 
 // ======================= MISC ==========================
-static const uint32 GROUND_RUPTURE_DELAY            = 0;            // ms after spawn that the ground rupture will be cast
-static const uint32 HAMSTRING_INITIAL_COOLDOWN      = 2000;         // Claw tentacle hamstring cooldown after spawn/tp
-uint32 hamstringResetCooldownFunc()                 { return 5000; }// Claw tentacle hamstring cooldown after use
-uint32 trashResetCooldownFunc()                     { return urand(6000, 12000); }
-uint32 groundTremorResetCooldownFunc()              { return urand(6000, 12000); }
-uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY              = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
-uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN            = 5000; // How long does a claw tentacle evade before TPing to new target
+static constexpr uint32 GROUND_RUPTURE_DELAY                   = 0;             // ms after spawn that the ground rupture will be cast
+static constexpr uint32 HAMSTRING_INITIAL_COOLDOWN             = 2000;          // Claw tentacle hamstring cooldown after spawn/tp
+static const uint32 hamstringResetCooldownFunc()               { return 5000; } // Claw tentacle hamstring cooldown after use
+static const uint32 trashResetCooldownFunc()                   { return urand(6000, 12000); }
+static const uint32 groundTremorResetCooldownFunc()            { return urand(6000, 12000); }
+static constexpr uint32 CLAW_TENTACLE_FIRST_MELEE_DELAY        = 1000; // Earliest possible point for a claw tentacle to melee after spawn/tp
+static constexpr uint32 CLAW_TENTACLE_EVADE_PORT_COOLDOWN      = 5000; // How long does a claw tentacle evade before TPing to new target
 
-uint32 TENTACLE_BIRTH_DURATION                      = 3000; // Duration of birth animation and /afk before tentacles start doing stuff
+static constexpr uint32 TENTACLE_BIRTH_DURATION                = 3000; // Duration of birth animation and /afk before tentacles start doing stuff
 
-uint32 GIANT_EYE_BEAM_COOLDOWN                      = 2100; // How often will giant eye tentacles cast green beam
-uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN        = 0;    // How long will giant eye wait after spawn before casting UPDATE: use TENTACLE_BIRTH_DURATION 
-uint32 MIND_FLAY_COOLDOWN_ON_RESIST                 = 1500; // How long do we wait if Eye Tentacle MF resists before retrying cast
-uint32 MIND_FLAY_INITIAL_WAIT_DURATION              = 0; // How long do we wait after Eye tentacle has spawned until first MF UPDATE: use TENTACLE_BIRTH_DURATION 
-
+static constexpr uint32 GIANT_EYE_BEAM_COOLDOWN                = 2100; // How often will giant eye tentacles cast green beam
+static constexpr uint32 GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN  = 0;    // How long will giant eye wait after spawn before casting UPDATE: use TENTACLE_BIRTH_DURATION 
+static constexpr uint32 MIND_FLAY_COOLDOWN_ON_RESIST           = 1500; // How long do we wait if Eye Tentacle MF resists before retrying cast
+static constexpr uint32 MIND_FLAY_INITIAL_WAIT_DURATION        = 0; // How long do we wait after Eye tentacle has spawned until first MF UPDATE: use TENTACLE_BIRTH_DURATION 
+static constexpr uint32 TELEPORT_DURATION                      = 3000;
 // =======================================================
 
 enum CThunPhase
