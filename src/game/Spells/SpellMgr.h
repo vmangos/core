@@ -237,9 +237,9 @@ inline bool IsNonCombatSpell(SpellEntry const *spellInfo)
     return (spellInfo->Attributes & SPELL_ATTR_CANT_USED_IN_COMBAT) != 0;
 }
 
-bool IsPositiveSpell(uint32 spellId);
-bool IsPositiveSpell(SpellEntry const *spellproto);
-bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex);
+bool IsPositiveSpell(uint32 spellId, Unit* caster = NULL, Unit* victim = NULL);
+bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster = NULL, Unit* victim = NULL);
+bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex, Unit* caster = NULL, Unit* victim = NULL);
 bool IsPositiveTarget(uint32 targetA, uint32 targetB);
 
 bool IsExplicitPositiveTarget(uint32 targetA);
@@ -431,11 +431,11 @@ inline bool IsNeedCastSpellAtFormApply(SpellEntry const* spellInfo, ShapeshiftFo
         !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
 }
 
-inline bool IsReflectableSpell(SpellEntry const* spellInfo)
+inline bool IsReflectableSpell(SpellEntry const* spellInfo, Unit* caster = NULL, Unit* victim = NULL)
 {
     return spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !spellInfo->HasAttribute(SPELL_ATTR_IS_ABILITY)
       && !spellInfo->HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !spellInfo->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
-      && !spellInfo->HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(spellInfo);
+      && !spellInfo->HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(spellInfo, caster, victim);
 }
 
 inline bool NeedsComboPoints(SpellEntry const* spellInfo)

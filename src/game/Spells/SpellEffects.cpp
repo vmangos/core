@@ -2830,7 +2830,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
     // Pierre de sort dissipe sorts negatifs et positifs.
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_SPELLSTONE>())
         checkFaction = false;
-    bool friendly = checkFaction ? unitTarget->IsFriendlyTo(m_caster) : false;
+    bool friendly = checkFaction && !isReflected ? unitTarget->IsFriendlyTo(m_caster) : false;
     // Create dispel mask by dispel type
     int32 dispel_type = m_spellInfo->EffectMiscValue[eff_idx];
     uint32 dispelMask  = GetDispellMask(dispel_type < 0 ? DISPEL_ALL : DispelType(dispel_type));

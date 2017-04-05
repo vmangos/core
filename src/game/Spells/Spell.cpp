@@ -260,7 +260,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
         data << m_strTarget;
 }
 
-Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy): m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
+Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim): m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to sSpellStore element");
@@ -326,7 +326,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_needAliveTargetMask = 0;
 
     // determine reflection
-    m_canReflect = IsReflectableSpell(m_spellInfo);
+    m_canReflect = IsReflectableSpell(m_spellInfo, caster, victim);
 
     m_isClientStarted = false;
 
@@ -1019,7 +1019,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         DoSpellHitOnUnit(unit, mask);
     if (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE)
     {
-        DoSpellHitOnUnit(m_caster, mask, true);
+        isReflected = true;
+        DoSpellHitOnUnit(m_caster, mask);
         unitTarget = m_caster;
     }
     else                                                    // in 1.12.1 we need explicit miss info
@@ -1274,7 +1275,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         ((Creature*)m_caster)->AI()->SpellHitTarget(unit, m_spellInfo);
 }
 
-void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask, bool isReflected)
+void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
 {
     if (!unit)
         return;
