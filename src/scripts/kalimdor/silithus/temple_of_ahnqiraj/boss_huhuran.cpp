@@ -34,7 +34,6 @@ enum
 
     SPELL_ACIDSPIT              = 26050,
     SPELL_FRENZY                = 26051,
-    SPELL_POISONBOLT            = 26052,
     SPELL_NOXIOUSPOISON         = 26053,
     SPELL_BERSERK               = 26068,
     SPELL_WYVERNSTING           = 26180
@@ -53,7 +52,6 @@ struct boss_huhuranAI : public ScriptedAI
     uint32 m_uiFrenzyTimer;
     uint32 m_uiWyvernTimer;
     uint32 m_uiSpitTimer;
-    uint32 m_uiPoisonBoltTimer;
     uint32 m_uiNoxiousPoisonTimer;
     uint32 m_uiBerserkTimer;
 
@@ -70,7 +68,6 @@ struct boss_huhuranAI : public ScriptedAI
         m_uiFrenzyTimer        = urand(25000, 35000);
         m_uiWyvernTimer        = urand(18000, 28000);
         m_uiSpitTimer          = 8000;
-        m_uiPoisonBoltTimer    = 4000;
         m_uiNoxiousPoisonTimer = urand(10000, 20000);
         m_uiBerserkTimer       = 5 * MINUTE * IN_MILLISECONDS;
 
@@ -89,7 +86,6 @@ struct boss_huhuranAI : public ScriptedAI
             if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
             {
                 DoScriptText(EMOTE_GENERIC_FRENZY_KILL, m_creature);
-                m_uiPoisonBoltTimer = 3000;
                 m_uiFrenzyTimer = urand(25000, 35000);
             }
         }
@@ -122,18 +118,6 @@ struct boss_huhuranAI : public ScriptedAI
         }
         else
             m_uiNoxiousPoisonTimer -= uiDiff;
-
-        //PoisonBolt only if frenzy or berserk
-        if (m_bBerserk || m_creature->HasAura(SPELL_FRENZY))
-        {
-            if (m_uiPoisonBoltTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISONBOLT) == CAST_OK)
-                    m_uiPoisonBoltTimer = 3000;
-            }
-            else
-                m_uiPoisonBoltTimer -= uiDiff;
-        }
 
         if (m_bBerserk)
             DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT);
