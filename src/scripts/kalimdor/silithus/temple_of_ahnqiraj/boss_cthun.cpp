@@ -1124,7 +1124,7 @@ public:
         cthunTentacle(pCreature),
         groundRuptureTimer(pCreature, groundRuptSpellId, GROUND_RUPTURE_DELAY, 0, true, selectSelfFunc)
     {
-        Unit* pPortal = DoSpawnCreature(portalId, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_DEAD_DESPAWN, 120000);
+        Unit* pPortal = DoSpawnCreature(portalId, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 500); //TEMPSUMMON_DEAD_DESPAWN, 120000
         if (pPortal) {
             portalGuid = pPortal->GetGUID();
             FixPortalPosition();
