@@ -1,4 +1,4 @@
--- INSERT INTO `migrations` VALUES ('20170404201051');
+INSERT INTO `migrations` VALUES ('20170404201051');
 
 UPDATE `quest_template` SET 
 -- Prevent from accepting after reaching neutral rep
