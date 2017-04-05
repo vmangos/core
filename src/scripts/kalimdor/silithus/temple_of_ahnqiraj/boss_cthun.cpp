@@ -1477,7 +1477,9 @@ struct flesh_tentacleAI : public cthunTentacle
         if (!cthunTentacle::UpdateCthunTentacle(diff))
             return;
 
-        CheckForMelee();
+        if (CheckForMelee() == nullptr) {
+            DoResetThreat();
+        }
     }
 
     void JustDied(Unit* killer)
