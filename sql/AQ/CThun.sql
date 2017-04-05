@@ -69,3 +69,11 @@ INSERT INTO scripted_areatrigger (`entry`, `ScriptName`) VALUES ('4036', 'at_tem
 
 -- flags update on trigger unit used to knock players out of cthuns body after being ported. Flags copied from viscidus trigger.
 -- UPDATE `mangos`.`creature_template` SET `unit_flags`='33587968', `ScriptName`='boss cthun knockback trigger' WHERE `entry`='15800';
+
+
+-- to remove c'thuns eye
+DELETE FROM `mangos`.`creature` WHERE `guid`='87560';
+
+-- to re-add c'thuns eye
+-- INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) 
+-- VALUES ('87560', '15589	', '531', '15556', '0', '-8577.27', '1986.94', '100.4', '3.44', '6380', '0', '0', '1269434', '0', '0', '0');
