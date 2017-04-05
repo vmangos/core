@@ -355,25 +355,24 @@ inline bool IsAreaEffectTarget( Targets target )
 
 inline bool IsAreaOfEffectSpell(SpellEntry const *spellInfo)
 {
-    if(IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])) || IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_0])))
-        return true;
-    if(IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_1])) || IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_1])))
-        return true;
-    if(IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_2])) || IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_2])))
-        return true;
-    return false;
+    return
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_0])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_1])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_1])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_2])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_2])) ;
 }
 
 inline bool IsAreaAuraEffect(uint32 effect)
 {
-    if (effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY    ||
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_PET      ||
-    // Post-vanilla mais bien utile desfois.
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID     ||
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY    ||
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND)
-        return true;
-    return false;
+    return
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY  ||
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_PET    ||
+        // Post-vanilla mais bien utile desfois.
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID   ||
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY  ||
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND ;
 }
 
 inline bool HasAreaAuraEffect(SpellEntry const *spellInfo)
