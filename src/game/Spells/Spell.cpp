@@ -1727,12 +1727,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 28542:                                 // Life Drain (Naxx, Sapphiron)
                     unMaxTargets = 2;
                     break;
-                case 26180:                                 // Wyvern Sting (AQ40, Princess Huhuran)
                 case 28796:                                 // Poison Bolt Volley (Naxx, Faerlina)
                     unMaxTargets = 10;
-                    break;
-                case 25991:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
-                    unMaxTargets = 15;
                     break;
             }
             break;
@@ -1772,8 +1768,17 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             switch (m_spellInfo->Id)
             {
+                case 26052:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
+                    SelectClosestTargets = true;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_HUNTER:
+        {
+            switch (m_spellInfo->Id)
+            {
                 case 26180:                                 // Wyvern Sting (AQ40, Princess Huhuran)
-                case 25991:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
                     SelectClosestTargets = true;
                     break;
             }
@@ -2019,7 +2024,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         targetUnitMap.erase(itr);
                 }
 	    }
-            if (SelectClosestTargets && targetUnitMap.size() > unMaxTargets)
+            if (SelectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
 	    {
                 targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
                 UnitList::iterator itr = targetUnitMap.begin();
