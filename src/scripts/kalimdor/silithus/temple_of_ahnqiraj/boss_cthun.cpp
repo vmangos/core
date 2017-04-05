@@ -647,10 +647,29 @@ struct cthunAI : public ScriptedAI
                 fleshTentaclePositions[i][2],
                 fleshTentaclePositions[i][3],
                 TEMPSUMMON_CORPSE_DESPAWN, 0);
-
-            if (pSpawned) {
-                fleshTentacles.push_back(pSpawned->GetObjectGuid());
+        }
+        
+    }
+    
+    void SummonedCreatureJustDied(Creature* pCreature) override
+    {
+        if (pCreature->GetEntry() == MOB_FLESH_TENTACLE) {
+            for (size_t i = 0; i < fleshTentacles.size(); i++) {
+                if (fleshTentacles.at(i) == ObjectGuid(pCreature->GetGUID())) {
+                    fleshTentacles.erase(fleshTentacles.begin() + i);
+                    return;
+                }
             }
+        }
+    }
+
+    void JustSummoned(Creature* pCreature) override
+    {
+        if (pCreature->GetEntry() == MOB_FLESH_TENTACLE) {
+            if (fleshTentacles.size() > 1 ) {
+                sLog.outBasic("Flesh tentacle summoned, but there are already %i tentacles up.", fleshTentacles.size());
+            }
+            fleshTentacles.push_back(pCreature->GetGUID());
         }
     }
 
@@ -736,6 +755,7 @@ struct cthunAI : public ScriptedAI
         sLog.outBasic("C'thun died. Enetered DONE phase");
     }
 
+    /*
     void FleshTentcleKilled(ObjectGuid guid)
     {
         for (size_t i = 0; i < fleshTentacles.size(); i++) {
@@ -745,6 +765,7 @@ struct cthunAI : public ScriptedAI
             }
         }
     }
+    */
 
 };
 
@@ -1557,17 +1578,20 @@ struct flesh_tentacleAI : public cthunTentacle
 
         if (CheckForMelee() == nullptr) {
             DoResetThreat();
+            DoStopAttack();
         }
     }
 
     void JustDied(Unit* killer)
     {
+        /*
         if (m_pInstance)
         {
             Creature* b_Cthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN);
             if (b_Cthun)
                 ((cthunAI*)(b_Cthun->AI()))->FleshTentcleKilled(m_creature->GetObjectGuid());
         }
+        */
     }
 };
 
