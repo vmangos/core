@@ -319,7 +319,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     case TYPE_SKERAM:
         m_auiEncounter[uiType] = uiData;
         if (uiData == DONE)
-            DoUseDoorOrButton(GO_SKERAM_GATE);
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_SKERAM_GATE))
+                DoUseDoorOrButton(pGo->GetGUID());
         break;
     case TYPE_BUG_TRIO:
         if (uiData == SPECIAL)
@@ -337,7 +338,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     case TYPE_HUHURAN:
         m_auiEncounter[uiType] = uiData;
         if (uiData == DONE) {
-				        DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
+                DoUseDoorOrButton(pGo->GetGUID());
             if (Creature* pCreature = GetSingleCreatureFromStorage(NPC_MASTERS_EYE)) {
                 //pCreature->NearLandTo(pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, 4.896f);
             }
@@ -386,9 +388,11 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             return;
 
         m_auiEncounter[uiType] = uiData;
-        DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+        if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
+            DoUseDoorOrButton(pGo->GetGUID());
         if (uiData == DONE) {
-            DoUseDoorOrButton(GO_TWINS_EXIT_DOOR);
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_EXIT_DOOR))
+                DoUseDoorOrButton(pGo->GetGUID());
             m_twinsDeadDialogue.StartNextDialogueText(SAY_VEKNILASH_DEATH);
         }
         break;
