@@ -143,6 +143,14 @@ struct boss_viscidusAI : public ScriptedAI
             m_pInstance->SetData(TYPE_VISCIDUS, DONE);
     }
 
+    void DamageTaken(Unit* /*pDealer*/, uint32 &damage)
+    {
+        const uint32 uiViscidusHealth = m_creature->GetHealth();
+
+        if (damage >= uiViscidusHealth)
+            damage = uiViscidusHealth - 1;
+    }
+
     void JustSummoned(Creature* pSummoned)
     {
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
