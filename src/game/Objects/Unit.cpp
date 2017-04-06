@@ -4581,9 +4581,39 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && !IsAreaOfEffectSpell(AurSpellInfo) && caster)
-        if (caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL) && caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL)->m_spellInfo->Id == auraSpellId)
-            caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    uint32 uiTriggeredSpell = 0;
+
+    switch (mode)
+    {
+        case AURA_REMOVE_BY_EXPIRE:
+            break;
+        case AURA_REMOVE_BY_DISPEL:
+            // Spell that trigger another spell on dispell
+            switch (auraSpellId)
+            {
+                // Wyvern Sting (AQ40, Princess Huhuran)
+                case 26180:
+                    uiTriggeredSpell = 26233;
+                    break;
+                default:
+                    break;
+            }
+            // No break
+        default:
+        {
+            if (IsChanneledSpell(AurSpellInfo) && !IsAreaOfEffectSpell(AurSpellInfo) && caster)
+            {
+                if (caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL) && caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL)->m_spellInfo->Id == auraSpellId)
+                    caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+            }
+            break;
+        }
+    }
+
+    if (uiTriggeredSpell)
+    {
+        CastSpell(this, uiTriggeredSpell, true);
+    }
 }
 
 void Unit::RemoveSingleAuraFromSpellAuraHolder(SpellAuraHolder *holder, SpellEffectIndex index, AuraRemoveMode mode)

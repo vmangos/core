@@ -245,6 +245,10 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
         if (m_auiEncounter[TYPE_TWINS] == DONE)
             pCreature->AddObjectToRemoveList();
         break;
+    case NPC_OURO_SCARAB:
+        if (m_auiEncounter[TYPE_OURO] != IN_PROGRESS)
+            pCreature->AddObjectToRemoveList();
+        break;
     case NPC_QIRAJI_MINDSLAYER:
     case NPC_QIRAJI_SLAYER:
     case NPC_QIRAJI_CHAMPION:
@@ -315,7 +319,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     case TYPE_SKERAM:
         m_auiEncounter[uiType] = uiData;
         if (uiData == DONE)
-            DoUseDoorOrButton(GO_SKERAM_GATE);
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_SKERAM_GATE))
+                DoUseDoorOrButton(pGo->GetGUID());
         break;
     case TYPE_BUG_TRIO:
         if (uiData == SPECIAL)
@@ -333,7 +338,8 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     case TYPE_HUHURAN:
         m_auiEncounter[uiType] = uiData;
         if (uiData == DONE) {
-				        DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
+                DoUseDoorOrButton(pGo->GetGUID());
             if (Creature* pCreature = GetSingleCreatureFromStorage(NPC_MASTERS_EYE)) {
                 //pCreature->NearLandTo(pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, 4.896f);
             }
@@ -351,11 +357,6 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             // Respawn the Ouro spawner on fail
             if (Creature* pSpawner = GetSingleCreatureFromStorage(NPC_OURO_SPAWNER))
                 pSpawner->Respawn();
-            // no break;
-        case DONE:
-            // Despawn the sandworm base on Done or Fail
-            if (GameObject* pBase = GetSingleGameObjectFromStorage(GO_SANDWORM_BASE))
-                pBase->SetLootState(GO_JUST_DEACTIVATED);
             break;
         }
         m_auiEncounter[uiType] = uiData;
@@ -387,9 +388,11 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             return;
 
         m_auiEncounter[uiType] = uiData;
-        DoUseDoorOrButton(GO_TWINS_ENTER_DOOR);
+        if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
+            DoUseDoorOrButton(pGo->GetGUID());
         if (uiData == DONE) {
-            DoUseDoorOrButton(GO_TWINS_EXIT_DOOR);
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_EXIT_DOOR))
+                DoUseDoorOrButton(pGo->GetGUID());
             m_twinsDeadDialogue.StartNextDialogueText(SAY_VEKNILASH_DEATH);
         }
         break;

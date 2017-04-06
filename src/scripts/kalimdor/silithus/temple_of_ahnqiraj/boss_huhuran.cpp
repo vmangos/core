@@ -129,9 +129,6 @@ struct boss_huhuranAI : public ScriptedAI
         else
             m_uiBerserkTimer -= uiDiff;
 
-        if (m_creature->isAttackReady() && m_creature->getVictim()->HasAura(SPELL_WYVERNSTING))
-            m_creature->getVictim()->RemoveAurasDueToSpell(SPELL_WYVERNSTING);
-
         DoMeleeAttackIfReady();
     }
 };

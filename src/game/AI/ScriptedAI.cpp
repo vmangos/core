@@ -381,9 +381,7 @@ void ScriptedAI::SetCombatMovement(bool bCombatMove)
 enum
 {
     NPC_BROODLORD   = 12017,
-    NPC_VOID_REAVER = 19516,
-    NPC_JAN_ALAI    = 23578,
-    NPC_SARTHARION  = 28860
+    NPC_VISCIDUS    = 15299
 };
 
 bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
@@ -409,16 +407,8 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
             if (fZ > 448.60f)
                 return false;
             break;
-        case NPC_VOID_REAVER:                               // void reaver (calculate from center of room)
-            if (m_creature->GetDistance2d(432.59f, 371.93f) < 105.0f)
-                return false;
-            break;
-        case NPC_JAN_ALAI:                                  // jan'alai (calculate by Z)
-            if (fZ > 12.0f)
-                return false;
-            break;
-        case NPC_SARTHARION:                                // sartharion (calculate box)
-            if (fX > 3218.86f && fX < 3275.69f && fY < 572.40f && fY > 484.68f)
+        case NPC_VISCIDUS:
+            if (fZ < -30.0f)
                 return false;
             break;
         default:
