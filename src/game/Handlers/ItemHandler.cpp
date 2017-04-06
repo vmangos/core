@@ -1013,8 +1013,9 @@ void WorldSession::HandleAutoStoreBankItemOpcode(WorldPacket& recvPacket)
         }
 
         _player->RemoveItem(srcbag, srcslot, true);
-        if (Item const* storedItem = _player->StoreItem(dest, pItem, true))
-            _player->ItemAddedQuestCheck(storedItem->GetEntry(), storedItem->GetCount());
+        Item const* storedItem = _player->StoreItem(dest, pItem, true);
+        if (storedItem)
+            _player->ItemAddedQuestCheck(storedItem->GetEntry(), 0);
     }
     else                                                    // moving from inventory to bank
     {
