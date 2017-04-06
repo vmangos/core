@@ -374,6 +374,8 @@ struct boss_viscidusAI : public ScriptedAI
             m_uiToxinTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
+
+        EnterEvadeIfOutOfCombatArea(uiDiff);
     }
 };
 
