@@ -133,7 +133,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         DespawnCreatures(true);
         m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
 
-        Submerge();
+        Submerge(true);
         m_creature->ForcedDespawn();
     }
 
@@ -168,7 +168,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             pSummoned->CastSpell(m_creature, SPELL_SUMMON_SCARABS, true);
     }
 
-    void Submerge()
+    void Submerge(bool isReset = false)
     {
         // Source : http://wowwiki.wikia.com/wiki/Ouro
         // "Ouro has a chance to submerge every 1.5minutes.
@@ -177,8 +177,11 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_uiSubmergeTimer = 90000;
         if (CanCastSpell(m_creature, sSpellMgr.GetSpellEntry(SPELL_SUBMERGE_VISUAL), false) == CAST_OK)
         {
-            DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
-            DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
+            if (!isReset)
+            {
+                DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
+            }
             m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
             DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL);
 

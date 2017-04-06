@@ -38,7 +38,7 @@ DELETE FROM spell_script_target WHERE entry = 26594;
 INSERT INTO spell_script_target (entry, type, targetEntry) VALUES (26594, 0, 180795);
 
 -- Ouro base shouldn't be targettable by players and should despawn after sending animation on use
-UPDATE gameobject_template SET data3 = 65536 * 1, data4 = 1, data5 = 1 WHERE entry = 180795;
+UPDATE gameobject_template SET data3 = 65536 * 900, data4 = 1, data5 = 1 WHERE entry = 180795;
 
 -- Add scriptname to Ouro base
 UPDATE gameobject_template SET scriptname = "go_sandworm_base" WHERE entry = 180795;
