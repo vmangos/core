@@ -27,6 +27,7 @@
 
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
+#include <algorithm>
 
 enum eCreatures {
     EMOTE_WEAKENED                  = -1531011,
@@ -1218,8 +1219,11 @@ struct cthunAI : public ScriptedAI
 
     std::vector<ObjectGuid> fleshTentacles;
 
+    uint32 wipeRespawnEyeTimer;
+
     cthunAI(Creature* pCreature) : 
-        ScriptedAI(pCreature)
+        ScriptedAI(pCreature),
+        wipeRespawnEyeTimer(0)
     {
         SetCombatMovement(false);
         
@@ -1231,8 +1235,6 @@ struct cthunAI : public ScriptedAI
             pPortal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
         }
 
-        CheckRespawnEye();
-
         Reset();
     }
 
@@ -1240,7 +1242,6 @@ struct cthunAI : public ScriptedAI
     {
         if(m_pInstance)
             m_pInstance->SetData(TYPE_CTHUN, FAIL);
-
     }
 
     void Reset() override
@@ -1270,7 +1271,10 @@ struct cthunAI : public ScriptedAI
         m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
         m_creature->DeMorph();
         
-
+        // Hack to allow eye-respawning with .respawn chat-command
+        if (!wipeRespawnEyeTimer) {
+            CheckRespawnEye();
+        }
 
         // Force despawn any tentacles or portals alive. 
         std::list<Creature*> creaturesToDespawn;
@@ -1345,6 +1349,15 @@ struct cthunAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
+        // Delaying respawn of eye if it was a wipe so we get the re-emerge animation before spawn
+        if (wipeRespawnEyeTimer > 0) {
+            wipeRespawnEyeTimer -= std::min(diff, wipeRespawnEyeTimer);
+            if (wipeRespawnEyeTimer < diff) {
+                CheckRespawnEye();
+                wipeRespawnEyeTimer = 0;
+            }
+        }
+
         if (!inProgress) {
             if (AggroRadius()) {
                 inProgress = true;
@@ -1355,6 +1368,7 @@ struct cthunAI : public ScriptedAI
         }
         else if (!m_pInstance->GetPlayerInMap(true, false)) {
             inProgress = false;
+            wipeRespawnEyeTimer = 5000;
             EnterEvadeMode();
         }
 
