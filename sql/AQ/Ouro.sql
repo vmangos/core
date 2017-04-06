@@ -26,5 +26,19 @@ UPDATE creature_template SET unit_flags = unit_flags | 33587200 WHERE entry = 15
 -- Ouro trigger is not targettable
 UPDATE creature_template SET unit_flags = unit_flags | 33554432 WHERE entry = 15717;
 
+-- Add scriptname to Ouro scarab
+UPDATE creature_template SET ScriptName = "npc_ouro_scarab" WHERE entry = 15718;
+
 -- Ouro sandblast should be a debuff
+DELETE FROM spell_mod where Id = 26102;
 INSERT INTO spell_mod (Id, Custom, Comment) VALUES (26102, 2, "Ouro's sandblast should be negative");
+
+-- Add scripted target for Despawn Base spell
+DELETE FROM spell_script_target WHERE entry = 26594;
+INSERT INTO spell_script_target (entry, type, targetEntry) VALUES (26594, 0, 180795);
+
+-- Ouro base shouldn't be targettable by players and should despawn after sending animation on use
+UPDATE gameobject_template SET data3 = 65536 * 1, data4 = 1, data5 = 1 WHERE entry = 180795;
+
+-- Add scriptname to Ouro base
+UPDATE gameobject_template SET scriptname = "go_sandworm_base" WHERE entry = 180795;

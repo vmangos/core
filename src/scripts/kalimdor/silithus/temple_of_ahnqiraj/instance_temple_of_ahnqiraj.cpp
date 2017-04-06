@@ -245,6 +245,10 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
         if (m_auiEncounter[TYPE_TWINS] == DONE)
             pCreature->AddObjectToRemoveList();
         break;
+    case NPC_OURO_SCARAB:
+        if (m_auiEncounter[TYPE_OURO] != IN_PROGRESS)
+            pCreature->AddObjectToRemoveList();
+        break;
     case NPC_QIRAJI_MINDSLAYER:
     case NPC_QIRAJI_SLAYER:
     case NPC_QIRAJI_CHAMPION:
@@ -351,11 +355,6 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             // Respawn the Ouro spawner on fail
             if (Creature* pSpawner = GetSingleCreatureFromStorage(NPC_OURO_SPAWNER))
                 pSpawner->Respawn();
-            // no break;
-        case DONE:
-            // Despawn the sandworm base on Done or Fail
-            if (GameObject* pBase = GetSingleGameObjectFromStorage(GO_SANDWORM_BASE))
-                pBase->SetLootState(GO_JUST_DEACTIVATED);
             break;
         }
         m_auiEncounter[uiType] = uiData;
