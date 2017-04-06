@@ -324,10 +324,11 @@ enum CThunPhase
 {
     PHASE_EYE_NORMAL = 0,
     PHASE_EYE_DARK_GLARE = 1,
-    PHASE_TRANSITION = 2,
-    PHASE_CTHUN_INVULNERABLE = 3,
-    PHASE_CTHUN_WEAKENED = 4,
-    PHASE_CTHUN_DONE = 5,
+    PHASE_PRE_TRANSITION = 2,
+    PHASE_TRANSITION = 3,
+    PHASE_CTHUN_INVULNERABLE = 4,
+    PHASE_CTHUN_WEAKENED = 5,
+    PHASE_CTHUN_DONE = 6,
 };
 
 
@@ -1260,16 +1261,18 @@ struct cthunAI : public ScriptedAI
 
         // Reset visibility
         m_creature->SetVisibility(VISIBILITY_OFF);
+        m_creature->InterruptNonMeleeSpells(false);
         if (m_creature->HasAura(SPELL_CTHUN_VULNERABLE)) {
             m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
         }
-        m_creature->SetVisibility(VISIBILITY_ON);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-                
         // Demorph should set C'thuns modelId back to burrowed. 
         // Also removing SPELL_TRANSFORM in case of reset just as he was casting that.
         m_creature->RemoveAurasDueToSpell(SPELL_TRANSFORM);
         m_creature->DeMorph();
+
+        m_creature->SetVisibility(VISIBILITY_ON);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+                
         
         // Hack to allow eye-respawning with .respawn chat-command
         if (!wipeRespawnEyeTimer) {
@@ -1332,6 +1335,9 @@ struct cthunAI : public ScriptedAI
                 fleshTentacles.erase(it);
 
         }
+        else if (pCreature->GetEntry() == NPC_EYE_OF_C_THUN) {
+            currentPhase = PHASE_PRE_TRANSITION;
+        }
     }
 
     void JustSummoned(Creature* pCreature) override
@@ -1359,16 +1365,18 @@ struct cthunAI : public ScriptedAI
         }
 
         if (!inProgress) {
-            if (AggroRadius()) {
+            // Wait with calling aggroRadius until eye has respawned
+            if (!wipeRespawnEyeTimer && AggroRadius()) {
                 inProgress = true;
             }
             else {
                 return;
             }
         }
-        else if (!m_pInstance->GetPlayerInMap(true, false)) {
+        // Not resetting during transition phase, just wait until it's over, then we reset.
+        else if (!m_pInstance->GetPlayerInMap(true, false) && currentPhase != PHASE_TRANSITION && currentPhase != PHASE_PRE_TRANSITION) {
             inProgress = false;
-            wipeRespawnEyeTimer = 5000;
+            wipeRespawnEyeTimer = 5000; 
             EnterEvadeMode();
         }
 
@@ -1380,6 +1388,9 @@ struct cthunAI : public ScriptedAI
             break;
         case PHASE_EYE_DARK_GLARE:
             UpdateTentaclesP1(diff);
+            break;
+        case PHASE_PRE_TRANSITION:
+            // We just wait for eye to death animation before it's despawwn will trigger PHASE_TRANSITION
             break;
         case PHASE_TRANSITION:
             UpdateTransitionPhase(diff);
