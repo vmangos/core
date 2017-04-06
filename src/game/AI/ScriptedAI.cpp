@@ -409,7 +409,7 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
             break;
         case NPC_VISCIDUS:
             if (fZ < -30.0f)
-                return false
+                return false;
             break;
         default:
             sLog.outError("EnterEvadeIfOutOfCombatArea used for creature entry %u, but does not have any definition.", m_creature->GetEntry());
