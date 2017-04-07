@@ -176,6 +176,7 @@ class Channel
 
         void Join(ObjectGuid p, const char* name, const char *pass);
         void Leave(ObjectGuid p, const char *chanName, bool send = true);
+        void Leave(ObjectGuid p, bool send = true) { Leave(p, m_name.c_str(), send); }
         void KickOrBan(ObjectGuid good, const char *badname, bool ban, const char *chanName);
         void Kick(ObjectGuid good, const char *badname, const char* chanName) { KickOrBan(good, badname, false, chanName); }
         void Ban(ObjectGuid good, const char *badname, const char* chanName) { KickOrBan(good, badname, true, chanName); }
