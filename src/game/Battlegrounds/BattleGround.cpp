@@ -1648,7 +1648,7 @@ void BattleGround::HandleKillPlayer(Player *player, Player *killer)
     // - Apres la fin du buff - a ce moment la killer=NULL
 
     // add +1 kills to group and +1 killing_blows to killer
-    if (killer)
+    if (killer && player->getFaction() != killer->getFaction())
     {
         UpdatePlayerScore(killer, SCORE_HONORABLE_KILLS, 1);
         UpdatePlayerScore(killer, SCORE_KILLING_BLOWS, 1);

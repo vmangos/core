@@ -1194,8 +1194,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     {
         Player *killed = ((Player*)pVictim);
         if (BattleGround *bg = killed->GetBattleGround())
-            if (player_tap)
-                bg->HandleKillPlayer(killed, player_tap);
+            bg->HandleKillPlayer(killed, player_tap);
     }
     else if (pVictim->GetTypeId() == TYPEID_UNIT)
     {
