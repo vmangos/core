@@ -7082,7 +7082,7 @@ void Player::RemovedInsignia(Player* looterPlr)
     if (!corpse)
         return;
 
-    WorldPacket data(SMSG_PLAYER_SKINNED);
+    WorldPacket data(SMSG_PLAYER_SKINNED,0);
     GetSession()->SendPacket(&data);
     // We have to convert player corpse to bones, not to be able to resurrect there
     // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
