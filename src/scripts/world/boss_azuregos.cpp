@@ -277,6 +277,10 @@ bool GossipSelect_boss_azuregos(Player* pPlayer, Creature* pCreature, uint32 uiS
             if (boss_azuregosAI* pAzuregosAI = dynamic_cast<boss_azuregosAI*>(pCreature->AI()))
                 pAzuregosAI->SayGoodDay();
 
+            // Make him stomp off
+            if (pCreature->IsStopped())
+                pCreature->GetMotionMaster()->Clear();
+
             pPlayer->CLOSE_GOSSIP_MENU();
 
             return true;
