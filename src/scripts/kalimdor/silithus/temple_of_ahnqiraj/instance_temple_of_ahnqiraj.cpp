@@ -591,10 +591,16 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
     }
 }
 
-void instance_temple_of_ahnqiraj::KillPlayersInStomach()
+bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
 {
     for (auto iter = playersInStomach.begin(); iter != playersInStomach.end();) {
         if (Player* p = GetMap()->GetPlayer(iter->first)) {
+            // Not killing people with god on, makes debugging easier
+            if (p->IsGod()) {
+                ++iter;
+                continue;
+            }
+
             if (p->isAlive()) {
                 p->KillPlayer();
                 //p->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
@@ -605,6 +611,8 @@ void instance_temple_of_ahnqiraj::KillPlayersInStomach()
         }
         iter = playersInStomach.erase(iter);
     }
+
+    return playersInStomach.size() == 0;
 }
 
 void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)

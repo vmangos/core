@@ -1476,9 +1476,10 @@ struct cthunAI : public ScriptedAI
 
     bool CheckIfAllDead() {
         if (!SelectRandomAliveNotStomach(m_pInstance)) {
-            m_pInstance->KillPlayersInStomach();
-            m_creature->OnLeaveCombat();
-            return true;
+            if (m_pInstance->KillPlayersInStomach()) {
+                m_creature->OnLeaveCombat();
+                return true;
+            }
         }
         return false;
     }

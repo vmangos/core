@@ -166,7 +166,7 @@ public:
     void HandleStomachTriggers(Player* pPlayer, const AreaTriggerEntry* pAt);
     void AddPlayerToStomach(Unit* p);
     bool PlayerInStomach(Unit* p);
-    void KillPlayersInStomach();
+    bool KillPlayersInStomach();
 
 private:
     enum eStomachSpells {
