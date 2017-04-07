@@ -273,8 +273,9 @@ static Unit* selectTargetFunc(Creature* c) {
 // ================== PHASE 1 CONSTANTS ==================
 static constexpr uint32 P1_EYE_TENTACLE_RESPAWN_TIMER   = 45000;
 static constexpr uint32 SPELL_ROTATE_TRIGGER_CASTTIME   = 3000;
-static constexpr uint32 EYE_BEAM_PHASE_DURATION         = 50000; 
-static constexpr uint32 DARK_GLARE_PHASE_DURATION       = 40000; 
+static constexpr uint32 GREEN_BEAM_PHASE_DURATION       = 45000;
+static constexpr uint32 DARK_GLARE_PHASE_DURATION       = 38000; 
+static constexpr uint32 DARK_GLARE_COOLING_DOWN         = 1000;
 static constexpr int32  MAX_INITIAL_PULLER_HITS         = 3;     // How many times will c'thun target the initial 
                                                                  // puller with green beam before random target.
 static constexpr int32  P1_GREEN_BEAM_COOLDOWN          = 3000;  // Green beam has a 2 sec cast time. If this number is > 2000, 
@@ -994,18 +995,41 @@ struct flesh_tentacleAI : public cthunTentacle
 
 struct eye_of_cthunAI : public ScriptedAI
 {
+    // The eye phases can be a bit difficult to decode due to cast time and "cooling down" duration 
+    // of red beam.
+    // There should be 45 seconds of "green beam phase"
+    // cast time of dark glare is 3 seconds
+    // once dark glare is up, boss rotates and keeps dark glare up for 38 seconds
+    // after 38 seconds he stops rotating and removes dark glare from himself, this is a 1 second period where nothing happens
+    // he then starts a new 45 seconds of green beam
+    // Dark glare should start casting every 86 seconds
+    // 45 sec green beam
+    // 3 sec cast dark glare
+    // 38 sec dark glare
+    // 1 sec "cooling down"
+    // = 86 seconds
     instance_temple_of_ahnqiraj* m_pInstance;
 
     bool IsAlreadyPulled;
 
     uint32 eyeBeamCooldown;
     uint32 eyeBeamCastCount;
-    uint32 eyeBeamPhaseDuration;
-    uint32 darkGlarePhaseDuration;
+    //uint32 eyeBeamPhaseDuration;
+    //uint32 darkGlarePhaseDuration;
     
     ObjectGuid initialPullerGuid;
-    
-    CThunPhase currentPhase;
+    enum CthunEyePhase {
+        GREEN_BEAM,
+        DARK_GLARE_CAST,
+        DARK_GLARE,
+        DARK_GLARE_COOLING
+    };
+    CthunEyePhase currentPhase;
+
+    uint32 greenBeamPhaseTimer;
+    uint32 darkGlareCastTimer;
+    uint32 darkGlareTimer;
+    uint32 darkGlareCoolingTimer;
 
     eye_of_cthunAI(Creature* pCreature) :
         ScriptedAI(pCreature)
@@ -1018,7 +1042,6 @@ struct eye_of_cthunAI : public ScriptedAI
 
         Reset();
     }
-
 
     void Pull(Player* puller) {
 
@@ -1037,16 +1060,14 @@ struct eye_of_cthunAI : public ScriptedAI
 
     void Reset()
     {
-        currentPhase = PHASE_EYE_NORMAL;
+
+        currentPhase = GREEN_BEAM;
         initialPullerGuid = 0;
         eyeBeamCastCount = 0;
         eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
-        eyeBeamPhaseDuration = EYE_BEAM_PHASE_DURATION;
+        greenBeamPhaseTimer = GREEN_BEAM_PHASE_DURATION;
 
         IsAlreadyPulled = false;
-
-        darkGlarePhaseDuration = DARK_GLARE_PHASE_DURATION;
-        eyeBeamPhaseDuration = EYE_BEAM_PHASE_DURATION;
 
         if (m_creature) {
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
@@ -1071,94 +1092,98 @@ struct eye_of_cthunAI : public ScriptedAI
 
         // No combat reset managment. C'thuns body will reset this creature when needed.
         
+        // Yes, could easily make all these different timers into just two, but
+        // this approach is much easier to understand, debug and tune.
         switch (currentPhase) {
-        case PHASE_EYE_NORMAL:
-            UpdateEyePhase(diff);
+        case GREEN_BEAM:
+            if (greenBeamPhaseTimer < diff) {
+                if (EnterDarkGlarePhase()) {
+                    darkGlareCastTimer = SPELL_ROTATE_TRIGGER_CASTTIME;
+                    currentPhase = DARK_GLARE_CAST;
+                }
+            }
+            else {
+                greenBeamPhaseTimer -= diff;
+                UpdateGreenBeamPhase(diff);
+            }
             break;
-        case PHASE_EYE_DARK_GLARE:
-            UpdateDarkGlarePhase(diff);
+        case DARK_GLARE_CAST:
+            if (darkGlareCastTimer < diff) {
+                currentPhase = DARK_GLARE;
+                darkGlareTimer = DARK_GLARE_PHASE_DURATION;
+            }
+            else {
+                darkGlareCastTimer -= diff;
+            }
+            break;
+        case DARK_GLARE:
+            if (darkGlareTimer < diff) {
+                RemoveGlarePhaseSpells();
+                currentPhase = DARK_GLARE_COOLING;
+                darkGlareCoolingTimer = DARK_GLARE_COOLING_DOWN;
+            }
+            else {
+                darkGlareTimer -= diff;
+            }
+            break;
+        case DARK_GLARE_COOLING:
+            if (darkGlareCoolingTimer < diff) {
+                currentPhase = GREEN_BEAM;
+                greenBeamPhaseTimer = GREEN_BEAM_PHASE_DURATION;
+                eyeBeamCooldown = 0;
+            }
+            else {
+                darkGlareCoolingTimer -= diff;
+            }
             break;
         default:
             sLog.outError("CThun eye update called with incorrect state: %d", currentPhase);
         }
     }
+    
+    void UpdateGreenBeamPhase(uint32 diff)
+    {
+        if (m_creature->HasAura(SPELL_FREEZE_ANIMATION))
+            m_creature->RemoveAurasDueToSpell(SPELL_FREEZE_ANIMATION);
 
-    void UpdateEyePhase(uint32 diff) {
+        if (eyeBeamCooldown < diff) {
+            Unit* target = nullptr;
 
-        if (eyeBeamPhaseDuration < diff) {
-            m_creature->InterruptNonMeleeSpells(false);
-            //Select random target for dark beam to start on and start the trigger
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                // Remove the target focus but allow the boss to face the current victim
-                m_creature->SetFacingToObject(target);
-                if (DoCastSpellIfCan(m_creature, SPELL_ROTATE_TRIGGER) == CAST_OK)
-                {
-                    if (!m_creature->HasAura(SPELL_FREEZE_ANIMATION))
-                        m_creature->CastSpell(m_creature, SPELL_FREEZE_ANIMATION, true);
-                }
-                m_creature->SetTargetGuid(ObjectGuid());
-                
-                // Switch to dark glare phase
-                currentPhase = PHASE_EYE_DARK_GLARE;
-                darkGlarePhaseDuration = DARK_GLARE_PHASE_DURATION;
-            }
-        }
-        else {
-            eyeBeamPhaseDuration -= diff;
-
-            if (m_creature->HasAura(SPELL_FREEZE_ANIMATION))
-                m_creature->RemoveAurasDueToSpell(SPELL_FREEZE_ANIMATION);
-
-            if (eyeBeamCooldown < diff) {
-                Unit* target = nullptr;
-
-                // We force the initial puller as the target for MAX_INITIAL_PULLER_HITS
-                if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
-                    target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
-                }
-                else {
-                    target = SelectRandomAliveNotStomach(m_pInstance);
-                }
-                if (target) {
-                    CastGreenBeam(target);
-                }
+            // We force the initial puller as the target for MAX_INITIAL_PULLER_HITS
+            if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
+                target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
             }
             else {
-                eyeBeamCooldown -= diff;
+                target = SelectRandomAliveNotStomach(m_pInstance);
             }
-        }
-    }
-
-    void CastGreenBeam(Unit* target)
-    {
-        if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
-            // There should not be any LOS check
-            m_creature->InterruptNonMeleeSpells(false);
-            m_creature->SetTargetGuid(target->GetObjectGuid());
-            m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
-            eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
-            ++eyeBeamCastCount;
-        }
-    }
-    
-    void UpdateDarkGlarePhase(uint32 diff) {
-        if (darkGlarePhaseDuration < diff) {
-            currentPhase = PHASE_EYE_NORMAL;
-            eyeBeamPhaseDuration = EYE_BEAM_PHASE_DURATION;
-            eyeBeamCooldown = 0; // Should not be any cd here as we cancel dark glare 2 sec before phase end
+            if (target) {
+                CastGreenBeam(target);
+            }
         }
         else {
-            // We remove auras a bit before the phase "ends" to let the red beam "cool down" 
-            // and dissapear before first eyeBeam is cast. This will spam for a while but that should not matter
-            if (darkGlarePhaseDuration < 2000) {
-                RemoveGlarePhaseSpells();
-            }
-
-            darkGlarePhaseDuration -= diff;
+            eyeBeamCooldown -= diff;
         }
     }
 
+    bool EnterDarkGlarePhase()
+    {
+        m_creature->InterruptNonMeleeSpells(false);
+        //Select random target for dark beam to start on and start the trigger
+        if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0)) {
+            // Remove the target focus but allow the boss to face the current victim
+            m_creature->SetFacingToObject(target);
+            if (DoCastSpellIfCan(m_creature, SPELL_ROTATE_TRIGGER) == CAST_OK) {
+                if (!m_creature->HasAura(SPELL_FREEZE_ANIMATION)) {
+                    m_creature->CastSpell(m_creature, SPELL_FREEZE_ANIMATION, true);
+                }
+            
+                m_creature->SetTargetGuid(ObjectGuid());
+                return true;
+            }
+        }
+        return false;
+    }
+    
     void RemoveGlarePhaseSpells() {
         if (m_creature->HasAura(SPELL_ROTATE_NEGATIVE_360)) {
             m_creature->RemoveAurasDueToSpell(SPELL_ROTATE_NEGATIVE_360);
@@ -1168,6 +1193,19 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
+    bool CastGreenBeam(Unit* target)
+    {
+        if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
+            // There should not be any LOS check
+            m_creature->InterruptNonMeleeSpells(false);
+            m_creature->SetTargetGuid(target->GetObjectGuid());
+            m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
+            ++eyeBeamCastCount;
+            eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
+            return false;
+        }
+        return false;
+    }
 };
 
 struct cthunAI : public ScriptedAI
