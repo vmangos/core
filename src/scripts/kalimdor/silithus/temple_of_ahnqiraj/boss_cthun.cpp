@@ -1098,12 +1098,11 @@ struct eye_of_cthunAI : public ScriptedAI
                         m_creature->CastSpell(m_creature, SPELL_FREEZE_ANIMATION, true);
                 }
                 m_creature->SetTargetGuid(ObjectGuid());
+                
+                // Switch to dark glare phase
+                currentPhase = PHASE_EYE_DARK_GLARE;
+                darkGlarePhaseDuration = DARK_GLARE_PHASE_DURATION;
             }
-
-
-            // Switch to dark glare phase
-            currentPhase = PHASE_EYE_DARK_GLARE;
-            darkGlarePhaseDuration = DARK_GLARE_PHASE_DURATION;
         }
         else {
             eyeBeamPhaseDuration -= diff;
