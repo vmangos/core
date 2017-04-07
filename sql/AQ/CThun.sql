@@ -77,3 +77,7 @@ DELETE FROM `mangos`.`creature` WHERE `guid`='87560';
 -- to re-add c'thuns eye
 -- INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) 
 -- VALUES ('87560', '15589	', '531', '15556', '0', '-8577.27', '1986.94', '100.4', '3.44', '6380', '0', '0', '1269434', '0', '0', '0');
+
+
+-- Remove CREATURE_FLAG_EXTRA_AGGRO_ZONE from C'thun as we want to manually handle his combat with zone.
+UPDATE creature_template SET flags_extra = flags_extra & ~512 WHERE entry = 15727;

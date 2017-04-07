@@ -236,7 +236,7 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
         {
             if (Player* player = itr->getSource())
             {
-                if (!player->isDead() && !player->isGameMaster() && !instance->PlayerInStomach(player)) {
+                if (!player->isDead() && !player->isGameMaster() && player->isInCombat() && !instance->PlayerInStomach(player)) {
                     temp.push_back(player);
                 }
             }
@@ -319,19 +319,27 @@ static constexpr uint32 MIND_FLAY_INITIAL_WAIT_DURATION        = 0;    // How lo
 static constexpr uint32 TELEPORT_BURIED_DURATION               = 1000; // How long will a claw tentacle say underground before re-emerging on teleport.
 // =======================================================
 
+// ================== THE PULL ===========================
+/* if defined, the encounter does not pull all players in combat on aggro, but
+*  rather aggros the initial puller and then places everyone else in combat 
+*  12 seconds later. Sources: https://pastebin.com/BiC33bU5
+*  
+*  If not defined, the current logic is to target the intial puller 3 times with the 
+*  beam before going on a random target. More research should be done to better understand
+*  how the pull worked *after* the later nerfs, and also when it was implemented.
+*  
+*  The one thing that is certain is that in all kills with videos around the time it first became
+*  "killable" (april 24th 2006), the 12seconds delayed combat was how it worked.
+*  In later kills, towards the end of 2006, people were put in combat as soon as the first beam *hit*
+*  the initial puller, but how many times it would hit the initial puller is currently unknown.
+*/
+#define USE_POSTFIX_PRENERF_PULL_LOGIC
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+static constexpr uint32 DELAYED_COMBAT_DURATION = 12000;
+#endif
+// =======================================================
+
 static constexpr TempSummonType TENTACLE_DESPAWN_FLAG = TEMPSUMMON_CORPSE_TIMED_DESPAWN;
-
-enum CThunPhase
-{
-    PHASE_EYE_NORMAL = 0,
-    PHASE_EYE_DARK_GLARE = 1,
-    PHASE_PRE_TRANSITION = 2,
-    PHASE_TRANSITION = 3,
-    PHASE_CTHUN_INVULNERABLE = 4,
-    PHASE_CTHUN_WEAKENED = 5,
-    PHASE_CTHUN_DONE = 6,
-};
-
 
 struct cthunTentacle : public ScriptedAI
 {
@@ -764,10 +772,6 @@ struct claw_tentacleAI : public clawTentacle
     void Reset() override
     {
         clawTentacle::Reset();
-        //m_creature->SetInCombatWithZone();
-        /*if (Creature* pCreature = m_creature->GetMap()->GetCreature(Portal))
-        pCreature->ForcedDespawn();
-        */
     }
 
     void UpdateAI(const uint32 diff)
@@ -892,6 +896,7 @@ struct flesh_tentacleAI : public cthunTentacle
 
     void UpdateAI(const uint32 diff)
     {
+        // Copied from Creature::SelectHostileTarget with modifications for melee only targets
         //function provides main threat functionality
         //next-victim-selection algorithm and evade mode are called
         //threat list sorting etc.
@@ -1003,7 +1008,6 @@ struct eye_of_cthunAI : public ScriptedAI
     void Pull(Player* puller) {
 
         m_creature->SetFactionTemporary(14);
-        m_creature->SetInCombatWithZone();
 
         initialPullerGuid = puller->GetObjectGuid();
         CastGreenBeam(puller);
@@ -1017,7 +1021,6 @@ struct eye_of_cthunAI : public ScriptedAI
 
     void Reset()
     {
-
         currentPhase = GREEN_BEAM;
         initialPullerGuid = 0;
         eyeBeamCastCount = 0;
@@ -1106,6 +1109,9 @@ struct eye_of_cthunAI : public ScriptedAI
         if (eyeBeamCooldown < diff) {
             Unit* target = nullptr;
 
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+            target = SelectRandomAliveNotStomach(m_pInstance);
+#else 
             // We force the initial puller as the target for MAX_INITIAL_PULLER_HITS
             if (eyeBeamCastCount < MAX_INITIAL_PULLER_HITS) {
                 target = m_pInstance->GetMap()->GetPlayer(initialPullerGuid);
@@ -1113,6 +1119,7 @@ struct eye_of_cthunAI : public ScriptedAI
             else {
                 target = SelectRandomAliveNotStomach(m_pInstance);
             }
+#endif
             if (target) {
                 CastGreenBeam(target);
             }
@@ -1167,6 +1174,17 @@ struct eye_of_cthunAI : public ScriptedAI
 
 struct cthunAI : public ScriptedAI
 {
+    enum CThunPhase
+    {
+        PHASE_EYE_NORMAL = 0,
+        PHASE_EYE_DARK_GLARE = 1,
+        PHASE_PRE_TRANSITION = 2,
+        PHASE_TRANSITION = 3,
+        PHASE_CTHUN_INVULNERABLE = 4,
+        PHASE_CTHUN_WEAKENED = 5,
+        PHASE_CTHUN_DONE = 6,
+    };
+
     instance_temple_of_ahnqiraj* m_pInstance;
 
     bool inProgress;
@@ -1184,7 +1202,12 @@ struct cthunAI : public ScriptedAI
     uint32 stomachEnterPortTimer;
     uint32 giantClawTentacleTimer;
     uint32 nextStomachEnterGrabTimer;
-    
+
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+    uint32 delayedCombatEntryTimer;
+    bool isInCombatWithZone;
+#endif
+
     ObjectGuid eyeGuid;
     ObjectGuid puntCreatureGuid;
     ObjectGuid StomachEnterTargetGUID;
@@ -1218,6 +1241,10 @@ struct cthunAI : public ScriptedAI
 
     void Reset() override
     {
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+        delayedCombatEntryTimer = DELAYED_COMBAT_DURATION;
+        isInCombatWithZone = false;
+#endif
         inProgress = false;
         currentPhase = PHASE_EYE_NORMAL;
         if (!m_pInstance)
@@ -1349,6 +1376,21 @@ struct cthunAI : public ScriptedAI
             wipeRespawnEyeTimer = 5000; 
             EnterEvadeMode();
         }
+
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+        if (!isInCombatWithZone) {
+            if (delayedCombatEntryTimer < diff) {
+                isInCombatWithZone = true;
+                m_creature->SetInCombatWithZone();
+                if (Creature* pEye = m_pInstance->GetCreature(eyeGuid)) {
+                    pEye->SetInCombatWithZone();
+                }
+            }
+            else {
+                delayedCombatEntryTimer -= diff;
+            }
+        }
+#endif
 
         m_creature->SetTargetGuid(0);
 
@@ -1485,7 +1527,13 @@ struct cthunAI : public ScriptedAI
                         }
                         eye_of_cthunAI* eyeAI = (eye_of_cthunAI*)pEye->AI();
                         eyeAI->Pull(pPlayer);
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+                        m_creature->SetInCombatWith(pPlayer);
+                        pEye->SetInCombatWith(pPlayer);
+#else
                         m_creature->SetInCombatWithZone();
+                        pEye->SetInCombatWithZone();
+#endif
                         if (m_pInstance) {
                             m_pInstance->SetData(TYPE_CTHUN, IN_PROGRESS);
                         }
