@@ -947,49 +947,6 @@ struct flesh_tentacleAI : public cthunTentacle
         else {
             m_creature->AttackStop(true);
         }
-        return;
-        
-
-
-        if (m_creature->SelectHostileTarget()) {
-            if (Unit* victim = m_creature->getVictim()) {
-                //XXX if the mob is not displaying its target correct, look at this.
-                if (previousTarget != m_creature->GetTargetGuid()) {
-                    m_creature->SetTargetGuid(victim->GetObjectGuid());
-                    m_creature->SetFacingToObject(victim);
-                }
-                previousTarget = victim->GetGUID();
-
-                // this will get us the highest threat target in meleee range, but
-                // if there is only one person on the threat list it will attack that 
-                // target regardless, so we need to check the range manually as well
-                if (!m_creature->CanReachWithMeleeAttack(victim)) {
-                    
-                    if (m_creature->hasUnitState(UNIT_STAT_MELEE_ATTACKING)) {
-                        m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
-                        m_creature->InterruptSpell(CURRENT_MELEE_SPELL);
-                    }
-                    m_creature->AttackStop(true);
-                    return;
-                }
-                else if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
-                {
-                    m_creature->AttackerStateUpdate(victim);
-                    m_creature->resetAttackTimer();
-                }
-            }
-        }
-        return;
-       
-        /*
-        if (!cthunTentacle::UpdateCthunTentacle(diff))
-        return;
-
-        if (CheckForMelee() == nullptr) {
-        DoResetThreat();
-        DoStopAttack();
-        }
-        */
     }
 };
 
