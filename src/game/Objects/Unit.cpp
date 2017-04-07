@@ -7849,7 +7849,7 @@ void Unit::SetDeathState(DeathState s)
             if (Pet* pet = GetPet())
                 pet->Unsummon(PET_SAVE_REAGENTS, this);
     }
-    else if (s == JUST_ALIVED)
+    else if (s == JUST_ALIVED || s == ALIVE)
     {
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);  // clear skinnable for creature and player (at battleground)
     }
