@@ -787,7 +787,7 @@ void Creature::RegenerateHealth()
         addvalue *= 4; // Le timer tick toutes les 4 secondes.
     }
     else
-        addvalue = maxValue / 3;
+        addvalue = maxValue / 10;
 
     ModifyHealth(addvalue);
 }
