@@ -1304,7 +1304,6 @@ struct cthunAI : public ScriptedAI
                 ts->UnSummon();
             }
         }
-        creaturesToDespawn.clear();
         
         if (m_pInstance && m_creature->isAlive())
             m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
@@ -1452,6 +1451,35 @@ struct cthunAI : public ScriptedAI
 
         sLog.outBasic("%s despawn", pCreature->GetName());
 
+    }
+
+    void JustDied(Unit* pKiller) override
+    {
+        if (m_pInstance) {
+            currentPhase = PHASE_CTHUN_DONE;
+            m_pInstance->SetData(TYPE_CTHUN, DONE);
+            if (GameObject* go = m_pInstance->GetGameObject(21797))
+                go->Despawn();
+            if (GameObject* go = m_pInstance->GetGameObject(21798))
+                go->Despawn();
+            if (GameObject* go = m_pInstance->GetGameObject(21799))
+                go->Despawn();
+            /*
+            while (GameObject* goGrasp = m_creature->FindNearestGameObject(180745, 300)) {
+            goGrasp->Despawn();
+            }
+            */
+
+            std::list<Creature*> creaturesToDespawn;
+            GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, MOB_FLESH_TENTACLE, 2000.0f);
+            for (auto it = creaturesToDespawn.cbegin(); it != creaturesToDespawn.cend(); it++) {
+                if (TemporarySummon* ts = dynamic_cast<TemporarySummon*>(*it)) {
+                    ts->UnSummon();
+                }
+            }
+
+        }
+        sLog.outBasic("C'thun died. Enetered DONE phase");
     }
 
     void ResetartUnvulnerablePhase(bool spawnFleshTentacles = true) {
@@ -1664,27 +1692,6 @@ struct cthunAI : public ScriptedAI
         else {
             eyeTentacleTimer -= diff;
         }
-    }
-    
-    void JustDied(Unit* pKiller)
-    {
-        if (m_pInstance) {
-            currentPhase = PHASE_CTHUN_DONE;
-            m_pInstance->SetData(TYPE_CTHUN, DONE);
-            if (GameObject* go = m_pInstance->GetGameObject(21797))
-                go->Despawn();
-            if (GameObject* go = m_pInstance->GetGameObject(21798))
-                go->Despawn();
-            if (GameObject* go = m_pInstance->GetGameObject(21799))
-                go->Despawn();
-            /*
-            while (GameObject* goGrasp = m_creature->FindNearestGameObject(180745, 300)) {
-                goGrasp->Despawn();
-            }
-            */
-
-        }
-        sLog.outBasic("C'thun died. Enetered DONE phase");
     }
 
     void SpawnEyeTentacles()
