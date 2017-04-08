@@ -1041,7 +1041,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
             return nullptr;
         }
-        bool Attack(Unit *victim, bool meleeAttack);
+        bool Attack(Unit *victim, bool meleeAttack, bool triggerAIReaction = true);
         void AttackedBy(Unit* attacker);
         void CastStop(uint32 except_spellid = 0);
         bool AttackStop(bool targetSwitch = false);

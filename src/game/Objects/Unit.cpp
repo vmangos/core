@@ -808,7 +808,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         if (damagetype != DOT)
         {
-            if (!getVictim())
+            if (!getVictim() || !getVictim()->getAttackerForHelper())
             {
                 // if not have main target then attack state with target (including AI call)
                 //start melee attacks only after melee hit
@@ -5491,7 +5491,7 @@ bool Unit::IsNeutralToAll() const
     return my_faction->IsNeutralToAll();
 }
 
-bool Unit::Attack(Unit *victim, bool meleeAttack)
+bool Unit::Attack(Unit *victim, bool meleeAttack, bool triggerAIReaction)
 {
     if (!victim || victim == this)
         return false;
@@ -5550,7 +5550,9 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
         addUnitState(UNIT_STAT_MELEE_ATTACKING);
 
     m_attacking = victim;
-    m_attacking->_addAttacker(this);
+
+    if (triggerAIReaction)
+        m_attacking->_addAttacker(this);        
 
     if (GetTypeId() == TYPEID_UNIT) // && !((Creature*)this)->GetLinkGroup())
     {
@@ -7837,7 +7839,6 @@ void Unit::SetDeathState(DeathState s)
     if (s == JUST_DIED)
     {
         RemoveAllAurasOnDeath();
-        RemoveGuardians();
         UnsummonAllTotems();
 
         i_motionMaster.Clear(false, true);
@@ -7848,10 +7849,6 @@ void Unit::SetDeathState(DeathState s)
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
-        // Desinvocation du pet a la mort
-        if (IsCreature())
-            if (Pet* pet = GetPet())
-                pet->Unsummon(PET_SAVE_REAGENTS, this);
     }
     else if (s == JUST_ALIVED || s == ALIVE)
     {
