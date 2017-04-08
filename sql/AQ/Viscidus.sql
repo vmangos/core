@@ -4,6 +4,10 @@ UPDATE creature_template SET unit_flags = unit_flags | 33587968 WHERE entry = 15
 -- Viscidus trigger aren't targettable and can't fight players
 UPDATE creature_template SET minlevel = 63, maxlevel = 63, unit_flags = unit_flags | (33554432 + 512), scriptname = "boss_viscidus_trigger" WHERE entry = 15922;
 
+-- Viscidus trigger must be hostile (faction 14 = moster) to work, both in viscidus logic and in c'thuns stomach.
+UPDATE creature_template SET faction_A = 14, faction_H= 14 WHERE entry=15922;
+
+
 -- Viscidus texts from cmangos
 DELETE FROM script_texts WHERE entry BETWEEN -1531046 AND -1531041;
 INSERT INTO script_texts (entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8, sound, type, language, emote, comment) VALUES
