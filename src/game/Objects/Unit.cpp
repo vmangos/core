@@ -7505,6 +7505,10 @@ bool Unit::canDetectInvisibilityOf(Unit const* u) const
     if (!u->m_invisibilityMask && m_detectInvisibilityMask)
         return true;
 
+    if (const Creature* worldBoss = u->ToCreature())
+        if (worldBoss->IsWorldBoss())
+            return true;
+
     if (uint32 mask = (m_detectInvisibilityMask & u->m_invisibilityMask))
     {
         for (int32 i = 0; i < 32; ++i)
