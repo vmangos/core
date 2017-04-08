@@ -332,10 +332,13 @@ static constexpr uint32 TELEPORT_BURIED_DURATION               = 1000; // How lo
 *  "killable" (april 24th 2006), the 12seconds delayed combat was how it worked.
 *  In later kills, towards the end of 2006, people were put in combat as soon as the first beam *hit*
 *  the initial puller, but how many times it would hit the initial puller is currently unknown.
+*
+*  A suggested way to make the pull slightly more challenging is tuning DELAYED_COMBAT_DURATION to 
+*  somewhere between 6 and 9 seconds.
 */
 #define USE_POSTFIX_PRENERF_PULL_LOGIC
 #ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
-static constexpr uint32 DELAYED_COMBAT_DURATION = 12000;
+static constexpr uint32 DELAYED_COMBAT_DURATION = 9000;
 #endif
 // =======================================================
 
@@ -1160,13 +1163,10 @@ struct eye_of_cthunAI : public ScriptedAI
     bool CastGreenBeam(Unit* target)
     {
         if (DoCastSpellIfCan(target, SPELL_GREEN_EYE_BEAM) == CAST_OK) {
-            // There should not be any LOS check
-            m_creature->InterruptNonMeleeSpells(false);
             m_creature->SetTargetGuid(target->GetObjectGuid());
-            m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
             ++eyeBeamCastCount;
             eyeBeamCooldown = P1_GREEN_BEAM_COOLDOWN;
-            return false;
+            return true;
         }
         return false;
     }
