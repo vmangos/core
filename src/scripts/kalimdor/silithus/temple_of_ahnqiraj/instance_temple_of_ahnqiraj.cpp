@@ -202,8 +202,10 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
             pGo->SetGoState(GO_STATE_ACTIVE);
         break;
     case GO_GRASP_OF_CTHUN:
-        if (m_auiEncounter[TYPE_CTHUN] == DONE)
-            pGo->SetActiveObjectState(false);
+        graspsOfCthun.push_back(pGo->GetObjectGuid());
+        if (m_auiEncounter[TYPE_CTHUN] == DONE) {
+            pGo->SetVisible(false);
+        }
         break;
     default:
         return;
@@ -316,6 +318,16 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
 {
     switch (uiType)
     {
+    case TYPE_CTHUN:
+        m_auiEncounter[uiType] = uiData;
+        if (uiData == DONE) {
+            for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
+                if (GameObject* pGo = GetGameObject(*it)) {
+                    pGo->SetVisible(false);
+                }
+            }
+        }
+        break;
     case TYPE_SKERAM:
         m_auiEncounter[uiType] = uiData;
         if (uiData == DONE)
@@ -360,27 +372,6 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             break;
         }
         m_auiEncounter[uiType] = uiData;
-        break;
-    case TYPE_CTHUN:
-        m_auiEncounter[uiType] = uiData;
-        switch (uiData)
-        {
-        case NOT_STARTED:
-            //if (Creature* pSpawner = GetSingleCreatureFromStorage(NPC_CTHUN))
-            //    pSpawner->Respawn();
-            //if(Creature* pSpawner = GetSingleCreatureFromStorage(NPC_EYE_OF_C_THUN))
-            //    pSpawner->Respawn();
-        break;
-        case DONE:
-            //despawn blue circles around NPCs after c'thun
-            for (size_t i = 21797; i <= 21799; i++) {
-                if (GameObject* obj = instance->GetGameObject(i)) {
-                //if (GameObject* obj = m_pInstance->GetSingleGameObjectFromStorage(i)) {
-                    obj->SetActiveObjectState(false);
-                }
-            }
-        break;
-        }
         break;
     case TYPE_TWINS:
         // Either of the twins can set data, so return to avoid double changing
@@ -431,18 +422,10 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
             m_auiEncounter[i] = NOT_STARTED;
     }
     
-    // Immediately despawn the C'thun grasp objects if c'thun is dead.
-    if (m_auiEncounter[TYPE_CTHUN] == DONE) {
-        for (size_t i = 21797; i <= 21799; i++) {
-            if (GameObject* obj = instance->GetGameObject(i)) {
-                //if (GameObject* obj = m_pInstance->GetSingleGameObjectFromStorage(i)) {
-                obj->SetActiveObjectState(false);
-            }
-        }
-    }
     if (m_auiEncounter[TYPE_TWINS] == DONE) {
         m_twinsIntroDialogue.SetDone();
     }
+    
     OUT_LOAD_INST_DATA_COMPLETE;
 }
 

@@ -157,6 +157,7 @@ private:
 
     TwinsIntroDialogue m_twinsIntroDialogue;
     DialogueHelper m_twinsDeadDialogue;
+    std::vector<ObjectGuid> graspsOfCthun;
 
     // The following functions, variables etc, are used to handle the C'thun stomach.
     // One might argue if they should be in boss_cthun.cpp instead, but it makes it a whole
