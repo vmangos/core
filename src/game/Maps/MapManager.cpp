@@ -241,33 +241,21 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
 class MapAsyncUpdater : public ACE_Based::Runnable
 {
 public:
-    MapAsyncUpdater(bool* updFinished, uint32 updateDiff) :
-        updateFinished(updFinished), diff(updateDiff), loops(0)
+    MapAsyncUpdater(uint32 updateDiff) :
+        diff(updateDiff)
     {
     }
 
     virtual void run()
     {
         WorldDatabase.ThreadStart();
-        do
-        {
-            for (std::vector<Map*>::iterator it = maps.begin(); it != maps.end(); ++it)
-            {
-                if (loops && *updateFinished)
-                    break;
-                (*it)->DoUpdate(diff);
-            }
-            if (!(*updateFinished))
-                ACE_Based::Thread::Sleep(5);
-            ++loops;
-        }
-        while (!(*updateFinished));
+        for (std::vector<Map*>::iterator it = maps.begin(); it != maps.end(); ++it)
+            (*it)->DoUpdate(diff);
         WorldDatabase.ThreadEnd();
     }
     std::vector<Map*> maps;
-    volatile bool* updateFinished;
-    uint32 diff;
-    uint32 loops;
+private:
+    const uint32 diff;
 };
 
 class ContinentAsyncUpdater : public ACE_Based::Runnable
@@ -294,11 +282,10 @@ void MapManager::Update(uint32 diff)
         return;
 
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
-    bool updateFinished = false;
     std::vector<MapAsyncUpdater*> instanceUpdaters(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS));
     std::vector<ContinentAsyncUpdater*> continentsUpdaters;
     for (int i = 0; i < instanceUpdaters.size(); ++i)
-        instanceUpdaters[i] = new MapAsyncUpdater(&updateFinished, mapsDiff); // Will be deleted at thread end
+        instanceUpdaters[i] = new MapAsyncUpdater(mapsDiff); // Will be deleted at thread end
 
     int mapIdx = 0;
     int continentsIdx = 0;
@@ -336,28 +323,28 @@ void MapManager::Update(uint32 diff)
     for (int i = 0; i < i_maxContinentThread; ++i)
         i_continentUpdateFinished[i] = false;
 
-    std::vector<ACE_Based::Thread*> asyncUpdateThreads(instanceUpdaters.size() + continentsUpdaters.size());
+    std::vector<ACE_Based::Thread*> continentsThreads(continentsUpdaters.size());
+    std::vector<ACE_Based::Thread*> instanceThreads(instanceUpdaters.size());
 
-    for (int tid = 0; tid < instanceUpdaters.size(); ++tid)
-        asyncUpdateThreads[tid]                             = new ACE_Based::Thread(instanceUpdaters[tid]);
     for (int tid = 0; tid < continentsUpdaters.size(); ++tid)
-        asyncUpdateThreads[tid + instanceUpdaters.size()]   = new ACE_Based::Thread(continentsUpdaters[tid]);
+        continentsThreads[tid]   = new ACE_Based::Thread(continentsUpdaters[tid]);
 
     // Finish continents updating
-    for (int tid = instanceUpdaters.size(); tid < asyncUpdateThreads.size(); ++tid)
+    for (int tid = 0; tid < continentsThreads.size(); ++tid)
     {
-        asyncUpdateThreads[tid]->wait();
-        delete asyncUpdateThreads[tid];
+        continentsThreads[tid]->wait();
+        delete continentsThreads[tid];
     }
 
-    updateFinished = true;
+    for (int tid = 0; tid < instanceUpdaters.size(); ++tid)
+        instanceThreads[tid]                             = new ACE_Based::Thread(instanceUpdaters[tid]);
     SwitchPlayersInstances();
 
     // And then instances updating
-    for (int tid = 0; tid < instanceUpdaters.size(); ++tid)
+    for (int tid = 0; tid < instanceThreads.size(); ++tid)
     {
-        asyncUpdateThreads[tid]->wait();
-        delete asyncUpdateThreads[tid];
+        instanceThreads[tid]->wait();
+        delete instanceThreads[tid];
     }
     delete[] i_continentUpdateFinished;
 
