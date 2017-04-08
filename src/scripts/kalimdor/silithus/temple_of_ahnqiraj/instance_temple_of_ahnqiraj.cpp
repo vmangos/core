@@ -215,6 +215,7 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
 
 void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
 {
+    
     switch (pCreature->GetEntry())
     {
     case NPC_ANUBISATH_SENTINEL:
@@ -309,6 +310,9 @@ void instance_temple_of_ahnqiraj::OnCreatureCreate(Creature* pCreature)
     case NPC_SARTURA_S_ROYAL_GUARD:
         m_lRoyalGuardGUIDList.push_back(pCreature->GetObjectGuid());
         break;
+    case NPC_CAELESTRASZ:
+        pCreature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+        break;
     }
     // Delete some creatures
     OnCreatureRespawn(pCreature);
@@ -320,11 +324,9 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
     {
     case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
-        if (uiData == DONE) {
-            for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
-                if (GameObject* pGo = GetGameObject(*it)) {
-                    pGo->SetVisible(false);
-                }
+        for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
+            if (GameObject* pGo = GetGameObject(*it)) {
+                pGo->SetVisible(uiData != DONE);
             }
         }
         break;
@@ -653,6 +655,20 @@ InstanceData* GetInstanceData_instance_temple_of_ahnqiraj(Map* pMap)
     return new instance_temple_of_ahnqiraj(pMap);
 }
 
+bool GossipHello_npc_Caelestrasz(Player* pPlayer, Creature* pCreature)
+{
+    if (InstanceData* instData = pCreature->GetInstanceData()) {
+        if (instData->GetData(TYPE_CTHUN) == DONE) {
+            pPlayer->SEND_GOSSIP_MENU(40101, pCreature->GetGUID());
+        }
+        else {
+            pPlayer->SEND_GOSSIP_MENU(40100, pCreature->GetGUID());
+        }
+        return true;
+    }
+    return false;
+}
+
 void AddSC_instance_temple_of_ahnqiraj()
 {
     Script* pNewScript;
@@ -665,6 +681,11 @@ void AddSC_instance_temple_of_ahnqiraj()
     pNewScript = new Script;
     pNewScript->Name = "at_temple_ahnqiraj";
     pNewScript->pAreaTrigger = &AreaTrigger_at_temple_ahnqiraj;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "aq_caelestrasz_ai";
+    pNewScript->pGossipHello = &GossipHello_npc_Caelestrasz;
     pNewScript->RegisterSelf();
 
 }

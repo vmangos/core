@@ -15,3 +15,10 @@ INSERT INTO gameobject (guid, id, map, position_x, position_y, position_z, orien
 
 -- Set Grasps untargettables
 UPDATE gameobject_template SET data1 = 0 WHERE entry = 180745;
+
+-- Add a scriptname to caelestrasz in aq, used to handle gossip text
+UPDATE creature_template SET `ScriptName`='aq_caelestrasz_ai' WHERE `entry`='15379';
+
+-- npc texts for Caelestrasz in AQ
+INSERT INTO npc_text (`ID`, `text0_0`) VALUES ('40100', 'Even if you somehow manage to free us without defeating C\'Thun, we would focus all our powers to see the beast banished back to the hell from whence it came - AT ANY COST.');
+INSERT INTO npc_text (`ID`, `text0_0`) VALUES ('40101', 'Our freedom would have meant nothing if C\'Thun had survived. You are truly a champion of prophecy.');
