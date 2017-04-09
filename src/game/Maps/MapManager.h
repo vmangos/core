@@ -72,6 +72,7 @@ struct MANGOS_DLL_DECL MapID
     uint32 nInstanceId;
 };
 
+class ThreadPool;
 class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> >
 {
     friend class MaNGOS::OperatorNew<MapManager>;
@@ -218,6 +219,8 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         uint32 i_MaxInstanceId;
         int             i_maxContinentThread;
         volatile bool*  i_continentUpdateFinished;
+
+        std::unique_ptr<ThreadPool> m_threads;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;

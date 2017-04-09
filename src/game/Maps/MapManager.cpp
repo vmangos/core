@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
+#include "Threading.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -41,9 +42,11 @@ MapManager::MapManager()
     i_MaxInstanceId(RESERVED_INSTANCES_LAST),
     i_GridStateErrorCount(0),
     i_continentUpdateFinished(NULL),
-    i_maxContinentThread(0)
+    i_maxContinentThread(0),
+    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)))
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
+    m_threads->start();
 }
 
 MapManager::~MapManager()
@@ -282,12 +285,9 @@ void MapManager::Update(uint32 diff)
         return;
 
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
-    std::vector<MapAsyncUpdater*> instanceUpdaters(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS));
-    std::vector<ContinentAsyncUpdater*> continentsUpdaters;
-    for (int i = 0; i < instanceUpdaters.size(); ++i)
-        instanceUpdaters[i] = new MapAsyncUpdater(mapsDiff); // Will be deleted at thread end
+    std::stack<std::future<void>> instanceUpdaters;
+    std::stack<std::future<void>> continentsUpdaters;
 
-    int mapIdx = 0;
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
@@ -303,19 +303,18 @@ void MapManager::Update(uint32 diff)
         iter->second->SetMapUpdateIndex(-1);
         if (iter->second->Instanceable())
         {
-            if (instanceUpdaters.size())
-            {
-                instanceUpdaters[mapIdx % instanceUpdaters.size()]->maps.push_back(iter->second);
-                ++mapIdx;
-            }
+            if (m_threads->isStarted())
+                instanceUpdaters.emplace(ThreadPool::wrap([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);}));
             else
                 iter->second->Update(mapsDiff);
         }
         else // One threat per continent part
         {
             iter->second->SetMapUpdateIndex(continentsIdx++);
-            ContinentAsyncUpdater* task = new ContinentAsyncUpdater(mapsDiff, iter->second);
-            continentsUpdaters.push_back(task);
+            if (m_threads->isStarted())
+                continentsUpdaters.emplace(ThreadPool::wrap([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);}));
+            else
+                iter->second->Update(mapsDiff);
         }
     }
     i_maxContinentThread = continentsIdx;
@@ -323,29 +322,15 @@ void MapManager::Update(uint32 diff)
     for (int i = 0; i < i_maxContinentThread; ++i)
         i_continentUpdateFinished[i] = false;
 
-    std::vector<ACE_Based::Thread*> continentsThreads(continentsUpdaters.size());
-    std::vector<ACE_Based::Thread*> instanceThreads(instanceUpdaters.size());
+    m_threads->setWorkload(std::move(continentsUpdaters));
+    m_threads->waitForFinished();
 
-    for (int tid = 0; tid < continentsUpdaters.size(); ++tid)
-        continentsThreads[tid]   = new ACE_Based::Thread(continentsUpdaters[tid]);
+    m_threads->setWorkload(std::move(instanceUpdaters));
 
-    // Finish continents updating
-    for (int tid = 0; tid < continentsThreads.size(); ++tid)
-    {
-        continentsThreads[tid]->wait();
-        delete continentsThreads[tid];
-    }
-
-    for (int tid = 0; tid < instanceUpdaters.size(); ++tid)
-        instanceThreads[tid]                             = new ACE_Based::Thread(instanceUpdaters[tid]);
     SwitchPlayersInstances();
 
-    // And then instances updating
-    for (int tid = 0; tid < instanceThreads.size(); ++tid)
-    {
-        instanceThreads[tid]->wait();
-        delete instanceThreads[tid];
-    }
+    m_threads->waitForFinished();
+
     delete[] i_continentUpdateFinished;
 
     MapMapType::iterator crashedMapsIter = i_maps.begin();
@@ -647,7 +632,7 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                 -6308.63f, -3049.32f,
                 -6107.82f, -3345.30f,
                 -6008.49f, -3590.52f,
-                -5989.37f, -4312.29f, 
+                -5989.37f, -4312.29f,
                 -5806.26f, -5864.11f
             };
             const static float stormwindAreaNorthLimit[] = {
