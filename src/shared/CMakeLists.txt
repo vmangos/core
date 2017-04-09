@@ -30,6 +30,7 @@ set (shared_SRCS
 	ServiceWin32.h
 	SystemConfig.h
 	Threading.h
+        ThreadPool.h
 	Timer.h
 	Util.h
 	WheatyExceptionReport.h
@@ -69,6 +70,7 @@ set (shared_SRCS
 	ProgressBar.cpp
 	ServiceWin32.cpp
 	Threading.cpp
+        ThreadPool.cpp
 	Util.cpp
 	Duration.h
 	WheatyExceptionReport.cpp

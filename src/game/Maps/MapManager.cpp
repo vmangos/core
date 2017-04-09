@@ -31,7 +31,7 @@
 #include "ObjectMgr.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
-#include "Threading.h"
+#include "ThreadPool.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
