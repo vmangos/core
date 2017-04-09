@@ -129,6 +129,7 @@ struct instance_stratholme : public ScriptedInstance
 
     uint8 m_uiBlackguardCount;
     uint32 m_uiYsidaReward_Timer;
+    uint32 m_uiPostboxesUsed;
 
     void Initialize()
     {
@@ -185,6 +186,7 @@ struct instance_stratholme : public ScriptedInstance
 
         m_uiBlackguardCount = 5;
         m_uiYsidaReward_Timer = 0;
+        m_uiPostboxesUsed = 0;
     }
 
     bool IsEncounterInProgress() const
@@ -653,6 +655,21 @@ struct instance_stratholme : public ScriptedInstance
                 IsSilverHandDead[4] = (uiData) ? true : false;
                 break;
             }
+            case TYPE_POSTMASTER:
+            {
+                m_auiEncounter[uiType] = uiData;
+                if (uiData == IN_PROGRESS)
+                {
+                    ++m_uiPostboxesUsed;
+
+                    // After the second post box prepare to spawn the Post Master
+                    if (m_uiPostboxesUsed == 2)
+                        SetData(TYPE_POSTMASTER, SPECIAL);
+                }
+                // No need to save anything here, so return
+                return;
+            }
+            
         }
         if (uiData == DONE)
         {

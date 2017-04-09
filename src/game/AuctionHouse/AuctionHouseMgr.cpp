@@ -717,7 +717,8 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
             if (query.auctionSubCategory != 0xffffffff && proto->SubClass != query.auctionSubCategory)
                 continue;
 
-            if (query.auctionSlotID != 0xffffffff && proto->InventoryType != query.auctionSlotID)
+            if (query.auctionSlotID != 0xffffffff && proto->InventoryType != query.auctionSlotID &&
+                    (query.auctionSlotID != INVTYPE_CHEST ||  query.auctionSlotID == INVTYPE_CHEST && proto->InventoryType != INVTYPE_ROBE))
                 continue;
 
             if (query.quality != 0xffffffff && proto->Quality < query.quality)

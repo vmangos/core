@@ -397,8 +397,15 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     return roll_chance_f(chance);
 }
 
-SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 cooldown)
+SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32 cooldown)
 {
+    // Flurry: last charge crit will reapply the buff, don't remove any charges
+    if (triggeredByAura->GetSpellProto()->SpellIconID == 108 && 
+        triggeredByAura->GetSpellProto()->SpellVisual == 2759 &&
+        triggeredByAura->GetHolder()->GetAuraCharges() <= 1 &&
+        (procEx & PROC_EX_CRITICAL_HIT))
+        return SPELL_AURA_PROC_FAILED;
+
     return SPELL_AURA_PROC_OK;
 }
 

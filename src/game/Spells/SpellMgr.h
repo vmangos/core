@@ -237,9 +237,9 @@ inline bool IsNonCombatSpell(SpellEntry const *spellInfo)
     return (spellInfo->Attributes & SPELL_ATTR_CANT_USED_IN_COMBAT) != 0;
 }
 
-bool IsPositiveSpell(uint32 spellId);
-bool IsPositiveSpell(SpellEntry const *spellproto);
-bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex);
+bool IsPositiveSpell(uint32 spellId, Unit* caster = NULL, Unit* victim = NULL);
+bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster = NULL, Unit* victim = NULL);
+bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex, Unit* caster = NULL, Unit* victim = NULL);
 bool IsPositiveTarget(uint32 targetA, uint32 targetB);
 
 bool IsExplicitPositiveTarget(uint32 targetA);
@@ -355,25 +355,24 @@ inline bool IsAreaEffectTarget( Targets target )
 
 inline bool IsAreaOfEffectSpell(SpellEntry const *spellInfo)
 {
-    if(IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])) || IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_0])))
-        return true;
-    if(IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_1])) || IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_1])))
-        return true;
-    if(IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_2])) || IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_2])))
-        return true;
-    return false;
+    return
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_0])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_1])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_1])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_2])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_2])) ;
 }
 
 inline bool IsAreaAuraEffect(uint32 effect)
 {
-    if (effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY    ||
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_PET      ||
-    // Post-vanilla mais bien utile desfois.
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID     ||
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY    ||
-        effect == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND)
-        return true;
-    return false;
+    return
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_PARTY  ||
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_PET    ||
+        // Post-vanilla mais bien utile desfois.
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_RAID   ||
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_ENEMY  ||
+            effect == SPELL_EFFECT_APPLY_AREA_AURA_FRIEND ;
 }
 
 inline bool HasAreaAuraEffect(SpellEntry const *spellInfo)
@@ -432,11 +431,11 @@ inline bool IsNeedCastSpellAtFormApply(SpellEntry const* spellInfo, ShapeshiftFo
         !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT));
 }
 
-inline bool IsReflectableSpell(SpellEntry const* spellInfo)
+inline bool IsReflectableSpell(SpellEntry const* spellInfo, Unit* caster = NULL, Unit* victim = NULL)
 {
     return spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !spellInfo->HasAttribute(SPELL_ATTR_IS_ABILITY)
       && !spellInfo->HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !spellInfo->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
-      && !spellInfo->HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(spellInfo);
+      && !spellInfo->HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(spellInfo, caster, victim);
 }
 
 inline bool NeedsComboPoints(SpellEntry const* spellInfo)

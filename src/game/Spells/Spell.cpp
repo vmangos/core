@@ -260,7 +260,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
         data << m_strTarget;
 }
 
-Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy): m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
+Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim): m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to sSpellStore element");
@@ -326,7 +326,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_needAliveTargetMask = 0;
 
     // determine reflection
-    m_canReflect = IsReflectableSpell(m_spellInfo);
+    m_canReflect = IsReflectableSpell(m_spellInfo, caster, victim);
 
     m_isClientStarted = false;
 
@@ -1019,7 +1019,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         DoSpellHitOnUnit(unit, mask);
     if (missInfo == SPELL_MISS_REFLECT && target->reflectResult == SPELL_MISS_NONE)
     {
-        DoSpellHitOnUnit(m_caster, mask, true);
+        isReflected = true;
+        DoSpellHitOnUnit(m_caster, mask);
         unitTarget = m_caster;
     }
     else                                                    // in 1.12.1 we need explicit miss info
@@ -1274,7 +1275,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         ((Creature*)m_caster)->AI()->SpellHitTarget(unit, m_spellInfo);
 }
 
-void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask, bool isReflected)
+void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
 {
     if (!unit)
         return;
@@ -4576,9 +4577,32 @@ SpellCastResult Spell::CheckCast(bool strict)
     }
     // Fin Nostalrius
 
-    // check cooldowns to prevent cheating (ignore passive spells, that client side visual only)
+    /*  Check cooldowns to prevent cheating (ignore passive spells, that client side visual only)
+
+        If the cast is an item cast, check the spell proto on the item for the category
+        cooldown to check, rather than this spell's category. This is due to bad
+        categories in the default Spell DBC.
+     */
+
+    uint32 spellCat = m_spellInfo->Category;
+    if (m_IsCastByItem)
+    {
+        // Find correct item category matching the current spell on item
+        // used when item spells have custom categories due to wrong category
+        // on spell
+        ItemPrototype const* proto = m_CastItem->GetProto();
+        for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; i++)
+        {
+            if (proto->Spells[i].SpellId == m_spellInfo->Id)
+            {
+                spellCat = proto->Spells[i].SpellCategory;
+                break;
+            }
+        }
+    }
+
     if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE) &&
-            (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(m_spellInfo->Category)))
+            (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(spellCat)))
     {
         if (m_triggeredByAuraSpell)
             return SPELL_FAILED_DONT_REPORT;

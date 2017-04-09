@@ -540,6 +540,31 @@ bool QuestRewarded_npc_overlord_saurfang(Player* pPlayer, Creature* pCreature, Q
 #define SPELL_CHAIN_LIGHTNING   16033
 #define SPELL_SHOCK             16034
 
+static const SpawnLocation aBlessingGeneratorLocs[8] =
+{
+    { 1678.6f, -4355.3f, 61.73f }, // Valley of Strength (North)
+    { 1543.2f, -4413.9f, 10.14f }, // Valley of Strength (South)
+    { 1550.3f, -4186.2f, 40.95f }, // Valley of Spirits
+    { 1931.2f, -4279.3f, 29.90f }, // Valley of Wisdom
+    { 1804.3f, -4344.9f, -2.9f  }, // The Cleft of Shadow
+    { 1881.0f, -4518.5f, 27.74f }, // The Drag
+    { 316.50f, -4737.3f, 9.56f  }, // Razor Hill
+    { -2356.8f, -1932.5f, 96.0f }  // Camp Taurajo
+};
+
+enum
+{
+    SPELL_WARCHIEF_BLESSING         = 16609,
+    NPC_WARCHIEF_BLESSING_GENERATOR = 21003,
+    NPC_HERALD_THRALL               = 10719,
+    MAX_BLESSING_GENERATORS         = 8,
+    QUEST_FOR_THE_HORDE             = 4974,
+    YELL_WARCHIEF_BLESSING_1        = -143961,
+    YELL_WARCHIEF_BLESSING_2        = -143962,
+    YELL_WARCHIEF_BLESSING_3        = -143963,
+    WARCHIEF_BLESSING_COOLDOWN      = 21600000
+};
+
 //TODO: verify abilities/timers
 struct npc_thrall_warchiefAI : public ScriptedAI
 {
@@ -548,17 +573,94 @@ struct npc_thrall_warchiefAI : public ScriptedAI
         Reset();
     }
 
+    uint32 m_uiTick;
     uint32 ChainLightning_Timer;
     uint32 Shock_Timer;
+    uint32 m_uiBlessingEventTimer;
+    bool m_bBlessingEvent;
+    Creature* m_pHerald;
 
     void Reset()
     {
         ChainLightning_Timer = 2000;
         Shock_Timer = 8000;
+        m_uiTick = 0;
+        m_uiBlessingEventTimer = 0;
+        m_bBlessingEvent = false;
+    }
+
+    void StartBlessingEvent()
+    {
+        if (!m_bBlessingEvent)
+        {
+            m_uiTick = 0;
+            m_uiBlessingEventTimer = 0;
+            m_bBlessingEvent = true;
+        }
     }
 
     void UpdateAI(const uint32 diff)
     {
+        if (m_bBlessingEvent)
+        {
+            if (m_uiBlessingEventTimer <= diff)
+            {
+                // Need video evidence to adjust the timers
+                switch (m_uiTick)
+                {
+                    case 0:
+                        // Spawn Herald of Thrall in the Crossroads
+                        m_pHerald = m_creature->SummonCreature(NPC_HERALD_THRALL, -462.404f, -2637.68f, 96.0656f, 5.8606f, TEMPSUMMON_TIMED_DESPAWN, WARCHIEF_BLESSING_COOLDOWN);
+                        m_pHerald->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                        m_uiBlessingEventTimer = 3000;
+                        m_uiTick++;
+                        break;
+                    case 1:
+                        // Do the first shout
+                        m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
+                        m_creature->MonsterYellToZone(YELL_WARCHIEF_BLESSING_1);
+                        if (m_pHerald)
+                        {
+                            m_pHerald->HandleEmote(EMOTE_ONESHOT_SHOUT);
+                            m_pHerald->MonsterYellToZone(YELL_WARCHIEF_BLESSING_1);
+                        }
+                        m_uiBlessingEventTimer = 10000;
+                        m_uiTick++;
+                        break;
+                    case 2:
+                        // Do the second shout
+                        m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
+                        m_creature->MonsterYellToZone(YELL_WARCHIEF_BLESSING_2);
+                        if (m_pHerald)
+                        {
+                            m_pHerald->HandleEmote(EMOTE_ONESHOT_SHOUT);
+                            m_pHerald->MonsterYellToZone(YELL_WARCHIEF_BLESSING_3);
+                        }
+                        m_uiBlessingEventTimer = 2000;
+                        m_uiTick++;
+                        break;
+                    case 3:
+                        // Cast the spell and spawn buff generators
+                        m_creature->CastSpell(m_creature, SPELL_WARCHIEF_BLESSING, true);
+                        if (m_pHerald)
+                            m_pHerald->CastSpell(m_pHerald, SPELL_WARCHIEF_BLESSING, true);
+                        for (uint8 i = 0; i < MAX_BLESSING_GENERATORS; ++i)
+                        {
+                            if (Creature* pGenerator = m_creature->SummonCreature(NPC_WARCHIEF_BLESSING_GENERATOR, aBlessingGeneratorLocs[i].m_fX, aBlessingGeneratorLocs[i].m_fY, aBlessingGeneratorLocs[i].m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                                pGenerator->CastSpell(pGenerator, SPELL_WARCHIEF_BLESSING, true);
+                        }
+                        // Disable the event for 6 hours
+                        m_uiBlessingEventTimer = WARCHIEF_BLESSING_COOLDOWN;
+                        m_uiTick++;
+                        break;
+                    case 4:
+                        Reset();
+                        return;
+                }
+            }
+            else m_uiBlessingEventTimer -= diff;
+        }
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -630,6 +732,16 @@ bool GossipSelect_npc_thrall_warchief(Player* pPlayer, Creature* pCreature, uint
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->AreaExploredOrEventHappens(QUEST_6566);
             break;
+    }
+    return true;
+}
+
+bool QuestRewarded_npc_thrall_warchief(Player* pPlayer, Creature* pCreature, Quest const* quest)
+{
+    if (quest->GetQuestId() == QUEST_FOR_THE_HORDE)
+    {
+        if (npc_thrall_warchiefAI* pThrall = dynamic_cast<npc_thrall_warchiefAI*>(pCreature->AI()))
+            pThrall->StartBlessingEvent();
     }
     return true;
 }
@@ -772,6 +884,7 @@ void AddSC_orgrimmar()
     newscript->GetAI = &GetAI_npc_thrall_warchief;
     newscript->pGossipHello =  &GossipHello_npc_thrall_warchief;
     newscript->pGossipSelect = &GossipSelect_npc_thrall_warchief;
+    newscript->pQuestRewardedNPC = &QuestRewarded_npc_thrall_warchief;
     newscript->RegisterSelf();
 
     newscript = new Script;

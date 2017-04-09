@@ -1226,13 +1226,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         }
     }
 
-    if (m_regenTimer)
-    {
-        if (update_diff >= m_regenTimer)
-            m_regenTimer = 0;
-        else
-            m_regenTimer -= update_diff;
-    }
+    m_regenTimer -= update_diff;
 
     if (m_weaponChangeTimer > 0)
     {
@@ -2167,7 +2161,7 @@ void Player::RewardRage(uint32 damage, bool attacker)
 
 void Player::RegenerateAll()
 {
-    if (m_regenTimer != 0)
+    if (m_regenTimer > 0)
         return;
 
     // Not in combat or they have regeneration
@@ -2183,7 +2177,7 @@ void Player::RegenerateAll()
 
     Regenerate(POWER_MANA);
 
-    m_regenTimer = REGEN_TIME_FULL;
+    m_regenTimer += REGEN_TIME_FULL;
 }
 
 void Player::Regenerate(Powers power)
@@ -2265,7 +2259,7 @@ void Player::RegenerateHealth()
 
     // polymorphed case
     if (IsPolymorphed())
-        addvalue = (float)GetMaxHealth() / 3;
+        addvalue = (float)GetMaxHealth() / 10;
     // normal regen case (maybe partly in combat case)
     else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
     {
@@ -4701,9 +4695,9 @@ void Player::CleanupChannels()
     {
         Channel* ch = *m_channels.begin();
         m_channels.erase(m_channels.begin());               // remove from player's channel list
-        ch->Leave(GetObjectGuid(), false);                  // not send to client, not remove from player's channel list
+        ch->Leave(GetObjectGuid(), ch->GetName().c_str(), false);   // not send to client, not remove from player's channel list
         if (ChannelMgr* cMgr = channelMgr(GetTeam()))
-            cMgr->LeftChannel(ch->GetName());               // deleted channel if empty
+            cMgr->LeftChannel(ch->GetName(), nullptr);      // deleted channel if empty
 
     }
     DEBUG_LOG("Player: channels cleaned up!");
@@ -4720,7 +4714,7 @@ void Player::LeaveLFGChannel()
     {
         if ((*i)->IsLFG())
         {
-            (*i)->Leave(GetObjectGuid());
+            (*i)->Leave(GetObjectGuid(), (*i)->GetName().c_str());
             break;
         }
     }
@@ -7088,6 +7082,8 @@ void Player::RemovedInsignia(Player* looterPlr)
     if (!corpse)
         return;
 
+    WorldPacket data(SMSG_PLAYER_SKINNED,0);
+    GetSession()->SendPacket(&data);
     // We have to convert player corpse to bones, not to be able to resurrect there
     // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
     Corpse *bones = sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), true);
@@ -11850,8 +11846,8 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             else if (status == DIALOG_STATUS_INCOMPLETE)
                 PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, false, true);
             // Send completable on repeatable quest if player don't have quest
-            else if (pQuest->IsRepeatable())
-                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanCompleteRepeatableQuest(pQuest), true);
+            else if (pQuest->IsRepeatable() && CanCompleteRepeatableQuest(pQuest))
+                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, true, true);
             else
                 PlayerTalkClass->SendQuestGiverQuestDetails(pQuest, guid, true);
         }
@@ -13157,7 +13153,7 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                 }
                 if (CanCompleteQuest(questid))
                     CompleteQuest(questid);
-                return;
+                break;
             }
         }
     }
@@ -13198,7 +13194,7 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
 
                     IncompleteQuest(questid);
                 }
-                return;
+                break;
             }
         }
     }

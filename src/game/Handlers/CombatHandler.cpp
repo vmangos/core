@@ -61,7 +61,7 @@ void WorldSession::HandleAttackSwingOpcode(WorldPacket & recv_data)
         return;
     }
 
-    _player->Attack(pEnemy, true);
+    _player->Attack(pEnemy, true, _player->CanReachWithMeleeAttack(pEnemy));
 }
 
 void WorldSession::HandleAttackStopOpcode(WorldPacket & /*recv_data*/)

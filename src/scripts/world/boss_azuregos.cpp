@@ -17,8 +17,24 @@ enum
     SPELL_CLEAVE                = 19983,
 
     SAY_TELEPORT                = -1000100,
+    SAY_GOOD_DAY                = -1000006,
     YELL_AGGRO                  = -1000099,
     YELL_PLAYERDEATH            = -1000098,
+
+    CHARGE_OF_THE_DRAGONFLIGHTS = 8555,
+    AZUREGOS_MAGICAL_LEDGER     = 8575,
+    MIGHT_OF_KALIMDOR           = 8742,
+
+    ITEM_MAGICAL_LEDGER         = 20949,
+
+    TEXT_HARM                   = 7880,
+    TEXT_SAVING_WORLD           = 1548114,
+    TEXT_SCEPTER_0              = 1548101,
+    PLAYER_SAY_0                = -3100013,
+    MAX_SCEPTER_DIALOGUE        = 13,
+
+
+    NPC_AZUREGOS                = 6109
 };
 
 
@@ -53,6 +69,9 @@ struct boss_azuregosAI : ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
+        if (m_creature->GetEntry() != NPC_AZUREGOS)
+            return EnterEvadeMode();
+
         DoCastSpellIfCan(m_creature, SPELL_MARK_OF_FROST, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
         DoScriptText(YELL_AGGRO, m_creature, pWho);
     }
@@ -175,6 +194,11 @@ struct boss_azuregosAI : ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    void SayGoodDay() 
+    {
+        DoScriptText(SAY_GOOD_DAY, m_creature);
+    }
 };
 CreatureAI* GetAI_boss_azuregos(Creature* pCreature)
 {
@@ -185,8 +209,31 @@ bool GossipHello_boss_azuregos(Player* pPlayer, Creature* pCreature)
 {
     if (pPlayer && pPlayer->isAlive())
     {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I am a treasure hunter in search of powerful artifacts. Give them to me and you will not be harmed.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->SEND_GOSSIP_MENU(7880, pCreature->GetObjectGuid());
+        if (pPlayer->GetQuestStatus(CHARGE_OF_THE_DRAGONFLIGHTS) == QUEST_STATUS_COMPLETE)
+        {
+            // Remove normal "Attack Azuregos" option until Might of Kalimdor is complete
+            if (pPlayer->GetQuestStatus(MIGHT_OF_KALIMDOR) != QUEST_STATUS_COMPLETE)
+            {
+                // If has Ledger or has started quest, send "Shouldn't you be saving the world?"
+                if (pPlayer->GetQuestStatus(AZUREGOS_MAGICAL_LEDGER) || pPlayer->HasItemCount(ITEM_MAGICAL_LEDGER, 1, true))
+                {
+                    pPlayer->SEND_GOSSIP_MENU(TEXT_SAVING_WORLD, pCreature->GetObjectGuid());
+                    return true;
+                }
+                else
+                {
+                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, PLAYER_SAY_0, GOSSIP_SENDER_MAIN, 1);
+                    pPlayer->SEND_GOSSIP_MENU(TEXT_SCEPTER_0, pCreature->GetObjectGuid());
+                    return true;
+                }
+
+            }
+        }
+
+        if (pCreature->GetEntry() == NPC_AZUREGOS)
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I am a treasure hunter in search of powerful artifacts. Give them to me and you will not be harmed.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+        
+        pPlayer->SEND_GOSSIP_MENU(TEXT_HARM, pCreature->GetObjectGuid());
 
         return true;
     }      
@@ -211,6 +258,30 @@ bool GossipSelect_boss_azuregos(Player* pPlayer, Creature* pCreature, uint32 uiS
             {
                 pAzuregosAI->AttackStart(pPlayer);
             }
+
+            return true;
+        }
+        else if (uiAction < MAX_SCEPTER_DIALOGUE)
+        {
+            if (uiAction == MAX_SCEPTER_DIALOGUE - 1)
+                pPlayer->AddItem(ITEM_MAGICAL_LEDGER);
+
+            // Player's dialogue options are stored in decreasing order
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, PLAYER_SAY_0 - uiAction, GOSSIP_SENDER_MAIN, uiAction + 1);
+            pPlayer->SEND_GOSSIP_MENU(TEXT_SCEPTER_0 + uiAction, pCreature->GetObjectGuid());
+
+            return true;
+        }
+        else if (uiAction == MAX_SCEPTER_DIALOGUE)
+        {
+            if (boss_azuregosAI* pAzuregosAI = dynamic_cast<boss_azuregosAI*>(pCreature->AI()))
+                pAzuregosAI->SayGoodDay();
+
+            // Make him stomp off
+            if (pCreature->IsStopped())
+                pCreature->GetMotionMaster()->Clear();
+
+            pPlayer->CLOSE_GOSSIP_MENU();
 
             return true;
         }        

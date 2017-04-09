@@ -1021,7 +1021,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         /***                    STORAGE SYSTEM                 ***/
         /*********************************************************/
 
-        Item* AddItem(uint32 itemId, uint32 count);
+        Item* AddItem(uint32 itemId, uint32 count = 1);
 
         void InterruptSpellsWithCastItem(Item* item);
         void SetVirtualItemSlot( uint8 i, Item* item);
@@ -1679,6 +1679,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         HonorMgr&       GetHonorMgr()       { return m_honorMgr; }
         HonorMgr const& GetHonorMgr() const { return m_honorMgr; }
+        HonorRankInfo GetHonorRankInfo() const { return m_honorMgr.GetRank(); }
 
         void UpdateSkillsForLevel();
         void UpdateSkillsToMaxSkillsForLevel();             // for .levelup

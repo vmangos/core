@@ -29,6 +29,19 @@ enum
     SAY_GAMESBEGIN_1                = -1469004,
     SAY_GAMESBEGIN_2                = -1469005,
 
+    SAY_SCEPTER_RUN_START           = -1469031,
+    SAY_SCEPTER_TAUNT_0             = -1469038,
+    SAY_SCEPTER_TAUNT_1             = -1469040,
+    SAY_SCEPTER_TAUNT_2             = -1469041,
+    SAY_SCEPTER_TAUNT_3             = -1469042,
+    SAY_SCEPTER_TAUNT_4             = -1469043,
+    MAX_SCEPTER_TAUNTS              = 6,
+
+    SAY_SCEPTER_RUN_LAUGHTER        = -1469039,
+
+    SAY_SCEPTER_FAIL_LAUGHTER       = -1469044,
+    SAY_SCEPTER_FAIL                = -1469045,
+
     GOSSIP_TEXT_NEFARIUS_1          = 7134,
     GOSSIP_TEXT_NEFARIUS_2          = 7198,
     GOSSIP_TEXT_NEFARIUS_3          = 7199,
@@ -58,7 +71,9 @@ enum
 
     GO_DRAKONID_BONES               = 179804,
 
-    NPC_NEFARIAN                    = 11583
+    NPC_NEFARIAN                    = 11583,
+
+    QUEST_NEFARIUS_CORRUPTION       = 8730
 };
 
 struct SpawnLocation
@@ -112,6 +127,10 @@ struct boss_victor_nefariusAI : ScriptedAI
         boss_victor_nefariusAI::Reset();
     }
 
+    const uint32 MAX_SCEPTER_RUN_TIME = 1.5 * HOUR * MINUTE * IN_MILLISECONDS;
+    const uint32 SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
+    const uint32 SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
+
     ScriptedInstance* m_pInstance;
 
     uint32 m_uiKilledAdds;
@@ -126,14 +145,19 @@ struct boss_victor_nefariusAI : ScriptedAI
     uint32 m_uiResetTimer;
     uint32 m_uiDrakeTypeOne;
     uint32 m_uiDrakeTypeTwo;
-
     uint32 m_uiEventTimer;
     uint32 blaBlaCount;
+    uint32 scepterRunTime;
+    uint32 nextScepterTauntTime;
+    uint32 scepterTauntID;
+
     bool NefaEventStart;
     bool phase1;
     bool phase2;
     bool phase2bis;
     bool Smoke;
+    bool scepterRun;
+    bool watchScepterRun;
 
     ObjectGuid m_uiMindControledPlayerGuid;
     float m_uiMindControledPlayerAggro;
@@ -150,6 +174,9 @@ struct boss_victor_nefariusAI : ScriptedAI
         m_uiMindControlTimer      = 25000;
         m_uiShadowBlinkTimer      = 1000;
         m_uiResetTimer            = 15 * MINUTE * IN_MILLISECONDS;
+        scepterRunTime            = 0;
+        nextScepterTauntTime      = 0;
+        scepterTauntID            = 0;
 
         m_uiMindControledPlayerGuid.Clear();
         m_uiMindControledPlayerAggro = 0;
@@ -161,6 +188,8 @@ struct boss_victor_nefariusAI : ScriptedAI
         phase2 = false;
         phase2bis = false;
         Smoke = false;
+        scepterRun = false;
+        watchScepterRun = false;
 
         m_creature->setFaction(FACTION_FRIENDLY);
 
@@ -171,6 +200,48 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Make visible if needed
         if (m_creature->GetVisibility() != VISIBILITY_ON)
             m_creature->SetVisibility(VISIBILITY_ON);
+
+        LoadScepterRun();
+    }
+
+    void LoadScepterRun()
+    {
+        if (!m_pInstance)
+            return;
+
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == FAIL)
+            return;
+
+        watchScepterRun = true;
+
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == IN_PROGRESS)
+        {
+            scepterRun = true;
+            scepterRunTime = m_pInstance->GetData64(DATA_SCEPTER_RUN_TIME);
+
+            // Find elapsed time + taunt time offset
+            uint32 elapsedTime = MAX_SCEPTER_RUN_TIME - scepterRunTime;
+            elapsedTime += SCEPTER_TAUNT_OFFSET;
+
+            // Restore next scepter taunt ID
+            scepterTauntID = elapsedTime / SCEPTER_TAUNT_INTERVAL;
+            // Restore time to next taunt
+            nextScepterTauntTime  = SCEPTER_TAUNT_INTERVAL - (elapsedTime % SCEPTER_TAUNT_INTERVAL);
+        }
+
+    }
+
+    void StartScepterRun()
+    {
+        DoScriptText(SAY_SCEPTER_RUN_START, m_creature);
+
+        scepterTauntID = 0;
+        nextScepterTauntTime = SCEPTER_TAUNT_OFFSET;
+
+        scepterRunTime = MAX_SCEPTER_RUN_TIME;
+        scepterRun = true;
+
+        m_pInstance->SetData(TYPE_SCEPTER_RUN, IN_PROGRESS);
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -221,6 +292,24 @@ struct boss_victor_nefariusAI : ScriptedAI
         // Despawn self when Nefarian is killed
         if (pSummoned->GetEntry() == NPC_NEFARIAN)
         {
+            if (nullptr == m_pInstance)
+                return;
+
+            uint32 scepterRunResult = FAIL;
+
+            // Check for successful Scepter Shard Run
+            if (scepterRun)
+            {
+                // Check if still has time left
+                if (Player* scepterChampion = m_creature->GetMap()->GetPlayer(m_pInstance->GetData64(DATA_SCEPTER_CHAMPION)))
+                    if (scepterChampion->GetQuestStatus(QUEST_NEFARIUS_CORRUPTION) == QUEST_STATUS_INCOMPLETE)
+                        scepterRunResult = DONE;
+                
+            }
+
+            m_pInstance->SetData(TYPE_SCEPTER_RUN, scepterRunResult);
+
+
             m_creature->SetRespawnDelay(7 * DAY);
             m_creature->ForcedDespawn();
         }
@@ -261,6 +350,28 @@ struct boss_victor_nefariusAI : ScriptedAI
             else
                 m_uiEventTimer -= uiDiff;
         }
+
+        if (watchScepterRun && nullptr != m_pInstance)
+        {   
+            if (scepterRun)
+            {
+                HandleScepterRun(uiDiff);
+            }
+            else
+            {
+                uint32 scepterRunStatus = m_pInstance->GetData(TYPE_SCEPTER_RUN);
+
+                if (FAIL == scepterRunStatus)
+                {
+                    watchScepterRun = false;
+                }
+                else if (SPECIAL == scepterRunStatus)
+                {
+                    StartScepterRun();
+                }
+            }
+        }
+
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -448,7 +559,71 @@ struct boss_victor_nefariusAI : ScriptedAI
         else
             m_uiMindControlTimer -= uiDiff;
     }
+
+    void HandleScepterRun(uint32 uiDiff)
+    {
+        if (!m_pInstance)
+            return;
+
+        // Handle Nefarius' taunts throughout the run
+        if (nextScepterTauntTime <= uiDiff)
+        {
+            switch (scepterTauntID)
+            {
+                case 0:
+                    DoScriptText(SAY_SCEPTER_TAUNT_0, m_creature);
+                    DoScriptText(SAY_SCEPTER_RUN_LAUGHTER, m_creature);
+                    break;
+
+                case 1:
+                    DoScriptText(SAY_SCEPTER_TAUNT_1, m_creature);
+                    break;
+
+                case 2:
+                    DoScriptText(SAY_SCEPTER_TAUNT_2, m_creature);
+                    break;
+
+                case 3:
+                    DoScriptText(SAY_SCEPTER_TAUNT_3, m_creature);
+                    break;
+
+                case 4:
+                    DoScriptText(SAY_SCEPTER_TAUNT_4, m_creature);
+                    break;
+
+            }
+
+            scepterTauntID ++;
+            nextScepterTauntTime = SCEPTER_TAUNT_INTERVAL;
+
+        }
+        else
+            nextScepterTauntTime -= uiDiff;
+
+        // Check overall Scepter Run time
+        if (scepterRunTime <= uiDiff)
+            FailScepterRun();
+        else
+            scepterRunTime -= uiDiff;
+
+
+        m_pInstance->SetData(DATA_SCEPTER_RUN_TIME, scepterRunTime);
+    }
+
+    void FailScepterRun()
+    {
+        if (nullptr == m_pInstance)
+            return;
+
+        scepterRun =  false;
+        watchScepterRun = false;
+        m_pInstance->SetData(TYPE_SCEPTER_RUN, FAIL);
+
+        DoScriptText(SAY_SCEPTER_FAIL, m_creature);
+        DoScriptText(SAY_SCEPTER_FAIL_LAUGHTER, m_creature);
+    }
 };
+
 
 CreatureAI* GetAI_boss_victor_nefarius(Creature* creature)
 {

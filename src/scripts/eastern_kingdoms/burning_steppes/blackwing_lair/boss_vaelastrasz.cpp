@@ -83,7 +83,9 @@ enum
     MODEL_INVISIBLE             = 11686,
 
     GOSSIP_TEXT_VAEL_1          = 7156,
-    GOSSIP_TEXT_VAEL_2          = 7256
+    GOSSIP_TEXT_VAEL_2          = 7256,
+
+    QUEST_NEFARIUS_CORRUPTION   = 8730
 };
 
 // Coords used to spawn Nefarius at the throne
@@ -107,8 +109,8 @@ struct boss_vaelAI : public ScriptedAI
 
     ScriptedInstance* m_pInstance;
 
-    uint32 m_uiSpeachTimer;
-    uint32 m_uiSpeachNum;
+    uint32 m_uiSpeechTimer;
+    uint32 m_uiSpeechNum;
     uint32 m_uiCleaveTimer;
     uint32 m_uiFlameBreathTimer;
     uint32 m_uiFireNovaTimer;
@@ -121,7 +123,7 @@ struct boss_vaelAI : public ScriptedAI
     uint32 m_uiIntroPhase;
     bool m_bIntroEvent;
     bool m_bHasYelled;
-    bool m_bIsDoingSpeach;
+    bool m_bIsDoingSpeech;
     bool m_bCastedEssenceOfTheRed;
     bool m_bCastedbanishment;
     bool m_bFlagSet;
@@ -131,8 +133,8 @@ struct boss_vaelAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiSpeachTimer                  = 0;
-        m_uiSpeachNum                    = 0;
+        m_uiSpeechTimer                  = 0;
+        m_uiSpeechNum                    = 0;
         m_uiCleaveTimer                  = 6000;
         m_uiFlameBreathTimer             = 8000;
         m_uiBurningAdrenalineCasterTimer = 15000;
@@ -143,7 +145,7 @@ struct boss_vaelAI : public ScriptedAI
         m_uiIntroTimer = 0;
         m_uiIntroPhase = 0;
         m_bHasYelled = false;
-        m_bIsDoingSpeach = false;
+        m_bIsDoingSpeech = false;
         m_bCastedEssenceOfTheRed = false;
         m_bCastedbanishment = false;
         m_bFlagSet = false;
@@ -156,19 +158,27 @@ struct boss_vaelAI : public ScriptedAI
         m_creature->SetHealthPercent(30.0f);
     }
 
-    void BeginSpeach(Unit* target)
+    void BeginSpeech(Unit* target)
     {
         ASSERT(target);
-        // Stand up and begin speach
+        // Stand up and begin speech
         m_playerGuid = target->GetObjectGuid();
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
         // 10 seconds
         DoScriptText(SAY_LINE_1, m_creature);
 
-        m_uiSpeachTimer = 10000;
-        m_uiSpeachNum = 0;
-        m_bIsDoingSpeach = true;
+        m_uiSpeechTimer = 10000;
+        m_uiSpeechNum = 0;
+        m_bIsDoingSpeech = true;
+
+        if (nullptr == m_pInstance)
+            return;
+
+        // If Nefarius's Corruption has not been accepted by this point, fail Scepter Run
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == NOT_STARTED)
+            m_pInstance->SetData(TYPE_SCEPTER_RUN, FAIL);
+
     }
 
     void KilledUnit(Unit* pVictim)
@@ -306,25 +316,25 @@ struct boss_vaelAI : public ScriptedAI
                 m_uiSelectableTimer -= uiDiff;
         }
 
-        // Speach
-        if (m_bIsDoingSpeach)
+        // Speech
+        if (m_bIsDoingSpeech)
         {
-            if (m_uiSpeachTimer < uiDiff)
+            if (m_uiSpeechTimer < uiDiff)
             {
-                switch (m_uiSpeachNum)
+                switch (m_uiSpeechNum)
                 {
                     case 0:
                         // 16 seconds till next line
                         DoScriptText(SAY_LINE_2, m_creature);
-                        m_uiSpeachTimer = 16000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 16000;
+                        ++m_uiSpeechNum;
                         break;
                     case 1:
                         // This one is actually 16 seconds but we only go to 10 seconds because he starts attacking after he says "I must fight this!"
-                        // 12 sec. French version (TODO: Change back to 10 seconds since we use the English version?)
+                        // (French version should start attacking after 12 seconds)
                         DoScriptText(SAY_LINE_3, m_creature);
-                        m_uiSpeachTimer = 12000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 10000;
+                        ++m_uiSpeechNum;
                         break;
                     case 2:
                         m_creature->setFaction(FACTION_BLACK_DRAGON);
@@ -336,13 +346,13 @@ struct boss_vaelAI : public ScriptedAI
                             DoCastSpellIfCan(m_creature, SPELL_ESSENCE_OF_THE_RED);
                             m_bCastedEssenceOfTheRed = true;
                         }
-                        m_uiSpeachTimer = 0;
-                        m_bIsDoingSpeach = false;
+                        m_uiSpeechTimer = 0;
+                        m_bIsDoingSpeech = false;
                         break;
                 }
             }
             else
-                m_uiSpeachTimer -= uiDiff;
+                m_uiSpeechTimer -= uiDiff;
         }
 
         // Return since we have no target
@@ -443,7 +453,7 @@ bool GossipSelect_boss_vael(Player* pPlayer, Creature* pCreature, uint32 uiSende
         case GOSSIP_ACTION_INFO_DEF+2: // Fight Time
             pPlayer->CLOSE_GOSSIP_MENU();
             if (boss_vaelAI* pVaelAI = dynamic_cast<boss_vaelAI*>(pCreature->AI()))
-                pVaelAI->BeginSpeach((Unit*)pPlayer);
+                pVaelAI->BeginSpeech((Unit*)pPlayer);
             break;
     }
 
@@ -452,13 +462,47 @@ bool GossipSelect_boss_vael(Player* pPlayer, Creature* pCreature, uint32 uiSende
 
 bool GossipHello_boss_vael(Player* pPlayer, Creature* pCreature)
 {
+    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+
+    if (nullptr == m_pInstance)
+        return false;
+
+    if (m_pInstance->GetData(TYPE_RAZORGORE) != DONE && !pPlayer->isGameMaster())
+        return false;
+
     if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
+        if (m_pInstance->GetData(TYPE_SCEPTER_RUN) == NOT_STARTED)
+            pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_VAEL_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXT_VAEL_1, pCreature->GetObjectGuid());
 
     return true;
+}
+
+bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+{
+    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+
+    if (nullptr == m_pInstance)
+        return false;
+
+    if (pQuest->GetQuestId() == QUEST_NEFARIUS_CORRUPTION)
+    {
+            // Only one may accept
+            if (m_pInstance->GetData(TYPE_SCEPTER_RUN) != NOT_STARTED)
+            {
+                pPlayer->FailQuest(QUEST_NEFARIUS_CORRUPTION);
+                return false;
+            }
+
+            m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
+            m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
+
+            return true;
+    }
+
+    return false;
 }
 
 CreatureAI* GetAI_boss_vael(Creature* pCreature)
@@ -693,6 +737,7 @@ void AddSC_boss_vael()
     pNewScript->GetAI = &GetAI_boss_vael;
     pNewScript->pGossipHello = &GossipHello_boss_vael;
     pNewScript->pGossipSelect = &GossipSelect_boss_vael;
+    pNewScript->pQuestAcceptNPC = &QuestAccept_vaelastrasz;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

@@ -775,16 +775,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Creature*)unitTarget)->ForcedDespawn(100);
                     return;
                 }
-                case 10254:                                 // Stone Dwarf Awaken Visual
-                {
-                    if (m_caster->GetTypeId() != TYPEID_UNIT)
-                        return;
-
-                    // see spell 10255 (aura dummy)
-                    m_caster->clearUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT);
-                    m_caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    return;
-                }
                 case 12162:                                 // Deep wounds
                 case 12850:                                 // (now good common check for this spells)
                 case 12868:
@@ -1801,10 +1791,18 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             else
                 m_caster->CastSpell(unitTarget, 11637, true, m_CastItem, nullptr, m_originalCasterGUID);
             return;
-        // Linken's Boomerang: 3% chance proc
+        // Linken's Boomerang: 10% chance to proc stun, 3% chance to proc disarm (dubious numbers)
         case 15712:
-            if (urand(0, 30))
+            if (triggered_spell_id == 15753 && urand(0, 10))
+            {
                 return;
+            }
+
+            if (triggered_spell_id == 15752 && urand(0, 30))
+            {
+                return;
+            }
+
             break;
     }
     switch (triggered_spell_id)
@@ -2822,7 +2820,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
     // Pierre de sort dissipe sorts negatifs et positifs.
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_SPELLSTONE>())
         checkFaction = false;
-    bool friendly = checkFaction ? unitTarget->IsFriendlyTo(m_caster) : false;
+    bool friendly = checkFaction && !isReflected ? unitTarget->IsFriendlyTo(m_caster) : false;
     // Create dispel mask by dispel type
     int32 dispel_type = m_spellInfo->EffectMiscValue[eff_idx];
     uint32 dispelMask  = GetDispellMask(dispel_type < 0 ? DISPEL_ALL : DispelType(dispel_type));
@@ -3105,6 +3103,14 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     *m_selfContainer = nullptr;
                     m_caster->CastSpell(summon, m_spellInfo->EffectTriggerSpell[1], true);
+                    break;
+                // Target Dummy
+                case 4071:
+                case 4072:
+                case 19805:
+                    summon->lootForCreator = true;
+                    summon->SetCreatorGuid(m_caster->GetObjectGuid());
+                    summon->SetLootRecipient(m_caster);
                     break;
             }
 

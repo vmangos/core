@@ -29,14 +29,6 @@ EndContentData */
 #include "scriptPCH.h"
 #include "uldaman.h"
 
-enum eSpells
-{
-    SPELL_CRYSTALLINE_SLUMBER = 3636,
-    SPELL_TRAMPLE = 5568,
-    SPELL_SELF_DESTRUCT = 9874,
-    SPELL_STONED = 10255,
-};
-
 /*######
  ## go_keystone_chamber
  ######*/
@@ -46,8 +38,14 @@ bool GOHello_go_keystone_chamber(Player* pPlayer, GameObject* pGo)
     ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData();
 
     if (!pInstance)
+    {
         return false;
+    }
 
+    if (pPlayer)
+    {
+        pInstance->SetData64(0, pPlayer->GetGUID()); // Ironaya first victim
+    }
     pInstance->SetData(DATA_IRONAYA_SEAL, IN_PROGRESS);
 
     return false;
@@ -57,70 +55,58 @@ struct mob_stone_keeperAI : public ScriptedAI
 {
     mob_stone_keeperAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->CastSpell(m_creature, SPELL_STONED, false);
+        instance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
-
+    
+    ScriptedInstance* instance;
+    
     uint32 m_uiTrample_Timer;
 
     void Reset()
     {
+        if (!instance)
+        {
+            return;
+        }
+        if (instance->GetData(DATA_STONE_KEEPERS) != FAIL)
+        {
+            instance->SetData(DATA_STONE_KEEPERS, FAIL);
+        }
         m_uiTrample_Timer = urand(4000, 9000);
     }
 
-    void Aggro(Unit* pWho)
+    void EnterEvadeMode()
     {
-        if (m_creature->HasAura(10255))
-            m_creature->RemoveAurasDueToSpell(10255);
+        if (Unit* target = me->SelectNearestHostileUnitInAggroRange(true))
+        {
+            AttackStart(target);
+            return;
+        }
+        Reset();
     }
 
     void JustDied(Unit* pWho)
     {
-        m_creature->CastSpell(m_creature, SPELL_SELF_DESTRUCT, false);
-
-        /** Unlock another Stone Keeper */
-        std::list<Creature*> m_StoneKeeperList;
-        GetCreatureListWithEntryInGrid(m_StoneKeeperList, m_creature, NPC_STONE_KEEPER, 30.0f);
-        for (std::list<Creature*>::iterator it = m_StoneKeeperList.begin(); it != m_StoneKeeperList.end(); ++it)
+        if (!instance)
         {
-            Creature* target;
-            if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
-                target = pInstance->GetCreature((*it)->GetObjectGuid());
-            else
-                return;
-
-            /** Check if a creature is available to become alive */
-            if (!target || !target->isAlive() || target->getFaction() == 14)
-                continue;
-
-            /** Creature become alive */
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE);
-            target->setFaction(14);
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_STUNNED);
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-            if (target->HasAura(10255))
-                target->RemoveAurasDueToSpell(10255);
-            SetCombatMovement(true);
-            if (Unit* victim = target->SelectNearestTarget(18.0f))
-                target->AI()->AttackStart(victim);
-            return; // Only one Creature per action
+            return;
         }
-        m_StoneKeeperList.clear();
-        /** Open the Altar's door */
-        if (ScriptedInstance* pInstance = (ScriptedInstance*)m_creature->GetInstanceData())
-            pInstance->SetData(DATA_ALTAR_DOORS, DONE);
+        instance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);
     }
 
     void UpdateAI(const uint32 diff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        {
             return;
-
+        }
         if (m_uiTrample_Timer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRAMPLE) == CAST_OK)
+            {
                 m_uiTrample_Timer = urand(4000, 10000);
+            }
         }
         else m_uiTrample_Timer -= diff;
 
@@ -156,14 +142,16 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        {
             return;
+        }
 
         //Cslumber_Timer
         if (Cslumber_Timer < diff)
         {
             //Cast
-            // DoCastSpellIfCan(m_creature->getVictim(),SPELL_CSLUMBER);
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_CSLUMBER, true);
+            // DoCastSpellIfCan(m_creature->getVictim(),SPELL_CRYSTALLINE_SLUMBER);
+            m_creature->CastSpell(m_creature->getVictim(), SPELL_CRYSTALLINE_SLUMBER, false);
 
             //Stop attacking target thast asleep and pick new target
             Cslumber_Timer = 28000;
@@ -171,11 +159,14 @@ struct mob_jadespine_basiliskAI : public ScriptedAI
             Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
             if (!Target || Target == m_creature->getVictim())
+            {
                 Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+            }
 
             if (Target)
+            {
                 m_creature->TauntApply(Target);
-
+            }
         }
         else Cslumber_Timer -= diff;
 
@@ -195,7 +186,9 @@ CreatureAI* GetAI_mob_jadespine_basilisk(Creature* pCreature)
 bool GossipHello_npc_lore_keeper_of_norgannon(Player* pPlayer, Creature* pCreature)
 {
     if (pPlayer->GetQuestStatus(2278) == QUEST_STATUS_INCOMPLETE)
+    {
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Who are the Earthen?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    }
 
 //    pPlayer->SEND_GOSSIP_MENU(1079, pCreature->GetGUID());
 
@@ -281,60 +274,85 @@ bool GossipSelect_npc_lore_keeper_of_norgannon(Player* pPlayer, Creature* pCreat
 bool OnTrigger_at_map_chamber(Player* pPlayer, const AreaTriggerEntry *at)
 {
     if (pPlayer->GetQuestStatus(QUEST_HIDDEN_CHAMBER) == QUEST_STATUS_INCOMPLETE)
+    {
         pPlayer->AreaExploredOrEventHappens(QUEST_HIDDEN_CHAMBER);
+    }
     return true;
 }
-
-enum
-{
-    SPELL_ULDAMAN_BOSS_OBJECT_VISUAL        = 11206,
-    TIMER_KEEPERS_SUMMON                    = 3000,
-};
 
 class go_altar_of_the_keepersAI : public GameObjectAI
 {
 public:
     go_altar_of_the_keepersAI(GameObject* gobj) : GameObjectAI(gobj)
     {
+        instance = (ScriptedInstance*)gobj->GetInstanceData();
         Reset();
     }
+
+    ScriptedInstance* instance;
+
     bool _eventStarted;
-    bool _eventFinished;
     uint32 _summonTimer;
     void Reset()
     {
         _eventStarted = false;
-        _eventFinished = false;
-        _summonTimer  = TIMER_KEEPERS_SUMMON;
+        _summonTimer  = TIMER_ALTAR_SUMMON;
+        instance->SetData(DATA_KEEPERS_ALTAR, NOT_STARTED);
     }
+    
+    uint32 CountSummoners()
+    {
+        const Map::PlayerList& players = me->GetMap()->GetPlayers();
+        uint32 count = 0;
+        for (auto it = players.begin(); it != players.end(); ++it)
+        {
+            if (Player* player = it->getSource())
+            {
+                if (Spell* spell = player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
+                {
+                    if (spell->m_spellInfo->Id == SPELL_ALTAR_SUMMONING_VISUAL)
+                    {
+                        ++count;
+                    }
+                }
+            }
+        }
+        return count;
+    }
+    
     void UpdateAI(const uint32 diff)
     {
-        if (_eventFinished)
-            return;
-        if (!_eventStarted)
+        if (!instance || instance->GetData(DATA_ALTAR_DOORS) == DONE ||
+            instance->GetData(DATA_STONE_KEEPERS) == DONE ||
+            instance->GetData(DATA_STONE_KEEPERS) == IN_PROGRESS)
         {
-            const Map::PlayerList& players = me->GetMap()->GetPlayers();
-            uint32 count = 0;
-            for (Map::PlayerList::const_iterator it = players.begin(); it != players.end(); ++it)
-                if (Player* player = it->getSource())
-                    if (Spell* spell = player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                        if (spell->m_spellInfo->Id == SPELL_ULDAMAN_BOSS_OBJECT_VISUAL)
-                            ++count;
-            if (count >= 3)
-                _eventStarted = true;
             return;
         }
-        if (_summonTimer <= diff)
+        if (!_eventStarted)
         {
-            _summonTimer = TIMER_KEEPERS_SUMMON;
-            if (InstanceData* instance = me->GetInstanceData())
+            if (CountSummoners() >= NEEDED_SUMMONERS)
             {
-                me->GetInstanceData()->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);
-                _eventFinished = true;
+                instance->SetData(DATA_KEEPERS_ALTAR, IN_PROGRESS); // activate the altar
+                _eventStarted = true;
+            }
+            return;
+        }
+        else if (CountSummoners() >= NEEDED_SUMMONERS)
+        {
+            if (_summonTimer <= diff)
+            {
+                Reset();
+                instance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);
+            }
+            else
+            {
+                _summonTimer -= diff;
             }
         }
         else
-            _summonTimer -= diff;
+        {
+            Reset();
+        }
     }
 };
 
@@ -348,7 +366,7 @@ struct AnnoraAI : public ScriptedAI
     AnnoraAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_creature->SetVisibility(VISIBILITY_OFF);
-        m_creature->setFaction(35);
+        m_creature->setFaction(FACTION_STONED);
         m_uiNbScorpion = 0;
         isSpawned = false;
         Reset();
@@ -373,10 +391,12 @@ struct AnnoraAI : public ScriptedAI
             m_uiNbScorpion = 0;
 
             GetCreatureListWithEntryInGrid(m_EscortList, m_creature, 7078, 30.0f);
-            for (std::list<Creature*>::iterator it = m_EscortList.begin(); it != m_EscortList.end(); ++it)
+            for (const auto& it : m_EscortList)
             {
-                if ((*it)->isAlive())
+                if (it->isAlive())
+                {
                     m_uiNbScorpion++;
+                }
             }
             m_EscortList.clear();
 
@@ -388,9 +408,10 @@ struct AnnoraAI : public ScriptedAI
             }
         }
 
-
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        {
             return;
+        }
 
         DoMeleeAttackIfReady();
     }
@@ -432,12 +453,16 @@ struct EarthenUldamanAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        {
             return;
+        }
 
         if (m_uiFireShield_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_FIRE_SHIELD, true) == CAST_OK)
+            {
                 m_uiFireShield_Timer = 15000;
+            }
         }
         else
             m_uiFireShield_Timer -= uiDiff;
@@ -447,8 +472,7 @@ struct EarthenUldamanAI : public ScriptedAI
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BUFFET);
             m_uiFlame_Timer = 5700;
         }
-        else
-            m_uiFlame_Timer -= uiDiff;
+        else m_uiFlame_Timer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }

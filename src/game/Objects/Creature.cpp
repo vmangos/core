@@ -721,14 +721,9 @@ void Creature::StopGroupLoot()
 
 void Creature::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 {
+    m_regenTimer -= update_diff;
+
     if (m_regenTimer > 0)
-    {
-        if (update_diff >= m_regenTimer)
-            m_regenTimer = 0;
-        else
-            m_regenTimer -= update_diff;
-    }
-    if (m_regenTimer != 0)
         return;
 
     if (!isInCombat() || IsPolymorphed() || skipCombatCheck)
@@ -792,7 +787,7 @@ void Creature::RegenerateHealth()
         addvalue *= 4; // Le timer tick toutes les 4 secondes.
     }
     else
-        addvalue = maxValue / 3;
+        addvalue = maxValue / 10;
 
     ModifyHealth(addvalue);
 }

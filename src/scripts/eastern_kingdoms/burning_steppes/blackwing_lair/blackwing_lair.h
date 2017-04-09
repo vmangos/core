@@ -16,7 +16,8 @@ enum
     TYPE_CHROMAGGUS             = 6,
     TYPE_NEFARIAN               = 7,
     TYPE_VAEL_EVENT             = 8,
-    MAX_ENCOUNTER               = 9,
+    TYPE_SCEPTER_RUN            = 9,
+    MAX_ENCOUNTER               = 10,
 
     DATA_RAZORGORE_GUID         = 0,
     DATA_VAELASTRASZ_GUID       = 1,
@@ -42,7 +43,9 @@ enum
     DATA_DOOR_CHROMAGGUS_EXIT   = 21,
     DATA_DOOR_CHROMAGGUS_SIDE   = 22,
     DATA_DOOR_NEFARIAN          = 23,
-    MAX_DATAS                   = 24
+    DATA_SCEPTER_CHAMPION       = 24,
+    DATA_SCEPTER_RUN_TIME       = 25,
+    MAX_DATAS                   = 26
 };
 
 #endif

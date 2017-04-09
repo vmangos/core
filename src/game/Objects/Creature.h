@@ -622,6 +622,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool lootForBody;
         bool lootForSkin;
         uint32 skinningForOthersTimer; // If == 0, then everyone can skin
+        bool lootForCreator = false;
 
         ObjectGuid GetLootRecipientGuid() const { return m_lootRecipientGuid; }
         uint32 GetLootGroupRecipientId() const { return m_lootGroupRecipientId; }

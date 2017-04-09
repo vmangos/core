@@ -112,6 +112,7 @@ public:
     const char* GetName() const { return name.c_str(); }
     uint32 GetZoneId() const { return zoneId; }
     uint32 GetAreaId() const { return areaId; }
+    uint32 GetCachedZoneId() const { return zoneId; }
     uint8 getClass() const { return classId; }
     uint8 getRace() const { return raceId; }
     uint32 getLevel() const { return level; }
