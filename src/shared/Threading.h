@@ -108,4 +108,147 @@ namespace ACE_Based
             static ThreadPriority m_TpEnum;
     };
 }
+
+
+#include <vector>
+#include <stack>
+#include <thread>
+#include <mutex>
+#include <condition_variable>
+#include <future>
+
+class ThreadPool
+{
+public:
+    /**
+     * @brief ThreadPool allocates memory, use ThreadPool::start() to spawn the threads.
+     * @param numThreads the number of threads that will be created.
+     */
+    ThreadPool(int numThreads) :
+        m_size(numThreads)
+    {
+        m_workers.reserve(m_size);
+    }
+
+    /**
+     * @brief start creates and start the treads.
+     */
+    void start()
+    {
+        if (!m_workers.empty())
+            return;
+        for (auto i = 0; i < m_size; i++)
+            m_workers.emplace_back([this,i](){this->workerLoop(i);});
+    }
+
+    /**
+     * @brief setWorkload set the workload, discards current one
+     * @param workload
+     * @param safe if true, will behave threadsafe
+     */
+    void setWorkload(std::stack<std::future<void>>&& workload, bool safe = false)
+    {
+        std::unique_lock<std::mutex> lock;
+        if (safe)
+            lock = std::unique_lock<std::mutex>(m_mutex);
+
+        m_workload = std::move(workload);
+        m_waitForWork.notify_one();
+    }
+
+    /**
+     * @brief waitForFinished
+     */
+    void waitForFinished()
+    {
+        std::unique_lock<std::mutex> lock(m_mutex);
+        while(!m_workload.empty() || m_activeWorkers)
+            m_waitForFinished.wait(lock);
+    }
+
+    /**
+     * @brief isWorking
+     * @return true if some thread is still running a task
+     */
+    bool isWorking()
+    {
+        return m_activeWorkers != 0;
+    }
+
+    /**
+     * @brief isStarted
+     * @return true if threads were created
+     */
+    bool isStarted()
+    {
+        return m_workers.size() > 0;
+    }
+
+    /**
+     * @brief size
+     * @return the number of threads that are/will be created
+     */
+    int size()
+    {
+        return m_size;
+    }
+
+    /**
+     * @brief operator << add a task to the workload
+     * @param future
+     * @return
+     */
+    ThreadPool& operator<<(std::future<void> &&future)
+    {
+        m_workload.emplace(std::move(future));
+    }
+
+    /**
+     * @brief operator << add a work to the workload
+     * @param f
+     * @return
+     */
+    ThreadPool& operator<<(auto f)
+    {
+        m_workload.emplace(wrap(f));
+    }
+
+    /**
+     * @brief wrap convenient function to wrap a function properly.
+     * @param f
+     * @return
+     */
+    static inline std::future<void> wrap(auto f) {
+        return async(std::launch::deferred, f);
+    }
+
+private:
+    int m_size;
+    std::vector<std::thread> m_workers;
+    std::mutex m_mutex;
+    u_int32_t m_activeWorkers = 0;
+    std::condition_variable m_waitForWork;
+    std::condition_variable m_waitForFinished;
+    std::stack<std::future<void>> m_workload;
+    void workerLoop(int id){ // WORKER THREAD LOOP
+        while(true)
+        {
+            std::unique_lock<std::mutex> lock(m_mutex); //locked!
+            while(m_workload.empty()) //wait for work
+                m_waitForWork.wait(lock);
+
+            m_activeWorkers++; //increment before to avoid having 0 workers with epty stack.
+            std::future<void> future = std::move(m_workload.top()); //get some work ...
+            m_workload.pop(); //... and remove it from available
+
+            m_waitForWork.notify_one(); // we're done picking a job, wake another worker
+            lock.unlock(); // unlock before starting to work
+            future.get(); // do work
+            lock.lock();
+            m_activeWorkers--; // we're done working ...
+            m_waitForFinished.notify_one(); // ... notify it
+            //we don't need to unlock, unique_lock lock will unlock the mutex on destruction
+        }
+    }
+};
 #endif
