@@ -150,15 +150,9 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         switch (pSummoned->GetEntry())
         {
         case NPC_OURO_TRIGGER:
-            float rx;
-            float ry;
-            float rz;
-            m_ouroTriggerGuid = pSummoned->GetObjectGuid();
-            pSummoned->GetRandomPoint(m_StartingLoc.coord_x,
-                                      m_StartingLoc.coord_y,
-                                      m_StartingLoc.coord_z,
-                                      50.0f, rx, ry, rz);
-            pSummoned->NearTeleportTo(rx, ry, rz, 0);
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                m_creature->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+            break;
         }
     }
 
@@ -433,11 +427,12 @@ struct npc_dirt_moundAI : public ScriptedAI
 
     uint32 m_uiChangeTargetTimer;
     ObjectGuid TargetGUID;
+    ObjectGuid CurrentTargetGUID;
 
     void Reset()
     {
-        m_uiChangeTargetTimer = urand(0, 5000);
 	TargetGUID.Clear();
+	CurrentTargetGUID.Clear();
 
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
     }
@@ -452,21 +447,27 @@ struct npc_dirt_moundAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (m_uiChangeTargetTimer < uiDiff)
-	{
-	    if (Unit* pTarget = m_creature->GetMap()->GetUnit(TargetGUID))
-	    {
+        Unit *pTarget = m_creature->GetMap()->GetUnit(CurrentTargetGUID);
+        const bool bForceChangeTarget = !pTarget || pTarget->isDead()
+            || pTarget->IsImmuneToDamage(SPELL_SCHOOL_MASK_NATURE);
+
+        if (bForceChangeTarget || m_uiChangeTargetTimer < uiDiff)
+        {
+            CurrentTargetGUID.Clear();
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit(TargetGUID))
+            {
                 m_creature->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+                CurrentTargetGUID = TargetGUID;
                 TargetGUID.Clear();
-	    }
-	    else
-	    {
-	        m_creature->GetMotionMaster()->MoveRandom();
-	    }
-	    m_uiChangeTargetTimer = urand(0, 10000);
-	}
-	else
-	  m_uiChangeTargetTimer -= uiDiff;
+            }
+            else
+            {
+                m_creature->GetMotionMaster()->MoveRandom();
+            }
+            m_uiChangeTargetTimer = urand(0, 10000);
+        }
+        else
+            m_uiChangeTargetTimer -= uiDiff;
     }
 };
 
@@ -485,7 +486,8 @@ struct npc_ouro_scarabAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *who)
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim())
+        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim()
+            && !urand(0, 5))
 	{
             AttackStart(who);
 	}
@@ -522,10 +524,6 @@ struct go_sandworm_baseAI: public GameObjectAI
         {
             m_bActive = false;
             me->SendGameObjectCustomAnim(me->GetObjectGuid());
-            /*
-            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_IN_USE);
-            me->SetLootState(GO_ACTIVATED);
-            */
         }
         else
         {
