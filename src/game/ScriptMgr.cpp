@@ -1581,7 +1581,15 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget)
     if (pData->SoundId)
     {
         if (GetSoundEntriesStore()->LookupEntry(pData->SoundId))
-            pSource->PlayDirectSound(pData->SoundId);
+        {
+            if(pData->Type == CHAT_TYPE_ZONE_YELL)
+            {
+                if(Map* pZone = pSource->GetMap())
+                    pZone->PlayDirectSoundToMap(pData->SoundId);
+            }
+            else
+                pSource->PlayDirectSound(pData->SoundId);
+        }
         else
             sLog.outError("DoScriptText entry %i tried to process invalid sound id %u.", iTextEntry, pData->SoundId);
     }
