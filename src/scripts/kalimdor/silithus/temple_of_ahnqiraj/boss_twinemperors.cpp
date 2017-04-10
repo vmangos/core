@@ -201,6 +201,8 @@ struct boss_twinemperorsAI : public ScriptedAI
     virtual void UpdateTeleportToMyBrother(uint32) {}
     virtual void TryHealBrother(uint32 diff) {}
 
+    ObjectGuid closestTargetAfterTP;
+
     float howLong;
     boss_twinemperorsAI(Creature* pCreature) : 
         ScriptedAI(pCreature)
@@ -349,37 +351,24 @@ struct boss_twinemperorsAI : public ScriptedAI
         // The rest of this script requires an instance, less managment and code duplication, and a bit of lazyness
         if (!m_pInstance)
             return;
-
-        /*
-        // If we just teleported the emperors won't do shit for a while
-        // todo: do they reset cooldowns on teleport to something, or just keep on going once
-        // the /afking is complete?
+      
         if (justTeleported) {
-            if (justTeleportedTimer <= diff) {
-                OnEndTeleport();
-            }
-            else {
-                justTeleportedTimer -= diff;
-                
-                // These must be called here as well, since selectHostileTarget || getVictim will
-                // fail during TP stun effect
-                CheckEnrage(diff);
-                UpdateTeleportToMyBrother(diff);
-                return;
-            }
-        }
-        */
 
-        // Return since we have no target.
-        // If we just teleported, selectHostileTarget should fail, so skip the check in that case
-        if (!justTeleported) {
-            if ( !m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
-                return;
+            // Delaying selection of new closest player until first update after TP
+            // to be sure we will actually select a target on the new location.
+            // (in other words, do it here instead of in OnStartTeleport())
+            if (closestTargetAfterTP.IsEmpty()) {
+                //Making sure everyone is contained in threatlist
+                m_creature->SetInCombatWithZone();
+                //todo: any potential issues with using GetNearestVictimInRange and 300 maxrange?
+                if (Unit* closestPlayer = m_creature->GetNearestVictimInRange(0, 300.0f)) {
+                    closestTargetAfterTP = closestPlayer->GetGUID();
+                    m_creature->getThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
+                }
+                else {
+                    sLog.outBasic("Twins unable to select closest target during TP stun");
+                }
             }
-        }
-        
-        
-        if (justTeleported) {
             howLong += diff;
             if (justTeleportedTimer <= diff) {
                 OnEndTeleport();
@@ -388,16 +377,24 @@ struct boss_twinemperorsAI : public ScriptedAI
                 justTeleportedTimer -= diff;
             }
         }
+        else {
+            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+                return;
+            }
+        }
 
         if (killSayCooldown > 0) {
             killSayCooldown -= diff;
         }
 
+        // We keep calling all of these updates also when TP-stunned,
+        // but the functions themself will delay the actual spells until
+        // they are no longer TP-stunned
         CheckEnrage(diff);
         UpdateTeleportToMyBrother(diff);
-        //HandleDeadBugs(diff); // they respawn by themself...
         HandleBugSpell(diff);
         TryHealBrother(diff);
+        //HandleDeadBugs(diff); // they respawn by themself...
         
         // We skip updating emperor-specific spells during teleport stun
         if (!justTeleported) {
@@ -421,9 +418,11 @@ struct boss_twinemperorsAI : public ScriptedAI
         justTeleportedTimer = JUST_TELEPORTED_FREEZE;
         m_creature->InterruptNonMeleeSpells(false);
         DoStopAttack();
-        
+        DoResetThreat();
+        closestTargetAfterTP = 0;
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_MSG, true);
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_VISUAL, true);
+        m_creature->addUnitState(UNIT_STAT_ROOT);
     }
 
     // Called JUST_TELEPORTED_FREEZE after teleport happened
@@ -431,11 +430,16 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         sLog.outBasic("End tp stun after %lu ms", (unsigned long)howLong);
         justTeleported = false;
-
-        DoResetThreat();
-        Unit* closestPlayer = m_creature->GetNearestVictimInRange(0, 300.0f);
-        AttackStart(closestPlayer);
-        m_creature->getThreatManager().addThreat(closestPlayer, AFTER_TELEPORT_THREAT);
+        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        
+        if (Player* closestPlayer = m_pInstance->GetMap()->GetPlayer(closestTargetAfterTP)) {
+            closestTargetAfterTP = closestPlayer->GetGUID();
+            AttackStart(closestPlayer);
+        }
+        else {
+            sLog.outBasic("Twins unable to select closest target after TP stun end");
+        }
+        
 
         OnEndTeleportVirtual();
     }
@@ -474,11 +478,10 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     void HandleBugSpell(uint32 diff)
     {
-        // Cant do stuff while stunned, but since stun effect isent really working properly we return manually
-        if (justTeleported)
-            return;
-
         if (bugMutationTimer < diff) {
+            // Wait with doign stuff until after idle
+            if (justTeleported) return;
+
             std::list<Creature*> lUnitList;
             GetCreatureListWithEntryInGrid(lUnitList, m_creature, BUG_TYPE_1, BUG_SPELL_MAX_DIST);
             GetCreatureListWithEntryInGrid(lUnitList, m_creature, BUG_TYPE_2, BUG_SPELL_MAX_DIST);
@@ -532,6 +535,9 @@ struct boss_twinemperorsAI : public ScriptedAI
         //todo: make sure casting berserk actually applies SPELL_BERSERK as aura
         if (EnrageTimer < diff && !m_creature->HasAura(SPELL_BERSERK))
         {
+            // Wait with casting enrage until after TP idle
+            if (justTeleported) return;
+
             // just force-apply berserk if it's time. No dilly-dally. 
             // todo: Does this always work?
             m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
@@ -668,9 +674,10 @@ struct boss_veklorAI : public boss_twinemperorsAI
     void OnEndTeleportVirtual()
     {
         // Seems rather random if he starts with an AB instantly, or delays it
+        // so possibly because the timer is not reset?
         //arcaneBurstTimer = ARCANE_BURST_TP_CD;
 
-        //shadowBoltTimer = 0; // Can instantly cast after TP it seems
+        shadowBoltTimer = 0; 
     }
 
     // Find a random target within blizzardRange, excluding topAggro target
@@ -745,49 +752,102 @@ struct boss_veklorAI : public boss_twinemperorsAI
                 pullDialogueTimer -= diff;
             }
         }
-        
 
         // Always update blizzard and arcane burst, regardless of melee or not
         UpdateBlizzard(diff);
         updateArcaneBurst(diff);
-
+    
+        /*
+        if (!m_creature->SelectHostileTarget())
+            return;
+        */
         Unit* victim = m_creature->getVictim();
-        if (!victim) return;
+        if (!victim) 
+            return;
 
-       
-        if (m_creature->IsWithinMeleeRange(victim) ) {
-            // Looks like VL should prioritize shadowbolt differently if
-            // target is in melee range. He seems to get a random cooldown on it, and meleeing when he can.
-            // https://www.youtube.com/watch?v=SNOmg7kE68U&t=53s
-            // https://www.youtube.com/watch?v=dCrDisOWOjU
-            
-            DoMeleeAttackIfReady();
-
-            if (shadowBoltTimer < diff) {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) {
-                    shadowBoltTimer = urand(SHADOWBOLT_MELEE_MIN_CD, SHADOWBOLT_MELEE_MAX_CD);
-                }
+        bool isMelee = m_creature->IsWithinMeleeRange(victim);
+        bool isInCastRange = m_creature->IsWithinDist(victim, shadowboltRange);
+        float dist = m_creature->GetDistanceToCenter(victim);
+        bool isInLos = m_creature->IsWithinLOS(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ());
+        bool isChasing = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
+        
+        if (isMelee) {
+            // XXX: is this fine even when creature is not in los? How do we chase when in melee, but out of los?
+            if (!DoMeleeAttackIfReady()) {
+                UpdateShadowBolt(diff, true);
             }
             else {
-                shadowBoltTimer -= diff;
+                shadowBoltTimer -= std::min(diff, shadowBoltTimer);
             }
         }
         else {
-            // When not in melee range, there is only a ~2 sec "gcd" on shadowbolt
-            // https://www.youtube.com/watch?v=nHXfSDVX_ZA
-            if (!m_creature->IsWithinDist(m_creature->getVictim(), shadowboltRange)) {
-                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), VEKLOR_DIST, 0);
+            if ((!isInLos || !isInCastRange) && !isChasing) {
+                // should we wait with starting chase until we have finished current cast?
+                DoStartMovement(victim);
+            }
+            else if(isChasing && dist <= VEKLOR_DIST){
+                DoStartNoMovement(victim);
             }
             else {
-                if (shadowBoltTimer < diff) {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) {
-                        shadowBoltTimer = SHADOWBOLT_RANGED_CD;
-                    }
+                UpdateShadowBolt(diff, false);
+            }
+        }
+        return;
+
+        if (isChasing) {
+            if (isInLos && isInCastRange) {
+                
+            }
+        }
+
+
+        if (isInLos) {
+            
+        }
+
+
+        if (isChasing  && isInLos && isInCastRange) {
+            DoStartNoMovement(victim);
+        } 
+        
+        if (!isInCastRange || !isInLos) {
+            DoStartMovement(victim, VEKLOR_DIST);
+        }
+        else if (isMelee && isInLos) {
+            if (!DoMeleeAttackIfReady()) {
+                UpdateShadowBolt(diff, true);
+            }
+            else {
+                shadowBoltTimer -= std::min(diff, shadowBoltTimer);
+            }
+        }
+        else if (isInCastRange && isInLos) {
+            UpdateShadowBolt(diff, false);
+        }
+        //else {
+        //    DoStartMovement(victim, VEKLOR_DIST);
+        //}
+    }
+
+    void UpdateShadowBolt(uint32 diff, bool inMelee) {
+        if (shadowBoltTimer < diff) {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) {
+                if (inMelee) {
+                    // Looks like VL should prioritize shadowbolt differently if
+                    // target is in melee range. He seems to get a random cooldown on it, and meleeing when he can.
+                    // https://www.youtube.com/watch?v=SNOmg7kE68U&t=53s
+                    // https://www.youtube.com/watch?v=dCrDisOWOjU
+                    shadowBoltTimer = urand(SHADOWBOLT_MELEE_MIN_CD, SHADOWBOLT_MELEE_MAX_CD);
                 }
                 else {
-                    shadowBoltTimer -= diff;
+                    // When not in melee range, there is only a ~2 sec "gcd" on shadowbolt
+                    // https://www.youtube.com/watch?v=nHXfSDVX_ZA
+                    shadowBoltTimer = SHADOWBOLT_RANGED_CD;
                 }
             }
+        }
+        else {
+            shadowBoltTimer -= diff;
         }
     }
 
@@ -876,6 +936,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         std::advance(it, candidates.size() - 1);
         return m_creature->GetMap()->GetUnit((*it)->getUnitGuid());
     }
+    
     void UpdateEmperor(uint32 diff)
     {       
         // Vek'nilash goes first, instantly does his yell when we are in combat. 
@@ -883,6 +944,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
             didPullDialogue = true;
             DoScriptText(irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), m_creature);
         }
+
 
         //UnbalancingStrike_Timer
         if (UnbalancingStrike_Timer < diff) {
