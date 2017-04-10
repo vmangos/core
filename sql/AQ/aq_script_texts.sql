@@ -67,9 +67,9 @@ INSERT INTO script_texts (entry, content_default, sound, type, language, emote, 
 (-1531040,'Your heart will explode.',                           8587,4,0,0,'cthun SAY_WHISPER_8'),
 
 -- Viscidus emotes
-(-1531041,'%s begins to slow!',                                 0,2,0,0,'viscidus EMOTE_SLOW'),
-(-1531042,'%s is freezing up!',                                 0,2,0,0,'viscidus EMOTE_FREEZE'),
-(-1531043,'%s is frozen solid!',                                0,2,0,0,'viscidus EMOTE_FROZEN'),
-(-1531044,'%s begins to crack!',                                0,2,0,0,'viscidus EMOTE_CRACK'),
-(-1531045,'%s looks ready to shatter!',                         0,2,0,0,'viscidus EMOTE_SHATTER'),
-(-1531046,'%s explodes!',                                       0,2,0,0,'viscidus EMOTE_EXPLODE');
+(-1531041,'%s begins to slow!',                                 0,3,0,0,'viscidus EMOTE_SLOW'),
+(-1531042,'%s is freezing up!',                                 0,3,0,0,'viscidus EMOTE_FREEZE'),
+(-1531043,'%s is frozen solid!',                                0,3,0,0,'viscidus EMOTE_FROZEN'),
+(-1531044,'%s begins to crack!',                                0,3,0,0,'viscidus EMOTE_CRACK'),
+(-1531045,'%s looks ready to shatter!',                         0,3,0,0,'viscidus EMOTE_SHATTER'),
+(-1531046,'%s explodes!',                                       0,3,0,0,'viscidus EMOTE_EXPLODE');

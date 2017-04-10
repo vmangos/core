@@ -20,5 +20,6 @@ UPDATE gameobject_template SET data1 = 0 WHERE entry = 180745;
 UPDATE creature_template SET `ScriptName`='aq_caelestrasz_ai' WHERE `entry`='15379';
 
 -- npc texts for Caelestrasz in AQ
+DELETE FROM npc_text WHERE ID BETWEEN '40100' AND '40101';
 INSERT INTO npc_text (`ID`, `text0_0`) VALUES ('40100', 'Even if you somehow manage to free us without defeating C\'Thun, we would focus all our powers to see the beast banished back to the hell from whence it came - AT ANY COST.');
 INSERT INTO npc_text (`ID`, `text0_0`) VALUES ('40101', 'Our freedom would have meant nothing if C\'Thun had survived. You are truly a champion of prophecy.');

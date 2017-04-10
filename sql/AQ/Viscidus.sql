@@ -7,17 +7,6 @@ UPDATE creature_template SET minlevel = 63, maxlevel = 63, unit_flags = unit_fla
 -- Viscidus trigger must be hostile (faction 14 = moster) to work, both in viscidus logic and in c'thuns stomach.
 UPDATE creature_template SET faction_A = 14, faction_H= 14 WHERE entry=15922;
 
-
--- Viscidus texts from cmangos
-DELETE FROM script_texts WHERE entry BETWEEN -1531046 AND -1531041;
-INSERT INTO script_texts (entry, content_default, content_loc1, content_loc2, content_loc3, content_loc4, content_loc5, content_loc6, content_loc7, content_loc8, sound, type, language, emote, comment) VALUES
-(-1531046, "%s explodes!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 3, 0, 0, "viscidus EMOTE_EXPLODE"),
-(-1531045, "%s looks ready to shatter!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 3, 0, 0, "viscidus EMOTE_SHATTER"),
-(-1531044, "%s begins to crack!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 3, 0, 0, "viscidus EMOTE_CRACK"),
-(-1531043, "%s is frozen solid!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 3, 0, 0, "viscidus EMOTE_FROZEN"),
-(-1531042, "%s is freezing up!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 3, 0, 0, "viscidus EMOTE_FREEZE"),
-(-1531041, "%s begins to slow!", NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 3, 0, 0, "viscidus EMOTE_SLOW");
-
 -- Summon glob of Viscidus spell target position
 DELETE FROM spell_target_position WHERE id BETWEEN 25865 AND 25884;
 INSERT INTO spell_target_position (id , target_map, target_position_x, target_position_y, target_position_z, target_orientation) VALUES
