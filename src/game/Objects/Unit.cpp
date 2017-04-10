@@ -2982,7 +2982,7 @@ int32 Unit::MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* s
 //   Parry
 // For spells
 //   Resist
-SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool CanReflect, Spell* spellPtr)
+SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool CanReflect, Spell* spellPtr)
 {
     // Return evade for units in evade mode
     if (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
@@ -2994,7 +2994,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if (IsPositiveSpell(spell->Id, this, pVictim))
+    if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex))
         return SPELL_MISS_NONE;
 
     // Check for immune (use charges)
