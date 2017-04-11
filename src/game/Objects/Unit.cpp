@@ -5587,6 +5587,11 @@ void Unit::AttackedBy(Unit* attacker)
     // trigger AI reaction
     if (((Creature*)this)->AI())
         ((Creature*)this)->AI()->AttackedBy(attacker);
+
+    // trigger owner AI reaction
+    if(Unit* owner = GetCharmerOrOwner())
+        if (owner->IsCreature() && ((Creature*)owner)->AI()){
+            ((Creature*)owner)->AI()->AttackedBy(attacker);
 }
 
 bool Unit::AttackStop(bool targetSwitch /*=false*/)

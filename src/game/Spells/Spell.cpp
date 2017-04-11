@@ -1280,10 +1280,14 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
     if (!unit)
         return;
 
-    if (!effectMask)
-        return;
-
     Unit* realCaster = GetAffectiveCaster();
+
+    if (!effectMask)
+    {
+        if (realCaster && !unit->isInCombat())
+            unit->AttackedBy(realCaster);
+        return;
+    }
 
     // Nostalrius: IsAuraResist pour les ModMechanicResistance des effets.
     if (IsSpellAppliesAura(m_spellInfo, effectMask) && unit->IsAuraResist(m_spellInfo))
