@@ -20,7 +20,7 @@
 /* ScriptData
 SDName: Boss_Twinemperors
 SD%Complete: 
-SDComment: 
+SDComment: uncertain which dialogue should be used on enrage
 SDCategory: Temple of Ahn'Qiraj
 Rewrtten by Gemt
 EndScriptData */
@@ -29,9 +29,7 @@ EndScriptData */
 #include "temple_of_ahnqiraj.h"
 
 
-static const uint32 PULL_RANGE      = 50;
 
-// todo: uncertain which dialogue should be used on enrage, wowwiki does not add up with db scripts
 
 enum eSpells {
     SPELL_BERSERK               = 27680, // todo: was 26662, replaced with db.vanillagaming spell. Is it right?
@@ -85,45 +83,46 @@ enum eScriptTexts {
 };
 
 // Shared constants
-static const uint32 ENRAGE_TIMER                = 60 * 60000;
+static constexpr uint32 PULL_RANGE = 50;
+static constexpr uint32 ENRAGE_TIMER                = 60 * 60000;
 
-static const uint32 JUST_TELEPORTED_FREEZE      = 2000;     // Emperor is "frozen", aka not doing anything, for this long after TP
-static const uint32 AFTER_TELEPORT_THREAT       = 3000;     // Threat added to nearest player after TP. TODO: correct amount?
+static constexpr uint32 JUST_TELEPORTED_FREEZE      = 2000;     // Emperor is "frozen", aka not doing anything, for this long after TP
+static constexpr uint32 AFTER_TELEPORT_THREAT       = 3000;     // Threat added to nearest player after TP. TODO: correct amount?
 
-static const uint32 TELEPORTTIME_MIN_CD         = 30000;    // Shortest possible cooldown on teleport
-static const uint32 TELEPORTTIME_MAX_CD         = 40000;    // Longest possible cooldown on teleport
+static constexpr uint32 TELEPORTTIME_MIN_CD         = 30000;    // Shortest possible cooldown on teleport
+static constexpr uint32 TELEPORTTIME_MAX_CD         = 40000;    // Longest possible cooldown on teleport
 
-static const uint32 TRY_HEAL_FREQUENCY          = 0;        // How ofthen will the emperors TRY to heal eachother, 0 for every update
-static const uint32 SUCCESS_HEAL_FREQUENCY      = 1500;     // How ofthen will the emperors actually heal, when in range of each other
-static const float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
-static const float  HEAL_BROTHER_RANGE          = 60.0f;
+static constexpr uint32 TRY_HEAL_FREQUENCY          = 0;        // How ofthen will the emperors TRY to heal eachother, 0 for every update
+static constexpr uint32 SUCCESS_HEAL_FREQUENCY      = 1500;     // How ofthen will the emperors actually heal, when in range of each other
+static constexpr float  HEAL_BROTHER_AMOUNT         = 30000.0f; // How much do they heal when in heal-range
+static constexpr float  HEAL_BROTHER_RANGE          = 60.0f;
 
-static const uint32 RESPAWN_BUG_FREQUENCY       = 10000;    // How often do we try to respawn a dead bug
-static const float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
-static const float  BUG_SPELL_MAX_DIST          = 20.0f;    // Max distance a bug can be for the twin to choose it
+static constexpr uint32 RESPAWN_BUG_FREQUENCY       = 10000;    // How often do we try to respawn a dead bug
+static constexpr float  RESPAWN_BUG_DISTANCE        = 50.0f;    // How far away do we look for dead bugs for respawning
+static constexpr float  BUG_SPELL_MAX_DIST          = 20.0f;    // Max distance a bug can be for the twin to choose it
 
 // Vek'nilash constants
-static const uint32 UPPERCUT_MIN_CD             = 14000;
-static const uint32 UPPERCUT_MAX_CD             = 29000;
-static const uint32 UNBALANCING_STRIKE_MIN_CD   = 8000;
-static const uint32 UNBALANCING_STRIKE_MAX_CD   = 18000;
-static const uint32 MUTATE_BUG_MIN_CD           = 10000;
-static const uint32 MUTATE_BUG_MAX_CD           = 15000;
+static constexpr uint32 UPPERCUT_MIN_CD             = 14000;
+static constexpr uint32 UPPERCUT_MAX_CD             = 29000;
+static constexpr uint32 UNBALANCING_STRIKE_MIN_CD   = 8000;
+static constexpr uint32 UNBALANCING_STRIKE_MAX_CD   = 18000;
+static constexpr uint32 MUTATE_BUG_MIN_CD           = 10000;
+static constexpr uint32 MUTATE_BUG_MAX_CD           = 15000;
 
 // Vek'lor constants
-static const float  ARCANE_BURST_RANGE          = 10.0f;    // How close must a player be if VL should cast AB
-static const uint32 ARCANE_BURST_MIN_CD         = 5000;     
-static const uint32 ARCANE_BURST_MAX_CD         = 10000;
-static const uint32 BLIZZARD_MIN_CD             = 15000;    // todo: no source on blizzard cooldown. Duration is 10s
-static const uint32 BLIZZARD_MAX_CD             = 20000;
-static const uint32 VEKLOR_DIST                 = 20;       // Vek'lor chase to this distance
-static const uint32 SHADOWBOLT_RANGED_MIN_CD    = 1800;     
-static const uint32 SHADOWBOLT_RANGED_MAX_CD    = 2500;     
-static const uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;     
-static const uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;    
-static const uint32 VEKLOR_PULL_YELL_DELAY      = 3000;     // Vek'lors pull yell happens after Vek'nilash
-static const uint32 EXPLODE_BUG_MIN_CD          = 7000;
-static const uint32 EXPLODE_BUG_MAX_CD          = 10000;
+static constexpr float  ARCANE_BURST_RANGE          = 10.0f;    // How close must a player be if VL should cast AB
+static constexpr uint32 ARCANE_BURST_MIN_CD         = 5000;     
+static constexpr uint32 ARCANE_BURST_MAX_CD         = 10000;
+static constexpr uint32 BLIZZARD_MIN_CD             = 15000;    // todo: no source on blizzard cooldown. Duration is 10s
+static constexpr uint32 BLIZZARD_MAX_CD             = 20000;
+static constexpr uint32 VEKLOR_DIST                 = 20;       // Vek'lor chase to this distance
+static constexpr uint32 SHADOWBOLT_RANGED_MIN_CD    = 1800;     
+static constexpr uint32 SHADOWBOLT_RANGED_MAX_CD    = 2500;     
+static constexpr uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;     
+static constexpr uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;    
+static constexpr uint32 VEKLOR_PULL_YELL_DELAY      = 3000;     // Vek'lors pull yell happens after Vek'nilash
+static constexpr uint32 EXPLODE_BUG_MIN_CD          = 7000;
+static constexpr uint32 EXPLODE_BUG_MAX_CD          = 10000;
 
 
 struct mob_TwinsBug : public ScriptedAI {
@@ -174,11 +173,10 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     uint32 killSayCooldown;
 
-    virtual uint32 GetBugSpellCooldown() = 0;
-    virtual uint32 GetBugSpell() = 0;
-
-    virtual void OnEndTeleportVirtual() = 0;
-    virtual void UpdateEmperor(uint32) = 0;
+    virtual uint32  GetBugSpellCooldown() = 0;
+    virtual uint32  GetBugSpell() = 0;
+    virtual void    OnEndTeleportVirtual() = 0;
+    virtual void    UpdateEmperor(uint32) = 0;
 
     // Only one of the twins should implement these functions
     virtual void UpdateTeleportToMyBrother(uint32) {}
@@ -186,7 +184,6 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     ObjectGuid closestTargetAfterTP;
 
-    float howLong;
     boss_twinemperorsAI(Creature* pCreature) : 
         ScriptedAI(pCreature)
     {
@@ -209,19 +206,16 @@ struct boss_twinemperorsAI : public ScriptedAI
     void SharedReset()
     {
         respawnBugTimer = RESPAWN_BUG_FREQUENCY;
-
-        m_creature->clearUnitState(UNIT_STAT_STUNNED);
-        EnrageTimer = ENRAGE_TIMER;
-
-        justTeleported = false;
+        EnrageTimer     = ENRAGE_TIMER;
+        justTeleported  = false;
         didPullDialogue = false;
-
         killSayCooldown = 0;
+        m_creature->clearUnitState(UNIT_STAT_STUNNED);
     }
 
-    // Aggro-radius handling
     void MoveInLineOfSight(Unit *who)
     {
+        // Only want to run this if we are not in combat
         if (!who || m_creature->getVictim() || m_creature->isInCombat())
             return;
 
@@ -249,6 +243,23 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     void DamageTaken(Unit *done_by, uint32 &damage) override
     {
+        if (!m_pInstance)
+            return;
+
+        if (Creature* pTwin = GetOtherBoss())
+        {
+            float fDamPercent = ((float)damage) / ((float)m_creature->GetMaxHealth());
+            uint32 uiTwinDamage = (uint32)(fDamPercent * ((float)pTwin->GetMaxHealth()));
+            uint32 uiTwinHealth = pTwin->GetHealth() - uiTwinDamage;
+            pTwin->SetHealth(uiTwinHealth > 0 ? uiTwinHealth : 0);
+
+            if (!uiTwinHealth)
+            {
+                pTwin->SetDeathState(JUST_DIED);
+                pTwin->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            }
+        }
+#if 0
         Creature *pOtherBoss = GetOtherBoss();
         if (pOtherBoss && !pOtherBoss->isDead())
         {
@@ -267,6 +278,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
             */
         }
+#endif
     }
 
     void JustDied(Unit* Killer) override
@@ -302,7 +314,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         Creature *pOtherBoss = GetOtherBoss();
         if (pOtherBoss)
         {
-            // The "other boss" will start running to the same first puller.
+            // The "other boss" will start running to the same initial puller.
             pOtherBoss->AI()->AttackStart(pWho);
             pOtherBoss->SetInCombatWithZone();
         }
@@ -380,7 +392,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                     sLog.outBasic("Twins unable to select closest target during TP stun");
                 }
             }
-            howLong += diff;
+
             if (justTeleportedTimer <= diff) {
                 OnEndTeleport();
             }
@@ -389,6 +401,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
         }
         else {
+            // Not attempting to get a hostile target during teleport-idle
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
                 return;
             }
@@ -408,11 +421,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         //HandleDeadBugs(diff); // they respawn by themself...
         
         // We skip updating emperor-specific spells during teleport stun
-        if (justTeleported) {
-            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
-                return;
-            }
-        } else if (!justTeleported) {
+        if (!justTeleported) {
             UpdateEmperor(diff);
         }
     }
@@ -427,7 +436,6 @@ struct boss_twinemperorsAI : public ScriptedAI
     // Called as teleport happens
     void OnStartTeleport(float x, float y, float z, float o)
     {
-        howLong = 0;
         justTeleported = true;
         justTeleportedTimer = JUST_TELEPORTED_FREEZE;
         m_creature->InterruptNonMeleeSpells(true);
@@ -436,8 +444,6 @@ struct boss_twinemperorsAI : public ScriptedAI
         m_creature->StopMoving();
         m_creature->NearTeleportTo(x, y, z, o);
         closestTargetAfterTP = 0;
-        //m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-        //m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_MSG, true);
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_VISUAL, true);
     }
@@ -445,9 +451,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     // Called JUST_TELEPORTED_FREEZE after teleport happened
     void OnEndTeleport()
     {
-        sLog.outBasic("End tp stun after %lu ms", (unsigned long)howLong);
         justTeleported = false;
-        //m_creature->clearUnitState(UNIT_STAT_ROOT);
         
         if (Player* closestPlayer = m_pInstance->GetMap()->GetPlayer(closestTargetAfterTP)) {
             closestTargetAfterTP = closestPlayer->GetGUID();
@@ -461,6 +465,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         OnEndTeleportVirtual();
     }
 
+    // ToDo: Not called anymore. Can be removed once Twins testing is done and we are sure it's not needed.
     void HandleDeadBugs(uint32 diff)
     {
         // We try to respawn one random bug every RESPAWN_BUG_FREQUENCY
@@ -496,29 +501,30 @@ struct boss_twinemperorsAI : public ScriptedAI
     void HandleBugSpell(uint32 diff)
     {
         if (bugMutationTimer < diff) {
-            // Wait with doign stuff until after idle
+            
+            // Wait with doing stuff until after idle
             if (justTeleported) return;
 
             std::list<Creature*> lUnitList;
-            GetCreatureListWithEntryInGrid(lUnitList, m_creature, BUG_TYPE_1, BUG_SPELL_MAX_DIST);
-            GetCreatureListWithEntryInGrid(lUnitList, m_creature, BUG_TYPE_2, BUG_SPELL_MAX_DIST);
+            GetCreatureListWithEntryInGrid(lUnitList, m_creature, { BUG_TYPE_1 , BUG_TYPE_1 }, BUG_SPELL_MAX_DIST);
 
             std::list<Creature*>::iterator iter;
             for (iter = lUnitList.begin(); iter != lUnitList.end();) {
                 if ((*iter)->isDead()) {
                     iter = lUnitList.erase(iter);
                 }
+                // Ignoring bugs that has already been affected by a spell
                 else if ((*iter)->HasAura(SPELL_MUTATE_BUG) || (*iter)->HasAura(SPELL_EXPLODEBUG)) {
-                    // Ignoring bugs that has already been affected by a spell
                     iter = lUnitList.erase(iter);
-                    //sLog.outBasic("skipped a bug that had aura");
                 }
                 else {
                     ++iter;
                 }
             }
+
             if (lUnitList.size() == 0)
                 return;
+
             iter = lUnitList.begin();
 
             std::advance(iter, urand(0, lUnitList.size() - 1));
@@ -527,20 +533,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             if (bugAI) {
                 bugAI->GoBeBadBug(GetBugSpell());
             }
-            //c->AddAura(GetBugSpell());
             bugMutationTimer = GetBugSpellCooldown();
-            
-            /* dosent work:
-            if (DoCastSpellIfCan(c, GetBugSpell()) == CAST_OK) {
-            }
-            */
-            //c->setFaction(14);
-            //c->SetInCombatWithZone();
-            //todo: try swapping with m_creature->castSpell as triggered instead
-            /*
-            c->AddAura(GetBugSpell());
-            c->SetHealth(c->GetMaxHealth());
-            */
         }
         else {
             bugMutationTimer -= diff;
@@ -549,28 +542,54 @@ struct boss_twinemperorsAI : public ScriptedAI
     
     void CheckEnrage(uint32 diff)
     {
-        //todo: make sure casting berserk actually applies SPELL_BERSERK as aura
         if (EnrageTimer < diff && !m_creature->HasAura(SPELL_BERSERK))
         {
             // Wait with casting enrage until after TP idle
             if (justTeleported) return;
 
             // just force-apply berserk if it's time. No dilly-dally. 
-            // todo: Does this always work?
             m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
-            EnrageTimer = 60000 * 5;
-            /*
-            if (!m_creature->IsNonMeleeSpellCasted(true))
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT) == CAST_OK)
-                    EnrageTimer = std::numeric_limits<uint32>::max();
-            }
-            else EnrageTimer = 0;
-            */
+            EnrageTimer = 60000 * 5; // resetting to duration of enrage
         }
-        else EnrageTimer -= diff;
+        else 
+        {
+            EnrageTimer -= diff;
+        }
     }
-   
+
+    // Get players in given range, optionally skip topaggro. Used where
+    // we dont want to compare distance + bounding radius etc, but rather
+    // simply center-to-center
+    Player* GetPlayerInP2PRange(float min, float max, bool skipTopAggro)
+    {
+        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+
+        if (tList.size() == 0)
+            return nullptr;
+
+        std::list<Player*> candidates;
+        ThreatList::const_iterator i = tList.begin();
+
+        // skipping top-aggro if there are more than 1 person on threat list
+        if (tList.size() > 1 && skipTopAggro)
+            ++i;
+
+        for (i; i != tList.end(); ++i) {
+            Player* pPlayer = m_creature->GetMap()->GetPlayer((*i)->getUnitGuid());
+            if (!pPlayer) continue;
+
+            if (m_creature->IsInRange(pPlayer, min, max)) {
+                candidates.push_back(pPlayer);
+            }
+        }
+
+        if (candidates.size() == 0)
+            return nullptr;
+
+        auto candIt = candidates.begin();
+        std::advance(candIt, candidates.size() - 1);
+        return *candIt;
+    }
 };
 
 struct boss_veklorAI : public boss_twinemperorsAI
@@ -666,8 +685,6 @@ struct boss_veklorAI : public boss_twinemperorsAI
         Creature *pOtherBoss = GetOtherBoss();
         if (!pOtherBoss) return; // Well, that was too bad...
 
-        //m_creature->MonsterYell("Teleporting ...", LANG_UNIVERSAL);
-
         float other_x = pOtherBoss->GetPositionX();
         float other_y = pOtherBoss->GetPositionY();
         float other_z = pOtherBoss->GetPositionZ();
@@ -685,12 +702,13 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     void TryHealBrother(uint32 diff) override
     {
-        // Cant heal while stunned, but since stun effect isent really working properly we return manually
-        if (justTeleported)
-            return;
-
-        // They cannot cast heal during teleport stun:
+        // Cant heal while tp-idle, but since the "stun" effect isent really working properly we return manually
         // https://www.youtube.com/watch?v=8mGchbCF1Lw
+        if (justTeleported) {
+            healTimer -= std::min(diff, healTimer);
+            return;
+        }
+        
         if (healTimer < diff) {
             Unit *pOtherBoss = GetOtherBoss();
             if (pOtherBoss && pOtherBoss->IsWithinDist(m_creature, HEAL_BROTHER_RANGE))
@@ -719,45 +737,13 @@ struct boss_veklorAI : public boss_twinemperorsAI
         shadowBoltTimer = 0; 
     }
 
-    // Find a random target within blizzardRange, excluding topAggro target
-    Player* GetBlizzardTarget()
-    {
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        
-        if (tList.size() == 0)
-            return nullptr;
-
-        std::list<HostileReference*> candidates;
-        ThreatList::const_iterator i = tList.begin();
-        
-        // skipping top-aggro if there are more than 1 person on threat list
-        if(tList.size() > 1)
-            ++i; 
-
-        for (i; i != tList.end(); ++i) {
-            Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
-            if (!pUnit) continue;
-
-            if (m_creature->IsInRange(m_creature, 0, blizzardRange)) {
-                candidates.push_back((*i));
-            }
-        }
-
-        if (candidates.size() == 0)
-            return nullptr;
-
-        i = candidates.begin();
-        std::advance(i, candidates.size() - 1);
-        return m_creature->GetMap()->GetPlayer(((*i)->getUnitGuid()));
-
-    }
-    
     void UpdateBlizzard(uint32 diff)
     {
         if (blizzardTimer < diff) {
-            if (Player* p = GetBlizzardTarget()) {
-                if (DoCastSpellIfCan(p, SPELL_BLIZZARD) == CAST_OK)
+            if (Player* p = GetPlayerInP2PRange(0, blizzardRange, true)) {
+                if (DoCastSpellIfCan(p, SPELL_BLIZZARD) == CAST_OK) {
                     blizzardTimer = urand(BLIZZARD_MIN_CD, BLIZZARD_MAX_CD);
+                }
             }
         }
         else {
@@ -768,8 +754,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
     void updateArcaneBurst(uint32 diff)
     {
         if (arcaneBurstTimer < diff) {
-            // If we find anyone in arcane burst range we cast it
-            if (Unit* mvic = m_creature->GetVictimInRange(0, ARCANE_BURST_RANGE)) {
+            if (Unit* mvic = GetPlayerInP2PRange(0, ARCANE_BURST_RANGE, false)) {
                 if (DoCastSpellIfCan(mvic, SPELL_ARCANEBURST) == CAST_OK)
                     arcaneBurstTimer = urand(ARCANE_BURST_MIN_CD, ARCANE_BURST_MAX_CD);
             }
