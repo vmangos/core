@@ -1,0 +1,1 @@
+UPDATE creature_template SET mindmg = 60 , maxdmg = 70, ScriptName = 'npc_arcanite_dragonling' WHERE entry = 12473;
