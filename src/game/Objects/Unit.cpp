@@ -3970,6 +3970,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
     holder->HandleSpellSpecificBoosts(true);
 
     // Check debuff limit
+    //DEBUG_LOG("AddSpellAuraHolder: Adding spell %d, debuff limit affected: %d", holder->GetId(), holder->IsAffectedByDebuffLimit());
     if (holder->IsAffectedByDebuffLimit())
     {
         uint32 negativeAuras = GetNegativeAurasCount();

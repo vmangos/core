@@ -92,6 +92,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         // Debuff limit
         void CalculateForDebuffLimit();
         bool IsAffectedByDebuffLimit() const { return m_debuffLimitAffected; }
+        void SetAffectedByDebuffLimit(bool isAffectedByDebuffLimit);
         bool IsMoreImportantDebuffThan(SpellAuraHolder *other) const;
         bool m_debuffLimitAffected;
         uint32 m_debuffLimitScore; // + haut => + important

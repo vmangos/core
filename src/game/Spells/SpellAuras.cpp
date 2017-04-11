@@ -5940,11 +5940,19 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
 {
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem();
 
+    // Check for persistent area auras that only do damage. If it has a secondary effect, it takes
+    // up a slot
+    bool persistent = m_spellProto->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_PERSISTENT_AREA_AURA;
+    bool persistentWithSecondaryEffect = false;
+    
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (!m_auras[i])
+        // Check for persistent aura here since the effect aura is applied to the holder 
+        // by a dynamic object as the target passes through the object field, meaning 
+        // m_auras will be unset when this method is called (initialization)
+        if (!m_auras[i] && !persistent)
             continue;
-
+            
         // special area auras cases
         switch (m_spellProto->Effect[i])
         {
@@ -5952,12 +5960,36 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
             case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
                 // passive auras (except totem auras) do not get placed in caster slot
                 return (m_target != caster || totemAura || !m_isPassive) && m_auras[i]->GetModifier()->m_auraname != SPELL_AURA_NONE;
+                
+                break;
+            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                // If spell aura applies something other than plain damage, it takes
+                // up a debuff slot.
+                if (m_spellProto->EffectApplyAuraName[i] != SPELL_AURA_PERIODIC_DAMAGE)
+                    persistentWithSecondaryEffect = true;
+                    
+                break;
             default:
                 break;
         }
     }
 
-
+    /*  Persistent area auras such as Blizzard/RoF/Volley do not get require debuff slots
+        since they just do area damage with no additional effects. However, spells like
+        Hurricane do since they have a secondary effect attached to them. There are enough
+        persistent area spells in-game that making a switch for all of them is a bit 
+        unreasonable. Any spell with a secondary affect should take up a slot. Note
+        that most (usable) persistent spells only deal damage.
+        
+        It was considered whether spells with secondary effects should still deal damage,
+        even if there is no room for the other effect, however the debuff tooltip states
+        that the spell causes damage AND slows, therefore it must take a debuff slot.
+     */
+    if (persistent && !persistentWithSecondaryEffect)
+    {
+        return false;
+    }
+    
     // necessary for some spells, e.g. Immolate visual passive 28330
     if (m_spellProto->SpellVisual)
         return true;
@@ -6322,6 +6354,10 @@ void SpellAuraHolder::UpdateAuraDuration() const
     }
 }
 
+void SpellAuraHolder::SetAffectedByDebuffLimit(bool isAffectedByDebuffLimit)
+{
+    m_debuffLimitAffected = isAffectedByDebuffLimit;
+}
 
 /** NOSTALRIUS
  Debuff limitation
