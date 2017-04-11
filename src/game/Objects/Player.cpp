@@ -435,6 +435,7 @@ Player::Player(WorldSession *session) : Unit(),
 
     m_modManaRegen = 0;
     m_modManaRegenInterrupt = 0;
+    m_carryHealthRegen = 0;
     for (int s = 0; s < MAX_SPELL_SCHOOL; s++)
         m_SpellCritPercentage[s] = 0.0f;
     m_regenTimer = 0;
@@ -2281,6 +2282,10 @@ void Player::RegenerateHealth()
     // always regeneration bonus (including combat)
     // This function is called every 2 seconds.
     addvalue += HealthIncreaseRate * 2.0f * (GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) / 5.0f);
+
+    // Health fractions get carried to the next tick
+    addvalue += m_carryHealthRegen;
+    m_carryHealthRegen = addvalue - int32(addvalue);
 
     if (addvalue < 0)
         addvalue = 0;
