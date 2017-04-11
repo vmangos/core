@@ -259,26 +259,6 @@ struct boss_twinemperorsAI : public ScriptedAI
                 pTwin->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
             }
         }
-#if 0
-        Creature *pOtherBoss = GetOtherBoss();
-        if (pOtherBoss && !pOtherBoss->isDead())
-        {
-            float dPercent = ((float)damage) / ((float)m_creature->GetMaxHealth());
-            int odmg = (int)(dPercent * ((float)pOtherBoss->GetMaxHealth()));
-            //int ohealth = pOtherBoss->GetHealth() - odmg;
-            //pOtherBoss->SetHealth(ohealth > 0 ? ohealth : 0);
-
-            // Note: does not re-trigger DamageTaken for other target with these flags. 
-            m_creature->DealDamage(pOtherBoss, odmg, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-            /*
-            if (ohealth <= 0)
-            {
-                pOtherBoss->SetDeathState(JUST_DIED);
-                pOtherBoss->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            }
-            */
-        }
-#endif
     }
 
     void JustDied(Unit* Killer) override
@@ -326,47 +306,19 @@ struct boss_twinemperorsAI : public ScriptedAI
             m_pInstance->SetData(TYPE_TWINS, FAIL);
     }
 
-    void OnHealHit(Unit* caster)
+    // Workaround for the shared health pool
+    void HealedBy(Unit* pHealer, uint32 uiHealedAmount) override
     {
-        if (caster == m_creature)
+        if (!m_pInstance)
             return;
 
-        Creature *pOtherBoss = GetOtherBoss();
-        if (!pOtherBoss)
-            return;
-
-        // add health so we keep same percentage for both brothers
-        uint32 mytotal = m_creature->GetMaxHealth(), histotal = pOtherBoss->GetMaxHealth();
-        float mult = ((float)mytotal) / ((float)histotal);
-        if (mult < 1)
-            mult = 1.0f / mult;
-
-        uint32 largerAmount = (uint32)((HEAL_BROTHER_AMOUNT * mult) - HEAL_BROTHER_AMOUNT);
-
-        uint32 myh = m_creature->GetHealth();
-        uint32 hish = pOtherBoss->GetHealth();
-        if (mytotal > histotal) {
-            uint32 h = m_creature->GetHealth() + largerAmount;
-            m_creature->SetHealth(std::min(mytotal, h));
-        }
-        else {
-            uint32 h = pOtherBoss->GetHealth() + largerAmount;
-            pOtherBoss->SetHealth(std::min(histotal, h));
-        }
-    }
-
-    void SpellHit(Unit *caster, const SpellEntry *entry) override
-    {
-        switch (entry->Id)
+        if (Creature* pTwin = GetOtherBoss())
         {
-        case SPELL_HEAL_BROTHER:
-            OnHealHit(caster);
-            break;
-        case SPELL_BERSERK:
-            sLog.outBasic("%s received berserk from %s", m_creature->GetName(), caster->GetName());
-            break;
+            float fHealPercent = ((float)uiHealedAmount) / ((float)m_creature->GetMaxHealth());
+            uint32 uiTwinHeal = (uint32)(fHealPercent * ((float)pTwin->GetMaxHealth()));
+            uint32 uiTwinHealth = pTwin->GetHealth() + uiTwinHeal;
+            pTwin->SetHealth(uiTwinHealth < pTwin->GetMaxHealth() ? uiTwinHealth : pTwin->GetMaxHealth());
         }
-        
     }
 
     void UpdateAI(const uint32 diff) override
@@ -708,7 +660,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
             healTimer -= std::min(diff, healTimer);
             return;
         }
-        
+
         if (healTimer < diff) {
             Unit *pOtherBoss = GetOtherBoss();
             if (pOtherBoss && pOtherBoss->IsWithinDist(m_creature, HEAL_BROTHER_RANGE))
