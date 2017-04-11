@@ -704,7 +704,7 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
 
     // Hellfire. Damages the caster, but is still positive !
     // (Has same SpellFamilyFlags as Soul Fire oO)
-    if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && spellproto->SpellIconID == 937)
+    if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && spellproto->SpellIconID == 937 && spellproto->SpellVisual == 5423)
         return true;
 
     switch (spellproto->Effect[effIndex])
