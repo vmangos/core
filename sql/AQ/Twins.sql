@@ -22,3 +22,8 @@ UPDATE creature_model_info SET `bounding_radius`='1.2', `combat_reach`='6' WHERE
 -- scripted ai for bugs on twins to robustify resetting
 UPDATE creature_template SET `ScriptName`='mob_twins_bug' WHERE `entry`='15317';
 UPDATE creature_template SET `ScriptName`='mob_twins_bug' WHERE `entry`='15316';
+
+-- creating creature_equip_template entry for Vek'lors scepter
+INSERT INTO creature_equip_template (entry, equipentry1) VALUES (16000, 21796);
+-- Giving Vek'lor the scepter equip template
+UPDATE creature_template SET equipment_id=16000 WHERE entry=15276;
