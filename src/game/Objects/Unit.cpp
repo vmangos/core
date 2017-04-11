@@ -5592,6 +5592,7 @@ void Unit::AttackedBy(Unit* attacker)
     if(Unit* owner = GetCharmerOrOwner())
         if (owner->IsCreature() && ((Creature*)owner)->AI()){
             ((Creature*)owner)->AI()->AttackedBy(attacker);
+    }
 }
 
 bool Unit::AttackStop(bool targetSwitch /*=false*/)

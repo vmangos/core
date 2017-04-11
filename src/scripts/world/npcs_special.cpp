@@ -1419,64 +1419,64 @@ enum
 
 struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
 {
-	explicit npc_arcanite_dragonling_dragonlingAI(Creature* pCreature) : ScriptedPetAI(pCreature)
-	{
-		m_creature->SetCanModifyStats(true);
+    explicit npc_arcanite_dragonling_dragonlingAI(Creature* pCreature) : ScriptedPetAI(pCreature)
+    {
+        m_creature->SetCanModifyStats(true);
 
-		if (m_creature->GetCharmInfo())
-			m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
-
-
-		m_firebreathtimer = urand(0, 10000);
-		m_flamebreathTimer = urand(0, 20000);
-
-		npc_arcanite_dragonling_dragonlingAI::Reset();
-	}
-
-	uint32 m_firebreathtimer;
-	uint32 m_flamebreathTimer;
+        if (m_creature->GetCharmInfo())
+            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
 
 
-	void Reset() override
-	{
+        m_firebuffetTimer = urand(0, 10000);
+        m_flamebreathTimer = urand(0, 20000);
 
-	}
+        npc_arcanite_dragonling_dragonlingAI::Reset();
+    }
 
-	void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
-	{
+    uint32 m_firebuffetTimer;
+    uint32 m_flamebreathTimer;
 
-		ScriptedPetAI::DamageTaken(pDoneBy, uiDamage);
-	}
 
-	void UpdatePetAI(const uint32 uiDiff) override
-	{
+    void Reset() override
+    {
 
-if (m_firebuffetTimer < uiDiff)
-			{
-				if (DoCastSpellIfCan(m_creature, SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
-					m_firebuffetTimer = urand(0, 10000);
-			}
-			else
-				m_firebuffetTimer -= uiDiff;
-			
-			if (m_flamebreathTimer < uiDiff)
-			{
-				int32 damage = 300;
-				m_creature->CastCustomSpell(m_creature, SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
-					m_flamebreathTimer = urand(0, 20000);
-			}
-			else
-				m_flamebreathTimer -= uiDiff;
+    }
 
-	
+    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
+    {
 
-		ScriptedPetAI::UpdatePetAI(uiDiff);
-	}
+        ScriptedPetAI::DamageTaken(pDoneBy, uiDamage);
+    }
+
+    void UpdatePetAI(const uint32 uiDiff) override
+    {
+
+        if (m_firebuffetTimer < uiDiff)
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
+                    m_firebuffetTimer = urand(0, 10000);
+            }
+        else
+            m_firebuffetTimer -= uiDiff;
+            
+        if (m_flamebreathTimer < uiDiff)
+        {
+            int32 damage = 300;
+            m_creature->CastCustomSpell(m_creature, SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
+                m_flamebreathTimer = urand(0, 20000);
+        }
+        else
+            m_flamebreathTimer -= uiDiff;
+
+    
+
+        ScriptedPetAI::UpdatePetAI(uiDiff);
+    }
 };
 
 CreatureAI* GetAI_npc_arcanite_dragonling_dragonling(Creature* pCreature)
 {
-	return new npc_arcanite_dragonling_dragonlingAI(pCreature);
+    return new npc_arcanite_dragonling_dragonlingAI(pCreature);
 }
 /*######
 ## npc_the_cleaner
@@ -2137,7 +2137,7 @@ struct npc_shahramAI : ScriptedPetAI
 
                 case 0: 
                     shahramSpell = SPELL_CURSE_OF_SHAHRAM;
-                    break;		
+                    break;      
 
                 case 1:
                     shahramSpell = SPELL_FLAMES_OF_SHAHRAM;
@@ -2704,11 +2704,11 @@ void AddSC_npcs_special()
     newscript->GetAI = &GetAI_npc_gnomish_battle_chicken;
     newscript->RegisterSelf();
 
-	newscript = new Script;
-	newscript->Name = "npc_arcanite_dragonling";
-	newscript->GetAI = &GetAI_npc_arcanite_dragonling_dragonling;
-	newscript->RegisterSelf();
-	
+    newscript = new Script;
+    newscript->Name = "npc_arcanite_dragonling";
+    newscript->GetAI = &GetAI_npc_arcanite_dragonling_dragonling;
+    newscript->RegisterSelf();
+    
     newscript = new Script;
     newscript->Name = "npc_the_cleaner";
     newscript->GetAI = &GetAI_npc_the_cleaner;
