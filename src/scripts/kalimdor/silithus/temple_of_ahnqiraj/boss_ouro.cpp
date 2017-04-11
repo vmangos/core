@@ -105,6 +105,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
         m_bEnraged            = false;
         m_bSubmerged          = false;
+
+        m_ouroTriggerGuid.Clear();
     }
 
     void Aggro(Unit* /*pWho*/)
@@ -134,7 +136,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
 
         Submerge(true);
-        m_creature->ForcedDespawn();
+        m_creature->ForcedDespawn(2000);
     }
 
     void JustDied(Unit* /*pKiller*/)
@@ -150,16 +152,20 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         switch (pSummoned->GetEntry())
         {
         case NPC_OURO_TRIGGER:
+            m_ouroTriggerGuid = pSummoned->GetGUID();
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                m_creature->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
+                pSummoned->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
             break;
         }
     }
 
-    void SummonedCreatureDespawn(Creature* pSummoned)
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
-        if (pSummoned->GetEntry() == NPC_DIRT_MOUND)
-            pSummoned->CastSpell(m_creature, SPELL_SUMMON_SCARABS, true);
+        if (pSpell->Id == SPELL_SANDBLAST)
+        {
+            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
+                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+        }
     }
 
     void Submerge(bool isReset = false)
@@ -355,6 +361,14 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
+                    ThreatList const& lThreat = m_creature->getThreatManager().getThreatList();
+                    for (ThreatList::const_iterator i = lThreat.begin(); i != lThreat.end(); ++i)
+                    {
+                        Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
+                        if (pUnit && pUnit->GetDistance2d(m_creature) < 5.0f)
+                            m_creature->CastSpell(pUnit, SPELL_GROUND_RUPTURE, true);
+                    }
+
                     m_bSubmerged        = false;
                     m_uiSummonBaseTimer = 2000;
                     m_uiSubmergeTimer   = 90000;
@@ -426,39 +440,41 @@ struct npc_dirt_moundAI : public ScriptedAI
     npc_dirt_moundAI(Creature* pCreature) : ScriptedAI(pCreature) {Reset();}
 
     uint32 m_uiChangeTargetTimer;
-    ObjectGuid TargetGUID;
-    ObjectGuid CurrentTargetGUID;
+    uint32 m_uiDespawnTimer;
+    ObjectGuid m_TargetGUID;
+    ObjectGuid m_CurrentTargetGUID;
 
     void Reset()
     {
-	TargetGUID.Clear();
-	CurrentTargetGUID.Clear();
+        m_uiDespawnTimer = 30000;
+	m_TargetGUID.Clear();
+	m_CurrentTargetGUID.Clear();
 
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
     }
 
     void MoveInLineOfSight(Unit *who)
     {
-        if (!TargetGUID && who->GetTypeId() == TYPEID_PLAYER)
+        if (!m_TargetGUID && who->GetTypeId() == TYPEID_PLAYER)
 	{
-  	    TargetGUID = who->GetGUID();
+  	    m_TargetGUID = who->GetGUID();
 	}
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        Unit *pTarget = m_creature->GetMap()->GetUnit(CurrentTargetGUID);
+        Unit *pTarget = m_creature->GetMap()->GetUnit(m_CurrentTargetGUID);
         const bool bForceChangeTarget = !pTarget || pTarget->isDead()
             || pTarget->IsImmuneToDamage(SPELL_SCHOOL_MASK_NATURE);
 
         if (bForceChangeTarget || m_uiChangeTargetTimer < uiDiff)
         {
-            CurrentTargetGUID.Clear();
-            if (Unit* pTarget = m_creature->GetMap()->GetUnit(TargetGUID))
+            m_CurrentTargetGUID.Clear();
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit(m_TargetGUID))
             {
                 m_creature->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
-                CurrentTargetGUID = TargetGUID;
-                TargetGUID.Clear();
+                m_CurrentTargetGUID = m_TargetGUID;
+                m_TargetGUID.Clear();
             }
             else
             {
@@ -468,6 +484,14 @@ struct npc_dirt_moundAI : public ScriptedAI
         }
         else
             m_uiChangeTargetTimer -= uiDiff;
+
+        if (m_uiDespawnTimer < uiDiff)
+        {
+            m_creature->CastSpell(m_creature, SPELL_SUMMON_SCARABS, true);
+            m_creature->ForcedDespawn();
+        }
+        else
+            m_uiDespawnTimer -= uiDiff;
     }
 };
 
@@ -478,10 +502,13 @@ CreatureAI* GetAI_npc_dirt_mound(Creature* pCreature)
 
 struct npc_ouro_scarabAI : public ScriptedAI
 {
-    npc_ouro_scarabAI(Creature* pCreature) : ScriptedAI(pCreature) {}
+    npc_ouro_scarabAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
+
+    uint32 m_uiDespawnTimer;
 
     void Reset()
     {
+        m_uiDespawnTimer = 45000;
     }
 
     void MoveInLineOfSight(Unit *who)
@@ -497,6 +524,11 @@ struct npc_ouro_scarabAI : public ScriptedAI
     {
         if (m_creature->getVictim())
             DoMeleeAttackIfReady();
+
+        if (m_uiDespawnTimer < uiDiff)
+            m_creature->ForcedDespawn();
+        else
+            m_uiDespawnTimer -= uiDiff;
     }
 };
 
