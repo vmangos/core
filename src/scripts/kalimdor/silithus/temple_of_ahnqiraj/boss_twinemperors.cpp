@@ -124,24 +124,6 @@ static const uint32 VEKLOR_PULL_YELL_DELAY      = 3000;     // Vek'lors pull yel
 static const uint32 EXPLODE_BUG_MIN_CD          = 7000;
 static const uint32 EXPLODE_BUG_MAX_CD          = 10000;
 
-/*
-void MoveInLineOfSight(Unit *who)
-{
-if (!who || m_creature->getVictim())
-return;
-
-if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
-{
-float attackRadius = m_creature->GetAttackDistance(who);
-if (attackRadius < PULL_RANGE)
-attackRadius = PULL_RANGE;
-
-// CREATURE_Z_ATTACK_RANGE there are stairs
-if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= 7)
-AttackStart(who);
-}
-}
-*/
 
 struct mob_TwinsBug : public ScriptedAI {
     mob_TwinsBug(Creature* pCreature) : ScriptedAI(pCreature)
@@ -234,6 +216,24 @@ struct boss_twinemperorsAI : public ScriptedAI
         didPullDialogue = false;
 
         killSayCooldown = 0;
+    }
+
+    // Aggro-radius handling
+    void MoveInLineOfSight(Unit *who)
+    {
+        if (!who || m_creature->getVictim())
+            return;
+
+        if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
+        {
+            float attackRadius = m_creature->GetAttackDistance(who);
+            if (attackRadius < PULL_RANGE)
+                attackRadius = PULL_RANGE;
+
+            // CREATURE_Z_ATTACK_RANGE there are stairs
+            if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= 7)
+                AttackStart(who);
+        }
     }
 
     void DamageTaken(Unit *done_by, uint32 &damage) override
@@ -397,7 +397,11 @@ struct boss_twinemperorsAI : public ScriptedAI
         //HandleDeadBugs(diff); // they respawn by themself...
         
         // We skip updating emperor-specific spells during teleport stun
-        if (!justTeleported) {
+        if (justTeleported) {
+            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+                return;
+            }
+        } else if (!justTeleported) {
             UpdateEmperor(diff);
         }
     }
@@ -419,10 +423,11 @@ struct boss_twinemperorsAI : public ScriptedAI
         m_creature->InterruptNonMeleeSpells(false);
         DoStopAttack();
         DoResetThreat();
+        m_creature->StopMoving();
         closestTargetAfterTP = 0;
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_MSG, true);
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_VISUAL, true);
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        //m_creature->addUnitState(UNIT_STAT_ROOT);
     }
 
     // Called JUST_TELEPORTED_FREEZE after teleport happened
@@ -430,7 +435,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         sLog.outBasic("End tp stun after %lu ms", (unsigned long)howLong);
         justTeleported = false;
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
+        //m_creature->clearUnitState(UNIT_STAT_ROOT);
         
         if (Player* closestPlayer = m_pInstance->GetMap()->GetPlayer(closestTargetAfterTP)) {
             closestTargetAfterTP = closestPlayer->GetGUID();
@@ -494,7 +499,7 @@ struct boss_twinemperorsAI : public ScriptedAI
                 else if ((*iter)->HasAura(SPELL_MUTATE_BUG) || (*iter)->HasAura(SPELL_EXPLODEBUG)) {
                     // Ignoring bugs that has already been affected by a spell
                     iter = lUnitList.erase(iter);
-                    sLog.outBasic("skipped a bug that had aura");
+                    //sLog.outBasic("skipped a bug that had aura");
                 }
                 else {
                     ++iter;
@@ -582,6 +587,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
 
     uint32 teleportTimer;
     uint32 healTimer;
+    uint32 timeSinceLastSB;
 
     void Reset() override
     {
@@ -593,6 +599,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         healTimer = TRY_HEAL_FREQUENCY;
         arcaneBurstTimer = 0; // No cooldown on pull
         pullDialogueTimer = VEKLOR_PULL_YELL_DELAY;
+        timeSinceLastSB = SHADOWBOLT_RANGED_CD;
 
         // Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
@@ -765,11 +772,40 @@ struct boss_veklorAI : public boss_twinemperorsAI
         if (!victim) 
             return;
 
+        bool isChasing = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
+        //if (isChasing)
+        //    return;
+        m_creature->IsMoving();
         bool isMelee = m_creature->IsWithinMeleeRange(victim);
         bool isInCastRange = m_creature->IsWithinDist(victim, shadowboltRange);
         float dist = m_creature->GetDistanceToCenter(victim);
-        bool isInLos = m_creature->IsWithinLOS(victim->GetPositionX(), victim->GetPositionY(), victim->GetPositionZ());
-        bool isChasing = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
+        bool isInLos = m_creature->IsWithinLOSInMap(victim);
+        
+        // Overriding shadowboltTimer if we're not in melee and we have not casted
+        // shadowbolt in at least SHADOWBOLT_RANGED_CD time. This will mostly be the 
+        // case if target was in melee, but then moved out, in which case we should 
+        // instantly re-cast a new shadowbolt unless it was just casted.
+        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_CD) {
+            shadowBoltTimer = 0;
+        }
+
+        if (isMelee && isInLos) {
+            DoMeleeAttackIfReady();
+            /*
+            if (!DoMeleeAttackIfReady()) {
+                UpdateShadowBolt(diff, true);
+            }
+            else {
+                shadowBoltTimer -= std::min(diff, shadowBoltTimer);
+            }
+            */
+        }
+        if (!m_creature->IsMoving()) {
+            UpdateShadowBolt(diff, isMelee);
+        }
+        return;
+
+
         
         if (isMelee) {
             // XXX: is this fine even when creature is not in los? How do we chase when in melee, but out of los?
@@ -780,20 +816,24 @@ struct boss_veklorAI : public boss_twinemperorsAI
                 shadowBoltTimer -= std::min(diff, shadowBoltTimer);
             }
         }
-        else {
+        else if (isInLos) {
+            UpdateShadowBolt(diff, false);
+        }
+        /*else {
             if ((!isInLos || !isInCastRange) && !isChasing) {
                 // should we wait with starting chase until we have finished current cast?
-                DoStartMovement(victim);
+                //DoStartMovement(victim);
             }
             else if(isChasing && dist <= VEKLOR_DIST){
-                DoStartNoMovement(victim);
+                //DoStartNoMovement(victim);
             }
             else {
-                UpdateShadowBolt(diff, false);
+                //UpdateShadowBolt(diff, false);
             }
-        }
+            UpdateShadowBolt(diff, false);
+        }*/
         return;
-
+        /*
         if (isChasing) {
             if (isInLos && isInCastRange) {
                 
@@ -824,6 +864,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         else if (isInCastRange && isInLos) {
             UpdateShadowBolt(diff, false);
         }
+        */
         //else {
         //    DoStartMovement(victim, VEKLOR_DIST);
         //}
@@ -832,6 +873,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
     void UpdateShadowBolt(uint32 diff, bool inMelee) {
         if (shadowBoltTimer < diff) {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) {
+                timeSinceLastSB = 0;
                 if (inMelee) {
                     // Looks like VL should prioritize shadowbolt differently if
                     // target is in melee range. He seems to get a random cooldown on it, and meleeing when he can.
@@ -851,8 +893,36 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
     }
 
+    void UpdateChase(Unit* victim)
+    {
+        //m_creature->SetCasterChaseDistance
+        
+        bool isChasing = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
+        if (isChasing)
+            return;
+        bool isMelee = m_creature->IsWithinMeleeRange(victim);
+        bool isInCastRange = m_creature->IsWithinDist(victim, shadowboltRange);
+        float dist = m_creature->GetDistanceToCenter(victim);
+        bool isInLos = m_creature->IsWithinLOSInMap(victim);
+
+    }
+
     void AttackStart(Unit* who)
     {
+        float dist = m_creature->GetDistanceToCenter(who);
+        if (dist <= VEKLOR_DIST) {
+            // if he is <=VEKLOR_DIST he should not start chasing again until
+            // target is further away than shadowboltRange
+            m_creature->SetCasterChaseDistance(shadowboltRange);
+        }
+        else if(dist > shadowboltRange) {
+            // if he is further away than shadowboltRange we set
+            // chase distance to VEKLOR_DIST
+            m_creature->SetCasterChaseDistance(VEKLOR_DIST);
+        }
+        ScriptedAI::AttackStart(who);
+        return;
+
         if (!who)
             return;
 
@@ -862,7 +932,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
             m_creature->SetInCombatWith(who);
             who->SetInCombatWith(m_creature);
 
-            m_creature->GetMotionMaster()->MoveChase(who, VEKLOR_DIST, 0);
+            //m_creature->GetMotionMaster()->MoveChase(who, VEKLOR_DIST, 0);
         }
     }
 
