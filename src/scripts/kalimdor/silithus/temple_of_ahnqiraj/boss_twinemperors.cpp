@@ -117,9 +117,10 @@ static const uint32 ARCANE_BURST_MAX_CD         = 10000;
 static const uint32 BLIZZARD_MIN_CD             = 15000;    // todo: no source on blizzard cooldown. Duration is 10s
 static const uint32 BLIZZARD_MAX_CD             = 20000;
 static const uint32 VEKLOR_DIST                 = 20;       // Vek'lor chase to this distance
-static const uint32 SHADOWBOLT_RANGED_CD        = 2000;      // 1.5sec GCD on ranged use.
-static const uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;     // Min cd on SB for when VL is in melee range
-static const uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;    // Max cd on SB for when VL is in melee range 
+static const uint32 SHADOWBOLT_RANGED_MIN_CD    = 1800;     
+static const uint32 SHADOWBOLT_RANGED_MAX_CD    = 2500;     
+static const uint32 SHADOWBOLT_MELEE_MIN_CD     = 2000;     
+static const uint32 SHADOWBOLT_MELEE_MAX_CD     = 10000;    
 static const uint32 VEKLOR_PULL_YELL_DELAY      = 3000;     // Vek'lors pull yell happens after Vek'nilash
 static const uint32 EXPLODE_BUG_MIN_CD          = 7000;
 static const uint32 EXPLODE_BUG_MAX_CD          = 10000;
@@ -221,7 +222,7 @@ struct boss_twinemperorsAI : public ScriptedAI
     // Aggro-radius handling
     void MoveInLineOfSight(Unit *who)
     {
-        if (!who || m_creature->getVictim())
+        if (!who || m_creature->getVictim() || m_creature->isInCombat())
             return;
 
         if (who->isTargetableForAttack() && who->isInAccessablePlaceFor(m_creature) && m_creature->IsHostileTo(who))
@@ -233,6 +234,16 @@ struct boss_twinemperorsAI : public ScriptedAI
             // CREATURE_Z_ATTACK_RANGE there are stairs
             if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->GetDistanceZ(who) <= 7)
                 AttackStart(who);
+        }
+    }
+
+    void AttackedBy(Unit* attacker) override
+    {
+        // Preventing the emperors to start attacking target
+        // during the teleport-idle period
+        if (!justTeleported)
+        {
+            ScriptedAI::AttackedBy(attacker);
         }
     }
 
@@ -417,17 +428,18 @@ struct boss_twinemperorsAI : public ScriptedAI
     void OnStartTeleport(float x, float y, float z, float o)
     {
         howLong = 0;
-        m_creature->NearTeleportTo(x, y, z, o);
         justTeleported = true;
         justTeleportedTimer = JUST_TELEPORTED_FREEZE;
-        m_creature->InterruptNonMeleeSpells(false);
+        m_creature->InterruptNonMeleeSpells(true);
         DoStopAttack();
         DoResetThreat();
         m_creature->StopMoving();
+        m_creature->NearTeleportTo(x, y, z, o);
         closestTargetAfterTP = 0;
+        //m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+        //m_creature->addUnitState(UNIT_STAT_ROOT);
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_MSG, true);
         m_creature->CastSpell(m_creature, SPELL_TWIN_TELEPORT_VISUAL, true);
-        //m_creature->addUnitState(UNIT_STAT_ROOT);
     }
 
     // Called JUST_TELEPORTED_FREEZE after teleport happened
@@ -592,21 +604,41 @@ struct boss_veklorAI : public boss_twinemperorsAI
     void Reset() override
     {
         SharedReset();
-        shadowBoltTimer = 0; // No cooldown on pull
-        bugMutationTimer = boss_veklorAI::GetBugSpellCooldown();
-        blizzardTimer = urand(BLIZZARD_MIN_CD, BLIZZARD_MAX_CD);
-        teleportTimer = urand(TELEPORTTIME_MIN_CD, TELEPORTTIME_MAX_CD);
-        healTimer = TRY_HEAL_FREQUENCY;
-        arcaneBurstTimer = 0; // No cooldown on pull
-        pullDialogueTimer = VEKLOR_PULL_YELL_DELAY;
-        timeSinceLastSB = SHADOWBOLT_RANGED_CD;
+        shadowBoltTimer     = 0; // No cooldown on pull
+        arcaneBurstTimer    = 0; // No cooldown on pull
+        bugMutationTimer    = boss_veklorAI::GetBugSpellCooldown();
+        blizzardTimer       = urand(BLIZZARD_MIN_CD, BLIZZARD_MAX_CD);
+        teleportTimer       = urand(TELEPORTTIME_MIN_CD, TELEPORTTIME_MAX_CD);
+        healTimer           = TRY_HEAL_FREQUENCY;
+        pullDialogueTimer   = VEKLOR_PULL_YELL_DELAY;
+        timeSinceLastSB     = SHADOWBOLT_RANGED_MIN_CD;
 
         // Can be removed if its included in DB.
         m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, true);
+    }
 
-        // todo: he should actually do some damage, but need sources for how much.
-        //m_creature->SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, 0);
-        //m_creature->SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, 0);
+    void AttackStart(Unit* who) override
+    {
+        float dist = m_creature->GetDistanceToCenter(who);
+        if (dist <= VEKLOR_DIST) {
+            // if he is <= VEKLOR_DIST he should not start chasing again until
+            // target is further away than shadowboltRange
+            m_creature->SetCasterChaseDistance(shadowboltRange);
+        }
+        else if (dist > shadowboltRange) {
+            // if he is further away than shadowboltRange we set
+            // chase distance to VEKLOR_DIST
+            m_creature->SetCasterChaseDistance(VEKLOR_DIST);
+        }
+        ScriptedAI::AttackStart(who);
+    }
+
+    void KilledUnit(Unit*) override
+    {
+        if (killSayCooldown == 0) {
+            DoScriptText(SAY_VEKLOR_SLAY, m_creature);
+            killSayCooldown = urand(5000, 10000);
+        }
     }
 
     uint32 GetBugSpellCooldown() override
@@ -678,10 +710,10 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
     }
 
-    void OnEndTeleportVirtual()
+    void OnEndTeleportVirtual() override
     {
-        // Seems rather random if he starts with an AB instantly, or delays it
-        // so possibly because the timer is not reset?
+        // Seems rather random if he starts with an AB instantly or delays it 
+        // when looking at vanilla videos, so possibly because the timer is not reset?
         //arcaneBurstTimer = ARCANE_BURST_TP_CD;
 
         shadowBoltTimer = 0; 
@@ -747,15 +779,18 @@ struct boss_veklorAI : public boss_twinemperorsAI
         }
     }
     
-    void UpdateEmperor(uint32 diff)
+    void UpdateEmperor(uint32 diff) override
     {
         // Vek'lor does his yell second, so we wait out pullDialogueTimer before yelling
-        if (!didPullDialogue) {
-            if (pullDialogueTimer < diff) {
+        if (!didPullDialogue) 
+        {
+            if (pullDialogueTimer < diff) 
+            {
                 didPullDialogue = true;
                 DoScriptText(irand(SAY_VEKLOR_AGGRO_4, SAY_VEKLOR_AGGRO_1), m_creature);
             }
-            else {
+            else 
+            {
                 pullDialogueTimer -= diff;
             }
         }
@@ -763,184 +798,61 @@ struct boss_veklorAI : public boss_twinemperorsAI
         // Always update blizzard and arcane burst, regardless of melee or not
         UpdateBlizzard(diff);
         updateArcaneBurst(diff);
-    
-        /*
-        if (!m_creature->SelectHostileTarget())
-            return;
-        */
+   
         Unit* victim = m_creature->getVictim();
         if (!victim) 
             return;
 
-        bool isChasing = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
-        //if (isChasing)
-        //    return;
-        m_creature->IsMoving();
         bool isMelee = m_creature->IsWithinMeleeRange(victim);
-        bool isInCastRange = m_creature->IsWithinDist(victim, shadowboltRange);
-        float dist = m_creature->GetDistanceToCenter(victim);
         bool isInLos = m_creature->IsWithinLOSInMap(victim);
         
         // Overriding shadowboltTimer if we're not in melee and we have not casted
         // shadowbolt in at least SHADOWBOLT_RANGED_CD time. This will mostly be the 
         // case if target was in melee, but then moved out, in which case we should 
         // instantly re-cast a new shadowbolt unless it was just casted.
-        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_CD) {
+        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_MIN_CD) 
+        {
             shadowBoltTimer = 0;
         }
 
-        if (isMelee && isInLos) {
-            DoMeleeAttackIfReady();
-            /*
-            if (!DoMeleeAttackIfReady()) {
-                UpdateShadowBolt(diff, true);
-            }
-            else {
-                shadowBoltTimer -= std::min(diff, shadowBoltTimer);
-            }
-            */
-        }
-        if (!m_creature->IsMoving()) {
-            UpdateShadowBolt(diff, isMelee);
-        }
-        return;
-
-
-        
-        if (isMelee) {
-            // XXX: is this fine even when creature is not in los? How do we chase when in melee, but out of los?
-            if (!DoMeleeAttackIfReady()) {
-                UpdateShadowBolt(diff, true);
-            }
-            else {
-                shadowBoltTimer -= std::min(diff, shadowBoltTimer);
-            }
-        }
-        else if (isInLos) {
-            UpdateShadowBolt(diff, false);
-        }
-        /*else {
-            if ((!isInLos || !isInCastRange) && !isChasing) {
-                // should we wait with starting chase until we have finished current cast?
-                //DoStartMovement(victim);
-            }
-            else if(isChasing && dist <= VEKLOR_DIST){
-                //DoStartNoMovement(victim);
-            }
-            else {
-                //UpdateShadowBolt(diff, false);
-            }
-            UpdateShadowBolt(diff, false);
-        }*/
-        return;
-        /*
-        if (isChasing) {
-            if (isInLos && isInCastRange) {
-                
-            }
-        }
-
-
-        if (isInLos) {
-            
-        }
-
-
-        if (isChasing  && isInLos && isInCastRange) {
-            DoStartNoMovement(victim);
-        } 
-        
-        if (!isInCastRange || !isInLos) {
-            DoStartMovement(victim, VEKLOR_DIST);
-        }
-        else if (isMelee && isInLos) {
-            if (!DoMeleeAttackIfReady()) {
-                UpdateShadowBolt(diff, true);
-            }
-            else {
-                shadowBoltTimer -= std::min(diff, shadowBoltTimer);
-            }
-        }
-        else if (isInCastRange && isInLos) {
-            UpdateShadowBolt(diff, false);
-        }
-        */
-        //else {
-        //    DoStartMovement(victim, VEKLOR_DIST);
-        //}
-    }
-
-    void UpdateShadowBolt(uint32 diff, bool inMelee) {
-        if (shadowBoltTimer < diff) {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) {
-                timeSinceLastSB = 0;
-                if (inMelee) {
-                    // Looks like VL should prioritize shadowbolt differently if
-                    // target is in melee range. He seems to get a random cooldown on it, and meleeing when he can.
-                    // https://www.youtube.com/watch?v=SNOmg7kE68U&t=53s
-                    // https://www.youtube.com/watch?v=dCrDisOWOjU
-                    shadowBoltTimer = urand(SHADOWBOLT_MELEE_MIN_CD, SHADOWBOLT_MELEE_MAX_CD);
-                }
-                else {
-                    // When not in melee range, there is only a ~2 sec "gcd" on shadowbolt
-                    // https://www.youtube.com/watch?v=nHXfSDVX_ZA
-                    shadowBoltTimer = SHADOWBOLT_RANGED_CD;
-                }
-            }
-        }
-        else {
-            shadowBoltTimer -= diff;
-        }
-    }
-
-    void UpdateChase(Unit* victim)
-    {
-        //m_creature->SetCasterChaseDistance
-        
-        bool isChasing = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE;
-        if (isChasing)
-            return;
-        bool isMelee = m_creature->IsWithinMeleeRange(victim);
-        bool isInCastRange = m_creature->IsWithinDist(victim, shadowboltRange);
-        float dist = m_creature->GetDistanceToCenter(victim);
-        bool isInLos = m_creature->IsWithinLOSInMap(victim);
-
-    }
-
-    void AttackStart(Unit* who)
-    {
-        float dist = m_creature->GetDistanceToCenter(who);
-        if (dist <= VEKLOR_DIST) {
-            // if he is <=VEKLOR_DIST he should not start chasing again until
-            // target is further away than shadowboltRange
-            m_creature->SetCasterChaseDistance(shadowboltRange);
-        }
-        else if(dist > shadowboltRange) {
-            // if he is further away than shadowboltRange we set
-            // chase distance to VEKLOR_DIST
-            m_creature->SetCasterChaseDistance(VEKLOR_DIST);
-        }
-        ScriptedAI::AttackStart(who);
-        return;
-
-        if (!who)
-            return;
-
-        if (m_creature->Attack(who, false))
+        // If we're in los and melee range and melee attack succeeded we wait one update before
+        // doing the shadowbolt.
+        if (isMelee && isInLos && !m_creature->IsNonMeleeSpellCasted() && DoMeleeAttackIfReady())
         {
-            m_creature->AddThreat(who);
-            m_creature->SetInCombatWith(who);
-            who->SetInCombatWith(m_creature);
-
-            //m_creature->GetMotionMaster()->MoveChase(who, VEKLOR_DIST, 0);
+            shadowBoltTimer -= std::min(diff, shadowBoltTimer);
         }
-    }
-
-    void KilledUnit(Unit*)
-    {
-        if (killSayCooldown == 0) {
-            DoScriptText(SAY_VEKLOR_SLAY, m_creature);
-            killSayCooldown = urand(5000, 10000);
+        else if (!m_creature->IsMoving())
+        {
+            if(m_creature->getStandState() != UNIT_STAND_STATE_STAND)
+                m_creature->SetStandState(UNIT_STAND_STATE_STAND);
+            if (shadowBoltTimer < diff) 
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK) 
+                {
+                    timeSinceLastSB = 0;
+                    if (isMelee) 
+                    {
+                        // Looks like VL should prioritize shadowbolt differently if
+                        // target is in melee range. He seems to get a random cooldown on it, and meleeing when he can.
+                        // https://www.youtube.com/watch?v=SNOmg7kE68U&t=53s
+                        // https://www.youtube.com/watch?v=dCrDisOWOjU
+                        // This may just be some bugged/different behaviour in blizzards spell-priority system, 
+                        // but I believe the effect should be the same by adding a random cooldown.
+                        shadowBoltTimer = urand(SHADOWBOLT_MELEE_MIN_CD, SHADOWBOLT_MELEE_MAX_CD);
+                    }
+                    else 
+                    {
+                        // When not in melee range, there is only a ~2 sec cooldown on shadowbolt, even though
+                        // the cast-time is only 1.5 seconds.
+                        // https://www.youtube.com/watch?v=nHXfSDVX_ZA
+                        shadowBoltTimer = urand(SHADOWBOLT_RANGED_MIN_CD, SHADOWBOLT_RANGED_MAX_CD);
+                    }
+                }
+            }
+            else 
+            {
+                shadowBoltTimer -= diff;
+            }
         }
     }
 };
