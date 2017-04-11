@@ -5051,7 +5051,8 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    if (pVictim && pVictim->isAlive() && procVictim)
+    // Don't proc victim auras if its a miss / resist
+    if (pVictim && pVictim->isAlive() && procVictim && !(PROC_EX_RESIST & procExtra) && !(PROC_EX_MISS & procExtra))
         pVictim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
 
     HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
