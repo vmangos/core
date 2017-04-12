@@ -285,8 +285,8 @@ void MapManager::Update(uint32 diff)
         return;
 
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
-    std::stack<std::future<void>> instanceUpdaters;
-    std::stack<std::future<void>> continentsUpdaters;
+    std::vector<std::function<void()>> instanceUpdaters;
+    std::vector<std::function<void()>> continentsUpdaters;
 
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
@@ -303,16 +303,16 @@ void MapManager::Update(uint32 diff)
         iter->second->SetMapUpdateIndex(-1);
         if (iter->second->Instanceable())
         {
-            if (m_threads->isStarted())
-                instanceUpdaters.emplace(ThreadPool::wrap([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);}));
+            if (m_threads->status() == ThreadPool::Status::READY)
+                instanceUpdaters.emplace_back([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);});
             else
                 iter->second->Update(mapsDiff);
         }
         else // One threat per continent part
         {
             iter->second->SetMapUpdateIndex(continentsIdx++);
-            if (m_threads->isStarted())
-                continentsUpdaters.emplace(ThreadPool::wrap([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);}));
+            if (m_threads->status() == ThreadPool::Status::READY)
+                continentsUpdaters.emplace_back([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);});
             else
                 iter->second->Update(mapsDiff);
         }
@@ -322,14 +322,13 @@ void MapManager::Update(uint32 diff)
     for (int i = 0; i < i_maxContinentThread; ++i)
         i_continentUpdateFinished[i] = false;
 
-    m_threads->setWorkload(std::move(continentsUpdaters));
-    m_threads->waitForFinished();
+    m_threads->processWorkload(std::move(continentsUpdaters)).wait();
 
-    m_threads->setWorkload(std::move(instanceUpdaters));
+    std::future<void> f = m_threads->processWorkload(std::move(instanceUpdaters));
 
     SwitchPlayersInstances();
 
-    m_threads->waitForFinished();
+    f.wait();
 
     delete[] i_continentUpdateFinished;
 

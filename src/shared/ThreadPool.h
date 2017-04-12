@@ -20,20 +20,53 @@
 #define THREADPOOL_H
 
 #include <vector>
-#include <stack>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
+#include <functional>
+#include <atomic>
 #include <future>
 
 class ThreadPool
 {
 public:
+    using workload_t = std::vector<std::function<void()>>;
+
+    enum class Status {
+        ERROR = -1,
+        STOPPED,
+        STARTING,
+        READY,
+        PROCESSING
+    };
+
+    enum class ClearMode {
+        NEVER,
+        UPPON_COMPLETION,
+        AT_NEXT_WORKLOAD
+    };
+
+    /**
+     * @brief The ErrorHandling enum defines how the workers will manage tasks generating exceptions
+     *  NONE:       the error will propagate
+     *  IGNORE:     skip the current task
+     *  LOG:        skip the current task, logs the error
+     *  TERMINATE:  skip all remaning tasks
+     */
+    enum class ErrorHandling {
+        NONE,
+        IGNORE,
+        LOG,
+        TERMINATE
+    };
+
     /**
      * @brief ThreadPool allocates memory, use ThreadPool::start() to spawn the threads.
      * @param numThreads the number of threads that will be created.
      */
-    ThreadPool(int numThreads);
+    ThreadPool(int numThreads, ClearMode when = ClearMode::AT_NEXT_WORKLOAD, ErrorHandling mode = ErrorHandling::NONE);
+
+    ThreadPool() = delete;
 
     /**
      * @brief start creates and start the treads.
@@ -41,28 +74,23 @@ public:
     void start();
 
     /**
-     * @brief setWorkload set the workload, discards current one
+     * @brief processWorkload notify the threads that the workload is ready.
+     */
+    std::future<void> processWorkload();
+
+    /**
+     * @brief setWorkload set the next workload
      * @param workload
-     * @param safe if true, will behave threadsafe
+     * @param safe if true, it will wait for previous workload to be done
      */
-    void setWorkload(std::stack<std::future<void>>&& workload, bool safe = false);
+    std::future<void> processWorkload(workload_t &workload);
+    std::future<void> processWorkload(workload_t &&workload);
 
     /**
-     * @brief waitForFinished
+     * @brief status
+     * @return the current status
      */
-    void waitForFinished();
-
-    /**
-     * @brief isWorking
-     * @return true if some thread is still running a task
-     */
-    bool isWorking();
-
-    /**
-     * @brief isStarted
-     * @return true if threads were created
-     */
-    bool isStarted();
+    Status status();
 
     /**
      * @brief size
@@ -71,41 +99,69 @@ public:
     int size();
 
     /**
-     * @brief operator << add a task to the workload
-     * NOT threadsafe
-     * @param future
-     * @return
+     * @brief taskErrors always return an empty vector if ErrorHandling was set to IGNORE
+     * @return a vector containing all task exceptions generated during last processed workload
      */
-    ThreadPool& operator<<(std::future<void> &&future);
+    std::vector<std::exception_ptr> taskErrors();
 
     /**
      * @brief operator << add a task to the workload
      * NOT threadsafe
-     * @param f
+     * @param function
      * @return
      */
-    ThreadPool& operator<<(auto f)
-    {
-        m_workload.emplace(wrap(f));
-    }
+    ThreadPool& operator<<(std::function<void()> function);
 
     /**
-     * @brief wrap convenient function to wrap a function properly.
-     * @param f
-     * @return
+     * @brief clearWorkload
+     *  clear the current workload
+     *  WARNING: NOT threadsafe, call waitForFinished() first
      */
-    static inline std::future<void> wrap(auto f) {
-        return async(std::launch::deferred, f);
-    }
+    void clearWorkload();
 
 private:
+
+
+    struct worker{
+        worker(ThreadPool *pool, int id, ErrorHandling mode) :
+            id(id), errorHandling(mode), pool(pool), thread([this](){this->loop_wrapper();})
+        {
+        }
+        ~worker();
+
+        void loop_wrapper();
+        void loop();
+        void waitForWork();
+
+        int id;
+        ErrorHandling errorHandling;
+        bool busy = false;
+        ThreadPool *pool;
+        std::thread thread;
+    };
+    using workers_t = std::vector<std::unique_ptr<worker>>;
+
+    Status m_status = Status::STOPPED;
+    ErrorHandling m_errorHandling;
+    workers_t m_workers;
     int m_size;
-    std::vector<std::thread> m_workers;
     std::mutex m_mutex;
-    u_int32_t m_activeWorkers = 0;
     std::condition_variable m_waitForWork;
-    std::condition_variable m_waitForFinished;
-    std::stack<std::future<void>> m_workload;
+    workload_t m_workload;
+    ClearMode m_clearMode;
+    bool m_dirty = false;
     void workerLoop(int id);
+    std::atomic<int> m_active;
+    std::atomic<int> m_index;
+    std::vector<std::exception_ptr> m_errors;
+    std::promise<void> m_result;
+    bool m_unlock;
 };
+
+std::unique_ptr<ThreadPool> & operator<<(std::unique_ptr<ThreadPool> & tp, auto f)
+{
+    (*tp) << f;
+    return tp;
+}
+
 #endif

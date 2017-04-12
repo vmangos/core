@@ -17,46 +17,65 @@
  */
 
 #include "ThreadPool.h"
+#include "Log.h"
 
-ThreadPool::ThreadPool(int numThreads) :
-    m_size(numThreads)
+ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
+    m_errorHandling(mode), m_size(numThreads), m_clearMode(when), m_active(0)
 {
     m_workers.reserve(m_size);
 }
 
 void ThreadPool::start()
 {
+    m_status = Status::STARTING;
     if (!m_workers.empty())
         return;
-    for (auto i = 0; i < m_size; i++)
-        m_workers.emplace_back([this,i](){this->workerLoop(i);});
+    for (int i = 0; i < m_size; i++)
+        m_workers.emplace_back(new worker(this, i, m_errorHandling));
+    m_status = Status::READY;
+    m_waitForWork.notify_all();
 }
 
-void ThreadPool::setWorkload(std::stack<std::future<void> > &&workload, bool safe)
+std::future<void> ThreadPool::processWorkload()
 {
-    std::unique_lock<std::mutex> lock;
-    if (safe)
-        lock = std::unique_lock<std::mutex>(m_mutex);
+    if (m_status != Status::READY)
+        return std::future<void>();
+    m_result = std::promise<void>();
+    if (m_workload.empty())
+    {
+        m_result.set_value();
+        return m_result.get_future();
+    }
+    m_unlock = false;
+    m_dirty = true;
+    m_active = m_size;
+    m_index = 0;
+    m_status = Status::PROCESSING;
+    for (int i = 0; i < m_size; i++)
+        m_workers[i]->busy = true;
+    m_waitForWork.notify_all();
+    return m_result.get_future();
+}
 
+std::future<void> ThreadPool::processWorkload(workload_t &workload)
+{
+    if (m_status != Status::READY)
+        return std::future<void>();
+    m_workload = workload;
+    return processWorkload();
+}
+
+std::future<void> ThreadPool::processWorkload(workload_t &&workload)
+{
+    if (m_status != Status::READY)
+        return std::future<void>();
     m_workload = std::move(workload);
-    m_waitForWork.notify_one();
+    return processWorkload();
 }
 
-void ThreadPool::waitForFinished()
+ThreadPool::Status ThreadPool::status()
 {
-    std::unique_lock<std::mutex> lock(m_mutex);
-    while(!m_workload.empty() || m_activeWorkers)
-        m_waitForFinished.wait(lock);
-}
-
-bool ThreadPool::isWorking()
-{
-    return m_activeWorkers != 0;
-}
-
-bool ThreadPool::isStarted()
-{
-    return m_workers.size() > 0;
+    return m_status;
 }
 
 int ThreadPool::size()
@@ -64,28 +83,113 @@ int ThreadPool::size()
     return m_size;
 }
 
-ThreadPool &ThreadPool::operator<<(std::future<void> &&future)
+std::vector<std::exception_ptr> ThreadPool::taskErrors()
 {
-    m_workload.emplace(std::move(future));
+    return m_errors;
 }
 
-void ThreadPool::workerLoop(int id){ // WORKER THREAD LOOP
+void ThreadPool::worker::waitForWork()
+{
+    std::unique_lock<std::mutex> lock(pool->m_mutex); //locked!
+    while(!busy) //wait for work
+        pool->m_waitForWork.wait(lock);
+}
+
+ThreadPool &ThreadPool::operator<<(std::function<void()> packaged_task)
+{
+    if (m_clearMode == ClearMode::AT_NEXT_WORKLOAD && m_dirty)
+        clearWorkload();
+    m_workload.emplace_back(packaged_task);
+    return *this;
+}
+
+void ThreadPool::clearWorkload()
+{
+    m_dirty = false;
+    m_workload.clear();
+}
+
+ThreadPool::worker::~worker()
+{
+    if (thread.joinable())
+        thread.detach();
+}
+
+void ThreadPool::worker::loop_wrapper()
+{
+        if (pool->m_errorHandling == ErrorHandling::NONE)
+            this->loop();
+        else
+        {
+            std::exception_ptr err_p;
+            try
+            {
+                this->loop();
+            }
+            catch (...)
+            {
+
+                err_p = std::current_exception();
+            }
+
+            if (pool->m_errorHandling == ErrorHandling::IGNORE)
+            {
+                loop_wrapper();
+                return;
+            }
+            try{
+                if (err_p)
+                {
+                    pool->m_errors.push_back(err_p);
+                    std::rethrow_exception(err_p);
+                }
+            }
+            catch (const std::exception &e)
+            {
+                sLog.outError("A ThreadPool task generated an exception: %s",e.what());
+            }
+            catch (const std::string &e)
+            {
+                sLog.outError("A ThreadPool task generated an exception: %s",e);
+            }
+            catch (...)
+            {
+                sLog.outError("A ThreadPool task generated an exception");
+            }
+            if (pool->m_errorHandling == ErrorHandling::TERMINATE)
+                pool->m_status = Status::ERROR;
+            loop_wrapper();
+        }
+}
+
+void ThreadPool::worker::loop()
+{
     while(true)
     {
-        std::unique_lock<std::mutex> lock(m_mutex); //locked!
-        while(m_workload.empty()) //wait for work
-            m_waitForWork.wait(lock);
+        waitForWork();
+        int i = pool->m_index++;
+        while (i < pool->m_workload.size() && pool->m_status == Status::PROCESSING)
+        {
+            pool->m_workload[i]();
+            i = pool->m_index++;
+        }
+        busy = false;
 
-        m_activeWorkers++; //increment before to avoid having 0 workers with epty stack.
-        std::future<void> future = std::move(m_workload.top()); //get some work ...
-        m_workload.pop(); //... and remove it from available
-
-        m_waitForWork.notify_one(); // we're done picking a job, wake another worker
-        lock.unlock(); // unlock before starting to work
-        future.get(); // do work
-        lock.lock();
-        m_activeWorkers--; // we're done working ...
-        m_waitForFinished.notify_one(); // ... notify it
-        //we don't need to unlock, unique_lock lock will unlock the mutex on destruction
+        int remaning = --(pool->m_active);
+        if (!remaning)
+        {
+            if (pool->m_clearMode == ClearMode::UPPON_COMPLETION)
+                pool->clearWorkload();
+            if (pool->m_status == Status::ERROR)
+            {
+                pool->m_status = Status::READY;
+                pool->m_result.set_exception(pool->m_errors.front());
+            }
+            else
+            {
+                pool->m_status = Status::READY;
+                pool->m_result.set_value();
+            }
+        }
     }
 }
