@@ -37,8 +37,8 @@ void ThreadPool::start()
     m_waitForWork.notify_all();
 }
 
-template void ThreadPool::start<ThreadPool::worker_sq>();
-template void ThreadPool::start<ThreadPool::worker_mq>();
+template void ThreadPool::start<ThreadPool::SingleQueue>();
+template void ThreadPool::start<ThreadPool::MultiQueue>();
 
 std::future<void> ThreadPool::processWorkload()
 {
