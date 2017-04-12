@@ -25,16 +25,20 @@ ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
     m_workers.reserve(m_size);
 }
 
+template<class WORKER_T>
 void ThreadPool::start()
 {
     if (!m_workers.empty())
         return;
     m_status = Status::STARTING;
     for (int i = 0; i < m_size; i++)
-        m_workers.emplace_back(new worker(this, i, m_errorHandling));
+        m_workers.emplace_back(new WORKER_T(this, i, m_errorHandling));
     m_status = Status::READY;
     m_waitForWork.notify_all();
 }
+
+template void ThreadPool::start<ThreadPool::worker_sq>();
+template void ThreadPool::start<ThreadPool::worker_mq>();
 
 std::future<void> ThreadPool::processWorkload()
 {
@@ -52,7 +56,7 @@ std::future<void> ThreadPool::processWorkload()
     m_index = 0;
     m_status = Status::PROCESSING;
     for (int i = 0; i < m_size; i++)
-        m_workers[i]->busy = true;
+        m_workers[i]->prepare();
     m_waitForWork.notify_all();
     return m_result.get_future();
 }
@@ -162,19 +166,18 @@ void ThreadPool::worker::loop_wrapper()
         }
 }
 
+void ThreadPool::worker::prepare()
+{
+    busy = true;
+}
+
 void ThreadPool::worker::loop()
 {
     while(true)
     {
         waitForWork();
-        int i = pool->m_index++;
-        while (i < pool->m_workload.size() && pool->m_status == Status::PROCESSING)
-        {
-            pool->m_workload[i]();
-            i = pool->m_index++;
-        }
+        doWork();
         busy = false;
-
         int remaning = --(pool->m_active);
         if (!remaning)
         {
@@ -191,5 +194,31 @@ void ThreadPool::worker::loop()
                 pool->m_result.set_value();
             }
         }
+    }
+}
+
+void ThreadPool::worker_mq::doWork()
+{
+    while (it < pool->m_workload.end() && pool->m_status == Status::PROCESSING)
+    {
+        workload_t::iterator w = it;
+        it += pool->m_size; //if it fails, we might want to skip this task.
+        (*w)();
+    }
+}
+
+void ThreadPool::worker_mq::prepare()
+{
+    it = pool->m_workload.begin() + id;
+    worker::prepare();
+}
+
+void ThreadPool::worker_sq::doWork()
+{
+    int i = pool->m_index++;
+    while (i < pool->m_workload.size() && pool->m_status == Status::PROCESSING)
+    {
+        pool->m_workload[i]();
+        i = pool->m_index++;
     }
 }
