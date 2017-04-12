@@ -186,7 +186,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         // "Ouro has a chance to submerge every 1.5minutes.
         // He will not submerge if he is busy casting a Sand Blast or Sweep, else he will submerge
         // (ie. the chance of submerging is totally random)"
-        m_uiSubmergeTimer = 90000;
+        m_uiSubmergeTimer = SUBMERGE_TIMER;
         if (CanCastSpell(m_creature, sSpellMgr.GetSpellEntry(SPELL_SUBMERGE_VISUAL), false) == CAST_OK)
         {
             if (!isReset)
@@ -203,7 +203,10 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             m_bSubmerged      = true;
             m_uiSubmergeTimer = 30000;
             m_uiNoMeleeTimer  = 10000;
-
+        }
+        else
+        {
+            m_uiSubmergeTimer = 2000; // try again in a moment
         }
     }
 
