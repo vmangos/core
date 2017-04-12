@@ -1546,15 +1546,20 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
     }
     
     bool immune = true;
+    bool feral = IsInFeralForm();
 
-    for (uint8 i = 0; i < m_weaponDamageCount[damageInfo->attackType]; i++)
+    // Only get one damage type for feral druids so they don't receive incorrect benefits
+    // from weapons with multiple types of damage
+    uint8 actualDamageCount = feral ? 1 : m_weaponDamageCount[damageInfo->attackType];
+    for (uint8 i = 0; i < actualDamageCount; i++)
     {
         SubDamageInfo *subDamage = &damageInfo->subDamage[i];
-
-        subDamage->damageSchoolMask = GetTypeId() == TYPEID_PLAYER
+    
+        // feral only allowed melee school
+        subDamage->damageSchoolMask = GetTypeId() == TYPEID_PLAYER && !feral
             ? GetSchoolMask(GetWeaponDamageSchool(damageInfo->attackType, i))
             : GetMeleeDamageSchoolMask();
-
+        
         if (damageInfo->target->IsImmuneToDamage(subDamage->damageSchoolMask))
         {
             subDamage->damage = 0;

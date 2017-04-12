@@ -395,12 +395,25 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
 
     if (IsInFeralForm())                                    // check if player is druid and in cat or bear forms, non main hand attacks not allowed for this mode so not check attack type
     {
-        uint32 lvl = getLevel();
-        if (lvl > 60)
-            lvl = 60;
+        /* Druids don't use weapons so a weapon damage index > 0 
+           should not affect their damage. Fixes crazy druid scaling
+           when using melee weapons with two or more damage types on it */
+        if (index > 0)
+        {
+            // Note that CalculateDamage will pull max_damage up to 5.0f, 
+            // so they'll still get some extra damage...
+            weapon_mindamage = 0.0f;
+            weapon_maxdamage = 0.0f;
+        }
+        else 
+        {
+            uint32 lvl = getLevel();
+            if (lvl > 60)
+                lvl = 60;
 
-        weapon_mindamage = lvl * 0.85f * att_speed;
-        weapon_maxdamage = lvl * 1.25f * att_speed;
+            weapon_mindamage = lvl * 0.85f * att_speed;
+            weapon_maxdamage = lvl * 1.25f * att_speed;
+        }
     }
     else if (!CanUseEquippedWeapon(attType))                // check if player not in form but still can't use weapon (broken/etc)
     {
