@@ -27,9 +27,9 @@ ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
 
 void ThreadPool::start()
 {
-    m_status = Status::STARTING;
     if (!m_workers.empty())
         return;
+    m_status = Status::STARTING;
     for (int i = 0; i < m_size; i++)
         m_workers.emplace_back(new worker(this, i, m_errorHandling));
     m_status = Status::READY;
