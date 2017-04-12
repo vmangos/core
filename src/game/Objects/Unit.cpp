@@ -2867,6 +2867,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     if (!pVictim->isAlive())
         return SPELL_MISS_NONE;
 
+    // Spell cannot be resisted (not exist on dbc, custom flag)
+    if (spell->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
+        return SPELL_MISS_NONE;
+
     int32 hitChance = MagicSpellHitChance(pVictim, spell, spellPtr);
     int32 missChance = 10000 - hitChance;
     int32 rand = irand(0, 10000);
