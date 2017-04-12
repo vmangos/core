@@ -66,6 +66,18 @@ enum
     NPC_DIRT_MOUND             = 15712,
 };
 
+/*
+ * Sand Blast timers are based on June 2006 values (15-20s) as shown in
+ * https://www.youtube.com/watch?v=REmX3uRTFkQ and further reduced to account
+ * for April 2006 nerfs (http://blue.cardplace.com/cache/wow-dungeons/481724.htm &
+ * http://blue.cardplace.com/cache/wow-general/7950998.htm
+ */
+const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
+const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
+const uint32_t SANDBLAST_TIMER_MIN     = 10000;
+const uint32_t SANDBLAST_TIMER_MAX     = 15000;
+const uint32_t SUBMERGE_TIMER = 60000;
+
 struct boss_ouroAI : public Scripted_NoMovementAI
 {
     boss_ouroAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
@@ -94,8 +106,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     void Reset()
     {
         m_uiSweepTimer        = urand(35000, 40000);
-        m_uiSandBlastTimer    = urand(30000, 45000);
-        m_uiSubmergeTimer     = 90000;
+        m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
+        m_uiSubmergeTimer     = SUBMERGE_TIMER;
         m_uiSummonBaseTimer   = 2000;
         // Source : http://wowwiki.wikia.com/wiki/Ouro
         // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
@@ -280,7 +292,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             if (m_uiSandBlastTimer < uiDiff)
 	    {
                 if (DoCastSpellIfCan(m_creature, SPELL_SANDBLAST) == CAST_OK)
-                    m_uiSandBlastTimer = 22000;
+                    m_uiSandBlastTimer = urand(SANDBLAST_TIMER_MIN, SANDBLAST_TIMER_MAX);
             }
             else
                 m_uiSandBlastTimer -= uiDiff;
