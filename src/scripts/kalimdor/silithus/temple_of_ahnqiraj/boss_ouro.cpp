@@ -422,13 +422,18 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
     }
 
-    void Aggro(Unit* /*pWho*/)
+    void MoveInLineOfSight(Unit* pWho) override
     {
-        if (!m_bHasSummoned)
+        // Spawn Ouro on LoS check
+        if (!m_bHasSummoned && pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster() && m_creature->IsWithinDistInMap(pWho, 25.0f))
         {
-            DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO, CAST_TRIGGERED);
-            m_bHasSummoned = true;
+            if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO) == CAST_OK)
+            {
+                m_bHasSummoned = true;
+            }
         }
+
+        ScriptedAI::MoveInLineOfSight(pWho);
     }
 
     void JustSummoned(Creature* pSummoned)
@@ -561,12 +566,9 @@ struct go_sandworm_baseAI: public GameObjectAI
     bool OnUse(Unit* pUser)
     {
         WorldLocation loc;
+        pUser->GetObjectScale();
         pUser->GetPosition(loc);
-        me->Relocate(
-            loc.coord_x,
-            loc.coord_y,
-            loc.coord_z,
-            loc.orientation);
+
         if (m_bActive)
         {
             m_bActive = false;

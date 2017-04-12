@@ -42,3 +42,6 @@ UPDATE gameobject_template SET data3 = 65536 * 900, data4 = 1, data5 = 1 WHERE e
 
 -- Add scriptname to Ouro base
 UPDATE gameobject_template SET scriptname = "go_sandworm_base" WHERE entry = 180795;
+
+-- Update model combat reach
+UPDATE creature_model_info SET combat_reach = '20' WHERE modelid = 15509;
