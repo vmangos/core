@@ -178,10 +178,10 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
-        if (pSpell->Id == SPELL_SANDBLAST)
+        if (pSpell->Id == SPELL_SANDBLAST && pTarget)
         {
-            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -100);
+            if (m_creature->getThreatManager().getThreat(pTarget))
+                m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
         }
     }
 
