@@ -183,6 +183,11 @@ struct boss_viscidusAI : public ScriptedAI
 
     void ResetViscidusState(bool bApplyToxin)
     {
+        if (m_creature->GetVisibility() == VISIBILITY_OFF)
+        {
+            DoCast(m_creature, SPELL_VISCIDUS_TELEPORT, CAST_TRIGGERED);
+        }
+
         DoResetThreat();
         m_creature->SetVisibility(VISIBILITY_ON);
         m_creature->clearUnitState(UNIT_STAT_DIED);
@@ -342,11 +347,6 @@ struct boss_viscidusAI : public ScriptedAI
             {
                 // Make invisible
                 m_creature->SetVisibility(VISIBILITY_OFF);
-
-                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_TELEPORT, CAST_TRIGGERED);
-                float fX, fY, fZ;
-                m_creature->GetRespawnCoord(fX, fY, fZ);
-                m_creature->NearTeleportTo(fX, fY, fZ, 0.0f);
                 m_uiExplodeDelayTimer = 0;
             }
             else

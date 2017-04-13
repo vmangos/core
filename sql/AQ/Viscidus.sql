@@ -39,3 +39,6 @@ UPDATE creature_template SET mingold = 0, maxgold = 0 WHERE entry = 15667;
 
 -- Update Glob of Viscidus immunities
 UPDATE creature_template SET MechanicImmuneMask = 617299803 WHERE entry = 15667;
+
+-- Viscidus teleport spell
+INSERT INTO spell_target_position (id, target_map, target_position_x, target_position_y, target_position_z, target_orientation) VALUES (25904, 531, -7992.36, 908.19, -52.62, 1.68);
