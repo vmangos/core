@@ -494,11 +494,17 @@ struct npc_dirt_moundAI : public ScriptedAI
     ObjectGuid m_TargetGUID;
     ObjectGuid m_CurrentTargetGUID;
 
+    void JustRespawned() override
+    {
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        ScriptedAI::JustRespawned();
+    }
+
     void Reset()
     {
         m_uiDespawnTimer = 30000;
-	m_TargetGUID.Clear();
-	m_CurrentTargetGUID.Clear();
+	    m_TargetGUID.Clear();
+	    m_CurrentTargetGUID.Clear();
 
         DoCastSpellIfCan(m_creature, SPELL_DIRTMOUND_PASSIVE);
     }
@@ -506,9 +512,9 @@ struct npc_dirt_moundAI : public ScriptedAI
     void MoveInLineOfSight(Unit *who)
     {
         if (!m_TargetGUID && who->GetTypeId() == TYPEID_PLAYER)
-	{
-  	    m_TargetGUID = who->GetGUID();
-	}
+        {
+  	        m_TargetGUID = who->GetGUID();
+	    }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -520,6 +526,7 @@ struct npc_dirt_moundAI : public ScriptedAI
         if (bForceChangeTarget || m_uiChangeTargetTimer < uiDiff)
         {
             m_CurrentTargetGUID.Clear();
+
             if (Unit* pTarget = m_creature->GetMap()->GetUnit(m_TargetGUID))
             {
                 m_creature->GetMotionMaster()->MoveFollow(pTarget, 0.0f, 0.0f);
@@ -541,7 +548,9 @@ struct npc_dirt_moundAI : public ScriptedAI
             m_creature->ForcedDespawn();
         }
         else
+        {
             m_uiDespawnTimer -= uiDiff;
+        }
     }
 };
 
@@ -563,11 +572,10 @@ struct npc_ouro_scarabAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit *who)
     {
-        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim()
-            && !urand(0, 5))
-	{
+        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim() && !urand(0, 5))
+	    {
             AttackStart(who);
-	}
+	    }
     }
 
     void UpdateAI(const uint32 uiDiff)
