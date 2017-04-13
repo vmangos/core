@@ -210,6 +210,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             m_uiSubmergeTimer = 30000;
             m_uiNoMeleeTimer  = 10000;
             m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
+            DoResetThreat();
         }
         else
         {
