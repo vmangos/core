@@ -80,7 +80,7 @@ struct boss_sarturaAI : public ScriptedAI
         m_creature->SetTauntImmunity(false);
 
         m_uiCleaveTimer = 4000;
-        m_uiWhirlWindTimer = urand(18000, 20000);;
+        m_uiWhirlWindTimer = urand(8000, 12000);;
         m_uiWhirlWindEndTimer = 0;
         m_uiAggroResetTimer = urand(5000, 7500);
         
@@ -180,7 +180,7 @@ struct boss_sarturaAI : public ScriptedAI
             if (m_uiWhirlWindEndTimer <= uiDiff)
             {
                 m_uiWhirlWindEndTimer = 0;
-                m_uiWhirlWindTimer = urand(8000, 10000);
+                m_uiWhirlWindTimer = urand(5000, 10000);
                 m_uiAggroResetTimer = urand(3000, 7000); 
                 // Remove the negative haste modifier from Whirlwind to restore Sartura's auto attack
                 m_creature->ApplyAttackTimePercentMod(BASE_ATTACK, 0, true);
