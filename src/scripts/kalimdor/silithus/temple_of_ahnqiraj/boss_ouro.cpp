@@ -303,9 +303,10 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             if (m_uiSandBlastTimer < uiDiff)
             {
                 // one post claims Sand Blast has melee priority when enraged, another post claims otherwise :(
-                auto target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
+                // note: need testing
+                auto target = m_creature->getThreatManager().getHostileTarget();
 
-                if (DoCastSpellIfCan(target, SPELL_SANDBLAST) == CAST_OK)
+                if (target && DoCastSpellIfCan(target, SPELL_SANDBLAST) == CAST_OK)
                 {
                     m_uiSandBlastTimer = urand(SANDBLAST_TIMER_MIN, SANDBLAST_TIMER_MAX);
                 }
