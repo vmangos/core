@@ -144,7 +144,11 @@ struct boss_fankrissAI : public ScriptedAI
                 Player* pPlayer = itr->getSource();
                 if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
                 {
-                   
+                    // cheap way of quickly disgarding the check most of the time. No point 
+                    // where he can be pulled should be higher than this point (he is at roughly -100)
+                    if (pPlayer->GetPositionZ() > -70.0f)
+                        continue;
+
                     float distToPull = pPlayer->GetDistance(pullCenter.m_fX, pullCenter.m_fY, pullCenter.m_fZ);
                     // If we're at the same Z axis of cthun, or within the maximum possible pull distance
                     if (distToPull < 85.0f && pPlayer->IsWithinLOSInMap(m_creature))
