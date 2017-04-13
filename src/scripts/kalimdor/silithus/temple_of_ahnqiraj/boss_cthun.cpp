@@ -346,9 +346,8 @@ static constexpr TempSummonType TENTACLE_DESPAWN_FLAG = TEMPSUMMON_CORPSE_TIMED_
 
 struct cthunTentacle : public ScriptedAI
 {
-    ObjectGuid previousTarget;
     instance_temple_of_ahnqiraj* m_pInstance;
-    uint32 oocDespawnTimer;
+    float defaultOrientation;
 
     cthunTentacle(Creature* pCreature) :
         ScriptedAI(pCreature)
@@ -358,23 +357,27 @@ struct cthunTentacle : public ScriptedAI
             sLog.outError("C'thun tentacle could not find it's instance");
 
         SetCombatMovement(false);
-        oocDespawnTimer = 10000;
+        defaultOrientation = m_creature->GetOrientation();
     }
 
     virtual void Reset() override
     {
         m_creature->addUnitState(UNIT_STAT_ROOT);
-        previousTarget = 0;
+        m_creature->StopMoving();
+        m_creature->SetMovement(MOVE_ROOT);
         m_creature->SetInCombatWithZone();
     }
 
     void Aggro(Unit* pWho) override
     {
+        ScriptedAI::Aggro(pWho);
         m_creature->SetInCombatWithZone();
     }
 
     bool UpdateCthunTentacle(uint32 diff)
     {
+        if (!m_pInstance) return false;
+
         if (!m_pInstance->GetPlayerInMap(true, false)) {
             if (TemporarySummon* tmpS = dynamic_cast<TemporarySummon*>(m_creature)) {
                 tmpS->UnSummon();
@@ -387,42 +390,118 @@ struct cthunTentacle : public ScriptedAI
             //Reset();
             return false;
         }
+
+        // This makes the mob behave like frostnovaed mobs etc, that is,
+        // retargetting another top-threat target if current leaves melee range
+        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->StopMoving();
+        m_creature->SetMovement(MOVE_ROOT);
         return true;
     }
-    // Rootet mob-type function for selecting attack target
-    Unit* CheckForMelee()
+    
+    bool UpdateMelee(bool resetOrientation)
     {
-        Unit* victim = nullptr;
+        if (!SelectHostileTargetMelee()) {
+            DoStopAttack();
+            if(resetOrientation)
+                m_creature->SetOrientation(defaultOrientation);
+            return false;
+        }
+        else {
+            DoMeleeAttackIfReady();
+            return true;
+        }
+    }
 
-        if (m_creature->SelectHostileTarget()) {
-            victim = m_creature->getVictim();
-            if (victim) {
-                //XXX if the mob is not displaying its target correct, look at this.
-                if (previousTarget != m_creature->GetTargetGuid()) {
-                    m_creature->SetTargetGuid(victim->GetObjectGuid());
-                    m_creature->SetFacingToObject(victim);
-                }
-                previousTarget = victim->GetGUID();
+    // Custom targetting function.
+    // Will only target hostile players/pets that are in melee range.
+    // If current target leaves melee range, his threat is reset.
+    // IF there are no targets in melee range, the creature will
+    // not target anyone.
+    // Returns true when the creature has a target.
+    bool SelectHostileTargetMelee()
+    {
+        if (!m_creature->isAlive())
+            return false;
 
-                // this will get us the highest threat target in meleee range, but
-                // if there is only one person on the threat list it will attack that 
-                // target regardless, so we need to check the range manually as well
-                if (!m_creature->CanReachWithMeleeAttack(victim)) {
-                    if (m_creature->hasUnitState(UNIT_STAT_MELEE_ATTACKING)) {
-                        m_creature->clearUnitState(UNIT_STAT_MELEE_ATTACKING);
-                        m_creature->InterruptSpell(CURRENT_MELEE_SPELL);
-                    }
-                    //m_creature->AttackStop();
-                    return nullptr;
-                }
-                else if (m_creature->isAttackReady() && !m_creature->IsNonMeleeSpellCasted(false))
-                {
-                    m_creature->AttackerStateUpdate(victim);
-                    m_creature->resetAttackTimer();
-                }
+        // If we're casting something its sort-of counter intuitive to return true,
+        // but it also means we do have a valid target already, even if it's not melee.
+        // DoMeleeAttack, which is typically called on true return, will check
+        // m_creature->IsNonMeleeSpellCasted(false) internally anyway.
+        if (m_creature->IsNonMeleeSpellCasted(false)) {
+            return true;
+        }
+
+        Unit* oldTarget = m_creature->getVictim();
+        Unit* target = nullptr;
+
+        // First checking if we have some taunt on us
+        const Unit::AuraList& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
+        for (auto it = tauntAuras.crbegin(); it != tauntAuras.crend(); it++) {
+            Unit* caster = (*it)->GetCaster();
+            if (!caster) continue;
+
+            if (caster->IsInMap(m_creature) && caster->isTargetableForAttack() && m_creature->CanReachWithMeleeAttack(caster))
+            {
+                target = caster;
+                break;
+            }
+            else {
+                // Target is not in melee and reset his threat
+                m_creature->getThreatManager().modifyThreatPercent(caster, -100);
             }
         }
-        return victim;
+        // So far so good. If we have a target after this loop it means we have a valid target in melee range.
+
+        // If we dont have a target we need to keep searching through the threatlist
+        if (!target)
+        {
+            Unit* tmpTarget = nullptr;
+            if (m_creature->CanHaveThreatList()) {
+                ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
+                ThreatList::const_iterator itr = threatlist.begin();
+                ThreatList::const_reverse_iterator ritr = threatlist.rbegin();
+                
+                // Implementing this loop manually instead of using Creature::SelectAttackingTarget
+                // to use target->CanReachWithMeleeAttack(creature) instead of creature->isWithinMeleeRange(target),
+                // because melee ranges are fucked up. todo: fix melee ranges....
+                for (; itr != threatlist.end(); ++itr) {
+                    if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid())) {
+                        if (pTarget->isTargetableForAttack() 
+                            && pTarget->CanReachWithMeleeAttack(m_creature)
+                            && pTarget->IsWithinLOSInMap(m_creature)) {
+                            tmpTarget = pTarget;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            // Resetting threat of old target if it has left melee range
+            if (oldTarget && tmpTarget != oldTarget && !oldTarget->CanReachWithMeleeAttack(m_creature)) {
+            //if (oldTarget && tmpTarget != oldTarget && !m_creature->IsWithinMeleeRange(oldTarget)) {
+                m_creature->getThreatManager().modifyThreatPercent(oldTarget, -100);
+            }
+
+            if (tmpTarget) {
+                // Need to call getHostileTarget to force an update of the threatlist, bleh
+                target = m_creature->getThreatManager().getHostileTarget();
+            }
+        }
+        
+
+        if (target)
+        {
+            // Nostalrius : Correction bug sheep/fear
+            if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING) 
+                && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
+            {
+                m_creature->SetInFront(target);
+                AttackStart(target);
+            }
+            return true;
+        }
+        return false;
     }
 };
 
@@ -501,7 +580,7 @@ public:
 
     void FixPortalPosition() {
         Unit* pPortal = nullptr;
-        if (portalGuid)
+        if (portalGuid && m_pInstance)
             pPortal = m_pInstance->GetCreature(portalGuid);
         if (!pPortal)
             return;
@@ -608,26 +687,38 @@ struct clawTentacle : public cthunPortalTentacle
 
 private:
     void updateNormal(uint32 diff) {
-        hamstringTimer.Update(diff);
 
+        if (UpdateMelee(false)) {
+            EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
+            hamstringTimer.Update(diff);
+        }
+        else {
+            if (EvadeTimer < diff) {
+                clawState = eClawState::FEIGN_IN_PROCES;
+                feignDeathTimer = 1000;
+                m_creature->CastSpell(m_creature, SPELL_SUBMERGE_VISUAL, false);
+            }
+            else {
+                EvadeTimer -= diff;
+            }
+        }
+        /*
         if (Unit* uP = CheckForMelee()) {
             EvadeTimer = CLAW_TENTACLE_EVADE_PORT_COOLDOWN;
         }
         else {
             // Initiate submerge->teleport->birth sequence if it's time
             if (EvadeTimer < diff) {
+                DoStopAttack(); // Added after testing
                 clawState = eClawState::FEIGN_IN_PROCES;
                 feignDeathTimer = 1000;
-                //m_creature->SetFeignDeath(true); //todo: find a spell for it  if possible
-                //m_creature->InterruptNonMeleeSpells(false);
-                //m_creature->HandleEmote(EMOTE_ONESHOT_SUBMERGE); //
                 m_creature->CastSpell(m_creature, SPELL_SUBMERGE_VISUAL, false);
-                // m_creature->resetAttackTimer(); // any reason to do this anymore?
             }
             else {
                 EvadeTimer -= diff;
             }
         }
+        */
     }
 
     void updateFeign(uint32 diff) {
@@ -691,7 +782,7 @@ private:
         }
     }
 };
-
+    
 struct eye_tentacleAI : public cthunPortalTentacle
 {
     uint32 nextMFAttempt;
@@ -708,6 +799,14 @@ struct eye_tentacleAI : public cthunPortalTentacle
         cthunPortalTentacle::Reset();
         nextMFAttempt = MIND_FLAY_INITIAL_WAIT_DURATION;
         currentMFTarget = 0;
+    }
+
+    void AttackStart(Unit* who) override
+    {
+        // Prevents AttacStart from stopping the cast animation
+        if (!m_creature->IsNonMeleeSpellCasted(false)) {
+            ScriptedAI::AttackStart(who);
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -736,9 +835,6 @@ struct eye_tentacleAI : public cthunPortalTentacle
                     {
                         if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK) {
                             currentMFTarget = target->GetGUID();
-                            // important to set this, so if next thing is a melee attack,
-                            // the CheckForMelee function will realize it has to re-target melee target.
-                            previousTarget = currentMFTarget;
                             m_creature->SetFacingToObject(target);
                             m_creature->SetTargetGuid(currentMFTarget);
                             didCast = true;
@@ -749,7 +845,7 @@ struct eye_tentacleAI : public cthunPortalTentacle
                 }
             }
             if (!didCast) {
-                CheckForMelee();
+                UpdateMelee(false);
             }
 
         }
@@ -817,7 +913,7 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
 {
     uint32 BeamTimer;
     ObjectGuid beamTargetGuid;
-
+    bool isCasting;
     giant_eye_tentacleAI(Creature* pCreature) :
         cthunPortalTentacle(pCreature, SPELL_GROUND_RUPTURE_NATURE, MOB_GIANT_PORTAL)
     {
@@ -827,19 +923,23 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
     {
         cthunPortalTentacle::Reset();
         BeamTimer = GIANT_EYE_INITIAL_GREEN_BEAM_COOLDOWN;
+        isCasting = false;
     }
 
     void UpdateAI(const uint32 diff)
     {
-        if (!cthunPortalTentacle::UpdatePortalTentacle(diff))
-            return;
+        if (!isCasting)
+        {
+            if (!cthunPortalTentacle::UpdatePortalTentacle(diff))
+                return;
+        }
 
         if (!m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
             beamTargetGuid = 0;
+            isCasting = false;
         }
 
         if (BeamTimer < diff) {
-            bool didCast = false;
             // Rough check against common auras that prevent the creature from casting,
             // before getting a random target etc
             if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, CANNOT_CAST_SPELL_MASK)) {
@@ -848,25 +948,18 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
                     // after initiating the cast, the cast animation dissapear for some reason
                     if (CanCastSpell(target, sSpellMgr.GetSpellEntry(SPELL_GREEN_EYE_BEAM), false) == CanCastResult::CAST_OK) {
                         beamTargetGuid = target->GetObjectGuid();
-                        // important to set this, so if next thing is a melee attack,
-                        // the CheckForMelee function will realize it has to re-target melee target.
-                        previousTarget = beamTargetGuid;
                         m_creature->SetTargetGuid(target->GetObjectGuid());
                         m_creature->SetFacingToObject(target);
                         m_creature->CastSpell(target, SPELL_GREEN_EYE_BEAM, false);
+                        isCasting = true;
                         BeamTimer = GIANT_EYE_BEAM_COOLDOWN;
-                        didCast = true;
                     }
                 }
-            }
-            if (!didCast) {
-                CheckForMelee();
             }
         }
         else {
             BeamTimer -= diff;
             if (m_creature->GetCurrentSpell(CurrentSpellTypes::CURRENT_GENERIC_SPELL)) {
-
                 // Stop casting on current target if it's been ported to stomach
                 // and immediately start casting on a new target
                 if (Unit* currentCastTarget = m_creature->GetMap()->GetPlayer(beamTargetGuid)) {
@@ -876,85 +969,31 @@ struct giant_eye_tentacleAI : public cthunPortalTentacle
                     }
                 }
             }
-            else {
-                CheckForMelee();
-            }
+        }
+        if (!isCasting)
+        {
+            UpdateMelee(false);
         }
     }
 };
 
 struct flesh_tentacleAI : public cthunTentacle
 {
+    ScriptedInstance* m_pInstance;
+
     flesh_tentacleAI(Creature* pCreature) : cthunTentacle(pCreature)
     {
         flesh_tentacleAI::Reset();
     }
-
-    ScriptedInstance* m_pInstance;
-
-    void Reset()
+    
+    void Reset()  override
     {
         cthunTentacle::Reset();
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 diff)  override
     {
-        // Copied from Creature::SelectHostileTarget with modifications for melee only targets
-        //function provides main threat functionality
-        //next-victim-selection algorithm and evade mode are called
-        //threat list sorting etc.
-
-        if (m_creature->IsTempPacified())
-            return;
-
-        Unit* target = nullptr;
-
-        // First checking if we have some taunt on us
-        const Unit::AuraList& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
-        if (!tauntAuras.empty())
-        {
-            Unit* caster;
-
-            // The last taunt aura caster is alive an we are happy to attack him
-            if ((caster = tauntAuras.back()->GetCaster()) && caster->isAlive())
-                return;
-            else if (tauntAuras.size() > 1)
-            {
-                // We do not have last taunt aura caster but we have more taunt auras,
-                // so find first available target
-
-                // Auras are pushed_back, last caster will be on the end
-                Unit::AuraList::const_iterator aura = --tauntAuras.end();
-                do
-                {
-                    --aura;
-                    if ((caster = (*aura)->GetCaster()) && caster->IsInMap(m_creature) && caster->isTargetableForAttack())
-                    {
-                        target = caster;
-                        break;
-                    }
-                } while (aura != tauntAuras.begin());
-            }
-        }
-
-        // No taunt aura or taunt aura caster is dead, standard target selection
-        if (!target && !m_creature->getThreatManager().isThreatListEmpty())
-            target = m_creature->getThreatManager().getHostileTarget();
-
-        if (target && m_creature->CanReachWithMeleeAttack(target))
-        {
-            // Nostalrius : Correction bug sheep/fear
-            if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
-                && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
-            {
-                m_creature->SetInFront(target);
-                AttackStart(target);
-            }
-            return;
-        }
-        else {
-            m_creature->AttackStop(true);
-        }
+        UpdateMelee(true);
     }
 };
 
