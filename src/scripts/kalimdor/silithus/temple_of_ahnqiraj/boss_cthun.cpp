@@ -1047,7 +1047,7 @@ struct eye_of_cthunAI : public ScriptedAI
         Reset();
     }
 
-    void Pull(Player* puller) {
+    void Pull(Unit* puller) {
 
         m_creature->SetFactionTemporary(14);
 
@@ -1057,8 +1057,15 @@ struct eye_of_cthunAI : public ScriptedAI
         IsAlreadyPulled = true;
     }
 
-    void Aggro(Unit*)
+    void Aggro(Unit* puller)
     {
+        // Just in case someone manages to get through the AggroRadius logic in C'thuns AI
+        // we make sure the proper pull-sequence is initiated by calling C'thuns attackstart.
+        if (!m_creature->isInCombat()) {
+            if (Creature* pCthun = m_pInstance->GetSingleCreatureFromStorage(NPC_CTHUN)) {
+                pCthun->AI()->AttackStart(puller);
+            }
+        }
     }
 
     void Reset()
@@ -1272,6 +1279,32 @@ struct cthunAI : public ScriptedAI
         Reset();
     }
 
+    void AttackStart(Unit* who) override
+    {
+        if (!m_creature->isInCombat()) {
+            Creature* pEye = m_pInstance->GetCreature(eyeGuid);
+            if (!pEye) {
+                sLog.outError("cthunAI::AggroRadius could not find pEye");
+                return;
+            }
+            eye_of_cthunAI* eyeAI = (eye_of_cthunAI*)pEye->AI();
+            eyeAI->Pull(who);
+#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
+            m_creature->SetInCombatWith(who);
+            pEye->SetInCombatWith(who);
+#else
+            m_creature->SetInCombatWithZone();
+            pEye->SetInCombatWithZone();
+#endif
+            if (m_pInstance) {
+                m_pInstance->SetData(TYPE_CTHUN, IN_PROGRESS);
+            }
+        }
+        else {
+            ScriptedAI::AttackStart(who);
+        }
+    }
+   
     void JustReachedHome() override
     {
         if(m_pInstance)
@@ -1328,8 +1361,8 @@ struct cthunAI : public ScriptedAI
             }
         }
         
-        if (m_pInstance && m_creature->isAlive())
-            m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
+        //if (m_pInstance && m_creature->isAlive())
+        //    m_pInstance->SetData(TYPE_CTHUN, NOT_STARTED);
     }
 
     void CheckRespawnEye()
@@ -1414,6 +1447,7 @@ struct cthunAI : public ScriptedAI
             inProgress = false;
             wipeRespawnEyeTimer = 5000; 
             EnterEvadeMode();
+            // C'thuns eye will enter evade mode through C'thuns Reset() call
         }
 
 #ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
@@ -1523,11 +1557,23 @@ struct cthunAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_CARAPACE_OF_CTHUN, true);
     }
 
+    bool UnitShouldPull(Unit* unit)
+    {
+        float distToCthun = unit->GetDistanceToCenter(m_creature);
+        //float distToCthun = pPlayer->GetDistance(m_creature);
+        float zDist = abs(unit->GetPositionZ() - 100.0f);
+        // If we're at the same Z axis of cthun, or within the maximum possible pull distance
+        if (zDist < 10.0f && distToCthun < 95.0f && unit->IsWithinLOSInMap(m_creature))
+        {
+            //xxx: it will still be possible to hide behind one of the pillars in the room to avoid pulling, 
+            //but I don't think it's really something to take advantage of anyway
+            return true;
+        }
+        return false;
+    }
+
     bool AggroRadius()
     {
-        //if (m_creature->getFaction() != 7 && !m_creature->isInCombat())
-        //    m_creature->setFaction(7); // This prevents strange, uncontrolled aggro's through the walls
-
         // Large aggro radius
         Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
@@ -1535,35 +1581,14 @@ struct cthunAI : public ScriptedAI
             Player* pPlayer = itr->getSource();
             if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
             {
-                float distToCthun = pPlayer->GetDistanceToCenter(m_creature);
-                //float distToCthun = pPlayer->GetDistance(m_creature);
-                float zDist = abs(pPlayer->GetPositionZ() - 100.0f);
-                // If we're at the same Z axis of cthun, or within the maximum possible pull distance
-                if (zDist < 10.0f && distToCthun < 95.0f && pPlayer->IsWithinLOSInMap(m_creature))
+                if (UnitShouldPull(pPlayer)) {
+                    AttackStart(pPlayer);
+                    return true;
+                }
+                else if (Pet* pPet = pPlayer->GetPet())
                 {
-                    bool pull = true;
-
-                    //xxx: it will still be possible to hide behind one of the pillars in the room to avoid pulling, 
-                    //but I don't think it's really something to take advantage of anyway
-                    if (pull)
-                    {
-                        Creature* pEye = m_pInstance->GetCreature(eyeGuid);
-                        if (!pEye) {
-                            sLog.outError("cthunAI::AggroRadius could not find pEye");
-                            return false;
-                        }
-                        eye_of_cthunAI* eyeAI = (eye_of_cthunAI*)pEye->AI();
-                        eyeAI->Pull(pPlayer);
-#ifdef USE_POSTFIX_PRENERF_PULL_LOGIC
-                        m_creature->SetInCombatWith(pPlayer);
-                        pEye->SetInCombatWith(pPlayer);
-#else
-                        m_creature->SetInCombatWithZone();
-                        pEye->SetInCombatWithZone();
-#endif
-                        if (m_pInstance) {
-                            m_pInstance->SetData(TYPE_CTHUN, IN_PROGRESS);
-                        }
+                    if (UnitShouldPull(pPet)) {
+                        AttackStart(pPlayer); //screw the pet, go straight for the head!
                         return true;
                     }
                 }
