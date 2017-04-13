@@ -747,7 +747,7 @@ struct boss_veklorAI : public boss_twinemperorsAI
         // shadowbolt in at least SHADOWBOLT_RANGED_CD time. This will mostly be the 
         // case if target was in melee, but then moved out, in which case we should 
         // instantly re-cast a new shadowbolt unless it was just casted.
-        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_MIN_CD) 
+        if (!isMelee && timeSinceLastSB > SHADOWBOLT_RANGED_MAX_CD) 
         {
             shadowBoltTimer = 0;
         }
@@ -791,6 +791,8 @@ struct boss_veklorAI : public boss_twinemperorsAI
                 shadowBoltTimer -= diff;
             }
         }
+
+        timeSinceLastSB += diff;
     }
 };
 
