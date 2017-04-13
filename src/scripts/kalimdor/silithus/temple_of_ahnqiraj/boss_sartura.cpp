@@ -228,7 +228,7 @@ struct boss_sarturaAI : public ScriptedAI
         }
         
         // If she is <25% enrage
-        if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 25.0f)
+        if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 20.0f)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE, m_uiWhirlWindEndTimer ? CAST_TRIGGERED : 0) == CAST_OK)
             {
