@@ -33,3 +33,6 @@ INSERT INTO spell_target_position (id , target_map, target_position_x, target_po
 
 -- correct glob of Viscidus modelid and unit flags
 UPDATE creature_template SET modelid_1 = 12349, unit_flags = 32768 WHERE entry = 15667;
+
+-- Remove silver drops from Glob of Viscidus
+UPDATE creature_template SET mingold = 0, maxgold = 0 WHERE entry = 15667;
