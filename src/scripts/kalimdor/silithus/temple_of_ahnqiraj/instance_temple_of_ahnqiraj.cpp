@@ -354,15 +354,14 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         if (uiData == DONE) {
             if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
                 DoUseDoorOrButton(pGo->GetGUID());
-            if (Creature* pCreature = GetSingleCreatureFromStorage(NPC_MASTERS_EYE)) {
-                //pCreature->NearLandTo(pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, 4.896f);
-            }
         }
 
         break;
     case TYPE_SARTURA:
     case TYPE_FANKRISS:
     case TYPE_VISCIDUS:
+        //ToDo: make sure this is included once it goes live
+        //m_auiEncounter[uiType] = uiData;
         break;
     case TYPE_OURO:
         switch (uiData)
