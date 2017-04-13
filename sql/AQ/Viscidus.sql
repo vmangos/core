@@ -36,3 +36,6 @@ UPDATE creature_template SET modelid_1 = 12349, unit_flags = 32768 WHERE entry =
 
 -- Remove silver drops from Glob of Viscidus
 UPDATE creature_template SET mingold = 0, maxgold = 0 WHERE entry = 15667;
+
+-- Update Glob of Viscidus immunities
+UPDATE creature_template SET MechanicImmuneMask = 617299803 WHERE entry = 15667;
