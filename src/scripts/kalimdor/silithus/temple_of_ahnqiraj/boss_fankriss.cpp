@@ -35,6 +35,7 @@ static const SpawnLocation aSummonWormLocs[3] =
     { -8150.18f, 1146.97f, -87.45f },
     { -8023.31f, 1242.42f, -83.47f },
 };
+static constexpr SpawnLocation pullCenter = {-8074.88f, 1193.64f, -92.11f};
 
 static const uint32 aIndex[3] = { 0, 1, 2 };
 static const uint32 aEntangleSpells[3] = { SPELL_ENTANGLE_1, SPELL_ENTANGLE_2, SPELL_ENTANGLE_3 };
@@ -136,8 +137,28 @@ struct boss_fankrissAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!m_creature->isInCombat()) {
+            Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+            for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+            {
+                Player* pPlayer = itr->getSource();
+                if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
+                {
+                   
+                    float distToPull = pPlayer->GetDistance(pullCenter.m_fX, pullCenter.m_fY, pullCenter.m_fZ);
+                    // If we're at the same Z axis of cthun, or within the maximum possible pull distance
+                    if (distToPull < 85.0f && pPlayer->IsWithinLOSInMap(m_creature))
+                    {
+                        AttackStart(pPlayer);
+                        //float distToCthun = pPlayer->GetDistance(m_creature);
+
+                    }
+                }
+            }
+        }
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
             return;
+        }
 
         //
         // Mortal Wound
