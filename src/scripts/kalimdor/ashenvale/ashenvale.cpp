@@ -140,6 +140,7 @@ struct npc_muglashAI : public npc_escortAI
                 if (GameObject* pGo = GetClosestGameObjectWithEntry(m_creature, GO_NAGA_BRAZIER, INTERACTION_DISTANCE * 2))
                 {
                     //some kind of event flag? Update to player/group only?
+                    pGo->SetGoState(GO_STATE_READY);
                     pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
                     SetEscortPaused(true);
                 }
@@ -274,7 +275,10 @@ bool QuestAccept_npc_muglash(Player* pPlayer, Creature* pCreature, const Quest* 
 
         // Ensure Brazier can be extinguished
         if (GameObject* go_naga_brazier = GetClosestGameObjectWithEntry(pCreature, GO_NAGA_BRAZIER, 1000))
+        {
             go_naga_brazier->ResetDoorOrButton();
+            go_naga_brazier->SetGoState(GO_STATE_READY);
+        }
 
     }
 
