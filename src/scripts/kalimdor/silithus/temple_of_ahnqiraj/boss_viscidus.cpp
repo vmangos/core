@@ -123,6 +123,16 @@ struct boss_viscidusAI : public ScriptedAI
         ResetViscidusState(false);
     }
 
+    void MoveInLineOfSight(Unit* who) override
+    {
+        if (who->GetTypeId() == TYPEID_PLAYER && !m_creature->getVictim() && m_creature->IsWithinDistInMap(who, 95.0f, true))
+        {
+            AttackStart(who);
+        }
+
+        ScriptedAI::MoveInLineOfSight(who);
+    }
+
     void Aggro(Unit* /*pWho*/)
     {
         if (m_pInstance)
