@@ -213,7 +213,7 @@ struct boss_twinemperorsAI : public ScriptedAI
         m_creature->clearUnitState(UNIT_STAT_STUNNED);
     }
 
-    void MoveInLineOfSight(Unit *who)
+    void MoveInLineOfSight(Unit *who) override
     {
         // Only want to run this if we are not in combat
         if (!who || m_creature->getVictim() || m_creature->isInCombat())
