@@ -4621,9 +4621,12 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     }
     }
 
-    if (uiTriggeredSpell && caster)
+    if (uiTriggeredSpell)
     {
-        caster->CastSpell(this, uiTriggeredSpell, true);
+        if (caster)
+            caster->CastSpell(this, uiTriggeredSpell, true);
+        else
+            CastSpell(this, uiTriggeredSpell, true);
     }
 }
 
