@@ -74,9 +74,10 @@ enum
  */
 const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
 const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
-const uint32_t SANDBLAST_TIMER_MIN     = 10000;
-const uint32_t SANDBLAST_TIMER_MAX     = 15000;
-const uint32_t SUBMERGE_TIMER = 60000;
+const uint32_t SANDBLAST_TIMER_MIN         = 10000;
+const uint32_t SANDBLAST_TIMER_MAX         = 15000;
+const uint32_t SUBMERGE_TIMER              = 60000;
+const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
 
 struct boss_ouroAI : public Scripted_NoMovementAI
 {
@@ -93,6 +94,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     uint32 m_uiSubmergeTimer;
     uint32 m_uiSummonBaseTimer;
     uint32 m_uiNoMeleeTimer;
+    uint32 m_uiSubmergeInvisTimer;
 
     uint32 m_uiSummonMoundTimer;
 
@@ -109,6 +111,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
         m_uiSubmergeTimer     = SUBMERGE_TIMER;
         m_uiSummonBaseTimer   = 2000;
+        m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
         // Source : http://wowwiki.wikia.com/wiki/Ouro
         // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
         m_uiNoMeleeTimer      = 10000;
@@ -187,22 +190,24 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         // He will not submerge if he is busy casting a Sand Blast or Sweep, else he will submerge
         // (ie. the chance of submerging is totally random)"
         m_uiSubmergeTimer = SUBMERGE_TIMER;
-        if (CanCastSpell(m_creature, sSpellMgr.GetSpellEntry(SPELL_SUBMERGE_VISUAL), false) == CAST_OK)
+
+        if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, false) == CAST_OK)
         {
             if (!isReset)
             {
                 DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
                 DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
             }
-            m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
-            DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL);
 
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+            m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
+
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             ClearTargetIcon();
 
             m_bSubmerged      = true;
             m_uiSubmergeTimer = 30000;
             m_uiNoMeleeTimer  = 10000;
+            m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
         }
         else
         {
@@ -365,6 +370,9 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             // Resume combat
             if (m_uiSubmergeTimer < uiDiff)
             {
+                m_creature->SetVisibility(VISIBILITY_ON);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+
                 // Teleport to the trigger in order to get a new location
                 if (Creature* pTrigger = m_creature->GetMap()->GetCreature(m_ouroTriggerGuid))
                     m_creature->NearTeleportTo(pTrigger->GetPositionX(), pTrigger->GetPositionY(), pTrigger->GetPositionZ(), 0);
@@ -387,6 +395,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_bSubmerged        = false;
                     m_uiSummonBaseTimer = 2000;
                     m_uiSubmergeTimer   = 90000;
+                    m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
 
                     DespawnCreatures(false);
 
@@ -399,7 +408,19 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                 }
             }
             else
+            {
+                if (m_uiSubmergeInvisTimer < uiDiff && m_creature->GetVisibility() == VISIBILITY_ON)
+                {
+                    m_creature->SetVisibility(VISIBILITY_OFF);
+                    m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
+                }
+                else
+                {
+                    m_uiSubmergeInvisTimer -= uiDiff;
+                }
+
                 m_uiSubmergeTimer -= uiDiff;
+            }
         }
     }
 };
