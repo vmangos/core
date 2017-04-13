@@ -390,7 +390,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     for (ThreatList::const_iterator i = lThreat.begin(); i != lThreat.end(); ++i)
                     {
                         Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
-                        if (pUnit && pUnit->GetDistance2d(m_creature) < 5.0f)
+                        if (pUnit && pUnit->GetDistance2d(m_creature) < 20.0f)
                             m_creature->CastSpell(pUnit, SPELL_GROUND_RUPTURE, true);
                     }
 
