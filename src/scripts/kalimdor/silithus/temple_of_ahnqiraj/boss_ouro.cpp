@@ -71,6 +71,7 @@ enum
  * https://www.youtube.com/watch?v=REmX3uRTFkQ and further reduced to account
  * for April 2006 nerfs (http://blue.cardplace.com/cache/wow-dungeons/481724.htm &
  * http://blue.cardplace.com/cache/wow-general/7950998.htm
+ * Sweep timers based on the same video. No known nerfs.
  */
 const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
 const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
@@ -78,6 +79,7 @@ const uint32_t SANDBLAST_TIMER_MIN         = 10000;
 const uint32_t SANDBLAST_TIMER_MAX         = 15000;
 const uint32_t SUBMERGE_TIMER              = 60000;
 const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
+const uint32_t SWEEP_TIMER                 = 15000;
 
 struct boss_ouroAI : public Scripted_NoMovementAI
 {
@@ -107,7 +109,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
     void Reset()
     {
-        m_uiSweepTimer        = urand(35000, 40000);
+        m_uiSweepTimer        = urand(30000, 40000);
         m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
         m_uiSubmergeTimer     = SUBMERGE_TIMER;
         m_uiSummonBaseTimer   = 2000;
@@ -291,7 +293,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             if (m_uiSweepTimer < uiDiff)
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_SWEEP) == CAST_OK)
-                    m_uiSweepTimer = 20000;
+                    m_uiSweepTimer = SWEEP_TIMER;
             }
             else
                 m_uiSweepTimer -= uiDiff;
