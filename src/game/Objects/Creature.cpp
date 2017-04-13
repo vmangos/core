@@ -1783,6 +1783,21 @@ bool Creature::IsImmuneToDamage(SpellSchoolMask meleeSchoolMask)
     return Unit::IsImmuneToDamage(meleeSchoolMask);
 }
 
+// hacky - seems to be the only way of doing this without wasting more time
+void Creature::SetTauntImmunity(bool immune)
+{
+    if (immune)
+    {
+        auto info = const_cast<CreatureInfo*>(m_creatureInfo);
+        info->flags_extra |= CREATURE_FLAG_EXTRA_NOT_TAUNTABLE;
+    }
+    else
+    {
+        auto info = const_cast<CreatureInfo*>(m_creatureInfo);
+        info->flags_extra ^= CREATURE_FLAG_EXTRA_NOT_TAUNTABLE;
+    }
+}
+
 bool Creature::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
     if (!castOnSelf && spellInfo->EffectMechanic[index] && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->EffectMechanic[index] - 1)))

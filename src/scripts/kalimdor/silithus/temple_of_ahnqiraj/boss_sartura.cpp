@@ -21,6 +21,12 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
+/*
+ * Notes:
+ * Whirlwind - Sartura does a physical AoE that does 3k+ damage to everyone within 10 yards of her.
+ * During this time she is immune to stuns and taunt. She tends to use this ability after a stun fades.
+ */
+
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -71,6 +77,8 @@ struct boss_sarturaAI : public ScriptedAI
 
     void Reset() override
     {
+        m_creature->SetTauntImmunity(false);
+
         m_uiCleaveTimer = 4000;
         m_uiWhirlWindTimer = urand(18000, 20000);;
         m_uiWhirlWindEndTimer = 0;
@@ -177,6 +185,7 @@ struct boss_sarturaAI : public ScriptedAI
                 // Remove the negative haste modifier from Whirlwind to restore Sartura's auto attack
                 m_creature->ApplyAttackTimePercentMod(BASE_ATTACK, 0, true);
                 m_creature->setAttackTimer(BASE_ATTACK, 100);
+                m_creature->SetTauntImmunity(false);
             }
             else
                 m_uiWhirlWindEndTimer -= uiDiff;
@@ -189,6 +198,7 @@ struct boss_sarturaAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND) == CAST_OK)
                 {
+                    m_creature->SetTauntImmunity(true);
                     AssignRandomThreat();
                     m_uiWhirlWindEndTimer = 15000;
                     m_uiAggroResetTimer = urand(1000, 2000);
@@ -217,7 +227,6 @@ struct boss_sarturaAI : public ScriptedAI
 
         }
         
-
         // If she is <25% enrage
         if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 25.0f)
         {
