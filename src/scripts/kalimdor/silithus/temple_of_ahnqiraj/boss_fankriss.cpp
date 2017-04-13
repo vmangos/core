@@ -150,16 +150,14 @@ struct boss_fankrissAI : public ScriptedAI
                         continue;
 
                     float distToPull = pPlayer->GetDistance(pullCenter.m_fX, pullCenter.m_fY, pullCenter.m_fZ);
-                    // If we're at the same Z axis of cthun, or within the maximum possible pull distance
                     if (distToPull < 85.0f && pPlayer->IsWithinLOSInMap(m_creature))
                     {
                         AttackStart(pPlayer);
-                        //float distToCthun = pPlayer->GetDistance(m_creature);
-
                     }
                 }
             }
         }
+        
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
             return;
         }
