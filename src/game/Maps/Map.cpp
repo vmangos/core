@@ -49,6 +49,7 @@
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GridSearchers.h"
+#include "ThreadPool.h"
 
 #define MAX_GRID_LOAD_TIME      50
 
@@ -94,7 +95,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       m_updateFinished(false), m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
       _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(WorldTimer::getMSTime()),
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
-      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0)
+      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
+      m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)))
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -117,6 +119,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
 
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
+    m_motionThreads->start();
 }
 
 // Nostalrius
@@ -726,27 +729,6 @@ inline void Map::UpdateActiveCellsSynch(uint32 now, uint32 diff)
     }
 }
 
-class UnitsMovementUpdater : public ACE_Based::Runnable
-{
-public:
-    UnitsMovementUpdater(int i, int nthreads, std::set<Unit*>& _updates, uint32 _diff) : threadIdx(i), nThreads(nthreads), updates(_updates), diff(_diff)
-    {
-    }
-
-    virtual void run()
-    {
-        int i = 0;
-        for (std::set<Unit*>::iterator iter = updates.begin(); iter != updates.end(); ++iter)
-            if (((++i) % nThreads) == threadIdx)
-                if ((*iter)->IsInWorld())
-                    (*iter)->GetMotionMaster()->UpdateMotionAsync(diff);
-    }
-    int threadIdx;
-    int nThreads;
-    std::set<Unit*>& updates;
-    uint32 diff;
-};
-
 inline void Map::UpdateCells(uint32 map_diff)
 {
     uint32 now = WorldTimer::getMSTime();
@@ -761,17 +743,14 @@ inline void Map::UpdateCells(uint32 map_diff)
     else
         UpdateActiveCellsSynch(now, diff);
 
-    int nthreads = sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS);
-    if (IsContinent() && nthreads)
+    if (IsContinent() && m_motionThreads->status() == ThreadPool::Status::READY)
     {
-        std::vector<ACE_Based::Thread*> threads;
-        for (int i = 0; i < nthreads; ++i)
-            threads.push_back(new ACE_Based::Thread(new UnitsMovementUpdater(i, nthreads, unitsMvtUpdate, diff)));
-        for (int i = 0; i < threads.size(); ++i)
-        {
-            threads[i]->wait();
-            delete threads[i];
-        }
+        for (std::set<Unit*>::iterator it = unitsMvtUpdate.begin(); it != unitsMvtUpdate.end(); it++)
+            m_motionThreads << [it,diff](){
+                 if ((*it)->IsInWorld())
+                    (*it)->GetMotionMaster()->UpdateMotionAsync(diff);
+            };
+        m_motionThreads->processWorkload().wait();
     }
     unitsMvtUpdate.clear();
 }
@@ -2684,7 +2663,7 @@ void Map::ScriptsProcess()
                     }
                 }
 
-                Creature* pCreature = summoner->SummonCreature(step.script->summonCreature.creatureEntry, x, y, z, o, 
+                Creature* pCreature = summoner->SummonCreature(step.script->summonCreature.creatureEntry, x, y, z, o,
                     TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, step.script->summonCreature.despawnDelay, step.script->summonCreature.flags & SUMMON_CREATURE_ACTIVE);
 
                 if (!pCreature)

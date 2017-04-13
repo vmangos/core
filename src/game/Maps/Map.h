@@ -190,6 +190,8 @@ typedef ACE_Thread_Mutex MapMutexType; // Use ACE_Null_Mutex to disable locks
 // Instance IDs reserved for internal use (instanced continent parts, ...)
 #define RESERVED_INSTANCES_LAST 100
 
+class ThreadPool;
+
 class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
 {
     friend class MapReference;
@@ -537,6 +539,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         mutable MapMutexType    unitsMvtUpdate_lock;
         std::set<Unit*>         unitsMvtUpdate;
 
+        std::unique_ptr<ThreadPool> m_motionThreads;
     protected:
         MapEntry const* i_mapEntry;
         uint32 i_id;
