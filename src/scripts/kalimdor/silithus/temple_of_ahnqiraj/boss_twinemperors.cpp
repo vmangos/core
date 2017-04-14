@@ -252,31 +252,40 @@ struct boss_twinemperorsAI : public ScriptedAI
             uint32 uiTwinDamage = (uint32)(fDamPercent * ((float)pTwin->GetMaxHealth()));
             uint32 uiTwinHealth = pTwin->GetHealth() - uiTwinDamage;
             pTwin->SetHealth(uiTwinHealth > 0 ? uiTwinHealth : 0);
-
-            if (!uiTwinHealth)
-            {
-                pTwin->SetDeathState(JUST_DIED);
-                pTwin->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            }
+            
+            // Possibly needed to make sure the damage dealth through setHealth is counted 
+            // in Unit::IsLootAllowedDueToDamageOrigin()
+            pTwin->CountDamageTaken(uiTwinDamage, true);
         }
     }
 
     void JustDied(Unit* Killer) override
     {
         // Only need one of them to kill the other and update instance data
-        if (m_pInstance->GetData(TYPE_TWINS) == DONE)
-            return;
+        if (m_pInstance) {
+            if (m_pInstance->GetData(TYPE_TWINS) == DONE) {
+                return;
+            }
+            else {
+                m_pInstance->SetData(TYPE_TWINS, DONE);
+            }
+        }
 
         if (Creature* pOtherBoss = GetOtherBoss())
         {
-            pOtherBoss->SetHealth(0);
-            pOtherBoss->SetDeathState(JUST_DIED);
-            pOtherBoss->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            //if(pOtherBoss->isAlive())
+            pOtherBoss->SetLootRecipient(Killer);
+            Killer->Kill(pOtherBoss, nullptr, false);
+            //pOtherBoss->SetHealth(0);
+            //pOtherBoss->SetLootRecipient(Killer);
+            //pOtherBoss->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+            //pOtherBoss->SetLootRecipient(Killer);
+            //pOtherBoss->SetDeathState(JUST_DIED);
+            //pOtherBoss->SetLootRecipient(Killer);
+            //pOtherBoss->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
         // Death text script is handled by instance upon receiving DONE data
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_TWINS, DONE);
     }
 
     void Aggro(Unit* pWho) override
