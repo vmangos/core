@@ -743,7 +743,7 @@ inline void Map::UpdateCells(uint32 map_diff)
     else
         UpdateActiveCellsSynch(now, diff);
 
-    if (IsContinent() && m_motionThreads->status() == ThreadPool::Status::READY)
+    if (IsContinent() && m_motionThreads->status() == ThreadPool::Status::READY && !unitsMvtUpdate.empty())
     {
         for (std::set<Unit*>::iterator it = unitsMvtUpdate.begin(); it != unitsMvtUpdate.end(); it++)
             m_motionThreads << [it,diff](){
