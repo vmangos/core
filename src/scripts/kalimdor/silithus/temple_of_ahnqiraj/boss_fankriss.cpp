@@ -9,6 +9,9 @@ Stryg comments:
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
+#include <algorithm>
+#include <utility>
+
 enum
 {
     SPELL_MORTAL_WOUND      = 25646,
@@ -20,8 +23,6 @@ enum
     //SPELL_SUMMON_WORM_3     = 25832,
 
     NPC_SPAWN_FANKRISS      = 15630,
-
-    MAX_HATCHLINGS          = 20,
 };
 
 struct SpawnLocation
@@ -29,18 +30,49 @@ struct SpawnLocation
     float m_fX, m_fY, m_fZ;
 };
 
-static const SpawnLocation aSummonWormLocs[3] =
+static constexpr SpawnLocation aSummonWormLocs[3] =
 {
     { -8076.53f, 1120.37f, -88.50f },
     { -8150.18f, 1146.97f, -87.45f },
     { -8023.31f, 1242.42f, -83.47f },
 };
-static constexpr SpawnLocation pullCenter = {-8074.88f, 1193.64f, -92.11f};
+static constexpr SpawnLocation hatchlingLocations[3] = 
+{
+    {-8043.01f, 1254.20f, -84.19f},
+    {-8003.00f, 1222.90f, -82.10f},
+    {-8022.68f, 1150.08f, -89.33f}
+};
+static constexpr SpawnLocation pullCenter       = {-8074.88f, 1193.64f, -92.11f};
+static constexpr uint32 aIndex[3]               = { 0, 1, 2 };
+static constexpr uint32 aEntangleSpells[3]      = { SPELL_ENTANGLE_1, SPELL_ENTANGLE_2, SPELL_ENTANGLE_3 };
+static constexpr size_t MAX_HATCHLINGS          = 20;   // Max hatchlings alive at any one time
+static constexpr size_t MAX_HATCHLINGS_PER_WEB  = 4;    // Max amount of hatchlings that can spawn at the same time, on one web. Its at least 4, might be 5.
+static constexpr uint32 HATCHLINGS_ATTACK_DELAY = 2500; // ~2.5sec in curse killvideo.
 
-static const uint32 aIndex[3] = { 0, 1, 2 };
-static const uint32 aEntangleSpells[3] = { SPELL_ENTANGLE_1, SPELL_ENTANGLE_2, SPELL_ENTANGLE_3 };
+// if defined, 2-MAX_HATCHLINGS_PER_WEB hatchlings are spawned in all 3 locations each time a player is ported,
+// otherwise 2-MAX_HATCHLINGS_PER_WEB hatchlings will only spawn on the single location the player was ported to.
+#define ALWAYS_HATCHLINGS_IN_3_LOCATIONS
+
+/*
+
+ALWAYS_HATCHLINGS_IN_3_LOCATIONS  when defined will spawn 2-MAX_HATCHLINGS_PER_WEB hatchlings in all 3 locations whenever one player is teleported. 
+                                  If its not defined 2-MAX_HATCHLINGS_PER_WEB  hatchlings only spawn in the location of the teleported player. 
+                                  In curse video it clearly looks like hatchlings spawn in all 3 locations, while in later videos they only spawn 
+                                  in the location of a teleported player.
+                                  
+MAX_HATCHLINGS                    defines how many hatchlings can be alive at the same time. I'm sure it was capped on retail, but not on the amount.
+
+MAX_HATCHLINGS_PER_WEB            defines how many hatchlings can spawn spawn in one web location. Currently 4, possible it should be 5, but I have not seen it.
+
+HATCHLINGS_ATTACK_DELAY           defines how long after hatchlings spawn until they go in combat with zone and attack the closest target. 
+                                  If the hatchling is already in combat when HATCHLINGS_ATTACK_DELAY runs out, they will not force themself on the closest target.
+
+    If we want to force players periodically aoe down hatchlings instead of just offtanking them we can set this MAX_HATCHLINGS  
+    to a high value so it's not tankable. This will however require us to adjust down the frequency of players being teleported, 
+    OR not define ALWAYS_HATCHLINGS_IN_3_LOCATIONS. If we increase MAX_HATCHLINGS  to an amount that is not offtankable, 
+    the current configuration will most likely overrun the raid.
+*/
 std::vector<uint32> vIndex(aIndex, aIndex + 3);
-std::vector<uint32> vEntangleSpells(aEntangleSpells, aEntangleSpells + 3);
 
 struct boss_fankrissAI : public ScriptedAI
 {
@@ -53,18 +85,34 @@ struct boss_fankrissAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
 
     uint32 m_uiMortalWoundTimer;
+
     uint32 m_uiSummonWorm1Timer;
     uint32 m_uiSummonWorm2Timer;
     uint32 m_uiSummonWorm3Timer;
-    uint32 m_uiEntangle1Timer;
-    uint32 m_uiEntangle2Timer;
-    uint32 m_uiEntangle3Timer;
-    uint32 m_uiEntangleSummonTimer;
-    uint32 m_uiEvadeCheckTimer;
-    uint32 m_uiEntangleAttackTimer;
 
-    ObjectGuid m_EntangleTargetGUID;
-    GuidList m_lHatchlingsGUIDs;
+    uint32 m_uiEvadeCheckTimer;
+
+    struct HatchlingBatch
+    {
+        HatchlingBatch(GuidList& list) :
+            attackTimer(HATCHLINGS_ATTACK_DELAY),
+            hasAttacked(false),
+            hatchlings(std::move(list))
+        {}
+        uint32 attackTimer;
+        bool hasAttacked;
+        GuidList hatchlings;
+    };
+    std::vector<HatchlingBatch> hatchlingVec;
+    uint32 aliveHatchlings;
+    std::vector < std::pair<uint32, SpawnLocation>> entangleSpells =
+    {
+        std::make_pair(SPELL_ENTANGLE_1, hatchlingLocations[0]),
+        std::make_pair(SPELL_ENTANGLE_2, hatchlingLocations[1]),
+        std::make_pair(SPELL_ENTANGLE_3, hatchlingLocations[2]),
+    };
+    
+    std::pair<uint32,bool> entangleTimers[3]; // timer and bool==true meaning the timer is ready for re-initialization
 
     void Reset() override
     {
@@ -72,13 +120,14 @@ struct boss_fankrissAI : public ScriptedAI
         m_uiSummonWorm1Timer    = urand(22500, 30000);
         m_uiSummonWorm2Timer    = 0;
         m_uiSummonWorm3Timer    = 0;
-        m_uiEntangle1Timer      = urand(10000, 15000);
-        m_uiEntangle2Timer      = 0;
-        m_uiEntangle3Timer      = 0;
-        m_uiEntangleSummonTimer = 0;
-        m_uiEntangleAttackTimer = 0;
+
         m_uiEvadeCheckTimer     = 2500;
-        m_lHatchlingsGUIDs.clear();
+        
+        // Delaying first webs by 8 seconds, such that they cannot happen
+        // until, at the earliest, 10 seconds after the pull.
+        ReinitializeWebTimers(8000);
+        aliveHatchlings = 0;
+        hatchlingVec.clear();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -113,12 +162,7 @@ struct boss_fankrissAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() == NPC_VEKNISS_HATCHLING)
         {
-            m_lHatchlingsGUIDs.push_back(pSummoned->GetObjectGuid());
-            if (Player* pTarget = m_creature->GetMap()->GetPlayer(m_EntangleTargetGUID))
-            {
-                pSummoned->AI()->AttackStart(pTarget);
-                pSummoned->SetInCombatWithZone();
-            }
+            ++aliveHatchlings;
         }
         else if (pSummoned->GetEntry() == NPC_SPAWN_FANKRISS)
         {
@@ -132,7 +176,129 @@ struct boss_fankrissAI : public ScriptedAI
     void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         if (pSummoned->GetEntry() == NPC_VEKNISS_HATCHLING)
-            m_lHatchlingsGUIDs.remove(pSummoned->GetObjectGuid());
+        {
+            for (auto it = hatchlingVec.begin(); it != hatchlingVec.end(); it++)
+            {
+                it->hatchlings.remove(pSummoned->GetObjectGuid());
+            }
+            --aliveHatchlings;
+        }
+    }
+
+    void ReinitializeWebTimers(uint32 add = 0)
+    {
+        std::random_shuffle(entangleSpells.begin(), entangleSpells.end());
+        // it's possible the longest cooldown should be able to reach more than the 
+        // 40 seconds max that it is here. Old nost code was 45sec. Cmangos use 75sec.
+        // Should it also be possible that two players are webbed at the same time?
+        // If not, we need shorter rand intervals and no overlap between the 3 webs.
+        entangleTimers[0] = std::make_pair(urand(2000  + add, 20000 + add), false);
+        entangleTimers[1] = std::make_pair(urand(12000 + add, 32000 + add), false);
+        entangleTimers[2] = std::make_pair(urand(22000 + add, 42000 + add), false);
+    }
+
+    size_t GetHatchlingSpawnAmount()
+    {
+        size_t spawnAmount = std::min(MAX_HATCHLINGS_PER_WEB, MAX_HATCHLINGS - aliveHatchlings);
+        if (spawnAmount > 2)
+            spawnAmount = (size_t)urand((uint32)2, (uint32)spawnAmount);
+        return spawnAmount;
+    }
+
+    void SummonHatchling(GuidList& batch, SpawnLocation loc)
+    {
+        if (Creature* hatchling = m_creature->SummonCreature(NPC_VEKNISS_HATCHLING, loc.m_fX, loc.m_fY, loc.m_fZ, 0.0f,
+            TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 65000))
+        {
+            batch.push_back(hatchling->GetObjectGuid());
+        }
+    }
+
+    void HandleHatchlings(const uint32 uiDiff)
+    {
+        bool reInitWebTimers = true;
+        for (size_t i = 0; i < 3; i++)
+        {
+            bool& webCast = entangleTimers[i].second;
+            if (webCast) continue;
+
+            uint32& t = entangleTimers[i].first;
+            if (t < uiDiff) {
+                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
+                {
+                    if (DoCastSpellIfCan(pTarget, entangleSpells[i].first) == CAST_OK)
+                    {
+                        webCast = true;
+                    }
+                }
+            }
+            else {
+                t -= uiDiff;
+            }
+
+            if (webCast)
+            {
+                GuidList batch;
+#ifdef ALWAYS_HATCHLINGS_IN_3_LOCATIONS
+                for (size_t x = 0; x < 3; x++)
+                {
+                    const SpawnLocation& sLoc = entangleSpells[x].second;
+                    size_t spawnAmount = GetHatchlingSpawnAmount();
+                    for (size_t s = 0; s < spawnAmount; s++)
+                    {
+                        SummonHatchling(batch, sLoc);
+                    }
+                }
+#else
+                const SpawnLocation& sLoc = entangleSpells[i].second;
+                size_t spawnAmount = GetHatchlingSpawnAmount();
+                for (size_t s = 0; s < spawnAmount; s++)
+                {
+                    SummonHatchling(batch, sLoc);
+                }
+#endif
+                hatchlingVec.push_back(HatchlingBatch(batch));
+            }
+            else {
+                reInitWebTimers = false;
+            }
+        }
+
+        if (reInitWebTimers)
+        {
+            ReinitializeWebTimers();
+        }
+        
+        for (auto it = hatchlingVec.begin(); it != hatchlingVec.end(); it++)
+        {
+            if (!it->hasAttacked)
+            {
+                if (it->attackTimer < uiDiff)
+                {
+                    for (auto hGuid = it->hatchlings.cbegin(); hGuid != it->hatchlings.cend(); hGuid++)
+                    {
+                        if (Creature* pHatchling = m_creature->GetMap()->GetCreature(*hGuid))
+                        {
+                            // If the hatchling is already in combat it means someone has already 
+                            // manually picked it up, and we should not force it on any target.
+                            if (!pHatchling->isInCombat())
+                            {
+                                if (Unit* pTarget = pHatchling->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_NEAREST, 0))
+                                {
+                                    pHatchling->AI()->AttackStart(pTarget);
+                                }
+                            }
+                            pHatchling->SetInCombatWithZone();
+
+                        }
+                    }
+                    it->hasAttacked = true;
+                }
+                else {
+                    it->attackTimer -= uiDiff;
+                }
+            }
+        }
     }
 
     void UpdateAI(const uint32 uiDiff) override
@@ -207,103 +373,8 @@ struct boss_fankrissAI : public ScriptedAI
             else
                 m_uiSummonWorm3Timer -= uiDiff;
         }
-
-        //
-        // Entangle (1-3)
-        if (m_uiEntangle1Timer < uiDiff)
-        {
-            // randomize order of Entangle pattern
-            std::random_shuffle(vEntangleSpells.begin(), vEntangleSpells.end());
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
-            {
-                if (DoCastSpellIfCan(pTarget, vEntangleSpells[0]) == CAST_OK)
-                {
-                    m_uiEntangle1Timer      = urand(35000, 45000);
-                    m_uiEntangle2Timer      = urand(2000, 20000);
-                    m_uiEntangle3Timer      = urand(2000, 20000);
-                    m_EntangleTargetGUID    = pTarget->GetObjectGuid();
-                    m_uiEntangleSummonTimer = 1000;
-                }
-            }
-        }
-        else
-            m_uiEntangle1Timer -= uiDiff;
-
-        if (m_uiEntangle2Timer && !m_uiEntangleSummonTimer)
-        {
-            if (m_uiEntangle2Timer < uiDiff)
-            {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
-                {
-                    if (DoCastSpellIfCan(pTarget, vEntangleSpells[1]) == CAST_OK)
-                    {
-                        m_uiEntangle2Timer = 0;
-                        m_EntangleTargetGUID = pTarget->GetObjectGuid();
-                        m_uiEntangleSummonTimer = 1000;
-                    }
-                }
-            }
-            else
-                m_uiEntangle2Timer -= uiDiff;
-        }
-
-        if (m_uiEntangle3Timer && !m_uiEntangleSummonTimer)
-        {
-            if (m_uiEntangle3Timer < uiDiff)
-            {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
-                {
-                    if (DoCastSpellIfCan(pTarget, vEntangleSpells[2]) == CAST_OK)
-                    {
-                        m_uiEntangle3Timer = 0;
-                        m_EntangleTargetGUID = pTarget->GetObjectGuid();
-                        m_uiEntangleSummonTimer = 1000;
-                    }
-                }
-            }
-            else
-                m_uiEntangle3Timer -= uiDiff;
-        }
-
-        //
-        // Spawn 4 Hatchlings on top of players who have been entangled
-        if (m_uiEntangleSummonTimer)
-        {
-            if (m_uiEntangleSummonTimer < uiDiff)
-            {
-                if (m_lHatchlingsGUIDs.size() < (MAX_HATCHLINGS + 4))                               // If there are already more than MAX_HATCHLINGS - 4 up, prevent spawn
-                {
-                    if (Player* pTarget = m_creature->GetMap()->GetPlayer(m_EntangleTargetGUID))
-                    {
-                        float fX, fY, fZ;
-                        for (uint8 i = 0; i < 4; ++i)
-                        {
-                            m_creature->GetRandomPoint(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 3.0f, fX, fY, fZ);
-                            m_creature->SummonCreature(NPC_VEKNISS_HATCHLING, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 65000);
-                        }
-                    }
-                }
-                m_uiEntangleAttackTimer = 1500;
-                m_uiEntangleSummonTimer = 0;
-            }
-            else
-                m_uiEntangleSummonTimer -= uiDiff;
-        }
-
-        // Summoned Hatchlings should be set in combat with Zone after meleeing the person they've spawned next to once (if not picked up by a tank)
-        if (m_uiEntangleAttackTimer)
-        {
-            if (m_uiEntangleAttackTimer < uiDiff)
-            {
-                for (GuidList::const_iterator itr = m_lHatchlingsGUIDs.begin(); itr != m_lHatchlingsGUIDs.end(); itr++)
-                {
-                    if (Creature* pSummoned = m_creature->GetMap()->GetCreature(*itr))
-                        pSummoned->SetInCombatWithZone();
-                }
-            }
-            else
-                m_uiEntangleAttackTimer -= uiDiff;
-        }
+        
+        HandleHatchlings(uiDiff);
 
         DoMeleeAttackIfReady();
 
