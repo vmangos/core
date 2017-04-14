@@ -86,7 +86,6 @@ public:
         for (int i = 0; i < m_size; i++)
             m_workers.emplace_back(new WORKER_T(this, i, m_errorHandling));
         m_status = Status::READY;
-        m_waitForWork.notify_all();
     }
 
     /**
