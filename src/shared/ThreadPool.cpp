@@ -41,7 +41,7 @@ std::future<void> ThreadPool::processWorkload()
     m_active = m_size;
     m_index = 0;
     m_status = Status::PROCESSING;
-    std::unique_lock<std::mutex> lock(m_mutex);
+    std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
     for (int i = 0; i < m_size; i++)
         m_workers[i]->prepare();
     m_waitForWork.notify_all();
@@ -83,7 +83,7 @@ std::vector<std::exception_ptr> ThreadPool::taskErrors()
 
 void ThreadPool::worker::waitForWork()
 {
-    std::unique_lock<std::mutex> lock(pool->m_mutex); //locked!
+    std::shared_lock<std::shared_timed_mutex> lock(pool->m_mutex); //locked!
     while(!busy) //wait for work
         pool->m_waitForWork.wait(lock);
 }

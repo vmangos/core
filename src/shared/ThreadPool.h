@@ -21,7 +21,7 @@
 
 #include <vector>
 #include <thread>
-#include <mutex>
+#include <shared_mutex>
 #include <condition_variable>
 #include <functional>
 #include <atomic>
@@ -174,8 +174,8 @@ private:
     ErrorHandling m_errorHandling;
     workers_t m_workers;
     int m_size;
-    std::mutex m_mutex;
-    std::condition_variable m_waitForWork;
+    std::shared_timed_mutex m_mutex;
+    std::condition_variable_any m_waitForWork;
     workload_t m_workload;
     ClearMode m_clearMode;
     bool m_dirty = false;
