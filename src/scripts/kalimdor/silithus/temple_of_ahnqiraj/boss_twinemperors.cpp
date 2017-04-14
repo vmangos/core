@@ -376,6 +376,13 @@ struct boss_twinemperorsAI : public ScriptedAI
         if (!justTeleported) {
             UpdateEmperor(diff);
         }
+
+        // Evade in case starts running after someone at zone in
+        if (m_creature->GetPositionY() > 1400) {
+            if(Creature* pOther = GetOtherBoss())
+                pOther->AI()->EnterEvadeMode();
+            EnterEvadeMode();
+        }
     }
 
     Creature* GetOtherBoss()
