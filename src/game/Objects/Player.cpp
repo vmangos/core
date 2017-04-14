@@ -6137,9 +6137,40 @@ uint32 Player::GetLevelFromDB(ObjectGuid guid)
     return level;
 }
 
+void Player::DismountCheck()
+{
+    if (IsMounted())
+    {
+        auto auras = this->GetAurasByType(SPELL_AURA_MOUNTED);
+
+        for (auto& aura : auras)
+        {
+            Spell mountSpell(this, aura->GetSpellProto(), true);
+
+            if (mountSpell.CheckCast(true) != SPELL_CAST_OK)
+            {
+                RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+                Unmount(true);
+            }
+        }
+    }
+}
+
+void Player::SetTransport(Transport* t)
+{
+    if (t) // don't bother checking when exiting a transport
+    {
+        DismountCheck();
+    }
+
+    WorldObject::SetTransport(t);
+}
+
 void Player::UpdateArea(uint32 newArea)
 {
     m_areaUpdateId    = newArea;
+
+    DismountCheck();
 
     const auto *areaEntry = AreaEntry::GetById(newArea);
 

@@ -779,7 +779,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
         // Transports / Movement
         Transport* GetTransport() const { return m_transport; }
-        void SetTransport(Transport * t) { m_transport = t; }
+        virtual void SetTransport(Transport * t) { m_transport = t; }
 
         float GetTransOffsetX() const { return m_movementInfo.GetTransportPos()->x; }
         float GetTransOffsetY() const { return m_movementInfo.GetTransportPos()->y; }
