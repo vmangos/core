@@ -560,6 +560,8 @@ struct CliCommandHolder
     ~CliCommandHolder() { delete[] m_command; }
 };
 
+class ThreadPool;
+
 /// The World
 class World
 {
@@ -744,10 +746,8 @@ class World
          * These async tasks should be added from THREADUNSAFE opcode handlers (since AddAsyncTask is *not* threadsafe)
          * The tasks will be executed *while* maps are updated. So don't touch the mobs, pets, etc ...
          */
-        void AddAsyncTask(AsyncTask* task) { _asyncTasks.push_back(task); }
+        void AddAsyncTask(AsyncTask* task);
         void HandleAsyncTasks(int currThreadIdx, int threadsCount);
-        typedef std::vector<AsyncTask*> AsyncTaskVect;
-        AsyncTaskVect _asyncTasks;
         /**
          * Database logs system
          */
@@ -860,6 +860,8 @@ class World
 
         // Packet broadcaster
         std::unique_ptr<MovementBroadcaster> m_broadcaster;
+
+        std::unique_ptr<ThreadPool> m_updateThreads;
 };
 
 extern uint32 realmID;
