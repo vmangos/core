@@ -32,9 +32,11 @@ class ThreadPool
 private:
     struct worker_sq;
     struct worker_mq;
+    struct worker_mysql;
 public:
     using SingleQueue = worker_sq;
     using MultiQueue = worker_mq;
+    using MySQL = worker_mysql;
 
     using workload_t = std::vector<std::function<void()>>;
 
@@ -166,6 +168,13 @@ private:
         void prepare() override;
 
         workload_t::iterator it;
+    };
+
+    struct worker_mysql : public worker_sq
+    {
+        worker_mysql(ThreadPool *tp, int id, ErrorHandling e);
+
+        void doWork() override;
     };
 
     using workers_t = std::vector<std::unique_ptr<worker>>;

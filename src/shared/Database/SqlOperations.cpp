@@ -142,32 +142,17 @@ void SqlResultQueue::Update(uint32 timeout)
         job.wait();
  }
 
-class mysql_worker :
-        public ThreadPool::MultiQueue
-{
-    // worker interface
-public:
-    mysql_worker(ThreadPool *tp, int id, ThreadPool::ErrorHandling e):
-        ThreadPool::MultiQueue(tp, id, e)
-    {
-    }
 
-    void doWork() override
-    {
 #ifndef DO_POSTGRESQL
-        mysql_thread_init();
+using SqlResultQueueWorker = ThreadPool::ThreadPool::MySQL;
+#else
+using SqlResultQueueWorker = ThreadPool::SingleQueue;
 #endif
-        ThreadPool::MultiQueue::doWork();
-#ifndef DO_POSTGRESQL
-        mysql_thread_end();
-#endif
-    }
-};
 
 SqlResultQueue::SqlResultQueue() :
     numUnsafeQueries(0), m_callbackThreads(new ThreadPool(6))
 {
-    m_callbackThreads->start<mysql_worker>();
+    m_callbackThreads->start<SqlResultQueueWorker>();
 }
 
 SqlResultQueue::~SqlResultQueue(){}

@@ -18,6 +18,7 @@
 
 #include "ThreadPool.h"
 #include "Log.h"
+#include <mysql.h>
 
 ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
     m_errorHandling(mode), m_size(numThreads), m_clearMode(when), m_active(0)
@@ -27,6 +28,7 @@ ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
 
 template void ThreadPool::start<ThreadPool::SingleQueue>();
 template void ThreadPool::start<ThreadPool::MultiQueue>();
+template void ThreadPool::start<ThreadPool::MySQL>();
 
 std::future<void> ThreadPool::processWorkload()
 {
@@ -227,4 +229,16 @@ void ThreadPool::worker_sq::doWork()
         pool->m_workload[i]();
         i = pool->m_index++;
     }
+}
+
+ThreadPool::worker_mysql::worker_mysql(ThreadPool *tp, int id, ThreadPool::ErrorHandling e):
+    worker_sq(tp, id, e)
+{
+}
+
+void ThreadPool::worker_mysql::doWork()
+{
+    mysql_thread_init();
+    worker_sq::doWork();
+    mysql_thread_end();
 }
