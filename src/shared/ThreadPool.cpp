@@ -25,31 +25,17 @@ ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
     m_workers.reserve(m_size);
 }
 
-template<class WORKER_T>
-void ThreadPool::start()
-{
-    if (!m_workers.empty())
-        return;
-    m_status = Status::STARTING;
-    for (int i = 0; i < m_size; i++)
-        m_workers.emplace_back(new WORKER_T(this, i, m_errorHandling));
-    m_status = Status::READY;
-    m_waitForWork.notify_all();
-}
-
 template void ThreadPool::start<ThreadPool::SingleQueue>();
 template void ThreadPool::start<ThreadPool::MultiQueue>();
 
 std::future<void> ThreadPool::processWorkload()
 {
-    if (m_status != Status::READY)
+    if (m_clearMode == ClearMode::AT_NEXT_WORKLOAD &&
+            m_status == Status::READY && m_dirty)
+        clearWorkload();
+    if (m_status != Status::READY || m_workload.empty())
         return std::future<void>();
     m_result = std::promise<void>();
-    if (m_workload.empty())
-    {
-        m_result.set_value();
-        return m_result.get_future();
-    }
     m_unlock = false;
     m_dirty = true;
     m_active = m_size;
@@ -66,6 +52,7 @@ std::future<void> ThreadPool::processWorkload(workload_t &workload)
     if (m_status != Status::READY)
         return std::future<void>();
     m_workload = workload;
+    m_dirty = false;
     return processWorkload();
 }
 
@@ -74,6 +61,7 @@ std::future<void> ThreadPool::processWorkload(workload_t &&workload)
     if (m_status != Status::READY)
         return std::future<void>();
     m_workload = std::move(workload);
+    m_dirty = false;
     return processWorkload();
 }
 
@@ -101,6 +89,8 @@ void ThreadPool::worker::waitForWork()
 
 ThreadPool &ThreadPool::operator<<(std::function<void()> packaged_task)
 {
+    if (m_status == Status::PROCESSING || m_status == Status::ERROR)
+        throw "Attempt to append a task to a load being processed!";
     if (m_clearMode == ClearMode::AT_NEXT_WORKLOAD && m_dirty)
         clearWorkload();
     m_workload.emplace_back(packaged_task);
@@ -113,6 +103,11 @@ void ThreadPool::clearWorkload()
     m_workload.clear();
 }
 
+ThreadPool::worker::worker(ThreadPool *pool, int id, ThreadPool::ErrorHandling mode) :
+    id(id), errorHandling(mode), pool(pool), thread([this](){this->loop_wrapper();})
+{
+}
+
 ThreadPool::worker::~worker()
 {
     if (thread.joinable())
@@ -121,8 +116,8 @@ ThreadPool::worker::~worker()
 
 void ThreadPool::worker::loop_wrapper()
 {
-        if (pool->m_errorHandling == ErrorHandling::NONE)
-            this->loop();
+    if (pool->m_errorHandling == ErrorHandling::NONE)
+        this->loop();
         else
         {
             std::exception_ptr err_p;
@@ -197,6 +192,11 @@ void ThreadPool::worker::loop()
     }
 }
 
+ThreadPool::worker_mq::worker_mq(ThreadPool *pool, int id, ThreadPool::ErrorHandling mode) :
+    worker(pool,id,mode)
+{
+}
+
 void ThreadPool::worker_mq::doWork()
 {
     while (it < pool->m_workload.end() && pool->m_status == Status::PROCESSING)
@@ -211,6 +211,11 @@ void ThreadPool::worker_mq::prepare()
 {
     it = pool->m_workload.begin() + id;
     worker::prepare();
+}
+
+ThreadPool::worker_sq::worker_sq(ThreadPool *pool, int id, ThreadPool::ErrorHandling mode) :
+    worker(pool,id,mode)
+{
 }
 
 void ThreadPool::worker_sq::doWork()

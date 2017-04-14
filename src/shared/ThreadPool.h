@@ -78,7 +78,16 @@ public:
      * @brief start creates and start the treads.
      */
     template<class WORKER_T = SingleQueue>
-    void start();
+    void start()
+    {
+        if (!m_workers.empty())
+            return;
+        m_status = Status::STARTING;
+        for (int i = 0; i < m_size; i++)
+            m_workers.emplace_back(new WORKER_T(this, i, m_errorHandling));
+        m_status = Status::READY;
+        m_waitForWork.notify_all();
+    }
 
     /**
      * @brief processWorkload notify the threads that the workload is ready.
@@ -128,10 +137,7 @@ public:
 
 private:
     struct worker {
-        worker(ThreadPool *pool, int id, ErrorHandling mode) :
-            id(id), errorHandling(mode), pool(pool), thread([this](){this->loop_wrapper();})
-        {
-        }
+        worker(ThreadPool *pool, int id, ErrorHandling mode);
         ~worker();
 
         void loop_wrapper();
@@ -149,19 +155,13 @@ private:
     };
 
     struct worker_sq : public worker{
-        worker_sq(ThreadPool *pool, int id, ErrorHandling mode) :
-            worker(pool,id,mode)
-        {
-        }
+        worker_sq(ThreadPool *pool, int id, ErrorHandling mode);
 
         void doWork() override;
     };
 
     struct worker_mq : public worker{
-        worker_mq(ThreadPool *pool, int id, ErrorHandling mode) :
-            worker(pool,id,mode)
-        {
-        }
+        worker_mq(ThreadPool *pool, int id, ErrorHandling mode);
 
         void doWork() override;
         void prepare() override;
