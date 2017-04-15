@@ -32,7 +32,7 @@ EndScriptData */
 
 
 enum eSpells {
-    SPELL_BERSERK               = 27680, // todo: was 26662, replaced with db.vanillagaming spell. Is it right?
+    SPELL_BERSERK               = 26662,
     
     SPELL_TWIN_TELEPORT_SCRIPT  = 799,   // should have a script effect, dosent seem to have one.
     SPELL_TWIN_TELEPORT_MSG     = 800,   // CTRA watches for this spell to start its teleport timer
