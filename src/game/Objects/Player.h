@@ -875,6 +875,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool Create( uint32 guidlow, const std::string& name, uint8 race, uint8 class_, uint8 gender, uint8 skin, uint8 face, uint8 hairStyle, uint8 hairColor, uint8 facialHair, uint8 outfitId );
 
         void Update(uint32 update_diff, uint32 time) override;
+        void SetTransport(Transport * t) override;
+        void DismountCheck();
 
         static bool BuildEnumData( QueryResult * result,  WorldPacket * p_data );
 
@@ -1914,6 +1916,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         float m_modManaRegen;
         float m_modManaRegenInterrupt;
         float m_SpellCritPercentage[MAX_SPELL_SCHOOL];
+        float m_carryHealthRegen;
 
         bool HasMovementFlag(MovementFlags f) const;        // for script access to m_movementInfo.HasMovementFlag
         void UpdateFallInformationIfNeed(MovementInfo const& minfo,uint16 opcode);

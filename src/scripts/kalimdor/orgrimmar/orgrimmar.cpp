@@ -571,12 +571,15 @@ struct npc_thrall_warchiefAI : public ScriptedAI
     npc_thrall_warchiefAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
+        m_uiTick = 0;
+        m_uiBlessingEventTimer = 0;
+        m_bBlessingEvent = false;
     }
 
     uint32 m_uiTick;
     uint32 ChainLightning_Timer;
     uint32 Shock_Timer;
-    uint32 m_uiBlessingEventTimer;
+    int32 m_uiBlessingEventTimer;
     bool m_bBlessingEvent;
     Creature* m_pHerald;
 
@@ -584,9 +587,6 @@ struct npc_thrall_warchiefAI : public ScriptedAI
     {
         ChainLightning_Timer = 2000;
         Shock_Timer = 8000;
-        m_uiTick = 0;
-        m_uiBlessingEventTimer = 0;
-        m_bBlessingEvent = false;
     }
 
     void StartBlessingEvent()
@@ -654,7 +654,9 @@ struct npc_thrall_warchiefAI : public ScriptedAI
                         m_uiTick++;
                         break;
                     case 4:
-                        Reset();
+                        m_uiTick = 0;
+                        m_uiBlessingEventTimer = 0;
+                        m_bBlessingEvent = false;
                         return;
                 }
             }

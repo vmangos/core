@@ -806,7 +806,7 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
     target.damage = 0;
 
     // Calculate hit result
-    target.missCondition = m_caster->SpellHitResult(pVictim, m_spellInfo, m_canReflect, this);
+    target.missCondition = m_caster->SpellHitResult(pVictim, m_spellInfo, effIndex, m_canReflect, this);
 
     // spell fly from visual cast object
     WorldObject* affectiveObject = GetAffectiveCasterObject();
@@ -833,7 +833,7 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
     if (target.missCondition == SPELL_MISS_REFLECT)
     {
         // Calculate reflected spell result on caster
-        target.reflectResult =  m_caster->SpellHitResult(m_caster, m_spellInfo, m_canReflect, this);
+        target.reflectResult =  m_caster->SpellHitResult(m_caster, m_spellInfo, effIndex, m_canReflect, this);
 
         if (target.reflectResult == SPELL_MISS_REFLECT)     // Impossible reflect again, so simply deflect spell
             target.reflectResult = SPELL_MISS_PARRY;
@@ -1280,10 +1280,14 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
     if (!unit)
         return;
 
-    if (!effectMask)
-        return;
-
     Unit* realCaster = GetAffectiveCaster();
+
+    if (!effectMask)
+    {
+        if (realCaster && !unit->isInCombat())
+            unit->AttackedBy(realCaster);
+        return;
+    }
 
     // Nostalrius: IsAuraResist pour les ModMechanicResistance des effets.
     if (IsSpellAppliesAura(m_spellInfo, effectMask) && unit->IsAuraResist(m_spellInfo))

@@ -435,6 +435,7 @@ Player::Player(WorldSession *session) : Unit(),
 
     m_modManaRegen = 0;
     m_modManaRegenInterrupt = 0;
+    m_carryHealthRegen = 0;
     for (int s = 0; s < MAX_SPELL_SCHOOL; s++)
         m_SpellCritPercentage[s] = 0.0f;
     m_regenTimer = 0;
@@ -908,7 +909,8 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
     // Absorb, resist some environmental damage type
     uint32 absorb = 0;
     uint32 resist = 0;
-    if (type == DAMAGE_LAVA)
+
+    if ((type == DAMAGE_LAVA) || (type == DAMAGE_FIRE))
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist, NULL);
     else if (type == DAMAGE_SLIME)
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist, NULL);
@@ -2280,6 +2282,10 @@ void Player::RegenerateHealth()
     // always regeneration bonus (including combat)
     // This function is called every 2 seconds.
     addvalue += HealthIncreaseRate * 2.0f * (GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) / 5.0f);
+
+    // Health fractions get carried to the next tick
+    addvalue += m_carryHealthRegen;
+    m_carryHealthRegen = addvalue - int32(addvalue);
 
     if (addvalue < 0)
         addvalue = 0;
@@ -6131,9 +6137,40 @@ uint32 Player::GetLevelFromDB(ObjectGuid guid)
     return level;
 }
 
+void Player::DismountCheck()
+{
+    if (IsMounted())
+    {
+        auto auras = this->GetAurasByType(SPELL_AURA_MOUNTED);
+
+        for (auto& aura : auras)
+        {
+            Spell mountSpell(this, aura->GetSpellProto(), true);
+
+            if (mountSpell.CheckCast(true) != SPELL_CAST_OK)
+            {
+                RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+                Unmount(true);
+            }
+        }
+    }
+}
+
+void Player::SetTransport(Transport* t)
+{
+    if (t) // don't bother checking when exiting a transport
+    {
+        DismountCheck();
+    }
+
+    WorldObject::SetTransport(t);
+}
+
 void Player::UpdateArea(uint32 newArea)
 {
     m_areaUpdateId    = newArea;
+
+    DismountCheck();
 
     const auto *areaEntry = AreaEntry::GetById(newArea);
 

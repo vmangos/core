@@ -704,7 +704,7 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
 
     // Hellfire. Damages the caster, but is still positive !
     // (Has same SpellFamilyFlags as Soul Fire oO)
-    if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && spellproto->SpellIconID == 937)
+    if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && spellproto->SpellIconID == 937 && spellproto->SpellVisual == 5423)
         return true;
 
     switch (spellproto->Effect[effIndex])
@@ -729,6 +729,9 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
             return true;
         // Negative Effects
         case SPELL_EFFECT_INSTAKILL:
+            // Suicide is a positive spell - ex. Garr Massive Eruption
+            if (spellproto->EffectImplicitTargetA[effIndex] == TARGET_SELF && spellproto->EffectImplicitTargetB[effIndex] == TARGET_NONE)
+                return true;
             // Sacrifice is a positive spell - for the warlock :)
             if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>())
                 return true;

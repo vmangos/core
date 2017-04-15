@@ -471,6 +471,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+                case 11885: // Capture Treant
+                case 11886: // Capture Wildkin
+                case 11887: // Capture Hippogryph
+                case 11888: // Capture Faerie Dragon
+                case 11889: // Capture Mountain Giant
+                case 12699: // Summon Screecher Spirit
+                {
+                    if (unitTarget->isDead() && unitTarget->GetTypeId() == TYPEID_UNIT)
+                        ((Creature*)unitTarget)->ForcedDespawn(1000);
+                    break;
+                }
                 case 25716 : // Force Self - Bow
                 {
                     m_caster->HandleEmote(EMOTE_ONESHOT_BOW);

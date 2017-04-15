@@ -1546,15 +1546,20 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
     }
     
     bool immune = true;
+    bool feral = IsInFeralForm();
 
-    for (uint8 i = 0; i < m_weaponDamageCount[damageInfo->attackType]; i++)
+    // Only get one damage type for feral druids so they don't receive incorrect benefits
+    // from weapons with multiple types of damage
+    uint8 actualDamageCount = feral ? 1 : m_weaponDamageCount[damageInfo->attackType];
+    for (uint8 i = 0; i < actualDamageCount; i++)
     {
         SubDamageInfo *subDamage = &damageInfo->subDamage[i];
-
-        subDamage->damageSchoolMask = GetTypeId() == TYPEID_PLAYER
+    
+        // feral only allowed melee school
+        subDamage->damageSchoolMask = GetTypeId() == TYPEID_PLAYER && !feral
             ? GetSchoolMask(GetWeaponDamageSchool(damageInfo->attackType, i))
             : GetMeleeDamageSchoolMask();
-
+        
         if (damageInfo->target->IsImmuneToDamage(subDamage->damageSchoolMask))
         {
             subDamage->damage = 0;
@@ -2986,7 +2991,7 @@ int32 Unit::MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* s
 //   Parry
 // For spells
 //   Resist
-SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool CanReflect, Spell* spellPtr)
+SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool CanReflect, Spell* spellPtr)
 {
     // Return evade for units in evade mode
     if (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
@@ -2998,7 +3003,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if (IsPositiveSpell(spell->Id, this, pVictim))
+    if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex))
         return SPELL_MISS_NONE;
 
     // Check for immune (use charges)
@@ -3974,6 +3979,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
     holder->HandleSpellSpecificBoosts(true);
 
     // Check debuff limit
+    //DEBUG_LOG("AddSpellAuraHolder: Adding spell %d, debuff limit affected: %d", holder->GetId(), holder->IsAffectedByDebuffLimit());
     if (holder->IsAffectedByDebuffLimit())
     {
         uint32 negativeAuras = GetNegativeAurasCount();
@@ -5087,7 +5093,8 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    if (pVictim && pVictim->isAlive() && procVictim)
+    // Don't proc victim auras if its a miss / resist
+    if (pVictim && pVictim->isAlive() && procVictim && !(PROC_EX_RESIST & procExtra) && !(PROC_EX_MISS & procExtra))
         pVictim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
 
     HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
@@ -5621,6 +5628,12 @@ void Unit::AttackedBy(Unit* attacker)
     // trigger AI reaction
     if (((Creature*)this)->AI())
         ((Creature*)this)->AI()->AttackedBy(attacker);
+
+    // trigger owner AI reaction
+    if(Unit* owner = GetCharmerOrOwner())
+        if (owner->IsCreature() && ((Creature*)owner)->AI()){
+            ((Creature*)owner)->AI()->AttackedBy(attacker);
+    }
 }
 
 bool Unit::AttackStop(bool targetSwitch /*=false*/)
