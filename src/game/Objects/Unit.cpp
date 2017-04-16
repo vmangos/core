@@ -808,7 +808,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 
         if (damagetype != DOT)
         {
-            if (!getVictim() || !getVictim()->getAttackerForHelper())
+            if (!getVictim())
             {
                 // if not have main target then attack state with target (including AI call)
                 //start melee attacks only after melee hit
@@ -5498,7 +5498,7 @@ bool Unit::IsNeutralToAll() const
     return my_faction->IsNeutralToAll();
 }
 
-bool Unit::Attack(Unit *victim, bool meleeAttack, bool triggerAIReaction)
+bool Unit::Attack(Unit *victim, bool meleeAttack)
 {
     if (!victim || victim == this)
         return false;
@@ -5557,9 +5557,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack, bool triggerAIReaction)
         addUnitState(UNIT_STAT_MELEE_ATTACKING);
 
     m_attacking = victim;
-
-    if (triggerAIReaction)
-        m_attacking->_addAttacker(this);        
+    m_attacking->_addAttacker(this);        
 
     if (GetTypeId() == TYPEID_UNIT) // && !((Creature*)this)->GetLinkGroup())
     {
