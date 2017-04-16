@@ -403,7 +403,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
                     m_bSubmerged        = false;
                     m_uiSummonBaseTimer = 2000;
-                    m_uiSubmergeTimer   = 90000;
+                    m_uiSubmergeTimer   = SUBMERGE_TIMER;
                     m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
 
                     DespawnCreatures(false);
