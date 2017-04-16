@@ -458,7 +458,7 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 default:
                 {
                     // must be destroyed only if no loot
-                    if (pItem->loot.isLooted())
+                    if (pItem->loot.isLooted() && !pItem->IsBag())
                     {
                         pItem->SetLootState(ITEM_LOOT_REMOVED);
                         player->DestroyItem(pItem->GetBagSlot(), pItem->GetSlot(), true);
