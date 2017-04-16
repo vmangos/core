@@ -157,7 +157,11 @@ void PetAI::UpdateAI(const uint32 diff)
             if (nextTarget)
                 AttackStart(nextTarget);
             else
+            {
+                if (m_creature->isInCombat())
+                    m_creature->CombatStop();
                 HandleReturnMovement();
+            }
         }
         else
             HandleReturnMovement();
@@ -379,7 +383,11 @@ void PetAI::KilledUnit(Unit* victim)
     if (Unit* nextTarget = SelectNextTarget(false))
         AttackStart(nextTarget);
     else
+    {
+        if (m_creature->isInCombat())
+            m_creature->CombatStop();
         HandleReturnMovement(); // Return
+    }
 }
 
 void PetAI::AttackStart(Unit* target)
@@ -464,11 +472,6 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
     if (m_creature->HasReactState(REACT_PASSIVE))
         return NULL;
 
-    // Check pet attackers first so we don't drag a bunch of targets to the owner
-    if (Unit* myAttacker = m_creature->getAttackerForHelper())
-        if (!myAttacker->HasBreakableByDamageCrowdControlAura())
-            return myAttacker;
-
     // Not sure why we wouldn't have an owner but just in case...
     Unit* owner = m_creature->GetCharmerOrOwner();
     if (!owner)
@@ -476,7 +479,7 @@ Unit* PetAI::SelectNextTarget(bool allowAutoSelect) const
 
     // Check owner attackers
     if (Unit* ownerAttacker = owner->getAttackerForHelper())
-        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura())
+        if (!ownerAttacker->HasBreakableByDamageCrowdControlAura() && owner->isInCombat())
             return ownerAttacker;
 
     // Check owner victim
