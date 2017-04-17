@@ -110,19 +110,19 @@ public:
      * @brief status
      * @return the current status
      */
-    Status status();
+    Status status() const;
 
     /**
      * @brief size
      * @return the number of threads that are/will be created
      */
-    int size();
+    int size() const;
 
     /**
      * @brief taskErrors always return an empty vector if ErrorHandling was set to IGNORE
      * @return a vector containing all task exceptions generated during last processed workload
      */
-    std::vector<std::exception_ptr> taskErrors();
+    std::vector<std::exception_ptr> taskErrors() const;
 
     /**
      * @brief operator << add a task to the workload

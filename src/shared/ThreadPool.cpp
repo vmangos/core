@@ -74,17 +74,17 @@ std::future<void> ThreadPool::processWorkload(workload_t &&workload)
     return processWorkload();
 }
 
-ThreadPool::Status ThreadPool::status()
+ThreadPool::Status ThreadPool::status() const
 {
     return m_status;
 }
 
-int ThreadPool::size()
+int ThreadPool::size() const
 {
     return m_size;
 }
 
-std::vector<std::exception_ptr> ThreadPool::taskErrors()
+std::vector<std::exception_ptr> ThreadPool::taskErrors() const
 {
     return m_errors;
 }
