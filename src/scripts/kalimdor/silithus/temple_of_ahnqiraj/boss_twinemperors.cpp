@@ -474,7 +474,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             if (justTeleported) return;
 
             std::list<Creature*> lUnitList;
-            GetCreatureListWithEntryInGrid(lUnitList, m_creature, { BUG_TYPE_1 , BUG_TYPE_1 }, BUG_SPELL_MAX_DIST);
+            GetCreatureListWithEntryInGrid(lUnitList, m_creature, { BUG_TYPE_1 , BUG_TYPE_2 }, BUG_SPELL_MAX_DIST);
 
             std::list<Creature*>::iterator iter;
             for (iter = lUnitList.begin(); iter != lUnitList.end();) {
