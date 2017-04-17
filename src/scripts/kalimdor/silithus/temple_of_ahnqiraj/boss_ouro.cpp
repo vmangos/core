@@ -94,7 +94,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     uint32 m_uiSweepTimer;
     uint32 m_uiSandBlastTimer;
     uint32 m_uiSubmergeTimer;
-    uint32 m_uiSummonBaseTimer;
+    bool m_SummonBase;
     uint32 m_uiNoMeleeTimer;
     uint32 m_uiSubmergeInvisTimer;
 
@@ -112,7 +112,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_uiSweepTimer        = urand(30000, 40000);
         m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
         m_uiSubmergeTimer     = SUBMERGE_TIMER;
-        m_uiSummonBaseTimer   = 2000;
+        m_SummonBase = true;
         m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
         // Source : http://wowwiki.wikia.com/wiki/Ouro
         // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
@@ -201,8 +201,6 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                 DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
             }
 
-            m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
-
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
             ClearTargetIcon();
 
@@ -276,18 +274,13 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         if (!m_bSubmerged)
         {
             // Summon sandworm base
-            if (m_uiSummonBaseTimer)
+            if (m_SummonBase)
             {
-                if (m_uiSummonBaseTimer <= uiDiff)
-                {
-                    // Note: server side spells should be cast directly
-                    m_creature->CastSpell(m_creature, SPELL_SUMMON_BASE, true);
-                    // Cast Despawn base to trigger spawn anim
-                    m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
-                    m_uiSummonBaseTimer = 0;
-                }
-                else
-                    m_uiSummonBaseTimer -= uiDiff;
+                // Note: server side spells should be cast directly
+                m_creature->CastSpell(m_creature, SPELL_SUMMON_BASE, true);
+                // Cast Despawn base to trigger spawn anim
+                m_creature->CastSpell(m_creature, SPELL_DESPAWN_BASE, true);
+                m_SummonBase = false;
             }
 
             // Sweep
@@ -402,7 +395,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     }
 
                     m_bSubmerged        = false;
-                    m_uiSummonBaseTimer = 2000;
+                    m_SummonBase = true;
                     m_uiSubmergeTimer   = SUBMERGE_TIMER;
                     m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
 
@@ -418,14 +411,16 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             }
             else
             {
-                if (m_uiSubmergeInvisTimer < uiDiff && m_creature->GetVisibility() == VISIBILITY_ON)
+                if (m_creature->GetVisibility() == VISIBILITY_ON)
                 {
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-                    m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
-                }
-                else
-                {
-                    m_uiSubmergeInvisTimer -= uiDiff;
+                    if (m_uiSubmergeInvisTimer < uiDiff)
+                    {
+                        m_creature->SetVisibility(VISIBILITY_OFF);
+                    }
+                    else
+                    {
+                        m_uiSubmergeInvisTimer -= uiDiff;
+                    }
                 }
 
                 m_uiSubmergeTimer -= uiDiff;
