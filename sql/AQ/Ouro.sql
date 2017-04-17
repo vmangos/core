@@ -45,3 +45,6 @@ UPDATE gameobject_template SET scriptname = "go_sandworm_base" WHERE entry = 180
 
 -- Update model combat reach
 UPDATE creature_model_info SET combat_reach = '20' WHERE modelid = 15509;
+
+-- Fix spell effect target for base desummoning
+INSERT INTO spell_script_target (`entry`, `type`, `targetEntry`) VALUES (26063, 0, 180795);
