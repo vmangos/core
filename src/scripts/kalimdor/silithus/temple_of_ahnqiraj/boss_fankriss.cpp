@@ -11,6 +11,7 @@ Stryg comments:
 
 #include <algorithm>
 #include <utility>
+#include <vector>
 
 enum
 {
@@ -21,7 +22,7 @@ enum
     //SPELL_SUMMON_WORM_1     = 518,
     //SPELL_SUMMON_WORM_2     = 25831,
     //SPELL_SUMMON_WORM_3     = 25832,
-
+    SPELL_SPAWN_ENRAGE      = 26662,
     NPC_SPAWN_FANKRISS      = 15630,
 };
 
@@ -48,6 +49,7 @@ static constexpr uint32 aEntangleSpells[3]      = { SPELL_ENTANGLE_1, SPELL_ENTA
 static constexpr size_t MAX_HATCHLINGS          = 20;   // Max hatchlings alive at any one time
 static constexpr size_t MAX_HATCHLINGS_PER_WEB  = 4;    // Max amount of hatchlings that can spawn at the same time, on one web. Its at least 4, might be 5.
 static constexpr uint32 HATCHLINGS_ATTACK_DELAY = 2500; // ~2.5sec in curse killvideo.
+static constexpr uint32 WORM_ENRAGE_BASE_TIMER  = 10000;
 
 // if defined, 2-MAX_HATCHLINGS_PER_WEB hatchlings are spawned in all 3 locations each time a player is ported,
 // otherwise 2-MAX_HATCHLINGS_PER_WEB hatchlings will only spawn on the single location the player was ported to.
@@ -74,9 +76,124 @@ HATCHLINGS_ATTACK_DELAY           defines how long after hatchlings spawn until 
 */
 std::vector<uint32> vIndex(aIndex, aIndex + 3);
 
+struct creature_spawn_fankrissAI : public ScriptedAI
+{
+    ScriptedInstance* m_pInstance;
+    uint32 enrageTimer;
+    creature_spawn_fankrissAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        Reset();
+    }
+
+    void Reset() override
+    {
+        enrageTimer = 10000;
+    }
+
+    void UpdateAI(const uint32 diff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+            return;
+        }
+
+        if (enrageTimer < diff)
+        {
+            DoCastSpellIfCan(m_creature, SPELL_SPAWN_ENRAGE, CAST_TRIGGERED);
+            enrageTimer = std::numeric_limits<uint32>::max();
+        }
+        else 
+        {
+            enrageTimer -= diff;
+        }
+        DoMeleeAttackIfReady();
+    }
+};
+
+struct creature_vekniss_hatchlingAI : public ScriptedAI
+{
+    ScriptedInstance* m_pInstance;
+    uint32 engageTimer;
+    bool hasEngaged;
+    bool wasAttacked;
+    creature_vekniss_hatchlingAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        Reset();
+    }
+
+    void Reset() override
+    {
+        engageTimer = HATCHLINGS_ATTACK_DELAY;
+        hasEngaged = false;
+        wasAttacked = false;
+    }
+
+    void AttackedBy(Unit* attacker) override
+    {
+        engageTimer = 0;
+        wasAttacked = true;
+        ScriptedAI::AttackedBy(attacker);
+    }
+    void AttackStart(Unit* u) override
+    {
+        if (hasEngaged)
+            ScriptedAI::AttackStart(u);
+    }
+    void EnterCombat(Unit* u) override
+    {
+        if (hasEngaged)
+            ScriptedAI::EnterCombat(u);
+    }
+    void MoveInLineOfSight(Unit* u) override
+    {
+        if (hasEngaged)
+            ScriptedAI::MoveInLineOfSight(u);
+    }
+    void Aggro(Unit* u) override
+    {
+        if (hasEngaged)
+            ScriptedAI::Aggro(u);
+    }
+
+    void UpdateAI(const uint32 diff) override
+    {
+        if (engageTimer <= diff && !hasEngaged)
+        {
+            hasEngaged = true;
+            m_creature->SetInCombatWithZone();
+            if (!wasAttacked)
+            {
+                if (Unit* pTarget = m_creature->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_NEAREST, 0))
+                {
+                    if (m_creature->GetDistance(pTarget) > 200) {
+                        return; //avoid running after people far off in the instance somewhere
+                    }
+                    m_creature->getThreatManager().addThreat(pTarget, 1);
+                    AttackStart(pTarget);
+
+                }
+            }
+        }
+        else if(!hasEngaged) {
+            engageTimer -= diff;
+            return;
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim()) {
+            return;
+        }
+        DoMeleeAttackIfReady();
+    }
+
+};
+
 struct boss_fankrissAI : public ScriptedAI
 {
-    boss_fankrissAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_fankrissAI(Creature* pCreature) : 
+        ScriptedAI(pCreature),
+        worms(3)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
@@ -85,18 +202,20 @@ struct boss_fankrissAI : public ScriptedAI
     ScriptedInstance* m_pInstance;
 
     uint32 m_uiMortalWoundTimer;
-
-    uint32 m_uiSummonWorm1Timer;
-    uint32 m_uiSummonWorm2Timer;
-    uint32 m_uiSummonWorm3Timer;
-
     uint32 m_uiEvadeCheckTimer;
+
+    struct Worm {
+        bool shouldSpawn;
+        bool haveSpawned;
+        uint32 enrageTimer;
+        uint32 spawnTimer;
+    };
+    std::vector<Worm> worms;
+    uint32 numSpawningThisWave;
 
     struct HatchlingBatch
     {
         HatchlingBatch(GuidList& list) :
-            attackTimer(HATCHLINGS_ATTACK_DELAY),
-            hasAttacked(false),
             hatchlings(std::move(list))
         {}
         uint32 attackTimer;
@@ -117,9 +236,14 @@ struct boss_fankrissAI : public ScriptedAI
     void Reset() override
     {
         m_uiMortalWoundTimer    = urand(4000, 8000);
-        m_uiSummonWorm1Timer    = urand(22500, 30000);
-        m_uiSummonWorm2Timer    = 0;
-        m_uiSummonWorm3Timer    = 0;
+
+        worms[0].shouldSpawn    = true;
+        worms[0].haveSpawned    = false;
+        worms[0].spawnTimer     = urand(20000, 30000);
+        worms[0].enrageTimer    = WORM_ENRAGE_BASE_TIMER;
+        worms[1].shouldSpawn    = false;
+        worms[2].shouldSpawn    = false;
+        numSpawningThisWave = 1;
 
         m_uiEvadeCheckTimer     = 2500;
         
@@ -268,36 +392,18 @@ struct boss_fankrissAI : public ScriptedAI
         {
             ReinitializeWebTimers();
         }
-        
-        for (auto it = hatchlingVec.begin(); it != hatchlingVec.end(); it++)
-        {
-            if (!it->hasAttacked)
-            {
-                if (it->attackTimer < uiDiff)
-                {
-                    for (auto hGuid = it->hatchlings.cbegin(); hGuid != it->hatchlings.cend(); hGuid++)
-                    {
-                        if (Creature* pHatchling = m_creature->GetMap()->GetCreature(*hGuid))
-                        {
-                            // If the hatchling is already in combat it means someone has already 
-                            // manually picked it up, and we should not force it on any target.
-                            if (!pHatchling->isInCombat())
-                            {
-                                if (Unit* pTarget = pHatchling->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_NEAREST, 0))
-                                {
-                                    pHatchling->AI()->AttackStart(pTarget);
-                                }
-                            }
-                            pHatchling->SetInCombatWithZone();
+    }
 
-                        }
-                    }
-                    it->hasAttacked = true;
-                }
-                else {
-                    it->attackTimer -= uiDiff;
-                }
+    void SummonWorm(const SpawnLocation& loc, uint32 enrageTimer)
+    {
+        if (Creature* pC = m_creature->SummonCreature(NPC_SPAWN_FANKRISS, loc.m_fX, loc.m_fY, loc.m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000))
+        {
+            creature_spawn_fankrissAI* ai = dynamic_cast<creature_spawn_fankrissAI*>(pC->AI());
+            if (!ai) {
+                sLog.outError("unable to cast spawn of fankriss AI to creature_spawn_fankrissAI");
+                return;
             }
+            ai->enrageTimer = enrageTimer;
         }
     }
 
@@ -338,42 +444,43 @@ struct boss_fankrissAI : public ScriptedAI
         else
             m_uiMortalWoundTimer -= uiDiff;
 
-        //
-        // Summon Worm (1-3)
-        if (m_uiSummonWorm1Timer < uiDiff)
+        bool allWormsSpawned = true;
+        for(size_t i = 0; i < worms.size(); i++)
         {
-            // randomize order of Summon Worm pattern
+            Worm& w = worms[i];
+            if (w.shouldSpawn && !w.haveSpawned) {
+                if (w.spawnTimer < uiDiff) {
+                    w.haveSpawned = true;
+                    SummonWorm(aSummonWormLocs[i], w.enrageTimer);
+                }
+                else {
+                    allWormsSpawned = false;
+                    w.spawnTimer -= uiDiff;
+                }
+            }
+        }
+
+        if (allWormsSpawned) 
+        {
             std::random_shuffle(vIndex.begin(), vIndex.end());
-            m_creature->SummonCreature(NPC_SPAWN_FANKRISS, aSummonWormLocs[vIndex[0]].m_fX, aSummonWormLocs[vIndex[0]].m_fY, aSummonWormLocs[vIndex[0]].m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-            m_uiSummonWorm1Timer = urand(50000, 70000);
-            m_uiSummonWorm2Timer = urand(1000, 30000);
-            m_uiSummonWorm3Timer = urand(2000, 30000);
-        }
-        else
-            m_uiSummonWorm1Timer -= uiDiff;
-
-        if (m_uiSummonWorm2Timer)
-        {
-            if (m_uiSummonWorm2Timer <= uiDiff)
+            uint32 spawnCount = urand(1, 3);
+            for (size_t i = 0; i < 3; i++) 
             {
-                m_creature->SummonCreature(NPC_SPAWN_FANKRISS, aSummonWormLocs[vIndex[1]].m_fX, aSummonWormLocs[vIndex[1]].m_fY, aSummonWormLocs[vIndex[1]].m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-                m_uiSummonWorm2Timer = 0;
+                Worm& w = worms[i];
+                w.haveSpawned = false;
+                w.shouldSpawn = i < spawnCount;
+                if (w.shouldSpawn) {
+                    w.enrageTimer = WORM_ENRAGE_BASE_TIMER*spawnCount;
+                    if (i == 0)
+                        w.spawnTimer = 18000 * numSpawningThisWave + urand(0, 5000); //randomizing a little extra
+                    else
+                        w.spawnTimer = worms[i-1].spawnTimer + urand(0, 5000);
+                    sLog.outBasic("worm %d spawning in %d. Will enrage after %d", i, w.spawnTimer, w.enrageTimer);
+                }
             }
-            else
-                m_uiSummonWorm2Timer -= uiDiff;
+            numSpawningThisWave = spawnCount;
         }
-
-        if (m_uiSummonWorm3Timer)
-        {
-            if (m_uiSummonWorm3Timer <= uiDiff)
-            {
-                m_creature->SummonCreature(NPC_SPAWN_FANKRISS, aSummonWormLocs[vIndex[2]].m_fX, aSummonWormLocs[vIndex[2]].m_fY, aSummonWormLocs[vIndex[2]].m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 50000);
-                m_uiSummonWorm3Timer = 0;
-            }
-            else
-                m_uiSummonWorm3Timer -= uiDiff;
-        }
-        
+      
         HandleHatchlings(uiDiff);
 
         DoMeleeAttackIfReady();
@@ -395,6 +502,16 @@ CreatureAI* GetAI_boss_fankriss(Creature* pCreature)
     return new boss_fankrissAI(pCreature);
 }
 
+CreatureAI* GetAI_creature_spawn_fankriss(Creature* pCreature)
+{
+    return new creature_spawn_fankrissAI(pCreature);
+}
+
+CreatureAI* GetAI_creature_vekniss_hatchling(Creature* pCreature)
+{
+    return new creature_vekniss_hatchlingAI(pCreature);
+}
+
 void AddSC_boss_fankriss()
 {
     Script* pNewScript;
@@ -403,4 +520,17 @@ void AddSC_boss_fankriss()
     pNewScript->Name = "boss_fankriss";
     pNewScript->GetAI = &GetAI_boss_fankriss;
     pNewScript->RegisterSelf();
+
+
+    pNewScript = new Script;
+    pNewScript->Name = "creature_spawn_fankriss";
+    pNewScript->GetAI = &GetAI_creature_spawn_fankriss;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "creature_vekniss_hatchling";
+    pNewScript->GetAI = &GetAI_creature_vekniss_hatchling;
+    pNewScript->RegisterSelf();
+
+    
 }

@@ -651,13 +651,13 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
                 void Update(uint32 time_diff)
                 {
-                    m_obj->Update( m_obj->m_updateTracker.timeElapsed(), time_diff);
-                    m_obj->m_updateTracker.Reset();
+m_obj->Update(m_obj->m_updateTracker.timeElapsed(), time_diff);
+m_obj->m_updateTracker.Reset();
                 }
 
                 void UpdateRealTime(uint32 now, uint32 time_diff)
                 {
-                    m_obj->Update( m_obj->m_updateTracker.timeElapsed(now), time_diff);
+                    m_obj->Update(m_obj->m_updateTracker.timeElapsed(now), time_diff);
                     m_obj->m_updateTracker.ResetTo(now);
                 }
 
@@ -906,6 +906,9 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         //mapId/instanceId should be set in SetMap() function!
         void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
+
+        bool IsWithinLootXPDist(const WorldObject const* objToLoot) const;
+        float lootAndXPRangeModifier;
 
     protected:
         explicit WorldObject();
