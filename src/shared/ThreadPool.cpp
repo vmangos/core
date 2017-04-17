@@ -26,6 +26,13 @@ ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
     m_workers.reserve(m_size);
 }
 
+ThreadPool::~ThreadPool()
+{
+    std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
+    m_status = Status::TERMINATING;
+    m_waitForWork.notify_all();
+}
+
 template void ThreadPool::start<ThreadPool::SingleQueue>();
 template void ThreadPool::start<ThreadPool::MultiQueue>();
 template void ThreadPool::start<ThreadPool::MySQL>();
@@ -38,7 +45,6 @@ std::future<void> ThreadPool::processWorkload()
     if (m_status != Status::READY || m_workload.empty())
         return std::future<void>();
     m_result = std::promise<void>();
-    m_unlock = false;
     m_dirty = true;
     m_active = m_size;
     m_index = 0;
@@ -86,7 +92,7 @@ std::vector<std::exception_ptr> ThreadPool::taskErrors()
 void ThreadPool::worker::waitForWork()
 {
     std::shared_lock<std::shared_timed_mutex> lock(pool->m_mutex); //locked!
-    while(!busy) //wait for work
+    while(!busy && pool->status() != Status::TERMINATING) //wait for work
         pool->m_waitForWork.wait(lock);
 }
 
@@ -113,55 +119,58 @@ ThreadPool::worker::worker(ThreadPool *pool, int id, ThreadPool::ErrorHandling m
 
 ThreadPool::worker::~worker()
 {
-    if (thread.joinable())
-        thread.detach();
+    thread.join();
 }
 
 void ThreadPool::worker::loop_wrapper()
 {
     if (pool->m_errorHandling == ErrorHandling::NONE)
-        this->loop();
-        else
+        loop();
+    else
+    {
+        std::exception_ptr err_p;
+        try
         {
-            std::exception_ptr err_p;
-            try
-            {
-                this->loop();
-            }
-            catch (...)
-            {
-
-                err_p = std::current_exception();
-            }
-
-            if (pool->m_errorHandling == ErrorHandling::IGNORE)
-            {
-                loop_wrapper();
-                return;
-            }
-            try{
-                if (err_p)
-                {
-                    pool->m_errors.push_back(err_p);
-                    std::rethrow_exception(err_p);
-                }
-            }
-            catch (const std::exception &e)
-            {
-                sLog.outError("A ThreadPool task generated an exception: %s",e.what());
-            }
-            catch (const std::string &e)
-            {
-                sLog.outError("A ThreadPool task generated an exception: %s",e);
-            }
-            catch (...)
-            {
-                sLog.outError("A ThreadPool task generated an exception");
-            }
-            if (pool->m_errorHandling == ErrorHandling::TERMINATE)
-                pool->m_status = Status::ERROR;
-            loop_wrapper();
+            loop();
         }
+        catch (...)
+        {
+
+            err_p = std::current_exception();
+        }
+
+        if (pool->m_errorHandling == ErrorHandling::IGNORE)
+        {
+            if (pool->status() == Status::TERMINATING)
+                return;
+            loop_wrapper();
+            return;
+        }
+        try{
+            if (err_p)
+            {
+                pool->m_errors.push_back(err_p);
+                std::rethrow_exception(err_p);
+            }
+        }
+        catch (const std::exception &e)
+        {
+            sLog.outError("A ThreadPool task generated an exception: %s",e.what());
+        }
+        catch (const std::string &e)
+        {
+            sLog.outError("A ThreadPool task generated an exception: %s",e);
+        }
+        catch (...)
+        {
+            sLog.outError("A ThreadPool task generated an exception");
+        }
+        if (pool->m_errorHandling == ErrorHandling::TERMINATE)
+            pool->m_status = Status::TERMINATING;
+        if (pool->status() == Status::TERMINATING)
+            return;
+        loop_wrapper();
+    }
 }
 
 void ThreadPool::worker::prepare()
@@ -174,6 +183,8 @@ void ThreadPool::worker::loop()
     while(true)
     {
         waitForWork();
+        if (pool->m_status == Status::TERMINATING)
+            return;
         doWork();
         busy = false;
         int remaning = --(pool->m_active);

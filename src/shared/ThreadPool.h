@@ -45,7 +45,8 @@ public:
         STOPPED,
         STARTING,
         READY,
-        PROCESSING
+        PROCESSING,
+        TERMINATING
     };
 
     enum class ClearMode {
@@ -75,6 +76,8 @@ public:
     ThreadPool(int numThreads, ClearMode when = ClearMode::AT_NEXT_WORKLOAD, ErrorHandling mode = ErrorHandling::NONE);
 
     ThreadPool() = delete;
+
+    ~ThreadPool();
 
     /**
      * @brief start creates and start the treads.
@@ -149,7 +152,7 @@ private:
 
         int id;
         ErrorHandling errorHandling;
-        bool busy = false;
+        volatile bool busy = false;
         ThreadPool *pool;
         std::thread thread;
 
@@ -181,19 +184,17 @@ private:
 
     Status m_status = Status::STOPPED;
     ErrorHandling m_errorHandling;
-    workers_t m_workers;
     int m_size;
     std::shared_timed_mutex m_mutex;
     std::condition_variable_any m_waitForWork;
     workload_t m_workload;
     ClearMode m_clearMode;
     bool m_dirty = false;
-    void workerLoop(int id);
     std::atomic<int> m_active;
     std::atomic<int> m_index;
     std::vector<std::exception_ptr> m_errors;
     std::promise<void> m_result;
-    bool m_unlock;
+    workers_t m_workers;
 };
 
 std::unique_ptr<ThreadPool> & operator<<(std::unique_ptr<ThreadPool> & tp, auto f)
