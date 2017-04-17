@@ -356,6 +356,7 @@ struct npc_deathstalker_faerleiaAI : ScriptedAI
             if (m_uiWaveCount == 4)
             {
                 DoScriptText(SAY_COMPLETED, m_creature);
+                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
                 if (Player* pPlayer = (m_creature->GetMap()->GetPlayer(m_uiPlayerGUID)))
                     pPlayer->GroupEventHappens(QUEST_PYREWOOD_AMBUSH, m_creature);
