@@ -1422,9 +1422,8 @@ void Map::AddObjectToRemoveList(WorldObject *obj)
     MANGOS_ASSERT(obj->GetMapId() == GetId() && obj->GetInstanceId() == GetInstanceId());
 
     obj->CleanupsBeforeDelete();                            // remove or simplify at least cross referenced links
-    i_objectsToRemove_lock.acquire();
+    std::unique_lock<std::mutex> lock(i_objectsToRemove_lock);
     i_objectsToRemove.insert(obj);
-    i_objectsToRemove_lock.release();
 }
 
 void Map::RemoveAllObjectsInRemoveList()
@@ -1432,7 +1431,7 @@ void Map::RemoveAllObjectsInRemoveList()
     if (i_objectsToRemove.empty())
         return;
 
-    i_objectsToRemove_lock.acquire();
+    std::unique_lock<std::mutex> lock(i_objectsToRemove_lock);
     while (!i_objectsToRemove.empty())
     {
         WorldObject* obj = *i_objectsToRemove.begin();
@@ -1469,7 +1468,6 @@ void Map::RemoveAllObjectsInRemoveList()
                 break;
         }
     }
-    i_objectsToRemove_lock.release();
 }
 
 uint32 Map::GetPlayersCountExceptGMs() const
@@ -2100,7 +2098,7 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
     ///- Schedule script execution for all scripts in the script map
     ScriptMap const *s2 = &(s->second);
     bool immedScript = false;
-    m_scriptSchedule_lock.acquire();
+    std::unique_lock<MapMutexType> lock(m_scriptSchedule_lock);
     for (ScriptMap::const_iterator iter = s2->begin(); iter != s2->end(); ++iter)
     {
         ScriptAction sa;
@@ -2115,7 +2113,6 @@ void Map::ScriptsStart(ScriptMapMap const& scripts, uint32 id, Object* source, O
 
         sScriptMgr.IncreaseScheduledScriptsCount();
     }
-    m_scriptSchedule_lock.release();
 }
 
 void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target)
@@ -2133,19 +2130,17 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     sa.ownerGuid  = ownerGuid;
 
     sa.script = &script;
-    m_scriptSchedule_lock.acquire();
+    std::unique_lock<std::mutex> lock(m_scriptSchedule_lock);
     m_scriptSchedule.insert(ScriptScheduleMap::value_type(time_t(sWorld.GetGameTime() + delay), sa));
     sScriptMgr.IncreaseScheduledScriptsCount();
-    m_scriptSchedule_lock.release();
 }
 
 /// Process queued scripts
 void Map::ScriptsProcess()
 {
-    m_scriptSchedule_lock.acquire();
+    std::unique_lock<std::mutex> lock(m_scriptSchedule_lock);
     if (m_scriptSchedule.empty())
     {
-        m_scriptSchedule_lock.release();
         return;
     }
 
@@ -2155,7 +2150,7 @@ void Map::ScriptsProcess()
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
         ScriptAction step = iter->second;
-        m_scriptSchedule_lock.release();
+        lock.unlock();
 
         Object* source = NULL;
 
@@ -3450,7 +3445,7 @@ void Map::ScriptsProcess()
                 break;
         }
 
-        m_scriptSchedule_lock.acquire();
+        lock.lock();
         iter = m_scriptSchedule.begin();
         if (iter->second.script == step.script)
             m_scriptSchedule.erase(iter);
@@ -3458,7 +3453,6 @@ void Map::ScriptsProcess()
 
         sScriptMgr.DecreaseScheduledScriptCount();
     }
-    m_scriptSchedule_lock.release();
 }
 
 /**
@@ -3575,6 +3569,48 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
     return NULL;
 }
 
+void Map::AddUpdateObject(Object *obj)
+{
+    if (_processingSendObjUpdates)
+        return;
+    std::unique_lock<std::mutex> lock(i_objectsToClientUpdate_lock);
+    i_objectsToClientUpdate.insert(obj);
+}
+
+void Map::RemoveUpdateObject(Object *obj)
+{
+    ASSERT(!_processingSendObjUpdates);
+    std::unique_lock<std::mutex> lock(i_objectsToClientUpdate_lock);
+    i_objectsToClientUpdate.erase( obj );
+}
+
+void Map::AddRelocatedUnit(Unit *obj)
+{
+    if (_processingUnitsRelocation)
+        return;
+    std::unique_lock<std::mutex> lock(i_unitsRelocated_lock);
+    i_unitsRelocated.insert(obj);
+}
+
+void Map::RemoveRelocatedUnit(Unit *obj)
+{
+    ASSERT(!_processingUnitsRelocation);
+    std::unique_lock<std::mutex> lock(i_unitsRelocated_lock);
+    i_unitsRelocated.erase(obj);
+}
+
+void Map::AddUnitToMovementUpdate(Unit *unit)
+{
+    std::unique_lock<std::mutex> lock(unitsMvtUpdate_lock);
+    unitsMvtUpdate.insert(unit);
+}
+
+void Map::RemoveUnitFromMovementUpdate(Unit *unit)
+{
+    std::unique_lock<std::mutex> lock(unitsMvtUpdate_lock);
+    unitsMvtUpdate.erase(unit);
+}
+
 /*
  * TODO:
  * implement a worker providing an accumulator
@@ -3656,7 +3692,7 @@ void Map::SendObjectUpdates()
                 ++itEnd;
         }
         objUpdaters.emplace_back(itBegin, itEnd, now);
-        if (i == threads -1)
+        if (i != threads -1)
             m_objectThreads << [&objUpdaters,i](){
                 objUpdaters[i]();
             };
@@ -3793,7 +3829,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
 {
     // TODOLOCK
     // TODO: for map local guid counters possible force reload map instead shutdown server at guid counter overflow
-    m_guidGenerators_lock.acquire();
+    std::unique_lock<std::mutex> lock(m_guidGenerators_lock);
     uint32 guid = 0;
     switch (guidhigh)
     {
@@ -3812,7 +3848,6 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
         default:
             MANGOS_ASSERT(0);
     }
-    m_guidGenerators_lock.release();
     return guid;
 }
 
@@ -4139,6 +4174,44 @@ VMAP::ModelInstance* Map::FindCollisionModel(float x1, float y1, float z1, float
     ASSERT(MaNGOS::IsValidMapCoord(x1, y1, z1));
     ASSERT(MaNGOS::IsValidMapCoord(x2, y2, z2));
     return VMAP::VMapFactory::createOrGetVMapManager()->FindCollisionModel(GetId(), x1, y1, z1, x2, y2, z2);
+}
+
+void Map::RemoveGameObjectModel(const GameObjectModel &model)
+{
+    std::unique_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    _dynamicTree.remove(model);
+    _dynamicTree.balance();
+}
+
+void Map::InsertGameObjectModel(const GameObjectModel &model)
+{
+    std::unique_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    _dynamicTree.insert(model);
+    _dynamicTree.balance();
+}
+
+bool Map::ContainsGameObjectModel(const GameObjectModel &model) const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    return _dynamicTree.contains(model);
+}
+
+bool Map::GetDynamicObjectHitPos(Movement::Vector3 start, Movement::Vector3 end, Movement::Vector3 &out, float finalDistMod) const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    return _dynamicTree.getObjectHitPos(start, end, out, finalDistMod);
+}
+
+float Map::GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    return _dynamicTree.getHeight(x, y, z, maxSearchDist);
+}
+
+bool Map::CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2) const
+{
+    std::shared_lock<std::shared_timed_mutex> lock(_dynamicTree_lock);
+    return _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2);
 }
 
 

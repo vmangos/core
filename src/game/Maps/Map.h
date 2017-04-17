@@ -47,6 +47,8 @@
 #include <bitset>
 #include <list>
 #include <set>
+#include <mutex>
+#include <shared_mutex>
 
 using Movement::Vector3;
 
@@ -185,7 +187,7 @@ struct AreaLocale
 #define MIN_UNLOAD_DELAY      1                             // immediate unload
 
 typedef std::map<uint32, CreatureGroup*> CreatureGroupHolderType;
-typedef ACE_Thread_Mutex MapMutexType; // Use ACE_Null_Mutex to disable locks
+using MapMutexType = std::mutex; // can be replaced with a null mutex
 
 // Instance IDs reserved for internal use (instanced continent parts, ...)
 #define RESERVED_INSTANCES_LAST 100
@@ -344,68 +346,28 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         template <typename T> void InsertObject(ObjectGuid const& guid, T* ptr)
         {
-            m_objectsStore_lock.acquire_write();
+            std::unique_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
             m_objectsStore.insert<T>(guid, ptr);
-            m_objectsStore_lock.release();
         }
         template <typename T> void EraseObject(ObjectGuid const& guid)
         {
-            m_objectsStore_lock.acquire_write();
+            std::unique_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
             m_objectsStore.erase<T>(guid, (T*)nullptr);
-            m_objectsStore_lock.release();
         }
         template <typename T> T* GetObject(ObjectGuid const& guid)
         {
-            m_objectsStore_lock.acquire_read();
-            T* ptr = m_objectsStore.find<T>(guid, (T*)nullptr);
-            m_objectsStore_lock.release();
-            return ptr;
+            std::shared_lock<std::shared_timed_mutex> lock(m_objectsStore_lock);
+            return m_objectsStore.find<T>(guid, (T*)nullptr);
         }
-        void AddUpdateObject(Object *obj)
-        {
-            if (_processingSendObjUpdates)
-                return;
-            i_objectsToClientUpdate_lock.acquire();
-            i_objectsToClientUpdate.insert(obj);
-            i_objectsToClientUpdate_lock.release();
-        }
+        void AddUpdateObject(Object *obj);
 
-        void RemoveUpdateObject(Object *obj)
-        {
-            ASSERT(!_processingSendObjUpdates);
-            i_objectsToClientUpdate_lock.acquire();
-            i_objectsToClientUpdate.erase( obj );
-            i_objectsToClientUpdate_lock.release();
-        }
+        void RemoveUpdateObject(Object *obj);
         // May be called from a different map ...
-        void AddRelocatedUnit(Unit* obj)
-        {
-            if (_processingUnitsRelocation)
-                return;
-            i_unitsRelocated_lock.acquire();
-            i_unitsRelocated.insert(obj);
-            i_unitsRelocated_lock.release();
-        }
-        void RemoveRelocatedUnit(Unit* obj)
-        {
-            ASSERT(!_processingUnitsRelocation);
-            i_unitsRelocated_lock.acquire();
-            i_unitsRelocated.erase(obj);
-            i_unitsRelocated_lock.release();
-        }
+        void AddRelocatedUnit(Unit* obj);
+        void RemoveRelocatedUnit(Unit* obj);
 
-        void AddUnitToMovementUpdate(Unit* unit)
-        {
-            unitsMvtUpdate_lock.acquire();
-            unitsMvtUpdate.insert(unit);
-            unitsMvtUpdate_lock.release();
-        }
-        void RemoveUnitFromMovementUpdate(Unit* unit)
-        {
-            unitsMvtUpdate_lock.acquire();
-            unitsMvtUpdate.erase(unit);
-            unitsMvtUpdate_lock.release();
-        }
+        void AddUnitToMovementUpdate(Unit* unit);
+        void RemoveUnitFromMovementUpdate(Unit* unit);
         // DynObjects currently
         uint32 GenerateLocalLowGuid(HighGuid guidhigh);
 
@@ -433,48 +395,12 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         VMAP::ModelInstance* FindCollisionModel(float x1, float y1, float z1, float x2, float y2, float z2);
 
         void Balance() { _dynamicTree.balance(); }
-        void RemoveGameObjectModel(const GameObjectModel& model)
-        {
-            _dynamicTree_lock.acquire_write();
-            _dynamicTree.remove(model);
-            _dynamicTree.balance();
-            _dynamicTree_lock.release();
-        }
-        void InsertGameObjectModel(const GameObjectModel& model)
-        {
-            _dynamicTree_lock.acquire_write();
-            _dynamicTree.insert(model);
-            _dynamicTree.balance();
-            _dynamicTree_lock.release();
-        }
-        bool ContainsGameObjectModel(const GameObjectModel& model) const
-        {
-            _dynamicTree_lock.acquire_read();
-            bool r = _dynamicTree.contains(model);
-            _dynamicTree_lock.release();
-            return r;
-        }
-        bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const
-        {
-            _dynamicTree_lock.acquire_read();
-            bool r = _dynamicTree.getObjectHitPos(start, end, out, finalDistMod);
-            _dynamicTree_lock.release();
-            return r;
-        }
-        float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const
-        {
-            _dynamicTree_lock.acquire_read();
-            float r = _dynamicTree.getHeight(x, y, z, maxSearchDist);
-            _dynamicTree_lock.release();
-            return r;
-        }
-        bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2) const
-        {
-            _dynamicTree_lock.acquire_read();
-            bool r = _dynamicTree.isInLineOfSight(x1, y1, z1, x2, y2, z2);
-            _dynamicTree_lock.release();
-            return r;
-        }
+        void RemoveGameObjectModel(const GameObjectModel& model);
+        void InsertGameObjectModel(const GameObjectModel& model);
+        bool ContainsGameObjectModel(const GameObjectModel& model) const;
+        bool GetDynamicObjectHitPos(Vector3 start, Vector3 end, Vector3& out, float finalDistMod) const;
+        float GetDynamicTreeHeight(float x, float y, float z, float maxSearchDist) const;
+        bool CheckDynamicTreeLoS(float x1, float y1, float z1, float x2, float y2, float z2) const;
         bool IsUnloading() const { return m_unloading; }
         void MarkAsCrashed() { m_crashed = true; }
         bool IsCrashed() const { return m_crashed; }
@@ -528,15 +454,15 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         bool                    _processingSendObjUpdates;
         uint32                  _objUpdatesThreads;
-        mutable MapMutexType    i_objectsToClientUpdate_lock;
+        mutable std::mutex              i_objectsToClientUpdate_lock;
         std::set<Object *>      i_objectsToClientUpdate;
 
         bool                    _processingUnitsRelocation;
         uint32                  _unitRelocationThreads;
-        mutable MapMutexType    i_unitsRelocated_lock;
+        mutable std::mutex    i_unitsRelocated_lock;
         std::set<Unit* >        i_unitsRelocated;
 
-        mutable MapMutexType    unitsMvtUpdate_lock;
+        mutable std::mutex    unitsMvtUpdate_lock;
         std::set<Unit*>         unitsMvtUpdate;
 
         std::unique_ptr<ThreadPool> m_objectThreads;
@@ -549,7 +475,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         float m_VisibleDistance;
         float m_GridActivationDistance;
 
-        mutable ACE_RW_Mutex   _dynamicTree_lock;
+        mutable std::shared_timed_mutex   _dynamicTree_lock;
         DynamicMapTree _dynamicTree;
 
         MapPersistentState* m_persistentState;
@@ -562,7 +488,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         ActiveNonPlayers::iterator m_activeNonPlayersIter;
 
         typedef TypeUnorderedMapContainer<AllMapStoredObjectTypes, ObjectGuid> MapStoredObjectTypesContainer;
-        ACE_RW_Mutex                    m_objectsStore_lock;
+        mutable std::shared_timed_mutex         m_objectsStore_lock;
         MapStoredObjectTypesContainer   m_objectsStore;
 
         // Objects that must update even in inactive grids without activating them
@@ -585,18 +511,18 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         std::bitset<TOTAL_NUMBER_OF_CELLS_PER_MAP*TOTAL_NUMBER_OF_CELLS_PER_MAP> marked_cells;
 
-        mutable MapMutexType    i_objectsToRemove_lock;
+        mutable std::mutex              i_objectsToRemove_lock;
         std::set<WorldObject *> i_objectsToRemove;
 
         typedef std::multimap<time_t, ScriptAction> ScriptScheduleMap;
-        MapMutexType      m_scriptSchedule_lock;
+        mutable MapMutexType      m_scriptSchedule_lock;
         ScriptScheduleMap m_scriptSchedule;
 
         InstanceData* i_data;
         uint32 i_script_id;
 
         // Map local low guid counters
-        mutable MapMutexType    m_guidGenerators_lock;
+        mutable std::mutex m_guidGenerators_lock;
         ObjectGuidGenerator<HIGHGUID_UNIT> m_CreatureGuids;
         ObjectGuidGenerator<HIGHGUID_GAMEOBJECT> m_GameObjectGuids;
         ObjectGuidGenerator<HIGHGUID_DYNAMICOBJECT> m_DynObjectGuids;
