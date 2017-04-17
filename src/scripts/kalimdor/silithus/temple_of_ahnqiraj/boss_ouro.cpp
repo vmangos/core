@@ -418,14 +418,16 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             }
             else
             {
-                if (m_uiSubmergeInvisTimer < uiDiff && m_creature->GetVisibility() == VISIBILITY_ON)
+                if (m_creature->GetVisibility() == VISIBILITY_ON)
                 {
-                    m_creature->SetVisibility(VISIBILITY_OFF);
-                    m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
-                }
-                else
-                {
-                    m_uiSubmergeInvisTimer -= uiDiff;
+                    if (m_uiSubmergeInvisTimer < uiDiff)
+                    {
+                        m_creature->SetVisibility(VISIBILITY_OFF);
+                    }
+                    else
+                    {
+                        m_uiSubmergeInvisTimer -= uiDiff;
+                    }
                 }
 
                 m_uiSubmergeTimer -= uiDiff;
