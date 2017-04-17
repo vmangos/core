@@ -96,7 +96,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(WorldTimer::getMSTime()),
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
       _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
-      m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)))
+      m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS))),
+      m_objectThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS)-1))
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -120,6 +121,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
     m_motionThreads->start();
+    m_objectThreads->start<ThreadPool::MySQL>();
 }
 
 // Nostalrius
@@ -3573,18 +3575,20 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
     return NULL;
 }
 
-class ObjectUpdatePacketBuilder : public ACE_Based::Runnable
+/*
+ * TODO:
+ * implement a worker providing an accumulator
+ */
+class ObjectUpdatePacketBuilder
 {
 public:
     ObjectUpdatePacketBuilder(std::set<Object*>::iterator& a, std::set<Object*>::iterator& b, uint32 now) : begin(a), end(b), beginTime(now), current(a)
     {
     }
 
-    virtual void run()
+    void operator()()
     {
-        WorldDatabase.ThreadStart(); // Not needed if we don't do SQL queries from this thread ...
         DoUpdateObjects();
-        WorldDatabase.ThreadEnd();
     }
     void DoUpdateObjects()
     {
@@ -3633,11 +3637,10 @@ void Map::SendObjectUpdates()
         _objUpdatesThreads = threads;
     if (threads > objectsCount)
         threads = objectsCount;
-
     uint32 step = objectsCount / threads;
-    uint32 i = 0;
-    ACE_Based::Thread** updaters = threads > 1 ? new ACE_Based::Thread*[threads - 1] : NULL;
-    ObjectUpdatePacketBuilder** objUpdaters = new ObjectUpdatePacketBuilder*[threads];
+
+    std::vector<ObjectUpdatePacketBuilder> objUpdaters;
+    objUpdaters.reserve(threads -1);
     std::set<Object*>::iterator itBegin = i_objectsToClientUpdate.begin();
     std::set<Object*>::iterator itEnd = i_objectsToClientUpdate.begin();
     ASSERT(step > 0);
@@ -3652,26 +3655,19 @@ void Map::SendObjectUpdates()
             for (uint32 j = 0; j < step; ++j)
                 ++itEnd;
         }
-        objUpdaters[i] = new ObjectUpdatePacketBuilder(itBegin, itEnd, now);
-        objUpdaters[i]->incReference();
-
-        if (i == (threads - 1)) // Do not create a useless supplementary thread
-            objUpdaters[i]->DoUpdateObjects();
-        else
-            updaters[i] = new ACE_Based::Thread(objUpdaters[i]);
+        objUpdaters.emplace_back(itBegin, itEnd, now);
+        if (i == threads -1)
+            m_objectThreads << [&objUpdaters,i](){
+                objUpdaters[i]();
+            };
     }
-    for (uint32 i = 0; i < (threads - 1); ++i)
-        updaters[i]->wait();
+    std::future<void> job = m_objectThreads->processWorkload();
+    objUpdaters[threads -1]();
+    if (job.valid())
+        job.wait();
     for (uint32 i = 0; i < threads; ++i)
     {
-        /* std::set::erase
-         * Iterators, pointers and references referring to elements removed by the function are invalidated.
-         * All other iterators, pointers and references keep their validity.
-         */
-        i_objectsToClientUpdate.erase(objUpdaters[i]->begin, objUpdaters[i]->current);
-        objUpdaters[i]->decReference();
-        if (i != (threads - 1))
-            delete updaters[i];
+        i_objectsToClientUpdate.erase(objUpdaters[i].begin, objUpdaters[i].current);
     }
 
     // If we timeout, use more threads !
@@ -3681,8 +3677,6 @@ void Map::SendObjectUpdates()
         --_objUpdatesThreads;
 
     _processingSendObjUpdates = false;
-    delete[] updaters;
-    delete[] objUpdaters;
 #ifdef MAP_SENDOBJECTUPDATES_PROFILE
     uint32 diff = WorldTimer::getMSTimeDiffToNow(now);
     if (diff > 50)

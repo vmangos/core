@@ -539,6 +539,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         mutable MapMutexType    unitsMvtUpdate_lock;
         std::set<Unit*>         unitsMvtUpdate;
 
+        std::unique_ptr<ThreadPool> m_objectThreads;
         std::unique_ptr<ThreadPool> m_motionThreads;
     protected:
         MapEntry const* i_mapEntry;
