@@ -24,6 +24,12 @@ UPDATE creature_template SET `ScriptName`='mob_twins_bug' WHERE `entry`='15317';
 UPDATE creature_template SET `ScriptName`='mob_twins_bug' WHERE `entry`='15316';
 
 -- creating creature_equip_template entry for Vek'lors scepter
+DELETE FROM creature_equip_template WHERE entry = 16000;
 INSERT INTO creature_equip_template (entry, equipentry1) VALUES (16000, 21796);
+
 -- Giving Vek'lor the scepter equip template
 UPDATE creature_template SET equipment_id=16000 WHERE entry=15276;
+
+-- making emperors immune to disarm
+UPDATE creature_template SET MechanicImmuneMask = (MechanicImmuneMask | 4) WHERE entry = 15275;
+UPDATE creature_template SET MechanicImmuneMask = (MechanicImmuneMask | 4) WHERE entry = 15276;
