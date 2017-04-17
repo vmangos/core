@@ -33,3 +33,7 @@ UPDATE creature_template SET equipment_id=16000 WHERE entry=15276;
 -- making emperors immune to disarm
 UPDATE creature_template SET MechanicImmuneMask = (MechanicImmuneMask | 4) WHERE entry = 15275;
 UPDATE creature_template SET MechanicImmuneMask = (MechanicImmuneMask | 4) WHERE entry = 15276;
+
+-- Vek'nilash should drop  Belt of the Fallen Emperor for alliance only, and Grasp of the Fallen Emperor for horde only
+UPDATE reference_loot_template SET condition_id = 3 WHERE entry = 328943 and item = 21606;
+UPDATE reference_loot_template SET condition_id = 2 WHERE entry = 328943 and item = 21607;
