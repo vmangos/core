@@ -297,6 +297,15 @@ struct boss_twinemperorsAI : public ScriptedAI
             }
             m_pInstance->SetData(TYPE_TWINS, IN_PROGRESS);
         }
+        std::list<Creature*> lst;
+        GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
+        for (auto it = lst.begin(); it != lst.end(); it++)
+        {
+            Creature* pC = *it;
+            if (pC->isDead()) continue;
+            pC->SetInCombatWithZone();
+            pC->AI()->AttackStart(pWho);
+        }
 
         m_creature->SetInCombatWithZone();
 
@@ -386,8 +395,8 @@ struct boss_twinemperorsAI : public ScriptedAI
             UpdateEmperor(diff);
         }
 
-        // Evade in case starts running after someone at zone in
-        if (m_creature->GetPositionY() > 1400) {
+        // Evade in case starts running after someone outside their room
+        if (m_creature->GetPositionZ() > -95.0f) {
             if(Creature* pOther = GetOtherBoss())
                 pOther->AI()->EnterEvadeMode();
             EnterEvadeMode();
