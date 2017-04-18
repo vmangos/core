@@ -862,7 +862,7 @@ void Map::Update(uint32 t_diff)
         sMapMgr.MarkContinentUpdateFinished(_updateIdx);
         while (!sMapMgr.IsContinentUpdateFinished())
         {
-            ACE_Based::Thread::Sleep(10);
+            std::this_thread::sleep_for(std::chrono::milliseconds(10));
             if (sMapMgr.IsContinentUpdateFinished())
                 break;
 
