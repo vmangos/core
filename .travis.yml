@@ -1,0 +1,48 @@
+language: cpp
+compiler: gcc
+dist: trusty
+
+os:
+  - linux
+
+before_script:
+  # g++6
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get update -qq
+  - sudo apt-get install -qq g++-6
+  - sudo update-alternatives --install /usr/bin/g++ g++ /usr/bin/g++-6 90
+
+  - g++   --version
+  - g++-6 --version
+
+  # TBB
+  - sudo apt-get install -y libtbb-dev
+  - export TBB_ROOT_DIR=/usr/include/tbb/
+
+  # BEGIN Install ACE
+
+  ## BEGIN Backup ACE install
+  #
+  #- wget http://download.dre.vanderbilt.edu/previous_versions/ACE-6.0.3.tar.gz
+  #- tar xzf ACE-6.0.3.tar.gz
+  #- cd ACE_wrappers/
+  #- mkdir build
+  #- cd build
+  #- ../configure --disable-ssl &> /dev/null
+  #- echo "Beginning ACE build. May take 10+ minutes."
+  #- make > /dev/null
+  #- sudo make install
+  #- cd ../../
+  #
+  ## END Backup ACE install
+
+  - sudo apt-get install -qq libace-dev
+  - export ACE_ROOT=/usr/include/ace/
+
+  # END Install ACE
+
+  - mkdir build
+  - cd build
+  - cmake -DDEBUG=0 ..
+
+script: make
