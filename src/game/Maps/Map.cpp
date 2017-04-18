@@ -98,7 +98,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
       m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS))),
       m_objectThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS)-1)),
-      m_visibilityThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1))
+      m_visibilityThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1)),
+      m_cellThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) -1))
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -124,6 +125,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_motionThreads->start();
     m_objectThreads->start<ThreadPool::MySQL>();
     m_visibilityThreads->start<ThreadPool::MySQL>();
+    m_cellThreads->start();
 }
 
 // Nostalrius
@@ -657,24 +659,6 @@ inline void Map::UpdateActiveCellsCallback(uint32 diff, uint32 now, uint32 threa
     }
 }
 
-class MapAsynchCellsWorker : public ACE_Based::Runnable
-{
-public:
-    MapAsynchCellsWorker(int i, int nthreads, uint32 _diff, uint32 _now, uint32 _step, Map* m) : threadIdx(i), nThreads(nthreads), now(_now), diff(_diff), map(m), step(_step)
-    {
-    }
-
-    virtual void run()
-    {
-        map->UpdateActiveCellsCallback(diff, now, threadIdx, nThreads, step);
-    }
-    int threadIdx;
-    int nThreads;
-    uint32 diff, now, step;
-    Map* map;
-};
-
-
 inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
 {
     resetMarkedCells();
@@ -686,26 +670,17 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
         MarkCellsAroundObject(*m_activeNonPlayersIter);
 
-    const int nthreads = sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS);
-    // Step 1
-    std::vector<ACE_Based::Thread*> threads;
-    for (int i = 0; i < (nthreads - 1); ++i)
-        threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 0, this)));
-    UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 0);
-    for (int i = 0; i < threads.size(); ++i)
+    const int nthreads = m_cellThreads->size() -1;
+    for (int step = 0; step < 2; step++)
     {
-        threads[i]->wait();
-        delete threads[i];
-    }
-    // Step 2
-    threads.clear();
-    for (int i = 0; i < (nthreads - 1); ++i)
-        threads.push_back(new ACE_Based::Thread(new MapAsynchCellsWorker(i, nthreads, diff, now, 1, this)));
-    UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 1);
-    for (int i = 0; i < threads.size(); ++i)
-    {
-        threads[i]->wait();
-        delete threads[i];
+        for (int i = 0; i < (nthreads - 1); ++i)
+            m_cellThreads << [this, diff, now, i, nthreads](){
+                UpdateActiveCellsCallback(diff, now, i, nthreads, 0);
+            };
+        std::future<void> job = m_cellThreads->processWorkload();
+        UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 0);
+        if (job.valid())
+            job.wait();
     }
 }
 
