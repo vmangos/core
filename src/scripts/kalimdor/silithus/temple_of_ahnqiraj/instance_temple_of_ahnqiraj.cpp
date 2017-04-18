@@ -27,7 +27,10 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
-
+static constexpr uint32 CTHUN_WHISPER_MUTE_DURATION = 60000 * 10;
+static constexpr uint32 CTHUN_FIRST_WHISPER         = 90000;
+static constexpr uint32 CTHUN_WHISPER_FREQ_MIN      = 30000;
+static constexpr uint32 CTHUN_WHISPER_FREQ_MAX      = 60000;
 
 enum eTwinsDeathTexts {
     SAY_VEKLOR_DEATH    = -1531024, //my brother...nO!
@@ -39,7 +42,6 @@ static const SIDialogueEntry twinsDeathDialogue[] =
     { SAY_VEKLOR_DEATH,     NPC_VEKLOR,    0 }, 
     { 0, 0, 0 }
 };
-
 
 enum eTwinsDialogueEntries
 {
@@ -142,7 +144,8 @@ void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
 instance_temple_of_ahnqiraj::instance_temple_of_ahnqiraj(Map* pMap) :
     ScriptedInstance(pMap),
     m_uiBugTrioDeathCount(0),
-    m_uiCthunWhisperTimer(90000),
+    m_uiCthunWhisperTimer(CTHUN_FIRST_WHISPER),
+    m_uiCthunPrevWhisperTimer(CTHUN_FIRST_WHISPER),
     m_twinsDeadDialogue(twinsDeathDialogue)
 {
     Initialize();
@@ -431,29 +434,70 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
     OUT_LOAD_INST_DATA_COMPLETE;
 }
 
+void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
+{
+    if (GetData(TYPE_CTHUN) == IN_PROGRESS || GetData(TYPE_CTHUN) == DONE)
+        return;
+
+    if (m_uiCthunWhisperTimer >= diff) {
+        m_uiCthunWhisperTimer -= diff;
+        return;
+    }
+    m_uiCthunWhisperTimer = urand(CTHUN_WHISPER_FREQ_MIN, CTHUN_WHISPER_FREQ_MAX);
+    
+    // Updating muted players
+    for (auto it = cthunWhisperMutes.begin(); it != cthunWhisperMutes.end(); ) {
+        it->second -= std::min(m_uiCthunPrevWhisperTimer, it->second);
+        
+        if (it->second < CTHUN_WHISPER_FREQ_MAX)
+            it = cthunWhisperMutes.erase(it);
+        else
+            ++it;
+    }
+    m_uiCthunPrevWhisperTimer = m_uiCthunWhisperTimer;
+
+    Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN);
+    if (!pCthun)
+        return;
+
+    std::list<Player*> candidates;
+    std::list<Player*>::iterator j;
+    const Map::PlayerList& PlayerList = GetMap()->GetPlayers();
+    if (PlayerList.isEmpty())
+        return;
+
+    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+    {
+        if (Player* player = itr->getSource())
+        {
+            if (!player->isDead()) {
+                auto find_it = std::find_if(cthunWhisperMutes.begin(), cthunWhisperMutes.end(), 
+                    [player](const std::pair<ObjectGuid, uint32>& e) {return e.first == player->GetObjectGuid(); });
+                if (find_it == cthunWhisperMutes.end()) {
+                    candidates.push_back(player);
+                }
+            }
+        }
+    }
+    
+    if (!candidates.size())
+        return;
+
+    j = candidates.begin();
+    std::advance(j, urand(0, candidates.size() - 1));
+    Player* targetPlayer = *j;
+    // ToDo: also cast the C'thun Whispering charm spell - requires additional research
+    DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, targetPlayer);
+
+    cthunWhisperMutes.push_back(std::make_pair(targetPlayer->GetGUID(), CTHUN_WHISPER_MUTE_DURATION));
+}
+
 void instance_temple_of_ahnqiraj::Update(uint32 uiDiff)
 {
     m_twinsIntroDialogue.DialogueUpdate(uiDiff);
     m_twinsDeadDialogue.DialogueUpdate(uiDiff);
  
-    if (GetData(TYPE_CTHUN) != IN_PROGRESS && GetData(TYPE_CTHUN) != DONE) {
-        if (m_uiCthunWhisperTimer < uiDiff)
-        {
-            if (Player* pPlayer = GetPlayerInMap())
-            {
-                if (Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN))
-                {
-                    // ToDo: this should whisper all players, not just one?
-                    // ToDo: also cast the C'thun Whispering charm spell - requires additional research
-                    DoScriptText(irand(SAY_CTHUN_WHISPER_8, SAY_CTHUN_WHISPER_1), pCthun, pPlayer);
-                }
-            }
-            m_uiCthunWhisperTimer = urand(1.5 * MINUTE * IN_MILLISECONDS, 5 * MINUTE * IN_MILLISECONDS);
-        }
-        else {
-            m_uiCthunWhisperTimer -= uiDiff;
-        }
-    }
+    UpdateCThunWhisper(uiDiff);
 
     UpdateStomachOfCthun(uiDiff);
 }
@@ -462,8 +506,6 @@ bool instance_temple_of_ahnqiraj::TwinsDialogueStartedOrDone()
 {
     return m_twinsIntroDialogue.StartedOrDone();
 }
-
-
 
 uint32 instance_temple_of_ahnqiraj::GetData(uint32 uiType)
 {
@@ -522,8 +564,6 @@ void instance_temple_of_ahnqiraj::RemovePlayerFromStomach(Unit * unit)
 
 bool instance_temple_of_ahnqiraj::PlayerInStomach(Unit * unit)
 {
-    //if (!unit->GetPositionZ() > -30.0f) return false;
-    //if (p->GetDistance(puntPosition[0], puntPosition[1], puntPosition[2]) > 95.0f) return false;
     if (!unit) return false;
 
     return PlayerInStomachIter(unit) != playersInStomach.end();

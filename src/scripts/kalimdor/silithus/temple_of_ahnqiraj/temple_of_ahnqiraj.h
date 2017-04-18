@@ -151,13 +151,17 @@ private:
 
     uint32 m_uiBugTrioDeathCount;
     uint32 m_uiCthunPhase;
-    uint32 m_uiCthunWhisperTimer;
 
     GuidList m_lRoyalGuardGUIDList;
 
     TwinsIntroDialogue m_twinsIntroDialogue;
     DialogueHelper m_twinsDeadDialogue;
     std::vector<ObjectGuid> graspsOfCthun;
+    
+    void UpdateCThunWhisper(uint32 diff);
+    std::vector<std::pair<ObjectGuid, uint32>> cthunWhisperMutes;
+    uint32 m_uiCthunWhisperTimer;
+    uint32 m_uiCthunPrevWhisperTimer;
 
     // The following functions, variables etc, are used to handle the C'thun stomach.
     // One might argue if they should be in boss_cthun.cpp instead, but it makes it a whole
