@@ -908,7 +908,10 @@ m_obj->m_updateTracker.Reset();
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
 
         bool IsWithinLootXPDist(WorldObject const* objToLoot) const;
-        float lootAndXPRangeModifier;
+
+        // val is added to CONFIG_FLOAT_GROUP_XP_DISTANCE when calculating
+        // if player should be eligible for loot and XP from this object.
+        void SetLootAndXPModDist(float val);
 
     protected:
         explicit WorldObject();
@@ -927,6 +930,8 @@ m_obj->m_updateTracker.Reset();
         ViewPoint m_viewPoint;
 
         WorldUpdateCounter m_updateTracker;
+        
+        float m_lootAndXPRangeModifier;
 };
 
 #endif

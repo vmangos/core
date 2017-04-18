@@ -1085,11 +1085,16 @@ void Object::ExecuteDelayedActions()
 
 bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
 {
-    return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->lootAndXPRangeModifier, false);
+    return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->m_lootAndXPRangeModifier, false);
+}
+
+void WorldObject::SetLootAndXPModDist(float val)
+{
+    m_lootAndXPRangeModifier = val;
 }
 
 WorldObject::WorldObject()
-    : m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), lootAndXPRangeModifier(0)
+    : m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;
