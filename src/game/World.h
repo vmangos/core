@@ -41,6 +41,7 @@
 #include <chrono>
 #include <memory>
 #include <unordered_map>
+#include <thread>
 
 class Object;
 class WorldPacket;
@@ -853,7 +854,7 @@ class World
 
         //used versions
         uint32      m_anticrashRearmTimer;
-        ACE_Based::Thread* m_charDbWorkerThread;
+        std::unique_ptr<std::thread> m_charDbWorkerThread;
 
         typedef std::unordered_map<uint32, ArchivedLogMessage> LogMessagesMap;
         LogMessagesMap m_logMessages;

@@ -171,8 +171,9 @@ World::~World()
 
     if (m_charDbWorkerThread)
     {
-        m_charDbWorkerThread->wait();
-        delete m_charDbWorkerThread;
+        if (m_charDbWorkerThread->joinable())
+            m_charDbWorkerThread->join();
+        m_charDbWorkerThread.reset(nullptr);
     }
     //TODO free addSessQueue
 }
@@ -181,8 +182,8 @@ void World::Shutdown()
 {
     sWorld.KickAll();                                       // save and kick all players
     sWorld.UpdateSessions( 1 );                             // real players unload required UpdateSessions call
-    if (m_charDbWorkerThread)
-        m_charDbWorkerThread->wait();
+    if (m_charDbWorkerThread && m_charDbWorkerThread->joinable())
+        m_charDbWorkerThread->join();
 }
 
 /// Find a player in a specified zone
@@ -1041,27 +1042,19 @@ void World::LoadNostalriusConfig(bool reload)
     }
 }
 
-class CharactersDatabaseWorkerThread : public ACE_Based::Runnable
+void charactersDatabaseWorkerThread()
 {
-public:
-    CharactersDatabaseWorkerThread()
+    CharacterDatabase.ThreadStart();
+    while (!sWorld.IsStopped())
     {
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+        if (CharacterDatabase.HasAsyncQuery())
+            continue;
+        Player::DeleteOldCharacters();
+        sObjectMgr.ReturnOrDeleteOldMails(true);
     }
-
-    virtual void run()
-    {
-        CharacterDatabase.ThreadStart();
-        while (!sWorld.IsStopped())
-        {
-            ACE_Based::Thread::Sleep(1000);
-            if (CharacterDatabase.HasAsyncQuery())
-                continue;
-            Player::DeleteOldCharacters();
-            sObjectMgr.ReturnOrDeleteOldMails(true);
-        }
-        CharacterDatabase.ThreadEnd();
-    }
-};
+    CharacterDatabase.ThreadEnd();
+}
 
 /// Initialize the World
 void World::SetInitialWorldSettings()
@@ -1599,7 +1592,7 @@ void World::SetInitialWorldSettings()
                                               std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY)));
 
     if (!isMapServer)
-        m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
+        m_charDbWorkerThread.reset(new std::thread(&charactersDatabaseWorkerThread));
 
     sLog.outString("%s initialized", isMapServer ? "Node" : "World");
 
