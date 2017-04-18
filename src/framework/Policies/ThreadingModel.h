@@ -75,41 +75,6 @@ namespace MaNGOS
     };
 
     template<class T, class MUTEX>
-    class MANGOS_DLL_DECL ObjectLevelLockable
-    {
-        public:
-
-            ObjectLevelLockable()
-                : i_mtx()
-            {
-            }
-
-            friend class Lock;
-
-            class Lock
-            {
-                public:
-
-                    Lock(ObjectLevelLockable<T, MUTEX> &host)
-                        : i_lock(host.i_mtx)
-                    {
-                    }
-
-                private:
-
-                    GeneralLock<MUTEX> i_lock;
-            };
-
-        private:
-
-            // prevent the compiler creating a copy construct
-            ObjectLevelLockable(const ObjectLevelLockable<T, MUTEX>&);
-            ObjectLevelLockable<T, MUTEX>& operator=(const ObjectLevelLockable<T, MUTEX>&);
-
-            MUTEX i_mtx;
-    };
-
-    template<class T, class MUTEX>
     class MANGOS_DLL_DECL ClassLevelLockable
     {
         public:

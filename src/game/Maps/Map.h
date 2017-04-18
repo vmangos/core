@@ -194,7 +194,7 @@ using MapMutexType = std::mutex; // can be replaced with a null mutex
 
 class ThreadPool;
 
-class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
+class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 {
     friend class MapReference;
     friend class ObjectGridLoader;
@@ -204,6 +204,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         Map(uint32 id, time_t, uint32 InstanceId);
 
     public:
+        Map(const Map &) = delete;
+        const Map & operator=(const Map &) = delete;
         virtual ~Map();
         void PrintInfos(ChatHandler& handler);
         void SpawnActiveObjects();
