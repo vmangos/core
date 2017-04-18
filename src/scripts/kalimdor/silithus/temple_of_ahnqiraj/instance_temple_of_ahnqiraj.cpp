@@ -549,8 +549,6 @@ instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqi
             return true;
         }
         return false;
-
-        return e.first == unit->GetObjectGuid();
     });
 }
 
