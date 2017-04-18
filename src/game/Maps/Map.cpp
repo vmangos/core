@@ -153,6 +153,8 @@ public:
 
 void Map::SpawnActiveObjects()
 {
+    if (MapPersistentState* state = GetPersistentState())
+        state->InitPools();
     ActiveObjectsGridLoader loader(this);
     sObjectMgr.DoGOData(loader);
     sObjectMgr.DoCreatureData(loader);
