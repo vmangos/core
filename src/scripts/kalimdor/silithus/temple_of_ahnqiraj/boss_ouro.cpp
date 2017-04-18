@@ -97,7 +97,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     bool m_SummonBase;
     uint32 m_uiNoMeleeTimer;
     uint32 m_uiSubmergeInvisTimer;
-
+    uint32 m_justEmergedGraceTimer;
     uint32 m_uiSummonMoundTimer;
 
     bool m_bEnraged;
@@ -114,14 +114,16 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         m_uiSubmergeTimer     = SUBMERGE_TIMER;
         m_SummonBase = true;
         m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
+        
+        m_uiNoMeleeTimer        = 3000;
         // Source : http://wowwiki.wikia.com/wiki/Ouro
         // "Ouro seems to give you about 10 seconds to get a MT in there when he pops up"
-        m_uiNoMeleeTimer      = 10000;
+        m_justEmergedGraceTimer = 10000;
 
         m_uiSummonMoundTimer  = 10000;
-
         m_bEnraged            = false;
         m_bSubmerged          = false;
+
 
         m_ouroTriggerGuid.Clear();
     }
@@ -206,7 +208,9 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
             m_bSubmerged      = true;
             m_uiSubmergeTimer = 30000;
-            m_uiNoMeleeTimer  = 10000;
+            
+            m_justEmergedGraceTimer = 10000;
+            m_uiNoMeleeTimer        = 3000;
             m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
             DoResetThreat();
         }
@@ -342,7 +346,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             // every tick we check for melee targets to attack
             if (CheckForMelee())
             {
-                m_uiNoMeleeTimer = 3000;
+                m_uiNoMeleeTimer = std::max((uint32)3000, m_justEmergedGraceTimer);
             }
 
             // If we are within range melee the target
@@ -366,6 +370,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             }
             else
                 m_uiNoMeleeTimer -= uiDiff;
+            
+            m_justEmergedGraceTimer -= std::min(uiDiff, m_justEmergedGraceTimer);
         }
         else
         {
