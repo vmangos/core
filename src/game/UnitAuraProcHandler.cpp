@@ -945,6 +945,15 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
 
                 float damageBasePoints = (maxDmg - minDmg) * ((speed - MIN_WSP) / (MAX_WSP - MIN_WSP)) + minDmg;
 
+                // Apply Improved Seal of Rightousness talent
+                // Modifier is applied on base damage only (changed patch 2.1.0)
+                uint32 impSoRList[] = { 20224, 20225, 20330, 20331, 20332 };
+                for (int i = 0; i < 5; ++i) {
+                    SpellModifier *mod = ((Player*)this)->GetSpellMod(SPELLMOD_ALL_EFFECTS, impSoRList[i]);
+                    if (mod && mod->type == SPELLMOD_PCT && mod->value > 0)
+                        damageBasePoints += damageBasePoints*(float)mod->value / 100.0f;
+                }
+
                 int32 damagePoint = urand(0, 1) ? floor(damageBasePoints) : ceil(damageBasePoints);
 
                 // apply damage bonuses manually
