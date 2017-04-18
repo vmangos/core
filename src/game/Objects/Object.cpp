@@ -1083,7 +1083,7 @@ void Object::ExecuteDelayedActions()
     }
 }
 
-bool WorldObject::IsWithinLootXPDist(const WorldObject const * objToLoot) const
+bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
 {
     return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->lootAndXPRangeModifier, false);
 }
