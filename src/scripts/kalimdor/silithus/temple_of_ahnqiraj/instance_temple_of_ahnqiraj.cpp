@@ -134,7 +134,7 @@ void TwinsIntroDialogue::JustDidDialogueStep(int32 iEntry)
         pVN->SetStandState(UNIT_STAND_STATE_STAND);
         break;
     case SAY_EMPERORS_INTRO_1:
-        pEye->ForcedDespawn(1); //1
+        pEye->ForcedDespawn(1); // Will look like a death to gm, but fade out for players
         break;
     }
 }
@@ -191,15 +191,15 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
     {
     case GO_SKERAM_GATE:
         if (m_auiEncounter[TYPE_SKERAM] == DONE)
-        pGo->SetGoState(GO_STATE_ACTIVE);
+            pGo->UseDoorOrButton(0, false);
     break;
     case GO_TWINS_ENTER_DOOR:
         if (m_auiEncounter[TYPE_HUHURAN] == DONE)
-            pGo->SetGoState(GO_STATE_ACTIVE);
+            pGo->UseDoorOrButton(0, false);
     break;
     case GO_TWINS_EXIT_DOOR:
         if (m_auiEncounter[TYPE_TWINS] == DONE)
-            pGo->SetGoState(GO_STATE_ACTIVE);
+            pGo->UseDoorOrButton(0, false);
         break;
     case GO_GRASP_OF_CTHUN:
         graspsOfCthun.push_back(pGo->GetObjectGuid());
@@ -215,7 +215,6 @@ void instance_temple_of_ahnqiraj::OnObjectCreate(GameObject* pGo)
 
 void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
 {
-    
     switch (pCreature->GetEntry())
     {
     case NPC_ANUBISATH_SENTINEL:
@@ -261,13 +260,10 @@ void instance_temple_of_ahnqiraj::OnCreatureRespawn(Creature* pCreature)
             pCreature->AddObjectToRemoveList();
         break;
     case NPC_MASTERS_EYE:
-        // Despawn C'thun eye at twins if twins is already dead
-        //m_auiEncounter[TYPE_TWINS] = NOT_STARTED;
+        // Despawn C'thun eye at twins if twins are already dead
         if (TwinsDialogueStartedOrDone()) {
-            pCreature->ForcedDespawn(1);
-        }
-        else {
-            pCreature->GetMotionMaster()->MovePoint(0, pCreature->GetPositionX(), pCreature->GetPositionY(), -102.0f, MOVE_FLY_MODE, 0.0f, 4.896f);
+            pCreature->AddObjectToRemoveList();
+            //pCreature->ForcedDespawn(1);
         }
         break;
     }
@@ -322,19 +318,12 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
 {
     switch (uiType)
     {
-    case TYPE_CTHUN:
-        m_auiEncounter[uiType] = uiData;
-        for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
-            if (GameObject* pGo = GetGameObject(*it)) {
-                pGo->SetVisible(uiData != DONE);
-            }
-        }
-        break;
     case TYPE_SKERAM:
         m_auiEncounter[uiType] = uiData;
-        if (uiData == DONE)
+        if (uiData == DONE) {
             if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_SKERAM_GATE))
-                DoUseDoorOrButton(pGo->GetGUID());
+                DoOpenDoor(pGo->GetGUID());
+        }
         break;
     case TYPE_BUG_TRIO:
         if (uiData == SPECIAL)
@@ -349,19 +338,37 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
             m_uiBugTrioDeathCount = 0;
         m_auiEncounter[uiType] = uiData;
         break;
+    case TYPE_SARTURA:
+    case TYPE_FANKRISS:
+    case TYPE_VISCIDUS:
+        m_auiEncounter[uiType] = uiData;
+        break;
     case TYPE_HUHURAN:
         m_auiEncounter[uiType] = uiData;
         if (uiData == DONE) {
             if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
-                DoUseDoorOrButton(pGo->GetGUID());
+                DoOpenDoor(pGo->GetGUID());
         }
-
         break;
-    case TYPE_SARTURA:
-    case TYPE_FANKRISS:
-    case TYPE_VISCIDUS:
-        //ToDo: make sure this is included once it goes live
-        //m_auiEncounter[uiType] = uiData;
+    case TYPE_TWINS:
+        // Either of the twins can set data, so return to avoid double changing
+        if (m_auiEncounter[uiType] ==  uiData)
+            return;
+        m_auiEncounter[uiType] = uiData;
+        if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR)) {
+            if (uiData == IN_PROGRESS) {
+                DoResetDoor(pGo->GetGUID());
+            }
+            else {
+                DoOpenDoor(pGo->GetGUID());
+            }
+        }
+        if (uiData == DONE) {
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_EXIT_DOOR)) {
+                DoOpenDoor(pGo->GetGUID());
+            }
+            m_twinsDeadDialogue.StartNextDialogueText(SAY_VEKNILASH_DEATH);
+        }
         break;
     case TYPE_OURO:
         switch (uiData)
@@ -374,18 +381,12 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         }
         m_auiEncounter[uiType] = uiData;
         break;
-    case TYPE_TWINS:
-        // Either of the twins can set data, so return to avoid double changing
-        if (m_auiEncounter[uiType] ==  uiData)
-            return;
-
+    case TYPE_CTHUN:
         m_auiEncounter[uiType] = uiData;
-        if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
-            DoUseDoorOrButton(pGo->GetGUID());
-        if (uiData == DONE) {
-            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_TWINS_EXIT_DOOR))
-                DoUseDoorOrButton(pGo->GetGUID());
-            m_twinsDeadDialogue.StartNextDialogueText(SAY_VEKNILASH_DEATH);
+        for (auto it = graspsOfCthun.begin(); it != graspsOfCthun.end(); it++) {
+            if (GameObject* pGo = GetGameObject(*it)) {
+                pGo->SetVisible(uiData != DONE);
+            }
         }
         break;
     }
