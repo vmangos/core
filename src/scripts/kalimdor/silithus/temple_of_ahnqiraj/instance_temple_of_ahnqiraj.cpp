@@ -436,9 +436,10 @@ void instance_temple_of_ahnqiraj::Load(const char* chrIn)
 
 void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
 {
-    if (GetData(TYPE_CTHUN) == IN_PROGRESS || GetData(TYPE_CTHUN) == DONE)
+    uint32 cthunStatus = GetData(TYPE_CTHUN);
+    if (cthunStatus == DONE) {
         return;
-
+    }
     if (m_uiCthunWhisperTimer >= diff) {
         m_uiCthunWhisperTimer -= diff;
         return;
@@ -455,6 +456,10 @@ void instance_temple_of_ahnqiraj::UpdateCThunWhisper(uint32 diff)
             ++it;
     }
     m_uiCthunPrevWhisperTimer = m_uiCthunWhisperTimer;
+    
+    if (cthunStatus == IN_PROGRESS) {
+        return;
+    }
 
     Creature* pCthun = GetSingleCreatureFromStorage(NPC_CTHUN);
     if (!pCthun)
