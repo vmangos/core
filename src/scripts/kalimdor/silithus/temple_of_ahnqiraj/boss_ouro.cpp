@@ -392,13 +392,16 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
+                    std::list<Unit*> lGroundRuptureTargets;
                     ThreatList const& lThreat = m_creature->getThreatManager().getThreatList();
                     for (ThreatList::const_iterator i = lThreat.begin(); i != lThreat.end(); ++i)
                     {
                         Unit* pUnit = m_creature->GetMap()->GetUnit((*i)->getUnitGuid());
                         if (pUnit && pUnit->GetDistance2d(m_creature) < 20.0f)
-                            m_creature->CastSpell(pUnit, SPELL_GROUND_RUPTURE, true);
+                            lGroundRuptureTargets.push_back(pUnit);
                     }
+                    for (auto &target : lGroundRuptureTargets)
+                        m_creature->CastSpell(target, SPELL_GROUND_RUPTURE, true);
 
                     m_bSubmerged        = false;
                     m_SummonBase = true;
