@@ -256,7 +256,6 @@ struct boss_twinemperorsAI : public ScriptedAI
             pTwin->SetHealth(uiTwinHealth > 0 ? uiTwinHealth : 0);
             
             // Possibly needed to make sure the damage dealth through setHealth is counted 
-            // in Unit::IsLootAllowedDueToDamageOrigin()
             pTwin->CountDamageTaken(uiTwinDamage, true);
         }
     }
@@ -275,19 +274,10 @@ struct boss_twinemperorsAI : public ScriptedAI
 
         if (Creature* pOtherBoss = GetOtherBoss())
         {
-            //if(pOtherBoss->isAlive())
-            pOtherBoss->SetLootRecipient(Killer);
             Killer->Kill(pOtherBoss, nullptr, false);
-            //pOtherBoss->SetHealth(0);
-            //pOtherBoss->SetLootRecipient(Killer);
-            //pOtherBoss->SetUInt32Value(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
-            //pOtherBoss->SetLootRecipient(Killer);
-            //pOtherBoss->SetDeathState(JUST_DIED);
-            //pOtherBoss->SetLootRecipient(Killer);
-            //pOtherBoss->RemoveFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
-        // Death text script is handled by instance upon receiving DONE data
+        // Death text script-text is handled by instance upon receiving DONE data
     }
 
     void Aggro(Unit* pWho) override
@@ -442,39 +432,6 @@ struct boss_twinemperorsAI : public ScriptedAI
         
 
         OnEndTeleportVirtual();
-    }
-
-    // ToDo: Not called anymore. Can be removed once Twins testing is done and we are sure it's not needed.
-    void HandleDeadBugs(uint32 diff)
-    {
-        // We try to respawn one random bug every RESPAWN_BUG_FREQUENCY
-        // todo: in retail videos, there seems to be a lot less bugs up later in fight. Why?
-        if (respawnBugTimer < diff) {
-            respawnBugTimer = RESPAWN_BUG_FREQUENCY;
-
-            std::list<Creature*> lUnitList;
-            GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15316, RESPAWN_BUG_DISTANCE);
-            GetCreatureListWithEntryInGrid(lUnitList, m_creature, 15317, RESPAWN_BUG_DISTANCE);
-            std::list<Creature*>::iterator iter;
-            for (iter = lUnitList.begin(); iter != lUnitList.end();) {
-                Creature *c = *iter;
-                if (!c->isDead()){
-                    iter = lUnitList.erase(iter);
-                }
-                else {
-                    ++iter;
-                }
-            }
-            if (lUnitList.size() == 0)
-                return;
-            iter = lUnitList.begin();
-            std::advance(iter, urand(0, lUnitList.size() - 1));
-            Creature* c = *iter;
-            c->Respawn();
-        }
-        else {
-            respawnBugTimer -= diff;
-        }
     }
 
     void HandleBugSpell(uint32 diff)
