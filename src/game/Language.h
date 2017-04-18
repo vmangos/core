@@ -670,6 +670,7 @@ enum MangosStrings
     LANG_BG_AB_A_NEAR_VICTORY           = 664,
     LANG_BG_AB_H_NEAR_VICTORY           = 665,
     LANG_BG_MARK_BY_MAIL                = 666,
+    LANG_NARAIN_LETTER                  = 667,
 
     //LANG_BG_EY_HAS_TAKEN_A_M_TOWER    = 667,
     //LANG_BG_EY_HAS_TAKEN_H_M_TOWER    = 668,
