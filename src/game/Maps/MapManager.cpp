@@ -241,43 +241,6 @@ void MapManager::DeleteInstance(uint32 mapid, uint32 instanceId)
     }
 }
 
-class MapAsyncUpdater : public ACE_Based::Runnable
-{
-public:
-    MapAsyncUpdater(uint32 updateDiff) :
-        diff(updateDiff)
-    {
-    }
-
-    virtual void run()
-    {
-        WorldDatabase.ThreadStart();
-        for (std::vector<Map*>::iterator it = maps.begin(); it != maps.end(); ++it)
-            (*it)->DoUpdate(diff);
-        WorldDatabase.ThreadEnd();
-    }
-    std::vector<Map*> maps;
-private:
-    const uint32 diff;
-};
-
-class ContinentAsyncUpdater : public ACE_Based::Runnable
-{
-public:
-    ContinentAsyncUpdater(uint32 updateDiff, Map* m) : diff(updateDiff), map(m)
-    {
-    }
-
-    virtual void run()
-    {
-        WorldDatabase.ThreadStart();
-        map->DoUpdate(diff);
-        WorldDatabase.ThreadEnd();
-    }
-    Map* map;
-    uint32 diff;
-};
-
 void MapManager::Update(uint32 diff)
 {
     i_timer.Update(diff);
