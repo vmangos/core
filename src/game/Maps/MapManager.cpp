@@ -312,7 +312,9 @@ void MapManager::Update(uint32 diff)
         {
             iter->second->SetMapUpdateIndex(continentsIdx++);
             if (m_threads->status() == ThreadPool::Status::READY)
-                continentsUpdaters.emplace_back([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);});
+                continentsUpdaters.emplace_back([iter,mapsDiff](){
+                    iter->second->DoUpdate(mapsDiff);
+                });
             else
                 iter->second->Update(mapsDiff);
         }
