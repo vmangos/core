@@ -907,7 +907,7 @@ m_obj->m_updateTracker.Reset();
         void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
 
-        bool IsWithinLootXPDist(const WorldObject const* objToLoot) const;
+        bool IsWithinLootXPDist(WorldObject const* objToLoot) const;
         float lootAndXPRangeModifier;
 
     protected:
