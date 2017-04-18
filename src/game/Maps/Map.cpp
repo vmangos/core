@@ -97,7 +97,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
       _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
       m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS))),
-      m_objectThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS)-1))
+      m_objectThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS)-1)),
+      m_visibilityThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1))
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -122,6 +123,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState->SetUsedByMapState(this);
     m_motionThreads->start();
     m_objectThreads->start<ThreadPool::MySQL>();
+    m_visibilityThreads->start<ThreadPool::MySQL>();
 }
 
 // Nostalrius
@@ -3702,9 +3704,7 @@ void Map::SendObjectUpdates()
     if (job.valid())
         job.wait();
     for (uint32 i = 0; i < threads; ++i)
-    {
         i_objectsToClientUpdate.erase(objUpdaters[i].begin, objUpdaters[i].current);
-    }
 
     // If we timeout, use more threads !
     if (i_objectsToClientUpdate.size())
@@ -3720,18 +3720,16 @@ void Map::SendObjectUpdates()
 #endif
 }
 
-class VisibilityUpdater : public ACE_Based::Runnable
+class VisibilityUpdater
 {
 public:
     VisibilityUpdater(std::set<Unit*>::iterator& a, std::set<Unit*>::iterator& b, uint32 now) : begin(a), end(b), beginTime(now), current(a)
     {
     }
 
-    virtual void run()
+    void operator()()
     {
-        WorldDatabase.ThreadStart();
         DoUpdateVisibility();
-        WorldDatabase.ThreadEnd();
     }
     void DoUpdateVisibility()
     {
@@ -3774,11 +3772,9 @@ void Map::UpdateVisibilityForRelocations()
         _unitRelocationThreads = threads;
     if (threads > objectsCount)
         threads = objectsCount;
-
     uint32 step = objectsCount / threads;
-    uint32 i = 0;
-    ACE_Based::Thread** updaters = threads > 1 ? new ACE_Based::Thread*[threads - 1] : NULL;
-    VisibilityUpdater** visUpdaters = new VisibilityUpdater*[threads];
+    std::vector<VisibilityUpdater> visUpdaters;
+    visUpdaters.reserve(threads);
     std::set<Unit*>::iterator itBegin = i_unitsRelocated.begin();
     std::set<Unit*>::iterator itEnd = i_unitsRelocated.begin();
     ASSERT(step > 0);
@@ -3792,22 +3788,18 @@ void Map::UpdateVisibilityForRelocations()
             for (uint32 j = 0; j < step; ++j)
                 ++itEnd;
         }
-        visUpdaters[i] = new VisibilityUpdater(itBegin, itEnd, now);
-        visUpdaters[i]->incReference();
-        if (i == (threads - 1))
-            visUpdaters[i]->DoUpdateVisibility();
-        else
-            updaters[i] = new ACE_Based::Thread(visUpdaters[i]);
-    }
-    for (uint32 i = 0; i < threads - 1; ++i)
-        updaters[i]->wait();
-    for (uint32 i = 0; i < threads; ++i)
-    {
-        i_unitsRelocated.erase(visUpdaters[i]->begin, visUpdaters[i]->current);
-        visUpdaters[i]->decReference();
+        visUpdaters.emplace_back(itBegin, itEnd, now);
         if (i != (threads - 1))
-            delete updaters[i];
+            m_visibilityThreads << [&visUpdaters,i]{
+                visUpdaters[i]();
+            };
     }
+    std::future<void> job = m_visibilityThreads->processWorkload();
+    visUpdaters[threads -1]();
+    if (job.valid())
+        job.wait();
+    for (uint32 i = 0; i < threads; ++i)
+        i_unitsRelocated.erase(visUpdaters[i].begin, visUpdaters[i].current);
 
     if (i_unitsRelocated.size())
         ++_unitRelocationThreads;
@@ -3815,8 +3807,6 @@ void Map::UpdateVisibilityForRelocations()
         --_unitRelocationThreads;
 
     _processingUnitsRelocation = false;
-    delete[] updaters;
-    delete[] visUpdaters;
 
 #ifdef MAP_UPDATEVISIBILITY_PROFILE
     uint32 diff = WorldTimer::getMSTimeDiffToNow(now);
