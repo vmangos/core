@@ -7,6 +7,6 @@ UPDATE creature_ai_scripts SET event_param1=10000, event_param2=20000 WHERE id=1
 
 
 
-UPDATE `mangos`.`creature_template` SET `AIName`='', `ScriptName`='creature_spawn_fankriss' WHERE `entry`='15630';
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='creature_spawn_fankriss' WHERE `entry`='15630';
 
-UPDATE `mangos`.`creature_template` SET `ScriptName`='creature_vekniss_hatchling' WHERE `entry`='15962';
+UPDATE `creature_template` SET `ScriptName`='creature_vekniss_hatchling' WHERE `entry`='15962';
