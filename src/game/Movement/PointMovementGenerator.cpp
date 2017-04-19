@@ -270,6 +270,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
                 {
                     victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
                     path.calculate(victimPos.x, victimPos.y, victimPos.z, false);
+                    path.UpdateForMelee(&victim, attacker.GetMeleeReach());
                 }
             }
             else
