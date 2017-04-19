@@ -203,6 +203,7 @@ struct boss_fankrissAI : public ScriptedAI
 
     uint32 m_uiMortalWoundTimer;
     uint32 m_uiEvadeCheckTimer;
+    uint32 entangleRotationTimer;
 
     struct Worm {
         bool shouldSpawn;
@@ -319,6 +320,7 @@ struct boss_fankrissAI : public ScriptedAI
         entangleTimers[0] = std::make_pair(urand(2000  + add, 20000 + add), false);
         entangleTimers[1] = std::make_pair(urand(12000 + add, 32000 + add), false);
         entangleTimers[2] = std::make_pair(urand(22000 + add, 42000 + add), false);
+        entangleRotationTimer = 42000+add;
     }
 
     size_t GetHatchlingSpawnAmount()
@@ -384,13 +386,16 @@ struct boss_fankrissAI : public ScriptedAI
                 hatchlingVec.push_back(HatchlingBatch(batch));
             }
             else {
-                reInitWebTimers = false;
+                reInitWebTimers = entangleTimers[i].second ? reInitWebTimers : false;
             }
         }
 
-        if (reInitWebTimers)
+        if (reInitWebTimers && entangleRotationTimer < uiDiff)
         {
             ReinitializeWebTimers();
+        }
+        else {
+            entangleRotationTimer -= uiDiff;
         }
     }
 
