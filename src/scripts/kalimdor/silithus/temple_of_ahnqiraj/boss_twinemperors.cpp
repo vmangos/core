@@ -799,7 +799,7 @@ struct boss_veknilashAI : public boss_twinemperorsAI
         UnbalancingStrike_Timer = urand(UNBALANCING_STRIKE_MIN_CD, UNBALANCING_STRIKE_MAX_CD);
 
         //Added. Can be removed if its included in DB.
-        m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_MAGIC, true);
+        m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_SPELL, true);
     }
 
     void OnEndTeleportVirtual()
