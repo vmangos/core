@@ -112,72 +112,53 @@ public:
     }
 };
 
-class RARunnable : public ACE_Based::Runnable
+void remoteAccess()
 {
-private:
-    ACE_Reactor *m_Reactor;
-    RASocket::Acceptor *m_Acceptor;
-public:
-    RARunnable()
+    #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
+
+    ACE_Dev_Poll_Reactor imp;
+
+    imp.max_notify_iterations (128);
+    imp.restart (1);
+
+    #else
+
+    ACE_TP_Reactor imp();
+    imp.max_notify_iterations (128);
+
+    #endif
+
+    ACE_Reactor reactor(&imp, 1 /* 1= delete implementation so we don't have to care */);
+
+    RASocket::Acceptor acceptor;
+
+    uint16 raport = sConfig.GetIntDefault ("Ra.Port", 3443);
+    std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
+
+    ACE_INET_Addr listen_addr(raport, stringip.c_str());
+
+    if (acceptor.open (listen_addr, &reactor, ACE_NONBLOCK) == -1)
     {
-        ACE_Reactor_Impl* imp = 0;
-
-        #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
-
-        imp = new ACE_Dev_Poll_Reactor ();
-
-        imp->max_notify_iterations (128);
-        imp->restart (1);
-
-        #else
-
-        imp = new ACE_TP_Reactor ();
-        imp->max_notify_iterations (128);
-
-        #endif
-
-        m_Reactor = new ACE_Reactor (imp, 1 /* 1= delete implementation so we don't have to care */);
-
-        m_Acceptor = new RASocket::Acceptor;
-
+        sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
     }
 
-    ~RARunnable()
+    sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
+
+    while (!reactor.reactor_event_loop_done())
     {
-        delete m_Reactor;
-        delete m_Acceptor;
-    }
+        ACE_Time_Value interval (0, 10000);
 
-    void run ()
-    {
-        uint16 raport = sConfig.GetIntDefault ("Ra.Port", 3443);
-        std::string stringip = sConfig.GetStringDefault ("Ra.IP", "0.0.0.0");
+        if (reactor.run_reactor_event_loop (interval) == -1)
+            break;
 
-        ACE_INET_Addr listen_addr(raport, stringip.c_str());
-
-        if (m_Acceptor->open (listen_addr, m_Reactor, ACE_NONBLOCK) == -1)
+        if(World::IsStopped())
         {
-            sLog.outError ("MaNGOS RA can not bind to port %d on %s", raport, stringip.c_str ());
+            acceptor.close();
+            break;
         }
-
-        sLog.outString ("Starting Remote access listner on port %d on %s", raport, stringip.c_str ());
-
-        while (!m_Reactor->reactor_event_loop_done())
-        {
-            ACE_Time_Value interval (0, 10000);
-
-            if (m_Reactor->run_reactor_event_loop (interval) == -1)
-                break;
-
-            if(World::IsStopped())
-            {
-                m_Acceptor->close();
-                break;
-            }
-        }
-        sLog.outString("RARunnable thread ended");
     }
-};
+    sLog.outString("RARunnable thread ended");
+}
 
 class OfflineChatRunnable : public ACE_Based::Runnable
 {
@@ -321,9 +302,9 @@ int Master::Run()
         cliThread = new std::thread(CliRunnable());
     }
 
-    ACE_Based::Thread* rar_thread = NULL;
+    std::thread* rar_thread = nullptr;
     if (sConfig.GetBoolDefault ("Ra.Enable", false))
-        rar_thread = new ACE_Based::Thread(new RARunnable);
+        rar_thread = new std::thread(&remoteAccess);
     ACE_Based::Thread* offlinechat_thread = NULL;
     if (sConfig.GetBoolDefault ("OfflineChat.Enable", false))
         offlinechat_thread = new ACE_Based::Thread(new OfflineChatRunnable);
@@ -451,8 +432,7 @@ int Master::Run()
 
     if(rar_thread)
     {
-        rar_thread->wait();
-        rar_thread->destroy();
+        rar_thread->join();
         delete rar_thread;
     }
 
@@ -614,7 +594,7 @@ void createdump(void)
         abort();
     }
 #endif
-    
+
 }
 /// Handle termination signals
 void Master::SigvSignalHandler()
