@@ -24,7 +24,6 @@
 
 #include "ace/Thread_Mutex.h"
 #include "LockedQueue.h"
-#include "Threading.h"
 
 
 class Database;

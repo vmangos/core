@@ -86,7 +86,6 @@
 
 #include "Errors.h"
 #include "LockedQueue.h"
-#include "Threading.h"
 
 #include <ace/Basic_Types.h>
 #include <ace/Guard_T.h>
