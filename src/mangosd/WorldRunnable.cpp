@@ -96,7 +96,7 @@ void WorldRunnable::operator()()
         if (diff <= WORLD_SLEEP_CONST+prevSleepTime)
         {
             prevSleepTime = WORLD_SLEEP_CONST+prevSleepTime-diff;
-            ACE_Based::Thread::Sleep(prevSleepTime);
+            std::this_thread::sleep_for(std::chrono::milliseconds(prevSleepTime));
         }
         else
             prevSleepTime = 0;
