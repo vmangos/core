@@ -49,7 +49,7 @@ void SqlDelayThread::run()
     {
         // if the running state gets turned off while sleeping
         // empty the queue before exiting
-        ACE_Based::Thread::Sleep(loopSleepms);
+        std::this_thread::sleep_for(std::chrono::milliseconds(loopSleepms));
 
         ProcessRequests();
 

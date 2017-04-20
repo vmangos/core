@@ -31,7 +31,7 @@ class Database;
 class SqlOperation;
 class SqlConnection;
 
-class SqlDelayThread : public ACE_Based::Runnable
+class SqlDelayThread
 {
     typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
 

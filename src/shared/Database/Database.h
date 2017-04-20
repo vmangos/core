@@ -30,6 +30,8 @@
 #include <ace/TSS_T.h>
 #include <ace/Atomic_Op.h>
 #include "SqlPreparedStatement.h"
+#include <memory>
+#include <thread>
 
 class SqlTransaction;
 class SqlResultQueue;
@@ -120,7 +122,7 @@ class MANGOS_DLL_SPEC Database
 
         virtual bool Initialize(const char *infoString, int nConns = 1, int nWorkers = 1);
         //start worker thread for async DB request execution
-        virtual bool InitDelayThread(int i, std::string const& infoString);
+        virtual bool InitDelayThread(std::string const& infoString);
         //stop worker thread
         virtual void HaltDelayThread();
 
@@ -312,8 +314,8 @@ class MANGOS_DLL_SPEC Database
 
         SqlResultQueue *    m_pResultQueue;                  ///< Transaction queues from diff. threads
         uint32              m_numAsyncWorkers;
-        SqlDelayThread**    m_threadsBodies;                  ///< Pointer to delay sql executer (owned by m_delayThread)
-        ACE_Based::Thread** m_delayThreads;                   ///< Pointer to executer thread
+        std::vector<std::shared_ptr<SqlDelayThread>>    m_threadsBodies;                  ///< Pointer to delay sql executer (owned by m_delayThread)
+        std::vector<std::thread> m_delayThreads;                   ///< Pointer to executer thread
 
         bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
 
