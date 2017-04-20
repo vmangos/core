@@ -28,6 +28,7 @@
 
 #include <bitset>
 #include <list>
+#include <atomic>
 
 class Creature;
 class Unit;
@@ -200,7 +201,7 @@ class MANGOS_DLL_SPEC Referencable
         Countable m_count;
 };
 
-typedef ACE_Atomic_Op<ACE_Thread_Mutex, int> AtomicLong;
+using AtomicLong = std::atomic<int>;
 
 #define MAX_HEIGHT            100000.0f                     // can be use for find ground height at surface
 #define INVALID_HEIGHT       -100000.0f                     // for check, must be equal to VMAP_INVALID_HEIGHT, real value for unknown height is VMAP_INVALID_HEIGHT_VALUE

@@ -28,10 +28,10 @@
 #include <ace/Recursive_Thread_Mutex.h>
 #include "Policies/ThreadingModel.h"
 #include <ace/TSS_T.h>
-#include <ace/Atomic_Op.h>
 #include "SqlPreparedStatement.h"
 #include <memory>
 #include <thread>
+#include <atomic>
 
 class SqlTransaction;
 class SqlResultQueue;
@@ -301,7 +301,7 @@ class MANGOS_DLL_SPEC Database
 
         //connection helper counters
         int m_nQueryConnPoolSize;                               //current size of query connection pool
-        ACE_Atomic_Op<ACE_Thread_Mutex, int> m_nQueryCounter;  //counter for connection selection
+        std::atomic<int> m_nQueryCounter;  //counter for connection selection
 
         //lets use pool of connections for sync queries
         typedef std::vector< SqlConnection * > SqlConnectionContainer;

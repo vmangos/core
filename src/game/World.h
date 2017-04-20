@@ -30,7 +30,6 @@
 #include "Timer.h"
 #include "Policies/Singleton.h"
 #include "SharedDefines.h"
-#include "ace/Atomic_Op.h"
 #include "Nostalrius.h"
 #include "ObjectGuid.h"
 #include "MapNodes/AbstractPlayer.h"

@@ -8,13 +8,13 @@
 #include <ace/TP_Reactor.h>
 #include <ace/Dev_Poll_Reactor.h>
 #include <ace/Guard_T.h>
-#include <ace/Atomic_Op.h>
 #include <ace/os_include/arpa/os_inet.h>
 #include <ace/os_include/netinet/os_tcp.h>
 #include <ace/os_include/sys/os_types.h>
 #include <ace/os_include/sys/os_socket.h>
 
 #include <set>
+#include <atomic>
 
 #include "Log.h"
 #include "Common.h"
@@ -85,7 +85,7 @@ public:
 
     long Connections()
     {
-        return static_cast<long>(m_Connections.value());
+        return m_Connections;
     }
 
     int AddSocket(SocketType* sock)
@@ -174,7 +174,7 @@ protected:
     }
 
 private:
-    typedef ACE_Atomic_Op<ACE_SYNCH_MUTEX, int> AtomicInt;
+    using AtomicInt = std::atomic<int>;
     typedef std::set<SocketType*> SocketSet;
 
     ACE_Reactor* m_Reactor;
