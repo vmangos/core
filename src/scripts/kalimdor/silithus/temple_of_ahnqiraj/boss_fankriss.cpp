@@ -49,8 +49,8 @@ static constexpr uint32 aEntangleSpells[3]      = { SPELL_ENTANGLE_1, SPELL_ENTA
 static constexpr size_t MAX_HATCHLINGS          = 20;   // Max hatchlings alive at any one time
 static constexpr size_t MAX_HATCHLINGS_PER_WEB  = 4;    // Max amount of hatchlings that can spawn at the same time, on one web. Its at least 4, might be 5.
 static constexpr uint32 HATCHLINGS_ATTACK_DELAY = 2500; // ~2.5sec in curse killvideo.
-static constexpr uint32 WORM_ENRAGE_BASE_TIMER  = 10000;
-
+static constexpr uint32 WORM_ENRAGE_BASE_TIMER  = 15000;
+static constexpr uint32 WORM_ENRAGE_ADDITION    = 5000;
 // if defined, 2-MAX_HATCHLINGS_PER_WEB hatchlings are spawned in all 3 locations each time a player is ported,
 // otherwise 2-MAX_HATCHLINGS_PER_WEB hatchlings will only spawn on the single location the player was ported to.
 #define ALWAYS_HATCHLINGS_IN_3_LOCATIONS
@@ -212,7 +212,7 @@ struct boss_fankrissAI : public ScriptedAI
         uint32 spawnTimer;
     };
     std::vector<Worm> worms;
-    uint32 numSpawningThisWave;
+    uint32 numWormsLastWave;
 
     struct HatchlingBatch
     {
@@ -244,7 +244,7 @@ struct boss_fankrissAI : public ScriptedAI
         worms[0].enrageTimer    = WORM_ENRAGE_BASE_TIMER;
         worms[1].shouldSpawn    = false;
         worms[2].shouldSpawn    = false;
-        numSpawningThisWave = 1;
+        numWormsLastWave = 1;
 
         m_uiEvadeCheckTimer     = 2500;
         
@@ -253,6 +253,7 @@ struct boss_fankrissAI : public ScriptedAI
         ReinitializeWebTimers(8000);
         aliveHatchlings = 0;
         hatchlingVec.clear();
+        std::random_shuffle(vIndex.begin(), vIndex.end());
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -291,6 +292,7 @@ struct boss_fankrissAI : public ScriptedAI
         }
         else if (pSummoned->GetEntry() == NPC_SPAWN_FANKRISS)
         {
+            pSummoned->SetInCombatWithZone();
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             {
                 pSummoned->AI()->AttackStart(pTarget);
@@ -314,13 +316,14 @@ struct boss_fankrissAI : public ScriptedAI
     {
         std::random_shuffle(entangleSpells.begin(), entangleSpells.end());
         // it's possible the longest cooldown should be able to reach more than the 
-        // 40 seconds max that it is here. Old nost code was 45sec. Cmangos use 75sec.
+        // 45 seconds max that it is here. Old nost code was 45sec. Cmangos use 75sec.
         // Should it also be possible that two players are webbed at the same time?
         // If not, we need shorter rand intervals and no overlap between the 3 webs.
         entangleTimers[0] = std::make_pair(urand(2000  + add, 20000 + add), false);
-        entangleTimers[1] = std::make_pair(urand(12000 + add, 32000 + add), false);
-        entangleTimers[2] = std::make_pair(urand(22000 + add, 42000 + add), false);
-        entangleRotationTimer = 42000+add;
+        entangleTimers[1] = std::make_pair(urand(15000 + add, 35000 + add), false);
+        entangleTimers[2] = std::make_pair(urand(25000 + add, 45000 + add), false);
+        entangleRotationTimer = 45000 + add;
+        sLog.outBasic("Next webs: %d, %d, %d", entangleTimers[0].first, entangleTimers[1].first, entangleTimers[2].first);
     }
 
     size_t GetHatchlingSpawnAmount()
@@ -456,7 +459,7 @@ struct boss_fankrissAI : public ScriptedAI
             if (w.shouldSpawn && !w.haveSpawned) {
                 if (w.spawnTimer < uiDiff) {
                     w.haveSpawned = true;
-                    SummonWorm(aSummonWormLocs[i], w.enrageTimer);
+                    SummonWorm(aSummonWormLocs[vIndex[i]], w.enrageTimer);
                 }
                 else {
                     allWormsSpawned = false;
@@ -475,15 +478,15 @@ struct boss_fankrissAI : public ScriptedAI
                 w.haveSpawned = false;
                 w.shouldSpawn = i < spawnCount;
                 if (w.shouldSpawn) {
-                    w.enrageTimer = WORM_ENRAGE_BASE_TIMER*spawnCount;
+                    w.enrageTimer = WORM_ENRAGE_BASE_TIMER + WORM_ENRAGE_ADDITION*i; // 15sec for first, 20 for second and 25 sec for last.
                     if (i == 0)
-                        w.spawnTimer = 18000 * numSpawningThisWave + urand(0, 5000); //randomizing a little extra
+                        w.spawnTimer = 20000 * numWormsLastWave + urand(2000 * numWormsLastWave, 4000* numWormsLastWave); //randomizing a little extra
                     else
-                        w.spawnTimer = worms[i-1].spawnTimer + urand(0, 5000);
+                        w.spawnTimer = worms[i-1].spawnTimer + urand(4000, 8000);
                     sLog.outBasic("worm %d spawning in %d. Will enrage after %d", i, w.spawnTimer, w.enrageTimer);
                 }
             }
-            numSpawningThisWave = spawnCount;
+            numWormsLastWave = spawnCount;
         }
       
         HandleHatchlings(uiDiff);
