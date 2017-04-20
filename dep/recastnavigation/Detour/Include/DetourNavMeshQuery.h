@@ -21,6 +21,7 @@
 
 #include "DetourNavMesh.h"
 #include "DetourStatus.h"
+#include <thread>
 
 
 // Define DT_VIRTUAL_QUERYFILTER if you wish to derive a custom filter from dtQueryFilter.
@@ -160,7 +161,7 @@ public:
 	///  @param[in]		nav			Pointer to the dtNavMesh object to use for all queries.
 	///  @param[in]		maxNodes	Maximum number of search nodes. [Limits: 0 < value <= 65536]
 	/// @returns The status flags for the query.
-	dtStatus init(const dtNavMesh* nav, const int maxNodes, unsigned int threadId);
+        dtStatus init(const dtNavMesh* nav, const int maxNodes, std::thread::id threadId);
 	
 	/// @name Standard Pathfinding Functions
 	// /@{
@@ -523,7 +524,7 @@ private:
 	class dtNodeQueue* m_openList;		///< Pointer to open list queue.
 
 public:
-    unsigned int m_owningThread;
+    std::thread::id m_owningThread;
 };
 
 /// Allocates a query object using the Detour allocator.

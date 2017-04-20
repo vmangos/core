@@ -29,6 +29,8 @@
 #include "Detour/Include/DetourNavMesh.h"
 #include "Detour/Include/DetourNavMeshQuery.h"
 
+#include <thread>
+
 //  memory management
 inline void* dtCustomAlloc(int size, dtAllocHint /*hint*/)
 {
@@ -44,7 +46,7 @@ inline void dtCustomFree(void* ptr)
 namespace MMAP
 {
     typedef UNORDERED_MAP<uint32, dtTileRef> MMapTileSet;
-    typedef UNORDERED_MAP<uint32, dtNavMeshQuery*> NavMeshQuerySet;
+    typedef UNORDERED_MAP<std::thread::id, dtNavMeshQuery*> NavMeshQuerySet;
 
     // dummy struct to hold map's mmap data
     struct MMapData
@@ -82,7 +84,7 @@ namespace MMAP
             bool loadGameObject(uint32 displayId);
             bool unloadMap(uint32 mapId, int32 x, int32 y);
             bool unloadMap(uint32 mapId);
-            bool unloadMapInstance(uint32 mapId, uint32 instanceId);
+            bool unloadMapInstance(uint32 mapId, std::thread::id instanceId);
 
             // The returned [dtNavMeshQuery const*] is NOT threadsafe
             // Returns a NavMeshQuery valid for current thread only.

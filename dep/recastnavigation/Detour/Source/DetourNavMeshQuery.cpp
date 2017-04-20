@@ -163,7 +163,7 @@ dtNavMeshQuery::~dtNavMeshQuery()
 /// functions are used.
 ///
 /// This function can be used multiple times.
-dtStatus dtNavMeshQuery::init(const dtNavMesh* nav, const int maxNodes, unsigned int threadId)
+dtStatus dtNavMeshQuery::init(const dtNavMesh* nav, const int maxNodes, std::thread::id threadId)
 {
 	m_nav = nav;
     m_owningThread = threadId;
