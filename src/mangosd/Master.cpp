@@ -354,14 +354,15 @@ int Master::Run()
     #endif
 
     ///- Start soap serving thread
-    ACE_Based::Thread* soap_thread = NULL;
+    std::thread* soap_thread = nullptr;
 
     if(sConfig.GetBoolDefault("SOAP.Enabled", false))
     {
-        MaNGOSsoapRunnable *runnable = new MaNGOSsoapRunnable();
-
-        runnable->setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
-        soap_thread = new ACE_Based::Thread(runnable);
+        soap_thread = new std::thread([](){
+            MaNGOSsoapRunnable runnable;
+            runnable.setListenArguments(sConfig.GetStringDefault("SOAP.IP", "127.0.0.1"), sConfig.GetIntDefault("SOAP.Port", 7878));
+            runnable.run();
+        });
     }
 
     ///- Start up freeze catcher thread
@@ -415,8 +416,7 @@ int Master::Run()
     ///- Stop soap thread
     if(soap_thread)
     {
-        soap_thread->wait();
-        soap_thread->destroy();
+        soap_thread->join();
         delete soap_thread;
     }
 
