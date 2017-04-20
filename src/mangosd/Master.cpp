@@ -605,6 +605,7 @@ void Master::_OnSignal(int s)
             signal(SIGSEGV, 0);
             if (!m_handleSigvSignals)
                 return;
+            std::exception_ptr exc = std::current_exception();
             m_handleSigvSignals = false; // Desarm anticrash
             sWorld.SetAnticrashRearmTimer(sWorld.getConfig(CONFIG_UINT32_ANTICRASH_REARM_TIMER));
             uint32 anticrashOptions = sWorld.getConfig(CONFIG_UINT32_ANTICRASH_OPTIONS);
@@ -628,7 +629,7 @@ void Master::_OnSignal(int s)
                 sObjectAccessor.SaveAllPlayers();
                 std::this_thread::sleep_for(std::chrono::seconds(25));
             }
-            *((int*)NULL) = 42; // Crash for real now.
+            std::rethrow_exception(exc); // Crash for real now.
             return;
     }
 
