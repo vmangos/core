@@ -66,51 +66,38 @@ INSTANTIATE_SINGLETON_1( Master );
 volatile uint32 Master::m_masterLoopCounter = 0;
 volatile bool Master::m_handleSigvSignals = false;
 
-class FreezeDetectorRunnable : public ACE_Based::Runnable
+void freezeDetector(uint32 _delaytime)
 {
-public:
-    FreezeDetectorRunnable() { _delaytime = 0; }
-    uint32 m_loops, m_lastchange;
-    uint32 w_loops, w_lastchange;
-    uint32 _delaytime;
-    void SetDelayTime(uint32 t) { _delaytime = t; }
-    void run(void)
+    if(!_delaytime)
+        return;
+    sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
+    uint32 loops = 0;
+    uint32 lastchange = 0;
+    while(!World::IsStopped())
     {
-        if(!_delaytime)
-            return;
-        sLog.outString("Starting up anti-freeze thread (%u seconds max stuck time)...",_delaytime/1000);
-        m_loops = 0;
-        w_loops = 0;
-        m_lastchange = 0;
-        w_lastchange = 0;
-        while(!World::IsStopped())
+        std::this_thread::sleep_for(std::chrono::seconds(1));
+
+        uint32 curtime = WorldTimer::getMSTime();
+        //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
+
+        // normal work
+        if (loops != World::m_worldLoopCounter)
         {
-            std::this_thread::sleep_for(std::chrono::seconds(1));
-
-            uint32 curtime = WorldTimer::getMSTime();
-            //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
-
-            // normal work
-            if (w_loops != World::m_worldLoopCounter)
-            {
-                w_lastchange = curtime;
-                w_loops = World::m_worldLoopCounter;
-            }
-            // possible freeze
-#ifdef NDEBUG
-            else if (WorldTimer::getMSTimeDiff(w_lastchange, curtime) > _delaytime)
-            {
-                sLog.outError("World Thread hangs, kicking out server!");
-                signal(SIGSEGV, 0);
-                Master::m_handleSigvSignals = false;        // disable anticrash
-                *((uint32 volatile*)NULL) = 0;              // bang crash
-            }
-#endif
+            lastchange = curtime;
+            loops = World::m_worldLoopCounter;
         }
-        // Fix crash au shutdown du serv. sLog n'existe plus ici.
-        //sLog.outString("Anti-freeze thread exiting without problems.");
+        // possible freeze
+#ifdef NDEBUG
+        else if (WorldTimer::getMSTimeDiff(lastchange, curtime) > _delaytime)
+        {
+            sLog.outError("World Thread hangs, kicking out server!");
+            std::terminate();              // bang crash
+        }
+#endif
     }
-};
+    // Fix crash au shutdown du serv. sLog n'existe plus ici.
+    //sLog.outString("Anti-freeze thread exiting without problems.");
+}
 
 void remoteAccess()
 {
@@ -366,13 +353,11 @@ int Master::Run()
     }
 
     ///- Start up freeze catcher thread
-    ACE_Based::Thread* freeze_thread = NULL;
+    std::thread* freeze_thread = nullptr;
     if(uint32 freeze_delay = sConfig.GetIntDefault("MaxCoreStuckTime", 0))
     {
-        FreezeDetectorRunnable *fdr = new FreezeDetectorRunnable();
-        fdr->SetDelayTime(freeze_delay*1000);
-        freeze_thread = new ACE_Based::Thread(fdr);
-        freeze_thread->setPriority(ACE_Based::Highest);
+        freeze_thread = new std::thread(std::bind(&freezeDetector,freeze_delay*1000));
+        //freeze_thread->setPriority(ACE_Based::Highest);
     }
 
     if (!sNodesMgr->OnServerStartup())
@@ -409,7 +394,7 @@ int Master::Run()
     ///- Stop freeze protection before shutdown tasks
     if (freeze_thread)
     {
-        freeze_thread->destroy();
+        freeze_thread->join();
         delete freeze_thread;
     }
 
