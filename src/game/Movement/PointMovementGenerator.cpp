@@ -195,6 +195,7 @@ void ChargeMovementGenerator<T>::Initialize(T &unit)
     init.Move(&path);
     init.SetVelocity(_speed);
     init.SetWalk(false);
+    init.SetFacingGUID(unit.GetTargetGuid());
     init.Launch();
 }
 
