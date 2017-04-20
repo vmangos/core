@@ -552,6 +552,23 @@ instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqi
     });
 }
 
+void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
+{
+    const AreaTriggerEntry* cthunAreaTrigger = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
+    if (cthunAreaTrigger) {
+        float x = cthunAreaTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float y = cthunAreaTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        pPlayer->NearTeleportTo(x, y, cthunAreaTrigger->z, pPlayer->GetOrientation());
+    }
+    else {
+        float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
+        pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
+        sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
+            AREATRIGGER_CTHUN_KNOCKBACK);
+    }
+}
+
 void instance_temple_of_ahnqiraj::RemovePlayerFromStomach(Unit * unit)
 {
     if (!unit) return;
@@ -592,20 +609,7 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         }
     }
     else if (pAt->id == AREATRIGGER_STOMACH_AIR) {
-        const AreaTriggerEntry* portOutTrigger = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
-
-        if (portOutTrigger) {
-            float x = portOutTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-            float y = portOutTrigger->y + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-            pPlayer->NearTeleportTo(x, y, portOutTrigger->z, pPlayer->GetOrientation());
-        }
-        else {
-            float x = -8578.0f + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-            float y = 1986.8f + sin((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
-            pPlayer->NearTeleportTo(x, y, 100.4f, pPlayer->GetOrientation());
-            sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
-                AREATRIGGER_CTHUN_KNOCKBACK);
-        }
+        TeleportPlayerToCThun(pPlayer);
     }
     else if (pAt->id == AREATRIGGER_CTHUN_KNOCKBACK) {
         RemovePlayerFromStomach(pPlayer);
@@ -672,6 +676,7 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
     // Update the players in the stomach
     if (playersInStomach.empty()) return;
 
+    const AreaTriggerEntry* pot = sAreaTriggerStore.LookupEntry(AREATRIGGER_STOMACH_AIR);
     for (auto it = playersInStomach.begin(); it != playersInStomach.end();) {
         Player* player = GetMap()->GetPlayer(it->first);
         //Player has left instance or something and we remove him from the list. 
@@ -687,6 +692,16 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
         }
         else {
             timers.acidDebuff -= diff;
+        }
+
+        if (pot)
+        {
+            if (player->GetDistance(pot->x, pot->y, pot->z) <= pot->radius) {
+                if (player->IsLaunched() && player->IsFalling()) {
+                    // The areatrigger must have failed. Teleport the player out manually
+                    TeleportPlayerToCThun(player);
+                }
+            }
         }
 
         ++it;

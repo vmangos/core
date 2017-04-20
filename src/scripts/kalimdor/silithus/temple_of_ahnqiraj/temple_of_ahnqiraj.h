@@ -196,6 +196,7 @@ private:
     void UpdateStomachOfCthun(uint32 diff);
     void RemovePlayerFromStomach(Unit* unit);
     CThunStomachList::iterator PlayerInStomachIter(Unit* unit);
+    void TeleportPlayerToCThun(Player* pPlayer);
 
     ObjectGuid puntCreatureGuid;
     uint32 quakeTimer;
