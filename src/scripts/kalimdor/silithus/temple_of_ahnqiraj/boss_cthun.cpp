@@ -1178,18 +1178,23 @@ struct eye_of_cthunAI : public ScriptedAI
         }
     }
 
+    void AttackStart(Unit* pUnit) override
+    {
+        // dont do nothin'
+    }
+
     bool EnterDarkGlarePhase()
     {
         m_creature->InterruptNonMeleeSpells(false);
         //Select random target for dark beam to start on and start the trigger
         if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0)) {
             // Remove the target focus but allow the boss to face the current victim
+            DoStopAttack();
             m_creature->SetFacingToObject(target);
             if (DoCastSpellIfCan(m_creature, SPELL_ROTATE_TRIGGER) == CAST_OK) {
                 if (!m_creature->HasAura(SPELL_FREEZE_ANIMATION)) {
                     m_creature->CastSpell(m_creature, SPELL_FREEZE_ANIMATION, true);
                 }
-            
                 m_creature->SetTargetGuid(ObjectGuid());
                 return true;
             }
