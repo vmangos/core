@@ -85,7 +85,7 @@ public:
         w_lastchange = 0;
         while(!World::IsStopped())
         {
-            ACE_Based::Thread::Sleep(1000);
+            std::this_thread::sleep_for(std::chrono::seconds(1));
 
             uint32 curtime = WorldTimer::getMSTime();
             //DEBUG_LOG("anti-freeze: time=%u, counters=[%u; %u]",curtime,Master::m_masterLoopCounter,World::m_worldLoopCounter);
@@ -655,13 +655,13 @@ void Master::_OnSignal(int s)
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Server has crashed. Now saving online players ...");
                 else
                     sWorld.SendWorldText(LANG_SYSTEMMESSAGE, "Crash server occurred :(");
-                ACE_Based::Thread::Sleep(500);
+                std::this_thread::sleep_for(std::chrono::milliseconds(500));
             }
             if (anticrashOptions & ANTICRASH_OPTION_SAVEALL)
             {
                 CharacterDatabase.ThreadStart();
                 sObjectAccessor.SaveAllPlayers();
-                ACE_Based::Thread::Sleep(25000); // Wait enough time to execute the SQL queries.
+                std::this_thread::sleep_for(std::chrono::seconds(25));
             }
             *((int*)NULL) = 42; // Crash for real now.
             return;
