@@ -43,6 +43,7 @@ static constexpr SpawnLocation hatchlingLocations[3] =
     {-8003.00f, 1222.90f, -82.10f},
     {-8022.68f, 1150.08f, -89.33f}
 };
+static constexpr float  PULL_DISTANCE           = 80.0f;
 static constexpr SpawnLocation pullCenter       = {-8074.88f, 1193.64f, -92.11f};
 static constexpr uint32 aIndex[3]               = { 0, 1, 2 };
 static constexpr uint32 aEntangleSpells[3]      = { SPELL_ENTANGLE_1, SPELL_ENTANGLE_2, SPELL_ENTANGLE_3 };
@@ -430,7 +431,7 @@ struct boss_fankrissAI : public ScriptedAI
                         continue;
 
                     float distToPull = pPlayer->GetDistance(pullCenter.m_fX, pullCenter.m_fY, pullCenter.m_fZ);
-                    if (distToPull < 85.0f && pPlayer->IsWithinLOSInMap(m_creature))
+                    if (distToPull < PULL_DISTANCE && pPlayer->IsWithinLOSInMap(m_creature))
                     {
                         AttackStart(pPlayer);
                     }
