@@ -587,7 +587,7 @@ int kb_hit_return()
 #endif
 
 /// %Thread start
-void CliRunnable::run()
+void CliRunnable::operator()()
 {
     ///- Init new SQL thread for the world database (one connection call enough)
     WorldDatabase.ThreadStart();                                // let thread do safe mySQL requests

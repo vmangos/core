@@ -309,7 +309,7 @@ int Master::Run()
         LoginDatabase.PExecute("UPDATE realmlist SET realmflags = realmflags & ~(%u), population = 0, realmbuilds = '%s'  WHERE id = '%u'", REALM_FLAG_OFFLINE, builds.c_str(), realmID);
     }
 
-    ACE_Based::Thread* cliThread = NULL;
+    std::thread* cliThread = nullptr;
 
 #ifdef WIN32
     if (sConfig.GetBoolDefault("Console.Enable", true) && (m_ServiceStatus == -1)/* need disable console in service mode*/)
@@ -318,7 +318,7 @@ int Master::Run()
 #endif
     {
         ///- Launch CliRunnable thread
-        cliThread = new ACE_Based::Thread(new CliRunnable);
+        cliThread = new std::thread(CliRunnable());
     }
 
     ACE_Based::Thread* rar_thread = NULL;
@@ -479,7 +479,7 @@ int Master::Run()
 
     if (cliThread)
     {
-        #ifdef WIN32
+#ifdef WIN32
 
         // this only way to terminate CLI thread exist at Win32 (alt. way exist only in Windows Vista API)
         //_exit(1);
@@ -516,13 +516,16 @@ int Master::Run()
         DWORD numb;
         BOOL ret = WriteConsoleInput(hStdIn, b, 4, &numb);
 
-        cliThread->wait();
+#else
 
-        #else
+        signal(SIGTERM,[](int){
+            fclose(stdin);
+        });
+        pthread_kill(cliThread->native_handle(),SIGTERM);
 
-        cliThread->destroy();
+#endif
 
-        #endif
+        cliThread->join();
 
         delete cliThread;
     }
