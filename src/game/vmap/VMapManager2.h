@@ -24,7 +24,9 @@
 #include "Platform/Define.h"
 #include <G3D/Vector3.h>
 #include <ace/RW_Thread_Mutex.h>
-#include <ace/Atomic_Op.h>
+#include <atomic>
+#include <memory>
+#include <shared_mutex>
 
 //===========================================================
 
@@ -48,19 +50,7 @@ namespace VMAP
     class WorldModel;
     class ModelInstance;
 
-    class ManagedModel
-    {
-        public:
-            ManagedModel(): iModel(0), iRefCount(0) {}
-            void setModel(WorldModel* model) { iModel = model; }
-            WorldModel* getModel() { return iModel; }
-            void incRefCount() { ++iRefCount; }
-            int decRefCount() { return --iRefCount; }
-            int getRefCount() const { return iRefCount.value(); }
-        protected:
-            WorldModel* iModel;
-            ACE_Atomic_Op<ACE_Thread_Mutex, int> iRefCount;
-    };
+    using ManagedModel = std::weak_ptr<WorldModel>;
 
     typedef UNORDERED_MAP<uint32 , StaticMapTree*> InstanceTreeMap;
     typedef UNORDERED_MAP<std::string, ManagedModel> ModelFileMap;
@@ -75,7 +65,7 @@ namespace VMAP
             bool _loadMap(uint32 pMapId, const std::string& basePath, uint32 tileX, uint32 tileY);
             /* void _unloadMap(uint32 pMapId, uint32 x, uint32 y); */
 
-            ACE_RW_Mutex    m_modelsLock;
+            std::shared_timed_mutex    m_modelsLock;
         public:
             // public for debug
             G3D::Vector3 convertPositionToInternalRep(float x, float y, float z) const;
@@ -103,8 +93,7 @@ namespace VMAP
             bool isUnderModel(unsigned int pMapId, float x, float y, float z, float* outDist = NULL, float* inDist = NULL) const override;
             bool GetLiquidLevel(uint32 pMapId, float x, float y, float z, uint8 ReqLiquidType, float& level, float& floor, uint32& type) const override;
 
-            WorldModel* acquireModelInstance(const std::string& basepath, const std::string& filename);
-            void releaseModelInstance(const std::string& filename);
+            std::shared_ptr<WorldModel> acquireModelInstance(const std::string& basepath, const std::string& filename);
 
             // what's the use of this? o.O
             std::string getDirFileName(unsigned int pMapId, int /*x*/, int /*y*/) const override

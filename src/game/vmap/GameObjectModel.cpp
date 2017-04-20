@@ -70,8 +70,6 @@ void LoadGameObjectModelList()
 
 GameObjectModel::~GameObjectModel()
 {
-    if (iModel)
-        ((VMAP::VMapManager2*)VMAP::VMapFactory::createOrGetVMapManager())->releaseModelInstance(name);
 }
 
 bool GameObjectModel::initialize(const GameObject* const pGo, const GameObjectDisplayInfoEntry* const pDisplayInfo)
