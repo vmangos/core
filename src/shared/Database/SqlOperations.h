@@ -94,14 +94,14 @@ class SqlQueryHolderEx;                                     /// points to a hold
 
 class ThreadPool;
 
-class SqlResultQueue : public ACE_Based::LockedQueue<MaNGOS::IQueryCallback* , ACE_Thread_Mutex>
+class SqlResultQueue : public LockedQueue<MaNGOS::IQueryCallback* , std::mutex>
 {
     public:
         SqlResultQueue();
         ~SqlResultQueue();
         void CancelAll();
         void Update(uint32 maxTime);
-        typedef ACE_Based::LockedQueue<MaNGOS::IQueryCallback*, ACE_Thread_Mutex> CallbackQueue;
+        typedef LockedQueue<MaNGOS::IQueryCallback*, std::mutex> CallbackQueue;
         CallbackQueue _threadUnsafeWaitingQueries;
         uint32 numUnsafeQueries;
         std::unique_ptr<ThreadPool> m_callbackThreads;

@@ -842,14 +842,14 @@ class World
         static uint32 m_relocation_ai_notify_delay;
 
         // CLI command holder to be thread safe
-        ACE_Based::LockedQueue<CliCommandHolder*,ACE_Thread_Mutex> cliCmdQueue;
+        LockedQueue<CliCommandHolder*,std::mutex> cliCmdQueue;
 
         //Player Queue
         Queue m_QueuedSessions;
 
         //sessions that are added async
         void AddSession_(WorldSession* s);
-        ACE_Based::LockedQueue<WorldSession*, ACE_Thread_Mutex> addSessQueue;
+        LockedQueue<WorldSession*, std::mutex> addSessQueue;
 
         //used versions
         uint32      m_anticrashRearmTimer;

@@ -32,7 +32,7 @@ class SqlConnection;
 
 class SqlDelayThread
 {
-    typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
+    typedef LockedQueue<SqlOperation*, std::mutex> SqlQueue;
 
     private:
         SqlQueue m_sqlQueue;                                ///< Queue of SQL statements

@@ -306,7 +306,7 @@ class MANGOS_DLL_SPEC Database
         typedef std::vector< SqlConnection * > SqlConnectionContainer;
         SqlConnectionContainer m_pQueryConnections;
 
-        typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
+        typedef LockedQueue<SqlOperation*, std::mutex> SqlQueue;
         SqlQueue* m_delayQueue;
 
         SqlConnection * m_pAsyncConn;

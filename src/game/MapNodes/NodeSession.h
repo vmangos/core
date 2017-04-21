@@ -119,7 +119,7 @@ protected:
     void ProcessPacket(WorldPacket* packet);
 
     MapSocket*      m_socket;
-    ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> m_recvQueue[NODE_MAX_PROCESS_TYPE];
+    LockedQueue<WorldPacket*, std::mutex> m_recvQueue[NODE_MAX_PROCESS_TYPE];
     uint32          m_lastReceivedPacketTime;
     std::string     m_name;
     bool            m_isConnectedToMaster;
