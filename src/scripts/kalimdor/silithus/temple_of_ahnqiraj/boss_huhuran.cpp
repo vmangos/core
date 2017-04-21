@@ -57,6 +57,19 @@ struct boss_huhuranAI : public ScriptedAI
 
     bool m_bBerserk;
 
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        
+        if (m_creature->canAttack(pWho)
+            && !m_creature->isInCombat()
+            && m_creature->IsWithinDistInMap(pWho, 80.0f) 
+            && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho); 
+        }
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
+
     void JustDied(Unit*) override
     {
         if (m_pInstance)
