@@ -290,8 +290,9 @@ std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(const std::string
         ret = std::shared_ptr<WorldModel>(
                     worldmodel,
                     [this, filename](WorldModel*){
-            iLoadedModelFiles.erase(filename);
-        });
+                        std::unique_lock<std::shared_timed_mutex> lock(m_modelsLock);
+                        iLoadedModelFiles.erase(filename);
+                    });
         model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(
                                              filename,
                                              ret
