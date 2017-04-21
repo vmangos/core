@@ -6148,7 +6148,7 @@ void Player::DismountCheck()
             Spell mountSpell(this, aura->GetSpellProto(), true);
             SpellCastResult pCheck = mountSpell.CheckCast(true);
 
-            if (pCheck != SPELL_CAST_OK && pCheck != SPELL_FAILED_AFFECTING_COMBAT)
+            if (pCheck == SPELL_FAILED_NO_MOUNTS_ALLOWED || pCheck == SPELL_FAILED_NOT_HERE)
             {
                 RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
                 Unmount(true);
