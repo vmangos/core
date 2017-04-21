@@ -90,7 +90,9 @@ public:
 
     int AddSocket(SocketType* sock)
     {
-        ACE_GUARD_RETURN(ACE_Thread_Mutex, Guard, m_NewSockets_Lock, -1);
+        std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
+        if (!lock.owns_lock())
+            return -1;
 
         ++m_Connections;
         sock->AddReference();
@@ -108,7 +110,7 @@ public:
 protected:
     void AddNewSockets()
     {
-        ACE_GUARD(ACE_Thread_Mutex, Guard, m_NewSockets_Lock);
+        std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
 
         if (m_NewSockets.empty())
             return;
@@ -185,7 +187,7 @@ private:
     SocketSet m_Sockets;
 
     SocketSet m_NewSockets;
-    ACE_Thread_Mutex m_NewSockets_Lock;
+    std::mutex m_NewSockets_Lock;
 };
 
 template <typename SocketType>
