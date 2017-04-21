@@ -36,7 +36,7 @@ INSERT INTO script_texts (entry, content_default, sound, type, language, emote, 
 (-1531015,'There will be pain...',                              0,1,0,0,'veklor SAY_INTRO_3'),
 (-1531016,'Oh so much pain...',                                 0,1,0,0,'veknilash SAY_INTRO_4'),
 (-1531017,'Come, little ones.',                                 0,1,0,0,'veklor SAY_INTRO_5'),
-(-1531018,'The feast of souls begin now...',                    0,1,0,0,'veknilash SAY_INTRO_6'),
+(-1531018,'The feast of souls begins now...',                    0,1,0,0,'veknilash SAY_INTRO_6'),
 
 -- Vek'lor yells
 (-1531019,'It\'s too late to turn away.', 		                8623,1,0,0,'veklor SAY_AGGRO_1'),
