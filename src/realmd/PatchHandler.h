@@ -31,7 +31,6 @@
 #include <ace/Svc_Handler.h>
 #include <ace/SOCK_Stream.h>
 #include <ace/Message_Block.h>
-#include <ace/Auto_Ptr.h>
 #include <map>
 
 #include <openssl/bn.h>
