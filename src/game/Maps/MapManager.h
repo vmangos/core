@@ -77,8 +77,8 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 {
     friend class MaNGOS::OperatorNew<MapManager>;
 
-    typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
-    typedef ACE_Guard<LOCK_TYPE> LOCK_TYPE_GUARD;
+    using  LOCK_TYPE = std::recursive_mutex;
+    using LOCK_TYPE_GUARD = std::unique_lock<LOCK_TYPE>;
     typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex>::Lock Guard;
 
     public:

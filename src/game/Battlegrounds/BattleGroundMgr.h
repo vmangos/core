@@ -94,7 +94,7 @@ class BattleGroundQueue
         bool PlayerLoggedIn(Player* player);
 
         //mutex that should not allow changing private data, nor allowing to update Queue during private data change.
-        ACE_Recursive_Thread_Mutex  m_Lock;
+        std::recursive_mutex  m_Lock;
 
 
         typedef std::map<ObjectGuid, PlayerQueueInfo> QueuedPlayersMap;

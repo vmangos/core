@@ -74,13 +74,13 @@ class MANGOS_DLL_SPEC SqlConnection
         class Lock
         {
             public:
-                Lock(SqlConnection * conn) : m_pConn(conn) { m_pConn->m_mutex.acquire(); }
-                ~Lock() { m_pConn->m_mutex.release(); }
+                Lock(SqlConnection * conn) : m_pConn(conn) {}
 
                 SqlConnection * operator->() const { return m_pConn; }
 
             private:
                 SqlConnection * const m_pConn;
+                std::unique_lock<std::recursive_mutex> m_lock{m_pConn->m_mutex};
         };
 
         //get DB object
@@ -107,7 +107,7 @@ class MANGOS_DLL_SPEC SqlConnection
         std::string m_database;
 
     private:
-        typedef ACE_Recursive_Thread_Mutex LOCK_TYPE;
+        using LOCK_TYPE = std::recursive_mutex;
         LOCK_TYPE m_mutex;
 
         typedef std::vector<SqlPreparedStatement * > StmtHolder;
