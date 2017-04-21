@@ -8,6 +8,7 @@
 #include "MapSocket.h"
 #include "NodesOpcodes.h"
 #include "ObjectGuid.h"
+#include <shared_mutex>
 
 class MapSocket;
 class WorldSocket;
@@ -125,7 +126,7 @@ protected:
     bool            m_isConnectedToMaster;
     bool            m_isReady;
 
-    ACE_RW_Mutex    m_socketsLock;
+    std::shared_timed_mutex    m_socketsLock;
     typedef std::unordered_map<uint32, WorldSocket*> SocketsMap;
     SocketsMap      m_accountSockets;
 

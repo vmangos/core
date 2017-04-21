@@ -23,7 +23,6 @@
 #define CONFIG_H
 
 #include "Common.h"
-#include <ace/Recursive_Thread_Mutex.h>
 #include <ace/Singleton.h>
 #include "Platform/Define.h"
 #include "ace/Configuration_Import_Export.h"

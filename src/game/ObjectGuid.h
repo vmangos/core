@@ -26,8 +26,6 @@
 #include <queue>
 #include <unordered_set>
 
-#include "ace/Thread_Mutex.h"
-
 #include "Common.h"
 #include "ByteBuffer.h"
 

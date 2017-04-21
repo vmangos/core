@@ -9,8 +9,6 @@
 #include <ace/SOCK_Connector.h>
 #include <ace/Acceptor.h>
 #include <ace/Connector.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/Guard_T.h>
 #include <ace/Unbounded_Queue.h>
 #include <ace/Message_Block.h>
 #include <mutex>

@@ -101,7 +101,7 @@ void NodeSession::UnsafeUpdate(uint32 diff)
     // Update corresponding sessions - to get packets handled !
     if (!IsConnectedToMaster())
     {
-        m_socketsLock.acquire_read();
+        std::shared_lock<std::shared_timed_mutex> rlock(m_socketsLock);
         for (SocketsMap::const_iterator it = m_accountSockets.begin(); it != m_accountSockets.end(); ++it)
             if (WorldSession* wsess = sWorld.FindSession(it->first))
             {
@@ -111,13 +111,11 @@ void NodeSession::UnsafeUpdate(uint32 diff)
                 f.SetProcessType(PACKET_PROCESS_DB_QUERY);
                 wsess->Update(f);
             }
-
-        m_socketsLock.release();
     }
     // Lost sockets ?
     if (!IsConnectedToMaster())
     {
-        m_socketsLock.acquire_write();
+        std::unique_lock<std::shared_timed_mutex> wlock(m_socketsLock);
         for (SocketsMap::iterator it = m_accountSockets.begin(); it != m_accountSockets.end();)
         {
             SocketsMap::iterator current = it++;
@@ -128,7 +126,6 @@ void NodeSession::UnsafeUpdate(uint32 diff)
                 m_accountSockets.erase(current);
             }
         }
-        m_socketsLock.release();
     }
 }
 
@@ -152,12 +149,11 @@ void NodeSession::Close()
     sLog.outString("[%s] Closing connection", GetName());
     // Will kick all connected users.
     // TODO: Go back to character selection screen ?
-    m_socketsLock.acquire_write();
+    std::unique_lock<std::shared_timed_mutex> lock(m_socketsLock);
     for (SocketsMap::iterator it = m_accountSockets.begin(); it != m_accountSockets.end(); ++it)
     {
         it->second->CloseSocket();
         it->second->RemoveReference();
     }
     m_accountSockets.clear();
-    m_socketsLock.release();
 }

@@ -31,7 +31,6 @@
 #include <ace/Svc_Handler.h>
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Acceptor.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/Semaphore.h>
 
 #define OFFCHAT_BUFF_SIZE 8192

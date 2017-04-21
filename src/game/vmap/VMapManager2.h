@@ -23,7 +23,6 @@
 #include "Utilities/UnorderedMapSet.h"
 #include "Platform/Define.h"
 #include <G3D/Vector3.h>
-#include <ace/RW_Thread_Mutex.h>
 #include <atomic>
 #include <memory>
 #include <shared_mutex>

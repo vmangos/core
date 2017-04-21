@@ -58,14 +58,13 @@ MMapManager::~MMapManager()
 
 bool MMapManager::loadMapData(uint32 mapId)
 {
-    loadedMMaps_lock.acquire_read();
+    std::shared_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
     // we already have this map loaded?
     if (loadedMMaps.find(mapId) != loadedMMaps.end())
     {
-        loadedMMaps_lock.release();
         return true;
     }
-    loadedMMaps_lock.release();
+    rlock.unlock();
 
     // load and init dtNavMesh - read parameters from file
     uint32 pathLen = sWorld.GetDataPath().length() + strlen("mmaps/%03i.mmap") + 1;
@@ -103,12 +102,11 @@ bool MMapManager::loadMapData(uint32 mapId)
     MMapData* mmap_data = new MMapData(mesh);
     mmap_data->mmapLoadedTiles.clear();
 
-    loadedMMaps_lock.acquire_write();
+    std::unique_lock<std::shared_timed_mutex> wlock(loadedMMaps_lock);
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
         loadedMMaps.insert(std::pair<uint32, MMapData*>(mapId, mmap_data));
     else
         delete mmap_data;
-    loadedMMaps_lock.release();
 
     return true;
 }
@@ -125,14 +123,14 @@ bool MMapManager::loadMap(uint32 mapId, int32 x, int32 y)
         return false;
 
     // get this mmap data
-    loadedMMaps_lock.acquire_read();
+    std::shared_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
     MMapData* mmap = loadedMMaps[mapId];
-    loadedMMaps_lock.release();
+    rlock.unlock();
     MANGOS_ASSERT(mmap->navMesh);
 
     // check if we already have this tile loaded
     uint32 packedGridPos = packTileID(x, y);
-    std::unique_lock<std::mutex> lock(mmap->tilesLoading_lock);
+    std::unique_lock<std::mutex> wlock(mmap->tilesLoading_lock);
     if (mmap->mmapLoadedTiles.find(packedGridPos) != mmap->mmapLoadedTiles.end())
         return false;
 
@@ -314,21 +312,21 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
 
     std::thread::id tid = std::this_thread::get_id();
     MMapData* mmap = loadedMMaps[mapId];
-    mmap->navMeshQueries_lock.acquire_read();
+    std::shared_lock<std::shared_timed_mutex> rlock(mmap->navMeshQueries_lock);
 
     NavMeshQuerySet::iterator it = mmap->navMeshQueries.find(tid);
     dtNavMeshQuery* navMeshQuery = NULL;
     if (it == mmap->navMeshQueries.end())
     {
-        mmap->navMeshQueries_lock.release();
-        mmap->navMeshQueries_lock.acquire_write();
+        rlock.unlock();
+        std::unique_lock<std::shared_timed_mutex> wlock(mmap->navMeshQueries_lock);
 
         // allocate mesh query
         navMeshQuery = dtAllocNavMeshQuery();
         MANGOS_ASSERT(navMeshQuery);
         if (DT_SUCCESS != navMeshQuery->init(mmap->navMesh, 2048, tid))
         {
-            mmap->navMeshQueries_lock.release();
+            wlock.unlock();
             dtFreeNavMeshQuery(navMeshQuery);
             sLog.outError("MMAP:GetNavMeshQuery: Failed to initialize dtNavMeshQuery for mapId %03u thread %u", mapId, tid);
             return NULL;
@@ -339,7 +337,6 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
     }
     else
         navMeshQuery = it->second;
-    mmap->navMeshQueries_lock.release();
 
     return navMeshQuery;
 }

@@ -19,9 +19,6 @@
 #ifndef _MOVE_MAP_H
 #define _MOVE_MAP_H
 
-#include <ace/Guard_T.h>
-#include <ace/Thread_Mutex.h>
-#include <ace/RW_Mutex.h>
 
 #include "Utilities/UnorderedMapSet.h"
 
@@ -30,7 +27,7 @@
 #include "Detour/Include/DetourNavMeshQuery.h"
 
 #include <thread>
-#include <mutex>
+#include <shared_mutex>
 
 //  memory management
 inline void* dtCustomAlloc(int size, dtAllocHint /*hint*/)
@@ -66,7 +63,7 @@ namespace MMAP
 
         // we have to use single dtNavMeshQuery for every instance, since those are not thread safe
         NavMeshQuerySet navMeshQueries;     // threadId to query
-        ACE_RW_Mutex navMeshQueries_lock;
+        std::shared_timed_mutex navMeshQueries_lock;
         MMapTileSet mmapLoadedTiles;        // maps [map grid coords] to [dtTile]
         std::mutex tilesLoading_lock;
     };
@@ -100,7 +97,7 @@ namespace MMAP
             uint32 packTileID(int32 x, int32 y);
 
             MMapDataSet loadedMMaps;
-            ACE_RW_Mutex loadedMMaps_lock;
+            std::shared_timed_mutex loadedMMaps_lock;
             MMapDataSet loadedModels;
             uint32 loadedTiles;
             std::mutex lockForModels;

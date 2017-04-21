@@ -22,7 +22,6 @@
 #ifndef __SQLDELAYTHREAD_H
 #define __SQLDELAYTHREAD_H
 
-#include "ace/Thread_Mutex.h"
 #include "LockedQueue.h"
 
 

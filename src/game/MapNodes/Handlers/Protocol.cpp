@@ -68,11 +68,10 @@ void NodeSession::HandleSendPacketToSession(WorldPacket& pkt)
     WorldPacket newPkt;
     ReadPacketForward(pkt, newPkt, sessionId);
 
-    m_socketsLock.acquire_read();
+    std::shared_lock<std::shared_timed_mutex> lock (m_socketsLock);
     SocketsMap::iterator it = m_accountSockets.find(sessionId);
     if (it != m_accountSockets.end())
         it->second->SendPacket(newPkt);
-    m_socketsLock.release();
 }
 
 void NodeSession::HandleForwardClientPacket(WorldPacket& pkt)
