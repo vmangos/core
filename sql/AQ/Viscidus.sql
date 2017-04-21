@@ -45,3 +45,6 @@ INSERT INTO spell_target_position (id, target_map, target_position_x, target_pos
 
 -- Not tauntable
 UPDATE creature_template SET flags_extra = 257 WHERE entry = 15299;
+
+-- Update speed
+UPDATE creature_template SET speed_walk = 3, speed_run = 3 WHERE entry = 15299;
