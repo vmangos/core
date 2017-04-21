@@ -1184,9 +1184,9 @@ float TerrainInfo::GetWaterLevel(float x, float y, float z, float* pGround /*= N
 }
 
 //////////////////////////////////////////////////////////////////////////
-typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> TerrainManagerLock;
+typedef MaNGOS::ClassLevelLockable<TerrainManager, std::mutex> TerrainManagerLock;
 INSTANTIATE_SINGLETON_2(TerrainManager, TerrainManagerLock);
-INSTANTIATE_CLASS_MUTEX(TerrainManager, ACE_Thread_Mutex);
+INSTANTIATE_CLASS_MUTEX(TerrainManager, std::mutex);
 
 TerrainManager::TerrainManager()
 {

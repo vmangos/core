@@ -28,6 +28,7 @@
  */
 
 #include "Platform/Define.h"
+#include <mutex>
 
 namespace MaNGOS
 {
@@ -57,62 +58,45 @@ namespace MaNGOS
     template<class T>
     class MANGOS_DLL_DECL SingleThreaded
     {
-        public:
+    public:
 
-            struct Lock                                     // empty object
-            {
-                Lock()
-                {
-                }
-                Lock(const T&)
-                {
-                }
+        struct Lock                                     // empty object
+        {
+            Lock() = default;
 
-                Lock(const SingleThreaded<T>&)              // for single threaded we ignore this
-                {
-                }
-            };
+            Lock(const T&) { }
+
+            Lock(const SingleThreaded<T>&) { }          // for single threaded we ignore this
+        };
     };
 
     template<class T, class MUTEX>
     class MANGOS_DLL_DECL ClassLevelLockable
     {
+    public:
+
+        ClassLevelLockable()
+        {
+        }
+
+        friend class Lock;
+
+        class Lock
+        {
         public:
 
-            ClassLevelLockable()
-            {
-            }
+            Lock(const T& /*host*/) { }
 
-            friend class Lock;
+            Lock(const ClassLevelLockable<T, MUTEX> &) { }
 
-            class Lock
-            {
-                public:
-
-                    Lock(const T& /*host*/)
-                    {
-                        ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
-                    }
-
-                    Lock(const ClassLevelLockable<T, MUTEX> &)
-                    {
-                        ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
-                    }
-
-                    Lock()
-                    {
-                        ClassLevelLockable<T, MUTEX>::si_mtx.acquire();
-                    }
-
-                    ~Lock()
-                    {
-                        ClassLevelLockable<T, MUTEX>::si_mtx.release();
-                    }
-            };
-
+            Lock() = default;
         private:
+            std::unique_lock<MUTEX> m_lock{si_mtx};
+        };
 
-            static MUTEX si_mtx;
+    private:
+
+        static MUTEX si_mtx;
     };
 
 }

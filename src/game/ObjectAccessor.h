@@ -89,7 +89,7 @@ class HashMapHolder
         static MapType  m_objectMap;
 };
 
-class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLevelLockable<ObjectAccessor, ACE_Thread_Mutex> >
+class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, MaNGOS::ClassLevelLockable<ObjectAccessor, std::mutex> >
 {
     friend class MaNGOS::OperatorNew<ObjectAccessor>;
 

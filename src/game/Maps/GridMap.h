@@ -278,7 +278,7 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
 };
 
 // class for managing TerrainData object and all sort of geometry querying operations
-class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> >
+class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, MaNGOS::ClassLevelLockable<TerrainManager, std::mutex> >
 {
         typedef UNORDERED_MAP<uint32,  TerrainInfo*> TerrainDataMap;
         friend class MaNGOS::OperatorNew<TerrainManager>;
@@ -319,7 +319,7 @@ class MANGOS_DLL_DECL TerrainManager : public MaNGOS::Singleton<TerrainManager, 
         TerrainManager(const TerrainManager&);
         TerrainManager& operator=(const TerrainManager&);
 
-        typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex>::Lock Guard;
+        typedef MaNGOS::ClassLevelLockable<TerrainManager, std::mutex>::Lock Guard;
         TerrainDataMap i_TerrainMap;
 };
 

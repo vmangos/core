@@ -33,9 +33,9 @@
 #include "Map.h"
 #include "ThreadPool.h"
 
-typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
+typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
-INSTANTIATE_CLASS_MUTEX(MapManager, ACE_Recursive_Thread_Mutex);
+INSTANTIATE_CLASS_MUTEX(MapManager, std::recursive_mutex);
 
 MapManager::MapManager()
     : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
