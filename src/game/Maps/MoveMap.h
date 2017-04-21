@@ -30,6 +30,7 @@
 #include "Detour/Include/DetourNavMeshQuery.h"
 
 #include <thread>
+#include <mutex>
 
 //  memory management
 inline void* dtCustomAlloc(int size, dtAllocHint /*hint*/)
@@ -67,7 +68,7 @@ namespace MMAP
         NavMeshQuerySet navMeshQueries;     // threadId to query
         ACE_RW_Mutex navMeshQueries_lock;
         MMapTileSet mmapLoadedTiles;        // maps [map grid coords] to [dtTile]
-        ACE_Thread_Mutex tilesLoading_lock;
+        std::mutex tilesLoading_lock;
     };
 
     typedef UNORDERED_MAP<uint32, MMapData*> MMapDataSet;
@@ -102,7 +103,7 @@ namespace MMAP
             ACE_RW_Mutex loadedMMaps_lock;
             MMapDataSet loadedModels;
             uint32 loadedTiles;
-            ACE_Thread_Mutex lockForModels;
+            std::mutex lockForModels;
     };
 
     // static class

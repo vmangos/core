@@ -75,7 +75,7 @@ class RASocket: protected RAHandler
         char inputBuffer[RA_BUFF_SIZE];
         uint32 inputBufferLen;
 
-        ACE_Thread_Mutex outBufferLock;
+        std::mutex outBufferLock;
         char outputBuffer[RA_BUFF_SIZE];
         uint32 outputBufferLen;
 

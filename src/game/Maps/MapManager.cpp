@@ -757,9 +757,8 @@ void MapManager::ScheduleInstanceSwitch(Player* player, uint16 newInstance)
 {
     uint8 mapId = player->GetMap()->GetId();
     ASSERT(mapId < LAST_CONTINENT_ID);
-    m_scheduledInstanceSwitches_lock[mapId].acquire();
+    std::unique_lock<std::mutex> lock(m_scheduledInstanceSwitches_lock[mapId]);
     m_scheduledInstanceSwitches[mapId][player] = newInstance;
-    m_scheduledInstanceSwitches_lock[mapId].release();
 }
 
 void MapManager::SwitchPlayersInstances()

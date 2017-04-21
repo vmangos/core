@@ -54,8 +54,8 @@ class MANGOS_DLL_SPEC Config
         std::string mFilename;
         ACE_Configuration_Heap *mConf;
 
-        typedef ACE_Thread_Mutex LockType;
-        typedef ACE_Guard<LockType> GuardType;
+        using LockType = std::mutex;
+        using GuardType = std::unique_lock<LockType>;
 
         std::string _filename;
         LockType m_configLock;

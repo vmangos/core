@@ -271,8 +271,8 @@ class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
         // global garbage collection timer
         ShortIntervalTimer i_timer;
 
-        typedef ACE_Thread_Mutex LOCK_TYPE;
-        typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
+        using LOCK_TYPE = std::mutex ;
+        using LOCK_GUARD = std::unique_lock<LOCK_TYPE>;
         LOCK_TYPE m_mutex;
         LOCK_TYPE m_refMutex;
 };

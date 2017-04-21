@@ -80,7 +80,7 @@ class OfflineChatSocket: protected OfflineChatHandler
         char inputBuffer[OFFCHAT_BUFF_SIZE];
         uint32 inputBufferLen;
 
-        ACE_Thread_Mutex outBufferLock;
+        std::mutex outBufferLock;
         char outputBuffer[OFFCHAT_BUFF_SIZE];
         uint32 outputBufferLen;
 

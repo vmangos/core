@@ -40,19 +40,19 @@ namespace MaNGOS
             GeneralLock(MUTEX &m)
                 : i_mutex(m)
             {
-                i_mutex.acquire();
             }
 
             ~GeneralLock()
             {
-                i_mutex.release();
             }
 
+            GeneralLock(const GeneralLock &) = delete;
+            GeneralLock& operator=(const GeneralLock &) = delete;
         private:
 
-            GeneralLock(const GeneralLock &);
-            GeneralLock& operator=(const GeneralLock &);
             MUTEX &i_mutex;
+            std::unique_lock<MUTEX> m_lock{i_mutex};
+
     };
 
     template<class T>

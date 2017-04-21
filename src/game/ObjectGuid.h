@@ -315,8 +315,8 @@ public:
         ObjectGuidGenerator<high>::GenerateRange(first, last);
     }
 protected:
-    typedef ACE_Thread_Mutex LockType;
-    typedef MaNGOS::GeneralLock<LockType > Guard;
+    using LockType = std::mutex;
+    using Guard = MaNGOS::GeneralLock<LockType>;
     LockType lock;
 };
 

@@ -319,8 +319,8 @@ class MANGOS_DLL_SPEC Database
         bool m_bAllowAsyncTransactions;                      ///< flag which specifies if async transactions are enabled
 
         //PREPARED STATEMENT REGISTRY
-        typedef ACE_Thread_Mutex LOCK_TYPE;
-        typedef ACE_Guard<LOCK_TYPE> LOCK_GUARD;
+        using LOCK_TYPE = std::mutex;
+        using LOCK_GUARD = std::unique_lock<LOCK_TYPE> ;
 
         mutable LOCK_TYPE m_stmtGuard;
 
