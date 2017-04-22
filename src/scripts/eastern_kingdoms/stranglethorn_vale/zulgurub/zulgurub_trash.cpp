@@ -455,12 +455,12 @@ void AddSC_zg_trash()
     newscript->Name = "npc_gurubashi_berserker";
     newscript->GetAI = &GetAI_GurubashiBerserker;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_gurubashi_axethrower";
     newscript->GetAI = &GetAI_GurubashiAxeThrower;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_hakkari_doctor";
     newscript->GetAI = &GetAI_npc_hakkari_doctor;
@@ -470,12 +470,12 @@ void AddSC_zg_trash()
     newscript->Name = "npc_esprit_vaudou";
     newscript->GetAI = &GetAI_npc_esprit_vaudou;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_fils_hakkar";
     newscript->GetAI = &GetAI_npc_fils_hakkar;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "go_pile_dechets";
     newscript->GOGetAI = &GetAIgo_pile_dechets;

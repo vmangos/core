@@ -5584,12 +5584,12 @@ void AddSC_bg_alterac()
     newscript->Name = "npc_AlteracBowman";
     newscript->GetAI = &GetAI_npc_AlteracBowman;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_AlteracDardosh";
     newscript->GetAI = &GetAI_npc_AlteracDardosh;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_ram_wolf_tamed";
     newscript->GetAI = &GetAI_npc_ram_wolf_tamed;
@@ -5622,12 +5622,12 @@ void AddSC_bg_alterac()
     newscript->pGossipSelect = &GossipSelect_npc_AVBlood_collector;
     newscript->GetAI = &GetAI_npc_eventAV;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_ram_wolf_quest";
     newscript->pQuestRewardedNPC = &QuestComplete_AV_npc_ram_wolf;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_ram_wolf_master";
     newscript->pGossipHello = &GossipHello_AV_npc_ram_wolf;

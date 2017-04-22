@@ -4054,12 +4054,12 @@ void AddSC_silithus()
     pNewScript->Name = "mob_HiveRegal_HunterKiller";
     pNewScript->GetAI = &GetAI_mob_HiveRegal_HunterKiller;
     pNewScript->RegisterSelf();
-
+    /*
     pNewScript = new Script;
     pNewScript->Name = "npc_Merok";
     pNewScript->GetAI = &GetAI_npc_Merok;
     pNewScript->RegisterSelf();
-
+    */
     pNewScript = new Script;
     pNewScript->Name = "npc_Shai";
     pNewScript->GetAI = &GetAI_npc_Shai;

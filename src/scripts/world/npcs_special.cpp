@@ -2718,12 +2718,12 @@ void AddSC_npcs_special()
     newscript->Name = "npc_pats_firework_guy";
     newscript->GetAI = &GetAI_npc_pats_firework_guy;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_firestarter_regular";
     newscript->GetAI = &GetAI_npc_firestarter_regular;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_firestarter_show";
     newscript->GetAI = &GetAI_npc_firestarter_show;

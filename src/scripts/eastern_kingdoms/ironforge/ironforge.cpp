@@ -241,12 +241,12 @@ void AddSC_ironforge()
     newscript->pGossipHello =  &GossipHello_npc_royal_historian_archesonus;
     newscript->pGossipSelect = &GossipSelect_npc_royal_historian_archesonus;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_magni_bronzebeard";
     newscript->pGossipHello   = &GossipHello_npc_magni_bronzebeard;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_tinker_mekkatorque";
     newscript->pGossipHello   = &GossipHello_npc_tinker_mekkatorque;
