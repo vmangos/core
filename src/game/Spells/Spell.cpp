@@ -4548,6 +4548,10 @@ SpellCastResult Spell::CheckCast(bool strict)
     }
     // Fin Nostalrius
 
+    // Prevent casting while sitting unless the spell allows it
+    if (!m_IsTriggeredSpell && m_caster->IsSitState() && !(m_spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_SITTING))
+        return SPELL_FAILED_NOT_STANDING;
+    
     /*  Check cooldowns to prevent cheating (ignore passive spells, that client side visual only)
 
         If the cast is an item cast, check the spell proto on the item for the category
