@@ -615,6 +615,29 @@ void CliRunnable::operator()()
         if (World::IsStopped())
             break;
         #endif
+
+        //select exit as soon as new data can be read or timeout is reached
+        //this is needed becouse `fgets` and `select` are not interrupted by fclose
+        int retval;
+        do
+        {
+            fd_set rfds;
+            struct timeval tv;
+            tv.tv_sec = 1;
+            tv.tv_usec = 0;
+
+            FD_ZERO(&rfds);
+            FD_SET(0, &rfds);
+
+            retval = select(1, &rfds, nullptr, nullptr, &tv);
+        } while (!retval);
+
+        if (retval == -1)
+        {
+            World::StopNow(SHUTDOWN_EXIT_CODE);
+            break;
+        }
+
         char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
         if (command_str != NULL)
         {
@@ -640,10 +663,6 @@ void CliRunnable::operator()()
             }
 
             sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, NULL, command.c_str(), &utf8print, &commandFinished));
-        }
-        else if (feof(stdin))
-        {
-            World::StopNow(SHUTDOWN_EXIT_CODE);
         }
     }
 
