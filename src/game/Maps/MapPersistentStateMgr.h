@@ -206,8 +206,8 @@ class DungeonPersistentState : public MapPersistentState
         void SaveToDB();
         /* When the instance is being reset (permanently deleted) */
         void DeleteFromDB();
-        /* Delete respawn data at dungeon reset */
-        void DeleteRespawnTimes();
+        /* Delete respawn and data at dungeon reset */
+        void DeleteRespawnTimesAndData();
 
     protected:
         bool CanBeUnload() const;                           // overwrite MapPersistentState::CanBeUnload
