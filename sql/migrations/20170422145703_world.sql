@@ -24,3 +24,27 @@ SET `maxhealth` = 1000616, `minhealth` = 1000616, `armor` = 7000, `mindmg` = 200
 `resistance1` = 0, `resistance2` = 250, `resistance3` = 250,`resistance4` = 250, `resistance5` = 300,`resistance6` = 250
 WHERE `entry` = 15625;
 
+-- Delete Narain's Scrying Goggles from bosses
+DELETE FROM `creature_loot_template` WHERE `item` = 20951;
+
+-- Add Narain's Scrying Goggles with 0.6635% chance to MC Trash
+-- Gives about 78% chance to drop from 1 run, 95% from 2
+INSERT INTO `creature_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES
+(11658, 20951,  -0.6635, 0,  1,  1,  0),
+(11659, 20951,  -0.6635, 0,  1,  1,  0),
+(11661, 20951,  -0.6635, 0,  1,  1,  0),
+(11662, 20951,  -0.6635, 0,  1,  1,  0),
+(11665, 20951,  -0.6635, 0,  1,  1,  0),
+(11666, 20951,  -0.6635, 0,  1,  1,  0),
+(11667, 20951,  -0.6635, 0,  1,  1,  0),
+(11668, 20951,  -0.6635, 0,  1,  1,  0),
+(11669, 20951,  -0.6635, 0,  1,  1,  0),
+(11671, 20951,  -0.6635, 0,  1,  1,  0),
+(11672, 20951,  -0.6635, 0,  1,  1,  0),
+(11673, 20951,  -0.6635, 0,  1,  1,  0),
+(12076, 20951,  -0.6635, 0,  1,  1,  0),
+(12099, 20951,  -0.6635, 0,  1,  1,  0),
+(12100, 20951,  -0.6635, 0,  1,  1,  0),
+(12101, 20951,  -0.6635, 0,  1,  1,  0),
+(12119, 20951,  -0.6635, 0,  1,  1,  0);
+
