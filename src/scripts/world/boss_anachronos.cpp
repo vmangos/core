@@ -20,12 +20,16 @@ EndScriptData */
 enum
 {
     NPC_ANACHRONOS          = 15192,
+    NPC_NARAIN              = 11811,
 
     // Anachronos's spells
     // -------------------
 
     SPELL_DIVINESHIELD      = 1020,
     SPELL_HOMESTONE         = 8690,
+
+    QUEST_WRATH_OF_NEPTULON = 8729,
+    LANG_NARAIN_LETTER      = 667,
 };
 
 // Anachronos script
@@ -95,6 +99,28 @@ struct boss_anachronosAI : public ScriptedAI
     }
 };
 
+bool QuestRewarded_boss_anachronos(Player* player, Creature* npc, Quest const* quest)
+{
+    if (quest->GetQuestId() != QUEST_WRATH_OF_NEPTULON)
+        return false;
+
+    if (npc->GetEntry() != NPC_ANACHRONOS)
+        return false;
+
+    if (!player)
+        return false;
+
+    std::string letterText = player->GetSession()->GetMangosString(LANG_NARAIN_LETTER);
+
+    // Send Narain's letter with 36 hour delay
+    MailDraft("", letterText.c_str())
+    // Attach 100g
+    .SetMoney(1000001)
+    .SendMailTo(player, MailSender(MAIL_CREATURE, (uint32)NPC_NARAIN), MAIL_CHECK_MASK_NONE, 1.5 * DAY, 30 * DAY);
+
+    return true;
+}
+
 CreatureAI* GetAI_boss_anachronos(Creature* pCreature)
 {
     return new boss_anachronosAI(pCreature);
@@ -107,5 +133,6 @@ void AddSC_boss_anachronos()
     newscript = new Script;
     newscript->Name = "boss_anachronos";
     newscript->GetAI = &GetAI_boss_anachronos;
+    newscript->pQuestRewardedNPC = &QuestRewarded_boss_anachronos;
     newscript->RegisterSelf();
 }

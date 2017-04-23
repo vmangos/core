@@ -1253,12 +1253,12 @@ void AddSC_stratholme()
     newscript->Name = "mobs_cristal_zuggurat";
     newscript->GetAI = &GetAI_mobs_cristal_zuggurat;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "mobs_rat_pestifere";
     newscript->GetAI = &GetAI_mobs_rat_pestifere;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_Aurius";
     newscript->GetAI = &GetAI_npc_aurius;

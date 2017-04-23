@@ -964,6 +964,12 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
             if (player_tap && !group_tap)
                 group_tap = player_tap->GetGroup();
         }
+        else if (creature->lootForCreator && creature->GetCreatorGuid()) 
+        {
+            Unit* creator = GetUnit(*this, creature->GetCreatorGuid());
+            if (creator->IsPlayer())
+                player_tap = (Player*)creator;
+        }
         else
             creature->SetLootRecipient(nullptr);
     }
@@ -1188,8 +1194,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     {
         Player *killed = ((Player*)pVictim);
         if (BattleGround *bg = killed->GetBattleGround())
-            if (player_tap)
-                bg->HandleKillPlayer(killed, player_tap);
+            bg->HandleKillPlayer(killed, player_tap);
     }
     else if (pVictim->GetTypeId() == TYPEID_UNIT)
     {
@@ -1541,15 +1546,20 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
     }
     
     bool immune = true;
+    bool feral = IsInFeralForm();
 
-    for (uint8 i = 0; i < m_weaponDamageCount[damageInfo->attackType]; i++)
+    // Only get one damage type for feral druids so they don't receive incorrect benefits
+    // from weapons with multiple types of damage
+    uint8 actualDamageCount = feral ? 1 : m_weaponDamageCount[damageInfo->attackType];
+    for (uint8 i = 0; i < actualDamageCount; i++)
     {
         SubDamageInfo *subDamage = &damageInfo->subDamage[i];
-
-        subDamage->damageSchoolMask = GetTypeId() == TYPEID_PLAYER
+    
+        // feral only allowed melee school
+        subDamage->damageSchoolMask = GetTypeId() == TYPEID_PLAYER && !feral
             ? GetSchoolMask(GetWeaponDamageSchool(damageInfo->attackType, i))
             : GetMeleeDamageSchoolMask();
-
+        
         if (damageInfo->target->IsImmuneToDamage(subDamage->damageSchoolMask))
         {
             subDamage->damage = 0;
@@ -2977,7 +2987,7 @@ int32 Unit::MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* s
 //   Parry
 // For spells
 //   Resist
-SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool CanReflect, Spell* spellPtr)
+SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool CanReflect, Spell* spellPtr)
 {
     // Return evade for units in evade mode
     if (pVictim->GetTypeId() == TYPEID_UNIT && ((Creature*)pVictim)->IsInEvadeMode())
@@ -2989,7 +2999,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, bool 
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if (IsPositiveSpell(spell->Id))
+    if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex))
         return SPELL_MISS_NONE;
 
     // Check for immune (use charges)
@@ -3965,6 +3975,7 @@ bool Unit::AddSpellAuraHolder(SpellAuraHolder *holder)
     holder->HandleSpellSpecificBoosts(true);
 
     // Check debuff limit
+    //DEBUG_LOG("AddSpellAuraHolder: Adding spell %d, debuff limit affected: %d", holder->GetId(), holder->IsAffectedByDebuffLimit());
     if (holder->IsAffectedByDebuffLimit())
     {
         uint32 negativeAuras = GetNegativeAurasCount();
@@ -4581,9 +4592,12 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && !IsAreaOfEffectSpell(AurSpellInfo) && caster)
-        if (caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL) && caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL)->m_spellInfo->Id == auraSpellId)
+    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && caster)
+    {
+        Spell *channeled = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+        if (channeled && channeled->m_spellInfo->Id == auraSpellId && channeled->m_targets.getUnitTarget() == this)
             caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    }
 }
 
 void Unit::RemoveSingleAuraFromSpellAuraHolder(SpellAuraHolder *holder, SpellEffectIndex index, AuraRemoveMode mode)
@@ -5043,7 +5057,8 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    if (pVictim && pVictim->isAlive() && procVictim)
+    // Don't proc victim auras if its a miss / resist
+    if (pVictim && pVictim->isAlive() && procVictim && !(PROC_EX_RESIST & procExtra) && !(PROC_EX_MISS & procExtra))
         pVictim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
 
     HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
@@ -5336,68 +5351,83 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
                 return *repRank;
     }
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+    // Interaction between pvp flagged units
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) &&
+        target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
     {
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+        if (selfPlayerOwner && targetPlayerOwner)
         {
-            if (selfPlayerOwner && targetPlayerOwner)
-            {
-                // always friendly to other unit controlled by player, or to the player himself
-                if (selfPlayerOwner == targetPlayerOwner)
-                    return REP_FRIENDLY;
+            // always friendly to other unit controlled by player, or to the player himself
+            if (selfPlayerOwner == targetPlayerOwner)
+                return REP_FRIENDLY;
 
-                // duel - always hostile to opponent
-                if (selfPlayerOwner->duel && selfPlayerOwner->duel->opponent == targetPlayerOwner && selfPlayerOwner->duel->startTime != 0 && !selfPlayerOwner->duel->finished)
-                    return REP_HOSTILE;
-
-                // same group - checks dependant only on our faction - skip FFA_PVP for example
-                if (selfPlayerOwner->IsInRaidWith(targetPlayerOwner))
-                    return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
-                // however client seems to allow mixed group parties, because in 13850 client it works like:
-                // return GetFactionReactionTo(getFactionTemplateEntry(), target);
-
-                // Sanctuary
-                if (selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY) && targetPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY))
-                    return REP_FRIENDLY;
-
-                // Nostalrius: Hackfix because UNIT_BYTE2_FLAG_FFA_PVP is not implemented yet.
-                if (selfPlayerOwner->IsFFAPvP() && targetPlayerOwner->IsFFAPvP())
-                    return REP_HOSTILE;
-            }
-
-            // check FFA_PVP - not implemented that way on MaNGOS :/
-            /*
-            if (GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP
-                && target->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP)
+            // duel - always hostile to opponent
+            if (selfPlayerOwner->duel && selfPlayerOwner->duel->opponent == targetPlayerOwner && selfPlayerOwner->duel->startTime != 0 && !selfPlayerOwner->duel->finished)
                 return REP_HOSTILE;
-            */
 
-            if (selfPlayerOwner)
+            // same group - checks dependant only on our faction - skip FFA_PVP for example
+            if (selfPlayerOwner->IsInRaidWith(targetPlayerOwner))
+                return REP_FRIENDLY; // return true to allow config option AllowTwoSide.Interaction.Group to work
+            // however client seems to allow mixed group parties, because in 13850 client it works like:
+            // return GetFactionReactionTo(getFactionTemplateEntry(), target);
+
+            // Sanctuary
+            if (selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY) && targetPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_SANCTUARY))
+                return REP_FRIENDLY;
+
+            // Nostalrius: Hackfix because UNIT_BYTE2_FLAG_FFA_PVP is not implemented yet.
+            if (selfPlayerOwner->IsFFAPvP() && targetPlayerOwner->IsFFAPvP())
+                return REP_HOSTILE;
+        }
+
+        // check FFA_PVP - not implemented that way on MaNGOS :/
+        /*
+        if (GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP
+            && target->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP)
+            return REP_HOSTILE;
+        */
+
+        if (selfPlayerOwner)
+        {
+            if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
             {
-                if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
+                if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
+                    return *repRank;
+                if (FactionEntry const* targetFactionEntry = sFactionStore.LookupEntry(targetFactionTemplateEntry->faction))
                 {
-                    if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
-                        return *repRank;
-                    if (FactionEntry const* targetFactionEntry = sFactionStore.LookupEntry(targetFactionTemplateEntry->faction))
+                    if (targetFactionEntry->CanHaveReputation())
                     {
-                        if (targetFactionEntry->CanHaveReputation())
-                        {
-                            // check contested flags
-                            if (targetFactionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD
-                                    && selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
-                                return REP_HOSTILE;
+                        // check contested flags
+                        if (targetFactionTemplateEntry->factionFlags & FACTION_TEMPLATE_FLAG_CONTESTED_GUARD
+                                && selfPlayerOwner->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
+                            return REP_HOSTILE;
 
-                            // if faction has reputation, hostile state depends only from AtWar state
-                            if (FactionState const* factionState = selfPlayerOwner->GetReputationMgr().GetState(targetFactionEntry))
-                                if (factionState->Flags & FACTION_FLAG_AT_WAR)
-                                    return REP_HOSTILE;
-                            return REP_FRIENDLY;
-                        }
+                        // if faction has reputation, hostile state depends only from AtWar state
+                        if (FactionState const* factionState = selfPlayerOwner->GetReputationMgr().GetState(targetFactionEntry))
+                            if (factionState->Flags & FACTION_FLAG_AT_WAR)
+                                return REP_HOSTILE;
+                        return REP_FRIENDLY;
                     }
                 }
             }
         }
     }
+
+    // Player reaction against Neutral faction Creature
+    if (selfPlayerOwner && !targetPlayerOwner)
+    {
+        if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
+        {
+            if (FactionEntry const* targetFactionEntry = sFactionStore.LookupEntry(targetFactionTemplateEntry->faction))
+            {
+                if(targetFactionEntry->CanHaveReputation())
+                {
+                    return selfPlayerOwner->GetReputationMgr().GetRank(targetFactionEntry);
+                }
+            }
+        }
+    }
+
     // do checks dependant only on our faction
     return GetFactionReactionTo(getFactionTemplateEntry(), target);
 }
@@ -5542,7 +5572,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
         addUnitState(UNIT_STAT_MELEE_ATTACKING);
 
     m_attacking = victim;
-    m_attacking->_addAttacker(this);
+    m_attacking->_addAttacker(this);        
 
     if (GetTypeId() == TYPEID_UNIT) // && !((Creature*)this)->GetLinkGroup())
     {
@@ -5575,6 +5605,12 @@ void Unit::AttackedBy(Unit* attacker)
     // trigger AI reaction
     if (((Creature*)this)->AI())
         ((Creature*)this)->AI()->AttackedBy(attacker);
+
+    // trigger owner AI reaction
+    if(Unit* owner = GetCharmerOrOwner())
+        if (owner->IsCreature() && ((Creature*)owner)->AI()){
+            ((Creature*)owner)->AI()->AttackedBy(attacker);
+    }
 }
 
 bool Unit::AttackStop(bool targetSwitch /*=false*/)
@@ -6054,7 +6090,7 @@ void Unit::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers 
     pVictim->ModifyPower(powertype, Damage);
 }
 
-int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, Spell* spell)
+int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, Unit *pCaster, Spell* spell)
 {
     // Distribute Damage over multiple effects, reduce by AoE
     float coeff = 0.0f;
@@ -6086,7 +6122,7 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
         float LvlPenalty = CalculateLevelPenalty(spellProto);
 
         // Calculate custom coefficient
-        coeff = CalculateCustomCoefficient(spellProto, this, damagetype, coeff, spell);
+        coeff = CalculateCustomCoefficient(spellProto, pCaster, damagetype, coeff, spell);
 
         // Spellmod SpellDamage
         if (Player* modOwner = GetSpellModOwner())
@@ -6137,6 +6173,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
 
     float DoneTotalMod = 1.0f;
     int32 DoneTotal = 0;
+    Item*  pWeapon = GetTypeId() == TYPEID_PLAYER ? ((Player*)this)->GetWeaponForAttack(BASE_ATTACK, true, false) : NULL;
 
     // Creature damage
     if (GetTypeId() == TYPEID_UNIT && !((Creature*)this)->IsPet())
@@ -6150,6 +6187,13 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
                 // -1 == any item class (not wand then)
                 (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
             // 0 == any inventory type (not wand then)
+            DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+
+        // Paladin seals benefit from weapon modifiers
+        else if ((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask() &&
+            spellProto->SpellFamilyName == SPELLFAMILY_PALADIN && spellProto->IsFitToFamilyMask<CF_PALADIN_SEALS>() &&
+            (((*i)->GetSpellProto()->EquippedItemClass == -1) ||
+            (pWeapon && pWeapon->IsFitToSpellRequirements((*i)->GetSpellProto()))))
             DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
     }
 
@@ -6206,7 +6250,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
         DoneAdvertisedBenefit += ((Pet*)this)->GetBonusDamage();
 
     // apply ap bonus and benefit affected by spell power implicit coeffs and spell level penalties
-    DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneAdvertisedBenefit, 0, damagetype, true, spell);
+    DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneAdvertisedBenefit, 0, damagetype, true, this, spell);
 
     float tmpDamage = (int32(pdamage) + DoneTotal * int32(stack)) * DoneTotalMod;
     // apply spellmod to Done damage (flat and pct)
@@ -6239,7 +6283,7 @@ uint32 Unit::SpellDamageBonusTaken(Unit *pCaster, SpellEntry const *spellProto, 
     int32 TakenAdvertisedBenefit = SpellBaseDamageBonusTaken(GetSpellSchoolMask(spellProto));
 
     // apply benefit affected by spell power implicit coeffs and spell level penalties
-    TakenTotal = SpellBonusWithCoeffs(spellProto, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, spell);
+    TakenTotal = SpellBonusWithCoeffs(spellProto, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, pCaster, spell);
 
     float tmpDamage = (int32(pdamage) + TakenTotal * int32(stack)) * TakenTotalMod;
 
@@ -6509,7 +6553,7 @@ uint32 Unit::SpellHealingBonusDone(Unit *pVictim, SpellEntry const *spellProto, 
     int32 DoneAdvertisedBenefit  = SpellBaseHealingBonusDone(GetSpellSchoolMask(spellProto));
 
     // apply ap bonus and benefit affected by spell power implicit coeffs and spell level penalties
-    DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneAdvertisedBenefit, 0, damagetype, true, spell);
+    DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneAdvertisedBenefit, 0, damagetype, true, this, spell);
 
     // use float as more appropriate for negative values and percent applying
     float heal = (healamount + DoneTotal * int32(stack)) * DoneTotalMod;
@@ -6573,7 +6617,7 @@ uint32 Unit::SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto,
         }
     }
     // apply benefit affected by spell power implicit coeffs and spell level penalties
-    TakenTotal = SpellBonusWithCoeffs(spellProto, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, spell);
+    TakenTotal = SpellBonusWithCoeffs(spellProto, TakenTotal, TakenAdvertisedBenefit, 0, damagetype, false, pCaster, spell);
 
     // Taken mods
     // Healing Wave cast
@@ -6834,7 +6878,7 @@ uint32 Unit::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAttackTyp
     if (!isWeaponDamageBasedSpell)
     {
         // apply ap bonus and benefit affected by spell power implicit coeffs and spell level penalties
-        DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneFlat, APbonus, damagetype, true, spell);
+        DoneTotal = SpellBonusWithCoeffs(spellProto, DoneTotal, DoneFlat, APbonus, damagetype, true, this, spell);
     }
     // weapon damage based spells
     else if (APbonus || DoneFlat)
@@ -6893,9 +6937,10 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* pCaster, uint32 pdamage, WeaponAttackTy
     if (pdamage == 0)
         return pdamage;
 
-    // Exception for Seal of Command
+    // Exception for Seal of Command and Seal of Righteousness
     // already with coeff!
-    if (spellProto && spellProto->Id == 20424)
+    if (spellProto && (spellProto->Id == 20424 ||
+        (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN && spellProto->DmgClass == SPELL_DAMAGE_CLASS_MELEE))) // SoR is the only pala spell with melee dmg class
         return pdamage;
 
     // differentiate for weapon damage based spells
@@ -6935,7 +6980,7 @@ uint32 Unit::MeleeDamageBonusTaken(Unit* pCaster, uint32 pdamage, WeaponAttackTy
     if (!isWeaponDamageBasedSpell)
     {
         // apply benefit affected by spell power implicit coeffs and spell level penalties
-        TakenFlat = SpellBonusWithCoeffs(spellProto, 0, TakenFlat, 0, damagetype, false, spell);
+        TakenFlat = SpellBonusWithCoeffs(spellProto, 0, TakenFlat, 0, damagetype, false, pCaster, spell);
     }
 
     if (!flat)
@@ -7497,6 +7542,10 @@ bool Unit::canDetectInvisibilityOf(Unit const* u) const
     if (!u->m_invisibilityMask && m_detectInvisibilityMask)
         return true;
 
+    if (const Creature* worldBoss = u->ToCreature())
+        if (worldBoss->IsWorldBoss())
+            return true;
+
     if (uint32 mask = (m_detectInvisibilityMask & u->m_invisibilityMask))
     {
         for (int32 i = 0; i < 32; ++i)
@@ -7825,7 +7874,6 @@ void Unit::SetDeathState(DeathState s)
     if (s == JUST_DIED)
     {
         RemoveAllAurasOnDeath();
-        RemoveGuardians();
         UnsummonAllTotems();
 
         i_motionMaster.Clear(false, true);
@@ -7836,12 +7884,8 @@ void Unit::SetDeathState(DeathState s)
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();
-        // Desinvocation du pet a la mort
-        if (IsCreature())
-            if (Pet* pet = GetPet())
-                pet->Unsummon(PET_SAVE_REAGENTS, this);
     }
-    else if (s == JUST_ALIVED)
+    else if (s == JUST_ALIVED || s == ALIVE)
     {
         RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SKINNABLE);  // clear skinnable for creature and player (at battleground)
     }

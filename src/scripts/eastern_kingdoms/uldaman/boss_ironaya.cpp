@@ -22,20 +22,20 @@ SDCategory: Uldaman
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "uldaman.h"
 
-#define SAY_AGGRO                   -1070000
-
-#define SPELL_ARCINGSMASH           8374
-#define SPELL_KNOCKAWAY             10101
-#define SPELL_WSTOMP                11876
+#define SAY_AGGRO -1070000
 
 struct boss_ironayaAI : public ScriptedAI
 {
     boss_ironayaAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        instance = (ScriptedInstance*)pCreature->GetInstanceData();
         hasMoved = false;
         Reset();
     }
+
+    ScriptedInstance* instance;
 
     uint32 Arcing_Timer;
     bool hasCastedWstomp;
@@ -56,35 +56,40 @@ struct boss_ironayaAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-
-        if (m_creature->getFaction() == 415 && !hasMoved)
+        if (m_creature->getFaction() == FACTION_AWAKE && !hasMoved)
         {
-            Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-            for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-                if (i->getSource() && i->getSource()->isAlive())
-                    m_creature->AddThreat(i->getSource(), 1.0f);
+            if (Unit* target = Unit::GetUnit(*me, instance->GetData64(0)))
+            {
+                AttackStart(target);
+            }
             hasMoved = true;
         }
 
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        {
             return;
+        }
 
         //If we are <50% hp do knockaway ONCE
         if (!hasCastedKnockaway && m_creature->GetHealthPercent() < 50.0f)
         {
-            m_creature->CastSpell(m_creature->getVictim(), SPELL_KNOCKAWAY, true);
+            m_creature->CastSpell(m_creature->getVictim(), SPELL_KNOCKAWAY, false);
 
             // current aggro target is knocked away pick new target
             Unit* Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
 
             if (!Target || Target == m_creature->getVictim())
+            {
                 Target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
+            }
 
             if (Target)
+            {
                 m_creature->TauntApply(Target);
+            }
 
-            //Shouldn't cast this agian
+            //Shouldn't cast this again
             hasCastedKnockaway = true;
         }
 

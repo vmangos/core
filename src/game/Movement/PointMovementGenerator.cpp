@@ -195,6 +195,7 @@ void ChargeMovementGenerator<T>::Initialize(T &unit)
     init.Move(&path);
     init.SetVelocity(_speed);
     init.SetWalk(false);
+    init.SetFacingGUID(unit.GetTargetGuid());
     init.Launch();
 }
 
@@ -270,6 +271,7 @@ void ChargeMovementGenerator<T>::ComputePath(T& attacker, Unit& victim)
                 {
                     victim.UpdateAllowedPositionZ(victimPos.x, victimPos.y, victimPos.z);
                     path.calculate(victimPos.x, victimPos.y, victimPos.z, false);
+                    path.UpdateForMelee(&victim, attacker.GetMeleeReach());
                 }
             }
             else

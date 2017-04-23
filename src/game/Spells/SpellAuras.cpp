@@ -1592,9 +1592,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 {
                     if (caster->GetTypeId() != TYPEID_UNIT)
                         return;
-
-                    // see dummy effect of spell 10254 for removal of flags etc
-                    caster->CastSpell(caster, 10254, true);
+                    caster->clearUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT);
+                    caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                 }
                 return;
             }
@@ -1947,9 +1946,6 @@ void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)
 
 void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 {
-    if (!Real)
-        return;
-
     uint32 modelid = 0;
     float mod_x = 0.0f;
     Powers PowerType = POWER_MANA;
@@ -2036,7 +2032,51 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             break;
     }
 
-    if (modelid > 0)
+    // remove polymorph before changing display id to keep new display id
+    if (Real)
+    {
+        switch (form)
+        {
+            case FORM_CAT:
+            case FORM_TREE:
+            case FORM_TRAVEL:
+            case FORM_AQUA:
+            case FORM_BEAR:
+            case FORM_DIREBEAR:
+            case FORM_MOONKIN:
+            {
+                // remove movement affects
+                target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
+                Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+                for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
+                {
+                    SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+
+                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
+
+                    // If spell that caused this aura has Croud Control or Daze effect
+                    if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
+                            // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
+                            (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
+                            (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
+                    {
+                        ++iter;
+                        continue;
+                    }
+
+                    // All OK, remove aura now
+                    target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
+                    iter = slowingAuras.begin();
+                }
+
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
+    if (modelid > 0 && !target->getTransForm())
     {
         // fix Tauren shapeshift scaling
         if (target->getRace() == RACE_TAUREN)
@@ -2046,61 +2086,22 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
             else
                 mod_x = -20.0f; // 0.8 * 1.25    = 1.0
         }
+        
+        if (apply)
+            target->SetDisplayId(modelid);
+        else
+            target->SetDisplayId(target->GetNativeDisplayId());
+        target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
     }
-
-    // remove polymorph before changing display id to keep new display id
-    switch (form)
-    {
-        case FORM_CAT:
-        case FORM_TREE:
-        case FORM_TRAVEL:
-        case FORM_AQUA:
-        case FORM_BEAR:
-        case FORM_DIREBEAR:
-        case FORM_MOONKIN:
-        {
-            // remove movement affects
-            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
-            Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
-            for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
-            {
-                SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
-
-                uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
-
-                // If spell that caused this aura has Croud Control or Daze effect
-                if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
-                        // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
-                        (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
-                         (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
-                {
-                    ++iter;
-                    continue;
-                }
-
-                // All OK, remove aura now
-                target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
-                iter = slowingAuras.begin();
-            }
-
-            // and polymorphic affects
-            if (target->IsPolymorphed())
-                target->RemoveAurasDueToSpell(target->getTransForm());
-
-            break;
-        }
-        default:
-            break;
-    }
-
+    
+    if (!Real)
+        return;
+    
     if (apply)
     {
         // remove other shapeshift before applying a new one
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT, GetHolder());
 
-        if (modelid > 0) 
-            target->SetDisplayId(modelid);
-     
         if (PowerType != POWER_MANA)
         {
             // reset power to default values only at power change
@@ -2187,9 +2188,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     }
     else
     {
-        if (modelid > 0)
-            target->SetDisplayId(target->GetNativeDisplayId());
-
         if (target->getClass() == CLASS_DRUID)
         {
             target->setPowerType(POWER_MANA);
@@ -2202,7 +2200,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
     // adding/removing linked auras
     // add/remove the shapeshift aura's boosts
     HandleShapeshiftBoosts(apply);
-    target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
     target->UpdateModelData();
 
     if (target->GetTypeId() == TYPEID_PLAYER)
@@ -2214,159 +2211,192 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
     Unit *target = GetTarget();
     if (apply)
     {
+        uint32 model_id;
+        
         // Discombobulate removes mount auras.
-        if (GetId() == 4060)
+        if (GetId() == 4060 && Real)
             target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
-        if (GetId() == 23603)   // Ustaag <Nostalrius> : Nefarian Class Call Mage
-        {
-            int rand = 0;
-            rand = urand(0, 2);
-            switch (rand)
-            {
-                case 0:
-                    target->SetDisplayId(1060);
-                    break;
-                case 1:
-                    target->SetDisplayId(4473);
-                    break;
-                case 2:
-                    target->SetDisplayId(7898);
-                    break;
-            }
-        }
-        else if (m_modifier.m_miscvalue == 0)         // special case (spell specific functionality)
-        {
-            switch (GetId())
-            {
-                case 16739:                                 // Orb of Deception
-                {
-                    uint32 orb_model = target->GetNativeDisplayId();
-                    switch (orb_model)
-                    {
-                        // Troll Female
-                        case 1479:
-                            target->SetDisplayId(10134);
-                            break;
-                        // Troll Male
-                        case 1478:
-                            target->SetDisplayId(10135);
-                            break;
-                        // Tauren Male
-                        case 59:
-                            target->SetDisplayId(10136);
-                            break;
-                        // Human Male
-                        case 49:
-                            target->SetDisplayId(10137);
-                            break;
-                        // Human Female
-                        case 50:
-                            target->SetDisplayId(10138);
-                            break;
-                        // Orc Male
-                        case 51:
-                            target->SetDisplayId(10139);
-                            break;
-                        // Orc Female
-                        case 52:
-                            target->SetDisplayId(10140);
-                            break;
-                        // Dwarf Male
-                        case 53:
-                            target->SetDisplayId(10141);
-                            break;
-                        // Dwarf Female
-                        case 54:
-                            target->SetDisplayId(10142);
-                            break;
-                        // NightElf Male
-                        case 55:
-                            target->SetDisplayId(10143);
-                            break;
-                        // NightElf Female
-                        case 56:
-                            target->SetDisplayId(10144);
-                            break;
-                        // Undead Female
-                        case 58:
-                            target->SetDisplayId(10145);
-                            break;
-                        // Undead Male
-                        case 57:
-                            target->SetDisplayId(10146);
-                            break;
-                        // Tauren Female
-                        case 60:
-                            target->SetDisplayId(10147);
-                            break;
-                        // Gnome Male
-                        case 1563:
-                            target->SetDisplayId(10148);
-                            break;
-                        // Gnome Female
-                        case 1564:
-                            target->SetDisplayId(10149);
-                            break;
-                        default:
-                            break;
-                    }
-                    break;
-                }
-                default:
-                    sLog.outError("Aura::HandleAuraTransform, spell %u does not have creature entry defined, need custom defined model.", GetId());
-                    break;
-            }
-        }
-        else
-        {
-            uint32 model_id;
-
-            CreatureInfo const * ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
-            if (!ci)
-            {
-                model_id = 16358;                           // pig pink ^_^
-                sLog.outError("Auras: unknown creature id = %d (only need its modelid) Form Spell Aura Transform in Spell ID = %d", m_modifier.m_miscvalue, GetId());
-            }
-            else
-                model_id = Creature::ChooseDisplayId(ci);   // Will use the default model here
-
-            target->SetDisplayId(model_id);
-
-            // creature case, need to update equipment
-            if (ci && target->GetTypeId() == TYPEID_UNIT)
-                ((Creature*)target)->LoadEquipment(ci->equipmentId, true);
-        }
-
+        
         // update active transform spell only not set or not overwriting negative by positive case
         if (!target->getTransForm() || !IsPositiveSpell(GetId()) || IsPositiveSpell(target->getTransForm()))
+        {
+            if (GetId() == 23603)   // Ustaag <Nostalrius> : Nefarian Class Call Mage
+            {
+                int rand = 0;
+                rand = urand(0, 2);
+                switch (rand)
+                {
+                    case 0:
+                        model_id = 1060;
+                        break;
+                    case 1:
+                        model_id = 4473;
+                        break;
+                    case 2:
+                        model_id = 7898;
+                        break;
+                }
+            }
+            else if (m_modifier.m_miscvalue == 0)         // special case (spell specific functionality)
+            {
+                switch (GetId())
+                {
+                    case 16739:                                 // Orb of Deception
+                    {
+                        uint32 orb_model = target->GetNativeDisplayId();
+                        switch (orb_model)
+                        {
+                            // Troll Female
+                            case 1479:
+                                model_id = 10134;
+                                break;
+                            // Troll Male
+                            case 1478:
+                                model_id = 10135;
+                                break;
+                            // Tauren Male
+                            case 59:
+                                model_id = 10136;
+                                break;
+                            // Human Male
+                            case 49:
+                                model_id = 10137;
+                                break;
+                            // Human Female
+                            case 50:
+                                model_id = 10138;
+                                break;
+                            // Orc Male
+                            case 51:
+                                model_id = 10139;
+                                break;
+                            // Orc Female
+                            case 52:
+                                model_id = 10140;
+                                break;
+                            // Dwarf Male
+                            case 53:
+                                model_id = 10141;
+                                break;
+                            // Dwarf Female
+                            case 54:
+                                model_id = 10142;
+                                break;
+                            // NightElf Male
+                            case 55:
+                                model_id = 10143;
+                                break;
+                            // NightElf Female
+                            case 56:
+                                model_id = 10144;
+                                break;
+                            // Undead Female
+                            case 58:
+                                model_id = 10145;
+                                break;
+                            // Undead Male
+                            case 57:
+                                model_id = 10146;
+                                break;
+                            // Tauren Female
+                            case 60:
+                                model_id = 10147;
+                                break;
+                            // Gnome Male
+                            case 1563:
+                                model_id = 10148;
+                                break;
+                            // Gnome Female
+                            case 1564:
+                                model_id = 10149;
+                                break;
+                            default:
+                                break;
+                        }
+                        break;
+                    }
+                    default:
+                        sLog.outError("Aura::HandleAuraTransform, spell %u does not have creature entry defined, need custom defined model.", GetId());
+                        break;
+                }
+            }
+            else
+            {
+                CreatureInfo const * ci = ObjectMgr::GetCreatureTemplate(m_modifier.m_miscvalue);
+                if (!ci)
+                {
+                    model_id = 16358;                           // pig pink ^_^
+                    sLog.outError("Auras: unknown creature id = %d (only need its modelid) Form Spell Aura Transform in Spell ID = %d", m_modifier.m_miscvalue, GetId());
+                }
+                else
+                    model_id = Creature::ChooseDisplayId(ci);   // Will use the default model here
+
+                // creature case, need to update equipment
+                if (ci && target->GetTypeId() == TYPEID_UNIT)
+                    ((Creature*)target)->LoadEquipment(ci->equipmentId, true);
+            }
+
+            //fix tauren scaling
+            if (target->getRace() == RACE_TAUREN && target->GetDisplayId() == target->GetNativeDisplayId())
+            {
+                float mod_x = 0;
+                if (target->getGender() == GENDER_MALE)
+                    mod_x = -25.9f; // 0.741 * 1.35 ~= 1.0
+                else
+                    mod_x = -20.0f; // 0.8 * 1.25    = 1.0
+                target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
+            }
+            
+            target->SetDisplayId(model_id);
             target->setTransForm(GetId());
+        }
     }
     else
     {
-        // ApplyModifier(true) will reapply it if need
-        target->setTransForm(0);
-        target->SetDisplayId(target->GetNativeDisplayId());
-
-        // apply default equipment for creature case
-        if (target->GetTypeId() == TYPEID_UNIT)
-            ((Creature*)target)->LoadEquipment(((Creature*)target)->GetCreatureInfo()->equipmentId, true);
-
-        // re-apply some from still active with preference negative cases
-        Unit::AuraList const& otherTransforms = target->GetAurasByType(SPELL_AURA_TRANSFORM);
-        if (!otherTransforms.empty())
+        //reset cosmetics only if it's the current transform
+        if (target->getTransForm() == GetId())
         {
-            // look for other transform auras
-            Aura* handledAura = *otherTransforms.begin();
-            for (Unit::AuraList::const_iterator i = otherTransforms.begin(); i != otherTransforms.end(); ++i)
+            target->setTransForm(0);
+            target->SetDisplayId(target->GetNativeDisplayId());
+
+            // apply default equipment for creature case
+            if (target->GetTypeId() == TYPEID_UNIT)
+                ((Creature*)target)->LoadEquipment(((Creature*)target)->GetCreatureInfo()->equipmentId, true);
+
+            //fix tauren scaling
+            if (target->getRace() == RACE_TAUREN)
             {
-                // negative auras are preferred
-                if (!IsPositiveSpell((*i)->GetSpellProto()->Id))
-                {
-                    handledAura = *i;
-                    break;
-                }
+                float mod_x = 0;
+                if (target->getGender() == GENDER_MALE)
+                    mod_x = -25.9f; // 0.741 * 1.35 ~= 1.0
+                else
+                    mod_x = -20.0f; // 0.8 * 1.25    = 1.0
+                target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
             }
-            handledAura->ApplyModifier(true);
+
+            // re-apply some from still active with preference negative cases
+            Unit::AuraList const& otherTransforms = target->GetAurasByType(SPELL_AURA_TRANSFORM);
+            if (!otherTransforms.empty())
+            {
+                // look for other transform auras
+                Aura* handledAura = *otherTransforms.rbegin();
+                for (Unit::AuraList::const_reverse_iterator i = otherTransforms.rbegin(); i != otherTransforms.rend(); ++i)
+                {
+                    // negative auras are preferred
+                    if (!IsPositiveSpell((*i)->GetSpellProto()->Id))
+                    {
+                        handledAura = *i;
+                        break;
+                    }
+                }
+                handledAura->HandleAuraTransform(true,false);
+            }
+            else //reapply shapeshifting, there should be only one.
+            {
+                Unit::AuraList const& shapeshift = target->GetAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
+                if (!shapeshift.empty() && !shapeshift.front()->IsInUse())
+                    shapeshift.front()->HandleAuraModShapeshift(true,false);
+            }
         }
     }
 }
@@ -4871,7 +4901,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             if (spellProto->Effect[GetEffIndex()] == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
-                    pCaster->SpellHitResult(target, spellProto, false) != SPELL_MISS_NONE)
+                    pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false) != SPELL_MISS_NONE)
                 return;
 
             // Check for immune (not use charges)
@@ -4980,7 +5010,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             if (spellProto->Effect[GetEffIndex()] == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
-                    pCaster->SpellHitResult(target, spellProto, false) != SPELL_MISS_NONE)
+                    pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false) != SPELL_MISS_NONE)
                 return;
 
             // Check for immune
@@ -5170,7 +5200,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             if (GetSpellProto()->Effect[GetEffIndex()] == SPELL_EFFECT_PERSISTENT_AREA_AURA &&
-                    pCaster->SpellHitResult(target, spellProto, false) != SPELL_MISS_NONE)
+                    pCaster->SpellHitResult(target, spellProto, GetEffIndex(), false) != SPELL_MISS_NONE)
                 return;
 
             // Check for immune (not use charges)
@@ -5899,11 +5929,19 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
 {
     bool totemAura = caster && caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem();
 
+    // Check for persistent area auras that only do damage. If it has a secondary effect, it takes
+    // up a slot
+    bool persistent = m_spellProto->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_PERSISTENT_AREA_AURA;
+    bool persistentWithSecondaryEffect = false;
+    
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (!m_auras[i])
+        // Check for persistent aura here since the effect aura is applied to the holder 
+        // by a dynamic object as the target passes through the object field, meaning 
+        // m_auras will be unset when this method is called (initialization)
+        if (!m_auras[i] && !persistent)
             continue;
-
+            
         // special area auras cases
         switch (m_spellProto->Effect[i])
         {
@@ -5911,12 +5949,36 @@ bool SpellAuraHolder::IsNeedVisibleSlot(Unit const* caster) const
             case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
                 // passive auras (except totem auras) do not get placed in caster slot
                 return (m_target != caster || totemAura || !m_isPassive) && m_auras[i]->GetModifier()->m_auraname != SPELL_AURA_NONE;
+                
+                break;
+            case SPELL_EFFECT_PERSISTENT_AREA_AURA:
+                // If spell aura applies something other than plain damage, it takes
+                // up a debuff slot.
+                if (m_spellProto->EffectApplyAuraName[i] != SPELL_AURA_PERIODIC_DAMAGE)
+                    persistentWithSecondaryEffect = true;
+                    
+                break;
             default:
                 break;
         }
     }
 
-
+    /*  Persistent area auras such as Blizzard/RoF/Volley do not get require debuff slots
+        since they just do area damage with no additional effects. However, spells like
+        Hurricane do since they have a secondary effect attached to them. There are enough
+        persistent area spells in-game that making a switch for all of them is a bit 
+        unreasonable. Any spell with a secondary affect should take up a slot. Note
+        that most (usable) persistent spells only deal damage.
+        
+        It was considered whether spells with secondary effects should still deal damage,
+        even if there is no room for the other effect, however the debuff tooltip states
+        that the spell causes damage AND slows, therefore it must take a debuff slot.
+     */
+    if (persistent && !persistentWithSecondaryEffect)
+    {
+        return false;
+    }
+    
     // necessary for some spells, e.g. Immolate visual passive 28330
     if (m_spellProto->SpellVisual)
         return true;
@@ -6281,6 +6343,10 @@ void SpellAuraHolder::UpdateAuraDuration() const
     }
 }
 
+void SpellAuraHolder::SetAffectedByDebuffLimit(bool isAffectedByDebuffLimit)
+{
+    m_debuffLimitAffected = isAffectedByDebuffLimit;
+}
 
 /** NOSTALRIUS
  Debuff limitation

@@ -1332,7 +1332,15 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
     if ((*i).second.SoundId)
     {
         if (GetSoundEntriesStore()->LookupEntry((*i).second.SoundId))
-            pSource->PlayDirectSound((*i).second.SoundId);
+        {
+            if((*i).second.Type == CHAT_TYPE_ZONE_YELL)
+            {
+                if(Map* pZone = pSource->GetMap())
+                    pZone->PlayDirectSoundToMap((*i).second.SoundId);
+            }
+            else
+                pSource->PlayDirectSound((*i).second.SoundId);
+        }
         else
             sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process invalid sound id %u.", textEntry, (*i).second.SoundId);
     }

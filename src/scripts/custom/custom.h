@@ -15,7 +15,7 @@
  */ 
 
 void AddSC_custom_creatures();
-void AddSC_zero_creatures();
+//void AddSC_zero_creatures();
 
 // used to call all scripts
 void AddSC_zero_scripts();

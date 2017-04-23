@@ -73,7 +73,6 @@ struct instance_deadmines : public ScriptedInstance
 
     void OnCreatureCreate(Creature* pCreature)
     {
-
         if (pCreature->GetEntry() == NPC_RHAHKZOR)
             m_uiRhahkGUID = pCreature->GetGUID();
 
@@ -92,13 +91,6 @@ struct instance_deadmines : public ScriptedInstance
 
         /** Initialize Gilnid Patrol */
         if (pCreature->GetRespawnDelay() == 43201)
-        {
-            pCreature->SetVisibility(VISIBILITY_OFF);
-            pCreature->setFaction(35);
-        }
-
-        /** Initialize Canon detroying door Patrol */
-        if (pCreature->GetRespawnDelay() == 43202)
         {
             pCreature->SetVisibility(VISIBILITY_OFF);
             pCreature->setFaction(35);
@@ -158,7 +150,9 @@ struct instance_deadmines : public ScriptedInstance
             {
                 if (GameObject* pGo = instance->GetGameObject(m_uiIronCladGUID))
                 {
-                    pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+                    // no breaking the door if it's open
+                    if (!(pGo->GetGoState() == GO_STATE_ACTIVE))
+                        pGo->UseDoorOrButton(0, true);
                     m_uiIronDoor_Timer = 3000;
                 }
             }
@@ -263,29 +257,15 @@ struct instance_deadmines : public ScriptedInstance
                     {
                         case 0:
                             DoScriptText(INST_SAY_ALARM1, pMrSmite);
-                            m_uiIronDoor_Timer = 2000;
-                            ++m_uiDoor_Step;
-
                             GetCreatureListWithEntryInGrid(m_EscortList, pMrSmite, 657, 400.0f);
                             for (std::list<Creature*>::iterator it = m_EscortList.begin(); it != m_EscortList.end(); ++it)
                                 if ((*it)->GetRespawnDelay() == 43202)
-                                {
-                                    (*it)->SetVisibility(VISIBILITY_ON);
-                                    (*it)->setFaction(17);
                                     (*it)->GetMotionMaster()->MovePoint(0, -99.6611f, -671.071655f, 7.42241f, MOVE_PATHFINDING | MOVE_RUN_MODE);
-                                }
                             m_EscortList.clear();
-
+                            ++m_uiDoor_Step;
+                            m_uiIronDoor_Timer = 15000;
                             break;
                         case 1:
-                            if (Creature* pi1 = pMrSmite->SummonCreature(NPC_PIRATE, 93.68f, -678.63f, 7.71f, 2.09f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                                pi1->GetMotionMaster()->MovePoint(0, 100.11f, -670.65f, 7.42f);
-                            if (Creature* pi2 = pMrSmite->SummonCreature(NPC_PIRATE, 102.63f, -685.07f, 7.42f, 1.28f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                                pi2->GetMotionMaster()->MovePoint(0, 100.11f, -670.65f, 7.42f);
-                            ++m_uiDoor_Step;
-                            m_uiIronDoor_Timer = 10000;
-                            break;
-                        case 2:
                             DoScriptText(INST_SAY_ALARM2, pMrSmite);
                             m_uiDoor_Step = 0;
                             m_uiIronDoor_Timer = 0;

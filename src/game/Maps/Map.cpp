@@ -162,6 +162,8 @@ public:
 
 void Map::SpawnActiveObjects()
 {
+    if (MapPersistentState* state = GetPersistentState())
+        state->InitPools();
     ActiveObjectsGridLoader loader(this);
     sObjectMgr.DoGOData(loader);
     sObjectMgr.DoCreatureData(loader);
@@ -1935,7 +1937,7 @@ void DungeonMap::UnloadAll(bool pForce)
     }
 
     if (m_resetAfterUnload == true)
-        GetPersistanceState()->DeleteRespawnTimes();
+        GetPersistanceState()->DeleteRespawnTimesAndData();
 
     Map::UnloadAll(pForce);
 }

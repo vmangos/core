@@ -137,6 +137,8 @@ class PoolGroup
         void ReSpawn1Object(MapPersistentState& mapState, PoolObject* obj);
         void RemoveOneRelation(uint16 child_pool_id);
 
+        time_t GetPoolObjectRespawnTime(MapPersistentState& mapState, uint32 guid);
+
         PoolObjectList const& GetExplicitlyChanced() const { return ExplicitlyChanced; }
         PoolObjectList const& GetEqualChanced() const { return EqualChanced; }
 

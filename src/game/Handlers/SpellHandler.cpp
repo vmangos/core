@@ -368,7 +368,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
         _player->m_castingSpell = _player->GetComboPoints();
 
-    Spell *spell = new Spell(_player, spellInfo, false);
+    Spell *spell = new Spell(_player, spellInfo, false, ObjectGuid(), NULL, targets.getUnitTarget());
 
     // Nostalrius : Ivina
     spell->SetClientStarted(true);

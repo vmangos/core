@@ -434,6 +434,10 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if (spellInfo->Id == 13161)
                 return SPELL_ASPECT;
 
+            // Shadow Vulnerability
+            if (spellInfo->SpellIconID == 213 && spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN)
+                return SPELL_SHADOW_VULN;
+
             // Food / Drinks (mostly)
             if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
@@ -596,6 +600,7 @@ bool IsSingleFromSpellSpecificSpellRanksPerTarget(SpellSpecific spellSpec1, Spel
         case SPELL_AURA:
         case SPELL_CURSE:
         case SPELL_ASPECT:
+        case SPELL_SHADOW_VULN:
             return spellSpec1 == spellSpec2;
         default:
             return false;
@@ -694,7 +699,7 @@ bool IsExplicitNegativeTarget(uint32 targetA)
     return false;
 }
 
-bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
+bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, Unit* caster, Unit* victim)
 {
     // Nostalrius (SpellMod)
     if (spellproto->Custom & SPELL_CUSTOM_POSITIVE)
@@ -704,7 +709,7 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
 
     // Hellfire. Damages the caster, but is still positive !
     // (Has same SpellFamilyFlags as Soul Fire oO)
-    if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && spellproto->SpellIconID == 937)
+    if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && spellproto->SpellIconID == 937 && spellproto->SpellVisual == 5423)
         return true;
 
     switch (spellproto->Effect[effIndex])
@@ -729,10 +734,17 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
             return true;
         // Negative Effects
         case SPELL_EFFECT_INSTAKILL:
+            // Suicide is a positive spell - ex. Garr Massive Eruption
+            if (spellproto->EffectImplicitTargetA[effIndex] == TARGET_SELF && spellproto->EffectImplicitTargetB[effIndex] == TARGET_NONE)
+                return true;
             // Sacrifice is a positive spell - for the warlock :)
             if (spellproto->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_VOIDWALKER_SPELLS>())
                 return true;
             return false;
+        // Dispel can be positive or negative depending on the target
+        case SPELL_EFFECT_DISPEL:
+            if (caster && victim)
+                return caster->IsFriendlyTo(victim);
 
         // non-positive aura use
         case SPELL_EFFECT_APPLY_AURA:
@@ -900,23 +912,23 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex)
     return true;
 }
 
-bool IsPositiveSpell(uint32 spellId)
+bool IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim)
 {
     SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
     if (!spellproto)
         return false;
 
-    return IsPositiveSpell(spellproto);
+    return IsPositiveSpell(spellproto, caster, victim);
 }
 
-bool IsPositiveSpell(SpellEntry const *spellproto)
+bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster, Unit* victim)
 {
     if (spellproto->Attributes & SPELL_ATTR_NEGATIVE)
         return false;
     // spells with at least one negative effect are considered negative
     // some self-applied spells have negative effects but in self casting case negative check ignored.
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-        if (spellproto->Effect[i] && !IsPositiveEffect(spellproto, SpellEffectIndex(i)))
+        if (spellproto->Effect[i] && !IsPositiveEffect(spellproto, SpellEffectIndex(i), caster, victim))
             return false;
     return true;
 }

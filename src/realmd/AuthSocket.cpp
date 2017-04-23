@@ -402,7 +402,7 @@ bool AuthSocket::_HandleLogonChallenge()
         "(unbandate = bandate OR unbandate > UNIX_TIMESTAMP()) AND ip = '%s'", address.c_str());
     if (result)
     {
-        pkt << (uint8)WOW_FAIL_BANNED;
+        pkt << (uint8)WOW_FAIL_DB_BUSY;
         BASIC_LOG("[AuthChallenge] Banned ip %s tries to login!", get_remote_address().c_str());
         delete result;
     }

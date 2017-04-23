@@ -2496,7 +2496,8 @@ bool ChatHandler::HandleGroupInfoCommand(char* args)
 
     if (!group)
     {
-        PSendSysMessage(LANG_NOT_IN_GROUP);
+        std::string nameLink = GetNameLink(target);
+        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
         return false;
     }
 
@@ -2540,9 +2541,12 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     uint8 race, class_;
     uint32 accId = 0;
     uint32 money = 0;
+    uint32 mail_gold_inbox = 0;
+    uint32 mail_gold_outbox = 0;
     uint32 total_player_time = 0;
     uint32 level = 0;
     uint32 latency = 0;
+    uint32 security_flag = 0;
     LocaleConstant loc = LOCALE_enUS;
 
     // get additional information from Player object
@@ -2560,6 +2564,7 @@ bool ChatHandler::HandlePInfoCommand(char* args)
         loc = target->GetSession()->GetSessionDbcLocale();
         race = target->getRace();
         class_ = target->getClass();
+
     }
     // get additional information from DB
     else
@@ -2569,7 +2574,8 @@ bool ChatHandler::HandlePInfoCommand(char* args)
             return false;
 
         //                                                     0          1      2      3        4     5
-        QueryResult *result = CharacterDatabase.PQuery("SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'", target_guid.GetCounter());
+        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'", target_guid.GetCounter()));
+
         if (!result)
             return false;
 
@@ -2580,8 +2586,23 @@ bool ChatHandler::HandlePInfoCommand(char* args)
         accId = fields[3].GetUInt32();
         race  = fields[4].GetUInt8();
         class_= fields[5].GetUInt8();
-        delete result;
     }
+
+    std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT SUM(money) FROM mail WHERE sender = %u", target_guid.GetCounter()));
+
+    if (!result)
+        return false;
+  
+    Field *fields = result->Fetch();
+    mail_gold_outbox = fields[0].GetUInt32();
+
+    result.reset(CharacterDatabase.PQuery("SELECT SUM(money) FROM mail WHERE receiver = %u", target_guid.GetCounter()));
+
+    if (!result)
+        return false;
+
+    fields = result->Fetch();
+    mail_gold_inbox = fields[0].GetUInt32();
 
     std::string username = GetMangosString(LANG_ERROR);
     std::string last_ip = GetMangosString(LANG_ERROR);
@@ -2589,18 +2610,21 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     std::string last_login = GetMangosString(LANG_ERROR);
     const char* raceName = GetRaceName(race, GetSessionDbcLocale());
     const char* className = GetClassName(class_, GetSessionDbcLocale());
+
     if (!raceName)
         raceName = "";
     if (!className)
         className = "";
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT username,last_ip,last_login,locale FROM account WHERE id = '%u'", accId);
+    result.reset(LoginDatabase.PQuery("SELECT username,last_ip,last_login,locale,locked FROM account WHERE id = '%u'", accId));
+
     if (result)
     {
         Field* fields = result->Fetch();
         username = fields[0].GetCppString();
         security = sAccountMgr.GetSecurity(accId);
         loc = LocaleConstant(fields[3].GetUInt8());
+        security_flag = fields[4].GetUInt8();
 
         bool showIp = true;
         if (GetAccessLevel() < security)
@@ -2617,24 +2641,29 @@ bool ChatHandler::HandlePInfoCommand(char* args)
             last_ip = "-";
             last_login = "-";
         }
-
-        delete result;
     }
 
     if (loc > LOCALE_esMX)
         loc = LOCALE_enUS;
 
     std::string nameLink = playerLink(target_name);
+    std::string two_factor_enabled = security_flag & 4? "Enabled" : "Disabled";
 
     PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className, (target ? "" : GetMangosString(LANG_OFFLINE)), nameLink.c_str(), target_guid.GetCounter(), playerLink(username).c_str(), accId, sAccountMgr.IsAccountBanned(accId) ? ", banned" : "",
                     security, playerLink(last_ip).c_str(), sAccountMgr.IsIPBanned(last_ip) ? " [BANIP]" : "", last_login.c_str(), latency,
-                    localeNames[loc]);
+                    localeNames[loc], two_factor_enabled.c_str());
 
     std::string timeStr = secsToTimeString(total_player_time, true, true);
     uint32 gold = money / GOLD;
     uint32 silv = (money % GOLD) / SILVER;
     uint32 copp = (money % GOLD) % SILVER;
-    PSendSysMessage(LANG_PINFO_LEVEL,  timeStr.c_str(), level, gold, silv, copp);
+    uint32 gold_in = mail_gold_inbox / GOLD;
+    uint32 silv_in = (mail_gold_inbox % GOLD) / SILVER;
+    uint32 copp_in = (mail_gold_inbox % GOLD) % SILVER;
+    uint32 gold_out = mail_gold_outbox / GOLD;
+    uint32 silv_out = (mail_gold_outbox % GOLD) / SILVER;
+    uint32 copp_out = (mail_gold_outbox % GOLD) % SILVER;
+    PSendSysMessage(LANG_PINFO_LEVEL,  timeStr.c_str(), level, gold, silv, copp, gold_in, silv_in, silv_out, gold_out, silv_out, copp_out);
     if (Guild* guild = sGuildMgr.GetPlayerGuild(target_guid))
         PSendSysMessage("Guild: %s", playerLink(guild->GetName()).c_str());
     return true;

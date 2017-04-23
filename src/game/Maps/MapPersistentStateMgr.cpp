@@ -256,11 +256,12 @@ void DungeonPersistentState::SaveToDB()
     CharacterDatabase.PExecute("INSERT INTO instance VALUES ('%u', '%u', '" UI64FMTD "', '%s')", GetInstanceId(), GetMapId(), (uint64)GetResetTimeForDB(), data.c_str());
 }
 
-void DungeonPersistentState::DeleteRespawnTimes()
+void DungeonPersistentState::DeleteRespawnTimesAndData()
 {
     CharacterDatabase.BeginTransaction();
     CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", GetInstanceId());
     CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", GetInstanceId());
+    CharacterDatabase.PExecute("UPDATE instance SET data = '' WHERE id = '%u'", GetInstanceId());
     CharacterDatabase.CommitTransaction();
 
     ClearRespawnTimes();                                    // state can be deleted at call if only respawn data prevent unload
@@ -320,27 +321,26 @@ void DungeonResetScheduler::LoadResetTimes()
     typedef std::map<uint32, std::pair<uint32, time_t> > ResetTimeMapType;
     ResetTimeMapType InstResetTime;
 
-    QueryResult *result = CharacterDatabase.Query("SELECT id, map, resettime FROM instance WHERE resettime > 0");
+    QueryResult *result = CharacterDatabase.Query("SELECT id, map, resettime FROM instance");
     if (result)
     {
         do
         {
             Field* fields = result->Fetch();
-            if (time_t resettime = time_t(fields[2].GetUInt64()))
+            uint32 id = fields[0].GetUInt32();
+            uint32 mapid = fields[1].GetUInt32();
+            time_t resettime = time_t(fields[2].GetUInt64());
+
+            MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapid);
+
+            if (!mapEntry || !mapEntry->IsDungeon())
             {
-                uint32 id = fields[0].GetUInt32();
-                uint32 mapid = fields[1].GetUInt32();
-
-                MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(mapid);
-
-                if (!mapEntry || !mapEntry->IsDungeon())
-                {
-                    sMapPersistentStateMgr.DeleteInstanceFromDB(id);
-                    continue;
-                }
-
-                InstResetTime[id] = std::pair<uint32, uint64>(mapid, resettime);
+                sMapPersistentStateMgr.DeleteInstanceFromDB(id);
+                continue;
             }
+
+            InstResetTime[id] = std::pair<uint32, uint64>(mapid,
+                resettime ? resettime : now + 2 * HOUR);
         }
         while (result->NextRow());
         delete result;
@@ -569,7 +569,19 @@ MapPersistentState* MapPersistentStateManager::AddPersistentState(MapEntry const
     {
         DungeonPersistentState* dungeonState = new DungeonPersistentState(mapEntry->id, instanceId, resetTime, canReset);
         if (!load)
+        {
+            // initialize reset time
+            // for normal instances if no creatures are killed the instance will reset in two hours
+            if (mapEntry->mapType != MAP_RAID)
+            {
+                if (!resetTime)
+                    resetTime = time(nullptr) + 2 * HOUR;
+                dungeonState->SetResetTime(resetTime);
+                // Schedule a reset for new instances, removed when a player enters in DungeonMap::Add
+                m_Scheduler.ScheduleReset(true, resetTime, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, mapEntry->id, instanceId));
+            }
             dungeonState->SaveToDB();
+        }
         state = dungeonState;
     }
     else if (mapEntry->IsBattleGround())
@@ -581,23 +593,6 @@ MapPersistentState* MapPersistentStateManager::AddPersistentState(MapEntry const
         m_instanceSaveByInstanceId[instanceId] = state;
     else
         m_instanceSaveByMapId[mapEntry->id] = state;
-
-    if (mapEntry->IsDungeon())
-    {
-        if (!resetTime)
-        {
-            // initialize reset time
-            // for normal instances if no creatures are killed the instance will reset in two hours
-            if (mapEntry->mapType == MAP_RAID)
-                resetTime = m_Scheduler.GetResetTimeFor(mapEntry->id);
-            else
-            {
-                resetTime = time(nullptr) + 2 * HOUR;
-                // normally this will be removed soon after in DungeonMap::Add, prevent error
-                m_Scheduler.ScheduleReset(true, resetTime, DungeonResetEvent(RESET_EVENT_NORMAL_DUNGEON, mapEntry->id, instanceId));
-            }
-        }
-    }
 
     if (initPools)
         state->InitPools();
@@ -642,14 +637,7 @@ void MapPersistentStateManager::RemovePersistentState(uint32 mapId, uint32 insta
     {
         PersistentStateMap::iterator itr = m_instanceSaveByInstanceId.find(instanceId);
         if (itr != m_instanceSaveByInstanceId.end())
-        {
-            // state the resettime for normal instances only when they get unloaded
-            if (itr->second->GetMapEntry()->IsDungeon())
-                if (time_t resettime = ((DungeonPersistentState*)itr->second)->GetResetTimeForDB())
-                    CharacterDatabase.PExecute("UPDATE instance SET resettime = '" UI64FMTD "' WHERE id = '%u'", (uint64)resettime, instanceId);
-
             _ResetSave(m_instanceSaveByInstanceId, itr);
-        }
     }
     else
     {
@@ -978,7 +966,8 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
         for (int instance = beginInstance; instance < endInstance; ++instance)
         {
-            MapPersistentState* state = AddPersistentState(mapEntry, instance, resetTime, mapEntry->IsDungeon(), true);
+            MapPersistentState* state = AddPersistentState(mapEntry, instance,
+                resetTime, mapEntry->IsDungeon(), true, false /*= initPools*/);
             if (!state)
                 continue;
 
@@ -1057,7 +1046,8 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
         for (int instance = beginInstance; instance < endInstance; ++instance)
         {
-            MapPersistentState* state = AddPersistentState(mapEntry, instance, resetTime, mapEntry->IsDungeon(), true);
+            MapPersistentState* state = AddPersistentState(mapEntry, instance,
+                resetTime, mapEntry->IsDungeon(), true, false /*= initPools*/);
             if (!state)
                 continue;
 

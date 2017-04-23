@@ -490,12 +490,12 @@ void AddSC_boss_ossirian()
     newscript->Name = "boss_ossirian";
     newscript->GetAI = &GetAI_boss_ossirian;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "generic_random_move";
     newscript->GetAI = &GetAI_generic_random_move;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "ossirian_crystal";
     newscript->GOGetAI = &GetAI_ossirian_crystal;

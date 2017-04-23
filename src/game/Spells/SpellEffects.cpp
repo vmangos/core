@@ -471,6 +471,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+                case 11885: // Capture Treant
+                case 11886: // Capture Wildkin
+                case 11887: // Capture Hippogryph
+                case 11888: // Capture Faerie Dragon
+                case 11889: // Capture Mountain Giant
+                case 12699: // Summon Screecher Spirit
+                {
+                    if (unitTarget->isDead() && unitTarget->GetTypeId() == TYPEID_UNIT)
+                        ((Creature*)unitTarget)->ForcedDespawn(1000);
+                    break;
+                }
                 case 25716 : // Force Self - Bow
                 {
                     m_caster->HandleEmote(EMOTE_ONESHOT_BOW);
@@ -773,16 +784,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 9998, true);
 
                     ((Creature*)unitTarget)->ForcedDespawn(100);
-                    return;
-                }
-                case 10254:                                 // Stone Dwarf Awaken Visual
-                {
-                    if (m_caster->GetTypeId() != TYPEID_UNIT)
-                        return;
-
-                    // see spell 10255 (aura dummy)
-                    m_caster->clearUnitState(UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT);
-                    m_caster->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
                     return;
                 }
                 case 12162:                                 // Deep wounds
@@ -1801,10 +1802,18 @@ void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
             else
                 m_caster->CastSpell(unitTarget, 11637, true, m_CastItem, nullptr, m_originalCasterGUID);
             return;
-        // Linken's Boomerang: 3% chance proc
+        // Linken's Boomerang: 10% chance to proc stun, 3% chance to proc disarm (dubious numbers)
         case 15712:
-            if (urand(0, 30))
+            if (triggered_spell_id == 15753 && urand(0, 10))
+            {
                 return;
+            }
+
+            if (triggered_spell_id == 15752 && urand(0, 30))
+            {
+                return;
+            }
+
             break;
     }
     switch (triggered_spell_id)
@@ -2822,7 +2831,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
     // Pierre de sort dissipe sorts negatifs et positifs.
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_SPELLSTONE>())
         checkFaction = false;
-    bool friendly = checkFaction ? unitTarget->IsFriendlyTo(m_caster) : false;
+    bool friendly = checkFaction && !isReflected ? unitTarget->IsFriendlyTo(m_caster) : false;
     // Create dispel mask by dispel type
     int32 dispel_type = m_spellInfo->EffectMiscValue[eff_idx];
     uint32 dispelMask  = GetDispellMask(dispel_type < 0 ? DISPEL_ALL : DispelType(dispel_type));
@@ -3105,6 +3114,14 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     *m_selfContainer = nullptr;
                     m_caster->CastSpell(summon, m_spellInfo->EffectTriggerSpell[1], true);
+                    break;
+                // Target Dummy
+                case 4071:
+                case 4072:
+                case 19805:
+                    summon->lootForCreator = true;
+                    summon->SetCreatorGuid(m_caster->GetObjectGuid());
+                    summon->SetLootRecipient(m_caster);
                     break;
             }
 
@@ -3928,6 +3945,28 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
     if (!unitTarget->isAlive())
         return;
     uint32 heal = m_caster->GetMaxHealth();
+
+    // Healing percent modifiers
+    float  DoneTotalMod = 1.0f;
+    float  TakenTotalMod = 1.0f;
+
+    // Healing done percent
+    std::list <Aura*> const& mHealingDonePct = m_caster->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+    for (std::list <Aura*>::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
+        DoneTotalMod *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
+
+    heal *= DoneTotalMod;
+
+    // Healing taken percent
+    float minval = float(unitTarget->GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    if (minval)
+        TakenTotalMod *= (100.0f + minval) / 100.0f;
+
+    float maxval = float(unitTarget->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    if (maxval)
+        TakenTotalMod *= (100.0f + maxval) / 100.0f;
+
+    heal *= TakenTotalMod;
 
     m_healing += heal;
 }

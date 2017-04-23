@@ -721,14 +721,9 @@ void Creature::StopGroupLoot()
 
 void Creature::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 {
+    m_regenTimer -= update_diff;
+
     if (m_regenTimer > 0)
-    {
-        if (update_diff >= m_regenTimer)
-            m_regenTimer = 0;
-        else
-            m_regenTimer -= update_diff;
-    }
-    if (m_regenTimer != 0)
         return;
 
     if (!isInCombat() || IsPolymorphed() || skipCombatCheck)
@@ -783,16 +778,25 @@ void Creature::RegenerateHealth()
     uint32 addvalue = 0;
 
     // Not only pet, but any controlled creature
-    if (GetCharmerOrOwnerGuid() && !IsPolymorphed())
+    if (GetCharmerOrOwnerGuid())
     {
-        float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
-        float Spirit = GetStat(STAT_SPIRIT);
+        if (IsPolymorphed())
+        {
+            addvalue = maxValue / 10;
+        }
+        else
+        {
+            float HealthIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_HEALTH);
+            float Spirit = GetStat(STAT_SPIRIT);
 
-        addvalue = uint32(Spirit * 0.25 * HealthIncreaseRate);
-        addvalue *= 4; // Le timer tick toutes les 4 secondes.
+            addvalue = uint32(Spirit * 0.25 * HealthIncreaseRate);
+            addvalue *= 4; // Le timer tick toutes les 4 secondes.
+        }
     }
     else
+    {
         addvalue = maxValue / 3;
+    }
 
     ModifyHealth(addvalue);
 }

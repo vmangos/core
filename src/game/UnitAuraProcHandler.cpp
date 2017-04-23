@@ -397,8 +397,15 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     return roll_chance_f(chance);
 }
 
-SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 /*procEx*/, uint32 cooldown)
+SpellAuraProcResult Unit::HandleHasteAuraProc(Unit *pVictim, uint32 damage, Aura* triggeredByAura, SpellEntry const * /*procSpell*/, uint32 /*procFlag*/, uint32 procEx, uint32 cooldown)
 {
+    // Flurry: last charge crit will reapply the buff, don't remove any charges
+    if (triggeredByAura->GetSpellProto()->SpellIconID == 108 && 
+        triggeredByAura->GetSpellProto()->SpellVisual == 2759 &&
+        triggeredByAura->GetHolder()->GetAuraCharges() <= 1 &&
+        (procEx & PROC_EX_CRITICAL_HIT))
+        return SPELL_AURA_PROC_FAILED;
+
     return SPELL_AURA_PROC_OK;
 }
 
@@ -937,6 +944,15 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 float maxDmg = triggerAmount / 25.0f;
 
                 float damageBasePoints = (maxDmg - minDmg) * ((speed - MIN_WSP) / (MAX_WSP - MIN_WSP)) + minDmg;
+
+                // Apply Improved Seal of Rightousness talent
+                // Modifier is applied on base damage only (changed patch 2.1.0)
+                uint32 impSoRList[] = { 20224, 20225, 20330, 20331, 20332 };
+                for (int i = 0; i < 5; ++i) {
+                    SpellModifier *mod = ((Player*)this)->GetSpellMod(SPELLMOD_ALL_EFFECTS, impSoRList[i]);
+                    if (mod && mod->type == SPELLMOD_PCT && mod->value > 0)
+                        damageBasePoints += damageBasePoints*(float)mod->value / 100.0f;
+                }
 
                 int32 damagePoint = urand(0, 1) ? floor(damageBasePoints) : ceil(damageBasePoints);
 

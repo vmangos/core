@@ -414,6 +414,16 @@ void WorldSession::HandleZoneUpdateOpcode(WorldPacket & recv_data)
     uint32 newzone, newarea;
     GetPlayer()->GetZoneAndAreaId(newzone, newarea);
     GetPlayer()->UpdateZone(newzone, newarea);
+
+    // Trigger a client camera reset by sending an `SMSG_STANDSTATE_UPDATE'
+    // event. See `WorldSession::HandleMoveWorldportAckOpcode'.
+    // Note: There might be a better place to perform this trigger
+    if (GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    {
+        WorldPacket data(SMSG_STANDSTATE_UPDATE, 1);
+        data << GetPlayer()->getStandState();
+        GetPlayer()->GetSession()->SendPacket(&data);
+    }
 }
 
 void WorldSession::HandleSetTargetOpcode(WorldPacket & recv_data)
@@ -752,7 +762,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
                 pl->AreaExploredOrEventHappens(quest_id);
         }
     }
-    
+
     // enter to tavern, not overwrite city rest
     if (sObjectMgr.IsTavernAreaTrigger(Trigger_ID))
     {

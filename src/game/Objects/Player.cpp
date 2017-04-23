@@ -435,6 +435,7 @@ Player::Player(WorldSession *session) : Unit(),
 
     m_modManaRegen = 0;
     m_modManaRegenInterrupt = 0;
+    m_carryHealthRegen = 0;
     for (int s = 0; s < MAX_SPELL_SCHOOL; s++)
         m_SpellCritPercentage[s] = 0.0f;
     m_regenTimer = 0;
@@ -908,7 +909,8 @@ uint32 Player::EnvironmentalDamage(EnvironmentalDamageType type, uint32 damage)
     // Absorb, resist some environmental damage type
     uint32 absorb = 0;
     uint32 resist = 0;
-    if (type == DAMAGE_LAVA)
+
+    if ((type == DAMAGE_LAVA) || (type == DAMAGE_FIRE))
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_FIRE, DIRECT_DAMAGE, damage, &absorb, &resist, NULL);
     else if (type == DAMAGE_SLIME)
         CalculateDamageAbsorbAndResist(this, SPELL_SCHOOL_MASK_NATURE, DIRECT_DAMAGE, damage, &absorb, &resist, NULL);
@@ -1226,13 +1228,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         }
     }
 
-    if (m_regenTimer)
-    {
-        if (update_diff >= m_regenTimer)
-            m_regenTimer = 0;
-        else
-            m_regenTimer -= update_diff;
-    }
+    m_regenTimer -= update_diff;
 
     if (m_weaponChangeTimer > 0)
     {
@@ -2167,7 +2163,7 @@ void Player::RewardRage(uint32 damage, bool attacker)
 
 void Player::RegenerateAll()
 {
-    if (m_regenTimer != 0)
+    if (m_regenTimer > 0)
         return;
 
     // Not in combat or they have regeneration
@@ -2183,7 +2179,7 @@ void Player::RegenerateAll()
 
     Regenerate(POWER_MANA);
 
-    m_regenTimer = REGEN_TIME_FULL;
+    m_regenTimer += REGEN_TIME_FULL;
 }
 
 void Player::Regenerate(Powers power)
@@ -2265,7 +2261,7 @@ void Player::RegenerateHealth()
 
     // polymorphed case
     if (IsPolymorphed())
-        addvalue = (float)GetMaxHealth() / 3;
+        addvalue = (float)GetMaxHealth() / 10;
     // normal regen case (maybe partly in combat case)
     else if (!isInCombat() || HasAuraType(SPELL_AURA_MOD_REGEN_DURING_COMBAT))
     {
@@ -2286,6 +2282,10 @@ void Player::RegenerateHealth()
     // always regeneration bonus (including combat)
     // This function is called every 2 seconds.
     addvalue += HealthIncreaseRate * 2.0f * (GetTotalAuraModifier(SPELL_AURA_MOD_HEALTH_REGEN_IN_COMBAT) / 5.0f);
+
+    // Health fractions get carried to the next tick
+    addvalue += m_carryHealthRegen;
+    m_carryHealthRegen = addvalue - int32(addvalue);
 
     if (addvalue < 0)
         addvalue = 0;
@@ -4701,9 +4701,9 @@ void Player::CleanupChannels()
     {
         Channel* ch = *m_channels.begin();
         m_channels.erase(m_channels.begin());               // remove from player's channel list
-        ch->Leave(GetObjectGuid(), false);                  // not send to client, not remove from player's channel list
+        ch->Leave(GetObjectGuid(), ch->GetName().c_str(), false);   // not send to client, not remove from player's channel list
         if (ChannelMgr* cMgr = channelMgr(GetTeam()))
-            cMgr->LeftChannel(ch->GetName());               // deleted channel if empty
+            cMgr->LeftChannel(ch->GetName(), nullptr);      // deleted channel if empty
 
     }
     DEBUG_LOG("Player: channels cleaned up!");
@@ -4720,7 +4720,7 @@ void Player::LeaveLFGChannel()
     {
         if ((*i)->IsLFG())
         {
-            (*i)->Leave(GetObjectGuid());
+            (*i)->Leave(GetObjectGuid(), (*i)->GetName().c_str());
             break;
         }
     }
@@ -6137,9 +6137,41 @@ uint32 Player::GetLevelFromDB(ObjectGuid guid)
     return level;
 }
 
+void Player::DismountCheck()
+{
+    if (IsMounted())
+    {
+        auto auras = this->GetAurasByType(SPELL_AURA_MOUNTED);
+
+        for (auto& aura : auras)
+        {
+            Spell mountSpell(this, aura->GetSpellProto(), true);
+            SpellCastResult pCheck = mountSpell.CheckCast(true);
+
+            if (pCheck == SPELL_FAILED_NO_MOUNTS_ALLOWED || pCheck == SPELL_FAILED_NOT_HERE)
+            {
+                RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+                Unmount(true);
+            }
+        }
+    }
+}
+
+void Player::SetTransport(Transport* t)
+{
+    if (t) // don't bother checking when exiting a transport
+    {
+        DismountCheck();
+    }
+
+    WorldObject::SetTransport(t);
+}
+
 void Player::UpdateArea(uint32 newArea)
 {
     m_areaUpdateId    = newArea;
+
+    DismountCheck();
 
     const auto *areaEntry = AreaEntry::GetById(newArea);
 
@@ -6292,7 +6324,7 @@ void Player::CheckDuelDistance(time_t currTime)
             CombatStopWithPets(true);
             if (duel->opponent)
                 duel->opponent->CombatStopWithPets(true);
-            
+
             DuelComplete(DUEL_FLED);
         }
     }
@@ -6423,7 +6455,7 @@ void Player::_ApplyItemMods(Item *item, uint8 slot, bool apply)
         _ApplyItemBonuses(proto, slot, false);
 
         if (slot == EQUIPMENT_SLOT_RANGED)
-            _ApplyAmmoBonuses(); 
+            _ApplyAmmoBonuses();
     }
 
     DEBUG_LOG("_ApplyItemMods complete.");
@@ -7088,6 +7120,8 @@ void Player::RemovedInsignia(Player* looterPlr)
     if (!corpse)
         return;
 
+    WorldPacket data(SMSG_PLAYER_SKINNED,0);
+    GetSession()->SendPacket(&data);
     // We have to convert player corpse to bones, not to be able to resurrect there
     // SpawnCorpseBones isn't handy, 'cos it saves player while he in BG
     Corpse *bones = sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), true);
@@ -11850,8 +11884,8 @@ void Player::SendPreparedQuest(ObjectGuid guid)
             else if (status == DIALOG_STATUS_INCOMPLETE)
                 PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, false, true);
             // Send completable on repeatable quest if player don't have quest
-            else if (pQuest->IsRepeatable())
-                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, CanCompleteRepeatableQuest(pQuest), true);
+            else if (pQuest->IsRepeatable() && CanCompleteRepeatableQuest(pQuest))
+                PlayerTalkClass->SendQuestGiverRequestItems(pQuest, guid, true, true);
             else
                 PlayerTalkClass->SendQuestGiverQuestDetails(pQuest, guid, true);
         }
@@ -13157,7 +13191,7 @@ void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
                 }
                 if (CanCompleteQuest(questid))
                     CompleteQuest(questid);
-                return;
+                break;
             }
         }
     }
@@ -13198,7 +13232,7 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
 
                     IncompleteQuest(questid);
                 }
-                return;
+                break;
             }
         }
     }
