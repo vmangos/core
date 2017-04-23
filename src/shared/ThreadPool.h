@@ -32,11 +32,13 @@ class ThreadPool
 private:
     struct worker_sq;
     struct worker_mq;
+    template <class T = worker_sq>
     struct worker_mysql;
 public:
     using SingleQueue = worker_sq;
     using MultiQueue = worker_mq;
-    using MySQL = worker_mysql;
+    template <class T = SingleQueue>
+    using MySQL = worker_mysql<T>;
 
     using workload_t = std::vector<std::function<void()>>;
 
@@ -173,7 +175,8 @@ private:
         workload_t::iterator it;
     };
 
-    struct worker_mysql : public worker_sq
+    template <class T>
+    struct worker_mysql : public T
     {
         worker_mysql(ThreadPool *tp, int id, ErrorHandling e);
 

@@ -1654,7 +1654,7 @@ void World::Update(uint32 diff)
                     getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT),
                     ThreadPool::ClearMode::UPPON_COMPLETION)
                                              );
-        m_updateThreads->start<ThreadPool::MySQL>();
+        m_updateThreads->start<ThreadPool::MySQL<>>();
     }
     ///- Update the different timers
     for (int i = 0; i < WUPDATE_COUNT; ++i)

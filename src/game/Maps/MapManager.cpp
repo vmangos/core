@@ -46,7 +46,7 @@ MapManager::MapManager()
     m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)))
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
-    m_threads->start<ThreadPool::MySQL>();
+    m_threads->start<ThreadPool::MySQL<>>();
 }
 
 MapManager::~MapManager()

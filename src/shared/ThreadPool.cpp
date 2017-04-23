@@ -33,9 +33,13 @@ ThreadPool::~ThreadPool()
     m_waitForWork.notify_all();
 }
 
+template struct ThreadPool::worker_mysql<ThreadPool::SingleQueue>;
+template struct ThreadPool::worker_mysql<ThreadPool::MultiQueue>;
+
 template void ThreadPool::start<ThreadPool::SingleQueue>();
 template void ThreadPool::start<ThreadPool::MultiQueue>();
-template void ThreadPool::start<ThreadPool::MySQL>();
+template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::SingleQueue>>();
+template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
 
 std::future<void> ThreadPool::processWorkload()
 {
@@ -242,14 +246,16 @@ void ThreadPool::worker_sq::doWork()
     }
 }
 
-ThreadPool::worker_mysql::worker_mysql(ThreadPool *tp, int id, ThreadPool::ErrorHandling e):
-    worker_sq(tp, id, e)
+template <class T>
+ThreadPool::worker_mysql<T>::worker_mysql(ThreadPool *tp, int id, ThreadPool::ErrorHandling e):
+    T(tp, id, e)
 {
 }
 
-void ThreadPool::worker_mysql::doWork()
+template <class T>
+void ThreadPool::worker_mysql<T>::doWork()
 {
     mysql_thread_init();
-    worker_sq::doWork();
+    T::doWork();
     mysql_thread_end();
 }

@@ -144,7 +144,7 @@ void SqlResultQueue::Update(uint32 timeout)
 
 
 #ifndef DO_POSTGRESQL
-using SqlResultQueueWorker = ThreadPool::ThreadPool::MySQL;
+using SqlResultQueueWorker = ThreadPool::ThreadPool::MySQL<>;
 #else
 using SqlResultQueueWorker = ThreadPool::SingleQueue;
 #endif

@@ -123,8 +123,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
     m_motionThreads->start();
-    m_objectThreads->start<ThreadPool::MySQL>();
-    m_visibilityThreads->start<ThreadPool::MySQL>();
+    m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
+    m_visibilityThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
     m_cellThreads->start();
 }
 
@@ -3590,42 +3590,6 @@ void Map::RemoveUnitFromMovementUpdate(Unit *unit)
     unitsMvtUpdate.erase(unit);
 }
 
-/*
- * TODO:
- * implement a worker providing an accumulator
- */
-class ObjectUpdatePacketBuilder
-{
-public:
-    ObjectUpdatePacketBuilder(std::set<Object*>::iterator& a, std::set<Object*>::iterator& b, uint32 now) : begin(a), end(b), beginTime(now), current(a)
-    {
-    }
-
-    void operator()()
-    {
-        DoUpdateObjects();
-    }
-    void DoUpdateObjects()
-    {
-        uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
-        UpdateDataMapType update_players; // Player -> UpdateData
-
-        for (; current != end; ++current)
-        {
-            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
-                break;
-            (*current)->BuildUpdateData(update_players);
-        }
-
-        for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
-            iter->second.Send(iter->first->GetSession());
-    }
-    std::set<Object*>::iterator begin;
-    std::set<Object*>::iterator current;
-    std::set<Object*>::iterator end;
-    uint32 beginTime;
-};
-
 //#define MAP_SENDOBJECTUPDATES_PROFILE
 
 void Map::SendObjectUpdates()
@@ -3654,34 +3618,37 @@ void Map::SendObjectUpdates()
         threads = objectsCount;
     uint32 step = objectsCount / threads;
 
-    std::vector<ObjectUpdatePacketBuilder> objUpdaters;
-    objUpdaters.reserve(threads -1);
-    std::set<Object*>::iterator itBegin = i_objectsToClientUpdate.begin();
-    std::set<Object*>::iterator itEnd = i_objectsToClientUpdate.begin();
     ASSERT(step > 0);
     ASSERT(threads >= 1);
-    for (uint32 i = 0; i < threads; ++i)
-    {
-        itBegin = itEnd;
-        if (i == (threads - 1))
-            itEnd = i_objectsToClientUpdate.end();
-        else
+
+    std::vector<std::set<Object*>::iterator> t;
+    t.reserve(i_objectsToClientUpdate.size());
+    for (std::set<Object*>::iterator it = i_objectsToClientUpdate.begin(); it != i_objectsToClientUpdate.end(); it++)
+        t.emplace_back(it);
+    std::atomic<int> ait(0);
+    uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_TIMEOUT);
+    auto f = [&t, &ait, beginTime=now, timeout](){
+        UpdateDataMapType update_players; // Player -> UpdateData
+        int it = ait++;
+        while (it < t.size())
         {
-            for (uint32 j = 0; j < step; ++j)
-                ++itEnd;
+            (*t[it])->BuildUpdateData(update_players);
+            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
+                break;
+            it = ait++;
         }
-        objUpdaters.emplace_back(itBegin, itEnd, now);
-        if (i != threads -1)
-            m_objectThreads << [&objUpdaters,i](){
-                objUpdaters[i]();
-            };
-    }
+
+        for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
+            iter->second.Send(iter->first->GetSession());
+    };
     std::future<void> job = m_objectThreads->processWorkload();
-    objUpdaters[threads -1]();
+    f();
     if (job.valid())
         job.wait();
-    for (uint32 i = 0; i < threads; ++i)
-        i_objectsToClientUpdate.erase(objUpdaters[i].begin, objUpdaters[i].current);
+    if (ait > i_objectsToClientUpdate.size()) //ait is increased before checks, so max value is `objectsCount + threads`
+        i_objectsToClientUpdate.clear();
+    else
+        i_objectsToClientUpdate.erase(t.front(), t[ait]);
 
     // If we timeout, use more threads !
     if (i_objectsToClientUpdate.size())
@@ -3696,33 +3663,6 @@ void Map::SendObjectUpdates()
         sLog.outString("SendObjectUpdates in %04u ms [%u threads. %3u/%3u]", diff, threads, objectsCount - i_objectsToClientUpdate.size(), objectsCount);
 #endif
 }
-
-class VisibilityUpdater
-{
-public:
-    VisibilityUpdater(std::set<Unit*>::iterator& a, std::set<Unit*>::iterator& b, uint32 now) : begin(a), end(b), beginTime(now), current(a)
-    {
-    }
-
-    void operator()()
-    {
-        DoUpdateVisibility();
-    }
-    void DoUpdateVisibility()
-    {
-        uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_TIMEOUT);
-        for (; current != end; ++current)
-        {
-            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
-                break;
-            (*current)->ProcessRelocationVisibilityUpdates();
-        }
-    }
-    std::set<Unit*>::iterator begin;
-    std::set<Unit*>::iterator current;
-    std::set<Unit*>::iterator end;
-    uint32 beginTime;
-};
 
 //#define MAP_UPDATEVISIBILITY_PROFILE
 
@@ -3750,33 +3690,36 @@ void Map::UpdateVisibilityForRelocations()
     if (threads > objectsCount)
         threads = objectsCount;
     uint32 step = objectsCount / threads;
-    std::vector<VisibilityUpdater> visUpdaters;
-    visUpdaters.reserve(threads);
-    std::set<Unit*>::iterator itBegin = i_unitsRelocated.begin();
-    std::set<Unit*>::iterator itEnd = i_unitsRelocated.begin();
     ASSERT(step > 0);
-    for (uint32 i = 0; i < threads; ++i)
-    {
-        itBegin = itEnd;
-        if (i == (threads - 1))
-            itEnd = i_unitsRelocated.end();
-        else
+
+    std::vector<std::set<Unit*>::iterator> t;
+    t.reserve(i_unitsRelocated.size());
+    for (std::set<Unit*>::iterator it = i_unitsRelocated.begin(); it != i_unitsRelocated.end(); it++)
+        t.emplace_back(it);
+    std::atomic<int> ait(0);
+    uint32 timeout = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_TIMEOUT);
+    auto f = [&t, &ait, beginTime=now, timeout](){
+        int it = ait++;
+        while (it < t.size())
         {
-            for (uint32 j = 0; j < step; ++j)
-                ++itEnd;
+            (*t[it])->ProcessRelocationVisibilityUpdates();
+            if (WorldTimer::getMSTimeDiffToNow(beginTime) > timeout)
+                break;
+            it = ait++;
         }
-        visUpdaters.emplace_back(itBegin, itEnd, now);
-        if (i != (threads - 1))
-            m_visibilityThreads << [&visUpdaters,i]{
-                visUpdaters[i]();
-            };
+    };
+    for (uint32 i = 0; i < threads -1; ++i)
+    {
+        m_visibilityThreads << f;
     }
     std::future<void> job = m_visibilityThreads->processWorkload();
-    visUpdaters[threads -1]();
+    f();
     if (job.valid())
         job.wait();
-    for (uint32 i = 0; i < threads; ++i)
-        i_unitsRelocated.erase(visUpdaters[i].begin, visUpdaters[i].current);
+    if (ait > i_unitsRelocated.size()) //ait is increased before checks, so max value is `objectsCount + threads`
+        i_unitsRelocated.clear();
+    else
+        i_unitsRelocated.erase(t.front(), t[ait]);
 
     if (i_unitsRelocated.size())
         ++_unitRelocationThreads;
