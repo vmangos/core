@@ -408,11 +408,11 @@ struct npc_keeper_remulosAI : public npc_escortAI
         }
     }
 
-    //Remulos follows player !
+    // Remulos follows player
     void EnterEvadeMode()
     {
         npc_escortAI::EnterEvadeMode();
-        if (HasEscortState(STATE_ESCORT_ESCORTING) && m_bIsFirstWave == false)
+        if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_bIsFirstWave)
         {
             if (Player* pPlayer = GetPlayerForEscort())
             {
@@ -1240,7 +1240,7 @@ struct boss_eranikusAI : public ScriptedAI
         for (uint8 j = 0; j < MAX_PRIESTESS; ++j)
         {
             m_creature->GetRandomPoint(aTyrandeLocations[0].m_fX, aTyrandeLocations[0].m_fY, aTyrandeLocations[0].m_fZ, 10.0f, fX, fY, fZ);
-            m_creature->SummonCreature(NPC_ELUNE_PRIESTESS, fX, fY, fZ, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
+            m_creature->SummonCreature(NPC_ELUNE_PRIESTESS, fX, fY, fZ, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0, MOVE_RUN_MODE);
         }
     }
 
@@ -1251,14 +1251,14 @@ struct boss_eranikusAI : public ScriptedAI
             case NPC_TYRANDE_WHISPERWIND:
                 m_uiTyrandeGUID = pSummoned->GetObjectGuid();
                 //pSummoned->GetMotionMaster()->MovePoint(POINT_ID_TYRANDE_HEAL, aTyrandeLocations[1].m_fX, aTyrandeLocations[1].m_fY, aTyrandeLocations[1].m_fZ);
-                pSummoned->GetMotionMaster()->MovePoint(1, aTyrandeLocations[1].m_fX, aTyrandeLocations[1].m_fY, aTyrandeLocations[1].m_fZ, MOVE_PATHFINDING);
+                pSummoned->GetMotionMaster()->MovePoint(1, aTyrandeLocations[1].m_fX, aTyrandeLocations[1].m_fY, aTyrandeLocations[1].m_fZ, MOVE_PATHFINDING | MOVE_RUN_MODE);
                 break;
             case NPC_ELUNE_PRIESTESS:
                 m_lPriestessList.push_back(pSummoned->GetObjectGuid());
                 float fX, fY, fZ;
                 m_creature->GetRandomPoint(aTyrandeLocations[1].m_fX, aTyrandeLocations[1].m_fY, aTyrandeLocations[1].m_fZ, 10.0f, fX, fY, fZ);
                 //pSummoned->GetMotionMaster()->MovePoint(POINT_ID_TYRANDE_HEAL, fX, fY, fZ);
-                pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_PATHFINDING);
+                pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_PATHFINDING | MOVE_RUN_MODE);
                 pSummoned->setFaction(495);//Alita : works out ^^'. 495 is an escort faction
                 break;
         }
@@ -1266,10 +1266,12 @@ struct boss_eranikusAI : public ScriptedAI
 
     void DoDespawnSummoned()
     {
-        for (std::list<uint64>::const_iterator itr = m_lPriestessList.begin(); itr != m_lPriestessList.end(); ++itr)
+        for (auto& guid : m_lPriestessList)
         {
-            if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
-                pTemp->ForcedDespawn();
+            if (Creature* creature = m_creature->GetMap()->GetCreature(guid))
+            {
+                creature->ForcedDespawn();
+            }
         }
     }
 
@@ -1287,11 +1289,11 @@ struct boss_eranikusAI : public ScriptedAI
             case 2:
             case 3:
                 if (pSummoned->GetEntry() == NPC_TYRANDE_WHISPERWIND || pSummoned->GetEntry() == NPC_ELUNE_PRIESTESS)
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 1, aTyrandeLocations[uiPointId + 1].m_fX, aTyrandeLocations[uiPointId + 1].m_fY, aTyrandeLocations[uiPointId + 1].m_fZ, MOVE_PATHFINDING);
+                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 1, aTyrandeLocations[uiPointId + 1].m_fX, aTyrandeLocations[uiPointId + 1].m_fY, aTyrandeLocations[uiPointId + 1].m_fZ, MOVE_PATHFINDING | MOVE_RUN_MODE);
                 break;
             case 4:
                 if (pSummoned->GetEntry() == NPC_TYRANDE_WHISPERWIND)
-                    pSummoned->GetMotionMaster()->MovePoint(POINT_ID_TYRANDE_HEAL, aTyrandeLocations[5].m_fX, aTyrandeLocations[5].m_fY, aTyrandeLocations[5].m_fZ, MOVE_PATHFINDING);
+                    pSummoned->GetMotionMaster()->MovePoint(POINT_ID_TYRANDE_HEAL, aTyrandeLocations[5].m_fX, aTyrandeLocations[5].m_fY, aTyrandeLocations[5].m_fZ, MOVE_PATHFINDING | MOVE_RUN_MODE);
                 else if (pSummoned->GetEntry() == NPC_ELUNE_PRIESTESS)
                 {
                     pSummoned->Unmount();//they don't unmount well.
@@ -1313,7 +1315,7 @@ struct boss_eranikusAI : public ScriptedAI
                 {
                     pSummoned->Unmount();
                     if (m_creature->GetHealthPercent() > 20)
-                        pSummoned->AI()->AttackStart(m_creature);
+                        pSummoned->AI()->AttackStart(m_creature); // should just focus on healing really
                     pSummoned->Unmount();//last try... just unmount pretty please?
                 }
                 break;
@@ -1354,7 +1356,7 @@ struct boss_eranikusAI : public ScriptedAI
                         }
                         // Note: this emote was a world wide yellow emote before WotLK
                         //DoScriptText(EMOTE_ERANIKUS_REDEEM, m_creature);
-                        sWorld.SendWorldText(EMOTE_ERANIKUS_REDEEM, m_creature->GetNameForLocaleIdx(0));
+                        sWorld.SendWorldText(EMOTE_ERANIKUS_REDEEM, m_creature->GetName());
                         //DoCastSpellIfCan(m_creature, SPELL_MOONGLADE_TRANQUILITY); // spell id unk for the moment
                         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
                         m_uiEventTimer = 5000;
@@ -1442,24 +1444,22 @@ struct boss_eranikusAI : public ScriptedAI
             {
                 case 85:
                     DoScriptText(SAY_ERANIKUS_ATTACK_3, m_creature);
-                    // Here Tyrande only yells but she doesn't appear anywhere - we summon here for 1 second just to handle the yell
-                    if (Creature* pTyrande = m_creature->SummonCreature(NPC_TYRANDE_WHISPERWIND, aTyrandeLocations[0].m_fX, aTyrandeLocations[0].m_fY, aTyrandeLocations[0].m_fZ, 0, TEMPSUMMON_TIMED_DESPAWN, 1000))
+                    m_creature->SummonCreature(NPC_TYRANDE_WHISPERWIND, aTyrandeLocations[0].m_fX, aTyrandeLocations[0].m_fY, aTyrandeLocations[0].m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
+                    if (Creature* pTyrande = m_creature->GetMap()->GetCreature(m_uiTyrandeGUID))
                         DoScriptText(SAY_TYRANDE_APPEAR, pTyrande);
+                    m_uiHealthCheck = 83; // priestess' should arrive a moment after Tyrande - hacks :(
+                    break;
+                case 83:
+                    // Summon the priestess
+                    DoSummonHealers();
                     m_uiHealthCheck = 75;
                     break;
                 case 75:
                     // Eranikus yells again
                     DoScriptText(SAY_ERANIKUS_ATTACK_3, m_creature);
-                    m_uiHealthCheck = 50;
-                    break;
-                case 50:
-                    // Summon Tyrande - she enters the fight this time
-                    m_creature->SummonCreature(NPC_TYRANDE_WHISPERWIND, aTyrandeLocations[0].m_fX, aTyrandeLocations[0].m_fY, aTyrandeLocations[0].m_fZ, 0, TEMPSUMMON_CORPSE_DESPAWN, 0);
                     m_uiHealthCheck = 35;
                     break;
                 case 35:
-                    // Summon the priestess
-                    DoSummonHealers();
                     DoScriptText(SAY_ERANIKUS_DEFEAT_1, m_creature);
                     m_uiHealthCheck = 31;
                     break;
