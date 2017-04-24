@@ -5518,11 +5518,11 @@ void Aura::HandleManaShield(bool apply, bool Real)
             float DoneActualBenefit = 0.0f;
 
             // Mana Shield
-            // +50% from +spd bonus
-            if (GetSpellProto()->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_MANA_SHIELD>())
-                DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(GetSpellProto())) * 0.5f;
+            // 0% coeff in vanilla (changed patch 2.4.0)
+            // if (GetSpellProto()->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_MANA_SHIELD>())
+            //    DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(GetSpellProto())) * 0.5f;
 
-            DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellProto());
+            // DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellProto());
 
             m_modifier.m_amount += (int32)DoneActualBenefit;
         }
