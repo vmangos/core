@@ -146,6 +146,10 @@ void SpellEntry::ComputeBinary()
     bool foundNoDamageAura   = false;
     for (int eff = 0; eff < 3; ++eff)
     {
+        // Micro opt - don't iterate anymore if we already have an aura
+        if (foundNoDamageAura)
+            break;
+        
         switch (Effect[eff])
         {
             case SPELL_EFFECT_INTERRUPT_CAST:
@@ -165,6 +169,9 @@ void SpellEntry::ComputeBinary()
                         foundNoDamageAura = true;
                         break;
                 }
+                break;
+            case SPELL_EFFECT_KNOCK_BACK:
+                foundNoDamageAura = true;
                 break;
         }
     }
