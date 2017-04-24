@@ -110,7 +110,7 @@ void remoteAccess()
 
     #else
 
-    ACE_TP_Reactor imp();
+    ACE_TP_Reactor imp;
     imp.max_notify_iterations (128);
 
     #endif
