@@ -184,7 +184,9 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
                                                             // any log level
         void outErrorDb( const char * str, ... )     ATTR_PRINTF(2,3);
                                                             // any log level
-        void outWorldPacketDump( uint64 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming );
+        void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
+                                char const* opcodeName,
+                                ByteBuffer const* packet, bool incoming);
         // any log level
         uint32 GetLogLevel() const { return m_logLevel; }
         void SetLogLevel(char * Level);
