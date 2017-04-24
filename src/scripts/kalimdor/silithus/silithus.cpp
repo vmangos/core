@@ -542,21 +542,21 @@ bool GossipSelect_npc_cenarion_scout_azenel(Player* pPlayer, Creature* pCreature
 enum
 {
     SPELL_FOOLS_PLIGHT              = 23504,
-    
+
     SPELL_SOUL_FLAME                = 23272,
     SPELL_DREADFUL_FRIGHT           = 23275,
     SPELL_CREEPING_DOOM             = 23589,
     SPELL_CRIPPLING_CLIP            = 23279,
 
     EMOTE_IMMOBILIZED               = -1000650,
-    
+
     SPELL_FROST_TRAP                = 13810,
-    
+
     NPC_NELSON_THE_NICE             = 14536,
     NPC_SOLENOR_THE_SLAYER          = 14530,
     NPC_CREEPING_DOOM               = 14761,
     NPC_THE_CLEANER                 = 14503,
-    
+
     QUEST_STAVE_OF_THE_ANCIENTS     = 7636
 };
 
@@ -572,11 +572,11 @@ enum
 
 struct npc_solenorAI : public ScriptedAI
 {
-    npc_solenorAI(Creature* pCreature) : ScriptedAI(pCreature) 
-    { 
+    npc_solenorAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
         m_bTransform      = false;
         m_uiDespawn_Timer = 0;
-        Reset(); 
+        Reset();
     }
 
     uint32 m_uiTransform_Timer;
@@ -615,7 +615,7 @@ struct npc_solenorAI : public ScriptedAI
             case NPC_SOLENOR_THE_SLAYER:
                 if (!m_uiDespawn_Timer)
                 {
-                    m_uiDespawn_Timer = 20*MINUTE*IN_MILLISECONDS; 
+                    m_uiDespawn_Timer = 20*MINUTE*IN_MILLISECONDS;
                     m_uiCastSoulFlame_Timer  = 150;
                     m_creature->AddAura(SPELL_SOUL_FLAME); // apply on spawn in case of instant Freezing Trap
                 }
@@ -656,11 +656,11 @@ struct npc_solenorAI : public ScriptedAI
         else
             DemonDespawn();
     }
-    
+
     void EnterEvadeMode() override
     {
         m_creature->RemoveGuardians();
-        
+
         ScriptedAI::EnterEvadeMode();
     }
 
@@ -669,7 +669,7 @@ struct npc_solenorAI : public ScriptedAI
         if (m_creature->getVictim())
             pSummoned->AI()->AttackStart(m_creature->getVictim());
     }
-    
+
     void JustDied(Unit* /*pKiller*/)
     {
         m_creature->SetHomePosition(-7724.21f, 1676.43f, 7.0571f, 4.80044f);
@@ -697,7 +697,7 @@ struct npc_solenorAI : public ScriptedAI
             if (pCleaner)
             {
                 ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-                
+
                 for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
                 {
                     if (Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
@@ -712,13 +712,13 @@ struct npc_solenorAI : public ScriptedAI
                 }
             }
         }
-        
+
         m_creature->ForcedDespawn();
     }
 
     void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
     {
-       
+
         if (pSpell && pSpell->Id == 14268)   // Wing Clip (Rank 3)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_CRIPPLING_CLIP, CAST_TRIGGERED) == CAST_OK)
@@ -729,7 +729,7 @@ struct npc_solenorAI : public ScriptedAI
     void UpdateAI(const uint32 uiDiff)
     {
         /** Nelson the Nice */
-        if (m_bTransform) 
+        if (m_bTransform)
         {
             if (m_uiTransformEmote_Timer)
             {
@@ -746,7 +746,7 @@ struct npc_solenorAI : public ScriptedAI
             {
                 m_bTransform = false;
                 Transform();
-            } 
+            }
             else
                 m_uiTransform_Timer -= uiDiff;
         }
@@ -762,7 +762,7 @@ struct npc_solenorAI : public ScriptedAI
             else
                 m_uiDespawn_Timer -= uiDiff;
         }
-        
+
         if (m_uiCastSoulFlame_Timer)
         {
             if (m_uiCastSoulFlame_Timer <= uiDiff)
@@ -774,22 +774,22 @@ struct npc_solenorAI : public ScriptedAI
             else
                 m_uiCastSoulFlame_Timer -= uiDiff;
         }
-    
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-        
+
         if (m_creature->HasAura(SPELL_SOUL_FLAME) && m_creature->HasAura(SPELL_FROST_TRAP))
                 m_creature->RemoveAurasDueToSpell(SPELL_SOUL_FLAME);
-    
+
         if (m_creature->getThreatManager().getThreatList().size() > 1 /*|| pHunter->isDead()*/)
             DemonDespawn();
 
-        if (m_uiCreepingDoom_Timer < uiDiff) 
+        if (m_uiCreepingDoom_Timer < uiDiff)
         {
             DoCastSpellIfCan(m_creature, SPELL_CREEPING_DOOM);
             m_uiCreepingDoom_Timer = 15000;
         }
-        else 
+        else
             m_uiCreepingDoom_Timer -= uiDiff;
 
         if (m_uiDreadfulFright_Timer < uiDiff)
@@ -840,7 +840,7 @@ struct npc_creeping_doomAI : public ScriptedAI
     npc_creeping_doomAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
     void Reset() {};
-    
+
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
         Unit* pOwner = m_creature->GetCharmerOrOwner();
@@ -1037,7 +1037,20 @@ enum
 {
     GO_RESONATING_CRYSTAL_FORMATION     = 180810,
 
-    SPELL_WHISPERINGS                   = 26197    // MC
+    // C'Thun's Mind Control has varying strengths based on location
+    WHISPERINGS_OF_CTHUN_0              = 26259, // (10-21) Barrens
+    WHISPERINGS_OF_CTHUN_1              = 26258, // (21-41) 1K Needles
+    WHISPERINGS_OF_CTHUN_2              = 26195, // (30-41) Desolace?
+    WHISPERINGS_OF_CTHUN_3              = 26197, // (41-51) Feralas/Tanaris/Un'Goro
+    WHISPERINGS_OF_CTHUN_4              = 26198, // (51-71) Silithus
+
+    ZONE_BARRENS                        = 17,
+    ZONE_THOUSAND_NEEDLES               = 400,
+    ZONE_DESOLACE                       = 405,
+    ZONE_FERALAS                        = 357,
+    ZONE_TANARIS                        = 440,
+    ZONE_UN_GORO                        = 490,
+    ZONE_SILITHUS                       = 1377,
 };
 
 struct npc_resonating_CrystalAI : public ScriptedAI
@@ -1045,11 +1058,13 @@ struct npc_resonating_CrystalAI : public ScriptedAI
     npc_resonating_CrystalAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
+        SPELL_WHISPERINGS = GetMCSpellForZone();
     }
 
     bool playerDetected;
     uint32 m_uiCheckTimer;
     uint32 m_uiWisperingsTimer;
+    uint32 SPELL_WHISPERINGS;
 
     void Reset()
     {
@@ -1057,6 +1072,30 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         playerDetected      = false;
         m_uiCheckTimer      = 2000;
         m_uiWisperingsTimer = 1000;
+    }
+
+    uint32 GetMCSpellForZone()
+    {
+        switch (m_creature->GetZoneId())
+        {
+            case ZONE_BARRENS:
+                return WHISPERINGS_OF_CTHUN_0;
+
+            case ZONE_THOUSAND_NEEDLES:
+                return WHISPERINGS_OF_CTHUN_1;
+
+            case ZONE_DESOLACE:
+                return WHISPERINGS_OF_CTHUN_2;
+
+            case ZONE_FERALAS:
+            case ZONE_TANARIS:
+            case ZONE_UN_GORO:
+                return WHISPERINGS_OF_CTHUN_3;
+
+            default:
+                // ZONE_SILITHUS
+                return WHISPERINGS_OF_CTHUN_4;
+        }
     }
 
     void MoveInLineOfSight(Unit* who)
@@ -1203,7 +1242,7 @@ static const WarEffort SharedObjectives[5] =
     {6887,  17000,  6887,  "Spotted Yellowtail", WAREFFORT_COOKING},
     {14529, 400000, 14529, "Runecloth Bandage", WAREFFORT_BANDAGES}
     */
-    
+
     {2840,  1250000,  2840,  "Copper Bar",          WAREFFORT_BAR},
     {8831,   700000,  8831,  "Purple Lotus",        WAREFFORT_HERBS},
     {4304,  1300000,  4304,  "Thick Leather",       WAREFFORT_SKINS},
@@ -1747,7 +1786,7 @@ bool ChatHandler::HandleGetWarEffortResource(char* args)
         double Progress = (double)CurrentResourceCount / (double)Resource->reqCount;
         PSendSysMessage("\"%s\"[%u] Current [%u] Required [%u] Completed: %.03f", Resource->itemName, Resource->itemID, CurrentResourceCount, Resource->reqCount, Progress);
     };
-    
+
     if (const WarEffort* pResource = GetResourceIDFromString(pResourceName))
     {
         PrintResources(pResource);
@@ -1757,7 +1796,7 @@ bool ChatHandler::HandleGetWarEffortResource(char* args)
     {
         PSendSysMessage("Error: resource with name \"%s\" not found", pResourceName);
     }
-    
+
     return false;
 }
 
@@ -2361,16 +2400,12 @@ enum
     SPELL_CALL_ANCIENTS = 25167, // Sends event 9426 - should activate Go 176147
     SPELL_SHATTER_HAMMER = 25182, // Breakes the scepter - needs DB coords
 
-    GO_AQ_BARRIER           = 176146,
-    GO_AQ_GATE_ROOTS        = 176147,
-    GO_AQ_GATE_RUNES        = 176148,
-
     POINT_ID_DRAGON_ATTACK = 0,
     POINT_ID_EXIT = 1,
     POINT_ID_GATE = 2,
     POINT_ID_SCEPTER = 3,
-    POINT_ID_SCEPTER_1 = 4, 
-    POINT_ID_SCEPTER_2 = 5, 
+    POINT_ID_SCEPTER_1 = 4,
+    POINT_ID_SCEPTER_2 = 5,
     POINT_ID_EPILOGUE = 6,
 
     MAX_DRAGONS = 4,
@@ -2378,10 +2413,18 @@ enum
     MAX_QIRAJI = 6,
     MAX_KALDOREI = 20,
 
+    GO_AQ_BARRIER           = 176146,
+    GO_AQ_GATE_ROOTS        = 176147,
+    GO_AQ_GATE_RUNES        = 176148,
+    GO_AQ_GHOST_GATE        = 180322,
+
     AQ_OPEN_IF_CLOSED = 0,
     AQ_PREPARE_CLOSE = 1,
     AQ_CLOSE = 2,
-    AQ_RESET = 3
+    AQ_RESET = 3,
+    AQ_CLOSE_QUIETLY = 4,
+
+    SCENE_BLOCK_TIME = 15 * MINUTE * IN_MILLISECONDS,
 };
 
 struct EventLocations
@@ -2469,6 +2512,35 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
+    void AbortScene()
+    {
+        m_uiEventStage = 1000;
+        m_uiEventTimer = 0;
+
+        DoUnsummonArmy();
+
+        // Despawn Dragons + Fandral
+        if (Creature* pFandral = m_creature->GetMap()->GetCreature(m_uiFandralGUID))
+            pFandral->ForcedDespawn();
+
+        if (Creature* pMerithra = m_creature->GetMap()->GetCreature(m_uiMerithraGUID))
+            pMerithra->ForcedDespawn();
+
+        if (Creature* pCaelestrasz = m_creature->GetMap()->GetCreature(m_uiCaelestraszGUID))
+            pCaelestrasz->ForcedDespawn();
+
+        if (Creature* pArygos = m_creature->GetMap()->GetCreature(m_uiArygosGUID))
+            pArygos->ForcedDespawn();
+
+        // Close AQ gates quietly
+        SetupAQGate(AQ_CLOSE_QUIETLY);
+
+        // Anachronos will go invisible, blocking new attempts to
+        // start the scene until the time is up
+        m_creature->SetVisibility(VISIBILITY_OFF);
+        m_creature->ForcedDespawn(SCENE_BLOCK_TIME);
+    }
+
     void SetupAQGate(uint32 phase)
     {
         if (AQ_OPEN_IF_CLOSED == phase)
@@ -2516,7 +2588,14 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
                 // Close gates with animation
                 go->ResetDoorOrButton();
-                go->UseDoorOrButton();
+                go->SetGoState(GO_STATE_READY);
+
+                break;
+
+            case AQ_CLOSE_QUIETLY:
+                go->SetVisible(false);
+                AnimateAQGate(go, AQ_CLOSE);
+                go->SetVisible(true);
 
                 break;
 
@@ -2583,7 +2662,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
             if (Creature* pTemp = m_creature->GetMap()->GetCreature(*itr))
                 if (pTemp->GetEntry() == NPC_KALDOREI_INFANTRY)
                     npc->AddThreat(pTemp, 100.0f);
-                
+
     }
 
     void JustSummoned(Creature* pSummoned)
@@ -2699,14 +2778,14 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                 break;
             case POINT_ID_SCEPTER_1:
                 // Pickup the pieces
-                
+
                 DoScriptText(EMOTE_ANACHRONOS_PICKUP, m_creature);
                 m_uiEventTimer = 2000;
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
                 break;
 
             case POINT_ID_SCEPTER_2:
-                
+
                 DoScriptText(SAY_ANACHRONOS_EPILOGUE_8, m_creature);
                 m_uiEventTimer = 4000;
                 m_creature->SetStandState(UNIT_STAND_STATE_KNEEL);
@@ -3021,15 +3100,15 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         break;
                     case 32:
                         DoCastSpellIfCan(m_creature, SPELL_PRISMATIC_BARRIER);
-                        
+
                         AnimateAQGate(go_aq_barrier);
-                        
+
 
                         m_uiEventTimer = 5000;
                         break;
                     case 33:
                         DoCastSpellIfCan(m_creature, SPELL_GLYPH_OF_WARDING);
-                        
+
                         AnimateAQGate(go_aq_gate_runes);
 
                         m_uiEventTimer = 4000;
@@ -3136,7 +3215,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
                         // Complete quest and despawn gate
                         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerGUID))
                             pPlayer->GroupEventHappens(QUEST_A_PAWN_ON_THE_ETERNAL_BOARD, m_creature);
-                        
+
                         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
                         m_uiEventTimer = 4000;
                         break;
@@ -3188,7 +3267,7 @@ bool QuestAcceptGO_crystalline_tear(Player* pPlayer, GameObject* pGo, const Ques
     if (pQuest->GetQuestId() == QUEST_A_PAWN_ON_THE_ETERNAL_BOARD)
     {
         // Check if event is already in progress first
-        if (Creature* pAnachronos = GetClosestCreatureWithEntry(pGo, NPC_ANACHRONOS_THE_ANCIENT, 90.0f))
+        if (Creature* pAnachronos = GetClosestCreatureWithEntry(pGo, NPC_ANACHRONOS_THE_ANCIENT, 180.0f))
             return true;
 
         if (Creature* pAnachronos = pPlayer->SummonCreature(NPC_ANACHRONOS_THE_ANCIENT, pGo->GetPositionX(), pGo->GetPositionY(), pGo->GetPositionZ(), 3.75f, TEMPSUMMON_CORPSE_DESPAWN, 0))
@@ -3203,6 +3282,234 @@ bool QuestAcceptGO_crystalline_tear(Player* pPlayer, GameObject* pGo, const Ques
 
     return false;
 }
+
+enum
+{
+    MAX_QIRAJI_CRYSTALS     = 6,
+    VAR_CRYSTALS_AWARDED    = 1,
+
+    QUEST_BANG_A_GONG       = 8743,
+
+    GLOBAL_TEXT_CHAMPION    = -1000007,
+    GLOBAL_TEXT_CRYSTALS    = -1000008,
+
+    TEXT_COLOSSUS_ASHI      = -1000009,
+    TEXT_COLOSSUS_REGAL     = -1000016,
+    TEXT_COLOSSUS_ZORA      = -1000017,
+
+    GAME_EVENT_AQ_WAR       = 61,
+    GAME_EVENT_ASHI         = 62,
+    GAME_EVENT_REGAL        = 63,
+    GAME_EVENT_ZORA         = 64,
+    GAME_EVENT_CRYSTALS     = 65,
+
+
+    STAGE_OPEN_GATES        = 0,
+    STAGE_WAR               = 1,
+    STAGE_RESET             = 2,
+};
+
+struct scarab_gongAI: public GameObjectAI
+{
+    scarab_gongAI(GameObject* go) : GameObjectAI(go)
+    {
+        eventTimer = 0;
+        eventStep = 0;
+        eventStage = STAGE_OPEN_GATES;
+    }
+
+    uint32 eventTimer;
+    uint32 eventStep;
+    uint32 eventStage;
+
+    GameObject* go_aq_barrier;
+    GameObject* go_aq_gate_runes;
+    GameObject* go_aq_gate_roots;
+    // Invisible AQ barrier
+    GameObject* go_aq_ghost_gate;
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (eventTimer)
+        {
+            if (eventTimer <= uiDiff)
+            {
+                switch (eventStage)
+                {
+                    case STAGE_OPEN_GATES: return HandleOpeningStage();
+                    case STAGE_WAR:         return HandleWarStage();
+                    case STAGE_RESET:      return ResetAQGates();
+                }
+
+            }
+            else eventTimer -= uiDiff;
+        }
+
+    }
+
+    void NextStage(uint32 timeUntil = 100)
+    {
+        eventStage++;
+        eventStep = 0;
+        eventTimer = timeUntil;
+    }
+
+    void HandleOpeningStage()
+    {
+        switch (eventStep)
+        {
+            case 0:
+                go_aq_gate_roots->ResetDoorOrButton();
+                go_aq_gate_roots->UseDoorOrButton();
+
+                // Remove invisible barrier
+                go_aq_ghost_gate->SetSpawnedByDefault(false);
+                go_aq_ghost_gate->Despawn();
+                go_aq_ghost_gate->SaveToDB();
+                eventTimer = 5000;
+                break;
+
+            case 1:
+                go_aq_gate_runes->ResetDoorOrButton();
+                go_aq_gate_runes->UseDoorOrButton();
+
+                eventTimer = 3000;
+                break;
+
+            case 2:
+                sWorld.SendWorldText(GLOBAL_TEXT_CRYSTALS);
+                eventTimer = 5000;
+
+                break;
+
+            case 3:
+                go_aq_barrier->ResetDoorOrButton();
+                go_aq_barrier->UseDoorOrButton();
+
+                me->MonsterScriptToZone(TEXT_COLOSSUS_ASHI, CHAT_MSG_MONSTER_EMOTE);
+                me->MonsterScriptToZone(TEXT_COLOSSUS_REGAL, CHAT_MSG_MONSTER_EMOTE);
+                me->MonsterScriptToZone(TEXT_COLOSSUS_ZORA, CHAT_MSG_MONSTER_EMOTE);
+
+                return NextStage(10000);
+
+        }
+
+        eventStep++;
+
+    }
+
+    void HandleWarStage()
+    {
+        switch (eventStep)
+        {
+            case 0:
+                sGameEventMgr.StartEvent(GAME_EVENT_CRYSTALS, true);
+
+                return EventDone();
+        }
+
+        eventStep++;
+    }
+
+
+    void BeginAQOpeningEvent(Player* player)
+    {
+        if (!player)
+            return;
+
+        go_aq_barrier    = GetClosestGameObjectWithEntry(me, GO_AQ_BARRIER, 150);
+        go_aq_gate_runes = GetClosestGameObjectWithEntry(me, GO_AQ_GATE_RUNES, 150);
+        go_aq_gate_roots = GetClosestGameObjectWithEntry(me, GO_AQ_GATE_ROOTS, 150);
+        go_aq_ghost_gate = GetClosestGameObjectWithEntry(me, GO_AQ_GHOST_GATE, 150);
+
+        if (!go_aq_barrier || !go_aq_gate_runes || !go_aq_gate_roots || !go_aq_ghost_gate)
+            return;
+
+        // Abort "Pawn on the Eternal Board" scene if currently active.
+        if (Creature* pAnachronos = GetClosestCreatureWithEntry(me, NPC_ANACHRONOS_THE_ANCIENT, 180.0f))
+        {
+            if (npc_anachronos_the_ancientAI* pAnachronosAI = dynamic_cast<npc_anachronos_the_ancientAI*>(pAnachronos->AI()))
+            {
+                pAnachronosAI->AbortScene();
+                eventTimer += 8000;
+            }
+        }
+
+        // Should not be open
+        if (go_aq_barrier->GetGoState() == GO_STATE_ACTIVE)
+            return;
+
+        // Announce Champion to the world
+        sWorld.SendWorldText(GLOBAL_TEXT_CHAMPION, player->GetName());
+
+        eventTimer += 1000;
+        eventStage = STAGE_OPEN_GATES;
+    }
+
+    void EventDone()
+    {
+        NextStage(0);
+        eventStage = STAGE_OPEN_GATES;
+    }
+
+    void ResetAQGates()
+    // For debugging
+    {
+        go_aq_ghost_gate->SetGoState(GO_STATE_READY);
+        go_aq_barrier->SetGoState(GO_STATE_READY);
+        go_aq_gate_runes->SetGoState(GO_STATE_READY);
+        go_aq_gate_roots->ResetDoorOrButton();
+        go_aq_gate_roots->SetGoState(GO_STATE_READY);
+
+        EventDone();
+    }
+};
+
+GameObjectAI* GetAIscarab_gong(GameObject *go)
+{
+    return new scarab_gongAI(go);
+}
+
+bool GOHello_scarab_gong(Player* player, GameObject* go)
+{
+    if (go->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
+        return false;
+
+    uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
+
+    if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
+        return false;
+
+    player->PrepareQuestMenu(go->GetGUID());
+    player->SendPreparedQuest(go->GetGUID());
+
+    return true;
+}
+
+bool QuestRewarded_scarab_gong(Player* player, GameObject* go, Quest const* quest)
+{
+    if (quest->GetQuestId() != QUEST_BANG_A_GONG)
+        return false;
+
+    uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
+
+    // Just to be sure
+    if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
+        return false;
+
+    // Increment number of black crystals given
+    sObjectMgr.SetSavedVariable(VAR_CRYSTALS_AWARDED, crystalsAwarded + 1, true);
+
+    // Special case for first to ring the Gong
+    if (0 == crystalsAwarded)
+    {
+        if (scarab_gongAI* gongAI = dynamic_cast<scarab_gongAI*>(go->AI()))
+            gongAI->BeginAQOpeningEvent(player);
+    }
+
+    return true;
+}
+
 
 
 /*########################
@@ -4101,5 +4408,12 @@ void AddSC_silithus()
     pNewScript = new Script;
     pNewScript->Name = "npc_creeping_doom";
     pNewScript->GetAI = &GetAI_npc_creeping_doom;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_scarab_gong";
+    pNewScript->GOGetAI = &GetAIscarab_gong;
+    pNewScript->pQuestRewardedGO = &QuestRewarded_scarab_gong;
+    pNewScript->pGOHello = &GOHello_scarab_gong;
     pNewScript->RegisterSelf();
 }
