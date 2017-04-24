@@ -886,7 +886,7 @@ void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
     outTimestamp(worldLogfile);
 
     fprintf(worldLogfile,
-            "\n%s:\nSOCKET: %llu\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
+            "\n%s:\nSOCKET: %p\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
             incoming ? "CLIENT" : "SERVER", socketHandle, packet->size(),
             opcodeName, opcode);
 
