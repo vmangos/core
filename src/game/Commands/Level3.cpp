@@ -7333,18 +7333,22 @@ bool ChatHandler::HandleDebugMoveCommand(char* args)
     switch (movetype)
     {
         case 0:
+            target->GetMotionMaster()->Clear(true, true);
             target->GetMotionMaster()->MoveIdle();
             break;
         case 1:
-            target->GetMotionMaster()->MoveRandom();
+            target->GetMotionMaster()->MoveIdle();
             break;
         case 2:
-            target->GetMotionMaster()->MoveConfused();
+            target->GetMotionMaster()->MoveRandom();
             break;
         case 3:
-            target->GetMotionMaster()->MoveFleeing(m_session->GetPlayer());
+            target->GetMotionMaster()->MoveConfused();
             break;
         case 4:
+            target->GetMotionMaster()->MoveFleeing(m_session->GetPlayer());
+            break;
+        case 5:
             target->GetMotionMaster()->MoveFeared(m_session->GetPlayer());
             break;
     }
