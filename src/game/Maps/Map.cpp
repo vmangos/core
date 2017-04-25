@@ -97,9 +97,9 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
       _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
       m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS))),
-      m_objectThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS)-1)),
-      m_visibilityThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1)),
-      m_cellThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) -1))
+      m_objectThreads(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS) -1,0))),
+      m_visibilityThreads(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0))),
+      m_cellThreads(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0)))
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -672,15 +672,15 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
     for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end(); ++m_activeNonPlayersIter)
         MarkCellsAroundObject(*m_activeNonPlayersIter);
 
-    const int nthreads = m_cellThreads->size() -1;
+    const int nthreads = m_cellThreads->size();
     for (int step = 0; step < 2; step++)
     {
-        for (int i = 0; i < (nthreads - 1); ++i)
+        for (int i = 0; i < nthreads; ++i)
             m_cellThreads << [this, diff, now, i, nthreads](){
-                UpdateActiveCellsCallback(diff, now, i, nthreads, 0);
+                UpdateActiveCellsCallback(diff, now, i, nthreads+1, 0);
             };
         std::future<void> job = m_cellThreads->processWorkload();
-        UpdateActiveCellsCallback(diff, now, nthreads-1, nthreads, 0);
+        UpdateActiveCellsCallback(diff, now, nthreads, nthreads+1, 0);
         if (job.valid())
             job.wait();
     }
@@ -719,7 +719,7 @@ inline void Map::UpdateCells(uint32 map_diff)
     _lastCellsUpdate = now;
 
     /// update active cells around players and active objects
-    if (IsContinent() && sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS))
+    if (IsContinent() && m_cellThreads->status() == ThreadPool::Status::READY)
         UpdateActiveCellsAsynch(now, diff);
     else
         UpdateActiveCellsSynch(now, diff);
@@ -3605,11 +3605,7 @@ void Map::SendObjectUpdates()
     // Compute maximum number of threads
     uint32 threads = 1;
     if (IsContinent())
-    {
-        threads = sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS);
-        if (!threads)
-            threads = 1;
-    }
+        threads = m_objectThreads->size() +1;
     if (!_objUpdatesThreads)
         _objUpdatesThreads = 1;
     if (threads < _objUpdatesThreads)
@@ -3678,11 +3674,7 @@ void Map::UpdateVisibilityForRelocations()
     // Compute number of threads to spawn
     uint32 threads = 1;
     if (IsContinent())
-    {
-        threads = sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS);
-        if (!threads)
-            threads = 1;
-    }
+        threads = m_visibilityThreads->size() + 1;
     if (!_unitRelocationThreads)
         _unitRelocationThreads = 1;
     if (threads < _unitRelocationThreads)
