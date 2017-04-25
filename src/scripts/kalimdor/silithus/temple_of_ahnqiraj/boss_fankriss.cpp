@@ -483,8 +483,8 @@ struct boss_fankrissAI : public ScriptedAI
                     w.enrageTimer = WORM_ENRAGE_BASE_TIMER + WORM_ENRAGE_ADDITION*i; // 15sec for first, 20 for second and 25 sec for last.
                     /*  How long after each wave has fully spawned will next wave start spawning. (minTime,maxTime)
                         1x snake in prev wave = (18, 23)
-                        2x snake in prev wave = (28  33)
-                        3x snake in prev wave = (38  43)
+                        2x snake in prev wave = (25  30)
+                        3x snake in prev wave = (32  37)
                     */
                     if (i == 0)
                         w.spawnTimer = 18000 + ((numWormsLastWave-1)*7000) + urand(0, 5000);
