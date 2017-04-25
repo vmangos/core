@@ -16,3 +16,13 @@ UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='100', `maxcount`='3
 
 -- regular scarab coffer bag droprate set to 85%
 UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='85' WHERE `entry`='17532' and`item`='21156';
+
+-- regular scarab coffer fixed droprate of 14% for 1-2 idols
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20866';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20867';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20868';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20869';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20870';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20871';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20872';
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`='14' WHERE `entry`='17532' and`item`='20873';
