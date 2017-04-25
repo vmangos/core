@@ -48,3 +48,4 @@ UPDATE creature_template SET flags_extra = 257 WHERE entry = 15299;
 
 -- Update speed
 UPDATE creature_template SET speed_walk = 3, speed_run = 3 WHERE entry = 15299;
+UPDATE creature_template SET speed_run = 1 WHERE entry = 15667;
