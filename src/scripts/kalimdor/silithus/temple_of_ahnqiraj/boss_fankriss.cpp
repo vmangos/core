@@ -52,6 +52,7 @@ static constexpr size_t MAX_HATCHLINGS_PER_WEB  = 4;    // Max amount of hatchli
 static constexpr uint32 HATCHLINGS_ATTACK_DELAY = 2500; // ~2.5sec in curse killvideo.
 static constexpr uint32 WORM_ENRAGE_BASE_TIMER  = 15000;
 static constexpr uint32 WORM_ENRAGE_ADDITION    = 5000;
+
 // if defined, 2-MAX_HATCHLINGS_PER_WEB hatchlings are spawned in all 3 locations each time a player is ported,
 // otherwise 2-MAX_HATCHLINGS_PER_WEB hatchlings will only spawn on the single location the player was ported to.
 #define ALWAYS_HATCHLINGS_IN_3_LOCATIONS
@@ -320,8 +321,8 @@ struct boss_fankrissAI : public ScriptedAI
         // 45 seconds max that it is here. Old nost code was 45sec. Cmangos use 75sec.
         // Should it also be possible that two players are webbed at the same time?
         // If not, we need shorter rand intervals and no overlap between the 3 webs.
-        entangleTimers[0] = std::make_pair(urand(2000  + add, 20000 + add), false);
-        entangleTimers[1] = std::make_pair(urand(15000 + add, 35000 + add), false);
+        entangleTimers[0] = std::make_pair(urand(2000  + add, 18000 + add), false);
+        entangleTimers[1] = std::make_pair(urand(15000 + add, 28000 + add), false);
         entangleTimers[2] = std::make_pair(urand(25000 + add, 45000 + add), false);
         entangleRotationTimer = 45000 + add;
         sLog.outBasic("Next webs: %d, %d, %d", entangleTimers[0].first, entangleTimers[1].first, entangleTimers[2].first);
@@ -458,7 +459,7 @@ struct boss_fankrissAI : public ScriptedAI
         {
             Worm& w = worms[i];
             if (w.shouldSpawn && !w.haveSpawned) {
-                if (w.spawnTimer < uiDiff) {
+                if (w.spawnTimer     < uiDiff) {
                     w.haveSpawned = true;
                     SummonWorm(aSummonWormLocs[vIndex[i]], w.enrageTimer);
                 }
@@ -480,10 +481,15 @@ struct boss_fankrissAI : public ScriptedAI
                 w.shouldSpawn = i < spawnCount;
                 if (w.shouldSpawn) {
                     w.enrageTimer = WORM_ENRAGE_BASE_TIMER + WORM_ENRAGE_ADDITION*i; // 15sec for first, 20 for second and 25 sec for last.
+                    /*  How long after each wave has fully spawned will next wave start spawning. (minTime,maxTime)
+                        1x snake in prev wave = (18, 23)
+                        2x snake in prev wave = (28  33)
+                        3x snake in prev wave = (38  43)
+                    */
                     if (i == 0)
-                        w.spawnTimer = 20000 * numWormsLastWave + urand(2000 * numWormsLastWave, 4000* numWormsLastWave); //randomizing a little extra
+                        w.spawnTimer = 18000 + ((numWormsLastWave-1)*7000) + urand(0, 5000);
                     else
-                        w.spawnTimer = worms[i-1].spawnTimer + urand(4000, 8000);
+                        w.spawnTimer = worms[i-1].spawnTimer + urand(4000, 8000); // Each snake in a wave comes 4-8s after the previous one
                     sLog.outBasic("worm %d spawning in %d. Will enrage after %d", i, w.spawnTimer, w.enrageTimer);
                 }
             }
