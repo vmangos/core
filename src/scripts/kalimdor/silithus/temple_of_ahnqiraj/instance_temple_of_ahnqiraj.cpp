@@ -715,6 +715,7 @@ InstanceData* GetInstanceData_instance_temple_of_ahnqiraj(Map* pMap)
 
 bool GossipHello_npc_Caelestrasz(Player* pPlayer, Creature* pCreature)
 {
+    pPlayer->PrepareQuestMenu(pCreature->GetGUID());
     if (InstanceData* instData = pCreature->GetInstanceData()) {
         if (instData->GetData(TYPE_CTHUN) == DONE) {
             pPlayer->SEND_GOSSIP_MENU(40101, pCreature->GetGUID());
