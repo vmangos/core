@@ -388,7 +388,7 @@ struct boss_viscidusAI : public ScriptedAI
                 // should be part of SPELL_VISCIDUS_SHRINKS_HP script!
                 auto scale = m_creature->GetObjectScale();
                 scale -= 0.04 * m_lGlobesGuidList.size();
-                //m_creature->SetObjectScale(scale);
+                m_creature->SetObjectScale(scale);
             }
             else
                 m_uiExplodeDelayTimer -= uiDiff;
