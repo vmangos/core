@@ -65,4 +65,10 @@ UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`='50', `RewOnKillRep
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`='50', `RewOnKillRepValue2`='150' WHERE `creature_id`='15348';
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`='50', `RewOnKillRepValue2`='150' WHERE `creature_id`='15369';
 UPDATE `creature_onkill_reputation` SET `RewOnKillRepValue1`='100', `RewOnKillRepValue2`='300' WHERE `creature_id`='15339';
- SELECT * FROM creature_onkill_reputation where creature_id IN (15370, 15340, 15348, 15369, 15339);
+ -- SELECT * FROM creature_onkill_reputation where creature_id IN (15370, 15340, 15348, 15369, 15339);
+
+-- C'thuns legacy gives 500 CC rep and 500 Brood rep.
+UPDATE `mangos`.`quest_template` SET `RewRepFaction2`='910', `RewRepValue1`='500', `RewRepValue2`='500' WHERE `entry`='8801';
+
+-- The Saviour of Kalimdor gives 500 CC rep and 1000 Brood rep.
+UPDATE `mangos`.`quest_template` SET `RewRepFaction2`='910', `RewRepValue1`='500', `RewRepValue2`='1000' WHERE `entry`='8802';
