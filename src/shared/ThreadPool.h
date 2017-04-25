@@ -27,6 +27,11 @@
 #include <atomic>
 #include <future>
 
+#ifdef WIN32
+#undef ERROR
+#undef IGNORE
+#endif
+
 class ThreadPool
 {
 private:
@@ -200,9 +205,10 @@ private:
     workers_t m_workers;
 };
 
-std::unique_ptr<ThreadPool> & operator<<(std::unique_ptr<ThreadPool> & tp, auto f)
+template<typename T>
+std::unique_ptr<ThreadPool> & operator<<(std::unique_ptr<ThreadPool> & tp, T &&f)
 {
-    (*tp) << f;
+    (*tp) << std::forward<T>(f);
     return tp;
 }
 

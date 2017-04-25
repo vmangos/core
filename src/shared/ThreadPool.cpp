@@ -20,6 +20,11 @@
 #include "Log.h"
 #include <mysql.h>
 
+#ifdef WIN32
+#undef ERROR
+#undef IGNORE
+#endif
+
 ThreadPool::ThreadPool(int numThreads, ClearMode when, ErrorHandling mode) :
     m_errorHandling(mode), m_size(numThreads), m_clearMode(when), m_active(0)
 {
