@@ -616,9 +616,9 @@ void CliRunnable::operator()()
             break;
         #endif
 
-        //select exit as soon as new data can be read or timeout is reached
-        //this is needed becouse `fgets` and `select` are not interrupted by fclose
-        int retval;
+#ifndef WIN32
+
+		int retval;
         do
         {
             fd_set rfds;
@@ -637,9 +637,10 @@ void CliRunnable::operator()()
             World::StopNow(SHUTDOWN_EXIT_CODE);
             break;
         }
+#endif
 
         char *command_str = fgets(commandbuf,sizeof(commandbuf),stdin);
-        if (command_str != NULL)
+        if (command_str != nullptr)
         {
             for(int x=0;command_str[x];x++)
                 if(command_str[x]=='\r'||command_str[x]=='\n')
@@ -664,6 +665,10 @@ void CliRunnable::operator()()
 
             sWorld.QueueCliCommand(new CliCommandHolder(0, SEC_CONSOLE, NULL, command.c_str(), &utf8print, &commandFinished));
         }
+		else if (feof(stdin))
+		{
+			World::StopNow(SHUTDOWN_EXIT_CODE);
+		}
     }
 
     ///- End the database thread
