@@ -1037,6 +1037,8 @@ enum
 {
     GO_RESONATING_CRYSTAL_FORMATION     = 180810,
 
+    MAX_SIGHT_DISTANCE                  = 55,
+
     // C'Thun's Mind Control has varying strengths based on location
     WHISPERINGS_OF_CTHUN_0              = 26259, // (10-21) Barrens
     WHISPERINGS_OF_CTHUN_1              = 26258, // (21-41) 1K Needles
@@ -1106,7 +1108,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         if (!who->isAlive())
             return;
 
-        playerDetected = m_creature->IsWithinDistInMap(who, 50.0f) ? true : false;
+        playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE) ? true : false;
     }
 
     bool MoreThanOnePlayerNear()
@@ -1116,8 +1118,9 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, 40.0f) && m_creature->IsWithinLOSInMap(pPlayer) && !pPlayer->isGameMaster())
+            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->isGameMaster())
                 ++var;
+
             if (var > 1)
                 return true;
         }
@@ -1130,7 +1133,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, 40.0f) && m_creature->IsWithinLOSInMap(pPlayer) && !pPlayer->isGameMaster())
+            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->isGameMaster())
             {
                 m_creature->AddThreat(pPlayer);
                 m_creature->SetInCombatWith(pPlayer);
@@ -1160,11 +1163,11 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         // Whisperings of C'Thun (MC)
         if (MoreThanOnePlayerNear())
         {
-            if (m_uiWisperingsTimer < uiDiff)
+            if (m_uiWisperingsTimer < uiDiff || (m_creature->GetCharm() && m_creature->GetCharm()->IsPolymorphed()))
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS) == CAST_OK)
-                        m_uiWisperingsTimer = 30000;
+                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                        m_uiWisperingsTimer = 20000;
             }
             else
                 m_uiWisperingsTimer -= uiDiff;
@@ -2492,7 +2495,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
     void Reset()
     {
         // We summon the rest of the dragons on timer
-        m_uiEventTimer = 100;
+        m_uiEventTimer = 0;
         m_uiEventStage = 0;
 
         m_uiFandralGUID.Clear();
@@ -2510,6 +2513,11 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
         m_creature->SetRespawnDelay(DAY);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+    }
+
+    void BeginScene()
+    {
+        m_uiEventTimer = 100;
     }
 
     void AbortScene()
@@ -2539,6 +2547,11 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         // start the scene until the time is up
         m_creature->SetVisibility(VISIBILITY_OFF);
         m_creature->ForcedDespawn(SCENE_BLOCK_TIME);
+    }
+
+    void JustDied(Unit* killer)
+    {
+        AbortScene();
     }
 
     void SetupAQGate(uint32 phase)
@@ -3274,7 +3287,10 @@ bool QuestAcceptGO_crystalline_tear(Player* pPlayer, GameObject* pGo, const Ques
         {
             // Send the player's guid in order to handle quest completion
             if (npc_anachronos_the_ancientAI* pAnachronosAI = dynamic_cast<npc_anachronos_the_ancientAI*>(pAnachronos->AI()))
+            {
                 pAnachronosAI->m_uiPlayerGUID = pPlayer->GetObjectGuid();
+                pAnachronosAI->BeginScene();
+            }
 
             return true;
         }
@@ -3288,6 +3304,7 @@ enum
     MAX_QIRAJI_CRYSTALS     = 6,
     VAR_CRYSTALS_AWARDED    = 1,
 
+    QUEST_MIGHT_OF_KALIMDOR = 8742,
     QUEST_BANG_A_GONG       = 8743,
 
     GLOBAL_TEXT_CHAMPION    = -1000007,
@@ -3307,7 +3324,11 @@ enum
     STAGE_OPEN_GATES        = 0,
     STAGE_WAR               = 1,
     STAGE_RESET             = 2,
+
+    NPC_RAJAXX              = 15341,
 };
+
+static const EventLocations rajaxxSpawnPoint = { -8106.35f, 1523.41f, 2.61f, 0.06166f, 0 };
 
 struct scarab_gongAI: public GameObjectAI
 {
@@ -3404,6 +3425,13 @@ struct scarab_gongAI: public GameObjectAI
         {
             case 0:
                 sGameEventMgr.StartEvent(GAME_EVENT_CRYSTALS, true);
+                eventTimer = 10000;
+
+                break;
+
+            // Summon Rajaxx
+            case 1:
+                me->SummonCreature(NPC_RAJAXX, rajaxxSpawnPoint.m_fX, rajaxxSpawnPoint.m_fY, rajaxxSpawnPoint.m_fZ, rajaxxSpawnPoint.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
 
                 return EventDone();
         }
@@ -3475,13 +3503,14 @@ bool GOHello_scarab_gong(Player* player, GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
         return false;
 
-    uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
+    //uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
 
-    if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
-        return false;
+    // Not used since we moved to time-based window
+    //if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
+    //    return false;
 
-    player->PrepareQuestMenu(go->GetGUID());
-    player->SendPreparedQuest(go->GetGUID());
+    player->PrepareQuestMenu(go->GetObjectGuid());
+    player->SendPreparedQuest(go->GetObjectGuid());
 
     return true;
 }
@@ -3494,8 +3523,9 @@ bool QuestRewarded_scarab_gong(Player* player, GameObject* go, Quest const* ques
     uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
 
     // Just to be sure
-    if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
-        return false;
+    // Not used since we moved to time-based window
+    //if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
+    //    return false;
 
     // Increment number of black crystals given
     sObjectMgr.SetSavedVariable(VAR_CRYSTALS_AWARDED, crystalsAwarded + 1, true);
@@ -4414,6 +4444,6 @@ void AddSC_silithus()
     pNewScript->Name = "go_scarab_gong";
     pNewScript->GOGetAI = &GetAIscarab_gong;
     pNewScript->pQuestRewardedGO = &QuestRewarded_scarab_gong;
-    pNewScript->pGOHello = &GOHello_scarab_gong;
+    pNewScript->pGOGossipHello = &GOHello_scarab_gong;
     pNewScript->RegisterSelf();
 }
