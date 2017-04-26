@@ -1,4 +1,4 @@
-INSERT INTO `migrations` VALUES ('20170422113527'); 
+INSERT INTO `migrations` VALUES ('20170424113527'); 
 
 UPDATE `script_texts` SET `content_default`='The rift will be opened there, above the Lake Elun\'ara. Prepare yourself, $N. Eranikus\'s entry into our world will be wrought with chaos and strife.' WHERE `entry`='-1000717';
 UPDATE `script_texts` SET `content_default`='IT BURNS! THE PAIN... SEARING...' WHERE `entry`='-1000740';
