@@ -6024,6 +6024,17 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     }
                     return;
                 }
+                case 11094:                                 // Improved Fire Ward
+                case 13043:
+                {
+                    if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
+                    {
+                        // reflection chance (effect 1) of Fire Ward, applied in dummy effect
+                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_EFFECT2, GetId()))
+                            ((Player*)m_target)->AddSpellMod(mod, false);
+                    }
+                    return;
+                }
                 default:
                     return;
             }

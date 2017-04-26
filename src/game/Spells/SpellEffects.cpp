@@ -1392,6 +1392,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Player*)unitTarget)->AddSpellMod(mod, true);
                     break;
                 }
+                case 11094:                                 // Improved Fire Ward
+                case 13043:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // increase reflaction chanced (effect 1) of Fire Ward, removed in aura boosts
+                    SpellModifier *mod = new SpellModifier(SPELLMOD_EFFECT2, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000008));
+                    ((Player*)unitTarget)->AddSpellMod(mod, true);
+                    break;
+                }
                 case 12472:                                 // Cold Snap
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
