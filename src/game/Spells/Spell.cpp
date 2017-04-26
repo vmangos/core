@@ -3785,10 +3785,6 @@ void Spell::SendCastResult(SpellCastResult result)
 
 void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
-    // Debug forme ombre, ...
-    if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_SHAPESHIFT) && result != SPELL_CAST_OK)
-        result = SPELL_FAILED_FIZZLE;
-
     WorldPacket data(SMSG_CAST_FAILED, (4 + 1 + 1));
     data << uint32(spellInfo->Id);
 
