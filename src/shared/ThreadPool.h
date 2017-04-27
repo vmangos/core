@@ -123,7 +123,7 @@ public:
      * @brief size
      * @return the number of threads that are/will be created
      */
-    int size() const;
+    size_t size() const;
 
     /**
      * @brief taskErrors always return an empty vector if ErrorHandling was set to IGNORE
@@ -192,7 +192,7 @@ private:
 
     Status m_status = Status::STOPPED;
     ErrorHandling m_errorHandling;
-    int m_size;
+    size_t m_size;
     std::shared_timed_mutex m_mutex;
     std::condition_variable_any m_waitForWork;
     workload_t m_workload;

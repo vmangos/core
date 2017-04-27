@@ -55,11 +55,11 @@ std::future<void> ThreadPool::processWorkload()
         return std::future<void>();
     m_result = std::promise<void>();
     m_dirty = true;
-    m_active = m_size;
+    m_active = std::min(m_size, m_workload.size());
     m_index = 0;
     m_status = Status::PROCESSING;
     std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
-    for (int i = 0; i < m_size; i++)
+    for (int i = 0; i < m_active; i++)
         m_workers[i]->prepare();
     m_waitForWork.notify_all();
     return m_result.get_future();
@@ -88,7 +88,7 @@ ThreadPool::Status ThreadPool::status() const
     return m_status;
 }
 
-int ThreadPool::size() const
+size_t ThreadPool::size() const
 {
     return m_size;
 }
