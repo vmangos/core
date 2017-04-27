@@ -177,7 +177,7 @@ private:
         void doWork() override;
         void prepare() override;
 
-        workload_t::iterator it;
+        int it;
     };
 
     template <class T>

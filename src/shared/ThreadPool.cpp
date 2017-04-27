@@ -222,17 +222,17 @@ ThreadPool::worker_mq::worker_mq(ThreadPool *pool, int id, ThreadPool::ErrorHand
 
 void ThreadPool::worker_mq::doWork()
 {
-    while (it < pool->m_workload.end() && pool->m_status == Status::PROCESSING)
+    while (it < pool->m_workload.size() && pool->m_status == Status::PROCESSING)
     {
-        workload_t::iterator w = it;
+        int w = it;
         it += pool->m_size; //if it fails, we might want to skip this task.
-        (*w)();
+        pool->m_workload[w]();
     }
 }
 
 void ThreadPool::worker_mq::prepare()
 {
-    it = pool->m_workload.begin() + id;
+    it = id;
     worker::prepare();
 }
 
