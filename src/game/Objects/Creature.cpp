@@ -356,10 +356,107 @@ uint32 Creature::GetSpawnFlags() const
     return 0;
 }
 
+void Creature::UnloadCreatureAddon(const CreatureDataAddon* data)
+{
+    if (data->mount != 0)
+        Unmount();
+
+    if (data->bytes1 != 0)
+    {
+        // 0 StandState
+        // 1 LoyaltyLevel  Pet only, so always 0 for default creature
+        // 2 ShapeshiftForm     Must be determined/set by shapeshift spell/aura
+        // 3 StandMiscFlags
+
+        SetByteValue(UNIT_FIELD_BYTES_1, 0, 0);
+        //SetByteValue(UNIT_FIELD_BYTES_1, 1, 0);
+        //SetByteValue(UNIT_FIELD_BYTES_1, 1, 0);
+        //SetByteValue(UNIT_FIELD_BYTES_2, 2, 0);
+        SetByteValue(UNIT_FIELD_BYTES_1, 3, 0);
+    }
+
+    // UNIT_FIELD_BYTES_2
+    // 0 SheathState
+    // 1 Bytes2Flags, in 3.x used UnitPVPStateFlags, that have different meaning
+    // 2 UnitRename         Pet only, so always 0 for default creature
+    // 3 ShapeshiftForm     Must be determined/set by shapeshift spell/aura
+    SetByteValue(UNIT_FIELD_BYTES_2, 0, 0);
+
+    if (data->flags != 0)
+        SetByteValue(UNIT_FIELD_BYTES_2, 1, 0);
+
+    //SetByteValue(UNIT_FIELD_BYTES_2, 2, 0);
+    //SetByteValue(UNIT_FIELD_BYTES_2, 3, 0);
+
+    if (data->emote != 0)
+        SetUInt32Value(UNIT_NPC_EMOTESTATE, 0);
+
+    if (data->move_flags & SPLINEFLAG_FLYING)
+        SetFly(false);
+
+    if (data->auras)
+    {
+        for (uint32 const* cAura = data->auras; *cAura; ++cAura)
+        {
+            if (HasAura(*cAura))
+            {
+                RemoveAurasDueToSpellByCancel(*cAura);
+            }
+        }
+    }
+}
+
 bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=NULL*/, GameEventCreatureData const* eventData /*=NULL*/, bool preserveHPAndPower /*=true*/)
 {
+    bool addonReload = false;
+
+    /*
+     * This section of code is an attempt to handle the case where creature entry IDs are
+     * updated after creature creation. This is typically done to randomise trash spawn
+     * types and it works (mostly) fine until the different creature entries have different
+     * creature_template_aura entries. What we want to do is ensure auras belonging to
+     * the previous creature entry are removed and auras belonging to the new creature
+     * entry are applied. This complication is that this function is also called 
+     * from several other spots, including Creature::Create, which causes a
+     * few problems if not handled correctly, for some definition of correct.
+     *
+     * TL;DR: Hack to handle randomised trash spawn auras without requiring
+     * script authors to do it explicitly and/or breaking existing code.
+     * Would be better to have a spawn system that could properly handle
+     * random entries.
+     */
+    if (m_creatureInfo) // prevent aura unloading if this creature is still under creation
+    {
+        auto newAddonData = ObjectMgr::GetCreatureTemplateAddon(Entry);
+        auto prevAddonData = ObjectMgr::GetCreatureTemplateAddon(m_creatureInfo->Entry);
+        auto creaAddonData = ObjectMgr::GetCreatureAddon(GetGUIDLow());
+
+        /* 
+         * Auras listed in creature_addon override anything contained in creature_template_addon, 
+         * so we don't want to unload GUID-based auras, even if we're changing the template entry
+         */
+        if (!creaAddonData && prevAddonData != newAddonData)
+        {
+            addonReload = true;
+
+            /* 
+             * Looks like we're changing the creature's entry ID, so remove any auras
+             * coming from the creature_template_auras table
+             */
+            if (prevAddonData)
+            {
+                UnloadCreatureAddon(prevAddonData);
+            }
+        }
+    }
+
     if (!InitEntry(Entry, team, data, eventData))
         return false;
+
+    if (addonReload)
+    {
+        LoadCreatureAddon(true);
+    }
 
     m_regenHealth = GetCreatureInfo()->RegenHealth;
 
