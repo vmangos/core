@@ -219,6 +219,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         volatile bool*  i_continentUpdateFinished;
 
         std::unique_ptr<ThreadPool> m_threads;
+        std::unique_ptr<ThreadPool> m_continentThreads;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;

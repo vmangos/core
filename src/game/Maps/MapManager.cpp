@@ -248,11 +248,10 @@ void MapManager::Update(uint32 diff)
         return;
 
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
-    std::vector<std::function<void()>> instanceUpdaters;
-    std::vector<std::function<void()>> continentsUpdaters;
 
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
+    std::vector<std::function<void()>> continentsUpdaters;
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
     {
         // If this map has been empty for too long, we no longer update it.
@@ -267,19 +266,18 @@ void MapManager::Update(uint32 diff)
         if (iter->second->Instanceable())
         {
             if (m_threads->status() == ThreadPool::Status::READY)
-                instanceUpdaters.emplace_back([iter,mapsDiff](){iter->second->DoUpdate(mapsDiff);});
+                m_threads << [iter,mapsDiff](){
+                    iter->second->DoUpdate(mapsDiff);
+                };
             else
-                iter->second->Update(mapsDiff);
+                iter->second->DoUpdate(mapsDiff);
         }
         else // One threat per continent part
         {
             iter->second->SetMapUpdateIndex(continentsIdx++);
-            if (m_threads->status() == ThreadPool::Status::READY)
-                continentsUpdaters.emplace_back([iter,mapsDiff](){
-                    iter->second->DoUpdate(mapsDiff);
-                });
-            else
-                iter->second->Update(mapsDiff);
+            continentsUpdaters.emplace_back([iter,mapsDiff](){
+                iter->second->DoUpdate(mapsDiff);
+            });
         }
     }
     i_maxContinentThread = continentsIdx;
@@ -287,11 +285,16 @@ void MapManager::Update(uint32 diff)
     for (int i = 0; i < i_maxContinentThread; ++i)
         i_continentUpdateFinished[i] = false;
 
-    std::future<void> f = m_threads->processWorkload(std::move(continentsUpdaters));
+    if (!m_continentThreads || m_continentThreads->size() < continentsUpdaters.size())
+    {
+        m_continentThreads.reset(new ThreadPool(continentsUpdaters.size()));
+        m_continentThreads->start<>();
+    }
+    std::future<void> f = m_continentThreads->processWorkload(std::move(continentsUpdaters));
     if (f.valid())
         f.wait();
 
-    f = m_threads->processWorkload(std::move(instanceUpdaters));
+    f = m_threads->processWorkload();
 
     SwitchPlayersInstances();
 
