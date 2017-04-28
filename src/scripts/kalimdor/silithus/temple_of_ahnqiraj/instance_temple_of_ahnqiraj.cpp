@@ -554,6 +554,7 @@ instance_temple_of_ahnqiraj::CThunStomachList::iterator instance_temple_of_ahnqi
 
 void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
 {
+    // Player is ported to center of c'thun with a small, random, offset to knock the player in a random direction.
     const AreaTriggerEntry* cthunAreaTrigger = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
     if (cthunAreaTrigger) {
         float x = cthunAreaTrigger->x + cos((frand(0.0f, 360.0f)) * (3.14f / 180.0f)) * 0.1f;
@@ -567,18 +568,31 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
         sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
             AREATRIGGER_CTHUN_KNOCKBACK);
     }
+
+    // Setting timeSincePortedFromStomach to 1 so the update function know's 
+    // the player has been teleported
+    auto it = PlayerInStomachIter(pPlayer);
+    if (it != playersInStomach.end()) {
+        it->second.timeSincePortedFromStomach = 1;
+    }
 }
 
-void instance_temple_of_ahnqiraj::RemovePlayerFromStomach(Unit * unit)
+void instance_temple_of_ahnqiraj::PerformCthunKnockback()
 {
-    if (!unit) return;
-
-    if (unit->HasAura(SPELL_DIGESTIVE_ACID)) {
-        unit->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+    const AreaTriggerEntry* pAt = sAreaTriggerStore.LookupEntry(AREATRIGGER_CTHUN_KNOCKBACK);
+    float x, y, z;
+    if (pAt) {
+        x = pAt->x;
+        y = pAt->y;
+        z = pAt->z;
     }
-    auto it = PlayerInStomachIter(unit);
-    if (it != playersInStomach.end()) {
-        playersInStomach.erase(it);
+    else {
+        x = -8578.0f;
+        y = 1986.8f;
+        z = 100.22f;
+    }
+    if (Creature* kbCreature = GetMap()->SummonCreature(EXIT_KNOCKBACK_CREATURE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
+        kbCreature->CastSpell(kbCreature, SPELL_EXIT_STOMACH_KNOCKBACK, false);
     }
 }
 
@@ -609,15 +623,15 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         }
     }
     else if (pAt->id == AREATRIGGER_STOMACH_AIR) {
-        TeleportPlayerToCThun(pPlayer);
+        //TeleportPlayerToCThun(pPlayer);
     }
     else if (pAt->id == AREATRIGGER_CTHUN_KNOCKBACK) {
-        RemovePlayerFromStomach(pPlayer);
-
         // "Disable" the knockback if c'thun is killed
         if (GetData(TYPE_CTHUN) != DONE) {
-            if (Creature* kbCreature = GetMap()->SummonCreature(EXIT_KNOCKBACK_CREATURE, pAt->x, pAt->y, pAt->z, 0, TEMPSUMMON_TIMED_DESPAWN, 1000)) {
-                kbCreature->CastSpell(kbCreature, SPELL_EXIT_STOMACH_KNOCKBACK, false);
+            PerformCthunKnockback();
+            auto it = PlayerInStomachIter(pPlayer);
+            if (it != playersInStomach.end() && !it->second.didKnockback) {
+                it->second.didKnockback = true;
             }
         }
     }
@@ -635,7 +649,6 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
 
             if (p->isAlive()) {
                 p->KillPlayer();
-                //p->CastSpell(p, SPELL_PORT_OUT_STOMACH, true);
             }
             if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
                 p->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
@@ -684,35 +697,46 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
             it = playersInStomach.erase(it);
             continue;
         }
-        //Updating debuff
+
         StomachTimers& timers = it->second;
-        if (timers.acidDebuff < diff) {
-            player->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
-            timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
-        }
-        else {
-            timers.acidDebuff -= diff;
-        }
 
-        // Crude hack for removing players from the stomach list if the areatrigger
-        // in the center of c'thun did not trigger.
-        if (player->GetPositionZ() > 0.0f) {
-            RemovePlayerFromStomach(player);
-        }
-
-        // Crude hack for removing players from the stomach list if the areatrigger
-        // in the center of c'thun did not trigger.
-        if (player->GetPositionZ() > 0.0f) {
-            RemovePlayerFromStomach(player);
-        }
-
-        if (pot)
+        // Areatriggers were used, but as they have proven unreliable we instead handle porting from 
+        // stomach manually. Debuff is removed as soon as player is ported. On second update after the TP
+        // we knock the player back. Finally, after a short delay, we remove the player from the stomachList,
+        // making him a valid target for all the stuff happening outside at c'thun.
+        if (player->GetPositionZ() > 0.0f && timers.timeSincePortedFromStomach > 0) 
         {
+            if (!timers.removedAcid && player->HasAura(SPELL_DIGESTIVE_ACID)) {
+                player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                timers.removedAcid = true;
+            }
+            else if (timers.timeSincePortedFromStomach > 1 && !timers.didKnockback) { 
+                PerformCthunKnockback();
+                timers.didKnockback = true;
+            }
+            else if (it->second.timeSincePortedFromStomach > 1500) {
+                it = playersInStomach.erase(it);
+                continue;
+            }
+            timers.timeSincePortedFromStomach += diff;
+        }
+        else 
+        {
+            if (timers.acidDebuff < diff) {
+                player->CastSpell(player, SPELL_DIGESTIVE_ACID, true);
+                timers.acidDebuff += StomachTimers::ACID_REFRESH_RATE;
+            }
+            else {
+                timers.acidDebuff -= diff;
+            }
+
             // Crude hack for teleporting players from the stomach if the areatrigger
             // in the air above knockback area in stomach of c'thun did not trigger.
-            if (player->GetDistance(pot->x, pot->y, pot->z) <= pot->radius) {
+            if (pot) {
                 if (player->IsLaunched() && player->IsFalling()) {
-                    TeleportPlayerToCThun(player);
+                    if (player->GetDistance(pot->x, pot->y, pot->z) <= pot->radius) {
+                        TeleportPlayerToCThun(player);
+                    }
                 }
             }
         }
