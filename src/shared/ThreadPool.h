@@ -92,7 +92,7 @@ public:
     template<class WORKER_T = SingleQueue>
     void start()
     {
-        if (!m_workers.empty())
+        if (m_status != Status::STOPPED || !m_size)
             return;
         m_status = Status::STARTING;
         for (int i = 0; i < m_size; i++)
