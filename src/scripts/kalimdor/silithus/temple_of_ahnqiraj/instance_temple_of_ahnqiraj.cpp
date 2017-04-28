@@ -694,11 +694,24 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
             timers.acidDebuff -= diff;
         }
 
+        // Crude hack for removing players from the stomach list if the areatrigger
+        // in the center of c'thun did not trigger.
+        if (player->GetPositionZ() > 0.0f) {
+            RemovePlayerFromStomach(player);
+        }
+
+        // Crude hack for removing players from the stomach list if the areatrigger
+        // in the center of c'thun did not trigger.
+        if (player->GetPositionZ() > 0.0f) {
+            RemovePlayerFromStomach(player);
+        }
+
         if (pot)
         {
+            // Crude hack for teleporting players from the stomach if the areatrigger
+            // in the air above knockback area in stomach of c'thun did not trigger.
             if (player->GetDistance(pot->x, pot->y, pot->z) <= pot->radius) {
                 if (player->IsLaunched() && player->IsFalling()) {
-                    // The areatrigger must have failed. Teleport the player out manually
                     TeleportPlayerToCThun(player);
                 }
             }

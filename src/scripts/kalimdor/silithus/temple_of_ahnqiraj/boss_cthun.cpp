@@ -566,8 +566,7 @@ public:
             if (birthTimer > diff) {
                 // Only want to cast it once, and it cant be done in ctor because groundRupture interrupts the animation.
                 if (birthTimer == TENTACLE_BIRTH_DURATION) {
-                    if (DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH, CAST_FORCE_TARGET_SELF) != CAST_OK)
-                        sLog.outBasic("Could not run tentacle birth animation");
+                    DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH, CAST_FORCE_TARGET_SELF)
                 }
                 birthTimer -= diff;
             }
@@ -1085,7 +1084,7 @@ struct eye_of_cthunAI : public ScriptedAI
             RemoveGlarePhaseSpells();
         }
         else {
-            sLog.outBasic("eye_of_cthunAI: Reset called, but m_creature does not exist.");
+            sLog.outError("eye_of_cthunAI: Reset called, but m_creature does not exist.");
         }
     }
 
@@ -1419,7 +1418,7 @@ struct cthunAI : public ScriptedAI
     {
         if (pCreature->GetEntry() == MOB_FLESH_TENTACLE) {
             if (fleshTentacles.size() > 1) {
-                sLog.outBasic("Flesh tentacle summoned, but there are already %i tentacles up.", fleshTentacles.size());
+                sLog.outError("Flesh tentacle summoned, but there are already %i tentacles up.", fleshTentacles.size());
             }
             fleshTentacles.push_back(pCreature->GetGUID());
         }
@@ -1509,10 +1508,8 @@ struct cthunAI : public ScriptedAI
     {
         // Despawn will happen EYE_DEAD_TO_BODY_EMERGE_DELAY time after eye death
         if (pCreature->GetEntry() == NPC_EYE_OF_C_THUN) {
-            sLog.outBasic("Entering TRANSITION_STATE");
             currentPhase = PHASE_TRANSITION;
 
-            sLog.outBasic("Starting C'thun emerge animation");
             ResetartUnvulnerablePhase();
 
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -1526,9 +1523,6 @@ struct cthunAI : public ScriptedAI
             if (it != fleshTentacles.end())
                 fleshTentacles.erase(it);
         }
-
-        sLog.outBasic("%s despawn", pCreature->GetName());
-
     }
 
     void JustDied(Unit* pKiller) override
@@ -1545,7 +1539,6 @@ struct cthunAI : public ScriptedAI
             }
 
         }
-        sLog.outBasic("C'thun died. Enetered DONE phase");
     }
 
     void ResetartUnvulnerablePhase(bool spawnFleshTentacles = true) {
@@ -1636,7 +1629,6 @@ struct cthunAI : public ScriptedAI
             m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_creature->SetInCombatWithZone();
 
-            sLog.outBasic("Entering INVULNERABLE_STATE");
             currentPhase = PHASE_CTHUN_INVULNERABLE;
         }
         else {
@@ -1663,7 +1655,6 @@ struct cthunAI : public ScriptedAI
             //Make him glow all red and nice
             m_creature->RemoveAurasDueToSpell(SPELL_CARAPACE_OF_CTHUN);
             
-            sLog.outBasic("Entering VULNERABLE_STATE");
             currentPhase = PHASE_CTHUN_WEAKENED;
         }
         else {
@@ -1682,7 +1673,6 @@ struct cthunAI : public ScriptedAI
             // if it does not visually dissapear
             m_creature->RemoveAurasDueToSpell(SPELL_CTHUN_VULNERABLE);
             
-            sLog.outBasic("Entering INVULNERABLE_STATE");
             currentPhase = PHASE_CTHUN_INVULNERABLE;
         }
         else {
@@ -1693,9 +1683,8 @@ struct cthunAI : public ScriptedAI
     void SpawnFleshTentacles() {
 
         if (fleshTentacles.size() != 0) {
-            sLog.outBasic("SpawnFleshTentacles() called, but there are already %i tentacles up.", fleshTentacles.size());
+            sLog.outError("SpawnFleshTentacles() called, but there are already %i tentacles up.", fleshTentacles.size());
         }
-        sLog.outBasic("Spawning flesh tentacles");
         //Spawn 2 flesh tentacles in C'thun stomach
         for (uint32 i = 0; i < 2; i++) {
             Creature* pSpawned = m_creature->SummonCreature(MOB_FLESH_TENTACLE,
@@ -1790,7 +1779,7 @@ struct cthunAI : public ScriptedAI
             if (Unit* target = SelectRandomAliveNotStomach(m_pInstance))
             {
                 if (target->GetPositionZ() < -30.0f) {
-                    sLog.outBasic("Trying to spawn %i <-30.0f", id);
+                    sLog.outError("Cthun trying to spawn %i <-30.0f", id);
                 }
                 float x;
                 float y;
