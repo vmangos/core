@@ -284,7 +284,6 @@ struct boss_twinemperorsAI : public ScriptedAI
     {
         if (m_pInstance) {
             if (m_pInstance->GetData(TYPE_TWINS) == IN_PROGRESS) {
-                sLog.outBasic("debugging - double Aggr() call");
                 return;
             }
             m_pInstance->SetData(TYPE_TWINS, IN_PROGRESS);
