@@ -81,3 +81,6 @@ DELETE FROM `creature` WHERE `guid`='87560';
 
 -- Remove CREATURE_FLAG_EXTRA_AGGRO_ZONE from C'thun as we want to manually handle his combat with zone.
 UPDATE creature_template SET flags_extra = flags_extra & ~512 WHERE entry = 15727;
+
+-- Taunt-immunity for both c'thuns body and the eye. Fixes eye being able to turn during dark glare
+UPDATE creature_template SET flags_extra = flags_extra | 256 where entry in (15589, 15727);
