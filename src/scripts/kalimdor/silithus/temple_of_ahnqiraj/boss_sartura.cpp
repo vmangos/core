@@ -43,12 +43,15 @@ enum
     SPELL_ENRAGE                    = 26527,
     SPELL_ENRAGEHARD                = 27680,
 
+    TAUNT_IMMUNE                    = 26602,
+
     EMOTE_ENRAGE                    = -1000003,
     EMOTE_ENRAGEHARD                = -1000004,
 
     // Royal Guard
     SPELL_KNOCKBACK                 = 19813,
     SPELL_GUARD_WHIRLWIND            = 26038,
+
 };
 
 // ********************
@@ -77,8 +80,6 @@ struct boss_sarturaAI : public ScriptedAI
 
     void Reset() override
     {
-        m_creature->SetTauntImmunity(false);
-
         m_uiCleaveTimer = 4000;
         m_uiWhirlWindTimer = urand(8000, 12000);;
         m_uiWhirlWindEndTimer = 0;
@@ -185,7 +186,7 @@ struct boss_sarturaAI : public ScriptedAI
                 // Remove the negative haste modifier from Whirlwind to restore Sartura's auto attack
                 m_creature->ApplyAttackTimePercentMod(BASE_ATTACK, 0, true);
                 m_creature->setAttackTimer(BASE_ATTACK, 100);
-                m_creature->SetTauntImmunity(false);
+                m_creature->RemoveAurasByCasterSpell(TAUNT_IMMUNE, m_creature->GetObjectGuid());
             }
             else
                 m_uiWhirlWindEndTimer -= uiDiff;
@@ -198,7 +199,7 @@ struct boss_sarturaAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND) == CAST_OK)
                 {
-                    m_creature->SetTauntImmunity(true);
+                    m_creature->CastSpell(m_creature, TAUNT_IMMUNE, true);
                     AssignRandomThreat();
                     m_uiWhirlWindEndTimer = 15000;
                     m_uiAggroResetTimer = urand(1000, 2000);
