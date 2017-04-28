@@ -177,18 +177,11 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void ScheduleInstanceSwitch(Player* player, uint16 newInstance);
         void SwitchPlayersInstances();
 
-        void MarkContinentUpdateFinished(int idx)
-        {
-            ASSERT(idx < i_maxContinentThread);
-            i_continentUpdateFinished[idx] = true;
-        }
-        bool IsContinentUpdateFinished()
-        {
-            for (int i = 0; i < i_maxContinentThread; ++i)
-                if (!i_continentUpdateFinished[i])
-                    return false;
-            return true;
-        }
+        void MarkContinentUpdateFinished(int idx);
+        bool IsContinentUpdateFinished();
+
+        bool waitContinentUpdateFinished(std::chrono::milliseconds time);
+
     private:
 
         // debugging code, should be deleted some day
@@ -216,6 +209,8 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         uint32 i_MaxInstanceId;
         int             i_maxContinentThread;
+        std::mutex      m_continentMutex;
+        std::condition_variable      m_continentCV;
         volatile bool*  i_continentUpdateFinished;
 
         std::unique_ptr<ThreadPool> m_threads;

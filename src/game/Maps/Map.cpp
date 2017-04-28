@@ -862,12 +862,8 @@ void Map::Update(uint32 t_diff)
     {
         additionnalWaitTime = WorldTimer::getMSTime();
         sMapMgr.MarkContinentUpdateFinished(_updateIdx);
-        while (!sMapMgr.IsContinentUpdateFinished())
+        while (!sMapMgr.waitContinentUpdateFinished(std::chrono::milliseconds(10)))
         {
-            std::this_thread::sleep_for(std::chrono::milliseconds(10));
-            if (sMapMgr.IsContinentUpdateFinished())
-                break;
-
             UpdateSessionsMovementAndSpellsIfNeeded();
             UpdatePlayers();
             ++additionnalUpdateCounts;
