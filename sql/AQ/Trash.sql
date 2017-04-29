@@ -20,3 +20,8 @@ UPDATE `creature` SET `position_x`='-900.787109', `position_y`='1916.039063', `p
 
 -- Replace qiraji mindslayers eventAI with scripted ai. Script is located in instance_temple_of_ahnqiraj.cpp.
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='mob_qiraji_mindslayer' WHERE `entry`='15246';
+
+-- In reference to issue #551 https://github.com/elysium-project/server/issues/551
+-- Anubisath Warders, Obsidian Nullfiers, QIraji Slayers, Qiraji Champions and Qiraji Mindslayers should not respawn
+-- during the same save-ID once killed. Setting spawntimersecs to 7 days.
+UPDATE `creature` SET `spawntimesecs`='604800' where id IN(15311, 15312, 15250, 15252, 15246);
