@@ -623,7 +623,7 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         }
     }
     else if (pAt->id == AREATRIGGER_STOMACH_AIR) {
-        //TeleportPlayerToCThun(pPlayer);
+        TeleportPlayerToCThun(pPlayer);
     }
     else if (pAt->id == AREATRIGGER_CTHUN_KNOCKBACK) {
         // "Disable" the knockback if c'thun is killed
