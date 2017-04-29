@@ -632,6 +632,8 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
             auto it = PlayerInStomachIter(pPlayer);
             if (it != playersInStomach.end() && !it->second.didKnockback) {
                 it->second.didKnockback = true;
+                if (it->second.timeSincePortedFromStomach == 0)
+                    it->second.timeSincePortedFromStomach = 1; 
             }
         }
     }
