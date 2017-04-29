@@ -3134,6 +3134,12 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     summon->SetLootRecipient(m_caster);
                     break;
+                // Rockwing Gargoyle
+                case 16381:
+                    if (m_caster->getAttackerForHelper())
+                        summon->AI()->AttackStart(m_caster->getAttackerForHelper());
+                    break;
+
             }
 
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.
