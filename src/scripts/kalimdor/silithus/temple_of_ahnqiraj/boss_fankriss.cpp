@@ -325,7 +325,6 @@ struct boss_fankrissAI : public ScriptedAI
         entangleTimers[1] = std::make_pair(urand(15000 + add, 28000 + add), false);
         entangleTimers[2] = std::make_pair(urand(25000 + add, 45000 + add), false);
         entangleRotationTimer = 45000 + add;
-        sLog.outBasic("Next webs: %d, %d, %d", entangleTimers[0].first, entangleTimers[1].first, entangleTimers[2].first);
     }
 
     size_t GetHatchlingSpawnAmount()
@@ -490,7 +489,6 @@ struct boss_fankrissAI : public ScriptedAI
                         w.spawnTimer = 18000 + ((numWormsLastWave-1)*7000) + urand(0, 5000);
                     else
                         w.spawnTimer = worms[i-1].spawnTimer + urand(4000, 8000); // Each snake in a wave comes 4-8s after the previous one
-                    sLog.outBasic("worm %d spawning in %d. Will enrage after %d", i, w.spawnTimer, w.enrageTimer);
                 }
             }
             numWormsLastWave = spawnCount;
