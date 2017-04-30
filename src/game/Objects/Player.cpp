@@ -15071,8 +15071,13 @@ void Player::SendRaidInfo()
         {
             DungeonPersistentState *state = itr->second.state;
             data << uint32(state->GetMapId());              // map id
-            data << uint32(state->GetResetTime() - time(NULL));
+
+            // Permanent dungeons (raids) don't have a valid reset timer since it's
+            // on a schedule. Send the scheduled time instead of state reset time
+            time_t resetTime = sMapPersistentStateMgr.GetScheduler().GetResetTimeFor(state->GetMapId());
+            data << uint32(resetTime - time(nullptr));
             data << uint32(state->GetInstanceId());         // instance id
+
             counter++;
         }
     }
