@@ -1477,6 +1477,14 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                 {
                     delete m_spellAuraHolder;
                     m_spellAuraHolder = nullptr;
+
+                    // Need to interrupt pet channeling spells or else they get stuck
+                    if (m_caster && m_caster->IsControlledByPlayer() && IsChanneledSpell(m_spellInfo))   
+                    {
+                        Spell *channeled = m_caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+                        if (channeled && channeled->m_spellInfo->Id == m_spellInfo->Id && channeled->m_targets.getUnitTarget() == unit)
+                            m_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                    }
                     return;
                 }
             }
