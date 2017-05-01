@@ -49,7 +49,7 @@ enum
     SAY_DEAGGRO         =   -1509015,
     SAY_KILLS_ANDOROV   =   -1509016,
 
-    SAY_COMPLETE_QUEST  =   -1509017, // Yell when realm complete quest 8743 for world event
+    SAY_AQ_WAR_START    =   -1509017, // Yell when realm complete quest 8743 for world event
     EMOTE_FRENZY        =   -1000001,
 
     // General Rajaxx
@@ -59,10 +59,17 @@ enum
     SPELL_THUNDERCRASH      =   25599,
     SPELL_TRASH             =   3391,
 
+    SPELL_CHARGE            =   26561,
+    SPELL_REFLECT           =   9906,
+    SPELL_FEAR              =   19408,
+    SPELL_ENRAGE            =   28747,
+
     // NPC General Andorov
     SPELL_AURA_OF_COMMAND   =   25516,
     SPELL_BASH              =   25515,
     SPELL_STRIKE            =   22591,
+
+    ZONE_SILITHUS           =   1377,
 };
 
 #ifdef DEBUG_MODE
@@ -340,6 +347,108 @@ struct boss_rajaxxAI : public ScriptedAI
     }
 };
 
+struct boss_rajaxxAQWarAI : public boss_rajaxxAI
+{
+    boss_rajaxxAQWarAI(Creature* pCreature) : boss_rajaxxAI(pCreature)
+    {
+        m_pInstance = nullptr;
+        Reset();
+
+        m_creature->SetNoXP();
+        // Rajaxx is drunk with the might of C'Thun
+        m_creature->SetMaxHealth(m_creature->GetMaxHealth() * 15);
+        m_creature->SetHealthPercent(100);
+        m_creature->SetObjectScale(7);
+        m_creature->UpdateModelData();
+
+        DoScriptText(SAY_AQ_WAR_START, m_creature);
+
+        chargeTargetNow = false;
+        uint32  spellReflectTimer = 60000;
+        uint32  AOEFearTimer = 45000;
+    }
+
+    bool chargeTargetNow;
+    uint32 spellReflectTimer;
+    uint32 AOEFearTimer;
+
+    void UpdateAI(uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        // ResetAggro
+        if (m_uiResetAggro_Timer < uiDiff)
+        {
+            m_uiResetAggro_Timer = urand(9000, 12000);
+            chargeTargetNow = true;
+        }
+        else
+            m_uiResetAggro_Timer -= uiDiff;
+
+        if (AOEFearTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
+                AOEFearTimer = urand(28000, 30000);
+        }
+        else
+            AOEFearTimer -= uiDiff;
+
+        if (spellReflectTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_REFLECT) == CAST_OK)
+            {
+                spellReflectTimer = urand(28000, 30000);
+
+                if (m_creature->GetHealthPercent() < 33.0f)
+                    spellReflectTimer /= 2;
+            }
+
+            if (m_creature->GetHealthPercent() < 10)
+                DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CAST_AURA_NOT_PRESENT);
+        }
+        else
+            spellReflectTimer -= uiDiff;
+
+        /* Trash */
+        if (m_uiTrash_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_TRASH) == CAST_OK)
+                m_uiTrash_Timer = urand(10000, 15000);
+        }
+        else
+            m_uiTrash_Timer -= uiDiff;
+
+        // Disarm
+        if (m_uiDisarm_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISARM, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                m_uiDisarm_Timer = 15000;
+        }
+        else
+            m_uiDisarm_Timer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+
+        if (chargeTargetNow)
+        {
+            if (Unit* newVictim = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            {
+                Unit* oldVictim = m_creature->getVictim();
+
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CHARGE) == CAST_OK)
+                {
+                    m_creature->getThreatManager().modifyThreatPercent(oldVictim, -100);
+                    m_creature->getThreatManager().modifyThreatPercent(newVictim, 100);
+
+                    chargeTargetNow = false;
+                }
+            }
+        }
+
+    }
+};
+
 struct npc_andorovAI : public ScriptedAI
 {
     npc_andorovAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -502,6 +611,9 @@ bool GossipSelect_npc_andorov(Player* pPlayer, Creature* pCreature, uint32 uiSen
 
 CreatureAI* GetAI_boss_rajaxx(Creature* pCreature)
 {
+    if (pCreature->GetZoneId() == ZONE_SILITHUS)
+        return new boss_rajaxxAQWarAI(pCreature);
+
     return new boss_rajaxxAI(pCreature);
 }
 

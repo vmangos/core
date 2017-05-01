@@ -721,8 +721,12 @@ void Spell::prepareDataForTriggerSystem()
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT;
                     m_procVictim   |= PROC_FLAG_TAKEN_POSITIVE_AOE;
                 }
-                else if (!IsTriggered())
+                else if (!IsTriggered()) 
+                {
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_SPELL_CAST;
+                    if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
+                        m_procAttacker |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+                }  
             }
             // Wands auto attack
             else if (m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG)
@@ -740,7 +744,11 @@ void Spell::prepareDataForTriggerSystem()
                     m_procVictim   |= PROC_FLAG_TAKEN_AOE_SPELL_HIT;
                 }
                 else if (!IsTriggered())
+                {
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_SPELL_CAST;
+                    if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
+                        m_procAttacker |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+                }
             }
             break;
         }
@@ -1223,24 +1231,27 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                             break;
                     }
 
+        // Fill base damage struct (unitTarget - is real spell target)
+        SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
+        procEx = createProcExtendMask(&damageInfo, missInfo);
+        // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
+        uint32 dmg = 0;
+        // Sometime we need to manually set dmg != 0 (arcane projectile triggers a spell that deals damage)
+        // Cant check SpellFamilyFlags & 0x40800 because some spells have strange SpellFamilyFlags=0x7FFFFFFF (sheep, ...)
+        if (m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyFlags == 0x40800)
+            dmg = 1;
+
+        // Periodic spells:
+        // Trigger spell cast procs and forward the damage / heal procs to the aura
         if (foundDamageOrHealAura)
         {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker;
+            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
+            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            procVictim = 0;
+            dmg = 1;
         }
-        else
-        {
-            // Fill base damage struct (unitTarget - is real spell target)
-            SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
-            procEx = createProcExtendMask(&damageInfo, missInfo);
-            // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
-            uint32 dmg = 0;
-            // Sometime we need to manually set dmg != 0 (arcane projectile triggers a spell that deals damage)
-            // Cant check SpellFamilyFlags & 0x40800 because some spells have strange SpellFamilyFlags=0x7FFFFFFF (sheep, ...)
-            if (m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyFlags == 0x40800)
-                dmg = 1;
-            caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
-        }
+        caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
     }
 
     if (missInfo != SPELL_MISS_NONE)
@@ -1466,6 +1477,14 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                 {
                     delete m_spellAuraHolder;
                     m_spellAuraHolder = nullptr;
+
+                    // Need to interrupt pet channeling spells or else they get stuck
+                    if (m_caster && m_caster->IsControlledByPlayer() && IsChanneledSpell(m_spellInfo))   
+                    {
+                        Spell *channeled = m_caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+                        if (channeled && channeled->m_spellInfo->Id == m_spellInfo->Id && channeled->m_targets.getUnitTarget() == unit)
+                            m_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                    }
                     return;
                 }
             }
@@ -2661,9 +2680,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         targetUnitMap.push_back(m_caster);
                     break;
                 case SPELL_EFFECT_SUMMON_PLAYER:
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetSelectionGuid())
-                        if (Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid()))
-                            targetUnitMap.push_back(target);
+                    if (m_targets.getUnitTarget())
+                        targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
                 case SPELL_EFFECT_RESURRECT_NEW:
                     if (m_targets.getUnitTarget())
@@ -2988,7 +3006,7 @@ void Spell::cancel()
         return;
 
     // channeled spells don't display interrupted message even if they are interrupted, possible other cases with no "Interrupted" message
-    bool sendInterrupt = IsChanneledSpell(m_spellInfo) ? false : true;
+    bool sendInterrupt = IsChanneledSpell(m_spellInfo) && m_spellState != SPELL_STATE_PREPARING ? false : true;
 
     m_autoRepeat = false;
     switch (m_spellState)
@@ -3246,7 +3264,11 @@ void Spell::cast(bool skipCheck)
             procAttacker = (m_procAttacker & PROC_FLAG_ON_TRAP_ACTIVATION);
         uint32 procAttackerFlags = procAttacker;
         if (!IsTriggered())
-            procAttackerFlags |= PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_AOE;
+        {
+            procAttackerFlags |= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_AOE);
+            if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
+                procAttackerFlags |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+        }
         m_caster->ProcDamageAndSpell(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
     }
 
@@ -3770,10 +3792,6 @@ void Spell::SendCastResult(SpellCastResult result)
 
 void Spell::SendCastResult(Player* caster, SpellEntry const* spellInfo, SpellCastResult result)
 {
-    // Debug forme ombre, ...
-    if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_SHAPESHIFT) && result != SPELL_CAST_OK)
-        result = SPELL_FAILED_FIZZLE;
-
     WorldPacket data(SMSG_CAST_FAILED, (4 + 1 + 1));
     data << uint32(spellInfo->Id);
 
@@ -4693,8 +4711,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         if (non_caster_target)
         {
-            // Not allow casting on flying player
-            if (target->IsTaxiFlying())
+            // Not allow casting on flying player unless its a ritual of summoning
+            if (target->IsTaxiFlying() && m_spellInfo->Id != 7720)
                 return SPELL_FAILED_BAD_TARGETS;
 
             if (!m_IsTriggeredSpell)
@@ -5570,10 +5588,12 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     return SPELL_FAILED_BAD_TARGETS;
-                if (!((Player*)m_caster)->GetSelectionGuid())
+                if (!m_targets.getUnitTarget())
+                    return SPELL_FAILED_BAD_TARGETS;
+                if (!m_targets.getUnitTarget()->IsPlayer())
                     return SPELL_FAILED_BAD_TARGETS;
 
-                Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid());
+                Player* target = (Player*)m_targets.getUnitTarget();
                 if (!target || ((Player*)m_caster) == target || !target->IsInSameRaidWith((Player*)m_caster))
                     return SPELL_FAILED_BAD_TARGETS;
 

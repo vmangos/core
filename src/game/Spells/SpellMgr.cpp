@@ -1681,11 +1681,14 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
         if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT))
             return true;
     }
-    else // all spells hits here only if resist/reflect/immune/evade
+    else // all spells hits here only if resist/reflect/immune/evade/periodic
     {
         // Exist req for PROC_EX_EX_TRIGGER_ALWAYS
         if (procEvent_procEx & PROC_EX_EX_TRIGGER_ALWAYS)
             return true;
+        // Exist req for PROC_EX_NO_PERIODIC
+        if ((procEvent_procEx & PROC_EX_NO_PERIODIC) && (procFlags & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC)))
+            return false;
         // Check Extra Requirement like (hit/crit/miss/resist/parry/dodge/block/immune/reflect/absorb and other)
         if (procEvent_procEx & procExtra)
             return true;

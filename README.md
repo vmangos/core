@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/elysium-project/server.svg?branch=master)](https://travis-ci.org/elysium-project/server)
+[![Build Status](https://travis-ci.org/elysium-project/server.svg?branch=development)](https://travis-ci.org/elysium-project/server)
 
 # Development process overview:
 

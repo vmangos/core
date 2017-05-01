@@ -109,7 +109,7 @@ void Log::InitSmartlogEntries(const std::string& str)
     while (ss)
     {
         ss >> entry;
-        m_smartlogExtraEntries.push_back(entry);        
+        m_smartlogExtraEntries.push_back(entry);
     }
 }
 
@@ -876,16 +876,19 @@ void Log::outCommand( uint32 account, const char * str, ... )
     fflush(stdout);
 }
 
-void Log::outWorldPacketDump( uint64 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming )
+void Log::outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
+                             char const* opcodeName, ByteBuffer const* packet,
+                             bool incoming)
 {
     if (!worldLogfile)
         return;
 
     outTimestamp(worldLogfile);
 
-    fprintf(worldLogfile,"\n%s:\nSOCKET: %llu\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
-        incoming ? "CLIENT" : "SERVER",
-        socket, packet->size(), opcodeName, opcode);
+    fprintf(worldLogfile,
+            "\n%s:\nSOCKET: %p\nLENGTH: %zu\nOPCODE: %s (0x%.4X)\nDATA:\n",
+            incoming ? "CLIENT" : "SERVER", socketHandle, packet->size(),
+            opcodeName, opcode);
 
     size_t p = 0;
     while (p < packet->size())

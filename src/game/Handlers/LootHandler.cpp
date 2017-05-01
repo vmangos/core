@@ -113,7 +113,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
     QuestItem *ffaitem = NULL;
     QuestItem *conditem = NULL;
 
-    LootItem *item = loot->LootItemInSlot(lootSlot, player, &qitem, &ffaitem, &conditem);
+    LootItem *item = loot->LootItemInSlot(lootSlot, player->GetGUIDLow(), &qitem, &ffaitem, &conditem);
 
     if (!item)
     {

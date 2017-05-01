@@ -43,6 +43,9 @@ struct instance_wailing_caverns : public ScriptedInstance
     uint64 m_uiSerpentisGUID;
     bool Assaulted;
 
+    // to be despawn when the nightmare is over
+    std::vector<uint64> vNightmareMonsters;
+
     void Initialize()
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
@@ -79,6 +82,10 @@ struct instance_wailing_caverns : public ScriptedInstance
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
                     break;*/
         }
+        if (!pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER &&
+            pCreature->getFaction() != 35 && // the 2 druids
+            pCreature->GetEntry() != 3653) // Kresh is cool
+            vNightmareMonsters.push_back(pCreature->GetGUID());
     }
 
     void SetData(uint32 uiType, uint32 uiData)
@@ -123,9 +130,24 @@ struct instance_wailing_caverns : public ScriptedInstance
                     Assaulted = true;
                 }
                 break;
+            case TYPE_MUTANUS:
+                m_auiEncounter[uiType] = uiData;
+                if (uiData == DONE) // despawn every hostile creature
+                {
+                    auto it = vNightmareMonsters.begin();
+                    while (it != vNightmareMonsters.end())
+                    {
+                        if (Creature* pCreature = instance->GetCreature(*it))
+                        {
+                            if (pCreature->isAlive() || pCreature->loot.empty())
+                                pCreature->ForcedDespawn();
+                        }
+                        it = vNightmareMonsters.erase(it);
+                    }
+                }
+                break;
             case TYPE_SERPENTIS:
             case TYPE_DISCIPLE:
-            case TYPE_MUTANOUS:
                 m_auiEncounter[uiType] = uiData;
                 break;
             default:
@@ -169,7 +191,7 @@ struct instance_wailing_caverns : public ScriptedInstance
             case TYPE_PYTHAS:
             case TYPE_SERPENTIS:
             case TYPE_DISCIPLE:
-            case TYPE_MUTANOUS:
+            case TYPE_MUTANUS:
                 return m_auiEncounter[uiType];
         }
         return 0;

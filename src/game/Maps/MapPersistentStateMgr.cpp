@@ -339,6 +339,10 @@ void DungeonResetScheduler::LoadResetTimes()
                 continue;
             }
 
+            // Don't set or update reset time for raid instances
+            if (mapEntry->IsRaid())
+                continue;
+
             InstResetTime[id] = std::pair<uint32, uint64>(mapid,
                 resettime ? resettime : now + 2 * HOUR);
         }

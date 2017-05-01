@@ -530,7 +530,9 @@ enum ProcFlags
     PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000,   // 23 Successful off-hand melee attacks
 
     PROC_FLAG_SUCCESSFUL_AOE                = 0x01000000,   // 24 Nostalrius: AoE casted. Triggered only once, whatever the number of targets.
-    PROC_FLAG_SUCCESSFUL_SPELL_CAST         = 0x02000000    // 25 Nostalrius: Spell cast successful (procs only once for AoE)
+    PROC_FLAG_SUCCESSFUL_SPELL_CAST         = 0x02000000,   // 25 Nostalrius: Spell cast successful (procs only once for AoE)
+
+    PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST    = 0x04000000    // 26 Successful cast of a mana based spell (procs only once for AoE)
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_HIT        | \

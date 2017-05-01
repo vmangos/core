@@ -2929,7 +2929,7 @@ int32 Unit::MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* s
     else
         modHitChance = 94 - (leveldif - 2) * lchance;
 
-    DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "%s [%u] : Binaire [%s]. Toucher de base %f", spell->SpellName[2], spell->Id, spell->IsBinary() ? "OUI" : "NON", modHitChance);
+    DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "%s [%u] : Binary [%s]. Base hit chance %f, level diff: %d", spell->SpellName[2], spell->Id, spell->IsBinary() ? "YES" : "NO", modHitChance, leveldif);
 
     // Spellmod from SPELLMOD_RESIST_MISS_CHANCE
     if (Player *modOwner = GetSpellModOwner())
@@ -4592,7 +4592,8 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (mode != AURA_REMOVE_BY_EXPIRE && IsChanneledSpell(AurSpellInfo) && caster)
+    if (caster && IsChanneledSpell(AurSpellInfo) && 
+       (mode != AURA_REMOVE_BY_EXPIRE || caster->IsControlledByPlayer()))   // Player pets need to be interrupted on channel expire or else they get stuck channeling
     {
         Spell *channeled = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
         if (channeled && channeled->m_spellInfo->Id == auraSpellId && channeled->m_targets.getUnitTarget() == this)
@@ -5057,8 +5058,7 @@ void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVic
 
     // Now go on with a victim's events'n'auras
     // Not much to do if no flags are set or there is no victim
-    // Don't proc victim auras if its a miss / resist
-    if (pVictim && pVictim->isAlive() && procVictim && !(PROC_EX_RESIST & procExtra) && !(PROC_EX_MISS & procExtra))
+    if (pVictim && pVictim->isAlive() && procVictim)
         pVictim->ProcDamageAndSpellFor(true, this, procVictim, procExtra, attType, procSpell, amount, procTriggered, spell);
 
     HandleTriggers(pVictim, procExtra, amount, procSpell, procTriggered);
@@ -6198,9 +6198,7 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
     }
 
     uint32 creatureTypeMask = pVictim->GetCreatureTypeMask();
-    // Add flat bonus from spell damage versus
-    DoneTotal += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS, creatureTypeMask);
-
+    
     // Add pct bonus from spell damage versus
     DoneTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_DONE_VERSUS, creatureTypeMask);
 
@@ -6243,6 +6241,9 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
 
     // Done fixed damage bonus auras
     int32 DoneAdvertisedBenefit = SpellBaseDamageBonusDone(GetSpellSchoolMask(spellProto));
+
+    // Add flat bonus from spell damage versus
+    DoneAdvertisedBenefit += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS, creatureTypeMask);
 
     // Pets just add their bonus damage to their spell damage
     // note that their spell damage is just gain of their own auras
@@ -6799,7 +6800,8 @@ uint32 Unit::MeleeDamageBonusDone(Unit* pVictim, uint32 pdamage, WeaponAttackTyp
         for (AuraList::const_iterator i = mModDamageDone.begin(); i != mModDamageDone.end(); ++i)
         {
             if ((*i)->GetModifier()->m_miscvalue & schoolMask &&                         // schoolmask has to fit with the intrinsic spell school
-                    (*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask() &&         // AND schoolmask has to fit with weapon damage school (essential for non-physical spells)
+                    ((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask() ||    // AND schoolmask has to fit with weapon damage school (essential for non-physical spells)
+                     spellProto->DmgClass == SPELL_DAMAGE_CLASS_RANGED) &&               // Some ranged physical attacks use magic damage, ex. Arcane Shot
                     (((*i)->GetSpellProto()->EquippedItemClass == -1) ||                     // general, weapon independent
                      (pWeapon && pWeapon->IsFitToSpellRequirements((*i)->GetSpellProto()))))  // OR used weapon fits aura requirements
                 DoneFlat += (*i)->GetModifier()->m_amount;
@@ -9360,15 +9362,16 @@ void Unit::StopMoving()
     // not need send any packets if not in world
     if (!IsInWorld())
         return;
-
+        
     Movement::MoveSplineInit init(*this, "StopMoving");
-    if (Transport* t = GetTransport())
+    if (Transport* t = GetTransport()) {
         init.SetTransport(t->GetGUIDLow());
-    if (GetTypeId() == TYPEID_PLAYER && !movespline->Finalized())
+    }
+    
+    if (GetTypeId() == TYPEID_PLAYER && !movespline->Finalized()) {
         init.SetStop(); // Will trigger CMSG_MOVE_SPLINE_DONE from client.
-    else
-        init.SetFacing(GetOrientation());
-    init.Launch();
+        init.Launch();
+    }
 
     DisableSpline();
 }
@@ -11100,7 +11103,6 @@ void Unit::SetMovement(UnitMovementType pType)
     if (!mePlayer && !controller)
         return;
 
-    // NOSTALRIUS: TODO: Envoyer 'MSG_MOVE_ROOT' aux autres, ou un Heartbeat ?
     switch (pType)
     {
         case MOVE_ROOT:
@@ -11125,6 +11127,16 @@ void Unit::SetMovement(UnitMovementType pType)
     {
         mePlayer->GetCheatData()->OrderSent(&data);
         mePlayer->GetSession()->SendPacket(&data);
+        
+        // Send root messages now rather than on acks from the force messages
+        // so our state is consistent
+        if (pType == MOVE_ROOT || pType == MOVE_UNROOT) {
+            WorldPacket rootData(pType == MOVE_ROOT ? MSG_MOVE_ROOT : MSG_MOVE_UNROOT, 31);
+            rootData << GetPackGUID();
+            rootData << m_movementInfo;
+            
+            mePlayer->SendMovementMessageToSet(std::move(rootData), false);
+        }
     }
     if (controller)
         controller->GetSession()->SendPacket(&data);

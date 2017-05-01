@@ -265,6 +265,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
     Unit *mover = _player->GetMover();
     if (mover->GetObjectGuid() != _clientMoverGuid)
         return;
+        
     Player *plMover = mover->GetTypeId() == TYPEID_PLAYER ? (Player*)mover : NULL;
 
     // ignore, waiting processing in WorldSession::HandleMoveWorldportAckOpcode and WorldSession::HandleMoveTeleportAck
@@ -400,7 +401,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     data << movementInfo;
     data << float(newspeed);
     _player->SendMovementMessageToSet(std::move(data), false);
-
+    
     if (!_player->GetMover()->movespline->Finalized())
     {
         WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
@@ -439,7 +440,8 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
     recv_data >> mi;
     _clientMoverGuid = ObjectGuid();
 
-    if (_player->GetMover()->GetObjectGuid() == old_mover_guid)
+    // Client sent not active mover, but maybe the mover is actually set?
+    if (_player->GetMover() && _player->GetMover()->GetObjectGuid() == old_mover_guid)
     {
         DETAIL_LOG("HandleMoveNotActiveMover: incorrect mover guid: mover is %s and should be %s instead of %s",
                        _player->GetMover()->GetGuidStr().c_str(),
@@ -761,14 +763,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     if (!_player->GetCheatData()->HandleAnticheatTests(movementInfo, this, &recv_data))
         return;
 
-    // Position change
+    // Update position if it has changed (possible on UNROOT ack?)
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
 
-    WorldPacket data(MSG_MOVE_UNROOT, recv_data.size());
-    data << _player->GetPackGUID();
-    movementInfo.Write(data);
-    _player->SendMovementMessageToSet(std::move(data), true, _player);
+    // Clear unit client state for brevity, though it should not be used
     _player->clearUnitState(UNIT_STAT_CLIENT_ROOT);
 }
 
@@ -798,11 +797,9 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // Position change
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
-
-    WorldPacket data(MSG_MOVE_ROOT, recv_data.size());
-    data << _player->GetPackGUID();
-    movementInfo.Write(data);
-    _player->SendMovementMessageToSet(std::move(data), true, _player);
+    
+    // Set unit client state for brevity, though it should not be used
+    _player->addUnitState(UNIT_STAT_CLIENT_ROOT);
 }
 
 void WorldSession::HandleMoveSplineDoneOpcode(WorldPacket& recv_data)

@@ -68,6 +68,7 @@ GameObject::GameObject() : WorldObject(),
     m_model = NULL;
     m_rotation = 0;
     m_playerGroupId = 0;
+    m_summonTarget = ObjectGuid();
 }
 
 GameObject::~GameObject()
@@ -1524,6 +1525,18 @@ void GameObject::Use(Unit* user)
             if (owner)
                 owner->FinishSpell(CURRENT_CHANNELED_SPELL);
 
+            // finish clickers spell
+            for (GuidsSet::const_iterator itr = m_UniqueUsers.begin(); itr != m_UniqueUsers.end(); ++itr)
+            {
+                if (Player* user = GetMap()->GetPlayer(*itr))
+                    if (user && user != owner)
+                    {
+                        Spell *channeled = user->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+                        if (channeled && channeled->m_spellInfo->Id == info->summoningRitual.animSpell)
+                            user->FinishSpell(CURRENT_CHANNELED_SPELL);
+                    }
+            }
+
             // can be deleted now, if
             if (!info->summoningRitual.ritualPersistent)
                 SetLootState(GO_JUST_DEACTIVATED);
@@ -1766,9 +1779,18 @@ void GameObject::Use(Unit* user)
 
     Spell *spell = new Spell(spellCaster, spellInfo, triggered, GetObjectGuid());
 
-    // spell target is user of GO
+    // spell target is user of GO 
     SpellCastTargets targets;
-    targets.setUnitTarget(user);
+
+    // If summoning ritual GO use the summon target instead
+    Player* summonTarget = nullptr;
+    if (GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL && getSummonTarget())
+        summonTarget = sObjectMgr.GetPlayer(getSummonTarget());
+
+    if (summonTarget)
+        targets.setUnitTarget(summonTarget);
+    else
+        targets.setUnitTarget(user);
 
     spell->prepare(&targets);
 }

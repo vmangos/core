@@ -71,6 +71,11 @@ bool GossipSelect_npc_deathly_usher(Player* pPlayer, Creature* pCreature, uint32
 #define GOSSIP_ITEM_FALLEN4 "You can count on me, Hero"
 #define GOSSIP_ITEM_FALLEN5 "I shall"
 
+#define NPC_ENTRY_CORPORAL_SPLITHOOF 7750
+
+#define QUEST_ENTRY_HEROES_OF_OLD1 2702
+#define QUEST_ENTRY_HEROES_OF_OLD2 2701
+
 bool GossipHello_npc_fallen_hero_of_horde(Player* pPlayer, Creature* pCreature)
 {
     if (pCreature->isQuestGiver())
@@ -84,6 +89,15 @@ bool GossipHello_npc_fallen_hero_of_horde(Player* pPlayer, Creature* pCreature)
 
     if (pPlayer->GetQuestStatus(2801) == QUEST_STATUS_INCOMPLETE && pPlayer->GetTeam() == ALLIANCE)
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Why are you here?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    bool bCantakeQuest = false;
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(QUEST_ENTRY_HEROES_OF_OLD2))
+        bCantakeQuest = pPlayer->CanTakeQuest(pQuest, false);
+    if ((bCantakeQuest ||
+        pPlayer->IsCurrentQuest(QUEST_ENTRY_HEROES_OF_OLD2) ||
+        pPlayer->IsCurrentQuest(QUEST_ENTRY_HEROES_OF_OLD1)) &&
+        !GetClosestCreatureWithEntry(pPlayer, NPC_ENTRY_CORPORAL_SPLITHOOF, DEFAULT_VISIBILITY_DISTANCE))
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "I must talk to Corporal Splithoof.", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
@@ -136,6 +150,15 @@ bool GossipSelect_npc_fallen_hero_of_horde(Player* pPlayer, Creature* pCreature,
         case GOSSIP_ACTION_INFO_DEF+26:
             pPlayer->CLOSE_GOSSIP_MENU();
             pPlayer->AreaExploredOrEventHappens(2801);
+            break;
+
+        case GOSSIP_ACTION_INFO_DEF+3:
+            // Start the quest_start_scripts that summons Splithoof
+            if (!GetClosestCreatureWithEntry(pPlayer, NPC_ENTRY_CORPORAL_SPLITHOOF, DEFAULT_VISIBILITY_DISTANCE))
+                if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(QUEST_ENTRY_HEROES_OF_OLD1))
+                    if (uint32 uiQuestScript = pQuest->GetQuestStartScript())
+                        pPlayer->GetMap()->ScriptsStart(sQuestStartScripts, uiQuestScript, pCreature, pPlayer);
+            pPlayer->CLOSE_GOSSIP_MENU();
             break;
     }
     return true;

@@ -1411,6 +1411,7 @@ CreatureAI* GetAI_npc_gnomish_battle_chicken(Creature* pCreature)
 /*######
 ## arcanite dragonling
 ######*/
+
 enum
 {
     SPELL_Flame_Buffet = 9574,
@@ -1453,7 +1454,7 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
 
         if (m_firebuffetTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
                     m_firebuffetTimer = urand(0, 10000);
             }
         else
@@ -1462,7 +1463,7 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
         if (m_flamebreathTimer < uiDiff)
         {
             int32 damage = 300;
-            m_creature->CastCustomSpell(m_creature, SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
+            m_creature->CastCustomSpell(m_creature->getVictim(), SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
                 m_flamebreathTimer = urand(0, 20000);
         }
         else

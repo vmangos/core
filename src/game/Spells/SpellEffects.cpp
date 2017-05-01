@@ -1392,6 +1392,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Player*)unitTarget)->AddSpellMod(mod, true);
                     break;
                 }
+                case 11094:                                 // Improved Fire Ward
+                case 13043:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // increase reflaction chanced (effect 1) of Fire Ward, removed in aura boosts
+                    SpellModifier *mod = new SpellModifier(SPELLMOD_EFFECT2, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000008));
+                    ((Player*)unitTarget)->AddSpellMod(mod, true);
+                    break;
+                }
                 case 12472:                                 // Cold Snap
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -2207,14 +2218,12 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
             int32 tickheal = targetAura->GetModifier()->m_amount;
             int32 tickcount = 0;
-            // Retablissement : 0x40
-            // pv / 3 sec. Dure 21 sec -> 7 tics
-            // -> Prompte Guerison rend "15 sec de reta", donc 5 tics
+            // Regrowth : 0x40
+            // "18 sec of Regrowth" -> 6 ticks
             if (targetAura->GetSpellProto()->IsFitToFamilyMask<CF_DRUID_REGROWTH>())
-                tickcount = 5;
-            // Recuperation : 0x10
-            // pv / 3 sec. Dure 12 sec -> 4 tics
-            // -> Prompte Guerison rend "12 sec de recup", donc 4 tics
+                tickcount = 6;
+            // Rejuvenation : 0x10
+            // "12 sec of Rejuvenation" -> 4 ticks
             if (targetAura->GetSpellProto()->IsFitToFamilyMask<CF_DRUID_REJUVENATION>())
                 tickcount = 4;
 
@@ -3123,6 +3132,12 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     summon->SetLootRecipient(m_caster);
                     break;
+                // Rockwing Gargoyle
+                case 16381:
+                    if (m_caster->getAttackerForHelper())
+                        summon->AI()->AttackStart(m_caster->getAttackerForHelper());
+                    break;
+
             }
 
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.
@@ -5631,6 +5646,10 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         {
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
+                // Set the summoning target
+                if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetSelectionGuid())
+                    pGameObj->SetSummonTarget(((Player*)m_caster)->GetSelectionGuid());
+
                 pGameObj->AddUniqueUse((Player*)m_caster);
                 m_caster->AddGameObject(pGameObj);          // will removed at spell cancel
             }

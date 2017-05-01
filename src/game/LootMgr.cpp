@@ -703,14 +703,14 @@ void Loot::generateMoneyLoot(uint32 minAmount, uint32 maxAmount)
     }
 }
 
-LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem **qitem, QuestItem **ffaitem, QuestItem **conditem)
+LootItem* Loot::LootItemInSlot(uint32 lootSlot, uint32 playerGuid, QuestItem **qitem, QuestItem **ffaitem, QuestItem **conditem)
 {
     LootItem* item = NULL;
     bool is_looted = true;
     if (lootSlot >= items.size())
     {
         uint32 questSlot = lootSlot - items.size();
-        QuestItemMap::const_iterator itr = m_playerQuestItems.find(player->GetGUIDLow());
+        QuestItemMap::const_iterator itr = m_playerQuestItems.find(playerGuid);
         if (itr != m_playerQuestItems.end() && questSlot < itr->second->size())
         {
             QuestItem *qitem2 = &itr->second->at(questSlot);
@@ -726,7 +726,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem **qite
         is_looted = item->is_looted;
         if (item->freeforall)
         {
-            QuestItemMap::const_iterator itr = m_playerFFAItems.find(player->GetGUIDLow());
+            QuestItemMap::const_iterator itr = m_playerFFAItems.find(playerGuid);
             if (itr != m_playerFFAItems.end())
             {
                 for (QuestItemList::const_iterator iter = itr->second->begin(); iter != itr->second->end(); ++iter)
@@ -742,7 +742,7 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem **qite
         }
         else if (item->conditionId && !is_looted)
         {
-            QuestItemMap::const_iterator itr = m_playerNonQuestNonFFAConditionalItems.find(player->GetGUIDLow());
+            QuestItemMap::const_iterator itr = m_playerNonQuestNonFFAConditionalItems.find(playerGuid);
             if (itr != m_playerNonQuestNonFFAConditionalItems.end())
             {
                 for (QuestItemList::const_iterator iter = itr->second->begin(); iter != itr->second->end(); ++iter)
@@ -766,9 +766,9 @@ LootItem* Loot::LootItemInSlot(uint32 lootSlot, Player* player, QuestItem **qite
     return item;
 }
 
-uint32 Loot::GetMaxSlotInLootFor(Player* player) const
+uint32 Loot::GetMaxSlotInLootFor(uint32 playerGuid) const
 {
-    QuestItemMap::const_iterator itr = m_playerQuestItems.find(player->GetGUIDLow());
+    QuestItemMap::const_iterator itr = m_playerQuestItems.find(playerGuid);
     return items.size() + (itr != m_playerQuestItems.end() ?  itr->second->size() : 0);
 }
 

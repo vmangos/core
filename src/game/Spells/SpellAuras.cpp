@@ -2777,11 +2777,12 @@ void Aura::HandleModCharm(bool apply, bool Real)
         return;
 
     Unit* caster = GetCaster();
-    if (!caster)
-        return;
 
     if (apply)
     {
+        if (!caster)
+            return;
+
         // is it really need after spell check checks?
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM, GetHolder());
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS, GetHolder());
@@ -2874,7 +2875,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 target->setFaction(cinfo->faction_A);
 
             // restore UNIT_FIELD_BYTES_0
-            if (cinfo && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
+            if (cinfo && caster && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
             {
                 // DB must have proper class set in field at loading, not req. restore, including workaround case at apply
                 // target->SetByteValue(UNIT_FIELD_BYTES_0, 1, cinfo->unit_class);
@@ -2886,10 +2887,12 @@ void Aura::HandleModCharm(bool apply, bool Real)
             }
         }
 
-        caster->SetCharm(nullptr);
-
-        if (caster->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)caster)->RemovePetActionBar();
+        if (caster)
+        {
+            caster->SetCharm(nullptr);
+            if (caster->GetTypeId() == TYPEID_PLAYER)
+                ((Player*)caster)->RemovePetActionBar();
+        }
 
         target->UpdateControl();
         target->CombatStop(true);
@@ -2905,7 +2908,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
         {
             if (pTargetCrea->AI() && pTargetCrea->AI()->SwitchAiAtControl())
                 pTargetCrea->AIM_Initialize();
-            pTargetCrea->AttackedBy(caster);
+            if (caster)
+                pTargetCrea->AttackedBy(caster);
         }
         else if (Player* pPlayer = target->ToPlayer())
             pPlayer->RemoveAI();
@@ -5514,11 +5518,11 @@ void Aura::HandleManaShield(bool apply, bool Real)
             float DoneActualBenefit = 0.0f;
 
             // Mana Shield
-            // +50% from +spd bonus
-            if (GetSpellProto()->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_MANA_SHIELD>())
-                DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(GetSpellProto())) * 0.5f;
+            // 0% coeff in vanilla (changed patch 2.4.0)
+            // if (GetSpellProto()->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_MANA_SHIELD>())
+            //    DoneActualBenefit = caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(GetSpellProto())) * 0.5f;
 
-            DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellProto());
+            // DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellProto());
 
             m_modifier.m_amount += (int32)DoneActualBenefit;
         }
@@ -6015,6 +6019,17 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
                     {
                         // reflection chance (effect 1) of Frost Ward, applied in dummy effect
+                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_EFFECT2, GetId()))
+                            ((Player*)m_target)->AddSpellMod(mod, false);
+                    }
+                    return;
+                }
+                case 11094:                                 // Improved Fire Ward
+                case 13043:
+                {
+                    if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
+                    {
+                        // reflection chance (effect 1) of Fire Ward, applied in dummy effect
                         if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_EFFECT2, GetId()))
                             ((Player*)m_target)->AddSpellMod(mod, false);
                     }
