@@ -412,8 +412,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void BindToInstanceOrRaid(Player* player, time_t objectResetTime, bool permBindToRaid);
         void TeleportAllPlayersToHomeBind();
 
-        void SetMapUpdateIndex(int idx) { _updateIdx = idx; }
-
     private:
         void LoadMapAndVMap(int gx, int gy);
 

@@ -41,7 +41,7 @@ MapManager::MapManager()
     : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
     i_MaxInstanceId(RESERVED_INSTANCES_LAST),
     i_GridStateErrorCount(0),
-    i_continentUpdateFinished(nullptr),
+    i_continentUpdateFinished(0),
     i_maxContinentThread(0),
     m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)))
 {
@@ -262,7 +262,6 @@ void MapManager::Update(uint32 diff)
         }
         iter->second->UpdateSync(mapsDiff);
         iter->second->MarkNotUpdated();
-        iter->second->SetMapUpdateIndex(-1);
         if (iter->second->Instanceable())
         {
             if (m_threads->status() == ThreadPool::Status::READY)
@@ -274,17 +273,15 @@ void MapManager::Update(uint32 diff)
         }
         else // One threat per continent part
         {
-            iter->second->SetMapUpdateIndex(continentsIdx++);
             continentsUpdaters.emplace_back([iter,mapsDiff](){
                 iter->second->DoUpdate(mapsDiff);
             });
+            continentsIdx++;
         }
     }
     i_maxContinentThread = continentsIdx;
 
-    i_continentUpdateFinished = new volatile bool[i_maxContinentThread];
-    for (int i = 0; i < i_maxContinentThread; ++i)
-        i_continentUpdateFinished[i] = false;
+    i_continentUpdateFinished.store(0);
 
     if (!m_continentThreads || m_continentThreads->size() < continentsUpdaters.size())
     {
@@ -301,8 +298,6 @@ void MapManager::Update(uint32 diff)
 
     if (f.valid())
         f.wait();
-
-    delete[] i_continentUpdateFinished;
 
     MapMapType::iterator crashedMapsIter = i_maps.begin();
     while (crashedMapsIter != i_maps.end())
@@ -780,25 +775,22 @@ void MapManager::SwitchPlayersInstances()
     }
 }
 
-void MapManager::MarkContinentUpdateFinished(int idx)
+void MapManager::MarkContinentUpdateFinished()
 {
-    ASSERT(idx < i_maxContinentThread);
+    ASSERT(i_continentUpdateFinished < i_maxContinentThread);
     std::unique_lock<std::mutex> lock(m_continentMutex);
-    i_continentUpdateFinished[idx] = true;
+    i_continentUpdateFinished++;
     if (IsContinentUpdateFinished())
         m_continentCV.notify_all();
 }
 
 bool MapManager::IsContinentUpdateFinished()
 {
-    for (int i = 0; i < i_maxContinentThread; ++i)
-        if (!i_continentUpdateFinished[i])
-            return false;
-    return true;
+    return i_continentUpdateFinished == i_maxContinentThread;
 }
 
 bool MapManager::waitContinentUpdateFinished(std::chrono::milliseconds time)
 {
     std::unique_lock<std::mutex> lock(m_continentMutex);
-    return m_continentCV.wait_for(lock,time,[this](){return IsContinentUpdateFinished();});
+    return m_continentCV.wait_for(lock,time,std::bind(&MapManager::IsContinentUpdateFinished,this));
 }
