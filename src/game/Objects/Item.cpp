@@ -382,7 +382,7 @@ void Item::SaveToDB()
 
     if (m_lootState == ITEM_LOOT_NEW || m_lootState == ITEM_LOOT_CHANGED)
     {
-        if (Player* owner = GetOwner())
+        if (auto ownerGuid = GetOwnerGuid())
         {
             static SqlStatementID saveGold ;
             static SqlStatementID saveLoot ;
@@ -391,17 +391,17 @@ void Item::SaveToDB()
             if (loot.gold)
             {
                 SqlStatement stmt = CharacterDatabase.CreateStatement(saveGold, "INSERT INTO item_loot (guid,owner_guid,itemid,amount,property) VALUES (?, ?, 0, ?, 0)");
-                stmt.PExecute(GetGUIDLow(), owner->GetGUIDLow(), loot.gold);
+                stmt.PExecute(GetGUIDLow(), ownerGuid.GetCounter(), loot.gold);
             }
 
             SqlStatement stmt = CharacterDatabase.CreateStatement(saveLoot, "INSERT INTO item_loot (guid,owner_guid,itemid,amount,property) VALUES (?, ?, ?, ?, ?)");
 
             // save items and quest items (at load its all will added as normal, but this not important for item loot case)
-            for (size_t i = 0; i < loot.GetMaxSlotInLootFor(owner); ++i)
+            for (size_t i = 0; i < loot.GetMaxSlotInLootFor(ownerGuid); ++i)
             {
                 QuestItem* qitem = NULL;
 
-                LootItem* item = loot.LootItemInSlot(i, owner, &qitem);
+                LootItem* item = loot.LootItemInSlot(i, ownerGuid, &qitem);
                 if (!item)
                     continue;
 
@@ -410,7 +410,7 @@ void Item::SaveToDB()
                     continue;
 
                 stmt.addUInt32(GetGUIDLow());
-                stmt.addUInt32(owner->GetGUIDLow());
+                stmt.addUInt32(ownerGuid);
                 stmt.addUInt32(item->itemid);
                 stmt.addUInt8(item->count);
                 stmt.addInt32(item->randomPropertyId);
