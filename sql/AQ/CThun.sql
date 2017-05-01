@@ -86,4 +86,4 @@ UPDATE creature_template SET flags_extra = flags_extra & ~512 WHERE entry = 1572
 UPDATE creature_template SET flags_extra = flags_extra | 256 where entry in (15589, 15727);
 
 -- Fix mechanic immunities for adds
-UPDATE creature_template SET MechanicImmuneMask = MechanicImmuneMask | (16 | 4096 | 512) WHERE entry IN (15728, 15334, 15725, 15726, 15802);
+UPDATE creature_template SET MechanicImmuneMask = MechanicImmuneMask | (2 | 16 | 4096 | 512) WHERE entry IN (15728, 15334, 15725, 15726, 15802);
