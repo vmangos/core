@@ -2680,9 +2680,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         targetUnitMap.push_back(m_caster);
                     break;
                 case SPELL_EFFECT_SUMMON_PLAYER:
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetSelectionGuid())
-                        if (Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid()))
-                            targetUnitMap.push_back(target);
+                    if (m_targets.getUnitTarget())
+                        targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
                 case SPELL_EFFECT_RESURRECT_NEW:
                     if (m_targets.getUnitTarget())
@@ -4712,8 +4711,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 
         if (non_caster_target)
         {
-            // Not allow casting on flying player
-            if (target->IsTaxiFlying())
+            // Not allow casting on flying player unless its a ritual of summoning
+            if (target->IsTaxiFlying() && m_spellInfo->Id != 7720)
                 return SPELL_FAILED_BAD_TARGETS;
 
             if (!m_IsTriggeredSpell)
@@ -5589,10 +5588,12 @@ SpellCastResult Spell::CheckCast(bool strict)
             {
                 if (m_caster->GetTypeId() != TYPEID_PLAYER)
                     return SPELL_FAILED_BAD_TARGETS;
-                if (!((Player*)m_caster)->GetSelectionGuid())
+                if (!m_targets.getUnitTarget())
+                    return SPELL_FAILED_BAD_TARGETS;
+                if (!m_targets.getUnitTarget()->IsPlayer())
                     return SPELL_FAILED_BAD_TARGETS;
 
-                Player* target = sObjectMgr.GetPlayer(((Player*)m_caster)->GetSelectionGuid());
+                Player* target = (Player*)m_targets.getUnitTarget();
                 if (!target || ((Player*)m_caster) == target || !target->IsInSameRaidWith((Player*)m_caster))
                     return SPELL_FAILED_BAD_TARGETS;
 

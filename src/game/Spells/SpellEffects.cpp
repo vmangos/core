@@ -5646,6 +5646,10 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         {
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
+                // Set the summoning target
+                if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetSelectionGuid())
+                    pGameObj->SetSummonTarget(((Player*)m_caster)->GetSelectionGuid());
+
                 pGameObj->AddUniqueUse((Player*)m_caster);
                 m_caster->AddGameObject(pGameObj);          // will removed at spell cancel
             }
