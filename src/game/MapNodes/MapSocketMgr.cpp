@@ -4,7 +4,10 @@
 
 template class MangosSocketMgr<MapSocket>;
 
+INSTANTIATE_SINGLETON_2(MapSocketMgr, MapSocketMgr::Lock);
+INSTANTIATE_CLASS_MUTEX(MapSocketMgr, std::mutex);
+
 MapSocketMgr* MapSocketMgr::Instance()
 {
-    return ACE_Singleton<MapSocketMgr, ACE_Thread_Mutex>::instance();
+    return &MaNGOS::Singleton<MapSocketMgr, Lock>::Instance();
 }

@@ -28,9 +28,12 @@
 #include "WorldSocketMgr.h"
 #include "MangosSocketMgrImpl.h"
 
+INSTANTIATE_SINGLETON_2(WorldSocketMgr, WorldSocketMgr::Lock);
+INSTANTIATE_CLASS_MUTEX(WorldSocketMgr, std::mutex);
+
 template class MangosSocketMgr<WorldSocket>;
 
 WorldSocketMgr* WorldSocketMgr::Instance()
 {
-    return ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>::instance();
+    return &MaNGOS::Singleton<WorldSocketMgr, Lock>::Instance();
 }
