@@ -187,13 +187,13 @@ private:
     struct StomachTimers {
         uint32 acidDebuff;
         uint32 timeSincePortedFromStomach;
+        uint32 timeSincePortedToStomach;
         bool didKnockback;
-        bool removedAcid;
         StomachTimers() :
             acidDebuff(StomachTimers::ACID_REFRESH_RATE),
-            timeSincePortedFromStomach(false),
-            didKnockback(false),
-            removedAcid(false)
+            timeSincePortedFromStomach(0),
+            timeSincePortedToStomach(0),
+            didKnockback(false)
         {}
         static const uint32 PUNT_CAST_TIME = 3000;
         static const uint32 ACID_REFRESH_RATE = 5000;

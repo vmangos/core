@@ -568,13 +568,6 @@ void instance_temple_of_ahnqiraj::TeleportPlayerToCThun(Player* pPlayer)
         sLog.outError("instance_temple_of_ahnqiraj::HandleStomachTriggers attempted to lookup area trigger %d, but it was not found.",
             AREATRIGGER_CTHUN_KNOCKBACK);
     }
-
-    // Setting timeSincePortedFromStomach to 1 so the update function know's 
-    // the player has been teleported
-    auto it = PlayerInStomachIter(pPlayer);
-    if (it != playersInStomach.end()) {
-        it->second.timeSincePortedFromStomach = 1;
-    }
 }
 
 void instance_temple_of_ahnqiraj::PerformCthunKnockback()
@@ -629,11 +622,12 @@ void instance_temple_of_ahnqiraj::HandleStomachTriggers(Player * pPlayer, const 
         // "Disable" the knockback if c'thun is killed
         if (GetData(TYPE_CTHUN) != DONE) {
             PerformCthunKnockback();
+            // If the areatrigger was triggered by a player who was ported from stomach
+            // we find his timer object and set didKnockback to true, to avoid double-knockback
+            // in the UpdateStomachOfCthun function
             auto it = PlayerInStomachIter(pPlayer);
             if (it != playersInStomach.end() && !it->second.didKnockback) {
                 it->second.didKnockback = true;
-                if (it->second.timeSincePortedFromStomach == 0)
-                    it->second.timeSincePortedFromStomach = 1; 
             }
         }
     }
@@ -701,26 +695,44 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
         }
 
         StomachTimers& timers = it->second;
-
-        // Areatriggers were used, but as they have proven unreliable we instead handle porting from 
-        // stomach manually. Debuff is removed as soon as player is ported. On second update after the TP
-        // we knock the player back. Finally, after a short delay, we remove the player from the stomachList,
-        // making him a valid target for all the stuff happening outside at c'thun.
-        if (player->GetPositionZ() > 0.0f && timers.timeSincePortedFromStomach > 0) 
+        timers.timeSincePortedToStomach += diff;
+        
+        // playerPositionZ > 0.0 (stomach teleport-out trigger is at ~-30.0f, c'thun is at ~100.f)
+        // means the player is outside the stomach as far as the server is concerned.
+        if (player->GetPositionZ() > 0.0f) 
         {
-            if (!timers.removedAcid && player->HasAura(SPELL_DIGESTIVE_ACID)) {
-                player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
-                timers.removedAcid = true;
+            // timeSincePortedToStomach prevents the player from being removed from stomach on first
+            // update after being TPed to the stomach, as the server might not realize the player
+            // has been teleported during the same update that TeleportPlayerToCThun is called
+            if (timers.timeSincePortedToStomach > 4000) 
+            {
+                if (player->HasAura(SPELL_DIGESTIVE_ACID)) 
+                {
+                    player->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
+                }
+
+                // HandleStomachTriggers() might be first to the party and perform the knockback,
+                // in which case we skip it here. We also use timeSincePortedFromStomach > 0 to delay
+                // the knockback one server-update, as it seems the knockback might not always hit 
+                // if it's cast on the same update as the player is ported.
+                if (!timers.didKnockback && timers.timeSincePortedFromStomach > 0) 
+                {
+                    PerformCthunKnockback();
+                    timers.didKnockback = true;
+                }
+                else 
+                {
+                    timers.timeSincePortedFromStomach += diff;
+                }
+
+                // ~1.5 sec after being registered as outside the stomach, we remove the player from the list.
+                // The delay will prevent tentacles to spawn in the center of c'thun through extremely bad luck, should
+                // c'thun attempt to spawn a tentacle on the player just as he is TPed out, before the knockback.
+                if (it->second.timeSincePortedFromStomach > 1500) {
+                    it = playersInStomach.erase(it);
+                    continue;
+                }
             }
-            else if (timers.timeSincePortedFromStomach > 1 && !timers.didKnockback) { 
-                PerformCthunKnockback();
-                timers.didKnockback = true;
-            }
-            else if (it->second.timeSincePortedFromStomach > 1500) {
-                it = playersInStomach.erase(it);
-                continue;
-            }
-            timers.timeSincePortedFromStomach += diff;
         }
         else 
         {
@@ -742,7 +754,7 @@ void instance_temple_of_ahnqiraj::UpdateStomachOfCthun(uint32 diff)
                 }
             }
         }
-
+        
         ++it;
     }
 }
