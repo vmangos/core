@@ -1117,6 +1117,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     // stored in unused spell effect basepoints in main spell code
                     uint32 spellid = m_currentBasePoints[EFFECT_INDEX_1];
                     spellInfo = sSpellMgr.GetSpellEntry(spellid);
+                    procAttacker |= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
                 }
             }
 
@@ -3274,6 +3275,13 @@ void Spell::cast(bool skipCheck)
                 procAttackerFlags |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
         }
         m_caster->ProcDamageAndSpell(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
+    }
+
+    // Shaman totems. Trigger spell cast
+    if (m_spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && m_spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4 && m_canTrigger)
+    {
+        uint32 procAttackerFlags = m_procAttacker | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+        m_caster->ProcDamageAndSpell(m_caster, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
     }
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
