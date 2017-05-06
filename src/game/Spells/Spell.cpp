@@ -673,6 +673,9 @@ void Spell::prepareDataForTriggerSystem()
                 // Holy Shock
                 else if (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_HOLY_SHOCK>())
                     m_canTrigger = true;
+                // Eye for an Eye triggered spell
+                else if (m_spellInfo->Id == 25997)
+                    m_canTrigger = true;
                 break;
             case SPELLFAMILY_PRIEST:
                 // Touch of Weakness / Devouring Plague
