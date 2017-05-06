@@ -1031,13 +1031,14 @@ void Map::Remove(Player *player, bool remove)
     player->m_needUpdateVisibility = false;
 
     player->m_visibleGUIDs_lock.acquire_write();
-    for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end(); ++it)
+    for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end();)
         if (Player* other = GetPlayer(*it))
         {
             other->DestroyForPlayer(player);
             other->m_broadcaster->RemoveListener(player);
-            player->m_visibleGUIDs.erase(*it);
+            it = player->m_visibleGUIDs.erase(it);
         }
+        else ++it;
     player->m_visibleGUIDs_lock.release();
 
     player->ResetMap();
