@@ -49,7 +49,14 @@ namespace VMAP
     class WorldModel;
     class ModelInstance;
 
-    using ManagedModel = std::weak_ptr<WorldModel>;
+    class ManagedModel :
+            public std::weak_ptr<WorldModel>
+    {
+    public:
+        ManagedModel(const std::shared_ptr<WorldModel> &ptr, bool managed);
+    private:
+        std::shared_ptr<WorldModel> m_persistent;
+    };
 
     typedef UNORDERED_MAP<uint32 , StaticMapTree*> InstanceTreeMap;
     typedef UNORDERED_MAP<std::string, ManagedModel> ModelFileMap;

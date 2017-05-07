@@ -903,6 +903,7 @@ void World::LoadConfigSettings(bool reload)
     m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
 
     LoadNostalriusConfig(reload);
+    VMAP::VMapFactory::createOrGetVMapManager()->setUseManagedPtrs(getConfig(CONFIG_BOOL_COLLISION_MODELS_UNLOAD));
 
     // Smartlog data
     sLog.InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));

@@ -295,7 +295,7 @@ std::shared_ptr<WorldModel> VMapManager2::acquireModelInstance(const std::string
                     });
         model = iLoadedModelFiles.insert(std::pair<std::string, ManagedModel>(
                                              filename,
-                                             ret
+                                            {ret, getUseManagedPtrs()}
                                              )).first;
         return ret;
     }
@@ -309,4 +309,12 @@ bool VMapManager2::existsMap(const char* pBasePath, unsigned int pMapId, int x, 
 {
     return StaticMapTree::CanLoadMap(std::string(pBasePath), pMapId, x, y);
 }
+
+ManagedModel::ManagedModel(const std::shared_ptr<WorldModel> &ptr, bool managed) :
+    std::weak_ptr<WorldModel>(ptr)
+{
+    if (managed)
+        m_persistent = lock();
+}
+
 } // namespace VMAP
