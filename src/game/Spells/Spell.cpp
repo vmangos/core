@@ -592,13 +592,14 @@ void Spell::FillTargetMap()
                 break;
         }
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_THREAT))
         {
             Player *me = (Player*)m_caster;
             for (UnitList::const_iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
             {
                 Player *targetOwner = (*itr)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner))
+                if ((targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner)) || // PvP flagged players
+                    ((*itr)->IsCreature() && (*itr)->IsPvP()))                                                      // PvP flagged creatures
                 {
                     me->UpdatePvP(true);
                     me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -671,6 +672,9 @@ void Spell::prepareDataForTriggerSystem()
                     m_canTrigger = true;
                 // Holy Shock
                 else if (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_HOLY_SHOCK>())
+                    m_canTrigger = true;
+                // Eye for an Eye triggered spell
+                else if (m_spellInfo->Id == 25997)
                     m_canTrigger = true;
                 break;
             case SPELLFAMILY_PRIEST:
@@ -1113,6 +1117,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     // stored in unused spell effect basepoints in main spell code
                     uint32 spellid = m_currentBasePoints[EFFECT_INDEX_1];
                     spellInfo = sSpellMgr.GetSpellEntry(spellid);
+                    procAttacker |= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
                 }
             }
 
@@ -3270,6 +3275,13 @@ void Spell::cast(bool skipCheck)
                 procAttackerFlags |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
         }
         m_caster->ProcDamageAndSpell(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
+    }
+
+    // Shaman totems. Trigger spell cast
+    if (m_spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && m_spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4 && m_canTrigger)
+    {
+        uint32 procAttackerFlags = m_procAttacker | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+        m_caster->ProcDamageAndSpell(m_caster, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
     }
 
     // Okay, everything is prepared. Now we need to distinguish between immediate and evented delayed spells
@@ -7344,6 +7356,11 @@ public:
                         {
                             if (!casterUnit->IsValidAttackTarget(sourceUnit))
                                 continue;
+
+                            // Negative AoE from non flagged players cannot target other players
+                            if (Player *attackedPlayer = sourceUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
+                                    continue;
                         }
                         else if (GameObject* gobj = i_originalCaster->ToGameObject())
                         {

@@ -985,13 +985,14 @@ void Map::Remove(Player *player, bool remove)
     player->m_needUpdateVisibility = false;
 
     std::unique_lock<std::shared_timed_mutex> lock(player->m_visibleGUIDs_lock);
-    for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end(); ++it)
+    for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end();)
         if (Player* other = GetPlayer(*it))
         {
             other->DestroyForPlayer(player);
             other->m_broadcaster->RemoveListener(player);
-            player->m_visibleGUIDs.erase(*it);
+            it = player->m_visibleGUIDs.erase(it);
         }
+        else ++it;
     lock.unlock();
 
     player->ResetMap();
