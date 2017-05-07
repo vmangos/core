@@ -1782,7 +1782,7 @@ public:
 
 void AddTest_cinematics()
 {
-    /*sAutoTestingMgr->AddTest(new cinematics_run_blackrock);
+    sAutoTestingMgr->AddTest(new cinematics_run_blackrock);
     sAutoTestingMgr->AddTest(new cinematics_tarren_mills_charge_alliance);
     sAutoTestingMgr->AddTest(new cinematics_tarren_mills_charge_horde);
     sAutoTestingMgr->AddTest(new cinematics_tarren_mills_fights);
@@ -1793,5 +1793,5 @@ void AddTest_cinematics()
     sAutoTestingMgr->AddTest(new cinematics_caverns_of_time_spirit_healers);
     sAutoTestingMgr->AddTest(new cinematics_crossroads_crowd);
     sAutoTestingMgr->AddTest(new cinematics_theramore_crowd);
-    sAutoTestingMgr->AddTest(new cinematics_duskwood_battle);*/
+    sAutoTestingMgr->AddTest(new cinematics_duskwood_battle);
 }

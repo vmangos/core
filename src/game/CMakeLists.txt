@@ -503,6 +503,7 @@ include_directories(
   ${MYSQL_INCLUDE_DIR}
   ${TBB_INCLUDE_DIRS}
   ${ACE_INCLUDE_DIR}
+  ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
 )
 
 source_group("Object"
