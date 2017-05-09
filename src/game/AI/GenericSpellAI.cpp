@@ -53,6 +53,7 @@ struct GenericAISpell
     uint32 healValue;
 
     uint32 spellFlags;
+    uint32 targetAuraState;
 };
 
 struct MobSpellEntry
@@ -272,6 +273,13 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                         cast = false;
                 }
 
+                // Test TargetAuraState
+                if (cast && it->targetAuraState)
+                {
+                    if (!target->HasAuraState(AuraState(it->targetAuraState)))
+                        cast = false;
+                }
+
                 if (cast)
                 {
                     DoCastSpellIfCan(target, it->spellId);
@@ -408,6 +416,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
     spellToModify->spellFlags = 0;
     spellToModify->initialMinCD = 0; //spellToModify->minCD;
     spellToModify->initialMaxCD = 0; //spellToModify->maxCD;
+    spellToModify->targetAuraState = spellInfos->TargetAuraState;
 
 #ifdef DEBUG_ON
     sLog.outString(">> Loading Spell %s (id=%u) !", spellInfos->SpellName[2], spellToModify->spellId);
