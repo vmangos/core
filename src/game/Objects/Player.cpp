@@ -4272,6 +4272,13 @@ void Player::DeleteOldCharacters(uint32 keepDays)
 */
 void Player::BuildPlayerRepop()
 {
+    // Waiting to Resurrect (probably redundant cast, yet to check thoroughly)
+    if (InBattleGround())
+        CastSpell(this, 2584, true);
+
+    //this is spirit release confirm?
+    RemovePet(PET_SAVE_REAGENTS);
+
     if (getRace() == RACE_NIGHTELF)
         CastSpell(this, 20584, true);                       // auras SPELL_AURA_INCREASE_SPEED(+speed in wisp form), SPELL_AURA_INCREASE_SWIM_SPEED(+swim speed in wisp form), SPELL_AURA_TRANSFORM (to wisp form)
     CastSpell(this, 8326, true);                            // auras SPELL_AURA_GHOST, SPELL_AURA_INCREASE_SPEED(why?), SPELL_AURA_INCREASE_SWIM_SPEED(why?)
