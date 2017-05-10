@@ -221,19 +221,22 @@ struct boss_viscidusAI : public ScriptedAI
         {
             // should be a spell script!
             if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SHRINKS_HP, CAST_TRIGGERED) == CAST_OK)
-                m_creature->SetHealth(m_creature->GetHealth() - (m_creature->GetMaxHealth() * 0.05f));
+            {
+                auto health = m_creature->GetHealth() - static_cast<uint32>((m_creature->GetMaxHealth() * 0.05f));
+
+                if (health && health <= m_creature->GetMaxHealth())
+                {
+                    m_creature->SetHealth(health);
+                }
+                else
+                {
+                    m_creature->SetHealthPercent(1.0f);
+                }
+            }
 
             m_lGlobesGuidList.remove(pSummoned->GetObjectGuid());
 
-            // suicide if required
-            if (m_creature->GetHealthPercent() < 5.0f)
-            {
-                m_creature->SetVisibility(VISIBILITY_ON);
-
-                if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SUICIDE, CAST_TRIGGERED) == CAST_OK)
-                    m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, nullptr, false);
-            }
-            else if (m_lGlobesGuidList.empty())
+            if (m_lGlobesGuidList.empty())
             {
                 ResetViscidusState(true);
             }
@@ -260,6 +263,17 @@ struct boss_viscidusAI : public ScriptedAI
     {
         if (pSpell->Id == SPELL_VISCIDUS_EXPLODE)
         {
+            // suicide if required
+            if (m_creature->GetHealthPercent() < 5.0f)
+            {
+                m_creature->SetVisibility(VISIBILITY_ON);
+
+                if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SUICIDE, CAST_TRIGGERED) == CAST_OK)
+                    m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, nullptr, false);
+
+                return;
+            }
+
             DoScriptText(EMOTE_EXPLODE, m_creature);
             m_uiPhase = PHASE_EXPLODED;
             m_lGlobesGuidList.clear();
