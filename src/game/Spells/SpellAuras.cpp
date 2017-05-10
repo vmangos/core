@@ -5156,8 +5156,10 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             }
             target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
-            // heal for caster damage
-            if (target != pCaster && spellProto->SpellVisual == 163)
+            // heal for caster damage, warlock's health funnel aldready cost hps
+            if (target != pCaster && spellProto->SpellVisual == 163 &&
+                !(spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                spellProto->IsFitToFamilyMask<CF_WARLOCK_HEALTH_FUNNEL>()))
             {
                 uint32 dmg = spellProto->manaPerSecond;
                 if (pCaster->GetHealth() <= dmg && pCaster->GetTypeId() == TYPEID_PLAYER)
@@ -6161,16 +6163,29 @@ void SpellAuraHolder::Update(uint32 diff)
         {
             if (Unit* caster = GetCaster())
             {
-                Powers powertype = Powers(GetSpellProto()->powerType);
-                int32 manaPerSecond = GetSpellProto()->manaPerSecond + GetSpellProto()->manaPerSecondPerLevel * caster->getLevel();
+                Powers powertype = Powers(m_spellProto->powerType);
+                int32 manaPerSecond = m_spellProto->manaPerSecond + m_spellProto->manaPerSecondPerLevel * caster->getLevel();
                 m_timeCla = 1 * IN_MILLISECONDS;
 
-                if (manaPerSecond)
+                Unit* target = GetTarget();
+                if (manaPerSecond && // avoid double cost for health funnel :
+                    !(m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                    m_spellProto->IsFitToFamilyMask<CF_WARLOCK_HEALTH_FUNNEL>() &&
+                    target && (target->GetCharmerOrOwnerGuid() == GetCasterGuid())))
                 {
-                    if (powertype == POWER_HEALTH)
+                    if (powertype == POWER_HEALTH && int32(caster->GetHealth()) > manaPerSecond)
                         caster->ModifyHealth(-manaPerSecond);
-                    else
+                    else if (int32(caster->GetPower(powertype)) >= manaPerSecond)
                         caster->ModifyPower(powertype, -manaPerSecond);
+                    else
+                    {
+                        if (target)
+                            target->RemoveAurasDueToSpell(m_spellProto->Id, this);
+                        if (IsChanneledSpell(m_spellProto))
+                            caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                        if (Player* plCaster = caster->ToPlayer())
+                            Spell::SendCastResult(plCaster, m_spellProto, SPELL_FAILED_FIZZLE);
+                    }
                 }
             }
         }
@@ -6209,6 +6224,8 @@ void SpellAuraHolder::Update(uint32 diff)
 
             if (m_target->IsHostileTo(caster))
                 max_range *= 1.33f;
+            else // add radius of caster (see Spell::CheckRange)
+                max_range += 1.25f;
 
             if (Player* modOwner = caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(GetId(), SPELLMOD_RANGE, max_range, nullptr);
