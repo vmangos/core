@@ -43,7 +43,7 @@ class Unit;
 struct SpellModifier;
 
 // Nostalrius : Champs 'Custom' de SpellEntry
-enum
+enum SpellAttributeCustom
 {
     SPELL_CUSTOM_NONE                       = 0x000,
 
@@ -53,7 +53,8 @@ enum
     SPELL_CUSTOM_POSITIVE                   = 0x004,
     SPELL_CUSTOM_CHAN_NO_DIST_LIMIT         = 0x008,
     SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,
-    SPELL_CUSTOM_IGNORE_ARMOR               = 0x020
+    SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
+    SPELL_CUSTOM_FROM_BEHIND                = 0x040     // For spells that require the caster to be behind the target
 };
 
 // only used in code
