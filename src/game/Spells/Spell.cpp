@@ -705,8 +705,16 @@ void Spell::prepareDataForTriggerSystem()
             }
             else // Ranged spell attack
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
-                m_procVictim   = PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+                // If blind, don't add proc flags for typical ranged abilities
+                // proc none
+                if (m_spellInfo->Id == 2094) {
+                    m_procAttacker = PROC_FLAG_NONE;
+                    m_procVictim = PROC_FLAG_NONE;
+                }
+                else {
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+                    m_procVictim   = PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+                }
             }
             break;
         default:
@@ -4406,6 +4414,10 @@ void Spell::TakeReagents()
 
 void Spell::TakeAmmo()
 {
+    // Blind is a ranged attack but should not take any ammo
+    if (m_spellInfo->Id == 2094)
+        return;
+            
     if (m_attackType == RANGED_ATTACK && m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         Item *pItem = ((Player*)m_caster)->GetWeaponForAttack(RANGED_ATTACK, true, false);
