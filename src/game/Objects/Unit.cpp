@@ -9584,6 +9584,44 @@ bool Unit::isAttackReady(WeaponAttackType type) const
 }
 void Unit::SetDisplayId(uint32 modelId)
 {
+    if (IsPlayer())
+    {
+        float mod_x = 1;
+        switch (modelId)
+        {
+        case 59:
+            mod_x *= DEFAULT_TAUREN_MALE_SCALE;
+            break;
+        case 60:
+            mod_x *= DEFAULT_TAUREN_FEMALE_SCALE;
+            break;
+        // Orb of Deception Gone
+        case 10148:
+            mod_x *= DEFAULT_TAUREN_MALE_SCALE;
+            break;
+        case 10149:
+            mod_x *= DEFAULT_TAUREN_FEMALE_SCALE;
+            break;
+        }
+        switch (GetDisplayId())
+        {
+        case 59:
+            mod_x /= DEFAULT_TAUREN_MALE_SCALE;
+            break;
+        case 60:
+            mod_x /= DEFAULT_TAUREN_FEMALE_SCALE;
+            break;
+            // Orb of Deception Gone
+        case 10148:
+            mod_x /= DEFAULT_TAUREN_MALE_SCALE;
+            break;
+        case 10149:
+            mod_x /= DEFAULT_TAUREN_FEMALE_SCALE;
+            break;
+        }
+        ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, (mod_x -1)*100, true);
+    }
+
     SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
 
     UpdateModelData();
@@ -11453,10 +11491,6 @@ void Unit::InitPlayerDisplayIds()
         return;
 
     uint8 gender = getGender();
-    if (getRace() == RACE_TAUREN)
-        SetObjectScale(gender == GENDER_MALE ? DEFAULT_TAUREN_MALE_SCALE : DEFAULT_TAUREN_FEMALE_SCALE);
-    else
-        SetObjectScale(DEFAULT_OBJECT_SCALE);
 
     switch (gender)
     {
