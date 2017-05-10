@@ -387,28 +387,22 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     // Daemon TODO: enregistrement de cette position ?
     // Daemon: mise a jour de la vitesse pour les joueurs a cote.
     // Cf Unit::SetSpeedRate pour plus d'infos.
-    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][2] =
+    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][3] =
     {
-        {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE},
-        {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE},
-        {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
-        {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
+        {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE,       SMSG_SPLINE_SET_WALK_SPEED},
+        {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE,        SMSG_SPLINE_SET_RUN_SPEED},
+        {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE,   SMSG_SPLINE_SET_RUN_BACK_SPEED},
+        {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE,       SMSG_SPLINE_SET_SWIM_SPEED},
+        {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  SMSG_SPLINE_SET_SWIM_BACK_SPEED},
+        {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
     };
-    WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
+    
+    // Update movespeed using the spline packet. works for move splines
+    // and normal movement
+    WorldPacket data(SetSpeed2Opc_table[move_type][2], 31);
     data << _player->GetMover()->GetPackGUID();
-    data << movementInfo;
     data << float(newspeed);
     _player->SendMovementMessageToSet(std::move(data), false);
-    
-    if (!_player->GetMover()->movespline->Finalized())
-    {
-        WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
-        splineData << _player->GetMover()->GetPackGUID();
-        Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
-        _player->SendMovementMessageToSet(std::move(splineData), false);
-    }
 }
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)

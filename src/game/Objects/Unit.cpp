@@ -7851,10 +7851,10 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
 
 
         // TODO: Actually such opcodes should (always?) be packed with SMSG_COMPRESSED_MOVES
-        // Nostalrius:
-        // Impossible d'envoyer ici le paquet 'MSG_MOVE_SET_*_SPEED', car on ne connait pas les flags de mouvements, et la position cote client
-        // (mise a jour toutes les 0.5 sec). Si on envoit un paquet, on abouti a une desynchro (en l'absence d'interpolation de la position)
-        // Ce paquet sera envoye apres reception d'un paquet type 'CMSG_FORCE_*_SPEED_CHANGE_ACK' (MovementHandler.cpp)
+        // Nostalrius: (google translated)
+        // Unable to send here the package 'MSG_MOVE_SET _ * _ SPEED', because we do not know the flags of movements, and the position dimension client
+        // (update every 0.5 sec). If one sends a packet, one leads to a desynchro (in the absence of interpolation of the position)
+        // This package will be sent after receiving a packet type 'CMSG_FORCE _ * _ SPEED_CHANGE_ACK' (MovementHandler.cpp)
         //m_updateFlag |= UPDATEFLAG_LIVING; // Mise a jour des mouvements en cours, spline, vitesses, etc ... Inutile ?
 
         propagateSpeedChange();
@@ -7891,7 +7891,7 @@ void Unit::SetDeathState(DeathState s)
 
         i_motionMaster.Clear(false, true);
         i_motionMaster.MoveIdle();
-        StopMoving();
+        StopMoving(true);
 
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
         // remove aurastates allowing special moves
@@ -9366,20 +9366,20 @@ void Unit::SendPetAIReaction()
 
 ///----------End of Pet responses methods----------
 
-void Unit::StopMoving()
+void Unit::StopMoving(bool force)
 {
     clearUnitState(UNIT_STAT_MOVING);
     RemoveUnitMovementFlag(MOVEFLAG_MASK_MOVING);
     // not need send any packets if not in world
     if (!IsInWorld())
         return;
-        
+
     Movement::MoveSplineInit init(*this, "StopMoving");
     if (Transport* t = GetTransport()) {
         init.SetTransport(t->GetGUIDLow());
     }
     
-    if (GetTypeId() == TYPEID_PLAYER && !movespline->Finalized()) {
+    if (!movespline->Finalized() || force) {
         init.SetStop(); // Will trigger CMSG_MOVE_SPLINE_DONE from client.
         init.Launch();
     }
@@ -11086,6 +11086,7 @@ void Unit::SetMovement(UnitMovementType pType)
     WorldPacket data;
     if (!movespline->Finalized())
     {
+        // Spline roots are sent here.
         MovementData mvtData(this);
         switch (pType)
         {
