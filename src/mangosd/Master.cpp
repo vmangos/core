@@ -281,6 +281,8 @@ int Master::Run()
         return 1;
     }
 
+    initMTRandTSS();
+
     ///- Initialize the World
     sWorld.SetInitialWorldSettings();
 
@@ -474,6 +476,8 @@ int Master::Run()
     WorldDatabase.StopServer();
     LoginDatabase.StopServer();
     LogsDatabase.StopServer();
+
+    deleteMTRandTSS();
 
     sLog.outString( "Halting process..." );
 

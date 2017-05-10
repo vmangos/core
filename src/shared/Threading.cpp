@@ -130,7 +130,7 @@ Thread::~Thread()
 }
 
 //initialize Thread's class static member
-Thread::ThreadStorage Thread::m_ThreadStorage;
+Thread::ThreadStorage *Thread::m_ThreadStorage = NULL;
 ThreadPriority Thread::m_TpEnum;
 
 bool Thread::start()
@@ -139,6 +139,9 @@ bool Thread::start()
         return false;
 
     m_task->incReference();
+
+    m_ThreadStorage = new ACE_TSS<Thread>();
+
     bool res = (ACE_Thread::spawn(&Thread::ThreadTask, (void*)m_task, THREADFLAG, &m_iThreadId, &m_hThreadHandle) == 0);
     if (!res)
         m_task->decReference();
@@ -156,6 +159,8 @@ bool Thread::wait()
 
     m_iThreadId = 0;
     m_hThreadHandle = 0;
+    delete m_ThreadStorage;
+    m_ThreadStorage = NULL;
 
     return (_res == 0);
 }
@@ -170,6 +175,8 @@ void Thread::destroy()
 
     m_iThreadId = 0;
     m_hThreadHandle = 0;
+    delete m_ThreadStorage;
+    m_ThreadStorage = NULL;
 
     // reference set at ACE_Thread::spawn
     Runnable* task = m_task;
@@ -218,14 +225,14 @@ ACE_hthread_t Thread::currentHandle()
 
 Thread * Thread::current()
 {
-    Thread * _thread = m_ThreadStorage.ts_object();
+    Thread* _thread = (*m_ThreadStorage).ts_object();
     if(!_thread)
     {
         _thread = new Thread();
         _thread->m_iThreadId = Thread::currentId();
         _thread->m_hThreadHandle = Thread::currentHandle();
 
-        Thread * _oldValue = m_ThreadStorage.ts_object(_thread);
+        Thread* _oldValue = (*m_ThreadStorage).ts_object(_thread);
         if(_oldValue)
             delete _oldValue;
     }

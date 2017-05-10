@@ -76,6 +76,20 @@ inline uint32 secsToTimeBitFields(time_t secs)
     return (lt->tm_year - 100) << 24 | lt->tm_mon  << 20 | (lt->tm_mday - 1) << 14 | lt->tm_wday << 11 | lt->tm_hour << 6 | lt->tm_min;
 }
 
+/**
+* @brief Initializes the TSS for MersenneTwister
+*
+*
+*/
+void initMTRandTSS();
+
+/**
+* @brief Cleanups the TSS for MersenneTwister
+*
+*
+*/
+void deleteMTRandTSS();
+
 /* Return a random number in the range min..max; (max-min) must be smaller than 32768. */
 MANGOS_DLL_SPEC int32 irand(int32 min, int32 max);
 
