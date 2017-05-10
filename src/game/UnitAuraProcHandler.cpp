@@ -444,48 +444,49 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     triggered_spell_id = 25997;
                     break;
                 }
-                 // Sweeping Strikes
-		case 12292:
-		case 18765:
-		{
-			// Prevent chain of triggered spell from same triggered spell
-			if (procSpell && procSpell->Id == 26654)
-				return SPELL_AURA_PROC_FAILED;
+                // Sweeping Strikes
+                case 12292:
+                case 18765:
+                {
+                    // Prevent chain of triggered spell from same triggered spell
+                    if (procSpell && (procSpell->Id == 26654 || procSpell->Id == 12723))
+                        return SPELL_AURA_PROC_FAILED;
 
-			if (procSpell && procSpell->Id == 12723)
-				return SPELL_AURA_PROC_FAILED;
+                    // Fix range for target selection when proccing SS with whirlwind. Whirlwind doesn't
+                    // have a radius set on its prototype, but it is 8 yards.
+                    float radius = ATTACK_DISTANCE;
+                    if (procSpell && procSpell->Id == 1680)
+                        radius = 8.0f;
 
-			target = SelectRandomUnfriendlyTarget(pVictim);
-			if (!target)
-				return SPELL_AURA_PROC_FAILED;
+                    target = SelectRandomUnfriendlyTarget(pVictim, radius);
+                    if (!target)
+                        return SPELL_AURA_PROC_FAILED;
 
-			// Case for Execute. This will only run when procced by Execute
-			if (procSpell && procSpell->Id == 20647)
-			{
-
-				if (pVictim->GetHealthPercent() < 20.0f && target->GetHealthPercent() < 20.0f)  // If Both Target A and target B is sub 20% do full damage
-				{
-					basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-					triggered_spell_id = 12723; //Note this SS id deals 1 damage by itself (Cannot crit)
-				}
-				else if (pVictim->GetHealthPercent() < 20.0f)	// If only Target A is sub 20% and target B is over 20% do Basic attack damage
-				{
-					triggered_spell_id = 26654;	// This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
-				}
-				else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used sub 20% anyway.                                             
-				{
-					basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-					triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
-				}
-			}
-			else // Full damage on anything else 
-			{
-				basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-				triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
-			}
-
-			break;
-		}
+                    // Case for Execute. This will only run when procced by Execute
+                    if (procSpell && procSpell->Id == 20647)
+                    {
+                        if (pVictim->GetHealthPercent() < 20.0f && target->GetHealthPercent() < 20.0f)  // If Both Target A and target B is sub 20% do full damage
+                        {
+                            basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                            triggered_spell_id = 12723; //Note this SS id deals 1 damage by itself (Cannot crit)
+                        }
+                        else if (pVictim->GetHealthPercent() < 20.0f)	// If only Target A is sub 20% and target B is over 20% do Basic attack damage
+                        {
+                            triggered_spell_id = 26654;	// This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
+                        }
+                        else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used sub 20% anyway.
+                        {
+                            basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                            triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
+                        }
+                    }
+                    else // Full damage on anything else
+                    {
+                        basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
+                        triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
+                    }
+                    break;
+                }
                 // Retaliation
                 case 20230:
                 {

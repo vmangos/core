@@ -634,6 +634,8 @@ void Spell::prepareDataForTriggerSystem()
     // Fill flag can spell trigger or not
     // TODO: possible exist spell attribute for this
     m_canTrigger = false;
+    m_procAttacker = PROC_FLAG_NONE;
+    m_procVictim = PROC_FLAG_NONE;
 
     if (m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CANT_TRIGGER_PROC)
         m_canTrigger = false;         // Explicitly not allowed to trigger
@@ -724,6 +726,7 @@ void Spell::prepareDataForTriggerSystem()
             // Hellfire regularly triggers an AoE spell.
             if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && m_spellInfo->SpellIconID == 937)
                 aoe = true;
+
             if (IsPositiveSpell(m_spellInfo->Id))                                 // Check for positive spell
             {
                 m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
@@ -1009,10 +1012,39 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // Reset damage/healing counter
     ResetEffectDamageAndHeal();
 
-    // Fill base trigger info
+    // Fill base trigger info. If this is hitting multiple targets, attacker procs should
+    // only apply on the first target aside from some special cases.
     uint32 procAttacker = m_procAttacker;
     uint32 procVictim   = m_procVictim;
     uint32 procEx       = PROC_EX_NONE;
+    
+    // Drop some attacker proc flags if this is a secondary target. Do not need to change
+    // the victim proc flags.
+    if (m_targetNum > 1) {
+        // If this is a melee spell hit, strip the flag and apply a spell hit flag instead.
+        // This is required to proc things like Deep Wounds on the victim when hitting 
+        // multiple targets, but not proc additional melee-only beneficial auras on the 
+        // attacker like Sweeping Strikes. Leave the victim proc flags responding to a melee
+        // spell.
+        if (procAttacker & PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT) {
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT);
+            procAttacker |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        }
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST)) {
+            // Secondary target on a successful spell cast. Remove these flags so we're not
+            // proccing beneficial auras multiple times. Also remove negative spell hit for
+            // chain lightning + clearcasting. Leave positive effects
+            // eg. Chain heal/lightning & Zandalarian Hero Charm
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | 
+                              PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+        }
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)) {
+            // Do not allow secondary hits for negative aoe spells (such as Arcane Explosion) 
+            // to proc beneficial abilities such as Clearcasting. Positive aoe spells can
+            // still trigger, as in the case of prayer of healing and inspiration...
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+        }
+    }
 
     // drop proc flags in case target not affected negative effects in negative spell
     // for example caster bonus or animation,
