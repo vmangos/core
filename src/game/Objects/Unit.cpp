@@ -2836,6 +2836,13 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
             canParry = false;
     }
 
+    // Check if the player can parry
+    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+    {
+        if (!((Player*)pVictim)->CanParry())
+            canParry = false;
+    }
+
     if (canDodge)
     {
         // Roll dodge
