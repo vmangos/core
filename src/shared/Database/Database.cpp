@@ -228,7 +228,6 @@ bool Database::InitDelayThread(int i, std::string const& infoString)
         return false;
     m_threadsBodies[i] = new SqlDelayThread(this, threadConnection);
     m_threadsBodies[i]->incReference();
-    m_TransStorage = new ACE_TSS<Database::TransHelper>();
     m_delayThreads[i] = new ACE_Based::Thread(m_threadsBodies[i]);
     return true;
 }
@@ -245,12 +244,10 @@ void Database::HaltDelayThread()
         delete m_delayThreads[i];
         m_threadsBodies[i]->decReference();
     }
-    delete m_TransStorage;
     delete[] m_threadsBodies;
     delete[] m_delayThreads;
     m_delayThreads = NULL;
     m_threadsBodies = NULL;
-    m_TransStorage = NULL;
     m_numAsyncWorkers = 0;
 }
 
@@ -397,7 +394,7 @@ bool Database::Execute(const char *sql)
     if (!m_pAsyncConn)
         return false;
 
-    SqlTransaction * pTrans = (*m_TransStorage)->get();
+    SqlTransaction * pTrans = m_TransStorage->get();
     if(pTrans)
     {
         //add SQL request to trans queue
@@ -461,12 +458,12 @@ bool Database::BeginTransaction()
     if (!m_pAsyncConn)
         return false;
     //ASSERT(!m_TransStorage->get());
-    if ((*m_TransStorage)->get())
+    if (m_TransStorage->get())
         return false;
 
     //initiate transaction on current thread
     //currently we do not support queued transactions
-    (*m_TransStorage)->init();
+    m_TransStorage->init();
     return true;
 }
 
@@ -477,7 +474,7 @@ bool Database::CommitTransaction()
 
     //check if we have pending transaction
     //ASSERT(m_TransStorage->get());
-    if (!(*m_TransStorage)->get())
+    if (!m_TransStorage->get())
         return false;
 
     //if async execution is not available
@@ -485,7 +482,7 @@ bool Database::CommitTransaction()
         return CommitTransactionDirect();
 
     //add SqlTransaction to the async queue
-    AddToDelayQueue((*m_TransStorage)->detach());
+    AddToDelayQueue(m_TransStorage->detach());
     return true;
 }
 
@@ -495,10 +492,10 @@ bool Database::CommitTransactionDirect()
         return false;
 
     //check if we have pending transaction
-    ASSERT ((*m_TransStorage)->get());
+    ASSERT (m_TransStorage->get());
 
     //directly execute SqlTransaction
-    SqlTransaction * pTrans = (*m_TransStorage)->detach();
+    SqlTransaction * pTrans = m_TransStorage->detach();
     pTrans->Execute(m_pAsyncConn);
     delete pTrans;
 
@@ -510,11 +507,11 @@ bool Database::RollbackTransaction()
     if (!m_pAsyncConn)
         return false;
 
-    if (!(*m_TransStorage)->get())
+    if(!m_TransStorage->get())
         return false;
 
     //remove scheduled transaction
-    (*m_TransStorage)->reset();
+    m_TransStorage->reset();
 
     return true;
 }
@@ -582,7 +579,7 @@ bool Database::ExecuteStmt(const SqlStatementID& id, SqlStmtParameters * params)
     if (!m_pAsyncConn)
         return false;
 
-    SqlTransaction * pTrans = (*m_TransStorage)->get();
+    SqlTransaction * pTrans = m_TransStorage->get();
     if(pTrans)
     {
         //add SQL request to trans queue

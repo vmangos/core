@@ -251,7 +251,7 @@ class MANGOS_DLL_SPEC Database
         void StopServer();
     protected:
         Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadsBodies(NULL), m_delayThreads(NULL), m_numAsyncWorkers(0), m_delayQueue(new SqlQueue()),
-            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false), m_iStmtIndex(-1), m_TransStorage(NULL)
+            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
         {
             m_nQueryCounter = -1;
         }
@@ -282,7 +282,7 @@ class MANGOS_DLL_SPEC Database
 
         //per-thread based storage for SqlTransaction object initialization - no locking is required
         typedef ACE_TSS<Database::TransHelper> DBTransHelperTSS;
-        Database::DBTransHelperTSS *m_TransStorage;
+        Database::DBTransHelperTSS m_TransStorage;
 
         ///< DB connections
 
