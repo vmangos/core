@@ -2289,7 +2289,14 @@ bool ChatHandler::HandleGoldRemoval(char* args)
             newMoney = 0;
         }
 
-        CharacterDatabase.PQuery("UPDATE characters SET money = %u WHERE name = '%s'", newMoney, name.c_str());
+        auto res = CharacterDatabase.PExecute("UPDATE characters SET money = %u WHERE name = '%s'", newMoney, name.c_str());
+
+        if (!res)
+        {
+            PSendSysMessage("Encountered a database error during gold removal - see log for details");
+            SetSentErrorMessage(true);
+            return false;
+        }
     }
 
     PSendSysMessage("Removed %ug %us %uc from %s", gold, silver, copper, name.c_str());
