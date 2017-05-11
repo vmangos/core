@@ -122,7 +122,7 @@ void GmTicket::WritePacket(WorldPacket& data) const
     if (IsCompleted())
     {
         displayedMessage << "\n\n-----------------------------------------------------------------------\n";
-        displayedMessage << "Nostalrius customer ticket #" << GetId() << " completed.\n";
+        displayedMessage << "Elysium customer ticket #" << GetId() << " completed.\n";
         if (!_response.empty())
         {
             displayedMessage << "\n    GM answer:\n";
