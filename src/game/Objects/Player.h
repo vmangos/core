@@ -509,7 +509,7 @@ enum BankItemSlots                                          // 28 slots
     BANK_SLOT_ITEM_END          = 63
 };
 
-enum BankBagSlots                                           // 7 slots
+enum BankBagSlots                                           // 6 slots
 {
     BANK_SLOT_BAG_START         = 63,
     BANK_SLOT_BAG_END           = 69

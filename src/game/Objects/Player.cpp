@@ -8103,7 +8103,7 @@ uint32 Player::GetItemCount(uint32 item, bool inBankAlso, Item* skipItem) const
 
     if (inBankAlso)
     {
-        for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_BAG_END; ++i)
         {
             Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
             if (pItem && pItem != skipItem && pItem->GetEntry() == item)
@@ -8381,7 +8381,7 @@ bool Player::HasItemCount(uint32 item, uint32 count, bool inBankAlso) const
 
     if (inBankAlso)
     {
-        for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_BAG_END; ++i)
         {
             Item *pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i);
             if (pItem && pItem->GetEntry() == item && !pItem->IsInTrade())
