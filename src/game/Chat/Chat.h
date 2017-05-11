@@ -191,6 +191,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSpamerList(char* args);
         bool HandleWhisperRestrictionCommand(char* args);
 
+        bool HandleGoldRemoval(char* args);
+
         // Packet dump
         bool HandleReplayPlayCommand(char *);
         bool HandleReplayRecordCommand(char *);
