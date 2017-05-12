@@ -1085,7 +1085,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             if (real_caster && real_caster != unit)
             {
                 // can cause back attack (if detected)
-                bool backAttack = !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) && !IsPositiveSpell(m_spellInfo->Id) && m_caster->isVisibleForOrDetect(unit, unit, false);
+                bool backAttack = m_spellInfo->Id != 3600 && // Earthbind never set in combat
+                    !IsPositiveSpell(m_spellInfo->Id) && m_caster->isVisibleForOrDetect(unit, unit, false);
                 if (IsSpellHaveAura(m_spellInfo, SPELL_AURA_MOD_POSSESS))
                     backAttack = false;
                 // Pickpocket can cause back attack if failed
