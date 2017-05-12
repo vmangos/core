@@ -1634,6 +1634,7 @@ void GameObject::Use(Unit* user)
                 // 15004
                 // 15005
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 bg->EventPlayerClickedOnFlag(player, this);
                 return;                                     //we don't need to delete flag ... it is despawned!
             }
@@ -1683,6 +1684,7 @@ void GameObject::Use(Unit* user)
                     }
                 }
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 //this cause to call return, all flags must be deleted here!!
                 spellId = 0;
                 Delete();

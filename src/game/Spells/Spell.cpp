@@ -3001,10 +3001,17 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
         // set timer base at cast time
         ReSetTimer();
 
-        // Si m_timer=0, le cast a lieu au prochain tic, et c'est la qu'il faut retirer
-        // ou non les auras d'invisibilite
-        if (m_timer)
+        // If timer = 0, it's an instant cast spell and will be casted on the next tick.
+        // Cast completion will remove all any stealth/invis auras
+        if (m_timer) {
             RemoveStealthAuras();
+            
+            // If using a game object we need to remove any remaining invis auras. Should only
+            // ever be Gnomish Cloaking Device, since it's a special case and not removed on
+            // opcode receive
+            if (m_caster->IsPlayer() && m_targets.getGOTarget())
+                m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
+        }
 
         OnSpellLaunch();
 
@@ -3289,6 +3296,9 @@ void Spell::cast(bool skipCheck)
     }
 
     // CAST SPELL
+    // Remove any remaining invis auras on cast completion, should only be gnomish cloaking device
+    m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
+    
     SendSpellCooldown();
 
     TakePower();
