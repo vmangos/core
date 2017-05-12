@@ -862,6 +862,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         bool TeleportToBGEntryPoint();
 
+        void restorePendingTeleport();
+
         void SetSummonPoint(uint32 mapid, float x, float y, float z)
         {
             m_summon_expire = time(NULL) + MAX_PLAYER_SUMMON_DELAY;

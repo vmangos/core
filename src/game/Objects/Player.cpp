@@ -1890,6 +1890,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
         // this will be used instead of the current location in SaveToDB
         m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
+        m_teleport_options = options;
         DisableSpline();
         SetFallInformation(0, z);
 
@@ -2041,6 +2042,14 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             return false;
     }
     return true;
+}
+
+void Player::restorePendingTeleport()
+{
+    if (!IsBeingTeleported())
+        return;
+
+    TeleportTo(m_teleport_dest,m_teleport_options);
 }
 
 bool Player::TeleportToBGEntryPoint()

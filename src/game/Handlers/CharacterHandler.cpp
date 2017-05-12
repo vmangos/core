@@ -766,6 +766,7 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         if (pCurrChar->getDeathState() == CORPSE)
             pCurrChar->KillPlayer();
     }
+    pCurrChar->restorePendingTeleport();
 
     // Update warden speeds
     //if (GetWarden())
