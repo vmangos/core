@@ -39,11 +39,14 @@ enum
     SPELL_IMPALE                = 28783,        //May be wrong spell id. Causes more dmg than I expect
     SPELL_LOCUSTSWARM           = 28785,        //This is a self buff that triggers the dmg debuff
 
-    SPELL_SELF_SPAWN_5          = 29105,        //This spawns 5 corpse scarabs ontop of us (most likely the pPlayer casts this on death)
-    SPELL_SELF_SPAWN_10         = 28864,        //This is used by the crypt guards when they die
+    SPELL_SELF_SPAWN_5          = 29105,        // These spells should spawn corpse scarabs, but only show the explosion anim.
+    SPELL_SELF_SPAWN_10         = 28864,        // If we fix them to spawn scarbs, code must be changed to not manually spawn them too.
 
     MOB_CRYPT_GUARD             = 16573,
     MOB_CORPSE_SCARAB           = 16698
+
+    //todo:
+    //cryptfiends enrage at 50%. Find corrrect spell
 };
 
 // Loaded on first pull of anub
@@ -55,6 +58,7 @@ static const float CGs[2][4] =
     { 3285.29, -3446.64, 287.26, 4.2 }
 };
 
+static constexpr float CRYPTGUARD_DESPAWN = 15000;
 struct boss_anubrekhanAI : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
@@ -62,7 +66,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
     uint32 m_uiSummonTimer;
-    
+    std::vector<std::pair<uint32, ObjectGuid>> deadCryptGuards;
 
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -78,7 +82,11 @@ struct boss_anubrekhanAI : public ScriptedAI
             // Create the creature if it dosent exist
             if (cryptGuards[i].IsEmpty())
             {
-                if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], TEMPSUMMON_MANUAL_DESPAWN))
+                // While the crypt guard will be despawned manually after CRYPTGUARD_DESPAWN time, when it explodes,
+                // we make it a TEMPSUMMON_CORPSE_TIMED_DESPAWN with a slightly longer duration, because if anub is killed
+                // before the last crypt guard dies, anubs updateAI will not be able to manually explode and despawn it.z   
+                if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], 
+                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, CRYPTGUARD_DESPAWN+10000))
                 {
                     cryptGuards[i] = c->GetObjectGuid();
                 }
@@ -98,6 +106,20 @@ struct boss_anubrekhanAI : public ScriptedAI
         }
     }
 
+    void SummonedCreatureJustDied(Creature* pSummoned) override
+    {
+        if (pSummoned->GetEntry() != MOB_CRYPT_GUARD)
+            return;
+        // If the crypt guard is one of the two initial crypt guards,
+        // set its guid in cryptGuards[] to 0 so it's respawned on JustReachedHome()
+        for (int i = 0; i < 2; i++) 
+        {
+            if (pSummoned->GetObjectGuid() == cryptGuards[i])
+                cryptGuards[i] = 0;
+        }
+        deadCryptGuards.push_back(std::make_pair(CRYPTGUARD_DESPAWN,pSummoned->GetObjectGuid()));
+    }
+
     void Reset()
     {
         m_uiImpaleTimer = 15000;                            // 15 seconds
@@ -115,7 +137,12 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         //Force the player to spawn corpse scarabs via spell
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
+        {
             pVictim->CastSpell(pVictim, SPELL_SELF_SPAWN_5, true);
+            
+            // summoning 5 corpse scarabs under the player
+            SpawnCorpseScarabs(5, pVictim);
+        }
 
         if (urand(0, 4))
             return;
@@ -170,10 +197,57 @@ struct boss_anubrekhanAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
+    void SpawnCorpseScarabs(int count, Unit* relTo)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, relTo->GetPositionX(), relTo->GetPositionY(), relTo->GetPositionZ(), 0,
+                TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
+            {
+                cs->SetInCombatWithZone();
+                if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                {
+                    cs->AI()->AttackStart(csTarget);
+                }
+            }
+        }
+    }
+
+    void UpdateCorpses(const uint32 diff)
+    {
+        for (auto it = deadCryptGuards.begin(); it != deadCryptGuards.end();)
+        {
+            if ((*it).first < diff)
+            {
+                if (Creature* cg = m_pInstance->GetCreature((*it).second))
+                {
+                    cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
+                    
+                    // summoning 10 corpse scarabs under the Crypt Guard
+                    SpawnCorpseScarabs(10, cg);
+
+                    if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
+                        tmpSumm->UnSummon();
+                    }
+
+                }
+                it = deadCryptGuards.erase(it);
+            }
+            else 
+            {
+                (*it).first -= diff;
+                ++it;
+            }
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
+        UpdateCorpses(uiDiff);
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
 
         // Impale
         if (m_uiImpaleTimer < uiDiff)
@@ -203,7 +277,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         // Summon
         if (m_uiSummonTimer < uiDiff)
         {
-            DoSpawnCreature(MOB_CRYPT_GUARD, 5, 5, 0, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000);
+            DoSpawnCreature(MOB_CRYPT_GUARD, 5, 5, 0, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000);
             m_uiSummonTimer = 45000;
         }
         else
@@ -253,7 +327,7 @@ struct mob_cryptguardsAI : public ScriptedAI
 
     void JustDied(Unit* pKiller) override
     {
-        DoCastSpellIfCan(m_creature, SPELL_SELF_SPAWN_10);
+        //DoCastSpellIfCan(m_creature, SPELL_SELF_SPAWN_10);
     }
 };
 
