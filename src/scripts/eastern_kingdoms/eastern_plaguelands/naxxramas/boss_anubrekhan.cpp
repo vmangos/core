@@ -41,12 +41,16 @@ enum
 
     SPELL_SELF_SPAWN_5          = 29105,        // These spells should spawn corpse scarabs, but only show the explosion anim.
     SPELL_SELF_SPAWN_10         = 28864,        // If we fix them to spawn scarbs, code must be changed to not manually spawn them too.
+    
+    SPELL_CRYPTGUARD_ENRAGE     = 28747,        // 50% attackspeed increase and 100 extra dmg on attack. could be wrong spell.
+    SPELL_CRYPTGUARD_CLEAVE     = 26350,        // could be wrong spell. 
+    SPELL_CRYPTGUARD_WEB        = 28991,
+    SPELL_CRYPTGUARD_ACID       = 28969,
 
     MOB_CRYPT_GUARD             = 16573,
     MOB_CORPSE_SCARAB           = 16698
 
-    //todo:
-    //cryptfiends enrage at 50%. Find corrrect spell
+    
 };
 
 // Loaded on first pull of anub
@@ -54,11 +58,35 @@ ObjectGuid cryptGuards[2] = { 0, 0 };
 
 static const float CGs[2][4] = 
 {
-    { 3291.26, -3502.08, 287.26, 2.14 },
-    { 3285.29, -3446.64, 287.26, 4.2 }
+    { 3291.26f, -3502.08f, 287.26f, 2.14f },
+    { 3285.29f, -3446.64f, 287.26f, 4.2f }
 };
 
-static constexpr float CRYPTGUARD_DESPAWN = 15000;
+static constexpr float CRYPTGUARD_DESPAWN       = 15000;
+
+
+static constexpr uint32 CRYPTGUARD_CLEAVE_CD    = 6000;  // Todo: find correct timer
+static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, so 12sec cd makes sense. 
+                                                         // From videos you can see there is 1-2sec between consecutive nets.
+static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct timer. 
+
+void SpawnCorpseScarabs(int count, Unit* pWhere, Creature* summoner)
+{
+    for (int i = 0; i < count; i++)
+    {
+        if (Creature* cs = summoner->SummonCreature(MOB_CORPSE_SCARAB, pWhere->GetPositionX(), pWhere->GetPositionY(), pWhere->GetPositionZ(), 0,
+            TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
+        {
+            cs->SetInCombatWithZone();
+            if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            {
+                cs->AI()->AttackStart(csTarget);
+                cs->AddThreat(csTarget, 5000);
+            }
+        }
+    }
+}
+
 struct boss_anubrekhanAI : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
@@ -77,6 +105,9 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void CheckSpawnInitialCryptGuards()
     {
+        if (m_pInstance->GetData(TYPE_ANUB_REKHAN) == DONE)
+            return;
+
         for (int i = 0; i < 2; i++)
         {
             // Create the creature if it dosent exist
@@ -135,13 +166,11 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        //Force the player to spawn corpse scarabs via spell
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
         {
-            pVictim->CastSpell(pVictim, SPELL_SELF_SPAWN_5, true);
-            
             // summoning 5 corpse scarabs under the player
-            SpawnCorpseScarabs(5, pVictim);
+            pVictim->CastSpell(pVictim, SPELL_SELF_SPAWN_5, true);
+            SpawnCorpseScarabs(5, pVictim, m_creature);
         }
 
         if (urand(0, 4))
@@ -197,23 +226,6 @@ struct boss_anubrekhanAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-    void SpawnCorpseScarabs(int count, Unit* relTo)
-    {
-        for (int i = 0; i < count; i++)
-        {
-            if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, relTo->GetPositionX(), relTo->GetPositionY(), relTo->GetPositionZ(), 0,
-                TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
-            {
-                cs->SetInCombatWithZone();
-                if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                {
-                    cs->AI()->AttackStart(csTarget);
-                    cs->AddThreat(csTarget, 5000);
-                }
-            }
-        }
-    }
-
     void UpdateCorpses(const uint32 diff)
     {
         for (auto it = deadCryptGuards.begin(); it != deadCryptGuards.end();)
@@ -225,7 +237,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
                     
                     // summoning 10 corpse scarabs under the Crypt Guard
-                    SpawnCorpseScarabs(10, cg);
+                    SpawnCorpseScarabs(10, cg, m_creature);
 
                     if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
                         tmpSumm->UnSummon();
@@ -291,6 +303,10 @@ struct boss_anubrekhanAI : public ScriptedAI
 struct mob_cryptguardsAI : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
+    bool isEnraged;
+    uint32 webTimer;
+    uint32 acidSpitTimer;
+    uint32 cleaveTimer;
 
     mob_cryptguardsAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -300,6 +316,11 @@ struct mob_cryptguardsAI : public ScriptedAI
 
     void Reset() override
     {
+        isEnraged = false;
+
+        webTimer        = CRYPTGUARD_WEB_CD;
+        acidSpitTimer   = CRYPTGUARD_ACID_CD;
+        cleaveTimer     = CRYPTGUARD_CLEAVE_CD;
     }
 
     void Aggro(Unit* pWho)
@@ -313,22 +334,54 @@ struct mob_cryptguardsAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim) override
     {
-        //Force the player to spawn corpse scarabs via spell
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
+        {
+            // summoning 5 corpse scarabs under the player
             pVictim->CastSpell(pVictim, SPELL_SELF_SPAWN_5, true);
+            SpawnCorpseScarabs(5, pVictim, m_creature);
+        }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        DoMeleeAttackIfReady();
-    }
+        // Crypt guards enrage at 50%
+        if (!isEnraged && m_creature->GetHealthPercent() <= 50.0f) {
+            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == CanCastResult::CAST_OK) {
+                isEnraged = true;
+            }
+        }
 
-    void JustDied(Unit* pKiller) override
-    {
-        //DoCastSpellIfCan(m_creature, SPELL_SELF_SPAWN_10);
+        if (webTimer < diff) {
+            if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_WEB) == CanCastResult::CAST_OK) {
+                webTimer = CRYPTGUARD_WEB_CD;
+            }
+        }
+        else {
+            webTimer -= diff;
+        }
+
+        if (cleaveTimer < diff) {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRYPTGUARD_CLEAVE) == CanCastResult::CAST_OK) {
+                cleaveTimer = CRYPTGUARD_CLEAVE_CD;
+            }
+        }
+        else {
+            cleaveTimer -= diff;
+        }
+
+        if (acidSpitTimer < diff) {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CRYPTGUARD_ACID) == CanCastResult::CAST_OK) {
+                acidSpitTimer = CRYPTGUARD_ACID_CD;
+            }
+        }
+        else {
+            acidSpitTimer -= diff;
+        }
+
+        DoMeleeAttackIfReady();
     }
 };
 
