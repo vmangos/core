@@ -70,22 +70,6 @@ static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, 
                                                          // From videos you can see there is 1-2sec between consecutive nets.
 static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct timer. 
 
-void SpawnCorpseScarabs(int count, Unit* pWhere, Creature* summoner)
-{
-    for (int i = 0; i < count; i++)
-    {
-        if (Creature* cs = summoner->SummonCreature(MOB_CORPSE_SCARAB, pWhere->GetPositionX(), pWhere->GetPositionY(), pWhere->GetPositionZ(), 0,
-            TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
-        {
-            cs->SetInCombatWithZone();
-            if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                cs->AI()->AttackStart(csTarget);
-                cs->AddThreat(csTarget, 5000);
-            }
-        }
-    }
-}
 
 struct boss_anubrekhanAI : public ScriptedAI
 {
@@ -95,7 +79,6 @@ struct boss_anubrekhanAI : public ScriptedAI
     uint32 m_uiLocustSwarmTimer;
     uint32 m_uiSummonTimer;
     std::vector<std::pair<uint32, ObjectGuid>> deadCryptGuards;
-
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
@@ -166,12 +149,8 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        {
-            // summoning 5 corpse scarabs under the player
-            pVictim->CastSpell(pVictim, SPELL_SELF_SPAWN_5, true);
-            SpawnCorpseScarabs(5, pVictim, m_creature);
-        }
+        // Scarabs are summoned by instance script when a player dies.
+        // See instance_naxxramas::OnPlayerDeath(Player*)
 
         if (urand(0, 4))
             return;
@@ -181,6 +160,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        m_pInstance->SetData(TYPE_ANUB_REKHAN, IN_PROGRESS);
         // Setting in combat with zone and pulling the two crypt-guards
         m_creature->SetInCombatWithZone();
         for (int i = 0; i < 2; i++) {
@@ -237,7 +217,19 @@ struct boss_anubrekhanAI : public ScriptedAI
                     cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
                     
                     // summoning 10 corpse scarabs under the Crypt Guard
-                    SpawnCorpseScarabs(10, cg, m_creature);
+                    for (int i = 0; i < 10; i++)
+                    {
+                        if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, cg->GetPositionX(), cg->GetPositionY(), cg->GetPositionZ(), 0,
+                            TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
+                        {
+                            cs->SetInCombatWithZone();
+                            if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                            {
+                                cs->AI()->AttackStart(csTarget);
+                                cs->AddThreat(csTarget, 5000);
+                            }
+                        }
+                    }
 
                     if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
                         tmpSumm->UnSummon();
@@ -329,16 +321,6 @@ struct mob_cryptguardsAI : public ScriptedAI
         if (Creature* anub = m_pInstance->GetCreature(m_pInstance->GetData64(NPC_ANUB_REKHAN)))
         {
             anub->AI()->AttackStart(pWho);
-        }
-    }
-
-    void KilledUnit(Unit* pVictim) override
-    {
-        if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        {
-            // summoning 5 corpse scarabs under the player
-            pVictim->CastSpell(pVictim, SPELL_SELF_SPAWN_5, true);
-            SpawnCorpseScarabs(5, pVictim, m_creature);
         }
     }
 

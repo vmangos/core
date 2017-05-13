@@ -591,6 +591,33 @@ void instance_naxxramas::SetChamberCenterCoords(float fX, float fY, float fZ)
     m_fChamberCenterZ = fZ;
 }
 
+void instance_naxxramas::OnPlayerDeath(Player* p)
+{
+    if (m_auiEncounter[TYPE_ANUB_REKHAN] == IN_PROGRESS)
+    {
+        // On player death we spawn 5 scarabs under the player. Since the player
+        // can die from falldmg or other sources, anubs script impl of KilledUnit may not
+        // be called, thus we need to do it here.
+        if (Creature* pAnub = instance->GetCreature(m_uiAnubRekhanGUID))
+        {
+            pAnub->AI()->DoCast(p, 29105, true);
+            for (int i = 0; i < 5; i++)
+            {
+                if (Creature* cs = pAnub->SummonCreature(16698, p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), 0,
+                    TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
+                {
+                    cs->SetInCombatWithZone();
+                    if (Unit* csTarget = pAnub->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        cs->AI()->AttackStart(csTarget);
+                        cs->AddThreat(csTarget, 5000);
+                    }
+                }
+            }
+        }
+    }
+}
+
 InstanceData* GetInstanceData_instance_naxxramas(Map* pMap)
 {
     return new instance_naxxramas(pMap);
