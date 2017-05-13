@@ -130,11 +130,17 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
     {
         case GO_ARAC_ANUB_DOOR:
             m_uiAnubDoorGUID = pGo->GetGUID();
+            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
+                DoOpenDoor(m_uiAnubDoorGUID);
+            else
+                DoResetDoor(m_uiAnubDoorGUID);
             break;
         case GO_ARAC_ANUB_GATE:
             m_uiAnubGateGUID = pGo->GetGUID();
-            if (m_auiEncounter[0] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
+                DoOpenDoor(m_uiAnubGateGUID);
+            else
+                DoResetDoor(m_uiAnubGateGUID);
             break;
         case GO_ARAC_FAER_WEB:
             m_uiFaerWebGUID = pGo->GetGUID();
@@ -271,9 +277,22 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
     {
         case TYPE_ANUB_REKHAN:
             m_auiEncounter[0] = uiData;
-            DoUseDoorOrButton(m_uiAnubDoorGUID);
             if (uiData == DONE)
-                DoUseDoorOrButton(m_uiAnubGateGUID);
+            {
+                DoOpenDoor(m_uiAnubGateGUID);
+                DoOpenDoor(m_uiAnubDoorGUID);
+            }
+            else if (uiData == FAIL)
+            {
+                DoOpenDoor(m_uiAnubDoorGUID);
+            }
+            else if (uiData == IN_PROGRESS)
+            {
+                DoResetDoor(m_uiAnubDoorGUID);
+            }
+            //DoUseDoorOrButton(m_uiAnubDoorGUID);
+            //if (uiData == DONE)
+            //    DoUseDoorOrButton(m_uiAnubGateGUID);
             break;
         case TYPE_FAERLINA:
             m_auiEncounter[1] = uiData;
@@ -507,6 +526,8 @@ uint64 instance_naxxramas::GetData64(uint32 uiData)
 {
     switch (uiData)
     {
+        case GO_ARAC_ANUB_DOOR:
+            return m_uiAnubDoorGUID;
         case NPC_ANUB_REKHAN:
             return m_uiAnubRekhanGUID;
         case NPC_FAERLINA:
