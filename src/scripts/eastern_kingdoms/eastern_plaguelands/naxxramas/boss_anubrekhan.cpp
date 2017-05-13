@@ -24,6 +24,12 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
+// todo:
+/*
+Armor check:
+https://www.youtube.com/watch?v=rmowgw2SZCA&t=60s
+
+*/
 enum
 {
     SAY_GREET                   = -1533000,
@@ -55,10 +61,11 @@ enum
 
 
 
-static const float CGs[2][4] = 
+static const float CGs[3][4] = 
 {
     { 3291.26f, -3502.08f, 287.26f, 2.14f },
-    { 3285.29f, -3446.64f, 287.26f, 4.2f }
+    { 3285.29f, -3446.64f, 287.26f, 4.2f },
+    { 3316.46f, -3476.23f, 287.26f, 3.18f } // this third entry is used as spawn loc during fight.
 };
 
 static constexpr float CRYPTGUARD_DESPAWN       = 15000;
@@ -69,6 +76,97 @@ static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, 
                                                          // From videos you can see there is 1-2sec between consecutive nets.
 static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct timer. 
 
+/*
+Impale timer research:
+video: https://www.youtube.com/watch?v=rmowgw2SZCA&t=60s
+Watch his stopatch in center of screen.
+2:05
+
+2:40
+2:54 +14
+3:07 +13
+3:20 +13
+
+4:38
+
+4:50 +12
+
+6:06
+6:23 +17
+
+7:44
+
+8:55
+
+9:27
+9:43 +16
+
+10:22
+
+11:03
+11:15 +12
+11:29 +14
+
+12:13
+12:38 +25 (missing one?)
+12:54 +16
+13:09 +15
+
+13:32
+
+14:15
+14:28+13
+
+Best guess so far is random between 12 and 18 seconds based on this video.
+Timer does not seem to reset after locust swarm, but rather continue from whatever it was when locust started.
+*/
+static const uint32 IMPALE_CD() { return urand(12000, 18000); }
+
+
+/*
+Locust Swarm - Every 70-120 seconds, Anub'rekhan casts a spell that causes AoE damage in a wide radius (30 yards) around him
+(the AoE remains centered on Anub'Rekhan as he moves), he will also slow to 40% of normal run speed. Remaining in the radius of
+effect will cause a DoT debuff to stack repeatedly, dealing a large amount of damage, around 1200 damage/2sec per stack and 
+silencing those afflicted. When he casts this spell, another Crypt Guard will also spawn at his initial engage point. 
+
+As of Patch 1.12, Anub'Rekhan is immune to Curse of Tongues.
+Note: The Locust Swarm attack has an approximately 90 second cooldown, however the first cast is not at a set time, 
+between 80 seconds and 2 minutes. As well, the Locust Swarm is not a normal silence. 
+Unlike a normal silence, it prevents the use of all abilities (even auto-attack). 
+This means that the MT cannot use Shield Wall or Last Stand to save himself if he gets stacked too high. Items, however,
+are still able to be used (this includes Lifegiving Gem).
+----------------------------
+As can be seen in snippet above, wowwiki seems to believe its 80-120sec for initial locust, (slightly unclear)
+90sec for any after that
+Video evidence:
+https://www.youtube.com/watch?v=rmowgw2SZCA&t=60s
+Watch his stopatch in center of screen.
+1:40 start cast
+2:00 ended?
+
+3:22 start cast
+3:47 ended?
+
+5:01 start cast (+74sec, 99 since prev start)
+5:25 ended?
+
+6:34 start cast (+69sec, 93 since prev start)
+6:58 ended?
+
+8:16 start cast (+78sec, 102 since prev start)
+8:40 ended?
+
+9:55 start cast (+75sec, 99 since prev start)
+10:20 ended?
+
+11:35 start cast (+75sec, 100 since prev start)
+
+13:12 start cast (93 since prev start)
+
+Based on those values, 90-110 or something like that does not seem far fetched as a cooldown.
+Cast time is 3 seconds. Duration is 20 seconds.
+*/
+static const uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
 struct boss_anubrekhanAI : public ScriptedAI
 {
@@ -79,7 +177,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
-    uint32 m_uiSummonTimer;
+    
     std::vector<std::pair<uint32, ObjectGuid>> deadCryptGuards;
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -138,9 +236,8 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiImpaleTimer = 15000;                            // 15 seconds
-        m_uiLocustSwarmTimer = urand(80000, 120000);        // Random time between 80 seconds and 2 minutes for initial cast
-        m_uiSummonTimer = m_uiLocustSwarmTimer + 45000;     // 45 seconds after initial locust swarm
+        m_uiImpaleTimer = IMPALE_CD();
+        m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
     }
 
     void JustReachedHome() override
@@ -210,19 +307,26 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void UpdateCorpses(const uint32 diff)
     {
+        // Iterating dead cryptguards
         for (auto it = deadCryptGuards.begin(); it != deadCryptGuards.end();)
         {
+            // If it's been dead for CRYPTGUARD_DESPAWN duration
             if ((*it).first < diff)
             {
                 if (Creature* cg = m_pInstance->GetCreature((*it).second))
                 {
+                    // The cryptguard casts SPELL_SELF_SPAWN_10 on itself. The spell is bugged and
+                    // wont spawn any adds, but it will show the visual.
                     cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
                     
-                    // summoning 10 corpse scarabs under the Crypt Guard
+                    // Manually summoning 10 corpse scarabs under the Crypt Guard
                     for (int i = 0; i < 10; i++)
                     {
+                        // The summoned corpse scarab will attack a random target, and add 5k threat to it.
+                        // The threat amount is a guess, but it can be seen in videos, and it's mentioned on wowhead,
+                        // that the scarab will "stick" to it's chosen target for quite a while, if not until dead.
                         if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, cg->GetPositionX(), cg->GetPositionY(), cg->GetPositionZ(), 0,
-                            TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000))
+                            TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
                         {
                             cs->SetInCombatWithZone();
                             if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -233,6 +337,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                         }
                     }
 
+                    // Despawning the Crypt guard
                     if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
                         tmpSumm->UnSummon();
                     }
@@ -254,41 +359,50 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-        
 
         // Impale
-        if (m_uiImpaleTimer < uiDiff)
+        // todo: Not sure if the timer should keep running, be paused or reset during locust swarm.
+        //       Currently the timer will simply be paused when locust swarm is active, or being cast
+        if (!m_creature->HasAura(SPELL_LOCUSTSWARM) && !m_creature->IsNonMeleeSpellCasted())
         {
-            //Cast Impale on a random target
-            //Do NOT cast it when we are afflicted by locust swarm
-            if (!m_creature->HasAura(SPELL_LOCUSTSWARM))
+            if (m_uiImpaleTimer < uiDiff)
             {
+                // Do NOT cast it when we are afflicted by locust swarm
+                // todo: Not sure if the timer should keep running, be paused or reset during locust swarm.
+                //       Currently the impale wil be cast instantly after locust, most likely not right.
                 if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    DoCastSpellIfCan(target, SPELL_IMPALE);
+                {
+                    if (DoCastSpellIfCan(target, SPELL_IMPALE) == CanCastResult::CAST_OK) 
+                    {
+                        m_uiImpaleTimer = IMPALE_CD();
+                    }
+                }
             }
-
-            m_uiImpaleTimer = 15000;
+            else
+                m_uiImpaleTimer -= uiDiff;
         }
-        else
-            m_uiImpaleTimer -= uiDiff;
 
         // Locust Swarm
         if (m_uiLocustSwarmTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_LOCUSTSWARM);
-            m_uiLocustSwarmTimer = 90000;
+            // Reset cd and summon a new crypt guard at the initial possition of anub'rekhan on successfull cast
+            if (DoCastSpellIfCan(m_creature, SPELL_LOCUSTSWARM) == CanCastResult::CAST_OK)
+            {
+                m_uiLocustSwarmTimer = LOCUST_SWARM_CD(false);
+                if (Creature* pCryptGuard = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[2][0], CGs[2][1], CGs[2][2], CGs[2][3],
+                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                {
+                    pCryptGuard->SetInCombatWithZone();
+                    if (Unit* pCryptTarget = pCryptGuard->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        pCryptGuard->AI()->AttackStart(pCryptTarget);
+                    }
+                }
+            }
         }
         else
             m_uiLocustSwarmTimer -= uiDiff;
 
-        // Summon
-        if (m_uiSummonTimer < uiDiff)
-        {
-            DoSpawnCreature(MOB_CRYPT_GUARD, 5, 5, 0, 0, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 15000);
-            m_uiSummonTimer = 45000;
-        }
-        else
-            m_uiSummonTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
