@@ -5,32 +5,33 @@
 #ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
+enum NAXX_ENCOUNTERS
+{
+    TYPE_ANUB_REKHAN            = 0,
+    TYPE_FAERLINA               = 1,
+    TYPE_MAEXXNA                = 2,
+
+    TYPE_NOTH                   = 3,
+    TYPE_HEIGAN                 = 4,
+    TYPE_LOATHEB                = 5,
+
+    TYPE_RAZUVIOUS              = 6,
+    TYPE_GOTHIK                 = 7,
+    TYPE_FOUR_HORSEMEN          = 8,
+
+    TYPE_PATCHWERK              = 9,
+    TYPE_GROBBULUS              = 10,
+    TYPE_GLUTH                  = 11,
+    TYPE_THADDIUS               = 12,
+
+    TYPE_SAPPHIRON              = 13,
+    TYPE_KELTHUZAD              = 14,
+    
+    MAX_ENCOUNTER               = 15,
+};
+
 enum
 {
-    MAX_ENCOUNTER               = 15,
-
-    TYPE_ANUB_REKHAN            = 1,
-    TYPE_FAERLINA               = 2,
-    TYPE_MAEXXNA                = 3,
-
-    TYPE_NOTH                   = 4,
-    TYPE_HEIGAN                 = 5,
-    TYPE_LOATHEB                = 6,
-
-    TYPE_RAZUVIOUS              = 7,
-    TYPE_GOTHIK                 = 8,
-    TYPE_FOUR_HORSEMEN          = 9,
-
-    TYPE_PATCHWERK              = 10,
-    TYPE_GROBBULUS              = 11,
-    TYPE_GLUTH                  = 12,
-    TYPE_THADDIUS               = 13,
-    TYPE_STALAGG                = 14,
-    TYPE_FEUGEN                 = 15,
-
-    TYPE_SAPPHIRON              = 16,
-    TYPE_KELTHUZAD              = 17,
-
     NPC_ANUB_REKHAN             = 15956,
     NPC_FAERLINA                = 15953,
 
