@@ -2003,6 +2003,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 oldmap->Remove(this, false);
 
             m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
+            m_teleport_options = options;
             DisableSpline();
             SetFallInformation(0, z);
             ScheduleDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
