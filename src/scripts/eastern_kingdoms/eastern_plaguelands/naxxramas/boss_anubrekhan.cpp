@@ -379,9 +379,6 @@ struct anub_doorAI : public GameObjectAI
         haveDoneIntro(false)
     {
         m_pInstance = (ScriptedInstance*)me->GetInstanceData();
-        //if (m_pInstance)
-        //    m_pInstance->DoResetDoor(m_pInstance->GetData64(GO_ARAC_ANUB_DOOR));
-        me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
     }
 
     bool OnUse(Unit* user)
@@ -426,7 +423,6 @@ struct anub_doorAI : public GameObjectAI
             // If we don't do this, some variables are wrong on first pull of the boss,
             // and the door wont close.
             m_pInstance->DoOpenDoor(m_pInstance->GetData64(GO_ARAC_ANUB_DOOR));
-            me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         }
         
         return true;

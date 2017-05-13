@@ -130,10 +130,13 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
     {
         case GO_ARAC_ANUB_DOOR:
             m_uiAnubDoorGUID = pGo->GetGUID();
-            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
+            pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE) {
                 DoOpenDoor(m_uiAnubDoorGUID);
-            else
+            }
+            else {
                 DoResetDoor(m_uiAnubDoorGUID);
+            }
             break;
         case GO_ARAC_ANUB_GATE:
             m_uiAnubGateGUID = pGo->GetGUID();
@@ -281,14 +284,23 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             {
                 DoOpenDoor(m_uiAnubGateGUID);
                 DoOpenDoor(m_uiAnubDoorGUID);
+                if (GameObject* go = GetGameObject(m_uiAnubDoorGUID)) {
+                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
             }
             else if (uiData == FAIL)
             {
                 DoOpenDoor(m_uiAnubDoorGUID);
+                if (GameObject* go = GetGameObject(m_uiAnubDoorGUID)) {
+                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
             }
             else if (uiData == IN_PROGRESS)
             {
                 DoResetDoor(m_uiAnubDoorGUID);
+                if (GameObject* go = GetGameObject(m_uiAnubDoorGUID)) {
+                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                }
             }
             break;
         case TYPE_FAERLINA:
