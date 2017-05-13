@@ -53,8 +53,7 @@ enum
     
 };
 
-// Loaded on first pull of anub
-ObjectGuid cryptGuards[2] = { 0, 0 };
+
 
 static const float CGs[2][4] = 
 {
@@ -74,6 +73,9 @@ static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct t
 struct boss_anubrekhanAI : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
+    
+    // Loaded on first pull of anub
+    ObjectGuid cryptGuards[2] = { 0, 0 };
 
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
@@ -370,26 +372,29 @@ struct mob_cryptguardsAI : public ScriptedAI
 struct anub_doorAI : public GameObjectAI
 {
     bool haveDoneIntro;
+    ScriptedInstance* m_pInstance;
 
     anub_doorAI(GameObject* pGo) : 
         GameObjectAI(pGo),
         haveDoneIntro(false)
     {
+        m_pInstance = (ScriptedInstance*)me->GetInstanceData();
+        //if (m_pInstance)
+        //    m_pInstance->DoResetDoor(m_pInstance->GetData64(GO_ARAC_ANUB_DOOR));
+        me->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
     }
 
     bool OnUse(Unit* user)
     {
         if (haveDoneIntro)
-            return true;
+            return false;
         
         haveDoneIntro = true;
-
-        ScriptedInstance* m_pInstance = (ScriptedInstance*)me->GetInstanceData();
 
         if (!m_pInstance)
         {
             sLog.outInfo("[boss_anubrekhan/anub_doorAI][Inst %03u] ERROR: No instance", user->GetInstanceId());
-            return true; // always true, door should be used regardless
+            return false;
         }
 
         // Not entirely sure if anub should be able to do all of these SAY_TAUNT* texts on door-open.
