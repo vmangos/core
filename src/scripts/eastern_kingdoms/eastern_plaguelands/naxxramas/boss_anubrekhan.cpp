@@ -42,22 +42,61 @@ enum
     SPELL_SELF_SPAWN_5          = 29105,        //This spawns 5 corpse scarabs ontop of us (most likely the pPlayer casts this on death)
     SPELL_SELF_SPAWN_10         = 28864,        //This is used by the crypt guards when they die
 
-    MOB_CRYPT_GUARD             = 16573
+    MOB_CRYPT_GUARD             = 16573,
+    MOB_CORPSE_SCARAB           = 16698
+};
+
+// Loaded on first pull of anub
+ObjectGuid cryptGuards[2] = { 0, 0 };
+
+static const float CGs[2][4] = 
+{
+    { 3291.26, -3502.08, 287.26, 2.14 },
+    { 3285.29, -3446.64, 287.26, 4.2 }
 };
 
 struct boss_anubrekhanAI : public ScriptedAI
 {
-    boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        Reset();
-    }
-
     instance_naxxramas* m_pInstance;
 
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
     uint32 m_uiSummonTimer;
+    
+
+    boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        CheckSpawnInitialCryptGuards();
+        Reset();
+    }
+
+    void CheckSpawnInitialCryptGuards()
+    {
+        for (int i = 0; i < 2; i++)
+        {
+            // Create the creature if it dosent exist
+            if (cryptGuards[i].IsEmpty())
+            {
+                if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], TEMPSUMMON_MANUAL_DESPAWN))
+                {
+                    cryptGuards[i] = c->GetObjectGuid();
+                }
+                else 
+                {
+                    sLog.outError("boss_anubrekhanAI::CheckSpawnInitialCryptGuards failed to spawn initial crypt guard");
+                }
+            }
+            else
+            {
+                if (Creature* c = m_pInstance->GetCreature(cryptGuards[i]))
+                {
+                    if (c->isDead()) 
+                        c->Respawn();
+                }
+            }
+        }
+    }
 
     void Reset()
     {
@@ -69,6 +108,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     void JustReachedHome() override
     {
         m_pInstance->SetData(TYPE_ANUB_REKHAN, FAIL);
+        CheckSpawnInitialCryptGuards();
     }
 
     void KilledUnit(Unit* pVictim)
@@ -85,6 +125,15 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        // Setting in combat with zone and pulling the two crypt-guards
+        m_creature->SetInCombatWithZone();
+        for (int i = 0; i < 2; i++) {
+            if (Creature* cg = m_pInstance->GetCreature(cryptGuards[i])) {
+                cg->AI()->AttackStart(pWho);
+                cg->SetInCombatWithZone();
+            }
+        }
+
         switch (urand(0, 2))
         {
             case 0:
@@ -166,13 +215,25 @@ struct boss_anubrekhanAI : public ScriptedAI
 
 struct mob_cryptguardsAI : public ScriptedAI
 {
+    instance_naxxramas* m_pInstance;
+
     mob_cryptguardsAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-
+        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        Reset();
     }
 
     void Reset() override
     {
+    }
+
+    void Aggro(Unit* pWho)
+    {
+        // Make sure anub is pulled too. Anub will take care of pulling the other crypt-guard
+        if (Creature* anub = m_pInstance->GetCreature(m_pInstance->GetData64(NPC_ANUB_REKHAN)))
+        {
+            anub->AI()->AttackStart(pWho);
+        }
     }
 
     void KilledUnit(Unit* pVictim) override
