@@ -208,6 +208,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                 if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
                     cs->AI()->AttackStart(csTarget);
+                    cs->AddThreat(csTarget, 5000);
                 }
             }
         }
