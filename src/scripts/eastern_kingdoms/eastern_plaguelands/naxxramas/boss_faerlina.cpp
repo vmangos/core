@@ -26,7 +26,7 @@ EndScriptData */
 
 enum
 {
-    SAY_GREET                 = -1533009,
+    SAY_GREET                 = -1533009,   // Done in instance_naxxramas::onNaxxramasAreaTrigger()
     SAY_AGGRO1                = -1533010,
     SAY_AGGRO2                = -1533011,
     SAY_AGGRO3                = -1533012,
@@ -35,19 +35,19 @@ enum
     SAY_SLAY2                 = -1533015,
     SAY_DEATH                 = -1533016,
 
-    //SOUND_RANDOM_AGGRO        = 8955,                              //soundId containing the 4 aggro sounds, we not using this
+    //SOUND_RANDOM_AGGRO        = 8955,     //soundId containing the 4 aggro sounds, we not using this
 
     SPELL_POSIONBOLT_VOLLEY   = 28796,
     SPELL_ENRAGE              = 28798,
 
-    SPELL_RAINOFFIRE          = 28794                       //Not sure if targeted AoEs work if casted directly upon a pPlayer
+    SPELL_RAINOFFIRE          = 28794       //Not sure if targeted AoEs work if casted directly upon a pPlayer
 };
+
 struct boss_faerlinaAI : public ScriptedAI
 {
     boss_faerlinaAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        m_bHasTaunted = false;
         Reset();
     }
 
@@ -56,7 +56,6 @@ struct boss_faerlinaAI : public ScriptedAI
     uint32 m_uiPoisonBoltVolleyTimer;
     uint32 m_uiRainOfFireTimer;
     uint32 m_uiEnrageTimer;
-    bool   m_bHasTaunted;
 
     void Reset()
     {
@@ -89,10 +88,9 @@ struct boss_faerlinaAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho)
     {
-        if (!m_bHasTaunted && m_creature->IsWithinDistInMap(pWho, 60.0f))
+        //todo aggro range
+        if (m_creature->IsWithinDistInMap(pWho, 60.0f))
         {
-            DoScriptText(SAY_GREET, m_creature);
-            m_bHasTaunted = true;
         }
 
         ScriptedAI::MoveInLineOfSight(pWho);

@@ -13,3 +13,7 @@ VALUES (533001,181195,533,3143.88,-3572.45,287,2.345,0,0,0.921723,0.387849,25,10
 
 -- Give Anub'rekhan gate GO_FLAG_NO_INTERACT flag. It's opened by instance script
 UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181195';
+
+-- give AreaTrigger outside Faerlina scriptname
+DELETE FROM `scripted_areatrigger` where entry = 4115;
+INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4115', 'at_naxxramas');

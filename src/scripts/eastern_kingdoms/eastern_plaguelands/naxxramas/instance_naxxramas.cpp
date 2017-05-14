@@ -25,6 +25,9 @@ EndScriptData */
 #include "naxxramas.h"
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
+    m_faerlinaHaveGreeted(false),
+
+
     m_uiAracEyeRampGUID(0),
     m_uiPlagEyeRampGUID(0),
     m_uiMiliEyeRampGUID(0),
@@ -635,13 +638,11 @@ InstanceData* GetInstanceData_instance_naxxramas(Map* pMap)
     return new instance_naxxramas(pMap);
 }
 
-bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
+void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pAt->id == AREATRIGGER_KELTHUZAD)
+    switch (pAt->id)
     {
-        if (pPlayer->isDead())
-            return false;
-
+    case AREATRIGGER_KELTHUZAD:
         if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
         {
             if (pInstance->GetData(TYPE_KELTHUZAD) == NOT_STARTED)
@@ -650,8 +651,29 @@ bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
                 pInstance->SetChamberCenterCoords(pAt->x, pAt->y, pAt->z);
             }
         }
+        break;
+    case AREATRIGGER_FAERLINA:
+        if (!m_faerlinaHaveGreeted)
+        {
+            m_faerlinaHaveGreeted = true;
+            if (Creature* pFaerlina = GetCreature(m_uiFaerlinanGUID))
+            {
+                DoScriptText(-1533009, pFaerlina);
+            }
+        }
+        break;
     }
+}
 
+bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
+{
+    if (pPlayer->isGameMaster() || !pPlayer->isAlive())
+        return false;
+
+    if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
+    {
+        pInstance->onNaxxramasAreaTrigger(pPlayer, pAt);
+    }
     return false;
 }
 
