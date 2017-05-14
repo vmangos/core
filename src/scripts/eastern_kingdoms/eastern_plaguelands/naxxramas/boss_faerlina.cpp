@@ -42,7 +42,7 @@ enum
 
     SPELL_RAINOFFIRE            = 28794,    //Not sure if targeted AoEs work if casted directly upon a pPlayer
 
-    SPELL_WIDOWS_EMBRACE        = 28732,    // Used by worshippers
+    SPELL_WIDOWS_EMBRACE        = 28732,    // Used by worshippers. ToDo: Spell does NOT add the attackspeed reduction, or is it just castspeed?
 
     MOB_FOLLOWER                = 16505,
     MOB_WORSHIPPER              = 16506
@@ -99,7 +99,6 @@ struct boss_faerlinaAI : public ScriptedAI
     uint32 m_uiPoisonBoltVolleyTimer;
     uint32 m_uiRainOfFireTimer;
     uint32 m_uiEnrageTimer;
-    uint32 natureSilencedTimer;
 
     ObjectGuid followers[2] = { 0,0 };
     ObjectGuid worshippers[4] = { 0,0,0,0 };
@@ -109,7 +108,6 @@ struct boss_faerlinaAI : public ScriptedAI
         m_uiPoisonBoltVolleyTimer   = INITIAL_POISONBOLT_VOLLEY_CD;
         m_uiRainOfFireTimer         = RAINOFFIRE_INITIAL_CD;
         m_uiEnrageTimer             = 60000;
-        natureSilencedTimer         = 0;
     }
 
     void SpellHit(Unit* pWho, const SpellEntry* pSpell) override 
@@ -126,7 +124,6 @@ struct boss_faerlinaAI : public ScriptedAI
         if (pSpell->Id == SPELL_WIDOWS_EMBRACE)
         {
             m_creature->RemoveAurasDueToSpell(SPELL_ENRAGE);
-            natureSilencedTimer = 30000;
             pWho->Kill(pWho, nullptr);
         }
     }
@@ -251,7 +248,11 @@ struct boss_faerlinaAI : public ScriptedAI
         // Poison Bolt Volley
         if (m_uiPoisonBoltVolleyTimer < uiDiff)
         {
-            if (natureSilencedTimer < uiDiff)
+            if (m_creature->HasAura(SPELL_WIDOWS_EMBRACE))
+            {
+                m_uiPoisonBoltVolleyTimer = 2500; // retrying in 2.5sec
+            }
+            else 
             {
                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POSIONBOLT_VOLLEY) == CanCastResult::CAST_OK)
                 {
@@ -287,8 +288,6 @@ struct boss_faerlinaAI : public ScriptedAI
         }
         else
             m_uiEnrageTimer -= uiDiff;
-
-        natureSilencedTimer -= std::min(natureSilencedTimer, uiDiff);
 
         DoMeleeAttackIfReady();
     }
