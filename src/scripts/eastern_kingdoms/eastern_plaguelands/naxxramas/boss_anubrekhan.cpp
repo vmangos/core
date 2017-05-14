@@ -16,8 +16,10 @@
 
 /* ScriptData
 SDName: Boss_Anubrekhan
-SD%Complete: 70
-SDComment:
+SD%Complete: 90
+SDComment: Check timers for corpse explosion of Crypt Guards. Currently not correct.
+           Locust Swarm timers could use more sources.
+           Damage and armor of boss, crypt guards and corpse scarabs needs research.
 SDCategory: Naxxramas
 EndScriptData */
 
@@ -48,7 +50,7 @@ enum
     SPELL_SELF_SPAWN_5          = 29105,        // These spells should spawn corpse scarabs, but only show the explosion anim.
     SPELL_SELF_SPAWN_10         = 28864,        // If we fix them to spawn scarbs, code must be changed to not manually spawn them too.
     
-    SPELL_CRYPTGUARD_ENRAGE     = 28747,        // 50% attackspeed increase and 100 extra dmg on attack. could be wrong spell.
+    SPELL_CRYPTGUARD_ENRAGE     = 28747,        // 50% attackspeed increase and 100 extra dmg on attack. PROBABLY WRONG SPELL!!!
     SPELL_CRYPTGUARD_CLEAVE     = 26350,        // could be wrong spell. 
     SPELL_CRYPTGUARD_WEB        = 28991,
     SPELL_CRYPTGUARD_ACID       = 28969,
@@ -182,6 +184,9 @@ struct boss_anubrekhanAI : public ScriptedAI
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("boss_anubrekhanAI::ctor failed to cast instanceData to instance_naxxramas");
+
         CheckSpawnInitialCryptGuards();
         Reset();
     }
@@ -242,7 +247,9 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void JustReachedHome() override
     {
-        m_pInstance->SetData(TYPE_ANUB_REKHAN, FAIL);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_ANUB_REKHAN, FAIL);
+
         CheckSpawnInitialCryptGuards();
     }
 
@@ -259,6 +266,8 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        if (!m_pInstance)
+            return;
         m_pInstance->SetData(TYPE_ANUB_REKHAN, IN_PROGRESS);
         // Setting in combat with zone and pulling the two crypt-guards
         m_creature->SetInCombatWithZone();
