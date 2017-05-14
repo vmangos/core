@@ -17,3 +17,12 @@ UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181195';
 -- give AreaTrigger outside Faerlina scriptname
 DELETE FROM `scripted_areatrigger` where entry = 4115;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4115', 'at_naxxramas');
+
+
+-- Faerlina web
+DELETE FROM `gameobject` where id = 181235;
+INSERT INTO `gameobject` (`guid`,`id`,`map`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`,`spawnFlags`) 
+VALUES (533002,181235,533,3322,-3694,258,3.8981,0,0,0.996865,-0.0791209,0,100,1,0);
+
+-- Give Faerlina web GO_FLAG_NO_INTERACT flag. It's opened by instance script
+UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181235';

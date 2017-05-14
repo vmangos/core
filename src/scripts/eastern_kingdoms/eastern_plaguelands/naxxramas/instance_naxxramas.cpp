@@ -133,23 +133,28 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
     {
         case GO_ARAC_ANUB_DOOR:
             m_uiAnubDoorGUID = pGo->GetGUID();
-            pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE) {
-                DoOpenDoor(m_uiAnubDoorGUID);
+            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
+            {
+                pGo->SetGoState(GO_STATE_ACTIVE);
+                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             }
-            else {
-                DoResetDoor(m_uiAnubDoorGUID);
+            else
+            {
+                pGo->SetGoState(GO_STATE_READY);
+                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             }
             break;
         case GO_ARAC_ANUB_GATE:
             m_uiAnubGateGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
-                DoOpenDoor(m_uiAnubGateGUID);
+                pGo->SetGoState(GO_STATE_ACTIVE);
             else
-                DoResetDoor(m_uiAnubGateGUID);
+                pGo->SetGoState(GO_STATE_READY);
             break;
         case GO_ARAC_FAER_WEB:
             m_uiFaerWebGUID = pGo->GetGUID();
+            pGo->SetGoState(GO_STATE_ACTIVE);
+            //PreMapAddOpenDoor(pGo);
             break;
         case GO_ARAC_FAER_DOOR:
             m_uiFaerDoorGUID = pGo->GetGUID();
@@ -164,7 +169,6 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             if (m_auiEncounter[TYPE_FAERLINA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
         case GO_PLAG_NOTH_ENTRY_DOOR:
             m_uiNothEntryDoorGUID = pGo->GetGUID();
             break;
@@ -283,32 +287,54 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
     {
         case TYPE_ANUB_REKHAN:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
+            if (GameObject* pGo = GetGameObject(m_uiAnubDoorGUID))
             {
-                DoOpenDoor(m_uiAnubGateGUID);
-                DoOpenDoor(m_uiAnubDoorGUID);
-                if (GameObject* go = GetGameObject(m_uiAnubDoorGUID)) {
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                switch (uiData)
+                {
+                case NOT_STARTED:
+                    pGo->SetGoState(GO_STATE_READY);
+                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                    break;
+                case IN_PROGRESS:
+                    pGo->SetGoState(GO_STATE_READY);
+                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                    break;
+                case FAIL:
+                case DONE:
+                case SPECIAL:
+                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+                    break;
                 }
             }
-            else if (uiData == FAIL)
+            if (GameObject* pGo = GetGameObject(m_uiAnubGateGUID))
             {
-                DoOpenDoor(m_uiAnubDoorGUID);
-                if (GameObject* go = GetGameObject(m_uiAnubDoorGUID)) {
-                    go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                }
-            }
-            else if (uiData == IN_PROGRESS)
-            {
-                DoResetDoor(m_uiAnubDoorGUID);
-                if (GameObject* go = GetGameObject(m_uiAnubDoorGUID)) {
-                    go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                }
+                if(uiData == DONE)
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+                else
+                    pGo->SetGoState(GO_STATE_READY);
             }
             break;
         case TYPE_FAERLINA:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiFaerWebGUID);
+            if (GameObject* pGo = GetGameObject(m_uiFaerWebGUID))
+            {
+                switch (uiData)
+                {
+                case NOT_STARTED:
+                case FAIL:
+                case DONE:
+                case SPECIAL:
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+                    //DoOpenDoor(m_uiFaerWebGUID);
+                    break;
+                case IN_PROGRESS:
+                    pGo->SetGoState(GO_STATE_READY);
+                    //DoResetDoor(m_uiFaerWebGUID);
+                    break;
+                }
+            }
+            //DoUseDoorOrButton(m_uiFaerWebGUID);
             if (uiData == DONE)
             {
                 DoUseDoorOrButton(m_uiFaerDoorGUID);
