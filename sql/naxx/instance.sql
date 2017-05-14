@@ -26,3 +26,14 @@ VALUES (533002,181235,533,3322,-3694,258,3.8981,0,0,0.996865,-0.0791209,0,100,1,
 
 -- Give Faerlina web GO_FLAG_NO_INTERACT flag. It's opened by instance script
 UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181235';
+
+
+-- adding faerlina door (gate towards maexxna) to gameobject_template. Its just a copy of Anub'rekhans door
+DELETE FROM `gameobject_template` where entry = 194022;
+INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`) 
+VALUES ('194022', '0', '6677', 'Faerlina Gate', '0', '16', '1', '0', '86');
+
+-- Adding faerlina door to gameobject
+DELETE FROM `gameobject` where guid = 533003;
+INSERT INTO `gameobject` (`guid`,`id`,`map`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`,`spawnFlags`) 
+VALUES (533003,194022,533,3121.44,-3791.08,273.904,0,0,0,0,1,25,100,0,0);

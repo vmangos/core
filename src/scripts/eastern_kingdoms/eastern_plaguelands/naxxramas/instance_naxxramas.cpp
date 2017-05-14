@@ -160,6 +160,8 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             m_uiFaerDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_FAERLINA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
         case GO_ARAC_MAEX_INNER_DOOR:
             m_uiMaexInnerGUID = pGo->GetGUID();
@@ -326,19 +328,25 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 case DONE:
                 case SPECIAL:
                     pGo->SetGoState(GO_STATE_ACTIVE);
-                    //DoOpenDoor(m_uiFaerWebGUID);
                     break;
                 case IN_PROGRESS:
                     pGo->SetGoState(GO_STATE_READY);
-                    //DoResetDoor(m_uiFaerWebGUID);
                     break;
                 }
             }
-            //DoUseDoorOrButton(m_uiFaerWebGUID);
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(m_uiFaerDoorGUID);
-                DoUseDoorOrButton(m_uiMaexOuterGUID);
+                if (GameObject* pGo = GetGameObject(m_uiFaerDoorGUID))
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+                if (GameObject* pGo = GetGameObject(m_uiMaexOuterGUID))
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+            }
+            else
+            {
+                if (GameObject* pGo = GetGameObject(m_uiFaerDoorGUID))
+                    pGo->SetGoState(GO_STATE_READY);
+                if (GameObject* pGo = GetGameObject(m_uiMaexOuterGUID))
+                    pGo->SetGoState(GO_STATE_READY);
             }
             break;
         case TYPE_MAEXXNA:
