@@ -165,11 +165,14 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             break;
         case GO_ARAC_MAEX_INNER_DOOR:
             m_uiMaexInnerGUID = pGo->GetGUID();
+            pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_ARAC_MAEX_OUTER_DOOR:
             m_uiMaexOuterGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_FAERLINA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else 
+                pGo->SetGoState(GO_STATE_READY);
             break;
         case GO_PLAG_NOTH_ENTRY_DOOR:
             m_uiNothEntryDoorGUID = pGo->GetGUID();

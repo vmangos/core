@@ -37,3 +37,13 @@ VALUES ('194022', '0', '6677', 'Faerlina Gate', '0', '16', '1', '0', '86');
 DELETE FROM `gameobject` where guid = 533003;
 INSERT INTO `gameobject` (`guid`,`id`,`map`,`position_x`,`position_y`,`position_z`,`orientation`,`rotation0`,`rotation1`,`rotation2`,`rotation3`,`spawntimesecs`,`animprogress`,`state`,`spawnFlags`) 
 VALUES (533003,194022,533,3121.44,-3791.08,273.904,0,0,0,0,1,25,100,0,0);
+
+
+-- Added outer maexxna web gate
+DELETE FROM `gameobject` where id = 181209;
+INSERT INTO `gameobject`(guid,id,map,position_x,position_y,position_z,orientation,rotation0,rotation1,rotation2,rotation3,spawntimesecs,animprogress,state,spawnFlags)
+VALUES (533004,181209,533,3434,-3844,310,5.69334,0,0,0,1,0,100,1,0);
+
+-- give maexxna web gate GO_FLAG_NO_INTERACT flag. It's opened by instance script
+UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181209';
+
