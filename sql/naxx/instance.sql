@@ -44,6 +44,15 @@ DELETE FROM `gameobject` where id = 181209;
 INSERT INTO `gameobject`(guid,id,map,position_x,position_y,position_z,orientation,rotation0,rotation1,rotation2,rotation3,spawntimesecs,animprogress,state,spawnFlags)
 VALUES (533004,181209,533,3434,-3844,310,5.69334,0,0,0,1,0,100,1,0);
 
--- give maexxna web gate GO_FLAG_NO_INTERACT flag. It's opened by instance script
+-- give maexxna outer web gate GO_FLAG_NO_INTERACT flag. It's opened by instance script
 UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181209';
+
+
+-- Added inner maexxna web gate
+DELETE FROM `gameobject` where id = 181197;
+INSERT INTO `gameobject`(guid,id,map,position_x,position_y,position_z,orientation,rotation0,rotation1,rotation2,rotation3,spawntimesecs,animprogress,state,spawnFlags)
+VALUES (533005,181197,533,3449, -3862, 309.2,3.15,0,0,0,0,0,100,1,0);
+
+-- give maexxna inner web gate GO_FLAG_NO_INTERACT flag. It's toggled by instance script
+UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181197';
 

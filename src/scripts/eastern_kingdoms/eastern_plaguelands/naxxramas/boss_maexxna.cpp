@@ -127,6 +127,12 @@ struct boss_maexxnaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MAEXXNA, DONE);
     }
 
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_MAEXXNA, FAIL);
+    }
+
     void DoCastWebWrap()
     {
         ThreatList const& tList = m_creature->getThreatManager().getThreatList();

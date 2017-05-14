@@ -354,11 +354,26 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_MAEXXNA:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiMaexInnerGUID, uiData);
+            if (GameObject* pGo = GetGameObject(m_uiMaexInnerGUID))
+            {
+                switch (uiData)
+                {
+                case NOT_STARTED:
+                case FAIL:
+                case DONE:
+                case SPECIAL:
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+                    break;
+                case IN_PROGRESS:
+                    pGo->SetGoState(GO_STATE_READY);
+                    break;
+                }
+            }
+            //DoUseDoorOrButton(m_uiMaexInnerGUID, uiData);
             if (uiData == DONE)
             {
                 DoUseDoorOrButton(m_uiAracEyeRampGUID);
-                DoRespawnGameObject(m_uiAracPortalGUID, 30 * MINUTE);
+                DoRespawnGameObject(m_uiAracPortalGUID, 30 * MINUTE); //1.8sec?
             }
             break;
         case TYPE_NOTH:
