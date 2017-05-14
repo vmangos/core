@@ -20,6 +20,7 @@ SD%Complete: 90
 SDComment: Check timers for corpse explosion of Crypt Guards. Currently not correct.
            Locust Swarm timers could use more sources.
            Damage and armor of boss, crypt guards and corpse scarabs needs research.
+           Anubs hitbox is probably too small.
 SDCategory: Naxxramas
 EndScriptData */
 
