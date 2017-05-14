@@ -114,6 +114,15 @@ struct boss_faerlinaAI : public ScriptedAI
 
     void SpellHit(Unit* pWho, const SpellEntry* pSpell) override 
     {
+        /*
+        note from wowhead:
+        --
+        Note: You must sacrifice the worshiper AFTER she enrages if you want to stop her for the full 60 seconds. 
+        If you sacrifice the Worshiper before the enrage, it will merely delay the enrage for 30 seconds.
+        -- 
+        Above note makes it seem that if she is not already enraged when widows embrace hits, we should do enrageTimer+=30000;
+        while if she is enraged we set the timer to 60000 again.
+        */
         if (pSpell->Id == SPELL_WIDOWS_EMBRACE)
         {
             m_creature->RemoveAurasDueToSpell(SPELL_ENRAGE);
@@ -240,7 +249,7 @@ struct boss_faerlinaAI : public ScriptedAI
             return;
 
         // Poison Bolt Volley
-        if (m_uiPoisonBoltVolleyTimer < uiDiff && natureSilencedTimer < uiDiff)
+        if (m_uiPoisonBoltVolleyTimer < uiDiff)
         {
             if (natureSilencedTimer < uiDiff)
             {
