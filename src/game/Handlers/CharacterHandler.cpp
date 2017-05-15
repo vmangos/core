@@ -765,10 +765,6 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         // Send "Release spirit" timer, etc ...
         if (pCurrChar->getDeathState() == CORPSE)
             pCurrChar->KillPlayer();
-        else if (pCurrChar->IsBeingTeleportedNear() &&
-                 pCurrChar->getDeathState() == DEAD &&
-                 pCurrChar->InBattleGround())
-            pCurrChar->RepopAtGraveyard();
     }
     pCurrChar->restorePendingTeleport();
 
