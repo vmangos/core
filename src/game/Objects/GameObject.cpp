@@ -1164,15 +1164,6 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            // TODO: possible must be moved to loot release (in different from linked triggering)
-            if (GetGOInfo()->chest.eventId)
-            {
-                DEBUG_LOG("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetGUIDLow());
-
-                if (!sScriptMgr.OnProcessEvent(GetGOInfo()->chest.eventId, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
-            }
-
             TriggerLinkedGameObject(user);
             return;
         }
