@@ -4004,8 +4004,21 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
 
 bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, uint32 moveAllowedFlags, float zSearchDist, bool locatedOnSteepSlope) const
 {
-    ASSERT(MaNGOS::IsValidMapCoord(srcX, srcY, srcZ));
-    ASSERT(MaNGOS::IsValidMapCoord(destX, destY, destZ));
+    if (!MaNGOS::IsValidMapCoord(srcX, srcY, srcZ))
+    {
+        sLog.outError("Map::GetWalkHitPosition invalid source coordinates,"
+            "x1: %f y1: %f z1: %f, x2: %f, y2: %f, z2: %f on map %d",
+            srcX, srcY, srcZ, destX, destY, destZ, GetId());
+        return false;
+    }
+
+    if (!MaNGOS::IsValidMapCoord(destX, destY, destZ))
+    {
+        sLog.outError("Map::GetWalkHitPosition invalid destination coordinates,"
+            "x1: %f y1: %f z1: %f, x2: %f, y2: %f, z2: %f on map %u",
+            srcX, srcY, srcZ, destX, destY, destZ, GetId());
+        return false;
+    }
 
     MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
     const dtNavMeshQuery* m_navMeshQuery = transport ? mmap->GetModelNavMeshQuery(transport->GetDisplayId()) : mmap->GetNavMeshQuery(GetId());
