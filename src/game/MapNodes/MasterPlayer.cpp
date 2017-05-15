@@ -235,8 +235,8 @@ void MasterPlayer::AddNewMailDeliverTime(time_t deliver_time)
 void MasterPlayer::LoadMailedItems(QueryResult *result)
 {
     // data needs to be at first place for Item::LoadFromDB
-    //         0                1        2         3       4       5       6           7               8           9       10     11        12
-    // creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, mail_id, item_guid, itemEntry
+    //         0                1        2         3       4       5       6           7               8           9       10     11        12            13
+    // creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, mail_id, item_guid, itemEntry, generated_loot
     if (!result)
         return;
 
@@ -263,6 +263,12 @@ void MasterPlayer::LoadMailedItems(QueryResult *result)
         }
 
         Item *item = NewItemOrBag(proto);
+
+        /* 
+         * LoadFromDB is called from multiple places but with a different set of fields - this is workaround
+         * so I don't need to fix the mess of queries and probably break something until a later date
+         */
+        item->SetGeneratedLoot(fields[13].GetBool());
 
         if (!item->LoadFromDB(item_guid_low, GetObjectGuid(), fields, item_template))
         {

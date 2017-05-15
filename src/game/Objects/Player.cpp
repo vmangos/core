@@ -4129,7 +4129,7 @@ void Player::DeleteFromDB(ObjectGuid playerguid, uint32 accountId, bool updateRe
                     if (has_items)
                     {
                         // data needs to be at first place for Item::LoadFromDB
-                        QueryResult *resultItems = CharacterDatabase.PQuery("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, item_guid, itemEntry FROM mail_items JOIN item_instance ON item_guid = guid WHERE mail_id='%u'", mail_id);
+                        QueryResult *resultItems = CharacterDatabase.PQuery("SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, item_guid, itemEntry, generated_loot FROM mail_items JOIN item_instance ON item_guid = guid WHERE mail_id='%u'", mail_id);
                         if (resultItems)
                         {
                             do
@@ -7267,6 +7267,15 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
 
             if (!item->HasGeneratedLoot())
             {
+                if (item->HasGeneratedLootSecondary()) // temporary check, merge conditions later
+                {
+                    sLog.outError("%s attempted to regenerate %s at map %u, zone %u, area %u - grouped? %s",
+                        GetGuidStr().c_str(), item->GetGuidStr().c_str(), GetMap()->GetId(), GetZoneId(), GetAreaId(), GetGroup()? "yes" : "no");
+                    GetSession()->ProcessAnticheatAction("ItemsCheck", "Player::SendLoot: attempted to regenerate container loot", CHEAT_ACTION_LOG);
+                    SendLootRelease(guid);
+                    return;
+                }
+
                 item->loot.clear();
 
                 switch (loot_type)
@@ -7279,6 +7288,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                         loot->FillLoot(item->GetEntry(), LootTemplates_Item, this, true, item->GetProto()->MaxMoneyLoot == 0);
                         loot->generateMoneyLoot(item->GetProto()->MinMoneyLoot, item->GetProto()->MaxMoneyLoot);
                         item->SetLootState(ITEM_LOOT_CHANGED);
+                        item->SetGeneratedLoot(true);
                         break;
                 }
             }
@@ -14566,8 +14576,8 @@ void Player::LoadCorpse()
 
 void Player::_LoadInventory(QueryResult *result, uint32 timediff)
 {
-    //               0                1      2         3        4      5             6                 7           8     9    10    11   12    13
-    //SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, bag, slot, item, itemEntry
+    //               0                1      2         3        4      5             6                 7           8     9    10    11   12    13              14
+    //SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, bag, slot, item, itemEntry, generated_loot
     std::unordered_map<uint32, Bag*> bagMap;                          // fast guid lookup for bags
     //NOTE: the "order by `bag`" is important because it makes sure
     //the bagMap is filled before items in the bags are loaded
@@ -14602,6 +14612,12 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             }
 
             Item *item = NewItemOrBag(proto);
+
+            /*
+             * LoadFromDB is called from multiple places but with a different set of fields - this is workaround
+             * so I don't need to fix the mess of queries and probably break something until a later date
+             */
+            item->SetGeneratedLoot(fields[14].GetBool());
 
             if (!item->LoadFromDB(item_lowguid, GetObjectGuid(), fields, item_id))
             {
