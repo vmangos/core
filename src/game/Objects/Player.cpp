@@ -14009,9 +14009,16 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     _LoadBGData(holder->GetResult(PLAYER_LOGIN_QUERY_LOADBGDATA));
 
     MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(GetMapId());
+
+    // Check for valid map
+    if (!mapEntry)
+    {
+        sLog.outError("Player %s in invalid map. Relocating to home.", guid.GetString().c_str());
+        RelocateToHomebind();
+    }
+    else if (mapEntry->IsBattleGround())
     // if server restart after player save in BG
     // player can have current coordinates in to BG map, fix this
-    if (!mapEntry || mapEntry->IsBattleGround())
     {
         const WorldLocation& _loc = GetBattleGroundEntryPoint();
         SetLocationMapId(_loc.mapid);
