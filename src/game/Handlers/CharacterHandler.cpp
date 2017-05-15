@@ -474,10 +474,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     ASSERT(playerGuid.IsPlayer());
 
     // If the character is online (ALT-F4 logout for example)
-    Player *pCurrChar = sObjectAccessor.FindPlayer(playerGuid);
+    Player *pCurrChar = sObjectAccessor.FindPlayerNotInWorld(playerGuid);
     MasterPlayer* pCurrMasterPlayer = sObjectAccessor.FindMasterPlayer(playerGuid);
     bool alreadyOnline = false;
-    if (pCurrChar)
+    if (pCurrChar && (pCurrChar->IsInWorld() || pCurrChar->IsBeingTeleportedFar()))
     {
         // Hacking attempt
         if (pCurrChar->GetSession()->GetAccountId() != GetAccountId())
@@ -653,9 +653,9 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             pCurrChar->TeleportToHomebind();
     }
 
-    if (alreadyOnline)
+    if (alreadyOnline && pCurrChar->FindMap())
         pCurrChar->GetMap()->ExistingPlayerLogin(pCurrChar); // SendInitSelf ...
-    else
+    else if (!alreadyOnline)
         sObjectAccessor.AddObject(pCurrChar);
 
     //DEBUG_LOG("Player %s added to Map.",pCurrChar->GetName());
