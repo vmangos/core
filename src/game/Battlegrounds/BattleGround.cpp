@@ -845,7 +845,7 @@ void BattleGround::SendRewardMarkByMail(Player *plr, uint32 mark, uint32 count)
 
         MailDraft(subject, textBuf)
         .AddItem(markItem)
-        .SendMailTo(plr, MailSender(MAIL_CREATURE, bmEntry), MAIL_CHECK_MASK_COPIED, 1 * HOUR, 3 * DAY);
+        .SendMailTo(plr, MailSender(MAIL_CREATURE, bmEntry), MAIL_CHECK_MASK_COPIED, 15 * MINUTE, 1 * DAY);
     }
 }
 
