@@ -307,7 +307,7 @@ struct mob_healing_wardAI : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        //Heal_Timer
+        //healTimer
         if (Heal_Timer < diff)
         {
             if (m_pInstance)

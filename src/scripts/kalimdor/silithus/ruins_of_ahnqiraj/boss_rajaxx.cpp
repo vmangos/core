@@ -238,6 +238,12 @@ struct boss_rajaxxAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAJAXX, DONE);
+        
+        // According to http://wowwiki.wikia.com/wiki/Cenarion_Circle_reputation_guide
+        // and http://wowwiki.wikia.com/wiki/General_Rajaxx,
+        // When Rajaxx dies, players should gain 90 (post-"nerf" 150) reputation for each
+        // of the NPCs that are still alive.
+        OnKillReputationReward();
     }
 
     void KilledUnit(Unit *pKilled)
@@ -269,6 +275,41 @@ struct boss_rajaxxAI : public ScriptedAI
             return true;
 
         return false;
+    }
+
+    void OnKillReputationReward()
+    {
+        FactionEntry const *factionEntry = sFactionStore.LookupEntry(609); // Cenarion Circle
+        if (!factionEntry) {
+            sLog.outError("Rajaxx justDied, unable to find Cenarion Circle faction");
+            return;
+        }
+        std::list<Creature*> helpers;
+        GetCreatureListWithEntryInGrid(helpers, m_creature, { 15473, 15478, 15471, 987001 }, 400.0f);
+        
+        if (!helpers.size())
+            return;
+        int alive = 0;
+        for (auto it : helpers)
+            if (it->isAlive()) ++alive;
+
+        if (Player* pLootRecepient = m_creature->GetLootRecipient()) {
+            if (Group* pGroup = pLootRecepient->GetGroup()) {
+                for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    Player* pGroupGuy = itr->getSource();
+                    if (!pGroupGuy || !pGroupGuy->IsInWorld())
+                        continue;
+
+                    uint32 current_reputation_rank1 = pGroupGuy->GetReputationMgr().GetRank(factionEntry);
+                    if (factionEntry && current_reputation_rank1 <= 7) {
+                        for(int i = 0; i < alive; i++)
+                            pGroupGuy->GetReputationMgr().ModifyReputation(factionEntry, 90);
+
+                    }
+                }
+            }
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)

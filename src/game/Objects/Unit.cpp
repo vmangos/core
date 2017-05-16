@@ -2879,6 +2879,10 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     if (!pVictim->isAlive())
         return SPELL_MISS_NONE;
 
+    // Spell cannot be resisted (not exist on dbc, custom flag)
+    if (spell->AttributesEx4 & SPELL_ATTR_EX4_IGNORE_RESISTANCES)
+        return SPELL_MISS_NONE;
+
     int32 hitChance = MagicSpellHitChance(pVictim, spell, spellPtr);
     int32 missChance = 10000 - hitChance;
     int32 rand = irand(0, 10000);
@@ -4599,12 +4603,34 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    if (caster && IsChanneledSpell(AurSpellInfo) && 
-       (mode != AURA_REMOVE_BY_EXPIRE || caster->IsControlledByPlayer()))   // Player pets need to be interrupted on channel expire or else they get stuck channeling
+    uint32 uiTriggeredSpell = 0;
+
+    // Spell that trigger another spell on dispell	
+    if (mode == AURA_REMOVE_BY_DISPEL)
+    {
+        switch (auraSpellId)
+        {
+        case 26180:    // Wyvern Sting (AQ40, Princess Huhuran)
+            uiTriggeredSpell = 26233;
+            break;
+        default:
+            break;
+        }
+    }
+  
+    if (IsChanneledSpell(AurSpellInfo) && caster && (mode != AURA_REMOVE_BY_EXPIRE || caster->IsControlledByPlayer())
     {
         Spell *channeled = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
         if (channeled && channeled->m_spellInfo->Id == auraSpellId && channeled->m_targets.getUnitTarget() == this)
             caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    }
+
+    if (uiTriggeredSpell)
+    {
+        if (caster)
+            caster->CastSpell(this, uiTriggeredSpell, true);
+        else
+            CastSpell(this, uiTriggeredSpell, true);
     }
 }
 
@@ -6023,6 +6049,10 @@ int32 Unit::DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellPro
 
     if (unit->GetTypeId() == TYPEID_PLAYER)
         unit->SendHealSpellLog(pVictim, spellProto->Id, addhealth, critical);
+
+    // Script Event HealedBy
+    if (pVictim->AI())
+        pVictim->AI()->HealedBy(this, addhealth);
 
     return gain;
 }

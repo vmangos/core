@@ -97,7 +97,7 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void JustReachedHome() {}
 
         // Called at any heal cast/item used (call non implemented)
-        virtual void HealBy(Unit * /*healer*/, uint32 /*amount_healed*/) {}
+        virtual void HealedBy(Unit * /*healer*/, uint32 /*amount_healed*/) {}
 
         // Helper functions for cast spell
         virtual CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered);
