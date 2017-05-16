@@ -81,6 +81,7 @@ enum
 #endif
 
 #define ANDOROV_WAYPOINT_MAX  7
+#define OOC_BETWEEN_WAVE 1000
 
 struct RespawnAndEvadeHelper
 {
@@ -109,6 +110,7 @@ struct boss_rajaxxAI : public ScriptedAI
     uint32 m_uiTrash_Timer;
     uint32 m_uiDisarm_Timer;
     uint32 m_uiWave_Timer;
+    uint32 m_uiNextWave_Timer;
     uint32 m_uiNextWaveIndex;
     bool m_bHasEnraged;
 
@@ -123,6 +125,7 @@ struct boss_rajaxxAI : public ScriptedAI
 
         // Waves reset
         m_uiWave_Timer = 1000;
+        m_uiNextWave_Timer = 0;
         m_uiNextWaveIndex = 0;
 
         if (m_pInstance)
@@ -317,9 +320,14 @@ struct boss_rajaxxAI : public ScriptedAI
         // Waves launcher
         if (m_pInstance && (m_pInstance->GetData(TYPE_RAJAXX) == IN_PROGRESS))
         {
+            if (IsCurrentWaveDead())
+                m_uiNextWave_Timer += uiDiff;
+            else
+                m_uiNextWave_Timer = 0;
+
             if (m_uiNextWaveIndex < WAVE_MAX)
             {
-                if ((m_uiWave_Timer < uiDiff) || IsCurrentWaveDead())
+                if ((m_uiWave_Timer < uiDiff) || (m_uiNextWave_Timer > OOC_BETWEEN_WAVE))
                 {
                     StartWave(m_uiNextWaveIndex);
                     m_uiNextWaveIndex++;
@@ -330,7 +338,7 @@ struct boss_rajaxxAI : public ScriptedAI
             }
             else if (m_uiNextWaveIndex == WAVE_MAX) // Rajaxx
             {
-                if (IsCurrentWaveDead())
+                if (m_uiNextWave_Timer > OOC_BETWEEN_WAVE)
                 {
                     DoScriptText(SAY_WAVE8, m_creature);
                     m_creature->SetInCombatWithZone();
@@ -577,6 +585,13 @@ struct npc_andorovAI : public ScriptedAI
             m_creature->HandleEmoteCommand(EMOTE_STATE_READY1H);
 
             m_pInstance->SetData(TYPE_RAJAXX, IN_PROGRESS);
+
+            m_creature->SetPvP(true);
+
+            std::list<Creature*> lCreature;
+            GetCreatureListWithEntryInGrid(lCreature, m_creature, NPC_KALDOREI_ELITE, 50.0f);
+            for (std::list<Creature*>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
+                (*itr)->SetPvP(true);
         }
     }
 
