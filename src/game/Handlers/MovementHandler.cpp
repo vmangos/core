@@ -632,7 +632,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
         plMover->m_movementInfo = movementInfo;
 
         // super smart decision; rework required
-        if (ObjectGuid lootGuid = plMover->GetLootGuid())
+        if (ObjectGuid lootGuid = plMover->GetLootGuid() && !lootGuid.IsItem())
             plMover->SendLootRelease(lootGuid);
 
         // Nostalrius - antiundermap1
