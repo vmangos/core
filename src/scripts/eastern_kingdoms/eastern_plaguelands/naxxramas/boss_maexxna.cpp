@@ -37,17 +37,12 @@ enum
     SPELL_SUMMON_SPIDERLING = 29434,
 };
 
-#define LOC_X1    3546.796f
-#define LOC_Y1    -3869.082f
-#define LOC_Z1    296.450f
-
-#define LOC_X2    3531.271f
-#define LOC_Y2    -3847.424f
-#define LOC_Z2    299.450f
-
-#define LOC_X3    3497.067f
-#define LOC_Y3    -3843.384f
-#define LOC_Z3    302.384f
+static constexpr float locs[3][3] =
+{
+    { 3546.796f, -3869.082f, 296.450f },
+    { 3546.796f, -3847.424f, 299.450f },
+    { 3546.796f, -3843.384f, 302.384f }
+};
 
 struct mob_webwrapAI : public ScriptedAI
 {
@@ -165,24 +160,9 @@ struct boss_maexxnaAI : public ScriptedAI
         for (std::vector<Unit *>::iterator iter = targets.begin(); iter != targets.end(); ++iter, ++i)
         {
             // Teleport the 3 targets to a location on the wall and summon a Web Wrap on them
-            switch (i)
-            {
-                case 0:
-                    DoTeleportPlayer((*iter), LOC_X1, LOC_Y1, LOC_Z1, (*iter)->GetOrientation());
-                    if (Creature* pWrap = m_creature->SummonCreature(16486, LOC_X1, LOC_Y1, LOC_Z1, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                        ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
-                    break;
-                case 1:
-                    DoTeleportPlayer((*iter), LOC_X2, LOC_Y2, LOC_Z2, (*iter)->GetOrientation());
-                    if (Creature* pWrap = m_creature->SummonCreature(16486, LOC_X2, LOC_Y2, LOC_Z2, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                        ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
-                    break;
-                case 2:
-                    DoTeleportPlayer((*iter), LOC_X3, LOC_Y3, LOC_Z3, (*iter)->GetOrientation());
-                    if (Creature* pWrap = m_creature->SummonCreature(16486, LOC_X3, LOC_Y3, LOC_Z3, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                        ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
-                    break;
-            }
+            DoTeleportPlayer((*iter), locs[i][0], locs[i][1], locs[i][2], (*iter)->GetOrientation());
+            if (Creature* pWrap = m_creature->SummonCreature(16486, locs[i][0], locs[i][1], locs[i][2], 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
+                ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
         }
     }
 
