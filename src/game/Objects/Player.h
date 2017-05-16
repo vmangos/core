@@ -46,6 +46,7 @@
 
 #include <string>
 #include <vector>
+#include <functional>
 
 struct Mail;
 class Channel;
@@ -853,14 +854,16 @@ class MANGOS_DLL_SPEC Player final: public Unit
          * Should be called in a thread-safe environnement (not in map update for example !)
          */
         bool SwitchInstance(uint32 newInstanceId);
-        bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0);
+        bool TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options = 0, std::function<void()> recover = std::function<void()>());
 
-        bool TeleportTo(WorldLocation const &loc, uint32 options = 0)
+        bool TeleportTo(WorldLocation const &loc, uint32 options = 0, std::function<void()> recover = std::function<void()>())
         {
-            return TeleportTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation, options);
+            return TeleportTo(loc.mapid, loc.coord_x, loc.coord_y, loc.coord_z, loc.orientation, options, recover);
         }
 
         bool TeleportToBGEntryPoint();
+
+        void restorePendingTeleport();
 
         void SetSummonPoint(uint32 mapid, float x, float y, float z)
         {
@@ -1645,8 +1648,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool IsBeingTeleported() const { return mSemaphoreTeleport_Near || mSemaphoreTeleport_Far; }
         bool IsBeingTeleportedNear() const { return mSemaphoreTeleport_Near; }
         bool IsBeingTeleportedFar() const { return mSemaphoreTeleport_Far; }
-        void SetSemaphoreTeleportNear(bool semphsetting) { mSemaphoreTeleport_Near = semphsetting; }
-        void SetSemaphoreTeleportFar(bool semphsetting) { mSemaphoreTeleport_Far = semphsetting; }
+        void SetSemaphoreTeleportNear(bool semphsetting);
+        void SetSemaphoreTeleportFar(bool semphsetting);
         void ProcessDelayedOperations();
 
         void CheckAreaExploreAndOutdoor(void);
@@ -2379,6 +2382,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         // Current teleport data
         WorldLocation m_teleport_dest;
         uint32 m_teleport_options;
+        std::function<void()> m_teleportRecover;
+        std::function<void()> m_teleportRecoverDelayed;
         bool mSemaphoreTeleport_Near;
         bool mSemaphoreTeleport_Far;
 

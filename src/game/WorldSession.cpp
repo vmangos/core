@@ -291,7 +291,7 @@ void WorldSession::LogUnprocessedTail(WorldPacket *packet)
 
 bool WorldSession::ForcePlayerLogoutDelay()
 {
-    if (!sWorld.IsStopped() && GetPlayer() && GetPlayer()->FindMap() && GetPlayer()->IsInWorld() && sPlayerBotMgr.ForceLogoutDelay())
+    if (!sWorld.IsStopped() && GetPlayer() && (GetPlayer()->IsBeingTeleportedFar() || GetPlayer()->FindMap() && GetPlayer()->IsInWorld()) && sPlayerBotMgr.ForceLogoutDelay())
     {
         sLog.out(LOG_CHAR, "Account: %d (IP: %s) Lost socket for character:[%s] (guid: %u)", GetAccountId(), GetRemoteAddress().c_str(), _player->GetName() , _player->GetGUIDLow());
         sWorld.LogCharacter(GetPlayer(), "LostSocket");
@@ -618,7 +618,7 @@ void WorldSession::SetDisconnectedSession()
 bool WorldSession::UpdateDisconnected(uint32 diff)
 {
     ASSERT(!m_connected);
-    if (!_player || !_player->IsInWorld() || !_player->FindMap())
+    if (!_player || !(_player->IsInWorld()  || !_player->FindMap()) && !_player->IsBeingTeleportedFar())
         return false;
     if (m_disconnectTimer < diff)
         return false; // Delete this session

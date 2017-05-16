@@ -1329,7 +1329,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     SendUpdateToOutOfRangeGroupMembers();
 
     if (IsHasDelayedTeleport())
-        TeleportTo(m_teleport_dest, m_teleport_options);
+        TeleportTo(m_teleport_dest, m_teleport_options, m_teleportRecoverDelayed);
     // Movement interpolation & cheat computation - only if not already kicked!
     if (!GetSession()->IsConnected())
         return;
@@ -1825,7 +1825,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
     return true;
 }
 
-bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options)
+bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientation, uint32 options, std::function<void()> recover)
 {
     if (!MapManager::IsValidMapCoord(mapid, x, y, z, orientation))
     {
@@ -1877,6 +1877,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             //lets save teleport destination for player
             m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
             m_teleport_options = options;
+            m_teleportRecoverDelayed = recover;
             return true;
         }
 
@@ -1904,12 +1905,24 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         // code for finish transfer called in WorldSession::HandleMovementOpcodes()
         // at client packet MSG_MOVE_TELEPORT_ACK
         SetSemaphoreTeleportNear(true);
+
         // near teleport, triggering send MSG_MOVE_TELEPORT_ACK from client at landing
         if (!GetSession()->PlayerLogout())
         {
-            WorldPacket data;
-            BuildTeleportAckMsg(data, x, y, z, orientation);
-            SendMovementMessageToSet(std::move(data), true);
+            const auto wps = [this](){
+                WorldPacket data;
+                BuildTeleportAckMsg(data,
+                                    m_teleport_dest.coord_x,
+                                    m_teleport_dest.coord_y,
+                                    m_teleport_dest.coord_z,
+                                    m_teleport_dest.orientation);
+                SendMovementMessageToSet(std::move(data), true);
+            };
+            if (recover)
+                m_teleportRecover = recover;
+            else
+                m_teleportRecover = wps;
+            wps();
         }
         m_movementInfo.moveFlags &= ~MOVEFLAG_MASK_MOVING_OR_TURN; // For interpolation
     }
@@ -1946,6 +1959,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
                 //lets save teleport destination for player
                 m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
                 m_teleport_options = options;
+                m_teleportRecoverDelayed = recover;
                 return true;
             }
 
@@ -2024,32 +2038,45 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             if (!GetSession()->PlayerLogout())
             {
-                // transfer finished, inform client to start load
-                WorldPacket data(SMSG_NEW_WORLD, (20));
-                data << uint32(mapid);
-                if (m_transport)
-                {
-                    data << float(m_movementInfo.GetTransportPos()->x);
-                    data << float(m_movementInfo.GetTransportPos()->y);
-                    data << float(m_movementInfo.GetTransportPos()->z);
-                    data << float(m_movementInfo.GetTransportPos()->o);
-                }
+                const auto wps = [this, mapid](){
+                    // transfer finished, inform client to start load
+                    WorldPacket data(SMSG_NEW_WORLD, (20));
+                    data << uint32(mapid);
+                    if (m_transport)
+                    {
+                        data << m_movementInfo.GetTransportPos()->x;
+                        data << m_movementInfo.GetTransportPos()->y;
+                        data << m_movementInfo.GetTransportPos()->z;
+                        data << m_movementInfo.GetTransportPos()->o;
+                    }
+                    else
+                    {
+                        data << m_teleport_dest.coord_x;
+                        data << m_teleport_dest.coord_y;
+                        data << m_teleport_dest.coord_z;
+                        data << m_teleport_dest.orientation;
+                    }
+                    GetSession()->SendPacket(&data);
+                    SendMovementMessageToSet(std::move(data), true);
+                    SendSavedInstances();
+                };
+                if (recover)
+                    m_teleportRecover = recover;
                 else
-                {
-                    data << float(x);
-                    data << float(y);
-                    data << float(z);
-                    data << float(orientation);
-                }
-
-                GetSession()->SendPacket(&data);
-                SendSavedInstances();
+                    m_teleportRecover = wps;
+                wps();
             }
         }
         else
             return false;
     }
     return true;
+}
+
+void Player::restorePendingTeleport()
+{
+    if (m_teleportRecover)
+        m_teleportRecover();
 }
 
 bool Player::TeleportToBGEntryPoint()
@@ -4678,8 +4705,14 @@ void Player::RepopAtGraveyard()
     WorldSafeLocsEntry const *ClosestGrave = NULL;
 
     // Special handle for battleground maps
+    std::function<void()> recover;
     if (BattleGround *bg = GetBattleGround())
+    {
         ClosestGrave = bg->GetClosestGraveYard(this);
+        recover = [this](){
+            RepopAtGraveyard();
+        };
+    }
     else
         ClosestGrave = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
 
@@ -4697,7 +4730,7 @@ void Player::RepopAtGraveyard()
             GetTransport()->RemovePassenger(this);
             ResurrectPlayer(1.0f);
         }
-        TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation());
+        TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation(), 0, std::move(recover));
     }
 }
 
@@ -17730,6 +17763,26 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
             else
                 learnSpell(pAbility->spellId, true);
         }
+    }
+}
+
+void Player::SetSemaphoreTeleportNear(bool semphsetting)
+{
+    mSemaphoreTeleport_Near = semphsetting;
+    if (!IsBeingTeleported())
+    {
+        m_teleportRecover = std::function<void()>();
+        m_teleportRecoverDelayed = std::function<void()>();
+    }
+}
+
+void Player::SetSemaphoreTeleportFar(bool semphsetting)
+{
+    mSemaphoreTeleport_Far = semphsetting;
+    if (!IsBeingTeleported())
+    {
+        m_teleportRecover = std::function<void()>();
+        m_teleportRecoverDelayed = std::function<void()>();
     }
 }
 
