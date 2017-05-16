@@ -1800,9 +1800,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 28796:                                 // Poison Bolt Volley (Naxx, Faerlina)
                     unMaxTargets = 10;
                     break;
-                case 25991:                                 // Poison Bolt Volley (AQ40, Pincess Huhuran)
-                    unMaxTargets = 15;
-                    break;
             }
             break;
         }
@@ -1824,6 +1821,35 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
                 default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    bool SelectClosestTargets = false;
+
+    // custom selection cases
+    switch (m_spellInfo->SpellFamilyName)
+    {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 26052:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
+                    SelectClosestTargets = true;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_HUNTER:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 26180:                                 // Wyvern Sting (AQ40, Princess Huhuran)
+                    SelectClosestTargets = true;
                     break;
             }
             break;
@@ -2067,7 +2093,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if ((*itr)->IsWithinDist(m_caster, minDist))
                         targetUnitMap.erase(itr);
                 }
-            }
+	    }
+            if (SelectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
+	    {
+                targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
+                UnitList::iterator itr = targetUnitMap.begin();
+                advance(itr, unMaxTargets);
+                targetUnitMap.erase(itr, targetUnitMap.end());
+	    }
             break;
         }
         case TARGET_AREAEFFECT_INSTANT:
@@ -2981,7 +3014,9 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
                     SendChannelUpdate(0);
                     triggeredByAura->GetHolder()->SetAuraDuration(0);
                 }
+
                 SendCastResult(result);
+                //SendInterrupted(0);
                 finish(false);
                 return;
             }
@@ -4661,8 +4696,8 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE) &&
-            (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(spellCat)))
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE)
+        && !m_IsTriggeredSpell && (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(spellCat)))
     {
         if (m_triggeredByAuraSpell)
             return SPELL_FAILED_DONT_REPORT;
@@ -4711,11 +4746,11 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         if (m_spellInfo->Attributes & SPELL_ATTR_OUTDOORS_ONLY &&
                 !m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
-            return m_IsTriggeredSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_ONLY_OUTDOORS;
+            return SPELL_FAILED_ONLY_OUTDOORS;
 
         if (m_spellInfo->Attributes & SPELL_ATTR_INDOORS_ONLY &&
                 m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
-            return m_IsTriggeredSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_ONLY_INDOORS;
+            return SPELL_FAILED_ONLY_INDOORS;
     }
 
     // caster state requirements
@@ -5870,13 +5905,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 switch (m_spellInfo->Id)
                 {
-                    case 25863:    // spell used by ingame item for Black Qiraji mount (legendary reward)
-                    case 26655:    // spells also related to Black Qiraji mount but use/trigger unknown
-                    case 26656:
-                    case 31700:
-                        if (m_caster->GetMapId() == 531)
-                            isAQ40Mount = true;
-                        break;
+                    case 25863:    // spell used by the Black Qiraji Crystal script when mounting inside AQ40
                     case 25953:    // spells of the 4 regular AQ40 mounts
                     case 26054:
                     case 26055:
@@ -5889,6 +5918,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         else
                             return SPELL_FAILED_NOT_HERE;
                     default:
+                        if ((m_caster->GetMapId() == 531 && m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ())))
+                            isAQ40Mount = true;
                         break;
                 }
 

@@ -25,121 +25,122 @@ SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "temple_of_ahnqiraj.h"
 
-#define EMOTE_GENERIC_FRENZY_KILL   -1000001
-#define EMOTE_GENERIC_BERSERK       -1000004
+enum
+{
+    EMOTE_GENERIC_FRENZY_KILL   = -1000001,
+    EMOTE_GENERIC_BERSERK       = -1000004,
 
-#define SPELL_FRENZY 26051
-#define SPELL_BERSERK 26068
-#define SPELL_POISONBOLT 26052
-#define SPELL_NOXIOUSPOISON 26053
-#define SPELL_WYVERNSTING 26180
-#define SPELL_ACIDSPIT 26050
+    SPELL_ACIDSPIT              = 26050,
+    SPELL_FRENZY                = 26051,
+    SPELL_NOXIOUSPOISON         = 26053,
+    SPELL_BERSERK               = 26068,
+    SPELL_WYVERNSTING           = 26180
+};
 
 struct boss_huhuranAI : public ScriptedAI
 {
     boss_huhuranAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
 
-    uint32 Frenzy_Timer;
-    uint32 Wyvern_Timer;
-    uint32 Spit_Timer;
-    uint32 PoisonBolt_Timer;
-    uint32 NoxiousPoison_Timer;
-    uint32 FrenzyBack_Timer;
+    ScriptedInstance* m_pInstance;
 
-    bool Frenzy;
-    bool Berserk;
+    uint32 m_uiFrenzyTimer;
+    uint32 m_uiWyvernTimer;
+    uint32 m_uiSpitTimer;
+    uint32 m_uiNoxiousPoisonTimer;
+    uint32 m_uiBerserkTimer;
+
+    bool m_bBerserk;
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        
+        if (m_creature->canAttack(pWho)
+            && !m_creature->isInCombat()
+            && m_creature->IsWithinDistInMap(pWho, 80.0f) 
+            && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho); 
+        }
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
+
+    void JustDied(Unit*) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_HUHURAN, DONE);
+    }
 
     void Reset()
     {
-        Frenzy_Timer = urand(25000, 35000);
-        Wyvern_Timer = urand(18000, 28000);
-        Spit_Timer = 8000;
-        PoisonBolt_Timer = 4000;
-        NoxiousPoison_Timer = urand(10000, 20000);
-        FrenzyBack_Timer = 15000;
+        m_uiFrenzyTimer        = urand(25000, 35000);
+        m_uiWyvernTimer        = urand(18000, 28000);
+        m_uiSpitTimer          = 8000;
+        m_uiNoxiousPoisonTimer = urand(10000, 20000);
+        m_uiBerserkTimer       = 5 * MINUTE * IN_MILLISECONDS;
 
-        Frenzy = false;
-        Berserk = false;
+        m_bBerserk             = false;
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //Frenzy_Timer
-        if (!Frenzy && Frenzy_Timer < diff)
+        //m_uiFrenzyTimer
+        if (m_uiFrenzyTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_FRENZY);
-            DoScriptText(EMOTE_GENERIC_FRENZY_KILL, m_creature);
-            Frenzy = true;
-            PoisonBolt_Timer = 3000;
-            Frenzy_Timer = urand(25000, 35000);
+            if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+            {
+                DoScriptText(EMOTE_GENERIC_FRENZY_KILL, m_creature);
+                m_uiFrenzyTimer = urand(25000, 35000);
+            }
         }
-        else Frenzy_Timer -= diff;
+        else
+            m_uiFrenzyTimer -= uiDiff;
 
         // Wyvern Timer
-        if (Wyvern_Timer < diff)
+        if (m_uiWyvernTimer < uiDiff)
         {
-            if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(target, SPELL_WYVERNSTING) == CAST_OK)
-                    Wyvern_Timer = urand(15000, 32000);
-            }
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_WYVERNSTING) == CAST_OK)
+                m_uiWyvernTimer = urand(15000, 32000);
         }
-        else Wyvern_Timer -= diff;
+        else
+            m_uiWyvernTimer -= uiDiff;
 
         //Spit Timer
-        if (Spit_Timer < diff)
+        if (m_uiSpitTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACIDSPIT) == CAST_OK)
-                Spit_Timer = urand(5000, 10000);
+                m_uiSpitTimer = urand(5000, 10000);
         }
-        else Spit_Timer -= diff;
+        else
+            m_uiSpitTimer -= uiDiff;
 
-        //NoxiousPoison_Timer
-        if (NoxiousPoison_Timer < diff)
+        //m_uiNoxiousPoisonTimer
+        if (m_uiNoxiousPoisonTimer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_NOXIOUSPOISON) == CAST_OK)
-                NoxiousPoison_Timer = urand(12000, 24000);
+                m_uiNoxiousPoisonTimer = urand(12000, 24000);
         }
-        else NoxiousPoison_Timer -= diff;
+        else
+            m_uiNoxiousPoisonTimer -= uiDiff;
 
-        //PoisonBolt only if frenzy or berserk
-        if (Frenzy || Berserk)
-        {
-            if (PoisonBolt_Timer < diff)
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISONBOLT) == CAST_OK)
-                    PoisonBolt_Timer = 3000;
-            }
-            else PoisonBolt_Timer -= diff;
-        }
-
-        //FrenzyBack_Timer
-        if (Frenzy && FrenzyBack_Timer < diff)
-        {
-            m_creature->InterruptNonMeleeSpells(false);
-            Frenzy = false;
-            FrenzyBack_Timer = 15000;
-        }
-        else FrenzyBack_Timer -= diff;
-
-        if (!Berserk && m_creature->GetHealthPercent() < 31.0f)
+        if (m_bBerserk)
+            DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT);
+        else if (m_creature->GetHealthPercent() < 31.0f || m_uiBerserkTimer < uiDiff)
         {
             DoScriptText(EMOTE_GENERIC_BERSERK, m_creature);
-            Berserk = true;
+            m_bBerserk = true;
         }
-        else if (Berserk)
-            DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT);
-
-        if (m_creature->isAttackReady() && m_creature->getVictim()->HasAura(SPELL_WYVERNSTING))
-            m_creature->getVictim()->RemoveAurasDueToSpell(SPELL_WYVERNSTING);
+        else
+            m_uiBerserkTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }

@@ -516,6 +516,8 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     return SPELL_AURA_PROC_OK;
                 }
                 // Viscidus Frost Weakness
+	        // Disabled for now, handled on Viscidus script
+                /*
                 case 25926:
                 {
                     if (!procSpell)
@@ -536,25 +538,25 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
 
                     break;
                 }
+		*/
                 // Viscidus Freeze
                 case 25937:
                 {
                     if (procSpell)
                     {
-                        if (GetSchoolMask(procSpell->School) != SPELL_SCHOOL_MASK_NORMAL)
+                        // Wand spell entry marked as physical, we need to add an exception here
+                        if (GetSchoolMask(procSpell->School) != SPELL_SCHOOL_MASK_NORMAL || procSpell->Id == 5019)
                             return SPELL_AURA_PROC_FAILED;
                     }
-                    else
-                        return SPELL_AURA_PROC_FAILED;
 
                     ++triggeredByAura->GetModifier()->m_amount;
                     triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
-                    if (triggerAmount == 25)
+                    if (triggerAmount == 50)
                         MonsterTextEmote(-1531044, NULL); // Cracks
-                    else if (triggerAmount == 50)
+                    else if (triggerAmount == 100)
                         MonsterTextEmote(-1531045, NULL); // Shatter
-                    else if (triggerAmount == 75)
+                    else if (triggerAmount == 150)
                     {
                         RemoveAurasDueToSpell(25937);
                         triggered_spell_id = 25938; // Explode
