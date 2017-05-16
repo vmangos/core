@@ -1862,8 +1862,11 @@ bool Creature::IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf)
     {
         if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK) && !IsPositiveSpell(spellInfo->Id))
         {
-            if (GetCreatureInfo()->Entry != 15263)  // The Prophet Skeram
+            if (GetCreatureInfo()->Entry != 15263 // The Prophet Skeram
+            && !(GetCreatureInfo()->Entry == 15953 && spellInfo->Id == 28732 )) // Grand Widow Faerlina can be hit by widows embrace
+            {
                 return true;
+            }
         }
 
         if (spellInfo->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_SCORPID_STING>())

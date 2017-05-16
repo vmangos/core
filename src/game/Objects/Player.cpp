@@ -6293,6 +6293,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
 
     UpdateZoneDependentAuras();
+    SetZoneScript();
 }
 
 //If players are too far way of duel flag... then player loose the duel

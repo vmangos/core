@@ -5,32 +5,33 @@
 #ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
+enum NAXX_ENCOUNTERS
+{
+    TYPE_ANUB_REKHAN            = 0,
+    TYPE_FAERLINA               = 1,
+    TYPE_MAEXXNA                = 2,
+
+    TYPE_NOTH                   = 3,
+    TYPE_HEIGAN                 = 4,
+    TYPE_LOATHEB                = 5,
+
+    TYPE_RAZUVIOUS              = 6,
+    TYPE_GOTHIK                 = 7,
+    TYPE_FOUR_HORSEMEN          = 8,
+
+    TYPE_PATCHWERK              = 9,
+    TYPE_GROBBULUS              = 10,
+    TYPE_GLUTH                  = 11,
+    TYPE_THADDIUS               = 12,
+
+    TYPE_SAPPHIRON              = 13,
+    TYPE_KELTHUZAD              = 14,
+    
+    MAX_ENCOUNTER               = 15,
+};
+
 enum
 {
-    MAX_ENCOUNTER               = 15,
-
-    TYPE_ANUB_REKHAN            = 1,
-    TYPE_FAERLINA               = 2,
-    TYPE_MAEXXNA                = 3,
-
-    TYPE_NOTH                   = 4,
-    TYPE_HEIGAN                 = 5,
-    TYPE_LOATHEB                = 6,
-
-    TYPE_RAZUVIOUS              = 7,
-    TYPE_GOTHIK                 = 8,
-    TYPE_FOUR_HORSEMEN          = 9,
-
-    TYPE_PATCHWERK              = 10,
-    TYPE_GROBBULUS              = 11,
-    TYPE_GLUTH                  = 12,
-    TYPE_THADDIUS               = 13,
-    TYPE_STALAGG                = 14,
-    TYPE_FEUGEN                 = 15,
-
-    TYPE_SAPPHIRON              = 16,
-    TYPE_KELTHUZAD              = 17,
-
     NPC_ANUB_REKHAN             = 15956,
     NPC_FAERLINA                = 15953,
 
@@ -45,7 +46,7 @@ enum
 
     // Gothik
     NPC_GOTHIK                  = 16060,
-    NPC_SUB_BOSS_TRIGGER        = 16137,                    //summon locations
+    NPC_SUB_BOSS_TRIGGER        = 16137,    //summon locations
     NPC_UNREL_TRAINEE           = 16124,
     NPC_UNREL_DEATH_KNIGHT      = 16125,
     NPC_UNREL_RIDER             = 16126,
@@ -61,38 +62,38 @@ enum
     NPC_GUARDIAN                = 16441,
 
     // Arachnid Quarter
-    GO_ARAC_ANUB_DOOR           = 181126,                   //encounter door
-    GO_ARAC_ANUB_GATE           = 181195,                   //open after boss is dead
-    GO_ARAC_FAER_WEB            = 181235,                   //encounter door
-    GO_ARAC_FAER_DOOR           = 194022,                   //after faerlina, to outer ring
-    GO_ARAC_MAEX_INNER_DOOR     = 181197,                   //encounter door
-    GO_ARAC_MAEX_OUTER_DOOR     = 181209,                   //right before maex
+    GO_ARAC_ANUB_DOOR           = 181126,   //encounter door
+    GO_ARAC_ANUB_GATE           = 181195,   //open after boss is dead
+    GO_ARAC_FAER_WEB            = 181235,   //encounter door
+    GO_ARAC_FAER_DOOR           = 194022,   //after faerlina, to outer ring
+    GO_ARAC_MAEX_INNER_DOOR     = 181197,   //encounter door
+    GO_ARAC_MAEX_OUTER_DOOR     = 181209,   //right before maex
 
     // Plague Quarter
-    GO_PLAG_SLIME01_DOOR        = 181198,                   //not used
-    GO_PLAG_SLIME02_DOOR        = 181199,                   //not used
-    GO_PLAG_NOTH_ENTRY_DOOR     = 181200,                   //encounter door
-    GO_PLAG_NOTH_EXIT_DOOR      = 181201,                   //exit, open when boss dead
+    GO_PLAG_SLIME01_DOOR        = 181198,   //not used
+    GO_PLAG_SLIME02_DOOR        = 181199,   //not used
+    GO_PLAG_NOTH_ENTRY_DOOR     = 181200,   //encounter door
+    GO_PLAG_NOTH_EXIT_DOOR      = 181201,   //exit, open when boss dead
     GO_PLAG_HEIG_ENTRY_DOOR     = 181202,
-    GO_PLAG_HEIG_EXIT_DOOR      = 181203,                   //exit, open when boss dead
-    GO_PLAG_LOAT_DOOR           = 181241,                   //encounter door
+    GO_PLAG_HEIG_EXIT_DOOR      = 181203,   //exit, open when boss dead
+    GO_PLAG_LOAT_DOOR           = 181241,   //encounter door
 
     // Military Quarter
-    GO_MILI_GOTH_ENTRY_GATE     = 181124,                   //open after razuvious died
-    GO_MILI_GOTH_EXIT_GATE      = 181125,                   //exit, open at boss dead
-    GO_MILI_GOTH_COMBAT_GATE    = 181170,                   //used while encounter is in progress
-    GO_MILI_HORSEMEN_DOOR       = 181119,                   //encounter door
+    GO_MILI_GOTH_ENTRY_GATE     = 181124,   //open after razuvious died
+    GO_MILI_GOTH_EXIT_GATE      = 181125,   //exit, open at boss dead
+    GO_MILI_GOTH_COMBAT_GATE    = 181170,   //used while encounter is in progress
+    GO_MILI_HORSEMEN_DOOR       = 181119,   //encounter door
 
-    GO_CHEST_HORSEMEN_NORM      = 181366,                   //four horsemen event, DoRespawnGameObject() when event == DONE
+    GO_CHEST_HORSEMEN_NORM      = 181366,   //four horsemen event, DoRespawnGameObject() when event == DONE
     GO_CHEST_HORSEMEN_HERO      = 193426,
 
     // Construct Quarter
     GO_CONS_PATH_EXIT_DOOR      = 181123,
     GO_CONS_GLUT_EXIT_DOOR      = 181120,
-    GO_CONS_THAD_DOOR           = 181121,                   // Thaddius enc door
+    GO_CONS_THAD_DOOR           = 181121,   // Thaddius enc door
 
     // Frostwyrm Lair
-    GO_KELTHUZAD_WATERFALL_DOOR = 181225,                   // exit, open after sapphiron is dead
+    GO_KELTHUZAD_WATERFALL_DOOR = 181225,   // exit, open after sapphiron is dead
 
     // Eyes
     GO_ARAC_EYE_RAMP            = 181212,
@@ -106,9 +107,10 @@ enum
     GO_MILI_PORTAL              = 181578,
     GO_CONS_PORTAL              = 181576,
 
-    AREATRIGGER_FROSTWYRM       = 4120,                    //not needed here, but AT to be scripted
+    AREATRIGGER_GOTHIK          = 4116,
     AREATRIGGER_KELTHUZAD       = 4112,
-    AREATRIGGER_GOTHIK          = 4116
+    AREATRIGGER_FAERLINA        = 4115,     // Used for faerlinas greet message
+    AREATRIGGER_FROSTWYRM       = 4120      //not needed here, but AT to be scripted
 };
 
 struct GothTrigger
@@ -147,6 +149,12 @@ class instance_naxxramas : public ScriptedInstance
         void SetChamberCenterCoords(float fX, float fY, float fZ);
         void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
 
+        void OnPlayerDeath(Player* p) override;
+
+        void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
+
+    private:
+        bool m_faerlinaHaveGreeted;
     protected:
         uint32 m_auiEncounter[MAX_ENCOUNTER];
         std::string strInstData;
