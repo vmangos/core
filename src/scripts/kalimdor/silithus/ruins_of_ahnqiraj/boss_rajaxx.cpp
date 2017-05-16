@@ -268,7 +268,7 @@ struct boss_rajaxxAI : public ScriptedAI
         }
     }
 
-    bool IsCurrentWaveDead()
+    bool IsCurrentBossDead()
     {
         if (!m_pInstance || (m_uiNextWaveIndex == 0))
             return false;
@@ -320,7 +320,7 @@ struct boss_rajaxxAI : public ScriptedAI
         // Waves launcher
         if (m_pInstance && (m_pInstance->GetData(TYPE_RAJAXX) == IN_PROGRESS))
         {
-            if (IsCurrentWaveDead())
+            if (IsCurrentBossDead())
                 m_uiNextWave_Timer += uiDiff;
             else
                 m_uiNextWave_Timer = 0;
@@ -338,7 +338,7 @@ struct boss_rajaxxAI : public ScriptedAI
             }
             else if (m_uiNextWaveIndex == WAVE_MAX) // Rajaxx
             {
-                if (m_uiNextWave_Timer > OOC_BETWEEN_WAVE)
+                if (IsCurrentBossDead())
                 {
                     DoScriptText(SAY_WAVE8, m_creature);
                     m_creature->SetInCombatWithZone();
@@ -585,13 +585,6 @@ struct npc_andorovAI : public ScriptedAI
             m_creature->HandleEmoteCommand(EMOTE_STATE_READY1H);
 
             m_pInstance->SetData(TYPE_RAJAXX, IN_PROGRESS);
-
-            m_creature->SetPvP(true);
-
-            std::list<Creature*> lCreature;
-            GetCreatureListWithEntryInGrid(lCreature, m_creature, NPC_KALDOREI_ELITE, 50.0f);
-            for (std::list<Creature*>::iterator itr = lCreature.begin(); itr != lCreature.end(); ++itr)
-                (*itr)->SetPvP(true);
         }
     }
 

@@ -369,14 +369,6 @@ struct instance_ruins_of_ahnqiraj : public ScriptedInstance
             case NPC_MAJOR_YEGGETH:
             case NPC_MAJOR_PAKKON:
             case NPC_COLONEL_ZERRAN:
-            case NPC_SWARMGUARD_NEEDLER:
-            case NPC_QIRAJI_WARRIOR:
-
-                if (pCreature->GetEntry() == NPC_SWARMGUARD_NEEDLER || pCreature->GetEntry() == NPC_QIRAJI_WARRIOR)
-                {
-                    pCreature->ForcedDespawn(3000);
-                    pCreature->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
-                }
                 // Count deathes in Rajaxx's waves
                 if (GetWaveFromCreature(pCreature) > 0)
                 {
@@ -385,6 +377,11 @@ struct instance_ruins_of_ahnqiraj : public ScriptedInstance
                     if (m_uiWaveMembersCount[waveIndex] > 0)
                         m_uiWaveMembersCount[waveIndex]--;
                 }
+                break;
+            case NPC_SWARMGUARD_NEEDLER:
+            case NPC_QIRAJI_WARRIOR:
+                pCreature->ForcedDespawn(3000);
+                pCreature->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
                 break;
             case NPC_GENERAL_ANDOROV:
                 pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
@@ -606,11 +603,17 @@ struct instance_ruins_of_ahnqiraj : public ScriptedInstance
     void SetAndorovSquadFaction(uint32 faction)
     {
         if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
+        {
             pAndorov->setFaction(faction);
+            pAndorov->SetPvP(true);
+        }
         for (std::list<uint64>::iterator it = m_lKaldoreiElites.begin(); it != m_lKaldoreiElites.end(); ++it)
         {
             if (Creature* pElite = instance->GetCreature(*it))
+            {
                 pElite->setFaction(faction);
+                pElite->SetPvP(true);
+            }
         }
     }
 
