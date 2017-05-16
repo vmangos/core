@@ -17079,16 +17079,17 @@ void Player::LeaveBattleground(bool teleportToEntryPoint)
         // nor more Waiting to Resurrect
         RemoveAurasDueToSpell(2584);
 
-        if (!isGameMaster() && sWorld.getConfig(CONFIG_BOOL_BATTLEGROUND_CAST_DESERTER))
+        if (!isGameMaster() &&
+                sWorld.getConfig(CONFIG_BOOL_BATTLEGROUND_CAST_DESERTER) &&
+                !sWorld.IsStopped() &&
+                (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN)
+                )
         {
-            if (bg->GetStatus() == STATUS_IN_PROGRESS || bg->GetStatus() == STATUS_WAIT_JOIN)
-            {
-                //lets check if player was teleported from BG and schedule delayed Deserter spell cast
-                if (IsBeingTeleportedFar())
-                    ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
-                else
-                    AddAura(26013, 0, this);               // Deserter
-            }
+            //lets check if player was teleported from BG and schedule delayed Deserter spell cast
+            if (IsBeingTeleportedFar())
+                ScheduleDelayedOperation(DELAYED_SPELL_CAST_DESERTER);
+            else
+                AddAura(26013, 0, this);               // Deserter
         }
         bg->RemovePlayerAtLeave(GetObjectGuid(), teleportToEntryPoint, true);
         sLog.out(LOG_BG, "[%u,%u]: %s:%u [%u:%s] leaves",
