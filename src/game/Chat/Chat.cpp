@@ -466,7 +466,9 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "block",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyBlockCommand,         "", nullptr },
         { NODE, "dodge",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyDodgeCommand,         "", nullptr },
         { NODE, "parry",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyParryCommand,         "", nullptr },
-        { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
+        { NODE, "cr",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyCrCommand,            "", nullptr },
+        { NODE, "br",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyBrCommand,            "", nullptr },
+        { MSTR, nullptr,       0,                     false, nullptr,                       "", nullptr }
     };
 
     static ChatCommand creatureGroupsCommandTable[] =

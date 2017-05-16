@@ -211,7 +211,7 @@ struct boss_moira_bronzebeardAI : public ScriptedAI
         else
             m_uiSmite_Timer -= uiDiff;
 
-        //Heal_Timer
+        //healTimer
         if (m_uiHeal_Timer < uiDiff)
         {
             if (Creature* pEmperor = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_EMPEROR)))

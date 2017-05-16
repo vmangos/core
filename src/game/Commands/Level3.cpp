@@ -6370,6 +6370,36 @@ bool ChatHandler::HandleSendMessageCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleModifyCrCommand(char *args)
+{
+    if (!*args)
+        return false;
+
+    Unit* target = getSelectedUnit();
+    if (!target) return false;
+    float f;
+    if (!ExtractFloat(&args, f))
+        return false;
+
+    target->SetFloatValue(UNIT_FIELD_COMBATREACH, f);
+    return true;
+}
+
+bool ChatHandler::HandleModifyBrCommand(char *args)
+{
+    if (!*args)
+        return false;
+
+    Unit* target = getSelectedUnit();
+    if (!target) return false;
+    float f;
+    if (!ExtractFloat(&args, f))
+        return false;
+
+    target->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, f);
+    return true;
+}
+
 bool ChatHandler::HandleModifyGenderCommand(char *args)
 {
     if (!*args)
