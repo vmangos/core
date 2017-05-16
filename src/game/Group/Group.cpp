@@ -636,7 +636,7 @@ void Group::MasterLoot(Creature *creature, Loot* loot)
     uint32 real_count = 0;
 
     WorldPacket data(SMSG_LOOT_MASTER_LIST, 330);
-    data << uint8(GetMembersCount());
+    data << uint8(0);
 
     for (GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
     {
