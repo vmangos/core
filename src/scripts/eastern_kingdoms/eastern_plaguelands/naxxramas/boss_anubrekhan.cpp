@@ -291,9 +291,6 @@ struct boss_anubrekhanAI : public ScriptedAI
                 DoScriptText(SAY_AGGRO3, m_creature);
                 break;
         }
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_ANUB_REKHAN, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)
@@ -496,13 +493,15 @@ struct mob_cryptguardsAI : public ScriptedAI
 struct anub_doorAI : public GameObjectAI
 {
     bool haveDoneIntro;
-    ScriptedInstance* m_pInstance;
+    instance_naxxramas* m_pInstance;
 
-    anub_doorAI(GameObject* pGo) : 
+    anub_doorAI(GameObject* pGo) :
         GameObjectAI(pGo),
         haveDoneIntro(false)
     {
-        m_pInstance = (ScriptedInstance*)me->GetInstanceData();
+        m_pInstance = (instance_naxxramas*)me->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("anub_doorAI could not find instanceData");
     }
 
     bool OnUse(Unit* user)
@@ -546,7 +545,7 @@ struct anub_doorAI : public GameObjectAI
             // "hack" to set the correct variables so we can use reset/open when he is pulled.
             // If we don't do this, some variables are wrong on first pull of the boss,
             // and the door wont close.
-            m_pInstance->DoOpenDoor(m_pInstance->GetData64(GO_ARAC_ANUB_DOOR));
+            m_pInstance->DoOpenDoor(me->GetGUID());
         }
         
         return true;

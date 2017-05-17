@@ -5,7 +5,7 @@
 #ifndef DEF_NAXXRAMAS_H
 #define DEF_NAXXRAMAS_H
 
-enum NAXX_ENCOUNTERS
+enum NAXX_ENCOUNTERS_TYPES
 {
     TYPE_ANUB_REKHAN            = 0,
     TYPE_FAERLINA               = 1,
@@ -30,22 +30,34 @@ enum NAXX_ENCOUNTERS
     MAX_ENCOUNTER               = 15,
 };
 
-enum
+enum NaxxNPCs : uint32
 {
     NPC_ANUB_REKHAN             = 15956,
     NPC_FAERLINA                = 15953,
+    NPC_MAEXXNA                 = 15952,
 
+    NPC_PATCHWERK               = 16028,
+    NPC_GROBBULUS               = 15931,
+    NPC_GLUTH                   = 15932,
     NPC_THADDIUS                = 15928,
     NPC_STALAGG                 = 15929,
     NPC_FEUGEN                  = 15930,
 
+    NPC_NOTH                    = 15954,
+    NPC_HEIGAN                  = 15936,
+    NPC_LOATHEB                 = 16011, 
+    
+    NPC_RAZUVIOUS               = 16061,
+    NPC_GOTHIK                  = 16060,
     NPC_ZELIEK                  = 16063,
     NPC_THANE                   = 16064,
     NPC_BLAUMEUX                = 16065,
     NPC_RIVENDARE               = 30549,
 
-    // Gothik
-    NPC_GOTHIK                  = 16060,
+    NPC_SAPPHIRON               = 15989,
+    NPC_KELTHUZAD               = 15990,
+
+    // Gothik adds
     NPC_SUB_BOSS_TRIGGER        = 16137,    //summon locations
     NPC_UNREL_TRAINEE           = 16124,
     NPC_UNREL_DEATH_KNIGHT      = 16125,
@@ -55,15 +67,27 @@ enum
     NPC_SPECT_RIDER             = 16150,
     NPC_SPECT_HORSE             = 16149,
 
-    // End boss adds
+    // Kel'Thuzad adds
     NPC_SOLDIER_FROZEN          = 16427,
     NPC_UNSTOPPABLE_ABOM        = 16428,
     NPC_SOUL_WEAVER             = 16429,
     NPC_GUARDIAN                = 16441,
+};
 
+enum NaxxAreaTriggers : uint32
+{
+    AREATRIGGER_KELTHUZAD   = 4112,
+    AREATRIGGER_FAERLINA    = 4115,     // Used for faerlinas greet message
+    AREATRIGGER_GOTHIK      = 4116,
+    AREATRIGGER_ANUB        = 4119,     // Triggers the greet-message from anub
+    AREATRIGGER_FROSTWYRM   = 4120      // Not needed here, but AT to be scripted
+};
+
+enum NaxxGOs : uint32
+{
     // Arachnid Quarter
-    GO_ARAC_ANUB_DOOR           = 181126,   //encounter door
-    GO_ARAC_ANUB_GATE           = 181195,   //open after boss is dead
+    GO_ARAC_ANUB_DOOR           = 181126,   //encounter door - open on click after click auto open/close on encounter pull/kill/reset
+    GO_ARAC_ANUB_GATE           = 181195,   //open after boss is dead 
     GO_ARAC_FAER_WEB            = 181235,   //encounter door
     GO_ARAC_FAER_DOOR           = 194022,   //after faerlina, to outer ring
     GO_ARAC_MAEX_INNER_DOOR     = 181197,   //encounter door
@@ -90,27 +114,28 @@ enum
     // Construct Quarter
     GO_CONS_PATH_EXIT_DOOR      = 181123,
     GO_CONS_GLUT_EXIT_DOOR      = 181120,
-    GO_CONS_THAD_DOOR           = 181121,   // Thaddius enc door
+    GO_CONS_THAD_DOOR           = 181121,   // Thaddius encounter door
 
     // Frostwyrm Lair
     GO_KELTHUZAD_WATERFALL_DOOR = 181225,   // exit, open after sapphiron is dead
 
-    // Eyes
+    // Eyes (goes together with the portals)
     GO_ARAC_EYE_RAMP            = 181212,
     GO_PLAG_EYE_RAMP            = 181211,
     GO_MILI_EYE_RAMP            = 181210,
     GO_CONS_EYE_RAMP            = 181213,
 
-    // Portals
+    // Portals (the buggers that port you at the end of a wing)
     GO_ARAC_PORTAL              = 181575,
     GO_PLAG_PORTAL              = 181577,
     GO_MILI_PORTAL              = 181578,
     GO_CONS_PORTAL              = 181576,
 
-    AREATRIGGER_GOTHIK          = 4116,
-    AREATRIGGER_KELTHUZAD       = 4112,
-    AREATRIGGER_FAERLINA        = 4115,     // Used for faerlinas greet message
-    AREATRIGGER_FROSTWYRM       = 4120      //not needed here, but AT to be scripted
+    // Kel'Thuzad window portals. "opening" on 40%
+    GO_KT_WINDOW_1              = 181402,
+    GO_KT_WINDOW_2              = 181403,
+    GO_KT_WINDOW_3              = 181404,
+    GO_KT_WINDOW_4              = 181405,
 };
 
 struct GothTrigger
@@ -121,97 +146,62 @@ struct GothTrigger
 
 class instance_naxxramas : public ScriptedInstance
 {
-    public:
-        instance_naxxramas(Map* pMap);
-        ~instance_naxxramas() {}
+    std::unordered_map<NaxxGOs, uint64> m_uniqueGOGuids;     // Primarily doors 
+    std::unordered_map<NaxxNPCs, uint64> m_uniqueNPCGuids;    // Primarily bosses
 
-        void Initialize();
+public:
+    instance_naxxramas(Map* pMap);
+    ~instance_naxxramas() {}
 
-        bool IsEncounterInProgress();
+    void Initialize();
 
-        void OnCreatureCreate(Creature* pCreature);
-        void OnObjectCreate(GameObject* pGo);
+    bool IsEncounterInProgress();
 
-        void SetData(uint32 uiType, uint32 uiData);
-        uint32 GetData(uint32 uiType);
-        uint64 GetData64(uint32 uiData);
+    void OnCreatureCreate(Creature* pCreature);
+    void OnObjectCreate(GameObject* pGo);
 
-        const char* Save() { return strInstData.c_str(); }
-        void Load(const char* chrIn);
+    void SetData(uint32 uiType, uint32 uiData);
+    uint32 GetData(uint32 uiType);
+    uint64 GetData64(uint32 uiData);
 
-        // goth
-        void SetGothTriggers();
-        Creature* GetClosestAnchorForGoth(Creature* pSource, bool bRightSide);
-        void GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide);
-        bool IsInRightSideGothArea(Unit* pUnit);
+    uint64 GetGOUuid(NaxxGOs which);
+    GameObject* GetGO(NaxxGOs which);
 
-        // kel
-        void SetChamberCenterCoords(float fX, float fY, float fZ);
-        void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
+    Creature* GetUniqueCreature(NaxxNPCs which);
 
-        void OnPlayerDeath(Player* p) override;
+    const char* Save() { return strInstData.c_str(); }
+    void Load(const char* chrIn);
 
-        void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
+    // goth
+    void SetGothTriggers();
+    Creature* GetClosestAnchorForGoth(Creature* pSource, bool bRightSide);
+    void GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide);
+    bool IsInRightSideGothArea(Unit* pUnit);
 
-    private:
-        bool m_faerlinaHaveGreeted;
-    protected:
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        std::string strInstData;
+    // kel
+    void SetChamberCenterCoords(float fX, float fY, float fZ);
+    void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
 
-        uint64 m_uiAracEyeRampGUID;
-        uint64 m_uiPlagEyeRampGUID;
-        uint64 m_uiMiliEyeRampGUID;
-        uint64 m_uiConsEyeRampGUID;
+    void OnPlayerDeath(Player* p) override;
 
-        uint64 m_uiAracPortalGUID;
-        uint64 m_uiPlagPortalGUID;
-        uint64 m_uiMiliPortalGUID;
-        uint64 m_uiConsPortalGUID;
+    void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
 
-        uint64 m_uiAnubRekhanGUID;
-        uint64 m_uiFaerlinanGUID;
+    void UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData);
+    void UpdateBossGate(NaxxGOs which, uint32 uiData);
 
-        uint64 m_uiZeliekGUID;
-        uint64 m_uiThaneGUID;
-        uint64 m_uiBlaumeuxGUID;
-        uint64 m_uiRivendareGUID;
+private:
+    bool m_faerlinaHaveGreeted;
+protected:
+    uint32 m_auiEncounter[MAX_ENCOUNTER];
+    std::string strInstData;
 
-        uint64 m_uiThaddiusGUID;
-        uint64 m_uiStalaggGUID;
-        uint64 m_uiFeugenGUID;
+    std::list<uint64> m_lGothTriggerList;
+    UNORDERED_MAP<uint64, GothTrigger> m_mGothTriggerMap;
 
-        uint64 m_uiPathExitDoorGUID;
-        uint64 m_uiGlutExitDoorGUID;
-        uint64 m_uiThadDoorGUID;
-
-        uint64 m_uiAnubDoorGUID;
-        uint64 m_uiAnubGateGUID;
-        uint64 m_uiFaerDoorGUID;
-        uint64 m_uiFaerWebGUID;
-        uint64 m_uiMaexOuterGUID;
-        uint64 m_uiMaexInnerGUID;
-
-        uint64 m_uiGothikGUID;
-        uint64 m_uiGothCombatGateGUID;
-        uint64 m_uiGothikEntryDoorGUID;
-        uint64 m_uiGothikExitDoorGUID;
-        std::list<uint64> m_lGothTriggerList;
-        UNORDERED_MAP<uint64, GothTrigger> m_mGothTriggerMap;
-
-        uint64 m_uiHorsemenDoorGUID;
-        uint64 m_uiHorsemenChestGUID;
-
-        uint64 m_uiNothEntryDoorGUID;
-        uint64 m_uiNothExitDoorGUID;
-        uint64 m_uiHeigEntryDoorGUID;
-        uint64 m_uiHeigExitDoorGUID;
-        uint64 m_uiLoathebDoorGUID;
-
-        uint64 m_uiKelthuzadDoorGUID;
-        float m_fChamberCenterX;
-        float m_fChamberCenterY;
-        float m_fChamberCenterZ;
+   
+    float m_fChamberCenterX;
+    float m_fChamberCenterY;
+    float m_fChamberCenterZ;
 };
 
 #endif

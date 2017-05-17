@@ -24,57 +24,9 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
+
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
-
-
-    m_uiAracEyeRampGUID(0),
-    m_uiPlagEyeRampGUID(0),
-    m_uiMiliEyeRampGUID(0),
-    m_uiConsEyeRampGUID(0),
-
-    m_uiAracPortalGUID(0),
-    m_uiPlagPortalGUID(0),
-    m_uiMiliPortalGUID(0),
-    m_uiConsPortalGUID(0),
-
-    m_uiAnubRekhanGUID(0),
-    m_uiFaerlinanGUID(0),
-
-    m_uiZeliekGUID(0),
-    m_uiThaneGUID(0),
-    m_uiBlaumeuxGUID(0),
-    m_uiRivendareGUID(0),
-
-    m_uiThaddiusGUID(0),
-    m_uiStalaggGUID(0),
-    m_uiFeugenGUID(0),
-
-    m_uiPathExitDoorGUID(0),
-    m_uiGlutExitDoorGUID(0),
-    m_uiThadDoorGUID(0),
-
-    m_uiAnubDoorGUID(0),
-    m_uiAnubGateGUID(0),
-    m_uiFaerDoorGUID(0),
-    m_uiFaerWebGUID(0),
-    m_uiMaexOuterGUID(0),
-    m_uiMaexInnerGUID(0),
-
-    m_uiGothikGUID(0),
-    m_uiGothCombatGateGUID(0),
-    m_uiGothikEntryDoorGUID(0),
-    m_uiGothikExitDoorGUID(0),
-    m_uiHorsemenDoorGUID(0),
-    m_uiHorsemenChestGUID(0),
-
-    m_uiNothEntryDoorGUID(0),
-    m_uiNothExitDoorGUID(0),
-    m_uiHeigEntryDoorGUID(0),
-    m_uiHeigExitDoorGUID(0),
-    m_uiLoathebDoorGUID(0),
-
-    m_uiKelthuzadDoorGUID(0),
     m_fChamberCenterX(0.0f),
     m_fChamberCenterY(0.0f),
     m_fChamberCenterZ(0.0f)
@@ -92,35 +44,42 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
     switch (pCreature->GetEntry())
     {
         case NPC_ANUB_REKHAN:
-            m_uiAnubRekhanGUID = pCreature->GetGUID();
-            break;
         case NPC_FAERLINA:
-            m_uiFaerlinanGUID = pCreature->GetGUID();
-            break;
+        case NPC_MAEXXNA:
+        case NPC_PATCHWERK:
+        case NPC_GROBBULUS:
+        case NPC_GLUTH:
         case NPC_THADDIUS:
-            m_uiThaddiusGUID = pCreature->GetGUID();
-            break;
         case NPC_STALAGG:
-            m_uiStalaggGUID = pCreature->GetGUID();
-            break;
         case NPC_FEUGEN:
-            m_uiFeugenGUID = pCreature->GetGUID();
-            break;
-        case NPC_ZELIEK:
-            m_uiZeliekGUID = pCreature->GetGUID();
-            break;
-        case NPC_THANE:
-            m_uiThaneGUID = pCreature->GetGUID();
-            break;
-        case NPC_BLAUMEUX:
-            m_uiBlaumeuxGUID = pCreature->GetGUID();
-            break;
-        case NPC_RIVENDARE:
-            m_uiRivendareGUID = pCreature->GetGUID();
-            break;
+        case NPC_NOTH:
+        case NPC_HEIGAN:
+        case NPC_LOATHEB:
+        case NPC_RAZUVIOUS:
         case NPC_GOTHIK:
-            m_uiGothikGUID = pCreature->GetGUID();
+        case NPC_ZELIEK:
+        case NPC_THANE:
+        case NPC_BLAUMEUX:
+        case NPC_RIVENDARE:
+        case NPC_SAPPHIRON:
+        case NPC_KELTHUZAD:
+            m_uniqueNPCGuids[(NaxxNPCs)pCreature->GetEntry()] = pCreature->GetGUID();
             break;
+        
+
+        case NPC_GUARDIAN:
+        case NPC_SOLDIER_FROZEN:
+        case NPC_SOUL_WEAVER:
+        case NPC_UNSTOPPABLE_ABOM:
+        case NPC_UNREL_TRAINEE:
+        case NPC_UNREL_DEATH_KNIGHT:
+        case NPC_UNREL_RIDER:
+        case NPC_SPECT_TRAINEE:
+        case NPC_SPECT_DEATH_KNIGTH:
+        case NPC_SPECT_RIDER:
+        case NPC_SPECT_HORSE:
+            break;
+
         case NPC_SUB_BOSS_TRIGGER:
             m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
@@ -132,7 +91,47 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
     switch (pGo->GetEntry())
     {
         case GO_ARAC_ANUB_DOOR:
-            m_uiAnubDoorGUID = pGo->GetGUID();
+        case GO_ARAC_ANUB_GATE:
+        case GO_ARAC_FAER_WEB:
+        case GO_ARAC_FAER_DOOR:
+        case GO_ARAC_MAEX_INNER_DOOR:
+        case GO_ARAC_MAEX_OUTER_DOOR:
+        case GO_PLAG_SLIME01_DOOR:
+        case GO_PLAG_SLIME02_DOOR:
+        case GO_PLAG_NOTH_ENTRY_DOOR:
+        case GO_PLAG_NOTH_EXIT_DOOR:
+        case GO_PLAG_HEIG_ENTRY_DOOR:
+        case GO_PLAG_HEIG_EXIT_DOOR:
+        case GO_PLAG_LOAT_DOOR:
+        case GO_MILI_GOTH_ENTRY_GATE:
+        case GO_MILI_GOTH_EXIT_GATE:
+        case GO_MILI_GOTH_COMBAT_GATE:
+        case GO_MILI_HORSEMEN_DOOR:
+        case GO_CHEST_HORSEMEN_NORM:
+        case GO_CHEST_HORSEMEN_HERO:
+        case GO_CONS_PATH_EXIT_DOOR:
+        case GO_CONS_GLUT_EXIT_DOOR:
+        case GO_CONS_THAD_DOOR:
+        case GO_KELTHUZAD_WATERFALL_DOOR:
+        case GO_ARAC_EYE_RAMP:
+        case GO_PLAG_EYE_RAMP:
+        case GO_MILI_EYE_RAMP:
+        case GO_CONS_EYE_RAMP:
+        case GO_ARAC_PORTAL:
+        case GO_PLAG_PORTAL:
+        case GO_MILI_PORTAL:
+        case GO_CONS_PORTAL:
+        case GO_KT_WINDOW_1:
+        case GO_KT_WINDOW_2:
+        case GO_KT_WINDOW_3:
+        case GO_KT_WINDOW_4:
+            m_uniqueGOGuids[(NaxxGOs)pGo->GetEntry()] = pGo->GetGUID();
+            break;
+    }
+
+    switch (pGo->GetEntry())
+    {
+        case GO_ARAC_ANUB_DOOR:
             if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
             {
                 pGo->SetGoState(GO_STATE_ACTIVE);
@@ -144,133 +143,137 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
                 pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             }
             break;
+
         case GO_ARAC_ANUB_GATE:
-            m_uiAnubGateGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             else
                 pGo->SetGoState(GO_STATE_READY);
             break;
+
         case GO_ARAC_FAER_WEB:
-            m_uiFaerWebGUID = pGo->GetGUID();
             pGo->SetGoState(GO_STATE_ACTIVE);
             //PreMapAddOpenDoor(pGo);
             break;
+
         case GO_ARAC_FAER_DOOR:
-            m_uiFaerDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_FAERLINA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             else
                 pGo->SetGoState(GO_STATE_READY);
             break;
+
         case GO_ARAC_MAEX_INNER_DOOR:
-            m_uiMaexInnerGUID = pGo->GetGUID();
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_ARAC_MAEX_OUTER_DOOR:
-            m_uiMaexOuterGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_FAERLINA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             else 
                 pGo->SetGoState(GO_STATE_READY);
             break;
+
         case GO_PLAG_NOTH_ENTRY_DOOR:
-            m_uiNothEntryDoorGUID = pGo->GetGUID();
+            
             break;
         case GO_PLAG_NOTH_EXIT_DOOR:
-            m_uiNothExitDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_NOTH] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_PLAG_HEIG_ENTRY_DOOR:
-            m_uiHeigEntryDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_NOTH] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_PLAG_HEIG_EXIT_DOOR:
-            m_uiHeigExitDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_HEIGAN] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_PLAG_LOAT_DOOR:
-            m_uiLoathebDoorGUID = pGo->GetGUID();
             break;
 
         case GO_MILI_GOTH_ENTRY_GATE:
-            m_uiGothikEntryDoorGUID = pGo->GetGUID();
             break;
+
         case GO_MILI_GOTH_EXIT_GATE:
-            m_uiGothikExitDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_GOTHIK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_MILI_GOTH_COMBAT_GATE:
-            m_uiGothCombatGateGUID = pGo->GetGUID();
             break;
+
         case GO_MILI_HORSEMEN_DOOR:
-            m_uiHorsemenDoorGUID  = pGo->GetGUID();
             if (m_auiEncounter[TYPE_GOTHIK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
         case GO_CHEST_HORSEMEN_NORM:
-            m_uiHorsemenChestGUID = pGo->GetGUID();
             break;
 
         case GO_CONS_PATH_EXIT_DOOR:
-            m_uiPathExitDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_PATCHWERK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_CONS_GLUT_EXIT_DOOR:
-            m_uiGlutExitDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_GLUTH] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_CONS_THAD_DOOR:
-            m_uiThadDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_GLUTH] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
         case GO_KELTHUZAD_WATERFALL_DOOR:
-            m_uiKelthuzadDoorGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_SAPPHIRON] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
         case GO_ARAC_EYE_RAMP:
-            m_uiAracEyeRampGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_MAEXXNA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_PLAG_EYE_RAMP:
-            m_uiPlagEyeRampGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_LOATHEB] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_MILI_EYE_RAMP:
-            m_uiMiliEyeRampGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_FOUR_HORSEMEN] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
+
         case GO_CONS_EYE_RAMP:
-            m_uiConsEyeRampGUID = pGo->GetGUID();
             if (m_auiEncounter[TYPE_THADDIUS] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
         case GO_ARAC_PORTAL:
-            m_uiAracPortalGUID = pGo->GetGUID();
             break;
+
         case GO_PLAG_PORTAL:
-            m_uiPlagPortalGUID = pGo->GetGUID();
             break;
+
         case GO_MILI_PORTAL:
-            m_uiMiliPortalGUID = pGo->GetGUID();
             break;
+
         case GO_CONS_PORTAL:
-            m_uiConsPortalGUID = pGo->GetGUID();
+            break;
+
+        case GO_KT_WINDOW_1:
+        case GO_KT_WINDOW_2:
+        case GO_KT_WINDOW_3:
+        case GO_KT_WINDOW_4:
+            if (m_auiEncounter[TYPE_KELTHUZAD] == DONE)
+                pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
     }
 }
@@ -284,6 +287,40 @@ bool instance_naxxramas::IsEncounterInProgress()
     return false;
 }
 
+// Many doors in naxx leading into encounters close when encounter is started and open
+// when the encounter is defeated, or the raid wipes. This utility function handles that.
+void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
+{
+    if (GameObject* pGo = GetGO(which))
+    {
+        switch (uiData)
+        {
+        case NOT_STARTED:
+        case FAIL:
+        case DONE:
+        case SPECIAL:
+            pGo->SetGoState(GO_STATE_ACTIVE);
+            break;
+        case IN_PROGRESS:
+            pGo->SetGoState(GO_STATE_READY);
+            break;
+        }
+    }
+}
+
+// Many doors in naxx act as gates, where you have to kill the previous boss for 
+// the door to open. This utility function handles that.
+void instance_naxxramas::UpdateBossGate(NaxxGOs which, uint32 uiData)
+{
+    if (GameObject* pGo = GetGO(which))
+    {
+        if(uiData == DONE)
+            pGo->SetGoState(GO_STATE_ACTIVE);
+        else
+            pGo->SetGoState(GO_STATE_READY);
+    }
+}
+
 void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 {
     ASSERT(this)
@@ -292,7 +329,10 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
     {
         case TYPE_ANUB_REKHAN:
             m_auiEncounter[uiType] = uiData;
-            if (GameObject* pGo = GetGameObject(m_uiAnubDoorGUID))
+            UpdateBossGate(GO_ARAC_ANUB_GATE, uiData);
+            UpdateBossEntranceDoor(GO_ARAC_ANUB_DOOR, uiData);
+            /*
+            if (GameObject* pGo = GetGO(GO_ARAC_ANUB_DOOR))
             {
                 switch (uiData)
                 {
@@ -312,162 +352,111 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     break;
                 }
             }
-            if (GameObject* pGo = GetGameObject(m_uiAnubGateGUID))
-            {
-                if(uiData == DONE)
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-                else
-                    pGo->SetGoState(GO_STATE_READY);
-            }
+            */
+
             break;
         case TYPE_FAERLINA:
             m_auiEncounter[uiType] = uiData;
-            if (GameObject* pGo = GetGameObject(m_uiFaerWebGUID))
-            {
-                switch (uiData)
-                {
-                case NOT_STARTED:
-                case FAIL:
-                case DONE:
-                case SPECIAL:
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-                    break;
-                case IN_PROGRESS:
-                    pGo->SetGoState(GO_STATE_READY);
-                    break;
-                }
-            }
-            if (uiData == DONE)
-            {
-                if (GameObject* pGo = GetGameObject(m_uiFaerDoorGUID))
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-                if (GameObject* pGo = GetGameObject(m_uiMaexOuterGUID))
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-            }
-            else
-            {
-                if (GameObject* pGo = GetGameObject(m_uiFaerDoorGUID))
-                    pGo->SetGoState(GO_STATE_READY);
-                if (GameObject* pGo = GetGameObject(m_uiMaexOuterGUID))
-                    pGo->SetGoState(GO_STATE_READY);
-            }
+            UpdateBossEntranceDoor(GO_ARAC_FAER_WEB, uiData);
+            UpdateBossGate(GO_ARAC_FAER_DOOR, uiData);
+            
+            // This one could potentially be linked to trash rather than Faerlina?
+            // Though probably not, because you can get to maexxna without killing faerlina
+            UpdateBossGate(GO_ARAC_MAEX_OUTER_DOOR, uiData);
             break;
         case TYPE_MAEXXNA:
             m_auiEncounter[uiType] = uiData;
-            if (GameObject* pGo = GetGameObject(m_uiMaexInnerGUID))
-            {
-                switch (uiData)
-                {
-                case NOT_STARTED:
-                case FAIL:
-                case DONE:
-                case SPECIAL:
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-                    break;
-                case IN_PROGRESS:
-                    pGo->SetGoState(GO_STATE_READY);
-                    break;
-                }
-            }
-            //DoUseDoorOrButton(m_uiMaexInnerGUID, uiData);
-            if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiAracEyeRampGUID);
-                DoRespawnGameObject(m_uiAracPortalGUID, 30 * MINUTE); //1.8sec?
-            }
+            UpdateBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
+            UpdateBossGate(GO_ARAC_PORTAL, uiData);
+            UpdateBossGate(GO_ARAC_EYE_RAMP, uiData);
+
+            DoRespawnGameObject(GetGOUuid(GO_ARAC_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             break;
         case TYPE_NOTH:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiNothEntryDoorGUID);
-            if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiNothExitDoorGUID);
-                DoUseDoorOrButton(m_uiHeigEntryDoorGUID);
-            }
+            UpdateBossEntranceDoor(GO_PLAG_NOTH_ENTRY_DOOR, uiData);
+            UpdateBossGate(GO_PLAG_NOTH_EXIT_DOOR, uiData);
+            
+            // Potentially open when some trash in room before is killed instead?
+            UpdateBossGate(GO_PLAG_HEIG_ENTRY_DOOR, uiData);
             break;
         case TYPE_HEIGAN:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiHeigEntryDoorGUID);
-            if (uiData == DONE)
-                DoUseDoorOrButton(m_uiHeigExitDoorGUID);
+            UpdateBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, uiData);
+            UpdateBossGate(GO_PLAG_HEIG_EXIT_DOOR, uiData);
             break;
         case TYPE_LOATHEB:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiLoathebDoorGUID);
-            if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiPlagEyeRampGUID);
-                DoRespawnGameObject(m_uiPlagPortalGUID, 30 * MINUTE);
-            }
+            UpdateBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
+            UpdateBossGate(GO_PLAG_PORTAL, uiData);
+            UpdateBossGate(GO_PLAG_EYE_RAMP, uiData);
+            DoRespawnGameObject(GetGOUuid(GO_PLAG_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             break;
         case TYPE_RAZUVIOUS:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
-                DoUseDoorOrButton(m_uiGothikEntryDoorGUID);
+            UpdateBossGate(GO_MILI_GOTH_ENTRY_GATE, uiData);
             break;
         case TYPE_GOTHIK:
-            switch (uiData)
+            m_auiEncounter[uiType] = uiData;
+            UpdateBossEntranceDoor(GO_MILI_GOTH_ENTRY_GATE, uiData);
+            UpdateBossGate(GO_MILI_GOTH_EXIT_GATE, uiData);
+            if (GameObject* pGO = GetGO(GO_MILI_GOTH_COMBAT_GATE))
             {
+                switch (uiData)
+                {
                 case IN_PROGRESS:
-                    DoUseDoorOrButton(m_uiGothikEntryDoorGUID);
-                    DoUseDoorOrButton(m_uiGothCombatGateGUID);
+                    pGO->SetGoState(GO_STATE_READY);
                     break;
                 case SPECIAL:
-                    DoUseDoorOrButton(m_uiGothCombatGateGUID);
+                    pGO->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case FAIL:
-                    if (m_auiEncounter[TYPE_RAZUVIOUS] == IN_PROGRESS) // double check TYPE_RAZUVIOUS is correct. Was hard-coded to 7, which referred to TYPE_RAZUVIOUS
-                        DoUseDoorOrButton(m_uiGothCombatGateGUID);
-
-                    DoUseDoorOrButton(m_uiGothikEntryDoorGUID);
+                    //if (m_auiEncounter[TYPE_GOTHIK] == IN_PROGRESS)
+                    pGO->SetGoState(GO_STATE_ACTIVE);
                     break;
                 case DONE:
-                    DoUseDoorOrButton(m_uiGothikEntryDoorGUID);
-                    DoUseDoorOrButton(m_uiGothikExitDoorGUID);
-                    DoUseDoorOrButton(m_uiHorsemenDoorGUID);
+                    pGO->SetGoState(GO_STATE_ACTIVE);
                     break;
+                }
             }
-            m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_FOUR_HORSEMEN:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiHorsemenDoorGUID);
+            UpdateBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
+            UpdateBossGate(GO_MILI_PORTAL, uiData);
+            UpdateBossGate(GO_MILI_EYE_RAMP, uiData);
+            DoRespawnGameObject(GetGOUuid(GO_MILI_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             if (uiData == DONE)
             {
-                DoUseDoorOrButton(m_uiMiliEyeRampGUID);
-                DoRespawnGameObject(m_uiMiliPortalGUID, 30 * MINUTE);
-                DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE);
+                // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE); <<<<<<<<<< What's this for?
             }
             break;
         case TYPE_PATCHWERK:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
-                DoUseDoorOrButton(m_uiPathExitDoorGUID);
+            UpdateBossGate(GO_CONS_PATH_EXIT_DOOR, uiData);
             break;
         case TYPE_GROBBULUS:
+            // no doors here?
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_GLUTH:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiGlutExitDoorGUID);
-                DoUseDoorOrButton(m_uiThadDoorGUID);
-            }
+            UpdateBossGate(GO_CONS_GLUT_EXIT_DOOR, uiData);
+            
+            // Should this open another way perhaps? Same issue as maexxna outer door.
+            UpdateBossGate(GO_CONS_THAD_DOOR, uiData);
             break;
         case TYPE_THADDIUS:
             m_auiEncounter[uiType] = uiData;
-            DoUseDoorOrButton(m_uiThadDoorGUID, uiData);
-            if (uiData == DONE)
-            {
-                DoUseDoorOrButton(m_uiConsEyeRampGUID);
-                DoRespawnGameObject(m_uiConsPortalGUID, 30 * MINUTE);
-            }
+            UpdateBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
+            
+            UpdateBossGate(GO_CONS_PORTAL, uiData);
+            UpdateBossGate(GO_CONS_EYE_RAMP, uiData);
+            DoRespawnGameObject(GetGOUuid(GO_CONS_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             break;
         case TYPE_SAPPHIRON:
             m_auiEncounter[uiType] = uiData;
-            if (uiData == DONE)
-                DoUseDoorOrButton(m_uiKelthuzadDoorGUID);
+            UpdateBossGate(GO_KELTHUZAD_WATERFALL_DOOR, uiData);
             break;
         case TYPE_KELTHUZAD:
             switch (uiData)
@@ -552,39 +541,60 @@ uint32 instance_naxxramas::GetData(uint32 uiType)
 
 uint64 instance_naxxramas::GetData64(uint32 uiData)
 {
-    switch (uiData)
-    {
-        case GO_ARAC_ANUB_DOOR:
-            return m_uiAnubDoorGUID;
-        case NPC_ANUB_REKHAN:
-            return m_uiAnubRekhanGUID;
-        case NPC_FAERLINA:
-            return m_uiFaerlinanGUID;
-        case GO_MILI_GOTH_COMBAT_GATE:
-            return m_uiGothCombatGateGUID;
-        case NPC_ZELIEK:
-            return m_uiZeliekGUID;
-        case NPC_THANE:
-            return m_uiThaneGUID;
-        case NPC_BLAUMEUX:
-            return m_uiBlaumeuxGUID;
-        case NPC_RIVENDARE:
-            return m_uiRivendareGUID;
-        case NPC_THADDIUS:
-            return m_uiThaddiusGUID;
-        case NPC_STALAGG:
-            return m_uiStalaggGUID;
-        case NPC_FEUGEN:
-            return m_uiFeugenGUID;
-        case NPC_GOTHIK:
-            return m_uiGothikGUID;
-    }
+    sLog.outBasic("instance_naxxramas::GetData64 called. Preferred usage is GetGOUuid and GetUniqueCreature");
+
+    auto itGO = m_uniqueGOGuids.find((NaxxGOs)uiData);
+    if (itGO != m_uniqueGOGuids.end())
+        return itGO->second;
+    auto itC = m_uniqueNPCGuids.find((NaxxNPCs)uiData);
+    if (itC != m_uniqueNPCGuids.end())
+        return itC->second;
+
+    sLog.outError("instance_naxxramas::GetData64 called with param %d, not found", uiData);
     return 0;
+}
+
+uint64 instance_naxxramas::GetGOUuid(NaxxGOs which)
+{
+    auto it = m_uniqueGOGuids.find(which);
+    if (it == m_uniqueGOGuids.end())
+    {
+        sLog.outError("instance_naxxramas::GetGO called with param %d, not found", which);
+        return 0;
+    }
+    return it->second;
+}
+
+GameObject * instance_naxxramas::GetGO(NaxxGOs which)
+{
+    uint64 gob_uuid = GetGOUuid(which);
+    if (gob_uuid) {
+        GameObject* gob = GetGameObject(gob_uuid);
+        if(!gob)
+            sLog.outError("instance_naxxramas::GetGOP called with param %d. Got GUID %llu, but no GO found", which, gob_uuid);
+        return gob;
+    }
+    else
+        return nullptr;
+}
+
+Creature * instance_naxxramas::GetUniqueCreature(NaxxNPCs which)
+{
+    auto it = m_uniqueNPCGuids.find(which);
+    if (it == m_uniqueNPCGuids.end())
+    {
+        sLog.outError("instance_naxxramas::GetUniqueCreature called with param %d, not found", which);
+        return nullptr;
+    }
+    Creature* pCreature = GetCreature(it->second);
+    if(!pCreature)
+        sLog.outError("instance_naxxramas::GetGOP called with param %d. Got GUID %llu, but no GO found", which, it->first);
+    return pCreature;
 }
 
 void instance_naxxramas::SetGothTriggers()
 {
-    Creature* pGoth = instance->GetCreature(m_uiGothikGUID);
+    Creature* pGoth = GetUniqueCreature(NPC_GOTHIK);
 
     if (!pGoth)
         return;
@@ -606,7 +616,7 @@ Creature* instance_naxxramas::GetClosestAnchorForGoth(Creature* pSource, bool bR
 {
     std::list<Creature* > lList;
 
-    for (UNORDERED_MAP<uint64, GothTrigger>::iterator itr = m_mGothTriggerMap.begin(); itr != m_mGothTriggerMap.end(); ++itr)
+    for (auto itr = m_mGothTriggerMap.begin(); itr != m_mGothTriggerMap.end(); ++itr)
     {
         if (!itr->second.bIsAnchorHigh)
             continue;
@@ -644,7 +654,7 @@ void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList
 
 bool instance_naxxramas::IsInRightSideGothArea(Unit* pUnit)
 {
-    if (GameObject* pCombatGate = instance->GetGameObject(m_uiGothCombatGateGUID))
+    if (GameObject* pCombatGate = GetGO(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
 
     sLog.outError("left/right side check, Gothik combat area failed.");
@@ -665,7 +675,7 @@ void instance_naxxramas::OnPlayerDeath(Player* p)
         // On player death we spawn 5 scarabs under the player. Since the player
         // can die from falldmg or other sources, anubs script impl of KilledUnit may not
         // be called, thus we need to do it here.
-        if (Creature* pAnub = instance->GetCreature(m_uiAnubRekhanGUID))
+        if (Creature* pAnub = GetUniqueCreature(NPC_ANUB_REKHAN))
         {
             pAnub->AI()->DoCast(p, 29105, true);
             for (int i = 0; i < 5; i++)
@@ -708,9 +718,10 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
         if (!m_faerlinaHaveGreeted)
         {
             m_faerlinaHaveGreeted = true;
-            if (Creature* pFaerlina = GetCreature(m_uiFaerlinanGUID))
+            if (Creature* pFaerlina = GetUniqueCreature(NPC_FAERLINA))
             {
-                DoScriptText(-1533009, pFaerlina);
+                if(pFaerlina->isAlive())
+                    DoScriptText(-1533009, pFaerlina);
             }
         }
         break;
