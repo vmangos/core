@@ -91,9 +91,40 @@ enum
     NPC_SPIRIT_OF_ZELIREK     = 16777
 };
 
-struct boss_lady_blaumeuxAI : public ScriptedAI
+struct boss_four_horsemen_shared : public ScriptedAI
 {
-    boss_lady_blaumeuxAI(Creature* pCreature) : ScriptedAI(pCreature)
+    instance_naxxramas* m_pInstance;
+
+    boss_four_horsemen_shared(Creature* pCreature) : 
+        ScriptedAI(pCreature)
+    {
+        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("boss_four_horsemen_shared ctor could not get instance data");
+    }
+    
+    void Reset() = 0;
+
+    void Aggro(Unit* pWho) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_FOUR_HORSEMEN, IN_PROGRESS);
+    }
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_FOUR_HORSEMEN, FAIL);
+    }
+    void JustDied(Unit* Killer) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_FOUR_HORSEMEN, SPECIAL);
+    }
+};
+
+struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
+{
+    boss_lady_blaumeuxAI(Creature* pCreature) : boss_four_horsemen_shared(pCreature)
     {
         Reset();
     }
@@ -113,6 +144,7 @@ struct boss_lady_blaumeuxAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
+        boss_four_horsemen_shared::Aggro(who);
         DoScriptText(SAY_BLAU_AGGRO, m_creature);
     }
 
@@ -123,6 +155,7 @@ struct boss_lady_blaumeuxAI : public ScriptedAI
 
     void JustDied(Unit* Killer)
     {
+        boss_four_horsemen_shared::JustDied(Killer);
         DoScriptText(SAY_BLAU_DEATH, m_creature);
     }
 
@@ -174,9 +207,9 @@ CreatureAI* GetAI_boss_lady_blaumeux(Creature* pCreature)
     return new boss_lady_blaumeuxAI(pCreature);
 }
 
-struct boss_highlord_mograineAI : public ScriptedAI
+struct boss_highlord_mograineAI : public boss_four_horsemen_shared
 {
-    boss_highlord_mograineAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_highlord_mograineAI(Creature* pCreature) : boss_four_horsemen_shared(pCreature)
     {
         Reset();
     }
@@ -196,6 +229,7 @@ struct boss_highlord_mograineAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
+        boss_four_horsemen_shared::Aggro(who);
         switch (urand(0, 2))
         {
             case 0:
@@ -217,6 +251,7 @@ struct boss_highlord_mograineAI : public ScriptedAI
 
     void JustDied(Unit* Killer)
     {
+        boss_four_horsemen_shared::JustDied(Killer);
         DoScriptText(SAY_MOG_DEATH, m_creature);
     }
 
@@ -269,9 +304,9 @@ CreatureAI* GetAI_boss_highlord_mograine(Creature* pCreature)
     return new boss_highlord_mograineAI(pCreature);
 }
 
-struct boss_thane_korthazzAI : public ScriptedAI
+struct boss_thane_korthazzAI : public boss_four_horsemen_shared
 {
-    boss_thane_korthazzAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_thane_korthazzAI(Creature* pCreature) : boss_four_horsemen_shared(pCreature)
     {
         Reset();
     }
@@ -291,6 +326,7 @@ struct boss_thane_korthazzAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
+        boss_four_horsemen_shared::Aggro(who);
         DoScriptText(SAY_KORT_AGGRO, m_creature);
     }
 
@@ -301,6 +337,7 @@ struct boss_thane_korthazzAI : public ScriptedAI
 
     void JustDied(Unit* Killer)
     {
+        boss_four_horsemen_shared::JustDied(Killer);
         DoScriptText(SAY_KORT_DEATH, m_creature);
     }
 
@@ -347,9 +384,9 @@ CreatureAI* GetAI_boss_thane_korthazz(Creature* pCreature)
     return new boss_thane_korthazzAI(pCreature);
 }
 
-struct boss_sir_zeliekAI : public ScriptedAI
+struct boss_sir_zeliekAI : public boss_four_horsemen_shared
 {
-    boss_sir_zeliekAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_sir_zeliekAI(Creature* pCreature) : boss_four_horsemen_shared(pCreature)
     {
         Reset();
     }
@@ -369,6 +406,7 @@ struct boss_sir_zeliekAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
+        boss_four_horsemen_shared::Aggro(who);
         DoScriptText(SAY_ZELI_AGGRO, m_creature);
     }
 
@@ -377,8 +415,9 @@ struct boss_sir_zeliekAI : public ScriptedAI
         DoScriptText(SAY_ZELI_SLAY, m_creature);
     }
 
-    void JustDied(Unit* Killer)
+    void JustDied(Unit* Killer) override
     {
+        boss_four_horsemen_shared::JustDied(Killer);
         DoScriptText(SAY_ZELI_DEATH, m_creature);
     }
 
