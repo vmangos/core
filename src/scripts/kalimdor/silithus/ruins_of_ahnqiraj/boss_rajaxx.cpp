@@ -268,7 +268,7 @@ struct boss_rajaxxAI : public ScriptedAI
         }
     }
 
-    bool IsCurrentBossDead()
+    bool IsCurrentWaveDead()
     {
         if (!m_pInstance || (m_uiNextWaveIndex == 0))
             return false;
@@ -320,7 +320,7 @@ struct boss_rajaxxAI : public ScriptedAI
         // Waves launcher
         if (m_pInstance && (m_pInstance->GetData(TYPE_RAJAXX) == IN_PROGRESS))
         {
-            if (IsCurrentBossDead())
+            if (IsCurrentWaveDead())
                 m_uiNextWave_Timer += uiDiff;
             else
                 m_uiNextWave_Timer = 0;
@@ -338,7 +338,7 @@ struct boss_rajaxxAI : public ScriptedAI
             }
             else if (m_uiNextWaveIndex == WAVE_MAX) // Rajaxx
             {
-                if (IsCurrentBossDead())
+                if (IsCurrentWaveDead())
                 {
                     DoScriptText(SAY_WAVE8, m_creature);
                     m_creature->SetInCombatWithZone();

@@ -35,7 +35,7 @@ enum
     L'instance fait le décompte grace a OnCreatureDeath */
 #define WAVE_MAX 7
 #define WAVE_OFFSET 10
-#define WAVE_MEMBERS_INIT_COUNT 1
+#define WAVE_MEMBERS_INIT_COUNT 7
 enum
 {
     TYPE_WAVE1              = WAVE_OFFSET,
