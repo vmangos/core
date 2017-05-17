@@ -17,3 +17,13 @@ UPDATE `gameobject_template` SET `flags` = `flags`| 16 WHERE `entry`='181209';
 -- give maexxna inner web gate GO_FLAG_NO_INTERACT flag. It's toggled by instance script
 UPDATE `gameobject_template` SET `flags` = `flags`| 16, `size`=1.1 WHERE `entry`='181197';
 
+-- Give teleport spell used by portals from end of a wing to center of naxx its target possition (portal to sapphiron)
+DELETE FROM `spell_target_position` where id = 28444;
+INSERT INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`) VALUES ('28444', '533', '3005.8', '-3434.3', '294', '0');
+
+-- Remove the areatrigger to teleport from center of naxx to sapphiron from areatrigger_teleport, 
+-- and add it to scripted_areatrigger instead so we can have a script that checks the required
+-- bosses area dead for the trigger to work.
+DELETE FROM `areatrigger_teleport` where id = 4156;
+DELETE FROM `scripted_areatrigger` where entry = 4156;
+INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4156', 'at_naxxramas');
