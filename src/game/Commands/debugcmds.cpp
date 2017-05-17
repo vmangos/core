@@ -265,6 +265,29 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
     return true;
 }
 
+//Play sound
+bool ChatHandler::HandleDebugPlayScriptText(char* args)
+{
+    // USAGE: .debug play scripttext #id
+    int32 dwSoundId;
+    if (!ExtractInt32(&args, dwSoundId))
+        return false;
+    if (!sScriptMgr.GetTextData(dwSoundId))
+    {
+        PSendSysMessage(LANG_SOUND_NOT_EXIST, dwSoundId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    Unit* unit = getSelectedUnit();
+    if (!unit)
+    {
+        unit = m_session->GetPlayer();
+    }
+
+    DoScriptText(dwSoundId, unit);
+
+    return true;
+}
 //Send notification in channel
 bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 {
