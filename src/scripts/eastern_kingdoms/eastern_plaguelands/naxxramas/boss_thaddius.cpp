@@ -72,8 +72,47 @@ enum
     C_TESLA_COIL                  = 16218                   //the coils (emotes "Tesla Coil overloads!")
 };
 
+struct boss_thaddius : public ScriptedAI
+{
+    instance_naxxramas* m_pInstance;
 
+    boss_thaddius(Creature* pCreature) :
+        ScriptedAI(pCreature)
+    {
+        m_pInstance = (instance_naxxramas*)m_creature->GetInstanceData();
+        if (!m_pInstance)
+            sLog.outError("boss_thaddius ctor could not get instancedata");
+    }
+
+    void Reset() override
+    {
+
+    }
+
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_THADDIUS, FAIL);
+    }
+
+    void JustDied(Unit* Killer) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_THADDIUS, DONE);
+    }
+
+};
+
+CreatureAI* GetAI_boss_thaddius(Creature* pCreature)
+{
+    return new boss_thaddius(pCreature);
+}
 void AddSC_boss_thaddius()
 {
+    Script* NewScript;
 
+    NewScript = new Script;
+    NewScript->Name = "boss_thaddius";
+    NewScript->GetAI = &GetAI_boss_thaddius;
+    NewScript->RegisterSelf();
 }
