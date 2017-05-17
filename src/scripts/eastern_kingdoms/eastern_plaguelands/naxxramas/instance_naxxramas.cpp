@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Instance_Naxxramas
-SD%Complete: 90%
+SD%Complete: 
 SDComment:
 SDCategory: Naxxramas
 EndScriptData */
@@ -27,6 +27,7 @@ EndScriptData */
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
+    m_horsemenDeathCounter(0),
     m_fChamberCenterX(0.0f),
     m_fChamberCenterY(0.0f),
     m_fChamberCenterZ(0.0f)
@@ -201,14 +202,19 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_MILI_GOTH_EXIT_GATE:
             if (m_auiEncounter[TYPE_GOTHIK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_MILI_GOTH_COMBAT_GATE:
+            pGo->SetGoState(GO_STATE_ACTIVE);
             break;
 
         case GO_MILI_HORSEMEN_DOOR:
             if (m_auiEncounter[TYPE_GOTHIK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_CHEST_HORSEMEN_NORM:
@@ -217,41 +223,57 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_CONS_PATH_EXIT_DOOR:
             if (m_auiEncounter[TYPE_PATCHWERK] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_CONS_GLUT_EXIT_DOOR:
             if (m_auiEncounter[TYPE_GLUTH] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_CONS_THAD_DOOR:
             if (m_auiEncounter[TYPE_GLUTH] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_KELTHUZAD_WATERFALL_DOOR:
             if (m_auiEncounter[TYPE_SAPPHIRON] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_ARAC_EYE_RAMP:
             if (m_auiEncounter[TYPE_MAEXXNA] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_PLAG_EYE_RAMP:
             if (m_auiEncounter[TYPE_LOATHEB] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_MILI_EYE_RAMP:
             if (m_auiEncounter[TYPE_FOUR_HORSEMEN] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_CONS_EYE_RAMP:
             if (m_auiEncounter[TYPE_THADDIUS] == DONE)
                 pGo->SetGoState(GO_STATE_ACTIVE);
+            else
+                pGo->SetGoState(GO_STATE_READY);
             break;
 
         case GO_ARAC_PORTAL:
@@ -425,11 +447,24 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
             UpdateBossGate(GO_MILI_PORTAL, uiData);
             UpdateBossGate(GO_MILI_EYE_RAMP, uiData);
-            DoRespawnGameObject(GetGOUuid(GO_MILI_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
-            if (uiData == DONE)
+            if (uiData == SPECIAL)
             {
-                // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE); <<<<<<<<<< What's this for?
+                ++m_horsemenDeathCounter;
+                if (m_horsemenDeathCounter >= 4)
+                {
+                    SetData(TYPE_FOUR_HORSEMEN, DONE);
+                }
             }
+            else if(uiData == FAIL)
+            {
+                m_horsemenDeathCounter = 0;
+            }
+            else if (uiData == DONE)
+            {
+                DoRespawnGameObject(GetGOUuid(GO_MILI_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+                // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE); << << << << << What's this for?
+            }
+                
             break;
         case TYPE_PATCHWERK:
             m_auiEncounter[uiType] = uiData;
@@ -459,7 +494,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_KELTHUZAD_WATERFALL_DOOR, uiData);
             break;
         case TYPE_KELTHUZAD:
-            switch (uiData)
+            switch (uiData) 
             {
                 case SPECIAL:
                 {
@@ -704,6 +739,16 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
 {
     switch (pAt->id)
     {
+    case AREATRIGGER_HUB_TO_FROSTWYRM:
+        if (   GetData(TYPE_MAEXXNA) == DONE
+            && GetData(TYPE_THADDIUS) == DONE
+            && GetData(TYPE_LOATHEB) == DONE
+            && GetData(TYPE_FOUR_HORSEMEN) == DONE
+           )
+        {
+            pPlayer->TeleportTo(toFrostwyrmTPPos);
+        }
+        break;
     case AREATRIGGER_KELTHUZAD:
         if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
         {

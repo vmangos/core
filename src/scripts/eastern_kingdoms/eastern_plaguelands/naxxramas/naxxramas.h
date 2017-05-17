@@ -76,12 +76,18 @@ enum NaxxNPCs : uint32
 
 enum NaxxAreaTriggers : uint32
 {
-    AREATRIGGER_KELTHUZAD   = 4112,
-    AREATRIGGER_FAERLINA    = 4115,     // Used for faerlinas greet message
-    AREATRIGGER_GOTHIK      = 4116,
-    AREATRIGGER_ANUB        = 4119,     // Triggers the greet-message from anub
-    AREATRIGGER_FROSTWYRM   = 4120      // Not needed here, but AT to be scripted
+    AREATRIGGER_KELTHUZAD       = 4112,
+    AREATRIGGER_FAERLINA        = 4115,     // Used for faerlinas greet message
+    AREATRIGGER_GOTHIK          = 4116,
+    AREATRIGGER_ANUB            = 4119,     // Triggers the greet-message from anub
+    
+    // AREATRIGGER_EXIT_NAXXRAMAS      = 
+    AREATRIGGER_BEHIND_FROSTWYRM_TP = 4120, // not sure why this one is there.
+    AREATRIGGER_FROSTWYRM_TP        = 4167,
+    AREATRIGGER_HUB_TO_FROSTWYRM    = 4156,     // Teleport to sapphiron from center of naxx
 };
+static const WorldLocation toFrostwyrmTPPos(533, 3498.0f, -5349.68f, 144.97f, 1.3f);
+static const WorldLocation entranceHubTPPos(533, 3023.52f, -3434.31f, 296.1f, 0.0f);
 
 enum NaxxGOs : uint32
 {
@@ -119,7 +125,10 @@ enum NaxxGOs : uint32
     // Frostwyrm Lair
     GO_KELTHUZAD_WATERFALL_DOOR = 181225,   // exit, open after sapphiron is dead
 
-    // Eyes (goes together with the portals)
+    // Eyes, are located around the central hub in naxx. They are activated when you kill 
+    // the end boss of any wing and light up when activated.
+    // todo: Should they be clicked to activate the tp to frostwyrm lair, 
+    //       or should they be permanently glowing once endbosses are killed?
     GO_ARAC_EYE_RAMP            = 181212,
     GO_PLAG_EYE_RAMP            = 181211,
     GO_MILI_EYE_RAMP            = 181210,
@@ -191,6 +200,7 @@ public:
 
 private:
     bool m_faerlinaHaveGreeted;
+    uint32 m_horsemenDeathCounter;
 protected:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string strInstData;
