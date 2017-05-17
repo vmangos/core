@@ -280,6 +280,19 @@ bool OnTrigger_at_map_chamber(Player* pPlayer, const AreaTriggerEntry *at)
     return true;
 }
 
+bool GOHello_go_altar_of_the_keepers(Player* pPlayer, GameObject* pGo)
+{
+    ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData();
+
+    if (!pInstance)
+        return false;
+
+    if (pPlayer)
+        pPlayer->CastSpell(nullptr, SPELL_ALTAR_SUMMONING_VISUAL, true);
+
+    return true;
+}
+
 class go_altar_of_the_keepersAI : public GameObjectAI
 {
 public:
@@ -522,6 +535,7 @@ void AddSC_uldaman()
     newscript = new Script;
     newscript->Name = "go_altar_of_the_keepers";
     newscript->GOGetAI = &GetAI_go_altar_of_the_keepers;
+    newscript->pGOHello = &GOHello_go_altar_of_the_keepers;
     newscript->RegisterSelf();
 
     newscript = new Script;

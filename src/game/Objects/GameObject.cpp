@@ -1520,7 +1520,7 @@ void GameObject::Use(Unit* user)
             for (GuidsSet::const_iterator itr = m_UniqueUsers.begin(); itr != m_UniqueUsers.end(); ++itr)
             {
                 if (Player* user = GetMap()->GetPlayer(*itr))
-                    if (user && user != owner)
+                    if (user && user != owner && !info->summoningRitual.ritualPersistent)
                     {
                         Spell *channeled = user->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
                         if (channeled && channeled->m_spellInfo->Id == info->summoningRitual.animSpell)

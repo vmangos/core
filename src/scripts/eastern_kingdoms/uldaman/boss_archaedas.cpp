@@ -383,6 +383,20 @@ SDComment: Needs 1 person to activate the Archaedas script
 SDCategory: Uldaman
 EndScriptData */
 
+
+bool GOHello_go_altar_of_archaedas(Player* pPlayer, GameObject* pGo)
+{
+    ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData();
+
+    if (!pInstance)
+        return false;
+
+    if (pPlayer)
+        pPlayer->CastSpell(nullptr, SPELL_ALTAR_SUMMONING_VISUAL, true);
+
+    return true;
+}
+
 class go_altar_of_archaedasAI : public GameObjectAI
 {
 public:
@@ -500,5 +514,6 @@ void AddSC_boss_archaedas()
     newscript = new Script;
     newscript->Name = "go_altar_of_archaedas";
     newscript->GOGetAI = &GetAI_go_altar_of_archaedas;
+    newscript->pGOHello = &GOHello_go_altar_of_archaedas;
     newscript->RegisterSelf();
 }
