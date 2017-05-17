@@ -214,4 +214,6 @@ void AddSC_boss_sapphiron()
     NewScript->Name = "boss_sapphiron";
     NewScript->GetAI = &GetAI_boss_sapphiron;
     NewScript->RegisterSelf();
+
+    //todo: go_sapphiron_birth
 }
