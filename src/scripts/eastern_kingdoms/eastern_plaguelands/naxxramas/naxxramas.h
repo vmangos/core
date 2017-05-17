@@ -42,6 +42,7 @@ enum NaxxNPCs : uint32
     NPC_THADDIUS                = 15928,
     NPC_STALAGG                 = 15929,
     NPC_FEUGEN                  = 15930,
+    NPC_TESLA_COIL              = 16218,
 
     NPC_NOTH                    = 15954,
     NPC_HEIGAN                  = 15936,
@@ -140,11 +141,19 @@ enum NaxxGOs : uint32
     GO_MILI_PORTAL              = 181578,
     GO_CONS_PORTAL              = 181576,
 
+    GO_ARAC_EYE_BOSS            = 181233,
+    GO_PLAG_EYE_BOSS            = 181231,
+    GO_MILI_EYE_BOSS            = 181230,
+    GO_CONS_EYE_BOSS            = 181232,
+
     // Kel'Thuzad window portals. "opening" on 40%
     GO_KT_WINDOW_1              = 181402,
     GO_KT_WINDOW_2              = 181403,
     GO_KT_WINDOW_3              = 181404,
     GO_KT_WINDOW_4              = 181405,
+
+    GO_CONS_NOX_TESLA_FEUGEN    = 181477,
+    GO_CONS_NOX_TESLA_STALAGG   = 181478,
 };
 
 struct GothTrigger
@@ -155,9 +164,6 @@ struct GothTrigger
 
 class instance_naxxramas : public ScriptedInstance
 {
-    std::unordered_map<NaxxGOs, uint64> m_uniqueGOGuids;     // Primarily doors 
-    std::unordered_map<NaxxNPCs, uint64> m_uniqueNPCGuids;    // Primarily bosses
-
 public:
     instance_naxxramas(Map* pMap);
     ~instance_naxxramas() {}
@@ -174,9 +180,6 @@ public:
     uint64 GetData64(uint32 uiData);
 
     uint64 GetGOUuid(NaxxGOs which);
-    GameObject* GetGO(NaxxGOs which);
-
-    Creature* GetUniqueCreature(NaxxNPCs which);
 
     const char* Save() { return strInstData.c_str(); }
     void Load(const char* chrIn);
@@ -198,6 +201,9 @@ public:
     void UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData);
     void UpdateBossGate(NaxxGOs which, uint32 uiData);
 
+    // thaddius
+    void GetThadTeslaCreatures(GuidList& lList) { lList = m_lThadTeslaCoilList; };
+
 private:
     bool m_faerlinaHaveGreeted;
     uint32 m_horsemenDeathCounter;
@@ -207,7 +213,7 @@ protected:
 
     std::list<uint64> m_lGothTriggerList;
     UNORDERED_MAP<uint64, GothTrigger> m_mGothTriggerMap;
-
+    GuidList m_lThadTeslaCoilList;
    
     float m_fChamberCenterX;
     float m_fChamberCenterY;

@@ -64,7 +64,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_RIVENDARE:
         case NPC_SAPPHIRON:
         case NPC_KELTHUZAD:
-            m_uniqueNPCGuids[(NaxxNPCs)pCreature->GetEntry()] = pCreature->GetGUID();
+            m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
         
 
@@ -83,6 +83,11 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
 
         case NPC_SUB_BOSS_TRIGGER:
             m_lGothTriggerList.push_back(pCreature->GetGUID());
+            break;
+        case NPC_TESLA_COIL:
+            m_lThadTeslaCoilList.push_back(pCreature->GetObjectGuid());
+            pCreature->SetFly(true);
+            pCreature->SetLevitate(true);
             break;
     }
 }
@@ -122,14 +127,19 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_PLAG_PORTAL:
         case GO_MILI_PORTAL:
         case GO_CONS_PORTAL:
+        case GO_ARAC_EYE_BOSS:
+        case GO_PLAG_EYE_BOSS:
+        case GO_MILI_EYE_BOSS:
+        case GO_CONS_EYE_BOSS:
         case GO_KT_WINDOW_1:
         case GO_KT_WINDOW_2:
         case GO_KT_WINDOW_3:
         case GO_KT_WINDOW_4:
-            m_uniqueGOGuids[(NaxxGOs)pGo->GetEntry()] = pGo->GetGUID();
+        case GO_CONS_NOX_TESLA_FEUGEN:
+        case GO_CONS_NOX_TESLA_STALAGG:
+            m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }
-
     switch (pGo->GetEntry())
     {
         case GO_ARAC_ANUB_DOOR:
@@ -313,7 +323,7 @@ bool instance_naxxramas::IsEncounterInProgress()
 // when the encounter is defeated, or the raid wipes. This utility function handles that.
 void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
 {
-    if (GameObject* pGo = GetGO(which))
+    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
     {
         switch (uiData)
         {
@@ -334,7 +344,7 @@ void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
 // the door to open. This utility function handles that.
 void instance_naxxramas::UpdateBossGate(NaxxGOs which, uint32 uiData)
 {
-    if (GameObject* pGo = GetGO(which))
+    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
     {
         if(uiData == DONE)
             pGo->SetGoState(GO_STATE_ACTIVE);
@@ -354,7 +364,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_ARAC_ANUB_GATE, uiData);
             UpdateBossEntranceDoor(GO_ARAC_ANUB_DOOR, uiData);
             /*
-            if (GameObject* pGo = GetGO(GO_ARAC_ANUB_DOOR))
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_ARAC_ANUB_DOOR))
             {
                 switch (uiData)
                 {
@@ -391,8 +401,20 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
             UpdateBossGate(GO_ARAC_PORTAL, uiData);
             UpdateBossGate(GO_ARAC_EYE_RAMP, uiData);
-
-            DoRespawnGameObject(GetGOUuid(GO_ARAC_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+            UpdateBossGate(GO_ARAC_EYE_BOSS, uiData);
+            DoRespawnGameObject(GO_ARAC_PORTAL, 30 * MINUTE);
+            if (uiData == DONE)
+            {
+                if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
+                    pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            }
+            else
+            {
+                if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
+                    pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            }
+            
+            //DoRespawnGameObject(GetGOUuid(GO_ARAC_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             break;
         case TYPE_NOTH:
             m_auiEncounter[uiType] = uiData;
@@ -412,7 +434,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
             UpdateBossGate(GO_PLAG_PORTAL, uiData);
             UpdateBossGate(GO_PLAG_EYE_RAMP, uiData);
-            DoRespawnGameObject(GetGOUuid(GO_PLAG_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+            //DoRespawnGameObject(GetGOUuid(GO_PLAG_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             break;
         case TYPE_RAZUVIOUS:
             m_auiEncounter[uiType] = uiData;
@@ -422,7 +444,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_MILI_GOTH_ENTRY_GATE, uiData);
             UpdateBossGate(GO_MILI_GOTH_EXIT_GATE, uiData);
-            if (GameObject* pGO = GetGO(GO_MILI_GOTH_COMBAT_GATE))
+            if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
             {
                 switch (uiData)
                 {
@@ -461,7 +483,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             }
             else if (uiData == DONE)
             {
-                DoRespawnGameObject(GetGOUuid(GO_MILI_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+                //DoRespawnGameObject(GetGOUuid(GO_MILI_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
                 // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE); << << << << << What's this for?
             }
                 
@@ -487,7 +509,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             
             UpdateBossGate(GO_CONS_PORTAL, uiData);
             UpdateBossGate(GO_CONS_EYE_RAMP, uiData);
-            DoRespawnGameObject(GetGOUuid(GO_CONS_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+            //DoRespawnGameObject(GetGOUuid(GO_CONS_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
             break;
         case TYPE_SAPPHIRON:
             m_auiEncounter[uiType] = uiData;
@@ -576,60 +598,24 @@ uint32 instance_naxxramas::GetData(uint32 uiType)
 
 uint64 instance_naxxramas::GetData64(uint32 uiData)
 {
-    sLog.outBasic("instance_naxxramas::GetData64 called. Preferred usage is GetGOUuid and GetUniqueCreature");
-
-    auto itGO = m_uniqueGOGuids.find((NaxxGOs)uiData);
-    if (itGO != m_uniqueGOGuids.end())
-        return itGO->second;
-    auto itC = m_uniqueNPCGuids.find((NaxxNPCs)uiData);
-    if (itC != m_uniqueNPCGuids.end())
-        return itC->second;
-
-    sLog.outError("instance_naxxramas::GetData64 called with param %d, not found", uiData);
+    sLog.outBasic("instance_naxxramas::GetData64 called. Not implemented");
     return 0;
 }
 
 uint64 instance_naxxramas::GetGOUuid(NaxxGOs which)
 {
-    auto it = m_uniqueGOGuids.find(which);
-    if (it == m_uniqueGOGuids.end())
+    auto it = m_mNpcEntryGuidStore.find(which);
+    if (it == m_mNpcEntryGuidStore.end())
     {
-        sLog.outError("instance_naxxramas::GetGO called with param %d, not found", which);
+        sLog.outError("instance_naxxramas::GetGOUuid called with param %d, not found", which);
         return 0;
     }
     return it->second;
 }
 
-GameObject * instance_naxxramas::GetGO(NaxxGOs which)
-{
-    uint64 gob_uuid = GetGOUuid(which);
-    if (gob_uuid) {
-        GameObject* gob = GetGameObject(gob_uuid);
-        if(!gob)
-            sLog.outError("instance_naxxramas::GetGOP called with param %d. Got GUID %llu, but no GO found", which, gob_uuid);
-        return gob;
-    }
-    else
-        return nullptr;
-}
-
-Creature * instance_naxxramas::GetUniqueCreature(NaxxNPCs which)
-{
-    auto it = m_uniqueNPCGuids.find(which);
-    if (it == m_uniqueNPCGuids.end())
-    {
-        sLog.outError("instance_naxxramas::GetUniqueCreature called with param %d, not found", which);
-        return nullptr;
-    }
-    Creature* pCreature = GetCreature(it->second);
-    if(!pCreature)
-        sLog.outError("instance_naxxramas::GetGOP called with param %d. Got GUID %llu, but no GO found", which, it->first);
-    return pCreature;
-}
-
 void instance_naxxramas::SetGothTriggers()
 {
-    Creature* pGoth = GetUniqueCreature(NPC_GOTHIK);
+    Creature* pGoth = GetSingleCreatureFromStorage(NPC_GOTHIK);
 
     if (!pGoth)
         return;
@@ -689,7 +675,7 @@ void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList
 
 bool instance_naxxramas::IsInRightSideGothArea(Unit* pUnit)
 {
-    if (GameObject* pCombatGate = GetGO(GO_MILI_GOTH_COMBAT_GATE))
+    if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());
 
     sLog.outError("left/right side check, Gothik combat area failed.");
@@ -710,7 +696,7 @@ void instance_naxxramas::OnPlayerDeath(Player* p)
         // On player death we spawn 5 scarabs under the player. Since the player
         // can die from falldmg or other sources, anubs script impl of KilledUnit may not
         // be called, thus we need to do it here.
-        if (Creature* pAnub = GetUniqueCreature(NPC_ANUB_REKHAN))
+        if (Creature* pAnub = GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
             pAnub->AI()->DoCast(p, 29105, true);
             for (int i = 0; i < 5; i++)
@@ -763,7 +749,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
         if (!m_faerlinaHaveGreeted)
         {
             m_faerlinaHaveGreeted = true;
-            if (Creature* pFaerlina = GetUniqueCreature(NPC_FAERLINA))
+            if (Creature* pFaerlina = GetSingleCreatureFromStorage(NPC_FAERLINA))
             {
                 if(pFaerlina->isAlive())
                     DoScriptText(-1533009, pFaerlina);
