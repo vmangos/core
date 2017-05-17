@@ -34,7 +34,13 @@ enum
     SPELL_FROST_AURA   = 28531,
     SPELL_LIFE_DRAIN   = 28542,
     SPELL_BLIZZARD     = 28547,
-    SPELL_BESERK       = 26662
+    SPELL_BESERK       = 26662,
+    
+    SPELL_PERIODIC_BUFFET = 29327, // periodically does 29328
+    SPELL_WING_BUFFET = 29328, // is it the spell he does on takeoff, or another one?
+
+
+    SPELL_SAPPHIRON_DIES = 29357, // adds camera-shake.
 };
 
 struct boss_sapphironAI : public ScriptedAI
