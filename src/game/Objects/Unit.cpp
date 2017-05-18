@@ -2738,11 +2738,11 @@ float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 
 
     // PvP - PvE melee chances
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        hitChance = 95.0f + skillDiff * 0.04f;
+        hitChance = 94.4f + skillDiff * 0.04f;
     else if (skillDiff < -10)
-        hitChance = 93.0f + (skillDiff + 10) * 0.4f;        // 7% base chance to miss for big skill diff (%6 in 3.x)
+        hitChance = 93.4f + (skillDiff + 10) * 0.4f;        // 7% ~ 6.60% base chance to miss for big skill diff
     else
-        hitChance = 95.0f + skillDiff * 0.1f;
+        hitChance = 94.4f + skillDiff * 0.1f;
 
     // Hit chance depends from victim auras
     if (attType == RANGED_ATTACK)
@@ -3079,8 +3079,8 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (!pVictim)
         return 0.0f;
 
-    // Base misschance 5%
-    float missChance = 5.0f;
+    // Base misschance 5.60%
+    float missChance = 5.60f;
 
     // DualWield - white damage has additional 19% miss penalty
     if (haveOffhandWeapon() && attType != RANGED_ATTACK)
@@ -3104,7 +3104,7 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
         missChance -= skillDiff * 0.04f;
     else if (skillDiff < -10)
-        missChance -= (skillDiff + 10) * 0.4f - 2.0f;       // 7% base chance to miss for big skill diff (%6 in 3.x)
+        missChance -= (skillDiff + 10) * 0.4f + 1.0f;       // 7% ~ 6.60% base chance to miss for big skill diff
     else
         missChance -=  skillDiff * 0.1f;
 
