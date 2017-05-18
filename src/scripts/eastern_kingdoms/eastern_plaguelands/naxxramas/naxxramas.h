@@ -101,15 +101,16 @@ enum NaxxGOs : uint32
     GO_ARAC_MAEX_OUTER_DOOR     = 181209,   //right before maex
 
     // Plague Quarter
-    GO_PLAG_SLIME01_DOOR        = 181198,   //not used
-    GO_PLAG_SLIME02_DOOR        = 181199,   //not used
     GO_PLAG_NOTH_ENTRY_DOOR     = 181200,   //encounter door
     GO_PLAG_NOTH_EXIT_DOOR      = 181201,   //exit, open when boss dead
     GO_PLAG_HEIG_ENTRY_DOOR     = 181202,
     GO_PLAG_HEIG_EXIT_DOOR      = 181203,   //exit, open when boss dead
+    GO_PLAG_HEIG_OLD_EXIT_DOOR  = 181496,   //between heigan and loatheb. Unsure if used
     GO_PLAG_LOAT_DOOR           = 181241,   //encounter door
 
     // Military Quarter
+    GO_PLAG_SLIME01_DOOR        = 181198,   //not used
+    GO_PLAG_SLIME02_DOOR        = 181199,   //not used
     GO_MILI_GOTH_ENTRY_GATE     = 181124,   //open after razuvious died
     GO_MILI_GOTH_EXIT_GATE      = 181125,   //exit, open at boss dead
     GO_MILI_GOTH_COMBAT_GATE    = 181170,   //used while encounter is in progress
@@ -123,30 +124,32 @@ enum NaxxGOs : uint32
     GO_CONS_GLUT_EXIT_DOOR      = 181120,
     GO_CONS_THAD_DOOR           = 181121,   // Thaddius encounter door
 
+    GO_HUB_PORTAL               = 181229,   // portal to frostwyrm lair
     // Frostwyrm Lair
-    GO_KELTHUZAD_WATERFALL_DOOR = 181225,   // exit, open after sapphiron is dead
+    GO_KELTHUZAD_WATERFALL_DOOR = 181225,   // open after sapphiron is dead
+    GO_KELTHUZAD_DOOR           = 181228,   // open after sapphiron is dead. Possibly not until players are close?
 
-    // Eyes, are located around the central hub in naxx. They are activated when you kill 
-    // the end boss of any wing and light up when activated.
-    // todo: Should they be clicked to activate the tp to frostwyrm lair, 
-    //       or should they be permanently glowing once endbosses are killed?
-    GO_ARAC_EYE_RAMP            = 181212,
-    GO_PLAG_EYE_RAMP            = 181211,
+    // Shiny things appearing at central hub eyes when killing boss
     GO_MILI_EYE_RAMP            = 181210,
+    GO_PLAG_EYE_RAMP            = 181211,
+    GO_ARAC_EYE_RAMP            = 181212,
     GO_CONS_EYE_RAMP            = 181213,
 
-    // Portals (the buggers that port you at the end of a wing)
+    // eye looking things at end of wings. Ports ut to central hub.
     GO_ARAC_PORTAL              = 181575,
+    GO_CONS_PORTAL              = 181576,
     GO_PLAG_PORTAL              = 181577,
     GO_MILI_PORTAL              = 181578,
-    GO_CONS_PORTAL              = 181576,
 
-    GO_ARAC_EYE_BOSS            = 181233,
-    GO_PLAG_EYE_BOSS            = 181231,
+    // Shiny things appearing at above GObs when killing boss.
     GO_MILI_EYE_BOSS            = 181230,
+    GO_PLAG_EYE_BOSS            = 181231,
     GO_CONS_EYE_BOSS            = 181232,
+    GO_ARAC_EYE_BOSS            = 181233,
 
     // Kel'Thuzad window portals. "opening" on 40%
+    // NOTE: the ids are used to loop over the GObjs, 
+    // so if they change, update code in instance_naxxramas::ToggleKelThuzadWindows
     GO_KT_WINDOW_1              = 181402,
     GO_KT_WINDOW_2              = 181403,
     GO_KT_WINDOW_3              = 181404,
@@ -193,16 +196,24 @@ public:
     // kel
     void SetChamberCenterCoords(float fX, float fY, float fZ);
     void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
+    void ToggleKelThuzadWindows(bool setOpen);
 
     void OnPlayerDeath(Player* p) override;
 
     void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
 
-    void UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData);
-    void UpdateBossGate(NaxxGOs which, uint32 uiData);
+    void UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData);  // GO closes when uiData==IN_PROGRESS, otherwise opens
+    void UpdateBossEntranceDoor(GameObject* pGO, uint32 uiData);// GO closes when uiData==IN_PROGRESS, otherwise opens
+    void UpdateBossGate(NaxxGOs which, uint32 uiData);          // GO_STATE_ACTIVE when uiData==DONE, otherwise GO_STATE_READY
+    void UpdateBossGate(GameObject* pGO, uint32 uiData);        // GO_STATE_ACTIVE when uiData==DONE, otherwise GO_STATE_READY
 
     // thaddius
     void GetThadTeslaCreatures(GuidList& lList) { lList = m_lThadTeslaCoilList; };
+
+
+    void UpdateTeleporters(uint32 uiType, uint32 uiData);           // Updates all portals related to an endboss specified by uiType
+    void SetTeleporterVisualState(GameObject* pGO, uint32 uiData);  // Sets the state of a specific eye-portal
+    void SetTeleporterState(GameObject* pGO, uint32 uiData);        // Sets the state of a specific eye-portal visual GO
 
 private:
     bool m_faerlinaHaveGreeted;

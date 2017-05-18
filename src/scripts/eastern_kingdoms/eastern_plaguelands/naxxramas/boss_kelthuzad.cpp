@@ -211,7 +211,10 @@ struct boss_kelthuzadAI : public ScriptedAI
     void JustReachedHome()
     {
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_KELTHUZAD, FAIL);
+            m_pInstance->ToggleKelThuzadWindows(false);
+        }
 
         DespawnAllIntroCreatures();
     }
@@ -561,6 +564,12 @@ struct boss_kelthuzadAI : public ScriptedAI
             //here Lich King should respond to KelThuzad but I don't know which creature to make talk
             //so for now just make Kelthuzad says it.
             DoScriptText(SAY_ANSWER_REQUEST, m_creature);
+
+            // "open the blinds", that is, at p3 start, the portals blocking the windows
+            // dissapear, and it's possible to see outside.
+            if (m_pInstance) {
+                m_pInstance->ToggleKelThuzadWindows(true);
+            }
         }
 
         if (m_bIsPhase3 && m_uiGuardiansCount < m_uiGuardiansCountMax)

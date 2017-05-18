@@ -40,6 +40,135 @@ void instance_naxxramas::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 }
 
+void instance_naxxramas::SetTeleporterVisualState(GameObject* pGO, uint32 uiData)
+{
+    if (uiData == DONE)
+        pGO->SetGoState(GO_STATE_ACTIVE);
+    else
+        pGO->SetGoState(GO_STATE_READY);
+}
+
+void instance_naxxramas::SetTeleporterState(GameObject* pGO, uint32 uiData)
+{
+    SetTeleporterVisualState(pGO, uiData);
+    if (uiData == DONE)
+        pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+    else
+        pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+}
+
+void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
+{
+    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
+    {
+        UpdateBossEntranceDoor(pGo, uiData);
+    }
+}
+
+void instance_naxxramas::UpdateBossEntranceDoor(GameObject* pGO, uint32 uiData)
+{
+    if (!pGO)
+    {
+        sLog.outError("instance_naxxramas::UpdateBossEntranceDoor called with nullptr GO");
+        return;
+    }
+    if (uiData == IN_PROGRESS)
+        pGO->SetGoState(GO_STATE_READY);
+    else
+        pGO->SetGoState(GO_STATE_ACTIVE);
+}
+
+void instance_naxxramas::UpdateBossGate(NaxxGOs which, uint32 uiData)
+{
+    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
+    {
+        UpdateBossGate(pGo, uiData);
+    }
+}
+
+void instance_naxxramas::UpdateBossGate(GameObject* pGO, uint32 uiData)
+{
+    if (!pGO)
+    {
+        sLog.outError("instance_naxxramas::UpdateBossGate called with nullptr GO");
+        return;
+    }
+    if (uiData == DONE)
+        pGO->SetGoState(GO_STATE_ACTIVE);
+    else
+        pGO->SetGoState(GO_STATE_READY);
+}
+
+void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
+{
+    // todo: what was the reason behind these? Should they despawn after 30 minutes?
+    // DoRespawnGameObject(GO_<WING>_PORTAL, 30 * MINUTE);
+    switch (uiType)
+    {
+    case TYPE_MAEXXNA:
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_BOSS))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_EYE_RAMP))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
+            SetTeleporterState(pGO, uiData);
+        break;
+    case TYPE_THADDIUS:
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_BOSS))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_EYE_RAMP))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_CONS_PORTAL))
+            SetTeleporterState(pGO, uiData);
+        break;
+    case TYPE_LOATHEB:
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_BOSS))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_EYE_RAMP))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_PLAG_PORTAL))
+            SetTeleporterState(pGO, uiData);
+        break;
+    case TYPE_FOUR_HORSEMEN:
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_BOSS))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_EYE_RAMP))
+            SetTeleporterVisualState(pGO, uiData);
+
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_PORTAL))
+            SetTeleporterState(pGO, uiData);
+        break;
+    default:
+        sLog.outError("instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
+    }
+
+    if (   m_auiEncounter[TYPE_THADDIUS] == DONE
+        && m_auiEncounter[TYPE_LOATHEB] == DONE
+        && m_auiEncounter[TYPE_FOUR_HORSEMEN] == DONE
+        && m_auiEncounter[TYPE_MAEXXNA] == DONE
+       )
+    {
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_HUB_PORTAL))
+        {
+            pGO->SetGoState(GO_STATE_ACTIVE);
+        }
+    }
+    else 
+    {
+        if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_HUB_PORTAL))
+        {
+            pGO->SetGoState(GO_STATE_READY);
+        }
+    }
+}
+
 void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
 {
     switch (pCreature->GetEntry())
@@ -85,6 +214,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
         case NPC_TESLA_COIL:
+            // todo: probably despawn if thaddius is dead.
             m_lThadTeslaCoilList.push_back(pCreature->GetObjectGuid());
             pCreature->SetFly(true);
             pCreature->SetLevitate(true);
@@ -108,6 +238,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_PLAG_NOTH_EXIT_DOOR:
         case GO_PLAG_HEIG_ENTRY_DOOR:
         case GO_PLAG_HEIG_EXIT_DOOR:
+        case GO_PLAG_HEIG_OLD_EXIT_DOOR:
         case GO_PLAG_LOAT_DOOR:
         case GO_MILI_GOTH_ENTRY_GATE:
         case GO_MILI_GOTH_EXIT_GATE:
@@ -119,6 +250,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_CONS_GLUT_EXIT_DOOR:
         case GO_CONS_THAD_DOOR:
         case GO_KELTHUZAD_WATERFALL_DOOR:
+        case GO_KELTHUZAD_DOOR:
         case GO_ARAC_EYE_RAMP:
         case GO_PLAG_EYE_RAMP:
         case GO_MILI_EYE_RAMP:
@@ -137,165 +269,120 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_KT_WINDOW_4:
         case GO_CONS_NOX_TESLA_FEUGEN:
         case GO_CONS_NOX_TESLA_STALAGG:
+        case GO_HUB_PORTAL:
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }
+    
     switch (pGo->GetEntry())
     {
+        // Arac wing
         case GO_ARAC_ANUB_DOOR:
-            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
-            {
-                pGo->SetGoState(GO_STATE_ACTIVE);
-                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
-            else
-            {
-                pGo->SetGoState(GO_STATE_READY);
-                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
+            // opening probably linked to trash
+            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_ANUB_REKHAN]);
             break;
-
         case GO_ARAC_ANUB_GATE:
-            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_ANUB_REKHAN]);
             break;
-
         case GO_ARAC_FAER_WEB:
             pGo->SetGoState(GO_STATE_ACTIVE);
-            //PreMapAddOpenDoor(pGo);
             break;
-
         case GO_ARAC_FAER_DOOR:
-            if (m_auiEncounter[TYPE_FAERLINA] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+        case GO_ARAC_MAEX_OUTER_DOOR:
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_FAERLINA]);
             break;
-
         case GO_ARAC_MAEX_INNER_DOOR:
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
-        case GO_ARAC_MAEX_OUTER_DOOR:
-            if (m_auiEncounter[TYPE_FAERLINA] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else 
-                pGo->SetGoState(GO_STATE_READY);
-            break;
-
-        case GO_PLAG_NOTH_ENTRY_DOOR:
+        
             
+        // Plague wing
+        case GO_PLAG_NOTH_ENTRY_DOOR:
+            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_NOTH]);
             break;
         case GO_PLAG_NOTH_EXIT_DOOR:
-            if (m_auiEncounter[TYPE_NOTH] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_NOTH]);
             break;
-
         case GO_PLAG_HEIG_ENTRY_DOOR:
-            if (m_auiEncounter[TYPE_NOTH] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
+            // todo: this gate does not close instantly on pull, but rather a while later
+            // https://www.youtube.com/watch?v=kCnk6lwi2ug
+            // This might be the case for more than this boss-entrance door.
+            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
-
         case GO_PLAG_HEIG_EXIT_DOOR:
-            if (m_auiEncounter[TYPE_HEIGAN] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            break;
-
+        case GO_PLAG_HEIG_OLD_EXIT_DOOR:
         case GO_PLAG_LOAT_DOOR:
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
-
+        
+        // -- Millitary wing
         case GO_MILI_GOTH_ENTRY_GATE:
+            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_GOTHIK]);
             break;
-
         case GO_MILI_GOTH_EXIT_GATE:
-            if (m_auiEncounter[TYPE_GOTHIK] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+        case GO_MILI_HORSEMEN_DOOR:
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_GOTHIK]);
             break;
-
         case GO_MILI_GOTH_COMBAT_GATE:
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-
-        case GO_MILI_HORSEMEN_DOOR:
-            if (m_auiEncounter[TYPE_GOTHIK] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
-            break;
-
         case GO_CHEST_HORSEMEN_NORM:
+            //todo: anything to be done?
             break;
 
+        
+        // -- Cons wing doors 
         case GO_CONS_PATH_EXIT_DOOR:
-            if (m_auiEncounter[TYPE_PATCHWERK] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_PATCHWERK]);
             break;
-
         case GO_CONS_GLUT_EXIT_DOOR:
-            if (m_auiEncounter[TYPE_GLUTH] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
-            break;
-
         case GO_CONS_THAD_DOOR:
-            if (m_auiEncounter[TYPE_GLUTH] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_GLUTH]);
             break;
 
+
+        // -- Frostwyrm lair 
         case GO_KELTHUZAD_WATERFALL_DOOR:
-            if (m_auiEncounter[TYPE_SAPPHIRON] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_SAPPHIRON]);
+            break;
+        case GO_KELTHUZAD_DOOR:
+            // todo: At least in wotlk an RP event started when players came close
+            // to this door, and only after the RP the door opened (aka not when sapphiron dies).
+            // unknown if this is the case in vanilla.
+            UpdateBossGate(pGo, m_auiEncounter[TYPE_SAPPHIRON]);
             break;
 
+
+        // --- Teleporters visual thing
         case GO_ARAC_EYE_RAMP:
-            if (m_auiEncounter[TYPE_MAEXXNA] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+        case GO_ARAC_EYE_BOSS:
+            SetTeleporterVisualState(pGo, m_auiEncounter[TYPE_MAEXXNA]);
             break;
-
         case GO_PLAG_EYE_RAMP:
-            if (m_auiEncounter[TYPE_LOATHEB] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+        case GO_PLAG_EYE_BOSS:
+            SetTeleporterVisualState(pGo, m_auiEncounter[TYPE_LOATHEB]);
             break;
-
         case GO_MILI_EYE_RAMP:
-            if (m_auiEncounter[TYPE_FOUR_HORSEMEN] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+        case GO_MILI_EYE_BOSS:
+            SetTeleporterVisualState(pGo, m_auiEncounter[TYPE_FOUR_HORSEMEN]);
             break;
-
         case GO_CONS_EYE_RAMP:
-            if (m_auiEncounter[TYPE_THADDIUS] == DONE)
-                pGo->SetGoState(GO_STATE_ACTIVE);
-            else
-                pGo->SetGoState(GO_STATE_READY);
+        case GO_CONS_EYE_BOSS:
+            SetTeleporterVisualState(pGo, m_auiEncounter[TYPE_THADDIUS]);
             break;
 
+        // --- Actual teleporters
         case GO_ARAC_PORTAL:
+            SetTeleporterState(pGo, m_auiEncounter[TYPE_MAEXXNA]);
             break;
-
         case GO_PLAG_PORTAL:
+            SetTeleporterState(pGo, m_auiEncounter[TYPE_LOATHEB]);
             break;
-
         case GO_MILI_PORTAL:
+            SetTeleporterState(pGo, m_auiEncounter[TYPE_FOUR_HORSEMEN]);
             break;
-
         case GO_CONS_PORTAL:
+            SetTeleporterState(pGo, m_auiEncounter[TYPE_THADDIUS]);
             break;
 
         case GO_KT_WINDOW_1:
@@ -307,6 +394,14 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             else
                 pGo->SetGoState(GO_STATE_READY);
             break;
+
+        case GO_CONS_NOX_TESLA_FEUGEN:
+        case GO_CONS_NOX_TESLA_STALAGG:
+            if (m_auiEncounter[TYPE_THADDIUS] == DONE)
+                pGo->SetGoState(GO_STATE_READY);
+            else
+                pGo->SetGoState(GO_STATE_ACTIVE);
+
     }
 }
 
@@ -319,40 +414,6 @@ bool instance_naxxramas::IsEncounterInProgress()
     return false;
 }
 
-// Many doors in naxx leading into encounters close when encounter is started and open
-// when the encounter is defeated, or the raid wipes. This utility function handles that.
-void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
-{
-    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
-    {
-        switch (uiData)
-        {
-        case NOT_STARTED:
-        case FAIL:
-        case DONE:
-        case SPECIAL:
-            pGo->SetGoState(GO_STATE_ACTIVE);
-            break;
-        case IN_PROGRESS:
-            pGo->SetGoState(GO_STATE_READY);
-            break;
-        }
-    }
-}
-
-// Many doors in naxx act as gates, where you have to kill the previous boss for 
-// the door to open. This utility function handles that.
-void instance_naxxramas::UpdateBossGate(NaxxGOs which, uint32 uiData)
-{
-    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
-    {
-        if(uiData == DONE)
-            pGo->SetGoState(GO_STATE_ACTIVE);
-        else
-            pGo->SetGoState(GO_STATE_READY);
-    }
-}
-
 void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 {
     ASSERT(this)
@@ -362,29 +423,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         case TYPE_ANUB_REKHAN:
             m_auiEncounter[uiType] = uiData;
             UpdateBossGate(GO_ARAC_ANUB_GATE, uiData);
+            // opening probably linked to trash
             UpdateBossEntranceDoor(GO_ARAC_ANUB_DOOR, uiData);
-            /*
-            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_ARAC_ANUB_DOOR))
-            {
-                switch (uiData)
-                {
-                case NOT_STARTED:
-                    pGo->SetGoState(GO_STATE_READY);
-                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                    break;
-                case IN_PROGRESS:
-                    pGo->SetGoState(GO_STATE_READY);
-                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                    break;
-                case FAIL:
-                case DONE:
-                case SPECIAL:
-                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-                    pGo->SetGoState(GO_STATE_ACTIVE);
-                    break;
-                }
-            }
-            */
 
             break;
         case TYPE_FAERLINA:
@@ -399,22 +439,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         case TYPE_MAEXXNA:
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
-            UpdateBossGate(GO_ARAC_PORTAL, uiData);
-            UpdateBossGate(GO_ARAC_EYE_RAMP, uiData);
-            UpdateBossGate(GO_ARAC_EYE_BOSS, uiData);
-            DoRespawnGameObject(GO_ARAC_PORTAL, 30 * MINUTE);
-            if (uiData == DONE)
-            {
-                if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
-                    pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
-            else
-            {
-                if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_ARAC_PORTAL))
-                    pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-            }
-            
-            //DoRespawnGameObject(GetGOUuid(GO_ARAC_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+            UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_NOTH:
             m_auiEncounter[uiType] = uiData;
@@ -428,13 +453,13 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, uiData);
             UpdateBossGate(GO_PLAG_HEIG_EXIT_DOOR, uiData);
+            UpdateBossGate(GO_PLAG_HEIG_OLD_EXIT_DOOR, uiData);
+            UpdateBossGate(GO_PLAG_LOAT_DOOR, uiData);
             break;
         case TYPE_LOATHEB:
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
-            UpdateBossGate(GO_PLAG_PORTAL, uiData);
-            UpdateBossGate(GO_PLAG_EYE_RAMP, uiData);
-            //DoRespawnGameObject(GetGOUuid(GO_PLAG_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+            UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_RAZUVIOUS:
             m_auiEncounter[uiType] = uiData;
@@ -444,6 +469,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_MILI_GOTH_ENTRY_GATE, uiData);
             UpdateBossGate(GO_MILI_GOTH_EXIT_GATE, uiData);
+            UpdateBossGate(GO_MILI_HORSEMEN_DOOR, uiData);
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
             {
                 switch (uiData)
@@ -467,8 +493,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         case TYPE_FOUR_HORSEMEN:
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
-            UpdateBossGate(GO_MILI_PORTAL, uiData);
-            UpdateBossGate(GO_MILI_EYE_RAMP, uiData);
+            UpdateTeleporters(uiType, uiData);
+
             if (uiData == SPECIAL)
             {
                 ++m_horsemenDeathCounter;
@@ -483,9 +509,10 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             }
             else if (uiData == DONE)
             {
-                //DoRespawnGameObject(GetGOUuid(GO_MILI_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
-                // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE); << << << << << What's this for?
+                // todo: (gemt) i commented this out. Is it to despawn chest after 30 minutes?
+                // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE);
             }
+            
                 
             break;
         case TYPE_PATCHWERK:
@@ -507,15 +534,16 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
             
-            UpdateBossGate(GO_CONS_PORTAL, uiData);
-            UpdateBossGate(GO_CONS_EYE_RAMP, uiData);
-            //DoRespawnGameObject(GetGOUuid(GO_CONS_PORTAL), 30 * MINUTE); //1.8sec? and what does it do
+            UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_SAPPHIRON:
             m_auiEncounter[uiType] = uiData;
             UpdateBossGate(GO_KELTHUZAD_WATERFALL_DOOR, uiData);
+            // todo: Should possibly be opened when players get close instead, after an RP event
+            UpdateBossGate(GO_KELTHUZAD_DOOR, uiData);
             break;
         case TYPE_KELTHUZAD:
+            UpdateBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData);
             switch (uiData) 
             {
                 case SPECIAL:
@@ -687,6 +715,15 @@ void instance_naxxramas::SetChamberCenterCoords(float fX, float fY, float fZ)
     m_fChamberCenterX = fX;
     m_fChamberCenterY = fY;
     m_fChamberCenterZ = fZ;
+}
+
+void instance_naxxramas::ToggleKelThuzadWindows(bool setOpen)
+{
+    for (int i = GO_KT_WINDOW_1; i <= GO_KT_WINDOW_4; i++)
+    {
+        if (GameObject* pGo = GetSingleGameObjectFromStorage(i))
+            pGo->SetGoState(setOpen ? GO_STATE_ACTIVE : GO_STATE_READY);
+    }
 }
 
 void instance_naxxramas::OnPlayerDeath(Player* p)
