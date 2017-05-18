@@ -314,55 +314,93 @@ DELETE FROM `gameobject_template` WHERE `entry` IN(
 193426,
 194022);
 
+
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `ScriptName`) VALUES
-(175369, 0, 3614, 'Elders\' Square Service Entrance', 0, 34, 1, 0, 879, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(175370, 0, 3614, 'Doodad_SmallPortcullis05', 0, 34, 1, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181119, 0, 6672, 'Deathknight Door', 0, 34, 1, 0, 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181120, 0, 6673, 'Gluth - Exit Door', 34, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181121, 0, 6674, 'Thaddius Door', 0, 34, 1, 0, 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181123, 0, 6676, 'Patchwork - Exit Door', 0, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181124, 0, 6676, 'Vaccuum - Enter Gate', 0, 34, 0.82, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181125, 0, 6676, 'Vaccuum - Exit Gate', 0, 34, 0.79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181126, 0, 6677, 'Anub\'Rekhan Door', 0, 32, 1, 1, 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+/*
+data0: startOpen;      - used client side to determine GO_ACTIVATED means open/closed
+data1: lockId;         - -> Lock.dbc
+data2: autoCloseTime;  - secs till autoclose = autoCloseTime / 0x10000
+data3: noDamageImmune; - break opening whenever you recieve damage?
+data4: openTextID;     - can be used to replace castBarCaption?
+data5: closeTextID;    - 
+*/
+/* Flags
+1  = disables interaction while animated
+2  = require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
+4  = cannot interact (condition to interact) (means no tooltip, no highlight, no nothing)
+8  = any kind of transport? Object can transport (elevator, boat, car)
+16 = players cannot interact with this go (often need to remove flag in event) (means no tooltip, no highlight, no nothing)
+32 = never despawn, typically for doors, they just change state
+64 = typically, summoned objects. Triggered by spell or other events
+
+seems there is no difference between flag 4 and 16?
+48 - never despawn and cannt interract. Seems correct for doors. Its known that blizzards naxx doors displayed their names (doodad_xxx), but we don't have the same names, and it
+complicates things, so screw it.
+*/
+-- these two are kindof pointless. They are the gates at strat entrance, so never visible for players in naxx. But i guess, for authenticity!
+(175369, 0, 3614, 'Elders\' Square Service Entrance',   0, 34, 1, 0, 879, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(175370, 0, 3614, 'Doodad_SmallPortcullis05',           0, 34, 1, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+-- doors                                               `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`,
+(181126, 0, 6677, 'Anub\'Rekhan Door',                  0,         48,      1,      0,       86,      0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181195, 0, 2451, 'Anub\'Rekhan Gate',                  0,         48,      0.54,   0,       86,      0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181235, 0, 6687, 'Grand Widow Faerlina - Wezb',        0,         48,      1,      1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(194022, 0, 6677, 'Doodad_Nox_door_spider02',           0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181209, 0, 6688, 'Maexxna - Outer Web Door',           0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181197, 0, 6688, 'Maexxna - Inner Web Door',           0,         48,      1,      1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+                                                                                                               
+(181198, 0, 6689, 'Doodad_Nox_door_slime01',            0,         48,      0.79,   1,       0,       3000,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181199, 0, 6689, 'Doodad_Nox_door_slime02',            0,         48,      1,      1,       0,       3000,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+-- vacuum are gothik gates                                                                                     
+(181124, 0, 6676, 'Vaccuum - Enter Gate',               0,         48,      0.82,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181125, 0, 6676, 'Vaccuum - Exit Gate',                0,         48,      0.79,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181170, 0, 6685, 'Vaccuum - Combat Gate',              0,         48,      1.05,   1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181119, 0, 6672, 'Deathknight Door',                   0,         48,      1,      0,       86,      0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+                                                                                                               
+(181123, 0, 6676, 'Patchwork - Exit Door',              0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181120, 0, 6673, 'Gluth - Exit Door',                  0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181121, 0, 6674, 'Thaddius Door',                      0,         48,      1,      0,       86,      0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+                                                                                                               
+(181200, 0, 6689, 'Noth - Entry Door',                  0,         48,      1,      1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181201, 0, 6689, 'Noth - Exit Door',                   0,         48,      1.15,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181202, 0, 6689, 'Heigan the Unclean - Entry Door',    0,         48,      0.99,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181203, 0, 6689, 'Heigan the Unclean - Exit Door',     0,         48,      1.02,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181496, 0, 6675, 'Heigan - Old Exit Door',             0,         48,      1,      1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181241, 0, 6675, 'Loatheb - Entrance Door',            0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181240, 0, 6702, 'Loatheb Fight Door 01 (not used)',   0,         48,      1.71,   0,       0,       3000,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181242, 0, 6675, 'Loatheb Fight Door 02 (not used)',   0,         48,      0.59,   0,       0,       3000,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181243, 0, 6675, 'Loatheb Fight Door 03 (not used)',   0,         48,      0.59,   0,       0,       3000,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+                                                                                                               
+(181225, 0, 6695, 'Frostwyrm Waterfall Door',           0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181228, 0, 6675, 'KelThuzad Door',                     0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+
+-- just visuals. Unknown if they should be targetable and clickable or not.
 (181168, 10, 6684, 'Icebellow Furnace', 0, 0, 1, 0, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 3, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181169, 10, 6684, 'Icebellow Furnace', 0, 0, 1, 0, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 3, 1, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181170, 0, 6685, 'Vaccuum - Combat Gate', 34, 0, 1.05, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181195, 0, 2451, 'Anub\'Rekhan Gate', 0, 34, 0.54, 0, 86, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181197, 0, 6688, 'Maexxna - Inner Web Door', 0, 34, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181198, 0, 6689, 'Doodad_Nox_door_slime01', 0, 34, 0.79, 1, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181199, 0, 6689, 'Doodad_Nox_door_slime02', 0, 34, 1, 1, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181200, 0, 6689, 'Noth - Entry Door', 0, 34, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181201, 0, 6689, 'Noth - Exit Door', 0, 34, 1.15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181202, 0, 6689, 'Heigan the Unclean - Entry Door', 0, 34, 0.99, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181203, 0, 6689, 'Heigan the Unclean - Exit Door', 0, 34, 1.02, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181209, 0, 6688, 'Maexxna - Outer Web Door', 0, 0, 1, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181210, 0, 6691, 'Deathknight Wing Eye Portal Ramp', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181211, 0, 6692, 'Plague Wing Eye Portal Ramp', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181212, 0, 6693, 'Spider Wing Eye Portal Ramp', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181213, 0, 6694, 'Abom Wing Eye Portal Ramp', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181225, 0, 6695, 'Frostwyrm Waterfall Door', 0, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181228, 0, 6675, 'KelThuzad Door', 0, 34, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181229, 0, 6696, 'Portal', 0, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181230, 0, 6697, 'Deathknight Wing Eye Portal Boss', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181231, 0, 6698, 'Plague Wing Eye Portal Boss', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181232, 0, 6699, 'Abom Wing Eye Portal Boss', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181233, 0, 6700, 'Spider Wing Eye Portal Boss', 0, 32, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181234, 8, 6701, 'Icebellow Anvil', 0, 0, 1, 1362, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181235, 0, 6687, 'Grand Widow Faerlina - Web', 0, 34, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181240, 0, 6702, 'Loatheb Fight Door 01 (not used)', 0, 34, 1.71, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181241, 0, 6675, 'Loatheb - Entrance Door', 0, 34, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181242, 0, 6675, 'Loatheb Fight Door 02 (not used)', 0, 34, 0.59, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181243, 0, 6675, 'Loatheb Fight Door 03 (not used)', 0, 34, 0.59, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+
+-- The scattered remains of sapphiron when you first get to him.
 (181356, 6, 6747, 'Sapphiron Birth', 0, 0, 1, 0, 63, 80, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_sapphiron_birth'),
+
+
+-- which one is correct?
 (181366, 3, 1387, 'Four Horsemen Chest', 0, 0, 1, 1634, 25192, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181402, 0, 6770, 'Doodad_kelthuzad_window_portal01', 0, 38, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181403, 0, 6770, 'Doodad_kelthuzad_window_portal02', 0, 38, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181404, 0, 6770, 'Doodad_kelthuzad_window_portal03', 0, 38, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181405, 0, 6770, 'Doodad_kelthuzad_window_portal04', 0, 38, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(193426, 3, 1387, 'Four Horsemen Chest', 0, 0, 1, 1634, 25193, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+
+-- Not sure what this is used for, or if we need it
 (181444, 1, 8093, 'Kel\'Thuzad Trigger', 0, 0, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181477, 1, 6775, 'Doodad_nox_tesla05', 0, 32, 1.78, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181478, 1, 6775, 'Doodad_nox_tesla06', 0, 32, 1.78, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181496, 0, 6675, 'Heigan - Old Exit Door', 0, 32, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+(181640, 7, 6690, 'Doodad_kelthuzad_throne02', 0, 48, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+-- Thaddius. Not sure if they should be targetable 
+(181477, 1, 6775, 'Doodad_nox_tesla05', 0, 48, 1.78, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181478, 1, 6775, 'Doodad_nox_tesla06', 0, 48, 1.78, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+-- Heigan plague fissures
 (181510, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181511, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181512, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
@@ -406,17 +444,63 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `factio
 (181550, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181551, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181552, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181575, 10, 6787, 'Naxxramas Portal', 0, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28444, 1, 129, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181576, 10, 6788, 'Naxxramas Portal', 0, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28444, 1, 129, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181577, 10, 6789, 'Naxxramas Portal', 0, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28444, 1, 129, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181578, 10, 6790, 'Naxxramas Portal', 0, 16, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 28444, 1, 129, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181640, 7, 6690, 'Doodad_kelthuzad_throne02', 0, 16, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+-- more fizzures, but grouped differently. Make sure there i s no good reason for this
 (181676, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181677, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181678, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181695, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(193426, 3, 1387, 'Four Horsemen Chest', 0, 0, 1, 1634, 25193, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(194022, 0, 6677, 'Doodad_Nox_door_spider02', 0, 34, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+-- Also around KT's chamber.  Blocks the view out, seems to open at 40% 
+(181402, 0, 6770, 'Doodad_kelthuzad_window_portal01',   0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181403, 0, 6770, 'Doodad_kelthuzad_window_portal02',   0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181404, 0, 6770, 'Doodad_kelthuzad_window_portal03',   0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181405, 0, 6770, 'Doodad_kelthuzad_window_portal04',   0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+-- The eyes at the end bosses. Teleports us when boss is dead.
+-- untargetable and no interract flags removed by script when boss is dead.
+/*
+data0: open (LockId from Lock.dbc)
+data1: questID (Required active quest_template.entry to work)
+data2: eventID (The id of the event that the gameobject will activate)
+data3: autoClose (most be the same like doors (65536 * seconds))
+data4: customAnim (unknown)
+data5: consumable (Boolean flag controling if gameobject will despawn or not)
+data6: cooldown (time in seconds)
+data7: pageID (page_text.entry)
+data8: language (from Languages.dbc)
+data9: pageMaterial (PageTextMaterial.dbc)
+data10: spell (Spell Id from spell.dbc)
+data11: noDamageImmune (Boolean flag)
+data12: linkedTrap (gameobject_template.entry (Spawned GO type 6))
+data13: large? (Boolean flag)
+data14: openTextID (Unknown ID)
+data15: closeTextID (Unknown ID)
+data16: losOK (Boolean flag)
+*/
+--                                                     `fact flgs sz   d0  d1  d2 d3 d4 d5 d6 d7 d8 d9 d10    d11 d12 d13 d14 d15 d16 d17
+(181575, 10, 6787, 'Naxxramas Portal',                  0,   48,   1,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 28444, 0,  0/*129*/, 0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181576, 10, 6788, 'Naxxramas Portal',                  0,   48,   1,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 28444, 0,  0/*129*/, 0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181577, 10, 6789, 'Naxxramas Portal',                  0,   48,   1,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 28444, 0,  0/*129*/, 0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181578, 10, 6790, 'Naxxramas Portal',                  0,   48,   1,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 28444, 0,  0/*129*/, 0,  0,  0,  0,  0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+-- the shiny stuff appearing on the eyes (portals) above, when killing endboss
+(181230, 0, 6697, 'Deathknight Wing Eye Portal Boss',   0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181231, 0, 6698, 'Plague Wing Eye Portal Boss',        0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181232, 0, 6699, 'Abom Wing Eye Portal Boss',          0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181233, 0, 6700, 'Spider Wing Eye Portal Boss',        0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+-- Shiny portals appearing when killing endbosses
+(181210, 0, 6691, 'Deathknight Wing Eye Portal Ramp',   0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181211, 0, 6692, 'Plague Wing Eye Portal Ramp',        0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181212, 0, 6693, 'Spider Wing Eye Portal Ramp',        0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181213, 0, 6694, 'Abom Wing Eye Portal Ramp',          0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+
+
+-- portal to frostwyrm lair
+(181229, 0, 6696, 'Portal', 0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
+
+
+
 
 -- script added to anub'rekhans door so we can do anubs welcome msg in onUse for the door
 UPDATE `gameobject_template` SET `ScriptName`='go_anub_door' WHERE `entry`='181126';
@@ -425,18 +509,5 @@ UPDATE `gameobject_template` SET `ScriptName`='go_anub_door' WHERE `entry`='1811
 DELETE FROM `scripted_areatrigger` where entry = 4115;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4115', 'at_naxxramas');
 
-
--- Give Doodad_kelthuzad_window_portal0(1,2,3,4)  GO_FLAG_NO_INTERACT
-UPDATE `gameobject_template` SET `flags` = flags| 16 WHERE `entry` in (
-181402, -- |
-181403, -- | 
-181404, -- | Doodad_kelthuzad_window_portal0(1,2,3,4)
-181405, -- | 
-181197, -- maexxna inner web gate
-181209, -- maexxna outer web gate
-181235, -- Faerlina web
-181195, -- Anub'rekhan gate
-181640 -- Doodad_kelthuzad_throne02
-);
 SELECT * FROM mangos.gameobject_template where entry in (select id from mangos.gameobject where map = 533) and type = 0;
 
