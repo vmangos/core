@@ -26,15 +26,33 @@ EndScriptData */
 
 enum
 {
-    SPELL_WEBWRAP           = 28622,                        //Spell is normally used by the webtrap on the wall NOT by Maexxna
+    SPELL_WEBWRAP           = 28622,    //Spell is normally used by the webtrap on the wall NOT by Maexxna
 
     SPELL_WEBSPRAY          = 29484,
     SPELL_POISONSHOCK       = 28741,
-    SPELL_NECROTICPOISON    = 28776,
-    SPELL_FRENZY            = 54123,
+    SPELL_NECROTICPOISON    = 28776,    // 90% reduced healing. Dispelllable
+    SPELL_FRENZY            = 28747,    // 30% enrage
 
     //spellId invalid
     SPELL_SUMMON_SPIDERLING = 29434,
+
+
+    // from cmangos, unimplemented
+    EMOTE_SPIN_WEB = -1533146,
+    EMOTE_SPIDERLING = -1533147,
+    EMOTE_SPRAY = -1533148,
+    EMOTE_BOSS_GENERIC_FRENZY = -1000005,
+
+    SPELL_DOUBLE_ATTACK = 19818, // seems it adds an aura, must be removed manually?
+
+    //SPELL_WEBWRAP = 28622,
+    SPELL_WEBWRAP_2 = 28673,                    // purpose unknown
+
+    NPC_WEB_WRAP = 16486,
+    NPC_SPIDERLING = 17055,
+
+    MAX_SPIDERLINGS = 10, // 8 in cmangos, should be 10 
+    MAX_WEB_WRAP_POSITIONS = 3,
 };
 
 static constexpr float locs[3][3] =
@@ -43,6 +61,14 @@ static constexpr float locs[3][3] =
     { 3546.796f, -3847.424f, 299.450f },
     { 3546.796f, -3843.384f, 302.384f }
 };
+
+/*
+first web wrap 20 sec into fight, then every 40 sec
+first web spray 30 sec (first spiderling 30
+web spray every 40 sec
+spiderlings always 7.5sec before web spray (possibly just 8sec before, lag/
+
+*/
 
 struct mob_webwrapAI : public ScriptedAI
 {
