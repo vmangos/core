@@ -44,7 +44,7 @@ enum
 
     SPELL_WIDOWS_EMBRACE        = 28732,    // Used by worshippers. ToDo: Spell does NOT add the attackspeed reduction, or is it just castspeed?
 
-    MOB_FOLLOWER                = 16505,
+    MOB_FOLLOWER                = 16505,    // TODO: should aoe silence (small range, 8-10yd)
     MOB_WORSHIPPER              = 16506
 };
 
