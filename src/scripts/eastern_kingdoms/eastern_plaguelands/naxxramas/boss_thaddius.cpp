@@ -87,6 +87,7 @@ enum
     SPELL_SHOCK_OVERLOAD = 28159,
     SPELL_SHOCK = 28099,
 
+    SPELL_MAGNETIC_PULL = 28337, //presumably used for tankswap satalagg/feugen
 };
 
 /************
