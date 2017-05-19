@@ -95,9 +95,9 @@ struct go_marshal_haggards_chestAI: public GameObjectAI
     {
         timer = 0;
         state = 0;
-        guid_kragaru = 0;
+        guid_spirit = 0;
     }
-    uint64 guid_kragaru;
+    uint64 guid_spirit;
     uint32 timer;
     bool state;//0 = usual, can launch. //1 = in use, cannot launch
 
@@ -113,14 +113,14 @@ struct go_marshal_haggards_chestAI: public GameObjectAI
     }
     bool CheckCanStartEvent()
     {
-        if (!state && !me->GetMap()->GetCreature(guid_kragaru))
+        if (!state && !me->GetMap()->GetCreature(guid_spirit))
             return true;
         return false;
     }
 
-    void SetInUse(Creature* kragaru)
+    void SetInUse(Creature* spirit)
     {
-        guid_kragaru = kragaru->GetGUID();
+        guid_spirit = spirit->GetGUID();
         state = 1;
         timer = 60000;
     }
@@ -137,8 +137,11 @@ bool GOHello_go_marshal_haggards_chest(Player* pPlayer, GameObject* pGo)
         {
             if (pPlayer->GetQuestStatus(QUEST_STALVANS_LEGEND) == QUEST_STATUS_INCOMPLETE)
             {
-                if (Creature* kragaru = pGo->SummonCreature(NPC_SPIRIT, 0, 0, 0, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 310000))
-                    pMarkAI->SetInUse(kragaru);
+                if (Creature* spirit = pGo->SummonCreature(NPC_SPIRIT, -9552.67, -1431.93, 62.3, 5.03, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
+                {
+                    pMarkAI->SetInUse(spirit);
+                    spirit->AI()->AttackStart(pPlayer);
+                }
             }
         }
     }
