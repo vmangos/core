@@ -5400,17 +5400,30 @@ void Spell::EffectSendTaxi(SpellEffectIndex eff_idx)
     ((Player*)unitTarget)->ActivateTaxiPathTo(m_spellInfo->EffectMiscValue[eff_idx], m_spellInfo->Id, true);
 }
 
+
 void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
+    
+    // unsure about this
+    unitTarget->Relocate(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ());
 
+
+    // This will make you land perfectly on thadddius
+    float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
+    float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
+    unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
+    
+    
+    
+    // this makes you overshoot like crazy on thaddius, and often go too far on maexxna
     float dist = unitTarget->GetDistance2d(m_caster);
     if (damage && dist > damage)
         dist = float(damage);
-
     unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[eff_idx]) / 10);
-}
+    
+    }
 
 void Spell::EffectDispelMechanic(SpellEffectIndex eff_idx)
 {
