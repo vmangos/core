@@ -104,27 +104,24 @@ struct boss_archaedasAI : public ScriptedAI
         me->MonsterYell(SAY_KILL, LANG_UNIVERSAL, 0);
         DoPlaySoundToSet(me, SOUND_KILL);
     }
-    
+
     // He goes back to his spawn point after reset, stone him after.
     void JustReachedHome()
     {
-        instance->SetData(DATA_MINIONS, SPECIAL);
-        instance->SetData(DATA_MINIONS, NOT_STARTED); // respawn any dead minions
-        instance->SetData(DATA_ARCHAEDAS, NOT_STARTED);
+        Reset();
+        instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, NOT_STARTED);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!instance)
-        {
-            return;
-        }
-        
         if (bJustCreated)
         {
             bJustCreated = false;
             JustReachedHome();
         }
+
+        if (!instance || instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) != IN_PROGRESS)
+            return;
 
         // we're still doing awaken animation
         if (bWakingUp && iAwakenTimer >= 0)
@@ -154,6 +151,7 @@ struct boss_archaedasAI : public ScriptedAI
             if (UnitIsOutside(me) || UnitIsOutside(me->getVictim()))
             {
                 EnterEvadeMode();
+                return;
             }
             uiRoomCheck = 500;
         }
@@ -162,7 +160,7 @@ struct boss_archaedasAI : public ScriptedAI
         // wake a wall minion
         if (uiWallMinionTimer <= uiDiff)
         {
-            instance->SetData(DATA_MINIONS, IN_PROGRESS);
+            instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS);
             uiWallMinionTimer = 10000;
         }
         else uiWallMinionTimer -= uiDiff;
@@ -179,13 +177,23 @@ struct boss_archaedasAI : public ScriptedAI
         //If we are <33 summon the vault warders
         if (!bVaultWardersAwake && me->GetHealthPercent() <= 33.0f)
         {
+            // Despawn the furniture
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(12)))
-            {
                 target->ForcedDespawn();
-            }
             if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(13)))
-            {
                 target->ForcedDespawn();
+            // fix factions now or they'll look green for a brief moment
+            if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(1)))
+            {
+                target->setFaction(FACTION_AWAKE);
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
+            }
+            if (Creature* target = instance->GetMap()->GetCreature(instance->GetData64(2)))
+            {
+                target->setFaction(FACTION_AWAKE);
+                target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                target->CastSpell(target, SPELL_STONE_DWARF_AWAKEN, false);
             }
             me->CastSpell(me, SPELL_AWAKEN_VAULT_WARDER, false);
             me->MonsterYell(SAY_SUMMON2, LANG_UNIVERSAL, 0);
@@ -215,17 +223,16 @@ struct boss_archaedasAI : public ScriptedAI
                 return;
             }
         }
-        instance->SetData(DATA_ANCIENT_DOOR, FAIL); // open the vault door
-        instance->SetData(DATA_ARCHAEDAS, FAIL);
+        if (instance)
+            instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, FAIL);
         ScriptedAI::EnterEvadeMode();
     }
+
     void JustDied(Unit* /*killer*/)
     {
         if (instance)
         {
-            instance->SetData(DATA_ANCIENT_DOOR, DONE); // open the vault door
-            instance->SetData(DATA_ARCHAEDAS, DONE);
-            instance->SetData(DATA_MINIONS, DONE); // remove anything alive
+            instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, DONE);
         }
     }
 };
@@ -254,6 +261,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
     uint32 uiTrample_Timer;
     uint32 uiReconstruct_Timer;
     uint32 uiAwakenTimer;
+    bool bWakeSpellHit;
     bool bWokenUp;
     bool bWakingUp;
     bool bAwake;
@@ -265,6 +273,7 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         uiTrample_Timer = urand(4000, 10000);
         uiReconstruct_Timer = urand(4000, 10000);
         uiAwakenTimer = 4000;
+        bWakeSpellHit = false;
         bWokenUp = false;
         bWakingUp = false;
         bAwake = false;
@@ -300,10 +309,16 @@ struct mob_archaedas_minionsAI : public ScriptedAI
     {
         // time to wake up, start animation
         if (spell->Id == SPELL_AWAKEN_EARTHEN_DWARF
-            || spell->Id == SPELL_AWAKEN_EARTHEN_GUARDIAN
-            || spell->Id == SPELL_AWAKEN_VAULT_WARDER)
+            || spell->Id == SPELL_AWAKEN_EARTHEN_GUARDIAN)
         {
+            bWakeSpellHit = true;
             bWokenUp = true;
+        }
+        // SPELL_AWAKEN_VAULT_WARDER has 5s cast, wake when it lands
+        else if (spell->Id == SPELL_AWAKEN_VAULT_WARDER)
+        {
+            bWakeSpellHit = true;
+            EnterCombat();
         }
     }
 
@@ -317,6 +332,12 @@ struct mob_archaedas_minionsAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) != IN_PROGRESS)
+        {
+            if (bWakeSpellHit)
+                Reset();
+            return;
+        }
         // 1st phase of wake, wait for awakening spell to land 1s
         if (bWokenUp && uiAwakenTimer <= (uiDiff + 3000))
         {
@@ -331,15 +352,17 @@ struct mob_archaedas_minionsAI : public ScriptedAI
         {
             bWakingUp = false;
             // Wake him only if Archaedas is in combat
-            if (instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
-            {
+            if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) == IN_PROGRESS)
                 EnterCombat();
-            }
             uiAwakenTimer = 4000;
             return; // dont want to continue until we finish the AttackStart method
         }
-        else if (bWokenUp || bWakingUp) uiAwakenTimer -= uiDiff;
-        
+        else if (bWokenUp || bWakingUp)
+        {
+            uiAwakenTimer -= uiDiff;
+            return;
+        }
+
         if (bAwake && m_creature->GetEntry() == NPC_EARTHEN_CUSTODIAN 
             && uiReconstruct_Timer <= uiDiff)
         {
@@ -397,9 +420,8 @@ bool GOHello_go_altar_of_archaedas(Player* pPlayer, GameObject* pGo)
     return true;
 }
 
-class go_altar_of_archaedasAI : public GameObjectAI
+struct go_altar_of_archaedasAI : public GameObjectAI
 {
-public:
     go_altar_of_archaedasAI(GameObject* gobj) : GameObjectAI(gobj)
     {
         instance = (ScriptedInstance*)gobj->GetInstanceData();
@@ -424,7 +446,7 @@ public:
         _summonTimer  = TIMER_ALTAR_SUMMON;
         instance->SetData(DATA_ARCHAEDAS_ALTAR, NOT_STARTED);
     }
-    
+
     uint32 CountSummoners()
     {
         const Map::PlayerList& players = me->GetMap()->GetPlayers();
@@ -447,13 +469,13 @@ public:
         }
         return count;
     }
-    
+
     void UpdateAI(const uint32 diff)
     {
         if (!instance ||
-            instance->GetData(DATA_ALTAR_DOORS) != DONE ||
-            instance->GetData(DATA_ARCHAEDAS) == DONE ||
-            instance->GetData(DATA_ARCHAEDAS) == IN_PROGRESS)
+            instance->GetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS) != DONE ||
+            instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) == DONE ||
+            instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) == IN_PROGRESS)
         {
             return;
         }
@@ -472,7 +494,7 @@ public:
             if (_summonTimer <= diff)
             {
                 Reset();
-                instance->SetData(DATA_ARCHAEDAS, IN_PROGRESS); // activate archaedas
+                instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS); // activate archaedas
             }
             else
             {
@@ -482,10 +504,8 @@ public:
         else
         {
             Reset();
-            if (instance->GetData(DATA_ARCHAEDAS) != IN_PROGRESS)
-            {
+            if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) != IN_PROGRESS)
                 instance->SetData(DATA_ANCIENT_DOOR, FAIL); // open the vault door
-            }
         }
     }
 };
