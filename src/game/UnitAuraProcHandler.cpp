@@ -726,11 +726,6 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                         
                         bool notAtMaxStack = igniteAura->GetStackAmount() < 5;
                         
-                        // If 1 of 2 ticks of ignite have been applied (2s),
-                        // Halve damage to apply correct remaining damage on 4s refresh
-                        if (1 == igniteAura->GetAuraTicks() && notAtMaxStack)
-                            tickDamage = tickDamage / 2 + 1;
-                        
                         bool reapplyIgnite = igniteAura->GetAuraTicks() >= igniteAura->GetAuraMaxTicks();
                         
                         if (!reapplyIgnite)
