@@ -445,7 +445,8 @@ struct mob_cryptguardsAI : public ScriptedAI
     void Aggro(Unit* pWho)
     {
         // Make sure anub is pulled too. Anub will take care of pulling the other crypt-guard
-        if (Creature* anub = m_pInstance->GetCreature(m_pInstance->GetData64(NPC_ANUB_REKHAN)))
+        
+        if (Creature* anub = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
             anub->AI()->AttackStart(pWho);
         }
