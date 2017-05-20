@@ -213,16 +213,24 @@ void TemporarySummon::Summon(TempSummonType type, uint32 lifetime)
     GetMap()->Add((Creature*)this);
 }
 
-void TemporarySummon::UnSummon()
+void TemporarySummon::UnSummon(uint32 delayDespawnTime /*= 0*/)
 {
-    CombatStop();
+    if (delayDespawnTime)
+    {
+        m_type = TEMPSUMMON_TIMED_DESPAWN;
+        m_timer = delayDespawnTime;
+    }
+    else
+    {
+        CombatStop();
 
-    if (GetSummonerGuid().IsCreature())
-        if (Creature* sum = GetMap()->GetCreature(GetSummonerGuid()))
-            if (sum->AI())
-                sum->AI()->SummonedCreatureDespawn(this);
+        if (GetSummonerGuid().IsCreature())
+            if (Creature* sum = GetMap()->GetCreature(GetSummonerGuid()))
+                if (sum->AI())
+                    sum->AI()->SummonedCreatureDespawn(this);
 
-    AddObjectToRemoveList();
+        AddObjectToRemoveList();
+    }
 }
 
 void TemporarySummon::SaveToDB()
