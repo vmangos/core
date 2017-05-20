@@ -522,7 +522,7 @@ struct boss_twinemperorsAI : public ScriptedAI
             return nullptr;
 
         auto candIt = candidates.begin();
-        std::advance(candIt, candidates.size() - 1);
+        std::advance(candIt, urand(0, candidates.size() - 1));
         return *candIt;
     }
 };
