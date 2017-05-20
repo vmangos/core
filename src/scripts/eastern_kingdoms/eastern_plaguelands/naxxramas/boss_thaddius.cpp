@@ -87,7 +87,15 @@ enum
     SPELL_SHOCK_OVERLOAD = 28159,
     SPELL_SHOCK = 28099,
 
+    /*
+    float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
+    float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
+    unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
+    
+    // the spell wont perform correct with current Spell::EffectPlayerPull
+    // implementation. Above code can be used, its much closer.
     SPELL_MAGNETIC_PULL = 28337, //presumably used for tankswap satalagg/feugen
+    */
 };
 
 /************
