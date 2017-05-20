@@ -45,9 +45,10 @@ enum
     SAY_TAUNT4                  = -1533007,
     SAY_SLAY                    = -1533008,
 
-    EMOTE_CORPSE_SCARABS        = -1533155, // todo: add usage
-    EMOTE_INSECT_SWARM          = -1533154, // todo: add usage
-    EMOTE_CRYPTGUARD_JOINS      = -1533153, // todo: add usage
+    EMOTE_GENERIC_ENRAGE        = -1000003, // used by crypt guards
+    //EMOTE_CORPSE_SCARABS        = -1533155, // Does not look like it's used in vanilla
+    //EMOTE_INSECT_SWARM          = -1533154, // Does not look like it's used in vanilla
+    //EMOTE_CRYPTGUARD_JOINS      = -1533153, // Does not look like it's used in vanilla
 
 
     SPELL_IMPALE                = 28783,        //May be wrong spell id. Causes more dmg than I expect
@@ -75,13 +76,13 @@ static const float CGs[3][4] =
     { 3316.46f, -3476.23f, 287.26f, 3.18f } // this third entry is used as spawn loc during fight.
 };
 
-static constexpr float CRYPTGUARD_DESPAWN       = 15000;
-
 
 static constexpr uint32 CRYPTGUARD_CLEAVE_CD    = 6000;  // Todo: find correct timer
 static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, so 12sec cd makes sense. 
                                                          // From videos you can see there is 1-2sec between consecutive nets.
 static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct timer. 
+
+static const uint32 CRYPTGUARD_DESPAWN() { return 15000; } // Todo: find correct timer
 
 /*
 Impale timer research:
@@ -184,7 +185,7 @@ struct boss_anubrekhanAI : public ScriptedAI
 
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
-    
+    bool m_firstBlood;
     std::vector<std::pair<uint32, ObjectGuid>> deadCryptGuards;
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -208,9 +209,9 @@ struct boss_anubrekhanAI : public ScriptedAI
             {
                 // While the crypt guard will be despawned manually after CRYPTGUARD_DESPAWN time, when it explodes,
                 // we make it a TEMPSUMMON_CORPSE_TIMED_DESPAWN with a slightly longer duration, because if anub is killed
-                // before the last crypt guard dies, anubs updateAI will not be able to manually explode and despawn it.z   
+                // before the last crypt guard dies, anubs updateAI will not be able to manually explode and despawn it.
                 if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], 
-                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, CRYPTGUARD_DESPAWN+10000))
+                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, CRYPTGUARD_DESPAWN()+10000))
                 {
                     cryptGuards[i] = c->GetObjectGuid();
                 }
@@ -219,6 +220,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                     sLog.outError("boss_anubrekhanAI::CheckSpawnInitialCryptGuards failed to spawn initial crypt guard");
                 }
             }
+            /*
             else
             {
                 if (Creature* c = m_pInstance->GetCreature(cryptGuards[i]))
@@ -227,6 +229,7 @@ struct boss_anubrekhanAI : public ScriptedAI
                         c->Respawn();
                 }
             }
+            */
         }
     }
 
@@ -234,26 +237,40 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() != MOB_CRYPT_GUARD)
             return;
+
         // If the crypt guard is one of the two initial crypt guards,
-        // set its guid in cryptGuards[] to 0 so it's respawned on JustReachedHome()
+        // set its guid in cryptGuards[] to 0 so a new one is respawned on JustReachedHome()
         for (int i = 0; i < 2; i++) 
         {
             if (pSummoned->GetObjectGuid() == cryptGuards[i])
                 cryptGuards[i] = 0;
         }
-        deadCryptGuards.push_back(std::make_pair(CRYPTGUARD_DESPAWN,pSummoned->GetObjectGuid()));
+        deadCryptGuards.push_back(std::make_pair(CRYPTGUARD_DESPAWN(),pSummoned->GetObjectGuid()));
     }
 
     void Reset()
     {
         m_uiImpaleTimer = IMPALE_CD();
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
+        m_firstBlood = false;
     }
 
     void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANUB_REKHAN, FAIL);
+
+        for (auto it = deadCryptGuards.begin(); it != deadCryptGuards.end();)
+        {
+            if (Creature* cg = m_pInstance->GetCreature((*it).second))
+            {
+                if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
+                    tmpSumm->UnSummon();
+                }
+            }
+
+            it = deadCryptGuards.erase(it);
+        }
 
         CheckSpawnInitialCryptGuards();
     }
@@ -263,10 +280,16 @@ struct boss_anubrekhanAI : public ScriptedAI
         // Scarabs are summoned by instance script when a player dies.
         // See instance_naxxramas::OnPlayerDeath(Player*)
 
+        if (!m_firstBlood) 
+        {
+            DoScriptText(SAY_SLAY, m_creature);
+            m_firstBlood = true;
+            return;
+        }
+
         if (urand(0, 4))
             return;
 
-        DoScriptText(SAY_SLAY, m_creature);
     }
 
     void Aggro(Unit* pWho)
@@ -283,18 +306,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             }
         }
 
-        switch (urand(0, 2))
-        {
-            case 0:
-                DoScriptText(SAY_AGGRO1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_AGGRO2, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_AGGRO3, m_creature);
-                break;
-        }
+        DoScriptText(SAY_AGGRO3 + urand(0, 2), m_creature);
     }
 
     void JustDied(Unit* pKiller)
@@ -347,10 +359,10 @@ struct boss_anubrekhanAI : public ScriptedAI
                             }
                         }
                     }
-
+                    
                     // Despawning the Crypt guard
                     if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
-                        tmpSumm->UnSummon();
+                        tmpSumm->UnSummon(250);
                     }
 
                 }
@@ -401,7 +413,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             {
                 m_uiLocustSwarmTimer = LOCUST_SWARM_CD(false);
                 if (Creature* pCryptGuard = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[2][0], CGs[2][1], CGs[2][2], CGs[2][3],
-                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, CRYPTGUARD_DESPAWN()+10000))
                 {
                     pCryptGuard->SetInCombatWithZone();
                     if (Unit* pCryptTarget = pCryptGuard->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_RANDOM, 0))
@@ -460,6 +472,7 @@ struct mob_cryptguardsAI : public ScriptedAI
         // Crypt guards enrage at 50%
         if (!isEnraged && m_creature->GetHealthPercent() <= 50.0f) {
             if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == CanCastResult::CAST_OK) {
+                DoScriptText(EMOTE_GENERIC_ENRAGE, m_creature);
                 isEnraged = true;
             }
         }
