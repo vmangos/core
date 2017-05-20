@@ -45,6 +45,11 @@ enum
     SAY_TAUNT4                  = -1533007,
     SAY_SLAY                    = -1533008,
 
+    EMOTE_CORPSE_SCARABS        = -1533155, // todo: add usage
+    EMOTE_INSECT_SWARM          = -1533154, // todo: add usage
+    EMOTE_CRYPTGUARD_JOINS      = -1533153, // todo: add usage
+
+
     SPELL_IMPALE                = 28783,        //May be wrong spell id. Causes more dmg than I expect
     SPELL_LOCUSTSWARM           = 28785,        //This is a self buff that triggers the dmg debuff
 
@@ -58,7 +63,6 @@ enum
 
     MOB_CRYPT_GUARD             = 16573,
     MOB_CORPSE_SCARAB           = 16698
-
     
 };
 

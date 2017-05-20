@@ -38,6 +38,7 @@ enum
     SAY_BLAU_SPECIAL        = -1533048,
     SAY_BLAU_SLAY           = -1533049,
     SAY_BLAU_DEATH          = -1533050,
+    SAY_BLAU_UNYIELDING_PAIN = -1533156, // todo: add use
 
     SPELL_MARK_OF_BLAUMEUX  = 28833,
     SPELL_UNYILDING_PAIN    = 57381,
@@ -72,6 +73,7 @@ enum
     SPELL_METEOR            = 26558,                        // m_creature->getVictim() auto-area spell but with a core problem
 
     //sir zeliek
+    EMOTE_ZELI_CONDEMNATION = -1533157, // todo: add usage
     SAY_ZELI_AGGRO          = -1533058,
     SAY_ZELI_TAUNT1         = -1533059,
     SAY_ZELI_TAUNT2         = -1533060,

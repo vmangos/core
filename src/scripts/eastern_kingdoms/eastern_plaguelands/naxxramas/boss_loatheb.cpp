@@ -26,6 +26,10 @@ EndScriptData */
 
 enum
 {
+    EMOTE_AURA_BLOCKING = -1533143, // todo: add use
+    EMOTE_AURA_FADING   = -1533145, // todo: add use
+    EMOTE_AURA_WANE     = -1533144, // todo: add use
+
     SPELL_CORRUPTED_MIND  = 29198,
     SPELL_POISON_AURA     = 29865,
     SPELL_INEVITABLE_DOOM = 29204,

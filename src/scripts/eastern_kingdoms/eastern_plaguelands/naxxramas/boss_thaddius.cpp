@@ -34,33 +34,34 @@ EndContentData */
 enum
 {
     // Stalagg
-    SAY_STAL_AGGRO = -1533023,
-    SAY_STAL_SLAY = -1533024,
-    SAY_STAL_DEATH = -1533025,
+    SAY_STAL_AGGRO  = -1533023,
+    SAY_STAL_SLAY   = -1533024,
+    SAY_STAL_DEATH  = -1533025,
 
     // Feugen
-    SAY_FEUG_AGGRO = -1533026,
-    SAY_FEUG_SLAY = -1533027,
-    SAY_FEUG_DEATH = -1533028,
+    SAY_FEUG_AGGRO  = -1533026,
+    SAY_FEUG_SLAY   = -1533027,
+    SAY_FEUG_DEATH  = -1533028,
 
     // Tesla Coils
-    EMOTE_LOSING_LINK = -1533149,
-    EMOTE_TESLA_OVERLOAD = -1533150,
+    EMOTE_LOSING_LINK       = -1533149,
+    EMOTE_TESLA_OVERLOAD    = -1533150,
 
     // Thaddus
-    SAY_AGGRO_1 = -1533030,
-    SAY_AGGRO_2 = -1533031,
-    SAY_AGGRO_3 = -1533032,
+    SAY_AGGRO_1     = -1533030,
+    SAY_AGGRO_2     = -1533031,
+    SAY_AGGRO_3     = -1533032,
 
-    SAY_SLAY = -1533033,
-    SAY_ELECT = -1533034,
-    SAY_DEATH = -1533035,
+    SAY_SLAY        = -1533033,
+    SAY_ELECT       = -1533034,
+    SAY_DEATH       = -1533035,
     
-    // Background screams in Instance if Thaddius still alive, needs general support most likely
-    SAY_SCREAM1 = -1533036,
-    SAY_SCREAM2 = -1533037,
-    SAY_SCREAM3 = -1533038,
-    SAY_SCREAM4 = -1533039,
+    // Background screams in Instance if Thaddius still alive
+    SAY_SCREAM1     = -1533036, // todo: add use
+    SAY_SCREAM2     = -1533037, // todo: add use
+    SAY_SCREAM3     = -1533038, // todo: add use
+    SAY_SCREAM4     = -1533039, // todo: add use
+
     EMOTE_POLARITY_SHIFT = -1533151,
 
     // Thaddius Spells

@@ -27,6 +27,7 @@ EndScriptData */
 enum
 {
     EMOTE_ZOMBIE      = -1533119,
+    EMOTE_DECIMATE    = -1533152, // todo: add use
 
     SPELL_MORTALWOUND = 25646,
     SPELL_DECIMATE    = 28374,
