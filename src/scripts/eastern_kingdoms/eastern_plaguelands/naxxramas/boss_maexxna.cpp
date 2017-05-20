@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: Boss_Maexxna
-SD%Complete: 60
-SDComment: this needs review, and rewrite of the webwrap ability
+SD%Complete:
+SDComment: 
 SDCategory: Naxxramas
 EndScriptData */
 
@@ -29,10 +29,10 @@ EndScriptData */
 enum
 {
     // from cmangos, unimplemented
-    EMOTE_SPIN_WEB              = -1533146,
-    EMOTE_SPIDERLING            = -1533147,
-    EMOTE_SPRAY                 = -1533148,
-    EMOTE_BOSS_GENERIC_FRENZY   = -1000005,
+    //EMOTE_SPIN_WEB              = -1533146, // Not in vanilla?
+    //EMOTE_SPIDERLING            = -1533147, // Not in vanilla?
+    //EMOTE_SPRAY                 = -1533148, // Not in vanilla?
+    EMOTE_BOSS_GENERIC_ENRAGE   = -1000003,
 
 
     SPELL_WEBWRAP               = 28622,    
@@ -40,7 +40,7 @@ enum
     SPELL_WEBSPRAY              = 29484,
     SPELL_POISONSHOCK           = 28741,
     SPELL_NECROTICPOISON        = 28776,    // 90% reduced healing. Dispelllable
-    SPELL_FRENZY                = 28747,    // 30% enrage
+    SPELL_ENRAGE                = 28747,    // 30% enrage
 
     SPELL_SUMMON_SPIDERLING     = 29434,
 
@@ -400,8 +400,11 @@ struct boss_maexxnaAI : public ScriptedAI
         //Enrage if not already enraged and below 30%
         if (!m_bEnraged && m_creature->GetHealthPercent() < 30.0f)
         {
-            if(DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+            {
                 m_bEnraged = true;
+                DoScriptText(EMOTE_BOSS_GENERIC_ENRAGE, m_creature);
+            }
         }
         
         DoMeleeAttackIfReady();
