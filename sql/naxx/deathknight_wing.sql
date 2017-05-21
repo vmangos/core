@@ -17,7 +17,7 @@ UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=25
 UPDATE `creature_equip_template_raw` SET `equipmodel2`='23356' WHERE `entry`='982';
 
 -- deathknights offhand is a shield, not a mount like it was!
-UPDATE `creature_equip_template_raw` SET `equipmodel2`='176' WHERE `entry`='142';
+UPDATE `creature_equip_template_raw` SET `equipmodel2`='6176' WHERE `entry`='142';
 
 	
 -- scale of death lord and deathknight cavalier update (cavalier was too big, death lord too small)
@@ -34,3 +34,7 @@ DELETE FROM `creature` where `guid` = 533000 ;
 INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`,`spawnFlags`) 
 VALUES (533000,16861,533,0,0,2932.73,-3188.07,273.371,3.13692,25,5,0,113175,12430,0,0,0);
 
+-- death lord and death knight cavalier curse of agony event slightly randomized to more easily stack with group when not spread
+-- todo: the curse adds separate debuffs for each mob. Each application from any mob should add a stack to the same debuff application.
+UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1686101;
+UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1616301;
