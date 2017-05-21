@@ -30,21 +30,8 @@ EndScriptData */
 
 enum
 {
-    //when shappiron dies. dialog between kel and lich king (in this order)
-    SAY_SAPP_DIALOG1                    = -1533084,
-    SAY_SAPP_DIALOG2_LICH               = -1533085,
-    SAY_SAPP_DIALOG3                    = -1533086,
-    SAY_SAPP_DIALOG4_LICH               = -1533087,
-    SAY_SAPP_DIALOG5                    = -1533088,
-
     //when cat dies
     SAY_CAT_DIED                        = -1533089,
-
-    //when each of the 4 wing bosses dies
-    SAY_TAUNT1                          = -1533090,
-    SAY_TAUNT2                          = -1533091,
-    SAY_TAUNT3                          = -1533092,
-    SAY_TAUNT4                          = -1533093,
 
     SAY_SUMMON_MINIONS                  = -1533105,         //start of phase 1
 

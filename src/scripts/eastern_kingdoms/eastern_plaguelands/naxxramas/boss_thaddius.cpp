@@ -30,63 +30,58 @@ EndContentData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
-
-enum
+enum eStalaggFeugen
 {
     // Stalagg
-    SAY_STAL_AGGRO  = -1533023,
-    SAY_STAL_SLAY   = -1533024,
-    SAY_STAL_DEATH  = -1533025,
+    SAY_STAL_AGGRO          = -1533023,
+    SAY_STAL_SLAY           = -1533024,
+    SAY_STAL_DEATH          = -1533025,
 
     // Feugen
-    SAY_FEUG_AGGRO  = -1533026,
-    SAY_FEUG_SLAY   = -1533027,
-    SAY_FEUG_DEATH  = -1533028,
+    SAY_FEUG_AGGRO          = -1533026,
+    SAY_FEUG_SLAY           = -1533027,
+    SAY_FEUG_DEATH          = -1533028,
 
-    // Tesla Coils
-    EMOTE_LOSING_LINK       = -1533149,
-    EMOTE_TESLA_OVERLOAD    = -1533150,
+    SPELL_WARSTOMP          = 28125,
+    SPELL_MAGNETIC_PULL_A   = 28338,
+    SPELL_STATIC_FIELD      = 28135,
+    SPELL_POWERSURGE        = 28134,
+};
 
-    // Thaddus
-    SAY_AGGRO_1     = -1533030,
-    SAY_AGGRO_2     = -1533031,
-    SAY_AGGRO_3     = -1533032,
 
-    SAY_SLAY        = -1533033,
-    SAY_ELECT       = -1533034,
-    SAY_DEATH       = -1533035,
+enum eThaddius
+{
+    SAY_AGGRO_1 = -1533030,
+    SAY_AGGRO_2 = -1533031,
+    SAY_AGGRO_3 = -1533032,
+
+    SAY_SLAY    = -1533033,
+    SAY_ELECT   = -1533034,
+    SAY_DEATH   = -1533035,
     
-    // Background screams in Instance if Thaddius still alive
-    SAY_SCREAM1     = -1533036, // todo: add use
-    SAY_SCREAM2     = -1533037, // todo: add use
-    SAY_SCREAM3     = -1533038, // todo: add use
-    SAY_SCREAM4     = -1533039, // todo: add use
+    EMOTE_POLARITY_SHIFT = -1533151, // todo: check if should be used in vanilla
 
-    EMOTE_POLARITY_SHIFT = -1533151,
+    SPELL_THADIUS_SPAWN             = 28160,
+    SPELL_THADIUS_LIGHTNING_VISUAL  = 28136,
+    SPELL_BALL_LIGHTNING            = 28299,
+    SPELL_CHAIN_LIGHTNING           = 28167,
+    SPELL_POLARITY_SHIFT            = 28089,
+    SPELL_BESERK                    = 27680,
+    // SPELL_CLEAR_CHARGES          = 63133, // TODO NYI, cast on death, most likely to remove remaining buffs
+    };
 
-    // Thaddius Spells
-    SPELL_THADIUS_SPAWN = 28160,
-    SPELL_THADIUS_LIGHTNING_VISUAL = 28136,
-    SPELL_BALL_LIGHTNING = 28299,
-    SPELL_CHAIN_LIGHTNING = 28167,
-    SPELL_POLARITY_SHIFT = 28089,
-    SPELL_BESERK = 27680,
-    // SPELL_CLEAR_CHARGES = 63133,                // TODO NYI, cast on death, most likely to remove remaining buffs
+enum eCoils
+{
+    EMOTE_LOSING_LINK = -1533149,
+    EMOTE_TESLA_OVERLOAD = -1533150,
 
-    // Stalagg & Feugen Spells
-    SPELL_WARSTOMP                  = 28125,             // Not used in Wotlk Version
-    SPELL_MAGNETIC_PULL_A = 28338,
-    SPELL_MAGNETIC_PULL_B = 54517,                // used by Feugen (wotlk)
-    SPELL_STATIC_FIELD = 28135,
-    SPELL_POWERSURGE = 28134,
-
-    // Tesla Spells
     SPELL_FEUGEN_CHAIN = 28111,
     SPELL_STALAGG_CHAIN = 28096,
     SPELL_FEUGEN_TESLA_PASSIVE = 28109,
     SPELL_STALAGG_TESLA_PASSIVE = 28097,
     SPELL_SHOCK_OVERLOAD = 28159,
     SPELL_SHOCK = 28099,
+};
 
     /*
     float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
@@ -97,7 +92,6 @@ enum
     // implementation. Above code can be used, its much closer.
     SPELL_MAGNETIC_PULL = 28337, //presumably used for tankswap satalagg/feugen
     */
-};
 
 /************
 ** boss_thaddius

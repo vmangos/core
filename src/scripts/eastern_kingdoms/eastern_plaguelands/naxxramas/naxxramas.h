@@ -73,6 +73,9 @@ enum NaxxNPCs : uint32
     NPC_UNSTOPPABLE_ABOM        = 16428,
     NPC_SOUL_WEAVER             = 16429,
     NPC_GUARDIAN                = 16441,
+    
+    NPC_MR_BIGGLESWORTH         = 16998,
+    NPC_LICH_KING               = 16980,
 };
 
 enum NaxxAreaTriggers : uint32
@@ -159,11 +162,37 @@ enum NaxxGOs : uint32
     GO_CONS_NOX_TESLA_STALAGG   = 181478,
 };
 
+enum NaxxZoneScriptTexts
+{
+    // Background screams in Instance if Thaddius still alive
+    THADDIUS_SAY_SCREAM1 = -1533036, // todo: add use
+    THADDIUS_SAY_SCREAM2 = -1533037, // todo: add use
+    THADDIUS_SAY_SCREAM3 = -1533038, // todo: add use
+    THADDIUS_SAY_SCREAM4 = -1533039, // todo: add use
+
+    //when each of the 4 wing bosses dies
+    KELTHUZAD_SAY_TAUNT1 = -1533090,
+    KELTHUZAD_SAY_TAUNT2 = -1533091,
+    KELTHUZAD_SAY_TAUNT3 = -1533092,
+    KELTHUZAD_SAY_TAUNT4 = -1533093,
+
+    // when bigglesworth dies, rip
+    KELTHUZAD_SAY_CAT_DIED = -1533089,
+
+    //when shappiron dies. dialog between kel and lich king (in this order)
+    SAY_SAPP_DIALOG1        = -1533084,
+    SAY_SAPP_DIALOG2_LICH   = -1533085,
+    SAY_SAPP_DIALOG3        = -1533086,
+    SAY_SAPP_DIALOG4_LICH   = -1533087,
+    SAY_SAPP_DIALOG5        = -1533088,
+};
+
 struct GothTrigger
 {
     bool bIsRightSide;
     bool bIsAnchorHigh;
 };
+
 
 class instance_naxxramas : public ScriptedInstance
 {
@@ -199,6 +228,7 @@ public:
     void ToggleKelThuzadWindows(bool setOpen);
 
     void OnPlayerDeath(Player* p) override;
+    void OnCreatureDeath(Creature* pCreature) override;
 
     void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
 
@@ -215,9 +245,12 @@ public:
     void SetTeleporterVisualState(GameObject* pGO, uint32 uiData);  // Sets the state of a specific eye-portal
     void SetTeleporterState(GameObject* pGO, uint32 uiData);        // Sets the state of a specific eye-portal visual GO
 
+    uint8 GetNumEndbossDead();
+
 private:
     bool m_faerlinaHaveGreeted;
     uint32 m_horsemenDeathCounter;
+
 protected:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string strInstData;
@@ -229,6 +262,10 @@ protected:
     float m_fChamberCenterX;
     float m_fChamberCenterY;
     float m_fChamberCenterZ;
+
+private:
+    EventMap m_events;
+    void Update(uint32 diff) override;
 };
 
 #endif

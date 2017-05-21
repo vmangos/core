@@ -24,6 +24,20 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
+enum NaxxEvents
+{
+    EVENT_BIGGLESWORTH_DIED_YELL = 1,
+    EVENT_THADDIUS_SCREAM,
+    EVENT_WINGBOSS_DEAD,
+    
+    EVENT_KT_LK_DIALOGUE_1,
+    EVENT_KT_LK_DIALOGUE_2,
+    EVENT_KT_LK_DIALOGUE_3,
+    EVENT_KT_LK_DIALOGUE_4,
+    EVENT_KT_LK_DIALOGUE_5,
+    EVENT_KT_LK_DIALOGUE_GATE_OPEN,
+};
+
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
@@ -38,6 +52,11 @@ instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
 void instance_naxxramas::Initialize()
 {
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
+
+    // 2-5min, no idea if it's correct
+    m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5)); 
+
+
 }
 
 void instance_naxxramas::SetTeleporterVisualState(GameObject* pGO, uint32 uiData)
@@ -55,6 +74,20 @@ void instance_naxxramas::SetTeleporterState(GameObject* pGO, uint32 uiData)
         pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
     else
         pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+}
+
+uint8 instance_naxxramas::GetNumEndbossDead()
+{
+    uint8 ret = 0;
+    if (GetData(TYPE_MAEXXNA) == DONE)
+        ++ret;
+    if (GetData(TYPE_THADDIUS) == DONE)
+        ++ret;
+    if (GetData(TYPE_FOUR_HORSEMEN) == DONE)
+        ++ret;
+    if (GetData(TYPE_LOATHEB) == DONE)
+        ++ret;
+    return ret;
 }
 
 void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
@@ -193,6 +226,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_RIVENDARE:
         case NPC_SAPPHIRON:
         case NPC_KELTHUZAD:
+        case NPC_MR_BIGGLESWORTH:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
         
@@ -437,6 +471,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_ARAC_MAEX_OUTER_DOOR, uiData);
             break;
         case TYPE_MAEXXNA:
+            if (uiData == DONE)
+                m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
@@ -457,6 +493,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_PLAG_LOAT_DOOR, uiData);
             break;
         case TYPE_LOATHEB:
+            if (uiData == DONE)
+                m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
@@ -491,10 +529,11 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             }
             break;
         case TYPE_FOUR_HORSEMEN:
+            if(uiData == DONE)
+                m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
-
             if (uiData == SPECIAL)
             {
                 ++m_horsemenDeathCounter;
@@ -531,16 +570,20 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_CONS_THAD_DOOR, uiData);
             break;
         case TYPE_THADDIUS:
+            if (uiData == DONE)
+                m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
             UpdateBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
             
             UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_SAPPHIRON:
+            if(uiData == DONE)
+                m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_1, 12000);
+
             m_auiEncounter[uiType] = uiData;
             UpdateBossGate(GO_KELTHUZAD_WATERFALL_DOOR, uiData);
-            // todo: Should possibly be opened when players get close instead, after an RP event
-            UpdateBossGate(GO_KELTHUZAD_DOOR, uiData);
+            // GO_KELTHUZAD_DOOR is opened at the end of EVENT_KT_LK_DIALOGUE
             break;
         case TYPE_KELTHUZAD:
             UpdateBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData);
@@ -749,6 +792,66 @@ void instance_naxxramas::OnPlayerDeath(Player* p)
                     }
                 }
             }
+        }
+    }
+}
+
+void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
+{
+    switch (pCreature->GetEntry())
+    {
+    case NPC_MR_BIGGLESWORTH:
+        m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
+        break;
+    }
+}
+
+void instance_naxxramas::Update(uint32 diff)
+{
+    m_events.Update(diff);
+    while (auto l_EventId = m_events.ExecuteEvent())
+    {
+        switch (l_EventId)
+        {
+        case EVENT_BIGGLESWORTH_DIED_YELL:
+            DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_CAT_DIED, NPC_KELTHUZAD);
+            break;
+        case EVENT_THADDIUS_SCREAM:
+            if (m_auiEncounter[TYPE_THADDIUS] != DONE)
+            {
+                // todo: probably not thaddius who does the scream!
+                if(m_auiEncounter[TYPE_THADDIUS] != IN_PROGRESS && m_auiEncounter[TYPE_THADDIUS] != SPECIAL)
+                    DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM4 + urand(0, 3), NPC_THADDIUS); 
+
+                m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5)); // 2-5min, no idea if it's correct
+            }
+            break;
+        case EVENT_WINGBOSS_DEAD:
+            DoOrSimulateScriptTextForThisInstance(KELTHUZAD_SAY_TAUNT1 - GetNumEndbossDead()+1, NPC_KELTHUZAD);
+            break;
+        case EVENT_KT_LK_DIALOGUE_1:
+            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG1, NPC_KELTHUZAD);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_2, 6000);
+            break;
+        case EVENT_KT_LK_DIALOGUE_2:
+            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG2_LICH, NPC_LICH_KING);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_3, 18000);
+            break;
+        case EVENT_KT_LK_DIALOGUE_3:
+            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG3, NPC_KELTHUZAD);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_4, 7000);
+            break;
+        case EVENT_KT_LK_DIALOGUE_4:
+            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG4_LICH, NPC_LICH_KING);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_5, 9000);
+            break;
+        case EVENT_KT_LK_DIALOGUE_5:
+            DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG5, NPC_KELTHUZAD);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_GATE_OPEN, 7000);
+            break;
+        case EVENT_KT_LK_DIALOGUE_GATE_OPEN:
+            UpdateBossGate(GO_KELTHUZAD_DOOR, DONE);
+            break;
         }
     }
 }
