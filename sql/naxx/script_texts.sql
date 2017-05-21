@@ -55,3 +55,29 @@ INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc1`,`content_lo
 INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc1`,`content_loc2`,`content_loc3`,`content_loc4`,`content_loc5`,`content_loc6`,`content_loc7`,`content_loc8`,`sound`,`type`,`language`,`emote`,`comment`) VALUES (-1533156,'%s casts Unyielding Pain on everyone!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,3,0,0,'lady_blaumeux EMOTE_UNYIELDING_PAIN');
 INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc1`,`content_loc2`,`content_loc3`,`content_loc4`,`content_loc5`,`content_loc6`,`content_loc7`,`content_loc8`,`sound`,`type`,`language`,`emote`,`comment`) VALUES (-1533157,'%s casts Condemation on everyone!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,3,0,0,'sir_zeliek EMOTE_CONDEMATION');
 INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc1`,`content_loc2`,`content_loc3`,`content_loc4`,`content_loc5`,`content_loc6`,`content_loc7`,`content_loc8`,`sound`,`type`,`language`,`emote`,`comment`) VALUES (-1533158,'%s injects you with a mutagen!',NULL,NULL,NULL,NULL,NULL,NULL,NULL,NULL,0,5,0,0,'grobbulus EMOTE_INJECTION');
+
+
+-- KT taunts and cat dead should be zone-yells
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533091';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533092';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533089';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533090';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533093';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533093';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533039';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533038';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533037';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533036';
+
+-- dialogue between LK and KT must be zone-yells
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533084';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533085';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533086';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533087';
+UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533088';
+
+-- fix incorrect sound ids
+UPDATE `script_texts` SET `sound`='8822' WHERE `entry`='-1533092';
+UPDATE `script_texts` SET `sound`='8823' WHERE `entry`='-1533093';
+
+
