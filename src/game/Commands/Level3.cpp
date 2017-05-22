@@ -3131,13 +3131,18 @@ bool ChatHandler::HandleGuildUninviteCommand(char *args)
     if (!ExtractPlayerTarget(&args, &target, &target_guid))
         return false;
 
-    uint32 glId   = target ? target->GetGuildId() : Player::GetGuildIdFromDB(target_guid);
+    uint32 glId = target ? target->GetGuildId() : Player::GetGuildIdFromDB(target_guid);
+
     if (!glId)
         return false;
 
     Guild* targetGuild = sGuildMgr.GetGuildById(glId);
     if (!targetGuild)
+    {
+        SendSysMessage(LANG_GUILD_NOT_FOUND);
+        SetSentErrorMessage(true);
         return false;
+    }
 
     if (targetGuild->DelMember(target_guid))
     {
@@ -3158,9 +3163,14 @@ bool ChatHandler::HandleGuildRankCommand(char *args)
     if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
         return false;
 
-    uint32 glId   = target ? target->GetGuildId() : Player::GetGuildIdFromDB(target_guid);
+    uint32 glId = target ? target->GetGuildId() : Player::GetGuildIdFromDB(target_guid);
+
     if (!glId)
+    {
+        SendSysMessage(LANG_GUILD_NOT_FOUND);
+        SetSentErrorMessage(true);
         return false;
+    }
 
     Guild* targetGuild = sGuildMgr.GetGuildById(glId);
     if (!targetGuild)
@@ -3193,8 +3203,13 @@ bool ChatHandler::HandleGuildDeleteCommand(char* args)
     std::string gld = guildStr;
 
     Guild* targetGuild = sGuildMgr.GetGuildByName(gld);
+
     if (!targetGuild)
+    {
+        SendSysMessage(LANG_GUILD_NOT_FOUND);
+        SetSentErrorMessage(true);
         return false;
+    }
 
     targetGuild->Disband();
     delete targetGuild;
