@@ -765,6 +765,13 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 // Combustion
                 case 11129:
                 {
+                    // combustion counter was dispelled or clicked off
+                    if (!HasAura(28682))
+                    {
+                        RemoveAurasDueToSpell(11129);
+                        return SPELL_AURA_PROC_FAILED;
+                    }
+
                     //last charge and crit
                     if (triggeredByAura->GetHolder()->GetAuraCharges() <= 1 && (procEx & PROC_EX_CRITICAL_HIT))
                     {
