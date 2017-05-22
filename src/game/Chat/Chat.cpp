@@ -971,6 +971,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand goldCommandTable[] =
     {
         { MSTR, "remove",            SEC_GAMEMASTER,        true,  &ChatHandler::HandleGoldRemoval,               "", nullptr },
+        { MSTR, nullptr,              0,                    false, nullptr,                                       "", nullptr }
     };
 
     static ChatCommand commandTable[] =
