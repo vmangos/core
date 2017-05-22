@@ -577,8 +577,8 @@ enum MangosStrings
     LANG_EXPLORE_AREA                   = 560,
     LANG_UNEXPLORE_AREA                 = 561,
 
-    //                                    562,              // not used
-    //                                    563,              // not used
+    LANG_GUILD_NOT_FOUND                = 562,
+    LANG_GUILD_INV_ERR                  = 563,
     LANG_TOO_BIG_INDEX                  = 564,
     LANG_SET_UINT                       = 565,              //log
     LANG_SET_UINT_FIELD                 = 566,
