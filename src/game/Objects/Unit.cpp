@@ -9614,44 +9614,6 @@ bool Unit::isAttackReady(WeaponAttackType type) const
 }
 void Unit::SetDisplayId(uint32 modelId)
 {
-    if (IsPlayer())
-    {
-        float mod_x = 1;
-        switch (modelId)
-        {
-        case 59:
-            mod_x *= DEFAULT_TAUREN_MALE_SCALE;
-            break;
-        case 60:
-            mod_x *= DEFAULT_TAUREN_FEMALE_SCALE;
-            break;
-        // Orb of Deception Gone
-        case 10148:
-            mod_x *= DEFAULT_TAUREN_MALE_SCALE;
-            break;
-        case 10149:
-            mod_x *= DEFAULT_TAUREN_FEMALE_SCALE;
-            break;
-        }
-        switch (GetDisplayId())
-        {
-        case 59:
-            mod_x /= DEFAULT_TAUREN_MALE_SCALE;
-            break;
-        case 60:
-            mod_x /= DEFAULT_TAUREN_FEMALE_SCALE;
-            break;
-            // Orb of Deception Gone
-        case 10148:
-            mod_x /= DEFAULT_TAUREN_MALE_SCALE;
-            break;
-        case 10149:
-            mod_x /= DEFAULT_TAUREN_FEMALE_SCALE;
-            break;
-        }
-        ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, (mod_x -1)*100, true);
-    }
-
     SetUInt32Value(UNIT_FIELD_DISPLAYID, modelId);
 
     UpdateModelData();
@@ -11368,6 +11330,33 @@ void Unit::RemoveAllSpellCooldown()
     }
 }
 
+void Unit::setTransformScale(float scale)
+{
+    if (!scale)
+    {
+        sLog.outError("Attempt to set transform scale to 0!");
+        return;
+    }
+    ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X,(scale/m_nativeScaleOverride -1)*100,true);
+    m_nativeScaleOverride = scale;
+}
+
+void Unit::resetTransformScale()
+{
+    setTransformScale(getNativeScale());
+}
+
+float Unit::getNativeScale() const
+{
+    return m_nativeScale;
+}
+
+void Unit::setNativeScale(float scale)
+{
+    setTransformScale(scale);
+    m_nativeScale = scale;
+}
+
 void Unit::CooldownEvent(SpellEntry const *spellInfo, uint32 itemId, Spell* spell)
 {
     // start cooldowns at server side, if any
@@ -11522,17 +11511,23 @@ void Unit::InitPlayerDisplayIds()
 
     uint8 gender = getGender();
 
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
     switch (gender)
     {
         case GENDER_FEMALE:
             SetDisplayId(info->displayId_f);
             SetNativeDisplayId(info->displayId_f);
+            if (getRace() == RACE_TAUREN)
+                setNativeScale(DEFAULT_TAUREN_FEMALE_SCALE);
             break;
         case GENDER_MALE:
             SetDisplayId(info->displayId_m);
             SetNativeDisplayId(info->displayId_m);
+            if (getRace() == RACE_TAUREN)
+                setNativeScale(DEFAULT_TAUREN_MALE_SCALE);
             break;
         default:
             return;
     }
+
 }

@@ -2069,19 +2069,24 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 
     std::pair<unsigned int, float> info = getShapeshiftModelInfo(form, target);
     unsigned int modelid = info.first;
-    float mod_x = info.second;
-
     if (modelid > 0 && !target->getTransForm())
     {
         if (apply)
+        {
+            target->setTransformScale(info.second);
             target->SetDisplayId(modelid);
+        }
         else
+        {
+            target->resetTransformScale();
             target->SetDisplayId(target->GetNativeDisplayId());
-        target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, (mod_x -1)*100, apply);
+        }
     }
 
     if (apply)
     {
+
+
         Powers PowerType = POWER_MANA;
         switch (form)
         {
@@ -2222,10 +2227,10 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 void Aura::HandleAuraTransform(bool apply, bool Real)
 {
     Unit *target = GetTarget();
-    float mod_x = 1;
     if (apply)
     {
-        uint32 model_id;
+        float mod_x = 1;
+        uint32 model_id = 0;
 
         // Discombobulate removes mount auras.
         if (GetId() == 4060 && Real)
@@ -2257,75 +2262,58 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 {
                     case 16739:                                 // Orb of Deception
                     {
-                        uint32 orb_model = target->GetNativeDisplayId();
-                        switch (orb_model)
+                        uint8 gender = sObjectMgr.GetCreatureModelInfo(target->GetDisplayId())->gender;
+                        switch (target->getRace())
                         {
-                            // Troll Female
-                            case 1479:
-                                model_id = 10134;
-                                break;
-                            // Troll Male
-                            case 1478:
-                                model_id = 10135;
-                                break;
-                            // Tauren Male
-                            case 59:
-                                model_id = 10136;
-                                break;
-                            // Human Male
-                            case 49:
-                                model_id = 10137;
-                                break;
-                            // Human Female
-                            case 50:
-                                model_id = 10138;
-                                break;
-                            // Orc Male
-                            case 51:
-                                model_id = 10139;
-                                break;
-                            // Orc Female
-                            case 52:
-                                model_id = 10140;
-                                break;
-                            // Dwarf Male
-                            case 53:
-                                model_id = 10141;
-                                break;
-                            // Dwarf Female
-                            case 54:
-                                model_id = 10142;
-                                break;
-                            // NightElf Male
-                            case 55:
-                                model_id = 10143;
-                                break;
-                            // NightElf Female
-                            case 56:
-                                model_id = 10144;
-                                break;
-                            // Undead Female
-                            case 58:
-                                model_id = 10145;
-                                break;
-                            // Undead Male
-                            case 57:
-                                model_id = 10146;
-                                break;
-                            // Tauren Female
-                            case 60:
-                                model_id = 10147;
-                                break;
-                            // Gnome Male
-                            case 1563:
+                        case RACE_TROLL:
+                            model_id = gender == GENDER_MALE ?
+                                        10135 :
+                                        10134 ;
+                            break;
+                        case RACE_TAUREN:
+                            model_id = gender == GENDER_MALE ?
+                                        10136 :
+                                        10147 ;
+                            break;
+                        case RACE_HUMAN:
+                            model_id = gender == GENDER_MALE ?
+                                        10137 :
+                                        10138 ;
+                            break;
+                        case RACE_ORC:
+                            model_id = gender == GENDER_MALE ?
+                                        10139 :
+                                        10140 ;
+                            break;
+                        case RACE_DWARF:
+                            model_id = gender == GENDER_MALE ?
+                                        10141 :
+                                        10142 ;
+                            break;
+                        case RACE_NIGHTELF:
+                            model_id = gender == GENDER_MALE ?
+                                        10143 :
+                                        10144 ;
+                            break;
+                        case RACE_UNDEAD:
+                            model_id = gender == GENDER_MALE ?
+                                        10146 :
+                                        10145 ;
+                            break;
+                        case RACE_GNOME:
+                            if (gender == GENDER_MALE)
+                            {
                                 model_id = 10148;
-                                break;
-                            // Gnome Female
-                            case 1564:
+                                mod_x = DEFAULT_TAUREN_MALE_SCALE;
+                            }
+                            else
+                            {
                                 model_id = 10149;
-                                break;
-                            default:
-                                break;
+                                mod_x = DEFAULT_TAUREN_FEMALE_SCALE;
+                            }
+                            break;
+                        default:
+                            break;
                         }
                         break;
                     }
@@ -2350,12 +2338,11 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     ((Creature*)target)->LoadEquipment(ci->equipmentId, true);
             }
 
-            std::pair<unsigned int, float> info = getShapeshiftModelInfo(target->GetShapeshiftForm(), target);
-            if (target->GetDisplayId() == info.first)
-                mod_x /= info.second;
-
             if (model_id)
+            {
                 target->SetDisplayId(model_id);
+                target->setTransformScale(mod_x);
+            }
             target->setTransForm(GetId());
         }
     }
@@ -2366,6 +2353,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         {
             target->setTransForm(0);
             target->SetDisplayId(target->GetNativeDisplayId());
+            target->resetTransformScale();
 
             // apply default equipment for creature case
             if (target->GetTypeId() == TYPEID_UNIT)
@@ -2392,13 +2380,14 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             else //reapply shapeshifting, there should be only one.
             {
                 std::pair<unsigned int, float> info = getShapeshiftModelInfo(target->GetShapeshiftForm(), target);
-                mod_x /= info.second;
                 if (info.first)
+                {
                     target->SetDisplayId(info.first);
+                    target->setTransformScale(info.second);
+                }
             }
         }
     }
-    target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, (mod_x -1)*100, apply);
 }
 
 void Aura::HandleForceReaction(bool apply, bool Real)

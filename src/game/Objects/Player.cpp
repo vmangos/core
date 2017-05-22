@@ -2800,17 +2800,6 @@ void Player::InitStatsForLevel(bool reapplyMods)
     // set default cast time multiplier
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 
-    // Reset Size Before Reapplying Auras
-    if (getRace() == RACE_TAUREN)
-    {
-        if (getGender() == GENDER_MALE)
-            SetObjectScale(DEFAULT_TAUREN_MALE_SCALE);
-        else
-            SetObjectScale(DEFAULT_TAUREN_FEMALE_SCALE);
-    }
-    else
-        SetObjectScale(DEFAULT_OBJECT_SCALE);
-
     // save base values (bonuses already included in stored stats)
     for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
         SetCreateStat(Stats(i), info.stats[i]);

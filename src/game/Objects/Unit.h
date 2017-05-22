@@ -1903,6 +1903,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
 
         void RemoveAllSpellCooldown();
+
+        void setTransformScale(float scale);
+        void resetTransformScale();
+        float getNativeScale() const;
+        void setNativeScale(float scale);
     protected:
         explicit Unit ();
 
@@ -2001,6 +2006,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
+
+        float m_nativeScale = 1;
+        float m_nativeScaleOverride = 1;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type
