@@ -1378,7 +1378,12 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
         m_creature->SetCanModifyStats(true);
 
         if (m_creature->GetCharmInfo())
-            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
+        {
+            if (sWorld.GetWowPatch() < WOW_PATCH_109)
+                m_creature->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+            else 
+                m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
+        }
 
 
         m_firebuffetTimer = urand(0, 10000);
@@ -1402,8 +1407,8 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
     {
         if (m_firebuffetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
-                m_firebuffetTimer = urand(0, 10000);
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_Flame_Buffet) == CAST_OK)
+                m_firebuffetTimer = urand(5000, 10000);
         }
         else
             m_firebuffetTimer -= uiDiff;
@@ -1412,7 +1417,7 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
         {
             int32 damage = 300;
             m_creature->CastCustomSpell(m_creature->getVictim(), SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
-            m_flamebreathTimer = urand(0, 20000);
+            m_flamebreathTimer = urand(5000, 20000);
         }
         else
             m_flamebreathTimer -= uiDiff;
@@ -1433,7 +1438,7 @@ CreatureAI* GetAI_npc_arcanite_dragonling_dragonling(Creature* pCreature)
 ######*/
 enum
 {
-    SPELL_HEALING_TOUCH = 23381,
+    SPELL_HEALING_TOUCH = 26097,
     SPELL_LIGHTNING_BOLT = 9532
 };
 
@@ -1461,14 +1466,29 @@ struct npc_timbermaw_ancestorAI : ScriptedPetAI
         {
             if (m_creature->GetOwner()->HealthBelowPct(50))
             {
-                if (DoCastSpellIfCan(m_creature->GetOwner(), SPELL_HEALING_TOUCH, false) == CAST_OK);
+                if (DoCastSpellIfCan(m_creature->GetOwner(), SPELL_HEALING_TOUCH, false) == CAST_OK)
                     m_healingTouchTimer = 7000;
+            }
+            else if (Unit* const pTarget = m_creature->SelectRandomFriendlyTarget(m_creature->GetOwner(), 30.0f))
+            {
+                if (pTarget->HealthBelowPct(50))
+                {
+                    if (DoCastSpellIfCan(pTarget, SPELL_HEALING_TOUCH, false) == CAST_OK)
+                        m_healingTouchTimer = 7000;
+                }
             }
         }
         else
             m_healingTouchTimer -= uiDiff;
 
-        DoCastSpellIfCan(m_creature->getVictim(), SPELL_LIGHTNING_BOLT, false);
+        if (!m_creature->IsNonMeleeSpellCasted(false))
+        {
+            if (Unit * const pTarget = m_creature->getVictim())
+            {
+                if (!pTarget->HasBreakableByDamageCrowdControlAura() && !pTarget->IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_NATURE))
+                    DoCastSpellIfCan(pTarget, SPELL_LIGHTNING_BOLT, false);
+            }
+        }
 
         ScriptedPetAI::UpdatePetAI(uiDiff);
     }
