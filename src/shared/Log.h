@@ -184,7 +184,9 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
                                                             // any log level
         void outErrorDb( const char * str, ... )     ATTR_PRINTF(2,3);
                                                             // any log level
-        void outWorldPacketDump( uint64 socket, uint32 opcode, char const* opcodeName, ByteBuffer const* packet, bool incoming );
+        void outWorldPacketDump(ACE_HANDLE socketHandle, uint32 opcode,
+                                char const* opcodeName,
+                                ByteBuffer const* packet, bool incoming);
         // any log level
         uint32 GetLogLevel() const { return m_logLevel; }
         void SetLogLevel(char * Level);
@@ -286,5 +288,14 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
 
 #define ERROR_DB_STRICT_LOG(...) \
     ERROR_DB_FILTER_LOG(LOG_FILTER_DB_STRICTED_CHECK, __VA_ARGS__)
+
+// primary for script library
+void MANGOS_DLL_SPEC outstring_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC detail_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC debug_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC error_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC error_db_log(const char* str, ...) ATTR_PRINTF(1, 2);
+void MANGOS_DLL_SPEC setScriptLibraryErrorFile(char const* fname, char const* libName);
+void MANGOS_DLL_SPEC script_error_log(const char* str, ...) ATTR_PRINTF(1, 2);
 
 #endif

@@ -153,6 +153,8 @@ public:
 
 void Map::SpawnActiveObjects()
 {
+    if (MapPersistentState* state = GetPersistentState())
+        state->InitPools();
     ActiveObjectsGridLoader loader(this);
     sObjectMgr.DoGOData(loader);
     sObjectMgr.DoCreatureData(loader);
@@ -1028,9 +1030,16 @@ void Map::Remove(Player *player, bool remove)
     RemoveUnitFromMovementUpdate(player);
     player->m_needUpdateVisibility = false;
 
-    for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end(); ++it)
+    player->m_visibleGUIDs_lock.acquire_write();
+    for (ObjectGuidSet::const_iterator it = player->m_visibleGUIDs.begin(); it != player->m_visibleGUIDs.end();)
         if (Player* other = GetPlayer(*it))
+        {
+            other->DestroyForPlayer(player);
             other->m_broadcaster->RemoveListener(player);
+            it = player->m_visibleGUIDs.erase(it);
+        }
+        else ++it;
+    player->m_visibleGUIDs_lock.release();
 
     player->ResetMap();
     if (remove)
@@ -1979,7 +1988,7 @@ void DungeonMap::UnloadAll(bool pForce)
     }
 
     if (m_resetAfterUnload == true)
-        GetPersistanceState()->DeleteRespawnTimes();
+        GetPersistanceState()->DeleteRespawnTimesAndData();
 
     Map::UnloadAll(pForce);
 }
@@ -3995,8 +4004,21 @@ bool Map::GetLosHitPosition(float srcX, float srcY, float srcZ, float& destX, fl
 
 bool Map::GetWalkHitPosition(Transport* transport, float srcX, float srcY, float srcZ, float& destX, float& destY, float& destZ, uint32 moveAllowedFlags, float zSearchDist, bool locatedOnSteepSlope) const
 {
-    ASSERT(MaNGOS::IsValidMapCoord(srcX, srcY, srcZ));
-    ASSERT(MaNGOS::IsValidMapCoord(destX, destY, destZ));
+    if (!MaNGOS::IsValidMapCoord(srcX, srcY, srcZ))
+    {
+        sLog.outError("Map::GetWalkHitPosition invalid source coordinates,"
+            "x1: %f y1: %f z1: %f, x2: %f, y2: %f, z2: %f on map %d",
+            srcX, srcY, srcZ, destX, destY, destZ, GetId());
+        return false;
+    }
+
+    if (!MaNGOS::IsValidMapCoord(destX, destY, destZ))
+    {
+        sLog.outError("Map::GetWalkHitPosition invalid destination coordinates,"
+            "x1: %f y1: %f z1: %f, x2: %f, y2: %f, z2: %f on map %u",
+            srcX, srcY, srcZ, destX, destY, destZ, GetId());
+        return false;
+    }
 
     MMAP::MMapManager* mmap = MMAP::MMapFactory::createOrGetMMapManager();
     const dtNavMeshQuery* m_navMeshQuery = transport ? mmap->GetModelNavMeshQuery(transport->GetDisplayId()) : mmap->GetNavMeshQuery(GetId());

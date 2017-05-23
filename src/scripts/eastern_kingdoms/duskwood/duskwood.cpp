@@ -26,18 +26,37 @@ enum
     QUEST_NIGHTMARE_CORRUPTION = 8735,
 };
 
+void Handle_NightmareCorruption(/*const*/ Player* player)
+{
+    if (player->isDead() || player->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) != QUEST_STATUS_INCOMPLETE)
+    {
+        return;
+    }
+
+    auto corrupter = player->FindNearestCreature(NPC_TWILIGHT_CORRUPTER, 350.0f);
+
+    if (!corrupter)
+    {
+        corrupter = player->SummonCreature(NPC_TWILIGHT_CORRUPTER, -10335.9f, -489.051f, 50.6233f, 2.59373f,
+            TEMPSUMMON_DEAD_DESPAWN, 0);
+
+        if (!corrupter)
+        {
+            sLog.outError("Handle_NightmareCorruption: Could not summon creature %u for quest %u for player %s",
+                NPC_TWILIGHT_CORRUPTER, QUEST_NIGHTMARE_CORRUPTION, player->GetName());
+            return;
+        }
+    }
+
+    char message[200];
+    sprintf(message, "Come, %s. See what the Nightmare brings...", player->GetName());
+
+    corrupter->MonsterWhisper(message, player);
+}
+
 bool AreaTrigger_at_twilight_grove(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pPlayer->isDead())
-        return false;
-
-    char wMessage[200];
-    sprintf(wMessage, "Come, %s. See what the Nightmare brings...", pPlayer->GetName());
-
-    if (pPlayer->GetQuestStatus(QUEST_NIGHTMARE_CORRUPTION) == QUEST_STATUS_INCOMPLETE)
-        if (!pPlayer->FindNearestCreature(NPC_TWILIGHT_CORRUPTER, 350.0f))
-            if (Creature* corrupter = pPlayer->SummonCreature(NPC_TWILIGHT_CORRUPTER, -10335.9f, -489.051f, 50.6233f, 2.59373f, TEMPSUMMON_DEAD_DESPAWN, 0))
-                corrupter->MonsterWhisper(wMessage, (Unit*)pPlayer);
+    Handle_NightmareCorruption(pPlayer);
     return false;
 }
 

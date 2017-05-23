@@ -648,12 +648,12 @@ void AddSC_stranglethorn_vale()
     newscript->Name = "mob_yenniku";
     newscript->GetAI = &GetAI_mob_yenniku;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "mob_assistant_kryll";
     newscript->GetAI = &GetAI_mob_assistant_kryll;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "go_transpolyporter";
     newscript->GOGetAI = &GetAIgo_transpolyporter;

@@ -14,7 +14,7 @@ enum
 	TYPE_PYTHAS							= 2,
 	TYPE_SERPENTIS						= 3,
 	TYPE_DISCIPLE						= 4,
-    TYPE_MUTANOUS                       = 5,
+    TYPE_MUTANUS                        = 5,
     WAILING_CAVERNS_MAX_ENCOUNTER       = 6,
 
     DATA_NARALEX                        = 6,

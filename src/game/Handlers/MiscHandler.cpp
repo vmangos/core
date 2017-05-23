@@ -71,12 +71,6 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
         player->KillPlayer();
     }
 
-    // Waiting to Resurrect (probably redundant cast, yet to check thoroughly)
-    if (player->InBattleGround())
-        player->CastSpell(player, 2584, true);
-
-    //this is spirit release confirm?
-    player->RemovePet(PET_SAVE_REAGENTS);
     player->BuildPlayerRepop();
     player->RepopAtGraveyard();
 }

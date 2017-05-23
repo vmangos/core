@@ -68,6 +68,7 @@ GameObject::GameObject() : WorldObject(),
     m_model = NULL;
     m_rotation = 0;
     m_playerGroupId = 0;
+    m_summonTarget = ObjectGuid();
 }
 
 GameObject::~GameObject()
@@ -1163,15 +1164,6 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            // TODO: possible must be moved to loot release (in different from linked triggering)
-            if (GetGOInfo()->chest.eventId)
-            {
-                DEBUG_LOG("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetGUIDLow());
-
-                if (!sScriptMgr.OnProcessEvent(GetGOInfo()->chest.eventId, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
-            }
-
             TriggerLinkedGameObject(user);
             return;
         }
@@ -1524,6 +1516,18 @@ void GameObject::Use(Unit* user)
             if (owner)
                 owner->FinishSpell(CURRENT_CHANNELED_SPELL);
 
+            // finish clickers spell
+            for (GuidsSet::const_iterator itr = m_UniqueUsers.begin(); itr != m_UniqueUsers.end(); ++itr)
+            {
+                if (Player* user = GetMap()->GetPlayer(*itr))
+                    if (user && user != owner)
+                    {
+                        Spell *channeled = user->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
+                        if (channeled && channeled->m_spellInfo->Id == info->summoningRitual.animSpell)
+                            user->FinishSpell(CURRENT_CHANNELED_SPELL);
+                    }
+            }
+
             // can be deleted now, if
             if (!info->summoningRitual.ritualPersistent)
                 SetLootState(GO_JUST_DEACTIVATED);
@@ -1621,6 +1625,7 @@ void GameObject::Use(Unit* user)
                 // 15004
                 // 15005
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 bg->EventPlayerClickedOnFlag(player, this);
                 return;                                     //we don't need to delete flag ... it is despawned!
             }
@@ -1670,6 +1675,7 @@ void GameObject::Use(Unit* user)
                     }
                 }
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 //this cause to call return, all flags must be deleted here!!
                 spellId = 0;
                 Delete();
@@ -1766,9 +1772,18 @@ void GameObject::Use(Unit* user)
 
     Spell *spell = new Spell(spellCaster, spellInfo, triggered, GetObjectGuid());
 
-    // spell target is user of GO
+    // spell target is user of GO 
     SpellCastTargets targets;
-    targets.setUnitTarget(user);
+
+    // If summoning ritual GO use the summon target instead
+    Player* summonTarget = nullptr;
+    if (GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL && getSummonTarget())
+        summonTarget = sObjectMgr.GetPlayer(getSummonTarget());
+
+    if (summonTarget)
+        targets.setUnitTarget(summonTarget);
+    else
+        targets.setUnitTarget(user);
 
     spell->prepare(&targets);
 }

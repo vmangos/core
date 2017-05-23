@@ -113,7 +113,7 @@ void WorldSession::HandleAutostoreLootItemOpcode(WorldPacket & recv_data)
     QuestItem *ffaitem = NULL;
     QuestItem *conditem = NULL;
 
-    LootItem *item = loot->LootItemInSlot(lootSlot, player, &qitem, &ffaitem, &conditem);
+    LootItem *item = loot->LootItemInSlot(lootSlot, player->GetGUIDLow(), &qitem, &ffaitem, &conditem);
 
     if (!item)
     {
@@ -264,7 +264,8 @@ void WorldSession::HandleLootMoneyOpcode(WorldPacket & /*recv_data*/)
                 Player* playerGroup = itr->getSource();
                 if (!playerGroup)
                     continue;
-                if (player->IsWithinDistInMap(playerGroup, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+                //if (player->IsWithinDistInMap(playerGroup, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE), false))
+                if(player->IsWithinLootXPDist(playerGroup))
                     playersNear.push_back(playerGroup);
             }
 
@@ -363,6 +364,15 @@ void WorldSession::DoLootRelease(ObjectGuid lguid)
                 {
                     uint32 go_min = go->GetGOInfo()->chest.minSuccessOpens;
                     uint32 go_max = go->GetGOInfo()->chest.maxSuccessOpens;
+
+                    // trigger loot events
+                    if (go->GetGOInfo()->chest.eventId)
+                    {
+                        DEBUG_LOG("Chest ScriptStart id %u for GO %u", go->GetGOInfo()->chest.eventId, go->GetGUIDLow());
+
+                        if (!sScriptMgr.OnProcessEvent(go->GetGOInfo()->chest.eventId, _player, go, true))
+                            go->GetMap()->ScriptsStart(sEventScripts, go->GetGOInfo()->chest.eventId, _player, go);
+                    }
 
                     // only vein pass this check
                     if (go_min != 0 && go_max > go_min)

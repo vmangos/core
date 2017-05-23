@@ -15,11 +15,11 @@ void AddSC_bg_alterac();
 //custom
 void AddSC_zero_scripts();
 void AddSC_ubrs_trash();
-void AddSC_gmisland();
+//void AddSC_gmisland();
 //void AddSC_boss_arena_hardog(); // EVENT de TORKIN
 
 // Event
-void AddSC_event_attack_city();
+//void AddSC_event_attack_city();
 void AddSC_elemental_invasions();
 
 // HT
@@ -63,7 +63,7 @@ void AddSC_instance_blackrock_depths();
 void AddSC_boss_drakkisath();                        //blackrock_spire
 void AddSC_boss_halycon();
 void AddSC_boss_highlordomokk();
-void AddSC_boss_mothersmolderweb();
+//void AddSC_boss_mothersmolderweb();
 void AddSC_boss_overlordwyrmthalak();
 void AddSC_boss_shadowvosh();
 void AddSC_boss_thebeast();
@@ -86,8 +86,8 @@ void AddSC_instance_blackwing_lair();
 void AddSC_deadmines();                              //deadmines
 void AddSC_instance_deadmines();
 void AddSC_boss_mr_smite();
-void AddSC_boss_sneed_shredder();
-void AddSC_boss_sneed();
+//void AddSC_boss_sneed_shredder();
+//void AddSC_boss_sneed();
 
 void AddSC_gnomeregan();                             //gnomeregan
 void AddSC_boss_thermaplugg();
@@ -120,7 +120,7 @@ void AddSC_boss_razuvious();
 void AddSC_boss_sapphiron();
 void AddSC_instance_naxxramas();
 void AddSC_boss_arcanist_doan();                     //scarlet_monastery
-void AddSC_boss_azshir_the_sleepless();
+//void AddSC_boss_azshir_the_sleepless();
 void AddSC_boss_bloodmage_thalnos();
 void AddSC_boss_scorn();
 void AddSC_boss_herod();
@@ -135,7 +135,7 @@ void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
 void AddSC_boss_instructormalicia();
 void AddSC_boss_jandicebarov();
-void AddSC_boss_kormok();
+//void AddSC_boss_kormok();
 void AddSC_boss_lordalexeibarov();
 void AddSC_boss_lorekeeperpolkelt();
 void AddSC_boss_rasfrost();
@@ -166,9 +166,9 @@ void AddSC_uldaman();                                //uldaman
 void AddSC_boss_archaedas();
 void AddSC_boss_arlokk();                            //zulgurub
 void AddSC_boss_gahzranka();
-void AddSC_boss_grilek();
+//void AddSC_boss_grilek();
 void AddSC_boss_hakkar();
-void AddSC_boss_hazzarah();
+//void AddSC_boss_hazzarah();
 void AddSC_boss_jeklik();
 void AddSC_boss_jindo();
 void AddSC_boss_mandokir();
@@ -177,7 +177,7 @@ void AddSC_boss_ouro();
 void AddSC_boss_renataki();
 void AddSC_boss_thekal();
 void AddSC_boss_venoxis();
-void AddSC_boss_wushoolay();
+//void AddSC_boss_wushoolay();
 void AddSC_instance_zulgurub();
 void AddSC_zg_trash();
 void AddSC_boss_omen();
@@ -227,7 +227,7 @@ void AddSC_boss_kurinnaxx();
 void AddSC_boss_moam();
 void AddSC_boss_ossirian();
 void AddSC_boss_rajaxx();
-void AddSC_npc_sandstalker(); 						// trash
+//void AddSC_npc_sandstalker(); 						// trash
 void AddSC_ruins_of_ahnqiraj();
 void AddSC_instance_ruins_of_ahnqiraj();
 void AddSC_boss_cthun();                             //temple_of_ahnqiraj
@@ -282,10 +282,10 @@ void AddScripts()
     //custom
     AddSC_zero_scripts();
     AddSC_ubrs_trash();
-    AddSC_gmisland();
+    //AddSC_gmisland();
 
     // Event
-    AddSC_event_attack_city();
+    //AddSC_event_attack_city();
     AddSC_elemental_invasions();
 
     // HT
@@ -328,7 +328,7 @@ void AddScripts()
     AddSC_boss_drakkisath();                                //blackrock_spire
     AddSC_boss_halycon();
     AddSC_boss_highlordomokk();
-    AddSC_boss_mothersmolderweb();
+    //AddSC_boss_mothersmolderweb();
     AddSC_boss_overlordwyrmthalak();
     AddSC_boss_shadowvosh();
     AddSC_boss_thebeast();
@@ -352,8 +352,8 @@ void AddScripts()
     AddSC_deadmines();                                      //deadmines
     AddSC_instance_deadmines();
     AddSC_boss_mr_smite();
-    AddSC_boss_sneed_shredder();
-    AddSC_boss_sneed();
+    //AddSC_boss_sneed_shredder();
+    //AddSC_boss_sneed();
     AddSC_gnomeregan();                                     //gnomeregan
     AddSC_boss_thermaplugg();
     AddSC_instance_gnomeregan();
@@ -384,7 +384,7 @@ void AddScripts()
     AddSC_boss_sapphiron();
     AddSC_instance_naxxramas();
     AddSC_boss_arcanist_doan();                             //scarlet_monastery
-    AddSC_boss_azshir_the_sleepless();
+    //AddSC_boss_azshir_the_sleepless();
     AddSC_boss_bloodmage_thalnos();
     AddSC_boss_scorn();
     AddSC_boss_herod();
@@ -399,7 +399,7 @@ void AddScripts()
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
     AddSC_boss_jandicebarov();
-    AddSC_boss_kormok();
+    //AddSC_boss_kormok();
     AddSC_boss_lordalexeibarov();
     AddSC_boss_lorekeeperpolkelt();
     AddSC_boss_rasfrost();
@@ -430,9 +430,9 @@ void AddScripts()
     AddSC_boss_archaedas();
     AddSC_boss_arlokk();                                    //zulgurub
     AddSC_boss_gahzranka();
-    AddSC_boss_grilek();
+    //AddSC_boss_grilek();
     AddSC_boss_hakkar();
-    AddSC_boss_hazzarah();
+    //AddSC_boss_hazzarah();
     AddSC_boss_jeklik();
     AddSC_boss_jindo();
     AddSC_boss_mandokir();
@@ -441,7 +441,7 @@ void AddScripts()
     AddSC_boss_renataki();
     AddSC_boss_thekal();
     AddSC_boss_venoxis();
-    AddSC_boss_wushoolay();
+    //AddSC_boss_wushoolay();
     AddSC_instance_zulgurub();
     AddSC_zg_trash();
     AddSC_boss_omen();
@@ -492,7 +492,7 @@ void AddScripts()
     AddSC_boss_ossirian();
     AddSC_boss_rajaxx();
     AddSC_ruins_of_ahnqiraj();
-	AddSC_npc_sandstalker();								//trash
+	//AddSC_npc_sandstalker();								//trash
     AddSC_instance_ruins_of_ahnqiraj();
     AddSC_boss_cthun();                                     //temple_of_ahnqiraj
 	AddSC_boss_viscidus();

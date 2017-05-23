@@ -7,18 +7,17 @@
 
 enum
 {
-    MAX_ENCOUNTER               = 10,
-    
     TYPE_SKERAM                 = 0,
     TYPE_SARTURA                = 1,
     TYPE_FANKRISS               = 2,
     TYPE_HUHURAN                = 3,
     TYPE_TWINS                  = 4,
-    TYPE_C_THUN                 = 5,
+    TYPE_CTHUN                  = 5,
     TYPE_BUG_TRIO               = 6,
     TYPE_VISCIDUS               = 7,
     TYPE_OURO                   = 8,
-    TYPE_CTHUN_PHASE            = 9,
+    
+    MAX_ENCOUNTER               = 10,
 };
 
 enum
@@ -66,53 +65,150 @@ enum
     NPC_VEKNISS_BORER           = 15622,
     NPC_SPAWN_OF_FANKRISS       = 15630,
     NPC_OURO_SCARAB             = 15718,
+    NPC_OURO_SPAWNER            = 15957,
     NPC_CTHUN                   = 15727,
     NPC_CTHUN_PORTAL            = 15896,
     NPC_VEKNISS_HATCHLING       = 15962,
-    NPC_THE_MASTERS_EYE         = 15963,
+    NPC_MASTERS_EYE             = 15963,
     NPC_SARTURA_S_ROYAL_GUARD   = 15984,
 
-    //GO_SKERAM_GATE              = 180636,
-    //GO_TWINS_ENTER_DOOR         = 180634,
-    //GO_TWINS_EXIT_DOOR          = 180635,
+    GO_SKERAM_GATE              = 180636,
+    GO_TWINS_ENTER_DOOR         = 180634,
+    GO_TWINS_EXIT_DOOR          = 180635,
+    GO_SANDWORM_BASE            = 180795,
+    GO_GRASP_OF_CTHUN           = 180745,
 
-	GO_SKERAM_GATE				= 21785,
-	GO_TWINS_ENTER_DOOR			= 21783,
-	GO_TWINS_EXIT_DOOR			= 21784,
+    AREATRIGGER_TWIN_EMPERORS	  = 4047,
+    AREATRIGGER_SARTURA		       = 4052,
+    AREATRIGGER_STOMACH_GROUND  = 4033,
+    AREATRIGGER_STOMACH_AIR     = 4034,
+    AREATRIGGER_CTHUN_KNOCKBACK = 4036,
 
-	AREATRIGGER_TWIN_EMPERORS	= 4047,
-	AREATRIGGER_SARTURA			= 4052,
+    // Whispered on players around the map
+    SAY_CTHUN_WHISPER_1         = -1531033,
+    SAY_CTHUN_WHISPER_2         = -1531034,
+    SAY_CTHUN_WHISPER_3         = -1531035,
+    SAY_CTHUN_WHISPER_4         = -1531036,
+    SAY_CTHUN_WHISPER_5         = -1531037,
+    SAY_CTHUN_WHISPER_6         = -1531038,
+    SAY_CTHUN_WHISPER_7         = -1531039,
+    SAY_CTHUN_WHISPER_8         = -1531040,
+
+
+
+    SPELL_SUMMON_PLAYER         = 20477,
+
+    // Cast periodically on players around the instance
+    SPELL_WHISPERINGS_CTHUN_1   = 26195,
+    SPELL_WHISPERINGS_CTHUN_2   = 26197,
+    SPELL_WHISPERINGS_CTHUN_3   = 26198,
+    SPELL_WHISPERINGS_CTHUN_4   = 26258,
+    SPELL_WHISPERINGS_CTHUN_5   = 26259,
 };
 
-class instance_temple_of_ahnqiraj : public ScriptedInstance_PTR
+class TwinsIntroDialogue : public DialogueHelper
 {
-    public:
-        instance_temple_of_ahnqiraj(Map* pMap);
+public:
+    TwinsIntroDialogue();
+    void Start();
+    bool StartedOrDone();
+    void SetDone();
 
-        void Initialize();
+protected:
+    void JustDidDialogueStep(int32 iEntry) override;
+private:
+    bool m_StartedOrDone;
+};
+
+class instance_temple_of_ahnqiraj : public ScriptedInstance
+{
+public:
+    instance_temple_of_ahnqiraj(Map* pMap);
+
+    void Initialize();
+
+    bool IsEncounterInProgress() const override;
+
+    void OnCreatureRespawn(Creature* pCreature);
+    void OnCreatureCreate(Creature* pCreature);
+    void OnObjectCreate(GameObject* pGo);
+
+    void SetData(uint32 uiType, uint32 uiData) override;
+    uint32 GetData(uint32 uiType) override;
+
+    void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
+
+    const char* Save() { return m_strInstData.c_str(); }
+    void Load(const char* chrIn);
+
+    void Update(uint32 uiDiff);
+
+    bool TwinsDialogueStartedOrDone();
+
+private:
+    uint32 m_auiEncounter[MAX_ENCOUNTER];
+    std::string m_strInstData;
+
+    uint32 m_uiBugTrioDeathCount;
+    uint32 m_uiCthunPhase;
+
+    GuidList m_lRoyalGuardGUIDList;
+
+    TwinsIntroDialogue m_twinsIntroDialogue;
+    DialogueHelper m_twinsDeadDialogue;
+    std::vector<ObjectGuid> graspsOfCthun;
+    
+    void UpdateCThunWhisper(uint32 diff);
+    std::vector<std::pair<ObjectGuid, uint32>> cthunWhisperMutes;
+    uint32 m_uiCthunWhisperTimer;
+    uint32 m_uiCthunPrevWhisperTimer;
+
+    // The following functions, variables etc, are used to handle the C'thun stomach.
+    // One might argue if they should be in boss_cthun.cpp instead, but it makes it a whole
+    // lot easier to handle this logic if it's handled by the instance script.
+public:
+    void DoHandleTempleAreaTrigger(uint32 uiTriggerId);
+    void HandleStomachTriggers(Player* pPlayer, const AreaTriggerEntry* pAt);
+    void AddPlayerToStomach(Unit* p);
+    bool PlayerInStomach(Unit* p);
+    bool KillPlayersInStomach();
+
+private:
+    enum eStomachSpells {
+        SPELL_PUNT_UPWARD               = 26224, //knocks up like craaayy everyone in range, maybe too big radius. Only works if thing is targeting player?
+        SPELL_EXIT_STOMACH_KNOCKBACK    = 26230, //knocks well back, but must be cast probably an invisible trigger, if not by cthun outside
         
-        bool IsEncounterInProgress() const override;
+        SPELL_DIGESTIVE_ACID            = 26476, // Must be stacked and removed manually. 
+        EXIT_KNOCKBACK_CREATURE         = 15800, // Exit trigger creature used for stomach and cthun knockups/knockbacks
+        PUNT_CREATURE                   = 15922, // Trigger for cthuns belly knockup spell
+        SPELL_QUAKE                     = 26093, //used for its visual only with SendSpellGo. It deals damage if cast normally
+        SPELL_PORT_OUT_STOMACH          = 26648, // Not yet used, was killing c'thun too. Maybe that's intended => a respawn?
+    };
+    struct StomachTimers {
+        uint32 acidDebuff;
+        uint32 timeSincePortedFromStomach;
+        uint32 timeSincePortedToStomach;
+        bool didKnockback;
+        StomachTimers() :
+            acidDebuff(StomachTimers::ACID_REFRESH_RATE),
+            timeSincePortedFromStomach(0),
+            timeSincePortedToStomach(0),
+            didKnockback(false)
+        {}
+        static const uint32 PUNT_CAST_TIME = 3000;
+        static const uint32 ACID_REFRESH_RATE = 5000;
+    };
+    using CThunStomachList = std::vector<std::pair<ObjectGuid, StomachTimers>>;
+    void UpdateStomachOfCthun(uint32 diff);
+    CThunStomachList::iterator PlayerInStomachIter(Unit* unit);
+    void TeleportPlayerToCThun(Player* pPlayer);
+    void PerformCthunKnockback();
 
-        void OnCreatureRespawn(Creature* pCreature);
-        void OnCreatureCreate(Creature* pCreature);
-        void OnObjectCreate(GameObject* pGo);
+    ObjectGuid puntCreatureGuid;
+    uint32 quakeTimer;
+    uint32 puntCountdown;
 
-        void SetData(uint32 uiType, uint32 uiData);
-        uint32 GetData(uint32 uiType);
-
-		void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
-
-        const char* Save() { return m_strInstData.c_str(); }
-        void Load(const char* chrIn);
-
-    private:
-        uint32 m_auiEncounter[MAX_ENCOUNTER];
-        std::string m_strInstData;
-
-        uint32 m_uiBugTrioDeathCount;
-        uint32 m_uiCthunPhase;
-
-		GuidList m_lRoyalGuardGUIDList;
+    std::vector<std::pair<ObjectGuid, StomachTimers>> playersInStomach;
 };
 
 #endif

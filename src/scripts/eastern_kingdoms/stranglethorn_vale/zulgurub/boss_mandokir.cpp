@@ -843,10 +843,11 @@ void AddSC_boss_mandokir()
     newscript->Name = "mob_chained_spirit";
     newscript->GetAI = &GetAI_mob_chained_spirit;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "mob_vilebranche";
     newscript->GetAI = &GetAI_mob_vilebranche;
     newscript->RegisterSelf();
+    */
 }
 

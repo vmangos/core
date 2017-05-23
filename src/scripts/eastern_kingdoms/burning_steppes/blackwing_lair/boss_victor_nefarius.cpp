@@ -127,7 +127,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         boss_victor_nefariusAI::Reset();
     }
 
-    const uint32 MAX_SCEPTER_RUN_TIME = 1.5 * HOUR * IN_MILLISECONDS;
+    const uint32 MAX_SCEPTER_RUN_TIME = 90 * MINUTE * IN_MILLISECONDS;
     const uint32 SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
     const uint32 SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
 
@@ -304,7 +304,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                 if (Player* scepterChampion = m_creature->GetMap()->GetPlayer(m_pInstance->GetData64(DATA_SCEPTER_CHAMPION)))
                     if (scepterChampion->GetQuestStatus(QUEST_NEFARIUS_CORRUPTION) == QUEST_STATUS_INCOMPLETE)
                         scepterRunResult = DONE;
-                
+
             }
 
             m_pInstance->SetData(TYPE_SCEPTER_RUN, scepterRunResult);
@@ -352,7 +352,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         }
 
         if (watchScepterRun && nullptr != m_pInstance)
-        {   
+        {
             if (scepterRun)
             {
                 HandleScepterRun(uiDiff);

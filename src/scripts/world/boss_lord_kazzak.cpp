@@ -342,10 +342,11 @@ void AddSC_boss_lord_kazzak()
     newscript->Name = "boss_lord_kazzak";
     newscript->GetAI = &GetAI_boss_lordkazzak;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "boss_spirit_lord_kazzak";
     newscript->GetAI = &GetAI_boss_spirit_lordkazzak;
     newscript->RegisterSelf();
+    */
 }
 

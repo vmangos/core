@@ -984,22 +984,22 @@ void AddSC_shadowfang_keep()
     newscript->pGossipSelect = &GossipSelect_npc_shadowfang_prisoner;
     newscript->GetAI = &GetAI_npc_shadowfang_prisoner;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "mob_arugal_voidwalker";
     newscript->GetAI = &GetAI_mob_arugal_voidwalker;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_arugal";
     newscript->GetAI = &GetAI_npc_arugal;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "boss_arugal";
     newscript->GetAI = &GetAI_boss_arugal;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_deathstalker_vincent";
     newscript->GetAI = &GetAI_npc_deathstalker_vincent;

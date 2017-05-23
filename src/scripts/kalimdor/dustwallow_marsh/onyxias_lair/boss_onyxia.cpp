@@ -525,26 +525,28 @@ struct boss_onyxiaAI : public ScriptedAI
         m_creature->InterruptNonMeleeSpells(false);
         m_pPointData = GetMoveData();
 
-        switch (urand(0, 2))
+        uint32 roll = urand(0, 99);
+        if (roll < 35)          // Move clockwise
         {
-            case 0:     // Move clockwise
-                m_uiMovePoint = (m_uiMovePoint + 1) % 8;
-                break;
-            case 1:     // Move counter-clockwise
-                m_uiMovePoint = (m_uiMovePoint + 8 - 1) % 8;
-                break;
-            case 2:     // Deep Breath
-                m_uiMovePoint = (m_uiMovePoint + 4) % 8;
-                DoScriptText(EMOTE_BREATH, m_creature);
-                
-                m_bDeepBreathIsCasting = true;
-                m_uiDeepBreathTimer = 5000;
-                m_creature->CastSpell(m_creature, m_pPointData->uiSpellId, true);
-                // face destination and clear target
-                m_pPointData = GetMoveData();
-                m_creature->SetFacingTo(m_creature->GetAngle(m_pPointData->fX, m_pPointData->fY));
-                m_creature->SetTargetGuid(ObjectGuid()); 
-                return true;
+            m_uiMovePoint = (m_uiMovePoint + 1) % 8;
+        }
+        else if (roll < 70)     // Move counter-clockwise
+        {
+            m_uiMovePoint = (m_uiMovePoint + 8 - 1) % 8;
+        }
+        else                    // Deep Breath
+        {
+            m_uiMovePoint = (m_uiMovePoint + 4) % 8;
+            DoScriptText(EMOTE_BREATH, m_creature);
+
+            m_bDeepBreathIsCasting = true;
+            m_uiDeepBreathTimer = 5000;
+            m_creature->CastSpell(m_creature, m_pPointData->uiSpellId, true);
+            // face destination and clear target
+            m_pPointData = GetMoveData();
+            m_creature->SetFacingTo(m_creature->GetAngle(m_pPointData->fX, m_pPointData->fY));
+            m_creature->SetTargetGuid(ObjectGuid());
+            return true;
         }
 
         m_pPointData = GetMoveData();

@@ -43,7 +43,7 @@ class Unit;
 struct SpellModifier;
 
 // Nostalrius : Champs 'Custom' de SpellEntry
-enum
+enum SpellAttributeCustom
 {
     SPELL_CUSTOM_NONE                       = 0x000,
 
@@ -53,7 +53,8 @@ enum
     SPELL_CUSTOM_POSITIVE                   = 0x004,
     SPELL_CUSTOM_CHAN_NO_DIST_LIMIT         = 0x008,
     SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,
-    SPELL_CUSTOM_IGNORE_ARMOR               = 0x020
+    SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
+    SPELL_CUSTOM_FROM_BEHIND                = 0x040     // For spells that require the caster to be behind the target
 };
 
 // only used in code
@@ -89,6 +90,7 @@ enum SpellSpecific
     SPELL_FOOD              = 20,
     SPELL_DRINK             = 21,
     SPELL_FOOD_AND_DRINK    = 22,
+    SPELL_SHADOW_VULN       = 23,
 };
 
 SpellSpecific GetSpellSpecific(uint32 spellId);
@@ -529,7 +531,9 @@ enum ProcFlags
     PROC_FLAG_SUCCESSFUL_OFFHAND_HIT        = 0x00800000,   // 23 Successful off-hand melee attacks
 
     PROC_FLAG_SUCCESSFUL_AOE                = 0x01000000,   // 24 Nostalrius: AoE casted. Triggered only once, whatever the number of targets.
-    PROC_FLAG_SUCCESSFUL_SPELL_CAST         = 0x02000000    // 25 Nostalrius: Spell cast successful (procs only once for AoE)
+    PROC_FLAG_SUCCESSFUL_SPELL_CAST         = 0x02000000,   // 25 Nostalrius: Spell cast successful (procs only once for AoE)
+
+    PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST    = 0x04000000    // 26 Successful cast of a mana based spell (procs only once for AoE)
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_HIT        | \

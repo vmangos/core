@@ -434,6 +434,10 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if (spellInfo->Id == 13161)
                 return SPELL_ASPECT;
 
+            // Shadow Vulnerability
+            if (spellInfo->SpellIconID == 213 && spellInfo->EffectApplyAuraName[0] == SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN)
+                return SPELL_SHADOW_VULN;
+
             // Food / Drinks (mostly)
             if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_NOT_SEATED)
             {
@@ -596,6 +600,7 @@ bool IsSingleFromSpellSpecificSpellRanksPerTarget(SpellSpecific spellSpec1, Spel
         case SPELL_AURA:
         case SPELL_CURSE:
         case SPELL_ASPECT:
+        case SPELL_SHADOW_VULN:
             return spellSpec1 == spellSpec2;
         default:
             return false;
@@ -789,7 +794,6 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
                         return true;                        // some expected positive spells have unclear target modes // maybe don't need this at all now that we don't check for what was SPELL_ATTR_EX_NEGATIVE
                     break;
                 case SPELL_AURA_ADD_TARGET_TRIGGER:
-                case SPELL_AURA_MOD_DETECT_RANGE:
                     return true;
                 case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
                     if (spellproto->Id != spellproto->EffectTriggerSpell[effIndex])
@@ -833,6 +837,7 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
                 case SPELL_AURA_PERIODIC_LEECH:
                 case SPELL_AURA_MOD_STALKED:
                 case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                case SPELL_AURA_MOD_DETECT_RANGE:
                     return false;
                 case SPELL_AURA_PERIODIC_DAMAGE:            // used in positive spells also.
                     // part of negative spell if casted at self (prevent cancel)
@@ -1676,11 +1681,14 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
         if (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT))
             return true;
     }
-    else // all spells hits here only if resist/reflect/immune/evade
+    else // all spells hits here only if resist/reflect/immune/evade/periodic
     {
         // Exist req for PROC_EX_EX_TRIGGER_ALWAYS
         if (procEvent_procEx & PROC_EX_EX_TRIGGER_ALWAYS)
             return true;
+        // Exist req for PROC_EX_NO_PERIODIC
+        if ((procEvent_procEx & PROC_EX_NO_PERIODIC) && (procFlags & (PROC_FLAG_ON_DO_PERIODIC | PROC_FLAG_ON_TAKE_PERIODIC)))
+            return false;
         // Check Extra Requirement like (hit/crit/miss/resist/parry/dodge/block/immune/reflect/absorb and other)
         if (procEvent_procEx & procExtra)
             return true;
@@ -2060,7 +2068,9 @@ bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1, uint32 spell
             spellInfo_1->SpellFamilyName != SPELLFAMILY_GENERIC &&
             spellInfo_1->Effect[0] == spellInfo_2->Effect[0] &&
             spellInfo_1->EffectApplyAuraName[0] == spellInfo_2->EffectApplyAuraName[0] &&
-            spellInfo_1->SpellIconID > 1)
+            spellInfo_1->SpellIconID > 1 &&
+            (spellInfo_1->EffectApplyAuraName[0] != SPELL_AURA_ADD_FLAT_MODIFIER ||
+             spellInfo_1->EffectMiscValue[0] == spellInfo_2->EffectMiscValue[0]))
         return true;
     return GetFirstSpellInChain(spellInfo_1->Id) == GetFirstSpellInChain(spellId_2);
 }

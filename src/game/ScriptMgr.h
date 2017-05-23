@@ -1,8 +1,6 @@
 /*
  * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
  * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
- * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
- * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -640,6 +638,7 @@ class ScriptMgr
 
 //Generic scripting text function
 void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr);
+void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()
 

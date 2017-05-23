@@ -146,6 +146,10 @@ void SpellEntry::ComputeBinary()
     bool foundNoDamageAura   = false;
     for (int eff = 0; eff < 3; ++eff)
     {
+        // Micro opt - don't iterate anymore if we already have an aura
+        if (foundNoDamageAura)
+            break;
+        
         switch (Effect[eff])
         {
             case SPELL_EFFECT_INTERRUPT_CAST:
@@ -166,9 +170,18 @@ void SpellEntry::ComputeBinary()
                         break;
                 }
                 break;
+            case SPELL_EFFECT_KNOCK_BACK:
+                foundNoDamageAura = true;
+                break;
         }
     }
     _isBinary = foundNoDamageAura;
+    if (Id == 26143) {              // SPELL_MIND_FLAY (C'Thuns Eye Tentacles)
+        _isBinary = true;
+    }
+    else if (Id == 26478) {
+        _isBinary = true;           // SPELL_GROUND_RUPTURE_NATURE (C'thuns Giant tentacles ground rupture)
+    }
 }
 
 void SpellEntry::ComputeDispel()

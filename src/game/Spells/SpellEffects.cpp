@@ -1392,6 +1392,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     ((Player*)unitTarget)->AddSpellMod(mod, true);
                     break;
                 }
+                case 11094:                                 // Improved Fire Ward
+                case 13043:
+                {
+                    if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
+                        return;
+
+                    // increase reflaction chanced (effect 1) of Fire Ward, removed in aura boosts
+                    SpellModifier *mod = new SpellModifier(SPELLMOD_EFFECT2, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000008));
+                    ((Player*)unitTarget)->AddSpellMod(mod, true);
+                    break;
+                }
                 case 12472:                                 // Cold Snap
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -2207,14 +2218,12 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
             int32 tickheal = targetAura->GetModifier()->m_amount;
             int32 tickcount = 0;
-            // Retablissement : 0x40
-            // pv / 3 sec. Dure 21 sec -> 7 tics
-            // -> Prompte Guerison rend "15 sec de reta", donc 5 tics
+            // Regrowth : 0x40
+            // "18 sec of Regrowth" -> 6 ticks
             if (targetAura->GetSpellProto()->IsFitToFamilyMask<CF_DRUID_REGROWTH>())
-                tickcount = 5;
-            // Recuperation : 0x10
-            // pv / 3 sec. Dure 12 sec -> 4 tics
-            // -> Prompte Guerison rend "12 sec de recup", donc 4 tics
+                tickcount = 6;
+            // Rejuvenation : 0x10
+            // "12 sec of Rejuvenation" -> 4 ticks
             if (targetAura->GetSpellProto()->IsFitToFamilyMask<CF_DRUID_REJUVENATION>())
                 tickcount = 4;
 
@@ -3123,6 +3132,12 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     summon->SetLootRecipient(m_caster);
                     break;
+                // Rockwing Gargoyle
+                case 16381:
+                    if (m_caster->getAttackerForHelper())
+                        summon->AI()->AttackStart(m_caster->getAttackerForHelper());
+                    break;
+
             }
 
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.
@@ -3946,6 +3961,28 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
         return;
     uint32 heal = m_caster->GetMaxHealth();
 
+    // Healing percent modifiers
+    float  DoneTotalMod = 1.0f;
+    float  TakenTotalMod = 1.0f;
+
+    // Healing done percent
+    std::list <Aura*> const& mHealingDonePct = m_caster->GetAurasByType(SPELL_AURA_MOD_HEALING_DONE_PERCENT);
+    for (std::list <Aura*>::const_iterator i = mHealingDonePct.begin(); i != mHealingDonePct.end(); ++i)
+        DoneTotalMod *= (100.0f + (*i)->GetModifier()->m_amount) / 100.0f;
+
+    heal *= DoneTotalMod;
+
+    // Healing taken percent
+    float minval = float(unitTarget->GetMaxNegativeAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    if (minval)
+        TakenTotalMod *= (100.0f + minval) / 100.0f;
+
+    float maxval = float(unitTarget->GetMaxPositiveAuraModifier(SPELL_AURA_MOD_HEALING_PCT));
+    if (maxval)
+        TakenTotalMod *= (100.0f + maxval) / 100.0f;
+
+    heal *= TakenTotalMod;
+
     m_healing += heal;
 }
 
@@ -3995,20 +4032,24 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     if (!target)
         target = m_caster;
 
-    float x, y, z;
+    float x, y, z, o;
     if (m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION)
     {
         x = m_targets.m_destX;
         y = m_targets.m_destY;
         z = m_targets.m_destZ;
+        o = target->GetOrientation();
     }
     else
-        m_caster->GetClosePoint(x, y, z, DEFAULT_WORLD_OBJECT_SIZE);
+    {
+        m_caster->GetPosition(x, y, z);
+        o = m_caster->GetOrientation();
+    }
 
     Map *map = target->GetMap();
 
     if (!pGameObj->Create(map->GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), gameobject_id, map,
-                          x, y, z, target->GetOrientation(), 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
+                          x, y, z, o, 0.0f, 0.0f, 0.0f, 0.0f, GO_ANIMPROGRESS_DEFAULT, GO_STATE_READY))
     {
         delete pGameObj;
         return;
@@ -4337,9 +4378,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                     // Two separate mounts depending on area id (allows use both in and out of specific instance)
                     if (unitTarget->GetAreaId() == 3428)
-                        unitTarget->CastSpell(unitTarget, 25863, false);
+                        unitTarget->CastSpell(unitTarget, 25863, true, m_CastItem);
                     else
-                        unitTarget->CastSpell(unitTarget, 26655, false);
+                        unitTarget->CastSpell(unitTarget, 26655, true, m_CastItem);
 
                     return;
                 }
@@ -5609,6 +5650,10 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
         {
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
             {
+                // Set the summoning target
+                if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetSelectionGuid())
+                    pGameObj->SetSummonTarget(((Player*)m_caster)->GetSelectionGuid());
+
                 pGameObj->AddUniqueUse((Player*)m_caster);
                 m_caster->AddGameObject(pGameObj);          // will removed at spell cancel
             }

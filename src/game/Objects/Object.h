@@ -651,13 +651,13 @@ class MANGOS_DLL_SPEC WorldObject : public Object
 
                 void Update(uint32 time_diff)
                 {
-                    m_obj->Update( m_obj->m_updateTracker.timeElapsed(), time_diff);
-                    m_obj->m_updateTracker.Reset();
+m_obj->Update(m_obj->m_updateTracker.timeElapsed(), time_diff);
+m_obj->m_updateTracker.Reset();
                 }
 
                 void UpdateRealTime(uint32 now, uint32 time_diff)
                 {
-                    m_obj->Update( m_obj->m_updateTracker.timeElapsed(now), time_diff);
+                    m_obj->Update(m_obj->m_updateTracker.timeElapsed(now), time_diff);
                     m_obj->m_updateTracker.ResetTo(now);
                 }
 
@@ -828,6 +828,7 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void MonsterTextEmote(int32 textId, Unit* target = nullptr, bool IsBossEmote = false) const;
         void MonsterWhisper(int32 textId, Unit* receiver, bool IsBossWhisper = false) const;
         void MonsterYellToZone(int32 textId, uint32 language = 0, Unit* target = nullptr) const;
+        void MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language = 0, Unit* target = nullptr) const;
         static void BuildMonsterChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid, char const* targetName);
 
         void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
@@ -907,6 +908,12 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         void SetLocationMapId(uint32 _mapId) { m_mapId = _mapId; }
         void SetLocationInstanceId(uint32 _instanceId) { m_InstanceId = _instanceId; }
 
+        bool IsWithinLootXPDist(WorldObject const* objToLoot) const;
+
+        // val is added to CONFIG_FLOAT_GROUP_XP_DISTANCE when calculating
+        // if player should be eligible for loot and XP from this object.
+        void SetLootAndXPModDist(float val);
+
     protected:
         explicit WorldObject();
 
@@ -924,6 +931,8 @@ class MANGOS_DLL_SPEC WorldObject : public Object
         ViewPoint m_viewPoint;
 
         WorldUpdateCounter m_updateTracker;
+        
+        float m_lootAndXPRangeModifier;
 };
 
 #endif

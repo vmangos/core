@@ -1083,8 +1083,18 @@ void Object::ExecuteDelayedActions()
     }
 }
 
+bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
+{
+    return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->m_lootAndXPRangeModifier, false);
+}
+
+void WorldObject::SetLootAndXPModDist(float val)
+{
+    m_lootAndXPRangeModifier = val;
+}
+
 WorldObject::WorldObject()
-    : m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0)
+    : m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;
@@ -1737,7 +1747,7 @@ namespace MaNGOS
         {
             char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
-            WorldObject::BuildMonsterChat(&data, i_object.GetObjectGuid(), i_msgtype, text, i_language, i_object.GetNameForLocaleIdx(loc_idx), 
+            WorldObject::BuildMonsterChat(&data, i_object.GetObjectGuid(), i_msgtype, text, i_language, i_object.GetNameForLocaleIdx(loc_idx),
                 i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
         }
 
@@ -1771,6 +1781,19 @@ void WorldObject::MonsterYell(int32 textId, uint32 language, Unit* target) const
 void WorldObject::MonsterYellToZone(int32 textId, uint32 language, Unit* target) const
 {
     MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, target);
+    MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
+
+    uint32 zoneid = GetZoneId();
+
+    auto const& pList = GetMap()->GetPlayers();
+    for (auto itr = pList.begin(); itr != pList.end(); ++itr)
+        if (itr->getSource()->GetZoneId() == zoneid)
+            say_do(itr->getSource());
+}
+
+void WorldObject::MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language, Unit* target) const
+{
+    MaNGOS::MonsterChatBuilder say_build(*this, type, textId, language, target);
     MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
 
     uint32 zoneid = GetZoneId();

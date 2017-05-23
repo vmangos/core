@@ -468,12 +468,12 @@ void AddSC_razorfen_downs()
     newscript->pGossipHello = &GossipHello_npc_henry_stern;
     newscript->pGossipSelect = &GossipSelect_npc_henry_stern;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "go_holding_pen";
     newscript->pGOHello = &GOHello_go_holding_pen;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "boss_lady_faltheress";
     newscript->GetAI = &GetAI_boss_ladyFaltheress;
@@ -489,12 +489,12 @@ void AddSC_razorfen_downs()
     newscript->Name = "go_gong";
     newscript->pGOHello =           &GOHello_go_gong;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "go_belnistrasz";
     newscript->pQuestRewardedGO = &GOQuestRewarded_go_belnistrasz;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_tomb_creature";
     newscript->GetAI = &GetAI_npc_tomb_creature;

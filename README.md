@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/elysium-project/server.svg?branch=development)](https://travis-ci.org/elysium-project/server)
+
 # Development process overview:
 
 Any development work should be done in local feature branches rather than on the main branches used for QA/live builds. For example, if you were working on a boss script, rather than committing directly to the development branch, you should first create a new branch with a descriptive name.

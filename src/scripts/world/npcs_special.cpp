@@ -1411,6 +1411,7 @@ CreatureAI* GetAI_npc_gnomish_battle_chicken(Creature* pCreature)
 /*######
 ## arcanite dragonling
 ######*/
+
 enum
 {
     SPELL_Flame_Buffet = 9574,
@@ -1437,38 +1438,33 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
     uint32 m_flamebreathTimer;
 
 
-    void Reset() override
-    {
-
-    }
+    void Reset() override { }
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
     {
-
         ScriptedPetAI::DamageTaken(pDoneBy, uiDamage);
     }
 
     void UpdatePetAI(const uint32 uiDiff) override
     {
-
         if (m_firebuffetTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
-                    m_firebuffetTimer = urand(0, 10000);
-            }
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_Flame_Buffet, CAST_TRIGGERED) == CAST_OK)
+                m_firebuffetTimer = urand(0, 10000);
+        }
         else
             m_firebuffetTimer -= uiDiff;
-            
+
         if (m_flamebreathTimer < uiDiff)
         {
             int32 damage = 300;
-            m_creature->CastCustomSpell(m_creature, SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
-                m_flamebreathTimer = urand(0, 20000);
+            m_creature->CastCustomSpell(m_creature->getVictim(), SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
+            m_flamebreathTimer = urand(0, 20000);
         }
         else
             m_flamebreathTimer -= uiDiff;
 
-    
+
 
         ScriptedPetAI::UpdatePetAI(uiDiff);
     }
@@ -1478,6 +1474,58 @@ CreatureAI* GetAI_npc_arcanite_dragonling_dragonling(Creature* pCreature)
 {
     return new npc_arcanite_dragonling_dragonlingAI(pCreature);
 }
+
+/*######
+## Timbermaw Ancestor
+######*/
+enum
+{
+    SPELL_HEALING_TOUCH = 23381,
+    SPELL_LIGHTNING_BOLT = 9532
+};
+
+struct npc_timbermaw_ancestorAI : ScriptedPetAI
+{
+    explicit npc_timbermaw_ancestorAI(Creature* pCreature) : ScriptedPetAI(pCreature)
+    {
+        m_creature->SetCanModifyStats(true);
+
+        if (m_creature->GetCharmInfo())
+            m_creature->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+
+        m_healingTouchTimer = 0;
+
+        npc_timbermaw_ancestorAI::Reset();
+    }
+
+    uint32 m_healingTouchTimer;
+
+    void Reset() override {}
+
+    void UpdatePetAI(const uint32 uiDiff) override
+    {
+        if (m_healingTouchTimer < uiDiff)
+        {
+            if (m_creature->GetOwner()->HealthBelowPct(50))
+            {
+                if (DoCastSpellIfCan(m_creature->GetOwner(), SPELL_HEALING_TOUCH, false) == CAST_OK);
+                    m_healingTouchTimer = 7000;
+            }
+        }
+        else
+            m_healingTouchTimer -= uiDiff;
+
+        DoCastSpellIfCan(m_creature->getVictim(), SPELL_LIGHTNING_BOLT, false);
+
+        ScriptedPetAI::UpdatePetAI(uiDiff);
+    }
+};
+
+CreatureAI* GetAI_timbermaw_ancestor(Creature* pCreature)
+{
+    return new npc_timbermaw_ancestorAI(pCreature);
+}
+
 /*######
 ## npc_the_cleaner
 ######*/
@@ -1492,25 +1540,25 @@ struct npc_the_cleanerAI : public ScriptedAI
     npc_the_cleanerAI(Creature* pCreature) : ScriptedAI(pCreature) { Reset(); }
 
     uint32 m_uiDespawnTimer;
-    
+
     void Reset()
     {
         DoCastSpellIfCan(m_creature, SPELL_IMMUNITY, CAST_TRIGGERED);
         m_uiDespawnTimer = 3000;
     }
-    
+
     void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_CLEANER_AGGRO, m_creature);
     }
-    
+
     void EnterEvadeMode() override
     {
         ScriptedAI::EnterEvadeMode();
-        
+
         m_creature->ForcedDespawn();
     }
-    
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (m_uiDespawnTimer < uiDiff)
@@ -1520,10 +1568,10 @@ struct npc_the_cleanerAI : public ScriptedAI
         }
         else
             m_uiDespawnTimer -= uiDiff;
-            
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-        
+
         DoMeleeAttackIfReady();
     }
 };
@@ -1556,7 +1604,7 @@ struct FireworkStruct
     bool m_bIsCluster;
 };
 
-const FireworkStruct Fireworks[] = 
+const FireworkStruct Fireworks[] =
 {
     { 15872, 180854,  true }, // Blue Firework Cluster
     { 15873, 180851,  true }, // Red Firework Cluster
@@ -1670,7 +1718,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
             if (pSummoner)
                 pSummoner->CastedCreatureOrGO(Fireworks[m_uiIndex].m_bIsCluster ? GO_CLUSTER_LAUNCHER : GO_FIREWORK_LAUNCHER, ObjectGuid(), 0);
         }
-        
+
         if (GetClosestGameObjectWithEntry(m_creature, GO_OMEN_CLUSTER_LAUNCHER, CONTACT_DISTANCE))
             boss_omenAI::OnFireworkLaunch(m_creature);
 
@@ -1687,7 +1735,7 @@ CreatureAI* GetAI_npc_pats_firework_guy(Creature* creature)
  * Huge Firework Show support
  */
 
-const uint32 FireBoxPlayer[] = 
+const uint32 FireBoxPlayer[] =
 {
     180854,180851,180855,180858,180857,
     180861,180862,180863,180860,180864,
@@ -1712,7 +1760,7 @@ struct FireworkShowStruct
     bool big;
 };
 
-const FireworkShowStruct FireboxShow[] = 
+const FireworkShowStruct FireboxShow[] =
 {
     { 180728, 1, COLOR_WHITE,   false },
     { 180729, 1, COLOR_WHITE,   true  },
@@ -1871,7 +1919,7 @@ enum
 struct npc_riggle_bassbaitAI : ScriptedAI
 {
     explicit npc_riggle_bassbaitAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {        
+    {
         m_uiTimer = 0;
 
         npc_riggle_bassbaitAI::Reset();
@@ -1905,7 +1953,7 @@ struct npc_riggle_bassbaitAI : ScriptedAI
                     m_creature->MonsterYellToZone(YELL_BEGIN);
                     sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 1, true);
                     sObjectMgr.SetSavedVariable(VAR_TOURN_OVER, 0, true);
-                }                  
+                }
             }
         }
         else
@@ -1950,7 +1998,7 @@ bool QuestRewarded_npc_riggle_bassbait(Player* pPlayer, Creature* pCreature, con
     {
         sObjectMgr.SetSavedVariable(VAR_TOURNAMENT, time(nullptr), true);
         sObjectMgr.SetSavedVariable(VAR_TOURN_GOES, 0, true);
-        pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);        
+        pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         pCreature->MonsterYellToZone(YELL_WINNER, 0, pPlayer);
     }
 
@@ -2113,7 +2161,7 @@ struct npc_shahramAI : ScriptedPetAI
 
     uint32 despawnTimer;
     uint32 combatDespawnTimer;
-    
+
     bool hasCastBuff;
     bool hasCastDebuff;
 
@@ -2135,9 +2183,9 @@ struct npc_shahramAI : ScriptedPetAI
                 switch(urand(0,2))
                 {
 
-                case 0: 
+                case 0:
                     shahramSpell = SPELL_CURSE_OF_SHAHRAM;
-                    break;      
+                    break;
 
                 case 1:
                     shahramSpell = SPELL_FLAMES_OF_SHAHRAM;
@@ -2294,7 +2342,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
                 m_uiDetonationTimer -= uiDiff;
         }
 
-        // if triggered despawn with a little delay to allow spell go first 
+        // if triggered despawn with a little delay to allow spell go first
         if (m_bDespawn)
         {
             if (m_uiDespawnTimer < uiDiff)
@@ -2449,7 +2497,7 @@ struct npc_sickly_critterAI : npc_critterAI
 
         team = pPlayer->GetTeam();
         m_bModify = true;
-        
+
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MoveFleeing(pPlayer);
         m_creature->ForcedDespawn(10 * IN_MILLISECONDS);
@@ -2552,8 +2600,8 @@ struct npc_goblin_bomb_dispenserAI : ScriptedPetAI
             }
             else
                 m_uiAliveTimer -= uiDiff;
-        
-            ScriptedPetAI::UpdateAI(uiDiff);            
+
+            ScriptedPetAI::UpdateAI(uiDiff);
         }
     }
 };
@@ -2708,7 +2756,12 @@ void AddSC_npcs_special()
     newscript->Name = "npc_arcanite_dragonling";
     newscript->GetAI = &GetAI_npc_arcanite_dragonling_dragonling;
     newscript->RegisterSelf();
-    
+
+    newscript = new Script;
+    newscript->Name = "npc_timbermaw_ancestor";
+    newscript->GetAI = &GetAI_timbermaw_ancestor;
+    newscript->RegisterSelf();
+
     newscript = new Script;
     newscript->Name = "npc_the_cleaner";
     newscript->GetAI = &GetAI_npc_the_cleaner;
@@ -2718,12 +2771,12 @@ void AddSC_npcs_special()
     newscript->Name = "npc_pats_firework_guy";
     newscript->GetAI = &GetAI_npc_pats_firework_guy;
     newscript->RegisterSelf();
-
+    /*
     newscript = new Script;
     newscript->Name = "npc_firestarter_regular";
     newscript->GetAI = &GetAI_npc_firestarter_regular;
     newscript->RegisterSelf();
-
+    */
     newscript = new Script;
     newscript->Name = "npc_firestarter_show";
     newscript->GetAI = &GetAI_npc_firestarter_show;

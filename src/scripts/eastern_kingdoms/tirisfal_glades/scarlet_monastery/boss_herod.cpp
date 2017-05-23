@@ -30,7 +30,8 @@ struct Coords
     float x, y, z, o;
 };
 
-const Coords MyrmidonSpawn = { 1927.22f, -431.56f, 18.0f, 0.05f };
+const Coords MyrmidonSpawn = { 1926.03f, -370.61f, 18.0f, 0.05f };
+const Coords RoomCenter    = { 1965.09f, -431.61f, 6.79f, 0.0f };
 
 struct boss_herodAI : ScriptedAI
 {
@@ -42,11 +43,13 @@ struct boss_herodAI : ScriptedAI
     bool Enrage;
     bool TraineeSay;
     bool m_bWhirlwind;
+    bool bMyrmidonsSpawned;
     uint8 NbTrainee;
     uint32 RushingCharge_Timer;
     uint32 Cleave_Timer;
     uint32 Whirlwind_Timer;
     uint32 m_uiRootTimer;
+    uint32 uiRoomCheck;
     std::list<ObjectGuid> m_lMyrmidonGuids;
 
     void Reset() override
@@ -59,13 +62,15 @@ struct boss_herodAI : ScriptedAI
         Cleave_Timer = 12000;
         Whirlwind_Timer = urand(10000, 20000);
         m_uiRootTimer = 0;
+        uiRoomCheck = 500;
+        bMyrmidonsSpawned = false;
     }
 
     void Aggro(Unit* /*pWho*/) override
     {
+        SpawnMyrmidons();
         DoScriptText(SAY_AGGRO, m_creature);
         DoCastSpellIfCan(m_creature, SPELL_RUSHINGCHARGE);
-        SpawnMyrmidons();
     }
 
     void KilledUnit(Unit* /*pVictim*/) override
@@ -96,35 +101,33 @@ struct boss_herodAI : ScriptedAI
         m_lMyrmidonGuids.push_back(pSummoned->GetObjectGuid());
     }
 
-    void SummonedCreatureJustDied(Creature* pSummoned) override
+    void EngageMyrmidons(Unit* victim)
     {
-        if (pSummoned->GetEntry() == NPC_SCARLET_MYRMIDON)
+        if (!victim)
+            return;
+
+        for (auto itr = m_lMyrmidonGuids.begin(); itr != m_lMyrmidonGuids.end(); ++itr)
         {
-            pSummoned->loot.clear();
+            if (auto pMyrmidon = m_creature->GetMap()->GetCreature(*itr))
+            {
+                if (!pMyrmidon->isAlive() || pMyrmidon->getVictim())
+                    continue;
+                if (victim->isAlive())
+                    pMyrmidon->SetInCombatWith(victim);
+            }
         }
     }
 
-    void SpawnMyrmidons() const
+    void SpawnMyrmidons()
     {
-        bool engage = false;
-
-        if (auto pDoor = m_creature->FindNearestGameObject(GO_HEROD_DOOR, 100.0f))
-        {
-            if (pDoor->GetGoState() == GO_STATE_ACTIVE)
-                engage = true;
-        }
-
+        bMyrmidonsSpawned = true;
         for (uint8 i = 0; i < 4; ++i)
         {
-            if (auto pMyrmidon = m_creature->SummonCreature(NPC_SCARLET_MYRMIDON, 
+            m_creature->SummonCreature(NPC_SCARLET_MYRMIDON,
                 MyrmidonSpawn.x + frand(-3.0, 3.0),
                 MyrmidonSpawn.y + frand(-3.0, 3.0),
                 MyrmidonSpawn.z,
-                MyrmidonSpawn.o, TEMPSUMMON_DEAD_DESPAWN, 20000))
-            {
-                if (engage)
-                    pMyrmidon->SetInCombatWithZone();
-            }
+                MyrmidonSpawn.o, TEMPSUMMON_DEAD_DESPAWN, 20000);
         }
     }
 
@@ -139,6 +142,7 @@ struct boss_herodAI : ScriptedAI
             }
         }
 
+        bMyrmidonsSpawned = false;
         m_lMyrmidonGuids.clear();
     }
 
@@ -151,10 +155,11 @@ struct boss_herodAI : ScriptedAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        for (uint8 i = 0; i < 20; ++i)
-            m_creature->SummonCreature(NPC_SCARLET_TRAINEE, 1939.18f, -431.58f, 17.09f, 6.22f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
-
         DespawnMyrmidons();
+        for (uint8 i = 0; i < 20; ++i)
+            m_creature->SummonCreature(NPC_SCARLET_TRAINEE,
+                                    1939.18f, -431.58f, 17.09f, 6.22f,
+                                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 600000);
 
         if (auto pDoor = m_creature->FindNearestGameObject(GO_HEROD_DOOR, 100.0f))
         {
@@ -167,6 +172,17 @@ struct boss_herodAI : ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        // check if the target is still inside the room
+        if (bMyrmidonsSpawned && uiRoomCheck <= diff)
+        {
+            if (!m_creature->IsWithinDist2d(RoomCenter.x, RoomCenter.y, 32.0f))
+            {
+                EngageMyrmidons(me->getVictim());
+            }
+            uiRoomCheck = 500;
+        }
+        else uiRoomCheck -= diff;
 
         if (m_bWhirlwind)
         {

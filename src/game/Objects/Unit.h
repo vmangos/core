@@ -99,8 +99,8 @@ enum SpellAuraInterruptFlags
     AURA_INTERRUPT_FLAG_CHANGE_MAP                  = 0x00080000,   // 19   leaving map/getting teleported
     AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION    = 0x00100000,   // 20   removed by auras that make you invulnerable, or make other to loose selection on you
     AURA_INTERRUPT_FLAG_UNK21                       = 0x00200000,   // 21
-    // TC - non implemente (9 sorts)
     AURA_INTERRUPT_FLAG_TELEPORTED                  = 0x00400000,   // 22
+    // TC - non implemente (9 sorts)
     AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT            = 0x00800000,   // 23   removed by entering pvp combat
     AURA_INTERRUPT_FLAG_DIRECT_DAMAGE               = 0x01000000    // 24   removed by any direct damage
 };
@@ -370,8 +370,8 @@ enum DeathState
 {
     ALIVE          = 0,                                     // show as alive
     JUST_DIED      = 1,                                     // temporary state at die, for creature auto converted to CORPSE, for player at next update call
-    CORPSE         = 2,                                     // corpse state, for player this also meaning that player not leave corpse
-    DEAD           = 3,                                     // for creature despawned state (corpse despawned), for player CORPSE/DEAD not clear way switches (FIXME), and use m_deathtimer > 0 check for real corpse state
+    CORPSE         = 2,                                     // corpse state, for player spirit is still within the corpse
+    DEAD           = 3,                                     // for creature despawned state (corpse despawned), for player spirit has been released (player is ghost)
     JUST_ALIVED    = 4,                                     // temporary state at resurrection, for creature auto converted to ALIVE, for player at next update call
     CORPSE_FALLING = 5                                      // corpse state in case when corpse still falling to ground
 };
@@ -1661,7 +1661,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void UnsummonAllTotems();
         Unit* SelectMagnetTarget(Unit *victim, Spell* spell = nullptr, SpellEffectIndex eff = EFFECT_INDEX_0);
 
-        int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, Spell* spell = nullptr);
+        int32 SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit, DamageEffectType damagetype, bool donePart, Unit *pCaster, Spell* spell = nullptr);
         int32 SpellBaseDamageBonusDone(SpellSchoolMask schoolMask);
         int32 SpellBaseDamageBonusTaken(SpellSchoolMask schoolMask);
         uint32 SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, uint32 pdamage, DamageEffectType damagetype, uint32 stack = 1, Spell* spell = nullptr);
@@ -1745,7 +1745,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
 
         bool IsStopped() const { return !(hasUnitState(UNIT_STAT_MOVING)); }
-        void StopMoving();
+        void StopMoving(bool force = false);
 
         void SetFleeing(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
         void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);/*DEPRECATED METHOD*/

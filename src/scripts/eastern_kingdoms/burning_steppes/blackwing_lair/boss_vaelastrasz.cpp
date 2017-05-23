@@ -499,6 +499,9 @@ bool QuestAccept_vaelastrasz(Player* pPlayer, Creature* pCreature, const Quest* 
             m_pInstance->SetData(TYPE_SCEPTER_RUN, SPECIAL);
             m_pInstance->SetData(DATA_SCEPTER_CHAMPION, pPlayer->GetObjectGuid());
 
+            // Permanently bind player to instance
+            pCreature->GetMap()->BindToInstanceOrRaid(pPlayer, pCreature->GetRespawnTimeEx(), true);
+
             return true;
     }
 
