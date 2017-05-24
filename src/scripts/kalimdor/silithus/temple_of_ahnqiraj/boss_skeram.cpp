@@ -23,11 +23,11 @@ EndScriptData */
 #define SPELL_TF_HASTE              2313
 #define SPELL_TF_MOD_HEAL           26525
 #define SPELL_TF_IMMUNITY           26526
-#define SPELL_TF_CANCEL             26589         
+#define SPELL_TF_CANCEL             26589
 
-#define SPELL_BLINK_1               4801
-#define SPELL_BLINK_2               8195
-#define SPELL_BLINK_3               20449
+#define SPELL_BLINK_0               4801
+#define SPELL_BLINK_1               8195
+#define SPELL_BLINK_2               20449
 
 #define SPELL_SUMMON_IMAGES         747
 
@@ -287,9 +287,9 @@ struct boss_skeramAI : public ScriptedAI
         // Blink to one of the three platforms
         switch (position)
         {
-            case 0: caster->CastSpell(caster, SPELL_BLINK_1, true); break;
-            case 1: caster->CastSpell(caster, SPELL_BLINK_2, true); break;
-            case 2: caster->CastSpell(caster, SPELL_BLINK_3, true); break;
+            case 0: caster->CastSpell(caster, SPELL_BLINK_0, true); break;
+            case 1: caster->CastSpell(caster, SPELL_BLINK_1, true); break;
+            case 2: caster->CastSpell(caster, SPELL_BLINK_2, true); break;
         }
 
         DoResetThreat();

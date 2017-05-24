@@ -1202,11 +1202,10 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         UpdateMeleeAttackingState();
 
         Unit *pVictim = getVictim();
-        if (pVictim && !IsNonMeleeSpellCasted(false) && CanReachWithMeleeAttack(pVictim))
+        if (pVictim && !IsNonMeleeSpellCasted(false))
         {
             Player *vOwner = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if ((vOwner && vOwner->IsPvP() && !IsInDuelWith(vOwner)) ||  // PvP flagged players
-                (pVictim->IsCreature() && pVictim->IsPvP()))             // PvP flagged creatures
+            if (vOwner && vOwner->IsPvP() && !IsInDuelWith(vOwner))
             {
                 UpdatePvP(true);
                 RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -6284,7 +6283,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     if (pvpInfo.inHostileArea)                              // in hostile area
     {
-        if ((!IsPvP() && !IsTaxiFlying()) || pvpInfo.endTimer != 0)
+        if (!IsPvP() || pvpInfo.endTimer != 0)
             UpdatePvP(true, true);
     }
     else                                                    // in friendly area
@@ -12340,10 +12339,6 @@ void Player::AddQuest(Quest const *pQuest, Object *questGiver)
     }
     else
         questStatusData.m_timer = 0;
-
-    // Set PvP flag for PvP quests
-    if (pQuest->GetType() == QUEST_TYPE_PVP)
-        UpdatePvP(true, true);
 
     SetQuestSlot(log_slot, quest_id, qtime);
 

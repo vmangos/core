@@ -592,14 +592,13 @@ void Spell::FillTargetMap()
                 break;
         }
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_THREAT))
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             Player *me = (Player*)m_caster;
             for (UnitList::const_iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
             {
                 Player *targetOwner = (*itr)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if ((targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner)) || // PvP flagged players
-                    ((*itr)->IsCreature() && (*itr)->IsPvP()))                                                      // PvP flagged creatures
+                if (targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner))
                 {
                     me->UpdatePvP(true);
                     me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -5024,7 +5023,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     // Nostalrius: impossible to cast spells while banned / feared / confused ...
     // Except divine shields, pvp trinkets for example
     // TODO: This condition allows an antifear item to be used while stuned for example.
-    if (!m_IsTriggeredSpell && !IsSpellHaveAura(m_spellInfo, SPELL_AURA_SCHOOL_IMMUNITY) && !IsSpellHaveAura(m_spellInfo, SPELL_AURA_MECHANIC_IMMUNITY) &&
+    if (!m_IsTriggeredSpell && !IsSpellAppliesAura(m_spellInfo, SPELL_AURA_SCHOOL_IMMUNITY) && !IsSpellAppliesAura(m_spellInfo, SPELL_AURA_MECHANIC_IMMUNITY) &&
             m_caster->hasUnitState(UNIT_STAT_ISOLATED | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
         return SPELL_FAILED_DONT_REPORT;
 
@@ -7442,11 +7441,6 @@ public:
                         {
                             if (!casterUnit->IsValidAttackTarget(sourceUnit))
                                 continue;
-
-                            // Negative AoE from non flagged players cannot target other players
-                            if (Player *attackedPlayer = sourceUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                                if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
-                                    continue;
                         }
                         else if (GameObject* gobj = i_originalCaster->ToGameObject())
                         {

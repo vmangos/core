@@ -970,8 +970,7 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
         for (int instance = beginInstance; instance < endInstance; ++instance)
         {
-            MapPersistentState* state = AddPersistentState(mapEntry, instance,
-                resetTime, mapEntry->IsDungeon(), true, false /*= initPools*/);
+            MapPersistentState* state = AddPersistentState(mapEntry, instance, resetTime, mapEntry->IsDungeon(), true);
             if (!state)
                 continue;
 
@@ -1050,8 +1049,7 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
         for (int instance = beginInstance; instance < endInstance; ++instance)
         {
-            MapPersistentState* state = AddPersistentState(mapEntry, instance,
-                resetTime, mapEntry->IsDungeon(), true, false /*= initPools*/);
+            MapPersistentState* state = AddPersistentState(mapEntry, instance, resetTime, mapEntry->IsDungeon(), true);
             if (!state)
                 continue;
 
