@@ -12072,12 +12072,12 @@ bool Player::CanSeeStartQuest(Quest const *pQuest) const
     return false;
 }
 
-bool Player::CanTakeQuest(Quest const *pQuest, bool msg) const
+bool Player::CanTakeQuest(Quest const *pQuest, bool msg, bool skipStatusCheck /*false*/) const
 {
     if (pQuest->GetType() == QUEST_TYPE_PVP && pQuest->GetQuestLevel() && pQuest->GetQuestLevel() < getLevel())
         return false;
 
-    return SatisfyQuestStatus(pQuest, msg) && SatisfyQuestExclusiveGroup(pQuest, msg) &&
+    return (skipStatusCheck || SatisfyQuestStatus(pQuest, msg)) && SatisfyQuestExclusiveGroup(pQuest, msg) &&
            SatisfyQuestClass(pQuest, msg) && SatisfyQuestRace(pQuest, msg) && SatisfyQuestLevel(pQuest, msg) &&
            SatisfyQuestSkill(pQuest, msg) && SatisfyQuestReputation(pQuest, msg) &&
            SatisfyQuestPreviousQuest(pQuest, msg) && SatisfyQuestTimed(pQuest, msg) &&
@@ -12196,11 +12196,21 @@ bool Player::CanCompleteRepeatableQuest(Quest const *pQuest) const
 
 bool Player::CanRewardQuest(Quest const *pQuest, bool msg) const
 {
-    // not auto complete quest and not completed quest (only cheating case, then ignore without message)
-    if (!pQuest->IsAutoComplete() && GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
-        return false;
+    // Prevent packet-editing exploits
+    // Players must meet prereqs for AutoComplete quests
+    if (pQuest->IsAutoComplete())
+    {
+        if (!CanTakeQuest(pQuest, false, true))
+            return false;
+    }
+    else
+    {
+        // Normal quests must be accepted and have a complete status
+        if (GetQuestStatus(pQuest->GetQuestId()) != QUEST_STATUS_COMPLETE)
+            return false;
+    }
 
-    // rewarded and not repeatable quest (only cheating case, then ignore without message)
+    // Prevent completing the same quest twice
     if (GetQuestRewardStatus(pQuest->GetQuestId()))
         return false;
 
@@ -12219,9 +12229,12 @@ bool Player::CanRewardQuest(Quest const *pQuest, bool msg) const
         }
     }
 
-    // prevent receive reward with low money and GetRewOrReqMoney() < 0
+    // Check if players have enough money to complete the quest
     if (pQuest->GetRewOrReqMoney() < 0 && GetMoney() < uint32(-pQuest->GetRewOrReqMoney()))
+    {
+        SendCanTakeQuestResponse(INVALIDREASON_QUEST_FAILED_NOT_ENOUGH_MONEY);
         return false;
+    }
 
     return true;
 }

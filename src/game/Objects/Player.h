@@ -1201,7 +1201,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool IsCurrentQuest(uint32 quest_id, uint8 completedOrNot = 0) const;
         Quest const *GetNextQuest(ObjectGuid guid, Quest const *pQuest );
         bool CanSeeStartQuest( Quest const *pQuest ) const;
-        bool CanTakeQuest( Quest const *pQuest, bool msg ) const;
+        bool CanTakeQuest( Quest const *pQuest, bool msg, bool skipStatusCheck = false ) const;
         bool CanAddQuest( Quest const *pQuest, bool msg ) const;
         bool CanCompleteQuest( uint32 quest_id ) const;
         bool CanCompleteRepeatableQuest(Quest const *pQuest) const;
