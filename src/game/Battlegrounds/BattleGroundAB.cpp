@@ -339,6 +339,8 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
     uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event1;
     if (event >= BG_AB_NODES_MAX)                           // not a node
         return;
+
+    target_obj->SendObjectDeSpawnAnim(target_obj->GetObjectGuid());
     BG_AB_Nodes node = BG_AB_Nodes(event);
 
     BattleGroundTeamIndex teamIndex = GetTeamIndexByTeamId(source->GetTeam());
