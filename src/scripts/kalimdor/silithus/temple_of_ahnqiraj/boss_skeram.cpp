@@ -95,9 +95,9 @@ struct boss_skeramAI : public ScriptedAI
     {
         switch (urand(0,8))
         {
-            case 0: DoScriptText(SAY_SLAY_0, m_creature); break;
-            case 1: DoScriptText(SAY_SLAY_1, m_creature); break;
-            case 2: DoScriptText(SAY_SLAY_2, m_creature); break;
+            case 0: DoScriptText(SAY_SLAY_1, m_creature); break;
+            case 1: DoScriptText(SAY_SLAY_2, m_creature); break;
+            case 2: DoScriptText(SAY_SLAY_3, m_creature); break;
         }
     }
 
