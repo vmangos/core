@@ -38,7 +38,7 @@ ChannelMgr* channelMgr(Team team)
     if (team == HORDE)
         return &MaNGOS::Singleton<HordeChannelMgr>::Instance();
 
-    return nullptr;
+    return NULL;
 }
 
 ChannelMgr::~ChannelMgr()
@@ -49,33 +49,29 @@ ChannelMgr::~ChannelMgr()
     channels.clear();
 }
 
-void ChannelMgr::SetJoinChannel(const std::string &name, PlayerPointer p, const std::string &pass, bool allowAreaDependantChans)
+Channel *ChannelMgr::GetJoinChannel(std::string name, bool allowAreaDependantChans)
 {
     std::wstring wname;
-    uint32 zoneid = GetAreaIdByLocalizedName(name);
-    std::string transName = TranslateChannel(name, zoneid);
-    Utf8toWStr(transName, wname);
+    Utf8toWStr(name, wname);
     wstrToLower(wname);
 
     if (channels.find(wname) == channels.end())
     {
-        ChatChannelsEntry const* ch = GetChannelEntryFor(transName);
+        ChatChannelsEntry const* ch = GetChannelEntryFor(name);
         if (!allowAreaDependantChans && ch && ch->flags & Channel::CHANNEL_DBC_FLAG_ZONE_DEP)
-            return;
-        LocaleConstant loc = (p == nullptr ? LOCALE_enUS : p->GetSession()->GetSessionDbcLocale());
-        Channel *nchan = new Channel(transName, name, loc);
+            return NULL;
+        Channel *nchan = new Channel(name);
         channels[wname] = nchan;
+        return nchan;
     }
-    if (p && !channels[wname]->IsPlayerOnChannel(p->GetObjectGuid()))
-        channels[wname]->Join(p->GetObjectGuid(), name.c_str(), pass.c_str());
+
+    return channels[wname];
 }
 
 Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
 {
     std::wstring wname;
-    uint32 zoneid = GetAreaIdByLocalizedName(name);
-    std::string transName = TranslateChannel(name, zoneid);
-    Utf8toWStr(transName, wname);
+    Utf8toWStr(name, wname);
     wstrToLower(wname);
 
     ChannelMap::const_iterator i = channels.find(wname);
@@ -89,20 +85,16 @@ Channel *ChannelMgr::GetChannel(std::string name, PlayerPointer p, bool pkt)
             p->GetSession()->SendPacket(&data);
         }
 
-        return nullptr;
+        return NULL;
     }
     else
         return i->second;
 }
 
-void ChannelMgr::LeftChannel(std::string name, PlayerPointer p)
+void ChannelMgr::LeftChannel(std::string name)
 {
     std::wstring wname;
-    uint32 zoneid = GetAreaIdByLocalizedName(name);
-    if (zoneid == 0 && p)
-        zoneid = p->GetCachedZoneId();
-    std::string transName = TranslateChannel(name, zoneid);
-    Utf8toWStr(transName, wname);
+    Utf8toWStr(name, wname);
     wstrToLower(wname);
 
     ChannelMap::const_iterator i = channels.find(wname);
@@ -125,56 +117,18 @@ void ChannelMgr::MakeNotOnPacket(WorldPacket *data, std::string name)
     (*data) << (uint8)CHAT_NOT_MEMBER_NOTICE << name;
 }
 
-std::string ChannelMgr::TranslateChannel(std::string channelName, uint32 zoneId)
-{
-    ChatChannelsEntry const* ch = GetChannelEntryFor(channelName);
-
-    if (ch)
-    {
-        std::stringstream sstm;
-        switch (ch->ChannelID)
-        {
-            case CHANNEL_ID_GENERAL:
-                sstm << "MGeneral - " << zoneId;
-                return sstm.str();
-            case CHANNEL_ID_TRADE:
-                return "MTrade";
-            case CHANNEL_ID_LOCAL_DEFENSE:
-                sstm << "MLDefense - " << zoneId;
-                return sstm.str();
-            case CHANNEL_ID_WORLD_DEFENSE:
-                return "MWDefense";
-            case CHANNEL_ID_LOOKING_FOR_GROUP:
-                return "MLFG";
-            case CHANNEL_ID_GUILD_RECRUITMENT:
-                return "MGuild";        }
-    }
-    return channelName;
-}
-
-
 void ChannelMgr::CreateDefaultChannels()
 {
-    SetJoinChannel("Warden", nullptr, "");
-    GetChannel("Warden", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("Anticrash", nullptr, "");
-    GetChannel("Anticrash", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("Antiflood", nullptr, "");
-    GetChannel("Antiflood", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("ItemsCheck", nullptr, "");
-    GetChannel("ItemsCheck", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("GoldDupe", nullptr, "");
-    GetChannel("GoldDupe", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("SAC", nullptr, "");
-    GetChannel("SAC", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("MailsAC", nullptr, "");
-    GetChannel("MailsAC", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("BotsDetector", nullptr, "");
-    GetChannel("BotsDetector", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
-    SetJoinChannel("ChatSpam", nullptr, "");
-    GetChannel("ChatSpam", nullptr)->SetSecurityLevel(SEC_MODERATOR);
-    SetJoinChannel("LowLevelBots", nullptr, "");
-    GetChannel("LowLevelBots", nullptr)->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("Warden")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("Anticrash")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("Antiflood")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("ItemsCheck")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("GoldDupe")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("SAC")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("MailsAC")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("BotsDetector")->SetSecurityLevel(SEC_GAMEMASTER);
+    GetJoinChannel("ChatSpam")->SetSecurityLevel(SEC_MODERATOR);
+    GetJoinChannel("LowLevelBots")->SetSecurityLevel(SEC_GAMEMASTER);
 
     for (ChannelMap::iterator it = channels.begin(); it != channels.end(); ++it)
         it->second->SetAnnounce(false);
@@ -182,10 +136,9 @@ void ChannelMgr::CreateDefaultChannels()
 
 void ChannelMgr::AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, const char* message)
 {
-    PlayerPointer plr = sObjectAccessor.FindPlayerPointer(playerGuid);
-    if (Channel* c = channelMgr(HORDE)->GetChannel(channelName, plr))
-        c->Say(playerGuid, message, channelName.c_str(), LANG_UNIVERSAL, true);
+    if (Channel* c = channelMgr(HORDE)->GetJoinChannel(channelName))
+        c->Say(playerGuid, message, LANG_UNIVERSAL, true);
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
-        if (Channel* c = channelMgr(ALLIANCE)->GetChannel(channelName, plr))
-            c->Say(playerGuid, message, channelName.c_str(), LANG_UNIVERSAL, true);
+        if (Channel* c = channelMgr(ALLIANCE)->GetJoinChannel(channelName))
+            c->Say(playerGuid, message, LANG_UNIVERSAL, true);
 }

@@ -27,7 +27,6 @@
 #include "Policies/Singleton.h"
 #include "ObjectGuid.h"
 #include "AbstractPlayer.h"
-#include "ObjectAccessor.h"
 
 #include <map>
 #include <string>
@@ -42,10 +41,9 @@ class ChannelMgr
         }
         ~ChannelMgr();
 
-        void SetJoinChannel(const std::string &name, PlayerPointer p, const std::string &pass, bool allowAreaDependantChans = true);
-        Channel *GetChannel(const std::string name, PlayerPointer p, bool pkt = true);
-        void LeftChannel(std::string name, PlayerPointer p);
-        std::string TranslateChannel(std::string channelName, uint32 zoneId);
+        Channel *GetJoinChannel(std::string name, bool allowAreaDependantChans = true);
+        Channel *GetChannel(std::string name, PlayerPointer p, bool pkt = true);
+        void LeftChannel(std::string name);
         void CreateDefaultChannels();
         static void AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, const char* message);
     private:

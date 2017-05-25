@@ -41,28 +41,6 @@
 #pragma pack(push,1)
 #endif
 
-struct AreaTableEntry
-{
-    uint32  ID;                                             // 0        m_ID
-    uint32  mapid;                                          // 1        m_ContinentID
-    uint32  zone;                                           // 2        m_ParentAreaID
-    uint32  exploreFlag;                                    // 3        m_AreaBit
-    uint32  flags;                                          // 4        m_flags
-															// 5        m_SoundProviderPref
-															// 6        m_SoundProviderPrefUnderwater
-															// 7        m_AmbienceID
-															// 8        m_ZoneMusic
-															// 9        m_IntroSound
-    int32   area_level;                                     // 10       m_ExplorationLevel
-    char*   area_name[8];                                   // 11-18    m_AreaName_lang
-															// 19 string flags
-    uint32  team;                                           // 20       m_factionGroupMask
-															// 21-23    uknown/unused
-    uint32  LiquidTypeOverride;                             // 24       m_liquidTypeID override for water type
-};
-
-#define CAPITAL_ZONE_ID 3459
-
 struct AreaTriggerEntry
 {
     uint32    id;                                           // 0

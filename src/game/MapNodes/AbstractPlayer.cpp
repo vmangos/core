@@ -13,8 +13,6 @@ uint32 PlayerWrapper<T>::GetZoneId() const { return player.GetZoneId(); }
 template <typename T>
 uint32 PlayerWrapper<T>::GetAreaId() const { return player.GetAreaId(); }
 template <typename T>
-uint32 PlayerWrapper<T>::GetCachedZoneId() const { return player.GetCachedZoneId(); }
-template <typename T>
 uint8 PlayerWrapper<T>::getClass() const { return player.getClass(); }
 template <typename T>
 uint8 PlayerWrapper<T>::getRace() const { return player.getRace(); }

@@ -28,7 +28,6 @@ class Player;
 class PlayerSocial;
 class WorldSession;
 class Channel;
-struct HonorRankInfo;
 
 class AbstractPlayer
 {
@@ -39,7 +38,6 @@ public:
     virtual const char* GetName() const = 0;
     virtual uint32 GetZoneId() const = 0;
     virtual uint32 GetAreaId() const = 0;
-    virtual uint32 GetCachedZoneId() const = 0;
     virtual uint8 getClass() const = 0;
     virtual uint8 getRace() const = 0;
     virtual uint32 getLevel() const = 0;
@@ -73,7 +71,6 @@ public:
     virtual const char* GetName() const;
     virtual uint32 GetZoneId() const;
     virtual uint32 GetAreaId() const;
-    virtual uint32 GetCachedZoneId() const;
     virtual uint8 getClass() const;
     virtual uint8 getRace() const;
     virtual uint32 getLevel() const;
