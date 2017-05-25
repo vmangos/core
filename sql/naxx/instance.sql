@@ -28,6 +28,9 @@ DELETE FROM `areatrigger_teleport` where id = 4156;
 DELETE FROM `scripted_areatrigger` where entry = 4156;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4156', 'at_naxxramas');
 
+-- thaddius entrance areatrigger
+DELETE FROM `scripted_areatrigger` where entry = 4113;
+INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4113', 'at_naxxramas');
 
 -- add Mr. Bigglesworth
 -- set movement type to random 
