@@ -41,6 +41,7 @@ enum NaxxEvents
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
+    m_thaddiusHaveGreeted(false),
     m_horsemenDeathCounter(0),
     m_fChamberCenterX(0.0f),
     m_fChamberCenterY(0.0f),
@@ -246,12 +247,6 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
 
         case NPC_SUB_BOSS_TRIGGER:
             m_lGothTriggerList.push_back(pCreature->GetGUID());
-            break;
-        case NPC_TESLA_COIL:
-            // todo: probably despawn if thaddius is dead.
-            m_lThadTeslaCoilList.push_back(pCreature->GetObjectGuid());
-            pCreature->SetFly(true);
-            pCreature->SetLevitate(true);
             break;
     }
 }
@@ -892,7 +887,18 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
             if (Creature* pFaerlina = GetSingleCreatureFromStorage(NPC_FAERLINA))
             {
                 if(pFaerlina->isAlive())
-                    DoScriptText(-1533009, pFaerlina);
+                    DoScriptText(SAY_FAERLINA_GREET, pFaerlina);
+            }
+        }
+        break;
+    case AREATRIGGER_THADDIUS_ENTRANCE:
+        if (!m_thaddiusHaveGreeted)
+        {
+            m_thaddiusHaveGreeted = true;
+            if (Creature* pThaddius = GetSingleCreatureFromStorage(NPC_THADDIUS))
+            {
+                if (pThaddius->isAlive())
+                    DoScriptText(SAY_THADDIUS_GREET, pThaddius);
             }
         }
         break;

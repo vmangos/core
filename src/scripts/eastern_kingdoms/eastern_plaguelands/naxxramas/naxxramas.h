@@ -89,7 +89,11 @@ enum NaxxAreaTriggers : uint32
     AREATRIGGER_BEHIND_FROSTWYRM_TP = 4120, // not sure why this one is there.
     AREATRIGGER_FROSTWYRM_TP        = 4167,
     AREATRIGGER_HUB_TO_FROSTWYRM    = 4156,     // Teleport to sapphiron from center of naxx
+    
+    AREATRIGGER_THADDIUS_ENTRANCE   = 4113,
+
 };
+
 static const WorldLocation toFrostwyrmTPPos(533, 3498.0f, -5349.68f, 144.97f, 1.3f);
 static const WorldLocation entranceHubTPPos(533, 3023.52f, -3434.31f, 296.1f, 0.0f);
 
@@ -185,6 +189,10 @@ enum NaxxZoneScriptTexts
     SAY_SAPP_DIALOG3        = -1533086,
     SAY_SAPP_DIALOG4_LICH   = -1533087,
     SAY_SAPP_DIALOG5        = -1533088,
+
+    // greets used on areatriggers
+    SAY_FAERLINA_GREET      = -1533009,
+    SAY_THADDIUS_GREET      = -1533029,
 };
 
 struct GothTrigger
@@ -237,10 +245,6 @@ public:
     void UpdateBossGate(NaxxGOs which, uint32 uiData);          // GO_STATE_ACTIVE when uiData==DONE, otherwise GO_STATE_READY
     void UpdateBossGate(GameObject* pGO, uint32 uiData);        // GO_STATE_ACTIVE when uiData==DONE, otherwise GO_STATE_READY
 
-    // thaddius
-    void GetThadTeslaCreatures(GuidList& lList) { lList = m_lThadTeslaCoilList; };
-
-
     void UpdateTeleporters(uint32 uiType, uint32 uiData);           // Updates all portals related to an endboss specified by uiType
     void SetTeleporterVisualState(GameObject* pGO, uint32 uiData);  // Sets the state of a specific eye-portal
     void SetTeleporterState(GameObject* pGO, uint32 uiData);        // Sets the state of a specific eye-portal visual GO
@@ -249,6 +253,7 @@ public:
 
 private:
     bool m_faerlinaHaveGreeted;
+    bool m_thaddiusHaveGreeted;
     uint32 m_horsemenDeathCounter;
 
 protected:
@@ -257,7 +262,6 @@ protected:
 
     std::list<uint64> m_lGothTriggerList;
     UNORDERED_MAP<uint64, GothTrigger> m_mGothTriggerMap;
-    GuidList m_lThadTeslaCoilList;
    
     float m_fChamberCenterX;
     float m_fChamberCenterY;
