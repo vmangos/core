@@ -279,6 +279,9 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         // Scarabs are summoned by instance script when a player dies.
         // See instance_naxxramas::OnPlayerDeath(Player*)
+        
+        if (pVictim->GetTypeId() != TYPEID_PLAYER)
+            return;
 
         if (!m_firstBlood) 
         {

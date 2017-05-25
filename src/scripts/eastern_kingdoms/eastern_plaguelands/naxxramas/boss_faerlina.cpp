@@ -26,7 +26,6 @@ EndScriptData */
 
 enum
 {
-    SAY_GREET                   = -1533009, // Done in instance_naxxramas::onNaxxramasAreaTrigger()
     SAY_PULL                    = -1533010, // slay them in the masters name
     SAY_ENRAGE1                 = -1533011, // you cannot hide from me!
     SAY_ENRAGE2                 = -1533012, // kneel before me, worm!
@@ -229,6 +228,9 @@ struct boss_faerlinaAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
+        if (pVictim->GetTypeId() != TYPEID_PLAYER)
+            return;
+
         DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
     }
 
