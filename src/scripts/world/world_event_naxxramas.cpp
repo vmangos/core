@@ -183,12 +183,14 @@ class naxx_go_necropolis : public GameObjectAI, public NecropolisRelatedObject
 public:
     naxx_go_necropolis(GameObject* go) : GameObjectAI(go), NecropolisRelatedObject(go)
     {
+        _worldstateTimer = 1000;
         _checkPylonsTimer = 1000;
         _animationTimer = 1000;
     }
 
     std::set<ObjectGuid> _pylons;
     std::vector<ObjectGuid> _necropolisList;
+    uint32 _worldstateTimer;
     uint32 _checkPylonsTimer;
     uint32 _animationTimer;
 
@@ -232,12 +234,75 @@ public:
         }
     }
 
+    // Update worlstate
+    void UpdateWorldState(bool enable)
+    {
+        Map::PlayerList const& list = me->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
+        {
+            Player* player = it->getSource();
+
+            switch (me->GetZoneId())
+            {
+                case ZONEID_WINTERSPRING:
+                {
+                    if (enable)
+                        player->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, 1);
+                    else
+                        player->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, 0);
+                    break;
+                }
+                case ZONEID_AZSHARA:
+                {
+                    if (enable)
+                        player->SendUpdateWorldState(WORLDSTATE_AZSHARA, 1);
+                    else
+                        player->SendUpdateWorldState(WORLDSTATE_AZSHARA, 0);
+                    break;
+                }
+                case ZONEID_BLASTED_LANDS:
+                {
+                    if (enable)
+                        player->SendUpdateWorldState(WORLDSTATE_BLASTED_LANDS, 1);
+                    else
+                        player->SendUpdateWorldState(WORLDSTATE_BLASTED_LANDS, 0);
+                    break;
+                }
+                case ZONEID_BURNING_STEPPES:
+                {
+                    if (enable)
+                        player->SendUpdateWorldState(WORLDSTATE_BURNING_STEPPES, 1);
+                    else
+                        player->SendUpdateWorldState(WORLDSTATE_BURNING_STEPPES, 0);;
+                    break;
+                }
+                case ZONEID_TANARIS:
+                {
+                    if (enable)
+                        player->SendUpdateWorldState(WORLDSTATE_TANARIS, 1);
+                    else
+                        player->SendUpdateWorldState(WORLDSTATE_TANARIS, 0);
+                    break;
+                }
+                case ZONEID_EASTERN_PLAGUELANDS:
+                {
+                    if (enable)
+                        player->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, 1);
+                    else
+                        player->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, 0);
+                    break;
+                }
+            }
+        }
+    }
+
     void Enable()
     {
         me->Respawn();
         me->SetVisible(true);
         _animationTimer = 1000;
         _checkPylonsTimer = 5000; // On laisse 5sec pour que les pylones spawn
+        UpdateWorldState(true);
         sLog.outInfo("[NAXX] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
     }
 
@@ -245,6 +310,7 @@ public:
     {
         me->SetVisible(false);
         UpdateVisibility(false);
+        UpdateWorldState(false);
         sLog.outInfo("[NAXX] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
     }
 
@@ -286,6 +352,15 @@ public:
                 ChangeAttackZone();
             return;
         }
+
+        if (_worldstateTimer < diff)
+        {
+            // Update worldstate for players in map of object
+            UpdateWorldState(true);
+            _worldstateTimer = 60000; // update every minute
+        }
+        else
+            _worldstateTimer -= diff;
 
         if (_animationTimer < diff)
         {

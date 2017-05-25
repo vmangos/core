@@ -81,6 +81,8 @@
 #include "NodeSession.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include "GameEventMgr.h"
+#include "world/world_event_naxxramas.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -7774,6 +7776,42 @@ void Player::SendInitWorldStates(uint32 zoneid)
     data << uint32(zoneid);                             // zone id
     size_t count_pos = data.wpos();
     data << uint16(0);                                  // count of uint32 blocks, placeholder
+
+    if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
+    {
+        int ATTACK_ZONE1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
+        int ATTACK_ZONE2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+
+        if (ATTACK_ZONE1 == ZONEID_WINTERSPRING || ATTACK_ZONE2 == ZONEID_WINTERSPRING)
+            data << uint32(WORLDSTATE_WINTERSPRING) << uint32(1);
+        else
+            data << uint32(WORLDSTATE_WINTERSPRING) << uint32(0);
+
+        if (ATTACK_ZONE1 == ZONEID_AZSHARA || ATTACK_ZONE2 == ZONEID_AZSHARA)
+            data << uint32(WORLDSTATE_AZSHARA) << uint32(1);
+        else
+            data << uint32(WORLDSTATE_AZSHARA) << uint32(0);
+
+        if (ATTACK_ZONE1 == ZONEID_EASTERN_PLAGUELANDS || ATTACK_ZONE2 == ZONEID_EASTERN_PLAGUELANDS)
+            data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS) << uint32(1);
+        else
+            data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS) << uint32(0);
+
+        if (ATTACK_ZONE1 == ZONEID_BLASTED_LANDS || ATTACK_ZONE2 == ZONEID_BLASTED_LANDS)
+            data << uint32(WORLDSTATE_BLASTED_LANDS) << uint32(1);
+        else
+            data << uint32(WORLDSTATE_BLASTED_LANDS) << uint32(0);
+
+        if (ATTACK_ZONE1 == ZONEID_BURNING_STEPPES || ATTACK_ZONE2 == ZONEID_BURNING_STEPPES)
+            data << uint32(WORLDSTATE_BURNING_STEPPES) << uint32(1);
+        else
+            data << uint32(WORLDSTATE_BURNING_STEPPES) << uint32(0);
+
+        if (ATTACK_ZONE1 == ZONEID_TANARIS || ATTACK_ZONE2 == ZONEID_TANARIS)
+            data << uint32(WORLDSTATE_TANARIS) << uint32(1);
+        else
+            data << uint32(WORLDSTATE_TANARIS) << uint32(0);
+    }
 
     for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
     {
