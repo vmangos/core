@@ -209,14 +209,17 @@ public:
         }
         return true;
     }
-    // Necropoles visibles de l'infini
+
+    // Update Visibility on necropolis, shown zone wide for every player
     void UpdateVisibility(bool visible)
     {
         Map::PlayerList const& list = me->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
         {
             Player* player = it->getSource();
-            if (visible)
+
+            // Update visibility only for players in zone
+            if (visible && player->GetZoneId() == me->GetZoneId())
             {
                 UpdateData data;
                 me->BuildCreateUpdateBlockForPlayer(&data, player);
@@ -228,6 +231,7 @@ public:
                 me->DestroyForPlayer(player);
         }
     }
+
     void Enable()
     {
         me->Respawn();
