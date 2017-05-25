@@ -376,7 +376,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     // Nostalrius : Ivina
     spell->SetClientStarted(true);
-    spell->prepare(&targets);
+    spell->prepare(std::move(targets));
     ALL_SESSION_SCRIPTS(this, OnSpellCasted(spellId));
 }
 

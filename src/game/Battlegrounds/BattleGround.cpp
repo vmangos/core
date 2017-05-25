@@ -1456,7 +1456,7 @@ void BattleGround::SpawnBGObject(ObjectGuid guid, uint32 respawntime)
         if (obj->getLootState() == GO_JUST_DEACTIVATED)
             obj->SetLootState(GO_READY);
 
-        obj->SetRespawnTime(0);
+        obj->SetRespawnTime(obj->GetGOInfo()->type == GAMEOBJECT_TYPE_FLAGSTAND ? 0 : 3);
         if (obj->GetEntry() == 178786 || obj->GetEntry() == 178787 || obj->GetEntry() == 178788 || obj->GetEntry() == 178789)
             obj->SetRespawnDelay(60);
 

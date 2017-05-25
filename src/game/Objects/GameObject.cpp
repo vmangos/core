@@ -1785,7 +1785,7 @@ void GameObject::Use(Unit* user)
     else
         targets.setUnitTarget(user);
 
-    spell->prepare(&targets);
+    spell->prepare(std::move(targets));
 }
 
 // overwrite WorldObject function for proper name localization

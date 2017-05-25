@@ -2946,9 +2946,14 @@ bool IsAcceptableAutorepeatError(SpellCastResult result)
     return false;
 }
 
-void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
+void Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura)
 {
-    m_targets = *targets;
+    m_targets = std::move(targets);
+    prepare(triggeredByAura);
+}
+
+void Spell::prepare(Aura* triggeredByAura)
+{
 
     m_spellState = SPELL_STATE_PREPARING;
     m_delayed = m_spellInfo->speed > 0.0f || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer());
@@ -3020,7 +3025,6 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
                 return;
             }
         }
-
         // Prepare data for triggers
         prepareDataForTriggerSystem();
 
@@ -4640,7 +4644,7 @@ void Spell::CastTriggerSpells()
     for (SpellInfoList::const_iterator si = m_TriggerSpells.begin(); si != m_TriggerSpells.end(); ++si)
     {
         Spell* spell = new Spell(m_caster, (*si), true, m_originalCasterGUID);
-        spell->prepare(&m_targets);                         // use original spell original targets
+        spell->prepare(m_targets);                         // use original spell original targets
     }
 }
 
@@ -5567,6 +5571,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_ALREADY_OPEN;
                     if (!go->IsUseRequirementMet())
                         return SPELL_FAILED_TRY_AGAIN;
+
                 }
                 else if (Item* item = m_targets.getItemTarget())
                 {
@@ -7666,6 +7671,13 @@ void Spell::OnSpellLaunch()
 {
     if (!m_caster || !m_caster->IsInWorld())
         return;
+
+    if (m_spellInfo->Id == 21651 &&
+            sLockStore.LookupEntry(m_targets.getGOTarget()->GetGOInfo()->GetLockId())->Index[1] == LOCKTYPE_SLOW_OPEN)
+    {
+        Spell *visual = new Spell(m_caster, sSpellMgr.GetSpellEntry(24390), true);
+        visual->prepare();
+    }
 
     unitTarget = m_targets.getUnitTarget();
 

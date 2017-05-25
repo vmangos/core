@@ -311,7 +311,7 @@ void PetAI::UpdateAI(const uint32 diff)
             else
                 m_creature->SendPetAIReaction();
 
-            spell->prepare(&targets);
+            spell->prepare(std::move(targets));
         }
 
         // deleted cached Spell objects

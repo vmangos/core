@@ -1249,7 +1249,7 @@ void BattleGroundAV::EventPlayerClickedOnFlag(Player *source, GameObject* target
     uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event1;
     if (event >= BG_AV_NODES_MAX)                           // not a node
         return;
-    target_obj->SendObjectDeSpawnAnim(target_obj->GetObjectGuid());
+
     BG_AV_Nodes node = BG_AV_Nodes(event);
     switch ((sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event2 % BG_AV_MAX_STATES)
     {
