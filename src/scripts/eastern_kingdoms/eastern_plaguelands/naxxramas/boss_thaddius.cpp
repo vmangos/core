@@ -97,16 +97,6 @@ enum eStalagFeugen {
     eFEUGEN = 1
 };
 
-    /*
-    float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
-    float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
-    unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
-    
-    // the spell wont perform correct with current Spell::EffectPlayerPull
-    // implementation. Above code can be used, its much closer.
-    SPELL_MAGNETIC_PULL = 28337, //presumably used for tankswap satalagg/feugen
-    */
-
 enum ThaddiusPhase
 {
     THAD_NOT_STARTED,
@@ -304,17 +294,15 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     instance_naxxramas* m_pInstance;
     eStalagFeugen m_SorF;
     bool m_bFakeDeath;
-    bool m_bBothDead;
+    uint32 fakeDeathTimer;
 
     EventMap m_events;
     ObjectGuid otherAdd;
 
     void Reset() override
     {
-        m_events.Reset();
-
+        fakeDeathTimer = 0;
         m_bFakeDeath = false;
-        m_bBothDead = false;
 
         // We might Reset while faking death, so undo this
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -347,6 +335,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         // animation can be seen in video, pretty much exactly every 6 seconds
         return 6000;
     }
+    
     Creature* GetOtherAdd()
     {
         if (!m_pInstance) return nullptr;
@@ -355,9 +344,12 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        if (!m_pInstance)
+        if (m_bFakeDeath)
             return;
 
+        if (!m_pInstance)
+            return;
+        m_creature->SetInCombatWithZone();
         m_pInstance->SetData(TYPE_THADDIUS, IN_PROGRESS);
 
         if (Creature* pOtherAdd = GetOtherAdd())
@@ -405,6 +397,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
+        m_events.Reset();
         m_pInstance->SetData(TYPE_THADDIUS, FAIL);
 
         /*
@@ -427,12 +420,6 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
         m_pInstance->SetData(TYPE_THADDIUS, FAIL);
         */
-    }
-
-    void Revive()
-    {
-        DoResetThreat();
-        Reset();
     }
 
     bool HandleMagneticPull()
@@ -483,8 +470,30 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         return true;
     }
 
+    void HandleReviveEvent()
+    {
+        Reset();
+        DoResetThreat();
+        if (Unit* nearestTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+        {
+            Aggro(nearestTarget);
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff) override
     {
+        if (m_bFakeDeath)
+        {
+            if (fakeDeathTimer < uiDiff)
+            {
+                // if other add died in time, this wont ever trigger, so always revive here
+                HandleReviveEvent();
+            }
+            else
+                fakeDeathTimer -= uiDiff;
+            return;
+        }
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -504,7 +513,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
                     m_events.Repeat(StaticFiledTimer());
                 else
                     m_events.Repeat(100);
-                break;
+                break;  
             case EVENT_POWERSURGE:
                 if (DoCastSpellIfCan(m_creature, SPELL_POWERSURGE) == CAST_OK)
                     m_events.Repeat(PowerSurgeTimer());
@@ -534,23 +543,35 @@ struct boss_thaddiusAddsAI : public ScriptedAI
             return;
         }
 
-        // prevent death
+        if (Creature* otherAdd = GetOtherAdd())
+        {
+            if (boss_thaddiusAddsAI* otherAI = static_cast<boss_thaddiusAddsAI*>(otherAdd->AI()))
+            {
+                if (otherAI->m_bFakeDeath)
+                {
+                    if (m_pInstance)
+                        m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
+                    otherAdd->Kill(otherAdd, nullptr); 
+                    return; // not modifying damage, thus will die
+                }
+            }
+        }
+
         uiDamage = 0;
         m_bFakeDeath = true;
+        fakeDeathTimer = 5000;
 
         m_creature->InterruptNonMeleeSpells(false);
         m_creature->SetHealth(0);
         m_creature->StopMoving();
         m_creature->ClearComboPointHolders();
-        m_creature->RemoveAllAurasOnDeath();
-        m_creature->ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
-        //m_creature->ModifyAuraState(AURA_STATE_HEALTHLESS_35_PERCENT, false);
+        m_creature->RemoveAllAurasOnDeath(); // todo: will this remove the chain?
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->ClearAllReactives();
         m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-
+        m_creature->AttackStop();
         JustDied(pKiller);                                  // Texts
     }
 };
