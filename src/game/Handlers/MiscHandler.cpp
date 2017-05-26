@@ -451,9 +451,8 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
         if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
             _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
-    // Perte des points de combo si changement de cible, pour les voleurs.
-    // (Les wars utilisent les points de combo en interne pour gerer Fulgurance)
-    if (_player->getPowerType() == POWER_ENERGY && unit && guid != _player->GetComboTargetGuid())
+    // Drop combo points only for rogues (druids don't)
+    if (_player->getClass() == CLASS_ROGUE && unit && guid != _player->GetComboTargetGuid())
         _player->ClearComboPoints();
 
     // Update autoshot if need
