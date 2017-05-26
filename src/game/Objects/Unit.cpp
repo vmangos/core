@@ -11162,15 +11162,15 @@ void Unit::SetMovement(UnitMovementType pType)
         mePlayer->GetCheatData()->OrderSent(&data);
         mePlayer->GetSession()->SendPacket(&data);
         
-        // Send root messages now rather than on acks from the force messages
-        // so our state is consistent
-        if (pType == MOVE_ROOT || pType == MOVE_UNROOT) {
+        // We can't send movement info here because it is out-of-date with the client
+        // and causes issues with unit speed updates on death/res
+        /*if (pType == MOVE_ROOT || pType == MOVE_UNROOT) {
             WorldPacket rootData(pType == MOVE_ROOT ? MSG_MOVE_ROOT : MSG_MOVE_UNROOT, 31);
             rootData << GetPackGUID();
             rootData << m_movementInfo;
             
             mePlayer->SendMovementMessageToSet(std::move(rootData), false);
-        }
+        }*/
     }
     if (controller)
         controller->GetSession()->SendPacket(&data);

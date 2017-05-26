@@ -397,12 +397,21 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
     };
     
-    // Update movespeed using the spline packet. works for move splines
-    // and normal movement
-    WorldPacket data(SetSpeed2Opc_table[move_type][2], 31);
+    // Maybe update movespeed using the spline packet. works for move splines
+    // and normal movement, but reverted due to issues in same changeset
+    WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
     data << _player->GetMover()->GetPackGUID();
+    data << movementInfo;
     data << float(newspeed);
     _player->SendMovementMessageToSet(std::move(data), false);
+    
+    if (!_player->GetMover()->movespline->Finalized())
+    {
+        WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
+        splineData << _player->GetMover()->GetPackGUID();
+        Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
+        _player->SendMovementMessageToSet(std::move(splineData), false);
+    }
 }
 
 void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
@@ -761,6 +770,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
 
+    WorldPacket data(MSG_MOVE_UNROOT, recv_data.size());
+    data << _player->GetPackGUID();
+    movementInfo.Write(data);
+    _player->SendMovementMessageToSet(std::move(data), true, _player);
+    
     // Clear unit client state for brevity, though it should not be used
     _player->clearUnitState(UNIT_STAT_CLIENT_ROOT);
 }
@@ -791,6 +805,11 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // Position change
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
+    
+    WorldPacket data(MSG_MOVE_ROOT, recv_data.size());
+    data << _player->GetPackGUID();
+    movementInfo.Write(data);
+    _player->SendMovementMessageToSet(std::move(data), true, _player);
     
     // Set unit client state for brevity, though it should not be used
     _player->addUnitState(UNIT_STAT_CLIENT_ROOT);
