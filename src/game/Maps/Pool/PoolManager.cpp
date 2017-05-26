@@ -358,8 +358,40 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     // If triggered from some object respawn this object is still marked as spawned
     // and also counted into m_SpawnedPoolAmount so we need increase count to be
     // spawned by 1
-    if (triggerFrom && spawns.IsSpawnedObject<T>(triggerFrom))
+    if (triggerFrom)
+    {
+        if (spawns.IsSpawnedObject<T>(triggerFrom))
         ++count;
+    }
+    // Instance loading : no object spawned, check if any timers have been loaded
+    // from the database and spawn the object at the right location
+    else if (count && count == limit)
+    {
+        if (!ExplicitlyChanced.empty())
+        {
+            for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i)
+            {
+                if (count && GetPoolObjectRespawnTime(mapState, ExplicitlyChanced[i].guid))
+                {
+                    spawns.AddSpawn<T>(ExplicitlyChanced[i].guid, poolId);
+                    Spawn1Object(mapState, &ExplicitlyChanced[i], instantly);
+                    --count;
+                }
+            }
+        }
+        else if (!EqualChanced.empty())
+        {
+            for (int i = 0; i < EqualChanced.size(); ++i)
+            {
+                if (count && GetPoolObjectRespawnTime(mapState, EqualChanced[i].guid))
+                {
+                    spawns.AddSpawn<T>(EqualChanced[i].guid, poolId);
+                    Spawn1Object(mapState, &EqualChanced[i], instantly);
+                    --count;
+                }
+            }
+        }
+    }
 
     // This will try to spawn the rest of pool, not guaranteed
     for (int i = 0; i < count; ++i)
@@ -390,6 +422,24 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
             triggerFrom = 0;
         }
     }
+}
+
+template <>
+time_t PoolGroup<Creature>::GetPoolObjectRespawnTime(MapPersistentState& mapState, uint32 guid)
+{
+    return mapState.GetCreatureRespawnTime(guid);
+}
+
+template <>
+time_t PoolGroup<GameObject>::GetPoolObjectRespawnTime(MapPersistentState& mapState, uint32 guid)
+{
+    return mapState.GetGORespawnTime(guid);
+}
+
+template <>
+time_t PoolGroup<Pool>::GetPoolObjectRespawnTime(MapPersistentState& mapState, uint32 guid)
+{
+    return 0;
 }
 
 // Method that is actualy doing the spawn job on 1 creature

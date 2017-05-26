@@ -580,7 +580,7 @@ void GameObject::JustDespawnedWaitingRespawn()
             sLog.outInfo("[Pool #%u] %s is not deleted but should be", poolid, GetGuidStr().c_str());
             AddObjectToRemoveList();
         }
-        sPoolMgr.UpdatePool<GameObject>(state, poolid, 0);
+        sPoolMgr.UpdatePool<GameObject>(state, poolid, GetGUIDLow());
         return;
     }
 }
