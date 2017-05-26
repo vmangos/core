@@ -28,3 +28,9 @@ UPDATE `creature` SET position_x = 3513.84, position_y = - 2926.55, position_z =
 
 -- Remove stalagg and feugen from creature db. Spawned by script instead.
 DELETE FROM `creature` where id IN (15929, 15930);
+
+-- give Stalagg CREATURE_FLAG_EXTRA_ALWAYS_CRUSH flag and set attackspeed to 2sec
+UPDATE `creature_template` SET `flags_extra` = flags_extra | 8192, `baseattacktime` = 2000 WHERE entry = 15929;
+
+-- Feugen attackspeed to 2sec
+UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15930;
