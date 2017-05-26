@@ -1439,6 +1439,14 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
                 damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
                 damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
             }
+
+            if (damage > 0)
+            {
+                // SPELL_CUSTOM_IGNORE_ARMOR should not be necessary anymore after realizing spells of DmgClass NONE or MAGIC
+                // ignore armor, while RANGED and MELEE don't.
+                if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL && !(spellInfo->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
+                    damage = CalcArmorReducedDamage(pVictim, damage);
+            }
         }
         break;
         // Magical Attacks
@@ -1459,15 +1467,8 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
         break;
     }
 
-    // damage mitigation
-    if (damage > 0)
-    {
-        // physical damage => armor
-        if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL && !(spellInfo->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
-            damage = CalcArmorReducedDamage(pVictim, damage);
-    }
-    else
-        damage = 0;
+    damage = std::max(damage, 0);
+
     damageInfo->damage = damage;
 }
 
