@@ -61,6 +61,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_GUARD                        = 0x00000400,       // creature is a guard
     CREATURE_FLAG_EXTRA_NO_THREAT_LIST               = 0x00000800,
     CREATURE_FLAG_EXTRA_KEEP_POSITIVE_AURAS_ON_EVADE = 0x00001000,       // creature keeps positive auras at reset
+    CREATURE_FLAG_EXTRA_ALWAYS_CRUSH                 = 0x00002000,       // creature always roll a crushing melee outcome when not miss/crit/dodge/parry/block
 };
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
