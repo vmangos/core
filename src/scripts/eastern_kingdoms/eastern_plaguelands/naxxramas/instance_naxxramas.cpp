@@ -214,8 +214,8 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_GROBBULUS:
         case NPC_GLUTH:
         case NPC_THADDIUS:
-        case NPC_STALAGG:
-        case NPC_FEUGEN:
+        //case NPC_STALAGG:
+        //case NPC_FEUGEN:
         case NPC_NOTH:
         case NPC_HEIGAN:
         case NPC_LOATHEB:
@@ -565,6 +565,10 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_CONS_THAD_DOOR, uiData);
             break;
         case TYPE_THADDIUS:
+            // Only set the same state once
+            if (uiData == m_auiEncounter[uiType])
+                break;
+
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
