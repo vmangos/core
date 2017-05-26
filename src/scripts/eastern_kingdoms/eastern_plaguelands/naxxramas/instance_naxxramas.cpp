@@ -106,7 +106,7 @@ void instance_naxxramas::UpdateBossEntranceDoor(GameObject* pGO, uint32 uiData)
         sLog.outError("instance_naxxramas::UpdateBossEntranceDoor called with nullptr GO");
         return;
     }
-    if (uiData == IN_PROGRESS)
+    if (uiData == IN_PROGRESS || uiData == SPECIAL)
         pGO->SetGoState(GO_STATE_READY);
     else
         pGO->SetGoState(GO_STATE_ACTIVE);
@@ -653,7 +653,10 @@ void instance_naxxramas::Load(const char* chrIn)
         if (m_auiEncounter[i] == IN_PROGRESS)
             m_auiEncounter[i] = NOT_STARTED;
     }
+    if (m_auiEncounter[TYPE_THADDIUS] == SPECIAL)
+        m_auiEncounter[TYPE_THADDIUS] = FAIL;
 
+    //todo: at least 4hm might need to be changed from SPECIAL to FAIL/NOT_STARTED as well
     OUT_LOAD_INST_DATA_COMPLETE;
 }
 
