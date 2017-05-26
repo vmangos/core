@@ -44,10 +44,10 @@ enum eStalaggFeugen
     SAY_FEUG_DEATH          = -1533028,
 
     SPELL_WARSTOMP          = 28125,
-    SPELL_FLASH             = 28127, // stun spell supposedly used by feugen?  
+    SPELL_FLASH             = 28127, // TODO: stun spell supposedly used by feugen? Cant find any sources for it
     SPELL_POWERSURGE        = 28134,
-    SPELL_STATIC_FIELD      = 28135, // dosent seem to drain mana?
-    SPELL_MAGNETIC_PULL   = 28337,
+    SPELL_STATIC_FIELD      = 28135,
+    SPELL_MAGNETIC_PULL     = 28337,
 };
 
 enum addEvents
@@ -308,10 +308,6 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
     EventMap m_events;
     ObjectGuid otherAdd;
-    //uint32 m_uiHoldTimer;
-    //uint32 m_uiWarStompTimer;
-    //uint32 m_uiReviveTimer;
-    //ObjectGuid m_teslaCoil;
 
     void Reset() override
     {
@@ -324,34 +320,37 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         m_creature->SetHealth(m_creature->GetMaxHealth());
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-
-        // EstablishLink();
     }
 
     uint32 WarstompTimer()
     {
-        // best guess timer based on https://www.youtube.com/watch?v=GmE5JufAcT0
-        return urand(15000, 22000);
+        // best guess timer based on 
+        // https://www.youtube.com/watch?v=GmE5JufAcT0
+        // and https://www.youtube.com/watch?v=3hen_d6cb-Y
+        return urand(15000, 20000);
     }
     uint32 PowerSurgeTimer()
     {
+        // https://www.youtube.com/watch?v=3hen_d6cb-Y
+        // Timer seems correct based on above video
         return urand(25000, 30000);
     }
     uint32 MagneticPullTimer()
     {
-        return 21000;
+        // Every 20 seconds, but from videos can be seen to drift a tiny bit. 
+        // guides mention 20.5sec, so lets just make it that.
+        return 20500; 
+    }
+    uint32 StaticFiledTimer()
+    {
+        //https://www.youtube.com/watch?v=GmE5JufAcT0
+        // animation can be seen in video, pretty much exactly every 6 seconds
+        return 6000;
     }
     Creature* GetOtherAdd()
     {
         if (!m_pInstance) return nullptr;
         return m_pInstance->GetCreature(otherAdd);
-        switch (m_creature->GetEntry())
-        {
-        case NPC_FEUGEN:  return m_pInstance->GetSingleCreatureFromStorage(NPC_STALAGG);
-        case NPC_STALAGG: return m_pInstance->GetSingleCreatureFromStorage(NPC_FEUGEN);
-        default:
-            return NULL;
-        }
     }
 
     void Aggro(Unit* pWho) override
@@ -501,7 +500,10 @@ struct boss_thaddiusAddsAI : public ScriptedAI
                     m_events.Repeat(100);
                 break;
             case EVENT_STATIC_FIELD:
-
+                if (DoCastSpellIfCan(m_creature, SPELL_STATIC_FIELD) == CAST_OK)
+                    m_events.Repeat(StaticFiledTimer());
+                else
+                    m_events.Repeat(100);
                 break;
             case EVENT_POWERSURGE:
                 if (DoCastSpellIfCan(m_creature, SPELL_POWERSURGE) == CAST_OK)
@@ -970,11 +972,6 @@ struct boss_stalaggAI : public boss_thaddiusAddsAI
     {
         Reset();
     }
-    
-    void Reset() override
-    {
-        boss_thaddiusAddsAI::Reset();
-    }
 
     void Aggro(Unit* pWho) override
     {
@@ -1005,22 +1002,12 @@ struct boss_feugenAI : public boss_thaddiusAddsAI
         Reset();
     }
 
-    uint32 m_uiStaticFieldTimer;
-    uint32 m_uiMagneticPullTimer;                           // TODO, missing
-
-    void Reset() override
-    {
-        boss_thaddiusAddsAI::Reset();
-        m_uiStaticFieldTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-        m_uiMagneticPullTimer = 20 * IN_MILLISECONDS;
-    }
-
     void Aggro(Unit* pWho) override
     {
         DoScriptText(SAY_FEUG_AGGRO, m_creature);
 
         m_events.ScheduleEvent(EVENT_WARSTOMP, WarstompTimer());
-        //m_events.ScheduleEvent(EVENT_FLASH, PowerSurgeTimer());
+        m_events.ScheduleEvent(EVENT_STATIC_FIELD, StaticFiledTimer());
 
         boss_thaddiusAddsAI::Aggro(pWho);
     }
@@ -1034,17 +1021,6 @@ struct boss_feugenAI : public boss_thaddiusAddsAI
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
             DoScriptText(SAY_FEUG_SLAY, m_creature);
-    }
-
-    void UpdateAddAI(const uint32 uiDiff)
-    {
-        if (m_uiStaticFieldTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_STATIC_FIELD) == CAST_OK)
-                m_uiStaticFieldTimer = urand(10 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
-        }
-        else
-            m_uiStaticFieldTimer -= uiDiff;
     }
 };
 
