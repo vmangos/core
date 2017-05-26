@@ -34,3 +34,7 @@ UPDATE `creature_template` SET `flags_extra` = flags_extra | 8192, `baseattackti
 
 -- Feugen attackspeed to 2sec
 UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15930;
+
+-- The shock spell used by tesla coil creatures on thaddius needs explisit target
+DELETE FROM `spell_script_target` where entry = 28159;
+INSERT INTO `spell_script_target` (`entry`,`type`,`targetEntry`) VALUES (28159, 1, 15928);
