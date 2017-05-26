@@ -149,9 +149,11 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
     npc_tesla_coilAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        /*
         m_uiSetupTimer = 1 * IN_MILLISECONDS;
         m_uiOverloadTimer = 0;
         m_bReapply = false;
+        */
         Reset();
     }
 
@@ -188,6 +190,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
 
     bool SetupChain()
     {
+        /*
         // Check, if instance_ script failed or encounter finished
         if (!m_pInstance || m_pInstance->GetData(TYPE_THADDIUS) == DONE)
             return true;
@@ -205,6 +208,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
             return true;
 
         return false;
+        */
     }
 
     void ReApplyChain(uint32 uiEntry)
@@ -237,46 +241,40 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        return;
-
-        if (!m_creature->IsNonMeleeSpellCasted())
-        {
-        }
-        /*
         m_creature->SelectHostileTarget();
         if (!m_uiOverloadTimer && !m_uiSetupTimer && !m_bReapply)
-        return;                                         // Nothing to do this tick
-
+            return;                                         // Nothing to do this tick
+        /*
         if (m_uiSetupTimer)
         {
-        if (m_uiSetupTimer <= uiDiff)
-        {
-        if (SetupChain())
-        m_uiSetupTimer = 0;
-        else
-        m_uiSetupTimer = 5 * IN_MILLISECONDS;
-        }
-        else
-        m_uiSetupTimer -= uiDiff;
+            if (m_uiSetupTimer <= uiDiff)
+            {
+                if (SetupChain())
+                    m_uiSetupTimer = 0;
+                else
+                    m_uiSetupTimer = 5 * IN_MILLISECONDS;
+            }
+            else
+                m_uiSetupTimer -= uiDiff;
         }
 
         if (m_uiOverloadTimer)
         {
-        if (m_uiOverloadTimer <= uiDiff)
-        {
-        m_uiOverloadTimer = 0;
-        m_creature->RemoveAurasDueToSpell(m_bToFeugen ? SPELL_FEUGEN_TESLA_PASSIVE : SPELL_STALAGG_TESLA_PASSIVE);
-        DoCastSpellIfCan(m_creature, SPELL_SHOCK_OVERLOAD, CAST_INTERRUPT_PREVIOUS);
-        DoScriptText(EMOTE_TESLA_OVERLOAD, m_creature);
-        m_pInstance->DoUseDoorOrButton(m_bToFeugen ? GO_CONS_NOX_TESLA_FEUGEN : GO_CONS_NOX_TESLA_STALAGG);
+            if (m_uiOverloadTimer <= uiDiff)
+            {
+                m_uiOverloadTimer = 0;
+                m_creature->RemoveAurasDueToSpell(m_bToFeugen ? SPELL_FEUGEN_TESLA_PASSIVE : SPELL_STALAGG_TESLA_PASSIVE);
+                DoCastSpellIfCan(m_creature, SPELL_SHOCK_OVERLOAD, CAST_INTERRUPT_PREVIOUS);
+                DoScriptText(EMOTE_TESLA_OVERLOAD, m_creature);
+                m_pInstance->DoUseDoorOrButton(m_bToFeugen ? GO_CONS_NOX_TESLA_FEUGEN : GO_CONS_NOX_TESLA_STALAGG);
+            }
+            else
+                m_uiOverloadTimer -= uiDiff;
         }
-        else
-        m_uiOverloadTimer -= uiDiff;
-        }
-
-        if (m_bReapply)
-        ReApplyChain(0);
         */
+        if (m_bReapply)
+            ReApplyChain(0);
+        
     }
 };
 
@@ -583,7 +581,18 @@ struct boss_thaddiusAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
-        CheckSpawnAdds();
+        
+        if (m_pInstance)
+        {
+            CheckSpawnAdds();
+        }
+
+        // Apply the "stun" aura again, which makes him darker and not moving
+        if (!m_creature->HasAura(SPELL_THADIUS_SPAWN))
+            m_creature->CastSpell(m_creature, SPELL_THADIUS_SPAWN, true);
+
+        // He is not targetable other than in p2
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
 
     instance_naxxramas* m_pInstance;
@@ -624,7 +633,7 @@ struct boss_thaddiusAI : public ScriptedAI
         // Summonming a new add
         uint32 addEntry = whichAdd == eSTALAGG ? NPC_STALAGG : NPC_FEUGEN;
         if (Creature* pC = m_creature->SummonCreature(addEntry, addPositions[whichAdd][0], addPositions[whichAdd][1], addPositions[whichAdd][2], addPositions[whichAdd][3],
-            TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
+            TEMPSUMMON_MANUAL_DESPAWN))
         {
             addGuids[whichAdd] = pC->GetObjectGuid();
         }
@@ -637,7 +646,7 @@ struct boss_thaddiusAI : public ScriptedAI
         {
             coilGuids[whichAdd] = tc->GetObjectGuid();
             if (npc_tesla_coilAI* pTeslaAI = dynamic_cast<npc_tesla_coilAI*>(tc->AI()))
-                pTeslaAI->ReApplyChain(m_creature->GetEntry());
+                pTeslaAI->ReApplyChain(addEntry);
             else
                 sLog.outError("boss_thaddiusAddsAI::EstablishLink failed to cast tesla coil to npc_tesla_coilAI*");
         }
@@ -647,7 +656,7 @@ struct boss_thaddiusAI : public ScriptedAI
         // Making sure the coil GO does its animation
         uint32 coilGOEntry = whichAdd == eSTALAGG ? GO_CONS_NOX_TESLA_STALAGG : GO_CONS_NOX_TESLA_FEUGEN;
         if (GameObject* tc = m_pInstance->GetSingleGameObjectFromStorage(coilGOEntry))
-            tc->SetGoState(GO_STATE_READY);
+            tc->SetGoState(GO_STATE_ACTIVE);
     }
     
     // Respawn stalagg and feugen and the tesla coils corresponding to them. Activates the tesla coil GO and sets the chain
@@ -687,32 +696,37 @@ struct boss_thaddiusAI : public ScriptedAI
         uint32 goEntry = which == eSTALAGG ? GO_CONS_NOX_TESLA_STALAGG : GO_CONS_NOX_TESLA_FEUGEN;
         if (GameObject* pG = m_pInstance->GetSingleGameObjectFromStorage(goEntry))
         {
-            pG->SetGoState(GO_STATE_ACTIVE);
+            pG->SetGoState(GO_STATE_READY);
         }
+    }
+
+    void HandleUnsummonAdd(eStalagFeugen which)
+    {
+        if (Creature* add = m_pInstance->GetCreature(addGuids[which]))
+        {
+            if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(add)) {
+                tmpSumm->UnSummon();
+            }
+        }
+        addGuids[which] = 0;
     }
 
     void SummonedCreatureDespawn(Creature* pC) override 
     {
         if (!m_pInstance)
             return;
-
+        /*
         // Unsummoning the tesla coils when stalagg and feugen despawns
         if (pC->GetObjectGuid() == addGuids[eSTALAGG])
             HandleUnsummonCoil(eSTALAGG);
         else if(pC->GetObjectGuid() == addGuids[eFEUGEN])
             HandleUnsummonCoil(eFEUGEN);
+        */
     }
 
     void Reset() override
     {
-        m_uiBallLightningTimer = 1000;
-
-        // Apply the "stun" aura again, which makes him darker and not moving
-        m_creature->CastSpell(m_creature, SPELL_THADIUS_SPAWN, true);
-        
-        // He is not targetable other than in p2
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        
+        m_uiBallLightningTimer = 1000;      
         m_Phase = THAD_NOT_STARTED;
     }
 
@@ -737,6 +751,13 @@ struct boss_thaddiusAI : public ScriptedAI
             m_pInstance->SetData(TYPE_THADDIUS, FAIL);
             CheckSpawnAdds();
         }
+
+        // Apply the "stun" aura again, which makes him darker and not moving
+        if (!m_creature->HasAura(SPELL_THADIUS_SPAWN))
+            m_creature->CastSpell(m_creature, SPELL_THADIUS_SPAWN, true);
+
+        // He is not targetable other than in p2
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
     }
     
     void KilledUnit(Unit* pVictim) override
@@ -773,6 +794,7 @@ struct boss_thaddiusAI : public ScriptedAI
 
     void TransitionToPhase(ThaddiusPhase newPhase)
     {
+        m_Phase = newPhase;
         switch (m_Phase)
         {
         case ThaddiusPhase::THAD_NOT_STARTED:
@@ -789,9 +811,14 @@ struct boss_thaddiusAI : public ScriptedAI
             // 3:33 +2  thaddius engage. GO stops animating
             m_events.ScheduleEvent(EVENT_TRANSITION_1, 10000);
             m_events.ScheduleEvent(EVENT_TRANSITION_2, 13000);
-            m_events.ScheduleEvent(EVENT_TRANSITION_3, 15000);
+            m_events.ScheduleEvent(EVENT_TRANSITION_3, 14000);
             break;
         case ThaddiusPhase::THAD_PHASE2:
+            DoResetThreat();
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+            {
+                AttackStart(pTarget);
+            }
             m_events.ScheduleEvent(EVENT_BERSERK, ENRAGE_TIMER);
             m_events.ScheduleEvent(EVENT_SHIFT, PolarityShiftTimer(true));
             m_events.ScheduleEvent(EVENT_CHAIN, ChainLightningTimer());
@@ -808,34 +835,44 @@ struct boss_thaddiusAI : public ScriptedAI
         {
             switch (l_EventId)
             {
-                // stop link to adds, coils do overload emote
             case EVENT_TRANSITION_1:
+                // stop link to adds, coils do overload emote
+                HandleUnsummonAdd(eSTALAGG);
+                HandleUnsummonAdd(eFEUGEN);
                 if (Creature* coil = m_pInstance->GetCreature(coilGuids[0]))
                 {
-
+                    DoScriptText(EMOTE_TESLA_OVERLOAD, coil);
                 }
                 if (Creature* coil = m_pInstance->GetCreature(coilGuids[1]))
                 {
-
-                }
-                break;
-                // coils shoot beam at thaddius. SPELL_THADIUS_SPAWN removed
-            case EVENT_TRANSITION_2:
-                if (Creature* coil = m_pInstance->GetCreature(coilGuids[0]))
-                {
+                    DoScriptText(EMOTE_TESLA_OVERLOAD, coil);
                     
                 }
+                break;
+            case EVENT_TRANSITION_2:
+                // coils shoot beam at thaddius. SPELL_THADIUS_SPAWN removed
+                if (Creature* coil = m_pInstance->GetCreature(coilGuids[0]))
+                {
+                    coil->CastSpell(m_creature, SPELL_SHOCK_OVERLOAD, true);
+                }
                 if (Creature* coil = m_pInstance->GetCreature(coilGuids[1]))
                 {
-
+                    coil->CastSpell(m_creature, SPELL_SHOCK_OVERLOAD, true);
                 }
+                m_creature->RemoveAurasDueToSpell(SPELL_THADIUS_SPAWN);
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                m_creature->CastSpell(m_creature, SPELL_THADIUS_LIGHTNING_VISUAL, true);
                 break;
-                // Thaddius engage. GOs stops animating
             case EVENT_TRANSITION_3:
+                HandleUnsummonCoil(eSTALAGG);
+                HandleUnsummonCoil(eFEUGEN);
+                /*
+                // Thaddius engage. GOs stops animating
                 if (GameObject* pG = m_pInstance->GetSingleGameObjectFromStorage(GO_CONS_NOX_TESLA_FEUGEN))
                     pG->SetGoState(GO_STATE_READY);
                 if (GameObject* pG = m_pInstance->GetSingleGameObjectFromStorage(GO_CONS_NOX_TESLA_STALAGG))
                     pG->SetGoState(GO_STATE_READY);
+                */
                 TransitionToPhase(THAD_PHASE2);
                 break;
             }
@@ -898,7 +935,11 @@ struct boss_thaddiusAI : public ScriptedAI
         {
             if (!m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
             {
-                m_uiBallLightningTimer -= diff;
+                m_uiBallLightningTimer -= std::min(diff, m_uiBallLightningTimer);
+            }
+            else
+            {
+                m_uiBallLightningTimer = 1000;
             }
         }
         else {
@@ -907,18 +948,16 @@ struct boss_thaddiusAI : public ScriptedAI
         
         // If we did not perform a melee attack, but MH or OH attack was ready, and we were not in melee range,
         // it's time to start hurl some balls of lightning
-        if (m_uiBallLightningTimer < diff)
+        if (m_uiBallLightningTimer < diff && !m_creature->IsNonMeleeSpellCasted())
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BALL_LIGHTNING) == CAST_OK)
                 m_uiBallLightningTimer = 1500;
         }
-        else
-            m_uiBallLightningTimer -= diff;
     }
     
     void UpdateAI(const uint32 uiDiff) override
     {
-        return; // xxx debugging adds
+        //return; // xxx debugging adds
 
         if (!m_pInstance)
             return;
@@ -929,6 +968,12 @@ struct boss_thaddiusAI : public ScriptedAI
             {
                 TransitionToPhase(THAD_NOT_STARTED);
             }
+        }
+        else
+        {
+            // He can act a bit weird if you stand next to him on server startup :/
+            if (m_creature->isInCombat())
+                TransitionToPhase(THAD_NOT_STARTED);
         }
 
         switch (m_Phase)
@@ -944,6 +989,11 @@ struct boss_thaddiusAI : public ScriptedAI
             {
                 TransitionToPhase(THAD_NOT_STARTED);
             }
+            // if adds are successfully killed, they set SPECIAL
+            else if (m_pInstance->GetData(TYPE_THADDIUS) == SPECIAL)
+            {
+                TransitionToPhase(THAD_TRANSITION);
+            }
             break;
         case ThaddiusPhase::THAD_TRANSITION:
             UpdateTransitionPhase(uiDiff);
@@ -957,7 +1007,8 @@ struct boss_thaddiusAI : public ScriptedAI
     }
 };
 
-bool EffectDummyNPC_spell_thaddius_encounter(Unit* /*pCaster*/, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
+/*
+bool EffectDummyNPC_spell_thaddius_encounter(Unit*, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
 {
     switch (uiSpellId)
     {
@@ -985,6 +1036,7 @@ bool EffectDummyNPC_spell_thaddius_encounter(Unit* /*pCaster*/, uint32 uiSpellId
     }
     return false;
 }
+*/
 
 struct boss_stalaggAI : public boss_thaddiusAddsAI
 {
@@ -1072,7 +1124,7 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "boss_thaddius";
     pNewScript->GetAI = &GetAI_boss_thaddius;
-    pNewScript->pEffectDummyCreature = &EffectDummyNPC_spell_thaddius_encounter;
+    //pNewScript->pEffectDummyCreature = &EffectDummyNPC_spell_thaddius_encounter;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -1088,6 +1140,6 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "npc_tesla_coil";
     pNewScript->GetAI = &GetAI_npc_tesla_coil;
-    pNewScript->pEffectDummyCreature = &EffectDummyNPC_spell_thaddius_encounter;
+    //pNewScript->pEffectDummyCreature = &EffectDummyNPC_spell_thaddius_encounter;
     pNewScript->RegisterSelf();
 }
