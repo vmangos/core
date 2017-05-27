@@ -2424,6 +2424,15 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
         return;
 
     uint32 prot = GetSpellProto()->EffectMiscValue[m_effIndex];
+
+    // Can't modify an unknown skill
+    if (!GetTarget()->ToPlayer()->HasSkill(prot))
+    {
+        // Revert m_applied assigned in Aura::ApplyModidier
+        m_applied = !apply;
+        return;
+    }
+
     int32 points = GetModifier()->m_amount;
 
     ((Player*)GetTarget())->ModifySkillBonus(prot, (apply ? points : -points), m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
