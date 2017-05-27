@@ -711,7 +711,6 @@ bool QuestAccept_npc_volcor(Player* pPlayer, Creature* pCreature, const Quest* p
 
 enum
 {
-    QUEST_PLAGUED_LANDS             = 2118,
     SPELL_TRAPPED_BEAR              = 9439,
     NPC_CAPTURED_RABID_THISTLE_BEAR = 11836,
     SPELL_RAGE                      = 3150
@@ -787,6 +786,132 @@ bool EffectDummyCreature_npc_rabid_thistle_bear(Unit* pCaster, uint32 uiSpellId,
         }
         //always return true when we are handling this spell and effect
         return true;
+    }
+    return false;
+}
+
+/*####
+# npc_tharnariun_treetender
+####*/
+
+enum
+{
+    SAY_THARNARIUN_CLEANSED = -1780226,
+    QUEST_PLAGUED_LANDS = 2118,
+    SPELL_THARNARIUN_HEAL = 9457
+};
+
+struct npc_tharnariun_treetenderAI : public ScriptedAI
+{
+    npc_tharnariun_treetenderAI(Creature *c) : ScriptedAI(c)
+    {
+        Reset();
+    }
+
+    bool m_bPlaguedLandsEvent;
+    uint32 m_uiPlaguedLandsTimer;
+    uint8 PlaguedLandsCount;
+    Player* pPlaguedLandsPlayer = nullptr;
+    Creature* pPlaguedLandsBear = nullptr;
+
+    void Reset()
+    {
+        m_bPlaguedLandsEvent = false;
+        PlaguedLandsCount = 0;
+        pPlaguedLandsPlayer = nullptr;
+        pPlaguedLandsBear = nullptr;
+    }
+
+    void StartPlaguedLandsEvent(Player* pPlayer)
+    {
+        pPlaguedLandsPlayer = pPlayer;
+        m_bPlaguedLandsEvent = true;
+        PlaguedLandsCount = 1;
+        m_uiPlaguedLandsTimer = 1100;
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (m_bPlaguedLandsEvent)
+        { 
+            if (m_uiPlaguedLandsTimer < diff)
+            {
+                switch (PlaguedLandsCount)
+                {
+                    case 1:
+                    {
+                        DoScriptText(SAY_THARNARIUN_CLEANSED, m_creature);
+                        m_uiPlaguedLandsTimer = 100;
+                        PlaguedLandsCount++;
+                        break;
+                    }
+                    case 2:
+                    {
+                        m_creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                        m_uiPlaguedLandsTimer = 100;
+                        PlaguedLandsCount++;
+                        break;
+                    }
+                    case 3:
+                    {
+                        if (pPlaguedLandsPlayer)
+                            pPlaguedLandsBear = pPlaguedLandsPlayer->FindNearestCreature(NPC_CAPTURED_RABID_THISTLE_BEAR, 10);
+
+                        if (pPlaguedLandsBear)
+                        {
+                            pPlaguedLandsBear->CastSpell(pPlaguedLandsBear, SPELL_THARNARIUN_HEAL, true);
+                            m_uiPlaguedLandsTimer = 3500;
+                            PlaguedLandsCount++;
+                            break;
+                        }
+                        else
+                        {
+                            m_bPlaguedLandsEvent = false;
+                        }
+                    }
+                    case 4:
+                    {
+                        if (pPlaguedLandsBear)
+                            pPlaguedLandsBear->DisappearAndDie();
+
+                        m_bPlaguedLandsEvent = false;
+                        break;
+                    }
+                    default:
+                    {
+                        m_bPlaguedLandsEvent = false;
+                        break;
+                    }
+                }
+            }
+            else m_uiPlaguedLandsTimer -= diff;
+        }
+
+        //Return since we have no target
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_npc_tharnariun_treetender(Creature *_Creature)
+{
+    return new npc_tharnariun_treetenderAI(_Creature);
+}
+
+bool QuestComplete_npc_tharnariun_treetender(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
+{
+    if (!pQuestGiver)
+        return false;
+
+    if (!pPlayer)
+        return false;
+
+    if (pQuest->GetQuestId() == QUEST_PLAGUED_LANDS)
+    {
+        if (auto pTharnariunAI = static_cast<npc_tharnariun_treetenderAI*>(pQuestGiver->AI()))
+            pTharnariunAI->StartPlaguedLandsEvent(pPlayer); // event that plays on completion of quest Plagued Lands
     }
     return false;
 }
@@ -1312,6 +1437,12 @@ void AddSC_darkshore()
     newscript->Name = "npc_rabid_thistle_bear";
     newscript->GetAI = &GetAI_npc_rabid_thistle_bear;
     newscript->pEffectDummyCreature = &EffectDummyCreature_npc_rabid_thistle_bear;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_tharnariun_treetender";
+    newscript->GetAI = &GetAI_npc_tharnariun_treetender;
+    newscript->pQuestRewardedNPC = &QuestComplete_npc_tharnariun_treetender;
     newscript->RegisterSelf();
 
     newscript = new Script;
