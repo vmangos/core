@@ -149,26 +149,20 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
     npc_tesla_coilAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        /*
-        m_uiSetupTimer = 1 * IN_MILLISECONDS;
-        m_uiOverloadTimer = 0;
-        m_bReapply = false;
-        */
         Reset();
     }
 
     instance_naxxramas* m_pInstance;
     bool m_bToFeugen;
-    bool m_bReapply;
-
-    uint32 m_uiSetupTimer;
-    uint32 m_uiOverloadTimer;
+    ObjectGuid m_guid;
+    uint32 shockTimer;
 
     void Reset() override
     {
         m_creature->SetRespawnRadius(0.01f);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         m_creature->GetMotionMaster()->Initialize();
+        shockTimer = 0;
     }
 
     void MoveInLineOfSight(Unit* /*pWho*/) override {}
@@ -177,104 +171,56 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
     {
         // Probably only in wotlk
         // DoScriptText(EMOTE_LOSING_LINK, m_creature);
+        //m_creature->SetInCombatWithZone();
     }
 
-    // Overwrite this function here to
-    // * Keep Chain spells casted when evading after useless EnterCombat caused by 'buffing' the add
-    // * To not remove the Passive spells when evading after ie killed a player
-    //void EnterEvadeMode() override
-    //{
-    //    m_creature->DeleteThreatList();
-    //    m_creature->CombatStop();
-    //}
-
-    bool SetupChain()
+    void ReApplyChain(uint32 uiEntry, ObjectGuid guid)
     {
-        /*
-        // Check, if instance_ script failed or encounter finished
-        if (!m_pInstance || m_pInstance->GetData(TYPE_THADDIUS) == DONE)
-            return true;
+        m_guid = guid;
+        if (uiEntry == NPC_FEUGEN)
+            m_bToFeugen = true;
+        else if (uiEntry == NPC_STALAGG)
+            m_bToFeugen = false;
+        else
+            sLog.outError("npc_tesla_coilAI::ReApplyChain got entry which was not stalagg or feugen.");
 
-        GameObject* pNoxTeslaFeugen = m_pInstance->GetSingleGameObjectFromStorage(GO_CONS_NOX_TESLA_FEUGEN);
-        GameObject* pNoxTeslaStalagg = m_pInstance->GetSingleGameObjectFromStorage(GO_CONS_NOX_TESLA_STALAGG);
 
-        // Try again, till Tesla GOs are spawned
-        if (!pNoxTeslaFeugen || !pNoxTeslaStalagg)
-            return false;
-
-        m_bToFeugen = m_creature->GetDistanceOrder(pNoxTeslaFeugen, pNoxTeslaStalagg);
-
-        if (DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN) == CAST_OK)
-            return true;
-
-        return false;
-        */
+        DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
     }
-
-    void ReApplyChain(uint32 uiEntry)
-    {
-        if (uiEntry)                                        // called from Stalagg/Feugen with their entry
-        {
-            // Only apply chain to own add
-            if ((uiEntry == NPC_FEUGEN && !m_bToFeugen) || (uiEntry == NPC_STALAGG && m_bToFeugen))
-                return;
-
-            m_bReapply = true;                              // Reapply Chains on next tick
-        }
-        else                                                // if called from next tick, needed because otherwise the spell doesn't bind
-        {
-            m_bReapply = false;
-            m_creature->InterruptNonMeleeSpells(true);
-            GameObject* pGo = m_pInstance->GetSingleGameObjectFromStorage(m_bToFeugen ? GO_CONS_NOX_TESLA_FEUGEN : GO_CONS_NOX_TESLA_STALAGG);
-
-            if (pGo && pGo->GetGoType() == GAMEOBJECT_TYPE_BUTTON && pGo->getLootState() == GO_ACTIVATED)
-                pGo->ResetDoorOrButton();
-
-            DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
-        }
-    }
-
-    void SetOverloading()
-    {
-        m_uiOverloadTimer = 14 * IN_MILLISECONDS;           // it takes some time to overload and activate Thaddius
-    }
-
+ 
     void UpdateAI(const uint32 uiDiff) override
     {
-        m_creature->SelectHostileTarget();
-        if (!m_uiOverloadTimer && !m_uiSetupTimer && !m_bReapply)
-            return;                                         // Nothing to do this tick
-        /*
-        if (m_uiSetupTimer)
+        if (Creature* add = m_pInstance->GetCreature(m_guid))
         {
-            if (m_uiSetupTimer <= uiDiff)
+            if (add->isInCombat() && !m_creature->isInCombat())
             {
-                if (SetupChain())
-                    m_uiSetupTimer = 0;
-                else
-                    m_uiSetupTimer = 5 * IN_MILLISECONDS;
+                m_creature->SetInCombatWithZone();
             }
-            else
-                m_uiSetupTimer -= uiDiff;
-        }
 
-        if (m_uiOverloadTimer)
-        {
-            if (m_uiOverloadTimer <= uiDiff)
+            if (m_creature->GetDistance2d(add) > 60.0f)
             {
-                m_uiOverloadTimer = 0;
-                m_creature->RemoveAurasDueToSpell(m_bToFeugen ? SPELL_FEUGEN_TESLA_PASSIVE : SPELL_STALAGG_TESLA_PASSIVE);
-                DoCastSpellIfCan(m_creature, SPELL_SHOCK_OVERLOAD, CAST_INTERRUPT_PREVIOUS);
-                DoScriptText(EMOTE_TESLA_OVERLOAD, m_creature);
-                m_pInstance->DoUseDoorOrButton(m_bToFeugen ? GO_CONS_NOX_TESLA_FEUGEN : GO_CONS_NOX_TESLA_STALAGG);
+                if (add->HasAura(m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN))
+                    m_creature->InterruptNonMeleeSpells(true);
+
+                if (shockTimer < uiDiff)
+                {
+                    shockTimer = 1500;
+                    // todo: not sure if should target nearest or random target
+                    if (Unit* shockTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0, nullptr, SELECT_FLAG_PLAYER))
+                    {
+                        m_creature->CastSpell(shockTarget, SPELL_SHOCK, true);
+                    }
+                }
+                else
+                    shockTimer -= uiDiff;
             }
             else
-                m_uiOverloadTimer -= uiDiff;
+            {
+                shockTimer = 0;
+                if (!m_creature->IsNonMeleeSpellCasted(true))
+                    DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
+            }
         }
-        */
-        if (m_bReapply)
-            ReApplyChain(0);
-        
     }
 };
 
@@ -293,6 +239,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     eStalagFeugen m_SorF;
     bool m_bFakeDeath;
     uint32 fakeDeathTimer;
+    bool bothDeath;
 
     EventMap m_events;
     ObjectGuid otherAdd;
@@ -301,6 +248,7 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     {
         fakeDeathTimer = 0;
         m_bFakeDeath = false;
+        bothDeath = false;
 
         // We might Reset while faking death, so undo this
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
@@ -356,35 +304,6 @@ struct boss_thaddiusAddsAI : public ScriptedAI
                 pOtherAdd->AI()->AttackStart(pWho);
         }
     }
-    /*
-    void EstablishLink()
-    {
-    if (!m_teslaCoil)
-    {
-    if (Creature* tc = m_creature->SummonCreature(NPC_TESLA_COIL,
-    teslaCoilPositions[m_SorF][0], teslaCoilPositions[m_SorF][1], teslaCoilPositions[m_SorF][2], 0,
-    TEMPSUMMON_MANUAL_DESPAWN))
-    {
-    m_teslaCoil = tc->GetObjectGuid();
-    if (npc_tesla_coilAI* pTeslaAI = dynamic_cast<npc_tesla_coilAI*>(tc->AI()))
-    pTeslaAI->ReApplyChain(m_creature->GetEntry());
-    else
-    sLog.outError("boss_thaddiusAddsAI::EstablishLink failed to cast tesla coil to npc_tesla_coilAI*");
-
-    //todo: make it stay in the air
-    }
-    else
-    sLog.outError("boss_thaddiusAddsAI::EstablishLink failed to spawn teslaCoil");
-    }
-    }
-
-    void SummonedCreatureDespawn(Creature* pCreature) override
-    {
-    if (!pCreature->GetEntry() == (uint32)NPC_TESLA_COIL)
-    return;
-    m_teslaCoil = 0;
-    }
-    */
 
     void JustRespawned() override
     {
@@ -397,27 +316,6 @@ struct boss_thaddiusAddsAI : public ScriptedAI
             return;
         m_events.Reset();
         m_pInstance->SetData(TYPE_THADDIUS, FAIL);
-
-        /*
-
-        if (Creature* pOther = GetOtherAdd())
-        {
-        if (boss_thaddiusAddsAI* pOtherAI = dynamic_cast<boss_thaddiusAddsAI*>(pOther->AI()))
-        {
-        if (pOtherAI->IsCountingDead())
-        {
-        pOther->ForcedDespawn();
-        pOther->Respawn();
-        }
-        }
-        }
-
-        // Reapply Chains if needed
-        if (!m_creature->HasAura(SPELL_FEUGEN_CHAIN) && !m_creature->HasAura(SPELL_STALAGG_CHAIN))
-        JustRespawned();
-
-        m_pInstance->SetData(TYPE_THADDIUS, FAIL);
-        */
     }
 
     bool HandleMagneticPull()
@@ -484,8 +382,8 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         {
             if (fakeDeathTimer < uiDiff)
             {
-                // if other add died in time, this wont ever trigger, so always revive here
-                HandleReviveEvent();
+                if(!bothDeath)
+                    HandleReviveEvent();
             }
             else
                 fakeDeathTimer -= uiDiff;
@@ -547,10 +445,12 @@ struct boss_thaddiusAddsAI : public ScriptedAI
             {
                 if (otherAI->m_bFakeDeath)
                 {
+                    otherAI->bothDeath = true;
+                    bothDeath = true;
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-                    otherAdd->Kill(otherAdd, nullptr); 
-                    return; // not modifying damage, thus will die
+                    //otherAdd->Kill(otherAdd, nullptr); 
+                    //return; // not modifying damage, thus will die
                 }
             }
         }
@@ -613,15 +513,30 @@ struct boss_thaddiusAI : public ScriptedAI
         // Respawn or revive the add itself
         Creature* addCreature = m_pInstance->GetCreature(addGuids[whichAdd]);
         Creature* coilCreature = m_pInstance->GetCreature(coilGuids[whichAdd]);
+        uint32 addEntry = whichAdd == eSTALAGG ? NPC_STALAGG : NPC_FEUGEN;
 
         // Simply unsummoning the add and the coil creature if they still exist
-        if(addCreature)
+        if(addCreature && addCreature->isDead())
         { 
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(addCreature))
                 tmpSumm->UnSummon();
             else
                 sLog.outError("Thaddius: HandleCheckSpawnAdd addCreature was not temp summon");
+            addCreature = nullptr;
         }
+        if(!addCreature)
+        {
+            // Summonming a new add
+            if (Creature* pC = m_creature->SummonCreature(addEntry, addPositions[whichAdd][0], addPositions[whichAdd][1], addPositions[whichAdd][2], addPositions[whichAdd][3],
+                TEMPSUMMON_MANUAL_DESPAWN))
+            {
+                addCreature = pC;
+                addGuids[whichAdd] = pC->GetObjectGuid();
+            }
+            else
+                sLog.outError("Thaddius: failed spawning add %d", whichAdd);
+        }
+
         if (coilCreature)
         {
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(coilCreature))
@@ -629,24 +544,13 @@ struct boss_thaddiusAI : public ScriptedAI
             else
                 sLog.outError("Thaddius: HandleCheckSpawnAdd coilCreature was not temp summon");
         }
-
-        // Summonming a new add
-        uint32 addEntry = whichAdd == eSTALAGG ? NPC_STALAGG : NPC_FEUGEN;
-        if (Creature* pC = m_creature->SummonCreature(addEntry, addPositions[whichAdd][0], addPositions[whichAdd][1], addPositions[whichAdd][2], addPositions[whichAdd][3],
-            TEMPSUMMON_MANUAL_DESPAWN))
-        {
-            addGuids[whichAdd] = pC->GetObjectGuid();
-        }
-        else
-            sLog.outError("Thaddius: failed spawning add %d", whichAdd);
-
         // Summoning a new coil
         if (Creature* tc = m_creature->SummonCreature(NPC_TESLA_COIL, teslaCoilPositions[whichAdd][0], teslaCoilPositions[whichAdd][1], teslaCoilPositions[whichAdd][2], 0,
             TEMPSUMMON_MANUAL_DESPAWN))
         {
             coilGuids[whichAdd] = tc->GetObjectGuid();
             if (npc_tesla_coilAI* pTeslaAI = dynamic_cast<npc_tesla_coilAI*>(tc->AI()))
-                pTeslaAI->ReApplyChain(addEntry);
+                pTeslaAI->ReApplyChain(addEntry, addGuids[whichAdd]);
             else
                 sLog.outError("boss_thaddiusAddsAI::EstablishLink failed to cast tesla coil to npc_tesla_coilAI*");
         }
@@ -1007,37 +911,6 @@ struct boss_thaddiusAI : public ScriptedAI
     }
 };
 
-/*
-bool EffectDummyNPC_spell_thaddius_encounter(Unit*, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)
-{
-    switch (uiSpellId)
-    {
-    case SPELL_SHOCK_OVERLOAD:
-        if (uiEffIndex == EFFECT_INDEX_0)
-        {
-            // Only do something to Thaddius, and on the first hit.
-            if (pCreatureTarget->GetEntry() != NPC_THADDIUS || !pCreatureTarget->HasAura(SPELL_THADIUS_SPAWN))
-                return true;
-            // remove Stun and then Cast
-            pCreatureTarget->RemoveAurasDueToSpell(SPELL_THADIUS_SPAWN);
-            pCreatureTarget->CastSpell(pCreatureTarget, SPELL_THADIUS_LIGHTNING_VISUAL, false);
-        }
-        return true;
-    case SPELL_THADIUS_LIGHTNING_VISUAL:
-        if (uiEffIndex == EFFECT_INDEX_0 && pCreatureTarget->GetEntry() == NPC_THADDIUS)
-        {
-            if (instance_naxxramas* pInstance = (instance_naxxramas*)pCreatureTarget->GetInstanceData())
-            {
-                if (Player* pPlayer = pInstance->GetPlayerInMap(true, false))
-                    pCreatureTarget->AI()->AttackStart(pPlayer);
-            }
-        }
-        return true;
-    }
-    return false;
-}
-*/
-
 struct boss_stalaggAI : public boss_thaddiusAddsAI
 {
     boss_stalaggAI(Creature* pCreature) : 
@@ -1124,7 +997,6 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "boss_thaddius";
     pNewScript->GetAI = &GetAI_boss_thaddius;
-    //pNewScript->pEffectDummyCreature = &EffectDummyNPC_spell_thaddius_encounter;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
@@ -1140,6 +1012,5 @@ void AddSC_boss_thaddius()
     pNewScript = new Script;
     pNewScript->Name = "npc_tesla_coil";
     pNewScript->GetAI = &GetAI_npc_tesla_coil;
-    //pNewScript->pEffectDummyCreature = &EffectDummyNPC_spell_thaddius_encounter;
     pNewScript->RegisterSelf();
 }
