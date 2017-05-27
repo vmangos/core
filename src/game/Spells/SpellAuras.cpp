@@ -1382,6 +1382,72 @@ void Aura::TriggerSpell()
                 caster->ProcDamageAndSpell(target, (PROC_FLAG_ON_TRAP_ACTIVATION | PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT | PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT), PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto());
                 return;
             }
+            // Thaddius negative charge
+            case 28084:
+            {
+                // Lets only process the following when in naxx, otherwise it can become expensive as hell
+                if (triggerTarget->GetMap()->GetId() != 533) 
+                    break;
+                Unit* caster = GetCaster();
+
+                int numStacks = 0;
+                // Finding the amount of other players within 13yd that has the same polarity
+                Map::PlayerList const& pList = triggerTarget->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator it = pList.begin(); it != pList.end(); ++it)
+                {
+                    Player* pPlayer = (*it).getSource();
+                    if (pPlayer->GetGUID() == casterGUID) continue;
+                    if (!pPlayer) continue;
+                    if (pPlayer->isDead()) continue;
+                    // 2d distance should be good enough
+                    if (pPlayer->HasAura(28084) && caster->GetDistance2d(pPlayer) < 13.0f) // 13.0f taken from dbc
+                    {
+                        ++numStacks;
+                    }
+                }
+                if (numStacks > 0)
+                {
+                    if (!triggerTarget->HasAura(29660))
+                        triggerTarget->AddAura(29660);
+                    triggerTarget->GetAura(29660, EFFECT_INDEX_0)->GetHolder()->SetStackAmount(numStacks);
+                }
+                else
+                    triggerTarget->RemoveAurasDueToSpell(29659);
+                break;
+            }
+            // Thaddius positive charge
+            case 28059:
+            {
+                // Lets only process the following when in naxx, otherwise it can become expensive as hell
+                if (triggerTarget->GetMap()->GetId() != 533)
+                    break;
+                Unit* caster = GetCaster();
+
+                int numStacks = 0;
+                // Finding the amount of other players within 13yd that has the same polarity
+                Map::PlayerList const& pList = triggerTarget->GetMap()->GetPlayers();
+                for (Map::PlayerList::const_iterator it = pList.begin(); it != pList.end(); ++it)
+                {
+                    Player* pPlayer = (*it).getSource();
+                    if (pPlayer->GetGUID() == triggerTarget->GetGUID()) continue; 
+                    if (!pPlayer) continue;
+                    if (pPlayer->isDead()) continue;
+                    // 2d distance should be good enough
+                    if (pPlayer->HasAura(28059) && caster->GetDistance2d(pPlayer) < 13.0f) // 13.0f taken from dbc
+                    {
+                        ++numStacks;
+                    }
+                }
+                if (numStacks > 0)
+                {
+                    if (!triggerTarget->HasAura(29659))
+                        triggerTarget->AddAura(29659);
+                    triggerTarget->GetAura(29659, EFFECT_INDEX_0)->GetHolder()->SetStackAmount(numStacks);
+                }
+                else
+                    triggerTarget->RemoveAurasDueToSpell(29659);
+                break;
+            }
         }
     }
 
@@ -1650,6 +1716,18 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             {
                 target->RemoveAurasDueToSpell(24321);
                 return;
+            }
+            case 28059: // Thaddius positive charge, removing aplify effect on remove
+            {
+                if (target->HasAura(29659))
+                    target->RemoveAurasDueToSpell(29659);
+                break;
+            }
+            case 28084: // Thaddius negative charge, removing aplify effect on remove
+            {
+                if (target->HasAura(29660))
+                    target->RemoveAurasDueToSpell(29660);
+                break;
             }
         }
 
