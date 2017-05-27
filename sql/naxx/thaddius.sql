@@ -38,3 +38,15 @@ UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15930;
 -- The shock spell used by tesla coil creatures on thaddius needs explisit target
 DELETE FROM `spell_script_target` where entry = 28159;
 INSERT INTO `spell_script_target` (`entry`,`type`,`targetEntry`) VALUES (28159, 1, 15928);
+
+-- Positive and negative charges modified to display as debuff
+DELETE FROM `spell_mod` WHERE Id IN(29659, 29660);
+INSERT INTO `spell_mod` 
+(`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
+VALUES 
+('29660 ', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '2', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Thaddius Negative Charge is debuff'),
+('29659', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '2', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Thaddius Positive Charge is debuff');
+
+
+-- much bigger hitbox on thaddius' model
+UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='10' WHERE `modelid`='16137';
