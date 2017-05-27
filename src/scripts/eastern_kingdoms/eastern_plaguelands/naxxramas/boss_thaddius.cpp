@@ -30,6 +30,8 @@ EndContentData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include <random>
+#include <algorithm>
 
 enum eStalaggFeugen
 {
@@ -74,9 +76,18 @@ enum eThaddius
     SPELL_THADIUS_LIGHTNING_VISUAL  = 28136,
     SPELL_BALL_LIGHTNING            = 28299,
     SPELL_CHAIN_LIGHTNING           = 28167,
-    SPELL_POLARITY_SHIFT            = 28089,
     SPELL_BESERK                    = 27680,
-    // SPELL_CLEAR_CHARGES          = 63133, // TODO NYI, cast on death, most likely to remove remaining buffs
+    
+
+    SPELL_POLARITY_SHIFT            = 28089,
+
+    SPELL_POSITIVE_CHARGE_APPLY     = 28059,
+    SPELL_POSITIVE_CHARGE_TICK      = 28062,
+    SPELL_POSITIVE_CHARGE_AMP       = 29659,
+
+    SPELL_NEGATIVE_CHARGE_APPLY     = 28084,
+    SPELL_NEGATIVE_CHARGE_TICK      = 28085,
+    SPELL_NEGATIVE_CHARGE_AMP       = 29660,
 };  
 
 enum eCoils
@@ -116,7 +127,9 @@ enum thaddiusEvents
     EVENT_TRANSITION_1,             // timer until overload emote
     EVENT_TRANSITION_2,             // timer until thaddius gets zapped by the coils
     EVENT_TRANSITION_3,             // timer until thaddius engages
-    EVENT_ENABLE_BALL_LIGHTNING     // grace period after thaddius aggro after which he starts being a baller (e.g. tossing ball lightning at out of range targets)
+    EVENT_ENABLE_BALL_LIGHTNING,    // grace period after thaddius aggro after which he starts being a baller (e.g. tossing ball lightning at out of range targets)
+
+    EVENT_POLARITY_CHANGE,
 };
 
 
@@ -507,6 +520,9 @@ struct boss_thaddiusAI : public ScriptedAI
 
     EventMap m_events;
 
+    std::random_device m_randDevice;
+    std::mt19937 m_random{ m_randDevice() };
+
     // Helper for CheckSpawnAdds
     void HandleCheckSpawnAdd(eStalagFeugen whichAdd)
     {
@@ -783,16 +799,46 @@ struct boss_thaddiusAI : public ScriptedAI
         }
     }
 
-    bool DoPolarityShift()
+    void RemoveDebuffsFromPlayer(Player* pPlayer)
     {
-        if (DoCastSpellIfCan(m_creature, SPELL_POLARITY_SHIFT, CAST_INTERRUPT_PREVIOUS) != CAST_OK)
-            return false;
-        
-        //todo: custom implementation needed
+        pPlayer->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_AMP);
+        pPlayer->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_APPLY);
+        pPlayer->RemoveAurasDueToSpell(SPELL_POSITIVE_CHARGE_TICK);
+        pPlayer->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_AMP);
+        pPlayer->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_APPLY);
+        pPlayer->RemoveAurasDueToSpell(SPELL_NEGATIVE_CHARGE_TICK);
+    }
 
+    void DoPolarityShift()
+    {
         DoScriptText(SAY_ELECT, m_creature);
 
-        return true;
+        // this is kinda ugly :/
+        Map::PlayerList const& lPlayers = m_pInstance->GetMap()->GetPlayers();
+        std::vector<Player*> playerVec;
+        for (auto& p : lPlayers)
+        {
+            Player* pPlayer = p.getSource();
+            if (pPlayer->isDead())
+                continue;
+
+            playerVec.push_back(p.getSource());
+        }
+        std::shuffle(playerVec.begin(), playerVec.end(), m_random);
+        int i = 0;
+        int firstHalf = playerVec.size() / 2;
+        for (i; i < firstHalf; i++)
+        {
+            Player* pPlayer = playerVec[i];
+            RemoveDebuffsFromPlayer(pPlayer);
+            pPlayer->CastSpell(pPlayer, SPELL_POSITIVE_CHARGE_APPLY, true);
+        }
+        for (i; i < playerVec.size(); i++)
+        {
+            Player* pPlayer = playerVec[i];
+            RemoveDebuffsFromPlayer(pPlayer);
+            pPlayer->CastSpell(pPlayer, SPELL_NEGATIVE_CHARGE_APPLY, true);
+        }
     }
 
     void DoSpellChain()
@@ -818,10 +864,19 @@ struct boss_thaddiusAI : public ScriptedAI
             switch (l_EventId)
             {
             case EVENT_SHIFT:
+                if (DoCastSpellIfCan(m_creature, SPELL_POLARITY_SHIFT, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
+                {
+                    m_events.Repeat(30000);
+                    m_events.ScheduleEvent(EVENT_POLARITY_CHANGE, 3000);
+                }
+                else
+                    m_events.Repeat(100);
+                /*
                 if (DoPolarityShift())
                     m_events.Repeat(30000);
                 else
                     m_events.Repeat(100);
+                */
                 break;
             case EVENT_CHAIN:
                 DoSpellChain();
@@ -829,6 +884,9 @@ struct boss_thaddiusAI : public ScriptedAI
             case EVENT_BERSERK:
                 if (DoCastSpellIfCan(m_creature, SPELL_BESERK) != CAST_OK)
                     m_events.Repeat(100);
+                break;
+            case EVENT_POLARITY_CHANGE:
+                DoPolarityShift();
                 break;
             }
         }
