@@ -25,7 +25,6 @@
 #include "ModelInstance.h"
 #include "WorldModel.h"
 #include "VMapDefinitions.h"
-#include "World.h"
 
 using G3D::Vector3;
 
@@ -311,7 +310,7 @@ void VMapManager2::releaseModelInstance(const std::string& filename)
         return;
     }
     int decreasedValue = model->second.decRefCount();
-    if (sWorld.getConfig(CONFIG_BOOL_COLLISION_MODELS_UNLOAD) && decreasedValue <= 0)
+    if (isModelUnloadDisabled() == false && decreasedValue <= 0)
     {
         m_modelsLock.release();
         m_modelsLock.acquire_write();

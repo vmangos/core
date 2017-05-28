@@ -72,4 +72,4 @@ set(SOURCES
 
 add_executable( MoveMapGen ${SOURCES} )
 
-target_link_libraries( MoveMapGen g3dlite vmap Detour Recast zlib )
+target_link_libraries( MoveMapGen g3dlite vmap Recast detour zlib ${ACE_LIBRARIES} )

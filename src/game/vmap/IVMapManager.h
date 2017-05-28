@@ -48,9 +48,10 @@ namespace VMAP
         private:
             bool iEnableLineOfSightCalc;
             bool iEnableHeightCalc;
+            bool iDisableModelUnloads;
 
         public:
-            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true) {}
+            IVMapManager() : iEnableLineOfSightCalc(true), iEnableHeightCalc(true), iDisableModelUnloads(false) {}
 
             virtual ~IVMapManager(void) {}
 
@@ -84,10 +85,16 @@ namespace VMAP
             It is enabled by default. If it is enabled in mid game the maps have to loaded manualy
             */
             void setEnableHeightCalc(bool pVal) { iEnableHeightCalc = pVal; }
+            /**
+            Enable/disable model unloading
+            It is disabled by default. If it is enabled the manager will no longer process unload requests on reference clear
+            */
+            void setDisableModelUnload(bool pVal) { iDisableModelUnloads = pVal; }
 
             bool isLineOfSightCalcEnabled() const { return iEnableLineOfSightCalc; }
             bool isHeightCalcEnabled() const { return iEnableHeightCalc; }
             bool isMapLoadingEnabled() const { return iEnableLineOfSightCalc || iEnableHeightCalc; }
+            bool isModelUnloadDisabled() const { return iDisableModelUnloads; }
 
             virtual std::string getDirFileName(unsigned int pMapId, int x, int y) const = 0;
             /**
