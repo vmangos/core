@@ -1200,6 +1200,14 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
 
         caster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
+        
+        // terribly ugly hack for Gluth Decimate to not be affected by any damage modifiers.
+        // SPELL_ATTR_EX3_UNK29 is probably meant to make the spell ignore any damage modifiers,
+        // but until implemented, this is the best we can do.
+        if (m_spellInfo->Id == 28375)
+        {
+            damageInfo.damage = m_damage;
+        }
 
         // Send log damage message to client
         caster->SendSpellNonMeleeDamageLog(&damageInfo);
