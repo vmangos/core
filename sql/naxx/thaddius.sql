@@ -50,3 +50,6 @@ VALUES
 
 -- much bigger hitbox on thaddius' model
 UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='10' WHERE `modelid`='16137';
+
+-- HP correction on Thaddius
+UPDATE `creature_template` SET `minhealth`='6708075', `maxhealth`='6708075' WHERE `entry`='15928';
