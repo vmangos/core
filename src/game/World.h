@@ -31,7 +31,7 @@
 #include "Policies/Singleton.h"
 #include "SharedDefines.h"
 #include "ace/Atomic_Op.h"
-#include "Nostalrius.h"
+#include "Commands/Nostalrius.h"
 #include "ObjectGuid.h"
 #include "MapNodes/AbstractPlayer.h"
 
@@ -376,7 +376,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_GRID_UNLOAD = 0,
     CONFIG_BOOL_IS_MAPSERVER,
     CONFIG_BOOL_GMS_ALLOW_PUBLIC_CHANNELS,
-    CONFIG_BOOL_COLLISION_MODELS_UNLOAD,
     CONFIG_BOOL_GMTICKETS_ENABLE,
     CONFIG_BOOL_TAG_IN_BATTLEGROUNDS,
     CONFIG_BOOL_CONTINENTS_INSTANCIATE,
