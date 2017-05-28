@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Boss_Gluth
-SD%Complete: 70
+SD%Complete: 
 SDComment:
 SDCategory: Naxxramas
 EndScriptData */
@@ -74,6 +74,7 @@ enum
     // Cannot see these emotes being used in vanilla
     // EMOTE_ZOMBIE    = -1533119,
     // EMOTE_DECIMATE  = -1533152,
+    EMOTE_FRENZY            = -1000002,
 
     SPELL_DOUBLE_ATTACK     = 19818, // Added on reset in cmangos, not sure why
 
@@ -84,8 +85,8 @@ enum
     SPELL_BERSERK           = 26662,
     SPELL_TERRIFYING_ROAR   = 29685,
 
-    SPELL_ZOMBIE_CHOW_SEARCH = 28235, // triggers 28236 every 3 sec
-    SPELL_CALL_ALL_ZOMBIE    = 29681, // triggers 29682 every 3 sec
+    //SPELL_ZOMBIE_CHOW_SEARCH = 28235, // triggers 28236 every 3 sec, manually implemented instead
+    //SPELL_CALL_ALL_ZOMBIE    = 29681, // triggers 29682 every 3 sec, manually implemented instead
 
     NPC_ZOMBIE_CHOW         = 16360
 };
@@ -102,22 +103,12 @@ enum eGLuthEvents
     EVENT_ZOMBIE_SEARCH,
 };
 
-/*
-=> cmangos timers
-m_uiMortalWoundTimer  = 10000;
-m_uiDecimateTimer     = 110000;
-m_uiEnrageTimer       = 10000;
-m_uiSummonTimer       = 6000;
-m_uiRoarTimer         = 20000;
-m_uiZombieSearchTimer = 3000;
-m_uiBerserkTimer      = MINUTE * 6.5 * IN_MILLISECONDS; // ~15 seconds after the third Decimate
-*/
-static constexpr uint32 MORTAL_WOUND_CD  = 8000;    // todo: verify
-static constexpr uint32 DECIMATE_CD      = 105000;  // todo: verify
-static constexpr uint32 FRENZY_CD        = 10000;   // todo: verify
+static constexpr uint32 MORTAL_WOUND_CD  = 10000;   // verified by: https://www.youtube.com/watch?v=RAPiZgo-pNA
+static constexpr uint32 DECIMATE_CD      = 105000;  // todo: Might be +- 5 seconds
+static constexpr uint32 FRENZY_CD        = 10000;   // verified by: https://www.youtube.com/watch?v=RAPiZgo-pNA
 static constexpr uint32 SUMMON_CD        = 6000;    // verified by dbc spell 28216
 static constexpr uint32 BERSERK_CD       = 330000;  // todo: verify (15 sec after third decimate)
-static constexpr uint32 FEAR_CD          = 20000;   // todo: verify
+static constexpr uint32 FEAR_CD          = 20000;   // verified by: https://www.youtube.com/watch?v=RAPiZgo-pNA
 static constexpr uint32 ZOMBIE_SEARCH_CD = 3000;    // dbc confirms this one
 
 struct boss_gluthAI : public ScriptedAI
@@ -134,6 +125,7 @@ struct boss_gluthAI : public ScriptedAI
 
     std::vector<ObjectGuid> m_zombies;
     uint32 five_percent;
+    
     void Reset()
     {
         m_events.Reset();
@@ -143,6 +135,19 @@ struct boss_gluthAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GLUTH, DONE);
+    }
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        // He should aggro just at the edge of the sewer pipe players jump from 
+        if (pWho->GetTypeId() == TYPEID_PLAYER 
+            && !m_creature->isInCombat() 
+            && m_creature->IsWithinDistInMap(pWho, 48.0f) 
+            && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho);
+        }
+        ScriptedAI::MoveInLineOfSight(pWho);
     }
 
     void Aggro(Unit* pWho) override
@@ -237,7 +242,10 @@ struct boss_gluthAI : public ScriptedAI
             {
                 // Frenzy every FRENZY_CD ms
                 if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+                {
                     m_events.Repeat(FRENZY_CD);
+                    DoScriptText(EMOTE_FRENZY, m_creature);
+                }
                 else
                     m_events.Repeat(100);
                 break;
@@ -310,9 +318,11 @@ struct boss_gluthAI : public ScriptedAI
     void SummonAdd()
     {
         int idx = urand(0, 2);
-        float x = aZombieSummonLoc[idx][0];
-        float y = aZombieSummonLoc[idx][1];
-        float z = aZombieSummonLoc[idx][2];
+        float x = aZombieSummonLoc[idx][0] + frand(-7.0f, 7.0f);
+        float y = aZombieSummonLoc[idx][1] + frand(-7.0f, 7.0f);
+        float z = aZombieSummonLoc[idx][2] + frand(-7.0f, 7.0f);
+
+        //todo: don't know if we should summon 1, 2 or 3 zombies each time.
         if (Creature* pZombie = m_creature->SummonCreature(NPC_ZOMBIE_CHOW, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 80000))
         {
             pZombie->SetInCombatWithZone();
@@ -320,15 +330,6 @@ struct boss_gluthAI : public ScriptedAI
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 pZombie->AI()->AttackStart(pTarget);
         }
-
-        // cmangos code, still dont know if 1 or 2 zombies should be summoned
-        /*
-         uint8 uiPos1 = urand(0, MAX_ZOMBIE_LOCATIONS - 1);
-        m_creature->SummonCreature(NPC_ZOMBIE_CHOW, aZombieSummonLoc[uiPos1][0], aZombieSummonLoc[uiPos1][1], aZombieSummonLoc[uiPos1][2], 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
-
-        uint8 uiPos2 = (uiPos1 + urand(1, MAX_ZOMBIE_LOCATIONS - 1)) % MAX_ZOMBIE_LOCATIONS;
-        m_creature->SummonCreature(NPC_ZOMBIE_CHOW, aZombieSummonLoc[uiPos2][0], aZombieSummonLoc[uiPos2][1], aZombieSummonLoc[uiPos2][2], 0.0f, TEMPSUMMON_DEAD_DESPAWN, 0);
-        */
     }
 };
 
