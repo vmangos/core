@@ -44,7 +44,7 @@ constexpr float MELEE_DISTANCE = 5.0;
 
 enum ePatchwerkEvents
 {
-    EVENT_BERSERK,
+    EVENT_BERSERK = 1,
     EVENT_HATEFULSTRIKE,
     EVENT_SLIMEBOLT
 };
