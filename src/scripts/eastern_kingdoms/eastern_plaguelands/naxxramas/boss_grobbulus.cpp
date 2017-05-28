@@ -42,13 +42,18 @@ enum
 
     SPELL_SLIME_STREAM = 28137,
     SPELL_MUTATING_INJECTION = 28169,
-    SPELL_POISON_CLOUD = 28240,
     SPELL_SLIME_SPRAY = 28157,
     SPELL_BERSERK = 26662,
 
-    NPC_FALLOUT_SLIME = 16290,
+    SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
+    SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud
 
     SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes
+    
+    SPELL_BOMBARD_SLIME = 28280, // todo: should spawn a slime at the room before patch every patroll round, if any are dead.
+    
+    NPC_FALLOUT_SLIME   = 16290,
+    NPC_POISON_CLOUD    = 16363,
 };
 
 enum eGrobbulusEvents
@@ -179,6 +184,14 @@ struct boss_grobbulusAI : public ScriptedAI
                 m_uiSlimeStreamTimer -= uiDiff;
         }
     }
+    
+    void JustSummoned(Creature* pCreature) override 
+    {
+        if (pCreature->GetEntry() == NPC_POISON_CLOUD) // poison cloud npc
+        {
+            pCreature->CastSpell(pCreature, SPELL_POISON_CLOUD_PASSIVE, true);
+        }
+    }
 
     void UpdateAI(const uint32 uiDiff) override
     {
@@ -225,9 +238,38 @@ struct boss_grobbulusAI : public ScriptedAI
     }
 };
 
+struct grob_poison_cloud : public ScriptedAI
+{
+    grob_poison_cloud(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_tickTimer;
+    void Reset() override
+    {
+        m_tickTimer = 1500;
+    }
+
+    void JustRespawned() override
+    {
+        m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD_PASSIVE, true);
+    }
+
+    void UpdateAI(const uint32 uiDiff) override
+    {
+
+    }
+};
+
 CreatureAI* GetAI_boss_grobbulus(Creature* pCreature)
 {
     return new boss_grobbulusAI(pCreature);
+}
+
+CreatureAI* GetAI_grob_poison_cloud(Creature* pCreature)
+{
+    return new grob_poison_cloud(pCreature);
 }
 
 void AddSC_boss_grobbulus()
@@ -237,5 +279,10 @@ void AddSC_boss_grobbulus()
     pNewScript = new Script;
     pNewScript->Name = "boss_grobbulus";
     pNewScript->GetAI = &GetAI_boss_grobbulus;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "boss_grobbulus_cloud";
+    pNewScript->GetAI = &GetAI_grob_poison_cloud;
     pNewScript->RegisterSelf();
 }
