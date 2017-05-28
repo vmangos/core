@@ -395,6 +395,17 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage = std::max(0, int32(unitTarget->GetHealth() - uint32(unitTarget->GetMaxHealth() * 0.05f)));
                         break;
                     }
+                    case 28206: // Grobbulus Mutagen Explosion
+                    {
+                        // All sources say the explosion should do around 4.5k physical dmg if it runs out,
+                        // but "less" if dispelled. I have been able to find different variations of this spell,
+                        // so the hack has become to set m_triggeredBySpellInfo when casting this spell from Aura::HandleAuraDummy 
+                        // when 28169 expires, and NOT set m_triggeredBySpellInfo 28169 is dispelled.
+                        if (m_triggeredBySpellInfo)
+                            damage = uint32(damage * 1.5f);
+                        else
+                            damage = uint32(damage / 1.5f);
+                    }
                 }
                 break;
             }

@@ -1706,10 +1706,19 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
             case 28169:                                     // Mutating Injection
             {
+                Unit* caster = GetCaster();
                 // Mutagen Explosion
-                target->CastSpell(target, 28206, true, nullptr, this);
-                // Poison Cloud
-                target->CastSpell(target, 28240, true, nullptr, this);
+                if (m_removeMode == AuraRemoveMode::AURA_REMOVE_BY_DISPEL)
+                {
+                    caster->CastSpell(target, 28206, true);
+                }
+                else
+                {
+                    caster->CastSpell(target, 28206, true, nullptr, this);
+                }
+                
+                // Summons Poison Cloud creature
+                caster->CastSpell(target, 28240, true, nullptr, this);
                 return;
             }
             case 24324: // Ivina < Nostalrius > : Hakkar
