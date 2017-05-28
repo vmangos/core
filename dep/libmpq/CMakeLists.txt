@@ -14,8 +14,16 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-cmake_minimum_required (VERSION 2.6)
-project (MANGOS_IOMAP_EXTRACTOR)
+add_library (libmpq mpq_libmpq.cpp libmpq/common.cpp libmpq/explode.cpp libmpq/extract.cpp libmpq/huffman.cpp libmpq/mpq.cpp libmpq/parser.cpp libmpq/wave.cpp )
 
-add_executable(vmapextractor adtfile.cpp  dbcfile.cpp gameobject_extract.cpp model.cpp  vmapexport.cpp  wdtfile.cpp  wmo.cpp)
-target_link_libraries(vmapextractor libmpq bzip2 zlib)
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+  ${CMAKE_SOURCE_DIR}/dep
+  ${CMAKE_SOURCE_DIR}/dep/include
+)
+
+if(WIN32)
+  target_link_libraries(libmpq loadlib
+    zlib
+  )
+endif()

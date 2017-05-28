@@ -1,4 +1,5 @@
-# This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
+# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+# Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,8 +15,20 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-cmake_minimum_required (VERSION 2.6)
-project (MANGOS_IOMAP_EXTRACTOR)
+set(bzip2_SRCS
+  blocksort.c
+  bzlib.c
+  compress.c
+  crctable.c
+  decompress.c
+  huffman.c
+  randtable.c
+)
 
-add_executable(vmapextractor adtfile.cpp  dbcfile.cpp gameobject_extract.cpp model.cpp  vmapexport.cpp  wdtfile.cpp  wmo.cpp)
-target_link_libraries(vmapextractor libmpq bzip2 zlib)
+include_directories(
+  ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+add_library(bzip2 STATIC
+  ${bzip2_SRCS}
+)

@@ -422,6 +422,12 @@ add_subdirectory(dep)
 
 #TODO: need fully implementation
 if (USE_EXTRACTORS)
+	add_subdirectory(dep/loadlib)
+	add_subdirectory(dep/libmpq)
+	add_subdirectory(dep/src/bzip2)
+	add_subdirectory(contrib/extractor)
+	add_subdirectory(contrib/vmap_extractor)
+	add_subdirectory(contrib/vmap_assembler)
 	add_subdirectory(contrib/mmap)
 endif()
 
