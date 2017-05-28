@@ -24,44 +24,7 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
-/*
-todo: should there really be 9 summon locations in vanilla?
-#define ADD_1X 3269.590f
-#define ADD_1Y -3161.287f
-#define ADD_1Z 297.423f
 
-#define ADD_2X 3277.797f
-#define ADD_2Y -3170.352f
-#define ADD_2Z 297.423f
-
-#define ADD_3X 3267.049f
-#define ADD_3Y -3172.820f
-#define ADD_3Z 297.423f
-
-#define ADD_4X 3252.157f
-#define ADD_4Y -3132.135f
-#define ADD_4Z 297.423f
-
-#define ADD_5X 3259.990f
-#define ADD_5Y -3126.590f
-#define ADD_5Z 297.423f
-
-#define ADD_6X 3259.815f
-#define ADD_6Y -3137.576f
-#define ADD_6Z 297.423f
-
-#define ADD_7X 3308.030f
-#define ADD_7Y -3132.135f
-#define ADD_7Z 297.423f
-
-#define ADD_8X 3303.046f
-#define ADD_8Y -3180.682f
-#define ADD_8Z 297.423f
-
-#define ADD_9X 3313.283f
-#define ADD_9Y -3180.766f
-#define ADD_9Z 297.423f
-*/
 static const float aZombieSummonLoc[3][3] =
 {
     { 3267.9f, -3172.1f, 297.42f },
