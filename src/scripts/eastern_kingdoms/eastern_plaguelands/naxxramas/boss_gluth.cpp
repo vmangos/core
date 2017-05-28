@@ -282,6 +282,7 @@ struct boss_gluthAI : public ScriptedAI
     // the way the core is
     void DoSearchZombieChow()
     {
+        std::vector<Creature*> chowableZombies;
         for (auto it = m_zombies.begin(); it != m_zombies.end(); ++it)
         {
             if (Creature* pZombie = m_creature->GetMap()->GetCreature(*it))
@@ -291,14 +292,18 @@ struct boss_gluthAI : public ScriptedAI
 
                 // Using 2d distance, should do fine
                 if (pZombie->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
-                {
-                    m_creature->SetFacingToObject(pZombie);
-                    m_creature->DealDamage(pZombie, pZombie->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-                    
-                    // heals gluth for 5%. SetHealth truncates to maxhealth internally
-                    m_creature->SetHealth(m_creature->GetHealth() + five_percent);
-                }
+                    chowableZombies.push_back(pZombie);
             }
+        }
+        // Need to chow them in a separate loop because when killed, 
+        // SummonedCreatureJustDied removes them from m_zombies
+        for (Creature* pZombie : chowableZombies)
+        {
+            m_creature->SetFacingToObject(pZombie);
+            m_creature->DealDamage(pZombie, pZombie->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+
+            // heals gluth for 5%. SetHealth truncates to maxhealth internally
+            m_creature->SetHealth(m_creature->GetHealth() + five_percent);
         }
     }
 
