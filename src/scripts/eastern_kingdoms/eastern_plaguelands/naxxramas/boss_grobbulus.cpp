@@ -37,8 +37,8 @@ Enrages 26527*/
 
 enum
 {
-    EMOTE_SPRAY_SLIME   = -1533021,
-    EMOTE_INJECTION     = -1533158,
+    EMOTE_SPRAY_SLIME   = -1533021, // todo: not working, should it?
+    EMOTE_INJECTION     = -1533158, // todo: not working, should it?
 
     SPELL_SLIME_STREAM = 28137,
     SPELL_MUTATING_INJECTION = 28169,
@@ -46,8 +46,25 @@ enum
     SPELL_SLIME_SPRAY = 28157,
     SPELL_BERSERK = 26662,
 
-    NPC_FALLOUT_SLIME = 16290
+    NPC_FALLOUT_SLIME = 16290,
+
+    SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes
 };
+
+enum eGrobbulusEvents
+{
+    EVENT_MUTATING_INJECTION = 1,
+    EVENT_POISON_CLOUD,
+    EVENT_SLIME_SPRAY,
+    EVENT_BERSERK,
+};
+
+
+static const uint32 POISONCLOUD_CD()            { return 15000; } //return urand(20000, 25000); }
+static const uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000) : urand(30000, 60000); }
+static constexpr uint32 BERSERK_TIMER           = 12 * 60 * 1000; // 12 minute enrage
+
+static constexpr uint32 SLIMESTREAM_REPEAT_CD   = 1500; // used every 1500ms if current target is out of melee range
 
 struct boss_grobbulusAI : public ScriptedAI
 {
@@ -58,26 +75,36 @@ struct boss_grobbulusAI : public ScriptedAI
     }
 
     instance_naxxramas* m_pInstance;
-
-    uint32 m_uiInjectionTimer;
-    uint32 m_uiPoisonCloudTimer;
-    uint32 m_uiSlimeSprayTimer;
-    uint32 m_uiBerserkTimer;
     uint32 m_uiSlimeStreamTimer;
+    EventMap m_events;
+
+    uint32 INJECTION_CD(bool initial)
+    {
+        // todo: its supposedly used more frequent after 30%. Need confirmation
+        if (initial)
+            return 12000;
+        else
+            if(m_creature->GetHealthPercent() > 30.0f)
+                return urand(7000, 13000);
+            else
+                return urand(3000, 7000);
+    }
 
     void Reset() override
     {
-        m_uiInjectionTimer = 12 * IN_MILLISECONDS;
-        m_uiPoisonCloudTimer = urand(20 * IN_MILLISECONDS, 25 * IN_MILLISECONDS);
-        m_uiSlimeSprayTimer = urand(20 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
-        m_uiBerserkTimer = 12 * MINUTE * IN_MILLISECONDS;
-        m_uiSlimeStreamTimer = 5 * IN_MILLISECONDS;         // The first few secs it is ok to be out of range
+        m_events.Reset();
+        m_uiSlimeStreamTimer = 5000; // allowing tank 5 sec to get to grobbulus on pull
     }
 
     void Aggro(Unit* /*pWho*/) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GROBBULUS, IN_PROGRESS);
+
+        m_events.ScheduleEvent(EVENT_MUTATING_INJECTION, INJECTION_CD(true));
+        m_events.ScheduleEvent(EVENT_POISON_CLOUD, POISONCLOUD_CD());
+        m_events.ScheduleEvent(EVENT_SLIME_SPRAY, SLIMESPRAY_CD(true));
+        m_events.ScheduleEvent(EVENT_BERSERK, BERSERK_TIMER);
     }
 
     void JustDied(Unit* /*pKiller*/) override
@@ -126,22 +153,22 @@ struct boss_grobbulusAI : public ScriptedAI
     void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
     {
         if ((pSpell->Id == SPELL_SLIME_SPRAY) && pTarget->GetTypeId() == TYPEID_PLAYER)
-            m_creature->SummonCreature(NPC_FALLOUT_SLIME, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS);
+            if (Creature* pSlime = m_creature->SummonCreature(NPC_FALLOUT_SLIME, 
+                pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f,
+                TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS))
+            {
+                pSlime->CastSpell(pSlime, SPELL_DISEASE_CLOUD, true);
+            }
     }
 
-    void UpdateAI(const uint32 uiDiff) override
+    void UpdateSlimeStream(uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        // Slime Stream
         if (!m_uiSlimeStreamTimer)
         {
             if (!m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_SLIME_STREAM) == CAST_OK)
-                    // Give some time, to re-reach grobbulus
-                    m_uiSlimeStreamTimer = 3 * IN_MILLISECONDS;
+                    m_uiSlimeStreamTimer = SLIMESTREAM_REPEAT_CD;
             }
         }
         else
@@ -151,54 +178,48 @@ struct boss_grobbulusAI : public ScriptedAI
             else
                 m_uiSlimeStreamTimer -= uiDiff;
         }
+    }
 
-        // Berserk
-        if (m_uiBerserkTimer)
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        // Slime Stream if is cast if current target is not in melee range
+        UpdateSlimeStream(uiDiff);
+
+        m_events.Update(uiDiff);
+        while (auto l_EventId = m_events.ExecuteEvent())
         {
-            if (m_uiBerserkTimer <= uiDiff)
+            switch (l_EventId)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) == CAST_OK)
-                    m_uiBerserkTimer = 0;
-            }
-            else
-                m_uiBerserkTimer -= uiDiff;
-        }
-
-        // SlimeSpray
-        if (m_uiSlimeSprayTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
-            {
-                m_uiSlimeSprayTimer = urand(30 * IN_MILLISECONDS, 60 * IN_MILLISECONDS);
-                DoScriptText(EMOTE_SPRAY_SLIME, m_creature);
-            }
-        }
-        else
-            m_uiSlimeSprayTimer -= uiDiff;
-
-        // Mutagen Injection
-        if (m_uiInjectionTimer < uiDiff)
-        {
-            if (DoCastMutagenInjection())
-            {
-                // Mutagen Injection should be used more often when below 30%
-                if (m_creature->GetHealthPercent() > 30.0f)
-                    m_uiInjectionTimer = urand(7000, 13000);
-                else
-                    m_uiInjectionTimer = urand(3000, 7000);
+                case EVENT_MUTATING_INJECTION:
+                    if (DoCastMutagenInjection())
+                        m_events.Repeat(INJECTION_CD(false));
+                    else
+                        m_events.Repeat(100);
+                    break;
+                case EVENT_POISON_CLOUD:
+                    if (DoCastSpellIfCan(m_creature, SPELL_POISON_CLOUD) == CAST_OK)
+                        m_events.Repeat(POISONCLOUD_CD());
+                    else
+                        m_events.Repeat(100);
+                    break;
+                case EVENT_SLIME_SPRAY:
+                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
+                    {
+                        m_events.Repeat(SLIMESPRAY_CD(false));
+                        DoScriptText(EMOTE_SPRAY_SLIME, m_creature);
+                    }
+                    else
+                        m_events.Repeat(100);
+                    break;
+                case EVENT_BERSERK:
+                    if (DoCastSpellIfCan(m_creature, SPELL_BERSERK) != CAST_OK)
+                        m_events.Repeat(100);
+                    break;
             }
         }
-        else
-            m_uiInjectionTimer -= uiDiff;
-
-        // Poison Cloud
-        if (m_uiPoisonCloudTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_POISON_CLOUD) == CAST_OK)
-                m_uiPoisonCloudTimer = 15 * IN_MILLISECONDS;
-        }
-        else
-            m_uiPoisonCloudTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
