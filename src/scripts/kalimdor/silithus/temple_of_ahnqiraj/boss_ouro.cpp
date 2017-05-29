@@ -67,7 +67,7 @@ enum
 };
 
 /*
- * Sand Blast timers are based on June 2006 values (17-22s) as shown in
+ * Sand Blast timers are based on June 2006 values (15-20s) as shown in
  * https://www.youtube.com/watch?v=REmX3uRTFkQ and further reduced to account
  * for April 2006 nerfs (http://blue.cardplace.com/cache/wow-dungeons/481724.htm &
  * http://blue.cardplace.com/cache/wow-general/7950998.htm
@@ -75,18 +75,17 @@ enum
  */
 const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
 const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
-const uint32_t SANDBLAST_TIMER_MIN         = 10000;
-const uint32_t SANDBLAST_TIMER_MAX         = 15000;
+const uint32_t SANDBLAST_TIMER_MIN         = 12000;
+const uint32_t SANDBLAST_TIMER_MAX         = 17000;
 const uint32_t SUBMERGE_TIMER              = 60000;
 const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
 const uint32_t SWEEP_TIMER                 = 15000;
 
-struct boss_ouroAI : public ScriptedAI
+struct boss_ouroAI : public Scripted_NoMovementAI
 {
-    boss_ouroAI(Creature* pCreature) : ScriptedAI(pCreature)
+    boss_ouroAI(Creature* pCreature) : Scripted_NoMovementAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        SetCombatMovement(false);
         Reset();
     }
 
@@ -110,8 +109,6 @@ struct boss_ouroAI : public ScriptedAI
 
     void Reset()
     {
-        m_creature->addUnitState(UNIT_STAT_ROOT);
-
         m_uiSweepTimer        = urand(30000, 40000);
         m_uiSandBlastTimer    = urand(SANDBLAST_TIMER_INITIAL_MIN, SANDBLAST_TIMER_INITIAL_MAX);
         m_uiSubmergeTimer     = SUBMERGE_TIMER;
@@ -302,7 +299,7 @@ struct boss_ouroAI : public ScriptedAI
             // Sand Blast
             if (m_uiSandBlastTimer < uiDiff)
             {
-                auto target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 0);
+                auto target = m_creature->getThreatManager().getHostileTarget();
 
                 if (target && DoCastSpellIfCan(target, SPELL_SANDBLAST) == CAST_OK)
                 {
