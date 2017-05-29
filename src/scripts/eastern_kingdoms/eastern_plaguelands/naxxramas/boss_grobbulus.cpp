@@ -46,7 +46,7 @@ enum
     SPELL_BERSERK = 26662,
 
     SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
-    SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud
+    SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
     SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes
     
@@ -213,6 +213,7 @@ struct boss_grobbulusAI : public ScriptedAI
                         m_events.Repeat(100);
                     break;
                 case EVENT_POISON_CLOUD:
+                    // todo: spell spawns the cloud slightly off center, make sure this is intended
                     if (DoCastSpellIfCan(m_creature, SPELL_POISON_CLOUD) == CAST_OK)
                         m_events.Repeat(POISONCLOUD_CD());
                     else
@@ -244,21 +245,26 @@ struct grob_poison_cloud : public ScriptedAI
     {
         Reset();
     }
-
-    uint32 m_tickTimer;
+    uint32 untilDespawn;
     void Reset() override
     {
-        m_tickTimer = 1500;
+        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->StopMoving();
+        m_creature->SetMovement(MOVE_ROOT);
+        untilDespawn = 70000;
     }
 
-    void JustRespawned() override
-    {
-        m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD_PASSIVE, true);
-    }
+    void AttackStart(Unit* /*pWho*/) { }
+    void MoveInLineOfSight(Unit* /*pWho*/) { }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-
+        if (untilDespawn < uiDiff)
+        {
+            m_creature->ForcedDespawn();
+        }
+        else
+            untilDespawn -= uiDiff;
     }
 };
 

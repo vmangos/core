@@ -1824,8 +1824,16 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             {
                 case 28241:                                 // Poison (Naxxramas, Grobbulus Cloud)
                 {
+                    // Spell states 30yd radius, which you would think is the max radius once its all grown,
+                    // however, the visual of the spell goes no further than ~20yd, so lets stop it there.
+                    // It will instantly get a 2(?) yd radius, and grow to 20 from there
                     if (SpellAuraHolder* auraHolder = m_caster->GetSpellAuraHolder(28158))
-                        radius = 0.5f * (60000 - auraHolder->GetAuraDuration()) * 0.001f;
+                    {
+                        const int maxDur = auraHolder->GetAuraMaxDuration();
+                        const int currTick = maxDur - auraHolder->GetAuraDuration();
+                        radius = 18.0f / maxDur*currTick + 2;
+                        //radius = 0.5f * (60000 - auraHolder->GetAuraDuration()) * 0.001f;
+                    }
                     break;
                 }
                 default:
