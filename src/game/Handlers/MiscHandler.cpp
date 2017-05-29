@@ -451,8 +451,9 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
         if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
             _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
-    // Drop combo points only for rogues (druids don't)
-    if (_player->getClass() == CLASS_ROGUE && unit && guid != _player->GetComboTargetGuid())
+    // Drop combo points only for rogues and druids
+    // Warriors use combo points internally, do no reset for everyone
+    if ((_player->getClass() == CLASS_ROGUE || _player->getClass() == CLASS_DRUID) && unit && guid != _player->GetComboTargetGuid())
         _player->ClearComboPoints();
 
     // Update autoshot if need
