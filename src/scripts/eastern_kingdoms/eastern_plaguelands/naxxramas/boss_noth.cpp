@@ -82,10 +82,15 @@ enum
     PHASE_SKELETON_2                    = 2,
     PHASE_SKELETON_3                    = 3,
 
-    NPC_GUARDIAN  = 16981,
-    NPC_CONSTRUCT = 16982, // not used afaik
-    NPC_CHAMPION  = 16983,
-    NPC_WARRIOR   = 16984,
+};
+
+enum eNPCs
+{
+
+    NPC_PLAGUED_GUARDIAN  = 16981,
+    NPC_PLAGUED_CONSTRUCT = 16982, // not used afaik
+    NPC_PLAGUED_CHAMPION  = 16983,
+    NPC_PLAGUED_WARRIOR   = 16984,
 };
 
 static constexpr uint32 WarriorSpells[] = {29247, 29248, 29249};
@@ -98,13 +103,6 @@ enum Spells
 
     SPELL_TELEPORT              = 29216,
     SPELL_TELEPORT_RETURN       = 29231,
-};
-
-enum Phases
-{
-    PHASE_NONE,
-    PHASE_GROUND,
-    PHASE_BALCONY
 };
 
 enum Events 
@@ -184,7 +182,7 @@ struct boss_nothAI : public ScriptedAI
     {
         m_creature->SetInCombatWithZone();
 
-        m_events.ScheduleEvent(EVENT_SUMMON, SUMMON_CD());
+        //m_events.ScheduleEvent(EVENT_SUMMON, SUMMON_CD());
 
         DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
 
@@ -214,38 +212,6 @@ struct boss_nothAI : public ScriptedAI
     {
         if (pCaster == m_creature && pSpell->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEAP)
             DoCastSpellIfCan(m_creature, SPELL_CRIPPLE);
-    }
-
-    void EnterPhaseGround()
-    {
-        m_events.SetPhase(PHASE_GROUND);
-
-        DoZoneInCombat();
-
-        if (me->getThreatManager().isThreatListEmpty())
-            Reset();
-        else
-        {
-            uint8 timeGround;
-            switch (balconyCount)
-            {
-            case 0:
-                timeGround = 90;
-                break;
-            case 1:
-                timeGround = 110;
-                break;
-            case 2:
-            default:
-                timeGround = 180;
-            }
-            events.ScheduleEvent(EVENT_GROUND_ATTACKABLE, Seconds(2), 0, PHASE_GROUND);
-            events.ScheduleEvent(EVENT_BALCONY, Seconds(timeGround), 0, PHASE_GROUND);
-            events.ScheduleEvent(EVENT_CURSE, randtime(Seconds(10), Seconds(25)), 0, PHASE_GROUND);
-            events.ScheduleEvent(EVENT_WARRIOR, randtime(Seconds(20), Seconds(30)), 0, PHASE_GROUND);
-            if (GetDifficulty() == DIFFICULTY_25_N)
-                events.ScheduleEvent(EVENT_BLINK, randtime(Seconds(20), Seconds(30)), 0, PHASE_GROUND);
-        }
     }
 
     void SummonWave()
