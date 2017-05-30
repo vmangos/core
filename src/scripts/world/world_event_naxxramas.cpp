@@ -25,7 +25,7 @@
 enum ScourgeInvasionLang
 {
     LANG_CULTIST_ENGINEER_OPTION = NOST_TEXT(120),
-    LANG_SURE_OPTION = NOST_TEXT(121),
+    LANG_GIVE_MAGIC_ITEM_OPTION = NOST_TEXT(121), // Give me one of your magic items.
     LANG_VICTORIES_COUNT_OPTION = NOST_TEXT(127),
     LANG_TANARIS_ATTACKED_OPTION = NOST_TEXT(128),
     LANG_AZSHARA_ATTACKED_OPTION = NOST_TEXT(129),
@@ -36,7 +36,9 @@ enum ScourgeInvasionLang
     LANG_NO_ATTACK_OPTION = NOST_TEXT(134),
 
     LANG_CULTIST_ENGINEER_MENU = 20100,
-    LANG_ARGENT_DAWN_GOSSIP = 20101,
+    LANG_ARGENT_DAWN_GOSSIP_0 = 20101,
+    LANG_ARGENT_DAWN_GOSSIP_1 = 20104,
+    LANG_ARGENT_DAWN_GOSSIP_2 = 20105,
     LANG_ARGENT_EMISSARY_GOSSIP = 20102,
 };
 
@@ -1036,8 +1038,9 @@ CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
     return new NecropolisRelayAI(pCreature);
 }
 
-
-/***/
+/*
+naxx_event_rewards_giver
+*/
 struct naxx_event_rewards_giverAI : public ScriptedAI
 {
     naxx_event_rewards_giverAI(Creature* c) : ScriptedAI(c)
@@ -1103,8 +1106,29 @@ bool GossipSelect_naxx_event_rewards_giver(Player* player, Creature* creature, u
 
 bool GossipHello_naxx_event_rewards_giver(Player* player, Creature* creature)
 {
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_SURE_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP, creature->GetGUID());
+    // Add Item
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
+    uint32 attacked1 = 0;
+    uint32 attacked2 = 0;
+    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < time(NULL))
+        attacked1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
+    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < time(NULL))
+        attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+
+    // No invasion happening
+    if (!attacked1 && !attacked2)
+    {
+        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_0, creature->GetGUID());
+    }
+    else
+    {
+        uint32 rnd = urand(0, 1); // Random text selection
+        if (rnd)
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_1, creature->GetGUID());
+        else
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_2, creature->GetGUID());
+    }
     return true;
 }
 
