@@ -89,7 +89,7 @@ class MassMailMgr
          */
         ReceiversList& AddMassMailTask(MailDraft* mailProto, MailSender sender)
         {
-            m_massMails.push_back(MassMail(mailProto, sender));
+            m_massMails.emplace_back(mailProto, sender);
             return m_massMails.rbegin()->m_receivers;
         }
 
@@ -109,12 +109,7 @@ class MassMailMgr
                 MANGOS_ASSERT(mailProto);
             }
 
-            MassMail(MassMail const& massmail)
-                : m_protoMail(massmail.m_protoMail), m_sender(massmail.m_sender)
-            {
-            }
-
-            std::shared_ptr<MailDraft> m_protoMail;
+            std::unique_ptr<MailDraft> m_protoMail;
 
             MailSender m_sender;
             ReceiversList m_receivers;
