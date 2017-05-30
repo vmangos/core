@@ -7,3 +7,41 @@ INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `lang0`, `prob0`, `em0_0`, `
 
 -- Update text for getting magic item.
 UPDATE `nostalrius_string` SET `content_default`='Give me one of your magic items.', `content_loc2`='Donnez-moi un de vos objets magiques.' WHERE  `entry`=121;
+
+
+-- ----------------------
+-- Add boss spawns
+-- Note: no ai yet and event id will change
+-- ----------------------
+
+-- Creatures
+SET @CGUID:=2349;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+5;
+INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
+(@CGUID+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0), -- Sever - Level 21 - Shadowfang Keep
+(@CGUID+1, 14693, 189, 0, 0, 1797.17, 1308.18, 18.6715, 4.71688, 300, 0, 0, 1, 0, 0, 0, 0), -- Scorn - Level 32 - Scarlet Monestary
+(@CGUID+2, 14686, 129, 0, 0, 2582.66, 695.779, 56.871, 2.04211, 300, 0, 0, 1, 0, 0, 0, 0), -- Lady Falther'ess - Level 37 - Razorfen Downs
+(@CGUID+3, 14690, 429, 0, 0, 29.7657, 547.141, -4.39526, 6.27435, 300, 0, 0, 1, 0, 0, 0, 0), -- Revanchion - Level 60 - Dire Maul
+(@CGUID+4, 14695, 289, 0, 1, 200.29, 151.785, 109.795, 3.19581, 300, 0, 0, 1, 0, 0, 0, 0), -- Lord Blackwood - Level 60 - Scholomance
+(@CGUID+5, 14684, 329, 0, 1, 3503.92, -3313.75, 130.357, 4.65155, 300, 0, 0, 1, 0, 0, 0, 0); -- Balzaphon - Level 60 - Stratholme
+
+-- Add instance bosses. 128 - Event Naxxramass P3 - Boss in instance activation
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+5;
+INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
+(@CGUID+0, 128),
+(@CGUID+1, 128),
+(@CGUID+2, 128),
+(@CGUID+3, 128),
+(@CGUID+4, 128),
+(@CGUID+5, 128);
+
+-- Add ghost glow
+DELETE FROM `creature_template_addon` WHERE `entry` IN (14682, 14693, 14686, 14690, 14695, 14684);
+INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES
+(14682, 0, 0, 0, 0, 0, 0, '50596'),
+(14693, 0, 0, 0, 0, 0, 0, '50596'),
+(14686, 0, 0, 0, 0, 0, 0, '50596'),
+(14690, 0, 0, 0, 0, 0, 0, '50596'),
+(14695, 0, 0, 0, 0, 0, 0, '50596'),
+(14684, 0, 0, 0, 0, 0, 0, '50596');
