@@ -17,7 +17,10 @@ UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=25
 UPDATE `creature_equip_template_raw` SET `equipmodel2`='23356' WHERE `entry`='982';
 
 -- deathknights offhand is a shield, not a mount like it was!
-UPDATE `creature_equip_template_raw` SET `equipmodel2`='6176' WHERE `entry`='142';
+-- UPDATE `creature_equip_template_raw` SET `equipmodel2`='6176' WHERE `entry`='142';
+DELETE FROM `creature_equip_template_raw` where entry = 142;
+DELETE FROM `creature_equip_template` where entry = 142;
+INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipentry3) VALUES (142, /*4800*/ 2179, 6176, 0);
 
 	
 -- scale of death lord and deathknight cavalier update (cavalier was too big, death lord too small)
