@@ -101,6 +101,10 @@ enum eScriptCommand
                                                             // datalong = stand state (enum UnitStandStateType)
                                                             // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
                                                             // data_flags = flag_target_as_source           = 0x01
+    SCRIPT_COMMAND_MODIFY_NPC_FLAGS         = 29,           // source=any, target=creature
+                                                            // datalong=NPCFlags
+                                                            // datalong2:0x00=toggle, 0x01=add, 0x02=remove
+                                                            // datalong3 = creature entry (searching for a buddy, closest to source), datalong4 = creature search radius
 };
 
 #define MAX_TEXT_ID 4                                       // used for SCRIPT_COMMAND_TALK
@@ -315,6 +319,14 @@ struct ScriptInfo
             uint32 unused1;                                 // datalong4
             uint32 flags;                                   // data_flags
         } standState;
+
+        struct                                              // SCRIPT_COMMAND_MODIFY_NPC_FLAGS (29)
+        {
+            uint32 flag;                                    // datalong
+            uint32 change_flag;                             // datalong2
+            uint32 creatureEntry;                           // datalong3
+            uint32 searchRadius;                            // datalong4
+        } npcFlag;
 
         struct
         {

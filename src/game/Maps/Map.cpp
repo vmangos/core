@@ -3466,6 +3466,74 @@ void Map::ScriptsProcess()
                 ((Unit*)pSource)->SetStandState(step.script->standState.stand_state);
                 break;
             }
+            case SCRIPT_COMMAND_MODIFY_NPC_FLAGS:
+            {
+                if (!source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_MODIFY_NPC_FLAGS (script id %u) call for NULL source.", step.script->id);
+                    break;
+                }
+
+                if (!source->isType(TYPEMASK_WORLDOBJECT))
+                {
+                    sLog.outError("SCRIPT_COMMAND_MODIFY_NPC_FLAGS (script id %u) call for unsupported non-worldobject (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+                    break;
+                }
+
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pOwner = NULL;
+
+                // No buddy defined, so try use source (or target if source is not creature)
+                if (!step.script->npcFlag.creatureEntry)
+                {
+                    if (pSource->GetTypeId() != TYPEID_UNIT)
+                    {
+                        // we can't be non-creature, so see if target is creature
+                        if (target && target->GetTypeId() == TYPEID_UNIT)
+                            pOwner = (Creature*)target;
+                    }
+                    else if (pSource->GetTypeId() == TYPEID_UNIT)
+                        pOwner = (Creature*)pSource;
+                }
+                else                                        // If step has a buddy entry defined, search for it
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->npcFlag.creatureEntry, true, step.script->npcFlag.searchRadius);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pOwner, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->npcFlag.searchRadius);
+                }
+
+                if (!pOwner)
+                {
+                    sLog.outError("SCRIPT_COMMAND_MODIFY_NPC_FLAGS (script id %u) call for non-creature (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", step.script->id, source->GetTypeId(), target ? target->GetTypeId() : 0);
+                    break;
+                }
+
+                // Add Flags
+                if (step.script->npcFlag.change_flag & 0x01)
+                {
+                    pOwner->SetFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
+                }
+                // Remove Flags
+                else if (step.script->npcFlag.change_flag & 0x02)
+                {
+                    pOwner->RemoveFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
+                }
+                // Toggle Flags
+                else
+                {
+                    if (pOwner->HasFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag))
+                    {
+                        pOwner->RemoveFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
+                    }
+                    else
+                    {
+                        pOwner->SetFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
+                    }
+                }
+
+                break;
+            }
             default:
                 sLog.outError("Unknown SCRIPT_COMMAND_ %u called for script id %u.", step.script->command, step.script->id);
                 break;

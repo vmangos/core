@@ -917,6 +917,38 @@ bool QuestComplete_npc_tharnariun_treetender(Player* pPlayer, Creature* pQuestGi
 }
 
 /*####
+# npc_terenthis
+####*/
+
+enum
+{
+    NPC_SENTINEL_SELARIN = 3694
+};
+
+bool QuestComplete_npc_terenthis(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
+{
+    if (!pQuestGiver)
+        return false;
+
+    if (!pPlayer)
+        return false;
+
+    if ((pQuest->GetQuestId() == QUEST_ESCAPE_THROUGH_FORCE) || (pQuest->GetQuestId() == QUEST_ESCAPE_THROUGH_STEALTH))
+    {
+        if (pQuestGiver->FindNearestCreature(NPC_SENTINEL_SELARIN, 40))
+            return true; // prevent starting db script if sentinel is already spawned
+        else if (Creature* pSentinel = pQuestGiver->SummonCreature(NPC_SENTINEL_SELARIN, 6409.01f, 381.597f, 13.7997f, 1, TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 120000))
+        {
+            pSentinel->SetWalk(false);
+            return false; // let quest_end_script take over from here
+        }
+        else
+            return true; // prevent starting db script if sentinel was not spawned
+    }
+    return false;
+}
+
+/*####
 # npc_sentinel_aynasha
 ####*/
 
@@ -1443,6 +1475,11 @@ void AddSC_darkshore()
     newscript->Name = "npc_tharnariun_treetender";
     newscript->GetAI = &GetAI_npc_tharnariun_treetender;
     newscript->pQuestRewardedNPC = &QuestComplete_npc_tharnariun_treetender;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_terenthis";
+    newscript->pQuestRewardedNPC = &QuestComplete_npc_terenthis;
     newscript->RegisterSelf();
 
     newscript = new Script;
