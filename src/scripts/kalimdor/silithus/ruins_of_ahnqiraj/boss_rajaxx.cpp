@@ -81,6 +81,7 @@ enum
 #endif
 
 #define ANDOROV_WAYPOINT_MAX  7
+#define OOC_BETWEEN_WAVE 1000
 
 struct RespawnAndEvadeHelper
 {
@@ -109,6 +110,7 @@ struct boss_rajaxxAI : public ScriptedAI
     uint32 m_uiTrash_Timer;
     uint32 m_uiDisarm_Timer;
     uint32 m_uiWave_Timer;
+    uint32 m_uiNextWave_Timer;
     uint32 m_uiNextWaveIndex;
     bool m_bHasEnraged;
 
@@ -123,6 +125,7 @@ struct boss_rajaxxAI : public ScriptedAI
 
         // Waves reset
         m_uiWave_Timer = 1000;
+        m_uiNextWave_Timer = 0;
         m_uiNextWaveIndex = 0;
 
         if (m_pInstance)
@@ -238,6 +241,12 @@ struct boss_rajaxxAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAJAXX, DONE);
+        
+        // According to http://wowwiki.wikia.com/wiki/Cenarion_Circle_reputation_guide
+        // and http://wowwiki.wikia.com/wiki/General_Rajaxx,
+        // When Rajaxx dies, players should gain 90 (post-"nerf" 150) reputation for each
+        // of the NPCs that are still alive.
+        OnKillReputationReward();
     }
 
     void KilledUnit(Unit *pKilled)
@@ -271,14 +280,54 @@ struct boss_rajaxxAI : public ScriptedAI
         return false;
     }
 
+    void OnKillReputationReward()
+    {
+        FactionEntry const *factionEntry = sFactionStore.LookupEntry(609); // Cenarion Circle
+        if (!factionEntry) {
+            sLog.outError("Rajaxx justDied, unable to find Cenarion Circle faction");
+            return;
+        }
+        std::list<Creature*> helpers;
+        GetCreatureListWithEntryInGrid(helpers, m_creature, { 15473, 15478, 15471, 987001 }, 400.0f);
+        
+        if (!helpers.size())
+            return;
+        int alive = 0;
+        for (auto it : helpers)
+            if (it->isAlive()) ++alive;
+
+        if (Player* pLootRecepient = m_creature->GetLootRecipient()) {
+            if (Group* pGroup = pLootRecepient->GetGroup()) {
+                for (GroupReference *itr = pGroup->GetFirstMember(); itr != NULL; itr = itr->next())
+                {
+                    Player* pGroupGuy = itr->getSource();
+                    if (!pGroupGuy || !pGroupGuy->IsInWorld())
+                        continue;
+
+                    uint32 current_reputation_rank1 = pGroupGuy->GetReputationMgr().GetRank(factionEntry);
+                    if (factionEntry && current_reputation_rank1 <= 7) {
+                        for(int i = 0; i < alive; i++)
+                            pGroupGuy->GetReputationMgr().ModifyReputation(factionEntry, 90);
+
+                    }
+                }
+            }
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
         // Waves launcher
         if (m_pInstance && (m_pInstance->GetData(TYPE_RAJAXX) == IN_PROGRESS))
         {
+            if (IsCurrentWaveDead())
+                m_uiNextWave_Timer += uiDiff;
+            else
+                m_uiNextWave_Timer = 0;
+
             if (m_uiNextWaveIndex < WAVE_MAX)
             {
-                if ((m_uiWave_Timer < uiDiff) || IsCurrentWaveDead())
+                if ((m_uiWave_Timer < uiDiff) || (m_uiNextWave_Timer > OOC_BETWEEN_WAVE))
                 {
                     StartWave(m_uiNextWaveIndex);
                     m_uiNextWaveIndex++;

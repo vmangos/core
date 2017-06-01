@@ -42,6 +42,7 @@
 #ifdef _DEBUG_VMAPS
 #include "VMapFactory.h"
 #endif
+#include <regex>
 
 //-----------------------Npc Commands-----------------------
 bool ChatHandler::HandleNpcSayCommand(char* args)
@@ -433,7 +434,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         // before GM
         float x, y, z;
         m_session->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectBoundingRadius());
-        target->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation());
+        target->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
     }
     else
     {
@@ -2198,5 +2199,108 @@ bool ChatHandler::HandleViewLogCommand(char* args)
         return false;
     }
     SendSysMessage(msg->msg.c_str());
+    return true;
+}
+
+bool ChatHandler::HandleGoldRemoval(char* args)
+{
+    std::string error("Illformed gold removal command. Format is: name #g #s #c"); // move?
+
+    std::string input(args);
+    // I'm bad at regex - feel free to improve this
+    std::regex pattern(R"(([a-zA-Z]{3,}) (\d{1,5})(g|s|c)\s?(\d{1,2})(g|s|c)\s?(\d{1,2})(g|s|c)\s?)");
+    std::smatch matches;
+
+    if (!std::regex_match(input, matches, pattern))
+    {
+        PSendSysMessage(error.c_str());
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    unsigned long gold = 0;
+    unsigned long silver = 0;
+    unsigned long copper = 0;
+
+    std::string name = matches[1];
+
+    for (auto i = matches.begin() + 2; i != matches.end(); i += 2)
+    {
+        try
+        {
+            auto type = (i + 1)->str();
+
+            if (type == "g" && !gold)
+            {
+                gold += std::stoul(*i);
+            }
+            else if (type == "s" && !silver)
+            {
+                silver += std::stoul(*i);
+            }
+            else if (type == "c" && !copper)
+            {
+                copper += std::stoul(*i);
+            }
+            else
+            {
+                PSendSysMessage(error.c_str());
+                SetSentErrorMessage(true);
+                return false;
+            }
+        }
+        catch (std::runtime_error&)
+        {
+            PSendSysMessage(error.c_str());
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    uint32_t prevMoney = 0;
+    uint32_t newMoney = 0;
+
+    Player* player = sObjectMgr.GetPlayer(name.c_str());
+
+    if (player)
+    {
+        prevMoney = player->GetMoney();
+        player->ModifyMoney(-static_cast<int32>((gold * GOLD) + (silver * SILVER) + copper));
+        newMoney = player->GetMoney();
+    }
+    else
+    {
+        CharacterDatabase.escape_string(name);
+        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT money FROM characters WHERE name = '%s'", name.c_str()));
+
+        if (!result)
+        {
+            PSendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        Field *fields = result->Fetch();
+        prevMoney = fields[0].GetUInt32();
+        newMoney = prevMoney - ((gold * GOLD) + (silver * SILVER) + copper);
+
+        if (newMoney > prevMoney)
+        {
+            newMoney = 0;
+        }
+
+        auto res = CharacterDatabase.PExecute("UPDATE characters SET money = %u WHERE name = '%s'", newMoney, name.c_str());
+
+        if (!res)
+        {
+            PSendSysMessage("Encountered a database error during gold removal - see log for details");
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    PSendSysMessage("Removed %ug %us %uc from %s", gold, silver, copper, name.c_str());
+    PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
+    PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
     return true;
 }

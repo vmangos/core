@@ -358,8 +358,11 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     // If triggered from some object respawn this object is still marked as spawned
     // and also counted into m_SpawnedPoolAmount so we need increase count to be
     // spawned by 1
-    if (triggerFrom && spawns.IsSpawnedObject<T>(triggerFrom))
+    if (triggerFrom)
+    {
+        if (spawns.IsSpawnedObject<T>(triggerFrom))
         ++count;
+    }
     // Instance loading : no object spawned, check if any timers have been loaded
     // from the database and spawn the object at the right location
     else if (count && count == limit)

@@ -107,7 +107,9 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         }
     }
 
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL); // Invisibility
+    // Remove invisibility except Gnomish Cloaking Device, since evidence suggests
+    // it remains until cast finish
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
 
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)
     if (pItem->GetProto()->Bonding == BIND_WHEN_USE || pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM)
@@ -349,7 +351,9 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
     }
 
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL); // invisibility auras have this
+    // Remove invisibility except Gnomish Cloaking Device, since evidence suggests
+    // it remains until cast finish
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
 
     // client provided targets
     SpellCastTargets targets;
@@ -372,7 +376,7 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 
     // Nostalrius : Ivina
     spell->SetClientStarted(true);
-    spell->prepare(&targets);
+    spell->prepare(std::move(targets));
     ALL_SESSION_SCRIPTS(this, OnSpellCasted(spellId));
 }
 

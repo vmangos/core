@@ -26,8 +26,6 @@ typedef short int16;
 typedef unsigned int uint32;
 typedef int int32; */
 
-#pragma pack(push,1)
-
 struct ModelHeader
 {
     char id[4];
@@ -106,5 +104,4 @@ struct ModelBoundingVertex
     Vec3D pos;
 };
 
-#pragma pack(pop)
 #endif

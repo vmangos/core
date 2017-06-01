@@ -580,7 +580,7 @@ void GameObject::JustDespawnedWaitingRespawn()
             sLog.outInfo("[Pool #%u] %s is not deleted but should be", poolid, GetGuidStr().c_str());
             AddObjectToRemoveList();
         }
-        sPoolMgr.UpdatePool<GameObject>(state, poolid, 0);
+        sPoolMgr.UpdatePool<GameObject>(state, poolid, GetGUIDLow());
         return;
     }
 }
@@ -1164,15 +1164,6 @@ void GameObject::Use(Unit* user)
             if (user->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            // TODO: possible must be moved to loot release (in different from linked triggering)
-            if (GetGOInfo()->chest.eventId)
-            {
-                DEBUG_LOG("Chest ScriptStart id %u for GO %u", GetGOInfo()->chest.eventId, GetGUIDLow());
-
-                if (!sScriptMgr.OnProcessEvent(GetGOInfo()->chest.eventId, user, this, true))
-                    GetMap()->ScriptsStart(sEventScripts, GetGOInfo()->chest.eventId, user, this);
-            }
-
             TriggerLinkedGameObject(user);
             return;
         }
@@ -1529,7 +1520,7 @@ void GameObject::Use(Unit* user)
             for (GuidsSet::const_iterator itr = m_UniqueUsers.begin(); itr != m_UniqueUsers.end(); ++itr)
             {
                 if (Player* user = GetMap()->GetPlayer(*itr))
-                    if (user && user != owner)
+                    if (user && user != owner && !info->summoningRitual.ritualPersistent)
                     {
                         Spell *channeled = user->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
                         if (channeled && channeled->m_spellInfo->Id == info->summoningRitual.animSpell)
@@ -1634,6 +1625,7 @@ void GameObject::Use(Unit* user)
                 // 15004
                 // 15005
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 bg->EventPlayerClickedOnFlag(player, this);
                 return;                                     //we don't need to delete flag ... it is despawned!
             }
@@ -1683,6 +1675,7 @@ void GameObject::Use(Unit* user)
                     }
                 }
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
+                player->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 //this cause to call return, all flags must be deleted here!!
                 spellId = 0;
                 Delete();
@@ -1792,7 +1785,7 @@ void GameObject::Use(Unit* user)
     else
         targets.setUnitTarget(user);
 
-    spell->prepare(&targets);
+    spell->prepare(std::move(targets));
 }
 
 // overwrite WorldObject function for proper name localization

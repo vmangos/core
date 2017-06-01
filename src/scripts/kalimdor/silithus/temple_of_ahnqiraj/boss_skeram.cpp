@@ -6,12 +6,12 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
-#define SAY_AGGRO_0                 -1531000
-#define SAY_AGGRO_1                 -1531001
-#define SAY_AGGRO_2                 -1531002
-#define SAY_SLAY_0                  -1531003
-#define SAY_SLAY_1                  -1531004
-#define SAY_SLAY_2                  -1531005
+#define SAY_AGGRO_1                 -1531000
+#define SAY_AGGRO_2                 -1531001
+#define SAY_AGGRO_3                 -1531002
+#define SAY_SLAY_1                  -1531003
+#define SAY_SLAY_2                  -1531004
+#define SAY_SLAY_3                  -1531005
 #define SAY_SPLIT                   -1531006
 #define SAY_DEATH                   -1531007
 
@@ -81,13 +81,23 @@ struct boss_skeramAI : public ScriptedAI
         }
     }
 
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        // The bug trio have a larger than normal aggro radius
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 28.0f, true) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho);
+        }
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
+
     void KilledUnit(Unit* victim)
     {
         switch (urand(0,8))
         {
-            case 0: DoScriptText(SAY_SLAY_0, m_creature); break;
-            case 1: DoScriptText(SAY_SLAY_1, m_creature); break;
-            case 2: DoScriptText(SAY_SLAY_2, m_creature); break;
+            case 0: DoScriptText(SAY_SLAY_1, m_creature); break;
+            case 1: DoScriptText(SAY_SLAY_2, m_creature); break;
+            case 2: DoScriptText(SAY_SLAY_3, m_creature); break;
         }
     }
 
@@ -109,14 +119,17 @@ struct boss_skeramAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
+        if (IsImage)
+            return;
+
         if (m_pInstance && m_pInstance->GetData(TYPE_SKERAM) == IN_PROGRESS)
             return;
 
         switch (urand(0,2))
         {
-            case 0: DoScriptText(SAY_AGGRO_0, m_creature); break;
-            case 1: DoScriptText(SAY_AGGRO_1, m_creature); break;
-            case 2: DoScriptText(SAY_AGGRO_2, m_creature); break;
+            case 0: DoScriptText(SAY_AGGRO_1, m_creature); break;
+            case 1: DoScriptText(SAY_AGGRO_2, m_creature); break;
+            case 2: DoScriptText(SAY_AGGRO_3, m_creature); break;
         }
 
         if (m_pInstance)

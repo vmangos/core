@@ -279,7 +279,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recv_data)
                 _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
         }
         else
+        {
             _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
+        }
     }
 }
 

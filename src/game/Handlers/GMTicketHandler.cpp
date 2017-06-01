@@ -125,13 +125,11 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         if (ticketType >= GMTICKET_MAX)
             return;
 
-        if (ticketType != GMTICKET_BEHAVIOR_HARASSMENT && ticketType != GMTICKET_STUCK)
-        {
-            ChatHandler(this).SendSysMessage("Game Masters do not handle bug reports.");
-            ChatHandler(this).SendSysMessage("Please use our bugtracker and provide sources if possible.");
-            ChatHandler(this).SendSysMessage("https://elysium-project.org/bugtracker");
-            return;
-        }
+        ChatHandler(this).SendSysMessage("NOTE: Game Masters DO NOT handle bug reports!");
+        ChatHandler(this).SendSysMessage("Please use our bugtracker and provide sources if possible:");
+        ChatHandler(this).SendSysMessage("https://github.com/elysium-project/server/issues");
+        ChatHandler(this).SendSysMessage("For quicker & casual support, visit our forums:");
+        ChatHandler(this).SendSysMessage("https://forum.elysium-project.org/forum/303-help-support/");
 
         ticket = new GmTicket(GetPlayer());
         ticket->SetPosition(mapId, x, y, z);

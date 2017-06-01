@@ -71,12 +71,6 @@ void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
         player->KillPlayer();
     }
 
-    // Waiting to Resurrect (probably redundant cast, yet to check thoroughly)
-    if (player->InBattleGround())
-        player->CastSpell(player, 2584, true);
-
-    //this is spirit release confirm?
-    player->RemovePet(PET_SAVE_REAGENTS);
     player->BuildPlayerRepop();
     player->RepopAtGraveyard();
 }
@@ -457,9 +451,9 @@ void WorldSession::HandleSetSelectionOpcode(WorldPacket & recv_data)
         if (FactionTemplateEntry const* factionTemplateEntry = sFactionTemplateStore.LookupEntry(unit->getFaction()))
             _player->GetReputationMgr().SetVisible(factionTemplateEntry);
 
-    // Perte des points de combo si changement de cible, pour les voleurs.
-    // (Les wars utilisent les points de combo en interne pour gerer Fulgurance)
-    if (_player->getPowerType() == POWER_ENERGY && unit && guid != _player->GetComboTargetGuid())
+    // Drop combo points only for rogues and druids
+    // Warriors use combo points internally, do no reset for everyone
+    if ((_player->getClass() == CLASS_ROGUE || _player->getClass() == CLASS_DRUID) && unit && guid != _player->GetComboTargetGuid())
         _player->ClearComboPoints();
 
     // Update autoshot if need
@@ -811,6 +805,10 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     if (!targetMapEntry)
         return;
 
+    auto playerRank = sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS) ?
+        GetPlayer()->GetHonorMgr().GetRank().visualRank
+        : GetPlayer()->GetHonorMgr().GetHighestRank().visualRank;
+
     if (!pl->isGameMaster())
     {
         // (Hack) : Entree dans les zones de recompenses JcJ
@@ -818,7 +816,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         {
             if (GetPlayer()->GetTeam() == HORDE)
             {
-                if (GetPlayer()->GetHonorMgr().GetHighestRank().visualRank < 6)
+                if (playerRank < 6)
                 {
                     SendAreaTriggerMessage("You must have the rank Stone Guard to enter");
                     return;
@@ -834,7 +832,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         {
             if (GetPlayer()->GetTeam() == ALLIANCE)
             {
-                if (GetPlayer()->GetHonorMgr().GetHighestRank().visualRank < 6)
+                if (playerRank < 6)
                 {
                     SendAreaTriggerMessage("You must have the rank Knight to enter");
                     return;

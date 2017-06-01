@@ -23,24 +23,15 @@
 enum
 {
     // Encounters
-    ULDAMAN_ENCOUNTER_ALTAR_DOORS   = 0,
+    ULDAMAN_ENCOUNTER_IRONAYA_DOOR  = 0,
     ULDAMAN_ENCOUNTER_STONE_KEEPERS = 1,
-    ULDAMAN_ENCOUNTER_ANCIENT_DOOR  = 2,
-    ULDAMAN_ENCOUNTER_IRONAYA_DOOR  = 3,
-    ULDAMAN_ENCOUNTER_ARCHAEDAS     = 4,
-    ULDAMAN_MAX_ENCOUNTER           = 5,
+    ULDAMAN_ENCOUNTER_ARCHAEDAS     = 2,
+    ULDAMAN_MAX_ENCOUNTER           = 3,
     
     // Data
-    DATA_IRONAYA         = 9,
-    DATA_ALTAR_DOORS     = 10,
+    DATA_KEEPERS_ALTAR   = 10,
     DATA_ANCIENT_DOOR    = 11,
-    DATA_IRONAYA_DOOR    = 12,
-    DATA_STONE_KEEPERS   = 13,
-    DATA_MINIONS         = 14,
-    DATA_IRONAYA_SEAL    = 15,
-    DATA_ARCHAEDAS       = 16,
-    DATA_KEEPERS_ALTAR   = 17,
-    DATA_ARCHAEDAS_ALTAR = 18,
+    DATA_ARCHAEDAS_ALTAR = 12,
     
     // Altar summoning ritual
     TIMER_ALTAR_SUMMON = 5000, // "Uldaman Boss Aggro" spellid=10340 has 5s cast

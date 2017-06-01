@@ -370,8 +370,8 @@ enum DeathState
 {
     ALIVE          = 0,                                     // show as alive
     JUST_DIED      = 1,                                     // temporary state at die, for creature auto converted to CORPSE, for player at next update call
-    CORPSE         = 2,                                     // corpse state, for player this also meaning that player not leave corpse
-    DEAD           = 3,                                     // for creature despawned state (corpse despawned), for player CORPSE/DEAD not clear way switches (FIXME), and use m_deathtimer > 0 check for real corpse state
+    CORPSE         = 2,                                     // corpse state, for player spirit is still within the corpse
+    DEAD           = 3,                                     // for creature despawned state (corpse despawned), for player spirit has been released (player is ghost)
     JUST_ALIVED    = 4,                                     // temporary state at resurrection, for creature auto converted to ALIVE, for player at next update call
     CORPSE_FALLING = 5                                      // corpse state in case when corpse still falling to ground
 };
@@ -1745,7 +1745,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         MotionMaster* GetMotionMaster() { return &i_motionMaster; }
 
         bool IsStopped() const { return !(hasUnitState(UNIT_STAT_MOVING)); }
-        void StopMoving();
+        void StopMoving(bool force = false);
 
         void SetFleeing(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
         void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);/*DEPRECATED METHOD*/
@@ -1903,6 +1903,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GlobalCooldownMgr& GetGlobalCooldownMgr() { return m_GlobalCooldownMgr; }
 
         void RemoveAllSpellCooldown();
+
+        void setTransformScale(float scale);
+        void resetTransformScale();
+        float getNativeScale() const;
+        void setNativeScale(float scale);
     protected:
         explicit Unit ();
 
@@ -2001,6 +2006,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
+
+        float m_nativeScale = 1;
+        float m_nativeScaleOverride = 1;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

@@ -1944,11 +1944,77 @@ void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)
         ((Player*)GetTarget())->UpdateMirrorTimers();
 }
 
+std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit *target){
+    unsigned int modelid = 0;
+    float mod = 1;
+    switch (form)
+    {
+    case FORM_CAT:
+        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+            modelid = 892;
+        else
+            modelid = 8571;
+        mod = 0.80;
+        break;
+    case FORM_TRAVEL:
+        modelid = 632;
+        mod = 0.80;
+        break;
+    case FORM_AQUA:
+        modelid = 2428;
+        mod = 0.80;
+        break;
+    case FORM_BEAR:
+        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+            modelid = 2281;
+        else
+            modelid = 2289;
+        break;
+    case FORM_GHOUL:
+        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+            modelid = 10045;
+        break;
+    case FORM_DIREBEAR:
+        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+            modelid = 2281;
+        else
+            modelid = 2289;
+        break;
+    case FORM_CREATUREBEAR:
+        modelid = 902;
+        break;
+    case FORM_GHOSTWOLF:
+        modelid = 4613;
+        mod = 0.80;
+        break;
+    case FORM_MOONKIN:
+        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+            modelid = 15374;
+        else
+            modelid = 15375;
+        break;
+    case FORM_TREE:
+        modelid = 864;
+        break;
+    case FORM_SPIRITOFREDEMPTION:
+        modelid = 16031;
+        break;
+    /*case FORM_BATTLESTANCE:
+    case FORM_BERSERKERSTANCE:
+    case FORM_DEFENSIVESTANCE:
+    case FORM_AMBIENT:
+    case FORM_SHADOW:
+    case FORM_STEALTH:*/
+    default:
+        break;
+    }
+    return {modelid,mod};
+}
+
 void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 {
-    uint32 modelid = 0;
-    float mod_x = 0.0f;
-    Powers PowerType = POWER_MANA;
+    if (!Real)
+        return;
     ShapeshiftForm form = ShapeshiftForm(m_modifier.m_miscvalue);
 
     Unit *target = GetTarget();
@@ -1960,145 +2026,97 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         return;
     }
 
+    // remove polymorph before changing display id to keep new display id
     switch (form)
     {
         case FORM_CAT:
-        {
-            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-                modelid = 892;
-            else
-                modelid = 8571;
-            PowerType = POWER_ENERGY;
-            break;
-        }
+        case FORM_TREE:
         case FORM_TRAVEL:
-            modelid = 632;
-            break;
         case FORM_AQUA:
-            modelid = 2428;
-            break;
         case FORM_BEAR:
-        {
-            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-                modelid = 2281;
-            else
-                modelid = 2289;
-            PowerType = POWER_RAGE;
-            break;
-        }
-        case FORM_GHOUL:
-            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-                modelid = 10045;
-            break;
         case FORM_DIREBEAR:
-        {
-            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-                modelid = 2281;
-            else
-                modelid = 2289;
-            PowerType = POWER_RAGE;
-            break;
-        }
-        case FORM_CREATUREBEAR:
-            modelid = 902;
-            break;
-        case FORM_GHOSTWOLF:
-            modelid = 4613;
-            break;
         case FORM_MOONKIN:
         {
-            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-                modelid = 15374;
-            else
-                modelid = 15375;
+            // remove movement affects
+            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
+            Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+            for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
+            {
+                SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+
+                uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
+
+                // If spell that caused this aura has Croud Control or Daze effect
+                if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
+                        // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
+                        (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
+                        (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
+                {
+                    ++iter;
+                    continue;
+                }
+
+                // All OK, remove aura now
+                target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
+                iter = slowingAuras.begin();
+            }
+
             break;
         }
+        default:
+            break;
+    }
+
+    std::pair<unsigned int, float> info = getShapeshiftModelInfo(form, target);
+    unsigned int modelid = info.first;
+    if (modelid > 0 && !target->getTransForm())
+    {
+        if (apply)
+        {
+            target->setTransformScale(info.second);
+            target->SetDisplayId(modelid);
+        }
+        else
+        {
+            target->resetTransformScale();
+            target->SetDisplayId(target->GetNativeDisplayId());
+        }
+    }
+
+    if (apply)
+    {
+
+
+        Powers PowerType = POWER_MANA;
+        switch (form)
+        {
+        case FORM_CAT:
+            PowerType = POWER_ENERGY;
+            break;
+        case FORM_BEAR:
+        case FORM_DIREBEAR:
+            PowerType = POWER_RAGE;
+            break;
+        /*case FORM_TRAVEL:
+        case FORM_AQUA:
+        case FORM_GHOUL:
+        case FORM_CREATUREBEAR:
+        case FORM_GHOSTWOLF:
+        case FORM_MOONKIN:
         case FORM_AMBIENT:
         case FORM_SHADOW:
         case FORM_STEALTH:
-            break;
         case FORM_TREE:
-            modelid = 864;
-            break;
+        case FORM_SPIRITOFREDEMPTION:
+            break;*/
         case FORM_BATTLESTANCE:
         case FORM_BERSERKERSTANCE:
         case FORM_DEFENSIVESTANCE:
             PowerType = POWER_RAGE;
             break;
-        case FORM_SPIRITOFREDEMPTION:
-            modelid = 16031;
-            break;
         default:
             break;
-    }
-
-    // remove polymorph before changing display id to keep new display id
-    if (Real)
-    {
-        switch (form)
-        {
-            case FORM_CAT:
-            case FORM_TREE:
-            case FORM_TRAVEL:
-            case FORM_AQUA:
-            case FORM_BEAR:
-            case FORM_DIREBEAR:
-            case FORM_MOONKIN:
-            {
-                // remove movement affects
-                target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
-                Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
-                for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
-                {
-                    SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
-
-                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
-
-                    // If spell that caused this aura has Croud Control or Daze effect
-                    if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
-                            // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
-                            (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
-                            (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
-                    {
-                        ++iter;
-                        continue;
-                    }
-
-                    // All OK, remove aura now
-                    target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
-                    iter = slowingAuras.begin();
-                }
-
-                break;
-            }
-            default:
-                break;
         }
-    }
-
-    if (modelid > 0 && !target->getTransForm())
-    {
-        // fix Tauren shapeshift scaling
-        if (target->getRace() == RACE_TAUREN)
-        {
-            if (target->getGender() == GENDER_MALE)
-                mod_x = -25.9f; // 0.741 * 1.35 ~= 1.0
-            else
-                mod_x = -20.0f; // 0.8 * 1.25    = 1.0
-        }
-        
-        if (apply)
-            target->SetDisplayId(modelid);
-        else
-            target->SetDisplayId(target->GetNativeDisplayId());
-        target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
-    }
-    
-    if (!Real)
-        return;
-    
-    if (apply)
-    {
         // remove other shapeshift before applying a new one
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT, GetHolder());
 
@@ -2211,12 +2229,13 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
     Unit *target = GetTarget();
     if (apply)
     {
-        uint32 model_id;
-        
+        float mod_x = 1;
+        uint32 model_id = 0;
+
         // Discombobulate removes mount auras.
         if (GetId() == 4060 && Real)
             target->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
-        
+
         // update active transform spell only not set or not overwriting negative by positive case
         if (!target->getTransForm() || !IsPositiveSpell(GetId()) || IsPositiveSpell(target->getTransForm()))
         {
@@ -2243,75 +2262,58 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                 {
                     case 16739:                                 // Orb of Deception
                     {
-                        uint32 orb_model = target->GetNativeDisplayId();
-                        switch (orb_model)
+                        uint8 gender = sObjectMgr.GetCreatureModelInfo(target->GetDisplayId())->gender;
+                        switch (target->getRace())
                         {
-                            // Troll Female
-                            case 1479:
-                                model_id = 10134;
-                                break;
-                            // Troll Male
-                            case 1478:
-                                model_id = 10135;
-                                break;
-                            // Tauren Male
-                            case 59:
-                                model_id = 10136;
-                                break;
-                            // Human Male
-                            case 49:
-                                model_id = 10137;
-                                break;
-                            // Human Female
-                            case 50:
-                                model_id = 10138;
-                                break;
-                            // Orc Male
-                            case 51:
-                                model_id = 10139;
-                                break;
-                            // Orc Female
-                            case 52:
-                                model_id = 10140;
-                                break;
-                            // Dwarf Male
-                            case 53:
-                                model_id = 10141;
-                                break;
-                            // Dwarf Female
-                            case 54:
-                                model_id = 10142;
-                                break;
-                            // NightElf Male
-                            case 55:
-                                model_id = 10143;
-                                break;
-                            // NightElf Female
-                            case 56:
-                                model_id = 10144;
-                                break;
-                            // Undead Female
-                            case 58:
-                                model_id = 10145;
-                                break;
-                            // Undead Male
-                            case 57:
-                                model_id = 10146;
-                                break;
-                            // Tauren Female
-                            case 60:
-                                model_id = 10147;
-                                break;
-                            // Gnome Male
-                            case 1563:
+                        case RACE_TROLL:
+                            model_id = gender == GENDER_MALE ?
+                                        10135 :
+                                        10134 ;
+                            break;
+                        case RACE_TAUREN:
+                            model_id = gender == GENDER_MALE ?
+                                        10136 :
+                                        10147 ;
+                            break;
+                        case RACE_HUMAN:
+                            model_id = gender == GENDER_MALE ?
+                                        10137 :
+                                        10138 ;
+                            break;
+                        case RACE_ORC:
+                            model_id = gender == GENDER_MALE ?
+                                        10139 :
+                                        10140 ;
+                            break;
+                        case RACE_DWARF:
+                            model_id = gender == GENDER_MALE ?
+                                        10141 :
+                                        10142 ;
+                            break;
+                        case RACE_NIGHTELF:
+                            model_id = gender == GENDER_MALE ?
+                                        10143 :
+                                        10144 ;
+                            break;
+                        case RACE_UNDEAD:
+                            model_id = gender == GENDER_MALE ?
+                                        10146 :
+                                        10145 ;
+                            break;
+                        case RACE_GNOME:
+                            if (gender == GENDER_MALE)
+                            {
                                 model_id = 10148;
-                                break;
-                            // Gnome Female
-                            case 1564:
+                                mod_x = DEFAULT_TAUREN_MALE_SCALE;
+                            }
+                            else
+                            {
                                 model_id = 10149;
-                                break;
-                            default:
-                                break;
+                                mod_x = DEFAULT_TAUREN_FEMALE_SCALE;
+                            }
+                            break;
+                        default:
+                            break;
                         }
                         break;
                     }
@@ -2336,18 +2338,11 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
                     ((Creature*)target)->LoadEquipment(ci->equipmentId, true);
             }
 
-            //fix tauren scaling
-            if (target->getRace() == RACE_TAUREN && target->GetDisplayId() == target->GetNativeDisplayId())
+            if (model_id)
             {
-                float mod_x = 0;
-                if (target->getGender() == GENDER_MALE)
-                    mod_x = -25.9f; // 0.741 * 1.35 ~= 1.0
-                else
-                    mod_x = -20.0f; // 0.8 * 1.25    = 1.0
-                target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
+                target->SetDisplayId(model_id);
+                target->setTransformScale(mod_x);
             }
-            
-            target->SetDisplayId(model_id);
             target->setTransForm(GetId());
         }
     }
@@ -2358,21 +2353,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
         {
             target->setTransForm(0);
             target->SetDisplayId(target->GetNativeDisplayId());
+            target->resetTransformScale();
 
             // apply default equipment for creature case
             if (target->GetTypeId() == TYPEID_UNIT)
                 ((Creature*)target)->LoadEquipment(((Creature*)target)->GetCreatureInfo()->equipmentId, true);
 
-            //fix tauren scaling
-            if (target->getRace() == RACE_TAUREN)
-            {
-                float mod_x = 0;
-                if (target->getGender() == GENDER_MALE)
-                    mod_x = -25.9f; // 0.741 * 1.35 ~= 1.0
-                else
-                    mod_x = -20.0f; // 0.8 * 1.25    = 1.0
-                target->ApplyPercentModFloatValue(OBJECT_FIELD_SCALE_X, mod_x, apply);
-            }
 
             // re-apply some from still active with preference negative cases
             Unit::AuraList const& otherTransforms = target->GetAurasByType(SPELL_AURA_TRANSFORM);
@@ -2393,9 +2379,12 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
             }
             else //reapply shapeshifting, there should be only one.
             {
-                Unit::AuraList const& shapeshift = target->GetAurasByType(SPELL_AURA_MOD_SHAPESHIFT);
-                if (!shapeshift.empty() && !shapeshift.front()->IsInUse())
-                    shapeshift.front()->HandleAuraModShapeshift(true,false);
+                std::pair<unsigned int, float> info = getShapeshiftModelInfo(target->GetShapeshiftForm(), target);
+                if (info.first)
+                {
+                    target->SetDisplayId(info.first);
+                    target->setTransformScale(info.second);
+                }
             }
         }
     }
@@ -2435,6 +2424,15 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
         return;
 
     uint32 prot = GetSpellProto()->EffectMiscValue[m_effIndex];
+
+    // Can't modify an unknown skill
+    if (!GetTarget()->ToPlayer()->HasSkill(prot))
+    {
+        // Revert m_applied assigned in Aura::ApplyModidier
+        m_applied = !apply;
+        return;
+    }
+
     int32 points = GetModifier()->m_amount;
 
     ((Player*)GetTarget())->ModifySkillBonus(prot, (apply ? points : -points), m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
@@ -5156,8 +5154,10 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             }
             target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
-            // heal for caster damage
-            if (target != pCaster && spellProto->SpellVisual == 163)
+            // heal for caster damage, warlock's health funnel aldready cost hps
+            if (target != pCaster && spellProto->SpellVisual == 163 &&
+                !(spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                spellProto->IsFitToFamilyMask<CF_WARLOCK_HEALTH_FUNNEL>()))
             {
                 uint32 dmg = spellProto->manaPerSecond;
                 if (pCaster->GetHealth() <= dmg && pCaster->GetTypeId() == TYPEID_PLAYER)
@@ -6161,16 +6161,29 @@ void SpellAuraHolder::Update(uint32 diff)
         {
             if (Unit* caster = GetCaster())
             {
-                Powers powertype = Powers(GetSpellProto()->powerType);
-                int32 manaPerSecond = GetSpellProto()->manaPerSecond + GetSpellProto()->manaPerSecondPerLevel * caster->getLevel();
+                Powers powertype = Powers(m_spellProto->powerType);
+                int32 manaPerSecond = m_spellProto->manaPerSecond + m_spellProto->manaPerSecondPerLevel * caster->getLevel();
                 m_timeCla = 1 * IN_MILLISECONDS;
 
-                if (manaPerSecond)
+                Unit* target = GetTarget();
+                if (manaPerSecond && // avoid double cost for health funnel :
+                    !(m_spellProto->SpellFamilyName == SPELLFAMILY_WARLOCK &&
+                    m_spellProto->IsFitToFamilyMask<CF_WARLOCK_HEALTH_FUNNEL>() &&
+                    target && (target->GetCharmerOrOwnerGuid() == GetCasterGuid())))
                 {
-                    if (powertype == POWER_HEALTH)
+                    if (powertype == POWER_HEALTH && int32(caster->GetHealth()) > manaPerSecond)
                         caster->ModifyHealth(-manaPerSecond);
-                    else
+                    else if (int32(caster->GetPower(powertype)) >= manaPerSecond)
                         caster->ModifyPower(powertype, -manaPerSecond);
+                    else
+                    {
+                        if (target)
+                            target->RemoveAurasDueToSpell(m_spellProto->Id, this);
+                        if (IsChanneledSpell(m_spellProto))
+                            caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+                        if (Player* plCaster = caster->ToPlayer())
+                            Spell::SendCastResult(plCaster, m_spellProto, SPELL_FAILED_FIZZLE);
+                    }
                 }
             }
         }
@@ -6209,6 +6222,8 @@ void SpellAuraHolder::Update(uint32 diff)
 
             if (m_target->IsHostileTo(caster))
                 max_range *= 1.33f;
+            else // add radius of caster (see Spell::CheckRange)
+                max_range += 1.25f;
 
             if (Player* modOwner = caster->GetSpellModOwner())
                 modOwner->ApplySpellMod(GetId(), SPELLMOD_RANGE, max_range, nullptr);

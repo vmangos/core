@@ -21,6 +21,12 @@ SDComment:
 SDCategory: Temple of Ahn'Qiraj
 EndScriptData */
 
+/*
+ * Notes:
+ * Whirlwind - Sartura does a physical AoE that does 3k+ damage to everyone within 10 yards of her.
+ * During this time she is immune to stuns and taunt. She tends to use this ability after a stun fades.
+ */
+
 #include "scriptPCH.h"
 #include "temple_of_ahnqiraj.h"
 
@@ -37,12 +43,15 @@ enum
     SPELL_ENRAGE                    = 26527,
     SPELL_ENRAGEHARD                = 27680,
 
+    TAUNT_IMMUNE                    = 26602,
+
     EMOTE_ENRAGE                    = -1000003,
     EMOTE_ENRAGEHARD                = -1000004,
 
     // Royal Guard
     SPELL_KNOCKBACK                 = 19813,
-	SPELL_GUARD_WHIRLWIND			= 26038,
+    SPELL_GUARD_WHIRLWIND            = 26038,
+
 };
 
 // ********************
@@ -53,11 +62,11 @@ struct boss_sarturaAI : public ScriptedAI
 {
     boss_sarturaAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-		m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
+        m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
         Reset();
     }
 
-	instance_temple_of_ahnqiraj* m_pInstance;
+    instance_temple_of_ahnqiraj* m_pInstance;
 
     uint32 m_uiCleaveTimer;
     uint32 m_uiWhirlWindTimer;
@@ -72,7 +81,7 @@ struct boss_sarturaAI : public ScriptedAI
     void Reset() override
     {
         m_uiCleaveTimer = 4000;
-        m_uiWhirlWindTimer = urand(18000, 20000);;
+        m_uiWhirlWindTimer = urand(8000, 12000);;
         m_uiWhirlWindEndTimer = 0;
         m_uiAggroResetTimer = urand(5000, 7500);
         
@@ -93,11 +102,11 @@ struct boss_sarturaAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
-	void EnterEvadeMode() override
-	{
-		LeashEncounter();
-		ScriptedAI::EnterEvadeMode();
-	}
+    void EnterEvadeMode() override
+    {
+        LeashEncounter();
+        ScriptedAI::EnterEvadeMode();
+    }
 
     void Aggro(Unit* /*pWho*/) override
     {
@@ -131,25 +140,25 @@ struct boss_sarturaAI : public ScriptedAI
     {
         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
         {
-			if (m_creature->IsWithinDist(pTarget, VISIBLE_RANGE))
-			{
-				DoResetThreat();
-				m_creature->getThreatManager().addThreatDirectly(pTarget, urand(1000, 2000));
-			}
+            if (m_creature->IsWithinDist(pTarget, VISIBLE_RANGE))
+            {
+                DoResetThreat();
+                m_creature->getThreatManager().addThreatDirectly(pTarget, urand(1000, 2000));
+            }
         }
     }
 
     void LeashEncounter()
     {
-		GuidList m_lRoyalGuardsGuid;
-		m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
-		for (GuidList::const_iterator itr = m_lRoyalGuardsGuid.begin(); itr != m_lRoyalGuardsGuid.end(); ++itr)
-		{
-			if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
-			{
-				if (pRoyalGuard->isDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
-			}
-		}
+        GuidList m_lRoyalGuardsGuid;
+        m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
+        for (GuidList::const_iterator itr = m_lRoyalGuardsGuid.begin(); itr != m_lRoyalGuardsGuid.end(); ++itr)
+        {
+            if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
+            {
+                if (pRoyalGuard->isDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
+            }
+        }
     }
 
     void UpdateAI(const uint32 uiDiff) override
@@ -172,11 +181,12 @@ struct boss_sarturaAI : public ScriptedAI
             if (m_uiWhirlWindEndTimer <= uiDiff)
             {
                 m_uiWhirlWindEndTimer = 0;
-                m_uiWhirlWindTimer = urand(8000, 10000);
+                m_uiWhirlWindTimer = urand(5000, 10000);
                 m_uiAggroResetTimer = urand(3000, 7000); 
-				// Remove the negative haste modifier from Whirlwind to restore Sartura's auto attack
-				m_creature->ApplyAttackTimePercentMod(BASE_ATTACK, 0, true);
-				m_creature->setAttackTimer(BASE_ATTACK, 100);
+                // Remove the negative haste modifier from Whirlwind to restore Sartura's auto attack
+                m_creature->ApplyAttackTimePercentMod(BASE_ATTACK, 0, true);
+                m_creature->setAttackTimer(BASE_ATTACK, 100);
+                m_creature->RemoveAurasByCasterSpell(TAUNT_IMMUNE, m_creature->GetObjectGuid());
             }
             else
                 m_uiWhirlWindEndTimer -= uiDiff;
@@ -189,6 +199,7 @@ struct boss_sarturaAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_WHIRLWIND) == CAST_OK)
                 {
+                    m_creature->CastSpell(m_creature, TAUNT_IMMUNE, true);
                     AssignRandomThreat();
                     m_uiWhirlWindEndTimer = 15000;
                     m_uiAggroResetTimer = urand(1000, 2000);
@@ -217,9 +228,8 @@ struct boss_sarturaAI : public ScriptedAI
 
         }
         
-
         // If she is <25% enrage
-        if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 25.0f)
+        if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 20.0f)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE, m_uiWhirlWindEndTimer ? CAST_TRIGGERED : 0) == CAST_OK)
             {
@@ -250,11 +260,11 @@ struct boss_sarturaAI : public ScriptedAI
         if (m_uiEvadeCheckTimer < uiDiff)
         {
             m_uiEvadeCheckTimer = 2500;
-			if (m_creature->GetPositionY() > 1780)
-			{
-				EnterEvadeMode();
-				LeashEncounter();
-			}
+            if (m_creature->GetPositionY() > 1780)
+            {
+                EnterEvadeMode();
+                LeashEncounter();
+            }
         }
         else
             m_uiEvadeCheckTimer -= uiDiff;
@@ -268,12 +278,12 @@ struct boss_sarturaAI : public ScriptedAI
 struct mob_sartura_royal_guardAI : public ScriptedAI
 {
     mob_sartura_royal_guardAI(Creature* pCreature) : ScriptedAI(pCreature)
-	{
-		m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
-		Reset();
-	}
+    {
+        m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
+        Reset();
+    }
 
-	instance_temple_of_ahnqiraj* m_pInstance;
+    instance_temple_of_ahnqiraj* m_pInstance;
 
     uint32 m_uiKnockbackTimer;
     uint32 m_uiWhirlWindTimer;
@@ -306,23 +316,23 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
 
     void LeashEncounter()
     {
-		if (Creature* pSartura = m_pInstance->GetSingleCreatureFromStorage(NPC_BATTLEGUARD_SARTURA))
-		{
-			if (pSartura->isAlive())
-			{
-				pSartura->AI()->EnterEvadeMode();
+        if (Creature* pSartura = m_pInstance->GetSingleCreatureFromStorage(NPC_BATTLEGUARD_SARTURA))
+        {
+            if (pSartura->isAlive())
+            {
+                pSartura->AI()->EnterEvadeMode();
 
-				GuidList m_lRoyalGuardsGuid;
-				m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
-				for (GuidList::const_iterator itr = m_lRoyalGuardsGuid.begin(); itr != m_lRoyalGuardsGuid.end(); ++itr)
-				{
-					if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
-					{
-						if (pRoyalGuard->isDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
-					}
-				}
-			}
-		}
+                GuidList m_lRoyalGuardsGuid;
+                m_pInstance->GetRoyalGuardGUIDList(m_lRoyalGuardsGuid);
+                for (GuidList::const_iterator itr = m_lRoyalGuardsGuid.begin(); itr != m_lRoyalGuardsGuid.end(); ++itr)
+                {
+                    if (Creature* pRoyalGuard = m_creature->GetMap()->GetCreature(*itr))
+                    {
+                        if (pRoyalGuard->isDead()) pRoyalGuard->Respawn(); else pRoyalGuard->AI()->EnterEvadeMode();
+                    }
+                }
+            }
+        }
     }
 
     void UpdateAI(const uint32 uiDiff) override
@@ -357,10 +367,10 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
             // Enter Whirlwind Phase
             if (m_uiWhirlWindTimer < uiDiff)
             {
-				if (DoCastSpellIfCan(m_creature, SPELL_GUARD_WHIRLWIND) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_GUARD_WHIRLWIND) == CAST_OK)
                 {
                     AssignRandomThreat();
-					m_uiWhirlWindEndTimer = 8000;
+                    m_uiWhirlWindEndTimer = 8000;
                     m_uiAggroResetTimer = urand(1000, 2000);
                 }
             }
@@ -391,14 +401,14 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
         DoMeleeAttackIfReady();
 
         // Leash check
-		if (m_uiEvadeCheckTimer < uiDiff)
-		{
-			m_uiEvadeCheckTimer = 2500;
-			if (m_creature->GetPositionY() > 1780)
-				LeashEncounter();
-		}
-		else
-			m_uiEvadeCheckTimer -= uiDiff;
+        if (m_uiEvadeCheckTimer < uiDiff)
+        {
+            m_uiEvadeCheckTimer = 2500;
+            if (m_creature->GetPositionY() > 1780)
+                LeashEncounter();
+        }
+        else
+            m_uiEvadeCheckTimer -= uiDiff;
     }
 };
 
@@ -408,12 +418,12 @@ struct mob_sartura_royal_guardAI : public ScriptedAI
 
 enum
 {
-	SPELL_IMPALE		= 26025,
-	SPELL_FRENZY		= 8599,
+    SPELL_IMPALE        = 26025,
+    SPELL_FRENZY        = 8599,
 
-	EMOTE_EMIT		= -1531100,
-	EMOTE_FRENZY		= -1000002,
-	SOUND_CHARGE		= 3330,
+    EMOTE_EMIT        = -1531100,
+    EMOTE_FRENZY        = -1000002,
+    SOUND_CHARGE        = 3330,
 };
 
 // array of GUIDs permitted to emote on aggro
@@ -421,153 +431,153 @@ static const uint32 aEmoteGUIDs[8] = { 87595, 87671, 87610, 87611, 87618, 87627,
 
 struct mob_vekniss_guardianAI : public ScriptedAI
 {
-	mob_vekniss_guardianAI(Creature* pCreature) : ScriptedAI(pCreature)
-	{
-		m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-		m_uiImpaleTimer = 0;
-		Reset();
-	}
+    mob_vekniss_guardianAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_uiImpaleTimer = 0;
+        Reset();
+    }
 
-	ScriptedInstance* m_pInstance;
+    ScriptedInstance* m_pInstance;
 
-	uint32 m_uiImpaleTimer;
-	uint32 m_uiEmoteTimer;
-	uint32 m_uiEvadeCheckTimer;
+    uint32 m_uiImpaleTimer;
+    uint32 m_uiEmoteTimer;
+    uint32 m_uiEvadeCheckTimer;
 
-	bool m_bCalledForHelp;
-	bool m_bFrenzied;
-	bool m_bIsAlone;
+    bool m_bCalledForHelp;
+    bool m_bFrenzied;
+    bool m_bIsAlone;
 
-	void Reset() override
-	{
-		m_bCalledForHelp = false;
-		m_bFrenzied = false;
-		m_uiEmoteTimer = 0;
-		m_uiEvadeCheckTimer = 2500;
-	}
+    void Reset() override
+    {
+        m_bCalledForHelp = false;
+        m_bFrenzied = false;
+        m_uiEmoteTimer = 0;
+        m_uiEvadeCheckTimer = 2500;
+    }
 
-	void Aggro(Unit* /*pWho*/) override
-	{
-		for (uint8 i = 0; i < 8; ++i)
-		{
-			if (m_creature->GetGUIDLow() == aEmoteGUIDs[i])
-			{
-				m_uiEmoteTimer = 2500;
-				break;
-			}
-		}
-	}
+    void Aggro(Unit* /*pWho*/) override
+    {
+        for (uint8 i = 0; i < 8; ++i)
+        {
+            if (m_creature->GetGUIDLow() == aEmoteGUIDs[i])
+            {
+                m_uiEmoteTimer = 2500;
+                break;
+            }
+        }
+    }
 
-	void MoveInLineOfSight(Unit* pWho) override
-	{
-		// Increased aggro radius
-		if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 50.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
-		{
-			AttackStart(pWho);
-		}
-		ScriptedAI::MoveInLineOfSight(pWho);
-	}
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        // Increased aggro radius
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 50.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho);
+        }
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
 
-	void EnterEvadeMode() override
-	{
-		m_creature->UpdateSpeed(MOVE_RUN, false);
-		ScriptedAI::EnterEvadeMode();
-	}
+    void EnterEvadeMode() override
+    {
+        m_creature->UpdateSpeed(MOVE_RUN, false);
+        ScriptedAI::EnterEvadeMode();
+    }
 
-	void ImpaleAssist(Unit* pWho)
-	{
-		m_creature->UpdateSpeed(MOVE_RUN, true, 2.5);
-		m_creature->GetMotionMaster()->MovePoint(1, pWho->GetPositionX(), pWho->GetPositionY(), pWho->GetPositionZ());
-		m_creature->PlayDistanceSound(SOUND_CHARGE);
-	}
+    void ImpaleAssist(Unit* pWho)
+    {
+        m_creature->UpdateSpeed(MOVE_RUN, true, 2.5);
+        m_creature->GetMotionMaster()->MovePoint(1, pWho->GetPositionX(), pWho->GetPositionY(), pWho->GetPositionZ());
+        m_creature->PlayDistanceSound(SOUND_CHARGE);
+    }
 
-	void MovementInform(uint32 uiMotionType, uint32 /*uiPointId*/) override
-	{
-		if (uiMotionType != POINT_MOTION_TYPE)
-			return;
+    void MovementInform(uint32 uiMotionType, uint32 /*uiPointId*/) override
+    {
+        if (uiMotionType != POINT_MOTION_TYPE)
+            return;
 
-		DoCastSpellIfCan(m_creature, SPELL_IMPALE);
-		m_creature->UpdateSpeed(MOVE_RUN, false);
-		DoStartMovement(m_creature->getVictim());
-	}
+        DoCastSpellIfCan(m_creature, SPELL_IMPALE);
+        m_creature->UpdateSpeed(MOVE_RUN, false);
+        DoStartMovement(m_creature->getVictim());
+    }
 
-	void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage) override
-	{
-		if (m_creature->GetHealthPercent() < 25.0f && !m_bCalledForHelp)
-		{
-			m_bCalledForHelp = true;
-			m_bIsAlone = true;
-			std::list<Creature*> lAssistList;
-			GetCreatureListWithEntryInGrid(lAssistList, m_creature, 15233, 45.0f);
+    void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage) override
+    {
+        if (m_creature->GetHealthPercent() < 25.0f && !m_bCalledForHelp)
+        {
+            m_bCalledForHelp = true;
+            m_bIsAlone = true;
+            std::list<Creature*> lAssistList;
+            GetCreatureListWithEntryInGrid(lAssistList, m_creature, 15233, 45.0f);
 
-			for (std::list<Creature*>::iterator itr = lAssistList.begin(); itr != lAssistList.end(); ++itr)
-			{
-				if ((*itr)->GetObjectGuid() == m_creature->GetObjectGuid())
-					continue;
+            for (std::list<Creature*>::iterator itr = lAssistList.begin(); itr != lAssistList.end(); ++itr)
+            {
+                if ((*itr)->GetObjectGuid() == m_creature->GetObjectGuid())
+                    continue;
 
-				if ((*itr)->isAlive() && m_creature->IsWithinLOSInMap((*itr)))
-				{
-					if (m_bIsAlone)
-						m_bIsAlone = false;
-					if (mob_vekniss_guardianAI* pVeknissAI = dynamic_cast<mob_vekniss_guardianAI*>((*itr)->AI()))
-						pVeknissAI->ImpaleAssist(m_creature);
-				}
-			}
-			if (m_bIsAlone)
-				DoCastSpellIfCan(m_creature, SPELL_IMPALE);
-		}
-	}
+                if ((*itr)->isAlive() && m_creature->IsWithinLOSInMap((*itr)))
+                {
+                    if (m_bIsAlone)
+                        m_bIsAlone = false;
+                    if (mob_vekniss_guardianAI* pVeknissAI = dynamic_cast<mob_vekniss_guardianAI*>((*itr)->AI()))
+                        pVeknissAI->ImpaleAssist(m_creature);
+                }
+            }
+            if (m_bIsAlone)
+                DoCastSpellIfCan(m_creature, SPELL_IMPALE);
+        }
+    }
 
-	void UpdateAI(const uint32 uiDiff) override
-	{
-		if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-			return;
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
 
-		if (m_uiEvadeCheckTimer < uiDiff)
-		{
-			m_uiEvadeCheckTimer = 2500;
-			if (m_creature->IsInEvadeMode())
-			{
-				if (Unit* pTarget = m_creature->getVictim())
-					m_creature->Relocate(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
-			}
-		}
-		else
-			m_uiEvadeCheckTimer -= uiDiff;
+        if (m_uiEvadeCheckTimer < uiDiff)
+        {
+            m_uiEvadeCheckTimer = 2500;
+            if (m_creature->IsInEvadeMode())
+            {
+                if (Unit* pTarget = m_creature->getVictim())
+                    m_creature->Relocate(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
+            }
+        }
+        else
+            m_uiEvadeCheckTimer -= uiDiff;
 
-		if (m_uiEmoteTimer)
-		{
-			if (m_uiEmoteTimer < uiDiff)
-			{
-				DoScriptText(EMOTE_EMIT, m_creature);
-				m_uiEmoteTimer = 0;
-			}
-			else
-				m_uiEmoteTimer -= uiDiff;
-		}
+        if (m_uiEmoteTimer)
+        {
+            if (m_uiEmoteTimer < uiDiff)
+            {
+                DoScriptText(EMOTE_EMIT, m_creature);
+                m_uiEmoteTimer = 0;
+            }
+            else
+                m_uiEmoteTimer -= uiDiff;
+        }
 
-		if (m_creature->GetHealthPercent() < 30.0f && !m_bFrenzied)
-		{
-			if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
-			{
-				DoScriptText(EMOTE_FRENZY, m_creature);
-				m_bFrenzied = true;
-			}
-		}
+        if (m_creature->GetHealthPercent() < 30.0f && !m_bFrenzied)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_FRENZY) == CAST_OK)
+            {
+                DoScriptText(EMOTE_FRENZY, m_creature);
+                m_bFrenzied = true;
+            }
+        }
 
-		if (m_uiImpaleTimer)																	// stop chasing momentarily after casting impale to prevent z-axis problems
-		{
-			if (m_uiImpaleTimer < uiDiff)
-			{
-				
-				m_uiImpaleTimer = 0;
-			}
-			else
-				m_uiImpaleTimer -= uiDiff;
-		}
+        if (m_uiImpaleTimer)                                                                    // stop chasing momentarily after casting impale to prevent z-axis problems
+        {
+            if (m_uiImpaleTimer < uiDiff)
+            {
+                
+                m_uiImpaleTimer = 0;
+            }
+            else
+                m_uiImpaleTimer -= uiDiff;
+        }
 
-		DoMeleeAttackIfReady();
-	}
+        DoMeleeAttackIfReady();
+    }
 };
 
 
@@ -583,7 +593,7 @@ CreatureAI* GetAI_mob_sartura_royal_guard(Creature* pCreature)
 
 CreatureAI* GetAI_mob_vekniss_guardian(Creature* pCreature)
 {
-	return new mob_vekniss_guardianAI(pCreature);
+    return new mob_vekniss_guardianAI(pCreature);
 }
 
 void AddSC_boss_sartura()
@@ -598,10 +608,10 @@ void AddSC_boss_sartura()
     pNewScript = new Script;
     pNewScript->Name = "mob_sartura_royal_guard";
     pNewScript->GetAI = &GetAI_mob_sartura_royal_guard;
-	pNewScript->RegisterSelf(); 
+    pNewScript->RegisterSelf(); 
 
-	pNewScript = new Script;
-	pNewScript->Name = "mob_vekniss_guardian";
-	pNewScript->GetAI = &GetAI_mob_vekniss_guardian;
-	pNewScript->RegisterSelf();
+    pNewScript = new Script;
+    pNewScript->Name = "mob_vekniss_guardian";
+    pNewScript->GetAI = &GetAI_mob_vekniss_guardian;
+    pNewScript->RegisterSelf();
 }

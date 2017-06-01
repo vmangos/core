@@ -46,7 +46,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     void EnterEvadeMode() override;
 
     //Called at any heal cast/item used (call non implemented in mangos)
-    void HealBy(Unit* /*pHealer*/, uint32 /*uiAmountHealed*/) override {}
+    void HealedBy(Unit* /*pHealer*/, uint32 /*uiAmountHealed*/) override {}
 
     // Called at any Damage to any victim (before damage apply)
     void DamageDeal(Unit* /*pDoneTo*/, uint32& /*uiDamage*/) override {}

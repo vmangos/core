@@ -338,7 +338,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
     SpellCastTargets targets;
     targets.setUnitTarget(_player);
 
-    spell->prepare(&targets);
+    spell->prepare(std::move(targets));
     spell->update(1); // Update the spell right now. Prevents desynch => take twice the money if you click really fast
 }
 

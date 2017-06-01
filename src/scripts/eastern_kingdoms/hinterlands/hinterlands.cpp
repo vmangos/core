@@ -62,39 +62,28 @@ struct npc_00x09hlAI : public npc_escortAI
         {
             case 26:
                 DoScriptText(SAY_OOX_AMBUSH, m_creature);
-                break;
-            case 43:
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
-                break;
-            case 64:
-                DoScriptText(SAY_OOX_END, m_creature);
-                if (Player* pPlayer = GetPlayerForEscort())
-                    pPlayer->GroupEventHappens(QUEST_RESQUE_OOX_09, m_creature);
-                break;
-        }
-    }
-
-    void WaypointStart(uint32 uiPointId)
-    {
-        switch (uiPointId)
-        {
-            case 27:
                 for (uint8 i = 0; i < 3; ++i)
                 {
                     float fX, fY, fZ;
                     m_creature->GetRandomPoint(147.927444f, -3851.513428f, 130.893f, 7.0f, fX, fY, fZ);
 
-                    m_creature->SummonCreature(NPC_MARAUDING_OWL, fX, fY, fZ, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000);
+                    m_creature->SummonCreature(NPC_MARAUDING_OWL, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
                 }
                 break;
-            case 44:
+            case 43:
+                DoScriptText(SAY_OOX_AMBUSH, m_creature);
                 for (uint8 i = 0; i < 3; ++i)
                 {
                     float fX, fY, fZ;
                     m_creature->GetRandomPoint(-141.151581f, -4291.213867f, 120.130f, 7.0f, fX, fY, fZ);
 
-                    m_creature->SummonCreature(NPC_VILE_AMBUSHER, fX, fY, fZ, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 25000);
+                    m_creature->SummonCreature(NPC_VILE_AMBUSHER, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
                 }
+                break;
+            case 64:
+                DoScriptText(SAY_OOX_END, m_creature);
+                if (Player* pPlayer = GetPlayerForEscort())
+                    pPlayer->GroupEventHappens(QUEST_RESQUE_OOX_09, m_creature);
                 break;
         }
     }

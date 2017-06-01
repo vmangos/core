@@ -85,6 +85,10 @@ namespace VMAP
             It is enabled by default. If it is enabled in mid game the maps have to loaded manualy
             */
             void setEnableHeightCalc(bool pVal) { iEnableHeightCalc = pVal; }
+            /**
+            Enable/disable model unloading
+            It is disabled by default. If it is enabled the manager will no longer process unload requests on reference clear
+            */
 
             bool isLineOfSightCalcEnabled() const { return iEnableLineOfSightCalc; }
             bool isHeightCalcEnabled() const { return iEnableHeightCalc; }

@@ -876,6 +876,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK, "vmap.enableIndoorCheck", true);
     bool enableLOS = sConfig.GetBoolDefault("vmap.enableLOS", false);
     bool enableHeight = sConfig.GetBoolDefault("vmap.enableHeight", false);
+    bool disableModelUnload = sConfig.GetBoolDefault("Collision.Models.Unload", false);
     std::string ignoreSpellIds = sConfig.GetStringDefault("vmap.ignoreSpellIds", "");
 
     if (!enableHeight)
@@ -883,6 +884,7 @@ void World::LoadConfigSettings(bool reload)
 
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableLineOfSightCalc(enableLOS);
     VMAP::VMapFactory::createOrGetVMapManager()->setEnableHeightCalc(enableHeight);
+    VMAP::VMapFactory::createOrGetVMapManager()->setUseManagedPtrs(!disableModelUnload);
     VMAP::VMapFactory::preventSpellsFromBeingTestedForLoS(ignoreSpellIds.c_str());
     sLog.outString("WORLD: VMap support included. LineOfSight:%i, getHeight:%i, indoorCheck:%i",
                    enableLOS, enableHeight, getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) ? 1 : 0);
@@ -903,7 +905,11 @@ void World::LoadConfigSettings(bool reload)
     m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
 
     LoadNostalriusConfig(reload);
-    VMAP::VMapFactory::createOrGetVMapManager()->setUseManagedPtrs(getConfig(CONFIG_BOOL_COLLISION_MODELS_UNLOAD));
+
+    // PvP options
+    setConfig(CONFIG_BOOL_ACCURATE_PVP_EQUIP_REQUIREMENTS, "PvP.AccurateEquipRequirements", false);
+    setConfig(CONFIG_BOOL_ACCURATE_PVP_PURCHASE_REQUIREMENTS, "PvP.AccuratePurchaseRequirements", false);
+    setConfig(CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS, "PvP.AccurateZoneRequirements", false);
 
     // Smartlog data
     sLog.InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
@@ -1021,7 +1027,6 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_BOOL_GMTICKETS_ENABLE,                             "GMTickets.Enable", true);
     setConfig(CONFIG_UINT32_GMTICKETS_MINLEVEL,                         "GMTickets.MinLevel", 0);
     setConfig(CONFIG_UINT32_GMTICKETS_ADMIN_SECURITY,                   "GMTickets.Admin.Security", SEC_CONSOLE);
-    setConfig(CONFIG_BOOL_COLLISION_MODELS_UNLOAD,                      "Collision.Models.Unload", true);
     setConfig(CONFIG_UINT32_COD_FORCE_TAG_MAX_LEVEL,                    "Mails.COD.ForceTag.MaxLevel", 0);
     setConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME,                     "Maps.Empty.UpdateTime", 0);
     setConfig(CONFIG_UINT32_PACKET_BCAST_THREADS,                       "Network.PacketBroadcast.Threads", 0);

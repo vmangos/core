@@ -277,7 +277,8 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
-    SetObjectScale(cinfo->scale);
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
+    setNativeScale(cinfo->scale);
 
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
@@ -526,7 +527,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(GetCreatureInfo()->faction_A))
     {
-        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP)
+        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP || IsCivilian())
             SetPvP(true);
         else
             SetPvP(false);
@@ -1889,6 +1890,21 @@ bool Creature::IsImmuneToDamage(SpellSchoolMask meleeSchoolMask)
     return Unit::IsImmuneToDamage(meleeSchoolMask);
 }
 
+// hacky - seems to be the only way of doing this without wasting more time
+void Creature::SetTauntImmunity(bool immune)
+{
+    if (immune)
+    {
+        auto info = const_cast<CreatureInfo*>(m_creatureInfo);
+        info->flags_extra |= CREATURE_FLAG_EXTRA_NOT_TAUNTABLE;
+    }
+    else
+    {
+        auto info = const_cast<CreatureInfo*>(m_creatureInfo);
+        info->flags_extra ^= CREATURE_FLAG_EXTRA_NOT_TAUNTABLE;
+    }
+}
+
 bool Creature::IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex index, bool castOnSelf) const
 {
     if (!castOnSelf && spellInfo->EffectMechanic[index] && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->EffectMechanic[index] - 1)))
@@ -3083,7 +3099,7 @@ Unit* Creature::GetNearestVictimInRange(float min, float max)
             continue;
 
         float currRange = GetDistance(pTarget);
-        if (currRange < bestRange && currRange > min)
+        if (currRange <= bestRange && currRange >= min)
         {
             bestRange = currRange;
             pUnit = pTarget;

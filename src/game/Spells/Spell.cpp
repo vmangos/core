@@ -592,14 +592,13 @@ void Spell::FillTargetMap()
                 break;
         }
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_THREAT))
+        if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             Player *me = (Player*)m_caster;
             for (UnitList::const_iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
             {
                 Player *targetOwner = (*itr)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if ((targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner)) || // PvP flagged players
-                    ((*itr)->IsCreature() && (*itr)->IsPvP()))                                                      // PvP flagged creatures
+                if (targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner))
                 {
                     me->UpdatePvP(true);
                     me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -634,6 +633,8 @@ void Spell::prepareDataForTriggerSystem()
     // Fill flag can spell trigger or not
     // TODO: possible exist spell attribute for this
     m_canTrigger = false;
+    m_procAttacker = PROC_FLAG_NONE;
+    m_procVictim = PROC_FLAG_NONE;
 
     if (m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CANT_TRIGGER_PROC)
         m_canTrigger = false;         // Explicitly not allowed to trigger
@@ -705,8 +706,16 @@ void Spell::prepareDataForTriggerSystem()
             }
             else // Ranged spell attack
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
-                m_procVictim   = PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+                // If blind, don't add proc flags for typical ranged abilities
+                // proc none
+                if (m_spellInfo->Id == 2094) {
+                    m_procAttacker = PROC_FLAG_NONE;
+                    m_procVictim = PROC_FLAG_NONE;
+                }
+                else {
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+                    m_procVictim   = PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+                }
             }
             break;
         default:
@@ -716,6 +725,7 @@ void Spell::prepareDataForTriggerSystem()
             // Hellfire regularly triggers an AoE spell.
             if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && m_spellInfo->SpellIconID == 937)
                 aoe = true;
+
             if (IsPositiveSpell(m_spellInfo->Id))                                 // Check for positive spell
             {
                 m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
@@ -1001,10 +1011,39 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     // Reset damage/healing counter
     ResetEffectDamageAndHeal();
 
-    // Fill base trigger info
+    // Fill base trigger info. If this is hitting multiple targets, attacker procs should
+    // only apply on the first target aside from some special cases.
     uint32 procAttacker = m_procAttacker;
     uint32 procVictim   = m_procVictim;
     uint32 procEx       = PROC_EX_NONE;
+    
+    // Drop some attacker proc flags if this is a secondary target. Do not need to change
+    // the victim proc flags.
+    if (m_targetNum > 1) {
+        // If this is a melee spell hit, strip the flag and apply a spell hit flag instead.
+        // This is required to proc things like Deep Wounds on the victim when hitting 
+        // multiple targets, but not proc additional melee-only beneficial auras on the 
+        // attacker like Sweeping Strikes. Leave the victim proc flags responding to a melee
+        // spell.
+        if (procAttacker & PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT) {
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT);
+            procAttacker |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+        }
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST)) {
+            // Secondary target on a successful spell cast. Remove these flags so we're not
+            // proccing beneficial auras multiple times. Also remove negative spell hit for
+            // chain lightning + clearcasting. Leave positive effects
+            // eg. Chain heal/lightning & Zandalarian Hero Charm
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | 
+                              PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+        }
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)) {
+            // Do not allow secondary hits for negative aoe spells (such as Arcane Explosion) 
+            // to proc beneficial abilities such as Clearcasting. Positive aoe spells can
+            // still trigger, as in the case of prayer of healing and inspiration...
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+        }
+    }
 
     // drop proc flags in case target not affected negative effects in negative spell
     // for example caster bonus or animation,
@@ -1045,7 +1084,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             if (real_caster && real_caster != unit)
             {
                 // can cause back attack (if detected)
-                bool backAttack = !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) && !IsPositiveSpell(m_spellInfo->Id) && m_caster->isVisibleForOrDetect(unit, unit, false);
+                bool backAttack = m_spellInfo->Id != 3600 && // Earthbind never set in combat
+                    !IsPositiveSpell(m_spellInfo->Id) && m_caster->isVisibleForOrDetect(unit, unit, false);
                 if (IsSpellHaveAura(m_spellInfo, SPELL_AURA_MOD_POSSESS))
                     backAttack = false;
                 // Pickpocket can cause back attack if failed
@@ -1759,9 +1799,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 28796:                                 // Poison Bolt Volley (Naxx, Faerlina)
                     unMaxTargets = 10;
                     break;
-                case 25991:                                 // Poison Bolt Volley (AQ40, Pincess Huhuran)
-                    unMaxTargets = 15;
-                    break;
             }
             break;
         }
@@ -1783,6 +1820,35 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
                 default:
+                    break;
+            }
+            break;
+        }
+        default:
+            break;
+    }
+
+    bool SelectClosestTargets = false;
+
+    // custom selection cases
+    switch (m_spellInfo->SpellFamilyName)
+    {
+        case SPELLFAMILY_GENERIC:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 26052:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
+                    SelectClosestTargets = true;
+                    break;
+            }
+            break;
+        }
+        case SPELLFAMILY_HUNTER:
+        {
+            switch (m_spellInfo->Id)
+            {
+                case 26180:                                 // Wyvern Sting (AQ40, Princess Huhuran)
+                    SelectClosestTargets = true;
                     break;
             }
             break;
@@ -2026,7 +2092,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if ((*itr)->IsWithinDist(m_caster, minDist))
                         targetUnitMap.erase(itr);
                 }
-            }
+	    }
+            if (SelectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
+	    {
+                targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
+                UnitList::iterator itr = targetUnitMap.begin();
+                advance(itr, unMaxTargets);
+                targetUnitMap.erase(itr, targetUnitMap.end());
+	    }
             break;
         }
         case TARGET_AREAEFFECT_INSTANT:
@@ -2873,9 +2946,14 @@ bool IsAcceptableAutorepeatError(SpellCastResult result)
     return false;
 }
 
-void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
+void Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura)
 {
-    m_targets = *targets;
+    m_targets = std::move(targets);
+    prepare(triggeredByAura);
+}
+
+void Spell::prepare(Aura* triggeredByAura)
+{
 
     m_spellState = SPELL_STATE_PREPARING;
     m_delayed = m_spellInfo->speed > 0.0f || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer());
@@ -2940,12 +3018,13 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
                     SendChannelUpdate(0);
                     triggeredByAura->GetHolder()->SetAuraDuration(0);
                 }
+
                 SendCastResult(result);
+                //SendInterrupted(0);
                 finish(false);
                 return;
             }
         }
-
         // Prepare data for triggers
         prepareDataForTriggerSystem();
 
@@ -2961,10 +3040,17 @@ void Spell::prepare(SpellCastTargets const* targets, Aura* triggeredByAura)
         // set timer base at cast time
         ReSetTimer();
 
-        // Si m_timer=0, le cast a lieu au prochain tic, et c'est la qu'il faut retirer
-        // ou non les auras d'invisibilite
-        if (m_timer)
+        // If timer = 0, it's an instant cast spell and will be casted on the next tick.
+        // Cast completion will remove all any stealth/invis auras
+        if (m_timer) {
             RemoveStealthAuras();
+            
+            // If using a game object we need to remove any remaining invis auras. Should only
+            // ever be Gnomish Cloaking Device, since it's a special case and not removed on
+            // opcode receive
+            if (m_caster->IsPlayer() && m_targets.getGOTarget())
+                m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
+        }
 
         OnSpellLaunch();
 
@@ -3249,6 +3335,10 @@ void Spell::cast(bool skipCheck)
     }
 
     // CAST SPELL
+    // Remove any remaining invis auras on cast completion, should only be gnomish cloaking device
+    if (!m_IsTriggeredSpell)
+        m_caster->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL);
+    
     SendSpellCooldown();
 
     TakePower();
@@ -4406,6 +4496,10 @@ void Spell::TakeReagents()
 
 void Spell::TakeAmmo()
 {
+    // Blind is a ranged attack but should not take any ammo
+    if (m_spellInfo->Id == 2094)
+        return;
+            
     if (m_attackType == RANGED_ATTACK && m_caster->GetTypeId() == TYPEID_PLAYER)
     {
         Item *pItem = ((Player*)m_caster)->GetWeaponForAttack(RANGED_ATTACK, true, false);
@@ -4551,7 +4645,7 @@ void Spell::CastTriggerSpells()
     for (SpellInfoList::const_iterator si = m_TriggerSpells.begin(); si != m_TriggerSpells.end(); ++si)
     {
         Spell* spell = new Spell(m_caster, (*si), true, m_originalCasterGUID);
-        spell->prepare(&m_targets);                         // use original spell original targets
+        spell->prepare(m_targets);                         // use original spell original targets
     }
 }
 
@@ -4606,8 +4700,8 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE) &&
-            (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(spellCat)))
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE)
+        && !m_IsTriggeredSpell && (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(spellCat)))
     {
         if (m_triggeredByAuraSpell)
             return SPELL_FAILED_DONT_REPORT;
@@ -4656,11 +4750,11 @@ SpellCastResult Spell::CheckCast(bool strict)
     {
         if (m_spellInfo->Attributes & SPELL_ATTR_OUTDOORS_ONLY &&
                 !m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
-            return m_IsTriggeredSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_ONLY_OUTDOORS;
+            return SPELL_FAILED_ONLY_OUTDOORS;
 
         if (m_spellInfo->Attributes & SPELL_ATTR_INDOORS_ONLY &&
                 m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ()))
-            return m_IsTriggeredSpell ? SPELL_FAILED_DONT_REPORT : SPELL_FAILED_ONLY_INDOORS;
+            return SPELL_FAILED_ONLY_INDOORS;
     }
 
     // caster state requirements
@@ -4934,7 +5028,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     // Nostalrius: impossible to cast spells while banned / feared / confused ...
     // Except divine shields, pvp trinkets for example
     // TODO: This condition allows an antifear item to be used while stuned for example.
-    if (!m_IsTriggeredSpell && !IsSpellHaveAura(m_spellInfo, SPELL_AURA_SCHOOL_IMMUNITY) && !IsSpellHaveAura(m_spellInfo, SPELL_AURA_MECHANIC_IMMUNITY) &&
+    if (!m_IsTriggeredSpell && !IsSpellAppliesAura(m_spellInfo, SPELL_AURA_SCHOOL_IMMUNITY) && !IsSpellAppliesAura(m_spellInfo, SPELL_AURA_MECHANIC_IMMUNITY) &&
             m_caster->hasUnitState(UNIT_STAT_ISOLATED | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
         return SPELL_FAILED_DONT_REPORT;
 
@@ -5478,6 +5572,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_ALREADY_OPEN;
                     if (!go->IsUseRequirementMet())
                         return SPELL_FAILED_TRY_AGAIN;
+
                 }
                 else if (Item* item = m_targets.getItemTarget())
                 {
@@ -5815,13 +5910,7 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                 switch (m_spellInfo->Id)
                 {
-                    case 25863:    // spell used by ingame item for Black Qiraji mount (legendary reward)
-                    case 26655:    // spells also related to Black Qiraji mount but use/trigger unknown
-                    case 26656:
-                    case 31700:
-                        if (m_caster->GetMapId() == 531)
-                            isAQ40Mount = true;
-                        break;
+                    case 25863:    // spell used by the Black Qiraji Crystal script when mounting inside AQ40
                     case 25953:    // spells of the 4 regular AQ40 mounts
                     case 26054:
                     case 26055:
@@ -5834,6 +5923,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                         else
                             return SPELL_FAILED_NOT_HERE;
                     default:
+                        if ((m_caster->GetMapId() == 531 && m_caster->GetTerrain()->IsOutdoors(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ())))
+                            isAQ40Mount = true;
                         break;
                 }
 
@@ -7356,11 +7447,6 @@ public:
                         {
                             if (!casterUnit->IsValidAttackTarget(sourceUnit))
                                 continue;
-
-                            // Negative AoE from non flagged players cannot target other players
-                            if (Player *attackedPlayer = sourceUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                                if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
-                                    continue;
                         }
                         else if (GameObject* gobj = i_originalCaster->ToGameObject())
                         {
@@ -7586,6 +7672,13 @@ void Spell::OnSpellLaunch()
 {
     if (!m_caster || !m_caster->IsInWorld())
         return;
+
+    if (m_spellInfo->Id == 21651 &&
+            sLockStore.LookupEntry(m_targets.getGOTarget()->GetGOInfo()->GetLockId())->Index[1] == LOCKTYPE_SLOW_OPEN)
+    {
+        Spell *visual = new Spell(m_caster, sSpellMgr.GetSpellEntry(24390), true);
+        visual->prepare();
+    }
 
     unitTarget = m_targets.getUnitTarget();
 

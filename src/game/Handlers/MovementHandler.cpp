@@ -387,15 +387,18 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     // Daemon TODO: enregistrement de cette position ?
     // Daemon: mise a jour de la vitesse pour les joueurs a cote.
     // Cf Unit::SetSpeedRate pour plus d'infos.
-    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][2] =
+    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][3] =
     {
-        {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE},
-        {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE},
-        {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE},
-        {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE},
-        {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE},
+        {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE,       SMSG_SPLINE_SET_WALK_SPEED},
+        {MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE,        SMSG_SPLINE_SET_RUN_SPEED},
+        {MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE,   SMSG_SPLINE_SET_RUN_BACK_SPEED},
+        {MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE,       SMSG_SPLINE_SET_SWIM_SPEED},
+        {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  SMSG_SPLINE_SET_SWIM_BACK_SPEED},
+        {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
     };
+    
+    // Maybe update movespeed using the spline packet. works for move splines
+    // and normal movement, but reverted due to issues in same changeset
     WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
     data << _player->GetMover()->GetPackGUID();
     data << movementInfo;
@@ -638,7 +641,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
         plMover->m_movementInfo = movementInfo;
 
         // super smart decision; rework required
-        if (ObjectGuid lootGuid = plMover->GetLootGuid())
+        if (ObjectGuid lootGuid = plMover->GetLootGuid() && !lootGuid.IsItem())
             plMover->SendLootRelease(lootGuid);
 
         // Nostalrius - antiundermap1
@@ -767,6 +770,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
 
+    WorldPacket data(MSG_MOVE_UNROOT, recv_data.size());
+    data << _player->GetPackGUID();
+    movementInfo.Write(data);
+    _player->SendMovementMessageToSet(std::move(data), true, _player);
+    
     // Clear unit client state for brevity, though it should not be used
     _player->clearUnitState(UNIT_STAT_CLIENT_ROOT);
 }
@@ -797,6 +805,11 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     // Position change
     HandleMoverRelocation(movementInfo);
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
+    
+    WorldPacket data(MSG_MOVE_ROOT, recv_data.size());
+    data << _player->GetPackGUID();
+    movementInfo.Write(data);
+    _player->SendMovementMessageToSet(std::move(data), true, _player);
     
     // Set unit client state for brevity, though it should not be used
     _player->addUnitState(UNIT_STAT_CLIENT_ROOT);

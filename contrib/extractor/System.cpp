@@ -30,7 +30,7 @@
 #endif
 
 #include "dbcfile.h"
-#include "mpq_libmpq.h"
+#include <libmpq\mpq_libmpq.h>
 
 #include "loadlib/adt.h"
 #include "loadlib/wdt.h"

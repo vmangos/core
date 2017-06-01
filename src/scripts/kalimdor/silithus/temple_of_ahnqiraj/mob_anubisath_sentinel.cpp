@@ -43,11 +43,11 @@ EndScriptData */
 #define SPELL_STORM_BUFF        2148
 #define SPELL_STORM             26546
 
-#define SPELL_ENRAGE				24318	
-#define EMOTE_ENRAGE	         -1000003	
+#define SPELL_ENRAGE            24318
+#define EMOTE_ENRAGE            -1000003
 
-#define SPELL_TRANSFER			2400
-#define EMOTE_TRANSFER       -1388101
+#define SPELL_TRANSFER          2400
+#define EMOTE_TRANSFER          -1388101
 
 struct aqsentinelAI;
 class SentinelAbilityAura : public Aura
@@ -70,40 +70,42 @@ struct aqsentinelAI : public ScriptedAI
     uint32 m_uiDrainMana_Timer;
     uint8 m_uiDrainCount;
     std::vector<ObjectGuid> _playerList;
-	bool m_bEnraged;
-	bool m_bAlone;
+    bool m_bEnraged;
+    bool m_bAlone;
+    bool gatherOthersWhenAggro;
+    Creature *nearby[3];
 
     void selectAbility(int asel)
     {
         switch (asel)
         {
-            case 0:
-                ability = SPELL_MENDING_BUFF;
-                break;
-            case 1:
-				ability = SPELL_MSTRIKE_BUFF;
-                break;
-            case 2:
-				ability = SPELL_STORM_BUFF;
-                break;
-            case 3:
-                ability = SPELL_REFLECTAF_BUFF;
-                break;
-            case 4:
-                ability = SPELL_REFLECTSFr_BUFF;
-                break;
-            case 5:
-                ability = SPELL_THORNS_BUFF;
-                break;
-            case 6:
-                ability = SPELL_THUNDER_BUFF;
-                break;
-            case 7:
-				ability = SPELL_KNOCK_BUFF;
-                break;
-            case 8:
-				ability = SPELL_MANAB_BUFF;
-                break;
+        case 0:
+            ability = SPELL_MENDING_BUFF;
+            break;
+        case 1:
+            ability = SPELL_MSTRIKE_BUFF;
+            break;
+        case 2:
+            ability = SPELL_STORM_BUFF;
+            break;
+        case 3:
+            ability = SPELL_REFLECTAF_BUFF;
+            break;
+        case 4:
+            ability = SPELL_REFLECTSFr_BUFF;
+            break;
+        case 5:
+            ability = SPELL_THORNS_BUFF;
+            break;
+        case 6:
+            ability = SPELL_THUNDER_BUFF;
+            break;
+        case 7:
+            ability = SPELL_KNOCK_BUFF;
+            break;
+        case 8:
+            ability = SPELL_MANAB_BUFF;
+            break;
         }
     }
 
@@ -111,21 +113,19 @@ struct aqsentinelAI : public ScriptedAI
     {
         ClearBudyList();
         abselected = 0;                                     // just initialization of variable
-		m_bEnraged = false;
+        m_bEnraged = false;
         Reset();
     }
 
-    Creature *nearby[3];
-
-	void MoveInLineOfSight(Unit* pWho) override
-	{
-		// Increase aggro radius
-		if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 45.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
-		{
-			AttackStart(pWho);
-		}
-		ScriptedAI::MoveInLineOfSight(pWho);
-	}
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        // Increase aggro radius
+        if (pWho->GetTypeId() == TYPEID_PLAYER && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 45.0f) && m_creature->IsWithinLOSInMap(pWho) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho);
+        }
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
 
     void ClearBudyList()
     {
@@ -197,7 +197,9 @@ struct aqsentinelAI : public ScriptedAI
     {
         for (int t = 0; t < 2; ++t)
         {
-            for (int i = !t ? (rand() % 8) : 0; i < 8; ++i)	// should be (rand() % 9) : 0; i < 9;			// temporarily precluding sentinels from rolling semi-broken mana burn
+            // should be (rand() % 9) : 0; i < 9;
+            // temporarily precluding sentinels from rolling semi-broken mana burn
+            for (int i = !t ? (rand() % 8) : 0; i < 8; ++i)
             {
                 if (!chosenAbilities[i])
                 {
@@ -234,8 +236,6 @@ struct aqsentinelAI : public ScriptedAI
         delete[] chosenAbilities;
     }
 
-    bool gatherOthersWhenAggro;
-
     void Reset()
     {
         if (!m_creature->isDead())
@@ -252,7 +252,7 @@ struct aqsentinelAI : public ScriptedAI
         gatherOthersWhenAggro = true;
         m_uiKnock_Timer = 13000;
         m_uiDrainMana_Timer = 11000;
-		m_bEnraged = 0;
+        m_bEnraged = 0;
         m_uiDrainCount = 0;
     }
 
@@ -264,18 +264,18 @@ struct aqsentinelAI : public ScriptedAI
     void cast_knock()
     {
         if (Unit* victim = m_creature->getVictim())
-			m_creature->CastSpell(victim, SPELL_KNOCK, false);
-	}
+            m_creature->CastSpell(victim, SPELL_KNOCK, false);
+    }
 
-	// Threat reduction for Knock Away
-	void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
-	{
-		if ((pSpell->Id == SPELL_KNOCK) && pTarget->GetTypeId() == TYPEID_PLAYER)
-		{
-			if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
-				m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -20);
-		}
-	}
+    // Threat reduction for Knock Away
+    void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
+    {
+        if ((pSpell->Id == SPELL_KNOCK) && pTarget->GetTypeId() == TYPEID_PLAYER)
+        {
+            if (m_creature->getThreatManager().getThreat(m_creature->getVictim()))
+                m_creature->getThreatManager().modifyThreatPercent(m_creature->getVictim(), -20);
+        }
+    }
 
     void Aggro(Unit* pWho)
     {
@@ -298,10 +298,10 @@ struct aqsentinelAI : public ScriptedAI
         }
     }
 
-	// Transfer powers on death
+    // Transfer powers on death
     void JustDied(Unit*)
     {
-		m_bAlone = true;
+        m_bAlone = true;
         for (int ni = 0; ni < 3; ++ni)
         {
             Creature *sent = nearby[ni];
@@ -309,16 +309,16 @@ struct aqsentinelAI : public ScriptedAI
                 continue;
             if (sent->isDead())
                 continue;
-			m_bAlone = false;
-			DoCastSpellIfCan(sent, SPELL_TRANSFER, CAST_TRIGGERED);
+            m_bAlone = false;
+            DoCastSpellIfCan(sent, SPELL_TRANSFER, CAST_TRIGGERED);
             uint32 h = sent->GetHealth() + (sent->GetMaxHealth() / 2);
             if (h > sent->GetMaxHealth())
                 h = sent->GetMaxHealth();
             sent->SetHealth(h);
             ((aqsentinelAI *)sent->AI())->GainSentinelAbility(ability);
         }
-		if (!m_bAlone)
-			DoScriptText(EMOTE_TRANSFER, m_creature);
+        if (!m_bAlone)
+            DoScriptText(EMOTE_TRANSFER, m_creature);
     }
 
     Unit *GetHatedManaUser()
@@ -334,16 +334,16 @@ struct aqsentinelAI : public ScriptedAI
     }
     void UpdateAI(const uint32 uiDiff)
     {
-		//Return since we have no target
-		if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-			return;
+        //Return since we have no target
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
 
         if (ability == SPELL_KNOCK_BUFF)
         {
             if (m_uiKnock_Timer < uiDiff)
             {
                 //cast_knock();
-				DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK);
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_KNOCK);
                 m_uiKnock_Timer = 13000;
             }
             else
@@ -394,14 +394,14 @@ struct aqsentinelAI : public ScriptedAI
                 m_uiDrainMana_Timer -= uiDiff;
         }
 
-		if (!m_bEnraged && m_creature->GetHealthPercent() < 30.0f)
-		{
-			if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
-			{
-				DoScriptText(EMOTE_ENRAGE, m_creature);
-				m_bEnraged = true;
-			}
-		}
+        if (!m_bEnraged && m_creature->GetHealthPercent() < 30.0f)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+            {
+                DoScriptText(EMOTE_ENRAGE, m_creature);
+                m_bEnraged = true;
+            }
+        }
 
         DoMeleeAttackIfReady();
     }
@@ -425,20 +425,20 @@ Unit* SentinelAbilityAura::GetTriggerTarget() const
 {
     switch (abilityId)
     {
-        case SPELL_KNOCK_BUFF:
-        case SPELL_THUNDER_BUFF:
-        case SPELL_MSTRIKE_BUFF:
-        case SPELL_STORM_BUFF:
-            return aOwner->m_creature->getVictim();
+    case SPELL_KNOCK_BUFF:
+    case SPELL_THUNDER_BUFF:
+    case SPELL_MSTRIKE_BUFF:
+    case SPELL_STORM_BUFF:
+        return aOwner->m_creature->getVictim();
 
-        case SPELL_MANAB_BUFF:
-            return aOwner->GetHatedManaUser();
-        case SPELL_MENDING_BUFF:
-        case SPELL_REFLECTAF_BUFF:
-        case SPELL_REFLECTSFr_BUFF:
-        case SPELL_THORNS_BUFF:
-        default:
-            return aOwner->m_creature;
+    case SPELL_MANAB_BUFF:
+        return aOwner->GetHatedManaUser();
+    case SPELL_MENDING_BUFF:
+    case SPELL_REFLECTAF_BUFF:
+    case SPELL_REFLECTSFr_BUFF:
+    case SPELL_THORNS_BUFF:
+    default:
+        return aOwner->m_creature;
     }
 }
 
