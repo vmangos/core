@@ -833,6 +833,7 @@ m_obj->m_updateTracker.Reset();
 
         void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
         void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
+        void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
 
         void SendObjectDeSpawnAnim(ObjectGuid guid);
         void SendGameObjectCustomAnim(ObjectGuid guid, uint32 animId = 0);
