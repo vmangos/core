@@ -14,17 +14,89 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Noth
-SD%Complete: 60
-SDComment: Summons need tuning, timers need tuning, need to add berserk "phase" after last skeleton phase
-SDCategory: Naxxramas
-EndScriptData */
+// Rewritten completely by Gemt
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include "Duration.h"
 
-enum
+#include <algorithm>
+
+// https://pastebin.com/AXPeUXub
+// pastbin link above has various noted timers and sources. Not much useful, but it's some of my notes
+// from when researching the encounter.
+
+// Regarding summoning add spells, there are a few spells which summon both two types of mobs, 
+// or multiple of the same mob in different locations with the same spell. However
+// our core does not support multiple spell target coordinates due to limitations with the DB, so 
+// we have to use the spells which summon a single creature.
+enum eSpell
+{
+    SPELL_TP_CENTER           = 29231,
+    SPELL_TP_BALC             = 29216,
+    SPELL_CRIPPLE             = 29212, // used on players where noth blinked FROM 
+    SPELL_CURSE_PLAGUEBRINGER = 29213,
+    SPELL_IMMUNE_ALL          = 29230, // used on TP to balc
+
+    SPELL_BLINK_1 = 29208,
+    SPELL_BLINK_2 = 29209,
+    SPELL_BLINK_3 = 29210,
+    SPELL_BLINK_4 = 29211,
+
+    SPELL_SUM_WARR_SW = 29247,
+    SPELL_SUM_WARR_NW = 29248,
+    SPELL_SUM_WARR_NE = 29249,
+
+    SPELL_SUM_CHAMP_SW1 = 29217,
+    SPELL_SUM_CHAMP_SW2 = 29224,
+    SPELL_SUM_CHAMP_SW3 = 29225,
+    SPELL_SUM_CHAMP_SW4 = 29227,
+    
+    SPELL_SUM_CHAMP_W   = 29238,
+    
+    SPELL_SUM_CHAMP_NW1 = 29255,
+    SPELL_SUM_CHAMP_NW2 = 29267,
+    SPELL_SUM_CHAMP_NW3 = 29257,
+    
+    SPELL_SUM_CHAMP_NE1 = 29258,
+    SPELL_SUM_CHAMP_NE2 = 29262,
+    
+    SPELL_SUM_GUARD_NE = 29226,
+    SPELL_SUM_GUARD_NW = 29239,
+    SPELL_SUM_GUARD_SW1 = 29256,
+    SPELL_SUM_GUARD_SW2 = 29268,
+};
+
+static const uint32 ChampionSpells[10] =
+{
+    //g1
+    SPELL_SUM_CHAMP_SW1,
+    SPELL_SUM_CHAMP_SW2,
+    SPELL_SUM_CHAMP_SW3,
+    SPELL_SUM_CHAMP_SW4,
+    //g2
+    SPELL_SUM_CHAMP_W,
+    SPELL_SUM_CHAMP_NW1,
+    SPELL_SUM_CHAMP_NW2,
+    SPELL_SUM_CHAMP_NW3,
+    //g3
+    SPELL_SUM_CHAMP_NE1,
+    SPELL_SUM_CHAMP_NE2,
+};
+
+static const uint8 g1_start = 0, g1_size = 4;
+static const uint8 g2_start = 4, g2_size = 4;
+static const uint8 g3_start = 8, g3_size = 2;
+
+static const uint32 GuardianSpells[4] =
+{
+    SPELL_SUM_GUARD_NE,
+    SPELL_SUM_GUARD_NW,
+    SPELL_SUM_GUARD_SW1,
+    SPELL_SUM_GUARD_SW2,
+};
+
+enum eScriptText
 {
     SAY_AGGRO1                          = -1533075,
     SAY_AGGRO2                          = -1533076,
@@ -35,115 +107,32 @@ enum
     SAY_SLAY2                           = -1533080,
     SAY_DEATH                           = -1533081,
 
-    EMOTE_WARRIOR                       = -1533130,
-    EMOTE_SKELETON                      = -1533131,
-    EMOTE_TELEPORT                      = -1533132,
-    EMOTE_TELEPORT_RETURN               = -1533133,
-
-    
-
-    SPELL_BLINK_1                       = 29208,
-    SPELL_BLINK_2                       = 29209,
-    SPELL_BLINK_3                       = 29210,
-    SPELL_BLINK_4                       = 29211,
-
-    
-
-    // these also need target coords
-    SPELL_SUMMON_WARRIOR_1              = 29247,
-    SPELL_SUMMON_WARRIOR_2              = 29248,
-    SPELL_SUMMON_WARRIOR_3              = 29249,
-
-    SPELL_SUMMON_WARRIOR_THREE          = 29237,
-
-    // todo: these need target coordinates
-    // they all need to be hostile
-    SPELL_SUMMON_CHAMP01                = 29217,
-    SPELL_SUMMON_CHAMP02                = 29224,
-    SPELL_SUMMON_CHAMP03                = 29225,
-    SPELL_SUMMON_CHAMP04                = 29227,
-
-    SPELL_SUMMON_CHAMP05                = 29238,
-    SPELL_SUMMON_CHAMP06                = 29255,
-    SPELL_SUMMON_CHAMP07                = 29257,
-    SPELL_SUMMON_CHAMP08                = 29258,
-    SPELL_SUMMON_CHAMP09                = 29262,
-    SPELL_SUMMON_CHAMP10                = 29267,
-
-    SPELL_SUMMON_GUARD01                = 29226,
-    SPELL_SUMMON_GUARD02                = 29239,
-    SPELL_SUMMON_GUARD03                = 29256,
-    SPELL_SUMMON_GUARD04                = 29268,
-
-    PHASE_GROUND                        = 0,
-    PHASE_BALCONY                       = 1,
-
-    PHASE_SKELETON_1                    = 1,
-    PHASE_SKELETON_2                    = 2,
-    PHASE_SKELETON_3                    = 3,
-
+    // Emotes probably only wotlk
+    //EMOTE_WARRIOR                       = -1533130,
+    //EMOTE_SKELETON                      = -1533131,
+    //EMOTE_TELEPORT                      = -1533132,
+    //EMOTE_TELEPORT_RETURN               = -1533133,
 };
 
 enum eNPCs
 {
-
     NPC_PLAGUED_GUARDIAN  = 16981,
-    NPC_PLAGUED_CONSTRUCT = 16982, // not used afaik
+    NPC_PLAGUED_CONSTRUCT = 16982, // unknown if this was ever used
     NPC_PLAGUED_CHAMPION  = 16983,
     NPC_PLAGUED_WARRIOR   = 16984,
 };
 
-static constexpr uint32 WarriorSpells[] = {29247, 29248, 29249};
-static constexpr uint32 GuardianSpells[] = { 29226, 29239, 29256, 29268 };
-
-enum Spells
+enum eEvents
 {
-    SPELL_CRIPPLE               = 29212, // used on players where noth blinked FROM 
-    SPELL_CURSE_PLAGUEBRINGER   = 29213,
-
-    SPELL_TELEPORT              = 29216,
-    SPELL_TELEPORT_RETURN       = 29231,
+    EVENT_BLINK = 1,
+    EVENT_CURSE,
+    EVENT_TP_BALC,
+    EVENT_TP_GROUND,
+    EVENT_RMV_INVULN,
+    EVENT_BALC_ADDS,
+    EVENT_WARRIORS
 };
 
-enum Events 
-{
-    EVENT_CURSE = 1,            // curse of the plaguebringer
-    EVENT_BLINK,                // blink 
-    EVENT_WARRIOR,              // summon warriors during ground phase
-    EVENT_BALCONY,              // become untargetable and begin balcony phase
-    EVENT_BALCONY_TELEPORT,     // actually teleport to balcony, this is slightly delayed
-    EVENT_WAVE,                 // spawn wave during balcony phase
-    EVENT_GROUND,               // end balcony phase and teleport to ground
-    EVENT_GROUND_ATTACKABLE     // become attackable and aggressive again at start of ground phase, once again slightly delayed to prevent motionmaster weirdness
-};
-
-static const uint32 SUMMON_CD() { return 30000; }
-static const uint32 BLINK_CD() { return urand(25000, 30000); }
-static const uint32 CURSE_CD(bool initial) { return initial ? 4000 : 28000; }
-static const uint32 WRATH_CD() { return 123; } // todo: missing completely
-
-/*
-Teleport/Champions - 90 sec after initial aggro Noth teleports to a balcony making him unreachable for DPS while on the ground two waves of Plagues Champions spawn. 
-Once these waves are beaten or 70 seconds have passed, he teleports back down.
-
-Teleport/Champions+Guardians - 110 sec after the 1st Teleport Noth teleports again to a balcony making him unreachable for DPS while on the ground two waves of 
-Plagues Champions + Plagued Guardians spawn. Once these waves are beaten or 90 seconds have passed, he teleports back down. Plagued Guardians are immune to shackle.
-
-Teleport/Guardians - 180 sec after the 2nd Teleport Noth teleports to a balcony making him unreachable for DPS while on the ground two waves of Plagues Guardians spawn.
-Once these waves are beaten or ?? seconds have passed, he teleports back down. Plagued Guardians are immune to shackle.
-*/
-static const uint32 TELEPORT_CD() { return 90000; } // todo: supposedly longer cd after each blink?
-
-/*
-00:10 first of 3 waves of warriors
-01:30 teleport to balcony, 2 waves of champions
-02:40 teleport back into room
-02:50 first of 5 waves of warriors
-04:30 teleport to balcony, 2 mixed champion/guardian waves
-06:00 teleport back into room
-06:10 first of (7)? waves of warriors
-09:00 tp to balcony (flame, death, destruction?)
-*/
 struct boss_nothAI : public ScriptedAI
 {
     boss_nothAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -153,41 +142,200 @@ struct boss_nothAI : public ScriptedAI
     }
 
     instance_naxxramas* m_pInstance;
-
-    uint8 m_uiPhase;
-    uint8 m_uiPhaseSub;
-    uint32 m_uiPhaseTimer;
-
-    uint32 m_uiBlinkTimer;
-    uint32 m_uiCurseTimer;
-    uint32 m_uiSummonTimer;
-
-    uint32 balcPhaseCount;
+    uint8 phaseCounter;
 
     EventMap m_events;
 
     void Reset()
     {
-        balcPhaseCount = 0;
-
-        //m_uiPhase = PHASE_GROUND;
-        //m_uiPhaseSub = PHASE_GROUND;
-        //m_uiPhaseTimer = 110000;
-        //m_uiBlinkTimer = 25000;
-        //m_uiCurseTimer = 4000;
-        //m_uiSummonTimer = 30000;
+        phaseCounter = 0;
+        m_events.Reset();
+    }
+    
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_NOTH, FAIL);
     }
 
     void Aggro(Unit* pWho)
     {
+        sLog.outBasic("aggro");
         m_creature->SetInCombatWithZone();
 
-        //m_events.ScheduleEvent(EVENT_SUMMON, SUMMON_CD());
+        m_events.ScheduleEvent(EVENT_CURSE,    Seconds(urand(8,12)));
+        m_events.ScheduleEvent(EVENT_BLINK,    Seconds(urand(30,40)));
+        m_events.ScheduleEvent(EVENT_WARRIORS, Seconds(10));
+        m_events.ScheduleEvent(EVENT_TP_BALC,  Seconds(90));
 
         DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_NOTH, IN_PROGRESS);
+    }
+
+    void SpawnWarriorsAndRepeatEvent()
+    {
+        DoScriptText(SAY_SUMMON, m_creature);
+
+        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_SW, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_NW, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_NE, CAST_TRIGGERED);
+
+        m_events.Repeat(Seconds(30));
+    }
+
+    void BlinkAndRepeatEvent()
+    {
+        static uint32 const auiSpellBlink[4] =
+        {
+            SPELL_BLINK_1, SPELL_BLINK_2, SPELL_BLINK_3, SPELL_BLINK_4
+        };
+
+        DoCastSpellIfCan(m_creature, SPELL_CRIPPLE, CAST_TRIGGERED | CAST_FORCE_CAST);
+        DoCastSpellIfCan(m_creature, auiSpellBlink[urand(0, 3)], CAST_TRIGGERED|CAST_FORCE_CAST);
+        m_events.Repeat(Seconds(urand(30, 40)));
+        DoResetThreat();
+        if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            AttackStart(target);
+    }
+
+    void CurseAndRepeatEvent()
+    {
+        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+        {
+            DoCastSpellIfCan(pTarget, SPELL_CURSE_PLAGUEBRINGER);
+            m_events.Repeat(Seconds(urand(50,60))); //It's somewhere around 50seconds+
+        }
+        else {
+            m_events.Repeat(100);
+        }
+    }
+
+    void TeleportToBalc()
+    {
+        if (DoCastSpellIfCan(m_creature, SPELL_TP_BALC, CAST_TRIGGERED|CAST_FORCE_CAST) != CAST_OK)
+        {
+            m_events.Repeat(100); // try again
+            return;
+        }
+
+        m_events.Reset();
+
+        // 70, 90 and 120 seconds for 1st, 2nd and 3rd balc phase respectively.
+        m_events.ScheduleEvent(EVENT_TP_GROUND, Seconds(70 + 25 * phaseCounter));
+
+        auto first_spawn = Seconds(urand(5, 7));
+        m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn);
+        m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(25+urand(0,5)));
+
+        m_creature->CastSpell(m_creature, SPELL_IMMUNE_ALL, true);
+
+        m_creature->GetMotionMaster()->MoveIdle();
+        DoStopAttack();
+    }
+
+    void TeleportFromBalc()
+    {
+        if (DoCastSpellIfCan(m_creature, SPELL_TP_CENTER, CAST_TRIGGERED) != CAST_OK)
+        {
+            m_events.Repeat(100); // try again
+            return;
+        }
+
+        m_events.Reset();
+        m_events.ScheduleEvent(EVENT_RMV_INVULN, Seconds(2));
+    }
+
+    void Summon4Champions()
+    {
+        // We need to spawn 4 champions. We have 10 different possible locations,
+        // and the adds need to be somewhat evenly spread out, yet somewhat randomized.
+
+        std::vector<uint32> champs(ChampionSpells, ChampionSpells + sizeof(ChampionSpells)/sizeof(uint32));
+        
+        // First selecting one random champ from each of the 3 main groups
+        uint32 champ1 = champs[urand(g1_start, g1_start+g1_size-1)];
+        uint32 champ2 = champs[urand(g2_start, g2_start+g2_size-1)];
+        uint32 champ3 = champs[urand(g3_start, g3_start+g3_size-1)];
+        
+        // Moving the selected champions to the end of the vector
+        std::remove(champs.begin(), champs.end(), champ1);
+        std::remove(champs.begin(), champs.end(), champ2);
+        std::remove(champs.begin(), champs.end(), champ3);
+
+        // Summoning the selected 3 guardians
+        DoCastSpellIfCan(m_creature, champ1, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, champ2, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, champ3, CAST_TRIGGERED);
+        
+        // Choosing the final champion at random between the remaining 7 locations
+        uint32 champ4 = champs[urand(0, 6)];
+        DoCastSpellIfCan(m_creature, champ4, CAST_TRIGGERED);
+    }
+
+    void Summon2Guardians()
+    {
+        // Choose one of two locations south-west, and either the north-east or north-west location
+        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW1, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_NE : SPELL_SUM_GUARD_NW, CAST_TRIGGERED);
+    }
+
+    void SpawnBalcAdds()
+    {
+        DoScriptText(SAY_SUMMON, m_creature);
+        switch (phaseCounter)
+        {
+        case 0:
+            Summon4Champions();
+            break;
+        case 1:
+            Summon4Champions();
+            Summon2Guardians();
+            break;
+        default:
+            // Sources for what happens in a third+ balcony phase is missing. In wotlk he would enrage, but 
+            // in vanilla all we know is "you get overrun". 
+            // Presumption then is there should be no surviving this wave, so a suggestion is to just use every
+            // single summon spell
+            for(int i = 0; i < 10; i++)
+                DoCastSpellIfCan(m_creature, ChampionSpells[i], CAST_TRIGGERED);
+            for (int i = 0; i < 4; i++)
+                DoCastSpellIfCan(m_creature, GuardianSpells[i], CAST_TRIGGERED);
+            break;
+        }
+    }
+
+    void OnRemoveVulnerability()
+    {
+        m_events.Reset();
+
+        m_events.ScheduleEvent(EVENT_BLINK,    Seconds(urand(2, 10)));
+        m_events.ScheduleEvent(EVENT_CURSE,    Seconds(urand(2, 10)));
+        m_events.ScheduleEvent(EVENT_WARRIORS, Seconds(urand(2,10)));
+        m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_ALL);
+
+        DoResetThreat();
+        if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            AttackStart(target);
+
+        // note that we increment phaseCounter here
+        switch (++phaseCounter) 
+        {
+        // case 0: won't happen, its initialized from Aggro()
+        case 1:
+            m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(110));
+            break;
+        case 2:
+            m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
+            break;
+        default:
+            // No good sources on duration of 4th ground phase, all guides explain it as a wipe
+            // if you don't kill him during the 3rd ground phase. We'll just repeat previous phase logic
+            // after this. It's highly unlikely that any guild get to this stage without killing him or wiping.
+            m_events.ScheduleEvent(EVENT_TP_BALC, Seconds(180));
+            //sLog.outError("boss_nothAI::OnRemoveVulnerability() called with phaseCounter: %d", phaseCounter);
+        }
     }
 
     void JustSummoned(Creature* pSummoned)
@@ -208,159 +356,56 @@ struct boss_nothAI : public ScriptedAI
             m_pInstance->SetData(TYPE_NOTH, DONE);
     }
 
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
-    {
-        if (pCaster == m_creature && pSpell->Effect[EFFECT_INDEX_0] == SPELL_EFFECT_LEAP)
-            DoCastSpellIfCan(m_creature, SPELL_CRIPPLE);
-    }
-
-    void SummonWave()
-    {
-
-    }
-
-    void Blink()
-    {
-
-    }
-
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
+        bool isOnBalc = m_creature->HasAura(SPELL_IMMUNE_ALL);
+        if (!isOnBalc)
+        {
+            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+                return;
+        }
+        else
+        {
+            // Will make him TP down rather thank walk through the air on a reset/wipe
+            if (m_creature->getThreatManager().isThreatListEmpty())
+            {
+                if (m_events.GetTimeUntilEvent(EVENT_RMV_INVULN) > 2000)
+                {
+                    TeleportFromBalc();
+                }
+            }
+        }
         
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
             switch (l_EventId)
             {
-
+            case EVENT_BLINK:
+                BlinkAndRepeatEvent();
+                break;
+            case EVENT_CURSE:
+                CurseAndRepeatEvent();
+                break;
+            case EVENT_TP_BALC:
+                TeleportToBalc();
+                break;
+            case EVENT_TP_GROUND:
+                TeleportFromBalc();
+                break;
+            case EVENT_RMV_INVULN:
+                OnRemoveVulnerability();
+                break;
+            case EVENT_BALC_ADDS:
+                SpawnBalcAdds();
+                break;
+            case EVENT_WARRIORS:
+                SpawnWarriorsAndRepeatEvent();
+                break;
             }
         }
-
-        if (m_uiPhase == PHASE_GROUND)
-        {
-            if (m_uiPhaseTimer < uiDiff)
-            {
-                // TODO: avoid teleport when skeleton phases is ended
-
-                if (DoCastSpellIfCan(m_creature, SPELL_TELEPORT) == CAST_OK)
-                {
-                    DoScriptText(EMOTE_TELEPORT, m_creature);
-                    m_creature->GetMotionMaster()->MoveIdle();
-                    m_uiPhaseTimer = 70000;
-                    m_uiPhase = PHASE_BALCONY;
-                    ++m_uiPhaseSub;
-                    return;
-                }
-            }
-            else
-                m_uiPhaseTimer -= uiDiff;
-
-            if (m_uiBlinkTimer < uiDiff)
-            {
-                static uint32 const auiSpellBlink[4] =
-                {
-                    SPELL_BLINK_1, SPELL_BLINK_2, SPELL_BLINK_3, SPELL_BLINK_4
-                };
-
-                if (DoCastSpellIfCan(m_creature, auiSpellBlink[urand(0, 3)]) == CAST_OK)
-                {
-                    DoResetThreat();
-                    m_uiBlinkTimer = 25000;
-                }
-            }
-            else
-                m_uiBlinkTimer -= uiDiff;
-
-            if (m_uiCurseTimer < uiDiff)
-            {
-                DoCastSpellIfCan(m_creature, SPELL_CURSE_PLAGUEBRINGER);
-                m_uiCurseTimer = 28000;
-            }
-            else
-                m_uiCurseTimer -= uiDiff;
-
-            if (m_uiSummonTimer < uiDiff)
-            {
-                DoScriptText(SAY_SUMMON, m_creature);
-                DoScriptText(EMOTE_WARRIOR, m_creature);
-
-                static uint32 const auiSpellSummonPlaguedWarrior[3] =
-                {
-                    SPELL_SUMMON_WARRIOR_1, SPELL_SUMMON_WARRIOR_2, SPELL_SUMMON_WARRIOR_3
-                };
-
-                for (uint8 i = 0; i < 2; ++i)
-                    DoCastSpellIfCan(m_creature, auiSpellSummonPlaguedWarrior[urand(0, 2)], CAST_TRIGGERED);
-
-                m_uiSummonTimer = 30000;
-            }
-            else
-                m_uiSummonTimer -= uiDiff;
-
+        if (!isOnBalc)
             DoMeleeAttackIfReady();
-        }
-        else
-        {
-            if (m_uiPhaseTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RETURN) == CAST_OK)
-                {
-                    DoScriptText(EMOTE_TELEPORT_RETURN, m_creature);
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                    m_uiPhaseTimer = 90000;
-                    m_uiPhase = PHASE_GROUND;
-                    return;
-                }
-            }
-            else
-                m_uiPhaseTimer -= uiDiff;
-
-            if (m_uiSummonTimer < uiDiff)
-            {
-                DoScriptText(EMOTE_SKELETON, m_creature);
-
-                static uint32 const auiSpellSummonPlaguedChampion[10] =
-                {
-                    SPELL_SUMMON_CHAMP01, SPELL_SUMMON_CHAMP02, SPELL_SUMMON_CHAMP03, SPELL_SUMMON_CHAMP04, SPELL_SUMMON_CHAMP05, SPELL_SUMMON_CHAMP06, SPELL_SUMMON_CHAMP07, SPELL_SUMMON_CHAMP08, SPELL_SUMMON_CHAMP09, SPELL_SUMMON_CHAMP10
-                };
-
-                static uint32 const auiSpellSummonPlaguedGuardian[4] =
-                {
-                    SPELL_SUMMON_GUARD01, SPELL_SUMMON_GUARD02, SPELL_SUMMON_GUARD03, SPELL_SUMMON_GUARD04
-                };
-
-                // A bit unclear how many in each sub phase, and if there are any clear difference in 25man
-                switch (m_uiPhaseSub)
-                {
-                    case PHASE_SKELETON_1:
-                    {
-                        for (uint8 i = 0; i < 2; ++i)
-                            DoCastSpellIfCan(m_creature, auiSpellSummonPlaguedChampion[urand(0, 9)], CAST_TRIGGERED);
-
-                        break;
-                    }
-                    case PHASE_SKELETON_2:
-                    {
-                        DoCastSpellIfCan(m_creature, auiSpellSummonPlaguedChampion[urand(0, 9)], CAST_TRIGGERED);
-                        DoCastSpellIfCan(m_creature, auiSpellSummonPlaguedGuardian[urand(0, 9)], CAST_TRIGGERED);
-                        break;
-                    }
-                    case PHASE_SKELETON_3:
-                    {
-                        for (uint8 i = 0; i < 2; ++i)
-                            DoCastSpellIfCan(m_creature, auiSpellSummonPlaguedGuardian[urand(0, 3)], CAST_TRIGGERED);
-
-                        break;
-                    }
-                }
-
-                m_uiSummonTimer = 30000;
-            }
-            else
-                m_uiSummonTimer -= uiDiff;
-        }
     }
 };
 
