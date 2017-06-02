@@ -990,6 +990,9 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_CHANNEL_INVITE_MIN_LEVEL,                   "ChannelInvite.MinLevel", 10);
     setConfig(CONFIG_BOOL_WHISPER_RESTRICTION,                          "WhisperRestriction", false);
     setConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL,                       "WorldChan.MinLevel", 0);
+    setConfig(CONFIG_UINT32_SAY_MIN_LEVEL,                              "SayMinLevel", 0);
+    setConfig(CONFIG_UINT32_YELL_MIN_LEVEL,                             "YellMinLevel", 0);
+    setConfig(CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL,                        "SayEmoteMinLevel", 0);
     setConfig(CONFIG_UINT32_WHISP_DIFF_ZONE_MIN_LEVEL,                  "WhisperDiffZone.MinLevel", 0);
     setConfig(CONFIG_UINT32_YELLRANGE_LINEARSCALE_MAXLEVEL,             "YellRange.LinearScale.MaxLevel", 0);
     setConfig(CONFIG_UINT32_YELLRANGE_QUADRATICSCALE_MAXLEVEL,          "YellRange.QuadraticScale.MaxLevel", 0);

@@ -1756,6 +1756,9 @@ YellRange.LinearScale.MaxLevel      = 0
 YellRange.QuadraticScale.MaxLevel   = 0
 ChannelInvite.MinLevel = 10
 WhisperRestriction = 0
+SayMinLevel = 0;
+SayEmoteMinLevel = 0;
+YellMinLevel = 0;
 
 # Database logs
 LogsDB.Chat                 = 0
