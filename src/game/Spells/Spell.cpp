@@ -1855,6 +1855,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             switch (m_spellInfo->Id)
             {
                 case 26052:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
+                case 29213:                                 // Curse of the Plaguebringer (Naxxramas, Noth the Plaguebringer)
                     SelectClosestTargets = true;
                     break;
             }
@@ -2109,14 +2110,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if ((*itr)->IsWithinDist(m_caster, minDist))
                         targetUnitMap.erase(itr);
                 }
-	    }
+	        }
             if (SelectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
-	    {
+	        {
                 targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
                 UnitList::iterator itr = targetUnitMap.begin();
                 advance(itr, unMaxTargets);
                 targetUnitMap.erase(itr, targetUnitMap.end());
-	    }
+	        }
             break;
         }
         case TARGET_AREAEFFECT_INSTANT:
