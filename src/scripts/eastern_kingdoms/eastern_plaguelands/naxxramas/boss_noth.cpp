@@ -202,10 +202,13 @@ struct boss_nothAI : public ScriptedAI
 
     void CurseAndRepeatEvent()
     {
-        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+        // From what I can understand, the plague should always target the current target,
+        // and will then also target the next 19 closest players to the current target
+        if (Unit* pTarget = m_creature->getVictim())
         {
             DoCastSpellIfCan(pTarget, SPELL_CURSE_PLAGUEBRINGER);
             m_events.Repeat(Seconds(urand(50,60))); //It's somewhere around 50seconds+
+
         }
         else {
             m_events.Repeat(100);
