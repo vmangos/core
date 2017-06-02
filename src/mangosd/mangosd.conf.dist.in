@@ -1264,6 +1264,22 @@ Visibility.AIRelocationNotifyDelay = 1000
 #        Talent Point rates
 #        Default: 1
 #
+#    Rate.RespecBaseCost
+#        Minimum cost for unlearning talents, in gold
+#        Default: 1
+#
+#    Rate.RespecMultiplicativeCost
+#        Cost * multiplier = total cost of unlearning talents, in gold
+#        Default: 5
+#
+#    Rate.RespecMaxMultiplier
+#        RespecMultiplicativeCost * RespecMaxMultiplier = maximum cost of unlearning talents, in gold
+#        Default: 10
+#
+#    Rate.RespecMinMultiplier
+#        Once the player exceeds this multiplier value, they can never drop below it again
+#        Default: 2
+#
 #    Rate.Reputation.Gain
 #         Reputation Gain rate
 #         Default: 1
@@ -1388,6 +1404,10 @@ Rate.Honor = 1
 Rate.Mining.Amount = 1
 Rate.Mining.Next   = 1
 Rate.Talent = 1
+Rate.RespecBaseCost = 1
+Rate.RespecMultiplicativeCost = 5
+Rate.RespecMaxMultiplier = 10
+Rate.RespecMinMultiplier = 2
 Rate.Reputation.Gain = 1
 Rate.Reputation.LowLevel.Kill    = 0.2
 Rate.Reputation.LowLevel.Quest   = 1

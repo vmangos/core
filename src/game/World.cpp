@@ -1036,6 +1036,11 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY,                     "Network.PacketBroadcast.Frequency", 50);
     setConfig(CONFIG_UINT32_PBCAST_DIFF_LOWER_VISIBILITY_DISTANCE,      "Network.PacketBroadcast.ReduceVisDistance.DiffAbove", 0);
 
+    setConfig(CONFIG_UINT32_RESPEC_BASE_COST,                           "Rate.RespecBaseCost",           1);
+    setConfig(CONFIG_UINT32_RESPEC_MULTIPLICATIVE_COST,                 "Rate.RespecMultiplicativeCost", 5);
+    setConfig(CONFIG_UINT32_RESPEC_MIN_MULTIPLIER,                      "Rate.RespecMinMultiplier",      2);
+    setConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER,                      "Rate.RespecMaxMultiplier",      10);
+
     if (getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT))
         setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, false);
 

@@ -522,7 +522,7 @@ Player::Player(WorldSession *session) : Unit(),
     rest_type = REST_TYPE_NO;
     ////////////////////Rest System/////////////////////
 
-    m_resetTalentsCost = 0;
+    m_resetTalentsMultiplier = 0;
     m_resetTalentsTime = 0;
     m_itemUpdateQueueBlocked = false;
 
@@ -3671,37 +3671,49 @@ void Player::_SaveSpellCooldowns()
     }
 }
 
-uint32 Player::resetTalentsCost() const
+void Player::updateResetTalentsMultiplier()
 {
-    // The first time reset costs 1 gold
-    if (m_resetTalentsCost < 1 * GOLD)
-        return 1 * GOLD;
-    // then 5 gold
-    else if (m_resetTalentsCost < 5 * GOLD)
-        return 5 * GOLD;
-    // After that it increases in increments of 5 gold
-    else if (m_resetTalentsCost < 10 * GOLD)
-        return 10 * GOLD;
-    else
+    time_t months = (sWorld.GetGameTime() - m_resetTalentsTime) / MONTH;
+
+    if (months > 0)
     {
-        time_t months = (sWorld.GetGameTime() - m_resetTalentsTime) / MONTH;
-        if (months > 0)
+        uint32 minMulti = sWorld.getConfig(CONFIG_UINT32_RESPEC_MIN_MULTIPLIER);
+        bool clamp = m_resetTalentsMultiplier >= minMulti;
+
+        if (months > m_resetTalentsMultiplier)
         {
-            // This cost will be reduced by a rate of 5 gold per month
-            int32 new_cost = int32((m_resetTalentsCost) - 5 * GOLD * months);
-            // to a minimum of 10 gold.
-            return uint32(new_cost < 10 * GOLD ? 10 * GOLD : new_cost);
+            m_resetTalentsMultiplier = 0;
         }
         else
         {
-            // After that it increases in increments of 5 gold
-            int32 new_cost = m_resetTalentsCost + 5 * GOLD;
-            // until it hits a cap of 50 gold.
-            if (new_cost > 50 * GOLD)
-                new_cost = 50 * GOLD;
-            return new_cost;
+            m_resetTalentsMultiplier -= months;
+        }
+
+        if (clamp && m_resetTalentsMultiplier < minMulti)
+        {
+            m_resetTalentsMultiplier = minMulti;
         }
     }
+}
+
+uint32 Player::resetTalentsCost()
+{
+    updateResetTalentsMultiplier(); // decay respec cost
+
+    if (!m_resetTalentsMultiplier) // initial respec
+    {
+        return sWorld.getConfig(CONFIG_UINT32_RESPEC_BASE_COST) * GOLD;
+    }
+
+    uint32 multiCost = sWorld.getConfig(CONFIG_UINT32_RESPEC_MULTIPLICATIVE_COST);
+    uint32 maxMulti = sWorld.getConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER);
+
+    if (m_resetTalentsMultiplier > maxMulti)
+    {
+        return (multiCost * maxMulti) * GOLD;
+    }
+
+    return (m_resetTalentsMultiplier * multiCost) * GOLD;
 }
 
 bool Player::resetTalents(bool no_cost)
@@ -3765,7 +3777,13 @@ bool Player::resetTalents(bool no_cost)
     {
         ModifyMoney(-(int32)cost);
 
-        m_resetTalentsCost = cost;
+        ++m_resetTalentsMultiplier;
+
+        if (m_resetTalentsMultiplier > sWorld.getConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER))
+        {
+            m_resetTalentsMultiplier = sWorld.getConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER);
+        }
+
         m_resetTalentsTime = time(NULL);
     }
 
@@ -13915,7 +13933,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     //       0     1        2     3     4      5       6      7   8      9            10            11
     //SELECT guid, account, name, race, class, gender, level, xp, money, playerBytes, playerBytes2, playerFlags,
     // 12          13          14          15   16           17        18         19         20         21          22           23                 24
-    //"position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
+    //"position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_multiplier,"
     // 25                 26       27       28       29       30         31           32            33        34    35      36                 37
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path,
     // 38               39                40             41               42               43             44
@@ -14180,7 +14198,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     m_Played_time[PLAYED_TIME_TOTAL] = fields[19].GetUInt32();
     m_Played_time[PLAYED_TIME_LEVEL] = fields[20].GetUInt32();
 
-    m_resetTalentsCost = fields[24].GetUInt32();
+    m_resetTalentsMultiplier = fields[24].GetUInt32();
     m_resetTalentsTime = time_t(fields[25].GetUInt64());
 
     // reserve some flags
@@ -15340,7 +15358,7 @@ void Player::SaveToDB(bool online, bool force)
     SqlStatement uberInsert = CharacterDatabase.CreateStatement(insChar, "REPLACE INTO characters (guid,account,name,race,class,gender,level,xp,money,playerBytes,playerBytes2,playerFlags,"
                               "map, position_x, position_y, position_z, orientation, "
                               "taximask, online, cinematic, "
-                              "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, "
+                              "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_multiplier, resettalents_time, "
                               "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
                               "death_expire_time, taxi_path, "
                               "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
@@ -15413,7 +15431,7 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0);
     //save, far from tavern/city
     //save, but in tavern/city
-    uberInsert.addUInt32(m_resetTalentsCost);
+    uberInsert.addUInt32(m_resetTalentsMultiplier);
     uberInsert.addUInt64(uint64(m_resetTalentsTime));
 
     uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos()->x));
