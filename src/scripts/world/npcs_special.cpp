@@ -1371,9 +1371,9 @@ enum
     SPELL_Flame_Breath = 20712
 };
 
-struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
+struct npc_arcanite_dragonlingAI : ScriptedPetAI
 {
-    explicit npc_arcanite_dragonling_dragonlingAI(Creature* pCreature) : ScriptedPetAI(pCreature)
+    explicit npc_arcanite_dragonlingAI(Creature* pCreature) : ScriptedPetAI(pCreature)
     {
         m_creature->SetCanModifyStats(true);
 
@@ -1389,7 +1389,7 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
         m_firebuffetTimer = urand(0, 10000);
         m_flamebreathTimer = urand(0, 20000);
 
-        npc_arcanite_dragonling_dragonlingAI::Reset();
+        npc_arcanite_dragonlingAI::Reset();
     }
 
     uint32 m_firebuffetTimer;
@@ -1428,9 +1428,9 @@ struct npc_arcanite_dragonling_dragonlingAI : ScriptedPetAI
     }
 };
 
-CreatureAI* GetAI_npc_arcanite_dragonling_dragonling(Creature* pCreature)
+CreatureAI* GetAI_npc_arcanite_dragonling(Creature* pCreature)
 {
-    return new npc_arcanite_dragonling_dragonlingAI(pCreature);
+    return new npc_arcanite_dragonlingAI(pCreature);
 }
 
 /*######
@@ -1469,7 +1469,7 @@ struct npc_timbermaw_ancestorAI : ScriptedPetAI
                 if (DoCastSpellIfCan(m_creature->GetOwner(), SPELL_HEALING_TOUCH, false) == CAST_OK)
                     m_healingTouchTimer = 7000;
             }
-            else if (Unit* const pTarget = m_creature->SelectRandomFriendlyTarget(m_creature->GetOwner(), 30.0f))
+            else if (Unit* pTarget = m_creature->SelectRandomFriendlyTarget(m_creature->GetOwner(), 30.0f))
             {
                 if (pTarget->HealthBelowPct(50))
                 {
@@ -1483,7 +1483,7 @@ struct npc_timbermaw_ancestorAI : ScriptedPetAI
 
         if (!m_creature->IsNonMeleeSpellCasted(false))
         {
-            if (Unit * const pTarget = m_creature->getVictim())
+            if (Unit * pTarget = m_creature->getVictim())
             {
                 if (!pTarget->HasBreakableByDamageCrowdControlAura() && !pTarget->IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_NATURE))
                     DoCastSpellIfCan(pTarget, SPELL_LIGHTNING_BOLT, false);
@@ -1494,9 +1494,54 @@ struct npc_timbermaw_ancestorAI : ScriptedPetAI
     }
 };
 
-CreatureAI* GetAI_timbermaw_ancestor(Creature* pCreature)
+CreatureAI* GetAI_npc_timbermaw_ancestor(Creature* pCreature)
 {
     return new npc_timbermaw_ancestorAI(pCreature);
+}
+
+/*######
+## Cannonball Runner
+######*/
+enum
+{
+    SPELL_CANNON_FIRE = 17501
+};
+
+struct npc_cannonball_runnerAI : ScriptedPetAI
+{
+    explicit npc_cannonball_runnerAI(Creature* pCreature) : ScriptedPetAI(pCreature)
+    {
+        m_creature->SetCanModifyStats(true);
+
+        if (m_creature->GetCharmInfo())
+            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
+
+        if (m_creature->GetOwner())
+            m_creature->SetOrientation(m_creature->GetOwner()->GetOrientation());
+
+        m_creature->addUnitState(UNIT_STAT_NO_COMBAT_MOVEMENT);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_ROTATE);
+
+        npc_cannonball_runnerAI::Reset();
+    }
+
+    void AttackStart(Unit* /*pWho*/) override {}
+
+    void Reset() override
+    {
+    }
+
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (!m_creature->IsNonMeleeSpellCasted())
+            if (Unit * pTarget = m_creature->SelectRandomUnfriendlyTarget((Unit *) nullptr, 40.0f, true))
+                DoCastSpellIfCan(pTarget, SPELL_CANNON_FIRE, false);
+    }
+};
+
+CreatureAI* GetAI_npc_cannonball_runner(Creature* pCreature)
+{
+    return new npc_cannonball_runnerAI(pCreature);
 }
 
 /*######
@@ -2721,12 +2766,17 @@ void AddSC_npcs_special()
 
     newscript = new Script;
     newscript->Name = "npc_arcanite_dragonling";
-    newscript->GetAI = &GetAI_npc_arcanite_dragonling_dragonling;
+    newscript->GetAI = &GetAI_npc_arcanite_dragonling;
     newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_timbermaw_ancestor";
-    newscript->GetAI = &GetAI_timbermaw_ancestor;
+    newscript->GetAI = &GetAI_npc_timbermaw_ancestor;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_cannonball_runner";
+    newscript->GetAI = &GetAI_npc_cannonball_runner;
     newscript->RegisterSelf();
 
     newscript = new Script;
