@@ -355,6 +355,8 @@ bool Map::Add(Player *player)
     // Send objects first => Can not take quests at relogin
     SendInitTransports(player);
     SendInitSelf(player);
+    if (player->IsBeingTeleportedFar())
+        player->m_visibleGUIDs.clear();
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
     player->GetViewPoint().Event_AddedToWorld(&(*grid)(cell.CellX(), cell.CellY()));
     UpdateObjectVisibility(player, cell, p);
