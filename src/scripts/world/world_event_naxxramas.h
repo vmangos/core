@@ -1,21 +1,36 @@
+/*
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+ * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+ * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
+
 #define DEBUG_WORLD_EVENT = true;
 
 enum ScourgeInvasion
 {
-    /** SPELLS */
+    /****************** SPELLS ******************/
     SPELL_COMMUNICATION_NAXXRAMAS = 28395, // Periodically triggers SPELL_COMMUNICATION_TRIGGER
     SPELL_COMMUNICATION_TRIGGER = 28373, // Send visual on all nearby targets
     SPELL_DUMMY_PYLON = 28351, // [Communication Camp-Relais, Mort]. Effect DUMMY
     SPELL_DAMAGE_PYLON = 28032, // [Zapper Cristal]. 15 de degats.
-    SPELL_COM_RECEPTION = 28449, // [Camp reçoit communication]. Effect DUMMY.
+    SPELL_CAMP_RECEIVES_COMMUNIQUE = 28449, // [Camp reçoit communication]. Effect DUMMY.
     SPELL_ENGINEER_REPAIR = 28078,
     SPELL_PURPLE_VISUAL = 28126,
-
-    // Unused ?
-    SPELL_SUMMON_CRYSTAL = 28344,
-    SPELL_SUMMON_BROKEN_CRYSTAL = 28424,
-    SPELL_SUMMON_NAXXRAMAS_GHOST = 28389,
-    SPELL_VISUAL_VOILE_TENEBRES = 28350,
 
     // Trash spells
     SPELL_ENRAGE = 8599,
@@ -33,25 +48,46 @@ enum ScourgeInvasion
     SPELL_DMG_BOOST_AT_PYLON_DEATH = 28681,
 
     // Shadow of Doom
-    SPELL_FEAR = 12542, //27990,
-    SPELL_MINDFLAY = 16568, //22919,
+    SPELL_FEAR = 12542,
+    SPELL_MINDFLAY = 16568,
     SPELL_SCOURGE_STRIKE = 28265,
+    
+    // Cultist Engineer
+    SPELL_KILL_SUMMONER_SUMMON_BOSS = 28250, // Reagents, 1 Necrotic Rune
+    SPELL_SUMMON_BOSS = 31315, // Reagents, 8 Necrotic Rune
 
+    // Spawn effects
+    SPELL_SPAWN_SMOKE_1 = 4335,
+    SPELL_SPAWN_SMOKE_2 = 29802,
+    SPELL_SPIRIT_SPAWN_IN = 17321,
+    SPELL_TELEPORT_VISUAL = 41236,
 
-    /** NPC */
-    NPC_PYLON_ENTRY = 16136,
-    NPC_DAMAGED_PYLON = 16172,
+    // Unused
+    SPELL_CREATE_CRYSTAL = 28344, // (NECROTIC_SHARD = 16136) CIRCLE - Gob 181136 CASTS this
+    SPELL_SUMMON_NAXXRAMAS_GHOST = 28389,
+    SPELL_VISUAL_VOILE_TENEBRES = 28350,
+
+    /****************** NPC ******************/
+    NPC_NECROTIC_SHARD = 16136,
+    NPC_DAMAGED_NECROTIC_SHARD = 16172,
     NPC_CULTIST_ENGINEER = 16230,
-    NPC_SHADOW_DOOM = 16143,
+    NPC_SHADOW_OF_DOOM = 16143,
+
+    // Necropolis Helpers
+    NPC_NECROPOLIS_PROXY = 16398,
+    NPC_NECROPOLIS_HEALTH = 16421,
+    NPC_NECROPOLIS_CONTROLLER = 16214,
     NPC_NECROPOLIS_RELAY = 16386,
 
+    // Thrash
     NPC_SKELETAL_SHOCKTROOPER = 16299,
     NPC_GHOUL_BERSERKER = 16141,
     NPC_SPECTRAL_SOLDIER = 16298,
 
-    NPC_PYLON_RARE_1 = 16379,
-    NPC_PYLON_RARE_2 = 16380,
-    NPC_PYLON_RARE_3 = 14697,
+    // Rare spawns
+    NPC_SPIRIT_OF_THE_DAMNED = 16379,
+    NPC_BONE_WITCH = 16380,
+    NPC_LUMBERING_HORROR = 14697,
 
     NPC_ARGENT_DAWN_REW_GIVER_1H = 16384,
     NPC_ARGENT_DAWN_REW_GIVER_2H = 16435,
@@ -60,7 +96,7 @@ enum ScourgeInvasion
     NPC_ARGENT_DAWN_REW_GIVER_2A = 16433,
     NPC_ARGENT_DAWN_REW_GIVER_3A = 16434,
 
-    /** OTHER */
+    /****************** OTHER ******************/
     ITEM_NECROTIC_RUNE = 22484,
 
     GOBJ_SUMMON_CIRCLE = 181227,

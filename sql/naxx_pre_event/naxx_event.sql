@@ -1,4 +1,8 @@
--- Missing texts
+-- ----------------------
+-- Texts
+-- ----------------------
+
+-- Add missing texts
 DELETE FROM `npc_text` WHERE `ID` IN (20101, 20104, 20105);
 INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `lang0`, `prob0`, `em0_0`, `em0_1`, `em0_2`, `em0_3`, `em0_4`, `em0_5`, `text1_0`, `text1_1`, `lang1`, `prob1`, `em1_0`, `em1_1`, `em1_2`, `em1_3`, `em1_4`, `em1_5`, `text2_0`, `text2_1`, `lang2`, `prob2`, `em2_0`, `em2_1`, `em2_2`, `em2_3`, `em2_4`, `em2_5`, `text3_0`, `text3_1`, `lang3`, `prob3`, `em3_0`, `em3_1`, `em3_2`, `em3_3`, `em3_4`, `em3_5`, `text4_0`, `text4_1`, `lang4`, `prob4`, `em4_0`, `em4_1`, `em4_2`, `em4_3`, `em4_4`, `em4_5`, `text5_0`, `text5_1`, `lang5`, `prob5`, `em5_0`, `em5_1`, `em5_2`, `em5_3`, `em5_4`, `em5_5`, `text6_0`, `text6_1`, `lang6`, `prob6`, `em6_0`, `em6_1`, `em6_2`, `em6_3`, `em6_4`, `em6_5`, `text7_0`, `text7_1`, `lang7`, `prob7`, `em7_0`, `em7_1`, `em7_2`, `em7_3`, `em7_4`, `em7_5`) VALUES
 (20101, 'The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.', '', 0, 1, 6, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0),
@@ -8,10 +12,15 @@ INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `lang0`, `prob0`, `em0_0`, `
 -- Update text for getting magic item.
 UPDATE `nostalrius_string` SET `content_default`='Give me one of your magic items.', `content_loc2`='Donnez-moi un de vos objets magiques.' WHERE  `entry`=121;
 
+-- Add texts for Shadow of Doom
+INSERT INTO `nostalrius_string` (`entry`, `content_default`) VALUES
+(135, 'Our dark master has noticed your trifling, and sends me to bring a message... of doom!'),
+(136, 'Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!');
+
+UPDATE `npc_text` SET `text0_0`='This cultist is in a deep trance...' WHERE  `ID`=20100;
 
 -- ----------------------
 -- Add boss spawns
--- Note: no ai yet and event id will change
 -- ----------------------
 
 -- Creatures
@@ -45,3 +54,17 @@ INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`
 (14690, 0, 0, 0, 0, 0, 0, '50596'),
 (14695, 0, 0, 0, 0, 0, 0, '50596'),
 (14684, 0, 0, 0, 0, 0, 0, '50596');
+
+UPDATE `creature_template` SET `ScriptName`='npc_spectral_spirit' WHERE `entry`=16437;
+UPDATE `creature_template` SET `ScriptName`='npc_spectral_spirit' WHERE `entry`=16437;
+UPDATE `creature_template` SET `ScriptName`='npc_skeletal_trooper' WHERE `entry`=16438;
+UPDATE `creature_template` SET `ScriptName`='npc_skeletal_shocktrooper' WHERE `entry`=16299;
+UPDATE `creature_template` SET `ScriptName`='npc_spectral_soldier' WHERE `entry`=16298;
+UPDATE `creature_template` SET `ScriptName`='npc_cultist_engineer' WHERE `entry`=16230;
+UPDATE `creature_template` SET `ScriptName`='npc_shadow_of_doom' WHERE `entry`=16143;
+UPDATE `creature_template` SET `ScriptName`='npc_ghoul_berserker' WHERE `entry`=16141;
+
+UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181223;
+UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181215;
+UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181374;
+UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181373;
