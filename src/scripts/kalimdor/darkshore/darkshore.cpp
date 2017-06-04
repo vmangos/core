@@ -474,11 +474,14 @@ enum
     SAY_AGGRO_1                     = -1000792,
     SAY_AGGRO_2                     = -1000793,
     SAY_AGGRO_3                     = -1000794,
+    SAY_END_2                       = -1000795,
+    SAY_END_3                       = -1000796,
 
     SAY_ESCAPE                      = -1780209,
 
     NPC_BLACKWOOD_SHAMAN            = 2171,
     NPC_BLACKWOOD_URSA              = 2170,
+    NPC_GRIMCLAW                    = 3695,
 
     SPELL_MOONSTALKER_FORM          = 10849,
 
@@ -522,6 +525,7 @@ struct npc_volcorAI : public npc_escortAI
     }
 
     uint32 m_uiQuestId;
+    bool m_bEscortFinished = false;
 
     void Reset() override
     {
@@ -532,8 +536,12 @@ struct npc_volcorAI : public npc_escortAI
             StealthDialogueTimer = 0;
         }
     }
+
     uint16 StealthDialogueStep;
     uint32 StealthDialogueTimer;
+    uint16 ForceDialogueStep;
+    uint32 ForceDialogueTimer;
+
     void Aggro(Unit* /*pWho*/) override
     {
         // shouldn't always use text on agro
@@ -610,7 +618,12 @@ struct npc_volcorAI : public npc_escortAI
             SetEscortPaused(true);
         }
         else
+        {
+            m_bEscortFinished = false;
+            ForceDialogueStep = 0;
+            ForceDialogueTimer = 0;
             Start(false, pPlayer->GetGUID(), pQuest);
+        }
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -639,12 +652,12 @@ struct npc_volcorAI : public npc_escortAI
                 m_creature->SummonCreature(NPC_BLACKWOOD_URSA, aVolcorSpawnLocs[5].m_fX, aVolcorSpawnLocs[5].m_fY, aVolcorSpawnLocs[5].m_fZ, aVolcorSpawnLocs[5].m_fO, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
                 break;
             case 15:
-                DoScriptText(SAY_END, m_creature);
                 if (Player* pPlayer = GetPlayerForEscort())
                     pPlayer->GroupEventHappens(QUEST_ESCAPE_THROUGH_FORCE, m_creature);
                 SetEscortPaused(true);
-                m_creature->ForcedDespawn();
-                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                ForceDialogueStep = 0;
+                ForceDialogueTimer = 3000;
+                m_bEscortFinished = true;
                 break;
         }
     }
@@ -684,7 +697,68 @@ struct npc_volcorAI : public npc_escortAI
                 else
                     StealthDialogueTimer -= uiDiff;
             }
+            else if (m_bEscortFinished && (m_uiQuestId == QUEST_ESCAPE_THROUGH_FORCE))
+            {
+                if (ForceDialogueTimer < uiDiff)
+                {
+                    switch (ForceDialogueStep)
+                    {
+                        case 0:
+                            DoScriptText(SAY_END, m_creature);
+                            ForceDialogueTimer = 1000;
+                            ForceDialogueStep++;
+                            break;
+                        case 1:
+                            if (Creature * pGrimClaw = m_creature->FindNearestCreature(NPC_GRIMCLAW, 40))
+                            {
+                                pGrimClaw->SetFacingToObject(m_creature);
+                                ForceDialogueTimer = 3000;
+                                ForceDialogueStep++;
+                            }
+                            else
+                            {
+                                m_bEscortFinished = false;
+                                m_creature->ForcedDespawn();
+                                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                            }
+                            break;
+                        case 2:
+                            if (Creature * pGrimClaw = m_creature->FindNearestCreature(NPC_GRIMCLAW, 40))
+                            {
+                                pGrimClaw->SetWalk(false);
+                                pGrimClaw->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX() + 3.0f, m_creature->GetPositionY() + 2.0f, m_creature->GetPositionZ(), MOVE_PATHFINDING);
+                                DoScriptText(SAY_END_2, pGrimClaw);
+                                ForceDialogueTimer = 4000;
+                                ForceDialogueStep++;
+                            }
+                            else
+                            {
+                                m_bEscortFinished = false;
+                                m_creature->ForcedDespawn();
+                                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                            }
+                            break;
+                        case 3:
+                            DoScriptText(SAY_END_3, m_creature);
+                            ForceDialogueTimer = 5000;
+                            ForceDialogueStep++;
+                            break;
+                        case 4:
+                            m_bEscortFinished = false;
+                            if (Creature * pGrimClaw = m_creature->FindNearestCreature(NPC_GRIMCLAW, 40))
+                                pGrimClaw->ForcedDespawn();
+                            m_creature->ForcedDespawn();
+                            m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                            break;
+                    }
+                }
+                else
+                    ForceDialogueTimer -= uiDiff;
+
+                return;
+            }
         }
+        
         npc_escortAI::UpdateAI(uiDiff);
     }
 };
@@ -922,7 +996,8 @@ bool QuestComplete_npc_tharnariun_treetender(Player* pPlayer, Creature* pQuestGi
 
 enum
 {
-    NPC_SENTINEL_SELARIN = 3694
+    NPC_SENTINEL_SELARIN     = 3694,
+    QUEST_HOW_BIG_A_THREAT_2 = 985
 };
 
 bool QuestComplete_npc_terenthis(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
@@ -945,6 +1020,14 @@ bool QuestComplete_npc_terenthis(Player* pPlayer, Creature* pQuestGiver, Quest c
         else
             return true; // prevent starting db script if sentinel was not spawned
     }
+    else if (pQuest->GetQuestId() == QUEST_HOW_BIG_A_THREAT_2)
+    {
+        if (pQuestGiver->FindNearestCreature(NPC_GRIMCLAW, 40))
+            return true; // prevent starting db script if grimclaw is already spawned
+        else
+            return false;
+    }
+
     return false;
 }
 
