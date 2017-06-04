@@ -42,7 +42,6 @@ enum ScourgeInvasionLang
     LANG_ARGENT_EMISSARY_GOSSIP = 20102,
 };
 
-/******************/
 bool IsPermanent(uint32 zone)
 {
     switch (zone)
@@ -62,6 +61,10 @@ bool IsPermanent(uint32 zone)
             return true;
     }
 }
+
+/*
+General Event AI
+*/
 class NecropolisRelatedObject
 {
 public:
@@ -103,7 +106,6 @@ public:
     }
     void ChangeAttackZone()
     {
-        // Deplacement de la necropole
         uint32 zone1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
         uint32 zone2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
         std::vector<uint32> possibleZones;
@@ -136,7 +138,10 @@ public:
     bool   _enabledNow;
 };
 
-// Pour transmettre la communication plus loin
+/*
+Necropolis Proxy
+For communiation
+*/
 struct NecropolisProxyAI : public ScriptedAI
 {
     NecropolisProxyAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -180,6 +185,9 @@ CreatureAI* GetAI_NecropolisProxy(Creature* pCreature)
     return new NecropolisProxyAI(pCreature);
 }
 
+/*
+Necropolis
+*/
 class naxx_go_necropolis : public GameObjectAI, public NecropolisRelatedObject
 {
 public:
@@ -398,11 +406,13 @@ GameObjectAI* GetAI_naxx_go_necropolis(GameObject* go)
     return new naxx_go_necropolis(go);
 }
 
-//#########"
 
-struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
+/*
+Necrotic Shard
+*/
+struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
 {
-    NecropolisPylonAI(Creature* creature) : ScriptedAI(creature), NecropolisRelatedObject(creature)
+    npc_necrotic_shard(Creature* creature) : ScriptedAI(creature), NecropolisRelatedObject(creature)
     {
         creature->SetHealth(creature->GetMaxHealth());
         SetCombatMovement(false);
@@ -612,23 +622,19 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
     }
 };
 
-CreatureAI* GetAI_NecropolisPylon(Creature* pCreature)
+CreatureAI* GetAI_necrotic_shard(Creature* pCreature)
 {
-    return new NecropolisPylonAI(pCreature);
+    return new npc_necrotic_shard(pCreature);
 }
 
-enum
-{
-    SPELL_FEAR          =   27990,
-    SPELL_MINDFLAY      =   22919,
-};
-
-/*****************/
+/*
+Shadow of Doom
+*/
 struct ShadowOfDoomAI : public ScriptedAI
 {
-
     uint32 m_uiFear_Timer;
     uint32 m_uiMindFlay_Timer;
+    uint32 m_uiScourgeStrike_Timer;
 
     ShadowOfDoomAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
@@ -639,6 +645,7 @@ struct ShadowOfDoomAI : public ScriptedAI
     {
         m_uiFear_Timer = 10000;
         m_uiMindFlay_Timer = 6000;
+        m_uiScourgeStrike_Timer = 120000;
     }
 
     void Aggro(Unit* pWho)
@@ -650,6 +657,7 @@ struct ShadowOfDoomAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        // Fear
         if (m_uiFear_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
@@ -658,6 +666,7 @@ struct ShadowOfDoomAI : public ScriptedAI
         else
             m_uiFear_Timer -= uiDiff;
 
+        // Mind Flay
         if (m_uiMindFlay_Timer < uiDiff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDFLAY) == CAST_OK)
@@ -665,6 +674,16 @@ struct ShadowOfDoomAI : public ScriptedAI
         }
         else
             m_uiMindFlay_Timer -= uiDiff;
+
+        // Scourge Strike
+        if (m_uiScourgeStrike_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                m_uiScourgeStrike_Timer = 120000;
+        }
+        else
+            m_uiScourgeStrike_Timer -= uiDiff;
+
 
         DoMeleeAttackIfReady();
     }
@@ -675,11 +694,12 @@ CreatureAI* GetAI_ShadowOfDoom(Creature* pCreature)
     return new ShadowOfDoomAI(pCreature);
 }
 
-
-/*****************/
-struct PylonEngineerAI : public ScriptedAI
+/*
+npc_cultist_engineer
+*/
+struct npc_cultist_engineer : public ScriptedAI
 {
-    PylonEngineerAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_cultist_engineer(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
@@ -704,7 +724,7 @@ struct PylonEngineerAI : public ScriptedAI
         {
             ASSERT(unit);
             _pylonGuid = unit->GetObjectGuid();
-            JustReachedHome(); // Actualiser canalisation
+            JustReachedHome();
         }
         else if (action == ENGINEER_AI_ACTION_ATTACK_START)
         {
@@ -717,19 +737,20 @@ struct PylonEngineerAI : public ScriptedAI
             }
         }
     }
+
     void UpdateAI(const uint32 diff)
     {
         if (_healTimer < diff)
         {
             _healTimer = 1000;
-            if (Creature* pylon = m_creature->GetMap()->GetCreature(_pylonGuid))
+            if (Creature* shard = m_creature->GetMap()->GetCreature(_pylonGuid))
             {
-                if (pylon->GetHealth() == pylon->GetMaxHealth() || pylon->GetDisplayId() != MODELID_PYLON_DAMAGED)
+                if (shard->GetHealth() == shard->GetMaxHealth() || shard->GetDisplayId() != MODELID_PYLON_DAMAGED)
                     m_creature->AddObjectToRemoveList();
                 else
-                    pylon->ModifyHealth(ENGINEER_MOD_HEALTH_PER_SEC);
+                    shard->ModifyHealth(ENGINEER_MOD_HEALTH_PER_SEC);
             }
-            else // Perdu le pylone !
+            else // Shard died
                 m_creature->AddObjectToRemoveList();
         }
         else
@@ -737,12 +758,12 @@ struct PylonEngineerAI : public ScriptedAI
     }
 };
 
-CreatureAI* GetAI_PylonEngineerAI(Creature* pCreature)
+CreatureAI* GetAI_npc_cultist_engineer(Creature* pCreature)
 {
-    return new PylonEngineerAI(pCreature);
+    return new npc_cultist_engineer(pCreature);
 }
 
-bool GossipSelect_pylon_engineer(Player* player, Creature* creature, uint32 sender, uint32 action)
+bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
     if (action == GOSSIP_ACTION_INFO_DEF + 1 && player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
     {
@@ -754,7 +775,7 @@ bool GossipSelect_pylon_engineer(Player* player, Creature* creature, uint32 send
     return true;
 }
 
-bool GossipHello_pylon_engineer(Player* player, Creature* creature)
+bool GossipHello_npc_cultist_engineer(Player* player, Creature* creature)
 {
     if (player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_CULTIST_ENGINEER_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
@@ -762,9 +783,12 @@ bool GossipHello_pylon_engineer(Player* player, Creature* creature)
     return true;
 }
 
-struct NecropolisGouleAI : public ScriptedAI
+/*
+npc_ghoul_berserker
+*/
+struct GhoulBerserker : public ScriptedAI
 {
-    NecropolisGouleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    GhoulBerserker(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
@@ -818,11 +842,14 @@ struct NecropolisGouleAI : public ScriptedAI
     }
 };
 
-CreatureAI* GetAI_NecropolisGoule(Creature* pCreature)
+CreatureAI* GetAI_GhoulBerserker(Creature* pCreature)
 {
-    return new NecropolisGouleAI(pCreature);
+    return new GhoulBerserker(pCreature);
 }
 
+/*
+Spectral Soldier
+*/
 struct SpectralSoldierAI : public ScriptedAI
 {
     SpectralSoldierAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -876,6 +903,9 @@ CreatureAI* GetAI_SpectralSoldierAI(Creature* pCreature)
     return new SpectralSoldierAI(pCreature);
 }
 
+/*
+Skeletal Shock Trooper
+*/
 struct SkeletalShocktrooperAI : public ScriptedAI
 {
     SkeletalShocktrooperAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -960,6 +990,9 @@ CreatureAI* GetAI_SkeletalTrooperAI(Creature* pCreature)
     return new SkeletalTrooperAI(pCreature);
 }
 
+/*
+Spectral Spirit
+*/
 struct SpectralSpiritAI : public ScriptedAI
 {
     SpectralSpiritAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1001,7 +1034,11 @@ CreatureAI* GetAI_SpectralSpiritAI(Creature* pCreature)
 {
     return new SpectralSpiritAI(pCreature);
 }
-// NPC invisible dans la necropole
+
+/*
+NecropolisRelayAI
+This creature is invisible near the necropolis
+*/
 struct NecropolisRelayAI : public ScriptedAI
 {
     NecropolisRelayAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1016,11 +1053,13 @@ struct NecropolisRelayAI : public ScriptedAI
     {
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
+
     // On transmet le GUID de la necropole
     void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
     {
         _necropolisGuid = necropolis;
     }
+
     void SpellHitTarget(Unit* target, const SpellEntry* spell)
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
@@ -1132,6 +1171,9 @@ bool GossipHello_naxx_event_rewards_giver(Player* player, Creature* creature)
     return true;
 }
 
+/*
+Argent Emissary
+*/
 bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
     player->CLOSE_GOSSIP_MENU();
@@ -1164,8 +1206,10 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_BL_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
     if (attacked1 == ZONEID_BURNING_STEPPES || attacked2 == ZONEID_BURNING_STEPPES)
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_BS_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+
     if (!attacked1 && !attacked2)
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_NO_ATTACK_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+
     player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
     return true;
 }
@@ -1199,30 +1243,30 @@ void AddSC_world_event_naxxramas()
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_relay";
+    newscript->Name = "npc_necropolis_relay";
     newscript->GetAI = &GetAI_NecropolisRelay;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_proxy";
+    newscript->Name = "npc_necropolis_proxy";
     newscript->GetAI = &GetAI_NecropolisProxy;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_pylon";
-    newscript->GetAI = &GetAI_NecropolisPylon;
+    newscript->Name = "npc_necrotic_shard";
+    newscript->GetAI = &GetAI_necrotic_shard;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_pylon_engineer";
-    newscript->GetAI = &GetAI_PylonEngineerAI;
-    newscript->pGossipHello = &GossipHello_pylon_engineer;
-    newscript->pGossipSelect = &GossipSelect_pylon_engineer;
+    newscript->Name = "npc_cultist_engineer";
+    newscript->GetAI = &GetAI_npc_cultist_engineer;
+    newscript->pGossipHello = &GossipHello_npc_cultist_engineer;
+    newscript->pGossipSelect = &GossipSelect_npc_cultist_engineer;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_goule";
-    newscript->GetAI = &GetAI_NecropolisGoule;
+    newscript->Name = "npc_ghoul_berserker";
+    newscript->GetAI = &GetAI_GhoulBerserker;
     newscript->RegisterSelf();
 
     newscript = new Script;

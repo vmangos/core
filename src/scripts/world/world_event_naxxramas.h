@@ -17,7 +17,7 @@ enum ScourgeInvasion
     SPELL_SUMMON_NAXXRAMAS_GHOST = 28389,
     SPELL_VISUAL_VOILE_TENEBRES = 28350,
 
-    // Sorts des trashs
+    // Trash spells
     SPELL_ENRAGE = 8599,
     SPELL_CONTAGION_OF_ROT = 7102,
     SPELL_SUNDER_ARMOR = 11971,
@@ -31,6 +31,12 @@ enum ScourgeInvasion
     SPELL_CREATE_SUP_MARK = 28321,
 
     SPELL_DMG_BOOST_AT_PYLON_DEATH = 28681,
+
+    // Shadow of Doom
+    SPELL_FEAR = 12542, //27990,
+    SPELL_MINDFLAY = 16568, //22919,
+    SPELL_SCOURGE_STRIKE = 28265,
+
 
     /** NPC */
     NPC_PYLON_ENTRY = 16136,
