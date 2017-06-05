@@ -175,6 +175,15 @@ enum QuestSpecialFlags
     QUEST_SPECIAL_FLAG_TIMED                = 0x040,        // Internal flag computed only
 };
 
+enum QuestMethod
+{
+    QUEST_METHOD_AUTOCOMPLETE               = 0x0,
+    QUEST_METHOD_DISABLED                   = 0x1,
+    QUEST_METHOD_DELIVER                    = 0x2,
+
+    QUEST_METHOD_LIMIT                      = 0x3,          // Highest Method entry DB should have
+};
+
 #define QUEST_SPECIAL_FLAG_DB_ALLOWED (QUEST_SPECIAL_FLAG_REPEATABLE | QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT)
 
 struct QuestLocale
