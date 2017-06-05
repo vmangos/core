@@ -53,7 +53,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+44 , 181444, 533, 3716.38, -5106.47, 141.29, 3.31536, 0, 0, -0.681998, 0.731354, 25, 0, 1, 					1),
 (@OGUID+45 , 181477, 533, 3527.94, -2952.26, 318.898, 3.14159, 0, 0, 1, 0.00000126759, 0, 0, 0, 					1),
 (@OGUID+46 , 181478, 533, 3487.32, -2911.38, 318.898, 3.14159, 0, 0, 1, 0.00000126759, 0, 0, 0, 					1),
-(@OGUID+47 , 181496, 533, 2909.69, -3818.45, 273.553, 3.14159, 0, 0, 1, 0.00000126759, 180, 0, 0, 					1),
+-- (@OGUID+47 , 181496, 533, 2909.69, -3818.45, 273.553, 3.14159, 0, 0, 1, 0.00000126759, 180, 0, 0, 					1), heigan door, not used for anything
 
 -- plague fizures
 (@OGUID+48 , 181510, 533, 2787.25, -3654.13, 274.317, 3.5343, 0, 0, 0.980784, -0.195094, 0, 0, 1, 					0),
@@ -131,9 +131,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+120, 181550, 533, 2765.33, -3728.61, 274.315, 6.21795, 0, 0, 0.0326119, -0.999468, 0, 0, 1, 				0),
 (@OGUID+121, 181551, 533, 2774.99, -3731.79, 274.387, 3.92792, 0, 0, 0.923702, -0.383113, 0, 0, 1, 					0),
 (@OGUID+122, 181552, 533, 2784.17, -3724.73, 274.385, 1.05084, 0, 0, 0.501576, 0.865113, 0, 0, 1, 					0),
-
--- duplicate?
--- (@OGUID+123, 181552, 533, 2784.17, -3724.73, 274.385, 1.05084, 0, 0, 0.501576, 0.865113, 0, 0, 1, 					1),
+(@OGUID+123, 181552, 533, 2784.17, -3724.73, 274.385, 1.05084, 0, 0, 0.501576, 0.865113, 0, 0, 1, 					1),
 
 (@OGUID+124, 181575, 533, 3465.18, -3940.4, 308.79, 2.44346, 0.241845, 0.664462, 0.664463, 0.241847, 7200, 255, 1, 	1),
 (@OGUID+125, 181576, 533, 3539.02, -2936.82, 302.476, 3.14159, 0, 0, 1, 0.00000126759, 7200, 255, 1, 				1),
@@ -212,6 +210,8 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID+198, 181695, 533, 2731.62, -3706.18, 273.623, -2.77507, 0, 0, -0.983255, 0.182237, 180, 0, 1, 				1),
 (@OGUID+199, 181695, 533, 2755.07, -3728.92, 273.626, 0.523598, 0, 0, 0.258819, 0.965926, 180, 0, 1, 				1),
 (@OGUID+200, 181695, 533, 2781.35, -3720.31, 273.64, 2.67035, 0, 0, 0.972369, 0.233447, 180, 0, 1, 					1),
+
+
 (@OGUID+201, 193426, 533, 2516.59, -2946.82, 245.552, 5.48034, 0, 0, 0.390728, -0.920506, -604800, 255, 1, 			1),
 (@OGUID+202, 194022, 533, 3121.47, -3791.07, 273.915, 3.14159, 0, 0, 1, 0.00000126759, 180, 0, 1, 					1);
 
@@ -322,27 +322,6 @@ DELETE FROM `gameobject_template` WHERE `entry` IN(
 
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`, `ScriptName`) VALUES
 
-/*
-data0: startOpen;      - used client side to determine GO_ACTIVATED means open/closed
-data1: lockId;         - -> Lock.dbc
-data2: autoCloseTime;  - secs till autoclose = autoCloseTime / 0x10000
-data3: noDamageImmune; - break opening whenever you recieve damage?
-data4: openTextID;     - can be used to replace castBarCaption?
-data5: closeTextID;    - 
-*/
-/* Flags
-1  = disables interaction while animated
-2  = require key, spell, event, etc to be opened. Makes "Locked" appear in tooltip
-4  = cannot interact (condition to interact) (means no tooltip, no highlight, no nothing)
-8  = any kind of transport? Object can transport (elevator, boat, car)
-16 = players cannot interact with this go (often need to remove flag in event) (means no tooltip, no highlight, no nothing)
-32 = never despawn, typically for doors, they just change state
-64 = typically, summoned objects. Triggered by spell or other events
-
-seems there is no difference between flag 4 and 16?
-48 - never despawn and cannt interract. Seems correct for doors. Its known that blizzards naxx doors displayed their names (doodad_xxx), but we don't have the same names, and it
-complicates things, so screw it.
-*/
 -- these two are kindof pointless. They are the gates at strat entrance, so never visible for players in naxx. But i guess, for authenticity!
 (175369, 0, 3614, 'Elders\' Square Service Entrance',   0, 34, 1, 0, 879, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (175370, 0, 3614, 'Doodad_SmallPortcullis05',           0, 34, 1, 0, 0, 3000, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
@@ -370,7 +349,7 @@ complicates things, so screw it.
 (181200, 0, 6689, 'Noth - Entry Door',                  0,         48,      1,      1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181201, 0, 6689, 'Noth - Exit Door',                   0,         48,      1.15,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181202, 0, 6689, 'Heigan the Unclean - Entry Door',    0,         48,      0.99,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
-(181203, 0, 6689, 'Heigan the Unclean - Exit Door',     0,         48,      1.02,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+-- (181203, 0, 6689, 'Heigan the Unclean - Exit Door',     0,         48,      1.02,   0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181496, 0, 6675, 'Heigan - Old Exit Door',             0,         48,      1,      1,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181241, 0, 6675, 'Loatheb - Entrance Door',            0,         48,      1,      0,       0,       0,       0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181240, 0, 6702, 'Loatheb Fight Door 01 (not used)',   0,         48,      1.71,   0,       0,       3000,    0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
@@ -449,8 +428,7 @@ complicates things, so screw it.
 (181550, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181551, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181552, 6, 6785, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
--- more fizzures, but grouped differently. Make sure there i s no good reason for this
-(181676, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+(181676, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),-- more fizzures, but grouped differently. Make sure there i s no good reason for this
 (181677, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181678, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181695, 6, 1287, 'Plague Fissure', 0, 0, 1, 0, 60, 0, 29371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
