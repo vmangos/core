@@ -536,6 +536,14 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcG
     */
     GetMenuSession()->SendPacket(&data);
 
+    // The DetailsEmote is not part of this packet in vanilla.
+    // We have to send it separately with a delayed event.
+    for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
+    {
+        if (pQuest->DetailsEmote[i] > 0)
+            GetMenuSession()->GetPlayer()->AddDelayedEmote(pQuest->DetailsEmote[i], ObjectGuid(npcGUID), pQuest->DetailsEmoteDelay[i]);
+    }
+
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid = %s, questid = %u", npcGUID.GetString().c_str(), pQuest->GetQuestId());
 }
 

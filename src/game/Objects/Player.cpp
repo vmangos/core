@@ -16235,6 +16235,34 @@ void Player::TextEmote(const std::string& text)
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 
+void Player::AddDelayedEmote(uint32 emote_id, ObjectGuid npc_guid, uint32 timeMSToEmote)
+{
+    if ((emote_id > 0) && npc_guid && npc_guid.IsUnit())
+    {
+        if (timeMSToEmote > 0)
+        {
+            EmoteDelayEvent *pEvent = new EmoteDelayEvent(*this, emote_id, npc_guid);
+            m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToEmote));
+        }
+        else
+        {
+            WorldPacket data(SMSG_EMOTE, 4 + 8);
+            data << uint32(emote_id);
+            data << npc_guid;
+            GetSession()->SendPacket(&data);
+        }
+    }
+}
+
+bool EmoteDelayEvent::Execute(uint64 /*e_time*/, uint32 /*p_time*/)
+{
+    WorldPacket data(SMSG_EMOTE, 4 + 8);
+    data << uint32(m_emote_id);
+    data << m_npc_guid;
+    m_owner.GetSession()->SendPacket(&data);
+    return true;
+}
+
 void Player::PetSpellInitialize()
 {
     Pet* pet = GetPet();

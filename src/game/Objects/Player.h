@@ -1184,6 +1184,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void PrepareGossipMenu(WorldObject *pSource, uint32 menuId = 0);
         void SendPreparedGossip(WorldObject *pSource);
         void OnGossipSelect(WorldObject *pSource, uint32 gossipListId);
+        void AddDelayedEmote(uint32 emote_id, ObjectGuid npc_guid, uint32 timeMSToEmote);
 
         uint32 GetGossipTextId(uint32 menuId, WorldObject const* source);
         uint32 GetGossipTextId(WorldObject *pSource);
@@ -2487,5 +2488,17 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
     basevalue = T((float)basevalue + diff);
     return T(diff);
 }
+
+class EmoteDelayEvent : public BasicEvent
+{
+public:
+    explicit EmoteDelayEvent(Player& owner, uint32 emote_id, ObjectGuid npc_guid) : BasicEvent(), m_owner(owner), m_emote_id(emote_id), m_npc_guid(npc_guid) { }
+    bool Execute(uint64 e_time, uint32 p_time) override;
+
+private:
+    Player& m_owner;
+    uint32 m_emote_id;
+    ObjectGuid m_npc_guid;
+};
 
 #endif
