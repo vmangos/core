@@ -706,9 +706,9 @@ void Spell::prepareDataForTriggerSystem()
             }
             else // Ranged spell attack
             {
-                // If blind, don't add proc flags for typical ranged abilities
+                // If blind or Expose Weakness, don't add proc flags for typical ranged abilities
                 // proc none
-                if (m_spellInfo->Id == 2094) {
+                if (m_spellInfo->Id == 2094 || m_spellInfo->Id == 23577) {
                     m_procAttacker = PROC_FLAG_NONE;
                     m_procVictim = PROC_FLAG_NONE;
                 }
@@ -4496,9 +4496,15 @@ void Spell::TakeReagents()
 
 void Spell::TakeAmmo()
 {
-    // Blind is a ranged attack but should not take any ammo
-    if (m_spellInfo->Id == 2094)
-        return;
+    // Some ranged attacks dont take any ammo
+    switch (m_spellInfo->Id)
+    {
+        case 2094:  // Blind
+        case 13099: // Net-o-Matic
+        case 13119: // Net-o-Matic
+        case 23577: // Expose Weakness
+            return;
+    }
             
     if (m_attackType == RANGED_ATTACK && m_caster->GetTypeId() == TYPEID_PLAYER)
     {
