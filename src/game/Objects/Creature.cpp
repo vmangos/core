@@ -174,7 +174,8 @@ Creature::Creature(CreatureSubtype subtype) :
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
-    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr)
+    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
+    m_callForHelpDist(5.0f)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -724,7 +725,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 float x, y, z;
                 GetRespawnCoord(x, y, z, nullptr, nullptr);
                 if (GetDistance(x, y, z) > 10.0f)
-                    CallForHelp(5.0f);
+                    CallForHelp(m_callForHelpDist);
             }
 
             // creature can be dead after Unit::Update call

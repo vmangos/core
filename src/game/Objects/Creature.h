@@ -813,6 +813,11 @@ class MANGOS_DLL_SPEC Creature : public Unit
             return float(_playerDamageTaken) / (_playerDamageTaken + _nonPlayerDamageTaken);
         }
 
+        void SetCallForHelpDist(float dist)
+        {
+            m_callForHelpDist = dist;
+        }
+
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 
@@ -882,6 +887,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // Used to compute XP.
         uint32 _playerDamageTaken;
         uint32 _nonPlayerDamageTaken;
+        
+        float m_callForHelpDist;
+
     private:
         GridReference<Creature> m_gridRef;
         CreatureInfo const* m_creatureInfo;
