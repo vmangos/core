@@ -821,25 +821,3 @@ void AddSC_boss_heigan()
     NewScript->GetAI = &GetAI_mob_eyeStalk;
     NewScript->RegisterSelf();
 }
-
-    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
