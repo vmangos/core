@@ -3411,7 +3411,7 @@ void Unit::SetCurrentCastedSpell(Spell * pSpell)
     CurrentSpellTypes CSpellType = pSpell->GetCurrentContainer();
 
     if (pSpell == m_currentSpells[CSpellType]) return;      // avoid breaking self
-
+    else if(pSpell->m_spellInfo->Id == 30122) return;       // Hack for Heigans Plague Cloud, without it, you interrupt yourself on first tick
     // break same type spell if it is not delayed
     InterruptSpell(CSpellType, false);
 
