@@ -250,7 +250,7 @@ public:
     void SetTeleporterState(GameObject* pGO, uint32 uiData);        // Sets the state of a specific eye-portal visual GO
 
     uint8 GetNumEndbossDead();
-
+    GuidList m_alHeiganTrapGuids[4];
 private:
     bool m_faerlinaHaveGreeted;
     bool m_thaddiusHaveGreeted;

@@ -302,7 +302,21 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }
-    
+
+    if (pGo->GetGoType() == GAMEOBJECT_TYPE_TRAP)
+    {
+        uint32 uiGoEntry = pGo->GetEntry();
+
+        if ((uiGoEntry >= 181517 && uiGoEntry <= 181524) || uiGoEntry == 181678)
+            m_alHeiganTrapGuids[0].push_back(pGo->GetObjectGuid());
+        else if ((uiGoEntry >= 181510 && uiGoEntry <= 181516) || (uiGoEntry >= 181525 && uiGoEntry <= 181531) || uiGoEntry == 181533 || uiGoEntry == 181676)
+            m_alHeiganTrapGuids[1].push_back(pGo->GetObjectGuid());
+        else if ((uiGoEntry >= 181534 && uiGoEntry <= 181544) || uiGoEntry == 181532 || uiGoEntry == 181677)
+            m_alHeiganTrapGuids[2].push_back(pGo->GetObjectGuid());
+        else if ((uiGoEntry >= 181545 && uiGoEntry <= 181552) || uiGoEntry == 181695)
+            m_alHeiganTrapGuids[3].push_back(pGo->GetObjectGuid());
+    }
+
     switch (pGo->GetEntry())
     {
         // Arac wing
@@ -482,9 +496,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_HEIGAN:
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, uiData);
-            UpdateBossGate(GO_PLAG_HEIG_EXIT_DOOR, uiData);
-            UpdateBossGate(GO_PLAG_HEIG_OLD_EXIT_DOOR, uiData);
+            // entry door is controlled by boss script
             UpdateBossGate(GO_PLAG_LOAT_DOOR, uiData);
             break;
         case TYPE_LOATHEB:
