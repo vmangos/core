@@ -33,6 +33,13 @@ go_resonite_cask
 go_sacred_fire_of_life
 go_tablet_of_madness
 go_tablet_of_the_seven
+go_silithyste
+go_restes_sha_ni
+go_Hive_Regal_Glyphed_Crystal
+go_Hive_Ashi_Glyphed_Crystal
+go_Hive_Zora_Glyphed_Crystal
+go_bells
+go_darkmoon_faire_music
 EndContentData */
 
 #include "scriptPCH.h"
@@ -495,6 +502,56 @@ GameObjectAI* GetAI_go_bells(GameObject* gameobject)
     return new go_bells(gameobject);
 }
 
+/*####
+## go_darkmoon_faire_music
+####*/
+
+enum DarkmoonFaireMusic
+{
+    MUSIC_DARKMOON_FAIRE_MUSIC = 8440
+};
+
+enum DarkmoonFaireMusicEvents
+{
+    EVENT_DFM_START_MUSIC = 1,
+    GAME_EVENT_DARKMOON_FAIRE_ELWYNN = 4,
+    GAME_EVENT_DARKMOON_FAIRE_THUNDER = 5
+};
+
+struct go_darkmoon_faire_music : public GameObjectAI
+{
+    go_darkmoon_faire_music(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(1));
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        _events.Update(diff);
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_DFM_START_MUSIC:
+                    if (sGameEventMgr.IsActiveEvent(GAME_EVENT_DARKMOON_FAIRE_ELWYNN) || sGameEventMgr.IsActiveEvent(GAME_EVENT_DARKMOON_FAIRE_THUNDER))
+                        me->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
+
+                    _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(5));  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+private:
+    EventMap _events;
+};
+
+GameObjectAI* GetAI_go_darkmoon_faire_music(GameObject* gameobject)
+{
+    return new go_darkmoon_faire_music(gameobject);
+}
+
 void AddSC_go_scripts()
 {
     Script *newscript;
@@ -596,5 +653,10 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_bells";
     newscript->GOGetAI = &GetAI_go_bells;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_darkmoon_faire_music";
+    newscript->GOGetAI = &GetAI_go_darkmoon_faire_music;
     newscript->RegisterSelf();
 }
