@@ -191,6 +191,7 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { NODE, "cinematic",      SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayCinematicCommand,       "", nullptr },
         { NODE, "sound",          SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlaySoundCommand,           "", nullptr },
+        { NODE, "music",          SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayMusicCommand,           "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                                "", nullptr }
     };
 

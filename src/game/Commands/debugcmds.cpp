@@ -265,6 +265,33 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDebugPlayMusicCommand(char* args)
+{
+    uint32 dwSoundId;
+
+    if (!ExtractUInt32(&args, dwSoundId))
+        return false;
+
+    if (!sSoundEntriesStore.LookupEntry(dwSoundId))
+    {
+        PSendSysMessage(LANG_SOUND_NOT_EXIST, dwSoundId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* target;
+
+    if (!ExtractPlayerTarget(&args, &target, nullptr, nullptr))
+        return false;
+
+    WorldPacket data(SMSG_PLAY_MUSIC, 4);
+    data << int32(dwSoundId);
+    target->SendDirectMessage(&data);
+
+    PSendSysMessage(LANG_YOU_HEAR_SOUND, dwSoundId);
+    return true;
+}
+
 //Send notification in channel
 bool ChatHandler::HandleDebugSendChannelNotifyCommand(char* args)
 {
