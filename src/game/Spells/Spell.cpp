@@ -4717,7 +4717,12 @@ SpellCastResult Spell::CheckCast(bool strict)
 
     // check death state to prevent cheating ("deathbug")
     if (!m_caster->isAlive() && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE) && !((m_spellInfo->Attributes & SPELL_ATTR_CASTABLE_WHILE_DEAD) || (m_IsTriggeredSpell && !m_triggeredByAuraSpell)))
-        return SPELL_FAILED_CASTER_DEAD;
+    {
+        if (m_triggeredByAuraSpell)
+            return SPELL_FAILED_DONT_REPORT;
+        else
+            return SPELL_FAILED_CASTER_DEAD;
+    }
 
     // check global cooldown
     if (!m_IsTriggeredSpell)
@@ -4906,7 +4911,12 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_NO_PET;
                 }
                 else if (!pet->isAlive())
-                    return SPELL_FAILED_TARGETS_DEAD;
+                {
+                    if (m_triggeredByAuraSpell)
+                        return SPELL_FAILED_DONT_REPORT;
+                    else
+                        return SPELL_FAILED_TARGETS_DEAD;
+                }
                 else if (!(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !pet->IsWithinLOSInMap(m_caster))
                     return SPELL_FAILED_LINE_OF_SIGHT;
                 break;
