@@ -1,4 +1,32 @@
 -- ----------------------
+-- Game Events
+-- ----------------------
+
+INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`) VALUES
+(110, '2014-03-30 05:25:00', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 1 - Circle spawn', 0, 0),
+(111, '2014-03-30 05:25:03', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 2 - Consacred earth spawn around Circle 1', 0, 0),
+(112, '2014-03-30 05:25:06', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 2 - Consacred earth spawn around Circle 2', 0, 0),
+(113, '2014-03-30 05:25:09', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 2 - Consacred earth spawn around Circle 3', 0, 0),
+(114, '2014-03-30 05:25:12', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 2 - Consacred earth spawn around Circle 4', 0, 0),
+(115, '2014-03-30 05:25:15', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 2 - Consacred earth spawn around Circle 5', 0, 0),
+(116, '2014-03-30 05:25:18', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 2 - Aura on Consacred earth spawn around Circle', 0, 0),
+(117, '2014-03-30 05:25:21', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 3 - Citadel spawn', 0, 0),
+(118, '2014-03-30 05:25:24', '2014-03-30 05:30:00', 525600, 33720, 0, 'Event Naxxramass phase 4 - Skeleton spawn / Quest activation lvl 9-11', 0, 0),
+(119, '2014-03-30 05:25:00', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.1 - Circle spawn outside cities', 0, 0),
+(120, '2014-03-30 05:25:03', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.2 - Consacred earth spawn around Circle 1 outside cities', 0, 0),
+(121, '2014-03-30 05:25:06', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.2 - Consacred earth spawn around Circle 2 outside cities', 0, 0),
+(122, '2014-03-30 05:25:09', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.2 - Consacred earth spawn around Circle 3 outside cities', 0, 0),
+(123, '2014-03-30 05:25:12', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.2 - Consacred earth spawn around Circle 4 outside cities', 0, 0),
+(124, '2014-03-30 05:25:15', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.2 - Consacred earth spawn around Circle 5 outside cities', 0, 0),
+(125, '2014-03-30 05:25:18', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.2 - Aura on Consacred earth spawn around Circle outside cities', 0, 0),
+(126, '2014-03-30 05:25:21', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.3 - Citadel spawn outside cities', 0, 0),
+(127, '2014-03-30 05:25:24', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P2.4 - Skeleton spawn / Quest activation', 0, 0),
+(128, '2014-03-30 05:25:24', '2014-04-20 04:30:00', 525600, 33720, 0, 'Event Naxxramass P3   - Boss in instance activation', 0, 0),
+(129, '2014-03-30 05:25:24', '2014-04-20 04:30:00', 525600, 2592000, 0, 'Event Naxxramas P2.5 - Invasion Stormwind', 0, 0),
+(130, '2014-03-30 05:25:24', '2014-04-20 04:30:00', 525600, 2592000, 0, 'Event Naxxramas P2.5 - Invasion Undercity', 0, 0);
+
+
+-- ----------------------
 -- Texts
 -- ----------------------
 
@@ -55,6 +83,23 @@ INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`
 (14695, 0, 0, 0, 0, 0, 0, '50596'),
 (14684, 0, 0, 0, 0, 0, 0, '50596');
 
+-- ----------------------
+-- Fix spawns
+-- ----------------------
+INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
+(2530150, 16285, 0, 0, 0, -4935.45, -990.098, 501.456, 2.40353, 25, 0, 0, 8, 0, 0, 0, 0),
+(2530151, 16241, 0, 0, 798, -4934.06, -988.571, 501.459, 2.40353, 25, 0, 0, 300, 0, 0, 1, 0),
+(2530152, 16786, 0, 0, 0, -4932.81, -987.199, 501.461, 2.40353, 25, 0, 0, 300, 0, 0, 1, 0);
+
+INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `spawnFlags`) VALUES
+(3998511, 181256, 0, -4923.36, -979.323, 501.471, 2.2426, 0, 0, 0.900666, 0.434513, 25, 100, 1, 0),
+(3998516, 181254, 0, -4930.26, -992.487, 501.443, 2.36819, 0, 0, 0.926159, 0.377134, 25, 100, 1, 0),
+(3998517, 181256, 0, -4929.6, -986.764, 501.459, 2.27002, 0, 0, 0.906538, 0.422124, 25, 100, 1, 0),
+(3998518, 181256, 0, -4936.46, -992.14, 501.453, 2.20325, 0, 0, 0.891943, 0.452147, 25, 100, 1, 0),
+(3998519, 181255, 0, -4930.98, -987.826, 501.458, 2.58025, 0, 0, 0.960869, 0.277003, 25, 100, 1, 0),
+(3998520, 181255, 0, -4930.98, -987.826, 502.024, 2.42317, 0, 0, 0.936174, 0.351538, 25, 100, 1, 0),
+(3998521, 181256, 0, -4917.47, -981.636, 501.451, 1.46499, 0, 0, 0.668728, 0.743507, 25, 100, 1, 0);
+
 UPDATE `creature_template` SET `ScriptName`='npc_spectral_spirit' WHERE `entry`=16437;
 UPDATE `creature_template` SET `ScriptName`='npc_spectral_spirit' WHERE `entry`=16437;
 UPDATE `creature_template` SET `ScriptName`='npc_skeletal_trooper' WHERE `entry`=16438;
@@ -62,9 +107,34 @@ UPDATE `creature_template` SET `ScriptName`='npc_skeletal_shocktrooper' WHERE `e
 UPDATE `creature_template` SET `ScriptName`='npc_spectral_soldier' WHERE `entry`=16298;
 UPDATE `creature_template` SET `ScriptName`='npc_cultist_engineer' WHERE `entry`=16230;
 UPDATE `creature_template` SET `ScriptName`='npc_shadow_of_doom' WHERE `entry`=16143;
-UPDATE `creature_template` SET `ScriptName`='npc_ghoul_berserker' WHERE `entry`=16141;
+UPDATE `creature_template` SET `ScriptName`='npc_ghoul_berserker' WHERE  `entry`=16141;
+UPDATE `creature_template` SET `ScriptName`='npc_spectral_apparition' WHERE  `entry`=16423;
+UPDATE `creature_template` SET `ScriptName`='npc_bone_witch' WHERE  `entry`=16380;
+UPDATE `creature_template` SET `ScriptName`='npc_spirit_of_the_damned' WHERE  `entry`=16379;
 
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181223;
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181215;
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181374;
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181373;
+
+-- ----------------------
+-- Spells
+-- ----------------------
+
+/*
+-- SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES = 28373, // Communique, Necropolis-to-Proxies
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16136);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16386);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16398);
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28373, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 18, 8, 0, -1, -1, -1, -1, 'Communication necropol');
+*/
+
+/*
+-- SPELL_DMG_BOOST_AT_PYLON_DEATH = 28681, // [Soul Revival] Increases all damage caused by 10%.
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (28861, 1, 16592);
+*/
+
+/*
+-- SPELL_ZAP_CRYSTAL = 28032, // [Zap Crystal]. 15 damage.
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28032, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 0, -1, -1, -1, -1, -1, 'Zap Crystal');
+*/

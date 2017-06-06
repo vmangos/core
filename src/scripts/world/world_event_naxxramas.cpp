@@ -38,10 +38,10 @@ enum ScourgeInvasionLang
     LANG_SHADOW_OF_DOOM_TEST_1 = NOST_TEXT(136), // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
 
     LANG_CULTIST_ENGINEER_GOSSIP = 20100, // This cultist is in a deep trance...
-    LANG_ARGENT_DAWN_GOSSIP_0 = 20101,
-    LANG_ARGENT_DAWN_GOSSIP_1 = 20104,
-    LANG_ARGENT_DAWN_GOSSIP_2 = 20105,
-    LANG_ARGENT_EMISSARY_GOSSIP = 20102,
+    LANG_ARGENT_DAWN_GOSSIP_0 = 20101, // The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
+    LANG_ARGENT_DAWN_GOSSIP_1 = 20104, // The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
+    LANG_ARGENT_DAWN_GOSSIP_2 = 20105, // The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
+    LANG_ARGENT_EMISSARY_GOSSIP = 20102, // The Scourge are establishing small staging points in the places under attack, receiving communications and other assistance from the necropolises that fly overhead. From what we can tell, the only way to root them out is by killing the ground forces that surround the points.
 };
 
 bool IsPermanent(uint32 zone)
@@ -142,7 +142,7 @@ public:
 
 /*
 Necropolis Proxy
-For communiation
+Notes: For communiation between necropolis and the shard
 */
 struct NecropolisProxyAI : public ScriptedAI
 {
@@ -188,8 +188,8 @@ CreatureAI* GetAI_NecropolisProxy(Creature* pCreature)
 }
 
 /*
-NecropolisRelayAI
-This creature is invisible near the necropolis
+Necropolis Relay
+Notes: For communiation between necropolis and the shard
 */
 struct NecropolisRelayAI : public ScriptedAI
 {
@@ -238,14 +238,14 @@ public:
     go_necropolis(GameObject* go) : GameObjectAI(go), NecropolisRelatedObject(go)
     {
         _worldstateTimer = 1000;
-        _checkPylonsTimer = 1000;
+        _checkShardsTimer = 1000;
         _animationTimer = 1000;
     }
 
-    std::set<ObjectGuid> _pylons;
+    std::set<ObjectGuid> _shards;
     std::vector<ObjectGuid> _necropolisList;
     uint32 _worldstateTimer;
-    uint32 _checkPylonsTimer;
+    uint32 _checkShardsTimer;
     uint32 _animationTimer;
 
     bool ZoneNecropolisDestroyed()
@@ -355,7 +355,7 @@ public:
         me->Respawn();
         me->SetVisible(true);
         _animationTimer = 1000;
-        _checkPylonsTimer = 5000; // On laisse 5sec pour que les pylones spawn
+        _checkShardsTimer = 5000; // On laisse 5sec pour que les pylones spawn
         UpdateWorldState(true);
         sLog.outInfo("[NAXX] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
     }
@@ -370,15 +370,15 @@ public:
 
     bool OnUse(Unit* pylon)
     {
-        _pylons.insert(pylon->GetObjectGuid());
+        _shards.insert(pylon->GetObjectGuid());
         return false;
     }
 
     bool AllPylonsDead()
     {
-        if (!_pylons.size())
+        if (!_shards.size())
             return false;
-        for (std::set<ObjectGuid>::const_iterator it = _pylons.begin(); it != _pylons.end(); ++it)
+        for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
             if (Creature* pylon = me->GetMap()->GetCreature(*it))
                 if (pylon->isAlive())
                     return false;
@@ -386,7 +386,7 @@ public:
     }
     void SetPylonsRespawnTime(uint32 time)
     {
-        for (std::set<ObjectGuid>::const_iterator it = _pylons.begin(); it != _pylons.end(); ++it)
+        for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
             if (Creature* pylon = me->GetMap()->GetCreature(*it))
             {
                 pylon->DoKillUnit(); // Normalement c'est deja fait. on sait jamais.
@@ -429,7 +429,7 @@ public:
         else
             _animationTimer -= diff;
 
-        if (_checkPylonsTimer < diff)
+        if (_checkShardsTimer < diff)
         {
             if (AllPylonsDead())
             {
@@ -441,7 +441,7 @@ public:
             }
         }
         else
-            _checkPylonsTimer -= diff;
+            _checkShardsTimer -= diff;
     }
 };
 
@@ -594,7 +594,7 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
 
     void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
     {
-        if (pSpell->Id == SPELL_COMMUNICATION_TRIGGER || pSpell->Id == SPELL_DAMAGE_PYLON)
+        if (pSpell->Id == SPELL_COMMUNICATION_TRIGGER || pSpell->Id == SPELL_ZAP_CRYSTAL)
             DoCastSpellIfCan(m_creature, SPELL_CAMP_RECEIVES_COMMUNIQUE);
     }
 
@@ -678,85 +678,6 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
 CreatureAI* GetAI_necrotic_shard(Creature* pCreature)
 {
     return new npc_necrotic_shard(pCreature);
-}
-
-/*
-Shadow of Doom
-*/
-struct ShadowOfDoomAI : public ScriptedAI
-{
-    uint32 m_uiFear_Timer;
-    uint32 m_uiMindFlay_Timer;
-    uint32 m_uiScourgeStrike_Timer;
-
-    ShadowOfDoomAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset()
-    {
-        m_uiFear_Timer = 10000;
-        m_uiMindFlay_Timer = 6000;
-        m_uiScourgeStrike_Timer = 120000;
-    }
-
-    void Aggro(Unit* pWho)
-    {
-    }
-
-    void JustSummoned(Creature* creature)
-    {
-        DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
-
-        uint32 rnd;
-        rnd = urand(0, 1);
-        if (rnd)
-            creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_0, LANG_UNIVERSAL, 0);
-        else
-            creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_1, LANG_UNIVERSAL, 0);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        // Fear
-        if (m_uiFear_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
-                m_uiFear_Timer = 10000;
-        }
-        else
-            m_uiFear_Timer -= uiDiff;
-
-        // Mind Flay
-        if (m_uiMindFlay_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDFLAY) == CAST_OK)
-                m_uiMindFlay_Timer = 10000;
-        }
-        else
-            m_uiMindFlay_Timer -= uiDiff;
-
-        // Scourge Strike
-        if (m_uiScourgeStrike_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
-                m_uiScourgeStrike_Timer = 120000;
-        }
-        else
-            m_uiScourgeStrike_Timer -= uiDiff;
-
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_ShadowOfDoom(Creature* pCreature)
-{
-    return new ShadowOfDoomAI(pCreature);
 }
 
 /*
@@ -857,7 +778,86 @@ bool GossipHello_npc_cultist_engineer(Player* player, Creature* creature)
 }
 
 /*
+Shadow of Doom
+Notes: 
+*/
+struct ShadowOfDoomAI : public ScriptedAI
+{
+    uint32 m_uiFear_Timer;
+    uint32 m_uiMindFlay_Timer;
+    uint32 m_uiScourgeStrike_Timer;
+
+    ShadowOfDoomAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    void Reset()
+    {
+        m_uiFear_Timer = 10000;
+        m_uiMindFlay_Timer = 6000;
+        m_uiScourgeStrike_Timer = 120000;
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        uint32 rnd;
+        rnd = urand(0, 1);
+        if (rnd)
+            creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_0, LANG_UNIVERSAL, 0);
+        else
+            creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_1, LANG_UNIVERSAL, 0);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        // Fear
+        if (m_uiFear_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
+                m_uiFear_Timer = 10000;
+        }
+        else
+            m_uiFear_Timer -= uiDiff;
+
+        // Mind Flay
+        if (m_uiMindFlay_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDFLAY) == CAST_OK)
+                m_uiMindFlay_Timer = 10000;
+        }
+        else
+            m_uiMindFlay_Timer -= uiDiff;
+
+        // Scourge Strike
+        if (m_uiScourgeStrike_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                m_uiScourgeStrike_Timer = 120000;
+        }
+        else
+            m_uiScourgeStrike_Timer -= uiDiff;
+
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_ShadowOfDoom(Creature* pCreature)
+{
+    return new ShadowOfDoomAI(pCreature);
+}
+
+/*
 npc_ghoul_berserker
+Notes: Shard trash
 */
 struct GhoulBerserker : public ScriptedAI
 {
@@ -889,8 +889,8 @@ struct GhoulBerserker : public ScriptedAI
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -927,6 +927,7 @@ CreatureAI* GetAI_GhoulBerserker(Creature* pCreature)
 
 /*
 Spectral Soldier
+Notes: Shard trash
 */
 struct SpectralSoldierAI : public ScriptedAI
 {
@@ -952,8 +953,8 @@ struct SpectralSoldierAI : public ScriptedAI
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -988,6 +989,7 @@ CreatureAI* GetAI_SpectralSoldierAI(Creature* pCreature)
 
 /*
 Skeletal Shock Trooper
+Notes: Shard trash
 */
 struct SkeletalShocktrooperAI : public ScriptedAI
 {
@@ -1013,8 +1015,8 @@ struct SkeletalShocktrooperAI : public ScriptedAI
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1046,6 +1048,10 @@ CreatureAI* GetAI_SkeletalShocktrooperAI(Creature* pCreature)
     return new SkeletalShocktrooperAI(pCreature);
 }
 
+/*
+Skeletal Trooper
+Notes: Low level mobs in starting area's
+*/
 struct SkeletalTrooperAI : public ScriptedAI
 {
     SkeletalTrooperAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1053,9 +1059,14 @@ struct SkeletalTrooperAI : public ScriptedAI
         Reset();
     }
 
+    uint32 _ShadowWordPainTimer;
+    uint32 _ScourgeStrikeTimer;
+
     void Reset()
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
+        _ScourgeStrikeTimer = 120000; // 2 min
+        _ShadowWordPainTimer = 15000; // 15 sec
     }
 
     void JustSummoned(Creature* creature)
@@ -1065,14 +1076,30 @@ struct SkeletalTrooperAI : public ScriptedAI
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (_ShadowWordPainTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD_PAIN) == CAST_OK)
+                _ShadowWordPainTimer = 30000; // 30 sec
+        }
+        else
+            _ShadowWordPainTimer -= uiDiff;
+
+        if (_ScourgeStrikeTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                _ScourgeStrikeTimer = 120000; // 2 min
+        }
+        else
+            _ScourgeStrikeTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
@@ -1085,6 +1112,7 @@ CreatureAI* GetAI_SkeletalTrooperAI(Creature* pCreature)
 
 /*
 Spectral Spirit
+Notes: Low level mobs in starting area's
 */
 struct SpectralSpiritAI : public ScriptedAI
 {
@@ -1093,12 +1121,9 @@ struct SpectralSpiritAI : public ScriptedAI
         Reset();
     }
 
-    uint32 _shadowWordPainTimer;
-
     void Reset()
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
-        _shadowWordPainTimer = 15000;
     }
 
     void JustSummoned(Creature* creature)
@@ -1108,8 +1133,8 @@ struct SpectralSpiritAI : public ScriptedAI
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1117,13 +1142,6 @@ struct SpectralSpiritAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (_shadowWordPainTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD_PAIN) == CAST_OK)
-                _shadowWordPainTimer = 30000;
-        }
-        else
-            _shadowWordPainTimer -= uiDiff;
         DoMeleeAttackIfReady();
     }
 };
@@ -1131,6 +1149,190 @@ struct SpectralSpiritAI : public ScriptedAI
 CreatureAI* GetAI_SpectralSpiritAI(Creature* pCreature)
 {
     return new SpectralSpiritAI(pCreature);
+}
+
+/*
+Spectral Apparition
+Notes: Low level mobs in starting area's
+*/
+struct SpectralApparitionAI : public ScriptedAI
+{
+    SpectralApparitionAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 _ScourgeStrikeTimer;
+
+    void Reset()
+    {
+        m_creature->AddAura(SPELL_PURPLE_VISUAL);
+        _ScourgeStrikeTimer = 120000; // 2 min
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
+    }
+
+    void JustDied(Unit*)
+    {
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (_ScourgeStrikeTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                _ScourgeStrikeTimer = 120000;
+        }
+        else
+            _ScourgeStrikeTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_SpectralApparitionAI(Creature* pCreature)
+{
+    return new SpectralApparitionAI(pCreature);
+}
+
+/*
+Bone Witch
+Notes: one of the 3 Rare spawns by the shard
+*/
+struct BoneWitchAI : public ScriptedAI
+{
+    BoneWitchAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 _ArcaneBoltTimer;
+    uint32 _BoneShardsTimer;
+    uint32 _ScourgeStrikeTimer;
+
+    void Reset()
+    {
+        m_creature->AddAura(SPELL_PURPLE_VISUAL);
+        _ArcaneBoltTimer = 1000;
+        _BoneShardsTimer = 12000;
+        _ScourgeStrikeTimer = 120000; // 2 min
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
+    }
+
+    void JustDied(Unit*)
+    {
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_DAMAGE_CRYSTAL);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (_ArcaneBoltTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_BOLT) == CAST_OK)
+                _ArcaneBoltTimer = 1000;
+        }
+        else
+            _ArcaneBoltTimer -= uiDiff;
+
+        if (_BoneShardsTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BONE_SHARDS) == CAST_OK)
+                _BoneShardsTimer = 12000;
+        }
+        else
+            _BoneShardsTimer -= uiDiff;
+
+        if (_ScourgeStrikeTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                _ScourgeStrikeTimer = 120000;
+        }
+        else
+            _ScourgeStrikeTimer -= uiDiff;
+    }
+};
+
+CreatureAI* GetAI_BoneWitchAI(Creature* pCreature)
+{
+    return new BoneWitchAI(pCreature);
+}
+
+/*
+Spirit of the Damned
+Notes: one of the 3 Rare spawns by the shard
+*/
+struct SpiritOfTheDamnedAI : public ScriptedAI
+{
+    SpiritOfTheDamnedAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 _RibbonOfSoulsTimer;
+    uint32 _ScourgeStrikeTimer;
+
+    void Reset()
+    {
+        m_creature->AddAura(SPELL_PURPLE_VISUAL);
+        _RibbonOfSoulsTimer = 15000;
+        _ScourgeStrikeTimer = 120000; // 2 min
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
+    }
+
+    void JustDied(Unit*)
+    {
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(shard, SPELL_DAMAGE_CRYSTAL);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (_RibbonOfSoulsTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_RIBBON_OF_SOULS) == CAST_OK)
+                _RibbonOfSoulsTimer = 15000;
+        }
+        else
+            _RibbonOfSoulsTimer -= uiDiff;
+
+        if (_ScourgeStrikeTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                _ScourgeStrikeTimer = 120000;
+        }
+        else
+            _ScourgeStrikeTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_SpiritOfTheDamnedAI(Creature* pCreature)
+{
+    return new SpiritOfTheDamnedAI(pCreature);
 }
 
 /*
@@ -1229,10 +1431,19 @@ bool GossipHello_naxx_event_rewards_giver(Player* player, Creature* creature)
 
 /*
 Argent Emissary
+Notes: NPC thats tells what is going on and shows what locations are under attack.
 */
 bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
-    player->CLOSE_GOSSIP_MENU();
+    switch (action)
+    {
+        case GOSSIP_ACTION_INFO_DEF + 1:
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 2:
+            break;
+    }
+
+    //player->CLOSE_GOSSIP_MENU();
     return true;
 }
 
@@ -1250,6 +1461,7 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
     char victories[200];
     sprintf(victories, victoriesFormat, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT));
     player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, victories, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+
     if (attacked1 == ZONEID_TANARIS || attacked2 == ZONEID_TANARIS)
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_TANARIS_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
     if (attacked1 == ZONEID_AZSHARA || attacked2 == ZONEID_AZSHARA)
@@ -1343,6 +1555,21 @@ void AddSC_world_event_naxxramas()
     newscript = new Script;
     newscript->Name = "npc_spectral_spirit";
     newscript->GetAI = &GetAI_SpectralSpiritAI;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_spectral_apparition";
+    newscript->GetAI = &GetAI_SpectralApparitionAI;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_bone_witch";
+    newscript->GetAI = &GetAI_BoneWitchAI;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_spirit_of_the_damned";
+    newscript->GetAI = &GetAI_SpiritOfTheDamnedAI;
     newscript->RegisterSelf();
 
     newscript = new Script;
