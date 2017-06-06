@@ -280,9 +280,16 @@ bool ChatHandler::HandleDebugPlayMusicCommand(char* args)
     }
 
     Player* target;
-
+   
     if (!ExtractPlayerTarget(&args, &target, nullptr, nullptr))
         return false;
+
+    if (target->GetSession() != GetSession() && GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+    {
+        PSendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     WorldPacket data(SMSG_PLAY_MUSIC, 4);
     data << int32(dwSoundId);
