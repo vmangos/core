@@ -20,8 +20,8 @@
 #include "model.h"
 #include "wmo.h"
 #include "matrix.h"
-#include <loadlib\loadlib.h>
-#include <libmpq\mpq_libmpq.h>
+#include "loadlib/loadlib.h"
+#include "libmpq/mpq_libmpq.h"
 
 Model::Model(std::string& filename) : filename(filename), vertices(0), indices(0)
 {

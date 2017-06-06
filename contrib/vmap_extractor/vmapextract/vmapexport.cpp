@@ -45,7 +45,7 @@
 #include "wdtfile.h"
 #include "dbcfile.h"
 #include "wmo.h"
-#include <libmpq\mpq_libmpq.h>
+#include "libmpq/mpq_libmpq.h"
 
 #include "vmapexport.h"
 

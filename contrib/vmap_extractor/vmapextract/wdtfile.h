@@ -19,7 +19,7 @@
 #ifndef WDTFILE_H
 #define WDTFILE_H
 
-#include <libmpq\mpq_libmpq.h>
+#include "libmpq/mpq_libmpq.h"
 #include "wmo.h"
 #include <string>
 #include "stdlib.h"

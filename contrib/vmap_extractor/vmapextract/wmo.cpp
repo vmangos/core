@@ -27,7 +27,7 @@
 #include <fstream>
 #undef min
 #undef max
-#include <libmpq\mpq_libmpq.h>
+#include "libmpq/mpq_libmpq.h"
 #include "adtfile.h" // for fixnamen
 
 using namespace std;

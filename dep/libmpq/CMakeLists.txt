@@ -24,6 +24,6 @@ include_directories(
 
 if(WIN32)
   target_link_libraries(libmpq loadlib
-    zlib
+    z
   )
 endif()

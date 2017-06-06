@@ -23,4 +23,4 @@ include_directories(
 )
 
 # link loadlib with zlib
-target_link_libraries (loadlib zlib libmpq)
+target_link_libraries (loadlib z libmpq)
