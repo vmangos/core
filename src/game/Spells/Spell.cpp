@@ -2828,12 +2828,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case SPELL_EFFECT_SKIN_PLAYER_CORPSE:
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
-                    else if (m_targets.getCorpseTargetGuid())
-                    {
-                        if (Corpse *corpse = m_caster->GetMap()->GetCorpse(m_targets.getCorpseTargetGuid()))
-                            if (Player* owner = ObjectAccessor::FindPlayer(corpse->GetOwnerGuid()))
-                                targetUnitMap.push_back(owner);
-                    }
                     break;
                 case SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER:
                     if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
