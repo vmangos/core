@@ -12610,6 +12610,7 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
         SetQuestSlot(log_slot, 0);
 
     QuestStatusData& q_status = mQuestStatus[quest_id];
+    q_status.m_reward_choice = pQuest->RewChoiceItemId[reward];
 
     // Not give XP in case already completed once repeatable quest
     uint32 XP = q_status.m_rewarded ? 0 : uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
@@ -14897,8 +14898,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
 
     uint32 slot = 0;
 
-    ////                                                     0      1       2         3         4      5          6          7          8          9           10          11          12
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4 FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
+    ////                                                     0      1       2         3         4      5          6          7          8          9           10          11          12          13
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4, reward_choice FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
     if (result)
     {
@@ -14978,8 +14979,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
 
                 if (questStatusData.m_rewarded)
                 {
-                    // learn rewarded spell if unknown
-                    learnQuestRewardedSpells(pQuest);
+                    questStatusData.m_reward_choice = fields[13].GetUInt32();
+                    learnQuestRewardedSpells(pQuest); // learn rewarded spell if unknown
                 }
 
                 DEBUG_LOG("Quest status is {%u} for quest {%u} for player (GUID: %u)", questStatusData.m_status, quest_id, GetGUIDLow());
@@ -15778,8 +15779,8 @@ void Player::_SaveQuestStatus()
         {
             case QUEST_NEW :
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insertQuestStatus, "INSERT INTO character_queststatus (guid,quest,status,rewarded,explored,timer,mobcount1,mobcount2,mobcount3,mobcount4,itemcount1,itemcount2,itemcount3,itemcount4) "
-                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insertQuestStatus, "INSERT INTO character_queststatus (guid,quest,status,rewarded,explored,timer,mobcount1,mobcount2,mobcount3,mobcount4,itemcount1,itemcount2,itemcount3,itemcount4,reward_choice) "
+                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(i->first);
@@ -15791,16 +15792,18 @@ void Player::_SaveQuestStatus()
                     stmt.addUInt32(i->second.m_creatureOrGOcount[k]);
                 for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
                     stmt.addUInt32(i->second.m_itemcount[k]);
+                stmt.addUInt32(i->second.m_reward_choice);
                 stmt.Execute();
             }
             break;
             case QUEST_CHANGED :
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(updateQuestStatus, "UPDATE character_queststatus SET status = ?,rewarded = ?,explored = ?,timer = ?,"
+                SqlStatement stmt = CharacterDatabase.CreateStatement(updateQuestStatus, "UPDATE character_queststatus SET status = ?,rewarded = ?,reward_choice = ?,explored = ?,timer = ?,"
                                     "mobcount1 = ?,mobcount2 = ?,mobcount3 = ?,mobcount4 = ?,itemcount1 = ?,itemcount2 = ?,itemcount3 = ?,itemcount4 = ?  WHERE guid = ? AND quest = ?");
 
                 stmt.addUInt8(i->second.m_status);
                 stmt.addUInt8(i->second.m_rewarded);
+                stmt.addUInt32(i->second.m_reward_choice);
                 stmt.addUInt8(i->second.m_explored);
                 stmt.addUInt64(uint64(i->second.m_timer / IN_MILLISECONDS + sWorld.GetGameTime()));
                 for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
