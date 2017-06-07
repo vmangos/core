@@ -176,22 +176,7 @@ void npc_escortAI::JustDied(Unit* /*pKiller*/)
 
     if (Player* pPlayer = GetPlayerForEscort())
     {
-        if (Group* pGroup = pPlayer->GetGroup())
-        {
-            for(GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
-            {
-                if (Player* pMember = pRef->getSource())
-                {
-                    if (pMember->GetQuestStatus(m_pQuestForEscort->GetQuestId()) == QUEST_STATUS_INCOMPLETE)
-                        pMember->FailQuest(m_pQuestForEscort->GetQuestId());
-                }
-            }
-        }
-        else
-        {
-            if (pPlayer->GetQuestStatus(m_pQuestForEscort->GetQuestId()) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->FailQuest(m_pQuestForEscort->GetQuestId());
-        }
+        pPlayer->GroupEventFailHappens(m_pQuestForEscort->GetQuestId());
     }
 }
 
