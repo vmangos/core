@@ -1393,6 +1393,31 @@ void Group::_removeRolls(ObjectGuid guid)
     }
 }
 
+bool Group::_swapMembersGroup(ObjectGuid guid, ObjectGuid swapGuid)
+{
+    // If we can't get a member slot for both members then the swap is impossible
+    member_witerator slot = _getMemberWSlot(guid);
+    if (slot == m_memberSlots.end())
+        return false;
+
+    member_witerator swapSlot = _getMemberWSlot(swapGuid);
+    if (swapSlot == m_memberSlots.end())
+        return false;
+
+    uint8 swapGroup = swapSlot->group;
+    swapSlot->group = slot->group;
+    slot->group = swapGroup;
+
+    // Don't need to change group counters since we are swapping
+    if (!isBGGroup())
+    {
+        CharacterDatabase.PExecute("UPDATE group_member SET subgroup='%u' WHERE memberGuid='%u'", slot->group, guid.GetCounter());
+        CharacterDatabase.PExecute("UPDATE group_member SET subgroup='%u' WHERE memberGuid='%u'", swapSlot->group, swapGuid.GetCounter());
+    }
+
+    return true;
+}
+
 bool Group::_setMembersGroup(ObjectGuid guid, uint8 group)
 {
     member_witerator slot = _getMemberWSlot(guid);
@@ -1481,7 +1506,11 @@ bool Group::SameSubGroup(Player const* member1, Player const* member2) const
 // allows setting subgroup for offline members
 void Group::ChangeMembersGroup(ObjectGuid guid, uint8 group)
 {
-    if (!isRaidGroup())
+    if (!isRaidGroup() || group >= MAX_RAID_SUBGROUPS)
+        return;
+
+    // Cannot put player in group if it would cause the group to overflow
+    if (m_subGroupsCounts && m_subGroupsCounts[group] >= MAX_GROUP_SIZE)
         return;
 
     Player *player = sObjectMgr.GetPlayer(guid);
@@ -1506,11 +1535,17 @@ void Group::ChangeMembersGroup(ObjectGuid guid, uint8 group)
 // only for online members
 void Group::ChangeMembersGroup(Player *player, uint8 group)
 {
-    if (!player || !isRaidGroup())
+    if (!player || !isRaidGroup() || group >= MAX_RAID_SUBGROUPS)
         return;
 
-    uint8 prevSubGroup = player->GetSubGroup();
-    if (prevSubGroup == group)
+    // Player's current subgroup may be from a battleground, so check
+    // subgroup in this Group
+    uint8 prevSubGroup = GetMemberGroup(player->GetObjectGuid());
+    if (prevSubGroup == group || prevSubGroup >= MAX_RAID_SUBGROUPS)
+        return;
+
+    // Cannot put player in group if it would cause the group to overflow
+    if (m_subGroupsCounts && m_subGroupsCounts[group] >= MAX_GROUP_SIZE)
         return;
 
     if (_setMembersGroup(player->GetObjectGuid(), group))
@@ -1529,6 +1564,85 @@ void Group::ChangeMembersGroup(Player *player, uint8 group)
     }
 }
 
+// One or both members are offline
+void Group::SwapMembersGroup(ObjectGuid guid, ObjectGuid swapGuid)
+{
+    if (!isRaidGroup())
+        return;
+
+    Player *player = sObjectMgr.GetPlayer(guid);
+    Player *swapPlayer = sObjectMgr.GetPlayer(swapGuid);
+
+    if (player && swapPlayer)
+        SwapMembersGroup(player, swapPlayer);
+    else
+    {
+        uint8 group = GetMemberGroup(guid);
+        uint8 swapGroup = GetMemberGroup(swapGuid);
+
+        // Same group, can't swap
+        if (group == swapGroup || group >= MAX_RAID_SUBGROUPS || swapGroup >= MAX_RAID_SUBGROUPS)
+            return;
+
+        if (_swapMembersGroup(guid, swapGuid))
+        {
+            // Player is online, update group refs
+            if (player)
+            {
+                if (player->GetGroup() == this)
+                    player->GetGroupRef().setSubGroup(swapGroup);
+                // BG group
+                else
+                    player->GetOriginalGroupRef().setSubGroup(swapGroup);
+            }
+
+            // Swap player is online, update group refs
+            if (swapPlayer)
+            {
+                if (swapPlayer->GetGroup() == this)
+                    swapPlayer->GetGroupRef().setSubGroup(group);
+                else
+                    swapPlayer->GetOriginalGroupRef().setSubGroup(group);
+            }
+
+            // Don't change group counters, we're swapping. Just update
+            SendUpdate();
+        }
+    }
+}
+
+// Both members online
+void Group::SwapMembersGroup(Player *player, Player *swapPlayer)
+{
+    if (!isRaidGroup() || !player || !swapPlayer)
+        return;
+
+    // Cannot swap players in the same sub group! Get groups from GetMemberGroup,
+    // as either player may be in a battleground and not have their current group
+    // set to this Group
+    uint8 group = GetMemberGroup(player->GetObjectGuid());
+    uint8 swapGroup = GetMemberGroup(swapPlayer->GetObjectGuid());
+
+    if (group == swapGroup || group >= MAX_RAID_SUBGROUPS || swapGroup >= MAX_RAID_SUBGROUPS)
+        return;
+
+    if (_swapMembersGroup(player->GetObjectGuid(), swapPlayer->GetObjectGuid()))
+    {
+        // One player may be in a BG group, the other not
+        if (player->GetGroup() == this)
+            player->GetGroupRef().setSubGroup(swapGroup);
+        // BG group
+        else
+            player->GetOriginalGroupRef().setSubGroup(swapGroup);
+
+        if (swapPlayer->GetGroup() == this)
+            swapPlayer->GetGroupRef().setSubGroup(group);
+        else
+            swapPlayer->GetOriginalGroupRef().setSubGroup(group);
+
+        SendUpdate();
+    }
+}
 
 uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount)
 {
