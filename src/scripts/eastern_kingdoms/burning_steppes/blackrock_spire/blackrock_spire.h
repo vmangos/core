@@ -42,6 +42,7 @@ enum
     GO_GYTH_COMBAT_DOOR         = 175185,                   // control in boss_script, because will auto-close after each wave
     GO_GYTH_EXIT_DOOR           = 175186,
 
+    GO_BLACKROCK_ALTAR          = 175706,
 
     GO_ROOM_7_RUNE              = 175194,
     GO_ROOM_3_RUNE              = 175195,
@@ -136,6 +137,8 @@ class instance_blackrock_spire : public ScriptedInstance
         uint64 m_uiEmberseerRune05GUID;
         uint64 m_uiEmberseerRune06GUID;
         uint64 m_uiEmberseerRune07GUID;
+
+        uint64 m_uiBlackRockAltarGUID;
 
         uint32 m_uiUBRSDoor_Timer;
         uint32 m_uiUBRSDoor_Step;

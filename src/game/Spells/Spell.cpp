@@ -275,6 +275,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_executeStack = 0;
     m_delayStart = 0;
     m_delayAtDamageCount = 0;
+    m_isChannelingVisual = false;
 
     m_applyMultiplierMask = 0;
 
@@ -3000,23 +3001,26 @@ void Spell::prepare(Aura* triggeredByAura)
             if (pPlayerCaster->HasOption(PLAYER_CHEAT_NO_POWER))
                 m_powerCost = 0;
 
-        SpellCastResult result = CheckCast(true);
-        Unit* pTarget = m_targets.getUnitTarget();
-        if (result != SPELL_CAST_OK || (IsAutoRepeat() && m_caster == pTarget))
+        if (!IsChannelingVisual())
         {
-            if (!IsAutoRepeat() || !IsAcceptableAutorepeatError(result))
+            SpellCastResult result = CheckCast(true);
+            Unit* pTarget = m_targets.getUnitTarget();
+            if (result != SPELL_CAST_OK || (IsAutoRepeat() && m_caster == pTarget))
             {
-                DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell %u failed for reason 0x%x (target %u)", m_spellInfo->Id, result, pTarget ? pTarget->GetGUIDLow() : 0);
-                if (triggeredByAura && !triggeredByAura->GetHolder()->IsPassive())
+                if (!IsAutoRepeat() || !IsAcceptableAutorepeatError(result))
                 {
-                    SendChannelUpdate(0);
-                    triggeredByAura->GetHolder()->SetAuraDuration(0);
-                }
+                    DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell %u failed for reason 0x%x (target %u)", m_spellInfo->Id, result, pTarget ? pTarget->GetGUIDLow() : 0);
+                    if (triggeredByAura && !triggeredByAura->GetHolder()->IsPassive())
+                    {
+                        SendChannelUpdate(0);
+                        triggeredByAura->GetHolder()->SetAuraDuration(0);
+                    }
 
-                SendCastResult(result);
-                //SendInterrupted(0);
-                finish(false);
-                return;
+                    SendCastResult(result);
+                    //SendInterrupted(0);
+                    finish(false);
+                    return;
+                }
             }
         }
         // Prepare data for triggers
@@ -3126,9 +3130,18 @@ void Spell::cancel()
             SendChannelUpdate(0);
             SendInterrupted(0);
 
-            // spell is canceled-take mods and clear list
             if (m_caster->GetTypeId() == TYPEID_PLAYER)
+            {
+                // spell is canceled-take mods and clear list
                 m_caster->ToPlayer()->RemoveSpellMods(this);
+
+                // summoning rituals, if a user has cancelled inform the go
+                if (GameObject* go = m_targets.getGOTarget())
+                    if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
+                        go->getLootState() != GO_JUST_DEACTIVATED &&
+                        go->HasUniqueUser(m_caster->ToPlayer()))
+                        go->RemoveUniqueUse(m_caster->ToPlayer());
+            }
             if (sendInterrupt)
                 SendCastResult(SPELL_FAILED_INTERRUPTED);
         }
@@ -3190,7 +3203,7 @@ void Spell::cast(bool skipCheck)
     }
 
     SpellCastResult castResult = SPELL_CAST_OK;
-    if (!skipCheck)
+    if (!skipCheck && !IsChannelingVisual())
     {
         // Nostalrius - compute power cost once again at cast finished
         // (in case of mana reduction buff proc while casting)
@@ -3622,6 +3635,28 @@ void Spell::update(uint32 difftime)
             cancel();
     }
 
+    // summoning ritual
+    if (GameObject* pGo = m_targets.getGOTarget())
+    {
+        if (GameObjectInfo const* pInfo = pGo->GetGOInfo())
+            // triggered spell
+            if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
+                m_spellInfo->Id == pInfo->summoningRitual.spellId &&
+                // too many helpers cancelled
+                (pGo->GetUniqueUseCount() < pInfo->summoningRitual.reqParticipants||
+                // the warlock cancelled
+                !pInfo->summoningRitual.ritualPersistent && !pGo->GetOwner()))
+            {
+                cancel();
+                pGo->SetGoState(GO_STATE_READY);
+                if (!pInfo->summoningRitual.ritualPersistent)
+                    pGo->Delete();
+            }
+    }
+    // visual spell and deleted ritual object
+    else if (IsChannelingVisual())
+        cancel();
+
     switch (m_spellState)
     {
         case SPELL_STATE_PREPARING:
@@ -3784,10 +3819,20 @@ void Spell::finish(bool ok)
 
     m_spellState = SPELL_STATE_FINISHED;
 
-    // Nostalrius: unstun du pet si cast de l'invocation interrompu.
-    if (!ok && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK && m_caster->GetPetGuid())
-        if (Pet* pet = ((Player*)m_caster)->GetPet())
-            pet->RemoveAurasDueToSpell(29825);
+    if (!ok && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
+    {
+        // Nostalrius: unstun du pet si cast de l'invocation interrompu.
+        if (m_caster->GetPetGuid())
+            if (Pet* pet = ((Player*)m_caster)->GetPet())
+                pet->RemoveAurasDueToSpell(29825);
+
+        // Fix a client problem with ritual of doom, by itself it disables
+        // the spell during cast and then the spell stays disabled
+        // Ignore the spell when it's triggered (ritual helper)
+        if (m_spellInfo->Id == 18540 && !m_IsTriggeredSpell
+            && !m_caster->HasSpellCooldown(m_spellInfo->Id))
+            m_caster->ToPlayer()->SendClearCooldown(18540, m_caster);
+    }
 
     // Restore pet movement after spell (succubus after seduce)
     if (CharmInfo* ci = m_caster->GetCharmInfo())
@@ -3863,7 +3908,15 @@ void Spell::finish(bool ok)
     }
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
+    {
         m_caster->ToPlayer()->RemoveSpellMods(this);
+
+        // summoning ritual triggered spell successfull hit
+        if (GameObject* pGo = m_targets.getGOTarget())
+            if (pGo->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL)
+                if (m_spellInfo->Id == pGo->GetGOInfo()->summoningRitual.spellId)
+                    pGo->FinishRitual();
+    }
     // Stop Attack for some spells
     if (m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET)
     {
@@ -4414,7 +4467,7 @@ void Spell::TakeCastItem()
 
 void Spell::TakePower()
 {
-    if (m_CastItem || m_triggeredByAuraSpell)
+    if (m_CastItem || m_triggeredByAuraSpell || IsChannelingVisual())
         return;
 
     // health as power used
@@ -4594,6 +4647,10 @@ void Spell::HandleThreatSpells()
 
 void Spell::HandleEffects(Unit *pUnitTarget, Item *pItemTarget, GameObject *pGOTarget, SpellEffectIndex i, float DamageMultiplier)
 {
+    // a summoning ritual visual has no effect
+    if (IsChannelingVisual())
+        return;
+
     unitTarget = pUnitTarget;
     itemTarget = pItemTarget;
     gameObjTarget = pGOTarget;
@@ -7129,8 +7186,8 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
 
 bool Spell::IsNeedSendToClient() const
 {
-    return m_spellInfo->SpellVisual != 0 || IsChanneledSpell(m_spellInfo) ||
-           m_spellInfo->speed > 0.0f || (!m_triggeredByAuraSpell && !m_IsTriggeredSpell);
+    return !IsChannelingVisual() && (m_spellInfo->SpellVisual != 0 || IsChanneledSpell(m_spellInfo) ||
+           m_spellInfo->speed > 0.0f || (!m_triggeredByAuraSpell && !m_IsTriggeredSpell));
 }
 
 bool Spell::IsTriggeredSpellWithRedundentData() const

@@ -45,6 +45,16 @@ EndScriptData */
 #define SAY_KILL "Reckless mortal."
 #define SOUND_KILL 5858
 
+// Return true to avoid db script attempt
+bool ProcessEventId_event_awaken_archaedas(uint32 eventId, Object* source, Object* target, bool isStart)
+{
+    if (!source || source->GetTypeId() != TYPEID_PLAYER)
+        return true;
+    ScriptedInstance* instance = (ScriptedInstance*)((Player*)source)->GetInstanceData();
+    instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS);
+    return true;
+}
+
 struct boss_archaedasAI : public ScriptedAI
 {
     boss_archaedasAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -399,122 +409,6 @@ CreatureAI* GetAI_mob_archaedas_minions(Creature* creature)
     return new mob_archaedas_minionsAI(creature);
 }
 
-/* ScriptData
-SDName: go_altar_archaedas
-SD%Complete: 100
-SDComment: Needs 1 person to activate the Archaedas script
-SDCategory: Uldaman
-EndScriptData */
-
-
-bool GOHello_go_altar_of_archaedas(Player* pPlayer, GameObject* pGo)
-{
-    ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData();
-
-    if (!pInstance)
-        return false;
-
-    if (pPlayer)
-        pPlayer->CastSpell(nullptr, SPELL_ALTAR_SUMMONING_VISUAL, true);
-
-    return true;
-}
-
-struct go_altar_of_archaedasAI : public GameObjectAI
-{
-    go_altar_of_archaedasAI(GameObject* gobj) : GameObjectAI(gobj)
-    {
-        instance = (ScriptedInstance*)gobj->GetInstanceData();
-        _gobjGuid = gobj->GetGUID();
-        _gobjType = gobj->GetGoType();
-        _gobj = gobj;
-        Reset();
-    }
-
-    ScriptedInstance* instance;
-
-    GameObject* _gobj;
-    uint64 _gobjGuid;
-    uint32 _gobjType;
-
-    bool _eventStarted;
-    uint32 _summonTimer;
-
-    void Reset()
-    {
-        _eventStarted = false;
-        _summonTimer  = TIMER_ALTAR_SUMMON;
-        instance->SetData(DATA_ARCHAEDAS_ALTAR, NOT_STARTED);
-    }
-
-    uint32 CountSummoners()
-    {
-        const Map::PlayerList& players = me->GetMap()->GetPlayers();
-        uint32 count = 0;
-        for (auto it = players.begin(); it != players.end(); ++it)
-        {
-            if (Player* player = it->getSource())
-            {
-                if (Spell* spell = player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                {
-                    if (spell->m_spellInfo->Id == SPELL_ALTAR_SUMMONING_VISUAL)
-                    {
-                        if (_gobj->GetDistance2d(player) <= INTERACTION_DISTANCE)
-                        {
-                            ++count;
-                        }
-                    }
-                }
-            }
-        }
-        return count;
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!instance ||
-            instance->GetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS) != DONE ||
-            instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) == DONE ||
-            instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) == IN_PROGRESS)
-        {
-            return;
-        }
-        if (!_eventStarted)
-        {
-            if (CountSummoners() >= NEEDED_SUMMONERS)
-            {
-                instance->SetData(DATA_ARCHAEDAS_ALTAR, IN_PROGRESS); // activate the altar
-                instance->SetData(DATA_ANCIENT_DOOR, IN_PROGRESS); // close the vault door
-                _eventStarted = true;
-            }
-            return;
-        }
-        else if (CountSummoners() >= NEEDED_SUMMONERS)
-        {
-            if (_summonTimer <= diff)
-            {
-                Reset();
-                instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS); // activate archaedas
-            }
-            else
-            {
-                _summonTimer -= diff;
-            }
-        }
-        else
-        {
-            Reset();
-            if (instance->GetData(ULDAMAN_ENCOUNTER_ARCHAEDAS) != IN_PROGRESS)
-                instance->SetData(DATA_ANCIENT_DOOR, FAIL); // open the vault door
-        }
-    }
-};
-
-GameObjectAI* GetAI_go_altar_of_archaedas(GameObject* go)
-{
-    return new go_altar_of_archaedasAI(go);
-}
-
 //This is the actual function called only once during InitScripts()
 //It must define all handled functions that are to be run in this script
 void AddSC_boss_archaedas()
@@ -532,8 +426,7 @@ void AddSC_boss_archaedas()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_altar_of_archaedas";
-    newscript->GOGetAI = &GetAI_go_altar_of_archaedas;
-    newscript->pGOHello = &GOHello_go_altar_of_archaedas;
+    newscript->Name = "event_awaken_archaedas";
+    newscript->pProcessEventId = &ProcessEventId_event_awaken_archaedas;
     newscript->RegisterSelf();
 }

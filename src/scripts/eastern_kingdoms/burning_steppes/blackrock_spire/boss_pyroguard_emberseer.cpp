@@ -60,6 +60,8 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
     uint32 m_uiFlameBuffetTimer;
     uint32 m_uiPyroBlastTimer;
 
+    std::set<Player*> sSummoners;
+
     // NOSTALRIUS
     bool initialized;
     bool bCanalisationEnCours;
@@ -93,6 +95,8 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
 
         // Tous doivent etre en vie au debut de l'event.
         RespawnAddWarlocks();
+        if (!m_creature->HasAura(SPELL_SELF_CAGE))
+            m_creature->CastSpell(m_creature, SPELL_SELF_CAGE, false);
         return true;
     }
 
@@ -107,49 +111,51 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         return true;
     }
 
-    void RefreshCanalisation(uint32 const diff)
+    void RefreshCanalisation()
     {
         if (!m_pInstance)
             return;
-        std::vector<ObjectGuid>::iterator it;
-        if (!m_creature->HasAura(SPELL_SELF_CAGE))
-            m_creature->CastSpell(m_creature, SPELL_SELF_CAGE, false);
-        // Verification si la canalisation a commence
-        uint32 playerSummonersCount = 0;
-        uint32 requiredSummoners = REQUIRED_SUMMONERS;
-        Player* pSummoners[REQUIRED_SUMMONERS] = {NULL};
+        std::set<Player*>::iterator it;
+        GameObject* pGo = m_creature->GetMap()->GetGameObject(m_pInstance->GetData64(GO_BLACKROCK_ALTAR));
         Map::PlayerList const &pl = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator it2 = pl.begin(); it2 != pl.end(); ++it2)
         {
             Player* currPlayer = it2->getSource();
-            if (currPlayer && currPlayer->HasAura(AURA_PLAYER_CANALISATION))
+            if (currPlayer)
             {
-                pSummoners[playerSummonersCount] = currPlayer;
-                if (currPlayer->isGameMaster()) // Debug mode
-                    requiredSummoners = 1;
-                playerSummonersCount++;
-                if (playerSummonersCount >= requiredSummoners)
-                    break;
+                it = sSummoners.find(currPlayer);
+                bool isUsing = pGo->HasUniqueUser(currPlayer);
+                if (isUsing && it == sSummoners.end())
+                    sSummoners.insert(currPlayer);
+                else if (!isUsing && it != sSummoners.end())
+                    sSummoners.erase(currPlayer);
             }
         }
+    }
 
-        if (playerSummonersCount >= requiredSummoners)
+    void StartWarlocksCombat()
+    {
+        std::set<Player*>::const_iterator itSummoners;
+
+        // Le combat avec les adds commence
+        m_pInstance->SetData(TYPE_EMBERSEER, SPECIAL);
+        for (auto it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
         {
-            // Le combat avec les adds commence
-            m_pInstance->SetData(TYPE_EMBERSEER, SPECIAL);
-            for (it = canaliseurs.begin(); it != canaliseurs.end(); ++it)
+            Creature *currCanaliseur = m_creature->GetMap()->GetCreature(*it);
+            if (!currCanaliseur)
+                continue;
+            currCanaliseur->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+            currCanaliseur->InterruptNonMeleeSpells(false);
+            if (currCanaliseur->AI())
             {
-                Creature *currCanaliseur = m_creature->GetMap()->GetCreature(*it);
-                if (!currCanaliseur)
-                    continue;
-                currCanaliseur->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
-                currCanaliseur->InterruptNonMeleeSpells(false);
-                if (currCanaliseur->AI())
-                    currCanaliseur->AI()->AttackStart(pSummoners[urand(0, requiredSummoners - 1)]);
+                itSummoners = sSummoners.begin();
+                if (itSummoners != sSummoners.end())
+                    std::advance(itSummoners, urand(0, sSummoners.size() - 1));
+                currCanaliseur->AI()->AttackStart(*itSummoners);
             }
-            bCanalisationEnCours = false;
-            bBossEnferme = true;
         }
+        bCanalisationEnCours = false;
+        bBossEnferme = true;
     }
 
     void EventBossLiberation()
@@ -237,6 +243,8 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
             m_pInstance->SetData(TYPE_EMBERSEER, FAIL);
         RespawnAddWarlocks();
         bCanalisationEnCours = true;
+        if (!m_creature->HasAura(SPELL_SELF_CAGE))
+            m_creature->CastSpell(m_creature, SPELL_SELF_CAGE, false);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -251,7 +259,7 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         // Return since we have no target
         if (bCanalisationEnCours)
         {
-            RefreshCanalisation(uiDiff);
+            RefreshCanalisation();
             return;
         }
         if (bBossEnferme)
@@ -299,6 +307,18 @@ struct boss_pyroguard_emberseerAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
+
+// Return true to avoid db script attempt
+bool ProcessEventId_event_free_pyroguard_emberseer(uint32 eventId, Object* source, Object* target, bool isStart)
+{
+    if (!source || source->GetTypeId() != TYPEID_PLAYER)
+        return true;
+    if (ScriptedInstance* instance = (ScriptedInstance*)((Player*)source)->GetInstanceData())
+        if (Creature* pyroguardEmberseer = source->ToPlayer()->GetMap()->GetCreature(instance->GetData64(NPC_PYROGUARD_EMBERSEER)))
+            if (boss_pyroguard_emberseerAI* bossAI = dynamic_cast<boss_pyroguard_emberseerAI*>(pyroguardEmberseer->AI()))
+                bossAI->StartWarlocksCombat();
+    return true;
+}
 
 CreatureAI* GetAI_boss_pyroguard_emberseer(Creature* pCreature)
 {
@@ -409,5 +429,10 @@ void AddSC_boss_pyroguard_emberseer()
     pNewScript = new Script;
     pNewScript->Name = "npc_geolier_main_noire";
     pNewScript->GetAI = &GetAI_npc_geolier_main_noire;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "event_free_pyroguard_emberseer";
+    pNewScript->pProcessEventId = &ProcessEventId_event_free_pyroguard_emberseer;
     pNewScript->RegisterSelf();
 }

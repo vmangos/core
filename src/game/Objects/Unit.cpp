@@ -4933,8 +4933,9 @@ void Unit::RemoveGameObject(GameObject* gameObj, bool del)
         RemoveAurasDueToSpell(spellid);
 
         SpellEntry const* createBySpell = sSpellMgr.GetSpellEntry(spellid);
-        // Need activate spell use for owner
-        if (createBySpell && createBySpell->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
+        // Need activate spell use for owner, for summoning rituals it happens at ritual success
+        if (createBySpell && createBySpell->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE &&
+            gameObj->GetGoType() != GAMEOBJECT_TYPE_SUMMONING_RITUAL)
             // note: item based cooldowns and cooldown spell mods with charges ignored (unknown existing cases)
             CooldownEvent(createBySpell);
     }
