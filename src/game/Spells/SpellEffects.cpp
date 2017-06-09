@@ -1593,6 +1593,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 {
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
                 }
+                case 29201: // Loatheb Corrupted Mind triggered sub spells
+                {
+                    uint32 spellid;
+                    switch (unitTarget->getClass())
+                    {
+                    case CLASS_PRIEST:  spellid = 29185; break;
+                    case CLASS_DRUID:   spellid = 29194; break;
+                    case CLASS_PALADIN: spellid = 29196; break;
+                    case CLASS_SHAMAN:  spellid = 29198; break;
+                    default: break;
+                    }
+                    if (spellid != 0)
+                        m_caster->CastSpell(unitTarget, spellid, true);
+                }
             }
             break;
         /*

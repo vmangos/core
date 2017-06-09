@@ -4808,6 +4808,26 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
         }
+
+        // Loatheb Corrupted Mind spell failed
+        if (   m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID 
+            || m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST
+            || m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN
+            || m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
+        {
+            if (IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEAL) || IsSpellHaveAura(m_spellInfo, SPELL_AURA_PERIODIC_HEAL) ||
+                IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL))
+            {
+                Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+                for (auto itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
+                {
+                    if ((*itr)->GetModifier()->m_miscvalue == 4327)
+                    {
+                        return SPELL_FAILED_FIZZLE;
+                    }
+                }
+            }
+        }
     }
 
     if (Unit *target = m_targets.getUnitTarget())
