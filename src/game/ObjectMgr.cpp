@@ -1904,6 +1904,7 @@ void ObjectMgr::LoadItemPrototypes()
 {
     SQLItemLoader loader;
     loader.Load(sItemStorage);
+    mQuestStartingItems.clear();
     sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();
 
@@ -2162,6 +2163,16 @@ void ObjectMgr::LoadItemPrototypes()
                     const_cast<ItemPrototype*>(proto)->ExtraFlags &= ~ITEM_EXTRA_REAL_TIME_DURATION;
                 }
             }
+        }
+
+
+        if (proto->StartQuest > 0)
+        // Item starts a quest, insert it into the quest->startItem map
+        {
+            if (mQuestStartingItems.find(proto->StartQuest) == mQuestStartingItems.end())
+                mQuestStartingItems.insert( std::pair<uint32, uint32>(proto->StartQuest, proto->ItemId) );
+            else
+                sLog.outErrorDb("Item #%u also starts quest #%u.", i, proto->StartQuest);
         }
     }
 
@@ -3875,6 +3886,16 @@ void ObjectMgr::LoadQuests()
 
     sLog.outString();
     sLog.outString(">> Loaded %lu quests definitions", (unsigned long)mQuestTemplates.size());
+}
+
+uint32 ObjectMgr::GetQuestStartingItemID(uint32 quest_id) const
+{
+    auto questItemPair = mQuestStartingItems.find(quest_id);
+
+    if (questItemPair != mQuestStartingItems.end())
+        return questItemPair->second;
+
+    return 0;
 }
 
 void ObjectMgr::LoadQuestLocales()

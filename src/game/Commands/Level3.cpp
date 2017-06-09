@@ -4593,7 +4593,7 @@ bool ChatHandler::HandleQuestRemoveCommand(char* args)
             player->SetQuestSlot(slot, 0);
 
             // we ignore unequippable quest items in this case, its' still be equipped
-            player->TakeQuestSourceItem(quest, false);
+            player->TakeOrReplaceQuestStartItems(quest, false, true);
         }
     }
 
@@ -7620,7 +7620,7 @@ bool ChatHandler::HandleDebugShowNearestGOInfo(char* args)
             float PlayerPosZ = 0.0f;
             pl->GetPosition(PlayerPosX, PlayerPosY, PlayerPosZ);
 
-            
+
         }
         else
         {
