@@ -299,6 +299,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_CONS_NOX_TESLA_FEUGEN:
         case GO_CONS_NOX_TESLA_STALAGG:
         case GO_HUB_PORTAL:
+        case GO_SAPPHIRON_SPAWN:
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }

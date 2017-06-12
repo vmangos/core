@@ -433,6 +433,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             case 4472:
                             case 4491:
                             case 6785:
+                            case 6747: //sapphiron birth
                                 SendGameObjectCustomAnim(GetObjectGuid());
                                 break;
                         }

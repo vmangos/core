@@ -133,6 +133,7 @@ enum NaxxGOs : uint32
 
     GO_HUB_PORTAL               = 181229,   // portal to frostwyrm lair
     // Frostwyrm Lair
+    GO_SAPPHIRON_SPAWN          = 181356,
     GO_KELTHUZAD_WATERFALL_DOOR = 181225,   // open after sapphiron is dead
     GO_KELTHUZAD_DOOR           = 181228,   // open after sapphiron is dead. Possibly not until players are close?
 
