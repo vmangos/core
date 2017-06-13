@@ -1196,9 +1196,11 @@ void Aura::TriggerSpell()
 //                    case 28114: break;
 //                    // Communique Timer, camp
 //                    case 28346: break;
-//                    // Icebolt
-//                    case 28522: break;
-//                    // Silithyst
+//                    
+                      case 28522: // Icebolt
+                          return; // avoid the warning below. Spell works as we want it due to sapphirons script
+                          break;
+                      // Silithyst
 //                    case 29519: break;
                     default:
                         break;
