@@ -26,10 +26,12 @@ enum
     EMOTE_ENRAGE       = -1533083,
 
     SPELL_ICEBOLT       = 28522,
-    SPELL_SUMM_ICEBLOCK = 28535,
+    // SPELL_SUMM_ICEBLOCK = 28535, // we manually summon an iceblock in SpellHitTarget
 
+    //SPELL_FROST_BREATH = 29318,
+    SPELL_FROST_BREATH        = 28524, // triggers the damage and explosion visual, 7sec cast
+    SPELL_FROST_BREATH_DUMMY  = 30101, // shows the falling ball thing
 
-    SPELL_FROST_BREATH = 29318,
     SPELL_FROST_AURA   = 28529,
     SPELL_LIFE_DRAIN   = 28542,
     SPELL_BLIZZARD     = 28547,
@@ -37,6 +39,11 @@ enum
     
     SPELL_CLEAVE        = 19983,
     SPELL_TAIL_SWEEP    = 15847,
+
+    // each blizzard has 30sec duration supposedly
+    SPELL_SUMMON_BLIZ1 = 28561, // summons creature 16474
+    SPELL_SUMMON_BLIZ2 = 28560, // unimplemented script effect
+
 
     SPELL_PERIODIC_BUFFET = 29327, // periodically does 29328
     SPELL_WING_BUFFET = 29328, // is it the spell he does on takeoff, or another one?
@@ -126,6 +133,7 @@ struct boss_sapphironAI : public ScriptedAI
     std::vector<ObjectGuid> iceboltedPlayers;
     std::vector<ObjectGuid> iceblocks;
     ObjectGuid wingBuffetCreature;
+    uint32 num_icebolts;
     void Reset()
     {
         //m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
@@ -141,7 +149,7 @@ struct boss_sapphironAI : public ScriptedAI
         m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
         UnSummonWingBuffet();
         DeleteIceBLocks();
-
+        num_icebolts = 0;
         //FrostBreath_Timer = 2500;
         //LifeDrain_Timer = 24000;
         //Blizzard_Timer = 20000;
@@ -263,11 +271,18 @@ struct boss_sapphironAI : public ScriptedAI
         switch (spell->Id)
         {
         case SPELL_ICEBOLT:
-            float ang = target->GetAngle(m_creature);
-            if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(),
-                target->GetPositionZ(), ang))
+            // checking to see if the target was in fact an initial icebolt target. Since the spell deals splash aoe dmg,
+            // we want to avoid spawning multiple iceblocks when multiple people are hit
+            if (iceboltedPlayers.size() == 0)
+                return;
+            if(iceboltedPlayers.at(iceboltedPlayers.size()-1) == target->GetObjectGuid())
             {
-                iceblocks.push_back(pGO->GetObjectGuid());
+                float ang = target->GetAngle(m_creature);
+                if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(),
+                    target->GetPositionZ(), ang))
+                {
+                    iceblocks.push_back(pGO->GetObjectGuid());
+                }
             }
             break;
         }
@@ -396,17 +411,11 @@ struct boss_sapphironAI : public ScriptedAI
             case EVENT_LIFTOFF: // liftoff is triggered from MovementInform()
             {
                 setHover(true);
-                
-                phase = PHASE_AIR_BOLTS;
-                events.ScheduleEvent(EVENT_FROST_BREATH, Seconds(26));
-                events.ScheduleEvent(EVENT_LAND, Seconds(32)); // might be 32ish sec
-                //5ib, 9ib, 13ib, 17ib, 21ib, 26fb, 32land
-                for (int i = 0; i < 5; i++)
-                {
-                    events.ScheduleEvent(EVENT_ICEBOLT, Seconds(5 + i * 4));
-                }
 
-                if (Creature* pWG = m_creature->SummonCreature(NPC_WING_BUFFET, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 
+                phase = PHASE_AIR_BOLTS;
+                events.ScheduleEvent(EVENT_ICEBOLT, Seconds(5));
+
+                if (Creature* pWG = m_creature->SummonCreature(NPC_WING_BUFFET, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0,
                     TEMPSUMMON_MANUAL_DESPAWN))
                 {
                     pWG->CastSpell(pWG, SPELL_PERIODIC_BUFFET, true);
@@ -416,6 +425,14 @@ struct boss_sapphironAI : public ScriptedAI
             }
             case EVENT_LAND:
             {
+                // in case something is delayed, and we're not finished 
+                // casting the frost breath
+                if (m_creature->IsNonMeleeSpellCasted())
+                {
+                    events.Repeat(100);
+                    return;
+                }
+                DeleteIceBLocks();
                 events.Reset();
                 iceboltedPlayers.clear();
                 setHover(false);
@@ -441,13 +458,39 @@ struct boss_sapphironAI : public ScriptedAI
                 break;
             }
             case EVENT_ICEBOLT:
+            {
                 DoIceBolt();
+                ++num_icebolts;
+                if (num_icebolts == 5)
+                {
+                    events.ScheduleEvent(EVENT_FROST_BREATH, Seconds(5));
+                    num_icebolts = 0;
+                }
+                else
+                {
+                    events.Repeat(Seconds(4));
+                }
                 break;
+            }
+            case EVENT_FROST_BREATH:
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) == CAST_OK)
+                {
+                    DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH_DUMMY, CAST_TRIGGERED);
+                    events.ScheduleEvent(EVENT_LAND, Seconds(8));
+                }
+                else
+                    events.Repeat(100);
+                break;
+            }
             case EVENT_BLIZZARD:
                 events.Repeat(Seconds(20));
                 break;
             case EVENT_LIFEDRAIN:
-                events.Repeat(Seconds(24));
+                if (DoCastSpellIfCan(m_creature, SPELL_LIFE_DRAIN) == CAST_OK)
+                    events.Repeat(Seconds(24));
+                else
+                    events.Repeat(100);
                 break;
             case EVENT_TAIL_SWEEP:
                 if (DoCastSpellIfCan(m_creature, SPELL_TAIL_SWEEP) == CAST_OK)
