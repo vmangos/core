@@ -1,6 +1,9 @@
 -- sapphiron hitbox update
 UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='20' WHERE `modelid`='16033';
 
+-- sapp should supposedly be immune to frost and hp around this
+UPDATE `creature_template` SET `minhealth`=3204800, `maxhealth`=3204800, `SchoolImmuneMask`=16 WHERE `entry`=15989;
+
 -- wing buffet crature
 DELETE FROM `creature_template` WHERE `entry` = 17025;
 INSERT INTO `creature_template` 
