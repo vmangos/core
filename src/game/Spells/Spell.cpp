@@ -1214,12 +1214,20 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger)
             caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, this);
-
+        
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
         {
             // trigger weapon enchants for weapon based spells; exclude spells that stop attack, because may break CC
             if (m_spellInfo->EquippedItemClass == ITEM_CLASS_WEAPON && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET))
                 ((Player*)m_caster)->CastItemCombatSpell(unitTarget, m_attackType);
+
+            // Bloodthirt triggers main hand despite not requiring weapon
+            // Execute damage component triggers main hand
+            else if ((m_spellInfo->SpellIconID == 38 && m_spellInfo->SpellVisual == 372) || //bloodthirst
+                    m_spellInfo->Id == 20647) //execute (damage dealing component does not require weapon)
+            {
+                 ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+            }
 
             // special Paladin cases - trigger weapon procs despite not having EquippedItemClass
             else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
@@ -1295,6 +1303,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             dmg = 1;
         }
         caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
+    }
+    // Sunder Armor triggers main hand proc despite dealing no damage
+    else if (m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>()) //sunder armor
+    {
+        ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
     }
 
     if (missInfo != SPELL_MISS_NONE)
