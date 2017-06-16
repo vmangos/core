@@ -9,4 +9,4 @@ VALUES
 ('17025', '0', '0', '15880', '0', '0', '0', "Sapphiron's Wing buffet", 'NULL', '0', '63', '63', '5000', '5000', '0', '0', '7', '35', '35', '0', '1.2', '1.1486', '2.5', '0', '0', '0', '0', '0', '1', '2000', '2000', '1', '33587968', '0', '0', '0', '0', '0', '0', '1', '1', '0', '10', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '0', '', '0', '3', '0', '0', '1', '0', '0', '0', '0', '0', '0', 'npc_sapphiron_wing_buffet');
 
 -- sapphirons blizzard no longer eventai. Giving it a script.
-UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `AIName`=0, `ScriptName`='npc_sapphiron_blizzard', `minlevel`=63, `maxlevel`=63, `speed_walk`='0.28', `speed_run`='0.28', `unit_flags`=0 /*33554434*/ WHERE `entry`=16474;
+UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `AIName`=0, `ScriptName`='npc_sapphiron_blizzard', `minlevel`=63, `maxlevel`=63, `speed_walk`='0.28', `speed_run`='0.28', `unit_flags`=33554434 WHERE `entry`=16474;

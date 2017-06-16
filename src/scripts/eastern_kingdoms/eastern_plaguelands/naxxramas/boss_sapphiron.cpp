@@ -34,19 +34,18 @@ enum
 
     SPELL_FROST_AURA   = 28529,
     SPELL_LIFE_DRAIN   = 28542,
-    SPELL_BLIZZARD     = 28547,
     SPELL_BESERK       = 26662,
-    
     SPELL_CLEAVE        = 19983,
     SPELL_TAIL_SWEEP    = 15847,
 
     // each blizzard has 30sec duration supposedly
-    SPELL_SUMMON_BLIZ1 = 28561, // summons creature 16474
-    SPELL_SUMMON_BLIZ2 = 28560, // unimplemented script effect
+    SPELL_SUMMON_BLIZ1      = 28561, // summons creature 16474
+    SPELL_SUMMON_BLIZ2      = 28560, // unimplemented script effect
+    SPELL_BLIZZARD_PERIODIC = 28534, // triggers 28547 every 3 second
+    SPELL_BLIZZARD          = 28547, // deals dmg every 2 seconds. Stationary, lasts for 15sec
 
-
-    SPELL_PERIODIC_BUFFET = 29327, // periodically does 29328
-    SPELL_WING_BUFFET = 29328, // is it the spell he does on takeoff, or another one?
+    SPELL_PERIODIC_BUFFET   = 29327, // periodically does 29328
+    SPELL_WING_BUFFET       = 29328, // is it the spell he does on takeoff, or another one?
 
 
     SPELL_SAPPHIRON_DIES = 29357, // adds camera-shake.
@@ -55,7 +54,8 @@ enum
 
     MOVE_POINT_LIFTOFF = 1,
     
-    NPC_WING_BUFFET = 17025
+    NPC_WING_BUFFET = 17025, 
+    NPC_BLIZZARD = 16474,
 };
 
 enum Events
@@ -92,7 +92,7 @@ struct boss_sapphironAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
-        /* todo: remove block comment thing. 
+         todo: remove block comment thing. 
         if (m_pInstance)
         {
             if (m_pInstance->GetData(TYPE_SAPPHIRON) != DONE)
@@ -106,7 +106,6 @@ struct boss_sapphironAI : public ScriptedAI
 
         }
         else
-            */
         {
             phase = PHASE_GROUND;
             if(m_pInstance)
@@ -133,7 +132,7 @@ struct boss_sapphironAI : public ScriptedAI
     std::vector<ObjectGuid> iceboltedPlayers;
     std::vector<ObjectGuid> iceblocks;
     ObjectGuid wingBuffetCreature;
-    uint32 num_icebolts;
+
     void Reset()
     {
         //m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
@@ -148,8 +147,7 @@ struct boss_sapphironAI : public ScriptedAI
         berserkTimer = 900000; // 15 min
         m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
         UnSummonWingBuffet();
-        DeleteIceBLocks();
-        num_icebolts = 0;
+        DeleteAndDispellIceBlocks();
         //FrostBreath_Timer = 2500;
         //LifeDrain_Timer = 24000;
         //Blizzard_Timer = 20000;
@@ -173,8 +171,17 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
     
-    void DeleteIceBLocks()
+    void DeleteAndDispellIceBlocks()
     {
+        for (auto it = iceboltedPlayers.begin(); it != iceboltedPlayers.end(); it++)
+        {
+            if (Player* pPlayer = m_pInstance->GetMap()->GetPlayer(*it))
+            {
+                pPlayer->RemoveAurasDueToSpell(SPELL_ICEBOLT);
+            }
+        }
+        iceboltedPlayers.clear();
+
         for (int i = 0; i < iceblocks.size(); i++)
         {
             if (GameObject* pGO = m_pInstance->GetGameObject(iceblocks.at(i)))
@@ -254,7 +261,7 @@ struct boss_sapphironAI : public ScriptedAI
 
         events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
         events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
-        events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(5)); //todo, 5 for debug, should be 40
+        events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(40));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
     }
@@ -271,20 +278,20 @@ struct boss_sapphironAI : public ScriptedAI
         switch (spell->Id)
         {
         case SPELL_ICEBOLT:
-            // checking to see if the target was in fact an initial icebolt target. Since the spell deals splash aoe dmg,
-            // we want to avoid spawning multiple iceblocks when multiple people are hit
-            if (iceboltedPlayers.size() == 0)
-                return;
-            if(iceboltedPlayers.at(iceboltedPlayers.size()-1) == target->GetObjectGuid())
+        {
+            // If the dmg is splash dmg we add this guy as well so we can dispell him on the frost breath hit
+            if (std::find(iceboltedPlayers.begin(), iceboltedPlayers.end(), target->GetObjectGuid()) == iceboltedPlayers.end())
+                iceboltedPlayers.push_back(target->GetObjectGuid());
+
+            // Uncertain if the iceblock should always be angled towards the center or not
+            float ang = target->GetAngle(m_creature);
+            if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(),
+                target->GetPositionZ(), ang))
             {
-                float ang = target->GetAngle(m_creature);
-                if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(),
-                    target->GetPositionZ(), ang))
-                {
-                    iceblocks.push_back(pGO->GetObjectGuid());
-                }
+                iceblocks.push_back(pGO->GetObjectGuid());
             }
             break;
+        }
         }
     }
 
@@ -411,10 +418,18 @@ struct boss_sapphironAI : public ScriptedAI
             case EVENT_LIFTOFF: // liftoff is triggered from MovementInform()
             {
                 setHover(true);
-
                 phase = PHASE_AIR_BOLTS;
-                events.ScheduleEvent(EVENT_ICEBOLT, Seconds(5));
 
+                // can be 4 or 5 IBs. First one is 5 sec after this event, last one is 22 sec after this event
+                int num_add_ib = urand(4, 5);
+                int first_ib = 5000;
+                int incr = 17000 / (num_add_ib - 1);
+                for (int i = 0; i < num_add_ib; i++) 
+                    events.ScheduleEvent(EVENT_ICEBOLT, first_ib + incr*i);
+
+                events.ScheduleEvent(EVENT_FROST_BREATH, Seconds(23)); // 1 sec after he can potentially cast final icebolt
+                events.ScheduleEvent(EVENT_LAND, Seconds(30));         // 1 sec after breath finishes
+                events.ScheduleEvent(EVENT_LANDED, Seconds(34));       // 5 sec after breath finishes
                 if (Creature* pWG = m_creature->SummonCreature(NPC_WING_BUFFET, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0,
                     TEMPSUMMON_MANUAL_DESPAWN))
                 {
@@ -432,60 +447,57 @@ struct boss_sapphironAI : public ScriptedAI
                     events.Repeat(100);
                     return;
                 }
-                DeleteIceBLocks();
-                events.Reset();
-                iceboltedPlayers.clear();
+                DeleteAndDispellIceBlocks();
                 setHover(false);
-
                 phase = PHASE_LANDING;
-                events.ScheduleEvent(EVENT_LANDED, Seconds(2));
                 break;
             }
             case EVENT_LANDED:
             {
                 events.Reset();
-                events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
-                events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
-                events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(70)); //todo: might be shorter at this point
-                events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
-                events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
-
+                events.ScheduleEvent(EVENT_LIFEDRAIN,   Seconds(24));
+                events.ScheduleEvent(EVENT_BLIZZARD,    Seconds(20));
+                events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(urand(50, 70))); // Sampling videos show its 50-70sec between engaging after landing, and disengaging to fly again
+                events.ScheduleEvent(EVENT_TAIL_SWEEP,  Seconds(12));
+                events.ScheduleEvent(EVENT_CLEAVE,      Seconds(5));
                 phase = PHASE_GROUND;
                 SetCombatMovement(true);
                 m_creature->GetMotionMaster()->Clear(false);
                 m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                UnSummonWingBuffet();
                 break;
             }
             case EVENT_ICEBOLT:
             {
                 DoIceBolt();
-                ++num_icebolts;
-                if (num_icebolts == 5)
-                {
-                    events.ScheduleEvent(EVENT_FROST_BREATH, Seconds(5));
-                    num_icebolts = 0;
-                }
-                else
-                {
-                    events.Repeat(Seconds(4));
-                }
                 break;
             }
             case EVENT_FROST_BREATH:
             {
+                // Looks like the wing buffet dissapears as he starts casting wing buffet
+                UnSummonWingBuffet();
+
+                // Due to the nature of the timing of the air phase it's hard to re-try casting
+                // this spell if it fails without screwing everything up
                 if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) == CAST_OK)
                 {
                     DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH_DUMMY, CAST_TRIGGERED);
-                    events.ScheduleEvent(EVENT_LAND, Seconds(8));
                 }
-                else
-                    events.Repeat(100);
                 break;
             }
             case EVENT_BLIZZARD:
-                events.Repeat(Seconds(20));
+            {
+                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER_NOT_GM))
+                {
+                    int angle = urand(0, 360);
+                    float x = pUnit->GetPositionX() + cos(angle * 0.01745f) * 5.0f;
+                    float y = pUnit->GetPositionY() + sin(angle * 0.01745f) * 5.0f;
+                    if (!m_creature->SummonCreature(NPC_BLIZZARD, x, y, 138.0f, 0, TEMPSUMMON_TIMED_DESPAWN, 30000))
+                        events.Repeat(100);
+                    else
+                        events.Repeat(Seconds(20));
+                }
                 break;
+            }
             case EVENT_LIFEDRAIN:
                 if (DoCastSpellIfCan(m_creature, SPELL_LIFE_DRAIN) == CAST_OK)
                     events.Repeat(Seconds(24));
@@ -666,6 +678,82 @@ struct npc_wing_buffetAI : public ScriptedAI
     }
 };
 
+struct npc_sapphiron_blizzardAI : public ScriptedAI
+{
+    npc_sapphiron_blizzardAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_creature->SetRespawnRadius(30.0f);
+        m_creature->SetReactState(ReactStates::REACT_PASSIVE);
+        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        events.ScheduleEvent(1, Seconds(2));
+    }
+    
+    EventMap events;
+    instance_naxxramas* m_pInstance;
+
+    void Reset() override
+    {
+    }
+
+    void JustRespawned() override
+    {
+        if (m_pInstance)
+        {
+        }
+    }
+
+    void AttackStart(Unit*)
+    {
+        return;
+    }
+
+    void MoveInLineOfSight(Unit*) override
+    {
+        return;
+    }
+
+    void Aggro(Unit*)
+    {
+        return;
+    }
+
+    void MovementInform(uint32 uiType, uint32 pointId) override
+    {
+     
+    }
+
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (!m_creature->HasAura(SPELL_BLIZZARD_PERIODIC))
+            m_creature->CastSpell(m_creature, SPELL_BLIZZARD_PERIODIC, true);
+        
+        if (!m_pInstance)
+            return;
+        
+        if(!m_creature->isInCombat())
+            m_creature->SetInCombatWithZone();
+
+        events.Update(uiDiff);
+        if (events.ExecuteEvent())
+        {
+            Creature* pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
+            if (!pSapp)
+            {
+                m_creature->GetMotionMaster()->MoveRandom();
+            }
+
+            Unit* newTarget = pSapp->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, 0.0f, true);
+            if (!newTarget)
+            {
+                m_creature->GetMotionMaster()->MoveRandom();
+                return;
+            }
+            m_creature->GetMotionMaster()->MoveFollow(newTarget, 0.1f, 0.0f);
+
+            events.Repeat(Seconds(2));
+        }
+    }
+};
 CreatureAI* GetAI_boss_sapphiron(Creature* pCreature)
 {
     return new boss_sapphironAI(pCreature);
@@ -674,6 +762,11 @@ CreatureAI* GetAI_boss_sapphiron(Creature* pCreature)
 CreatureAI* GetAI_npc_wing_buffet(Creature* pCreature)
 {
     return new npc_wing_buffetAI(pCreature);
+}
+
+CreatureAI* GetAI_npc_sapphironBlizzard(Creature* pCreature)
+{
+    return new npc_sapphiron_blizzardAI(pCreature);
 }
 
 GameObjectAI* GetAI_sapp_body(GameObject* pGo)
@@ -695,9 +788,14 @@ void AddSC_boss_sapphiron()
     NewScript->RegisterSelf();
 
     NewScript = new Script;
+    NewScript->Name = "npc_sapphiron_blizzard";
+    NewScript->GetAI = &GetAI_npc_sapphironBlizzard;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
     NewScript->Name = "go_sapphiron_birth";
     NewScript->GOGetAI = &GetAI_sapp_body;
     NewScript->RegisterSelf();
 
-    //npc_sapphiron_wing_buffet
+    //npc_sapphiron_blizzard
 }
