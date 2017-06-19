@@ -63,6 +63,9 @@ enum eScriptCommand
     SCRIPT_COMMAND_KILL_CREDIT              = 8,            // source or target with Player, datalong = creature entry, datalong2 = bool (0=personal credit, 1=group credit)
     SCRIPT_COMMAND_RESPAWN_GAMEOBJECT       = 9,            // source = any (summoner), datalong=db_guid, datalong2=despawn_delay
     SCRIPT_COMMAND_TEMP_SUMMON_CREATURE     = 10,           // source = any (summoner), datalong=creature entry, datalong2=despawn_delay
+                                                            // data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL = summon active, SUMMON_CREATURE_UNIQUE = check for same entry in radius, SUMMON_CREATURE_UNIQUE_TEMP = same but only TempSummon
+                                                            // dataint = (bool) setRun; 0 = off (default), 1 = on
+                                                            // dataint2: 0 = use orientation specified, 1 = face source, 2 = face target
     SCRIPT_COMMAND_OPEN_DOOR                = 11,           // source = unit, datalong=db_guid, datalong2=reset_delay
     SCRIPT_COMMAND_CLOSE_DOOR               = 12,           // source = unit, datalong=db_guid, datalong2=reset_delay
     SCRIPT_COMMAND_ACTIVATE_OBJECT          = 13,           // source = unit, target=GO
@@ -219,6 +222,8 @@ struct ScriptInfo
             uint32 uniqueLimit;                             // datalong3
             uint32 uniqueDistance;                          // datalong4
             uint32 flags;                                   // data_flags
+            int32 setRun;                                   // dataint
+            int32 facingLogic;                              // dataint2
         } summonCreature;
 
         struct                                              // SCRIPT_COMMAND_OPEN_DOOR (11)

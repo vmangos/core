@@ -2688,7 +2688,20 @@ void Map::ScriptsProcess()
                     }
                 }
 
-                Creature* pCreature = summoner->SummonCreature(step.script->summonCreature.creatureEntry, x, y, z, o, 
+                float orientation = o;
+                
+                if ((step.script->summonCreature.facingLogic == 1) || (step.script->summonCreature.facingLogic == 2))
+                {
+                    WorldObject* facingTarget = ((step.script->summonCreature.facingLogic == 2) && target && target->isType(TYPEMASK_WORLDOBJECT)) ? (WorldObject*)target : summoner;
+
+                    float dx = facingTarget->GetPositionX() - x;
+                    float dy = facingTarget->GetPositionY() - y;
+
+                    orientation = atan2(dy, dx);
+                    orientation = (orientation >= 0) ? orientation : 2 * M_PI_F + orientation;
+                }
+
+                Creature* pCreature = summoner->SummonCreature(step.script->summonCreature.creatureEntry, x, y, z, orientation,
                     TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, step.script->summonCreature.despawnDelay, step.script->summonCreature.flags & SUMMON_CREATURE_ACTIVE);
 
                 if (!pCreature)
@@ -2696,6 +2709,9 @@ void Map::ScriptsProcess()
                     sLog.outError("SCRIPT_COMMAND_TEMP_SUMMON (script id %u) failed for creature (entry: %u).", step.script->id, step.script->summonCreature.creatureEntry);
                     break;
                 }
+
+                if (step.script->summonCreature.setRun == 1)
+                    pCreature->SetWalk(false);
 
                 break;
             }
@@ -3624,7 +3640,8 @@ void Map::ScriptsProcess()
                             ++rmItr;
                         }
                     }
-                    return;
+                    iter = m_scriptSchedule.begin();
+                    continue;
                 }
 
                 break;
@@ -3726,7 +3743,8 @@ void Map::ScriptsProcess()
                             ++rmItr;
                         }
                     }
-                    return;
+                    iter = m_scriptSchedule.begin();
+                    continue;
                 }
 
                 break;
@@ -3745,34 +3763,40 @@ void Map::ScriptsProcess()
                     break;
                 }
 
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pCreatureTarget = nullptr;
+
+                if (step.script->turnTo.creatureEntry)
+                {
+                    MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->turnTo.creatureEntry, true, step.script->turnTo.searchRadius);
+                    MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreatureTarget, u_check);
+
+                    Cell::VisitGridObjects(pSource, searcher, step.script->turnTo.searchRadius);
+
+                    if (!pCreatureTarget)
+                        break;
+                }
+
                 if (step.script->turnTo.facingLogic == 0)
                 {
                     if (step.script->turnTo.isSourceTarget)
                     {
-                        if (!step.script->turnTo.creatureEntry && target && (target->GetTypeId() == TYPEID_UNIT))
+                        if (target && (target->GetTypeId() == TYPEID_UNIT || target->GetTypeId() == TYPEID_PLAYER) && target->IsInWorld())
                         {
-                            // the target (probably player) faces the source of the script
-                            Unit* pSource = target->ToUnit();
+                            Unit* pTarget = target->ToUnit();
 
-                            WorldObject* pTarget = (WorldObject*)source;
-
-                            if (pSource && pTarget)
-                                pSource->SetFacingToObject(pTarget);
-                        }
-                        else if (target && (target->GetTypeId() == TYPEID_UNIT || target->GetTypeId() == TYPEID_PLAYER))
-                        {
-                            // the target (probably player) searches for a creature and faces it
-                            WorldObject* pSource = (WorldObject*)source;
-                            Creature* pTarget;
-                            Unit* originalTarget = target->ToUnit();
-
-                            MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->turnTo.creatureEntry, true, step.script->turnTo.searchRadius);
-                            MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pTarget, u_check);
-
-                            Cell::VisitGridObjects(pSource, searcher, step.script->turnTo.searchRadius);
-
-                            if (pTarget && originalTarget)
-                                originalTarget->SetFacingToObject(pTarget);
+                            if (!step.script->turnTo.creatureEntry)
+                            {
+                                // the target (probably player) faces the source of the script
+                                if (pSource && pTarget)
+                                    pTarget->SetFacingToObject(pSource);
+                            }
+                            else
+                            {
+                                // search for a creature and make the target (probably player) face it
+                                if (pTarget)
+                                    pTarget->SetFacingToObject(pCreatureTarget);
+                            }
                         }
                         else
                         {
@@ -3782,39 +3806,34 @@ void Map::ScriptsProcess()
                     }
                     else
                     {
-                        if (!step.script->turnTo.creatureEntry && (source->GetTypeId() == TYPEID_UNIT))
+                        if (target && target->isType(TYPEMASK_WORLDOBJECT) && target->IsInWorld())
                         {
-                            // unit that is the source of the script faces the target (probably player)
-                            Unit* pSource = source->ToUnit();
-                        
-                            WorldObject* pTarget;
+                            WorldObject* pTarget = (WorldObject*)target;
 
-                            if (target && target->isType(TYPEMASK_WORLDOBJECT))
-                                pTarget = (WorldObject*) target;
+                            if (!step.script->turnTo.creatureEntry)
+                            {
+                                if (source->GetTypeId() != TYPEID_UNIT)
+                                {
+                                    sLog.outError("SCRIPT_COMMAND_TURN_TO (script id %u) call with datalong=0 and datalong2=0 but script source is not Unit.", step.script->id);
+                                    break;
+                                }
 
-                            if (pTarget && pSource)
-                                pSource->SetFacingToObject(pTarget);
-                        }
-                        else if (step.script->turnTo.creatureEntry)
-                        {
-                            // unit that is the source of the script searches for a creature and faces it
-                            WorldObject* pSource = (WorldObject*)source;
-                            Creature* pTarget;
-                            WorldObject* originalTarget;
-                            if (target && target->isType(TYPEMASK_WORLDOBJECT))
-                                originalTarget = (WorldObject*)target;
+                                // unit that is the source of the script faces the target (probably player)
+                                Unit* pUnitSource = source->ToUnit();
 
-                            MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->turnTo.creatureEntry, true, step.script->turnTo.searchRadius);
-                            MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pTarget, u_check);
-
-                            Cell::VisitGridObjects(pSource, searcher, step.script->turnTo.searchRadius);
-
-                            if (pTarget && originalTarget)
-                                pTarget->SetFacingToObject(originalTarget);
+                                if (pTarget && pUnitSource)
+                                    pUnitSource->SetFacingToObject(pTarget);
+                            }
+                            else
+                            {
+                                // search for a creature and make it face the target (probably player)
+                                if (pTarget)
+                                    pCreatureTarget->SetFacingToObject(pTarget);
+                            }
                         }
                         else
                         {
-                            sLog.outError("SCRIPT_COMMAND_TURN_TO (script id %u) call with datalong=0 and datalong2=0 but script source is not Unit.", step.script->id);
+                            sLog.outError("SCRIPT_COMMAND_TURN_TO (script id %u) call with datalong=0 and datalong2=0 but script target is invalid.", step.script->id);
                             break;
                         }
                     }
@@ -3823,22 +3842,13 @@ void Map::ScriptsProcess()
                 {
                     if (step.script->turnTo.creatureEntry)
                     {
-                        // searching for a creature and setting its facing to the orientation specified
-                        WorldObject* pSource = (WorldObject*)source;
-                        Creature* pTarget;
-
-                        MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->turnTo.creatureEntry, true, step.script->turnTo.searchRadius);
-                        MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pTarget, u_check);
-
-                        Cell::VisitGridObjects(pSource, searcher, step.script->turnTo.searchRadius);
-
-                        if (pTarget)
-                            pTarget->SetFacingTo(step.script->o);
+                        // search for a creature and set its facing to the orientation specified
+                        pCreatureTarget->SetFacingTo(step.script->o);
                     }
                     else if (step.script->turnTo.isSourceTarget)
                     {
                         // setting target's (probably player) facing to the orientation specified
-                        if (target && (target->GetTypeId() == TYPEID_UNIT || target->GetTypeId() == TYPEID_PLAYER))
+                        if (target && (target->GetTypeId() == TYPEID_UNIT || target->GetTypeId() == TYPEID_PLAYER) && target->IsInWorld())
                         {
                             Unit* pTarget = target->ToUnit();
 
@@ -3854,17 +3864,16 @@ void Map::ScriptsProcess()
                     else if (source->GetTypeId() == TYPEID_UNIT)
                     {
                         // setting the script source's facing to the orientation specified
-                        Unit* pSource = source->ToUnit();
+                        Unit* pUnitSource = source->ToUnit();
 
-                        if (pSource)
-                            pSource->SetFacingTo(step.script->o);
+                        if (pUnitSource)
+                            pUnitSource->SetFacingTo(step.script->o);
                     }
                     else
                     {
                         sLog.outError("SCRIPT_COMMAND_TURN_TO (script id %u) call with datalong=1 and datalong2=0 but script source is not Unit.", step.script->id);
                         break;
                     }
-                    
                 }
                 else if (step.script->turnTo.facingLogic == 2)
                 {
@@ -3873,30 +3882,15 @@ void Map::ScriptsProcess()
                         if (step.script->turnTo.isSourceTarget)
                         {
                             // searches for a creature and makes it face the source of the script
-                            WorldObject* pSource = (WorldObject*)source;
-                            Creature* pTarget;
-
-                            MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->turnTo.creatureEntry, true, step.script->turnTo.searchRadius);
-                            MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pTarget, u_check);
-
-                            Cell::VisitGridObjects(pSource, searcher, step.script->turnTo.searchRadius);
-
-                            if (pTarget)
-                                pTarget->SetFacingToObject(pSource);
+                            pCreatureTarget->SetFacingToObject(pSource);
                         }
                         else if (source->GetTypeId() == TYPEID_UNIT)
                         {
                             // searches for a creature and makes unit that is the source of the script face it
-                            Unit* pSource = source->ToUnit();
-                            Creature* pTarget;
+                            Unit* pUnitSource = source->ToUnit();
 
-                            MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->turnTo.creatureEntry, true, step.script->turnTo.searchRadius);
-                            MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pTarget, u_check);
-
-                            Cell::VisitGridObjects(pSource, searcher, step.script->turnTo.searchRadius);
-
-                            if (pTarget)
-                                pSource->SetFacingToObject(pTarget);
+                            if (pUnitSource)
+                                pUnitSource->SetFacingToObject(pCreatureTarget);
                         }
                         else
                         {
