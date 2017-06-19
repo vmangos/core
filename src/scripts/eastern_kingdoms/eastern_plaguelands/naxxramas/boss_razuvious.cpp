@@ -38,9 +38,7 @@ enum
     SAY_DEATH                = -1533129,
 
     SPELL_UNBALANCING_STRIKE = 26613,
-    SPELL_DISRUPTING_SHOUT   = 55543,
-    SPELL_DISRUPTING_SHOUT_H = 29107,
-    SPELL_JAGGED_KNIFE       = 55550,
+    SPELL_DISRUPTING_SHOUT   = 29107,
     SPELL_HOPELESS           = 29125
 };
 
@@ -132,16 +130,6 @@ struct boss_razuviousAI : public ScriptedAI
         }
         else
             m_uiDisruptingShoutTimer -= uiDiff;
-
-        // Jagged Knife
-        if (m_uiJaggedKnifeTimer < uiDiff)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                DoCastSpellIfCan(pTarget, SPELL_JAGGED_KNIFE);
-            m_uiJaggedKnifeTimer = 10000;
-        }
-        else
-            m_uiJaggedKnifeTimer -= uiDiff;
 
         // Random say
         if (m_uiCommandSoundTimer < uiDiff)
