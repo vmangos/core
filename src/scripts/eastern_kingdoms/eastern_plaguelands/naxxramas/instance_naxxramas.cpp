@@ -892,6 +892,8 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
         }
         break;
     case AREATRIGGER_KELTHUZAD:
+        OnKTAreaTrigger(pAt);
+        /*
         if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
         {
             if (pInstance->GetData(TYPE_KELTHUZAD) == NOT_STARTED)
@@ -900,6 +902,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
                 pInstance->SetChamberCenterCoords(pAt->x, pAt->y, pAt->z);
             }
         }
+        */
         break;
     case AREATRIGGER_FAERLINA:
         if (!m_faerlinaHaveGreeted)

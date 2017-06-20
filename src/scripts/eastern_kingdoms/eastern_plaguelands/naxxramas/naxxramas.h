@@ -232,6 +232,7 @@ public:
     bool IsInRightSideGothArea(Unit* pUnit);
 
     // kel
+    void OnKTAreaTrigger(const AreaTriggerEntry* pAT); //impl in boss_kelthuzad.cpp
     void SetChamberCenterCoords(float fX, float fY, float fZ);
     void GetChamberCenterCoords(float &fX, float &fY, float &fZ) { fX = m_fChamberCenterX; fY = m_fChamberCenterY; fZ = m_fChamberCenterZ; }
     void ToggleKelThuzadWindows(bool setOpen);
