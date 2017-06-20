@@ -5593,6 +5593,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (!creature->IsSkinnableBy(m_caster->ToPlayer()))
                     return SPELL_FAILED_TARGET_NOT_LOOTED;
 
+                // If the player isn't in loot range, the skins are lost forever.
+                // This only happens on large mobs with disjointed models (i.e. Devilsaurs).
+                if (!creature->IsWithinDistInMap(m_caster, INTERACTION_DISTANCE))
+                    return SPELL_FAILED_OUT_OF_RANGE;
+
                 uint32 skill = creature->GetCreatureInfo()->GetRequiredLootSkill();
 
                 int32 skillValue = ((Player*)m_caster)->GetSkillValue(skill);
