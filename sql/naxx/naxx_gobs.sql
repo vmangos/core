@@ -375,8 +375,8 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `factio
 (193426, 3, 1387, 'Four Horsemen Chest', 0, 0, 1, 1634, 25193, 0, 1, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 
 
--- Not sure what this is used for, or if we need it
-(181444, 1, 8093, 'Kel\'Thuzad Trigger', 0, 0, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
+-- we manually spawn this ingame instead
+-- (181444, 1, 8093, 'Kel\'Thuzad Trigger', 0, 0, 1.5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 
 (181640, 7, 6690, 'Doodad_kelthuzad_throne02', 0, 48, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 
