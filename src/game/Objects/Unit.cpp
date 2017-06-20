@@ -6168,6 +6168,10 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
         //else if (spellProto->Id == 19968)
             //bUsePenalty = false;
 
+        // Dragonbreath Chili
+        if (spellProto->Id == 15851)
+            bUsePenalty = false;
+
         if (bUsePenalty)
             total += int32(benefit * coeff * LvlPenalty);
         else

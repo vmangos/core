@@ -2280,8 +2280,6 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
 
     if (m_caster->isAlive())
     {
-        healthGain = m_caster->SpellHealingBonusDone(m_caster, m_spellInfo, healthGain, HEAL); // ?
-
         m_caster->DealHeal(m_caster, uint32(healthGain), m_spellInfo);
     }
 }

@@ -1,0 +1,36 @@
+INSERT INTO migrations VALUES ('20170604041201');
+
+DELETE FROM spell_mod WHERE Id IN (16666,27869,15700,15701,23682,24251,23590);
+INSERT INTO spell_mod (Id, SpellFamilyName, Comment) VALUES (16666, 13, 'Demonic Rune: Potion Family so it can crit');
+INSERT INTO spell_mod (Id, SpellFamilyName, Comment) VALUES (27869, 13, 'Dark Rune: Potion Family so it can crit');
+INSERT INTO spell_mod (Id, SpellFamilyName, Comment) VALUES (15700, 13, 'Whipper Root Tuber: Potion Family so it can crit');
+INSERT INTO spell_mod (Id, SpellFamilyName, Comment) VALUES (15701, 13, 'Night Dragons Breath: Potion Family so it can crit');
+INSERT INTO spell_mod (Id, DmgClass, Comment) VALUES (23682, 1, 'Heroism: Magic DmgClass so it can crit');
+INSERT INTO spell_mod (Id, DmgClass, Comment) VALUES (24251, 1, 'Zulian Slice: Magic DmgClass');
+INSERT INTO spell_mod (Id, DmgClass, Comment) VALUES (23590, 2, 'Paladin T2 Judgement: Melee DmgClass');
+
+DELETE FROM spell_bonus_data WHERE entry IN (26693,24585,16414,18084,21170,29155,18817,23682,23687,26789,24251,21162,23590,29502,29638,29640,29641,29644,29646,29647,29653,29655,15851,16608);
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (26693, 1, 'Neretzek - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (24585, 1, 'Ancient Hakkari Manslayer - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (16414, 1, 'Wraith Scythe - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (18084, 1, 'Fist of the Damned - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (21170, 1, 'Shadowstrike - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29155, 1, 'Corrupted Ashbringer - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (18817, 1, 'Skullflame Shield - Drain Life');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (23682, 0, 'Heroism - No coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (23687, 0, 'Maelstrom - No coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (26789, 0, 'Shard of the Fallen Star - No coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (24251, 1, 'Zulian Slicer - 100% coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (21162, 0, 'Sulfuras - No coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (23590, 0, 'Paladin T2 Judgement - No coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29502, 0, 'Hurricane - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29638, 0, 'Bow of Searing Arrows - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29640, 0, 'Heartseeking Crossbow - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29641, 0, 'Dark Iron Rifle - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29644, 0, 'Galganns Fireblaster - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29646, 0, 'Quillshooter - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29647, 0, 'Shell Launcher Shotgun - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29653, 0, 'Venomstrike - No coefficient');
+-- INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (29655, 0, 'Verdant Keepers Aim - No coefficient');
+INSERT INTO spell_bonus_data (entry, direct_bonus, comments) VALUES (15851, 1, 'Dragonbreath Chili - 100% coefficient');
+INSERT INTO spell_bonus_data (entry, dot_bonus, comments) VALUES (16608, 0.125, 'Demon Forged Breastplate - Drain Life');
