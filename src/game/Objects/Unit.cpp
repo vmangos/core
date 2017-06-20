@@ -1426,49 +1426,48 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
     switch (spellInfo->DmgClass)
     {
         // Melee and Ranged Spells
-        case SPELL_DAMAGE_CLASS_RANGED:
-        case SPELL_DAMAGE_CLASS_MELEE:
+    case SPELL_DAMAGE_CLASS_RANGED:
+    case SPELL_DAMAGE_CLASS_MELEE:
+    {
+        //Calculate damage bonus
+        damage = MeleeDamageBonusDone(pVictim, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
+        damage = pVictim->MeleeDamageBonusTaken(this, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
+
+        // if crit add critical bonus
+        if (crit)
         {
-            //Calculate damage bonus
-            damage = MeleeDamageBonusDone(pVictim, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
-            damage = pVictim->MeleeDamageBonusTaken(this, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
-
-            // if crit add critical bonus
-            if (crit)
-            {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-                damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
-            }
-
-            if (damage > 0)
-            {
-                // SPELL_CUSTOM_IGNORE_ARMOR should not be necessary anymore after realizing spells of DmgClass NONE or MAGIC
-                // ignore armor, while RANGED and MELEE don't.
-                if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL && !(spellInfo->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
-                    damage = CalcArmorReducedDamage(pVictim, damage);
-            }
+            damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+            damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
         }
-        break;
-        // Magical Attacks
-        case SPELL_DAMAGE_CLASS_NONE:
-        case SPELL_DAMAGE_CLASS_MAGIC:
+    }
+    break;
+    // Magical Attacks
+    case SPELL_DAMAGE_CLASS_NONE:
+    case SPELL_DAMAGE_CLASS_MAGIC:
+    {
+        // Calculate damage bonus
+        damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+        damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+
+        // If crit add critical bonus
+        if (crit)
         {
-            // Calculate damage bonus
-            damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
-            damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
-
-            // If crit add critical bonus
-            if (crit)
-            {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-                damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
-            }
+            damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+            damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
         }
-        break;
+    }
+    break;
     }
 
-    damage = std::max(damage, 0);
-
+    // damage mitigation
+    if (damage > 0)
+    {
+        // physical damage => armor
+        if (damageSchoolMask & SPELL_SCHOOL_MASK_NORMAL && !(spellInfo->Custom & SPELL_CUSTOM_IGNORE_ARMOR))
+            damage = CalcArmorReducedDamage(pVictim, damage);
+    }
+    else
+        damage = 0;
     damageInfo->damage = damage;
 }
 
@@ -3411,7 +3410,8 @@ void Unit::SetCurrentCastedSpell(Spell * pSpell)
     CurrentSpellTypes CSpellType = pSpell->GetCurrentContainer();
 
     if (pSpell == m_currentSpells[CSpellType]) return;      // avoid breaking self
-    else if(pSpell->m_spellInfo->Id == 30122) return;       // Hack for Heigans Plague Cloud, without it, you interrupt yourself on first tick
+    // Hack for Heigans Plague Cloud and KTs channel, without it, you interrupt yourself on first tick
+    else if(pSpell->m_spellInfo->Id == 30122 || pSpell->m_spellInfo->Id == 29422) return;
     // break same type spell if it is not delayed
     InterruptSpell(CSpellType, false);
 
