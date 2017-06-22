@@ -243,13 +243,16 @@ struct boss_kelthuzadAI : public ScriptedAI
     std::vector<ObjectGuid> p1_adds;
     EventMap events;
     ObjectGuid pullPortalGuid;
-    uint32 p1Timer;
+    int p1Timer;
     uint32 numSkeletons, numAboms, numBanshees;
+    uint32 nextBanshee, nextAbom;
     void Reset()
     {
         numSkeletons = 0;
         numAboms = 0;
         numBanshees = 0;
+        nextBanshee = 30000;
+        nextAbom = 30000;
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
         events.Reset();
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -626,7 +629,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         p1Timer = 320000;
         events.ScheduleEvent(EVENT_SKELETON, Seconds(20));
         events.ScheduleEvent(EVENT_SOUL_WEAVER, Seconds(35));
-        events.ScheduleEvent(EVENT_ABOMINATION, Seconds(45));
+        events.ScheduleEvent(EVENT_ABOMINATION, Seconds(43));
 
         m_pInstance->DoUseDoorOrButton(pullPortalGuid);
 
@@ -694,7 +697,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_KELTHUZAD) != IN_PROGRESS)
             return;
         
-        p1Timer -= std::min(p1Timer, diff);
+        p1Timer -= diff;
 
         while (uint32 eventId = events.ExecuteEvent())
         {
@@ -713,24 +716,17 @@ struct boss_kelthuzadAI : public ScriptedAI
                 break;
             case EVENT_SKELETON:
             {
-                // linearly increasing spawn frequency, starting at 5sec, going towards 2sec.
-                // We will reach 2 sec aprox when p1timer is at 150sec. In other words, 
-                // first half of p1 frequency increases. Last half it is constant.
-                /*
-                float x = (p1Timer - 120000.0f) / 1000.0f;
-                float t = (3.0f / 195.0f) * x + 2.0f;
-                uint32 ms = t * 1000.0f;
-                repeat_next = std::max(uint32(2), ms);
-                ///3 / 150 * (X100 - 150)
-                */
                 if (numSkeletons < 120)
                 {
+
                     float t = 3.0f / 150.0f * (p1Timer / 1000.0f - 150.0f);
-                    uint32 repeat_next = t * 1000 + 2000;
+                    uint32 repeat_next = std::max(uint32(t * 1000 + 2000), uint32(2000));
                     if (SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN))
                     {
+                        uint32 repeat_next = std::max(uint32(3750-25*numSkeletons), uint32(2000));
                         events.Repeat(repeat_next);
                         ++numSkeletons;
+                        sLog.outBasic("[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
                     }
                     else
                         events.Repeat(100);
@@ -739,16 +735,15 @@ struct boss_kelthuzadAI : public ScriptedAI
             }
             case EVENT_ABOMINATION:
             {
+
                 if (numAboms < 14)
                 {
-                    float d = (p1Timer - 135000.0f) / 1000.0f;
-                    float t = 15.0f / 150.0f * d;
-                    uint32 repeat_next = t*1000.0f + 15000;
-                    
                     if (SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM))
                     {
-                        events.Repeat(repeat_next);
+                        uint32 nextAbom = std::max(uint32(26000 - (numAboms * 1000)), uint32(15000));
+                        events.Repeat(nextAbom);
                         ++numAboms;
+                        sLog.outBasic("[%d] Spawn ABOM #%d, next in %dms", p1Timer, numAboms, nextAbom);
                     }
                     else
                         events.Repeat(100);
@@ -759,13 +754,12 @@ struct boss_kelthuzadAI : public ScriptedAI
             {
                 if (numBanshees < 14)
                 {
-                    float d = (p1Timer - 125000.0f) / 1000.0f;
-                    float t = 15.0f / 150.0f * d;
-                    uint32 repeat_next = t*1000.0f + 15000;
                     if (SpawnAndSendP1Creature(NPC_SOUL_WEAVER))
                     {
-                        events.Repeat(repeat_next);
+                        uint32 nextBanshee = std::max(uint32(26000 - (numBanshees * 1000)), uint32(17000));
+                        events.Repeat(nextBanshee);
                         ++numBanshees;
+                        sLog.outBasic("[%d] Spawn SOUL #%d, next in %dms", p1Timer, numBanshees, nextBanshee);
                     }
                     else
                         events.Repeat(100);
@@ -778,7 +772,24 @@ struct boss_kelthuzadAI : public ScriptedAI
                 // until he engages. Most vanilla timers say 20 seconds, but he always engages earlier than that.
                 // Seen it at around 10 seconds in a german video (https://www.youtube.com/watch?v=QafmVXupeHc),
                 // and as late as ~17-18 sec in another one (https://www.youtube.com/watch?v=6RpqjIFbQYw https://www.youtube.com/watch?v=wSQtlvVebm0)
+                events.Reset();
                 events.ScheduleEvent(EVENT_PHASE_TWO_START, Seconds(17));
+                if (numBanshees < 14)
+                {
+                    SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
+                    sLog.outBasic("(post)[%d] Spawn bansh #%d, next in %dms", p1Timer, ++numBanshees, nextBanshee);
+                }
+                if (numAboms < 14)
+                {
+                    SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
+                    sLog.outBasic("(post)[%d] Spawn abom #%d, next in %dms", p1Timer, ++numAboms, nextBanshee);
+                }
+                if (numSkeletons < 120)
+                {
+                    SpawnAndSendP1Creature(NPC_SOLDIER_FROZEN);
+                    sLog.outBasic("(post)[%d] Spawn skele #%d, next in %dms", p1Timer, ++numSkeletons, nextBanshee);
+                }
+
                 DoScriptText(irand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
                 m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
                 DespawnAllIntroCreatures();
