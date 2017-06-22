@@ -194,7 +194,7 @@ struct kt_p1AddAI : public ScriptedAI
     }
     void MoveInLineOfSight(Unit* pWho) override
     {
-        if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < 20.0f) //todo: no idea what the pull range should be
+        if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < 25.0f) //todo: no idea what the pull range should be
         {
             ScriptedAI::AttackStart(pWho);
         }
