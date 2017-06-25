@@ -1,5 +1,5 @@
 -- KT updates
-UPDATE `creature_template` SET `minhealth`=3150000, `maxhealth`=3150000 WHERE `entry`=15990;
+UPDATE `creature_template` SET `minhealth`=3150000, `maxhealth`=3150000, `MechanicImmuneMask`=617316223/*not immune to interrupt*/ WHERE `entry`=15990;
 
 
 -- unstoppable abomination. Stun/shackle immune?
