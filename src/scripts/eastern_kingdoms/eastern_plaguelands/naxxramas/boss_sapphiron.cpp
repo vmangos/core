@@ -92,7 +92,6 @@ struct boss_sapphironAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
-         todo: remove block comment thing. 
         if (m_pInstance)
         {
             if (m_pInstance->GetData(TYPE_SAPPHIRON) != DONE)
