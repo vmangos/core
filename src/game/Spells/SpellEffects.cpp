@@ -4469,6 +4469,34 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 */
                     return;
                 }
+                case 28408:                                 // Chains of Kel'Thuzad (Naxxramas: Kel'thuzad)
+                {
+                    // selects up to 5 randm targets in threatlist and charm them
+                    std::vector<Unit*> viableTargets;
+                    const ThreatList& tl = m_caster->getThreatManager().getThreatList();
+                    for (auto it = tl.begin(); it != tl.end(); it++)
+                    {
+                        if ((*it)->getUnitGuid().IsPlayer())
+                        {
+                            if (Unit* pUnit = m_caster->GetMap()->GetUnit((*it)->getUnitGuid()))
+                            {
+                                if (pUnit->isAlive())
+                                    viableTargets.push_back(pUnit);
+                            }
+                        }
+                    }
+                    int num_targets = std::min(int(viableTargets.size()), 5);
+                    for (int i = 0; i < num_targets; i++)
+                    {
+                        int rand = irand(0, viableTargets.size() - 1);
+                        Unit* target = viableTargets[rand];
+                        viableTargets.erase(viableTargets.begin() + rand);
+                        
+                        target->CastSpell(target, 28409, true); // modifies scale
+                        m_caster->CastSpell(target, 28410, true); // applies dmg and healing mod, as well as the charm itself
+                    }
+                    return;
+                }
                 case 28560:                                 // Summon Blizzard
                 {
                     if (!unitTarget)
