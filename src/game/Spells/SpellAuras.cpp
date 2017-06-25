@@ -235,7 +235,7 @@ pAuraHandler AuraHandler[TOTAL_AURAS] =
     &Aura::HandleModSpellDamagePercentFromStat,             //174 SPELL_AURA_MOD_SPELL_DAMAGE_OF_STAT_PERCENT  implemented in Unit::SpellBaseDamageBonusDone (in 1.12.* only spirit)
     &Aura::HandleModSpellHealingPercentFromStat,            //175 SPELL_AURA_MOD_SPELL_HEALING_OF_STAT_PERCENT implemented in Unit::SpellBaseHealingBonusDone (in 1.12.* only spirit)
     &Aura::HandleSpiritOfRedemption,                        //176 SPELL_AURA_SPIRIT_OF_REDEMPTION   only for Spirit of Redemption spell, die at aura end
-    &Aura::HandleNULL,                                      //177 SPELL_AURA_AOE_CHARM
+    &Aura::HandleAuraAoeCharm,                              //177 SPELL_AURA_AOE_CHARM
     &Aura::HandleNoImmediateEffect,                         //178 SPELL_AURA_MOD_DEBUFF_RESISTANCE          implemented in Unit::MagicSpellHitResult
     &Aura::HandleNoImmediateEffect,                         //179 SPELL_AURA_MOD_ATTACKER_SPELL_CRIT_CHANCE implemented in Unit::SpellCriticalBonus
     &Aura::HandleNoImmediateEffect,                         //180 SPELL_AURA_MOD_FLAT_SPELL_DAMAGE_VERSUS   implemented in Unit::SpellDamageBonusDone
@@ -4919,6 +4919,16 @@ void Aura::HandleSpiritOfRedemption(bool apply, bool Real)
     // die at aura end
     else
         target->DealDamage(target, target->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, GetSpellProto(), false);
+}
+
+void Aura::HandleAuraAoeCharm(bool apply, bool real)
+{
+    if (!real)
+        return;
+    if (GetSpellProto()->Id == 28410) // Chains of Kel'Thuzad 
+    {
+        HandleModCharm(apply, real);
+    }
 }
 
 void Aura::HandleSchoolAbsorb(bool apply, bool Real)
