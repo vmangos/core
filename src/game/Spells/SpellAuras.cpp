@@ -2994,8 +2994,15 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
             target->InterruptNonMeleeSpells(false);
 
         // Player specific
-        if (target->GetTypeId() == TYPEID_PLAYER && !target->IsMounted())
-            target->SetStandState(UNIT_STAND_STATE_STAND);// in 1.5 client
+        if (Player* targetPlayer = target->ToPlayer())
+        {
+            if (!targetPlayer->IsMounted())
+                targetPlayer->SetStandState(UNIT_STAND_STATE_STAND);// in 1.5 client
+
+            // Release loot if any
+            if (ObjectGuid lootGuid = targetPlayer->GetLootGuid())
+                targetPlayer->GetSession()->DoLootRelease(lootGuid);
+        }
 
         if (!target->movespline->Finalized() || target->GetTypeId() == TYPEID_UNIT)
             if (!inCharge)
