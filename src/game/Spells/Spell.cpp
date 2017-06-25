@@ -798,6 +798,9 @@ void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
     if (m_spellInfo->Effect[effIndex] == 0)
         return;
 
+    if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_CANT_TARGET_SELF && pVictim->GetObjectGuid() == m_originalCaster->GetObjectGuid())
+        return;
+
     // Check for effect immune skip if immuned
     bool immuned = pVictim->IsImmuneToSpellEffect(m_spellInfo, effIndex, pVictim == m_caster);
 
