@@ -21,7 +21,10 @@
 
 #define DEBUG_WORLD_EVENT = true;
 
-enum ScourgeInvasion
+ // Texte nostalrius (nostalrius_string)
+#define NOST_TEXT(id) (id+2000010000)
+
+enum ScourgeInvasionSpells
 {
     /****************** SPELLS ******************/
     SPELL_COMMUNICATION_NAXXRAMAS = 28395, // Periodically triggers SPELL_COMMUNICATION_TRIGGER
@@ -55,7 +58,7 @@ enum ScourgeInvasion
     SPELL_SCOURGE_STRIKE = 28265,
     SPELL_ARCANE_BOLT = 13748,
     SPELL_RIBBON_OF_SOULS = 16243,
-    
+
     // Cultist Engineer
     SPELL_KILL_SUMMONER_SUMMON_BOSS = 28250, // Reagents, 1 Necrotic Rune
     SPELL_SUMMON_BOSS = 31315, // Reagents, 8 Necrotic Rune
@@ -70,8 +73,10 @@ enum ScourgeInvasion
     SPELL_CREATE_CRYSTAL = 28344, // (NECROTIC_SHARD = 16136) CIRCLE - Gob 181136 CASTS this
     SPELL_SUMMON_NAXXRAMAS_GHOST = 28389,
     SPELL_VISUAL_VOILE_TENEBRES = 28350,
+};
 
-    /****************** NPC ******************/
+enum ScourgeInvasionNPC
+{
     NPC_NECROTIC_SHARD = 16136,
     NPC_DAMAGED_NECROTIC_SHARD = 16172,
     NPC_CULTIST_ENGINEER = 16230,
@@ -103,13 +108,16 @@ enum ScourgeInvasion
     // Low level mobs
     NPC_SKELETAL_TROOPER = 16438,
     NPC_SPECTRAL_SPIRIT = 16437,
-    NPC_SPECTRAL_APPARITATION = 16423,
+    NPC_SPECTRAL_APPARITATION = 16423
+};
 
-    /****************** OTHER ******************/
+enum ScourgeInvasionMisc
+{
     ITEM_NECROTIC_RUNE = 22484,
 
     GOBJ_SUMMON_CIRCLE = 181227,
     GOBJ_NECROPOLIS = 181223,
+
     MODELID_PYLON_RESET = 16135,
     MODELID_PYLON_DAMAGED = 16136,
 
@@ -137,27 +145,90 @@ enum ScourgeInvasion
     ZONEID_TANARIS = 440,
 
     GAME_EVENT_SCOURGE_INVASION = 110,
+};
 
-    WORLDSTATE_WINTERSPRING = 0x08D3, // 2259
-    WORLDSTATE_AZSHARA = 0x08D4, // 2260
-    WORLDSTATE_EASTERN_PLAGUELANDS = 0x08D8, // 2264
-    WORLDSTATE_BLASTED_LANDS = 0x08D5, // 2261
-    WORLDSTATE_BURNING_STEPPES = 0x08D6, // 2262
-    WORLDSTATE_TANARIS = 0x08D7, // 2263
+enum ScourgeInvasionWorldStatesVariables
+{
+    // Worldstates
+    WORLDSTATE_WINTERSPRING = 0x08D3, // 2259 - Icon on map
+    WORLDSTATE_AZSHARA = 0x08D4, // 2260 - Icon on map
+    WORLDSTATE_EASTERN_PLAGUELANDS = 0x08D8, // 2264 - Icon on map
+    WORLDSTATE_BLASTED_LANDS = 0x08D5, // 2261 - Icon on map
+    WORLDSTATE_BURNING_STEPPES = 0x08D6, // 2262 - Icon on map
+    WORLDSTATE_TANARIS = 0x08D7, // 2263 - Icon on map
 
-    WORLDSTATE_SI_BATTLES_WON = 2219,
-
-    // unused
+    WORLDSTATE_SI_BATTLES_WON = 2219, // We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over. & We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them. & We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
     WORLDSTATE_SI_AZSHARA_REMAINING = 2279, // The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
     WORLDSTATE_SI_BLASTED_LANDS_REMAINING = 2280,// The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
     WORLDSTATE_SI_BURNING_STEPPES_REMAINING = 2281, // If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
     WORLDSTATE_SI_EASTERN_PLAGUELANDS = 2282, // The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
     WORLDSTATE_SI_TANARIS = 2283, // It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
-    WORLDSTATE_SI_WINTERGRASP = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
+    WORLDSTATE_SI_WINTERSPRING = 2284, // Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault. Your assistance would help them greatly.$B$BNumber of Necropolises remaining: $2284W
+
+    // Variables
+    VARIABLE_NAXX_ATTACK_ZONE1 = 10,
+    VARIABLE_NAXX_ATTACK_ZONE2 = 11,
+    VARIABLE_NAXX_ATTACK_TIME1 = 12,
+    VARIABLE_NAXX_ATTACK_TIME2 = 13,
+    VARIABLE_NAXX_ATTACK_COUNT = 14,
+    VARIABLE_NAXX_ELITE_ID = 15,
+    VARIABLE_NAXX_ELITE_PYLON = 16,
+    VARIABLE_NAXX_ELITE_SPAWNTIME = 17,
+    VARIABLE_SI_AZSHARA_REMAINING = 18,
+    VARIABLE_SI_BLASTED_LANDS_REMAINING = 19,
+    VARIABLE_SI_BURNING_STEPPES_REMAINING = 20,
+    VARIABLE_SI_EASTERN_PLAGUELANDS = 21,
+    VARIABLE_SI_TANARIS = 22,
+    VARIABLE_SI_WINTERSPRING = 23
 };
 
 enum ScourgeInvasionEngineerAI
 {
     ENGINEER_AI_ACTION_SET_PYLON,
     ENGINEER_AI_ACTION_ATTACK_START,
+};
+
+enum ScourgeInvasionLang
+{
+    LANG_CULTIST_ENGINEER_OPTION = NOST_TEXT(120), // Use 8 necrotic runes and disrupt his ritual.
+    LANG_GIVE_MAGIC_ITEM_OPTION = NOST_TEXT(121), // Give me one of your magic items.
+    LANG_VICTORIES_COUNT_OPTION = NOST_TEXT(127), // Unused
+    LANG_TANARIS_ATTACKED_OPTION = NOST_TEXT(128), // Unused
+    LANG_AZSHARA_ATTACKED_OPTION = NOST_TEXT(129), // Unused
+    LANG_EP_ATTACKED_OPTION = NOST_TEXT(130), // Unused
+    LANG_WINTERSPRING_ATTACKED_OPTION = NOST_TEXT(131), // Unused
+    LANG_BL_ATTACKED_OPTION = NOST_TEXT(132), // Unused
+    LANG_BS_ATTACKED_OPTION = NOST_TEXT(133), // Unused
+    LANG_NO_ATTACK_OPTION = NOST_TEXT(134), // Unused
+    LANG_SHADOW_OF_DOOM_TEST_0 = NOST_TEXT(135), // 12420 - Our dark master has noticed your trifling, and sends me to bring a message... of doom!
+    LANG_SHADOW_OF_DOOM_TEST_1 = NOST_TEXT(136), // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
+    LANG_ARGENT_EMISSARY_OPTION_0 = NOST_TEXT(137), // 12176 - What's happening?
+    LANG_ARGENT_EMISSARY_OPTION_1 = NOST_TEXT(138), // 12207 - What can I do?
+    LANG_ARGENT_EMISSARY_OPTION_2 = NOST_TEXT(139), // 12434 - Where are we battling the Scourge?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0 = NOST_TEXT(140), // 12198 - Is Winterspring currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1 = NOST_TEXT(141), // 12201 - Is Tanaris currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2 = NOST_TEXT(142), // 12203 - Are the Blasted Lands currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3 = NOST_TEXT(143), // 12205 - Are the Burning Steppes currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4 = NOST_TEXT(144), // 12476 - Is Azshara currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5 = NOST_TEXT(145), // 12477 - Are the Eastern Plaguelands currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_3 = NOST_TEXT(146), // 12398 - How many battles have we won?
+    LANG_ARGENT_EMISSARY_OPTION = NOST_TEXT(147), // 12478 - I have another question.
+
+    LANG_CULTIST_ENGINEER_GOSSIP = 20100, // 12111 - This cultist is in a deep trance...
+    LANG_ARGENT_DAWN_GOSSIP_0 = 20101, // 12299 - The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
+    LANG_ARGENT_DAWN_GOSSIP_1 = 20104, // 12300 - The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
+    LANG_ARGENT_DAWN_GOSSIP_2 = 20105, // 12301 - The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
+    LANG_ARGENT_EMISSARY_GOSSIP = 20102, // 12109 - The time has come for Horde and Alliance to look towards Northrend and the invasion of the Lich King. In recent days, territories across Kalimdor and the Eastern Kingdoms have come under attack. Will you take up arms to save your land from destruction at their hands?
+    LANG_ARGENT_EMISSARY_AWNSER_0 = 20106, // 12180 - The tides of war have come again. From the cold north, the Lich King's necropolises have laid siege to
+    LANG_ARGENT_EMISSARY_AWNSER_1 = 20107, // 12209 - The Scourge are establishing small staging points in the places under attack, receiving communications and other assistance from the necropolises that fly overhead. From what we can tell, the only way to root them out is by killing the ground forces that surround the points.
+    LANG_ARGENT_EMISSARY_AWNSER_2 = 20108,  // 12435 - The Lich King brought only small forces to bear against each of Azeroth's capital cities, while their main forces periodically attack the following lands:$B$BAzshara, the Blasted Lands, the Burning Steppes, the Tanaris Desert, the Eastern Plaguelands and Winterspring.
+    LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0 = 20109, // 12199 - Indeed, the hills of Winterspring are currently attempting to withstand a renewed Scourge assault.Your assistance would help them greatly.$B$BNumber of Necropolises remaining : $2284W
+    LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1 = 20110, // 12202 - It seems the army of the Scourge has come to Tanaris. A significant number of their necropolises and other forces have been dispatched there.$B$BNumber of Necropolises remaining: $2283W
+    LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2 = 20111, // 12204 - The Scourge infestation grows in the Blasted Lands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2280W
+    LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3 = 20112, // 12206 - If additional support is not soon sent to the Burning Steppes, I fear the Scourge will establish a base of operations there. If you can, you should go there to aid the defenders.$B$BNumber of Necropolises remaining: $2281W
+    LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4 = 20113, // 12474 - The Scourge infestation grows in Azshara. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2279W
+    LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5 = 20114, // 12475 - The Scourge infestation grows in the Eastern Plaguelands. Every able bodied warrior is needed to stem the tide of their invasion.$B$BNumber of Necropolises remaining: $2282W
+    LANG_ARGENT_EMISSARY_AWBSER_3_0 = 20115, // 12399 - We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over.
+    LANG_ARGENT_EMISSARY_AWBSER_3_1 = 20116, // 12402 - We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.
+    LANG_ARGENT_EMISSARY_AWBSER_3_2 = 20117, // 12403 - We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
 };

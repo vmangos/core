@@ -22,28 +22,6 @@
 #include "scriptPCH.h"
 #include "world_event_naxxramas.h"
 
-enum ScourgeInvasionLang
-{
-    LANG_CULTIST_ENGINEER_OPTION = NOST_TEXT(120),
-    LANG_GIVE_MAGIC_ITEM_OPTION = NOST_TEXT(121), // Give me one of your magic items.
-    LANG_VICTORIES_COUNT_OPTION = NOST_TEXT(127),
-    LANG_TANARIS_ATTACKED_OPTION = NOST_TEXT(128),
-    LANG_AZSHARA_ATTACKED_OPTION = NOST_TEXT(129),
-    LANG_EP_ATTACKED_OPTION = NOST_TEXT(130),
-    LANG_WINTERSPRING_ATTACKED_OPTION = NOST_TEXT(131),
-    LANG_BL_ATTACKED_OPTION = NOST_TEXT(132),
-    LANG_BS_ATTACKED_OPTION = NOST_TEXT(133),
-    LANG_NO_ATTACK_OPTION = NOST_TEXT(134),
-    LANG_SHADOW_OF_DOOM_TEST_0 = NOST_TEXT(135), // 12420 - Our dark master has noticed your trifling, and sends me to bring a message... of doom!
-    LANG_SHADOW_OF_DOOM_TEST_1 = NOST_TEXT(136), // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
-
-    LANG_CULTIST_ENGINEER_GOSSIP = 20100, // This cultist is in a deep trance...
-    LANG_ARGENT_DAWN_GOSSIP_0 = 20101, // The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.
-    LANG_ARGENT_DAWN_GOSSIP_1 = 20104, // The battle goes well. The Scourge forces seem weakened. I believe it will only be a matter of time before we drive them from our shores. I will turn my magics to you, to aid in this struggle.
-    LANG_ARGENT_DAWN_GOSSIP_2 = 20105, // The first steps of our fight against the Scourge go well. We have had some successes, and hopefully my assistance can aid you in bringing future success to the battle.
-    LANG_ARGENT_EMISSARY_GOSSIP = 20102, // The Scourge are establishing small staging points in the places under attack, receiving communications and other assistance from the necropolises that fly overhead. From what we can tell, the only way to root them out is by killing the ground forces that surround the points.
-};
-
 bool IsPermanent(uint32 zone)
 {
     switch (zone)
@@ -55,10 +33,6 @@ bool IsPermanent(uint32 zone)
         case ZONEID_BLASTED_LANDS:
         case ZONEID_BURNING_STEPPES:
             return false;
-        /*case 14:    // Durotar
-        case 85:    // Clairieres de Tirisfal
-        case 215:   // Mulgore
-        case 141:   // Teldrassil*/
         default:
             return true;
     }
@@ -77,13 +51,17 @@ public:
             _zone = 0;
         _enabledNow = true;
     }
+
     virtual ~NecropolisRelatedObject() {}
+
     bool IsZoneEnabled() const
     {
         return _enabledNow;
     }
+
     virtual void Enable() = 0;
     virtual void Disable() = 0;
+
     void Update()
     {
         if (!_zone)
@@ -106,6 +84,7 @@ public:
             _enabledNow = true;
         }
     }
+
     void ChangeAttackZone()
     {
         uint32 zone1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
@@ -136,9 +115,106 @@ public:
         }
         sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
     }
+
     uint32 _zone;
     bool   _enabledNow;
 };
+
+/*
+Necropolis Controller
+Notes: General AI / Controlling what zone is under attack
+*//*
+struct npc_necropolis_controller : public ScriptedAI
+{
+    npc_necropolis_controller(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 _checkStatusTimer;
+
+    void Reset()
+    {
+        _checkStatusTimer = 60000;
+    }
+
+    void UpdateNecropolisRemaning(bool add)
+    {
+        uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+        uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+        uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+        uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
+        uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
+        uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
+
+        switch (me->GetZoneId())
+        {
+            case ZONEID_AZSHARA:
+            {
+                if (add)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA - 1, true);
+                break;
+            }
+            case ZONEID_BLASTED_LANDS:
+            {
+                if (add)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS - 1, true);
+                break;
+            }
+            case ZONEID_BURNING_STEPPES:
+            {
+                if (add)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES - 1, true);
+                break;
+            }
+            case ZONEID_EASTERN_PLAGUELANDS:
+            {
+                if (add)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS - 1, true);
+                break;
+            }
+            case ZONEID_TANARIS:
+            {
+                if (add)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS - 1, true);
+                break;
+            }
+            case ZONEID_WINTERSPRING:
+            {
+                if (add)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING - 1, true);
+                break;
+            }
+        }
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (_checkStatusTimer < diff)
+        {
+            UpdateNecropolisRemaning(true);
+        }
+        else
+            _checkStatusTimer -= diff;
+    }
+};
+
+CreatureAI* GetAI_npc_necropolis_controller(Creature* pCreature)
+{
+    return new npc_necropolis_controller(pCreature);
+}*/
 
 /*
 Necropolis Proxy
@@ -165,11 +241,13 @@ struct NecropolisProxyAI : public ScriptedAI
     {
         _necropolisGuid = necropolis;
     }
+
     void SpellHit(Unit* caster, const SpellEntry* spell)
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && caster != m_creature)
             DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_TRIGGER);
     }
+
     void SpellHitTarget(Unit* target, const SpellEntry* spell)
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
@@ -350,13 +428,76 @@ public:
         }
     }
 
+    void SetNecropolisRemaning(bool enable)
+    {
+        uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+        uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+        uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+        uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
+        uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
+        uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
+
+        switch (me->GetZoneId())
+        {
+            case ZONEID_AZSHARA:
+            {
+                if (enable)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA - 1, true);
+                break;
+            }
+            case ZONEID_BLASTED_LANDS:
+            {
+                if (enable)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS - 1, true);
+                break;
+            }
+            case ZONEID_BURNING_STEPPES:
+            {
+                if (enable)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES - 1, true);
+                break;
+            }
+            case ZONEID_EASTERN_PLAGUELANDS:
+            {
+                if (enable)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS - 1, true);
+                break;
+            }
+            case ZONEID_TANARIS:
+            {
+                if (enable)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS - 1, true);
+                break;
+            }
+            case ZONEID_WINTERSPRING:
+            {
+                if (enable)
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING + 1, true);
+                else
+                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING - 1, true);
+                break;
+            }
+        }
+    }
+
     void Enable()
     {
         me->Respawn();
         me->SetVisible(true);
         _animationTimer = 1000;
-        _checkShardsTimer = 5000; // On laisse 5sec pour que les pylones spawn
+        _checkShardsTimer = 5000; // 5 sec to spawn shard
         UpdateWorldState(true);
+        SetNecropolisRemaning(true);
         sLog.outInfo("[NAXX] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
     }
 
@@ -365,44 +506,54 @@ public:
         me->SetVisible(false);
         UpdateVisibility(false);
         UpdateWorldState(false);
+        SetNecropolisRemaning(false);
         sLog.outInfo("[NAXX] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
     }
 
-    bool OnUse(Unit* pylon)
+    bool OnUse(Unit* shard)
     {
-        _shards.insert(pylon->GetObjectGuid());
+        _shards.insert(shard->GetObjectGuid());
         return false;
     }
 
-    bool AllPylonsDead()
+    bool AllShardsDead()
     {
         if (!_shards.size())
             return false;
+
         for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
-            if (Creature* pylon = me->GetMap()->GetCreature(*it))
-                if (pylon->isAlive())
+        {
+            if (Creature* shard = me->GetMap()->GetCreature(*it))
+            {
+                if (shard->isAlive())
                     return false;
+            }
+        }
         return true;
     }
+
     void SetPylonsRespawnTime(uint32 time)
     {
         for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
-            if (Creature* pylon = me->GetMap()->GetCreature(*it))
+            if (Creature* shard = me->GetMap()->GetCreature(*it))
             {
-                pylon->DoKillUnit(); // Normalement c'est deja fait. on sait jamais.
-                pylon->RemoveCorpse(); // Pour que le cooldown de respawn soit bien synchro avec la necropole
-                pylon->SetRespawnTime(time);
-                pylon->SaveRespawnTime();
+                shard->DoKillUnit(); // Should already be done
+                shard->RemoveCorpse(); // Sync the necropolis with respawn cooldown
+                shard->SetRespawnTime(time);
+                shard->SaveRespawnTime();
             }
     }
+
     void UpdateAI(const uint32 diff)
     {
         NecropolisRelatedObject::Update();
+
         if (!IsZoneEnabled())
             return;
+
         if (!me->isSpawned())
         {
-            if (ZoneNecropolisDestroyed())
+            //if (ZoneNecropolisDestroyed())
                 ChangeAttackZone();
             return;
         }
@@ -411,6 +562,7 @@ public:
         {
             // Update worldstate for players in map of object
             UpdateWorldState(true);
+            //UpdateRemainingNecropolis(_necropolisList.size());
             _worldstateTimer = 60000; // update every minute
         }
         else
@@ -418,12 +570,14 @@ public:
 
         if (_animationTimer < diff)
         {
-            // Petite animation pour redevenir visible
+            // Small animation to become visible again
             UpdateVisibility(true);
             me->SendGameObjectCustomAnim(me->GetObjectGuid());
-            // Je m'identifie aupres du relay (pour qu'il transmette mon GUID jusqu'aux pylones)
+
+            // Identify myself with the relay (to transmit my GUID to the shards)
             if (Creature* crea = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 100.0f))
                 crea->AI()->InformGuid(me->GetObjectGuid());
+
             _animationTimer = urand(20000, 30000);
         }
         else
@@ -431,12 +585,14 @@ public:
 
         if (_checkShardsTimer < diff)
         {
-            if (AllPylonsDead())
+            //TotalShardsInZone();
+
+            if (AllShardsDead())
             {
                 me->SendObjectDeSpawnAnim(me->GetObjectGuid());
                 me->SetRespawnTime(NECROPOLIS_RESPAWN_TIME);
                 me->SaveRespawnTime();
-                SetPylonsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // Si les pylones resp apres, la necropole va despawn instant.
+                SetPylonsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // If all shards are gone, despawn necroplis instantly.
                 _animationTimer = 1000;
             }
         }
@@ -459,6 +615,7 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
     {
         creature->SetHealth(creature->GetMaxHealth());
         SetCombatMovement(false);
+
         switch (creature->GetGUIDLow() % 3)
         {
             case 0:
@@ -474,6 +631,7 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
                 _spawnEntry2 = NPC_SPECTRAL_SOLDIER;
                 break;
         }
+
         SpawnAdds();
         Reset();
         _checkSpecialAddTimer = urand(1000, 5000);
@@ -720,14 +878,14 @@ struct npc_cultist_engineer : public ScriptedAI
         else if (action == ENGINEER_AI_ACTION_ATTACK_START)
         {
             ASSERT(unit);
-            DoCastSpellIfCan(m_creature, SPELL_SUMMON_BOSS);
+            //DoCastSpellIfCan(m_creature, SPELL_SUMMON_BOSS);
 
-            /*if (Unit* invoked = m_creature->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
+            if (Unit* invoked = m_creature->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
             {
                 invoked->AI()->AttackStart(unit);
                 invoked->ToCreature()->SetLootRecipient(unit);
                 m_creature->DoKillUnit();
-            }*/
+            }
         }
     }
 
@@ -760,7 +918,7 @@ bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint3
 {
     if (action == GOSSIP_ACTION_INFO_DEF + 1 && player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
     {
-        //player->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
+        player->DestroyItemCount(ITEM_NECROTIC_RUNE, 8, true);
         player->CLOSE_GOSSIP_MENU();
         creature->AI()->DoAction(player, ENGINEER_AI_ACTION_ATTACK_START);
     }
@@ -1204,138 +1362,6 @@ CreatureAI* GetAI_SpectralApparitionAI(Creature* pCreature)
 }
 
 /*
-Bone Witch
-Notes: one of the 3 Rare spawns by the shard
-*/
-struct BoneWitchAI : public ScriptedAI
-{
-    BoneWitchAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 _ArcaneBoltTimer;
-    uint32 _BoneShardsTimer;
-    uint32 _ScourgeStrikeTimer;
-
-    void Reset()
-    {
-        m_creature->AddAura(SPELL_PURPLE_VISUAL);
-        _ArcaneBoltTimer = 1000;
-        _BoneShardsTimer = 12000;
-        _ScourgeStrikeTimer = 120000; // 2 min
-    }
-
-    void JustSummoned(Creature* creature)
-    {
-        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
-    }
-
-    void JustDied(Unit*)
-    {
-        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_DAMAGE_CRYSTAL);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (_ArcaneBoltTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_BOLT) == CAST_OK)
-                _ArcaneBoltTimer = 1000;
-        }
-        else
-            _ArcaneBoltTimer -= uiDiff;
-
-        if (_BoneShardsTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BONE_SHARDS) == CAST_OK)
-                _BoneShardsTimer = 12000;
-        }
-        else
-            _BoneShardsTimer -= uiDiff;
-
-        if (_ScourgeStrikeTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
-                _ScourgeStrikeTimer = 120000;
-        }
-        else
-            _ScourgeStrikeTimer -= uiDiff;
-    }
-};
-
-CreatureAI* GetAI_BoneWitchAI(Creature* pCreature)
-{
-    return new BoneWitchAI(pCreature);
-}
-
-/*
-Spirit of the Damned
-Notes: one of the 3 Rare spawns by the shard
-*/
-struct SpiritOfTheDamnedAI : public ScriptedAI
-{
-    SpiritOfTheDamnedAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 _RibbonOfSoulsTimer;
-    uint32 _ScourgeStrikeTimer;
-
-    void Reset()
-    {
-        m_creature->AddAura(SPELL_PURPLE_VISUAL);
-        _RibbonOfSoulsTimer = 15000;
-        _ScourgeStrikeTimer = 120000; // 2 min
-    }
-
-    void JustSummoned(Creature* creature)
-    {
-        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
-    }
-
-    void JustDied(Unit*)
-    {
-        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_DAMAGE_CRYSTAL);
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (_RibbonOfSoulsTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_RIBBON_OF_SOULS) == CAST_OK)
-                _RibbonOfSoulsTimer = 15000;
-        }
-        else
-            _RibbonOfSoulsTimer -= uiDiff;
-
-        if (_ScourgeStrikeTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
-                _ScourgeStrikeTimer = 120000;
-        }
-        else
-            _ScourgeStrikeTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_SpiritOfTheDamnedAI(Creature* pCreature)
-{
-    return new SpiritOfTheDamnedAI(pCreature);
-}
-
-/*
 naxx_event_rewards_giver
 */
 struct naxx_event_rewards_giverAI : public ScriptedAI
@@ -1438,73 +1464,104 @@ bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32
     switch (action)
     {
         case GOSSIP_ACTION_INFO_DEF + 1:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_0, creature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF + 2:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_1, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 3:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 4:
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+
+            uint32 random_text = urand(0, 2); // Random text selection
+            if (random_text == 1)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_0, creature->GetGUID());
+            else if (random_text == 2)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_1, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_2, creature->GetGUID());
+            break;
+        }
+        case GOSSIP_ACTION_INFO_DEF + 5:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+
+            // Send General Gossip
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 6:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 7:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 8:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 9:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 10:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 11:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5, creature->GetGUID());
             break;
     }
-
     //player->CLOSE_GOSSIP_MENU();
     return true;
 }
 
 bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
 {
-    uint32 attacked1 = 0;
-    uint32 attacked2 = 0;
-    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < time(NULL))
-        attacked1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-    if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < time(NULL))
-        attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+    // Get current values
+    uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+    uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+    uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+    uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+    uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
+    uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
+    uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
 
-    uint32 loc = player->GetSession()->GetSessionDbLocaleIndex();
-    const char* victoriesFormat    = sObjectMgr.GetMangosString(LANG_VICTORIES_COUNT_OPTION, loc);
-    char victories[200];
-    sprintf(victories, victoriesFormat, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT));
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, victories, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    // Send to client
+    player->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
+    player->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
+    player->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
+    player->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
+    player->SendUpdateWorldState(WORLDSTATE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS);
+    player->SendUpdateWorldState(WORLDSTATE_SI_TANARIS, REMAINING_TANARIS);
+    player->SendUpdateWorldState(WORLDSTATE_SI_WINTERSPRING, REMAINING_WINTERSPRING);
 
-    if (attacked1 == ZONEID_TANARIS || attacked2 == ZONEID_TANARIS)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_TANARIS_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    if (attacked1 == ZONEID_AZSHARA || attacked2 == ZONEID_AZSHARA)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_AZSHARA_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-    if (attacked1 == ZONEID_EASTERN_PLAGUELANDS || attacked2 == ZONEID_EASTERN_PLAGUELANDS)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_EP_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-    if (attacked1 == ZONEID_WINTERSPRING || attacked2 == ZONEID_WINTERSPRING)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_WINTERSPRING_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-    if (attacked1 == ZONEID_BLASTED_LANDS || attacked2 == ZONEID_BLASTED_LANDS)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_BL_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-    if (attacked1 == ZONEID_BURNING_STEPPES || attacked2 == ZONEID_BURNING_STEPPES)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_BS_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
 
-    if (!attacked1 && !attacked2)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_NO_ATTACK_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-
+    // Send General Gossip
     player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+
     return true;
 }
-
-
-/***/
-/*struct npc_naxx_rareeliteAI : public CreatureEventAI
-{
-    npc_naxx_rareeliteAI(Creature* c) : CreatureEventAI(c)
-    {
-    }
-
-
-    void JustDied(Unit* killer)
-    {
-        sLog.outString("[NAXX] RareElite %u killed by guid=%u", m_creature->GetEntry(), killer ? killer->GetGUIDLow() : 0);
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, time(NULL) + DELAY_ELITE_RESPAWN, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_ID, 0, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0, true);
-        CreatureEventAI::JustDied(killer);
-    }
-};
-
-CreatureAI* GetAI_npc_naxx_rareeliteAI(Creature* c)
-{
-    return new npc_naxx_rareeliteAI(c);
-}*/
 
 void AddSC_world_event_naxxramas()
 {
@@ -1563,16 +1620,6 @@ void AddSC_world_event_naxxramas()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_bone_witch";
-    newscript->GetAI = &GetAI_BoneWitchAI;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_spirit_of_the_damned";
-    newscript->GetAI = &GetAI_SpiritOfTheDamnedAI;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "npc_shadow_of_doom";
     newscript->GetAI = &GetAI_ShadowOfDoom;
     newscript->RegisterSelf();
@@ -1595,11 +1642,8 @@ void AddSC_world_event_naxxramas()
     newscript->pGossipSelect = &GossipSelect_npc_argent_emissary;
     newscript->RegisterSelf();
 
-    //newscript = new Script;
-    //newscript->Name = "npc_naxx_rareelite";
-    //newscript->GetAI = &GetAI_npc_naxx_rareeliteAI;
-    //newscript->RegisterSelf();
-
+    /*
+    // This should be standard in an sql file.. don't change to default zone.
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_AZSHARA);
@@ -1608,4 +1652,11 @@ void AddSC_world_event_naxxramas()
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING, 0);
+    */
 }
