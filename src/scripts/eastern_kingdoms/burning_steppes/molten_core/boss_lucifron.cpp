@@ -36,6 +36,7 @@ struct boss_lucifronAI : public ScriptedAI
 
     void Reset() override
     {
+        m_Events.Reset(); // wipe existing events or old timers are executed again on subsequent attempts
         m_Events.ScheduleEvent(eEvents::EventImpendingDoom, Seconds(10));       // Zerix: 10s Initial Cast, Repeats every 20s.
         m_Events.ScheduleEvent(eEvents::EventCurse, Seconds(20));               // Zerix: 20s Initial Cast, Repeats every 15s.
         m_Events.ScheduleEvent(eEvents::EventShadowShock, Seconds(6));          // Zerix: 6s Initial Cast, Repeats every 6s.
