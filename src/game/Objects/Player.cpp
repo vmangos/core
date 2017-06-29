@@ -821,6 +821,9 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
     SetCustomFlags(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_FROM_NOSTALRIUS_3);
+
+    SetJustBoarded(false);
+
     return true;
 }
 
@@ -6227,12 +6230,12 @@ void Player::DismountCheck()
 
 void Player::SetTransport(Transport* t)
 {
+    WorldObject::SetTransport(t);
+
     if (t) // don't bother checking when exiting a transport
     {
         DismountCheck();
     }
-
-    WorldObject::SetTransport(t);
 }
 
 void Player::UpdateArea(uint32 newArea)

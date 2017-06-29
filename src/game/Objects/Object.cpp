@@ -381,6 +381,15 @@ void Object::BuildOutOfRangeUpdateBlock(UpdateData * data) const
     data->AddOutOfRangeGUID(GetObjectGuid());
 }
 
+void Object::SendOutOfRangeUpdateToPlayer(Player* player)
+{
+    UpdateData data;
+    BuildOutOfRangeUpdateBlock(&data);
+    WorldPacket packet;
+    data.BuildPacket(&packet);
+    player->SendDirectMessage(&packet);
+}
+
 void Object::DestroyForPlayer(Player *target) const
 {
     MANGOS_ASSERT(target);

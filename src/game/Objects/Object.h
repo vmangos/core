@@ -363,6 +363,8 @@ class MANGOS_DLL_SPEC Object
         void BuildValuesUpdate(uint8 updatetype, ByteBuffer *data, UpdateMask *updateMask, Player *target ) const;
         void BuildUpdateDataForPlayer(Player* pl, UpdateDataMapType& update_players);
 
+        void SendOutOfRangeUpdateToPlayer(Player* player);
+
         virtual void DestroyForPlayer( Player *target ) const;
 
         const int32& GetInt32Value( uint16 index ) const

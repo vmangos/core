@@ -92,6 +92,8 @@ class Transport : public GameObject
             x = (inx + iny * std::tan(transO)) / (std::cos(transO) + std::sin(transO) * std::tan(transO));
         }
         void UpdatePassengerPosition(WorldObject* object);
+        void SendOutOfRangeUpdateToMap();
+        void SendCreateUpdateToMap();
     private:
         void MoveToNextWaypoint();
         float CalculateSegmentPos(float perc);

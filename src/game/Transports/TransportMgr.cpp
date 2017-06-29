@@ -128,7 +128,7 @@ void TransportMgr::GeneratePath(GameObjectInfo const* goInfo, TransportTemplate*
     orientationSpline.init_spline_custom(initer);
     orientationSpline.initLengths();
 
-    for (size_t i = 0; i < path.size(); ++i)
+    for (size_t i = 1; i < path.size() - 1; ++i)
     {
         if (!mapChange)
         {
@@ -324,11 +324,10 @@ void TransportMgr::GeneratePath(GameObjectInfo const* goInfo, TransportTemplate*
     }
 
     keyFrames.back().NextArriveTime = keyFrames.back().DepartureTime;
-    // 1.12 specific code
-    int l = keyFrames.size();
-    keyFrames[l - 2].NextArriveTime = keyFrames[l - 2].DepartureTime;
-    keyFrames.back().NextArriveTime = keyFrames[l - 2].DepartureTime;
-    keyFrames.back().DepartureTime = keyFrames[l - 2].DepartureTime;
+    // the client destroys a transport by itself after a while, refresh is needed mid course
+    // Feathermoon 303 & Teldrassil 293 ferries
+    if (pathId == 303 || pathId == 293)
+        keyFrames[12].Update = true;
     transport->pathTime = keyFrames.back().DepartureTime;
 }
 

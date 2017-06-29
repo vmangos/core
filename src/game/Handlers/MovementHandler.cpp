@@ -595,6 +595,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
             GetPlayer()->GetCheatData()->OnTransport(plMover, movementInfo.GetTransportGuid());
             Unit* loadPetOnTransport = nullptr;
             if (!plMover->GetTransport())
+            {
                 if (Transport* t = plMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
                 {
                     t->AddPassenger(plMover);
@@ -602,6 +603,11 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
                         if (pet->GetTransport() != t)
                             loadPetOnTransport = pet;
                 }
+                // fix an 1.12 client problem with transports
+                plMover->SetJustBoarded(true);
+            }
+            else
+                plMover->SetJustBoarded(false);
             if (plMover->GetTransport())
             {
                 movementInfo.pos.x = movementInfo.GetTransportPos()->x;
@@ -705,12 +711,26 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
     uint32 lag;
     recv_data >> lag;
 
-    WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
-    data << GetPlayer()->GetPackGUID();
-    data << lag;
-    GetPlayer()->m_movementInfo.time += lag;
-    GetPlayer()->m_movementInfo.ctime += lag;
-    GetPlayer()->SendMovementMessageToSet(std::move(data), false);
+    Player* pl = GetPlayer();
+
+    pl->m_movementInfo.time += lag;
+    pl->m_movementInfo.ctime += lag;
+
+    // fix an 1.12 client problem with transports
+    Transport* tr = pl->GetTransport();
+    if (pl->HasJustBoarded() && tr)
+    {
+        pl->SetJustBoarded(false);
+        tr->SendOutOfRangeUpdateToPlayer(pl);
+        tr->SendCreateUpdateToPlayer(pl);
+    }
+    else
+    {
+        WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
+        data << pl->GetPackGUID();
+        data << lag;
+        pl->SendMovementMessageToSet(std::move(data), false);
+    }
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)

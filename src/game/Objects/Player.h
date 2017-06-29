@@ -2328,6 +2328,12 @@ class MANGOS_DLL_SPEC Player final: public Unit
         uint32 m_currentTicketCounter;
         bool m_smartInstanceRebind;
 
+        // to fix an 1.12 client problem with transports
+        // sometimes they need a refresh before being usable
+        bool m_justBoarded;
+        void SetJustBoarded(bool hasBoarded) { m_justBoarded = hasBoarded; }
+        bool HasJustBoarded() { return m_justBoarded; }
+
     private:
         // internal common parts for CanStore/StoreItem functions
         InventoryResult _CanStoreItem_InSpecificSlot( uint8 bag, uint8 slot, ItemPosCountVec& dest, ItemPrototype const *pProto, uint32& count, bool swap, Item *pSrcItem ) const;
