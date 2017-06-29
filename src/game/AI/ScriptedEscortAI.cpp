@@ -325,7 +325,15 @@ void npc_escortAI::ResetEscort()
 
 void npc_escortAI::UpdateEscortAI(const uint32 uiDiff)
 {
-    //Check if we have a current target
+    // Make nearby enemies aggro passive escort npcs
+    if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_creature->isInCombat())
+    {
+        if (Unit* pTarget = m_creature->SelectNearestHostileUnitInAggroRange(true))
+            if ((pTarget->GetTypeId() == TYPEID_UNIT) && !pTarget->GetCharmInfo() && !pTarget->isInCombat())
+                pTarget->AI()->AttackStart(m_creature);
+    }
+
+    // Check if we have a current target
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
