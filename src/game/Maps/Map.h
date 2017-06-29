@@ -536,7 +536,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         mutable MapMutexType    unitsMvtUpdate_lock;
         std::set<Unit*>         unitsMvtUpdate;
-        uint32 m_diffBuffer;
+
     protected:
         MapEntry const* i_mapEntry;
         uint32 i_id;
