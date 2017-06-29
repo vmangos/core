@@ -260,7 +260,8 @@ void SpellCastTargets::write(ByteBuffer& data) const
         data << m_strTarget;
 }
 
-Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim): m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
+Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim):
+    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to sSpellStore element");
@@ -323,6 +324,8 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_casttime = 0;                                         // setup to correct value in Spell::prepare, don't must be used before.
     m_timer = 0;                                            // will set to cast time in prepare
     m_duration = 0;
+
+    m_channeled = IsChanneledSpell(info);
 
     m_needAliveTargetMask = 0;
 
@@ -1113,7 +1116,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     if (real_caster)
     {
         // Restauration d'energie sur miss/dodge des sorts rapportant un CP.
-        // Source : http://roguecrap.blogspot.co.uk/2006/03/energy-regeneration-oddities.html, + vérifiable en vidéo
+        // Source : http://roguecrap.blogspot.co.uk/2006/03/energy-regeneration-oddities.html, + verifiable en video
         // Source for Parry: https://youtu.be/aDXXr3ad3is?t=3m07s
         if ((missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_DODGE || missInfo == SPELL_MISS_PARRY) &&
                 m_spellInfo->powerType == POWER_ENERGY && IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_ADD_COMBO_POINTS))
@@ -1535,7 +1538,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                     m_spellAuraHolder = nullptr;
 
                     // Need to interrupt pet channeling spells or else they get stuck
-                    if (m_caster && m_caster->IsControlledByPlayer() && IsChanneledSpell(m_spellInfo))   
+                    if (m_caster && m_caster->IsControlledByPlayer() && m_channeled)
                     {
                         Spell *channeled = m_caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
                         if (channeled && channeled->m_spellInfo->Id == m_spellInfo->Id && channeled->m_targets.getUnitTarget() == unit)
@@ -1558,6 +1561,14 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
         {
             delete m_spellAuraHolder;
             m_spellAuraHolder = nullptr;
+        }
+
+        // Aura applied successfully. If it's a channeled spell keep track of the holder so
+        // we can update it on spell update. Units do not update holders on themselves if
+        // they are from a channeled spell
+        if (m_channeled && m_spellAuraHolder)
+        {
+            AddChanneledAuraHolder(m_spellAuraHolder);
         }
     }
 }
@@ -3062,7 +3073,7 @@ void Spell::prepare(Aura* triggeredByAura)
 
         OnSpellLaunch();
 
-        bool channeled = IsChanneledSpell(m_spellInfo);
+        bool channeled = m_channeled;
 
         // [Nostalrius] Stop pets casting channeled spells ! (succubus seduce ...)
         if (m_timer && channeled)
@@ -3105,7 +3116,7 @@ void Spell::cancel()
         return;
 
     // channeled spells don't display interrupted message even if they are interrupted, possible other cases with no "Interrupted" message
-    bool sendInterrupt = IsChanneledSpell(m_spellInfo) && m_spellState != SPELL_STATE_PREPARING ? false : true;
+    bool sendInterrupt = m_channeled && m_spellState != SPELL_STATE_PREPARING ? false : true;
 
     m_autoRepeat = false;
     switch (m_spellState)
@@ -3339,7 +3350,7 @@ void Spell::cast(bool skipCheck)
     m_targets.updateTradeSlotItem();
 
     FillTargetMap();
-    if (IsChanneledSpell(m_spellInfo))
+    if (m_channeled)
         HandleAddTargetTriggerAuras();
 
     if (m_spellState == SPELL_STATE_FINISHED)                // stop cast if spell marked as finish somewhere in FillTargetMap
@@ -3439,7 +3450,7 @@ void Spell::handle_immediate()
     _handle_immediate_phase();
 
     // start channeling if applicable (after _handle_immediate_phase for get persistent effect dynamic object for channel target
-    if (IsChanneledSpell(m_spellInfo) && m_duration)
+    if (m_channeled && m_duration)
     {
         m_spellState = SPELL_STATE_CASTING;
         SendChannelStart(m_duration);
@@ -3725,6 +3736,42 @@ void Spell::update(uint32 difftime)
                     finish();
                 }
 
+                // Must update target holder since the target will not update it. Used to keep it in sync
+                // If the cast is interrupted mid-iteration (i.e. unit dies), break
+                SpellAuraHolderList::iterator iter = m_channeledHolders.begin();
+                SpellAuraHolderList::iterator curr;
+                while (iter != m_channeledHolders.end())
+                {
+                    // increment now, current holder may be removed from the list externally so we need to step
+                    curr = iter;
+                    ++iter;
+
+                    SpellAuraHolder *holder = *curr;
+                    holder->UpdateHolder(difftime);
+
+                    // Spell cast was interrupted on holder update. Unit likely died, targetted buff was
+                    // dispelled, or unit ran out of range. Return since we cleaned up in
+                    // SendChannelUpdate(0) on cancel. Continuing equals segfault due to deleted
+                    // holders
+                    if (m_spellState == SPELL_STATE_FINISHED)
+                        return;
+
+                    // Handle typical removal modes for aura updates here for efficiency,
+                    // RemoveChanneledAuraHolder will ignore these modes. Have to check deleted
+                    // for expired holder as well, because the unit can die on the last tick
+                    // and have a non-checked remove mode. Expired holders will be cleaned up
+                    // on the unit's own update if it's from AoE. Single target cleaned up in
+                    // SendChannelUpdate(0)
+                    AuraRemoveMode remove = holder->GetRemoveMode();
+                    if ((holder->GetAuraDuration() == 0 && !holder->IsDeleted()) || 
+                            (holder->IsDeleted() && (remove == AURA_REMOVE_BY_RANGE || remove == AURA_REMOVE_BY_GROUP)))
+                    {
+                        holder->SetInUse(false);
+
+                        m_channeledHolders.erase(curr);
+                    }
+                }
+
                 if (difftime >= m_timer)
                     m_timer = 0;
                 else
@@ -3862,7 +3909,7 @@ void Spell::finish(bool ok)
         return;
     }
 
-    if (!IsChanneledSpell(m_spellInfo))
+    if (!m_channeled)
         HandleAddTargetTriggerAuras();
 
     // Heal caster for all health leech from all targets
@@ -4172,7 +4219,7 @@ void Spell::WriteSpellGoTargets(WorldPacket* data)
         }
     }
     // Reset m_needAliveTargetMask for non channeled spell
-    if (!IsChanneledSpell(m_spellInfo))
+    if (!m_channeled)
         m_needAliveTargetMask = 0;
 
     data->put<uint8>(hitPos, (uint8)hit);
@@ -4278,6 +4325,9 @@ void Spell::SendInterrupted(uint8 result)
 
 void Spell::SendChannelUpdate(uint32 time)
 {
+    if (!m_channeled || m_spellState == SPELL_STATE_FINISHED)
+        return;
+
     if (!time)
     {
         // Reset farsight for some possessing auras of possessed summoned (as they might work with different aura types)
@@ -4308,12 +4358,43 @@ void Spell::SendChannelUpdate(uint32 time)
             }
         }
 
-        m_caster->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid());
+        // Free channeled holders now so they can be safely removed, no handling for
+        // external removal. Nothing else should be modifying this list during this iteration
+        SpellAuraHolderList::iterator iter = m_channeledHolders.begin();
+        while (iter != m_channeledHolders.end())
+        {
+            SpellAuraHolder *holder = *iter;
+            holder->SetInUse(false);
+            // Remove any left over auras on all targets at channel end if they
+            // have not already been marked as deleted. Cleans up non-expired
+            // aoe targets
+            if (!holder->IsDeleted())
+            {
+                if (Unit *unit = holder->GetTarget())
+                    unit->RemoveSpellAuraHolder(holder, AURA_REMOVE_BY_CHANNEL);
+            }
+
+            iter = m_channeledHolders.erase(iter);
+        }
+
+        // Remove single target auras on caster now if they expired
+        m_caster->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid(), AURA_REMOVE_BY_CHANNEL);
 
         ObjectGuid target_guid = m_caster->GetChannelObjectGuid();
         if (target_guid != m_caster->GetObjectGuid() && target_guid.IsUnit())
+        {
             if (Unit* target = ObjectAccessor::GetUnit(*m_caster, target_guid))
-                target->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid());
+            {
+                // Remove single target auras on target now if they expired
+                target->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid(), AURA_REMOVE_BY_CHANNEL);
+            }
+        }
+
+        // Remove dynamic objects if they are still alive. Persistent channel objects
+        // live until the cast has finished. Technically don't need to explicitly remove
+        // but no harm
+        m_caster->RemoveDynObject(m_spellInfo->Id);
+        m_caster->RemoveGameObject(m_spellInfo->Id, true);
     }
     // Only modify/send values if we are the current channeled spell !
     if (m_caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL) && m_caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL) != this)
@@ -4722,6 +4803,35 @@ void Spell::CastPreCastSpells(Unit* target)
         m_caster->CastSpell(target, (*si), true, m_CastItem);
 }
 
+void Spell::AddChanneledAuraHolder(SpellAuraHolder *holder)
+{
+    // Set and hold in use until clean up to prevent any delete calls destroying
+    // the object before we can handle it
+    holder->SetInUse(true);
+    m_channeledHolders.push_back(holder);
+}
+
+// Occurs when an aura should be removed from handling due to deletion or expiration
+void Spell::RemoveChanneledAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
+{
+    // AURA_REMOVE_BY_CHANNEL comes from here, don't want to double erase. other modes are handled in holder update
+    if (!holder || mode == AURA_REMOVE_BY_CHANNEL || mode == AURA_REMOVE_BY_GROUP || mode == AURA_REMOVE_BY_RANGE)
+        return;
+
+    SpellAuraHolderList::iterator iter = m_channeledHolders.begin();
+    while (iter != m_channeledHolders.end())
+    {
+        if (*iter == holder)
+        {
+            (*iter)->SetInUse(false);
+            m_channeledHolders.erase(iter);
+            break;
+        }
+        else
+            ++iter;
+    }
+}
+
 SpellCastResult Spell::CheckCast(bool strict)
 {
     // Cheat du joueur ?
@@ -4731,7 +4841,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     //sLog.outString("CheckCast de %u %s%s%s sur %s",
     //   m_spellInfo->Id, strict ? "[strict]" : "", m_IsTriggeredSpell ? "[triggered]" : "", m_triggeredByAuraSpell ? "[triggeredByAura]" : "", m_targets.getUnitTargetGuid().GetString().c_str());
 
-    // Quel sort peut-on faire lancer à un mob que l'on CM ?
+    // Quel sort peut-on faire lancer a un mob que l'on CM ?
     if (m_caster->hasUnitState(UNIT_STAT_CONTROLLED))
     {
         if (m_spellInfo->Category == 21) // Enrager
@@ -7038,7 +7148,7 @@ void Spell::DelayedChannel()
         if ((*ihit).missCondition == SPELL_MISS_NONE)
         {
             if (Unit* unit = m_caster->GetObjectGuid() == ihit->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, ihit->targetGUID))
-                unit->DelaySpellAuraHolder(m_spellInfo->Id, delaytime, unit->GetObjectGuid());
+                unit->DelaySpellAuraHolder(m_spellInfo->Id, delaytime, m_caster->GetObjectGuid());
         }
     }
 
@@ -7049,7 +7159,10 @@ void Spell::DelayedChannel()
             dynObj->Delay(delaytime);
     }
 
-    SendChannelUpdate(m_timer);
+    if (m_timer == 0)
+        m_caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
+    else
+        SendChannelUpdate(m_timer);
 }
 
 void Spell::UpdateOriginalCasterPointer()
@@ -7111,7 +7224,7 @@ CurrentSpellTypes Spell::GetCurrentContainer() const
         return (CURRENT_MELEE_SPELL);
     else if (IsAutoRepeat())
         return (CURRENT_AUTOREPEAT_SPELL);
-    else if (IsChanneledSpell(m_spellInfo))
+    else if (m_channeled)
         return (CURRENT_CHANNELED_SPELL);
     else
         return (CURRENT_GENERIC_SPELL);
@@ -7212,7 +7325,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
 
 bool Spell::IsNeedSendToClient() const
 {
-    return !IsChannelingVisual() && (m_spellInfo->SpellVisual != 0 || IsChanneledSpell(m_spellInfo) ||
+    return !IsChannelingVisual() && (m_spellInfo->SpellVisual != 0 || m_channeled ||
            m_spellInfo->speed > 0.0f || (!m_triggeredByAuraSpell && !m_IsTriggeredSpell));
 }
 
