@@ -4770,7 +4770,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->Attributes & SPELL_ATTR_PASSIVE)
         && !m_IsTriggeredSpell && (m_caster->HasSpellCooldown(m_spellInfo->Id) || m_caster->HasSpellCategoryCooldown(spellCat)))
     {
-        if (m_triggeredByAuraSpell)
+        if (m_triggeredByAuraSpell || m_spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
             return SPELL_FAILED_DONT_REPORT;
         else
             return SPELL_FAILED_NOT_READY;
@@ -4789,7 +4789,13 @@ SpellCastResult Spell::CheckCast(bool strict)
     if (!m_IsTriggeredSpell)
     {
         if (strict && HasGlobalCooldown())
-            return SPELL_FAILED_NOT_READY;
+        {
+            // Activated spells will get stuck if we return SPELL_FAILED_NOT_READY during GCD
+            if (m_spellInfo->Attributes & SPELL_ATTR_DISABLED_WHILE_ACTIVE)
+                return SPELL_FAILED_DONT_REPORT;
+            else
+                return SPELL_FAILED_NOT_READY;
+        }
 
         // only allow triggered spells if at an ended battleground
         if (m_caster->GetTypeId() == TYPEID_PLAYER)
