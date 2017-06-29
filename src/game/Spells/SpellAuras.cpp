@@ -2635,6 +2635,7 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if (!caster || !target)
         return;
     caster->ModPossess(target, apply, m_removeMode);
+    target->AddThreat(caster,target->GetHealth(), false, GetSpellSchoolMask(GetSpellProto()));
 }
 
 void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
@@ -2655,8 +2656,6 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
     else
         return;
 
-    Camera& camera = p_caster->GetCamera();
-
     if (apply)
     {
         target->addUnitState(UNIT_STAT_CONTROLLED);
@@ -2673,7 +2672,6 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         p_caster->SetMover(target);
 
         target->CombatStop(true);
-        target->DeleteThreatList();
 
         if (CharmInfo *charmInfo = target->InitCharmInfo(target))
         {
@@ -2688,8 +2686,8 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
             if (pTargetCrea->AI()->SwitchAiAtControl())
                 pTargetCrea->AIM_Initialize();
 
-        if (Player* p_target = target->ToPlayer())
-                p_target->SetControlledBy(caster);
+        if (target->IsPlayer() && !caster->IsPlayer())
+                target->ToPlayer()->SetControlledBy(caster);
         // Les mobs doivent attaquer celui qui est CM.
         // On appelle donc 'MoveInLineOfSight' pour les mobs a cote.
         target->ScheduleAINotify(0);
@@ -2722,27 +2720,20 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
         target->clearUnitState(UNIT_STAT_CONTROLLED);
 
-        target->DeleteThreatList();
-
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-        if (!target->GetAffectingPlayer())
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_PVP_ATTACKABLE);
 
         target->SetCharmerGuid(ObjectGuid());
 
         if (target->GetTypeId() == TYPEID_PLAYER)
         {
             Player* p_target = ((Player*)target);
-            p_target->setFactionForRace(target->getRace());
             p_target->RemoveAI();
             p_target->RelocateToLastClientPosition(); // Movement interpolation - prevent undermap.
         }
-        else if (target->GetTypeId() == TYPEID_UNIT)
-        {
-            CreatureInfo const *cinfo = ((Creature*)target)->GetCreatureInfo();
-            target->setFaction(cinfo->faction_A);
-        }
-        target->StopMoving();
+
+        target->RestoreFaction();
+        target->CombatStop(true);
+        target->StopMoving(true);
         target->UpdateControl();
 
         if (Creature* pCreature = target->ToCreature())
