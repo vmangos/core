@@ -1858,3 +1858,6 @@ Movement.RelocationVmapsCheckDelay = 0
 # Sanction applied to a player if sending too many packets
 # - By default: Kick
 Antiflood.Sanction = 4
+
+# Maximum milliseconds the map update is allowed to recover after lagging behind.
+MapUpdateSteadyBuffer = 0
