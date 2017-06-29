@@ -5652,9 +5652,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (GameObject* go = m_targets.getGOTarget())
                 {
                     // In BattleGround players can use only flags and banners
-                    if (((Player*)m_caster)->InBattleGround() &&
-                            !((Player*)m_caster)->CanUseBattleGroundObject())
-                        return SPELL_FAILED_TRY_AGAIN;
+                    if (((Player*)m_caster)->InBattleGround())
+                    {
+                        if (go->GetGoState() != GO_STATE_READY)
+                            return SPELL_FAILED_BAD_TARGETS;
+                        if(!((Player*)m_caster)->CanUseBattleGroundObject())
+                            return SPELL_FAILED_TRY_AGAIN;
+                    }
                     lockId = go->GetGOInfo()->GetLockId();
                     if (!lockId)
                         return SPELL_FAILED_ALREADY_OPEN;

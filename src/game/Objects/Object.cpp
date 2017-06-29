@@ -293,8 +293,16 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
         // UPDATETYPE_CREATE_OBJECT2 for some gameobject types...
         if (isType(TYPEMASK_GAMEOBJECT))
         {
-            switch (((GameObject*)this)->GetGoType())
+            GameObject *go = (GameObject*)this;
+            switch (go->GetGoType())
             {
+                case GAMEOBJECT_TYPE_BUTTON:
+                {
+                    const LockEntry *lock = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
+                    if (!lock || lock->Index[1] != LOCKTYPE_SLOW_OPEN ||
+                            (go->isSpawned() && !go->GetRespawnDelay()))
+                        break;
+                }
                 case GAMEOBJECT_TYPE_TRAP:
                 case GAMEOBJECT_TYPE_DUEL_ARBITER:
                 case GAMEOBJECT_TYPE_FLAGSTAND:
@@ -303,8 +311,6 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
                     break;
                 case GAMEOBJECT_TYPE_TRANSPORT:
                     updateFlags |= UPDATEFLAG_TRANSPORT;
-                    break;
-                default:
                     break;
             }
         }
