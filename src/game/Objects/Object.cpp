@@ -1646,7 +1646,7 @@ public:
         va_copy(argsCpy, *i_vaList);
         vsnprintf(textFinal, 2048, text, argsCpy);
         va_end(argsCpy);
-        WorldObject::BuildMonsterChat(&data, i_object.GetObjectGuid(), i_msgtype, textFinal, i_language, i_object.GetNameForLocaleIdx(loc_idx), i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
+        WorldObject::BuildMonsterChat(&data, i_object.GetObjectGuid(), i_msgtype, textFinal, i_language, i_object.GetNameForLocaleIdx(loc_idx), i_target ? i_target->GetObjectGuid() : ObjectGuid());
     }
 
 private:
@@ -1706,14 +1706,14 @@ void WorldObject::PMonsterYell(const char* text, ...)
 void WorldObject::MonsterSay(const char* text, uint32 language, Unit* target)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, GetObjectGuid(), CHAT_MSG_MONSTER_SAY, text, language, GetName(), target ? target->GetObjectGuid() : ObjectGuid(), target ? target->GetName() : "");
+    BuildMonsterChat(&data, GetObjectGuid(), CHAT_MSG_MONSTER_SAY, text, language, GetName(), target ? target->GetObjectGuid() : ObjectGuid());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), true);
 }
 
 void WorldObject::MonsterYell(const char* text, uint32 language, Unit* target)
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
-    BuildMonsterChat(&data, GetObjectGuid(), CHAT_MSG_MONSTER_YELL, text, language, GetName(), target ? target->GetObjectGuid() : ObjectGuid(), target ? target->GetName() : "");
+    BuildMonsterChat(&data, GetObjectGuid(), CHAT_MSG_MONSTER_YELL, text, language, GetName(), target ? target->GetObjectGuid() : ObjectGuid());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_YELL), true);
 }
 
@@ -1721,7 +1721,7 @@ void WorldObject::MonsterTextEmote(const char* text, Unit* target, bool IsBossEm
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildMonsterChat(&data, GetObjectGuid(), IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, text, LANG_UNIVERSAL,
-                     GetName(), target ? target->GetObjectGuid() : ObjectGuid(), target ? target->GetName() : "");
+                     GetName(), target ? target->GetObjectGuid() : ObjectGuid());
     SendMessageToSetInRange(&data, sWorld.getConfig(IsBossEmote ? CONFIG_FLOAT_LISTEN_RANGE_YELL : CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true);
 }
 
@@ -1732,7 +1732,7 @@ void WorldObject::MonsterWhisper(const char* text, Unit* target, bool IsBossWhis
 
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildMonsterChat(&data, GetObjectGuid(), IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL,
-                     GetName(), target->GetObjectGuid(), target->GetName());
+                     GetName(), target->GetObjectGuid());
     ((Player*)target)->GetSession()->SendPacket(&data);
 }
 
@@ -1747,8 +1747,8 @@ namespace MaNGOS
         {
             char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
 
-            WorldObject::BuildMonsterChat(&data, i_object.GetObjectGuid(), i_msgtype, text, i_language, i_object.GetNameForLocaleIdx(loc_idx),
-                i_target ? i_target->GetObjectGuid() : ObjectGuid(), i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
+            WorldObject::BuildMonsterChat(&data, i_object.GetObjectGuid(), i_msgtype, text, i_language, i_object.GetNameForLocaleIdx(loc_idx), 
+                i_target ? i_target->GetObjectGuid() : ObjectGuid());
         }
 
     private:
@@ -1824,12 +1824,12 @@ void WorldObject::MonsterWhisper(int32 textId, Unit* target, bool IsBossWhisper)
 
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildMonsterChat(&data, GetObjectGuid(), IsBossWhisper ? CHAT_MSG_RAID_BOSS_WHISPER : CHAT_MSG_MONSTER_WHISPER, text, LANG_UNIVERSAL,
-                     GetNameForLocaleIdx(loc_idx), target->GetObjectGuid(), "");
+                     GetNameForLocaleIdx(loc_idx), target->GetObjectGuid());
 
     ((Player*)target)->GetSession()->SendPacket(&data);
 }
 
-void WorldObject::BuildMonsterChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid, char const* targetName)
+void WorldObject::BuildMonsterChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid)
 {
     *data << uint8(msgtype);
     *data << uint32(language);
@@ -1847,11 +1847,6 @@ void WorldObject::BuildMonsterChat(WorldPacket *data, ObjectGuid senderGuid, uin
     *data << uint32(strlen(name) + 1);
     *data << name;
     *data << ObjectGuid(targetGuid);                        // Unit Target
-    if (targetGuid && !targetGuid.IsPlayer())
-    {
-        *data << uint32(strlen(targetName) + 1);            // target name length
-        *data << targetName;                                // target name
-    }
     *data << (uint32)(strlen(text) + 1);
     *data << text;
     *data << (uint8)0;                                      // ChatTag
