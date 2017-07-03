@@ -31,6 +31,7 @@ GossipMenu::GossipMenu(WorldSession* session) : m_session(session)
 {
     m_gItems.reserve(16);                                   // can be set for max from most often sizes to speedup push_back and less memory use
     m_gMenuId = 0;
+    m_discoveredNode = false;
 }
 
 GossipMenu::~GossipMenu()
@@ -119,6 +120,7 @@ void GossipMenu::ClearMenu()
     m_gItems.clear();
     m_gItemsData.clear();
     m_gMenuId = 0;
+    m_discoveredNode = false;
 }
 
 PlayerMenu::PlayerMenu(WorldSession *session) : mGossipMenu(session)
