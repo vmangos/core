@@ -65,7 +65,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES (252, 87, 0, 0, 1436, 80, 7, 0, 2000000135, 0, 0, 0, 0, 0, 0, 0, 'Translation to Ello - Cutford Say Text 1');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES (252, 87, 1, 66, 1436, 80, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Translation to Ello - Cutford Emote Salute');
 INSERT INTO `creature_movement_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `datalong4`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES (20, 0, 35, 1, 0, 264, 20, 0, 0, 0, 0, 0, 0, 0, 0, 3.55585, 'Translation to Ello - Althea Reset Orientation');
-UPDATE `quest_Template` SET `CompleteScript`=252 WHERE `entry`=252;
+UPDATE `quest_template` SET `CompleteScript`=252 WHERE `entry`=252;
 
 -- Texts for quest start script for Wait for Sirra to Finish and Translation to Ello
 INSERT INTO `db_script_string` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`) VALUES (2000000137, '$n, the translation is finished!', '휴, 번역이 끝났습니다!', '$n, la traduction est terminée !', '$n, die Übersetzung ist abgeschlossen!', '$n，翻译完成了！', '$n，翻譯完成了!', '¡$n, la traducción está lista!', '¡$n, la traducción está lista!', '$n, перевод закончен!');

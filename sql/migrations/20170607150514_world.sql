@@ -21,9 +21,6 @@ DELETE FROM `npc_gossip` WHERE `npc_guid`=2;
 INSERT INTO `gossip_menu` VALUES (703, 1255, 0);
 UPDATE `creature_template` SET `gossip_menu_id`=703, `npcflag`=5 WHERE `entry`=1302;
 
--- Change gossip menu option icon for Spirit Healer
-UPDATE `gossip_menu_option` SET `option_icon`=0 WHERE `menu_id`=0 AND `id`=4;
-
 -- Gossip text for Apothecary Johaan
 INSERT INTO `npc_text` VALUES (213,'The Dark Lady has put forth the challenge. It is up to us to meet it.','',0,1,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0,'','',0,0,0,0,0,0,0,0);
 INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES (35231, 213);

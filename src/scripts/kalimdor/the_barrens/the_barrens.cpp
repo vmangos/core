@@ -24,7 +24,6 @@ EndScriptData */
 /* ContentData
 npc_beaten_corpse
 npc_gilthares
-npc_sputtervalve
 npc_taskmaster_fizzule
 npc_twiggy_flathead
 at_twiggy_flathead
@@ -249,32 +248,6 @@ bool QuestAccept_npc_gilthares(Player* pPlayer, Creature* pCreature, const Quest
 
         if (npc_giltharesAI* pEscortAI = dynamic_cast<npc_giltharesAI*>(pCreature->AI()))
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
-    }
-    return true;
-}
-
-/*######
-## npc_sputtervalve
-######*/
-
-bool GossipHello_npc_sputtervalve(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(6981) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Can you tell me about this shard?", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());;
-    return true;
-}
-
-bool GossipSelect_npc_sputtervalve(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-    {
-        pPlayer->SEND_GOSSIP_MENU(2013, pCreature->GetGUID());
-        pPlayer->AreaExploredOrEventHappens(6981);
     }
     return true;
 }
@@ -1589,12 +1562,6 @@ void AddSC_the_barrens()
     newscript->Name = "npc_gilthares";
     newscript->GetAI = &GetAI_npc_gilthares;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_gilthares;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_sputtervalve";
-    newscript->pGossipHello = &GossipHello_npc_sputtervalve;
-    newscript->pGossipSelect = &GossipSelect_npc_sputtervalve;
     newscript->RegisterSelf();
 
     newscript = new Script;
