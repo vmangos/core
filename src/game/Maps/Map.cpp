@@ -95,11 +95,7 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       m_updateFinished(false), m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
       _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(0),
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
-      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
-      m_motionThreads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS))),
-      m_objectThreads(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS) -1,0))),
-      m_visibilityThreads(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0))),
-      m_cellThreads(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0))), m_diffBuffer(0)
+      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0), m_diffBuffer(0)
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -122,10 +118,17 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
 
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
-    m_motionThreads->start();
-    m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-    m_visibilityThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
-    m_cellThreads->start();
+    if (IsContinent())
+    {
+        m_motionThreads.reset(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_CONTINENTS_MOTIONUPDATE_THREADS)));
+        m_objectThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_OBJECTSUPDATE_THREADS) -1,0)));
+        m_visibilityThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MAP_VISIBILITYUPDATE_THREADS) -1,0)));
+        m_cellThreads.reset(new ThreadPool(std::max((int)sWorld.getConfig(CONFIG_UINT32_MTCELLS_THREADS) - 1, 0)));
+        m_visibilityThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
+        m_cellThreads->start();
+        m_motionThreads->start();
+        m_objectThreads->start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
+    }
 }
 
 // Nostalrius
@@ -4067,7 +4070,9 @@ void Map::SendObjectUpdates()
         for (UpdateDataMapType::iterator iter = update_players.begin(); iter != update_players.end(); ++iter)
             iter->second.Send(iter->first->GetSession());
     };
-    std::future<void> job = m_objectThreads->processWorkload();
+    std::future<void> job;
+    if (m_objectThreads)
+         job = m_objectThreads->processWorkload();
     f();
     if (job.valid())
         job.wait();
@@ -4131,10 +4136,12 @@ void Map::UpdateVisibilityForRelocations()
         }
     };
     for (uint32 i = 0; i < threads -1; ++i)
-    {
         m_visibilityThreads << f;
-    }
-    std::future<void> job = m_visibilityThreads->processWorkload();
+
+    std::future<void> job;
+    if (m_visibilityThreads)
+        job = m_visibilityThreads->processWorkload();
+
     f();
     if (job.valid())
         job.wait();
