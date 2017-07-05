@@ -873,17 +873,6 @@ struct instance_blackrock_depths : ScriptedInstance
                 m_auiEncounter[15] = uiData;
                 break;
             case TYPE_QUEST_JAIL_BREAK:
-                if (uiData == FAIL)
-                {
-                    Map::PlayerList const &PlayerList = instance->GetPlayers();
-
-                    for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                    {
-                    Player* pPlayer = itr->getSource();
-                    if (pPlayer && pPlayer->GetQuestStatus(QUEST_JAIL_BREAK) == QUEST_STATUS_INCOMPLETE)
-                        pPlayer->SendQuestFailed(QUEST_JAIL_BREAK);
-                    }
-                }
                 m_auiEncounter[16] = uiData;
                 break;
             case TYPE_JAIL_DUGHAL:

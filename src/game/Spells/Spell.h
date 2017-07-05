@@ -472,6 +472,9 @@ class Spell
         }
         void RemoveStealthAuras();
 
+        void AddChanneledAuraHolder(SpellAuraHolder *holder);
+        void RemoveChanneledAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode);
+
         void Delete() const;
 
         bool HasModifierApplied(SpellModifier* mod);
@@ -481,6 +484,10 @@ class Spell
 
         // Stryg
         uint8 GetTargetNum() const { return m_targetNum; }
+
+        // For summoning ritual helpers visual spell
+        void SetChannelingVisual(bool value) { m_isChannelingVisual = value; }
+        bool IsChannelingVisual() const { return m_isChannelingVisual; }
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
@@ -507,6 +514,9 @@ class Spell
         bool m_autoRepeat;
         bool m_delayed;
         bool m_successCast;
+        bool m_channeled;
+        bool m_isChannelingVisual;                          // For summoning ritual helpers visual spell
+                                                            // no effect handled, only channel start/update is sent
 
         uint8 m_delayAtDamageCount;
         int32 GetNextDelayAtDamageMsTime() { return m_delayAtDamageCount < 5 ? 1000 - (m_delayAtDamageCount++)* 200 : 200; }
@@ -515,6 +525,10 @@ class Spell
         uint64 m_delayStart;                                // time of spell delay start, filled by event handler, zero = just started
         uint64 m_delayMoment;                               // moment of next delay call, used internally
         bool m_immediateHandled;                            // were immediate actions handled? (used by delayed spells only)
+
+        // Channeled spells system
+        typedef std::list<SpellAuraHolder *> SpellAuraHolderList;
+        SpellAuraHolderList m_channeledHolders;             // aura holders of spell on targets for channeled spells. process in sync with spell
 
         // These vars are used in both delayed spell system and modified immediate spell system
         bool m_referencedFromCurrentSpell;                  // mark as references to prevent deleted and access by dead pointers

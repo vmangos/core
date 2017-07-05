@@ -692,7 +692,7 @@ void Opcodes::BuildOpcodeList()
     /*0x27D*/  StoreOpcode(CMSG_ENABLE_DAMAGE_LOG,            "CMSG_ENABLE_DAMAGE_LOG",           STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x27E*/  StoreOpcode(CMSG_GROUP_CHANGE_SUB_GROUP,       "CMSG_GROUP_CHANGE_SUB_GROUP",      STATUS_LOGGEDIN,  PACKET_PROCESS_GROUP,         &WorldSession::HandleGroupChangeSubGroupOpcode);
     /*0x27F*/  StoreOpcode(CMSG_REQUEST_PARTY_MEMBER_STATS,   "CMSG_REQUEST_PARTY_MEMBER_STATS",  STATUS_LOGGEDIN,  PACKET_PROCESS_GROUP,         &WorldSession::HandleRequestPartyMemberStatsOpcode);
-    /*0x280*/  StoreOpcode(CMSG_GROUP_SWAP_SUB_GROUP,         "CMSG_GROUP_SWAP_SUB_GROUP",        STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
+    /*0x280*/  StoreOpcode(CMSG_GROUP_SWAP_SUB_GROUP,         "CMSG_GROUP_SWAP_SUB_GROUP",        STATUS_LOGGEDIN,  PACKET_PROCESS_GROUP,         &WorldSession::HandleGroupSwapSubGroupOpcode);
     /*0x281*/  StoreOpcode(CMSG_RESET_FACTION_CHEAT,          "CMSG_RESET_FACTION_CHEAT",         STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x282*/  StoreOpcode(CMSG_AUTOSTORE_BANK_ITEM,          "CMSG_AUTOSTORE_BANK_ITEM",         STATUS_LOGGEDIN,  PACKET_PROCESS_SELF_ITEMS,    &WorldSession::HandleAutoStoreBankItemOpcode);
     /*0x283*/  StoreOpcode(CMSG_AUTOBANK_ITEM,                "CMSG_AUTOBANK_ITEM",               STATUS_LOGGEDIN,  PACKET_PROCESS_SELF_ITEMS,    &WorldSession::HandleAutoBankItemOpcode);

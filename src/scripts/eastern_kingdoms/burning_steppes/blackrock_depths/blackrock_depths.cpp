@@ -1587,8 +1587,7 @@ struct npc_GorShakAI : public ScriptedAI
         if (bQuestActive)
         {
             if (Player* player = m_creature->GetMap()->GetPlayer(playerGuid))
-                if (player->GetQuestStatus(QUEST_WHATISGOINGON) == QUEST_STATUS_INCOMPLETE)
-                    player->FailQuest(QUEST_WHATISGOINGON);
+                player->GroupEventFailHappens(QUEST_WHATISGOINGON);
             Reset();
         }
     }
@@ -1670,7 +1669,7 @@ struct npc_GorShakAI : public ScriptedAI
                             // DoScriptText(SAY_END, m_creature);
                             // Validate Quest :
                             if (Player* player = m_creature->GetMap()->GetPlayer(playerGuid))
-                                player->AreaExploredOrEventHappens(QUEST_WHATISGOINGON);
+                                player->GroupEventHappens(QUEST_WHATISGOINGON, m_creature);
                             Reset();
                         }
                         break;
@@ -2176,14 +2175,8 @@ struct npc_marshal_reginald_windsorAI : npc_escortAI
 
     void DoJailBreakQuestCredit() const
     {
-        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-
-        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->GetQuestStatus(QUEST_JAIL_BREAK) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->AreaExploredOrEventHappens(QUEST_JAIL_BREAK);
-        }
+        if (Player* pPlayer = GetPlayerForEscort())
+            pPlayer->GroupEventHappens(QUEST_JAIL_BREAK, m_creature);
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -2261,14 +2254,9 @@ struct npc_marshal_reginald_windsorAI : npc_escortAI
                 break;
             case 32:
                 DoScriptText(SAY_REGINALD_WINDSOR_20_2, m_creature);
-                Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
-
-                for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
-                {
-                    Player* m_pPlayer = itr->getSource();
-                    if (m_pPlayer && m_pPlayer->GetQuestStatus(QUEST_JAIL_BREAK) == QUEST_STATUS_INCOMPLETE)
-                        m_pPlayer->AreaExploredOrEventHappens(QUEST_JAIL_BREAK);
-                }
+                
+                DoJailBreakQuestCredit();
+                
                 m_pInstance->SetData(TYPE_QUEST_JAIL_BREAK, DONE);
                 break;
         }
@@ -2300,6 +2288,9 @@ struct npc_marshal_reginald_windsorAI : npc_escortAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
+        if (Player* pPlayer = GetPlayerForEscort())
+            pPlayer->GroupEventFailHappens(QUEST_JAIL_BREAK);
+        
         m_pInstance->SetData(TYPE_QUEST_JAIL_BREAK, FAIL);
     }
 
@@ -2483,6 +2474,9 @@ struct npc_marshal_windsorAI : npc_escortAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
+        if (Player* pPlayer = GetPlayerForEscort())
+            pPlayer->GroupEventFailHappens(QUEST_JAIL_BREAK);
+            
         m_pInstance->SetData(TYPE_QUEST_JAIL_BREAK, FAIL);
     }
 

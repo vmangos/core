@@ -106,8 +106,6 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     if (GetPlayer()->m_InstanceValid == false && !mEntry->IsDungeon())
         GetPlayer()->m_InstanceValid = true;
 
-    GetPlayer()->SetSemaphoreTeleportFar(false);
-
     // relocate the player to the teleport destination
     if (!map)
     {
@@ -127,6 +125,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // while the player is in transit, for example the map may get full
     if (!GetPlayer()->GetMap()->Add(GetPlayer()))
     {
+        GetPlayer()->SetSemaphoreTeleportFar(false);
         // if player wasn't added to map, reset his map pointer!
         GetPlayer()->ResetMap();
 
@@ -143,6 +142,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         }
         return;
     }
+    GetPlayer()->SetSemaphoreTeleportFar(false);
 
     // battleground state prepare (in case join to BG), at relogin/tele player not invited
     // only add to bg group and object, if the player was invited (else he entered through command)
@@ -595,6 +595,7 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
             GetPlayer()->GetCheatData()->OnTransport(plMover, movementInfo.GetTransportGuid());
             Unit* loadPetOnTransport = nullptr;
             if (!plMover->GetTransport())
+            {
                 if (Transport* t = plMover->GetMap()->GetTransport(movementInfo.GetTransportGuid()))
                 {
                     t->AddPassenger(plMover);
@@ -602,6 +603,11 @@ void WorldSession::HandleMoverRelocation(MovementInfo& movementInfo)
                         if (pet->GetTransport() != t)
                             loadPetOnTransport = pet;
                 }
+                // fix an 1.12 client problem with transports
+                plMover->SetJustBoarded(true);
+            }
+            else
+                plMover->SetJustBoarded(false);
             if (plMover->GetTransport())
             {
                 movementInfo.pos.x = movementInfo.GetTransportPos()->x;
@@ -705,12 +711,26 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
     uint32 lag;
     recv_data >> lag;
 
-    WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
-    data << GetPlayer()->GetPackGUID();
-    data << lag;
-    GetPlayer()->m_movementInfo.time += lag;
-    GetPlayer()->m_movementInfo.ctime += lag;
-    GetPlayer()->SendMovementMessageToSet(std::move(data), false);
+    Player* pl = GetPlayer();
+
+    pl->m_movementInfo.time += lag;
+    pl->m_movementInfo.ctime += lag;
+
+    // fix an 1.12 client problem with transports
+    Transport* tr = pl->GetTransport();
+    if (pl->HasJustBoarded() && tr)
+    {
+        pl->SetJustBoarded(false);
+        tr->SendOutOfRangeUpdateToPlayer(pl);
+        tr->SendCreateUpdateToPlayer(pl);
+    }
+    else
+    {
+        WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
+        data << pl->GetPackGUID();
+        data << lag;
+        pl->SendMovementMessageToSet(std::move(data), false);
+    }
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)

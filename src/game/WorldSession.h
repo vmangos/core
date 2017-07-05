@@ -664,6 +664,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleRaidReadyCheckFinishedOpcode( WorldPacket & recv_data );
         void HandleGroupRaidConvertOpcode( WorldPacket & recv_data );
         void HandleGroupChangeSubGroupOpcode( WorldPacket & recv_data );
+        void HandleGroupSwapSubGroupOpcode( WorldPacket & recv_data );
         void HandleGroupAssistantLeaderOpcode( WorldPacket & recv_data );
         void HandlePartyAssignmentOpcode( WorldPacket & recv_data );
 

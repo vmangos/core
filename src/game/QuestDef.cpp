@@ -132,6 +132,15 @@ Quest::Quest(Field * questRecord)
 
     m_isActive = true;
 
+    if (QuestMethod & QUEST_METHOD_DISABLED)
+    {
+        // Leave invalid entries to be caught by ObjectMgr
+        if (QuestMethod <= QUEST_METHOD_LIMIT)
+            QuestMethod = QUEST_METHOD_DISABLED;
+
+        m_isActive = false;
+    }
+
     m_reqitemscount = 0;
     m_reqCreatureOrGOcount = 0;
     m_rewitemscount = 0;

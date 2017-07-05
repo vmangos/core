@@ -529,8 +529,6 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     {
         if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP || IsCivilian())
             SetPvP(true);
-        else
-            SetPvP(false);
     }
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)

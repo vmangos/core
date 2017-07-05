@@ -513,7 +513,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         bool CanWalk() const override { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
         bool CanSwim() const override { return IsPet() || GetCreatureInfo()->InhabitType & INHABIT_WATER; }
-        bool CanFly()  const override { return GetCreatureInfo()->InhabitType & INHABIT_AIR; }
+        bool CanFly()  const override { return !IsPet() && GetCreatureInfo()->InhabitType & INHABIT_AIR; }
 
         void SetReactState(ReactStates st) { m_reactState = st; }
         ReactStates GetReactState() const { return m_reactState; }

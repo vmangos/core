@@ -176,22 +176,7 @@ void npc_escortAI::JustDied(Unit* /*pKiller*/)
 
     if (Player* pPlayer = GetPlayerForEscort())
     {
-        if (Group* pGroup = pPlayer->GetGroup())
-        {
-            for(GroupReference* pRef = pGroup->GetFirstMember(); pRef != nullptr; pRef = pRef->next())
-            {
-                if (Player* pMember = pRef->getSource())
-                {
-                    if (pMember->GetQuestStatus(m_pQuestForEscort->GetQuestId()) == QUEST_STATUS_INCOMPLETE)
-                        pMember->FailQuest(m_pQuestForEscort->GetQuestId());
-                }
-            }
-        }
-        else
-        {
-            if (pPlayer->GetQuestStatus(m_pQuestForEscort->GetQuestId()) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->FailQuest(m_pQuestForEscort->GetQuestId());
-        }
+        pPlayer->GroupEventFailHappens(m_pQuestForEscort->GetQuestId());
     }
 }
 
@@ -340,7 +325,15 @@ void npc_escortAI::ResetEscort()
 
 void npc_escortAI::UpdateEscortAI(const uint32 uiDiff)
 {
-    //Check if we have a current target
+    // Make nearby enemies aggro passive escort npcs
+    if (HasEscortState(STATE_ESCORT_ESCORTING) && !m_creature->isInCombat())
+    {
+        if (Unit* pTarget = m_creature->SelectNearestHostileUnitInAggroRange(true))
+            if ((pTarget->GetTypeId() == TYPEID_UNIT) && !pTarget->GetCharmInfo() && !pTarget->isInCombat())
+                pTarget->AI()->AttackStart(m_creature);
+    }
+
+    // Check if we have a current target
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 

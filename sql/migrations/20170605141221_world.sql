@@ -1,0 +1,5 @@
+INSERT INTO `migrations` VALUES ('20170605141221'); 
+
+-- Brother Sarno should greet players who enter The Cathedral of Light
+INSERT INTO `creature_ai_texts` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES (-791702, 'Greetings, $c! Welcome to the Cathedral of Light!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0, 7, 1, 'Brother Sarno - Greeting text');
+INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) VALUES (791702, 7917, 10, 0, 100, 1, 1, 20, 20000, 60000, 1, -791702, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Brother Sarno - Greet players on entering cathedral');

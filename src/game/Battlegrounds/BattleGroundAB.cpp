@@ -210,12 +210,23 @@ void BattleGroundAB::HandleAreaTrigger(Player *Source, uint32 Trigger)
     teamIndex: 0-ally, 1-horde                        */
 void BattleGroundAB::_CreateBanner(uint8 node, uint8 type, uint8 teamIndex)
 {
+    uint32 delay = 0;
+    switch (type){
+    case BG_AB_NODE_TYPE_CONTESTED:
+        delay = 1;
+        break;
+    case BG_AB_NODE_TYPE_OCCUPIED:
+        delay = 5;
+        break;
+    }
+
     // cause the node-type is in the generic form
     // please see in the headerfile for the ids
     if (type != BG_AB_NODE_TYPE_NEUTRAL)
         type += teamIndex;
 
-    SpawnEvent(node, type, true, true);                           // will automaticly despawn other events
+
+    SpawnEvent(node, type, true, true, delay);                           // will automaticly despawn other events
 }
 
 int32 BattleGroundAB::_GetNodeNameId(uint8 node)

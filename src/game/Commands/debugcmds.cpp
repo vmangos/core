@@ -71,6 +71,77 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
+{
+    uint32 uiPlayId = 0;
+    char* playIdStr = strtok(args, " ");
+    if (playIdStr)
+        uiPlayId = int32(atoi(playIdStr));
+
+    if (uiPlayId == -1)
+    {
+        m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+        WorldPacket data(MSG_CHANNEL_UPDATE, (4));
+        data << uint32(0);
+        m_session->GetPlayer()->SendDirectMessage(&data);
+        PSendSysMessage("Sending channel stop");
+        return true;
+    }
+    uint32 id = 0;
+    SpellEntry const *spellInfo = NULL;
+    for (id = uiPlayId + 1; id <= sSpellStore.GetNumRows(); id++)
+    {
+        spellInfo = sSpellMgr.GetSpellEntry(id);
+        if (!spellInfo || uiPlayId >= spellInfo->Id || !spellInfo->SpellVisual || !IsChanneledSpell(spellInfo))
+            continue;
+        else
+            break;
+    }
+    if (id && id <= sSpellStore.GetNumRows())
+    {
+        WorldPacket data(MSG_CHANNEL_START, (4 + 4));
+        data << uint32(id);
+        data << uint32(60000);
+        m_session->GetPlayer()->SendDirectMessage(&data);
+        m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, id);
+        PSendSysMessage("Playing channel visual of spell %u %s %s", id, spellInfo->SpellName[0], spellInfo->Rank[0]);
+        return true;
+    }
+    PSendSysMessage("Spell Id range 0 to %u, -1 to stop animation", sSpellStore.GetNumRows());
+    return true;
+}
+
+bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
+{
+    uint32 uiPlayId = 0;
+    char* playIdStr = strtok(args, " ");
+    if (playIdStr)
+        uiPlayId = int32(atoi(playIdStr));
+
+    if (uiPlayId && uiPlayId <= sSpellStore.GetNumRows())
+    {
+        WorldPacket data(MSG_CHANNEL_START, (4 + 4));
+        data << uint32(uiPlayId);
+        data << uint32(60000);
+        m_session->GetPlayer()->SendDirectMessage(&data);
+        m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, uiPlayId);
+        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(uiPlayId);
+        PSendSysMessage("Playing channel visual of spell %u %s %s", uiPlayId, spellInfo->SpellName[0], spellInfo->Rank[0]);
+        return true;
+    }
+    else if (!uiPlayId)
+    {
+        m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, 0);
+        WorldPacket data(MSG_CHANNEL_UPDATE, (4));
+        data << uint32(0);
+        m_session->GetPlayer()->SendDirectMessage(&data);
+        PSendSysMessage("Sending channel stop");
+        return true;
+    }
+    PSendSysMessage("Spell Id range 1 to %u, 0 to stop animation", sSpellStore.GetNumRows());
+    return true;
+}
+
 bool ChatHandler::HandleDebugSendPoiCommand(char* args)
 {
     Player *pPlayer = m_session->GetPlayer();
@@ -260,6 +331,40 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
         unit->PlayDistanceSound(dwSoundId, m_session->GetPlayer());
     else
         unit->PlayDirectSound(dwSoundId, m_session->GetPlayer());
+
+    PSendSysMessage(LANG_YOU_HEAR_SOUND, dwSoundId);
+    return true;
+}
+
+bool ChatHandler::HandleDebugPlayMusicCommand(char* args)
+{
+    uint32 dwSoundId;
+
+    if (!ExtractUInt32(&args, dwSoundId))
+        return false;
+
+    if (!sSoundEntriesStore.LookupEntry(dwSoundId))
+    {
+        PSendSysMessage(LANG_SOUND_NOT_EXIST, dwSoundId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player* target;
+   
+    if (!ExtractPlayerTarget(&args, &target, nullptr, nullptr))
+        return false;
+
+    if (target->GetSession() != GetSession() && GetSession()->GetSecurity() < SEC_ADMINISTRATOR)
+    {
+        PSendSysMessage(LANG_YOURS_SECURITY_IS_LOW);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    WorldPacket data(SMSG_PLAY_MUSIC, 4);
+    data << int32(dwSoundId);
+    target->SendDirectMessage(&data);
 
     PSendSysMessage(LANG_YOU_HEAR_SOUND, dwSoundId);
     return true;

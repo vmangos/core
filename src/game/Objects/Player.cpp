@@ -522,7 +522,7 @@ Player::Player(WorldSession *session) : Unit(),
     rest_type = REST_TYPE_NO;
     ////////////////////Rest System/////////////////////
 
-    m_resetTalentsCost = 0;
+    m_resetTalentsMultiplier = 0;
     m_resetTalentsTime = 0;
     m_itemUpdateQueueBlocked = false;
 
@@ -821,6 +821,9 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
     SetCustomFlags(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_FROM_NOSTALRIUS_3);
+
+    SetJustBoarded(false);
+
     return true;
 }
 
@@ -3671,37 +3674,49 @@ void Player::_SaveSpellCooldowns()
     }
 }
 
-uint32 Player::resetTalentsCost() const
+void Player::updateResetTalentsMultiplier()
 {
-    // The first time reset costs 1 gold
-    if (m_resetTalentsCost < 1 * GOLD)
-        return 1 * GOLD;
-    // then 5 gold
-    else if (m_resetTalentsCost < 5 * GOLD)
-        return 5 * GOLD;
-    // After that it increases in increments of 5 gold
-    else if (m_resetTalentsCost < 10 * GOLD)
-        return 10 * GOLD;
-    else
+    time_t months = (sWorld.GetGameTime() - m_resetTalentsTime) / MONTH;
+
+    if (months > 0)
     {
-        time_t months = (sWorld.GetGameTime() - m_resetTalentsTime) / MONTH;
-        if (months > 0)
+        uint32 minMulti = sWorld.getConfig(CONFIG_UINT32_RESPEC_MIN_MULTIPLIER);
+        bool clamp = m_resetTalentsMultiplier >= minMulti;
+
+        if (months > m_resetTalentsMultiplier)
         {
-            // This cost will be reduced by a rate of 5 gold per month
-            int32 new_cost = int32((m_resetTalentsCost) - 5 * GOLD * months);
-            // to a minimum of 10 gold.
-            return uint32(new_cost < 10 * GOLD ? 10 * GOLD : new_cost);
+            m_resetTalentsMultiplier = 0;
         }
         else
         {
-            // After that it increases in increments of 5 gold
-            int32 new_cost = m_resetTalentsCost + 5 * GOLD;
-            // until it hits a cap of 50 gold.
-            if (new_cost > 50 * GOLD)
-                new_cost = 50 * GOLD;
-            return new_cost;
+            m_resetTalentsMultiplier -= months;
+        }
+
+        if (clamp && m_resetTalentsMultiplier < minMulti)
+        {
+            m_resetTalentsMultiplier = minMulti;
         }
     }
+}
+
+uint32 Player::resetTalentsCost()
+{
+    updateResetTalentsMultiplier(); // decay respec cost
+
+    if (!m_resetTalentsMultiplier) // initial respec
+    {
+        return sWorld.getConfig(CONFIG_UINT32_RESPEC_BASE_COST) * GOLD;
+    }
+
+    uint32 multiCost = sWorld.getConfig(CONFIG_UINT32_RESPEC_MULTIPLICATIVE_COST);
+    uint32 maxMulti = sWorld.getConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER);
+
+    if (m_resetTalentsMultiplier > maxMulti)
+    {
+        return (multiCost * maxMulti) * GOLD;
+    }
+
+    return (m_resetTalentsMultiplier * multiCost) * GOLD;
 }
 
 bool Player::resetTalents(bool no_cost)
@@ -3765,7 +3780,13 @@ bool Player::resetTalents(bool no_cost)
     {
         ModifyMoney(-(int32)cost);
 
-        m_resetTalentsCost = cost;
+        ++m_resetTalentsMultiplier;
+
+        if (m_resetTalentsMultiplier > sWorld.getConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER))
+        {
+            m_resetTalentsMultiplier = sWorld.getConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER);
+        }
+
         m_resetTalentsTime = time(NULL);
     }
 
@@ -5477,7 +5498,7 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
                             if (GetQuestSlotQuestId(slot) == itr->first)
                             {
                                 SetQuestSlot(slot, 0);
-                                TakeQuestSourceItem(itr->first, false);
+                                TakeOrReplaceQuestStartItems(itr->first, false, false);
                                 break;
                             }
                         }
@@ -6042,7 +6063,7 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
         percent *= repRate;
     }
 
-    return int32(sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_GAIN) * rep * percent / 100.0f); 
+    return int32(sWorld.getConfig(CONFIG_FLOAT_RATE_REPUTATION_GAIN) * rep * percent / 100.0f);
 }
 
 //Calculates how many reputation points player gains in victim's enemy factions
@@ -6209,12 +6230,12 @@ void Player::DismountCheck()
 
 void Player::SetTransport(Transport* t)
 {
+    WorldObject::SetTransport(t);
+
     if (t) // don't bother checking when exiting a transport
     {
         DismountCheck();
     }
-
-    WorldObject::SetTransport(t);
 }
 
 void Player::UpdateArea(uint32 newArea)
@@ -7153,7 +7174,7 @@ bool Player::CheckAmmoCompatibility(const ItemPrototype *ammo_proto) const
 
 /*  If in a battleground a player dies, and an enemy removes the insignia, the player's bones is lootable
     Called by remove insignia spell effect    */
-void Player::RemovedInsignia(Player* looterPlr)
+void Player::RemovedInsignia(Player* looterPlr, Corpse *corpse)
 {
     if (!GetBattleGroundId())
         return;
@@ -7165,7 +7186,8 @@ void Player::RemovedInsignia(Player* looterPlr)
         RepopAtGraveyard();
     }
 
-    Corpse *corpse = GetCorpse();
+    if (!corpse)
+        corpse = GetCorpse();
     if (!corpse)
         return;
 
@@ -7176,6 +7198,11 @@ void Player::RemovedInsignia(Player* looterPlr)
     Corpse *bones = sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), true);
     if (!bones)
         return;
+
+    // Notify the client that the corpse is gone
+    WorldPacket cdata(MSG_CORPSE_QUERY, 1);
+    cdata << uint8(0);
+    GetSession()->SendPacket(&cdata);
 
     // Now we must make bones lootable, and send player loot
     bones->SetFlag(CORPSE_FIELD_DYNAMIC_FLAGS, CORPSE_DYNFLAG_LOOTABLE);
@@ -9743,9 +9770,9 @@ InventoryResult Player::CanUseItem(ItemPrototype const *pProto, bool not_loading
         if (pProto->RequiredSpell != 0 && !HasSpell(pProto->RequiredSpell))
             return EQUIP_ERR_NO_REQUIRED_PROFICIENCY;
 
-        
+
         auto playerRank = m_honorMgr.GetHighestRank().rank;
-        
+
         if (sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_EQUIP_REQUIREMENTS)
             && sWorld.GetWowPatch() < WOW_PATCH_106)
         {
@@ -10741,8 +10768,6 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
             RemoveItem(srcbag, srcslot, true);
             StoreItem(dest, pSrcItem, true);
-            if (IsBankPos(src))
-                ItemAddedQuestCheck(pSrcItem->GetEntry(), pSrcItem->GetCount());
         }
         else if (IsBankPos(dst))
         {
@@ -10756,7 +10781,6 @@ void Player::SwapItem(uint16 src, uint16 dst)
 
             RemoveItem(srcbag, srcslot, true);
             BankItem(dest, pSrcItem, true);
-            ItemRemovedQuestCheck(pSrcItem->GetEntry(), pSrcItem->GetCount());
         }
         else if (IsEquipmentPos(dst))
         {
@@ -11551,7 +11575,7 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
                     break;
                 case GOSSIP_OPTION_TAXIVENDOR:
                     if (GetSession()->SendLearnNewTaxiNode(pCreature))
-                        return;
+                        pMenu->GetGossipMenu().SetDiscoveredNode();
                     break;
                 case GOSSIP_OPTION_BATTLEFIELD:
                     if (!pCreature->CanInteractWithBattleMaster(this, false))
@@ -11657,10 +11681,16 @@ void Player::SendPreparedGossip(WorldObject *pSource)
     if (!pSource)
         return;
 
+    GossipMenu gossipMenu = PlayerTalkClass->GetGossipMenu();
+    QuestMenu questMenu = PlayerTalkClass->GetQuestMenu();
+
     if (pSource->GetTypeId() == TYPEID_UNIT)
     {
+        if (gossipMenu.IsJustDiscoveredNode() && questMenu.Empty())
+            return;
+
         // in case no gossip flag and quest menu not empty, open quest menu (client expect gossip menu with this flag)
-        if (!((Creature*)pSource)->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && !PlayerTalkClass->GetQuestMenu().Empty()
+        if (!((Creature*)pSource)->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP) && !questMenu.Empty()
                 && !((Creature*)pSource)->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR)) // Fix mobs vendeurs avec des quetes.
         {
             SendPreparedQuest(pSource->GetObjectGuid());
@@ -11670,7 +11700,7 @@ void Player::SendPreparedGossip(WorldObject *pSource)
     else if (pSource->GetTypeId() == TYPEID_GAMEOBJECT)
     {
         // probably need to find a better way here
-        if (!PlayerTalkClass->GetGossipMenu().GetMenuId() && !PlayerTalkClass->GetQuestMenu().Empty())
+        if (!gossipMenu.GetMenuId() && !questMenu.Empty())
         {
             SendPreparedQuest(pSource->GetObjectGuid());
             return;
@@ -11682,7 +11712,7 @@ void Player::SendPreparedGossip(WorldObject *pSource)
 
     uint32 textId = GetGossipTextId(pSource);
 
-    if (uint32 menuId = PlayerTalkClass->GetGossipMenu().GetMenuId())
+    if (uint32 menuId = gossipMenu.GetMenuId())
         textId = GetGossipTextId(menuId, pSource);
 
     PlayerTalkClass->SendGossipMenu(textId, pSource->GetObjectGuid());
@@ -12586,6 +12616,7 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
         SetQuestSlot(log_slot, 0);
 
     QuestStatusData& q_status = mQuestStatus[quest_id];
+    q_status.m_reward_choice = pQuest->RewChoiceItemId[reward];
 
     // Not give XP in case already completed once repeatable quest
     uint32 XP = q_status.m_rewarded ? 0 : uint32(pQuest->XPValue(this) * sWorld.getConfig(CONFIG_FLOAT_RATE_XP_QUEST));
@@ -13071,35 +13102,61 @@ void Player::GiveQuestSourceItemIfNeed(Quest const *pQuest)
 }
 
 
-bool Player::TakeQuestSourceItem(uint32 quest_id, bool msg)
+bool Player::TakeOrReplaceQuestStartItems(uint32 quest_id, bool msg, bool giveQuestStartItem)
 {
     Quest const* qInfo = sObjectMgr.GetQuestTemplate(quest_id);
-    if (qInfo)
+
+    if (!qInfo)
+        return true;
+
+    uint32 srcItemID = qInfo->GetSrcItemId();
+
+    if (0 == srcItemID)
+        return true;
+
+    // If nullptr, someone messed up in DB
+    ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(srcItemID);
+
+    if (nullptr == pItem)
+        return true;
+
+    uint32 count = qInfo->GetSrcItemCount();
+
+    if (giveQuestStartItem && quest_id == pItem->StartQuest)
     {
-        uint32 srcitem = qInfo->GetSrcItemId();
-        if (srcitem > 0)
-        {
-            uint32 count = qInfo->GetSrcItemCount();
-            if (count <= 0)
-                count = 1;
-
-            if (ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(srcitem))
-                if (pItem->StartQuest == quest_id)
-                    return true;
-
-            // exist one case when destroy source quest item not possible:
-            // non un-equippable item (equipped non-empty bag, for example)
-            InventoryResult res = CanUnequipItems(srcitem, count);
-            if (res != EQUIP_ERR_OK)
-            {
-                if (msg)
-                    SendEquipError(res, NULL, NULL, srcitem);
-                return false;
-            }
-
-            DestroyItemCount(srcitem, count, true, true);
-        }
+        // Quest-starting item and item given at quest start identical. Just leave it.
+        return true;
     }
+    else
+    {
+        // Can't destroy items in certain cases.
+        InventoryResult res = CanUnequipItems(srcItemID, count);
+
+        if (res != EQUIP_ERR_OK)
+        {
+            if (msg)
+                SendEquipError(res, NULL, NULL, srcItemID);
+
+            return false;
+        }
+
+        // Additional check to prevent possible unlimited gold
+        if (!HasItemCount(srcItemID, count, true))
+            return true;
+
+        // Start- and given item not the same, destroy it.
+        DestroyItemCount(srcItemID, count, true, true);
+
+        // Replace item, if requested
+        if (giveQuestStartItem)
+        {
+            if (uint32 questStartingItemID = sObjectMgr.GetQuestStartingItemID(quest_id))
+                AddItem(questStartingItemID, count);
+
+        }
+
+    }
+
     return true;
 }
 
@@ -13235,6 +13292,23 @@ void Player::GroupEventHappens(uint32 questId, WorldObject const* pEventObject)
     }
     else
         AreaExploredOrEventHappens(questId);
+}
+
+void Player::GroupEventFailHappens(uint32 questId)
+{
+    if (Group* pGroup = GetGroup())
+    {
+        for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            Player* pGroupGuy = itr->getSource();
+            
+            // Fail regardless of distance
+            if (pGroupGuy && pGroupGuy->GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+                pGroupGuy->FailQuest(questId);
+        }
+    }
+    else if (GetQuestStatus(questId) == QUEST_STATUS_INCOMPLETE)
+        FailQuest(questId);
 }
 
 void Player::ItemAddedQuestCheck(uint32 entry, uint32 count)
@@ -13915,7 +13989,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     //       0     1        2     3     4      5       6      7   8      9            10            11
     //SELECT guid, account, name, race, class, gender, level, xp, money, playerBytes, playerBytes2, playerFlags,
     // 12          13          14          15   16           17        18         19         20         21          22           23                 24
-    //"position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost,"
+    //"position_x, position_y, position_z, map, orientation, taximask, cinematic, totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_multiplier,"
     // 25                 26       27       28       29       30         31           32            33        34    35      36                 37
     //"resettalents_time, trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, online, death_expire_time, taxi_path,
     // 38               39                40             41               42               43             44
@@ -14180,7 +14254,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     m_Played_time[PLAYED_TIME_TOTAL] = fields[19].GetUInt32();
     m_Played_time[PLAYED_TIME_LEVEL] = fields[20].GetUInt32();
 
-    m_resetTalentsCost = fields[24].GetUInt32();
+    m_resetTalentsMultiplier = fields[24].GetUInt32();
     m_resetTalentsTime = time_t(fields[25].GetUInt64());
 
     // reserve some flags
@@ -14446,6 +14520,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 
 void Player::SendPacketsAtRelogin()
 {
+    SendProficiency(ITEM_CLASS_WEAPON, GetWeaponProficiency());
+    SendProficiency(ITEM_CLASS_ARMOR, GetArmorProficiency());
     for (uint8 i = 0; i < MAX_SPELLMOD; ++i)
         for (SpellModList::iterator itr = m_spellMods[i].begin(); itr != m_spellMods[i].end(); ++itr)
             SendSpellMod(*itr);
@@ -14873,8 +14949,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
 
     uint32 slot = 0;
 
-    ////                                                     0      1       2         3         4      5          6          7          8          9           10          11          12
-    //QueryResult *result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4 FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
+    ////                                                     0      1       2         3         4      5          6          7          8          9           10          11          12          13
+    //QueryResult *result = CharacterDatabase.PQuery("SELECT quest, status, rewarded, explored, timer, mobcount1, mobcount2, mobcount3, mobcount4, itemcount1, itemcount2, itemcount3, itemcount4, reward_choice FROM character_queststatus WHERE guid = '%u'", GetGUIDLow());
 
     if (result)
     {
@@ -14954,8 +15030,8 @@ void Player::_LoadQuestStatus(QueryResult *result)
 
                 if (questStatusData.m_rewarded)
                 {
-                    // learn rewarded spell if unknown
-                    learnQuestRewardedSpells(pQuest);
+                    questStatusData.m_reward_choice = fields[13].GetUInt32();
+                    learnQuestRewardedSpells(pQuest); // learn rewarded spell if unknown
                 }
 
                 DEBUG_LOG("Quest status is {%u} for quest {%u} for player (GUID: %u)", questStatusData.m_status, quest_id, GetGUIDLow());
@@ -15340,7 +15416,7 @@ void Player::SaveToDB(bool online, bool force)
     SqlStatement uberInsert = CharacterDatabase.CreateStatement(insChar, "REPLACE INTO characters (guid,account,name,race,class,gender,level,xp,money,playerBytes,playerBytes2,playerFlags,"
                               "map, position_x, position_y, position_z, orientation, "
                               "taximask, online, cinematic, "
-                              "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_cost, resettalents_time, "
+                              "totaltime, leveltime, rest_bonus, logout_time, is_logout_resting, resettalents_multiplier, resettalents_time, "
                               "trans_x, trans_y, trans_z, trans_o, transguid, extra_flags, stable_slots, at_login, zone, "
                               "death_expire_time, taxi_path, "
                               "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
@@ -15413,7 +15489,7 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) ? 1 : 0);
     //save, far from tavern/city
     //save, but in tavern/city
-    uberInsert.addUInt32(m_resetTalentsCost);
+    uberInsert.addUInt32(m_resetTalentsMultiplier);
     uberInsert.addUInt64(uint64(m_resetTalentsTime));
 
     uberInsert.addFloat(finiteAlways(m_movementInfo.GetTransportPos()->x));
@@ -15754,8 +15830,8 @@ void Player::_SaveQuestStatus()
         {
             case QUEST_NEW :
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(insertQuestStatus, "INSERT INTO character_queststatus (guid,quest,status,rewarded,explored,timer,mobcount1,mobcount2,mobcount3,mobcount4,itemcount1,itemcount2,itemcount3,itemcount4) "
-                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                SqlStatement stmt = CharacterDatabase.CreateStatement(insertQuestStatus, "INSERT INTO character_queststatus (guid,quest,status,rewarded,explored,timer,mobcount1,mobcount2,mobcount3,mobcount4,itemcount1,itemcount2,itemcount3,itemcount4,reward_choice) "
+                                    "VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
 
                 stmt.addUInt32(GetGUIDLow());
                 stmt.addUInt32(i->first);
@@ -15767,16 +15843,18 @@ void Player::_SaveQuestStatus()
                     stmt.addUInt32(i->second.m_creatureOrGOcount[k]);
                 for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
                     stmt.addUInt32(i->second.m_itemcount[k]);
+                stmt.addUInt32(i->second.m_reward_choice);
                 stmt.Execute();
             }
             break;
             case QUEST_CHANGED :
             {
-                SqlStatement stmt = CharacterDatabase.CreateStatement(updateQuestStatus, "UPDATE character_queststatus SET status = ?,rewarded = ?,explored = ?,timer = ?,"
+                SqlStatement stmt = CharacterDatabase.CreateStatement(updateQuestStatus, "UPDATE character_queststatus SET status = ?,rewarded = ?,reward_choice = ?,explored = ?,timer = ?,"
                                     "mobcount1 = ?,mobcount2 = ?,mobcount3 = ?,mobcount4 = ?,itemcount1 = ?,itemcount2 = ?,itemcount3 = ?,itemcount4 = ?  WHERE guid = ? AND quest = ?");
 
                 stmt.addUInt8(i->second.m_status);
                 stmt.addUInt8(i->second.m_rewarded);
+                stmt.addUInt32(i->second.m_reward_choice);
                 stmt.addUInt8(i->second.m_explored);
                 stmt.addUInt64(uint64(i->second.m_timer / IN_MILLISECONDS + sWorld.GetGameTime()));
                 for (int k = 0; k < QUEST_OBJECTIVES_COUNT; ++k)
@@ -18406,7 +18484,7 @@ bool Player::IsAtGroupRewardDistance(WorldObject const* pRewardSource) const
     if (!corpse)
         return false;
 
-    return IsWithinLootXPDist(pRewardSource); // pRewardSource->IsWithinDistInMap(corpse, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE));
+    return corpse->IsWithinLootXPDist(pRewardSource); // pRewardSource->IsWithinDistInMap(corpse, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE));
 }
 
 uint32 Player::GetBaseWeaponSkillValue(WeaponAttackType attType) const
@@ -19733,7 +19811,7 @@ bool Player::ChangeQuestsForRace(uint8 oldRace, uint8 newRace)
                         RemoveTimedQuest(removeQuestId);
                     SetQuestSlotState(log_slot, QUEST_STATUS_NONE);
                     SetQuestSlot(log_slot, 0);
-                    TakeQuestSourceItem(removeQuestId, true);
+                    TakeOrReplaceQuestStartItems(removeQuestId, true, false);
                     // Et prendre la nouvelle
                     if (!CanAddQuest(pNewQuest, true))
                     {
@@ -19788,7 +19866,8 @@ bool Player::ChangeQuestsForRace(uint8 oldRace, uint8 newRace)
         {
             if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
                 RemoveTimedQuest(itr->first);
-            TakeQuestSourceItem(itr->first, true);
+
+            TakeOrReplaceQuestStartItems(itr->first, true, false);
         }
         itr->second.uState = QUEST_DELETED;
         CHANGERACE_LOG("Suppression de la quete %u", quest_id);

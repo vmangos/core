@@ -118,6 +118,7 @@ bool DynamicObject::Create(uint32 guidlow, Unit *caster, uint32 spellId, SpellEf
     m_effIndex = effIndex;
     m_spellId = spellId;
     m_positive = IsPositiveEffect(spellProto, m_effIndex);
+    m_channeled = IsChanneledSpell(spellProto);
 
     return true;
 }
@@ -139,11 +140,19 @@ void DynamicObject::Update(uint32 update_diff, uint32 p_time)
         return;
     }
 
+    if (_deleted)
+        return;
+
+    // If this object is from the current channeled spell, do not delete it. Otherwise
+    // we can lose the last tick of the effect due to differeng updates. The spell
+    // itself will call for the object to be removed at the end of the cast
     bool deleteThis = false;
 
-    if (m_aliveDuration > int32(p_time))
-        m_aliveDuration -= p_time;
-    else
+    m_aliveDuration -= p_time;
+    if (m_aliveDuration <= 0)
+        m_aliveDuration = 0;
+
+    if (m_aliveDuration == 0 && (!m_channeled || caster->GetChannelObjectGuid() != GetObjectGuid()))
         deleteThis = true;
 
     for (AffectedMap::iterator iter = m_affected.begin(); iter != m_affected.end(); ++iter)

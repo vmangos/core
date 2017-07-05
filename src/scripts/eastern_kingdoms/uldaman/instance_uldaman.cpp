@@ -412,6 +412,8 @@ struct instance_uldaman : public ScriptedInstance
                     {
                         if (m_auiEncounter[ULDAMAN_ENCOUNTER_ARCHAEDAS] != IN_PROGRESS)
                         {
+                            if (m_auiEncounter[ULDAMAN_ENCOUNTER_ARCHAEDAS] != DONE)
+                                SetData(DATA_ANCIENT_DOOR, IN_PROGRESS);
                             if (archaedas)
                             {
                                 if (archaedas->isAlive() && archaedas->getFaction() != FACTION_AWAKE)

@@ -455,7 +455,7 @@ class BattleGround
         void OnObjectDBLoad(Creature* /*creature*/);
         void OnObjectDBLoad(GameObject* /*obj*/);
         // (de-)spawns creatures and gameobjects from an event
-        void SpawnEvent(uint8 event1, uint8 event2, bool spawn, bool forced_despawn);
+        void SpawnEvent(uint8 event1, uint8 event2, bool spawn, bool forced_despawn, uint32 delay = 0);
         void SetSpawnEventMode(uint8 event1, uint8 event2, BattleGroundCreatureSpawnMode mode);
         bool IsActiveEvent(uint8 event1, uint8 event2)
         {

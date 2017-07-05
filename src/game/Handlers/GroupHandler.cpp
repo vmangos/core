@@ -528,6 +528,44 @@ void WorldSession::HandleGroupChangeSubGroupOpcode(WorldPacket & recv_data)
     }
 }
 
+void WorldSession::HandleGroupSwapSubGroupOpcode(WorldPacket & recv_data)
+{
+    //DEBUG_LOG("WORLD: Recvd CMSG_GROUP_CHANGE_SUB_GROUP Message");
+    std::string name;
+    std::string nameSwapWith;
+
+    recv_data >> name;
+    recv_data >> nameSwapWith;
+
+    Group *group = GetPlayer()->GetGroup();
+    if (!group)
+        return;
+
+    /** error handling **/
+    if (!group->IsLeader(GetPlayer()->GetObjectGuid()) &&
+            !group->IsAssistant(GetPlayer()->GetObjectGuid()))
+        return;
+    /********************/
+    // If both players are online do swap with Player objects, else
+    // do swap with Guids
+    Player *player = sObjectMgr.GetPlayer(name.c_str());
+    Player *swapPlayer = sObjectMgr.GetPlayer(nameSwapWith.c_str());
+
+    if (player && swapPlayer)
+    {
+        group->SwapMembersGroup(player, swapPlayer);
+    }
+    else {
+        ObjectGuid swapGuid = sObjectMgr.GetPlayerGuidByName(name.c_str());
+        ObjectGuid swapWithGuid = sObjectMgr.GetPlayerGuidByName(nameSwapWith.c_str());
+
+        if (!swapGuid || !swapWithGuid)
+            return;
+
+        group->SwapMembersGroup(swapGuid, swapWithGuid);
+    }
+}
+
 void WorldSession::HandleGroupAssistantLeaderOpcode(WorldPacket & recv_data)
 {
     ObjectGuid guid;

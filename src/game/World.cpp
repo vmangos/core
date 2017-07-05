@@ -900,6 +900,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE,      "MaxCreaturesStealthDetectRange", 15.0f);
 
     setConfig(CONFIG_BOOL_IS_MAPSERVER,                             "IsMapServer", false);
+    setConfig(CONFIG_UINT32_UPDATE_STEADY_BUFFER,                   "MapUpdateSteadyBuffer", 0);
 
     m_timeZoneOffset = sConfig.GetIntDefault("TimeZoneOffset", 0) * HOUR;
     m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
@@ -990,6 +991,9 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_CHANNEL_INVITE_MIN_LEVEL,                   "ChannelInvite.MinLevel", 10);
     setConfig(CONFIG_BOOL_WHISPER_RESTRICTION,                          "WhisperRestriction", false);
     setConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL,                       "WorldChan.MinLevel", 0);
+    setConfig(CONFIG_UINT32_SAY_MIN_LEVEL,                              "SayMinLevel", 0);
+    setConfig(CONFIG_UINT32_YELL_MIN_LEVEL,                             "YellMinLevel", 0);
+    setConfig(CONFIG_UINT32_SAY_EMOTE_MIN_LEVEL,                        "SayEmoteMinLevel", 0);
     setConfig(CONFIG_UINT32_WHISP_DIFF_ZONE_MIN_LEVEL,                  "WhisperDiffZone.MinLevel", 0);
     setConfig(CONFIG_UINT32_YELLRANGE_LINEARSCALE_MAXLEVEL,             "YellRange.LinearScale.MaxLevel", 0);
     setConfig(CONFIG_UINT32_YELLRANGE_QUADRATICSCALE_MAXLEVEL,          "YellRange.QuadraticScale.MaxLevel", 0);
@@ -1032,6 +1036,11 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_PACKET_BCAST_THREADS,                       "Network.PacketBroadcast.Threads", 0);
     setConfig(CONFIG_UINT32_PACKET_BCAST_FREQUENCY,                     "Network.PacketBroadcast.Frequency", 50);
     setConfig(CONFIG_UINT32_PBCAST_DIFF_LOWER_VISIBILITY_DISTANCE,      "Network.PacketBroadcast.ReduceVisDistance.DiffAbove", 0);
+
+    setConfig(CONFIG_UINT32_RESPEC_BASE_COST,                           "Rate.RespecBaseCost",           1);
+    setConfig(CONFIG_UINT32_RESPEC_MULTIPLICATIVE_COST,                 "Rate.RespecMultiplicativeCost", 5);
+    setConfig(CONFIG_UINT32_RESPEC_MIN_MULTIPLIER,                      "Rate.RespecMinMultiplier",      2);
+    setConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER,                      "Rate.RespecMaxMultiplier",      10);
 
     if (getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT))
         setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, false);
