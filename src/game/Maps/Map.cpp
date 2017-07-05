@@ -840,6 +840,7 @@ void Map::Update(uint32 t_diff)
     uint32 sessionsUpdateTime = WorldTimer::getMSTimeDiffToNow(updateMapTime);
 
     /// update players at tick
+    std::chrono::high_resolution_clock::time_point start = std::chrono::high_resolution_clock::now();
     UpdateSessionsMovementAndSpellsIfNeeded();
     UpdatePlayers();
     uint32 playersUpdateTime = WorldTimer::getMSTimeDiffToNow(updateMapTime) - sessionsUpdateTime;
@@ -866,8 +867,9 @@ void Map::Update(uint32 t_diff)
     {
         additionnalWaitTime = WorldTimer::getMSTime();
         sMapMgr.MarkContinentUpdateFinished();
-        while (!sMapMgr.waitContinentUpdateFinished(std::chrono::milliseconds(10)))
+        while (!sMapMgr.waitContinentUpdateFinishedUntil(start + std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE))))
         {
+            start = std::chrono::high_resolution_clock::now();
             UpdateSessionsMovementAndSpellsIfNeeded();
             UpdatePlayers();
             ++additionnalUpdateCounts;

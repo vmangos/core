@@ -252,6 +252,7 @@ void MapManager::Update(uint32 diff)
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
     std::vector<std::function<void()>> continentsUpdaters;
+    std::vector<std::function<void()>> instancesUpdaters;
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
     {
         // If this map has been empty for too long, we no longer update it.
@@ -265,16 +266,18 @@ void MapManager::Update(uint32 diff)
         if (iter->second->Instanceable())
         {
             if (m_threads->status() == ThreadPool::Status::READY)
-                m_threads << [iter,mapsDiff](){
+                instancesUpdaters.emplace_back([iter,mapsDiff](){
                     iter->second->DoUpdate(mapsDiff);
-                };
+                });
             else
                 iter->second->DoUpdate(mapsDiff);
         }
         else // One threat per continent part
         {
             continentsUpdaters.emplace_back([iter,mapsDiff](){
-                iter->second->DoUpdate(mapsDiff);
+                Map *m = iter->second;
+                if (!m->IsUpdateFinished() || !sMapMgr.IsContinentUpdateFinished())
+                    m->DoUpdate(mapsDiff);
             });
             continentsIdx++;
         }
@@ -288,16 +291,24 @@ void MapManager::Update(uint32 diff)
         m_continentThreads.reset(new ThreadPool(continentsUpdaters.size()));
         m_continentThreads->start<>();
     }
-    std::future<void> f = m_continentThreads->processWorkload(std::move(continentsUpdaters));
-    if (f.valid())
-        f.wait();
-
-    f = m_threads->processWorkload();
+    std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters));
 
     SwitchPlayersInstances();
 
-    if (f.valid())
-        f.wait();
+    std::chrono::high_resolution_clock::time_point start;
+    do {
+        start = std::chrono::high_resolution_clock::now();
+        std::future<void> f = m_threads->processWorkload(instancesUpdaters);
+
+        if (f.valid())
+            f.wait();
+        else
+            break;
+    }while(!sMapMgr.waitContinentUpdateFinishedUntil(start + std::chrono::milliseconds(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE))));
+
+
+    if (continents.valid())
+        continents.wait();
 
     MapMapType::iterator crashedMapsIter = i_maps.begin();
     while (crashedMapsIter != i_maps.end())
@@ -784,13 +795,19 @@ void MapManager::MarkContinentUpdateFinished()
         m_continentCV.notify_all();
 }
 
-bool MapManager::IsContinentUpdateFinished()
+bool MapManager::IsContinentUpdateFinished() const
 {
     return i_continentUpdateFinished == i_maxContinentThread;
 }
 
-bool MapManager::waitContinentUpdateFinished(std::chrono::milliseconds time)
+bool MapManager::waitContinentUpdateFinishedFor(std::chrono::milliseconds time) const
 {
     std::unique_lock<std::mutex> lock(m_continentMutex);
     return m_continentCV.wait_for(lock,time,std::bind(&MapManager::IsContinentUpdateFinished,this));
+}
+
+bool MapManager::waitContinentUpdateFinishedUntil(std::chrono::high_resolution_clock::time_point time) const
+{
+    std::unique_lock<std::mutex> lock(m_continentMutex);
+    return m_continentCV.wait_until(lock,time,std::bind(&MapManager::IsContinentUpdateFinished,this));
 }
