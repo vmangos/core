@@ -1,7 +1,9 @@
 [![Build Status](https://travis-ci.org/elysium-project/server.svg?branch=development)](https://travis-ci.org/elysium-project/server)
 
-# Development process overview:
+# Bug reporting:
+Before opening any bug reports on the issue tracker, please read the guidelines [located here](https://github.com/elysium-project/server/blob/development/docs/Bug%20Reporting.md).
 
+# Development process overview:
 Any development work should be done in local feature branches rather than on the main branches used for QA/live builds. For example, if you were working on a boss script, rather than committing directly to the development branch, you should first create a new branch with a descriptive name.
 
 When you have finished working on your fix or feature, you should open a pull request to allow for your code to be automatically compiled by the continuous integration system and reviewed by other developers. After receiving feedback and making any requested changes, your pull request will be squashed and merged to the development branch. Squashing your commits is to ensure that the development branch can be compiled at any point in its history as well as ensuring a clean history.
