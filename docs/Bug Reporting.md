@@ -6,7 +6,7 @@ Before opening any issues on the bug tracker, use the search feature to locate a
 If you didn't find any duplicate reports, the next step is to try to do some research to confirm that the current behaviour is incorrect. We receive a number of false reports that could be have been avoided if the user had used the sources below to confirm that a problem existed before opening a bug report.
 
 ### Sources
-Any links that you can provide that demonstrate that the information in your bug report will go a long way to helping the developers fix the problem. Although finding data from over a decade ago can be tricky, there are still avenues that are worth exploring.
+Any links that you can provide that demonstrate that the information in your bug report is accurate will go a long way to helping the developers fix the problem. Although finding data from over a decade ago can be tricky, there are still avenues that are worth exploring.
 * The official patch notes are usually the first port of call for finding evidence of game mechanic and item changes. However, many changes will not be documented.
 * Through searching, you can often find lists of unofficial patch notes that document changes that were not detailed in the official notes.
 * Using relevant keywords in Google while restricting the time range will often find old, useful forum posts that describe mechanics/boss strategies.
@@ -25,4 +25,3 @@ Having done the above, if you have a new bug to report, please ensure that you i
 * Where applicable, provide relevant sources that show or describe the correct behaviour.
 
 Thank you!
-
