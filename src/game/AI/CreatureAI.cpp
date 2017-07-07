@@ -266,10 +266,9 @@ void CreatureAI::EnterEvadeMode()
     {
         m_creature->RemoveAurasAtReset();
 
-        // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
-        MovementGeneratorType moveType = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType();
-        if (moveType == CHASE_MOTION_TYPE || moveType == IDLE_MOTION_TYPE || moveType == RANDOM_MOTION_TYPE)
-            m_creature->GetMotionMaster()->MoveTargetedHome();
+        // clear all movement generators except default
+        m_creature->GetMotionMaster()->Clear(false);
+        m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
     m_creature->DeleteThreatList();
