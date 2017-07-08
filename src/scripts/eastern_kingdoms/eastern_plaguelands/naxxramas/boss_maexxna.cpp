@@ -77,8 +77,8 @@ enum
 static const float WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
 static const float SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
 static const float WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
-static const float PoisonShockCooldown(bool initial = false)        { return initial ? 30000 : 30000; } // todo: probably not correct
-static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 20000 : 20000; } // todo: probably not correct
+static const float PoisonShockCooldown(bool initial = false)        { return initial ? 30000 : 30000; } // todo: possibly not correct
+static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 20000 : 20000; } // todo: possibly not correct
 
 /* note:
 It has been witnessed that with surgical timing Rogues (using Vanish) and Mages (with Iceblock) 
