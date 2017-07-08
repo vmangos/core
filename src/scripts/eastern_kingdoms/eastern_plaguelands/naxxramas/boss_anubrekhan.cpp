@@ -82,7 +82,7 @@ static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, 
                                                          // From videos you can see there is 1-2sec between consecutive nets.
 static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct timer. 
 
-static const uint32 CRYPTGUARD_DESPAWN() { return 15000; } // Todo: find correct timer
+static const uint32 CRYPTGUARD_DESPAWN() { return urand(15000, 60000); } // Todo: find correct timer
 
 /*
 Impale timer research:
