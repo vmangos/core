@@ -14,13 +14,6 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Faerlina
-SD%Complete: 50
-SDComment:
-SDCategory: Naxxramas
-EndScriptData */
-
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
@@ -54,7 +47,7 @@ https://www.youtube.com/watch?v=iTUc8xUeLgw
 ^ Around 7-10sec cooldown. Times she's not casting it for 30+sec she is silenced by worshipper sacrifice.
   Might be fixed 8sec cast, but slightly delayed sometimes due to rain of fire or other reasons.
 */
-static const uint32 POSIONBOLT_VOLLEY_CD() { return urand(7000, 10000); }
+static const uint32 POSIONBOLT_VOLLEY_CD() { return urand(10000, 12000); }
 static const uint32 INITIAL_POISONBOLT_VOLLEY_CD = 8000;
 
 /*
