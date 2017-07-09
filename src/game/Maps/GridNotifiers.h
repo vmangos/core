@@ -1288,7 +1288,7 @@ namespace MaNGOS
             }
             bool operator()(Unit* u)
             {
-                if (!u->IsHostileTo(_me))
+                if (!_me->IsHostileTo(u))
                     return false;
 
                 if (!u->isVisibleForOrDetect(_me, _me, false))
