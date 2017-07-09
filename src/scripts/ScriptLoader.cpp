@@ -270,6 +270,8 @@ void AddSC_thunder_bluff();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
 
+void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Jar
+
 void AddScripts()
 {
     //Nostalrius
@@ -535,4 +537,5 @@ void AddScripts()
     AddSC_ungoro_crater();
     AddSC_winterspring();
 
+    AddSC_npc_j_eevee();
 }

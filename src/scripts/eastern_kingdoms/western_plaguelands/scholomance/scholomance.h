@@ -20,7 +20,9 @@ enum
     NPC_KIRTONOS            = 10506,
     NPC_GANDLING            = 1853,
     NPC_VECTUS              = 10432,
-    NPC_MARDUKE             = 10433
+    NPC_MARDUKE             = 10433,
+
+    NPC_J_EEVEE             = 14500
 };
 
 enum
