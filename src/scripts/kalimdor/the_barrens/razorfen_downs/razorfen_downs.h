@@ -22,7 +22,8 @@
 enum eData
 {
     BOSS_TUTEN_KASH,
-    DATA_GONG_WAVES
+    DATA_GONG_WAVES,
+    EXTINGUISH_FIRES
 };
 
 enum eData64
@@ -32,7 +33,8 @@ enum eData64
 
 enum eGameObject
 {
-        GO_GONG                                                                         = 148917
+    GO_GONG                                     = 148917,
+    GO_IDOL_CUP_FIRE                            = 151952
 };
 
 enum eCreature
