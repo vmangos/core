@@ -62,8 +62,6 @@ bool GOHello_go_shadowforge_brazier(Player* pPlayer, GameObject* pGo)
 
 enum
 {
-    NPC_GRIMSTONE       = 10096,
-
     //4 or 6 in total? 1+2+1 / 2+2+2 / 3+3. Depending on this, code should be changed.
     MAX_MOB_AMOUNT      = 8
 };
@@ -88,26 +86,10 @@ uint32 RingBoss[] =
     9032,                                                   // Hedrum
 };
 
-bool AreaTrigger_at_ring_of_law(Player* pPlayer, const AreaTriggerEntry *at)
-{
-    if (ScriptedInstance* pInstance = (ScriptedInstance*)pPlayer->GetInstanceData())
-    {
-        if (pInstance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || pInstance->GetData(TYPE_RING_OF_LAW) == DONE)
-            return false;
-
-        pInstance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
-        pPlayer->SummonCreature(NPC_GRIMSTONE, 625.559f, -205.618f, -52.735f, 2.609f, TEMPSUMMON_DEAD_DESPAWN, 0);
-
-        return false;
-    }
-    return false;
-}
-
 /*######
 ## npc_grimstone
 ######*/
 
-//TODO: implement quest part of event (different end boss)
 struct npc_grimstoneAI : public npc_escortAI
 {
     npc_grimstoneAI(Creature* pCreature) : npc_escortAI(pCreature)
@@ -129,7 +111,13 @@ struct npc_grimstoneAI : public npc_escortAI
     uint64 RingMobGUID[MAX_MOB_AMOUNT];
     uint64 RingBossGUID;
 
+    uint64 ChallengeMobGUID[4];
+
+    bool ArenaChallenge;
+
     bool CanWalk;
+
+    bool GroupIsWiped;
 
     void Reset()
     {
@@ -144,9 +132,14 @@ struct npc_grimstoneAI : public npc_escortAI
         for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
             RingMobGUID[i] = 0;
 
+        for (uint8 i = 0; i < 4; ++i)
+            ChallengeMobGUID[i] = 0;
+
         RingBossGUID = 0;
 
         CanWalk = false;
+        ArenaChallenge = false;
+        GroupIsWiped = false;
     }
 
     void DoGate(uint32 id, uint32 state)
@@ -168,22 +161,105 @@ struct npc_grimstoneAI : public npc_escortAI
             RingMobGUID[MobCount] = tmp->GetGUID();
             tmp->GetMotionMaster()->MovePoint(1, 596.285156f, -188.698944f, -54.132176f);
             tmp->SetHomePosition(596.285156f, -188.698944f, -54.132176f, 0);
-        }
+            tmp->SetInCombatWithZone();
 
-        ++MobCount;
+            ++MobCount;
+        }
 
         if (MobCount == MAX_MOB_AMOUNT)
             MobDeath_Timer = 2500;
     }
 
-    //TODO: move them to center
     void SummonRingBoss()
     {
-        if (Creature* tmp = m_creature->SummonCreature(RingBoss[rand() % 6], 644.300f, -175.989f, -53.739f, 3.418f, TEMPSUMMON_DEAD_DESPAWN, 0))
+        float spawnX, spawnY, spawnZ, spawnO;
+        float homeX, homeY, homeZ, homeO;
+        spawnX = 644.300f;
+        spawnY = -175.989f;
+        spawnZ = -53.739f;
+        spawnO = 3.418f;
+
+        homeX = 596.285156f;
+        homeY = -188.698944f;
+        homeZ = -54.132176f;
+        homeO = 0;
+
+        // T0.5 Challenge has been put down, summon Theldren and his random adds
+        if (m_pInstance->GetData(DATA_THELDREN) == IN_PROGRESS)
         {
-            RingBossGUID = tmp->GetGUID();
-            tmp->GetMotionMaster()->MovePoint(1, 596.285156f, -188.698944f, -54.132176f);
-            tmp->SetHomePosition(596.285156f, -188.698944f, -54.132176f, 0);
+            Player *challenger = m_creature->GetMap()->GetPlayer(m_pInstance->GetData64(DATA_ARENA_CHALLENGER));
+            if (!challenger)
+            {
+                sLog.outError("[Blackrock Depths] Ring of Law challenger player not found!");
+                return;
+            }
+
+            ArenaChallenge = true;
+
+            // Can spawn up to 5 creatures. One is guaranteed to be Theldren, a DPS warrior
+            // Always have at least one 'healer', priest or shaman
+            // The last three are DPS. Can both be ranged, both melee or one from each.
+            // https://web.archive.org/web/20060523124717/http://wow.allakhazam.com:80/db/quest.html?wquest=9015&mid=114423967727961
+
+            uint32 HealerEntries[2];
+            uint32 DPSEntries[6];
+
+            HealerEntries[0] = 16053;
+            HealerEntries[1] = 16055;
+
+            DPSEntries[0] = 16058;
+            DPSEntries[1] = 16051;
+            DPSEntries[2] = 16052;
+            DPSEntries[3] = 16049;
+            DPSEntries[4] = 16050;
+            DPSEntries[5] = 16054;
+            // Offset spawns slightly so the NPCs aren't stacked
+            if (Creature *healer = m_creature->SummonCreature(HealerEntries[rand() % 2], spawnX+3, spawnY-1, spawnZ-1, spawnO, TEMPSUMMON_DEAD_DESPAWN, 0))
+            {
+                healer->GetMotionMaster()->MovePoint(1, spawnX, spawnY, spawnZ);
+                healer->SetHomePosition(homeX, homeY, homeZ, homeO);
+                healer->SetInCombatWithZone();
+                ChallengeMobGUID[0] = healer->GetGUID();
+                ++MobCount;
+            }
+
+            // Spawn 3 more random DPS!
+            for (uint8 i = 0; i < 3; ++i)
+            {
+                float x, y, z;
+                x = spawnX + 1.5f;
+                y = spawnY - 3 + 3 * i;
+                z = spawnZ;
+
+                if (Creature *dps = m_creature->SummonCreature(DPSEntries[rand() % 6], x, y, z, spawnO, TEMPSUMMON_DEAD_DESPAWN, 0))
+                {
+                    dps->GetMotionMaster()->MovePoint(1, spawnX, spawnY, spawnZ);
+                    dps->SetHomePosition(homeX, homeY, homeZ, homeO);
+                    dps->SetInCombatWithZone();
+                    ChallengeMobGUID[i + 1] = dps->GetGUID();
+                    ++MobCount;
+                }
+            }
+
+            // Lastly, spawn Theldren
+            if (Creature *theldren = m_creature->SummonCreature(NPC_THELDREN, spawnX, spawnY, spawnZ, spawnO, TEMPSUMMON_DEAD_DESPAWN, 0))
+            {
+                RingBossGUID = theldren->GetGUID();
+                theldren->GetMotionMaster()->MovePoint(1, spawnX, spawnY, spawnZ);
+                theldren->SetHomePosition(homeX, homeY, homeZ, homeO);
+                theldren->SetInCombatWithZone();
+                ++MobCount;
+            }
+        }
+        else {
+            if (Creature* tmp = m_creature->SummonCreature(RingBoss[rand() % 6], spawnX, spawnY, spawnZ, spawnO, TEMPSUMMON_DEAD_DESPAWN, 0))
+            {
+                RingBossGUID = tmp->GetGUID();
+                tmp->GetMotionMaster()->MovePoint(1, 596.285156f, -188.698944f, -54.132176f);
+                tmp->SetHomePosition(homeX, homeY, homeZ, homeO);
+                tmp->SetInCombatWithZone();
+                ++MobCount;
+            }
         }
 
         MobDeath_Timer = 2500;
@@ -218,6 +294,9 @@ struct npc_grimstoneAI : public npc_escortAI
                 if (m_pInstance)
                 {
                     m_pInstance->SetData(TYPE_RING_OF_LAW, DONE);
+
+                    if (m_pInstance->GetData(DATA_THELDREN) == IN_PROGRESS)
+                        m_pInstance->SetData(DATA_THELDREN, DONE);
                     sLog.outDebug("npc_grimstone: event reached end and set complete.");
                 }
                 break;
@@ -243,26 +322,50 @@ struct npc_grimstoneAI : public npc_escortAI
                         RingBossGUID = 0;
                         Event_Timer = 5000;
                         MobDeath_Timer = 0;
+                        
+                        --MobCount;
+                        // End of the event if boss dies, even if some adds are left alive
                         return;
                     }
-                    return;
-                }
 
-                for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
-                {
-                    Creature *mob = m_creature->GetMap()->GetCreature(RingMobGUID[i]);
-                    if (mob && !mob->isAlive() && mob->isDead())
+                    if (ArenaChallenge)
                     {
-                        RingMobGUID[i] = 0;
-                        --MobCount;
-
-                        //seems all are gone, so set timer to continue and discontinue this
-                        if (!MobCount)
+                        for (uint8 i = 0; i < 4; ++i)
                         {
-                            Event_Timer = 5000;
-                            MobDeath_Timer = 0;
+                            Creature *mob = m_creature->GetMap()->GetCreature(ChallengeMobGUID[i]);
+                            if (mob && !mob->isAlive() && mob->isDead())
+                            {
+                                ChallengeMobGUID[i] = 0;
+                                --MobCount;
+                            }
                         }
                     }
+                }
+                else 
+                {
+                    for (uint8 i = 0; i < MAX_MOB_AMOUNT; ++i)
+                    {
+                        Creature *mob = m_creature->GetMap()->GetCreature(RingMobGUID[i]);
+                        if (mob && !mob->isAlive() && mob->isDead())
+                        {
+                            RingMobGUID[i] = 0;
+                            --MobCount;
+
+                            //seems all are gone, so set timer to continue and discontinue this
+                            if (!MobCount)
+                            {
+                                Event_Timer = 10000;
+                                MobDeath_Timer = 0;
+                            }
+                        }
+                    }
+                }
+
+                // Group wiped?
+                if (CheckForWipe())
+                {
+                    GroupIsWiped = true;
+                    return;
                 }
             }
             else MobDeath_Timer -= diff;
@@ -276,7 +379,7 @@ struct npc_grimstoneAI : public npc_escortAI
                 {
                     case 0:
                         DoScriptText(-1000010, m_creature);
-                        DoGate(DATA_ARENA4, 1);
+                        DoGate(DATA_ARENA4, GO_STATE_READY);
                         Start(false);
                         CanWalk = true;
                         Event_Timer = 0;
@@ -357,6 +460,64 @@ struct npc_grimstoneAI : public npc_escortAI
         if (CanWalk)
             npc_escortAI::UpdateAI(diff);
     }
+
+    bool CheckForWipe() {
+        if (GroupIsWiped)
+            return true;
+        // If there are no players within the vicinity of Grimstone in combat
+        // and there are mobs alive, it's a wipe
+        bool wiped = MobCount > 0;
+        if (!wiped)
+            return wiped;
+
+        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+
+        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        {
+            Player *player = itr->getSource();
+
+            if (player && player->IsWithinDistInMap(m_creature, 80.0f) && player->isInCombat()) {
+                wiped = false;
+                break;
+            }
+        }
+
+        if (wiped)
+        {
+            // Players wiped, open the gates. 
+            DoGate(DATA_ARENA1, GO_STATE_READY);
+            DoGate(DATA_ARENA2, GO_STATE_READY);
+            DoGate(DATA_ARENA4, GO_STATE_ACTIVE); // jail entrance
+
+            // If the phase is before the boss has spawned, reset the event
+            if (!RingBossGUID)
+            {
+                m_pInstance->SetData(TYPE_RING_OF_LAW, NOT_STARTED);
+
+                Reset();
+                m_creature->ForcedDespawn();
+            }
+        }
+        
+        return wiped;
+    }
+
+    void PlayerEnteredArena(Player *player)
+    {
+        // Re-enter zone after wipe, have boss. Close gates
+        if (GroupIsWiped)
+        {
+            if (Creature *boss = m_pInstance->GetCreature(RingBossGUID))
+            {
+                DoGate(DATA_ARENA4, GO_STATE_READY); // jail entrance
+
+                // Charge!
+                boss->SetInCombatWith(player);
+            }
+
+            GroupIsWiped = false;
+        }
+    }
 };
 
 CreatureAI* GetAI_npc_grimstone(Creature* pCreature)
@@ -364,6 +525,30 @@ CreatureAI* GetAI_npc_grimstone(Creature* pCreature)
     if (!pCreature->GetInstanceData())
         return NULL;
     return new npc_grimstoneAI(pCreature);
+}
+
+bool AreaTrigger_at_ring_of_law(Player* pPlayer, const AreaTriggerEntry *at)
+{
+    if (ScriptedInstance* pInstance = (ScriptedInstance*)pPlayer->GetInstanceData())
+    {
+        if (pInstance->GetData(TYPE_RING_OF_LAW) == IN_PROGRESS || pInstance->GetData(TYPE_RING_OF_LAW) == DONE)
+        {
+            // Player triggered ring of law while it's in progress. Might have been after a wipe
+            if (Creature *creature = pInstance->GetCreature(pInstance->GetData64(NPC_GRIMSTONE)))
+            {
+                if (npc_grimstoneAI *grimstoneAI = dynamic_cast<npc_grimstoneAI *>(creature->AI()))
+                    grimstoneAI->PlayerEnteredArena(pPlayer);
+            }
+            return false;
+        }
+
+
+        pInstance->SetData(TYPE_RING_OF_LAW, IN_PROGRESS);
+        pPlayer->SummonCreature(NPC_GRIMSTONE, 625.559f, -205.618f, -52.735f, 2.609f, TEMPSUMMON_DEAD_DESPAWN, 0);
+
+        return false;
+    }
+    return false;
 }
 
 /*######

@@ -50,6 +50,7 @@ set (SCRIPTS_SRCS
 	eastern_kingdoms/arathi_highlands/arathi_highlands.cpp
 	eastern_kingdoms/blasted_lands/blasted_lands.cpp
 	eastern_kingdoms/burning_steppes/burning_steppes.cpp
+	eastern_kingdoms/burning_steppes/blackrock_depths/arena_challenge_ai.cpp
 	eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.cpp
 	eastern_kingdoms/burning_steppes/blackrock_depths/boss_ambassador_flamelash.cpp
 	eastern_kingdoms/burning_steppes/blackrock_depths/boss_anubshiah.cpp

@@ -49,6 +49,7 @@ void AddSC_spell_scripts();
 //eastern kingdoms
 void AddSC_instance_blackrock_spire();
 void AddSC_blackrock_depths();                       //blackrock_depths
+void AddSC_blackrock_depths_arena_challenge();
 void AddSC_boss_ambassador_flamelash();
 void AddSC_boss_anubshiah();
 void AddSC_boss_draganthaurissan();
@@ -314,6 +315,7 @@ void AddScripts()
 
     //eastern kingdoms
     AddSC_blackrock_depths();                               //blackrock_depths
+    AddSC_blackrock_depths_arena_challenge();
     AddSC_boss_ambassador_flamelash();
     AddSC_boss_anubshiah();
     AddSC_boss_draganthaurissan();

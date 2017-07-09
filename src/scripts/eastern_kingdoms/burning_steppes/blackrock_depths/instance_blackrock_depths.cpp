@@ -46,6 +46,9 @@ struct instance_blackrock_depths : ScriptedInstance
     uint64 m_uiDoperelGUID;
 
     uint64 m_uiTheldrenGUID;
+    uint64 m_uiGrimstoneGUID;
+    uint64 m_uiChallengerPlayerGUID;
+    uint64 m_uiArenaSpoilsGUID;
 
     uint64 m_uiGoArena1GUID;
     uint64 m_uiGoArena2GUID;
@@ -132,8 +135,13 @@ struct instance_blackrock_depths : ScriptedInstance
         m_uiDoomrelGUID = 0;
         m_uiDoperelGUID = 0;
 
-        m_uiTheldrenGUID = 0;
         m_uiGoMagnusGUID = 0;
+
+        // Ring of Law Challenge
+        m_uiTheldrenGUID = 0;
+        m_uiGrimstoneGUID = 0;
+        m_uiChallengerPlayerGUID = 0;
+        m_uiArenaSpoilsGUID = 0;
 
         m_uiGoArena1GUID = 0;
         m_uiGoArena2GUID = 0;
@@ -298,6 +306,8 @@ struct instance_blackrock_depths : ScriptedInstance
             case NPC_JAZ:
                 m_uiJazGUID = pCreature->GetObjectGuid();
                 break;
+            case NPC_GRIMSTONE:
+                m_uiGrimstoneGUID = pCreature->GetGUID();
         }
     }
 
@@ -313,6 +323,10 @@ struct instance_blackrock_depths : ScriptedInstance
                 break;
             case GO_ARENA3:
                 m_uiGoArena3GUID = pGo->GetGUID();
+                // Re-open the door for saved instance after restart
+                if (GetData(TYPE_RING_OF_LAW) == DONE)
+                    pGo->SetGoState(GOState(GO_STATE_ACTIVE));
+
                 break;
             case GO_ARENA4:
                 m_uiGoArena4GUID = pGo->GetGUID();
@@ -383,6 +397,9 @@ struct instance_blackrock_depths : ScriptedInstance
             case GO_JAIL_SUPPLY_CRATE:
                 m_uiGoJailSupplyCrateGUID = pGo->GetObjectGuid();
                 break;
+            case GO_ARENA_SPOILS:
+                m_uiArenaSpoilsGUID = pGo->GetGUID();
+                break;
         }
     }
 
@@ -418,7 +435,10 @@ struct instance_blackrock_depths : ScriptedInstance
             case NPC_HAMMERED_PATRON:
             case NPC_GUZZLING_PATRON:
                HandleBarPatrons(PATRON_HOSTILE);
-               break; 
+               break;
+            /*case NPC_THELDREN:
+                SetData(DATA_THELDREN, DONE);
+                break;*/
         }
     }
 
@@ -635,48 +655,9 @@ struct instance_blackrock_depths : ScriptedInstance
 
     void BeginTheldrenEvent(Player* pPlayer)
     {
-        uint32 MobsEntries[4];
-        //uint32 MobsEntries[8];
-        switch (pPlayer->GetTeam())
-        {
-            case ALLIANCE:
-                MobsEntries[0] = 16053;
-                MobsEntries[1] = 16055;
-                MobsEntries[2] = 16050;
-                MobsEntries[3] = 16051;
-                break;
-            case HORDE:
-                MobsEntries[0] = 16049;
-                MobsEntries[1] = 16052;
-                MobsEntries[2] = 16054;
-                MobsEntries[3] = 16058;
-                break;
-        }
-        /*MobsEntries[0] = 16053;
-        MobsEntries[1] = 16055;
-        MobsEntries[2] = 16050;
-        MobsEntries[3] = 16051;
-        MobsEntries[4] = 16049;
-        MobsEntries[5] = 16052;
-        MobsEntries[6] = 16054;
-        MobsEntries[7] = 16058;
+        SetData(DATA_THELDREN, IN_PROGRESS);
 
-        uint8 uiMob1 = urand(0, 7);
-        uint8 uiMob2 = (uiMob1 + urand(1, 7)) % 8;
-        uint8 uiMob3 = (uiMob2 + urand(2, 7)) % 8;
-        uint8 uiMob4 = (uiMob3 + urand(3, 7)) % 8;
-
-        DoSummonCreatureAndAttack(MobsEntries[uiMob1], pPlayer, 0);
-        DoSummonCreatureAndAttack(MobsEntries[uiMob2], pPlayer, 1);
-        DoSummonCreatureAndAttack(MobsEntries[uiMob3], pPlayer, 2);
-        DoSummonCreatureAndAttack(MobsEntries[uiMob4], pPlayer, 3);*/
-
-        for (uint8 i = 0; i < 4; ++i)
-        {
-            if (i != 0)
-                DoSummonCreatureAndAttack(MobsEntries[i], pPlayer, i);
-        }
-        DoSummonCreatureAndAttack(16059, pPlayer, 4);
+        m_uiChallengerPlayerGUID = pPlayer->GetGUID();
     }
 
     void ReplacePrincessIfPossible()
@@ -852,6 +833,11 @@ struct instance_blackrock_depths : ScriptedInstance
                 m_auiEncounter[11] = uiData;
                 break;
             case DATA_THELDREN:
+                if (uiData == DONE)
+                {
+                    // Spawn "Arena Spoils" chest with sick loot
+                    DoRespawnGameObject(m_uiArenaSpoilsGUID);
+                }
                 m_auiEncounter[12] = uiData;
                 break;
             case TYPE_NAGMARA:
@@ -1050,6 +1036,11 @@ struct instance_blackrock_depths : ScriptedInstance
                 return m_uiGoJailSupplyRoomGUID;
             case GO_JAIL_SUPPLY_CRATE:
                 return m_uiGoJailSupplyCrateGUID; 
+
+            case DATA_ARENA_CHALLENGER:
+                return m_uiChallengerPlayerGUID;
+            case NPC_GRIMSTONE:
+                return m_uiGrimstoneGUID;
         }
         return 0;
     }
