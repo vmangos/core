@@ -8894,6 +8894,7 @@ void Unit::CleanupsBeforeDelete()
                 getHostileRefManager().deleteReferences();
         }
         RemoveAllAuras(AURA_REMOVE_BY_DELETE);
+        CleanupDeletedAuras(); // any long range channeled spells need to be cleaned up after aura deletion
     }
     WorldObject::CleanupsBeforeDelete();
 }
