@@ -582,6 +582,8 @@ Player::Player(WorldSession *session) : Unit(),
     // TODO: remove it
     launched = false;
     xy_speed = 0.0f;
+
+    m_justBoarded = false;
 }
 
 Player::~Player()
@@ -821,8 +823,6 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
     SetCustomFlags(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_FROM_NOSTALRIUS_3);
-
-    SetJustBoarded(false);
 
     return true;
 }
