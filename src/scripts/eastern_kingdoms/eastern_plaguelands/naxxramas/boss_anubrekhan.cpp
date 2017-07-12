@@ -82,8 +82,6 @@ static constexpr uint32 CRYPTGUARD_WEB_CD       = 12000; // 10 second duration, 
                                                          // From videos you can see there is 1-2sec between consecutive nets.
 static constexpr uint32 CRYPTGUARD_ACID_CD      = 5000;  // Todo: find correct timer. 
 
-static const uint32 CRYPTGUARD_DESPAWN() { return urand(15000, 60000); } // Todo: find correct timer
-
 /*
 Impale timer research:
 video: https://www.youtube.com/watch?v=rmowgw2SZCA&t=60s
@@ -176,17 +174,20 @@ Cast time is 3 seconds. Duration is 20 seconds.
 */
 static const uint32 LOCUST_SWARM_CD(bool initial) { return initial ? urand(80000, 120000) : urand(90000, 110000); }
 
+
 struct boss_anubrekhanAI : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
     
-    // Loaded on first pull of anub
-    ObjectGuid cryptGuards[2] = { 0, 0 };
-
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
+    uint32 m_uiCorpseExplosionTimer;
     bool m_firstBlood;
-    std::vector<std::pair<uint32, ObjectGuid>> deadCryptGuards;
+    EventMap events;
+
+    std::vector<ObjectGuid> deadCryptGuards;
+    std::vector<ObjectGuid> summonedCryptGuards;
+    
     boss_anubrekhanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
@@ -204,32 +205,18 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         for (int i = 0; i < 2; i++)
         {
-            // Create the creature if it dosent exist
-            if (cryptGuards[i].IsEmpty())
+            // While the crypt guard will be despawned manually after CRYPTGUARD_DESPAWN time, when it explodes,
+            // we make it a TEMPSUMMON_CORPSE_TIMED_DESPAWN with a slightly longer duration, because if anub is killed
+            // before the last crypt guard dies, anubs updateAI will not be able to manually explode and despawn it.
+            if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], 
+                TEMPSUMMON_MANUAL_DESPAWN))
             {
-                // While the crypt guard will be despawned manually after CRYPTGUARD_DESPAWN time, when it explodes,
-                // we make it a TEMPSUMMON_CORPSE_TIMED_DESPAWN with a slightly longer duration, because if anub is killed
-                // before the last crypt guard dies, anubs updateAI will not be able to manually explode and despawn it.
-                if (Creature* c = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[i][0], CGs[i][1], CGs[i][2], CGs[i][3], 
-                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, CRYPTGUARD_DESPAWN()+10000))
-                {
-                    cryptGuards[i] = c->GetObjectGuid();
-                }
-                else 
-                {
-                    sLog.outError("boss_anubrekhanAI::CheckSpawnInitialCryptGuards failed to spawn initial crypt guard");
-                }
+                summonedCryptGuards.push_back(c->GetObjectGuid());
             }
-            /*
-            else
+            else 
             {
-                if (Creature* c = m_pInstance->GetCreature(cryptGuards[i]))
-                {
-                    if (c->isDead()) 
-                        c->Respawn();
-                }
+                sLog.outError("boss_anubrekhanAI::CheckSpawnInitialCryptGuards failed to spawn initial crypt guard");
             }
-            */
         }
     }
 
@@ -237,21 +224,14 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() != MOB_CRYPT_GUARD)
             return;
-
-        // If the crypt guard is one of the two initial crypt guards,
-        // set its guid in cryptGuards[] to 0 so a new one is respawned on JustReachedHome()
-        for (int i = 0; i < 2; i++) 
-        {
-            if (pSummoned->GetObjectGuid() == cryptGuards[i])
-                cryptGuards[i] = 0;
-        }
-        deadCryptGuards.push_back(std::make_pair(CRYPTGUARD_DESPAWN(),pSummoned->GetObjectGuid()));
+        deadCryptGuards.push_back(pSummoned->GetObjectGuid());
     }
 
     void Reset()
     {
         m_uiImpaleTimer = IMPALE_CD();
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
+        m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + urand(5000, 10000);
         m_firstBlood = false;
     }
 
@@ -259,10 +239,23 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_ANUB_REKHAN, FAIL);
+        
+        // despawn any summoned cryptguards that stil exist
+        for (auto it = summonedCryptGuards.begin(); it != summonedCryptGuards.end();)
+        {
+            if (Creature* cg = m_pInstance->GetCreature((*it)))
+            {
+                if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
+                    tmpSumm->UnSummon();
+                }
+            }
+            it = summonedCryptGuards.erase(it);
+        }
 
+        // despawn any remaining corpses
         for (auto it = deadCryptGuards.begin(); it != deadCryptGuards.end();)
         {
-            if (Creature* cg = m_pInstance->GetCreature((*it).second))
+            if (Creature* cg = m_pInstance->GetCreature((*it)))
             {
                 if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
                     tmpSumm->UnSummon();
@@ -272,6 +265,7 @@ struct boss_anubrekhanAI : public ScriptedAI
             it = deadCryptGuards.erase(it);
         }
 
+        // respawn the two initial guards
         CheckSpawnInitialCryptGuards();
     }
 
@@ -302,8 +296,9 @@ struct boss_anubrekhanAI : public ScriptedAI
         m_pInstance->SetData(TYPE_ANUB_REKHAN, IN_PROGRESS);
         // Setting in combat with zone and pulling the two crypt-guards
         m_creature->SetInCombatWithZone();
-        for (int i = 0; i < 2; i++) {
-            if (Creature* cg = m_pInstance->GetCreature(cryptGuards[i])) {
+
+        for (int i = 0; i < summonedCryptGuards.size(); i++) {
+            if (Creature* cg = m_pInstance->GetCreature(summonedCryptGuards[i])) {
                 cg->AI()->AttackStart(pWho);
                 cg->SetInCombatWithZone();
             }
@@ -330,59 +325,50 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         ScriptedAI::MoveInLineOfSight(pWho);
     }
-
-    void UpdateCorpses(const uint32 diff)
+    
+    void ExplodeOneDeadCryptGuard()
     {
-        // Iterating dead cryptguards
-        for (auto it = deadCryptGuards.begin(); it != deadCryptGuards.end();)
-        {
-            // If it's been dead for CRYPTGUARD_DESPAWN duration
-            if ((*it).first < diff)
-            {
-                if (Creature* cg = m_pInstance->GetCreature((*it).second))
-                {
-                    // The cryptguard casts SPELL_SELF_SPAWN_10 on itself. The spell is bugged and
-                    // wont spawn any adds, but it will show the visual.
-                    cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
-                    
-                    // Manually summoning 10 corpse scarabs under the Crypt Guard
-                    for (int i = 0; i < 10; i++)
-                    {
-                        // The summoned corpse scarab will attack a random target, and add 5k threat to it.
-                        // The threat amount is a guess, but it can be seen in videos, and it's mentioned on wowhead,
-                        // that the scarab will "stick" to it's chosen target for quite a while, if not until dead.
-                        if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, cg->GetPositionX(), cg->GetPositionY(), cg->GetPositionZ(), 0,
-                            TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
-                        {
-                            cs->SetInCombatWithZone();
-                            if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                            {
-                                cs->AI()->AttackStart(csTarget);
-                                cs->AddThreat(csTarget, 5000);
-                            }
-                        }
-                    }
-                    
-                    // Despawning the Crypt guard
-                    if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
-                        tmpSumm->UnSummon(250);
-                    }
+        if (deadCryptGuards.size() == 0)
+            return;
 
-                }
-                it = deadCryptGuards.erase(it);
-            }
-            else 
+        int idx = urand(0, deadCryptGuards.size() - 1);
+        ObjectGuid deadCryptGuard = deadCryptGuards[idx];
+        auto it = deadCryptGuards.begin() + idx;
+        deadCryptGuards.erase(it);
+     
+        if (Creature* cg = m_pInstance->GetCreature(deadCryptGuard))
+        {
+            // The cryptguard casts SPELL_SELF_SPAWN_10 on itself. The spell is bugged and
+            // wont spawn any adds, but it will show the visual.
+            cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
+                    
+            // Manually summoning 10 corpse scarabs under the Crypt Guard
+            for (int i = 0; i < 10; i++)
             {
-                (*it).first -= diff;
-                ++it;
+                // The summoned corpse scarab will attack a random target, and add 5k threat to it.
+                // The threat amount is a guess, but it can be seen in videos, and it's mentioned on wowhead,
+                // that the scarab will "stick" to it's chosen target for quite a while, if not until dead.
+                if (Creature* cs = m_creature->SummonCreature(MOB_CORPSE_SCARAB, cg->GetPositionX(), cg->GetPositionY(), cg->GetPositionZ(), 0,
+                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                {
+                    cs->SetInCombatWithZone();
+                    if (Unit* csTarget = cs->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                    {
+                        cs->AI()->AttackStart(csTarget);
+                        cs->AddThreat(csTarget, 5000);
+                    }
+                }
+            }
+                    
+            // Despawning the Crypt guard
+            if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
+                tmpSumm->UnSummon(250);
             }
         }
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        UpdateCorpses(uiDiff);
-
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -408,6 +394,14 @@ struct boss_anubrekhanAI : public ScriptedAI
                 m_uiImpaleTimer -= uiDiff;
         }
 
+        if (m_uiCorpseExplosionTimer < uiDiff)
+        {
+            ExplodeOneDeadCryptGuard();
+            m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + urand(5000, 10000);
+        }
+        else
+            m_uiCorpseExplosionTimer -= uiDiff;
+
         // Locust Swarm
         if (m_uiLocustSwarmTimer < uiDiff)
         {
@@ -416,8 +410,10 @@ struct boss_anubrekhanAI : public ScriptedAI
             {
                 m_uiLocustSwarmTimer = LOCUST_SWARM_CD(false);
                 if (Creature* pCryptGuard = m_creature->SummonCreature(MOB_CRYPT_GUARD, CGs[2][0], CGs[2][1], CGs[2][2], CGs[2][3],
-                    TEMPSUMMON_CORPSE_TIMED_DESPAWN, CRYPTGUARD_DESPAWN()+10000))
+                    TEMPSUMMON_MANUAL_DESPAWN))
                 {
+                    summonedCryptGuards.push_back(pCryptGuard->GetObjectGuid());
+
                     pCryptGuard->SetInCombatWithZone();
                     if (Unit* pCryptTarget = pCryptGuard->SelectAttackingTarget(AttackingTarget::ATTACKING_TARGET_RANDOM, 0))
                     {
