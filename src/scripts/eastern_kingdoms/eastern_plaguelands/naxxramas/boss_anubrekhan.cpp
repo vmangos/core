@@ -182,6 +182,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     uint32 m_uiImpaleTimer;
     uint32 m_uiLocustSwarmTimer;
     uint32 m_uiCorpseExplosionTimer;
+    uint32 m_uiRestoreTargetTimer;
     bool m_firstBlood;
     EventMap events;
 
@@ -233,6 +234,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
         m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + 20000 + urand(5000, 10000); // 5-10s after swarm end
         m_firstBlood = false;
+        m_uiRestoreTargetTimer = 0;
     }
 
     void JustReachedHome() override
@@ -372,6 +374,18 @@ struct boss_anubrekhanAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
+        if (m_uiRestoreTargetTimer)
+        {
+            if (m_uiRestoreTargetTimer <= uiDiff)
+            {
+                m_creature->SetInFront(m_creature->getVictim());
+                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_uiRestoreTargetTimer = 0;
+            }
+            else
+                m_uiRestoreTargetTimer -= uiDiff;
+        }
+
         // Impale
         // todo: Not sure if the timer should keep running, be paused or reset during locust swarm.
         //       Currently the timer will simply be paused when locust swarm is active, or being cast
@@ -384,9 +398,15 @@ struct boss_anubrekhanAI : public ScriptedAI
                 //       Currently the impale wil be cast instantly after locust, most likely not right.
                 if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 {
-                    if (DoCastSpellIfCan(target, SPELL_IMPALE) == CanCastResult::CAST_OK) 
+                    m_creature->SetInFront(target);
+                    m_creature->SetTargetGuid(target->GetObjectGuid());
+                    m_uiRestoreTargetTimer = 1000;
+                    m_uiImpaleTimer = IMPALE_CD();
+                    
+                    if (Creature* pC = m_creature->SummonCreature(533003, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetAngle(target),
+                        TEMPSUMMON_TIMED_DESPAWN, 4000))
                     {
-                        m_uiImpaleTimer = IMPALE_CD();
+                        pC->CastSpell(pC, SPELL_IMPALE, true);
                     }
                 }
             }
@@ -405,6 +425,14 @@ struct boss_anubrekhanAI : public ScriptedAI
         // Locust Swarm
         if (m_uiLocustSwarmTimer < uiDiff)
         {
+            // restore target at once if we have just done an impale
+            if (m_uiRestoreTargetTimer)
+            {
+                m_creature->SetInFront(m_creature->getVictim());
+                m_creature->SetTargetGuid(m_creature->getVictim()->GetObjectGuid());
+                m_uiRestoreTargetTimer = 0;
+            }
+
             // Reset cd and summon a new crypt guard at the initial possition of anub'rekhan on successfull cast
             if (DoCastSpellIfCan(m_creature, SPELL_LOCUSTSWARM) == CanCastResult::CAST_OK)
             {

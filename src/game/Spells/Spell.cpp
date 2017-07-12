@@ -2373,6 +2373,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 7441:
                     pushType = PUSH_IN_FRONT_15;
                     break;
+                case 7619: // anub impale
+                    pushType = PUSH_IN_FRONT_15;
+                    break;
             }
             FillAreaTargets(targetUnitMap, radius, pushType, SPELL_TARGETS_AOE_DAMAGE);
             break;

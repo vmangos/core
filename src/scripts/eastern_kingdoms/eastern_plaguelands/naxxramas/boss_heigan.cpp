@@ -818,6 +818,6 @@ void AddSC_boss_heigan()
 
     NewScript = new Script;
     NewScript->Name = "mob_plague_cloud";
-    NewScript->GetAI = &GetAI_mob_eyeStalk;
+    NewScript->GetAI = &GetAI_mob_plagueCloud;
     NewScript->RegisterSelf();
 }
