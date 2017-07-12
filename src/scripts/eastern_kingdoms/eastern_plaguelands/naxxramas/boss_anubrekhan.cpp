@@ -231,7 +231,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         m_uiImpaleTimer = IMPALE_CD();
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
-        m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + urand(5000, 10000);
+        m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + 20000 + urand(5000, 10000); // 5-10s after swarm end
         m_firstBlood = false;
     }
 
@@ -397,7 +397,7 @@ struct boss_anubrekhanAI : public ScriptedAI
         if (m_uiCorpseExplosionTimer < uiDiff)
         {
             ExplodeOneDeadCryptGuard();
-            m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + urand(5000, 10000);
+            m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + 20000 + urand(5000, 10000);
         }
         else
             m_uiCorpseExplosionTimer -= uiDiff;
