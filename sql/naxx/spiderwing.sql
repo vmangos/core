@@ -9,3 +9,35 @@ UPDATE `creature_ai_scripts` SET `event_param2`=3000, `event_param3`=7000, `even
 
 -- naxxramas acolyte shadowbolt timer randomized more
 UPDATE `creature_ai_scripts` SET `event_param2`=5000, `event_param3`=7000, `event_param4`=9000 WHERE `id`=1598102;
+
+
+-- Portal of naxxxramas to EventAI
+UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16420;
+
+-- Portal of naxxramas casts Portal of Shadow on itself on spawn, which triggers a spawn of a ghost every 10 sec
+DELETE FROM `creature_ai_scripts` where id = 1642001;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1642001, 16420, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28384, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Cast portal of naxxramas on self');
+
+
+-- Spirit of Naxxramas given script and correct faction
+UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `AIName`='', `ScriptName`='spirit_of_naxxramas_ai' WHERE `entry`=16449;
+
+-- Ghost of Naxxramas 
+UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `armor`=3200, `faction_A`=20, `faction_H`=20, `mindmg`=1500, `maxdmg`=2200, `attackpower`=320, `dmg_multiplier`=1, `type`=6, `MovementType`=1, `speed_walk`='0.5', `speed_run`='0.5', `AIName`='EventAI' WHERE `entry`=16419;
+
+-- ghost of naxxramas zone combat pulse on spawn
+DELETE FROM `creature_ai_scripts` where id = 1641901;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1641901, 16419, 11, 0, 100, 0, 0, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'ghost of naxxramas zone combat pulse on spawn');
+
+-- ghost of naxxramas suecide if in combat for more than 30 sec
+DELETE FROM `creature_ai_scripts` where id = 1641902;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1641902, 16419, 0, 0, 100, 0, 30000, 30000, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'todo');

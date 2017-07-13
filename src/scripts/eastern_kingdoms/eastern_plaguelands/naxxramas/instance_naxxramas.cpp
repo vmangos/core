@@ -947,6 +947,77 @@ bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
     return false;
 }
 
+
+struct mob_spiritOfNaxxramasAI : public ScriptedAI
+{
+    mob_spiritOfNaxxramasAI(Creature* pCreature) 
+        : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+    
+    ObjectGuid portal;
+    uint32 portalTimer;
+    uint32 shadowboltVolleyTimer;
+
+    void Reset() override
+    {
+        portalTimer = 5000;
+        shadowboltVolleyTimer = 10000;
+    }
+
+    void JustDied(Unit* pKiller) override
+    {
+        if (Creature* pPortal = m_creature->GetMap()->GetCreature(portal))
+        {
+            pPortal->ForcedDespawn();
+        }
+    }
+
+    void UpdateAI(const uint32 diff) override
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (portalTimer)
+        {
+            if (portalTimer < diff)
+            {
+                // summon portal of shadows
+                if (Creature* pCreature = m_creature->SummonCreature(16420, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0,
+                    TEMPSUMMON_TIMED_DESPAWN, 120000))
+                {
+                    m_creature->SendSpellGo(m_creature, 28383); // since we're manually summoning, we also send the visual that we're not using
+                    portal = pCreature->GetObjectGuid();
+                    pCreature->CastSpell(pCreature, 28384, true); // pCreature casts portal of shadow spell on self
+                    portalTimer = 0;
+                }
+            }
+            else
+                portalTimer -= diff;
+        }
+
+        // casting shadowbolt volley every 10 sec
+        if (shadowboltVolleyTimer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature, 28599) == CAST_OK)
+            {
+                shadowboltVolleyTimer = 10000;
+            }
+        }
+        else
+            shadowboltVolleyTimer -= diff;
+
+        DoMeleeAttackIfReady();
+    }
+
+};
+
+CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
+{
+    return new mob_spiritOfNaxxramasAI(pCreature);
+}
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -959,5 +1030,10 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "at_naxxramas";
     pNewScript->pAreaTrigger = &AreaTrigger_at_naxxramas;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "spirit_of_naxxramas_ai";
+    pNewScript->GetAI = &GetAI_mob_spiritOfNaxxramas;
     pNewScript->RegisterSelf();
 }
