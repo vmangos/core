@@ -5627,6 +5627,10 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     {
         ((Creature*)this)->SendAIReaction(AI_REACTION_HOSTILE);
         ((Creature*)this)->CallAssistance();
+
+        if (Pet* pet = GetPet())
+            if (pet->isAlive())
+                pet->AI()->OwnerAttacked(victim);
     }
 
     // delay offhand weapon attack to next attack time
@@ -5636,9 +5640,6 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     if (meleeAttack)
         SendMeleeAttackStart(victim);
 
-    if (Pet* pet = GetPet())
-        if (pet->isAlive())
-            pet->AI()->OwnerAttacked(victim);
     return true;
 }
 
@@ -7208,7 +7209,13 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
     // set pet in combat
     if (Pet* pet = GetPet())
-        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+        if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
+        {
+            pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+
+            if (IsPlayer() && pet->isAlive() && enemy)
+                pet->AI()->OwnerAttacked(enemy);
+        }
 
     // interrupt all delayed non-combat casts
     if (!wasInCombat)
