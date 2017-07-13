@@ -19,6 +19,7 @@ UPDATE `creature_template` SET faction_A = 16, faction_H = 16 WHERE entry = 1648
  corrected faction
  hp corection based on http://imgur.com/a/wxlbI from this video: https://www.youtube.com/watch?v=rHZPMqAOJAY
  Had generic_spell_ai as scriptname, not needed with no spells.
+ attackspeed set to 0.5sec and dmg increased slightly (120-180dmg hits on leather druid in videos)
  */
- Update `creature_template` SET spell1 = 0, spell2 = 0, faction_A = 16, faction_H = 16, minhealth = 4175, maxhealth = 4175, ScriptName = ""
+ Update `creature_template` SET spell1 = 0, spell2 = 0, faction_A = 16, faction_H = 16, minhealth = 4175, maxhealth = 4175, ScriptName = "", `baseattacktime`=500, `mindmg`=194, `maxdmg`=250
  where entry = 17055;
