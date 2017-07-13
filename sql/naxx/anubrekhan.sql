@@ -9,8 +9,8 @@ DELETE FROM `creature` where id = 16698;
 -- Increasing anubs attackspeed from 2.4 to 2.2
 UPDATE `creature_template` SET `baseattacktime`=2000 WHERE `entry`=15956;
 
-
-
+-- corpse scarabs dmg reduced
+UPDATE `creature_template` SET `mindmg`=350, `maxdmg`=500 WHERE `entry`=16698;
 
 
 -- we need a dummy creature named Anub'Rekhan to use for casting impale to avoid the visual bug where impale is always cast towards maintank
