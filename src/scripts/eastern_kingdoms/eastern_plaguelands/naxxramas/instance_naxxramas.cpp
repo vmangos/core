@@ -248,6 +248,12 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_SUB_BOSS_TRIGGER:
             m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
+        
+        // naxxramas acolyte and cultist
+        case 15980:
+        case 15981:
+            pCreature->SetStandState(UNIT_STAND_STATE_KNEEL);
+            break;
     }
 }
 
