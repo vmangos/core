@@ -40,4 +40,16 @@ DELETE FROM `creature_ai_scripts` where id = 1641902;
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
-(1641902, 16419, 0, 0, 100, 0, 30000, 30000, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'todo');
+(1641902, 16419, 0, 0, 100, 0, 30000, 30000, 0, 0, 37, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'ghost of naxxramas suecide');
+
+UPDATE creature_template SET `MechanicImmuneMask`=1023383290 where entry in 
+(
+15981, -- naxxramas acoloyte
+15980, -- naxxramas cultist
+15975, -- carrion spinner
+15977, -- poisonous skitter
+15976, -- venom stalker
+15978, -- crypt reaver
+15974, -- dread creaper
+16453 -- necro stalker
+);
