@@ -1,0 +1,2 @@
+-- Venom Stalker Poson charge repeats every 10-20 sec, and targets a random hostile, not current tank
+UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param3`=10000, `event_param4`=20000, `action1_param2`=4 WHERE `id`=1597601;
