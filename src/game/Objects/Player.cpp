@@ -18604,6 +18604,11 @@ void Player::UpdateUnderwaterState()
 
     if (!res)
     {
+        if (m_MirrorTimerFlags & UNDERWATER_INSLIME)
+        {
+            if (HasAura(28801))
+                RemoveAurasDueToSpell(28801);
+        }
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
         // Small hack for enable breath in WMO
         /* if (IsInWater())
@@ -18638,36 +18643,13 @@ void Player::UpdateUnderwaterState()
     if (liquid_status.type_flags & MAP_LIQUID_TYPE_SLIME)
     {
         if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER | LIQUID_MAP_WATER_WALK))
-            m_MirrorTimerFlags |= UNDERWATER_INSLIME;
-        else
-            m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
-    }
-
-    // cast any spells associated with this liquid type (only used in Naxxramas)
-    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_status.entry))
-    {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(liq->SpellId);
-
-        if (spellInfo)
         {
-            SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, this, nullptr);
-
-            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-            {
-                uint8 eff = spellInfo->Effect[i];
-                if (eff >= TOTAL_SPELL_EFFECTS)
-                    continue;
-                if (IsAreaAuraEffect(eff) ||
-                    eff == SPELL_EFFECT_APPLY_AURA ||
-                    eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
-                {
-                    Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, this);
-                    holder->AddAura(aur, SpellEffectIndex(i));
-                }
-            }
-            AddSpellAuraHolder(holder);
+            m_MirrorTimerFlags |= UNDERWATER_INSLIME;
+            if (!HasAura(28801))
+                CastSpell(this, 28801, true);
         }
     }
+
 }
 
 void Player::SetCanParry(bool value)
