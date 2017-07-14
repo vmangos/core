@@ -864,7 +864,7 @@ m_obj->m_updateTracker.Reset();
         Map * FindMap() const { return m_currMap; }
 
         //used to check all object's GetMap() calls when object is not in world!
-        void ResetMap() { m_currMap = nullptr; }
+        void ResetMap();
 
         //obtain terrain data for map where this object belong...
         TerrainInfo const* GetTerrain() const;

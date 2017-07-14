@@ -187,24 +187,35 @@ public:
                 victimGuid = itr->first;
             }
         }
-        return (victimGuid);
+        return victimGuid;
     }
+    void RemovePotentialVictim(ObjectGuid victimGuid)
+    {
+        // Victim died, must be removed from threat list or we can get stuck on it.
+        // Better to remove it here than in RecalculateThreat since we'd have to keep
+        // track and update during iteration otherwise
+        std::map<ObjectGuid, float>::iterator itr = m_mThreatGuid.find(victimGuid);
+        if (itr != m_mThreatGuid.end())
+            m_mThreatGuid.erase(itr);
+    }
+
     ScriptedInstance *GetInstance() const
     {
         return (m_pInstance);
     }
-    void RecalculateThreath()
+    void RecalculateThreat()
     {
+        // Update when m_uiTechniciansUpdate == 0 (buffered update)
         if (m_uiTechniciansUpdate)
-        {            
-            if (--m_uiTechniciansUpdate == 0)
-                m_bUpdated = false;
-            return;
-        }
+            --m_uiTechniciansUpdate;
+        else
+            m_bUpdated = false;
 
         if (!m_bUpdated)
         {
-            m_uiTechniciansUpdate = m_vTechniciansGuid.size() - 1;
+            // Don't -1 for 0 index, otherwise we get stuck and never update again. Also the potential
+            // for an integer overflow
+            m_uiTechniciansUpdate = m_vTechniciansGuid.size();
             m_bUpdated = true;
             for (std::vector<ObjectGuid>::iterator itr = m_vTechniciansGuid.begin(); itr != m_vTechniciansGuid.end(); ++itr)
             {
@@ -584,6 +595,11 @@ struct instance_blackwing_lair : public ScriptedInstance
                     pCreature->DeleteLater();
                 break;
         }
+    }
+
+    void OnPlayerDeath(Player *player) override
+    {
+        m_hBlackwingTechnicians.RemovePotentialVictim(player->GetObjectGuid());
     }
 
     uint64 GetData64(uint32 data)
@@ -1280,14 +1296,17 @@ struct npc_blackwing_technicianAI : public ScriptedAI
             else m_uiEmoteTimer -= uiDiff;
         }
 
-        if (/*!m_creature->SelectHostileTarget() || */!m_creature->getVictim())
+        // If we don't have a current victim and we're not added to the helper, stop AI.
+        // Have to check the helper if possible in case the victim has died, otherwise
+        // the technician will stand still doing nothing rather than re-targeting
+        if (!m_creature->getVictim() && !m_bAdded)
             return;
 
         if (m_pTechnicianHelper)
         {
             if (m_uiAggroSyncTimer <= uiDiff)
             {
-                m_pTechnicianHelper->RecalculateThreath();
+                m_pTechnicianHelper->RecalculateThreat();
                 m_uiAggroSyncTimer = 2500;
             }
             else
@@ -1298,6 +1317,9 @@ struct npc_blackwing_technicianAI : public ScriptedAI
         if (m_pTechnicianHelper)
             if (ObjectGuid victimGuid = m_pTechnicianHelper->GetVictimGuid())
                 victim = m_pTechnicianHelper->GetInstance()->instance->GetUnit(victimGuid);
+        
+        if (!victim)
+            return;
 
         if (victim)
         {
