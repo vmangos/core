@@ -155,8 +155,8 @@ struct boss_patchwerkAI : public ScriptedAI
         // If we found no viable target, we choose the maintank
         if (!pTarget)
             pTarget = mainTank;
-        
-        DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE);
+        m_creature->SetFacingToObject(pTarget);
+        DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
