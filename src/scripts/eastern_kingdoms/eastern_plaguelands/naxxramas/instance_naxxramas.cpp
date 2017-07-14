@@ -1013,11 +1013,56 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
 
 };
 
+
+
+struct mob_plaguedGarboyleAI : public ScriptedAI
+{
+    mob_plaguedGarboyleAI(Creature* pCreature)
+        : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+    uint32 acidVolleyTimer;
+    void Reset() override
+    {
+        acidVolleyTimer = 4000;
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (m_creature->GetHealthPercent() < 30.0f && !m_creature->IsNonMeleeSpellCasted() && !m_creature->HasAura(28995))
+        {
+            if (DoCastSpellIfCan(m_creature, 28995) == CAST_OK)
+            {
+                m_creature->CastSpell(m_creature, 28995, true); // Stoneskin
+                DoScriptText(-1531100, m_creature); // %s emits a strange noise.
+            }
+        }
+
+        if (acidVolleyTimer < diff && !m_creature->IsNonMeleeSpellCasted())
+        {
+            if (DoCastSpellIfCan(m_creature, 29325) == CAST_OK) // acid volley
+                acidVolleyTimer = 8000;
+        }
+        else
+            acidVolleyTimer -= diff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
 {
     return new mob_spiritOfNaxxramasAI(pCreature);
 }
 
+CreatureAI* GetAI_mob_plaguedGargoyle(Creature* pCreature)
+{
+    return new mob_plaguedGarboyleAI(pCreature);
+}
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -1035,5 +1080,10 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "spirit_of_naxxramas_ai";
     pNewScript->GetAI = &GetAI_mob_spiritOfNaxxramas;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "plagued_gargoyle_ai";
+    pNewScript->GetAI = &GetAI_mob_plaguedGargoyle;
     pNewScript->RegisterSelf();
 }
