@@ -799,7 +799,8 @@ void instance_naxxramas::OnPlayerDeath(Player* p)
         // be called, thus we need to do it here.
         if (Creature* pAnub = GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
-            pAnub->AI()->DoCast(p, 29105, true);
+            //pAnub->AI()->DoCast(p, 29105, true);
+            pAnub->SendSpellGo(p, 28864);
             for (int i = 0; i < 5; i++)
             {
                 if (Creature* cs = pAnub->SummonCreature(16698, p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), 0,
@@ -1063,6 +1064,7 @@ CreatureAI* GetAI_mob_plaguedGargoyle(Creature* pCreature)
 {
     return new mob_plaguedGarboyleAI(pCreature);
 }
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
