@@ -342,8 +342,8 @@ struct boss_anubrekhanAI : public ScriptedAI
         {
             // The cryptguard casts SPELL_SELF_SPAWN_10 on itself. The spell is bugged and
             // wont spawn any adds, but it will show the visual.
-            cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
-                    
+            //cg->AI()->DoCast(cg, SPELL_SELF_SPAWN_10, true);
+            cg->SendSpellGo(cg, SPELL_SELF_SPAWN_10);
             // Manually summoning 10 corpse scarabs under the Crypt Guard
             for (int i = 0; i < 10; i++)
             {
@@ -506,6 +506,7 @@ struct mob_cryptguardsAI : public ScriptedAI
 
         if (webTimer < diff) {
             if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_WEB) == CanCastResult::CAST_OK) {
+                DoResetThreat();
                 webTimer = CRYPTGUARD_WEB_CD;
             }
         }
