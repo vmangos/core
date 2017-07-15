@@ -73,3 +73,9 @@ VALUES
 
 -- Updated timer of Necropolis Acolyte shadow bolt volley such that it happens at the same time as arcane explosion
 UPDATE `creature_ai_scripts` SET `event_param1`=2000, `event_param2`=2000, `event_param3`=5000, `event_param4`=5000 WHERE `id`=1636802;
+
+-- plagued ghoul immunities
+UPDATE `creature_template` SET `MechanicImmuneMask`=13109328 WHERE `entry`=16447;
+
+-- replace crypt reaver with tomb horror after faerlina
+update creature SET id = 15979, modelid = 15942 where guid = 5061270;
