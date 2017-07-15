@@ -804,7 +804,7 @@ void instance_naxxramas::OnPlayerDeath(Player* p)
             for (int i = 0; i < 5; i++)
             {
                 if (Creature* cs = pAnub->SummonCreature(16698, p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), 0,
-                    TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                    TEMPSUMMON_CORPSE_DESPAWN))
                 {
                     cs->SetInCombatWithZone();
                     if (Unit* csTarget = pAnub->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))

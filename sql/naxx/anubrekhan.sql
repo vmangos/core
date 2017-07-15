@@ -23,3 +23,6 @@ VALUES
 
 
 UPDATE creature_template SET `MechanicImmuneMask`=1023383290 where entry = 16573;
+
+-- giving corrpse scarabs an AI to do patrolling
+UPDATE `creature_template` SET `ScriptName`='mob_corpse_scarab' WHERE `entry`=16698;
