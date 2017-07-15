@@ -55,7 +55,7 @@ UPDATE creature_template SET `MechanicImmuneMask`=1023383290 where entry in
 );
 
 -- plagued gargoyle switch from eventAI to script. Immmune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `MechanicImmuneMask`=1073725439, `ScriptName`='plagued_gargoyle_ai' WHERE `entry`=16446;
+UPDATE `creature_template` SET `AIName`='', `MechanicImmuneMask`=1073725439, `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16446;
 
 -- carrion spinners dmg increase
 UPDATE `creature_template` SET `mindmg`='3000', `maxdmg`='3500' WHERE `entry`=15975;

@@ -1,0 +1,2 @@
+-- Stoneskin gargoyle switch from eventAI to script. Immune to pmuch everything
+UPDATE `creature_template` SET `AIName`='', `MechanicImmuneMask`=1073725439, `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16168;
