@@ -275,10 +275,15 @@ struct boss_faerlinaAI : public ScriptedAI
         //Enrage_Timer
         if (m_uiEnrageTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CanCastResult::CAST_OK)
+            // widows embrace can be used as a preventive method rather than dispelling method for the enrage as well,
+            // but then it only prevents the enrage for the duration of the debuff.
+            if (!m_creature->HasAura(SPELL_WIDOWS_EMBRACE))
             {
-                m_uiEnrageTimer = 61000;
-                DoScriptText(SAY_ENRAGE3 + urand(0, 2), m_creature);
+                if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CanCastResult::CAST_OK)
+                {
+                    m_uiEnrageTimer = 61000;
+                    DoScriptText(SAY_ENRAGE3 + urand(0, 2), m_creature);
+                }
             }
         }
         else
