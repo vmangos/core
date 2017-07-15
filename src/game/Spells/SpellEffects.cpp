@@ -5487,13 +5487,38 @@ void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
     if (!unitTarget)
         return;
     
-    if (m_spellInfo->Id == 28337) // thaddius Magnetic Pull
+    switch (m_spellInfo->Id)
+    {
+    case 28337: // thaddius Magnetic Pull
     {
         float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
         float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
         unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
+        break;
     }
-    else
+    case 28434: // Spider Web
+    {
+        // see boss_maexxnaAI::DoCastWebWrap() for some info on this rather weird implementation
+        float dx = unitTarget->GetPositionX() - m_caster->GetPositionX();
+        float dy = unitTarget->GetPositionY() - m_caster->GetPositionY();
+        float dist = sqrt((dx * dx) + (dy * dy));
+        const float  distXY = (dist > 0 ? dist : 0);
+        float yDist = m_caster->GetPositionZ() - unitTarget->GetPositionZ();
+        float horizontalSpeed = dist / 1.5f;
+        float verticalSpeed = 12.0f + (yDist*0.5f);
+        float angle = unitTarget->GetAngle(m_caster->GetPositionX(), m_caster->GetPositionY());
+
+        // set immune anticheat and calculate speed
+        if (Player* plr = unitTarget->ToPlayer())
+        {
+            plr->SetLaunched(true);
+            plr->SetXYSpeed(horizontalSpeed);
+        }
+
+        unitTarget->KnockBack(angle, horizontalSpeed, verticalSpeed);
+        break;
+    }
+    default:
     {
         // Todo: this implementation seems very wrong. Gives terrible results for maexxna web-wrap and
         // thaddius magnetic pull
@@ -5501,6 +5526,7 @@ void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
         if (damage && dist > damage)
             dist = float(damage);
         unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[eff_idx]) / 10);
+    }
     }
 }
 
