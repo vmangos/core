@@ -1016,9 +1016,9 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
 
 
 
-struct mob_plaguedGarboyleAI : public ScriptedAI
+struct mob_naxxramasGarboyleAI : public ScriptedAI
 {
-    mob_plaguedGarboyleAI(Creature* pCreature)
+    mob_naxxramasGarboyleAI(Creature* pCreature)
         : ScriptedAI(pCreature)
     {
         Reset();
@@ -1060,9 +1060,9 @@ CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
     return new mob_spiritOfNaxxramasAI(pCreature);
 }
 
-CreatureAI* GetAI_mob_plaguedGargoyle(Creature* pCreature)
+CreatureAI* GetAI_mob_naxxramasGargoyle(Creature* pCreature)
 {
-    return new mob_plaguedGarboyleAI(pCreature);
+    return new mob_naxxramasGarboyleAI(pCreature);
 }
 
 void AddSC_instance_naxxramas()
@@ -1085,7 +1085,7 @@ void AddSC_instance_naxxramas()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "plagued_gargoyle_ai";
-    pNewScript->GetAI = &GetAI_mob_plaguedGargoyle;
+    pNewScript->Name = "naxxramas_gargoyle_ai";
+    pNewScript->GetAI = &GetAI_mob_naxxramasGargoyle;
     pNewScript->RegisterSelf();
 }
