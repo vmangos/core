@@ -5,8 +5,8 @@ DELETE FROM `creature` WHERE `id`='16573';
 -- Remove all the corpse scarabs that were next to the crypt guards
 DELETE FROM `creature` where id = 16698;
 
--- Increasing anubs attackspeed from 2.4 to 2.2
-UPDATE `creature_template` SET `baseattacktime`=2000 WHERE `entry`=15956;
+-- Increasing anubs attackspeed from 2.4 to 2.0
+UPDATE `creature_template` SET `baseattacktime`=2000, `flags_extra`=257 WHERE `entry`=15956;
 
 -- corpse scarabs dmg reduced
 UPDATE `creature_template` SET `mindmg`=200, `maxdmg`=300 WHERE `entry`=16698;
