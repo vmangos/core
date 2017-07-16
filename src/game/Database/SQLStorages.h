@@ -39,5 +39,4 @@ extern SQLStorage sAreaStorage;
 
 extern SQLHashStorage sGOStorage;
 
-
 #endif

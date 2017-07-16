@@ -63,6 +63,9 @@ enum eScriptCommand
     SCRIPT_COMMAND_KILL_CREDIT              = 8,            // source or target with Player, datalong = creature entry, datalong2 = bool (0=personal credit, 1=group credit)
     SCRIPT_COMMAND_RESPAWN_GAMEOBJECT       = 9,            // source = any (summoner), datalong=db_guid, datalong2=despawn_delay
     SCRIPT_COMMAND_TEMP_SUMMON_CREATURE     = 10,           // source = any (summoner), datalong=creature entry, datalong2=despawn_delay
+                                                            // data_flags & SCRIPT_FLAG_COMMAND_ADDITIONAL = summon active, SUMMON_CREATURE_UNIQUE = check for same entry in radius, SUMMON_CREATURE_UNIQUE_TEMP = same but only TempSummon
+                                                            // dataint = (bool) setRun; 0 = off (default), 1 = on
+                                                            // dataint2: 0 = use orientation specified, 1 = face source, 2 = face target
     SCRIPT_COMMAND_OPEN_DOOR                = 11,           // source = unit, datalong=db_guid, datalong2=reset_delay
     SCRIPT_COMMAND_CLOSE_DOOR               = 12,           // source = unit, datalong=db_guid, datalong2=reset_delay
     SCRIPT_COMMAND_ACTIVATE_OBJECT          = 13,           // source = unit, target=GO
@@ -71,7 +74,10 @@ enum eScriptCommand
                                                             // datalong2: 0: s->t 1: s->s 2: t->t 3: t->s (this values in 2 bits), and 0x4 mask for cast triggered can be added to
     SCRIPT_COMMAND_PLAY_SOUND               = 16,           // source = any object, target=any/player, datalong (sound_id), datalong2 (bitmask: 0/1=anyone/target, 0/2=with distance dependent, so 1|2 = 3 is target with distance dependent)
     SCRIPT_COMMAND_CREATE_ITEM              = 17,           // source or target must be player, datalong = item entry, datalong2 = amount
-    SCRIPT_COMMAND_DESPAWN_SELF             = 18,           // source or target must be creature, datalong = despawn delay
+    SCRIPT_COMMAND_DESPAWN_CREATURE         = 18,           // source or target must be creature
+                                                            // datalong = despawn delay
+                                                            // datalong2 = search for npc entry if provided
+                                                            // datalong3 = search distance
     SCRIPT_COMMAND_PLAY_MOVIE               = 19,           // target can only be a player, datalog = movie id
     SCRIPT_COMMAND_MOVEMENT                 = 20,           // source or target must be creature. datalong = MovementType (0:idle, 1:random or 2:waypoint)
                                                             // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
@@ -101,6 +107,29 @@ enum eScriptCommand
                                                             // datalong = stand state (enum UnitStandStateType)
                                                             // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
                                                             // data_flags = flag_target_as_source           = 0x01
+    SCRIPT_COMMAND_MODIFY_NPC_FLAGS         = 29,           // source=any, target=creature
+                                                            // datalong=NPCFlags
+                                                            // datalong2:0x00=toggle, 0x01=add, 0x02=remove
+                                                            // datalong3 = creature entry (searching for a buddy, closest to source), datalong4 = creature search radius
+    SCRIPT_COMMAND_SEND_TAXI_PATH           = 30,           // source or target must be player
+                                                            // datalong = taxi path id
+    SCRIPT_COMMAND_TERMINATE_SCRIPT         = 31,           // source = any
+                                                            // datalong = search for npc entry if provided
+                                                            // datalong2= search distance
+                                                            // data_flags & 0x01: terminate steps of this script if npc found
+                                                            //              ELSE: terminate steps of this script if npc not found
+    SCRIPT_COMMAND_ENTER_EVADE_MODE         = 33,           // source = Unit (or WorldObject when creature entry defined), target = Unit (or none)
+                                                            // datalong = search for npc entry if provided
+                                                            // datalong2= search distance
+    SCRIPT_COMMAND_TERMINATE_COND           = 34,           // source = any
+                                                            // datalong = condition_id, datalong2 = if != 0 then quest_id of quest that will be failed for player's group if the script is terminated
+                                                            // data_flags & 0x01 terminate when condition is false ELSE terminate when condition is true
+    SCRIPT_COMMAND_TURN_TO                  = 35,           // source = Unit or any worldobject if datalong2 = 1, target = Unit
+                                                            // datalong: 0=face target (usually player), 1=set to orientation specified, 2=face a creature
+                                                            // datalong2 = 0, change source's orientation, ELSE change traget's orientation
+                                                            // datalong3 = search for npc entry if provided
+                                                            // datalong4 = search distance
+
 };
 
 #define MAX_TEXT_ID 4                                       // used for SCRIPT_COMMAND_TALK
@@ -193,6 +222,8 @@ struct ScriptInfo
             uint32 uniqueLimit;                             // datalong3
             uint32 uniqueDistance;                          // datalong4
             uint32 flags;                                   // data_flags
+            int32 setRun;                                   // dataint
+            int32 facingLogic;                              // dataint2
         } summonCreature;
 
         struct                                              // SCRIPT_COMMAND_OPEN_DOOR (11)
@@ -233,9 +264,11 @@ struct ScriptInfo
             uint32 amount;                                  // datalong2
         } createItem;
 
-        struct                                              // SCRIPT_COMMAND_DESPAWN_SELF (18)
+        struct                                              // SCRIPT_COMMAND_DESPAWN_CREATURE (18)
         {
             uint32 despawnDelay;                            // datalong
+            uint32 creatureEntry;                           // datalong2
+            uint32 searchRadius;                            // datalong3
         } despawn;
 
         struct                                              // SCRIPT_COMMAND_PLAY_MOVIE (19)
@@ -316,6 +349,51 @@ struct ScriptInfo
             uint32 flags;                                   // data_flags
         } standState;
 
+        struct                                              // SCRIPT_COMMAND_MODIFY_NPC_FLAGS (29)
+        {
+            uint32 flag;                                    // datalong
+            uint32 change_flag;                             // datalong2
+            uint32 creatureEntry;                           // datalong3
+            uint32 searchRadius;                            // datalong4
+        } npcFlag;
+
+        struct                                              // SCRIPT_COMMAND_SEND_TAXI_PATH (30)
+        {
+            uint32 taxiPathId;                              // datalong
+        } sendTaxiPath;
+
+        struct                                              // SCRIPT_COMMAND_TERMINATE_SCRIPT (31)
+        {
+            uint32 creatureEntry;                           // datalong
+            uint32 searchRadius;                            // datalong2
+            uint32 unused1;                                 // datalong3
+            uint32 unused2;                                 // datalong4
+            uint32 flags;                                   // data_flags
+        } terminateScript;
+
+        struct                                              // SCRIPT_COMMAND_ENTER_EVADE_MODE (33)
+        {
+            uint32 creatureEntry;                           // datalong
+            uint32 searchRadius;                            // datalong2
+        } enterEvadeMode;
+
+        struct                                              // SCRIPT_COMMAND_TERMINATE_COND (34)
+        {
+            uint32 conditionId;                             // datalong
+            uint32 failQuest;                               // datalong2
+            uint32 unused1;                                 // datalong3
+            uint32 unused2;                                 // datalong4
+            uint32 flags;                                   // data_flags
+        } terminateCond;
+
+        struct                                              // SCRIPT_COMMAND_TURN_TO (35)
+        {
+            uint32 facingLogic;                             // datalong
+            uint32 isSourceTarget;                          // datalong2
+            uint32 creatureEntry;                           // datalong3
+            uint32 searchRadius;                            // datalong4
+        } turnTo;
+
         struct
         {
             uint32 data[9];
@@ -346,6 +424,14 @@ struct ScriptAction
     ObjectGuid targetGuid;
     ObjectGuid ownerGuid;                                   // owner of source if source is item
     ScriptInfo const* script;                               // pointer to static script data
+
+    bool IsSameScript(uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid, ObjectGuid ownerGuid) const
+    {
+        return id == script->id &&
+            (sourceGuid == sourceGuid || !sourceGuid) &&
+            (targetGuid == targetGuid || !targetGuid) &&
+            (ownerGuid == ownerGuid || !ownerGuid);
+    }
 };
 
 typedef std::multimap<uint32, ScriptInfo> ScriptMap;

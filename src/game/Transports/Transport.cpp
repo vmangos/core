@@ -38,8 +38,8 @@ Transport::Transport() : GameObject(),
     _transportInfo(NULL), _isMoving(true), _pendingStop(false),
     _passengerTeleportItr(_passengers.begin()), _pathProgress(0)
 {
-    //m_updateFlag = UPDATEFLAG_TRANSPORT | UPDATEFLAG_LOWGUID | UPDATEFLAG_STATIONARY_POSITION | UPDATEFLAG_ROTATION;
-    m_updateFlag = (UPDATEFLAG_TRANSPORT | UPDATEFLAG_ALL | UPDATEFLAG_HAS_POSITION);
+    // the path progress is the only value that seem to matter
+    m_updateFlag = UPDATEFLAG_TRANSPORT;
 }
 
 Transport::~Transport()
@@ -127,27 +127,23 @@ void Transport::Update(uint32 diff, uint32)
 
     if (IsMoving() || !_pendingStop)
         _pathProgress = (_pathProgress + diff) % GetPeriod();
-    uint32 timer = (_pathProgress + _transportInfo->keyFrames[1].DepartureTime) % GetPeriod();
 
     // Set current waypoint
-    // Desired outcome: _currentFrame->DepartureTime < timer < _nextFrame->ArriveTime
+    // Desired outcome: _currentFrame->DepartureTime < _pathProgress < _nextFrame->ArriveTime
     // ... arrive | ... delay ... | departure
     //      event /         event /
     for (;;)
     {
-        if (timer >= _currentFrame->ArriveTime)
+        if (_pathProgress >= _currentFrame->ArriveTime && _pathProgress < _currentFrame->DepartureTime)
         {
-            if (timer < _currentFrame->DepartureTime)
-            {
-                SetMoving(false);
-                break;  // its a stop frame and we are waiting
-            }
+            SetMoving(false);
+            break;  // its a stop frame and we are waiting
         }
 
         // not waiting anymore
         SetMoving(true);
 
-        if (timer >= _currentFrame->DepartureTime && timer < _currentFrame->NextArriveTime)
+        if (_pathProgress >= _currentFrame->DepartureTime && _pathProgress < _currentFrame->NextArriveTime)
             break;  // found current waypoint
 
         MoveToNextWaypoint();
@@ -156,8 +152,15 @@ void Transport::Update(uint32 diff, uint32)
 
         // Departure event
         if (_currentFrame->IsTeleportFrame())
+        {
             if (TeleportTransport(_nextFrame->Node->mapid, _nextFrame->Node->x, _nextFrame->Node->y, _nextFrame->Node->z, _nextFrame->InitialOrientation))
                 return; // Update more in new map thread
+        }
+        else if (_currentFrame->IsUpdateFrame())
+        {
+            SendOutOfRangeUpdateToMap();
+            SendCreateUpdateToMap();
+        }
     }
 
     // Set position
@@ -165,9 +168,9 @@ void Transport::Update(uint32 diff, uint32)
     if (_positionChangeTimer.Passed())
     {
         _positionChangeTimer.Reset(positionUpdateDelay);
-        if (IsMoving())
+        if (IsMoving() && _pathProgress)
         {
-            float t = CalculateSegmentPos(float(timer) * 0.001f);
+            float t = CalculateSegmentPos(float(_pathProgress) * 0.001f);
             G3D::Vector3 pos, dir;
             _currentFrame->Spline->evaluate_percent(_currentFrame->Index, t, pos);
             _currentFrame->Spline->evaluate_derivative(_currentFrame->Index, t, dir);
@@ -237,10 +240,9 @@ void Transport::MoveToNextWaypoint()
     // Set frames
     _currentFrame = _nextFrame++;
     if (_nextFrame == GetKeyFrames().end())
-    {
         _nextFrame = GetKeyFrames().begin();
+    if (_currentFrame == GetKeyFrames().begin())
         _pathProgress = 0;
-    }
 }
 
 float Transport::CalculateSegmentPos(float now)
@@ -408,4 +410,33 @@ void Transport::BuildUpdate(UpdateDataMapType& data_map)
         BuildUpdateDataForPlayer(itr->getSource(), data_map);
 
     ClearUpdateMask(true);
+}
+
+
+void Transport::SendOutOfRangeUpdateToMap()
+{
+    Map::PlayerList const& players = GetMap()->GetPlayers();
+    if (!players.isEmpty())
+    {
+        UpdateData data;
+        BuildOutOfRangeUpdateBlock(&data);
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            if (itr->getSource()->GetTransport() != this)
+                data.Send(itr->getSource()->GetSession());
+    }
+}
+
+void Transport::SendCreateUpdateToMap()
+{
+    Map::PlayerList const& players = GetMap()->GetPlayers();
+    if (!players.isEmpty())
+    {
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            if (itr->getSource()->GetTransport() != this)
+            {
+                UpdateData data;
+                BuildCreateUpdateBlockForPlayer(&data, itr->getSource());
+                data.Send(itr->getSource()->GetSession());
+            }
+    }
 }

@@ -643,6 +643,10 @@ class ObjectMgr
         }
         QuestMap const& GetQuestTemplates() const { return mQuestTemplates; }
 
+        // Return the ID of the item that starts a quest.
+        // Return 0 if no such item exists.
+        uint32 GetQuestStartingItemID(uint32 quest_id) const;
+
         uint32 GetQuestForAreaTrigger(uint32 Trigger_ID) const
         {
             auto itr = mQuestAreaTriggerMap.find(Trigger_ID);
@@ -1234,6 +1238,8 @@ class ObjectMgr
         typedef UNORDERED_MAP<uint32, GossipText> GossipTextMap;
         typedef UNORDERED_MAP<uint32, uint32> QuestAreaTriggerMap;
         typedef UNORDERED_MAP<uint32, std::string> ItemTextMap;
+        // Map quest_id->id of start item
+        typedef UNORDERED_MAP<uint32, uint32> QuestStartingItemMap;
         typedef std::set<uint32> TavernAreaTriggerSet;
         typedef std::set<uint32> GameObjectForQuestSet;
 
@@ -1246,6 +1252,7 @@ class ObjectMgr
         GameObjectForQuestSet mGameObjectForQuestSet;
         GossipTextMap       mGossipText;
         AreaTriggerMap      mAreaTriggers;
+        QuestStartingItemMap   mQuestStartingItems;
         BGEntranceTriggerMap mBGEntranceTriggers;
 
         RepRewardRateMap    m_RepRewardRateMap;

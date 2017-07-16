@@ -45,7 +45,7 @@
 #include "wdtfile.h"
 #include "dbcfile.h"
 #include "wmo.h"
-#include "mpq_libmpq04.h"
+#include <libmpq\mpq_libmpq.h>
 
 #include "vmapexport.h"
 
@@ -437,10 +437,8 @@ int main(int argc, char** argv)
         return 1;
 
     if (!ModelLOSMgr::Load())
-    {
         printf("Unable to open LOS Modificators.\n");
-        return 1;
-    }
+
     printf("Extract for %s. Beginning work ....\n", szRawVMAPMagic);
     //xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
     // Create the working directory
@@ -456,6 +454,8 @@ int main(int argc, char** argv)
     fillArchiveNameVector(archiveNames);
     for (size_t i = 0; i < archiveNames.size(); ++i)
     {
+        if(!FileExists(archiveNames[i].c_str()))
+            continue;
         MPQArchive* archive = new MPQArchive(archiveNames[i].c_str());
         if (!gOpenArchives.size() || gOpenArchives.front() != archive)
             delete archive;
@@ -494,7 +494,7 @@ int main(int argc, char** argv)
 
 
         delete dbc;
-        //ParsMapFiles();
+        ParsMapFiles();
         delete [] map_ids;
         //nError = ERROR_SUCCESS;
         // Extract models, listed in DameObjectDisplayInfo.dbc

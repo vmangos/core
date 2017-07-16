@@ -31,6 +31,7 @@ GossipMenu::GossipMenu(WorldSession* session) : m_session(session)
 {
     m_gItems.reserve(16);                                   // can be set for max from most often sizes to speedup push_back and less memory use
     m_gMenuId = 0;
+    m_discoveredNode = false;
 }
 
 GossipMenu::~GossipMenu()
@@ -119,6 +120,7 @@ void GossipMenu::ClearMenu()
     m_gItems.clear();
     m_gItemsData.clear();
     m_gMenuId = 0;
+    m_discoveredNode = false;
 }
 
 PlayerMenu::PlayerMenu(WorldSession *session) : mGossipMenu(session)
@@ -473,9 +475,10 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcG
     {
         ItemPrototype const* IProto;
 
-        data << uint32(pQuest->GetRewChoiceItemsCount());
+        auto count = pQuest->GetRewChoiceItemsCount(); // // QUEST_REWARD_CHOICES_COUNT
+        data << uint32(count); 
 
-        for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
+        for (uint32 i = 0; i < count; ++i)
         {
             data << uint32(pQuest->RewChoiceItemId[i]);
             data << uint32(pQuest->RewChoiceItemCount[i]);
@@ -488,9 +491,10 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcG
                 data << uint32(0x00);
         }
 
-        data << uint32(pQuest->GetRewItemsCount());
-
-        for (uint32 i = 0; i < QUEST_REWARDS_COUNT; ++i)
+        count = pQuest->GetRewItemsCount(); // QUEST_REWARDS_COUNT
+        data << uint32(count);
+        
+        for (uint32 i = 0; i < count; ++i)
         {
             data << uint32(pQuest->RewItemId[i]);
             data << uint32(pQuest->RewItemCount[i]);
@@ -506,34 +510,15 @@ void PlayerMenu::SendQuestGiverQuestDetails(Quest const *pQuest, ObjectGuid npcG
         data << uint32(pQuest->GetRewOrReqMoney());
     }
 
-    data << pQuest->GetReqItemsCount();
-    for (uint32 i = 0; i <  QUEST_OBJECTIVES_COUNT; i++)
-    {
-        data << pQuest->ReqItemId[i];
-        data << pQuest->ReqItemCount[i];
-    }
-
-
-    data << pQuest->GetReqCreatureOrGOcount();
-    for (uint32 i = 0; i < QUEST_OBJECTIVES_COUNT; i++)
-    {
-        data << uint32(pQuest->ReqCreatureOrGOId[i]);
-        data << pQuest->ReqCreatureOrGOCount[i];
-    }
-
-    /*[-ZERO]
-    // rewarded honor points. Multiply with 10 to satisfy client
     data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
-    data << uint32(pQuest->GetRewSpellCast());              // casted spell
-
     data << uint32(QUEST_EMOTE_COUNT);
 
     for (uint32 i = 0; i < QUEST_EMOTE_COUNT; ++i)
     {
         data << uint32(pQuest->DetailsEmote[i]);
-        data << uint32(pQuest->DetailsEmoteDelay[i]);       // DetailsEmoteDelay (in ms)
+        data << uint32(pQuest->DetailsEmoteDelay[i]); // delay between emotes in ms
     }
-    */
+
     GetMenuSession()->SendPacket(&data);
 
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_DETAILS NPCGuid = %s, questid = %u", npcGUID.GetString().c_str(), pQuest->GetQuestId());
@@ -753,8 +738,11 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const *pQuest, ObjectGuid npcG
         }
     }
 
-    // We may wish a better check, perhaps checking the real quest requirements
-    if (RequestItemsText.empty())
+    // Quests that don't require items use the RequestItemsText field to store the text
+    // that is shown when you talk to the quest giver while the quest is incomplete.
+    // Therefore the text should not be shown for them when the quest is complete.
+    // For quests that do require items, it is self explanatory.
+    if (RequestItemsText.empty() || (!pQuest->HasItemsRequirement() && Completable))
     {
         SendQuestGiverOfferReward(pQuest, npcGUID, true);
         return;

@@ -33,6 +33,13 @@ go_resonite_cask
 go_sacred_fire_of_life
 go_tablet_of_madness
 go_tablet_of_the_seven
+go_silithyste
+go_restes_sha_ni
+go_Hive_Regal_Glyphed_Crystal
+go_Hive_Ashi_Glyphed_Crystal
+go_Hive_Zora_Glyphed_Crystal
+go_bells
+go_darkmoon_faire_music
 EndContentData */
 
 #include "scriptPCH.h"
@@ -389,6 +396,162 @@ bool GOSelect_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo, uint32 s
     return true;
 }
 
+/*####
+## go_bells
+####*/
+
+enum BellHourlySoundFX
+{
+    BELLTOLLHORDE = 6595, // Horde
+    BELLTOLLTRIBAL = 6675,
+    BELLTOLLALLIANCE = 6594, // Alliance
+    BELLTOLLNIGHTELF = 6674,
+    BELLTOLLDWARFGNOME = 7234,
+};
+
+enum BellHourlySoundAreas
+{
+    UNDERCITY_AREA = 1497,
+    IRONFORGE_1_AREA = 809,
+    IRONFORGE_2_AREA = 1,
+    DARNASSUS_AREA = 1657,
+    TELDRASSIL_ZONE = 141,
+};
+
+enum BellHourlyObjects
+{
+    GO_HORDE_BELL = 175885,
+    GO_ALLIANCE_BELL = 176573,
+};
+
+enum BellHourlyMisc
+{
+    GAME_EVENT_HOURLY_BELLS = 78,
+    EVENT_RING_BELL = 1,
+    EVENT_RESET = 2,
+    EVENT_TIME = 3
+};
+
+struct go_bells : public GameObjectAI
+{
+    go_bells(GameObject* go) : GameObjectAI(go), _soundId(0), once(true)
+    {
+        switch (me->GetEntry())
+        {
+            case GO_HORDE_BELL:
+                _soundId = me->GetAreaId() == UNDERCITY_AREA ? BELLTOLLHORDE : BELLTOLLTRIBAL;
+                break;
+            case GO_ALLIANCE_BELL:
+            {
+                if (me->GetAreaId() == IRONFORGE_1_AREA || me->GetAreaId() == IRONFORGE_2_AREA)
+                    _soundId = BELLTOLLDWARFGNOME;
+                else if (me->GetAreaId() == DARNASSUS_AREA || me->GetZoneId() == TELDRASSIL_ZONE)
+                    _soundId = BELLTOLLNIGHTELF;
+                else
+                    _soundId = BELLTOLLALLIANCE;
+                break;
+            }
+        }
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        _events.Update(diff);
+
+        if (sGameEventMgr.IsActiveEvent(GAME_EVENT_HOURLY_BELLS) && once == true)
+        {
+            // Reset
+            once = false;
+            _events.ScheduleEvent(EVENT_TIME, Seconds(1));
+        }
+
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_TIME:
+                {
+                    // Get how many times it should ring
+                    time_t rawtime;
+                    time(&rawtime);
+                    struct tm * timeinfo = localtime(&rawtime);
+                    uint8 _rings = ((timeinfo->tm_hour - 1) % 12 + 1);
+
+                    // Schedule ring event
+                    for (auto i = 0; i < _rings; ++i)
+                        _events.ScheduleEvent(EVENT_RING_BELL, Seconds(i * 4 + 1));
+
+                    break;
+                }
+                case EVENT_RING_BELL:
+                    me->PlayDirectSound(_soundId);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+private:
+    EventMap _events;
+    uint32 _soundId;
+    bool once;
+};
+
+GameObjectAI* GetAI_go_bells(GameObject* gameobject)
+{
+    return new go_bells(gameobject);
+}
+
+/*####
+## go_darkmoon_faire_music
+####*/
+
+enum DarkmoonFaireMusic
+{
+    MUSIC_DARKMOON_FAIRE_MUSIC = 8440
+};
+
+enum DarkmoonFaireMusicEvents
+{
+    EVENT_DFM_START_MUSIC = 1,
+    GAME_EVENT_DARKMOON_FAIRE_ELWYNN = 4,
+    GAME_EVENT_DARKMOON_FAIRE_THUNDER = 5
+};
+
+struct go_darkmoon_faire_music : public GameObjectAI
+{
+    go_darkmoon_faire_music(GameObject* gobj) : GameObjectAI(gobj)
+    {
+        _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(1));
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        _events.Update(diff);
+        while (uint32 eventId = _events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+                case EVENT_DFM_START_MUSIC:
+                    if (sGameEventMgr.IsActiveEvent(GAME_EVENT_DARKMOON_FAIRE_ELWYNN) || sGameEventMgr.IsActiveEvent(GAME_EVENT_DARKMOON_FAIRE_THUNDER))
+                        me->PlayDirectMusic(MUSIC_DARKMOON_FAIRE_MUSIC);
+
+                    _events.ScheduleEvent(EVENT_DFM_START_MUSIC, Seconds(5));  // Every 5 second's SMSG_PLAY_MUSIC packet (PlayDirectMusic) is pushed to the client (sniffed value)
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+private:
+    EventMap _events;
+};
+
+GameObjectAI* GetAI_go_darkmoon_faire_music(GameObject* gameobject)
+{
+    return new go_darkmoon_faire_music(gameobject);
+}
+
 void AddSC_go_scripts()
 {
     Script *newscript;
@@ -485,5 +648,15 @@ void AddSC_go_scripts()
     newscript->Name = "go_Hive_Zora_Glyphed_Crystal";
     newscript->pGOHello =           &(GOHello_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
     newscript->pGOGossipSelect =    &(GOSelect_go_Hive_Glyphed_Crystal<ITEM_HIVE_ZORA_RUBBING>);
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_bells";
+    newscript->GOGetAI = &GetAI_go_bells;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "go_darkmoon_faire_music";
+    newscript->GOGetAI = &GetAI_go_darkmoon_faire_music;
     newscript->RegisterSelf();
 }

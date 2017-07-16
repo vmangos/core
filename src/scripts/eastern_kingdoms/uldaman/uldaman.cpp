@@ -38,17 +38,28 @@ bool GOHello_go_keystone_chamber(Player* pPlayer, GameObject* pGo)
     ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData();
 
     if (!pInstance)
-    {
         return false;
-    }
 
     if (pPlayer)
-    {
         pInstance->SetData64(0, pPlayer->GetGUID()); // Ironaya first victim
-    }
-    pInstance->SetData(DATA_IRONAYA_SEAL, IN_PROGRESS);
+
+    if (pGo)
+        pGo->SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_INTERACT_COND);
+
+    // save state
+    pInstance->SetData(ULDAMAN_ENCOUNTER_IRONAYA_DOOR, DONE);
 
     return false;
+}
+
+// Return true to avoid db script attempt
+bool ProcessEventId_event_awaken_stone_keeper(uint32 eventId, Object* source, Object* target, bool isStart)
+{
+    if (!source || source->GetTypeId() != TYPEID_PLAYER)
+        return true;
+    ScriptedInstance* instance = (ScriptedInstance*)((Player*)source)->GetInstanceData();
+    instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
+    return true;
 }
 
 struct mob_stone_keeperAI : public ScriptedAI
@@ -65,14 +76,6 @@ struct mob_stone_keeperAI : public ScriptedAI
 
     void Reset()
     {
-        if (!instance)
-        {
-            return;
-        }
-        if (instance->GetData(DATA_STONE_KEEPERS) != FAIL)
-        {
-            instance->SetData(DATA_STONE_KEEPERS, FAIL);
-        }
         m_uiTrample_Timer = urand(4000, 9000);
     }
 
@@ -84,15 +87,14 @@ struct mob_stone_keeperAI : public ScriptedAI
             return;
         }
         Reset();
+        if (instance)
+            instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, FAIL);
     }
 
     void JustDied(Unit* pWho)
     {
-        if (!instance)
-        {
-            return;
-        }
-        instance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);
+        if (instance)
+            instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
     }
 
     void UpdateAI(const uint32 diff)
@@ -280,87 +282,6 @@ bool OnTrigger_at_map_chamber(Player* pPlayer, const AreaTriggerEntry *at)
     return true;
 }
 
-class go_altar_of_the_keepersAI : public GameObjectAI
-{
-public:
-    go_altar_of_the_keepersAI(GameObject* gobj) : GameObjectAI(gobj)
-    {
-        instance = (ScriptedInstance*)gobj->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* instance;
-
-    bool _eventStarted;
-    uint32 _summonTimer;
-    void Reset()
-    {
-        _eventStarted = false;
-        _summonTimer  = TIMER_ALTAR_SUMMON;
-        instance->SetData(DATA_KEEPERS_ALTAR, NOT_STARTED);
-    }
-    
-    uint32 CountSummoners()
-    {
-        const Map::PlayerList& players = me->GetMap()->GetPlayers();
-        uint32 count = 0;
-        for (auto it = players.begin(); it != players.end(); ++it)
-        {
-            if (Player* player = it->getSource())
-            {
-                if (Spell* spell = player->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-                {
-                    if (spell->m_spellInfo->Id == SPELL_ALTAR_SUMMONING_VISUAL)
-                    {
-                        ++count;
-                    }
-                }
-            }
-        }
-        return count;
-    }
-    
-    void UpdateAI(const uint32 diff)
-    {
-        if (!instance || instance->GetData(DATA_ALTAR_DOORS) == DONE ||
-            instance->GetData(DATA_STONE_KEEPERS) == DONE ||
-            instance->GetData(DATA_STONE_KEEPERS) == IN_PROGRESS)
-        {
-            return;
-        }
-        if (!_eventStarted)
-        {
-            if (CountSummoners() >= NEEDED_SUMMONERS)
-            {
-                instance->SetData(DATA_KEEPERS_ALTAR, IN_PROGRESS); // activate the altar
-                _eventStarted = true;
-            }
-            return;
-        }
-        else if (CountSummoners() >= NEEDED_SUMMONERS)
-        {
-            if (_summonTimer <= diff)
-            {
-                Reset();
-                instance->SetData(DATA_STONE_KEEPERS, IN_PROGRESS);
-            }
-            else
-            {
-                _summonTimer -= diff;
-            }
-        }
-        else
-        {
-            Reset();
-        }
-    }
-};
-
-GameObjectAI* GetAI_go_altar_of_the_keepers(GameObject* go)
-{
-    return new go_altar_of_the_keepersAI(go);
-}
-
 struct AnnoraAI : public ScriptedAI
 {
     AnnoraAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -520,8 +441,8 @@ void AddSC_uldaman()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_altar_of_the_keepers";
-    newscript->GOGetAI = &GetAI_go_altar_of_the_keepers;
+    newscript->Name = "event_awaken_stone_keeper";
+    newscript->pProcessEventId = &ProcessEventId_event_awaken_stone_keeper;
     newscript->RegisterSelf();
 
     newscript = new Script;

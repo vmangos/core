@@ -23,6 +23,7 @@
 #include "Creature.h"
 #include "DBCStores.h"
 #include "Spell.h"
+#include "Totem.h"
 
 CreatureAI::~CreatureAI()
 {
@@ -252,6 +253,25 @@ bool CreatureAI::DoMeleeAttackIfReady()
     return m_creature->UpdateMeleeAttackingState();
 }
 
+struct EnterEvadeModeHelper
+{
+    explicit EnterEvadeModeHelper(Unit* _source) : source(_source) {}
+    void operator()(Unit* unit) const
+    {
+        if (unit->IsCreature() && unit->ToCreature()->IsTotem())
+            ((Totem*)unit)->UnSummon();
+        else
+        {
+            unit->GetMotionMaster()->Clear(false);
+            // for a controlled unit this will result in a follow move
+            unit->GetMotionMaster()->MoveTargetedHome();
+            unit->DeleteThreatList();
+            unit->CombatStop(true);
+        }
+    }
+    Unit* source;
+};
+
 void CreatureAI::EnterEvadeMode()
 {
     if (!m_creature->isAlive())
@@ -266,15 +286,15 @@ void CreatureAI::EnterEvadeMode()
     {
         m_creature->RemoveAurasAtReset();
 
-        // Remove ChaseMovementGenerator from MotionMaster stack list, and add HomeMovementGenerator instead
-        MovementGeneratorType moveType = m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType();
-        if (moveType == CHASE_MOTION_TYPE || moveType == IDLE_MOTION_TYPE || moveType == RANDOM_MOTION_TYPE)
-            m_creature->GetMotionMaster()->MoveTargetedHome();
+        // clear all movement generators except default
+        m_creature->GetMotionMaster()->Clear(false);
+        m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
     m_creature->DeleteThreatList();
     m_creature->CombatStop(true);
     m_creature->SetLootRecipient(nullptr);
+    m_creature->CallForAllControlledUnits(EnterEvadeModeHelper(m_creature), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_TOTEMS);
 }
 
 // Distract creature, if player gets too close while stealthed/prowling

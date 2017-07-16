@@ -311,7 +311,7 @@ void PetAI::UpdateAI(const uint32 diff)
             else
                 m_creature->SendPetAIReaction();
 
-            spell->prepare(&targets);
+            spell->prepare(std::move(targets));
         }
 
         // deleted cached Spell objects
@@ -562,19 +562,6 @@ void PetAI::DoAttack(Unit* target, bool chase)
             m_creature->GetCharmInfo()->SetIsAtStay(true);
             m_creature->GetMotionMaster()->Clear();
             m_creature->GetMotionMaster()->MoveIdle();
-        }
-
-        // Flag owner for PvP if owner is player and target is flagged
-        Unit* owner = m_creature->GetCharmerOrOwner();
-        if (owner && owner->IsPlayer() && !owner->IsPvP())
-        {
-            Player* pOwner = owner->ToPlayer();
-            if ((target->IsPlayer() && target->IsPvP() && !pOwner->IsInDuelWith((Player*)target)) || // PvP flagged players
-                (target->IsCreature() && target->IsPvP()))                                           // PvP flagged creatures
-            {
-                pOwner->UpdatePvP(true);
-                pOwner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
-            }
         }
     }
 }

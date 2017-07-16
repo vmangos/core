@@ -606,11 +606,17 @@ struct instance_ruins_of_ahnqiraj : public ScriptedInstance
     void SetAndorovSquadFaction(uint32 faction)
     {
         if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
+        {
             pAndorov->setFaction(faction);
+            pAndorov->SetPvP(true);
+        }
         for (std::list<uint64>::iterator it = m_lKaldoreiElites.begin(); it != m_lKaldoreiElites.end(); ++it)
         {
             if (Creature* pElite = instance->GetCreature(*it))
+            {
                 pElite->setFaction(faction);
+                pElite->SetPvP(true);
+            }
         }
     }
 

@@ -491,10 +491,10 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         trader->LogModifyMoney(my_trade->GetMoney(), "Trade", _player->GetObjectGuid());
 
         if (my_spell)
-            my_spell->prepare(&my_targets);
+            my_spell->prepare(std::move(my_targets));
 
         if (his_spell)
-            his_spell->prepare(&his_targets);
+            his_spell->prepare(std::move(his_targets));
 
         // cleanup
         clearAcceptTradeMode(my_trade, his_trade);

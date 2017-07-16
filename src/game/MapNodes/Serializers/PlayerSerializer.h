@@ -101,7 +101,7 @@ void Player::Serialize(OP& buf)
     buf(m_Played_time[PLAYED_TIME_LEVEL]);
 
     buf(m_rest_bonus);
-    buf(m_resetTalentsCost);
+    buf(m_resetTalentsMultiplier);
     buf(m_resetTalentsTime);
 
     buf(m_ExtraFlags);

@@ -75,8 +75,8 @@ enum
  */
 const uint32_t SANDBLAST_TIMER_INITIAL_MIN = 30000;
 const uint32_t SANDBLAST_TIMER_INITIAL_MAX = 45000;
-const uint32_t SANDBLAST_TIMER_MIN         = 10000;
-const uint32_t SANDBLAST_TIMER_MAX         = 15000;
+const uint32_t SANDBLAST_TIMER_MIN         = 12000;
+const uint32_t SANDBLAST_TIMER_MAX         = 17000;
 const uint32_t SUBMERGE_TIMER              = 60000;
 const uint32_t SUBMERGE_ANIMATION_INVIS    = 2000;
 const uint32_t SWEEP_TIMER                 = 15000;
@@ -299,8 +299,6 @@ struct boss_ouroAI : public Scripted_NoMovementAI
             // Sand Blast
             if (m_uiSandBlastTimer < uiDiff)
             {
-                // one post claims Sand Blast has melee priority when enraged, another post claims otherwise :(
-                // note: need testing
                 auto target = m_creature->getThreatManager().getHostileTarget();
 
                 if (target && DoCastSpellIfCan(target, SPELL_SANDBLAST) == CAST_OK)
@@ -407,6 +405,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
                     m_SummonBase = true;
                     m_uiSubmergeTimer   = SUBMERGE_TIMER;
                     m_uiSubmergeInvisTimer = SUBMERGE_ANIMATION_INVIS;
+                    m_uiSweepTimer = SWEEP_TIMER;
+                    m_uiSandBlastTimer = urand(SANDBLAST_TIMER_MIN, SANDBLAST_TIMER_MAX);
 
                     DespawnCreatures(false);
 

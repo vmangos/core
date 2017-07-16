@@ -171,8 +171,12 @@ struct boss_viscidusAI : public ScriptedAI
 
         const uint32 uiViscidusHealth = m_creature->GetHealth();
 
+        // Prevent Viscidus dying to the damage taken. We cannot modify the damage to be less,
+        // because it eventually hits 0. At which point any damage dealt will be considered
+        // 'absorbed' and have no effect. i.e. won't be able to shatter or freeze the
+        // boss once he hits 1 hp.
         if (damage >= uiViscidusHealth)
-            damage = uiViscidusHealth - 1;
+            m_creature->SetHealth(damage + 1);
     }
 
     void JustSummoned(Creature* pSummoned)

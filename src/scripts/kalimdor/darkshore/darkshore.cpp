@@ -474,11 +474,14 @@ enum
     SAY_AGGRO_1                     = -1000792,
     SAY_AGGRO_2                     = -1000793,
     SAY_AGGRO_3                     = -1000794,
+    SAY_END_2                       = -1000795,
+    SAY_END_3                       = -1000796,
 
     SAY_ESCAPE                      = -1780209,
 
     NPC_BLACKWOOD_SHAMAN            = 2171,
     NPC_BLACKWOOD_URSA              = 2170,
+    NPC_GRIMCLAW                    = 3695,
 
     SPELL_MOONSTALKER_FORM          = 10849,
 
@@ -522,6 +525,7 @@ struct npc_volcorAI : public npc_escortAI
     }
 
     uint32 m_uiQuestId;
+    bool m_bEscortFinished = false;
 
     void Reset() override
     {
@@ -532,8 +536,12 @@ struct npc_volcorAI : public npc_escortAI
             StealthDialogueTimer = 0;
         }
     }
+
     uint16 StealthDialogueStep;
     uint32 StealthDialogueTimer;
+    uint16 ForceDialogueStep;
+    uint32 ForceDialogueTimer;
+
     void Aggro(Unit* /*pWho*/) override
     {
         // shouldn't always use text on agro
@@ -610,7 +618,12 @@ struct npc_volcorAI : public npc_escortAI
             SetEscortPaused(true);
         }
         else
+        {
+            m_bEscortFinished = false;
+            ForceDialogueStep = 0;
+            ForceDialogueTimer = 0;
             Start(false, pPlayer->GetGUID(), pQuest);
+        }
     }
 
     void WaypointReached(uint32 uiPointId) override
@@ -639,12 +652,12 @@ struct npc_volcorAI : public npc_escortAI
                 m_creature->SummonCreature(NPC_BLACKWOOD_URSA, aVolcorSpawnLocs[5].m_fX, aVolcorSpawnLocs[5].m_fY, aVolcorSpawnLocs[5].m_fZ, aVolcorSpawnLocs[5].m_fO, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
                 break;
             case 15:
-                DoScriptText(SAY_END, m_creature);
                 if (Player* pPlayer = GetPlayerForEscort())
                     pPlayer->GroupEventHappens(QUEST_ESCAPE_THROUGH_FORCE, m_creature);
                 SetEscortPaused(true);
-                m_creature->ForcedDespawn();
-                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                ForceDialogueStep = 0;
+                ForceDialogueTimer = 3000;
+                m_bEscortFinished = true;
                 break;
         }
     }
@@ -684,7 +697,68 @@ struct npc_volcorAI : public npc_escortAI
                 else
                     StealthDialogueTimer -= uiDiff;
             }
+            else if (m_bEscortFinished && (m_uiQuestId == QUEST_ESCAPE_THROUGH_FORCE))
+            {
+                if (ForceDialogueTimer < uiDiff)
+                {
+                    switch (ForceDialogueStep)
+                    {
+                        case 0:
+                            DoScriptText(SAY_END, m_creature);
+                            ForceDialogueTimer = 1000;
+                            ForceDialogueStep++;
+                            break;
+                        case 1:
+                            if (Creature * pGrimClaw = m_creature->FindNearestCreature(NPC_GRIMCLAW, 40))
+                            {
+                                pGrimClaw->SetFacingToObject(m_creature);
+                                ForceDialogueTimer = 3000;
+                                ForceDialogueStep++;
+                            }
+                            else
+                            {
+                                m_bEscortFinished = false;
+                                m_creature->ForcedDespawn();
+                                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                            }
+                            break;
+                        case 2:
+                            if (Creature * pGrimClaw = m_creature->FindNearestCreature(NPC_GRIMCLAW, 40))
+                            {
+                                pGrimClaw->SetWalk(false);
+                                pGrimClaw->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX() + 3.0f, m_creature->GetPositionY() + 2.0f, m_creature->GetPositionZ(), MOVE_PATHFINDING);
+                                DoScriptText(SAY_END_2, pGrimClaw);
+                                ForceDialogueTimer = 4000;
+                                ForceDialogueStep++;
+                            }
+                            else
+                            {
+                                m_bEscortFinished = false;
+                                m_creature->ForcedDespawn();
+                                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                            }
+                            break;
+                        case 3:
+                            DoScriptText(SAY_END_3, m_creature);
+                            ForceDialogueTimer = 5000;
+                            ForceDialogueStep++;
+                            break;
+                        case 4:
+                            m_bEscortFinished = false;
+                            if (Creature * pGrimClaw = m_creature->FindNearestCreature(NPC_GRIMCLAW, 40))
+                                pGrimClaw->ForcedDespawn();
+                            m_creature->ForcedDespawn();
+                            m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+                            break;
+                    }
+                }
+                else
+                    ForceDialogueTimer -= uiDiff;
+
+                return;
+            }
         }
+        
         npc_escortAI::UpdateAI(uiDiff);
     }
 };
@@ -711,7 +785,6 @@ bool QuestAccept_npc_volcor(Player* pPlayer, Creature* pCreature, const Quest* p
 
 enum
 {
-    QUEST_PLAGUED_LANDS             = 2118,
     SPELL_TRAPPED_BEAR              = 9439,
     NPC_CAPTURED_RABID_THISTLE_BEAR = 11836,
     SPELL_RAGE                      = 3150
@@ -788,6 +861,173 @@ bool EffectDummyCreature_npc_rabid_thistle_bear(Unit* pCaster, uint32 uiSpellId,
         //always return true when we are handling this spell and effect
         return true;
     }
+    return false;
+}
+
+/*####
+# npc_tharnariun_treetender
+####*/
+
+enum
+{
+    SAY_THARNARIUN_CLEANSED = -1780226,
+    QUEST_PLAGUED_LANDS = 2118,
+    SPELL_THARNARIUN_HEAL = 9457
+};
+
+struct npc_tharnariun_treetenderAI : public ScriptedAI
+{
+    npc_tharnariun_treetenderAI(Creature *c) : ScriptedAI(c)
+    {
+        Reset();
+    }
+
+    bool m_bPlaguedLandsEvent;
+    uint32 m_uiPlaguedLandsTimer;
+    uint8 PlaguedLandsCount;
+    Player* pPlaguedLandsPlayer = nullptr;
+    Creature* pPlaguedLandsBear = nullptr;
+
+    void Reset()
+    {
+        m_bPlaguedLandsEvent = false;
+        PlaguedLandsCount = 0;
+        pPlaguedLandsPlayer = nullptr;
+        pPlaguedLandsBear = nullptr;
+    }
+
+    void StartPlaguedLandsEvent(Player* pPlayer)
+    {
+        pPlaguedLandsPlayer = pPlayer;
+        m_bPlaguedLandsEvent = true;
+        PlaguedLandsCount = 1;
+        m_uiPlaguedLandsTimer = 1100;
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (m_bPlaguedLandsEvent)
+        { 
+            if (m_uiPlaguedLandsTimer < diff)
+            {
+                switch (PlaguedLandsCount)
+                {
+                    case 1:
+                    {
+                        DoScriptText(SAY_THARNARIUN_CLEANSED, m_creature);
+                        m_uiPlaguedLandsTimer = 100;
+                        PlaguedLandsCount++;
+                        break;
+                    }
+                    case 2:
+                    {
+                        m_creature->HandleEmoteCommand(EMOTE_ONESHOT_EXCLAMATION);
+                        m_uiPlaguedLandsTimer = 100;
+                        PlaguedLandsCount++;
+                        break;
+                    }
+                    case 3:
+                    {
+                        if (pPlaguedLandsPlayer)
+                            pPlaguedLandsBear = pPlaguedLandsPlayer->FindNearestCreature(NPC_CAPTURED_RABID_THISTLE_BEAR, 10);
+
+                        if (pPlaguedLandsBear)
+                        {
+                            pPlaguedLandsBear->CastSpell(pPlaguedLandsBear, SPELL_THARNARIUN_HEAL, true);
+                            m_uiPlaguedLandsTimer = 3500;
+                            PlaguedLandsCount++;
+                            break;
+                        }
+                        else
+                        {
+                            m_bPlaguedLandsEvent = false;
+                        }
+                    }
+                    case 4:
+                    {
+                        if (pPlaguedLandsBear)
+                            pPlaguedLandsBear->DisappearAndDie();
+
+                        m_bPlaguedLandsEvent = false;
+                        break;
+                    }
+                    default:
+                    {
+                        m_bPlaguedLandsEvent = false;
+                        break;
+                    }
+                }
+            }
+            else m_uiPlaguedLandsTimer -= diff;
+        }
+
+        //Return since we have no target
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_npc_tharnariun_treetender(Creature *_Creature)
+{
+    return new npc_tharnariun_treetenderAI(_Creature);
+}
+
+bool QuestComplete_npc_tharnariun_treetender(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
+{
+    if (!pQuestGiver)
+        return false;
+
+    if (!pPlayer)
+        return false;
+
+    if (pQuest->GetQuestId() == QUEST_PLAGUED_LANDS)
+    {
+        if (auto pTharnariunAI = static_cast<npc_tharnariun_treetenderAI*>(pQuestGiver->AI()))
+            pTharnariunAI->StartPlaguedLandsEvent(pPlayer); // event that plays on completion of quest Plagued Lands
+    }
+    return false;
+}
+
+/*####
+# npc_terenthis
+####*/
+
+enum
+{
+    NPC_SENTINEL_SELARIN     = 3694,
+    QUEST_HOW_BIG_A_THREAT_2 = 985
+};
+
+bool QuestComplete_npc_terenthis(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
+{
+    if (!pQuestGiver)
+        return false;
+
+    if (!pPlayer)
+        return false;
+
+    if ((pQuest->GetQuestId() == QUEST_ESCAPE_THROUGH_FORCE) || (pQuest->GetQuestId() == QUEST_ESCAPE_THROUGH_STEALTH))
+    {
+        if (pQuestGiver->FindNearestCreature(NPC_SENTINEL_SELARIN, 40))
+            return true; // prevent starting db script if sentinel is already spawned
+        else if (Creature* pSentinel = pQuestGiver->SummonCreature(NPC_SENTINEL_SELARIN, 6409.01f, 381.597f, 13.7997f, 1, TEMPSUMMON_TIMED_COMBAT_OR_DEAD_DESPAWN, 120000))
+        {
+            pSentinel->SetWalk(false);
+            return false; // let quest_end_script take over from here
+        }
+        else
+            return true; // prevent starting db script if sentinel was not spawned
+    }
+    else if (pQuest->GetQuestId() == QUEST_HOW_BIG_A_THREAT_2)
+    {
+        if (pQuestGiver->FindNearestCreature(NPC_GRIMCLAW, 40))
+            return true; // prevent starting db script if grimclaw is already spawned
+        else
+            return false;
+    }
+
     return false;
 }
 
@@ -1312,6 +1552,17 @@ void AddSC_darkshore()
     newscript->Name = "npc_rabid_thistle_bear";
     newscript->GetAI = &GetAI_npc_rabid_thistle_bear;
     newscript->pEffectDummyCreature = &EffectDummyCreature_npc_rabid_thistle_bear;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_tharnariun_treetender";
+    newscript->GetAI = &GetAI_npc_tharnariun_treetender;
+    newscript->pQuestRewardedNPC = &QuestComplete_npc_tharnariun_treetender;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_terenthis";
+    newscript->pQuestRewardedNPC = &QuestComplete_npc_terenthis;
     newscript->RegisterSelf();
 
     newscript = new Script;

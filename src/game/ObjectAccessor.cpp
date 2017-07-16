@@ -81,21 +81,15 @@ Corpse* ObjectAccessor::GetCorpseInMap(ObjectGuid guid, uint32 mapid)
 Player* ObjectAccessor::FindPlayerNotInWorld(ObjectGuid guid)
 {
     if (!guid)
-        return NULL;
-
-    Player * plr = HashMapHolder<Player>::Find(guid);;
-    if (!plr || !plr->IsInWorld())
-        return NULL;
-
-    return plr;
+        return nullptr;
+    return HashMapHolder<Player>::Find(guid);
 }
 
-Player*
-ObjectAccessor::FindPlayer(ObjectGuid guid)
+Player* ObjectAccessor::FindPlayer(ObjectGuid guid)
 {
-    Player * plr = FindPlayerNotInWorld(guid);;
+    Player * plr = FindPlayerNotInWorld(guid);
     if (!plr || !plr->IsInWorld())
-        return NULL;
+        return nullptr;
 
     return plr;
 }

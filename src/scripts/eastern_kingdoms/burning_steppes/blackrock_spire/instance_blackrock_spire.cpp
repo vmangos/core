@@ -82,6 +82,8 @@ instance_blackrock_spire::instance_blackrock_spire(Map* pMap) : ScriptedInstance
     m_uiEmberseerRune06GUID(0),
     m_uiEmberseerRune07GUID(0),
 
+    m_uiBlackRockAltarGUID(0),
+
     m_uiUBRSDoor_Timer(0),
     m_uiUBRSDoor_Step(0),
 
@@ -104,6 +106,9 @@ void instance_blackrock_spire::OnObjectCreate(GameObject* pGo)
 {
     switch (pGo->GetEntry())
     {
+        case GO_BLACKROCK_ALTAR:
+            m_uiBlackRockAltarGUID = pGo->GetGUID();
+            break;
         case GO_EMBERSEER_IN:
             m_uiEmberseerInDoorGUID = pGo->GetGUID();
             if (GetData(TYPE_ROOM_EVENT) == DONE)
@@ -225,7 +230,7 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
     switch (pCreature->GetEntry())
     {
         case NPC_PYROGUARD_EMBERSEER:
-            m_uiEmberseerGUID = pCreature->GetEntry();
+            m_uiEmberseerGUID = pCreature->GetGUID();
             break;
         case NPC_LORD_VICTOR_NEFARIUS:
             m_uiNefariusGUID = pCreature->GetGUID();
@@ -494,6 +499,8 @@ uint64 instance_blackrock_spire::GetData64(uint32 uiType)
 {
     switch (uiType)
     {
+        case GO_BLACKROCK_ALTAR:
+            return m_uiBlackRockAltarGUID;
         case NPC_PYROGUARD_EMBERSEER:
             return m_uiEmberseerGUID;
         case NPC_LORD_VICTOR_NEFARIUS:

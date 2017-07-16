@@ -192,6 +192,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "cinematic",      SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayCinematicCommand,       "", nullptr },
         { NODE, "sound",          SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlaySoundCommand,           "", nullptr },
         { NODE, "scripttext",     SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayScriptText,           "", nullptr },
+        { NODE, "music",          SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayMusicCommand,           "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                                "", nullptr }
     };
 
@@ -215,6 +216,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "sellerror",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendSellErrorCommand,       "", nullptr },
         { NODE, "spellfail",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleDebugSendSpellFailCommand,       "", nullptr },
         { NODE, "visual",         SEC_GAMEMASTER,     true,  &ChatHandler::HandleSendSpellVisualCommand,          "", nullptr },
+        { NODE, "chanvisual",     SEC_GAMEMASTER,     true,  &ChatHandler::HandleSendSpellChannelVisualCommand,   "", nullptr },
+        { NODE, "chanvisualnext", SEC_GAMEMASTER,     true,  &ChatHandler::HandleDebugSendNextChannelSpellVisualCommand, "", nullptr },
         { NODE, "impact",         SEC_GAMEMASTER,     true,  &ChatHandler::HandleSendSpellImpactCommand,          "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                                "", nullptr }
     };
@@ -972,6 +975,7 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand goldCommandTable[] =
     {
         { MSTR, "remove",            SEC_GAMEMASTER,        true,  &ChatHandler::HandleGoldRemoval,               "", nullptr },
+        { MSTR, nullptr,              0,                    false, nullptr,                                       "", nullptr }
     };
 
     static ChatCommand commandTable[] =

@@ -1295,6 +1295,82 @@ bool QuestRewarded_npc_field_marshal_afrasiabi(Player* pPlayer, Creature* pCreat
     return true;
 }
 
+/*######
+## npc_master_wood
+######*/
+
+enum
+{
+    SAY_RUDE_1 = -1780227,
+    SAY_RUDE_2 = -1780228,
+    SAY_RUDE_3 = -1780229
+};
+
+struct npc_master_woodAI : public ScriptedAI
+{
+    npc_master_woodAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiRudeCount;
+
+    void Reset()
+    {
+        m_uiRudeCount = 0;
+    }
+
+    void ReceiveEmote(Player* pPlayer, uint32 emote)
+    {
+        if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->isInCombat())
+        {
+            switch (emote)
+            {
+                case TEXTEMOTE_RUDE:
+                {
+                    switch (m_uiRudeCount)
+                    {
+                        case 0:
+                            DoScriptText(SAY_RUDE_1, m_creature, pPlayer);
+                            m_uiRudeCount = 1;
+                            break;
+                        case 1:
+                            DoScriptText(SAY_RUDE_2, m_creature, pPlayer);
+                            m_uiRudeCount = 2;
+                            break;
+                        case 2:
+                            DoScriptText(SAY_RUDE_3, m_creature, pPlayer);
+                            m_uiRudeCount = 3;
+                            break;
+                        case 3:
+                            m_creature->GetMotionMaster()->MoveCharge(pPlayer, 1000, true);
+                            m_uiRudeCount = 0;
+                            break;
+                    }
+                    break;
+                }
+                case TEXTEMOTE_WAVE:
+                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_WAVE);
+                    break;
+                case TEXTEMOTE_BOW:
+                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_FLEX);
+                    break;
+                case TEXTEMOTE_SALUTE:
+                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_SALUTE);
+                    break;
+                case TEXTEMOTE_FLEX:
+                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_LAUGH);
+                    break;
+            }
+        }
+    }
+};
+
+CreatureAI* GetAI_npc_master_wood(Creature* pCreature)
+{
+    return new npc_master_woodAI(pCreature);
+}
+
 void AddSC_stormwind_city()
 {
     Script *newscript;
@@ -1357,5 +1433,10 @@ void AddSC_stormwind_city()
     newscript->Name = "npc_field_marshal_afrasiabi";
     newscript->GetAI = &GetAI_npc_field_marshal_afrasiabi;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_field_marshal_afrasiabi;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_master_wood";
+    newscript->GetAI = &GetAI_npc_master_wood;
     newscript->RegisterSelf();
 }

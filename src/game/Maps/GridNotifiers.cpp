@@ -109,6 +109,18 @@ VisibleNotifier::Notify()
                 plr->UpdateVisibilityOf(plr->GetCamera().GetBody(), &player);
         }
     }
+
+    // for every new visible unit send attack stance if needed
+    for (Object const* obj : i_visibleNow)
+        if (Unit const* unit = obj->ToUnit())
+            if (unit->hasUnitState(UNIT_STAT_MELEE_ATTACKING))
+                if (Unit const* victim = unit->getVictim())
+                {
+                    WorldPacket data(SMSG_ATTACKSTART, 8 + 8);
+                    data << unit->GetObjectGuid();
+                    data << victim->GetObjectGuid();
+                    player.SendDirectMessage(&data);
+                }
 }
 
 void

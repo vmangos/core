@@ -279,7 +279,9 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recv_data)
                 _player->PlayerTalkClass->SendQuestGiverQuestDetails(nextquest, guid, true);
         }
         else
+        {
             _player->PlayerTalkClass->SendQuestGiverOfferReward(pQuest, guid, true);
+        }
     }
 }
 
@@ -348,8 +350,9 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
     {
         if (uint32 quest = _player->GetQuestSlotQuestId(slot))
         {
-            if (!_player->TakeQuestSourceItem(quest, true))
-                return;                                     // can't un-equip some items, reject quest cancel
+            if (!_player->TakeOrReplaceQuestStartItems(quest, true, true))
+            // can't un-equip some items, reject quest cancel
+                return;
 
             if (const Quest *pQuest = sObjectMgr.GetQuestTemplate(quest))
             {

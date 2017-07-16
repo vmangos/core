@@ -278,7 +278,8 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
-    SetObjectScale(cinfo->scale);
+    SetObjectScale(DEFAULT_OBJECT_SCALE);
+    setNativeScale(cinfo->scale);
 
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
@@ -529,8 +530,6 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     {
         if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP || IsCivilian())
             SetPvP(true);
-        else
-            SetPvP(false);
     }
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)

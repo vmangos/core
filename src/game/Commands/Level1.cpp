@@ -434,7 +434,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         // before GM
         float x, y, z;
         m_session->GetPlayer()->GetClosePoint(x, y, z, target->GetObjectBoundingRadius());
-        target->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation());
+        target->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, target->GetOrientation(), TELE_TO_NOT_LEAVE_COMBAT);
     }
     else
     {

@@ -19,11 +19,9 @@
 #include "vmapexport.h"
 #include "model.h"
 #include "wmo.h"
-#include "mpq_libmpq04.h"
 #include "matrix.h"
-#include <cassert>
-#include <algorithm>
-#include <cstdio>
+#include <loadlib\loadlib.h>
+#include <libmpq\mpq_libmpq.h>
 
 Model::Model(std::string& filename) : filename(filename), vertices(0), indices(0)
 {

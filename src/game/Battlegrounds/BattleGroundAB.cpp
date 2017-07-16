@@ -54,17 +54,6 @@ void BattleGroundAB::Update(uint32 diff)
 
         for (int node = 0; node < BG_AB_NODES_MAX; ++node)
         {
-            // 3 sec delay to spawn new banner instead previous despawned one
-            if (m_BannerTimers[node].timer)
-            {
-                if (m_BannerTimers[node].timer > diff)
-                    m_BannerTimers[node].timer -= diff;
-                else
-                {
-                    m_BannerTimers[node].timer = 0;
-                    _CreateBanner(node, m_BannerTimers[node].type, m_BannerTimers[node].teamIndex, false);
-                }
-            }
 
             // 1-minute to occupy a node from contested state
             if (m_NodeTimers[node])
@@ -79,7 +68,7 @@ void BattleGroundAB::Update(uint32 diff)
                     m_prevNodes[node] = m_Nodes[node];
                     m_Nodes[node] += 2;
                     // create new occupied banner
-                    _CreateBanner(node, BG_AB_NODE_TYPE_OCCUPIED, teamIndex, true);
+                    _CreateBanner(node, BG_AB_NODE_TYPE_OCCUPIED, teamIndex);
                     _SendNodeUpdate(node);
                     _NodeOccupied(node, (teamIndex == 0) ? ALLIANCE : HORDE);
                     // Message to chatlog
@@ -219,15 +208,16 @@ void BattleGroundAB::HandleAreaTrigger(Player *Source, uint32 Trigger)
 
 /*  type: 0-neutral, 1-contested, 3-occupied
     teamIndex: 0-ally, 1-horde                        */
-void BattleGroundAB::_CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool delay)
+void BattleGroundAB::_CreateBanner(uint8 node, uint8 type, uint8 teamIndex)
 {
-    // Just put it into the queue
-    if (delay)
-    {
-        m_BannerTimers[node].timer = 2000;
-        m_BannerTimers[node].type = type;
-        m_BannerTimers[node].teamIndex = teamIndex;
-        return;
+    uint32 delay = 0;
+    switch (type){
+    case BG_AB_NODE_TYPE_CONTESTED:
+        delay = 1;
+        break;
+    case BG_AB_NODE_TYPE_OCCUPIED:
+        delay = 5;
+        break;
     }
 
     // cause the node-type is in the generic form
@@ -235,7 +225,8 @@ void BattleGroundAB::_CreateBanner(uint8 node, uint8 type, uint8 teamIndex, bool
     if (type != BG_AB_NODE_TYPE_NEUTRAL)
         type += teamIndex;
 
-    SpawnEvent(node, type, true, true);                           // will automaticly despawn other events
+
+    SpawnEvent(node, type, true, true, delay);                           // will automaticly despawn other events
 }
 
 int32 BattleGroundAB::_GetNodeNameId(uint8 node)
@@ -339,6 +330,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
     uint8 event = (sBattleGroundMgr.GetGameObjectEventIndex(target_obj->GetGUIDLow())).event1;
     if (event >= BG_AB_NODES_MAX)                           // not a node
         return;
+
     BG_AB_Nodes node = BG_AB_Nodes(event);
 
     BattleGroundTeamIndex teamIndex = GetTeamIndexByTeamId(source->GetTeam());
@@ -368,7 +360,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
         m_prevNodes[node] = m_Nodes[node];
         m_Nodes[node] = teamIndex + 1;
         // create new contested banner
-        _CreateBanner(node, BG_AB_NODE_TYPE_CONTESTED, teamIndex, true);
+        _CreateBanner(node, BG_AB_NODE_TYPE_CONTESTED, teamIndex);
         _SendNodeUpdate(node);
         m_NodeTimers[node] = BG_AB_FLAG_CAPTURING_TIME;
 
@@ -389,7 +381,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
             m_prevNodes[node] = m_Nodes[node];
             m_Nodes[node] = teamIndex + BG_AB_NODE_TYPE_CONTESTED;
             // create new contested banner
-            _CreateBanner(node, BG_AB_NODE_TYPE_CONTESTED, teamIndex, true);
+            _CreateBanner(node, BG_AB_NODE_TYPE_CONTESTED, teamIndex);
             _SendNodeUpdate(node);
             m_NodeTimers[node] = BG_AB_FLAG_CAPTURING_TIME;
 
@@ -405,7 +397,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
             m_prevNodes[node] = m_Nodes[node];
             m_Nodes[node] = teamIndex + BG_AB_NODE_TYPE_OCCUPIED;
             // create new occupied banner
-            _CreateBanner(node, BG_AB_NODE_TYPE_OCCUPIED, teamIndex, true);
+            _CreateBanner(node, BG_AB_NODE_TYPE_OCCUPIED, teamIndex);
             _SendNodeUpdate(node);
             m_NodeTimers[node] = 0;
             _NodeOccupied(node, (teamIndex == BG_TEAM_ALLIANCE) ? ALLIANCE : HORDE);
@@ -424,7 +416,7 @@ void BattleGroundAB::EventPlayerClickedOnFlag(Player *source, GameObject* target
         m_prevNodes[node] = m_Nodes[node];
         m_Nodes[node] = teamIndex + BG_AB_NODE_TYPE_CONTESTED;
         // create new contested banner
-        _CreateBanner(node, BG_AB_NODE_TYPE_CONTESTED, teamIndex, true);
+        _CreateBanner(node, BG_AB_NODE_TYPE_CONTESTED, teamIndex);
         _SendNodeUpdate(node);
         m_NodeTimers[node] = BG_AB_FLAG_CAPTURING_TIME;
 
@@ -485,7 +477,6 @@ void BattleGroundAB::Reset()
         m_Nodes[i] = 0;
         m_prevNodes[i] = 0;
         m_NodeTimers[i] = 0;
-        m_BannerTimers[i].timer = 0;
 
         // all nodes owned by neutral team at beginning
         m_ActiveEvents[i] = BG_AB_NODE_TYPE_NEUTRAL;

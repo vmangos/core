@@ -376,7 +376,7 @@ struct elloEbonlockeAI : ScriptedAI
         m_stitchesGuid.Clear();
     }
 
-    void SummonStitches();
+    bool SummonStitches();
     void LaunchStitches(Creature* pStitches) const;
 
     void UpdateAI(uint32 const uiDiff) override
@@ -410,7 +410,14 @@ enum
     NPC_WATCHER_SELKIN      = 1100,
     NPC_WATCHER_THAYER      = 1101,
 
-    STITCHES_YELL           = -1500000,
+    STITCHES_YELL_1         = -1500000,
+    STITCHES_YELL_2         = -1500001,
+    TOWNCRIER_YELL_1        = -1500002,
+    TOWNCRIER_YELL_2        = -1500003,
+    TOWNCRIER_YELL_3        = -1500004,
+    TOWNCRIER_YELL_4        = -1500005,
+    TOWNCRIER_YELL_5        = -1500006,
+    CUTFORD_YELL            = -1500007,
 
     SPELL_AURA_OF_ROT       = 3106
 };
@@ -437,10 +444,6 @@ static const Coords Watchman[] =
     { NPC_WATCHER_CORWIN,   -10575.13f, -1170.07f, 28.25f, 3.61f }
 };
 
-#define TOWNCRIER_YELL_1    "The abomination has overrun the Night Watch camp! Quickly, we must intercept it before it reaches town!"
-#define TOWNCRIER_YELL_2    "The abomination has come! Forward!"
-#define TOWNCRIER_YELL_3    "The beast is slain! All's well in Darkshire!"
-
 struct npc_stitchesAI : npc_escortAI
 {
     explicit npc_stitchesAI(Creature* pCreature) : npc_escortAI(pCreature)
@@ -465,7 +468,7 @@ struct npc_stitchesAI : npc_escortAI
     {
         auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
         if (pTownCrier && pTownCrier->isAlive())
-            pTownCrier->MonsterYell(TOWNCRIER_YELL_3);
+            pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_5);
 
         DespawnWatcher();
 
@@ -479,6 +482,16 @@ struct npc_stitchesAI : npc_escortAI
         {
             if (auto pElloAI = static_cast<elloEbonlockeAI*>(pEllo->AI()))
                 pElloAI->StitchesDied();
+        }
+    }
+
+    void KilledUnit(Unit* pUnit) override
+    {
+        if (pUnit && (pUnit->GetEntry() == NPC_WATCHER_SELKIN))
+        {
+            auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
+            if (pTownCrier && pTownCrier->isAlive())
+                pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_3);
         }
     }
 
@@ -500,7 +513,7 @@ struct npc_stitchesAI : npc_escortAI
             Watchman[index].x,
             Watchman[index].y,
             Watchman[index].z,
-            Watchman[index].o, TEMPSUMMON_CORPSE_DESPAWN, 10000, true);
+            Watchman[index].o, TEMPSUMMON_DEAD_DESPAWN, 10000, true);
     }
 
     void AddToFormation(Creature* pLeader, Creature* pAdd) const
@@ -537,9 +550,15 @@ struct npc_stitchesAI : npc_escortAI
             break;
         case NPC_WATCHER_CUTFORD:
             pSummoned->SetWalk(false);
-            pSummoned->GetMotionMaster()->MovePoint(0, -10904.029297f, -374.387299f, 39.899269f, MOVE_PATHFINDING);
-            pSummoned->SetCombatStartPosition(-10904.029297f, -374.387299f, 39.899269f);
-            pSummoned->SetHomePosition(-10904.029297f, -374.387299f, 39.899269f, 0.0f);
+            if (pSummoned->GetDistance2d(m_creature) > 40.0f)
+            {
+                pSummoned->GetMotionMaster()->MovePoint(0, -10904.632f, -425.087f, 42.189217f, MOVE_PATHFINDING);
+                pSummoned->SetCombatStartPosition(-10904.632f, -425.087f, 42.189217f);
+                pSummoned->SetHomePosition(-10904.632f, -425.087f, 42.189217f, 0.0f);
+            }
+            else
+                pSummoned->AI()->AttackStart(m_creature);
+            pSummoned->MonsterYell(CUTFORD_YELL);
             break;
         case NPC_WATCHER_SELKIN:
             if (auto pSummonedAI = static_cast<npc_watcher_selkinAI*>(pSummoned->AI()))
@@ -559,23 +578,30 @@ struct npc_stitchesAI : npc_escortAI
         {
         case 10:
         case 29:
-            m_creature->MonsterYellToZone(STITCHES_YELL);
+            m_creature->MonsterYellToZone(STITCHES_YELL_1);
             break;
-        case 21:
-            SummonWatchman(0);
-            SummonWatchman(1);
-            break;
-        case 23:
+        case 30:
             {
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
                 if (pTownCrier && pTownCrier->isAlive())
-                    pTownCrier->MonsterYell(TOWNCRIER_YELL_1);
+                    pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_1);
             }
             break;
-        case 33:
+        case 31:
+            SummonWatchman(0);
+            SummonWatchman(1);
+            break;
+        case 34:
             SummonWatchman(2);
             break;
-        case 41:
+        case 35:
+            {
+                auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
+                if (pTownCrier && pTownCrier->isAlive())
+                    pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_2);
+            }
+            break;
+        case 39:
             {
                 auto pLeader = SummonWatchman(3);
                 AddToFormation(pLeader, SummonWatchman(4));
@@ -586,12 +612,12 @@ struct npc_stitchesAI : npc_escortAI
             break;
         case 61:
             {
-                m_creature->MonsterYellToZone(STITCHES_YELL);
+                m_creature->MonsterYellToZone(STITCHES_YELL_1);
                 SummonWatchman(7);
                 SummonWatchman(8);
                 auto pTownCrier = m_creature->GetMap()->GetCreature(m_townCrierGuid);
                 if (pTownCrier && pTownCrier->isAlive())
-                    pTownCrier->MonsterYell(TOWNCRIER_YELL_2);                
+                    pTownCrier->MonsterYellToZone(TOWNCRIER_YELL_4);
             }
             break;
         case 65:
@@ -605,7 +631,7 @@ struct npc_stitchesAI : npc_escortAI
     void Aggro(Unit* /*pWho*/) override
     {
         if (!urand(0, 3))
-            m_creature->MonsterYell("ROAAAARR!");
+            m_creature->MonsterYell(STITCHES_YELL_2);
     }
 
     void UpdateEscortAI(uint32 const uiDiff) override
@@ -651,13 +677,13 @@ CreatureAI* GetAI_stitches(Creature* pCreature)
  * Lord Ello Ebonlocke
  */
 
-void elloEbonlockeAI::SummonStitches()
+bool elloEbonlockeAI::SummonStitches()
 {
     if (m_creature->GetMap()->GetCreature(m_stitchesGuid))
-        return;
+        return false;
 
     if (!m_bCanSummon)
-        return;
+        return false;
 
     if (auto pStitches = m_creature->SummonCreature(NPC_STITCHES, -10277.63f, 54.27f, 42.2f, 4.22f, TEMPSUMMON_DEAD_DESPAWN, 0, true))
     {
@@ -666,7 +692,10 @@ void elloEbonlockeAI::SummonStitches()
         pStitches->SetObjectScale(2.0f);
 
         LaunchStitches(pStitches);
+        return true;
     }
+
+    return false;
 }
 
 void elloEbonlockeAI::LaunchStitches(Creature* pStitches) const
@@ -703,10 +732,10 @@ bool QuestRewarded_npc_lord_ello_ebonlocke(Player* pPlayer, Creature* pCreature,
     if (pQuest->GetQuestId() == QUEST_TRANSLATION_TO_ELO)
     {
         if (auto pCreatureAI = static_cast<elloEbonlockeAI*>(pCreature->AI()))
-            pCreatureAI->SummonStitches();
+            return !pCreatureAI->SummonStitches();
     }
 
-    return true;
+    return false;
 }
 
 void AddSC_duskwood()
