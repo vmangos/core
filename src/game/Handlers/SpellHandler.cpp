@@ -445,13 +445,6 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
             _player->SetNextRelocationsIgnoredCount(1);
             break;
         }
-
-        // Eyes of the Beast case
-        if (spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_POSSESS_PET)
-        {
-            _player->SetNextRelocationsIgnoredCount(3);
-            break;
-        }
     }
 
     // channeled spell case (it currently casted then)

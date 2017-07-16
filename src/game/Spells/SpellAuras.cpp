@@ -2789,6 +2789,14 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
         pet->GetMotionMaster()->Clear(false);
         pet->GetMotionMaster()->MoveIdle();
         pet->UpdateControl();
+        pet->SetWalk(p_caster->IsWalking());
+
+        if (CharmInfo* charmInfo = pet->GetCharmInfo())
+        {
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsReturning(false);
+            charmInfo->SetIsFollowing(false);
+        }
     }
     else
     {
@@ -2801,21 +2809,8 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
         pet->UpdateControl();
         pet->SetCharmerGuid(ObjectGuid());
 
-        // on delete only do caster related effects
-        if (m_removeMode == AURA_REMOVE_BY_DELETE)
-            return;
-
-        pet->clearUnitState(UNIT_STAT_CONTROLLED);
-
-        pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-
-        //pet->AttackStop();
-
-        // out of range pet dismissed
-        if (!pet->IsWithinDistInMap(p_caster, pet->GetMap()->GetGridActivationDistance()))
-            p_caster->RemovePet(PET_SAVE_REAGENTS);
-        else if (!pet->isInCombat())
-            pet->GetMotionMaster()->MoveFollow(p_caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+        // To avoid moving the wrong unit on server side between cancellation and mover swap
+        // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode
     }
 }
 
