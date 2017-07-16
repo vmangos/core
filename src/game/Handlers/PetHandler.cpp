@@ -178,9 +178,8 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                     if (((Creature*)pet)->IsPet())
                     {
                         Pet* p = (Pet*)pet;
-                        if (p->getPetType() == HUNTER_PET)
-                            p->Unsummon(PET_SAVE_AS_CURRENT, _player);
-                        else
+                        // Hunter pets are dismissed with a spell with a cast time
+                        if (p->getPetType() != HUNTER_PET)
                             // dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                             p->Unsummon(PET_SAVE_NOT_IN_SLOT);
                     }
