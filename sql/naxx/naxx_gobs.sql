@@ -478,12 +478,8 @@ data16: losOK (Boolean flag)
 (181212, 0, 6693, 'Spider Wing Eye Portal Ramp',        0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 (181213, 0, 6694, 'Abom Wing Eye Portal Ramp',          0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 
-
 -- portal to frostwyrm lair
 (181229, 0, 6696, 'Portal', 0, 48, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '');
-
-
-
 
 -- script added to anub'rekhans door so we can do anubs welcome msg in onUse for the door
 UPDATE `gameobject_template` SET `ScriptName`='go_anub_door' WHERE `entry`='181126';
@@ -491,6 +487,3 @@ UPDATE `gameobject_template` SET `ScriptName`='go_anub_door' WHERE `entry`='1811
 -- give AreaTrigger outside Faerlina scriptname
 DELETE FROM `scripted_areatrigger` where entry = 4115;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4115', 'at_naxxramas');
-
-SELECT * FROM mangos.gameobject_template where entry in (select id from mangos.gameobject where map = 533) and type = 0;
-SELECT * FROM mangos.gameobject where map = 533;
