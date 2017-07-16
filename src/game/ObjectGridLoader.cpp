@@ -24,6 +24,7 @@
 #include "ObjectMgr.h"
 #include "MapPersistentStateMgr.h"
 #include "Creature.h"
+#include "CreatureAI.h"
 #include "GameObject.h"
 #include "DynamicObject.h"
 #include "Corpse.h"
@@ -332,7 +333,7 @@ ObjectGridStoper::Visit(CreatureMapType &m)
     // stop any fights at grid de-activation and remove dynobjects created at cast by creatures
     for (CreatureMapType::iterator iter = m.begin(); iter != m.end(); ++iter)
     {
-        iter->getSource()->CombatStop();
+        iter->getSource()->AI()->EnterEvadeMode();
         iter->getSource()->DeleteThreatList();
         iter->getSource()->RemoveAllDynObjects();
     }
