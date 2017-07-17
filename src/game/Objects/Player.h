@@ -2383,6 +2383,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         uint32 m_lastFallTime;
         float  m_lastFallZ;
 
+        LiquidTypeEntry const* m_lastLiquid;
         uint8 m_isunderwater;
         bool m_isInWater;
 
