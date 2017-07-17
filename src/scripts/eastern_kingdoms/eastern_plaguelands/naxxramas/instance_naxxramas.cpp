@@ -36,6 +36,8 @@ enum NaxxEvents
     EVENT_KT_LK_DIALOGUE_4,
     EVENT_KT_LK_DIALOGUE_5,
     EVENT_KT_LK_DIALOGUE_GATE_OPEN,
+
+    EVENT_SUMMON_FROGGER_WAVE
 };
 
 
@@ -57,7 +59,7 @@ void instance_naxxramas::Initialize()
     // 2-5min, no idea if it's correct
     m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5)); 
 
-
+    m_events.ScheduleEvent(EVENT_SUMMON_FROGGER_WAVE, Seconds(6));
 }
 
 void instance_naxxramas::SetTeleporterVisualState(GameObject* pGO, uint32 uiData)
@@ -875,6 +877,24 @@ void instance_naxxramas::Update(uint32 diff)
         case EVENT_KT_LK_DIALOGUE_GATE_OPEN:
             UpdateBossGate(GO_KELTHUZAD_DOOR, DONE);
             break;
+        case EVENT_SUMMON_FROGGER_WAVE:
+            static constexpr float pos[6][4] = {
+            {3128.66f, -3121.27f, 293.341f, 4.73893f},
+            {3154.58f, -3126.18f, 293.591f, 4.43020f},
+            {3175.28f, -3134.76f, 293.437f, 4.24492f},
+            {3129.630f, -3157.652f, 293.32f, 4.73893f},
+            {3144.894f, -3159.587f, 293.32f, 4.43020f},
+            {3159.510f, -3166.001f, 293.27f, 4.24492f} };
+            
+            for (int i = 0; i < 3; i++)
+            {
+                if (Creature* frogger = instance->SummonCreature(16027, pos[i][0], pos[i][1], pos[i][2], pos[i][3], TEMPSUMMON_TIMED_DESPAWN, 13000))
+                {
+                    frogger->GetMotionMaster()->MovePoint(0, pos[i+3][0], pos[i + 3][1], pos[i + 3][2], pos[i + 3][3]);
+                }
+            }
+            m_events.Repeat(Seconds(6));
+            break;
         }
     }
 }
@@ -1013,8 +1033,6 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
     }
 
 };
-
-
 
 struct mob_naxxramasGarboyleAI : public ScriptedAI
 {
