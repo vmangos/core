@@ -20,6 +20,11 @@ void ElementalInvasion::Update()
     auto stageEarth = sObjectMgr.GetSavedVariable(VAR_EARTH, 0);
     auto stageWater = sObjectMgr.GetSavedVariable(VAR_WATER, 0);
 
+    auto delayFire = sObjectMgr.GetSavedVariable(VAR_DELAY_FIRE, 0);
+    auto delayAir = sObjectMgr.GetSavedVariable(VAR_DELAY_AIR, 0);
+    auto delayWater = sObjectMgr.GetSavedVariable(VAR_DELAY_WATER, 0);
+    auto delayEarth = sObjectMgr.GetSavedVariable(VAR_DELAY_EARTH, 0);
+
     if (!sGameEventMgr.IsActiveEvent(EVENT_INVASION))
     {
         auto invasionTime = sObjectMgr.GetSavedVariable(VAR_INVAS_TIMER, 0);
@@ -32,22 +37,23 @@ void ElementalInvasion::Update()
             StartLocalInvasion(EVENT_IND_AIR, stageAir);
             StartLocalInvasion(EVENT_IND_WATER, stageWater);
             StartLocalInvasion(EVENT_IND_EARTH, stageEarth);
+
+            // Recover after restart
+            StartLocalBoss(EVENT_IND_FIRE, stageFire, delayFire);
+            StartLocalBoss(EVENT_IND_AIR, stageAir, delayAir);
+            StartLocalBoss(EVENT_IND_WATER, stageWater, delayWater);
+            StartLocalBoss(EVENT_IND_EARTH, stageEarth, delayEarth);
         }
     }
     else
     {
-        auto delayFire = sObjectMgr.GetSavedVariable(VAR_DELAY_FIRE, 0);
-        auto delayAir = sObjectMgr.GetSavedVariable(VAR_DELAY_AIR, 0);
-        auto delayWater = sObjectMgr.GetSavedVariable(VAR_DELAY_WATER, 0);
-        auto delayEarth = sObjectMgr.GetSavedVariable(VAR_DELAY_EARTH, 0);
+        // check bosses, spawn if possible
+        StartLocalBoss(EVENT_IND_FIRE, stageFire, delayFire);
+        StartLocalBoss(EVENT_IND_AIR, stageAir, delayAir);
+        StartLocalBoss(EVENT_IND_WATER, stageWater, delayWater);
+        StartLocalBoss(EVENT_IND_EARTH, stageEarth, delayEarth);
 
-        // bosses are not rifted in yet, all hail the bosses
-        StartLocalBoss(EVENT_IND_FIRE, stageFire);
-        StartLocalBoss(EVENT_IND_AIR, stageAir);
-        StartLocalBoss(EVENT_IND_WATER, stageWater);
-        StartLocalBoss(EVENT_IND_EARTH, stageEarth);
-
-        // bosses were just killed
+        // check for boss death
         // stop rifts immediately, stop bosses' events with a delay to allow looting
         StopLocalInvasion(EVENT_IND_FIRE, stageFire, delayFire);
         StopLocalInvasion(EVENT_IND_AIR, stageAir, delayAir);
@@ -73,32 +79,16 @@ void ElementalInvasion::Enable()
 
 void ElementalInvasion::Disable()
 {
-    // stop rifts
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_FIRE].eventRift))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_FIRE].eventRift, true);
+    for (uint8 i = 0; i < 4; ++i)
+    {
+        // Stop rifts
+        if (sGameEventMgr.IsActiveEvent(InvasionData[i].eventRift))
+            sGameEventMgr.StopEvent(InvasionData[i].eventRift, true);
 
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_AIR].eventRift))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_AIR].eventRift, true);
-
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_WATER].eventRift))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_WATER].eventRift, true);
-
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_EARTH].eventRift))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_EARTH].eventRift, true);
-
-    // stop bosses
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_FIRE].eventBoss))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_FIRE].eventBoss, true);
-
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_AIR].eventBoss))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_AIR].eventBoss, true);
-
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_WATER].eventBoss))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_WATER].eventBoss, true);
-
-    if (sGameEventMgr.IsActiveEvent(InvasionData[EVENT_IND_EARTH].eventBoss))
-        sGameEventMgr.StopEvent(InvasionData[EVENT_IND_EARTH].eventBoss, true);
-
+        // Stop bosses
+        if (sGameEventMgr.IsActiveEvent(InvasionData[i].eventBoss))
+            sGameEventMgr.StopEvent(InvasionData[i].eventBoss, true);
+    }
     // stop main event
     if (sGameEventMgr.IsActiveEvent(EVENT_INVASION))
         sGameEventMgr.StopEvent(EVENT_INVASION, true);
@@ -110,23 +100,25 @@ void ElementalInvasion::Disable()
 void ElementalInvasion::StartLocalInvasion(uint8 index, uint32 stage)
 {
     if (stage < STAGE_BOSS_DOWN)
-    {
         sGameEventMgr.StartEvent(InvasionData[index].eventRift, true);
-
-        if (stage == STAGE_BOSS)
-            sGameEventMgr.StartEvent(InvasionData[index].eventBoss, true);
-    }
 }
 
-void ElementalInvasion::StartLocalBoss(uint8 index, uint32 stage)
+void ElementalInvasion::StartLocalBoss(uint8 index, uint32 stage, uint8 delay)
 {
-    if (stage == STAGE_BOSS && !sGameEventMgr.IsActiveEvent(InvasionData[index].eventBoss))
+    // If we're in boss stage and the event is not started, start it.
+    // Similarly, if the boss is dead but we're delaying the despawn, start the
+    // event. Must do this or the next time the event is triggered the boss will
+    // be spawned dead
+    if (((stage == STAGE_BOSS_DOWN && delay > 0) || stage == STAGE_BOSS) && 
+            !sGameEventMgr.IsActiveEvent(InvasionData[index].eventBoss))
         sGameEventMgr.StartEvent(InvasionData[index].eventBoss, true);
 }
 
 void ElementalInvasion::StopLocalInvasion(uint8 index, uint32 stage, uint8 delay)
 {
-    if (stage == STAGE_BOSS_DOWN && sGameEventMgr.IsActiveEvent(InvasionData[index].eventBoss))
+    // Process regardless of event activeness, otherwise the main event can
+    // become perpetually stuck waiting for the delay to end
+    if (stage == STAGE_BOSS_DOWN)
     {
         if (sGameEventMgr.IsActiveEvent(InvasionData[index].eventRift))
             sGameEventMgr.StopEvent(InvasionData[index].eventRift, true);
@@ -136,10 +128,8 @@ void ElementalInvasion::StopLocalInvasion(uint8 index, uint32 stage, uint8 delay
             --delay;
             sObjectMgr.SetSavedVariable(InvasionData[index].varDelay, delay, true);
         }
-        else
-        {
+        else if (sGameEventMgr.IsActiveEvent(InvasionData[index].eventBoss))
             sGameEventMgr.StopEvent(InvasionData[index].eventBoss, true);
-        }
     }
 }
 
