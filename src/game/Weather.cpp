@@ -230,7 +230,7 @@ bool Weather::UpdateWeather()
 
     WorldPacket data(SMSG_WEATHER, (4 + 4 + 4));
     data << (uint32)m_type << (float)m_grade << (uint32)sound;
-    player->SendMessageToSet(&data, true);
+    player->GetMap()->MessageBroadcast(&data, m_zone);
 
     ///- Log the event
     char const* wthstr;
