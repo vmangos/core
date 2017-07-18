@@ -39,7 +39,17 @@ enum
 
     SPELL_UNBALANCING_STRIKE = 26613,
     SPELL_DISRUPTING_SHOUT   = 29107,
-    SPELL_HOPELESS           = 29125
+    SPELL_HOPELESS           = 29125,
+
+    NPC_DK_UNDERSTUDY   = 16803,
+};
+
+static constexpr float addPositions[4][4] =
+{
+    {2757.48f, -3111.52f, 267.768f, 3.92699f },
+    {2762.05f, -3084.47f, 267.768f, 2.1293f  },
+    {2778.91f, -3114.14f, 267.768f, 5.28835f },
+    {2781.87f, -3088.19f, 267.768f, 0.907571f},
 };
 
 struct boss_razuviousAI : public ScriptedAI
@@ -48,6 +58,7 @@ struct boss_razuviousAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
+        RespawnAdds();
     }
 
     instance_naxxramas* m_pInstance;
@@ -56,6 +67,8 @@ struct boss_razuviousAI : public ScriptedAI
     uint32 m_uiDisruptingShoutTimer;
     uint32 m_uiJaggedKnifeTimer;
     uint32 m_uiCommandSoundTimer;
+    
+    std::vector<ObjectGuid> summonedAdds;
 
     void Reset()
     {
@@ -63,6 +76,39 @@ struct boss_razuviousAI : public ScriptedAI
         m_uiDisruptingShoutTimer   = 15000;                 // 15 seconds
         m_uiJaggedKnifeTimer       = urand(10000, 15000);
         m_uiCommandSoundTimer      = 40000;                 // 40 seconds
+    }
+    
+    void RespawnAdds()
+    {
+        // start by despawning any adds that may still be around
+        for (auto it = summonedAdds.begin(); it != summonedAdds.end();)
+        {
+            if (Creature* cg = m_pInstance->GetCreature((*it)))
+            {
+                if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
+                    tmpSumm->UnSummon();
+                }
+            }
+            it = summonedAdds.erase(it);
+        }
+
+        // respawn all 4 adds
+        for (int i = 0; i < 4; i++)
+        {
+            if (Creature* pAdd = m_creature->SummonCreature(NPC_DK_UNDERSTUDY, addPositions[i][0], addPositions[i][1], addPositions[i][2], addPositions[i][3],
+                TEMPSUMMON_CORPSE_TIMED_DESPAWN, 60000))
+            {
+                summonedAdds.push_back(pAdd->GetObjectGuid());
+            }
+        }
+    }
+
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_RAZUVIOUS, FAIL);
+
+        RespawnAdds();
     }
 
     void KilledUnit(Unit* Victim)
@@ -106,6 +152,12 @@ struct boss_razuviousAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAZUVIOUS, IN_PROGRESS);
+
+        for (auto it = summonedAdds.begin(); it != summonedAdds.end(); it++)
+        {
+            if (Creature* pC = m_pInstance->GetCreature(*it))
+                pC->AI()->AttackStart(pWho);
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
