@@ -80,13 +80,6 @@ static const float WebSprayCooldown(bool initial = false)           { return ini
 static const float PoisonShockCooldown(bool initial = false)        { return initial ? 30000 : 30000; } // todo: possibly not correct
 static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 20000 : 20000; } // todo: possibly not correct
 
-/* note:
-It has been witnessed that with surgical timing Rogues (using Vanish) and Mages (with Iceblock) 
-can avoid the Web Spray and continue to DPS her down during the final Web Spray when they 
-would normally be immobilised. Also, since a Web Wrap takes a half second to be removed after 
-it's been DPS'd down, a player can avoid Web Spray if timed correctly.
-*/
-
 
 struct mob_webwrapAI : public ScriptedAI
 {
