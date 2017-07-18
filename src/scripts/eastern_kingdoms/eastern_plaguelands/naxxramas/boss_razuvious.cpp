@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: Boss_Razuvious
-SD%Complete: 75%
-SDComment: TODO: Timers and sounds need confirmation, implement spell Hopeless
+SD%Complete: 99%
+SDComment: TODO: Timers and sounds need confirmation
 SDCategory: Naxxramas
 EndScriptData */
 
@@ -52,6 +52,13 @@ static constexpr float addPositions[4][4] =
     {2781.87f, -3088.19f, 267.768f, 0.907571f},
 };
 
+enum Events
+{
+    EVENT_UNBALANCING_STRIKE = 1,
+    EVENT_DISRUPTING_SHOUT,
+    EVENT_COMMAND,
+};
+
 struct boss_razuviousAI : public ScriptedAI
 {
     boss_razuviousAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -62,20 +69,12 @@ struct boss_razuviousAI : public ScriptedAI
     }
 
     instance_naxxramas* m_pInstance;
-
-    uint32 m_uiUnbalancingStrikeTimer;
-    uint32 m_uiDisruptingShoutTimer;
-    uint32 m_uiJaggedKnifeTimer;
-    uint32 m_uiCommandSoundTimer;
-    
     std::vector<ObjectGuid> summonedAdds;
+    EventMap events;
 
     void Reset()
     {
-        m_uiUnbalancingStrikeTimer = 30000;                 // 30 seconds
-        m_uiDisruptingShoutTimer   = 15000;                 // 15 seconds
-        m_uiJaggedKnifeTimer       = urand(10000, 15000);
-        m_uiCommandSoundTimer      = 40000;                 // 40 seconds
+        events.Reset();
     }
     
     void RespawnAdds()
@@ -115,101 +114,60 @@ struct boss_razuviousAI : public ScriptedAI
     {
         if (urand(0, 3))
             return;
-
-        switch (urand(0, 1))
-        {
-            case 0:
-                DoScriptText(SAY_SLAY1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_SLAY2, m_creature);
-                break;
-        }
+        DoScriptText(urand(SAY_SLAY2, SAY_SLAY1), m_creature);
     }
 
     void JustDied(Unit* pKiller)
     {
         DoScriptText(SAY_DEATH, m_creature);
-
+        DoCastSpellIfCan(m_creature, SPELL_HOPELESS, CAST_TRIGGERED);
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAZUVIOUS, DONE);
     }
 
     void Aggro(Unit* pWho)
     {
-        switch (urand(0, 2))
-        {
-            case 0:
-                DoScriptText(SAY_AGGRO1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_AGGRO2, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_AGGRO3, m_creature);
-                break;
-        }
+        DoScriptText(urand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAZUVIOUS, IN_PROGRESS);
 
-        for (auto it = summonedAdds.begin(); it != summonedAdds.end(); it++)
-        {
-            if (Creature* pC = m_pInstance->GetCreature(*it))
-                pC->AI()->AttackStart(pWho);
-        }
+        m_creature->CallForHelp(30.0f);
+
+        events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, Seconds(30));
+        events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, Seconds(15));
+        events.ScheduleEvent(EVENT_COMMAND, Seconds(40));
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        // Unbalancing Strike
-        if (m_uiUnbalancingStrikeTimer < uiDiff)
+        
+        events.Update(uiDiff);
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_UNBALANCING_STRIKE);
-            m_uiUnbalancingStrikeTimer = 30000;
-        }
-        else
-            m_uiUnbalancingStrikeTimer -= uiDiff;
-
-        // Disrupting Shout
-        if (m_uiDisruptingShoutTimer < uiDiff)
-        {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISRUPTING_SHOUT);
-            m_uiDisruptingShoutTimer = 25000;
-        }
-        else
-            m_uiDisruptingShoutTimer -= uiDiff;
-
-        // Random say
-        if (m_uiCommandSoundTimer < uiDiff)
-        {
-            switch (urand(0, 3))
+            switch (eventId)
             {
-                case 0:
-                    DoScriptText(SAY_COMMAND1, m_creature);
-                    break;
-                case 1:
-                    DoScriptText(SAY_COMMAND2, m_creature);
-                    break;
-                case 2:
-                    DoScriptText(SAY_COMMAND3, m_creature);
-                    break;
-                case 3:
-                    DoScriptText(SAY_COMMAND4, m_creature);
-                    break;
+            case EVENT_UNBALANCING_STRIKE:
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_UNBALANCING_STRIKE);
+                events.Repeat(Seconds(30));
+                break;
+            case EVENT_DISRUPTING_SHOUT:
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISRUPTING_SHOUT);
+                events.Repeat(Seconds(25));
+                break;
+            case EVENT_COMMAND:
+                DoScriptText(urand(SAY_COMMAND4, SAY_COMMAND1), m_creature);
+                events.Repeat(Seconds(40));
+                break;
             }
-
-            m_uiCommandSoundTimer = 40000;
         }
-        else
-            m_uiCommandSoundTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
 };
+
 CreatureAI* GetAI_boss_razuvious(Creature* pCreature)
 {
     return new boss_razuviousAI(pCreature);
