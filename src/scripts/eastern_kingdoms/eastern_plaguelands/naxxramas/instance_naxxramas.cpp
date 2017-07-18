@@ -248,7 +248,8 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             break;
 
         case NPC_SUB_BOSS_TRIGGER:
-            m_lGothTriggerList.push_back(pCreature->GetGUID());
+            if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
+                m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
         
         // naxxramas acolyte and cultist

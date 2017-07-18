@@ -193,24 +193,48 @@ struct boss_gothikAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if (Creature* pAnchor = m_pInstance->GetClosestAnchorForGoth(pSummoned, true))
+        Creature* pAnchor = m_pInstance->GetClosestAnchorForGoth(pSummoned, true);
+        if (!pAnchor)
+            return;
+
+        Creature* pTempTrigger = m_creature->SummonCreature(
+            NPC_SUB_BOSS_TRIGGER,
+            pSummoned->GetPositionX(),
+            pSummoned->GetPositionY(),
+            pSummoned->GetPositionZ(),
+            pSummoned->GetOrientation(),
+            TEMPSUMMON_TIMED_DESPAWN,
+            15000);
+        if (!pTempTrigger)
+            return;
+
+        switch (pSummoned->GetEntry())
         {
-            switch (pSummoned->GetEntry())
-            {
-                // Wrong caster, it expected to be pSummoned.
-                // Mangos deletes the spell event at caster death, so for delayed spell like this
-                // it's just a workaround. Does not affect other than the visual though (+ spell takes longer to "travel")
-                case NPC_UNREL_TRAINEE:
-                    m_creature->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                    break;
-                case NPC_UNREL_DEATH_KNIGHT:
-                    m_creature->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                    break;
-                case NPC_UNREL_RIDER:
-                    m_creature->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                    break;
-            }
+            // Wrong caster, it expected to be pSummoned.
+            // Mangos deletes the spell event at caster death, so for delayed spell like this
+            // it's just a workaround. Does not affect other than the visual though (+ spell takes longer to "travel")
+            // Elysium: we use a temp creature to handle this issue
+            case NPC_UNREL_TRAINEE:
+                //m_creature->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+                //pSummoned->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+                pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+                break;
+            case NPC_UNREL_DEATH_KNIGHT:
+                pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+                break;
+            case NPC_UNREL_RIDER:
+                pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+                break;
         }
+    }
+
+    void JustSummoned(Creature *pSummoned)
+    {
+        if (pSummoned->GetEntry() == NPC_SUB_BOSS_TRIGGER)
+            return;
+
+        // TODO : Only set in combat with proper side
+        pSummoned->SetInCombatWithZone();
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -416,7 +440,7 @@ bool EffectDummyCreature_spell_anchor(Unit* pCaster, uint32 uiSpellId, SpellEffe
         case SPELL_B_TO_SKULL:
         case SPELL_C_TO_SKULL:
         {
-            if (Creature* pGoth = pInstance->instance->GetCreature(pInstance->GetData64(NPC_GOTHIK)))
+            if (Creature* pGoth = pInstance->GetSingleCreatureFromStorage(NPC_GOTHIK))
             {
                 uint32 uiNpcEntry = NPC_SPECT_TRAINEE;
 
