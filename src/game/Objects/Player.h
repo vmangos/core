@@ -1231,6 +1231,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void GiveQuestSourceItemIfNeed(Quest const *pQuest);
         bool TakeOrReplaceQuestStartItems( uint32 quest_id, bool msg, bool giveQuestStartItem );
         bool GetQuestRewardStatus( uint32 quest_id ) const;
+        const QuestStatusData* GetQuestStatusData(uint32 quest_id) const;
         QuestStatus GetQuestStatus( uint32 quest_id ) const;
         void SetQuestStatus( uint32 quest_id, QuestStatus status );
 

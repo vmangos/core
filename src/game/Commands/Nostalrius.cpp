@@ -2831,17 +2831,31 @@ bool ChatHandler::HandlePetRenameCommand(char* args)
         SetSentErrorMessage(true);
         return false;
     }
-    CharacterPetCache* petData = sCharacterDatabaseCache.GetCharacterPetById(petId);
-    if (!petData)
+
+    std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT owner, name FROM character_pet WHERE id = %u", petId));
+
+    if (!result)
     {
         PSendSysMessage("Pet #%u not found", petId);
         SetSentErrorMessage(true);
         return false;
     }
-    PSendSysMessage("Pet #%u (\"%s\", owner #%u) renamed to \"%s\"", petData->id, petData->name.c_str(), petData->owner, newName.c_str());
-    petData->name = newName;
+
+    auto fields = result->Fetch();
+    auto owner_guid = fields[0].GetUInt32();
+    auto pet_name = fields[1].GetString();
+
+    PSendSysMessage("Pet #%u (\"%s\", owner #%u) renamed to \"%s\"", petId, pet_name, owner_guid, newName.c_str());
     CharacterDatabase.escape_string(newName);
     CharacterDatabase.PExecute("UPDATE character_pet SET name = \"%s\" WHERE id = %u", newName.c_str(), petId);
+
+    CharacterPetCache* petData = sCharacterDatabaseCache.GetCharacterPetById(petId);
+
+    if (petData)
+    {
+        petData->name = newName;
+    }
+
     return true;
 }
 

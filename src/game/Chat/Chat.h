@@ -783,9 +783,11 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleCooldownCommand(char* args);
         bool HandleUnLearnCommand(char* args);
+        bool HandleRemoveRidingCommand(char* args);
         bool HandleGetDistanceCommand(char* args);
         bool HandleModifyStandStateCommand(char* args);
         bool HandleDieCommand(char* args);
+		bool HandleFearCommand(char* args);
         bool HandleDamageCommand(char* args);
         bool HandleReviveCommand(char* args);
         bool HandleModifyMorphCommand(char* args);
@@ -799,6 +801,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleShowAreaCommand(char* args);
         bool HandleHideAreaCommand(char* args);
         bool HandleAddItemCommand(char* args);
+        bool HandleDeleteItemCommand(char* args);
         bool HandleAddItemSetCommand(char* args);
 
         bool HandleBankCommand(char* args);

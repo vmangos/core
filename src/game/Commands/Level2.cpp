@@ -3812,19 +3812,43 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
     if (!ExtractUInt32(&args, itemId))
         return false;
 
-    Player* pl = m_session->GetPlayer();
-    Player* plTarget = getSelectedPlayer();
-    if(!plTarget)
-        plTarget = pl;
+    Player* plTarget;
+    ObjectGuid target_guid;
+    std::string target_name;
 
-    if (ItemPrototype const* pItem = ObjectMgr::GetItemPrototype(itemId))
+    if (!ExtractPlayerTarget(&args, &plTarget, &target_guid, &target_name))
+        return false;
+
+    ItemPrototype const* pItem = ObjectMgr::GetItemPrototype(itemId);
+
+    if (!pItem)
     {
-        uint32 itemCount = plTarget->GetItemCount(itemId, true);
-        PSendSysMessage("%s's amount of %s (id %u) is: %u", GetNameLink(plTarget).c_str(), GetItemLink(pItem).c_str(), itemId, itemCount);
+        PSendSysMessage("Unknown item %u", itemId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    uint32 itemCount = 0;
+
+    if (plTarget)
+    {
+        itemCount = plTarget->GetItemCount(itemId, true);
     }
     else
-        PSendSysMessage("Unknown item %u", itemId);
+    {
+        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery(
+            "SELECT SUM(count) AS item_count FROM item_instance ii WHERE itemEntry = %u and owner_guid = %u",
+            itemId, target_guid.GetCounter()
+        ));
 
+        if (result)
+        {
+            auto fields = result->Fetch();
+            itemCount = fields[0].GetUInt32();
+        }
+    }
+
+    PSendSysMessage("%s's amount of %s (id %u) is: %u", target_name, GetItemLink(pItem).c_str(), itemId, itemCount);
     return true;
 }
 

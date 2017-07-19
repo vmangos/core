@@ -13176,6 +13176,18 @@ bool Player::GetQuestRewardStatus(uint32 quest_id) const
     return false;
 }
 
+const QuestStatusData* Player::GetQuestStatusData(uint32 quest_id) const
+{
+    auto it = mQuestStatus.find(quest_id);
+
+    if (it != mQuestStatus.end())
+    {
+        return &it->second;
+    }
+
+    return nullptr;
+}
+
 QuestStatus Player::GetQuestStatus(uint32 quest_id) const
 {
     if (quest_id)
