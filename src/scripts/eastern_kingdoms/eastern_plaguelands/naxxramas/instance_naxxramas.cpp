@@ -55,7 +55,7 @@ instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
 void instance_naxxramas::Initialize()
 {
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
-
+    m_events.Reset();
     // 2-5min, no idea if it's correct
     m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5)); 
 
