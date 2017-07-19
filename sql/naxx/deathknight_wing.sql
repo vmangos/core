@@ -38,3 +38,37 @@ VALUES (533000,16861,533,0,0,2932.73,-3188.07,273.371,3.13692,25,5,0,113175,1243
 -- death lord and death knight cavalier curse of agony event slightly randomized to more easily stack with group when not spread
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1686101;
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1616301;
+
+
+-- Dark Touched Warrior periodically wipe aggro
+UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16156;
+DELETE FROM `creature_ai_scripts` where id = 1615601;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1615601, 16156, 0, 0, 0, 1, 5000, 5000, 5000, 5000, 14, -100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dark Touched Warrior periodically wipe aggro');
+
+-- Death Knight raise dead	
+DELETE FROM `creature_ai_scripts` where id = 1614603;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1614603, 16146, 0, 0, 100, 1, 5000, 5000, 10000, 20000, 11, 28353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight raise dead');
+
+-- Death knight frequency of intimidating shout reduced
+UPDATE `creature_ai_scripts` SET `event_param3`=14000, `event_param4`=18000 WHERE `id`=1614601;
+
+-- Creatures that the spell Raise Dead can target
+-- todo: no idea which creatures should be "ressable", other than other death knights should not be.
+DELETE FROM `spell_script_target` where entry = 28353;
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) 
+VALUES
+(28353, 2, 16165),
+(28353, 2, 16167),
+(28353, 2, 16154),
+(28353, 2, 16193),
+(28353, 2, 16156),
+(28353, 2, 16157);	
+
+
+
