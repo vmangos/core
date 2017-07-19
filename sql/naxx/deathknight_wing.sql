@@ -25,6 +25,8 @@ UPDATE `creature_template` SET `scale` = 1.8 where `entry` IN (16861, 16861);
 -- correct faction of death lord
 UPDATE `creature_template` SET `faction_A`=21, `faction_H`=21 WHERE `entry`=16861;
 
+-- Death lord deathcoil hits random excluding top aggro, rather than random including top aggro
+UPDATE `creature_ai_scripts` SET `action1_param2`=5 WHERE `id`=1686103;
 
 -- death lord
 -- https://youtu.be/VrykhhdPfc4?t=6m9s
