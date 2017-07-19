@@ -1047,6 +1047,11 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     {
         acidVolleyTimer = 4000;
     }
+    
+    void Aggro(Unit*)
+    {
+        m_creature->CallForHelp(20.0f);
+    }
 
     void UpdateAI(const uint32 diff)
     {
@@ -1074,6 +1079,56 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     }
 };
 
+struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
+{
+    mob_naxxramasPlagueSlimeAI(Creature* pCreature)
+        : ScriptedAI(pCreature)
+    {
+        Reset();
+        prev_spell = 0;
+    }
+    uint32 colorChangeTimer;
+    uint32 prev_spell;
+    void ChangeColor()
+    {
+        uint32 spell = urand(28987, 28990);
+        if(const DBCSpellEntry* entry = sSpellStore.LookupEntry(spell))
+            m_creature->UpdateEntry(entry->EffectMiscValue[0]);
+        if (prev_spell)
+            m_creature->RemoveAurasDueToSpell(prev_spell);
+        DoCastSpellIfCan(m_creature, spell, CAST_TRIGGERED);
+        m_creature->SetObjectScale(2.0f); // updateentry and the actual spells screws up the scale...
+        prev_spell = spell;
+    }
+
+    void Reset() override
+    {
+        colorChangeTimer = 0;
+        ChangeColor();
+    }
+
+    void Aggro(Unit*)
+    {
+        m_creature->CallForHelp(10.0f);
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (colorChangeTimer < diff)
+        {
+            colorChangeTimer = urand(9000, 12000); // todo: no idea if timer is correct
+            ChangeColor();
+        }
+        else
+            colorChangeTimer -= diff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
 {
     return new mob_spiritOfNaxxramasAI(pCreature);
@@ -1082,6 +1137,11 @@ CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
 CreatureAI* GetAI_mob_naxxramasGargoyle(Creature* pCreature)
 {
     return new mob_naxxramasGarboyleAI(pCreature);
+}
+
+CreatureAI* GetAI_mob_plagueSlimeAI(Creature* pCreature)
+{
+    return new mob_naxxramasPlagueSlimeAI(pCreature);
 }
 
 void AddSC_instance_naxxramas()
@@ -1106,5 +1166,10 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "naxxramas_gargoyle_ai";
     pNewScript->GetAI = &GetAI_mob_naxxramasGargoyle;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "naxxramas_plague_slime_ai";
+    pNewScript->GetAI = &GetAI_mob_plagueSlimeAI;
     pNewScript->RegisterSelf();
 }
