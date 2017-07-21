@@ -241,13 +241,15 @@ struct boss_maexxnaAI : public ScriptedAI
 
         std::shuffle(wepWrapLoc.begin(), wepWrapLoc.end(), m_random);
 
-        auto candIt = candidates.begin();
         for (int i = 0; i < 3; i++)
         {
             if (!candidates.size())
                 break;
+            auto candIt = candidates.begin();
 
-            std::advance(candIt, urand(0, candidates.size() - 1));
+            if(candidates.size() > 1)
+                std::advance(candIt, urand(0, candidates.size() - 1));
+            
             Unit* pTarget = *candIt;
             candIt = candidates.erase(candIt);
 
