@@ -3431,7 +3431,9 @@ void Unit::SetCurrentCastedSpell(Spell * pSpell)
 
     if (pSpell == m_currentSpells[CSpellType]) return;      // avoid breaking self
     // Hack for Heigans Plague Cloud and KTs channel, without it, you interrupt yourself on first tick
-    else if(pSpell->m_spellInfo->Id == 30122 || pSpell->m_spellInfo->Id == 29422) return;
+    else if(pSpell->m_spellInfo->Id == 30122 || pSpell->m_spellInfo->Id == 29422 
+        || pSpell->m_spellInfo->Id == 28369 || pSpell->m_spellInfo->Id == 30075) // same thing for toxic gas
+        return;
     // break same type spell if it is not delayed
     InterruptSpell(CSpellType, false);
 

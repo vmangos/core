@@ -1128,6 +1128,34 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
+struct mob_toxic_tunnelAI : public ScriptedAI
+{
+    mob_toxic_tunnelAI(Creature* pCreature)
+        : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+    uint32 checktime;
+    void Reset() override
+    {
+        checktime = 0;
+    }
+
+    void AttackStart(Unit*) { }
+    void MoveInLineOfSight(Unit*) { }
+
+    void UpdateAI(const uint32 diff) override 
+    {
+        if (checktime < diff)
+        {
+            checktime = 5000;
+            if (!m_creature->HasAura(28370))
+                m_creature->CastSpell(m_creature, 28370, true);
+        }
+        else
+            checktime -= diff;
+    }
+};
 
 CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
 {
@@ -1142,6 +1170,11 @@ CreatureAI* GetAI_mob_naxxramasGargoyle(Creature* pCreature)
 CreatureAI* GetAI_mob_plagueSlimeAI(Creature* pCreature)
 {
     return new mob_naxxramasPlagueSlimeAI(pCreature);
+}
+
+CreatureAI* GetAI_toxic_tunnel(Creature* pCreature)
+{
+    return new mob_toxic_tunnelAI(pCreature);
 }
 
 void AddSC_instance_naxxramas()
@@ -1171,5 +1204,11 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "naxxramas_plague_slime_ai";
     pNewScript->GetAI = &GetAI_mob_plagueSlimeAI;
+    pNewScript->RegisterSelf();
+
+
+    pNewScript = new Script;
+    pNewScript->Name = "toxic_tunnel_ai";
+    pNewScript->GetAI = &GetAI_toxic_tunnel;
     pNewScript->RegisterSelf();
 }

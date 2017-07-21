@@ -29,3 +29,7 @@ INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1602902, 16029, 0, 0, 100, 1, 2000, 2000, 5000, 5000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge');
+
+
+-- toxic tunnel creature lvl 60 and script
+UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
