@@ -655,7 +655,6 @@ struct boss_kelthuzadAI : public ScriptedAI
                     {
                         if (urand(0, 1))
                             DoScriptText(SAY_SPECIAL3_MANA_DET, m_creature);
-                        events.Repeat(Seconds(urand(10, 20)));
                         break;
                     }
                 }
