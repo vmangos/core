@@ -136,3 +136,13 @@ REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1621602, 16216, 0, 0, 100, 1, 2000, 2000, 8000, 8000, 11, 15284, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords cleave');
+
+REPLACE INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES 
+(127816, 127816, 0, 0   ,3),
+(127816, 127817, 3, 270 ,3),
+(127819, 127819, 0, 0   ,3),
+(127819, 127820, 3, 270 ,3),
+(127796, 127796, 0, 0   ,3),
+(127796, 127797, 3, 270 ,3),
+(127822, 127822, 0, 0   ,3),
+(127822, 127823, 4, 90  ,3);
