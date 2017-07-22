@@ -347,8 +347,15 @@ struct boss_sapphironAI : public ScriptedAI
             m_creature->SendMovementMessageToSet(std::move(data), true);
             m_creature->UpdateCombatState(false);
             m_creature->SetReactState(ReactStates::REACT_PASSIVE);
+            
 
-            m_creature->CombatStop(true);
+
+            m_creature->InterruptNonMeleeSpells(false);
+            m_creature->AttackStop();
+            m_creature->RemoveAllAttackers();
+            ((Creature*)this)->m_TargetNotReachableTimer = 0;
+            if (((Creature*)this)->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
+                ((Creature*)this)->ClearTemporaryFaction();
         }
         else
         {
