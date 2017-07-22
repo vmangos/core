@@ -33,3 +33,14 @@ VALUES
 
 -- toxic tunnel creature lvl 60 and script
 UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
+
+delete from `creature` where id = 16400;
+INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`, `DeathState`, `MovementType`,`spawnFlags`) 
+VALUES
+(127631,16400,533,11686,0,3223.02,-3218.73,316.371,0.760995,3600,10,0,17010,0,  0,1,0),
+(127632,16400,533,11686,0,3208.17,-3234.59,315.457,0.742117,3600,10,0,17010,0,  0,1,0),
+(127633,16400,533,11686,0,3178.61,-3263.67,316.428,0.783571,3600,10,0,17010,0,  0,1,0),
+(127634,16400,533,11686,0,3217.32,-3224.75,316.058,0.825181,3600,10,0,17010,0,  0,1,0),
+(127635,16400,533,11686,0,3190.63,-3252.56,315.568,3.91208, 3600,10,0,17010,0,  0,1,0),
+(127636,16400,533,11686,0,3237.07,-3207.60,317.365,3.95566, 3600,10,0,17010,0,  0,1,0),
+(127637,16400,533,11686,0,3246.76,-3193.86,317.33, 3.83134, 3600,10,0,17010,0,  0,1,0);
