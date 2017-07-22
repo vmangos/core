@@ -70,6 +70,7 @@ enum Events
     EVENT_TAIL_SWEEP,
     EVENT_CLEAVE,
     EVENT_FROST_BREATH,
+    EVENT_RECALC_ICEBLOCK_POS
 };
 
 enum Phase
@@ -128,33 +129,20 @@ struct boss_sapphironAI : public ScriptedAI
     Phase phase;
     uint32 spawnTimer;
     uint32 berserkTimer;
-    std::vector<ObjectGuid> iceboltedPlayers;
-    std::vector<ObjectGuid> iceblocks;
+    std::vector<std::pair<ObjectGuid, ObjectGuid>> iceboltTargets;
     ObjectGuid wingBuffetCreature;
 
     void Reset()
     {
-        //m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
-        //m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
-        //SetCombatMovement(true);
-        //m_creature->SetLevitate(false);
         phase = PHASE_GROUND;
         m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
 
         events.Reset();
-        iceboltedPlayers.clear();
+        DeleteAndDispellIceBlocks();
         berserkTimer = 900000; // 15 min
         m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
         UnSummonWingBuffet();
         DeleteAndDispellIceBlocks();
-        //FrostBreath_Timer = 2500;
-        //LifeDrain_Timer = 24000;
-        //Blizzard_Timer = 20000;
-        //Fly_Timer = 45000;
-        //Icebolt_Timer = 4000;
-        //land_Timer = 2000;
-        //Icebolt_Count = 0;
-        //landoff = false;
     }
 
     void UnSummonWingBuffet()
@@ -172,23 +160,14 @@ struct boss_sapphironAI : public ScriptedAI
     
     void DeleteAndDispellIceBlocks()
     {
-        for (auto it = iceboltedPlayers.begin(); it != iceboltedPlayers.end(); it++)
+        for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
         {
-            if (Player* pPlayer = m_pInstance->GetMap()->GetPlayer(*it))
-            {
+            if (Player* pPlayer = m_pInstance->GetMap()->GetPlayer(it->first))
                 pPlayer->RemoveAurasDueToSpell(SPELL_ICEBOLT);
-            }
-        }
-        iceboltedPlayers.clear();
-
-        for (int i = 0; i < iceblocks.size(); i++)
-        {
-            if (GameObject* pGO = m_pInstance->GetGameObject(iceblocks.at(i)))
-            {
+            if (GameObject* pGO = m_pInstance->GetGameObject(it->second))
                 pGO->Delete();
-            }
         }
-        iceblocks.clear();
+        iceboltTargets.clear();
     }
 
     void MakeVisible()
@@ -260,7 +239,7 @@ struct boss_sapphironAI : public ScriptedAI
 
         events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
         events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
-        events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(40));
+        events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(4));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
     }
@@ -268,6 +247,8 @@ struct boss_sapphironAI : public ScriptedAI
     void JustDied(Unit* pKiller)
     {
         m_creature->CastSpell(m_creature, SPELL_SAPPHIRON_DIES, true);
+        UnSummonWingBuffet();
+        DeleteAndDispellIceBlocks();
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SAPPHIRON, DONE);
     }
@@ -278,16 +259,24 @@ struct boss_sapphironAI : public ScriptedAI
         {
         case SPELL_ICEBOLT:
         {
-            // If the dmg is splash dmg we add this guy as well so we can dispell him on the frost breath hit
-            if (std::find(iceboltedPlayers.begin(), iceboltedPlayers.end(), target->GetObjectGuid()) == iceboltedPlayers.end())
-                iceboltedPlayers.push_back(target->GetObjectGuid());
+            bool found = false;
+            auto it = iceboltTargets.begin();
+            for (it; it != iceboltTargets.end(); it++)
+            {
+                if (it->first == target->GetObjectGuid())
+                    break;
+            }
+            if (it == iceboltTargets.end())
+                it = iceboltTargets.insert(iceboltTargets.end(), std::make_pair(target->GetObjectGuid(), ObjectGuid()));
 
             // Uncertain if the iceblock should always be angled towards the center or not
             float ang = target->GetAngle(m_creature);
             if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(),
                 target->GetPositionZ(), ang))
             {
-                iceblocks.push_back(pGO->GetObjectGuid());
+                it->second = pGO->GetObjectGuid();
+                //iceblocks.push_back(pGO->GetObjectGuid());
+                events.ScheduleEvent(EVENT_RECALC_ICEBLOCK_POS, Seconds(1));
             }
             break;
         }
@@ -297,7 +286,7 @@ struct boss_sapphironAI : public ScriptedAI
     void DoIceBolt()
     {
         ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
-        if (threatlist.size() <= iceboltedPlayers.size())
+        if (threatlist.size() <= iceboltTargets.size())
             return;
 
         std::vector<Unit*> suitableUnits;
@@ -306,9 +295,12 @@ struct boss_sapphironAI : public ScriptedAI
             {
                 if (pTarget->isDead())
                     continue;
-                if (std::find(iceboltedPlayers.begin(), iceboltedPlayers.end(), pTarget->GetObjectGuid()) != iceboltedPlayers.end())
-                    continue;
                 
+                for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
+                {
+                    if (it->first == pTarget->GetObjectGuid())
+                        continue;
+                }
                 suitableUnits.push_back(pTarget);
             }
 
@@ -317,7 +309,9 @@ struct boss_sapphironAI : public ScriptedAI
         auto it = suitableUnits.begin();
         std::advance(it, urand(0, suitableUnits.size() - 1));
         Unit* target = *it;
-        iceboltedPlayers.push_back(target->GetObjectGuid());
+        
+        //iceboltedPlayers.push_back(target->GetObjectGuid());
+        iceboltTargets.push_back(std::make_pair(target->GetObjectGuid(), ObjectGuid()));
         m_creature->SetFacingToObject(target);
         DoCastSpellIfCan(target, SPELL_ICEBOLT, CAST_TRIGGERED);
 
@@ -521,6 +515,19 @@ struct boss_sapphironAI : public ScriptedAI
                     events.Repeat(Seconds(urand(5, 10)));
                 else
                     events.Repeat(100);
+                break;
+            case EVENT_RECALC_ICEBLOCK_POS:
+                for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
+                {
+                    Player* pPlayer = nullptr;
+                    GameObject* pGO = nullptr;
+                    pPlayer = m_pInstance->GetMap()->GetPlayer(it->first);
+                    pGO = m_pInstance->GetGameObject(it->second);
+                    if (pPlayer && pGO)
+                    {
+                        pGO->Relocate(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
+                    }
+                }
                 break;
             }
         }
