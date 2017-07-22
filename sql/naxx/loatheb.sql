@@ -10,3 +10,6 @@ VALUES
 
 -- remove all the initial spores from creature db. None should be there
 DELETE FROM creature where id = 16286;
+
+-- Loatheb slightly larger hitbox
+UPDATE `creature_model_info` SET `combat_reach`='5' WHERE `modelid` = 16110;
