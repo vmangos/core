@@ -146,3 +146,6 @@ REPLACE INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`
 (127796, 127797, 3, 270 ,3),
 (127822, 127822, 0, 0   ,3),
 (127822, 127823, 4, 90  ,3);
+
+-- giving shade of naxxramas same script as spirit of naxxramas
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai' WHERE `entry`=16164;
