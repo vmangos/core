@@ -693,6 +693,7 @@ struct boss_heiganAI : public ScriptedAI
     
     void UpdateAI(const uint32 uiDiff)
     {
+        WhackAStalk(uiDiff);
 
         // This will avoid him running off the platform during dance phase.
         if (currentPhase == PHASE_FIGHT)
@@ -705,7 +706,6 @@ struct boss_heiganAI : public ScriptedAI
             if (m_creature->getThreatManager().isThreatListEmpty())
                 EventDanceEnd();
         }
-        WhackAStalk(uiDiff);
 
         m_events.Update(uiDiff);
         while (uint32 eventId = m_events.ExecuteEvent())
