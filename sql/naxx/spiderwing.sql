@@ -2,7 +2,7 @@
 UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param3`=10000, `event_param4`=20000, `action1_param2`=4 WHERE `id`=1597601;
 
 -- Poisonous Skitterer scale reduced, increased movementspeed
-UPDATE `creature_template` SET `scale`='0.5', `speed_run`='1.75', `speed_walk`='1.5' WHERE `entry`=15977;
+UPDATE `creature_template` SET `scale`='0.5', `speed_run`='1.75', `speed_walk`='3.5' WHERE `entry`=15977;
 
 -- naxxramas acolyte arcane explosion spell changed to one with 1.5sec cast time, and timers randomized slightly 
 UPDATE `creature_ai_scripts` SET `event_param2`=3000, `event_param3`=7000, `event_param4`=9000, `action1_param1`=30096 WHERE `id`=1598101;
@@ -79,3 +79,10 @@ UPDATE `creature_template` SET `MechanicImmuneMask`=13109328 WHERE `entry`=16447
 
 -- replace crypt reaver with tomb horror after faerlina
 update creature SET id = 15979, modelid = 15942 where guid = 5061270;
+
+REPLACE INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1644801, 16448, 0, 0, 100, 1, 6000, 8000, 8000, 10000, 11, 30121, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Deathhound forceful howl');
+-- Plagued deathhound ai
+UPDATE `creature_template` SET `minhealth`=93736, `maxhealth`=93736, `maxmana`=0, `scale`=2.5, `AIName`='EventAI' WHERE `entry`=16448;
