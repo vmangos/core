@@ -1644,6 +1644,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 29154:
+                    {
+                        Unit* caster = GetCaster();
+                        if (!caster) break;
+                        caster->HandleEmote(EMOTE_STATE_SUBMERGED);
+                    }
                 }
                 break;
             }

@@ -1041,16 +1041,54 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         : ScriptedAI(pCreature)
     {
         Reset();
+        goStoneform();
     }
+    
+    void goStoneform()
+    {
+        if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
+        {
+            m_creature->CastSpell(m_creature, 29154, true);
+            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        }
+    }
+
     uint32 acidVolleyTimer;
     void Reset() override
     {
         acidVolleyTimer = 4000;
     }
     
+    void JustReachedHome() override
+    {
+        goStoneform();
+    }
+
+    void MoveInLineOfSight(Unit* pWho)
+    {
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
+        {
+            if (pWho->GetTypeId() == TYPEID_PLAYER
+                && !m_creature->isInCombat()
+                && m_creature->IsWithinDistInMap(pWho, 10.0f)
+                && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
+                && m_creature->IsWithinLOSInMap(pWho))
+            {
+                AttackStart(pWho);
+            }
+        }
+        else
+        {
+            ScriptedAI::MoveInLineOfSight(pWho);
+        }
+    }
+
     void Aggro(Unit*)
     {
-        m_creature->CallForHelp(20.0f);
+        if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE))
+        {
+            m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+        }
     }
 
     void UpdateAI(const uint32 diff)
