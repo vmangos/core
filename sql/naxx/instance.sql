@@ -37,10 +37,11 @@ INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4113', 'at_n
 -- add Mr. Bigglesworth
 -- set movement type to random 
 UPDATE `creature_template` SET `MovementType`=1 WHERE `entry`=16998;
+/*
 DELETE FROM `creature` where id = 16998;
 INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`,`spawnFlags`) 
 VALUES (533001,16998,533,0,0,3005.8,-3434.81,304.196,5.38862,604800,50,0,37000,0,0,1,0);
-
+*/
 
 
 -- Acid Volley stack with self

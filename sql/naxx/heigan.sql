@@ -1,5 +1,5 @@
 -- correct possition for Heigan
-UPDATE creature SET position_x = 2793.86, position_y = -3707.38, position_z = 276.627, orientation = 0.593412 WHERE id = 15936;
+-- UPDATE creature SET position_x = 2793.86, position_y = -3707.38, position_z = 276.627, orientation = 0.593412 WHERE id = 15936;
 
 -- Creating a creature that will be the caster of the eruption. Looking at vanilla combatlogs it seems when players are hit it says "Plague fissure eruption hits you for xxxx"
 -- Since we cant have the GOs themself do the cast, we need this creature to be the caster.
@@ -37,5 +37,7 @@ UPDATE `creature_template` SET `minhealth`=500, `maxhealth`=500, `faction_A`=20,
 
 -- eye stalks no longer eventai
 DELETE FROM `creature_ai_scripts` where id IN (1623601,1623602, 1623603);
+/*
 -- remove all eye stalks from creature table. Script spawns them 
 DELETE FROM `creature` WHERE id = 16236;
+*/

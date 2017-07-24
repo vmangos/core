@@ -2,8 +2,8 @@
 UPDATE `creature_template` SET `baseattacktime`=2500, `flags_extra`=257,`speed_run`='1.4' WHERE `entry`=15953;
 
 -- remove worshippers and followers. They are spawned by faerlina
-DELETE FROM `creature` WHERE `id`='16505';
-DELETE FROM `creature` WHERE `id`='16506';
+-- DELETE FROM `creature` WHERE `id`='16505';
+-- DELETE FROM `creature` WHERE `id`='16506';
 
 -- give Worshippers widows embrace
 UPDATE `creature_template` SET `spell1`=28732, `MechanicImmuneMask`=1023383290 WHERE `entry`=16506;

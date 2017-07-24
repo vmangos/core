@@ -1,5 +1,5 @@
 -- Razuvious should follow waypoints
-UPDATE creature SET MovementType = 2 WHERE id = 16061;
+-- UPDATE creature SET MovementType = 2 WHERE id = 16061;
 
 -- Razuvious adds (deathknight understudy)
 DELETE FROM creature_template_addon WHERE entry = 16803;

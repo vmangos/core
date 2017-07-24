@@ -1,4 +1,4 @@
-
+/*
 -- combat dummies, possitions from trinitycore
 DELETE FROM `creature` where guid >= 533010 and guid <= 533021;
 INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`,`spawnFlags`) 
@@ -15,3 +15,4 @@ VALUES
 (533019,16211,533,16074,0,2827.83,-3209.98,298.344,0.994838,3600, 0, 0, 42, 0, 0, 0, 0),
 (533020,16211,533,16074,0,2851.85,-3162.62,298.236,4.08407, 3600, 0, 0, 42, 0, 0, 0, 0),
 (533021,16211,533,16074,0,2859.65,-3180.16,298.237,3.24631, 3600, 0, 0, 42, 0, 0, 0, 0);
+*/

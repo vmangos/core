@@ -15,19 +15,15 @@ VALUES ('16218', '0', '0', '13069', '0', '0', '0', 'Tesla Coil', '0', '60', '60'
  '0', '0', '3', '0', '0', '0', '1', '0', '0', 'npc_tesla_coil');
 
 -- Thaddius spawn tesla coils, so remove if any in creature table
-DELETE FROM `creature` where id = 16218;
-/*
-INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`)
- VALUES (6095,16218,533,0,0,3487.76,-2911.2,319.406,3.90954,120,0,0,17010,0,0,2);
-INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`) 
-VALUES (6096,16218,533,0,0,3527.81,-2952.38,319.326,3.90954,120,0,0,17010,0,0,2);
-*/
+-- DELETE FROM `creature` where id = 16218;
 
+/*
 -- correct thaddius possition
 UPDATE `creature` SET position_x = 3513.84, position_y = - 2926.55, position_z = 302.914, orientation = 4.13643 where id = 15928;
 
 -- Remove stalagg and feugen from creature db. Spawned by script instead.
 DELETE FROM `creature` where id IN (15929, 15930);
+*/
 
 -- give Stalagg CREATURE_FLAG_EXTRA_ALWAYS_CRUSH flag and set attackspeed to 2sec
 UPDATE `creature_template` SET `flags_extra` = flags_extra | 8192, `baseattacktime` = 2000 WHERE entry = 15929;

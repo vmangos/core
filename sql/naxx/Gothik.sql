@@ -1,3 +1,4 @@
+/*
 -- Delete creature involved in Gothik event
 DELETE FROM creature WHERE guid BETWEEN 127618 AND 127630;
 DELETE FROM creature WHERE id BETWEEN 16124 AND 16127;
@@ -18,7 +19,7 @@ INSERT INTO creature (guid, id, map, modelid, equipment_id, position_x, position
 (127628, 16137, 533, 0, 0, 2664.87, -3340.75, 267.767, 5.93412, 3600, 0, 0, 42, 0, 0, 0),
 (127629, 16137, 533, 0, 0, 2725.82, -3309.57, 267.769, 2.82743, 3600, 0, 0, 42, 0, 0, 0),
 (127630, 16137, 533, 0, 0, 2643.73, -3321.73, 284.233, 6.19592, 3600, 0, 0, 42, 0, 0, 0);
-
+*/
 -- Faction for Gothik event creatures
 UPDATE creature_template SET faction_H = 20, faction_A = 20 WHERE entry BETWEEN 16124 AND 16127 OR entry BETWEEN 16148 AND 16150;
 

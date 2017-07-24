@@ -2,7 +2,7 @@
 UPDATE `creature_template` SET `minhealth`=1626363, `maxhealth`=1626363 WHERE `entry`=15954;
 
 -- Removing the static adds from creature table, all should be spawned during combat by noth
-DELETE FROM creature where id in (16984, 16981,  16982, 16983);
+-- DELETE FROM creature where id in (16984, 16981,  16982, 16983);
 
 DELETE FROM `creature_ai_scripts` where id IN(
 1698101,

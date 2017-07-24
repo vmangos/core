@@ -1,5 +1,6 @@
 -- sewage slimes around patchwerk. Probably old replacement for froggers, Incorrect mob, and also needs to be handled from script.
-delete from creature where id = 16375;
+-- delete from creature where id = 16375;
+
 -- Living Poison (froggers) speed fix
 UPDATE `creature_template` SET `speed_walk`='0.375', `speed_run`='0.375' WHERE `entry`=16027;
 
@@ -34,6 +35,7 @@ VALUES
 -- toxic tunnel creature lvl 60 and script
 UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
 
+/*
 delete from `creature` where id = 16400;
 INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`, `DeathState`, `MovementType`,`spawnFlags`) 
 VALUES
@@ -44,3 +46,4 @@ VALUES
 (127635,16400,533,11686,0,3190.63,-3252.56,315.568,3.91208, 3600,10,0,17010,0,  0,1,0),
 (127636,16400,533,11686,0,3237.07,-3207.60,317.365,3.95566, 3600,10,0,17010,0,  0,1,0),
 (127637,16400,533,11686,0,3246.76,-3193.86,317.33, 3.83134, 3600,10,0,17010,0,  0,1,0);
+*/

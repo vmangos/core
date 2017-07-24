@@ -31,9 +31,11 @@ UPDATE `creature_ai_scripts` SET `action1_param2`=5 WHERE `id`=1686103;
 -- death lord
 -- https://youtu.be/VrykhhdPfc4?t=6m9s
 -- It also kindof looks like the pack in the video does not patroll, unlike it does in our db.
+/*
 DELETE FROM `creature` where `guid` = 533000 ;
 INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`,`spawnFlags`) 
 VALUES (533000,16861,533,0,0,2932.73,-3188.07,273.371,3.13692,25,5,0,113175,12430,0,0,0);
+*/
 
 -- death lord and death knight cavalier curse of agony event slightly randomized to more easily stack with group when not spread
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1686101;
@@ -77,11 +79,13 @@ INSERT into creature_equip_template (entry, equipentry1, equipentry2, equipentry
 (16194, 11342, 0, 0),
 (16215, 12959, 0, 0),
 (16216, 13222, 13222, 0);
+
 -- unholy weapns equipment id
 UPDATE `creature_template` SET `unit_flags`=32768, `equipment_id`=16194, MovementType=1, `AIName`='EventAI',`baseattacktime`=2000, `mindmg`=3230, `maxdmg`=4284 WHERE entry=16194;
 UPDATE `creature_template` SET `unit_flags`=32768, `equipment_id`=16215, MovementType=1, `AIName`='EventAI',`baseattacktime`=2000, `mindmg`=2500, `maxdmg`=3200 WHERE entry=16215;
 UPDATE `creature_template` SET `unit_flags`=32768, `equipment_id`=16216, MovementType=1, `AIName`='EventAI',`baseattacktime`=1600, `mindmg`=2900, `maxdmg`=3700 WHERE entry=16216;
 
+/*
 DELETE FROM `creature` where id in (16194, 16215, 16216);
 INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,`position_y`,`position_z`,`orientation`,`spawntimesecs`,`spawndist`,`currentwaypoint`,`curhealth`,`curmana`,`DeathState`,`MovementType`, `spawnFlags`) VALUES 
 (127794,16194,533,0,0,2707.62,-3244.26,267.682,1.37881, 3600,20,0,113184,0,0,0,0),
@@ -100,7 +104,7 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,
 (127822,16216,533,0,0,2739.77,-3219.47,267.539,4.46863, 3600,20,0,94320, 0,0,1,0),
 (127823,16216,533,0,0,2731.77,-3230.92,267.679,4.46872, 3600,20,0,94320, 0,0,1,0),
 (127824,16216,533,0,0,2708.13,-3174.65,267.605,0.418879,3600,20,0,94320, 0,0,0,0);
-
+*/
 
 REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
@@ -137,6 +141,7 @@ REPLACE INTO `creature_ai_scripts`
 VALUES
 (1621602, 16216, 0, 0, 100, 1, 2000, 2000, 8000, 8000, 11, 15284, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords cleave');
 
+/*
 REPLACE INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES 
 (127816, 127816, 0, 0   ,3),
 (127816, 127817, 3, 270 ,3),
@@ -146,6 +151,12 @@ REPLACE INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`
 (127796, 127797, 3, 270 ,3),
 (127822, 127822, 0, 0   ,3),
 (127822, 127823, 4, 90  ,3);
+*/
 
 -- giving shade of naxxramas same script as spirit of naxxramas
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai' WHERE `entry`=16164;
+
+
+UPDATE `creature_template` SET `equipment_id` = 16861 where `entry` = 16861;
+DELETE FROM `creature_equip_template` where entry = 16861;
+INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipentry3) VALUES (16861, 22738, 0, 0);
