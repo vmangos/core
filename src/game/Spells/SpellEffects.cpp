@@ -1599,7 +1599,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     uint32 spellid;
                     switch (unitTarget->getClass())
                     {
-                    case CLASS_PRIEST:  spellid = 29185; break;
+                        // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
+                        // stealing druid version for priests until anyone has a reason priests cant smite.s
+                    case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
                     case CLASS_DRUID:   spellid = 29194; break;
                     case CLASS_PALADIN: spellid = 29196; break;
                     case CLASS_SHAMAN:  spellid = 29198; break;
