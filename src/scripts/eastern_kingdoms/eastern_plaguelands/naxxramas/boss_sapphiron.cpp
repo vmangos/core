@@ -26,6 +26,8 @@ enum
     EMOTE_ENRAGE       = -1533083,
 
     SPELL_ICEBOLT       = 28522,
+    SPELL_STUN_IMMUNE   = 28782,
+
     // SPELL_SUMM_ICEBLOCK = 28535, // we manually summon an iceblock in SpellHitTarget
 
     //SPELL_FROST_BREATH = 29318,
@@ -69,8 +71,7 @@ enum Events
     EVENT_LIFEDRAIN,
     EVENT_TAIL_SWEEP,
     EVENT_CLEAVE,
-    EVENT_FROST_BREATH,
-    EVENT_RECALC_ICEBLOCK_POS
+    EVENT_FROST_BREATH
 };
 
 enum Phase
@@ -85,6 +86,7 @@ enum Phase
     PHASE_SUMMONING,
     PHASE_DEAD
 };
+
 static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
 uint32 SPAWN_ANIM_TIMER = 21500;
 struct boss_sapphironAI : public ScriptedAI
@@ -129,7 +131,7 @@ struct boss_sapphironAI : public ScriptedAI
     Phase phase;
     uint32 spawnTimer;
     uint32 berserkTimer;
-    std::vector<std::pair<ObjectGuid, ObjectGuid>> iceboltTargets;
+    std::vector<ObjectGuid> iceboltTargets;
     ObjectGuid wingBuffetCreature;
 
     void Reset()
@@ -162,12 +164,21 @@ struct boss_sapphironAI : public ScriptedAI
     {
         for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
         {
-            if (Player* pPlayer = m_pInstance->GetMap()->GetPlayer(it->first))
+            if (Player* pPlayer = m_pInstance->GetMap()->GetPlayer(*it))
+            {
                 pPlayer->RemoveAurasDueToSpell(SPELL_ICEBOLT);
-            if (GameObject* pGO = m_pInstance->GetGameObject(it->second))
-                pGO->Delete();
+                pPlayer->RemoveAurasDueToSpell(SPELL_STUN_IMMUNE);
+            }
         }
         iceboltTargets.clear();
+
+        std::list<GameObject*> iceblocks;
+        GetGameObjectListWithEntryInGrid(iceblocks, m_creature, GO_ICEBLOCK, 300.0f);
+        for (auto it = iceblocks.begin(); it != iceblocks.end();)
+        {
+            (*it)->Delete();
+            it = iceblocks.erase(it);
+        }
     }
 
     void MakeVisible()
@@ -260,23 +271,20 @@ struct boss_sapphironAI : public ScriptedAI
         case SPELL_ICEBOLT:
         {
             bool found = false;
-            auto it = iceboltTargets.begin();
-            for (it; it != iceboltTargets.end(); it++)
-            {
-                if (it->first == target->GetObjectGuid())
-                    break;
-            }
+            auto it = std::find(iceboltTargets.begin(), iceboltTargets.end(), target->GetObjectGuid());
             if (it == iceboltTargets.end())
-                it = iceboltTargets.insert(iceboltTargets.end(), std::make_pair(target->GetObjectGuid(), ObjectGuid()));
+            {
+                iceboltTargets.push_back(target->GetObjectGuid());
+            }
+
+            target->CastSpell(target, SPELL_STUN_IMMUNE, true);
 
             // Uncertain if the iceblock should always be angled towards the center or not
             float ang = target->GetAngle(m_creature);
-            if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(),
-                target->GetPositionZ(), ang))
+            if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), ang))
             {
-                it->second = pGO->GetObjectGuid();
-                //iceblocks.push_back(pGO->GetObjectGuid());
-                events.ScheduleEvent(EVENT_RECALC_ICEBLOCK_POS, Seconds(1));
+                target->TeleportPositionRelocation(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
+                target->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
             }
             break;
         }
@@ -296,22 +304,20 @@ struct boss_sapphironAI : public ScriptedAI
                 if (pTarget->isDead())
                     continue;
                 
-                for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
-                {
-                    if (it->first == pTarget->GetObjectGuid())
-                        continue;
-                }
+                if (std::find(iceboltTargets.begin(), iceboltTargets.end(), pTarget->GetObjectGuid()) != iceboltTargets.end())
+                    continue;
+                
                 suitableUnits.push_back(pTarget);
             }
 
         if (suitableUnits.size() == 0)
             return;
+
         auto it = suitableUnits.begin();
         std::advance(it, urand(0, suitableUnits.size() - 1));
         Unit* target = *it;
         
-        //iceboltedPlayers.push_back(target->GetObjectGuid());
-        iceboltTargets.push_back(std::make_pair(target->GetObjectGuid(), ObjectGuid()));
+        iceboltTargets.push_back(target->GetObjectGuid());
         m_creature->SetFacingToObject(target);
         DoCastSpellIfCan(target, SPELL_ICEBOLT, CAST_TRIGGERED);
 
@@ -347,9 +353,9 @@ struct boss_sapphironAI : public ScriptedAI
             m_creature->InterruptNonMeleeSpells(false);
             m_creature->AttackStop();
             m_creature->RemoveAllAttackers();
-            ((Creature*)this)->m_TargetNotReachableTimer = 0;
-            if (((Creature*)this)->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
-                ((Creature*)this)->ClearTemporaryFaction();
+            m_creature->m_TargetNotReachableTimer = 0;
+            if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
+                m_creature->ClearTemporaryFaction();
         }
         else
         {
@@ -424,7 +430,7 @@ struct boss_sapphironAI : public ScriptedAI
                 int num_add_ib = urand(4, 5);
                 int first_ib = 5000;
                 int incr = 17000 / (num_add_ib - 1);
-                for (int i = 0; i < num_add_ib; i++) 
+                for (int i = 0; i < num_add_ib; i++)
                     events.ScheduleEvent(EVENT_ICEBOLT, first_ib + incr*i);
 
                 events.ScheduleEvent(EVENT_FROST_BREATH, Seconds(23)); // 1 sec after he can potentially cast final icebolt
@@ -455,11 +461,11 @@ struct boss_sapphironAI : public ScriptedAI
             case EVENT_LANDED:
             {
                 events.Reset();
-                events.ScheduleEvent(EVENT_LIFEDRAIN,   Seconds(24));
-                events.ScheduleEvent(EVENT_BLIZZARD,    Seconds(20));
+                events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
+                events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
                 events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(urand(50, 70))); // Sampling videos show its 50-70sec between engaging after landing, and disengaging to fly again
-                events.ScheduleEvent(EVENT_TAIL_SWEEP,  Seconds(12));
-                events.ScheduleEvent(EVENT_CLEAVE,      Seconds(5));
+                events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
+                events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
                 phase = PHASE_GROUND;
                 SetCombatMovement(true);
                 m_creature->GetMotionMaster()->Clear(false);
@@ -516,19 +522,6 @@ struct boss_sapphironAI : public ScriptedAI
                 else
                     events.Repeat(100);
                 break;
-            case EVENT_RECALC_ICEBLOCK_POS:
-                for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
-                {
-                    Player* pPlayer = nullptr;
-                    GameObject* pGO = nullptr;
-                    pPlayer = m_pInstance->GetMap()->GetPlayer(it->first);
-                    pGO = m_pInstance->GetGameObject(it->second);
-                    if (pPlayer && pGO)
-                    {
-                        pGO->Relocate(pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ());
-                    }
-                }
-                break;
             }
         }
 
@@ -546,109 +539,6 @@ struct boss_sapphironAI : public ScriptedAI
 
         if (phase == PHASE_GROUND)
             DoMeleeAttackIfReady();
-
-#if 0
-        if (phase == 1)
-        {
-            if (FrostAura_Timer < uiDiff)
-            {
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_AURA);
-                FrostAura_Timer = 5000;
-            }
-            else FrostAura_Timer -= uiDiff;
-
-            if (LifeDrain_Timer < uiDiff)
-            {
-                if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    DoCastSpellIfCan(target, SPELL_LIFE_DRAIN);
-
-                LifeDrain_Timer = 24000;
-            }
-            else LifeDrain_Timer -= uiDiff;
-
-            if (Blizzard_Timer < uiDiff)
-            {
-                if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    DoCastSpellIfCan(target, SPELL_BLIZZARD);
-
-                Blizzard_Timer = 20000;
-            }
-            else Blizzard_Timer -= uiDiff;
-
-            if (m_creature->GetHealthPercent() > 10.0f)
-            {
-                if (Fly_Timer < uiDiff)
-                {
-                    phase = 2;
-                    m_creature->InterruptNonMeleeSpells(false);
-                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_LIFTOFF);
-                    m_creature->GetMotionMaster()->Clear(false);
-                    m_creature->GetMotionMaster()->MoveIdle();
-                    DoCastSpellIfCan(m_creature, 11010);
-                    m_creature->SetHover(true);
-                    DoCastSpellIfCan(m_creature, 18430);
-                    Icebolt_Timer = 4000;
-                    Icebolt_Count = 0;
-                    landoff = false;
-                }
-                else Fly_Timer -= uiDiff;
-            }
-        }
-
-        if (phase == 2)
-        {
-            if (Icebolt_Timer < uiDiff && Icebolt_Count < 5)
-            {
-                if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    DoCastSpellIfCan(target, SPELL_ICEBOLT);
-
-                ++Icebolt_Count;
-                Icebolt_Timer = 4000;
-            }
-            else Icebolt_Timer -= uiDiff;
-
-            if (Icebolt_Count == 5 && !landoff)
-            {
-                if (FrostBreath_Timer < uiDiff)
-                {
-                    DoScriptText(EMOTE_BREATH, m_creature);
-                    DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BREATH);
-                    land_Timer = 2000;
-                    landoff = true;
-                    FrostBreath_Timer = 6000;
-                }
-                else FrostBreath_Timer -= uiDiff;
-            }
-
-            if (landoff)
-            {
-                if (land_Timer < uiDiff)
-                {
-                    phase = 1;
-                    m_creature->HandleEmoteCommand(EMOTE_ONESHOT_LAND);
-                    m_creature->SetHover(false);
-                    m_creature->GetMotionMaster()->Clear(false);
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                    Fly_Timer = 67000;
-                }
-                else land_Timer -= uiDiff;
-            }
-        }
-
-        if (m_creature->GetHealthPercent() <= 10.0f)
-        {
-            if (Beserk_Timer < uiDiff)
-            {
-                DoScriptText(EMOTE_ENRAGE, m_creature);
-                DoCastSpellIfCan(m_creature, SPELL_BESERK);
-                Beserk_Timer = 300000;
-            }
-            else Beserk_Timer -= uiDiff;
-        }
-
-        if (phase != 2)
-            DoMeleeAttackIfReady();
-#endif
     }
 };
 
