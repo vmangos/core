@@ -489,7 +489,7 @@ struct boss_heiganAI : public ScriptedAI
         const ThreatList& tl = m_creature->getThreatManager().getThreatList();
         std::vector<Unit*> candidates;
         auto it = tl.begin();
-        //++it; // skip the tank
+        ++it; // skip the tank
         for (it; it != tl.end(); it++)
         {
             if (Unit* pUnit = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
