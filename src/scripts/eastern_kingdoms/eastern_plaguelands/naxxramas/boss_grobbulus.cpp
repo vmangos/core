@@ -66,7 +66,7 @@ enum eGrobbulusEvents
 
 
 static const uint32 POISONCLOUD_CD()            { return 15000; } //return urand(20000, 25000); }
-static const uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000) : urand(30000, 60000); }
+static const uint32 SLIMESPRAY_CD(bool initial) { return initial ? urand(20000, 30000): urand(30000,35000); }
 static constexpr uint32 BERSERK_TIMER           = 12 * 60 * 1000; // 12 minute enrage
 
 static constexpr uint32 SLIMESTREAM_REPEAT_CD   = 1500; // used every 1500ms if current target is out of melee range
