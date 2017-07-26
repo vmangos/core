@@ -168,18 +168,15 @@ struct boss_grobbulusAI : public ScriptedAI
 
     void UpdateSlimeStream(uint32 uiDiff)
     {
-        if (!m_uiSlimeStreamTimer)
+        if (m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            m_uiSlimeStreamTimer = SLIMESTREAM_REPEAT_CD;
+        else
         {
-            if (!m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+            if (m_uiSlimeStreamTimer < uiDiff)
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_SLIME_STREAM) == CAST_OK)
                     m_uiSlimeStreamTimer = SLIMESTREAM_REPEAT_CD;
             }
-        }
-        else
-        {
-            if (m_uiSlimeStreamTimer < uiDiff)
-                m_uiSlimeStreamTimer = 0;
             else
                 m_uiSlimeStreamTimer -= uiDiff;
         }
