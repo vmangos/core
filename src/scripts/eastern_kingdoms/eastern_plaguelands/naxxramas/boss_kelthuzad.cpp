@@ -658,7 +658,6 @@ struct boss_kelthuzadAI : public ScriptedAI
                         break;
                     }
                 }
-                events.Repeat(Seconds(1));
                 break;
             case EVENT_DETONATE_MANA:
                 if(Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_MANA_DETONATION, SELECT_FLAG_POWER_MANA|SELECT_FLAG_PLAYER))
