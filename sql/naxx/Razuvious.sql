@@ -15,16 +15,25 @@ INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipent
 -- removing razu adds from creature table. Spawned by script
 delete from creature where id = 16803;
 
--- razu adds given eventai to "attack" the training dummies out of combat
-UPDATE `creature_template` SET `AIName`='EventAI', `ScriptName`='' WHERE `entry`=16803;
+-- scale of combat dummies
+UPDATE `creature_template` SET `scale`='1.5' WHERE `entry`=16211;
+
+
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='deathknight_understudy_ai' WHERE `entry`=16803;
+-- removing understudy EventAI scripts
 DELETE FROM `creature_ai_scripts` where id = 1680301;
+DELETE FROM `creature_ai_scripts` where id = 1680302;
+
+/*
+-- razu adds given eventai to "attack" the training dummies out of combat
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1680301, 16803, 1, 0, 100, 1, 0, 5000, 5000, 10000, 5, 36, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathknight Understudy attack emote');
 
-DELETE FROM `creature_ai_scripts` where id = 1680302;
+
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1680302, 16803, 4, 0, 100, 0, 0, 0, 0, 0, 39, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathknight Understudiy calls for help on aggro');
+*/
