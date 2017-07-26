@@ -2133,6 +2133,7 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
                 case 23461:     // Vaelastrasz's Flame Breath
                 case 24818:     // Nightmare Dragon's Noxious Breath
                 case 25812:     // Lord Kri's Toxic Volley
+                case 28531:     // Sapphiron's Frost Aura
                     break;
                 default:
                     resistanceChance *= 0.1f;
