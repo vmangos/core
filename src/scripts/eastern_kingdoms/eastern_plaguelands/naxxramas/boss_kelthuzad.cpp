@@ -551,10 +551,11 @@ struct boss_kelthuzadAI : public ScriptedAI
             case EVENT_PHASE_TWO_START:
                 // engage!
                 events.Reset();
-                events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, Seconds(30));
-                events.ScheduleEvent(EVENT_SHADOW_FISSURE,   Seconds(10));
-                events.ScheduleEvent(EVENT_DETONATE_MANA,    Seconds(20));
                 events.ScheduleEvent(EVENT_FROSTBOLT,        Seconds(10));
+                events.ScheduleEvent(EVENT_SHADOW_FISSURE,   Seconds(14));
+                events.ScheduleEvent(EVENT_DETONATE_MANA,    Seconds(20));
+                events.ScheduleEvent(EVENT_FROSTBOLT_VOLLEY, Seconds(30));
+                events.ScheduleEvent(EVENT_FROST_BLAST,      Seconds(50));
                 events.ScheduleEvent(EVENT_CHAINS,           Seconds(60));
                 m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
@@ -562,6 +563,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                 m_creature->InterruptNonMeleeSpells(true);
                 
                 DoResetThreat();
+                m_creature->SetInCombatWithZone();
                 if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
                     AttackStart(pUnit);
 
@@ -618,7 +620,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                     {
                         guardians.push_back(std::make_pair(pCreature->GetObjectGuid(), portalIndex));
                         ++numSummonedGuardians;
-                        events.Repeat(Seconds(5));
+                        events.Repeat(Seconds(7));
                         pCreature->SetInCombatWithZone();
                         if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                         {
@@ -631,31 +633,45 @@ struct boss_kelthuzadAI : public ScriptedAI
                 break;
             }
             case EVENT_FROSTBOLT_VOLLEY:
+                if (m_creature->IsNonMeleeSpellCasted())
+                {
+                    events.Repeat(Seconds(2));
+                    break;
+                }
                 DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BOLT_NOVA);
                 events.Repeat(Seconds(urand(15, 30)));
                 break;
             case EVENT_FROST_BLAST:
+                if (m_creature->IsNonMeleeSpellCasted())
+                {
+                    events.Repeat(Seconds(2));
+                    break;
+                }
+                events.Repeat(Seconds(urand(55, 65)));
                 if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1)) // todo: can it hit maintank?
                 {
                     if (DoCastSpellIfCan(pUnit, SPELL_FROST_BLAST) == CAST_OK)
                     {
                         if (urand(0, 1))
                             DoScriptText(SAY_FROST_BLAST, m_creature);
-                        events.Repeat(Seconds(urand(55, 65)));
                         break;
                     }
                 }
-                events.Repeat(Seconds(1));
                 break;
             case EVENT_FROSTBOLT:
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BOLT);
                 events.Repeat(Seconds(urand(5, 7))); // todo: this is guesswork
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BOLT);
                 break;
             case EVENT_SHADOW_FISSURE:
-                events.Repeat(Seconds(urand(10, 20)));
-                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                if (m_creature->IsNonMeleeSpellCasted())
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_FISSURE) == CAST_OK)
+                    events.Repeat(Seconds(2));
+                    break;
+                }
+                events.Repeat(Seconds(urand(10, 20)));
+                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1)) // todo: can it hit maintank?
+                {
+                    if (DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
                     {
                         if (urand(0, 1))
                             DoScriptText(SAY_SPECIAL3_MANA_DET, m_creature);
@@ -664,18 +680,21 @@ struct boss_kelthuzadAI : public ScriptedAI
                 }
                 break;
             case EVENT_DETONATE_MANA:
+                if (m_creature->IsNonMeleeSpellCasted())
+                {
+                    events.Repeat(Seconds(2));
+                    break;
+                }
+                events.Repeat(Seconds(urand(20,25))); // todo: not verified
                 if(Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_MANA_DETONATION, SELECT_FLAG_POWER_MANA|SELECT_FLAG_PLAYER))
                 {
                     if (DoCastSpellIfCan(pUnit, SPELL_MANA_DETONATION) == CAST_OK)
                     {
                         if (urand(0, 1))
                             DoScriptText(SAY_SPECIAL1_MANA_DET, m_creature);
-                        events.Repeat(Seconds(urand(20,25))); // todo: not verified
                         break;
                     }
                 }
-                else
-                    events.Repeat(Seconds(1));
                 break;
             case EVENT_CHAINS:
                 DoChains();
@@ -785,7 +804,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
     uint32 bloodTapTimer;
     void Reset() override
     {
-        bloodTapTimer = 5000;
+        bloodTapTimer = 10000;
     }
     void JustReachedHome() override
     {
@@ -800,7 +819,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         if (bloodTapTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLOOD_TAP) == CAST_OK)
-                bloodTapTimer = 5000;
+                bloodTapTimer = 10000;
         }
         else
             bloodTapTimer -= diff;
