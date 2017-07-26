@@ -241,6 +241,8 @@ struct kt_p1AddAI : public ScriptedAI
     }
     void MoveInLineOfSight(Unit* pWho) override
     {
+        if (m_creature->isInCombat()) return;
+
         if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < 25.0f) //todo: no idea what the pull range should be
         {
             ScriptedAI::AttackStart(pWho);
@@ -248,6 +250,8 @@ struct kt_p1AddAI : public ScriptedAI
     }
     void SpellHit(Unit* unit, const SpellEntry*) override 
     {
+        if (m_creature->isInCombat()) return;
+
         ScriptedAI::AttackStart(unit);
     }
 };
