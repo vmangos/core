@@ -24,8 +24,8 @@ INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipent
 -- scale of death lord and deathknight cavalier update (cavalier was too big, death lord too small)
 UPDATE `creature_template` SET `scale` = 1.8 where `entry` IN (16861, 16861);
 
--- correct faction of death lord
-UPDATE `creature_template` SET `faction_A`=21, `faction_H`=21 WHERE `entry`=16861;
+-- death lords had 0 dmg
+UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3500 WHERE `entry`=16861;
 
 -- Death lord and death knight cavalier deathcoil hits current tank
 UPDATE `creature_ai_scripts` SET `action1_param2`=1 WHERE `id`=1686103;
