@@ -35,3 +35,70 @@ INSERT INTO spell_script_target (entry, type, targetEntry) VALUES
 (27929, 1, 16137),
 (27935, 1, 16137),
 (27936, 1, 16137);
+
+-- his adds changed to EventAI
+/*
+16126 unrelenting rider
+16125 unrelenting death knight
+16124 unrelenting trainee
+
+16148 spectral death knight
+16149 spectral horse
+16150 spectral rider 
+16127 spectral trainee
+*/
+
+UPDATE `creature_template` SET `equipment_id` = 16125 where `entry` = 16125;
+UPDATE `creature_template` SET `equipment_id` = 16148 where `entry` = 16148;
+UPDATE `creature_template` SET `equipment_id` = 16126 where `entry` = 16126;
+DELETE FROM `creature_equip_template` where entry in (16125, 16148, 16126);
+INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipentry3) VALUES 
+(16125, 13504, 23356, 0),
+(16148, 13504, 23356, 0),
+(16126, 12949, 0,     0);
+
+UPDATE `creature_template` SET `AIName`='EventAI', `ScriptName`='' WHERE `entry` in (16124,16125,16126, 16148, 16149, 16150, 16127);
+
+DELETE FROM `creature_ai_scripts` where creature_id in (16124, 16125, 16126, 16127, 16148, 16149, 16150);
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1612401, 16124, 0, 0, 100, 1, 0,    0,    15500, 15500, 11, 30285, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Trainee Eagle Claw'),
+(1612402, 16124, 0, 0, 100, 1, 5000, 6000, 8000,  10000, 11, 20276, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Trainee Knockdown'),
+
+(1612501, 16125, 0, 0, 100, 1, 5000, 8000, 12000, 15000, 11, 27577, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight intercept random hostile'),
+(1612502, 16125, 0, 0, 100, 1, 1000, 2000, 15500, 15500, 11, 27825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight Shadow Mark'),
+
+(1612601, 16126, 11,0, 100, 0,   0,    0,     0,     0,  11, 27987, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider Unholy Aura on spawn'),
+(1612602, 16126, 0, 0, 100, 1, 1000, 2000,  5000,  6000, 11, 27831, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider cast Shadow Bolt Volley'),
+
+(1612701, 16127, 0, 0, 100, 1, 1000, 1500,  3000,  4000, 11, 27989, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Trainee Arcane Explosion'),
+(1612702, 16127, 0, 0, 100, 1, 3000, 3000, 10000, 11000, 11, 27990, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Trainee fear random'),
+
+(1614801, 16148, 0, 0, 100, 1, 1000, 3000,  5000,  6000, 11, 27991, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Death Knight Sunder Armor'),
+(1614802, 16148, 0, 0, 100, 1, 5000, 1000, 10000, 12000, 11, 27992, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Death Knight Mana Burn'),
+
+(1614901, 16149, 0, 0, 100, 1, 2000, 5000, 30500, 30500, 11, 27993, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Horse cast Stomp'),
+
+(1615001, 16150, 0, 0, 100, 1, 3001, 5000, 10000, 12000, 11, 27994, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider life drain on random hostile'),
+(1615002, 16150, 0, 0, 100, 1, 1000, 3000,  8000, 10000, 11, 27994, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider Unholy Frenzy'),
+(1615003, 16150, 11,0, 100, 0,   0,    0,     0,     0,  11, 27987, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider Unholy Aura on spawn');
+
+-- unrelenting trainee
+UPDATE `creature_template` SET `mindmg`=700, `maxdmg`=1000 WHERE `entry`=16124;
+-- unrelenting death knight
+UPDATE `creature_template` SET `mindmg`=3000, `maxdmg`=3500 WHERE `entry`=16125;
+-- unrelenting rider
+UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500 WHERE `entry`=16126;
+-- spectral rider
+UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500 WHERE `entry`=16150;
+-- spectral death knight
+UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500 WHERE `entry`=16148;
+-- spectral horse
+UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=5500 WHERE `entry`=16149;
+
+-- spectral death knight hp
+UPDATE `creature_template` SET `minhealth`=19000, `maxhealth`=19500 where `entry`=16148;
+-- spectral trainee hp
+UPDATE `creature_template` SET `minhealth`=6000, `maxhealth`=7000 WHERE `entry`=16127;
+
