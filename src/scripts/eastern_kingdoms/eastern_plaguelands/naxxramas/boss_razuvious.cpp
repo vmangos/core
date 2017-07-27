@@ -211,7 +211,7 @@ struct boss_razuviousAI : public ScriptedAI
             rpEvents.ScheduleEvent(EVENT_ADD_TALK,        Milliseconds(3500));
             rpEvents.ScheduleEvent(EVENT_ADD_SALUTE,      Seconds(8));
             rpEvents.ScheduleEvent(EVENT_ADD_TURN_BACK,   Seconds(12));
-            rpEvents.ScheduleEvent(EVENT_ADD_ATTACK,      Milliseconds(11));
+            rpEvents.ScheduleEvent(EVENT_ADD_ATTACK,      Milliseconds(12500));
         }
     }
 

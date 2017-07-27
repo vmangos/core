@@ -3,11 +3,13 @@
 -- Death Knight fear targets hostile, not self. Also not on pull, but a while later. -- https://youtu.be/VrykhhdPfc4?t=4m37s
 UPDATE `creature_ai_scripts` SET `event_param1`=10000, `event_param2`=12000, `action1_param2`=1 WHERE `id`=1614601;
 
+/*
 -- death knight captain spam casts whirlwind (different spell than was originally) 15ec after pull, instead (could be hp based too) https://youtu.be/VrykhhdPfc4?t=4m51s
 UPDATE `creature_ai_scripts` SET `event_type`=0, `event_param1`=15000, `event_param2`=15000, `event_param3`=8500, `event_param4`=8500, `action1_param1`=28333, `action1_param2`=1 WHERE `id`=1614501;
+*/
 
--- Death knight captain increased dmg, but reduced attackspeed
-UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=2500 WHERE `entry`=16145;
+-- Death knight captain increased dmg, but reduced attackspeed and ai
+UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=2500, `AIName`='', `ScriptName`='death_knight_captain_ai' WHERE `entry`=16145;
 
 -- missing npc death lord (16861): https://youtu.be/VrykhhdPfc4?t=6m9s
 -- exists in db, but must be scaled up and faction changed.
@@ -38,8 +40,8 @@ VALUES (533000,16861,533,0,0,2932.73,-3188.07,273.371,3.13692,25,5,0,113175,1243
 */
 
 -- death lord and death knight cavalier curse of agony event slightly randomized to more easily stack with group when not spread
-UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1686101;
-UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=8500 WHERE `id`=1616301;
+UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=6000 WHERE `id`=1686101;
+UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param4`=6000 WHERE `id`=1616301;
 
 
 -- Dark Touched Warrior periodically wipe aggro
@@ -135,7 +137,7 @@ VALUES
 REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
-(1621601, 16216, 0, 0, 100, 1, 4000, 4000, 8000, 8000, 11, 15284, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords trash');
+(1621601, 16216, 0, 0, 100, 1, 4000, 4000, 8000, 8000, 11, 3391, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords trash');
 REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
@@ -160,3 +162,77 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai
 UPDATE `creature_template` SET `equipment_id` = 16861 where `entry` = 16861;
 DELETE FROM `creature_equip_template` where entry = 16861;
 INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipentry3) VALUES (16861, 22738, 0, 0);
+
+
+
+-- RP stuff for deathknight packs
+DELETE FROM creature_movement_scripts where id in(1614601, 1614602, 1614603, 1614604);
+insert into creature_movement_scripts (id, delay, command, datalong, datalong2, datalong3, datalong4, data_flags, dataint, dataint2, dataint3, dataint4, x, y, z, o, comments) VALUES
+                                  (1614601,	1,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
+                                  (1614601,	2,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
+                                  (1614601,	5,	   1,	     1,	        16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain talks"),
+                                  (1614601,	7,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
+                                  (1614601,	8,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
+                                  (1614601,	14,	   1,	     60,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain kicks"),
+                                  (1614601,	15,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
+                                                                                                                                          
+                                  (1614601,	17,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
+                                  (1614601,	18,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
+                                  (1614601,	20,	   1,	     5,	        16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain shouts"),
+                                  (1614601,	22,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
+                                  (1614601,	23,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
+                                  (1614601,	26,	   1,	     60,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain kicks"),
+                                  (1614601,	27,	   1,	     36,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks"),
+                                                                                                                                          
+                                  (1614602,	0,	   1,	     333,	    16146,	    88435,     0,	      16,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attack stance"),
+                                  (1614602,	0,	   1,	     333,	    0,	         0,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attack stance"),
+                                  (1614602,	1,	   1,	     22,	    16145,	    12,	       0,	      0,	      53,	25,	          25,	25,	0,	0,	0,	0,	"Deathknight Captain shout"),
+                                  (1614602,	3,	   1,	     36,	    16146,	    88435,     0,	      16,	      54,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  (1614602,	5,	   1,	     36,	        0,	     0,	       0,	      0,	      35,	36,	          38,	54,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614602,	12,	   1,	     36,	    16146,	    88435,	   0,	      16,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  (1614602,	13,	   1,	     36,	        0,	     0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614602,	20,	   1,	     36,	        0,	     0,	       0,	      0,	      54,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614602,	21,	   1,	     36,	    16146,	    88435,     0,	      16,	      35,	36,	          38,	54,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  
+                                  (1614603,	0,	   1,	     333,	    16146,	    88437,     0,	      16,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attack stance"),
+                                  (1614603,	0,	   1,	     333,	    0,	         0,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attack stance"),
+                                  (1614603,	3,	   1,	     36,	    16146,	    88437,     0,	      16,	      54,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  (1614603,	5,	   1,	     36,	        0,	     0,	       0,	      0,	      35,	36,	          38,	54,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614603,	10,	   1,	     22,	    16145,	    12,	       0,	      0,	      53,	25,	          25,	25,	0,	0,	0,	0,	"Deathknight Captain shout"),
+                                  (1614603,	12,	   1,	     36,	    16146,	    88437,	   0,	      16,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  (1614603,	13,	   1,	     36,	        0,	     0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614603,	20,	   1,	     36,	        0,	     0,	       0,	      0,	      54,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614603,	21,	   1,	     36,	    16146,	    88437,     0,	      16,	      35,	36,	          38,	54,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  
+                                  (1614604,	0,	   1,	     333,	    16146,	    88438,     0,	      16,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attack stance"),
+                                  (1614604,	0,	   1,	     333,	    0,	         0,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attack stance"),
+                                  (1614604,	2,	   1,	     36,	    16146,	    88438,     0,	      16,	      54,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  (1614604,	4,	   1,	     36,	        0,	     0,	       0,	      0,	      35,	36,	          38,	54,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614604,	11,	   1,	     36,	    16146,	    88438,	   0,	      16,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy"),
+                                  (1614604,	12,	   1,	     36,	        0,	     0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614604,	16,	   1,	     22,	    16145,	    12,	       0,	      0,	      53,	25,	          25,	25,	0,	0,	0,	0,	"Deathknight Captain shout"),
+                                  (1614604,	18,	   1,	     36,	        0,	     0,	       0,	      0,	      54,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks combat dummy"),
+                                  (1614604,	20,	   1,	     36,	    16146,	    88438,     0,	      16,	      35,	36,	          38,	54,	0,	0,	0,	0,	"Deathknight buddy attacks combat dummy");
+
+-- dummy waypoints for dk packs, needed by above movement_scripts
+DELETE FROM `creature_movement` where id in (88430, 88444, 88439, 88434, 88436);
+INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`position_z`,`waittime`,`script_id`,`textid1`,`textid2`,`textid3`,`textid4`,`textid5`,`emote`,`spell`,`orientation`,`model1`,`model2`) VALUES 
+(88430,1, 2872.69, -3202.18, 298.146, 0,    0,      0,0,0,0,0,0,0,5.8079,0,0),
+(88430,2, 2872.69, -3202.18, 298.146, 15000,1614601,0,0,0,0,0,0,0,5.8079,0,0),
+
+(88444,1, 2799.66, -3166, 298.147, 0,    0,      0,0,0,0,0,0,0,3.11147,0,0),
+(88444,2, 2799.66, -3166, 298.147, 15000,1614601,0,0,0,0,0,0,0,3.11147,0,0),
+
+
+(88434,1, 2829.04, -3208.18, 298.252, 0,    0,      0,0,0,0,0,0,0,4.10672,0,0),
+(88434,2, 2829.04, -3208.18, 298.252, 15000,1614602,0,0,0,0,0,0,0,4.10672,0,0),
+
+(88436,1, 2857.09, -3180.16, 298.153, 0,    0,      0,0,0,0,0,0,0,0.024496,0,0),
+(88436,2, 2857.09, -3180.16, 298.147, 15000,1614603,0,0,0,0,0,0,0,0.024496,0,0),
+
+
+(88439,1, 2825.19, -3157.38, 298.146, 0,    0,      0,0,0,0,0,0,0,1.3861,0,0),
+(88439,2, 2825.19, -3157.38, 298.146, 15000,1614604,0,0,0,0,0,0,0,1.3861,0,0);
+
+-- remove script-id for razuvious, the Rp is done in c++ script.
+update creature_movement_template set script_id = 0 where entry = 16061;
