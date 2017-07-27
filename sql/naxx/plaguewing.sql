@@ -19,3 +19,6 @@ VALUES
 
 /*green (nature) */
 (16785,0,0,11137,0,0,0,'Plague Slime','',0,61,61,140943,140943,0,0,4091,21,21,0,1,0.35,2,1,7500,9000,0,278,1,1150,1265,0,0,0,0,0,0,0,0,172.1,240.07,100,10,8,16243,0,0,0,5,5,5,5,5,0,0,0,0,0,6051,7906,'',0,3,0,0,1,0,0,0,0,8,0,'naxxramas_plague_slime_ai');
+
+-- plague beast keep positive auras on evade
+UPDATE `creature_template` SET `flags_extra`=4096 WHERE `entry`=16034;
