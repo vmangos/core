@@ -524,15 +524,30 @@ void Spell::FillTargetMap()
                         {
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
-                            // Exception: Intimidating Shout
-                            // The AoE fear does not apply to spell main target (that is stunned by another aura)
-                            if (m_spellInfo->Id == 5246)
-                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
+                            switch (m_spellInfo->Id)
+                            {
+                            case 5246:
+                                // Exception: Intimidating Shout
+                                // The AoE fear does not apply to spell main target (that is stunned by another aura)
+                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
+                                {
                                     if (*itr == m_targets.getUnitTarget())
-                                    {
-                                        tmpUnitMap.erase(itr);
-                                        itr = tmpUnitMap.begin();
-                                    }
+                                        itr = tmpUnitMap.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+                                break;
+                            case 27831:
+                                // Shadow Bolt volley which should only target players with the Shadow Mark debuff
+                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
+                                {
+                                    if (!(*itr)->HasAura(27825)) // Shadow Mark
+                                        itr = tmpUnitMap.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+                                break;
+                            }
                         }
                         break;
                     case 0:
