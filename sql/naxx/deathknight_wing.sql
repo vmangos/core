@@ -111,36 +111,12 @@ INSERT INTO `creature` (`guid`,`id`,`map`,`modelid`,`equipment_id`,`position_x`,
 REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
-(1621501, 16215, 0, 0, 100, 1, 4000, 4000, 15000, 15000, 11, 28450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unholy staff Arcane Explosion');
-
-REPLACE INTO `creature_ai_scripts`
-(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
-VALUES
-(1621502, 16215, 0, 0, 100, 1, 8000, 8000, 15000, 15000, 11, 29848, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unholy staff polymorph');
-
-REPLACE INTO `creature_ai_scripts`
-(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
-VALUES
-(1621503, 16215, 0, 0, 100, 1, 12000, 12000, 15000, 15000, 11, 29849, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy staff frost nova');
-
-
-REPLACE INTO `creature_ai_scripts`
-(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
-VALUES
-(1619401, 16194, 0, 0, 100, 1, 4000, 4000, 15000, 15000, 11, 29852, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy axe whirlwind');
-REPLACE INTO `creature_ai_scripts`
-(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
-VALUES
-(1619402, 16194, 0, 0, 100, 1, 6000, 6000, 7000, 8000, 11, 16856, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy axe Mortal Strike');
-
-
-REPLACE INTO `creature_ai_scripts`
-(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
-VALUES
-(1621601, 16216, 0, 0, 100, 1, 4000, 4000, 8000, 8000, 11, 3391, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords trash');
-REPLACE INTO `creature_ai_scripts`
-(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
-VALUES
+(1621501, 16215, 0, 0, 100, 1, 4000, 4000, 15000, 15000, 11, 28450, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unholy staff Arcane Explosion'),
+(1621502, 16215, 0, 0, 100, 1, 8000, 8000, 15000, 15000, 11, 29848, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unholy staff polymorph'),
+(1621503, 16215, 0, 0, 100, 1, 12000, 12000, 15000, 15000, 11, 29849, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy staff frost nova'),
+(1619401, 16194, 0, 0, 100, 1, 4000, 4000, 15000, 15000, 11, 29852, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy axe whirlwind'),
+(1619402, 16194, 0, 0, 100, 1, 6000, 6000, 7000, 8000, 11, 16856, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy axe Mortal Strike'),
+(1621601, 16216, 0, 0, 100, 1, 4000, 4000, 8000, 8000, 11, 3391, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords trash'),
 (1621602, 16216, 0, 0, 100, 1, 2000, 2000, 8000, 8000, 11, 15284, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'unholy swords cleave');
 
 /*
@@ -236,3 +212,41 @@ INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`positio
 
 -- remove script-id for razuvious, the Rp is done in c++ script.
 update creature_movement_template set script_id = 0 where entry = 16061;
+
+-- doom touched warrior
+UPDATE `creature_template` SET `minhealth`=24990, `maxhealth`=24999, `AIName`='EventAI' WHERE `entry`=16157;
+DELETE FROM `creature_ai_scripts` where id = 1615701;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1615701, 16157, 0, 0, 100, 1, 2000, 3000, 3000, 4000, 14, -100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Doom Touched Warrior aggro wipe');
+
+
+-- Below are updates for Necro Knights.
+-- Setting randomly fire, arcane or frost phase on pull.
+-- adjusted timers for each ability to reflect that it now only uses 2/6 abilities at a time.
+
+REPLACE INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1616507, 16165, 4, 0, 100, 0, 0, 0, 0, 0, 30, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 'Necro Knight set phase on pull');
+
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-5 WHERE `id`=1616506;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-9 WHERE `id`=1616505;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-9 WHERE `id`=1616504;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-3 WHERE `id`=1616501;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-3 WHERE `id`=1616502;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-5 WHERE `id`=1616503;
+
+UPDATE `creature_ai_scripts` SET `event_param1`=5500, `event_param2`=5500, `event_param3`=7000, `event_param4`=7000, `action1_param1`=29207 WHERE `id`=1616505;
+UPDATE `creature_ai_scripts` SET `event_param1`=6000, `event_param2`=6000, `event_param3`=7000, `event_param4`=7000 WHERE `id`=1616504;
+UPDATE `creature_ai_scripts` SET `event_param1`=4000, `event_param2`=4000, `event_param3`=8000, `event_param4`=10000 WHERE `id`=1616501;
+UPDATE `creature_ai_scripts` SET `event_param1`=7000, `event_param2`=7000, `event_param3`=8000, `event_param4`=10000 WHERE `id`=1616502;
+UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=3000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1616503;
+UPDATE `creature_ai_scripts` SET `event_param1`=3500, `event_param2`=3500, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1616506;
+
+
+REPLACE INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1639001, 16390, 0, 0, 0, 0, 0, 0, 4000, 6000, 14, -100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill servant periodic threat reset');

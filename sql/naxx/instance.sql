@@ -58,3 +58,30 @@ VALUES ('28413', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1
 UPDATE `creature_template` SET `subname`='', `scale`='0.2' WHERE `entry`=16068;
 -- remove NULL as subname of Maggot, and fix scale
 UPDATE `creature_template` SET `subname`='', `scale`='0.2' WHERE `entry`=16030;
+
+
+
+
+
+-- Below are updates for Necro Knight Guardians. Note it's the same AI as for regular Necro Knights.
+-- Setting randomly fire, arcane or frost phase on pull.
+-- adjusted timers for each ability to reflect that it now only uses 2/6 abilities at a time.
+
+REPLACE INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1645207, 16452, 4, 0, 100, 0, 0, 0, 0, 0, 30, 1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 'Necro Knight Guardian set phase on pull');
+
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-5 WHERE `id`=1645206;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-9 WHERE `id`=1645205;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-9 WHERE `id`=1645204;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-3 WHERE `id`=1645201;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-3 WHERE `id`=1645202;
+UPDATE `creature_ai_scripts` SET `event_inverse_phase_mask`=-5 WHERE `id`=1645203;
+
+UPDATE `creature_ai_scripts` SET `event_param1`=5500, `event_param2`=5500, `event_param3`=7000,  `event_param4`=7000, `action1_param1`=29207 WHERE `id`=1645205;
+UPDATE `creature_ai_scripts` SET `event_param1`=6000, `event_param2`=6000, `event_param3`=7000,  `event_param4`=7000  WHERE `id`=1645204;
+UPDATE `creature_ai_scripts` SET `event_param1`=4000, `event_param2`=4000, `event_param3`=8000,  `event_param4`=10000 WHERE `id`=1645201;
+UPDATE `creature_ai_scripts` SET `event_param1`=7000, `event_param2`=7000, `event_param3`=8000,  `event_param4`=10000 WHERE `id`=1645202;
+UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=3000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1645203;
+UPDATE `creature_ai_scripts` SET `event_param1`=3500, `event_param2`=3500, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1645206;
