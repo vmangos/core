@@ -2373,15 +2373,26 @@ void Map::ScriptsProcess()
                 }
 
                 WorldObject* pSource = (WorldObject*)source;
-
+                
                 // flag_target_as_source            0x01
 
                 // If target is Unit* and should do the emote (or should be source of searcher below)
                 if (target && target->isType(TYPEMASK_UNIT) && step.script->emote.flags & 0x01)
+                {
                     pSource = (WorldObject*)target;
-
-                // If step has a buddy entry defined, search for it.
-                if (step.script->emote.creatureEntry)
+                }
+                // Step has flag SCRIPT_FLAG_BUDDY_BY_GUID, so we look for the creature with guid as defined in searchRadius
+                else if (step.script->emote.flags & 0x10) 
+                {
+                    pSource = pSource->GetMap()->GetCreature(ObjectGuid(HIGHGUID_UNIT, step.script->emote.creatureEntry, step.script->emote.searchRadius));
+                    if (!pSource)
+                    {
+                        sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) had flag SCRIPT_FLAG_BUDDY_BY_GUID, but could not find buddy with entry %u, guid %u", step.script->id, step.script->emote.creatureEntry, step.script->emote.searchRadius);
+                        break;
+                    }
+                }
+                // If step has a buddy entry defined, but not flag SCRIPT_FLAG_BUDDY_BY_GUID, search for it.
+                else if (step.script->emote.creatureEntry)
                 {
                     Creature* pBuddy = NULL;
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->emote.creatureEntry, true, step.script->emote.searchRadius);
@@ -2395,9 +2406,19 @@ void Map::ScriptsProcess()
                     else
                         break;
                 }
+                
+                // find the emote
+                std::vector<uint32> emotes;
+                emotes.push_back(step.script->emote.emoteId);
+                for (int i = 0; i < MAX_EMOTE_ID; ++i)
+                {
+                    if (!step.script->emote.randomEmotes[i])
+                        continue;
+                    emotes.push_back(uint32(step.script->emote.randomEmotes[i]));
+                }
 
                 // Must be safe cast to Unit*
-                ((Unit*)pSource)->HandleEmote(step.script->emote.emoteId);
+                ((Unit*)pSource)->HandleEmote(emotes[urand(0, emotes.size() - 1)]);
                 break;
             }
             case SCRIPT_COMMAND_FIELD_SET:

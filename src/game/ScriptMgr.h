@@ -133,6 +133,7 @@ enum eScriptCommand
 };
 
 #define MAX_TEXT_ID 4                                       // used for SCRIPT_COMMAND_TALK
+static constexpr uint32 MAX_EMOTE_ID = 4;                   // used for SCRIPT_COMMAND_EMOTE
 
 enum SummonCreatureFlags
 {
@@ -166,6 +167,7 @@ struct ScriptInfo
             uint32 searchRadius;                            // datalong3
             uint32 unused1;                                 // datalong4
             uint32 flags;                                   // data_flags
+            uint32 randomEmotes[MAX_EMOTE_ID];              // dataint to dataint4
         } emote;
 
         struct                                              // SCRIPT_COMMAND_FIELD_SET (2)
