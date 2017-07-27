@@ -3,13 +3,13 @@
 -- Death Knight fear targets hostile, not self. Also not on pull, but a while later. -- https://youtu.be/VrykhhdPfc4?t=4m37s
 UPDATE `creature_ai_scripts` SET `event_param1`=10000, `event_param2`=12000, `action1_param2`=1 WHERE `id`=1614601;
 
-/*
+
 -- death knight captain spam casts whirlwind (different spell than was originally) 15ec after pull, instead (could be hp based too) https://youtu.be/VrykhhdPfc4?t=4m51s
-UPDATE `creature_ai_scripts` SET `event_type`=0, `event_param1`=15000, `event_param2`=15000, `event_param3`=8500, `event_param4`=8500, `action1_param1`=28333, `action1_param2`=1 WHERE `id`=1614501;
-*/
+UPDATE `creature_ai_scripts` SET `event_type`=0, `event_param1`=15000, `event_param2`=15000, `event_param3`=15000, `event_param4`=20000, `action1_param1`=28333, `action1_param2`=1 WHERE `id`=1614501;
+
 
 -- Death knight captain increased dmg, but reduced attackspeed and ai
-UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=2500, `AIName`='', `ScriptName`='death_knight_captain_ai' WHERE `entry`=16145;
+UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=2500, `AIName`='EventAI', `ScriptName`='' WHERE `entry`=16145;
 
 -- missing npc death lord (16861): https://youtu.be/VrykhhdPfc4?t=6m9s
 -- exists in db, but must be scaled up and faction changed.
