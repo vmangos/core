@@ -40,7 +40,8 @@ VALUES (533000,16861,533,0,0,2932.73,-3188.07,273.371,3.13692,25,5,0,113175,1243
 */
 
 -- death lord and death knight cavalier curse of agony event slightly randomized to more easily stack with group when not spread
-UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1686101;
+-- death lord has higher frequency of aura of agony
+UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=3000, `event_param4`=3000 WHERE `id`=1686101;
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `event_param4`=6000  WHERE `id`=1616301;
 
 
