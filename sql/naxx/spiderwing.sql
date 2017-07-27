@@ -23,10 +23,10 @@ VALUES
 
 
 -- Spirit of Naxxramas given script and correct faction
-UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `AIName`='', `ScriptName`='spirit_of_naxxramas_ai', `minhealth`=150000, `maxhealth`=150000 WHERE `entry`=16449;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai', `minhealth`=150000, `maxhealth`=150000 WHERE `entry`=16449;
 
 -- Ghost of Naxxramas 
-UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `armor`=3200, `faction_A`=20, `faction_H`=20, `mindmg`=1500, `maxdmg`=2200, `attackpower`=320, `dmg_multiplier`=1, `type`=6, `MovementType`=1, `speed_walk`='0.5', `speed_run`='0.5', `AIName`='EventAI' WHERE `entry`=16419;
+UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `armor`=3200, `mindmg`=1500, `maxdmg`=2200, `attackpower`=320, `dmg_multiplier`=1, `type`=6, `MovementType`=1, `speed_walk`='0.5', `speed_run`='0.5', `AIName`='EventAI' WHERE `entry`=16419;
 
 -- ghost of naxxramas zone combat pulse on spawn
 DELETE FROM `creature_ai_scripts` where id = 1641901;

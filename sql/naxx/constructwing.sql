@@ -9,7 +9,7 @@ UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entr
 
 -- Lightning Totem (summoned by Living Monstrosity) no movement
 -- UPDATE `creature_template` SET `speed_walk`=0, `speed_run`=0, `unit_flags`=4, `MovementType`=0 WHERE `entry`=16385;
-UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10 WHERE `entry`=16385;
+UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10 WHERE `entry`=16385;
 
 -- Patchwork Golem correct War stomp spell
 UPDATE `creature_ai_scripts` SET `action1_param1`=28125 WHERE `id`=1601701;

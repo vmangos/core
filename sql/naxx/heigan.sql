@@ -14,10 +14,10 @@ VALUES
 -- Rotting maggots in heigans gauntlet. 
 -- Should be elite, does around 700-900 in an AQ geared hunter, and move randomly around in its area
 -- need a script to properly control its evading
-UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `speed_walk`=0.55, `speed_run`=0.63, `rank`=1, `mindmg`=1425, `maxdmg`=1722, `MovementType`=1, `ScriptName`='mob_rotting_maggot',`baseattacktime`='3000', `rangeattacktime`='3000' WHERE `entry`=16057;
+UPDATE `creature_template` SET `speed_walk`=0.55, `speed_run`=0.63, `rank`=1, `mindmg`=1425, `maxdmg`=1722, `MovementType`=1, `ScriptName`='mob_rotting_maggot',`baseattacktime`='3000', `rangeattacktime`='3000' WHERE `entry`=16057;
 
 -- Diseased maggots pretty much the same, but less melee dmg as they use a spell
-UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `speed_walk`=0.55, `speed_run`=0.63, `rank`=1, `mindmg`=700, `maxdmg`=900, `MovementType`=1, `ScriptName`='mob_diseased_maggot'  WHERE `entry`=16056;
+UPDATE `creature_template` SET `speed_walk`=0.55, `speed_run`=0.63, `rank`=1, `mindmg`=700, `maxdmg`=900, `MovementType`=1, `ScriptName`='mob_diseased_maggot'  WHERE `entry`=16056;
 
 -- Allowing rotting maggtots and diseased maggots to randomly patrol within a 15yd radius, and respawn after 1 minute
 UPDATE creature SET spawndist = 15, spawntimesecs = 60, MovementType = 1 WHERE id IN (16056, 16057);
@@ -30,7 +30,7 @@ update creature set id = 16056, modelid = 15978 where guid in (88233, 88235, 882
 UPDATE `creature_model_info` SET `bounding_radius`='4', `combat_reach`='6' WHERE `modelid`='16309';
 
 -- Eye stalks should have "around 500 hp" according to original vanilla guides. Corrected faction, and unitflag DISABLE_MOVE
-UPDATE `creature_template` SET `minhealth`=500, `maxhealth`=500, `faction_A`=20, `faction_H`=20, `unit_flags`=4, `AIName` = "", `ScriptName`='mob_eye_stalk' WHERE `entry`=16236;
+UPDATE `creature_template` SET `minhealth`=500, `maxhealth`=500, `unit_flags`=4, `AIName` = "", `ScriptName`='mob_eye_stalk' WHERE `entry`=16236;
 
 -- eye stalks cast spell "root anybody forever" instead of disabling combat movement, which isent working at all.
 -- also added an event which recasts it on itself after evade

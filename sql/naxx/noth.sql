@@ -42,7 +42,3 @@ INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipent
 VALUES 
 (16984, 12285, 0, 0),
 (16983, 4991, 0, 0);
-
-
--- Noth adds corrected faction.
-UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20 WHERE `entry` IN (16981, 16982, 16983, 16984);

@@ -92,6 +92,9 @@ UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `even
 
 -- updating a bunch of creatures faction which were previously 21 or other incorrect factions
 UPDATE creature_template SET faction_A=20, faction_H=20 where entry in(
+16419,
+16474,
+16286,
 16447,
 16243,
 16244,
@@ -188,5 +191,4 @@ UPDATE creature_template SET faction_A=20, faction_H=20 where entry in(
 16981,
 16982,
 16983,
-16984,
-17055);
+16984);
