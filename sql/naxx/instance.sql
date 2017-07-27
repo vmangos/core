@@ -85,3 +85,7 @@ UPDATE `creature_ai_scripts` SET `event_param1`=4000, `event_param2`=4000, `even
 UPDATE `creature_ai_scripts` SET `event_param1`=7000, `event_param2`=7000, `event_param3`=8000,  `event_param4`=10000 WHERE `id`=1645202;
 UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=3000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1645203;
 UPDATE `creature_ai_scripts` SET `event_param1`=3500, `event_param2`=3500, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1645206;
+
+-- death knight vindicator, increase frequency of aura of agony and death coil hit maintank
+UPDATE `creature_ai_scripts` SET `action1_param2`=1 WHERE `id`=1645103;
+UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1645101;
