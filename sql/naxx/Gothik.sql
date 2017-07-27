@@ -24,7 +24,7 @@ INSERT INTO creature (guid, id, map, modelid, equipment_id, position_x, position
 UPDATE creature_template SET faction_H = 20, faction_A = 20 WHERE entry BETWEEN 16124 AND 16127 OR entry BETWEEN 16148 AND 16150;
 
 -- Invisibility of Gothik triggers
-UPDATE creature_template SET  scriptname = "spell_anchor" WHERE entry = 16137;
+UPDATE creature_template SET modelid_1=11686, modelid_2=0, scriptname = "spell_anchor" WHERE entry = 16137;
 
 -- Gothik spell script target
 DELETE FROM spell_script_target WHERE entry IN (27892, 27928,27935, 27893, 27929, 27936, 27915, 27931, 27937);
