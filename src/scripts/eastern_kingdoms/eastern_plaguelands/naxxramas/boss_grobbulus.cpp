@@ -48,7 +48,7 @@ enum
     SPELL_POISON_CLOUD          = 28240, // Summons a poison cloud npc
     SPELL_POISON_CLOUD_PASSIVE  = 28158, // the visual poison cloud, triggers 28241 every second
 
-    SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes
+    //SPELL_DISEASE_CLOUD = 28362, // triggers ~300 dmg every 3 sec in 10yd radius, used by fallout slimes EventAI
     
     SPELL_BOMBARD_SLIME = 28280, // todo: should spawn a slime at the room before patch every patroll round, if any are dead.
     
@@ -162,7 +162,7 @@ struct boss_grobbulusAI : public ScriptedAI
                 pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), 0.0f,
                 TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 10 * IN_MILLISECONDS))
             {
-                pSlime->CastSpell(pSlime, SPELL_DISEASE_CLOUD, true);
+                pSlime->SetInCombatWithZone();
             }
     }
 
