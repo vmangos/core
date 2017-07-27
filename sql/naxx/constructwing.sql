@@ -55,3 +55,6 @@ UPDATE `creature_ai_scripts` SET `event_param1`=5000, `event_param2`=5000, `even
 
 -- Bile Sludges cast clone on a timer rather than 15%
 UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`=6000, `event_param2`=6000, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1614201;
+
+-- bile sludge damage increase
+UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000 WHERE `entry`=16142;
