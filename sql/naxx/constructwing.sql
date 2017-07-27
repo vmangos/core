@@ -52,3 +52,6 @@ VALUES
 */
 
 UPDATE `creature_ai_scripts` SET `event_param1`=5000, `event_param2`=5000, `event_param3`=10000, `event_param4`=15000 WHERE `id`=1602103;
+
+-- Bile Sludges cast clone on a timer rather than 15%
+UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`=6000, `event_param2`=6000, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1614201;
