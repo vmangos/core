@@ -288,7 +288,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         nextAbom = 30000;
         p3Started = false;
         numSummonedGuardians = 0;
-        m_pInstance->ToggleKelThuzadWindows(false);
+        
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
 
@@ -350,8 +350,8 @@ struct boss_kelthuzadAI : public ScriptedAI
         {
             m_pInstance->SetData(TYPE_KELTHUZAD, NOT_STARTED);
             m_pInstance->ToggleKelThuzadWindows(false);
+            m_pInstance->ToggleKelThuzadWindows(false);
         }
-
         DespawnAllIntroCreatures();
         EvadeAllGuardians();
     }
@@ -379,6 +379,8 @@ struct boss_kelthuzadAI : public ScriptedAI
   
     void StartEncounter()
     {
+        m_pInstance->ToggleKelThuzadWindows(false);
+
         // on pull there are in each alcove:
         // 3 aboms
         // 1 banshee
