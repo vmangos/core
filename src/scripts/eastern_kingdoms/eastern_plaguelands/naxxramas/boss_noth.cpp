@@ -225,7 +225,7 @@ struct boss_nothAI : public ScriptedAI
 
         m_events.Reset();
 
-        // 70, 90 and 120 seconds for 1st, 2nd and 3rd balc phase respectively.
+        // 70, 95 and 120 seconds for 1st, 2nd and 3rd balc phase respectively.
         m_events.ScheduleEvent(EVENT_TP_GROUND, Seconds(70 + 25 * phaseCounter));
 
         auto first_spawn = Seconds(urand(5, 7));
