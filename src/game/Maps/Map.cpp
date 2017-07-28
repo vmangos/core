@@ -502,19 +502,6 @@ void Map::MessageBroadcast(WorldObject *obj, WorldPacket *msg)
     cell.Visit(p, message, *this, *obj, GetVisibilityDistance());
 }
 
-void Map::MessageBroadcast(WorldPacket* msg, uint32 zone)
-{
-    const auto& pList = GetPlayers();
-
-    for (auto mapref : pList)
-    {
-        if (!zone || mapref.getSource()->GetCachedZoneId() == zone)
-        {
-            mapref.getSource()->SendDirectMessage(msg);
-        }
-    }
-}
-
 void Map::MessageDistBroadcast(Player *player, WorldPacket *msg, float dist, bool to_self, bool own_team_only)
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());

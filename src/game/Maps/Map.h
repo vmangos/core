@@ -233,7 +233,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         void UpdateSessionsMovementAndSpellsIfNeeded();
         void ProcessSessionPackets(PacketProcessing type);
 
-        void MessageBroadcast(WorldPacket* msg, uint32 zone);
         void MessageBroadcast(Player*, WorldPacket*, bool to_self);
         void MessageBroadcast(WorldObject*, WorldPacket*);
         void MessageDistBroadcast(Player*, WorldPacket*, float dist, bool to_self, bool own_team_only = false);
