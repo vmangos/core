@@ -80,4 +80,8 @@ UPDATE `script_texts` SET `type`='6' WHERE `entry`='-1533088';
 UPDATE `script_texts` SET `sound`='8822' WHERE `entry`='-1533092';
 UPDATE `script_texts` SET `sound`='8823' WHERE `entry`='-1533093';
 
+-- 4hm intro RP must be type zone-yells
+UPDATE `script_texts` set type = 6 where entry in (-1533059, -1533045, -1533071, -1533046, -1533060, -1533053, -1533072);
+UPDATE `script_texts` SET `content_default`='Invaders! Cease this foolish venture at once! Turn away while you still can!' WHERE `entry`='-1533059';
+UPDATE `script_texts` SET `content_default`='I\'ve heard about enough a\' yer snivelin\'. Shut your flytrap before I shut it for ye\'!' WHERE `entry`='-1533053';
 

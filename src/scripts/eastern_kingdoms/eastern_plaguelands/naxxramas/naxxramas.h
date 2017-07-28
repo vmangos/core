@@ -50,10 +50,10 @@ enum NaxxNPCs : uint32
     
     NPC_RAZUVIOUS               = 16061,
     NPC_GOTHIK                  = 16060,
+    NPC_MOGRAINE                = 16062,
     NPC_ZELIEK                  = 16063,
     NPC_THANE                   = 16064,
     NPC_BLAUMEUX                = 16065,
-    NPC_RIVENDARE               = 30549,
 
     NPC_SAPPHIRON               = 15989,
     NPC_KELTHUZAD               = 15990,

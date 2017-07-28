@@ -37,7 +37,16 @@ enum NaxxEvents
     EVENT_KT_LK_DIALOGUE_5,
     EVENT_KT_LK_DIALOGUE_GATE_OPEN,
 
-    EVENT_SUMMON_FROGGER_WAVE
+    EVENT_SUMMON_FROGGER_WAVE,
+
+    EVENT_4HM_DIALOGUE_1, // Sir Zeliek yells: Invaders! Cease this foolish venture at once! Turn away while you still can!
+    EVENT_4HM_DIALOGUE_2, // Lady Blaumeux yells: Come, Zeliek, do not drive them out. Not until we've had our fun!
+    EVENT_4HM_DIALOGUE_3, // Highlord Mograine yells: Enough prattling. Let them come. We shall grind their bones to dust.
+    EVENT_4HM_DIALOGUE_4, // Lady Blaumeux yells: I do hope they stay long enough for me to... introduce myself.
+    EVENT_4HM_DIALOGUE_5, // Sir Zeliek yells: Perhaps they will come to their senses... and run away as fast as they can.
+    EVENT_4HM_DIALOGUE_6, // Thane Korth'azz yells: I've heard about enough a' yer snivelin'!Shut your flytrap before I shut it for ye'!
+    EVENT_4HM_DIALOGUE_7, // Highlord Mograine yells: Conserve your anger. Harness your rage. You will all have outlets for your frustrations soon enough.
+
 };
 
 
@@ -226,7 +235,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_ZELIEK:
         case NPC_THANE:
         case NPC_BLAUMEUX:
-        case NPC_RIVENDARE:
+        case NPC_MOGRAINE:
         case NPC_SAPPHIRON:
         case NPC_KELTHUZAD:
         case NPC_MR_BIGGLESWORTH:
@@ -541,6 +550,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     break;
                 case DONE:
                     pGO->SetGoState(GO_STATE_ACTIVE);
+                    m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_1, Seconds(10)); // todo: don't know if it should trigger here or when opening 4hm door
                     break;
                 }
             }
@@ -879,6 +889,8 @@ void instance_naxxramas::Update(uint32 diff)
             UpdateBossGate(GO_KELTHUZAD_DOOR, DONE);
             break;
         case EVENT_SUMMON_FROGGER_WAVE:
+        {
+
             static constexpr float pos[6][4] = {
             {3128.66f, -3121.27f, 293.341f, 4.73893f},
             {3154.58f, -3126.18f, 293.591f, 4.43020f},
@@ -895,6 +907,34 @@ void instance_naxxramas::Update(uint32 diff)
                 }
             }
             m_events.Repeat(Seconds(6));
+            break;
+        }
+        case EVENT_4HM_DIALOGUE_1:
+            DoOrSimulateScriptTextForMap(-1533059, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(16063));
+            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_2, Seconds(7));
+            break;
+        case EVENT_4HM_DIALOGUE_2:
+            DoOrSimulateScriptTextForMap(-1533045, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(16065));
+            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_3, Seconds(7));
+            break;
+        case EVENT_4HM_DIALOGUE_3:
+            DoOrSimulateScriptTextForMap(-1533071, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(16062));
+            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_4, Seconds(7));
+            break;
+        case EVENT_4HM_DIALOGUE_4:
+            DoOrSimulateScriptTextForMap(-1533046, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(16065));
+            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_5, Seconds(7));
+            break;
+        case EVENT_4HM_DIALOGUE_5:
+            DoOrSimulateScriptTextForMap(-1533060, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(16063));
+            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_6, Seconds(6));
+            break;
+        case EVENT_4HM_DIALOGUE_6:
+            DoOrSimulateScriptTextForMap(-1533053, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
+            m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_7, Seconds(7));
+            break;
+        case EVENT_4HM_DIALOGUE_7:
+            DoOrSimulateScriptTextForMap(-1533072, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(16062));
             break;
         }
     }
