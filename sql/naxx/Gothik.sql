@@ -64,7 +64,7 @@ VALUES
 (1612401, 16124, 0, 0, 100, 1, 0,    0,    15500, 15500, 11, 30285, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Trainee Eagle Claw'),
 (1612402, 16124, 0, 0, 100, 1, 5000, 6000, 8000,  10000, 11, 20276, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Trainee Knockdown'),
 
-(1612501, 16125, 0, 0, 100, 1, 5000, 8000, 12000, 15000, 11, 27577, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight intercept random hostile'),
+(1612501, 16125, 0, 0, 100, 1, 5000, 8000, 12000, 15000, 11, 27577, 4, 0, 14, -100, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight intercept random hostile and reset threat'),
 (1612502, 16125, 0, 0, 100, 1, 1000, 2000, 15500, 15500, 11, 27825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight Shadow Mark'),
 
 (1612601, 16126, 11,0, 100, 0,   0,    0,     0,     0,  11, 27987, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider Unholy Aura on spawn'),
@@ -100,3 +100,5 @@ UPDATE `creature_template` SET `minhealth`=19000, `maxhealth`=19500 where `entry
 -- spectral trainee hp
 UPDATE `creature_template` SET `minhealth`=6000, `maxhealth`=7000 WHERE `entry`=16127;
 
+-- gothiks HP
+UPDATE creature_template set minhealth = 399750, maxhealth = 399750 where entry = 16060; 
