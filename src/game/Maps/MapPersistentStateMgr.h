@@ -267,11 +267,15 @@ struct DungeonResetEvent
     bool operator == (const DungeonResetEvent& e) { return e.mapid == mapid && e.instanceId == instanceId; }
 };
 
+typedef std::map<uint32, std::pair<uint32, time_t> > ResetTimeMapType;
+
 class DungeonResetScheduler
 {
     public:                                                 // constructors
         explicit DungeonResetScheduler(MapPersistentStateManager& mgr) : m_InstanceSaves(mgr) {}
         void LoadResetTimes();
+
+        void ScheduleAllDungeonResets();
 
     public:                                                 // accessors
         time_t GetResetTimeFor(uint32 mapid) { return m_resetTimeByMapId[mapid]; }
@@ -326,10 +330,11 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
     public:                                                 // DungeonPersistentState specific
         void CleanupInstances();
         void PackInstances();
+        void ScheduleInstanceResets();
 
         DungeonResetScheduler& GetScheduler() { return m_Scheduler; }
 
-        static void DeleteInstanceFromDB(uint32 instanceid);
+        static void DeleteInstanceFromDB(uint32 mapid, uint32 instanceid);
 
         void GetStatistics(uint32& numStates, uint32& numBoundPlayers, uint32& numBoundGroups);
 

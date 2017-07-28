@@ -1171,6 +1171,9 @@ void World::SetInitialWorldSettings()
 
         sLog.outString("Packing groups...");
         sObjectMgr.PackGroupIds();                              // must be after CleanupInstances
+
+        sLog.outString("Scheduling normal instance reset...");
+        sMapPersistentStateMgr.ScheduleInstanceResets();        // Must be after cleanup and packing
     }
 
     ///- Init highest guids before any guid using table loading to prevent using not initialized guids in some code.
