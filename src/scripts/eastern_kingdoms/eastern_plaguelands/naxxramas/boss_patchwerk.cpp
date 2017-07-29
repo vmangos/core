@@ -50,7 +50,7 @@ enum ePatchwerkEvents
 };
 
 static constexpr uint32 BERSERK_TIMER           = 7 * 60 * 1000; // 7 minutes enrage
-static constexpr uint32 HATEFUL_CD              = 1200;
+static constexpr uint32 HATEFUL_CD              = 1400;
 
 // 30 sec after berserk he starts throwing slime at ppl
 // this was added in 1.12.1 to cope with guilds kiting him
@@ -71,12 +71,14 @@ struct boss_patchwerkAI : public ScriptedAI
 
     bool   m_bEnraged;
     bool   m_bBerserk;
+    ObjectGuid previousTarget;
 
     void Reset()
     {
         m_events.Reset();
         m_bEnraged = false;
         m_bBerserk = false;
+        previousTarget = 0;
     }
 
     void KilledUnit(Unit* pVictim)
@@ -163,8 +165,12 @@ struct boss_patchwerkAI : public ScriptedAI
         // If we found no viable target, we choose the maintank
         if (!pTarget)
             pTarget = mainTank;
-        m_creature->SetInFront(pTarget);
-        m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+        if (pTarget->GetObjectGuid() != previousTarget)
+        {
+            m_creature->SetInFront(pTarget);
+            m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+            previousTarget = pTarget->GetObjectGuid();
+        }
         DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CAST_TRIGGERED);
     }
 
@@ -185,11 +191,16 @@ struct boss_patchwerkAI : public ScriptedAI
             if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
                 && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
             {
-                if (!m_creature->isAttackReady(BASE_ATTACK)) // he does not have offhand attack
+                
+                if (!m_creature->isAttackReady(BASE_ATTACK) && m_creature->IsWithinMeleeRange(target)) // he does not have offhand attack
                     return true;
 
-                m_creature->SetInFront(target);
-                m_creature->SetTargetGuid(target->GetObjectGuid());
+                if (target->GetObjectGuid() != previousTarget)
+                {
+                    m_creature->SetInFront(target);
+                    m_creature->SetTargetGuid(target->GetObjectGuid());
+                    previousTarget = target->GetObjectGuid();
+                }
                 AttackStart(target);
             }
             return true;
