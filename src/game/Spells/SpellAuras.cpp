@@ -2838,6 +2838,13 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
             pCreature->AttackedBy(caster);
         }
+        // cast mind exhaustion on self when the posess possess ends if the creature
+        // is death knight understudy (razuvious). 
+        // todo: if there is a way to know a possess has ended through scriptAI, fix this.
+        if (target->GetEntry() == 16803)
+        {
+            target->CastSpell(target, 29051, true); 
+        }
     }
     target->SetUnitMovementFlags(MOVEFLAG_NONE);
 }
