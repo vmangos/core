@@ -79,22 +79,23 @@ struct mob_deathknightUnderstudyAI : public ScriptedAI
     instance_naxxramas* m_pInstance;
 
     uint32 attackTimer;
-
+    bool runAttack;
     void Reset()
     {
         m_creature->HandleEmote(EMOTE_STATE_READY1H);
         attackTimer = urand(5000, 10000);
+        runAttack = true;
     }
 
     void Aggro(Unit*) override
     {
-        attackTimer = 0;
+        runAttack = false;
         m_creature->CallForHelp(30.0f);
     }
 
     void UpdateAI(const uint32 diff) override
     {
-        if (attackTimer)
+        if (runAttack)
         {
             if (attackTimer < diff)
             {
@@ -239,7 +240,10 @@ struct boss_razuviousAI : public ScriptedAI
                 if (Creature* b = getRPBuddy())
                 {
                     if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
+                    {
                         ai->attackTimer = 0;
+                        ai->runAttack = false;
+                    }
                     b->SetFacingToObject(m_creature);
                     b->HandleEmote(EMOTE_STATE_STAND);
                 }
@@ -266,7 +270,10 @@ struct boss_razuviousAI : public ScriptedAI
                 {
                     b->HandleEmote(EMOTE_STATE_READY1H);
                     if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
+                    {
                         ai->attackTimer = 500;
+                        ai->runAttack = true;
+                    }
                 }
                 break;
             }
