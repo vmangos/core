@@ -135,6 +135,9 @@ struct boss_razuviousAI : public ScriptedAI
     
     void RespawnAdds()
     {
+        if (m_pInstance && m_pInstance->GetData(TYPE_RAZUVIOUS) == DONE)
+            return;
+
         // start by despawning any adds that may still be around
         for (auto it = summonedAdds.begin(); it != summonedAdds.end();)
         {
