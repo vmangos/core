@@ -1147,8 +1147,13 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
 
         if (acidVolleyTimer < diff && !m_creature->IsNonMeleeSpellCasted())
         {
-            if (DoCastSpellIfCan(m_creature, 29325) == CAST_OK) // acid volley
-                acidVolleyTimer = 8000;
+            // supposedly the first gargoyle in plague wing did not do the acid volley, so
+            // hackfix here to skip him
+            if (m_creature->GetDBTableGUIDLow() != 88095)
+            {
+                if (DoCastSpellIfCan(m_creature, 29325) == CAST_OK) // acid volley
+                    acidVolleyTimer = 8000;
+            }
         }
         else
             acidVolleyTimer -= diff;
