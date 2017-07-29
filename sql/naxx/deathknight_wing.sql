@@ -153,18 +153,22 @@ INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipent
 -- RP stuff for deathknight packs
 DELETE FROM creature_movement_scripts where id in(1614601, 1614602, 1614603, 1614604);
 insert into creature_movement_scripts (id, delay, command, datalong, datalong2, datalong3, datalong4, data_flags, dataint, dataint2, dataint3, dataint4, x, y, z, o, comments) VALUES
+                                  (1614601,	0,	   1,	     19,	    16157,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Doom Touched warrior chicken"),
                                   (1614601,	1,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
                                   (1614601,	2,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
                                   (1614601,	5,	   1,	     1,	        16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain talks"),
                                   (1614601,	7,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
                                   (1614601,	8,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
+                                  (1614601,	10,	   1,	     15,	    16156,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Dark Touched warrior roar"),
                                   (1614601,	14,	   1,	     60,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain kicks"),
                                   (1614601,	15,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
-                                                                                                                                          
                                   (1614601,	17,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
                                   (1614601,	18,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
                                   (1614601,	20,	   1,	     5,	        16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain shouts"),
                                   (1614601,	22,	   1,	     36,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain attacks"),
+                                  
+                                  (1614601,	23,	   1,	     21,	    16157,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Doom Touched warrior applaude"),
+                                                                    
                                   (1614601,	23,	   1,	     43,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight parries"),
                                   (1614601,	26,	   1,	     60,	    16145,	    10,	       0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight captain kicks"),
                                   (1614601,	27,	   1,	     36,	    0,	         0,        0,	      0,	      0,	0,	          0,	0,	0,	0,	0,	0,	"Deathknight attacks"),
@@ -203,21 +207,23 @@ insert into creature_movement_scripts (id, delay, command, datalong, datalong2, 
 DELETE FROM `creature_movement` where id in (88430, 88444, 88439, 88434, 88436);
 INSERT INTO `creature_movement` (`id`,`point`,`position_x`,`position_y`,`position_z`,`waittime`,`script_id`,`textid1`,`textid2`,`textid3`,`textid4`,`textid5`,`emote`,`spell`,`orientation`,`model1`,`model2`) VALUES 
 (88430,1, 2872.69, -3202.18, 298.146, 0,    0,      0,0,0,0,0,0,0,5.8079,0,0),
-(88430,2, 2872.69, -3202.18, 298.146, 15000,1614601,0,0,0,0,0,0,0,5.8079,0,0),
+(88430,2, 2872.69, -3202.18, 298.146, 27000,1614601,0,0,0,0,0,0,0,5.8079,0,0),
 
 (88444,1, 2799.66, -3166, 298.147, 0,    0,      0,0,0,0,0,0,0,3.11147,0,0),
-(88444,2, 2799.66, -3166, 298.147, 15000,1614601,0,0,0,0,0,0,0,3.11147,0,0),
+(88444,2, 2799.66, -3166, 298.147, 27000,1614601,0,0,0,0,0,0,0,3.11147,0,0),
 
 
 (88434,1, 2829.04, -3208.18, 298.252, 0,    0,      0,0,0,0,0,0,0,4.10672,0,0),
-(88434,2, 2829.04, -3208.18, 298.252, 15000,1614602,0,0,0,0,0,0,0,4.10672,0,0),
+(88434,2, 2829.04, -3208.18, 298.252, 21000,1614602,0,0,0,0,0,0,0,4.10672,0,0),
 
 (88436,1, 2857.09, -3180.16, 298.153, 0,    0,      0,0,0,0,0,0,0,0.024496,0,0),
-(88436,2, 2857.09, -3180.16, 298.147, 15000,1614603,0,0,0,0,0,0,0,0.024496,0,0),
+(88436,2, 2857.09, -3180.16, 298.147, 20000,1614603,0,0,0,0,0,0,0,0.024496,0,0),
 
 
 (88439,1, 2825.19, -3157.38, 298.146, 0,    0,      0,0,0,0,0,0,0,1.3861,0,0),
-(88439,2, 2825.19, -3157.38, 298.146, 15000,1614604,0,0,0,0,0,0,0,1.3861,0,0);
+(88439,2, 2825.19, -3157.38, 298.146, 20000,1614604,0,0,0,0,0,0,0,1.3861,0,0);
+
+
 
 -- remove script-id for razuvious, the Rp is done in c++ script.
 update creature_movement_template set script_id = 0 where entry = 16061;
