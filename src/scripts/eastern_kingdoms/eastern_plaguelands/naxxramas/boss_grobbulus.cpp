@@ -101,7 +101,7 @@ struct boss_grobbulusAI : public ScriptedAI
         m_uiSlimeStreamTimer = 5000; // allowing tank 5 sec to get to grobbulus on pull
     }
 
-    void Aggro(Unit* /*pWho*/) override
+    void Aggro(Unit* pWho) override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GROBBULUS, IN_PROGRESS);
@@ -110,6 +110,13 @@ struct boss_grobbulusAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_POISON_CLOUD, POISONCLOUD_CD());
         m_events.ScheduleEvent(EVENT_SLIME_SPRAY, SLIMESPRAY_CD(true));
         m_events.ScheduleEvent(EVENT_BERSERK, BERSERK_TIMER);
+
+        std::list<Creature*> creatures;
+        GetCreatureListWithEntryInGrid(creatures, m_creature, 16025, 150.0f);
+        for (Creature* pCreature : creatures)
+        {
+            pCreature->AI()->AttackStart(pWho);
+        }
     }
 
     void JustDied(Unit* /*pKiller*/) override
