@@ -252,3 +252,16 @@ REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1639001, 16390, 0, 0, 0, 0, 0, 0, 4000, 6000, 14, -100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathchill servant periodic threat reset');
+
+-- risen squire is called risen deathknight
+UPDATE `creature_template` SET `name`='Risen Deathknight' WHERE `entry`=16154;
+
+-- dark touched warriors are equipped with a bucket
+delete from creature_equip_template_raw where entry = 1447;
+UPDATE `creature_template` SET `equipment_id`=16156 WHERE `entry`=16156;
+DELETE FROM creature_equip_template where entry = 16156;
+INSERT into creature_equip_template (entry, equipentry1, equipentry2, equipentry3) VALUES
+(16156, 12801, 0, 0);
+
+-- dark touched warriors got a script to do custom running towards horses
+UPDATE `creature_template` SET `AIName`='', `equipment_id`=16156, `ScriptName`='dark_touched_warriorAI' WHERE `entry`=16156;

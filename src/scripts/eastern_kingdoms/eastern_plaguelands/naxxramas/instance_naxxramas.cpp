@@ -1240,6 +1240,56 @@ struct mob_toxic_tunnelAI : public ScriptedAI
     }
 };
 
+struct mob_dark_touched_warriorAI : public ScriptedAI
+{
+    mob_dark_touched_warriorAI(Creature* pCreature)
+        : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    bool hasFled;
+    void Reset() override
+    {
+        hasFled = false;
+    }
+
+    void FleeToHorse()
+    {
+        if (!m_creature->getVictim() || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+            return;
+
+        Creature* pNearest = NULL;
+        MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_creature, 16067, true, 100.0f);
+        MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pNearest, u_check);
+
+        Cell::VisitGridObjects(m_creature, searcher, 100.0f);
+        if (pNearest)
+        {
+            m_creature->GetMotionMaster()->MoveSeekAssistance(pNearest->GetPositionX(), pNearest->GetPositionY(), pNearest->GetPositionZ());
+            m_creature->SetTargetGuid(ObjectGuid());
+           
+            m_creature->UpdateSpeed(MOVE_RUN, false);
+            m_creature->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+        }
+    }
+
+    void UpdateAI(const uint32 diff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (!hasFled && m_creature->GetHealthPercent() < 50.0f)
+        {
+            hasFled = true;
+            FleeToHorse();
+        }
+
+        DoMeleeAttackIfReady();
+    }
+
+};
+
 CreatureAI* GetAI_mob_spiritOfNaxxramas(Creature* pCreature)
 {
     return new mob_spiritOfNaxxramasAI(pCreature);
@@ -1258,6 +1308,11 @@ CreatureAI* GetAI_mob_plagueSlimeAI(Creature* pCreature)
 CreatureAI* GetAI_toxic_tunnel(Creature* pCreature)
 {
     return new mob_toxic_tunnelAI(pCreature);
+}
+
+CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
+{
+    return new mob_dark_touched_warriorAI(pCreature);
 }
 
 void AddSC_instance_naxxramas()
@@ -1294,4 +1349,11 @@ void AddSC_instance_naxxramas()
     pNewScript->Name = "toxic_tunnel_ai";
     pNewScript->GetAI = &GetAI_toxic_tunnel;
     pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "dark_touched_warriorAI";
+    pNewScript->GetAI = &GetAI_dark_touched_warrior;
+    pNewScript->RegisterSelf();
+
+    
 }
