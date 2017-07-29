@@ -47,9 +47,9 @@ UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `even
 
 -- Touched Warriors periodically wipe aggro 
 UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16156;
-UPDATE `creature_template` SET `minhealth`=24990, `maxhealth`=24999, `AIName`='EventAI' WHERE `entry`=16157;
+UPDATE `creature_template` SET `minhealth`=24990, `maxhealth`=24999, `AIName`='EventAI', scale=1.6 WHERE `entry`=16157;
 UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16158;
-DELETE FROM `creature_ai_scripts` where id in (1615601, 1615701);
+DELETE FROM `creature_ai_scripts` where id in (1615601, 1615701, 1615801);
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
