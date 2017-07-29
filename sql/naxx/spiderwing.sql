@@ -86,3 +86,9 @@ VALUES
 (1644801, 16448, 0, 0, 100, 1, 6000, 8000, 8000, 10000, 11, 30121, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Deathhound forceful howl');
 -- Plagued deathhound ai
 UPDATE `creature_template` SET `minhealth`=93736, `maxhealth`=93736, `maxmana`=0, `scale`=2.5, `AIName`='EventAI' WHERE `entry`=16448;
+
+-- venom stalker back to default scale, necro stalker to scale 2.5
+UPDATE `creature_template` SET `scale`='0' WHERE `entry`=15976;
+UPDATE `creature_template` SET `scale`='2.5' WHERE `entry`=16453;
+/*
+
