@@ -192,3 +192,12 @@ UPDATE creature_template SET faction_A=20, faction_H=20 where entry in(
 16982,
 16983,
 16984);
+
+update creature_template set speed_walk = 0.8 where entry in (16447, 16244, 16011, 16021, 16243);
+update creature_template set speed_walk = 1.5 where entry in (15931, 16158,16290,16365,16368,16381,16446,16448,16449,16451,16452,16453);
+update creature_template set speed_walk = 1.65 where entry in (15928, 15929,15930,15952,15989,16062,16063,16064,16065);
+update creature_template set speed_walk = 1.6 where entry = 16061;
+update creature_template set speed_walk = 1.28 where entry in (16145,16146,16156,16193);
+update creature_template set speed_walk = 2, speed_run = 1.71429 where entry = 16028;
+update creature_template set speed_walk = 0.4, speed_run = 0.142857 where entry = 16142;
+update creature_template set speed_walk = 2 where entry = 16168;
