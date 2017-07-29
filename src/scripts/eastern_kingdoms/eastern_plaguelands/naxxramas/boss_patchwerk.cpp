@@ -133,7 +133,7 @@ struct boss_patchwerkAI : public ScriptedAI
         ThreatList const& tList = m_creature->getThreatManager().getThreatList();
         for (ThreatList::const_iterator iter = tList.begin(); iter != tList.end(); ++iter)
         {
-            // Skipping maintank, only using him if there is no other viable target
+            // Skipping maintank, only using him if there is no other viable target todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
             if ((*iter)->getUnitGuid() == mainTankGuid)
                 continue;
 
@@ -155,13 +155,63 @@ struct boss_patchwerkAI : public ScriptedAI
         // If we found no viable target, we choose the maintank
         if (!pTarget)
             pTarget = mainTank;
-        m_creature->SetFacingToObject(pTarget);
+        m_creature->SetInFront(pTarget);
+        m_creature->SetTargetGuid(pTarget->GetObjectGuid());
         DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CAST_TRIGGERED);
+    }
+
+    bool CustomGetTarget()
+    {
+        if (!m_creature->isAlive())
+            return false;
+
+        Unit* target = nullptr;
+
+        // No taunt aura or taunt aura caster is dead, standard target selection
+        if (!target && !m_creature->getThreatManager().isThreatListEmpty())
+            target = m_creature->getThreatManager().getHostileTarget();
+
+        if (target)
+        {
+            // Nostalrius : Correction bug sheep/fear
+            if (!m_creature->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_DIED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING)
+                && (!m_creature->HasAuraType(SPELL_AURA_MOD_FEAR) || m_creature->HasAuraType(SPELL_AURA_PREVENTS_FLEEING)) && !m_creature->HasAuraType(SPELL_AURA_MOD_CONFUSE))
+            {
+                if (!m_creature->isAttackReady(BASE_ATTACK)) // he does not have offhand attack
+                    return true;
+
+                m_creature->SetInFront(target);
+                m_creature->SetTargetGuid(target->GetObjectGuid());
+                AttackStart(target);
+            }
+            return true;
+        }
+
+        // no target but something prevent go to evade mode // Nostalrius - fix evade quand CM.
+        if (!m_creature->isInCombat() || m_creature->HasAuraType(SPELL_AURA_MOD_TAUNT) || m_creature->GetCharmerGuid())
+            return false;
+
+        // last case when creature don't must go to evade mode:
+        // it in combat but attacker not make any damage and not enter to aggro radius to have record in threat list
+        // for example at owner command to pet attack some far away creature
+        // Note: creature not have targeted movement generator but have attacker in this case
+        if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+        {
+            for (std::set<Unit*>::const_iterator itr = m_creature->getAttackers().begin(); itr != m_creature->getAttackers().end(); ++itr)
+            {
+                if ((*itr)->IsInMap(m_creature) && (*itr)->isTargetableForAttack())
+                    return false;
+            }
+        }
+
+        // enter in evade mode in other case
+        m_creature->OnLeaveCombat();
+        return false;
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+        if (!CustomGetTarget() || !m_creature->getVictim())
             return;
 
         // Soft Enrage at 5%
