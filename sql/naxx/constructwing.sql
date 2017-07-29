@@ -58,3 +58,6 @@ UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`
 
 -- bile sludge damage increase
 UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000 WHERE `entry`=16142;
+
+-- Stitched giants were named stitched spewer in vanilla
+UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
