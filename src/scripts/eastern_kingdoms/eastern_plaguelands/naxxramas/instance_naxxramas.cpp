@@ -279,12 +279,70 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
-        
-        // naxxramas acolyte and cultist
-        case 15980:
-        case 15981:
-            pCreature->SetStandState(UNIT_STAND_STATE_KNEEL);
+                  
+        // patchwerk trash
+        case NPC_PatchworkGolem:
+        case NPC_BileRetcher:
+        case NPC_SludgeBelcher:
+        case NPC_EmbalmingSlime:
+        case NPC_LivingMonstrosity:
+        case NPC_SurgicalAssistant:
+        case NPC_MadScientist:
+            if (m_auiEncounter[TYPE_PATCHWERK] == DONE)
+                pCreature->DeleteLater();
             break;
+        
+        // grobbulus trash
+        case NPC_StitchedGiant:
+            if (m_auiEncounter[TYPE_GROBBULUS] == DONE)
+                pCreature->DeleteLater();
+            break;
+
+        // faerlina trash
+        case NPC_NaxxramasCultist:
+        case NPC_NaxxramasAcolyte:
+            if (m_auiEncounter[TYPE_FAERLINA] == DONE)
+                pCreature->DeleteLater();
+            else
+                pCreature->SetStandState(UNIT_STAND_STATE_KNEEL);
+            break;
+
+        // heigan gountlet trash
+        case NPC_PlagueBeast:
+        case NPC_PlaguedBat:
+        case NPC_MutatedGrub:
+            if (m_auiEncounter[TYPE_HEIGAN] == DONE)
+                pCreature->DeleteLater();
+            break;
+
+        // razuvious trash
+        case NPC_DarkTouchedWarrior:
+        case NPC_DoomTouchedWarrior:
+        case NPC_DeathTouchedWarrior:
+        case NPC_DeathKnightCaptain:
+        case NPC_DeathKnight:
+        case NPC_DeathKnightCavalier:
+        case NPC_SkeletalSmith:
+        case NPC_DeathLord:
+        case NPC_DeathchargerSteed:
+        case NPC_BonyConstruct:
+        case NPC_RisenSquire:
+            if (m_auiEncounter[TYPE_RAZUVIOUS] == DONE)
+                pCreature->DeleteLater();
+            break;
+
+        // gothik trash
+        case NPC_UnholyAxe:
+        case NPC_UnholyStaff:
+        case NPC_UnholySwords:
+        case NPC_NecroKnight:
+        case NPC_ShadeOfNaxxramas:
+            if (m_auiEncounter[TYPE_GOTHIK] == DONE)
+                pCreature->DeleteLater();
+            break;
+
+
+
     }
 }
 
