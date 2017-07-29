@@ -941,23 +941,23 @@ void instance_naxxramas::Update(uint32 diff)
             break;
         case EVENT_KT_LK_DIALOGUE_1:
             DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG1, NPC_KELTHUZAD);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_2, 6000);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_2, Seconds(5));
             break;
         case EVENT_KT_LK_DIALOGUE_2:
             DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG2_LICH, NPC_LICH_KING);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_3, 18000);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_3, 16500);
             break;
         case EVENT_KT_LK_DIALOGUE_3:
             DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG3, NPC_KELTHUZAD);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_4, 7000);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_4, Seconds(6));
             break;
         case EVENT_KT_LK_DIALOGUE_4:
             DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG4_LICH, NPC_LICH_KING);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_5, 9000);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_5, Seconds(8));
             break;
         case EVENT_KT_LK_DIALOGUE_5:
             DoOrSimulateScriptTextForThisInstance(SAY_SAPP_DIALOG5, NPC_KELTHUZAD);
-            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_GATE_OPEN, 7000);
+            m_events.ScheduleEvent(EVENT_KT_LK_DIALOGUE_GATE_OPEN, 5500);
             break;
         case EVENT_KT_LK_DIALOGUE_GATE_OPEN:
             UpdateBossGate(GO_KELTHUZAD_DOOR, DONE);
