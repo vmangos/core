@@ -111,6 +111,14 @@ struct boss_patchwerkAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_BERSERK, BERSERK_TIMER);
         m_events.ScheduleEvent(EVENT_HATEFULSTRIKE, HATEFUL_CD);
         m_events.ScheduleEvent(EVENT_SLIMEBOLT, SLIMEBOLT_INITIAL);
+        
+        static const std::vector<uint32> aggroEntriesOnPull = { 16018, 16017, 16029, 16024, 16021 };
+        std::list<Creature*> creatures;
+        GetCreatureListWithEntryInGrid(creatures, m_creature, aggroEntriesOnPull, 300.0f);
+        for (Creature* pCreature : creatures)
+        {
+            pCreature->AI()->AttackStart(pWho);
+        }
     }
 
     void DoHatefulStrike()
