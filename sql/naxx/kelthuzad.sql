@@ -6,7 +6,7 @@ UPDATE `creature_template` SET `minhealth`=3150000, `maxhealth`=3150000, `Mechan
 UPDATE `creature_template` SET `mindmg`=8000, `maxdmg`=10000, `speed_walk`='0.7', `speed_run`='0.8', `ScriptName`='unstoppable_abomination_ai', `unit_flags`=0 /*256passive*/ WHERE `entry`=16428;
 
 -- soldier of the frozen wastes. Should not be shackle immune
-UPDATE `creature_template` SET `minhealth`=2012, `maxhealth`=2012, `speed_walk`='0.3', `speed_run`='0.4',`ScriptName`='soldier_frozen_wastes_ai', `unit_flags`=0/*256passive*/ WHERE `entry`=16427;
+UPDATE `creature_template` SET `minhealth`=2012, `maxhealth`=2012, `speed_walk`='0.35', `speed_run`='0.35',`ScriptName`='soldier_frozen_wastes_ai', `unit_flags`=0/*256passive*/ WHERE `entry`=16427;
 
 -- soul weaver. 
 UPDATE `creature_template` SET `ScriptName`='soul_weaver_ai', `speed_walk`='0.1', `speed_run`='0.114286', `unit_flags`=0 /*256passive*/  WHERE `entry`=16429;
