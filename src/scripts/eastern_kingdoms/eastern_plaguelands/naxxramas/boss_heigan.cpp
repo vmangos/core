@@ -384,7 +384,7 @@ struct boss_heiganAI : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_HEIGAN, DONE);
-            m_pInstance->UpdateBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, DONE);
+            m_pInstance->UpdateAutomaticBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, DONE);
         }
 
     }
@@ -394,7 +394,7 @@ struct boss_heiganAI : public ScriptedAI
         if (m_pInstance)
         {
             m_pInstance->SetData(TYPE_HEIGAN, FAIL);
-            m_pInstance->UpdateBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, FAIL);
+            m_pInstance->UpdateAutomaticBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, FAIL);
         }
         
     }
@@ -730,7 +730,7 @@ struct boss_heiganAI : public ScriptedAI
                 break;
             case EVENT_DOOR_CLOSE:
                 if(m_pInstance)
-                    m_pInstance->UpdateBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, IN_PROGRESS);
+                    m_pInstance->UpdateAutomaticBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, IN_PROGRESS);
                 break;
             case EVENT_MANABURN:
                 CheckManausersAndRepeat();

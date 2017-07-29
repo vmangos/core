@@ -49,7 +49,6 @@ enum NaxxEvents
 
 };
 
-
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
     m_thaddiusHaveGreeted(false),
@@ -102,25 +101,45 @@ uint8 instance_naxxramas::GetNumEndbossDead()
     return ret;
 }
 
-void instance_naxxramas::UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData)
+void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData)
 {
     if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
     {
-        UpdateBossEntranceDoor(pGo, uiData);
+        UpdateAutomaticBossEntranceDoor(pGo, uiData);
     }
 }
 
-void instance_naxxramas::UpdateBossEntranceDoor(GameObject* pGO, uint32 uiData)
+void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData)
 {
     if (!pGO)
     {
-        sLog.outError("instance_naxxramas::UpdateBossEntranceDoor called with nullptr GO");
+        sLog.outError("instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
         return;
     }
     if (uiData == IN_PROGRESS || uiData == SPECIAL)
+    {
+        pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         pGO->SetGoState(GO_STATE_READY);
+    }
     else
+    {
+        pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         pGO->SetGoState(GO_STATE_ACTIVE);
+    }
+}
+
+void instance_naxxramas::UpdateManualDoor(NaxxGOs which, uint32 uiData)
+{
+    if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
+    {
+        UpdateManualDoor(pGo, uiData);
+    }
+}
+
+void instance_naxxramas::UpdateManualDoor(GameObject * pGO, uint32 uiData)
+{
+    if (uiData == DONE)
+        pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
 }
 
 void instance_naxxramas::UpdateBossGate(NaxxGOs which, uint32 uiData)
@@ -340,16 +359,19 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
     {
         // Arac wing
         case GO_ARAC_ANUB_DOOR:
-            // opening probably linked to trash
-            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_ANUB_REKHAN]);
+            // starts closed by default, but must make sure it can be interracted with
+            pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT | GO_FLAG_IN_USE);
             break;
         case GO_ARAC_ANUB_GATE:
-            UpdateBossGate(pGo, m_auiEncounter[TYPE_ANUB_REKHAN]);
+            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
+                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
             break;
         case GO_ARAC_FAER_WEB:
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_ARAC_FAER_DOOR:
+            UpdateManualDoor(pGo, m_auiEncounter[TYPE_FAERLINA]);
+            break;
         case GO_ARAC_MAEX_OUTER_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_FAERLINA]);
             break;
@@ -360,16 +382,13 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             
         // Plague wing
         case GO_PLAG_NOTH_ENTRY_DOOR:
-            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_NOTH]);
+            UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_NOTH]);
             break;
         case GO_PLAG_NOTH_EXIT_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_NOTH]);
             break;
         case GO_PLAG_HEIG_ENTRY_DOOR:
-            // todo: this gate does not close instantly on pull, but rather a while later
-            // https://www.youtube.com/watch?v=kCnk6lwi2ug
-            // This might be the case for more than this boss-entrance door.
-            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_HEIGAN]);
+            UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
         case GO_PLAG_HEIG_EXIT_DOOR:
         case GO_PLAG_HEIG_OLD_EXIT_DOOR:
@@ -379,11 +398,13 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         
         // -- Millitary wing
         case GO_MILI_GOTH_ENTRY_GATE:
-            UpdateBossEntranceDoor(pGo, m_auiEncounter[TYPE_GOTHIK]);
+            UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_GOTHIK]);
             break;
         case GO_MILI_GOTH_EXIT_GATE:
-        case GO_MILI_HORSEMEN_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_GOTHIK]);
+            break;
+        case GO_MILI_HORSEMEN_DOOR:
+            UpdateManualDoor(pGo, m_auiEncounter[TYPE_GOTHIK]);
             break;
         case GO_MILI_GOTH_COMBAT_GATE:
             pGo->SetGoState(GO_STATE_ACTIVE);
@@ -398,19 +419,15 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             UpdateBossGate(pGo, m_auiEncounter[TYPE_PATCHWERK]);
             break;
         case GO_CONS_GLUT_EXIT_DOOR:
-        case GO_CONS_THAD_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_GLUTH]);
+        case GO_CONS_THAD_DOOR:
+            UpdateManualDoor(pGo, m_auiEncounter[TYPE_GLUTH]);
             break;
 
 
         // -- Frostwyrm lair 
         case GO_KELTHUZAD_WATERFALL_DOOR:
-            UpdateBossGate(pGo, m_auiEncounter[TYPE_SAPPHIRON]);
-            break;
         case GO_KELTHUZAD_DOOR:
-            // todo: At least in wotlk an RP event started when players came close
-            // to this door, and only after the RP the door opened (aka not when sapphiron dies).
-            // unknown if this is the case in vanilla.
             UpdateBossGate(pGo, m_auiEncounter[TYPE_SAPPHIRON]);
             break;
 
@@ -484,45 +501,46 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
     {
         case TYPE_ANUB_REKHAN:
             m_auiEncounter[uiType] = uiData;
-            UpdateBossGate(GO_ARAC_ANUB_GATE, uiData);
-            // opening probably linked to trash
-            UpdateBossEntranceDoor(GO_ARAC_ANUB_DOOR, uiData);
-
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_ARAC_ANUB_DOOR))
+            {
+                if (uiData == IN_PROGRESS)
+                    pGo->SetGoState(GO_STATE_READY);
+                else
+                    pGo->SetGoState(GO_STATE_ACTIVE);
+            }
+            UpdateManualDoor(GO_ARAC_ANUB_GATE, uiData);
             break;
         case TYPE_FAERLINA:
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_ARAC_FAER_WEB, uiData);
-            UpdateBossGate(GO_ARAC_FAER_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_ARAC_FAER_WEB, uiData);
             
-            // This one could potentially be linked to trash rather than Faerlina?
-            // Though probably not, because you can get to maexxna without killing faerlina
+            UpdateManualDoor(GO_ARAC_FAER_DOOR, uiData);
             UpdateBossGate(GO_ARAC_MAEX_OUTER_DOOR, uiData);
             break;
         case TYPE_MAEXXNA:
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_NOTH:
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_PLAG_NOTH_ENTRY_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_PLAG_NOTH_ENTRY_DOOR, uiData);
             UpdateBossGate(GO_PLAG_NOTH_EXIT_DOOR, uiData);
-            
-            // Potentially open when some trash in room before is killed instead?
             UpdateBossGate(GO_PLAG_HEIG_ENTRY_DOOR, uiData);
             break;
         case TYPE_HEIGAN:
             m_auiEncounter[uiType] = uiData;
             // entry door is controlled by boss script
             UpdateBossGate(GO_PLAG_LOAT_DOOR, uiData);
+            UpdateBossGate(GO_PLAG_HEIG_OLD_EXIT_DOOR, uiData);
             break;
         case TYPE_LOATHEB:
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_RAZUVIOUS:
@@ -531,9 +549,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_GOTHIK:
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_MILI_GOTH_ENTRY_GATE, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_MILI_GOTH_ENTRY_GATE, uiData);
             UpdateBossGate(GO_MILI_GOTH_EXIT_GATE, uiData);
-            UpdateBossGate(GO_MILI_HORSEMEN_DOOR, uiData);
             if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
             {
                 switch (uiData)
@@ -554,12 +571,13 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     break;
                 }
             }
+            UpdateManualDoor(GO_MILI_HORSEMEN_DOOR, uiData);
             break;
         case TYPE_FOUR_HORSEMEN:
             if(uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
             if (uiData == SPECIAL)
             {
@@ -592,9 +610,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         case TYPE_GLUTH:
             m_auiEncounter[uiType] = uiData;
             UpdateBossGate(GO_CONS_GLUT_EXIT_DOOR, uiData);
-            
-            // Should this open another way perhaps? Same issue as maexxna outer door.
-            UpdateBossGate(GO_CONS_THAD_DOOR, uiData);
+            UpdateManualDoor(GO_CONS_THAD_DOOR, uiData);
             break;
         case TYPE_THADDIUS:
             // Only set the same state once
@@ -604,7 +620,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
             
             UpdateTeleporters(uiType, uiData);
             break;
@@ -617,7 +633,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             // GO_KELTHUZAD_DOOR is opened at the end of EVENT_KT_LK_DIALOGUE
             break;
         case TYPE_KELTHUZAD:
-            UpdateBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData);
             switch (uiData) 
             {
                 case SPECIAL:

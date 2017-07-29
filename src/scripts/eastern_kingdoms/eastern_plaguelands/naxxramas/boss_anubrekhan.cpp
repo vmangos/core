@@ -655,7 +655,7 @@ struct anub_doorAI : public GameObjectAI
         // Not entirely sure if anub should be able to do all of these SAY_TAUNT* texts on door-open.
         // Wowwiki seems quite sure of it, but it makes more sense if it's just the GREET being used
         // on door open, while the rest are said at random points during the fight?
-        if (Creature* anubRekhan = me->GetMap()->GetCreature(m_pInstance->GetData64(NPC_ANUB_REKHAN))) 
+        if (Creature* anubRekhan = m_pInstance->GetSingleCreatureFromStorage(NPC_ANUB_REKHAN))
         {
             if (anubRekhan->isAlive()) {
                 switch (urand(0, 4))
@@ -677,13 +677,9 @@ struct anub_doorAI : public GameObjectAI
                     break;
                 }
             }
-            // "hack" to set the correct variables so we can use reset/open when he is pulled.
-            // If we don't do this, some variables are wrong on first pull of the boss,
-            // and the door wont close.
-            m_pInstance->DoOpenDoor(me->GetGUID());
         }
-        
-        return true;
+        me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+        return false;
     }
 
 };

@@ -242,8 +242,12 @@ public:
 
     void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
 
-    void UpdateBossEntranceDoor(NaxxGOs which, uint32 uiData);  // GO closes when uiData==IN_PROGRESS, otherwise opens
-    void UpdateBossEntranceDoor(GameObject* pGO, uint32 uiData);// GO closes when uiData==IN_PROGRESS, otherwise opens
+    void UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData);  // GO closes when uiData==IN_PROGRESS, otherwise opens
+    void UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData);// GO closes when uiData==IN_PROGRESS, otherwise opens
+
+    void UpdateManualDoor(NaxxGOs which, uint32 uiData);
+    void UpdateManualDoor(GameObject* pGO, uint32 uiData);
+
     void UpdateBossGate(NaxxGOs which, uint32 uiData);          // GO_STATE_ACTIVE when uiData==DONE, otherwise GO_STATE_READY
     void UpdateBossGate(GameObject* pGO, uint32 uiData);        // GO_STATE_ACTIVE when uiData==DONE, otherwise GO_STATE_READY
 
