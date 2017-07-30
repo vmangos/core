@@ -373,6 +373,9 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
 
         if (m_uiRestoreTargetTimer)
         {
@@ -495,7 +498,7 @@ struct mob_cryptguardsAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
+        
         // Crypt guards enrage at 50%
         if (!isEnraged && m_creature->GetHealthPercent() <= 50.0f) {
             if (DoCastSpellIfCan(m_creature, SPELL_CRYPTGUARD_ENRAGE) == CanCastResult::CAST_OK) {
