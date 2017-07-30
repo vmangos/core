@@ -116,7 +116,11 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         dist = 180.0f;
         break;
     case NPC_FAERLINA:
-        dist = 105.0f;
+        if (pWho->GetPositionZ() > 266.0f)
+        {
+            pWho->AI()->EnterEvadeMode();
+            return false;
+        }
         break;
     case NPC_ANUB_REKHAN:
         dist = 130.0f;
@@ -134,7 +138,11 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         dist = 150.0f;
         break;
     case NPC_RAZUVIOUS:
-        dist = 130.0f;
+        if (pWho->GetPositionZ() > 275.0f)
+        {
+            pWho->AI()->EnterEvadeMode();
+            return false;
+        }
         break;
     case NPC_SAPPHIRON:
         dist = 200.0f;
