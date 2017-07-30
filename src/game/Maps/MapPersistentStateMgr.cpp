@@ -666,17 +666,17 @@ MapPersistentState *MapPersistentStateManager::GetPersistentState(uint32 mapId, 
 
 void MapPersistentStateManager::DeleteInstanceFromDB(uint32 mapid, uint32 instanceid)
 {
-    // Make sure we are only deleting where the instance and map are equal to the specified,
-    // just in case we have the wrong map ID for some reason
+    // TODO: An efficient query which ensures that we are only deleting instance data
+    // if the mapid is correct (otherwise, we just assume the map is correct - which it _should_ be)
+    // eg. DELETE FROM character_instance WHERE instance = '101' AND EXISTS (SELECT id FROM instance WHERE id = '101' AND map = '429');
     if (instanceid)
     {
         CharacterDatabase.BeginTransaction();
-        CharacterDatabase.PExecute("DELETE d FROM character_instance    d LEFT JOIN instance i ON d.instance = i.id WHERE i.map = '%u' AND d.instance = '%u'", mapid, instanceid);
-        CharacterDatabase.PExecute("DELETE d FROM group_instance        d LEFT JOIN instance i ON d.instance = i.id WHERE i.map = '%u' AND d.instance = '%u'", mapid, instanceid);
-        CharacterDatabase.PExecute("DELETE d FROM creature_respawn      d LEFT JOIN instance i ON d.instance = i.id WHERE i.map = '%u' AND d.instance = '%u'", mapid, instanceid);
-        CharacterDatabase.PExecute("DELETE d FROM gameobject_respawn    d LEFT JOIN instance i ON d.instance = i.id WHERE i.map = '%u' AND d.instance = '%u'", mapid, instanceid);
-        // Must be done last, otherwise the above queries fail!
-        CharacterDatabase.PExecute("DELETE FROM instance WHERE map = '%u' AND id = '%u'", mapid, instanceid);
+        CharacterDatabase.PExecute("DELETE FROM instance WHERE id = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM character_instance WHERE instance = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM group_instance WHERE instance = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM creature_respawn WHERE instance = '%u'", instanceid);
+        CharacterDatabase.PExecute("DELETE FROM gameobject_respawn WHERE instance = '%u'", instanceid);
         CharacterDatabase.CommitTransaction();
     }
 }
