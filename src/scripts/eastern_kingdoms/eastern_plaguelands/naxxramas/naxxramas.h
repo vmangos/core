@@ -298,8 +298,8 @@ public:
 
     void onNaxxramasAreaTrigger(Player* pPlayer, const AreaTriggerEntry* pAt);
 
-    void UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData);  // GO closes when uiData==IN_PROGRESS, otherwise opens
-    void UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData);// GO closes when uiData==IN_PROGRESS, otherwise opens
+    void UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData = -1);  // GO closes when uiData==IN_PROGRESS, otherwise opens
+    void UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData, int requiredPreBossData = -1);// GO closes when uiData==IN_PROGRESS, otherwise opens
 
     void UpdateManualDoor(NaxxGOs which, uint32 uiData);
     void UpdateManualDoor(GameObject* pGO, uint32 uiData);
@@ -313,6 +313,9 @@ public:
 
     uint8 GetNumEndbossDead();
     GuidList m_alHeiganTrapGuids[4];
+    
+    bool HandleEvadeOutOfHome(Creature* pWho);
+
 private:
     bool m_faerlinaHaveGreeted;
     bool m_thaddiusHaveGreeted;

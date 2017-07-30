@@ -101,16 +101,78 @@ uint8 instance_naxxramas::GetNumEndbossDead()
     return ret;
 }
 
-void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData)
+bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
+    if (pWho->IsInEvadeMode() || !pWho->getVictim())
+        return false;
+
+    float dist;
+    switch (pWho->GetEntry())
+    {
+    case NPC_GLUTH:
+        dist = 150.0f;
+        break;
+    case NPC_GROBBULUS:
+        dist = 180.0f;
+        break;
+    case NPC_FAERLINA:
+        dist = 105.0f;
+        break;
+    case NPC_ANUB_REKHAN:
+        dist = 130.0f;
+        break;
+    case NPC_NOTH:
+        dist = 120.0f;
+        break;
+    case NPC_HEIGAN:
+        dist = 160.0f;
+        break;
+    case NPC_LOATHEB:
+        dist = 100.0f;
+        break;
+    case NPC_GOTHIK:
+        dist = 150.0f;
+        break;
+    case NPC_RAZUVIOUS:
+        dist = 130.0f;
+        break;
+    case NPC_SAPPHIRON:
+        dist = 200.0f;
+        break;
+    case NPC_KELTHUZAD:
+        dist = 130.0f;
+        break;
+    default:
+        sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
+        dist = 9999.0f;
+        break;
+    }
+    float x, y, z, o;
+    pWho->GetHomePosition(x, y, z, o);
+    if (pWho->GetDistance2d(x, y) > dist)
+    {
+        pWho->AI()->EnterEvadeMode();
+        return false;
+    }
+    return true;
+}
+
+void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
+{
+    if (requiredPreBossData > -1 && requiredPreBossData != DONE)
+        return;
+  
     if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
     {
-        UpdateAutomaticBossEntranceDoor(pGo, uiData);
+        UpdateAutomaticBossEntranceDoor(pGo, uiData, requiredPreBossData);
     }
 }
 
-void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData)
+void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32 uiData, int requiredPreBossData)
 {
+    if (requiredPreBossData > -1 && requiredPreBossData != DONE)
+        return;
+
     if (!pGO)
     {
         sLog.outError("instance_naxxramas::UpdateAutomaticBossEntranceDoor called with nullptr GO");
@@ -590,6 +652,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             // It has the locked flags, and it displays as locked ingame,
             // but with green text, aka it can be clicked and opened. 
             // hackfix by setting no interract flag unless it should be openable.
+
             if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_ARAC_FAER_DOOR))
             {
                 if(uiData == DONE)
@@ -602,7 +665,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateAutomaticBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_ARAC_MAEX_INNER_DOOR, uiData, m_auiEncounter[TYPE_FAERLINA]);
             UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_NOTH:
@@ -621,7 +684,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateAutomaticBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_PLAG_LOAT_DOOR, uiData, m_auiEncounter[TYPE_HEIGAN]);
             UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_RAZUVIOUS:
@@ -659,9 +722,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
             
-            // preventing any pets or whatever getting the door to open without gothik being dead
-            if(m_auiEncounter[TYPE_GOTHIK] == DONE)
-                UpdateAutomaticBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData, m_auiEncounter[TYPE_GOTHIK]);
             UpdateTeleporters(uiType, uiData);
             if (uiData == SPECIAL)
             {
@@ -688,7 +749,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             UpdateBossGate(GO_CONS_PATH_EXIT_DOOR, uiData);
             break;
         case TYPE_GROBBULUS:
-            // no doors here?
+            UpdateAutomaticBossEntranceDoor(GO_CONS_PATH_EXIT_DOOR, uiData, m_auiEncounter[TYPE_PATCHWERK]);
             m_auiEncounter[uiType] = uiData;
             break;
         case TYPE_GLUTH:
@@ -705,9 +766,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
 
-            // preventing any pets or whatever getting the door to open without gluth being dead
-            if (m_auiEncounter[TYPE_GLUTH] == DONE)
-                UpdateAutomaticBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_CONS_THAD_DOOR, uiData, m_auiEncounter[TYPE_GLUTH]);
             
             UpdateTeleporters(uiType, uiData);
             break;
@@ -720,7 +779,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             // GO_KELTHUZAD_DOOR is opened at the end of EVENT_KT_LK_DIALOGUE
             break;
         case TYPE_KELTHUZAD:
-            UpdateAutomaticBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData);
+            UpdateAutomaticBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData, m_auiEncounter[TYPE_SAPPHIRON]);
             switch (uiData) 
             {
                 case SPECIAL:
