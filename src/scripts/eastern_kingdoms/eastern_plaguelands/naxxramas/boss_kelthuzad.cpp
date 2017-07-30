@@ -220,39 +220,48 @@ static constexpr float windowPortals[NUM_WINDOW_PORTALS][2] =
     {3783.36f, -5062.35f}
 };
 
+//todo: no idea what the pull range should be
+static constexpr float ALCOVE_ADD_PULL_RADIUS = 30.0f;
+
 struct kt_p1AddAI : public ScriptedAI
 {
     kt_p1AddAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-
+        me->SetNoSearchAssistance(true);
+        hasAggroed = false;
     }
+    bool hasAggroed;
     virtual void Reset() = 0;
     void ActualAttack(Unit* target)
     {
         ScriptedAI::AttackStart(target);
+        hasAggroed = true;
     }
-    void Aggro(Unit*) override
+    void Aggro(Unit* pWho) override
     {
         // want to prevent the creature from aggroing unless we explicitly do it through base class
     }
-    void AttackStart(Unit*) override
+    void AttackStart(Unit* pWho) override
     {
         // want to prevent the creature from aggroing unless we explicitly do it through base class
+        if(m_creature->GetDistance2d(pWho) < ALCOVE_ADD_PULL_RADIUS) 
+        {
+            ActualAttack(pWho);
+        }
     }
     void MoveInLineOfSight(Unit* pWho) override
     {
         if (m_creature->isInCombat()) return;
 
-        if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < 25.0f) //todo: no idea what the pull range should be
+        if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < ALCOVE_ADD_PULL_RADIUS) //todo: no idea what the pull range should be
         {
-            ScriptedAI::AttackStart(pWho);
+            ScriptedAI::MoveInLineOfSight(pWho);
         }
     }
     void SpellHit(Unit* unit, const SpellEntry*) override 
     {
-        if (m_creature->isInCombat()) return;
-
-        ScriptedAI::AttackStart(unit);
+        if(!hasAggroed)
+            ActualAttack(unit);
     }
 };
 
@@ -724,12 +733,18 @@ struct boss_kelthuzadAI : public ScriptedAI
                 return;
         }
         
+
         events.Update(diff);
 
         if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE))
             UpdateP1(diff);
         else
+        {
+
+            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+                return;
             UpdateP2P3(diff);
+        }
     }
 
 };
