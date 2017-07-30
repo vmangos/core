@@ -92,6 +92,11 @@ struct boss_gluthAI : public ScriptedAI
     void Reset()
     {
         m_events.Reset();
+
+        std::list<Creature*> zombies;
+        GetCreatureListWithEntryInGrid(zombies, m_creature, NPC_ZOMBIE_CHOW, 200.0f);
+        for (Creature* c : zombies)
+            c->DeleteLater();
     }
 
     void JustDied(Unit* pKiller) override
@@ -176,6 +181,10 @@ struct boss_gluthAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
+
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
