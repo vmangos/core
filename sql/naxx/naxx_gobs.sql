@@ -20,7 +20,7 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 
 (@OGUID+5  , 181123, 533, 3317.97, -3254.35, 293.346, -1.5708, 0, 0, -0.707108, 0.707106, 180, 100, 1, 				1), -- grobbbulus entrance/open on patchwerk dead
 
-(@OGUID+6  , 181124, 533, 2750.49, -3384.36, 267.341, 0,       0, 0, 0,         1,     180, 100, 0, 				1), -- gothik entrance/open on razuv dead
+(@OGUID+6  , 181124, 533, 2750.49, -3384.36, 267.341, 0,       0, 0, 0,         1,     180, 100, 1, 				1), -- gothik entrance/open on razuv dead
 (@OGUID+7  , 181125, 533, 2633.84, -3336.82, 267.084, 0,       0, 0, 0,         1,     180, 100, 1, 				1), -- gothik exit/open on gothik dead
 (@OGUID+11 , 181170, 533, 2692.07, -3360.78, 267.504, 3.14159, 0, 0, 1, 0.00000126759, 180, 100, 0, 					1), -- gothik combat gate
 
