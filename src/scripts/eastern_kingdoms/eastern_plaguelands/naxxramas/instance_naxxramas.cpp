@@ -121,7 +121,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
             pWho->AI()->EnterEvadeMode();
             return false;
         }
-        break;
+        return true;
     case NPC_ANUB_REKHAN:
         dist = 130.0f;
         break;
@@ -143,7 +143,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
             pWho->AI()->EnterEvadeMode();
             return false;
         }
-        break;
+        return true;
     case NPC_SAPPHIRON:
         dist = 200.0f;
         break;
