@@ -170,6 +170,105 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
     return true;
 }
 
+void instance_naxxramas::HandleCreatureCreateRespawn(Creature * pCreature)
+{
+    switch (pCreature->GetEntry())
+    {
+    case NPC_ANUB_REKHAN:
+    case NPC_FAERLINA:
+    case NPC_MAEXXNA:
+    case NPC_PATCHWERK:
+    case NPC_GROBBULUS:
+    case NPC_GLUTH:
+    case NPC_THADDIUS:
+    case NPC_NOTH:
+    case NPC_HEIGAN:
+    case NPC_LOATHEB:
+    case NPC_RAZUVIOUS:
+    case NPC_GOTHIK:
+    case NPC_ZELIEK:
+    case NPC_THANE:
+    case NPC_BLAUMEUX:
+    case NPC_MOGRAINE:
+    case NPC_SAPPHIRON:
+    case NPC_KELTHUZAD:
+    case NPC_MR_BIGGLESWORTH:
+    case NPC_GUARDIAN:
+    case NPC_SOLDIER_FROZEN:
+    case NPC_SOUL_WEAVER:
+    case NPC_UNSTOPPABLE_ABOM:
+    case NPC_UNREL_TRAINEE:
+    case NPC_UNREL_DEATH_KNIGHT:
+    case NPC_UNREL_RIDER:
+    case NPC_SPECT_TRAINEE:
+    case NPC_SPECT_DEATH_KNIGTH:
+    case NPC_SPECT_RIDER:
+    case NPC_SPECT_HORSE:
+        break;
+
+
+        // patchwerk trash
+    case NPC_PatchworkGolem:
+    case NPC_BileRetcher:
+    case NPC_SludgeBelcher:
+    case NPC_EmbalmingSlime:
+    case NPC_LivingMonstrosity:
+    case NPC_SurgicalAssistant:
+    case NPC_MadScientist:
+        if (m_auiEncounter[TYPE_PATCHWERK] == DONE)
+            pCreature->DeleteLater();
+        break;
+
+        // grobbulus trash
+    case NPC_StitchedGiant:
+        if (m_auiEncounter[TYPE_GROBBULUS] == DONE)
+            pCreature->DeleteLater();
+        break;
+
+        // faerlina trash
+    case NPC_NaxxramasCultist:
+    case NPC_NaxxramasAcolyte:
+        if (m_auiEncounter[TYPE_FAERLINA] == DONE)
+            pCreature->DeleteLater();
+        break;
+
+        // heigan gountlet trash
+    case NPC_PlagueBeast:
+    case NPC_PlaguedBat:
+    case NPC_MutatedGrub:
+        if (m_auiEncounter[TYPE_HEIGAN] == DONE)
+            pCreature->DeleteLater();
+        break;
+
+        // razuvious trash
+    case NPC_DarkTouchedWarrior:
+    case NPC_DoomTouchedWarrior:
+    case NPC_DeathTouchedWarrior:
+    case NPC_DeathKnightCaptain:
+    case NPC_DeathKnight:
+    case NPC_DeathKnightCavalier:
+    case NPC_SkeletalSmith:
+    case NPC_DeathLord:
+    case NPC_DeathchargerSteed:
+    case NPC_BonyConstruct:
+    case NPC_RisenSquire:
+        if (m_auiEncounter[TYPE_RAZUVIOUS] == DONE)
+            pCreature->DeleteLater();
+        break;
+
+        // gothik trash
+    case NPC_UnholyAxe:
+    case NPC_UnholyStaff:
+    case NPC_UnholySwords:
+    case NPC_NecroKnight:
+    case NPC_ShadeOfNaxxramas:
+        if (m_auiEncounter[TYPE_GOTHIK] == DONE)
+            pCreature->DeleteLater();
+        break;
+    }
+
+}
+
 void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
 {
     if (requiredPreBossData > -1 && requiredPreBossData != DONE)
@@ -337,90 +436,20 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_MR_BIGGLESWORTH:
             m_mNpcEntryGuidStore[pCreature->GetEntry()] = pCreature->GetObjectGuid();
             break;
-        
-
-        case NPC_GUARDIAN:
-        case NPC_SOLDIER_FROZEN:
-        case NPC_SOUL_WEAVER:
-        case NPC_UNSTOPPABLE_ABOM:
-        case NPC_UNREL_TRAINEE:
-        case NPC_UNREL_DEATH_KNIGHT:
-        case NPC_UNREL_RIDER:
-        case NPC_SPECT_TRAINEE:
-        case NPC_SPECT_DEATH_KNIGTH:
-        case NPC_SPECT_RIDER:
-        case NPC_SPECT_HORSE:
-            break;
 
         case NPC_SUB_BOSS_TRIGGER:
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
-                  
-        // patchwerk trash
-        case NPC_PatchworkGolem:
-        case NPC_BileRetcher:
-        case NPC_SludgeBelcher:
-        case NPC_EmbalmingSlime:
-        case NPC_LivingMonstrosity:
-        case NPC_SurgicalAssistant:
-        case NPC_MadScientist:
-            if (m_auiEncounter[TYPE_PATCHWERK] == DONE)
-                pCreature->DeleteLater();
-            break;
-        
-        // grobbulus trash
-        case NPC_StitchedGiant:
-            if (m_auiEncounter[TYPE_GROBBULUS] == DONE)
-                pCreature->DeleteLater();
-            break;
 
         // faerlina trash
         case NPC_NaxxramasCultist:
         case NPC_NaxxramasAcolyte:
-            if (m_auiEncounter[TYPE_FAERLINA] == DONE)
-                pCreature->DeleteLater();
-            else
                 pCreature->SetStandState(UNIT_STAND_STATE_KNEEL);
             break;
-
-        // heigan gountlet trash
-        case NPC_PlagueBeast:
-        case NPC_PlaguedBat:
-        case NPC_MutatedGrub:
-            if (m_auiEncounter[TYPE_HEIGAN] == DONE)
-                pCreature->DeleteLater();
-            break;
-
-        // razuvious trash
-        case NPC_DarkTouchedWarrior:
-        case NPC_DoomTouchedWarrior:
-        case NPC_DeathTouchedWarrior:
-        case NPC_DeathKnightCaptain:
-        case NPC_DeathKnight:
-        case NPC_DeathKnightCavalier:
-        case NPC_SkeletalSmith:
-        case NPC_DeathLord:
-        case NPC_DeathchargerSteed:
-        case NPC_BonyConstruct:
-        case NPC_RisenSquire:
-            if (m_auiEncounter[TYPE_RAZUVIOUS] == DONE)
-                pCreature->DeleteLater();
-            break;
-
-        // gothik trash
-        case NPC_UnholyAxe:
-        case NPC_UnholyStaff:
-        case NPC_UnholySwords:
-        case NPC_NecroKnight:
-        case NPC_ShadeOfNaxxramas:
-            if (m_auiEncounter[TYPE_GOTHIK] == DONE)
-                pCreature->DeleteLater();
-            break;
-
-
-
     }
+
+    HandleCreatureCreateRespawn(pCreature);
 }
 
 void instance_naxxramas::OnObjectCreate(GameObject* pGo)
@@ -627,6 +656,11 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             break;
 
     }
+}
+
+void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
+{
+    HandleCreatureCreateRespawn(pCreature);
 }
 
 bool instance_naxxramas::IsEncounterInProgress()

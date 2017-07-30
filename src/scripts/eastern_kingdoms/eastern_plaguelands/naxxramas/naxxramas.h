@@ -276,8 +276,9 @@ public:
 
     bool IsEncounterInProgress();
 
-    void OnCreatureCreate(Creature* pCreature);
-    void OnObjectCreate(GameObject* pGo);
+    void OnCreatureCreate(Creature* pCreature) override;
+    void OnObjectCreate(GameObject* pGo) override;
+    void OnCreatureRespawn(Creature* pCreature) override;
 
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
@@ -328,6 +329,9 @@ private:
     bool m_thaddiusHaveGreeted;
     bool m_haveDoneDKWingIntro;
     uint32 m_horsemenDeathCounter;
+
+    void HandleCreatureCreateRespawn(Creature* pCreature);
+
 protected:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string strInstData;
