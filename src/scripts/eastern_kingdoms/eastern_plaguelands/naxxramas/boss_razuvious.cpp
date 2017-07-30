@@ -37,6 +37,8 @@ enum
     SAY_COMMAND4             = -1533128,
     SAY_DEATH                = -1533129,
 
+    EMOTE_SHOUT              = -1533159,
+
     SPELL_UNBALANCING_STRIKE = 26613,
     SPELL_DISRUPTING_SHOUT   = 29107,
     SPELL_HOPELESS           = 29125,
@@ -305,54 +307,12 @@ struct boss_razuviousAI : public ScriptedAI
                 break;
             case EVENT_DISRUPTING_SHOUT:
                 DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISRUPTING_SHOUT);
+                DoScriptText(EMOTE_SHOUT, m_creature);
                 events.Repeat(Seconds(25));
                 break;
             case EVENT_COMMAND:
                 DoScriptText(urand(SAY_COMMAND4, SAY_COMMAND1), m_creature);
-                events.Repeat(Seconds(40));
-                break;
-
-
-            case EVENT_TURN_TO_TRAINEE:
-                if (Creature* b = getRPBuddy())
-                    m_creature->SetFacingToObject(b);
-                break;
-            case EVENT_EMOTE_SHOUT:
-                m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-                break;
-            case EVENT_ADD_TURN_RAZUV:
-                if (Creature* b = getRPBuddy())
-                {
-                    if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
-                        ai->attackTimer = 0;
-                    b->SetFacingToObject(m_creature);
-                    b->HandleEmote(EMOTE_STATE_STAND);
-                }
-                break;
-            case EVENT_ADD_TALK:
-                if (Creature* b = getRPBuddy())
-                    b->HandleEmote(EMOTE_ONESHOT_TALK);
-                break;
-            case EVENT_ADD_SALUTE:
-                if (Creature* b = getRPBuddy())
-                    b->HandleEmote(EMOTE_ONESHOT_SALUTE);
-                break;
-            case EVENT_ADD_TURN_BACK:
-                if (Creature* b = getRPBuddy())
-                {
-                    std::list<Creature*> lst;
-                    GetCreatureListWithEntryInGrid(lst, m_creature, 16211, 5.0f);
-                    if (lst.size())
-                        b->SetFacingToObject((*lst.begin()));
-                }
-                break;
-            case EVENT_ADD_ATTACK:
-                if (Creature* b = getRPBuddy())
-                {
-                    b->HandleEmote(EMOTE_STATE_READY1H);
-                    if (mob_deathknightUnderstudyAI* ai = (mob_deathknightUnderstudyAI*)b->AI())
-                        ai->attackTimer = 500;
-                }
+                events.Repeat(Seconds(urand(30,60)));
                 break;
             }
         }
