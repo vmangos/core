@@ -148,6 +148,8 @@ enum NaxxAreaTriggers : uint32
     
     AREATRIGGER_THADDIUS_ENTRANCE   = 4113,
 
+    AREATRIGGER_START_DK_WING       = 4117,
+
 };
 
 static const WorldLocation toFrostwyrmTPPos(533, 3498.0f, -5349.68f, 144.97f, 1.3f);
@@ -250,6 +252,11 @@ enum NaxxZoneScriptTexts
     // greets used on areatriggers
     SAY_FAERLINA_GREET      = -1533009,
     SAY_THADDIUS_GREET      = -1533029,
+
+    SAY_KORT_TAUNT1         = -1533052, // To arms, ye roustabouts! We've got company!
+    SAY_ZELI_TAUNT3         = -1533061, // Do not continue! Turn back while there's still time!
+    SAY_MOG_TAUNT3          = -1533073, // Life is meaningless. It is in death that we are truly tested.
+    SAY_BLAU_TAUNT3         = -1533047, // The first kill goes to me! Anyone care to wager?
 };
 
 struct GothTrigger
@@ -319,8 +326,8 @@ public:
 private:
     bool m_faerlinaHaveGreeted;
     bool m_thaddiusHaveGreeted;
+    bool m_haveDoneDKWingIntro;
     uint32 m_horsemenDeathCounter;
-
 protected:
     uint32 m_auiEncounter[MAX_ENCOUNTER];
     std::string strInstData;

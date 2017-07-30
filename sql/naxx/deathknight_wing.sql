@@ -271,3 +271,6 @@ INSERT into creature_equip_template (entry, equipentry1, equipentry2, equipentry
 
 -- dark touched warriors got a script to do custom running towards horses
 UPDATE `creature_template` SET `AIName`='', `equipment_id`=16156, `ScriptName`='dark_touched_warriorAI' WHERE `entry`=16156;
+
+-- give AreaTrigger at start of DK wing script name
+REPLACE INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4117', 'at_naxxramas');

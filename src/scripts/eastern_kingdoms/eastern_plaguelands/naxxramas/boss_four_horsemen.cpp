@@ -35,7 +35,7 @@ enum
     SAY_BLAU_AGGRO          = -1533044,
     SAY_BLAU_TAUNT1         = -1533045,
     SAY_BLAU_TAUNT2         = -1533046,
-    SAY_BLAU_TAUNT3         = -1533047,
+    // SAY_BLAU_TAUNT3         = -1533047, // randomly called by instance script
     SAY_BLAU_SPECIAL        = -1533048,
     SAY_BLAU_SLAY           = -1533049,
     SAY_BLAU_DEATH          = -1533050,
@@ -54,7 +54,7 @@ enum
     SAY_MOG_SPECIAL        = -1533070,
     SAY_MOG_TAUNT1         = -1533071,
     SAY_MOG_TAUNT2         = -1533072,
-    SAY_MOG_TAUNT3         = -1533073,
+    // SAY_MOG_TAUNT3         = -1533073, // randomly called by instance script
     SAY_MOG_DEATH          = -1533074,
 
     SPELL_MARK_OF_MOGRAINE = 28834,
@@ -63,7 +63,7 @@ enum
 
     //thane korthazz
     SAY_KORT_AGGRO          = -1533051,
-    SAY_KORT_TAUNT1         = -1533052,
+    // SAY_KORT_TAUNT1         = -1533052, // randomly called by instance script
     SAY_KORT_TAUNT2         = -1533053,
     SAY_KORT_TAUNT3         = -1533054,
     SAY_KORT_SPECIAL        = -1533055,
@@ -77,9 +77,11 @@ enum
     //sir zeliek
     EMOTE_ZELI_CONDEMNATION = -1533157, // todo: add usage
     SAY_ZELI_AGGRO          = -1533058,
-    SAY_ZELI_TAUNT1         = -1533059,
-    SAY_ZELI_TAUNT2         = -1533060,
-    SAY_ZELI_TAUNT3         = -1533061,
+    
+    // SAY_ZELI_TAUNT1         = -1533059, // called by instance script after gothik kill
+    // SAY_ZELI_TAUNT2         = -1533060, // called by instance script after gothik kill
+    // SAY_ZELI_TAUNT3         = -1533061, // randomly called by instance script
+
     SAY_ZELI_SPECIAL        = -1533062,
     SAY_ZELI_SLAY           = -1533063,
     SAY_ZELI_DEATH          = -1533064,

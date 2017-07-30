@@ -47,11 +47,16 @@ enum NaxxEvents
     EVENT_4HM_DIALOGUE_6, // Thane Korth'azz yells: I've heard about enough a' yer snivelin'!Shut your flytrap before I shut it for ye'!
     EVENT_4HM_DIALOGUE_7, // Highlord Mograine yells: Conserve your anger. Harness your rage. You will all have outlets for your frustrations soon enough.
 
+    EVENT_DKWING_INTRO_2,
+    EVENT_DKWING_INTRO_3,
+    EVENT_DKWING_INTRO_4,
+
 };
 
 instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
     m_thaddiusHaveGreeted(false),
+    m_haveDoneDKWingIntro(false),
     m_horsemenDeathCounter(0),
     m_fChamberCenterX(0.0f),
     m_fChamberCenterY(0.0f),
@@ -1077,23 +1082,23 @@ void instance_naxxramas::Update(uint32 diff)
             break;
         }
         case EVENT_4HM_DIALOGUE_1:
-            DoOrSimulateScriptTextForMap(-1533059, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(16063));
+            DoOrSimulateScriptTextForMap(-1533059, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
             m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_2, Seconds(7));
             break;
         case EVENT_4HM_DIALOGUE_2:
-            DoOrSimulateScriptTextForMap(-1533045, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(16065));
+            DoOrSimulateScriptTextForMap(-1533045, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
             m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_3, Seconds(7));
             break;
         case EVENT_4HM_DIALOGUE_3:
-            DoOrSimulateScriptTextForMap(-1533071, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(16062));
+            DoOrSimulateScriptTextForMap(-1533071, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
             m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_4, Seconds(7));
             break;
         case EVENT_4HM_DIALOGUE_4:
-            DoOrSimulateScriptTextForMap(-1533046, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(16065));
+            DoOrSimulateScriptTextForMap(-1533046, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
             m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_5, Seconds(7));
             break;
         case EVENT_4HM_DIALOGUE_5:
-            DoOrSimulateScriptTextForMap(-1533060, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(16063));
+            DoOrSimulateScriptTextForMap(-1533060, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
             m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_6, Seconds(6));
             break;
         case EVENT_4HM_DIALOGUE_6:
@@ -1101,7 +1106,19 @@ void instance_naxxramas::Update(uint32 diff)
             m_events.ScheduleEvent(EVENT_4HM_DIALOGUE_7, Seconds(7));
             break;
         case EVENT_4HM_DIALOGUE_7:
-            DoOrSimulateScriptTextForMap(-1533072, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(16062));
+            DoOrSimulateScriptTextForMap(-1533072, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+            break;
+
+        case EVENT_DKWING_INTRO_2:
+            DoOrSimulateScriptTextForMap(SAY_ZELI_TAUNT3, NPC_ZELIEK, GetMap(), GetSingleCreatureFromStorage(NPC_ZELIEK));
+            m_events.ScheduleEvent(EVENT_DKWING_INTRO_3, 5000);
+            break;
+        case EVENT_DKWING_INTRO_3:
+            DoOrSimulateScriptTextForMap(SAY_MOG_TAUNT3, NPC_MOGRAINE, GetMap(), GetSingleCreatureFromStorage(NPC_MOGRAINE));
+            m_events.ScheduleEvent(EVENT_DKWING_INTRO_4, 6200);
+            break;
+        case EVENT_DKWING_INTRO_4:
+            DoOrSimulateScriptTextForMap(SAY_BLAU_TAUNT3, NPC_BLAUMEUX, GetMap(), GetSingleCreatureFromStorage(NPC_BLAUMEUX));
             break;
         }
     }
@@ -1159,6 +1176,14 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
                 if (pThaddius->isAlive())
                     DoScriptText(SAY_THADDIUS_GREET, pThaddius);
             }
+        }
+        break;
+    case AREATRIGGER_START_DK_WING:
+        if (!m_haveDoneDKWingIntro)
+        {
+            m_haveDoneDKWingIntro = true;
+            DoOrSimulateScriptTextForMap(SAY_KORT_TAUNT1, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
+            m_events.ScheduleEvent(EVENT_DKWING_INTRO_2, 5500);
         }
         break;
     }
