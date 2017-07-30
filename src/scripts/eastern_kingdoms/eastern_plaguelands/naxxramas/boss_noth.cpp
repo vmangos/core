@@ -379,6 +379,9 @@ struct boss_nothAI : public ScriptedAI
             }
         }
         
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
+
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {

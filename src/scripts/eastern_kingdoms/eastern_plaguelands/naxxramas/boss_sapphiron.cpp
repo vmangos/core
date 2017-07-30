@@ -398,6 +398,9 @@ struct boss_sapphironAI : public ScriptedAI
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
         }
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
 
         if(!m_creature->HasAura(SPELL_FROST_AURA))
             m_creature->CastSpell(m_creature, SPELL_FROST_AURA, true);

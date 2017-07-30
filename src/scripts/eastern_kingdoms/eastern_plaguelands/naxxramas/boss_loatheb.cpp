@@ -108,6 +108,9 @@ struct boss_loathebAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
 
         events.Update(uiDiff);
         while (uint32 eventId = events.ExecuteEvent())

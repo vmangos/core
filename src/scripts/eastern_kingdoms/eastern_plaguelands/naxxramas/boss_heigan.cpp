@@ -706,6 +706,9 @@ struct boss_heiganAI : public ScriptedAI
             if (m_creature->getThreatManager().isThreatListEmpty())
                 EventDanceEnd();
         }
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
 
         m_events.Update(uiDiff);
         while (uint32 eventId = m_events.ExecuteEvent())

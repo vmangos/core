@@ -201,6 +201,9 @@ struct boss_grobbulusAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
 
         // Slime Stream if is cast if current target is not in melee range
         UpdateSlimeStream(uiDiff);
