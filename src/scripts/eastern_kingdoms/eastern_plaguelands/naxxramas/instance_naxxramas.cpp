@@ -1065,7 +1065,7 @@ void instance_naxxramas::Update(uint32 diff)
             {
                 if (m_auiEncounter[TYPE_THADDIUS] != IN_PROGRESS && m_auiEncounter[TYPE_THADDIUS] != SPECIAL)
                     DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM4 + urand(0, 3), NPC_THADDIUS); 
-                m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5)); // 2-5min, no idea if it's correct
+                m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, Minutes(urand(5,10)));
             }
             break;
         case EVENT_WINGBOSS_DEAD:
