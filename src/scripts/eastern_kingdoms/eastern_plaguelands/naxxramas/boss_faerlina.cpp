@@ -247,6 +247,17 @@ struct boss_faerlinaAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+        {
+            std::list<Creature*> creatures;
+            GetCreatureListWithEntryInGrid(creatures, m_creature, { NPC_NaxxramasFollower, NPC_NaxxramasWorshipper}, 150.0f);
+            for (Creature* pCreature : creatures)
+            {
+                pCreature->AI()->EnterEvadeMode();
+            }
+            return;
+        }
 
         // Poison Bolt Volley
         if (m_uiPoisonBoltVolleyTimer < uiDiff)
