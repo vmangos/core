@@ -140,6 +140,8 @@ void instance_naxxramas::UpdateManualDoor(GameObject * pGO, uint32 uiData)
 {
     if (uiData == DONE)
         pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+    else
+        pGO->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
 }
 
 void instance_naxxramas::UpdateBossGate(NaxxGOs which, uint32 uiData)
@@ -421,14 +423,21 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT | GO_FLAG_IN_USE);
             break;
         case GO_ARAC_ANUB_GATE:
-            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
-                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+            UpdateManualDoor(pGo, m_auiEncounter[TYPE_ANUB_REKHAN]);
             break;
         case GO_ARAC_FAER_WEB:
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
         case GO_ARAC_FAER_DOOR:
             UpdateManualDoor(pGo, m_auiEncounter[TYPE_FAERLINA]);
+            // todo: unable to get the door to be properly locked.
+            // It has the locked flags, and it displays as locked ingame,
+            // but with green text, aka it can be clicked and opened. 
+            // hackfix by setting no interract flag unless it should be openable.
+            if (m_auiEncounter[TYPE_FAERLINA] == DONE)
+                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            else
+                pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             break;
         case GO_ARAC_MAEX_OUTER_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_FAERLINA]);
@@ -456,7 +465,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         
         // -- Millitary wing
         case GO_MILI_GOTH_ENTRY_GATE:
-            UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_GOTHIK]);
+            UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_RAZUVIOUS]);
             break;
         case GO_MILI_GOTH_EXIT_GATE:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_GOTHIK]);
@@ -574,6 +583,17 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             
             UpdateManualDoor(GO_ARAC_FAER_DOOR, uiData);
             UpdateBossGate(GO_ARAC_MAEX_OUTER_DOOR, uiData);
+            // todo: unable to get the door to be properly locked.
+            // It has the locked flags, and it displays as locked ingame,
+            // but with green text, aka it can be clicked and opened. 
+            // hackfix by setting no interract flag unless it should be openable.
+            if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_ARAC_FAER_DOOR))
+            {
+                if(uiData == DONE)
+                    pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                else
+                    pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            }
             break;
         case TYPE_MAEXXNA:
             if (uiData == DONE)
@@ -635,7 +655,10 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if(uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateAutomaticBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
+            
+            // preventing any pets or whatever getting the door to open without gothik being dead
+            if(m_auiEncounter[TYPE_GOTHIK] == DONE)
+                UpdateAutomaticBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData);
             UpdateTeleporters(uiType, uiData);
             if (uiData == SPECIAL)
             {
@@ -678,7 +701,10 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if (uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            UpdateAutomaticBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
+
+            // preventing any pets or whatever getting the door to open without gluth being dead
+            if (m_auiEncounter[TYPE_GLUTH] == DONE)
+                UpdateAutomaticBossEntranceDoor(GO_CONS_THAD_DOOR, uiData);
             
             UpdateTeleporters(uiType, uiData);
             break;
