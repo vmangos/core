@@ -55,6 +55,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "Anticheat.h"
+#include "CreatureLinkingMgr.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -247,6 +248,9 @@ void Creature::RemoveCorpse()
 
     if (AI())
         AI()->CorpseRemoved(respawnDelay);
+
+    if (m_isCreatureLinkingTrigger)
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_DESPAWN, this);
 
     // script can set time (in seconds) explicit, override the original
     if (respawnDelay)
@@ -592,7 +596,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
         case DEAD:
         {
 
-            if (m_respawnTime <= time(nullptr))
+            if (m_respawnTime <= time(nullptr) && (!m_isSpawningLinked || GetMap()->GetCreatureLinkingHolder()->CanSpawn(this)))
             {
                 DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Respawning...");
                 m_respawnTime = 0;
@@ -632,6 +636,10 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 if (m_zoneScript)
                     m_zoneScript->OnCreatureRespawn(this);
+
+                if (m_isCreatureLinkingTrigger)
+                    GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
+
                 // 5 sec delay before aggro.
                 if (!IsLikePlayer())
                     SetTempPacified(5000);
@@ -988,6 +996,15 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     {
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
+    }
+    
+    // Add to CreatureLinkingHolder if needed
+    if (sCreatureLinkingMgr.GetLinkedTriggerInformation(this))
+        cPos.GetMap()->GetCreatureLinkingHolder()->AddSlaveToHolder(this);
+    if (sCreatureLinkingMgr.IsLinkedEventTrigger(this))
+    {
+        m_isCreatureLinkingTrigger = true;
+        cPos.GetMap()->GetCreatureLinkingHolder()->AddMasterToHolder(this);
     }
 
     LoadCreatureAddon();
@@ -1544,11 +1561,32 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
             curhealth = 1;
     }
 
+    if (sCreatureLinkingMgr.IsSpawnedByLinkedMob(this))
+    {
+        m_isSpawningLinked = true;
+        if (m_deathState == ALIVE && !GetMap()->GetCreatureLinkingHolder()->CanSpawn(this))
+        {
+            m_deathState = DEAD;
+
+            // Just set to dead, so need to relocate like above
+            if (CanFly())
+            {
+                float tz = GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
+                if (data->posZ - tz > 0.1)
+                    Relocate(data->posX, data->posY, tz);
+            }
+        }
+    }
+
     SetHealth(m_deathState == ALIVE ? curhealth : 0);
     SetPower(POWER_MANA, data->curmana);
 
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movementType);
+
+    // Creature Linking, Initial load is handled like respawn
+    if (m_isCreatureLinkingTrigger && isAlive())
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
 
     return true;
 }

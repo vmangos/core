@@ -1783,6 +1783,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // group updates
         void UpdateAuraForGroup(uint8 slot);
+        
+        bool IsLinkingEventTrigger() { return m_isCreatureLinkingTrigger; }
 
         // pet auras
         typedef std::set<PetAura const*> PetAuraSet;
@@ -1966,6 +1968,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         SpellCooldowns m_spellCooldowns;
         GlobalCooldownMgr m_GlobalCooldownMgr;
+
+        bool m_isCreatureLinkingTrigger;
+        bool m_isSpawningLinked;
+
     public:
         void DisableSpline();
         void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }

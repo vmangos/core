@@ -61,6 +61,7 @@
 #include "packet_builder.h"
 #include "Chat.h"
 #include "Anticheat.h"
+#include "CreatureLinkingMgr.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -207,6 +208,9 @@ Unit::Unit()
     m_doExtraAttacks = false;
 
     m_spellUpdateTimeBuffer = 0;
+
+    m_isCreatureLinkingTrigger = false;
+    m_isSpawningLinked = false;
 }
 
 Unit::~Unit()
@@ -7247,6 +7251,9 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
             if (spell->getState() == SPELL_STATE_CASTING)
                 if (spell->m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_ENTER_COMBAT)
                     InterruptSpell(CURRENT_CHANNELED_SPELL);
+
+        if (m_isCreatureLinkingTrigger)
+            GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_AGGRO, pCreature, enemy);
     }
 }
 
@@ -8089,6 +8096,10 @@ void Unit::TauntFadeOut(Unit *taunter)
         // Nostalrius - pas d'evade quand on charm quelque chose.
         if (!GetCharmGuid())
             OnLeaveCombat();
+
+        if (m_isCreatureLinkingTrigger)
+            GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
+
         return;
     }
 
@@ -8189,6 +8200,10 @@ bool Unit::SelectHostileTarget()
 
     // enter in evade mode in other case
     OnLeaveCombat();
+    
+    if (m_isCreatureLinkingTrigger)
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
+
     return false;
 }
 
