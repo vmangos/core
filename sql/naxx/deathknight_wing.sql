@@ -274,3 +274,6 @@ UPDATE `creature_template` SET `AIName`='', `equipment_id`=16156, `ScriptName`='
 
 -- give AreaTrigger at start of DK wing script name
 REPLACE INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4117', 'at_naxxramas');
+
+-- deathknight vindicator faster aura of agony
+UPDATE `creature_ai_scripts` SET `event_param3`=4000, `event_param4`=4000, `action1_param2`=0 WHERE `id`=1645101;
