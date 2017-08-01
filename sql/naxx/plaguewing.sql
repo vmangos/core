@@ -29,3 +29,6 @@ UPDATE `creature_ai_scripts` SET `event_param1`=4000, `event_param2`=5000, `even
 -- Putrid Bite stack with self
 REPLACE INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
 VALUES ('30113', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Putrid Bite stack with self');
+	
+-- frenzied bat targets random hostile and repeats less frequently
+UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param1`=500, `event_param2`=1000, `event_param3`=5000, `event_param4`=10000, `action1_param2`=4 WHERE `id`=1603601;
