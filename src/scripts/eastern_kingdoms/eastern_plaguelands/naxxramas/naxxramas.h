@@ -107,6 +107,7 @@ enum NaxxNPCs : uint32
     NPC_DeathLord	            = 16861,
     NPC_StoneskinGargoyle	    = 16168,
     NPC_PlagueBeast	            = 16034,
+    NPC_FrenziedBat             = 16036,
     NPC_PlaguedBat	            = 16037,
     NPC_DreadCreeper	        = 15974,
     NPC_CarrionSpinner	        = 15975,
@@ -132,6 +133,9 @@ enum NaxxNPCs : uint32
     NPC_UnholySwords	        = 16216,
     NPC_LightningTotem	        = 16385,
     NPC_PlaguedDeathhound	    = 16448,
+
+    NPC_EyeStalk                = 16236,
+
 };
 
 enum NaxxAreaTriggers : uint32
@@ -265,6 +269,30 @@ struct GothTrigger
     bool bIsAnchorHigh;
 };
 
+static constexpr uint8 max_stalks = 20;
+static constexpr float eyeStalkPossitions[max_stalks][4] =
+{
+    { 2761.28f, -3765.37f, 275.08f, 1.24f },
+    { 2770.17f, -3782.11f, 275.08f, 1.33f },
+    { 2798.11f, -3788.94f, 275.08f, 2.35f },
+    { 2797.91f, -3776.86f, 275.08f, 2.25f },
+    { 2792.06f, -3762.52f, 275.08f, 2.9f, },
+    { 2789.87f, -3752.15f, 275.08f, 2.74f },
+    { 2804.21f, -3757.96f, 275.08f, 3.9f },
+    { 2821.16f, -3759.75f, 275.08f, 4.47f },
+    { 2834.64f, -3751.23f, 275.08f, 4.27f },
+    { 2843.54f, -3768.08f, 275.08f, 3.06f },
+    { 2862.4f,  -3758.3f,  275.08f, 4.8f },
+    { 2877.8f,  -3762.46f, 275.08f, 4.8f },
+    { 2894.11f, -3757.89f, 275.08f, 4.56f },
+    { 2895.25f, -3779.5f,  275.08f, 2.4f },
+    { 2881.59f, -3782.22f, 275.08f, 2.79f },
+    { 2867.2f,  -3778.21f, 275.08f, 3.01f },
+    { 2851.39f, -3776.54f, 275.08f, 2.69f },
+    { 2846.16f, -3789.13f, 275.08f, 1.79f },
+    { 2830.09f, -3776.49f, 275.08f, 0.94f },
+    { 2813.34f, -3780.97f, 275.08f, 1.84f },
+};
 
 class instance_naxxramas : public ScriptedInstance
 {

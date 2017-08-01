@@ -234,7 +234,7 @@ void instance_naxxramas::HandleCreatureCreateRespawn(Creature * pCreature)
 
         // heigan gountlet trash
     case NPC_PlagueBeast:
-    case NPC_PlaguedBat:
+    case NPC_FrenziedBat:
     case NPC_MutatedGrub:
         if (m_auiEncounter[TYPE_HEIGAN] == DONE)
             pCreature->DeleteLater();
@@ -1579,7 +1579,5 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "dark_touched_warriorAI";
     pNewScript->GetAI = &GetAI_dark_touched_warrior;
-    pNewScript->RegisterSelf();
-
-    
+    pNewScript->RegisterSelf();   
 }
