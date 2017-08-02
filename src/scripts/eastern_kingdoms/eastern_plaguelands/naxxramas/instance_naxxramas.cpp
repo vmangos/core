@@ -427,6 +427,8 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             break;
         case GO_ARAC_ANUB_GATE:
             UpdateManualDoor(pGo, m_auiEncounter[TYPE_ANUB_REKHAN]);
+            if (m_auiEncounter[TYPE_ANUB_REKHAN] == DONE)
+                pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
             break;
         case GO_ARAC_FAER_WEB:
             pGo->SetGoState(GO_STATE_ACTIVE);
