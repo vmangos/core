@@ -50,7 +50,7 @@ enum ePatchwerkEvents
 };
 
 static constexpr uint32 BERSERK_TIMER           = 7 * 60 * 1000; // 7 minutes enrage
-static constexpr uint32 HATEFUL_CD              = 1400;
+static constexpr uint32 HATEFUL_CD              = 1200;
 
 // 30 sec after berserk he starts throwing slime at ppl
 // this was added in 1.12.1 to cope with guilds kiting him
