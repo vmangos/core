@@ -207,14 +207,6 @@ struct boss_faerlinaAI : public ScriptedAI
             if (Creature* c = m_pInstance->GetCreature(worshippers[i]))
                 c->AI()->AttackStart(pWho);
         }
-
-        std::list<Creature*> creatures;
-        GetCreatureListWithEntryInGrid(creatures, m_creature, { 15981, 15980 }, 150.0f);
-        for (Creature* pCreature : creatures)
-        {
-            pCreature->AI()->AttackStart(pWho);
-        }
-        
     }
 
     void MoveInLineOfSight(Unit* pWho)

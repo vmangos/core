@@ -203,13 +203,6 @@ struct boss_razuviousAI : public ScriptedAI
         events.ScheduleEvent(EVENT_UNBALANCING_STRIKE, Seconds(30));
         events.ScheduleEvent(EVENT_DISRUPTING_SHOUT, Seconds(15));
         events.ScheduleEvent(EVENT_COMMAND, Seconds(40));
-        
-        std::list<Creature*> pullOnAggro;
-        GetCreatureListWithEntryInGrid(pullOnAggro, m_creature, { 16067, 16154, 16156, 16157, 16158, 16146 }, 230.0f);
-        for (Creature* pC : pullOnAggro)
-        {
-            pC->AI()->AttackStart(pWho);
-        }
     }
 
     void MovementInform(uint32 movementType, uint32 id) override
