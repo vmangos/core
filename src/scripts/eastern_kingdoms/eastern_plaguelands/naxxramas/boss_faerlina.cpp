@@ -122,6 +122,8 @@ struct boss_faerlinaAI : public ScriptedAI
 
     void CheckRespawnAdds()
     {
+        if (m_pInstance && m_pInstance->GetData(TYPE_FAERLINA) == DONE)
+            return;
         // 2 Followers.
         for (int i = 0; i < 2; i++) 
         {
