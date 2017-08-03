@@ -43,7 +43,7 @@ enum
     PHASE_GROUND                = 2,
     PHASE_END                   = 3,
 
-    MAX_WAVES                   = 19,
+    MAX_WAVES                   = 18,
 
     SPELL_TELEPORT_LEFT         = 28025,                    // guesswork
     SPELL_TELEPORT_RIGHT        = 28026,                    // could be defined as dead or live side, left or right facing north
@@ -88,7 +88,8 @@ struct boss_gothikAI : public ScriptedAI
 
     uint32 m_uiTeleportTimer;
     uint32 m_uiShadowboltTimer;
-
+    uint32 m_uiHarvestSoulTimer;
+    
     void Reset()
     {
         m_uiPhase = PHASE_SPEECH;
@@ -97,10 +98,11 @@ struct boss_gothikAI : public ScriptedAI
         m_uiSpeechTimer = 5000;
 
         m_uiSummonCount = 0;
-        m_uiSummonTimer = 5000;
+        m_uiSummonTimer = 4000;
 
         m_uiTeleportTimer = 15000;
         m_uiShadowboltTimer = 2500;
+        m_uiHarvestSoulTimer = 1000;
     }
 
     void Aggro(Unit* pWho)
@@ -164,27 +166,35 @@ struct boss_gothikAI : public ScriptedAI
         if (lSummonList.empty())
             return;
 
-        uint8 uiCount = 2;
+        lSummonList.sort(ObjectDistanceOrder(m_creature));
+        std::list<Creature*>::iterator itr = lSummonList.begin();
 
         switch (uiSummonEntry)
         {
-            case NPC_UNREL_TRAINEE:
-                lSummonList.sort(ObjectDistanceOrder(m_creature));
-                break;
             case NPC_UNREL_DEATH_KNIGHT:
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
+                itr = lSummonList.end();
+                --itr;
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
+                break;
+            case NPC_UNREL_TRAINEE:
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
+                ++itr;
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
+                ++itr;
+                ++itr;
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
+                break;
             case NPC_UNREL_RIDER:
-                uiCount = 1;
-                lSummonList.sort(ObjectDistanceOrderReversed(m_creature));
+                ++itr;
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
                 break;
-        }
-
-        for (std::list<Creature*>::iterator itr = lSummonList.begin(); itr != lSummonList.end(); ++itr)
-        {
-            if (uiCount == 0)
-                break;
-
-            m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
-            --uiCount;
         }
     }
 
@@ -205,26 +215,25 @@ struct boss_gothikAI : public ScriptedAI
             pSummoned->GetOrientation(),
             TEMPSUMMON_TIMED_DESPAWN,
             15000);
+
         if (!pTempTrigger)
             return;
 
+        // Wrong caster, it expected to be pSummoned.
+        // Mangos deletes the spell event at caster death, so for delayed spell like this
+        // it's just a workaround. Does not affect other than the visual though (+ spell takes longer to "travel")
+        // Elysium: we use a temp creature to handle this issue
         switch (pSummoned->GetEntry())
         {
-            // Wrong caster, it expected to be pSummoned.
-            // Mangos deletes the spell event at caster death, so for delayed spell like this
-            // it's just a workaround. Does not affect other than the visual though (+ spell takes longer to "travel")
-            // Elysium: we use a temp creature to handle this issue
-            case NPC_UNREL_TRAINEE:
-                //m_creature->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                //pSummoned->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                break;
-            case NPC_UNREL_DEATH_KNIGHT:
-                pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                break;
-            case NPC_UNREL_RIDER:
-                pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
-                break;
+        case NPC_UNREL_TRAINEE:
+            pTempTrigger->CastSpell(pAnchor, SPELL_A_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+            break;
+        case NPC_UNREL_DEATH_KNIGHT:
+            pTempTrigger->CastSpell(pAnchor, SPELL_B_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+            break;
+        case NPC_UNREL_RIDER:
+            pTempTrigger->CastSpell(pAnchor, SPELL_C_TO_ANCHOR_1, true, NULL, NULL, pSummoned->GetGUID());
+            break;
         }
     }
 
@@ -293,20 +302,19 @@ struct boss_gothikAI : public ScriptedAI
                         {NPC_UNREL_TRAINEE, 0, 0, 10000},
                         {NPC_UNREL_DEATH_KNIGHT, 0, 0, 10000},
                         {NPC_UNREL_TRAINEE, 0, 0, 15000},
-                        {NPC_UNREL_DEATH_KNIGHT, 0, 0, 10000},
-                        {NPC_UNREL_TRAINEE, 0, 0, 15000},
+                        {NPC_UNREL_DEATH_KNIGHT, 0, 0, 5000},
+                        {NPC_UNREL_TRAINEE, 0, 0, 20000},
                         {NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_TRAINEE, 0, 10000},
                         {NPC_UNREL_RIDER, 0, 0, 10000},
                         {NPC_UNREL_TRAINEE, 0, 0, 5000},
                         {NPC_UNREL_DEATH_KNIGHT, 0, 0, 15000},
                         {NPC_UNREL_TRAINEE, NPC_UNREL_RIDER, 0, 10000},
-                        {NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_DEATH_KNIGHT, 0, 10000},
+                        {NPC_UNREL_DEATH_KNIGHT, 0, 0, 10000},
                         {NPC_UNREL_TRAINEE, 0, 0, 10000},
                         {NPC_UNREL_RIDER, 0, 0, 5000},
                         {NPC_UNREL_DEATH_KNIGHT, 0, 0, 5000},
                         {NPC_UNREL_TRAINEE, 0, 0, 20000},
-                        {NPC_UNREL_RIDER, NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_TRAINEE, 15000},
-                        {NPC_UNREL_TRAINEE, 0, 0, 30000},
+                        {NPC_UNREL_RIDER, NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_TRAINEE, 50000},
                     };
 
                     SummonAdds(true, auiSummonData[m_uiSummonCount][0]);
@@ -317,8 +325,7 @@ struct boss_gothikAI : public ScriptedAI
                     if (auiSummonData[m_uiSummonCount][2])
                         SummonAdds(true, auiSummonData[m_uiSummonCount][2]);
 
-                    m_uiSummonTimer = auiSummonData[m_uiSummonCount][3];
-
+                    m_uiSummonTimer += auiSummonData[m_uiSummonCount][3] - uiDiff;
                     ++m_uiSummonCount;
                 }
                 else
@@ -366,6 +373,14 @@ struct boss_gothikAI : public ScriptedAI
                 }
                 else
                     m_uiShadowboltTimer -= uiDiff;
+
+                if (m_uiHarvestSoulTimer < uiDiff)
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_HARVESTSOUL) == CAST_OK)
+                        m_uiHarvestSoulTimer = 20000;
+                }
+                else
+                    m_uiHarvestSoulTimer -= uiDiff;
 
                 DoMeleeAttackIfReady();                     // possibly no melee at all
                 break;
@@ -449,10 +464,12 @@ bool EffectDummyCreature_spell_anchor(Unit* pCaster, uint32 uiSpellId, SpellEffe
                 else if (uiSpellId == SPELL_C_TO_SKULL)
                     uiNpcEntry = NPC_SPECT_RIDER;
 
-                pGoth->SummonCreature(uiNpcEntry, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
+                if (Creature *pCreature = pGoth->SummonCreature(uiNpcEntry, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    pCreature->SetInCombatWithZone();
 
                 if (uiNpcEntry == NPC_SPECT_RIDER)
-                    pGoth->SummonCreature(NPC_SPECT_HORSE, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 20000);
+                    if (Creature *pCreature = pGoth->SummonCreature(NPC_SPECT_HORSE, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                        pCreature->SetInCombatWithZone();
             }
             return true;
         }
