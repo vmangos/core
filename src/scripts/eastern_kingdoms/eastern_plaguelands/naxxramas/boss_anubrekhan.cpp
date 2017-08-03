@@ -539,95 +539,6 @@ struct mob_cryptguardsAI : public ScriptedAI
     }
 };
 
-
-struct mob_corpse_scarabAI : public ScriptedAI
-{
-    instance_naxxramas* m_pInstance;
-    bool isEnraged;
-    uint32 webTimer;
-    uint32 acidSpitTimer;
-    uint32 cleaveTimer;
-    uint32 next_waypoint;
-    
-    static constexpr uint32 NUM_WAYPOINTS = 17;
-    static constexpr float waypoints[17][3] = 
-    {
-        {3203.53f, -3475.68f, 287.06f},
-        {3173.12f, -3478.96f, 287.12f},
-        {3130.50f, -3511.49f, 287.07f},
-        {3086.07f, -3509.39f, 287.08f},
-        {3068.29f, -3538.47f, 287.08f},
-        {3100.69f, -3574.87f, 287.08f},
-        {3138.66f, -3550.26f, 287.08f},
-        {3132.69f, -3511.14f, 287.07f},
-        
-        {3173.12f, -3478.96f, 287.12f },
-        {3203.53f, -3475.68f, 287.06f },
-
-        {3233.81f, -3488.35f, 287.08f},
-        {3259.52f, -3512.41f, 287.08f},
-        {3287.53f, -3513.52f, 287.08f},
-        {3311.63f, -3490.15f, 287.08f},
-        {3309.49f, -3454.61f, 287.08f},
-        {3267.45f, -3435.48f, 287.08f},
-        {3232.18f, -3470.62f, 287.08f}
-    };
-
-    mob_corpse_scarabAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        next_waypoint = 0;
-    }
-
-    void Reset() override
-    {
-    }
-
-    void EnterEvadeMode() override
-    {
-        ScriptedAI::EnterEvadeMode();
-
-        m_creature->GetMotionMaster()->Clear(false);
-        m_creature->GetMotionMaster()->MoveIdle();
-
-        m_creature->GetMotionMaster()->MovePoint(
-            next_waypoint,
-            waypoints[next_waypoint][0], waypoints[next_waypoint][1], waypoints[next_waypoint][2],
-            MOVE_PATHFINDING);
-    }
-
-    void Aggro(Unit* pWho)
-    {
-        m_creature->GetMotionMaster()->Clear(false);
-        m_creature->GetMotionMaster()->MoveIdle();
-
-        ScriptedAI::Aggro(pWho);
-    }
-
-    void MovementInform(uint32 moveType, uint32 data) override
-    {
-        if (moveType != POINT_MOTION_TYPE)
-            return;
-
-        m_creature->GetMotionMaster()->MovePoint(
-            next_waypoint, 
-            waypoints[next_waypoint][0], waypoints[next_waypoint][1], waypoints[next_waypoint][2], 
-            MOVE_PATHFINDING);
-
-        if (next_waypoint == NUM_WAYPOINTS - 1)
-            next_waypoint = 0;
-        else
-            ++next_waypoint;
-    }
-
-    void UpdateAI(const uint32) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
 struct anub_doorAI : public GameObjectAI
 {
     bool haveDoneIntro;
@@ -697,11 +608,6 @@ CreatureAI* GetAI_mob_cryptguards(Creature* pCreature)
     return new mob_cryptguardsAI(pCreature);
 }
 
-CreatureAI* GetAI_mob_corpse_scarab(Creature* pCreature)
-{
-    return new mob_corpse_scarabAI(pCreature);
-}
-
 GameObjectAI* GetAI_anub_door(GameObject* pGo)
 {
     return new anub_doorAI(pGo);
@@ -724,11 +630,5 @@ void AddSC_boss_anubrekhan()
     NewScript = new Script;
     NewScript->Name = "go_anub_door";
     NewScript->GOGetAI = &GetAI_anub_door;
-    NewScript->RegisterSelf();
-
-    NewScript = new Script;
-    NewScript->Name = "mob_corpse_scarab";
-    NewScript->GetAI = &GetAI_mob_corpse_scarab;
-    NewScript->RegisterSelf();
-    
+    NewScript->RegisterSelf();  
 }

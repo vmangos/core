@@ -9,7 +9,7 @@ DELETE FROM `creature` where id = 16698;
 UPDATE `creature_template` SET `baseattacktime`=2000, `flags_extra`=257 WHERE `entry`=15956;
 
 -- corpse scarabs dmg reduced
-UPDATE `creature_template` SET `mindmg`=200, `maxdmg`=300 WHERE `entry`=16698;
+UPDATE `creature_template` SET `mindmg`=200, `maxdmg`=300, `speed_walk`=3, `speed_run`=1.5, `MovementType`=2, `ScriptName`='' WHERE `entry`=16698;
 
 
 -- we need a dummy creature named Anub'Rekhan to use for casting impale to avoid the visual bug where impale is always cast towards maintank
@@ -25,3 +25,23 @@ UPDATE creature_template SET `MechanicImmuneMask`=1023383290 where entry = 16573
 
 -- giving corrpse scarabs an AI to do patrolling
 UPDATE `creature_template` SET `ScriptName`='mob_corpse_scarab' WHERE `entry`=16698;
+
+DELETE FROM creature_movement_template  where entry = 16698;
+INSERT INTO creature_movement_template (entry, point, position_x, position_y, position_z) VALUES
+(16698, 1, 3203.53,  -3475.68, 287.06),
+(16698, 2, 3173.12,  -3478.96, 287.12),
+(16698, 3, 3130.50,  -3511.49, 287.07),
+(16698, 4, 3086.07,  -3509.39, 287.08),
+(16698, 5, 3068.29,  -3538.47, 287.08),
+(16698, 6, 3100.69,  -3574.87, 287.08),
+(16698, 7, 3138.66,  -3550.26, 287.08),
+(16698, 8, 3132.69,  -3511.14, 287.07),
+(16698, 9, 3173.12,  -3478.96, 287.12),
+(16698, 10, 3203.53, -3475.68, 287.06),
+(16698, 11, 3233.81, -3488.35, 287.08),
+(16698, 12, 3259.52, -3512.41, 287.08),
+(16698, 13, 3287.53, -3513.52, 287.08),
+(16698, 14, 3311.63, -3490.15, 287.08),
+(16698, 15, 3309.49, -3454.61, 287.08),
+(16698, 16, 3267.45, -3435.48, 287.08),
+(16698, 17, 3232.18, -3470.62, 287.08);
