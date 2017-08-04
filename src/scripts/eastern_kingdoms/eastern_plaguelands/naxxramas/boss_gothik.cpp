@@ -91,7 +91,9 @@ struct boss_gothikAI : public ScriptedAI
     uint32 m_uiTeleportTimer;
     uint32 m_uiShadowboltTimer;
     uint32 m_uiHarvestSoulTimer;
-    
+    uint32 m_uiNumTP;
+    bool gatesOpened;
+
     void Reset()
     {
         m_uiPhase = PHASE_SPEECH;
@@ -105,6 +107,9 @@ struct boss_gothikAI : public ScriptedAI
         m_uiTeleportTimer = 15000;
         m_uiShadowboltTimer = 2500;
         m_uiHarvestSoulTimer = 1000;
+        
+        m_uiNumTP = 0;
+        gatesOpened = false;
 
         std::list<Creature*> creaturesToDespawn;
         GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, 
@@ -178,7 +183,7 @@ struct boss_gothikAI : public ScriptedAI
     void JustDied(Unit* pKiller)
     {
         DoScriptText(SAY_DEATH, m_creature);
-
+        OpenTheGate();
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOTHIK, DONE);
     }
@@ -187,6 +192,47 @@ struct boss_gothikAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GOTHIK, FAIL);
+    }
+
+    void SummonAdd(uint32 entry, float x, float y, float z, float o)
+    {
+        static constexpr float xMin = 2632.0f;
+        static constexpr float xMax = 2750.0f;
+        static constexpr float dividingY = -3360.0f; // left < -3360, right > -3360.0f
+        static constexpr float maxRightY = -3280.0f;
+        static constexpr float minLeftY  = -3436.0f;
+
+        if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
+        {
+            MapRefManager const&  lPlayers = m_pInstance->GetMap()->GetPlayers();
+            for (auto& playerRef : lPlayers)
+            {
+                Player* p = playerRef.getSource();
+                {
+                    float px = p->GetPositionX();
+                    float py = p->GetPositionY();
+                    if (x > xMin && x < xMax)
+                    {
+                        switch (entry)
+                        {
+                        case NPC_UNREL_RIDER:
+                        case NPC_UNREL_DEATH_KNIGHT:
+                        case NPC_UNREL_TRAINEE:
+                            if(py < dividingY && py > minLeftY)
+                                pCreature->SetInCombatWith(p);
+                            break;
+                        case NPC_SPECT_DEATH_KNIGTH:
+                        case NPC_SPECT_HORSE:
+                        case NPC_SPECT_RIDER:
+                        case NPC_SPECT_TRAINEE:
+                            if (py > dividingY && py < maxRightY)
+                                pCreature->SetInCombatWith(p);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     void SummonAdds(bool bRightSide, uint32 uiSummonEntry)
@@ -203,28 +249,21 @@ struct boss_gothikAI : public ScriptedAI
         switch (uiSummonEntry)
         {
             case NPC_UNREL_DEATH_KNIGHT:
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
-                itr = lSummonList.end();
-                --itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
+                SummonAdd(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
+                itr = lSummonList.end();--itr;
+                SummonAdd(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
                 break;
             case NPC_UNREL_TRAINEE:
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
+                SummonAdd(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
                 ++itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
+                SummonAdd(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
                 ++itr;
                 ++itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
+                SummonAdd(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
                 break;
             case NPC_UNREL_RIDER:
                 ++itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
+                SummonAdd(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation());
                 break;
         }
     }
@@ -268,13 +307,22 @@ struct boss_gothikAI : public ScriptedAI
         }
     }
 
-    void JustSummoned(Creature *pSummoned)
+    void OpenTheGate()
     {
-        if (pSummoned->GetEntry() == NPC_SUB_BOSS_TRIGGER)
-            return;
+        if (gatesOpened) return;
 
-        // TODO : Only set in combat with proper side
-        pSummoned->SetInCombatWithZone();
+        gatesOpened = true;
+        if (GameObject* pGO = m_pInstance->GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
+            pGO->SetGoState(GO_STATE_ACTIVE);
+        
+        std::list<Creature*> allAdds;
+        GetCreatureListWithEntryInGrid(allAdds, m_creature,
+        { NPC_UNREL_TRAINEE, NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_RIDER, NPC_SPECT_TRAINEE, NPC_SPECT_DEATH_KNIGTH, NPC_SPECT_RIDER, NPC_SPECT_HORSE },
+            300.0f);
+        for (Creature* pC : allAdds)
+        {
+            pC->SetInCombatWithZone();
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -403,6 +451,7 @@ struct boss_gothikAI : public ScriptedAI
 
                         if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
                         {
+                            ++m_uiNumTP;
                             DoResetThreat();
                             m_uiTeleportTimer = 15000;
                             m_uiShadowboltTimer = 2000;
@@ -411,6 +460,11 @@ struct boss_gothikAI : public ScriptedAI
                     }
                     else
                         m_uiTeleportTimer -= uiDiff;
+                }
+
+                if (m_uiNumTP == 4 && !gatesOpened)
+                {
+                    OpenTheGate();
                 }
 
                 if (m_uiShadowboltTimer < uiDiff)
@@ -511,12 +565,10 @@ bool EffectDummyCreature_spell_anchor(Unit* pCaster, uint32 uiSpellId, SpellEffe
                 else if (uiSpellId == SPELL_C_TO_SKULL)
                     uiNpcEntry = NPC_SPECT_RIDER;
 
-                if (Creature *pCreature = pGoth->SummonCreature(uiNpcEntry, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                    pCreature->SetInCombatWithZone();
+                ((boss_gothikAI*)pGoth->AI())->SummonAdd(uiNpcEntry, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation());
 
                 if (uiNpcEntry == NPC_SPECT_RIDER)
-                    if (Creature *pCreature = pGoth->SummonCreature(NPC_SPECT_HORSE, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
-                        pCreature->SetInCombatWithZone();
+                    ((boss_gothikAI*)pGoth->AI())->SummonAdd(NPC_SPECT_HORSE, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation());
             }
             return true;
         }
