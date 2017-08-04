@@ -172,27 +172,27 @@ struct boss_gothikAI : public ScriptedAI
         switch (uiSummonEntry)
         {
             case NPC_UNREL_DEATH_KNIGHT:
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
                 itr = lSummonList.end();
                 --itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
                 break;
             case NPC_UNREL_TRAINEE:
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
                 ++itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
                 ++itr;
                 ++itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
                 break;
             case NPC_UNREL_RIDER:
                 ++itr;
-                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = m_creature->SummonCreature(uiSummonEntry, (*itr)->GetPositionX(), (*itr)->GetPositionY(), (*itr)->GetPositionZ(), (*itr)->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
                 break;
         }
@@ -464,11 +464,11 @@ bool EffectDummyCreature_spell_anchor(Unit* pCaster, uint32 uiSpellId, SpellEffe
                 else if (uiSpellId == SPELL_C_TO_SKULL)
                     uiNpcEntry = NPC_SPECT_RIDER;
 
-                if (Creature *pCreature = pGoth->SummonCreature(uiNpcEntry, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                if (Creature *pCreature = pGoth->SummonCreature(uiNpcEntry, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                     pCreature->SetInCombatWithZone();
 
                 if (uiNpcEntry == NPC_SPECT_RIDER)
-                    if (Creature *pCreature = pGoth->SummonCreature(NPC_SPECT_HORSE, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_DEAD_DESPAWN, 1000))
+                    if (Creature *pCreature = pGoth->SummonCreature(NPC_SPECT_HORSE, pCreatureTarget->GetPositionX(), pCreatureTarget->GetPositionY(), pCreatureTarget->GetPositionZ(), pCreatureTarget->GetOrientation(), TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
                         pCreature->SetInCombatWithZone();
             }
             return true;
