@@ -50,6 +50,8 @@ enum
 
     SPELL_HARVESTSOUL           = 28679,
     SPELL_SHADOWBOLT            = 29317,
+
+    SPELL_IMMUNE_ALL            = 29230,
 };
 
 enum eSpellDummy
@@ -103,6 +105,15 @@ struct boss_gothikAI : public ScriptedAI
         m_uiTeleportTimer = 15000;
         m_uiShadowboltTimer = 2500;
         m_uiHarvestSoulTimer = 1000;
+
+        std::list<Creature*> creaturesToDespawn;
+        GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, 
+        { NPC_UNREL_TRAINEE, NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_RIDER, NPC_SPECT_TRAINEE, NPC_SPECT_DEATH_KNIGTH, NPC_SPECT_RIDER, NPC_SPECT_HORSE }, 
+            200.0f);
+        for (Creature* pC : creaturesToDespawn)
+        {
+            pC->DeleteLater();
+        }
     }
 
     void Aggro(Unit* pWho)
@@ -117,6 +128,26 @@ struct boss_gothikAI : public ScriptedAI
         m_pInstance->SetData(TYPE_GOTHIK, IN_PROGRESS);
 
         m_pInstance->SetGothTriggers();
+
+        m_creature->GetMotionMaster()->MoveIdle();
+        DoStopAttack();
+        if(!m_creature->HasAura(SPELL_IMMUNE_ALL))
+            m_creature->CastSpell(m_creature, SPELL_IMMUNE_ALL, true);
+    }
+
+    void AttackStart(Unit* pWho) override
+    {
+        if (!m_creature->HasAura(SPELL_IMMUNE_ALL))
+            ScriptedAI::AttackStart(pWho);
+    }
+
+    void EnterEvadeMode() override
+    {
+        ScriptedAI::EnterEvadeMode();
+        m_creature->Respawn();
+        float x, y, z, o;
+        m_creature->GetHomePosition(x, y, z, o);
+        m_creature->NearTeleportTo(x, y, z, o);
     }
 
     bool HasPlayersInLeftSide()
@@ -248,8 +279,20 @@ struct boss_gothikAI : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
+        if(!m_creature->HasAura(SPELL_IMMUNE_ALL))
+        {
+            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+                return;
+            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+                return;
+        }
+        else
+        {
+            if (m_creature->getThreatManager().isThreatListEmpty())
+            {
+                EnterEvadeMode();
+            }
+        }
 
         switch (m_uiPhase)
         {
@@ -290,6 +333,10 @@ struct boss_gothikAI : public ScriptedAI
                         DoScriptText(SAY_TELEPORT, m_creature);
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
+                        
+                        if (m_creature->HasAura(SPELL_IMMUNE_ALL))
+                            m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_ALL);
+
                         m_uiPhase = PHASE_GROUND;
                         return;
                     }
