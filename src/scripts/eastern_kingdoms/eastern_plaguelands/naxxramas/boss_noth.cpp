@@ -366,6 +366,8 @@ struct boss_nothAI : public ScriptedAI
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
+            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+                return;
         }
         else
         {
@@ -379,8 +381,6 @@ struct boss_nothAI : public ScriptedAI
             }
         }
         
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
-            return;
 
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
