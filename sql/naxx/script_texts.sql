@@ -95,3 +95,30 @@ UPDATE `script_texts` SET `content_default`='I\'ve heard about enough a\' yer sn
 
 -- https://youtu.be/VrykhhdPfc4?t=7m33s
 UPDATE `script_texts` SET `content_default`='Sto-o-op! Make it stop!!' WHERE `entry`='-1533037';
+
+-- all the in-combat script_texts for 4hm encounter are of type say
+UPDATE `script_texts` SET `type`='0' WHERE `entry` in (
+-1533056, 
+-1533055, 
+-1533070, 
+-1533063, 
+-1533048, 
+-1533062, 
+-1533049, 
+-1533064, 
+-1533057,
+-1533069,
+-1533068,
+-1533067,
+-1533066,
+-1533065,
+-1533058,
+-1533054,
+-1533051,
+-1533050,
+-1533044);
+
+-- misc typo fixes for 4hm
+UPDATE `script_texts` SET `content_default`='Forgive me.' WHERE `entry`='-1533063';
+UPDATE `script_texts` SET `content_default`='Bow to the might of the Highlord!' WHERE `entry`='-1533070';
+UPDATE `script_texts` SET `content_default`='I have no choice but to obey!' WHERE `entry`='-1533062';

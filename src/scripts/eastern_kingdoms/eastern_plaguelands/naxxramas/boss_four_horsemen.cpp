@@ -97,6 +97,10 @@ enum
     NPC_SPIRIT_OF_ZELIEK      = 16777
 };
 
+enum Events
+{
+    EVENT_AGGRO_TEXT = 1,
+};
 struct boss_four_horsemen_shared : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
@@ -106,6 +110,8 @@ struct boss_four_horsemen_shared : public ScriptedAI
     const uint32 m_uiMarkId;
     const uint32 m_uiGhostId;
     const bool m_bIsSpirit;
+
+    EventMap m_events;
 
     boss_four_horsemen_shared(Creature* pCreature, uint32 uiMarkId, uint32 uiGhostId) :
         ScriptedAI(pCreature),
@@ -162,8 +168,25 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
+        if (m_pInstance->GetData(TYPE_FOUR_HORSEMEN) == IN_PROGRESS)
+            return;
+        
+        if (m_creature->GetEntry() != NPC_THANE)
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_THANE))
+                pC->AI()->AttackStart(pWho);
+        if (m_creature->GetEntry() != NPC_MOGRAINE)
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_MOGRAINE))
+                pC->AI()->AttackStart(pWho);
+        if (m_creature->GetEntry() != NPC_ZELIEK)
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_ZELIEK))
+                pC->AI()->AttackStart(pWho);
+        if (m_creature->GetEntry() != NPC_BLAUMEUX)
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_BLAUMEUX))
+                pC->AI()->AttackStart(pWho);
+
         if (m_pInstance)
             m_pInstance->SetData(TYPE_FOUR_HORSEMEN, IN_PROGRESS);
+
     }
 
     void JustReachedHome() override
@@ -207,6 +230,8 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
+        m_events.Update(uiDiff);
+
         // Shield Wall - All 4 horsemen will shield wall at 50% hp and 20% hp for 20 seconds
         if (m_bShieldWall1 && m_creature->GetHealthPercent() < 50.0f)
         {
@@ -359,18 +384,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
             return;
 
         boss_four_horsemen_shared::Aggro(who);
-        switch (urand(0, 2))
-        {
-            case 0:
-                DoScriptText(SAY_MOG_AGGRO1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_MOG_AGGRO2, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_MOG_AGGRO3, m_creature);
-                break;
-        }
+        m_events.ScheduleEvent(EVENT_AGGRO_TEXT, Seconds(7));
     }
 
     void KilledUnit(Unit* Victim)
@@ -403,6 +417,16 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
 
         boss_four_horsemen_shared::UpdateAI(uiDiff);
 
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_AGGRO_TEXT:
+                DoScriptText(irand(SAY_MOG_AGGRO3, SAY_MOG_AGGRO1), m_creature);
+                break;
+            }
+        }
+
         DoMeleeAttackIfReady();
     }
 };
@@ -434,7 +458,8 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
             return;
 
         boss_four_horsemen_shared::Aggro(who);
-        DoScriptText(SAY_KORT_AGGRO, m_creature);
+        m_events.ScheduleEvent(EVENT_AGGRO_TEXT, Seconds(4)); 
+        
     }
 
     void KilledUnit(Unit* Victim)
@@ -479,7 +504,15 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
             else
                 m_uiMeteorTimer -= uiDiff;
         }
-
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_AGGRO_TEXT:
+                DoScriptText(SAY_KORT_AGGRO, m_creature);
+                break;
+            }
+        }
         DoMeleeAttackIfReady();
     }
 };
@@ -509,9 +542,8 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
     {
         if (m_bIsSpirit)
             return;
-
         boss_four_horsemen_shared::Aggro(who);
-        DoScriptText(SAY_ZELI_AGGRO, m_creature);
+        m_events.ScheduleEvent(EVENT_AGGRO_TEXT, Seconds(2));
     }
 
     void KilledUnit(Unit* Victim)
@@ -555,6 +587,16 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
             }
             else
                 m_uiHolyWrathTimer -= uiDiff;
+        }
+
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_AGGRO_TEXT:
+                DoScriptText(SAY_ZELI_AGGRO, m_creature);
+                break;
+            }
         }
 
         DoMeleeAttackIfReady();
