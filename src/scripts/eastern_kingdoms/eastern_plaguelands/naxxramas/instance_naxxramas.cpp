@@ -58,6 +58,7 @@ instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
     m_thaddiusHaveGreeted(false),
     m_haveDoneDKWingIntro(false),
     m_horsemenDeathCounter(0),
+    m_uiHorsemenChestGUID(0),
     m_fChamberCenterX(0.0f),
     m_fChamberCenterY(0.0f),
     m_fChamberCenterZ(0.0f)
@@ -349,6 +350,14 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
                 pCreature->SetStandState(UNIT_STAND_STATE_KNEEL);
             break;
     }
+    // 4hm 
+    if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
+    {
+        if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->isDead())
+        {
+            pCreature->Respawn();
+        }
+    }
 }
 
 void instance_naxxramas::OnObjectCreate(GameObject* pGo)
@@ -374,7 +383,6 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_MILI_GOTH_COMBAT_GATE:
         case GO_MILI_HORSEMEN_DOOR:
         case GO_CHEST_HORSEMEN_NORM:
-        case GO_CHEST_HORSEMEN_HERO:
         case GO_CONS_PATH_EXIT_DOOR:
         case GO_CONS_GLUT_EXIT_DOOR:
         case GO_CONS_THAD_DOOR:
@@ -403,6 +411,8 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             m_mGoEntryGuidStore[pGo->GetEntry()] = pGo->GetObjectGuid();
             break;
     }
+    if (pGo->GetEntry() == GO_CHEST_HORSEMEN_NORM)
+        m_uiHorsemenChestGUID = pGo->GetGUID();
 
     if (pGo->GetGoType() == GAMEOBJECT_TYPE_TRAP)
     {
@@ -678,11 +688,22 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             else if(uiData == FAIL)
             {
                 m_horsemenDeathCounter = 0;
+                for (uint32 i = NPC_MOGRAINE; i <= NPC_BLAUMEUX; i++)
+                {
+                    if (Creature* p = GetSingleCreatureFromStorage(i))
+                        if (p->isDead())
+                            p->Respawn();
+                }
+
             }
             else if (uiData == DONE)
             {
-                // todo: (gemt) i commented this out. Is it to despawn chest after 30 minutes?
-                // DoRespawnGameObject(m_uiHorsemenChestGUID, 30 * MINUTE);
+                // spawns it for 30 minutes?
+                DoRespawnGameObject(m_uiHorsemenChestGUID);
+                std::list<Creature*> spirits;
+                GetCreatureListWithEntryInGrid(spirits, GetSingleCreatureFromStorage(NPC_ZELIEK), { 16775, 16776, 16777, 16778}, 300.0f);
+                for (Creature* pC : spirits)
+                    pC->DeleteLater();
             }
             
                 

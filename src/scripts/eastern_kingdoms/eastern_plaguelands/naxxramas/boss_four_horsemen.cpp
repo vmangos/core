@@ -94,7 +94,7 @@ enum
     NPC_SPIRIT_OF_BLAUMEUX    = 16776,
     NPC_SPIRIT_OF_MOGRAINE    = 16775,
     NPC_SPIRIT_OF_KORTHAZZ    = 16778,
-    NPC_SPIRIT_OF_ZELIREK     = 16777
+    NPC_SPIRIT_OF_ZELIEK      = 16777
 };
 
 struct boss_four_horsemen_shared : public ScriptedAI
@@ -115,7 +115,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             m_creature->GetEntry() == NPC_SPIRIT_OF_BLAUMEUX
             || m_creature->GetEntry() == NPC_SPIRIT_OF_MOGRAINE
             || m_creature->GetEntry() == NPC_SPIRIT_OF_KORTHAZZ
-            || m_creature->GetEntry() == NPC_SPIRIT_OF_ZELIREK)
+            || m_creature->GetEntry() == NPC_SPIRIT_OF_ZELIEK)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         if (!m_pInstance)
@@ -135,6 +135,28 @@ struct boss_four_horsemen_shared : public ScriptedAI
         {
             m_creature->addUnitState(UNIT_STAT_ROOT);
             m_creature->SetInCombatWithZone();
+        }
+        else
+        {
+            Creature* pSpirit = nullptr;
+            switch (m_creature->GetEntry())
+            {
+            case NPC_BLAUMEUX:
+                pSpirit = GetClosestCreatureWithEntry(m_creature, NPC_SPIRIT_OF_BLAUMEUX, 300.0f);
+                break;
+            case NPC_MOGRAINE:
+                pSpirit = GetClosestCreatureWithEntry(m_creature, NPC_SPIRIT_OF_MOGRAINE, 300.0f);
+                break;
+            case NPC_THANE:
+                pSpirit = GetClosestCreatureWithEntry(m_creature, NPC_SPIRIT_OF_KORTHAZZ, 300.0f);
+                break;
+            case NPC_ZELIEK:
+                pSpirit = GetClosestCreatureWithEntry(m_creature, NPC_SPIRIT_OF_ZELIEK, 300.0f);
+                break;
+            }
+            if (pSpirit)
+                pSpirit->DeleteLater();
+            // despawn the spirit on reset
         }
     }
 
