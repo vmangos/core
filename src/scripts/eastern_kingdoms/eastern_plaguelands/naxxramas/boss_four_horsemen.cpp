@@ -224,7 +224,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
             if ((DoCastSpellIfCan(m_creature, m_uiMarkId)) == CAST_OK)
             {
                 m_uiMarkTimer = 12000;
-
+                //todo: this behavior should get some more confirmation
                 ThreatList const& tList = m_creature->getThreatManager().getThreatList();
                 for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
                 {
@@ -302,8 +302,25 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
             // Void Zone
             if (m_uiVoidZoneTimer < uiDiff)
             {
-                if ((DoCastSpellIfCan(m_creature->getVictim(), SPELL_VOIDZONE)) == CAST_OK)
-                    m_uiVoidZoneTimer = 12000;
+                Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
+                bool OtherPlayerFound = false;
+                std::vector<Player*> candidates;
+                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+                {
+                    Player* pPlayer = itr->getSource();
+                    if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, 45.0f) && m_creature->IsWithinLOSInMap(pPlayer) && !pPlayer->isGameMaster())
+                    {
+                        candidates.push_back(pPlayer);
+                    }
+                }
+                if (candidates.size() > 0)
+                {
+                    auto iter = candidates.begin();
+                    std::advance(iter, urand(0, candidates.size() - 1));
+                    if (DoCastSpellIfCan(*iter, SPELL_VOIDZONE, CAST_TRIGGERED) == CAST_OK)
+                        m_uiVoidZoneTimer = 12000;
+                }
+                
             }
             else
                 m_uiVoidZoneTimer -= uiDiff;
