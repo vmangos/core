@@ -819,13 +819,55 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         Reset();
     }
     uint32 bloodTapTimer;
+    uint32 checkNeighbourTImer;
     void Reset() override
     {
-        bloodTapTimer = 10000;
+        bloodTapTimer = 18000;
+        checkNeighbourTImer = 1000;
     }
     void JustReachedHome() override
     {
         m_creature->ForcedDespawn(1);
+    }
+    
+    void DispellShackle(Creature* pC)
+    {
+        if (pC->HasAura(9484))
+            pC->RemoveAurasDueToSpell(9484);
+        else if (pC->HasAura(9485))
+            pC->RemoveAurasDueToSpell(9485);
+        else if (pC->HasAura(10955))
+            pC->RemoveAurasDueToSpell(10955);
+    }
+
+    void SpellHit(Unit*, const SpellEntry* spell) override 
+    {
+        // if hit by any shackle spell we check how many other guardians are shackled.
+        // If more than 3, we release everyone.
+        switch (spell->Id)
+        {
+        case 10955:
+        case 9485:
+        case 9484:
+        {
+            std::list<Creature*> guardians;
+            GetCreatureListWithEntryInGrid(guardians, m_creature, NPC_GUARDIAN, 130.0f);
+            uint32 numShackled = 0;
+            for (Creature* pC : guardians)
+            {
+                if (pC->HasAura(9484) || pC->HasAura(9485) || pC->HasAura(10955))
+                    ++numShackled;
+            }
+            if (numShackled >= 4)
+            {
+                for (Creature* pC : guardians)
+                {
+                    DispellShackle(pC);
+                }
+            }
+            break;
+        }
+        }
     }
 
     void UpdateAI(const uint32 diff) override
@@ -836,11 +878,23 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         if (bloodTapTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLOOD_TAP) == CAST_OK)
-                bloodTapTimer = 10000;
+                bloodTapTimer = 18000;
         }
-        else
-            bloodTapTimer -= diff;
+        else bloodTapTimer -= diff;
 
+        if (checkNeighbourTImer < diff)
+        {
+            checkNeighbourTImer = 1000;
+            std::list<Creature*> closeGuardians;
+            GetCreatureListWithEntryInGrid(closeGuardians, m_creature, NPC_GUARDIAN, 10.0f);
+            for (Creature* pC : closeGuardians)
+            {
+                if (pC->GetObjectGuid() == m_creature->GetObjectGuid())
+                    continue;
+                DispellShackle(pC);
+            }
+        }
+        else checkNeighbourTImer -= diff;
 
         DoMeleeAttackIfReady();
     }
