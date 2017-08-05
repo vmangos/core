@@ -272,7 +272,6 @@ struct boss_four_horsemen_shared : public ScriptedAI
     Unit* GetRandPlayerInRange(float maxRange)
     {
         Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-        bool OtherPlayerFound = false;
         std::vector<Player*> candidates;
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
@@ -290,6 +289,26 @@ struct boss_four_horsemen_shared : public ScriptedAI
             auto iter = candidates.begin();
             std::advance(iter, urand(0, candidates.size() - 1));
             return *iter;
+        }
+    }
+
+    void ScriptTextInRange(int32 msg)
+    {
+        m_creature->MonsterSay(msg);
+        const StringTextData* pData = sScriptMgr.GetTextData(msg);
+        if (!pData)
+            return;
+        if (!pData->SoundId)
+            return;
+        float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
+        Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        {
+            Player* pPlayer = itr->getSource();
+            if (m_creature->IsWithinDistInMap(pPlayer, range))
+            {
+                m_creature->PlayDirectSound(pData->SoundId, pPlayer);
+            }
         }
     }
 };
@@ -360,11 +379,11 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
                 if (m_bIsSpirit)
                     break;
 
-                if (Unit* pTarget = GetPlayerAtMinimumRange(45.0f))
+                if (Unit* pTarget = GetRandPlayerInRange(45.0f))
                 {
                     if ((DoCastSpellIfCan(pTarget, SPELL_VOIDZONE)) == CAST_OK)
                     {
-                        DoScriptText(SAY_BLAU_SPECIAL, m_creature);
+                        ScriptTextInRange(SAY_BLAU_SPECIAL);
                         m_events.Repeat(Seconds(urand(12, 15)));
                         break;
                     }
@@ -433,7 +452,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
         if (pSpell->Id == 28882 && specialSayCooldown == 0) // Righteous Fire
         {
-            DoScriptText(SAY_MOG_SPECIAL, m_creature);
+            ScriptTextInRange(SAY_MOG_SPECIAL);
             specialSayCooldown = 12000;
         }
     }
@@ -536,7 +555,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
                 {
                     if ((DoCastSpellIfCan(pTarget, SPELL_METEOR)) == CAST_OK)
                     {
-                        DoScriptText(SAY_KORT_SPECIAL, m_creature);
+                        ScriptTextInRange(SAY_KORT_SPECIAL);
                         m_events.Repeat(Seconds(urand(12, 15)));
                         break;
                     }
@@ -619,7 +638,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
                 if ((DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLY_WRATH)) == CAST_OK)
                 {
                     m_events.Repeat(Seconds(urand(12, 15)));
-                    DoScriptText(SAY_ZELI_SPECIAL, m_creature);
+                    ScriptTextInRange(SAY_ZELI_SPECIAL);
                 }
                 else
                     m_events.Repeat(Milliseconds(100));
