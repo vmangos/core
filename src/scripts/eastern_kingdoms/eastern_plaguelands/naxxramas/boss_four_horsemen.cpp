@@ -70,9 +70,9 @@ enum
     SAY_KORT_SLAY           = -1533056,
     SAY_KORT_DEATH          = -1533057,
 
-    SPELL_MARK_OF_KORTHAZZ  = 28832,
+    SPELL_MARK_OF_KORTHAZZ   = 28832,
     SPELL_SPIRIT_OF_KORTHAZZ = 28932,
-    SPELL_METEOR            = 26558,                        // m_creature->getVictim() auto-area spell but with a core problem
+    SPELL_METEOR             = 28884, // wowhead dmg amount suggests spell 26558, but 28884 makes way more sense due to the id range
 
     //sir zeliek
     EMOTE_ZELI_CONDEMNATION = -1533157, // todo: add usage
@@ -100,7 +100,10 @@ enum
 enum Events
 {
     EVENT_AGGRO_TEXT = 1,
+
+    EVENT_BOSS_ABILITY,
 };
+
 struct boss_four_horsemen_shared : public ScriptedAI
 {
     instance_naxxramas* m_pInstance;
@@ -133,6 +136,8 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void Reset() override
     {
+        m_events.Reset();
+
         m_bShieldWall1 = true;
         m_bShieldWall2 = true;
         m_uiMarkTimer = 20000;
@@ -264,6 +269,29 @@ struct boss_four_horsemen_shared : public ScriptedAI
             m_uiMarkTimer -= uiDiff;
     }
 
+    Unit* GetRandPlayerInRange(float maxRange)
+    {
+        Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
+        bool OtherPlayerFound = false;
+        std::vector<Player*> candidates;
+        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+        {
+            Player* pPlayer = itr->getSource();
+            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, maxRange) && m_creature->IsWithinLOSInMap(pPlayer) && !pPlayer->isGameMaster())
+            {
+                candidates.push_back(pPlayer);
+            }
+        }
+        if (candidates.empty())
+            return nullptr;
+
+        else
+        {
+            auto iter = candidates.begin();
+            std::advance(iter, urand(0, candidates.size() - 1));
+            return *iter;
+        }
+    }
 };
 
 struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
@@ -274,12 +302,9 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    uint32 m_uiVoidZoneTimer;
-
     void Reset()
     {
         boss_four_horsemen_shared::Reset();
-        m_uiVoidZoneTimer = 12000;                             // right
     }
 
     void Aggro(Unit *who)
@@ -289,6 +314,8 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
 
         boss_four_horsemen_shared::Aggro(who);
         DoScriptText(SAY_BLAU_AGGRO, m_creature);
+
+        m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(12));
     }
 
     void KilledUnit(Unit* Victim)
@@ -318,37 +345,33 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
     {
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
 
-
-        if (!m_bIsSpirit)
+        while (uint32 eventId = m_events.ExecuteEvent())
         {
-            // Void Zone
-            if (m_uiVoidZoneTimer < uiDiff)
+            switch (eventId)
             {
-                Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-                bool OtherPlayerFound = false;
-                std::vector<Player*> candidates;
-                for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
+            case EVENT_AGGRO_TEXT:
+                DoScriptText(SAY_KORT_AGGRO, m_creature);
+                break;
+            case EVENT_BOSS_ABILITY:
+                if (m_bIsSpirit)
+                    break;
+
+                if (Unit* pTarget = GetPlayerAtMinimumRange(45.0f))
                 {
-                    Player* pPlayer = itr->getSource();
-                    if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, 45.0f) && m_creature->IsWithinLOSInMap(pPlayer) && !pPlayer->isGameMaster())
+                    if ((DoCastSpellIfCan(pTarget, SPELL_VOIDZONE)) == CAST_OK)
                     {
-                        candidates.push_back(pPlayer);
+                        DoScriptText(SAY_BLAU_SPECIAL, m_creature);
+                        m_events.Repeat(Seconds(urand(12, 15)));
+                        break;
                     }
                 }
-                if (candidates.size() > 0)
-                {
-                    auto iter = candidates.begin();
-                    std::advance(iter, urand(0, candidates.size() - 1));
-                    if (DoCastSpellIfCan(*iter, SPELL_VOIDZONE, CAST_TRIGGERED) == CAST_OK)
-                        m_uiVoidZoneTimer = 12000;
-                }
-                
+                m_events.Repeat(Milliseconds(100));
+                break;
             }
-            else
-                m_uiVoidZoneTimer -= uiDiff;
         }
 
         DoMeleeAttackIfReady();
@@ -373,18 +396,18 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
             return;
-
-        // Should spirit have it too ?
-        m_creature->CastSpell(m_creature, SPELL_RIGHTEOUS_FIRE, true);
+        specialSayCooldown = 12000;
     }
-
+    uint32 specialSayCooldown;
     void Aggro(Unit *who)
     {
         if (m_bIsSpirit)
             return;
-
         boss_four_horsemen_shared::Aggro(who);
         m_events.ScheduleEvent(EVENT_AGGRO_TEXT, Seconds(7));
+
+        // Should spirit have it too ?
+        m_creature->CastSpell(m_creature, SPELL_RIGHTEOUS_FIRE, true);
     }
 
     void KilledUnit(Unit* Victim)
@@ -408,15 +431,21 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
     void SpellHitTarget(Unit *pTarget, const SpellEntry *pSpell)
     {
         boss_four_horsemen_shared::SpellHitTarget(pTarget, pSpell);
+        if (pSpell->Id == 28882 && specialSayCooldown == 0) // Righteous Fire
+        {
+            DoScriptText(SAY_MOG_SPECIAL, m_creature);
+            specialSayCooldown = 12000;
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
-
+        specialSayCooldown -= std::min(uiDiff, specialSayCooldown);
         while (uint32 eventId = m_events.ExecuteEvent())
         {
             switch (eventId)
@@ -444,12 +473,9 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    uint32 m_uiMeteorTimer;
-
     void Reset()
     {
         boss_four_horsemen_shared::Reset();
-        m_uiMeteorTimer = 30000;                               // wrong
     }
 
     void Aggro(Unit *who)
@@ -460,6 +486,8 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         boss_four_horsemen_shared::Aggro(who);
         m_events.ScheduleEvent(EVENT_AGGRO_TEXT, Seconds(4)); 
         
+        // unknown if it should be this long for initial cast. Might be right to get in possition
+        m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(30));
     }
 
     void KilledUnit(Unit* Victim)
@@ -489,27 +517,31 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
     {
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
 
-        if (!m_bIsSpirit)
-        {
-            // Meteor
-            if (m_uiMeteorTimer < uiDiff)
-            {
-                // target should be random between 20 yds
-                if ((DoCastSpellIfCan(m_creature->getVictim(), SPELL_METEOR)) == CAST_OK)
-                    m_uiMeteorTimer = 20000;                           // wrong
-            }
-            else
-                m_uiMeteorTimer -= uiDiff;
-        }
         while (uint32 eventId = m_events.ExecuteEvent())
         {
             switch (eventId)
             {
             case EVENT_AGGRO_TEXT:
                 DoScriptText(SAY_KORT_AGGRO, m_creature);
+                break;
+            case EVENT_BOSS_ABILITY:
+                if (m_bIsSpirit)
+                    break;
+
+                if (Unit* pTarget = GetRandPlayerInRange(20.0f))
+                {
+                    if ((DoCastSpellIfCan(pTarget, SPELL_METEOR)) == CAST_OK)
+                    {
+                        DoScriptText(SAY_KORT_SPECIAL, m_creature);
+                        m_events.Repeat(Seconds(urand(12, 15)));
+                        break;
+                    }
+                }
+                m_events.Repeat(Milliseconds(100));
                 break;
             }
         }
@@ -530,12 +562,9 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         Reset();
     }
 
-    uint32 m_uiHolyWrathTimer;
-
     void Reset()
     {
         boss_four_horsemen_shared::Reset();
-        m_uiHolyWrathTimer = 12000;                            // right
     }
 
     void Aggro(Unit *who)
@@ -544,6 +573,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
             return;
         boss_four_horsemen_shared::Aggro(who);
         m_events.ScheduleEvent(EVENT_AGGRO_TEXT, Seconds(2));
+        m_events.ScheduleEvent(EVENT_BOSS_ABILITY, Seconds(12));
     }
 
     void KilledUnit(Unit* Victim)
@@ -574,20 +604,9 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         //Return since we have no target
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
-
-        if (!m_bIsSpirit)
-        {
-            // Holy Wrath
-            if (m_uiHolyWrathTimer < uiDiff)
-            {
-                if ((DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLY_WRATH)) == CAST_OK)
-                    m_uiHolyWrathTimer = 12000;
-            }
-            else
-                m_uiHolyWrathTimer -= uiDiff;
-        }
 
         while (uint32 eventId = m_events.ExecuteEvent())
         {
@@ -595,6 +614,15 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
             {
             case EVENT_AGGRO_TEXT:
                 DoScriptText(SAY_ZELI_AGGRO, m_creature);
+                break;
+            case EVENT_BOSS_ABILITY:
+                if ((DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLY_WRATH)) == CAST_OK)
+                {
+                    m_events.Repeat(Seconds(urand(12, 15)));
+                    DoScriptText(SAY_ZELI_SPECIAL, m_creature);
+                }
+                else
+                    m_events.Repeat(Milliseconds(100));
                 break;
             }
         }
