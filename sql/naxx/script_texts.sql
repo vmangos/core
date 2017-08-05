@@ -116,7 +116,8 @@ UPDATE `script_texts` SET `type`='0' WHERE `entry` in (
 -1533054,
 -1533051,
 -1533050,
--1533044);
+-1533044,
+-1533074);
 
 -- misc typo fixes for 4hm
 UPDATE `script_texts` SET `content_default`='Forgive me.' WHERE `entry`='-1533063';
