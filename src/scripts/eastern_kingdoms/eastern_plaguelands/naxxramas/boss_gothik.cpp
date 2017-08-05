@@ -69,8 +69,15 @@ enum eSpellDummy
     SPELL_C_TO_SKULL        = 27937
 };
 
+static constexpr float xMin = 2632.0f;
+static constexpr float xMax = 2750.0f;
+static constexpr float dividingY = -3360.0f; // left < -3360, right > -3360.0f
+static constexpr float maxRightY = -3280.0f;
+static constexpr float minLeftY = -3436.0f;
+
 struct boss_gothikAI : public ScriptedAI
 {
+
     boss_gothikAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
@@ -196,11 +203,11 @@ struct boss_gothikAI : public ScriptedAI
 
     void SummonAdd(uint32 entry, float x, float y, float z, float o)
     {
-        static constexpr float xMin = 2632.0f;
-        static constexpr float xMax = 2750.0f;
-        static constexpr float dividingY = -3360.0f; // left < -3360, right > -3360.0f
-        static constexpr float maxRightY = -3280.0f;
-        static constexpr float minLeftY  = -3436.0f;
+        if (gatesOpened)
+        {
+            m_creature->SetInCombatWithZone();
+            return;
+        }
 
         if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
         {
@@ -211,7 +218,7 @@ struct boss_gothikAI : public ScriptedAI
                 {
                     float px = p->GetPositionX();
                     float py = p->GetPositionY();
-                    if (x > xMin && x < xMax)
+                    if (px > xMin && px < xMax)
                     {
                         switch (entry)
                         {
@@ -325,6 +332,34 @@ struct boss_gothikAI : public ScriptedAI
         }
     }
 
+    bool IsAllPlayersOneSide()
+    {
+        MapRefManager const&  lPlayers = m_pInstance->GetMap()->GetPlayers();
+        uint32 num_left = 0, num_right = 0;
+        for (auto& playerRef : lPlayers)
+        {
+            Player* p = playerRef.getSource();
+            {
+                float px = p->GetPositionX();
+                float py = p->GetPositionY();
+                if (px > xMin && px < xMax)
+                {
+                    if (py < dividingY && py > minLeftY)
+                        ++num_left;
+                    break;
+                    if (py > dividingY && py < maxRightY)
+                        ++num_right;
+                    break;
+                }
+            }
+        }
+        // if there are less than 10 people on one of the sides we consider it as
+        // "everyone is on the same side". That to avoid the whole raid afking on spectral
+        // side, waiting for gothik to TP down, in which case they have 40 sec to kill him
+        // before the gates would ordinarily open.
+        return (num_left < 10 || num_right < 10); 
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
         if(!m_creature->HasAura(SPELL_IMMUNE_ALL))
@@ -382,9 +417,12 @@ struct boss_gothikAI : public ScriptedAI
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
                         
+                        // opening the gates on first teleport if all players are considered on the same side
+                        if (!gatesOpened && IsAllPlayersOneSide())
+                            OpenTheGate();
+
                         if (m_creature->HasAura(SPELL_IMMUNE_ALL))
                             m_creature->RemoveAurasDueToSpell(SPELL_IMMUNE_ALL);
-
                         m_uiPhase = PHASE_GROUND;
                         return;
                     }
@@ -448,7 +486,7 @@ struct boss_gothikAI : public ScriptedAI
                     if (m_uiTeleportTimer < uiDiff)
                     {
                         uint32 uiTeleportSpell = m_pInstance->IsInRightSideGothArea(m_creature) ? SPELL_TELEPORT_LEFT : SPELL_TELEPORT_RIGHT;
-
+                        
                         if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
                         {
                             ++m_uiNumTP;
