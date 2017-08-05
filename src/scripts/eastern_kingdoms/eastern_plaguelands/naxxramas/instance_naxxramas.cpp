@@ -111,9 +111,9 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
     if (pWho->IsInEvadeMode() || !pWho->getVictim())
         return false;
-
+    uint32 entry = pWho->GetEntry();
     float dist;
-    switch (pWho->GetEntry())
+    switch (entry)
     {
     case NPC_GLUTH:
         dist = 150.0f;
@@ -156,6 +156,12 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
     case NPC_KELTHUZAD:
         dist = 130.0f;
         break;
+    case NPC_BLAUMEUX:
+    case NPC_MOGRAINE:
+    case NPC_ZELIEK:
+    case NPC_THANE:
+        dist = 115.0f;
+        break;
     default:
         sLog.outError("instance_naxxramas::HandleEvadeOutOfHome called for unsupported creture %d", pWho->GetEntry());
         dist = 9999.0f;
@@ -165,7 +171,21 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
     pWho->GetHomePosition(x, y, z, o);
     if (pWho->GetDistance2d(x, y) > dist)
     {
-        pWho->AI()->EnterEvadeMode();
+        if (entry == NPC_BLAUMEUX || entry == NPC_MOGRAINE || entry == NPC_ZELIEK || entry == NPC_THANE)
+        {
+            if (Creature* pC = GetSingleCreatureFromStorage(NPC_BLAUMEUX))
+                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+            if (Creature* pC = GetSingleCreatureFromStorage(NPC_MOGRAINE))
+                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+            if (Creature* pC = GetSingleCreatureFromStorage(NPC_ZELIEK))
+                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+            if (Creature* pC = GetSingleCreatureFromStorage(NPC_THANE))
+                if (pC->isAlive()) pC->AI()->EnterEvadeMode();
+        }
+        else
+        {
+            pWho->AI()->EnterEvadeMode();
+        }
         return false;
     }
     return true;
