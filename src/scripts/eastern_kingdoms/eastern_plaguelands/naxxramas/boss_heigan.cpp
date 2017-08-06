@@ -261,9 +261,13 @@ struct boss_heiganAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(48));
         m_creature->CastStop();
         m_creature->SetReactState(REACT_AGGRESSIVE);
+        eruptionPhase = 0;
+
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
         m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
 
-        eruptionPhase = 0;
     }
 
     void EventPortPlayer()
