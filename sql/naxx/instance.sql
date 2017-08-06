@@ -265,3 +265,33 @@ VALUES
 (1644801, 16448, 0, 0, 100, 1, 6000, 8000, 8000, 10000, 11, 30121, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Deathhound forceful howl');
 -- Plagued deathhound ai
 UPDATE `creature_template` SET `minhealth`=93736, `maxhealth`=93736, `maxmana`=0, `scale`=2.5, `AIName`='EventAI' WHERE `entry`=16448;
+
+
+DELETE FROM gossip_menu where entry between 8400 and 8409;
+INSERT INTO gossip_menu (entry, text_id, condition_id) VALUES
+(8400, 8517, 0),
+(8401, 8518, 0),
+(8402, 8519, 0),
+(8403, 8520, 0),
+(8404, 8521, 0),
+(8405, 8522, 0),
+(8406, 8523, 0),
+(8407, 8529, 0),
+(8408, 8530, 0),
+(8409, 8531, 0);
+
+DELETE FROM gossip_menu_option where menu_id  between 8400 and 8409;
+INSERT INTO gossip_menu_option (menu_id, id, option_icon, option_text, option_id, npc_option_npcflag, action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text, condition_id) VALUES
+('8400', '0', '0', 'What are you talking about, mage?', '1', '1', '8401', '0', '0', '0', '0', NULL, '0'),
+('8401', '0', '0', 'Why have you done such horrible things?', '1', '1', '8402', '0', '0', '0', '0', NULL, '0'),
+('8402', '0', '0', 'I still do not understand.', '1', '1', '8403', '0', '0', '0', '0', NULL, '0'),
+('8403', '0', '0', 'You are talking nonsense, mage.', '1', '1', '8404', '0', '0', '0', '0', NULL, '0'),
+('8404', '0', '0', 'What staff?', '1', '1', '8405', '0', '0', '0', '0', NULL, '0'),
+('8405', '0', '0', 'You said you would have it back. What does that mean?', '1', '1', '8406', '0', '0', '0', '0', NULL, '0'),
+('8406', '0', '0', 'What happened to the staff?', '1', '1', '8407', '0', '0', '0', '0', NULL, '0'),
+('8407', '0', '0', 'So what has led you to Naxxramas?', '1', '1', '8408', '0', '0', '0', '0', NULL, '0'),
+('8408', '0', '0', 'So Kel\'Thuzad holds all of the pieces?', '1', '1', '8409', '0', '0', '0', '0', NULL, '0');
+
+UPDATE `creature_template` SET `gossip_menu_id`=8400, `npcflag`=1, `ScriptName`='npc_archmage_tarsis' WHERE `entry`=16381;
+UPDATE `npc_text` SET `em0_1`='13' WHERE `ID`='8517';
+

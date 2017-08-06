@@ -135,6 +135,7 @@ enum NaxxNPCs : uint32
     NPC_PlaguedDeathhound	    = 16448,
 
     NPC_EyeStalk                = 16236,
+    NPC_ArchmageTarsis          = 16381,
 
 };
 

@@ -363,6 +363,9 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
+        case NPC_ArchmageTarsis:
+            pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
+            break;
     }
     // 4hm 
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
@@ -1472,6 +1475,13 @@ CreatureAI* GetAI_dark_touched_warrior(Creature* pCreature)
     return new mob_dark_touched_warriorAI(pCreature);
 }
 
+bool GossipHello_npc_ArchmageTarsis(Player* pPlayer, Creature* pCreature)
+{
+    if(pCreature->getStandState() != UNIT_STAND_STATE_SIT)
+        pCreature->SetStandState(UNIT_STAND_STATE_SIT);
+    return false;
+}
+
 void AddSC_instance_naxxramas()
 {
     Script* pNewScript;
@@ -1511,4 +1521,9 @@ void AddSC_instance_naxxramas()
     pNewScript->Name = "dark_touched_warriorAI";
     pNewScript->GetAI = &GetAI_dark_touched_warrior;
     pNewScript->RegisterSelf();   
+
+    pNewScript = new Script;
+    pNewScript->Name = "npc_archmage_tarsis";
+    pNewScript->pGossipHello = &GossipHello_npc_ArchmageTarsis;
+    pNewScript->RegisterSelf();
 }
