@@ -361,6 +361,8 @@ struct boss_heiganAI : public ScriptedAI
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
+            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+                return;
         }
         else {
             // If wipe, we force the dance phase to end so above code runs and he evades.
@@ -368,8 +370,6 @@ struct boss_heiganAI : public ScriptedAI
                 EventDanceEnd();
         }
         
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
-            return;
 
         m_events.Update(uiDiff);
         while (uint32 eventId = m_events.ExecuteEvent())

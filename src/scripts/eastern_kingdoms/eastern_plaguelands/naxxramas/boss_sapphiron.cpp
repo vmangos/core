@@ -104,15 +104,15 @@ struct boss_sapphironAI : public ScriptedAI
                 m_creature->SetVisibility(VISIBILITY_OFF);
             }
             else
+            {
+                if (GameObject* skeleton = m_pInstance->GetSingleGameObjectFromStorage(GO_SAPPHIRON_SPAWN))
+                    skeleton->Despawn();
                 phase = PHASE_DEAD;
-
+            }
         }
         else
         {
             phase = PHASE_GROUND;
-            if(m_pInstance)
-                if (GameObject* skeleton = m_pInstance->GetSingleGameObjectFromStorage(GO_SAPPHIRON_SPAWN))
-                    skeleton->Despawn();
         }
     }
 
@@ -397,11 +397,10 @@ struct boss_sapphironAI : public ScriptedAI
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
+            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+                return;
         }
-        
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
-            return;
-
+      
         if(!m_creature->HasAura(SPELL_FROST_AURA))
             m_creature->CastSpell(m_creature, SPELL_FROST_AURA, true);
         

@@ -580,7 +580,8 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             else
                 pGo->SetGoState(GO_STATE_ACTIVE);
         case GO_SAPPHIRON_SPAWN:
-            pGo->DeleteLater();
+            if(m_auiEncounter[TYPE_SAPPHIRON] == DONE)
+                pGo->DeleteLater();
             break;
 
     }
