@@ -250,7 +250,7 @@ struct boss_sapphironAI : public ScriptedAI
 
         events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
         events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
-        events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(4));
+        events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(40));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
     }
