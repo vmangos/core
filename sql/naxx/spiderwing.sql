@@ -5,10 +5,10 @@ UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param3`=10000, `event_p
 UPDATE `creature_template` SET `scale`='0.5', `speed_run`='1.75', `speed_walk`='3.5' WHERE `entry`=15977;
 
 -- naxxramas acolyte arcane explosion spell changed to one with 1.5sec cast time, and timers randomized slightly 
-UPDATE `creature_ai_scripts` SET `event_param2`=3000, `event_param3`=7000, `event_param4`=9000, `action1_param1`=30096 WHERE `id`=1598101;
+UPDATE `creature_ai_scripts` SET `event_param1`=7000, `event_param2`=7000, `event_param3`=7000, `event_param4`=9000, `action1_param1`=30096 WHERE `id`=1598101;
 
--- naxxramas acolyte shadowbolt timer randomized more
-UPDATE `creature_ai_scripts` SET `event_param2`=5000, `event_param3`=7000, `event_param4`=9000 WHERE `id`=1598102;
+-- naxxramas acolyte shadowbolt timer randomized more and changed spell
+UPDATE `creature_ai_scripts` SET `event_param1`=1800, `event_param2`=2000, `event_param3`=7000, `event_param4`=9000, `action1_param1`=28448 WHERE `id`=1598102;
 
 
 UPDATE creature_template SET `MechanicImmuneMask`=1023383290 where entry in 
