@@ -363,12 +363,6 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             if (m_auiEncounter[TYPE_GOTHIK] != IN_PROGRESS)
                 m_lGothTriggerList.push_back(pCreature->GetGUID());
             break;
-
-        // faerlina trash
-        case NPC_NaxxramasCultist:
-        case NPC_NaxxramasAcolyte:
-                pCreature->SetStandState(UNIT_STAND_STATE_KNEEL);
-            break;
     }
     // 4hm 
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
