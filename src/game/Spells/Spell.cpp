@@ -3157,12 +3157,23 @@ void Spell::cancel()
                 m_caster->ToPlayer()->RemoveSpellMods(this);
 
                 // summoning rituals, if a user has cancelled inform the go
-                if (GameObject* go = m_targets.getGOTarget())
-                    if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
-                        go->getLootState() != GO_JUST_DEACTIVATED &&
-                        go->HasUniqueUser(m_caster->ToPlayer()))
-                        go->RemoveUniqueUse(m_caster->ToPlayer());
+                // Don't use m_targets.getGOTarget(), as it may be a dangling pointer since we don't
+                // update the target pointers here (only want to check a single target pointer). We
+                // can use it as a speed-up to see if this spell had a GO target at some point though
+                if (m_targets.getGOTarget())
+                {
+                    if (GameObject *go = m_caster->GetMap()->GetGameObject(m_targets.getGOTargetGuid()))
+                    {
+                        if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
+                            go->getLootState() != GO_JUST_DEACTIVATED &&
+                            go->HasUniqueUser(m_caster->ToPlayer()))
+                        {
+                            go->RemoveUniqueUse(m_caster->ToPlayer());
+                        }
+                    }
+                }
             }
+
             if (sendInterrupt)
                 SendCastResult(SPELL_FAILED_INTERRUPTED);
         }
