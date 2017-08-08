@@ -547,26 +547,6 @@ struct boss_sapphironAI : public ScriptedAI
     }
 };
 
-
-struct boss_sapphiron_birthAI : public GameObjectAI
-{
-    instance_naxxramas* m_pInstance;
-
-    boss_sapphiron_birthAI(GameObject* pGo) :
-        GameObjectAI(pGo)
-    {
-        m_pInstance = (instance_naxxramas*)me->GetInstanceData();
-        if (!m_pInstance)
-            sLog.outError("anub_doorAI could not find instanceData");
-    }
-
-    bool OnUse(Unit* user)
-    {
-        return false;
-    }
-
-};
-
 struct npc_wing_buffetAI : public ScriptedAI
 {
     npc_wing_buffetAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -677,11 +657,6 @@ CreatureAI* GetAI_npc_sapphironBlizzard(Creature* pCreature)
     return new npc_sapphiron_blizzardAI(pCreature);
 }
 
-GameObjectAI* GetAI_sapp_body(GameObject* pGo)
-{
-    return new boss_sapphiron_birthAI(pGo);
-}
-
 void AddSC_boss_sapphiron()
 {
     Script* NewScript;
@@ -699,11 +674,4 @@ void AddSC_boss_sapphiron()
     NewScript->Name = "npc_sapphiron_blizzard";
     NewScript->GetAI = &GetAI_npc_sapphironBlizzard;
     NewScript->RegisterSelf();
-
-    NewScript = new Script;
-    NewScript->Name = "go_sapphiron_birth";
-    NewScript->GOGetAI = &GetAI_sapp_body;
-    NewScript->RegisterSelf();
-
-    //npc_sapphiron_blizzard
 }

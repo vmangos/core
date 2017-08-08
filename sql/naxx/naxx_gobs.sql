@@ -392,7 +392,7 @@ INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `factio
 
 
 -- The scattered remains of sapphiron when you first get to him.
-(181356, 6, 6747, 'Sapphiron Birth', 0, 0, 1, 0, 63, 80, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'go_sapphiron_birth'),
+(181356, 6, 6747, 'Sapphiron Birth', 0, 0, 1, 0, 63, 80, 0, 1, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ''),
 
 
 -- which one is correct?
