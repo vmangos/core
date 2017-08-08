@@ -355,6 +355,9 @@ bool Map::Add(Player *player)
     // Send objects first => Can not take quests at relogin
     SendInitTransports(player);
     SendInitSelf(player);
+    // Clear m_visibleGUIDs in case 2 players entered a map at the same time,
+    // one could stay invisible from the other until re-zoning.
+    // Inspired from the TrinityCore way.
     if (player->IsBeingTeleportedFar())
         player->m_visibleGUIDs.clear();
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
