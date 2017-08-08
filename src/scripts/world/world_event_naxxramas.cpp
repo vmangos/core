@@ -122,8 +122,10 @@ public:
 
 /*
 Necropolis Controller
-Notes: General AI / Controlling what zone is under attack
-*//*
+Notes: General AI / Controlling what zone is under attack, not in use for now
+*/
+
+/*
 struct npc_necropolis_controller : public ScriptedAI
 {
     npc_necropolis_controller(Creature* pCreature) : ScriptedAI(pCreature)
@@ -726,7 +728,6 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
 
     void AttackStart(Unit* who)
     {
-        // Empeche de bouger et entrer en combat
     }
 
     void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
@@ -878,7 +879,8 @@ struct npc_cultist_engineer : public ScriptedAI
         else if (action == ENGINEER_AI_ACTION_ATTACK_START)
         {
             ASSERT(unit);
-            //DoCastSpellIfCan(m_creature, SPELL_SUMMON_BOSS);
+
+            //DoCastSpellIfCan(m_creature, SPELL_SUMMON_BOSS); // Boss summon spell 
 
             if (Unit* invoked = m_creature->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
             {
@@ -937,7 +939,7 @@ bool GossipHello_npc_cultist_engineer(Player* player, Creature* creature)
 
 /*
 Shadow of Doom
-Notes: 
+Notes: mini boss
 */
 struct ShadowOfDoomAI : public ScriptedAI
 {
@@ -1642,21 +1644,7 @@ void AddSC_world_event_naxxramas()
     newscript->pGossipSelect = &GossipSelect_npc_argent_emissary;
     newscript->RegisterSelf();
 
-    /*
-    // This should be standard in an sql file.. don't change to default zone.
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
+    // At start up, set time for both 
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_AZSHARA);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING, 0);
-    */
 }

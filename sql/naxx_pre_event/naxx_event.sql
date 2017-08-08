@@ -1,6 +1,6 @@
 SET @CGUID_BOSS:=2349;
-SET @CGUID_GENERAL:=2349;
-SET @OGUID_GENERAL:=2349;
+SET @CGUID_GENERAL:=12410;
+SET @OGUID_GENERAL:=1267;
 SET @Event_1:=17; -- Scourge Invasion
 SET @Event_2:=80; -- Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11
 SET @Event_3:=81; -- Scourge Invasion - Boss in instance activation
@@ -8,8 +8,8 @@ SET @Event_3:=81; -- Scourge Invasion - Boss in instance activation
 -- ----------------------
 -- Texts
 -- ----------------------
-UPDATE `npc_text` SET `text0_0`='This cultist is in a deep trance...' WHERE  ID`=20100;
-UPDATE `npc_text` SET `text0_0`='The time has come for Horde and Alliance to look towards Northrend and the invasion of the Lich King. In recent days, territories across Kalimdor and the Eastern Kingdoms have come under attack. Will you take up arms to save your land from destruction at their hands?' WHERE  `ID`=20102;
+UPDATE `npc_text` SET `text0_0`='This cultist is in a deep trance...' WHERE `ID`=20100;
+UPDATE `npc_text` SET `text0_0`='The time has come for Horde and Alliance to look towards Northrend and the invasion of the Lich King. In recent days, territories across Kalimdor and the Eastern Kingdoms have come under attack. Will you take up arms to save your land from destruction at their hands?' WHERE `ID`=20102;
 
 -- Add missing texts
 DELETE FROM `npc_text` WHERE `ID` IN (20100, 20101, 20102, 20104, 20105, 20106, 20107, 20108, 20109, 20110, 20111, 20112, 20113, 20114, 20115, 20116, 20117);
@@ -37,7 +37,7 @@ UPDATE `nostalrius_string` SET `content_default`='Give me one of your magic item
 UPDATE `nostalrius_string` SET `content_default`='Use 8 necrotic runes and disrupt his ritual.', `content_loc2`='Utilisez 8 runes nécrotiques et interrompez son rituel.' WHERE `entry`=120;
 
 -- Add texts for Shadow of Doom
-DELETE FROM `nostalrius_string` WHERE `ID` IN (135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147);
+DELETE FROM `nostalrius_string` WHERE `entry` IN (135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147);
 INSERT INTO `nostalrius_string` (`entry`, `content_default`) VALUES
 (135, 'Our dark master has noticed your trifling, and sends me to bring a message... of doom!'),
 (136, 'Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!'),
@@ -82,7 +82,7 @@ UPDATE `creature_template` SET `modelid_2`=16239 WHERE  `entry`=16435;
 UPDATE `creature_template` SET `modelid_2`=16240 WHERE  `entry`=16436;
 UPDATE `creature_template` SET `modelid_2`=10672, `modelid_3`=10670 WHERE  `entry`=16511;
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+5;
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
 (@CGUID_BOSS+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0), -- Sever - Level 21 - Shadowfang Keep
 (@CGUID_BOSS+1, 14693, 189, 0, 0, 1797.17, 1308.18, 18.6715, 4.71688, 300, 0, 0, 1, 0, 0, 0, 0), -- Scorn - Level 32 - Scarlet Monestary
@@ -92,7 +92,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `positio
 (@CGUID_BOSS+5, 14684, 329, 0, 1, 3503.92, -3313.75, 130.357, 4.65155, 300, 0, 0, 1, 0, 0, 0, 0); -- Balzaphon - Level 60 - Stratholme
 
 -- Add instance bosses
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID+0 AND @CGUID+5;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (@CGUID_BOSS+0, 81),
 (@CGUID_BOSS+1, 81),
@@ -329,23 +329,23 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `positio
 (@CGUID_GENERAL+177, 16423, 1, 0, 0, 9756.88, 1859.74, 1305.55, 6.01373, 25, 5, 0, 137, 0, 0, 1, 0),
 (@CGUID_GENERAL+178, 16423, 1, 0, 0, 9728.21, 1843.1, 1302.12, 2.77003, 25, 5, 0, 120, 0, 0, 1, 0);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178 AND `eventEntry`=@Event_2;
-INSERT INTO `game_event_creature` SELECT @Event_2, creature.guid FROM `creature` WHERE creature.guid BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178 AND `event`=@Event_2;
+INSERT INTO `game_event_creature` SELECT creature.guid, @Event_2 FROM `creature` WHERE creature.guid BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178;
 
-DELETE FROM `creature` WHERE `entry` IN (1242996, 1242997, 1243011, 1242995, 1242992, 1242993, 1243010, 1242994, );
+DELETE FROM `creature` WHERE `guid` IN (1242996, 1242997, 1243011, 1242995, 1242992, 1242993, 1243010, 1242994);
 
 -- ----------------------
 -- Game Events
 -- ----------------------
 UPDATE `game_event` SET `start_time`='2017-06-20 00:00:00', `end_time`='2018-06-20 00:00:00', `length`=33720 WHERE `entry`=17;
 
-DELETE FROM `game_event` WHERE `entry` IN (110, 111, 112, 113, 114, 115, 116, 117, 118);
+DELETE FROM `game_event` WHERE `entry` IN (110, 111, 112, 113, 114, 115, 116, 117, 118, 80, 81);
 INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`) VALUES
 (80, '2014-03-30 05:25:24', '2018-03-30 05:30:00', 525600, 33720, 0, 'Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11', 0, 0),
 (81, '2014-03-30 05:25:24', '2018-04-20 04:30:00', 525600, 33720, 0, 'Scourge Invasion - Boss in instance activation', 0, 0);
 
 -- Objects
-DELETE FROM `game_event_gameobject` WHERE `entry`=17;
+DELETE FROM `game_event_gameobject` WHERE `event`=17;
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996418, 17), -- 110),
 (3996419, 17), -- 110),
@@ -353,7 +353,6 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996421, 17), -- 110),
 (3996422, 17), -- 110),
 (3996423, 17), -- 110),
-(3996444, 17), -- 110),
 (3996424, 17), -- 111),
 (3996430, 17), -- 111),
 (3996435, 17), -- 111),
@@ -842,7 +841,7 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996960, 17); -- 126),
 
 -- Creatures
-DELETE FROM `game_event_creature` WHERE `entry` IN (17,80);
+DELETE FROM `game_event_creature` WHERE `event` IN (17,80);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (1242626, 80), -- 118),
 (1242627, 80), -- 118),
@@ -1035,7 +1034,7 @@ UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=1812
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181374;
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181373;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+6;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `spawnFlags`) VALUES
 (@OGUID_GENERAL+0, 181254, 0, -4930.26, -992.487, 501.443, 2.36819, 0, 0, 0.926159, 0.377134, 25, 100, 1, 0),
 (@OGUID_GENERAL+1, 181256, 0, -4929.6, -986.764, 501.459, 2.27002, 0, 0, 0.906538, 0.422124, 25, 100, 1, 0),
@@ -1043,17 +1042,34 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID_GENERAL+3, 181255, 0, -4930.98, -987.826, 501.458, 2.58025, 0, 0, 0.960869, 0.277003, 25, 100, 1, 0),
 (@OGUID_GENERAL+4, 181255, 0, -4930.98, -987.826, 502.024, 2.42317, 0, 0, 0.936174, 0.351538, 25, 100, 1, 0),
 (@OGUID_GENERAL+5, 181256, 0, -4917.47, -981.636, 501.451, 1.46499, 0, 0, 0.668728, 0.743507, 25, 100, 1, 0),
-(@OGUID_GENERAL+6, 181256, 0, -8833.53, 645.621, 95.3165, 4.06871, 0, 0, 0.894466, -0.447135, 25, 100, 1, 0);
+(@OGUID_GENERAL+6, 181256, 0, -8833.53, 645.621, 95.3165, 4.06871, 0, 0, 0.894466, -0.447135, 25, 100, 1, 0),
 (@OGUID_GENERAL+7, 181256, 0, -8827.92, 640.435, 94.331, 3.8221, 0, 0, 0.942671, -0.333724, 25, 100, 1, 0),
 (@OGUID_GENERAL+8, 181254, 0, -8828.14, 644.609, 94.4657, 3.78675, 0, 0, 0.948421, -0.317014, 25, 100, 1, 0),
 (@OGUID_GENERAL+9, 181256, 0, -8838.25, 644.563, 95.7177, 3.9674, 0, 0, 0.91596, -0.401268, 25, 100, 1, 0),
 (@OGUID_GENERAL+10, 181255, 0, -8828.24, 643.265, 94.4295, 5.40467, 0, 0, 0.42527, -0.905067, 25, 100, 1, 0),
 (@OGUID_GENERAL+11, 181255, 0, -8828.24, 643.265, 94.9958, 5.76987, 0, 0, 0.253848, -0.967244, 25, 100, 1, 0);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11 AND `eventEntry`=@Event_1;
-INSERT INTO `game_event_gameobject` SELECT @Event_1, gameobject.guid FROM `gameobject` WHERE gameobject.guid BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11;
+DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11 AND `event`=@Event_1;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @Event_1 FROM `gameobject` WHERE gameobject.guid BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11;
 
 DELETE FROM `gameobject` WHERE `guid` IN (3996948, 3996951, 3996952, 3996946, 3996946, 3996949, 3996945, 3996924, 3996924, 3996925);
+
+-- 
+-- Start values for zones etc
+-- 
+INSERT INTO `variables` (`index`, `value`) VALUES
+(10, 440), -- VARIABLE_NAXX_ATTACK_ZONE1 & ZONEID_TANARIS
+(11, 16), -- VARIABLE_NAXX_ATTACK_ZONE2 & ZONEID_AZSHARA
+(14, 0),
+(15, 0),
+(16, 0),
+(17, 0),
+(18, 0),
+(19, 0),
+(20, 0),
+(21, 0),
+(22, 0),
+(23, 0);
 
 -- ----------------------
 -- Spells
