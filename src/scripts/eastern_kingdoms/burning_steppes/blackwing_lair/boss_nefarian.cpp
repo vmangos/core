@@ -208,7 +208,9 @@ struct boss_nefarianAI : ScriptedAI
             return false;
 
         bool bClassFound = false;
-
+        // Clear mage GUIDs or we'll be adding the same players again for subsequent
+        // mage class calls, resulting in far more polymorphs than intended
+        MagePlayerGUID.clear();
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
