@@ -968,7 +968,9 @@ enum MangosStrings
     LANG_SCRIPTS_WRONG_API              = 1167,
     LANG_SCRIPTS_RELOADED_OK            = 1168,
     LANG_SCRIPTS_OUTDATED               = 1169,
-    // Room for more level 3              1170-1199 not used
+    LANG_SET_LOCK_SUCCESS               = 1170,
+    LANG_SET_LOCK_USAGE                 = 1171,
+    // Room for more level 3              1172-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

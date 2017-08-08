@@ -962,6 +962,44 @@ bool ChatHandler::HandleAccountSetPasswordCommand(char* args)
     return true;
 }
 
+/// Set locked status for account
+bool ChatHandler::HandleAccountSetLockedCommand(char* args)
+{
+    ///- Get the command line arguments
+    char* accountStr = ExtractOptNotLastArg(&args);
+
+    std::string account_name;
+    uint32 account_id = ExtractAccountId(&accountStr, &account_name);
+    if (!account_id)
+        return false;
+
+    // Let set locked state only for lesser (strong) security level
+    // or to self account
+    if (GetAccountId() && GetAccountId() != account_id &&
+        HasLowerSecurityAccount(NULL, account_id, true))
+        return false;
+
+    uint32 value;
+    if (!ExtractUInt32(&args, value))
+    {
+        PSendSysMessage(LANG_SET_LOCK_USAGE);
+        return false;
+    }
+
+    if (value < 16)
+    {
+        LoginDatabase.PExecute("UPDATE account SET locked = '%u' WHERE id = '%u'", value, account_id);
+        PSendSysMessage(LANG_SET_LOCK_SUCCESS, account_name.c_str(), account_id, value);
+    }
+    else
+    {
+        PSendSysMessage(LANG_SET_LOCK_USAGE);
+        return false;
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleMaxSkillCommand(char* /*args*/)
 {
     Player* SelectedPlayer = getSelectedPlayer();
@@ -3573,6 +3611,7 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
     }
 
     target->AddSpellAuraHolder(holder);
+    return true;
 }
 
 bool ChatHandler::HandleDamageCommand(char* args)
