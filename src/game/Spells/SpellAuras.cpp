@@ -2720,7 +2720,10 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
         target->clearUnitState(UNIT_STAT_CONTROLLED);
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_PVP_ATTACKABLE);
+        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        // removing UNIT_FLAG_PVP_ATTACKABLE from a player now has weird consequences like walking underwater
+        if (!target->GetAffectingPlayer())
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
 
         target->SetCharmerGuid(ObjectGuid());
 
