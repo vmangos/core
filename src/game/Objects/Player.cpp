@@ -18518,9 +18518,9 @@ void Player::ResurectUsingRequestData()
     if (m_resurrectGuid.IsPlayer())
         TeleportTo(m_resurrectMap, m_resurrectX, m_resurrectY, m_resurrectZ, GetOrientation());
 
-    //we cannot resurrect player when we triggered far teleport
-    //player will be resurrected upon teleportation
-    if (IsBeingTeleportedFar())
+    //we cannot resurrect player when we triggered any kind of teleport
+    //player will be resurrected upon teleportation (in MSG_MOVE_TELEPORT_ACK handler)
+    if (IsBeingTeleported())
     {
         ScheduleDelayedOperation(DELAYED_RESURRECT_PLAYER);
         return;
