@@ -1102,7 +1102,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
         }*/
     }
 
-    PSendSysMessage("Riding skill removed from %s", name); // check
+    PSendSysMessage("Riding skill removed from %s", name.c_str()); // check
     return true;
 }
 
@@ -3361,7 +3361,7 @@ bool ChatHandler::HandleGuildInviteCommand(char *args)
         return false;
     }
 
-    PSendSysMessage("Player added to %s.", glName);
+    PSendSysMessage("Player added to %s.", glName.c_str());
     return true;
 }
 

@@ -3848,7 +3848,7 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
         }
     }
 
-    PSendSysMessage("%s's amount of %s (id %u) is: %u", target_name, GetItemLink(pItem).c_str(), itemId, itemCount);
+    PSendSysMessage("%s's amount of %s (id %u) is: %u", target_name.c_str(), GetItemLink(pItem).c_str(), itemId, itemCount);
     return true;
 }
 
