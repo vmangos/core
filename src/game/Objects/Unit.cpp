@@ -3093,10 +3093,13 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (!pVictim)
         return 0.0f;
 
-    // Base misschance 5.60%
-    float missChance = 5.60f;
+    float missChance = 5.60f; // The base chance to miss is 5.60%
+    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+    {
+      missChance = 5.00f;  // The base chance to miss in PvP is 5%
+    }
 
-    // DualWield - white damage has additional 19% miss penalty
+    // DualWield - white damage has an additional 19% miss penalty
     if (haveOffhandWeapon() && attType != RANGED_ATTACK)
     {
         bool isNormal = false;
