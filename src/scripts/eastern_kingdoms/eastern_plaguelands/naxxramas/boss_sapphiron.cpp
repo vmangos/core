@@ -137,14 +137,14 @@ struct boss_sapphironAI : public ScriptedAI
     void Reset()
     {
         phase = PHASE_GROUND;
-        m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
-
         events.Reset();
-        DeleteAndDispellIceBlocks();
         berserkTimer = 900000; // 15 min
         m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
         UnSummonWingBuffet();
         DeleteAndDispellIceBlocks();
+        setHover(false);
+        SetCombatMovement(true);
+        m_creature->GetMotionMaster()->Clear(false);
     }
 
     void UnSummonWingBuffet()
@@ -397,8 +397,11 @@ struct boss_sapphironAI : public ScriptedAI
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
-            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
-                return;
+        }
+        else 
+        {
+            if (m_creature->getThreatManager().isThreatListEmpty())
+                EnterEvadeMode();
         }
       
         if(!m_creature->HasAura(SPELL_FROST_AURA))
