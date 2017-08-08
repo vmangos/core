@@ -323,27 +323,82 @@ public:
     }
 
     std::set<ObjectGuid> _shards;
-    std::vector<ObjectGuid> _necropolisList;
+    std::set<ObjectGuid> _necropolisList;
     uint32 _worldstateTimer;
+    uint32 _totalnecropolisTimer;
     uint32 _checkShardsTimer;
     uint32 _animationTimer;
 
     bool ZoneNecropolisDestroyed()
     {
-        for (std::vector<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
+        for (std::set<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
         {
             GameObject* necropolis = me->GetMap()->GetGameObject(*it);
+
             if (!necropolis)
                 continue;
+
             if (necropolis->GetZoneId() != _zone)
             {
                 _necropolisList.erase(it);
                 return false;
             }
+
             if (necropolis->isSpawned())
                 return false;
         }
         return true;
+    }
+
+    void ZoneNecropolisRemaning()
+    {
+        uint32 totalzone = 0;
+        for (std::set<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
+        {
+            GameObject* necropolis = me->GetMap()->GetGameObject(*it);
+            totalzone = _necropolisList.size();
+        }
+
+        uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+        uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+        uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+        uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
+        uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
+        uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
+
+        switch (me->GetZoneId())
+        {
+            case ZONEID_AZSHARA:
+            {
+                sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, totalzone, true);
+                break;
+            }
+            case ZONEID_BLASTED_LANDS:
+            {
+                sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, totalzone, true);
+                break;
+            }
+            case ZONEID_BURNING_STEPPES:
+            {
+                sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, totalzone, true);
+                break;
+            }
+            case ZONEID_EASTERN_PLAGUELANDS:
+            {
+                sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, totalzone, true);
+                break;
+            }
+            case ZONEID_TANARIS:
+            {
+                sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, totalzone, true);
+                break;
+            }
+            case ZONEID_WINTERSPRING:
+            {
+                sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, totalzone, true);
+                break;
+            }
+        }
     }
 
     // Update Visibility on necropolis, shown zone wide for every player
@@ -430,68 +485,6 @@ public:
         }
     }
 
-    void SetNecropolisRemaning(bool enable)
-    {
-        uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
-        uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
-        uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
-        uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
-        uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
-        uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
-
-        switch (me->GetZoneId())
-        {
-            case ZONEID_AZSHARA:
-            {
-                if (enable)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA - 1, true);
-                break;
-            }
-            case ZONEID_BLASTED_LANDS:
-            {
-                if (enable)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS - 1, true);
-                break;
-            }
-            case ZONEID_BURNING_STEPPES:
-            {
-                if (enable)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES - 1, true);
-                break;
-            }
-            case ZONEID_EASTERN_PLAGUELANDS:
-            {
-                if (enable)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS - 1, true);
-                break;
-            }
-            case ZONEID_TANARIS:
-            {
-                if (enable)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS - 1, true);
-                break;
-            }
-            case ZONEID_WINTERSPRING:
-            {
-                if (enable)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING - 1, true);
-                break;
-            }
-        }
-    }
-
     void Enable()
     {
         me->Respawn();
@@ -499,8 +492,8 @@ public:
         _animationTimer = 1000;
         _checkShardsTimer = 5000; // 5 sec to spawn shard
         UpdateWorldState(true);
-        SetNecropolisRemaning(true);
-        sLog.outInfo("[NAXX] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
+        _necropolisList.insert(me->GetObjectGuid());
+        sLog.outInfo("[Scourge Invasion Event] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
     }
 
     void Disable()
@@ -508,8 +501,8 @@ public:
         me->SetVisible(false);
         UpdateVisibility(false);
         UpdateWorldState(false);
-        SetNecropolisRemaning(false);
-        sLog.outInfo("[NAXX] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
+        _necropolisList.erase(me->GetObjectGuid());
+        sLog.outInfo("[Scourge Invasion Event] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
     }
 
     bool OnUse(Unit* shard)
@@ -534,7 +527,7 @@ public:
         return true;
     }
 
-    void SetPylonsRespawnTime(uint32 time)
+    void SetShardsRespawnTime(uint32 time)
     {
         for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
             if (Creature* shard = me->GetMap()->GetCreature(*it))
@@ -555,7 +548,7 @@ public:
 
         if (!me->isSpawned())
         {
-            //if (ZoneNecropolisDestroyed())
+            if (ZoneNecropolisDestroyed())
                 ChangeAttackZone();
             return;
         }
@@ -564,11 +557,18 @@ public:
         {
             // Update worldstate for players in map of object
             UpdateWorldState(true);
-            //UpdateRemainingNecropolis(_necropolisList.size());
             _worldstateTimer = 60000; // update every minute
         }
         else
             _worldstateTimer -= diff;
+
+        if (_totalnecropolisTimer < diff)
+        {
+            ZoneNecropolisRemaning();
+            _totalnecropolisTimer = 60000; // update every minute
+        }
+        else
+            _totalnecropolisTimer -= diff;
 
         if (_animationTimer < diff)
         {
@@ -594,7 +594,7 @@ public:
                 me->SendObjectDeSpawnAnim(me->GetObjectGuid());
                 me->SetRespawnTime(NECROPOLIS_RESPAWN_TIME);
                 me->SaveRespawnTime();
-                SetPylonsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // If all shards are gone, despawn necroplis instantly.
+                SetShardsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // If all shards are gone, despawn necroplis instantly.
                 _animationTimer = 1000;
             }
         }
@@ -658,7 +658,7 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
         JustDied(NULL);
         if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) == m_creature->GetGUIDLow())
         {
-            sLog.outInfo("[NAXX] Elite despawned by shard disable");
+            sLog.outInfo("[Scourge Invasion Event] Elite despawned by shard disable");
             sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0, true);
         }
     }

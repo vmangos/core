@@ -5,6 +5,10 @@ SET @Event_1:=17; -- Scourge Invasion
 SET @Event_2:=80; -- Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11
 SET @Event_3:=81; -- Scourge Invasion - Boss in instance activation
 
+-- Delete time
+DELETE FROM `game_event_gameobject` WHERE `event` IN (17, 110, 111, 112, 113, 114, 115, 116, 117, 119, 120, 121, 122, 123, 124, 125, 126);
+DELETE FROM `game_event_creature` WHERE `event` IN (17, 80, 118, 126, 127);
+
 -- ----------------------
 -- Texts
 -- ----------------------
@@ -109,7 +113,8 @@ INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`
 (14686, 0, 0, 0, 0, 0, 0, '50596'),
 (14690, 0, 0, 0, 0, 0, 0, '50596'),
 (14695, 0, 0, 0, 0, 0, 0, '50596'),
-(14684, 0, 0, 0, 0, 0, 0, '50596');
+(14684, 0, 0, 0, 0, 0, 0, '50596'),
+(14697, 0, 0, 0, 0, 0, 0, '50596');
 
 -- Creature id: 14682
 -- Sever
@@ -134,13 +139,19 @@ INSERT INTO creature_ai_scripts VALUES
 ('1469001','14690','0','0','100','1','5000','6000','9000','10000','11','29849','1','0','0','0','0','0','0','0','0','0','Revanchion - Frost Nova'),
 ('1469002','14690','0','0','100','1','2000','3000','5000','8000','11','15245','1','0','0','0','0','0','0','0','0','0','Revanchion - Shadowbolt Volley');
 
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=14682;
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=14693;
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=14686;
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=14690;
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=14695;
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=14684;
-UPDATE `creature_template` SET `subname`=NULL WHERE `entry`=16508;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14682;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14693;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14686;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14690;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14695;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14697;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14684;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=16423;
+UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=16508;
+
+-- Correct factions
+UPDATE `creature_template` SET `faction_A`=1630, `faction_H`=1630 WHERE  `entry`=16423;
+UPDATE `creature_template` SET `faction_A`=1630, `faction_H`=1630 WHERE  `entry`=16422;
 
 -- Update Lord Blackwood equipment
 DELETE FROM creature_equip_template WHERE entry=14695;
@@ -345,7 +356,6 @@ INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `lengt
 (81, '2014-03-30 05:25:24', '2018-04-20 04:30:00', 525600, 33720, 0, 'Scourge Invasion - Boss in instance activation', 0, 0);
 
 -- Objects
-DELETE FROM `game_event_gameobject` WHERE `event`=17;
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996418, 17), -- 110),
 (3996419, 17), -- 110),
@@ -841,7 +851,6 @@ INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
 (3996960, 17); -- 126),
 
 -- Creatures
-DELETE FROM `game_event_creature` WHERE `event` IN (17,80);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (1242626, 80), -- 118),
 (1242627, 80), -- 118),
@@ -1052,11 +1061,12 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11 AND `event`=@Event_1;
 INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @Event_1 FROM `gameobject` WHERE gameobject.guid BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11;
 
-DELETE FROM `gameobject` WHERE `guid` IN (3996948, 3996951, 3996952, 3996946, 3996946, 3996949, 3996945, 3996924, 3996924, 3996925);
+DELETE FROM `gameobject` WHERE `guid` IN (3996948, 3996951, 3996952, 3996946, 3996946, 3996949, 3996945, 3996924, 3996923, 3996925);
 
 -- 
 -- Start values for zones etc
 -- 
+DELETE FROM `variables` WHERE `index` IN (10,11,14,15,16,17,18,19,20,21,22,23);
 INSERT INTO `variables` (`index`, `value`) VALUES
 (10, 440), -- VARIABLE_NAXX_ATTACK_ZONE1 & ZONEID_TANARIS
 (11, 16), -- VARIABLE_NAXX_ATTACK_ZONE2 & ZONEID_AZSHARA
