@@ -1285,6 +1285,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                             break;
                     }
 
+        // Sunder Armor triggers weapon proc as well as normal procs despite dealing no damage
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>())
+            ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
         procEx = createProcExtendMask(&damageInfo, missInfo);
@@ -1306,11 +1310,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             dmg = 1;
         }
         caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
-    }
-    // Sunder Armor triggers main hand proc despite dealing no damage
-    else if (m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>()) //sunder armor
-    {
-        ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
     }
 
     if (missInfo != SPELL_MISS_NONE)
