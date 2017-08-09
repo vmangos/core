@@ -3007,21 +3007,33 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     if (!apply && target->HasAuraType(SPELL_AURA_MOD_DISARM))
         return;
 
-    target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
-
-    if (target->GetTypeId() != TYPEID_PLAYER)
-        return;
-
     // main-hand attack speed already set to special value for feral form already and don't must change and reset at remove.
-    if (target->IsInFeralForm())
-        return;
+    if (target->GetTypeId() == TYPEID_PLAYER && !target->IsInFeralForm())
+    {
+        Player* pTarget = target->ToPlayer();
 
-    if (apply)
-        target->SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
+        // (un)applying weapon dependent mods is more practical on a non disarmed player
+        // if we unapply the aura remove the flag before _ApplyWeaponDependentAuraMods
+        if (!apply)
+        {
+            target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, false);
+            pTarget->SetRegularAttackTime();
+        }
+
+        if (Item* weapon = pTarget->GetWeaponForAttack(BASE_ATTACK, true, true))
+            pTarget->_ApplyWeaponDependentAuraMods(weapon, BASE_ATTACK, !apply);
+
+        // if we apply the aura add the flag after _ApplyWeaponDependentAuraMods
+        if (apply)
+        {
+            target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, true);
+            target->SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
+        }
+
+        target->UpdateDamagePhysical(BASE_ATTACK);
+    }
     else
-        ((Player *)target)->SetRegularAttackTime();
-
-    target->UpdateDamagePhysical(BASE_ATTACK);
+        target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
 }
 
 void Aura::HandleAuraModStun(bool apply, bool Real)
