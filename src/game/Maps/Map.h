@@ -43,6 +43,7 @@
 #include "MoveSplineInitArgs.h"
 #include "WorldSession.h"
 #include "SQLStorages.h"
+#include "CreatureLinkingMgr.h"
 
 #include <bitset>
 #include <list>
@@ -486,6 +487,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         void SetMapUpdateIndex(int idx) { _updateIdx = idx; }
 
+        // Get Holder for Creature Linking
+        CreatureLinkingHolder* GetCreatureLinkingHolder() { return &m_creatureLinkingHolder; }
+
     private:
         void LoadMapAndVMap(int gx, int gy);
 
@@ -612,6 +616,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32 _lastCellsUpdate;
 
         int8 _updateIdx;
+
+        // Holder for information about linked mobs
+        CreatureLinkingHolder m_creatureLinkingHolder;
+
     public:
         CreatureGroupHolderType CreatureGroupHolder;
         uint32 GetLastPlayerLeftTime() const { return _lastPlayerLeftTime; }

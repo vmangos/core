@@ -373,6 +373,39 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             damage *= 0.25;
                          break;
                     }
+                    // Thaddius positive charge tick
+                    case 28062:
+                    {
+                        // Target also has positive charge, so no damage
+                        if (unitTarget->HasAura(28059))
+                            damage = 0;
+                        break;
+                    }
+                    // Thaddius negative charge tick
+                    case 28085:
+                    {
+                        // Target also has negative charge, so no damage
+                        if (unitTarget->HasAura(28084))
+                            damage = 0;
+                        break;
+                    }
+                    case 28375: // Gluth decimate
+                    {
+                        // damage should put target at maximum 5% hp, but not reduce it below that
+                        damage = std::max(0, int32(unitTarget->GetHealth() - uint32(unitTarget->GetMaxHealth() * 0.05f)));
+                        break;
+                    }
+                    case 28206: // Grobbulus Mutagen Explosion
+                    {
+                        // All sources say the explosion should do around 4.5k physical dmg if it runs out,
+                        // but "less" if dispelled. I have been able to find different variations of this spell,
+                        // so the hack has become to set m_triggeredBySpellInfo when casting this spell from Aura::HandleAuraDummy 
+                        // when 28169 expires, and NOT set m_triggeredBySpellInfo 28169 is dispelled.
+                        if (m_triggeredBySpellInfo)
+                            damage = uint32(damage * 1.5f);
+                        else
+                            damage = uint32(damage / 1.5f);
+                    }
                 }
                 break;
             }
@@ -1560,6 +1593,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 5229:                                  // Enrage
                 {
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
+                }
+                case 29201: // Loatheb Corrupted Mind triggered sub spells
+                {
+                    uint32 spellid;
+                    switch (unitTarget->getClass())
+                    {
+                        // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
+                        // stealing druid version for priests until anyone has a reason priests cant smite.s
+                    case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
+                    case CLASS_DRUID:   spellid = 29194; break;
+                    case CLASS_PALADIN: spellid = 29196; break;
+                    case CLASS_SHAMAN:  spellid = 29198; break;
+                    default: break;
+                    }
+                    if (spellid != 0)
+                        m_caster->CastSpell(unitTarget, spellid, true);
                 }
             }
             break;
@@ -4436,12 +4485,46 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 28374:                                 // Decimate (Naxxramas: Gluth)
                 {
+                //implemented in SpellEffects::EffectSchoolDMG  instead, under case 28375
+                /*
                     if (!unitTarget)
                         return;
-
-                    int32 damage = unitTarget->GetHealth() - unitTarget->GetMaxHealth() * 0.05f;
-                    if (damage > 0)
-                        m_caster->CastCustomSpell(unitTarget, 28375, &damage, nullptr, nullptr, true);
+                    // Should only affect players and zombies
+                    if (unitTarget->IsPlayer() || unitTarget->GetEntry() == 16360)
+                    {
+                        int32 damage = unitTarget->GetHealth() - unitTarget->GetMaxHealth() * 0.05f;
+                        if (damage > 0)
+                            m_caster->CastCustomSpell(unitTarget, 28375, &damage, nullptr, nullptr, true);
+                    }
+                */
+                    return;
+                }
+                case 28408:                                 // Chains of Kel'Thuzad (Naxxramas: Kel'thuzad)
+                {
+                    // selects up to 5 randm targets in threatlist and charm them
+                    std::vector<Unit*> viableTargets;
+                    const ThreatList& tl = m_caster->getThreatManager().getThreatList();
+                    for (auto it = tl.begin(); it != tl.end(); it++)
+                    {
+                        if ((*it)->getUnitGuid().IsPlayer())
+                        {
+                            if (Unit* pUnit = m_caster->GetMap()->GetUnit((*it)->getUnitGuid()))
+                            {
+                                if (pUnit->isAlive())
+                                    viableTargets.push_back(pUnit);
+                            }
+                        }
+                    }
+                    int num_targets = std::min(int(viableTargets.size()), 5);
+                    for (int i = 0; i < num_targets; i++)
+                    {
+                        int rand = irand(0, viableTargets.size() - 1);
+                        Unit* target = viableTargets[rand];
+                        viableTargets.erase(viableTargets.begin() + rand);
+                        
+                        target->CastSpell(target, 28409, true); // modifies scale
+                        m_caster->CastSpell(target, 28410, true); // applies dmg and healing mod, as well as the charm itself
+                    }
                     return;
                 }
                 case 28560:                                 // Summon Blizzard
@@ -5434,16 +5517,53 @@ void Spell::EffectSendTaxi(SpellEffectIndex eff_idx)
     ((Player*)unitTarget)->ActivateTaxiPathTo(m_spellInfo->EffectMiscValue[eff_idx], m_spellInfo->Id, true);
 }
 
+
 void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
+    
+    switch (m_spellInfo->Id)
+    {
+    case 28337: // thaddius Magnetic Pull
+    {
+        float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
+        float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
+        unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
+        break;
+    }
+    case 28434: // Spider Web
+    {
+        // see boss_maexxnaAI::DoCastWebWrap() for some info on this rather weird implementation
+        float dx = unitTarget->GetPositionX() - m_caster->GetPositionX();
+        float dy = unitTarget->GetPositionY() - m_caster->GetPositionY();
+        float dist = sqrt((dx * dx) + (dy * dy));
+        const float  distXY = (dist > 0 ? dist : 0);
+        float yDist = m_caster->GetPositionZ() - unitTarget->GetPositionZ();
+        float horizontalSpeed = dist / 1.5f;
+        float verticalSpeed = 12.0f + (yDist*0.5f);
+        float angle = unitTarget->GetAngle(m_caster->GetPositionX(), m_caster->GetPositionY());
 
-    float dist = unitTarget->GetDistance2d(m_caster);
-    if (damage && dist > damage)
-        dist = float(damage);
+        // set immune anticheat and calculate speed
+        if (Player* plr = unitTarget->ToPlayer())
+        {
+            plr->SetLaunched(true);
+            plr->SetXYSpeed(horizontalSpeed);
+        }
 
-    unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[eff_idx]) / 10);
+        unitTarget->KnockBack(angle, horizontalSpeed, verticalSpeed);
+        break;
+    }
+    default:
+    {
+        // Todo: this implementation seems very wrong. Gives terrible results for maexxna web-wrap and
+        // thaddius magnetic pull
+        float dist = unitTarget->GetDistance2d(m_caster);
+        if (damage && dist > damage)
+            dist = float(damage);
+        unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[eff_idx]) / 10);
+    }
+    }
 }
 
 void Spell::EffectDispelMechanic(SpellEffectIndex eff_idx)

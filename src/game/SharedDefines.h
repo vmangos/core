@@ -368,7 +368,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK26                      = 0x04000000,            // 26
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
-    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29
+    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_UNK31                      = 0x80000000            // 31
 };

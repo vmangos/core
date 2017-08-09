@@ -61,6 +61,7 @@
 #include "packet_builder.h"
 #include "Chat.h"
 #include "Anticheat.h"
+#include "CreatureLinkingMgr.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -207,6 +208,9 @@ Unit::Unit()
     m_doExtraAttacks = false;
 
     m_spellUpdateTimeBuffer = 0;
+
+    m_isCreatureLinkingTrigger = false;
+    m_isSpawningLinked = false;
 }
 
 Unit::~Unit()
@@ -1440,37 +1444,37 @@ void Unit::CalculateSpellDamage(SpellNonMeleeDamage *damageInfo, int32 damage, S
     switch (spellInfo->DmgClass)
     {
         // Melee and Ranged Spells
-        case SPELL_DAMAGE_CLASS_RANGED:
-        case SPELL_DAMAGE_CLASS_MELEE:
-        {
-            //Calculate damage bonus
-            damage = MeleeDamageBonusDone(pVictim, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
-            damage = pVictim->MeleeDamageBonusTaken(this, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
+    case SPELL_DAMAGE_CLASS_RANGED:
+    case SPELL_DAMAGE_CLASS_MELEE:
+    {
+        //Calculate damage bonus
+        damage = MeleeDamageBonusDone(pVictim, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
+        damage = pVictim->MeleeDamageBonusTaken(this, damage, attackType, spellInfo, SPELL_DIRECT_DAMAGE, 1, spell);
 
-            // if crit add critical bonus
-            if (crit)
-            {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-                damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
-            }
-        }
-        break;
-        // Magical Attacks
-        case SPELL_DAMAGE_CLASS_NONE:
-        case SPELL_DAMAGE_CLASS_MAGIC:
+        // if crit add critical bonus
+        if (crit)
         {
-            // Calculate damage bonus
-            damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
-            damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
-
-            // If crit add critical bonus
-            if (crit)
-            {
-                damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
-                damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
-            }
+            damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+            damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
         }
-        break;
+    }
+    break;
+    // Magical Attacks
+    case SPELL_DAMAGE_CLASS_NONE:
+    case SPELL_DAMAGE_CLASS_MAGIC:
+    {
+        // Calculate damage bonus
+        damage = SpellDamageBonusDone(pVictim, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+        damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damage, SPELL_DIRECT_DAMAGE, 1, spell);
+
+        // If crit add critical bonus
+        if (crit)
+        {
+            damageInfo->HitInfo |= SPELL_HIT_TYPE_CRIT;
+            damage = SpellCriticalDamageBonus(spellInfo, damage, pVictim, spell);
+        }
+    }
+    break;
     }
 
     // damage mitigation
@@ -2133,6 +2137,7 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
                 case 23461:     // Vaelastrasz's Flame Breath
                 case 24818:     // Nightmare Dragon's Noxious Breath
                 case 25812:     // Lord Kri's Toxic Volley
+                case 28531:     // Sapphiron's Frost Aura
                     break;
                 default:
                     resistanceChance *= 0.1f;
@@ -2599,27 +2604,35 @@ MeleeHitOutcome Unit::RollMeleeOutcomeAgainst(const Unit *pVictim, WeaponAttackT
     }
 
     if ((GetTypeId() != TYPEID_PLAYER && !((Creature*)this)->IsPet()) &&
-            !(((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH) &&
-            !SpellCasted /*Only autoattack can be crashing blow*/)
+        !(((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_CRUSH) &&
+        !SpellCasted /*Only autoattack can be crashing blow*/)
     {
-        // mobs can score crushing blows if they're 3 or more levels above victim
-        // or when their weapon skill is 15 or more above victim's defense skill
-        tmp = victimDefenseSkill;
-        int32 tmpmax = victimMaxSkillValueForLevel;
-        // having defense above your maximum (from items, talents etc.) has no effect
-        tmp = tmp > tmpmax ? tmpmax : tmp;
-        // tmp = mob's level * 5 - player's current defense skill
-        tmp = attackerMaxSkillValueForLevel - tmp;
-        if (tmp >= 15)
+        if ( ((Creature*)this)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_ALWAYS_CRUSH )
         {
-            // add 2% chance per lacking skill point, min. is 15%
-            tmp = tmp * 200 - 1500;
-            if (roll < (sum += tmp))
+            return MELEE_HIT_CRUSHING;
+        }
+        else
+        {
+            // mobs can score crushing blows if they're 3 or more levels above victim
+            // or when their weapon skill is 15 or more above victim's defense skill
+            tmp = victimDefenseSkill;
+            int32 tmpmax = victimMaxSkillValueForLevel;
+            // having defense above your maximum (from items, talents etc.) has no effect
+            tmp = tmp > tmpmax ? tmpmax : tmp;
+            // tmp = mob's level * 5 - player's current defense skill
+            tmp = attackerMaxSkillValueForLevel - tmp;
+            if (tmp >= 15)
             {
-                DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRUSHING <%d, %d)", sum - tmp, sum);
-                return MELEE_HIT_CRUSHING;
+                // add 2% chance per lacking skill point, min. is 15%
+                tmp = tmp * 200 - 1500;
+                if (roll < (sum += tmp))
+                {
+                    DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: CRUSHING <%d, %d)", sum - tmp, sum);
+                    return MELEE_HIT_CRUSHING;
+                }
             }
         }
+
     }
 
     DEBUG_FILTER_LOG(LOG_FILTER_COMBAT, "RollMeleeOutcomeAgainst: NORMAL");
@@ -3425,7 +3438,10 @@ void Unit::SetCurrentCastedSpell(Spell * pSpell)
     CurrentSpellTypes CSpellType = pSpell->GetCurrentContainer();
 
     if (pSpell == m_currentSpells[CSpellType]) return;      // avoid breaking self
-
+    // Hack for Heigans Plague Cloud and KTs channel, without it, you interrupt yourself on first tick
+    else if(pSpell->m_spellInfo->Id == 30122 || pSpell->m_spellInfo->Id == 29422 
+        || pSpell->m_spellInfo->Id == 28369 || pSpell->m_spellInfo->Id == 30075) // same thing for toxic gas
+        return;
     // break same type spell if it is not delayed
     InterruptSpell(CSpellType, false);
 
@@ -7246,6 +7262,9 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
             if (spell->getState() == SPELL_STATE_CASTING)
                 if (spell->m_spellInfo->ChannelInterruptFlags & CHANNEL_FLAG_ENTER_COMBAT)
                     InterruptSpell(CURRENT_CHANNELED_SPELL);
+
+        if (m_isCreatureLinkingTrigger)
+            GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_AGGRO, pCreature, enemy);
     }
 }
 
@@ -8088,6 +8107,10 @@ void Unit::TauntFadeOut(Unit *taunter)
         // Nostalrius - pas d'evade quand on charm quelque chose.
         if (!GetCharmGuid())
             OnLeaveCombat();
+
+        if (m_isCreatureLinkingTrigger)
+            GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
+
         return;
     }
 
@@ -8188,6 +8211,10 @@ bool Unit::SelectHostileTarget()
 
     // enter in evade mode in other case
     OnLeaveCombat();
+    
+    if (m_isCreatureLinkingTrigger)
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_EVADE, (Creature*)this);
+
     return false;
 }
 

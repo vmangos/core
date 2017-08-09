@@ -2067,6 +2067,11 @@ Creature *Map::SummonCreature(uint32 entry, float x, float y, float z, float ang
     // Active state set before added to map
     pCreature->SetActiveObjectState(asActiveObject);
     pCreature->Summon(spwtype, despwtime);
+    
+    // Creature Linking, Initial load is handled like respawn
+    if (pCreature->IsLinkingEventTrigger())
+        GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
+
     // return the creature therewith the summoner has access to it
     return pCreature;
 }
@@ -2106,6 +2111,11 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
         ((Creature*)this)->AI()->JustSummoned(pCreature);
+
+    // Creature Linking, Initial load is handled like respawn
+    if (pCreature->IsLinkingEventTrigger())
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, pCreature);
+
     pCreature->SetWorldMask(GetWorldMask());
     // return the creature therewith the summoner has access to it
     return pCreature;
