@@ -10334,7 +10334,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
     }
 }
 
-void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequip_check)
+void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequip_check, bool check_bank)
 {
     DEBUG_LOG("STORAGE: DestroyItemCount item = %u, count = %u", item, count);
     uint32 remcount = 0;
@@ -10461,8 +10461,70 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
             }
         }
     }
-}
 
+    if (check_bank)
+    {
+        // in bank
+        for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        {
+            if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                if (pItem->GetEntry() == item && !pItem->IsInTrade())
+                {
+                    if (pItem->GetCount() + remcount <= count)
+                    {
+                        remcount += pItem->GetCount();
+                        DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
+
+                        if (remcount >= count)
+                            return;
+                    }
+                    else
+                    {
+                        pItem->SetCount(pItem->GetCount() - count + remcount);
+                        if (IsInWorld() & update)
+                            pItem->SendCreateUpdateToPlayer(this);
+                        pItem->SetState(ITEM_CHANGED, this);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // in bank bags
+        for (int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        {
+            if (Bag *pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                {
+                    if (Item* pItem = pBag->GetItemByPos(j))
+                    {
+                        if (pItem->GetEntry() == item && !pItem->IsInTrade())
+                        {
+                            if (pItem->GetCount() + remcount <= count)
+                            {
+                                remcount += pItem->GetCount();
+                                DestroyItem(i, j, update);
+
+                                if (remcount >= count)
+                                    return;
+                            }
+                            else
+                            {
+                                pItem->SetCount(pItem->GetCount() - count + remcount);
+                                if (IsInWorld() && update)
+                                    pItem->SendCreateUpdateToPlayer(this);
+                                pItem->SetState(ITEM_CHANGED, this);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 bool Player::DestroyEquippedItem(uint32 itemId)
 {
