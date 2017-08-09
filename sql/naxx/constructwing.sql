@@ -11,6 +11,11 @@ UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entr
 -- UPDATE `creature_template` SET `speed_walk`=0, `speed_run`=0, `unit_flags`=4, `MovementType`=0 WHERE `entry`=16385;
 UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10 WHERE `entry`=16385;
 
+REPLACE INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1638502, 16385, 7, 0, 100, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning totem despawn on evade');
+
 -- Patchwork Golem correct War stomp spell
 UPDATE `creature_ai_scripts` SET `action1_param1`=28125 WHERE `id`=1601701;
 -- Patchwork Golem slightly reduced frequency on 360 cleave
@@ -62,7 +67,7 @@ UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000 WHERE `entry`=16142;
 -- Stitched giants were named stitched spewer in vanilla
 UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
 
-INSERT INTO `creature_ai_scripts`
+REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc');
