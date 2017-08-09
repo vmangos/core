@@ -970,7 +970,11 @@ enum MangosStrings
     LANG_SCRIPTS_OUTDATED               = 1169,
     LANG_SET_LOCK_SUCCESS               = 1170,
     LANG_SET_LOCK_USAGE                 = 1171,
-    // Room for more level 3              1172-1199 not used
+    LANG_REMOVE_RIDING_WRONG_TYPE       = 1172,
+    LANG_REMOVE_RIDING_NOT_HAVE         = 1173,
+    LANG_REMOVE_RIDING_ERROR            = 1174,
+    LANG_REMOVE_RIDING_SUCCESS          = 1175,
+    // Room for more level 3              1176-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,
