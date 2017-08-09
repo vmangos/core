@@ -1,13 +1,12 @@
 /*
 -- Query: select * from creature_groups where leaderGUID in (select guid from creature where map = 533)
-LIMIT 0, 10000
+LIMIT 0, 1000
 
--- Date: 2017-08-04 17:27
+-- Date: 2017-08-09 17:14
 */
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88780,88779,14.6885,4.44886,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88777,88778,13.8705,10.174,6);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (127819,2530408,2.49451,0.035731,15);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (127819,127820,3,270,3);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (127819,2530408,9.76768,2.13932,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (127796,127796,0,0,3);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (127796,127797,3,270,3);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88776,88775,12.452,9.94033,6);
@@ -29,6 +28,10 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88859,88862,7.1089,3.87524,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88859,88861,9.71605,4.47342,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88859,88860,8.18054,3.1538,7);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88309,88308,13.3273,6.04149,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88329,12.644,5.35923,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88321,4.07449,5.33926,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88320,9.86019,4.86203,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530371,88856,5.99895,2.23625,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530220,2530222,7.31388,2.1626,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530220,2530221,5.67378,2.87948,7);
@@ -83,6 +86,9 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530254,2530251,11.1241,4.74158,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530254,2530248,7.48921,5.85891,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530254,2530247,3.3425,0.199258,15);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88319,13.2604,4.55184,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88318,14.6728,4.08865,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88317,10.6915,3.67431,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88851,88850,6.24229,3.28306,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530310,2530308,7.43091,2.41619,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530310,2530307,5.46088,3.15992,15);
@@ -90,7 +96,7 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530323,2530320,11.0326,4.33498,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530314,2530313,8.75329,4.68497,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530312,2530311,7.70149,4.34586,15);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530323,2530319,11.0685,3.89827,15);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88322,88315,8.56629,4.32451,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530323,2530318,9.91787,4.04833,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530323,2530317,7.36797,4.14387,15);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530323,2530316,6.75805,3.86557,15);
@@ -121,7 +127,7 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88444,88446,9.29992,0.715415,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88444,88445,6.52038,0.175761,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88444,88443,8.40371,1.36711,6);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88438,88439,11.3125,3.27637,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88438,88433,9.77186,2.46351,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88432,88436,9.24439,3.57235,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88432,88437,9.14933,2.73958,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88429,88427,8.84809,0.44141,6);
@@ -271,6 +277,9 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88873,88872,4.72641,1.73874,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88873,88871,5.33233,1.08282,7);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88873,88874,4.27234,6.14226,7);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88263,88264,39.7219,5.47465,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88263,88262,23.54,4.4805,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88263,88261,33.3301,4.87695,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530412,88455,13.4782,0.034894,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530412,88456,8.47306,5.05169,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530412,88454,11.1084,1.18696,6);
@@ -354,14 +363,14 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530504,2530511,6.8253,1.75953,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530504,2530510,5.86693,3.05798,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530504,2530503,13.3421,1.92561,6);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530512,195.502,2.40803,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530514,2530513,14.909,4.90269,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530507,16.1132,5.75559,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530506,16.3558,0.438498,6);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530516,202.907,2.46591,6);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530515,202.279,2.43678,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530514,2530512,16.0155,6.15798,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530514,2530516,6.6079,5.14829,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530509,8.1768,0.443777,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530508,9.02102,5.88518,6);
-INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530505,2530513,197.589,2.49997,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530514,2530515,7.2668,6.02722,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530519,2530517,14.0084,2.25317,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530519,2530521,5.55853,1.10021,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530519,2530520,7.50705,2.56276,6);
@@ -400,6 +409,9 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530559,2530558,16.0982,3.37969,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88271,88265,16.5511,0.365131,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88271,88266,15.6906,4.28666,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88281,88279,23.4214,2.59019,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88281,88278,10.5548,2.74369,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88281,88280,31.4668,2.39891,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88272,88267,17.1744,3.46205,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88272,88268,16.9939,1.22811,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88296,88295,10.4993,6.03982,6);
@@ -416,3 +428,63 @@ INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`)
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88296,88283,20.0169,3.69966,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88296,88282,12.5201,3.34181,6);
 INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88296,88297,19.775,4.41207,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88309,88307,12.9739,1.21249,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88309,88335,11.3303,5.26734,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88309,88334,12.8484,0.463996,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88309,88310,17.9315,0.049089,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530245,14.1146,2.55949,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530244,16.6207,1.56237,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530243,24.1565,2.02,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530241,6.72544,1.28902,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530240,13.3963,1.17297,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530239,17.7232,1.86917,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530238,19.3819,2.35728,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (2530242,2530246,10.4201,2.03228,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88313,88314,17.983,4.28829,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88313,88312,13.1395,2.00686,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88313,88337,12.4199,3.00835,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88313,88336,19.1011,3.728,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88313,88311,21.357,3.33715,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88343,88341,13.7664,6.201,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88343,88340,15.7231,0.747608,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88343,88339,10.7638,1.32107,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88343,88338,8.39385,5.14513,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88343,88342,18.3672,5.73128,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88083,88081,13.3155,0.446518,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88083,88080,15.1907,0.801229,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88083,88079,6.82699,0.856945,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88083,88082,8.19107,0.014665,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88091,88276,9.96018,0.688706,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88091,88090,8.40036,1.56365,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88091,88089,11.365,5.62631,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88091,88277,10.1765,0.114252,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88088,88084,13.4617,3.76875,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88088,88087,5.45014,5.01037,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88088,88086,5.69517,3.29315,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88088,88085,11.9467,4.34509,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88093,88092,17.2004,4.70541,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88097,88096,15.3997,4.7481,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88099,88098,13.9368,4.74324,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88406,88423,6.33888,6.09756,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88406,88404,10.8064,5.35161,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88406,88405,7.08383,4.56789,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88413,88415,6.11542,5.41674,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88413,88412,9.69387,5.84306,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88413,88414,12.3101,6.27993,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88426,88416,7.76384,3.68887,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88426,88417,7.28106,1.07091,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88420,88421,8.18176,4.76619,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88420,88419,12.9696,2.20109,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88420,88418,19.4298,2.80589,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88420,88422,21.5361,3.77267,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88409,88410,9.80378,1.86171,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88409,88408,9.2693,2.86626,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88409,88411,30.6756,5.47968,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88395,88396,17.9912,3.94272,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88393,88402,5.14078,5.1247,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88393,88403,4.36646,2.60825,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88394,88400,5.40285,2.04768,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88394,88401,5.50621,5.71132,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88431,88434,8.28381,0.19928,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88431,88435,7.40747,1.6397,6);
+INSERT INTO `creature_groups` (`leaderGUID`,`memberGUID`,`dist`,`angle`,`flags`) VALUES (88438,88439,11.3125,3.27637,6);

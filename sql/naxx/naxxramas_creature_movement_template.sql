@@ -1,8 +1,8 @@
 /*
 -- Query: SELECT * FROM creature_movement_template where entry in (select id from creature where map = 533)
-LIMIT 0, 10000
+LIMIT 0, 5000
 
--- Date: 2017-08-04 17:27
+-- Date: 2017-08-09 17:16
 */
 INSERT INTO `creature_movement_template` (`entry`,`point`,`position_x`,`position_y`,`position_z`,`waittime`,`script_id`,`textid1`,`textid2`,`textid3`,`textid4`,`textid5`,`emote`,`spell`,`wpguid`,`orientation`,`model1`,`model2`) VALUES (15931,1,3205.45,-3341.86,320.177,0,0,0,0,0,0,0,0,0,0,1.55799,0,0);
 INSERT INTO `creature_movement_template` (`entry`,`point`,`position_x`,`position_y`,`position_z`,`waittime`,`script_id`,`textid1`,`textid2`,`textid3`,`textid4`,`textid5`,`emote`,`spell`,`wpguid`,`orientation`,`model1`,`model2`) VALUES (15931,2,3205.57,-3306.46,320.333,0,0,0,0,0,0,0,0,0,0,3.10619,0,0);
