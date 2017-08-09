@@ -360,6 +360,7 @@ void MapManager::Update(uint32 diff)
         delete asyncUpdateThreads[tid];
     }
     delete[] i_continentUpdateFinished;
+    i_continentUpdateFinished = NULL;
 
     MapMapType::iterator crashedMapsIter = i_maps.begin();
     while (crashedMapsIter != i_maps.end())

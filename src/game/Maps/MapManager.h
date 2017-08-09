@@ -185,6 +185,11 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         }
         bool IsContinentUpdateFinished()
         {
+            // Check pointer rather than deref. Deleted after
+            // continent and instance updates are finished
+            if (i_continentUpdateFinished == NULL)
+                return true;
+
             for (int i = 0; i < i_maxContinentThread; ++i)
                 if (!i_continentUpdateFinished[i])
                     return false;
