@@ -3548,3 +3548,12 @@ void Creature::JoinCreatureGroup(Creature* leader, float dist, float angle, uint
     if (group->IsFormation())
         GetMotionMaster()->Initialize();
 }
+
+bool Creature::HasWeapon() const
+{
+    uint8 itemClass = GetByteValue(UNIT_VIRTUAL_ITEM_INFO + (0 * 2) + 0, VIRTUAL_ITEM_INFO_0_OFFSET_CLASS);
+    if (itemClass == ITEM_CLASS_WEAPON)
+        return true;
+
+    return false;
+}

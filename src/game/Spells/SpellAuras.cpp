@@ -3007,7 +3007,12 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     if (!apply && target->HasAuraType(SPELL_AURA_MOD_DISARM))
         return;
 
-    // main-hand attack speed already set to special value for feral form already and don't must change and reset at remove.
+    // Main-hand speed and attack damage is already set for feral form (and they cannot be disarmed anyway)
+    // If the form is switched the disarm speed/damage will be applied automatically
+    // Only update swing timers for players on disarm
+    // https://www.youtube.com/watch?v=8TDUpudEL-M&t=6m5s
+    // Furthermore, we need to apply/unapply weapon mods for players on disarm
+    // so they don't have weapon stats (or talent boosts) whilst disarmed
     if (target->GetTypeId() == TYPEID_PLAYER && !target->IsInFeralForm())
     {
         Player* pTarget = target->ToPlayer();
@@ -3029,11 +3034,25 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
             target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, true);
             target->SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
         }
-
-        target->UpdateDamagePhysical(BASE_ATTACK);
     }
     else
         target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
+
+    // Warrior 'Disarm' skill generates 104 base threat
+    // http://wowwiki.wikia.com/wiki/Disarm?direction=prev&oldid=200198 (2006) implies it 
+    // generates a large amount
+    // http://wowwiki.wikia.com/wiki/Threat has threat listed at 104, which is in line
+    // with the values of other warrior abilities
+    // We can suppose that the same is true for all spells which apply disarm
+    if (apply)
+    {
+        float threat = 104.0f * sSpellMgr.GetSpellThreatMultiplier(GetHolder()->GetSpellProto());
+        target->AddThreat(GetCaster(), threat, false, SPELL_SCHOOL_MASK_NONE, GetHolder()->GetSpellProto());
+    }
+
+    // Don't update damage if in feral
+    if (!target->IsInFeralForm())
+        target->UpdateDamagePhysical(BASE_ATTACK);
 }
 
 void Aura::HandleAuraModStun(bool apply, bool Real)

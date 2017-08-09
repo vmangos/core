@@ -59,7 +59,17 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
 
     if (pSpell->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, m_creature))
         return CAST_FAIL_OTHER;
-    
+
+    // If the unit is disarmed and the skill requires a weapon, it cannot be cast
+    if (m_creature->HasWeapon() && !m_creature->CanUseEquippedWeapon(BASE_ATTACK))
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; i++)
+        {
+            if (pSpell->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE || pSpell->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
+                return CAST_FAIL_OTHER;
+        }
+    }
+
     if (pSpell->rangeIndex == SPELL_RANGE_IDX_SELF_ONLY)
         return CAST_OK;
 

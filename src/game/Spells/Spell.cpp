@@ -6677,6 +6677,22 @@ bool Spell::IgnoreItemRequirements() const
 
 SpellCastResult Spell::CheckItems()
 {
+    // Check creature casts again here, even though they are checked in CreatureAI
+    // Need to do this for some melee attacks which are channeled, and then triggered
+    // eg. 13736
+    if (Creature *creature = m_caster->ToCreature())
+    {
+        // If the unit is disarmed and the skill requires a weapon, it cannot be cast
+        if (creature->HasWeapon() && !creature->CanUseEquippedWeapon(BASE_ATTACK))
+        {
+            for (int i = 0; i < MAX_EFFECT_INDEX; i++)
+            {
+                if (m_spellInfo->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE || m_spellInfo->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
+                    return SPELL_FAILED_EQUIPPED_ITEM;
+            }
+        }
+    }
+
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return SPELL_CAST_OK;
 
