@@ -1080,8 +1080,8 @@ enum
 {
     QUEST_CELEBRATING_GOOD_TIMES        = 7496,
 
-    YELL_ONY_ALLY_REWARD_1              = -143941,
-    YELL_ONY_ALLY_REWARD_2              = -143942,
+    YELL_ONY_ALLY_REWARD_1              = -1900111,
+    YELL_ONY_ALLY_REWARD_2              = -1900110,
 
     GO_ONYXIAS_HEAD_ALLY                = 179558,
 
@@ -1187,14 +1187,12 @@ bool QuestRewarded_npc_major_mattingly(Player* pPlayer, Creature* pCreature, Que
 
 enum
 {
-    QUEST_LORD_OF_BLACKROCK_ALLY          = 7782,
+    QUEST_LORD_OF_BLACKROCK_ALLY    = 7782,
 
-    YELL_NEF_REWARD_1_MALE_ALLY          = -147211,
-    YELL_NEF_REWARD_2_MALE_ALLY          = -147212,
-    YELL_NEF_REWARD_1_FEMALE_ALLY        = -147213,
-    YELL_NEF_REWARD_2_FEMALE_ALLY        = -147214,
+    YELL_NEF_REWARD_1_ALLY          = -1900104,
+    YELL_NEF_REWARD_2_ALLY          = -1900103,
 
-    GO_NEFARIANS_HEAD_ALLY               = 179882,
+    GO_NEFARIANS_HEAD_ALLY          = 179882,
 };
 
 struct npc_field_marshal_afrasiabiAI : public ScriptedAI
@@ -1238,7 +1236,7 @@ struct npc_field_marshal_afrasiabiAI : public ScriptedAI
                         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
                         {
                             m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
-                            m_creature->MonsterYellToZone(pPlayer->getGender() ? YELL_NEF_REWARD_1_FEMALE_ALLY : YELL_NEF_REWARD_1_MALE_ALLY, 0, pPlayer);
+                            m_creature->MonsterYellToZone(YELL_NEF_REWARD_1_ALLY, 0, pPlayer);
                         }
                         m_uiDialogueTimer = 10000;
                         break;
@@ -1246,7 +1244,7 @@ struct npc_field_marshal_afrasiabiAI : public ScriptedAI
                         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
                         {
                             m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
-                            m_creature->MonsterYellToZone(pPlayer->getGender() ? YELL_NEF_REWARD_2_FEMALE_ALLY : YELL_NEF_REWARD_2_MALE_ALLY);
+                            m_creature->MonsterYellToZone(YELL_NEF_REWARD_2_ALLY, 0, pPlayer);
                         }
                         if (GameObject* pGo = m_creature->FindNearestGameObject(GO_NEFARIANS_HEAD_ALLY, 150.0f))
                         {

@@ -692,12 +692,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     sLog.outString("Quest 8606 item Dummy Effect.");
                     Player* pPlayer = (Player*)m_originalCaster;
-                    // Check si joueur a la tenue de Narain
+                    // Check for buff Narain!
                     if (!pPlayer->HasAura(25688))
                         return;
-                    // Lancement de l'event 9527
-                    pPlayer->GetMap()->ScriptsStart(sEventScripts, 9527, pPlayer, focusObject);
-                    // Suppression de l'item sac d'or 21041
+                    // Start event 9527 using custom spell to avoid db error
+                    pPlayer->CastSpell(pPlayer, 33031, true);
+                    // Delete item Bag of Gold (21041)
                     pPlayer->DestroyItemCount(21041, -1, true, false);
                     return;
                 }

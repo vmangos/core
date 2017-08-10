@@ -1047,6 +1047,7 @@ struct YeggethAI : public ScriptedAI
 
 enum
 {
+    SAY_TUUBID_KILL       =   -1900117,
     SPELL_ATTACK_ORDER    =   25471,
     SPELL_CLEAVE_T        =   26350,
     SPELL_SUNDER_ARMOR    =   24317,
@@ -1089,6 +1090,7 @@ struct TuubidAI : public ScriptedAI
                 {
                     DoCastSpellIfCan(pMark, SPELL_ATTACK_ORDER);
                     m_uiMarkedGUID = pMark->GetGUID();
+                    DoScriptText(SAY_TUUBID_KILL, m_creature, pMark);
                 }
                 else
                 {

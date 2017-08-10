@@ -175,6 +175,22 @@ enum
     SPELL_FUFU              = 23196,
     SPELL_SEE               = 23199,        // Pas sur de son utilité
 
+    SAY_PEASANT_RANDOM_3    = -1900118,
+    SAY_PEASANT_RANDOM_2    = -1900119,
+    SAY_PEASANT_RANDOM_1    = -1900120,
+    SAY_PEASANT_END_4       = -1900121,
+    SAY_PEASANT_END_3       = -1900122,
+    SAY_PEASANT_END_2       = -1900123,
+    SAY_PEASANT_END_1       = -1900124,
+    SAY_ERIS_FAIL_1         = -1900125,
+    SAY_ERIS_FAIL_2         = -1900126,
+    SAY_PEASANT_SPAWN_1     = -1900127,
+    SAY_PEASANT_SPAWN_2     = -1900128,
+    SAY_PEASANT_SPAWN_3     = -1900129,
+    SAY_PEASANT_SPAWN_4     = -1900130,
+    SAY_ERIS_END            = -1900131,
+    SAY_ERIS_HEAL           = -1900132,
+
     QUEST_BALANCE_OF_LIGHT  = 7622,
 
     POINT_DEBUT_COMBAT      = 0,
@@ -411,16 +427,16 @@ struct npc_eris_havenfireAI : public ScriptedAI
             switch (rand() % 15)
             {
                 case 0:
-                    pSummoned->MonsterSay("The power of the light is truly great and merciful.", 0, 0);
+                    DoScriptText(SAY_PEASANT_END_1, pSummoned);
                     break;
                 case 1:
-                    pSummoned->MonsterSay("We shall be reunited once more, my love...", 0, 0);
+                    DoScriptText(SAY_PEASANT_END_2, pSummoned);
                     break;
                 case 2:
-                    pSummoned->MonsterSay("At last, it ends...", 0, 0);
+                    DoScriptText(SAY_PEASANT_END_3, pSummoned);
                     break;
                 case 3:
-                    pSummoned->MonsterSay("Stranger, find the fallen Prince Menethil and end his reign of terror.", 0, 0);
+                    DoScriptText(SAY_PEASANT_END_4, pSummoned);
                     break;
             }
 
@@ -464,9 +480,9 @@ struct npc_eris_havenfireAI : public ScriptedAI
             pPlayer->SetQuestStatus(QUEST_BALANCE_OF_LIGHT, QUEST_STATUS_FAILED);
 
         if (rand() % 2)
-            m_creature->MonsterYell("I have failed once more...", 0);
+            DoScriptText(SAY_ERIS_FAIL_1, m_creature);
         else
-            m_creature->MonsterSay("I now return to whence I came, only to find myself here once more to relive the same epic tragedy.", 0);
+            DoScriptText(SAY_ERIS_FAIL_2, m_creature);
 
         if (GameObject* pLight = m_creature->FindNearestGameObject(GO_LIGHT, 100.0f))
             pLight->AddObjectToRemoveList();
@@ -532,16 +548,19 @@ struct npc_eris_havenfireAI : public ScriptedAI
                     {
                         ++Vague;
                         Yell = true;
-                        switch (rand() % 3)
+                        switch (urand(0,3))
                         {
                             case 0:
-                                Cre->MonsterYell("The Scourge are upon us! Run! Run for your lives!", 0);
+                                DoScriptText(SAY_PEASANT_SPAWN_1, Cre);
                                 break;
                             case 1:
-                                Cre->MonsterYell("Please help us! The Prince has gone mad!", 0);
+                                DoScriptText(SAY_PEASANT_SPAWN_2, Cre);
                                 break;
                             case 2:
-                                Cre->MonsterYell("Seek sanctuary in Hearthglen! It is our only hope!", 0);
+                                DoScriptText(SAY_PEASANT_SPAWN_3, Cre);
+                                break;
+                            case 3:
+                                DoScriptText(SAY_PEASANT_SPAWN_4, Cre);
                                 break;
                         }
                     }
@@ -584,7 +603,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         if (pPlayer->GetQuestStatus(QUEST_BALANCE_OF_LIGHT) == QUEST_STATUS_INCOMPLETE)
             pPlayer->SetQuestStatus(QUEST_BALANCE_OF_LIGHT, QUEST_STATUS_COMPLETE);
 
-        m_creature->MonsterYell("We are saved! The peasants have escaped the Scourge!", 0);
+        DoScriptText(SAY_ERIS_END, m_creature);
 
         if (GameObject* pLight = m_creature->FindNearestGameObject(GO_LIGHT, 30.0f))
             pLight->AddObjectToRemoveList();
@@ -684,7 +703,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
         {
             if (DoCastSpellIfCan(m_creature, SPELL_BUFF) == CAST_OK)
             {
-                m_creature->MonsterYell("Be healed!", 0);
+                DoScriptText(SAY_ERIS_HEAL, m_creature);
                 BuffTimer = urand(75000, 90000);
             }
         }
@@ -863,13 +882,13 @@ struct npc_eris_havenfire_peasantAI : public ScriptedAI
             switch (rand() % 30)
             {
                 case 0:
-                    m_creature->MonsterSay("Should I live through this, I shall make it my life's sole ambition to destroy Arthas...", 0, 0);
+                    DoScriptText(SAY_PEASANT_RANDOM_1, m_creature);
                     break;
                 case 1:
-                    m_creature->MonsterSay("I won't make it... go... go on without me...", 0, 0);
+                    DoScriptText(SAY_PEASANT_RANDOM_2, m_creature);
                     break;
                 case 2:
-                    m_creature->MonsterSay("Death take me! I cannot go on! I have nothing left...", 0, 0);
+                    DoScriptText(SAY_PEASANT_RANDOM_3, m_creature);
                     break;
             }
             m_uiSayPeasantTimer = urand(20000, 50000);
@@ -1326,6 +1345,27 @@ enum
 
     SPELL_SUMMON_MARDUK_THE_BLACK = 18650,
 
+    SAY_HORGUS_DIED             = -1900133,
+    SAY_LIGHTFIRE_DIED          = -1900134,
+    SAY_REDPATH_DIED            = -1900135,
+    SAY_SCOURGE_DEFEATED        = -1900136,
+    SAY_MILITIA_RANDOM_1        = -1900137,
+    SAY_MILITIA_RANDOM_2        = -1900138,
+    SAY_MILITIA_RANDOM_3        = -1900139,
+    SAY_MILITIA_RANDOM_4        = -1900140,
+    SAY_MILITIA_RANDOM_5        = -1900141,
+    SAY_MILITIA_RANDOM_6        = -1900142,
+    SAY_MILITIA_RANDOM_7        = -1900143,
+    SAY_MILITIA_RANDOM_8        = -1900144,
+    SAY_DEFENDER_YELL           = -1900145,
+    SAY_LIGHTFIRE_YELL          = -1900146,
+    SAY_DAVIL_YELL              = -1900147,
+    SAY_HORGUS_YELL             = -1900148,
+    SAY_DAVIL_DESPAWN           = -1900149,
+    SAY_REDPATH_YELL            = -1900150,
+    SAY_REDPATH_CORRUPTED       = -1900151,
+    SAY_MARDUK_YELL             = -1900152,
+
     QUEST_BATTLE_DARROWSHIRE    = 5721,
 };
 
@@ -1512,7 +1552,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             case NPC_HORGUS_THE_RAVAGER:
             {
                 if (Creature* Crea = m_creature->FindNearestCreature(NPC_DARROWSHIRE_DEFENDER, 100.0f, true))
-                    Crea->MonsterYell("Horgus is slain! Take heart, defenders of Darrowshire!", 0);
+                    DoScriptText(SAY_HORGUS_DIED, Crea);
                 PhaseStep = 3;
                 PhaseTimer = 8000;
                 break;
@@ -1523,7 +1563,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 {
                     // echec de la quete
                     if (Creature* Crea = m_creature->FindNearestCreature(NPC_DARROWSHIRE_DEFENDER, 100.0f, true))
-                        Crea->MonsterYell("Lightfire is defeated! Darrowshire is lost!", 0);
+                        DoScriptText(SAY_LIGHTFIRE_DIED, Crea);
                     DespawnAll();
                 }
                 break;
@@ -1534,7 +1574,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 {
                     // echec de la quete
                     if (Creature* Crea = m_creature->FindNearestCreature(NPC_DARROWSHIRE_DEFENDER, 100.0f, true))
-                        Crea->MonsterYell("Captain Redpath is slain!", 0);
+                        DoScriptText(SAY_REDPATH_DIED, Crea);
                     DespawnAll();
                 }
                 break;
@@ -1542,7 +1582,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             case NPC_REDPATH_THE_CORRUPTED:
             {
                 if (Creature* Crea = m_creature->FindNearestCreature(NPC_DARROWSHIRE_DEFENDER, 100.0f, true))
-                    Crea->MonsterYell("The Scourge are defeated! Darrowshire is saved!", 0);
+                    DoScriptText(SAY_SCOURGE_DEFEATED, Crea);
                 m_creature->SummonCreature(NPC_JOSEPH_REDPATH, DarrowshireEvent[7].X, DarrowshireEvent[7].Y, DarrowshireEvent[7].Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 600000);
                 m_creature->SummonCreature(NPC_DAVIL_CROKFORD, 1465.43f, -3678.48f, 78.0816f, 0.0402176f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000);
                 DespawnAll();
@@ -1667,16 +1707,31 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                             {
                                 if (!yelled)
                                 {
-                                    switch (rand() % 3)
+                                    switch (urand(1,8))
                                     {
-                                        case 0:
-                                            Militia->MonsterSay("Fight to your last breath, brothers and sisters!", 0, 0);
-                                            break;
                                         case 1:
-                                            Militia->MonsterSay("Go back to your Lich King, foul creatures!", 0, 0);
+                                            DoScriptText(SAY_MILITIA_RANDOM_1, Militia);
                                             break;
                                         case 2:
-                                            Militia->MonsterSay("Our captain will save us!", 0, 0);
+                                            DoScriptText(SAY_MILITIA_RANDOM_2, Militia);
+                                            break;
+                                        case 3:
+                                            DoScriptText(SAY_MILITIA_RANDOM_3, Militia);
+                                            break;
+                                        case 4:
+                                            DoScriptText(SAY_MILITIA_RANDOM_4, Militia);
+                                            break;
+                                        case 5:
+                                            DoScriptText(SAY_MILITIA_RANDOM_5, Militia);
+                                            break;
+                                        case 6:
+                                            DoScriptText(SAY_MILITIA_RANDOM_6, Militia);
+                                            break;
+                                        case 7:
+                                            DoScriptText(SAY_MILITIA_RANDOM_7, Militia);
+                                            break;
+                                        case 8:
+                                            DoScriptText(SAY_MILITIA_RANDOM_8, Militia);
                                             break;
                                     }
                                     yelled = true;
@@ -1738,7 +1793,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 {
                     if (Creature* Cre = m_creature->SummonCreature(NPC_DARROWSHIRE_DEFENDER, DarrowshireEvent[7].X, DarrowshireEvent[7].Y, DarrowshireEvent[7].Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                     {
-                        Cre->MonsterYell("Darrowshire, to arms! The Scourge approach!", 0);
+                        DoScriptText(SAY_DEFENDER_YELL, Cre);
                         Cre->SetWalk(false);
                         Cre->SetHomePosition(DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, DarrowshireEvent[4].O);
                         Cre->GetMotionMaster()->MovePoint(0, DarrowshireEvent[4].X, DarrowshireEvent[4].Y, DarrowshireEvent[4].Z, MOVE_PATHFINDING, 3.0f);
@@ -1751,7 +1806,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                 {
                     if (Creature* davilLightfire = m_creature->SummonCreature(NPC_DAVIL_LIGHTFIRE, DarrowshireEvent[7].X, DarrowshireEvent[7].Y, DarrowshireEvent[7].Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                     {
-                        davilLightfire->MonsterYell("Do not lose hope, Darrowshire! We will not fall!", 0);
+                        DoScriptText(SAY_LIGHTFIRE_YELL, davilLightfire);
                         davilGuid = davilLightfire->GetObjectGuid();
                         PhaseTimer = 60000;
                         MobTimer[2] = 4000;
@@ -1768,7 +1823,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                         break;
                     if (Creature* horgus = m_creature->GetMap()->GetCreature(horgusGuid))
                     {
-                        davil->MonsterYell("Horgus, your nightmare ends! Now!", 0);
+                        DoScriptText(SAY_DAVIL_YELL, davil);
                         PhaseTimer = 0;
                         break;
                     }
@@ -1779,7 +1834,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                     {
                         horgus->AI()->AttackStart(davil);
                         horgusGuid = horgus->GetObjectGuid();
-                        horgus->MonsterYell("The Light burns bright in you, Davil. I will enjoy snuffing it out!", 0);
+                        DoScriptText(SAY_HORGUS_YELL, horgus);
                         PhaseTimer = 3000;
                     }
                     break;
@@ -1789,14 +1844,14 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                     if (Creature* davil = m_creature->GetMap()->GetCreature(davilGuid))
                     {
                         davil->ForcedDespawn(2000);
-                        davil->MonsterYell("Ah! My wounds are too severe. Defenders, fight on without me!", 0);
+                        DoScriptText(SAY_DAVIL_DESPAWN, davil);
                         PhaseTimer = 10000;
                         break;
                     }
 
                     if (Creature* redpath = m_creature->SummonCreature(NPC_CAPTAIN_REDPATH, DarrowshireEvent[7].X, DarrowshireEvent[7].Y, DarrowshireEvent[7].Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                     {
-                        redpath->MonsterYell("Defenders of Darrowshire! Rally! We must prevail!", 0);
+                        DoScriptText(SAY_REDPATH_YELL, redpath);
                         redpathGuid = redpath->GetObjectGuid();
                         PhaseTimer = urand(300000, 350000);
                         PhaseStep = 4;
@@ -1817,7 +1872,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                             marduk->DealDamage(redpath, redpath->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
                             if (Creature* redpathCorrupted = m_creature->SummonCreature(NPC_REDPATH_THE_CORRUPTED, redpath->GetPositionX(), redpath->GetPositionY(), redpath->GetPositionZ(), 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                             {
-                                redpathCorrupted->MonsterYell("Darrowshire is defeated! Soon, all of Lordaeron will fall!", 0);
+                                DoScriptText(SAY_REDPATH_CORRUPTED, redpathCorrupted);
                                 redpathCorruptedGuid = redpathCorrupted->GetObjectGuid();
                             }
                         }
@@ -1830,7 +1885,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
                         m_creature->GetRandomPoint(redpath->GetPositionX(), redpath->GetPositionY(), redpath->GetPositionZ(), 10.0f, X, Y, Z);
                         if (Creature* marduk = m_creature->SummonCreature(NPC_MARDUK_THE_BLACK, X, Y, Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                         {
-                            marduk->MonsterYell("Redpath! Your life ends, here and now!", 0);
+                            DoScriptText(SAY_MARDUK_YELL, marduk);
                             mardukGuid = marduk->GetObjectGuid();
                             PhaseTimer = 5000;
                         }
@@ -1858,7 +1913,15 @@ CreatureAI* GetAI_npc_darrowshire_trigger(Creature* pCreature)
 
 enum
 {
-    NPC_PAMELA_REDPATH        = 10926
+    SAY_JOSEPH_1            = -1900153,
+    SAY_PAMELA_1            = -1900154,
+    SAY_PAMELA_2            = -1900155,
+    SAY_PAMELA_3            = -1900156,
+    SAY_JOSEPH_2            = -1900157,
+    SAY_PAMELA_4            = -1900158,
+    SAY_JOSEPH_3            = -1900159,
+
+    NPC_PAMELA_REDPATH      = 10926
 };
 
 struct npc_joseph_redpathAI : public ScriptedAI
@@ -1892,12 +1955,46 @@ struct npc_joseph_redpathAI : public ScriptedAI
     {
         if (uiType != POINT_MOTION_TYPE)
             return;
-
-        if (uiPointId == 0)
+        
+        switch(uiPointId)
         {
-            if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 20.0f, true))
-                m_creature->SetFacingToObject(pamela);
-            EventTimer = 2000;
+            case 0:
+            {
+                m_creature->GetMotionMaster()->MovePoint(1, 1434.22f, -3668.756f, 76.671f, MOVE_PATHFINDING, 1.5f);
+                break;
+            }
+            case 1:
+            {
+                m_creature->GetMotionMaster()->MovePoint(2, 1438.526f, -3632.733f, 78.268f, MOVE_PATHFINDING, 1.2f);
+                DoScriptText(SAY_JOSEPH_1, m_creature);
+                EventTimer = 3000;
+                break;
+            }
+            case 2:
+            {
+                if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
+                {
+                    DoScriptText(SAY_PAMELA_2, pamela);
+                    m_creature->SetWalk(false);
+                    float x, y, z = 0;
+                    pamela->GetContactPoint(m_creature, x, y, z, 1.0f);
+                    m_creature->GetMotionMaster()->MovePoint(3, x, y, z, MOVE_PATHFINDING, 4.0f);
+                    EventTimer = 0;
+                }
+                else
+                    EventTimer = 1;
+                break;
+            }
+            case 3:
+            {
+                if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 20.0f, true))
+                {
+                    m_creature->SetFacingToObject(pamela);
+                    pamela->SetFacingToObject(m_creature);
+                }
+                EventTimer = 2000;
+                break;
+            }
         }
     }
 
@@ -1910,73 +2007,57 @@ struct npc_joseph_redpathAI : public ScriptedAI
                 case 0:
                 {
                     m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    m_creature->MonsterSay("Pamela? Are you there, honey?", 0, 0);
-                    m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
+                    
+                    m_creature->GetMotionMaster()->MovePoint(0, 1431.501f, -3684.229f, 75.726f, MOVE_PATHFINDING, 1.5f);
                     ++EventStep;
-                    EventTimer = 1000;
+                    EventTimer = 0;
                     break;
                 }
                 case 1:
                 {
                     if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
-                        pamela->MonsterYell("Daddy! You're back!", 0);
+                    { 
+                        DoScriptText(SAY_PAMELA_1, pamela);
+                        pamela->GetMotionMaster()->MovePoint(0, 1450.733f, -3599.974f, 85.621f, MOVE_PATHFINDING, 4.0f);
+                    }
                     ++EventStep;
-                    EventTimer = 2000;
+                    EventTimer = 0;
                     break;
                 }
                 case 2:
                 {
                     if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
                     {
-                        m_creature->SetWalk(false);
-                        float x, y, z = 0;
-                        pamela->GetContactPoint(m_creature, x, y, z, 1.0f);
-                        m_creature->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING, 4.0f);
-                        EventTimer = 0;
+                        DoScriptText(SAY_PAMELA_3, pamela);
                     }
-                    else
-                        EventTimer = 1;
                     ++EventStep;
+                    EventTimer = 5000;
                     break;
                 }
                 case 3:
                 {
+                    DoScriptText(SAY_JOSEPH_2, m_creature);
+                    ++EventStep;
+                    EventTimer = 3000;
+                    break;
+                }
+                case 4:
+                {
                     if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
                     {
-                        pamela->MonsterSay("Let's go play! No, tell me a story, Daddy! No... let's go pick flowers! And play tea time! I found my dollie, did I tell you?", 0, 0);
-                        pamela->HandleEmote(EMOTE_ONESHOT_TALK);
+                        DoScriptText(SAY_PAMELA_4, pamela);
                     }
                     ++EventStep;
                     EventTimer = 4000;
                     break;
                 }
-                case 4:
-                {
-                    m_creature->MonsterSay("Hahah!", 0, 0);
-                    m_creature->HandleEmote(EMOTE_ONESHOT_LAUGH);
-                    ++EventStep;
-                    EventTimer = 3000;
-                    break;
-                }
                 case 5:
                 {
-                    if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
-                    {
-                        pamela->MonsterSay("I missed you so much, Daddy!", 0, 0);
-                        pamela->HandleEmote(EMOTE_ONESHOT_TALK);
-                    }
-                    ++EventStep;
-                    EventTimer = 2000;
-                    break;
-                }
-                case 6:
-                {
-                    m_creature->MonsterSay("I missed you too, honey. And I'm finally home...", 0, 0);
-                    m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
+                    DoScriptText(SAY_JOSEPH_3, m_creature);
                     m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    m_creature->ForcedDespawn(120000);
+                    m_creature->ForcedDespawn(6000);
                     if (Creature* pamela = m_creature->FindNearestCreature(NPC_PAMELA_REDPATH, 150.0f, true))
-                        pamela->ForcedDespawn(120000);
+                        pamela->ForcedDespawn(4000);
                     EventTimer = 0;
                     break;
                 }

@@ -23,7 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 
-#define SAY_SPAWN               "TIMMY!"
+#define SAY_SPAWN               -1900160
 
 #define SPELL_RAVENOUSCLAW      17470
 #define SPELL_ENRAGE            8599

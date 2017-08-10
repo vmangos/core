@@ -13,6 +13,7 @@ enum zfEntries
     ENTRY_ORO = 7606,
     ENTRY_WEEGLI = 7607,
     ENTRY_MURTA = 7608,
+    ENTRY_UKORZ = 7267,
 
     GO_END_DOOR = 146084,
 
