@@ -453,10 +453,12 @@ struct boss_loathebAI : public ScriptedAI
                 if (m_creature->HasAura(15286)) // vamperic embrace
                 {
                     if (DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE) == CAST_OK)
-                        events.Repeat(Seconds(1));
+                        events.Repeat(Seconds(2));
                     else
                         events.Repeat(100);
                 }
+                else
+                    events.Repeat(Seconds(2));
                 break;
             }
         }
