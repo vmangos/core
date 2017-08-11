@@ -444,6 +444,11 @@ inline bool NeedsComboPoints(SpellEntry const* spellInfo)
     return (spellInfo->AttributesEx & (SPELL_ATTR_EX_REQ_TARGET_COMBO_POINTS | SPELL_ATTR_EX_REQ_COMBO_POINTS));
 }
 
+inline bool IsTotemSummonSpell(SpellEntry const* spellInfo)
+{
+    return spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4;
+}
+
 inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)
 {
     return GetSchoolMask(spellInfo->School);

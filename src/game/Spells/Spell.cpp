@@ -659,6 +659,8 @@ void Spell::prepareDataForTriggerSystem()
         m_canTrigger = false;         // Explicitly not allowed to trigger
     else if (m_CastItem)
         m_canTrigger = false;         // Do not trigger from item cast spell
+    else if (m_originalCasterGUID.IsGameObject())   // Do not trigger anything if the spell is casted by using a game object (eg. Lightwell)
+        m_canTrigger = false;
     else if (!m_IsTriggeredSpell)
         m_canTrigger = true;          // Normal cast - can trigger
     else if (!m_triggeredByAuraSpell)
@@ -747,8 +749,14 @@ void Spell::prepareDataForTriggerSystem()
 
             if (IsPositiveSpell(m_spellInfo->Id))                                 // Check for positive spell
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-                m_procVictim   = PROC_FLAG_TAKEN_POSITIVE_SPELL;
+                // Totem summon spells are not negative, but they aren't positive effects in the same sense
+                // as a heal or buff either. Ignore these flags for totems (required for Loatheb Corrupted Mind)
+                if (!IsTotemSummonSpell(m_spellInfo))
+                {
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+                    m_procVictim = PROC_FLAG_TAKEN_POSITIVE_SPELL;
+                }
+
                 if (aoe)
                 {
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT;
@@ -1329,9 +1337,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Trigger spell cast procs and forward the damage / heal procs to the aura
         if (foundDamageOrHealAura)
         {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL);
             m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
-            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL);
             procVictim = 0;
             dmg = 1;
         }
@@ -3448,7 +3456,7 @@ void Spell::cast(bool skipCheck)
     }
 
     // Shaman totems. Trigger spell cast
-    if (m_spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && m_spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4 && m_canTrigger)
+    if (IsTotemSummonSpell(m_spellInfo) && m_canTrigger)
     {
         uint32 procAttackerFlags = m_procAttacker | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
         m_caster->ProcDamageAndSpell(m_caster, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
@@ -5042,8 +5050,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             || m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN
             || m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
         {
-            if (IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEAL) || IsSpellHaveAura(m_spellInfo, SPELL_AURA_PERIODIC_HEAL) ||
-                IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL))
+            if (!m_IsCastByItem && (
+                    IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEAL) || 
+                    IsSpellHaveAura(m_spellInfo, SPELL_AURA_PERIODIC_HEAL) ||
+                    IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL) || 
+                    IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEAL_MAX_HEALTH) ||
+                    m_spellInfo->IsFitToFamilyMask<CF_PRIEST_HOLY_NOVA1>() ||
+                    m_spellInfo->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>())
+                )
             {
                 Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
                 for (auto itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
