@@ -53,7 +53,7 @@ enum NaxxEvents
 
 };
 
-instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance(pMap),
+instance_naxxramas::instance_naxxramas(Map* pMap) : ScriptedInstance_PTR(pMap), // : ScriptedInstance(pMap),
     m_faerlinaHaveGreeted(false),
     m_thaddiusHaveGreeted(false),
     m_haveDoneDKWingIntro(false),
@@ -987,6 +987,7 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
 
 void instance_naxxramas::Update(uint32 diff)
 {
+    ScriptedInstance_PTR::Update(diff);
     m_events.Update(diff);
     while (auto l_EventId = m_events.ExecuteEvent())
     {
