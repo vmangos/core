@@ -1294,6 +1294,10 @@ void World::SetInitialWorldSettings()
     sLog.outString(">>> Quests Relations loaded");
     sLog.outString();
 
+    sLog.outString("Loading Quests Greetings...");          // must be loaded after creature_template
+    sObjectMgr.LoadQuestGreetings();
+    sLog.outString();
+
     sLog.outString("Loading Game Event Data...");           // must be after sPoolMgr.LoadFromDB and quests to properly load pool events and quests for events
     sLog.outString();
     sGameEventMgr.LoadFromDB();
