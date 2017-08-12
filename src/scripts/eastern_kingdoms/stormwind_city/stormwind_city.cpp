@@ -131,26 +131,103 @@ CreatureAI* GetAI_npc_bartleby(Creature* pCreature)
 ## npc_dashel_stonefist
 ######*/
 
+//-----------------------------------------------------------------------------
+// Full quest event implementation (Missing Diplomat part 8 id:1447).
+// Author: Kampeador
+//-----------------------------------------------------------------------------
+
 enum
 {
-    QUEST_MISSING_DIPLO_PT8     = 1447,
-    FACTION_HOSTILE             = 168
+    // ids from "script_texts" table
+    SAY_PROGRESS_1_DAS = -1999902, // Now you're gonna get it good, "PlayerName".
+    SAY_PROGRESS_2_DAS = -1999903, // Okay, okay! Enough fighting. No one else needs to get hurt.
+    SAY_PROGRESS_3_DAS = -1999904, // It's okay. boys. Back off. You've done enough. I'll meet up with you later
+    SAY_PROGRESS_4_THU = -1999905, // Ok, boss.
+    // quest id
+    QUEST_MISSING_DIPLO_PT8 = 1447,
+    // NPCs that help Dashel
+    NPC_OLD_TOWN_THUG = 4969,
+    // factions
+    FACTION_NEUTRAL = 189,
+    FACTION_FRIENDLY = 84, // taken from DB
+    // quest phases
+    MDQP_NONE = 0,
+    MDQP_FIGHT = 1,
+    MDQP_THUGS_STOP_ATTACK = 2,
+    MDQP_RETURN_HOME = 3,
+    MDQP_COMPLETE = 4 // player has completed an event and thugs are dead
+};
+
+// thugs spawn
+struct vec3o { float x, y, z, o; };
+// old town thugs spawn points
+static const vec3o oldTownThugsSpawn[] =
+{
+    { -8686.803711f, 445.267792f, 99.789223f, 5.461184f },
+    { -8675.571289f, 444.162262f, 99.644737f, 3.834103f }
 };
 
 struct npc_dashel_stonefistAI : public ScriptedAI
 {
+    // thugs
+    Creature* m_thugs[2];
+    // missing diplomat quest event phase index
+    uint32 m_mdQuestPhase;
+    // player guid
+    ObjectGuid m_playerGuid;
+    // quest/local phase delay timer
+    uint32 m_nextPhaseDelayTimer;
+    // local phase index
+    uint32 m_localPhaseIndex;
+    // Dashel reached spawn point to trigger quest completed
+    bool m_dashelReachedHome;
+
     npc_dashel_stonefistAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_uiNormalFaction = pCreature->getFaction();
+        // zero init required to prevent crash
+        for (ptrdiff_t i = 0; i < 2; ++i)
+            m_thugs[i] = nullptr;
+
         Reset();
     }
 
-    uint32 m_uiNormalFaction;
-
     void Reset()
     {
-        if (m_creature->getFaction() != m_uiNormalFaction)
-            m_creature->setFaction(m_uiNormalFaction);
+        // if Dashel returns to his spawn point in MDQP_FIGHT phase, players have failed a quest.
+        if (m_mdQuestPhase == MDQP_FIGHT)
+        {
+            // Set quest failed
+            Player* player = m_creature->GetMap()->GetPlayer(m_playerGuid);
+            if (player)
+                player->GroupEventFailHappens(QUEST_MISSING_DIPLO_PT8);
+        }
+
+        // reset player guid
+        m_playerGuid.Clear();
+        // reset Dashel's faction
+        m_creature->setFaction(FACTION_FRIENDLY);
+        // remove thugs if there are any thugs around
+        for (ptrdiff_t i = 0; i < 2; ++i)
+        {
+            // if thug is valid
+            if (m_thugs[i])
+            {
+                if (m_thugs[i]->isAlive())
+                {
+                    // Thugs won't despawn with ForceDespawn(), when using ".GM on".
+                    // so UnSummon() used instead.
+                    static_cast<TemporarySummon*>(m_thugs[i])->UnSummon();
+                    m_thugs[i] = nullptr; // do we need this?
+                }
+            }
+        }
+        // reset phase flags
+        m_mdQuestPhase = MDQP_NONE;
+        m_nextPhaseDelayTimer = 0;
+        m_localPhaseIndex = 0;
+        m_dashelReachedHome = false;
+        // case: When NPC respawns after previous event and looses quest giver flag for some players, so they need to relog to talk to him again.
+        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
     void AttackedBy(Unit* pAttacker)
@@ -164,17 +241,177 @@ struct npc_dashel_stonefistAI : public ScriptedAI
         AttackStart(pAttacker);
     }
 
+    void UpdateAI(const uint32 uiDiff)
+    {
+        switch (m_mdQuestPhase)
+        {
+        default: // MDQP_NONE
+            ScriptedAI::UpdateAI(uiDiff);
+            break;
+        case MDQP_THUGS_STOP_ATTACK:
+        {
+            if (m_nextPhaseDelayTimer < uiDiff)
+            {
+                switch (m_localPhaseIndex)
+                {
+                case 0:
+                {
+                    // Dashel says thugs to stop from attacking the player
+                    DoScriptText(SAY_PROGRESS_3_DAS, m_creature);
+                    m_nextPhaseDelayTimer = 3000; // next local phase in 3 seconds
+                } break;
+                case 1: // thugs say "Ok, boss."
+                {
+                    for (ptrdiff_t i = 0; i < 2; ++i)
+                    {
+                        if (m_thugs[i]->isAlive())
+                            DoScriptText(SAY_PROGRESS_4_THU, m_thugs[i]);
+                    }
+
+                    m_nextPhaseDelayTimer = 2000; // next local phase in 2 seconds
+
+                } break;
+                case 2: // remove thugs
+                {
+                    for (ptrdiff_t i = 0; i < 2; ++i)
+                    {
+                        if (m_thugs[i])
+                        {
+                            if (m_thugs[i]->isAlive())
+                                m_thugs[i]->ForcedDespawn(4000); // despawn 4 seconds
+
+                            m_thugs[i] = nullptr;
+                        }
+                    }
+
+                    // Dashel runs to spawn point
+                    if (MotionMaster* pMotionMaster = m_creature->GetMotionMaster())
+                        pMotionMaster->MoveTargetedHome();
+
+                    m_nextPhaseDelayTimer = 1500;
+
+                    m_mdQuestPhase = MDQP_RETURN_HOME;
+
+                } break;
+                }
+
+                // switch local phase
+                ++m_localPhaseIndex;
+            }
+            else
+                m_nextPhaseDelayTimer -= uiDiff;
+        } break;
+        case MDQP_RETURN_HOME: // Dashel Stonefist returns to his spawn point
+        {
+            if (m_dashelReachedHome)
+                m_mdQuestPhase = MDQP_COMPLETE;
+        } break;
+        case MDQP_COMPLETE: // quest completed
+        {
+            if (m_nextPhaseDelayTimer < uiDiff)
+            {
+                m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+                // Set quest completed
+                Player* player = m_creature->GetMap()->GetPlayer(m_playerGuid);
+                if (player)
+                    player->GroupEventHappens(QUEST_MISSING_DIPLO_PT8, m_creature);
+
+                m_mdQuestPhase = MDQP_NONE;
+            }
+            else
+                m_nextPhaseDelayTimer -= uiDiff;
+        }break;
+        }
+    }
+
+    void JustDied(Unit* pUnit) override
+    {
+        // case: something weird happened
+        if (m_mdQuestPhase != MDQP_NONE)
+        {
+            // remove thugs
+            for (ptrdiff_t i = 0; i < 2; ++i)
+            {
+                // if thug is valid
+                if (m_thugs[i])
+                {
+                    // There are some with ForceDespawn(), for example with ".GM on",
+                    if (m_thugs[i]->isAlive())
+                        static_cast<TemporarySummon*>(m_thugs[i])->UnSummon();
+
+                    m_thugs[i] = nullptr;
+                }
+            }
+        }
+    }
+
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
     {
-        if (uiDamage > m_creature->GetHealth() || ((m_creature->GetHealth() - uiDamage) * 100 / m_creature->GetMaxHealth() < 15))
+        // This is required to handle other fight cases For example if NPC is getting attacked by opposite faction, hostile creatures, etc.
+        if (m_mdQuestPhase == MDQP_NONE)
+            return;
+
+        if (uiDamage > m_creature->GetHealth() || m_creature->GetHealthPercent() < 20.0f)
         {
             uiDamage = 0;
 
-            if (pDoneBy->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)pDoneBy)->AreaExploredOrEventHappens(QUEST_MISSING_DIPLO_PT8);
+            // say_2 on defeat
+            DoScriptText(SAY_PROGRESS_2_DAS, m_creature);
 
-            EnterEvadeMode();
+            // remove all dots, etc
+            m_creature->RemoveAllAuras();
+            // restore faction(theramore faction)
+            m_creature->setFaction(FACTION_FRIENDLY);
+            // clean thread list
+            m_creature->DeleteThreatList();
+            // stop combat
+            m_creature->CombatStop();
+
+            // check if thugs are alive
+            bool areThugsAlive = false;
+            for (ptrdiff_t i = 0; i < 2; ++i)
+            {
+                if (m_thugs[i]->isAlive())
+                {
+                    // set thugs faction to friendly
+                    m_thugs[i]->setFaction(FACTION_FRIENDLY);
+                    // remove all dots, etc
+                    m_thugs[i]->RemoveAllAuras();
+                    // clean thread list
+                    m_thugs[i]->DeleteThreatList();
+                    // stop combat
+                    m_thugs[i]->CombatStop();
+                    // rare case: horde players can pull thugs here, so making him non pvp attackable and passive at this stage
+                    m_thugs[i]->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE); // NON_PVP_ATTACKABLE
+
+                    areThugsAlive = true;
+                }
+            }
+
+            if (areThugsAlive)
+            {
+                m_mdQuestPhase = MDQP_THUGS_STOP_ATTACK;
+                m_nextPhaseDelayTimer = 4000;
+                return;
+            }
+
+            // thugs are dead, so skip phases
+            m_mdQuestPhase = MDQP_RETURN_HOME;
+            m_nextPhaseDelayTimer = 3000;
+
+            // NPC runs to spawn point
+            if (MotionMaster* pMotionMaster = m_creature->GetMotionMaster())
+                pMotionMaster->MoveTargetedHome();
         }
+    }
+
+    // NPC has reached his spawn point.
+    // rare case: player can pull Dashel Stonefist too far from his spawn point
+    // if thugs are alive, quest will be completed when Dashel reached his respawn point
+    void JustReachedHome() override
+    {
+        if (m_mdQuestPhase == MDQP_RETURN_HOME)
+            m_dashelReachedHome = true;
     }
 };
 
@@ -182,8 +419,29 @@ bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, cons
 {
     if (pQuest->GetQuestId() == QUEST_MISSING_DIPLO_PT8)
     {
-        pCreature->setFaction(FACTION_HOSTILE);
-        ((npc_dashel_stonefistAI*)pCreature->AI())->AttackStart(pPlayer);
+        DoScriptText(SAY_PROGRESS_1_DAS, pCreature, pPlayer);
+
+        // set npc_private_hendel's faction to hostile
+        pCreature->setFaction(FACTION_NEUTRAL);
+        // prevents random player pick up a quest during event
+        pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+        npc_dashel_stonefistAI* dashelStonefistAI = dynamic_cast<npc_dashel_stonefistAI*>(pCreature->AI());
+        // save player guid for later use(trigger quest completed)
+        dashelStonefistAI->m_playerGuid = pPlayer->GetObjectGuid();
+        dashelStonefistAI->AttackStart(pPlayer);
+        // switch quest event phase to FIGHT
+        dashelStonefistAI->m_mdQuestPhase = MDQP_FIGHT;
+
+        // spawn thugs
+        for (ptrdiff_t i = 0; i < 2; ++i)
+        {
+            dashelStonefistAI->m_thugs[i] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, oldTownThugsSpawn[i].x, oldTownThugsSpawn[i].y, oldTownThugsSpawn[i].z, oldTownThugsSpawn[i].o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 30000);
+            // Set time delay same as other thugs to match DB. This will prevent too fast respawns.
+            dashelStonefistAI->m_thugs[i]->SetRespawnDelay(270); // 270 secs
+                                                                 // make them focus player
+            if (pPlayer)
+                dashelStonefistAI->m_thugs[i]->AI()->AttackStart(pPlayer);
+        }
     }
     return true;
 }
