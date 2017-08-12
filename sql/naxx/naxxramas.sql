@@ -285,14 +285,12 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai
 UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `armor`=3200, `mindmg`=1500, `maxdmg`=2200, `attackpower`=320, `dmg_multiplier`=1, `type`=6, `MovementType`=1, `speed_walk`='0.5', `speed_run`='0.5', `AIName`='EventAI' WHERE `entry`=16419;
 
 -- plagued gargoyle switch from eventAI to script. Immmune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `MechanicImmuneMask`=1073725439, `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16446;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16446;
 
 -- necropolis acolyte updates
 UPDATE `creature_ai_scripts` SET `event_param1`=500, `event_param2`=500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1636801;
 DELETE FROM `creature_ai_scripts` where id = 1636802;
 
--- plagued ghoul immunities
-UPDATE `creature_template` SET `MechanicImmuneMask`=13109328 WHERE `entry`=16447;
 
 -- Plagued deathhound ai
 UPDATE `creature_template` SET `minhealth`=93736, `maxhealth`=93736, `maxmana`=93736, `scale`=2.5, `AIName`='EventAI' WHERE `entry`=16448;
@@ -347,8 +345,6 @@ UPDATE `creature_template` SET `speed_walk`='0.375', `speed_run`='0.375' WHERE `
 UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entry`=16024;
 -- Lightning Totem (summoned by Living Monstrosity) no movement
 UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10 WHERE `entry`=16385;
--- patchwork golem keeps positive auras on evade
-UPDATE `creature_template` SET `flags_extra`=4096 WHERE `entry`=16017;
 -- toxic tunnel creature lvl 60 and script
 UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
 -- bile sludge damage increase
@@ -614,18 +610,6 @@ UPDATE `creature_ai_scripts` SET `event_param1`=1800, `event_param2`=2000, `even
 -- tomb horror 
 UPDATE `creature_template` SET `minhealth`=140105, `maxhealth`=140105, `mindmg`='3050', `maxdmg`='3680' WHERE `entry`=15979;
 
-UPDATE creature_template SET `MechanicImmuneMask`=1023383290 where entry in 
-(
-15981, -- naxxramas acoloyte
-15980, -- naxxramas cultist
-15975, -- carrion spinner
-15977, -- poisonous skitter
-15976, -- venom stalker
-15978, -- crypt reaver
-15974, -- dread creaper
-16453 -- necro stalker
-);
-
 -- carrion spinners dmg increase
 UPDATE `creature_template` SET `mindmg`='3000', `maxdmg`='3500' WHERE `entry`=15975;
 
@@ -664,10 +648,10 @@ VALUES
 */
 
 -- Stoneskin gargoyle switch from eventAI to script. Immune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `MechanicImmuneMask`=1073725439, `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16168;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16168;
 
 -- Plague Slime switch from eventAI to script
-UPDATE `creature_template` SET `AIName`='', `MechanicImmuneMask`=1073725439, `ScriptName`='naxxramas_plague_slime_ai' WHERE `entry`=16243;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_plague_slime_ai' WHERE `entry`=16243;
 
 -- Plague slime creating creature_template entries for all 4 colors
 DELETE FROM `creature_template` where entry in (16243, 16783, 16784, 16785);
@@ -686,8 +670,6 @@ VALUES
 /*green (nature) */
 (16785,0,0,11137,0,0,0,'Plague Slime','',0,61,61,140943,140943,0,0,4091,21,21,0,1,0.35,2,1,7500,9000,0,278,1,1150,1265,0,0,0,0,0,0,0,0,172.1,240.07,100,10,8,16243,0,0,0,5,5,5,5,5,0,0,0,0,0,6051,7906,'',0,3,0,0,1,0,0,0,0,8,0,'naxxramas_plague_slime_ai');
 
--- plague beast keep positive auras on evade
-UPDATE `creature_template` SET `flags_extra`=4096 WHERE `entry`=16034;
 
 -- plagued bat putrid bite much higher frequency
 UPDATE `creature_ai_scripts` SET `event_param1`=4000, `event_param2`=5000, `event_param3`=4000, `event_param4`=5000, `action1_param2`=1 WHERE `id`=1603701;
@@ -713,11 +695,11 @@ UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param1`=500, `event_par
  * Anub'Rekhan
  */
 -- Increasing anubs attackspeed from 2.4 to 2.0
-UPDATE `creature_template` SET `baseattacktime`=2000, `flags_extra`=257 WHERE `entry`=15956;
+UPDATE `creature_template` SET `baseattacktime`=2000 WHERE `entry`=15956;
 
 -- corpse scarabs dmg reduced
 UPDATE `creature_template` SET `mindmg`=200, `maxdmg`=300, `speed_walk`=3, `speed_run`=1.5, `MovementType`=2, `ScriptName`='' WHERE `entry`=16698;
-UPDATE creature_template SET `MechanicImmuneMask`=1023383290 WHERE entry = 16573;
+
 -- giving corrpse scarabs an AI to do patrolling
 UPDATE `creature_template` SET `ScriptName`='mob_corpse_scarab' WHERE `entry`=16698;
 
@@ -908,13 +890,13 @@ UPDATE creature_template set minhealth = 399750, maxhealth = 399750 where entry 
 */
 
 -- Set her base attackspeed to 2.5sec, based on https://www.youtube.com/watch?v=pVjB7pCX3XM
-UPDATE `creature_template` SET `baseattacktime`=2500, `flags_extra`=257,`speed_run`='1.4' WHERE `entry`=15953;
+UPDATE `creature_template` SET `baseattacktime`=2500,`speed_run`='1.4' WHERE `entry`=15953;
 
 -- give Worshippers widows embrace and eventAI
-UPDATE `creature_template` SET `spell1`=28732, `MechanicImmuneMask`=1023383290, `AIName`='EventAI' WHERE `entry`=16506;
+UPDATE `creature_template` SET `spell1`=28732, `AIName`='EventAI' WHERE `entry`=16506;
 
 -- follower has aoe silence spell and eventAI
-UPDATE `creature_template` SET `spell1`=29943, `AIName`='EventAI', `MechanicImmuneMask`=1023383290 WHERE `entry`=16505;
+UPDATE `creature_template` SET `spell1`=29943, `AIName`='EventAI' WHERE `entry`=16505;
 
 
 -- follower eventAI entry for periodically casting aoe silence
@@ -968,7 +950,7 @@ UPDATE creature set MovementType=2, currentWaypoint=5 where id = 15931;
 -- make sewage slimes that grobbulus spawn move randomly
 UPDATE `creature_template` SET `MovementType`=1 WHERE `entry`=16375;
 
-UPDATE `creature_template` SET `AIName`='EventAI', `flags_extra`=4096 WHERE `entry`=16290;
+UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16290;
 
 DELETE FROM `creature_ai_scripts` where id = 1629001;
 INSERT INTO `creature_ai_scripts`
@@ -1035,7 +1017,7 @@ DELETE FROM `creature_ai_scripts` where id IN (1623601,1623602, 1623603);
 */
 
 -- KT updates
-UPDATE `creature_template` SET `minhealth`=3150000, `maxhealth`=3150000, `MechanicImmuneMask`=617316223/*not immune to interrupt*/ WHERE `entry`=15990;
+UPDATE `creature_template` SET `minhealth`=3150000, `maxhealth`=3150000 WHERE `entry`=15990;
 
 
 -- unstoppable abomination. Stun/shackle immune?
@@ -1099,8 +1081,7 @@ UPDATE `creature_model_info` SET `combat_reach`='5' WHERE `modelid` = 16110;
 */
 
 -- dmg/hp source: http://www.kurai.com/wow/naxx/maexxna.jpg
--- should not be tauntable (flags_extra 257)
-UPDATE `creature_template` SET `minhealth`=1498950, `maxhealth`=1498950, `armor`=3731, `mindmg`=5491, `maxdmg`=7281, `flags_extra`=257 WHERE `entry`=15952;
+UPDATE `creature_template` SET `minhealth`=1498950, `maxhealth`=1498950, `armor`=3731, `mindmg`=5491, `maxdmg`=7281 WHERE `entry`=15952;
 
 -- give web-wrap correct faction
 UPDATE `creature_template` SET faction_A = 16, faction_H = 16 WHERE entry = 16486;
@@ -1299,8 +1280,8 @@ VALUES
  '4', -- inhabittype always flying
  '0', '0', '3', '0', '0', '0', '1', '0', '0', 'npc_tesla_coil');
 
--- give Stalagg CREATURE_FLAG_EXTRA_ALWAYS_CRUSH flag and set attackspeed to 2sec
-UPDATE `creature_template` SET `flags_extra` = flags_extra | 8192, `baseattacktime` = 2000 WHERE entry = 15929;
+-- Stalagg attackspeed to 2sec
+UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15929;
 
 -- Feugen attackspeed to 2sec
 UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15930;
@@ -4896,3 +4877,217 @@ VALUES
 (127798,127824,7.12035,5.40927,15),
 (127797,127796,10.3397,5.29395,15),
 (127819,2530408,4.03805,5.51352,15);
+
+
+
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+update `creature_template` set `flags_extra` = 769 where `entry` = 15928; -- Thaddius
+update `creature_template` set `flags_extra` = 8961 where `entry` = 15929; -- Stalagg
+update `creature_template` set `flags_extra` = 769 where `entry` = 15930; -- Feugen
+update `creature_template` set `flags_extra` = 769 where `entry` = 15931; -- Grobbulus
+update `creature_template` set `flags_extra` = 769 where `entry` = 15932; -- Gluth
+update `creature_template` set `flags_extra` = 769 where `entry` = 15936; -- Heigan the Unclean
+update `creature_template` set `flags_extra` = 769 where `entry` = 15952; -- Maexxna
+update `creature_template` set `flags_extra` = 769 where `entry` = 15953; -- Grand Widow Faerlina
+update `creature_template` set `flags_extra` = 769 where `entry` = 15954; -- Noth the Plaguebringer
+update `creature_template` set `flags_extra` = 769 where `entry` = 15956; -- Anub'Rekhan
+update `creature_template` set `flags_extra` = 769 where `entry` = 15989; -- Sapphiron
+update `creature_template` set `flags_extra` = 769 where `entry` = 15990; -- Kel'Thuzad
+update `creature_template` set `flags_extra` = 769 where `entry` = 16011; -- Loatheb
+update `creature_template` set `flags_extra` = 769 where `entry` = 16060; -- Gothik the Harvester
+update `creature_template` set `flags_extra` = 513 where `entry` = 16061; -- Instructor Razuvious
+update `creature_template` set `flags_extra` = 513 where `entry` = 16062; -- Highlord Mograine
+update `creature_template` set `flags_extra` = 513 where `entry` = 16063; -- Sir Zeliek
+update `creature_template` set `flags_extra` = 513 where `entry` = 16064; -- Thane Korth'azz
+update `creature_template` set `flags_extra` = 513 where `entry` = 16065; -- Lady Blaumeux
+update `creature_template` set `flags_extra` = 768 where `entry` = 16028; -- Patchwerk
+update `creature_template` set `flags_extra` = 0 where `entry` = 15974; -- Dread Creeper
+update `creature_template` set `flags_extra` = 0 where `entry` = 15975; -- Carrion Spinner
+update `creature_template` set `flags_extra` = 0 where `entry` = 15976; -- Venom Stalker
+update `creature_template` set `flags_extra` = 0 where `entry` = 15977; -- Poisonous Skitterer
+update `creature_template` set `flags_extra` = 0 where `entry` = 15978; -- Crypt Reaver
+update `creature_template` set `flags_extra` = 0 where `entry` = 15980; -- Naxxramas Cultist
+update `creature_template` set `flags_extra` = 0 where `entry` = 15981; -- Naxxramas Acolyte
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16017; -- Patchwork Golem
+update `creature_template` set `flags_extra` = 0 where `entry` = 16018; -- Bile Retcher
+update `creature_template` set `flags_extra` = 0 where `entry` = 16020; -- Mad Scientist
+update `creature_template` set `flags_extra` = 0 where `entry` = 16021; -- Living Monstrosity
+update `creature_template` set `flags_extra` = 0 where `entry` = 16022; -- Surgical Assistant
+update `creature_template` set `flags_extra` = 0 where `entry` = 16024; -- Embalming Slime
+update `creature_template` set `flags_extra` = 0 where `entry` = 16025; -- Stitched Giant
+update `creature_template` set `flags_extra` = 2050 where `entry` = 16027; -- Living Poison
+update `creature_template` set `flags_extra` = 0 where `entry` = 16029; -- Sludge Belcher
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16034; -- Plague Beast
+update `creature_template` set `flags_extra` = 0 where `entry` = 16037; -- Plagued Bat
+update `creature_template` set `flags_extra` = 0 where `entry` = 16056; -- Diseased Maggot
+update `creature_template` set `flags_extra` = 0 where `entry` = 16057; -- Rotting Maggot
+update `creature_template` set `flags_extra` = 0 where `entry` = 16067; -- Deathcharger Steed
+update `creature_template` set `flags_extra` = 0 where `entry` = 16124; -- Unrelenting Trainee
+update `creature_template` set `flags_extra` = 0 where `entry` = 16125; -- Unrelenting Death Knight
+update `creature_template` set `flags_extra` = 0 where `entry` = 16126; -- Unrelenting Rider
+update `creature_template` set `flags_extra` = 0 where `entry` = 16127; -- Spectral Trainee
+update `creature_template` set `flags_extra` = 0 where `entry` = 16142; -- Bile Sludge
+update `creature_template` set `flags_extra` = 0 where `entry` = 16145; -- Death Knight Captain
+update `creature_template` set `flags_extra` = 0 where `entry` = 16146; -- Death Knight
+update `creature_template` set `flags_extra` = 0 where `entry` = 16148; -- Spectral Death Knight
+update `creature_template` set `flags_extra` = 0 where `entry` = 16149; -- Spectral Horse
+update `creature_template` set `flags_extra` = 0 where `entry` = 16150; -- Spectral Rider
+update `creature_template` set `flags_extra` = 0 where `entry` = 16154; -- Risen Squire
+update `creature_template` set `flags_extra` = 0 where `entry` = 16156; -- Dark Touched Warrior
+update `creature_template` set `flags_extra` = 0 where `entry` = 16157; -- Doom Touched Warrior
+update `creature_template` set `flags_extra` = 0 where `entry` = 16158; -- Death Touched Warrior
+update `creature_template` set `flags_extra` = 0 where `entry` = 16163; -- Death Knight Cavalier
+update `creature_template` set `flags_extra` = 0 where `entry` = 16164; -- Shade of Naxxramas
+update `creature_template` set `flags_extra` = 0 where `entry` = 16165; -- Necro Knight
+update `creature_template` set `flags_extra` = 0 where `entry` = 16167; -- Bony Construct
+update `creature_template` set `flags_extra` = 0 where `entry` = 16168; -- Stoneskin Gargoyle
+update `creature_template` set `flags_extra` = 0 where `entry` = 16236; -- Eye Stalk
+update `creature_template` set `flags_extra` = 0 where `entry` = 16243; -- Plague Slime
+update `creature_template` set `flags_extra` = 0 where `entry` = 16244; -- Infectious Ghoul
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16290; -- Fallout Slime
+update `creature_template` set `flags_extra` = 0 where `entry` = 16297; -- Mutated Grub
+update `creature_template` set `flags_extra` = 0 where `entry` = 16360; -- Zombie Chow
+update `creature_template` set `flags_extra` = 0 where `entry` = 16368; -- Necropolis Acolyte
+update `creature_template` set `flags_extra` = 0 where `entry` = 16375; -- Sewage Slime
+update `creature_template` set `flags_extra` = 0 where `entry` = 16427; -- Soldier of the Frozen Wastes
+update `creature_template` set `flags_extra` = 0 where `entry` = 16428; -- Unstoppable Abomination
+update `creature_template` set `flags_extra` = 0 where `entry` = 16429; -- Soul Weaver
+update `creature_template` set `flags_extra` = 0 where `entry` = 16441; -- Guardian of Icecrown
+update `creature_template` set `flags_extra` = 0 where `entry` = 16446; -- Plagued Gargoyle
+update `creature_template` set `flags_extra` = 0 where `entry` = 16447; -- Plagued Ghoul
+update `creature_template` set `flags_extra` = 0 where `entry` = 16449; -- Spirit of Naxxramas
+update `creature_template` set `flags_extra` = 0 where `entry` = 16451; -- Deathknight Vindicator
+update `creature_template` set `flags_extra` = 0 where `entry` = 16452; -- Necro Knight Guardian
+update `creature_template` set `flags_extra` = 0 where `entry` = 16453; -- Necro Stalker
+update `creature_template` set `flags_extra` = 0 where `entry` = 16505; -- Naxxramas Follower
+update `creature_template` set `flags_extra` = 0 where `entry` = 16506; -- Naxxramas Worshipper
+update `creature_template` set `flags_extra` = 0 where `entry` = 16573; -- Crypt Guard
+update `creature_template` set `flags_extra` = 0 where `entry` = 16698; -- Corpse Scarab
+update `creature_template` set `flags_extra` = 0 where `entry` = 16803; -- Death Knight Understudy
+update `creature_template` set `flags_extra` = 0 where `entry` = 16861; -- Death Lord
+update `creature_template` set `flags_extra` = 0 where `entry` = 16981; -- Plagued Guardian
+update `creature_template` set `flags_extra` = 0 where `entry` = 16982; -- Plagued Construct
+update `creature_template` set `flags_extra` = 0 where `entry` = 16983; -- Plagued Champion
+update `creature_template` set `flags_extra` = 0 where `entry` = 16984; -- Plagued Warrior
+update `creature_template` set `flags_extra` = 0 where `entry` = 17055; -- Maexxna Spiderling
+update `creature_template` set `flags_extra` = 0 where `entry` = 16194; -- Unholy Axe
+update `creature_template` set `flags_extra` = 0 where `entry` = 16215; -- Unholy Staff
+update `creature_template` set `flags_extra` = 0 where `entry` = 16216; -- Unholy Swords
+update `creature_template` set `flags_extra` = 0 where `entry` = 16382; -- Patchwork Terror
+update `creature_template` set `flags_extra` = 0 where `entry` = 16420; -- Portal of Shadows
+update `creature_template` set `flags_extra` = 0 where `entry` = 16446; -- Plagued Gargoyle
+update `creature_template` set `flags_extra` = 0 where `entry` = 16448; -- Plagued Deathhound
+update `creature_template` set `flags_extra` = 0 where `entry` = 16390; -- Deathchill Servant
+
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+----------------------------------------------------------------------------------------------------------------------------------------------
+
+
+
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15928; -- Thaddius
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15929; -- Stalagg
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15930; -- Feugen
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15931; -- Grobbulus
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15932; -- Gluth
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15936; -- Heigan the Unclean
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15952; -- Maexxna
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15953; -- Grand Widow Faerlina
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15954; -- Noth the Plaguebringer
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15956; -- Anub'Rekhan
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15989; -- Sapphiron
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15990; -- Kel'Thuzad
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16011; -- Loatheb
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16028; -- Patchwerk
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16060; -- Gothik the Harvester
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16061; -- Instructor Razuvious
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16062; -- Highlord Mograine
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16063; -- Sir Zeliek
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16064; -- Thane Korth'azz
+update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16065; -- Lady Blaumeux
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15974; -- Dread Creeper
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15975; -- Carrion Spinner
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15976; -- Venom Stalker
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15977; -- Poisonous Skitterer
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15978; -- Crypt Reaver
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15980; -- Naxxramas Cultist
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15981; -- Naxxramas Acolyte
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16017; -- Patchwork Golem
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16018; -- Bile Retcher
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16020; -- Mad Scientist
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16021; -- Living Monstrosity
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16022; -- Surgical Assistant
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16024; -- Embalming Slime
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16025; -- Stitched Giant
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16027; -- Living Poison
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16029; -- Sludge Belcher
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16034; -- Plague Beast
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16037; -- Plagued Bat
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16056; -- Diseased Maggot
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16057; -- Rotting Maggot
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16067; -- Deathcharger Steed
+update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16124; -- Unrelenting Trainee
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16125; -- Unrelenting Death Knight
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16126; -- Unrelenting Rider
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16127; -- Spectral Trainee
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16142; -- Bile Sludge
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16145; -- Death Knight Captain
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16146; -- Death Knight
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16148; -- Spectral Death Knight
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16149; -- Spectral Horse
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16150; -- Spectral Rider
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16154; -- Risen Squire
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16156; -- Dark Touched Warrior
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16157; -- Doom Touched Warrior
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16158; -- Death Touched Warrior
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16163; -- Death Knight Cavalier
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16164; -- Shade of Naxxramas
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16165; -- Necro Knight
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16167; -- Bony Construct
+update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16168; -- Stoneskin Gargoyle
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16236; -- Eye Stalk
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16243; -- Plague Slime
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16244; -- Infectious Ghoul
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16290; -- Fallout Slime
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16297; -- Mutated Grub
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16360; -- Zombie Chow
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16368; -- Necropolis Acolyte
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16375; -- Sewage Slime
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16427; -- Soldier of the Frozen Wastes
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16428; -- Unstoppable Abomination
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16429; -- Soul Weaver
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16441; -- Guardian of Icecrown
+update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16446; -- Plagued Gargoyle
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16447; -- Plagued Ghoul
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16449; -- Spirit of Naxxramas
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16451; -- Deathknight Vindicator
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16452; -- Necro Knight Guardian
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16453; -- Necro Stalker
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16505; -- Naxxramas Follower
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16506; -- Naxxramas Worshipper
+update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16573; -- Crypt Guard
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16698; -- Corpse Scarab
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16803; -- Death Knight Understudy
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16861; -- Death Lord
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16981; -- Plagued Guardian
+update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16982; -- Plagued Construct
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16983; -- Plagued Champion
+update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16984; -- Plagued Warrior
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 17055; -- Maexxna Spiderling
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16194; -- Unholy Axe
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16215; -- Unholy Staff
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16216; -- Unholy Swords
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16382; -- Patchwork Terror
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16448; -- Plagued Deathhound
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16390; -- Deathchill Servant
