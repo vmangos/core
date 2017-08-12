@@ -1,20 +1,12 @@
 /*
--- Query: select * from creature_linking where guid in (select guid from creature where map = 533)
+-- Query: select * from creature_linking where master_guid in (select guid from creature where map = 533)
 LIMIT 0, 5000
 
--- Date: 2017-08-09 17:18
+-- Date: 2017-08-12 14:12
 */
-DELETE FROM `creature_linking` where master_guid in (
-88460,
-88479,
-88100,
-88205,
-88303,
-88346,
-88496,
-88298),
-
-INSERT INTO `creature_linking` (`guid`,`master_guid`,`flag`) VALUES (88453,88460,3073),
+INSERT INTO `creature_linking` (`guid`,`master_guid`,`flag`) 
+VALUES 
+(88453,88460,3073),
 (88452,88460,3073),
 (88451,88460,3073),
 (88448,88460,3073),
