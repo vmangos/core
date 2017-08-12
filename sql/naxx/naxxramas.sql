@@ -4981,7 +4981,6 @@ update `creature_template` set `flags_extra` = 0 where `entry` = 17055; -- Maexx
 update `creature_template` set `flags_extra` = 0 where `entry` = 16194; -- Unholy Axe
 update `creature_template` set `flags_extra` = 0 where `entry` = 16215; -- Unholy Staff
 update `creature_template` set `flags_extra` = 0 where `entry` = 16216; -- Unholy Swords
-update `creature_template` set `flags_extra` = 0 where `entry` = 16382; -- Patchwork Terror
 update `creature_template` set `flags_extra` = 0 where `entry` = 16420; -- Portal of Shadows
 update `creature_template` set `flags_extra` = 0 where `entry` = 16446; -- Plagued Gargoyle
 update `creature_template` set `flags_extra` = 0 where `entry` = 16448; -- Plagued Deathhound
@@ -5088,6 +5087,5 @@ update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` =
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16194; -- Unholy Axe
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16215; -- Unholy Staff
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16216; -- Unholy Swords
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16382; -- Patchwork Terror
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16448; -- Plagued Deathhound
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16390; -- Deathchill Servant
