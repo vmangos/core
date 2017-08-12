@@ -5058,7 +5058,7 @@ update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` =
 update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16168; -- Stoneskin Gargoyle
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16236; -- Eye Stalk
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16243; -- Plague Slime
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16244; -- Infectious Ghoul
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16244; -- Infectious Ghoul
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16290; -- Fallout Slime
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16297; -- Mutated Grub
 update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16360; -- Zombie Chow
@@ -5069,7 +5069,7 @@ update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` =
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16429; -- Soul Weaver
 update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16441; -- Guardian of Icecrown
 update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16446; -- Plagued Gargoyle
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16447; -- Plagued Ghoul
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16447; -- Plagued Ghoul
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16449; -- Spirit of Naxxramas
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16451; -- Deathknight Vindicator
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16452; -- Necro Knight Guardian
