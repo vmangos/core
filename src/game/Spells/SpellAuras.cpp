@@ -1683,6 +1683,33 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 20939: // Undying Soul - Dummy aura used for Unstuck command
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                { 
+                    if (Unit* caster = GetCaster())
+                        if (Player* casterPlayer = caster->ToPlayer())
+                        {
+                            if (casterPlayer->isAlive() && !casterPlayer->isInCombat() && !casterPlayer->IsTaxiFlying())
+                            {
+                                casterPlayer->AddAura(15007); // Add Resurrection Sickness
+                                if (sObjectMgr.GetClosestGraveYard(casterPlayer->GetPositionX(), casterPlayer->GetPositionY(), casterPlayer->GetPositionZ(), casterPlayer->GetMapId(), casterPlayer->GetTeam()))
+                                    casterPlayer->DealDamage(casterPlayer, casterPlayer->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                                else
+                                {
+                                    // If there is no nearby graveyard, player's ghost would spawn at the same spot.
+                                    WorldSafeLocsEntry const *ClosestGrave = casterPlayer->GetTeamId() ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
+                                    if (ClosestGrave)
+                                    {
+                                        casterPlayer->SetHealth(1);
+                                        casterPlayer->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0, 0);
+                                    }
+                                }
+                            }
+                        }
+                }
+                return;
+            }
             case 24906:                                     // Emeriss Aura
             {
                 if (m_removeMode == AURA_REMOVE_BY_DEATH)
