@@ -465,16 +465,16 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     // Case for Execute. This will only run when procced by Execute
                     if (procSpell && procSpell->Id == 20647)
                     {
-                        if (pVictim->GetHealthPercent() < 20.0f && target->GetHealthPercent() < 20.0f)  // If Both Target A and target B is sub 20% do full damage
+                        if (pVictim->GetHealthPercent() <= 20.0f && target->GetHealthPercent() <= 20.0f)  // If Both Target A and target B is less or equal than 20% do full damage
                         {
                             basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
                             triggered_spell_id = 12723; //Note this SS id deals 1 damage by itself (Cannot crit)
                         }
-                        else if (pVictim->GetHealthPercent() < 20.0f)	// If only Target A is sub 20% and target B is over 20% do Basic attack damage
+                        else if (pVictim->GetHealthPercent() <= 20.0f)	// If only Target A is less or equal than 20% and target B is over 20% do Basic attack damage
                         {
                             triggered_spell_id = 26654;	// This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
                         }
-                        else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used sub 20% anyway.
+                        else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used less or equal than 20% anyway.
                         {
                             basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
                             triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
