@@ -26,9 +26,6 @@ UPDATE `creature_model_info` SET `modelid_other_gender` = 0 WHERE `modelid` = 11
 -- Fixed Tabetha's model.
 UPDATE `creature_model_info` SET `modelid_other_gender` = 0 WHERE `modelid` = 5375;
 
--- Removed a winterspring owl from Silithus.
-DELETE FROM `creature` WHERE `guid` = 2230118;
-
 -- Fixed a loot table for Small Barnacled Clam.
 DELETE FROM `item_loot_template` WHERE `entry` = 5523;
 INSERT INTO `item_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES
