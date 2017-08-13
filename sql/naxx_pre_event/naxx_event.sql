@@ -74,9 +74,6 @@ UPDATE `creature_template` SET `ScriptName`='npc_necropolis_relay' WHERE `entry`
 UPDATE `creature_template` SET `ScriptName`='npc_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `ScriptName`='npc_necrotic_shard' WHERE `entry`=16136;
 
--- Remove the NULL on subname of Spectral Apparition
-UPDATE `creature_template` SET `subname`='' WHERE  `entry`=16423;
-
 -- Update modelids for several creatures
 UPDATE `creature_template` SET `modelid_2`=16238 WHERE  `entry`=16384;
 UPDATE `creature_template` SET `modelid_2`=16230 WHERE  `entry`=16395;
@@ -85,6 +82,10 @@ UPDATE `creature_template` SET `modelid_2`=16232 WHERE  `entry`=16434;
 UPDATE `creature_template` SET `modelid_2`=16239 WHERE  `entry`=16435;
 UPDATE `creature_template` SET `modelid_2`=16240 WHERE  `entry`=16436;
 UPDATE `creature_template` SET `modelid_2`=10672, `modelid_3`=10670 WHERE  `entry`=16511;
+
+UPDATE `creature` SET `modelid`=16230 WHERE `guid`=1242988;
+
+
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
@@ -154,21 +155,30 @@ UPDATE `creature_template` SET `faction_A`=1630, `faction_H`=1630 WHERE  `entry`
 UPDATE `creature_template` SET `faction_A`=1630, `faction_H`=1630 WHERE  `entry`=16422;
 
 -- Update Lord Blackwood equipment
-DELETE FROM creature_equip_template WHERE entry=14695;
+UPDATE `creature` SET `equipment_id`=14695 WHERE `guid`=2353;
+DELETE FROM `creature_equip_template` WHERE entry=14695;
 INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
 (14695, 18985, 12893, 5258);
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178;
+-- Add loot to quartermaster
+UPDATE `creature_template` SET `npcflag`=16388 WHERE  `entry`=16786;
+DELETE FROM `npc_vendor` WHERE entry=16786;
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(16786, 22999, 0, 0),
+(16786, 23122, 0, 0),
+(16786, 23123, 0, 0);
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
 (@CGUID_GENERAL+0  , 16285, 0, 0, 0, -4935.45, -990.098, 501.456, 2.40353, 25, 0, 0, 8, 0, 0, 0, 0),
 (@CGUID_GENERAL+1  , 16241, 0, 0, 798, -4934.06, -988.571, 501.459, 2.40353, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+2  , 16786, 0, 0, 0, -4932.81, -987.199, 501.461, 2.40353, 25, 0, 0, 300, 0, 0, 0, 0),
--- (@CGUID_GENERAL+3  , 16285, 1, 0, 0, -7278.58, -3674.31, 13.5989, 5.47971, 25, 0, 0, 8, 0, 0, 0, 0),
+(@CGUID_GENERAL+3  , 16511, 1, 0, 0, 1589.57, -4413.12, 8.30807, 2.9829, 25, 5, 0, 8, 0, 0, 0, 0),
 (@CGUID_GENERAL+4  , 16395, 0, 0, 0, -4925.02, -985.091, 501.455, 2.30543, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+5  , 16241, 0, 0, 798, -8832.93, 643.004, 94.7504, 4.21086, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+6  , 16285, 0, 0, 0, -8831.22, 640.154, 94.4378, 3.90063, 25, 0, 0, 8, 0, 0, 0, 0),
-(@CGUID_GENERAL+7  , 16395, 0, 0, 0, -8839.21, 646.997, 96.0542, 5.58767, 25, 0, 0, 300, 0, 0, 0, 0),
-(@CGUID_GENERAL+8  , 16786, 0, 0, 0, -8837.75, 645.808, 95.8512, 2.39895, 25, 0, 0, 300, 0, 0, 0, 0),
+(@CGUID_GENERAL+7  , 16395, 0, 0, 0, -8839.21, 646.997, 96.0542, 3.617884, 25, 0, 0, 300, 0, 0, 0, 0),
+(@CGUID_GENERAL+8  , 16786, 0, 0, 0, -8835.663086, 644.270447, 95.505074, 4.238351, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+9  , 16423, 0, 0, 0, -9041.08, 342.393, 93.4455, 2.48927, 25, 5, 0, 120, 0, 0, 1, 0),
 (@CGUID_GENERAL+10 , 16423, 0, 0, 0, -9058.45, 359.37, 92.9135, 2.61494, 25, 5, 0, 120, 0, 0, 1, 0),
 (@CGUID_GENERAL+11 , 16423, 0, 0, 0, -9061.93, 327.891, 93.7343, 5.04574, 25, 5, 0, 137, 0, 0, 1, 0),
@@ -338,22 +348,26 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `positio
 (@CGUID_GENERAL+175, 16423, 1, 0, 0, 9696.21, 1840.31, 1299.51, 2.29095, 25, 5, 0, 137, 0, 0, 1, 0),
 (@CGUID_GENERAL+176, 16423, 1, 0, 0, 9714.65, 1871.04, 1306.07, 0.728003, 25, 5, 0, 120, 0, 0, 1, 0),
 (@CGUID_GENERAL+177, 16423, 1, 0, 0, 9756.88, 1859.74, 1305.55, 6.01373, 25, 5, 0, 137, 0, 0, 1, 0),
-(@CGUID_GENERAL+178, 16423, 1, 0, 0, 9728.21, 1843.1, 1302.12, 2.77003, 25, 5, 0, 120, 0, 0, 1, 0);
+(@CGUID_GENERAL+178, 16423, 1, 0, 0, 9728.21, 1843.1, 1302.12, 2.77003, 25, 5, 0, 120, 0, 0, 1, 0),
+(@CGUID_GENERAL+179, 16508, 0, 0, 0, -8822.24, 647.135, 94.4622, 4.71745, 25, 5, 0, 8, 0, 0, 0, 0),
+(@CGUID_GENERAL+180, 16787, 1, 0, 0, 1586.24, -4425.39, 7.83914, 3.34184, 25, 5, 0, 300, 0, 0, 0, 0),
+(@CGUID_GENERAL+181, 16359, 1, 0, 0, 1589.03, -4422.22, 8.61155, 3.34184, 25, 5, 0, 5228, 0, 0, 0, 0),
+(@CGUID_GENERAL+182, 16255, 1, 0, 0, 1587.85, -4418.74, 8.66717, 3.50677, 25, 5, 0, 8, 0, 0, 0, 0);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178 AND `event`=@Event_2;
-INSERT INTO `game_event_creature` SELECT creature.guid, @Event_2 FROM `creature` WHERE creature.guid BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+178;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182 AND `event`=@Event_2;
+INSERT INTO `game_event_creature` SELECT creature.guid, @Event_2 FROM `creature` WHERE creature.guid BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182;
 
-DELETE FROM `creature` WHERE `guid` IN (1242996, 1242997, 1243011, 1242995, 1242992, 1242993, 1243010, 1242994);
+DELETE FROM `creature` WHERE `guid` IN (1242996, 1242997, 1243011, 1242995, 1242992, 1242993, 1243010, 1242994, 1242988, 1242986, 1242987, 1243008);
 
 -- ----------------------
 -- Game Events
 -- ----------------------
-UPDATE `game_event` SET `start_time`='2017-06-20 00:00:00', `end_time`='2018-06-20 00:00:00', `length`=33720 WHERE `entry`=17;
+UPDATE `game_event` SET `start_time`='2017-06-20 00:00:00', `end_time`='2018-06-20 00:00:00', `length`=999999999 WHERE `entry`=17;
 
 DELETE FROM `game_event` WHERE `entry` IN (110, 111, 112, 113, 114, 115, 116, 117, 118, 80, 81);
 INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`) VALUES
-(80, '2014-03-30 05:25:24', '2018-03-30 05:30:00', 525600, 33720, 0, 'Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11', 0, 0),
-(81, '2014-03-30 05:25:24', '2018-04-20 04:30:00', 525600, 33720, 0, 'Scourge Invasion - Boss in instance activation', 0, 0);
+(80, '2014-03-30 05:25:24', '2018-03-30 05:30:00', 525600, 999999999, 0, 'Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11', 0, 0),
+(81, '2014-03-30 05:25:24', '2018-04-20 04:30:00', 525600, 999999999, 0, 'Scourge Invasion - Boss in instance activation', 0, 0);
 
 -- Objects
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
@@ -1011,9 +1025,6 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (1242982, 17), -- 126),
 (1242983, 17), -- 126),
 (1242984, 17), -- 126),
-(1242986, 17), -- 126),
-(1242987, 17), -- 126),
-(1242988, 17), -- 126),
 (1242989, 17), -- 126),
 (1242990, 17), -- 126),
 (1242991, 17), -- 126),
@@ -1027,12 +1038,10 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (1242999, 17), -- 126),
 (1243000, 17), -- 126),
 (1243007, 17), -- 126),
-(1243008, 17), -- 126),
 (1243009, 17), -- 126),
 (1243010, 17), -- 126),
 (1243011, 17), -- 126),
-(1243012, 17), -- 126),
-(1243008, 80); -- 127),
+(1243012, 17); -- 126),
 
 -- ----------------------
 -- Objects
@@ -1043,7 +1052,7 @@ UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=1812
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181374;
 UPDATE `gameobject_template` SET `ScriptName`='go_necropolis' WHERE `entry`=181373;
 
-DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11;
+DELETE FROM `gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+14;
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `spawnFlags`) VALUES
 (@OGUID_GENERAL+0, 181254, 0, -4930.26, -992.487, 501.443, 2.36819, 0, 0, 0.926159, 0.377134, 25, 100, 1, 0),
 (@OGUID_GENERAL+1, 181256, 0, -4929.6, -986.764, 501.459, 2.27002, 0, 0, 0.906538, 0.422124, 25, 100, 1, 0),
@@ -1056,10 +1065,13 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (@OGUID_GENERAL+8, 181254, 0, -8828.14, 644.609, 94.4657, 3.78675, 0, 0, 0.948421, -0.317014, 25, 100, 1, 0),
 (@OGUID_GENERAL+9, 181256, 0, -8838.25, 644.563, 95.7177, 3.9674, 0, 0, 0.91596, -0.401268, 25, 100, 1, 0),
 (@OGUID_GENERAL+10, 181255, 0, -8828.24, 643.265, 94.4295, 5.40467, 0, 0, 0.42527, -0.905067, 25, 100, 1, 0),
-(@OGUID_GENERAL+11, 181255, 0, -8828.24, 643.265, 94.9958, 5.76987, 0, 0, 0.253848, -0.967244, 25, 100, 1, 0);
+(@OGUID_GENERAL+11, 181255, 0, -8828.24, 643.265, 94.9958, 5.76987, 0, 0, 0.253848, -0.967244, 25, 100, 1, 0),
+(@OGUID_GENERAL+12, 181256, 1, 1586.61, -4413.88, 8.18393, 2.67034, 0, 0, 0.972368, 0.233452, 25, 100, 1, 0),
+(@OGUID_GENERAL+13, 181255, 1, 1592.43, -4415.54, 9.15589, 3.4204, 0, 0, 0.990299, -0.138951, 25, 100, 1, 0),
+(@OGUID_GENERAL+14, 181255, 1, 1592.43, -4415.54, 9.72213, 3.07482, 0, 0, 0.999443, 0.033379, 25, 100, 1, 0);
 
-DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11 AND `event`=@Event_1;
-INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @Event_1 FROM `gameobject` WHERE gameobject.guid BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+11;
+DELETE FROM `game_event_gameobject` WHERE `guid` BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+14 AND `event`=@Event_1;
+INSERT INTO `game_event_gameobject` SELECT gameobject.guid, @Event_1 FROM `gameobject` WHERE gameobject.guid BETWEEN @OGUID_GENERAL+0 AND @OGUID_GENERAL+14;
 
 DELETE FROM `gameobject` WHERE `guid` IN (3996948, 3996951, 3996952, 3996946, 3996946, 3996949, 3996945, 3996924, 3996923, 3996925);
 

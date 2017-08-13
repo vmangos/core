@@ -357,7 +357,7 @@ public:
         {
             GameObject* necropolis = me->GetMap()->GetGameObject(*it);
             totalzone = _necropolisList.size();
-        }
+        }   
 
         uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
         uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
@@ -822,8 +822,7 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
             m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_VOILE_TENEBRES);
         }
 
-        /* If all 4 Cultists Engineers died or their transformation into Shadow of Doom died too,
-           damaged shard is destroyed */
+        /* If all 4 Cultists Engineers died or their transformation into Shadow of Doom died too, damaged shard is destroyed */
         if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD &&
                 !m_creature->FindNearestCreature(NPC_CULTIST_ENGINEER, 100.0f, true) &&
                 !m_creature->FindNearestCreature(NPC_SHADOW_OF_DOOM, 100.0f, true))
@@ -1480,7 +1479,7 @@ bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 0);
 
             player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2, creature->GetGUID());
             break;
