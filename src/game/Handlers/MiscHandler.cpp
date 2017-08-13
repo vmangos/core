@@ -907,7 +907,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if (!GetPlayer()->GetQuestRewardStatus(9121) && !GetPlayer()->GetQuestRewardStatus(9122) && !GetPlayer()->GetQuestRewardStatus(9123))
             {
 //               SendAreaTriggerMessage("You need to accomplish the Naxxramas quest to enter");
-                return;
+                //return;
             }
 
         }
