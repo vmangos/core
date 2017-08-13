@@ -798,6 +798,158 @@ bool GossipSelect_EnchantNPC(Player* player, Creature* creature, uint32 sender, 
     return true;
 }
 
+
+
+void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
+{
+    uint32 classmask = player->getClassMask();
+
+    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+    {
+        SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j);
+        if (!skillLine)
+            continue;
+
+        // wrong skill
+        if (skillLine->skillId != skill_id)
+            continue;
+
+        // not high rank
+        if (skillLine->forward_spellid)
+            continue;
+
+        // skip racial skills
+        if (skillLine->racemask != 0)
+            continue;
+
+        // skip wrong class skills
+        if (skillLine->classmask && (skillLine->classmask & classmask) == 0)
+            continue;
+
+        SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(skillLine->spellId);
+        if (!spellEntry || !SpellMgr::IsSpellValid(spellEntry, player, false))
+            continue;
+
+        player->learnSpell(skillLine->spellId, false);
+    }
+}
+bool LearnAllRecipesInProfession(Player *pPlayer, SkillType skill)
+{
+    ChatHandler handler(pPlayer->GetSession());
+    char* skill_name;
+
+    SkillLineEntry const *SkillInfo = sSkillLineStore.LookupEntry(skill);
+    skill_name = SkillInfo->name[sWorld.GetDefaultDbcLocale()];
+
+    if (!SkillInfo)
+    {
+        sLog.outError("Profession NPC: received non-valid skill ID");
+        return false;
+    }
+
+    pPlayer->SetSkill(SkillInfo->id, 300, 300);
+    LearnSkillRecipesHelper(pPlayer, SkillInfo->id);
+    pPlayer->GetSession()->SendNotification("All recipes for %s learned", skill_name);
+    return true;
+}
+
+bool GossipHello_ProfessionNPC(Player* player, Creature* creature)
+{
+
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Alchemy",              GOSSIP_SENDER_MAIN, 1);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Blacksmithing",        GOSSIP_SENDER_MAIN, 2);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Leatherworking",       GOSSIP_SENDER_MAIN, 3);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Tailoring",            GOSSIP_SENDER_MAIN, 4);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Engineering",          GOSSIP_SENDER_MAIN, 5);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Enchanting",           GOSSIP_SENDER_MAIN, 6);
+    //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Jewelcrafting",      GOSSIP_SENDER_MAIN, 7);
+    //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Inscription",        GOSSIP_SENDER_MAIN, 8);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Herbalism",            GOSSIP_SENDER_MAIN, 9);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Skinning",             GOSSIP_SENDER_MAIN, 10);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Mining",               GOSSIP_SENDER_MAIN, 11);
+
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "First Aid",            GOSSIP_SENDER_MAIN, 12);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Fishing",              GOSSIP_SENDER_MAIN, 13);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_INTERACT_2, "Cooking",              GOSSIP_SENDER_MAIN, 14);
+
+    player->PlayerTalkClass->SendGossipMenu(1, creature->GetGUID());
+
+    player->SEND_GOSSIP_MENU(DEFAULT_GOSSIP_MESSAGE, creature->GetGUID());
+    return true;
+}
+void CompleteLearnProfession(Player *pPlayer, Creature *pCreature, SkillType skill)
+{
+    if (pPlayer->GetFreePrimaryProfessionPoints() == 0 && !(skill == SKILL_COOKING || skill == SKILL_FIRST_AID))
+    {
+        pPlayer->GetSession()->SendNotification("You already know two primary professions.");
+    }
+    else
+    {
+        if (!LearnAllRecipesInProfession(pPlayer, skill))
+            pPlayer->GetSession()->SendNotification("Internal error.");
+    }
+}
+bool GossipSelect_ProfessionNPC(Player* player, Creature* creature, uint32 sender, uint32 action)
+{
+    switch (action)
+    {
+    case 1:
+        if (!player->HasSkill(SKILL_ALCHEMY))
+            CompleteLearnProfession(player, creature, SKILL_ALCHEMY);
+        break;
+    case 2:
+        if (!player->HasSkill(SKILL_BLACKSMITHING))
+            CompleteLearnProfession(player, creature, SKILL_BLACKSMITHING);
+        break;
+    case 3:
+        if (!player->HasSkill(SKILL_LEATHERWORKING))
+            CompleteLearnProfession(player, creature, SKILL_LEATHERWORKING);
+        break;
+    case 4:
+        if (!player->HasSkill(SKILL_TAILORING))
+            CompleteLearnProfession(player, creature, SKILL_TAILORING);
+        break;
+    case 5:
+        if (!player->HasSkill(SKILL_ENGINEERING))
+            CompleteLearnProfession(player, creature, SKILL_ENGINEERING);
+        break;
+    case 6:
+        if (!player->HasSkill(SKILL_ENCHANTING))
+            CompleteLearnProfession(player, creature, SKILL_ENCHANTING);
+        break;
+    case 7:
+    case 8:
+        break;
+    case 9:
+        if (!player->HasSkill(SKILL_HERBALISM))
+            CompleteLearnProfession(player, creature, SKILL_HERBALISM);
+        break;
+    case 10:
+        if (!player->HasSkill(SKILL_SKINNING))
+            CompleteLearnProfession(player, creature, SKILL_SKINNING);
+        break;
+    case 11:
+        if (!player->HasSkill(SKILL_MINING))
+            CompleteLearnProfession(player, creature, SKILL_MINING);
+        break;
+    case 12:
+        if (!player->HasSkill(SKILL_FIRST_AID))
+            CompleteLearnProfession(player, creature, SKILL_FIRST_AID);
+        break;
+    case 13:
+        if (!player->HasSkill(SKILL_FISHING))
+            CompleteLearnProfession(player, creature, SKILL_FISHING);
+        break;
+    case 14:
+        if (!player->HasSkill(SKILL_COOKING))
+            CompleteLearnProfession(player, creature, SKILL_COOKING);
+        break;
+    }
+
+    player->CLOSE_GOSSIP_MENU();
+    return true;
+}
+
 void AddSC_custom_creatures()
 {
     Script *newscript;
@@ -812,6 +964,12 @@ void AddSC_custom_creatures()
     newscript->Name = "custom_EnchantNPC";
     newscript->pGossipHello = &GossipHello_EnchantNPC;
     newscript->pGossipSelect = &GossipSelect_EnchantNPC;
+    newscript->RegisterSelf(true);
+
+    newscript = new Script;
+    newscript->Name = "custom_ProfessionsNPC";
+    newscript->pGossipHello = &GossipHello_ProfessionNPC;
+    newscript->pGossipSelect = &GossipSelect_ProfessionNPC;
     newscript->RegisterSelf(true);
 
 }
