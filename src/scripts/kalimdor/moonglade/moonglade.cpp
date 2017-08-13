@@ -1240,7 +1240,7 @@ struct boss_eranikusAI : public ScriptedAI
         for (uint8 j = 0; j < MAX_PRIESTESS; ++j)
         {
             m_creature->GetRandomPoint(aTyrandeLocations[0].m_fX, aTyrandeLocations[0].m_fY, aTyrandeLocations[0].m_fZ, 10.0f, fX, fY, fZ);
-            m_creature->SummonCreature(NPC_ELUNE_PRIESTESS, fX, fY, fZ, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0, MOVE_RUN_MODE);
+            m_creature->SummonCreature(NPC_ELUNE_PRIESTESS, fX, fY, fZ, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
         }
     }
 

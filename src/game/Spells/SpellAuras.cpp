@@ -2045,15 +2045,15 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
             modelid = 892;
         else
             modelid = 8571;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_TRAVEL:
         modelid = 632;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_AQUA:
         modelid = 2428;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_BEAR:
         if (Player::TeamForRace(target->getRace()) == ALLIANCE)
@@ -2076,7 +2076,7 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
         break;
     case FORM_GHOSTWOLF:
         modelid = 4613;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_MOONKIN:
         if (Player::TeamForRace(target->getRace()) == ALLIANCE)
@@ -5096,7 +5096,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
             {
                 //ticks: 2/3, 2/3, 1, 1, 4/3, 4/3
-                float ticks[] = {0,.111,.222,.389,.556,.778,1};
+                float ticks[] = {0,.111f,.222f,.389f,.556f,.778f,1};
                 float dmg = ticks[GetAuraTicks() -1];
                 float ddone = ticks[GetAuraTicks()];
                 pdamage *= 6;

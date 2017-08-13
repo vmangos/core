@@ -137,7 +137,7 @@ bool GOHello_go_marshal_haggards_chest(Player* pPlayer, GameObject* pGo)
         {
             if (pPlayer->GetQuestStatus(QUEST_STALVANS_LEGEND) == QUEST_STATUS_INCOMPLETE)
             {
-                if (Creature* spirit = pGo->SummonCreature(NPC_SPIRIT, -9552.67, -1431.93, 62.3, 5.03, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
+                if (Creature* spirit = pGo->SummonCreature(NPC_SPIRIT, -9552.67f, -1431.93f, 62.3f, 5.03f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
                 {
                     pMarkAI->SetInUse(spirit);
                     spirit->AI()->AttackStart(pPlayer);

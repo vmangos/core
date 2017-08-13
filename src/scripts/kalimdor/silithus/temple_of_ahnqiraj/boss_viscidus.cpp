@@ -200,7 +200,7 @@ struct boss_viscidusAI : public ScriptedAI
     {
         if (m_creature->GetVisibility() == VISIBILITY_OFF)
         {
-            DoCast(m_creature, SPELL_VISCIDUS_TELEPORT, CAST_TRIGGERED);
+            DoCast(m_creature, SPELL_VISCIDUS_TELEPORT, true);
         }
 
         DoResetThreat();

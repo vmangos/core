@@ -22,7 +22,6 @@ SDCategory: Stormwind City
 EndScriptData */
 
 /* ContentData
-npc_archmage_malin
 npc_bartleby
 npc_dashel_stonefist
 npc_lady_katrana_prestor
@@ -30,36 +29,6 @@ EndContentData */
 
 #include "scriptPCH.h"
 #include <list>
-
-/*######
-## npc_archmage_malin
-######*/
-
-#define GOSSIP_ITEM_MALIN "Can you send me to Theramore? I have an urgent message for Lady Jaina from Highlord Bolvar."
-
-bool GossipHello_npc_archmage_malin(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(11223) == QUEST_STATUS_COMPLETE && !pPlayer->GetQuestRewardStatus(11223))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_MALIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_archmage_malin(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, 42711, true);
-    }
-
-    return true;
-}
 
 /*######
 ## npc_bartleby
@@ -1578,27 +1547,25 @@ struct npc_master_woodAI : public ScriptedAI
 
     void ReceiveEmote(Player* pPlayer, uint32 emote)
     {
-        if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->isInCombat())
+        if (pPlayer && (pPlayer->GetTeam() == ALLIANCE) && !m_creature->isInCombat() && m_creature->IsWithinLOSInMap(pPlayer))
         {
             switch (emote)
             {
                 case TEXTEMOTE_RUDE:
                 {
+                    m_uiRudeCount++;
                     switch (m_uiRudeCount)
                     {
-                        case 0:
-                            DoScriptText(SAY_RUDE_1, m_creature, pPlayer);
-                            m_uiRudeCount = 1;
-                            break;
                         case 1:
-                            DoScriptText(SAY_RUDE_2, m_creature, pPlayer);
-                            m_uiRudeCount = 2;
+                            DoScriptText(SAY_RUDE_1, m_creature, pPlayer);
                             break;
                         case 2:
-                            DoScriptText(SAY_RUDE_3, m_creature, pPlayer);
-                            m_uiRudeCount = 3;
+                            DoScriptText(SAY_RUDE_2, m_creature, pPlayer);
                             break;
                         case 3:
+                            DoScriptText(SAY_RUDE_3, m_creature, pPlayer);
+                            break;
+                        case 5:
                             m_creature->GetMotionMaster()->MoveCharge(pPlayer, 1000, true);
                             m_uiRudeCount = 0;
                             break;
@@ -1630,12 +1597,6 @@ CreatureAI* GetAI_npc_master_wood(Creature* pCreature)
 void AddSC_stormwind_city()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_archmage_malin";
-    newscript->pGossipHello = &GossipHello_npc_archmage_malin;
-    newscript->pGossipSelect = &GossipSelect_npc_archmage_malin;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_bartleby";

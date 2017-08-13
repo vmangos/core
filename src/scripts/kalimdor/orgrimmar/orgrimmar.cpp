@@ -577,7 +577,7 @@ struct npc_thrall_warchiefAI : public ScriptedAI
     uint32 m_uiTick;
     uint32 ChainLightning_Timer;
     uint32 Shock_Timer;
-    int32 m_uiBlessingEventTimer;
+    uint32 m_uiBlessingEventTimer;
     bool m_bBlessingEvent;
     Creature* m_pHerald;
 
