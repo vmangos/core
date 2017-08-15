@@ -31,6 +31,7 @@
 #include "ObjectMgr.h"
 #include "ZoneScriptMgr.h"
 #include "Map.h"
+#include "MoveMap.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -262,6 +263,8 @@ public:
             ++loops;
         }
         while (!(*updateFinished));
+
+        MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
         WorldDatabase.ThreadEnd();
     }
     std::vector<Map*> maps;
@@ -281,6 +284,8 @@ public:
     {
         WorldDatabase.ThreadStart();
         map->DoUpdate(diff);
+
+        MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
         WorldDatabase.ThreadEnd();
     }
     Map* map;
@@ -347,6 +352,8 @@ void MapManager::Update(uint32 diff)
     for (int tid = instanceUpdaters.size(); tid < asyncUpdateThreads.size(); ++tid)
     {
         asyncUpdateThreads[tid]->wait();
+        // Thread has finished. Remove any nav mesh queries from the MMapManager
+        //MMAP::MMapFactory::createOrGetMMapManager()->CleanUpNavQuery(asyncUpdateThreads[tid]->currentId());
         delete asyncUpdateThreads[tid];
     }
 
