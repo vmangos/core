@@ -1272,7 +1272,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
                 && !m_creature->isInCombat()
-                && m_creature->IsWithinDistInMap(pWho, 10.0f)
+                && m_creature->IsWithinDistInMap(pWho, 15.0f)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
                 && m_creature->IsWithinLOSInMap(pWho))
             {
