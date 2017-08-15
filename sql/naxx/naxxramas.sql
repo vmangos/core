@@ -99,8 +99,9 @@ DELETE FROM `scripted_areatrigger` where entry = 4113;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4113', 'at_naxxramas');
 
 -- add Mr. Bigglesworth
--- set movement type to waypoint 
-UPDATE `creature_template` SET `MovementType`=2 WHERE `entry`=16998;
+-- set movement type to waypoint, set faction friendly or something
+UPDATE `creature_template` SET `MovementType`=2, `faction_A`=31, `faction_H`=31 WHERE `entry`=16998;
+
 
 -- Acid Volley stack with self
 DELETE FROM spell_mod where Id = 29325;
