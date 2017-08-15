@@ -2752,7 +2752,7 @@ float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 
 
     // PvP - PvE melee chances
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        hitChance = 94.4f + skillDiff * 0.04f;
+        hitChance = 95.0f + skillDiff * 0.04f;  // PvP misschance base is 5.00%
     else if (skillDiff < -10)
         hitChance = 93.4f + (skillDiff + 10) * 0.4f;        // 7% ~ 6.60% base chance to miss for big skill diff
     else
@@ -3096,7 +3096,7 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     float missChance = 5.60f; // The base chance to miss is 5.60%
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
     {
-      missChance = 5.00f;  // The base chance to miss in PvP is 5%
+        missChance = 5.00f;  // The base chance to miss in PvP is 5%
     }
 
     // DualWield - white damage has an additional 19% miss penalty
