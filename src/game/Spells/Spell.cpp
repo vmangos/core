@@ -2757,7 +2757,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
                 case SPELL_EFFECT_BIND:
-                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
                 case SPELL_EFFECT_CREATE_ITEM:
@@ -2782,6 +2781,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
+                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
@@ -7318,6 +7318,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
                 break;
         // no break. Cannibalize checks corpse target LOS.
         // fall through
+        case SPELL_EFFECT_RESURRECT:
         case SPELL_EFFECT_RESURRECT_NEW:
             // player far away, maybe his corpse near?
             if (target != m_caster && !(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !target->IsWithinLOSInMap(m_caster))
