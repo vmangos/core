@@ -328,9 +328,13 @@ UPDATE `npc_text` SET `em0_1`='13' WHERE `ID`='8517';
 /* 
 * constructwing
 */ 
-
+ 
 -- Living Poison (froggers) speed fix
 UPDATE `creature_template` SET `speed_walk`='0.375', `speed_run`='0.375' WHERE `entry`=16027;
+-- Living Poison hitbox so it dosent trigger further away than the explode spell range
+update creature_model_info set bounding_radius = 0, combat_reach = 0 where modelid = 12349;
+UPDATE `creature_ai_scripts` SET `event_param2`=4 WHERE `id`=1602701;
+
 -- Embalming slime moves at 50% movementspeed
 UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entry`=16024;
 -- Lightning Totem (summoned by Living Monstrosity) no movement
