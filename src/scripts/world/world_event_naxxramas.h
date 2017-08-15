@@ -19,9 +19,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+// Change this for live!
 #define DEBUG_WORLD_EVENT = true;
 
- // Texte nostalrius (nostalrius_string)
+ // Text nostalrius (nostalrius_string)
 #define NOST_TEXT(id) (id+2000010000)
 
 enum ScourgeInvasionSpells
