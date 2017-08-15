@@ -258,7 +258,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recv_data)
         return;
 
     GameObject *obj = GetPlayer()->GetMap()->GetGameObject(guid);
-    if (!obj)
+    if (!obj || obj->IsDeleted())
         return;
 
     // Additional check preventing exploits (ie loot despawned chests)

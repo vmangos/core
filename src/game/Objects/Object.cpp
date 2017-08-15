@@ -1113,7 +1113,7 @@ void Object::ExecuteDelayedActions()
 {
     if (_delayedActions & OBJECT_DELAYED_MARK_CLIENT_UPDATE)
     {
-        if (m_inWorld)
+        if (m_inWorld && !_deleted)
         {
             if (!m_objectUpdated)
             {
