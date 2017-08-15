@@ -85,8 +85,6 @@ UPDATE `creature_template` SET `modelid_2`=10672, `modelid_3`=10670 WHERE  `entr
 
 UPDATE `creature` SET `modelid`=16230 WHERE `guid`=1242988;
 
-
-
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
 (@CGUID_BOSS+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0), -- Sever - Level 21 - Shadowfang Keep
@@ -166,7 +164,13 @@ DELETE FROM `npc_vendor` WHERE entry=16786;
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 (16786, 22999, 0, 0),
 (16786, 23122, 0, 0),
-(16786, 23123, 0, 0);
+(16786, 23123, 0, 0),
+(16786, 13444, 0, 0),
+(16786, 13446, 0, 0),
+(16786, 23078, 0, 0),
+(16786, 23082, 0, 0),
+(16786, 23081, 0, 0),
+(16786, 23084, 0, 0);
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
