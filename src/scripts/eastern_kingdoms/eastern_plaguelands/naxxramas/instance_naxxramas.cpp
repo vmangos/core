@@ -366,6 +366,19 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
         case NPC_ArchmageTarsis:
             pCreature->SetStandState(UNIT_STAND_STATE_DEAD);
             break;
+        case NPC_SewageSlime:
+            pCreature->SetRespawnRadius(30.0f);
+            break;
+        case NPC_BileSludge:
+        {
+            // hack to prevent the endless amounts of adds to spawn in case something bugs out
+            std::list<Creature*> clist;
+            GetCreatureListWithEntryInGrid(clist, pCreature, NPC_BileSludge, 50.0f);
+            if (clist.size() > 20)
+            {
+                pCreature->ForcedDespawn();
+            }
+        }
     }
     // 4hm 
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)

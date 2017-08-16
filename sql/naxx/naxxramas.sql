@@ -342,18 +342,23 @@ UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `m
 -- toxic tunnel creature lvl 60 and script
 UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
 -- bile sludge damage increase
-UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000 WHERE `entry`=16142;
+UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000, `minhealth`=35000, `maxhealth`=35000  WHERE `entry`=16142;
 -- Stitched giants were named stitched spewer in vanilla
 UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
 
-DELETE FROM `creature_ai_scripts` WHERE id in (1638502,1601703,1602902,1614202);
+-- sludge belcher HP
+UPDATE `creature_template` SET `minhealth`=248189, `maxhealth`=248189 WHERE `entry`=16029;
+DELETE FROM `creature_ai_scripts` WHERE id in (1638502,1601703,1602902,1614202, 1602903);
 INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) 
 VALUES
 (1638502, 16385, 7, 0, 100, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning totem despawn on evade'),
 (1601703, 16017, 11, 0, 100, 1, 0, 0, 0, 0, 11, 27793, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem disease cloud on spawn'),
-(1602902, 16029, 0, 0, 100, 1, 2000, 2000, 5000, 5000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge'),
-(1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc'); 
+(1602902, 16029, 0, 0, 100, 1, 5000, 5000, 10000, 10000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge'),
+(1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc'),
+(1602903, 16029, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge belcher disease cloud on spawn');
 
+-- bile retcher HP
+UPDATE `creature_template` SET `minhealth`=187197, `maxhealth`=187197 WHERE `entry`=16018;
 
 -- Patchwork Golem correct War stomp spell
 UPDATE `creature_ai_scripts` SET `action1_param1`=28725 WHERE `id`=1601701;
@@ -363,7 +368,7 @@ UPDATE `creature_ai_scripts` SET `event_param3`=8000, `event_param4`=15000, `act
 UPDATE `creature_template` SET `mindmg`=3875, `maxdmg`=4105 WHERE `entry`=16017;
 UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=4000, `event_param3`=7000, `event_param4`=10000 WHERE `id`=1602103;
 -- Bile Sludges cast clone on a timer rather than 15%
-UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`=6000, `event_param2`=6000, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1614201;
+UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`=10000, `event_param2`=10000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1614201;
 
 
 
@@ -913,6 +918,11 @@ UPDATE creature set MovementType=2, currentWaypoint=5 where id = 15931;
 
 -- make sewage slimes that grobbulus spawn move randomly
 UPDATE `creature_template` SET `MovementType`=1 WHERE `entry`=16375;
+DELETE FROM `creature_ai_scripts` where id = 1637502;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1637502, 16375, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'sewage slime cast disease cloud on spawn');
 
 UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16290;
 
@@ -2475,12 +2485,12 @@ VALUES
 (2530386,16022,533,0,0,2987.71,-3200.98,294.063,3.2242,3000,0,0,42290,0,0,0,0),
 (88725,16017,533,9760,0,3021.23,-3190.64,294.063,2.26996,3520,3,0,87532,0,0,1,0),
 (88724,16017,533,9760,0,3018.16,-3175.53,294.064,2.12136,3520,3,0,87532,0,0,1,0),
-(88723,16018,533,0,0,3028.91,-3235.28,294.15,1.58,3520,0,0,106795,0,0,2,0),
-(88722,16029,533,15962,0,3132.07,-3244.12,294.18,0.05,3520,0,0,81453,0,0,2,0),
-(88721,16017,533,15962,0,3135.62,-3179.65,294.15,3.26,3520,0,0,87532,0,0,2,0),
-(88720,16029,533,15962,0,3171.7,-3301.83,294.66,2.21,3520,0,0,81453,0,0,2,0),
-(88719,16018,533,15958,0,3081.44,-3084.35,294.15,4.99,3520,0,0,106795,0,0,2,0),
-(88718,16018,533,15958,0,3034.2,-3116.27,294.15,5.52,3520,0,0,106795,0,0,2,0),
+(88723,16018,533,0,0,3028.91,-3235.28,294.15,1.58,3520,0,0,187197,0,0,2,0),
+(88722,16029,533,15962,0,3132.07,-3244.12,294.18,0.05,3520,0,0,248189,0,0,2,0),
+(88721,16029,533,15962,0,3135.62,-3179.65,294.15,3.26,3520,0,0,248189,0,0,2,0),
+(88720,16029,533,15962,0,3171.7,-3301.83,294.66,2.21,3520,0,0,248189,0,0,2,0),
+(88719,16018,533,15958,0,3081.44,-3084.35,294.15,4.99,3520,0,0,187197,0,0,2,0),
+(88718,16018,533,15958,0,3034.2,-3116.27,294.15,5.52,3520,0,0,187197,0,0,2,0),
 (2530403,16022,533,0,0,3060.77,-3110.43,294.078,1.47355,3000,0,0,42290,0,0,0,0),
 (2530383,16021,533,0,0,2981.4,-3202.53,294.063,0.0551154,3000,0,0,45467,0,0,0,0),
 (88716,16022,533,836,0,3106.89,-3092.72,294.077,1.03923,3520,0,0,42290,0,0,0,0),
@@ -2832,10 +2842,10 @@ VALUES
 (88265,16017,533,9760,0,3081.76,-3298.5,294.53,5.47,3520,0,0,87532,0,0,0,0),
 (88277,16244,533,10627,0,2864.44,-3540.59,298.05,0.32,3520,0,0,93620,0,0,0,0),
 (88276,16244,533,10627,0,2866.86,-3545.76,297.95,0.49,3520,0,0,93620,0,0,0,0),
-(88272,16018,533,15958,0,3146.67,-3342.52,294.69,2.24,3520,0,0,106795,0,0,0,0),
-(88271,16018,533,15958,0,3097.22,-3292.59,294.69,5.36,3520,0,0,106795,0,0,0,0),
-(88270,16018,533,15958,0,3118.04,-3323.24,293.81,2.33,3520,0,0,106795,0,0,2,0),
-(88269,16018,533,15958,0,3087.84,-3354.07,299.47,0.81,3520,0,0,106795,0,0,2,0),
+(88272,16018,533,15958,0,3146.67,-3342.52,294.69,2.24,3520,0,0,187197,0,0,0,0),
+(88271,16018,533,15958,0,3097.22,-3292.59,294.69,5.36,3520,0,0,187197,0,0,0,0),
+(88270,16018,533,15958,0,3118.04,-3323.24,293.81,2.33,3520,0,0,187197,0,0,2,0),
+(88269,16018,533,15958,0,3087.84,-3354.07,299.47,0.81,3520,0,0,187197,0,0,2,0),
 (88278,16017,533,9760,0,3161.87,-3268.43,294.94,3.93,3520,0,0,87532,0,0,0,0),
 (88279,16017,533,9760,0,3172.09,-3276.61,295.02,3.81,3520,0,0,87532,0,0,0,0),
 (88280,16017,533,9760,0,3175.32,-3285.62,294.85,3.71,3520,0,0,87532,0,0,0,0),
@@ -4888,7 +4898,7 @@ update `creature_template` set `flags_extra` = 0 where `entry` = 16022; -- Surgi
 update `creature_template` set `flags_extra` = 0 where `entry` = 16024; -- Embalming Slime
 update `creature_template` set `flags_extra` = 0 where `entry` = 16025; -- Stitched Giant
 update `creature_template` set `flags_extra` = 2050 where `entry` = 16027; -- Living Poison
-update `creature_template` set `flags_extra` = 0 where `entry` = 16029; -- Sludge Belcher
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16029; -- Sludge Belcher
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16034; -- Plague Beast
 update `creature_template` set `flags_extra` = 0 where `entry` = 16037; -- Plagued Bat
 update `creature_template` set `flags_extra` = 0 where `entry` = 16056; -- Diseased Maggot
