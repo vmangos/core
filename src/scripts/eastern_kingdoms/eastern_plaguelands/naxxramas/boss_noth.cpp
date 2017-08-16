@@ -156,6 +156,13 @@ struct boss_nothAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_NOTH, FAIL);
+
+        std::list<Creature*> clist;
+        GetCreatureListWithEntryInGrid(clist, m_creature, { NPC_PLAGUED_GUARDIAN, NPC_PLAGUED_CONSTRUCT, NPC_PLAGUED_CHAMPION, NPC_PLAGUED_WARRIOR }, 150.0f);
+        for (Creature* pC : clist)
+        {
+            pC->DeleteLater();
+        }
     }
 
     void Aggro(Unit* pWho)
