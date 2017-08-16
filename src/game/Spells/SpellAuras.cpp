@@ -1790,7 +1790,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 
                 // Summons Poison Cloud creature
-                caster->CastSpell(target, 28240, true, nullptr, this);
+                target->CastSpell(target, 28240, true, nullptr, this);
                 return;
             }
             case 24324: // Ivina < Nostalrius > : Hakkar

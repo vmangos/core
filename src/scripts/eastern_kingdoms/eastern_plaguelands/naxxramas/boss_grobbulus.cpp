@@ -182,14 +182,6 @@ struct boss_grobbulusAI : public ScriptedAI
         }
     }
     
-    void JustSummoned(Creature* pCreature) override 
-    {
-        if (pCreature->GetEntry() == NPC_POISON_CLOUD) // poison cloud npc
-        {
-            pCreature->CastSpell(pCreature, SPELL_POISON_CLOUD_PASSIVE, true);
-        }
-    }
-
     void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -259,6 +251,8 @@ struct grob_poison_cloud : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
+        if (untilDespawn == 70000)
+            m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD_PASSIVE, true);
         if (untilDespawn < uiDiff)
         {
             m_creature->ForcedDespawn();
