@@ -337,6 +337,8 @@ UPDATE `creature_ai_scripts` SET `event_param2`=4 WHERE `id`=1602701;
 
 -- Embalming slime moves at 50% movementspeed
 UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entry`=16024;
+-- embalming slime faster embalming cloud
+UPDATE `creature_ai_scripts` SET `event_param3`=2000, `event_param4`=3000 WHERE `id`=1602401;
 -- Lightning Totem (summoned by Living Monstrosity) no movement
 UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10 WHERE `entry`=16385;
 -- toxic tunnel creature lvl 60 and script
