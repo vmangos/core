@@ -350,9 +350,10 @@ UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
 
 -- sludge belcher HP
 UPDATE `creature_template` SET `minhealth`=248189, `maxhealth`=248189 WHERE `entry`=16029;
-DELETE FROM `creature_ai_scripts` WHERE id in (1638502,1601703,1602902,1614202, 1602903);
+DELETE FROM `creature_ai_scripts` WHERE id in (1638501,1638502,1601703,1602902,1614202, 1602903);
 INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) 
 VALUES
+(1638501, 16385, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28298, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning Totem aura on spawn'),
 (1638502, 16385, 7, 0, 100, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning totem despawn on evade'),
 (1601703, 16017, 11, 0, 100, 1, 0, 0, 0, 0, 11, 27793, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem disease cloud on spawn'),
 (1602902, 16029, 0, 0, 100, 1, 5000, 5000, 10000, 10000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge'),
