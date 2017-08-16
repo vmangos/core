@@ -362,6 +362,8 @@ VALUES
 
 -- bile retcher HP
 UPDATE `creature_template` SET `minhealth`=187197, `maxhealth`=187197 WHERE `entry`=16018;
+-- Bile retcher also reset threat when casting bile retcher slam
+UPDATE `creature_ai_scripts` SET `action2_type`=14, `action2_param1`=-100 WHERE `id`=1601801;
 
 -- Patchwork Golem correct War stomp spell
 UPDATE `creature_ai_scripts` SET `action1_param1`=28725 WHERE `id`=1601701;
