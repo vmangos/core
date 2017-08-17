@@ -12,34 +12,6 @@ DELETE FROM `creature_addon` WHERE `guid` IN (31268, 31271);
 -- ERROR:Table `areatrigger_involvedrelation` has record (id: 2206) for not quest 5156, but quest not have flag QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT. Trigger or quest flags must be fixed, quest modified to require objective.
 UPDATE `quest_template` SET `SpecialFlags`=2 WHERE `entry`=5156;
 
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 1 (X: -10531.799805, Y: -1155.079956).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 2 (X: -10531.099609, Y: -1161.780029).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 3 (X: -10529.599609, Y: -1164.640015).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 4 (X: -10526.599609, Y: -1165.650024).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 5 (X: -10523.900391, Y: -1165.829956).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 6 (X: -10522.799805, Y: -1171.439941).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 7 (X: -10518.900391, Y: -1172.770020).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 8 (X: -10512.500000, Y: -1172.219971).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 9 (X: -10510.599609, Y: -1169.430054).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 10 (X: -10512.799805, Y: -1167.310059).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 11 (X: -10518.799805, Y: -1167.650024).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 12 (X: -10520.900391, Y: -1169.089966).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 13 (X: -10521.700195, Y: -1173.810059).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 14 (X: -10523.799805, Y: -1173.969971).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 15 (X: -10521.700195, Y: -1173.810059).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 16 (X: -10520.900391, Y: -1169.089966).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 17 (X: -10518.799805, Y: -1167.650024).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 18 (X: -10512.799805, Y: -1167.310059).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 19 (X: -10510.599609, Y: -1169.430054).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 20 (X: -10512.500000, Y: -1172.219971).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 21 (X: -10518.900391, Y: -1172.770020).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 22 (X: -10522.799805, Y: -1171.439941).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 23 (X: -10523.900391, Y: -1165.829956).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 24 (X: -10526.599609, Y: -1165.650024).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 25 (X: -10529.599609, Y: -1164.640015).
--- ERROR:Creature (guidlow 4203, entry 227) have invalid coordinates in his waypoint 26 (X: -10531.099609, Y: -1161.780029).
-UPDATE `creature_movement` SET `orientation`=0 WHERE `id`=4203 && `orientation`=100;
-
 -- Add missing quest text for "Speak with Anastasia".
 UPDATE `quest_template` SET `OfferRewardText`='Greetings, $N. You were wise to answer my call, and wiser still if you heed what I next say...' WHERE `entry`=1881;
 
