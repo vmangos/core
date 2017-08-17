@@ -184,6 +184,11 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_SI_WINTERSPRING = 23
 };
 
+enum ScourgeInvasionQuests
+{
+    QUEST_UNDER_THE_SHADOW = 9153,
+};
+
 enum ScourgeInvasionEngineerAI
 {
     ENGINEER_AI_ACTION_SET_PYLON,

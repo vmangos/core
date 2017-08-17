@@ -410,7 +410,7 @@ public:
             Player* player = it->getSource();
 
             // Update visibility only for players in zone
-            if (visible && player->GetZoneId() == me->GetZoneId())
+            if (visible/* && player->GetZoneId() == me->GetZoneId()*/)
             {
                 UpdateData data;
                 me->BuildCreateUpdateBlockForPlayer(&data, player);
@@ -1565,6 +1565,18 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
     return true;
 }
 
+/*
+Argent Quartermaster
+Notes: NPC will only show vendor if QUEST_UNDER_THE_SHADOW is done.
+Have no gossip for him.
+*/
+bool GossipHello_npc_argent_quartermaster(Player* player, Creature* creature)
+{
+    if (player->GetQuestRewardStatus(QUEST_UNDER_THE_SHADOW))
+        player->SEND_VENDORLIST(creature->GetGUID());
+    return true;
+}
+
 void AddSC_world_event_naxxramas()
 {
     Script* newscript;
@@ -1642,6 +1654,11 @@ void AddSC_world_event_naxxramas()
     newscript->Name = "npc_argent_emissary";
     newscript->pGossipHello = &GossipHello_npc_argent_emissary;
     newscript->pGossipSelect = &GossipSelect_npc_argent_emissary;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_argent_quartermaster";
+    newscript->pGossipHello = &GossipHello_npc_argent_quartermaster;
     newscript->RegisterSelf();
 
     // At start up, set time for both 

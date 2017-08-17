@@ -160,7 +160,7 @@ DELETE FROM `creature_equip_template` WHERE entry=14695;
 INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
 (14695, 18985, 12893, 5258);
 
--- Add loot to quartermaster
+-- Add loot to Quartermaster
 UPDATE `creature_template` SET `npcflag`=16388 WHERE  `entry`=16786;
 DELETE FROM `npc_vendor` WHERE entry=16786;
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
