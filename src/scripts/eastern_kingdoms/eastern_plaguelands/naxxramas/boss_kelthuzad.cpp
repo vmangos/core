@@ -827,7 +827,8 @@ struct mob_guardian_icecrownAI : public ScriptedAI
     }
     void JustReachedHome() override
     {
-        m_creature->ForcedDespawn(1);
+        m_creature->DeleteLater();
+        ///m_creature->ForcedDespawn(1);
     }
     
     void DispellShackle(Creature* pC)
