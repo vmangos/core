@@ -3047,8 +3047,11 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell
     else
         schoolMask = GetSpellSchoolMask(spell);
 
-    if (pVictim != this && pVictim->IsImmuneToDamage(schoolMask))
-        return SPELL_MISS_IMMUNE;
+    if (!spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
+    {
+        if (pVictim != this && pVictim->IsImmuneToDamage(schoolMask))
+            return SPELL_MISS_IMMUNE;
+    }
 
     // Try victim reflect spell
     if (CanReflect)
