@@ -2266,6 +2266,25 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             }
             break;
         }
+        case TARGET_AREAEFFECT_GO_AROUND_SOURCE:
+            // Despawn Ice Block (sapphiron)
+            if (m_spellInfo->Id == 30132) 
+            {
+                float x, y, z;
+                m_caster->GetPosition(x, y, z);
+                std::list<GameObject*> tempTargetGOList;
+                // search all GO's with entry, within range of caster
+                MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, 181247/*Ice BLock*/, x , y, z, radius);
+                MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
+                Cell::VisitGridObjects(m_caster, checker, radius);
+                
+                if (!tempTargetGOList.empty())
+                {
+                    for (std::list<GameObject*>::iterator iter = tempTargetGOList.begin(); iter != tempTargetGOList.end(); ++iter)
+                        AddGOTarget(*iter, effIndex);
+                }
+            }
+            break;
         case TARGET_AREAEFFECT_GO_AROUND_DEST:
         {
             // It may be possible to fill targets for some spell effects
