@@ -4133,6 +4133,12 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     }
 
     int32 duration = GetSpellDuration(m_spellInfo);
+    
+    // Sapphirons summoned iceblocks have a duration *just* long enough to dissapear before the ice bomb.
+    // Since they are despawned by another spell anyway, I make the gobj add slightly longer to avoid any lag
+    // causing the gobj to despawn before the bomb goes off
+    if (m_spellInfo->Id == 28535)
+        duration = 30000;
 
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
@@ -4555,6 +4561,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (unitTarget && unitTarget->IsPlayer())
                         unitTarget->CastSpell(unitTarget, 29190, true);
                     return;
+                }
+                case 30132:                                 // Despawn Ice Block
+                {
+                    if (unitTarget && unitTarget->IsPlayer())
+                    {
+                        unitTarget->RemoveAurasDueToSpell(31800); // Icebolt immunity spell
+                        unitTarget->RemoveAurasDueToSpell(28522); // Icebolt stun/damage spell
+                    }
                 }
             }
             break;

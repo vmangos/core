@@ -1261,11 +1261,21 @@ void Aura::TriggerSpell()
 //                    // Communique Timer, camp
 //                    case 28346: break;
 //                    
-                      case 28522: // Icebolt
-                          return; // avoid the warning below. Spell works as we want it due to sapphirons script
-                          break;
-                      // Silithyst
-//                    case 29519: break;
+                    case 28522: // Icebolt
+                    {
+                        if (target && target->isAlive() && !target->HasAura(31800))
+                        {
+                            target->CastSpell(target, 31800, true); // Icebolt which causes immunity to frost dmg
+                            trigger_spell_id = 28535; //summon ice block
+                            break;
+                        }
+                        else
+                        {
+                            return;
+                        }
+                    }
+                    // Silithyst
+//                  case 29519: break;
                     default:
                         break;
                 }

@@ -71,7 +71,8 @@ enum Events
     EVENT_LIFEDRAIN,
     EVENT_TAIL_SWEEP,
     EVENT_CLEAVE,
-    EVENT_FROST_BREATH
+    EVENT_FROST_BREATH_DUMMY,
+    EVENT_FROST_BREATH_CAST,
 };
 
 enum Phase
@@ -89,6 +90,7 @@ enum Phase
 
 static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
 uint32 SPAWN_ANIM_TIMER = 21500;
+static constexpr float AGGRO_RADIUS = 80.0f;
 struct boss_sapphironAI : public ScriptedAI
 {
     boss_sapphironAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -204,12 +206,11 @@ struct boss_sapphironAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho) override
     {
-        // Todo: how long is the range?
         if (m_pInstance 
             && phase == PHASE_SKELETON
             && pWho->GetTypeId() == TYPEID_PLAYER 
             && !((Player*)pWho)->isGameMaster() 
-            && m_creature->IsWithinDistInMap(pWho, 30.0f))
+            && m_creature->IsWithinDistInMap(pWho, AGGRO_RADIUS))
         {
             phase = PHASE_SUMMONING;
             spawnTimer = SPAWN_ANIM_TIMER;
@@ -226,18 +227,9 @@ struct boss_sapphironAI : public ScriptedAI
                 MakeVisible();
             }
         }
-        else if (phase == PHASE_GROUND && m_creature->IsWithinDistInMap(pWho, 30.0f))
+        else if (phase == PHASE_GROUND && m_creature->IsWithinDistInMap(pWho, AGGRO_RADIUS))
         {
-            if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
-            {
-                if (!m_creature->getVictim())
-                    AttackStart(pWho);
-                else if (m_creature->GetMap()->IsDungeon())
-                {
-                    pWho->SetInCombatWith(m_creature);
-                    m_creature->AddThreat(pWho);
-                }
-            }
+            ScriptedAI::MoveInLineOfSight(pWho);
         }
     }
 
@@ -264,33 +256,6 @@ struct boss_sapphironAI : public ScriptedAI
             m_pInstance->SetData(TYPE_SAPPHIRON, DONE);
     }
     
-    void SpellHitTarget(Unit* target, const SpellEntry* spell) override
-    {
-        switch (spell->Id)
-        {
-        case SPELL_ICEBOLT:
-        {
-            bool found = false;
-            auto it = std::find(iceboltTargets.begin(), iceboltTargets.end(), target->GetObjectGuid());
-            if (it == iceboltTargets.end())
-            {
-                iceboltTargets.push_back(target->GetObjectGuid());
-            }
-
-            target->CastSpell(target, SPELL_STUN_IMMUNE, true);
-
-            // Uncertain if the iceblock should always be angled towards the center or not
-            float ang = target->GetAngle(m_creature);
-            if (GameObject* pGO = m_creature->SummonGameObject(GO_ICEBLOCK, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), ang))
-            {
-                target->TeleportPositionRelocation(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
-                target->NearTeleportTo(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation());
-            }
-            break;
-        }
-        }
-    }
-
     void DoIceBolt()
     {
         ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
@@ -335,8 +300,14 @@ struct boss_sapphironAI : public ScriptedAI
     {
         if (on)
         {
-            m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
+            m_creature->InterruptNonMeleeSpells(false);
+            m_creature->AttackStop();
+            m_creature->RemoveAllAttackers();
+            SetCombatMovement(false);
+            m_creature->SetReactState(ReactStates::REACT_PASSIVE);
+            m_creature->UpdateCombatState(false);
 
+            m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
             m_creature->SetUnitMovementFlags(MOVEFLAG_HOVER);
             m_creature->SendHeartBeat(true);
 
@@ -345,30 +316,28 @@ struct boss_sapphironAI : public ScriptedAI
             data << m_creature->GetPackGUID();
             data << uint32(0);
             m_creature->SendMovementMessageToSet(std::move(data), true);
-            m_creature->UpdateCombatState(false);
-            m_creature->SetReactState(ReactStates::REACT_PASSIVE);
             
 
 
-            m_creature->InterruptNonMeleeSpells(false);
-            m_creature->AttackStop();
-            m_creature->RemoveAllAttackers();
             m_creature->m_TargetNotReachableTimer = 0;
             if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
                 m_creature->ClearTemporaryFaction();
         }
         else
         {
+            SetCombatMovement(true);
             if (m_creature->HasUnitMovementFlag(MOVEFLAG_HOVER))
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
-                m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
             }
+
+            m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
             WorldPacket data;
             data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
             data << m_creature->GetPackGUID();
             data << uint32(0);
             m_creature->SendMovementMessageToSet(std::move(data), true);
+
             m_creature->UpdateCombatState(true);
             m_creature->SetReactState(ReactStates::REACT_AGGRESSIVE);
         }
@@ -397,6 +366,8 @@ struct boss_sapphironAI : public ScriptedAI
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
+            //todo: need the evade out of home mechanic back
+
         }
         else 
         {
@@ -428,18 +399,16 @@ struct boss_sapphironAI : public ScriptedAI
                 break;
             case EVENT_LIFTOFF: // liftoff is triggered from MovementInform()
             {
-                setHover(true);
                 phase = PHASE_AIR_BOLTS;
 
-                // can be 4 or 5 IBs. First one is 5 sec after this event, last one is 22 sec after this event
-                int num_add_ib = urand(4, 5);
-                int first_ib = 5000;
+                int num_add_ib = 5;//urand(4, 5);
+                int first_ib = 7000;
                 int incr = 17000 / (num_add_ib - 1);
                 for (int i = 0; i < num_add_ib; i++)
                     events.ScheduleEvent(EVENT_ICEBOLT, first_ib + incr*i);
 
-                events.ScheduleEvent(EVENT_FROST_BREATH, Seconds(23)); // 1 sec after he can potentially cast final icebolt
-                events.ScheduleEvent(EVENT_LAND, Seconds(30));         // 1 sec after breath finishes
+                events.ScheduleEvent(EVENT_FROST_BREATH_DUMMY, Seconds(22) + Milliseconds(500)); // 0.5 sec after he can potentially cast final icebolt
+                events.ScheduleEvent(EVENT_LAND, Seconds(30));         // 1.5 sec after breath finishes
                 events.ScheduleEvent(EVENT_LANDED, Seconds(34));       // 5 sec after breath finishes
                 if (Creature* pWG = m_creature->SummonCreature(NPC_WING_BUFFET, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0,
                     TEMPSUMMON_MANUAL_DESPAWN))
@@ -447,10 +416,14 @@ struct boss_sapphironAI : public ScriptedAI
                     pWG->CastSpell(pWG, SPELL_PERIODIC_BUFFET, true);
                     wingBuffetCreature = pWG->GetObjectGuid();
                 }
+                
+                setHover(true);
+
                 break;
             }
             case EVENT_LAND:
             {
+                iceboltTargets.clear();
                 // in case something is delayed, and we're not finished 
                 // casting the frost breath
                 if (m_creature->IsNonMeleeSpellCasted())
@@ -458,7 +431,6 @@ struct boss_sapphironAI : public ScriptedAI
                     events.Repeat(100);
                     return;
                 }
-                DeleteAndDispellIceBlocks();
                 setHover(false);
                 phase = PHASE_LANDING;
                 break;
@@ -482,17 +454,20 @@ struct boss_sapphironAI : public ScriptedAI
                 DoIceBolt();
                 break;
             }
-            case EVENT_FROST_BREATH:
+            case EVENT_FROST_BREATH_DUMMY:
             {
-                // Looks like the wing buffet dissapears as he starts casting wing buffet
+                // Looks like the wing buffet dissapears as he starts casting frost breath
                 UnSummonWingBuffet();
-
-                // Due to the nature of the timing of the air phase it's hard to re-try casting
-                // this spell if it fails without screwing everything up
-                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) == CAST_OK)
-                {
-                    DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH_DUMMY, CAST_TRIGGERED);
-                }
+                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH_DUMMY, CAST_TRIGGERED) == CAST_OK)
+                    events.ScheduleEvent(EVENT_FROST_BREATH_CAST, 500);
+                else
+                    events.Repeat(100);
+                break;
+            }
+            case EVENT_FROST_BREATH_CAST:
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) != CAST_OK)
+                    events.Repeat(100);
                 break;
             }
             case EVENT_BLIZZARD:
@@ -585,9 +560,6 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
     void JustRespawned() override
     {
-        if (m_pInstance)
-        {
-        }
     }
 
     void AttackStart(Unit*)
@@ -607,7 +579,29 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
     void MovementInform(uint32 uiType, uint32 pointId) override
     {
-     
+        events.Reset();
+        PickNewTarget();
+        events.Repeat(Seconds(6));
+    }
+
+    void PickNewTarget()
+    {
+        m_creature->GetMotionMaster()->Clear();
+        Creature* pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
+        if (!pSapp)
+        {
+            m_creature->GetMotionMaster()->MoveRandom();
+            return;
+        }
+
+        Unit* newTarget = pSapp->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, 0.0f, true);
+        if (!newTarget)
+        {
+            events.Repeat(100);
+            m_creature->GetMotionMaster()->MoveRandom();
+            return;
+        }
+        m_creature->GetMotionMaster()->MoveFollow(newTarget, 1.0f, 0.0f);
     }
 
     void UpdateAI(const uint32 uiDiff) override
@@ -617,31 +611,16 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         
         if (!m_pInstance)
             return;
-        
-        if(!m_creature->isInCombat())
-            m_creature->SetInCombatWithZone();
 
         events.Update(uiDiff);
         if (events.ExecuteEvent())
         {
-            Creature* pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
-            if (!pSapp)
-            {
-                m_creature->GetMotionMaster()->MoveRandom();
-            }
-
-            Unit* newTarget = pSapp->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, 0.0f, true);
-            if (!newTarget)
-            {
-                m_creature->GetMotionMaster()->MoveRandom();
-                return;
-            }
-            m_creature->GetMotionMaster()->MoveFollow(newTarget, 0.1f, 0.0f);
-
-            events.Repeat(Seconds(2));
+            PickNewTarget();
+            events.Repeat(Seconds(6));
         }
     }
 };
+
 CreatureAI* GetAI_boss_sapphiron(Creature* pCreature)
 {
     return new boss_sapphironAI(pCreature);
