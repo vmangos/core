@@ -1099,7 +1099,7 @@ UPDATE `creature_template` SET faction_A = 16, faction_H = 16 WHERE entry = 1648
  Update `creature_template` SET spell1 = 0, spell2 = 0, faction_A = 16, faction_H = 16, minhealth = 4175, maxhealth = 4175, ScriptName = "", `baseattacktime`=500, `mindmg`=194, `maxdmg`=250 where entry = 17055;
  
  -- maexxna hitbox update
-UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='10' WHERE `modelid`='15928';
+UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='13' WHERE `modelid`='15928';
 
 
 
