@@ -73,6 +73,7 @@ enum Events
     EVENT_CLEAVE,
     EVENT_FROST_BREATH_DUMMY,
     EVENT_FROST_BREATH_CAST,
+    EVENT_SET_HOVER,
 };
 
 enum Phase
@@ -317,7 +318,7 @@ struct boss_sapphironAI : public ScriptedAI
             data << uint32(0);
             m_creature->SendMovementMessageToSet(std::move(data), true);
             
-
+            events.ScheduleEvent(EVENT_SET_HOVER, Seconds(2));
 
             m_creature->m_TargetNotReachableTimer = 0;
             if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
@@ -325,6 +326,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
         else
         {
+            m_creature->RemoveAurasDueToSpell(17131);
             SetCombatMovement(true);
             if (m_creature->HasUnitMovementFlag(MOVEFLAG_HOVER))
             {
@@ -501,6 +503,9 @@ struct boss_sapphironAI : public ScriptedAI
                     events.Repeat(Seconds(urand(5, 10)));
                 else
                     events.Repeat(100);
+                break;
+            case EVENT_SET_HOVER:
+                m_creature->CastSpell(m_creature, 17131, true);
                 break;
             }
         }
