@@ -377,7 +377,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
     {
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+        if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
 
@@ -481,7 +481,7 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
     {
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+        if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
         specialSayCooldown -= std::min(uiDiff, specialSayCooldown);
@@ -563,7 +563,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
     {
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+        if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
 
@@ -657,7 +657,7 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         //Return since we have no target
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+        if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
         boss_four_horsemen_shared::UpdateAI(uiDiff);
 
