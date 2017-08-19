@@ -351,6 +351,9 @@ template <class T>
 void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint32 triggerFrom, bool instantly)
 {
     SpawnedPoolData& spawns = mapState.GetSpawnedPoolData();
+    // GameObjects are processed differently than Creatures
+    // we have a triggerFrom go but it's alreay despawned
+    bool isTriggerSpawned = spawns.IsSpawnedObject<T>(triggerFrom);
 
     uint32 lastDespawned = 0;
     int count = limit - spawns.GetSpawnedObjects(poolId);
@@ -360,8 +363,8 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
     // spawned by 1
     if (triggerFrom)
     {
-        if (spawns.IsSpawnedObject<T>(triggerFrom))
-        ++count;
+        if (isTriggerSpawned)
+            ++count;
     }
     // Instance loading : no object spawned, check if any timers have been loaded
     // from the database and spawn the object at the right location
@@ -402,7 +405,7 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
         if (obj->guid == lastDespawned)
             continue;
 
-        if (obj->guid == triggerFrom)
+        if (obj->guid == triggerFrom && isTriggerSpawned)
         {
             //MANGOS_ASSERT(spawns.IsSpawnedObject<T>(obj->guid));
             //MANGOS_ASSERT(spawns.GetSpawnedObjects(poolId) > 0);
@@ -414,7 +417,7 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
         spawns.AddSpawn<T>(obj->guid, poolId);
         Spawn1Object(mapState, obj, instantly);
 
-        if (triggerFrom)
+        if (triggerFrom && isTriggerSpawned)
         {
             // One spawn one despawn no count increase
             DespawnObject(mapState, triggerFrom);
