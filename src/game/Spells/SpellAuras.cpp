@@ -6857,6 +6857,8 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 18192: // Bouffe +10 Agility
         case 18191: // Bouffe +10 Endu
         case 25661: // Bouffe +25 Endu
+        case 24427: // Diamond Flask
+        case 17528: // Mighty Rage Potion
             return false;
 
         case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.
