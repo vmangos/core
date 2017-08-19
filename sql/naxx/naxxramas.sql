@@ -792,6 +792,7 @@ VALUES
 /*
 * Gothik
 */
+UPDATE `creature_template` SET `mindmg`=2811, `maxdmg`=3721 WHERE `entry`=16060;
 
 -- Invisibility of Gothik triggers
 UPDATE creature_template SET modelid_1=11686, modelid_2=0, scriptname = "spell_anchor" WHERE entry = 16137;
@@ -824,7 +825,7 @@ VALUES
 (1612401, 16124, 0, 0, 100, 1, 0,    0,    15500, 15500, 11, 30285, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Trainee Eagle Claw'),
 (1612402, 16124, 0, 0, 100, 1, 5000, 6000, 8000,  10000, 11, 20276, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Trainee Knockdown'),
 (1612501, 16125, 0, 0, 100, 1, 5000, 8000, 12000, 15000, 11, 27577, 4, 0, 14, -100, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight intercept random hostile and reset threat'),
-(1612502, 16125, 0, 0, 100, 1, 1000, 2000, 15500, 15500, 11, 27825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight Shadow Mark'),
+(1612502, 16125, 0, 0, 100, 1, 1000, 2000, 10500, 15500, 11, 27825, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Death Knight Shadow Mark'),
 (1612601, 16126, 11,0, 100, 0,   0,    0,     0,     0,  11, 27987, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider Unholy Aura on spawn'),
 (1612602, 16126, 0, 0, 100, 1, 1000, 2000,  5000,  6000, 11, 27831, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider cast Shadow Bolt Volley'),
 (1612701, 16127, 0, 0, 100, 1, 1000, 1500,  3000,  4000, 11, 27989, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Trainee Arcane Explosion'),
