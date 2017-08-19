@@ -3549,6 +3549,14 @@ bool Unit::IsNonMeleeSpellCasted(bool withDelayed, bool skipChanneled, bool skip
     return (false);
 }
 
+bool Unit::IsNextSwingSpellCasted() const
+{
+    if (m_currentSpells[CURRENT_MELEE_SPELL] && m_currentSpells[CURRENT_MELEE_SPELL]->IsNextMeleeSwingSpell())
+        return (true);
+
+    return (false);
+}
+
 bool Unit::IsNoMovementSpellCasted() const
 {
     if (m_currentSpells[CURRENT_GENERIC_SPELL] &&
