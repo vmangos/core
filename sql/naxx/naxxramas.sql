@@ -393,6 +393,11 @@ UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`
 */ 
 
 UPDATE `creature_template` SET `name`='Skeletal Steed' WHERE `entry`=16067;
+DELETE FROM `creature_ai_scripts` where id = 1606702;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1606702, 16067, 0, 0, 100, 1, 0, 0, 10000, 10000, 11, 27577, 4, 0, 14, -100, 0, 0, 0, 0, 0, 0, 'Skeletal Steed Intercept random  and reset threat');
 
 -- Death Knight fear targets hostile, not self. Also not on pull, but a while later. -- https://youtu.be/VrykhhdPfc4?t=4m37s
 UPDATE `creature_ai_scripts` SET `event_param1`=10000, `event_param2`=12000, `action1_param2`=1 WHERE `id`=1614601;
