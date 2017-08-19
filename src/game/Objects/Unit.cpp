@@ -3023,6 +3023,10 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell
     if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex))
         return SPELL_MISS_NONE;
 
+    // Farsight spells can't miss
+    if (spell->AttributesEx & SPELL_ATTR_EX_FARSIGHT)
+        return SPELL_MISS_NONE;
+
     // Check for immune (use charges)
     SpellSchoolMask schoolMask;
     if (spellPtr)
