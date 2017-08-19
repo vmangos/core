@@ -134,6 +134,12 @@ struct boss_four_horsemen_shared : public ScriptedAI
             SetCombatMovement(false);
     }
 
+    void AttackStart(Unit* pWho)
+    {
+        if (!m_bIsSpirit)
+            ScriptedAI::AttackStart(pWho);
+    }
+
     void Reset() override
     {
         m_events.Reset();
@@ -324,6 +330,13 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
     void Reset()
     {
         boss_four_horsemen_shared::Reset();
+        if (m_bIsSpirit)
+        {
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_BLAUMEUX))
+            {
+                m_uiMarkTimer = static_cast<boss_lady_blaumeuxAI*>(pC->AI())->m_uiMarkTimer;
+            }
+        }
     }
 
     void Aggro(Unit *who)
@@ -414,6 +427,13 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
     {
         boss_four_horsemen_shared::Reset();
         if (m_bIsSpirit)
+        {
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_MOGRAINE))
+            {
+                m_uiMarkTimer = static_cast<boss_highlord_mograineAI*>(pC->AI())->m_uiMarkTimer;
+            }
+        }
+        if (m_bIsSpirit)
             return;
         specialSayCooldown = 12000;
     }
@@ -495,6 +515,13 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
     void Reset()
     {
         boss_four_horsemen_shared::Reset();
+        if (m_bIsSpirit)
+        {
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_THANE))
+            {
+                m_uiMarkTimer = static_cast<boss_thane_korthazzAI*>(pC->AI())->m_uiMarkTimer;
+            }
+        }
     }
 
     void Aggro(Unit *who)
@@ -584,6 +611,13 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
     void Reset()
     {
         boss_four_horsemen_shared::Reset();
+        if (m_bIsSpirit)
+        {
+            if (Creature* pC = m_pInstance->GetSingleCreatureFromStorage(NPC_ZELIEK))
+            {
+                m_uiMarkTimer = static_cast<boss_sir_zeliekAI*>(pC->AI())->m_uiMarkTimer;
+            }
+        }
     }
 
     void Aggro(Unit *who)
