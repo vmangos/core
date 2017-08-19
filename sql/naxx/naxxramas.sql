@@ -104,7 +104,7 @@ UPDATE `creature_template` SET `MovementType`=2, `faction_A`=31, `faction_H`=31 
 
 
 -- Acid Volley and zombie chow infected wounds stack with self
-DELETE FROM spell_mod where Id in (29325, 29306, 28332, 28333, 28334, 28335);
+DELETE FROM spell_mod where Id in (29325, 29306, 28832, 28833, 28834, 28835);
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`, `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
 VALUES 
 ('29325', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Acid Volley stack with self'),
@@ -346,7 +346,7 @@ UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entr
 -- embalming slime faster embalming cloud
 UPDATE `creature_ai_scripts` SET `event_param3`=2000, `event_param4`=3000 WHERE `id`=1602401;
 -- Lightning Totem (summoned by Living Monstrosity) no movement
-UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10, `MovementType`=0, WHERE `entry`=16385;
+UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10, `MovementType`=0 WHERE `entry`=16385;
 -- toxic tunnel creature lvl 60 and script
 UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
 -- bile sludge damage increase
@@ -1195,7 +1195,7 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='deathknight_understudy
 DELETE FROM `creature_ai_scripts` where id = 1680301;
 DELETE FROM `creature_ai_scripts` where id = 1680302;
 
-UPDATE `creature_template` SET `minhealth`=1998600, `maxhealth`=1998600, `mindmg`=17299, `maxdmg`=22933, `speed_run`='1.5', WHERE `entry`=16061;
+UPDATE `creature_template` SET `minhealth`=1998600, `maxhealth`=1998600, `mindmg`=17299, `maxdmg`=22933, `speed_run`='1.5' WHERE `entry`=16061;
 
 
 
@@ -1238,7 +1238,7 @@ INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `Durati
 VALUES 
 ('28531', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Aura not unnaffected by invulnerability'),
 ('28529', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '536870912', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Aura trigger unaffected by invulnerability'),
-('29318', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Breath dont ignore los ffs'),
+('29318', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Breath dont ignore los ffs');
 
 -- ice blocks used on sapphiron should be generic gobjs
 update gameobject_template set type=5, data2=0 where entry = 181247;
@@ -4898,84 +4898,85 @@ update `creature_template` set `flags_extra` = 513 where `entry` = 16063; -- Sir
 update `creature_template` set `flags_extra` = 513 where `entry` = 16064; -- Thane Korth'azz
 update `creature_template` set `flags_extra` = 513 where `entry` = 16065; -- Lady Blaumeux
 update `creature_template` set `flags_extra` = 768 where `entry` = 16028; -- Patchwerk
-update `creature_template` set `flags_extra` = 0 where `entry` = 15974; -- Dread Creeper
-update `creature_template` set `flags_extra` = 0 where `entry` = 15975; -- Carrion Spinner
-update `creature_template` set `flags_extra` = 0 where `entry` = 15976; -- Venom Stalker
-update `creature_template` set `flags_extra` = 0 where `entry` = 15977; -- Poisonous Skitterer
-update `creature_template` set `flags_extra` = 0 where `entry` = 15978; -- Crypt Reaver
-update `creature_template` set `flags_extra` = 0 where `entry` = 15980; -- Naxxramas Cultist
-update `creature_template` set `flags_extra` = 0 where `entry` = 15981; -- Naxxramas Acolyte
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16017; -- Patchwork Golem
-update `creature_template` set `flags_extra` = 0 where `entry` = 16018; -- Bile Retcher
-update `creature_template` set `flags_extra` = 0 where `entry` = 16020; -- Mad Scientist
-update `creature_template` set `flags_extra` = 0 where `entry` = 16021; -- Living Monstrosity
-update `creature_template` set `flags_extra` = 0 where `entry` = 16022; -- Surgical Assistant
-update `creature_template` set `flags_extra` = 0 where `entry` = 16024; -- Embalming Slime
-update `creature_template` set `flags_extra` = 0 where `entry` = 16025; -- Stitched Giant
 update `creature_template` set `flags_extra` = 2050 where `entry` = 16027; -- Living Poison
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16029; -- Sludge Belcher
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16034; -- Plague Beast
-update `creature_template` set `flags_extra` = 0 where `entry` = 16037; -- Plagued Bat
-update `creature_template` set `flags_extra` = 0 where `entry` = 16056; -- Diseased Maggot
-update `creature_template` set `flags_extra` = 0 where `entry` = 16057; -- Rotting Maggot
-update `creature_template` set `flags_extra` = 0 where `entry` = 16067; -- Deathcharger Steed
-update `creature_template` set `flags_extra` = 0 where `entry` = 16124; -- Unrelenting Trainee
-update `creature_template` set `flags_extra` = 0 where `entry` = 16125; -- Unrelenting Death Knight
-update `creature_template` set `flags_extra` = 0 where `entry` = 16126; -- Unrelenting Rider
-update `creature_template` set `flags_extra` = 0 where `entry` = 16127; -- Spectral Trainee
-update `creature_template` set `flags_extra` = 0 where `entry` = 16142; -- Bile Sludge
-update `creature_template` set `flags_extra` = 0 where `entry` = 16145; -- Death Knight Captain
-update `creature_template` set `flags_extra` = 0 where `entry` = 16146; -- Death Knight
-update `creature_template` set `flags_extra` = 0 where `entry` = 16148; -- Spectral Death Knight
-update `creature_template` set `flags_extra` = 0 where `entry` = 16149; -- Spectral Horse
-update `creature_template` set `flags_extra` = 0 where `entry` = 16150; -- Spectral Rider
-update `creature_template` set `flags_extra` = 0 where `entry` = 16154; -- Risen Squire
-update `creature_template` set `flags_extra` = 0 where `entry` = 16156; -- Dark Touched Warrior
-update `creature_template` set `flags_extra` = 0 where `entry` = 16157; -- Doom Touched Warrior
-update `creature_template` set `flags_extra` = 0 where `entry` = 16158; -- Death Touched Warrior
-update `creature_template` set `flags_extra` = 0 where `entry` = 16163; -- Death Knight Cavalier
-update `creature_template` set `flags_extra` = 0 where `entry` = 16164; -- Shade of Naxxramas
-update `creature_template` set `flags_extra` = 0 where `entry` = 16165; -- Necro Knight
-update `creature_template` set `flags_extra` = 0 where `entry` = 16167; -- Bony Construct
-update `creature_template` set `flags_extra` = 0 where `entry` = 16168; -- Stoneskin Gargoyle
-update `creature_template` set `flags_extra` = 0 where `entry` = 16236; -- Eye Stalk
-update `creature_template` set `flags_extra` = 0 where `entry` = 16243; -- Plague Slime
-update `creature_template` set `flags_extra` = 0 where `entry` = 16244; -- Infectious Ghoul
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16290; -- Fallout Slime
-update `creature_template` set `flags_extra` = 0 where `entry` = 16297; -- Mutated Grub
-update `creature_template` set `flags_extra` = 0 where `entry` = 16360; -- Zombie Chow
-update `creature_template` set `flags_extra` = 0 where `entry` = 16368; -- Necropolis Acolyte
-update `creature_template` set `flags_extra` = 0 where `entry` = 16375; -- Sewage Slime
-update `creature_template` set `flags_extra` = 0 where `entry` = 16427; -- Soldier of the Frozen Wastes
-update `creature_template` set `flags_extra` = 0 where `entry` = 16428; -- Unstoppable Abomination
-update `creature_template` set `flags_extra` = 0 where `entry` = 16429; -- Soul Weaver
-update `creature_template` set `flags_extra` = 0 where `entry` = 16441; -- Guardian of Icecrown
-update `creature_template` set `flags_extra` = 0 where `entry` = 16446; -- Plagued Gargoyle
-update `creature_template` set `flags_extra` = 0 where `entry` = 16447; -- Plagued Ghoul
-update `creature_template` set `flags_extra` = 0 where `entry` = 16449; -- Spirit of Naxxramas
-update `creature_template` set `flags_extra` = 0 where `entry` = 16451; -- Deathknight Vindicator
-update `creature_template` set `flags_extra` = 0 where `entry` = 16452; -- Necro Knight Guardian
-update `creature_template` set `flags_extra` = 0 where `entry` = 16453; -- Necro Stalker
-update `creature_template` set `flags_extra` = 0 where `entry` = 16505; -- Naxxramas Follower
-update `creature_template` set `flags_extra` = 0 where `entry` = 16506; -- Naxxramas Worshipper
-update `creature_template` set `flags_extra` = 0 where `entry` = 16573; -- Crypt Guard
-update `creature_template` set `flags_extra` = 0 where `entry` = 16698; -- Corpse Scarab
-update `creature_template` set `flags_extra` = 0 where `entry` = 16803; -- Death Knight Understudy
-update `creature_template` set `flags_extra` = 0 where `entry` = 16861; -- Death Lord
-update `creature_template` set `flags_extra` = 0 where `entry` = 16981; -- Plagued Guardian
-update `creature_template` set `flags_extra` = 0 where `entry` = 16982; -- Plagued Construct
-update `creature_template` set `flags_extra` = 0 where `entry` = 16983; -- Plagued Champion
-update `creature_template` set `flags_extra` = 0 where `entry` = 16984; -- Plagued Warrior
-update `creature_template` set `flags_extra` = 0 where `entry` = 17055; -- Maexxna Spiderling
-update `creature_template` set `flags_extra` = 0 where `entry` = 16194; -- Unholy Axe
-update `creature_template` set `flags_extra` = 0 where `entry` = 16215; -- Unholy Staff
-update `creature_template` set `flags_extra` = 0 where `entry` = 16216; -- Unholy Swords
-update `creature_template` set `flags_extra` = 0 where `entry` = 16420; -- Portal of Shadows
-update `creature_template` set `flags_extra` = 0 where `entry` = 16446; -- Plagued Gargoyle
-update `creature_template` set `flags_extra` = 0 where `entry` = 16448; -- Plagued Deathhound
-update `creature_template` set `flags_extra` = 0 where `entry` = 16390; -- Deathchill Servant
 
-
+update creature_template set flags_extra = 0 where entry in (
+15974, -- Dread Creeper
+15975, -- Carrion Spinner
+15976, -- Venom Stalker
+15977, -- Poisonous Skitterer
+15978, -- Crypt Reaver
+15980, -- Naxxramas Cultist
+15981, -- Naxxramas Acolyte
+16018, -- Bile Retcher
+16020, -- Mad Scientist
+16021, -- Living Monstrosity
+16022, -- Surgical Assistant
+16024, -- Embalming Slime
+16025, -- Stitched Giant
+16037, -- Plagued Bat
+16056, -- Diseased Maggot
+16057, -- Rotting Maggot
+16067, -- Deathcharger Steed
+16124, -- Unrelenting Trainee
+16125, -- Unrelenting Death Knight
+16126, -- Unrelenting Rider
+16127, -- Spectral Trainee
+16142, -- Bile Sludge
+16145, -- Death Knight Captain
+16146, -- Death Knight
+16148, -- Spectral Death Knight
+16149, -- Spectral Horse
+16150, -- Spectral Rider
+16154, -- Risen Squire
+16156, -- Dark Touched Warrior
+16157, -- Doom Touched Warrior
+16158, -- Death Touched Warrior
+16163, -- Death Knight Cavalier
+16164, -- Shade of Naxxramas
+16165, -- Necro Knight
+16167, -- Bony Construct
+16168, -- Stoneskin Gargoyle
+16236, -- Eye Stalk
+16243, -- Plague Slime
+16244, -- Infectious Ghoul
+16297, -- Mutated Grub
+16360, -- Zombie Chow
+16368, -- Necropolis Acolyte
+16375, -- Sewage Slime
+16427, -- Soldier of the Frozen Wastes
+16428, -- Unstoppable Abomination
+16429, -- Soul Weaver
+16441, -- Guardian of Icecrown
+16446, -- Plagued Gargoyle
+16447, -- Plagued Ghoul
+16449, -- Spirit of Naxxramas
+16451, -- Deathknight Vindicator
+16452, -- Necro Knight Guardian
+16453, -- Necro Stalker
+16505, -- Naxxramas Follower
+16506, -- Naxxramas Worshipper
+16573, -- Crypt Guard
+16698, -- Corpse Scarab
+16803, -- Death Knight Understudy
+16861, -- Death Lord
+16981, -- Plagued Guardian
+16982, -- Plagued Construct
+16983, -- Plagued Champion
+16984, -- Plagued Warrior
+17055, -- Maexxna Spiderling
+16194, -- Unholy Axe
+16215, -- Unholy Staff
+16216, -- Unholy Swords
+16420, -- Portal of Shadows
+16446, -- Plagued Gargoyle
+16448, -- Plagued Deathhound
+16390 -- Deathchill Servant
+);
 
 
 
