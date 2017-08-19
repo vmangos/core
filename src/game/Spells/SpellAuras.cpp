@@ -6667,6 +6667,7 @@ void SpellAuraHolder::CalculateForDebuffLimit()
                 // Hakkar's Blood Siphon
                 case 24323:
                 case 24322:
+                case 28732: // Faerlina Widow's Embrace
                     m_debuffLimitScore = 4;
                     return;
             }
