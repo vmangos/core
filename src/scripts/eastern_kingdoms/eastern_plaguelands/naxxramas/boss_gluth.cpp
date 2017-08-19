@@ -94,6 +94,11 @@ struct boss_gluthAI : public ScriptedAI
     {
         m_events.Reset();
 
+        DespawnAllZombiess();
+    }
+
+    void DespawnAllZombiess()
+    {
         std::list<Creature*> zombies;
         GetCreatureListWithEntryInGrid(zombies, m_creature, NPC_ZOMBIE_CHOW, 200.0f);
         for (Creature* c : zombies)
@@ -104,6 +109,7 @@ struct boss_gluthAI : public ScriptedAI
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_GLUTH, DONE);
+        DespawnAllZombiess();
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -288,10 +294,9 @@ struct boss_gluthAI : public ScriptedAI
         float z = aZombieSummonLoc[idx][2];// +frand(-7.0f, 7.0f);
 
         //todo: don't know if we should summon 1, 2 or 3 zombies each time.
-        if (Creature* pZombie = m_creature->SummonCreature(NPC_ZOMBIE_CHOW, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 80000))
+        if (Creature* pZombie = m_creature->SummonCreature(NPC_ZOMBIE_CHOW, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
         {
             pZombie->SetInCombatWithZone();
-            //m_zombies.push_back(pZombie->GetObjectGuid());
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 pZombie->AI()->AttackStart(pTarget);
         }
