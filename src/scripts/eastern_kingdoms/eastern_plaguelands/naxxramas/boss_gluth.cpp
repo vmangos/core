@@ -51,7 +51,8 @@ enum
     //SPELL_ZOMBIE_CHOW_SEARCH = 28235, // triggers 28236 every 3 sec, manually implemented instead
     //SPELL_CALL_ALL_ZOMBIE    = 29681, // triggers 29682 every 3 sec, manually implemented instead
 
-    NPC_ZOMBIE_CHOW         = 16360
+    NPC_ZOMBIE_CHOW         = 16360,
+    SPELL_INFECTED_WOUND    = 29307
 };
 
 
@@ -64,6 +65,7 @@ enum eGLuthEvents
     EVENT_BERSERK,
     EVENT_TERRIFYING_ROAR,
     EVENT_ZOMBIE_SEARCH,
+    EVENT_EVADE_CHECK
 };
 
 static constexpr uint32 MORTAL_WOUND_CD  = 10000;   // verified by: https://www.youtube.com/watch?v=RAPiZgo-pNA
@@ -86,7 +88,6 @@ struct boss_gluthAI : public ScriptedAI
     instance_naxxramas* m_pInstance;
     EventMap m_events;
 
-    std::vector<ObjectGuid> m_zombies;
     uint32 five_percent;
     
     void Reset()
@@ -110,7 +111,7 @@ struct boss_gluthAI : public ScriptedAI
         // He should aggro just at the edge of the sewer pipe players jump from 
         if (pWho->GetTypeId() == TYPEID_PLAYER 
             && !m_creature->isInCombat() 
-            && m_creature->IsWithinDistInMap(pWho, 48.0f) 
+            && m_creature->IsWithinDistInMap(pWho, 49.0f) 
             && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
         {
             AttackStart(pWho);
@@ -130,6 +131,7 @@ struct boss_gluthAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_BERSERK,         BERSERK_CD);
         m_events.ScheduleEvent(EVENT_TERRIFYING_ROAR, FEAR_CD);
         m_events.ScheduleEvent(EVENT_ZOMBIE_SEARCH,   ZOMBIE_SEARCH_CD);
+        m_events.ScheduleEvent(EVENT_EVADE_CHECK,     Seconds(5));
     }
 
     void JustReachedHome() override
@@ -153,36 +155,12 @@ struct boss_gluthAI : public ScriptedAI
                 if (pPlayer->isDead()) continue;
                 DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CAST_TRIGGERED);
             }
-            for (auto it = m_zombies.begin(); it != m_zombies.end(); ++it)
-            {
-                if (Creature* pZombie = m_pInstance->GetCreature(*it))
-                {
-                    if (pZombie->isDead()) continue;
-                    DoCastSpellIfCan(pZombie, SPELL_DECIMATE_OTHER, CAST_TRIGGERED);
-                    pZombie->GetMotionMaster()->MoveFollow(m_creature, ATTACK_DISTANCE, 0);
-                }
-            }
-        }
-    }
-
-    void SummonedCreatureJustDied(Creature* pUnit) override
-    {
-        for (auto it = m_zombies.begin(); it != m_zombies.end();++it)
-        {
-            if ((*it) == pUnit->GetObjectGuid())
-            {
-                m_zombies.erase(it);
-                break; 
-            }
         }
     }
 
     void UpdateAI(const uint32 uiDiff)  override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-        
-        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
             return;
 
         m_events.Update(uiDiff);
@@ -252,6 +230,25 @@ struct boss_gluthAI : public ScriptedAI
                 m_events.Repeat(ZOMBIE_SEARCH_CD);
                 break;
             }
+            case EVENT_EVADE_CHECK:
+            {
+                m_events.Repeat(Seconds(5));
+                float curZ = m_creature->GetPositionZ();
+                if (curZ < 293.0f && curZ > 300.0f) // avoid getting stuck in wall on pull
+                {
+                    EnterEvadeMode();
+                }
+                else
+                {
+                    float x, y, z, o;
+                    m_creature->GetHomePosition(x, y, z, o);
+                    if (m_creature->GetDistance2d(x, y) > 150.0f)
+                    {
+                        EnterEvadeMode();
+                    }
+                }
+                break;
+            }
             }
         }
 
@@ -262,28 +259,24 @@ struct boss_gluthAI : public ScriptedAI
     // the way the core is
     void DoSearchZombieChow()
     {
-        std::vector<Creature*> chowableZombies;
-        for (auto it = m_zombies.begin(); it != m_zombies.end(); ++it)
+        std::list<Creature*> chowableZombies;
+        GetCreatureListWithEntryInGrid(chowableZombies, m_creature, NPC_ZOMBIE_CHOW, 15.0f);
+        if (chowableZombies.empty())
+            return;
+        for (auto it = chowableZombies.begin(); it != chowableZombies.end(); ++it)
         {
-            if (Creature* pZombie = m_creature->GetMap()->GetCreature(*it))
+            if (!(*it)->isAlive())
+                continue;
+
+            // Using 2d distance, should do fine
+            if ((*it)->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
             {
-                if (!pZombie->isAlive())
-                    continue;
+                m_creature->SetFacingToObject(*it);
+                m_creature->DealDamage((*it), (*it)->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 
-                // Using 2d distance, should do fine
-                if (pZombie->GetDistance2d(m_creature) < 15.0f) // distance based on dbc for spellid 289236
-                    chowableZombies.push_back(pZombie);
+                // heals gluth for 5%. SetHealth truncates to maxhealth internally
+                m_creature->SetHealth(m_creature->GetHealth() + five_percent);
             }
-        }
-        // Need to chow them in a separate loop because when killed, 
-        // SummonedCreatureJustDied removes them from m_zombies
-        for (Creature* pZombie : chowableZombies)
-        {
-            m_creature->SetFacingToObject(pZombie);
-            m_creature->DealDamage(pZombie, pZombie->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-
-            // heals gluth for 5%. SetHealth truncates to maxhealth internally
-            m_creature->SetHealth(m_creature->GetHealth() + five_percent);
         }
     }
 
@@ -292,16 +285,82 @@ struct boss_gluthAI : public ScriptedAI
         int idx = urand(0, 2);
         float x = aZombieSummonLoc[idx][0] + frand(-7.0f, 7.0f);
         float y = aZombieSummonLoc[idx][1] + frand(-7.0f, 7.0f);
-        float z = aZombieSummonLoc[idx][2] + frand(-7.0f, 7.0f);
+        float z = aZombieSummonLoc[idx][2];// +frand(-7.0f, 7.0f);
 
         //todo: don't know if we should summon 1, 2 or 3 zombies each time.
         if (Creature* pZombie = m_creature->SummonCreature(NPC_ZOMBIE_CHOW, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 80000))
         {
             pZombie->SetInCombatWithZone();
-            m_zombies.push_back(pZombie->GetObjectGuid());
+            //m_zombies.push_back(pZombie->GetObjectGuid());
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                 pZombie->AI()->AttackStart(pTarget);
         }
+    }
+};
+
+struct mob_zombieChow : public ScriptedAI
+{
+    mob_zombieChow(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
+        Reset();
+    }
+
+    instance_naxxramas* m_pInstance;
+    bool isHitByDecimate;
+    void Reset() override
+    {
+        isHitByDecimate = false;
+        m_creature->CastSpell(m_creature, SPELL_INFECTED_WOUND, true);
+    }
+
+    bool ChaseGluth()
+    {
+        if (Creature* pGluth = m_pInstance->GetSingleCreatureFromStorage(NPC_GLUTH))
+        {
+            m_creature->GetMotionMaster()->Clear();
+            m_creature->GetMotionMaster()->MoveFollow(pGluth, ATTACK_DISTANCE, 0.0f);
+            m_creature->SetTargetGuid(0);
+            return true;
+        }
+        return false;
+    }
+
+    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    {
+        ScriptedAI::SpellHit(pWho, pSpell);
+        if (pWho->GetEntry() == NPC_GLUTH && pSpell->Id == SPELL_DECIMATE)
+        {
+            if (ChaseGluth())
+            {
+                DoCastSpellIfCan(m_creature, SPELL_DECIMATE_OTHER, CAST_TRIGGERED);
+                isHitByDecimate = true;
+            }
+        }
+    }
+
+    void AttackStart(Unit* pWho) override
+    {
+        if (isHitByDecimate)
+            return;
+        ScriptedAI::AttackStart(pWho);
+    }
+
+    void UpdateAI(const uint32 diff) override
+    {
+        if (isHitByDecimate)
+        {
+            if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+            {
+                ChaseGluth();
+            }
+            return;
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -310,11 +369,21 @@ CreatureAI* GetAI_boss_gluth(Creature* pCreature)
     return new boss_gluthAI(pCreature);
 }
 
+CreatureAI* GetAI_mob_zombieChow(Creature* pCreature)
+{
+    return new mob_zombieChow(pCreature);
+}
+
 void AddSC_boss_gluth()
 {
     Script* NewScript;
     NewScript = new Script;
     NewScript->Name = "boss_gluth";
     NewScript->GetAI = &GetAI_boss_gluth;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "mob_zombie_chow";
+    NewScript->GetAI = &GetAI_mob_zombieChow;
     NewScript->RegisterSelf();
 }

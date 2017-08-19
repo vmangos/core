@@ -766,7 +766,7 @@ VALUES
 UPDATE `creature_template` SET `minhealth`='1608075', `maxhealth`='1608075' WHERE `entry`='15932';
 
 -- Zombie chow health from 52k to 122k (wowwiki states they still have 6104 hp at 5% after decimate)
-UPDATE `creature_template` SET `minhealth`='122080', `maxhealth`='122080' WHERE `entry`='16360';
+UPDATE `creature_template` SET `minhealth`='122080', `maxhealth`='122080', `ScriptName`='mob_zombie_chow' WHERE `entry`='16360';
 
 -- makes decimate ignore armor
 DELETE FROM spell_mod where id = 28375;
