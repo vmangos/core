@@ -109,15 +109,12 @@ uint8 instance_naxxramas::GetNumEndbossDead()
 
 bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
 {
-    if (pWho->IsInEvadeMode() || !pWho->getVictim())
+    if (pWho->IsInEvadeMode())
         return false;
     uint32 entry = pWho->GetEntry();
     float dist;
     switch (entry)
     {
-    case NPC_GLUTH:
-        dist = 150.0f;
-        break;
     case NPC_GROBBULUS:
         dist = 180.0f;
         break;
@@ -150,9 +147,6 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
             return false;
         }
         return true;
-    case NPC_SAPPHIRON:
-        dist = 200.0f;
-        break;
     case NPC_KELTHUZAD:
         dist = 130.0f;
         break;
