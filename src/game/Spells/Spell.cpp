@@ -1191,13 +1191,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         else
         {
             caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType, this);
-            // Judgement of Command
-            if (m_spellInfo->SpellIconID == 561)
-            {
-                // damage halved if target not stunned.
-                if (!unitTarget->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
-                     damageInfo.damage = int32(damageInfo.damage * 0.5f);
-            }
         }
 
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
