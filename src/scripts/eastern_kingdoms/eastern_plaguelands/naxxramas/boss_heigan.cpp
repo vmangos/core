@@ -335,19 +335,21 @@ struct boss_heiganAI : public ScriptedAI
 
     void CheckManausersAndRepeat()
     {
-        // Looking for anyone with a manabar (pets presumably included)
+        // Looking for anyone with a manabar, currently excluded pets and totems
         // within 25yd range (radius of SPELL_MANABURN). If there is one we cast SPELL_MANABURN
         const auto& tl = m_creature->getThreatManager().getThreatList();
         bool found_mana_in_range = false;
         for (auto it = tl.begin(); it != tl.end(); ++it)
         {
-            // todo: is getTarget the player/pet/whatever in the list? Seems like it
-            if ((*it)->getTarget()->getPowerType() == POWER_MANA)
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
             {
-                if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 25.0f)
+                if (pTarget->getPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->isAlive())
                 {
-                    found_mana_in_range = true;
-                    break;
+                    if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 25.0f)
+                    {
+                        found_mana_in_range = true;
+                        break;
+                    }
                 }
             }
         }

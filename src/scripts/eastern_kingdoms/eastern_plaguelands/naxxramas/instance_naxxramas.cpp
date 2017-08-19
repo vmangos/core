@@ -1055,7 +1055,7 @@ void instance_naxxramas::Update(uint32 diff)
             
             for (int i = 0; i < 3; i++)
             {
-                if (Creature* frogger = instance->SummonCreature(16027, pos[i][0], pos[i][1], pos[i][2], pos[i][3], TEMPSUMMON_TIMED_DESPAWN, 13000))
+                if (Creature* frogger = instance->SummonCreature(NPC_LivingPoison, pos[i][0], pos[i][1], pos[i][2], pos[i][3], TEMPSUMMON_TIMED_DESPAWN, 13000))
                 {
                     frogger->GetMotionMaster()->MovePoint(0, pos[i+3][0], pos[i + 3][1], pos[i + 3][2], pos[i + 3][3]);
                 }

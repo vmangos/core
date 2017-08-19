@@ -50,7 +50,7 @@ enum
     SPELL_FROST_BOLT          = 28478,
     SPELL_FROST_BOLT_NOVA     = 28479,
 
-    SPELL_CHAINS_OF_KELTHUZAD           = 28408,            // 3.x, heroic only
+    SPELL_CHAINS_OF_KELTHUZAD           = 28408,           
     SPELL_CHAINS_OF_KELTHUZAD_SCALE     = 28409,
     SPELL_CHAINS_OF_KELTHUZAD_EFFECTS   = 28410,
 
