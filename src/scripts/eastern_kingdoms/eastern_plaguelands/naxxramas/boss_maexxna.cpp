@@ -206,10 +206,34 @@ struct boss_maexxnaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MAEXXNA, DONE);
     }
 
+    void MoveInLineOfSight(Unit* pWho) override 
+    {
+        if (!m_creature->IsWithinDistInMap(pWho, 40.0f))
+            return;
+
+        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        {
+            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            {
+                if (!m_creature->getVictim())
+                    AttackStart(pWho);
+                else if (m_creature->GetMap()->IsDungeon())
+                {
+                    pWho->SetInCombatWith(m_creature);
+                    m_creature->AddThreat(pWho);
+                }
+            }
+        }
+    }
+    
     void JustReachedHome() override
     {
         if (m_pInstance)
             m_pInstance->SetData(TYPE_MAEXXNA, FAIL);
+        std::list<Creature*> spiderlings;
+        GetCreatureListWithEntryInGrid(spiderlings, m_creature, NPC_SPIDERLING, 100.0f);
+        for (Creature* pSpider : spiderlings)
+            pSpider->DeleteLater();
     }
     
     bool DoCastWebWrap()
