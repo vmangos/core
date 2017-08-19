@@ -390,6 +390,7 @@ UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`
 * deathknight wing
 */ 
 
+UPDATE `creature_template` SET `name`='Skeletal Steed' WHERE `entry`=16067;
 
 -- Death Knight fear targets hostile, not self. Also not on pull, but a while later. -- https://youtu.be/VrykhhdPfc4?t=4m37s
 UPDATE `creature_ai_scripts` SET `event_param1`=10000, `event_param2`=12000, `action1_param2`=1 WHERE `id`=1614601;
