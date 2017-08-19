@@ -351,11 +351,16 @@ UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `m
 -- toxic tunnel creature lvl 60 and script
 UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `ScriptName`='toxic_tunnel_ai' WHERE `entry`=16400;
 -- bile sludge damage increase
-UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000, `minhealth`=35000, `maxhealth`=35000  WHERE `entry`=16142;
+UPDATE `creature_template` SET `mindmg`=1500, `maxdmg`=2000, `minhealth`=35000, `maxhealth`=35000  WHERE `entry`=16142;
 -- Stitched giants were named stitched spewer in vanilla
 UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
--- Stitched Giant reset threat of current target when using Knockback
-UPDATE `creature_ai_scripts` SET `action2_type`=13, `action2_param1`=-100, `action2_param2`=1 WHERE `id`=1602503;
+
+-- Stitched Spewer AI changes:
+-- remove knockback
+DELETE FROM creature_ai_scripts where id = 1602503; 
+-- Slime shot on current target, and reset threat on that target
+UPDATE `creature_ai_scripts` SET `action1_param2`=1, `action2_type`=13, `action2_param1`=-100, `action2_param2`=1 WHERE `id`=1602502;
+
 
 -- sludge belcher HP
 UPDATE `creature_template` SET `minhealth`=248189, `maxhealth`=248189 WHERE `entry`=16029;
@@ -369,8 +374,6 @@ VALUES
 (1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc'),
 (1602903, 16029, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge belcher disease cloud on spawn');
 
--- bile retcher HP
-UPDATE `creature_template` SET `minhealth`=187197, `maxhealth`=187197 WHERE `entry`=16018;
 -- Bile retcher also reset threat when casting bile retcher slam
 UPDATE `creature_ai_scripts` SET `action2_type`=14, `action2_param1`=-100 WHERE `id`=1601801;
 
@@ -378,13 +381,18 @@ UPDATE `creature_ai_scripts` SET `action2_type`=14, `action2_param1`=-100 WHERE 
 UPDATE `creature_ai_scripts` SET `action1_param1`=28725 WHERE `id`=1601701;
 -- Patchwork Golem slightly reduced frequency on 360 cleave
 UPDATE `creature_ai_scripts` SET `event_param3`=8000, `event_param4`=15000, `action1_param3`=0 WHERE `id`=1601702;
--- Patchwork golem dmg
-UPDATE `creature_template` SET `mindmg`=3875, `maxdmg`=4105 WHERE `entry`=16017;
 UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=4000, `event_param3`=7000, `event_param4`=10000 WHERE `id`=1602103;
 -- Bile Sludges cast clone on a timer rather than 15%
 UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`=10000, `event_param2`=10000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1614201;
 
-
+-- Patchwork golem
+UPDATE `creature_template` SET `mindmg`=3575, `maxdmg`=4105, `baseattacktime`=1480,`minhealth`=87532, `maxhealth`=87532 WHERE `entry`=16017;
+-- bile retcher
+UPDATE `creature_template` SET `mindmg`=3875, `maxdmg`=4505, `baseattacktime`=1480,`minhealth`=187197, `maxhealth`=187197 WHERE `entry`=16018;
+-- Sludge Belcher
+UPDATE `creature_template` SET `mindmg`=4200, `maxdmg`=4900, `baseattacktime`=1480,`minhealth`=195189, `maxhealth`=195189 WHERE `entry`=16029;
+-- Stitched Spewer
+UPDATE `creature_template` SET `mindmg`=4500, `maxdmg`=5200, `baseattacktime`=1480,`minhealth`=217197, `maxhealth`=217197 WHERE `entry`=16025;
 
 
 
@@ -2515,9 +2523,9 @@ VALUES
 (88725,16017,533,9760,0,3021.23,-3190.64,294.063,2.26996,3520,3,0,87532,0,0,1,0),
 (88724,16017,533,9760,0,3018.16,-3175.53,294.064,2.12136,3520,3,0,87532,0,0,1,0),
 (88723,16018,533,0,0,3028.91,-3235.28,294.15,1.58,3520,0,0,187197,0,0,2,0),
-(88722,16029,533,15962,0,3132.07,-3244.12,294.18,0.05,3520,0,0,248189,0,0,2,0),
-(88721,16029,533,15962,0,3135.62,-3179.65,294.15,3.26,3520,0,0,248189,0,0,2,0),
-(88720,16029,533,15962,0,3171.7,-3301.83,294.66,2.21,3520,0,0,248189,0,0,2,0),
+(88722,16029,533,15962,0,3132.07,-3244.12,294.18,0.05,3520,0,0,195189,0,0,2,0),
+(88721,16029,533,15962,0,3135.62,-3179.65,294.15,3.26,3520,0,0,195189,0,0,2,0),
+(88720,16029,533,15962,0,3171.7,-3301.83,294.66,2.21,3520,0,0,195189,0,0,2,0),
 (88719,16018,533,15958,0,3081.44,-3084.35,294.15,4.99,3520,0,0,187197,0,0,2,0),
 (88718,16018,533,15958,0,3034.2,-3116.27,294.15,5.52,3520,0,0,187197,0,0,2,0),
 (2530403,16022,533,0,0,3060.77,-3110.43,294.078,1.47355,3000,0,0,42290,0,0,0,0),
@@ -2841,14 +2849,14 @@ VALUES
 (88310,15976,533,15939,0,3054.23,-3540.13,287.074,6.21981,3520,0,0,92095,0,0,0,0),
 (88308,15975,533,15938,0,3059.2,-3536.06,287.25,0.12,3520,0,0,55905,0,0,0,0),
 (88307,15975,533,15938,0,3067.59,-3551.4,287.26,1.14,3520,0,0,55905,0,0,0,0),
-(88305,16025,533,15961,0,3331.06,-3322.79,292.77,3.04,3520,0,0,149724,0,0,0,0),
-(88306,16025,533,15961,0,3330.77,-3299.13,292.77,3.11,3520,0,0,149724,0,0,0,0),
+(88305,16025,533,15961,0,3331.06,-3322.79,292.77,3.04,3520,0,0,217197,0,0,0,0),
+(88306,16025,533,15961,0,3330.77,-3299.13,292.77,3.11,3520,0,0,217197,0,0,0,0),
 (88304,15932,533,16064,0,3283.09,-3156.96,297.788,3.82227,6380,0,0,1665500,0,0,0,0),
 (88303,15931,533,16035,0,3179.6,-3306.65,320.056,3.26349,6380,0,5,2165150,0,0,2,0),
-(88302,16025,533,15961,0,3200.55,-3277.2,292.596,6.22207,3520,0,0,149724,0,0,0,0),
-(88301,16025,533,15961,0,3197.16,-3337.31,292.596,6.22207,3520,0,0,149724,0,0,0,0),
-(88300,16025,533,15961,0,3288.33,-3359.58,292.596,1.53074,3520,0,0,149724,0,0,0,0),
-(88299,16025,533,15961,0,3264.63,-3357.66,292.78,1.59,3520,0,0,149724,0,0,0,0),
+(88302,16025,533,15961,0,3200.55,-3277.2,292.596,6.22207,3520,0,0,217197,0,0,0,0),
+(88301,16025,533,15961,0,3197.16,-3337.31,292.596,6.22207,3520,0,0,217197,0,0,0,0),
+(88300,16025,533,15961,0,3288.33,-3359.58,292.596,1.53074,3520,0,0,217197,0,0,0,0),
+(88299,16025,533,15961,0,3264.63,-3357.66,292.78,1.59,3520,0,0,217197,0,0,0,0),
 (88298,16028,533,16174,0,3308.46,-3232.08,294.24,3.01,6380,0,0,3997200,0,0,2,0),
 (88297,16024,533,12349,0,3138.39,-3208.57,294.24,2.97,180,0,0,11887,0,0,0,0),
 (88296,16024,533,12349,0,3132.54,-3227.46,294.24,0.24,180,0,0,11887,0,0,0,0),
@@ -2984,7 +2992,7 @@ VALUES
 (88127,16297,533,7898,0,2771.57,-3562.39,252.11,1.89,30,7,0,24843,12000,0,1,0),
 (88126,16297,533,7898,0,2767.52,-3599.94,256.48,0.59,30,7,0,24843,12000,0,1,0),
 (88123,16297,533,7898,0,2724.52,-3589.56,259.11,1.25,30,7,0,24843,12000,0,1,0),
-(2530568,16025,533,0,0,3200.39,-3309.29,292.596,6.13411,3520,0,0,149724,0,0,0,0),
+(2530568,16025,533,0,0,3200.39,-3309.29,292.596,6.13411,3520,0,0,217197,0,0,0,0),
 (88125,16297,533,7898,0,2745.61,-3580.18,256.65,1.29,30,7,0,24843,12000,0,1,0),
 (88124,16297,533,7898,0,2739.28,-3602.42,258.33,0.91,30,7,0,24843,12000,0,1,0),
 (88122,16297,533,7898,0,2715.56,-3611.95,260.57,0.18,30,7,0,24843,12000,0,1,0),
