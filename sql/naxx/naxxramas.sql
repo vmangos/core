@@ -354,6 +354,8 @@ UPDATE `creature_template` SET `minlevel`=60, `maxlevel`=60, `AIName`='', `Scrip
 UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3000, `minhealth`=35000, `maxhealth`=35000  WHERE `entry`=16142;
 -- Stitched giants were named stitched spewer in vanilla
 UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
+-- Stitched Giant reset threat of current target when using Knockback
+UPDATE `creature_ai_scripts` SET `action2_type`=13, `action2_param1`=-100, `action2_param2`=1 WHERE `id`=1602503;
 
 -- sludge belcher HP
 UPDATE `creature_template` SET `minhealth`=248189, `maxhealth`=248189 WHERE `entry`=16029;
