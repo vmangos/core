@@ -266,7 +266,7 @@ struct boss_loathebAI : public ScriptedAI
         events.ScheduleEvent(EVENT_CORRUPTED_MIND,  Seconds(5));
         events.ScheduleEvent(EVENT_POISON_AURA,     Seconds(5));
         events.ScheduleEvent(EVENT_INEVITABLE_DOOM, Minutes(2));
-        events.ScheduleEvent(EVENT_REMOVE_CURSE,    Seconds(2));
+        events.ScheduleEvent(EVENT_REMOVE_CURSE,    Seconds(5));
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LOATHEB, IN_PROGRESS);
     }
@@ -400,6 +400,14 @@ struct boss_loathebAI : public ScriptedAI
         }
     }
 
+    void SpellHit(Unit*, const SpellEntry* pSpell) override 
+    {
+        if (pSpell->Id == 15286) // vamperic embrace
+        {
+            DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE);
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
 
@@ -446,19 +454,10 @@ struct boss_loathebAI : public ScriptedAI
                     events.Repeat(Seconds(30));
                 break;
             case EVENT_REMOVE_CURSE:
-                // The remove curse part was added to prevent the boss from being super easy by stacking spriests.
-                // I have not seen any videos where curse of elements etc is dispelled. Its unknown if he should cast
-                // decurse regardless of vamperic embrace or not, but my assumption is he only does it if he has 
-                // vamperic embrace on, so curse of elements etc an still be up.
-                if (m_creature->HasAura(15286)) // vamperic embrace
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE) == CAST_OK)
-                        events.Repeat(Seconds(2));
-                    else
-                        events.Repeat(100);
-                }
+                if (DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE) == CAST_OK)
+                    events.Repeat(Seconds(30));
                 else
-                    events.Repeat(Seconds(2));
+                    events.Repeat(100);
                 break;
             }
         }
