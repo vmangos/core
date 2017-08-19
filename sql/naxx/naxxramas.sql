@@ -1117,7 +1117,7 @@ VALUES
 (1698301, 16983, 0, 0, 100, 1, 1000, 4000, 8000, 8500,  11, 30138, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Champion shadow shock'), -- Same as wotlk, should be right, matches in dmg on videos
 (1698302, 16983, 0, 0, 100, 1, 0,    1000, 4000, 5000,  11, 13737, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Champion mortal strike'), -- MS used by eventAI hits for about 1-1.3k, which is a bit higher for some unknown reason. Using 130% MS which is the lowest % i found
 (1698401, 16984, 0, 0, 100, 1, 1000, 4000, 7000, 8000,  11, 20691, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Warrior cleave'), -- 15496 is used by wotlk version of this mob, might be more correct but who knows
-(1698201, 16982, 0, 0, 100, 1, 1000, 4000, 7000, 10000, 11, 30092, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Construct blast wave'); -- this is pure guesswork, based on a quote that third balc phase is "flame, death, destruction", and that the spellid is around that of shadow shock
+(1698201, 16982, 0, 0, 100, 1, 1000, 4000, 6500, 7000,  11, 17547, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Construct Mortal Strike'); -- dungeon journal
 
 -- Plagued champion shadow shock should be cast even while shackled according to
 -- https://web.archive.org/web/20070224095002/http://www.worldofraids.com:80/v2/?page=Nboss&wing=plague&mob=8
@@ -1128,9 +1128,9 @@ UPDATE `creature_ai_scripts` SET `action1_param3`=6 WHERE `id`=1698301;
 -- Making them elite
 -- Updating damage values. Plagued champion matches with vanilla videos. Rest are unchecked.
 UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=1953, `maxdmg`=2382 WHERE `entry`=16981;
-UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=1953, `maxdmg`=2382 WHERE `entry`=16982;
-UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=2000, `maxdmg`=3012 WHERE `entry`=16983;
-UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=2000, `maxdmg`=3012 WHERE `entry`=16984;
+UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=4000, `maxdmg`=4500 WHERE `entry`=16982;
+UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=3000, `maxdmg`=3612 WHERE `entry`=16983;
+UPDATE `creature_template` SET `AIName`='EventAI', `rank`=1, `mindmg`=2500, `maxdmg`=3012 WHERE `entry`=16984;
 
 -- Giving Plagued Warrior and Champion their weps
 UPDATE `creature_template` SET `equipment_id` = 16984 where `entry` = 16984;
