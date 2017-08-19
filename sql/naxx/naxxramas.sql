@@ -1195,7 +1195,7 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='deathknight_understudy
 DELETE FROM `creature_ai_scripts` where id = 1680301;
 DELETE FROM `creature_ai_scripts` where id = 1680302;
 
-UPDATE `creature_template` SET `minhealth`=1998600, `maxhealth`=1998600, `mindmg`=17299, `maxdmg`=22933 WHERE `entry`=16061;
+UPDATE `creature_template` SET `minhealth`=1998600, `maxhealth`=1998600, `mindmg`=17299, `maxdmg`=22933, `speed_run`='1.5', WHERE `entry`=16061;
 
 
 
