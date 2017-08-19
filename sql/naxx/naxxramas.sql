@@ -378,7 +378,7 @@ VALUES
 UPDATE `creature_ai_scripts` SET `action2_type`=14, `action2_param1`=-100 WHERE `id`=1601801;
 
 -- Patchwork Golem correct War stomp spell
-UPDATE `creature_ai_scripts` SET `action1_param1`=28725 WHERE `id`=1601701;
+UPDATE `creature_ai_scripts` SET `action1_param1`=28725, `event_param3`=10000 WHERE `id`=1601701;
 -- Patchwork Golem slightly reduced frequency on 360 cleave
 UPDATE `creature_ai_scripts` SET `event_param3`=8000, `event_param4`=15000, `action1_param3`=0 WHERE `id`=1601702;
 UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=4000, `event_param3`=7000, `event_param4`=10000 WHERE `id`=1602103;
@@ -5228,3 +5228,9 @@ REPLACE INTO creature_onkill_reputation (creature_id, RewOnKillRepFaction1, MaxS
 (16028, 529, 7, 100),
 (16060, 529, 7, 100),
 (16061, 529, 7, 100);
+
+
+-- misc events with incorrrect event chance, and 16243 no longer uses EventAI
+delete from creature_ai_scripts where creature_id in (16243);
+update creature_ai_scripts set event_chance = 100 where creature_id in (15975, 15979, 16017, 16018, 16020, 16024, 16165, 16297, 16446, 16452);
+update creature_ai_scripts set event_chance = 100 where id in (1616301, 1616302, 1616802, 1645101, 1686101);
