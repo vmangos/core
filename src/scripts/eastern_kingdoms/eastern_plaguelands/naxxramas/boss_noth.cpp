@@ -292,6 +292,13 @@ struct boss_nothAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_NE : SPELL_SUM_GUARD_NW, CAST_TRIGGERED);
     }
 
+    void Summon3Constructs()
+    {
+        m_creature->SummonCreature(NPC_PLAGUED_CONSTRUCT, 2649.0f, -3456.0f, 264.0f, 5.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+        m_creature->SummonCreature(NPC_PLAGUED_CONSTRUCT, 2727.0f, -3458.0f, 263.5f, 3.8f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+        m_creature->SummonCreature(NPC_PLAGUED_CONSTRUCT, 2727.0f, -3534.0f, 268.0f, 0.1f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 25000);
+    }
+
     void SpawnBalcAdds()
     {
         DoScriptText(SAY_SUMMON, m_creature);
@@ -304,15 +311,10 @@ struct boss_nothAI : public ScriptedAI
             Summon4Champions();
             Summon2Guardians();
             break;
-        default:
-            // Sources for what happens in a third+ balcony phase is missing. In wotlk he would enrage, but 
-            // in vanilla all we know is "you get overrun". 
-            // Presumption then is there should be no surviving this wave, so a suggestion is to just use every
-            // single summon spell
-            for(int i = 0; i < 10; i++)
-                DoCastSpellIfCan(m_creature, ChampionSpells[i], CAST_TRIGGERED);
-            for (int i = 0; i < 4; i++)
-                DoCastSpellIfCan(m_creature, GuardianSpells[i], CAST_TRIGGERED);
+        default: // third balc phase and onwards
+            Summon4Champions();
+            Summon2Guardians();
+            Summon3Constructs();
             break;
         }
     }
