@@ -590,6 +590,7 @@ struct boss_kelthuzadAI : public ScriptedAI
             events.Repeat(Seconds(4));
             return;
         }
+        DoResetThreat();
         m_creature->CastSpell(m_creature, SPELL_CHAINS_OF_KELTHUZAD, false);
         DoScriptText(urand(0, 1) ? SAY_CHAIN1 : SAY_CHAIN2, m_creature);
         events.Repeat(Seconds(urand(60, 90)));
