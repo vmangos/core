@@ -143,13 +143,15 @@ struct boss_nothAI : public ScriptedAI
 
     instance_naxxramas* m_pInstance;
     uint8 phaseCounter;
-
+    uint32 killSayCooldown;
     EventMap m_events;
-
+    bool isOnBalc;
     void Reset()
     {
+        isOnBalc = false;
         phaseCounter = 0;
         m_events.Reset();
+        killSayCooldown = 5000;
     }
     
     void JustReachedHome() override
@@ -230,8 +232,8 @@ struct boss_nothAI : public ScriptedAI
             return;
         }
 
+        isOnBalc = true;
         m_events.Reset();
-
         // 70, 95 and 120 seconds for 1st, 2nd and 3rd balc phase respectively.
         m_events.ScheduleEvent(EVENT_TP_GROUND, Seconds(70 + 25 * phaseCounter));
 
@@ -252,7 +254,6 @@ struct boss_nothAI : public ScriptedAI
             m_events.Repeat(100); // try again
             return;
         }
-
         m_events.Reset();
         m_events.ScheduleEvent(EVENT_RMV_INVULN, Seconds(2));
     }
@@ -318,8 +319,9 @@ struct boss_nothAI : public ScriptedAI
 
     void OnRemoveVulnerability()
     {
-        m_events.Reset();
+        isOnBalc = false;
 
+        m_events.Reset();
         m_events.ScheduleEvent(EVENT_BLINK,    Seconds(urand(2, 10)));
         m_events.ScheduleEvent(EVENT_CURSE,    Seconds(urand(2, 10)));
         m_events.ScheduleEvent(EVENT_WARRIORS, Seconds(urand(2,10)));
@@ -355,7 +357,11 @@ struct boss_nothAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
+        if (!killSayCooldown)
+        {
+            DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
+            killSayCooldown = 5000;
+        }
     }
 
     void JustDied(Unit* pKiller)
@@ -366,9 +372,18 @@ struct boss_nothAI : public ScriptedAI
             m_pInstance->SetData(TYPE_NOTH, DONE);
     }
 
+    void AttackStart(Unit* pWho)
+    {
+        if (!isOnBalc)
+            ScriptedAI::AttackStart(pWho);
+    }
+    void DamageTaken(Unit* /*pDoneBy*/, uint32& uiDamage) override 
+    {
+        if (isOnBalc && uiDamage > 0)
+            uiDamage = 0;
+    }
     void UpdateAI(const uint32 uiDiff)
     {
-        bool isOnBalc = m_creature->HasAura(SPELL_IMMUNE_ALL);
         if (!isOnBalc)
         {
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
@@ -388,7 +403,7 @@ struct boss_nothAI : public ScriptedAI
             }
         }
         
-
+        killSayCooldown -= std::min(killSayCooldown, uiDiff);
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
