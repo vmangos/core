@@ -74,6 +74,7 @@ enum Events
     EVENT_FROST_BREATH_DUMMY,
     EVENT_FROST_BREATH_CAST,
     EVENT_SET_HOVER,
+    EVENT_CHECK_EVADE
 };
 
 enum Phase
@@ -246,6 +247,7 @@ struct boss_sapphironAI : public ScriptedAI
         events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(40));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
+        events.ScheduleEvent(EVENT_CHECK_EVADE, Seconds(5));
     }
 
     void JustDied(Unit* pKiller)
@@ -507,6 +509,17 @@ struct boss_sapphironAI : public ScriptedAI
             case EVENT_SET_HOVER:
                 m_creature->CastSpell(m_creature, 17131, true);
                 break;
+            case EVENT_CHECK_EVADE:
+            {
+                events.Repeat(Seconds(5));
+                float x, y, z, o;
+                m_creature->GetHomePosition(x, y, z, o);
+                if (m_creature->GetDistance(x, y, z) > 70.0f)
+                {
+                    EnterEvadeMode();
+                }
+                break;
+            }
             }
         }
 
