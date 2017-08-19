@@ -397,7 +397,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
                     if ((DoCastSpellIfCan(pTarget, SPELL_VOIDZONE)) == CAST_OK)
                     {
                         ScriptTextInRange(SAY_BLAU_SPECIAL);
-                        m_events.Repeat(Seconds(urand(12, 15)));
+                        m_events.Repeat(Seconds(12));
                         break;
                     }
                 }
