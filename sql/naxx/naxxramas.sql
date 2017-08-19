@@ -1209,8 +1209,7 @@ UPDATE `creature_template` SET `minhealth`=1998600, `maxhealth`=1998600, `mindmg
 -- sapphiron hitbox update
 UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='20' WHERE `modelid`='16033';
 
--- sapp should supposedly be immune to frost and hp around this
-UPDATE `creature_template` SET `minhealth`=3204800, `maxhealth`=3204800, `SchoolImmuneMask`=16 WHERE `entry`=15989;
+UPDATE `creature_template` SET `minhealth`=3164450, `maxhealth`=3164450, `mindmg`=6919, `maxdmg`=9173, `SchoolImmuneMask`=16 WHERE `entry`=15989;
 
 -- wing buffet crature
 DELETE FROM `creature_template` WHERE `entry` = 17025;
@@ -2477,7 +2476,7 @@ VALUES
 (2530375,16022,533,0,0,2995.88,-3239.01,294.063,5.4697,3000,0,0,42290,0,0,0,0),
 (2530311,16453,533,0,0,3117.87,-3875,267.593,5.91656,3600,0,0,81178,0,0,0,0),
 (2530312,16453,533,0,0,3115.11,-3882.19,267.593,5.91656,3600,0,0,81178,0,0,2,1),
-(88756,15989,533,16033,0,3521.3,-5237.56,137.72,4.51,6380,0,0,3204800,0,0,0,0),
+(88756,15989,533,16033,0,3521.3,-5237.56,137.72,4.51,6380,0,0,3164450,0,0,0,0),
 (88755,16062,533,16139,0,2519.95,-2947.47,245.64,5.43,6380,0,0,810000,0,0,0,0),
 (88754,16063,533,16154,0,2524.45,-2944.71,245.64,5.46,6380,0,0,810000,0,0,0,0),
 (88753,16065,533,16153,0,2516.24,-2951.57,245.64,5.53,6380,0,0,810000,60000,0,0,0),
