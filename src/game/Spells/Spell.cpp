@@ -1296,9 +1296,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Trigger spell cast procs and forward the damage / heal procs to the aura
         if (foundDamageOrHealAura)
         {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
-            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            procAttacker &= (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             procVictim = 0;
             dmg = 1;
         }
