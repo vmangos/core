@@ -735,6 +735,11 @@ UPDATE creature_template SET scriptname = "boss_lady_blaumeux" WHERE entry = 167
 UPDATE creature_template SET scriptname = "boss_thane_korthazz" WHERE entry = 16778;
 UPDATE creature_template SET scriptname = "boss_sir_zeliek" WHERE entry = 16777;
 
+UPDATE `creature_template` SET `mindmg`=2745, `maxdmg`=3640 WHERE `entry`=16064;
+UPDATE `creature_template` SET `mindmg`=3844, `maxdmg`=5096 WHERE `entry`=16065;
+UPDATE `creature_template` SET `mindmg`=2636, `maxdmg`=3494 WHERE `entry`=16062;
+UPDATE `creature_template` SET `mindmg`=3844, `maxdmg`=5096 WHERE `entry`=16063;
+
 -- chest loot
 DELETE FROM gameobject_loot_template where entry = 181366;
 INSERT INTO gameobject_loot_template (entry, item, ChanceOrQuestChance, groupid, mincountOrRef, maxcount, condition_id) VALUES
