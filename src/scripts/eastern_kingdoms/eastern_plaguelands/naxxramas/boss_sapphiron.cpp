@@ -144,6 +144,7 @@ struct boss_sapphironAI : public ScriptedAI
         events.Reset();
         berserkTimer = 900000; // 15 min
         m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
+        m_creature->RemoveAurasDueToSpell(17131);
         UnSummonWingBuffet();
         DeleteAndDispellIceBlocks();
         setHover(false);
@@ -178,10 +179,9 @@ struct boss_sapphironAI : public ScriptedAI
 
         std::list<GameObject*> iceblocks;
         GetGameObjectListWithEntryInGrid(iceblocks, m_creature, GO_ICEBLOCK, 300.0f);
-        for (auto it = iceblocks.begin(); it != iceblocks.end();)
+        for(GameObject* ib : iceblocks)
         {
-            (*it)->Delete();
-            it = iceblocks.erase(it);
+            ib->DeleteLater();
         }
     }
 
@@ -313,7 +313,6 @@ struct boss_sapphironAI : public ScriptedAI
             m_creature->HandleEmote(EMOTE_ONESHOT_LIFTOFF);
             m_creature->SetUnitMovementFlags(MOVEFLAG_HOVER);
             m_creature->SendHeartBeat(true);
-
             WorldPacket data;
             data.Initialize(SMSG_MOVE_SET_HOVER, 8 + 4);
             data << m_creature->GetPackGUID();
@@ -328,14 +327,15 @@ struct boss_sapphironAI : public ScriptedAI
         }
         else
         {
-            m_creature->RemoveAurasDueToSpell(17131);
             SetCombatMovement(true);
             if (m_creature->HasUnitMovementFlag(MOVEFLAG_HOVER))
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
+                
+                m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
             }
 
-            m_creature->RemoveUnitMovementFlag(MOVEFLAG_HOVER);
+
             WorldPacket data;
             data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
             data << m_creature->GetPackGUID();
@@ -441,6 +441,7 @@ struct boss_sapphironAI : public ScriptedAI
             }
             case EVENT_LANDED:
             {
+                DeleteAndDispellIceBlocks();
                 events.Reset();
                 events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
                 events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
@@ -472,6 +473,8 @@ struct boss_sapphironAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) != CAST_OK)
                     events.Repeat(100);
+                else
+                    m_creature->RemoveAurasDueToSpell(17131);
                 break;
             }
             case EVENT_BLIZZARD:
