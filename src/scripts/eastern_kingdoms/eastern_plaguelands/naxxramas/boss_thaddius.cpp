@@ -50,6 +50,8 @@ enum eStalaggFeugen
     SPELL_POWERSURGE        = 28134,
     SPELL_STATIC_FIELD      = 28135,
     SPELL_MAGNETIC_PULL     = 28337,
+
+    SPELL_SUECIDE           = 28748,
 };
 
 enum addEvents
@@ -169,21 +171,20 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
     bool m_bToFeugen;
     ObjectGuid m_guid;
     uint32 shockTimer;
-
+    bool hadLink;
     void Reset() override
     {
         m_creature->SetRespawnRadius(0.01f);
         m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
         m_creature->GetMotionMaster()->Initialize();
         shockTimer = 0;
+        hadLink = true;
     }
 
     void MoveInLineOfSight(Unit* /*pWho*/) override {}
 
     void Aggro(Unit* /*pWho*/) override
     {
-        // Probably only in wotlk
-        // DoScriptText(EMOTE_LOSING_LINK, m_creature);
         //m_creature->SetInCombatWithZone();
     }
 
@@ -212,9 +213,11 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
 
             if (m_creature->GetDistance2d(add) > 60.0f)
             {
-                if (add->HasAura(m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN))
-                    m_creature->InterruptNonMeleeSpells(true);
-
+                m_creature->InterruptNonMeleeSpells(true);
+                //if (add->HasAura(m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN))
+                if(hadLink)
+                    DoScriptText(EMOTE_LOSING_LINK, m_creature);
+                hadLink = false;
                 if (shockTimer < uiDiff)
                 {
                     shockTimer = 1500;
@@ -232,6 +235,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
                 shockTimer = 0;
                 if (!m_creature->IsNonMeleeSpellCasted(true))
                     DoCastSpellIfCan(m_creature, m_bToFeugen ? SPELL_FEUGEN_CHAIN : SPELL_STALAGG_CHAIN);
+                hadLink = true;
             }
         }
     }
@@ -253,12 +257,14 @@ struct boss_thaddiusAddsAI : public ScriptedAI
     bool m_bFakeDeath;
     uint32 fakeDeathTimer;
     bool bothDeath;
-
+    uint32 timeSincePull;
     EventMap m_events;
     ObjectGuid otherAdd;
 
     void Reset() override
     {
+        m_events.Reset();
+        timeSincePull = 0;
         fakeDeathTimer = 0;
         m_bFakeDeath = false;
         bothDeath = false;
@@ -405,17 +411,26 @@ struct boss_thaddiusAddsAI : public ScriptedAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
+        timeSincePull += uiDiff;
         m_events.Update(uiDiff);
         while (auto l_EventId = m_events.ExecuteEvent())
         {
             switch (l_EventId)
             {
             case EVENT_WARSTOMP:
-                if (DoCastSpellIfCan(m_creature, SPELL_WARSTOMP) == CAST_OK)
-                    m_events.Repeat(WarstompTimer());
+                // need to delay warstomp if we have just done the pull. If warstomp hits midair the
+                // pull effect is cancelled and tanks fall down
+                if (timeSincePull < 5000)
+                {
+                    m_events.Repeat(5000 - timeSincePull);
+                }
                 else
-                    m_events.Repeat(100);
+                {
+                    if (DoCastSpellIfCan(m_creature, SPELL_WARSTOMP) == CAST_OK)
+                        m_events.Repeat(WarstompTimer());
+                    else
+                        m_events.Repeat(100);
+                }
                 break;
             case EVENT_STATIC_FIELD:
                 if (DoCastSpellIfCan(m_creature, SPELL_STATIC_FIELD) == CAST_OK)
@@ -431,7 +446,10 @@ struct boss_thaddiusAddsAI : public ScriptedAI
                 break;
             case EVENT_MAGNETIC_PULL:
                 if (HandleMagneticPull())
+                {
                     m_events.Repeat(MagneticPullTimer());
+                    timeSincePull = 0;
+                }
                 else
                     m_events.Repeat(100);
                 break;
@@ -440,6 +458,12 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 
+    void AttackStart(Unit* pWho) override
+    {
+        if (m_bFakeDeath)
+            return;
+        ScriptedAI::AttackStart(pWho);
+    }
     void DamageTaken(Unit* pKiller, uint32& uiDamage) override
     {
         if (uiDamage < m_creature->GetHealth())
@@ -458,21 +482,33 @@ struct boss_thaddiusAddsAI : public ScriptedAI
             {
                 if (otherAI->m_bFakeDeath)
                 {
+                    //if(m_SorF == eSTALAGG)
+                    //    DoScriptText(SAY_STAL_DEATH, m_creature);
+                    //else
+                    //    DoScriptText(SAY_FEUG_DEATH, m_creature);
                     otherAI->bothDeath = true;
                     bothDeath = true;
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-                    otherAdd->Kill(otherAdd, nullptr); 
-                    m_creature->Kill(m_creature, nullptr);
-                    return; // not modifying damage, thus will die
+                    //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    //m_creature->CastSpell(m_creature, SPELL_SUECIDE, true);
+                    //otherAdd->CastSpell(otherAdd, SPELL_SUECIDE, true);
+                    //otherAdd->Kill(otherAdd, nullptr); 
+                    //m_creature->Kill(m_creature, nullptr);
+                    //return;
                 }
             }
         }
 
-        uiDamage = 0;
-        m_bFakeDeath = true;
-        fakeDeathTimer = 5000;
+        if (m_SorF == eSTALAGG)
+            DoScriptText(SAY_STAL_DEATH, m_creature);
+        else
+            DoScriptText(SAY_FEUG_DEATH, m_creature);
 
+        uiDamage = 0;
+        
+        fakeDeathTimer = 5000;
+        m_bFakeDeath = true;
         m_creature->InterruptNonMeleeSpells(false);
         m_creature->SetHealth(0);
         m_creature->StopMoving();
@@ -484,7 +520,6 @@ struct boss_thaddiusAddsAI : public ScriptedAI
         m_creature->GetMotionMaster()->MoveIdle();
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
         m_creature->AttackStop();
-        JustDied(pKiller);                                  // Texts
     }
 };
 
@@ -533,7 +568,7 @@ struct boss_thaddiusAI : public ScriptedAI
         uint32 addEntry = whichAdd == eSTALAGG ? NPC_STALAGG : NPC_FEUGEN;
 
         // Simply unsummoning the add and the coil creature if they still exist
-        if(addCreature && addCreature->isDead())
+        if(addCreature)
         { 
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(addCreature))
                 tmpSumm->UnSummon();
@@ -647,6 +682,7 @@ struct boss_thaddiusAI : public ScriptedAI
 
     void Reset() override
     {
+        m_events.Reset();
         m_uiBallLightningTimer = 1000;      
         m_Phase = THAD_NOT_STARTED;
     }
@@ -989,11 +1025,8 @@ struct boss_stalaggAI : public boss_thaddiusAddsAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        DoScriptText(SAY_STAL_DEATH, m_creature);
         if (bothDeath && m_pInstance && m_pInstance->GetData(TYPE_THADDIUS) != SPECIAL)
-        {
             m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-        }
     }
 
     void KilledUnit(Unit* pVictim) override
@@ -1023,11 +1056,8 @@ struct boss_feugenAI : public boss_thaddiusAddsAI
 
     void JustDied(Unit* /*pKiller*/) override
     {
-        DoScriptText(SAY_FEUG_DEATH, m_creature);
         if (bothDeath && m_pInstance && m_pInstance->GetData(TYPE_THADDIUS) != SPECIAL)
-        {
             m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-        }
     }
 
     void KilledUnit(Unit* pVictim) override
