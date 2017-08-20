@@ -277,15 +277,43 @@ bool ChatHandler::HandleGMTicketListEscalatedCommand(char* /*args*/)
     return true;
 }
 
-bool ChatHandler::HandleGMTicketListCommand(char* /*args*/)
+bool ChatHandler::HandleGMTicketListCommand(char* args)
 {
-    sTicketMgr->ShowList(*this, false);
+    static const std::unordered_map<std::string, uint8> categories
+    {
+        { "stuck", 1 },{ "behavior", 2 },{ "harassment", 2 },{ "guild", 3 },
+        { "item", 4 },{ "environment", 5 },{ "world", 5 },{ "npc", 6 },
+        { "creature", 6 },{ "creep", 6 },{ "quest", 7 },{ "questnpc", 7 },
+        { "technical", 8 },{ "account", 9 },{ "billing", 9 },{ "character", 10 }
+    };
+
+    auto it = categories.find(args);
+
+    if (it == categories.end())
+        sTicketMgr->ShowList(*this, false);
+    else
+        sTicketMgr->ShowList(*this, false, it->second);
+
     return true;
 }
 
-bool ChatHandler::HandleGMTicketListOnlineCommand(char* /*args*/)
+bool ChatHandler::HandleGMTicketListOnlineCommand(char* args)
 {
-    sTicketMgr->ShowList(*this, true);
+    static const std::unordered_map<std::string, uint8> categories
+    {
+        { "stuck", 1 },{ "behavior", 2 },{ "harassment", 2 },{ "guild", 3 },
+        { "item", 4 },{ "environment", 5 },{ "world", 5 },{ "npc", 6 },
+        { "creature", 6 },{ "creep", 6 },{ "quest", 7 },{ "questnpc", 7 },
+        { "technical", 8 },{ "account", 9 },{ "billing", 9 },{ "character", 10 }
+    };
+
+    auto it = categories.find(args);
+
+    if (it == categories.end())
+        sTicketMgr->ShowList(*this, true);
+    else
+        sTicketMgr->ShowList(*this, true, it->second);
+
     return true;
 }
 
