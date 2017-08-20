@@ -5064,7 +5064,6 @@ update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` =
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15974; -- Dread Creeper
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15975; -- Carrion Spinner
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15977; -- Poisonous Skitterer
-update `creature_template` set `MechanicImmuneMask` =  where `entry` = ; -- 
 update `creature_template` set `MechanicImmuneMask` = 1023391483 where `entry` = 15980; -- Naxxramas Cultist
 update `creature_template` set `MechanicImmuneMask` = 1023391483 where `entry` = 15981; -- Naxxramas Acolyte
 update `creature_template` set `MechanicImmuneMask` = 1015758352 where `entry` = 16020; -- Mad Scientist
@@ -5086,12 +5085,10 @@ update `creature_template` set `MechanicImmuneMask` = 1022042643 where `entry` =
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16036; -- Frenzied Bat
 update `creature_template` set `MechanicImmuneMask` = 1022049811 where `entry` = 16034; -- Plague Beast
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16297; -- Mutated Grub
-update `creature_template` set `MechanicImmuneMask` =  where `entry` = ; -- 
 update `creature_template` set `MechanicImmuneMask` = 1015751186 where `entry` = 16164; -- Shade of Naxxramas
 update `creature_template` set `MechanicImmuneMask` = 1015751186 where `entry` = 16449; -- Spirit of Naxxramas
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16505; -- Naxxramas Follower
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16506; -- Naxxramas Worshipper
-update `creature_template` set `MechanicImmuneMask` =  where `entry` = ; -- 
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16981; -- Plagued Guardian
 update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16982; -- Plagued Construct
 update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16983; -- Plagued Champion
