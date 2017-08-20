@@ -613,6 +613,13 @@ INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4117', 'at_n
 -- deathknight vindicator faster aura of agony
 UPDATE `creature_ai_scripts` SET `event_param3`=4000, `event_param4`=4000, `action1_param2`=0 WHERE `id`=1645101;
 
+UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=3415 WHERE `entry`=16154; -- risen deathkngiht
+UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=3415 WHERE `entry`=16156; -- dark touched warrior
+UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=2600 WHERE `entry`=16157; -- doom touched warrior
+UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=3415 WHERE `entry`=16158; -- death touched warrior
+
+
+
 
 
 /*
