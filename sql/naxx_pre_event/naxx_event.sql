@@ -73,6 +73,9 @@ UPDATE `creature_template` SET `ScriptName`='npc_spectral_apparition' WHERE `ent
 UPDATE `creature_template` SET `ScriptName`='npc_necropolis_relay' WHERE `entry`=16386;
 UPDATE `creature_template` SET `ScriptName`='npc_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `ScriptName`='npc_necrotic_shard' WHERE `entry`=16136;
+UPDATE `creature_template` SET `ScriptName`='npc_argent_emissary' WHERE `entry`=16359;
+UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16786;
+UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16787;
 
 -- Update modelids for several creatures
 UPDATE `creature_template` SET `modelid_2`=16238 WHERE  `entry`=16384;
@@ -84,6 +87,9 @@ UPDATE `creature_template` SET `modelid_2`=16240 WHERE  `entry`=16436;
 UPDATE `creature_template` SET `modelid_2`=10672, `modelid_3`=10670 WHERE  `entry`=16511;
 
 UPDATE `creature` SET `modelid`=16230 WHERE `guid`=1242988;
+
+-- Argent Scouts have spawned at an Argent Dawn camp in the main cities and give a new quest, Light's Hope Chapel. The quest asks plays to deliver the [Call to Arms Announcement] to the Keeper of the Rolls at Light's Hope Chapel, in Eastern Plaguelands.
+-- Add Argent Scouts 16255 and Argent Recruiter 16241 gives quest http://www.wowhead.com/quest=9154/lights-hope-chapel
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
@@ -105,7 +111,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (@CGUID_BOSS+5, 81);
 
 -- Add ghost glow
-DELETE FROM `creature_template_addon` WHERE `entry` IN (14682, 14693, 14686, 14690, 14695, 14684);
+DELETE FROM `creature_template_addon` WHERE `entry` IN (14682, 14693, 14686, 14690, 14695, 14684, 16380, 16379, 14697);
 INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES
 (14682, 0, 0, 0, 0, 0, 0, '50596'),
 (14693, 0, 0, 0, 0, 0, 0, '50596'),
@@ -128,6 +134,7 @@ INSERT INTO creature_ai_scripts VALUES
 
 -- Creature id: 14684
 -- Balzaphon
+UPDATE creature_template SET AIName='EventAI' WHERE entry=14684;
 DELETE FROM creature_ai_scripts WHERE creature_id=14684;
 INSERT INTO creature_ai_scripts VALUES 
 ('1468401','14684','0','0','100','1','1000','4000','2000','4000','11','16799','1','0','0','0','0','0','0','0','0','0','Balzaphon - Frostbolt'),
@@ -135,10 +142,27 @@ INSERT INTO creature_ai_scripts VALUES
 
 -- Creature id: 14690
 -- Revanchion
+UPDATE creature_template SET AIName='EventAI' WHERE entry=14690;
 DELETE FROM creature_ai_scripts WHERE creature_id=14690;
 INSERT INTO creature_ai_scripts VALUES 
 ('1469001','14690','0','0','100','1','5000','6000','9000','10000','11','29849','1','0','0','0','0','0','0','0','0','0','Revanchion - Frost Nova'),
 ('1469002','14690','0','0','100','1','2000','3000','5000','8000','11','15245','1','0','0','0','0','0','0','0','0','0','Revanchion - Shadowbolt Volley');
+
+-- Creature id: 16241
+-- Argent Recruiter
+UPDATE creature_template SET AIName='EventAI' WHERE entry=16241;
+DELETE FROM creature_ai_scripts WHERE creature_id=16241;
+INSERT INTO creature_ai_scripts VALUES 
+('1624101','16241','1','0','100','1','10000','90000','20000','70000','10','11','18','0','0','0','0','0','0','0','0','0','Argent Recruiter - Random Laugh or Cry Emote'),
+('1624102','16241','1','0','100','1','5000','25000','10000','30000','5','1','0','0','0','0','0','0','0','0','0','0','Argent Recruiter - Talk Emote OOC');
+
+-- Creature id: 16255
+-- Argent Scout
+UPDATE creature_template SET AIName='EventAI' WHERE entry=16255;
+DELETE FROM creature_ai_scripts WHERE creature_id=16255;
+INSERT INTO creature_ai_scripts VALUES 
+('1625501','16255','1','0','100','1','10000','90000','20000','70000','10','11','18','0','0','0','0','0','0','0','0','0','Argent Scout - Random Laugh or Cry Emote'),
+('1625502','16255','1','0','100','1','5000','25000','10000','30000','5','1','0','0','0','0','0','0','0','0','0','0','Argent Scout - Talk Emote OOC');
 
 UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14682;
 UPDATE `creature_template` SET `subname`=' ' WHERE `entry`=14693;
@@ -160,7 +184,7 @@ DELETE FROM `creature_equip_template` WHERE entry=14695;
 INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
 (14695, 18985, 12893, 5258);
 
--- Add loot to Quartermaster
+-- Add loot to Argent Quartermaster
 UPDATE `creature_template` SET `npcflag`=16388 WHERE  `entry`=16786;
 DELETE FROM `npc_vendor` WHERE entry=16786;
 INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
@@ -174,7 +198,85 @@ INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
 (16786, 23081, 0, 0),
 (16786, 23084, 0, 0);
 
-DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182;
+-- Add loot to Argent Outfitter
+UPDATE `creature_template` SET `npcflag`=16388 WHERE  `entry`=16787;
+DELETE FROM `npc_vendor` WHERE entry=16787;
+INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`) VALUES
+(16787, 22999, 0, 0),
+(16787, 23122, 0, 0),
+(16787, 23123, 0, 0),
+(16787, 13444, 0, 0),
+(16787, 13446, 0, 0),
+(16787, 23078, 0, 0),
+(16787, 23082, 0, 0),
+(16787, 23081, 0, 0),
+(16787, 23084, 0, 0);
+
+-- Correct several spawns
+UPDATE `creature` SET `id`=16255, `equipment_id`=0 WHERE `guid`=1243007; -- id 16241 equipment_id 798
+UPDATE `creature` SET `id`=16255, `equipment_id`=0 WHERE `guid`=1243009;
+UPDATE `creature` SET `id`=16787 WHERE `guid`=1242991;
+UPDATE `creature` SET `id`=16359 WHERE `guid`=1242990;
+UPDATE `creature` SET `id`=16787 WHERE `guid`=1242984;
+UPDATE `creature` SET `id`=16359 WHERE `guid`=1242983;
+
+-- Update Argent Scout equipment
+UPDATE `creature` SET `equipment_id`=16255 WHERE `guid`=16255;
+DELETE FROM `creature_equip_template` WHERE entry=16255;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16255, 5305, 12980, 0);
+
+-- Update Argent Messenger equipment
+UPDATE `creature` SET `equipment_id`=16359 WHERE `guid`=16359;
+DELETE FROM `creature_equip_template` WHERE entry=16359;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16359, 5305, 12980, 0);
+
+-- Update Argent Dawn Initiate equipment
+UPDATE `creature` SET `equipment_id`=16384 WHERE `guid`=16384;
+DELETE FROM `creature_equip_template` WHERE entry=16384;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16384, 19053, 0, 0);
+
+-- Update Argent Dawn Paladin equipment
+UPDATE `creature` SET `equipment_id`=16395 WHERE `guid`=16395;
+DELETE FROM `creature_equip_template` WHERE entry=16395;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16395, 19053, 0, 0);
+
+-- Update Argent Dawn Cleric equipment
+UPDATE `creature` SET `equipment_id`=16435 WHERE `guid`=16435;
+DELETE FROM `creature_equip_template` WHERE entry=16435;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16435, 14873, 0, 0);
+
+-- Update Argent Dawn Priest equipment
+UPDATE `creature` SET `equipment_id`=16436 WHERE `guid`=16436;
+DELETE FROM `creature_equip_template` WHERE entry=16436;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16436, 18122, 0, 0);
+
+-- Update Argent Dawn Crusader equipment
+UPDATE `creature` SET `equipment_id`=16433 WHERE `guid`=16433;
+DELETE FROM `creature_equip_template` WHERE entry=16433;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16433, 2196, 0, 0);
+
+-- Update Argent Dawn Crusader equipment
+UPDATE `creature` SET `equipment_id`=16433 WHERE `guid`=16433;
+DELETE FROM `creature_equip_template` WHERE entry=16433;
+INSERT INTO `creature_equip_template` (`entry`, `equipentry1`, `equipentry2`, `equipentry3`) VALUES
+(16433, 2196, 0, 0);
+
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16490;
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16493;
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16494;
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16495;
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16241;
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16359;
+UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16255;
+
+DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+183;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
 (@CGUID_GENERAL+0  , 16285, 0, 0, 0, -4935.45, -990.098, 501.456, 2.40353, 25, 0, 0, 8, 0, 0, 0, 0),
 (@CGUID_GENERAL+1  , 16241, 0, 0, 798, -4934.06, -988.571, 501.459, 2.40353, 25, 0, 0, 300, 0, 0, 0, 0),
@@ -183,7 +285,7 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `positio
 (@CGUID_GENERAL+4  , 16395, 0, 0, 0, -4925.02, -985.091, 501.455, 2.30543, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+5  , 16241, 0, 0, 798, -8832.93, 643.004, 94.7504, 4.21086, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+6  , 16285, 0, 0, 0, -8831.22, 640.154, 94.4378, 3.90063, 25, 0, 0, 8, 0, 0, 0, 0),
-(@CGUID_GENERAL+7  , 16395, 0, 0, 0, -8839.21, 646.997, 96.0542, 3.617884, 25, 0, 0, 300, 0, 0, 0, 0),
+(@CGUID_GENERAL+7  , 16395, 0, 0, 16395, -8839.21, 646.997, 96.0542, 3.617884, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+8  , 16786, 0, 0, 0, -8835.663086, 644.270447, 95.505074, 4.238351, 25, 0, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+9  , 16423, 0, 0, 0, -9041.08, 342.393, 93.4455, 2.48927, 25, 5, 0, 120, 0, 0, 1, 0),
 (@CGUID_GENERAL+10 , 16423, 0, 0, 0, -9058.45, 359.37, 92.9135, 2.61494, 25, 5, 0, 120, 0, 0, 1, 0),
@@ -358,10 +460,11 @@ INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `positio
 (@CGUID_GENERAL+179, 16508, 0, 0, 0, -8822.24, 647.135, 94.4622, 4.71745, 25, 5, 0, 8, 0, 0, 0, 0),
 (@CGUID_GENERAL+180, 16787, 1, 0, 0, 1586.24, -4425.39, 7.83914, 3.34184, 25, 5, 0, 300, 0, 0, 0, 0),
 (@CGUID_GENERAL+181, 16359, 1, 0, 0, 1589.03, -4422.22, 8.61155, 3.34184, 25, 5, 0, 5228, 0, 0, 0, 0),
-(@CGUID_GENERAL+182, 16255, 1, 0, 0, 1587.85, -4418.74, 8.66717, 3.50677, 25, 5, 0, 8, 0, 0, 0, 0);
+(@CGUID_GENERAL+182, 16255, 1, 0, 0, 1587.85, -4418.74, 8.66717, 3.50677, 25, 5, 0, 8, 0, 0, 0, 0),
+(@CGUID_GENERAL+183, 16384, 1, 0, 0, 1581.95, -4413.12, 7.66595, 2.68213, 25, 5, 0, 300, 0, 0, 0, 0);
 
-DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182 AND `event`=@Event_2;
-INSERT INTO `game_event_creature` SELECT creature.guid, @Event_2 FROM `creature` WHERE creature.guid BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+182;
+DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+183 AND `event`=@Event_2;
+INSERT INTO `game_event_creature` SELECT creature.guid, @Event_2 FROM `creature` WHERE creature.guid BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+183;
 
 DELETE FROM `creature` WHERE `guid` IN (1242996, 1242997, 1243011, 1242995, 1242992, 1242993, 1243010, 1242994, 1242988, 1242986, 1242987, 1243008);
 
