@@ -786,7 +786,7 @@ UPDATE `creature_template` SET `faction_A`=20, `faction_H`=20, `mindmg`=0, `maxd
 REPLACE INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
-(1669701, 16697, 1, 0, 100, 1, 1000, 1000, 1000, 1000, 11, 28865, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Void Zone cast Consumption');
+(1669701, 16697, 1, 0, 100, 1, 1500, 1500, 1000, 1000, 11, 28865, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Void Zone cast Consumption');
 
 
 
