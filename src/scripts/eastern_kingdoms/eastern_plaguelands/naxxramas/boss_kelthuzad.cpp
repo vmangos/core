@@ -647,11 +647,19 @@ struct boss_kelthuzadAI : public ScriptedAI
             case EVENT_FROSTBOLT_VOLLEY:
                 if (m_creature->IsNonMeleeSpellCasted())
                 {
+                    sLog.outBasic("KT frostbolt aoe delayed as other spell is casted");
                     events.Repeat(Seconds(2));
-                    break;
                 }
-                DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BOLT_NOVA);
-                events.Repeat(Seconds(urand(15, 30)));
+                else
+                {
+                    if(DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
+                        events.Repeat(Seconds(urand(15, 30)));
+                    else
+                    {
+                        sLog.outBasic("KT frostbolt aoe failed to cast");
+                        events.Repeat(Seconds(1));
+                    }
+                }
                 break;
             case EVENT_FROST_BLAST:
                 if (m_creature->IsNonMeleeSpellCasted())
@@ -860,7 +868,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
                 if (pC->HasAura(9484) || pC->HasAura(9485) || pC->HasAura(10955))
                     ++numShackled;
             }
-            if (numShackled >= 4)
+            if (numShackled >= 3)
             {
                 for (Creature* pC : guardians)
                 {
