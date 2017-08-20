@@ -60,6 +60,13 @@ DELETE FROM creature where map = 533;
 
 -- todo: set spawntimesecs of all bosses to 604800
 
+DELETE FROM `spell_mod` where Id in (28800);
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`,
+`AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, 
+`StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
+VALUES 
+('28800', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1 ', '4', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'World of Thawing ignore los');
+
 -- give AreaTrigger outside Faerlina scriptname
 DELETE FROM `scripted_areatrigger` where entry = 4115;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4115', 'at_naxxramas');
@@ -1259,8 +1266,7 @@ INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `Durati
 `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
 VALUES 
 ('28531', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Aura not unnaffected by invulnerability'),
-('28529', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '536870912', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Aura trigger unaffected by invulnerability'),
-('29318', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Breath dont ignore los ffs');
+('28529', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '536870912', '-1', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Sapphiron Frost Aura trigger unaffected by invulnerability');
 
 -- ice blocks used on sapphiron should be generic gobjs
 update gameobject_template set type=5, data2=0 where entry = 181247;
@@ -1372,8 +1378,8 @@ VALUES
 
 -- Data exported from Trinitycore Database
 
--- deletes all gobs in map 533 (naxx) from gameobject table with the exception of gobs with id 181287. 181287 are the frozen runes, which were removed in wotlk and thus does not exist in wotlk
-DELETE FROM gameobject where map = 533 and id != 181287;
+-- deletes all gobs in map 533 (naxx) from gameobject table
+DELETE FROM gameobject where map = 533;
 
 -- Using guid 533xxx for GObs in naxx to keep it structured. 533 is map-id, so makes some kind of sense at least.
 SET @OGUID:=533000;
