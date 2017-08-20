@@ -50,8 +50,6 @@ enum eStalaggFeugen
     SPELL_POWERSURGE        = 28134,
     SPELL_STATIC_FIELD      = 28135,
     SPELL_MAGNETIC_PULL     = 28337,
-
-    SPELL_SUECIDE           = 28748,
 };
 
 enum addEvents
@@ -482,20 +480,10 @@ struct boss_thaddiusAddsAI : public ScriptedAI
             {
                 if (otherAI->m_bFakeDeath)
                 {
-                    //if(m_SorF == eSTALAGG)
-                    //    DoScriptText(SAY_STAL_DEATH, m_creature);
-                    //else
-                    //    DoScriptText(SAY_FEUG_DEATH, m_creature);
                     otherAI->bothDeath = true;
                     bothDeath = true;
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-                    //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-                    //m_creature->CastSpell(m_creature, SPELL_SUECIDE, true);
-                    //otherAdd->CastSpell(otherAdd, SPELL_SUECIDE, true);
-                    //otherAdd->Kill(otherAdd, nullptr); 
-                    //m_creature->Kill(m_creature, nullptr);
-                    //return;
                 }
             }
         }
