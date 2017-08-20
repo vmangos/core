@@ -58,7 +58,8 @@ DELETE FROM creature where map = 533;
 * General naxx stuff
 */ 
 
--- todo: set spawntimesecs of all bosses to 604800
+-- moving the naxxramas flying gobj outside naxx to... naxx
+update gameobject set position_x = 3132, position_y = -3731, position_z = 139 where id = 181056;
 
 DELETE FROM `spell_mod` where Id in (28800);
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`,

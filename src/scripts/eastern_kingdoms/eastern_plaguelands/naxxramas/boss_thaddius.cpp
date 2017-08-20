@@ -462,8 +462,9 @@ struct boss_thaddiusAddsAI : public ScriptedAI
                     bothDeath = true;
                     if (m_pInstance)
                         m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
-                    //otherAdd->Kill(otherAdd, nullptr); 
-                    //return; // not modifying damage, thus will die
+                    otherAdd->Kill(otherAdd, nullptr); 
+                    m_creature->Kill(m_creature, nullptr);
+                    return; // not modifying damage, thus will die
                 }
             }
         }
@@ -989,6 +990,10 @@ struct boss_stalaggAI : public boss_thaddiusAddsAI
     void JustDied(Unit* /*pKiller*/) override
     {
         DoScriptText(SAY_STAL_DEATH, m_creature);
+        if (bothDeath && m_pInstance && m_pInstance->GetData(TYPE_THADDIUS) != SPECIAL)
+        {
+            m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
+        }
     }
 
     void KilledUnit(Unit* pVictim) override
@@ -1019,6 +1024,10 @@ struct boss_feugenAI : public boss_thaddiusAddsAI
     void JustDied(Unit* /*pKiller*/) override
     {
         DoScriptText(SAY_FEUG_DEATH, m_creature);
+        if (bothDeath && m_pInstance && m_pInstance->GetData(TYPE_THADDIUS) != SPECIAL)
+        {
+            m_pInstance->SetData(TYPE_THADDIUS, SPECIAL);
+        }
     }
 
     void KilledUnit(Unit* pVictim) override
