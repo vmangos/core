@@ -791,30 +791,28 @@ void AreaAura::Update(uint32 diff)
 
 void PersistentAreaAura::Update(uint32 diff)
 {
-    bool remove = false;
-
     // remove the aura if its caster or the dynamic object causing it was removed
     // or if the target moves too far from the dynamic object
 
+    bool remove = false;
+    uint32 spellId = GetId();
     // Nostalrius: piege explosif. Ne doit pas etre retire lorsqu'on sort de la zone.
-    if (GetId() != 13812 && GetId() != 14314 && GetId() != 14315)
+    if (spellId != 13812 && spellId != 14314 && spellId != 14315)
     {
+        remove = true;
         if (Unit *caster = GetCaster())
         {
-            DynamicObject *dynObj = caster->GetDynObject(GetId(), GetEffIndex());
-            if (dynObj)
+            std::vector<DynamicObject*> dynObjs;
+            caster->GetDynObjects(spellId, GetEffIndex(), dynObjs);
+            Unit* pUnitTarget = GetTarget();
+            for (DynamicObject* obj : dynObjs)
             {
-                if (!GetTarget()->IsWithinDistInMap(dynObj, dynObj->GetRadius()))
-                {
-                    remove = true;
-                    dynObj->RemoveAffected(GetTarget());        // let later reapply if target return to range
-                }
+                if (pUnitTarget->IsWithinDistInMap(obj, obj->GetRadius()))
+                    remove = false;
+                else
+                    obj->RemoveAffected(pUnitTarget);           // let later reapply if target return to range
             }
-            else
-                remove = true;
         }
-        else
-            remove = true;
     }
 
     Aura::Update(diff);
