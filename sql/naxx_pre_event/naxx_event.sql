@@ -273,7 +273,7 @@ UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16493;
 UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16494;
 UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16495;
 UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16241;
-UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16359;
+UPDATE `creature_template` SET `npcflag`=1 WHERE `entry`=16359;
 UPDATE `creature_template` SET `npcflag`=2 WHERE `entry`=16255;
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_GENERAL+0 AND @CGUID_GENERAL+183;
