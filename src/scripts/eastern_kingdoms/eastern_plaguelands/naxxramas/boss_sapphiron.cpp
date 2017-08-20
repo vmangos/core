@@ -242,8 +242,8 @@ struct boss_sapphironAI : public ScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SAPPHIRON, IN_PROGRESS);
 
-        events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
-        events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
+        events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(12));
+        events.ScheduleEvent(EVENT_BLIZZARD, Seconds(10));
         events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(40));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
@@ -443,8 +443,8 @@ struct boss_sapphironAI : public ScriptedAI
             {
                 DeleteAndDispellIceBlocks();
                 events.Reset();
-                events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(24));
-                events.ScheduleEvent(EVENT_BLIZZARD, Seconds(20));
+                events.ScheduleEvent(EVENT_LIFEDRAIN, Seconds(3));
+                events.ScheduleEvent(EVENT_BLIZZARD, Seconds(1));
                 events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(urand(50, 70))); // Sampling videos show its 50-70sec between engaging after landing, and disengaging to fly again
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
                 events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
@@ -570,11 +570,12 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         m_creature->SetReactState(ReactStates::REACT_PASSIVE);
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         events.ScheduleEvent(1, Seconds(2));
+        checkAuraTimer = 0;
     }
     
     EventMap events;
     instance_naxxramas* m_pInstance;
-
+    uint32 checkAuraTimer;
     void Reset() override
     {
     }
@@ -602,42 +603,50 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
     {
         events.Reset();
         PickNewTarget();
-        events.Repeat(Seconds(6));
+        events.Repeat(Seconds(8));
     }
 
     void PickNewTarget()
     {
         m_creature->GetMotionMaster()->Clear();
-        Creature* pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
+
+        Creature* pSapp = nullptr;
+        if(m_pInstance)
+            m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
         if (!pSapp)
         {
             m_creature->GetMotionMaster()->MoveRandom();
             return;
         }
 
-        Unit* newTarget = pSapp->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, 0.0f, true);
+        // dont select tank position as destination
+        Unit* newTarget = pSapp->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, 0.0f, true);
         if (!newTarget)
         {
             events.Repeat(100);
             m_creature->GetMotionMaster()->MoveRandom();
             return;
         }
-        m_creature->GetMotionMaster()->MoveFollow(newTarget, 1.0f, 0.0f);
+        
+        m_creature->GetMotionMaster()->MovePoint(1, newTarget->GetPositionX(), newTarget->GetPositionY(), newTarget->GetPositionZ());
     }
 
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (!m_creature->HasAura(SPELL_BLIZZARD_PERIODIC))
-            m_creature->CastSpell(m_creature, SPELL_BLIZZARD_PERIODIC, true);
-        
-        if (!m_pInstance)
-            return;
+        if (checkAuraTimer < uiDiff)
+        {
+            if (!m_creature->HasAura(SPELL_BLIZZARD_PERIODIC))
+                m_creature->CastSpell(m_creature, SPELL_BLIZZARD_PERIODIC, true);
+            checkAuraTimer = 2000;
+        }
+        else
+            checkAuraTimer -= uiDiff;
 
         events.Update(uiDiff);
         if (events.ExecuteEvent())
         {
             PickNewTarget();
-            events.Repeat(Seconds(6));
+            events.Repeat(Seconds(8));
         }
     }
 };
