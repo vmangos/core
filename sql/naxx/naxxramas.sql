@@ -5041,108 +5041,104 @@ update creature_template set flags_extra = 0 where entry in (
 
 
 
-
-
-
-
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15928; -- Thaddius
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15929; -- Stalagg
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15930; -- Feugen
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15931; -- Grobbulus
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15932; -- Gluth
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15936; -- Heigan the Unclean
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15952; -- Maexxna
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15953; -- Grand Widow Faerlina
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15954; -- Noth the Plaguebringer
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15956; -- Anub'Rekhan
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15989; -- Sapphiron
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 15990; -- Kel'Thuzad
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16011; -- Loatheb
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16028; -- Patchwerk
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16060; -- Gothik the Harvester
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16061; -- Instructor Razuvious
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16062; -- Highlord Mograine
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16063; -- Sir Zeliek
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16064; -- Thane Korth'azz
-update `creature_template` set `MechanicImmuneMask` = 1019952987 where `entry` = 16065; -- Lady Blaumeux
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15928; -- Thaddius
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15929; -- Stalagg
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15930; -- Feugen
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15931; -- Grobbulus
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15932; -- Gluth
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15936; -- Heigan the Unclean
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15952; -- Maexxna
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15953; -- Grand Widow Faerlina
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15954; -- Noth the Plaguebringer
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15956; -- Anub'Rekhan
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15989; -- Sapphiron
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 15990; -- Kel'Thuzad
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16011; -- Loatheb
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16028; -- Patchwerk
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16060; -- Gothik the Harvester
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16061; -- Instructor Razuvious
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16062; -- Highlord Mograine
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16063; -- Sir Zeliek
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16064; -- Thane Korth'azz
+update `creature_template` set `MechanicImmuneMask` = 1019953019 where `entry` = 16065; -- Lady Blaumeux
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15974; -- Dread Creeper
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15975; -- Carrion Spinner
-update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15976; -- Venom Stalker
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15977; -- Poisonous Skitterer
-update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15978; -- Crypt Reaver
-update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15980; -- Naxxramas Cultist
-update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 15981; -- Naxxramas Acolyte
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16017; -- Patchwork Golem
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16018; -- Bile Retcher
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16020; -- Mad Scientist
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16021; -- Living Monstrosity
+update `creature_template` set `MechanicImmuneMask` =  where `entry` = ; -- 
+update `creature_template` set `MechanicImmuneMask` = 1023391483 where `entry` = 15980; -- Naxxramas Cultist
+update `creature_template` set `MechanicImmuneMask` = 1023391483 where `entry` = 15981; -- Naxxramas Acolyte
+update `creature_template` set `MechanicImmuneMask` = 1015758352 where `entry` = 16020; -- Mad Scientist
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16022; -- Surgical Assistant
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16024; -- Embalming Slime
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16025; -- Stitched Giant
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16027; -- Living Poison
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16029; -- Sludge Belcher
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16034; -- Plague Beast
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16037; -- Plagued Bat
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16021; -- Living Monstrosity
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16056; -- Diseased Maggot
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16057; -- Rotting Maggot
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16067; -- Deathcharger Steed
-update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16124; -- Unrelenting Trainee
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16125; -- Unrelenting Death Knight
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16126; -- Unrelenting Rider
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16127; -- Spectral Trainee
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16142; -- Bile Sludge
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16145; -- Death Knight Captain
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16146; -- Death Knight
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16148; -- Spectral Death Knight
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16149; -- Spectral Horse
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16150; -- Spectral Rider
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16154; -- Risen Squire
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16156; -- Dark Touched Warrior
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16157; -- Doom Touched Warrior
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16158; -- Death Touched Warrior
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16163; -- Death Knight Cavalier
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16164; -- Shade of Naxxramas
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16165; -- Necro Knight
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16167; -- Bony Construct
-update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16168; -- Stoneskin Gargoyle
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16236; -- Eye Stalk
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16243; -- Plague Slime
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16057; -- Rotting Maggot
+update `creature_template` set `MechanicImmuneMask` = 1015751186 where `entry` = 16027; -- Living Poison
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16142; -- Bile Sludge
+update `creature_template` set `MechanicImmuneMask` = 1015756368 where `entry` = 16167; -- Bony Construct
+update `creature_template` set `MechanicImmuneMask` = 1022049811 where `entry` = 16243; -- Plague Slime
 update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16244; -- Infectious Ghoul
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16290; -- Fallout Slime
+update `creature_template` set `MechanicImmuneMask` = 1021518352 where `entry` = 16447; -- Plagued Ghoul
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16698; -- Corpse Scarab
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 17055; -- Maexxna Spiderling
+update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16390; -- Deathchill Servant
+update `creature_template` set `MechanicImmuneMask` = 1022042643 where `entry` = 16037; -- Plagued Bat
+update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16036; -- Frenzied Bat
+update `creature_template` set `MechanicImmuneMask` = 1022049811 where `entry` = 16034; -- Plague Beast
 update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16297; -- Mutated Grub
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16360; -- Zombie Chow
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16368; -- Necropolis Acolyte
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16375; -- Sewage Slime
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16427; -- Soldier of the Frozen Wastes
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16428; -- Unstoppable Abomination
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16429; -- Soul Weaver
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16441; -- Guardian of Icecrown
-update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16446; -- Plagued Gargoyle
-update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16447; -- Plagued Ghoul
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16449; -- Spirit of Naxxramas
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16451; -- Deathknight Vindicator
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16452; -- Necro Knight Guardian
-update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16453; -- Necro Stalker
+update `creature_template` set `MechanicImmuneMask` =  where `entry` = ; -- 
+update `creature_template` set `MechanicImmuneMask` = 1015751186 where `entry` = 16164; -- Shade of Naxxramas
+update `creature_template` set `MechanicImmuneMask` = 1015751186 where `entry` = 16449; -- Spirit of Naxxramas
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16505; -- Naxxramas Follower
 update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16506; -- Naxxramas Worshipper
-update `creature_template` set `MechanicImmuneMask` = 1023391482 where `entry` = 16573; -- Crypt Guard
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16698; -- Corpse Scarab
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16803; -- Death Knight Understudy
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16861; -- Death Lord
+update `creature_template` set `MechanicImmuneMask` =  where `entry` = ; -- 
 update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16981; -- Plagued Guardian
 update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16982; -- Plagued Construct
 update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16983; -- Plagued Champion
 update `creature_template` set `MechanicImmuneMask` = 1021518353 where `entry` = 16984; -- Plagued Warrior
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 17055; -- Maexxna Spiderling
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16194; -- Unholy Axe
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16215; -- Unholy Staff
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16216; -- Unholy Swords
-update `creature_template` set `MechanicImmuneMask` = 1022042641 where `entry` = 16448; -- Plagued Deathhound
-update `creature_template` set `MechanicImmuneMask` = 1015751184 where `entry` = 16390; -- Deathchill Servant
-
-
-
-
+update `creature_template` set `MechanicImmuneMask` = 1023393530 where `entry` = 16573; -- Crypt Guard
+update `creature_template` set `MechanicImmuneMask` = 1006632960 where `entry` = 16127; -- Spectral Trainee
+update `creature_template` set `MechanicImmuneMask` = 1006764032 where `entry` = 16148; -- Spectral Death Knight
+update `creature_template` set `MechanicImmuneMask` = 1006764050 where `entry` = 16149; -- Spectral Horse
+update `creature_template` set `MechanicImmuneMask` = 1015693311 where `entry` = 16150; -- Spectral Rider
+update `creature_template` set `MechanicImmuneMask` = 1006764032 where `entry` = 16124; -- Unrelenting Trainee
+update `creature_template` set `MechanicImmuneMask` = 1006764050 where `entry` = 16125; -- Unrelenting Death Knight
+update `creature_template` set `MechanicImmuneMask` = 1023033343 where `entry` = 16126; -- Unrelenting Rider
+update `creature_template` set `MechanicImmuneMask` = 1006830096 where `entry` = 16154; -- Risen Squire
+update `creature_template` set `MechanicImmuneMask` = 1006830096 where `entry` = 16156; -- Dark Touched Warrior
+update `creature_template` set `MechanicImmuneMask` = 1006830096 where `entry` = 16157; -- Doom Touched Warrior
+update `creature_template` set `MechanicImmuneMask` = 1006830096 where `entry` = 16158; -- Death Touched Warrior
+update `creature_template` set `MechanicImmuneMask` = 1015758354 where `entry` = 16024; -- Embalming Slime
+update `creature_template` set `MechanicImmuneMask` = 1015758450 where `entry` = 16375; -- Sewage Slime
+update `creature_template` set `MechanicImmuneMask` = 1015758846 where `entry` = 16290; -- Fallout Slime
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16360; -- Zombie Chow
+update `creature_template` set `MechanicImmuneMask` = 1022049874 where `entry` = 16803; -- Death Knight Understudy
+update `creature_template` set `MechanicImmuneMask` = 1019952754 where `entry` = 16429; -- Soul Weaver
+update `creature_template` set `MechanicImmuneMask` = 1019428466 where `entry` = 16441; -- Guardian of Icecrown
+update `creature_template` set `MechanicImmuneMask` = 1019952754 where `entry` = 16428; -- Unstoppable Abomination
+update `creature_template` set `MechanicImmuneMask` = 1015226896 where `entry` = 16427; -- Soldier of the Frozen Wastes
+update `creature_template` set `MechanicImmuneMask` = 1022066674 where `entry` = 16017; -- Patchwork Golem
+update `creature_template` set `MechanicImmuneMask` = 1022066674 where `entry` = 16025; -- Stitched Spewer
+update `creature_template` set `MechanicImmuneMask` = 1022066674 where `entry` = 16018; -- Bile Retcher
+update `creature_template` set `MechanicImmuneMask` = 1022066674 where `entry` = 16029; -- Sludge Belcher
+update `creature_template` set `MechanicImmuneMask` = 1022049875 where `entry` = 16448; -- Plagued Deathhound
+update `creature_template` set `MechanicImmuneMask` = 1022049875 where `entry` = 16368; -- Necropolis Acolyte
+update `creature_template` set `MechanicImmuneMask` = 1023393531 where `entry` = 15978; -- Crypt Reaver
+update `creature_template` set `MechanicImmuneMask` = 1019945555 where `entry` = 16067; -- Deathcharger Steed
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16145; -- Death Knight Captain
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16146; -- Death Knight
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16163; -- Death Knight Cavalier
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16165; -- Necro Knight
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16452; -- Necro Knight Guardian
+update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16446; -- Plagued Gargoyle
+update `creature_template` set `MechanicImmuneMask` = 1073725439 where `entry` = 16168; -- Stoneskin Gargoyle
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16451; -- Deathknight Vindicator
+update `creature_template` set `MechanicImmuneMask` = 1023393531 where `entry` = 15976; -- Venom Stalker
+update `creature_template` set `MechanicImmuneMask` = 1023393531 where `entry` = 16453; -- Necro Stalker
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16194; -- Unholy Axe
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16215; -- Unholy Staff
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16216; -- Unholy Swords
+update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16861; -- Death Lord
 
 
 
