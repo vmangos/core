@@ -161,6 +161,7 @@ UPDATE `creature_ai_scripts` SET `event_param1`=3500, `event_param2`=3500, `even
 -- death knight vindicator, increase frequency of aura of agony and death coil hit maintank
 UPDATE `creature_ai_scripts` SET `action1_param2`=1 WHERE `id`=1645103;
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1645101;
+UPDATE `creature_template` SET `minhealth`=163859, `maxhealth`=163859, `mindmg`=3500, `maxdmg`=4162 WHERE `entry`=16451;
 
 -- updating a bunch of creatures faction which were previously 21 or other incorrect factions
 UPDATE creature_template SET faction_A=20, faction_H=20 where entry in(
@@ -427,9 +428,6 @@ UPDATE `creature_ai_scripts` SET `event_type`=0, `event_param1`=15000, `event_pa
 -- Death knight captain increased dmg, but reduced attackspeed and ai
 UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=2500, `AIName`='EventAI', `ScriptName`='' WHERE `entry`=16145;
 
--- missing npc death lord (16861): https://youtu.be/VrykhhdPfc4?t=6m9s
--- exists in db, but must be scaled up and faction changed.
-
 
 -- deathknights offhand is a shield, not a mount like it was
 UPDATE `creature_template` SET `equipment_id` = 16146 where `entry` = 16146;
@@ -440,7 +438,7 @@ INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipent
 UPDATE `creature_template` SET `scale` = 1.8 where `entry` IN (16861, 16861);
 
 -- death lords had 0 dmg
-UPDATE `creature_template` SET `mindmg`=2500, `maxdmg`=3500 WHERE `entry`=16861;
+UPDATE `creature_template` SET `minhealth`=163859, `maxhealth`=163859, `mindmg`=3406, `maxdmg`=4793 WHERE `entry`=16861;
 
 -- Death lord and death knight cavalier deathcoil hits current tank
 UPDATE `creature_ai_scripts` SET `action1_param2`=1 WHERE `id`=1686103;
@@ -450,6 +448,9 @@ UPDATE `creature_ai_scripts` SET `action1_param2`=1 WHERE `id`=1616303;
 -- death lord has higher frequency of aura of agony
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=3000, `event_param4`=3000 WHERE `id`=1686101;
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `event_param4`=6000  WHERE `id`=1616301;
+
+-- death knight cavalier
+UPDATE `creature_template` SET `mindmg`=3219, `maxdmg`=4231 WHERE `entry`=16163;
 
 -- Touched Warriors periodically wipe aggro 
 UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16156;
@@ -513,7 +514,7 @@ VALUES
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai',`minhealth`=150000, `maxhealth`=150000, `mindmg`=4100, `maxdmg`=5100 WHERE `entry`=16164;
 
 
-UPDATE `creature_template` SET `equipment_id` = 16861 where `entry` = 16861;
+UPDATE `creature_template` SET `equipment_id`= 16861 where `entry` = 16861;
 DELETE FROM `creature_equip_template` where entry = 16861;
 INSERT INTO `creature_equip_template` (entry, equipentry1, equipentry2, equipentry3) VALUES (16861, 22738, 0, 0);
 
@@ -2463,7 +2464,7 @@ VALUES
 (88811,16365,533,16129,0,2853.57,-3251.69,298.21,5.19,3520,0,0,19500,12000,0,0,0),
 (88810,16452,533,2606,0,2852.16,-2982.05,267.68,3.09,3520,0,0,106651,108270,0,0,0),
 (88809,16452,533,2606,0,2851.85,-2987.67,267.68,3.08,3520,0,0,105698,108270,0,0,0),
-(88808,16451,533,10729,0,2849.82,-2984.93,267.68,3.18,3520,0,0,156138,25680,0,2,0),
+(88808,16451,533,10729,0,2849.82,-2984.93,267.68,3.18,3520,0,0,163859,25680,0,2,0),
 (88807,16368,533,16160,0,2848.82,-2974.33,267.68,4.67,3520,0,0,110197,25680,0,0,0),
 (88806,16368,533,0,0,2848.44,-2997.48,267.68,1.54,3520,0,0,110197,25680,0,0,1),
 (88805,16368,533,16160,0,2760.94,-2974.27,240.62,4.66,3520,0,0,110197,25680,0,0,0),
@@ -2477,7 +2478,7 @@ VALUES
 (88797,16452,533,2606,0,2554.02,-3280.62,267.68,1.6,3520,0,0,106818,108270,0,0,0),
 (88796,16452,533,2606,0,2559.33,-3280.48,267.68,1.6,3520,0,0,108534,108270,0,0,0),
 (88793,16368,533,0,0,2567.26,-3277.1,267.68,3.07,3520,0,0,110197,25680,0,0,1),
-(88795,16451,533,10729,0,2556.46,-3279.11,267.68,1.6,3520,0,0,157698,25680,0,2,0),
+(88795,16451,533,10729,0,2556.46,-3279.11,267.68,1.6,3520,0,0,163859,25680,0,2,0),
 (88794,16368,533,16160,0,2545.62,-3277.69,267.68,6.28,3520,0,0,110197,25680,0,0,0),
 (88792,16368,533,0,0,3161.45,-3871.26,267.68,4.7,3520,0,0,110197,25680,0,0,1),
 (88791,16368,533,16160,0,3161.44,-3894.13,267.68,1.57,3520,0,0,110197,25680,0,0,0),
@@ -2505,12 +2506,12 @@ VALUES
 (88769,16368,533,16160,0,3161.82,-2974.66,267.68,4.57,3520,0,0,110197,25680,0,0,0),
 (88768,16452,533,2606,0,3251.4,-2988.49,294.75,3.17,3520,0,0,108584,108270,0,0,0),
 (88767,16452,533,2606,0,3251.23,-2982.27,294.75,3.17,3520,0,0,108527,108270,0,0,0),
-(88766,16451,533,0,0,3250.71,-2985.39,294.75,3.17,3520,0,0,166363,25680,0,2,0),
+(88766,16451,533,0,0,3250.71,-2985.39,294.75,3.17,3520,0,0,163859,25680,0,2,0),
 (88765,16452,533,2606,0,3455.85,-3187.64,294.75,4.68,3520,0,0,106882,108270,0,0,0),
 (88764,16452,533,2606,0,3449.93,-3187.6,294.75,4.71,3520,0,0,107130,108270,0,0,0),
-(88763,16451,533,0,0,3452.74,-3188.47,294.75,4.71,3520,0,0,158000,25680,0,2,0),
+(88763,16451,533,0,0,3452.74,-3188.47,294.75,4.71,3520,0,0,163859,25680,0,2,0),
 (88762,16452,533,2606,0,3456.05,-3680.37,294.75,1.58,3520,0,0,107750,108270,0,0,0),
-(88760,16451,533,0,0,3453.17,-3679.64,294.75,1.55,3520,0,0,165430,25680,0,2,0),
+(88760,16451,533,0,0,3453.17,-3679.64,294.75,1.55,3520,0,0,163859,25680,0,2,0),
 (88761,16452,533,2606,0,3450.36,-3680.23,294.75,1.58,3520,0,0,108168,108270,0,0,0),
 (2530375,16022,533,0,0,2995.88,-3239.01,294.063,5.4697,3000,0,0,42290,0,0,0,0),
 (2530311,16453,533,0,0,3117.87,-3875,267.593,5.91656,3600,0,0,138165,0,0,0,0),
@@ -2706,7 +2707,7 @@ VALUES
 (2530263,15981,533,0,0,3342.57,-3686.82,259.085,1.5207,3600,0,0,26274,58750,0,0,0),
 (127631,16400,533,11686,0,3223.02,-3218.73,316.371,0.760995,3600,10,0,17010,0,0,1,0),
 (127632,16400,533,11686,0,3208.17,-3234.59,315.457,0.742117,3600,10,0,17010,0,0,1,0),
-(533000,16861,533,0,16861,2932.14,-3187.84,273.371,3.13828,3000,0,0,113175,12430,0,2,1),
+(533000,16861,533,0,16861,2932.14,-3187.84,273.371,3.13828,3000,0,0,163859,12430,0,2,1),
 (88496,15953,533,15940,0,3353.16,-3620.63,261.18,4.76,604800,0,0,1312027,0,0,0,0),
 (533001,16998,533,0,0,3005.8,-3434.81,304.196,5.38862,604800,50,0,37000,0,0,2,0),
 (88483,15952,533,15928,0,3503.04,-3919.22,297.6,2.16,604800,0,0,1498950,0,0,0,0),
