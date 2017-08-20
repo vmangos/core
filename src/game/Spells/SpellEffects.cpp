@@ -4507,7 +4507,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 28408:                                 // Chains of Kel'Thuzad (Naxxramas: Kel'thuzad)
                 {
-                    // selects up to 5 randm targets in threatlist and charm them
+                    // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
                     const ThreatList& tl = m_caster->getThreatManager().getThreatList();
                     for (auto it = tl.begin(); it != tl.end(); it++)
@@ -4521,7 +4521,20 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             }
                         }
                     }
+
                     int num_targets = std::min(int(viableTargets.size()), 5);
+                    
+                    // always MC maintank
+                    if (Unit* maintank = m_caster->getVictim())
+                    {
+                        auto it = std::find(viableTargets.begin(), viableTargets.end(), maintank);
+                        if (it != viableTargets.end())
+                            viableTargets.erase(it);
+                        num_targets -= 1;
+                        maintank->CastSpell(maintank, 28409, true); // modifies scale
+                        m_caster->CastSpell(maintank, 28410, true); // applies dmg and healing mod, as well as the charm itself
+                    }
+
                     for (int i = 0; i < num_targets; i++)
                     {
                         int rand = irand(0, viableTargets.size() - 1);
