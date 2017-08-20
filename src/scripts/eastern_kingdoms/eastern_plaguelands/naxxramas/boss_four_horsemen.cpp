@@ -669,14 +669,17 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
                 DoScriptText(SAY_ZELI_AGGRO, m_creature);
                 break;
             case EVENT_BOSS_ABILITY:
-                if ((DoCastSpellIfCan(m_creature->getVictim(), SPELL_HOLY_WRATH)) == CAST_OK)
+                if (Unit* pTar = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_HOLY_WRATH, SELECT_FLAG_IN_LOS))
                 {
-                    m_events.Repeat(Seconds(urand(12, 15)));
-                    ScriptTextInRange(SAY_ZELI_SPECIAL);
+                    if ((DoCastSpellIfCan(pTar, SPELL_HOLY_WRATH)) == CAST_OK)
+                    {
+                        m_events.Repeat(Seconds(urand(10, 14)));
+                        ScriptTextInRange(SAY_ZELI_SPECIAL);
+                    }
+                    else
+                        m_events.Repeat(Milliseconds(100));
+                    break;
                 }
-                else
-                    m_events.Repeat(Milliseconds(100));
-                break;
             }
         }
 
