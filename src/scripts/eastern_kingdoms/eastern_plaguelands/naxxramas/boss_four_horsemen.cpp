@@ -134,6 +134,26 @@ struct boss_four_horsemen_shared : public ScriptedAI
             SetCombatMovement(false);
     }
 
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        if (!m_creature->IsWithinDistInMap(pWho, 75.0f))
+            return;
+
+        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        {
+            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            {
+                if (!m_creature->getVictim())
+                    AttackStart(pWho);
+                else if (m_creature->GetMap()->IsDungeon())
+                {
+                    pWho->SetInCombatWith(m_creature);
+                    m_creature->AddThreat(pWho);
+                }
+            }
+        }
+    }
+
     void AttackStart(Unit* pWho)
     {
         if (!m_bIsSpirit)
