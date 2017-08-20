@@ -353,9 +353,10 @@ update creature_model_info set bounding_radius = 1, combat_reach = 1 where model
 UPDATE `creature_ai_scripts` SET `event_param2`=3.5 WHERE `id`=1602701;
 
 -- Embalming slime moves at 50% movementspeed
-UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5' WHERE `entry`=16024;
+UPDATE `creature_template` SET `speed_walk`='0.5', `speed_run`='0.5', `minhealth`=14619, `maxhealth`=14619 WHERE `entry`=16024;
 -- embalming slime faster embalming cloud
 UPDATE `creature_ai_scripts` SET `event_param3`=2000, `event_param4`=3000 WHERE `id`=1602401;
+
 -- Lightning Totem (summoned by Living Monstrosity) no movement
 UPDATE `creature_template` SET `speed_walk`='0.00001', `speed_run`='0.00001', `mindmg`=0, `maxdmg`=0, `unit_flags`=0, `type`=10, `MovementType`=0 WHERE `entry`=16385;
 -- toxic tunnel creature lvl 60 and script
@@ -374,7 +375,7 @@ UPDATE `creature_ai_scripts` SET `action1_param2`=1, `action2_type`=13, `action2
 
 -- sludge belcher HP
 UPDATE `creature_template` SET `minhealth`=248189, `maxhealth`=248189 WHERE `entry`=16029;
-DELETE FROM `creature_ai_scripts` WHERE id in (1638501,1638502,1601703,1602902,1614202, 1602903);
+DELETE FROM `creature_ai_scripts` WHERE id in (1638501,1638502,1601703,1602902,1614202, 1602903,1602402);
 INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) 
 VALUES
 (1638501, 16385, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28298, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning Totem aura on spawn'),
@@ -382,7 +383,8 @@ VALUES
 (1601703, 16017, 11, 0, 100, 1, 0, 0, 0, 0, 11, 27793, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem disease cloud on spawn'),
 (1602902, 16029, 0, 0, 100, 1, 5000, 5000, 10000, 10000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge'),
 (1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc'),
-(1602903, 16029, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge belcher disease cloud on spawn');
+(1602903, 16029, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge belcher disease cloud on spawn'),
+(1602402, 16024, 10, 0, 100, 1, 0, 40, 0, 0, 11, 28033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Embalming Slime aggro all in los');
 
 -- Bile retcher also reset threat when casting bile retcher slam
 UPDATE `creature_ai_scripts` SET `action2_type`=14, `action2_param1`=-100 WHERE `id`=1601801;
@@ -973,8 +975,8 @@ INSERT INTO creature_movement_scripts (id, delay, command, datalong, comments) V
 
 UPDATE creature set MovementType=2, currentWaypoint=5 where id = 15931;
 
--- make sewage slimes that grobbulus spawn move randomly
-UPDATE `creature_template` SET `MovementType`=1 WHERE `entry`=16375;
+-- make sewage slimes that grobbulus spawn move randomly and keep positive auras on evade
+UPDATE `creature_template` SET `MovementType`=1, `flags_extra`=4096 WHERE `entry`=16375;
 DELETE FROM `creature_ai_scripts` where id = 1637502;
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
@@ -2876,22 +2878,22 @@ VALUES
 (88300,16025,533,15961,0,3288.33,-3359.58,292.596,1.53074,3520,0,0,217197,0,0,0,0),
 (88299,16025,533,15961,0,3264.63,-3357.66,292.78,1.59,3520,0,0,217197,0,0,0,0),
 (88298,16028,533,16174,0,3308.46,-3232.08,294.24,3.01,604800,0,0,3997200,0,0,2,0),
-(88297,16024,533,12349,0,3138.39,-3208.57,294.24,2.97,180,0,0,11887,0,0,0,0),
-(88296,16024,533,12349,0,3132.54,-3227.46,294.24,0.24,180,0,0,11887,0,0,0,0),
-(88295,16024,533,12349,0,3122.35,-3224.93,294.24,5.63,180,0,0,11887,0,0,0,0),
-(88294,16024,533,12349,0,3116.53,-3213.87,294.24,4.61,180,0,0,11887,0,0,0,0),
-(88293,16024,533,12349,0,3129.32,-3195.76,294.24,2.71,180,0,0,11887,0,0,0,0),
-(88292,16024,533,12349,0,3130.98,-3213.34,294.24,6.02,180,0,0,11887,0,0,0,0),
-(88291,16024,533,12349,0,3128.57,-3206.8,294.24,4.72,180,0,0,11887,0,0,0,0),
-(88290,16024,533,12349,0,3137.26,-3202.88,294.24,2.57,180,0,0,11887,0,0,0,0),
-(88288,16024,533,12349,0,3126.7,-3220.53,294.24,6.01,180,0,0,11887,0,0,0,0),
-(88289,16024,533,12349,0,3138.04,-3221.12,294.24,0.77,180,0,0,11887,0,0,0,0),
-(88287,16024,533,12349,0,3117.48,-3207.45,294.24,5.28,180,0,0,11887,0,0,0,0),
-(88286,16024,533,12349,0,3123.89,-3199.2,294.24,5.38,180,0,0,11887,0,0,0,0),
-(88285,16024,533,12349,0,3143.48,-3198.31,294.24,3.39,180,0,0,11887,0,0,0,0),
-(88284,16024,533,12349,0,3150.39,-3205.3,294.24,3.62,180,0,0,11887,0,0,0,0),
-(88282,16024,533,12349,0,3144.81,-3224.97,294.24,0.93,180,0,0,11887,0,0,0,0),
-(88283,16024,533,12349,0,3149.52,-3216.86,294.24,1.2,180,0,0,11887,0,0,0,0),
+(88297,16024,533,12349,0,3138.39,-3208.57,294.24,2.97,180,0,0,14619,0,0,0,0),
+(88296,16024,533,12349,0,3132.54,-3227.46,294.24,0.24,180,0,0,14619,0,0,0,0),
+(88295,16024,533,12349,0,3122.35,-3224.93,294.24,5.63,180,0,0,14619,0,0,0,0),
+(88294,16024,533,12349,0,3116.53,-3213.87,294.24,4.61,180,0,0,14619,0,0,0,0),
+(88293,16024,533,12349,0,3129.32,-3195.76,294.24,2.71,180,0,0,14619,0,0,0,0),
+(88292,16024,533,12349,0,3130.98,-3213.34,294.24,6.02,180,0,0,14619,0,0,0,0),
+(88291,16024,533,12349,0,3128.57,-3206.8,294.24,4.72,180,0,0,14619,0,0,0,0),
+(88290,16024,533,12349,0,3137.26,-3202.88,294.24,2.57,180,0,0,14619,0,0,0,0),
+(88288,16024,533,12349,0,3126.7,-3220.53,294.24,6.01,180,0,0,14619,0,0,0,0),
+(88289,16024,533,12349,0,3138.04,-3221.12,294.24,0.77,180,0,0,14619,0,0,0,0),
+(88287,16024,533,12349,0,3117.48,-3207.45,294.24,5.28,180,0,0,14619,0,0,0,0),
+(88286,16024,533,12349,0,3123.89,-3199.2,294.24,5.38,180,0,0,14619,0,0,0,0),
+(88285,16024,533,12349,0,3143.48,-3198.31,294.24,3.39,180,0,0,14619,0,0,0,0),
+(88284,16024,533,12349,0,3150.39,-3205.3,294.24,3.62,180,0,0,14619,0,0,0,0),
+(88282,16024,533,12349,0,3144.81,-3224.97,294.24,0.93,180,0,0,14619,0,0,0,0),
+(88283,16024,533,12349,0,3149.52,-3216.86,294.24,1.2,180,0,0,14619,0,0,0,0),
 (88266,16017,533,9760,0,3103.7,-3278.3,294.5,5.55,3520,0,0,87532,0,0,0,0),
 (88281,16017,533,9760,0,3152.14,-3264.34,294.77,4.18,3520,0,0,87532,0,0,0,0),
 (88265,16017,533,9760,0,3081.76,-3298.5,294.53,5.47,3520,0,0,87532,0,0,0,0),
