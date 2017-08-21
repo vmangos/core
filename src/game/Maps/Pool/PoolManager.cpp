@@ -424,6 +424,11 @@ void PoolGroup<T>::SpawnObject(MapPersistentState& mapState, uint32 limit, uint3
             lastDespawned = triggerFrom;
             triggerFrom = 0;
         }
+
+        // Spawned based on the trigger, trigger was not previously spawned, spawn count > 1. Must
+        // clear triggerFrom to prevent trying to spawn the same object multiple times
+        if (triggerFrom == obj->guid)
+            triggerFrom = 0;
     }
 }
 
