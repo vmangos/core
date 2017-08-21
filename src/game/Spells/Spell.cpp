@@ -6940,9 +6940,11 @@ SpellCastResult Spell::CheckItems()
                     break; // Master Healthstone
             }
 
-            if (p_caster->HasItemCount(itemtype, 1))
+            ItemPosCountVec dest;
+            InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemtype, 1);
+            if (msg != EQUIP_ERR_OK)
             {
-                p_caster->SendEquipError(EQUIP_ERR_CANT_CARRY_MORE_OF_THIS, nullptr, nullptr, itemtype);
+                p_caster->SendEquipError(msg, nullptr, nullptr, itemtype);
                 return SPELL_FAILED_DONT_REPORT;
             }
         }
