@@ -57,7 +57,8 @@ enum
     SPELL_MANA_DETONATION               = 27819,
     SPELL_SHADOW_FISSURE                = 27810,
     SPELL_VOID_BLAST                    = 27812,
-    SPELL_FROST_BLAST                   = 27808
+    SPELL_FROST_BLAST                   = 27808,
+    SPELL_BERSERK                       = 28498,
 };
 
 static float M_F_ANGLE = 0.2f;                              // to adjust for map rotation
@@ -285,11 +286,13 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 numSummonedGuardians;
     uint32 nextBanshee, nextAbom;
     uint32 numSkeletons, numAboms, numBanshees;
-    
+    uint32 enrageTimer;
+
     void Reset()
     {
         events.Reset();
-
+        // no info on enragetimer in vanilla, but wotlk has a 19min enrage and uses a spell from 1.11 dbc
+        enrageTimer = 1000 * 60 * 19; 
         numSkeletons = 0;
         numAboms = 0;
         numBanshees = 0;
@@ -585,15 +588,17 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void DoChains()
     {
-        if (m_creature->IsNonMeleeSpellCasted())
+        if (DoCastSpellIfCan(m_creature, SPELL_CHAINS_OF_KELTHUZAD) != CAST_OK)
         {
-            events.Repeat(Seconds(4));
+            events.Repeat(Seconds(2));
             return;
         }
         DoResetThreat();
-        m_creature->CastSpell(m_creature, SPELL_CHAINS_OF_KELTHUZAD, false);
         DoScriptText(urand(0, 1) ? SAY_CHAIN1 : SAY_CHAIN2, m_creature);
-        events.Repeat(Seconds(urand(60, 90)));
+        // Wowwiki the useless has this on 60sec cd,
+        // but sampling a random vanilla video, the shortest cd was 60sec, with one as high as 142sec.
+        // Setting this to 60-75 as a slight buff
+        events.Repeat(Seconds(urand(60, 75)));
     }
 
     void UpdateP2P3(uint32 diff)
@@ -645,21 +650,10 @@ struct boss_kelthuzadAI : public ScriptedAI
                 break;
             }
             case EVENT_FROSTBOLT_VOLLEY:
-                if (m_creature->IsNonMeleeSpellCasted())
-                {
-                    sLog.outBasic("KT frostbolt aoe delayed as other spell is casted");
-                    events.Repeat(Seconds(2));
-                }
+                if(DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
+                    events.Repeat(Seconds(urand(15, 17)));
                 else
-                {
-                    if(DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
-                        events.Repeat(Seconds(urand(15, 30)));
-                    else
-                    {
-                        sLog.outBasic("KT frostbolt aoe failed to cast");
-                        events.Repeat(Seconds(1));
-                    }
-                }
+                    events.Repeat(Seconds(1));
                 break;
             case EVENT_FROST_BLAST:
                 if (m_creature->IsNonMeleeSpellCasted())
@@ -667,16 +661,20 @@ struct boss_kelthuzadAI : public ScriptedAI
                     events.Repeat(Seconds(2));
                     break;
                 }
-                events.Repeat(Seconds(urand(55, 65)));
                 if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1)) // todo: can it hit maintank?
                 {
                     if (DoCastSpellIfCan(pUnit, SPELL_FROST_BLAST) == CAST_OK)
                     {
+                        events.Repeat(Seconds(urand(30, 60)));
                         if (urand(0, 1))
                             DoScriptText(SAY_FROST_BLAST, m_creature);
                         break;
                     }
+                    else
+                        events.Repeat(Seconds(1));
                 }
+                else
+                    events.Repeat(Seconds(1));
                 break;
             case EVENT_FROSTBOLT:
                 events.Repeat(Seconds(urand(5, 7))); // todo: this is guesswork
@@ -705,7 +703,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                     events.Repeat(Seconds(2));
                     break;
                 }
-                events.Repeat(Seconds(urand(20,25))); // todo: not verified
+                events.Repeat(Seconds(urand(20,25)));
                 if(Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_MANA_DETONATION, SELECT_FLAG_POWER_MANA|SELECT_FLAG_PLAYER))
                 {
                     if (DoCastSpellIfCan(pUnit, SPELL_MANA_DETONATION) == CAST_OK)
@@ -732,6 +730,14 @@ struct boss_kelthuzadAI : public ScriptedAI
 
         if (m_pInstance->GetData(TYPE_KELTHUZAD) != IN_PROGRESS)
             return;
+        
+        if (enrageTimer < diff)
+        {
+            m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
+            enrageTimer = 300000;
+        }
+        else
+            enrageTimer -= diff;
 
         if (m_creature->isInCombat())
         {
@@ -831,7 +837,9 @@ struct mob_guardian_icecrownAI : public ScriptedAI
     uint32 checkNeighbourTImer;
     void Reset() override
     {
-        bloodTapTimer = 18000;
+        // Not sure if this was 18 or 15sec cd in vanilla, was 15 in wotlk. But making it 15 as we already
+        // overpower last phase anyway
+        bloodTapTimer = 15000;
         checkNeighbourTImer = 1000;
     }
     void JustReachedHome() override
@@ -888,7 +896,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
         if (bloodTapTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BLOOD_TAP) == CAST_OK)
-                bloodTapTimer = 18000;
+                bloodTapTimer = 15000;
         }
         else bloodTapTimer -= diff;
 
