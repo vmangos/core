@@ -74,6 +74,7 @@ enum Events
     EVENT_FROST_BREATH_DUMMY,
     EVENT_FROST_BREATH_CAST,
     EVENT_SET_HOVER,
+    EVENT_UNSET_HOVER,
     EVENT_CHECK_EVADE
 };
 
@@ -398,6 +399,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
         else
         {
+            m_creature->RemoveAurasDueToSpell(17131);
             SetCombatMovement(true);
             if (m_creature->HasUnitMovementFlag(MOVEFLAG_HOVER))
             {
@@ -502,6 +504,7 @@ struct boss_sapphironAI : public ScriptedAI
                     events.ScheduleEvent(EVENT_ICEBOLT, first_ib + incr*i);
 
                 events.ScheduleEvent(EVENT_FROST_BREATH_DUMMY, Seconds(22) + Milliseconds(500)); // 0.5 sec after he can potentially cast final icebolt
+                events.ScheduleEvent(EVENT_UNSET_HOVER, Seconds(28));
                 events.ScheduleEvent(EVENT_LAND, Seconds(30));         // 1.5 sec after breath finishes
                 events.ScheduleEvent(EVENT_LANDED, Seconds(34));       // 5 sec after breath finishes
                 if (Creature* pWG = m_creature->SummonCreature(NPC_WING_BUFFET, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0,
@@ -563,8 +566,8 @@ struct boss_sapphironAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) != CAST_OK)
                     events.Repeat(100);
-                else
-                    m_creature->RemoveAurasDueToSpell(17131);
+                //else
+                //    m_creature->RemoveAurasDueToSpell(17131);
                 break;
             }
             case EVENT_BLIZZARD:
@@ -601,6 +604,9 @@ struct boss_sapphironAI : public ScriptedAI
                 break;
             case EVENT_SET_HOVER:
                 m_creature->CastSpell(m_creature, 17131, true);
+                break;
+            case EVENT_UNSET_HOVER:
+                m_creature->RemoveAurasDueToSpell(17131);
                 break;
             case EVENT_CHECK_EVADE:
             {
