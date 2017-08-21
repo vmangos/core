@@ -26,6 +26,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include <vector>
 
 // todo:
 /*
@@ -235,6 +236,11 @@ struct boss_anubrekhanAI : public ScriptedAI
         m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + 20000 + urand(5000, 10000); // 5-10s after swarm end
         m_firstBlood = false;
         m_uiRestoreTargetTimer = 0;
+
+        std::list<Creature*> scarabs;
+        GetCreatureListWithEntryInGrid(scarabs, m_creature, MOB_CORPSE_SCARAB, 100.0f);
+        while (scarabs.size() > 30)
+            scarabs.erase(scarabs.begin());
     }
 
     void JustReachedHome() override
