@@ -75,7 +75,8 @@ enum Events
     EVENT_FROST_BREATH_CAST,
     EVENT_SET_HOVER,
     EVENT_UNSET_HOVER,
-    EVENT_CHECK_EVADE
+    EVENT_CHECK_EVADE,
+    EVENT_REMOVE_NO_COMBAT_MOVEMENT,
 };
 
 enum Phase
@@ -400,7 +401,6 @@ struct boss_sapphironAI : public ScriptedAI
         else
         {
             m_creature->RemoveAurasDueToSpell(17131);
-            SetCombatMovement(true);
             if (m_creature->HasUnitMovementFlag(MOVEFLAG_HOVER))
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_LAND);
@@ -541,11 +541,10 @@ struct boss_sapphironAI : public ScriptedAI
                 events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(urand(50, 70))); // Sampling videos show its 50-70sec between engaging after landing, and disengaging to fly again
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
                 events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
-                phase = PHASE_GROUND;
-                SetCombatMovement(true);
-                m_creature->GetMotionMaster()->Clear(false);
-                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                break;
+                                
+                // give 1 extra second of no combat movement, looks like hes "stuck" in the middle a bit extra
+                // after airphase to avoid him running off after tank
+                events.ScheduleEvent(EVENT_REMOVE_NO_COMBAT_MOVEMENT, Seconds(1)); 
             }
             case EVENT_ICEBOLT:
             {
@@ -607,6 +606,12 @@ struct boss_sapphironAI : public ScriptedAI
                 break;
             case EVENT_UNSET_HOVER:
                 m_creature->RemoveAurasDueToSpell(17131);
+                break;
+            case EVENT_REMOVE_NO_COMBAT_MOVEMENT:
+                phase = PHASE_GROUND;
+                SetCombatMovement(true);
+                m_creature->GetMotionMaster()->Clear(false);
+                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
                 break;
             case EVENT_CHECK_EVADE:
             {
