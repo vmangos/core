@@ -81,7 +81,6 @@ struct boss_gothikAI : public ScriptedAI
     boss_gothikAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        SetCombatMovement(false);
         Reset();
     }
 
@@ -507,8 +506,11 @@ struct boss_gothikAI : public ScriptedAI
 
                 if (m_uiShadowboltTimer < uiDiff)
                 {
-                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWBOLT) == CAST_OK)
-                        m_uiShadowboltTimer = 1500;
+                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SHADOWBOLT))
+                    {
+                        if (DoCastSpellIfCan(pTarget, SPELL_SHADOWBOLT) == CAST_OK)
+                            m_uiShadowboltTimer = urand(1500, 2500);
+                    }
                 }
                 else
                     m_uiShadowboltTimer -= uiDiff;
