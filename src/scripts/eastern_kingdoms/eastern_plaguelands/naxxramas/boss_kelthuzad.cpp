@@ -235,6 +235,7 @@ struct kt_p1AddAI : public ScriptedAI
     virtual void Reset() = 0;
     void ActualAttack(Unit* target)
     {
+        m_creature->AddThreat(target, 300.0f);
         ScriptedAI::AttackStart(target);
         hasAggroed = true;
     }
@@ -244,17 +245,21 @@ struct kt_p1AddAI : public ScriptedAI
     }
     void AttackStart(Unit* pWho) override
     {
-        // want to prevent the creature from aggroing unless we explicitly do it through base class
-        if(m_creature->GetDistance2d(pWho) < ALCOVE_ADD_PULL_RADIUS) 
+        if (hasAggroed)
+            ScriptedAI::AttackStart(pWho);
+        // want to prevent the creature from aggroing unless we explicitly do it through this class
+        else if(m_creature->GetDistance2d(pWho) < ALCOVE_ADD_PULL_RADIUS)
         {
             ActualAttack(pWho);
         }
     }
     void MoveInLineOfSight(Unit* pWho) override
     {
-        if (m_creature->isInCombat()) return;
-
-        if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < ALCOVE_ADD_PULL_RADIUS) //todo: no idea what the pull range should be
+        if (hasAggroed)
+        {
+            ScriptedAI::MoveInLineOfSight(pWho);
+        }
+        else if (m_creature->IsHostileTo(pWho) && m_creature->GetDistance2d(pWho) < ALCOVE_ADD_PULL_RADIUS) //todo: no idea what the pull range should be
         {
             ScriptedAI::MoveInLineOfSight(pWho);
         }
@@ -782,8 +787,9 @@ struct mob_abomAI : public kt_p1AddAI
 
         if (mortalWoundTimer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
-                mortalWoundTimer = 7500;
+            if(m_creature->getVictim() && m_creature->IsWithinMeleeRange(m_creature->getVictim()))
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORTAL_WOUND) == CAST_OK)
+                    mortalWoundTimer = 7500;
         }
         else
             mortalWoundTimer -= diff;
@@ -806,6 +812,22 @@ struct mob_soldierAI : public kt_p1AddAI
             return;
         if (!m_creature->HasAura(SPELL_DARK_BLAST_AUR))
             m_creature->CastSpell(m_creature, SPELL_DARK_BLAST_AUR, true);
+
+        //if (m_creature->getVictim() && m_creature->getVictim()->IsPlayer()) 
+        //{
+        //    bool inVisibleList = m_creature->getVictim()->ToPlayer()->IsInVisibleList(m_creature);
+        //    sLog.outBasic("%s visible: %d", m_creature->getVictim()->GetName(), inVisibleList);
+        //}
+        //m_creature->ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
+
+        // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
+        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+        {
+            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAttack(pNearest))
+            {
+                ScriptedAI::AttackStart(pNearest);
+            }
+        }
         DoMeleeAttackIfReady();
     }
 };
@@ -814,8 +836,10 @@ struct mob_soulweaverAI : public kt_p1AddAI
     mob_soulweaverAI(Creature* pCreature) : kt_p1AddAI(pCreature)
     {
     }
+    bool hasHitSomeone;
     void Reset() override
     {
+        hasHitSomeone = false;
     }
     void UpdateAI(const uint32 diff) override
     {
@@ -824,6 +848,14 @@ struct mob_soulweaverAI : public kt_p1AddAI
         if (!m_creature->HasAura(SPELL_WAIL_SOULS_AUR))
             m_creature->CastSpell(m_creature, SPELL_WAIL_SOULS_AUR, true);
 
+        // to avoid melees being able to dps while casters hold aggro, this is most likely a logic that's supposed to exist
+        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+        {
+            if (m_creature->getVictim() != pNearest && m_creature->CanReachWithMeleeAttack(pNearest))
+            {
+                ScriptedAI::AttackStart(pNearest);
+            }
+        }
         DoMeleeAttackIfReady();
     }
 };
