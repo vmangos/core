@@ -2752,11 +2752,11 @@ float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 
 
     // PvP - PvE melee chances
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        hitChance = 95.0f + skillDiff * 0.04f;
+        hitChance = 94.4f + skillDiff * 0.04f;
     else if (skillDiff < -10)
-        hitChance = 93.0f + (skillDiff + 10) * 0.4f;        // 7% base chance to miss for big skill diff (%6 in 3.x)
+        hitChance = 93.4f + (skillDiff + 10) * 0.4f;        // 7% ~ 6.60% base chance to miss for big skill diff
     else
-        hitChance = 95.0f + skillDiff * 0.1f;
+        hitChance = 94.4f + skillDiff * 0.1f;
 
     // Hit chance depends from victim auras
     if (attType == RANGED_ATTACK)
@@ -3093,10 +3093,13 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (!pVictim)
         return 0.0f;
 
-    // Base misschance 5%
-    float missChance = 5.0f;
+    float missChance = 5.60f; // The base chance to miss is 5.60%
+    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+    {
+      missChance = 5.00f;  // The base chance to miss in PvP is 5%
+    }
 
-    // DualWield - white damage has additional 19% miss penalty
+    // DualWield - white damage has an additional 19% miss penalty
     if (haveOffhandWeapon() && attType != RANGED_ATTACK)
     {
         bool isNormal = false;
@@ -3118,7 +3121,7 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
         missChance -= skillDiff * 0.04f;
     else if (skillDiff < -10)
-        missChance -= (skillDiff + 10) * 0.4f - 2.0f;       // 7% base chance to miss for big skill diff (%6 in 3.x)
+        missChance -= (skillDiff + 10) * 0.4f - 1.0f;       // 7% ~ 6.60% base chance to miss for big skill diff
     else
         missChance -=  skillDiff * 0.1f;
 
@@ -4576,7 +4579,8 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     SpellEntry const* AurSpellInfo = holder->GetSpellProto();
     Totem* statue = nullptr;
     Unit* caster = holder->GetCaster();
-    if (holder->IsChanneled() && caster)
+    bool isChanneled = holder->IsChanneled(); // cache for after the holder is deleted
+    if (isChanneled && caster)
         if (caster->GetTypeId() == TYPEID_UNIT && ((Creature*)caster)->IsTotem() && ((Totem*)caster)->GetTotemType() == TOTEM_STATUE)
             statue = ((Totem*)caster);
 
@@ -4640,7 +4644,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
         }
     }
 
-    if (holder->IsChanneled() && caster)
+    if (isChanneled && caster)
     {
         Spell *channeled = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
         if (channeled && channeled->m_spellInfo->Id == auraSpellId)
@@ -5627,6 +5631,10 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     {
         ((Creature*)this)->SendAIReaction(AI_REACTION_HOSTILE);
         ((Creature*)this)->CallAssistance();
+
+        if (Pet* pet = GetPet())
+            if (pet->isAlive())
+                pet->AI()->OwnerAttacked(victim);
     }
 
     // delay offhand weapon attack to next attack time
@@ -5636,9 +5644,6 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     if (meleeAttack)
         SendMeleeAttackStart(victim);
 
-    if (Pet* pet = GetPet())
-        if (pet->isAlive())
-            pet->AI()->OwnerAttacked(victim);
     return true;
 }
 
@@ -7208,7 +7213,13 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
     // set pet in combat
     if (Pet* pet = GetPet())
-        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+        if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT))
+        {
+            pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+
+            if (IsPlayer() && pet->isAlive() && enemy)
+                pet->AI()->OwnerAttacked(enemy);
+        }
 
     // interrupt all delayed non-combat casts
     if (!wasInCombat)
@@ -8894,6 +8905,7 @@ void Unit::CleanupsBeforeDelete()
                 getHostileRefManager().deleteReferences();
         }
         RemoveAllAuras(AURA_REMOVE_BY_DELETE);
+        CleanupDeletedAuras(); // any long range channeled spells need to be cleaned up after aura deletion
     }
     WorldObject::CleanupsBeforeDelete();
 }
@@ -9136,11 +9148,16 @@ bool CharmInfo::IsCommandFollow()
 
 void CharmInfo::SaveStayPosition()
 {
-    //! At this point a new spline destination is enabled because of Unit::StopMoving()
-    G3D::Vector3 const stayPos = m_unit->movespline->FinalDestination();
-    _stayX = stayPos.x;
-    _stayY = stayPos.y;
-    _stayZ = stayPos.z;
+    // No Unit::StopMoving while possessed
+    if (m_unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+        m_unit->GetPosition(_stayX, _stayY, _stayZ);
+    else //! At this point a new spline destination is enabled because of Unit::StopMoving()
+    {
+        G3D::Vector3 stayPos = m_unit->movespline->FinalDestination();
+        _stayX = stayPos.x;
+        _stayY = stayPos.y;
+        _stayZ = stayPos.z;
+    }
 }
 
 void CharmInfo::GetStayPosition(float &x, float &y, float &z)

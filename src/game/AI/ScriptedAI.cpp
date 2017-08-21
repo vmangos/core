@@ -345,8 +345,8 @@ Player* ScriptedAI::GetPlayerAtMinimumRange(float fMinimumRange)
 {
     Player* pPlayer = nullptr;
 
-    MaNGOS::AnyPlayerInObjectRangeCheck check(m_creature, fMinimumRange);
-    MaNGOS::PlayerSearcher<MaNGOS::AnyPlayerInObjectRangeCheck> searcher(pPlayer, check);
+    MaNGOS::PlayerAtMinimumRangeAway check(m_creature, fMinimumRange);
+    MaNGOS::PlayerSearcher<MaNGOS::PlayerAtMinimumRangeAway> searcher(pPlayer, check);
 
     Cell::VisitWorldObjects(m_creature, searcher, fMinimumRange);
 

@@ -85,6 +85,9 @@ void PetAI::UpdateAI(const uint32 diff)
     if (!m_creature->isAlive() || !m_creature->GetCharmInfo())
         return;
 
+    // part of it must run during eyes of the Beast to update melee hits
+    bool playerControlled = m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+
     Unit* owner = m_creature->GetCharmerOrOwner();
 
     if (m_updateAlliesTimer <= diff)
@@ -96,7 +99,7 @@ void PetAI::UpdateAI(const uint32 diff)
     // First checking if we have some taunt on us
     Unit* tauntTarget = NULL;
     const Unit::AuraList& tauntAuras = m_creature->GetAurasByType(SPELL_AURA_MOD_TAUNT);
-    if (!tauntAuras.empty())
+    if (!tauntAuras.empty() && !playerControlled)
     {
         Unit* caster = NULL;
 
@@ -119,7 +122,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
     if (m_creature->getVictim() && m_creature->getVictim()->isAlive())
     {
-        
+
         if (_needToStop())
         {
             _stopAttack();
@@ -143,7 +146,7 @@ void PetAI::UpdateAI(const uint32 diff)
                     owner->SetInCombatWith(v);
         }
     }
-    else
+    else if (!playerControlled)
     {
         if (m_creature->HasReactState(REACT_AGGRESSIVE) || m_creature->GetCharmInfo()->IsAtStay())
         {
@@ -166,6 +169,10 @@ void PetAI::UpdateAI(const uint32 diff)
         else
             HandleReturnMovement();
     }
+
+    // End of possessed pet updates
+    if (playerControlled)
+        return;
 
     // Autocast (casted only in combat or persistent spells in any state)
     if (!m_creature->IsNonMeleeSpellCasted(false))
@@ -507,7 +514,7 @@ void PetAI::HandleReturnMovement()
 
     // Prevent activating movement when under control of spells
     // such as "Eyes of the Beast"
-    if (m_creature->isCharmed())
+    if (m_creature->isCharmed() || m_creature ->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
         return;
 
     if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_STAY))
@@ -520,7 +527,7 @@ void PetAI::HandleReturnMovement()
             m_creature->GetCharmInfo()->GetStayPosition(x, y, z);
             ClearCharmInfoFlags();
             m_creature->GetCharmInfo()->SetIsReturning(true);
-            m_creature->GetMotionMaster()->Clear();
+            m_creature->GetMotionMaster()->Clear(false);
             m_creature->GetMotionMaster()->MovePoint(m_creature->GetGUIDLow(), x, y, z);
         }
     }
@@ -530,7 +537,7 @@ void PetAI::HandleReturnMovement()
         {
             ClearCharmInfoFlags();
             m_creature->GetCharmInfo()->SetIsReturning(true);
-            m_creature->GetMotionMaster()->Clear();
+            m_creature->GetMotionMaster()->Clear(false);
             m_creature->GetMotionMaster()->MoveFollow(m_creature->GetCharmerOrOwner(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
         }
     }

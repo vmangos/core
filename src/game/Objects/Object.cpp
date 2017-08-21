@@ -2017,6 +2017,15 @@ void WorldObject::SetMap(Map * map)
     //lets save current map's Id/instanceId
     m_mapId = map->GetId();
     m_InstanceId = map->GetInstanceId();
+
+    // Order is important, must be done after m_currMap is set
+    SetZoneScript();
+}
+
+void WorldObject::ResetMap()
+{
+    m_currMap = nullptr;
+    m_zoneScript = nullptr;
 }
 
 TerrainInfo const* WorldObject::GetTerrain() const
@@ -2132,6 +2141,7 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
 
 void WorldObject::SetZoneScript()
 {
+    m_zoneScript = nullptr;
     if (Map* pMap = FindMap())
     {
         if (pMap->IsDungeon())

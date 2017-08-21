@@ -1285,16 +1285,17 @@ namespace MaNGOS
         public:
             explicit NearestHostileUnitInAggroRangeCheck(Creature const* creature, bool useLOS = false) : _me(creature), _useLOS(useLOS)
             {
+                m_dist = 9999;
             }
             bool operator()(Unit* u)
             {
-                if (!u->IsHostileTo(_me))
+                if (!_me->IsHostileTo(u))
                     return false;
 
                 if (!u->isVisibleForOrDetect(_me, _me, false))
                     return false;
 
-                if (!u->IsWithinDistInMap(_me, _me->GetAttackDistance(u)))
+                if (!u->IsWithinDistInMap(_me, std::min(_me->GetAttackDistance(u), m_dist)))
                     return false;
 
                 if (!u->isTargetableForAttack())
@@ -1303,12 +1304,14 @@ namespace MaNGOS
                 if (_useLOS && !u->IsWithinLOSInMap(_me))
                     return false;
 
+                m_dist = _me->GetDistance(u);
                 return true;
             }
 
     private:
             Creature const* _me;
             bool _useLOS;
+            float m_dist;
             NearestHostileUnitInAggroRangeCheck(NearestHostileUnitInAggroRangeCheck const&);
     };
 

@@ -428,6 +428,18 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
         _clientMoverGuid = _player->GetMover()->GetObjectGuid();
         return;
     }
+
+    // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
+    if (_player->GetPetGuid() == _clientMoverGuid)
+        if (Pet* pet = _player->GetPet())
+        {
+            pet->clearUnitState(UNIT_STAT_CONTROLLED);
+            pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            // out of range pet dismissed
+            if (!pet->IsWithinDistInMap(_player, pet->GetMap()->GetGridActivationDistance()))
+                _player->RemovePet(PET_SAVE_REAGENTS);
+        }
+
     _clientMoverGuid = guid;
 }
 

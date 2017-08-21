@@ -286,7 +286,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         virtual void RemoveAllObjectsInRemoveList();
 
-        bool CreatureRespawnRelocation(Creature *c);        // used only in CreatureRelocation and ObjectGridUnloader
+        bool CreatureRespawnRelocation(Creature *c, bool forGridUnload = false);        // used only in CreatureRelocation and ObjectGridUnloader
 
         bool CheckGridIntegrity(Creature* c, bool moved) const;
 

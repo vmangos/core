@@ -812,6 +812,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
             return float(_playerDamageTaken) / (_playerDamageTaken + _nonPlayerDamageTaken);
         }
 
+        bool HasWeapon() const;
+
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 

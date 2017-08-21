@@ -4,6 +4,7 @@ set(LIBRARY_NAME scripts)
 set (SCRIPTS_SRCS 
 	ScriptLoader.h
 	custom/custom.h
+	custom/npc_j_eevee.h
 	eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.h
 	eastern_kingdoms/burning_steppes/blackrock_spire/blackrock_spire.h
 	eastern_kingdoms/burning_steppes/blackwing_lair/blackwing_lair.h
@@ -46,10 +47,12 @@ set (SCRIPTS_SRCS
 	custom/npc_escort.cpp
 	custom/npc_gobj_spawner.cpp
 	custom/zero_creatures.cpp
+	custom/npc_j_eevee.cpp
 	eastern_kingdoms/alterac_mountains/alterac_mountains.cpp
 	eastern_kingdoms/arathi_highlands/arathi_highlands.cpp
 	eastern_kingdoms/blasted_lands/blasted_lands.cpp
 	eastern_kingdoms/burning_steppes/burning_steppes.cpp
+	eastern_kingdoms/burning_steppes/blackrock_depths/arena_challenge_ai.cpp
 	eastern_kingdoms/burning_steppes/blackrock_depths/blackrock_depths.cpp
 	eastern_kingdoms/burning_steppes/blackrock_depths/boss_ambassador_flamelash.cpp
 	eastern_kingdoms/burning_steppes/blackrock_depths/boss_anubshiah.cpp

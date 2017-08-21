@@ -1463,6 +1463,8 @@ void BattleGround::SpawnBGObject(ObjectGuid guid, uint32 respawntime)
         if (obj->GetEntry() == 178786 || obj->GetEntry() == 178787 || obj->GetEntry() == 178788 || obj->GetEntry() == 178789)
             obj->SetRespawnDelay(60);
 
+        if (!obj->GetRespawnTime())
+            map->Add(obj);
     }
     else
     {

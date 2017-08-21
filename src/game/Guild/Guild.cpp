@@ -153,7 +153,7 @@ bool Guild::Create(Player* leader, std::string gname)
 
     CreateDefaultGuildRanks(lSession->GetSessionDbLocaleIndex());
 
-    return AddMember(m_LeaderGuid, (uint32)GR_GUILDMASTER);
+    return AddMember(m_LeaderGuid, (uint32)GR_GUILDMASTER) == GuildAddStatus::OK;
 }
 
 void Guild::CreateDefaultGuildRanks(int locale_idx)
@@ -167,20 +167,20 @@ void Guild::CreateDefaultGuildRanks(int locale_idx)
     CreateRank(sObjectMgr.GetMangosString(LANG_GUILD_INITIATE, locale_idx), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
 }
 
-bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
+GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 {
     if (members.size() >= GUILD_MAX_MEMBERS)
-        return false;
+        return GuildAddStatus::GUILD_FULL;
     Player* pl = sObjectAccessor.FindPlayerNotInWorld(plGuid);
     if (pl)
     {
         if (pl->GetGuildId() != 0)
-            return false;
+            return GuildAddStatus::ALREADY_IN_GUILD;
     }
     else
     {
         if (members.find(plGuid) != members.end())
-            return false;
+            return GuildAddStatus::ALREADY_IN_GUILD;
     }
 
     // remove all player signs from another petitions
@@ -206,7 +206,7 @@ bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
     {
         PlayerCacheData const* data = sObjectMgr.GetPlayerDataByGUID(lowguid);
         if (!data)
-            return false;
+            return GuildAddStatus::UNKNOWN_PLAYER;
         newmember.Name   = data->sName;
         newmember.Level  = data->uiLevel;
         newmember.Class  = data->uiClass;
@@ -217,7 +217,7 @@ bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
                 !((1 << (newmember.Class - 1)) & CLASSMASK_ALL_PLAYABLE))
         {
             sLog.outError("%s has a broken data in field `characters` table, cannot add him to guild.", plGuid.GetString().c_str());
-            return false;
+            return GuildAddStatus::PLAYER_DATA_ERROR;
         }
     }
 
@@ -246,7 +246,7 @@ bool Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 
     UpdateAccountsNumber();
 
-    return true;
+    return GuildAddStatus::OK;
 }
 
 void Guild::SetMOTD(std::string motd)

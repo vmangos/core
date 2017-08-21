@@ -4,6 +4,7 @@
 
 #include "scriptPCH.h"
 #include "dire_maul.h"
+#include "../../../custom/npc_j_eevee.h"
 
 enum
 {
@@ -51,119 +52,7 @@ struct EventLocations
     float m_fX, m_fY, m_fZ, m_fO;
     int m_wait;
 };
-static EventLocations aJeeveeLocations[] =
-{
-    { -38.939999f, 812.849976f, -29.530002f, 4.890318f, 3500}, //Jeevee spawn
-    { -27.768442f, 812.457703f, -29.535814f, 6.258483f, 4000}, //Jeevee first point
-    { -45.293509f, 822.046747f, -29.535671f, 2.211563f, 3000}, //Jeevee second point
-    { -44.074763f, 802.921135f, -29.535734f, 4.357706f, 3000}, //Jeevee third point
-    { -38.939999f, 812.849976f, -29.530002f, 4.890318f, 4000} //Jeevee last point
-};
-enum
-{
-    SPELL_J_EEVEE_SUMMONS_OBJECT = 23140,
-    //SPELL_J_EEVEE_TELEPORT //???
-    SHOUT_J_EEVEE_FREEDOM       = -1780196,
-    SAY_J_EEVEE_1               = -1780197,
-    SAY_J_EEVEE_2               = -1780198,
-    SAY_J_EEVEE_3               = -1780199,
-    SAY_J_EEVEE_4               = -1780200
-};
 
-// J'eevee
-struct npc_j_eeveeAI : public ScriptedAI
-{
-    npc_j_eeveeAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        //m_pInstance = (instance_dire_maul*) pCreature->GetInstanceData();
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PACIFIED);
-        m_creature->setFaction(35); //friendly to everyone
-		m_creature->SetWalk(true);
-        Reset();
-    }
-
-
-    void Reset()
-    {
-        waitTimer = 3500;
-        currentPoint = 0;
-        waypointReached = true;
-    }
-    uint64 guidPlayer;
-    uint32 waitTimer;
-    uint8 currentPoint;
-    bool waypointReached;
-    void MovementInform(uint32 uiType, uint32 uiPointId)
-    {
-        if (uiType != POINT_MOTION_TYPE)
-            return;
-        switch (uiPointId)
-        {
-            case 1:
-            case 2:
-            case 3:
-                m_creature->SetFacingTo(aJeeveeLocations[currentPoint].m_fO);
-                waypointReached = true;
-                m_creature->CastSpell(m_creature, SPELL_J_EEVEE_SUMMONS_OBJECT, false);
-                break;
-            case 4:
-                m_creature->SetFacingTo(aJeeveeLocations[currentPoint].m_fO);
-                waypointReached = true;
-                if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
-                    DoScriptText(SAY_J_EEVEE_4, m_creature, player);
-                break;
-
-        }
-    }
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-        {
-            if (waypointReached)
-            {
-                if (waitTimer < uiDiff)
-                {
-                    if (currentPoint < 4)
-                    {
-                        switch (currentPoint)
-                        {
-                            case 0:
-                                DoScriptText(SAY_J_EEVEE_1, m_creature);
-                                break;
-                            case 1:
-                                DoScriptText(SAY_J_EEVEE_2, m_creature);
-                                break;
-                            case 2:
-                                DoScriptText(SAY_J_EEVEE_3, m_creature);
-                                break;
-                        }
-                        currentPoint++;
-                        m_creature->GetMotionMaster()->MovePoint(currentPoint, aJeeveeLocations[currentPoint].m_fX, aJeeveeLocations[currentPoint].m_fY, aJeeveeLocations[currentPoint].m_fZ, true);
-                        waitTimer = aJeeveeLocations[currentPoint].m_wait;
-                    }
-                    else
-                        m_creature->DisappearAndDie();
-                    waypointReached = false;
-                }
-                else
-                    waitTimer -= uiDiff;
-            }
-            return;
-        }
-        DoMeleeAttackIfReady();
-    }
-    void SetPlayerGuid(uint64 playerGuid)
-    {
-        guidPlayer = playerGuid;
-    }
-};
-
-CreatureAI* GetAI_npc_j_eevee(Creature* pCreature)
-{
-    if (pCreature->GetMapId() == 429) //Map 429 Zone 2557. HT.
-        return new npc_j_eeveeAI(pCreature);
-    return NULL;
-}
 struct NodeInfo
 {
     uint64 highGuid;
@@ -243,9 +132,11 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
         eventPhase = 1;
         if (Creature* jeevee = me->SummonCreature(NPC_J_EEVEE, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
         {
-            DoScriptText(SHOUT_J_EEVEE_FREEDOM, jeevee);
-            if (npc_j_eeveeAI* jeeveeAI = dynamic_cast<npc_j_eeveeAI*>(jeevee->AI()))
+            if (npc_j_eevee_dreadsteedAI* jeeveeAI = dynamic_cast<npc_j_eevee_dreadsteedAI*>(jeevee->AI()))
+            {
+                jeeveeAI->ShoutFreedom();
                 jeeveeAI->SetPlayerGuid(playerGuid);
+            }
         }
         return true;
     }
@@ -1039,11 +930,6 @@ void AddSC_dreadsteed_ritual()
     newscript = new Script;
     newscript->Name = "event_dreadsteed_ritual_second_part";
     newscript->pProcessEventId = &ProcessEventId_event_dreadsteed_ritual_second_part;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_j_eevee";
-    newscript->GetAI = &GetAI_npc_j_eevee;
     newscript->RegisterSelf();
 
     newscript = new Script;

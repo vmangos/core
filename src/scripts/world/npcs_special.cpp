@@ -322,6 +322,7 @@ struct npc_injured_patientAI : public ScriptedAI
     {
         Doctorguid = 0;
         Coord = nullptr;
+        Pvloss = false;
         if (!m_creature->GetDBTableGUIDLow())
             Pvloss = true;
 

@@ -337,10 +337,10 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
             return;
         }
     }
-    else
+    else if (caster->GetTypeId() == TYPEID_UNIT)
     {
         // not have spell in spellbook or spell passive and not casted by client
-        if (!((Creature*)caster)->HasSpell(spellId) || IsPassiveSpell(spellInfo))
+        if (!caster->HasSpell(spellId) || IsPassiveSpell(spellInfo))
         {
             //cheater? kick? ban?
             recvPacket.rpos(recvPacket.wpos());                 // prevent spam at ignore packet
@@ -443,13 +443,6 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
         if (spellInfo->Effect[i] == SPELL_EFFECT_SUMMON_POSSESSED)
         {
             _player->SetNextRelocationsIgnoredCount(1);
-            break;
-        }
-
-        // Eyes of the Beast case
-        if (spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MOD_POSSESS_PET)
-        {
-            _player->SetNextRelocationsIgnoredCount(3);
             break;
         }
     }

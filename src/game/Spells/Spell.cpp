@@ -1285,6 +1285,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                             break;
                     }
 
+        // Sunder Armor triggers weapon proc as well as normal procs despite dealing no damage
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>())
+            ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
         procEx = createProcExtendMask(&damageInfo, missInfo);
@@ -1306,11 +1310,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             dmg = 1;
         }
         caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
-    }
-    // Sunder Armor triggers main hand proc despite dealing no damage
-    else if (m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>()) //sunder armor
-    {
-        ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
     }
 
     if (missInfo != SPELL_MISS_NONE)
@@ -3157,12 +3156,23 @@ void Spell::cancel()
                 m_caster->ToPlayer()->RemoveSpellMods(this);
 
                 // summoning rituals, if a user has cancelled inform the go
-                if (GameObject* go = m_targets.getGOTarget())
-                    if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
-                        go->getLootState() != GO_JUST_DEACTIVATED &&
-                        go->HasUniqueUser(m_caster->ToPlayer()))
-                        go->RemoveUniqueUse(m_caster->ToPlayer());
+                // Don't use m_targets.getGOTarget(), as it may be a dangling pointer since we don't
+                // update the target pointers here (only want to check a single target pointer). We
+                // can use it as a speed-up to see if this spell had a GO target at some point though
+                if (m_targets.getGOTarget())
+                {
+                    if (GameObject *go = m_caster->GetMap()->GetGameObject(m_targets.getGOTargetGuid()))
+                    {
+                        if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
+                            go->getLootState() != GO_JUST_DEACTIVATED &&
+                            go->HasUniqueUser(m_caster->ToPlayer()))
+                        {
+                            go->RemoveUniqueUse(m_caster->ToPlayer());
+                        }
+                    }
+                }
             }
+
             if (sendInterrupt)
                 SendCastResult(SPELL_FAILED_INTERRUPTED);
         }
@@ -6666,6 +6676,22 @@ bool Spell::IgnoreItemRequirements() const
 
 SpellCastResult Spell::CheckItems()
 {
+    // Check creature casts again here, even though they are checked in CreatureAI
+    // Need to do this for some melee attacks which are channeled, and then triggered
+    // eg. 13736
+    if (Creature *creature = m_caster->ToCreature())
+    {
+        // If the unit is disarmed and the skill requires a weapon, it cannot be cast
+        if (creature->HasWeapon() && !creature->CanUseEquippedWeapon(BASE_ATTACK))
+        {
+            for (int i = 0; i < MAX_EFFECT_INDEX; i++)
+            {
+                if (m_spellInfo->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE || m_spellInfo->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
+                    return SPELL_FAILED_EQUIPPED_ITEM;
+            }
+        }
+    }
+
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return SPELL_CAST_OK;
 

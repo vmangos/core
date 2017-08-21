@@ -3136,6 +3136,35 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                     if (m_caster->getAttackerForHelper())
                         summon->AI()->AttackStart(m_caster->getAttackerForHelper());
                     break;
+                // Chained Essence of Eranikus
+                case 12766:
+                    int EranikusText = -1001012;
+                    switch (urand(0, 7))
+                    {
+                        case 1:
+                            EranikusText = -1001013;
+                            break;
+                        case 2:
+                            EranikusText = -1001014;
+                            break;
+                        case 3:
+                            EranikusText = -1001015;
+                            break;
+                        case 4:
+                            EranikusText = -1001016;
+                            break;
+                        case 5:
+                            EranikusText = -1001017;
+                            break;
+                        case 6:
+                            EranikusText = -1001018;
+                            break;
+                        case 7:
+                            EranikusText = -1001019;
+                            break;
+                    }
+                    summon->MonsterWhisper(EranikusText, m_caster);
+                    break;
 
             }
 

@@ -56,6 +56,8 @@ enum
     TYPE_JAIL_SUPPLY_ROOM      = 40,
     TYPE_JAIL_TOBIAS           = 41,
 
+    DATA_ARENA_CHALLENGER      = 42,
+
     MAX_ENCOUNTER              = 20,
 
     EVENT_BAR_PATRONS          = 100,
@@ -119,6 +121,7 @@ enum
     NPC_ANVILRAGE_OFFICER      = 8895,
 
     NPC_SHADOWFORGE_SENATOR    = 8904,
+    NPC_GRIMSTONE              = 10096,
     NPC_THELDREN               = 16059,
 
     GO_ARENA1                  = 161525,
@@ -142,6 +145,8 @@ enum
     GO_SPECTRAL_CHALICE        = 164869,
     GO_CHEST_SEVEN             = 169243,
     GO_SECRET_DOOR             = 174553,
+
+    GO_ARENA_SPOILS            = 181074,
 
     QUEST_ROYAL_RESCUE         = 4003,   // horde quest
     QUEST_FATE_KINGDOM         = 4362,   // alliance quest

@@ -772,6 +772,13 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE);
 
+    // Disarm effects. Only applies to mobs with a weapon equipped. Sources suggest a 
+    // ~60% damage reduction on mobs which can be disarmed and have a weapon
+    // http://wowwiki.wikia.com/wiki/Attumen_the_Huntsman?oldid=1377353
+    // http://wowwiki.wikia.com/wiki/Disarm?direction=prev&oldid=200198
+    if (HasWeapon() && !CanUseEquippedWeapon(attType))
+        total_pct *= 0.4f;
+
     /* AP for units is 30% of base damage.
      * ie if AP is reduced to 0, attack will be reduced of 30%
      * We have to ignore creatures that don't have AP set in database (we would divide by 0)

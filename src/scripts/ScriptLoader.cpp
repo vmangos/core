@@ -49,6 +49,7 @@ void AddSC_spell_scripts();
 //eastern kingdoms
 void AddSC_instance_blackrock_spire();
 void AddSC_blackrock_depths();                       //blackrock_depths
+void AddSC_blackrock_depths_arena_challenge();
 void AddSC_boss_ambassador_flamelash();
 void AddSC_boss_anubshiah();
 void AddSC_boss_draganthaurissan();
@@ -269,6 +270,8 @@ void AddSC_thunder_bluff();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
 
+void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Jar
+
 void AddScripts()
 {
     //Nostalrius
@@ -314,6 +317,7 @@ void AddScripts()
 
     //eastern kingdoms
     AddSC_blackrock_depths();                               //blackrock_depths
+    AddSC_blackrock_depths_arena_challenge();
     AddSC_boss_ambassador_flamelash();
     AddSC_boss_anubshiah();
     AddSC_boss_draganthaurissan();
@@ -533,4 +537,5 @@ void AddScripts()
     AddSC_ungoro_crater();
     AddSC_winterspring();
 
+    AddSC_npc_j_eevee();
 }

@@ -214,7 +214,7 @@ void WorldSession::HandleGuildAcceptOpcode(WorldPacket& /*recvPacket*/)
     if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GUILD) && player->GetTeam() != sObjectMgr.GetPlayerTeamByGUID(guild->GetLeaderGuid()))
         return;
 
-    if (!guild->AddMember(GetPlayer()->GetObjectGuid(), guild->GetLowestRank()))
+    if (guild->AddMember(GetPlayer()->GetObjectGuid(), guild->GetLowestRank()) != GuildAddStatus::OK)
         return;
     // Put record into guild log
     guild->LogGuildEvent(GUILD_EVENT_LOG_JOIN_GUILD, GetPlayer()->GetObjectGuid());

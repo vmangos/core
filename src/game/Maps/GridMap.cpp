@@ -1005,7 +1005,9 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
             {
                 uint32 liquidFlagType = 0;
                 if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_type))
+                {
                     liquidFlagType = 1 << liq->Type;
+                }
 
                 data->level = liquid_level;
                 data->depth_level = ground_level;
@@ -1029,7 +1031,7 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
     }
     else if (GridMap* gmap = const_cast<TerrainInfo*>(this)->GetGrid(x, y))
     {
-        GridMapLiquidData map_data;
+        GridMapLiquidData map_data{};
         GridMapLiquidStatus map_result = gmap->getLiquidStatus(x, y, z, ReqLiquidType, &map_data);
         // Not override LIQUID_MAP_ABOVE_WATER with LIQUID_MAP_NO_WATER:
         if (map_result != LIQUID_MAP_NO_WATER && (map_data.level > ground_level))

@@ -228,10 +228,10 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         locale = LOCALE_enUS;
     os = fields[9].GetString();
     uint32 accFlags = fields[10].GetUInt32();
-
+    bool isBanned = fields[11].GetBool();
     delete result;
 
-    bool isBanned = fields[11].GetBool();
+    
     if (isBanned || sAccountMgr.IsIPBanned(GetRemoteAddress()))
     {
         packet.Initialize(SMSG_AUTH_RESPONSE, 1);
