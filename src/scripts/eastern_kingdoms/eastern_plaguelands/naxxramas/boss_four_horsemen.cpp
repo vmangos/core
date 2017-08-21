@@ -113,7 +113,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     const uint32 m_uiMarkId;
     const uint32 m_uiGhostId;
     const bool m_bIsSpirit;
-
+    uint32 pullCheckTimer;
     EventMap m_events;
 
     boss_four_horsemen_shared(Creature* pCreature, uint32 uiMarkId, uint32 uiGhostId) :
@@ -132,6 +132,52 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
         if (m_bIsSpirit)
             SetCombatMovement(false);
+    }
+
+    void AggroRadius(uint32 diff)
+    {
+        if (m_pInstance->GetData(TYPE_FOUR_HORSEMEN) != NOT_STARTED && m_pInstance->GetData(TYPE_FOUR_HORSEMEN) != FAIL)
+            return;
+
+        if (pullCheckTimer < diff)
+        {
+            pullCheckTimer = 1000;
+        }
+        else
+        {
+            pullCheckTimer -= diff;
+            return;
+        }
+
+        // Large aggro radius
+        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        {
+            Player* pPlayer = itr->getSource();
+            
+            if (m_creature->GetDistanceToCenter(pPlayer) > 74.0f)
+                continue;
+            bool alert;
+            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+                return;
+            if (m_creature->CanInitiateAttack() && pPlayer->isTargetableForAttack() && m_creature->IsHostileTo(pPlayer))
+            {
+                if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
+                {
+                    if (!m_creature->getVictim())
+                    {
+                        AttackStart(pPlayer);
+                        return;
+                    }
+                    else if (m_creature->GetMap()->IsDungeon())
+                    {
+                        pPlayer->SetInCombatWith(m_creature);
+                        m_creature->AddThreat(pPlayer);
+                        return;
+                    }
+                }
+            }
+        }
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -162,6 +208,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void Reset() override
     {
+        pullCheckTimer = 1000;
         m_events.Reset();
 
         m_bShieldWall1 = true;
@@ -395,6 +442,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
 
     void UpdateAI(const uint32 uiDiff)
     {
+        AggroRadius(uiDiff);
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -499,6 +547,8 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
 
     void UpdateAI(const uint32 uiDiff)
     {
+        AggroRadius(uiDiff);
+
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -581,6 +631,8 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
 
     void UpdateAI(const uint32 uiDiff)
     {
+        AggroRadius(uiDiff);
+
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
         if (!m_bIsSpirit && !m_pInstance->HandleEvadeOutOfHome(m_creature))
@@ -674,6 +726,8 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
 
     void UpdateAI(const uint32 uiDiff)
     {
+        AggroRadius(uiDiff);
+
         //Return since we have no target
         if (!m_bIsSpirit && (!m_creature->SelectHostileTarget() || !m_creature->getVictim()))
             return;
