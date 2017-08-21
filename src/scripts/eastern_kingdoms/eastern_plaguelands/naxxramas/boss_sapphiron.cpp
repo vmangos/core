@@ -612,7 +612,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 
         Creature* pSapp = nullptr;
         if(m_pInstance)
-            m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
+            pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
         if (!pSapp)
         {
             m_creature->GetMotionMaster()->MoveRandom();
