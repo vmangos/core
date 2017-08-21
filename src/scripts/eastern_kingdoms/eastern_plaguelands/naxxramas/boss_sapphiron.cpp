@@ -92,7 +92,7 @@ enum Phase
 
 static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
 uint32 SPAWN_ANIM_TIMER = 21500;
-static constexpr float AGGRO_RADIUS = 80.0f;
+static constexpr float AGGRO_RADIUS = 70.0f;
 struct boss_sapphironAI : public ScriptedAI
 {
     boss_sapphironAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -137,9 +137,11 @@ struct boss_sapphironAI : public ScriptedAI
     uint32 berserkTimer;
     std::vector<ObjectGuid> iceboltTargets;
     ObjectGuid wingBuffetCreature;
+    uint32 pullCheckTimer;
 
     void Reset()
     {
+        pullCheckTimer = 0;
         phase = PHASE_GROUND;
         events.Reset();
         berserkTimer = 900000; // 15 min
@@ -150,6 +152,11 @@ struct boss_sapphironAI : public ScriptedAI
         setHover(false);
         SetCombatMovement(true);
         m_creature->GetMotionMaster()->Clear(false);
+    }
+
+    void JustReachedHome() override
+    {
+        ScriptedAI::JustReachedHome();
     }
 
     void UnSummonWingBuffet()
@@ -208,30 +215,94 @@ struct boss_sapphironAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho) override
     {
-        if (m_pInstance 
-            && phase == PHASE_SKELETON
-            && pWho->GetTypeId() == TYPEID_PLAYER 
-            && !((Player*)pWho)->isGameMaster() 
-            && m_creature->IsWithinDistInMap(pWho, AGGRO_RADIUS))
+        if (m_creature->IsInEvadeMode())
+            return;
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
+
+    void StartSkeletonSummon()
+    {
+        phase = PHASE_SUMMONING;
+        spawnTimer = SPAWN_ANIM_TIMER;
+        // atm can only get the animation to play when summoning the gameobject. Thus, as a hack,
+        // we remove the old skeleton and summon a new one temporarily.
+        if (GameObject* skeleton = m_pInstance->GetSingleGameObjectFromStorage(GO_SAPPHIRON_SPAWN))
         {
-            phase = PHASE_SUMMONING;
-            spawnTimer = SPAWN_ANIM_TIMER;
-            // atm can only get the animation to play when summoning the gameobject. Thus, as a hack,
-            // we remove the old skeleton and summon a new one temporarily.
-            if (GameObject* skeleton = m_pInstance->GetSingleGameObjectFromStorage(GO_SAPPHIRON_SPAWN))
-            {
-                skeleton->Despawn();
-                m_creature->SummonGameObject(GO_SAPPHIRON_SPAWN, skeleton->GetPositionX(), skeleton->GetPositionY(), skeleton->GetPositionZ(),
-                    skeleton->GetRotation(), 0, 0, 0, 0, SPAWN_ANIM_TIMER);
-            }
-            else
-            {
-                MakeVisible();
-            }
+            skeleton->Despawn();
+            m_creature->SummonGameObject(GO_SAPPHIRON_SPAWN, skeleton->GetPositionX(), skeleton->GetPositionY(), skeleton->GetPositionZ(),
+                skeleton->GetRotation(), 0, 0, 0, 0, SPAWN_ANIM_TIMER);
         }
-        else if (phase == PHASE_GROUND && m_creature->IsWithinDistInMap(pWho, AGGRO_RADIUS))
+        else
         {
-            ScriptedAI::MoveInLineOfSight(pWho);
+            MakeVisible();
+        }
+    }
+
+    void AggroRadius(uint32 diff)
+    {
+        if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
+            return;
+        if (phase != PHASE_GROUND && phase != PHASE_SKELETON)
+            return;
+
+        if (pullCheckTimer < diff)
+        {
+            pullCheckTimer = 1000;
+        }
+        else
+        {
+            pullCheckTimer -= diff;
+            return;
+        }
+
+        float x, y, z, o;
+        m_creature->GetHomePosition(x, y, z, o);
+
+        // Large aggro radius
+        Map::PlayerList const &PlayerList = m_creature->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
+        {
+            Player* pPlayer = itr->getSource();
+            
+            float dx = pPlayer->GetPositionX() - x;
+            float dy = pPlayer->GetPositionY() - y;
+            float dz = pPlayer->GetPositionZ() - z;
+            float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+            dist = (dist > 0 ? dist : 0);
+            if (dist > AGGRO_RADIUS)
+                continue;
+            
+
+            bool alert;
+            if (!pPlayer->isVisibleForOrDetect(m_creature, m_creature, true, false, &alert))
+                continue;
+
+            if (!pPlayer->isTargetableForAttack() || !m_creature->IsHostileTo(pPlayer))
+                continue;
+
+            if (phase == PHASE_SKELETON)
+            {
+                StartSkeletonSummon();
+                return;
+            }
+
+            if (m_creature->CanInitiateAttack())
+            {
+                if (pPlayer->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pPlayer))
+                {
+                    if (!m_creature->getVictim())
+                    {
+                        AttackStart(pPlayer);
+                        return;
+                    }
+                    else if (m_creature->GetMap()->IsDungeon())
+                    {
+                        pPlayer->SetInCombatWith(m_creature);
+                        m_creature->AddThreat(pPlayer);
+                        return;
+                    }
+                }
+            }
         }
     }
 
@@ -351,6 +422,7 @@ struct boss_sapphironAI : public ScriptedAI
     {
         if (phase == PHASE_SKELETON)
         {
+            AggroRadius(uiDiff);
             return;
         }
         else if (phase == PHASE_SUMMONING)
@@ -368,6 +440,7 @@ struct boss_sapphironAI : public ScriptedAI
 
         if (phase == PHASE_GROUND)
         {
+            AggroRadius(uiDiff);
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
             //todo: need the evade out of home mechanic back
@@ -379,6 +452,23 @@ struct boss_sapphironAI : public ScriptedAI
                 EnterEvadeMode();
         }
       
+        if (phase == PHASE_GROUND || phase == PHASE_LIFT_OFF)
+        {
+            float x, y, z, o;
+            m_creature->GetHomePosition(x, y, z, o);
+            float dx = m_creature->GetPositionX() - x;
+            float dy = m_creature->GetPositionY() - y;
+            float dz = m_creature->GetPositionZ() - z;
+            float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+            dist = (dist > 0 ? dist : 0);
+            if (dist > 85.0f)
+            {
+                m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
+                EnterEvadeMode();
+                return;
+            }
+        }
+
         if(!m_creature->HasAura(SPELL_FROST_AURA))
             m_creature->CastSpell(m_creature, SPELL_FROST_AURA, true);
         
@@ -576,6 +666,8 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
     EventMap events;
     instance_naxxramas* m_pInstance;
     uint32 checkAuraTimer;
+    std::vector<ObjectGuid> previousTargets;
+
     void Reset() override
     {
     }
@@ -606,10 +698,12 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         events.Repeat(Seconds(8));
     }
 
+
     void PickNewTarget()
     {
         m_creature->GetMotionMaster()->Clear();
 
+        // if no sapphiron, move random
         Creature* pSapp = nullptr;
         if(m_pInstance)
             pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
@@ -619,16 +713,41 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
             return;
         }
 
-        // dont select tank position as destination
-        Unit* newTarget = pSapp->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, 0.0f, true);
-        if (!newTarget)
+        // if only "tank" alive, move random
+        ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
+        if (threatlist.size() < 2)
         {
-            events.Repeat(100);
+            m_creature->GetMotionMaster()->MoveRandom();
+            return;
+        }
+
+        std::vector<Unit*> suitableUnits;
+        auto it = threatlist.begin();
+        ++it; // skip tank
+        for (it; it != threatlist.end(); ++it)
+        {
+            if (Unit* pTarget = m_pInstance->GetMap()->GetUnit((*it)->getUnitGuid()))
+            {
+                if (!pTarget->IsPlayer())
+                    continue;
+                if (std::find(previousTargets.begin(), previousTargets.end(), pTarget->GetObjectGuid()) != previousTargets.end())
+                    continue;
+                // want to encourage the blizzard to move towards a semi-far-away target to make it spread out
+                if (m_creature->GetDistanceToCenter(pTarget) < 15.0f)
+                    continue;
+                suitableUnits.push_back(pTarget);
+            }
+        }
+        // when no suitable units found, we move random, this will generally only happen right before a wipe
+        if (suitableUnits.empty())
+        {
             m_creature->GetMotionMaster()->MoveRandom();
             return;
         }
         
-        m_creature->GetMotionMaster()->MovePoint(1, newTarget->GetPositionX(), newTarget->GetPositionY(), newTarget->GetPositionZ());
+        Unit* target = suitableUnits[urand(0, suitableUnits.size() - 1)];
+        previousTargets.push_back(target->GetObjectGuid());
+        m_creature->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
     }
 
     void UpdateAI(const uint32 uiDiff) override
