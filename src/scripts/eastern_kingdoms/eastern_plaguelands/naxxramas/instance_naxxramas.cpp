@@ -729,6 +729,25 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 GetCreatureListWithEntryInGrid(spirits, GetSingleCreatureFromStorage(NPC_ZELIEK), { 16775, 16776, 16777, 16778}, 300.0f);
                 for (Creature* pC : spirits)
                     pC->DeleteLater();
+
+                // reputation
+                FactionEntry const *factionEntry = sFactionStore.LookupEntry(529); // Cenarion Circle
+                if (factionEntry) 
+                {
+                    Map::PlayerList const &liste = GetMap()->GetPlayers();
+                    for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
+                    {
+                        if (Player* pPlayer = i->getSource())
+                        {
+                            uint32 current_reputation_rank1 = pPlayer->GetReputationMgr().GetRank(factionEntry);
+                            pPlayer->GetReputationMgr().ModifyReputation(factionEntry, 100);
+                        }
+                    }
+                }
+                else
+                {
+                    sLog.outError("Rajaxx justDied, unable to find Cenarion Circle faction");
+                }
             }
             
                 
