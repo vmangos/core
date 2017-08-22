@@ -5194,75 +5194,67 @@ VALUES
 (3998520,181287,533,2766.1,-2951,243,3.11252,0,0,0.999894,0.0145333,604800,100,1,0);
 
 
+REPLACE INTO creature_onkill_reputation (creature_id, RewOnKillRepFaction1, MaxStanding1, RewOnKillRepValue1) VALUES 			
+(16861,529,7,50), -- Death Lord
+(16451,529,7,50), -- Deathknight Vindicator
+(16018,529,7,50), -- Bile Retcher
+(16025,529,7,50), -- Stitched Giant
+(16029,529,7,50), -- Sludge Belcher
+(16163,529,7,50), -- Death Knight Cavalier
 
+(16368,529,7,25), -- Necropolis Acolyte
+(16452,529,7,25), -- Necro Knight Guardian
+(16168,529,7,25), -- Stoneskin Gargoyle
+(16021,529,7,25), -- Living Monstrosity
+(16145,529,7,25), -- Death Knight Captain
+(15978,529,7,25), -- Crypt Reaver
+(16446,529,7,25), -- Plagued Gargoyle
+(16165,529,7,25), -- Necro Knight
+(16448,529,7,25), -- Plagued Deathhound
+(15976,529,7,25), -- Venom Stalker
+(16453,529,7,25), -- Necro Stalker
+(16449,529,7,25), -- Spirit of Naxxramas
+(16164,529,7,25), -- Shade of Naxxramas
 
-/*
- Reputation by GuyBrush
- https://github.com/elysium-project/naxxramas_ptr_feedback/issues/53
-*/
--- Elites
-REPLACE INTO creature_onkill_reputation (creature_id, RewOnKillRepFaction1, MaxStanding1, RewOnKillRepValue1) VALUES 
-(16017, 529, 5, 5),
-(16018, 529, 5, 5),
-(16020, 529, 5, 5),
-(16021, 529, 5, 5),
-(16022, 529, 5, 5),
-(16025, 529, 5, 5),
-(16029, 529, 5, 5),
-(16067, 529, 5, 5),
-(16145, 529, 5, 5),
-(16146, 529, 5, 5),
-(16154, 529, 5, 5),
-(16156, 529, 5, 5),
-(16157, 529, 5, 5),
-(16158, 529, 5, 5),
-(16163, 529, 5, 5),
-(16167, 529, 5, 5),
-(16193, 529, 5, 5),
-(16451, 529, 5, 5),
-(16452, 529, 5, 5),
-(16861, 529, 5, 5),
-(16168, 529, 5, 5),
-(16037, 529, 5, 5),
-(15974, 529, 5, 5),
-(15975, 529, 5, 5),
-(15976, 529, 5, 5),
-(15977, 529, 5, 5),
-(15978, 529, 5, 5),
-(15980, 529, 5, 5),
-(15981, 529, 5, 5),
-(16447, 529, 5, 5),
-(16453, 529, 5, 5),
-(16449, 529, 5, 5),
-(16446, 529, 5, 5),
-(16164, 529, 5, 5),
-(16165, 529, 5, 5),
-(16243, 529, 5, 5),
-(16244, 529, 5, 5),
-(16368, 529, 5, 5),
-(16194, 529, 5, 5),
-(16215, 529, 5, 5),
-(16216, 529, 5, 5),
-(16446, 529, 5, 5),
-(16448, 529, 5, 5);
+(16146,529,7,0), -- Death Knight
+(16154,529,7,0), -- Risen Squire
+(16156,529,7,0), -- Dark Touched Warrior
+(16157,529,7,0), -- Doom Touched Warrior
+(16158,529,7,0), -- Death Touched Warrior
+(16167,529,7,0), -- Bony Construct
+(16193,529,7,0), -- Skeletal Smith
+(16067,529,7,0), -- Deathcharger Steed
+(16022,529,7,0), -- Surgical Assistant
+(16020,529,7,0), -- Mad Scientist
+(15974,529,7,0), -- Dread Creeper
+(15975,529,7,0), -- Carrion Spinner
+(15977,529,7,0), -- Poisonous Skitterer
+(15980,529,7,0), -- Naxxramas Cultist
+(15981,529,7,0), -- Naxxramas Acolyte
+(16447,529,7,0), -- Plagued Ghoul
+(16243,529,7,0), -- Plague Slime
+(16244,529,7,0), -- Infectious Ghoul
+(16194,529,7,0), -- Unholy Axe
+(16215,529,7,0), -- Unholy Staff
+(16216,529,7,0), -- Unholy Swords
 
--- Bosses
-REPLACE INTO creature_onkill_reputation (creature_id, RewOnKillRepFaction1, MaxStanding1, RewOnKillRepValue1) VALUES 
-(15928, 529, 7, 100),
-(15931, 529, 7, 100),
-(15932, 529, 7, 100),
-(15936, 529, 7, 100),
-(15952, 529, 7, 100),
-(15953, 529, 7, 100),
-(15954, 529, 7, 100),
-(15956, 529, 7, 100),
-(15989, 529, 7, 100),
-(15990, 529, 7, 100),
-(16011, 529, 7, 100),
-(16028, 529, 7, 100),
-(16060, 529, 7, 100),
-(16061, 529, 7, 100);
-
+(15928,529,7,100), -- Thaddius
+(15929,529,7,100), -- Stalagg
+(15930,529,7,100), -- Feugen
+(15931,529,7,100), -- Grobbulus
+(15932,529,7,100), -- Gluth
+(15936,529,7,100), -- Heigan the Unclean
+(15952,529,7,100), -- Maexxna
+(15953,529,7,100), -- Grand Widow Faerlina
+(15954,529,7,100), -- Noth the Plaguebringer
+(15956,529,7,100), -- Anub'Rekhan
+(15989,529,7,100), -- Sapphiron
+(15990,529,7,100), -- Kel'Thuzad
+(16011,529,7,100), -- Loatheb
+(16028,529,7,100), -- Patchwerk
+(16060,529,7,100), -- Gothik the Harvester
+(16061,529,7,100); -- Instructor Razuvious
+-- 4hm is handled by script
 
 -- misc events with incorrrect event chance, and 16243 no longer uses EventAI
 delete from creature_ai_scripts where creature_id in (16243);
