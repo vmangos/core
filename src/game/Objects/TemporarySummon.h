@@ -43,5 +43,6 @@ class TemporarySummon : public Creature
         uint32 m_lifetime;
         ObjectGuid m_summoner;
         bool m_justDied = false;
+        uint32 m_forceTargetUpdateTimer;
 };
 #endif
