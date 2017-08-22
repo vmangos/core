@@ -21,34 +21,34 @@ enum
 {
     SAY_SUMMON_MINIONS                  = -1533105,         //start of phase 1
 
-    EMOTE_PHASE2                        = -1533135,         //start of phase 2
-    SAY_AGGRO1                          = -1533094,
-    SAY_AGGRO2                          = -1533095,
-    SAY_AGGRO3                          = -1533096,
+    EMOTE_PHASE2                        = -1533135,         // %s strikes!, cant find use of it in vanilla
+    SAY_AGGRO1                          = -1533094,         // pray for mercy
+    SAY_AGGRO2                          = -1533095,         // Scream your dying breath!
+    SAY_AGGRO3                          = -1533096,         // The end is upon you!
 
     SAY_SLAY1                           = -1533097,
     SAY_SLAY2                           = -1533098,
 
     SAY_DEATH                           = -1533099,
 
-    SAY_CHAIN1                          = -1533100,
-    SAY_CHAIN2                          = -1533101,
-    SAY_FROST_BLAST                     = -1533102,
+    SAY_CHAIN1                          = -1533100,         // Your soul, is bound to me now!
+    SAY_CHAIN2                          = -1533101,         // there will be  no escape
+    SAY_FROST_BLAST                     = -1533102,         // I will freeze the blood in your veins!
 
-    SAY_REQUEST_AID                     = -1533103,         //start of phase 3
-    SAY_ANSWER_REQUEST                  = -1533104,         //lich king answer
+    SAY_REQUEST_AID                     = -1533103,         // Master! I require aid! 
+    SAY_ANSWER_REQUEST                  = -1533104,         // Very well... warriors of the frozen wastes, rise up! I command you to fight, kill, and die for your master. Let none survive...
 
-    SAY_SPECIAL1_MANA_DET               = -1533106,
-    SAY_SPECIAL3_MANA_DET               = -1533107,
-    SAY_SPECIAL2_DISPELL                = -1533108,
+    SAY_SPECIAL1_MANA_DET               = -1533106,         // Your petty magics are no challenge to the might of the Scourge! 
+    SAY_SPECIAL3_MANA_DET               = -1533107,         // Enough! I grow tired of these distractions! 
+    SAY_SPECIAL2_DISPELL                = -1533108,         // Fools, you have spread your powers too thin. Be free, my minions!
+        
+    EMOTE_GUARDIAN                      = -1533134,         // at each guardian summon, cant see that it's used in vanilla
 
-    EMOTE_GUARDIAN                      = -1533134,         // at each guardian summon
-
-    SPELL_VISUAL_CHANNEL = 29423,  // channeled throughout phase one
+    SPELL_VISUAL_CHANNEL = 29423,                           // channeled throughout phase one
 
     //spells to be casted
-    SPELL_FROST_BOLT          = 28478,
-    SPELL_FROST_BOLT_NOVA     = 28479,
+    SPELL_FROST_BOLT                    = 28478,
+    SPELL_FROST_BOLT_NOVA               = 28479,
 
     SPELL_CHAINS_OF_KELTHUZAD           = 28408,           
     SPELL_CHAINS_OF_KELTHUZAD_SCALE     = 28409,
@@ -59,6 +59,8 @@ enum
     SPELL_VOID_BLAST                    = 27812,
     SPELL_FROST_BLAST                   = 27808,
     SPELL_BERSERK                       = 28498,
+
+    SPELL_DISPELL_SHACKLES              = 28471,            // not used, doing it "manually"
 };
 
 static float M_F_ANGLE = 0.2f;                              // to adjust for map rotation
@@ -102,7 +104,7 @@ enum Events
 
     // phase three
     EVENT_REQUEST_REPLY,
-    EVENT_SUMMON_GUARDIAN
+    EVENT_SUMMON_GUARDIAN,
 };
 
 // the shiny thing in center that despawns after pull
@@ -691,16 +693,13 @@ struct boss_kelthuzadAI : public ScriptedAI
                     events.Repeat(Seconds(2));
                     break;
                 }
-                events.Repeat(Seconds(urand(10, 20)));
-                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1)) // todo: can it hit maintank?
-                {
-                    if (DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
-                    {
-                        if (urand(0, 1))
-                            DoScriptText(SAY_SPECIAL3_MANA_DET, m_creature);
-                        break;
-                    }
-                }
+                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                    if(DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
+                        events.Repeat(Seconds(urand(10, 20)));
+                    else
+                        events.Repeat(Seconds(1));
+                else
+                    events.Repeat(Seconds(1));
                 break;
             case EVENT_DETONATE_MANA:
                 if (m_creature->IsNonMeleeSpellCasted())
@@ -863,16 +862,16 @@ struct mob_guardian_icecrownAI : public ScriptedAI
 {
     mob_guardian_icecrownAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
     }
+    instance_naxxramas* m_pInstance;
     uint32 bloodTapTimer;
-    uint32 checkNeighbourTImer;
     void Reset() override
     {
         // Not sure if this was 18 or 15sec cd in vanilla, was 15 in wotlk. But making it 15 as we already
         // overpower last phase anyway
         bloodTapTimer = 15000;
-        checkNeighbourTImer = 1000;
     }
     void JustReachedHome() override
     {
@@ -908,8 +907,14 @@ struct mob_guardian_icecrownAI : public ScriptedAI
                 if (pC->HasAura(9484) || pC->HasAura(9485) || pC->HasAura(10955))
                     ++numShackled;
             }
+
             if (numShackled >= 3)
             {
+                if (m_pInstance)
+                {
+                    if (Creature* pKT = m_pInstance->GetSingleCreatureFromStorage(NPC_KELTHUZAD))
+                        DoScriptText(SAY_SPECIAL2_DISPELL, pKT);
+                }
                 for (Creature* pC : guardians)
                 {
                     DispellShackle(pC);
@@ -931,20 +936,6 @@ struct mob_guardian_icecrownAI : public ScriptedAI
                 bloodTapTimer = 15000;
         }
         else bloodTapTimer -= diff;
-
-        if (checkNeighbourTImer < diff)
-        {
-            checkNeighbourTImer = 1000;
-            std::list<Creature*> closeGuardians;
-            GetCreatureListWithEntryInGrid(closeGuardians, m_creature, NPC_GUARDIAN, 10.0f);
-            for (Creature* pC : closeGuardians)
-            {
-                if (pC->GetObjectGuid() == m_creature->GetObjectGuid())
-                    continue;
-                DispellShackle(pC);
-            }
-        }
-        else checkNeighbourTImer -= diff;
 
         DoMeleeAttackIfReady();
     }
