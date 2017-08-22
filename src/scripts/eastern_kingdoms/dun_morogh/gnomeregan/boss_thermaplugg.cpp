@@ -200,14 +200,19 @@ struct boss_thermapluggAI : public ScriptedAI
                 {
                     if (m_asBombFaces[i].m_uiBombTimer < uiDiff)
                     {
-                        // Calculate the spawning position as 90% between face and thermaplugg spawn-pos, and hight hardcoded
-                        float fX = 0.0f, fY = 0.0f;
-                        if (GameObject* pFace = m_creature->GetMap()->GetGameObject(m_asBombFaces[i].m_uiGnomeFaceGUID))
+                        std::list<Creature*> m_BombList;
+                        GetCreatureListWithEntryInGrid(m_BombList, m_creature, NPC_WALKING_BOMB, 250.0f);
+                        if (m_BombList.size() < MAX_GNOME_FACES)
                         {
-                            fX = 0.35 * m_afSpawnPos[0] + 0.65 * pFace->GetPositionX();
-                            fY = 0.35 * m_afSpawnPos[1] + 0.65 * pFace->GetPositionY();
+                            // Calculate the spawning position as 90% between face and thermaplugg spawn-pos, and hight hardcoded
+                            float fX = 0.0f, fY = 0.0f;
+                            if (GameObject* pFace = m_creature->GetMap()->GetGameObject(m_asBombFaces[i].m_uiGnomeFaceGUID))
+                            {
+                                fX = 0.35 * m_afSpawnPos[0] + 0.65 * pFace->GetPositionX();
+                                fY = 0.35 * m_afSpawnPos[1] + 0.65 * pFace->GetPositionY();
+                            }
+                            m_creature->SummonCreature(NPC_WALKING_BOMB, fX, fY, fBombSpawnZ, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
                         }
-                        m_creature->SummonCreature(NPC_WALKING_BOMB, fX, fY, fBombSpawnZ, 0.0f, TEMPSUMMON_CORPSE_DESPAWN, 0);
                         m_asBombFaces[i].m_uiBombTimer = urand(10000, 25000);   // TODO
                     }
                     else

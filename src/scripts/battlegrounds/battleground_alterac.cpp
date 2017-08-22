@@ -34,17 +34,17 @@ Vanndar: Thunderclap (about 200-300 nature damage per player in range not been u
 #define SPELL_THUNDERCLAP   15588
 #define VANNDAR_CENTER_X        722.4f
 #define VANNDAR_CENTER_Y        -11.0f
-#define    VANNDAR_AGGRO       -50020
-#define    VANNDAR_RESET       -50021
-#define    VANNDAR_BUFF1       -50022
-#define    VANNDAR_BUFF2       -50023
-#define    VANNDAR_RAID_WYPE   -50024
-#define    VANNDAR_FIGHT1      -50025
-#define    VANNDAR_FIGHT2      -50026
-#define    VANNDAR_FIGHT3      -50027
-#define    VANNDAR_FIGHT4      -50028
-#define    VANNDAR_FIGHT5      -50029
-#define    VANNDAR_FIGHT6      -50030
+#define    VANNDAR_AGGRO       -1050020
+#define    VANNDAR_RESET       -1050021
+#define    VANNDAR_BUFF1       -1050022
+#define    VANNDAR_BUFF2       -1050023
+#define    VANNDAR_RAID_WIPE   -1050024
+#define    VANNDAR_FIGHT1      -1050025
+#define    VANNDAR_FIGHT2      -1050026
+#define    VANNDAR_FIGHT3      -1050027
+#define    VANNDAR_FIGHT4      -1050028
+#define    VANNDAR_FIGHT5      -1050029
+#define    VANNDAR_FIGHT6      -1050030
 
 class npc_alterac_bossHelper
 {
@@ -87,7 +87,6 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
 {
     npc_VanndarAI(Creature* pCreature) : ScriptedAI(pCreature), npc_alterac_bossHelper(pCreature)
     {
-        m_bReset = false;
         AddLinkedMob(13333);
         for (int i = 14762; i <= 14769; ++i)
             AddLinkedMob(i);
@@ -105,7 +104,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat4;
     bool m_bCombat5;
     int32 m_uiRandomSpeech;
-    bool m_bReset;
+    bool m_bLeashed;
 
     void Reset()
     {
@@ -115,16 +114,25 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiStormbolt_Timer = 8000;
         m_uiThunderclap_Timer = 5000;
         m_creature->clearUnitState(UNIT_STAT_ROOT);
-        if (m_bReset)
-            m_creature->MonsterYellToZone(VANNDAR_RESET, LANG_UNIVERSAL, 0);
-        m_bReset = true;
         m_bAggro = true;
+        m_bLeashed = false;
         m_bCombat1 = true;
         m_bCombat2 = true;
         m_bCombat3 = true;
         m_bCombat4 = true;
         m_bCombat5 = true;
         m_uiRandomSpeech = 0;
+    }
+
+    void EnterEvadeMode()
+    {
+        if (m_bLeashed)
+            m_creature->MonsterYellToZone(VANNDAR_RESET, LANG_UNIVERSAL, 0);
+        else
+            m_creature->MonsterYellToZone(VANNDAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+
+        m_bLeashed = false;
+        ScriptedAI::EnterEvadeMode();
     }
 
     void Aggro(Unit* pWho)
@@ -153,6 +161,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
                 m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_bLeashed = true;
                 EnterEvadeMode();
                 return;
             }
@@ -218,35 +227,35 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
-            m_uiRandomSpeech = urand(50025, 50030);
+            m_uiRandomSpeech = urand(1050025, 1050030);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
-            m_uiRandomSpeech = urand(50025, 50030);
+            m_uiRandomSpeech = urand(1050025, 1050030);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
-            m_uiRandomSpeech = urand(50025, 50030);
+            m_uiRandomSpeech = urand(1050025, 1050030);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
-            m_uiRandomSpeech = urand(50025, 50030);
+            m_uiRandomSpeech = urand(1050025, 1050030);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
-            m_uiRandomSpeech = urand(50025, 50030);
+            m_uiRandomSpeech = urand(1050025, 1050030);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat5 = false;
         }
@@ -272,14 +281,14 @@ CreatureAI* GetAI_npc_Vanndar(Creature* m_creature)
 #define    SPELL_KNOCKDOWN       19128
 #define    DKT_CENTER_X         -1370.9f
 #define    DKT_CENTER_Y          -219.8f
-#define    DREKTHAR_AGGRO       -50006
-#define    DREKTHAR_RESET       -50007
-#define    DREKTHAR_RAID_WYPE   -50008
-#define    DREKTHAR_FIGHT1      -50009 // 80%
-#define    DREKTHAR_FIGHT2      -50010 // 60%
-#define    DREKTHAR_FIGHT3      -50011 // 40%
-#define    DREKTHAR_FIGHT4      -50012 // 20%
-#define    DREKTHAR_FIGHT5      -50013 // 5%
+#define    DREKTHAR_AGGRO       -1050006
+#define    DREKTHAR_RESET       -1050007
+#define    DREKTHAR_RAID_WIPE   -1050008
+#define    DREKTHAR_FIGHT1      -1050009 // 80%
+#define    DREKTHAR_FIGHT2      -1050010 // 60%
+#define    DREKTHAR_FIGHT3      -1050011 // 40%
+#define    DREKTHAR_FIGHT4      -1050012 // 20%
+#define    DREKTHAR_FIGHT5      -1050013 // 5%
 
 // Duros 12121 Drakan 12122
 
@@ -315,7 +324,6 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 {
     npc_DrekTharAI(Creature* pCreature) : ScriptedAI(pCreature), npc_alterac_bossHelper(pCreature)
     {
-        m_bReset = false;
         AddLinkedMob(12121);
         AddLinkedMob(12122);
         for (int i = 14772; i <= 14777; ++i)
@@ -335,7 +343,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat4;
     bool m_bCombat5;
     int32 m_uiRandomSpeech;
-    bool m_bReset;
+    bool m_bLeashed;
 
     void Reset()
     {
@@ -346,10 +354,8 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         m_uiKnockDown_Timer = 18000;
         m_uiFrenzy_Timer = 1000;
         m_creature->clearUnitState(UNIT_STAT_ROOT);
-        if (m_bReset)
-            m_creature->MonsterYellToZone(DREKTHAR_RESET, LANG_UNIVERSAL, 0);
-        m_bReset = true;
         m_bAggro = true;
+        m_bLeashed = false;
         m_bCombat1 = true;
         m_bCombat2 = true;
         m_bCombat3 = true;
@@ -371,6 +377,17 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
                 (*it)->Respawn();
         m_Wolf.clear();
 
+    }
+
+    void EnterEvadeMode()
+    {
+        if (m_bLeashed)
+            m_creature->MonsterYellToZone(DREKTHAR_RESET, LANG_UNIVERSAL, 0);
+        else
+            m_creature->MonsterYellToZone(DREKTHAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+
+        m_bLeashed = false;
+        ScriptedAI::EnterEvadeMode();
     }
 
     void Aggro(Unit* pWho)
@@ -400,6 +417,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
                 m_creature->clearUnitState(UNIT_STAT_ROOT);
+                m_bLeashed = true;
                 EnterEvadeMode();
                 return;
             }
@@ -483,35 +501,35 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
-            m_uiRandomSpeech = urand(50009, 50013);
+            m_uiRandomSpeech = urand(1050009, 1050013);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
-            m_uiRandomSpeech = urand(50009, 50013);
+            m_uiRandomSpeech = urand(1050009, 1050013);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
-            m_uiRandomSpeech = urand(50009, 50013);
+            m_uiRandomSpeech = urand(1050009, 1050013);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
-            m_uiRandomSpeech = urand(50009, 50013);
+            m_uiRandomSpeech = urand(1050009, 1050013);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
-            m_uiRandomSpeech = urand(50009, 50013);
+            m_uiRandomSpeech = urand(1050009, 1050013);
             m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
             m_bCombat5 = false;
         }
@@ -539,9 +557,9 @@ CreatureAI* GetAI_npc_DrekThar(Creature* m_creature)
 #define SPELL_POLYMORPH    15534
 #define BAL_CENTER_X       -57.7f
 #define BAL_CENTER_Y       -286.6f
-#define SAY_AGGRO          -50003
-#define SAY_BALINDA        -50004
-#define SAY_RESET          -50005
+#define SAY_AGGRO          -1050003
+#define SAY_BALINDA        -1050004
+#define SAY_RESET          -1050005
 
 
 struct npc_BalindaAI : public ScriptedAI
@@ -776,9 +794,9 @@ CreatureAI* GetAI_npc_Balinda(Creature* m_creature)
 #define SPELL_FRIGHTSHOUT        19134
 #define GAL_CENTER_X            -545.2f
 #define GAL_CENTER_Y            -165.3f
-#define SAY_AGGRO_GALVANGAR     -50001
-#define SAY_HALF_LIFE_GALVANGAR -50002
-#define SAY_RESET_GALVANGAR     -50000
+#define SAY_AGGRO_GALVANGAR     -1050001
+#define SAY_HALF_LIFE_GALVANGAR -1050002
+#define SAY_RESET_GALVANGAR     -1050000
 
 struct npc_GalvangarAI : public ScriptedAI
 {

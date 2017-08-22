@@ -389,9 +389,25 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
 {
     WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);      // guess size
     data << ObjectGuid(npcGUID);
-    data << Title;
-    data << uint32(eEmote._Delay);                          // player emote
-    data << uint32(eEmote._Emote);                          // NPC emote
+
+    if (QuestGreetingLocale const *questGreeting = sObjectMgr.GetQuestGreetingLocale(npcGUID.GetEntry()))
+    {
+        int locale_idx = GetMenuSession()->GetSessionDbLocaleIndex();
+
+        if ((int32)questGreeting->Content.size() > locale_idx + 1 && !questGreeting->Content[locale_idx + 1].empty())
+            data << questGreeting->Content[locale_idx + 1];
+        else
+            data << questGreeting->Content[0];
+
+        data << uint32(questGreeting->EmoteDelay);
+        data << uint32(questGreeting->Emote);
+    }
+    else
+    {
+        data << Title;
+        data << uint32(eEmote._Delay);                          // player emote
+        data << uint32(eEmote._Emote);                          // NPC emote
+    }
 
     size_t count_pos = data.wpos();
     data << uint8(mQuestMenu.MenuItemCount());
@@ -742,7 +758,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const *pQuest, ObjectGuid npcG
     // that is shown when you talk to the quest giver while the quest is incomplete.
     // Therefore the text should not be shown for them when the quest is complete.
     // For quests that do require items, it is self explanatory.
-    if (RequestItemsText.empty() || (!pQuest->HasItemsRequirement() && Completable))
+    if (RequestItemsText.empty() || ((pQuest->GetReqItemsCount() == 0) && Completable))
     {
         SendQuestGiverOfferReward(pQuest, npcGUID, true);
         return;

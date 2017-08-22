@@ -82,7 +82,7 @@ struct instance_wailing_caverns : public ScriptedInstance
                     pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
                     break;*/
         }
-        if (!pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER &&
+        if ((pCreature->GetCreatureType() != CREATURE_TYPE_CRITTER) &&
             pCreature->getFaction() != 35 && // the 2 druids
             pCreature->GetEntry() != 3653) // Kresh is cool
             vNightmareMonsters.push_back(pCreature->GetGUID());

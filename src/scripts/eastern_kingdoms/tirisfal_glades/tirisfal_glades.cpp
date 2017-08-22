@@ -50,7 +50,10 @@ bool GOHello_go_mausoleum_door(Player* pPlayer, GameObject* pGo)
     if (GameObject* pTrigger = GetClosestGameObjectWithEntry(pPlayer, GO_TRIGGER, 30.0f))
     {
         pTrigger->SetGoState(GO_STATE_READY);
-        pPlayer->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
+
+        Creature* ulag = pPlayer->FindNearestCreature(NPC_ULAG, 100.0f);
+        if (!ulag || ulag->isDead())
+            pPlayer->SummonCreature(NPC_ULAG, 2390.26f, 336.47f, 40.01f, 2.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);       
         return false;
     }
 

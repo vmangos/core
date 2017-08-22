@@ -146,6 +146,7 @@ public:
     void TeleportTo(Player* player) const;
     std::string FormatMessageString(ChatHandler& handler, bool detailed = false) const;
     std::string FormatMessageString(ChatHandler& handler, const char* szClosedName, const char* szAssignedToName, const char* szUnassignedName, const char* szDeletedName, const char* szCompletedName) const;
+    const char* GetTicketCategoryName(TicketType category) const;
 
     void SetChatLog(std::list<uint32> time, std::string const& log);
     std::string const& GetChatLog() const { return _chatLog; }
@@ -260,7 +261,7 @@ public:
     void Initialize();
     void ResetTickets();
 
-    void ShowList(ChatHandler& handler, bool onlineOnly) const;
+    void ShowList(ChatHandler& handler, bool onlineOnly, uint8 category = 0) const;
     void ShowClosedList(ChatHandler& handler) const;
     void ShowEscalatedList(ChatHandler& handler) const;
 

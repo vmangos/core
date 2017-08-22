@@ -46,7 +46,7 @@ template void ThreadPool::start<ThreadPool::MultiQueue>();
 template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::SingleQueue>>();
 template void ThreadPool::start<ThreadPool::MySQL<ThreadPool::MultiQueue>>();
 
-std::future<void> ThreadPool::processWorkload()
+std::future<void> ThreadPool::processWorkload(Callable pre, Callable post)
 {
     if (m_clearMode == ClearMode::AT_NEXT_WORKLOAD &&
             m_status == Status::READY && m_dirty)
@@ -60,27 +60,27 @@ std::future<void> ThreadPool::processWorkload()
     m_status = Status::PROCESSING;
     std::unique_lock<std::shared_timed_mutex> lock(m_mutex);
     for (int i = 0; i < m_active; i++)
-        m_workers[i]->prepare();
+        m_workers[i]->prepare(pre, post);
     m_waitForWork.notify_all();
     return m_result.get_future();
 }
 
-std::future<void> ThreadPool::processWorkload(workload_t &workload)
+std::future<void> ThreadPool::processWorkload(workload_t &workload, Callable pre, Callable post)
 {
     if (m_status != Status::READY)
         return std::future<void>();
     m_workload = workload;
     m_dirty = false;
-    return processWorkload();
+    return processWorkload(pre, post);
 }
 
-std::future<void> ThreadPool::processWorkload(workload_t &&workload)
+std::future<void> ThreadPool::processWorkload(workload_t &&workload, Callable pre, Callable post)
 {
     if (m_status != Status::READY)
         return std::future<void>();
     m_workload = std::move(workload);
     m_dirty = false;
-    return processWorkload();
+    return processWorkload(pre, post);
 }
 
 ThreadPool::Status ThreadPool::status() const
@@ -105,7 +105,7 @@ void ThreadPool::worker::waitForWork()
         pool->m_waitForWork.wait(lock);
 }
 
-ThreadPool &ThreadPool::operator<<(std::function<void()> packaged_task)
+ThreadPool &ThreadPool::operator<<(Callable packaged_task)
 {
     if (m_status == Status::PROCESSING || m_status == Status::ERROR)
         throw "Attempt to append a task to a load being processed!";
@@ -182,9 +182,11 @@ void ThreadPool::worker::loop_wrapper()
     }
 }
 
-void ThreadPool::worker::prepare()
+void ThreadPool::worker::prepare(ThreadPool::Callable pre, ThreadPool::Callable post)
 {
     busy = true;
+    this->pre = pre;
+    this->post = post;
 }
 
 void ThreadPool::worker::loop()
@@ -194,7 +196,15 @@ void ThreadPool::worker::loop()
         waitForWork();
         if (pool->m_status == Status::TERMINATING)
             return;
+
+        if (pre)
+            pre();
+
         doWork();
+
+        if (post)
+            post();
+
         busy = false;
         int remaning = --(pool->m_active);
         if (!remaning)
@@ -230,10 +240,10 @@ void ThreadPool::worker_mq::doWork()
     }
 }
 
-void ThreadPool::worker_mq::prepare()
+void ThreadPool::worker_mq::prepare(ThreadPool::Callable pre, ThreadPool::Callable post)
 {
     it = id;
-    worker::prepare();
+    worker::prepare(pre, post);
 }
 
 ThreadPool::worker_sq::worker_sq(ThreadPool *pool, int id, ThreadPool::ErrorHandling mode) :

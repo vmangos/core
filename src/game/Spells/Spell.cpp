@@ -1191,13 +1191,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         else
         {
             caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType, this);
-            // Judgement of Command
-            if (m_spellInfo->SpellIconID == 561)
-            {
-                // damage halved if target not stunned.
-                if (!unitTarget->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
-                     damageInfo.damage = int32(damageInfo.damage * 0.5f);
-            }
         }
 
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
@@ -1303,9 +1296,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Trigger spell cast procs and forward the damage / heal procs to the aura
         if (foundDamageOrHealAura)
         {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
-            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            procAttacker &= (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             procVictim = 0;
             dmg = 1;
         }
@@ -2757,7 +2750,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
                 case SPELL_EFFECT_BIND:
-                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
                 case SPELL_EFFECT_CREATE_ITEM:
@@ -2782,6 +2774,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
+                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
@@ -3479,6 +3472,11 @@ void Spell::handle_immediate()
 
         ++m_targetNum;
         DoAllEffectOnTarget(&(*ihit));
+
+        // a channeled spell could be interrupted already because the aura on target
+        // was diminished to duration=0 see Spell::DoSpellHitOnUnit
+        if (m_channeled && m_spellState != SPELL_STATE_CASTING)
+            return;
     }
 
     for (auto ihit = m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
@@ -5046,7 +5044,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-                if (m_spellInfo->Id == 7266 && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
+                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
                 {
                     return SPELL_FAILED_TARGET_DUELING;
                 }
@@ -6942,9 +6940,11 @@ SpellCastResult Spell::CheckItems()
                     break; // Master Healthstone
             }
 
-            if (p_caster->HasItemCount(itemtype, 1))
+            ItemPosCountVec dest;
+            InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemtype, 1);
+            if (msg != EQUIP_ERR_OK)
             {
-                p_caster->SendEquipError(EQUIP_ERR_CANT_CARRY_MORE_OF_THIS, nullptr, nullptr, itemtype);
+                p_caster->SendEquipError(msg, nullptr, nullptr, itemtype);
                 return SPELL_FAILED_DONT_REPORT;
             }
         }
@@ -7313,6 +7313,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
                 break;
         // no break. Cannibalize checks corpse target LOS.
         // fall through
+        case SPELL_EFFECT_RESURRECT:
         case SPELL_EFFECT_RESURRECT_NEW:
             // player far away, maybe his corpse near?
             if (target != m_caster && !(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !target->IsWithinLOSInMap(m_caster))

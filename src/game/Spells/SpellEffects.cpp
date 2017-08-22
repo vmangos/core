@@ -448,6 +448,10 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 // Judgement of Command - receive bonus from spell damage
                 else if (m_spellInfo->SpellIconID == 561)
                 {
+                    // base damage halved if target not stunned.
+                    if (!unitTarget->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
+                        damage = int32(damage * 0.5f);
+
                     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
                     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
                 }
@@ -692,12 +696,12 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     sLog.outString("Quest 8606 item Dummy Effect.");
                     Player* pPlayer = (Player*)m_originalCaster;
-                    // Check si joueur a la tenue de Narain
+                    // Check for buff Narain!
                     if (!pPlayer->HasAura(25688))
                         return;
-                    // Lancement de l'event 9527
-                    pPlayer->GetMap()->ScriptsStart(sEventScripts, 9527, pPlayer, focusObject);
-                    // Suppression de l'item sac d'or 21041
+                    // Start event 9527 using custom spell to avoid db error
+                    pPlayer->CastSpell(pPlayer, 33031, true);
+                    // Delete item Bag of Gold (21041)
                     pPlayer->DestroyItemCount(21041, -1, true, false);
                     return;
                 }
@@ -4783,7 +4787,7 @@ void Spell::EffectStuck(SpellEffectIndex /*eff_idx*/)
     Player* pTarget = (Player*)unitTarget;
 
     DEBUG_LOG("Spell Effect: Stuck");
-    sLog.outInfo("Player %s (guid %u) used auto-unstuck future at map %u (%f, %f, %f)", pTarget->GetName(), pTarget->GetGUIDLow(), m_caster->GetMapId(), m_caster->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
+    sLog.outInfo("Player %s (guid %u) used auto-unstuck feature at map %u (%f, %f, %f).", pTarget->GetName(), pTarget->GetGUIDLow(), m_caster->GetMapId(), m_caster->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
 
     if (pTarget->IsTaxiFlying())
         return;

@@ -396,21 +396,24 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  SMSG_SPLINE_SET_SWIM_BACK_SPEED},
         {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
     };
-    
-    // Maybe update movespeed using the spline packet. works for move splines
-    // and normal movement, but reverted due to issues in same changeset
-    WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
-    data << _player->GetMover()->GetPackGUID();
-    data << movementInfo;
-    data << float(newspeed);
-    _player->SendMovementMessageToSet(std::move(data), false);
-    
-    if (!_player->GetMover()->movespline->Finalized())
+
+    if (!_player->IsTaxiFlying()) 
     {
-        WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
-        splineData << _player->GetMover()->GetPackGUID();
-        Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
-        _player->SendMovementMessageToSet(std::move(splineData), false);
+        // Maybe update movespeed using the spline packet. works for move splines
+        // and normal movement, but reverted due to issues in same changeset
+        WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
+        data << _player->GetMover()->GetPackGUID();
+        data << movementInfo;
+        data << float(newspeed);
+        _player->SendMovementMessageToSet(std::move(data), false);
+
+        if (!_player->GetMover()->movespline->Finalized())
+        {
+            WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
+            splineData << _player->GetMover()->GetPackGUID();
+            Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
+            _player->SendMovementMessageToSet(std::move(splineData), false);
+        }
     }
 }
 

@@ -97,6 +97,7 @@ public:
     };
 
     uint32 GahzRillaEncounter;
+    uint64 UkorzGUID;
     uint64 ZumrahGUID;
     uint64 BlyGUID;
     uint64 WeegliGUID;
@@ -141,6 +142,9 @@ public:
             case ENTRY_MURTA:
                 MurtaGUID = pCreature->GetGUID();
                 //pCreature->GetCharmInfo()->SetReactState(REACT_PASSIVE);// starts out passive (in a cage)
+                break;
+            case ENTRY_UKORZ:
+                UkorzGUID = pCreature->GetGUID();
                 break;
             case NPC_GAHZRILLA:
                 if (GahzRillaEncounter >= IN_PROGRESS)
@@ -187,6 +191,8 @@ public:
                 return WeegliGUID;
             case ENTRY_MURTA:
                 return MurtaGUID;
+            case ENTRY_UKORZ:
+                return UkorzGUID;
             case GO_END_DOOR:
                 return EndDoorGUID;
         }

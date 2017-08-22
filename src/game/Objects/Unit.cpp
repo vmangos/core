@@ -2020,11 +2020,7 @@ uint32 Unit::CalcArmorReducedDamage(Unit* pVictim, const uint32 damage)
     if (armor < 0.0f)
         armor = 0.0f;
 
-    float levelModifier = (float)getLevel();
-    if (levelModifier > 59)
-        levelModifier = levelModifier + (4.5f * (levelModifier - 59));
-
-    float tmpvalue = 0.1f * armor / (8.5f * levelModifier + 40);
+    float tmpvalue = 0.1f * armor / (8.5f * (float)getLevel() + 40);
     tmpvalue = tmpvalue / (1.0f + tmpvalue);
 
     if (tmpvalue < 0.0f)
@@ -2752,7 +2748,7 @@ float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 
 
     // PvP - PvE melee chances
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        hitChance = 94.4f + skillDiff * 0.04f;
+        hitChance = 95.0f + skillDiff * 0.04f;  // PvP misschance base is 5.00%
     else if (skillDiff < -10)
         hitChance = 93.4f + (skillDiff + 10) * 0.4f;        // 7% ~ 6.60% base chance to miss for big skill diff
     else
@@ -3027,6 +3023,10 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell
     if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex))
         return SPELL_MISS_NONE;
 
+    // Farsight spells can't miss
+    if (spell->AttributesEx & SPELL_ATTR_EX_FARSIGHT)
+        return SPELL_MISS_NONE;
+
     // Check for immune (use charges)
     SpellSchoolMask schoolMask;
     if (spellPtr)
@@ -3096,7 +3096,7 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     float missChance = 5.60f; // The base chance to miss is 5.60%
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
     {
-      missChance = 5.00f;  // The base chance to miss in PvP is 5%
+        missChance = 5.00f;  // The base chance to miss in PvP is 5%
     }
 
     // DualWield - white damage has an additional 19% miss penalty
@@ -3548,6 +3548,14 @@ bool Unit::IsNonMeleeSpellCasted(bool withDelayed, bool skipChanneled, bool skip
 
     // autorepeat spells may be finished or delayed, but they are still considered casted
     else if (!skipAutorepeat && m_currentSpells[CURRENT_AUTOREPEAT_SPELL])
+        return (true);
+
+    return (false);
+}
+
+bool Unit::IsNextSwingSpellCasted() const
+{
+    if (m_currentSpells[CURRENT_MELEE_SPELL] && m_currentSpells[CURRENT_MELEE_SPELL]->IsNextMeleeSwingSpell())
         return (true);
 
     return (false);
