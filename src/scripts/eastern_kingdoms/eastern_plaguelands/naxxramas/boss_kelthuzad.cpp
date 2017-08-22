@@ -517,7 +517,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                         uint32 repeat_next = std::max(uint32(3750 - 25 * numSkeletons), uint32(2000));
                         events.Repeat(repeat_next);
                         ++numSkeletons;
-                        sLog.outBasic("[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
+                        //sLog.outBasic("[%d] Spawn SKEL #%d, next in %dms", p1Timer, numSkeletons, repeat_next);
                     }
                     else
                         events.Repeat(100);
@@ -528,14 +528,14 @@ struct boss_kelthuzadAI : public ScriptedAI
             {
                 SpawnAndSendP1Creature(NPC_UNSTOPPABLE_ABOM);
                 ++numAboms;
-                sLog.outBasic("[%d] Spawn ABOM #%d", p1Timer, numAboms);
+                //sLog.outBasic("[%d] Spawn ABOM #%d", p1Timer, numAboms);
                 break;
             }
             case EVENT_SOUL_WEAVER:
             {
                 SpawnAndSendP1Creature(NPC_SOUL_WEAVER);
                 ++numBanshees;
-                sLog.outBasic("[%d] Spawn SOUL #%d", p1Timer, numBanshees);
+                //sLog.outBasic("[%d] Spawn SOUL #%d", p1Timer, numBanshees);
                 break;
             }
             case EVENT_PHASE_TWO_INTRO:
