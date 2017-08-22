@@ -20,7 +20,7 @@
 
 // TELEPORT NPC
 
-bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
+bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)   
 {
     // HORDE
     if (player->GetTeam() == HORDE)
@@ -39,7 +39,7 @@ bool GossipHello_TeleportNPC(Player *player, Creature *_Creature)
     // ALLIANCE
     else
     {
-        player->ADD_GOSSIP_ITEM(5, "PreTBC Mall"          , GOSSIP_SENDER_MAIN, 74);
+        //player->ADD_GOSSIP_ITEM(5, "PreTBC Mall"          , GOSSIP_SENDER_MAIN, 74);
         player->ADD_GOSSIP_ITEM(5, "Major Cities"               , GOSSIP_SENDER_MAIN, 2);
         player->ADD_GOSSIP_ITEM(5, "Starting Areas"       , GOSSIP_SENDER_MAIN, 4);
         player->ADD_GOSSIP_ITEM(5, "Instances"            , GOSSIP_SENDER_MAIN, 5);
@@ -292,8 +292,8 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             player->TeleportTo(1, -7180.401367f, -3773.328369f, 8.728320f, 0.0f);
             break;
         case 74: // Pretbc Mall
-            player->CLOSE_GOSSIP_MENU();
-            player->TeleportTo(1, 16201.107422f, 16205.1875f, 0.140072f, 1.630427f);
+            //player->CLOSE_GOSSIP_MENU();
+            //player->TeleportTo(1, 16201.107422f, 16205.1875f, 0.140072f, 1.630427f);
             break;
         case 4015:// Gurubashi
             player->CLOSE_GOSSIP_MENU();
@@ -512,7 +512,7 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             // HORDE
             if (player->GetTeam() == HORDE)
             {
-                player->ADD_GOSSIP_ITEM(5, "PreTBC Mall"          , GOSSIP_SENDER_MAIN, 74);
+                //player->ADD_GOSSIP_ITEM(5, "PreTBC Mall"          , GOSSIP_SENDER_MAIN, 74);
                 player->ADD_GOSSIP_ITEM(5, "Major Cities"               , GOSSIP_SENDER_MAIN, 1);
                 player->ADD_GOSSIP_ITEM(5, "Starting Areas"       , GOSSIP_SENDER_MAIN, 3);
                 player->ADD_GOSSIP_ITEM(5, "Instances"            , GOSSIP_SENDER_MAIN, 5);
@@ -526,7 +526,7 @@ void SendDefaultMenu_TeleportNPC(Player *player, Creature *_Creature, uint32 act
             // ALLIANCE
             else
             {
-                player->ADD_GOSSIP_ITEM(5, "PreTBC Mall"          , GOSSIP_SENDER_MAIN, 74);
+                //player->ADD_GOSSIP_ITEM(5, "PreTBC Mall"          , GOSSIP_SENDER_MAIN, 74);
                 player->ADD_GOSSIP_ITEM(5, "Major Cities"               , GOSSIP_SENDER_MAIN, 2);
                 player->ADD_GOSSIP_ITEM(5, "Starting Areas"       , GOSSIP_SENDER_MAIN, 4);
                 player->ADD_GOSSIP_ITEM(5, "Instances"            , GOSSIP_SENDER_MAIN, 5);
