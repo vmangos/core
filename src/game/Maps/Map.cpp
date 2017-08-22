@@ -681,6 +681,7 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
             };
         std::future<void> job = m_cellThreads->processWorkload();
         UpdateActiveCellsCallback(diff, now, nthreads, nthreads+1, 0);
+        MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
         if (job.valid())
             job.wait();
     }
