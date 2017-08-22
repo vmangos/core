@@ -68,7 +68,7 @@ void MMapManager::CleanUpNavQuery(std::thread::id tid)
 
     rlock.unlock();
 
-    std::unique_lock<std::shared_timed_mutex> wlock (loadedModels_lock);
+    std::shared_lock<std::shared_timed_mutex> models_rlock (loadedModels_lock);
     //DEBUG_LOG("Cleaning up any dtNavMeshQuery related to tid %u in loadedModels", tid);
     for (MMapDataSet::iterator itr = loadedModels.begin(); itr != loadedModels.end(); ++itr)
         RemoveThreadNavMeshQueries(tid, itr->second);
@@ -287,7 +287,7 @@ bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
 
 bool MMapManager::unloadMap(uint32 mapId)
 {
-    std::shared_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
+    std::unique_lock<std::shared_timed_mutex> wlock(loadedMMaps_lock);
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
     {
         // file may not exist, therefore not loaded
@@ -311,7 +311,7 @@ bool MMapManager::unloadMap(uint32 mapId)
 
     delete mmap;
     loadedMMaps.erase(mapId);
-    rlock.unlock();
+    wlock.unlock();
 
     DETAIL_LOG("MMAP:unloadMap: Unloaded %03i.mmap", mapId);
 
