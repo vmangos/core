@@ -287,7 +287,7 @@ bool MMapManager::unloadMap(uint32 mapId, int32 x, int32 y)
 
 bool MMapManager::unloadMap(uint32 mapId)
 {
-    std::unique_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
+    std::shared_lock<std::shared_timed_mutex> rlock(loadedMMaps_lock);
     if (loadedMMaps.find(mapId) == loadedMMaps.end())
     {
         // file may not exist, therefore not loaded
@@ -311,7 +311,7 @@ bool MMapManager::unloadMap(uint32 mapId)
 
     delete mmap;
     loadedMMaps.erase(mapId);
-    rlock.release();
+    rlock.unlock();
 
     DETAIL_LOG("MMAP:unloadMap: Unloaded %03i.mmap", mapId);
 
