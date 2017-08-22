@@ -406,6 +406,15 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         else
                             damage = uint32(damage / 1.5f);
                     }
+                    case 27812: // Kel'Thuzad Void Blast
+                    {
+                        // If target has the chains of kel'thuzad aura the spell should not do any damage.
+                        // This check should not be necessary as you should be friendly to the caster of
+                        // the spell, but some bug caused players to take damage anyway, and even if that is fixed,
+                        // this is a safetycheck.
+                        if (unitTarget->HasAura(28410))
+                            damage = 0;
+                    }
                 }
                 break;
             }
