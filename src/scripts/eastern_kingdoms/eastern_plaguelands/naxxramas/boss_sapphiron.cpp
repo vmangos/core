@@ -99,6 +99,7 @@ struct boss_sapphironAI : public ScriptedAI
 {
     boss_sapphironAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_forceTargetUpdateTimer = 1000;
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
         if (m_pInstance)
@@ -140,6 +141,8 @@ struct boss_sapphironAI : public ScriptedAI
     std::vector<ObjectGuid> iceboltTargets;
     ObjectGuid wingBuffetCreature;
     uint32 pullCheckTimer;
+
+    uint32 m_forceTargetUpdateTimer;
 
     void Reset()
     {
@@ -445,8 +448,18 @@ struct boss_sapphironAI : public ScriptedAI
             AggroRadius(uiDiff);
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
-            //todo: need the evade out of home mechanic back
-
+            
+            // hack to avoid bug where players cant see target of sapphiron after initial summoning
+            if (m_forceTargetUpdateTimer)
+            {
+                if (m_forceTargetUpdateTimer < uiDiff)
+                {
+                    m_forceTargetUpdateTimer = 0;
+                    m_creature->ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
+                }
+                else
+                    m_forceTargetUpdateTimer -= uiDiff;
+            }
         }
         else 
         {
@@ -474,6 +487,7 @@ struct boss_sapphironAI : public ScriptedAI
         if(!m_creature->HasAura(SPELL_FROST_AURA))
             m_creature->CastSpell(m_creature, SPELL_FROST_AURA, true);
         
+
         events.Update(uiDiff);
         if (uint32 eventId = events.ExecuteEvent())
         {
