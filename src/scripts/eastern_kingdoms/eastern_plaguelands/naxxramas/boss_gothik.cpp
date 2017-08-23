@@ -347,13 +347,17 @@ struct boss_gothikAI : public ScriptedAI
         uint32 num_right = 0;
         for (auto& playerRef : lPlayers)
         {
-            const Player* p = playerRef.getSource();
+            if (const Player* p = playerRef.getSource())
             {
+                const float px = p->GetPositionX();
                 const float py = p->GetPositionY();
-                if (py < dividingY && py > minLeftY)
-                    ++num_left;
-                else if (py > dividingY && py < maxRightY)
-                    ++num_right;
+                if (px > xMin && px < xMax)
+                {
+                    if (py < dividingY && py > minLeftY)
+                        ++num_left;
+                    else if (py > dividingY && py < maxRightY)
+                        ++num_right;
+                }
             }
         }
         // if there are less than 10 people on one of the sides we consider it as
