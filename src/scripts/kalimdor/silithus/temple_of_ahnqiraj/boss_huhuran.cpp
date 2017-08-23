@@ -123,11 +123,12 @@ struct boss_huhuranAI : public ScriptedAI
         else
             m_uiSpitTimer -= uiDiff;
 
-        //m_uiNoxiousPoisonTimer
+        // Noxious Poison
         if (m_uiNoxiousPoisonTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_NOXIOUSPOISON) == CAST_OK)
-                m_uiNoxiousPoisonTimer = urand(12000, 24000);
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                if (DoCastSpellIfCan(pTarget, SPELL_NOXIOUSPOISON) == CAST_OK)
+                    m_uiNoxiousPoisonTimer = urand(12000, 24000);
         }
         else
             m_uiNoxiousPoisonTimer -= uiDiff;
