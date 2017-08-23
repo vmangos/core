@@ -77,8 +77,8 @@ enum
 static const float WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
 static const float SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
 static const float WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
-static const float PoisonShockCooldown(bool initial = false)        { return initial ? 30000 : 30000; } // todo: possibly not correct
-static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 20000 : 20000; } // todo: possibly not correct
+static const float PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
+static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
 
 
 struct mob_webwrapAI : public ScriptedAI
