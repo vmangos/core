@@ -681,11 +681,11 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
 {
     npc_sapphiron_blizzardAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->SetRespawnRadius(30.0f);
+        m_creature->SetRespawnRadius(60.0f);
         m_creature->SetReactState(ReactStates::REACT_PASSIVE);
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
-        events.ScheduleEvent(1, Seconds(2));
         checkAuraTimer = 0;
+        events.ScheduleEvent(1, 10);
     }
     
     EventMap events;
@@ -720,13 +720,19 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
     {
         events.Reset();
         PickNewTarget();
-        events.Repeat(Seconds(8));
+        events.ScheduleEvent(1, Seconds(8));
     }
 
-
+    void SetRandomMove()
+    {
+        if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() != RANDOM_MOTION_TYPE)
+        {
+            m_creature->GetMotionMaster()->Clear();
+            m_creature->GetMotionMaster()->MoveRandom();
+        }
+    }
     void PickNewTarget()
     {
-        m_creature->GetMotionMaster()->Clear();
 
         // if no sapphiron, move random
         Creature* pSapp = nullptr;
@@ -734,15 +740,15 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
             pSapp = m_pInstance->GetSingleCreatureFromStorage(NPC_SAPPHIRON);
         if (!pSapp)
         {
-            m_creature->GetMotionMaster()->MoveRandom();
+            SetRandomMove();
             return;
         }
 
         // if only "tank" alive, move random
-        ThreatList const& threatlist = m_creature->getThreatManager().getThreatList();
+        ThreatList const& threatlist = pSapp->getThreatManager().getThreatList();
         if (threatlist.size() < 2)
         {
-            m_creature->GetMotionMaster()->MoveRandom();
+            SetRandomMove();
             return;
         }
 
@@ -766,12 +772,13 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         // when no suitable units found, we move random, this will generally only happen right before a wipe
         if (suitableUnits.empty())
         {
-            m_creature->GetMotionMaster()->MoveRandom();
+            SetRandomMove();
             return;
         }
         
         Unit* target = suitableUnits[urand(0, suitableUnits.size() - 1)];
         previousTargets.push_back(target->GetObjectGuid());
+        m_creature->GetMotionMaster()->Clear();
         m_creature->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
     }
 
