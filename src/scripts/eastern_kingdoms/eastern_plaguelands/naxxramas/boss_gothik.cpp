@@ -113,7 +113,7 @@ struct boss_gothikAI : public ScriptedAI
         m_uiTeleportTimer = 15000;
         m_uiShadowboltTimer = 2500;
         m_uiHarvestSoulTimer = 1000;
-        
+
         m_uiNumTP = 0;
         gatesOpened = false;
 
@@ -279,6 +279,15 @@ struct boss_gothikAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
+        switch (pSummoned->GetEntry())
+        {
+        case NPC_SPECT_DEATH_KNIGTH:
+        case NPC_SPECT_HORSE:
+        case NPC_SPECT_RIDER:
+        case NPC_SPECT_TRAINEE:
+            return;
+        }
+
         Creature* pAnchor = m_pInstance->GetClosestAnchorForGoth(pSummoned, true);
         if (!pAnchor)
             return;
@@ -334,29 +343,24 @@ struct boss_gothikAI : public ScriptedAI
     bool IsAllPlayersOneSide()
     {
         MapRefManager const&  lPlayers = m_pInstance->GetMap()->GetPlayers();
-        uint32 num_left = 0, num_right = 0;
+        uint32 num_left = 0;
+        uint32 num_right = 0;
         for (auto& playerRef : lPlayers)
         {
-            Player* p = playerRef.getSource();
+            const Player* p = playerRef.getSource();
             {
-                float px = p->GetPositionX();
-                float py = p->GetPositionY();
-                if (px > xMin && px < xMax)
-                {
-                    if (py < dividingY && py > minLeftY)
-                        ++num_left;
-                    break;
-                    if (py > dividingY && py < maxRightY)
-                        ++num_right;
-                    break;
-                }
+                const float py = p->GetPositionY();
+                if (py < dividingY && py > minLeftY)
+                    ++num_left;
+                else if (py > dividingY && py < maxRightY)
+                    ++num_right;
             }
         }
         // if there are less than 10 people on one of the sides we consider it as
         // "everyone is on the same side". That to avoid the whole raid afking on spectral
         // side, waiting for gothik to TP down, in which case they have 40 sec to kill him
         // before the gates would ordinarily open.
-        return (num_left < 10 || num_right < 10); 
+        return (num_left < 10 || num_right < 10);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -488,20 +492,16 @@ struct boss_gothikAI : public ScriptedAI
                         
                         if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
                         {
-                            ++m_uiNumTP;
                             DoResetThreat();
                             m_uiTeleportTimer = 15000;
                             m_uiShadowboltTimer = 2000;
+                            if (++m_uiNumTP == 4 && !gatesOpened)
+                                OpenTheGate();
                             return;
                         }
                     }
                     else
                         m_uiTeleportTimer -= uiDiff;
-                }
-
-                if (m_uiNumTP == 4 && !gatesOpened)
-                {
-                    OpenTheGate();
                 }
 
                 if (m_uiShadowboltTimer < uiDiff)
