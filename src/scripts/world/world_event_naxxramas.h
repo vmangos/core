@@ -146,7 +146,7 @@ enum ScourgeInvasionMisc
     ZONEID_BURNING_STEPPES = 46,
     ZONEID_TANARIS = 440,
 
-    GAME_EVENT_SCOURGE_INVASION = 110,
+    GAME_EVENT_SCOURGE_INVASION = 17,
 };
 
 enum ScourgeInvasionWorldStatesVariables
