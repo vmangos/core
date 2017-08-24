@@ -1225,7 +1225,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
     {
         if (Creature* pPortal = m_creature->GetMap()->GetCreature(portal))
         {
-            pPortal->ForcedDespawn();
+            static_cast<TemporarySummon*>(pPortal)->UnSummon();
         }
     }
 
