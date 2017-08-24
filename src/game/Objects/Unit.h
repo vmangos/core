@@ -1975,6 +1975,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
     public:
         void DisableSpline();
         void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }
+        void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
+        float GetMeleeZLimit() const { return m_meleeZLimit; }
 
     protected:
         typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
@@ -2019,6 +2021,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         float m_nativeScale = 1;
         float m_nativeScaleOverride = 1;
+
+        float m_meleeZLimit;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

@@ -104,7 +104,8 @@ void GlobalCooldownMgr::CancelGlobalCooldown(SpellEntry const* spellInfo)
 Unit::Unit()
     : WorldObject(), i_motionMaster(this), m_ThreatManager(this), m_HostileRefManager(this),
       movespline(new Movement::MoveSpline()), _debugFlags(0), m_needUpdateVisibility(false),
-      m_AutoRepeatFirstCast(true), m_castingSpell(0), m_regenTimer(0), _lastDamageTaken(0)
+      m_AutoRepeatFirstCast(true), m_castingSpell(0), m_regenTimer(0), _lastDamageTaken(0),
+      m_meleeZLimit(MELEE_Z_LIMIT)
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -10663,7 +10664,7 @@ bool Unit::CanReachWithMeleeAttack(Unit const* pVictim, float flat_mod /*= 0.0f*
     float dy = GetPositionY() - pVictim->GetPositionY();
     float dz = GetPositionZ() - pVictim->GetPositionZ();
 
-    return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < MELEE_Z_LIMIT);
+    return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < pVictim->GetMeleeZLimit());
 }
 
 bool Unit::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const
