@@ -666,7 +666,11 @@ struct boss_sapphironAI : public ScriptedAI
                 phase = PHASE_GROUND;
                 SetCombatMovement(true);
                 m_creature->GetMotionMaster()->Clear(false);
-                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                m_creature->SelectHostileTarget();
+                if (m_creature->getVictim())
+                {
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                }
                 break;
             case EVENT_CHECK_EVADE:
             {
@@ -820,7 +824,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         Unit* target = suitableUnits[urand(0, suitableUnits.size() - 1)];
         previousTargets.push_back(target->GetObjectGuid());
         m_creature->GetMotionMaster()->Clear();
-        m_creature->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ());
+        m_creature->GetMotionMaster()->MovePoint(1, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), MOVE_PATHFINDING);
     }
 
     void UpdateAI(const uint32 uiDiff) override
