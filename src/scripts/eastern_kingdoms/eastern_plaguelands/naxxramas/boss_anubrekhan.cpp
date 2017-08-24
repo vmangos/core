@@ -238,9 +238,16 @@ struct boss_anubrekhanAI : public ScriptedAI
         m_uiRestoreTargetTimer = 0;
 
         std::list<Creature*> scarabs;
-        GetCreatureListWithEntryInGrid(scarabs, m_creature, MOB_CORPSE_SCARAB, 100.0f);
-        while (scarabs.size() > 30)
-            scarabs.erase(scarabs.begin());
+        GetCreatureListWithEntryInGrid(scarabs, m_creature, MOB_CORPSE_SCARAB, 300.0f);
+        int count = 0;
+        for (auto it = scarabs.begin(); it != scarabs.end();)
+        {
+            if (scarabs.size() < 31)
+                break;
+            Creature* pC = *it;
+            static_cast<TemporarySummon*>(pC)->UnSummon();
+            it = scarabs.erase(it);
+        }
     }
 
     void JustReachedHome() override
