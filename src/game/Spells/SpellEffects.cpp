@@ -3871,7 +3871,22 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
 
     // Also use this effect to set the taunter's threat to the taunted creature's highest value
     if (unitTarget->CanHaveThreatList() && unitTarget->getThreatManager().getCurrentVictim())
+    {
         unitTarget->getThreatManager().addThreat(m_caster, unitTarget->getThreatManager().getCurrentVictim()->getThreat());
+
+        // Patch 1.11 notes
+        // https://web.archive.org/web/20061109034626/http://evilempireguild.org:80/guides/kenco2.php
+        // Recently(1.11.x), the behaviour of Taunt has been buffed slightly.It now does three things :
+
+        // Taunt debuff.The mob is forced to attack you for 3 seconds.Later taunts by other players override this. 
+        // You are given threat equal to the mob's previous aggro target, permanently. Importantly, you won't necessarily get as much threat 
+        // as the highest person on the mob's list, only as much as whoever is currently tanking it. 
+        // You gain complete aggro on the mob at the instant you taunt.Usually you would need 10 % more threat to gain aggro(see section 3), 
+        // but a taunt now gives you instant aggro on the mob.
+        // Of course if other people are generating significant threat on the mob, they could exceed your threat by more than 10 % before the taunt debuff wears off, 
+        // and will gain aggro as soon as it does.There is no limit to the amount of threat you can gain from Taunt.
+        unitTarget->getThreatManager().setCurrentVictimIfCan(m_caster);
+    }
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }
