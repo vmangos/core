@@ -5126,7 +5126,7 @@ update `creature_template` set `MechanicImmuneMask` = 1022049875 where `entry` =
 update `creature_template` set `MechanicImmuneMask` = 1022049875 where `entry` = 16368; -- Necropolis Acolyte
 update `creature_template` set `MechanicImmuneMask` = 1023393531 where `entry` = 15978; -- Crypt Reaver
 update `creature_template` set `MechanicImmuneMask` = 1019945555 where `entry` = 16067; -- Deathcharger Steed
-update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16145; -- Death Knight Captain
+update `creature_template` set `MechanicImmuneMask` = 1019952727 where `entry` = 16145; -- Death Knight Captain
 update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16146; -- Death Knight
 update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16163; -- Death Knight Cavalier
 update `creature_template` set `MechanicImmuneMask` = 1019952723 where `entry` = 16165; -- Necro Knight
