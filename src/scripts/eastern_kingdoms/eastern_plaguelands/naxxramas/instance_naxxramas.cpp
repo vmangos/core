@@ -1215,18 +1215,27 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
     uint32 portalTimer;
     uint32 shadowboltVolleyTimer;
 
-    void Reset() override
+    void DespawnPortal()
     {
-        portalTimer = 5000;
-        shadowboltVolleyTimer = 10000;
-    }
+        if (!portal)
+            return;
 
-    void JustDied(Unit* pKiller) override
-    {
         if (Creature* pPortal = m_creature->GetMap()->GetCreature(portal))
         {
             static_cast<TemporarySummon*>(pPortal)->UnSummon();
         }
+        portal = 0;
+    }
+    void Reset() override
+    {
+        portalTimer = 5000;
+        shadowboltVolleyTimer = 6000;
+        DespawnPortal();
+    }
+
+    void JustDied(Unit* pKiller) override
+    {
+        DespawnPortal();
     }
 
     void UpdateAI(const uint32 diff) override
@@ -1240,7 +1249,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
             {
                 // summon portal of shadows
                 if (Creature* pCreature = m_creature->SummonCreature(16420, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0,
-                    TEMPSUMMON_TIMED_DESPAWN, 120000))
+                    TEMPSUMMON_TIMED_DESPAWN, 60000))
                 {
                     m_creature->SendSpellGo(m_creature, 28383); // since we're manually summoning, we also send the visual that we're not using
                     portal = pCreature->GetObjectGuid();
