@@ -142,7 +142,25 @@ struct boss_heiganAI : public ScriptedAI
         if (currentPhase == PHASE_DANCE)
             return;
         else
-            ScriptedAI::MoveInLineOfSight(pWho);
+        {
+            if (!m_creature->IsWithinDistInMap(pWho, 38.0f))
+                return;
+            if (pWho->GetPositionX() > 2825.0f)
+                return;
+            if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+            {
+                if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+                {
+                    if (!m_creature->getVictim())
+                        AttackStart(pWho);
+                    else if (m_creature->GetMap()->IsDungeon())
+                    {
+                        pWho->SetInCombatWith(m_creature);
+                        m_creature->AddThreat(pWho);
+                    }
+                }
+            }
+        }
     }
     
     void AttackStart(Unit* pWho) override
