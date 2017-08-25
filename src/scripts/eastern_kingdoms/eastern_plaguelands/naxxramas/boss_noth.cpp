@@ -352,6 +352,11 @@ struct boss_nothAI : public ScriptedAI
         }
     }
 
+    virtual void SummonedCreatureJustDied(Creature* unit) 
+    {
+        unit->ForcedDespawn(3000);
+    }
+
     void JustSummoned(Creature* pSummoned)
     {
         pSummoned->SetInCombatWithZone();
