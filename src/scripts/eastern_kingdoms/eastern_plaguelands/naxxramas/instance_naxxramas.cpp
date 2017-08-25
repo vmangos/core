@@ -1009,8 +1009,12 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
         m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
         break;
     case NPC_FrenziedBat:
+    case NPC_PlaguedBat:
     case NPC_MutatedGrub:
     case NPC_PlagueBeast:
+        pCreature->ForcedDespawn(10000);
+        break;
+    case NPC_EmbalmingSlime:
         pCreature->ForcedDespawn(30000);
         break;
     }
