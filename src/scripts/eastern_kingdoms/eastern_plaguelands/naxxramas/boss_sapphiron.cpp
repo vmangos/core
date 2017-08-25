@@ -842,7 +842,7 @@ struct npc_sapphiron_blizzardAI : public ScriptedAI
         if (events.ExecuteEvent())
         {
             PickNewTarget();
-            events.Repeat(Seconds(8));
+            events.Repeat(Seconds(urand(8,10)));
         }
     }
 };
