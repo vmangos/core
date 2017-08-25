@@ -299,7 +299,7 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai
 UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `armor`=3200, `mindmg`=1500, `maxdmg`=2200, `attackpower`=320, `dmg_multiplier`=1, `type`=6, `MovementType`=1, `speed_walk`='0.5', `speed_run`='0.5', `AIName`='EventAI' WHERE `entry`=16419;
 
 -- plagued gargoyle switch from eventAI to script. Immmune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16446;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai',`speed_run`=1.5 WHERE `entry`=16446;
 
 -- necropolis acolyte updates
 UPDATE `creature_ai_scripts` SET `event_param1`=500, `event_param2`=500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1636801;
@@ -695,7 +695,7 @@ VALUES
 */
 
 -- Stoneskin gargoyle switch from eventAI to script. Immune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai' WHERE `entry`=16168;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai',`speed_run`=1.5 WHERE `entry`=16168;
 
 -- Plague Slime switch from eventAI to script
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_plague_slime_ai' WHERE `entry`=16243;
