@@ -408,6 +408,11 @@ UPDATE `creature_template` SET `mindmg`=4200, `maxdmg`=4900, `baseattacktime`=14
 -- Stitched Spewer
 UPDATE `creature_template` SET `mindmg`=4500, `maxdmg`=5200, `baseattacktime`=1480,`minhealth`=217197, `maxhealth`=217197 WHERE `entry`=16025;
 
+DELETE FROM `spell_effect_mod` where Id in (28310);
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`,
+`EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`)
+VALUES 
+('28310', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '5', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', 'Surgical Assistant Mind Flay Chain damage');
 
 
 /* 
