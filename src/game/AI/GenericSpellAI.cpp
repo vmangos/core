@@ -500,6 +500,15 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
                     spellToModify->spellFlags |= SPELL_FLAG_APPLY_AURA;
                     break;
                 }
+                case SPELL_EFFECT_SUMMON_GUARDIAN:
+                {
+                    int32 duration = GetSpellDuration(spellInfos);
+                    if (duration > 0) 
+                    {
+                        spellToModify->minCD = duration;
+                        spellToModify->maxCD = duration;
+                    }
+                }
             }
         }
         if (spellInfos->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE)

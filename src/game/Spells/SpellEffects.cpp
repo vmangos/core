@@ -3211,6 +3211,10 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
             return;
     }
 
+    // Hard cap for NPC summoned guardians
+    if (m_caster->GetTypeId() != TYPEID_PLAYER && m_caster->GetGuardianCountWithEntry(pet_entry) > 15)
+        return;
+
     // in another case summon new
     uint32 level = m_caster->getLevel();
 

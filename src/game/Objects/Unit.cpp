@@ -6023,6 +6023,17 @@ Pet* Unit::FindGuardianWithEntry(uint32 entry)
     return nullptr;
 }
 
+uint32 Unit::GetGuardianCountWithEntry(uint32 entry)
+{
+    uint32 result = 0;
+    for (GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
+        if (Pet* pet = GetMap()->GetPet(*itr))
+            if (pet->GetEntry() == entry && pet->isAlive())
+                result++;
+
+    return result;
+}
+
 Unit* Unit::_GetTotem(TotemSlot slot) const
 {
     return GetTotem(slot);
