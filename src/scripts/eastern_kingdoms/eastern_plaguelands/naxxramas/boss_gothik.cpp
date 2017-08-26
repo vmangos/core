@@ -415,12 +415,13 @@ struct boss_gothikAI : public ScriptedAI
             {
                 if (m_uiSummonTimer < uiDiff)
                 {
-                    if (m_uiSummonCount >= 1)//MAX_WAVES)
+                    if (m_uiSummonCount >= MAX_WAVES)
                     {
                         DoScriptText(SAY_TELEPORT, m_creature);
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
-                        
+                        DoResetThreat();
+
                         // opening the gates on first teleport if all players are considered on the same side
                         if (!gatesOpened && IsAllPlayersOneSide())
                             OpenTheGate();
