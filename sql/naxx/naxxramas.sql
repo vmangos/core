@@ -1065,7 +1065,7 @@ UPDATE `creature_template` SET `minhealth`=1832050, `maxhealth`=1832050, `mindmg
 
 -- KT updates
 UPDATE `creature_template` SET `minhealth`=3198000, `maxhealth`=3198000, `mindmg`=6389, `maxdmg`=8458 WHERE `entry`=15990;
-
+UPDATE creature_model_info set combat_reach = 9 where modelid = 15945;
 
 -- unstoppable abomination. Stun/shackle immune?
 UPDATE `creature_template` SET `mindmg`=8000, `maxdmg`=10000, `speed_walk`='0.7', `speed_run`='0.8', `ScriptName`='unstoppable_abomination_ai', `unit_flags`=0 /*256passive*/ WHERE `entry`=16428;
