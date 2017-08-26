@@ -546,6 +546,7 @@ struct boss_thaddiusAI : public ScriptedAI
 
     std::random_device m_randDevice;
     std::mt19937 m_random{ m_randDevice() };
+    uint32 killSayCooldown;
 
     // Helper for CheckSpawnAdds
     void HandleCheckSpawnAdd(eStalagFeugen whichAdd)
@@ -673,6 +674,7 @@ struct boss_thaddiusAI : public ScriptedAI
         m_events.Reset();
         m_uiBallLightningTimer = 1000;      
         m_Phase = THAD_NOT_STARTED;
+        killSayCooldown = 0;
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -710,8 +712,11 @@ struct boss_thaddiusAI : public ScriptedAI
         if (pVictim->GetTypeId() != TYPEID_PLAYER)
             return;
 
-        // todo: don't spam it
-        DoScriptText(SAY_SLAY, m_creature);
+        if (!killSayCooldown)
+        {
+            DoScriptText(SAY_SLAY, m_creature);
+            killSayCooldown = 5000;
+        }
     }
 
     void JustDied(Unit* /*pKiller*/) override
@@ -962,6 +967,8 @@ struct boss_thaddiusAI : public ScriptedAI
             if (m_creature->isInCombat())
                 TransitionToPhase(THAD_NOT_STARTED);
         }
+
+        killSayCooldown -= std::min(killSayCooldown, uiDiff);
 
         switch (m_Phase)
         {
