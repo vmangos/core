@@ -86,17 +86,29 @@ void PlayerAI::UpdateAI(const uint32 /*diff*/)
 PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobalCD(0), PlayerAI(pPlayer), controllerGuid(caster ? caster->GetObjectGuid() : ObjectGuid())
 {
     ASSERT(pPlayer);
-    // bIsCac ?
     switch (pPlayer->getClass())
     {
         case CLASS_WARRIOR:
-        case CLASS_PALADIN:
         case CLASS_ROGUE:
-        case CLASS_DRUID:
-            bIsCac = true;
+            bIsMelee = true;
+            isHealer = false;
             break;
-        default:
-            bIsCac = false;
+        case CLASS_PALADIN:
+        case CLASS_DRUID:
+            bIsMelee = true;
+            isHealer = true;
+            break;
+        case CLASS_PRIEST:
+        case CLASS_SHAMAN:
+            isHealer = true;
+            bIsMelee = false;
+            break;
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+        case CLASS_HUNTER:
+            isHealer = false;
+            bIsMelee = false;
+            break;
     }
     PlayerSpellMap spells = me->GetSpellMap();
     usableSpells.clear();
@@ -111,7 +123,7 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobal
             continue;
         if (spellInfo->AuraInterruptFlags & AURA_INTERRUPT_FLAG_DAMAGE)
             continue;
-        if (IsPositiveSpell(itr->first))
+        if (IsPositiveSpell(itr->first) && !enablePositiveSpells)
             continue;
         usableSpells.push_back(itr->first);
     }
@@ -141,10 +153,13 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobal
         else
             ++it;
     }
-
+    
+    me->GetMotionMaster()->Clear();
+    
     if (caster && caster->ToCreature())
         if (Unit* victim = caster->ToCreature()->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
             UpdateTarget(victim);
+
 }
 
 Unit* PlayerControlledAI::FindController()
@@ -156,7 +171,9 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
 {
     Unit* controller = FindController();
 
-    if (me->getVictim() != victim)
+    bool isNewVictim = me->getVictim() != victim;
+
+    if (isNewVictim)
         me->Attack(victim, true);
 
     // Mode combat
@@ -180,17 +197,38 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
             victim->SetInCombatWith(controller);
         }
 
-        if (!me->GetMotionMaster()->empty() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
-            return;
-        me->GetMotionMaster()->Clear();
-
-        if (!bIsCac)
-        {
+        if (!bIsMelee)
             me->SetCasterChaseDistance(25.0f);
-            if (fabs(me->GetOrientation() - me->GetAngle(victim)) > 0.5f)
-                me->SetFacingToObject(victim);
+
+        if (isNewVictim)
+        {
+            me->GetMotionMaster()->Clear();
+            me->GetMotionMaster()->MoveChase(victim);
+            return;
         }
-        me->GetMotionMaster()->MoveChase(victim);
+        else
+        {
+            bool inMeleeRange = me->IsWithinMeleeRange(victim);
+            if ( (bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving()) )
+            {
+                if(!me->isInFront(victim, 30.0f, 1.0f))
+                    me->SetFacingToObject(victim);
+            }
+         
+            if (!me->GetMotionMaster()->empty() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
+            {
+                if (bIsMelee && inMeleeRange)
+                    return;
+                else if (!bIsMelee && (me->GetDistance(victim) < me->GetMaxChaseDistance(victim)) )
+                    return;
+
+                if (!me->isInRoots() && !me->IsMoving())
+                {
+                    me->GetMotionMaster()->Clear();
+                    me->GetMotionMaster()->MoveChase(victim);
+                }
+            }
+        }
     }
 }
 
@@ -210,7 +248,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
     CharmInfo* charmInfo = me->GetCharmInfo();
     Unit* controller = FindController();
 
-    // Si controller est un joueur
+    // If controller is a player
     if (controller && controller->GetTypeId() == TYPEID_PLAYER)
     {
         Player* Pcontroller = ((Player*)controller);
@@ -247,16 +285,16 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
 
         UpdateTarget(victim);
     }
-    else // Si controller est une creature
+    else // If controller is a creature
     {
         Creature* Ccontroller = ((Creature*)controller);
 
-        // Puisqu'on va faire un truc du style usableSpells[0, urand(0, usableSpells.size()-1)], on doit avoir au moins un element.
+        // Since we are going to do something usableSpells [0, urand (0, usableSpells.size () - 1)], we must have at least one element.
         if (usableSpells.empty())
             return;
 
-        // Unit* victim = controller->getVictim();
-        // Ivina <Nostalrius> : choisit la cible au hasard et pas toujours la cible du controleur.
+        // Unit * victim = controller-> getVictim ();
+        // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
         victim = Ccontroller ? Ccontroller->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : me->SelectNearestTarget(50.0f);
         if (Unit* v2 = me->getVictim())
             if (me->canAttack(v2, false))
@@ -267,12 +305,14 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         {
             me->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
             me->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+            me->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
             Ccontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
             Ccontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+            Ccontroller->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
             return;
         }
 
-        if (!victim || (victim == me)) // Ivina <Nostalrius> : eviter de se prendre pour cible
+        if (!victim || (victim == me)) // Ivina <Nostalrius>: avoid being targeted
             return;
 
         UpdateTarget(victim);
@@ -285,10 +325,18 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
             {
                 uint32 spellId = usableSpells[urand(0, usableSpells.size() - 1)];
                 SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+                
+                // If its a positive spell we prioritize controller, if he's out of range,
+                // ourself, otherwise it will probably not be cast.
+                Unit* spellTarget = victim;
+                if (controller && IsPositiveSpell(spellInfo, me, controller))
+                    spellTarget = controller;
+                else if (IsPositiveSpell(spellInfo, me, me))
+                    spellTarget = me;
 
-                if (spellInfo && CanCastSpell(victim, spellInfo, false, false) == CAST_OK)
+                if (spellInfo && CanCastSpell(spellTarget, spellInfo, false, false) == CAST_OK)
                 {
-                    me->CastSpell(victim, spellId, false);
+                    me->CastSpell(spellTarget, spellId, false);
                     uiGlobalCD = 1500;
                 }
                 else

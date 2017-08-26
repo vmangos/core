@@ -36,7 +36,7 @@ class SpellEntry;
 class MANGOS_DLL_SPEC PlayerAI
 {
     public:
-        explicit PlayerAI(Player* pPlayer) : me(pPlayer) {}
+        explicit PlayerAI(Player* pPlayer) : me(pPlayer), enablePositiveSpells(false) {}
         virtual ~PlayerAI();
         void SetPlayer(Player* player) { me = player; }
         virtual void Remove();
@@ -52,6 +52,7 @@ class MANGOS_DLL_SPEC PlayerAI
 
         // Pointer to controlled by AI player
         Player* me;
+        bool enablePositiveSpells;
 };
 
 class MANGOS_DLL_SPEC PlayerControlledAI: public PlayerAI
@@ -70,7 +71,9 @@ class MANGOS_DLL_SPEC PlayerControlledAI: public PlayerAI
         ObjectGuid controllerGuid;
         uint32 uiGlobalCD;
         std::vector<uint32> usableSpells;
-        bool bIsCac;
+        bool bIsMelee;
+        bool isHealer;
+        
 };
 
 #endif
