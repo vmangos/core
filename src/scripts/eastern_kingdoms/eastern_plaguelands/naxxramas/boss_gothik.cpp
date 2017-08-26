@@ -69,12 +69,6 @@ enum eSpellDummy
     SPELL_C_TO_SKULL        = 27937
 };
 
-static constexpr float xMin = 2632.0f;
-static constexpr float xMax = 2750.0f;
-static constexpr float dividingY = -3360.0f; // left < -3360, right > -3360.0f
-static constexpr float maxRightY = -3280.0f;
-static constexpr float minLeftY = -3436.0f;
-
 struct boss_gothikAI : public ScriptedAI
 {
 
@@ -125,6 +119,8 @@ struct boss_gothikAI : public ScriptedAI
         {
             pC->DeleteLater();
         }
+
+        m_creature->SetCasterChaseDistance(40);
     }
 
     void Aggro(Unit* pWho)
@@ -215,28 +211,34 @@ struct boss_gothikAI : public ScriptedAI
             {
                 Player* p = playerRef.getSource();
                 {
-                    float px = p->GetPositionX();
-                    float py = p->GetPositionY();
-                    if (px > xMin && px < xMax)
+                    bool isRightSide = m_pInstance->IsInRightSideGothArea(p);
+                    switch (entry)
                     {
-                        switch (entry)
+                    case NPC_UNREL_RIDER:
+                    case NPC_UNREL_DEATH_KNIGHT:
+                    case NPC_UNREL_TRAINEE:
+                        if (isRightSide)
                         {
-                        case NPC_UNREL_RIDER:
-                        case NPC_UNREL_DEATH_KNIGHT:
-                        case NPC_UNREL_TRAINEE:
-                            if(py < dividingY && py > minLeftY)
-                                pCreature->SetInCombatWith(p);
-                            break;
-                        case NPC_SPECT_DEATH_KNIGTH:
-                        case NPC_SPECT_HORSE:
-                        case NPC_SPECT_RIDER:
-                        case NPC_SPECT_TRAINEE:
-                            if (py > dividingY && py < maxRightY)
-                                pCreature->SetInCombatWith(p);
-                            break;
+                            pCreature->SetInCombatWith(p);
+                            pCreature->AddThreat(p, 100);
                         }
+                        break;
+                    case NPC_SPECT_DEATH_KNIGTH:
+                    case NPC_SPECT_HORSE:
+                    case NPC_SPECT_RIDER:
+                    case NPC_SPECT_TRAINEE:
+                        if (!isRightSide)
+                        {
+                            pCreature->SetInCombatWith(p);
+                            pCreature->AddThreat(p, 100);
+                        }
+                        break;
                     }
                 }
+            }
+            if (Unit* pTar = pCreature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
+            {
+                pCreature->AI()->AttackStart(pTar);
             }
         }
     }
@@ -349,15 +351,10 @@ struct boss_gothikAI : public ScriptedAI
         {
             if (const Player* p = playerRef.getSource())
             {
-                const float px = p->GetPositionX();
-                const float py = p->GetPositionY();
-                if (px > xMin && px < xMax)
-                {
-                    if (py < dividingY && py > minLeftY)
-                        ++num_left;
-                    else if (py > dividingY && py < maxRightY)
-                        ++num_right;
-                }
+                if(m_pInstance->IsInRightSideGothArea(p))
+                    ++num_right;
+                else
+                    ++num_left;
             }
         }
         // if there are less than 10 people on one of the sides we consider it as
@@ -418,7 +415,7 @@ struct boss_gothikAI : public ScriptedAI
             {
                 if (m_uiSummonTimer < uiDiff)
                 {
-                    if (m_uiSummonCount >= MAX_WAVES)
+                    if (m_uiSummonCount >= 1)//MAX_WAVES)
                     {
                         DoScriptText(SAY_TELEPORT, m_creature);
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
@@ -513,7 +510,7 @@ struct boss_gothikAI : public ScriptedAI
                     if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SHADOWBOLT))
                     {
                         if (DoCastSpellIfCan(pTarget, SPELL_SHADOWBOLT) == CAST_OK)
-                            m_uiShadowboltTimer = urand(1500, 2500);
+                            m_uiShadowboltTimer = urand(1600, 2000);
                     }
                 }
                 else
@@ -527,7 +524,7 @@ struct boss_gothikAI : public ScriptedAI
                 else
                     m_uiHarvestSoulTimer -= uiDiff;
 
-                DoMeleeAttackIfReady();                     // possibly no melee at all
+                DoMeleeAttackIfReady();
                 break;
             }
         }
@@ -621,6 +618,30 @@ bool EffectDummyCreature_spell_anchor(Unit* pCaster, uint32 uiSpellId, SpellEffe
     return true;
 };
 
+struct gothikTriggerAI : public ScriptedAI
+{
+    gothikTriggerAI(Creature* pCreature) 
+        : ScriptedAI(pCreature)
+    {
+
+    }
+    void Reset() 
+    {
+        m_creature->SetRespawnRadius(0.01f);
+        m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
+        m_creature->GetMotionMaster()->Initialize();
+    }
+    void MoveInLineOfSight(Unit*) override {}
+    void Aggro(Unit*) override {}
+    void AttackStart(Unit*) override {}
+    void UpdateAI(const uint32 diff) {}
+};
+
+CreatureAI* GetAI_GothikTrigger(Creature* pCreature)
+{
+    return new gothikTriggerAI(pCreature);
+}
+
 void AddSC_boss_gothik()
 {
     Script* newscript;
@@ -633,5 +654,7 @@ void AddSC_boss_gothik()
     newscript = new Script;
     newscript->Name = "spell_anchor";
     newscript->pEffectDummyCreature = &EffectDummyCreature_spell_anchor;
+    newscript->GetAI = &GetAI_GothikTrigger;
+
     newscript->RegisterSelf();
 }
