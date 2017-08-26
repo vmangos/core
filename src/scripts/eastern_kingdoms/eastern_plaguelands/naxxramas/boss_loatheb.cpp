@@ -169,7 +169,7 @@ struct mob_eyeStalkAI : public ScriptedAI
         if (timeSinceSpawn < 3000)
             return;
 
-        if (!m_creature->IsWithinDistInMap(pWho, 15.0f))
+        if (!m_creature->IsWithinDistInMap(pWho, 19.0f))
             return;
 
         if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
