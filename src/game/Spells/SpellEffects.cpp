@@ -4546,7 +4546,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         }
                     }
 
-                    int num_targets = std::min(int(viableTargets.size()), 5);
+                    int num_targets = std::min(int(viableTargets.size()), 5)-1; // leaving 1 target not MCed to avoid reset due to all MCed
                     
                     // always MC maintank
                     if (Unit* maintank = m_caster->getVictim())
