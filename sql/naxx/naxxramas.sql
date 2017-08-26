@@ -5342,3 +5342,6 @@ UPDATE creature set spawntimesecs = 7200 where map = 533 and id in (
 16163,
 16067,
 16020);
+
+-- no gold from Frenzied Bat
+UPDATE `creature_template` SET `mingold`='0', `maxgold`='0' WHERE `entry`=16036;
