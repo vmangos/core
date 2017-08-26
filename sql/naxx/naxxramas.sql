@@ -57,6 +57,8 @@ DELETE FROM creature where map = 533;
 /*
 * General naxx stuff
 */ 
+-- Make Necropolis acolyte only use male gender (female gender is 16161), as this was the case in retail vanilla
+update creature_model_info set modelid_other_gender = 0 where modelid = 16160;
 
 -- moving the naxxramas flying gobj outside naxx to... naxx
 update gameobject set position_x = 3132, position_y = -3731, position_z = 139 where id = 181056;
