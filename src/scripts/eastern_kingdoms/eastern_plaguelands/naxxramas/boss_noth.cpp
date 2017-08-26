@@ -239,7 +239,18 @@ struct boss_nothAI : public ScriptedAI
 
         auto first_spawn = Seconds(urand(5, 7));
         m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn);
-        m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(25+urand(0,5)));
+        switch (phaseCounter)
+        {
+        case 0:
+            m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(25 + urand(0,5)));
+            break;
+        case 1:
+            m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(44 + urand(0, 5)));
+            break;
+        case 2:
+            m_events.ScheduleEvent(EVENT_BALC_ADDS, first_spawn + Seconds(57 + urand(0, 5)));
+            break;
+        }
 
         m_creature->CastSpell(m_creature, SPELL_IMMUNE_ALL, true);
 
