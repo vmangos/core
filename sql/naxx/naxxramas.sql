@@ -661,6 +661,8 @@ UPDATE `creature_ai_scripts` SET `event_param1`=7000, `event_param2`=7000, `even
 -- naxxramas acolyte shadowbolt timer randomized more and changed spell
 UPDATE `creature_ai_scripts` SET `event_param1`=1800, `event_param2`=2000, `event_param3`=7000, `event_param4`=9000, `action1_param1`=28448 WHERE `id`=1598102;
 
+UPDATE `creature_template` SET `mindmg`=2178, `maxdmg`=3317, `armor`=3891 WHERE `entry` in (15980, 15981);
+
 -- tomb horror 
 UPDATE `creature_template` SET `minhealth`=140105, `maxhealth`=140105, `mindmg`='3050', `maxdmg`='3680' WHERE `entry`=15979;
 
