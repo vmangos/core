@@ -1884,6 +1884,10 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     }
                     break;
                 }
+                case 29310:                                 // Mana Burn (Heigan, naxxramas)
+                    // Without a bigger raidus its possible to tank heigan in one corner of the platform, and have ranged stay in the other corner
+                    radius = 28.0f;
+                    break;
                 default:
                     break;
             }

@@ -91,6 +91,28 @@ static const uint8 numEruptions[numSections] = { // count of sequential GO DBGUI
     13
 };
 
+// in tunnel
+static constexpr float safespotFissures[3][3] = 
+{   
+    {2747.0f, -3754.0f, 274.0f},
+    {2805.8f, -3695.88f, 273.61f},
+    {2812.95f, -3703.52f, 273.61f},
+};
+
+static constexpr float sect1SafeSpot[3][3] = 
+{
+    { 2799.5f, -3691.0f, 273.62f },
+    { 2810.67f, -3706.06f, 275.0f },
+    { 2803.51f, -3697.42f, 274.1f }
+};
+static constexpr float sect2SafeSpot[3] = { 2790.51f, -3690.45f, 273.622f };
+static constexpr float sect3SafeSpot[3] = { 2778.40f, -3702.645f, 273.621f };
+static constexpr float sect4SafeSpot[3][3] = 
+{
+    { 2777.2f, -3712.41f, 273.63f },
+    { 2783.06f, -3717.7f, 273.63f },
+    { 2791.62f, -3726.04f, 273.63f },
+};
 
 struct boss_heiganAI : public ScriptedAI
 {
@@ -199,9 +221,18 @@ struct boss_heiganAI : public ScriptedAI
         
     }
 
-    void UpdateEruption(uint32 uiDiff)
+    void SendEruptCustomLocation(float x, float y, float z)
     {
-        Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, 2773, -3684, 292, 0, TEMPSUMMON_TIMED_DESPAWN, 1000);
+        if (Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 50))
+        {
+            fissureCreature->CastSpell(fissureCreature, SPELL_ERUPTION, true);
+        }
+    }
+    void UpdateEruption()
+    {
+        if (!m_pInstance)
+            return;
+        Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, 2773.0f, -3684.0f, 292.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000);
         if (!fissureCreature)
         {
             sLog.outError("Heigan: failed spawning fissure creature");
@@ -223,10 +254,43 @@ struct boss_heiganAI : public ScriptedAI
                     pTrap->SendGameObjectCustomAnim(pTrap->GetObjectGuid());
                 }
             }
+
+            switch (uiArea)
+            {
+            case 0:
+                for (int i = 0; i < 3; i++)
+                    SendEruptCustomLocation(sect1SafeSpot[i][0], sect1SafeSpot[i][1], sect1SafeSpot[i][2]);
+                break;
+            case 1:
+                SendEruptCustomLocation(sect2SafeSpot[0], sect2SafeSpot[1], sect2SafeSpot[2]);
+                break;
+            case 2:
+                SendEruptCustomLocation(sect3SafeSpot[0], sect3SafeSpot[1], sect3SafeSpot[2]);
+                break;
+            case 3:
+                for (int i = 0; i < 3; i++)
+                    SendEruptCustomLocation(sect4SafeSpot[i][0], sect4SafeSpot[i][1], sect4SafeSpot[i][2]);
+                break;
+            }
         }
 
-        m_events.Repeat(currentPhase == PHASE_DANCE ? Seconds(3) : Seconds(10));
+        // safespot avoidance in tunnel
+        if (currentPhase == PHASE_DANCE)
+        {
+            for (int i = 0; i < 3; i++)
+                SendEruptCustomLocation(safespotFissures[i][0], safespotFissures[i][1], safespotFissures[i][2]);
+        }
+
         ++eruptionPhase;
+    }
+
+    void SummmonPlagueCloud(float x, float y, float z, float o)
+    {
+        if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_CLOUD, x, y, z, o,
+            TEMPSUMMON_TIMED_DESPAWN, 45000))
+        {
+            pCloud->CastSpell((Unit*)nullptr, SPELL_PLAGUE_CLOUD, true);
+        }
     }
 
     void EventStartDance()
@@ -252,14 +316,12 @@ struct boss_heiganAI : public ScriptedAI
         m_events.ScheduleEvent(EVENT_DANCE_END, Seconds(45), 0, PHASE_DANCE);
         m_events.ScheduleEvent(EVENT_ERUPT, Seconds(4));
         
+        // the regular ones
         for (int i = 0; i < max_stalks; i++)
         {
-            if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_CLOUD, eyeStalkPossitions[i][0], eyeStalkPossitions[i][1], eyeStalkPossitions[i][2], eyeStalkPossitions[i][3],
-                TEMPSUMMON_TIMED_DESPAWN, 45000))
-            {
-                pCloud->CastSpell((Unit*)nullptr, SPELL_PLAGUE_CLOUD, true);
-            }
+            SummmonPlagueCloud(eyeStalkPossitions[i][0], eyeStalkPossitions[i][1], eyeStalkPossitions[i][2], eyeStalkPossitions[i][3]);
         }
+        
         DoScriptText(SAY_CHANNELING, m_creature);
         eruptionPhase = 0;
     }
@@ -363,7 +425,7 @@ struct boss_heiganAI : public ScriptedAI
             {
                 if (pTarget->getPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->isAlive())
                 {
-                    if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 25.0f)
+                    if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 28.0f)
                     {
                         found_mana_in_range = true;
                         break;
@@ -377,7 +439,7 @@ struct boss_heiganAI : public ScriptedAI
         else
             m_events.Repeat(Seconds(1));
     }
-        
+   
     void UpdateAI(const uint32 uiDiff)
     {
         // This will avoid him running off the platform during dance phase.
@@ -394,7 +456,6 @@ struct boss_heiganAI : public ScriptedAI
                 EventDanceEnd();
         }
         
-
         m_events.Update(uiDiff);
         while (uint32 eventId = m_events.ExecuteEvent())
         {
@@ -411,7 +472,8 @@ struct boss_heiganAI : public ScriptedAI
                 EventDanceEnd();
                 break;
             case EVENT_ERUPT:
-                UpdateEruption(uiDiff);
+                UpdateEruption();
+                m_events.Repeat(currentPhase == PHASE_DANCE ? Seconds(3) : Seconds(10));
                 break;
             case EVENT_TAUNT:
                 EventTaunt();
