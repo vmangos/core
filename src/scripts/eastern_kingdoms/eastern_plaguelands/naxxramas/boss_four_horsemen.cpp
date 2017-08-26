@@ -115,6 +115,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     const bool m_bIsSpirit;
     uint32 pullCheckTimer;
     EventMap m_events;
+    uint32 killSayCooldown;
 
     boss_four_horsemen_shared(Creature* pCreature, uint32 uiMarkId, uint32 uiGhostId) :
         ScriptedAI(pCreature),
@@ -214,6 +215,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
         m_bShieldWall1 = true;
         m_bShieldWall2 = true;
         m_uiMarkTimer = 20000;
+        killSayCooldown = 0;
 
         if (m_bIsSpirit)
         {
@@ -309,6 +311,7 @@ struct boss_four_horsemen_shared : public ScriptedAI
     void UpdateAI(const uint32 uiDiff) override
     {
         m_events.Update(uiDiff);
+        killSayCooldown -= std::min(killSayCooldown, uiDiff);
 
         // Shield Wall - All 4 horsemen will shield wall at 50% hp and 20% hp for 20 seconds
         if (m_bShieldWall1 && m_creature->GetHealthPercent() < 50.0f)
@@ -423,7 +426,11 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
         if (m_bIsSpirit)
             return;
 
-        DoScriptText(SAY_BLAU_SLAY, m_creature);
+        if (!killSayCooldown)
+        {
+            DoScriptText(SAY_BLAU_SLAY, m_creature);
+            killSayCooldown = 5000;
+        }
     }
 
     void JustDied(Unit* Killer)
@@ -523,7 +530,11 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
         if (m_bIsSpirit)
             return;
 
-        DoScriptText(urand(0, 1) ? SAY_MOG_SLAY1 : SAY_MOG_SLAY2, m_creature);
+        if (!killSayCooldown)
+        {
+            DoScriptText(urand(0, 1) ? SAY_MOG_SLAY1 : SAY_MOG_SLAY2, m_creature);
+            killSayCooldown = 5000;
+        }
     }
 
     void JustDied(Unit* Killer)
@@ -612,7 +623,11 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
         if (m_bIsSpirit)
             return;
 
-        DoScriptText(SAY_KORT_SLAY, m_creature);
+        if (!killSayCooldown)
+        {
+            DoScriptText(SAY_KORT_SLAY, m_creature);
+            killSayCooldown = 5000;
+        }
     }
 
     void JustDied(Unit* Killer)
@@ -707,7 +722,11 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
         if (m_bIsSpirit)
             return;
 
-        DoScriptText(SAY_ZELI_SLAY, m_creature);
+        if (!killSayCooldown)
+        {
+            DoScriptText(SAY_ZELI_SLAY, m_creature);
+            killSayCooldown = 5000;
+        }
     }
 
     void JustDied(Unit* Killer) override
