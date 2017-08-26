@@ -1046,7 +1046,7 @@ UPDATE creature SET spawndist = 15, spawntimesecs = 60, MovementType = 1 WHERE i
 update creature set id = 16056, modelid = 15978 where guid in (88233, 88235, 88237, 88239, 88241, 88243, 88245, 88247, 88249, 88251, 88253, 88255, 88257, 88259);
 
 -- Heigan should have a slightly larger hitbox judging from videos
-UPDATE `creature_model_info` SET `bounding_radius`='4', `combat_reach`='6' WHERE `modelid`='16309';
+UPDATE `creature_model_info` SET `bounding_radius`='1', `combat_reach`='5' WHERE `modelid`='16309';
 
 -- Eye stalks should have "around 500 hp" according to original vanilla guides. Corrected faction, and unitflag DISABLE_MOVE
 UPDATE `creature_template` SET `minhealth`=500, `maxhealth`=500, `unit_flags`=4, `AIName` = "", `ScriptName`='mob_eye_stalk' WHERE `entry`=16236;
