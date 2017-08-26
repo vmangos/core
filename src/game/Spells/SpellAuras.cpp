@@ -3004,12 +3004,18 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (Player* pPlayer = target->ToPlayer())
         {
-            PlayerAI *oldAi = pPlayer->i_AI;
-            delete oldAi;
-            pPlayer->i_AI = new PlayerControlledAI(pPlayer, caster);
-
             if (caster->GetTypeId() == TYPEID_UNIT)
+            {
                 pPlayer->SetControlledBy(caster);
+                if (pPlayer->i_AI && m_spellAuraHolder->GetId() == 28410)
+                    pPlayer->i_AI->enablePositiveSpells = true;
+            }
+            else
+            {
+                PlayerAI *oldAi = pPlayer->i_AI;
+                delete oldAi;
+                pPlayer->i_AI = new PlayerControlledAI(pPlayer, caster);
+            }
         }
         target->UpdateControl();
         if (caster->GetTypeId() == TYPEID_PLAYER)
@@ -3019,6 +3025,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
     {
         target->SetCharmerGuid(ObjectGuid());
 
+        // todo: what causes friendly players to randomly see the "target" as hostile
+        // after the charm effect has ended, even if we restore faction below.
         if (target->GetTypeId() == TYPEID_PLAYER)
             ((Player*)target)->setFactionForRace(target->getRace());
         else
@@ -3055,11 +3063,42 @@ void Aura::HandleModCharm(bool apply, bool Real)
             if (caster->GetTypeId() == TYPEID_PLAYER)
                 ((Player*)caster)->RemovePetActionBar();
         }
-
+        
         target->UpdateControl();
-        target->CombatStop(true);
-        target->DeleteThreatList();
-        target->getHostileRefManager().deleteReferences();
+
+        // this should possibly be the case for other spells too...
+        // why on earth remove player from combat if, for example, its a boss casting it
+        if (m_spellAuraHolder->GetId() == 28410 && target->GetTypeId() == TYPEID_PLAYER)
+        {
+            if (caster->isAlive() && caster->isInCombat())
+            {
+                if (target->IsNonMeleeSpellCasted(false))
+                    target->InterruptNonMeleeSpells(false);
+
+                target->AttackStop();
+                target->RemoveAllAttackers();
+
+                if (target->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)target)->SendAttackSwingCancelAttack();
+
+                target->DeleteThreatList();
+                target->getHostileRefManager().deleteReferences();
+                caster->SetInCombatWith(target);
+                target->SetInCombatWith(caster);
+            }
+            else
+            {
+                target->CombatStop(true);
+                target->DeleteThreatList();
+                target->getHostileRefManager().deleteReferences();
+            }
+        }
+        else
+        {
+            target->CombatStop(true);
+            target->DeleteThreatList();
+            target->getHostileRefManager().deleteReferences();
+        }
 
         target->SetUnitMovementFlags(MOVEFLAG_NONE);
         target->StopMoving();
