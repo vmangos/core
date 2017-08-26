@@ -1213,6 +1213,7 @@ struct mob_spiritOfNaxxramasAI : public ScriptedAI
         : ScriptedAI(pCreature)
     {
         Reset();
+        m_creature->CastSpell(m_creature, 18950, true); // stealth detection
     }
     
     ObjectGuid portal;
@@ -1288,6 +1289,9 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     {
         Reset();
         goStoneform();
+        
+        if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
+            m_creature->CastSpell(m_creature, 18950, true); // stealth detection
     }
     
     void goStoneform()
@@ -1316,7 +1320,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
         {
             if (pWho->GetTypeId() == TYPEID_PLAYER
                 && !m_creature->isInCombat()
-                && m_creature->IsWithinDistInMap(pWho, 15.0f)
+                && m_creature->IsWithinDistInMap(pWho, 17.0f)
                 && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH)
                 && m_creature->IsWithinLOSInMap(pWho))
             {

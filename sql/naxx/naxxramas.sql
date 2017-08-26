@@ -4976,6 +4976,9 @@ update `creature_template` set `flags_extra` = 2050 where `entry` = 16027; -- Li
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16029; -- Sludge Belcher
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16034; -- Plague Beast
 update `creature_template` set `flags_extra` = 4096 where `entry` = 16290; -- Fallout Slime
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16168; -- Stoneskin Gargoyle
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16164; -- Shade of Naxxramas
+update `creature_template` set `flags_extra` = 4096 where `entry` = 16449; -- Spirit of Naxxramas
 
 update creature_template set flags_extra = 0 where entry in (
 15974, -- Dread Creeper
@@ -5010,24 +5013,20 @@ update creature_template set flags_extra = 0 where entry in (
 16157, -- Doom Touched Warrior
 16158, -- Death Touched Warrior
 16163, -- Death Knight Cavalier
-16164, -- Shade of Naxxramas
 16165, -- Necro Knight
 16167, -- Bony Construct
-16168, -- Stoneskin Gargoyle
 16236, -- Eye Stalk
 16243, -- Plague Slime
 16244, -- Infectious Ghoul
 16297, -- Mutated Grub
 16360, -- Zombie Chow
 16368, -- Necropolis Acolyte
-16375, -- Sewage Slime
 16427, -- Soldier of the Frozen Wastes
 16428, -- Unstoppable Abomination
 16429, -- Soul Weaver
 16441, -- Guardian of Icecrown
 16446, -- Plagued Gargoyle
 16447, -- Plagued Ghoul
-16449, -- Spirit of Naxxramas
 16451, -- Deathknight Vindicator
 16452, -- Necro Knight Guardian
 16453, -- Necro Stalker
