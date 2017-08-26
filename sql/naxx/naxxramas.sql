@@ -374,10 +374,14 @@ UPDATE `creature_template` SET `mindmg`=1500, `maxdmg`=2000, `minhealth`=35000, 
 UPDATE `creature_template` SET `name`='Stitched Spewer' WHERE `entry`=16025;
 
 -- Stitched Spewer AI changes:
--- remove knockback
-DELETE FROM creature_ai_scripts where id = 1602503; 
--- Slime shot on current target, and reset threat on that target
-UPDATE `creature_ai_scripts` SET `action1_param2`=1, `action2_type`=13, `action2_param1`=-100, `action2_param2`=1 WHERE `id`=1602502;
+
+DELETE FROM creature_ai_scripts where creature_id = 16025;
+INSERT INTO `creature_ai_scripts`
+(`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
+VALUES
+(1602501, 16025, 0, 0, 100, 3, 0, 0, 5000, 10000, 11, 28311, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stitched Spewer - Casts Slime Bolt'),
+(1602502, 16025, 0, 0, 100, 3, 5000, 5000, 6000, 6000, 11, 28318, 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Stitched Spewer - Casts Slime Shoot');
+(1602503, 16025, 0, 0, 100, 1, 3000, 4000, 8000, 10000, 11, 28405, 1, 0, 13, -95, 1, 0, 0, 0, 0, 0, 'Stitched Spewer knockback with threat reduction');
 
 
 -- sludge belcher HP
