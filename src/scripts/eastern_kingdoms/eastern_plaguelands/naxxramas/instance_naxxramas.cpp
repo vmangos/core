@@ -132,7 +132,7 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         dist = 120.0f;
         break;
     case NPC_HEIGAN:
-        dist = 160.0f;
+        dist = 90.0f;
         break;
     case NPC_LOATHEB:
         dist = 100.0f;
@@ -948,7 +948,7 @@ void instance_naxxramas::GetGothSummonPointCreatures(std::list<Creature*> &lList
     }
 }
 
-bool instance_naxxramas::IsInRightSideGothArea(Unit* pUnit)
+bool instance_naxxramas::IsInRightSideGothArea(const Unit* pUnit)
 {
     if (GameObject* pCombatGate = GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
         return (pCombatGate->GetPositionY() >= pUnit->GetPositionY());

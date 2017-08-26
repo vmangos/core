@@ -320,7 +320,7 @@ public:
     void SetGothTriggers();
     Creature* GetClosestAnchorForGoth(Creature* pSource, bool bRightSide);
     void GetGothSummonPointCreatures(std::list<Creature*> &lList, bool bRightSide);
-    bool IsInRightSideGothArea(Unit* pUnit);
+    bool IsInRightSideGothArea(const Unit* pUnit);
 
     // kel
     void OnKTAreaTrigger(const AreaTriggerEntry* pAT); //impl in boss_kelthuzad.cpp
