@@ -19,6 +19,7 @@
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include "MovementGenerator.h"
 
 enum
 {
@@ -96,6 +97,7 @@ enum Phase
 static const float aLiftOffPosition[3] = { 3521.300f, -5237.560f, 138.261f };
 uint32 SPAWN_ANIM_TIMER = 21500;
 static constexpr float AGGRO_RADIUS = 70.0f;
+
 struct boss_sapphironAI : public ScriptedAI
 {
     boss_sapphironAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -122,7 +124,7 @@ struct boss_sapphironAI : public ScriptedAI
         {
             phase = PHASE_GROUND;
         }
-        isEvading = false;
+        m_TargetNotReachableTimer = 0;
     }
 
     instance_naxxramas* m_pInstance;
@@ -145,7 +147,7 @@ struct boss_sapphironAI : public ScriptedAI
     uint32 pullCheckTimer;
 
     uint32 m_forceTargetUpdateTimer;
-    bool isEvading;
+    uint32 m_TargetNotReachableTimer;
 
     void Reset()
     {
@@ -157,15 +159,9 @@ struct boss_sapphironAI : public ScriptedAI
         m_creature->RemoveAurasDueToSpell(17131);
         UnSummonWingBuffet();
         DeleteAndDispellIceBlocks();
-        setHover(false);
+        setHover(false, true);
         SetCombatMovement(true);
-        m_creature->GetMotionMaster()->Clear(false);
-    }
-
-    void JustReachedHome() override
-    {
-        isEvading = false;
-        ScriptedAI::JustReachedHome();
+        m_TargetNotReachableTimer = 0;
     }
 
     void UnSummonWingBuffet()
@@ -183,16 +179,6 @@ struct boss_sapphironAI : public ScriptedAI
     
     void DeleteAndDispellIceBlocks()
     {
-        for (auto it = iceboltTargets.begin(); it != iceboltTargets.end(); it++)
-        {
-            if (Player* pPlayer = m_pInstance->GetMap()->GetPlayer(*it))
-            {
-                pPlayer->RemoveAurasDueToSpell(SPELL_ICEBOLT);
-                pPlayer->RemoveAurasDueToSpell(SPELL_STUN_IMMUNE);
-            }
-        }
-        iceboltTargets.clear();
-
         std::list<GameObject*> iceblocks;
         GetGameObjectListWithEntryInGrid(iceblocks, m_creature, GO_ICEBLOCK, 300.0f);
         for(GameObject* ib : iceblocks)
@@ -222,22 +208,20 @@ struct boss_sapphironAI : public ScriptedAI
         {
             AttackStart(pUnit);
         }
-
+        if (GameObject* pGO1 = GetClosestGameObjectWithEntry(m_creature, GO_SAPPHIRON_SPAWN, 200.0f))
+        {
+            pGO1->Delete();
+            if (GameObject* pGO2 = GetClosestGameObjectWithEntry(m_creature, GO_SAPPHIRON_SPAWN, 200.0f))
+                pGO2->Delete();
+        }
     }
 
     void AttackStart(Unit* who)
     {
-        if (phase != PHASE_GROUND || isEvading)
+        if (phase != PHASE_GROUND)
             return;
 
         ScriptedAI::AttackStart(who);
-    }
-
-    void MoveInLineOfSight(Unit* pWho) override
-    {
-        if (m_creature->IsInEvadeMode() || isEvading)
-            return;
-        ScriptedAI::MoveInLineOfSight(pWho);
     }
 
     void StartSkeletonSummon()
@@ -260,7 +244,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void AggroRadius(uint32 diff)
     {
-        if (m_creature->isInCombat() || m_creature->IsInEvadeMode() || isEvading)
+        if (m_creature->isInCombat() || m_creature->IsInEvadeMode())
             return;
         if (phase != PHASE_GROUND && phase != PHASE_SKELETON)
             return;
@@ -327,7 +311,7 @@ struct boss_sapphironAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
-        if (phase != PHASE_GROUND || isEvading)
+        if (phase != PHASE_GROUND)
             return;
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SAPPHIRON, IN_PROGRESS);
@@ -337,7 +321,6 @@ struct boss_sapphironAI : public ScriptedAI
         events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(40));
         events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
         events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
-        events.ScheduleEvent(EVENT_CHECK_EVADE, Seconds(5));
     }
 
     void JustDied(Unit* pKiller)
@@ -404,7 +387,7 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
-    void setHover(bool on)
+    void setHover(bool on, bool onReset = false)
     {
         if (on)
         {
@@ -451,8 +434,11 @@ struct boss_sapphironAI : public ScriptedAI
             data << uint32(0);
             m_creature->SendMovementMessageToSet(std::move(data), true);
 
-            m_creature->UpdateCombatState(true);
-            m_creature->SetReactState(ReactStates::REACT_AGGRESSIVE);
+            if (!onReset)
+            {
+                m_creature->UpdateCombatState(true);
+                m_creature->SetReactState(ReactStates::REACT_AGGRESSIVE);
+            }
 
             //m_creature->SetFly(false);
             //m_creature->SetLevitate(false);
@@ -460,6 +446,23 @@ struct boss_sapphironAI : public ScriptedAI
         }
     }
 
+    void UpdateReachable(uint32 update_diff)
+    {
+        bool unreachableTarget = 
+            !m_creature->GetMotionMaster()->empty() &&
+             m_creature->getVictim() &&
+             m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
+            !m_creature->HasDistanceCasterMovement() &&
+           (!m_creature->IsWithinDistInMap(m_creature->getVictim(), m_creature->GetMaxChaseDistance(m_creature->getVictim())) || !m_creature->IsWithinLOSInMap(m_creature->getVictim())) &&
+            !m_creature->GetMotionMaster()->operator->()->IsReachable();
+        
+        if (unreachableTarget)
+        {
+            m_TargetNotReachableTimer += update_diff;
+        }
+        else
+            m_TargetNotReachableTimer = 0;
+    }
     void UpdateAI(const uint32 uiDiff) override
     {
         if (phase == PHASE_SKELETON)
@@ -485,7 +488,13 @@ struct boss_sapphironAI : public ScriptedAI
             AggroRadius(uiDiff);
             if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
                 return;
-            
+         
+            UpdateReachable(uiDiff);
+            if (m_TargetNotReachableTimer > 10000)
+            {
+                EnterEvadeMode();
+            }
+
             // hack to avoid bug where players cant see target of sapphiron after initial summoning
             if (m_forceTargetUpdateTimer)
             {
@@ -503,24 +512,6 @@ struct boss_sapphironAI : public ScriptedAI
             if (m_creature->getThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
-                isEvading = true;
-            }
-        }
-      
-        if (phase == PHASE_GROUND || phase == PHASE_LIFT_OFF)
-        {
-            float x, y, z, o;
-            m_creature->GetHomePosition(x, y, z, o);
-            float dx = m_creature->GetPositionX() - x;
-            float dy = m_creature->GetPositionY() - y;
-            float dz = m_creature->GetPositionZ() - z;
-            float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-            dist = (dist > 0 ? dist : 0);
-            if (dist > 85.0f)
-            {
-                m_creature->RemoveAurasDueToSpell(SPELL_FROST_AURA);
-                EnterEvadeMode();
-                return;
             }
         }
 
@@ -672,17 +663,6 @@ struct boss_sapphironAI : public ScriptedAI
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
                 }
                 break;
-            case EVENT_CHECK_EVADE:
-            {
-                events.Repeat(Seconds(5));
-                float x, y, z, o;
-                m_creature->GetHomePosition(x, y, z, o);
-                if (m_creature->GetDistance(x, y, z) > 70.0f)
-                {
-                    EnterEvadeMode();
-                }
-                break;
-            }
             }
         }
 
