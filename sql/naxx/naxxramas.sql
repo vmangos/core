@@ -281,6 +281,7 @@ update creature_template set speed_walk = 1.28 where entry in (16145,16146,16156
 update creature_template set speed_walk = 2, speed_run = 1.71429 where entry = 16028;
 update creature_template set speed_walk = 0.4, speed_run = 0.4 where entry = 16142;
 update creature_template set speed_walk = 2 where entry = 16168;
+update creature_template set speed_run = 1.28 where entry in (16163,16861,16451);
 
 -- Portal of naxxxramas to EventAI
 UPDATE `creature_template` SET `AIName`='EventAI' WHERE `entry`=16420;
