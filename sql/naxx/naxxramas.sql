@@ -1236,6 +1236,7 @@ DELETE FROM creature_template_addon WHERE entry = 16803;
 INSERT INTO creature_template_addon (entry, mount, bytes1, b2_0_sheath, b2_1_flags, emote, moveflags, auras)
 VALUE (16803, 0, 0, 0, 0, 333, 0, 18950);
 UPDATE creature_template SET spell1 = 29060 WHERE entry = 16803;
+UPDATE `creature_template` SET `mindmg`=3100, `maxdmg`=4000 WHERE `entry`=16803;
 
 -- Razu adds equipment
 UPDATE `creature_template` SET `equipment_id` = 16803 where `entry` = 16803;
