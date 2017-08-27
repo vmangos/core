@@ -2084,6 +2084,9 @@ void Player::restorePendingTeleport()
 
 bool Player::TeleportToBGEntryPoint()
 {
+    if (m_bgData.joinPos.coord_x == 0.0f && m_bgData.joinPos.coord_y == 0.0f && m_bgData.joinPos.coord_z == 0.0f)
+        m_bgData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+
     return TeleportTo(m_bgData.joinPos);
 }
 
@@ -19381,7 +19384,7 @@ void Player::_SaveBGData()
 
     stmt.PExecute(GetGUIDLow());
 
-    if (m_bgData.bgInstanceID)
+    if (m_bgData.bgInstanceID || InBattleGroundQueue())
     {
         stmt = CharacterDatabase.CreateStatement(insBGData, "INSERT INTO character_battleground_data VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         /* guid, bgInstanceID, bgTeam, x, y, z, o, map */
