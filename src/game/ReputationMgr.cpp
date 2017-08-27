@@ -221,7 +221,7 @@ void ReputationMgr::Initialize()
     }
 }
 
-bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental)
+bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool noSpillover)
 {
     bool res = false;
     // if spillover definition exists in DB
@@ -229,7 +229,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
     {
         for (uint32 i = 0; i < MAX_SPILLOVER_FACTIONS; ++i)
         {
-            if (repTemplate->faction[i])
+            if (!noSpillover && repTemplate->faction[i])
             {
                 if (m_player->GetReputationRank(repTemplate->faction[i]) <= ReputationRank(repTemplate->faction_rank[i]))
                 {
