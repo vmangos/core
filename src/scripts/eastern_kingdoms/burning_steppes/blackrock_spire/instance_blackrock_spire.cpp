@@ -351,6 +351,11 @@ void instance_blackrock_spire::SetData(uint32 uiType, uint32 uiData)
     }
 }
 
+enum
+{
+    SAY_ROOKERY_EVENT_START = -1229020
+};
+
 void instance_blackrock_spire::Update(uint32 uiDiff)
 {
     if (m_uiUBRSDoor_Timer)
@@ -394,26 +399,35 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
         {
             if (m_uiFatherFlame_timer <= uiDiff)
             {
-                if (m_uiFatherFlame_WaveCount < 5)
+                if (m_uiFatherFlame_WaveCount == 0) // First wave should be a Rookery Hatcher and there is a text that it has to say.
+                {
+                    Creature* pFirstHatcher = Crea->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                    if (pFirstHatcher)
+                        DoScriptText(SAY_ROOKERY_EVENT_START, pFirstHatcher);
+                    Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                    m_uiFatherFlame_timer = urand(30000, 40000);
+                    ++m_uiFatherFlame_WaveCount;
+                }
+                else if (m_uiFatherFlame_WaveCount < 5)
                 {
                     switch (urand(0, 2))
                     {
                         case 0:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 82.071198f, -284.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 84.071198f, -286.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                         case 1:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 82.071198f, -284.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 84.071198f, -286.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                         case 2:
                         {
-                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 82.071198f, -284.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
-                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 84.071198f, -286.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            Crea->SummonCreature(NPC_ROOKERY_GUARDIAN, 55.232342f, -265.751282f, 93.883f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                            Crea->SummonCreature(NPC_ROOKERY_HATCHER, 60.011333f, -263.914703f, 94.022f, 5, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                             break;
                         }
                     }
@@ -422,7 +436,7 @@ void instance_blackrock_spire::Update(uint32 uiDiff)
                 }
                 else
                 {
-                    Crea->SummonCreature(NPC_SOLAKAR, 83.071198f, -285.478424f, 91.448f, 1, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
+                    Crea->SummonCreature(NPC_SOLAKAR, 43.7685f, -259.82f, 91.6483f, 0, TEMPSUMMON_DEAD_DESPAWN, HOUR * IN_MILLISECONDS);
                     SetData(TYPE_SOLAKAR, DONE);
                     m_uiFatherFlame_timer = 0;
                 }

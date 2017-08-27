@@ -1931,9 +1931,9 @@ enum
 
     EVENT_TOURNAMENT        = 15,
 
-    YELL_BEGIN              = 2000007008,
-    YELL_WINNER             = 2000007009,
-    YELL_OVER               = 2000007010,
+    YELL_BEGIN              = -1900100,
+    YELL_WINNER             = -1900101,
+    YELL_OVER               = -1900102,
 };
 
 struct npc_riggle_bassbaitAI : ScriptedAI

@@ -190,7 +190,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSpamerUnmute(char* args);
         bool HandleSpamerList(char* args);
         bool HandleWhisperRestrictionCommand(char* args);
-
+        bool HandleUnstuckCommand(char* args);
         bool HandleGoldRemoval(char* args);
 
         // Packet dump
@@ -687,6 +687,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadQuestEndScriptsCommand(char* args);
         bool HandleReloadQuestStartScriptsCommand(char* args);
         bool HandleReloadQuestTemplateCommand(char* args);
+        bool HandleReloadQuestGreetingCommand(char* args);
         bool HandleReloadReservedNameCommand(char* args);
         bool HandleReloadReputationRewardRateCommand(char* args);
         bool HandleReloadReputationSpilloverTemplateCommand(char* args);

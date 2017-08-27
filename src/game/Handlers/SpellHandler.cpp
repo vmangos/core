@@ -258,7 +258,7 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recv_data)
         return;
 
     GameObject *obj = GetPlayer()->GetMap()->GetGameObject(guid);
-    if (!obj)
+    if (!obj || obj->IsDeleted())
         return;
 
     // Additional check preventing exploits (ie loot despawned chests)
@@ -389,6 +389,9 @@ void WorldSession::HandleCancelCastOpcode(WorldPacket& recvPacket)
 
     if (_player->IsNonMeleeSpellCasted(false))
         _player->InterruptNonMeleeSpells(false, spellId);
+
+    if (_player->IsNextSwingSpellCasted())
+        _player->InterruptSpell(CURRENT_MELEE_SPELL);
 }
 
 void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)

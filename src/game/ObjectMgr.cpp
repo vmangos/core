@@ -7149,6 +7149,74 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
     return "<error>";
 }
 
+bool ObjectMgr::LoadQuestGreetings()
+{
+    mQuestGreetingLocaleMap.clear(); // need for reload case
+
+    QueryResult *result = WorldDatabase.Query("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 quest greetings. DB table `quest_greeting` is empty.");
+        return false;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field *fields = result->Fetch();
+        int32 entry = fields[0].GetInt32();
+
+        if ((entry < 1) || !ObjectMgr::GetCreatureTemplate(entry))
+        {
+            sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+            continue;
+        }
+
+        QuestGreetingLocale& data = mQuestGreetingLocaleMap[entry];
+
+        data.Content.resize(1);
+        ++count;
+
+        // 0 -> default, idx in to idx+1
+        data.Content[0] = fields[1].GetCppString();
+
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[i + 1].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    // 0 -> default, idx in to idx+1
+                    if ((int32)data.Content.size() <= idx + 1)
+                        data.Content.resize(idx + 2);
+
+                    data.Content[idx + 1] = str;
+                }
+            }
+        }
+
+        data.Emote = fields[10].GetUInt16();
+        data.EmoteDelay = fields[11].GetUInt32();
+
+        if (data.Emote && !sEmotesStore.LookupEntry(data.Emote))
+        {
+            sLog.outErrorDb("Entry %i in table `quest_greeting` has Emote %u but emote does not exist.", entry, data.Emote);
+            data.Emote = EMOTE_ONESHOT_NONE;
+        }
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u quest greetings.", count);
+
+    return true;
+}
+
 void ObjectMgr::LoadFishingBaseSkillLevel()
 {
     mFishingBaseForArea.clear();                            // for reload case

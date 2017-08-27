@@ -55,7 +55,7 @@ enum blySpells
     SPELL_REVENGE              = 12170
 };
 
-#define GOSSIP_BLY                  "[PH] In that case, I will take my reward!"
+#define GOSSIP_BLY                  "That's it! I'm tired of helping you out.  It's time we settled things on the battlefield!"
 
 
 struct npc_sergeant_blyAI : public ScriptedAI
@@ -266,11 +266,12 @@ enum weegliSpells
 
 enum weegliSays
 {
-    SAY_WEEGLI_OHNO = -1209000,
-    SAY_WEEGLI_OK_I_GO = -1209001
+    SAY_WEEGLI_OHNO      = -1209000,
+    SAY_WEEGLI_OK_I_GO   = -1209001,
+    SAY_CHIEF_UKORZ_DOOR = -1209004
 };
 
-#define GOSSIP_WEEGLI               "[PH] Please blow up the door."
+#define GOSSIP_WEEGLI               "Will you blow up that door now?"
 
 
 struct npc_weegli_blastfuseAI : public ScriptedAI
@@ -420,6 +421,8 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
                     }
                     uint64 EndDoorGUID = pInstance->GetData64(GO_END_DOOR);
                     pInstance->DoUseDoorOrButton(EndDoorGUID);
+                    if (Creature* pChief = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_UKORZ)))
+                        DoScriptText(SAY_CHIEF_UKORZ_DOOR, pChief);
                     RunAfterExplosion2();
                     runAway = false;
                 }
@@ -565,6 +568,10 @@ enum zumrahConsts
     ZUMRAH_HOSTILE_FACTION = 37
 };
 
+#define SAY_ZUMRAH_TRIGGER -1900163
+#define SAY_ZUMRAH_YELL    -1900164
+#define SAY_ZUMRAH_KILLED  -1900165
+
 bool OnTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry *at)
 {
     Creature* pZumrah = pPlayer->FindNearestCreature(ZUMRAH_ID, 30.0f);
@@ -572,7 +579,12 @@ bool OnTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry *at)
     if (!pZumrah)
         return false;
 
-    pZumrah->setFaction(ZUMRAH_HOSTILE_FACTION);
+    if (pZumrah->getFaction() != ZUMRAH_HOSTILE_FACTION)
+    {
+        pZumrah->setFaction(ZUMRAH_HOSTILE_FACTION);
+        DoScriptText(SAY_ZUMRAH_TRIGGER, pZumrah);
+    }
+
     return true;
 }
 
@@ -581,7 +593,6 @@ struct ZumRahAI : public ScriptedAI
 {
     ZumRahAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        aggro = false;
         Reset();
     }
 
@@ -589,21 +600,25 @@ struct ZumRahAI : public ScriptedAI
     uint32 m_uiWardTimer;
     uint32 m_uiShadowBoltTimer;
     uint32 m_uiHealingTimer;
-    bool aggro;
-    bool emote;
+    bool zombies;
     bool isHealed;
-    uint32 m_uiEmoteTimer;
+    uint32 m_uiZombiesTimer;
 
     void Reset()
     {
-        aggro = false;
-        emote = false;
+        zombies = false;
         isHealed = false;
         m_uiShadowBoltTimer = 0;
         m_uiHealingTimer = 0;
-        m_uiEmoteTimer = 3000;
+        m_uiZombiesTimer = 3000;
         m_uiGraveTimer = 5000;
         m_uiWardTimer  = 3000;
+    }
+
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(SAY_ZUMRAH_KILLED, m_creature);
+        ScriptedAI::KilledUnit(pVictim);
     }
 
     void JustDied(Unit* pKiller)
@@ -613,25 +628,19 @@ struct ZumRahAI : public ScriptedAI
     void Aggro(Unit* pWho)
     {
         m_creature->SetInCombatWithZone();
-        if (!aggro)
-        {
-            aggro = true;
-            m_creature->MonsterSay("How dare you enter my sanctum!");
-        }
+        DoScriptText(SAY_ZUMRAH_YELL, m_creature);
     }
-
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (m_uiEmoteTimer < uiDiff)
+        if (m_uiZombiesTimer < uiDiff)
         {
-            if (!emote)
+            if (!zombies)
             {
-                m_creature->MonsterYell("Sands will consume you!", 0);
-                emote = true;
+                zombies = true;
 
                 std::list<Creature*> m_ZombieList;
                 GetCreatureListWithEntryInGrid(m_ZombieList, m_creature, 7286, 200.0f);
@@ -641,7 +650,7 @@ struct ZumRahAI : public ScriptedAI
             }
         }
         else
-            m_uiEmoteTimer -= uiDiff;
+            m_uiZombiesTimer -= uiDiff;
 
         if (m_uiShadowBoltTimer < uiDiff)
         {

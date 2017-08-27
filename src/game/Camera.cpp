@@ -148,6 +148,11 @@ template void Camera::UpdateVisibilityOf(DynamicObject* , UpdateData& , std::set
 
 void Camera::UpdateVisibilityForOwner()
 {
+    // Temporary hackfix if the camera has no map assigned to it
+    // TODO: Find out why/how this happens
+    if (!m_source->FindMap())
+        return;
+
     GetOwner()->m_visibleGUIDs_lock.acquire_read();
     MaNGOS::VisibleNotifier notifier(*this); // Will copy m_clientGUIDs
     GetOwner()->m_visibleGUIDs_lock.release();

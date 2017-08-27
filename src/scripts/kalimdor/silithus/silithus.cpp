@@ -2522,7 +2522,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
 
     void AbortScene()
     {
-        m_uiEventStage = 1000;
+        m_uiEventStage = 0;
         m_uiEventTimer = 0;
 
         DoUnsummonArmy();

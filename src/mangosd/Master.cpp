@@ -542,12 +542,46 @@ bool StartDB(std::string name, DatabaseType& database, const char **migrations)
         sLog.outError("%s database not specified in configuration file", name.c_str());
         return false;
     }
-    sLog.outString("%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbstring.c_str(), nConnections, nAsyncConnections);
+
+    // Remove password from DB string for log output
+    // format: 127.0.0.1;3306;mangos;mangos;characters
+    // In a properly formatted string, token 4 is the password
+    std::string dbStringLog = dbstring;
+
+    if (std::count(dbStringLog.begin(), dbStringLog.end(), ';') == 4)
+    {
+        // Have correct number of tokens, can replace
+        std::string::iterator start = dbStringLog.end(), end = dbStringLog.end();
+
+        int occurrence = 0;
+        for (std::string::iterator itr = dbStringLog.begin(); itr != dbStringLog.end(); ++itr)
+        {
+            if (*itr == ';')
+                ++occurrence;
+
+            if (occurrence == 3 && start == dbStringLog.end())
+                start = ++itr;
+            else if (occurrence == 4 && end == dbStringLog.end())
+                end = itr;
+
+            if (start != dbStringLog.end() && end != dbStringLog.end())
+                break;
+        }
+
+        dbStringLog.replace(start, end, "*");
+    }
+    else
+    {
+        sLog.outError("Incorrectly formatted database connection string for database %s", name.c_str());
+        return false;
+    }
+
+    sLog.outString("%s Database: %s, sync threads: %i, workers: %i", name.c_str(), dbStringLog.c_str(), nConnections, nAsyncConnections);
 
     ///- Initialise the world database
     if (!database.Initialize(dbstring.c_str(), nConnections, nAsyncConnections))
     {
-        sLog.outError("Cannot connect to world database %s",dbstring.c_str());
+        sLog.outError("Cannot connect to world database %s", name.c_str());
         return false;
     }
 

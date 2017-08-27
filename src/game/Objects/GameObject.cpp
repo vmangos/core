@@ -715,6 +715,9 @@ uint32 GameObject::GetUniqueUseCount()
 
 void GameObject::Delete()
 {
+    if (!IsDeleted())
+        AddObjectToRemoveList();
+
     // no despawn animation for not activated rituals
     if (GetGoType() != GAMEOBJECT_TYPE_SUMMONING_RITUAL ||
         GetGoState() == GO_STATE_ACTIVE)
@@ -725,9 +728,6 @@ void GameObject::Delete()
 
     if (uint16 poolid = sPoolMgr.IsPartOfAPool<GameObject>(GetGUIDLow()))
         sPoolMgr.GetPoolGameObjects(poolid).DespawnObject(*GetMap()->GetPersistentState(), GetGUIDLow());
-
-    if (!IsDeleted())
-        AddObjectToRemoveList();
 }
 
 void GameObject::getFishLoot(Loot *fishloot, Player* loot_owner)

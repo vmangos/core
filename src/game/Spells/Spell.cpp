@@ -611,13 +611,14 @@ void Spell::FillTargetMap()
                 break;
         }
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_THREAT))
         {
             Player *me = (Player*)m_caster;
             for (UnitList::const_iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
             {
                 Player *targetOwner = (*itr)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner))
+                if ((targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner)) || // PvP flagged players
+                    ((*itr)->IsCreature() && (*itr)->IsPvP()))                                                      // PvP flagged creatures
                 {
                     me->UpdatePvP(true);
                     me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -1217,13 +1218,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         else
         {
             caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType, this);
-            // Judgement of Command
-            if (m_spellInfo->SpellIconID == 561)
-            {
-                // damage halved if target not stunned.
-                if (!unitTarget->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
-                     damageInfo.damage = int32(damageInfo.damage * 0.5f);
-            }
         }
 
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
@@ -1337,9 +1331,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Trigger spell cast procs and forward the damage / heal procs to the aura
         if (foundDamageOrHealAura)
         {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL);
+            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
-            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL);
+            procAttacker &= (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             procVictim = 0;
             dmg = 1;
         }
@@ -2830,7 +2824,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
                 case SPELL_EFFECT_BIND:
-                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
                 case SPELL_EFFECT_CREATE_ITEM:
@@ -2855,6 +2848,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
+                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
@@ -3552,6 +3546,11 @@ void Spell::handle_immediate()
 
         ++m_targetNum;
         DoAllEffectOnTarget(&(*ihit));
+
+        // a channeled spell could be interrupted already because the aura on target
+        // was diminished to duration=0 see Spell::DoSpellHitOnUnit
+        if (m_channeled && m_spellState != SPELL_STATE_CASTING)
+            return;
     }
 
     for (auto ihit = m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
@@ -5145,7 +5144,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-                if (m_spellInfo->Id == 7266 && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
+                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
                 {
                     return SPELL_FAILED_TARGET_DUELING;
                 }
@@ -6539,12 +6538,6 @@ bool Spell::CanAutoCast(Unit* target)
                 if (target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)))
                     return false;
             }
-            else
-            {
-                if (Aura* aura = target->GetAura(m_spellInfo->Id, SpellEffectIndex(j)))
-                    if (aura->GetStackAmount() >= m_spellInfo->StackAmount)
-                        return false;
-            }
         }
         else if (IsAreaAuraEffect(m_spellInfo->Effect[j]))
         {
@@ -7041,9 +7034,11 @@ SpellCastResult Spell::CheckItems()
                     break; // Master Healthstone
             }
 
-            if (p_caster->HasItemCount(itemtype, 1))
+            ItemPosCountVec dest;
+            InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemtype, 1);
+            if (msg != EQUIP_ERR_OK)
             {
-                p_caster->SendEquipError(EQUIP_ERR_CANT_CARRY_MORE_OF_THIS, nullptr, nullptr, itemtype);
+                p_caster->SendEquipError(msg, nullptr, nullptr, itemtype);
                 return SPELL_FAILED_DONT_REPORT;
             }
         }
@@ -7412,6 +7407,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
                 break;
         // no break. Cannibalize checks corpse target LOS.
         // fall through
+        case SPELL_EFFECT_RESURRECT:
         case SPELL_EFFECT_RESURRECT_NEW:
             // player far away, maybe his corpse near?
             if (target != m_caster && !(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !target->IsWithinLOSInMap(m_caster))
@@ -7778,6 +7774,11 @@ public:
                         {
                             if (!casterUnit->IsValidAttackTarget(sourceUnit))
                                 continue;
+
+                            // Negative AoE from non flagged players cannot target other players
+                            if (Player *attackedPlayer = sourceUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
+                                    continue;
                         }
                         else if (GameObject* gobj = i_originalCaster->ToGameObject())
                         {

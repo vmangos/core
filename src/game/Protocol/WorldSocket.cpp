@@ -219,6 +219,12 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 
     K.SetHexStr(fields[2].GetString());
 
+    if (K.AsByteArray().empty())
+    {
+        delete result;
+        return -1;
+    }
+
     time_t mutetime = time_t (fields[7].GetUInt64());
 
     locale = LocaleConstant(fields[8].GetUInt8());
@@ -291,16 +297,6 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
     SqlStatement stmt = LoginDatabase.CreateStatement(updAccount, "UPDATE account SET last_ip = ? WHERE username = ?");
     stmt.PExecute(address.c_str(), account.c_str());
 
-    // NOTE ATM the socket is single-threaded, have this in mind ...
-    ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), mutetime, locale), -1);
-
-    m_Crypt.SetKey(K.AsByteArray());
-    m_Crypt.Init();
-
-    m_Session->SetUsername(account);
-    m_Session->SetGameBuild(BuiltNumberClient);
-    m_Session->SetAccountFlags(accFlags);
-
     ClientOSType clientOs;
     if (os == "niW")
         clientOs = CLIENT_OS_WIN;
@@ -312,6 +308,15 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
         return -1;
     }
 
+    // NOTE ATM the socket is single-threaded, have this in mind ...
+    ACE_NEW_RETURN(m_Session, WorldSession(id, this, AccountTypes(security), mutetime, locale), -1);
+
+    m_Crypt.SetKey(K.AsByteArray());
+    m_Crypt.Init();
+
+    m_Session->SetUsername(account);
+    m_Session->SetGameBuild(BuiltNumberClient);
+    m_Session->SetAccountFlags(accFlags);
     m_Session->SetOS(clientOs);
     m_Session->LoadTutorialsData();
     m_Session->InitWarden(&K);

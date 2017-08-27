@@ -1412,6 +1412,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveGuardian(Pet* pet);
         void RemoveGuardians();
         Pet* FindGuardianWithEntry(uint32 entry);
+        uint32 GetGuardianCountWithEntry(uint32 entry);
 
         bool isCharmed() const { return !GetCharmerGuid().IsEmpty(); }
 
@@ -1495,6 +1496,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // delayed+channeled spells are always accounted as casted
         // we can skip channeled or delayed checks using flags
         bool IsNonMeleeSpellCasted(bool withDelayed = false, bool skipChanneled = false, bool skipAutorepeat = false) const;
+        bool IsNextSwingSpellCasted() const;
         // for movement generators, check if current casted spell has movement interrupt flags
         bool IsNoMovementSpellCasted() const;
         
