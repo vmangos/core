@@ -8357,23 +8357,7 @@ void Unit::ApplyDiminishingToDuration(DiminishingGroup group, int32 &duration, U
     bool pvp = (IsLikePlayer() && caster->IsLikePlayer());
     if ((GetDiminishingReturnsGroupType(group) == DRTYPE_PLAYER && pvp) || GetDiminishingReturnsGroupType(group) == DRTYPE_ALL)
     {
-        DiminishingLevels diminish = Level;
-        switch (diminish)
-        {
-            case DIMINISHING_LEVEL_1:
-                break;
-            case DIMINISHING_LEVEL_2:
-                mod = 0.5f;
-                break;
-            case DIMINISHING_LEVEL_3:
-                mod = 0.25f;
-                break;
-            case DIMINISHING_LEVEL_IMMUNE:
-                mod = 0.0f;
-                break;
-            default:
-                break;
-        }
+        mod = GetDiminishingRate(Level);
     }
 
     duration = int32(duration * mod);

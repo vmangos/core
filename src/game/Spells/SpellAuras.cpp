@@ -6245,16 +6245,23 @@ void SpellAuraHolder::Update(uint32 diff)
     // PvP
     if (_heartBeatRandValue)
     {
+        Unit* pTarget = GetTarget();
+        float diminishRate = 1.0f;
+        if (pTarget)
+            diminishRate = GetDiminishingRate(pTarget->GetDiminishing(this->m_AuraDRGroup) - 1);
+
         float elapsedTime = (m_maxDuration - m_duration) / 1000.0f;
-        static const float averageBreakTime = 12.0f; // 50% chance to break after 12 secs
-        static const float chanceBreakAt15 = 1.0f; // 1% break > 15 secs. Patch 1.2: "Players now have an increasing chance to break free of the effect, such that it is unlikely the effect will last more than 15 seconds."
-        static const float coeff = (1.0f / (15 - averageBreakTime)) * log((100 - chanceBreakAt15) / chanceBreakAt15);
+        float averageBreakTime = 12.0f * diminishRate; // 50% chance to break after 12 secs
+        float maxBreakTime = 15.0f * diminishRate;
+        static const float chanceBreakAtMax = 1.0f; // 1% break > 15 secs. Patch 1.2: "Players now have an increasing chance to break free of the effect, such that it is unlikely the effect will last more than 15 seconds."
+        static const float chanceBreakAtMaxLog = log((100 - chanceBreakAtMax) / chanceBreakAtMax);
+        float coeff = (1.0f / (maxBreakTime - averageBreakTime)) * chanceBreakAtMaxLog;
         float currHeartBeatValue = 100.0f / (1.0f + exp(coeff * (averageBreakTime - elapsedTime)));
         DEBUG_UNIT(GetTarget(), DEBUG_DR, "|HB Duration [Curr%.2f|Max%u]. Value[Curr%.2f|Limit%.2f]",
                            elapsedTime, m_maxDuration / 1000, currHeartBeatValue, _heartBeatRandValue);
         if (_heartBeatRandValue <=  currHeartBeatValue)
         {
-            if (Unit* pTarget = GetTarget())
+            if (pTarget)
                 pTarget->RemoveSpellAuraHolder(this);
             return;
         }
