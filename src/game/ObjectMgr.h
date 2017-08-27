@@ -485,17 +485,16 @@ enum PermVariables
     // ITEM ID RANGES ARE USED FOR AQ WAR EFFORT
 
     // Dragons of Nightmare support
-    VAR_ALIVE_COUNT = 30000,    // how many dragons should be alive atm (updated once dragon is killed)
-    VAR_REQ_UPDATE  = 30001,    // should keep >=1 if the last alive dragon was killed and the repawn time is not saved yet, 0 otherwise
+    VAR_ALIVE_COUNT = 30000,    // unused
+    VAR_REQ_UPDATE  = 30001,    // keep at DEF_STOP_DELAY unless all dragons are dead
     VAR_RESP_TIME   = 30002,    // next event time; should be set in here once last dragon is killed
-    VAR_REQ_PERM    = 30003,    // permutation required
+    VAR_REQ_PERM    = 30003,    // unused
     VAR_PERM_1      = 30004,    // saved permutation result
     VAR_PERM_2      = 30005,
     VAR_PERM_3      = 30006,
     VAR_PERM_4      = 30007,
 
     DEF_ALIVE_COUNT = 4,        // default alive dragons count for VAR_ALIVE_COUNT
-    DEF_REQ_UPDATE  = 0,        // default update requirement for VAR_REQ_UPDATE
     DEF_STOP_DELAY  = 5,        // default times event check will not stop the event
 
     NPC_YSONDRE     = 14887,

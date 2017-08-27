@@ -1977,6 +1977,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         DamageTakenHistoryMap   _damageTakenHistory;
         uint32                  _lastDamageTaken;
 
+        float m_nativeScale = 1.0f;
+        float m_nativeScaleOverride = 1.0f;
+
     private:
         void CleanupDeletedAuras();
         void UpdateSplineMovement(uint32 t_diff);
@@ -2012,9 +2015,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
-
-        float m_nativeScale = 1;
-        float m_nativeScaleOverride = 1;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

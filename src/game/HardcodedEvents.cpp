@@ -241,59 +241,59 @@ MoonbrookEventState Moonbrook::GetMoonbrookState()
 
 void DragonsOfNightmare::Update()
 {
-    std::vector<ObjectGuid> dragons;
-
-    uint32 varAliveCount = DEF_ALIVE_COUNT;
-    uint32 varReqUpdate = DEF_REQ_UPDATE;
-    uint32 varRespawnTimer = time(nullptr) + urand(4 * 24 * 3600, 7 * 24 * 3600);
-
-    CheckNightmareDragonsVariables(varAliveCount, varReqUpdate, varRespawnTimer);
-    LoadDragons(dragons);
-
-    // if at least one is alive and at least one is dead
-    // update the respawn timer of dead dragons by some big value
-    // thus we are just waiting for all dragons to die
-    if (varAliveCount && varAliveCount < 4)
-        UpdateRespawnTimeForDeadDragons(dragons, 9999999999);
-
-    if (!varReqUpdate)
+    std::vector<ObjectGuid> dragonGUIDs;
+    // Get Dragon GUIDs, these should always be available if the unit exists
+    if (!LoadDragons(dragonGUIDs))
     {
-        if (!sGameEventMgr.IsActiveEvent(m_eventId))
-        {
-            if (varRespawnTimer < time(nullptr))
-            {
-                if (!varAliveCount)
-                {
-                    varAliveCount = DEF_ALIVE_COUNT;
-                    sObjectMgr.SetSavedVariable(VAR_ALIVE_COUNT, DEF_ALIVE_COUNT, true);
-                }
-
-                PermutateDragons();
-                BASIC_LOG("GameEventMgr: [Dragons of Nightmare] %u of 4 alive.", varAliveCount);
-                sGameEventMgr.StartEvent(m_eventId, true);
-            }
-        }
-
+        sLog.outError("[Dragons of Nightmare] Only %u nightmare dragons exist in the database, there should be 4", dragonGUIDs.size());
         return;
     }
 
-    // allow some time before event stop so the players could loot the body
-    if (varReqUpdate > 1)
-    {
-        --varReqUpdate;
-        sObjectMgr.SetSavedVariable(VAR_REQ_UPDATE, varReqUpdate, true);
-
-        return;
-    }
-
-    // stop the event, update all timers
+    // Actual Creature objects do not exist unless the event is active
     if (sGameEventMgr.IsActiveEvent(m_eventId))
     {
-        UpdateRespawnTimeForDeadDragons(dragons, varRespawnTimer);
-        sObjectMgr.SetSavedVariable(VAR_REQ_UPDATE, 0, true);
-        sObjectMgr.SetSavedVariable(VAR_REQ_PERM, 1, true);
-        BASIC_LOG("GameEventMgr: [Dragons of Nightmare] last dragon just died.", varAliveCount);
-        sGameEventMgr.StopEvent(m_eventId, true);
+        // Event is active, dragons exist in the world
+        uint32 alive = 0;
+        // Update respawn time to 9999999999 if the dragon is dead, get current alive count
+        GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, 9999999999);
+
+        // If any dragons are still alive, do not pass go. We'll update once they are all dead
+        if (alive)
+            return;
+
+        // All the dragons are dead. We have a minor delay on ending the event so that groups can loot
+        // the last dragon before we despawn the dragon via ending the event
+        uint32 varReqUpdate = DEF_STOP_DELAY;
+        CheckSingleVariable(VAR_REQ_UPDATE, varReqUpdate); // Check and update default value if none exists
+
+        // Decrement and check value. Once we hit zero, event is done.
+        if (!varReqUpdate)
+        {
+            // We're done, update the permutation and set the respawn time
+            uint32 varRespawnTimer = time(nullptr) + urand(4 * 24 * 3600, 7 * 24 * 3600);
+            GetAliveCountAndUpdateRespawnTime(dragonGUIDs, alive, varRespawnTimer);
+
+            sObjectMgr.SetSavedVariable(VAR_RESP_TIME, varRespawnTimer, true);
+            varReqUpdate = DEF_STOP_DELAY; // reset for next round
+
+            // For next spawn
+            PermutateDragons();
+            sGameEventMgr.StopEvent(m_eventId, true);
+        }
+        else
+            --varReqUpdate;
+
+        sObjectMgr.SetSavedVariable(VAR_REQ_UPDATE, varReqUpdate, true);
+    }
+    else
+    {
+        // Event is not active, check respawn time. If we're at the respawn time, start the event
+        // so dragons are visible
+        uint32 varRespawnTimer = 0;
+        CheckSingleVariable(VAR_RESP_TIME, varRespawnTimer);
+
+        if (varRespawnTimer < time(nullptr))
+            sGameEventMgr.StartEvent(m_eventId, true);
     }
 }
 
@@ -306,8 +306,7 @@ void DragonsOfNightmare::Disable()
 {
     if (sGameEventMgr.IsActiveEvent(m_eventId))
     {
-        sObjectMgr.SetSavedVariable(VAR_REQ_UPDATE, 0, true);
-        sObjectMgr.SetSavedVariable(VAR_REQ_PERM, 1, true);
+        sObjectMgr.SetSavedVariable(VAR_REQ_UPDATE, DEF_STOP_DELAY, true);
         sGameEventMgr.StopEvent(m_eventId, true);
     }
 }
@@ -329,14 +328,7 @@ void DragonsOfNightmare::CheckSingleVariable(uint32 idx, uint32& value)
     }
 }
 
-void DragonsOfNightmare::CheckNightmareDragonsVariables(uint32 &aliveCount, uint32 &reqUpdate, uint32 &respawnTimer)
-{
-    CheckSingleVariable(VAR_ALIVE_COUNT, aliveCount);
-    CheckSingleVariable(VAR_REQ_UPDATE, reqUpdate);
-    CheckSingleVariable(VAR_RESP_TIME, respawnTimer);
-}
-
-void DragonsOfNightmare::UpdateRespawnTimeForDeadDragons(std::vector<ObjectGuid> &dragons, time_t respawnTime)
+void DragonsOfNightmare::GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> &dragons, uint32 &alive, time_t respawnTime)
 {
     for (auto& guid : dragons)
     {
@@ -369,10 +361,12 @@ void DragonsOfNightmare::UpdateRespawnTimeForDeadDragons(std::vector<ObjectGuid>
 
         if (pCreature->isDead())
             map->GetPersistentState()->SaveCreatureRespawnTime(guid.GetCounter(), respawnTime);
+        else
+            ++alive;
     }
 }
 
-bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid> &dragons)
+bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid> &dragonGUIDs)
 {
     for (uint8 i = 0; i < 4; ++i)
     {
@@ -385,27 +379,23 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid> &dragons)
             return false;
         }
 
-        dragons.push_back(dCreatureGuid);
+        dragonGUIDs.push_back(dCreatureGuid);
     }
 
     return true;
 }
 
+//void DragonsOfNightmare::GetAliveCount(std::vector<ObjectGuid> dragonGUIDs, uint32 &alive)
+
 void DragonsOfNightmare::PermutateDragons()
 {
-    auto reqPerm = sObjectMgr.GetSavedVariable(VAR_REQ_PERM, 0);
-
-    if (!reqPerm) return;
-
     std::vector<uint32> permutation = { NPC_LETHON, NPC_EMERISS, NPC_YSONDRE, NPC_TAERAR };
     std::random_shuffle(permutation.begin(), permutation.end());
 
-    sObjectMgr.SetSavedVariable(VAR_PERM_1, permutation[0]);
-    sObjectMgr.SetSavedVariable(VAR_PERM_2, permutation[1]);
-    sObjectMgr.SetSavedVariable(VAR_PERM_3, permutation[2]);
-    sObjectMgr.SetSavedVariable(VAR_PERM_4, permutation[3]);
-
-    sObjectMgr.SetSavedVariable(VAR_REQ_PERM, 0);
+    sObjectMgr.SetSavedVariable(VAR_PERM_1, permutation[0], true);
+    sObjectMgr.SetSavedVariable(VAR_PERM_2, permutation[1], true);
+    sObjectMgr.SetSavedVariable(VAR_PERM_3, permutation[2], true);
+    sObjectMgr.SetSavedVariable(VAR_PERM_4, permutation[3], true);
 }
 
 /*

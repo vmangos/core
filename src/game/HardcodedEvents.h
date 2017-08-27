@@ -132,10 +132,10 @@ struct DragonsOfNightmare : WorldEvent
 
     static void CheckSingleVariable(uint32 idx, uint32& value);
 
-private:    
-    void CheckNightmareDragonsVariables(uint32 &aliveCount, uint32 &reqUpdate, uint32 &respawnTimer);
-    void UpdateRespawnTimeForDeadDragons(std::vector<ObjectGuid> &dragons, time_t respawnTime);
-    bool LoadDragons(std::vector<ObjectGuid> &dragons);
+private:
+    void GetAliveCountAndUpdateRespawnTime(std::vector<ObjectGuid> &dragons, uint32 &alive, time_t respawnTime);
+    bool LoadDragons(std::vector<ObjectGuid> &dragonGUIDs);
+    //void GetExistingDragons(std::vector<ObjectGuid> &dragonGUIDs, std::vector<Creature*> &existingDragons);
     void PermutateDragons();
 };
 

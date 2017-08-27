@@ -174,7 +174,8 @@ Creature::Creature(CreatureSubtype subtype) :
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
-    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr)
+    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
+    m_AI_InitializeOnRespawn(false)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -277,8 +278,12 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
-    setNativeScale(cinfo->scale);
+    SetObjectScale(cinfo->scale);
+    // Reset native scale before we apply creature info multiplier, otherwise we are
+    // stuck at 1 from the previous m_nativeScaleOverride if the unit's entry is
+    // being changed
+    m_nativeScaleOverride = cinfo->scale;
+    m_nativeScale = cinfo->scale;
 
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
@@ -627,7 +632,14 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 //Call AI respawn virtual function
                 if (AI())
+                {
                     AI()->JustRespawned();
+
+                    // If the creature AI needs to be re-initialized after respawn, do it now
+                    // Useful for swapping AIs on mobs that change entry on respawn
+                    if (m_AI_InitializeOnRespawn)
+                        AIM_Initialize();
+                }
 
                 if (m_zoneScript)
                     m_zoneScript->OnCreatureRespawn(this);

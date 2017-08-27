@@ -562,6 +562,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         CreatureAI* AI() { return i_AI; }
         CreatureAI const* AI() const { return i_AI; }
+        void SetAInitializeOnRespawn(bool initialize) { m_AI_InitializeOnRespawn = initialize; }
 
         uint32 GetShieldBlockValue() const override
         {
@@ -857,6 +858,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool m_AlreadySearchedAssistance;
         bool m_regenHealth;
         bool m_AI_locked;
+        bool m_AI_InitializeOnRespawn;
         bool m_isDeadByDefault;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)
 
