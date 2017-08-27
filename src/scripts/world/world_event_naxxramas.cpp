@@ -286,7 +286,7 @@ struct NecropolisRelayAI : public ScriptedAI
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
 
-    // On transmet le GUID de la necropole
+    // The GUID of the necropolis
     void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
     {
         _necropolisGuid = necropolis;
@@ -320,6 +320,7 @@ public:
         _worldstateTimer = 1000;
         _checkShardsTimer = 1000;
         _animationTimer = 1000;
+        _necropolisList.insert(go->GetObjectGuid());
     }
 
     std::set<ObjectGuid> _shards;
@@ -352,51 +353,58 @@ public:
 
     void ZoneNecropolisRemaning()
     {
-        uint32 totalzone = 0;
+        uint32 totalzone_AZSHARA = 0;
+        uint32 totalzone_BLASTED_LANDS = 0;
+        uint32 totalzone_BURNING_STEPPES = 0;
+        uint32 totalzone_EASTERN_PLAGUELANDS = 0;
+        uint32 totalzone_TANARIS = 0;
+        uint32 totalzone_WINTERSPRING = 0;
+
         for (std::set<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
         {
             GameObject* necropolis = me->GetMap()->GetGameObject(*it);
-            totalzone = _necropolisList.size();
-        }   
 
-        uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
-        uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
-        uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
-        uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
-        uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
-        uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
-
-        switch (me->GetZoneId())
-        {
-            case ZONEID_AZSHARA:
+            if (necropolis->IsVisible() && necropolis->GetZoneId() == _zone)
             {
-                sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, totalzone, true);
-                break;
-            }
-            case ZONEID_BLASTED_LANDS:
-            {
-                sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, totalzone, true);
-                break;
-            }
-            case ZONEID_BURNING_STEPPES:
-            {
-                sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, totalzone, true);
-                break;
-            }
-            case ZONEID_EASTERN_PLAGUELANDS:
-            {
-                sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, totalzone, true);
-                break;
-            }
-            case ZONEID_TANARIS:
-            {
-                sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, totalzone, true);
-                break;
-            }
-            case ZONEID_WINTERSPRING:
-            {
-                sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, totalzone, true);
-                break;
+                switch (necropolis->GetZoneId())
+                {
+                    case ZONEID_AZSHARA:
+                    {
+                        totalzone_AZSHARA = +1;
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, totalzone_AZSHARA, true);
+                        break;
+                    }
+                    case ZONEID_BLASTED_LANDS:
+                    {
+                        totalzone_BLASTED_LANDS = +1;
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, totalzone_BLASTED_LANDS, true);
+                        break;
+                    }
+                    case ZONEID_BURNING_STEPPES:
+                    {
+                        totalzone_BURNING_STEPPES = +1;
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, totalzone_BURNING_STEPPES, true);
+                        break;
+                    }
+                    case ZONEID_EASTERN_PLAGUELANDS:
+                    {
+                        totalzone_EASTERN_PLAGUELANDS = +1;
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, totalzone_EASTERN_PLAGUELANDS, true);
+                        break;
+                    }
+                    case ZONEID_TANARIS:
+                    {
+                        totalzone_TANARIS = +1;
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, totalzone_TANARIS, true);
+                        break;
+                    }
+                    case ZONEID_WINTERSPRING:
+                    {
+                        totalzone_WINTERSPRING = +1;
+                        sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, totalzone_WINTERSPRING, true);
+                        break;
+                    }
+                }
             }
         }
     }
@@ -1661,7 +1669,20 @@ void AddSC_world_event_naxxramas()
     newscript->pGossipHello = &GossipHello_npc_argent_quartermaster;
     newscript->RegisterSelf();
 
-    // At start up, set time for both 
+    // At start up
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING, 0);
 }
