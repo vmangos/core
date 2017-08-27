@@ -929,6 +929,42 @@ bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster, Unit* victim)
     return true;
 }
 
+bool IsHealSpell(SpellEntry const *spellProto)
+{
+    // Holy Light/Flash of Light
+    if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
+    {
+        if (spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>() ||
+            spellProto->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>())
+            return true;
+    }
+
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        switch (spellProto->Effect[i])
+        {
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                return true;
+            case SPELL_EFFECT_APPLY_AURA:
+            case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+            case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+            {
+                switch (spellProto->EffectApplyAuraName[i])
+                {
+                    case SPELL_AURA_PERIODIC_HEAL:
+                        return true;
+                }
+                break;
+            }
+        }
+    }
+
+    return false;
+}
+
 bool IsSingleTargetSpell(SpellEntry const *spellInfo)
 {
     // exceptions (have spellInfo->AttributesEx & (1<<18) but not single targeted)

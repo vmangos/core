@@ -1154,10 +1154,10 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 // Nostalrius
                 case 28200:
                 {
-                    if (procFlags & (PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT | PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT))
+                    if (procFlags & (PROC_FLAG_SUCCESSFUL_AOE))
                     {
-                        if (procFlags != PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT &&
-                                procFlags != PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT)
+                        if (procFlags != PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL &&
+                                procFlags != PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT)
                             return SPELL_AURA_PROC_FAILED;
                     }
                     break;
@@ -1552,6 +1552,13 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint3
                 return SPELL_AURA_PROC_FAILED;
 
             triggered_spell_id = 24406;
+            break;
+        }
+        case 3656: // Corrupted Healing
+        {
+            // only proc on direct healing
+            if (IsSpellHaveEffect(procSpell, SPELL_EFFECT_HEAL))
+                triggered_spell_id = 23402;
             break;
         }
     }

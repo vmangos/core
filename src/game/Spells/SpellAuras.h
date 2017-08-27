@@ -100,9 +100,6 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         // Refresh de buff
         void Refresh(Unit* caster, Unit* target, SpellAuraHolder* pRefreshWithAura);
         bool CanBeRefreshedBy(SpellAuraHolder* other) const;
-        // Proc de buff
-        uint32 spellFirstHitAttackerProcFlags;
-        uint32 spellFirstHitTargetProcFlags;
         // FIN NOSTALRIUS
 
         bool IsPermanent() const { return m_permanent; }
