@@ -169,6 +169,13 @@ Unit* PlayerControlledAI::FindController()
 
 void PlayerControlledAI::UpdateTarget(Unit* victim)
 {
+    if (victim->isCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid())
+    {
+        me->AttackStop();
+        me->CastStop();
+        return;
+    }
+
     Unit* controller = FindController();
 
     bool isNewVictim = me->getVictim() != victim;
