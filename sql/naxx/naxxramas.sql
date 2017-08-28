@@ -4965,8 +4965,8 @@ VALUES
 
 
 update `creature_template` set `flags_extra` = 769 where `entry` = 15928; -- Thaddius
-update `creature_template` set `flags_extra` = 8961 where `entry` = 15929; -- Stalagg
-update `creature_template` set `flags_extra` = 769 where `entry` = 15930; -- Feugen
+update `creature_template` set `flags_extra` = 8705 where `entry` = 15929; -- Stalagg
+update `creature_template` set `flags_extra` = 513 where `entry` = 15930; -- Feugen
 update `creature_template` set `flags_extra` = 769 where `entry` = 15931; -- Grobbulus
 update `creature_template` set `flags_extra` = 769 where `entry` = 15932; -- Gluth
 update `creature_template` set `flags_extra` = 769 where `entry` = 15936; -- Heigan the Unclean
