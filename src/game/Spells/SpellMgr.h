@@ -242,6 +242,7 @@ bool IsPositiveSpell(uint32 spellId, Unit* caster = NULL, Unit* victim = NULL);
 bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster = NULL, Unit* victim = NULL);
 bool IsPositiveEffect(SpellEntry const *spellInfo, SpellEffectIndex effIndex, Unit* caster = NULL, Unit* victim = NULL);
 bool IsPositiveTarget(uint32 targetA, uint32 targetB);
+bool IsHealSpell(SpellEntry const *spellProto);
 
 bool IsExplicitPositiveTarget(uint32 targetA);
 bool IsExplicitNegativeTarget(uint32 targetA);
@@ -513,14 +514,14 @@ enum ProcFlags
     PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT   = 0x00000100,   // 08 Successful Ranged attack by Spell that use ranged weapon
     PROC_FLAG_TAKEN_RANGED_SPELL_HIT        = 0x00000200,   // 09 Taken damage by Spell that use ranged weapon
 
-    PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT   = 0x00000400,   // 10 Successful AoE (not 100% shure unused)
-    PROC_FLAG_TAKEN_POSITIVE_AOE            = 0x00000800,   // 11 Taken AoE      (not 100% shure unused)
+    PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL    = 0x00000400,   // 10 Successful positive spell cast (no damage class, or not a healing spell)
+    PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL         = 0x00000800,   // 11 Taken positive spell (no damage class)
 
-    PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT      = 0x00001000,   // 12 Successful AoE damage spell hit (not 100% shure unused)
-    PROC_FLAG_TAKEN_AOE_SPELL_HIT           = 0x00002000,   // 13 Taken AoE damage spell hit      (not 100% shure unused)
+    PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT         = 0x00001000,   // 12 Successful negative spell cast (no damage class)
+    PROC_FLAG_TAKEN_NONE_SPELL_HIT              = 0x00002000,   // 13 Taken negative damage (no damage class)
 
-    PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL     = 0x00004000,   // 14 Successful cast positive spell (by default only on healing)
-    PROC_FLAG_TAKEN_POSITIVE_SPELL          = 0x00008000,   // 15 Taken positive spell hit (by default only on healing)
+    PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL     = 0x00004000,   // 14 Successful cast positive spell (by default only on healing (direct and periodic))
+    PROC_FLAG_TAKEN_POSITIVE_SPELL          = 0x00008000,   // 15 Taken positive spell hit (by default only on healing (direct and periodic))
 
     PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT = 0x00010000,   // 16 Successful negative spell cast (by default only on damage)
     PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT      = 0x00020000,   // 17 Taken negative spell (by default only on damage)
@@ -537,7 +538,8 @@ enum ProcFlags
     PROC_FLAG_SUCCESSFUL_AOE                = 0x01000000,   // 24 Nostalrius: AoE casted. Triggered only once, whatever the number of targets.
     PROC_FLAG_SUCCESSFUL_SPELL_CAST         = 0x02000000,   // 25 Nostalrius: Spell cast successful (procs only once for AoE)
 
-    PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST    = 0x04000000    // 26 Successful cast of a mana based spell (procs only once for AoE)
+    PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST    = 0x04000000,   // 26 Successful cast of a mana based spell (procs only once for AoE)
+    PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST    = 0x08000000    // 27 Successful cast of curing spell (i.e. Cleanse)
 };
 
 #define MELEE_BASED_TRIGGER_MASK (PROC_FLAG_SUCCESSFUL_MELEE_HIT        | \
@@ -550,8 +552,8 @@ enum ProcFlags
                                   PROC_FLAG_TAKEN_RANGED_SPELL_HIT)
 
 #define NEGATIVE_TRIGGER_MASK (MELEE_BASED_TRIGGER_MASK                | \
-                               PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT      | \
-                               PROC_FLAG_TAKEN_AOE_SPELL_HIT           | \
+                               PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT     | \
+                               PROC_FLAG_TAKEN_NONE_SPELL_HIT          | \
                                PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT | \
                                PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT)
 

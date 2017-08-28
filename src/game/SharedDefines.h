@@ -2140,6 +2140,14 @@ enum DiminishingGroup
     DIMINISHING_LIMITONLY
 };
 
+enum DiminishingLevels
+{
+    DIMINISHING_LEVEL_1 = 0,
+    DIMINISHING_LEVEL_2 = 1,
+    DIMINISHING_LEVEL_3 = 2,
+    DIMINISHING_LEVEL_IMMUNE = 3
+};
+
 enum SummonType
 {
     SUMMON_TYPE_CRITTER     = 41,

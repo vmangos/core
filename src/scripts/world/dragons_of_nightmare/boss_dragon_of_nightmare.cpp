@@ -7,20 +7,24 @@
 #include "boss_dragon_of_nightmare.h"
 #include "HardcodedEvents.h"
 
-uint32 GetDrakeVar(uint32 guid)
+uint32 GetDrakeVar(uint32 entry)
 {
-    switch (guid)
+    switch (entry)
     {
-    case GUID_YSONDRE:  return VAR_PERM_1;
-    case GUID_LETHON:   return VAR_PERM_2;
-    case GUID_EMERISS:  return VAR_PERM_3;
-    default:            return VAR_PERM_4;
+        case NPC_YSONDRE:  return VAR_PERM_1;
+        case NPC_LETHON:   return VAR_PERM_2;
+        case NPC_EMERISS:  return VAR_PERM_3;
+        default:           return VAR_PERM_4; // Taerar
     }
 }
 
 boss_dragon_of_nightmareAI::boss_dragon_of_nightmareAI(Creature* pCreature) : ScriptedAI(pCreature)
 {
     boss_dragon_of_nightmareAI::Reset();
+
+    // The entry changes back to the default when the boss respawns. Re-apply
+    // the current permutation by ensuring the AI is re-initialized on respawn
+    m_creature->SetAInitializeOnRespawn(true);
 }
 
 void boss_dragon_of_nightmareAI::Reset()
@@ -49,16 +53,6 @@ void boss_dragon_of_nightmareAI::EnterEvadeMode()
 
 void boss_dragon_of_nightmareAI::JustDied(Unit* pKiller)
 {
-    uint32 varAliveCount = DEF_ALIVE_COUNT;
-    DragonsOfNightmare::CheckSingleVariable(VAR_ALIVE_COUNT, varAliveCount);
-    --varAliveCount;
-    sObjectMgr.SetSavedVariable(VAR_ALIVE_COUNT, varAliveCount, true);
-
-    if (varAliveCount) return;
-
-    sObjectMgr.SetSavedVariable(VAR_REQ_UPDATE, DEF_STOP_DELAY, true);
-    sObjectMgr.SetSavedVariable(VAR_RESP_TIME, time(nullptr) + urand(4 * 24 * 3600, 7 * 24 * 3600), true);
-
     ScriptedAI::JustDied(pKiller);
 }
 
@@ -241,7 +235,7 @@ GameObjectAI* GetAI_go_putrid_shroom(GameObject* pGo)
 
 CreatureAI* GetAI_boss_dragon_of_nightmare(Creature* pCreature)
 {
-    auto permVar = GetDrakeVar(pCreature->GetObjectGuid().GetCounter());
+    auto permVar = GetDrakeVar(pCreature->GetEntry());
     auto permEntry = sObjectMgr.GetSavedVariable(permVar, 0);
 
     if (permEntry && permEntry != pCreature->GetEntry())

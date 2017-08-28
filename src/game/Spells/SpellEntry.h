@@ -28,6 +28,7 @@
 // Diminishing Returns interaction with spells
 bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
+float GetDiminishingRate(uint32 type);
 
 
 class SpellEntry
