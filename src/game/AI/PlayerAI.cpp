@@ -169,7 +169,7 @@ Unit* PlayerControlledAI::FindController()
 
 void PlayerControlledAI::UpdateTarget(Unit* victim)
 {
-    if (victim->isCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid())
+    if ((victim->isCharmed() && victim->GetCharmerGuid() == me->GetCharmerGuid()) || me->isFeared() || me->IsPolymorphed())
     {
         me->AttackStop();
         me->CastStop();
