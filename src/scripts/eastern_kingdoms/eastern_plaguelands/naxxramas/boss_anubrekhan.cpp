@@ -233,7 +233,7 @@ struct boss_anubrekhanAI : public ScriptedAI
     {
         m_uiImpaleTimer = IMPALE_CD();
         m_uiLocustSwarmTimer = LOCUST_SWARM_CD(true);
-        m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + 20000 + urand(5000, 10000); // 5-10s after swarm end
+        m_uiCorpseExplosionTimer = urand(20000, 80000);
         m_firstBlood = false;
         m_uiRestoreTargetTimer = 0;
 
@@ -341,11 +341,11 @@ struct boss_anubrekhanAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
     
-    void ExplodeOneDeadCryptGuard()
+    bool ExplodeOneDeadCryptGuard()
     {
         if (deadCryptGuards.size() == 0)
-            return;
-
+            return false;
+         
         int idx = urand(0, deadCryptGuards.size() - 1);
         ObjectGuid deadCryptGuard = deadCryptGuards[idx];
         auto it = deadCryptGuards.begin() + idx;
@@ -378,8 +378,10 @@ struct boss_anubrekhanAI : public ScriptedAI
             // Despawning the Crypt guard
             if (TemporarySummon* tmpSumm = static_cast<TemporarySummon*>(cg)) {
                 tmpSumm->UnSummon(250);
+                return true;
             }
         }
+        return false;
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -432,8 +434,10 @@ struct boss_anubrekhanAI : public ScriptedAI
 
         if (m_uiCorpseExplosionTimer < uiDiff)
         {
-            ExplodeOneDeadCryptGuard();
-            m_uiCorpseExplosionTimer = m_uiLocustSwarmTimer + 20000 + urand(5000, 10000);
+            if(ExplodeOneDeadCryptGuard())
+                m_uiCorpseExplosionTimer = urand(20000, 80000);
+            else
+                m_uiCorpseExplosionTimer = urand(10000, 20000);
         }
         else
             m_uiCorpseExplosionTimer -= uiDiff;
