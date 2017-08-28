@@ -75,10 +75,7 @@ enum Events
     EVENT_CLEAVE = 9,
     EVENT_FROST_BREATH_DUMMY = 10,
     EVENT_FROST_BREATH_CAST = 11,
-    EVENT_SET_HOVER = 12,
-    EVENT_UNSET_HOVER = 13,
-    EVENT_CHECK_EVADE = 14,
-    EVENT_REMOVE_NO_COMBAT_MOVEMENT = 15,
+    EVENT_CHECK_EVADE = 12,
 };
 
 enum Phase
@@ -407,8 +404,6 @@ struct boss_sapphironAI : public ScriptedAI
             data << uint32(0);
             m_creature->SendMovementMessageToSet(std::move(data), true);
             
-            events.ScheduleEvent(EVENT_SET_HOVER, Seconds(2));
-
             m_creature->m_TargetNotReachableTimer = 0;
             if (m_creature->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
                 m_creature->ClearTemporaryFaction();
@@ -550,7 +545,7 @@ struct boss_sapphironAI : public ScriptedAI
                     pWG->CastSpell(pWG, SPELL_PERIODIC_BUFFET, true);
                     wingBuffetCreature = pWG->GetObjectGuid();
                 }
-                
+
                 setHover(true);
 
                 break;
@@ -580,10 +575,14 @@ struct boss_sapphironAI : public ScriptedAI
                 events.ScheduleEvent(EVENT_MOVE_TO_FLY, Seconds(urand(50, 70))); // Sampling videos show its 50-70sec between engaging after landing, and disengaging to fly again
                 events.ScheduleEvent(EVENT_TAIL_SWEEP, Seconds(12));
                 events.ScheduleEvent(EVENT_CLEAVE, Seconds(5));
-                                
-                // give 1 extra second of no combat movement, looks like hes "stuck" in the middle a bit extra
-                // after airphase to avoid him running off after tank
-                events.ScheduleEvent(EVENT_REMOVE_NO_COMBAT_MOVEMENT, Seconds(1)); 
+
+                SetCombatMovement(true);
+                m_creature->GetMotionMaster()->Clear(false);
+                m_creature->SelectHostileTarget();
+                if (m_creature->getVictim())
+                {
+                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
+                }
                 break;
             }
             case EVENT_ICEBOLT:
@@ -606,10 +605,7 @@ struct boss_sapphironAI : public ScriptedAI
                 if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH) != CAST_OK)
                     events.Repeat(100);
                 else
-                {
-                    events.ScheduleEvent(EVENT_UNSET_HOVER, 5000);
                     events.ScheduleEvent(EVENT_LAND, 7000);
-                }
                 break;
             }
             case EVENT_BLIZZARD:
@@ -627,42 +623,29 @@ struct boss_sapphironAI : public ScriptedAI
                 break;
             }
             case EVENT_LIFEDRAIN:
+            {
                 if (DoCastSpellIfCan(m_creature, SPELL_LIFE_DRAIN) == CAST_OK)
                     events.Repeat(Seconds(24));
                 else
                     events.Repeat(100);
                 break;
+            }
             case EVENT_TAIL_SWEEP:
+            {
                 if (DoCastSpellIfCan(m_creature, SPELL_TAIL_SWEEP) == CAST_OK)
                     events.Repeat(Seconds(urand(7, 10)));
                 else
                     events.Repeat(100);
                 break;
+            }
             case EVENT_CLEAVE:
+            {
                 if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
                     events.Repeat(Seconds(urand(5, 10)));
                 else
                     events.Repeat(100);
                 break;
-            case EVENT_SET_HOVER:
-            {
-                //m_creature->CastSpell(m_creature, 17131, true);
-                //m_creature->GetMotionMaster()->MovePoint(MOVE_POINT_FLYPOINT, m_creature->GetPositionX(), m_creature->GetPositionY(), 137.7f+6.0f, MOVE_PATHFINDING | MOVE_FLY_MODE);
-                break;
             }
-            case EVENT_UNSET_HOVER:
-                //m_creature->RemoveAurasDueToSpell(17131);
-                break;
-            case EVENT_REMOVE_NO_COMBAT_MOVEMENT:
-                phase = PHASE_GROUND;
-                SetCombatMovement(true);
-                m_creature->GetMotionMaster()->Clear(false);
-                m_creature->SelectHostileTarget();
-                if (m_creature->getVictim())
-                {
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                }
-                break;
             }
         }
 
