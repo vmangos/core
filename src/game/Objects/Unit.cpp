@@ -8198,7 +8198,7 @@ bool Unit::SelectHostileTarget()
         Unit* caster;
 
         // The last taunt aura caster is alive an we are happy to attack him
-        if ((caster = tauntAuras.back()->GetCaster()) && caster->isAlive())
+        if ((caster = tauntAuras.back()->GetCaster()) && caster->isAlive() && IsValidAttackTarget(caster))
             return true;
         else if (tauntAuras.size() > 1)
         {
