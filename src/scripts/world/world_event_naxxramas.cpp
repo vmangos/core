@@ -314,9 +314,11 @@ struct NecropolisRelayAI : public ScriptedAI
 
     uint32     _checkStatusTimer;
     ObjectGuid _necropolisGuid;
+    uint32 _animationTimer;
 
     void Reset()
     {
+        _animationTimer = 1000;
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
 
@@ -333,8 +335,40 @@ struct NecropolisRelayAI : public ScriptedAI
                 crea->AI()->InformGuid(_necropolisGuid);
     }
 
-    void UpdateAI(const uint32 diff)
+    // Update Visibility on necropolis, shown zone wide for every player
+    void UpdateVisibility(bool visible)
     {
+        Map::PlayerList const& list = me->GetMap()->GetPlayers();
+        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
+        {
+            Player* player = it->getSource();
+
+            // Update visibility only for players in zone
+            if (visible && player->GetZoneId() == me->GetZoneId())
+            {
+                UpdateData data;
+                me->BuildCreateUpdateBlockForPlayer(&data, player);
+                WorldPacket packet;
+                data.BuildPacket(&packet, false);
+                player->GetSession()->SendPacket(&packet);
+            }
+            else if (!visible)
+                me->DestroyForPlayer(player);
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (_animationTimer < uiDiff)
+        {
+            UpdateVisibility(true);
+            _animationTimer = urand(20000, 30000);
+        }
+        else
+        {
+            UpdateVisibility(false);
+            _animationTimer -= uiDiff;
+        }
     }
 };
 
