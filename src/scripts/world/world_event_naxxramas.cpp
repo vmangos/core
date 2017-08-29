@@ -290,7 +290,6 @@ struct NecropolisProxyAI : public ScriptedAI
         }
         else
         {
-            UpdateVisibility(false);
             _animationTimer -= uiDiff;
         }
     }
@@ -366,7 +365,6 @@ struct NecropolisRelayAI : public ScriptedAI
         }
         else
         {
-            UpdateVisibility(false);
             _animationTimer -= uiDiff;
         }
     }
