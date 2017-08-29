@@ -747,7 +747,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                                      getVictim() &&
                                      GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
                                      !HasDistanceCasterMovement() &&
-                                     (!IsWithinDistInMap(getVictim(), GetMaxChaseDistance(getVictim())) || !IsWithinLOSInMap(getVictim())) &&
+                                     (!CanReachWithMeleeAttack(getVictim()) || !IsWithinLOSInMap(getVictim())) &&
                                      !GetMotionMaster()->operator->()->IsReachable();
             // No evade mode for pets.
             if (unreachableTarget && GetCharmerOrOwnerGuid().IsPlayer())

@@ -10612,15 +10612,21 @@ float Unit::GetCombatReach(Unit const* pVictim, bool forMeleeRange /*=true*/, fl
 
 bool Unit::CanReachWithMeleeAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const
 {
+    float x = GetPositionX(), y = GetPositionY(), z = GetPositionZ();
+
+    return CanReachWithMeleeAttackAtPosition(pVictim, x, y, z, flat_mod);
+}
+
+bool Unit::CanReachWithMeleeAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod /*= 0.0f*/) const
+{
     if (!pVictim || !pVictim->IsInWorld())
         return false;
 
     float reach = GetCombatReach(pVictim, true, flat_mod);
 
-    // This check is not related to bounding radius
-    float dx = GetPositionX() - pVictim->GetPositionX();
-    float dy = GetPositionY() - pVictim->GetPositionY();
-    float dz = GetPositionZ() - pVictim->GetPositionZ();
+    float dx = x - pVictim->GetPositionX();
+    float dy = y - pVictim->GetPositionY();
+    float dz = z - pVictim->GetPositionZ();
 
     return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < MELEE_Z_LIMIT);
 }

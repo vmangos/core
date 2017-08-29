@@ -1811,6 +1811,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void GetRandomAttackPoint(const Unit* target, float &x, float &y, float &z) const;
 
         bool CanReachWithMeleeAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
+        bool CanReachWithMeleeAttackAtPosition(Unit const* pVictim, float x, float y, float z, float flat_mod = 0.0f) const;
         bool CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod = 0.0f) const;
 
         // Caster movement
