@@ -1057,7 +1057,7 @@ struct GhoulBerserker : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1121,7 +1121,7 @@ struct SpectralSoldierAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1183,7 +1183,7 @@ struct SkeletalShocktrooperAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1244,7 +1244,7 @@ struct SkeletalTrooperAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1301,7 +1301,7 @@ struct SpectralSpiritAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -1345,7 +1345,7 @@ struct SpectralApparitionAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL);
+            DoCastSpellIfCan(shard, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
