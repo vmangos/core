@@ -1126,7 +1126,7 @@ VALUES
 UPDATE `creature_model_info` SET `combat_reach`='5' WHERE `modelid` = 16110;
 
 
-UPDATE `creature_template` SET `minhealth`=5329600, `maxhealth`=5329600, `mindmg`=5491, `maxdmg`=7280 WHERE `entry`=16011;
+UPDATE `creature_template` SET `minhealth`=5329600, `maxhealth`=5329600, `mindmg`=5491, `maxdmg`=7280,`armor`=5491 WHERE `entry`=16011;
 
 
 
@@ -1224,7 +1224,7 @@ VALUES
 */
 
 -- increased patcwerks movementspeed slightly
-UPDATE `creature_template` SET `speed_walk`='1.5', `speed_run`='1.5', `baseattacktime`=1500, `minhealth`=3997200, `maxhealth`=3997200, `mindmg`=8319, `maxdmg`=8923 WHERE `entry`=16028;
+UPDATE `creature_template` SET `speed_walk`='1.5', `speed_run`='1.5', `baseattacktime`=1500, `minhealth`=3997200, `maxhealth`=3997200, `mindmg`=8319, `maxdmg`=8923,`armor`=5491 WHERE `entry`=16028;
 
 -- patchwerk slightly larger hitbox
 UPDATE `creature_model_info` SET `combat_reach`='5' WHERE modelid = 16174;
@@ -1358,7 +1358,7 @@ VALUES
 -- much bigger hitbox on thaddius' model
 UPDATE `creature_model_info` SET `bounding_radius`='10', `combat_reach`='10' WHERE `modelid`='16137';
 
-UPDATE `creature_template` SET `minhealth`=6662000, `maxhealth`=6662000, `mindmg`=5491, `maxdmg`=7280 WHERE `entry`=15928;
+UPDATE `creature_template` SET `minhealth`=6662000, `maxhealth`=6662000, `mindmg`=5491, `maxdmg`=7280,`armor`=5491 WHERE `entry`=15928;
 
 
 
