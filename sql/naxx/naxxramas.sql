@@ -162,6 +162,8 @@ UPDATE `creature_ai_scripts` SET `event_param1`=7000, `event_param2`=7000, `even
 UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=3000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1645203;
 UPDATE `creature_ai_scripts` SET `event_param1`=3500, `event_param2`=3500, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1645206;
 
+UPDATE `creature_template` SET `mindmg`=2045, `maxdmg`=2704 WHERE `entry`=16452;
+
 -- death knight vindicator, increase frequency of aura of agony and death coil hit maintank
 UPDATE `creature_ai_scripts` SET `action1_param2`=1 WHERE `id`=1645103;
 UPDATE `creature_ai_scripts` SET `event_param2`=2500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1645101;
@@ -297,6 +299,9 @@ VALUES
 (1636802, 16368, 0, 0, 100, 1, 2500, 2500, 6000, 6000, 11, 27646, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Necropolis Acolyte shadow bolt volley'),
 (1644801, 16448, 0, 0, 100, 1, 6000, 8000, 8000, 10000, 11, 30121, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Plagued Deathhound forceful howl');
 
+-- Plagued Ghoul
+UPDATE `creature_template` SET `mindmg`=2778, `maxdmg`=3683 WHERE `entry`=16447;
+
 -- Spirit of Naxxramas given script and correct faction
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai', `minhealth`=150000, `maxhealth`=150000,`mindmg`=4100, `maxdmg`=5100 WHERE `entry`=16449;
 
@@ -304,7 +309,7 @@ UPDATE `creature_template` SET `AIName`='', `ScriptName`='spirit_of_naxxramas_ai
 UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `armor`=3200, `mindmg`=1500, `maxdmg`=2200, `attackpower`=320, `dmg_multiplier`=1, `type`=6, `MovementType`=1, `speed_walk`='0.5', `speed_run`='0.5', `AIName`='EventAI' WHERE `entry`=16419;
 
 -- plagued gargoyle switch from eventAI to script. Immmune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai',`speed_run`=1.5 WHERE `entry`=16446;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai',`speed_run`=1.5, `mindmg`=3695, `maxdmg`=4889  WHERE `entry`=16446;
 
 -- necropolis acolyte updates
 UPDATE `creature_ai_scripts` SET `event_param1`=500, `event_param2`=500, `event_param3`=6000, `event_param4`=6000 WHERE `id`=1636801;
@@ -315,7 +320,8 @@ UPDATE `creature_template` SET `minhealth`=110197, `maxhealth`=110197, `mindmg`=
 -- Plagued deathhound ai
 UPDATE `creature_template` SET `minhealth`=93736, `maxhealth`=93736, `maxmana`=93736, `scale`=2.5, `AIName`='EventAI' WHERE `entry`=16448;
 
-
+-- Infectious Ghoul
+UPDATE `creature_template` SET `mindmg`=2778, `maxdmg`=3683 WHERE `entry`=16244;
 
 -- Archmage Tarsis gossip stuff
 DELETE FROM gossip_menu where entry between 8400 and 8409;
@@ -386,12 +392,13 @@ VALUES
 
 -- sludge belcher HP
 UPDATE `creature_template` SET `minhealth`=248189, `maxhealth`=248189 WHERE `entry`=16029;
-DELETE FROM `creature_ai_scripts` WHERE id in (1638501,1638502,1601703,1602902,1614202, 1602903,1602402);
+DELETE FROM `creature_ai_scripts` WHERE id in (1638501,1638502,1601703,1601704,1602902,1614202, 1602903,1602402);
 INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) 
 VALUES
 (1638501, 16385, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28298, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning Totem aura on spawn'),
 (1638502, 16385, 7, 0, 100, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning totem despawn on evade'),
 (1601703, 16017, 11, 0, 100, 1, 0, 0, 0, 0, 11, 27793, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem disease cloud on spawn'),
+(1601704, 16017, 12, 0, 100, 1, 19, 0, 4000, 5000, 11, 7160, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem Execute');
 (1602902, 16029, 0, 0, 100, 1, 5000, 5000, 10000, 10000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge'),
 -- (1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc'),
 (1602903, 16029, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge belcher disease cloud on spawn'),
@@ -409,13 +416,13 @@ UPDATE `creature_ai_scripts` SET `event_param1`=3000, `event_param2`=4000, `even
 UPDATE `creature_ai_scripts` SET `event_type`=0, `event_flags`=1, `event_param1`=10000, `event_param2`=10000, `event_param3`=10000, `event_param4`=10000 WHERE `id`=1614201;
 
 -- Patchwork golem
-UPDATE `creature_template` SET `mindmg`=3575, `maxdmg`=4105, `baseattacktime`=1480,`minhealth`=87532, `maxhealth`=87532 WHERE `entry`=16017;
+UPDATE `creature_template` SET `mindmg`=3968, `maxdmg`=5261, `baseattacktime`=1480,`minhealth`=87532, `maxhealth`=87532 WHERE `entry`=16017;
 -- bile retcher
-UPDATE `creature_template` SET `mindmg`=3875, `maxdmg`=4505, `baseattacktime`=1480,`minhealth`=187197, `maxhealth`=187197 WHERE `entry`=16018;
+UPDATE `creature_template` SET `mindmg`=3704, `maxdmg`=4911, `baseattacktime`=1480,`minhealth`=187197, `maxhealth`=187197 WHERE `entry`=16018;
 -- Sludge Belcher
-UPDATE `creature_template` SET `mindmg`=4200, `maxdmg`=4900, `baseattacktime`=1480,`minhealth`=195189, `maxhealth`=195189 WHERE `entry`=16029;
+UPDATE `creature_template` SET `mindmg`=3776, `maxdmg`=5009, `baseattacktime`=1480,`minhealth`=195189, `maxhealth`=195189 WHERE `entry`=16029;
 -- Stitched Spewer
-UPDATE `creature_template` SET `mindmg`=4500, `maxdmg`=5200, `baseattacktime`=1480,`minhealth`=217197, `maxhealth`=217197 WHERE `entry`=16025;
+UPDATE `creature_template` SET `mindmg`=4119, `maxdmg`=5462, `baseattacktime`=1480,`minhealth`=217197, `maxhealth`=217197 WHERE `entry`=16025;
 
 DELETE FROM `spell_effect_mod` where Id in (28310);
 INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`,
@@ -502,7 +509,8 @@ INSERT INTO `creature_ai_scripts`
 VALUES
 (1614603, 16146, 0, 0, 100, 1, 5000, 5000, 10000, 20000, 11, 28353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight raise dead'),
 (1614604, 16146, 11, 0, 100, 0, 0, 0, 0, 0, 11, 13589, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathknight haste aura');
-UPDATE `creature_template` SET flags_extra`=4096 WHERE `entry`=16146; -- keep positive auras on death
+
+UPDATE `creature_template` SET `flags_extra`=4096 WHERE `entry`=16146; -- keep positive auras on death
 
 -- Death knight frequency of intimidating shout reduced
 UPDATE `creature_ai_scripts` SET `event_param3`=14000, `event_param4`=18000 WHERE `id`=1614601;
@@ -649,10 +657,10 @@ INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4117', 'at_n
 -- deathknight vindicator faster aura of agony
 UPDATE `creature_ai_scripts` SET `event_param3`=4000, `event_param4`=4000, `action1_param2`=0 WHERE `id`=1645101;
 
-UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=3415 WHERE `entry`=16154; -- risen deathkngiht
-UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=3415 WHERE `entry`=16156; -- dark touched warrior
-UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=2600 WHERE `entry`=16157; -- doom touched warrior
-UPDATE `creature_template` SET `minhealth`=48478, `maxhealth`=48478, `maxdmg`=3415 WHERE `entry`=16158; -- death touched warrior
+UPDATE `creature_template` SET `minhealth`=24260, `maxhealth`=24260, `maxdmg`=3415 WHERE `entry`=16154; -- risen deathkngiht
+UPDATE `creature_template` SET `minhealth`=24372, `maxhealth`=24372, `maxdmg`=3415 WHERE `entry`=16156; -- dark touched warrior
+UPDATE `creature_template` SET `minhealth`=24997, `maxhealth`=24997, `maxdmg`=2600 WHERE `entry`=16157; -- doom touched warrior
+UPDATE `creature_template` SET `minhealth`=24734, `maxhealth`=24734, `maxdmg`=3415 WHERE `entry`=16158; -- death touched warrior
 
 
 
@@ -717,7 +725,7 @@ VALUES
 */
 
 -- Stoneskin gargoyle switch from eventAI to script. Immune to pmuch everything
-UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai',`speed_run`=1.5 WHERE `entry`=16168;
+UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_gargoyle_ai',`speed_run`=1.5, `armor`=4096, `mindmg`=3547, `maxdmg`=4693  WHERE `entry`=16168;
 
 -- Plague Slime switch from eventAI to script
 UPDATE `creature_template` SET `AIName`='', `ScriptName`='naxxramas_plague_slime_ai' WHERE `entry`=16243;
@@ -912,11 +920,13 @@ VALUES
 (1612701, 16127, 0, 0, 100, 1, 1000, 1500,  3000,  4000, 11, 27989, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Trainee Arcane Explosion'),
 (1612702, 16127, 0, 0, 100, 1, 3000, 3000, 10000, 11000, 11, 27990, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Trainee fear random'),
 (1614801, 16148, 0, 0, 100, 1, 1000, 3000,  5000,  6000, 11, 27991, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Death Knight Sunder Armor'),
+(1614803, 16148, 0, 0, 100, 1, 10000, 20000, 15000, 20000, 11, 28333, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Death Knight whirlwind'),
 (1614802, 16148, 0, 0, 100, 1, 5000, 10000, 10000, 12000, 11, 27992, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Death Knight Mana Burn'),
 (1614901, 16149, 0, 0, 100, 1, 2000, 5000, 30500, 30500, 11, 27993, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Horse cast Stomp'),
 (1615001, 16150, 0, 0, 100, 1, 3001, 5000, 10000, 12000, 11, 27994, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider life drain on random hostile'),
-(1615002, 16150, 0, 0, 100, 1, 1000, 3000,  8000, 10000, 11, 27994, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider Unholy Frenzy'),
+(1615002, 16150, 16, 0, 100, 1, 27995, 30,  5000, 10000, 11, 27995, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider Unholy Frenzy on friendly');
 (1615003, 16150, 11,0, 100, 0,   0,    0,     0,     0,  11, 27987, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider Unholy Aura on spawn');
+
 
 -- unrelenting trainee
 UPDATE `creature_template` SET `mindmg`=700, `maxdmg`=1000 WHERE `entry`=16124;
@@ -951,13 +961,13 @@ UPDATE creature_template set minhealth = 399750, maxhealth = 399750 where entry 
 
 -- Set her base attackspeed to 2.5sec, based on https://www.youtube.com/watch?v=pVjB7pCX3XM
 -- but increase it again to 1.75 because its too easy to survive enrage phase without dispelling :/
-UPDATE `creature_template` SET `baseattacktime`=1750,`speed_run`='1.4' WHERE `entry`=15953;
+UPDATE `creature_template` SET `baseattacktime`=1750,`speed_run`='1.4', `mindmg`=5492, `maxdmg`=7281 WHERE `entry`=15953;
 
 -- give Worshippers widows embrace and eventAI
-UPDATE `creature_template` SET `spell1`=28732, `AIName`='EventAI' WHERE `entry`=16506;
+UPDATE `creature_template` SET `spell1`=28732, `AIName`='EventAI' WHERE, `minhealth`=88040, `maxhealth`=88040, `mindmg`=3194, `maxdmg`=4215  `entry`=16506;
 
 -- follower has aoe silence spell and eventAI
-UPDATE `creature_template` SET `spell1`=29943, `AIName`='EventAI' WHERE `entry`=16505;
+UPDATE `creature_template` SET `spell1`=29943, `AIName`='EventAI', `mindmg`=4562, `maxdmg`=6022 WHERE `entry`=16505;
 
 
 -- follower eventAI entry for periodically casting aoe silence
@@ -1351,7 +1361,7 @@ VALUES
 UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15929;
 
 -- Feugen attackspeed to 2sec
-UPDATE `creature_template` SET `baseattacktime` = 2000 WHERE entry = 15930;
+UPDATE `creature_template` SET `baseattacktime` = 2000, `mindmg`=6178, `maxdmg`=8190 WHERE entry = 15930;
 
 -- The shock spell used by tesla coil creatures on thaddius needs explisit target
 DELETE FROM `spell_script_target` where entry = 28159;
@@ -2768,7 +2778,7 @@ VALUES
 (88460,16061,533,16582,0,2755.56,-3098.04,267.86,6.27,604800,0,0,1998600,0,0,2,0),
 (2530465,16036,533,0,0,2895.02,-3649.39,276.352,5.31885,30,7,0,10283,12000,0,1,0),
 (2530432,16447,533,0,0,2731.5,-2984.48,240.525,6.26198,3520,0,0,93736,0,0,0,0),
-(88457,16158,533,16533,0,2795.27,-3159.02,273.97,4.47,3520,0,0,24734,12000,0,0,0),
+(88457,16158,533,16533,0,2795.27,-3159.02,273.97,4.47,3520,0,0,48478,12000,0,0,0),
 (88456,16156,533,16534,0,2858.83,-3129.66,273.787,4.73594,3520,0,0,24372,12000,0,0,0),
 (88455,16154,533,0,525,2852.05,-3139.9,273.804,0.329851,3520,0,0,24260,0,0,0,0),
 (88454,16154,533,0,525,2862.17,-3147.76,273.789,1.70273,3520,0,0,24260,0,0,0,0),
