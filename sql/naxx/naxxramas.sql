@@ -1136,8 +1136,9 @@ UPDATE `creature_template` SET `minhealth`=5329600, `maxhealth`=5329600, `mindmg
 * Maexxna
 */
 
--- dmg/hp source: http://www.kurai.com/wow/naxx/maexxna.jpg
-UPDATE `creature_template` SET `minhealth`=1498950, `maxhealth`=1498950, `armor`=3731, `mindmg`=5491, `maxdmg`=7281, `speed_run`='1.65' WHERE `entry`=15952;
+-- dmg/hp/armor source: http://www.kurai.com/wow/naxx/maexxna.jpg
+-- Due to the ease at which you can skip aoe web during enrage phase, we use regular armor values 
+UPDATE `creature_template` SET `minhealth`=1498950, `maxhealth`=1498950, `armor`=4691, /*`armor`=3731*/, `mindmg`=5491, `maxdmg`=7281, `speed_run`='1.65',`baseattacktime`=2000 WHERE `entry`=15952;
 
 -- give web-wrap correct faction
 UPDATE `creature_template` SET faction_A = 16, faction_H = 16 WHERE entry = 16486;
