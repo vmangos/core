@@ -4659,8 +4659,8 @@ bool ChatHandler::ShowAccountListHelper(QueryResult* result, uint32* limit, bool
 
 bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
 {
-    char* ipOrNameStr = ExtractQuotedOrLiteralArg(&args);
-    if (!ipOrNameStr)
+    char* ipStr = ExtractQuotedOrLiteralArg(&args);
+    if (!ipStr)
         return false;
 
     uint32 limit;
@@ -4668,17 +4668,7 @@ bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
         return false;
 
     QueryResult* result = NULL;
-    std::string ip = ipOrNameStr;
-    std::string normalizedName = ipOrNameStr;
-    if (normalizePlayerName(normalizedName))
-        if (PlayerCacheData const* data = sObjectMgr.GetPlayerDataByName(normalizedName))
-            if (result = LoginDatabase.PQuery("SELECT id, last_ip FROM account WHERE id = %u", data->uiAccount))
-            {
-                Field* fields = result->Fetch();
-                ip = fields[1].GetCppString();
-                delete result;
-            }
-
+    std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
     result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
 
@@ -4748,6 +4738,38 @@ bool ChatHandler::HandleLookupPlayerNameCommand(char* args)
     }
 
     return true;
+}
+
+bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
+{
+    char* nameStr = ExtractQuotedOrLiteralArg(&args);
+    if (!nameStr)
+        return false;
+
+    uint32 limit;
+    if (!ExtractOptUInt32(&args, limit, 100))
+        return false;
+
+    QueryResult* result = NULL;
+    std::string normalizedName = nameStr;
+    if (normalizePlayerName(normalizedName))
+        if (PlayerCacheData const* data = sObjectMgr.GetPlayerDataByName(normalizedName))
+            if (result = LoginDatabase.PQuery("SELECT id, last_ip FROM account WHERE id = %u", data->uiAccount))
+            {
+                Field* fields = result->Fetch();
+                uint32 id = fields[0].GetInt32();
+                std::string ip = fields[1].GetCppString();
+                delete result;
+
+                AccountTypes security = sAccountMgr.GetSecurity(id);
+                if (GetAccessLevel() < security || (GetAccessLevel() < SEC_ADMINISTRATOR && security > SEC_PLAYER))
+                    return LookupPlayerSearchCommand(NULL, &limit);
+
+                LoginDatabase.escape_string(ip);
+                result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
+            }
+
+    return LookupPlayerSearchCommand(result, &limit);
 }
 
 bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)

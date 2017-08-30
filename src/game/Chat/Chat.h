@@ -512,6 +512,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLookupPlayerAccountCommand(char* args);
         bool HandleLookupPlayerEmailCommand(char* args);
         bool HandleLookupPlayerNameCommand(char* args);
+        bool HandleLookupPlayerCharacterCommand(char* args);
         bool HandleLookupPoolCommand(char* args);
         bool HandleLookupQuestCommand(char* args);
         bool HandleLookupSkillCommand(char* args);
