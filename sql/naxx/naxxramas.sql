@@ -1087,7 +1087,7 @@ UPDATE `creature_template` SET `minhealth`=2012, `maxhealth`=2012, `speed_walk`=
 UPDATE `creature_template` SET `ScriptName`='soul_weaver_ai', `speed_walk`='0.1', `speed_run`='0.114286', `unit_flags`=0 /*256passive*/  WHERE `entry`=16429;
 
 -- guardian of icecrown. 
-UPDATE `creature_template` SET `minhealth`='3150000', `maxhealth`='3150000', `speed_run`='1.42858', rank=1, scale=0.7, `mindmg`=3250, `maxdmg`=3750, `ScriptName`='mob_guardian_icecrownAI' WHERE `entry`=16441;
+UPDATE `creature_template` SET `minhealth`='3150000', `maxhealth`='3150000', `speed_run`='1.42858', rank=1, scale=0.7, `mindmg`=4558, `maxdmg`=5359, `ScriptName`='mob_guardian_icecrownAI' WHERE `entry`=16441;
 UPDATE `creature_model_info` SET bounding_radius = 1.2, combat_reach = 3 where modelid = 16586;
 
 -- frost blast not resistable hack, cant find any evidence of it being binary or partially resistable
