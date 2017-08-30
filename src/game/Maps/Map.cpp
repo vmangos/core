@@ -1361,10 +1361,63 @@ const char* Map::GetMapName() const
 
 void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellPair cellpair)
 {
+    // Update visibility of objects in cells within draw distance
     cell.SetNoCreate();
     MaNGOS::VisibleChangesNotifier notifier(*obj);
     TypeContainerVisitor<MaNGOS::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
     cell.Visit(cellpair, player_notifier, *this, *obj, GetVisibilityDistance());
+
+    // Update visibility of active objects within the map.
+    // Important performance note: if continents are not instantiated
+    // the list of active objects can be large (~360 total in the world)
+    if (Player *player = obj->ToPlayer())
+        UpdateActiveObjectVisibility(player);
+}
+
+void Map::UpdateActiveObjectVisibility(Player *player)
+{
+    // Params for compressed data set - will only be compressed if packet size > 100 (multiple units)
+    ObjectGuidSet guids;
+    UpdateData data;
+    std::set<WorldObject*> visibleNow;
+
+    UpdateActiveObjectVisibility(player, guids, data, visibleNow);
+
+    if (data.HasData())
+        data.Send(player->GetSession());
+}
+
+// Not compressed
+void Map::UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids)
+{
+    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    {
+        WorldObject *obj = *m_activeNonPlayersIter;
+        if (obj->IsInWorld())
+        {
+            player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj);
+            visibleGuids.erase(obj->GetObjectGuid());
+        }
+
+        ++m_activeNonPlayersIter;
+    }
+}
+
+// Support for compressed data packet
+void Map::UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids, UpdateData &data, std::set<WorldObject*> &visibleNow)
+{
+    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    {
+        WorldObject *obj = *m_activeNonPlayersIter;
+        if (obj->IsInWorld())
+        {
+            // TODO: Why is this templated? Why not just base class WorldObject for the target...?
+            player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj, data, visibleNow);
+            visibleGuids.erase(obj->GetObjectGuid());
+        }
+
+        ++m_activeNonPlayersIter;
+    }
 }
 
 void Map::SendInitSelf(Player * player)

@@ -10428,6 +10428,7 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
     // Maximum spell range=100m ?
     MaNGOS::AnyUnitInObjectRangeCheck u_check(this, 100.0f);
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnitInObjectRangeCheck> searcher(targets, u_check);
+    // Don't need to use visibility modifier, units won't be able to cast outside of draw distance
     Cell::VisitAllObjects(this, searcher, GetMap()->GetVisibilityDistance());
     for (std::list<Unit*>::iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
@@ -10454,6 +10455,10 @@ void Unit::InterruptAttacksOnMe(float dist)
 {
     if (dist == 0.0f)
         dist = GetMap()->GetVisibilityDistance();
+
+    // Must use modifier, otherwise long range auto attacks will not toggle
+    dist += GetVisibilityModifier();
+
     std::list<Unit*> targets;
     MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);
@@ -10472,6 +10477,10 @@ void Unit::CombatStopInRange(float dist)
 {
     if (dist == 0.0f)
         dist = GetMap()->GetVisibilityDistance();
+
+    // must check with modifier, otherwise we could combat bug
+    dist += GetVisibilityModifier();
+
     std::list<Unit*> targets;
     MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck u_check(this, this, dist);
     MaNGOS::UnitListSearcher<MaNGOS::AnyUnfriendlyUnitInObjectRangeCheck> searcher(targets, u_check);

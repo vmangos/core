@@ -306,6 +306,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellPair cellpair);
 
+        void UpdateActiveObjectVisibility(Player *player);
+        void UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids);
+        void UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids, UpdateData &data, std::set<WorldObject*> &visibleNow);
+
         void resetMarkedCells() { marked_cells.reset(); }
         bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
         void markCell(uint32 pCellId) { marked_cells.set(pCellId); }

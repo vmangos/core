@@ -77,6 +77,11 @@ VisibleNotifier::Notify()
         }
     }
 
+    // Update current map active objects, modifies i_clientGUIDs so we are not sending
+    // out of range updates for an active obj
+    if (player.GetMap())
+        player.GetMap()->UpdateActiveObjectVisibility(&player, i_clientGUIDs, i_data, i_visibleNow);
+
     // generate outOfRange for not iterate objects
     i_data.AddOutOfRangeGUID(i_clientGUIDs);
     player.m_visibleGUIDs_lock.acquire_write();
