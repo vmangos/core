@@ -452,6 +452,13 @@ UPDATE `creature_ai_scripts` SET `event_type`=0, `event_param1`=15000, `event_pa
 -- Death knight captain increased dmg, but reduced attackspeed and ai
 UPDATE `creature_template` SET `mindmg`=3500, `maxdmg`=4250, `baseattacktime`=2500, `AIName`='EventAI', `ScriptName`='' WHERE `entry`=16145;
 
+-- names, really...
+UPDATE `creature_template` SET `name`='Deathknight Captain' WHERE `entry`=16145;
+UPDATE `creature_template` SET `name`='Deathknight' WHERE `entry`=16146;
+UPDATE `creature_template` SET `name`='Spectral Deathknight' WHERE `entry`=16148;
+UPDATE `creature_template` SET `name`='Deathknight Cavalier' WHERE `entry`=16163;
+UPDATE `creature_template` SET `name`='Deathknight Understudy' WHERE `entry`=16803;
+UPDATE `creature_template` SET `name`='Unrelenting Deathknight' WHERE `entry`=16125;
 
 -- deathknights offhand is a shield, not a mount like it was
 UPDATE `creature_template` SET `equipment_id` = 16146 where `entry` = 16146;
@@ -489,11 +496,13 @@ VALUES
 (1615801, 16158, 0, 0, 100, 1, 2000, 3000, 3000, 4000, 14, -100, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Touched Warrior periodically aggro wipe');
 
 -- Death Knight raise dead	
-DELETE FROM `creature_ai_scripts` where id = 1614603;
+DELETE FROM `creature_ai_scripts` where id in (1614603, 1614604);
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
-(1614603, 16146, 0, 0, 100, 1, 5000, 5000, 10000, 20000, 11, 28353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight raise dead');
+(1614603, 16146, 0, 0, 100, 1, 5000, 5000, 10000, 20000, 11, 28353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight raise dead'),
+(1614604, 16146, 11, 0, 100, 0, 0, 0, 0, 0, 11, 13589, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathknight haste aura');
+UPDATE `creature_template` SET flags_extra`=4096 WHERE `entry`=16146; -- keep positive auras on death
 
 -- Death knight frequency of intimidating shout reduced
 UPDATE `creature_ai_scripts` SET `event_param3`=14000, `event_param4`=18000 WHERE `id`=1614601;
@@ -5021,7 +5030,6 @@ update creature_template set flags_extra = 0 where entry in (
 16127, -- Spectral Trainee
 16142, -- Bile Sludge
 16145, -- Death Knight Captain
-16146, -- Death Knight
 16148, -- Spectral Death Knight
 16149, -- Spectral Horse
 16150, -- Spectral Rider
