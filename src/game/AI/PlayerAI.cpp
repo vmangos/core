@@ -24,6 +24,19 @@
 #include "SpellMgr.h"
 #include "MotionMaster.h"
 #include "MoveSpline.h"
+#include "Spell.h"
+
+// Misc spells we dont want players to cast
+static std::vector<uint32> priestSkipSpells =
+{
+    453,8123,8192,8193,10953,10954,  // mind soothe
+    1150,2096,2097,10909,10910,      // mind vision
+    1265,9580,9581,9593,10943,10944, // fade
+};
+static std::vector<uint32> hunterSkipSpells =
+{
+    75, // auto shot
+};
 
 void PlayerAI::Remove()
 {
@@ -34,7 +47,6 @@ void PlayerAI::Remove()
 PlayerAI::~PlayerAI()
 {
 }
-
 
 CanCastResult PlayerAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered, bool checkControlled)
 {
@@ -125,6 +137,25 @@ PlayerControlledAI::PlayerControlledAI(Player* pPlayer, Unit* caster) : uiGlobal
             continue;
         if (IsPositiveSpell(itr->first) && !enablePositiveSpells)
             continue;
+        switch (pPlayer->getClass())
+        {
+        case CLASS_WARRIOR:
+        case CLASS_ROGUE:
+        case CLASS_PALADIN:
+        case CLASS_DRUID:
+        case CLASS_SHAMAN:
+        case CLASS_MAGE:
+        case CLASS_WARLOCK:
+            break;
+        case CLASS_HUNTER:
+            if (std::find(hunterSkipSpells.begin(), hunterSkipSpells.end(), itr->first) != hunterSkipSpells.end())
+                continue;
+            break;
+        case CLASS_PRIEST:
+            if (std::find(priestSkipSpells.begin(), priestSkipSpells.end(), itr->first) != priestSkipSpells.end())
+                continue;
+            break;
+        }
         usableSpells.push_back(itr->first);
     }
     // Suppression des sorts dont on a deja des rangs superieurs
@@ -216,19 +247,21 @@ void PlayerControlledAI::UpdateTarget(Unit* victim)
         else
         {
             bool inMeleeRange = me->IsWithinMeleeRange(victim);
-            if ( (bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving()) )
+            if ( (bIsMelee && inMeleeRange) || (!bIsMelee && !me->IsMoving() && me->IsWithinDist(victim, 30.0f)))
             {
-                if(!me->isInFront(victim, 30.0f, 1.0f))
+                me->GetMotionMaster()->Clear();
+                if (bIsMelee && !me->HasInArc(0.2f, victim))
+                {
                     me->SetFacingToObject(victim);
+                }
+                else if (!me->HasInArc(0.5f, victim))
+                {
+                    me->SetFacingToObject(victim);
+                }
             }
-         
-            if (!me->GetMotionMaster()->empty() && me->GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
+            else
             {
-                if (bIsMelee && inMeleeRange)
-                    return;
-                else if (!bIsMelee && (me->GetDistance(victim) < me->GetMaxChaseDistance(victim)) )
-                    return;
-
+                // melee not in melee range or nonmoving caster not in caster range
                 if (!me->isInRoots() && !me->IsMoving())
                 {
                     me->GetMotionMaster()->Clear();
@@ -324,8 +357,22 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
 
         UpdateTarget(victim);
 
+
         if (uiGlobalCD < uiDiff)
         {
+            if (me->getClass() == CLASS_HUNTER)
+            {
+                float dist = me->GetDistance(victim);
+                if (dist > 10.0f)
+                {
+                    if (Spell* pSpell = me->GetCurrentSpell(CURRENT_AUTOREPEAT_SPELL))
+                    {
+                        if (pSpell->m_spellInfo && pSpell->m_spellInfo->Id != 75) // auto shoot
+                            me->CastSpell(victim, 75, true);
+                    }
+                }
+            }
+
             if (me->IsNonMeleeSpellCasted(true))
                 uiGlobalCD = 200;
             else
@@ -341,13 +388,21 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
                 else if (IsPositiveSpell(spellInfo, me, me))
                     spellTarget = me;
 
-                if (spellInfo && CanCastSpell(spellTarget, spellInfo, false, false) == CAST_OK)
+                if (spellInfo)
                 {
-                    me->CastSpell(spellTarget, spellId, false);
-                    uiGlobalCD = 1500;
+                    if (CanCastSpell(spellTarget, spellInfo, false, false) == CAST_OK)
+                    {
+                        me->CastSpell(spellTarget, spellId, false);
+                        uiGlobalCD = 1500;
+                        if(!bIsMelee)
+                            me->SetCasterChaseDistance(25.0f);
+                    }
+                    else
+                    {
+                        if (!bIsMelee)
+                            me->SetCasterChaseDistance(0.0f);
+                    }
                 }
-                else
-                    uiGlobalCD = 0;
             }
         }
         else
