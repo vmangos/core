@@ -904,17 +904,11 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         // La verification de naxxramas.
         if (Trigger_ID == 4055) // Naxxramas (Entrance)
         {
-            // A retirer lors de l'ouverture de l'instance apres travaux.
-//            SendAreaTriggerMessage("Instance En Travaux");
-//            return;
-            //
-
             if (!GetPlayer()->GetQuestRewardStatus(9121) && !GetPlayer()->GetQuestRewardStatus(9122) && !GetPlayer()->GetQuestRewardStatus(9123))
             {
-//               SendAreaTriggerMessage("You need to accomplish the Naxxramas quest to enter");
-                //return;
+                SendAreaTriggerMessage("You must complete The Dread Citadel to enter Naxxramas");
+                return;
             }
-
         }
         // fin Verification Naxxramas
 
