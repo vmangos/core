@@ -951,7 +951,7 @@ struct mob_shadow_fissureAI : public ScriptedAI
     bool haveCasted;
     void Reset() override
     {
-        timer = 4000;
+        timer = 3000;
         haveCasted = false;
     }
 
@@ -973,7 +973,7 @@ struct mob_shadow_fissureAI : public ScriptedAI
         {
             m_creature->CastSpell(m_creature, SPELL_VOID_BLAST, true);
             haveCasted = true;
-            m_creature->ForcedDespawn(1250);
+            m_creature->ForcedDespawn(2250);
         }
         else
             timer -= diff;
