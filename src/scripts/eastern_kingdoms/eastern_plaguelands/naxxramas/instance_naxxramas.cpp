@@ -185,6 +185,22 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
     return true;
 }
 
+void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
+{
+    if (creature->GetEntry() == NPC_SewageSlime)
+    {
+        std::list<Creature*> sewageSlimes;
+        GetCreatureListWithEntryInGrid(sewageSlimes, creature, NPC_SewageSlime, 100.0f);
+        for (Creature* pC : sewageSlimes)
+        {
+            if (!pC->isInCombat())
+            {
+                pC->CastSpell(pC, 28033, true); // aggro all in los
+            }
+        }
+    }
+}
+
 void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
 {
     if (requiredPreBossData > -1 && requiredPreBossData != DONE)

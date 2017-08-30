@@ -351,6 +351,8 @@ public:
     
     bool HandleEvadeOutOfHome(Creature* pWho);
 
+    void OnCreatureEnterCombat(Creature * creature) override;
+
 private:
     bool m_faerlinaHaveGreeted;
     bool m_thaddiusHaveGreeted;
