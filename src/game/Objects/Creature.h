@@ -202,6 +202,7 @@ struct CreatureData
     bool  is_dead;
     uint8 movementType;
     uint32 spawnFlags;
+    float visibilityModifier;
 
     uint32 instanciatedContinentInstanceId;
     // helper function

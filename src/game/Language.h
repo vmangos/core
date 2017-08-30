@@ -560,6 +560,7 @@ enum MangosStrings
     LANG_NPCINFO_VENDOR                 = 545,
     LANG_NPCINFO_TRAINER                = 546,
     LANG_NPCINFO_DUNGEON_ID             = 547,
+    LANG_NPCINFO_ACTIVE_VISIBILITY      = 1030,
 
     LANG_PINFO_ACCOUNT                  = 616,
     LANG_PINFO_LEVEL                    = 549,

@@ -871,6 +871,8 @@ bool GameObject::LoadFromDB(uint32 guid, Map *map)
     }
 
     m_isActiveObject = (data->spawnFlags & SPAWN_FLAG_ACTIVE);
+    m_visibilityModifier = data->visibilityModifier;
+
     return true;
 }
 
@@ -1002,7 +1004,7 @@ bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoi
 
     // check distance
     return IsWithinDistInMap(viewPoint, GetMap()->GetVisibilityDistance() +
-                             (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+                             (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
 }
 
 void GameObject::Respawn()
