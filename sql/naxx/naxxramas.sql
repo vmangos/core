@@ -940,7 +940,8 @@ UPDATE creature_template set minhealth = 399750, maxhealth = 399750 where entry 
 */
 
 -- Set her base attackspeed to 2.5sec, based on https://www.youtube.com/watch?v=pVjB7pCX3XM
-UPDATE `creature_template` SET `baseattacktime`=2500,`speed_run`='1.4' WHERE `entry`=15953;
+-- but increase it again to 1.75 because its too easy to survive enrage phase without dispelling :/
+UPDATE `creature_template` SET `baseattacktime`=1750,`speed_run`='1.4' WHERE `entry`=15953;
 
 -- give Worshippers widows embrace and eventAI
 UPDATE `creature_template` SET `spell1`=28732, `AIName`='EventAI' WHERE `entry`=16506;
