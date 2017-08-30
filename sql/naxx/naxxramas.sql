@@ -916,13 +916,13 @@ UPDATE `creature_template` SET `mindmg`=3000, `maxdmg`=3500 WHERE `entry`=16125;
 UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500 WHERE `entry`=16126;
 
 -- spectral trainee hp
-UPDATE `creature_template` SET `minhealth`=6000, `maxhealth`=7000, `SchoolImmuneMask`=126, `scale`=1 WHERE `entry`=16127;
+UPDATE `creature_template` SET `minhealth`=6000, `maxhealth`=7000, `SchoolImmuneMask`=124, `scale`=1 WHERE `entry`=16127;
 -- spectral rider
-UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500, `SchoolImmuneMask`=126 WHERE `entry`=16150;
+UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500, `SchoolImmuneMask`=124 WHERE `entry`=16150;
 -- spectral death knight
-UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500, `SchoolImmuneMask`=126, `minhealth`=19000, `maxhealth`=19500 WHERE `entry`=16148;
+UPDATE `creature_template` SET `mindmg`=4000, `maxdmg`=4500, `SchoolImmuneMask`=124, `minhealth`=19000, `maxhealth`=19500 WHERE `entry`=16148;
 -- spectral horse
-UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=5500, `SchoolImmuneMask`=126 WHERE `entry`=16149;
+UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=5500, `SchoolImmuneMask`=124 WHERE `entry`=16149;
 
 
 -- gothiks HP
