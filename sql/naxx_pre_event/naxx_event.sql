@@ -77,6 +77,11 @@ UPDATE `creature_template` SET `ScriptName`='npc_argent_emissary' WHERE `entry`=
 UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16786;
 UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16787;
 
+-- Makes the necropolis relay and proxy invisible 
+UPDATE `creature_template` SET `flags_extra`=128 WHERE `entry`=16386;
+UPDATE `creature_template` SET `flags_extra`=128 WHERE `entry`=16398;
+
+
 -- Update modelids for several creatures
 UPDATE `creature_template` SET `modelid_2`=16238 WHERE  `entry`=16384;
 UPDATE `creature_template` SET `modelid_2`=16230 WHERE  `entry`=16395;
