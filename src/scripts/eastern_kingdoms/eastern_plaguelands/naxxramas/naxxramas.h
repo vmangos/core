@@ -303,6 +303,8 @@ public:
     void Initialize();
 
     bool IsEncounterInProgress();
+    
+    void OnPlayerEnter(Player* player);
 
     void OnCreatureCreate(Creature* pCreature) override;
     void OnObjectCreate(GameObject* pGo) override;
