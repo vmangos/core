@@ -77,11 +77,6 @@ UPDATE `creature_template` SET `ScriptName`='npc_argent_emissary' WHERE `entry`=
 UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16786;
 UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16787;
 
--- Makes the necropolis relay and proxy invisible 
-UPDATE `creature_template` SET `flags_extra`=128 WHERE `entry`=16386;
-UPDATE `creature_template` SET `flags_extra`=128 WHERE `entry`=16398;
-
-
 -- Update modelids for several creatures
 UPDATE `creature_template` SET `modelid_2`=16238 WHERE  `entry`=16384;
 UPDATE `creature_template` SET `modelid_2`=16230 WHERE  `entry`=16395;
@@ -1260,3 +1255,11 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (28861
 -- SPELL_ZAP_CRYSTAL = 28032, // [Zap Crystal]. 15 damage.
 INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28032, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 0, -1, -1, -1, -1, -1, 'Zap Crystal');
 */
+
+-- Makes the necropolis relay and proxy "invisible"
+UPDATE `creature_template` SET `flags_extra`=0,`unit_flags`=33554560 WHERE `entry`=16386;
+UPDATE `creature_template` SET `flags_extra`=0,`unit_flags`=33554560 WHERE `entry`=16398;
+
+update creature set visibilitymod = 700, spawnFlags = 1 where id = 16386; -- necropolis relay
+update creature set visibilitymod = 700, spawnFlags = 1 where id = 16136; -- necrotic shard
+update gameobject set visibilitymod = 1000 where id = 181223; -- necropolis
