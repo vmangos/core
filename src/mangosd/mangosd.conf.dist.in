@@ -1473,6 +1473,15 @@ Death.Ghost.RunSpeed.Battleground = 1.0
 #                 1800000 (30 minutes)
 #        Default: 0 - disable premade group matches (group always added to bg team in normal way)
 #
+#    BattleGround.RandomizeQueues
+#        Randomize the queue positions
+#        Default: 0 - first players to queue will be invited first
+#
+#    BattleGround.GroupQueueLimit
+#        The maximum number of players that can be queued as a group
+#        If the group is bigger than this value, players are queued solo
+#        Default: 40
+#
 ###################################################################################################################
 
 Battleground.CastDeserter = 1
@@ -1484,6 +1493,8 @@ BattleGround.PremadeGroupWaitForMatch = 0
 BattleGround.PremadeQueue.MinGroupSize = 6
 BattleGround.QueuesCount            = 3
 BattleGround.TagInBattleGrounds     = 1
+BattleGround.RandomizeQueues = 0
+BattleGround.GroupQueueLimit = 40
 
 ###################################################################################################################
 #

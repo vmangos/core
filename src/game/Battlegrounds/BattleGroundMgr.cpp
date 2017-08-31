@@ -167,28 +167,36 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, Group* grp, BattleG
         //ACE_Guard<ACE_Recursive_Thread_Mutex> guard(m_Lock);
         if (grp)
         {
+            const uint32 group_limit = sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_GROUP_LIMIT);
             for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
             {
                 Player *member = itr->getSource();
                 if (!member)
                     continue;   // this should never happen
-                PlayerQueueInfo& pl_info = m_QueuedPlayers[member->GetObjectGuid()];
-                pl_info.online           = true;
-                pl_info.LastOnlineTime   = 0;
-                pl_info.GroupInfo        = ginfo;
-                // add the pinfo to ginfo's list
-                ginfo->Players[member->GetObjectGuid()]  = &pl_info;
-                sLog.out(LOG_BG, "%s:%u [%u:%s] tag BG=%u (groupLeader '%s')",
 
-                         member->GetName(),
-                         member->GetGUIDLow(), member->GetSession()->GetAccountId(), member->GetSession()->GetRemoteAddress().c_str(),
-                         BgTypeId, leader->GetName());
+                if (grp->GetMembersCount() > group_limit) // queue players solo if group size is above limit set in config
+                {
+                    AddGroup(member, nullptr, BgTypeId, bracketId, false);
+                    ChatHandler(member).PSendSysMessage("Group queue limit is set to %u. You have been queued solo.", group_limit);
+                }
+                else
+                {
+                    PlayerQueueInfo& pl_info = m_QueuedPlayers[member->GetObjectGuid()];
+                    pl_info.online = true;
+                    pl_info.LastOnlineTime = 0;
+                    pl_info.GroupInfo = ginfo;
+                    // add the pinfo to ginfo's list
+                    ginfo->Players[member->GetObjectGuid()] = &pl_info;
+                    sLog.out(LOG_BG, "%s:%u [%u:%s] tag BG=%u (groupLeader '%s')",
+
+                        member->GetName(),
+                        member->GetGUIDLow(), member->GetSession()->GetAccountId(), member->GetSession()->GetRemoteAddress().c_str(),
+                        BgTypeId, leader->GetName());
+                }
             }
         }
         else
         {
-
-
             PlayerQueueInfo& pl_info = m_QueuedPlayers[leader->GetObjectGuid()];
             pl_info.online           = true;
             pl_info.LastOnlineTime   = 0;
@@ -201,7 +209,10 @@ GroupQueueInfo * BattleGroundQueue::AddGroup(Player *leader, Group* grp, BattleG
         }
 
         //add GroupInfo to m_QueuedGroups
-        m_QueuedGroups[bracketId][index].push_back(ginfo);
+        if (ginfo->Players.size())
+            m_QueuedGroups[bracketId][index].push_back(ginfo);
+        else
+            return ginfo; // group size was above limit
 
         //announce to world, this code needs mutex
         if (!isPremade && sWorld.getConfig(CONFIG_UINT32_BATTLEGROUND_QUEUE_ANNOUNCER_JOIN))
@@ -663,6 +674,12 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
             m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].empty() &&
             m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].empty())
         return;
+
+    if (sWorld.getConfig(CONFIG_BOOL_BATTLEGROUND_RANDOMIZE))
+    {
+        std::random_shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end());
+        std::random_shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end());
+    }
 
     //battleground with free slot for player should be always in the beginning of the queue
     // maybe it would be better to create bgfreeslotqueue for each bracket_id
