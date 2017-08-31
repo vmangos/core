@@ -52,6 +52,8 @@ DELETE FROM creature where map = 533;
 
 
 
+-- make the flying naxxramas thing visible from faaar away
+update gameobject set visibilitymod = 1000 where id = 181056;
 
 
 /*
