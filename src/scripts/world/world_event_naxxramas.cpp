@@ -230,11 +230,9 @@ struct NecropolisProxyAI : public ScriptedAI
     }
 
     ObjectGuid _necropolisGuid;
-    uint32 _animationTimer;
 
     void Reset()
     {
-        _animationTimer = 1000;
     }
 
     void Aggro(Unit* pWho)
@@ -259,39 +257,8 @@ struct NecropolisProxyAI : public ScriptedAI
                 crea->AI()->InformGuid(_necropolisGuid);
     }
 
-    // Update Visibility on necropolis, shown zone wide for every player
-    void UpdateVisibility(bool visible)
-    {
-        Map::PlayerList const& list = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
-        {
-            Player* player = it->getSource();
-
-            // Update visibility only for players in zone
-            if (visible && player->GetZoneId() == me->GetZoneId())
-            {
-                UpdateData data;
-                me->BuildCreateUpdateBlockForPlayer(&data, player);
-                WorldPacket packet;
-                data.BuildPacket(&packet, false);
-                player->GetSession()->SendPacket(&packet);
-            }
-            else if (!visible)
-                me->DestroyForPlayer(player);
-        }
-    }
-
     void UpdateAI(const uint32 uiDiff)
     {
-        if (_animationTimer < uiDiff)
-        {
-            UpdateVisibility(true);
-            _animationTimer = urand(20000, 30000);
-        }
-        else
-        {
-            _animationTimer -= uiDiff;
-        }
     }
 };
 
@@ -313,11 +280,9 @@ struct NecropolisRelayAI : public ScriptedAI
 
     uint32     _checkStatusTimer;
     ObjectGuid _necropolisGuid;
-    uint32 _animationTimer;
 
     void Reset()
     {
-        _animationTimer = 1000;
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
 
@@ -334,39 +299,8 @@ struct NecropolisRelayAI : public ScriptedAI
                 crea->AI()->InformGuid(_necropolisGuid);
     }
 
-    // Update Visibility on necropolis, shown zone wide for every player
-    void UpdateVisibility(bool visible)
-    {
-        Map::PlayerList const& list = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
-        {
-            Player* player = it->getSource();
-
-            // Update visibility only for players in zone
-            if (visible && player->GetZoneId() == me->GetZoneId())
-            {
-                UpdateData data;
-                me->BuildCreateUpdateBlockForPlayer(&data, player);
-                WorldPacket packet;
-                data.BuildPacket(&packet, false);
-                player->GetSession()->SendPacket(&packet);
-            }
-            else if (!visible)
-                me->DestroyForPlayer(player);
-        }
-    }
-
     void UpdateAI(const uint32 uiDiff)
     {
-        if (_animationTimer < uiDiff)
-        {
-            UpdateVisibility(true);
-            _animationTimer = urand(20000, 30000);
-        }
-        else
-        {
-            _animationTimer -= uiDiff;
-        }
     }
 };
 
@@ -378,6 +312,8 @@ CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
 /*
 Necropolis
 */
+static std::set<ObjectGuid> _staticNecropolisList;
+static std::mutex necro_mutex;
 class go_necropolis : public GameObjectAI, public NecropolisRelatedObject
 {
 public:
@@ -386,11 +322,14 @@ public:
         _worldstateTimer = 1000;
         _checkShardsTimer = 1000;
         _animationTimer = 1000;
-        _necropolisList.insert(go->GetObjectGuid());
+
+        std::lock_guard<std::mutex> lock(necro_mutex);
+        _staticNecropolisList.insert(go->GetObjectGuid());
     }
 
-    std::set<ObjectGuid> _shards;
     std::set<ObjectGuid> _necropolisList;
+
+    std::set<ObjectGuid> _shards;
     uint32 _worldstateTimer;
     uint32 _totalnecropolisTimer;
     uint32 _checkShardsTimer;
@@ -407,7 +346,7 @@ public:
 
             if (necropolis->GetZoneId() != _zone)
             {
-                _necropolisList.erase(it);
+                //_necropolisList.erase(it);
                 return false;
             }
 
@@ -425,10 +364,18 @@ public:
         uint32 totalzone_EASTERN_PLAGUELANDS = 0;
         uint32 totalzone_TANARIS = 0;
         uint32 totalzone_WINTERSPRING = 0;
+        
+
+        {
+            std::lock_guard<std::mutex> lock(necro_mutex);
+            _necropolisList = _staticNecropolisList;
+        }
 
         for (std::set<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
         {
             GameObject* necropolis = me->GetMap()->GetGameObject(*it);
+            if (!necropolis)
+                continue;
 
             if (necropolis->IsVisible() && necropolis->GetZoneId() == _zone)
             {
@@ -436,43 +383,44 @@ public:
                 {
                     case ZONEID_AZSHARA:
                     {
-                        totalzone_AZSHARA = +1;
-                        sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, totalzone_AZSHARA, true);
+                        totalzone_AZSHARA += 1;
                         break;
                     }
                     case ZONEID_BLASTED_LANDS:
                     {
-                        totalzone_BLASTED_LANDS = +1;
-                        sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, totalzone_BLASTED_LANDS, true);
+                        totalzone_BLASTED_LANDS += 1;
                         break;
                     }
                     case ZONEID_BURNING_STEPPES:
                     {
-                        totalzone_BURNING_STEPPES = +1;
-                        sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, totalzone_BURNING_STEPPES, true);
+                        totalzone_BURNING_STEPPES += 1;
                         break;
                     }
                     case ZONEID_EASTERN_PLAGUELANDS:
                     {
-                        totalzone_EASTERN_PLAGUELANDS = +1;
-                        sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, totalzone_EASTERN_PLAGUELANDS, true);
+                        totalzone_EASTERN_PLAGUELANDS += 1;
                         break;
                     }
                     case ZONEID_TANARIS:
                     {
-                        totalzone_TANARIS = +1;
-                        sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, totalzone_TANARIS, true);
+                        totalzone_TANARIS += 1;
                         break;
                     }
                     case ZONEID_WINTERSPRING:
                     {
-                        totalzone_WINTERSPRING = +1;
-                        sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, totalzone_WINTERSPRING, true);
+                        totalzone_WINTERSPRING += 1;
                         break;
                     }
                 }
             }
         }
+
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, totalzone_BURNING_STEPPES, true);
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, totalzone_AZSHARA, true);
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, totalzone_BLASTED_LANDS, true);
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, totalzone_EASTERN_PLAGUELANDS, true);
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, totalzone_TANARIS, true);
+        sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, totalzone_WINTERSPRING, true);
     }
 
     // Update Visibility on necropolis, shown zone wide for every player
@@ -562,20 +510,20 @@ public:
     void Enable()
     {
         me->Respawn();
-        me->SetVisible(true);
+        //me->SetVisible(true);
         _animationTimer = 1000;
         _checkShardsTimer = 5000; // 5 sec to spawn shard
         UpdateWorldState(true);
-        _necropolisList.insert(me->GetObjectGuid());
+        //_necropolisList.insert(me->GetObjectGuid());
         sLog.outInfo("[Scourge Invasion Event] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
     }
 
     void Disable()
     {
         me->SetVisible(false);
-        UpdateVisibility(false);
+        //UpdateVisibility(false);
         UpdateWorldState(false);
-        _necropolisList.erase(me->GetObjectGuid());
+        //_necropolisList.erase(me->GetObjectGuid());
         sLog.outInfo("[Scourge Invasion Event] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
     }
 
@@ -647,8 +595,8 @@ public:
         if (_animationTimer < diff)
         {
             // Small animation to become visible again
-            UpdateVisibility(true);
-            me->SendGameObjectCustomAnim(me->GetObjectGuid());
+            //UpdateVisibility(true);
+            //me->SendGameObjectCustomAnim(me->GetObjectGuid());
 
             // Identify myself with the relay (to transmit my GUID to the shards)
             if (Creature* crea = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 100.0f))
