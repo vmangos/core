@@ -5259,7 +5259,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto);
 
             // Grande tenue de marchereve (Druide T3)
-            if (spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION>())
+            if (spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION, CF_DRUID_REGROWTH>())
             {
                 Unit::AuraList const& auraClassScripts = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
                 for (Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
@@ -5267,7 +5267,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                     uint32 triggered_spell_id = 0;
 
                     // Aura giving mana / health at recuperation tick
-                    if ((*itr)->GetModifier()->m_miscvalue == 4533 && roll_chance_i(50))
+                    if ((*itr)->GetModifier()->m_miscvalue == 4533 && spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION>() && roll_chance_i(50))
                     {
                         switch (target->getPowerType())
                         {
@@ -5282,7 +5282,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                                 break;
                         }
                     }
-                    else if ((*itr)->GetModifier()->m_miscvalue == 4537)
+                    else if ((*itr)->GetModifier()->m_miscvalue == 4537 && spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REGROWTH>())
                         triggered_spell_id = 28750;
                     if (triggered_spell_id)
                         pCaster->CastSpell(target, triggered_spell_id, true);
