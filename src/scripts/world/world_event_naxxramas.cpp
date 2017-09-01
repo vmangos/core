@@ -312,8 +312,14 @@ CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
 /*
 Necropolis
 */
-static std::set<ObjectGuid> _staticNecropolisList;
-static std::mutex necro_mutex;
+
+static std::set<ObjectGuid> winterspringNecropolis;
+static std::set<ObjectGuid> azsharaNecropolis;
+static std::set<ObjectGuid> easternPlaguelandsNecropolis;
+static std::set<ObjectGuid> blastedLandsNecropolis;
+static std::set<ObjectGuid> burningSteppesNecropolis;
+static std::set<ObjectGuid> tanarisNecropolis;
+
 class go_necropolis : public GameObjectAI, public NecropolisRelatedObject
 {
 public:
@@ -323,8 +329,8 @@ public:
         _checkShardsTimer = 1000;
         _animationTimer = 1000;
 
-        std::lock_guard<std::mutex> lock(necro_mutex);
-        _staticNecropolisList.insert(go->GetObjectGuid());
+        if(auto* lst = NecropolisList())
+            lst->insert(go->GetObjectGuid());
     }
 
     std::set<ObjectGuid> _necropolisList;
@@ -335,20 +341,37 @@ public:
     uint32 _checkShardsTimer;
     uint32 _animationTimer;
 
+    std::set<ObjectGuid>* NecropolisList()
+    {
+        switch (me->GetZoneId())
+        {
+        case ZONEID_WINTERSPRING:
+            return &winterspringNecropolis;
+        case ZONEID_AZSHARA:
+            return &azsharaNecropolis;
+        case ZONEID_EASTERN_PLAGUELANDS:
+            return &easternPlaguelandsNecropolis;
+        case ZONEID_BLASTED_LANDS:
+            return &blastedLandsNecropolis;
+        case ZONEID_BURNING_STEPPES:
+            return &burningSteppesNecropolis;
+        case ZONEID_TANARIS:
+            return &tanarisNecropolis;
+        default:
+            sLog.outError("go_necropolis::NecropolisList not implemented for zone %d, gobj %d", me->GetZoneId(), me->GetDBTableGUIDLow());
+            return nullptr;
+        }
+    }
+
     bool ZoneNecropolisDestroyed()
     {
-        for (std::set<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
+        auto* lst = NecropolisList();
+        if (!lst) return true;
+        for (auto it = lst->begin(); it != lst->end(); ++it)
         {
             GameObject* necropolis = me->GetMap()->GetGameObject(*it);
-
             if (!necropolis)
                 continue;
-
-            if (necropolis->GetZoneId() != _zone)
-            {
-                //_necropolisList.erase(it);
-                return false;
-            }
 
             if (necropolis->isSpawned())
                 return false;
@@ -356,71 +379,54 @@ public:
         return true;
     }
 
-    void ZoneNecropolisRemaning()
+    uint32 NumNecropolisRemainingInZone()
     {
-        uint32 totalzone_AZSHARA = 0;
-        uint32 totalzone_BLASTED_LANDS = 0;
-        uint32 totalzone_BURNING_STEPPES = 0;
-        uint32 totalzone_EASTERN_PLAGUELANDS = 0;
-        uint32 totalzone_TANARIS = 0;
-        uint32 totalzone_WINTERSPRING = 0;
-        
-
-        {
-            std::lock_guard<std::mutex> lock(necro_mutex);
-            _necropolisList = _staticNecropolisList;
-        }
-
-        for (std::set<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
+        auto* lst = NecropolisList();
+        if (!lst) return 0;
+        uint32 numRemaining = 0;
+        for (auto it = lst->begin(); it != lst->end(); ++it)
         {
             GameObject* necropolis = me->GetMap()->GetGameObject(*it);
             if (!necropolis)
                 continue;
 
             if (necropolis->IsVisible() && necropolis->GetZoneId() == _zone)
-            {
-                switch (necropolis->GetZoneId())
-                {
-                    case ZONEID_AZSHARA:
-                    {
-                        totalzone_AZSHARA += 1;
-                        break;
-                    }
-                    case ZONEID_BLASTED_LANDS:
-                    {
-                        totalzone_BLASTED_LANDS += 1;
-                        break;
-                    }
-                    case ZONEID_BURNING_STEPPES:
-                    {
-                        totalzone_BURNING_STEPPES += 1;
-                        break;
-                    }
-                    case ZONEID_EASTERN_PLAGUELANDS:
-                    {
-                        totalzone_EASTERN_PLAGUELANDS += 1;
-                        break;
-                    }
-                    case ZONEID_TANARIS:
-                    {
-                        totalzone_TANARIS += 1;
-                        break;
-                    }
-                    case ZONEID_WINTERSPRING:
-                    {
-                        totalzone_WINTERSPRING += 1;
-                        break;
-                    }
-                }
-            }
+                ++numRemaining;
         }
+        return numRemaining;
+    }
 
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, totalzone_BURNING_STEPPES, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, totalzone_AZSHARA, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, totalzone_BLASTED_LANDS, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, totalzone_EASTERN_PLAGUELANDS, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, totalzone_TANARIS, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, totalzone_WINTERSPRING, true);
+    void SetNecropolisRemaining(ScourgeInvasionWorldStatesVariables whichZone)
+    {
+        uint32 numRemaining = NumNecropolisRemainingInZone();
+        sObjectMgr.SetSavedVariable(whichZone, numRemaining, true);
+    }
+
+    void ZoneNecropolisRemaning()
+    {
+        switch (me->GetZoneId())
+        {
+        case ZONEID_WINTERSPRING:
+            SetNecropolisRemaining(VARIABLE_SI_WINTERSPRING);
+            break;
+        case ZONEID_AZSHARA:
+            SetNecropolisRemaining(VARIABLE_SI_AZSHARA_REMAINING);
+            break;
+        case ZONEID_EASTERN_PLAGUELANDS:
+            SetNecropolisRemaining(VARIABLE_SI_EASTERN_PLAGUELANDS);
+            break;
+        case ZONEID_BLASTED_LANDS:
+            SetNecropolisRemaining(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+            break;
+        case ZONEID_BURNING_STEPPES:
+            SetNecropolisRemaining(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+            break;
+        case ZONEID_TANARIS:
+            SetNecropolisRemaining(VARIABLE_SI_TANARIS);
+            break;
+        default:
+            sLog.outError("go_necropolis::ZoneNecropolisRemaning not implemented for zone %d, gobj %d", me->GetZoneId(), me->GetDBTableGUIDLow());
+        }
     }
 
     // Update Visibility on necropolis, shown zone wide for every player
@@ -564,6 +570,14 @@ public:
     void UpdateAI(const uint32 diff)
     {
         NecropolisRelatedObject::Update();
+        
+        if (_totalnecropolisTimer < diff)
+        {
+            ZoneNecropolisRemaning();
+            _totalnecropolisTimer = 60000; // update every minute
+        }
+        else
+            _totalnecropolisTimer -= diff;
 
         if (!IsZoneEnabled())
             return;
@@ -571,7 +585,10 @@ public:
         if (!me->isSpawned())
         {
             if (ZoneNecropolisDestroyed())
+            {
+                sLog.outBasic("All necropolises in zone %d destroyed, changing attack-zone", _zone);
                 ChangeAttackZone();
+            }
             return;
         }
 
@@ -584,13 +601,6 @@ public:
         else
             _worldstateTimer -= diff;
 
-        if (_totalnecropolisTimer < diff)
-        {
-            ZoneNecropolisRemaning();
-            _totalnecropolisTimer = 60000; // update every minute
-        }
-        else
-            _totalnecropolisTimer -= diff;
 
         if (_animationTimer < diff)
         {
@@ -609,8 +619,6 @@ public:
 
         if (_checkShardsTimer < diff)
         {
-            //TotalShardsInZone();
-
             if (AllShardsDead())
             {
                 me->SendObjectDeSpawnAnim(me->GetObjectGuid());
@@ -618,6 +626,7 @@ public:
                 me->SaveRespawnTime();
                 SetShardsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // If all shards are gone, despawn necroplis instantly.
                 _animationTimer = 1000;
+                sLog.outBasic("Necropolis %d in zone %d destroyed, %d necropolises remaining", me->GetDBTableGUIDLow(), _zone, NumNecropolisRemainingInZone());
             }
         }
         else
