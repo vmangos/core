@@ -642,6 +642,7 @@ class Spell
 
         uint32 m_spellState;
         uint32 m_timer;
+        uint32 m_triggeredByAuraBasePoints;
 
         float m_castPositionX;
         float m_castPositionY;

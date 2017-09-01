@@ -316,6 +316,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     gameObjTarget = nullptr;
     focusObject = nullptr;
     m_triggeredByAuraSpell  = nullptr;
+    m_triggeredByAuraBasePoints = 0;
 
     //Auto Shot & Shoot
     m_autoRepeat = IsAutoRepeatRangedSpell(m_spellInfo);
@@ -3067,7 +3068,9 @@ void Spell::prepare(Aura* triggeredByAura)
 {
 
     m_spellState = SPELL_STATE_PREPARING;
-    m_delayed = m_spellInfo->speed > 0.0f || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer());
+    m_delayed = m_spellInfo->speed > 0.0f 
+        || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer())
+        || IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEALTH_LEECH);
 
     if (m_caster->GetTransport())
     {
@@ -3084,8 +3087,10 @@ void Spell::prepare(Aura* triggeredByAura)
         m_castOrientation = m_caster->GetOrientation();
     }
 
-    if (triggeredByAura)
-        m_triggeredByAuraSpell  = triggeredByAura->GetSpellProto();
+    if (triggeredByAura) {
+        m_triggeredByAuraSpell = triggeredByAura->GetSpellProto();
+        m_triggeredByAuraBasePoints = triggeredByAura->GetBasePoints();
+    }
 
     try
     {
