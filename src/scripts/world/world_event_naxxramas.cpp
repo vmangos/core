@@ -358,7 +358,6 @@ public:
         case ZONEID_TANARIS:
             return &tanarisNecropolis;
         default:
-            sLog.outError("go_necropolis::NecropolisList not implemented for zone %d, gobj %d", me->GetZoneId(), me->GetDBTableGUIDLow());
             return nullptr;
         }
     }
@@ -424,8 +423,6 @@ public:
         case ZONEID_TANARIS:
             SetNecropolisRemaining(VARIABLE_SI_TANARIS);
             break;
-        default:
-            sLog.outError("go_necropolis::ZoneNecropolisRemaning not implemented for zone %d, gobj %d", me->GetZoneId(), me->GetDBTableGUIDLow());
         }
     }
 
