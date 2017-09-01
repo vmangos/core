@@ -1374,7 +1374,8 @@ void Creature::SaveToDB(uint32 mapid)
        << GetPower(POWER_MANA) << ","                      //curmana
        << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
        << GetDefaultMovementType() << ","                 //default movement generator type
-       << m_isActiveObject << ")";
+       << m_isActiveObject << ","
+       << m_visibilityModifier << ")";
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
