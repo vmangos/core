@@ -800,7 +800,8 @@ void GameObject::SaveToDB(uint32 mapid)
        << m_respawnDelayTime << ", "
        << uint32(GetGoAnimProgress()) << ", "
        << uint32(GetGoState()) << ","
-       << m_isActiveObject << ")";
+       << m_isActiveObject << ","
+       << m_visibilityModifier << ")";
 
     WorldDatabase.BeginTransaction();
     WorldDatabase.PExecuteLog("DELETE FROM gameobject WHERE guid = '%u'", GetGUIDLow());
