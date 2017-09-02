@@ -1,4 +1,3 @@
-
 --
 -- Table structure for table `creature_linking`
 --
@@ -388,7 +387,7 @@ INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1602501, 16025, 0, 0, 100, 3, 0, 0, 5000, 10000, 11, 28311, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Stitched Spewer - Casts Slime Bolt'),
-(1602502, 16025, 0, 0, 100, 3, 5000, 5000, 6000, 6000, 11, 28318, 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Stitched Spewer - Casts Slime Shoot');
+(1602502, 16025, 0, 0, 100, 3, 5000, 5000, 6000, 6000, 11, 28318, 5, 0, 0, 0, 1, 0, 0, 0, 0, 0, 'Stitched Spewer - Casts Slime Shoot'),
 (1602503, 16025, 0, 0, 100, 1, 3000, 4000, 8000, 10000, 11, 28405, 1, 0, 13, -95, 1, 0, 0, 0, 0, 0, 'Stitched Spewer knockback with threat reduction');
 
 
@@ -400,7 +399,7 @@ VALUES
 (1638501, 16385, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28298, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning Totem aura on spawn'),
 (1638502, 16385, 7, 0, 100, 0, 0, 0, 0, 0, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Lightning totem despawn on evade'),
 (1601703, 16017, 11, 0, 100, 1, 0, 0, 0, 0, 11, 27793, 0, 7, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem disease cloud on spawn'),
-(1601704, 16017, 12, 0, 100, 1, 19, 0, 4000, 5000, 11, 7160, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem Execute');
+(1601704, 16017, 12, 0, 100, 1, 19, 0, 4000, 5000, 11, 7160, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Patchwork Golem Execute'),
 (1602902, 16029, 0, 0, 100, 1, 5000, 5000, 10000, 10000, 11, 27889, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge Belcher summon Bile Sludge'),
 -- (1614202, 16142, 1, 0, 100, 1, 30000, 30000, 30000, 30000, 41, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'bile sludge despawn after 30 sec ooc'),
 (1602903, 16029, 11, 0, 100, 0, 0, 0, 0, 0, 11, 28362, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Sludge belcher disease cloud on spawn'),
@@ -718,9 +717,8 @@ INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1597801, 15978, 0, 0, 100, 1, 5000, 5000, 6000, 7000, 11, 26350, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt Reaver Cleave'),
-(1597802, 15978, 2, 0, 100, 1, 50, 50, 300000, 300000, 11, 28371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt Reaver Frenzy'),
-(1602403, 15978, 10, 0, 100, 1, 0, 40, 0, 0, 11, 28033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt reaver increased aggro range');
-
+(1602403, 15978, 10, 0, 100, 1, 0, 40, 0, 0, 11, 28033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt reaver increased aggro range'),
+(1597802, 15978, 2, 0, 100, 1, 50, 50, 300000, 300000, 11, 28371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt Reaver Frenzy');
 
 /*
 * Plaguewing
@@ -749,7 +747,6 @@ VALUES
 /*green (nature) */
 (16785,0,0,11137,0,0,0,'Plague Slime','',0,61,61,140943,140943,0,0,4091,20,20,0,1,0.35,2,1,9000,11000,0,278,1,1150,1265,0,0,0,0,0,0,0,0,172.1,240.07,100,10,8,16243,0,0,0,5,5,5,5,5,0,0,0,0,0,6051,7906,'',0,3,0,0,1,0,0,0,0,8,0,'naxxramas_plague_slime_ai');
 
-
 -- plagued bat putrid bite much higher frequency
 UPDATE `creature_ai_scripts` SET `event_param1`=4000, `event_param2`=5000, `event_param3`=4000, `event_param4`=5000, `action1_param2`=1 WHERE `id`=1603701;
 -- plagued bat same hp as frenzied bat
@@ -761,10 +758,6 @@ VALUES ('30113', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1
 	
 -- frenzied bat targets random hostile and repeats less frequently
 UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param1`=500, `event_param2`=1000, `event_param3`=5000, `event_param4`=10000, `action1_param2`=4 WHERE `id`=1603601;
-
-
-
-
 
 /*
  * Anub'Rekhan
@@ -803,12 +796,6 @@ INSERT INTO creature_movement_template (entry, point, position_x, position_y, po
 (16698, 15, 3309.49, -3454.61, 287.08),
 (16698, 16, 3267.45, -3435.48, 287.08),
 (16698, 17, 3232.18, -3470.62, 287.08);
-
-
-
-
-
-
 
 /*
 * Four Horsemen
@@ -926,7 +913,7 @@ VALUES
 (1614802, 16148, 0, 0, 100, 1, 5000, 10000, 10000, 12000, 11, 27992, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Death Knight Mana Burn'),
 (1614901, 16149, 0, 0, 100, 1, 2000, 5000, 30500, 30500, 11, 27993, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Horse cast Stomp'),
 (1615001, 16150, 0, 0, 100, 1, 3001, 5000, 10000, 12000, 11, 27994, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider life drain on random hostile'),
-(1615002, 16150, 16, 0, 100, 1, 27995, 30,  5000, 10000, 11, 27995, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider Unholy Frenzy on friendly');
+(1615002, 16150, 16, 0, 100, 1, 27995, 30,  5000, 10000, 11, 27995, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Spectral Rider Unholy Frenzy on friendly'),
 (1615003, 16150, 11,0, 100, 0,   0,    0,     0,     0,  11, 27987, 0, 6, 0, 0, 0, 0, 0, 0, 0, 0, 'Unrelenting Rider Unholy Aura on spawn');
 
 
@@ -966,7 +953,7 @@ UPDATE creature_template set minhealth = 399750, maxhealth = 399750 where entry 
 UPDATE `creature_template` SET `baseattacktime`=1750,`speed_run`='1.4', `mindmg`=5492, `maxdmg`=7281 WHERE `entry`=15953;
 
 -- give Worshippers widows embrace and eventAI
-UPDATE `creature_template` SET `spell1`=28732, `AIName`='EventAI' WHERE, `minhealth`=88040, `maxhealth`=88040, `mindmg`=3194, `maxdmg`=4215  `entry`=16506;
+UPDATE `creature_template` SET `spell1`=28732, `AIName`='EventAI' , `minhealth`=88040, `maxhealth`=88040, `mindmg`=3194, `maxdmg`=4215 WHERE `entry`=16506;
 
 -- follower has aoe silence spell and eventAI
 UPDATE `creature_template` SET `spell1`=29943, `AIName`='EventAI', `mindmg`=4562, `maxdmg`=6022 WHERE `entry`=16505;
@@ -1160,7 +1147,7 @@ UPDATE `creature_template` SET `minhealth`=5329600, `maxhealth`=5329600, `mindmg
 
 -- dmg/hp/armor source: http://www.kurai.com/wow/naxx/maexxna.jpg
 -- Due to the ease at which you can skip aoe web during enrage phase, we use regular armor values 
-UPDATE `creature_template` SET `minhealth`=1498950, `maxhealth`=1498950, `armor`=4691, /*`armor`=3731*/, `mindmg`=5491, `maxdmg`=7281, `speed_run`='1.65',`baseattacktime`=2000 WHERE `entry`=15952;
+UPDATE `creature_template` SET `minhealth`=1498950, `maxhealth`=1498950, `armor`=4691, /*`armor`=3731*/ `mindmg`=5491, `maxdmg`=7281, `speed_run`='1.65',`baseattacktime`=2000 WHERE `entry`=15952;
 
 -- give web-wrap correct faction
 UPDATE `creature_template` SET faction_A = 16, faction_H = 16 WHERE entry = 16486;
