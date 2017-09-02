@@ -185,13 +185,16 @@ struct boss_scarlet_commander_mograineAI : public ScriptedAI
         //On first death, fake death and open door, as well as initiate whitemane if exist
         if (Creature* pWhitemane = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_WHITEMANE)))
         {
-            m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
+            if (pWhitemane->isAlive())
+            {
+                m_pInstance->SetData(TYPE_MOGRAINE_AND_WHITE_EVENT, IN_PROGRESS);
 
-            pWhitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
+                pWhitemane->GetMotionMaster()->MovePoint(1, 1163.113370f, 1398.856812f, 32.527786f);
 
-            FakeDeath();
+                FakeDeath();
 
-            uiDamage = 0;
+                uiDamage = 0;
+            }
         }
     }
 
