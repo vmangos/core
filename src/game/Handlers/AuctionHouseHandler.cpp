@@ -760,7 +760,10 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recv_data)
 
     // converting string that we try to find to lower case
     if (!Utf8toWStr(searchedname, task->wsearchedname))
+    {
+        delete task;
         return;
+    }
 
     wstrToLower(task->wsearchedname);
     SetReceivedAHListRequest(true);

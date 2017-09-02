@@ -603,7 +603,11 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                     {
                         const SpellEntry *spell = sSpellMgr.GetSpellEntry(action.cast.spellId);
                         if (!spell)
+                        {
                             sLog.outErrorDb("CreatureEventAI:  Event %u Action %u uses nonexistent SpellID %u.", i, j + 1, action.cast.spellId);
+                            continue;
+                        }
+
                         else if (spell->SpellFamilyName == SPELLFAMILY_GENERIC)
                         {
                             // Don't modify player spells, or spells that have category cooldown already (stealth for example)

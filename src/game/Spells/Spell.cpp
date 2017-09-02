@@ -5085,6 +5085,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
 
+                if (!casterOwner && !targetOwner)
+                    return SPELL_FAILED_BAD_TARGETS;
+
                 if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
                 {
                     return SPELL_FAILED_TARGET_DUELING;
@@ -7946,11 +7949,19 @@ void Spell::OnSpellLaunch()
     if (!m_caster || !m_caster->IsInWorld())
         return;
 
-    if (m_spellInfo->Id == 21651 &&
-            sLockStore.LookupEntry(m_targets.getGOTarget()->GetGOInfo()->GetLockId())->Index[1] == LOCKTYPE_SLOW_OPEN)
+    // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
+    // can succeed with a lockId of 0
+    if (m_spellInfo->Id == 21651)
     {
-        Spell *visual = new Spell(m_caster, sSpellMgr.GetSpellEntry(24390), true);
-        visual->prepare();
+        if (GameObject *go = m_targets.getGOTarget())
+        {
+            LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
+            if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
+            {
+                Spell *visual = new Spell(m_caster, sSpellMgr.GetSpellEntry(24390), true);
+                visual->prepare();
+            }
+        }
     }
 
     unitTarget = m_targets.getUnitTarget();

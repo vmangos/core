@@ -330,7 +330,9 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         Tokens tokens = StrSplit(m_pTmpCache->TeachSpelldata, " ");
         Tokens::const_iterator iter;
         int index;
-        for (iter = tokens.begin(), index = 0; index < 4; ++iter, ++index)
+        // Spells are in pairs. First is the ability, second is what teaches it to the hunter
+        // Pets can have a max of 4 spells.
+        for (iter = tokens.begin(), index = 0; index < 4 && iter != tokens.end(); ++iter, ++index)
         {
             uint32 tmp = atol((*iter).c_str());
 

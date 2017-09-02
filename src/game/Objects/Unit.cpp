@@ -6090,6 +6090,9 @@ int32 Unit::DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellPro
     if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsTotem() && ((Totem*)this)->GetTotemType() != TOTEM_STATUE)
         unit = GetOwner();
 
+    if (!unit)
+        return 0;
+
     if (unit->GetTypeId() == TYPEID_PLAYER)
         unit->SendHealSpellLog(pVictim, spellProto->Id, addhealth, critical);
 
@@ -11136,7 +11139,7 @@ public:
 
         if (unit->getThreatManager().getThreat(_from) > 0.1f)
             unit->AddThreat(_to, unit->getThreatManager().getThreat(_from));
-        else if (unit->getVictim() == _from) // Si on aggro sans faire de degat
+        else if (unit->getVictim() == _from && unit->AI()) // Si on aggro sans faire de degat
             unit->AI()->AttackStart(_to);
         else
             return;

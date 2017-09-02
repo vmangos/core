@@ -6750,6 +6750,12 @@ void Aura::CalculatePeriodic(Player * modOwner, bool create)
 // Battements de coeur (chance de briser les CC)
 void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
 {
+    if (_pveHeartBeatData)
+    {
+        delete _pveHeartBeatData;
+        _pveHeartBeatData = nullptr;
+    }
+
     _heartBeatRandValue = 0;
 
     // Ni les sorts permanents, ni les sorts positifs ne sont affectes.

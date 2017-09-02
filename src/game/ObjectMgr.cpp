@@ -405,8 +405,12 @@ SavedVariable& ObjectMgr::_InsertVariable(uint32 index, uint32 value, bool saved
 
 void ObjectMgr::_SaveVariable(const SavedVariable& toSave)
 {
+    // Must do this in a transaction, else if worker threads > 1 we could do one before the other
+    // when order is important...
+    WorldDatabase.BeginTransaction();
     WorldDatabase.PExecute("DELETE FROM `variables` WHERE `index` = %u", toSave.uiIndex);
     WorldDatabase.PExecute("INSERT INTO `variables` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
+    WorldDatabase.CommitTransaction();
 }
 
 void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
