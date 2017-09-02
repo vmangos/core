@@ -57,7 +57,7 @@ enum
     NPC_SHADE_OF_HAKKAR   = 8440,                           // Shade of Hakkar appears when the event starts; will despawn when avatar of hakkar is summoned
     NPC_BLOODKEEPER       = 8438,                           // Spawned rarely and contains the hakkari blood -> used to extinguish the flames
     NPC_HAKKARI_MINION    = 8437,                           // Npc randomly spawned during the event = trash
-    NPC_SUPPRESSOR        = 8497,                           // Npc summoned at one of the two doors and moves to the boss;
+    NPC_SUPPRESSOR        = 8497,                           // Npc summoned at one of the two doors and moves to the boss
 
     NPC_MALFURION         = 15362,
     AREATRIGGER_MALFURION = 4016,
@@ -112,7 +112,42 @@ enum
     SAY_DREAMSCYTHE_AGGRO = -1109012,
     SAY_ATALALARION_AGGRO = -1109013,
     SAY_ATALALARION_SPAWN = -1109014,
+};
 
+enum ShadeOfHakkar
+{
+    SHADE_SPAWN_TYPES   = 2,                             // The number of different event spawn types for the Shade of Hakkar
+    SHADE_HAKKARI_TYPE  = 0,
+    SHADE_KEEPER_TYPE   = 1,
+    MAX_HAKKARI_MINION  = 17,                            // Maximum number of Hakkari minions that can be alive at once 8 + 3 + 3 + 3 = 17 (4 waves w/ max spawn each time)
+    MAX_BLOODKEEPER     = 4,                             // Maximum number of blood keepers that can be alive at once
+    NUM_BRAZIERS        = 4,
+};
+
+struct npc_shade_hakkarAI : public ScriptedAI
+{
+    npc_shade_hakkarAI(Creature *m_creature);
+
+    ScriptedInstance* m_pInstance;
+
+    uint32 m_uiBraziersUsed;
+    uint32 m_uiHakkariTimer;
+    uint32 m_uiSuppressorTimer;
+    uint32 m_uiSuppressingTimer;
+    uint32 CheckTimer;
+    bool EngagedOnce;
+    bool FirstPop;
+    uint32 eventSpawns[SHADE_SPAWN_TYPES];
+
+    void Reset();
+    void Aggro(Unit *pWho);
+    void JustSummoned(Creature *m_creature);
+    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId);
+    void UpdateAI(const uint32 uiDiff);
+
+    void SummonJustDied(Creature *m_pcreature);
+    void UpdateBrazierState(GameObject *go, bool used);
+    void SummonTheAvatar();
 };
 
 #endif

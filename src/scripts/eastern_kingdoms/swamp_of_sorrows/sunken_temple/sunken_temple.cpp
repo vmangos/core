@@ -180,6 +180,9 @@ struct go_eternal_flameAI: public GameObjectAI
 
     bool OnUse(Unit* pUser)
     {
+        if (me->GetGoState() == GO_STATE_ACTIVE)    // already used - script handler calls twice
+            return true;
+
         ScriptedInstance* pInstance = (ScriptedInstance*)me->GetInstanceData();
 
         if (!pInstance)
@@ -188,12 +191,16 @@ struct go_eternal_flameAI: public GameObjectAI
         if (pInstance->GetData(TYPE_AVATAR) != IN_PROGRESS)
             return false;
 
-        // Set data to special when flame is used
-        me->SetGoState(GO_STATE_ACTIVE);
-        me->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-        pInstance->SetData(TYPE_AVATAR, SPECIAL);
+        if (Creature *shade = pInstance->GetCreature(pInstance->GetData64(NPC_SHADE_OF_HAKKAR)))
+        {
+            if (npc_shade_hakkarAI *ai = dynamic_cast<npc_shade_hakkarAI*>(shade->AI()))
+            {
+                ai->UpdateBrazierState(me, true);
+                return true;
+            }
+        }
 
-        return true;
+        return false;
     }
 };
 
@@ -240,251 +247,335 @@ enum
     SPELL_SUPPRESSION   = 12623
 };
 
-struct npc_shade_hakkarAI : public ScriptedAI
+static const uint32 brazierEntries[] = { GO_ETERNAL_FLAME_1, GO_ETERNAL_FLAME_2, GO_ETERNAL_FLAME_3, GO_ETERNAL_FLAME_4 };
+
+npc_shade_hakkarAI::npc_shade_hakkarAI(Creature* pCreature) : ScriptedAI(pCreature)
 {
-    npc_shade_hakkarAI(Creature* pCreature) : ScriptedAI(pCreature)
+    m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+    if (m_pInstance)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        if (m_pInstance)
+        m_pInstance->SetData64(NPC_SHADE_OF_HAKKAR, pCreature->GetGUID());
+        if (m_pInstance->GetData(TYPE_AVATAR) == DONE || m_pInstance->GetData(TYPE_AVATAR) == FAIL)
         {
-            m_pInstance->SetData64(NPC_SHADE_OF_HAKKAR, pCreature->GetGUID());
-            if (m_pInstance->GetData(TYPE_AVATAR) == DONE || m_pInstance->GetData(TYPE_AVATAR) == FAIL)
-            {
-                pCreature->SetVisibility(VISIBILITY_OFF);
-                pCreature->ForcedDespawn(1000);
-            }
-            else
-                EngagedOnce = false;
+            pCreature->SetVisibility(VISIBILITY_OFF);
+            pCreature->ForcedDespawn(1000);
+
+            return;
         }
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    uint32 m_uiHakkariTimer;
-    uint32 m_uiSuppressorTimer;
-    uint32 m_uiSuppressingTimer;
-    uint32 CheckTimer;
-    bool EngagedOnce;
-    bool FirstPop;
-
-    void Reset()
-    {
-        m_uiHakkariTimer        = 6000;
-        CheckTimer              = 2000;
-        m_uiSuppressorTimer     = 5000;
-        m_uiSuppressingTimer    = 10000;
-        FirstPop                = true;
-
-        while (Creature* Cre = m_creature->FindNearestCreature(NPC_HAKKARI_MINION, 150.0f))
-            Cre->DisappearAndDie();
-
-        while (Creature* Cre = m_creature->FindNearestCreature(NPC_BLOODKEEPER, 150.0f))
-            Cre->DisappearAndDie();
-
-        while (Creature* Cre = m_creature->FindNearestCreature(NPC_SUPPRESSOR, 150.0f))
-            Cre->DisappearAndDie();
-
-        while (Creature* Cre = m_creature->FindNearestCreature(NPC_AVATAR_OF_HAKKAR, 150.0f))
-            Cre->DisappearAndDie();
-
-        if (EngagedOnce)
-        {
-            if (m_pInstance && m_pInstance->GetData(TYPE_AVATAR) != DONE)
-                m_pInstance->SetData(TYPE_AVATAR, FAIL);
-
+        else
             EngagedOnce = false;
-            m_creature->ForcedDespawn(1000);
+    }
+    Reset();
+}
+
+void npc_shade_hakkarAI::Reset()
+{
+    m_uiHakkariTimer        = 6000;
+    CheckTimer              = 2000;
+    m_uiSuppressorTimer     = 0;
+    m_uiSuppressingTimer    = 10000;
+    m_uiBraziersUsed        = 0;
+    FirstPop                = true;
+
+    while (Creature* Cre = m_creature->FindNearestCreature(NPC_HAKKARI_MINION, 150.0f))
+        Cre->DisappearAndDie();
+
+    while (Creature* Cre = m_creature->FindNearestCreature(NPC_BLOODKEEPER, 150.0f))
+        Cre->DisappearAndDie();
+
+    while (Creature* Cre = m_creature->FindNearestCreature(NPC_SUPPRESSOR, 150.0f))
+        Cre->DisappearAndDie();
+
+    while (Creature* Cre = m_creature->FindNearestCreature(NPC_AVATAR_OF_HAKKAR, 150.0f))
+        Cre->DisappearAndDie();
+
+    if (EngagedOnce)
+    {
+        if (m_pInstance && m_pInstance->GetData(TYPE_AVATAR) != DONE)
+            m_pInstance->SetData(TYPE_AVATAR, FAIL);
+
+        EngagedOnce = false;
+        m_creature->ForcedDespawn(1000);
+    }
+    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+    //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+
+    for (uint32 i = 0; i < SHADE_SPAWN_TYPES; ++i)
+        eventSpawns[i] = 0;
+
+    if (m_pInstance)
+    {
+        for (uint32 i = 0; i < NUM_BRAZIERS; ++i)
+        {
+            if (GameObject *go = m_pInstance->GetGameObject(m_pInstance->GetData64(brazierEntries[i])))
+                UpdateBrazierState(go, false);
         }
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        //m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+    }
+}
+
+void npc_shade_hakkarAI::UpdateBrazierState(GameObject *go, bool used)
+{
+    if (go)
+    {
+        if (used)
+        {
+            ++m_uiBraziersUsed;
+            m_uiSuppressorTimer = 1000;
+
+            go->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            go->SetGoState(GO_STATE_ACTIVE);
+        }
+        else
+        {
+            go->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            go->SetGoState(GO_STATE_READY);
+        }
     }
 
-    void Aggro(Unit* pWho)
+    switch (m_uiBraziersUsed)
+    {
+        case 1:
+            DoScriptText(SAY_AVATAR_BRAZIER_1, m_creature);
+            break;
+        case 2:
+            DoScriptText(SAY_AVATAR_BRAZIER_2, m_creature);
+            break;
+        case 3:
+            DoScriptText(SAY_AVATAR_BRAZIER_3, m_creature);
+            break;
+            // Summon the avatar of all flames are used
+        case 4:
+            DoScriptText(SAY_AVATAR_BRAZIER_4, m_creature);
+            SummonTheAvatar();
+            break;
+    }
+}
+
+void npc_shade_hakkarAI::SummonTheAvatar()
+{
+    m_creature->CastSpell(m_creature, 12639, true); // Summon Hakkar (Visual)
+    if (Creature* Avatar = m_creature->SummonCreature(NPC_AVATAR_OF_HAKKAR, -466.8673f, 272.31204f, -90.7441f, 3.5255f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
     {
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_AVATAR, IN_PROGRESS);
+            m_pInstance->SetData64(NPC_AVATAR_OF_HAKKAR, Avatar->GetGUID());
+
+        Avatar->CastSpell(Avatar, 12948, true); // Summon Hakkar (Visual)
+        //Avatar->SetInCombatWithZone();
     }
 
-    void JustSummoned(Creature* summoned)
+    std::list<GameObject*> circles;
+    m_creature->GetGameObjectListWithEntryInGrid(circles, GO_EVIL_CIRCLE, 20);
+
+    for (auto go : circles)
+        go->Use(m_creature);
+
+    m_creature->ForcedDespawn(500);
+}
+
+void npc_shade_hakkarAI::Aggro(Unit* pWho)
+{
+    if (m_pInstance)
+        m_pInstance->SetData(TYPE_AVATAR, IN_PROGRESS);
+}
+
+void npc_shade_hakkarAI::JustSummoned(Creature* summoned)
+{
+    switch (summoned->GetEntry())
     {
-        switch (summoned->GetEntry())
+        case NPC_SUPPRESSOR:
+            summoned->CastSpell(summoned, 7741, true);  // Summoned Demon (Visual)
+            break;
+        case NPC_BLOODKEEPER:
+            summoned->CastSpell(summoned, 7741, true);  // Summoned Demon (Visual)
+            ++eventSpawns[SHADE_KEEPER_TYPE];
+            break;
+        case NPC_HAKKARI_MINION:
+            ++eventSpawns[SHADE_HAKKARI_TYPE];
+            break;
+    }
+}
+
+void npc_shade_hakkarAI::SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+{
+    if (uiMotionType != POINT_MOTION_TYPE || !pSummoned->isAlive())
+        return;
+
+    if (pSummoned->GetEntry() == NPC_HAKKARI_MINION)
+    {
+        switch (uiPointId)
         {
-            case NPC_SUPPRESSOR:
-            case NPC_BLOODKEEPER:
-                summoned->CastSpell(summoned, 7741, true);  // Summoned Demon (Visual)
+            case 0:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 1:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 2:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 3:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 4:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 5:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 6:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 7:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 10:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[0].m_fX, aMobDest[0].m_fY, aMobDest[0].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 11:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[1].m_fX, aMobDest[1].m_fY, aMobDest[1].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 12:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[2].m_fX, aMobDest[2].m_fY, aMobDest[2].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 13:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[3].m_fX, aMobDest[3].m_fY, aMobDest[3].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 14:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[4].m_fX, aMobDest[4].m_fY, aMobDest[4].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 15:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[5].m_fX, aMobDest[5].m_fY, aMobDest[5].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 16:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[6].m_fX, aMobDest[6].m_fY, aMobDest[6].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
+                break;
+            case 17:
+                pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[7].m_fX, aMobDest[7].m_fY, aMobDest[7].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
                 break;
         }
     }
-
-    void SummonedMovementInform(Creature* pSummoned, uint32 uiMotionType, uint32 uiPointId)
+    if (pSummoned->GetEntry() == NPC_SUPPRESSOR)
     {
-        if (uiMotionType != POINT_MOTION_TYPE || !pSummoned->isAlive())
-            return;
-
-        if (pSummoned->GetEntry() == NPC_HAKKARI_MINION)
+        switch (uiPointId)
         {
-            switch (uiPointId)
-            {
-                case 0:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 1:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 2:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 3:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 4:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 5:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 6:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 7:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId + 10, -466.110f, 274.284f, -90.460f, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 10:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[0].m_fX, aMobDest[0].m_fY, aMobDest[0].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 11:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[1].m_fX, aMobDest[1].m_fY, aMobDest[1].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 12:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[2].m_fX, aMobDest[2].m_fY, aMobDest[2].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 13:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[3].m_fX, aMobDest[3].m_fY, aMobDest[3].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 14:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[4].m_fX, aMobDest[4].m_fY, aMobDest[4].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 15:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[5].m_fX, aMobDest[5].m_fY, aMobDest[5].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 16:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[6].m_fX, aMobDest[6].m_fY, aMobDest[6].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-                case 17:
-                    pSummoned->GetMotionMaster()->MovePoint(uiPointId - 10, aMobDest[7].m_fX, aMobDest[7].m_fY, aMobDest[7].m_fZ, MOVE_PATHFINDING | MOVE_WALK_MODE | MOVE_FORCE_DESTINATION);
-                    break;
-            }
-        }
-        if (pSummoned->GetEntry() == NPC_SUPPRESSOR)
-        {
-            switch (uiPointId)
-            {
-                case 0:
-                    pSummoned->GetMotionMaster()->MoveIdle();
-                    if (pSummoned->isAlive())
-                        if (Creature* Shade = pSummoned->FindNearestCreature(8440, 150.0f)) // NPC_SHADE_OF_HAKKAR
-                            pSummoned->CastSpell(Shade, SPELL_SUPPRESSION, false);
-                    break;
-            }
+            case 0:
+                pSummoned->GetMotionMaster()->MoveIdle();
+                if (pSummoned->isAlive())
+                    if (Creature* Shade = pSummoned->FindNearestCreature(8440, 150.0f)) // NPC_SHADE_OF_HAKKAR
+                        pSummoned->CastSpell(Shade, SPELL_SUPPRESSION, false);
+                break;
         }
     }
+}
 
-    void UpdateAI(const uint32 uiDiff)
+void npc_shade_hakkarAI::UpdateAI(const uint32 uiDiff)
+{
+    if (CheckTimer <= uiDiff && !EngagedOnce)
     {
-        if (CheckTimer <= uiDiff && !EngagedOnce)
-        {
-            /*if (Creature* Cre = m_creature->FindNearestCreature(8440, 20.0f))    // NPC_SHADE_OF_HAKKAR
-                if (Cre->GetGUID() != m_pInstance->GetData64(8440))
-                    Cre->DisappearAndDie();*/
+        /*if (Creature* Cre = m_creature->FindNearestCreature(8440, 20.0f))    // NPC_SHADE_OF_HAKKAR
+            if (Cre->GetGUID() != m_pInstance->GetData64(8440))
+                Cre->DisappearAndDie();*/
 
-            m_creature->SetInCombatWithZone();
-            SetCombatMovement(false);
-            EngagedOnce = true;
-            return;
-        }
-        else
-            CheckTimer -= uiDiff;
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
-            return;
-
-        if (m_creature->HasAura(SPELL_SUPPRESSION))
-        {
-            if (m_uiSuppressingTimer <= uiDiff)
-            {
-                EnterEvadeMode();
-                return;
-            }
-            else
-                m_uiSuppressingTimer -= uiDiff;
-        }
-        else
-            m_uiSuppressingTimer = 10000;
-
-        if (m_uiHakkariTimer <= uiDiff)
-        {
-            uint32 uiRoll = urand(0, 99);
-            int uiMaxSummons = uiRoll < 75 ? 1 : uiRoll < 95 ? 2 : 3;
-
-            if (m_pInstance->GetData(TYPE_AVATAR) == IN_PROGRESS)
-            {
-                // NPC_BLOODKEEPER
-                if (FirstPop)
-                {
-                    int RandomLoc = urand(0, 7);
-                    m_creature->SummonCreature(NPC_BLOODKEEPER, aMobLocs[RandomLoc].m_fX, aMobLocs[RandomLoc].m_fY, aMobLocs[RandomLoc].m_fZ, aMobLocs[RandomLoc].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
-                }
-                else if (!urand(0, 3))
-                {
-                    int RandomLoc = urand(0, 7);
-                    m_creature->SummonCreature(NPC_BLOODKEEPER, aMobLocs[RandomLoc].m_fX, aMobLocs[RandomLoc].m_fY, aMobLocs[RandomLoc].m_fZ, aMobLocs[RandomLoc].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
-                    --uiMaxSummons;
-                }
-                m_uiSuppressorTimer = 1000;
-            }
-
-            // NPC_HAKKARI_MINION
-            if (FirstPop)
-            {
-                for (int i = 0; i < 8; i++)
-                    if (Creature* Minion = m_creature->SummonCreature(NPC_HAKKARI_MINION, aMobLocs[i].m_fX, aMobLocs[i].m_fY, aMobLocs[i].m_fZ, aMobLocs[i].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                        Minion->GetMotionMaster()->MovePoint(i, aMobDest[i].m_fX, aMobDest[i].m_fY, aMobDest[i].m_fZ, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
-                FirstPop = false;
-            }
-            else
-            {
-                for (int i = 0; i < uiMaxSummons; i++)
-                {
-                    int rand = urand(0, 7);
-                    if (Creature* Minion = m_creature->SummonCreature(NPC_HAKKARI_MINION, aMobLocs[rand].m_fX, aMobLocs[rand].m_fY, aMobLocs[rand].m_fZ, aMobLocs[rand].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                        Minion->GetMotionMaster()->MovePoint(rand, aMobDest[rand].m_fX, aMobDest[rand].m_fY, aMobDest[rand].m_fZ, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
-                }
-            }
-            m_uiHakkariTimer = urand(5000, 15000);
-        }
-        else
-            m_uiHakkariTimer -= uiDiff;
-
-        if (m_pInstance->GetData(TYPE_AVATAR) == SPECIAL)
-        {
-            if (m_uiSuppressorTimer && m_uiSuppressorTimer <= uiDiff)
-            {
-                // NPC_SUPPRESSOR
-                if (urand(0, 1))
-                {
-                    if (Creature* Suppressor = m_creature->SummonCreature(NPC_SUPPRESSOR, -415.681f, 276.184f, -91.201f, 3.174f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                        Suppressor->GetMotionMaster()->MovePoint(0, -448.663f, 276.239f, -90.615f, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
-                }
-                else if (Creature* Suppressor = m_creature->SummonCreature(NPC_SUPPRESSOR, -518.494f, 276.067f, -91.201f, 6.280f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                    Suppressor->GetMotionMaster()->MovePoint(0, -485.250f, 276.099f, -90.672f, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
-                m_uiSuppressorTimer = 0;
-            }
-            else
-                m_uiSuppressorTimer -= uiDiff;
-        }
+        m_creature->SetInCombatWithZone();
+        SetCombatMovement(false);
+        EngagedOnce = true;
+        return;
     }
-};
+    else
+        CheckTimer -= uiDiff;
+
+    if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || !m_pInstance)
+        return;
+
+    if (m_creature->HasAura(SPELL_SUPPRESSION))
+    {
+        if (m_uiSuppressingTimer <= uiDiff)
+        {
+            EnterEvadeMode();
+            return;
+        }
+        else
+            m_uiSuppressingTimer -= uiDiff;
+    }
+    else
+        m_uiSuppressingTimer = 10000;
+
+    if (m_uiHakkariTimer <= uiDiff)
+    {
+        uint32 uiRoll = urand(0, 99);
+        int uiMaxSummons = uiRoll < 75 ? 1 : uiRoll < 95 ? 2 : 3;
+
+        // NPC_BLOODKEEPER
+        if (FirstPop)
+        {
+            int RandomLoc = urand(0, 7);
+            m_creature->SummonCreature(NPC_BLOODKEEPER, aMobLocs[RandomLoc].m_fX, aMobLocs[RandomLoc].m_fY, aMobLocs[RandomLoc].m_fZ, aMobLocs[RandomLoc].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
+        }
+        else if (!urand(0, 3) && eventSpawns[SHADE_KEEPER_TYPE] < MAX_BLOODKEEPER)
+        {
+            int RandomLoc = urand(0, 7);
+            m_creature->SummonCreature(NPC_BLOODKEEPER, aMobLocs[RandomLoc].m_fX, aMobLocs[RandomLoc].m_fY, aMobLocs[RandomLoc].m_fZ, aMobLocs[RandomLoc].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
+            --uiMaxSummons;
+        }
+
+        // NPC_HAKKARI_MINION
+        if (FirstPop)
+        {
+            for (int i = 0; i < 8; i++)
+                if (Creature* Minion = m_creature->SummonCreature(NPC_HAKKARI_MINION, aMobLocs[i].m_fX, aMobLocs[i].m_fY, aMobLocs[i].m_fZ, aMobLocs[i].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
+                    Minion->GetMotionMaster()->MovePoint(i, aMobDest[i].m_fX, aMobDest[i].m_fY, aMobDest[i].m_fZ, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
+        }
+        else if (eventSpawns[SHADE_HAKKARI_TYPE] < MAX_HAKKARI_MINION)
+        {
+            for (int i = 0; i < uiMaxSummons; i++)
+            {
+                int rand = urand(0, 7);
+                if (Creature* Minion = m_creature->SummonCreature(NPC_HAKKARI_MINION, aMobLocs[rand].m_fX, aMobLocs[rand].m_fY, aMobLocs[rand].m_fZ, aMobLocs[rand].m_fO, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
+                    Minion->GetMotionMaster()->MovePoint(rand, aMobDest[rand].m_fX, aMobDest[rand].m_fY, aMobDest[rand].m_fZ, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
+            }
+        }
+
+        if (FirstPop)
+            FirstPop = false;
+
+        m_uiHakkariTimer = urand(5000, 15000);
+    }
+    else
+        m_uiHakkariTimer -= uiDiff;
+
+    if (m_uiSuppressorTimer)
+    {
+        if (m_uiSuppressorTimer <= uiDiff)
+        {
+            // NPC_SUPPRESSOR
+            if (urand(0, 1))
+            {
+                if (Creature* Suppressor = m_creature->SummonCreature(NPC_SUPPRESSOR, -415.681f, 276.184f, -91.201f, 3.174f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
+                    Suppressor->GetMotionMaster()->MovePoint(0, -448.663f, 276.239f, -90.615f, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
+            }
+            else if (Creature* Suppressor = m_creature->SummonCreature(NPC_SUPPRESSOR, -518.494f, 276.067f, -91.201f, 6.280f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
+                Suppressor->GetMotionMaster()->MovePoint(0, -485.250f, 276.099f, -90.672f, MOVE_PATHFINDING | MOVE_FORCE_DESTINATION | MOVE_WALK_MODE);
+            m_uiSuppressorTimer = 0;
+        }
+        else
+            m_uiSuppressorTimer -= uiDiff;
+    }
+}
+
+void npc_shade_hakkarAI::SummonJustDied(Creature *m_creature)
+{
+    switch (m_creature->GetEntry())
+    {
+        case NPC_HAKKARI_MINION:
+            if (eventSpawns[SHADE_HAKKARI_TYPE] > 0)
+                --eventSpawns[SHADE_HAKKARI_TYPE];
+            break;
+        case NPC_BLOODKEEPER:
+            if (eventSpawns[SHADE_KEEPER_TYPE] > 0)
+                --eventSpawns[SHADE_KEEPER_TYPE];
+            break;
+    }
+}
 
 CreatureAI* GetAI_npc_shade_hakkar(Creature* pCreature)
 {

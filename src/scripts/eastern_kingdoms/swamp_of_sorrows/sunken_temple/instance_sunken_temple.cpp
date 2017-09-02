@@ -355,6 +355,21 @@ struct instance_sunken_temple : public ScriptedInstance
         }
     }
 
+    void OnCreatureDeath(Creature *pCreature)
+    {
+        if (m_uiShadeHakkarGUID && (pCreature->GetEntry() == NPC_HAKKARI_MINION || pCreature->GetEntry() == NPC_BLOODKEEPER))
+        {
+            if (Creature *shade = GetMap()->GetCreature(m_uiShadeHakkarGUID))
+            {
+                if (!shade->isAlive() || !shade->AI())
+                    return;
+
+                if (npc_shade_hakkarAI *ai = dynamic_cast<npc_shade_hakkarAI*>(shade->AI()))
+                    ai->SummonJustDied(pCreature);
+            }
+        }
+    }
+
     void SetData(uint32 uiType, uint32 uiData)
     {
         switch (uiType)
@@ -505,49 +520,6 @@ struct instance_sunken_temple : public ScriptedInstance
                 m_auiEncounter[3] = uiData;
                 break;
             case TYPE_AVATAR:
-                if (uiData == SPECIAL)
-                {
-                    ++m_uiFlameCounter;
-
-                    Creature* pShade = instance->GetCreature(GetData64(NPC_SHADE_OF_HAKKAR));
-                    if (!pShade)
-                        break;
-
-                    switch (m_uiFlameCounter)
-                    {
-                        // Yells on each flame
-                        // TODO It might be possible that these yells should be ordered randomly, however this is the seen state
-                        case 1:
-                            DoScriptText(SAY_AVATAR_BRAZIER_1, pShade);
-                            break;
-                        case 2:
-                            DoScriptText(SAY_AVATAR_BRAZIER_2, pShade);
-                            break;
-                        case 3:
-                            DoScriptText(SAY_AVATAR_BRAZIER_3, pShade);
-                            break;
-                        // Summon the avatar of all flames are used
-                        case 4:
-                            DoScriptText(SAY_AVATAR_BRAZIER_4, pShade);
-
-                            // NPC_AVATAR_OF_HAKKAR
-                            pShade->CastSpell(pShade, 12639, true); // Summon Hakkar (Visual)
-                            if (Creature* Avatar = pShade->SummonCreature(8443, -466.8673f, 272.31204f, -90.7441f, 3.5255f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000))
-                            {
-                                SetData64(NPC_AVATAR_OF_HAKKAR, Avatar->GetGUID());
-                                Avatar->CastSpell(Avatar, 12948, true); // Summon Hakkar (Visual)
-                                //Avatar->SetInCombatWithZone();
-                            }
-                            for (int i = 0; i < 8; i++)
-                            {
-                                if (GameObject* pGob = instance->GetGameObject(m_luiCircleGUIDs[i]))
-                                    pGob->Use(pShade);
-                            }
-                            pShade->ForcedDespawn(500);
-                            break;
-                    }
-                }
-
                 if (uiData == IN_PROGRESS)
                 {
                     // Use combat doors
@@ -562,13 +534,11 @@ struct instance_sunken_temple : public ScriptedInstance
                     if (pAvatar)
                         break;
 
-                    if (m_auiEncounter[4] != SPECIAL)
-                        DoUpdateFlamesFlags(false);
-
-                    // Ustaag : pop NPC_SHADE_OF_HAKKAR géré via la DB : Spell 12346 Event 8502
-                    // Respawn circles
-                    for (int i = 0; i < 8; i++)
-                        DoRespawnGameObject(m_luiCircleGUIDs[i], HOUR * IN_MILLISECONDS);
+                    if (m_auiEncounter[4] != IN_PROGRESS)
+                    {
+                        for (int i = 0; i < 8; i++)
+                            DoRespawnGameObject(m_luiCircleGUIDs[i], HOUR * IN_MILLISECONDS);
+                    }
                 }
                 else if (uiData == FAIL)
                 {
@@ -587,8 +557,8 @@ struct instance_sunken_temple : public ScriptedInstance
                     if (!pShade)
                         break;
 
-                    // Reset flames
-                    DoUpdateFlamesFlags(true);
+                    // We only get one attempt
+                    DoUpdateFlamesFlags(false);
 
                     for (int i = 0; i < 8; i++)
                     {
@@ -729,6 +699,14 @@ struct instance_sunken_temple : public ScriptedInstance
                 return m_uiAtalarionGUID;
             case NPC_AVATAR_OF_HAKKAR:
                 return m_uiAvatarHakkarGUID;
+            case GO_ETERNAL_FLAME_1:
+                return m_luiFlameGUIDs[0];
+            case GO_ETERNAL_FLAME_2:
+                return m_luiFlameGUIDs[1];
+            case GO_ETERNAL_FLAME_3:
+                return m_luiFlameGUIDs[2];
+            case GO_ETERNAL_FLAME_4:
+                return m_luiFlameGUIDs[3];
         }
         return 0;
     }
