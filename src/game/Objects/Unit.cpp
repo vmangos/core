@@ -2395,7 +2395,7 @@ void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool ext
         AddExtraAttackOnUpdate();
 
     // melee attack spell casted at main hand attack only
-    if (attType == BASE_ATTACK && m_currentSpells[CURRENT_MELEE_SPELL])
+    if (attType == BASE_ATTACK && m_currentSpells[CURRENT_MELEE_SPELL] && !extra)
     {
         m_currentSpells[CURRENT_MELEE_SPELL]->cast();
         Spell* spell = m_currentSpells[CURRENT_MELEE_SPELL];
