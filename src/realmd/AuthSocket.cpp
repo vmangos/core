@@ -764,7 +764,7 @@ bool AuthSocket::_HandleLogonProof()
     }
 
     // reject credentials on unexpected build to confuse custom client authors
-    auto const approvedBuild = _platform == X86 && (_os == Win || _os == OSX);
+    auto const approvedBuild = (_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX);
 
     ///- Check if SRP6 results match (password is correct), else send an error
     if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult && approvedBuild)

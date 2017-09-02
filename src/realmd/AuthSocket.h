@@ -109,6 +109,7 @@ class AuthSocket: public BufferedSocket
         static constexpr uint32 OSX = 'OSX';
 
         static constexpr uint32 X86 = 'x86';
+        static constexpr uint32 PPC = 'PPC';
 
         uint32 _os;
         uint32 _platform;
