@@ -686,9 +686,15 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= NULL*/)
     for (auto hEvent_iter = mGameEventHardcodedList.begin(); hEvent_iter != mGameEventHardcodedList.end(); ++hEvent_iter)
         if (!mGameEvent[(*hEvent_iter)->m_eventId].disabled)
             (*hEvent_iter)->Update();
+    
 
     time_t currenttime = time(nullptr);
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
+    
+    if (IsActiveEvent(17))      // Scourge Invasion Event
+    {
+        nextEventDelay = 20; // Updating Scourge event every 20 seconds
+    }
 
     for (uint16 itr = 1; itr < mGameEvent.size(); ++itr)
     {

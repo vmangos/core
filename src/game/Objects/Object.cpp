@@ -1152,6 +1152,11 @@ float WorldObject::GetVisibilityModifier() const
     return m_visibilityModifier;
 }
 
+void WorldObject::SetVisibilityModifier(float f)
+{
+    m_visibilityModifier = f;
+}
+
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0),
         m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER)
@@ -2166,6 +2171,9 @@ GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float 
         ((Unit*)this)->AddGameObject(go);
     else
         go->SetSpawnedByDefault(false);
+
+    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
+        ((Creature*)this)->AI()->JustSummoned(go);
 
     map->Add(go);
     go->SetWorldMask(GetWorldMask());

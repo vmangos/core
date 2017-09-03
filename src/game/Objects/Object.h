@@ -919,6 +919,7 @@ m_obj->m_updateTracker.Reset();
         void SetLootAndXPModDist(float val);
 
         float GetVisibilityModifier() const;
+        void SetVisibilityModifier(float f);
 
     protected:
         explicit WorldObject();

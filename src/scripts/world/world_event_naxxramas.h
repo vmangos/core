@@ -19,6 +19,8 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
+#pragma once
+
 // Change this for live!
 #define DEBUG_WORLD_EVENT = true;
 
@@ -30,14 +32,27 @@ enum ScourgeInvasionSpells
     /****************** SPELLS ******************/
     SPELL_COMMUNICATION_NAXXRAMAS = 28395, // Periodically triggers SPELL_COMMUNICATION_TRIGGER
     SPELL_COMMUNICATION_TRIGGER = 28373, // Send visual on all nearby targets
-    SPELL_DUMMY_PYLON = 28351, // [Communique, Camp-to-Relay, Death]. Effect DUMMY
+    SPELL_COMMUNICATION_CAMP_RELAY = 28351, // [Communique, Camp-to-Relay, Death]. Effect DUMMY
     SPELL_ZAP_CRYSTAL = 28032, // [Zap Crystal]. 15 damage.
     SPELL_DAMAGE_CRYSTAL = 28041, // [Damage Crystal]. 100 damage.
-    SPELL_CAMP_RECEIVES_COMMUNIQUE = 28449, // [Camp Receives Communique]. Effect DUMMY.
     SPELL_ENGINEER_REPAIR = 28078,
     SPELL_PURPLE_VISUAL = 28126,
     SPELL_DMG_BOOST_AT_PYLON_DEATH = 28681, // [Soul Revival] Increases all damage caused by 10%.
-    SPELL_COMMUNIQUE_NECROPOLIS_TO_PROXIES = 28373, // Communique, Necropolis-to-Proxies
+
+
+    // Camp - Relay
+    SPELL_CAMP_RECEIVES_COMMUNIQUE = 28449, // (WHEN IT HITS)
+    SPELL_COMMUNIQUE_TIMER_CAMP = 28346,
+    SPELL_COMMUNIQUE_TRIGGER = 28345, // SERVERSIDE
+    SPELL_COMMUNIQUE_CAMP_TO_RELAY = 28281, // (death bolt)
+    SPELL_COMMUNIQUE_RELAY_TO_CAMP = 28326, // (purple bolt)
+    SPELL_COMMUNIQUE_CAMP_TO_RELAY_DEATH = 28351,
+    SPELL_VEIL_OF_DARKNESS = 28350,
+
+    // Relay - Proxy
+    SPELL_COMMUNIQUE_PROXY_TO_RELAY = 28366, // (purple bolt)
+    SPELL_COMMUNIQUE_RELAY_TO_PROXY = 28365, // (death bolt)
+
 
     // Trash spells
     SPELL_ENRAGE = 8599,
@@ -129,15 +144,14 @@ enum ScourgeInvasionMisc
     ENGINEER_MOD_HEALTH_PER_SEC = 15,
 
 #ifdef DEBUG_WORLD_EVENT
-    NECROPOLIS_RESPAWN_TIME = 60 * 5, // 5 min
-    NECROPOLIS_ATTACK_TIMER = 10,
-    DELAY_ELITE_RESPAWN = 10,
+    NECROPOLIS_ATTACK_TIMER = 60 * 5, 
 #else
-    NECROPOLIS_RESPAWN_TIME = 4 * 24 * 60 * 60, // 4 days
     // The change of zone takes 4 hours
-    NECROPOLIS_ATTACK_TIMER = 4 * 60 * 60,
-    DELAY_ELITE_RESPAWN = 1 * 60 * 60, // 1 hour
+    NECROPOLIS_ATTACK_TIMER = 4 * 60 * 60, // 4 hours
 #endif
+    ELITE_SPAWN_MINIMUM = 1000*60*12, // 12min
+    ELITE_SPAWN_MAXIMUM = 1000*60*18, // 18 min
+    ELITE_DESPAWN       = 1000*60*15, // 15 min
 
     ZONEID_WINTERSPRING = 618,
     ZONEID_AZSHARA = 16,
@@ -173,15 +187,17 @@ enum ScourgeInvasionWorldStatesVariables
     VARIABLE_NAXX_ATTACK_TIME1 = 12,
     VARIABLE_NAXX_ATTACK_TIME2 = 13,
     VARIABLE_NAXX_ATTACK_COUNT = 14,
+
     VARIABLE_NAXX_ELITE_ID = 15,
     VARIABLE_NAXX_ELITE_PYLON = 16,
     VARIABLE_NAXX_ELITE_SPAWNTIME = 17,
+
     VARIABLE_SI_AZSHARA_REMAINING = 18,
     VARIABLE_SI_BLASTED_LANDS_REMAINING = 19,
     VARIABLE_SI_BURNING_STEPPES_REMAINING = 20,
-    VARIABLE_SI_EASTERN_PLAGUELANDS = 21,
-    VARIABLE_SI_TANARIS = 22,
-    VARIABLE_SI_WINTERSPRING = 23
+    VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING = 21,
+    VARIABLE_SI_TANARIS_REMAINING = 22,
+    VARIABLE_SI_WINTERSPRING_REMAINING = 23
 };
 
 enum ScourgeInvasionQuests

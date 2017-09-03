@@ -37,187 +37,6 @@ bool IsPermanent(uint32 zone)
             return true;
     }
 }
-
-/*
-General Event AI
-*/
-class NecropolisRelatedObject
-{
-public:
-    NecropolisRelatedObject(WorldObject* me)
-    {
-        _zone = me->GetZoneId();
-        if (IsPermanent(_zone))
-            _zone = 0;
-        _enabledNow = true;
-    }
-
-    virtual ~NecropolisRelatedObject() {}
-
-    bool IsZoneEnabled() const
-    {
-        return _enabledNow;
-    }
-
-    virtual void Enable() = 0;
-    virtual void Disable() = 0;
-
-    void Update()
-    {
-        if (!_zone)
-            return;
-        bool nowStatus = false;
-        time_t now = time(NULL);
-        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1) == _zone && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < now)
-            nowStatus = true;
-        else if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2) == _zone && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < now)
-            nowStatus = true;
-
-        if (!nowStatus && _enabledNow)
-        {
-            Disable();
-            _enabledNow = false;
-        }
-        if (nowStatus && !_enabledNow)
-        {
-            Enable();
-            _enabledNow = true;
-        }
-    }
-
-    void ChangeAttackZone()
-    {
-        uint32 zone1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-        uint32 zone2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
-        std::vector<uint32> possibleZones;
-        if (zone1 != ZONEID_TANARIS && zone2 != ZONEID_TANARIS)
-            possibleZones.push_back(ZONEID_TANARIS);
-        if (zone1 != ZONEID_AZSHARA && zone2 != ZONEID_AZSHARA)
-            possibleZones.push_back(ZONEID_AZSHARA);
-        if (zone1 != ZONEID_EASTERN_PLAGUELANDS && zone2 != ZONEID_EASTERN_PLAGUELANDS)
-            possibleZones.push_back(ZONEID_EASTERN_PLAGUELANDS);
-        if (zone1 != ZONEID_BLASTED_LANDS && zone2 != ZONEID_BLASTED_LANDS)
-            possibleZones.push_back(ZONEID_BLASTED_LANDS);
-        if (zone1 != ZONEID_BURNING_STEPPES && zone2 != ZONEID_BURNING_STEPPES)
-            possibleZones.push_back(ZONEID_BURNING_STEPPES);
-        if (zone1 != ZONEID_WINTERSPRING && zone2 != ZONEID_WINTERSPRING)
-            possibleZones.push_back(ZONEID_WINTERSPRING);
-        uint32 newZone = possibleZones[urand(0, possibleZones.size() - 1)];
-        if (zone1 == _zone)
-        {
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, newZone, true);
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL) + NECROPOLIS_RESPAWN_TIME, true);
-        }
-        else if (zone2 == _zone)
-        {
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, newZone, true);
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL) + NECROPOLIS_RESPAWN_TIME, true);
-        }
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
-    }
-
-    uint32 _zone;
-    bool   _enabledNow;
-};
-
-/*
-Necropolis Controller
-Notes: General AI / Controlling what zone is under attack, not in use for now
-*/
-
-/*
-struct npc_necropolis_controller : public ScriptedAI
-{
-    npc_necropolis_controller(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 _checkStatusTimer;
-
-    void Reset()
-    {
-        _checkStatusTimer = 60000;
-    }
-
-    void UpdateNecropolisRemaning(bool add)
-    {
-        uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
-        uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
-        uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
-        uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
-        uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
-        uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
-
-        switch (me->GetZoneId())
-        {
-            case ZONEID_AZSHARA:
-            {
-                if (add)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA - 1, true);
-                break;
-            }
-            case ZONEID_BLASTED_LANDS:
-            {
-                if (add)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS - 1, true);
-                break;
-            }
-            case ZONEID_BURNING_STEPPES:
-            {
-                if (add)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES - 1, true);
-                break;
-            }
-            case ZONEID_EASTERN_PLAGUELANDS:
-            {
-                if (add)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS - 1, true);
-                break;
-            }
-            case ZONEID_TANARIS:
-            {
-                if (add)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_TANARIS, REMAINING_TANARIS - 1, true);
-                break;
-            }
-            case ZONEID_WINTERSPRING:
-            {
-                if (add)
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING + 1, true);
-                else
-                    sObjectMgr.SetSavedVariable(VARIABLE_SI_WINTERSPRING, REMAINING_WINTERSPRING - 1, true);
-                break;
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (_checkStatusTimer < diff)
-        {
-            UpdateNecropolisRemaning(true);
-        }
-        else
-            _checkStatusTimer -= diff;
-    }
-};
-
-CreatureAI* GetAI_npc_necropolis_controller(Creature* pCreature)
-{
-    return new npc_necropolis_controller(pCreature);
-}*/
-
 /*
 Necropolis Proxy
 Notes: For communiation between necropolis and the shard
@@ -275,32 +94,78 @@ struct NecropolisRelayAI : public ScriptedAI
 {
     NecropolisRelayAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
         Reset();
+        despawnTimer = 0;
     }
+
+    uint32 despawnTimer;
 
     uint32     _checkStatusTimer;
     ObjectGuid _necropolisGuid;
+    std::vector<ObjectGuid> SpawnedShards;
 
     void Reset()
     {
         m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
 
-    // The GUID of the necropolis
-    void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
+    void JustSummoned(GameObject* pGobj) override
     {
-        _necropolisGuid = necropolis;
+        _necropolisGuid = pGobj->GetObjectGuid();
     }
-
+    
+    void JustSummoned(Creature* pCreature) override
+    {
+        SpawnedShards.push_back(pCreature->GetObjectGuid());
+    }
     void SpellHitTarget(Unit* target, const SpellEntry* spell)
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
+        {
             if (Creature* crea = target->ToCreature())
                 crea->AI()->InformGuid(_necropolisGuid);
+        }
+    }
+    
+    void SpellHit(Unit* caster, const SpellEntry* spell) override
+    {
+        if (spell->Id == SPELL_COMMUNICATION_CAMP_RELAY)
+        {
+            auto it = std::find(SpawnedShards.begin(), SpawnedShards.end(), caster->GetObjectGuid());
+            if (it != SpawnedShards.end())
+            {
+                SpawnedShards.erase(it);
+                if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
+                {
+                    if (SpawnedShards.empty())
+                    {
+                        despawnTimer = 20000;
+                        necropolis->SendObjectDeSpawnAnim(necropolis->GetObjectGuid());
+                    }
+                    else
+                        necropolis->SendGameObjectCustomAnim(necropolis->GetObjectGuid());
+                }
+            }
+        }
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
+        if (despawnTimer)
+        {
+            if (despawnTimer < uiDiff)
+            {
+                if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
+                    necropolis->Delete();
+                
+                me->DeleteLater();
+                despawnTimer = 0;
+            }
+            else
+                despawnTimer -= uiDiff;
+        }
     }
 };
 
@@ -313,321 +178,16 @@ CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
 Necropolis
 */
 
-static std::set<ObjectGuid> winterspringNecropolis;
-static std::set<ObjectGuid> azsharaNecropolis;
-static std::set<ObjectGuid> easternPlaguelandsNecropolis;
-static std::set<ObjectGuid> blastedLandsNecropolis;
-static std::set<ObjectGuid> burningSteppesNecropolis;
-static std::set<ObjectGuid> tanarisNecropolis;
-
-class go_necropolis : public GameObjectAI, public NecropolisRelatedObject
+class go_necropolis : public GameObjectAI
 {
 public:
-    go_necropolis(GameObject* go) : GameObjectAI(go), NecropolisRelatedObject(go)
+    go_necropolis(GameObject* go) : GameObjectAI(go)
     {
-        _worldstateTimer = 1000;
-        _checkShardsTimer = 1000;
-        _animationTimer = 1000;
-
-        if(auto* lst = NecropolisList())
-            lst->insert(go->GetObjectGuid());
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
     }
-
-    std::set<ObjectGuid> _necropolisList;
-
-    std::set<ObjectGuid> _shards;
-    uint32 _worldstateTimer;
-    uint32 _totalnecropolisTimer;
-    uint32 _checkShardsTimer;
-    uint32 _animationTimer;
-
-    std::set<ObjectGuid>* NecropolisList()
-    {
-        switch (me->GetZoneId())
-        {
-        case ZONEID_WINTERSPRING:
-            return &winterspringNecropolis;
-        case ZONEID_AZSHARA:
-            return &azsharaNecropolis;
-        case ZONEID_EASTERN_PLAGUELANDS:
-            return &easternPlaguelandsNecropolis;
-        case ZONEID_BLASTED_LANDS:
-            return &blastedLandsNecropolis;
-        case ZONEID_BURNING_STEPPES:
-            return &burningSteppesNecropolis;
-        case ZONEID_TANARIS:
-            return &tanarisNecropolis;
-        default:
-            return nullptr;
-        }
-    }
-
-    bool ZoneNecropolisDestroyed()
-    {
-        auto* lst = NecropolisList();
-        if (!lst) return true;
-        for (auto it = lst->begin(); it != lst->end(); ++it)
-        {
-            GameObject* necropolis = me->GetMap()->GetGameObject(*it);
-            if (!necropolis)
-                continue;
-
-            if (necropolis->isSpawned())
-                return false;
-        }
-        return true;
-    }
-
-    uint32 NumNecropolisRemainingInZone()
-    {
-        auto* lst = NecropolisList();
-        if (!lst) return 0;
-        uint32 numRemaining = 0;
-        for (auto it = lst->begin(); it != lst->end(); ++it)
-        {
-            GameObject* necropolis = me->GetMap()->GetGameObject(*it);
-            if (!necropolis)
-                continue;
-
-            if (necropolis->IsVisible() && necropolis->GetZoneId() == _zone)
-                ++numRemaining;
-        }
-        return numRemaining;
-    }
-
-    void SetNecropolisRemaining(ScourgeInvasionWorldStatesVariables whichZone)
-    {
-        uint32 numRemaining = NumNecropolisRemainingInZone();
-        sObjectMgr.SetSavedVariable(whichZone, numRemaining, true);
-    }
-
-    void ZoneNecropolisRemaning()
-    {
-        switch (me->GetZoneId())
-        {
-        case ZONEID_WINTERSPRING:
-            SetNecropolisRemaining(VARIABLE_SI_WINTERSPRING);
-            break;
-        case ZONEID_AZSHARA:
-            SetNecropolisRemaining(VARIABLE_SI_AZSHARA_REMAINING);
-            break;
-        case ZONEID_EASTERN_PLAGUELANDS:
-            SetNecropolisRemaining(VARIABLE_SI_EASTERN_PLAGUELANDS);
-            break;
-        case ZONEID_BLASTED_LANDS:
-            SetNecropolisRemaining(VARIABLE_SI_BLASTED_LANDS_REMAINING);
-            break;
-        case ZONEID_BURNING_STEPPES:
-            SetNecropolisRemaining(VARIABLE_SI_BURNING_STEPPES_REMAINING);
-            break;
-        case ZONEID_TANARIS:
-            SetNecropolisRemaining(VARIABLE_SI_TANARIS);
-            break;
-        }
-    }
-
-    // Update Visibility on necropolis, shown zone wide for every player
-    void UpdateVisibility(bool visible)
-    {
-        Map::PlayerList const& list = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
-        {
-            Player* player = it->getSource();
-
-            // Update visibility only for players in zone
-            if (visible/* && player->GetZoneId() == me->GetZoneId()*/)
-            {
-                UpdateData data;
-                me->BuildCreateUpdateBlockForPlayer(&data, player);
-                WorldPacket packet;
-                data.BuildPacket(&packet, false);
-                player->GetSession()->SendPacket(&packet);
-            }
-            else if (!visible)
-                me->DestroyForPlayer(player);
-        }
-    }
-
-    // Update worlstate
-    void UpdateWorldState(bool enable)
-    {
-        Map::PlayerList const& list = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
-        {
-            Player* player = it->getSource();
-
-            switch (me->GetZoneId())
-            {
-                case ZONEID_WINTERSPRING:
-                {
-                    if (enable)
-                        player->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, 1);
-                    else
-                        player->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, 0);
-                    break;
-                }
-                case ZONEID_AZSHARA:
-                {
-                    if (enable)
-                        player->SendUpdateWorldState(WORLDSTATE_AZSHARA, 1);
-                    else
-                        player->SendUpdateWorldState(WORLDSTATE_AZSHARA, 0);
-                    break;
-                }
-                case ZONEID_BLASTED_LANDS:
-                {
-                    if (enable)
-                        player->SendUpdateWorldState(WORLDSTATE_BLASTED_LANDS, 1);
-                    else
-                        player->SendUpdateWorldState(WORLDSTATE_BLASTED_LANDS, 0);
-                    break;
-                }
-                case ZONEID_BURNING_STEPPES:
-                {
-                    if (enable)
-                        player->SendUpdateWorldState(WORLDSTATE_BURNING_STEPPES, 1);
-                    else
-                        player->SendUpdateWorldState(WORLDSTATE_BURNING_STEPPES, 0);;
-                    break;
-                }
-                case ZONEID_TANARIS:
-                {
-                    if (enable)
-                        player->SendUpdateWorldState(WORLDSTATE_TANARIS, 1);
-                    else
-                        player->SendUpdateWorldState(WORLDSTATE_TANARIS, 0);
-                    break;
-                }
-                case ZONEID_EASTERN_PLAGUELANDS:
-                {
-                    if (enable)
-                        player->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, 1);
-                    else
-                        player->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, 0);
-                    break;
-                }
-            }
-        }
-    }
-
-    void Enable()
-    {
-        me->Respawn();
-        //me->SetVisible(true);
-        _animationTimer = 1000;
-        _checkShardsTimer = 5000; // 5 sec to spawn shard
-        UpdateWorldState(true);
-        //_necropolisList.insert(me->GetObjectGuid());
-        sLog.outInfo("[Scourge Invasion Event] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
-    }
-
-    void Disable()
-    {
-        me->SetVisible(false);
-        //UpdateVisibility(false);
-        UpdateWorldState(false);
-        //_necropolisList.erase(me->GetObjectGuid());
-        sLog.outInfo("[Scourge Invasion Event] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
-    }
-
-    bool OnUse(Unit* shard)
-    {
-        _shards.insert(shard->GetObjectGuid());
-        return false;
-    }
-
-    bool AllShardsDead()
-    {
-        if (!_shards.size())
-            return false;
-
-        for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
-        {
-            if (Creature* shard = me->GetMap()->GetCreature(*it))
-            {
-                if (shard->isAlive())
-                    return false;
-            }
-        }
-        return true;
-    }
-
-    void SetShardsRespawnTime(uint32 time)
-    {
-        for (std::set<ObjectGuid>::const_iterator it = _shards.begin(); it != _shards.end(); ++it)
-            if (Creature* shard = me->GetMap()->GetCreature(*it))
-            {
-                shard->DoKillUnit(); // Should already be done
-                shard->RemoveCorpse(); // Sync the necropolis with respawn cooldown
-                shard->SetRespawnTime(time);
-                shard->SaveRespawnTime();
-            }
-    }
-
     void UpdateAI(const uint32 diff)
     {
-        NecropolisRelatedObject::Update();
-        
-        if (_totalnecropolisTimer < diff)
-        {
-            ZoneNecropolisRemaning();
-            _totalnecropolisTimer = 60000; // update every minute
-        }
-        else
-            _totalnecropolisTimer -= diff;
-
-        if (!IsZoneEnabled())
-            return;
-
-        if (!me->isSpawned())
-        {
-            if (ZoneNecropolisDestroyed())
-            {
-                sLog.outBasic("All necropolises in zone %d destroyed, changing attack-zone", _zone);
-                ChangeAttackZone();
-            }
-            return;
-        }
-
-        if (_worldstateTimer < diff)
-        {
-            // Update worldstate for players in map of object
-            UpdateWorldState(true);
-            _worldstateTimer = 60000; // update every minute
-        }
-        else
-            _worldstateTimer -= diff;
-
-
-        if (_animationTimer < diff)
-        {
-            // Small animation to become visible again
-            //UpdateVisibility(true);
-            //me->SendGameObjectCustomAnim(me->GetObjectGuid());
-
-            // Identify myself with the relay (to transmit my GUID to the shards)
-            if (Creature* crea = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 100.0f))
-                crea->AI()->InformGuid(me->GetObjectGuid());
-
-            _animationTimer = urand(20000, 30000);
-        }
-        else
-            _animationTimer -= diff;
-
-        if (_checkShardsTimer < diff)
-        {
-            if (AllShardsDead())
-            {
-                me->SendObjectDeSpawnAnim(me->GetObjectGuid());
-                me->SetRespawnTime(NECROPOLIS_RESPAWN_TIME);
-                me->SaveRespawnTime();
-                SetShardsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // If all shards are gone, despawn necroplis instantly.
-                _animationTimer = 1000;
-                sLog.outBasic("Necropolis %d in zone %d destroyed, %d necropolises remaining", me->GetDBTableGUIDLow(), _zone, NumNecropolisRemainingInZone());
-            }
-        }
-        else
-            _checkShardsTimer -= diff;
     }
 };
 
@@ -639,14 +199,17 @@ GameObjectAI* GetAI_go_necropolis(GameObject* go)
 /*
 Necrotic Shard
 */
-struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
+struct npc_necrotic_shard : public ScriptedAI
 {
-    npc_necrotic_shard(Creature* creature) : ScriptedAI(creature), NecropolisRelatedObject(creature)
+    npc_necrotic_shard(Creature* creature) : ScriptedAI(creature)
     {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
+
         creature->SetHealth(creature->GetMaxHealth());
         SetCombatMovement(false);
 
-        switch (creature->GetGUIDLow() % 3)
+        switch (urand(0,2))
         {
             case 0:
                 _spawnEntry1 = NPC_SKELETAL_SHOCKTROOPER;
@@ -664,32 +227,17 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
 
         SpawnAdds();
         Reset();
-        _checkSpecialAddTimer = urand(1000, 5000);
+        
+        eliteSpawnTimer = urand(ELITE_SPAWN_MINIMUM, ELITE_SPAWN_MAXIMUM);
+        if(m_creature->isAlive())
+            me->SetVisibility(VISIBILITY_ON);
     }
 
     ObjectGuid _necropolisGuid;
     uint32 _spawnEntry1;
     uint32 _spawnEntry2;
-    uint32 _checkSpecialAddTimer;
+    uint32 eliteSpawnTimer;
     std::set<ObjectGuid> _adds;
-
-    void Enable()
-    {
-        me->Respawn();
-        me->SetVisibility(VISIBILITY_ON);
-        JustRespawned();
-    }
-
-    void Disable()
-    {
-        me->SetVisibility(VISIBILITY_RESPAWN);
-        JustDied(NULL);
-        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) == m_creature->GetGUIDLow())
-        {
-            sLog.outInfo("[Scourge Invasion Event] Elite despawned by shard disable");
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0, true);
-        }
-    }
 
     void OnRemoveFromWorld()
     {
@@ -722,27 +270,12 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
             m_creature->UpdateGroundPositionZ(x, y, z);
             if (Creature* add = m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
             {
-                add->SetRespawnTime(30);
+                add->SetCorpseDelay(120);  // 2 min for corpse to despawn
+                //add->SetRespawnDelay(30); // 30 sec to respawn 
+                //add->SetRespawnTime(150); // total respawn should be 2.5min
+                //add->SetRespawnRadius(20.0f);
                 _adds.insert(add->GetObjectGuid());
             }
-        }
-        SpawnSpecialAdd();
-    }
-
-    void SpawnSpecialAdd()
-    {
-        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME) < time(NULL) && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) == m_creature->GetGUIDLow())
-        {
-            float a = rand_norm_f() * 2 * M_PI;
-            float d = urand(10, 30);
-            float x, y, z;
-            m_creature->GetPosition(x, y, z);
-            x += d * cos(a);
-            y += d * sin(a);
-            m_creature->UpdateGroundPositionZ(x, y, z);
-            Creature* c = m_creature->SummonCreature(sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_ID), x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN);
-            if (c)
-                _adds.insert(c->GetObjectGuid());
         }
     }
 
@@ -758,24 +291,28 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
     {
     }
 
-    void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
-    {
-        _necropolisGuid = necropolis;
-        if (GameObject* gobjNecropolis = m_creature->GetMap()->GetGameObject(necropolis))
-            gobjNecropolis->AI()->OnUse(m_creature);
+    void SummonedCreatureJustDied(Creature* unit) override {
+        switch (unit->GetEntry())
+        {
+        case NPC_SKELETAL_SHOCKTROOPER:
+        case NPC_SPECTRAL_SOLDIER:
+        case NPC_GHOUL_BERSERKER:
+            unit->SetRespawnTime(150);
+            break;
+        }
     }
-
     void JustRespawned()
     {
         m_creature->UpdateEntry(NPC_NECROTIC_SHARD);
-        SpawnAdds();
     }
 
     void JustDied(Unit* pKiller)
     {
-        if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
-            necropolis->SendGameObjectCustomAnim(necropolis->GetObjectGuid());
+        // buff players around 
+        DoCastSpellIfCan(m_creature, SPELL_DMG_BOOST_AT_PYLON_DEATH, CAST_TRIGGERED);
 
+        // send death to relay
+        DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_CAMP_RELAY, CAST_TRIGGERED);
         DespawnAdds();
     }
 
@@ -814,14 +351,8 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
 
     void UpdateAI(const uint32 diff)
     {
-        NecropolisRelatedObject::Update();
-        if (!IsZoneEnabled())
-            return;
-
-        if (_checkSpecialAddTimer < diff)
+        if (eliteSpawnTimer < diff)
         {
-            if (!sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME) < time(NULL))
-            {
                 uint32 entry = 0;
                 switch (urand(0, 2))
                 {
@@ -835,14 +366,20 @@ struct npc_necrotic_shard : public ScriptedAI, public NecropolisRelatedObject
                         entry = NPC_LUMBERING_HORROR;
                         break;
                 }
-                sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_ID, entry, true);
-                sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, m_creature->GetGUIDLow(), true);
-                SpawnSpecialAdd();
-            }
-            _checkSpecialAddTimer = urand(1000, 5000);
+                float a = rand_norm_f() * 2 * M_PI;
+                float d = urand(10, 30);
+                float x, y, z;
+                m_creature->GetPosition(x, y, z);
+                x += d * cos(a);
+                y += d * sin(a);
+                m_creature->UpdateGroundPositionZ(x, y, z);
+                if(Creature* c = m_creature->SummonCreature(entry, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, ELITE_DESPAWN))
+                    _adds.insert(c->GetObjectGuid());
+
+                eliteSpawnTimer = ELITE_DESPAWN + urand(ELITE_SPAWN_MINIMUM,ELITE_SPAWN_MAXIMUM);
         }
         else
-            _checkSpecialAddTimer -= diff;
+            eliteSpawnTimer -= diff;
 
         if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD && m_creature->GetHealth() == m_creature->GetMaxHealth())
         {
@@ -1569,9 +1106,9 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
     uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
     uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
     uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
-    uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS);
-    uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS);
-    uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING);
+    uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
+    uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
+    uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
     // Send to client
     player->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
@@ -1702,7 +1239,7 @@ void AddSC_world_event_naxxramas()
     sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS, 0);
-    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0);
 }
