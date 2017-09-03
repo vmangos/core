@@ -7860,35 +7860,12 @@ void Player::SendInitWorldStates(uint32 zoneid)
         int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
         int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
 
-        if (ATTACK_ZONE1 == ZONEID_WINTERSPRING || ATTACK_ZONE2 == ZONEID_WINTERSPRING)
-            data << uint32(WORLDSTATE_WINTERSPRING) << uint32(1);
-        else
-            data << uint32(WORLDSTATE_WINTERSPRING) << uint32(0);
-
-        if (ATTACK_ZONE1 == ZONEID_AZSHARA || ATTACK_ZONE2 == ZONEID_AZSHARA)
-            data << uint32(WORLDSTATE_AZSHARA) << uint32(1);
-        else
-            data << uint32(WORLDSTATE_AZSHARA) << uint32(0);
-
-        if (ATTACK_ZONE1 == ZONEID_EASTERN_PLAGUELANDS || ATTACK_ZONE2 == ZONEID_EASTERN_PLAGUELANDS)
-            data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS) << uint32(1);
-        else
-            data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS) << uint32(0);
-
-        if (ATTACK_ZONE1 == ZONEID_BLASTED_LANDS || ATTACK_ZONE2 == ZONEID_BLASTED_LANDS)
-            data << uint32(WORLDSTATE_BLASTED_LANDS) << uint32(1);
-        else
-            data << uint32(WORLDSTATE_BLASTED_LANDS) << uint32(0);
-
-        if (ATTACK_ZONE1 == ZONEID_BURNING_STEPPES || ATTACK_ZONE2 == ZONEID_BURNING_STEPPES)
-            data << uint32(WORLDSTATE_BURNING_STEPPES) << uint32(1);
-        else
-            data << uint32(WORLDSTATE_BURNING_STEPPES) << uint32(0);
-
-        if (ATTACK_ZONE1 == ZONEID_TANARIS || ATTACK_ZONE2 == ZONEID_TANARIS)
-            data << uint32(WORLDSTATE_TANARIS) << uint32(1);
-        else
-            data << uint32(WORLDSTATE_TANARIS) << uint32(0);
+        data << uint32(WORLDSTATE_AZSHARA)              << uint32(REMAINING_AZSHARA > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_BLASTED_LANDS)        << uint32(REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_BURNING_STEPPES)      << uint32(REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS)  << uint32(REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_TANARIS)              << uint32(REMAINING_TANARIS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_WINTERSPRING)         << uint32(REMAINING_WINTERSPRING > 0 ? 1 : 0);
 
         // Battles & remaining necropolisses
         data << uint32(WORLDSTATE_SI_BATTLES_WON) << uint32(VICTORIES);
