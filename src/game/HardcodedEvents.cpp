@@ -925,7 +925,7 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
         sObjectMgr.SetSavedVariable(attackTimeVar, now + NECROPOLIS_ATTACK_TIMER, true);
         sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
 
-        sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next invasion starting in %d minutes", zoneId, uint32(timeToNextAttack/60000));
+        sLog.outBasic("[Scourge Invasion Event] zone %d cleared, next invasion starting in %d minutes", zoneId, uint32(timeToNextAttack/60));
         sLog.outBasic("[Scourge Invasion Event] %d victories", sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT));
     }
 }
@@ -1116,22 +1116,22 @@ void ScourgeInvasionEvent::UpdateWorldState()
         if (!pl->IsInWorld())
             continue;
 
-        if (ATTACK_ZONE1 == ZONEID_AZSHARA || ATTACK_ZONE2 == ZONEID_AZSHARA)
+        //if (ATTACK_ZONE1 == ZONEID_AZSHARA || ATTACK_ZONE2 == ZONEID_AZSHARA)
             pl->SendUpdateWorldState(WORLDSTATE_AZSHARA, REMAINING_AZSHARA > 0 ? 1 : 0);
 
-        if (ATTACK_ZONE1 == ZONEID_BLASTED_LANDS || ATTACK_ZONE2 == ZONEID_BLASTED_LANDS)
+        //if (ATTACK_ZONE1 == ZONEID_BLASTED_LANDS || ATTACK_ZONE2 == ZONEID_BLASTED_LANDS)
             pl->SendUpdateWorldState(WORLDSTATE_BLASTED_LANDS, REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
 
-        if (ATTACK_ZONE1 == ZONEID_BURNING_STEPPES || ATTACK_ZONE2 == ZONEID_BURNING_STEPPES)
+        //if (ATTACK_ZONE1 == ZONEID_BURNING_STEPPES || ATTACK_ZONE2 == ZONEID_BURNING_STEPPES)
             pl->SendUpdateWorldState(WORLDSTATE_BURNING_STEPPES, REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
 
-        if (ATTACK_ZONE1 == ZONEID_EASTERN_PLAGUELANDS || ATTACK_ZONE2 == ZONEID_EASTERN_PLAGUELANDS)
+        //if (ATTACK_ZONE1 == ZONEID_EASTERN_PLAGUELANDS || ATTACK_ZONE2 == ZONEID_EASTERN_PLAGUELANDS)
             pl->SendUpdateWorldState(WORLDSTATE_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
 
-        if (ATTACK_ZONE1 == ZONEID_TANARIS || ATTACK_ZONE2 == ZONEID_TANARIS)
+        //if (ATTACK_ZONE1 == ZONEID_TANARIS || ATTACK_ZONE2 == ZONEID_TANARIS)
             pl->SendUpdateWorldState(WORLDSTATE_TANARIS, REMAINING_TANARIS > 0 ? 1 : 0);
 
-        if (ATTACK_ZONE1 == ZONEID_WINTERSPRING || ATTACK_ZONE2 == ZONEID_WINTERSPRING)
+        //if (ATTACK_ZONE1 == ZONEID_WINTERSPRING || ATTACK_ZONE2 == ZONEID_WINTERSPRING)
             pl->SendUpdateWorldState(WORLDSTATE_WINTERSPRING, REMAINING_WINTERSPRING > 0 ? 1 : 0);
     }
 }
