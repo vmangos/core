@@ -1243,6 +1243,7 @@ INSERT INTO `variables` (`index`, `value`) VALUES
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16136);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16386);
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16398);
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16172);
 INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28373, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 18, 8, 0, -1, -1, -1, -1, 'Communication necropol');
 */
 
@@ -1256,10 +1257,67 @@ INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (28861
 INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28032, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 0, -1, -1, -1, -1, -1, 'Zap Crystal');
 */
 
+-- Want the communication from relay to shard to hit damaged shard as well
+delete from spell_script_target where entry = 28373 and targetEntry = 16172;
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES(28373, 1, 16172);
+
+-- Since we are not using proxies, we need to set the shard death spell (28351) to target
+-- the relay, and we mod the spell to use script-targeting.
+DELETE FROM `spell_script_target` where entry = 28351;
+INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (28351, 1, 16386);
+DELETE FROM `spell_effect_mod` where Id = 28351;
+INSERT INTO `spell_effect_mod` 
+(`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, 
+`EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) 
+VALUES
+ (28351, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 38, 0, -1, -1, -1, -1, -1, 'Communique, Relay-to-Proxy');
+
 -- Makes the necropolis relay and proxy "invisible"
 UPDATE `creature_template` SET `flags_extra`=0,`unit_flags`=33554560 WHERE `entry`=16386;
 UPDATE `creature_template` SET `flags_extra`=0,`unit_flags`=33554560 WHERE `entry`=16398;
 
-update creature set visibilitymod = 700, spawnFlags = 1 where id = 16386; -- necropolis relay
-update creature set visibilitymod = 700, spawnFlags = 1 where id = 16136; -- necrotic shard
-update gameobject set visibilitymod = 1000 where id = 181223; -- necropolis
+update creature set visibilitymod = 3000, spawnFlags = 1 where id = 16386; -- necropolis relay
+update creature set visibilitymod = 3000, spawnFlags = 1 where id = 16136; -- necrotic shard
+update gameobject set visibilitymod = 1000, spawnFlags = 1 where id = 181223; -- necropolis
+
+-- deleteing all necropolises except those stationed outside cities. 
+-- the deleted gobjs are summmoned by the hardcoded WorldEvent
+delete from gameobject where guid in (
+3998522,
+3996700,
+3996866,
+3998521,
+3996880,
+3996881,
+3996882,
+3996883,
+3996884,
+3996885,
+3996886,
+3996887,
+3996888,
+3996889
+);
+-- deleting all necropolis relays. They are ssummoned by the hardcoded worldevent
+delete from creature where id = 16386;
+-- Deleting all necropolis shards. They are spawned by the hardcoded gameevent
+delete from creature where id = 16136;
+-- remove all necropolis proxies, not using them
+delete from creature where id = 16398; 
+
+-- The scourge invasion phase 1 is now a hardcoded world event
+UPDATE `game_event` SET `hardcoded`='1' WHERE `entry`='17';
+
+
+-- add gobj 3998521
+-- move 3996867 to 3998522, remove 3998522
+-- move c 1242817 to 2530718, remove 2530718
+-- remove 
+
+-- 3998521 new gobj
+-- 2532308 new creature
+
+-- 3998522 new gobj
+-- 1242817 moved(?) creature
+
+
