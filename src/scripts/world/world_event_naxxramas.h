@@ -144,7 +144,7 @@ enum ScourgeInvasionMisc
     ENGINEER_MOD_HEALTH_PER_SEC = 15,
 
 #ifdef DEBUG_WORLD_EVENT
-    NECROPOLIS_ATTACK_TIMER = 60 * 5, 
+    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
 #else
     // The change of zone takes 4 hours
     NECROPOLIS_ATTACK_TIMER = 4 * 60 * 60, // 4 hours

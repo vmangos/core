@@ -1044,7 +1044,7 @@ bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
             player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 0);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
 
             player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2, creature->GetGUID());
             break;
@@ -1137,9 +1137,11 @@ Have no gossip for him.
 */
 bool GossipHello_npc_argent_quartermaster(Player* player, Creature* creature)
 {
-    if (player->GetQuestRewardStatus(QUEST_UNDER_THE_SHADOW))
-        player->SEND_VENDORLIST(creature->GetGUID());
-    return true;
+    //if (player->GetQuestRewardStatus(QUEST_UNDER_THE_SHADOW))
+    //    player->SEND_VENDORLIST(creature->GetGUID());
+    //return true;
+    // its in wotlk he's a vendor
+    return false; 
 }
 
 void AddSC_world_event_naxxramas()
