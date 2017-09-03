@@ -769,7 +769,7 @@ UPDATE `creature_template` SET `baseattacktime`=2000 WHERE `entry`=15956;
 UPDATE `creature_template` SET `mindmg`=200, `maxdmg`=300, `speed_walk`=3, `speed_run`=1.5, `MovementType`=2, `ScriptName`='' WHERE `entry`=16698;
 
 -- giving corrpse scarabs an AI to do patrolling
-UPDATE `creature_template` SET `ScriptName`='mob_corpse_scarab' WHERE `entry`=16698;
+UPDATE `creature_template` SET `ScriptName`='' WHERE `entry`=16698;
 
 -- we need a dummy creature named Anub'Rekhan to use for casting impale to avoid the visual bug WHERE impale is always cast towards maintank
 -- super ugly ninjaing the mob_plague_cloud AI for this creature as well, as it does the same, aka nothing.
