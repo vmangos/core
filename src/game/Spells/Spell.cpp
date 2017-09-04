@@ -766,7 +766,7 @@ void Spell::prepareDataForTriggerSystem()
                     m_procVictim = PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL;
                 }
 
-                if (IsDispelSpell(m_spellInfo))
+                if (m_spellInfo->IsDispel())
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST;
 
                 if (aoe)
@@ -1312,6 +1312,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     }
     else if (m_canTrigger && (procAttacker || procVictim))
     {
+        // TODO: Allow all procs, and explicitly deny some rather than denying all and
+        // explicitly allowing some
         bool foundDamageOrHealAura = false;
         // m_spellAuraHolder is null for non-stacking periodic effects that are already
         // on the target - they simply refresh. However, they should still proc on
@@ -1329,6 +1331,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     case SPELL_AURA_PERIODIC_HEAL:
                     case SPELL_AURA_OBS_MOD_HEALTH:
                     case SPELL_AURA_POWER_BURN_MANA:
+                    case SPELL_AURA_SCHOOL_ABSORB:
                         foundDamageOrHealAura = true;
                         break;
                 }
@@ -1353,7 +1356,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             dmg = 1;
 
         // Proc for dispels (or "cures")
-        if (IsDispelSpell(m_spellInfo))
+        if (m_spellInfo->IsDispel())
         {
             dmg = 1;
             // Override proc flags for offensive dispel
@@ -5101,24 +5104,21 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
 
         // Loatheb Corrupted Mind spell failed
-        if (   m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID 
-            || m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST
-            || m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN
-            || m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN)
+        if (!m_IsCastByItem && !m_IsTriggeredSpell)
         {
-            if (!m_IsCastByItem && (
-                    IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEAL) || 
-                    IsSpellHaveAura(m_spellInfo, SPELL_AURA_PERIODIC_HEAL) ||
-                    IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL) || 
-                    IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEAL_MAX_HEALTH) ||
-                    m_spellInfo->IsFitToFamilyMask<CF_PRIEST_HOLY_NOVA1>() ||
-                    m_spellInfo->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>())
-                )
+            Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+            for (auto itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
             {
-                Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                for (auto itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
+                if ((*itr)->GetModifier()->m_miscvalue == 4327)
                 {
-                    if ((*itr)->GetModifier()->m_miscvalue == 4327)
+                    if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID ||
+                         m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST ||
+                         m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN ||
+                         m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN) &&
+                        (IsHealSpell(m_spellInfo) ||
+                         m_spellInfo->IsDispel() || // don't really care if the target is non-friendly, there's nothing to purge on Loatheb
+                         m_spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_HOLY_NOVA1>() || // prevent holy nova cast (casted spell is damage part, heal is triggered)
+                         m_spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_POWER_WORD_SHIELD>())) // prevent PW:Shield cast
                     {
                         return SPELL_FAILED_FIZZLE;
                     }
@@ -6089,7 +6089,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
-    if (m_spellInfo->IsDispel() && !m_IsTriggeredSpell) // Buff Abolir le poison non concerne par exemple (Debuff a chaque tic)
+    if (m_spellInfo->IsNonPeriodicDispel() && !m_IsTriggeredSpell) // Buff Abolir le poison non concerne par exemple (Debuff a chaque tic)
     {
         uint32 dispelMask     = 0;
         bool bFoundOneDispell = false;

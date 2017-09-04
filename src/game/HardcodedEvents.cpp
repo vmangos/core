@@ -820,6 +820,9 @@ void ScourgeInvasionEvent::Update()
         for (auto& point : it->points)
         {
             Map* mapPtr = GetMap(it->map, point);
+            if (!mapPtr)
+                continue;
+
             Creature* pRelay = mapPtr->GetCreature(point.relayGuid);
             if (!pRelay)
                 point.relayGuid = 0;
@@ -982,7 +985,7 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     for (auto& necro : zone->points)
     {
         Map* mapPtr = GetMap(zone->map, necro);
-        if (SummonNecropolis(mapPtr, necro))
+        if (mapPtr && SummonNecropolis(mapPtr, necro))
             ++num_necropolises_remaining;
     }
     
