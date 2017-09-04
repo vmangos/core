@@ -130,6 +130,7 @@ void SpellEntry::InitCachedValues()
 {
     ComputeBinary();
     ComputeDispel();
+    ComputeNonPeriodicDispel();
 }
 
 void SpellEntry::ComputeBinary()
@@ -184,12 +185,25 @@ void SpellEntry::ComputeBinary()
     }
 }
 
+void SpellEntry::ComputeNonPeriodicDispel()
+{
+    _isNonPeriodicDispel = true;
+    for (int i = 0; i < 3; ++i)
+        if (_isNonPeriodicDispel && Effect[i] != 0 && (Effect[i] != SPELL_EFFECT_DISPEL || EffectRadiusIndex[i] != 0))
+            _isNonPeriodicDispel = false;
+}
+
 void SpellEntry::ComputeDispel()
 {
-    _isDispel = true;
+    _isDispel = false;
     for (int i = 0; i < 3; ++i)
-        if (_isDispel && Effect[i] != 0 && (Effect[i] != SPELL_EFFECT_DISPEL || EffectRadiusIndex[i] != 0))
-            _isDispel = false;
+    {
+        if (Effect[i] == SPELL_EFFECT_DISPEL)
+        {
+            _isDispel = true;
+            break;
+        }
+    }
 }
 DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
 {
