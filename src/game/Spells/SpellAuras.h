@@ -66,6 +66,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void CleanupTriggeredSpells();
 
         void setDiminishGroup(DiminishingGroup group) { m_AuraDRGroup = group; }
+        void setDiminishLevel(DiminishingLevels level) { m_AuraDRLevel = level; }
         DiminishingGroup getDiminishGroup() const { return m_AuraDRGroup; }
 
         uint32 GetStackAmount() const { return m_stackAmount; }
@@ -218,6 +219,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
 
         AuraRemoveMode m_removeMode:8;                      // Store info for know remove aura reason
         DiminishingGroup m_AuraDRGroup:8;                   // Diminishing
+        DiminishingLevels m_AuraDRLevel:8;
 
         bool m_permanent:1;
         bool m_isPassive:1;

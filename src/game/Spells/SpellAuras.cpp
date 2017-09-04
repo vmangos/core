@@ -5676,7 +5676,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, Wor
     m_stackAmount(1), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE), m_timeCla(1000),
     m_permanent(false), m_isRemovedOnShapeLost(true), m_deleted(false), m_in_use(0),
     m_debuffLimitAffected(false), m_debuffLimitScore(0), _heartBeatRandValue(0), _pveHeartBeatData(nullptr),
-    m_spellTriggered(false)
+    m_spellTriggered(false), m_AuraDRLevel(DIMINISHING_LEVEL_1)
 {
     MANGOS_ASSERT(target);
     MANGOS_ASSERT(spellproto && spellproto == sSpellMgr.GetSpellEntry(spellproto->Id) && "`info` must be pointer to sSpellStore element");
@@ -6245,11 +6245,7 @@ void SpellAuraHolder::Update(uint32 diff)
     // PvP
     if (_heartBeatRandValue)
     {
-        Unit* pTarget = GetTarget();
-        float diminishRate = 1.0f;
-        if (pTarget)
-            diminishRate = GetDiminishingRate(pTarget->GetDiminishing(this->m_AuraDRGroup) - 1);
-
+        float diminishRate = GetDiminishingRate(m_AuraDRLevel);
         float elapsedTime = (m_maxDuration - m_duration) / 1000.0f;
         float averageBreakTime = 12.0f * diminishRate; // 50% chance to break after 12 secs
         float maxBreakTime = 15.0f * diminishRate;
@@ -6261,7 +6257,7 @@ void SpellAuraHolder::Update(uint32 diff)
                            elapsedTime, m_maxDuration / 1000, currHeartBeatValue, _heartBeatRandValue);
         if (_heartBeatRandValue <=  currHeartBeatValue)
         {
-            if (pTarget)
+            if (Unit* pTarget = GetTarget())
                 pTarget->RemoveSpellAuraHolder(this);
             return;
         }
