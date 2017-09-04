@@ -1653,45 +1653,45 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     case GOSSIP_SELECT_TAILOR:
         if (argentDawnRep >= CRACT1_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Gloves", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_GLACIAL_GLOVES);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Wrists", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_GLACIAL_WRISTS);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Gloves", GOSSIP_SELECT_TAILOR, uiSender);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Wrists", GOSSIP_SELECT_TAILOR, uiSender);
         }
         if (argentDawnRep >= CRAFT2_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Vest" , GOSSIP_SENDER_MAIN, GOSSIP_SELECT_GLACIAL_CHEST);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Cloak", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_GLACIAL_CLOAK);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Vest" , GOSSIP_SELECT_TAILOR, uiSender);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Glacial Cloak", GOSSIP_SELECT_TAILOR, uiSender);
         }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_TAILOR, GOSSIP_CLOSE);
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
         return true;
     case GOSSIP_SELECT_BS:
         if (argentDawnRep >= CRACT1_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Gauntlets", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_ICEBANE_GLOVES);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Bracers", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_ICEBANE_WRISTS);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Gauntlets", GOSSIP_SELECT_BS, uiSender);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Bracers", GOSSIP_SELECT_BS, uiSender);
         }
         if (argentDawnRep >= CRAFT2_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Breastplate", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_ICEBANE_CHEST);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icebane Breastplate", GOSSIP_SELECT_BS, uiSender);
         }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_BS, GOSSIP_CLOSE);
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
         return true;
     case GOSSIP_SELECT_LW:
         if (argentDawnRep >= CRACT1_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Gloves", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_POLAR_GLOVES);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Gauntlets", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_ICYSCALE_GLOVES);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Gloves", GOSSIP_SELECT_LW, uiSender);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Gauntlets", GOSSIP_SELECT_LW, uiSender);
 
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Bracers", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_POLAR_WRISTS);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Bracers", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_ICYSCALE_WRISTS);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Bracers", GOSSIP_SELECT_LW, uiSender);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Bracers", GOSSIP_SELECT_LW, uiSender);
         }
         if (argentDawnRep >= CRAFT2_REQ_RANK)
         {
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Tunic", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_ICYSCALE_CHEST);
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Breastplate", GOSSIP_SENDER_MAIN, GOSSIP_SELECT_POLAR_CHEST);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Polar Tunic", GOSSIP_SELECT_LW, uiSender);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Icy Scale Breastplate", GOSSIP_SELECT_LW, uiSender);
         }
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SELECT_LW, GOSSIP_CLOSE);
         pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
         return true;
     case GOSSIP_SELECT_NOCRAFT:
@@ -1781,7 +1781,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     }
     }
 
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, GOSSIP_SENDER_MAIN, GOSSIP_CLOSE);
+    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, close_crafter, uiSender, GOSSIP_CLOSE);
     pPlayer->SEND_GOSSIP_MENU(GOSSIP_MENU_CRAFTER, pCreature->GetGUID());
     return true;
 }
@@ -1793,11 +1793,11 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
     uint32 leatherworkSkill = pPlayer->GetSkillValue(SKILL_LEATHERWORKING);
 
     if(tailorSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, tailorText, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_TAILOR);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, tailorText, GOSSIP_SELECT_TAILOR, GOSSIP_SELECT_TAILOR);
     if(blacksmithSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, blacksmithText, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_BS);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, blacksmithText, GOSSIP_SELECT_BS, GOSSIP_SELECT_BS);
     if(leatherworkSkill >= 225)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, leatherworkerText, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_LW);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, leatherworkerText, GOSSIP_SELECT_LW, GOSSIP_SELECT_LW);
 
     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, nocraftText, GOSSIP_SENDER_MAIN, GOSSIP_SELECT_NOCRAFT);
 
