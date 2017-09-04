@@ -254,4 +254,5 @@ enum ScourgeInvasionLang
     LANG_ARGENT_EMISSARY_AWBSER_3_0 = 20115, // 12399 - We have won $2219W battles against the Scourge.  Gird yourself, $n, for this war is far from over.
     LANG_ARGENT_EMISSARY_AWBSER_3_1 = 20116, // 12402 - We have won $2219W battles against the Scourge.  Take heart, $n.  While many battles lie ahead, heroes, heroes from every realm have risen to fight them.
     LANG_ARGENT_EMISSARY_AWBSER_3_2 = 20117, // 12403 - We have won $2219W battles against the Scourge.  Stand firm, $n!  We must persevere!
+    LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE = 20118, // For the time being, that area is free of Scourge influence. I fear it will only be a matter of time before they return.
 };
