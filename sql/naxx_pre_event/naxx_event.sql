@@ -74,7 +74,7 @@ UPDATE `creature_template` SET `ScriptName`='npc_necropolis_relay' WHERE `entry`
 UPDATE `creature_template` SET `ScriptName`='npc_necropolis_proxy' WHERE `entry`=16398;
 UPDATE `creature_template` SET `ScriptName`='npc_necrotic_shard' WHERE `entry`=16136;
 UPDATE `creature_template` SET `ScriptName`='npc_argent_emissary' WHERE `entry`=16359;
-UPDATE `creature_template` SET `ScriptName`='npc_argent_quartermaster' WHERE `entry`=16786;
+UPDATE `creature_template` SET `ScriptName`='' WHERE `entry`=16786; -- npc_argent_quartermaster
 UPDATE `creature_template` SET `ScriptName`='' WHERE `entry`=16787;
 
 -- Update modelids for several creatures
