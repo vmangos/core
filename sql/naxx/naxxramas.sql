@@ -759,6 +759,10 @@ VALUES ('30113', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1
 -- frenzied bat targets random hostile and repeats less frequently
 UPDATE `creature_ai_scripts` SET `event_flags`=3, `event_param1`=500, `event_param2`=1000, `event_param3`=5000, `event_param4`=10000, `action1_param2`=4 WHERE `id`=1603601;
 
+REPLACE INTO spell_effect_mod (Id, EffectIndex, Effect, EffectDieSides, EffectBaseDice, EffectDicePerLevel, EffectRealPointsPerLevel, EffectBasePoints, EffectAmplitude, EffectPointsPerComboPoint, EffectChainTarget, EffectMultipleValue, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB, EffectRadiusIndex, EffectApplyAuraName, EffectItemType, EffectMiscValue, EffectTriggerSpell, Comment) VALUES 
+(30080, 2, 6, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, 3, 0, 13, 42, -1, 0, 30080, 'Retching Plague'),
+(30081, 2, 6, -1, -1, -1, -1, 1, -1, -1, 1, -1, -1, 3, 0, 13, 42, -1, 0, 30080, 'Retching Plague');
+
 /*
  * Anub'Rekhan
  */
