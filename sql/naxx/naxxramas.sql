@@ -58,6 +58,41 @@ update gameobject set visibilitymod = 1000 where id = 181056;
 /*
 * General naxx stuff
 */ 
+
+REPLACE INTO script_texts (entry, content_default, type, language, emote, comment)
+VALUES
+(-1999913, "%s spits on $N", 2, 0, 0, "spit on target");
+
+update quest_template set PrevQuestId = 9121 where entry = 9033; -- echoes of war requires 9121
+
+UPDATE `creature_template` SET `npcflag`=3, `ScriptName`='mob_craftsman_omarion' WHERE `entry`=16365;
+
+-- quest "The only song i know..." requires quest "Echoes of war" completed
+update quest_template set PrevQuestId = 9033 where entry = 9232;
+
+-- The remaining craft quests require quest "Omarion's Handbook" completed
+update quest_template set PrevQuestId = 9233 where entry in (
+9234,
+9235,
+9236,
+9237,
+9238,
+9239,
+9240,
+9241,
+9242,
+9243,
+9244,
+9245,
+9246);
+
+REPLACE INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `lang0`, `prob0`, `em0_0`, `em0_1`, `em0_2`, `em0_3`, `em0_4`, `em0_5`, `text1_0`, `text1_1`, `lang1`, `prob1`, `em1_0`, `em1_1`, `em1_2`, `em1_3`, `em1_4`, 
+`em1_5`, `text2_0`, `text2_1`, `lang2`, `prob2`, `em2_0`, `em2_1`, `em2_2`, `em2_3`, `em2_4`, `em2_5`, `text3_0`, `text3_1`, `lang3`, `prob3`, `em3_0`, `em3_1`, `em3_2`, `em3_3`, `em3_4`, `em3_5`, `text4_0`, 
+`text4_1`, `lang4`, `prob4`, `em4_0`, `em4_1`, `em4_2`, `em4_3`, `em4_4`, `em4_5`, `text5_0`, `text5_1`, `lang5`, `prob5`, `em5_0`, `em5_1`, `em5_2`, `em5_3`, `em5_4`, `em5_5`, `text6_0`, `text6_1`, `lang6`,
+ `prob6`, `em6_0`, `em6_1`, `em6_2`, `em6_3`, `em6_4`, `em6_5`, `text7_0`, `text7_1`, `lang7`, `prob7`, `em7_0`, `em7_1`, `em7_2`, `em7_3`, `em7_4`, `em7_5`) 
+ VALUES
+(8508, 'Perhaps I can teach you something...','', 0, 1, 6, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0, '', '', 0, 0, 0, 0, 0, 0, 0, 0);
+
 -- Make Necropolis acolyte only use male gender (female gender is 16161), as this was the case in retail vanilla
 update creature_model_info set modelid_other_gender = 0 where modelid = 16160;
 -- Same thing for death knight captains (though both are male, just different haircolor)
