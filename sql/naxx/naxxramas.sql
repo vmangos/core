@@ -73,6 +73,10 @@ INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `Durati
 VALUES 
 ('28800', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1 ', '4', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'World of Thawing ignore los');
 
+update quest_template set RequiredClasses = 8 where entry = 9078; -- Bonescythe Legplates should require class rogue
+
+
+
 -- give AreaTrigger outside Faerlina scriptname
 DELETE FROM `scripted_areatrigger` where entry = 4115;
 INSERT INTO `scripted_areatrigger` (`entry`, `ScriptName`) VALUES ('4115', 'at_naxxramas');
