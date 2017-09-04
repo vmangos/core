@@ -1158,7 +1158,6 @@ bool GossipHello_npc_argent_quartermaster(Player* player, Creature* creature)
     if (player->GetQuestRewardStatus(QUEST_UNDER_THE_SHADOW))
     {
         return false;
-        //player->PrepareQuestMenu(creature->GetObjectGuid());
     }
     else
     {
