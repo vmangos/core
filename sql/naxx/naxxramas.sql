@@ -712,12 +712,12 @@ VALUES
 
 -- Crypt Reaver
 UPDATE `creature_template` SET `AIName`='EventAI', `ScriptName`='' WHERE `entry`=15978;
-DELETE FROM `creature_ai_scripts` where id in (1597801, 1597802, 1597803);
+DELETE FROM `creature_ai_scripts` where id in (1597801, 1597802, 1597803,1602403);
 INSERT INTO `creature_ai_scripts`
 (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`)
 VALUES
 (1597801, 15978, 0, 0, 100, 1, 5000, 5000, 6000, 7000, 11, 26350, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt Reaver Cleave'),
-(1602403, 15978, 10, 0, 100, 1, 0, 40, 0, 0, 11, 28033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt reaver increased aggro range'),
+(1597803, 15978, 10, 0, 100, 1, 0, 40, 0, 0, 11, 28033, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt reaver increased aggro range'),
 (1597802, 15978, 2, 0, 100, 1, 50, 50, 300000, 300000, 11, 28371, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Crypt Reaver Frenzy');
 
 /*
