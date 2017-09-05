@@ -12426,9 +12426,10 @@ uint32 Player::CountFreeInventorySlots() const
             ++freeSlots;
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
-                if (!GetItemByPos(i, j))
-                    ++freeSlots;
+            if (pBag->GetProto()->Class == ITEM_CLASS_CONTAINER && pBag->GetProto()->SubClass == ITEM_SUBCLASS_CONTAINER)
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                    if (!GetItemByPos(i, j))
+                        ++freeSlots;
     return freeSlots;
 }
 
