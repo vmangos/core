@@ -187,7 +187,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                 Event_Timer = 2000;
                 Point = i;
                 SetEscortPaused(true);
-                m_creature->SetFacingTo(6.24);
+                m_creature->SetFacingTo(6.24f);
                 DoScriptText(SAY_BEFORE_CHAMBER, m_creature);
                 m_creature->HandleEmoteCommand(EMOTE_ONESHOT_POINT);
                 break;
@@ -218,29 +218,29 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
         switch (uiPointId)
         {
             case 33:
-                m_creature->GetMotionMaster()->MovePoint(34, 91.9, 233.6, -88.7, MOVE_FLY_MODE, 35.0, 3.8);
+                m_creature->GetMotionMaster()->MovePoint(34, 91.9f, 233.6f, -88.7f, MOVE_FLY_MODE, 35.0f, 3.8f);
                 if (Naralex)
-                    Naralex->GetMotionMaster()->MovePoint(34, 91.9, 233.6, -85.2, MOVE_FLY_MODE, 35.0, 3.8);
+                    Naralex->GetMotionMaster()->MovePoint(34, 91.9f, 233.6f, -85.2f, MOVE_FLY_MODE, 35.0f, 3.8f);
                 break;
             case 34:
-                m_creature->GetMotionMaster()->MovePoint(35, 84.4, 218.1, -85.3, MOVE_FLY_MODE, 35.0, 4.2);
+                m_creature->GetMotionMaster()->MovePoint(35, 84.4f, 218.1f, -85.3f, MOVE_FLY_MODE, 35.0f, 4.2f);
                 if (Naralex)
-                    Naralex->GetMotionMaster()->MovePoint(35, 84.4, 218.1, -80.8, MOVE_FLY_MODE, 35.0, 4.2);
+                    Naralex->GetMotionMaster()->MovePoint(35, 84.4f, 218.1f, -80.8f, MOVE_FLY_MODE, 35.0f, 4.2f);
                 break;
             case 35:
-                m_creature->GetMotionMaster()->MovePoint(36, 77.4, 208.2, -83.1, MOVE_FLY_MODE, 35.0, 3.9);
+                m_creature->GetMotionMaster()->MovePoint(36, 77.4f, 208.2f, -83.1f, MOVE_FLY_MODE, 35.0f, 3.9f);
                 if (Naralex)
-                    Naralex->GetMotionMaster()->MovePoint(36, 77.4, 208.2, -77.6, MOVE_FLY_MODE, 35.0, 3.9);
+                    Naralex->GetMotionMaster()->MovePoint(36, 77.4f, 208.2f, -77.6f, MOVE_FLY_MODE, 35.0f, 3.9f);
                 break;
             case 36:
-                m_creature->GetMotionMaster()->MovePoint(37, 63.3, 205.4, -79.9, MOVE_FLY_MODE, 35.0, 3.3);
+                m_creature->GetMotionMaster()->MovePoint(37, 63.3f, 205.4f, -79.9f, MOVE_FLY_MODE, 35.0f, 3.3f);
                 if (Naralex)
-                    Naralex->GetMotionMaster()->MovePoint(37, 63.3, 205.4, -74.4, MOVE_FLY_MODE, 35.0, 3.3);
+                    Naralex->GetMotionMaster()->MovePoint(37, 63.3f, 205.4f, -74.4f, MOVE_FLY_MODE, 35.0f, 3.3f);
                 break;
             case 37:
-                m_creature->GetMotionMaster()->MovePoint(38, 33.3, 201.4, -70.3, MOVE_FLY_MODE, 35.0, 3.3);
+                m_creature->GetMotionMaster()->MovePoint(38, 33.3f, 201.4f, -70.3f, MOVE_FLY_MODE, 35.0f, 3.3f);
                 if (Naralex)
-                    Naralex->GetMotionMaster()->MovePoint(38, 33.3, 201.4, -65.8, MOVE_FLY_MODE, 35.0, 3.3);
+                    Naralex->GetMotionMaster()->MovePoint(38, 33.3f, 201.4f, -65.8f, MOVE_FLY_MODE, 35.0f, 3.3f);
                 break;
             case 38:
                 m_creature->SetRespawnTime(12 * HOUR);
@@ -383,7 +383,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                     switch (Subevent_Phase)
                     {
                         case 0:
-                            m_creature->SetFacingTo(5.86);
+                            m_creature->SetFacingTo(5.86f);
                             SummonAttacker(MOB_DEVIATE_RAPTOR, -67.851196f, 214.383102f, -93.499001f);
                             SummonAttacker(MOB_DEVIATE_RAPTOR, -69.769707f, 211.342804f, -93.450737f);
                             Subevent_Phase = 1;
@@ -552,8 +552,8 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
                         case 11:
                             m_creature->SetFly(true);
                             Naralex->SetFly(true);
-                            m_creature->GetMotionMaster()->MovePoint(33, 101.0, 239.2, -91.2, MOVE_FLY_MODE, 35.0, 3.5);
-                            Naralex->GetMotionMaster()->MovePoint(0, 101.0, 239.2, -90.7, MOVE_FLY_MODE, 35.0, 3.5);
+                            m_creature->GetMotionMaster()->MovePoint(33, 101.0f, 239.2f, -91.2f, MOVE_FLY_MODE, 35.0f, 3.5f);
+                            Naralex->GetMotionMaster()->MovePoint(0, 101.0f, 239.2f, -90.7f, MOVE_FLY_MODE, 35.0f, 3.5f);
                             Stop();
                             Event_Timer = 0;
                             break;

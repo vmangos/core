@@ -1683,6 +1683,33 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                 return;
             }
+            case 20939: // Undying Soul - Dummy aura used for Unstuck command
+            {
+                if (m_removeMode == AURA_REMOVE_BY_EXPIRE)
+                { 
+                    if (Unit* caster = GetCaster())
+                        if (Player* casterPlayer = caster->ToPlayer())
+                        {
+                            if (casterPlayer->isAlive() && !casterPlayer->isInCombat() && !casterPlayer->IsTaxiFlying())
+                            {
+                                casterPlayer->AddAura(15007); // Add Resurrection Sickness
+                                if (sObjectMgr.GetClosestGraveYard(casterPlayer->GetPositionX(), casterPlayer->GetPositionY(), casterPlayer->GetPositionZ(), casterPlayer->GetMapId(), casterPlayer->GetTeam()))
+                                    casterPlayer->DealDamage(casterPlayer, casterPlayer->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
+                                else
+                                {
+                                    // If there is no nearby graveyard, player's ghost would spawn at the same spot.
+                                    WorldSafeLocsEntry const *ClosestGrave = casterPlayer->GetTeamId() ? sWorldSafeLocsStore.LookupEntry(10) : sWorldSafeLocsStore.LookupEntry(4);
+                                    if (ClosestGrave)
+                                    {
+                                        casterPlayer->SetHealth(1);
+                                        casterPlayer->TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, 0, 0);
+                                    }
+                                }
+                            }
+                        }
+                }
+                return;
+            }
             case 24906:                                     // Emeriss Aura
             {
                 if (m_removeMode == AURA_REMOVE_BY_DEATH)
@@ -2018,15 +2045,15 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
             modelid = 892;
         else
             modelid = 8571;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_TRAVEL:
         modelid = 632;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_AQUA:
         modelid = 2428;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_BEAR:
         if (Player::TeamForRace(target->getRace()) == ALLIANCE)
@@ -2049,7 +2076,7 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
         break;
     case FORM_GHOSTWOLF:
         modelid = 4613;
-        mod = 0.80;
+        mod = 0.80f;
         break;
     case FORM_MOONKIN:
         if (Player::TeamForRace(target->getRace()) == ALLIANCE)
@@ -2720,7 +2747,10 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
         target->clearUnitState(UNIT_STAT_CONTROLLED);
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_PVP_ATTACKABLE);
+        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        // removing UNIT_FLAG_PVP_ATTACKABLE from a player now has weird consequences like walking underwater
+        if (!target->GetAffectingPlayer())
+            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
 
         target->SetCharmerGuid(ObjectGuid());
 
@@ -2789,6 +2819,14 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
         pet->GetMotionMaster()->Clear(false);
         pet->GetMotionMaster()->MoveIdle();
         pet->UpdateControl();
+        pet->SetWalk(p_caster->IsWalking());
+
+        if (CharmInfo* charmInfo = pet->GetCharmInfo())
+        {
+            charmInfo->SetIsAtStay(false);
+            charmInfo->SetIsReturning(false);
+            charmInfo->SetIsFollowing(false);
+        }
     }
     else
     {
@@ -2801,21 +2839,8 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
         pet->UpdateControl();
         pet->SetCharmerGuid(ObjectGuid());
 
-        // on delete only do caster related effects
-        if (m_removeMode == AURA_REMOVE_BY_DELETE)
-            return;
-
-        pet->clearUnitState(UNIT_STAT_CONTROLLED);
-
-        pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-
-        //pet->AttackStop();
-
-        // out of range pet dismissed
-        if (!pet->IsWithinDistInMap(p_caster, pet->GetMap()->GetGridActivationDistance()))
-            p_caster->RemovePet(PET_SAVE_REAGENTS);
-        else if (!pet->isInCombat())
-            pet->GetMotionMaster()->MoveFollow(p_caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+        // To avoid moving the wrong unit on server side between cancellation and mover swap
+        // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode
     }
 }
 
@@ -3009,21 +3034,52 @@ void Aura::HandleAuraModDisarm(bool apply, bool Real)
     if (!apply && target->HasAuraType(SPELL_AURA_MOD_DISARM))
         return;
 
-    target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
+    // Main-hand speed and attack damage is already set for feral form (and they cannot be disarmed anyway)
+    // If the form is switched the disarm speed/damage will be applied automatically
+    // Only update swing timers for players on disarm
+    // https://www.youtube.com/watch?v=8TDUpudEL-M&t=6m5s
+    // Furthermore, we need to apply/unapply weapon mods for players on disarm
+    // so they don't have weapon stats (or talent boosts) whilst disarmed
+    if (target->GetTypeId() == TYPEID_PLAYER && !target->IsInFeralForm())
+    {
+        Player* pTarget = target->ToPlayer();
 
-    if (target->GetTypeId() != TYPEID_PLAYER)
-        return;
+        // (un)applying weapon dependent mods is more practical on a non disarmed player
+        // if we unapply the aura remove the flag before _ApplyWeaponDependentAuraMods
+        if (!apply)
+        {
+            target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, false);
+            pTarget->SetRegularAttackTime();
+        }
 
-    // main-hand attack speed already set to special value for feral form already and don't must change and reset at remove.
-    if (target->IsInFeralForm())
-        return;
+        if (Item* weapon = pTarget->GetWeaponForAttack(BASE_ATTACK, true, true))
+            pTarget->_ApplyWeaponDependentAuraMods(weapon, BASE_ATTACK, !apply);
 
-    if (apply)
-        target->SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
+        // if we apply the aura add the flag after _ApplyWeaponDependentAuraMods
+        if (apply)
+        {
+            target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, true);
+            target->SetAttackTime(BASE_ATTACK, BASE_ATTACK_TIME);
+        }
+    }
     else
-        ((Player *)target)->SetRegularAttackTime();
+        target->ApplyModFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISARMED, apply);
 
-    target->UpdateDamagePhysical(BASE_ATTACK);
+    // Warrior 'Disarm' skill generates 104 base threat
+    // http://wowwiki.wikia.com/wiki/Disarm?direction=prev&oldid=200198 (2006) implies it 
+    // generates a large amount
+    // http://wowwiki.wikia.com/wiki/Threat has threat listed at 104, which is in line
+    // with the values of other warrior abilities
+    // We can suppose that the same is true for all spells which apply disarm
+    if (apply)
+    {
+        float threat = 104.0f * sSpellMgr.GetSpellThreatMultiplier(GetHolder()->GetSpellProto());
+        target->AddThreat(GetCaster(), threat, false, SPELL_SCHOOL_MASK_NONE, GetHolder()->GetSpellProto());
+    }
+
+    // Don't update damage if in feral
+    if (!target->IsInFeralForm())
+        target->UpdateDamagePhysical(BASE_ATTACK);
 }
 
 void Aura::HandleAuraModStun(bool apply, bool Real)
@@ -4412,8 +4468,9 @@ void Aura::HandleModCastingSpeed(bool apply, bool /*Real*/)
 void Aura::HandleModAttackSpeed(bool apply, bool /*Real*/)
 {
     Unit *target = GetTarget();
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, float(m_modifier.m_amount), apply, true);
-    target->UpdateDamagePhysical(BASE_ATTACK);
+    target->ApplyAttackTimePercentMod(BASE_ATTACK, float(m_modifier.m_amount), apply);
+    target->ApplyAttackTimePercentMod(OFF_ATTACK, float(m_modifier.m_amount), apply);
+    target->ApplyAttackTimePercentMod(RANGED_ATTACK, float(m_modifier.m_amount), apply);
 }
 
 void Aura::HandleModMeleeSpeedPct(bool apply, bool /*Real*/)
@@ -5040,7 +5097,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_STARSHARDS>())
             {
                 //ticks: 2/3, 2/3, 1, 1, 4/3, 4/3
-                float ticks[] = {0,.111,.222,.389,.556,.778,1};
+                float ticks[] = {0,.111f,.222f,.389f,.556f,.778f,1};
                 float dmg = ticks[GetAuraTicks() -1];
                 float ddone = ticks[GetAuraTicks()];
                 pdamage *= 6;
@@ -6801,6 +6858,8 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 18192: // Bouffe +10 Agility
         case 18191: // Bouffe +10 Endu
         case 25661: // Bouffe +25 Endu
+        case 24427: // Diamond Flask
+        case 17528: // Mighty Rage Potion
             return false;
 
         case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.

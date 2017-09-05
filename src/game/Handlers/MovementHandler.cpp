@@ -396,21 +396,24 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  SMSG_SPLINE_SET_SWIM_BACK_SPEED},
         {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
     };
-    
-    // Maybe update movespeed using the spline packet. works for move splines
-    // and normal movement, but reverted due to issues in same changeset
-    WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
-    data << _player->GetMover()->GetPackGUID();
-    data << movementInfo;
-    data << float(newspeed);
-    _player->SendMovementMessageToSet(std::move(data), false);
-    
-    if (!_player->GetMover()->movespline->Finalized())
+
+    if (!_player->IsTaxiFlying()) 
     {
-        WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
-        splineData << _player->GetMover()->GetPackGUID();
-        Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
-        _player->SendMovementMessageToSet(std::move(splineData), false);
+        // Maybe update movespeed using the spline packet. works for move splines
+        // and normal movement, but reverted due to issues in same changeset
+        WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
+        data << _player->GetMover()->GetPackGUID();
+        data << movementInfo;
+        data << float(newspeed);
+        _player->SendMovementMessageToSet(std::move(data), false);
+
+        if (!_player->GetMover()->movespline->Finalized())
+        {
+            WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
+            splineData << _player->GetMover()->GetPackGUID();
+            Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
+            _player->SendMovementMessageToSet(std::move(splineData), false);
+        }
     }
 }
 
@@ -428,6 +431,18 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
         _clientMoverGuid = _player->GetMover()->GetObjectGuid();
         return;
     }
+
+    // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
+    if (_player->GetPetGuid() == _clientMoverGuid)
+        if (Pet* pet = _player->GetPet())
+        {
+            pet->clearUnitState(UNIT_STAT_CONTROLLED);
+            pet->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+            // out of range pet dismissed
+            if (!pet->IsWithinDistInMap(_player, pet->GetMap()->GetGridActivationDistance()))
+                _player->RemovePet(PET_SAVE_REAGENTS);
+        }
+
     _clientMoverGuid = guid;
 }
 

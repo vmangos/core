@@ -7,6 +7,8 @@
 
 enum
 {
+    SAY_TENDRIS_AGGRO          = -1900168,
+
     SPELL_TRAMPLE              = 5568,
     SPELL_UPPERCUT             = 22916,
     SPELL_GRASPING_VINES       = 22924,
@@ -67,7 +69,7 @@ struct boss_tendris_warpwoodAI : public ScriptedAI
                     (*it)->SetInCombatWithZone();
             }
             m_uiAggroProtector = true;
-            m_creature->MonsterYell("You do not belong here! Ancients, rise up against these intruders!");
+            DoScriptText(SAY_TENDRIS_AGGRO, m_creature);
         }
     }
 

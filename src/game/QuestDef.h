@@ -213,7 +213,6 @@ class Quest
         bool HasQuestFlag(QuestFlags flag) const { return (m_QuestFlags & flag) != 0; }
         bool HasSpecialFlag(QuestSpecialFlags flag) const { return (m_SpecialFlags & flag) != 0; }
         void SetSpecialFlag(QuestSpecialFlags flag) { m_SpecialFlags |= flag; }
-        bool HasItemsRequirement() const { return (ReqItemId[0] || ReqItemId[1] || ReqItemId[2] || ReqItemId[03]); }
 
         // table data accessors:
         uint32 GetQuestId() const { return QuestId; }

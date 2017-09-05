@@ -26,7 +26,8 @@ EndScriptData */
 //Spell ID to summon this guy is 24627 "Summon Postmaster Malown"
 //He should be spawned along with three other elites once the third postbox has been opened
 
-#define SAY_MALOWNED    "You just got MALOWNED!"
+#define SAY_AGGRO   -1900161
+#define SAY_KILLED  -1900162
 
 #define SPELL_WAILINGDEAD    7713
 #define SPELL_BACKHAND    6253
@@ -56,6 +57,18 @@ struct boss_postmaster_malownAI : public ScriptedAI
         CurseOfTongues_Timer = 22000;
         CallOfTheGrave_Timer = 25000;
         HasYelled = false;
+    }
+
+    void Aggro(Unit* pWho)
+    {
+        DoScriptText(SAY_AGGRO, m_creature);
+        ScriptedAI::Aggro(pWho);
+    }
+
+    void KilledUnit(Unit* pVictim)
+    {
+        DoScriptText(SAY_KILLED, m_creature);
+        ScriptedAI::KilledUnit(pVictim);
     }
 
     void UpdateAI(const uint32 diff)

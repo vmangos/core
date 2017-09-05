@@ -32,6 +32,7 @@
 #include "ZoneScriptMgr.h"
 #include "Map.h"
 #include "ThreadPool.h"
+#include "MoveMap.h"
 
 typedef MaNGOS::ClassLevelLockable<MapManager, std::recursive_mutex> MapManagerLock;
 INSTANTIATE_SINGLETON_2(MapManager, MapManagerLock);
@@ -291,14 +292,18 @@ void MapManager::Update(uint32 diff)
         m_continentThreads.reset(new ThreadPool(continentsUpdaters.size()));
         m_continentThreads->start<>();
     }
-    std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters));
+    std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters),
+                                                                       ThreadPool::Callable(),
+                                                                       [](){MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();});
 
     SwitchPlayersInstances();
 
     std::chrono::high_resolution_clock::time_point start;
     do {
         start = std::chrono::high_resolution_clock::now();
-        std::future<void> f = m_threads->processWorkload(instancesUpdaters);
+        std::future<void> f = m_threads->processWorkload(instancesUpdaters,
+                                                         ThreadPool::Callable(),
+                                                         [](){MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();});
 
         if (f.valid())
             f.wait();

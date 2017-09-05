@@ -95,7 +95,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       m_updateFinished(false), m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
       _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(0),
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
-      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0), m_diffBuffer(0)
+      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0), m_diffBuffer(0),
+      m_lastMvtSpellsUpdate(0)
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());
@@ -367,6 +368,9 @@ bool Map::Add(Player *player)
     // Send objects first => Can not take quests at relogin
     SendInitTransports(player);
     SendInitSelf(player);
+    // Clear m_visibleGUIDs in case 2 players entered a map at the same time,
+    // one could stay invisible from the other until re-zoning.
+    // Inspired from the TrinityCore way.
     if (player->IsBeingTeleportedFar())
         player->m_visibleGUIDs.clear();
     NGridType* grid = getNGrid(cell.GridX(), cell.GridY());
@@ -672,9 +676,12 @@ inline void Map::UpdateActiveCellsAsynch(uint32 now, uint32 diff)
         for (int i = 0; i < nthreads; ++i)
             m_cellThreads << [this, diff, now, i, nthreads](){
                 UpdateActiveCellsCallback(diff, now, i, nthreads+1, 0);
+
+                MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
             };
         std::future<void> job = m_cellThreads->processWorkload();
         UpdateActiveCellsCallback(diff, now, nthreads, nthreads+1, 0);
+        MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
         if (job.valid())
             job.wait();
     }
@@ -1201,7 +1208,7 @@ bool Map::CreatureCellRelocation(Creature *c, Cell new_cell)
     return true;
 }
 
-bool Map::CreatureRespawnRelocation(Creature *c)
+bool Map::CreatureRespawnRelocation(Creature *c, bool forGridUnload)
 {
     float resp_x, resp_y, resp_z, resp_o;
     c->GetRespawnCoord(resp_x, resp_y, resp_z, &resp_o);
@@ -1209,7 +1216,9 @@ bool Map::CreatureRespawnRelocation(Creature *c)
     CellPair resp_val = MaNGOS::ComputeCellPair(resp_x, resp_y);
     Cell resp_cell(resp_val);
 
-    c->CombatStop();
+    // in some AI EnterEvadeMode() calls a relocation
+    if (forGridUnload)
+        c->AI()->EnterEvadeMode();
     c->GetMotionMaster()->Clear();
 
     DEBUG_FILTER_LOG(LOG_FILTER_CREATURE_MOVES, "Creature (GUID: %u Entry: %u) will moved from grid[%u,%u]cell[%u,%u] to respawn grid[%u,%u]cell[%u,%u].", c->GetGUIDLow(), c->GetEntry(), c->GetCurrentCell().GridX(), c->GetCurrentCell().GridY(), c->GetCurrentCell().CellX(), c->GetCurrentCell().CellY(), resp_cell.GridX(), resp_cell.GridY(), resp_cell.CellX(), resp_cell.CellY());

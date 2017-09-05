@@ -1163,6 +1163,9 @@ void World::SetInitialWorldSettings()
 
         sLog.outString("Packing groups...");
         sObjectMgr.PackGroupIds();                              // must be after CleanupInstances
+
+        sLog.outString("Scheduling normal instance reset...");
+        sMapPersistentStateMgr.ScheduleInstanceResets();        // Must be after cleanup and packing
     }
 
     ///- Init highest guids before any guid using table loading to prevent using not initialized guids in some code.
@@ -1281,6 +1284,10 @@ void World::SetInitialWorldSettings()
     sLog.outString();
     sObjectMgr.LoadQuestRelations();                        // must be after quest load
     sLog.outString(">>> Quests Relations loaded");
+    sLog.outString();
+
+    sLog.outString("Loading Quests Greetings...");          // must be loaded after creature_template
+    sObjectMgr.LoadQuestGreetings();
     sLog.outString();
 
     sLog.outString("Loading Game Event Data...");           // must be after sPoolMgr.LoadFromDB and quests to properly load pool events and quests for events

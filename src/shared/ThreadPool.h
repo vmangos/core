@@ -45,7 +45,9 @@ public:
     template <class T = SingleQueue>
     using MySQL = worker_mysql<T>;
 
-    using workload_t = std::vector<std::function<void()>>;
+    using Callable = std::function<void()>;
+
+    using workload_t = std::vector<Callable>;
 
     enum class Status {
         ERROR = -1,
@@ -103,15 +105,15 @@ public:
     /**
      * @brief processWorkload notify the threads that the workload is ready.
      */
-    std::future<void> processWorkload();
+    std::future<void> processWorkload(Callable pre = Callable(), Callable post = Callable());
 
     /**
      * @brief setWorkload set the next workload
      * @param workload
      * @param safe if true, it will wait for previous workload to be done
      */
-    std::future<void> processWorkload(workload_t &workload);
-    std::future<void> processWorkload(workload_t &&workload);
+    std::future<void> processWorkload(workload_t &workload, Callable pre = Callable(), Callable post = Callable());
+    std::future<void> processWorkload(workload_t &&workload,Callable pre = Callable(), Callable post = Callable());
 
     /**
      * @brief status
@@ -137,7 +139,7 @@ public:
      * @param function
      * @return
      */
-    ThreadPool& operator<<(std::function<void()> function);
+    ThreadPool& operator<<(Callable function);
 
     /**
      * @brief clearWorkload
@@ -154,7 +156,7 @@ private:
         void loop_wrapper();
         void loop();
         virtual void doWork() = 0;
-        virtual void prepare();
+        virtual void prepare(Callable pre, Callable post);
         void waitForWork();
 
         int id;
@@ -162,6 +164,7 @@ private:
         volatile bool busy = false;
         ThreadPool *pool;
         std::thread thread;
+        Callable pre, post;
 
     };
 
@@ -175,7 +178,7 @@ private:
         worker_mq(ThreadPool *pool, int id, ErrorHandling mode);
 
         void doWork() override;
-        void prepare() override;
+        void prepare(Callable pre, Callable post) override;
 
         int it;
     };

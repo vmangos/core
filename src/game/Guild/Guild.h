@@ -86,6 +86,15 @@ enum Typecommand
     GUILD_UNK3      = 0x16
 };
 
+enum class GuildAddStatus
+{
+    OK,
+    GUILD_FULL,
+    ALREADY_IN_GUILD,
+    UNKNOWN_PLAYER,
+    PLAYER_DATA_ERROR
+};
+
 enum CommandErrors
 {
     ERR_PLAYER_NO_MORE_IN_GUILD     = 0x00,
@@ -233,7 +242,7 @@ class Guild
         uint32 GetBackgroundColor() const { return m_BackgroundColor; }
 
         void SetLeader(ObjectGuid guid);
-        bool AddMember(ObjectGuid plGuid, uint32 plRank);
+        GuildAddStatus AddMember(ObjectGuid plGuid, uint32 plRank);
         bool DelMember(ObjectGuid guid, bool isDisbanding = false);
         //lowest rank is the count of ranks - 1 (the highest rank_id in table)
         uint32 GetLowestRank() const { return m_Ranks.size() - 1; }

@@ -152,12 +152,13 @@ enum
     NPC_PLAGUEMAW_THE_ROTTING = 7356,
 
     GO_BELNISTRASZ_BRAZIER = 152097,
+    GO_IDOL_OVEN_FIRE = 151951,
+    GO_IDOL_MOUTH_FIRE = 151973,
 
     SPELL_ARCANE_INTELLECT = 13326, // use this somewhere (he has it as default)
     SPELL_FIREBALL = 9053,
     SPELL_FROST_NOVA = 11831,
     SPELL_IDOL_SHUTDOWN = 12774,
-    SPELL_ROOT_SELF = 23973,
 
     // summon spells only exist in 1.x
     //SPELL_SUMMON_1 = 12694, // NPC_WITHERED_BATTLE_BOAR
@@ -176,12 +177,14 @@ struct npc_belnistraszAI : public npc_escortAI
 {
     npc_belnistraszAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
+        pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         m_uiRitualPhase = 0;
         m_uiRitualTimer = 1000;
         m_bAggro = false;
         Reset();
     }
 
+    ScriptedInstance* pInstance;
     uint8 m_uiRitualPhase;
     uint32 m_uiRitualTimer;
     bool m_bAggro;
@@ -206,6 +209,14 @@ struct npc_belnistraszAI : public npc_escortAI
             return;
         }
         ScriptedAI::AttackedBy(pAttacker);
+    }
+
+    void AttackStart(Unit* pWho) override
+    {
+        if (HasEscortState(STATE_ESCORT_PAUSED) && (m_uiRitualPhase > 0))
+            return;
+
+        npc_escortAI::AttackStart(pWho);
     }
 
     void SpawnerSummon(Creature* pSummoner)
@@ -273,7 +284,7 @@ struct npc_belnistraszAI : public npc_escortAI
                 switch (m_uiRitualPhase)
                 {
                     case 0:
-                        DoCast(m_creature, SPELL_ROOT_SELF, true); // roots self so he stays put while channeling
+                        SetCombatMovement(false);
                         DoCastSpellIfCan(m_creature, SPELL_IDOL_SHUTDOWN);
                         m_uiRitualTimer = 1000;
                         break;
@@ -322,6 +333,12 @@ struct npc_belnistraszAI : public npc_escortAI
                         }
                         m_creature->RemoveAurasDueToSpell(SPELL_IDOL_SHUTDOWN);
                         m_creature->SummonGameObject(GO_BELNISTRASZ_BRAZIER, 2577.196f, 947.0781f, 53.16757f, 2.356195f, 0, 0, 0.9238796f, 0.3826832f, 3600);
+                        if (GameObject* pGoOvenFire = GetClosestGameObjectWithEntry(m_creature, GO_IDOL_OVEN_FIRE, 50))
+                            pGoOvenFire->SetLootState(GO_JUST_DEACTIVATED);
+                        if (GameObject* pGoMouthFire = GetClosestGameObjectWithEntry(m_creature, GO_IDOL_MOUTH_FIRE, 50))
+                            pGoMouthFire->SetLootState(GO_JUST_DEACTIVATED);
+                        if (pInstance)
+                            pInstance->SetData(EXTINGUISH_FIRES, 0);
                         SetEscortPaused(false);
                         break;
                     }

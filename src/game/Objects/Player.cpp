@@ -582,6 +582,8 @@ Player::Player(WorldSession *session) : Unit(),
     // TODO: remove it
     launched = false;
     xy_speed = 0.0f;
+
+    m_justBoarded = false;
 }
 
 Player::~Player()
@@ -821,8 +823,6 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
     SetCustomFlags(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_FROM_NOSTALRIUS_3);
-
-    SetJustBoarded(false);
 
     return true;
 }
@@ -2681,7 +2681,30 @@ void Player::GiveLevel(uint32 level)
     if (level == getLevel())
         return;
 
-    sLog.out(LOG_LEVELUP, "Character %s:%u [c%u r%u] reaches level %2u", GetName(), GetGUIDLow(), getClass(), getRace(), level);
+    std::stringstream groupInfo;
+    if (GetGroup())
+    {
+        bool first = true;
+        for (GroupReference* itr = GetGroup()->GetFirstMember(); itr != nullptr; itr = itr->next())
+        {
+            if (Player *player = itr->getSource())
+            {
+                if (!first)
+                    groupInfo << ", ";
+
+                groupInfo << player->GetName();
+
+                first = false;
+            }
+        }
+    }
+    else
+        groupInfo << "None";
+
+    sLog.out(LOG_LEVELUP, "Character %s:%u [c%u r%u] reaches level %2u, zone %u, pos: [%0.2f, %0.2f, %0.2f] [Group: %s]",
+        GetName(), GetGUIDLow(), getClass(), getRace(), level, GetZoneId(), GetPositionX(), GetPositionY(), GetPositionZ(),
+        groupInfo.str().c_str());
+
     PlayerLevelInfo info;
     sObjectMgr.GetPlayerLevelInfo(getRace(), getClass(), level, &info);
 
@@ -10334,7 +10357,7 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
     }
 }
 
-void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequip_check)
+void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequip_check, bool check_bank)
 {
     DEBUG_LOG("STORAGE: DestroyItemCount item = %u, count = %u", item, count);
     uint32 remcount = 0;
@@ -10461,8 +10484,70 @@ void Player::DestroyItemCount(uint32 item, uint32 count, bool update, bool unequ
             }
         }
     }
-}
 
+    if (check_bank)
+    {
+        // in bank
+        for (int i = BANK_SLOT_ITEM_START; i < BANK_SLOT_ITEM_END; ++i)
+        {
+            if (Item* pItem = GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                if (pItem->GetEntry() == item && !pItem->IsInTrade())
+                {
+                    if (pItem->GetCount() + remcount <= count)
+                    {
+                        remcount += pItem->GetCount();
+                        DestroyItem(INVENTORY_SLOT_BAG_0, i, update);
+
+                        if (remcount >= count)
+                            return;
+                    }
+                    else
+                    {
+                        pItem->SetCount(pItem->GetCount() - count + remcount);
+                        if (IsInWorld() & update)
+                            pItem->SendCreateUpdateToPlayer(this);
+                        pItem->SetState(ITEM_CHANGED, this);
+                        return;
+                    }
+                }
+            }
+        }
+
+        // in bank bags
+        for (int i = BANK_SLOT_BAG_START; i < BANK_SLOT_BAG_END; ++i)
+        {
+            if (Bag *pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
+            {
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                {
+                    if (Item* pItem = pBag->GetItemByPos(j))
+                    {
+                        if (pItem->GetEntry() == item && !pItem->IsInTrade())
+                        {
+                            if (pItem->GetCount() + remcount <= count)
+                            {
+                                remcount += pItem->GetCount();
+                                DestroyItem(i, j, update);
+
+                                if (remcount >= count)
+                                    return;
+                            }
+                            else
+                            {
+                                pItem->SetCount(pItem->GetCount() - count + remcount);
+                                if (IsInWorld() && update)
+                                    pItem->SendCreateUpdateToPlayer(this);
+                                pItem->SetState(ITEM_CHANGED, this);
+                                return;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
 
 bool Player::DestroyEquippedItem(uint32 itemId)
 {
@@ -11460,7 +11545,7 @@ void Player::SendItemDurations()
         (*itr)->SendTimeUpdate(this);
 }
 
-void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, bool broadcast)
+void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, bool broadcast /*=false*/, bool showInChat /*=true*/)
 {
     if (!item)                                              // prevent crash
         return;
@@ -11470,7 +11555,7 @@ void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, 
     data << GetObjectGuid();                                // player GUID
     data << uint32(received);                               // 0=looted, 1=from npc
     data << uint32(created);                                // 0=received, 1=created
-    data << uint32(1);                                      // IsShowChatMessage
+    data << uint32(showInChat);                             // showInChat
     data << uint8(item->GetBagSlot());                      // bagslot
     // item slot, but when added to stack: 0xFFFFFFFF
     data << uint32((item->GetCount() == count) ? item->GetSlot() : -1);
@@ -12588,7 +12673,7 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
             if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewChoiceItemCount[reward]) == EQUIP_ERR_OK)
             {
                 Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
-                SendNewItem(item, pQuest->RewChoiceItemCount[reward], true, false);
+                SendNewItem(item, pQuest->RewChoiceItemCount[reward], true, false, false, false);
             }
         }
     }
@@ -12603,7 +12688,7 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
                 if (CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemId, pQuest->RewItemCount[i]) == EQUIP_ERR_OK)
                 {
                     Item* item = StoreNewItem(dest, itemId, true, Item::GenerateItemRandomPropertyId(itemId));
-                    SendNewItem(item, pQuest->RewItemCount[i], true, false);
+                    SendNewItem(item, pQuest->RewItemCount[i], true, false, false, false);
                 }
             }
         }
@@ -13176,6 +13261,18 @@ bool Player::GetQuestRewardStatus(uint32 quest_id) const
     return false;
 }
 
+const QuestStatusData* Player::GetQuestStatusData(uint32 quest_id) const
+{
+    auto it = mQuestStatus.find(quest_id);
+
+    if (it != mQuestStatus.end())
+    {
+        return &it->second;
+    }
+
+    return nullptr;
+}
+
 QuestStatus Player::GetQuestStatus(uint32 quest_id) const
 {
     if (quest_id)
@@ -13591,7 +13688,8 @@ void Player::TalkedToCreature(uint32 entry, ObjectGuid guid)
 
 void Player::LogModifyMoney(int32 d, const char* type, ObjectGuid fromGuid, uint32 data)
 {
-    if (uint32(abs(d)) > sWorld.getConfig(CONFIG_UINT32_LOG_MONEY_TRADES_TRESHOLD))
+    // Always log GM transactions regardless of threshold
+    if (uint32(abs(d)) > sWorld.getConfig(CONFIG_UINT32_LOG_MONEY_TRADES_TRESHOLD) || GetSession()->GetSecurity() > SEC_PLAYER)
     {
         sLog.out(LOG_MONEY_TRADES, "[%s] %s gets %ic (data: %u|%s)", type, GetShortDescription().c_str(), d, data, fromGuid.GetString().c_str());
         if (d > 0)
@@ -17096,7 +17194,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
             return false;
         }
 
-        ModifyMoney(-int32(price));
+        LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
         pItem = StoreNewItem(dest, item, true);
     }
@@ -17116,7 +17214,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
             return false;
         }
 
-        ModifyMoney(-int32(price));
+        LogModifyMoney(-int32(price), "BuyItem", vendorGuid, item);
 
         pItem = EquipNewItem(dest, item, true);
 
@@ -18506,9 +18604,9 @@ void Player::ResurectUsingRequestData()
     if (m_resurrectGuid.IsPlayer())
         TeleportTo(m_resurrectMap, m_resurrectX, m_resurrectY, m_resurrectZ, GetOrientation());
 
-    //we cannot resurrect player when we triggered far teleport
-    //player will be resurrected upon teleportation
-    if (IsBeingTeleportedFar())
+    //we cannot resurrect player when we triggered any kind of teleport
+    //player will be resurrected upon teleportation (in MSG_MOVE_TELEPORT_ACK handler)
+    if (IsBeingTeleported())
     {
         ScheduleDelayedOperation(DELAYED_RESURRECT_PLAYER);
         return;
@@ -18754,6 +18852,7 @@ void Player::UpdateUnderwaterState()
 {
     GridMapLiquidData liquid_status;
     GridMapLiquidStatus res = GetMap()->GetTerrain()->getLiquidStatus(GetPositionX(), GetPositionY(), GetPositionZ(), MAP_ALL_LIQUIDS, &liquid_status);
+
     if (!res)
     {
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
@@ -18793,6 +18892,32 @@ void Player::UpdateUnderwaterState()
             m_MirrorTimerFlags |= UNDERWATER_INSLIME;
         else
             m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
+    }
+
+    // cast any spells associated with this liquid type (only used in Naxxramas)
+    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_status.entry))
+    {
+        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(liq->SpellId);
+
+        if (spellInfo)
+        {
+            SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, this, nullptr);
+
+            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                uint8 eff = spellInfo->Effect[i];
+                if (eff >= TOTAL_SPELL_EFFECTS)
+                    continue;
+                if (IsAreaAuraEffect(eff) ||
+                    eff == SPELL_EFFECT_APPLY_AURA ||
+                    eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+                {
+                    Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, this);
+                    holder->AddAura(aur, SpellEffectIndex(i));
+                }
+            }
+            AddSpellAuraHolder(holder);
+        }
     }
 }
 
@@ -19030,7 +19155,10 @@ void Player::HandleFall(MovementInfo const& movementInfo)
 
         if (damageperc > 0)
         {
-            uint32 damage = (uint32)(damageperc * GetMaxHealth() * sWorld.getConfig(CONFIG_FLOAT_RATE_DAMAGE_FALL));
+            float TakenTotalMod = 1.0f;
+            TakenTotalMod *= GetTotalAuraMultiplierByMiscMask(SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN, SPELL_SCHOOL_MASK_NORMAL);
+
+            uint32 damage = (uint32)(damageperc * GetMaxHealth() * sWorld.getConfig(CONFIG_FLOAT_RATE_DAMAGE_FALL) * TakenTotalMod);
 
             float height = movementInfo.GetPos()->z;
             UpdateAllowedPositionZ(movementInfo.GetPos()->x, movementInfo.GetPos()->y, height);

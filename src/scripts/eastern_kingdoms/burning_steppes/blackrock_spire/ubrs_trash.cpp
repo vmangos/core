@@ -6,13 +6,16 @@ enum
     // Invocateur Main-noire
     SPELL_BOULE_FEU             = 12466, // Boule de feu
     SPELL_NOVA_GIVRE            = 15532, // Nova de givre
-    SPELL_INVOC_TISSEUR_EFFROI  = 15794,
-    SPELL_INVOC_VETERAN         = 15792,
+    SPELL_SUMMON_DREADWEAVER    = 15794,
+    SPELL_SUMMON_VETERAN        = 15792,
 
     // Veteran Main-noire
     SPELL_CHARGE_BOUCLIER       = 15749,
     SPELL_COUP_BOUCLIER         = 11972,
     SPELL_FRAPPE                = 14516,
+
+    SAY_SUMMONING_DREADWEAVER   = -1900166,
+    SAY_SUMMONING_VETERAN       = -1900167
 };
 
 // npc_blackhand_summoner
@@ -63,13 +66,19 @@ struct npc_blackhand_summonerAI : public ScriptedAI
             {
                 if (urand(0, 1) == 0)
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_INVOC_TISSEUR_EFFROI) == CAST_OK)
+                    if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_DREADWEAVER) == CAST_OK)
+                    {
+                        DoScriptText(SAY_SUMMONING_DREADWEAVER, m_creature);
                         m_uiSummonTimer = 15000;
+                    }
                 }
                 else
                 {
-                    if (DoCastSpellIfCan(pTarget, SPELL_INVOC_VETERAN) == CAST_OK)
+                    if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_VETERAN) == CAST_OK)
+                    {
+                        DoScriptText(SAY_SUMMONING_VETERAN, m_creature);
                         m_uiSummonTimer = 15000;
+                    }
                 }
             }
         }

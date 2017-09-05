@@ -89,22 +89,28 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
             switch (spellid)
             {
                 case COMMAND_STAY:                          // flat=1792  //STAY
-                    pet->StopMoving();
-                    pet->GetMotionMaster()->Clear(false);
-                    pet->GetMotionMaster()->MoveIdle();
+                    if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+                    {
+                        pet->StopMoving();
+                        pet->GetMotionMaster()->Clear(false);
+                        pet->GetMotionMaster()->MoveIdle();
+                        charmInfo->SetIsAtStay(true);
+                    }
                     charmInfo->SetCommandState(COMMAND_STAY);
 
                     charmInfo->SetIsCommandAttack(false);
-                    charmInfo->SetIsAtStay(true);
                     charmInfo->SetIsCommandFollow(false);
                     charmInfo->SetIsFollowing(false);
                     charmInfo->SetIsReturning(false);
                     charmInfo->SaveStayPosition();
                     break;
                 case COMMAND_FOLLOW:                        // spellid=1792  //FOLLOW
-                    pet->AttackStop();
-                    pet->InterruptNonMeleeSpells(false);
-                    pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                    if (!pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+                    {
+                        pet->AttackStop();
+                        pet->InterruptNonMeleeSpells(false);
+                        pet->GetMotionMaster()->MoveFollow(_player, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                    }
                     charmInfo->SetCommandState(COMMAND_FOLLOW);
 
                     charmInfo->SetIsCommandAttack(false);
@@ -132,7 +138,7 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
 
                     pet->clearUnitState(UNIT_STAT_FOLLOW);
                     // This is true if pet has no target or has target but targets differs.
-                    if (pet->getVictim() != TargetUnit || (pet->getVictim() == TargetUnit && !pet->GetCharmInfo()->IsCommandAttack()))
+                    if (pet->getVictim() != TargetUnit || (pet->getVictim() == TargetUnit && !pet->GetCharmInfo()->IsCommandAttack()) || pet->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
                     {
                         if (pet->getVictim())
                             pet->AttackStop();
@@ -178,9 +184,8 @@ void WorldSession::HandlePetAction(WorldPacket& recv_data)
                     if (((Creature*)pet)->IsPet())
                     {
                         Pet* p = (Pet*)pet;
-                        if (p->getPetType() == HUNTER_PET)
-                            p->Unsummon(PET_SAVE_AS_CURRENT, _player);
-                        else
+                        // Hunter pets are dismissed with a spell with a cast time
+                        if (p->getPetType() != HUNTER_PET)
                             // dismissing a summoned pet is like killing them (this prevents returning a soulshard...)
                             p->Unsummon(PET_SAVE_NOT_IN_SLOT);
                     }

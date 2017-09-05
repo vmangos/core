@@ -78,6 +78,9 @@ namespace MMAP
             MMapManager() : loadedTiles(0) {}
             ~MMapManager();
 
+            void CleanUpNavQuery(std::thread::id tid);       // Cleans up the dtNavMeshQuery created by the given thread (if any)
+            void CleanUpCurrentThreadNavQuery();    // Cleans up the dtNavMeshQuery created by the current thread (if any)
+
             bool loadMap(uint32 mapId, int32 x, int32 y);
             bool loadGameObject(uint32 displayId);
             bool unloadMap(uint32 mapId, int32 x, int32 y);
@@ -96,11 +99,13 @@ namespace MMAP
             bool loadMapData(uint32 mapId);
             uint32 packTileID(int32 x, int32 y);
 
+            void RemoveThreadNavMeshQueries(std::thread::id tid, MMapData *mmap);    // Cleans up any dtNavMeshQuery in the given mmap related to the given tid
+
             MMapDataSet loadedMMaps;
             std::shared_timed_mutex loadedMMaps_lock;
             MMapDataSet loadedModels;
+            std::shared_timed_mutex loadedModels_lock;
             uint32 loadedTiles;
-            std::mutex lockForModels;
     };
 
     // static class

@@ -29,6 +29,8 @@ struct instance_razorfen_downs : public ScriptedInstance
     };
 
     uint64 uiGongGUID;
+    uint64 uiCupFire1GUID;
+    uint64 uiCupFire2GUID;
 
     uint32 m_auiEncounter[MAX_ENCOUNTER];
 
@@ -40,6 +42,10 @@ struct instance_razorfen_downs : public ScriptedInstance
     void Initialize()
     {
         uiGongGUID = 0;
+
+        uiCupFire1GUID = 0;
+
+        uiCupFire2GUID = 0;
 
         uiGongWaves = 0;
 
@@ -75,6 +81,12 @@ struct instance_razorfen_downs : public ScriptedInstance
                 uiGongGUID = pGo->GetGUID();
                 if (m_auiEncounter[0] == DONE)
                     pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+                break;
+            case GO_IDOL_CUP_FIRE:
+                if (uiCupFire1GUID != 0)
+                    uiCupFire2GUID = pGo->GetGUID();
+                else
+                    uiCupFire1GUID = pGo->GetGUID();
                 break;
             default:
                 break;
@@ -166,6 +178,14 @@ struct instance_razorfen_downs : public ScriptedInstance
 
             if (uiData == DONE)
                 SaveToDB();
+        }
+
+        if (uiType == EXTINGUISH_FIRES)
+        {
+            if (GameObject* pGoCupFire1 = instance->GetGameObject(uiCupFire1GUID))
+                pGoCupFire1->SetLootState(GO_JUST_DEACTIVATED);
+            if (GameObject* pGoCupFire2 = instance->GetGameObject(uiCupFire2GUID))
+                pGoCupFire2->SetLootState(GO_JUST_DEACTIVATED);
         }
 
         if (uiData == DONE)

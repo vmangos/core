@@ -8,8 +8,9 @@ EndContentData */
 #include "scriptPCH.h"
 #include "stratholme.h"
 
-#define TEXTE_CRISTAL_MORT         -20003
-#define TEXTE_CRISTAL_TOUS_MORT    -20004
+#define SAY_CRYSTAL_DESTROYED         -1900116
+#define SAY_ALL_CRYSTALS_DESTROYED    -1900115
+#define SAY_SCOURGE_HAVE_BROKEN_IN    -1900114
 /*######
 ## go_gauntlet_gate (this is the _first_ of the gauntlet gates, two exist)
 ######*/
@@ -340,12 +341,12 @@ struct mobs_cristal_zugguratAI : public ScriptedAI
     {
         if (Creature* pop = m_creature->SummonCreature(10399, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() - 100, 0, TEMPSUMMON_TIMED_DESPAWN, 1))
         {
-            pop->MonsterYellToZone(TEXTE_CRISTAL_MORT, LANG_UNIVERSAL, 0);
+            pop->MonsterYellToZone(SAY_CRYSTAL_DESTROYED, LANG_UNIVERSAL, 0);
             if (m_pInstance)
             {
                 m_pInstance->SetData(TYPE_CRISTAL_DIE, IN_PROGRESS);
                 if (m_pInstance->GetData(TYPE_CRISTAL_ALL_DIE) == DONE)
-                    pop->MonsterYellToZone(TEXTE_CRISTAL_TOUS_MORT, LANG_UNIVERSAL, 0);
+                    pop->MonsterYellToZone(SAY_ALL_CRYSTALS_DESTROYED, LANG_UNIVERSAL, 0);
             }
         }
     }
@@ -871,7 +872,7 @@ struct npc_couloir_trigger1AI : public ScriptedAI
                     if (Crea->isAlive() && !Crea->isInCombat())
                     {
                         //"The scourge has broken into our bastion!"
-                        Crea->MonsterYellToZone(-20005);
+                        Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
                     }
                     else
                         return;
@@ -1017,7 +1018,7 @@ struct npc_Scourge_TriggerAI : public ScriptedAI
                     if (Crea->isAlive() && !Crea->isInCombat())
                     {
                         //"The scourge has broken into our bastion!"
-                        Crea->MonsterYellToZone(-20005);
+                        Crea->MonsterYellToZone(SAY_SCOURGE_HAVE_BROKEN_IN);
                     }
                     else
                         return;

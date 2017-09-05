@@ -420,9 +420,11 @@ void Transport::SendOutOfRangeUpdateToMap()
     {
         UpdateData data;
         BuildOutOfRangeUpdateBlock(&data);
+        WorldPacket packet;
+        data.BuildPacket(&packet);
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
             if (itr->getSource()->GetTransport() != this)
-                data.Send(itr->getSource()->GetSession());
+                itr->getSource()->SendDirectMessage(&packet);
     }
 }
 

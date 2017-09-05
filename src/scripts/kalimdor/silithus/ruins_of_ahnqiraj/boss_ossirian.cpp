@@ -16,8 +16,8 @@
 
 /* ScriptData
 SDName: Boss_Ossirian
-SD%Complete: 75
-SDComment: Weaknesses casting not 100%, weather NYI
+SD%Complete: 99
+SDComment:
 SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
@@ -462,9 +462,7 @@ struct ossirian_crystalAI : public GameObjectAI
 
         if (triggerCrystalPylons)
         {
-            if (triggerCrystalPylons->GetDistance(ossirian) < 40.0f)
-                triggerCrystalPylons->CastSpell(ossirian, SpellWeakness[urand(0, sizeof(SpellWeakness)/sizeof(SpellWeakness[0])-1)], false);
-
+            triggerCrystalPylons->CastSpell(ossirian, SpellWeakness[urand(0, 4)], true);
             ossirian->AI()->DoAction(0xBEEF);
         }
         return false;

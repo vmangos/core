@@ -1191,13 +1191,6 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         else
         {
             caster->CalculateSpellDamage(&damageInfo, m_damage, m_spellInfo, m_attackType, this);
-            // Judgement of Command
-            if (m_spellInfo->SpellIconID == 561)
-            {
-                // damage halved if target not stunned.
-                if (!unitTarget->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED))
-                     damageInfo.damage = int32(damageInfo.damage * 0.5f);
-            }
         }
 
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
@@ -1285,6 +1278,10 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                             break;
                     }
 
+        // Sunder Armor triggers weapon proc as well as normal procs despite dealing no damage
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>())
+            ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
+
         // Fill base damage struct (unitTarget - is real spell target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
         procEx = createProcExtendMask(&damageInfo, missInfo);
@@ -1299,18 +1296,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // Trigger spell cast procs and forward the damage / heal procs to the aura
         if (foundDamageOrHealAura)
         {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
-            procAttacker &= (PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
+            procAttacker &= (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
             procVictim = 0;
             dmg = 1;
         }
         caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
-    }
-    // Sunder Armor triggers main hand proc despite dealing no damage
-    else if (m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>()) //sunder armor
-    {
-        ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
     }
 
     if (missInfo != SPELL_MISS_NONE)
@@ -2758,7 +2750,6 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     break;
                 }
                 case SPELL_EFFECT_BIND:
-                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_PARRY:
                 case SPELL_EFFECT_BLOCK:
                 case SPELL_EFFECT_CREATE_ITEM:
@@ -2783,6 +2774,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
                     break;
+                case SPELL_EFFECT_RESURRECT:
                 case SPELL_EFFECT_RESURRECT_NEW:
                     if (m_targets.getUnitTarget())
                         targetUnitMap.push_back(m_targets.getUnitTarget());
@@ -3157,12 +3149,23 @@ void Spell::cancel()
                 m_caster->ToPlayer()->RemoveSpellMods(this);
 
                 // summoning rituals, if a user has cancelled inform the go
-                if (GameObject* go = m_targets.getGOTarget())
-                    if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
-                        go->getLootState() != GO_JUST_DEACTIVATED &&
-                        go->HasUniqueUser(m_caster->ToPlayer()))
-                        go->RemoveUniqueUse(m_caster->ToPlayer());
+                // Don't use m_targets.getGOTarget(), as it may be a dangling pointer since we don't
+                // update the target pointers here (only want to check a single target pointer). We
+                // can use it as a speed-up to see if this spell had a GO target at some point though
+                if (m_targets.getGOTarget())
+                {
+                    if (GameObject *go = m_caster->GetMap()->GetGameObject(m_targets.getGOTargetGuid()))
+                    {
+                        if (go->GetGoType() == GAMEOBJECT_TYPE_SUMMONING_RITUAL &&
+                            go->getLootState() != GO_JUST_DEACTIVATED &&
+                            go->HasUniqueUser(m_caster->ToPlayer()))
+                        {
+                            go->RemoveUniqueUse(m_caster->ToPlayer());
+                        }
+                    }
+                }
             }
+
             if (sendInterrupt)
                 SendCastResult(SPELL_FAILED_INTERRUPTED);
         }
@@ -3469,6 +3472,11 @@ void Spell::handle_immediate()
 
         ++m_targetNum;
         DoAllEffectOnTarget(&(*ihit));
+
+        // a channeled spell could be interrupted already because the aura on target
+        // was diminished to duration=0 see Spell::DoSpellHitOnUnit
+        if (m_channeled && m_spellState != SPELL_STATE_CASTING)
+            return;
     }
 
     for (auto ihit = m_UniqueGOTargetInfo.begin(); ihit != m_UniqueGOTargetInfo.end(); ++ihit)
@@ -5036,7 +5044,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-                if (m_spellInfo->Id == 7266 && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
+                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
                 {
                     return SPELL_FAILED_TARGET_DUELING;
                 }
@@ -6666,6 +6674,22 @@ bool Spell::IgnoreItemRequirements() const
 
 SpellCastResult Spell::CheckItems()
 {
+    // Check creature casts again here, even though they are checked in CreatureAI
+    // Need to do this for some melee attacks which are channeled, and then triggered
+    // eg. 13736
+    if (Creature *creature = m_caster->ToCreature())
+    {
+        // If the unit is disarmed and the skill requires a weapon, it cannot be cast
+        if (creature->HasWeapon() && !creature->CanUseEquippedWeapon(BASE_ATTACK))
+        {
+            for (int i = 0; i < MAX_EFFECT_INDEX; i++)
+            {
+                if (m_spellInfo->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE || m_spellInfo->Effect[i] == SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL)
+                    return SPELL_FAILED_EQUIPPED_ITEM;
+            }
+        }
+    }
+
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
         return SPELL_CAST_OK;
 
@@ -6916,9 +6940,11 @@ SpellCastResult Spell::CheckItems()
                     break; // Master Healthstone
             }
 
-            if (p_caster->HasItemCount(itemtype, 1))
+            ItemPosCountVec dest;
+            InventoryResult msg = p_caster->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, itemtype, 1);
+            if (msg != EQUIP_ERR_OK)
             {
-                p_caster->SendEquipError(EQUIP_ERR_CANT_CARRY_MORE_OF_THIS, nullptr, nullptr, itemtype);
+                p_caster->SendEquipError(msg, nullptr, nullptr, itemtype);
                 return SPELL_FAILED_DONT_REPORT;
             }
         }
@@ -7287,6 +7313,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
                 break;
         // no break. Cannibalize checks corpse target LOS.
         // fall through
+        case SPELL_EFFECT_RESURRECT:
         case SPELL_EFFECT_RESURRECT_NEW:
             // player far away, maybe his corpse near?
             if (target != m_caster && !(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !target->IsWithinLOSInMap(m_caster))
