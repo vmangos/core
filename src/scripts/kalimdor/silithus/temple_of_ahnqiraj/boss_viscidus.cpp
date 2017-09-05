@@ -285,16 +285,11 @@ struct boss_viscidusAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
-            // move all summoned globs to the Viscidus's spawn point
-            //float fX, fY, fZ;
-            //m_creature->GetRespawnCoord(fX, fY, fZ);
-            //pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_FORCE_DESTINATION | MOVE_PATHFINDING | MOVE_RUN_MODE);
-            // optimization(hardcoded position)
-            // This is alot better than previous, but not exact. Need data from official.
-            // When changing this value, these also need to be updated:
-            // UPDATE `creature` SET `position_x` = -8000.87939, `position_y` = 928.599731, `position_z` = -51.861111 WHERE `guid` = 87938;
-            // UPDATE `spell_target_position` SET `target_position_x` = -8000.87939, `target_position_y` = 928.599731, `target_position_z` = -51.861111 WHERE `id` = 25904;
-            pSummoned->GetMotionMaster()->MovePoint(1, -8000.879395f, 928.599731f, -51.861111f, MOVE_FORCE_DESTINATION | MOVE_PATHFINDING | MOVE_RUN_MODE);
+            // Move all summoned globs to Viscidus's spawn point. The spawn point is essentially
+            // the center of the room triangulated between 4 points with a distance of 100 between
+            // points on the same gridline. Globs are spawned on a circle with 52 yard radius from
+            // the center point
+            pSummoned->GetMotionMaster()->MovePoint(1, -7993.956f, 926.309f, -52.699f, MOVE_FORCE_DESTINATION | MOVE_PATHFINDING | MOVE_RUN_MODE);
 
             m_lGlobesGuidList.push_back(pSummoned->GetObjectGuid());
         }
@@ -353,7 +348,7 @@ struct boss_viscidusAI : public ScriptedAI
 
         m_lGlobesGuidList.remove(pSummoned->GetObjectGuid());
         pSummoned->CastSpell(m_creature, SPELL_REJOIN_VISCIDUS, true);
-        pSummoned->ForcedDespawn(1000);
+        pSummoned->ForcedDespawn(650);
         ++m_uiGrowCount; // should be done in spell script
 
         if (m_lGlobesGuidList.empty())
