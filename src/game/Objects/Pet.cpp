@@ -466,6 +466,11 @@ void Pet::SavePetToDB(PetSaveMode mode)
             // for warlock case
             mode = PET_SAVE_NOT_IN_SLOT;
         }
+
+        // pet is dead so it doesn't have to be shown at character login
+        if (mode == PET_SAVE_AS_CURRENT && !isAlive())
+            mode = PET_SAVE_NOT_IN_SLOT;
+
         // On recup l'info dans le cache
         uint32 ownerLow = GetOwnerGuid().GetCounter();
         m_pTmpCache = sCharacterDatabaseCache.GetCharacterPetCacheByOwnerAndId(ownerLow, m_charmInfo->GetPetNumber());
@@ -477,7 +482,8 @@ void Pet::SavePetToDB(PetSaveMode mode)
         uint32 curmana = GetPower(POWER_MANA);
 
         // stable and not in slot saves
-        if (mode != PET_SAVE_AS_CURRENT)
+        if ( (mode != PET_SAVE_AS_CURRENT && getPetType() != HUNTER_PET) ||
+              mode == PET_SAVE_FIRST_STABLE_SLOT || mode == PET_SAVE_LAST_STABLE_SLOT )
             RemoveAllAuras();
 
         //save pet's data as one single transaction
