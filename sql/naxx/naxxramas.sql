@@ -390,8 +390,9 @@ INSERT INTO gossip_menu_option (menu_id, id, option_icon, option_text, option_id
 UPDATE `creature_template` SET `gossip_menu_id`=8400, `npcflag`=1, `ScriptName`='npc_archmage_tarsis' WHERE `entry`=16381;
 UPDATE `npc_text` SET `em0_1`='13' WHERE `ID`='8517';
 
-
-
+-- Some trash loot is faction specific, paladin/shaman gear
+UPDATE `creature_loot_template` SET `condition_id` = 2 WHERE `item` IN (23663, 23664, 23665);
+UPDATE `creature_loot_template` SET `condition_id` = 3 WHERE `item` IN (23666, 23667, 23668);
 
 
 
