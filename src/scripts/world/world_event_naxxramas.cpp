@@ -155,7 +155,7 @@ struct NecropolisRelayAI : public ScriptedAI
     {
         if (despawnTimer)
         {
-            if (despawnTimer < uiDiff)
+            if (despawnTimer <= uiDiff)
             {
                 if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
                     necropolis->Delete();
