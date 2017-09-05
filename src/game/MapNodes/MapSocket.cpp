@@ -44,8 +44,6 @@ int MapSocket::ProcessIncoming(WorldPacket* new_pct)
         default:
         {
             std::unique_lock<LockType> lock(m_SessionLock);
-            if (!lock.owns_lock())
-                return -1;
 
             if (m_Session != NULL)
             {

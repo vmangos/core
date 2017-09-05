@@ -63,8 +63,6 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
         bool next(T& result)
         {
             std::unique_lock<LockType> g(this->_lock);
-            if (!g.owns_lock())
-                return false;
 
             if (_queue.empty())
                 return false;
@@ -79,8 +77,6 @@ template <class T, class LockType, typename StorageType=std::deque<T> >
         bool next(T& result, Checker& check)
         {
             std::unique_lock<LockType> g(this->_lock);
-            if (!g.owns_lock())
-                return false;
 
             if (_queue.empty())
                 return false;

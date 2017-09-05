@@ -91,8 +91,6 @@ public:
     int AddSocket(SocketType* sock)
     {
         std::unique_lock<std::mutex> lock(m_NewSockets_Lock);
-        if (!lock.owns_lock())
-            return -1;
 
         ++m_Connections;
         sock->AddReference();

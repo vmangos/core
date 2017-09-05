@@ -82,8 +82,6 @@ template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::SendPacket(const WorldPacket& pct)
 {
     GuardType lock(m_OutBufferLock);
-    if (!lock.owns_lock())
-        return -1;
 
     if (closing_)
         return -1;
@@ -207,8 +205,6 @@ template <typename SessionType, typename SocketName, typename Crypt>
 int MangosSocket<SessionType, SocketName, Crypt>::handle_output(ACE_HANDLE)
 {
     GuardType lock(m_OutBufferLock);
-    if (!lock.owns_lock())
-        return -1;
 
     if (closing_)
         return -1;
@@ -261,8 +257,6 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_close(ACE_HANDLE h, ACE
     // Critical section
     {
         GuardType lock(m_OutBufferLock);
-        if (!lock.owns_lock())
-            return -1;
 
         closing_ = true;
 
@@ -273,8 +267,6 @@ int MangosSocket<SessionType, SocketName, Crypt>::handle_close(ACE_HANDLE h, ACE
     // Critical section
     {
         GuardType lock(m_SessionLock);
-        if (!lock.owns_lock())
-            return -1;
 
         m_Session = NULL;
     }
