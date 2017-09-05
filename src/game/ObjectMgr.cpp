@@ -420,7 +420,8 @@ void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
     for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
         if (it->uiIndex == index)
             return;
-    // Si on est la, c'est que la variable n'existe pas.
+    
+    // If we are there, it means that the variable does not exist.
     SavedVariable& variable = _InsertVariable(index, value, true);
     _SaveVariable(variable);
 }
@@ -1398,8 +1399,8 @@ void ObjectMgr::LoadCreatures(bool reload)
                           "equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint,"
                           //   12         13       14          15            16
                           "curhealth, curmana, DeathState, MovementType, event,"
-                          //   17                        18                                 19
-                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags "
+                          //   17                        18                                 19          20
+                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, visibilitymod "
                           "FROM creature "
                           "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
                           "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid "
@@ -1455,6 +1456,7 @@ void ObjectMgr::LoadCreatures(bool reload)
         data.is_dead            = fields[14].GetBool();
         data.movementType       = fields[15].GetUInt8();
         data.spawnFlags         = fields[19].GetUInt32();
+        data.visibilityModifier = fields[20].GetFloat();
         data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
         int16 gameEvent         = fields[16].GetInt16();
         int16 GuidPoolId        = fields[17].GetInt16();
@@ -1580,8 +1582,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
     QueryResult *result = WorldDatabase.Query("SELECT gameobject.guid, gameobject.id, map, position_x, position_y, position_z, orientation,"
                           //   7          8          9          10         11             12            13     14
                           "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, event, "
-                          //   15                          16                                   17
-                          "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry, spawnFlags "
+                          //   15                          16                                   17          18
+                          "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry, spawnFlags, visibilitymod "
                           "FROM gameobject "
                           "LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
                           "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid "
@@ -1637,6 +1639,7 @@ void ObjectMgr::LoadGameobjects(bool reload)
         data.rotation3      = fields[10].GetFloat();
         data.spawntimesecs  = fields[11].GetInt32();
         data.spawnFlags     = fields[17].GetUInt32();
+        data.visibilityModifier = fields[18].GetFloat();
         data.instanciatedContinentInstanceId = sMapMgr.GetContinentInstanceId(data.mapid, data.posX, data.posY);
 
         MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(data.mapid);

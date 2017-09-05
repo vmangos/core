@@ -14,7 +14,9 @@ REPLACE INTO spell_effect_mod (Id, EffectIndex, Effect, EffectBasePoints, Effect
 VALUES (28756, 1, 6, 50, 1, 0, 124, 0, 'Hunter T3: Ranged AP');
 REPLACE INTO spell_effect_mod (Id, EffectIndex, Effect, EffectBasePoints, EffectImplicitTargetA, EffectImplicitTargetB, EffectApplyAuraName, EffectMiscValue, Comment) 
 VALUES (28756, 2, 6, 50, 1, 0, 99, 0, 'Hunter T3: Melee AP');
+
 DELETE FROM spell_pet_auras WHERE spell=28757;
+
 
 -- Misplaced Servo Arm
 REPLACE INTO spell_bonus_data (entry, comments) VALUES (29151, 'Misplaced Servo Arm - No coeff');

@@ -192,6 +192,7 @@ ChatCommand * ChatHandler::getCommandTable()
     {
         { NODE, "cinematic",      SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayCinematicCommand,       "", nullptr },
         { NODE, "sound",          SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlaySoundCommand,           "", nullptr },
+        { NODE, "scripttext",     SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayScriptText,           "", nullptr },
         { NODE, "music",          SEC_MODERATOR,      false, &ChatHandler::HandleDebugPlayMusicCommand,           "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                                "", nullptr }
     };
@@ -471,15 +472,17 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "block",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyBlockCommand,         "", nullptr },
         { NODE, "dodge",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyDodgeCommand,         "", nullptr },
         { NODE, "parry",          SEC_GAMEMASTER,     false, &ChatHandler::HandleModifyParryCommand,         "", nullptr },
-        { NODE, "cr",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyCrCommand,            "", nullptr },
-        { NODE, "br",             SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyBrCommand,            "", nullptr },
+        { NODE, "combreach",      SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyCrCommand,            "", nullptr },
+        { NODE, "boundrad",       SEC_ADMINISTRATOR,  false, &ChatHandler::HandleModifyBrCommand,            "", nullptr },
         { MSTR, nullptr,       0,                     false, nullptr,                       "", nullptr }
     };
 
     static ChatCommand creatureGroupsCommandTable[] =
     {
         { NODE, "add",            SEC_MODERATOR,      false, &ChatHandler::HandleNpcGroupAddCommand,         "", nullptr },
+        { NODE, "addrel",         SEC_MODERATOR,      false, &ChatHandler::HandleNpcGroupAddRelCommand,      "", nullptr },
         { NODE, "del",            SEC_MODERATOR,      false, &ChatHandler::HandleNpcGroupDelCommand,         "", nullptr },
+        { NODE, "link",           SEC_MODERATOR,      false, &ChatHandler::HandleNpcGroupLinkCommand,        "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 

@@ -199,6 +199,7 @@ public:
     void processThreatEvent(ThreatRefStatusChangeEvent* threatRefStatusChangeEvent);
 
     HostileReference* getCurrentVictim() const { return iCurrentVictim; }
+    void setCurrentVictimIfCan(Unit* pVictim);
 
     Unit*  getOwner() const { return iOwner; }
 

@@ -285,7 +285,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugUpdateCommand(char *args) { return true; }
         // Formations
         bool HandleNpcGroupAddCommand(char *args);
+        bool HandleNpcGroupAddRelCommand(char *args);
         bool HandleNpcGroupDelCommand(char *args);
+        bool HandleNpcGroupLinkCommand(char* args);
+
         bool HandleReloadCreatureGroupsCommand(char *args);
         // Characters
         bool HandleCharacterChangeRaceCommand(char *args);
@@ -396,8 +399,9 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleDebugPlayCinematicCommand(char* args);
         bool HandleDebugPlaySoundCommand(char* args);
+        bool HandleDebugPlayScriptText(char* args);
         bool HandleDebugPlayMusicCommand(char* args);
-
+        
         bool HandleDebugSendBuyErrorCommand(char* args);
         bool HandleDebugSendChannelNotifyCommand(char* args);
         bool HandleDebugSendChatMsgCommand(char* args);

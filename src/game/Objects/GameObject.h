@@ -513,6 +513,7 @@ struct GameObjectData
     uint32 animprogress;
     GOState go_state;
     uint32 spawnFlags;
+    float visibilityModifier;
 
     uint32 instanciatedContinentInstanceId;
     uint32 ComputeRespawnDelay(uint32 baseDelay) const;

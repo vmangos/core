@@ -55,6 +55,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 #include "Anticheat.h"
+#include "CreatureLinkingMgr.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -175,7 +176,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false)
+    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -247,6 +248,9 @@ void Creature::RemoveCorpse()
 
     if (AI())
         AI()->CorpseRemoved(respawnDelay);
+
+    if (m_isCreatureLinkingTrigger)
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_DESPAWN, this);
 
     // script can set time (in seconds) explicit, override the original
     if (respawnDelay)
@@ -596,7 +600,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
         case DEAD:
         {
 
-            if (m_respawnTime <= time(nullptr))
+            if (m_respawnTime <= time(nullptr) && (!m_isSpawningLinked || GetMap()->GetCreatureLinkingHolder()->CanSpawn(this)))
             {
                 DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Respawning...");
                 m_respawnTime = 0;
@@ -643,6 +647,10 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 if (m_zoneScript)
                     m_zoneScript->OnCreatureRespawn(this);
+
+                if (m_isCreatureLinkingTrigger)
+                    GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
+
                 // 5 sec delay before aggro.
                 if (!IsLikePlayer())
                     SetTempPacified(5000);
@@ -735,7 +743,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 float x, y, z;
                 GetRespawnCoord(x, y, z, nullptr, nullptr);
                 if (GetDistance(x, y, z) > 10.0f)
-                    CallForHelp(5.0f);
+                    CallForHelp(m_callForHelpDist);
             }
 
             // creature can be dead after Unit::Update call
@@ -999,6 +1007,15 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
     {
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
+    }
+    
+    // Add to CreatureLinkingHolder if needed
+    if (sCreatureLinkingMgr.GetLinkedTriggerInformation(this))
+        cPos.GetMap()->GetCreatureLinkingHolder()->AddSlaveToHolder(this);
+    if (sCreatureLinkingMgr.IsLinkedEventTrigger(this))
+    {
+        m_isCreatureLinkingTrigger = true;
+        cPos.GetMap()->GetCreatureLinkingHolder()->AddMasterToHolder(this);
     }
 
     LoadCreatureAddon();
@@ -1357,7 +1374,8 @@ void Creature::SaveToDB(uint32 mapid)
        << GetPower(POWER_MANA) << ","                      //curmana
        << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
        << GetDefaultMovementType() << ","                 //default movement generator type
-       << m_isActiveObject << ")";
+       << m_isActiveObject << ","
+       << m_visibilityModifier << ")";
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
@@ -1527,6 +1545,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     m_isDeadByDefault = data->is_dead;
     m_deathState = m_isDeadByDefault ? DEAD : ALIVE;
     m_isActiveObject = data->spawnFlags & SPAWN_FLAG_ACTIVE;
+    m_visibilityModifier = data->visibilityModifier;
 
     m_respawnTime  = map->GetPersistentState()->GetCreatureRespawnTime(GetGUIDLow());
 
@@ -1555,11 +1574,32 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
             curhealth = 1;
     }
 
+    if (sCreatureLinkingMgr.IsSpawnedByLinkedMob(this))
+    {
+        m_isSpawningLinked = true;
+        if (m_deathState == ALIVE && !GetMap()->GetCreatureLinkingHolder()->CanSpawn(this))
+        {
+            m_deathState = DEAD;
+
+            // Just set to dead, so need to relocate like above
+            if (CanFly())
+            {
+                float tz = GetTerrain()->GetHeightStatic(data->posX, data->posY, data->posZ, false);
+                if (data->posZ - tz > 0.1)
+                    Relocate(data->posX, data->posY, tz);
+            }
+        }
+    }
+
     SetHealth(m_deathState == ALIVE ? curhealth : 0);
     SetPower(POWER_MANA, data->curmana);
 
     // checked at creature_template loading
     m_defaultMovementType = MovementGeneratorType(data->movementType);
+
+    // Creature Linking, Initial load is handled like respawn
+    if (m_isCreatureLinkingTrigger && isAlive())
+        GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
 
     return true;
 }
@@ -1873,8 +1913,11 @@ bool Creature::IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf)
     {
         if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK) && !IsPositiveSpell(spellInfo->Id))
         {
-            if (GetCreatureInfo()->Entry != 15263)  // The Prophet Skeram
+            if (GetCreatureInfo()->Entry != 15263 // The Prophet Skeram
+            && !(GetCreatureInfo()->Entry == 15953 && spellInfo->Id == 28732 )) // Grand Widow Faerlina can be hit by widows embrace
+            {
                 return true;
+            }
         }
 
         if (spellInfo->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_SCORPID_STING>())

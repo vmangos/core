@@ -102,6 +102,7 @@ set (game_SRCS
 	Database/CharacterDatabaseCleaner.cpp
 	Database/DBCStores.cpp
 	Database/SQLStorages.cpp
+	Group/CreatureLinkingMgr.cpp
 	Group/Group.cpp
 	Group/GroupReference.cpp
 	Guild/Guild.cpp
@@ -296,6 +297,7 @@ set (game_SRCS
 	Database/DBCStores.h
 	Database/DBCStructure.h
 	Database/SQLStorages.h
+	Group/CreatureLinkingMgr.h
 	Group/Group.h
 	Group/GroupReference.h
 	Group/GroupRefManager.h

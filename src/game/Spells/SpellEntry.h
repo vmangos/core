@@ -129,11 +129,14 @@ class SpellEntry
     protected:
         bool _isBinary;
         bool _isDispel;
+        bool _isNonPeriodicDispel;
         void ComputeBinary();
+        void ComputeNonPeriodicDispel();
         void ComputeDispel();
     public:
         bool IsBinary() const { return _isBinary; }
         bool IsDispel() const { return _isDispel; }
+        bool IsNonPeriodicDispel() const { return _isNonPeriodicDispel; }
         bool IsPvEHeartBeat() const;
         bool IsCCSpell() const;
         DiminishingGroup GetDiminishingReturnsGroup(bool triggered) const;

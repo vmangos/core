@@ -16,76 +16,135 @@
 
 /* ScriptData
 SDName: Boss_Maexxna
-SD%Complete: 60
-SDComment: this needs review, and rewrite of the webwrap ability
+SD%Complete:
+SDComment: 
 SDCategory: Naxxramas
 EndScriptData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
-
+#include <random>
+#include <algorithm>
+#include <array>
 enum
 {
-    SPELL_WEBWRAP           = 28622,                        //Spell is normally used by the webtrap on the wall NOT by Maexxna
+    // from cmangos, unimplemented
+    //EMOTE_SPIN_WEB              = -1533146, // Not in vanilla?
+    //EMOTE_SPIDERLING            = -1533147, // Not in vanilla?
+    //EMOTE_SPRAY                 = -1533148, // Not in vanilla?
+    EMOTE_BOSS_GENERIC_ENRAGE   = -1000003,
 
-    SPELL_WEBSPRAY          = 29484,
-    SPELL_POISONSHOCK       = 28741,
-    SPELL_NECROTICPOISON    = 28776,
-    SPELL_FRENZY            = 54123,
 
-    //spellId invalid
-    SPELL_SUMMON_SPIDERLING = 29434,
+    SPELL_WEBWRAP               = 28622,    
+
+    SPELL_WEBSPRAY              = 29484,
+    SPELL_POISONSHOCK           = 28741,
+    SPELL_NECROTICPOISON        = 28776,    // 90% reduced healing. Dispelllable
+    SPELL_ENRAGE                = 28747,    // 30% enrage
+
+    SPELL_SUMMON_SPIDERLING     = 29434,
+
+
+
+
+    SPELL_DOUBLE_ATTACK = 19818,            // seems it adds an aura, must be removed manually?
+
+    //SPELL_WEBWRAP = 28622,
+    SPELL_WEBWRAP_2 = 28673,                // does an attack animation, purpose unknown
+
+    NPC_WEB_WRAP = 16486,
+    NPC_SPIDERLING = 17055,
+
+    // SPELL_SUMMON_SPIDERLING_1 = 29434,                   // works.
+    // SPELL_SUMMON_SPIDERLING_2 = 30076,                   // works
+
+    SPELL_SUMMON_WEB_WRAP     = 28627,
+    /*
+    SPELL_WEB_WRAP_UNKNOWN   = 28617,
+    SPELL_WEB_WRAP_1         = 28618,
+    SPELL_WEB_WRAP_2         = 28619,
+    SPELL_WEB_WRAP_3         = 28620,
+    SPELL_WEB_WRAP_4         = 28621,
+    SPELL_WEB_WRAP_TRIGGERED = 28622, //triggered by SPELL_WEB_WRAP_1-4
+    SPELL_CLEAR_WEB_WRAP     = 28628,
+    SPELL_CLEAR_WEB_WRAP     = 28629,
+    */
+
+    MAX_SPIDERLINGS         = 10, // 8 in cmangos, should be 10 
+    MAX_WEB_WRAP_POSITIONS  = 3,
 };
 
-#define LOC_X1    3546.796f
-#define LOC_Y1    -3869.082f
-#define LOC_Z1    296.450f
+static const float WebWrapCooldown(bool initial = false)            { return initial ? 20000 : 40000; }
+static const float SummonSpiderlingsCooldown(bool initial = false)  { return initial ? 30000 : 40000; }
+static const float WebSprayCooldown(bool initial = false)           { return initial ? 40000 : 40000; }
+static const float PoisonShockCooldown(bool initial = false)        { return urand(9000,11000); }
+static const float NecroticPoisonCooldown(bool initial = false)     { return initial ? 15000 : urand(5000, 10000); } 
 
-#define LOC_X2    3531.271f
-#define LOC_Y2    -3847.424f
-#define LOC_Z2    299.450f
-
-#define LOC_X3    3497.067f
-#define LOC_Y3    -3843.384f
-#define LOC_Z3    302.384f
 
 struct mob_webwrapAI : public ScriptedAI
 {
-    mob_webwrapAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
+    mob_webwrapAI(Creature* pCreature) : ScriptedAI(pCreature) {
+        Reset(); 
     }
 
-    uint64 m_uiVictimGUID;
-
-    void Reset()
+    ObjectGuid m_victimGuid;
+    uint32 m_uiWebWrapTimer;
+    bool webWrapDone;
+    void Reset() override
     {
-        m_uiVictimGUID = 0;
+        m_uiWebWrapTimer = 0;
+        webWrapDone = false;
     }
+
+    void MoveInLineOfSight(Unit* /*pWho*/) override {}
+    void AttackStart(Unit* /*pWho*/) override {}
 
     void SetVictim(Unit* pVictim)
     {
-        if (pVictim)
+        if (!pVictim || pVictim->GetTypeId() != TYPEID_PLAYER)
         {
-            m_uiVictimGUID = pVictim->GetGUID();
-            pVictim->CastSpell(pVictim, SPELL_WEBWRAP, true);
+            sLog.outError("mob_webwrapAI::SetVictim called for non-player");
+            return;
         }
+        pVictim->AddAura(SPELL_SUMMON_WEB_WRAP);
+        m_victimGuid = pVictim->GetObjectGuid();
+        m_creature->GetMotionMaster()->MovePoint(0, pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ(),
+            MOVE_FLY_MODE | MOVE_CYCLIC, 0.0f, 0);
+        return;
     }
 
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
+    void JustDied(Unit* /*pKiller*/) override
     {
-        if (uiDamage > m_creature->GetHealth())
+        if (m_victimGuid)
         {
-            if (m_uiVictimGUID)
+            if (Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid))
             {
-                if (Unit* pVictim = m_creature->GetMap()->GetUnit(m_uiVictimGUID))
+                if (pVictim->isAlive()) {
                     pVictim->RemoveAurasDueToSpell(SPELL_WEBWRAP);
+                    pVictim->RemoveAurasDueToSpell(SPELL_SUMMON_WEB_WRAP);
+                }
             }
         }
+        ((TemporarySummon*)m_creature)->UnSummon();
     }
 
-    void MoveInLineOfSight(Unit* pWho) { }
-    void UpdateAI(const uint32 uiDiff) { }
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (!m_victimGuid)
+            return;
+
+        Player* pVictim = m_creature->GetMap()->GetPlayer(m_victimGuid);
+        if (!pVictim || pVictim->isDead()) {
+            m_creature->Kill(m_creature, nullptr);
+            // ((TemporarySummon*)m_creature)->UnSummon();
+            return;
+        }
+        // todo: can this be removed? We set MovePoint in SetVictim
+        /*
+        m_creature->GetMotionMaster()->MovePoint(0, pVictim->GetPositionX(), pVictim->GetPositionY(), pVictim->GetPositionZ(),
+            MOVE_FLY_MODE|MOVE_CYCLIC, 0.0f, 0);
+        */
+    }
 };
 
 struct boss_maexxnaAI : public ScriptedAI
@@ -95,7 +154,6 @@ struct boss_maexxnaAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
     }
-
     instance_naxxramas* m_pInstance;
 
     uint32 m_uiWebWrapTimer;
@@ -104,15 +162,36 @@ struct boss_maexxnaAI : public ScriptedAI
     uint32 m_uiNecroticPoisonTimer;
     uint32 m_uiSummonSpiderlingTimer;
     bool   m_bEnraged;
+    std::random_device m_randDevice;
+    std::mt19937 m_random{ m_randDevice() };
+
+    std::vector<std::pair<uint32, ObjectGuid>> wraps;
+    std::vector<std::pair<uint32, ObjectGuid>> wraps2;
+
+    // todo: only aproximate coordinates. Might be good enough,
+    // but should be double-checked.
+    std::vector<std::array<float,3>> wepWrapLoc =
+    {
+        {3562.40f, -3890.35f, 314.30f},
+        {3560.78f, -3878.10f, 316.18f},
+        {3554.95f, -3863.24f, 314.46f},
+        {3549.02f, -3855.07f, 311.58f},
+        {3538.34f, -3844.68f, 314.21f},
+        {3526.43f, -3838.73f, 317.10f},
+        {3507.84f, -3832.71f, 319.00f},
+        {3493.35f, -3834.06f, 318.71f}
+    };
 
     void Reset()
     {
-        m_uiWebWrapTimer = 20000;                           //20 sec init, 40 sec normal
-        m_uiWebSprayTimer = 40000;                          //40 seconds
-        m_uiPoisonShockTimer = 20000;                       //20 seconds
-        m_uiNecroticPoisonTimer = 30000;                    //30 seconds
-        m_uiSummonSpiderlingTimer = 30000;                  //30 sec init, 40 sec normal
+        m_uiWebWrapTimer            = WebWrapCooldown(true);
+        m_uiWebSprayTimer           = WebSprayCooldown(true);
+        m_uiPoisonShockTimer        = PoisonShockCooldown(true);
+        m_uiNecroticPoisonTimer     = NecroticPoisonCooldown(true);
+        m_uiSummonSpiderlingTimer   = SummonSpiderlingsCooldown(true);
         m_bEnraged = false;
+        wraps.clear();
+        wraps2.clear();
     }
 
     void Aggro(Unit* pWho)
@@ -127,78 +206,185 @@ struct boss_maexxnaAI : public ScriptedAI
             m_pInstance->SetData(TYPE_MAEXXNA, DONE);
     }
 
-    void DoCastWebWrap()
+    void MoveInLineOfSight(Unit* pWho) override 
     {
-        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-        std::vector<Unit *> targets;
-
-        //This spell doesn't work if we only have 1 player on threat list
-        if (tList.size() < 2)
+        if (!m_creature->IsWithinDistInMap(pWho, 40.0f))
             return;
 
-        //begin + 1 , so we don't target the one with the highest threat
-        ThreatList::const_iterator itr = tList.begin();
-        std::advance(itr, 1);
-
-        //store the threat list in a different container
-        for (; itr != tList.end(); ++itr)
+        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
         {
-            Unit* target = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid());
-
-            //only on alive players
-            if (target && target->isAlive() && target->GetTypeId() == TYPEID_PLAYER)
-                targets.push_back(target);
-        }
-
-        //cut down to size if we have more than 3 targets
-        while (targets.size() > 3)
-            targets.erase(targets.begin() + rand() % targets.size());
-
-        int i = 0;
-
-        for (std::vector<Unit *>::iterator iter = targets.begin(); iter != targets.end(); ++iter, ++i)
-        {
-            // Teleport the 3 targets to a location on the wall and summon a Web Wrap on them
-            switch (i)
+            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
             {
-                case 0:
-                    DoTeleportPlayer((*iter), LOC_X1, LOC_Y1, LOC_Z1, (*iter)->GetOrientation());
-                    if (Creature* pWrap = m_creature->SummonCreature(16486, LOC_X1, LOC_Y1, LOC_Z1, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                        ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
-                    break;
-                case 1:
-                    DoTeleportPlayer((*iter), LOC_X2, LOC_Y2, LOC_Z2, (*iter)->GetOrientation());
-                    if (Creature* pWrap = m_creature->SummonCreature(16486, LOC_X2, LOC_Y2, LOC_Z2, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                        ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
-                    break;
-                case 2:
-                    DoTeleportPlayer((*iter), LOC_X3, LOC_Y3, LOC_Z3, (*iter)->GetOrientation());
-                    if (Creature* pWrap = m_creature->SummonCreature(16486, LOC_X3, LOC_Y3, LOC_Z3, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
-                        ((mob_webwrapAI*)pWrap->AI())->SetVictim((*iter));
-                    break;
+                if (!m_creature->getVictim())
+                    AttackStart(pWho);
+                else if (m_creature->GetMap()->IsDungeon())
+                {
+                    pWho->SetInCombatWith(m_creature);
+                    m_creature->AddThreat(pWho);
+                }
             }
         }
+    }
+    
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_MAEXXNA, FAIL);
+        std::list<Creature*> spiderlings;
+        GetCreatureListWithEntryInGrid(spiderlings, m_creature, NPC_SPIDERLING, 100.0f);
+        for (Creature* pSpider : spiderlings)
+            pSpider->DeleteLater();
+    }
+    
+    bool DoCastWebWrap()
+    {
+        ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+        if (tList.size() < 2)
+            return false;
+
+        std::list<Player*> candidates;
+        ThreatList::const_iterator it = tList.begin();
+        ++it;
+        for (it; it != tList.end(); ++it) {
+            Player* pPlayer = m_creature->GetMap()->GetPlayer((*it)->getUnitGuid());
+            if (!pPlayer) continue;
+
+            // todo: verify that IsWithinLOSInMap does not screw anyting up. Afaik there should be nowhere
+            // to los in maexxnas room, so would only stop us from selecting players outside the room, which is good.
+            if (pPlayer->isAlive() && !pPlayer->isGameMaster()
+                && m_creature->IsWithinLOSInMap(pPlayer)        // Only players in the room
+                && !pPlayer->HasAura(SPELL_WEBWRAP))            // Don't retarget players who are still wrapped
+            {
+                candidates.push_back(pPlayer);
+            }
+        }
+        
+
+        if (!candidates.size())
+            return false;
+
+        std::shuffle(wepWrapLoc.begin(), wepWrapLoc.end(), m_random);
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (!candidates.size())
+                break;
+            auto candIt = candidates.begin();
+
+            if(candidates.size() > 1)
+                std::advance(candIt, urand(0, candidates.size() - 1));
+            
+            Unit* pTarget = *candIt;
+            candIt = candidates.erase(candIt);
+
+            float dx = pTarget->GetPositionX() - wepWrapLoc[i][0];
+            float dy = pTarget->GetPositionY() - wepWrapLoc[i][1];
+            float dist = sqrt((dx * dx) + (dy * dy));
+            const float  distXY = (dist > 0 ? dist : 0);
+            float yDist = wepWrapLoc[i][2] - pTarget->GetPositionZ();
+
+            // todo: to avoid ever hitting the overhanging ceiling we would need to adjust the horizontal
+            // velocity based on how close we are to it. If we are close initially, reduce the travel-time
+            // by increasing horizontal velocity, in which case we won't need as much vertical velocity, thus
+            // won't hit the ceiling.
+            //s=ut+(0.5a*t^2) || s = vertical speed, u = initial up velocity, a = gravity factor(negative), t = time of flight
+            // sadly this only aproximates some parts of this formula
+            float horizontalSpeed = dist/1.5f;
+            float verticalSpeed = 20.0f + (yDist*0.5f);
+            float angle = pTarget->GetAngle(wepWrapLoc[i][0], wepWrapLoc[i][1]);
+                
+            // set immune anticheat and calculate speed
+            if (Player* plr = pTarget->ToPlayer())
+            {
+                plr->SetLaunched(true);
+                plr->SetXYSpeed(horizontalSpeed);
+            }
+
+            pTarget->KnockBack(angle, horizontalSpeed, verticalSpeed);
+            wraps.push_back(std::make_pair(uint32(2000), pTarget->GetObjectGuid()));
+        }
+
+        return true;
+    }
+
+    void JustSummoned(Creature* pSummoned) override
+    {
+        if (pSummoned->GetEntry() == NPC_SPIDERLING)
+        {
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+            {
+                pSummoned->AddThreat(pTarget, 100);
+                pSummoned->AI()->AttackStart(pTarget);
+            }
+            
+        }
+    }
+
+    void UpdateWraps(const uint32 uiDiff)
+    {
+        bool wdone = false;
+        for (auto& p : wraps2)
+        {
+            if (p.first < uiDiff)
+            {
+                if (Player* pl = m_pInstance->GetMap()->GetPlayer(p.second))
+                {
+                    if (Creature* pC = pl->SummonCreature(NPC_WEB_WRAP, pl->GetPositionX(), pl->GetPositionY(), pl->GetPositionZ(), 0, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 57000))
+                    {
+                        if (mob_webwrapAI* pcAI = (mob_webwrapAI*)pC->AI())
+                        {
+                            pcAI->SetVictim(pl);
+                        }
+                    }
+                }
+                wdone = true;
+            }
+            else
+                p.first -= uiDiff;
+        }
+        if (wdone)
+            wraps2.clear();
+
+        wdone = false;
+        for (auto& p : wraps)
+        {
+            if (p.first < uiDiff)
+            {
+                if (Player* pl = m_pInstance->GetMap()->GetPlayer(p.second))
+                {
+                    pl->CastSpell(pl, 28622, true);
+                    wraps2.push_back(std::make_pair(3000, p.second));
+                }
+                wdone = true;
+            }
+            else
+                p.first -= uiDiff;
+        }
+        if (wdone)
+            wraps.clear();
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        
+        UpdateWraps(uiDiff);
 
         // Web Wrap
         if (m_uiWebWrapTimer < uiDiff)
         {
-            DoCastWebWrap();
-            m_uiWebWrapTimer = 40000;
+            DoCastWebWrap();    // probably no point checking if successfull.*
+            m_uiWebWrapTimer = WebWrapCooldown();
         }
         else
             m_uiWebWrapTimer -= uiDiff;
-
+        
         // Web Spray
         if (m_uiWebSprayTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_WEBSPRAY);
-            m_uiWebSprayTimer = 40000;
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_WEBSPRAY) == CAST_OK)
+                m_uiWebSprayTimer = WebSprayCooldown();
         }
         else
             m_uiWebSprayTimer -= uiDiff;
@@ -206,8 +392,8 @@ struct boss_maexxnaAI : public ScriptedAI
         // Poison Shock
         if (m_uiPoisonShockTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISONSHOCK);
-            m_uiPoisonShockTimer = 20000;
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISONSHOCK) == CAST_OK)
+                m_uiPoisonShockTimer = PoisonShockCooldown();
         }
         else
             m_uiPoisonShockTimer -= uiDiff;
@@ -215,8 +401,8 @@ struct boss_maexxnaAI : public ScriptedAI
         // Necrotic Poison
         if (m_uiNecroticPoisonTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_NECROTICPOISON);
-            m_uiNecroticPoisonTimer = 30000;
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_NECROTICPOISON) == CAST_OK)
+                m_uiNecroticPoisonTimer = NecroticPoisonCooldown();
         }
         else
             m_uiNecroticPoisonTimer -= uiDiff;
@@ -224,8 +410,8 @@ struct boss_maexxnaAI : public ScriptedAI
         // Summon Spiderling
         if (m_uiSummonSpiderlingTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIDERLING);
-            m_uiSummonSpiderlingTimer = 40000;
+            if(DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIDERLING) == CAST_OK)
+                m_uiSummonSpiderlingTimer = SummonSpiderlingsCooldown();
         }
         else
             m_uiSummonSpiderlingTimer -= uiDiff;
@@ -233,10 +419,13 @@ struct boss_maexxnaAI : public ScriptedAI
         //Enrage if not already enraged and below 30%
         if (!m_bEnraged && m_creature->GetHealthPercent() < 30.0f)
         {
-            DoCastSpellIfCan(m_creature, SPELL_FRENZY);
-            m_bEnraged = true;
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+            {
+                m_bEnraged = true;
+                DoScriptText(EMOTE_BOSS_GENERIC_ENRAGE, m_creature);
+            }
         }
-
+        
         DoMeleeAttackIfReady();
     }
 };

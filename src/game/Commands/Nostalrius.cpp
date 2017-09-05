@@ -1227,6 +1227,55 @@ bool ChatHandler::HandleNpcGroupAddCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleNpcGroupAddRelCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    Creature* target = getSelectedCreature();
+    SetSentErrorMessage(true);
+
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        return false;
+    }
+
+    uint32 leaderGuidCounter = 0;
+    uint32 options = OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER | OPTION_RESPAWN_TOGETHER;
+    if (!ExtractUInt32(&args, leaderGuidCounter))
+        return false;
+    ExtractUInt32(&args, options);
+    Creature* leader = target->GetMap()->GetCreature(CreatureGroupsManager::ConvertDBGuid(leaderGuidCounter));
+    if (!leader)
+    {
+        PSendSysMessage("Leader not found");
+        return false;
+    }
+    if (target->GetCreatureGroup())
+    {
+        SendSysMessage("Selected creature is already member of a group.");
+        return false;
+    }
+
+    bool dbsave = target->HasStaticDBSpawnData();
+    //Player *chr = m_session->GetPlayer();
+    float angle = target->GetAngle(leader);//(chr->GetAngle(target) - target->GetOrientation()) + 2 * M_PI_F;
+    float dist = sqrtf(pow(leader->GetPositionX() - target->GetPositionX(), int(2)) + pow(leader->GetPositionY() - target->GetPositionY(), int(2)));
+
+    CreatureGroup* group = leader->GetCreatureGroup();
+    if (!group)
+        group = new CreatureGroup(leader->GetObjectGuid());
+    group->AddMember(target->GetObjectGuid(), dist, angle, options);
+    target->SetCreatureGroup(group);
+    leader->SetCreatureGroup(group);
+    target->GetMotionMaster()->Initialize();
+    if (dbsave)
+        group->SaveToDb();
+    PSendSysMessage("Group added for creature %u. Leader %u, Angle %f, Dist %f", target->GetGUIDLow(), leader->GetGUIDLow(), angle, dist);
+    return true;
+}
+
 bool ChatHandler::HandleNpcGroupDelCommand(char *args)
 {
     Creature *target = getSelectedCreature();
@@ -1249,6 +1298,42 @@ bool ChatHandler::HandleNpcGroupDelCommand(char *args)
     g->SaveToDb();
     target->SetCreatureGroup(NULL);
     target->GetMotionMaster()->Initialize();
+    return true;
+}
+
+bool ChatHandler::HandleNpcGroupLinkCommand(char * args)
+{
+    if (!*args)
+        return false;
+
+    Creature* target = getSelectedCreature();
+    SetSentErrorMessage(true);
+
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        return false;
+    }
+
+    uint32 options;
+    uint32 leaderGuidCounter = 0;
+    if (!ExtractUInt32(&args, leaderGuidCounter))
+        return false;
+    
+    ExtractUInt32(&args, options);
+    
+    Creature* leader = target->GetMap()->GetCreature(CreatureGroupsManager::ConvertDBGuid(leaderGuidCounter));
+    if (!leader)
+    {
+        PSendSysMessage("Leader not found");
+        return false;
+    }
+    
+    WorldDatabase.PExecute("DELETE FROM creature_linking WHERE guid=%u", target->GetGUIDLow());
+        WorldDatabase.PExecute("INSERT INTO creature_linking SET guid=%u, master_guid=%u, flag='%u'",
+            target->GetGUIDLow(), leaderGuidCounter, options);
+
+    PSendSysMessage("creature_link for creature %u. Leader %u", target->GetGUIDLow(), leader->GetGUIDLow());
     return true;
 }
 
@@ -2274,6 +2359,10 @@ bool ChatHandler::HandleDebugMoveFlagsCommand(char* args)
         PSendSysMessage("moveFlags = 0x%x", flags);
         unit->m_movementInfo.moveFlags = flags;
         unit->SendHeartBeat(true);
+    }
+    else
+    {
+        PSendSysMessage("moveFlags = 0x%x", unit->GetUnitMovementFlags());
     }
     return true;
 }

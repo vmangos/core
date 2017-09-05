@@ -368,7 +368,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK26                      = 0x04000000,            // 26
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
-    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29
+    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_UNK31                      = 0x80000000            // 31
 };
@@ -924,6 +924,7 @@ enum Targets
     TARGET_DYNAMIC_OBJECT_BEHIND       = 48,
     TARGET_DYNAMIC_OBJECT_LEFT_SIDE    = 49,
     TARGET_DYNAMIC_OBJECT_RIGHT_SIDE   = 50,
+    TARGET_AREAEFFECT_GO_AROUND_SOURCE = 51,
     TARGET_AREAEFFECT_GO_AROUND_DEST   = 52,                // gameobject around destination, select by spell_script_target
     TARGET_CURRENT_ENEMY_COORDINATES   = 53,                // set unit coordinates as dest, only 16 target B imlemented
     TARGET_LARGE_FRONTAL_CONE          = 54,
