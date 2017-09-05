@@ -879,165 +879,35 @@ bool GOHello_go_altar_of_elune(Player* pPlayer, GameObject* pGo)
 
 enum
 {
-    AREA_UNGORO                 = 541,
-    AREA_TANARIS                = 976,
-    AREA_WINTERSPRING           = 2255,
-
-    NPC_SPRINKLE                = 7583,
-    NPC_QUIXXIL                 = 10977,
-    NPC_LEGACKI                 = 10978,
-
-    SPELL_AUTO_FEAR             = 31365,
+    SPELL_UNSUMMON_YETI         = 17163
 };
 
 struct npc_umi_yetiAI : public ScriptedAI
 {
-    enum TargetType
-    {
-        TARGET_QUIXXIL = 0,
-        TARGET_LEGACKI,
-        TARGET_SPRINKLE
-    };
-
     npc_umi_yetiAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
 
-    bool        inited;
-    bool        reached;
-    uint32      phase;
-    uint32      m_timer;
-    ObjectGuid  m_targetGuid;
-    TargetType  m_targetType;
-
     void Reset() override
     {
-        inited = false;
-        reached = false;
-        phase = 0;
-        m_timer = 0;
     }
 
     void MoveInLineOfSight(Unit *) override
     {
     }
 
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    {
+        if (pSpell->Id == SPELL_UNSUMMON_YETI)
+        {
+            m_creature->GetMotionMaster()->MoveIdle();
+            m_creature->ForcedDespawn(1000);
+        }
+    }
+
     void UpdateAI(const uint32 uiDiff) override
     {
-        if (inited)
-        {
-            if (m_timer <= uiDiff)
-            {
-                if (Creature *pCreature = m_creature->GetMap()->GetCreature(m_targetGuid))
-                {
-                    if (!reached)
-                    {
-                        if (!(m_creature->GetDistance2d(pCreature) < 5.0f))
-                            return;
-                        reached = true;
-                    }
-                    switch (phase)
-                    {
-                        case 0:
-                            m_creature->MonsterTextEmote("Umi's Mechanical Yeti marches around, roaring and making a ruckus.", 0);
-                            m_creature->MonsterSay("RAAAAAAAR!", 0);
-                            pCreature->CastSpell(pCreature, SPELL_AUTO_FEAR, true);
-                            break;
-                        case 1:
-                            switch (m_targetType)
-                            {
-                                case TARGET_QUIXXIL:
-                                    pCreature->MonsterSay("Oh!!! Get that thing away from me!", 0);
-                                    pCreature->MonsterTextEmote("Quixxil runs quickly away from Umi's Mechanical yeti.", 0);
-                                    break;
-                                case TARGET_LEGACKI:
-                                    pCreature->MonsterTextEmote("Legacki jumps in fright!", 0);
-                                    pCreature->MonsterSay("Ahhhhh!!!", 0);
-                                    break;
-                                case TARGET_SPRINKLE:
-                                    pCreature->MonsterTextEmote("Sprinkle jumps in fright!", 0);
-                                    pCreature->MonsterSay("Ahhhhh!!! What is that thing?!", 0);
-                                    break;
-                            }
-                            break;
-                        case 2:
-                            switch (m_targetType)
-                            {
-                                case TARGET_QUIXXIL:
-                                    pCreature->MonsterSay("Why do you chase me, Mechanical yeti?! WHY?!", 0);
-                                    break;
-                                case TARGET_LEGACKI:
-                                    pCreature->MonsterSay("You big meanie! Who put you up to this?", 0);
-                                    break;
-                                case TARGET_SPRINKLE:
-                                    pCreature->MonsterSay("Umi sent you, didn't she? She told me to expect a surprise, but I never thought that this is what she meant! ", 0);
-                                    break;
-                            }
-                            break;
-                        case 3:
-                            switch (m_targetType)
-                            {
-                                case TARGET_QUIXXIL:
-                                    m_creature->MonsterTextEmote("the mechanical yeti winds down.", 0);
-                                    break;
-                                case TARGET_LEGACKI:
-                                    pCreature->MonsterSay("It was Umi, wasn't it?! She's always playing jokes on me, and now she's got you in on it too!", 0);
-                                    break;
-                            }
-                            break;
-                        case 4:
-                            switch (m_targetType)
-                            {
-                                case TARGET_QUIXXIL:
-                                    pCreature->MonsterTextEmote("Quixxil looks relieved.", 0);
-                                    pCreature->MonsterSay("I'm jumpy as it is... and people insist on scaring me... Next time, though, I'll be ready!", 0);
-                                    break;
-                                case TARGET_LEGACKI:
-                                    pCreature->MonsterTextEmote("Legacki sighs.", 0);
-                                    break;
-                            }
-                        case 5:
-                            pCreature->RemoveAurasDueToSpell(SPELL_AUTO_FEAR);
-                            pCreature->GetMotionMaster()->MoveTargetedHome();
-                            break;
-                    }
-                    phase++;
-                    m_timer = 2500;
-                }
-            }
-            else
-                m_timer -= uiDiff;
-            return;
-        }
-        inited = true;
-        switch (m_creature->GetAreaId())
-        {
-            case AREA_UNGORO:
-                if (Creature* pCreature = GetClosestCreatureWithEntry(m_creature, NPC_QUIXXIL, 15.0f))
-                {
-                    m_targetType = TARGET_QUIXXIL;
-                    m_targetGuid = pCreature->GetObjectGuid();
-                    m_creature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
-                }
-                break;
-            case AREA_TANARIS:
-                if (Creature* pCreature = GetClosestCreatureWithEntry(m_creature, NPC_SPRINKLE, 15.0f))
-                {
-                    m_targetType = TARGET_LEGACKI;
-                    m_targetGuid = pCreature->GetObjectGuid();
-                    m_creature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
-                }
-                break;
-            case AREA_WINTERSPRING:
-                if (Creature* pCreature = GetClosestCreatureWithEntry(m_creature, NPC_LEGACKI, 15.0f))
-                {
-                    m_targetType = TARGET_SPRINKLE;
-                    m_targetGuid = pCreature->GetObjectGuid();
-                    m_creature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
-                }
-                break;
-        }
     }
 };
 

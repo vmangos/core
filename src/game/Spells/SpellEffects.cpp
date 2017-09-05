@@ -3303,23 +3303,63 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 
         m_caster->AddGuardian(spawnCreature);
 
-        // Kilrogg eye
-        if (m_spellInfo->Id == 126)
-            spawnCreature->SetWalk(false);
-
         map->Add((Creature*)spawnCreature);
 
         // Notify Summoner
         if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
             ((Creature*)m_caster)->AI()->JustSummoned(spawnCreature);
-        // Kilrogg eye
-        if (m_spellInfo->Id == 126)
-            if (Player* p = m_caster->ToPlayer())
+
+        switch (m_spellInfo->Id)
+        {
+            case 126: // Eye of Kilrogg
             {
-                // Stealth
-                spawnCreature->CastSpell(spawnCreature, 2585, true);
-                p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
+                spawnCreature->SetWalk(false);
+                if (Player* p = m_caster->ToPlayer())
+                {
+                    // Stealth
+                    spawnCreature->CastSpell(spawnCreature, 2585, true);
+                    p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
+                }
+                break;
             }
+            case 17166: // Release Umi's Yeti - Quest Are We There, Yeti? Part 3
+            {
+                spawnCreature->MonsterTextEmote(-1900169);
+                spawnCreature->MonsterSay(-1900170);
+
+                switch (spawnCreature->GetAreaId())
+                {
+                    case 541: // Un'Goro Crater
+                        if (Creature* pCreature = spawnCreature->FindNearestCreature(10977, 30.0f, true)) // NPC_QUIXXIL
+                        {
+                            spawnCreature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
+                            pCreature->MonsterSay(-1900171);
+                            pCreature->SetWalk(false);
+                            pCreature->GetMotionMaster()->MoveWaypoint(false);
+                        }
+                        break;
+                    case 976: // Tanaris
+                        if (Creature* pCreature = spawnCreature->FindNearestCreature(7583, 30.0f, true)) // NPC_SPRINKLE
+                        {
+                            spawnCreature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
+                            pCreature->MonsterTextEmote(-1900172);
+                            pCreature->SetWalk(false);
+                            pCreature->GetMotionMaster()->MoveWaypoint(false);
+                        }
+                        break;
+                    case 2255: // Winterspring
+                        if (Creature* pCreature = spawnCreature->FindNearestCreature(10978, 30.0f, true)) // NPC_LEGACKI
+                        {
+                            spawnCreature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
+                            pCreature->MonsterTextEmote(-1900173);
+                            pCreature->SetWalk(false);
+                            pCreature->GetMotionMaster()->MoveWaypoint(false);
+                        }
+                        break;
+                }
+                break;
+            }
+        }
     }
 }
 
