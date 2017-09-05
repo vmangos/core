@@ -391,9 +391,8 @@ UPDATE `creature_template` SET `gossip_menu_id`=8400, `npcflag`=1, `ScriptName`=
 UPDATE `npc_text` SET `em0_1`='13' WHERE `ID`='8517';
 
 -- Some trash loot is faction specific, paladin/shaman gear
-UPDATE `creature_loot_template` SET `condition_id` = 2 WHERE `item` IN (23663, 23664, 23665);
-UPDATE `creature_loot_template` SET `condition_id` = 3 WHERE `item` IN (23666, 23667, 23668);
-
+UPDATE `creature_loot_template` SET `condition_id` = 2 WHERE `item` IN (23663, 23664, 23665, 23065);
+UPDATE `creature_loot_template` SET `condition_id` = 3 WHERE `item` IN (23666, 23667, 23668, 23066);
 
 
 /* 
