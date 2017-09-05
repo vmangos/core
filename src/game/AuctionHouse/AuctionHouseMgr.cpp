@@ -623,6 +623,7 @@ void AuctionHouseObject::Update()
                 data.parts[0].itemsEntries[0] = itr->second->itemTemplate;
                 Item* item = sAuctionMgr.GetAItem(itr->second->itemGuidLow);
                 data.parts[0].itemsCount[0] = item ? item->GetCount() : 0;
+                data.parts[0].itemsGuid[0] = itr->second->itemGuidLow;
                 data.parts[1].lowGuid = itr->second->bidder;
                 data.parts[1].money = itr->second->bid;
                 sWorld.LogTransaction(data);

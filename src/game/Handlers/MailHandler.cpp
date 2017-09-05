@@ -328,6 +328,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
         {
             data.parts[0].itemsEntries[0] = item->GetEntry();
             data.parts[0].itemsCount[0] = item->GetCount();
+            data.parts[0].itemsGuid[0] = item->GetGUIDLow();
         }
         data.parts[0].money = req->money;
         data.parts[1].lowGuid = req->receiver.GetCounter();
@@ -590,6 +591,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data)
             {
                 data.parts[0].itemsEntries[0] = it->GetEntry();
                 data.parts[0].itemsCount[0] = it->GetCount();
+                data.parts[0].itemsGuid[0] = it->GetGUIDLow();
             }
             data.parts[1].lowGuid = _player->GetGUIDLow();
             data.parts[1].money = m->COD;

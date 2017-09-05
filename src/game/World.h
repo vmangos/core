@@ -540,6 +540,7 @@ struct TransactionPart
     uint32 spell;
     uint16 itemsEntries[MAX_TRANSACTION_ITEMS];
     uint8 itemsCount[MAX_TRANSACTION_ITEMS];
+    uint32 itemsGuid[MAX_TRANSACTION_ITEMS];
 };
 
 struct PlayerTransactionData

@@ -316,6 +316,7 @@ void TradeData::FillTransactionLog(TransactionPart& log) const
         {
             log.itemsCount[i] = item->GetCount();
             log.itemsEntries[i] = item->GetEntry();
+            log.itemsGuid[i] = item->GetGUIDLow();
         }
     }
 }
@@ -14837,10 +14838,10 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
         do
         {
             Field *fields = result->Fetch();
-            uint32 bag_guid  = fields[10].GetUInt32();
-            uint8  slot      = fields[11].GetUInt8();
+            uint32 bag_guid     = fields[10].GetUInt32();
+            uint8  slot         = fields[11].GetUInt8();
             uint32 item_lowguid = fields[12].GetUInt32();
-            uint32 item_id   = fields[13].GetUInt32();
+            uint32 item_id      = fields[13].GetUInt32();
 
             ItemPrototype const * proto = ObjectMgr::GetItemPrototype(item_id);
 
@@ -14849,6 +14850,18 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_lowguid);
                 CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_lowguid);
                 sLog.outError("Player::_LoadInventory: Player %s has an unknown item (id: #%u) in inventory, deleted.", GetName(), item_id);
+                continue;
+            }
+
+            // Duplicate check. Player listed item in AH and then immediately relogged, before the item
+            // was deleted from the inventory in the DB
+            if (Item *item = sAuctionMgr.GetAItem(item_lowguid))
+            {
+                std::stringstream oss;
+                oss << "Duplicate item (via AH) " << item_id << " GUID:" << item_lowguid << ", count: " << item->GetCount() << ", bag: " << bag_guid << ", slot: " << uint32(slot);
+                CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_lowguid);
+                GetSession()->ProcessAnticheatAction("ItemCheck", oss.str().c_str(), CHEAT_ACTION_LOG);
+                DETAIL_LOG(oss.str().c_str());
                 continue;
             }
 
@@ -14873,7 +14886,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             if (itemGuids.find(item_lowguid) != itemGuids.end())
             {
                 std::stringstream oss;
-                oss << "Duplicate item " << item->GetEntry() << " GUID:" << item->GetGUIDLow() << " count:" << item->GetCount() << " bag:" << bag_guid << " slot:" << uint32(slot);
+                oss << "Duplicate item " << item_id << " GUID:" << item_lowguid << ", count: " << item->GetCount() << ", bag: " << bag_guid << ", slot: " << uint32(slot);
                 GetSession()->ProcessAnticheatAction("ItemCheck", oss.str().c_str(), CHEAT_ACTION_LOG);
             }
             itemGuids.insert(item_lowguid);
