@@ -8,7 +8,7 @@
 #include "PlayerBotAI.h"
 #include "CinematicStuff.h"
 #include "MapManager.h"
-#include "world\world_event_naxxramas.h"
+#include "world/world_event_naxxramas.h"
 #include "GridSearchers.h"
 
 /*
