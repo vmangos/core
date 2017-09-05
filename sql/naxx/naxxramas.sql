@@ -550,6 +550,11 @@ VALUES
 (1614603, 16146, 0, 0, 100, 1, 5000, 5000, 10000, 20000, 11, 28353, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Death Knight raise dead'),
 (1614604, 16146, 11, 0, 100, 0, 0, 0, 0, 0, 11, 13589, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Deathknight haste aura');
 
+-- use SPELL_EFFECT_APPLY_AREA_AURA_FRIEND  for Haste Aura, it actually works in our core unlike SPELL_EFFECT_APPLY_AREA_AURA_PARTY
+ REPLACE INTO spell_effect_mod (Id, EffectIndex, Effect, EffectDieSides, EffectBaseDice, EffectDicePerLevel, EffectRealPointsPerLevel, EffectBasePoints, EffectAmplitude, EffectPointsPerComboPoint, EffectChainTarget, EffectMultipleValue, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB, EffectRadiusIndex, EffectApplyAuraName, EffectItemType, EffectMiscValue, EffectTriggerSpell, Comment) VALUES 
+ (13589, 0, 128, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 'Haste Aura');
+
+
 UPDATE `creature_template` SET `flags_extra`=4096 WHERE `entry`=16146; -- keep positive auras on death
 
 -- Death knight frequency of intimidating shout reduced
