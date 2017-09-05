@@ -4389,6 +4389,9 @@ void Player::BuildPlayerRepop()
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 {
+    // Interrupt resurrect spells
+    InterruptSpellsCastedOnMe(false, true);
+
     // remove death flag + set aura
     SetByteValue(UNIT_FIELD_BYTES_1, 3, 0x00);
 
@@ -4751,6 +4754,9 @@ void Player::RepopAtGraveyard()
     }
     else
         ClosestGrave = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
+
+    // Interrupt resurrect spells
+    InterruptSpellsCastedOnMe(false, true);
 
     // stop countdown until repop
     m_deathTimer = 0;
