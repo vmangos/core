@@ -1247,10 +1247,17 @@ INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`,
 INSERT INTO `spell_script_target` (`entry`, `type`, `targetEntry`) VALUES (28861, 1, 16592);
 */
 
-/*
 -- SPELL_ZAP_CRYSTAL = 28032, // [Zap Crystal]. 15 damage.
-INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) VALUES (28032, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 0, -1, -1, -1, -1, -1, 'Zap Crystal');
+/*
+INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`, `EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`) 
+VALUES 
+(28032, 0, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1, 25, 0, -1, -1, -1, -1, -1, 'Zap Crystal');
 */
+delete from spell_effect_mod where Id = 28032;
+delete from spell_script_target  where entry = 28032;
+insert into spell_script_target (entry, type, targetEntry) VALUES
+(28032, 1, 16136),
+(28032, 1, 16172);
 
 -- Want the communication from relay to shard to hit damaged shard as well
 delete from spell_script_target where entry = 28373 and targetEntry = 16172;
