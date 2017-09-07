@@ -44,7 +44,7 @@ enum
         
     EMOTE_GUARDIAN                      = -1533134,         // at each guardian summon, cant see that it's used in vanilla
 
-    SPELL_VISUAL_CHANNEL = 29423,                           // channeled throughout phase one
+    SPELL_VISUAL_CHANNEL                = 29423,            // channeled throughout phase one
 
     //spells to be casted
     SPELL_FROST_BOLT                    = 28478,

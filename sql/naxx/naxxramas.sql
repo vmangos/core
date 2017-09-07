@@ -111,6 +111,15 @@ VALUES
 update quest_template set RequiredClasses = 8 where entry = 9078; -- Bonescythe Legplates should require class rogue
 
 
+DELETE FROM `spell_mod` where Id in (30122, 29422, 28369, 30075);
+INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`,
+`AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, 
+`StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
+VALUES 
+('30122', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '268435592 ', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'No channeled_2 flag on Plague Cloud'),
+('29422', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '268435456 ', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'No channeled_2 flag on KelThuzad CHannel'),
+('28369', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0 ', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'No channeled_1 flag on Gas'),
+('30075', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '268435456 ', '-1', '-1', '-1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'No channeled_1 flag on Gas');
 
 -- give AreaTrigger outside Faerlina scriptname
 DELETE FROM `scripted_areatrigger` where entry = 4115;
@@ -1130,6 +1139,7 @@ UPDATE `creature_template` SET `minhealth`=1832050, `maxhealth`=1832050, `mindmg
 /*
 * Kel'Thuzad
 */
+
 
 -- KT updates
 UPDATE `creature_template` SET `minhealth`=3198000, `maxhealth`=3198000, `mindmg`=6389, `maxdmg`=8458 WHERE `entry`=15990;
