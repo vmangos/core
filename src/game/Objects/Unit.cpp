@@ -6311,18 +6311,22 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
     for (AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
     {
         if (((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(spellProto)) &&
-                (*i)->GetSpellProto()->EquippedItemClass == -1 &&
-                // -1 == any item class (not wand then)
-                (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
+            (*i)->GetSpellProto()->EquippedItemClass == -1 &&
+            spellProto->EquippedItemClass == -1 && 
+            // -1 == any item class (not wand then)
+            (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
             // 0 == any inventory type (not wand then)
+        {
             DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
-
+        }
         // Paladin seals benefit from weapon modifiers
         else if ((*i)->GetModifier()->m_miscvalue & GetMeleeDamageSchoolMask() &&
             spellProto->SpellFamilyName == SPELLFAMILY_PALADIN && spellProto->IsFitToFamilyMask<CF_PALADIN_SEALS>() &&
             (((*i)->GetSpellProto()->EquippedItemClass == -1) ||
             (pWeapon && pWeapon->IsFitToSpellRequirements((*i)->GetSpellProto()))))
+        {
             DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+        }
     }
 
     uint32 creatureTypeMask = pVictim->GetCreatureTypeMask();
