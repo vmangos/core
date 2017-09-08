@@ -136,6 +136,8 @@ public:
     void SetData(uint32 uiType, uint32 uiData) override;
     uint32 GetData(uint32 uiType) override;
 
+    bool CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const;
+
     void GetRoyalGuardGUIDList(GuidList& lList) { lList = m_lRoyalGuardGUIDList; }
 
     const char* Save() { return m_strInstData.c_str(); }
