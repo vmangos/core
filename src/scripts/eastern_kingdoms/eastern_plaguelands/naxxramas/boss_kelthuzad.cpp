@@ -294,6 +294,8 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 nextBanshee, nextAbom;
     uint32 numSkeletons, numAboms, numBanshees;
     uint32 enrageTimer;
+    uint32 timeSinceLastFrostBlast;
+    uint32 timeSinceLastShadowFissure;
 
     void Reset()
     {
@@ -307,7 +309,9 @@ struct boss_kelthuzadAI : public ScriptedAI
         nextAbom = 30000;
         p3Started = false;
         numSummonedGuardians = 0;
-        
+        timeSinceLastFrostBlast = 0;
+        timeSinceLastShadowFissure = 0;
+
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
 
@@ -610,6 +614,9 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void UpdateP2P3(uint32 diff)
     {
+        timeSinceLastFrostBlast += diff;
+        timeSinceLastShadowFissure += diff;
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -657,22 +664,31 @@ struct boss_kelthuzadAI : public ScriptedAI
                 break;
             }
             case EVENT_FROSTBOLT_VOLLEY:
+            {
                 if(DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
                     events.Repeat(Seconds(urand(15, 17)));
                 else
                     events.Repeat(Seconds(1));
                 break;
+            }
             case EVENT_FROST_BLAST:
-                if (m_creature->IsNonMeleeSpellCasted())
+            {
+                if (timeSinceLastShadowFissure < 4000)
                 {
-                    events.Repeat(Seconds(2));
+                    events.Repeat(4000 - timeSinceLastShadowFissure);
                     break;
                 }
-                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1)) // todo: can it hit maintank?
+                if (m_creature->IsNonMeleeSpellCasted())
+                {
+                    events.Repeat(Seconds(1));
+                    break;
+                }
+                if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
                 {
                     if (DoCastSpellIfCan(pUnit, SPELL_FROST_BLAST) == CAST_OK)
                     {
                         events.Repeat(Seconds(urand(30, 60)));
+                        timeSinceLastFrostBlast = 0;
                         if (urand(0, 1))
                             DoScriptText(SAY_FROST_BLAST, m_creature);
                         break;
@@ -683,25 +699,41 @@ struct boss_kelthuzadAI : public ScriptedAI
                 else
                     events.Repeat(Seconds(1));
                 break;
+            }
             case EVENT_FROSTBOLT:
+            {
                 events.Repeat(Seconds(urand(5, 7))); // todo: this is guesswork
                 DoCastSpellIfCan(m_creature->getVictim(), SPELL_FROST_BOLT);
                 break;
+            }
             case EVENT_SHADOW_FISSURE:
+            {
+                if (timeSinceLastFrostBlast < 4000)
+                {
+                    events.Repeat(4000 - timeSinceLastFrostBlast);
+                    break;
+                }
                 if (m_creature->IsNonMeleeSpellCasted())
                 {
                     events.Repeat(Seconds(2));
                     break;
                 }
                 if (Unit* pUnit = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-                    if(DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
+                {
+                    if (DoCastSpellIfCan(pUnit, SPELL_SHADOW_FISSURE) == CAST_OK)
+                    {
                         events.Repeat(Seconds(urand(10, 20)));
+                        timeSinceLastShadowFissure = 0;
+                    }
                     else
                         events.Repeat(Seconds(1));
+                }
                 else
                     events.Repeat(Seconds(1));
                 break;
+            }
             case EVENT_DETONATE_MANA:
+            {
                 if (m_creature->IsNonMeleeSpellCasted())
                 {
                     events.Repeat(Seconds(2));
@@ -718,6 +750,7 @@ struct boss_kelthuzadAI : public ScriptedAI
                     }
                 }
                 break;
+            }
             case EVENT_CHAINS:
                 DoChains();
                 break;
