@@ -632,6 +632,7 @@ void instance_naxxramas::OnPlayerEnter(Player * player)
         22820, // Slip'kik's Savvy (3% spellcrit)
         22817, // Fengus' Ferocity (200 AP)
         20707,20765,20764,20762,20763, // Soulstones
+        28681, // Soul Revival (Scourge Invasion Buff)
     };
     for (uint32 buff : wbuffs)
         if (player->HasAura(buff))
