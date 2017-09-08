@@ -349,6 +349,12 @@ struct npc_necrotic_shard : public ScriptedAI
         }
     }
 
+    void HealedBy(Unit* pHealer, uint32& uiAmountHealed) override
+    {
+        if (pHealer->GetEntry() != 16230)
+            uiAmountHealed = 0;
+    }
+
     void UpdateAI(const uint32 diff)
     {
         if (eliteSpawnTimer < diff)
