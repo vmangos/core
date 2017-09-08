@@ -237,8 +237,7 @@ struct npc_necrotic_shard : public ScriptedAI
     uint32 _spawnEntry1;
     uint32 _spawnEntry2;
     uint32 eliteSpawnTimer;
-    //std::set<ObjectGuid> _adds;
-    std::vector<uint32> respawnTimers;
+    std::set<ObjectGuid> _adds;
 
     void OnRemoveFromWorld()
     {
@@ -247,22 +246,10 @@ struct npc_necrotic_shard : public ScriptedAI
 
     void DespawnAdds()
     {
-        respawnTimers.clear();
-        std::list<Creature*> nearbyCreatures;
-        GetCreatureListWithEntryInGrid(nearbyCreatures, m_creature, 
-        { NPC_SKELETAL_SHOCKTROOPER, NPC_SPECTRAL_SOLDIER, NPC_GHOUL_BERSERKER,
-         NPC_SPIRIT_OF_THE_DAMNED,NPC_BONE_WITCH,NPC_LUMBERING_HORROR }, 
-            60.0f);
-        for (auto creature : nearbyCreatures)
-        {
-            if(!creature->isDead())
-                creature->AddObjectToRemoveList();
-        }
-
-        //for (std::set<ObjectGuid>::iterator it = _adds.begin(); it != _adds.end(); ++it)
-        //    if (Creature* add = m_creature->GetMap()->GetCreature(*it))
-        //        add->AddObjectToRemoveList();
-        //_adds.clear();
+        for (std::set<ObjectGuid>::iterator it = _adds.begin(); it != _adds.end(); ++it)
+            if (Creature* add = m_creature->GetMap()->GetCreature(*it))
+                add->AddObjectToRemoveList();
+        _adds.clear();
     }
 
     uint32 GenerateAddEntry()
@@ -270,37 +257,24 @@ struct npc_necrotic_shard : public ScriptedAI
         return urand(0, 1) ? _spawnEntry1 : _spawnEntry2;
     }
 
-    void SpawnAdd()
-    {
-        float a = rand_norm_f() * 2 * M_PI;
-        float d = urand(10, 30);
-        float x, y, z;
-        m_creature->GetPosition(x, y, z);
-        x += d * cos(a);
-        y += d * sin(a);
-        m_creature->UpdateGroundPositionZ(x, y, z);
-        m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000);
-    }
     void SpawnAdds()
     {
         for (int i = 0; i < 30; ++i)
         {
-            SpawnAdd();
-            //float a = rand_norm_f() * 2 * M_PI;
-            //float d = urand(10, 30);
-            //float x, y, z;
-            //m_creature->GetPosition(x, y, z);
-            //x += d * cos(a);
-            //y += d * sin(a);
-            //m_creature->UpdateGroundPositionZ(x, y, z);
-            //if (Creature* add = m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 120000))
-            //{
-            //    //add->SetCorpseDelay(120);  // 2 min for corpse to despawn
-            //    //add->SetRespawnDelay(30); // 30 sec to respawn 
-            //    //add->SetRespawnTime(150); // total respawn should be 2.5min
-            //    //add->SetRespawnRadius(20.0f);
-            //    //_adds.insert(add->GetObjectGuid());
-            //}
+            float a = rand_norm_f() * 2 * M_PI;
+            float d = urand(10, 30);
+            float x, y, z;
+            m_creature->GetPosition(x, y, z);
+            x += d * cos(a);
+            y += d * sin(a);
+            m_creature->UpdateGroundPositionZ(x, y, z);
+            if (Creature* add = m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
+            {
+                add->SetCorpseDelay(120);  // 2 min for corpse to despawn
+                add->SetRespawnDelay(30); // 30 sec to respawn after despawn(?)
+                add->SetRespawnRadius(20.0f);
+                _adds.insert(add->GetObjectGuid());
+            }
         }
     }
 
@@ -322,12 +296,9 @@ struct npc_necrotic_shard : public ScriptedAI
         //case NPC_SKELETAL_SHOCKTROOPER:
         //case NPC_SPECTRAL_SOLDIER:
         //case NPC_GHOUL_BERSERKER:
-        //    unit->SetRespawnTime(150);
+        //    //unit->SetRespawnTime(150);
         //    break;
         //}
-
-        respawnTimers.push_back(150000);
-        //std::remove(_adds.begin(), _adds.end(), unit->GetEntry());
     }
     void JustRespawned()
     {
@@ -385,24 +356,6 @@ struct npc_necrotic_shard : public ScriptedAI
 
     void UpdateAI(const uint32 diff)
     {
-        //for (int i = 0; i < respawnTimers.size(); i++)
-        if (!m_creature->isDead())
-        {
-            for(auto it = respawnTimers.begin(); it != respawnTimers.end();)
-            {
-                if (*it < diff)
-                {
-                    SpawnAdd();
-                    it = respawnTimers.erase(it);
-                }
-                else
-                {
-                    (*it) -= diff;
-                    ++it;
-                }
-            }
-        }
-
         if (eliteSpawnTimer < diff)
         {
                 uint32 entry = 0;
