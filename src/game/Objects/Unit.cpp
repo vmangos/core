@@ -8449,6 +8449,14 @@ bool Unit::isInvisibleForAlive() const
     return isSpiritService();
 }
 
+/// returns true if creature can be seen by dead units
+bool Unit::isVisibleForDead() const
+{
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_GHOST_VISIBLE)
+        return true;
+    return isSpiritService();
+}
+
 uint32 Unit::GetCreatureType() const
 {
     if (GetTypeId() == TYPEID_PLAYER)
