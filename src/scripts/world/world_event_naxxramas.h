@@ -21,9 +21,6 @@
 
 #pragma once
 
-// Change this for live!
-#define DEBUG_WORLD_EVENT = true;
-
  // Text nostalrius (nostalrius_string)
 #define NOST_TEXT(id) (id+2000010000)
 
@@ -143,12 +140,12 @@ enum ScourgeInvasionMisc
 
     ENGINEER_MOD_HEALTH_PER_SEC = 15,
 
-#ifdef DEBUG_WORLD_EVENT
-    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
-#else
+//#ifdef DEBUG_WORLD_EVENT
+//    NECROPOLIS_ATTACK_TIMER = 60 * 5, // 5min from 
+//#else
     // The change of zone takes 4 hours
-    NECROPOLIS_ATTACK_TIMER = 4 * 60 * 60, // 4 hours
-#endif
+    NECROPOLIS_ATTACK_TIMER = 60 * 60, // 1 hour
+//#endif
     ELITE_SPAWN_MINIMUM = 1000*60*12, // 12min
     ELITE_SPAWN_MAXIMUM = 1000*60*18, // 18 min
     ELITE_DESPAWN       = 1000*60*15, // 15 min
