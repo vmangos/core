@@ -1311,15 +1311,5 @@ delete from creature where id = 16398;
 UPDATE `game_event` SET `hardcoded`='1' WHERE `entry`='17';
 
 
--- add gobj 3998521
--- move 3996867 to 3998522, remove 3998522
--- move c 1242817 to 2530718, remove 2530718
--- remove 
-
--- 3998521 new gobj
--- 2532308 new creature
-
--- 3998522 new gobj
--- 1242817 moved(?) creature
-
-
+-- boss in scholomance
+UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE `entry`=16383;
