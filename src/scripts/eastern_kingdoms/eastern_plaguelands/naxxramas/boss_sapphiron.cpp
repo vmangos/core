@@ -579,6 +579,7 @@ struct boss_sapphironAI : public ScriptedAI
                 SetCombatMovement(true);
                 m_creature->GetMotionMaster()->Clear(false);
                 m_creature->SelectHostileTarget();
+                phase = PHASE_GROUND;
                 if (m_creature->getVictim())
                 {
                     m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
