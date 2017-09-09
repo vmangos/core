@@ -767,7 +767,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     pC->DeleteLater();
 
                 // reputation
-                FactionEntry const *factionEntry = sFactionStore.LookupEntry(529); // Cenarion Circle
+                FactionEntry const *factionEntry = sFactionStore.LookupEntry(529); // Argent Dawn
                 if (factionEntry) 
                 {
                     Map::PlayerList const &liste = GetMap()->GetPlayers();
@@ -782,7 +782,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                 }
                 else
                 {
-                    sLog.outError("Rajaxx justDied, unable to find Cenarion Circle faction");
+                    sLog.outError("4hm just died. Unable to find Argent Dawn faction for reputation ");
                 }
             }
             
@@ -1052,6 +1052,9 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
         break;
     case NPC_EmbalmingSlime:
         pCreature->ForcedDespawn(30000);
+        break;
+    case NPC_LightningTotem:
+        pCreature->DeleteLater();
         break;
     }
 }
