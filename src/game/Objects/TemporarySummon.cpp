@@ -30,9 +30,9 @@ TemporarySummon::TemporarySummon(ObjectGuid summoner) :
 
 void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
 {
-    if (m_forceTargetUpdateTimer)
+    if (m_forceTargetUpdateTimer && isInCombat())
     {
-        if (m_forceTargetUpdateTimer < diff)
+        if (m_forceTargetUpdateTimer <= diff)
         {
             m_forceTargetUpdateTimer = 0;
             ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
@@ -40,6 +40,7 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
         else
             m_forceTargetUpdateTimer -= diff;
     }
+
     switch (m_type)
     {
         case TEMPSUMMON_MANUAL_DESPAWN:
