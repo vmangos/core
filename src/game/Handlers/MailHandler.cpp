@@ -722,7 +722,7 @@ void WorldSession::HandleGetMailList(WorldPacket & recv_data)
             break;
 
         // skip deleted or not delivered (deliver delay not expired) mails
-        if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time)
+        if ((*itr)->state == MAIL_STATE_DELETED || cur_time < (*itr)->deliver_time || cur_time > (*itr)->expire_time)
             continue;
 
         /*[-ZERO] TODO recheck this
