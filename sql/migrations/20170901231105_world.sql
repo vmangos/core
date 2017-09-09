@@ -34,7 +34,7 @@ UPDATE quest_template SET RequestItemsText='The brazier still reflects the ambie
 
 -- Dusty tome
 -- https://github.com/elysium-project/server/issues/1430
-UPDATE gameobject_template SET data12=0 WHERE entryin(179547,179548);
+UPDATE gameobject_template SET data12=0 WHERE entry IN (179547,179548);
 
 -- "Gol'dir"
 -- https://github.com/elysium-project/server/issues/1877
