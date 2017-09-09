@@ -176,7 +176,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f)
+    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatPulseTimer(0), m_combatWithZoneState(false)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -778,6 +778,18 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             {
                 LogLongCombat();
                 ResetCombatTime(true);
+            }
+
+            // Raid bosses do a periodic combat pulse
+            if (m_combatState && m_combatWithZoneState)
+            {
+                if (m_combatPulseTimer > 3000)
+                {
+                    SetInCombatWithZone(false);
+                    m_combatPulseTimer = 0;
+                }
+                else
+                    m_combatPulseTimer += update_diff;
             }
 
             if (AI())
@@ -2426,7 +2438,7 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
     sWorld.SendGlobalMessage(&data, nullptr, (enemy_team == ALLIANCE ? HORDE : ALLIANCE));
 }
 
-void Creature::SetInCombatWithZone()
+void Creature::SetInCombatWithZone(bool initialPulse)
 {
     if (!CanHaveThreatList())
     {
@@ -2447,11 +2459,17 @@ void Creature::SetInCombatWithZone()
     if (PlList.isEmpty())
         return;
 
+    if (!m_combatWithZoneState)
+        UpdateCombatWithZoneState(true);
+
     for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
     {
         if (Player* pPlayer = i->getSource())
         {
             if (pPlayer->isGameMaster())
+                continue;
+
+            if (!initialPulse && pPlayer->isInCombat())
                 continue;
 
             if (pPlayer->isAlive() && !IsFriendlyTo(pPlayer))
@@ -3083,6 +3101,7 @@ void Creature::SetHomePosition(float x, float y, float z, float o)
 void Creature::OnLeaveCombat()
 {
     UpdateCombatState(false);
+    UpdateCombatWithZoneState(false);
 
     if (_creatureGroup)
         _creatureGroup->OnLeaveCombat(this);
@@ -3113,6 +3132,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
 
         SetStandState(UNIT_STAND_STATE_STAND);
         _pacifiedTimer = 0;
+        m_combatPulseTimer = 0;
 
         if (m_zoneScript)
             m_zoneScript->OnCreatureEnterCombat(this);

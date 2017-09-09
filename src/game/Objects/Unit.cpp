@@ -1161,6 +1161,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
         {
             creature->LogDeath(this);
             creature->UpdateCombatState(false);
+            creature->UpdateCombatWithZoneState(false);
 
             creature->DeleteThreatList();
             if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
