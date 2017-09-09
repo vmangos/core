@@ -655,7 +655,8 @@ void BattlePlayerAI::OnPlayerLogin()
 
 ScourgeInvasionEvent::ScourgeInvasionEvent()
     :WorldEvent(GAME_EVENT_SCOURGE_INVASION),
-    isFirstUpdate(true)
+    invasion1Loaded(false),
+    invasion2Loaded(false)
 {
     memset(&previousRemainingCounts[0], -1, sizeof(int) * 6);
 
@@ -808,11 +809,24 @@ void ScourgeInvasionEvent::Update()
 {
     if (!sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
         sGameEventMgr.StartEvent(GAME_EVENT_SCOURGE_INVASION, true);
-       
-    time_t now = time(NULL);
-    
+
     uint32 current1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
     uint32 current2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+    
+    if (!invasion1Loaded)
+        invasion1Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE1, VARIABLE_NAXX_ATTACK_TIME1);
+
+    if(!invasion2Loaded)
+        invasion2Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE2, VARIABLE_NAXX_ATTACK_TIME2);
+
+    // Waiting until both invasions have been loaded. OnEnable will return true
+    // if no invasions are supposed to be started, so this will only be the case if any of the 
+    // maps required for a current invasionZone were not yet loaded
+    if (!invasion1Loaded || !invasion2Loaded)
+        return;
+
+    time_t now = time(NULL);
+
     bool attackStateChange = false;
     for (auto it = invasionPoints.begin(); it != invasionPoints.end(); ++it)
     {
@@ -821,7 +835,10 @@ void ScourgeInvasionEvent::Update()
         {
             Map* mapPtr = GetMap(it->map, point);
             if (!mapPtr)
+            {
+                sLog.outError("ScourgeInvasionEvent::Update no map for zone %d", it->map);
                 continue;
+            }
 
             Creature* pRelay = mapPtr->GetCreature(point.relayGuid);
             if (!pRelay)
@@ -845,15 +862,15 @@ void ScourgeInvasionEvent::Update()
 
         sObjectMgr.SetSavedVariable(it->remainingVar, numNecrosAlive, true);
     }
-    
-    
+       
     UpdateWorldState();
 }
 
 void ScourgeInvasionEvent::Enable()
 {
-    OnEnable(VARIABLE_NAXX_ATTACK_ZONE1, VARIABLE_NAXX_ATTACK_TIME1);
-    OnEnable(VARIABLE_NAXX_ATTACK_ZONE2, VARIABLE_NAXX_ATTACK_TIME2);
+    invasion1Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE1, VARIABLE_NAXX_ATTACK_TIME1);
+    invasion2Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE2, VARIABLE_NAXX_ATTACK_TIME2);
+
     UpdateWorldState();
 }
 
@@ -866,6 +883,9 @@ void ScourgeInvasionEvent::Disable()
             if (!necro.relayGuid)
                 continue;
             Map* pMap = GetMap(zone.map, necro);
+            if (!pMap)
+                continue;
+
             Creature* pRelay = pMap->GetCreature(necro.relayGuid);
             if (!pRelay)
                 continue;
@@ -933,7 +953,9 @@ void ScourgeInvasionEvent::HandleActiveZone(uint32 attackTimeVar, uint32 attackZ
     }
 }
 
-void ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
+// Will return false if we were supposed to resume an invasion, but ResumeInvasion() returned false.
+// In all other cases returns true
+bool ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
 {
     uint32 current1 = sObjectMgr.GetSavedVariable(attackZoneVar);
     uint32 current2 = sObjectMgr.GetSavedVariable(attackZoneVar);
@@ -949,16 +971,22 @@ void ScourgeInvasionEvent::OnEnable(uint32 attackZoneVar, uint32 attackTimeVar)
         // If there were remaining necropolises in the old zone before shutdown, we
         // restore that zone
         if (oldZone && sObjectMgr.GetSavedVariable(oldZone->remainingVar) > 0)
-            ResumeInvasion(current1);
+        {
+            return ResumeInvasion(current1);
+        }
         // Otherwise we start a new Invasion
-        else {
+        else 
+        {
             if (!oldZone)
-                sLog.outError("ScourgeInvasionEvent::OnEnable started new invasion as oldZone could not be found");
+                sLog.outError("ScourgeInvasionEvent::OnEnable starting new invasion as oldZone could not be found");
             StartNewInvasionIfTime(attackTimeVar, attackZoneVar);
         }
     }
+    return true;
 }
 
+// Will initialize an invasion in a new, random, zone if the cooldown is up. If somehow the maps for the
+// chosen zone is unavailable the invasion will simply not be started, and a new attempt will be made next update
 void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable)
 {
     time_t now = time(NULL);
@@ -981,10 +1009,26 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     InvasionZone* zone = GetZone(zoneId);
     if (!zone) return;
 
+    for (auto& necro : zone->points)
+    {
+        Map* mapPtr = GetMap(zone->map, necro);
+        // If any of the required maps are not available we return. Will cause the invasion to be started
+        // on next update instead
+        if (!mapPtr)
+        {
+            sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access required map (%d). Retrying next update", zone->map);
+            return;
+        }
+    }
+
     uint32 num_necropolises_remaining = 0;
     for (auto& necro : zone->points)
     {
         Map* mapPtr = GetMap(zone->map, necro);
+        if (!mapPtr) {
+            sLog.outError("ScourgeInvasionEvent::StartNewInvasionIfTime unable to access map %d", zone->map);
+            continue;
+        }
         if (mapPtr && SummonNecropolis(mapPtr, necro))
             ++num_necropolises_remaining;
     }
@@ -993,13 +1037,17 @@ void ScourgeInvasionEvent::StartNewInvasionIfTime(uint32 timeVariable, uint32 zo
     sObjectMgr.SetSavedVariable(zone->remainingVar, num_necropolises_remaining, true);
 }
 
-void ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
+// Will return false if a required map was not available. In all other cases returns true.
+bool ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
 {
     // Dont have a save variable to know which necropolises had already been destroyed, so we
     // just summon the same amount, but not necessarily the same necropolises
     sLog.outBasic("Resuming Scourge invasion in zone %d", zoneId);
     InvasionZone* zone = GetZone(zoneId);
-    if (!zone) return;
+    if (!zone) {
+        sLog.outError("ScourgeInvasionEvent::ResumeInvasion somehow magically could not find InvasionZone object for zoneId: %d", zoneId);
+        return false;
+    }
     
     uint32 num_necropolises_remaining = sObjectMgr.GetSavedVariable(zone->remainingVar);
     if (num_necropolises_remaining > zone->points.size())
@@ -1008,12 +1056,31 @@ void ScourgeInvasionEvent::ResumeInvasion(uint32 zoneId)
             zone->zoneId, num_necropolises_remaining, zone->points.size());
         num_necropolises_remaining = zone->points.size();
     }
+
+    // Just making sure we can access all maps before starting the invasion
+    for (uint32 i = 0; i < num_necropolises_remaining; i++)
+    {
+        InvasionNecropolis& necro = zone->points[i];
+        if (!GetMap(zone->map, necro))
+        {
+            sLog.outError("ScourgeInvasionEvent::ResumeInvasion map %d not accessible. Retry next update", zone->map);
+            return false;
+        }
+    }
+
     for (uint32 i = 0; i < num_necropolises_remaining; i++)
     {
         InvasionNecropolis& necro = zone->points[i];
         Map* mapPtr = GetMap(zone->map, necro);
+        if (!mapPtr)
+        {
+            sLog.outError("ScourgeInvasionEvent::ResumeInvasion failed getting map, even after making sure they were loaded....");
+            continue;
+        }
+
         SummonNecropolis(mapPtr, necro);
     }
+    return true;
 }
 
 bool ScourgeInvasionEvent::SummonNecropolis(Map * pMap, InvasionNecropolis & point)

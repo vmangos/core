@@ -288,13 +288,16 @@ private:
         uint32 remainingVar;
         std::vector<InvasionNecropolis> points;
     };
-    bool isFirstUpdate;
+
+    bool invasion1Loaded;
+    bool invasion2Loaded;
+
     void HandleActiveZone(uint32 attackTimeVar, uint32 attackZoneVar, uint32 remainingVar, time_t now, uint32 zoneId);
 
-    void OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
+    bool OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
 
     void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
-    void ResumeInvasion(uint32 zoneId);
+    bool ResumeInvasion(uint32 zoneId);
     bool SummonNecropolis(Map* pMap, InvasionNecropolis& point);
 
     Map* GetMap(uint32 mapId, const InvasionNecropolis& invZone);
