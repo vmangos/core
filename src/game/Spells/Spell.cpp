@@ -3576,7 +3576,7 @@ void Spell::handle_immediate()
 
         // a channeled spell could be interrupted already because the aura on target
         // was diminished to duration=0 see Spell::DoSpellHitOnUnit
-        if (m_channeled && m_spellState != SPELL_STATE_CASTING)
+        if (IsChanneledSpell(m_spellInfo) && m_spellState != SPELL_STATE_CASTING)
             return;
     }
 
