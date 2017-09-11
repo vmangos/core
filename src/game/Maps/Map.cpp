@@ -657,8 +657,6 @@ public:
     virtual void run()
     {
         map->UpdateActiveCellsCallback(diff, now, threadIdx, nThreads, step);
-
-        MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
     }
     int threadIdx;
     int nThreads;
