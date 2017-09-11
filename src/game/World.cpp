@@ -81,6 +81,7 @@
 #include "MovementBroadcaster.h"
 #include "HonorMgr.h"
 #include "Anticheat/Anticheat.h"
+#include "AuraRemovalMgr.h"
 
 #include <chrono>
 
@@ -1509,6 +1510,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Initializing Scripts...");
     sScriptMgr.Initialize();
     sLog.outString();
+
+    sLog.outString("Loading aura removal on map change definitions");
+    sAuraRemovalMgr.LoadFromDB();
 
     ///- Initialize game time and timers
     sLog.outString("DEBUG:: Initialize game time and timers");

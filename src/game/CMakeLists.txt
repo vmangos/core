@@ -19,6 +19,7 @@ set (game_SRCS
 	AdvancedPlayerBotAI.h
 	AdvancedPlayerBotAI.cpp
 	AccountMgr.cpp
+	AuraRemovalMgr.cpp
 	AutoBroadCastMgr.cpp
 	Camera.cpp
 	CreatureGroups.cpp
@@ -223,6 +224,7 @@ set (game_SRCS
 	vmap/VMapManager2.cpp
 	vmap/WorldModel.cpp
 	AccountMgr.h
+	AuraRemovalMgr.h
 	AutoBroadCastMgr.h
 	Camera.h
 	CreatureGroups.h
