@@ -619,26 +619,6 @@ bool instance_naxxramas::IsEncounterInProgress()
     return false;
 }
 
-void instance_naxxramas::OnPlayerEnter(Player * player)
-{
-    static const std::vector<uint32> wbuffs
-    {
-        22888, // rallying cry
-        16609, // Warchief's blessing
-        24425, // Spirit of Zandalar
-        26393, // Elune's Blessing
-        15366, // Songflower Serenade
-        22818, // Mol'dar's Moxie (15% stam)
-        22820, // Slip'kik's Savvy (3% spellcrit)
-        22817, // Fengus' Ferocity (200 AP)
-        20707,20765,20764,20762,20763, // Soulstones
-        28681, // Soul Revival (Scourge Invasion Buff)
-    };
-    for (uint32 buff : wbuffs)
-        if (player->HasAura(buff))
-            player->RemoveAurasDueToSpell(buff);
-}
-
 void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 {
     ASSERT(this)
