@@ -4586,6 +4586,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 28408:                                 // Chains of Kel'Thuzad (Naxxramas: Kel'thuzad)
                 {
+                    if (!m_caster)
+                        return;
+
                     // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
                     const ThreatList& tl = m_caster->getThreatManager().getThreatList();
