@@ -21,6 +21,18 @@
 
 #include "Common.h"
 
+enum AuraRemovalFlags
+{
+    AURA_REM_FLAG_EXCLUDE_HORDE     = 1,
+    AURA_REM_FLAG_EXCLUDE_ALLIANCE  = 2,
+};
+
+struct AuraRemovalEntry
+{
+    uint32 auraEntry;
+    uint32 flags;
+};
+
 // Handles removal of auras from players on map changes, based on
 // definitions in world-db table instance_buff_removal
 class AuraRemovalManager
@@ -36,7 +48,7 @@ public:                                                 // Accessors
 
 private:
     // <map ID, aura ID>
-    std::map<uint32, std::vector<uint32>> m_data;
+    std::map<uint32, std::vector<AuraRemovalEntry>> m_data;
 };
 
 #define sAuraRemovalMgr MaNGOS::Singleton<AuraRemovalManager>::Instance()

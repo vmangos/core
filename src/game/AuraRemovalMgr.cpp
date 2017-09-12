@@ -29,7 +29,7 @@ void AuraRemovalManager::LoadFromDB()
 
     sLog.outString("> Loading table `instance_buff_removal`");
     uint32 count = 0;
-    QueryResult* result = WorldDatabase.Query("SELECT mapId, auraId, enabled, comment FROM instance_buff_removal");
+    QueryResult* result = WorldDatabase.Query("SELECT mapId, auraId, enabled, flags, comment FROM instance_buff_removal");
     if (!result)
     {
         BarGoLink bar(1);
@@ -49,11 +49,12 @@ void AuraRemovalManager::LoadFromDB()
             uint32 mapId  = fields[0].GetUInt32();
             uint32 auraId = fields[1].GetUInt32();
             bool enabled = (bool)fields[2].GetUInt8();
-            
+            uint32 flags = fields[3].GetUInt32();
+
             ++count;
 
             if (enabled)
-                m_data[mapId].push_back(auraId);
+                m_data[mapId].push_back(AuraRemovalEntry{ auraId, flags });
 
         } while (result->NextRow());
 
@@ -73,9 +74,15 @@ void AuraRemovalManager::PlayerEnterMap(uint32 mapId, Player* pPlayer)
     if (it == m_data.end()) 
         return;
 
-    for(uint32 aura : it->second)
+    for(const auto& aura : it->second)
     {
-        if (pPlayer->HasAura(aura))
-            pPlayer->RemoveAurasDueToSpellByCancel(aura);
+        
+        if (pPlayer->GetTeam() == Team::HORDE && (aura.flags & AURA_REM_FLAG_EXCLUDE_HORDE))
+            continue;
+        else if (pPlayer->GetTeam() == Team::ALLIANCE && (aura.flags & AURA_REM_FLAG_EXCLUDE_ALLIANCE))
+            continue;
+
+        if (pPlayer->HasAura(aura.auraEntry))
+            pPlayer->RemoveAurasDueToSpellByCancel(aura.auraEntry);
     }
 }
