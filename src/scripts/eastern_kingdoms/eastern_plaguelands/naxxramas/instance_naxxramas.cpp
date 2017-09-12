@@ -23,6 +23,7 @@ EndScriptData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
+#include "InstanceStatistics.h"
 
 enum NaxxEvents
 {
@@ -200,6 +201,7 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
         }
     }
 }
+
 
 void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
 {
@@ -622,6 +624,10 @@ bool instance_naxxramas::IsEncounterInProgress()
 void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 {
     ASSERT(this)
+    
+    bool sameStateAsLast = false; 
+    if (uiType < MAX_ENCOUNTER)
+        sameStateAsLast = (m_auiEncounter[uiType] == uiData);
 
     switch (uiType)
     {
@@ -837,6 +843,79 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     break;
             }
             break;
+    }
+
+    if (uiData == FAIL && !sameStateAsLast)
+    {
+        uint32 entry = 0;
+        switch (uiType)
+        {
+        case TYPE_ANUB_REKHAN:
+            entry = NPC_ANUB_REKHAN;
+        break;
+        case TYPE_FAERLINA:
+            entry = NPC_FAERLINA;
+        break;
+        case TYPE_MAEXXNA:
+            entry = NPC_MAEXXNA;
+        break;
+        case TYPE_NOTH:
+            entry = NPC_NOTH;
+        break;
+        case TYPE_HEIGAN:
+            entry = NPC_HEIGAN;
+        break;
+        case TYPE_LOATHEB:
+            entry = NPC_LOATHEB;
+        break;
+
+        case TYPE_RAZUVIOUS:
+            entry = NPC_RAZUVIOUS;
+        break;
+        case TYPE_GOTHIK:
+            entry = NPC_GOTHIK;
+        break;
+        case TYPE_FOUR_HORSEMEN:
+        {
+            // special case handling for these buggers
+            sInstanceStatistics.IncrementWipeCounter(533, NPC_ZELIEK);
+            sInstanceStatistics.IncrementWipeCounter(533, NPC_MOGRAINE);
+            sInstanceStatistics.IncrementWipeCounter(533, NPC_BLAUMEUX);
+            sInstanceStatistics.IncrementWipeCounter(533, NPC_THANE);
+        }
+        break;
+
+        case TYPE_PATCHWERK:
+            entry = NPC_PATCHWERK;
+        break;
+        case TYPE_GROBBULUS:
+            entry = NPC_GROBBULUS;
+        break;
+        case TYPE_GLUTH:
+            entry = NPC_GLUTH;
+        break;
+        case TYPE_THADDIUS:
+            entry = NPC_THADDIUS;
+        break;
+            
+        case TYPE_SAPPHIRON:
+            entry = NPC_SAPPHIRON;
+        break;
+        case TYPE_KELTHUZAD:
+            entry = NPC_KELTHUZAD;
+        break;
+        }
+
+        if (entry)
+        {
+            if (Creature* pCreature = GetSingleCreatureFromStorage(entry))
+            {
+                // Crude check to to avoid silly data clogging up our statistics
+                // We only update the wipe counter if the boss has been in combat for at least 10 seconds
+                if(pCreature->GetCombatTime(false) > 10)
+                    sInstanceStatistics.IncrementWipeCounter(533, entry);
+            }
+        }
     }
 
     if (uiData == DONE)

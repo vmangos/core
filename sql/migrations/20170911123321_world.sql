@@ -22,3 +22,46 @@ LOCK TABLES `instance_buff_removal` WRITE;
 /*!40000 ALTER TABLE `instance_buff_removal` DISABLE KEYS */;
 /*!40000 ALTER TABLE `instance_buff_removal` ENABLE KEYS */;
 UNLOCK TABLES;
+
+
+--
+-- Table structure for table `instance_creature_kills`
+--
+DROP TABLE IF EXISTS `instance_creature_kills`;
+CREATE TABLE `instance_creature_kills` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
+  `creatureEntry` int(10) unsigned NOT NULL COMMENT 'entry of the creature who performed the kill',
+  `spellEntry` TINYINT(1) NOT NULL COMMENT 'entry of spell which did the kill. 0 for melee or unknown',
+  `count` int(10) unsigned NOT NULL COMMENT 'number of kills',
+  PRIMARY KEY (`MapId`, `creatureEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
+
+--
+-- Dumping data for table `instance_creature_kills`
+--
+
+LOCK TABLES `instance_creature_kills` WRITE;
+/*!40000 ALTER TABLE `instance_creature_kills` DISABLE KEYS */;
+/*!40000 ALTER TABLE `instance_creature_kills` ENABLE KEYS */;
+UNLOCK TABLES;
+
+
+--
+-- Table structure for table `crea`
+--
+DROP TABLE IF EXISTS `instance_wipes`;
+CREATE TABLE `instance_wipes` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
+  `creatureEntry` int(10) unsigned NOT NULL COMMENT 'creature which the wipe occured against',
+  `count` int(10) unsigned NOT NULL COMMENT 'number of wipes',
+  PRIMARY KEY (`MapId`, `creatureEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='players wiping against creatures statistics';
+
+--
+-- Dumping data for table `instance_wipes`
+--
+
+LOCK TABLES `instance_wipes` WRITE;
+/*!40000 ALTER TABLE `instance_wipes` DISABLE KEYS */;
+/*!40000 ALTER TABLE `instance_wipes` ENABLE KEYS */;
+UNLOCK TABLES;

@@ -28,6 +28,7 @@ set (game_SRCS
 	GossipDef.cpp
 	HardcodedEvents.cpp
 	HonorMgr.cpp
+	InstanceStatistics.cpp
 	ItemEnchantmentMgr.cpp
 	LootMgr.cpp
 	ObjectAccessor.cpp
@@ -234,6 +235,7 @@ set (game_SRCS
 	GossipDef.h
 	HardcodedEvents.h
 	HonorMgr.h
+	InstanceStatistics.h
 	ItemEnchantmentMgr.h
 	Language.h
 	LootMgr.h

@@ -1,0 +1,157 @@
+/*
+* Copyright (C) 2017 Elysium Project <https://github.com/elysium-project>
+*
+* This program is free software; you can redistribute it and/or modify
+* it under the terms of the GNU General Public License as published by
+* the Free Software Foundation; either version 2 of the License, or
+* (at your option) any later version.
+*
+* This program is distributed in the hope that it will be useful,
+* but WITHOUT ANY WARRANTY; without even the implied warranty of
+* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+* GNU General Public License for more details.
+*
+* You should have received a copy of the GNU General Public License
+* along with this program; if not, write to the Free Software
+* Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+*/
+
+#include "InstanceStatistics.h"
+#include "Policies/Singleton.h"
+#include "Database/DatabaseEnv.h"
+#include "Policies/SingletonImp.h"
+
+INSTANTIATE_SINGLETON_1(InstanceStatisticsMgr);
+
+void InstanceStatisticsMgr::LoadFromDB()
+{
+    m_instanceWipes.clear();
+    m_instanceCreatureKills.clear();
+
+    sLog.outString("> Loading table `instance_wipes`");
+    uint32 count = 0;
+    QueryResult* result = WorldDatabase.Query("SELECT mapId, creatureEntry, count FROM instance_wipes");
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString(">> Table instance_creature_kills is empty.");
+        sLog.outString();
+    }
+    else
+    {
+        BarGoLink bar((int)result->GetRowCount());
+        do
+        {
+            bar.step();
+
+            Field* fields = result->Fetch();
+
+            uint32 mapId = fields[0].GetUInt32();
+            uint32 creatureEntry = fields[1].GetUInt32();
+            uint32 count = fields[4].GetUInt32();
+
+            m_instanceWipes[std::make_pair(mapId, creatureEntry)] = InstanceWipes{ mapId,creatureEntry,count };
+            ++count;
+        } while (result->NextRow());
+
+        sLog.outString(">> Loaded %u entries from instance_wipes", count);
+        sLog.outString();
+
+        delete result;
+    }
+
+    sLog.outString("> Loading table `instance_creature_kills`");
+    count = 0;
+    result = WorldDatabase.Query("SELECT mapId, creatureEntry, spellEntry, count FROM instance_creature_kills");
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString(">> Table instance_creature_kills is empty.");
+        sLog.outString();
+    }
+    else
+    {
+        BarGoLink bar((int)result->GetRowCount());
+        do
+        {
+            bar.step();
+
+            Field* fields = result->Fetch();
+
+            uint32 mapId = fields[0].GetUInt32();
+            uint32 creatureEntry = fields[1].GetUInt32();
+            uint32 spellEntry = fields[2].GetUInt32();
+            uint32 count = fields[4].GetUInt32();
+
+            m_instanceCreatureKills[std::make_pair(mapId, creatureEntry)] = InstanceCreatureKlls{ mapId,creatureEntry,spellEntry,count };
+            ++count;
+        } while (result->NextRow());
+
+        sLog.outString(">> Loaded %u entries from instance_creature_kills", count);
+        sLog.outString();
+
+        delete result;
+    }
+}
+
+void InstanceStatisticsMgr::IncrementWipeCounter(uint32 mapId, uint32 creatureEntry)
+{
+    auto it = m_instanceWipes.find(std::make_pair(mapId, creatureEntry));
+    if (it == m_instanceWipes.end())
+    {
+        InstanceWipes obj{ mapId,creatureEntry, 1 };
+        m_instanceWipes[std::make_pair(mapId, creatureEntry)] = obj;
+        Save(obj);
+    }
+    else {
+        it->second.count++;
+        Save(it->second);
+    }
+}
+
+void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVictim, SpellEntry const* spellProto)
+{
+    if (!pKiller || !pVictim)
+        return;
+    if (!pKiller->GetMap())
+        return;
+    uint32 mapId = pKiller->GetMap()->GetId();
+    uint32 creatureEntry = pKiller->GetEntry();
+    uint32 spellId = 0;
+    if (spellProto)
+        spellId = spellProto->Id;
+
+    auto it = m_instanceCreatureKills.find(std::make_pair(mapId, creatureEntry));
+    if (it == m_instanceCreatureKills.end())
+    {
+        InstanceCreatureKlls obj{ mapId,creatureEntry, spellId, 1 };
+        m_instanceCreatureKills[std::make_pair(mapId, creatureEntry)] = obj;
+        Save(obj);
+    }
+    else {
+        it->second.count++;
+        Save(it->second);
+    }
+}
+
+void InstanceStatisticsMgr::Save(const InstanceCreatureKlls & ick)
+{
+    WorldDatabase.BeginTransaction();
+    WorldDatabase.PExecute("DELETE FROM `instance_creature_kills` WHERE `mapId` = %u and `creatureEntry` = %u", 
+        ick.mapId, ick.creatureEntry);
+    WorldDatabase.PExecute("INSERT INTO `instance_creature_kills` (`mapId`, `creatureEntry`, `spellEntry`, `count`) VALUES (%u, %u, %u, %u)", 
+        ick.mapId, ick.creatureEntry, ick.spellEntry, ick.count);
+    WorldDatabase.CommitTransaction();
+}
+
+void InstanceStatisticsMgr::Save(const InstanceWipes & iw)
+{
+    WorldDatabase.BeginTransaction();
+    WorldDatabase.PExecute("DELETE FROM `instance_wipes` WHERE `mapId` = %u and `creatureEntry` = %u", 
+        iw.mapId, iw.creatureEntry);
+    WorldDatabase.PExecute("INSERT INTO `instance_wipes` (`mapId`, `creatureEntry`, `count`) VALUES (%u, %u, %u)", 
+        iw.mapId, iw.creatureEntry, iw.count);
+    WorldDatabase.CommitTransaction();
+}
