@@ -12095,23 +12095,17 @@ void Player::SendPreparedQuest(ObjectGuid guid)
         // need pet case for some quests
         if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
         {
-            uint32 textid = GetGossipTextId(pCreature);
+            uint32 textid = sObjectMgr.GetNpcGossip(pCreature->GetGUIDLow());
 
             GossipText const* gossiptext = sObjectMgr.GetGossipText(textid);
-            if (!gossiptext)
-            {
-                qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
-                qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
-                title = "";
-            }
-            else
+            if (gossiptext)
             {
                 qe = gossiptext->Options[0].Emotes[0];
 
                 if (!gossiptext->Options[0].Text_0.empty())
                 {
                     title = gossiptext->Options[0].Text_0;
-
+                    
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                     {
@@ -12126,7 +12120,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
                 else
                 {
                     title = gossiptext->Options[0].Text_1;
-
+                    
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                     {

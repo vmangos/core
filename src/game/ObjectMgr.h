@@ -126,6 +126,13 @@ struct QuestGreetingLocale
     uint32 EmoteDelay;
 };
 
+enum
+{
+    QUESTGIVER_CREATURE = 0,
+    QUESTGIVER_GAMEOBJECT = 1,
+    QUESTGIVER_TYPE_MAX = 2,
+};
+
 typedef UNORDERED_MAP<uint32,CreatureData> CreatureDataMap;
 typedef CreatureDataMap::value_type CreatureDataPair;
 
@@ -1012,10 +1019,10 @@ class ObjectMgr
         int32 GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(uint32 lang) { DBCLocaleIndex = GetIndexForLocale(LocaleConstant(lang)); }
 
-        QuestGreetingLocale const* GetQuestGreetingLocale(int32 entry) const
+        QuestGreetingLocale const* GetQuestGreetingLocale(uint32 entry, uint8 type) const
         {
-            auto itr = mQuestGreetingLocaleMap.find(entry);
-            if (itr == mQuestGreetingLocaleMap.end()) return nullptr;
+            auto itr = mQuestGreetingLocaleMap[type].find(entry);
+            if (itr == mQuestGreetingLocaleMap[type].end()) return nullptr;
             return &itr->second;
         }
 
@@ -1347,7 +1354,7 @@ class ObjectMgr
         NpcTextLocaleMap mNpcTextLocaleMap;
         PageTextLocaleMap mPageTextLocaleMap;
         MangosStringLocaleMap mMangosStringLocaleMap;
-        QuestGreetingLocaleMap mQuestGreetingLocaleMap;
+        QuestGreetingLocaleMap mQuestGreetingLocaleMap[QUESTGIVER_TYPE_MAX];
         GossipMenuItemsLocaleMap mGossipMenuItemsLocaleMap;
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;
         AreaLocaleMap mAreaLocaleMap;

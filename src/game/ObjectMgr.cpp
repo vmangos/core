@@ -7149,9 +7149,10 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
 
 bool ObjectMgr::LoadQuestGreetings()
 {
-    mQuestGreetingLocaleMap.clear(); // need for reload case
+    for (uint32 i = 0; i < QUESTGIVER_TYPE_MAX; i++)
+        mQuestGreetingLocaleMap[i].clear(); // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
+    QueryResult *result = WorldDatabase.Query("SELECT entry,type,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
 
     if (!result)
     {
@@ -7164,25 +7165,47 @@ bool ObjectMgr::LoadQuestGreetings()
     do
     {
         Field *fields = result->Fetch();
-        int32 entry = fields[0].GetInt32();
+        uint32 entry = fields[0].GetUInt32();
+        uint8 type = fields[1].GetUInt8();
 
-        if ((entry < 1) || !ObjectMgr::GetCreatureTemplate(entry))
+        switch (type)
         {
-            sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
-            continue;
+            case QUESTGIVER_CREATURE:
+            {
+                if (!ObjectMgr::GetCreatureTemplate(entry))
+                {
+                    sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+                    continue;
+                }
+                break;
+            }
+            case QUESTGIVER_GAMEOBJECT:
+            {
+                if (!ObjectMgr::GetGameObjectInfo(entry))
+                {
+                    sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent gameobject template (Entry: %u), ignore", entry);
+                    continue;
+                }
+                break;
+            }
+            default:
+            {
+                sLog.outErrorDb("Table `quest_greeting` have entry with invalid type (Type: %u), ignore", type);
+                continue;
+            }
         }
 
-        QuestGreetingLocale& data = mQuestGreetingLocaleMap[entry];
+        QuestGreetingLocale& data = mQuestGreetingLocaleMap[type][entry];
 
         data.Content.resize(1);
         ++count;
 
         // 0 -> default, idx in to idx+1
-        data.Content[0] = fields[1].GetCppString();
+        data.Content[0] = fields[2].GetCppString();
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[i + 1].GetCppString();
+            std::string str = fields[i + 2].GetCppString();
             if (!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -7197,8 +7220,8 @@ bool ObjectMgr::LoadQuestGreetings()
             }
         }
 
-        data.Emote = fields[10].GetUInt16();
-        data.EmoteDelay = fields[11].GetUInt32();
+        data.Emote = fields[11].GetUInt16();
+        data.EmoteDelay = fields[12].GetUInt32();
 
         if (data.Emote && !sEmotesStore.LookupEntry(data.Emote))
         {
