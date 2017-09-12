@@ -21,6 +21,8 @@
 
 #include "Common.h"
 
+// Handles removal of auras from players on map changes, based on
+// definitions in world-db table instance_buff_removal
 class AuraRemovalManager
 {
 public:                                                 // Constructors
