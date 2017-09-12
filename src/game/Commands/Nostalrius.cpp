@@ -33,6 +33,7 @@
 #include "Pet.h"
 #include "CharacterDatabaseCache.h"
 #include "LootMgr.h"
+#include "AuraRemovalMgr.h"
 
 #include "Formulas.h"
 #include "Nostalrius.h"
@@ -3300,6 +3301,13 @@ bool ChatHandler::HandleReloadIPBanList(char*)
 bool ChatHandler::HandleReloadAccountBanList(char*)
 {
     sAccountMgr.LoadAccountBanList();
+    SendSysMessage(">> Table `account_banned` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadInstanceBuffRemoval(char*)
+{
+    sAuraRemovalMgr.LoadFromDB();
     SendSysMessage(">> Table `account_banned` reloaded.");
     return true;
 }
