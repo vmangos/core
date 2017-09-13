@@ -65,6 +65,11 @@ struct boss_renatakiAI : public ScriptedAI
         m_creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_INFO  + 1, 3);
     }
 
+    void JustDied(Unit* pKiller)
+    {
+        m_creature->LeaveVanish();
+    }
+
     void UpdateAI(const uint32 diff)
     {
         if (!Light)
