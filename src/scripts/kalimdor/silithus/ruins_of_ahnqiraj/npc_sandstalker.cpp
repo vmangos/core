@@ -35,6 +35,11 @@ struct npc_sandstalkerAI : public ScriptedAI
         m_creature->Ambush(pVanishTarget, SPELL_BURROW);
     }
 
+    void JustDied(Unit* pKiller)
+    {
+        m_creature->LeaveVanish();
+    }
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->isInCombat())
