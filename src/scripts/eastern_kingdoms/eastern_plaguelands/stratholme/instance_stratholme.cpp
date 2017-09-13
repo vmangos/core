@@ -44,6 +44,7 @@ enum
     NPC_AURIUS_1                = 10917,
     NPC_AURIUS_2                = 10931,
     NPC_DATHROHAN               = 10812,
+    NPC_MAGISTRATE              = 10435,
 
     NPC_RAMSTEIN                = 10439,
     NPC_ABOM_BILE               = 10416,
@@ -278,6 +279,9 @@ struct instance_stratholme : public ScriptedInstance
                 break;
             case NPC_DATHROHAN:
                 m_uiDathrohanGUID = pCreature->GetGUID();
+                break;
+            case NPC_MAGISTRATE:
+                pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                 break;
         }
 
