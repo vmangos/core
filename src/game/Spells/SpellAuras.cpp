@@ -5227,7 +5227,17 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             // Don't heal target if it is already at max health
             if (target->GetHealth() == target->GetMaxHealth())
+            {
+                // Trigger Improved Mend Pet even if health is full
+                if (spellProto->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_MEND_PET>())
+                {
+                    uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+                    uint32 procVictim = PROC_FLAG_ON_TAKE_PERIODIC;
+                    uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
+                    pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto);
+                }
                 return;
+            }
 
             // heal for caster damage (must be alive)
             if (target != pCaster && spellProto->SpellVisual == 163 && !pCaster->isAlive())
