@@ -35,7 +35,7 @@ void InstanceStatisticsMgr::LoadFromDB()
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString(">> Table instance_creature_kills is empty.");
+        sLog.outString(">> Table instance_wipes is empty.");
         sLog.outString();
     }
     else
@@ -49,9 +49,9 @@ void InstanceStatisticsMgr::LoadFromDB()
 
             uint32 mapId = fields[0].GetUInt32();
             uint32 creatureEntry = fields[1].GetUInt32();
-            uint32 count = fields[4].GetUInt32();
+            uint32 killCount = fields[2].GetUInt32();
 
-            m_instanceWipes[std::make_pair(mapId, creatureEntry)] = InstanceWipes{ mapId,creatureEntry,count };
+            m_instanceWipes[std::make_pair(mapId, creatureEntry)] = InstanceWipes{ mapId,creatureEntry,killCount };
             ++count;
         } while (result->NextRow());
 
@@ -83,9 +83,20 @@ void InstanceStatisticsMgr::LoadFromDB()
             uint32 mapId = fields[0].GetUInt32();
             uint32 creatureEntry = fields[1].GetUInt32();
             uint32 spellEntry = fields[2].GetUInt32();
-            uint32 count = fields[4].GetUInt32();
-
-            m_instanceCreatureKills[std::make_pair(mapId, creatureEntry)] = InstanceCreatureKlls{ mapId,creatureEntry,spellEntry,count };
+            uint32 killCount = fields[3].GetUInt32();
+            auto it = m_instanceCreatureKills.find(std::make_pair(mapId, creatureEntry));
+            if (it == m_instanceCreatureKills.end())
+            {
+                InstanceCreatureKlls obj;
+                obj.mapId = mapId;
+                obj.creatureEntry = creatureEntry;
+                obj.killsBySpells[spellEntry] = killCount;
+                m_instanceCreatureKills.insert(std::make_pair(std::make_pair(mapId, creatureEntry), std::move(obj));
+            }
+            else
+            {
+                it->second.killsBySpells[spellEntry] = killCount;
+            }
             ++count;
         } while (result->NextRow());
 
@@ -122,27 +133,39 @@ void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVic
     uint32 spellId = 0;
     if (spellProto)
         spellId = spellProto->Id;
-
+    uint32 count = 0;
     auto it = m_instanceCreatureKills.find(std::make_pair(mapId, creatureEntry));
     if (it == m_instanceCreatureKills.end())
     {
-        InstanceCreatureKlls obj{ mapId,creatureEntry, spellId, 1 };
-        m_instanceCreatureKills[std::make_pair(mapId, creatureEntry)] = obj;
-        Save(obj);
+        count = 1;
+        InstanceCreatureKlls obj;
+        obj.mapId = mapId;
+        obj.creatureEntry = creatureEntry;
+        obj.killsBySpells[spellId] = count;
+        m_instanceCreatureKills.insert(std::make_pair(std::make_pair(mapId, creatureEntry), std::move(obj)));
     }
     else {
-        it->second.count++;
-        Save(it->second);
+        auto it2 = it->second.killsBySpells.find(spellId);
+        if (it2 == it->second.killsBySpells.end())
+        {
+            count = 1;
+            it->second.killsBySpells[spellId] = count;
+        }
+        else
+        {
+            count = ++it2->second;
+        }
     }
+    Save(mapId,creatureEntry,spellId,count);
 }
 
-void InstanceStatisticsMgr::Save(const InstanceCreatureKlls & ick)
+void InstanceStatisticsMgr::Save(uint32 mapId, uint32 creatureEntry, uint32 spellId, uint32 count)
 {
     WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecute("DELETE FROM `instance_creature_kills` WHERE `mapId` = %u and `creatureEntry` = %u", 
-        ick.mapId, ick.creatureEntry);
+    WorldDatabase.PExecute("DELETE FROM `instance_creature_kills` WHERE `mapId` = %u and `creatureEntry` = %u and `spellEntry` = %u", 
+        mapId, creatureEntry, spellId);
     WorldDatabase.PExecute("INSERT INTO `instance_creature_kills` (`mapId`, `creatureEntry`, `spellEntry`, `count`) VALUES (%u, %u, %u, %u)", 
-        ick.mapId, ick.creatureEntry, ick.spellEntry, ick.count);
+        mapId, creatureEntry, spellId, count);
     WorldDatabase.CommitTransaction();
 }
 

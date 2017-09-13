@@ -241,6 +241,7 @@ class ZoneScript
         Creature* GetCreature(ObjectGuid guid);
         GameObject* GetGameObject(ObjectGuid guid);
 
+        virtual void OnUnitDeath(Unit* /*pKiller*/, Unit* /*pVictim*/, SpellEntry const* /*spellProto*/) {}
     protected:
 
         PlayerSet m_players[2];

@@ -26,8 +26,7 @@ struct InstanceCreatureKlls
 {
     uint32 mapId;
     uint32 creatureEntry;
-    uint32 spellEntry;
-    uint32 count;
+    std::map<uint32, uint32> killsBySpells; 
 };
 
 struct InstanceWipes
@@ -50,7 +49,7 @@ public:
     void IncrementKillCounter(Creature* pKiller, Player* pVictim, SpellEntry const* spellProto);
 
 private:
-    void Save(const InstanceCreatureKlls& ick);
+    void Save(uint32 mapId, uint32 creatureEntry, uint32 spellId, uint32 count);
     void Save(const InstanceWipes& iw);
     
     std::map<std::pair<uint32,uint32>,InstanceWipes>        m_instanceWipes;

@@ -31,9 +31,9 @@ DROP TABLE IF EXISTS `instance_creature_kills`;
 CREATE TABLE `instance_creature_kills` (
   `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
   `creatureEntry` int(10) unsigned NOT NULL COMMENT 'entry of the creature who performed the kill',
-  `spellEntry` TINYINT(1) NOT NULL COMMENT 'entry of spell which did the kill. 0 for melee or unknown',
+  `spellEntry` INT(10) NOT NULL COMMENT 'entry of spell which did the kill. 0 for melee or unknown',
   `count` int(10) unsigned NOT NULL COMMENT 'number of kills',
-  PRIMARY KEY (`MapId`, `creatureEntry`)
+  PRIMARY KEY (`MapId`, `creatureEntry`,`spellEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
 
 --
