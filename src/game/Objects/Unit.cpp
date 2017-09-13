@@ -4127,6 +4127,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
     }
 
     uint32 firstInChain = 0;
+    bool dmgPeriodic = false;
     for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
     {
         if (Aura* aura = holder->GetAuraByEffectIndex(SpellEffectIndex(eff)))
@@ -4137,6 +4138,13 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
                 case SPELL_AURA_OBS_MOD_HEALTH:
                 {
                     firstInChain = sSpellMgr.GetFirstSpellInChain(holder->GetId());
+                    break;
+                }
+                case SPELL_AURA_PERIODIC_DAMAGE:
+                case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                case SPELL_AURA_PERIODIC_LEECH:
+                {
+                    dmgPeriodic = true;
                     break;
                 }
                 default:
@@ -4301,9 +4309,21 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
             continue;
         }
 
+        // Periodic damage: allow different ranks from different casters for the same spell chain
+        if (dmgPeriodic && holder->GetCasterGuid() != (*i).second->GetCasterGuid() && sSpellMgr.IsRankSpellDueToSpell(spellProto, i_spellId))
+        {
+            continue;
+        }
+
         // non single (per caster) per target spell specific (possible single spell per target at caster)
         if (!is_spellSpecPerTargetPerCaster && !is_spellSpecPerTarget && sSpellMgr.IsNoStackSpellDueToSpell(spellId, i_spellId))
         {
+            // Prevent replacing higher ranks with lesser ranks
+            if (sSpellMgr.IsRankSpellDueToSpell(spellProto, i_spellId) && CompareAuraRanks(spellId, i_spellId) < 0)
+            {
+                return false;
+            }
+
             // Its a parent aura (create this aura in ApplyModifier)
             if ((*i).second->IsInUse())
             {
@@ -4311,7 +4331,7 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
                 continue;
             }
             DETAIL_LOG("[STACK][%u/%u] NoStackSpellDueToSpell", spellId, i_spellId);
-            RemoveAurasDueToSpell(i_spellId);
+            RemoveAurasByCasterSpell(i_spellId, (*i).second->GetCasterGuid());
 
             if (m_spellAuraHolders.empty())
                 break;
