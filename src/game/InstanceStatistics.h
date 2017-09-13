@@ -20,7 +20,12 @@
 #define INSTANCE_STATISTICS_H
 
 #include "Common.h"
+#include "Threading.h"
 
+enum eInstanceCustomCounter : int
+{
+    MR_BIGGLESWORTH_KILLS = 0,
+};
 
 struct InstanceCreatureKlls
 {
@@ -47,13 +52,19 @@ public:
 public:
     void IncrementWipeCounter(uint32 mapId, uint32 creatureEntry);
     void IncrementKillCounter(Creature* pKiller, Player* pVictim, SpellEntry const* spellProto);
+    void IncrementCustomCounter(eInstanceCustomCounter index, bool save);
 
 private:
     void Save(uint32 mapId, uint32 creatureEntry, uint32 spellId, uint32 count);
-    void Save(const InstanceWipes& iw);
+    void Save(uint32 mapId, uint32 creatureEntry, uint32 count);
     
     std::map<std::pair<uint32,uint32>,InstanceWipes>        m_instanceWipes;
     std::map<std::pair<uint32,uint32>,InstanceCreatureKlls> m_instanceCreatureKills;
+    std::map<uint32, uint32> m_instanceCustomCounters;
+    
+    ACE_Thread_Mutex m_wipesMutex;
+    ACE_Thread_Mutex m_creatureKillsMutex;
+    ACE_Thread_Mutex m_customCountersMutex;
 };
 
 

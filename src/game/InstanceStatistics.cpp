@@ -26,8 +26,6 @@ INSTANTIATE_SINGLETON_1(InstanceStatisticsMgr);
 void InstanceStatisticsMgr::LoadFromDB()
 {
     m_instanceWipes.clear();
-    m_instanceCreatureKills.clear();
-
     sLog.outString("> Loading table `instance_wipes`");
     uint32 count = 0;
     QueryResult* result = WorldDatabase.Query("SELECT mapId, creatureEntry, count FROM instance_wipes");
@@ -61,6 +59,9 @@ void InstanceStatisticsMgr::LoadFromDB()
         delete result;
     }
 
+
+
+    m_instanceCreatureKills.clear();
     sLog.outString("> Loading table `instance_creature_kills`");
     count = 0;
     result = WorldDatabase.Query("SELECT mapId, creatureEntry, spellEntry, count FROM instance_creature_kills");
@@ -91,7 +92,7 @@ void InstanceStatisticsMgr::LoadFromDB()
                 obj.mapId = mapId;
                 obj.creatureEntry = creatureEntry;
                 obj.killsBySpells[spellEntry] = killCount;
-                m_instanceCreatureKills.insert(std::make_pair(std::make_pair(mapId, creatureEntry), std::move(obj));
+                m_instanceCreatureKills.insert(std::make_pair(std::make_pair(mapId, creatureEntry), std::move(obj)));
             }
             else
             {
@@ -105,21 +106,61 @@ void InstanceStatisticsMgr::LoadFromDB()
 
         delete result;
     }
+
+
+
+    m_instanceCustomCounters.clear();
+    sLog.outString("> Loading table `instance_custom_counters`");
+    count = 0;
+    result = WorldDatabase.Query("SELECT `index`, `count` FROM instance_custom_counters");
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString(">> Table instance_custom_counters is empty.");
+        sLog.outString();
+    }
+    else
+    {
+        BarGoLink bar((int)result->GetRowCount());
+        do
+        {
+            bar.step();
+
+            Field* fields = result->Fetch();
+
+            uint32 index = fields[0].GetUInt32();
+            uint32 count = fields[1].GetUInt32();
+            m_instanceCustomCounters[index] = count;
+            ++count;
+        } while (result->NextRow());
+
+        sLog.outString(">> Loaded %u entries from instance_custom_counters", count);
+        sLog.outString();
+
+        delete result;
+    }
+
 }
 
 void InstanceStatisticsMgr::IncrementWipeCounter(uint32 mapId, uint32 creatureEntry)
 {
+    uint32 count;
+    m_wipesMutex.acquire();
     auto it = m_instanceWipes.find(std::make_pair(mapId, creatureEntry));
     if (it == m_instanceWipes.end())
     {
-        InstanceWipes obj{ mapId,creatureEntry, 1 };
+        count = 1;
+        InstanceWipes obj{ mapId,creatureEntry, count };
         m_instanceWipes[std::make_pair(mapId, creatureEntry)] = obj;
-        Save(obj);
     }
     else {
         it->second.count++;
-        Save(it->second);
+        count = it->second.count;
     }
+    m_wipesMutex.release();
+
+    Save(mapId, creatureEntry, count);
 }
 
 void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVictim, SpellEntry const* spellProto)
@@ -134,6 +175,8 @@ void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVic
     if (spellProto)
         spellId = spellProto->Id;
     uint32 count = 0;
+
+    m_creatureKillsMutex.acquire();
     auto it = m_instanceCreatureKills.find(std::make_pair(mapId, creatureEntry));
     if (it == m_instanceCreatureKills.end())
     {
@@ -156,7 +199,35 @@ void InstanceStatisticsMgr::IncrementKillCounter(Creature* pKiller, Player* pVic
             count = ++it2->second;
         }
     }
+    m_creatureKillsMutex.release();
+
     Save(mapId,creatureEntry,spellId,count);
+}
+
+void InstanceStatisticsMgr::IncrementCustomCounter(eInstanceCustomCounter index, bool save)
+{
+    m_customCountersMutex.acquire();
+    uint32 count;
+    auto it = m_instanceCustomCounters.find(index);
+    if (it == m_instanceCustomCounters.end())
+    {
+        count = 1;
+        m_instanceCustomCounters[index] = count;
+    }
+    else
+    {
+        it->second++;
+        count = it->second;
+    }
+    m_customCountersMutex.release();
+
+    if (save)
+    {
+        WorldDatabase.BeginTransaction();
+        WorldDatabase.PExecute("DELETE FROM `instance_custom_counters` WHERE `index` = %u", index);
+        WorldDatabase.PExecute("INSERT INTO `instance_custom_counters` (`index`, `count`) VALUES (%u, %u)", index, count);
+        WorldDatabase.CommitTransaction();
+    }
 }
 
 void InstanceStatisticsMgr::Save(uint32 mapId, uint32 creatureEntry, uint32 spellId, uint32 count)
@@ -169,12 +240,10 @@ void InstanceStatisticsMgr::Save(uint32 mapId, uint32 creatureEntry, uint32 spel
     WorldDatabase.CommitTransaction();
 }
 
-void InstanceStatisticsMgr::Save(const InstanceWipes & iw)
+void InstanceStatisticsMgr::Save(uint32 mapId, uint32 creatureEntry, uint32 count)
 {
     WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecute("DELETE FROM `instance_wipes` WHERE `mapId` = %u and `creatureEntry` = %u", 
-        iw.mapId, iw.creatureEntry);
-    WorldDatabase.PExecute("INSERT INTO `instance_wipes` (`mapId`, `creatureEntry`, `count`) VALUES (%u, %u, %u)", 
-        iw.mapId, iw.creatureEntry, iw.count);
+    WorldDatabase.PExecute("DELETE FROM `instance_wipes` WHERE `mapId` = %u and `creatureEntry` = %u",  mapId, creatureEntry);
+    WorldDatabase.PExecute("INSERT INTO `instance_wipes` (`mapId`, `creatureEntry`, `count`) VALUES (%u, %u, %u)", mapId, creatureEntry, count);
     WorldDatabase.CommitTransaction();
 }

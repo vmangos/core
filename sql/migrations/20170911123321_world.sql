@@ -24,6 +24,8 @@ LOCK TABLES `instance_buff_removal` WRITE;
 UNLOCK TABLES;
 
 
+
+
 --
 -- Table structure for table `instance_creature_kills`
 --
@@ -46,6 +48,8 @@ LOCK TABLES `instance_creature_kills` WRITE;
 UNLOCK TABLES;
 
 
+
+
 --
 -- Table structure for table `crea`
 --
@@ -61,7 +65,26 @@ CREATE TABLE `instance_wipes` (
 -- Dumping data for table `instance_wipes`
 --
 
-LOCK TABLES `instance_wipes` WRITE;
-/*!40000 ALTER TABLE `instance_wipes` DISABLE KEYS */;
-/*!40000 ALTER TABLE `instance_wipes` ENABLE KEYS */;
+LOCK TABLES `instance_custom_counters` WRITE;
+/*!40000 ALTER TABLE `instance_custom_counters` DISABLE KEYS */;
+/*!40000 ALTER TABLE `instance_custom_counters` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `crea`
+--
+DROP TABLE IF EXISTS `instance_custom_counters`;
+CREATE TABLE `instance_custom_counters` (
+  `index` int(10) unsigned NOT NULL COMMENT 'index as defined in InstanceStatistics.h',
+  `count` int(10) unsigned NOT NULL COMMENT 'counter',
+  PRIMARY KEY (`index`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
+
+--
+-- Dumping data for table `instance_custom_counters`
+--
+
+LOCK TABLES `instance_custom_counters` WRITE;
+/*!40000 ALTER TABLE `instance_custom_counters` DISABLE KEYS */;
+/*!40000 ALTER TABLE `instance_custom_counters` ENABLE KEYS */;
 UNLOCK TABLES;
