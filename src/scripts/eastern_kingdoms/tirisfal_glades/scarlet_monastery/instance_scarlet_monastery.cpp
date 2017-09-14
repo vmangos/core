@@ -264,6 +264,7 @@ struct instance_scarlet_monastery : ScriptedInstance
                         {
                             pHighlord->HandleEmote(EMOTE_ONESHOT_POINT);
                             DoScriptText(SAY_ASHBRINGER1, pHighlord);
+                            pMograine->SetFacingToObject(pHighlord);
                         }
                         m_events.ScheduleEvent(EVENT_STAND, Seconds(4));
                         break;
@@ -299,7 +300,7 @@ struct instance_scarlet_monastery : ScriptedInstance
                     case EVENT_FORGIVEN:
                         if (pHighlord)
                             DoScriptText(SAY_ASHBRINGER3, pHighlord);
-                        m_events.ScheduleEvent(EVENT_DESPAWN, Seconds(3));
+                        m_events.ScheduleEvent(EVENT_DESPAWN, Seconds(4));
                         break;
                     case EVENT_DESPAWN:
                         if (pHighlord)
