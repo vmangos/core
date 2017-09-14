@@ -137,6 +137,10 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void AggroRadius(uint32 diff)
     {
+        // He is used for SM event too, sooo 
+        if (m_creature->GetMapId() != 533)
+            return;
+
         if (m_pInstance->GetData(TYPE_FOUR_HORSEMEN) != NOT_STARTED && m_pInstance->GetData(TYPE_FOUR_HORSEMEN) != FAIL)
             return;
 
@@ -183,6 +187,10 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void MoveInLineOfSight(Unit* pWho) override
     {
+        // He is used for SM event too, sooo 
+        if (m_creature->GetMapId() != 533)
+            return;
+
         if (!m_creature->IsWithinDistInMap(pWho, 75.0f))
             return;
 
@@ -209,6 +217,10 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void Reset() override
     {
+        // Mograine is used for SM event too, sooo 
+        if (m_creature->GetMapId() != 533)
+            return;
+
         pullCheckTimer = 1000;
         m_events.Reset();
 
@@ -248,6 +260,10 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
+        // Mograine is used for SM event too, sooo 
+        if (m_creature->GetMapId() != 533)
+            return;
+
         if (m_pInstance->GetData(TYPE_FOUR_HORSEMEN) == IN_PROGRESS)
             return;
         
@@ -310,6 +326,10 @@ struct boss_four_horsemen_shared : public ScriptedAI
 
     void UpdateAI(const uint32 uiDiff) override
     {
+        // He is used for SM event too, sooo 
+        if (m_creature->GetMapId() != 533)
+            return;
+
         m_events.Update(uiDiff);
         killSayCooldown -= std::min(killSayCooldown, uiDiff);
 
@@ -526,6 +546,10 @@ struct boss_highlord_mograineAI : public boss_four_horsemen_shared
 
     void KilledUnit(Unit* Victim)
     {
+        // He is used for SM event too, sooo 
+        if (m_creature->GetMapId() != 533)
+            return;
+
         // Not sure about it
         if (m_bIsSpirit)
             return;

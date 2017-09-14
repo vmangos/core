@@ -1401,6 +1401,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 28441:                                 // AB Effect 000
+                {
+
+                    return;
+                }
+                case 28697:                                 // Forgiveness (SM Ashbringer event)
+                {
+                    if (unitTarget && m_caster)
+                    {
+                        m_caster->Kill(unitTarget, nullptr);
+                    }
+                    return;
+                }
             }
 
             //All IconID Check in there
