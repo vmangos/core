@@ -49,6 +49,7 @@
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GridSearchers.h"
+#include "AuraRemovalMgr.h"
 
 #define MAX_GRID_LOAD_TIME      50
 
@@ -367,6 +368,9 @@ bool Map::Add(Player *player)
 
     if (i_data)
         i_data->OnPlayerEnter(player);
+
+    // Remove any buffs defined in instance_aura_removal for the new map
+    sAuraRemovalMgr.PlayerEnterMap(i_id, player);
 
     player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
     player->m_broadcaster->SetInstanceId(GetInstanceId());

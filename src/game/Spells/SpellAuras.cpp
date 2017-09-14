@@ -1439,8 +1439,8 @@ void Aura::TriggerSpell()
                 for (Map::PlayerList::const_iterator it = pList.begin(); it != pList.end(); ++it)
                 {
                     Player* pPlayer = (*it).getSource();
-                    if (pPlayer->GetGUID() == triggerTarget->GetGUID()) continue; 
                     if (!pPlayer) continue;
+                    if (pPlayer->GetGUID() == triggerTarget->GetGUID()) continue; 
                     if (pPlayer->isDead()) continue;
                     // 2d distance should be good enough
                     if (pPlayer->HasAura(28059) && caster->GetDistance2d(pPlayer) < 13.0f) // 13.0f taken from dbc
@@ -2540,12 +2540,26 @@ void Aura::HandleForceReaction(bool apply, bool Real)
     if ((apply && faction_rank >= REP_FRIENDLY) || (!apply && player->GetReputationRank(faction_id) >= REP_FRIENDLY))
         player->StopAttackFaction(faction_id);
 
+    // sorry, need to hack ashbringer to make you friendly with scarlet crusade too
+    if (m_spellAuraHolder && m_spellAuraHolder->GetSpellProto() &&  m_spellAuraHolder->GetId() == 28282)
+    {
+        uint32 scarlet_crusade_faction_id = 56;
+        ReputationRank scarlet_crusade_rank = ReputationRank(7);
+        player->GetReputationMgr().ApplyForceReaction(scarlet_crusade_faction_id, scarlet_crusade_rank, apply);
+        player->GetReputationMgr().SendForceReactions();
+
+        // stop fighting if at apply forced rank friendly or at remove real rank friendly
+        if ((apply && scarlet_crusade_rank >= REP_FRIENDLY) || (!apply && player->GetReputationRank(scarlet_crusade_faction_id) >= REP_FRIENDLY))
+            player->StopAttackFaction(scarlet_crusade_faction_id);
+    }
+
     if (!apply && player->GetZoneId() == 1377 && GetId() == 29519 && m_removeMode == AURA_REMOVE_BY_DEATH)
     {
         // OutdoorPVP Silithus : Perte du buff silithyste
         if (ZoneScript* pScript = player->GetZoneScript())
             pScript->HandleDropFlag(player, GetId());
     }
+
 }
 
 void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)

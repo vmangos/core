@@ -47,6 +47,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
     uint32 Sleep_Timer;
     uint32 Dispel_Timer;
     bool PowerWordShield;
+    bool bAshbringer;
 
     void Reset()
     {
@@ -57,6 +58,19 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         Sleep_Timer = 30000;
         Dispel_Timer = 20000;
         PowerWordShield = false;
+        bAshbringer = false;
+    }
+
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell) override
+    {
+        if (pSpell->Id == 28441 && !bAshbringer && pCaster && me->IsWithinLOSInMap(pCaster))
+        {
+            me->SetSheath(SHEATH_STATE_UNARMED);
+            me->CastSpell(me, 28443, true); // transform
+            me->SetFacingToObject(pCaster);
+            me->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
+            bAshbringer = true;
+        }
     }
 
     void UpdateAI(const uint32 diff)
@@ -120,6 +134,7 @@ struct boss_high_inquisitor_fairbanksAI : public ScriptedAI
         DoMeleeAttackIfReady();
     }
 };
+
 
 CreatureAI* GetAI_boss_high_inquisitor_fairbanks(Creature* pCreature)
 {

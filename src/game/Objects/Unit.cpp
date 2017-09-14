@@ -62,6 +62,7 @@
 #include "Chat.h"
 #include "Anticheat.h"
 #include "CreatureLinkingMgr.h"
+#include "InstanceStatistics.h"
 
 #include <math.h>
 #include <stdarg.h>
@@ -1192,6 +1193,13 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
         if (creature->GetInstanceId() && creature->GetMapId() > 1)
             if (Player* playerKiller = GetCharmerOrOwnerPlayerOrPlayerItself())
                 creature->GetMap()->BindToInstanceOrRaid(playerKiller, creature->GetRespawnTimeEx(), creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
+
+    }
+
+    // If we're in a dungeon, the killer is a creature and the victim is a player
+    if (GetInstanceId() && GetMapId() > 1 && this->IsCreature() && pVictim && pVictim->IsPlayer())
+    {
+        sInstanceStatistics.IncrementKillCounter(this->ToCreature(), pVictim->ToPlayer(), spellProto);
     }
 
     // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)

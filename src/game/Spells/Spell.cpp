@@ -50,6 +50,7 @@
 #include "PathFinder.h"
 #include "CharacterDatabaseCache.h"
 #include "GameObjectAI.h"
+#include "ZoneScript.h"
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
@@ -1382,8 +1383,12 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             if (Player* p = real_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
                 p->RewardPlayerAndGroupAtCast(unit, m_spellInfo->Id);
 
-        if (((Creature*)unit)->AI())
+        if (((Creature*)unit)->AI())    
             ((Creature*)unit)->AI()->SpellHit(m_caster, m_spellInfo);
+        
+        if (ZoneScript* pZoneScript = unit->GetZoneScript()) {
+            pZoneScript->OnCreatureSpellHit(m_caster, unit->ToCreature(), m_spellInfo);
+        }
     }
 
     // Tell any pets to stop attacking the target on application of breakable crowd control spells
@@ -5063,8 +5068,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (strict && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER && !IsAreaOfEffectSpell(m_spellInfo))
                     return SPELL_FAILED_BAD_TARGETS;
             }
-            // Can't help a friend in duel
-            if (IsPositiveSpell(m_spellInfo))
+            // Can't help a friend in duel   |  sorry, not enough time to figure out why this is necessary
+            if (IsPositiveSpell(m_spellInfo) && m_spellInfo->Id != 28697)
             {
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();

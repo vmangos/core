@@ -1401,6 +1401,19 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 28441:                                 // AB Effect 000
+                {
+
+                    return;
+                }
+                case 28697:                                 // Forgiveness (SM Ashbringer event)
+                {
+                    if (unitTarget && m_caster)
+                    {
+                        m_caster->Kill(unitTarget, nullptr);
+                    }
+                    return;
+                }
             }
 
             //All IconID Check in there
@@ -4586,6 +4599,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 28408:                                 // Chains of Kel'Thuzad (Naxxramas: Kel'thuzad)
                 {
+                    if (!m_caster)
+                        return;
+
                     // Select maintank + 4 random targets
                     std::vector<Unit*> viableTargets;
                     const ThreatList& tl = m_caster->getThreatManager().getThreatList();

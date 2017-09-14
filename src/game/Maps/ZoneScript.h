@@ -221,9 +221,10 @@ class ZoneScript
         virtual void OnCreatureEvade(Creature * /*creature*/)       {}
         virtual void OnCreatureRespawn(Creature * /*crea*/)         {}
         virtual void OnCreatureDeath(Creature * /*creature*/)       {}
+        virtual void OnCreatureSpellHit(Unit* /*caster*/,Creature* /*receiver*/, const SpellEntry*)    {}
         virtual void OnPlayerEnter(Player *);
         virtual void OnPlayerLeave(Player *);
-
+        
         // send world state update to all players present
         void SendUpdateWorldState(uint32 field, uint32 value);
 
@@ -241,6 +242,7 @@ class ZoneScript
         Creature* GetCreature(ObjectGuid guid);
         GameObject* GetGameObject(ObjectGuid guid);
 
+        virtual void OnUnitDeath(Unit* /*pKiller*/, Unit* /*pVictim*/, SpellEntry const* /*spellProto*/) {}
     protected:
 
         PlayerSet m_players[2];
