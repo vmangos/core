@@ -20,6 +20,7 @@
 #define AURA_REMOVAL_MGR
 
 #include "Common.h"
+#include "Policies/Singleton.h"
 
 enum AuraRemovalFlags
 {
@@ -32,6 +33,8 @@ struct AuraRemovalEntry
     uint32 auraEntry;
     uint32 flags;
 };
+
+class Player;
 
 // Handles removal of auras from players on map changes, based on
 // definitions in world-db table instance_buff_removal

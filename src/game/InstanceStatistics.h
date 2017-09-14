@@ -41,6 +41,9 @@ struct InstanceWipes
     uint32 count;
 };
 
+class Creature;
+class Player;
+class SpellEntry;
 
 class InstanceStatisticsMgr
 {
