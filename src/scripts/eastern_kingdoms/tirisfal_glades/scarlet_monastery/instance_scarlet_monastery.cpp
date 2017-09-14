@@ -295,12 +295,12 @@ struct instance_scarlet_monastery : ScriptedInstance
                     case EVENT_SPELL:
                         if (pHighlord)
                             pHighlord->CastSpell(pMograine, SPELL_FORGIVENESS, false);
-                        m_events.ScheduleEvent(EVENT_FORGIVEN, Seconds(3));
+                        m_events.ScheduleEvent(EVENT_FORGIVEN, Seconds(4));
                         break;
                     case EVENT_FORGIVEN:
                         if (pHighlord)
                             DoScriptText(SAY_ASHBRINGER3, pHighlord);
-                        m_events.ScheduleEvent(EVENT_DESPAWN, Seconds(4));
+                        m_events.ScheduleEvent(EVENT_DESPAWN, Seconds(5));
                         break;
                     case EVENT_DESPAWN:
                         if (pHighlord)
