@@ -194,13 +194,6 @@ VALUES
 ('28441', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1',   '-1', '32 ', '-1', '131072', '-1',   '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 
 'AB Effect 000');
 
-DELETE FROM `spell_effect_mod` where Id in (28442);
-INSERT INTO `spell_effect_mod` (`Id`, `EffectIndex`, `Effect`, `EffectDieSides`, `EffectBaseDice`, `EffectDicePerLevel`, `EffectRealPointsPerLevel`, `EffectBasePoints`, `EffectAmplitude`, `EffectPointsPerComboPoint`,
-`EffectChainTarget`, `EffectMultipleValue`, `EffectMechanic`, `EffectImplicitTargetA`, `EffectImplicitTargetB`, `EffectRadiusIndex`, `EffectApplyAuraName`, `EffectItemType`, `EffectMiscValue`, `EffectTriggerSpell`, `Comment`)
-VALUES 
-('28442', '3', '6', '0', '0, '-1', '-1', '7', '-1', '-1', '5', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', 'AB Effect 001 exalted Scarlet Crusade');
-
-
 -- ashbringer in SM event scripttexts 
 delete from script_texts where entry between -1999926 and -1999914;
 INSERT INTO `script_texts` (`entry`,`content_default`,`content_loc1`,`content_loc2`,`content_loc3`,`content_loc4`,`content_loc5`,`content_loc6`,`content_loc7`,`content_loc8`,`sound`,`type`,`language`,`emote`,`comment`)
