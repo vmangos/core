@@ -1107,6 +1107,7 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
     {
     case NPC_MR_BIGGLESWORTH:
         m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
+        sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
         break;
     case NPC_FrenziedBat:
     case NPC_PlaguedBat:
