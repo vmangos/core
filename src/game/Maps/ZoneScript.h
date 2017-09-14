@@ -22,6 +22,7 @@
 #include "ObjectGuid.h"
 
 class GameObject;
+class SpellEntry;
 
 enum OutdoorPvPTypes
 {
