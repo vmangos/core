@@ -186,13 +186,13 @@ UPDATE creature_template SET faction_A=21, faction_H=21 where entry in(
  To avoid this we set attributes SPELL_ATTR_EX3_NO_INITIAL_AGGRO to avoid combat,
  and SPELL_ATTR_EX_NOT_BREAK_STEALTH to not break stealth of everything in range
  */
-DELETE FROM `spell_mod` where Id in (28441);
+DELETE FROM `spell_mod` where Id in (28441, 28282);
 INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `DurationIndex`, `Category`, `CastingTimeIndex`, `StackAmount`, `SpellIconID`, `activeIconID`, `manaCost`, `Attributes`, `AttributesEx`,
 `AttributesEx2`, `AttributesEx3`, `AttributesEx4`, `Custom`, `InterruptFlags`, `AuraInterruptFlags`, `ChannelInterruptFlags`, `Dispel`, `Stances`, `StancesNot`, `SpellVisual`, `ManaCostPercentage`, 
 `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
 VALUES                                                              
-('28441', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1',   '-1', '32 ', '-1', '131072', '-1',   '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 
-'AB Effect 000');
+('28441', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1',   '-1', '32 ', '-1', '131072', '-1',   '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'AB Effect 000'),
+('28282', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1',   '320', '-1 ', '-1', '-1', '-1',   '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Ashbringer to passive');
 
 -- ashbringer in SM event scripttexts 
 delete from script_texts where entry between -1999926 and -1999914;
