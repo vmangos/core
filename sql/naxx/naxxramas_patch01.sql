@@ -285,3 +285,11 @@ INSERT INTO `npc_text` (`ID`, `text0_0`, `text0_1`, `lang0`, `prob0`, `em0_0`, `
 
 UPDATE `creature_template` SET `gossip_menu_id`='30101', `npcflag`=1 WHERE `entry`=16439;
 UPDATE `creature_template` SET `gossip_menu_id`=30101 WHERE `entry`=4542;
+
+
+UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=10000 WHERE `entry`=16116;
+UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=10000 WHERE `entry`=16113;
+UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=10000 WHERE `entry`=16115;
+UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=10000 WHERE `entry`=16112;
+-- make Archmage Angela Dosantos (naxx attunement npc) respawn after 60 sec
+update `creature` SET `spawntimesecs`=60 where `id`=16116;
