@@ -483,7 +483,7 @@ void npc_doctorAI::PatientDied(Location* Point)
                 pPlayer->FailQuest(QUEST_TRIAGE_A);
             else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
                 pPlayer->FailQuest(QUEST_TRIAGE_H);
-
+            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);                
             Reset();
             return;
         }
@@ -491,8 +491,11 @@ void npc_doctorAI::PatientDied(Location* Point)
         Coordinates.push_back(Point);
     }
     else
+    {
         // If no player or player abandon quest in progress
+        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);        
         Reset();
+    }
 }
 
 void npc_doctorAI::PatientSaved(Creature* soldier, Player* pPlayer, Location* Point)
