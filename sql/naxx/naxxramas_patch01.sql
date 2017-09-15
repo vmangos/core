@@ -293,3 +293,7 @@ UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=10000 WHERE `entry`=16115
 UPDATE `creature_template` SET `mindmg`=5000, `maxdmg`=10000 WHERE `entry`=16112;
 -- make Archmage Angela Dosantos (naxx attunement npc) respawn after 60 sec
 update `creature` SET `spawntimesecs`=60 where `id`=16116;
+
+-- lord blackwood
+UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE `entry`=14695;
+
