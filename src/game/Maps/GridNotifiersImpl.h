@@ -210,8 +210,11 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         holder = CreateSpellAuraHolder(spellInfo, target, i_dynobject.GetCaster());
         PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, NULL, holder, target, i_dynobject.GetCaster());
         holder->AddAura(Aur, eff_index);
-            
-        target->AddSpellAuraHolder(holder);
+
+        // Debuff slots may be full, in which case holder is deleted or holder is not able to
+        // be added for some reason
+        if (!target->AddSpellAuraHolder(holder))
+            holder = nullptr;
     }
 
     if (holder && holder->IsChanneled())

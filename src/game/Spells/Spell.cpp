@@ -3797,6 +3797,17 @@ void Spell::update(uint32 difftime)
                     ++iter;
 
                     SpellAuraHolder *holder = *curr;
+                    // Holder deleted before updating, but not removed from list. Clear usage
+                    // and remove. Use case: Cannot find caster in world to remove holder from
+                    // channeled spell in RemoveSpellAuraHolder
+                    if (holder->IsDeleted())
+                    {
+                        // TODO: Is this a leak if we don't delete it here? Unit probably removed from world
+                        holder->SetInUse(false);
+                        m_channeledHolders.erase(curr);
+                        continue;
+                    }
+
                     holder->UpdateHolder(difftime);
 
                     // Spell cast was interrupted on holder update. Unit likely died, targetted buff was
@@ -3817,7 +3828,6 @@ void Spell::update(uint32 difftime)
                             (holder->IsDeleted() && (remove == AURA_REMOVE_BY_RANGE || remove == AURA_REMOVE_BY_GROUP)))
                     {
                         holder->SetInUse(false);
-
                         m_channeledHolders.erase(curr);
                     }
                 }
@@ -4855,6 +4865,9 @@ void Spell::CastPreCastSpells(Unit* target)
 
 void Spell::AddChanneledAuraHolder(SpellAuraHolder *holder)
 {
+    if (!holder || !holder->IsChanneled())
+        return;
+
     // Set and hold in use until clean up to prevent any delete calls destroying
     // the object before we can handle it
     holder->SetInUse(true);

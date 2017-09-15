@@ -655,9 +655,11 @@ void AreaAura::Update(uint32 diff)
                 // false if an area aura of the same spellid exists on the target
                 bool apply = true;
 
+                Unit *target = *tIter;
+
                 // we need to ignore present caster self applied area auras sometimes
                 // in cases where this is the only aura applied for this spell effect
-                Unit::SpellAuraHolderBounds spair = (*tIter)->GetSpellAuraHolderBounds(GetId());
+                Unit::SpellAuraHolderBounds spair = target->GetSpellAuraHolderBounds(GetId());
                 for (Unit::SpellAuraHolderMap::const_iterator i = spair.first; i != spair.second; ++i)
                 {
                     if (i->second->IsDeleted())
@@ -687,26 +689,26 @@ void AreaAura::Update(uint32 diff)
                     continue;
 
                 // Skip some targets (TODO: Might require better checks, also unclear how the actual caster must/can be handled)
-                if (GetSpellProto()->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && (*tIter)->GetTypeId() != TYPEID_PLAYER)
+                if (GetSpellProto()->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER)
                     continue;
 
-                if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), (*tIter)->getLevel()))
+                if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), target->getLevel()))
                 {
                     int32 actualBasePoints = m_currentBasePoints;
                     // recalculate basepoints for lower rank (all AreaAura spell not use custom basepoints?)
                     if (actualSpellInfo != GetSpellProto())
                         actualBasePoints = actualSpellInfo->CalculateSimpleValue(m_effIndex);
 
-                    SpellAuraHolder *holder = (*tIter)->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
+                    SpellAuraHolder *holder = target->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
 
                     bool addedToExisting = true;
                     if (!holder)
                     {
-                        holder = CreateSpellAuraHolder(actualSpellInfo, (*tIter), caster);
+                        holder = CreateSpellAuraHolder(actualSpellInfo, target, caster);
                         addedToExisting = false;
                     }
 
-                    AreaAura *aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, holder, (*tIter), caster, nullptr);
+                    AreaAura *aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, holder, target, caster, nullptr);
                     holder->AddAura(aur, m_effIndex);
 
                     if (!holder->IsPassive() && !holder->IsPermanent())
@@ -721,18 +723,18 @@ void AreaAura::Update(uint32 diff)
 
                     if (addedToExisting)
                     {
-                        (*tIter)->AddAuraToModList(aur);
+                        target->AddAuraToModList(aur);
                         holder->SetInUse(true);
                         aur->ApplyModifier(true, true);
                         holder->SetInUse(false);
                     }
-                    else
-                        (*tIter)->AddSpellAuraHolder(holder);
+                    else if (!target->AddSpellAuraHolder(holder))
+                        holder = nullptr;
 
-                    DEBUG_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), (*tIter)->GetName());
+                    DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
 
                     // Add holder to spell if it's channeled so the updates are synced
-                    if (IsChanneled() && !addedToExisting)
+                    if (holder && IsChanneled() && !addedToExisting)
                     {
                         if (Spell *spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                         {
@@ -6568,7 +6570,6 @@ void SpellAuraHolder::CalculateForDebuffLimit()
 {
     m_debuffLimitAffected = true;
     m_debuffLimitScore = 0;
-
 
     // First, some exceptions
     switch (m_spellProto->SpellFamilyName)

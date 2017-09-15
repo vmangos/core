@@ -1723,7 +1723,10 @@ void Pet::_LoadAuras(uint32 timediff)
             }
 
             if (!holder->IsEmptyHolder())
-                AddSpellAuraHolder(holder);
+            {
+                if (!AddSpellAuraHolder(holder))
+                    holder = nullptr;
+            }
             else
                 delete holder;
         }

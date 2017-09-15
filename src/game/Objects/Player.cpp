@@ -14787,7 +14787,8 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
         if (s.caster_guid != GetObjectGuid() && holder->IsSingleTarget())
             holder->SetIsSingleTarget(false);
 
-        AddSpellAuraHolder(holder);
+        if (!AddSpellAuraHolder(holder))
+            holder = nullptr;
         DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
     }
     else
@@ -18938,7 +18939,8 @@ void Player::UpdateUnderwaterState()
                     holder->AddAura(aur, SpellEffectIndex(i));
                 }
             }
-            AddSpellAuraHolder(holder);
+            if (!AddSpellAuraHolder(holder))
+                holder = nullptr;
         }
     }
 }
