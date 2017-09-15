@@ -329,17 +329,12 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
     {
         Creature* Ccontroller = ((Creature*)controller);
 
-        // Since we are going to do something usableSpells [0, urand (0, usableSpells.size () - 1)], we must have at least one element.
-        if (usableSpells.empty())
-            return;
-
         // Unit * victim = controller-> getVictim ();
         // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
         victim = Ccontroller ? Ccontroller->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0) : me->SelectNearestTarget(50.0f);
         if (Unit* v2 = me->getVictim())
             if (me->canAttack(v2, false))
                 victim = v2;
-
 
         if (Ccontroller && (!Ccontroller->isAlive() || !Ccontroller->isInCombat()))
         {
@@ -353,6 +348,10 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         }
 
         if (!victim || (victim == me)) // Ivina <Nostalrius>: avoid being targeted
+            return;
+
+        // Need a valid target
+        if (!me->IsHostileTo(victim))
             return;
 
         UpdateTarget(victim);
@@ -377,6 +376,10 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
                 uiGlobalCD = 200;
             else
             {
+                // Since we are going to do something usableSpells [0, urand (0, usableSpells.size () - 1)], we must have at least one element.
+                if (usableSpells.empty())
+                    return;
+
                 uint32 spellId = usableSpells[urand(0, usableSpells.size() - 1)];
                 SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
                 

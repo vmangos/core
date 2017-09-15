@@ -3001,11 +3001,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
     {
         target->SetCharmerGuid(ObjectGuid());
 
-        // todo: what causes friendly players to randomly see the "target" as hostile
-        // after the charm effect has ended, even if we restore faction below.
-        if (target->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)target)->setFactionForRace(target->getRace());
-        else
+        if(target->GetTypeId() != TYPEID_PLAYER)
         {
             CreatureInfo const *cinfo = ((Creature*)target)->GetCreatureInfo();
 
@@ -3042,25 +3038,32 @@ void Aura::HandleModCharm(bool apply, bool Real)
         
         target->UpdateControl();
 
+        if (target->GetTypeId() == TYPEID_PLAYER)
+        {
+            Player* pPlayer = target->ToPlayer();
+            ((Player*)target)->setFactionForRace(target->getRace());
+        }
         // this should possibly be the case for other spells too...
         // why on earth remove player from combat if, for example, its a boss casting it
         if (m_spellAuraHolder->GetId() == 28410 && target->GetTypeId() == TYPEID_PLAYER)
         {
             if (caster->isAlive() && caster->isInCombat())
             {
+                if (target->GetTypeId() == TYPEID_PLAYER)
+                    ((Player*)target)->SendAttackSwingCancelAttack();
+
                 if (target->IsNonMeleeSpellCasted(false))
                     target->InterruptNonMeleeSpells(false);
 
                 target->AttackStop();
                 target->RemoveAllAttackers();
-
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)target)->SendAttackSwingCancelAttack();
-
                 target->DeleteThreatList();
                 target->getHostileRefManager().deleteReferences();
+
                 caster->SetInCombatWith(target);
                 target->SetInCombatWith(caster);
+                
+                target->SetInCombatState(false, caster);
             }
             else
             {
@@ -3090,6 +3093,19 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (Player* pPlayer = target->ToPlayer())
             pPlayer->RemoveAI();
+
+        // todo: what causes friendly players to randomly see the "target" as hostile
+        // after the charm effect has ended, even if we restore faction below.
+        // --- this is a hacky attempt at solving hostile bug -_-
+        if (target->GetTypeId() == TYPEID_PLAYER)
+        {
+            if (Player* pPlayer = target->ToPlayer())
+            {
+                pPlayer->setFactionForRace(target->getRace());
+                if(pPlayer->GetGroup())
+                    pPlayer->GetGroup()->BroadcastGroupUpdate();
+            }
+        }
     }
 }
 
