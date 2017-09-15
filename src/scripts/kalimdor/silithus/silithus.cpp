@@ -3630,7 +3630,7 @@ enum
     /* Hunterkiller */
     SPELL_THUNDERCLAP = 15588,
     SPELL_CHARGE = 25821,
-    SPELL_CLEAVE = 40504,
+    SPELL_CLEAVE = 11427,
     SPELL_FEAR = 25815,
 
     /* Merok */
@@ -3782,7 +3782,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
     void ResetEvent()
     {
-        m_creature->MonsterTextEmote("reset", NULL); // pour debug
+        // m_creature->MonsterTextEmote("reset", NULL); // pour debug
         eEventStatus = EVENT_NOT_STARTED;
         if (Creature* pHunterKiller = m_creature->GetMap()->GetCreature(m_uiHunterKillerGUID))
         {
@@ -3816,7 +3816,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
             Creature* pHunterKiller = m_creature->SummonCreature(NPC_HUNTERKILLER,
                                       HUNTERKILLER_SPAWN_POS_X, HUNTERKILLER_SPAWN_POS_Y, HUNTERKILLER_SPAWN_POS_Z, 0.8f,
-                                      TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 150000);
+                                      TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 450000, true);
             if (pHunterKiller)
             {
                 eEventStatus = EVENT_STARTED;
@@ -3830,7 +3830,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
     void CompleteEvent()
     {
-        m_uiEventResetTimer = 30000;
+        m_uiEventResetTimer = 1800000;
         eEventStatus = EVENT_COMPLETE;
         m_bIsDoingSpeach = false;
         m_bGruntSpeech = true;
@@ -3863,7 +3863,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
         if (pSummoned->GetObjectGuid() == m_uiHunterKillerGUID)
         {
-            m_creature->MonsterTextEmote("SumCreaJustDied", NULL); // pour debug
+            // m_creature->MonsterTextEmote("SumCreaJustDied", NULL); // pour debug
             CompleteEvent();
         }
     }
@@ -3872,14 +3872,14 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
     {
         if (pSummoned->GetObjectGuid() == m_uiHunterKillerGUID)
         {
-            m_creature->MonsterTextEmote("SumCreaDespawn", NULL); // pour debug
+            // m_creature->MonsterTextEmote("SumCreaDespawn", NULL); // pour debug
             ResetEvent();
         }
     }
 
     void JustDied(Unit* pKiller)
     {
-        m_creature->MonsterTextEmote("JustDied", NULL); // pour debug
+        // m_creature->MonsterTextEmote("JustDied", NULL); // pour debug
         ResetEvent();
     }
 
@@ -3890,7 +3890,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         {
             if (m_uiEventResetTimer <= uiDiff)
             {
-                m_creature->MonsterTextEmote("CompleteEnd", NULL); // pour debug
+                // m_creature->MonsterTextEmote("CompleteEnd", NULL); // pour debug
                 ResetEvent();
             }
             else
@@ -4018,7 +4018,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         {
             if (eEventStatus == EVENT_STARTED)
             {
-                m_creature->MonsterTextEmote("Clean2", NULL); // pour debug
+                // m_creature->MonsterTextEmote("Clean2", NULL); // pour debug
                 ResetEvent();
             }
         }
