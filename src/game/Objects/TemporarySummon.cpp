@@ -30,17 +30,6 @@ TemporarySummon::TemporarySummon(ObjectGuid summoner) :
 
 void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
 {
-    if (m_forceTargetUpdateTimer && isInCombat())
-    {
-        if (m_forceTargetUpdateTimer <= diff)
-        {
-            m_forceTargetUpdateTimer = 0;
-            ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
-        }
-        else
-            m_forceTargetUpdateTimer -= diff;
-    }
-
     switch (m_type)
     {
         case TEMPSUMMON_MANUAL_DESPAWN:
@@ -73,7 +62,6 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
 
             break;
         }
-
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
         {
             if (IsCorpse())
@@ -209,6 +197,20 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
             UnSummon();
             sLog.outError("Temporary summoned creature (entry: %u) have unknown type %u of ", GetEntry(), m_type);
             break;
+    }
+
+    if (isAlive() && isInCombat())
+    {
+        if (m_forceTargetUpdateTimer <= diff)
+        {
+            m_forceTargetUpdateTimer = 3000;
+            ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
+        }
+        else
+            m_forceTargetUpdateTimer -= diff;
+    }
+    else {
+        m_forceTargetUpdateTimer = 1000;
     }
 
     Creature::Update(update_diff, diff);
