@@ -40,7 +40,3 @@ UPDATE `creature_template` SET `npcflag`=7 WHERE `entry`=233;
 -- Fix startup error.
 -- ERROR:Table `creature` have creature (GUID: 100170 Entry: 2683) with `MovementType`=0 (idle) have `spawndist`<>0, set to 0.
 UPDATE `creature` SET `spawndist`=0 WHERE `guid`=100170;
-
--- Add missing spawn for gameobject Swirling Maelstrom.
--- Fixes https://github.com/elysium-project/server/issues/2577
-INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `spawnFlags`) VALUES (133140, 180669, 1, 3512.29, -6618.08, 0.01, 0, 0, 0, 0, 1, 180, 100, 1, 0);
