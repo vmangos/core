@@ -297,5 +297,3 @@ update `creature` SET `spawntimesecs`=60 where `id`=16116;
 -- lord blackwood
 UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE `entry`=14695;
 UPDATE creature SET spawntimesecs='3600' WHERE guid='2353';
-
-UPDATE `creature_template` SET `mindmg`=2358, `maxdmg`=3059, `MechanicImmuneMask`=1019427442 WHERE `entry`=16441;
