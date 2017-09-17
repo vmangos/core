@@ -104,6 +104,8 @@ bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 
 template<>
 void RandomMovementGenerator<Creature>::UpdateAsync(Creature &creature, uint32 diff)
 {
+    // Lock async updates for safety, see Unit::asyncMovesplineLock doc
+    ACE_Guard<ACE_Thread_Mutex> guard(creature.asyncMovesplineLock);
     if (creature.hasUnitState(UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_DISTRACTED))
     {
         i_nextMoveTime.Reset(0);  // Expire the timer
