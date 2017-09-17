@@ -296,6 +296,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 enrageTimer;
     uint32 timeSinceLastFrostBlast;
     uint32 timeSinceLastShadowFissure;
+    uint32 killSayTimer;
 
     void Reset()
     {
@@ -311,6 +312,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         numSummonedGuardians = 0;
         timeSinceLastFrostBlast = 0;
         timeSinceLastShadowFissure = 0;
+        killSayTimer = 0;
 
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -335,7 +337,11 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void KilledUnit(Unit* pVictim)
     {
-        DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
+        if (!killSayTimer)
+        {
+            DoScriptText(urand(0, 1) ? SAY_SLAY1 : SAY_SLAY2, m_creature);
+            killSayTimer = 5000;
+        }
     }
 
     void JustDied(Unit* pKiller)
@@ -768,6 +774,8 @@ struct boss_kelthuzadAI : public ScriptedAI
         if (m_pInstance->GetData(TYPE_KELTHUZAD) != IN_PROGRESS)
             return;
         
+        killSayTimer -= std::min(killSayTimer, diff);
+
         if (enrageTimer < diff)
         {
             m_creature->CastSpell(m_creature, SPELL_BERSERK, true);
@@ -940,7 +948,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
                 if (pC->HasAura(9484) || pC->HasAura(9485) || pC->HasAura(10955))
                     ++numShackled;
             }
-
+                
             if (numShackled > 3)
             {
                 if (m_pInstance)
