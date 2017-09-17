@@ -5074,10 +5074,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-                if (!casterOwner && !targetOwner)
-                    return SPELL_FAILED_BAD_TARGETS;
-
-                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
+                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
                 {
                     return SPELL_FAILED_TARGET_DUELING;
                 }
