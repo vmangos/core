@@ -536,6 +536,22 @@ MovementGeneratorType MotionMaster::GetCurrentMovementGeneratorType() const
 
 bool MotionMaster::GetDestination(float &x, float &y, float &z)
 {
+    // Often used in motion gen, lock target movespline while checking in case
+    // they are async updating their spline too. Don't blocking lock, otherwise
+    // we deadlock if the owner is already locked and checking the user of
+    // this function at the same time (interlocked deadlock). This is not a critical
+    // function that MUST succeed, so better to fail if we cannot acquire the
+    // lock. Example deadlock (same timestamp):
+    //  2017-09-16 02:06:32 Targeted UpdateAsync::Acquiring movespline lock for Unit Pet (Petnumber: 87 Guid: 21) in map (0, 6) thread 3156
+    //  2017-09-16 02:06:32 MotionMaster::Acquiring movespline lock for Unit Pet (Petnumber: 93 Guid: 22) in map (0, 6) thread 3156
+    //  ...
+    //  2017-09-16 02:06:32 Targeted UpdateAsync::Acquiring movespline lock for Unit Pet (Petnumber: 93 Guid: 22) in map (0, 6) thread 11156
+    //  2017-09-16 02:06:32 MotionMaster::Acquiring movespline lock for Unit Pet (Petnumber: 87 Guid :21) in map (0, 6) thread 11156
+
+    ACE_Guard<ACE_Thread_Mutex> guard(m_owner->asyncMovesplineLock, false);
+    if (!guard.locked())
+        return false;
+
     if (m_owner->movespline->Finalized())
         return false;
 

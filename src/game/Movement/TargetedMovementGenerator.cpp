@@ -34,6 +34,8 @@
 template<class T, typename D>
 void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 {
+    // Note: Any method that accesses the target's movespline here must be
+    // internally locked by the target's spline lock
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
 
@@ -329,6 +331,8 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
             || owner.IsNoMovementSpellCasted())
         return;
 
+    // Lock async updates for safety, see Unit::asyncMovesplineLock doc
+    ACE_Guard<ACE_Thread_Mutex> guard(owner.asyncMovesplineLock);
     _setTargetLocation(owner);
 }
 
