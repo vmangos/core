@@ -941,7 +941,7 @@ struct mob_guardian_icecrownAI : public ScriptedAI
                     ++numShackled;
             }
 
-            if (numShackled >= 3)
+            if (numShackled > 3)
             {
                 if (m_pInstance)
                 {
