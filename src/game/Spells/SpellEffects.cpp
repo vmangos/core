@@ -3635,7 +3635,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
         duration = 1800;                                    // 30 mins
     // some fishing pole bonuses
     else if (m_spellInfo->SpellVisual == 563)
-        duration = 600;                                     // 10 mins
+        duration = enchant_id == 266 ? 300 : 600;           // 10 or 5 mins
     // shaman Rockbiter enchantments
     else if (m_spellInfo->SpellVisual == 58)
         duration = 300;                                     // 5 mins (Ustaag <Nostalrius> : 30 mn post 1.12)
