@@ -107,6 +107,7 @@ struct boss_lordkazzakAI : public ScriptedAI
 {
     boss_lordkazzakAI(Creature *c) : ScriptedAI(c)
     {
+        c->SetLootAndXPModDist(150.0f);
         Reset();
     }
 
