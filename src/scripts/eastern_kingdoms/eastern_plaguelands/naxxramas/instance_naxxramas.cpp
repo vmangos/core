@@ -1106,9 +1106,18 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
     switch (pCreature->GetEntry())
     {
     case NPC_MR_BIGGLESWORTH:
-        m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
-        sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
+    {
+        if (Creature* pKT = GetSingleCreatureFromStorage(NPC_KELTHUZAD))
+        {
+            if (pKT->isAlive())
+            {
+                m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
+                sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
+            }
+        }
+
         break;
+    }
     case NPC_FrenziedBat:
     case NPC_PlaguedBat:
     case NPC_MutatedGrub:
