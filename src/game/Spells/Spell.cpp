@@ -815,8 +815,15 @@ void Spell::prepareDataForTriggerSystem()
     // avoid triggering negative hit for only positive targets
     m_negativeEffectMask = 0x0;
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
         if (!IsPositiveEffect(m_spellInfo, SpellEffectIndex(i)))
             m_negativeEffectMask |= (1 << i);
+
+        // Self damage is a positive effect but should still trigger negative proc flags
+        if (m_spellInfo->Effect[i] == SPELL_EFFECT_SCHOOL_DAMAGE && m_spellInfo->EffectImplicitTargetA[i] == TARGET_SELF)
+            m_negativeEffectMask |= (1 << i);
+    }
+
 }
 
 void Spell::CleanupTargetList()
@@ -1257,6 +1264,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // item procs should probably trigger for all classes, e.g. Judgement of Wisdom, but many issues to test for first. Paladin exclusive for now.
         if (m_CastItem && m_caster->getClass() == CLASS_PALADIN && (procEx & PROC_EX_CRITICAL_HIT) && !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CANT_TRIGGER_PROC))
             m_canTrigger = true;
+        // JoR and JoC: Paladin melee spells trigger melee procs instead of magic
+        if ((m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25) || 
+            (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && m_spellInfo->SpellIconID == 561 && m_spellInfo->SpellVisual == 0))
+        {
+            procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+            procVictim = PROC_FLAG_TAKEN_MELEE_SPELL_HIT | PROC_FLAG_TAKEN_ANY_DAMAGE;
+        }
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger)
             caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, this);
