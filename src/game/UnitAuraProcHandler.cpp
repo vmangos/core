@@ -259,13 +259,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     /// Delete all these spells, and manage it via the DB (spell_proc_event)
     if (procSpell)
     {
-        // Redoubt
-        if (spellProto->SpellIconID == 28 && spellProto->SpellFamilyName == 0)
-        {
-            if (procFlag & PROC_FLAG_TAKEN_MELEE_HIT && procExtra & PROC_EX_CRITICAL_HIT)
-                return true;
-            return false;
-        }
         // Eye for an Eye
         if (spellProto->SpellIconID == 1820)
         {
