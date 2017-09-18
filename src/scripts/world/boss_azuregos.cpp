@@ -43,6 +43,7 @@ struct boss_azuregosAI : ScriptedAI
 {
     explicit boss_azuregosAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        pCreature->SetLootAndXPModDist(150.0f);
         boss_azuregosAI::Reset();
     }
 

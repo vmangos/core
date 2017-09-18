@@ -31,6 +31,7 @@ enum
 
 boss_taerarAI::boss_taerarAI(Creature* pCreature) : boss_dragon_of_nightmareAI(pCreature)
 {
+    pCreature->SetLootAndXPModDist(150.0f);
     boss_taerarAI::Reset();
 }
 
