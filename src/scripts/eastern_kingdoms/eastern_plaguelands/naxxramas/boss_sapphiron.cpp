@@ -458,6 +458,7 @@ struct boss_sapphironAI : public ScriptedAI
         else
             m_TargetNotReachableTimer = 0;
     }
+    
     void UpdateAI(const uint32 uiDiff) override
     {
         if (phase == PHASE_SKELETON)

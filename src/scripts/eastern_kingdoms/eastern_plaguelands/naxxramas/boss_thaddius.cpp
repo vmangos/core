@@ -163,6 +163,7 @@ struct npc_tesla_coilAI : public Scripted_NoMovementAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
+        pCreature->SetLootAndXPModDist(150.0f);
     }
 
     instance_naxxramas* m_pInstance;

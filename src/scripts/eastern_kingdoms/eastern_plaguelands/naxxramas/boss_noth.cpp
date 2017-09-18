@@ -139,6 +139,7 @@ struct boss_nothAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
+        pCreature->SetLootAndXPModDist(100.0f);
     }
 
     instance_naxxramas* m_pInstance;

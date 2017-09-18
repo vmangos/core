@@ -83,6 +83,7 @@ struct boss_gluthAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
         five_percent = uint32(m_creature->GetMaxHealth() * 0.05f);
+        pCreature->SetLootAndXPModDist(150.0f);
     }
 
     instance_naxxramas* m_pInstance;
