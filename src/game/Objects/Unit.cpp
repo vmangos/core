@@ -2826,11 +2826,19 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     if (roll < tmp)
         return SPELL_MISS_MISS;
 
-    // Chance resist mechanic (select max value from every mechanic spell effect)
+    // Chance resist mechanic (select max value from spell or effect mechanics)
     int32 resist_mech = 0;
-    // Get effects mechanic and chance
     if (spell->Mechanic)
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic) * 100;
+    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+    {
+        if (spell->EffectMechanic[eff])
+        {
+            int32 temp = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->EffectMechanic[eff]) * 100;
+            if (resist_mech < temp)
+                resist_mech = temp;
+        }
+    }
     // Roll chance
     tmp += resist_mech;
     if (roll < tmp)
@@ -2989,11 +2997,19 @@ int32 Unit::MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* s
         DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_AOE_AVOIDANCE (- %i) : %f", pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_AOE_AVOIDANCE), modHitChance);
     }
 
-    // Chance resist mechanic
+    // Chance resist mechanic (select max value from spell or effect mechanics)
     int32 resist_mech = 0;
-    // Get effects mechanic and chance
     if (spell->Mechanic)
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic);
+    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+    {
+        if (spell->EffectMechanic[eff])
+        {
+            int32 temp = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->EffectMechanic[eff]);
+            if (resist_mech < temp)
+                resist_mech = temp;
+        }
+    }
     // Apply mod
     modHitChance -= resist_mech;
     DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_MECHANIC_RESISTANCE (- %i) : %f", resist_mech, modHitChance);
