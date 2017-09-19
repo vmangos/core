@@ -212,7 +212,6 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
     }
 }
 
-
 void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
 {
     if (requiredPreBossData > -1 && requiredPreBossData != DONE)
@@ -410,6 +409,8 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             pCreature->Respawn();
         }
     }
+
+    OnCreatureRespawn(pCreature);
 }
 
 void instance_naxxramas::OnObjectCreate(GameObject* pGo)
@@ -619,6 +620,66 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
                 pGo->DeleteLater();
             break;
 
+    }
+}
+
+void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
+{
+    bool forcedDespawn = false;
+    switch (pCreature->GetEntry())
+    {
+    case NPC_ANUB_REKHAN:
+        forcedDespawn = (GetData(TYPE_ANUB_REKHAN) == DONE);
+        break;
+    case NPC_FAERLINA:
+        forcedDespawn = (GetData(TYPE_FAERLINA) == DONE);
+        break;
+    case NPC_MAEXXNA:
+        forcedDespawn = (GetData(TYPE_MAEXXNA) == DONE);
+        break;
+    case NPC_PATCHWERK:
+        forcedDespawn = (GetData(TYPE_PATCHWERK) == DONE);
+        break;
+    case NPC_GROBBULUS:
+        forcedDespawn = (GetData(TYPE_GROBBULUS) == DONE);
+        break;
+    case NPC_GLUTH:
+        forcedDespawn = (GetData(TYPE_GLUTH) == DONE);
+        break;
+    case NPC_THADDIUS:
+        forcedDespawn = (GetData(TYPE_THADDIUS) == DONE);
+        break;
+    case NPC_NOTH:
+        forcedDespawn = (GetData(TYPE_NOTH) == DONE);
+        break;
+    case NPC_HEIGAN:
+        forcedDespawn = (GetData(TYPE_HEIGAN) == DONE);
+        break;
+    case NPC_LOATHEB:
+        forcedDespawn = (GetData(TYPE_LOATHEB) == DONE);
+        break;
+    case NPC_RAZUVIOUS:
+        forcedDespawn = (GetData(TYPE_RAZUVIOUS) == DONE);
+        break;
+    case NPC_GOTHIK:
+        forcedDespawn = (GetData(TYPE_GOTHIK) == DONE);
+        break;
+    case NPC_ZELIEK:
+    case NPC_THANE:
+    case NPC_BLAUMEUX:
+    case NPC_MOGRAINE:
+        forcedDespawn = (GetData(TYPE_FOUR_HORSEMEN) == DONE);
+        break;
+    case NPC_SAPPHIRON:
+        forcedDespawn = (GetData(TYPE_SAPPHIRON) == DONE);
+        break;
+    case NPC_KELTHUZAD:
+        forcedDespawn = (GetData(TYPE_KELTHUZAD) == DONE);
+        break;
+    }
+    if (forcedDespawn)
+    {
+        pCreature->AddObjectToRemoveList();
     }
 }
 

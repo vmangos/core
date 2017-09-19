@@ -306,7 +306,8 @@ public:
 
     void OnCreatureCreate(Creature* pCreature) override;
     void OnObjectCreate(GameObject* pGo) override;
-
+    void OnCreatureRespawn(Creature * pCreature) override;
+     
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
     uint64 GetData64(uint32 uiData);
