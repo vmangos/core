@@ -1329,16 +1329,6 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
         break;
     case AREATRIGGER_KELTHUZAD:
         OnKTAreaTrigger(pAt);
-        /*
-        if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())
-        {
-            if (pInstance->GetData(TYPE_KELTHUZAD) == NOT_STARTED)
-            {
-                pInstance->SetData(TYPE_KELTHUZAD, SPECIAL);
-                pInstance->SetChamberCenterCoords(pAt->x, pAt->y, pAt->z);
-            }
-        }
-        */
         break;
     case AREATRIGGER_FAERLINA:
         if (!m_faerlinaHaveGreeted)
@@ -1366,8 +1356,11 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
         if (!m_haveDoneDKWingIntro)
         {
             m_haveDoneDKWingIntro = true;
-            DoOrSimulateScriptTextForMap(SAY_KORT_TAUNT1, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
-            m_events.ScheduleEvent(EVENT_DKWING_INTRO_2, 5500);
+            if (GetData(TYPE_FOUR_HORSEMEN) != DONE)
+            {
+                DoOrSimulateScriptTextForMap(SAY_KORT_TAUNT1, NPC_THANE, GetMap(), GetSingleCreatureFromStorage(NPC_THANE));
+                m_events.ScheduleEvent(EVENT_DKWING_INTRO_2, 5500);
+            }
         }
         break;
     }
