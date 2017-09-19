@@ -133,14 +133,24 @@ bool instance_naxxramas::HandleEvadeOutOfHome(Creature* pWho)
         dist = 120.0f;
         break;
     case NPC_HEIGAN:
+    {
+        // evade if brought out of room towards bat/grub/beast gauntlet
+        if (pWho->GetPositionX() > 2825.0f)
+        {
+            pWho->AI()->EnterEvadeMode();
+            return false;
+        }
         dist = 90.0f;
         break;
+    }
     case NPC_LOATHEB:
         dist = 100.0f;
         break;
     case NPC_GOTHIK:
+    {
         dist = 150.0f;
         break;
+    }
     case NPC_RAZUVIOUS:
         if (pWho->GetPositionZ() > 275.0f)
         {
@@ -1112,7 +1122,7 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
             m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
             sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
         }
-        break;
+        break;  
     }
     case NPC_FrenziedBat:
     case NPC_PlaguedBat:
