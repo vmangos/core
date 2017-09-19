@@ -158,25 +158,6 @@ struct boss_gothikAI : public ScriptedAI
         m_creature->NearTeleportTo(x, y, z, o);
     }
 
-    bool HasPlayersInLeftSide()
-    {
-        Map::PlayerList const& lPlayers = m_pInstance->instance->GetPlayers();
-
-        if (lPlayers.isEmpty())
-            return false;
-
-        for (Map::PlayerList::const_iterator itr = lPlayers.begin(); itr != lPlayers.end(); ++itr)
-        {
-            if (Player* pPlayer = itr->getSource())
-            {
-                if (!m_pInstance->IsInRightSideGothArea(pPlayer))
-                    return true;
-            }
-        }
-
-        return false;
-    }
-
     void KilledUnit(Unit* pVictim)
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
@@ -352,6 +333,10 @@ struct boss_gothikAI : public ScriptedAI
         {
             if (const Player* p = playerRef.getSource())
             {
+                // Don't count dead players
+                if (p->isDead())
+                    continue;
+
                 if(m_pInstance->IsInRightSideGothArea(p))
                     ++num_right;
                 else
@@ -379,6 +364,10 @@ struct boss_gothikAI : public ScriptedAI
             if (m_creature->getThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
+            }
+            else if (!gatesOpened && IsAllPlayersOneSide())
+            {
+                OpenTheGate();
             }
         }
 
@@ -423,7 +412,7 @@ struct boss_gothikAI : public ScriptedAI
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
                         DoResetThreat();
 
-                        // opening the gates on first teleport if all players are considered on the same side
+                        // opening the gates when TPing down if all players are considered on the same side
                         if (!gatesOpened && IsAllPlayersOneSide())
                             OpenTheGate();
 
