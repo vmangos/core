@@ -149,7 +149,7 @@ struct boss_grobbulusAI : public ScriptedAI
         Unit* pTarget = suitableTargets[urand(0, suitableTargets.size() - 1)];
         if (DoCastSpellIfCan(pTarget, SPELL_MUTATING_INJECTION) == CAST_OK)
         {
-            DoScriptText(EMOTE_INJECTION, m_creature, pTarget);
+            // DoScriptText(EMOTE_INJECTION, m_creature, pTarget);
             return true;
         }
         else
@@ -216,7 +216,7 @@ struct boss_grobbulusAI : public ScriptedAI
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLIME_SPRAY) == CAST_OK)
                     {
                         m_events.Repeat(SLIMESPRAY_CD(false));
-                        DoScriptText(EMOTE_SPRAY_SLIME, m_creature);
+                        //DoScriptText(EMOTE_SPRAY_SLIME, m_creature);
                     }
                     else
                         m_events.Repeat(100);
