@@ -82,8 +82,8 @@ void AddSC_maraudon()
 {
     Script* pNewScript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_primordial_behemoth";
-    pNewScript->GetAI = &GetAI_npc_primordial_behemoth;
-    pNewScript->RegisterSelf();
+    //pNewScript = new Script;
+    //pNewScript->Name = "npc_primordial_behemoth";
+    //pNewScript->GetAI = &GetAI_npc_primordial_behemoth;
+    //pNewScript->RegisterSelf();
 }
