@@ -1663,6 +1663,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 return;
             }
+            case 11403: // Dream Vision
+                if (Unit* caster = GetCaster())
+                    if (Player* casterPlayer = caster->ToPlayer())
+                        if (Pet* guardian = caster->FindGuardianWithEntry(7863))
+                        {
+                            casterPlayer->ModPossessPet(guardian, false, AURA_REMOVE_BY_DEFAULT);
+                            guardian->DisappearAndDie();
+                        }
+                return;
             case 11826:
                 if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
                     return;

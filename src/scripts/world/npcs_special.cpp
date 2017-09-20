@@ -1886,19 +1886,20 @@ CreatureAI* GetAI_npc_firestarter_regular(Creature* pCreature)
 }
 
 /*
- * Eye of Kilrogg
+ * Summon possessed mobs
  */
 
 enum
 {
-    SPELL_SUMMON_EYE_OF_KILROGG     = 126
+    SPELL_SUMMON_EYE_OF_KILROGG     = 126,
+    SPELL_SUMMON_DREAM_VISION       = 11403
 };
 
-struct npc_eye_of_kilroggAI : ScriptedAI
+struct npc_summon_possessedAI : ScriptedAI
 {
-    explicit npc_eye_of_kilroggAI(Creature* pCreature) : ScriptedAI(pCreature)
+    explicit npc_summon_possessedAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        npc_eye_of_kilroggAI::Reset();
+        npc_summon_possessedAI::Reset();
     }
 
     void Reset() override
@@ -1911,16 +1912,19 @@ struct npc_eye_of_kilroggAI : ScriptedAI
         if (auto pOwner = m_creature->GetOwner())
         {
             if (auto pPlayer = pOwner->ToPlayer())
+            {
                 pPlayer->RemoveAurasDueToSpell(SPELL_SUMMON_EYE_OF_KILROGG);
+                pPlayer->RemoveAurasDueToSpell(SPELL_SUMMON_DREAM_VISION);
+            } 
         }
 
         ScriptedAI::JustDied(pKiller);
     }
 };
 
-CreatureAI* GetAI_npc_eye_of_kilrogg(Creature* pCreature)
+CreatureAI* GetAI_npc_summon_possessed(Creature* pCreature)
 {
-    return new npc_eye_of_kilroggAI(pCreature);
+    return new npc_summon_possessedAI(pCreature);
 }
 
 /*
@@ -2804,8 +2808,8 @@ void AddSC_npcs_special()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_eye_of_kilrogg";
-    newscript->GetAI = &GetAI_npc_eye_of_kilrogg;
+    newscript->Name = "npc_summon_possessed";
+    newscript->GetAI = &GetAI_npc_summon_possessed;
     newscript->RegisterSelf();
 
     newscript = new Script;

@@ -3322,6 +3322,16 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                 }
                 break;
             }
+            case 11403: // Elixir of Dream Vision
+            {
+                spawnCreature->SetWalk(false);
+                if (Player* p = m_caster->ToPlayer())
+                {
+                    spawnCreature->CastSpell(spawnCreature, 27986, true); // Levitate
+                    p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
+                }
+                break;
+            }
             case 17166: // Release Umi's Yeti - Quest Are We There, Yeti? Part 3
             {
                 spawnCreature->MonsterTextEmote(-1900169);
