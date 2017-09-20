@@ -247,8 +247,8 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
         sLog.outString("Flag : 0x%x, Extr : 0x%x. Aura %u (ICON %u)",
             procFlag, procExtra, spellProto->Id, spellProto->SpellIconID);*/
 
-    // Flurry can't proc on additional windfury attacks (is this right?)
-    if (spellProto->Id == 16280 && m_extraAttacks)
+    // Flurry can't proc on additional windfury attacks
+    if (spellProto->SpellIconID == 108 && spellProto->SpellVisual == 2759 && m_extraAttacks)
         return false;
 
     // Don't proc weapons on Sap
