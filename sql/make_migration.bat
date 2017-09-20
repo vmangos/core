@@ -27,6 +27,7 @@ ECHO END IF;>> migrations/%output%
 ECHO END;>> migrations/%output%
 ECHO ^|>> migrations/%output%
 ECHO CALL add_migration;>> migrations/%output%
+ECHO DROP PROCEDURE IF EXISTS add_migration;>> migrations/%output%
 
 REM End of the script Body
 :EndOfScriptBody
