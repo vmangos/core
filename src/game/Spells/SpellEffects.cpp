@@ -2939,7 +2939,8 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         SpellAuraHolder *holder = itr->second;
         if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
         {
-            if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC)
+            if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC || 
+                holder->GetSpellProto()->Dispel == DISPEL_POISON)
             {
                 if (checkFaction)
                 {
