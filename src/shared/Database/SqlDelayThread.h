@@ -41,11 +41,13 @@ class SqlDelayThread : public ACE_Based::Runnable
         SqlConnection * m_dbConnection;                     ///< Pointer to DB connection
         volatile bool m_running;
 
+        int m_workerId;
+
         //process all enqueued requests
         void ProcessRequests();
 
     public:
-        SqlDelayThread(Database* db, SqlConnection* conn);
+        SqlDelayThread(Database* db, SqlConnection* conn, int workerId);
         ~SqlDelayThread();
 
         ///< Put sql statement to delay queue

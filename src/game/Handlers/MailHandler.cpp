@@ -346,7 +346,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
             }
 
             loadedPlayer->MoveItemFromInventory(item->GetBagSlot(), item->GetSlot(), true);
-            CharacterDatabase.BeginTransaction();
+            CharacterDatabase.BeginTransaction(loadedPlayer->GetGUIDLow());
             item->DeleteFromInventoryDB();                  // deletes item from character's inventory
             item->SaveToDB();                               // recursive and not have transaction guard into self, item not in inventory and can be save standalone
             // owner in data will set at mail receive and item extracting
@@ -380,7 +380,7 @@ void WorldSession::HandleSendMailCallback(WorldSession::AsyncMailSendRequest* re
     .SetCOD(req->COD)
     .SendMailTo(MailReceiver(req->receiverPtr, req->receiver), loadedPlayer, req->body.empty() ? MAIL_CHECK_MASK_COPIED : MAIL_CHECK_MASK_HAS_BODY, deliver_delay);
 
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(loadedPlayer->GetGUIDLow());
     loadedPlayer->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
 }
@@ -640,7 +640,7 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data)
         it->SetState(ITEM_UNCHANGED);                       // need to set this state, otherwise item cannot be removed later, if necessary
         loadedPlayer->MoveItemToInventory(dest, it, true);
 
-        CharacterDatabase.BeginTransaction();
+        CharacterDatabase.BeginTransaction(loadedPlayer->GetGUIDLow());
         loadedPlayer->SaveInventoryAndGoldToDB();
         pl->SaveMails();
         CharacterDatabase.CommitTransaction();

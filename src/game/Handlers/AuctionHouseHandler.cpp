@@ -388,7 +388,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     sAuctionMgr.AddAItem(it);
     pl->MoveItemFromInventory(it->GetBagSlot(), it->GetSlot(), true);
 
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     it->DeleteFromInventoryDB();
     it->SaveToDB();                                         // recursive and not have transaction guard into self, not in inventiory and can be save standalone
     AH->SaveToDB();
@@ -543,7 +543,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
 
         delete auction;
     }
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
 }
@@ -614,7 +614,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
     // inform player, that auction is removed
     SendAuctionCommandResult(auction, AUCTION_REMOVED, AUCTION_OK);
     // Now remove the auction
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     auction->DeleteFromDB();
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
