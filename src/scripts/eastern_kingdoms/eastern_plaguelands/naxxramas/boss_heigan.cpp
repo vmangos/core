@@ -166,8 +166,6 @@ struct boss_heiganAI : public ScriptedAI
             return;
         else
         {
-            if (!m_creature->IsWithinDistInMap(pWho, 38.0f))
-                return;
             if (pWho->GetPositionX() > 2825.0f)
                 return;
             if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
