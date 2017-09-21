@@ -581,10 +581,6 @@ struct boss_sapphironAI : public ScriptedAI
                 m_creature->GetMotionMaster()->Clear(false);
                 m_creature->SelectHostileTarget();
                 phase = PHASE_GROUND;
-                if (m_creature->getVictim())
-                {
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-                }
                 break;
             }
             case EVENT_ICEBOLT:
