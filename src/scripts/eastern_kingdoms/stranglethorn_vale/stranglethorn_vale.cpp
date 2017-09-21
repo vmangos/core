@@ -548,7 +548,8 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
         if (!m_bStartEvent)
             return;
 
-        --m_uiAttackersCount;
+        if (m_uiAttackersCount > 0)
+            --m_uiAttackersCount;
 
         if (!m_uiAttackersCount && m_uiWaveCount > MAX_WAVE_COUNT)          
             ResetCreature();
