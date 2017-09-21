@@ -347,7 +347,7 @@ struct boss_gothikAI : public ScriptedAI
         // "everyone is on the same side". That to avoid the whole raid afking on spectral
         // side, waiting for gothik to TP down, in which case they have 40 sec to kill him
         // before the gates would ordinarily open.
-        return (num_left < 10 || num_right < 10);
+        return (num_left < 1 || num_right < 1);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -364,10 +364,6 @@ struct boss_gothikAI : public ScriptedAI
             if (m_creature->getThreatManager().isThreatListEmpty())
             {
                 EnterEvadeMode();
-            }
-            else if (!gatesOpened && IsAllPlayersOneSide())
-            {
-                OpenTheGate();
             }
         }
 
