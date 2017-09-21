@@ -40,6 +40,8 @@ class Database;
 
 #define MAX_QUERY_LEN   32*1024
 
+typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
+
 //
 class MANGOS_DLL_SPEC SqlConnection
 {
@@ -207,7 +209,7 @@ class MANGOS_DLL_SPEC Database
         // Writes SQL commands to a LOG file (see mangosd.conf "LogSQL")
         bool PExecuteLog(const char *format,...) ATTR_PRINTF(2,3);
 
-        bool BeginTransaction();
+        bool BeginTransaction(int serialId = -1);
         bool CommitTransaction();
         bool RollbackTransaction();
         //for sync transaction execution
@@ -245,13 +247,20 @@ class MANGOS_DLL_SPEC Database
         void AllowAsyncTransactions() { m_bAllowAsyncTransactions = true; }
         inline void AddToDelayQueue(SqlOperation* op) { m_delayQueue->add(op); }
         inline bool NextDelayedOperation(SqlOperation*& op) { return m_delayQueue->next(op); }
-        inline bool HasAsyncQuery() { return !(m_delayQueue->empty_unsafe()); }
+
+        inline void AddToSerialDelayQueue(int workerId, SqlOperation *op) { m_serialDelayQueue[workerId]->add(op); }
+        bool NextSerialDelayedOperation(int workerId, SqlOperation*& op);
+
+        bool HasAsyncQuery();
+
+        void AddToSerialDelayQueue(SqlOperation *op);
 
         // Frees data, cancels scheduled queries, closes connection
         void StopServer();
     protected:
-        Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadsBodies(NULL), m_delayThreads(NULL), m_numAsyncWorkers(0), m_delayQueue(new SqlQueue()),
-            m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1), m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
+        Database() : m_pAsyncConn(NULL), m_pResultQueue(NULL), m_threadsBodies(NULL), m_delayThreads(NULL), m_numAsyncWorkers(0),
+            m_serialDelayQueue(NULL), m_delayQueue(new SqlQueue()), m_logSQL(false), m_pingIntervallms(0), m_nQueryConnPoolSize(1),
+            m_bAllowAsyncTransactions(false), m_iStmtIndex(-1)
         {
             m_nQueryCounter = -1;
         }
@@ -266,7 +275,7 @@ class MANGOS_DLL_SPEC Database
                 ~TransHelper();
 
                 //initializes new SqlTransaction object
-                SqlTransaction * init();
+                SqlTransaction * init(int serialId);
                 //gets pointer on current transaction object. Returns NULL if transaction was not initiated
                 SqlTransaction * get() const { return m_pTrans; }
                 //detaches SqlTransaction object allocated by init() function
@@ -305,8 +314,8 @@ class MANGOS_DLL_SPEC Database
         typedef std::vector< SqlConnection * > SqlConnectionContainer;
         SqlConnectionContainer m_pQueryConnections;
 
-        typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
         SqlQueue* m_delayQueue;
+        SqlQueue** m_serialDelayQueue; // simple mapping for worker ID -> serialized queue (only executed in set worker thread)
 
         SqlConnection * m_pAsyncConn;
 
