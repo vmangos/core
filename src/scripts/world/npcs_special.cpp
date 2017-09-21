@@ -473,28 +473,31 @@ void npc_doctorAI::PatientDied(Location* Point)
 {
     Player* pPlayer = (m_creature->GetMap()->GetPlayer(Playerguid));
 
-    if (pPlayer && ((pPlayer->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (pPlayer->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE)))
+    if (pPlayer)
     {
-        ++PatientDiedCount;
-
-        if (PatientDiedCount > 5 && Event)
+        if ((pPlayer->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (pPlayer->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
         {
-            if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->FailQuest(QUEST_TRIAGE_A);
-            else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->FailQuest(QUEST_TRIAGE_H);
-            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);                
-            Reset();
-            return;
-        }
+            ++PatientDiedCount;
 
-        Coordinates.push_back(Point);
-    }
-    else
-    {
-        // If no player or player abandon quest in progress
-        pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);        
-        Reset();
+            if (PatientDiedCount > 5 && Event)
+            {
+                if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->FailQuest(QUEST_TRIAGE_A);
+                else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->FailQuest(QUEST_TRIAGE_H);
+                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);                
+                Reset();
+                return;
+            }
+
+            Coordinates.push_back(Point);
+        }
+        else
+        {
+            // If no player or player abandon quest in progress
+            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);        
+            Reset();
+        }
     }
 }
 
