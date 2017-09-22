@@ -138,6 +138,8 @@ struct boss_patchwerkAI : public ScriptedAI
             // Skipping maintank, only using him if there is no other viable target todo: not sure if this is correct. Should we target the MT over the offtanks, if the offtanks have less hp?
             if ((*iter)->getUnitGuid() == mainTankGuid)
                 continue;
+            if (!(*iter)->getUnitGuid().IsPlayer())
+                continue;
 
             if (Unit* pTempTarget = m_creature->GetMap()->GetUnit((*iter)->getUnitGuid()))
             {
