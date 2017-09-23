@@ -297,6 +297,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 enrageTimer;
     uint32 timeSinceLastFrostBlast;
     uint32 timeSinceLastShadowFissure;
+    uint32 timeSinceLastAEFrostBolt;
     uint32 killSayTimer;
 
     void Reset()
@@ -313,6 +314,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         numSummonedGuardians = 0;
         timeSinceLastFrostBlast = 0;
         timeSinceLastShadowFissure = 0;
+        timeSinceLastAEFrostBolt = 0;
         killSayTimer = 0;
 
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
@@ -623,6 +625,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     {
         timeSinceLastFrostBlast += diff;
         timeSinceLastShadowFissure += diff;
+        timeSinceLastAEFrostBolt += diff;
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -672,8 +675,16 @@ struct boss_kelthuzadAI : public ScriptedAI
             }
             case EVENT_FROSTBOLT_VOLLEY:
             {
-                if(DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
+                if (timeSinceLastFrostBlast < 5000)
+                {
+                    events.Repeat(5000 - timeSinceLastFrostBlast);
+                    break;
+                }
+                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BOLT_NOVA) == CAST_OK)
+                {
                     events.Repeat(Seconds(urand(15, 17)));
+                    timeSinceLastAEFrostBolt = 0;
+                }
                 else
                     events.Repeat(Seconds(1));
                 break;
@@ -683,6 +694,11 @@ struct boss_kelthuzadAI : public ScriptedAI
                 if (timeSinceLastShadowFissure < 4000)
                 {
                     events.Repeat(4000 - timeSinceLastShadowFissure);
+                    break;
+                }
+                else if (timeSinceLastAEFrostBolt < 5000) 
+                {
+                    events.Repeat(5000 - timeSinceLastAEFrostBolt);
                     break;
                 }
                 if (m_creature->IsNonMeleeSpellCasted())
