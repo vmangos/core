@@ -180,6 +180,9 @@ struct boss_gothikAI : public ScriptedAI
 
     void SummonAdd(uint32 entry, float x, float y, float z, float o)
     {
+        if (!m_creature->isInCombat() && !m_creature->isDead())
+            return;
+
         if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
         {
             if (gatesOpened)
