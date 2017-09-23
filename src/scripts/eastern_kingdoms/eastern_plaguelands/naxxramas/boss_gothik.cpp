@@ -93,6 +93,8 @@ struct boss_gothikAI : public ScriptedAI
     uint32 m_uiShadowboltTimer;
     uint32 m_uiHarvestSoulTimer;
     uint32 m_uiNumTP;
+    uint32 m_checkAllPlayersOneSideTimer;
+
     bool gatesOpened;
 
     void Reset()
@@ -106,9 +108,9 @@ struct boss_gothikAI : public ScriptedAI
         m_uiSummonTimer = 4000;
 
         m_uiTeleportTimer = 15000;
-        m_uiShadowboltTimer = 2500;
+        m_uiShadowboltTimer = 1000;
         m_uiHarvestSoulTimer = 1000;
-
+        m_checkAllPlayersOneSideTimer = 1000;
         m_uiNumTP = 0;
         gatesOpened = false;
 
@@ -120,7 +122,6 @@ struct boss_gothikAI : public ScriptedAI
         {
             pC->DeleteLater();
         }
-
         m_creature->SetCasterChaseDistance(40);
     }
 
@@ -313,6 +314,8 @@ struct boss_gothikAI : public ScriptedAI
     {
         if (gatesOpened) return;
 
+        DoScriptText(EMOTE_GATE, m_creature);
+
         gatesOpened = true;
         if (GameObject* pGO = m_pInstance->GetSingleGameObjectFromStorage(GO_MILI_GOTH_COMBAT_GATE))
             pGO->SetGoState(GO_STATE_ACTIVE);
@@ -410,7 +413,6 @@ struct boss_gothikAI : public ScriptedAI
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
                         DoResetThreat();
-
                         // opening the gates when TPing down if all players are considered on the same side
                         if (!gatesOpened && IsAllPlayersOneSide())
                             OpenTheGate();
@@ -465,42 +467,49 @@ struct boss_gothikAI : public ScriptedAI
             {
                 if (m_uiPhase == PHASE_GROUND)
                 {
-                    if (m_creature->GetHealthPercent() < 30.0f)
+                    if (!gatesOpened && m_creature->GetHealthPercent() < 30.0f)
                     {
-                        if (m_pInstance->IsInRightSideGothArea(m_creature))
-                        {
-                            DoScriptText(EMOTE_GATE, m_creature);
-                            m_pInstance->SetData(TYPE_GOTHIK, SPECIAL);
-                            m_uiPhase = PHASE_END;
-                            m_uiShadowboltTimer = 2000;
-                            return;
-                        }
+                        OpenTheGate();
                     }
 
-                    if (m_uiTeleportTimer < uiDiff)
+                    // We check if a side has wiped every 1 sec. If it's the case, we open the gates
+                    if (!gatesOpened && m_checkAllPlayersOneSideTimer < uiDiff)
+                    {
+                        if(IsAllPlayersOneSide())
+                            OpenTheGate();
+                        m_checkAllPlayersOneSideTimer = 1000;
+                    }
+                    else
+                        m_checkAllPlayersOneSideTimer -= uiDiff;
+
+                    if (m_uiTeleportTimer < uiDiff && !gatesOpened) // stop teleporting after gates open
                     {
                         uint32 uiTeleportSpell = m_pInstance->IsInRightSideGothArea(m_creature) ? SPELL_TELEPORT_LEFT : SPELL_TELEPORT_RIGHT;
                         
                         if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
                         {
                             DoResetThreat();
-                            m_uiTeleportTimer = 15000;
+                            m_uiTeleportTimer = urand(15000, 20000);
                             m_uiShadowboltTimer = 2000;
-                            if (++m_uiNumTP == 4 && !gatesOpened)
+                            if (++m_uiNumTP >= 4 && !gatesOpened)
                                 OpenTheGate();
                             return;
                         }
                     }
                     else
-                        m_uiTeleportTimer -= uiDiff;
+                    {
+                        m_uiTeleportTimer -= std::min(m_uiTeleportTimer, uiDiff);
+                    }
                 }
 
                 if (m_uiShadowboltTimer < uiDiff)
                 {
-                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SHADOWBOLT))
+                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SHADOWBOLT, SELECT_FLAG_IN_LOS))
                     {
                         if (DoCastSpellIfCan(pTarget, SPELL_SHADOWBOLT) == CAST_OK)
+                        {
                             m_uiShadowboltTimer = urand(1600, 2000);
+                        }
                     }
                 }
                 else
