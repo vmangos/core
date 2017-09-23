@@ -115,7 +115,7 @@ struct boss_gothikAI : public ScriptedAI
         std::list<Creature*> creaturesToDespawn;
         GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, 
         { NPC_UNREL_TRAINEE, NPC_UNREL_DEATH_KNIGHT, NPC_UNREL_RIDER, NPC_SPECT_TRAINEE, NPC_SPECT_DEATH_KNIGTH, NPC_SPECT_RIDER, NPC_SPECT_HORSE }, 
-            200.0f);
+            1000.0f);
         for (Creature* pC : creaturesToDespawn)
         {
             pC->DeleteLater();
