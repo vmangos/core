@@ -302,6 +302,7 @@ struct boss_kelthuzadAI : public ScriptedAI
 
     void Reset()
     {
+        m_creature->SetHealth(m_creature->GetMaxHealth());
         events.Reset();
         // no info on enragetimer in vanilla, but wotlk has a 19min enrage and uses a spell from 1.11 dbc
         enrageTimer = 1000 * 60 * 19; 
@@ -412,7 +413,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     void StartEncounter()
     {
         m_pInstance->ToggleKelThuzadWindows(false);
-
+        m_creature->SetHealth(m_creature->GetMaxHealth());
         // on pull there are in each alcove:
         // 3 aboms
         // 1 banshee
