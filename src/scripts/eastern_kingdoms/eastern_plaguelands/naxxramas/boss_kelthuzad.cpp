@@ -288,6 +288,7 @@ struct boss_kelthuzadAI : public ScriptedAI
     std::vector<ObjectGuid> p1_adds;
     
     int p1Timer;
+    bool hasPutInCombat;
     bool p3Started;
     EventMap events;
     ObjectGuid pullPortalGuid;
@@ -317,6 +318,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         timeSinceLastShadowFissure = 0;
         timeSinceLastAEFrostBolt = 0;
         killSayTimer = 0;
+        hasPutInCombat = false;
 
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -520,6 +522,7 @@ struct boss_kelthuzadAI : public ScriptedAI
             case EVENT_PUT_IN_COMBAT:
                 m_creature->SetInCombatState(false);
                 m_creature->SetInCombatWithZone();
+                hasPutInCombat = true;
                 break;
             case EVENT_SKELETON:
             {
@@ -802,7 +805,7 @@ struct boss_kelthuzadAI : public ScriptedAI
         else
             enrageTimer -= diff;
 
-        if (m_creature->isInCombat())
+        if (hasPutInCombat)
         {
             if (!m_creature->SelectHostileTarget())
                 return;
