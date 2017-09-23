@@ -180,14 +180,14 @@ struct boss_gothikAI : public ScriptedAI
 
     void SummonAdd(uint32 entry, float x, float y, float z, float o)
     {
-        if (gatesOpened)
-        {
-            m_creature->SetInCombatWithZone();
-            return;
-        }
-
         if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
         {
+            if (gatesOpened)
+            {
+                pCreature->SetInCombatWithZone();
+                return;
+            }
+
             MapRefManager const&  lPlayers = m_pInstance->GetMap()->GetPlayers();
             for (auto& playerRef : lPlayers)
             {
