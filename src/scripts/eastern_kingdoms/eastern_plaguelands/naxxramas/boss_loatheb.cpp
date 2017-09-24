@@ -434,23 +434,31 @@ struct boss_loathebAI : public ScriptedAI
             case EVENT_CORRUPTED_MIND:
                 // https://www.youtube.com/watch?v=a0z9qjLxD98&list=PLYsWP02PY54A3RkEJv_VaT-0ZhfMs5zxN&index=4
                 // shows it refreshing every ~10 sec
-                DoCastAOE(SPELL_CORRUPTED_MIND, false);
-                events.Repeat(Seconds(10));
+                if (DoCastSpellIfCan(m_creature, SPELL_CORRUPTED_MIND) == CAST_OK)
+                    events.Repeat(Seconds(10));
+                else
+                    events.Repeat(Milliseconds(100));
                 break;
             case EVENT_POISON_AURA:
-                DoCastAOE(SPELL_POISON_AURA, false);
-                events.Repeat(Seconds(12));
+                if (DoCastSpellIfCan(m_creature, SPELL_POISON_AURA) == CAST_OK)
+                    events.Repeat(Seconds(12));
+                else
+                    events.Repeat(Milliseconds(100));
                 break;
             case EVENT_INEVITABLE_DOOM:
-                DoCastAOE(SPELL_INEVITABLE_DOOM);
-                ++numDooms;
-                // 2, 2:30, 3, 3:30, 4, 4:30, 5
-                // after 7 dooms, or 5 minutes into the fight,
-                // the doom timer becomes 15 instead of 30 seconds.
-                if(numDooms > 6)
-                    events.Repeat(Seconds(15));
+                if (DoCastSpellIfCan(m_creature, SPELL_INEVITABLE_DOOM) == CAST_OK)
+                {
+                    ++numDooms;
+                    // 2, 2:30, 3, 3:30, 4, 4:30, 5
+                    // after 7 dooms, or 5 minutes into the fight,
+                    // the doom timer becomes 15 instead of 30 seconds.
+                    if (numDooms > 6)
+                        events.Repeat(Seconds(15));
+                    else
+                        events.Repeat(Seconds(30));
+                }
                 else
-                    events.Repeat(Seconds(30));
+                    events.Repeat(Milliseconds(100));
                 break;
             case EVENT_REMOVE_CURSE:
                 if (DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE) == CAST_OK)
