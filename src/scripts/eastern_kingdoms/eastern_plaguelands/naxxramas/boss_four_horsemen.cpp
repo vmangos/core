@@ -365,29 +365,6 @@ struct boss_four_horsemen_shared : public ScriptedAI
             m_uiMarkTimer -= uiDiff;
     }
 
-    Unit* GetRandPlayerInRange(float maxRange)
-    {
-        Map::PlayerList const& players = m_pInstance->GetMap()->GetPlayers();
-        std::vector<Player*> candidates;
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, maxRange) && m_creature->IsWithinLOSInMap(pPlayer) && !pPlayer->isGameMaster())
-            {
-                candidates.push_back(pPlayer);
-            }
-        }
-        if (candidates.empty())
-            return nullptr;
-
-        else
-        {
-            auto iter = candidates.begin();
-            std::advance(iter, urand(0, candidates.size() - 1));
-            return *iter;
-        }
-    }
-
     void ScriptTextInRange(int32 msg)
     {
         m_creature->MonsterSay(msg);
@@ -486,8 +463,7 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
             case EVENT_BOSS_ABILITY:
                 if (m_bIsSpirit)
                     break;
-
-                if (Unit* pTarget = GetRandPlayerInRange(45.0f))
+                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_VOIDZONE, SELECT_FLAG_IN_LOS | SELECT_FLAG_PLAYER))
                 {
                     if ((DoCastSpellIfCan(pTarget, SPELL_VOIDZONE)) == CAST_OK)
                     {
@@ -688,8 +664,7 @@ struct boss_thane_korthazzAI : public boss_four_horsemen_shared
             case EVENT_BOSS_ABILITY:
                 if (m_bIsSpirit)
                     break;
-
-                if (Unit* pTarget = GetRandPlayerInRange(20.0f))
+                if(Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_METEOR, SELECT_FLAG_IN_LOS|SELECT_FLAG_PLAYER))
                 {
                     if ((DoCastSpellIfCan(pTarget, SPELL_METEOR)) == CAST_OK)
                     {
@@ -788,15 +763,15 @@ struct boss_sir_zeliekAI : public boss_four_horsemen_shared
             case EVENT_BOSS_ABILITY:
                 if (Unit* pTar = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_HOLY_WRATH, SELECT_FLAG_IN_LOS))
                 {
-                    if ((DoCastSpellIfCan(pTar, SPELL_HOLY_WRATH)) == CAST_OK)
+                    if (DoCastSpellIfCan(pTar, SPELL_HOLY_WRATH) == CAST_OK)
                     {
                         m_events.Repeat(Seconds(urand(10, 14)));
                         ScriptTextInRange(SAY_ZELI_SPECIAL);
+                        break;
                     }
-                    else
-                        m_events.Repeat(Milliseconds(100));
-                    break;
                 }
+                m_events.Repeat(Milliseconds(100));
+                break;
             }
         }
 
