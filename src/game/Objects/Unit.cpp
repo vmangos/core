@@ -1058,7 +1058,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
     // You should specify 'AURA_REMOVE_BY_DEATH', but this is not useful for these auras.
     pVictim->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
     pVictim->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-
+    pVictim->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
     // stop combat
     pVictim->CombatStop();
     pVictim->getHostileRefManager().deleteReferences();
@@ -5920,6 +5920,7 @@ void Unit::Uncharm()
         charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
         charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
         charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS_PET);
+        charm->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
     }
 }
 

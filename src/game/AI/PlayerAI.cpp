@@ -297,8 +297,10 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
         {
             me->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
             me->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+            me->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
             Pcontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
             Pcontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+            Pcontroller->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
             return;
         }
 

@@ -1808,6 +1808,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
     RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
     RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+    RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
     DisableSpline();
     SetMover(this);
 
@@ -2014,7 +2015,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
             RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
             RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-
+            RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packet to display load screen
