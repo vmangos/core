@@ -354,6 +354,8 @@ public:
 
     void OnCreatureEnterCombat(Creature * creature) override;
 
+    bool WingsAreCleared();
+
 private:
     bool m_faerlinaHaveGreeted;
     bool m_thaddiusHaveGreeted;

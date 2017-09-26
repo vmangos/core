@@ -212,6 +212,14 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
     }
 }
 
+bool instance_naxxramas::WingsAreCleared()
+{
+    return GetData(TYPE_MAEXXNA) == DONE
+        && GetData(TYPE_THADDIUS) == DONE
+        && GetData(TYPE_LOATHEB) == DONE
+        && GetData(TYPE_FOUR_HORSEMEN) == DONE;
+}
+
 void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
 {
     if (requiredPreBossData > -1 && requiredPreBossData != DONE)
@@ -332,11 +340,7 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
         sLog.outError("instance_naxxramas::UpdateTeleporters called with unsupported type %d", uiType);
     }
 
-    if (   m_auiEncounter[TYPE_THADDIUS] == DONE
-        && m_auiEncounter[TYPE_LOATHEB] == DONE
-        && m_auiEncounter[TYPE_FOUR_HORSEMEN] == DONE
-        && m_auiEncounter[TYPE_MAEXXNA] == DONE
-       )
+    if (WingsAreCleared())
     {
         if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_HUB_PORTAL))
         {
@@ -1318,11 +1322,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
     switch (pAt->id)
     {
     case AREATRIGGER_HUB_TO_FROSTWYRM:
-        if (   GetData(TYPE_MAEXXNA) == DONE
-            && GetData(TYPE_THADDIUS) == DONE
-            && GetData(TYPE_LOATHEB) == DONE
-            && GetData(TYPE_FOUR_HORSEMEN) == DONE
-           )
+        if (WingsAreCleared())
         {
             pPlayer->TeleportTo(toFrostwyrmTPPos);
         }
@@ -1377,7 +1377,6 @@ bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
     }
     return false;
 }
-
 
 struct mob_spiritOfNaxxramasAI : public ScriptedAI
 {
