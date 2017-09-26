@@ -791,6 +791,13 @@ struct boss_kelthuzadAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
+        if (hasPutInCombat)
+        {
+            // won't have a victim if we are in p1, even if selectHostileTarget returns true, so check that before return
+            if (!m_creature->SelectHostileTarget() || (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && !m_creature->getVictim()))
+                return;
+        }
+        
         if (m_pInstance->GetData(TYPE_KELTHUZAD) != IN_PROGRESS)
             return;
         
@@ -803,16 +810,6 @@ struct boss_kelthuzadAI : public ScriptedAI
         }
         else
             enrageTimer -= diff;
-
-        if (hasPutInCombat)
-        {
-            if (!m_creature->SelectHostileTarget())
-                return;
-            // won't have a victim if we are in p1, even if selectHostileTarget returns true, so check that before return
-            else if (!m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE) && !m_creature->getVictim())
-                return;
-        }
-        
 
         events.Update(diff);
 
