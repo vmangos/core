@@ -14374,6 +14374,15 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
                 Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
                 SetLocationMapId(at->target_mapId);
             }
+            else if (GetMapId() == 533) // Naxxramas
+            {
+                // There exist no exit areatrigger for Naxxramas. Not sure how Blizzard handled this in 
+                // the original version of Naxx, but to keep the usual logic of being TPed outside the instance
+                // we have the following special-case. Using areatriggers is not possible without even uglier hacking
+                // as sObjectMgr.GetGoBackTrigger() requires the areatrigger to exist in the DBC files, not just in the DB
+                Relocate(3120.16f, -3725.0f, 137.7f, 5.83f); // Just outside Naxxramas
+                SetLocationMapId(0);                         // Eastern Kingdoms
+            }
         }
     }
 

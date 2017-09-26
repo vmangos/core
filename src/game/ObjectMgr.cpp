@@ -5321,20 +5321,6 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     delete result;
 
-    // Dummy, nonexisting areatrigger used as Naxxramas "exit". Should only be used by GetGoBackTrigger below. 
-    AreaTrigger at;
-    at.requiredLevel = 61;
-    at.requiredItem = 0;
-    at.requiredItem2 = 0;
-    at.requiredQuest = 0;
-    at.requiredFailedText = "";
-    at.target_mapId = 0;
-    at.target_X = 3120.16f;
-    at.target_Y = -3725.0f;
-    at.target_Z = 137.7f;
-    at.target_Orientation = 5.83f;
-    mAreaTriggers[533999] = at;
-
     sLog.outString();
     sLog.outString(">> Loaded %u area trigger teleport definitions", count);
 }
@@ -5343,16 +5329,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
  * Searches for the areatrigger which teleports players out of the given map (only direct to continent)
  */
 AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
-{
-    // Specialcase for Naxxramas. There should not be any exit for naxx, and i have not found any dummy 
-    // ATs to handle this "goback" case, so LoadAreaTriggerTeleports() above creates a dummy AT with ID 533999 which we use.
-    if (map_id == 533)
-    {
-        auto it = mAreaTriggers.find(533999);
-        if (it != mAreaTriggers.end())
-            return &it->second;
-    }
-
+{  
     MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(map_id);
     if (!mapEntry || !mapEntry->IsDungeon())
         return nullptr;
