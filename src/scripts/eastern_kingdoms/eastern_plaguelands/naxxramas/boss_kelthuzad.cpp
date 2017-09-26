@@ -300,7 +300,6 @@ struct boss_kelthuzadAI : public ScriptedAI
     uint32 timeSinceLastShadowFissure;
     uint32 timeSinceLastAEFrostBolt;
     uint32 killSayTimer;
-    uint32 customCombatPulse;
 
     void Reset()
     {
@@ -320,7 +319,6 @@ struct boss_kelthuzadAI : public ScriptedAI
         timeSinceLastAEFrostBolt = 0;
         killSayTimer = 0;
         hasPutInCombat = false;
-        customCombatPulse = 5000;
 
         m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_CHANNEL);
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE|UNIT_FLAG_NOT_SELECTABLE);
@@ -626,28 +624,6 @@ struct boss_kelthuzadAI : public ScriptedAI
         // Setting this to 60-75 as a slight buff
         events.Repeat(Seconds(urand(60, 75)));
     }
-
-    void CombatPulse()
-    {
-        Map::PlayerList const &PlList = m_creature->GetMap()->GetPlayers();
-        if (PlList.isEmpty())
-            return;
-        for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
-        {
-            if (Player* pPlayer = i->getSource())
-            {
-                if (pPlayer->isGameMaster())
-                    continue;
-
-                if (pPlayer->isAlive() && !m_creature->IsFriendlyTo(pPlayer))
-                {
-                    pPlayer->SetInCombatWith(m_creature);
-                    m_creature->AddThreat(pPlayer);
-                }
-            }
-        }
-    }
-
     void UpdateP2P3(uint32 diff)
     {
         timeSinceLastFrostBlast += diff;
@@ -656,14 +632,6 @@ struct boss_kelthuzadAI : public ScriptedAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        if (customCombatPulse < diff)
-        {
-            CombatPulse();
-            customCombatPulse = 3000;
-        }
-        else
-            customCombatPulse -= diff;
 
         if (m_creature->GetHealthPercent() < 40.0f && !p3Started)
         {
