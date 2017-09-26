@@ -184,8 +184,9 @@ struct boss_gothikAI : public ScriptedAI
         if (!m_creature->isInCombat() && !m_creature->isDead())
             return;
 
-        if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 10000))
+        if (Creature *pCreature = m_creature->SummonCreature(entry, x, y, z, o, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000))
         {
+            pCreature->SetCorpseDelay(10);
             if (gatesOpened)
             {
                 pCreature->SetInCombatWithZone();
