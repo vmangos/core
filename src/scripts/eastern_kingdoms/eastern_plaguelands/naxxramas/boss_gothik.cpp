@@ -41,7 +41,6 @@ enum
     PHASE_SPEECH                = 0,
     PHASE_BALCONY               = 1,
     PHASE_GROUND                = 2,
-    PHASE_END                   = 3,
 
     MAX_WAVES                   = 18,
 
@@ -94,6 +93,7 @@ struct boss_gothikAI : public ScriptedAI
     uint32 m_uiHarvestSoulTimer;
     uint32 m_uiNumTP;
     uint32 m_checkAllPlayersOneSideTimer;
+    bool m_IsRightSide;
 
     bool gatesOpened;
 
@@ -113,6 +113,7 @@ struct boss_gothikAI : public ScriptedAI
         m_checkAllPlayersOneSideTimer = 1000;
         m_uiNumTP = 0;
         gatesOpened = false;
+        m_IsRightSide = true;
 
         std::list<Creature*> creaturesToDespawn;
         GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, 
@@ -414,6 +415,7 @@ struct boss_gothikAI : public ScriptedAI
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
                         DoResetThreat();
+                        m_IsRightSide = false;
                         // opening the gates when TPing down if all players are considered on the same side
                         if (!gatesOpened && IsAllPlayersOneSide())
                             OpenTheGate();
@@ -464,43 +466,68 @@ struct boss_gothikAI : public ScriptedAI
                 break;
             }
             case PHASE_GROUND:
-            case PHASE_END:
             {
-                if (m_uiPhase == PHASE_GROUND)
+                if (!gatesOpened && m_creature->GetHealthPercent() < 30.0f)
                 {
-                    if (!gatesOpened && m_creature->GetHealthPercent() < 30.0f)
-                    {
+                    OpenTheGate();
+                }
+
+                // We check if a side has wiped every 1 sec. If it's the case, we open the gates
+                if (!gatesOpened && m_checkAllPlayersOneSideTimer < uiDiff)
+                {
+                    if(IsAllPlayersOneSide())
                         OpenTheGate();
-                    }
+                    m_checkAllPlayersOneSideTimer = 1000;
+                }
+                else
+                    m_checkAllPlayersOneSideTimer -= uiDiff;
 
-                    // We check if a side has wiped every 1 sec. If it's the case, we open the gates
-                    if (!gatesOpened && m_checkAllPlayersOneSideTimer < uiDiff)
+                // threat reset and new target selection logic to prevent Gothik from running off to other side after 
+                // TP has finished
+                if (!gatesOpened)
+                {
+                    bool isRightSide = m_pInstance->IsInRightSideGothArea(m_creature);
+                    // we are now on right side, but last we checked we were not
+                    if (isRightSide && !m_IsRightSide)
                     {
-                        if(IsAllPlayersOneSide())
-                            OpenTheGate();
-                        m_checkAllPlayersOneSideTimer = 1000;
-                    }
-                    else
-                        m_checkAllPlayersOneSideTimer -= uiDiff;
-
-                    if (m_uiTeleportTimer < uiDiff && !gatesOpened) // stop teleporting after gates open
-                    {
-                        uint32 uiTeleportSpell = m_pInstance->IsInRightSideGothArea(m_creature) ? SPELL_TELEPORT_LEFT : SPELL_TELEPORT_RIGHT;
-                        
-                        if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
+                        m_IsRightSide = true;
+                        DoResetThreat();
+                        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
                         {
-                            DoResetThreat();
-                            m_uiTeleportTimer = urand(15000, 20000);
-                            m_uiShadowboltTimer = 2000;
-                            if (++m_uiNumTP >= 4 && !gatesOpened)
-                                OpenTheGate();
-                            return;
+                            AttackStart(pNearest);
+                            m_creature->AddThreat(pNearest, 300.0f);
                         }
                     }
-                    else
+                    // we are now on left side, but last we checked we were not
+                    else if (!isRightSide && m_IsRightSide)
                     {
-                        m_uiTeleportTimer -= std::min(m_uiTeleportTimer, uiDiff);
+                        m_IsRightSide = false;
+                        DoResetThreat();
+                        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0, nullptr, SELECT_FLAG_IN_LOS))
+                        {
+                            AttackStart(pNearest);
+                            m_creature->AddThreat(pNearest, 300.0f);
+                        }
                     }
+                }
+
+                if (m_uiTeleportTimer < uiDiff && !gatesOpened) // stop teleporting after gates open
+                {
+                    uint32 uiTeleportSpell = m_pInstance->IsInRightSideGothArea(m_creature) ? SPELL_TELEPORT_LEFT : SPELL_TELEPORT_RIGHT;
+                        
+                    if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
+                    {
+                        DoResetThreat();
+                        m_uiTeleportTimer = urand(15000, 20000);
+                        m_uiShadowboltTimer = 2000;
+                        if (++m_uiNumTP >= 4 && !gatesOpened)
+                            OpenTheGate();
+                        return;
+                    }
+                }
+                else 
+                {
+                    m_uiTeleportTimer -= std::min(m_uiTeleportTimer, uiDiff);
                 }
 
                 if (m_uiShadowboltTimer < uiDiff)
