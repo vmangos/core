@@ -5742,6 +5742,8 @@ void Unit::CombatStop(bool includingCast)
         ((Player*)this)->SendAttackSwingCancelAttack();     // melee and ranged forced attack cancel
     else if (GetTypeId() == TYPEID_UNIT)
     {
+        ((Creature*)this)->UpdateCombatState(false);
+        ((Creature*)this)->UpdateCombatWithZoneState(false);
         ((Creature*)this)->m_TargetNotReachableTimer = 0;
         if (((Creature*)this)->GetTemporaryFactionFlags() & TEMPFACTION_RESTORE_COMBAT_STOP)
             ((Creature*)this)->ClearTemporaryFaction();
