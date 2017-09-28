@@ -248,7 +248,7 @@ void instance_naxxramas::UpdateAutomaticBossEntranceDoor(GameObject* pGO, uint32
     }
     else
     {
-        pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+        //pGO->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
         pGO->SetGoState(GO_STATE_ACTIVE);
     }
 }
