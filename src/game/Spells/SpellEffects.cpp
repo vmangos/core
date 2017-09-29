@@ -671,16 +671,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     uint32 spell_id = 0;
                     uint32 roll = urand(0, 99);
                     if (roll < 25)                          // Fireball (25% chance)
-                        spell_id = 15662;
+                        spell_id = 11921;
                     else if (roll < 50)                     // Frostbolt (25% chance)
-                        spell_id = 11538;
+                        spell_id = 13322;
                     else if (roll < 70)                     // Chain Lighting (20% chance)
                         spell_id = 21179;
                     else if (roll < 77)                     // Polymorph (10% chance, 7% to target)
-                        spell_id = 14621;
+                        spell_id = 13323;
                     else if (roll < 80)                     // Polymorph (10% chance, 3% to self, backfire)
                     {
-                        spell_id = 14621;
+                        spell_id = 13323;
                         newTarget = m_caster;
                     }
                     else if (roll < 95)                     // Enveloping Winds (15% chance)
@@ -3320,6 +3320,8 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 
     if (m_spellInfo->Id == 9515) // Exception for 'Summon Tracking Hound'
         level = m_spellInfo->spellLevel;
+    if (m_spellInfo->Id == 14642 && level > cInfo->maxlevel) // Felhound Minion level cap
+        level = cInfo->maxlevel;
 
     // select center of summon position
     float center_x = m_targets.m_destX;
