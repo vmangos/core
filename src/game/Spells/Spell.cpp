@@ -1402,18 +1402,17 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
         return;
     }
 
-    // Nostalrius: IsAuraResist pour les ModMechanicResistance des effets.
-    if (IsSpellAppliesAura(m_spellInfo, effectMask) && unit->IsAuraResist(m_spellInfo))
-        for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
-            if (m_spellInfo->Effect[eff] == SPELL_EFFECT_APPLY_AURA)
-            {
-                if ((realCaster && realCaster->IsPlayer() && realCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-                    (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-                    break;
-                effectMask &= ~(1 << eff);
-                if (!effectMask)
-                    return;
-            }
+    // Check mechanic resistance for each effect
+    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+        if (unit->IsEffectResist(m_spellInfo, eff))
+        {
+            if ((realCaster && realCaster->IsPlayer() && realCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
+                (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
+                break;
+            effectMask &= ~(1 << eff);
+            if (!effectMask)
+                return;
+        }
 
     // Recheck immune (only for delayed spells)
     if (m_caster != unit && m_spellInfo->speed && (

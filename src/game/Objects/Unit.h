@@ -1200,7 +1200,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         int32 MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* spellPtr = nullptr);
         SpellMissInfo SpellHitResult(Unit *pVictim, SpellEntry const *spell, SpellEffectIndex effIndex, bool canReflect = false, Spell* spellPtr = nullptr);
         // Nostalrius : SPELL_AURA_MOD_MECHANIC_RESISTANCE
-        bool IsAuraResist(SpellEntry const *spell);
+        bool IsEffectResist(SpellEntry const* spell, int eff);
 
         float GetUnitDodgeChance()    const;
         float GetUnitParryChance()    const;

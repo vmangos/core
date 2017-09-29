@@ -2822,19 +2822,10 @@ SpellMissInfo Unit::MeleeSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     if (roll < tmp)
         return SPELL_MISS_MISS;
 
-    // Chance resist mechanic (select max value from spell or effect mechanics)
+    // Chance resist mechanic for spell (effect resistance handled later)
     int32 resist_mech = 0;
     if (spell->Mechanic)
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic) * 100;
-    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
-    {
-        if (spell->EffectMechanic[eff])
-        {
-            int32 temp = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->EffectMechanic[eff]) * 100;
-            if (resist_mech < temp)
-                resist_mech = temp;
-        }
-    }
     // Roll chance
     tmp += resist_mech;
     if (roll < tmp)
@@ -2993,19 +2984,10 @@ int32 Unit::MagicSpellHitChance(Unit *pVictim, SpellEntry const *spell, Spell* s
         DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_AOE_AVOIDANCE (- %i) : %f", pVictim->GetTotalAuraModifier(SPELL_AURA_MOD_AOE_AVOIDANCE), modHitChance);
     }
 
-    // Chance resist mechanic (select max value from spell or effect mechanics)
+    // Chance resist mechanic for spell (effect resistance handled later)
     int32 resist_mech = 0;
     if (spell->Mechanic)
         resist_mech = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->Mechanic);
-    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
-    {
-        if (spell->EffectMechanic[eff])
-        {
-            int32 temp = pVictim->GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, spell->EffectMechanic[eff]);
-            if (resist_mech < temp)
-                resist_mech = temp;
-        }
-    }
     // Apply mod
     modHitChance -= resist_mech;
     DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "SPELL_AURA_MOD_MECHANIC_RESISTANCE (- %i) : %f", resist_mech, modHitChance);
@@ -3098,26 +3080,18 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell
     return SPELL_MISS_NONE;
 }
 
-bool Unit::IsAuraResist(SpellEntry const* spell)
+bool Unit::IsEffectResist(SpellEntry const* spell, int eff)
 {
-    // Chance resist mechanic (select max value from every mechanic spell effect)
-    int32 resist_mech = 0;
-    int32 rand = urand(0, 99);
-    // Get effects mechanic and chance => Aura side (Nostalrius)
-    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+    // Chance resist mechanic
+    int32 effect_mech = spell->EffectMechanic[eff];
+    if (effect_mech && effect_mech != spell->Mechanic)
     {
-        if (spell->Effect[eff] != SPELL_EFFECT_APPLY_AURA)
-            continue;
-        int32 effect_mech = spell->EffectMechanic[eff];
-        if (effect_mech && effect_mech != spell->Mechanic)
-        {
-            int32 temp = GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, effect_mech);
-            DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "Spell %u Eff %u: MechanicResistChance %i", spell->Id, eff, temp);
-            if (resist_mech < temp)
-                resist_mech = temp;
-        }
+        int32 rand = urand(0, 99);
+        int32 resist_mech = GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_MECHANIC_RESISTANCE, effect_mech);
+        DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "Spell %u Eff %u: MechanicResistChance %i", spell->Id, eff, resist_mech);
+        return (rand < resist_mech);
     }
-    return (rand < resist_mech);
+    return false;
 }
 
 float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) const
