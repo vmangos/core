@@ -164,45 +164,6 @@ bool GossipSelect_npc_loramus_thalipedes(Player* pPlayer, Creature* pCreature, u
     return true;
 }
 
-
-/*######
-## npc_duc_hydraxis
-######*/
-/*
-[SQL]
-UPDATE creature_template SET ScriptName="npc_duc_hydraxis" WHERE entry=13278;
-*/
-enum
-{
-    ITEM_ETERNAL_QUINTESSENCE   = 22754,
-    ITEM_AQUAL_QUINTESSENCE     = 17333,
-    QUEST_HANDS_OF_THE_ENEMY    = 6824,
-};
-
-bool GossipHello_npc_duc_hydraxis(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (!pPlayer->HasItemCount(ITEM_ETERNAL_QUINTESSENCE, 1, true) && !pPlayer->HasItemCount(ITEM_AQUAL_QUINTESSENCE, 1, true))
-    {
-        if (pPlayer->GetQuestRewardStatus(QUEST_HANDS_OF_THE_ENEMY))
-        {
-            // [-PROGRESSIVE] TODO Post 1.11: Give eternal quintessence if revered
-            uint32 noSpaceForCount = 0;
-            ItemPosCountVec dest;
-            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, ITEM_AQUAL_QUINTESSENCE, 1, &noSpaceForCount);
-            if (msg == EQUIP_ERR_OK)
-            {
-                Item* pItem = pPlayer->StoreNewItem(dest, ITEM_AQUAL_QUINTESSENCE, true, Item::GenerateItemRandomPropertyId(ITEM_AQUAL_QUINTESSENCE));
-                pPlayer->SendNewItem(pItem, 1, true, false);
-            }
-        }
-    }
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    return true;
-}
-
 //--Alita MAWS
 enum
 {
@@ -377,11 +338,6 @@ void AddSC_azshara()
     newscript->Name = "npc_loramus_thalipedes";
     newscript->pGossipHello =  &GossipHello_npc_loramus_thalipedes;
     newscript->pGossipSelect = &GossipSelect_npc_loramus_thalipedes;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_duc_hydraxis";
-    newscript->pGossipHello =  &GossipHello_npc_duc_hydraxis;
     newscript->RegisterSelf();
 
     //--Alita

@@ -287,42 +287,6 @@ struct boss_jindoAI : public ScriptedAI
     }
 };
 
-//Healing Ward
-struct mob_healing_wardAI : public ScriptedAI
-{
-    mob_healing_wardAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    uint32 Heal_Timer;
-
-    void Reset()
-    {
-        Heal_Timer = 2000;
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        //healTimer
-        if (Heal_Timer < diff)
-        {
-            if (m_pInstance)
-                if (Unit *pJindo = m_creature->GetMap()->GetUnit(m_pInstance->GetData64(DATA_JINDO)))
-                    DoCastSpellIfCan(pJindo, SPELL_HEAL);
-
-            Heal_Timer = 3000;
-        }
-        else
-            Heal_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
 struct mob_lava_spout_wardAI : public ScriptedAI
 {
     mob_lava_spout_wardAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -489,11 +453,6 @@ CreatureAI* GetAI_boss_jindo(Creature* pCreature)
     return new boss_jindoAI(pCreature);
 }
 
-CreatureAI* GetAI_mob_healing_ward(Creature* pCreature)
-{
-    return new mob_healing_wardAI(pCreature);
-}
-
 CreatureAI* GetAI_mob_shade_of_jindo(Creature* pCreature)
 {
     return new mob_shade_of_jindoAI(pCreature);
@@ -512,11 +471,6 @@ void AddSC_boss_jindo()
     newscript = new Script;
     newscript->Name = "boss_jindo";
     newscript->GetAI = &GetAI_boss_jindo;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_healing_ward";
-    newscript->GetAI = &GetAI_mob_healing_ward;
     newscript->RegisterSelf();
 
     newscript = new Script;
