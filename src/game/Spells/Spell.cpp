@@ -260,7 +260,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
         data << m_strTarget;
 }
 
-Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim):
+Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
     m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
@@ -270,6 +270,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_destroyed = false;
     m_spellInfo = info;
     m_triggeredBySpellInfo = triggeredBy;
+    m_triggeredByParentSpellInfo = triggeredByParent;
     m_caster = caster;
     m_selfContainer = nullptr;
     m_referencedFromCurrentSpell = false;

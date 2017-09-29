@@ -879,7 +879,15 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             }
         }
 
-        pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0);
+        // Prevent item procs from breaking the CC that caused them
+        bool isProcSpell = false;
+        if (spell && spell->m_triggeredBySpellInfo && spell->m_triggeredByParentSpellInfo)
+            isProcSpell = HasAuraWithSpellTriggerEffect(spell->m_triggeredBySpellInfo);
+
+        if (isProcSpell)
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spell->m_triggeredByParentSpellInfo->Id);
+        else
+            pVictim->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_DAMAGE, spellProto ? spellProto->Id : 0);
 
         if (damagetype != NODAMAGE && damage && pVictim->GetTypeId() == TYPEID_PLAYER)
         {
@@ -1248,7 +1256,7 @@ void Unit::CastStop(uint32 except_spellid)
                 InterruptSpell(CurrentSpellTypes(i), false);
 }
 
-void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
 
@@ -1261,10 +1269,10 @@ void Unit::CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castIte
         return;
     }
 
-    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy);
+    CastSpell(Victim, spellInfo, triggered, castItem, triggeredByAura, originalCaster, triggeredBy, triggeredByParent);
 }
 
-void Unit::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy)
+void Unit::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, Item *castItem, Aura* triggeredByAura, ObjectGuid originalCaster, SpellEntry const* triggeredBy, SpellEntry const* triggeredByParent)
 {
     if (!spellInfo)
     {
@@ -1286,7 +1294,7 @@ void Unit::CastSpell(Unit* Victim, SpellEntry const *spellInfo, bool triggered, 
         triggeredBy = triggeredByAura->GetSpellProto();
     }
 
-    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy);
+    Spell *spell = new Spell(this, spellInfo, triggered, originalCaster, triggeredBy, NULL, triggeredByParent);
 
     SpellCastTargets targets;
 

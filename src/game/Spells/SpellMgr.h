@@ -389,11 +389,24 @@ inline bool HasAuraWithTriggerEffect(SpellEntry const *spellInfo)
 {
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        switch(spellInfo->Effect[i])
+        switch(spellInfo->EffectApplyAuraName[i])
         {
             case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
             case SPELL_AURA_PROC_TRIGGER_SPELL:
             case SPELL_AURA_PROC_TRIGGER_DAMAGE:
+                return true;
+        }
+    }
+    return false;
+}
+
+inline bool HasAuraWithSpellTriggerEffect(SpellEntry const *spellInfo)
+{
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        switch (spellInfo->EffectApplyAuraName[i])
+        {
+            case SPELL_AURA_PROC_TRIGGER_SPELL:
                 return true;
         }
     }
