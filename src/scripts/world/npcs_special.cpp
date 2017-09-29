@@ -1245,10 +1245,15 @@ CreatureAI* GetAI_rat_des_profondeurs(Creature* pCreature)
 ## npc_felhound_minion
 ######*/
 
-struct npc_felhound_minionAI : public ScriptedAI
+struct npc_felhound_minionAI : public ScriptedPetAI
 {
-    npc_felhound_minionAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_felhound_minionAI(Creature* pCreature) : ScriptedPetAI(pCreature)
     {
+        m_creature->SetCanModifyStats(true);
+
+        if (m_creature->GetCharmInfo())
+            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
+
         Reset();
     }
 
@@ -1266,14 +1271,15 @@ struct npc_felhound_minionAI : public ScriptedAI
 
         if (m_uiManaBurnTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), 15980);
+            if (m_creature->getVictim()->getPowerType() == POWER_MANA)
+                DoCastSpellIfCan(m_creature->getVictim(), 15980);
             m_uiManaBurnTimer = urand(9800, 15200);
             return;
         }
         else
             m_uiManaBurnTimer -= uiDiff;
 
-        DoMeleeAttackIfReady();
+        ScriptedPetAI::UpdatePetAI(uiDiff);
     }
 };
 
