@@ -5,3 +5,6 @@ INSERT INTO `spell_mod` (`Id`, `procChance`, `procFlags`, `procCharges`, `Durati
 `StartRecoveryCategory`, `StartRecoveryTime`, `MaxAffectedTargets`, `MaxTargetLevel`, `DmgClass`, `rangeIndex`, `RecoveryTime`, `CategoryRecoveryTime`, `SpellFamilyName`, `SpellFamilyFlags`, `Mechanic`, `Comment`) 
 VALUES 
 ('29204', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1 ', '-1', '-1', '1', '0', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '-1', '0', '-1', 'Inevitable Doom cant be resisted');
+
+-- necrotic stalker immune flags
+UPDATE `creature_template` SET `MechanicImmuneMask`=12599283 WHERE `entry`=16453;
