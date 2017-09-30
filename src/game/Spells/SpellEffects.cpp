@@ -5256,6 +5256,12 @@ void Spell::EffectFeedPet(SpellEffectIndex eff_idx)
     if (!pet->isAlive())
         return;
 
+    if (!pet->IsWithinLOSInMap(_player))
+    {
+        SendCastResult(SPELL_FAILED_LINE_OF_SIGHT);
+        return;
+    }
+
     int32 benefit = pet->GetCurrentFoodBenefitLevel(foodItem->GetProto()->ItemLevel);
     if (benefit <= 0)
         return;
