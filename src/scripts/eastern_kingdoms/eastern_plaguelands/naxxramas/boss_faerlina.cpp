@@ -116,6 +116,7 @@ struct boss_faerlinaAI : public ScriptedAI
         */
         if (pSpell->Id == SPELL_WIDOWS_EMBRACE)
         {
+            m_uiEnrageTimer = std::max(m_uiEnrageTimer, (uint32)30000);
             m_creature->RemoveAurasDueToSpell(SPELL_ENRAGE);
             pWho->Kill(pWho, nullptr);
         }
@@ -295,7 +296,7 @@ struct boss_faerlinaAI : public ScriptedAI
             {
                 if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CanCastResult::CAST_OK)
                 {
-                    m_uiEnrageTimer = 61000;
+                    m_uiEnrageTimer = 60000;
                     DoScriptText(SAY_ENRAGE3 + urand(0, 2), m_creature);
                 }
             }
