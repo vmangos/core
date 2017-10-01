@@ -170,7 +170,6 @@ struct boss_nothAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
-        sLog.outBasic("aggro");
         m_creature->SetInCombatWithZone();
 
         m_events.ScheduleEvent(EVENT_CURSE,    Seconds(urand(8,12)));
