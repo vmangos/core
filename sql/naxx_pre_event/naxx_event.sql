@@ -494,6 +494,7 @@ DELETE FROM `creature` WHERE `guid` IN (1242996, 1242997, 1243011, 1242995, 1242
 -- ----------------------
 -- Game Events
 -- ----------------------
+/*
 UPDATE `game_event` SET `start_time`='2017-06-20 00:00:00', `end_time`='2018-06-20 00:00:00', `length`=999999999 WHERE `entry`=17; -- Scourge Invasion
 UPDATE `game_event` SET `start_time`='2017-06-20 00:00:00', `end_time`='2018-06-20 00:00:00', `length`=999999999 WHERE `entry`=155; -- Argent Dawn Spawns
 UPDATE `game_event` SET `start_time`='2017-06-20 00:00:00', `end_time`='2018-06-20 00:00:00', `length`=999999999, `description`='Scourge Invasion - Phase 2 - Invasion Stormwind' WHERE  `entry`=129;
@@ -503,6 +504,7 @@ DELETE FROM `game_event` WHERE `entry` IN (110, 111, 112, 113, 114, 115, 116, 11
 INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`) VALUES
 (80, '2014-03-30 05:25:24', '2018-03-30 05:30:00', 525600, 999999999, 0, 'Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11', 0, 0),
 (81, '2014-03-30 05:25:24', '2018-04-20 04:30:00', 525600, 999999999, 0, 'Scourge Invasion - Boss in instance activation', 0, 0);
+*/
 
 -- Objects
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
