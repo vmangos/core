@@ -465,8 +465,16 @@ struct boss_lady_blaumeuxAI : public boss_four_horsemen_shared
                     break;
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_VOIDZONE, SELECT_FLAG_IN_LOS | SELECT_FLAG_PLAYER))
                 {
-                    if ((DoCastSpellIfCan(pTarget, SPELL_VOIDZONE)) == CAST_OK)
+                    float height = m_pInstance->GetMap()->GetHeight(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), true, 5.0f) + 0.2f;
+                    if (height < 241.35f)
+                        height = 241.35f;
+                    if (Creature* pVZ = m_creature->SummonCreature(16697, pTarget->GetPositionX(), pTarget->GetPositionY(), height, 0, TEMPSUMMON_TIMED_DESPAWN, 90000))
                     {
+                        pVZ->SetRespawnRadius(0.1f);
+                        pVZ->SetSpeedRate(UnitMoveType::MOVE_RUN, 0.1f);
+                        pVZ->SetSpeedRate(UnitMoveType::MOVE_WALK, 0.1f);
+                        pVZ->GetMotionMaster()->MoveRandom();
+
                         ScriptTextInRange(SAY_BLAU_SPECIAL);
                         m_events.Repeat(Seconds(12));
                         break;
