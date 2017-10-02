@@ -1353,23 +1353,26 @@ void Creature::SaveToDB(uint32 mapid)
 
     std::ostringstream ss;
     ss << "INSERT INTO creature VALUES ("
-       << GetGUIDLow() << ","
-       << GetEntry() << ","
-       << mapid << ","
-       << displayId << ","
-       << GetEquipmentId() << ","
-       << GetPositionX() << ","
-       << GetPositionY() << ","
-       << GetPositionZ() << ","
-       << GetOrientation() << ","
-       << m_respawnDelay << ","                            //respawn time
-       << (float) m_respawnradius << ","                   //spawn distance (float)
-       << (uint32)(0) << ","                               //currentwaypoint
-       << GetHealth() << ","                               //curhealth
-       << GetPower(POWER_MANA) << ","                      //curmana
-       << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
-       << GetDefaultMovementType() << ","                 //default movement generator type
-       << m_isActiveObject << ")";
+        << GetGUIDLow() << ","
+        << GetEntry() << ","
+        << mapid << ","
+        << displayId << ","
+        << GetEquipmentId() << ","
+        << GetPositionX() << ","
+        << GetPositionY() << ","
+        << GetPositionZ() << ","
+        << GetOrientation() << ","
+        << m_respawnDelay << ","                            //respawn time
+        << (float)m_respawnradius << ","                    //spawn distance (float)
+        << (uint32)(0) << ","                               //currentwaypoint
+        << GetHealth() << ","                               //curhealth
+        << GetPower(POWER_MANA) << ","                      //curmana
+        << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
+        << GetDefaultMovementType() << ","                  //default movement generator type
+        << m_isActiveObject << ","
+        << "0,"                                             //patch_min
+        << "10)";                                           //patch_max
+       
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 

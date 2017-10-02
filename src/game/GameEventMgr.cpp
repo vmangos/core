@@ -185,7 +185,7 @@ void GameEventMgr::LoadFromDB()
         mGameEvent.resize(max_event_id + 1);
     }
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description,hardcoded,disabled FROM game_event");
+    QueryResult *result = WorldDatabase.Query("SELECT entry,UNIX_TIMESTAMP(start_time),UNIX_TIMESTAMP(end_time),occurence,length,holiday,description,hardcoded,disabled,patch_min,patch_max FROM game_event");
     if (!result)
     {
         mGameEvent.clear();
@@ -208,7 +208,7 @@ void GameEventMgr::LoadFromDB()
             uint16 event_id = fields[0].GetUInt16();
             if (event_id == 0)
             {
-                sLog.outErrorDb("`game_event` game event id (%i) is reserved and can't be used.", event_id);
+                sLog.outErrorDb("Table `game_event` game event id (%i) is reserved and can't be used.", event_id);
                 continue;
             }
 
@@ -223,13 +223,26 @@ void GameEventMgr::LoadFromDB()
 
             if (pGameEvent.length == 0)                         // length>0 is validity check
             {
-                sLog.outErrorDb("`game_event` game event id (%i) have length 0 and can't be used.", event_id);
+                sLog.outErrorDb("Table `game_event` game event id (%i) have length 0 and can't be used.", event_id);
                 continue;
             }
 
             pGameEvent.description  = fields[6].GetCppString();
             pGameEvent.hardcoded    = fields[7].GetUInt8();
             pGameEvent.disabled     = fields[8].GetUInt8();
+            uint8 patch_min         = fields[9].GetUInt8();
+            uint8 patch_max         = fields[10].GetUInt8();
+
+            if ((patch_min > patch_max) || (patch_max > 10))
+            {
+                sLog.outErrorDb("Table `game_event` game event id (%i) has invalid values min_patch=%u, max_patch=%u.", event_id, patch_min, patch_max);
+                sLog.out(LOG_DBERRFIX, "UPDATE game_event SET min_patch=0, max_patch=10 WHERE entry=%u;", event_id);
+                patch_min = 0;
+                patch_max = 10;
+            }
+
+            if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
+                pGameEvent.disabled = 1;
         }
         while (result->NextRow());
         delete result;
@@ -503,7 +516,7 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventQuests.resize(mGameEvent.size());
 
-    result = WorldDatabase.Query("SELECT quest, event FROM game_event_quest");
+    result = WorldDatabase.PQuery("SELECT quest, event FROM game_event_quest WHERE patch <= %u", sWorld.GetWowPatch());
 
     count = 0;
     if (!result)

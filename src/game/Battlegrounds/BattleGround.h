@@ -70,6 +70,10 @@ enum BattleGroundQuests
 
 enum BattleGroundMarks
 {
+    SPELL_WS_ALLY_WINNER            = 23661,
+    SPELL_WS_HORDE_WINNER           = 23702,
+    SPELL_OLD_ARATHI_WINNER         = 24017,
+    SPELL_WS_OLD_LOSER              = 24637,
     SPELL_WS_MARK_LOSER             = 24950,
     SPELL_WS_MARK_WINNER            = 24951,
     SPELL_AB_MARK_LOSER             = 24952,
@@ -302,6 +306,11 @@ class BattleGround
         uint32 GetMinLevel() const          { return m_LevelMin; }
         uint32 GetMaxLevel() const          { return m_LevelMax; }
 
+        uint32 GetAllianceWinSpell() const  { return m_AllianceWinSpell; }
+        uint32 GetAllianceLoseSpell() const { return m_AllianceLoseSpell; }
+        uint32 GetHordeWinSpell() const     { return m_HordeWinSpell; }
+        uint32 GetHordeLoseSpell() const    { return m_HordeLoseSpell; }
+
         uint32 GetMaxPlayersPerTeam() const { return m_MaxPlayersPerTeam; }
         uint32 GetMinPlayersPerTeam() const { return m_MinPlayersPerTeam; }
 
@@ -311,17 +320,21 @@ class BattleGround
         uint32 GetBonusHonorFromKill(uint32 kills) const;
 
         // Set methods:
-        void SetName(char const* Name)      { m_Name = Name; }
-        void SetTypeID(BattleGroundTypeId TypeID) { m_TypeID = TypeID; }
-        void SetBracketId(BattleGroundBracketId ID) { m_BracketId = ID; }
-        void SetStatus(BattleGroundStatus Status) { m_Status = Status; }
-        void SetClientInstanceID(uint32 InstanceID) { m_ClientInstanceID = InstanceID; }
-        void SetStartTime(uint32 Time)      { m_StartTime = Time; }
-        void SetEndTime(uint32 Time)        { m_EndTime = Time; }
-        void SetMaxPlayers(uint32 MaxPlayers) { m_MaxPlayers = MaxPlayers; }
-        void SetMinPlayers(uint32 MinPlayers) { m_MinPlayers = MinPlayers; }
-        void SetLevelRange(uint32 min, uint32 max) { m_LevelMin = min; m_LevelMax = max; }
-        void SetWinner(uint8 winner)        { m_Winner = winner; }
+        void SetName(char const* Name)               { m_Name = Name; }
+        void SetTypeID(BattleGroundTypeId TypeID)    { m_TypeID = TypeID; }
+        void SetBracketId(BattleGroundBracketId ID)  { m_BracketId = ID; }
+        void SetStatus(BattleGroundStatus Status)    { m_Status = Status; }
+        void SetClientInstanceID(uint32 InstanceID)  { m_ClientInstanceID = InstanceID; }
+        void SetStartTime(uint32 Time)               { m_StartTime = Time; }
+        void SetEndTime(uint32 Time)                 { m_EndTime = Time; }
+        void SetMaxPlayers(uint32 MaxPlayers)        { m_MaxPlayers = MaxPlayers; }
+        void SetMinPlayers(uint32 MinPlayers)        { m_MinPlayers = MinPlayers; }
+        void SetAllianceWinSpell(uint32 WinSpell)    { m_AllianceWinSpell = WinSpell; }
+        void SetAllianceLoseSpell(uint32 LoseSpell)  { m_AllianceLoseSpell = LoseSpell; }
+        void SetHordeWinSpell(uint32 WinSpell)       { m_HordeWinSpell = WinSpell; }
+        void SetHordeLoseSpell(uint32 LoseSpell)     { m_HordeLoseSpell = LoseSpell; }
+        void SetLevelRange(uint32 min, uint32 max)   { m_LevelMin = min; m_LevelMax = max; }
+        void SetWinner(uint8 winner)                 { m_Winner = winner; }
 
         void ModifyStartDelayTime(int diff) { m_StartDelayTime -= diff; }
         void SetStartDelayTime(int Time)    { m_StartDelayTime = Time; }
@@ -573,6 +586,12 @@ class BattleGround
         uint32 m_MaxPlayers;
         uint32 m_MinPlayersPerTeam;
         uint32 m_MinPlayers;
+
+        // Spell that is cast on player at end of BG to grant him reward.
+        uint32 m_AllianceWinSpell;
+        uint32 m_AllianceLoseSpell;
+        uint32 m_HordeWinSpell;
+        uint32 m_HordeLoseSpell;
 
         /* Start location */
         uint32 m_MapId;

@@ -755,33 +755,17 @@ uint32 BattleGround::GetBattlemasterEntry() const
 
 void BattleGround::RewardMark(Player *plr, uint32 count)
 {
-    switch (GetTypeID())
-    {
-        case BATTLEGROUND_AV:
-            if (count == ITEM_WINNER_COUNT)
-                RewardSpellCast(plr, SPELL_AV_MARK_WINNER);
-            else
-                RewardSpellCast(plr, SPELL_AV_MARK_LOSER);
-            break;
-        case BATTLEGROUND_WS:
-            if (count == ITEM_WINNER_COUNT)
-                RewardSpellCast(plr, SPELL_WS_MARK_WINNER);
-            else
-                RewardSpellCast(plr, SPELL_WS_MARK_LOSER);
-            break;
-        case BATTLEGROUND_AB:
-            if (count == ITEM_WINNER_COUNT)
-                RewardSpellCast(plr, SPELL_AB_MARK_WINNER);
-            else
-                RewardSpellCast(plr, SPELL_AB_MARK_LOSER);
-            break;
-        default:
-            break;
-    }
+    if (count == ITEM_WINNER_COUNT)
+        RewardSpellCast(plr, plr->GetTeamId() ? GetHordeWinSpell() : GetAllianceWinSpell());
+    else
+        RewardSpellCast(plr, plr->GetTeamId() ? GetHordeLoseSpell() : GetAllianceLoseSpell());
 }
 
 void BattleGround::RewardSpellCast(Player *plr, uint32 spell_id)
 {
+    if (!spell_id)
+        return;
+
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
     if (!spellInfo)
     {
