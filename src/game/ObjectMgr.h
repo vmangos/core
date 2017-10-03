@@ -845,7 +845,7 @@ class ObjectMgr
         void FreeAuctionID(uint32 id);
         uint32 GenerateGuildId() { return m_GuildIds.Generate(); }
         uint32 GenerateGroupId() { return m_GroupIds.Generate(); }
-        uint32 GenerateItemTextID() { return m_ItemGuids.Generate(); }
+        uint32 GenerateItemTextID() { return m_ItemTextIds.Generate(); }
         uint32 GenerateMailID() { return m_MailIds.Generate(); }
         uint32 GeneratePetitionID() { return m_PetitionIds.Generate(); }
         uint32 GeneratePetNumber();
@@ -1222,7 +1222,6 @@ class ObjectMgr
 
         // first free id for selected id type
         IdGenerator<uint32> m_GuildIds;
-        IdGenerator<uint32> m_ItemTextIds;
         IdGenerator<uint32> m_MailIds;
         IdGenerator<uint32> m_GroupIds;
         IdGenerator<uint32> m_PetitionIds;
@@ -1241,6 +1240,7 @@ class ObjectMgr
         // first free low guid for selected guid type
         ObjectGuidGenerator<HIGHGUID_PLAYER>     m_CharGuids;
         ObjectSafeGuidGenerator<HIGHGUID_ITEM>   m_ItemGuids;   // Needs to be thread safe
+        ObjectSafeGuidGenerator<HIGHGUID_ITEM>   m_ItemTextIds;
         ObjectGuidGenerator<HIGHGUID_CORPSE>     m_CorpseGuids;
 
         QuestMap            mQuestTemplates;
