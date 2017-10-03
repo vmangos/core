@@ -129,7 +129,7 @@ void MasterPlayer::SaveMails()
                     stmt.PExecute(itr2->item_guid);
             }
 
-            if (m->itemTextId)
+            if (m->itemTextId && m->stationery != MAIL_STATIONERY_DEFAULT)
             {
                 SqlStatement stmt = CharacterDatabase.CreateStatement(deleteItemText, "DELETE FROM item_text WHERE id = ?");
                 stmt.PExecute(m->itemTextId);
