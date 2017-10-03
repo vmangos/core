@@ -681,6 +681,28 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
         forcedDespawn = (GetData(TYPE_KELTHUZAD) == DONE);
         break;
     }
+
+    // Something, probably silly, makes gothik respawn, thus the trash
+    // linked to him gets a chance to respawn as well. Force-despawning his
+    // trash like this as well to prevent that. There should be no deathknight captains,
+    // deathknight cavaliers or necro knights after gothik, so this works. 
+    // The hardcoded dbGUID is a lonely shade of naxxramas
+    if (GetData(TYPE_GOTHIK) == DONE)
+    {
+        uint32 e = pCreature->GetEntry();
+        if (e == NPC_UnholyAxe ||
+            e == NPC_UnholyStaff ||
+            e == NPC_UnholySwords ||
+            e == NPC_NecroKnight ||
+            e == NPC_DeathKnightCaptain ||
+            e == NPC_DeathKnightCavalier ||
+            pCreature->GetDBTableGUIDLow() == 88470)
+        {
+            forcedDespawn = true;
+        }
+        
+    }
+
     if (forcedDespawn)
     {
         pCreature->AddObjectToRemoveList();
