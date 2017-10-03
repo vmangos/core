@@ -125,7 +125,6 @@ ObjectMgr::ObjectMgr() :
     m_FirstTemporaryCreatureGuid(1),
     m_FirstTemporaryGameObjectGuid(1),
     m_GuildIds("Guild ids"),
-    m_ItemTextIds("Item text ids"),
     m_MailIds("Mail ids"),
     m_GroupIds("Group ids"),
     // Nostalrius
