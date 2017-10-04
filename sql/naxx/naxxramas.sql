@@ -9,14 +9,6 @@ CREATE TABLE `creature_linking` (
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature Linking System';
 
---
--- Dumping data for table `creature_linking`
---
-
-LOCK TABLES `creature_linking` WRITE;
-/*!40000 ALTER TABLE `creature_linking` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creature_linking` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `creature_linking_template`
@@ -32,15 +24,6 @@ CREATE TABLE `creature_linking_template` (
   PRIMARY KEY (`entry`,`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature Linking System';
 
---
--- Dumping data for table `creature_linking_template`
---
-
-LOCK TABLES `creature_linking_template` WRITE;
-/*!40000 ALTER TABLE `creature_linking_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creature_linking_template` ENABLE KEYS */;
-UNLOCK TABLES;
- 
 
 -- Removing all creatures, their groups and links and movement where the creature exists in naxx
 DELETE FROM creature_movement_template where entry in (select id from creature where map = 533);
