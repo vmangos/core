@@ -1,4 +1,0 @@
-INSERT INTO `migrations` VALUES ('20170929190759');
-
-ALTER TABLE `item_instance`
-	CHANGE COLUMN `text` `text` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `durability`;
