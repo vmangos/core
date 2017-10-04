@@ -1,6 +1,5 @@
 INSERT INTO `migrations` VALUES ('20170911123321');
 
-
 --
 -- Table structure for table `instance_buff_removal`
 --
@@ -15,18 +14,6 @@ CREATE TABLE `instance_buff_removal` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Aura removal on map entry';
 
 --
--- Dumping data for table `instance_buff_removal`
---
-
-LOCK TABLES `instance_buff_removal` WRITE;
-/*!40000 ALTER TABLE `instance_buff_removal` DISABLE KEYS */;
-/*!40000 ALTER TABLE `instance_buff_removal` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-
-
---
 -- Table structure for table `instance_creature_kills`
 --
 DROP TABLE IF EXISTS `instance_creature_kills`;
@@ -39,19 +26,7 @@ CREATE TABLE `instance_creature_kills` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
 
 --
--- Dumping data for table `instance_creature_kills`
---
-
-LOCK TABLES `instance_creature_kills` WRITE;
-/*!40000 ALTER TABLE `instance_creature_kills` DISABLE KEYS */;
-/*!40000 ALTER TABLE `instance_creature_kills` ENABLE KEYS */;
-UNLOCK TABLES;
-
-
-
-
---
--- Table structure for table `crea`
+-- Table structure for table `instance_wipes`
 --
 DROP TABLE IF EXISTS `instance_wipes`;
 CREATE TABLE `instance_wipes` (
@@ -62,16 +37,7 @@ CREATE TABLE `instance_wipes` (
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='players wiping against creatures statistics';
 
 --
--- Dumping data for table `instance_wipes`
---
-
-LOCK TABLES `instance_custom_counters` WRITE;
-/*!40000 ALTER TABLE `instance_custom_counters` DISABLE KEYS */;
-/*!40000 ALTER TABLE `instance_custom_counters` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
--- Table structure for table `crea`
+-- Table structure for table `instance_custom_counters`
 --
 DROP TABLE IF EXISTS `instance_custom_counters`;
 CREATE TABLE `instance_custom_counters` (
@@ -79,12 +45,3 @@ CREATE TABLE `instance_custom_counters` (
   `count` int(10) unsigned NOT NULL COMMENT 'counter',
   PRIMARY KEY (`index`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
-
---
--- Dumping data for table `instance_custom_counters`
---
-
-LOCK TABLES `instance_custom_counters` WRITE;
-/*!40000 ALTER TABLE `instance_custom_counters` DISABLE KEYS */;
-/*!40000 ALTER TABLE `instance_custom_counters` ENABLE KEYS */;
-UNLOCK TABLES;
