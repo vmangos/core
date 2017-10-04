@@ -39,15 +39,15 @@ class SqlStmtParameters;
 class SqlOperation
 {
     public:
-        SqlOperation(int id) : serialId(id) {}
-        SqlOperation() : serialId(-1) {}
-        int GetSerialId() const { return serialId; }
+        SqlOperation(uint32 id) : serialId(id) {}
+        SqlOperation() : serialId(0) {}
+        uint32 GetSerialId() const { return serialId; }
         virtual void OnRemove() { delete this; }
         virtual bool Execute(SqlConnection *conn) = 0;
         virtual ~SqlOperation() {}
 
     protected:
-        int serialId;
+        uint32 serialId;
 };
 
 /// ---- ASYNC STATEMENTS / TRANSACTIONS ----
@@ -68,7 +68,7 @@ class SqlTransaction : public SqlOperation
         std::vector<SqlOperation * > m_queue;
 
     public:
-        SqlTransaction(int serialId) : SqlOperation(serialId) {}
+        SqlTransaction(uint32 serialId) : SqlOperation(serialId) {}
         ~SqlTransaction();
 
         void DelayExecute(SqlOperation * sql)   {   m_queue.push_back(sql); }
@@ -128,10 +128,10 @@ class SqlQueryHolder
         typedef std::pair<const char*, QueryResult*> SqlResultPair;
         std::vector<SqlResultPair> m_queries;
 
-        int serialId;
+        uint32 serialId;
     public:
-        SqlQueryHolder(int id) : serialId(id) {}
-        SqlQueryHolder() : serialId(-1) {}
+        SqlQueryHolder(uint32 id) : serialId(id) {}
+        SqlQueryHolder() : serialId(0) {}
         virtual ~SqlQueryHolder();
         bool SetQuery(size_t index, const char *sql);
         bool SetPQuery(size_t index, const char *format, ...) ATTR_PRINTF(3,4);
@@ -140,7 +140,7 @@ class SqlQueryHolder
         void SetResult(size_t index, QueryResult *result);
         bool Execute(MaNGOS::IQueryCallback * callback, Database *db, SqlResultQueue *queue);
         void DeleteAllResults();
-        int GetSerialId() const { return serialId; }
+        uint32 GetSerialId() const { return serialId; }
 };
 
 class SqlQueryHolderEx : public SqlOperation
@@ -150,7 +150,7 @@ class SqlQueryHolderEx : public SqlOperation
         MaNGOS::IQueryCallback * m_callback;
         SqlResultQueue * m_queue;
     public:
-        SqlQueryHolderEx(SqlQueryHolder *holder, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue, int id)
+        SqlQueryHolderEx(SqlQueryHolder *holder, MaNGOS::IQueryCallback * callback, SqlResultQueue * queue, uint32 id)
             : SqlOperation(id), m_holder(holder), m_callback(callback), m_queue(queue) {}
         bool Execute(SqlConnection *conn);
 };

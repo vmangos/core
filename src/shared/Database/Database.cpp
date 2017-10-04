@@ -460,7 +460,7 @@ bool Database::DirectPExecute(const char * format,...)
     return DirectExecute(szQuery);
 }
 
-bool Database::BeginTransaction(int serialId)
+bool Database::BeginTransaction(uint32 serialId)
 {
     if (!m_pAsyncConn)
         return false;
@@ -471,6 +471,19 @@ bool Database::BeginTransaction(int serialId)
     //initiate transaction on current thread
     m_TransStorage->init(serialId);
     return true;
+}
+
+bool Database::InTransaction()
+{
+    return m_TransStorage->get() != NULL;
+}
+
+uint32 Database::GetTransactionSerialId()
+{
+    if (SqlTransaction *trans = m_TransStorage->get())
+        return trans->GetSerialId();
+
+    return 0;
 }
 
 bool Database::CommitTransaction()
@@ -490,7 +503,7 @@ bool Database::CommitTransaction()
     //add SqlTransaction to the async queue
     // if serial ID > 0, add to the serial delay queue
     SqlTransaction *trans = m_TransStorage->detach();
-    if (trans->GetSerialId() >= 0)
+    if (trans->GetSerialId() > 0)
         AddToSerialDelayQueue(trans);
     else
         AddToDelayQueue(trans);
@@ -529,7 +542,7 @@ bool Database::RollbackTransaction()
 
 void Database::AddToSerialDelayQueue(SqlOperation *op)
 {
-    if (op->GetSerialId() < 0 || m_numAsyncWorkers == 0)
+    if (op->GetSerialId() == 0 || m_numAsyncWorkers == 0)
     {
         AddToDelayQueue(op);
         return;
@@ -702,7 +715,7 @@ Database::TransHelper::~TransHelper()
     reset();
 }
 
-SqlTransaction * Database::TransHelper::init(int serialId)
+SqlTransaction * Database::TransHelper::init(uint32 serialId)
 {
     MANGOS_ASSERT(!m_pTrans);   //if we will get a nested transaction request - we MUST fix code!!!
     m_pTrans = new SqlTransaction(serialId);

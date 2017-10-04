@@ -209,7 +209,9 @@ class MANGOS_DLL_SPEC Database
         // Writes SQL commands to a LOG file (see mangosd.conf "LogSQL")
         bool PExecuteLog(const char *format,...) ATTR_PRINTF(2,3);
 
-        bool BeginTransaction(int serialId = -1);
+        bool BeginTransaction(uint32 serialId = 0);
+        bool InTransaction();
+        uint32 GetTransactionSerialId();
         bool CommitTransaction();
         bool RollbackTransaction();
         //for sync transaction execution
@@ -275,7 +277,7 @@ class MANGOS_DLL_SPEC Database
                 ~TransHelper();
 
                 //initializes new SqlTransaction object
-                SqlTransaction * init(int serialId);
+                SqlTransaction * init(uint32 serialId);
                 //gets pointer on current transaction object. Returns NULL if transaction was not initiated
                 SqlTransaction * get() const { return m_pTrans; }
                 //detaches SqlTransaction object allocated by init() function
