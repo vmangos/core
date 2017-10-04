@@ -93,7 +93,7 @@ void Channel::Join(ObjectGuid p, const char *pass)
         return;
     }
 
-    if (m_password.length() > 0 && strcmp(pass, m_password.c_str()))
+    if (m_password.length() > 0 && strcmp(pass, m_password.c_str()) != 0)
     {
         MakeWrongPassword(&data);
         SendToOne(&data, p);

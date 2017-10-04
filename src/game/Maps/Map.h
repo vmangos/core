@@ -467,8 +467,6 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         std::unique_ptr<ThreadPool> m_motionThreads;
         std::unique_ptr<ThreadPool> m_visibilityThreads;
         std::unique_ptr<ThreadPool> m_cellThreads;
-        
-        uint32 m_diffBuffer;
     protected:
         MapEntry const* i_mapEntry;
         uint32 i_id;

@@ -75,6 +75,7 @@ struct boss_theolenkrastinovAI : public ScriptedAI
         if (m_uiBackhand_Timer < uiDiff)
         {
             DoCastSpellIfCan(m_creature->getVictim(), SPELL_BACKHAND);
+            DoModifyThreatPercent(m_creature->getVictim(), -100);
             m_uiBackhand_Timer = 10000;
         }
         else

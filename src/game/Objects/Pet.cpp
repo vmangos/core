@@ -330,7 +330,9 @@ bool Pet::LoadPetFromDB(Player* owner, uint32 petentry, uint32 petnumber, bool c
         Tokens tokens = StrSplit(m_pTmpCache->TeachSpelldata, " ");
         Tokens::const_iterator iter;
         int index;
-        for (iter = tokens.begin(), index = 0; index < 4; ++iter, ++index)
+        // Spells are in pairs. First is the ability, second is what teaches it to the hunter
+        // Pets can have a max of 4 spells.
+        for (iter = tokens.begin(), index = 0; index < 4 && iter != tokens.end(); ++iter, ++index)
         {
             uint32 tmp = atol((*iter).c_str());
 
@@ -464,6 +466,11 @@ void Pet::SavePetToDB(PetSaveMode mode)
             // for warlock case
             mode = PET_SAVE_NOT_IN_SLOT;
         }
+
+        // pet is dead so it doesn't have to be shown at character login
+        if (mode == PET_SAVE_AS_CURRENT && !isAlive())
+            mode = PET_SAVE_NOT_IN_SLOT;
+
         // On recup l'info dans le cache
         uint32 ownerLow = GetOwnerGuid().GetCounter();
         m_pTmpCache = sCharacterDatabaseCache.GetCharacterPetCacheByOwnerAndId(ownerLow, m_charmInfo->GetPetNumber());
@@ -475,7 +482,8 @@ void Pet::SavePetToDB(PetSaveMode mode)
         uint32 curmana = GetPower(POWER_MANA);
 
         // stable and not in slot saves
-        if (mode != PET_SAVE_AS_CURRENT)
+        if ( (mode != PET_SAVE_AS_CURRENT && getPetType() != HUNTER_PET) ||
+              mode == PET_SAVE_FIRST_STABLE_SLOT || mode == PET_SAVE_LAST_STABLE_SLOT )
             RemoveAllAuras();
 
         //save pet's data as one single transaction
@@ -1715,7 +1723,10 @@ void Pet::_LoadAuras(uint32 timediff)
             }
 
             if (!holder->IsEmptyHolder())
-                AddSpellAuraHolder(holder);
+            {
+                if (!AddSpellAuraHolder(holder))
+                    holder = nullptr;
+            }
             else
                 delete holder;
         }

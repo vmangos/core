@@ -562,6 +562,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         CreatureAI* AI() { return i_AI; }
         CreatureAI const* AI() const { return i_AI; }
+        void SetAInitializeOnRespawn(bool initialize) { m_AI_InitializeOnRespawn = initialize; }
 
         uint32 GetShieldBlockValue() const override
         {
@@ -693,7 +694,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SendZoneUnderAttackMessage(Player* attacker);
 
-        void SetInCombatWithZone();
+        void SetInCombatWithZone(bool initialPulse = true);
         bool canStartAttack(Unit const* who, bool force) const;
         Unit *SelectVictim();
         bool _IsTargetAcceptable(Unit const *target) const;
@@ -703,6 +704,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         time_t GetCombatTime(bool total) const;
         void ResetCombatTime(bool combat = false);
         void UpdateCombatState(bool combat) { m_combatState = combat; }
+        void UpdateCombatWithZoneState(bool combat) { m_combatWithZoneState = combat; }
         void LogDeath(Unit* pKiller) const;
         void LogLongCombat() const;
         void LogScriptInfo(std::ostringstream &data) const;
@@ -842,10 +844,12 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
         float m_respawnradius;
+        uint32 m_combatPulseTimer;
 
         time_t m_combatStartTime;
         bool m_combatState;
         uint32 m_combatResetCount;
+        bool m_combatWithZoneState;                         // for raid bosses that set the entire raid in combat
 
         CreatureSubtype m_subtype;                          // set in Creatures subclasses for fast it detect without dynamic_cast use
         MovementGeneratorType m_defaultMovementType;
@@ -857,6 +861,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool m_AlreadySearchedAssistance;
         bool m_regenHealth;
         bool m_AI_locked;
+        bool m_AI_InitializeOnRespawn;
         bool m_isDeadByDefault;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)
 

@@ -473,26 +473,32 @@ void npc_doctorAI::PatientDied(Location* Point)
 {
     Player* pPlayer = (m_creature->GetMap()->GetPlayer(Playerguid));
 
-    if (pPlayer && ((pPlayer->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (pPlayer->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE)))
+    if (pPlayer)
     {
-        ++PatientDiedCount;
-
-        if (PatientDiedCount > 5 && Event)
+        if ((pPlayer->GetQuestStatus(6624) == QUEST_STATUS_INCOMPLETE) || (pPlayer->GetQuestStatus(6622) == QUEST_STATUS_INCOMPLETE))
         {
-            if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->FailQuest(QUEST_TRIAGE_A);
-            else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
-                pPlayer->FailQuest(QUEST_TRIAGE_H);
+            ++PatientDiedCount;
 
-            Reset();
-            return;
+            if (PatientDiedCount > 5 && Event)
+            {
+                if (pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->FailQuest(QUEST_TRIAGE_A);
+                else if (pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_INCOMPLETE)
+                    pPlayer->FailQuest(QUEST_TRIAGE_H);
+                pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);                
+                Reset();
+                return;
+            }
+
+            Coordinates.push_back(Point);
         }
-
-        Coordinates.push_back(Point);
+        else
+        {
+            // If no player or player abandon quest in progress
+            pPlayer->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);        
+            Reset();
+        }
     }
-    else
-        // If no player or player abandon quest in progress
-        Reset();
 }
 
 void npc_doctorAI::PatientSaved(Creature* soldier, Player* pPlayer, Location* Point)
@@ -1239,10 +1245,15 @@ CreatureAI* GetAI_rat_des_profondeurs(Creature* pCreature)
 ## npc_felhound_minion
 ######*/
 
-struct npc_felhound_minionAI : public ScriptedAI
+struct npc_felhound_minionAI : public ScriptedPetAI
 {
-    npc_felhound_minionAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_felhound_minionAI(Creature* pCreature) : ScriptedPetAI(pCreature)
     {
+        m_creature->SetCanModifyStats(true);
+
+        if (m_creature->GetCharmInfo())
+            m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
+
         Reset();
     }
 
@@ -1260,14 +1271,15 @@ struct npc_felhound_minionAI : public ScriptedAI
 
         if (m_uiManaBurnTimer < uiDiff)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), 15980);
+            if (m_creature->getVictim()->getPowerType() == POWER_MANA)
+                DoCastSpellIfCan(m_creature->getVictim(), 15980);
             m_uiManaBurnTimer = urand(9800, 15200);
             return;
         }
         else
             m_uiManaBurnTimer -= uiDiff;
 
-        DoMeleeAttackIfReady();
+        ScriptedPetAI::UpdatePetAI(uiDiff);
     }
 };
 
@@ -1883,19 +1895,20 @@ CreatureAI* GetAI_npc_firestarter_regular(Creature* pCreature)
 }
 
 /*
- * Eye of Kilrogg
+ * Summon possessed mobs
  */
 
 enum
 {
-    SPELL_SUMMON_EYE_OF_KILROGG     = 126
+    SPELL_SUMMON_EYE_OF_KILROGG     = 126,
+    SPELL_SUMMON_DREAM_VISION       = 11403
 };
 
-struct npc_eye_of_kilroggAI : ScriptedAI
+struct npc_summon_possessedAI : ScriptedAI
 {
-    explicit npc_eye_of_kilroggAI(Creature* pCreature) : ScriptedAI(pCreature)
+    explicit npc_summon_possessedAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        npc_eye_of_kilroggAI::Reset();
+        npc_summon_possessedAI::Reset();
     }
 
     void Reset() override
@@ -1908,16 +1921,19 @@ struct npc_eye_of_kilroggAI : ScriptedAI
         if (auto pOwner = m_creature->GetOwner())
         {
             if (auto pPlayer = pOwner->ToPlayer())
+            {
                 pPlayer->RemoveAurasDueToSpell(SPELL_SUMMON_EYE_OF_KILROGG);
+                pPlayer->RemoveAurasDueToSpell(SPELL_SUMMON_DREAM_VISION);
+            } 
         }
 
         ScriptedAI::JustDied(pKiller);
     }
 };
 
-CreatureAI* GetAI_npc_eye_of_kilrogg(Creature* pCreature)
+CreatureAI* GetAI_npc_summon_possessed(Creature* pCreature)
 {
-    return new npc_eye_of_kilroggAI(pCreature);
+    return new npc_summon_possessedAI(pCreature);
 }
 
 /*
@@ -2801,8 +2817,8 @@ void AddSC_npcs_special()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_eye_of_kilrogg";
-    newscript->GetAI = &GetAI_npc_eye_of_kilrogg;
+    newscript->Name = "npc_summon_possessed";
+    newscript->GetAI = &GetAI_npc_summon_possessed;
     newscript->RegisterSelf();
 
     newscript = new Script;

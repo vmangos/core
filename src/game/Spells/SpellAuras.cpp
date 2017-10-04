@@ -655,9 +655,11 @@ void AreaAura::Update(uint32 diff)
                 // false if an area aura of the same spellid exists on the target
                 bool apply = true;
 
+                Unit *target = *tIter;
+
                 // we need to ignore present caster self applied area auras sometimes
                 // in cases where this is the only aura applied for this spell effect
-                Unit::SpellAuraHolderBounds spair = (*tIter)->GetSpellAuraHolderBounds(GetId());
+                Unit::SpellAuraHolderBounds spair = target->GetSpellAuraHolderBounds(GetId());
                 for (Unit::SpellAuraHolderMap::const_iterator i = spair.first; i != spair.second; ++i)
                 {
                     if (i->second->IsDeleted())
@@ -687,26 +689,26 @@ void AreaAura::Update(uint32 diff)
                     continue;
 
                 // Skip some targets (TODO: Might require better checks, also unclear how the actual caster must/can be handled)
-                if (GetSpellProto()->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && (*tIter)->GetTypeId() != TYPEID_PLAYER)
+                if (GetSpellProto()->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER)
                     continue;
 
-                if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), (*tIter)->getLevel()))
+                if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(GetSpellProto(), target->getLevel()))
                 {
                     int32 actualBasePoints = m_currentBasePoints;
                     // recalculate basepoints for lower rank (all AreaAura spell not use custom basepoints?)
                     if (actualSpellInfo != GetSpellProto())
                         actualBasePoints = actualSpellInfo->CalculateSimpleValue(m_effIndex);
 
-                    SpellAuraHolder *holder = (*tIter)->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
+                    SpellAuraHolder *holder = target->GetSpellAuraHolder(actualSpellInfo->Id, GetCasterGuid());
 
                     bool addedToExisting = true;
                     if (!holder)
                     {
-                        holder = CreateSpellAuraHolder(actualSpellInfo, (*tIter), caster);
+                        holder = CreateSpellAuraHolder(actualSpellInfo, target, caster);
                         addedToExisting = false;
                     }
 
-                    AreaAura *aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, holder, (*tIter), caster, nullptr);
+                    AreaAura *aur = new AreaAura(actualSpellInfo, m_effIndex, &actualBasePoints, holder, target, caster, nullptr);
                     holder->AddAura(aur, m_effIndex);
 
                     if (!holder->IsPassive() && !holder->IsPermanent())
@@ -721,18 +723,18 @@ void AreaAura::Update(uint32 diff)
 
                     if (addedToExisting)
                     {
-                        (*tIter)->AddAuraToModList(aur);
+                        target->AddAuraToModList(aur);
                         holder->SetInUse(true);
                         aur->ApplyModifier(true, true);
                         holder->SetInUse(false);
                     }
-                    else
-                        (*tIter)->AddSpellAuraHolder(holder);
+                    else if (!target->AddSpellAuraHolder(holder))
+                        holder = nullptr;
 
-                    DEBUG_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), (*tIter)->GetName());
+                    DETAIL_LOG("Added aura %u to holder for spell %u on %s", m_effIndex, GetId(), target->GetName());
 
                     // Add holder to spell if it's channeled so the updates are synced
-                    if (IsChanneled() && !addedToExisting)
+                    if (holder && IsChanneled() && !addedToExisting)
                     {
                         if (Spell *spell = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
                         {
@@ -1443,7 +1445,7 @@ void Aura::TriggerSpell()
                 if (!caster)
                     return;
                 // Pour le talent hunt 'Piege' par exemple (chances de stun)
-                caster->ProcDamageAndSpell(target, (PROC_FLAG_ON_TRAP_ACTIVATION | PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT | PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT), PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto());
+                caster->ProcDamageAndSpell(target, (PROC_FLAG_ON_TRAP_ACTIVATION | PROC_FLAG_SUCCESSFUL_AOE), PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto());
                 return;
             }
         }
@@ -1661,6 +1663,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 return;
             }
+            case 11403: // Dream Vision
+                if (Unit* caster = GetCaster())
+                    if (Player* casterPlayer = caster->ToPlayer())
+                        if (Pet* guardian = caster->FindGuardianWithEntry(7863))
+                        {
+                            casterPlayer->ModPossessPet(guardian, false, AURA_REMOVE_BY_DEFAULT);
+                            guardian->DisappearAndDie();
+                        }
+                return;
             case 11826:
                 if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
                     return;
@@ -3667,8 +3678,9 @@ void Aura::HandleAuraModSchoolImmunity(bool apply, bool Real)
     target->ApplySpellImmune(GetId(), IMMUNITY_SCHOOL, m_modifier.m_miscvalue, apply);
 
     // remove all flag auras (they are positive, but they must be removed when you are immune)
-    if (GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY
-            && GetSpellProto()->AttributesEx2 & SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD)
+    if (apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY
+              && GetSpellProto()->AttributesEx2 & SPELL_ATTR_EX2_DAMAGE_REDUCED_SHIELD
+              && target->IsPlayer() && !target->isCharmed())
         target->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION);
 
     // TODO: optimalize this cycle - use RemoveAurasWithInterruptFlags call or something else
@@ -5113,8 +5125,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             pCaster->DealDamageMods(target, pdamage, &absorb);
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC | GetHolder()->spellFirstHitAttackerProcFlags;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC | GetHolder()->spellFirstHitTargetProcFlags;
+            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
             pdamage = (pdamage <= absorb + resist) ? 0 : (pdamage - absorb - resist);
 
             SpellPeriodicAuraLogInfo pInfo(this, pdamage, absorb, resist, 0.0f);
@@ -5186,8 +5198,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             float multiplier = spellProto->EffectMultipleValue[GetEffIndex()] > 0 ? spellProto->EffectMultipleValue[GetEffIndex()] : 1;
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC | GetHolder()->spellFirstHitAttackerProcFlags;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC | GetHolder()->spellFirstHitTargetProcFlags;
+            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
 
             pdamage = (pdamage <= absorb + resist) ? 0 : (pdamage - absorb - resist);
             if (pdamage)
@@ -5227,7 +5239,17 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             // Don't heal target if it is already at max health
             if (target->GetHealth() == target->GetMaxHealth())
+            {
+                // Trigger Improved Mend Pet even if health is full
+                if (spellProto->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_MEND_PET>())
+                {
+                    uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+                    uint32 procVictim = PROC_FLAG_ON_TAKE_PERIODIC;
+                    uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
+                    pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto);
+                }
                 return;
+            }
 
             // heal for caster damage (must be alive)
             if (target != pCaster && spellProto->SpellVisual == 163 && !pCaster->isAlive())
@@ -5253,13 +5275,13 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             target->SendPeriodicAuraLog(&pInfo);
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC | GetHolder()->spellFirstHitAttackerProcFlags;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC | GetHolder()->spellFirstHitTargetProcFlags;
+            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
             uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
             pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto);
 
             // Grande tenue de marchereve (Druide T3)
-            if (spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION>())
+            if (spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION, CF_DRUID_REGROWTH>())
             {
                 Unit::AuraList const& auraClassScripts = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
                 for (Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
@@ -5267,7 +5289,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                     uint32 triggered_spell_id = 0;
 
                     // Aura giving mana / health at recuperation tick
-                    if ((*itr)->GetModifier()->m_miscvalue == 4533 && roll_chance_i(50))
+                    if ((*itr)->GetModifier()->m_miscvalue == 4533 && spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION>() && roll_chance_i(50))
                     {
                         switch (target->getPowerType())
                         {
@@ -5282,7 +5304,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                                 break;
                         }
                     }
-                    else if ((*itr)->GetModifier()->m_miscvalue == 4537)
+                    else if ((*itr)->GetModifier()->m_miscvalue == 4537 && spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REGROWTH>())
                         triggered_spell_id = 28750;
                     if (triggered_spell_id)
                         pCaster->CastSpell(target, triggered_spell_id, true);
@@ -5493,8 +5515,8 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             pCaster->SendSpellNonMeleeDamageLog(&damageInfo);
 
             // Set trigger flag
-            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC | GetHolder()->spellFirstHitAttackerProcFlags;
-            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC | GetHolder()->spellFirstHitTargetProcFlags;
+            uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+            uint32 procVictim   = PROC_FLAG_ON_TAKE_PERIODIC;
             uint32 procEx       = createProcExtendMask(&damageInfo, SPELL_MISS_NONE);
             if (damageInfo.damage)
                 procVictim |= PROC_FLAG_TAKEN_ANY_DAMAGE;
@@ -5560,9 +5582,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
         default:
             break;
     }
-    // First tick is done now.
-    GetHolder()->spellFirstHitAttackerProcFlags = 0;
-    GetHolder()->spellFirstHitTargetProcFlags = 0;
 }
 
 void Aura::PeriodicDummyTick()
@@ -5679,7 +5698,7 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, Wor
     m_stackAmount(1), m_removeMode(AURA_REMOVE_BY_DEFAULT), m_AuraDRGroup(DIMINISHING_NONE), m_timeCla(1000),
     m_permanent(false), m_isRemovedOnShapeLost(true), m_deleted(false), m_in_use(0),
     m_debuffLimitAffected(false), m_debuffLimitScore(0), _heartBeatRandValue(0), _pveHeartBeatData(nullptr),
-    spellFirstHitAttackerProcFlags(0), spellFirstHitTargetProcFlags(0), m_spellTriggered(false)
+    m_spellTriggered(false), m_AuraDRLevel(DIMINISHING_LEVEL_1)
 {
     MANGOS_ASSERT(target);
     MANGOS_ASSERT(spellproto && spellproto == sSpellMgr.GetSpellEntry(spellproto->Id) && "`info` must be pointer to sSpellStore element");
@@ -6248,10 +6267,13 @@ void SpellAuraHolder::Update(uint32 diff)
     // PvP
     if (_heartBeatRandValue)
     {
+        float diminishRate = GetDiminishingRate(m_AuraDRLevel);
         float elapsedTime = (m_maxDuration - m_duration) / 1000.0f;
-        static const float averageBreakTime = 12.0f; // 50% chance to break after 12 secs
-        static const float chanceBreakAt15 = 1.0f; // 1% break > 15 secs. Patch 1.2: "Players now have an increasing chance to break free of the effect, such that it is unlikely the effect will last more than 15 seconds."
-        static const float coeff = (1.0f / (15 - averageBreakTime)) * log((100 - chanceBreakAt15) / chanceBreakAt15);
+        float averageBreakTime = 12.0f * diminishRate; // 50% chance to break after 12 secs
+        float maxBreakTime = 15.0f * diminishRate;
+        static const float chanceBreakAtMax = 1.0f; // 1% break > 15 secs. Patch 1.2: "Players now have an increasing chance to break free of the effect, such that it is unlikely the effect will last more than 15 seconds."
+        static const float chanceBreakAtMaxLog = log((100 - chanceBreakAtMax) / chanceBreakAtMax);
+        float coeff = (1.0f / (maxBreakTime - averageBreakTime)) * chanceBreakAtMaxLog;
         float currHeartBeatValue = 100.0f / (1.0f + exp(coeff * (averageBreakTime - elapsedTime)));
         DEBUG_UNIT(GetTarget(), DEBUG_DR, "|HB Duration [Curr%.2f|Max%u]. Value[Curr%.2f|Limit%.2f]",
                            elapsedTime, m_maxDuration / 1000, currHeartBeatValue, _heartBeatRandValue);
@@ -6559,7 +6581,6 @@ void SpellAuraHolder::CalculateForDebuffLimit()
     m_debuffLimitAffected = true;
     m_debuffLimitScore = 0;
 
-
     // First, some exceptions
     switch (m_spellProto->SpellFamilyName)
     {
@@ -6746,6 +6767,12 @@ void Aura::CalculatePeriodic(Player * modOwner, bool create)
 // Battements de coeur (chance de briser les CC)
 void SpellAuraHolder::CalculateHeartBeat(Unit* caster, Unit* target)
 {
+    if (_pveHeartBeatData)
+    {
+        delete _pveHeartBeatData;
+        _pveHeartBeatData = nullptr;
+    }
+
     _heartBeatRandValue = 0;
 
     // Ni les sorts permanents, ni les sorts positifs ne sont affectes.

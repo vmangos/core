@@ -162,7 +162,11 @@ void BattleGroundWS::RespawnFlagAfterDrop(Team team)
         sLog.outError("Unknown dropped flag bg: %s", GetDroppedFlagGuid(team).GetString().c_str());
 
     ClearDroppedFlagGuid(team);
+    ForceFlagAreaTrigger(team);
+}
 
+void BattleGroundWS::ForceFlagAreaTrigger(Team team)
+{
     // Is the opposite flag carrier at flag spawn position ?
     Player* oppositeFlagKeeper = GetBgMap()->GetPlayer(team == ALLIANCE ? m_FlagKeepers[BG_TEAM_HORDE] : m_FlagKeepers[BG_TEAM_ALLIANCE]);
     AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(team == ALLIANCE ? AREATRIGGER_ALLIANCE_FLAG_SPAWN : AREATRIGGER_HORDE_FLAG_SPAWN);
@@ -375,6 +379,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
             RespawnFlag(ALLIANCE, false);
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
             UpdatePlayerScore(Source, SCORE_FLAG_RETURNS, 1);
+            ForceFlagAreaTrigger(ALLIANCE);
         }
         else
         {
@@ -405,6 +410,7 @@ void BattleGroundWS::EventPlayerClickedOnFlag(Player *Source, GameObject* target
             RespawnFlag(HORDE, false);
             PlaySoundToAll(BG_WS_SOUND_FLAG_RETURNED);
             UpdatePlayerScore(Source, SCORE_FLAG_RETURNS, 1);
+            ForceFlagAreaTrigger(HORDE);
         }
         else
         {

@@ -316,6 +316,7 @@ void TradeData::FillTransactionLog(TransactionPart& log) const
         {
             log.itemsCount[i] = item->GetCount();
             log.itemsEntries[i] = item->GetEntry();
+            log.itemsGuid[i] = item->GetGUIDLow();
         }
     }
 }
@@ -1205,10 +1206,11 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         UpdateMeleeAttackingState();
 
         Unit *pVictim = getVictim();
-        if (pVictim && !IsNonMeleeSpellCasted(false))
+        if (pVictim && !IsNonMeleeSpellCasted(false) && CanReachWithMeleeAttack(pVictim))
         {
             Player *vOwner = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if (vOwner && vOwner->IsPvP() && !IsInDuelWith(vOwner))
+            if ((vOwner && vOwner->IsPvP() && !IsInDuelWith(vOwner)) ||  // PvP flagged players
+                (pVictim->IsCreature() && pVictim->IsPvP()))             // PvP flagged creatures
             {
                 UpdatePvP(true);
                 RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -1225,7 +1227,7 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             {
                 float bubble = 0.125f * sWorld.getConfig(CONFIG_FLOAT_RATE_REST_INGAME);
                 //speed collect rest bonus (section/in hour)
-                SetRestBonus(float(GetRestBonus() + time_inn * (GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 72000)*bubble));
+                SetRestBonus(GetRestBonus() + time_inn * ((float)GetUInt32Value(PLAYER_NEXT_LEVEL_XP) / 72000)*bubble);
                 UpdateInnerTime(time(NULL));
             }
         }
@@ -2083,6 +2085,9 @@ void Player::restorePendingTeleport()
 
 bool Player::TeleportToBGEntryPoint()
 {
+    if (m_bgData.joinPos.coord_x == 0.0f && m_bgData.joinPos.coord_y == 0.0f && m_bgData.joinPos.coord_z == 0.0f)
+        m_bgData.joinPos = WorldLocation(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, 0.0f);
+
     return TeleportTo(m_bgData.joinPos);
 }
 
@@ -4385,6 +4390,9 @@ void Player::BuildPlayerRepop()
 
 void Player::ResurrectPlayer(float restore_percent, bool applySickness)
 {
+    // Interrupt resurrect spells
+    InterruptSpellsCastedOnMe(false, true);
+
     // remove death flag + set aura
     SetByteValue(UNIT_FIELD_BYTES_1, 3, 0x00);
 
@@ -4747,6 +4755,9 @@ void Player::RepopAtGraveyard()
     }
     else
         ClosestGrave = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
+
+    // Interrupt resurrect spells
+    InterruptSpellsCastedOnMe(false, true);
 
     // stop countdown until repop
     m_deathTimer = 0;
@@ -6114,7 +6125,7 @@ void Player::RewardReputation(Unit *pVictim, float rate)
         {
             FactionEntry const *team1_factionEntry = sFactionStore.LookupEntry(factionEntry1->team);
             if (team1_factionEntry)
-                GetReputationMgr().ModifyReputation(team1_factionEntry, donerep1 / 2);
+                GetReputationMgr().ModifyReputation(team1_factionEntry, donerep1 / 2, true);
         }
     }
 
@@ -6132,7 +6143,7 @@ void Player::RewardReputation(Unit *pVictim, float rate)
         {
             FactionEntry const *team2_factionEntry = sFactionStore.LookupEntry(factionEntry2->team);
             if (team2_factionEntry)
-                GetReputationMgr().ModifyReputation(team2_factionEntry, donerep2 / 2);
+                GetReputationMgr().ModifyReputation(team2_factionEntry, donerep2 / 2, true);
         }
     }
 }
@@ -6340,7 +6351,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
 
     if (pvpInfo.inHostileArea)                              // in hostile area
     {
-        if (!IsPvP() || pvpInfo.endTimer != 0)
+        if ((!IsPvP() && !IsTaxiFlying()) || pvpInfo.endTimer != 0)
             UpdatePvP(true, true);
     }
     else                                                    // in friendly area
@@ -12084,23 +12095,17 @@ void Player::SendPreparedQuest(ObjectGuid guid)
         // need pet case for some quests
         if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
         {
-            uint32 textid = GetGossipTextId(pCreature);
+            uint32 textid = sObjectMgr.GetNpcGossip(pCreature->GetGUIDLow());
 
             GossipText const* gossiptext = sObjectMgr.GetGossipText(textid);
-            if (!gossiptext)
-            {
-                qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
-                qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
-                title = "";
-            }
-            else
+            if (gossiptext)
             {
                 qe = gossiptext->Options[0].Emotes[0];
 
                 if (!gossiptext->Options[0].Text_0.empty())
                 {
                     title = gossiptext->Options[0].Text_0;
-
+                    
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                     {
@@ -12115,7 +12120,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
                 else
                 {
                     title = gossiptext->Options[0].Text_1;
-
+                    
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                     {
@@ -12422,9 +12427,10 @@ uint32 Player::CountFreeInventorySlots() const
             ++freeSlots;
     for (int i = INVENTORY_SLOT_BAG_START; i < INVENTORY_SLOT_BAG_END; ++i)
         if (Bag* pBag = (Bag*)GetItemByPos(INVENTORY_SLOT_BAG_0, i))
-            for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
-                if (!GetItemByPos(i, j))
-                    ++freeSlots;
+            if (pBag->GetProto()->Class == ITEM_CLASS_CONTAINER && pBag->GetProto()->SubClass == ITEM_SUBCLASS_CONTAINER)
+                for (uint32 j = 0; j < pBag->GetBagSize(); ++j)
+                    if (!GetItemByPos(i, j))
+                        ++freeSlots;
     return freeSlots;
 }
 
@@ -12480,6 +12486,10 @@ void Player::AddQuest(Quest const *pQuest, Object *questGiver)
     }
     else
         questStatusData.m_timer = 0;
+
+    // Set PvP flag for PvP quests
+    if (pQuest->GetType() == QUEST_TYPE_PVP)
+        UpdatePvP(true, true);
 
     SetQuestSlot(log_slot, quest_id, qtime);
 
@@ -14738,6 +14748,9 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
 
     if (s.remaintime != -1 && !IsPositiveSpell(spellproto))
     {
+        if (timediff > (INT_MAX / IN_MILLISECONDS))
+            return;
+
         if (s.remaintime <= int32(timediff) * IN_MILLISECONDS)
             return;
 
@@ -14777,7 +14790,8 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
         if (s.caster_guid != GetObjectGuid() && holder->IsSingleTarget())
             holder->SetIsSingleTarget(false);
 
-        AddSpellAuraHolder(holder);
+        if (!AddSpellAuraHolder(holder))
+            holder = nullptr;
         DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
     }
     else
@@ -14822,10 +14836,10 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
         do
         {
             Field *fields = result->Fetch();
-            uint32 bag_guid  = fields[10].GetUInt32();
-            uint8  slot      = fields[11].GetUInt8();
+            uint32 bag_guid     = fields[10].GetUInt32();
+            uint8  slot         = fields[11].GetUInt8();
             uint32 item_lowguid = fields[12].GetUInt32();
-            uint32 item_id   = fields[13].GetUInt32();
+            uint32 item_id      = fields[13].GetUInt32();
 
             ItemPrototype const * proto = ObjectMgr::GetItemPrototype(item_id);
 
@@ -14834,6 +14848,18 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_lowguid);
                 CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_lowguid);
                 sLog.outError("Player::_LoadInventory: Player %s has an unknown item (id: #%u) in inventory, deleted.", GetName(), item_id);
+                continue;
+            }
+
+            // Duplicate check. Player listed item in AH and then immediately relogged, before the item
+            // was deleted from the inventory in the DB
+            if (Item *item = sAuctionMgr.GetAItem(item_lowguid))
+            {
+                std::stringstream oss;
+                oss << "Duplicate item (via AH) " << item_id << " GUID:" << item_lowguid << ", count: " << item->GetCount() << ", bag: " << bag_guid << ", slot: " << uint32(slot);
+                CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_lowguid);
+                GetSession()->ProcessAnticheatAction("ItemCheck", oss.str().c_str(), CHEAT_ACTION_LOG);
+                DETAIL_LOG(oss.str().c_str());
                 continue;
             }
 
@@ -14858,7 +14884,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             if (itemGuids.find(item_lowguid) != itemGuids.end())
             {
                 std::stringstream oss;
-                oss << "Duplicate item " << item->GetEntry() << " GUID:" << item->GetGUIDLow() << " count:" << item->GetCount() << " bag:" << bag_guid << " slot:" << uint32(slot);
+                oss << "Duplicate item " << item_id << " GUID:" << item_lowguid << ", count: " << item->GetCount() << ", bag: " << bag_guid << ", slot: " << uint32(slot);
                 GetSession()->ProcessAnticheatAction("ItemCheck", oss.str().c_str(), CHEAT_ACTION_LOG);
             }
             itemGuids.insert(item_lowguid);
@@ -15505,7 +15531,7 @@ void Player::SaveToDB(bool online, bool force)
     //DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "The value of player %s at save: ", m_name.c_str());
     //outDebugStatsValues();
 
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(GetGUIDLow());
 
     m_honorMgr.Update();
 
@@ -15688,8 +15714,17 @@ void Player::SaveToDB(bool online, bool force)
 // fast save function for item/money cheating preventing - save only inventory and money state
 void Player::SaveInventoryAndGoldToDB()
 {
+    bool haveTransaction = CharacterDatabase.InTransaction();
+    if (!haveTransaction)
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
+    else if (CharacterDatabase.GetTransactionSerialId() != GetGUIDLow())
+        sLog.outError("[PLAYER SAVE] Player %s items are being saved in a transaction that is not serialized with its own GUID... potential dupe avenue", GetGuidStr().c_str());
+
     _SaveInventory();
     SaveGoldToDB();
+
+    if (!haveTransaction)
+        CharacterDatabase.CommitTransaction();
 }
 
 void Player::SaveGoldToDB()
@@ -18268,7 +18303,7 @@ void Player::AutoUnequipOffhandIfNeed()
     else
     {
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
-        CharacterDatabase.BeginTransaction();
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
         offItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
         offItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
         CharacterDatabase.CommitTransaction();
@@ -18295,7 +18330,7 @@ void Player::AutoUnequipMainHandIfNeed()
     else
     {
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND, true);
-        CharacterDatabase.BeginTransaction();
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
         mainItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
         mainItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
         CharacterDatabase.CommitTransaction();
@@ -18916,7 +18951,8 @@ void Player::UpdateUnderwaterState()
                     holder->AddAura(aur, SpellEffectIndex(i));
                 }
             }
-            AddSpellAuraHolder(holder);
+            if (!AddSpellAuraHolder(holder))
+                holder = nullptr;
         }
     }
 }
@@ -19376,7 +19412,7 @@ void Player::_SaveBGData()
 
     stmt.PExecute(GetGUIDLow());
 
-    if (m_bgData.bgInstanceID)
+    if (m_bgData.bgInstanceID || InBattleGroundQueue())
     {
         stmt = CharacterDatabase.CreateStatement(insBGData, "INSERT INTO character_battleground_data VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
         /* guid, bgInstanceID, bgTeam, x, y, z, o, map */

@@ -583,6 +583,8 @@ struct instance_blackwing_lair : public ScriptedInstance
                         pCreature->DeleteLater();
                         break;
                     }
+                    if (m_auiEncounter[TYPE_RAZORGORE] != DONE)
+                        pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
                     m_lVaelGobs.push_back(pCreature->GetObjectGuid());
                  }
             case MOB_DEMONISTE_AILE_NOIRE:
@@ -649,6 +651,13 @@ struct instance_blackwing_lair : public ScriptedInstance
                 {
                     if (pGo->GetGoState() != GO_STATE_ACTIVE) // Close
                         DoUseDoorOrButton(m_auiData[DATA_DOOR_RAZORGORE_ENTER]);
+                }
+                for (std::list<ObjectGuid>::iterator itr = m_lVaelGobs.begin(); itr != m_lVaelGobs.end(); ++itr)
+                {
+                    if (Creature *pCreature = instance->GetCreature(*itr))
+                    {
+                        pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    }
                 }
             }
             break;

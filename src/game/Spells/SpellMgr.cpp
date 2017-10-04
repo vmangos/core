@@ -596,6 +596,7 @@ bool IsSingleFromSpellSpecificSpellRanksPerTarget(SpellSpecific spellSpec1, Spel
         case SPELL_AURA:
         case SPELL_CURSE:
         case SPELL_ASPECT:
+        case SPELL_JUDGEMENT:
             return spellSpec1 == spellSpec2;
         default:
             return false;
@@ -926,6 +927,42 @@ bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster, Unit* victim)
         if (spellproto->Effect[i] && !IsPositiveEffect(spellproto, SpellEffectIndex(i), caster, victim))
             return false;
     return true;
+}
+
+bool IsHealSpell(SpellEntry const *spellProto)
+{
+    // Holy Light/Flash of Light
+    if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
+    {
+        if (spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>() ||
+            spellProto->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>())
+            return true;
+    }
+
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        switch (spellProto->Effect[i])
+        {
+            case SPELL_EFFECT_HEAL:
+            case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                return true;
+            case SPELL_EFFECT_APPLY_AURA:
+            case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+            case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+            {
+                switch (spellProto->EffectApplyAuraName[i])
+                {
+                    case SPELL_AURA_PERIODIC_HEAL:
+                        return true;
+                }
+                break;
+            }
+        }
+    }
+
+    return false;
 }
 
 bool IsSingleTargetSpell(SpellEntry const *spellInfo)
@@ -1815,8 +1852,8 @@ void SpellMgr::LoadSpellGroupStackRules()
 
 bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) const
 {
-    // Trouver le groupid du sort.
-    SpellGroup spellGroupId = SPELL_GROUP_NULL;
+    std::vector<uint32> spellGroupIds;
+    std::vector<uint32>::iterator spellGroupIdsIt;
     // first = groupid, second = spellId
     for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
     {
@@ -1830,34 +1867,36 @@ bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) 
             SpellGroupStackRule stackRule = found->second;
             if (stackRule == SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN)
             {
-                spellGroupId = itr->first;
-                break;
+                spellGroupIds.push_back(itr->first);
             }
         }
     }
-    if (spellGroupId == SPELL_GROUP_NULL)
+    if (spellGroupIds.size() == 0)
         return false;
-    bool spellPassed = false;
-    for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+    for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
-        if (itr->first != spellGroupId)
-            continue;
-        if (!spellPassed)
+        bool spellPassed = false;
+        for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
         {
-            if (itr->second == spellId)
-                spellPassed = true;
-            continue;
+            if (itr->first != *(spellGroupIdsIt))
+                continue;
+            if (!spellPassed)
+            {
+                if (itr->second == spellId)
+                    spellPassed = true;
+                continue;
+            }
+            list.push_back(itr->second);
         }
-        list.push_back(itr->second);
+        MANGOS_ASSERT(spellPassed == true);
     }
-    MANGOS_ASSERT(spellPassed == true);
     return !list.empty();
 }
 
 bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) const
 {
-    // Trouver le groupid du sort.
-    SpellGroup spellGroupId = SPELL_GROUP_NULL;
+    std::vector<uint32> spellGroupIds;
+    std::vector<uint32>::iterator spellGroupIdsIt;
     // first = groupid, second = spellId
     for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
     {
@@ -1871,20 +1910,22 @@ bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) 
             SpellGroupStackRule stackRule = found->second;
             if (stackRule == SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN)
             {
-                spellGroupId = itr->first;
-                break;
+                spellGroupIds.push_back(itr->first);
             }
         }
     }
-    if (spellGroupId == SPELL_GROUP_NULL)
+    if (spellGroupIds.size() == 0)
         return false;
-    for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+    for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
-        if (itr->first != spellGroupId)
-            continue;
-        if (itr->second == spellId)
-            break;
-        list.push_back(itr->second);
+        for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+        {
+            if (itr->first != *(spellGroupIdsIt))
+                continue;
+            if (itr->second == spellId)
+                break;
+            list.push_back(itr->second);
+        }
     }
     return !list.empty();
 }
@@ -2054,16 +2095,27 @@ bool SpellMgr::IsRankSpellDueToSpell(SpellEntry const *spellInfo_1, uint32 spell
     if (spellInfo_1->Id == spellId_2) return false;
     // Nostalrius : Check generique.
     if (spellInfo_1->SpellFamilyName == spellInfo_2->SpellFamilyName &&
-            spellInfo_1->SpellFamilyFlags == spellInfo_2->SpellFamilyFlags &&
-            spellInfo_1->SpellIconID == spellInfo_2->SpellIconID &&
-            spellInfo_1->SpellVisual == spellInfo_2->SpellVisual &&
-            spellInfo_1->SpellFamilyName != SPELLFAMILY_GENERIC &&
-            spellInfo_1->Effect[0] == spellInfo_2->Effect[0] &&
-            spellInfo_1->EffectApplyAuraName[0] == spellInfo_2->EffectApplyAuraName[0] &&
-            spellInfo_1->SpellIconID > 1 &&
-            (spellInfo_1->EffectApplyAuraName[0] != SPELL_AURA_ADD_FLAT_MODIFIER ||
-             spellInfo_1->EffectMiscValue[0] == spellInfo_2->EffectMiscValue[0]))
+        spellInfo_1->SpellFamilyFlags == spellInfo_2->SpellFamilyFlags &&
+        spellInfo_1->SpellIconID == spellInfo_2->SpellIconID &&
+        spellInfo_1->SpellVisual == spellInfo_2->SpellVisual &&
+        spellInfo_1->SpellFamilyName != SPELLFAMILY_GENERIC &&
+        spellInfo_1->Effect[0] == spellInfo_2->Effect[0] &&
+        spellInfo_1->EffectApplyAuraName[0] == spellInfo_2->EffectApplyAuraName[0] &&
+        spellInfo_1->SpellIconID > 1 &&
+        (spellInfo_1->EffectApplyAuraName[0] != SPELL_AURA_ADD_FLAT_MODIFIER ||
+         spellInfo_1->EffectMiscValue[0] == spellInfo_2->EffectMiscValue[0]))
+    {
+        // Same modifier but it affects different spells
+        if (spellInfo_1->EffectApplyAuraName[0] == SPELL_AURA_ADD_FLAT_MODIFIER &&
+            spellInfo_1->EffectItemType[0] != 0 && spellInfo_2->EffectItemType[0] != 0 &&
+            !(spellInfo_1->EffectItemType[0] & spellInfo_2->EffectItemType[0]))
+        {
+            return GetFirstSpellInChain(spellInfo_1->Id) == GetFirstSpellInChain(spellId_2);
+        }
+
         return true;
+    }
+
     return GetFirstSpellInChain(spellInfo_1->Id) == GetFirstSpellInChain(spellId_2);
 }
 

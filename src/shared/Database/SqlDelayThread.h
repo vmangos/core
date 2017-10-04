@@ -37,7 +37,9 @@ class SqlDelayThread
         SqlQueue m_sqlQueue;                                ///< Queue of SQL statements
         Database* m_dbEngine;                               ///< Pointer to used Database engine
         SqlConnection * m_dbConnection;                     ///< Pointer to DB connection
+        SqlQueue m_serialDelayQueue;
         volatile bool m_running;
+
 
         //process all enqueued requests
         void ProcessRequests();
@@ -48,6 +50,8 @@ class SqlDelayThread
 
         ///< Put sql statement to delay queue
         bool Delay(SqlOperation* sql) { m_sqlQueue.add(sql); return true; }
+        void addSerialOperation(SqlOperation *op);
+        bool HasAsyncQuery();
 
         virtual void Stop();                                ///< Stop event
         virtual void run();                                 ///< Main Thread loop

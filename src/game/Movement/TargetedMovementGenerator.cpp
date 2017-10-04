@@ -34,6 +34,8 @@
 template<class T, typename D>
 void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
 {
+    // Note: Any method that accesses the target's movespline here must be
+    // internally locked by the target's spline lock
     if (!i_target.isValid() || !i_target->IsInWorld())
         return;
 
@@ -102,7 +104,18 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     Movement::MoveSplineInit init(owner, "TargetedMovementGenerator");
     path.SetTransport(transport);
     path.calculate(x, y, z, petFollowing);
+
     i_reachable = path.getPathType() & PATHFIND_NORMAL;
+
+    // Enforce stricter checking inside dungeons
+    if (i_reachable && owner.GetMap() && owner.GetMap()->IsDungeon())
+    {
+        // Check dest coords to ensure reachability
+        G3D::Vector3 dest = path.getActualEndPosition();
+        if (!owner.CanReachWithMeleeAttackAtPosition(i_target.getTarget(), dest[0], dest[1], dest[2]))
+            i_reachable = false;
+    }
+
     i_recalculateTravel = false;
     if (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE && !transport && owner.HasDistanceCasterMovement())
         if (path.UpdateForCaster(i_target.getTarget(), owner.GetMinChaseDistance(i_target.getTarget())))
@@ -116,7 +129,8 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     float pathLength = path.Length();
     if (pathLength < 0.4f ||
             (pathLength < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
-            ((path.getPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)) && !petFollowing))
+            ((path.getPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)) && !petFollowing) ||
+            (!petFollowing && !i_reachable))
     {
         if (!losChecked)
             losResult = owner.IsWithinLOSInMap(i_target.getTarget());
@@ -317,6 +331,8 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
             || owner.IsNoMovementSpellCasted())
         return;
 
+    // Lock async updates for safety, see Unit::asyncMovesplineLock doc
+    std::unique_lock<std::mutex> guard(owner.asyncMovesplineLock);
     _setTargetLocation(owner);
 }
 

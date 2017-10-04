@@ -93,9 +93,9 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
       i_data(NULL), i_script_id(0), m_unloading(false), m_crashed(false),
       _processingSendObjUpdates(false), _processingUnitsRelocation(false),
       m_updateFinished(false), m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
-      _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(0),
+      _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(WorldTimer::getMSTime()),
       _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
-      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0), m_diffBuffer(0),
+      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
       m_lastMvtSpellsUpdate(0)
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
@@ -805,19 +805,9 @@ void Map::UpdatePlayers()
 void Map::DoUpdate(uint32 maxDiff)
 {
     uint32 now = WorldTimer::getMSTime();
-    uint32 diff = _lastMapUpdate?WorldTimer::getMSTimeDiff(_lastMapUpdate, now):maxDiff;
+    uint32 diff = WorldTimer::getMSTimeDiff(_lastMapUpdate, now);
     if (diff > maxDiff)
-    {
-        m_diffBuffer = std::min<uint32>(sWorld.getConfig(CONFIG_UINT32_UPDATE_STEADY_BUFFER), m_diffBuffer + diff - maxDiff);
         diff = maxDiff;
-    }
-    else if (m_diffBuffer)
-    {
-        uint32 ddiff = std::min(maxDiff - diff, m_diffBuffer);
-        diff += ddiff;
-        m_diffBuffer -= ddiff;
-    }
-
     _lastMapUpdate = now;
     if (HavePlayers())
         _lastPlayerLeftTime = now;
@@ -1533,34 +1523,35 @@ void Map::AddToActive(WorldObject* obj)
 
 void Map::RemoveFromActive(WorldObject* obj)
 {
-    // Map::Update for active object in proccess
-    if (m_activeNonPlayersIter != m_activeNonPlayers.end())
+    // Map::Update for active object in proccess. Only erase and dec grid active lock if the
+    // obj is actually active
+    ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
+    if (itr != m_activeNonPlayers.end())
     {
-        ActiveNonPlayers::iterator itr = m_activeNonPlayers.find(obj);
-        if (itr == m_activeNonPlayersIter)
+        if (m_activeNonPlayersIter != m_activeNonPlayers.end() && itr == m_activeNonPlayersIter)
             ++m_activeNonPlayersIter;
+
         m_activeNonPlayers.erase(itr);
-    }
-    else
-        m_activeNonPlayers.erase(obj);
 
-    // also allow unloading spawn grid
-    if (obj->GetTypeId() == TYPEID_UNIT)
-    {
-        Creature* c = (Creature*)obj;
 
-        if (!c->IsPet() && c->HasStaticDBSpawnData())
+        // also allow unloading spawn grid
+        if (obj->GetTypeId() == TYPEID_UNIT)
         {
-            float x, y, z;
-            c->GetRespawnCoord(x, y, z);
-            GridPair p = MaNGOS::ComputeGridPair(x, y);
-            if (getNGrid(p.x_coord, p.y_coord))
-                getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
-            else
+            Creature* c = (Creature*)obj;
+
+            if (!c->IsPet() && c->HasStaticDBSpawnData())
             {
-                GridPair p2 = MaNGOS::ComputeGridPair(c->GetPositionX(), c->GetPositionY());
-                sLog.outError("Active creature (GUID: %u Entry: %u) removed from grid[%u,%u] but spawn grid[%u,%u] not loaded.",
-                              c->GetGUIDLow(), c->GetEntry(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+                float x, y, z;
+                c->GetRespawnCoord(x, y, z);
+                GridPair p = MaNGOS::ComputeGridPair(x, y);
+                if (getNGrid(p.x_coord, p.y_coord))
+                    getNGrid(p.x_coord, p.y_coord)->decUnloadActiveLock();
+                else
+                {
+                    GridPair p2 = MaNGOS::ComputeGridPair(c->GetPositionX(), c->GetPositionY());
+                    sLog.outError("Active creature (GUID: %u Entry: %u) removed from grid[%u,%u] but spawn grid[%u,%u] not loaded.",
+                        c->GetGUIDLow(), c->GetEntry(), p.x_coord, p.y_coord, p2.x_coord, p2.y_coord);
+                }
             }
         }
     }
@@ -3532,7 +3523,7 @@ void Map::ScriptsProcess()
             }
             case SCRIPT_COMMAND_SEND_TAXI_PATH:
             {
-                Player* pPlayer;
+                Player* pPlayer = nullptr;
 
                 if (target && target->IsPlayer())
                     pPlayer = (Player*)target;
@@ -3552,13 +3543,21 @@ void Map::ScriptsProcess()
             case SCRIPT_COMMAND_TERMINATE_SCRIPT:
             {
                 bool result = false;
+
                 if (step.script->terminateScript.creatureEntry)
                 {
+                    if (!source && !target)
+                    {
+                        sLog.outError("SCRIPT_COMMAND_TERMINATE_SCRIPT (script id %u) call for NULL object, skipping.", step.script->id);
+                        break;
+                    }
+
                     WorldObject* pSearcher = source ? (WorldObject*) source : (WorldObject*) target;
                     if (pSearcher->GetTypeId() == TYPEID_PLAYER && target && target->GetTypeId() != TYPEID_PLAYER)
                     {
                         pSearcher = (WorldObject*) target;
                     }
+
 
                     Creature* pCreatureBuddy = NULL;
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSearcher, step.script->terminateScript.creatureEntry, true, step.script->terminateScript.searchRadius);
@@ -3648,6 +3647,12 @@ void Map::ScriptsProcess()
             }
             case SCRIPT_COMMAND_TERMINATE_COND:
             {
+                if (!target && !source)
+                {
+                    sLog.outError("SCRIPT_COMMAND_TERMINATE_COND (script id %u) call for NULL object, skipping.", step.script->id);
+                    break;
+                }
+
                 Player* player = NULL;
                 WorldObject* second = (WorldObject*) source;
                 // First case: target is player

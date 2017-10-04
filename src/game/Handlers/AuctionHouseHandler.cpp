@@ -367,18 +367,34 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     AH->deposit = deposit;
     AH->auctionHouseEntry = auctionHouseEntry;
 
-    DETAIL_LOG("selling %s to auctioneer %s with initial bid %u with buyout %u and with time %u (in sec) in auctionhouse %u",
-               itemGuid.GetString().c_str(), auctioneerGuid.GetString().c_str(), bid, buyout, auction_time, AH->GetHouseId());
+    sLog.out(LOG_MONEY_TRADES, "[AuctionHouse]: Player %s listing %s (%u) at auctioneer %s. Initial bid: %u, buyout: %u, duration: %u, auctionhouse: %u",
+                pl->GetShortDescription().c_str(), it->GetGuidStr().c_str(), it->GetEntry(), 
+                auctioneerGuid.GetString().c_str(), bid, buyout, auction_time, AH->GetHouseId());
+
+    // Log this transaction
+    PlayerTransactionData data;
+    data.type = "PlaceAuction";
+    data.parts[0].lowGuid = AH->owner;
+    data.parts[0].itemsEntries[0] = AH->itemTemplate;
+    data.parts[0].itemsCount[0] = it->GetCount();
+    data.parts[0].itemsGuid[0] = it->GetGUIDLow();
+    data.parts[0].money = bid;
+    data.parts[1].lowGuid = auctioneerGuid.GetCounter();
+    data.parts[1].money = buyout;
+    sWorld.LogTransaction(data);
+
     auctionHouse->AddAuction(AH);
 
     sAuctionMgr.AddAItem(it);
     pl->MoveItemFromInventory(it->GetBagSlot(), it->GetSlot(), true);
 
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     it->DeleteFromInventoryDB();
     it->SaveToDB();                                         // recursive and not have transaction guard into self, not in inventiory and can be save standalone
     AH->SaveToDB();
     pl->SaveInventoryAndGoldToDB();
+    // Note that if the player relogs before the transaction executes, the item will both
+    // be on the AH and in their inventory. Must check this on relog
     CharacterDatabase.CommitTransaction();
 
     SendAuctionCommandResult(AH, AUCTION_STARTED, AUCTION_OK);
@@ -511,6 +527,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
         data.parts[0].itemsEntries[0] = auction->itemTemplate;
         Item* item = sAuctionMgr.GetAItem(auction->itemGuidLow);
         data.parts[0].itemsCount[0] = item ? item->GetCount() : 0;
+        data.parts[0].itemsGuid[0] = auction->itemGuidLow;
         data.parts[1].lowGuid = auction->bidder;
         data.parts[1].money = auction->bid;
         sWorld.LogTransaction(data);
@@ -526,7 +543,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
 
         delete auction;
     }
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
 }
@@ -597,7 +614,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
     // inform player, that auction is removed
     SendAuctionCommandResult(auction, AUCTION_REMOVED, AUCTION_OK);
     // Now remove the auction
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     auction->DeleteFromDB();
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
@@ -760,7 +777,10 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recv_data)
 
     // converting string that we try to find to lower case
     if (!Utf8toWStr(searchedname, task->wsearchedname))
+    {
+        delete task;
         return;
+    }
 
     wstrToLower(task->wsearchedname);
     SetReceivedAHListRequest(true);

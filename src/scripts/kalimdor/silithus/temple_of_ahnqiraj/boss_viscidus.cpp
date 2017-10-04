@@ -31,12 +31,12 @@ EndScriptData */
 enum
 {
     // emotes
-    EMOTE_SLOW                  = -1531041,
-    EMOTE_FREEZE                = -1531042,
-    EMOTE_FROZEN                = -1531043,
-    EMOTE_CRACK                 = -1531044,
-    EMOTE_SHATTER               = -1531045,
-    EMOTE_EXPLODE               = -1531046,
+    EMOTE_SLOW                  = -1531041, // Viscidus begins to slow.
+    EMOTE_FREEZE                = -1531042, // Viscidus is freezing up.
+    EMOTE_FROZEN                = -1531043, // Viscidus is frozen solid.
+    // These are currently handled in UnitAuraProcHandler.cpp.
+    EMOTE_CRACK                 = -1531044, // Viscidus begins to crack.
+    EMOTE_SHATTER               = -1531045, // Viscidus looks ready to shatter.
 
     // Timer spells
     SPELL_POISON_SHOCK          = 25993,
@@ -62,7 +62,7 @@ enum
     SPELL_VISCIDUS_GROWS        = 25897,
     SPELL_SUMMON_GLOBS          = 25885,                    // summons npc 15667 using spells from 25865 to 25884; All spells have target coords
     SPELL_VISCIDUS_TELEPORT     = 25904,                    // teleport to room center
-    SPELL_SUMMONT_TRIGGER       = 26564,                    // summons 15992
+    SPELL_SUMMONT_TRIGGER       = 26564,                    // summons 15922
 
     SPELL_GLOB_SPEED            = 26633,                    // apply aura 26634 each second
     
@@ -86,16 +86,109 @@ enum
 
 static const uint32 auiGlobSummonSpells[MAX_VISCIDUS_GLOBS] = { 25865, 25866, 25867, 25868, 25869, 25870, 25871, 25872, 25873, 25874, 25875, 25876, 25877, 25878, 25879, 25880, 25881, 25882, 25883, 25884 };
 
+//-----------------------------------------------------------------------------
+// mob_viscidus_globAI
+//-----------------------------------------------------------------------------
+struct mob_viscidus_globAI : public ScriptedAI
+{
+    // Acceleration delay
+    uint32 m_uiGlobStartAccelerationTimer;
+    // prevents SPELL_GLOB_SPEED casting multiple times
+    bool m_spellCasted;
+
+    // Everything is an approximated here. Need data from official.
+    // Initial glob speed is 0.335625. They start acceleration with 4 seconds delay timer.
+    // Each tick of the aura(id:26634) doubles their speed.
+    // This solution gives smooth movement and acceleration.
+
+    mob_viscidus_globAI(Creature* pCreature)
+        : ScriptedAI(pCreature), m_uiGlobStartAccelerationTimer(4000), m_spellCasted(false)
+    { }
+
+    // dummy methods
+    void Reset() { }
+    void AttackStart(Unit* /*pWho*/) { }
+    void MoveInLineOfSight(Unit* /*pWho*/) { }
+
+    // Implements acceleration on timer, prevents combat.
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiGlobStartAccelerationTimer <= uiDiff)
+        {
+            // SPELL_GLOB_SPEED should be casted only once
+            if (!m_spellCasted)
+            {
+                m_spellCasted = true;
+                m_creature->CastSpell(m_creature, SPELL_GLOB_SPEED, true);
+            }
+        }
+        else
+        {
+            m_uiGlobStartAccelerationTimer -= uiDiff;
+        }
+    }
+};
+
+CreatureAI* GetAI_mob_viscidus_glob(Creature* pCreature)
+{
+    return new mob_viscidus_globAI(pCreature);
+}
+
+//-----------------------------------------------------------------------------
+// mob_viscidus_triggerAI
+//-----------------------------------------------------------------------------
+struct mob_viscidus_triggerAI : public ScriptedAI
+{
+    // Acceleration delay
+    uint32 m_uiToxinDelayTimer;
+    bool m_spellCasted;
+
+    mob_viscidus_triggerAI(Creature* pCreature)
+     : ScriptedAI(pCreature), m_uiToxinDelayTimer(3000), m_spellCasted(false)
+    { }
+
+    // dummy methods
+    void Reset() { }
+    void AttackStart(Unit* /*pWho*/) { }
+    void MoveInLineOfSight(Unit* /*pWho*/) { }
+    // Implements toxin cloud on timer, prevents combat.
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiToxinDelayTimer <= uiDiff)
+        {
+            if (!m_spellCasted)
+            {
+                // set faction and flags before toxin cloud, so it won't damage a boss.
+                m_creature->setFaction(14); // 14 is a hostile faction
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1);
+
+                m_spellCasted = true;
+                // cast spell instantly, only once
+                m_creature->CastSpell(m_creature, SPELL_TOXIN_CLOUD, true);
+                // apply an aura, which will continously repeat this spell.
+                m_creature->CastSpell(m_creature, SPELL_TOXIN, true);
+            }
+        }
+        else
+        {
+            m_uiToxinDelayTimer -= uiDiff;
+        }
+    }
+};
+
+CreatureAI* GetAI_mob_viscidus_trigger(Creature* pCreature)
+{
+    return new mob_viscidus_triggerAI(pCreature);
+}
+
+//-----------------------------------------------------------------------------
+// boss_viscidusAI
+//-----------------------------------------------------------------------------
 struct boss_viscidusAI : public ScriptedAI
 {
-    boss_viscidusAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        m_initialScale = pCreature->GetObjectScale();
-        Reset();
-    }
-
     ScriptedInstance* m_pInstance;
+
+    uint32 m_uiRestoreTargetTimer;
 
     uint32 m_uiHitCount;
     uint32 m_uiToxinTimer;
@@ -113,15 +206,24 @@ struct boss_viscidusAI : public ScriptedAI
     GuidList m_lGlobesGuidList;
     std::bitset<20> track;
 
+    boss_viscidusAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_initialScale = pCreature->GetObjectScale();
+        Reset();
+    }
+
     void Reset()
     {
         m_uiGrowTimer = 0;
         m_uiPhase                 = PHASE_NORMAL;
         m_uiPhaseTimer            = 0;
 
+        m_uiRestoreTargetTimer    = 0;
+
         m_uiHitCount              = 0;
         m_uiExplodeDelayTimer     = 0;
-        m_uiToxinTimer            = 30000;
+        m_uiToxinTimer            = urand(30000, 40000);
         m_uiPoisonShockTimer      = urand(7000, 12000);
         m_uiPoisonBoltVolleyTimer = urand(10000, 15000);
         m_uiGrowCount = 0;
@@ -131,7 +233,7 @@ struct boss_viscidusAI : public ScriptedAI
         DoCastSpellIfCan(m_creature, SPELL_MEMBRANE_VISCIDUS, CAST_TRIGGERED);
         DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_WEAKNESS, CAST_TRIGGERED);
 
-        ResetViscidusState(false);
+        ResetViscidusState();
     }
 
     void MoveInLineOfSight(Unit* who) override
@@ -183,20 +285,17 @@ struct boss_viscidusAI : public ScriptedAI
     {
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
-            float fX, fY, fZ;
-            m_creature->GetRespawnCoord(fX, fY, fZ);
-            pSummoned->GetMotionMaster()->MovePoint(1, fX, fY, fZ);
+            // Move all summoned globs to Viscidus's spawn point. The spawn point is essentially
+            // the center of the room triangulated between 4 points with a distance of 100 between
+            // points on the same gridline. Globs are spawned on a circle with 52 yard radius from
+            // the center point
+            pSummoned->GetMotionMaster()->MovePoint(1, -7993.956f, 926.309f, -52.699f, MOVE_FORCE_DESTINATION | MOVE_PATHFINDING | MOVE_RUN_MODE);
+
             m_lGlobesGuidList.push_back(pSummoned->GetObjectGuid());
-            //pSummoned->CastSpell(pSummoned, SPELL_GLOB_SPEED, true);
-        }
-        else if (pSummoned->GetEntry() == NPC_VISCIDUS_TRIGGER)
-        {
-            pSummoned->CastSpell(pSummoned, SPELL_TOXIN_CLOUD, true);
-            pSummoned->CastSpell(pSummoned, SPELL_TOXIN, true);
         }
     }
 
-    void ResetViscidusState(bool bApplyToxin)
+    void ResetViscidusState()
     {
         if (m_creature->GetVisibility() == VISIBILITY_OFF)
         {
@@ -212,11 +311,6 @@ struct boss_viscidusAI : public ScriptedAI
         m_uiHitCount = 0;
 
         SetCombatMovement(true);
-
-        if (bApplyToxin)
-        {
-            DoCastSpellIfCan(m_creature, SPELL_TOXIN);
-        }
     }
 
     void SummonedCreatureJustDied(Creature* pSummoned)
@@ -242,7 +336,7 @@ struct boss_viscidusAI : public ScriptedAI
 
             if (m_lGlobesGuidList.empty())
             {
-                ResetViscidusState(true);
+                ResetViscidusState();
             }
         }
     }
@@ -254,12 +348,12 @@ struct boss_viscidusAI : public ScriptedAI
 
         m_lGlobesGuidList.remove(pSummoned->GetObjectGuid());
         pSummoned->CastSpell(m_creature, SPELL_REJOIN_VISCIDUS, true);
-        pSummoned->ForcedDespawn(1000);
+        pSummoned->ForcedDespawn(650);
         ++m_uiGrowCount; // should be done in spell script
 
         if (m_lGlobesGuidList.empty())
         {
-            ResetViscidusState(true);
+            ResetViscidusState();
         }
     }
 
@@ -278,7 +372,6 @@ struct boss_viscidusAI : public ScriptedAI
                 return;
             }
 
-            DoScriptText(EMOTE_EXPLODE, m_creature);
             m_uiPhase = PHASE_EXPLODED;
             m_lGlobesGuidList.clear();
             uint32 uiGlobeCount = m_creature->GetHealthPercent() / 5.0f;
@@ -286,9 +379,7 @@ struct boss_viscidusAI : public ScriptedAI
             for (uint8 i = 0; i < uiGlobeCount; ++i)
                 DoCastSpellIfCan(m_creature, auiGlobSummonSpells[i], CAST_TRIGGERED);
 
-            m_creature->RemoveAurasDueToSpell(SPELL_TOXIN);
-            m_creature->RemoveAurasDueToSpell(SPELL_VISCIDUS_FREEZE);
-            m_uiExplodeDelayTimer = 1000;
+            m_uiExplodeDelayTimer = 2500; // 2500(instead of 1000) makes glob summon effect more visible
             return;
         }
 
@@ -333,18 +424,18 @@ struct boss_viscidusAI : public ScriptedAI
             else if (m_uiHitCount >= HITCOUNT_SLOW_MORE)
             {
                 if (m_uiHitCount == HITCOUNT_SLOW_MORE)
-		{
+                {
                     DoScriptText(EMOTE_FREEZE, m_creature);
-		    m_creature->RemoveAurasDueToSpell(SPELL_VISCIDUS_SLOWED);
-		}
+                    m_creature->RemoveAurasDueToSpell(SPELL_VISCIDUS_SLOWED);
+                }
                 DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SLOWED_MORE, CAST_TRIGGERED);
             }
             else if (m_uiHitCount >= HITCOUNT_SLOW)
             {
-	        if (m_uiHitCount == HITCOUNT_SLOW)
-		{
+                if (m_uiHitCount == HITCOUNT_SLOW)
+                {
                     DoScriptText(EMOTE_SLOW, m_creature);
-		}
+                }
                 DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SLOWED, CAST_TRIGGERED);
             }
         }
@@ -352,14 +443,12 @@ struct boss_viscidusAI : public ScriptedAI
 
     void ResetFrozenPhase()
     {
-      if (m_uiPhase == PHASE_EXPLODED)
-	return;
+        if (m_uiPhase == PHASE_EXPLODED)
+            return;
 
-      DoCastSpellIfCan(m_creature, SPELL_TOXIN);
-
-      // reset phase if not already exploded
-      m_uiPhase = PHASE_NORMAL;
-      m_uiHitCount = 0;
+        // reset phase if not already exploded
+        m_uiPhase = PHASE_NORMAL;
+        m_uiHitCount = 0;
     }
 
     void HackyScaleUpdate()
@@ -383,7 +472,6 @@ struct boss_viscidusAI : public ScriptedAI
         // should be spell scripted properly
         if (m_uiGrowTimer <= uiDiff)
         {
-
             if (m_uiGrowCount)
             {
                 DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_GROWS, CAST_TRIGGERED);
@@ -412,6 +500,22 @@ struct boss_viscidusAI : public ScriptedAI
                 m_uiExplodeDelayTimer -= uiDiff;
         }
 
+        // Restore original target after "casting" a Toxic Cloud near someone.
+        if (m_uiRestoreTargetTimer)
+        {
+            if (m_uiRestoreTargetTimer <= uiDiff)
+            {
+                if (Unit* pTarget = m_creature->getVictim())
+                {
+                    m_creature->SetInFront(pTarget);
+                    m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+                    m_uiRestoreTargetTimer = 0;
+                }
+            }
+            else
+                m_uiRestoreTargetTimer -= uiDiff;
+        }
+
         if (m_uiPhase != PHASE_NORMAL)
             return;
 
@@ -433,10 +537,26 @@ struct boss_viscidusAI : public ScriptedAI
 
         if (m_uiToxinTimer < uiDiff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_IN_LOS))
             {
-	        m_creature->SummonCreature(NPC_VISCIDUS_TRIGGER, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), pTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 180000);
-		m_uiToxinTimer = 30000;
+                Creature* trigger = m_creature->SummonCreature(NPC_VISCIDUS_TRIGGER, pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), pTarget->GetOrientation(), TEMPSUMMON_TIMED_DESPAWN, 180000);
+                m_uiToxinTimer = urand(30000, 40000);
+
+                // visual spell effect, which predates Toxin Cloud.
+                if (trigger)
+                {
+                    // visual effect doen't work if target is not selectable...
+                    trigger->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                    // set boss facing to the trigger
+                    m_creature->SetInFront(trigger);
+                    m_creature->SetTargetGuid(trigger->GetObjectGuid());
+                    // cast spell, which will be completely resisted by trigger(immune) to simulate a visual effect
+                    m_creature->CastSpell(trigger, 26601, true);
+                    // restore boss orientation in 800 ms
+                    m_uiRestoreTargetTimer = 800;
+                    // restore trigger flag
+                    trigger->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+                }
             }
         }
         else
@@ -459,52 +579,12 @@ bool EffectAuraDummy_spell_aura_dummy_viscidus_freeze(const Aura* pAura, bool bA
     if (pAura->GetId() == SPELL_VISCIDUS_FREEZE && pAura->GetEffIndex() == EFFECT_INDEX_1 && !bApply)
     {
         if (Creature* pTarget = (Creature*)pAura->GetTarget())
-	{
-	  if (boss_viscidusAI* pViscidusAI = dynamic_cast<boss_viscidusAI*>(pTarget->AI()))
-            pViscidusAI->ResetFrozenPhase();
-	}
+        {
+            if (boss_viscidusAI* pViscidusAI = dynamic_cast<boss_viscidusAI*>(pTarget->AI()))
+                pViscidusAI->ResetFrozenPhase();
+        }
     }
     return true;
-}
-
-// TODO Remove these 'script' when combat can be proper prevented from core-side
-struct ViscidusNullAI : public ScriptedAI
-{
-    // Hacky timer to work around a core issue
-    const uint16_t GLOB_SPEED_INTERVAL = 1000;
-
-    uint16 m_uiGlobSpeedTimer = 0;
-    float speed = 1.0f;
-
-    ViscidusNullAI(Creature* pCreature) : ScriptedAI(pCreature) { }
-
-    void Reset() { }
-
-    void AttackStart(Unit* /*pWho*/) { }
-    void MoveInLineOfSight(Unit* /*pWho*/) { }
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (m_uiGlobSpeedTimer <= uiDiff)
-        {
-            speed += 1.50f;
-            m_creature->UpdateSpeed(MOVE_WALK, true, speed);
-            m_uiGlobSpeedTimer = GLOB_SPEED_INTERVAL;
-        }
-        else
-        {
-            m_uiGlobSpeedTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_boss_glob_of_viscidus(Creature* pCreature)
-{
-    return new ViscidusNullAI(pCreature);
-}
-
-CreatureAI* GetAI_boss_viscidus_trigger(Creature* pCreature)
-{
-    return new ViscidusNullAI(pCreature);
 }
 
 void AddSC_boss_viscidus()
@@ -518,12 +598,12 @@ void AddSC_boss_viscidus()
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "boss_glob_of_viscidus";
-    pNewScript->GetAI = &GetAI_boss_glob_of_viscidus;
+    pNewScript->Name = "mob_viscidus_glob";
+    pNewScript->GetAI = &GetAI_mob_viscidus_glob;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;
-    pNewScript->Name = "boss_viscidus_trigger";
-    pNewScript->GetAI = &GetAI_boss_glob_of_viscidus;
+    pNewScript->Name = "mob_viscidus_trigger";
+    pNewScript->GetAI = &GetAI_mob_viscidus_trigger;
     pNewScript->RegisterSelf();
 }

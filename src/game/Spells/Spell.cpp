@@ -260,7 +260,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
         data << m_strTarget;
 }
 
-Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim):
+Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
     m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
@@ -270,6 +270,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_destroyed = false;
     m_spellInfo = info;
     m_triggeredBySpellInfo = triggeredBy;
+    m_triggeredByParentSpellInfo = triggeredByParent;
     m_caster = caster;
     m_selfContainer = nullptr;
     m_referencedFromCurrentSpell = false;
@@ -316,6 +317,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     gameObjTarget = nullptr;
     focusObject = nullptr;
     m_triggeredByAuraSpell  = nullptr;
+    m_triggeredByAuraBasePoints = 0;
 
     //Auto Shot & Shoot
     m_autoRepeat = IsAutoRepeatRangedSpell(m_spellInfo);
@@ -596,13 +598,14 @@ void Spell::FillTargetMap()
                 break;
         }
 
-        if (m_caster->GetTypeId() == TYPEID_PLAYER)
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && !(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NO_THREAT))
         {
             Player *me = (Player*)m_caster;
             for (UnitList::const_iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
             {
                 Player *targetOwner = (*itr)->GetCharmerOrOwnerPlayerOrPlayerItself();
-                if (targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner))
+                if ((targetOwner && targetOwner != me && targetOwner->IsPvP() && !me->IsInDuelWith(targetOwner)) || // PvP flagged players
+                    ((*itr)->IsCreature() && (*itr)->IsPvP()))                                                      // PvP flagged creatures
                 {
                     me->UpdatePvP(true);
                     me->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
@@ -725,26 +728,41 @@ void Spell::prepareDataForTriggerSystem()
         default:
         {
             bool aoe = IsAreaOfEffectSpell(m_spellInfo);
+            bool positive = IsPositiveSpell(m_spellInfo);
             // Some spells should be categorized as AoE
             // Hellfire regularly triggers an AoE spell.
             if (m_spellInfo->IsFitToFamily<SPELLFAMILY_WARLOCK, CF_WARLOCK_HELLFIRE>() && m_spellInfo->SpellIconID == 937)
                 aoe = true;
 
-            if (IsPositiveSpell(m_spellInfo->Id))                                 // Check for positive spell
+            // Check for positive spell. 'Positive' spells include various things such as buffs, but
+            // they shouldn't proc with PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL. Note that some spells
+            // with SPELL_EFFECT_DISPEL are negative, such as Purge.
+            if (positive)
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
-                m_procVictim   = PROC_FLAG_TAKEN_POSITIVE_SPELL;
-                if (aoe)
+                if (IsHealSpell(m_spellInfo))
                 {
-                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT;
-                    m_procVictim   |= PROC_FLAG_TAKEN_POSITIVE_AOE;
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+                    m_procVictim = PROC_FLAG_TAKEN_POSITIVE_SPELL;
                 }
-                else if (!IsTriggered()) 
+                else
+                {
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+                    m_procVictim = PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL;
+                }
+
+                if (IsDispelSpell(m_spellInfo))
+                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST;
+
+                if (aoe)
+                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_AOE;
+
+                // Always proc with PROC_FLAG_SUCCESSFUL_SPELL_CAST if not AoE or triggered spell
+                if (!aoe && !IsTriggered())
                 {
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_SPELL_CAST;
                     if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
                         m_procAttacker |= PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
-                }  
+                }
             }
             // Wands auto attack
             else if (m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_AUTOREPEAT_FLAG)
@@ -754,14 +772,21 @@ void Spell::prepareDataForTriggerSystem()
             }
             else                                           // Negative spell
             {
-                m_procAttacker = PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
-                m_procVictim   = PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
-                if (aoe)
+                if (m_spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
                 {
-                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT;
-                    m_procVictim   |= PROC_FLAG_TAKEN_AOE_SPELL_HIT;
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+                    m_procVictim = PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
                 }
-                else if (!IsTriggered())
+                else
+                {
+                    m_procAttacker = PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+                    m_procVictim = PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+                }
+
+                if (aoe)
+                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_AOE;
+
+                if (!aoe && !IsTriggered())
                 {
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_SPELL_CAST;
                     if (m_powerCost > 0 && m_spellInfo->powerType == POWER_MANA)
@@ -776,8 +801,15 @@ void Spell::prepareDataForTriggerSystem()
     // avoid triggering negative hit for only positive targets
     m_negativeEffectMask = 0x0;
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
         if (!IsPositiveEffect(m_spellInfo, SpellEffectIndex(i)))
             m_negativeEffectMask |= (1 << i);
+
+        // Self damage is a positive effect but should still trigger negative proc flags
+        if (m_spellInfo->Effect[i] == SPELL_EFFECT_SCHOOL_DAMAGE && m_spellInfo->EffectImplicitTargetA[i] == TARGET_SELF)
+            m_negativeEffectMask |= (1 << i);
+    }
+
 }
 
 void Spell::CleanupTargetList()
@@ -1041,11 +1073,11 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             procAttacker &= ~(PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST | 
                               PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
         }
-        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)) {
+        else if (procAttacker & (PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT)) {
             // Do not allow secondary hits for negative aoe spells (such as Arcane Explosion) 
             // to proc beneficial abilities such as Clearcasting. Positive aoe spells can
             // still trigger, as in the case of prayer of healing and inspiration...
-            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
+            procAttacker &= ~(PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT);
         }
     }
 
@@ -1207,6 +1239,13 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         // item procs should probably trigger for all classes, e.g. Judgement of Wisdom, but many issues to test for first. Paladin exclusive for now.
         if (m_CastItem && m_caster->getClass() == CLASS_PALADIN && (procEx & PROC_EX_CRITICAL_HIT) && !(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CANT_TRIGGER_PROC))
             m_canTrigger = true;
+        // JoR and JoC: Paladin melee spells trigger melee procs instead of magic
+        if ((m_spellInfo->IsFitToFamilyMask<CF_PALADIN_JUDGEMENT_OF_RIGHTEOUSNESS>() && m_spellInfo->SpellIconID == 25) || 
+            (m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN && m_spellInfo->SpellIconID == 561 && m_spellInfo->SpellVisual == 0))
+        {
+            procAttacker = PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+            procVictim = PROC_FLAG_TAKEN_MELEE_SPELL_HIT | PROC_FLAG_TAKEN_ANY_DAMAGE;
+        }
         // Do triggers for unit (reflect triggers passed on hit phase for correct drop charge)
         if (m_canTrigger)
             caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, damageInfo.damage, m_attackType, m_spellInfo, this);
@@ -1258,28 +1297,32 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             }
         }
     }
-    // No damage = no trigger. But the aura may cause damage. So let's forward proc flags to the aura.
     else if (m_canTrigger && (procAttacker || procVictim))
     {
         bool foundDamageOrHealAura = false;
-        if (m_spellAuraHolder)
-            for (int i = 0; i < 3 && !foundDamageOrHealAura; ++i)
-                if (Aura* aura = m_spellAuraHolder->m_auras[i])
-                    switch (aura->GetModifier()->m_auraname)
-                    {
-                        case SPELL_AURA_PERIODIC_DAMAGE:
-                        case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
-                        case SPELL_AURA_PERIODIC_LEECH:
-                        case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
-                        case SPELL_AURA_PERIODIC_HEAL:
-                        case SPELL_AURA_OBS_MOD_HEALTH:
-                        case SPELL_AURA_POWER_BURN_MANA:
-                            foundDamageOrHealAura = true;
-                            break;
-                    }
-
+        // m_spellAuraHolder is null for non-stacking periodic effects that are already
+        // on the target - they simply refresh. However, they should still proc on
+        // cast!
+        if (IsSpellAppliesAura(m_spellInfo, target->effectMask))
+        {
+            for (int i = 0; i < MAX_EFFECT_INDEX && !foundDamageOrHealAura; ++i)
+            {
+                switch (m_spellInfo->EffectApplyAuraName[i])
+                {
+                    case SPELL_AURA_PERIODIC_DAMAGE:
+                    case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                    case SPELL_AURA_PERIODIC_LEECH:
+                    case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                    case SPELL_AURA_PERIODIC_HEAL:
+                    case SPELL_AURA_OBS_MOD_HEALTH:
+                    case SPELL_AURA_POWER_BURN_MANA:
+                        foundDamageOrHealAura = true;
+                        break;
+                }
+            }
+        }
         // Sunder Armor triggers weapon proc as well as normal procs despite dealing no damage
-        if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SUNDER_ARMOR>())
+        if (m_caster->GetTypeId() == TYPEID_PLAYER && m_spellInfo->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_SUNDER_ARMOR>() && missInfo == SPELL_MISS_NONE)
             ((Player*)m_caster)->CastItemCombatSpell(unitTarget, BASE_ATTACK);
 
         // Fill base damage struct (unitTarget - is real spell target)
@@ -1292,17 +1335,26 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         if (m_spellInfo->SpellFamilyName == SPELLFAMILY_MAGE && m_spellInfo->SpellFamilyFlags == 0x40800)
             dmg = 1;
 
-        // Periodic spells:
-        // Trigger spell cast procs and forward the damage / heal procs to the aura
+        // Proc periodic casts now, so initial cast procs are triggered
         if (foundDamageOrHealAura)
-        {
-            m_spellAuraHolder->spellFirstHitAttackerProcFlags = procAttacker & ~(PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
-            m_spellAuraHolder->spellFirstHitTargetProcFlags = procVictim;
-            procAttacker &= (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST);
-            procVictim = 0;
             dmg = 1;
+
+        // Proc for dispels (or "cures")
+        if (IsDispelSpell(m_spellInfo))
+        {
+            dmg = 1;
+            // Override proc flags for offensive dispel
+            if (caster->IsHostileTo(unitTarget))
+            {
+                procAttacker &= ~(PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL | PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST);
+                procAttacker |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+
+                procVictim &= ~PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL;
+                procVictim |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+            }
         }
-        caster->ProcDamageAndSpell(unit, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
+
+        caster->ProcDamageAndSpell(unitTarget, real_caster ? procAttacker : PROC_FLAG_NONE, procVictim, procEx, dmg, m_attackType, m_spellInfo, this);
     }
 
     if (missInfo != SPELL_MISS_NONE)
@@ -1351,18 +1403,17 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
         return;
     }
 
-    // Nostalrius: IsAuraResist pour les ModMechanicResistance des effets.
-    if (IsSpellAppliesAura(m_spellInfo, effectMask) && unit->IsAuraResist(m_spellInfo))
-        for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
-            if (m_spellInfo->Effect[eff] == SPELL_EFFECT_APPLY_AURA)
-            {
-                if ((realCaster && realCaster->IsPlayer() && realCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-                    (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-                    break;
-                effectMask &= ~(1 << eff);
-                if (!effectMask)
-                    return;
-            }
+    // Check mechanic resistance for each effect
+    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+        if (unit->IsEffectResist(m_spellInfo, eff))
+        {
+            if ((realCaster && realCaster->IsPlayer() && realCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
+                (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
+                break;
+            effectMask &= ~(1 << eff);
+            if (!effectMask)
+                return;
+        }
 
     // Recheck immune (only for delayed spells)
     if (m_caster != unit && m_spellInfo->speed && (
@@ -1488,6 +1539,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
         m_spellAuraHolder = CreateSpellAuraHolder(m_spellInfo, unit, realCaster, m_CastItem);
         m_spellAuraHolder->SetTriggered(IsTriggered());
         m_spellAuraHolder->setDiminishGroup(m_diminishGroup);
+        m_spellAuraHolder->setDiminishLevel(m_diminishLevel);
     }
     else
         m_spellAuraHolder = nullptr;
@@ -2964,7 +3016,9 @@ void Spell::prepare(Aura* triggeredByAura)
 {
 
     m_spellState = SPELL_STATE_PREPARING;
-    m_delayed = m_spellInfo->speed > 0.0f || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer());
+    m_delayed = m_spellInfo->speed > 0.0f 
+        || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer())
+        || IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEALTH_LEECH);
 
     if (m_caster->GetTransport())
     {
@@ -2981,8 +3035,10 @@ void Spell::prepare(Aura* triggeredByAura)
         m_castOrientation = m_caster->GetOrientation();
     }
 
-    if (triggeredByAura)
-        m_triggeredByAuraSpell  = triggeredByAura->GetSpellProto();
+    if (triggeredByAura) {
+        m_triggeredByAuraSpell = triggeredByAura->GetSpellProto();
+        m_triggeredByAuraBasePoints = triggeredByAura->GetBasePoints();
+    }
 
     try
     {
@@ -3380,7 +3436,7 @@ void Spell::cast(bool skipCheck)
     InitializeDamageMultipliers();
 
     // AoE case. Trigger spells for caster now.
-    if (m_procAttacker & (PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT | PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT) && m_canTrigger)
+    if (m_procAttacker & PROC_FLAG_SUCCESSFUL_AOE && m_canTrigger)
     {
         uint32 procAttacker = 0;
         // Blizzard case. Should trigger at launch for clearcast.
@@ -3398,10 +3454,10 @@ void Spell::cast(bool skipCheck)
         m_caster->ProcDamageAndSpell(nullptr, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
     }
 
-    // Shaman totems. Trigger spell cast
-    if (m_spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && m_spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4 && m_canTrigger)
+    // Shaman totems. Trigger spell cast procs, but not others
+    if (IsTotemSummonSpell(m_spellInfo) && m_canTrigger)
     {
-        uint32 procAttackerFlags = m_procAttacker | PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
+        uint32 procAttackerFlags = PROC_FLAG_SUCCESSFUL_SPELL_CAST | PROC_FLAG_SUCCESSFUL_MANA_SPELL_CAST;
         m_caster->ProcDamageAndSpell(m_caster, procAttackerFlags, PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, m_attackType, m_spellInfo, this);
     }
 
@@ -3436,6 +3492,13 @@ void Spell::cast(bool skipCheck)
             SetExecutedCurrently(false);
             return;
         }
+    }
+
+    if (IsMeleeAttackResetSpell() && !(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_RESET_AUTO_ACTIONS))
+    {
+        m_caster->resetAttackTimer(BASE_ATTACK);
+        if (m_caster->haveOffhandWeapon())
+            m_caster->resetAttackTimer(OFF_ATTACK);
     }
 
     m_caster->DecreaseCastCounter();
@@ -3755,6 +3818,17 @@ void Spell::update(uint32 difftime)
                     ++iter;
 
                     SpellAuraHolder *holder = *curr;
+                    // Holder deleted before updating, but not removed from list. Clear usage
+                    // and remove. Use case: Cannot find caster in world to remove holder from
+                    // channeled spell in RemoveSpellAuraHolder
+                    if (holder->IsDeleted())
+                    {
+                        // TODO: Is this a leak if we don't delete it here? Unit probably removed from world
+                        holder->SetInUse(false);
+                        m_channeledHolders.erase(curr);
+                        continue;
+                    }
+
                     holder->UpdateHolder(difftime);
 
                     // Spell cast was interrupted on holder update. Unit likely died, targetted buff was
@@ -3775,7 +3849,6 @@ void Spell::update(uint32 difftime)
                             (holder->IsDeleted() && (remove == AURA_REMOVE_BY_RANGE || remove == AURA_REMOVE_BY_GROUP)))
                     {
                         holder->SetInUse(false);
-
                         m_channeledHolders.erase(curr);
                     }
                 }
@@ -4813,6 +4886,9 @@ void Spell::CastPreCastSpells(Unit* target)
 
 void Spell::AddChanneledAuraHolder(SpellAuraHolder *holder)
 {
+    if (!holder || !holder->IsChanneled())
+        return;
+
     // Set and hold in use until clean up to prevent any delete calls destroying
     // the object before we can handle it
     holder->SetInUse(true);
@@ -5044,7 +5120,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
 
-                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && !casterOwner->IsInDuelWith(targetOwner))
+                if (m_spellInfo->Id == 7266 && targetOwner && targetOwner->duel && casterOwner && !casterOwner->IsInDuelWith(targetOwner))
                 {
                     return SPELL_FAILED_TARGET_DUELING;
                 }
@@ -5986,7 +6062,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 SpellAuraHolder *holder = itr->second;
                 if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
                 {
-                    if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC)
+                    if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC ||
+                        holder->GetSpellProto()->Dispel == DISPEL_POISON)
                     {
                         bool positive = holder->IsPositive();
                         // do not remove positive auras if friendly target
@@ -6437,12 +6514,6 @@ bool Spell::CanAutoCast(Unit* target)
             {
                 if (target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)))
                     return false;
-            }
-            else
-            {
-                if (Aura* aura = target->GetAura(m_spellInfo->Id, SpellEffectIndex(j)))
-                    if (aura->GetStackAmount() >= m_spellInfo->StackAmount)
-                        return false;
             }
         }
         else if (IsAreaAuraEffect(m_spellInfo->Effect[j]))
@@ -7680,6 +7751,11 @@ public:
                         {
                             if (!casterUnit->IsValidAttackTarget(sourceUnit))
                                 continue;
+
+                            // Negative AoE from non flagged players cannot target other players
+                            if (Player *attackedPlayer = sourceUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
+                                if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
+                                    continue;
                         }
                         else if (GameObject* gobj = i_originalCaster->ToGameObject())
                         {
@@ -7906,11 +7982,19 @@ void Spell::OnSpellLaunch()
     if (!m_caster || !m_caster->IsInWorld())
         return;
 
-    if (m_spellInfo->Id == 21651 &&
-            sLockStore.LookupEntry(m_targets.getGOTarget()->GetGOInfo()->GetLockId())->Index[1] == LOCKTYPE_SLOW_OPEN)
+    // Make sure the player is sending a valid GO target and lock ID. SPELL_EFFECT_OPEN_LOCK
+    // can succeed with a lockId of 0
+    if (m_spellInfo->Id == 21651)
     {
-        Spell *visual = new Spell(m_caster, sSpellMgr.GetSpellEntry(24390), true);
-        visual->prepare();
+        if (GameObject *go = m_targets.getGOTarget())
+        {
+            LockEntry const *lockInfo = sLockStore.LookupEntry(go->GetGOInfo()->GetLockId());
+            if (lockInfo && lockInfo->Index[1] == LOCKTYPE_SLOW_OPEN)
+            {
+                Spell *visual = new Spell(m_caster, sSpellMgr.GetSpellEntry(24390), true);
+                visual->prepare();
+            }
+        }
     }
 
     unitTarget = m_targets.getUnitTarget();

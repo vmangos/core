@@ -260,7 +260,7 @@ void WorldSession::HandleQuestgiverChooseRewardOpcode(WorldPacket & recv_data)
         // Some quest can be rewarded while dead (cf q3912 [Meet at the Grave])
         if (Creature* crea = pObject->ToCreature())
         {
-            if (!crea->isInvisibleForAlive())
+            if (!crea->isVisibleForDead())
                 return;
         }
         else

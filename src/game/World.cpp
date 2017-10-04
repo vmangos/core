@@ -485,9 +485,11 @@ void World::LoadConfigSettings(bool reload)
         }
     }
 
+    m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
+
     ///- Read the player limit and the Message of the day from the config file
     SetPlayerLimit(sConfig.GetIntDefault("PlayerLimit", DEFAULT_PLAYER_LIMIT), true);
-    SetMotd(sConfig.GetStringDefault("Motd", "Welcome to the Massive Network Game Object Server."));
+    SetMotd(sConfig.GetStringDefault("Motd", "Welcome to the Massive Network Game Object Server.") + std::string("\n") + std::string(ObjectMgr::GetPatchName()) + std::string(" is now live!"));
 
     ///- Read all rates from the config file
     setConfigPos(CONFIG_FLOAT_RATE_HEALTH, "Rate.Health", 1.0f);
@@ -759,6 +761,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMATURE_FINISH_TIMER,       "BattleGround.PrematureFinishTimer", 5 * MINUTE * IN_MILLISECONDS);
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMADE_GROUP_WAIT_FOR_MATCH, "BattleGround.PremadeGroupWaitForMatch", 0);
     setConfig(CONFIG_UINT32_BATTLEGROUND_PREMADE_QUEUE_GROUP_MIN_SIZE, "BattleGround.PremadeQueue.MinGroupSize", 6);
+    setConfig(CONFIG_BOOL_BATTLEGROUND_RANDOMIZE,                      "BattleGround.RandomizeQueues", false);
+    setConfig(CONFIG_UINT32_BATTLEGROUND_GROUP_LIMIT,                  "BattleGround.GroupQueueLimit", 40);
 
     setConfig(CONFIG_BOOL_KICK_PLAYER_ON_BAD_PACKET, "Network.KickOnBadPacket", false);
 
@@ -900,10 +904,8 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE,      "MaxCreaturesStealthDetectRange", 15.0f);
 
     setConfig(CONFIG_BOOL_IS_MAPSERVER,                             "IsMapServer", false);
-    setConfig(CONFIG_UINT32_UPDATE_STEADY_BUFFER,                   "MapUpdateSteadyBuffer", 0);
 
     m_timeZoneOffset = sConfig.GetIntDefault("TimeZoneOffset", 0) * HOUR;
-    m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
 
     LoadNostalriusConfig(reload);
 
@@ -1616,7 +1618,13 @@ void World::SetInitialWorldSettings()
     if (!isMapServer)
         m_charDbWorkerThread.reset(new std::thread(&charactersDatabaseWorkerThread));
 
-    sLog.outString("%s initialized", isMapServer ? "Node" : "World");
+    sLog.outString();
+    sLog.outString("==========================================================");
+    sLog.outString("Current content is set to %s.", ObjectMgr::GetPatchName());
+    sLog.outString("==========================================================");
+    sLog.outString();
+
+    sLog.outString("%s initialized.", isMapServer ? "Node" : "World");
 
     uint32 uStartInterval = WorldTimer::getMSTimeDiff(uStartTime, WorldTimer::getMSTime());
     sLog.outString("SERVER STARTUP TIME: %i minutes %i seconds", uStartInterval / 60000, (uStartInterval % 60000) / 1000);
@@ -2722,7 +2730,7 @@ void World::LogTransaction(PlayerTransactionData const& data)
         std::stringstream items;
         for (int i = 0; i < TransactionPart::MAX_TRANSACTION_ITEMS; ++i)
             if (part.itemsEntries[i])
-                items << uint32(part.itemsEntries[i]) << ":" << uint32(part.itemsCount[i]) << " ";
+                items << uint32(part.itemsEntries[i]) << ":" << uint32(part.itemsCount[i]) << ":" << part.itemsGuid[i];
         logStmt.addString(items.str());
     }
     logStmt.Execute();

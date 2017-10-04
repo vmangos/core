@@ -125,9 +125,9 @@ ObjectMgr::ObjectMgr() :
     m_FirstTemporaryCreatureGuid(1),
     m_FirstTemporaryGameObjectGuid(1),
     m_GuildIds("Guild ids"),
-    m_ItemTextIds("Item text ids"),
     m_MailIds("Mail ids"),
     m_GroupIds("Group ids"),
+    m_PetitionIds("Petition ids"),
     // Nostalrius
     DBCLocaleIndex(0)
 {
@@ -166,6 +166,37 @@ ObjectMgr::~ObjectMgr()
 
     for (PlayerCacheDataMap::iterator itr = m_playerCacheData.begin(); itr != m_playerCacheData.end(); ++itr)
         delete itr->second;
+}
+
+char* const ObjectMgr::GetPatchName()
+{
+    switch(sWorld.GetWowPatch())
+    {
+        case 0:
+            return "Patch 1.2: Mysteries of Maraudon";
+        case 1:
+            return "Patch 1.3: Ruins of the Dire Maul";
+        case 2:
+            return "Patch 1.4: The Call to War";
+        case 3:
+            return "Patch 1.5: Battlegrounds";
+        case 4:
+            return "Patch 1.6: Assault on Blackwing Lair";
+        case 5:
+            return "Patch 1.7: Rise of the Blood God";
+        case 6:
+            return "Patch 1.8: Dragons of Nightmare";
+        case 7:
+            return "Patch 1.9: The Gates of Ahn'Qiraj";
+        case 8:
+            return "Patch 1.10: Storms of Azeroth";
+        case 9:
+            return "Patch 1.11: Shadow of the Necropolis";
+        case 10:
+            return "Patch 1.12: Drums of War";
+    }
+
+    return "Invalid Patch!";
 }
 
 // Nostalrius
@@ -405,8 +436,12 @@ SavedVariable& ObjectMgr::_InsertVariable(uint32 index, uint32 value, bool saved
 
 void ObjectMgr::_SaveVariable(const SavedVariable& toSave)
 {
+    // Must do this in a transaction, else if worker threads > 1 we could do one before the other
+    // when order is important...
+    WorldDatabase.BeginTransaction();
     WorldDatabase.PExecute("DELETE FROM `variables` WHERE `index` = %u", toSave.uiIndex);
     WorldDatabase.PExecute("INSERT INTO `variables` (`index`, `value`) VALUES (%u, %u)", toSave.uiIndex, toSave.uiValue);
+    WorldDatabase.CommitTransaction();
 }
 
 void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
@@ -895,7 +930,7 @@ struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader, SQLSto
 void ObjectMgr::LoadCreatureTemplates()
 {
     SQLCreatureLoader loader;
-    loader.Load(sCreatureStorage);
+    loader.LoadProgressive(sCreatureStorage, sWorld.GetWowPatch());
 
     sLog.outString(">> Loaded %u creature definitions", sCreatureStorage.GetRecordCount());
     sLog.outString();
@@ -1121,7 +1156,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
 
 void ObjectMgr::LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment)
 {
-    creatureaddons.Load();
+    creatureaddons.LoadProgressive(sWorld.GetWowPatch());
 
     sLog.outString(">> Loaded %u %s", creatureaddons.GetRecordCount(), comment);
     sLog.outString();
@@ -1186,7 +1221,7 @@ EquipmentInfoRaw const* ObjectMgr::GetEquipmentInfoRaw(uint32 entry)
 
 void ObjectMgr::LoadEquipmentTemplates()
 {
-    sEquipmentStorage.Load(true);
+    sEquipmentStorage.LoadProgressive(sWorld.GetWowPatch(), true);
 
     for (uint32 i = 0; i < sEquipmentStorage.GetMaxEntry(); ++i)
     {
@@ -1228,7 +1263,7 @@ void ObjectMgr::LoadEquipmentTemplates()
     sLog.outString(">> Loaded %u equipment template", sEquipmentStorage.GetRecordCount());
     sLog.outString();
 
-    sEquipmentStorageRaw.Load(false);
+    sEquipmentStorageRaw.LoadProgressive(sWorld.GetWowPatch(), false);
     for (uint32 i = 1; i < sEquipmentStorageRaw.GetMaxEntry(); ++i)
         if (sEquipmentStorageRaw.LookupEntry<EquipmentInfoRaw>(i))
             if (sEquipmentStorage.LookupEntry<EquipmentInfo>(i))
@@ -1394,8 +1429,8 @@ void ObjectMgr::LoadCreatures(bool reload)
                           "equipment_id, position_x, position_y, position_z, orientation, spawntimesecs, spawndist, currentwaypoint,"
                           //   12         13       14          15            16
                           "curhealth, curmana, DeathState, MovementType, event,"
-                          //   17                        18                                 19
-                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags "
+                          //   17                        18                                 19          20        21
+                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, patch_min, patch_max "
                           "FROM creature "
                           "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
                           "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid "
@@ -1423,12 +1458,29 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
+        uint8 patch_min     = fields[20].GetUInt8();
+        uint8 patch_max     = fields[21].GetUInt8();
+        bool existsInPatch  = true;
+
+        if ((patch_min > patch_max) || (patch_max > 10))
+        {
+            sLog.outErrorDb("Table `creature` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, entry, patch_min, patch_max);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, entry);
+            patch_min = 0;
+            patch_max = 10;
+        }
+
+        if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
+            existsInPatch = false;
 
         CreatureInfo const* cInfo = GetCreatureTemplate(entry);
         if (!cInfo)
         {
-            sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
-            sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
+            if (existsInPatch) // don't print error when it is not loaded for the current patch
+            {
+                sLog.outErrorDb("Table `creature` has creature (GUID: %u) with non existing creature entry %u, skipped.", guid, entry);
+                sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u;", guid);
+            }
             continue;
         }
 
@@ -1463,6 +1515,9 @@ void ObjectMgr::LoadCreatures(bool reload)
             sLog.out(LOG_DBERRFIX, "DELETE FROM creature WHERE guid=%u AND id=%u;", guid, data.id);
             continue;
         }
+
+        if (!existsInPatch)
+            data.spawnFlags |= SPAWN_FLAG_DISABLED;
 
         if (data.modelid_override > 0 && !sCreatureDisplayInfoStore.LookupEntry(data.modelid_override))
         {
@@ -1533,7 +1588,7 @@ void ObjectMgr::LoadCreatures(bool reload)
             }
         }
 
-        if (!alreadyPresent && gameEvent == 0 && GuidPoolId == 0 && EntryPoolId == 0) // if not this is to be managed by GameEvent System or Pool system
+        if (!alreadyPresent && existsInPatch && gameEvent == 0 && GuidPoolId == 0 && EntryPoolId == 0) // if not this is to be managed by GameEvent System or Pool system
             AddCreatureToGrid(guid, &data);
         ++count;
 
@@ -1899,7 +1954,7 @@ struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
 void ObjectMgr::LoadItemPrototypes()
 {
     SQLItemLoader loader;
-    loader.Load(sItemStorage);
+    loader.LoadProgressive(sItemStorage, sWorld.GetWowPatch());
     mQuestStartingItems.clear();
     sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();
@@ -3255,7 +3310,7 @@ void ObjectMgr::LoadQuests()
     m_ExclusiveQuestGroups.clear();
 
     //                                                0      1       2           3         4           5     6                7              8              9
-    QueryResult *result = WorldDatabase.Query("SELECT entry, Method, ZoneOrSort, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue,"
+    QueryResult *result = WorldDatabase.PQuery("SELECT entry, Method, ZoneOrSort, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue,"
                           //   10                   11                 12                     13                   14                     15                   16                17
                           "RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, SuggestedPlayers, LimitTime,"
                           //   18          19            20           21           22              23                24         25            26
@@ -3288,7 +3343,7 @@ void ObjectMgr::LoadQuests()
                           "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
                           //   123          124
                           "StartScript, CompleteScript"
-                          " FROM quest_template");
+                          " FROM quest_template t1 WHERE patch=(SELECT max(patch) FROM quest_template t2 WHERE t1.entry=t2.entry && patch <= %u)", sWorld.GetWowPatch());
     if (!result)
     {
         BarGoLink bar(1);
@@ -5215,7 +5270,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
     uint32 count = 0;
 
     //                                                0   1               2              3               4                    5                      6                    7                     8           9                  10
-    QueryResult *result = WorldDatabase.Query("SELECT id, required_level, required_item, required_item2, required_quest_done, required_failed_text, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport");
+    QueryResult *result = WorldDatabase.PQuery("SELECT id, required_level, required_item, required_item2, required_quest_done, required_failed_text, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport t1 WHERE patch=(SELECT max(patch) FROM areatrigger_teleport t2 WHERE t1.id=t2.id && patch <= %u)", sWorld.GetWowPatch());
     if (!result)
     {
 
@@ -5493,6 +5548,13 @@ void ObjectMgr::SetHighestGuids()
     if (result)
     {
         m_GroupIds.Set((*result)[0].GetUInt32() + 1);
+        delete result;
+    }
+
+    result = CharacterDatabase.Query("SELECT MAX(petitionguid) FROM petition");
+    if (result)
+    {
+        m_PetitionIds.Set((*result)[0].GetUInt32() + 1);
         delete result;
     }
 
@@ -6262,12 +6324,6 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
             continue;
         }
 
-        if (factionEntry->team == 0)
-        {
-            sLog.outErrorDb("Faction (faction.dbc) %u in `reputation_spillover_template` does not belong to any team, skipping", factionId);
-            continue;
-        }
-
         for (uint32 i = 0; i < MAX_SPILLOVER_FACTIONS; ++i)
         {
             if (repTemplate.faction[i])
@@ -6491,7 +6547,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id,quest FROM %s", table);
+    QueryResult *result = WorldDatabase.PQuery("SELECT id,quest FROM %s t1 WHERE patch=(SELECT max(patch) FROM %s t2 WHERE t1.id=t2.id && t1.quest=t2.quest && patch <= %u)", table, table, sWorld.GetWowPatch());
 
     if (!result)
     {
@@ -7146,9 +7202,10 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
 
 bool ObjectMgr::LoadQuestGreetings()
 {
-    mQuestGreetingLocaleMap.clear(); // need for reload case
+    for (uint32 i = 0; i < QUESTGIVER_TYPE_MAX; i++)
+        mQuestGreetingLocaleMap[i].clear(); // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
+    QueryResult *result = WorldDatabase.Query("SELECT entry,type,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
 
     if (!result)
     {
@@ -7161,25 +7218,47 @@ bool ObjectMgr::LoadQuestGreetings()
     do
     {
         Field *fields = result->Fetch();
-        int32 entry = fields[0].GetInt32();
+        uint32 entry = fields[0].GetUInt32();
+        uint8 type = fields[1].GetUInt8();
 
-        if ((entry < 1) || !ObjectMgr::GetCreatureTemplate(entry))
+        switch (type)
         {
-            sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
-            continue;
+            case QUESTGIVER_CREATURE:
+            {
+                if (!ObjectMgr::GetCreatureTemplate(entry))
+                {
+                    sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+                    continue;
+                }
+                break;
+            }
+            case QUESTGIVER_GAMEOBJECT:
+            {
+                if (!ObjectMgr::GetGameObjectInfo(entry))
+                {
+                    sLog.outErrorDb("Table `quest_greeting` have entry for nonexistent gameobject template (Entry: %u), ignore", entry);
+                    continue;
+                }
+                break;
+            }
+            default:
+            {
+                sLog.outErrorDb("Table `quest_greeting` have entry with invalid type (Type: %u), ignore", type);
+                continue;
+            }
         }
 
-        QuestGreetingLocale& data = mQuestGreetingLocaleMap[entry];
+        QuestGreetingLocale& data = mQuestGreetingLocaleMap[type][entry];
 
         data.Content.resize(1);
         ++count;
 
         // 0 -> default, idx in to idx+1
-        data.Content[0] = fields[1].GetCppString();
+        data.Content[0] = fields[2].GetCppString();
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
-            std::string str = fields[i + 1].GetCppString();
+            std::string str = fields[i + 2].GetCppString();
             if (!str.empty())
             {
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
@@ -7194,8 +7273,8 @@ bool ObjectMgr::LoadQuestGreetings()
             }
         }
 
-        data.Emote = fields[10].GetUInt16();
-        data.EmoteDelay = fields[11].GetUInt32();
+        data.Emote = fields[11].GetUInt16();
+        data.EmoteDelay = fields[12].GetUInt32();
 
         if (data.Emote && !sEmotesStore.LookupEntry(data.Emote))
         {
@@ -7596,7 +7675,7 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
 
     std::set<uint32> skip_vendors;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, item, maxcount, incrtime FROM %s", tableName);
+    QueryResult *result = WorldDatabase.PQuery("SELECT entry, item, maxcount, incrtime FROM %s WHERE (item NOT IN (SELECT entry FROM forbidden_items WHERE (AfterOrBefore = 0 && patch <= %u) || (AfterOrBefore = 1 && patch >= %u)))", tableName, sWorld.GetWowPatch(), sWorld.GetWowPatch());
     if (!result)
     {
         BarGoLink bar(1);
@@ -9015,6 +9094,19 @@ bool PlayerCondition::Meets(Player const* player, Map const* map, WorldObject co
                 case 3:                                     // Creature source is dead
                     return !source || source->GetTypeId() != TYPEID_UNIT || !((Unit*)source)->isAlive();
             }
+        case CONDITION_WOW_PATCH:
+        {
+            switch (m_value2)
+            {
+                case 0:
+                    return sWorld.GetWowPatch() == m_value1;
+                case 1:
+                    return sWorld.GetWowPatch() >= m_value1;
+                case 2:
+                    return sWorld.GetWowPatch() <= m_value1;
+            }
+            return false;
+        }
         default:
             return false;
     }
@@ -9420,6 +9512,20 @@ bool PlayerCondition::IsValid(uint16 entry, ConditionType condition, uint32 valu
             }
             break;
         }
+        case CONDITION_WOW_PATCH:
+        {
+            if (value1 > 10)
+            {
+                sLog.outErrorDb("Patch condition (entry %u, type %u) has an invalid value in value1 (must be 0..10), skipping.", entry, condition, value1);
+                return false;
+            }
+            if (value2 > 2)
+            {
+                sLog.outErrorDb("Patch condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped.", entry, condition, value2);
+                return false;
+            }
+            break;
+        }
         case CONDITION_NONE:
             break;
         default:
@@ -9453,6 +9559,7 @@ bool PlayerCondition::CanBeUsedWithoutPlayer(uint16 entry)
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_SOURCE_AURA:
         case CONDITION_LAST_WAYPOINT:
+        case CONDITION_WOW_PATCH:
             return true;
         default:
             return false;

@@ -247,8 +247,8 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
         sLog.outString("Flag : 0x%x, Extr : 0x%x. Aura %u (ICON %u)",
             procFlag, procExtra, spellProto->Id, spellProto->SpellIconID);*/
 
-    // Flurry can't proc on additional windfury attacks (is this right?)
-    if (spellProto->Id == 16280 && m_extraAttacks)
+    // Flurry can't proc on additional windfury attacks
+    if (spellProto->SpellIconID == 108 && spellProto->SpellVisual == 2759 && m_extraAttacks)
         return false;
 
     // Don't proc weapons on Sap
@@ -259,13 +259,6 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     /// Delete all these spells, and manage it via the DB (spell_proc_event)
     if (procSpell)
     {
-        // Redoubt
-        if (spellProto->SpellIconID == 28 && spellProto->SpellFamilyName == 0)
-        {
-            if (procFlag & PROC_FLAG_TAKEN_MELEE_HIT && procExtra & PROC_EX_CRITICAL_HIT)
-                return true;
-            return false;
-        }
         // Eye for an Eye
         if (spellProto->SpellIconID == 1820)
         {
@@ -553,9 +546,9 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     triggerAmount = triggeredByAura->GetModifier()->m_amount;
 
                     if (triggerAmount == 50)
-                        MonsterTextEmote(-1531044, NULL); // Cracks
+                        MonsterTextEmote(-1531044, NULL, true); // Cracks
                     else if (triggerAmount == 100)
-                        MonsterTextEmote(-1531045, NULL); // Shatter
+                        MonsterTextEmote(-1531045, NULL, true); // Shatter
                     else if (triggerAmount == 150)
                     {
                         RemoveAurasDueToSpell(25937);
@@ -1154,10 +1147,10 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 // Nostalrius
                 case 28200:
                 {
-                    if (procFlags & (PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT | PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT))
+                    if (procFlags & (PROC_FLAG_SUCCESSFUL_AOE))
                     {
-                        if (procFlags != PROC_FLAG_SUCCESSFUL_POSITIVE_AOE_HIT &&
-                                procFlags != PROC_FLAG_SUCCESSFUL_AOE_SPELL_HIT)
+                        if (procFlags != PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL &&
+                                procFlags != PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT)
                             return SPELL_AURA_PROC_FAILED;
                     }
                     break;
@@ -1480,7 +1473,7 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                         basepoints[EFFECT_INDEX_2] ? &basepoints[EFFECT_INDEX_2] : NULL,
                         true, castItem, triggeredByAura);
     else
-        CastSpell(target, trigger_spell_id, true, castItem, triggeredByAura);
+        CastSpell(target, trigger_spell_id, true, castItem, triggeredByAura, ObjectGuid(), nullptr, procSpell);
 
     if (cooldown && GetTypeId() == TYPEID_PLAYER)
         ((Player*)this)->AddSpellCooldown(trigger_spell_id, 0, time(NULL) + cooldown);
@@ -1494,7 +1487,9 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit *pVictim, uint32 
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
-    CalculateSpellDamage(&damageInfo, triggeredByAura->GetModifier()->m_amount, spellInfo);
+    damageInfo.damage = CalculateSpellDamage(pVictim, spellInfo, triggeredByAura->GetEffIndex());
+    damageInfo.damage = SpellDamageBonusDone(pVictim, spellInfo, damageInfo.damage, SPELL_DIRECT_DAMAGE);
+    damageInfo.damage = pVictim->SpellDamageBonusTaken(this, spellInfo, damageInfo.damage, SPELL_DIRECT_DAMAGE);
     damageInfo.target->CalculateAbsorbResistBlock(this, &damageInfo, spellInfo);
     DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
     SendSpellNonMeleeDamageLog(&damageInfo);
@@ -1552,6 +1547,13 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint3
                 return SPELL_AURA_PROC_FAILED;
 
             triggered_spell_id = 24406;
+            break;
+        }
+        case 3656: // Corrupted Healing
+        {
+            // only proc on direct healing
+            if (IsSpellHaveEffect(procSpell, SPELL_EFFECT_HEAL))
+                triggered_spell_id = 23402;
             break;
         }
     }

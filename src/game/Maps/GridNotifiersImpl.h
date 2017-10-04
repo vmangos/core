@@ -156,6 +156,11 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!i_dynobject.NeedsRefresh(target))
         return;
 
+    // Negative AoE from non flagged players cannot target other players
+    if (Player *attackedPlayer = target->GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (!i_positive && i_check->IsPlayer() && !i_check->IsPvP() && !((Player*)i_check)->IsInDuelWith(attackedPlayer))
+            return;
+
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(i_dynobject.GetSpellId());
     SpellEffectIndex eff_index  = i_dynobject.GetEffIndex();
 
@@ -205,8 +210,11 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
         holder = CreateSpellAuraHolder(spellInfo, target, i_dynobject.GetCaster());
         PersistentAreaAura* Aur = new PersistentAreaAura(spellInfo, eff_index, NULL, holder, target, i_dynobject.GetCaster());
         holder->AddAura(Aur, eff_index);
-            
-        target->AddSpellAuraHolder(holder);
+
+        // Debuff slots may be full, in which case holder is deleted or holder is not able to
+        // be added for some reason
+        if (!target->AddSpellAuraHolder(holder))
+            holder = nullptr;
     }
 
     if (holder && holder->IsChanneled())

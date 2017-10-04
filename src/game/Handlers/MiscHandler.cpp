@@ -97,6 +97,9 @@ public:
         bool allowTwoSideWhoList = sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_WHO_LIST);
         AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
+        const uint32 zone = sess->GetPlayer()->GetCachedZoneId();
+        const bool notInBattleground = !((zone == 2597) || (zone == 3277) || (zone == 3358));
+
         WorldPacket data(SMSG_WHO, 50);                         // guess size
         data << uint32(clientcount);                            // clientcount place holder, listed count
         data << uint32(clientcount);                            // clientcount place holder, online count
@@ -166,7 +169,9 @@ public:
             {
                 if (zoneids[i] == pzoneid)
                 {
-                    z_show = true;
+                    // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+                    // Using the / who command while in a Battleground instance will now only display players in your instance.
+                    z_show = (zone != pzoneid) || notInBattleground || (sess->GetPlayer()->GetInstanceId() == pl->GetInstanceId());
                     break;
                 }
 

@@ -184,6 +184,7 @@ bool Database::Initialize(const char * infoString, int nConns /*= 1*/, int nWork
         return false;
 
     m_numAsyncWorkers = nWorkers;
+
     for (int i = 0; i < nWorkers; ++i)
         if (!InitDelayThread(infoString))
             return false;
@@ -224,11 +225,13 @@ bool Database::InitDelayThread(std::string const& infoString)
     SqlConnection* threadConnection = CreateConnection();
     if(!threadConnection->Initialize(infoString.c_str()))
         return false;
+
     std::shared_ptr<SqlDelayThread> tbody = std::make_shared<SqlDelayThread>(this, threadConnection);
     m_threadsBodies.emplace_back(tbody);
     m_delayThreads.emplace_back([tbody](){
         tbody->run();
     });
+
     return true;
 }
 
@@ -239,10 +242,13 @@ void Database::HaltDelayThread()
 
     for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
         m_threadsBodies[i]->Stop();
+
     for (uint32 i = 0; i < m_numAsyncWorkers; ++i)
         m_delayThreads[i].join();
+
     m_threadsBodies.clear();
     m_delayThreads.clear();
+
     m_numAsyncWorkers = 0;
 }
 
@@ -448,7 +454,7 @@ bool Database::DirectPExecute(const char * format,...)
     return DirectExecute(szQuery);
 }
 
-bool Database::BeginTransaction()
+bool Database::BeginTransaction(uint32 serialId)
 {
     if (!m_pAsyncConn)
         return false;
@@ -457,9 +463,21 @@ bool Database::BeginTransaction()
         return false;
 
     //initiate transaction on current thread
-    //currently we do not support queued transactions
-    m_TransStorage->init();
+    m_TransStorage->init(serialId);
     return true;
+}
+
+bool Database::InTransaction()
+{
+    return m_TransStorage->get() != NULL;
+}
+
+uint32 Database::GetTransactionSerialId()
+{
+    if (SqlTransaction *trans = m_TransStorage->get())
+        return trans->GetSerialId();
+
+    return 0;
 }
 
 bool Database::CommitTransaction()
@@ -477,7 +495,12 @@ bool Database::CommitTransaction()
         return CommitTransactionDirect();
 
     //add SqlTransaction to the async queue
-    AddToDelayQueue(m_TransStorage->detach());
+    // if serial ID > 0, add to the serial delay queue
+    SqlTransaction *trans = m_TransStorage->detach();
+    if (trans->GetSerialId() > 0)
+        AddToSerialDelayQueue(trans);
+    else
+        AddToDelayQueue(trans);
     return true;
 }
 
@@ -509,6 +532,31 @@ bool Database::RollbackTransaction()
     m_TransStorage->reset();
 
     return true;
+}
+
+void Database::AddToSerialDelayQueue(SqlOperation *op)
+{
+    if (op->GetSerialId() == 0 || m_numAsyncWorkers == 0)
+    {
+        AddToDelayQueue(op);
+        return;
+    }
+
+    // This is a very naive way of doing this. No load balancing.
+    // TODO: Load balance, must maintain mapping of serial ID so queries are
+    // executed sequentially, however
+    int worker = op->GetSerialId() % m_numAsyncWorkers;
+    m_threadsBodies[worker]->addSerialOperation(op);
+}
+
+bool Database::HasAsyncQuery()
+{
+    bool hasQuery = !m_delayQueue->empty_unsafe();
+
+    for (int i = 0; i < m_numAsyncWorkers && !hasQuery; ++i)
+        hasQuery = m_threadsBodies[i]->HasAsyncQuery();
+
+    return hasQuery;
 }
 
 bool Database::CheckRequiredMigrations(const char **migrations)
@@ -653,10 +701,11 @@ Database::TransHelper::~TransHelper()
     reset();
 }
 
-SqlTransaction * Database::TransHelper::init()
+SqlTransaction * Database::TransHelper::init(uint32 serialId)
 {
     MANGOS_ASSERT(!m_pTrans);   //if we will get a nested transaction request - we MUST fix code!!!
-    m_pTrans = new SqlTransaction;
+    m_pTrans = new SqlTransaction(serialId);
+
     return m_pTrans;
 }
 

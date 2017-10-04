@@ -126,6 +126,13 @@ struct QuestGreetingLocale
     uint32 EmoteDelay;
 };
 
+enum
+{
+    QUESTGIVER_CREATURE = 0,
+    QUESTGIVER_GAMEOBJECT = 1,
+    QUESTGIVER_TYPE_MAX = 2,
+};
+
 typedef UNORDERED_MAP<uint32,CreatureData> CreatureDataMap;
 typedef CreatureDataMap::value_type CreatureDataPair;
 
@@ -343,6 +350,8 @@ enum ConditionType
     CONDITION_GENDER                = 35,                   // 0=male, 1=female, 2=none (see enum Gender)
     CONDITION_DEAD_OR_AWAY          = 36,                   // value1: 0=player dead, 1=player is dead (with group dead), 2=player in instance are dead, 3=creature is dead
                                                             // value2: if != 0 only consider players in range of this value
+    CONDITION_WOW_PATCH             = 37,                   // value1: wow patch setting from config (0-10)
+                                                            // value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
 };
 
 enum ConditionSource                                        // From where was the condition called?
@@ -485,17 +494,16 @@ enum PermVariables
     // ITEM ID RANGES ARE USED FOR AQ WAR EFFORT
 
     // Dragons of Nightmare support
-    VAR_ALIVE_COUNT = 30000,    // how many dragons should be alive atm (updated once dragon is killed)
-    VAR_REQ_UPDATE  = 30001,    // should keep >=1 if the last alive dragon was killed and the repawn time is not saved yet, 0 otherwise
+    VAR_ALIVE_COUNT = 30000,    // unused
+    VAR_REQ_UPDATE  = 30001,    // keep at DEF_STOP_DELAY unless all dragons are dead
     VAR_RESP_TIME   = 30002,    // next event time; should be set in here once last dragon is killed
-    VAR_REQ_PERM    = 30003,    // permutation required
+    VAR_REQ_PERM    = 30003,    // unused
     VAR_PERM_1      = 30004,    // saved permutation result
     VAR_PERM_2      = 30005,
     VAR_PERM_3      = 30006,
     VAR_PERM_4      = 30007,
 
     DEF_ALIVE_COUNT = 4,        // default alive dragons count for VAR_ALIVE_COUNT
-    DEF_REQ_UPDATE  = 0,        // default update requirement for VAR_REQ_UPDATE
     DEF_STOP_DELAY  = 5,        // default times event check will not stop the event
 
     NPC_YSONDRE     = 14887,
@@ -673,6 +681,8 @@ class ObjectMgr
         {
             return mGameObjectForQuestSet.find(entry) != mGameObjectForQuestSet.end();
         }
+
+        static char* const GetPatchName();
 
         GossipText const* GetGossipText(uint32 Text_ID) const;
 
@@ -855,8 +865,9 @@ class ObjectMgr
         void FreeAuctionID(uint32 id);
         uint32 GenerateGuildId() { return m_GuildIds.Generate(); }
         uint32 GenerateGroupId() { return m_GroupIds.Generate(); }
-        uint32 GenerateItemTextID() { return m_ItemGuids.Generate(); }
+        uint32 GenerateItemTextID() { return m_ItemTextIds.Generate(); }
         uint32 GenerateMailID() { return m_MailIds.Generate(); }
+        uint32 GeneratePetitionID() { return m_PetitionIds.Generate(); }
         uint32 GeneratePetNumber();
 
         void GenerateItemLowGuidRange(uint32& first, uint32& last) { m_ItemGuids.GenerateRange(first, last); }
@@ -1013,10 +1024,10 @@ class ObjectMgr
         int32 GetDBCLocaleIndex() const { return DBCLocaleIndex; }
         void SetDBCLocaleIndex(uint32 lang) { DBCLocaleIndex = GetIndexForLocale(LocaleConstant(lang)); }
 
-        QuestGreetingLocale const* GetQuestGreetingLocale(int32 entry) const
+        QuestGreetingLocale const* GetQuestGreetingLocale(uint32 entry, uint8 type) const
         {
-            auto itr = mQuestGreetingLocaleMap.find(entry);
-            if (itr == mQuestGreetingLocaleMap.end()) return nullptr;
+            auto itr = mQuestGreetingLocaleMap[type].find(entry);
+            if (itr == mQuestGreetingLocaleMap[type].end()) return nullptr;
             return &itr->second;
         }
 
@@ -1230,9 +1241,9 @@ class ObjectMgr
 
         // first free id for selected id type
         IdGenerator<uint32> m_GuildIds;
-        IdGenerator<uint32> m_ItemTextIds;
         IdGenerator<uint32> m_MailIds;
         IdGenerator<uint32> m_GroupIds;
+        IdGenerator<uint32> m_PetitionIds;
         uint32              m_NextPetNumber;
         std::set<uint32>    m_AuctionsIds;
         uint32              m_NextAuctionId;
@@ -1248,6 +1259,7 @@ class ObjectMgr
         // first free low guid for selected guid type
         ObjectGuidGenerator<HIGHGUID_PLAYER>     m_CharGuids;
         ObjectSafeGuidGenerator<HIGHGUID_ITEM>   m_ItemGuids;   // Needs to be thread safe
+        ObjectSafeGuidGenerator<HIGHGUID_ITEM>   m_ItemTextIds;
         ObjectGuidGenerator<HIGHGUID_CORPSE>     m_CorpseGuids;
 
         QuestMap            mQuestTemplates;
@@ -1347,7 +1359,7 @@ class ObjectMgr
         NpcTextLocaleMap mNpcTextLocaleMap;
         PageTextLocaleMap mPageTextLocaleMap;
         MangosStringLocaleMap mMangosStringLocaleMap;
-        QuestGreetingLocaleMap mQuestGreetingLocaleMap;
+        QuestGreetingLocaleMap mQuestGreetingLocaleMap[QUESTGIVER_TYPE_MAX];
         GossipMenuItemsLocaleMap mGossipMenuItemsLocaleMap;
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;
         AreaLocaleMap mAreaLocaleMap;

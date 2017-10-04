@@ -174,7 +174,8 @@ Creature::Creature(CreatureSubtype subtype) :
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
-    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr)
+    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
+    m_AI_InitializeOnRespawn(false), m_combatPulseTimer(0), m_combatWithZoneState(false)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -277,8 +278,12 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
     SetEntry(Entry);                                        // normal entry always
     m_creatureInfo = cinfo;                                 // map mode related always
 
-    SetObjectScale(DEFAULT_OBJECT_SCALE);
-    setNativeScale(cinfo->scale);
+    SetObjectScale(cinfo->scale);
+    // Reset native scale before we apply creature info multiplier, otherwise we are
+    // stuck at 1 from the previous m_nativeScaleOverride if the unit's entry is
+    // being changed
+    m_nativeScaleOverride = cinfo->scale;
+    m_nativeScale = cinfo->scale;
 
     // equal to player Race field, but creature does not have race
     SetByteValue(UNIT_FIELD_BYTES_0, 0, 0);
@@ -627,7 +632,14 @@ void Creature::Update(uint32 update_diff, uint32 diff)
 
                 //Call AI respawn virtual function
                 if (AI())
+                {
                     AI()->JustRespawned();
+
+                    // If the creature AI needs to be re-initialized after respawn, do it now
+                    // Useful for swapping AIs on mobs that change entry on respawn
+                    if (m_AI_InitializeOnRespawn)
+                        AIM_Initialize();
+                }
 
                 if (m_zoneScript)
                     m_zoneScript->OnCreatureRespawn(this);
@@ -735,7 +747,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                                      getVictim() &&
                                      GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
                                      !HasDistanceCasterMovement() &&
-                                     (!IsWithinDistInMap(getVictim(), GetMaxChaseDistance(getVictim())) || !IsWithinLOSInMap(getVictim())) &&
+                                     (!CanReachWithMeleeAttack(getVictim()) || !IsWithinLOSInMap(getVictim())) &&
                                      !GetMotionMaster()->operator->()->IsReachable();
             // No evade mode for pets.
             if (unreachableTarget && GetCharmerOrOwnerGuid().IsPlayer())
@@ -758,6 +770,18 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             {
                 LogLongCombat();
                 ResetCombatTime(true);
+            }
+
+            // Raid bosses do a periodic combat pulse
+            if (m_combatState && m_combatWithZoneState)
+            {
+                if (m_combatPulseTimer > 3000)
+                {
+                    SetInCombatWithZone(false);
+                    m_combatPulseTimer = 0;
+                }
+                else
+                    m_combatPulseTimer += update_diff;
             }
 
             if (AI())
@@ -1329,23 +1353,26 @@ void Creature::SaveToDB(uint32 mapid)
 
     std::ostringstream ss;
     ss << "INSERT INTO creature VALUES ("
-       << GetGUIDLow() << ","
-       << GetEntry() << ","
-       << mapid << ","
-       << displayId << ","
-       << GetEquipmentId() << ","
-       << GetPositionX() << ","
-       << GetPositionY() << ","
-       << GetPositionZ() << ","
-       << GetOrientation() << ","
-       << m_respawnDelay << ","                            //respawn time
-       << (float) m_respawnradius << ","                   //spawn distance (float)
-       << (uint32)(0) << ","                               //currentwaypoint
-       << GetHealth() << ","                               //curhealth
-       << GetPower(POWER_MANA) << ","                      //curmana
-       << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
-       << GetDefaultMovementType() << ","                 //default movement generator type
-       << m_isActiveObject << ")";
+        << GetGUIDLow() << ","
+        << GetEntry() << ","
+        << mapid << ","
+        << displayId << ","
+        << GetEquipmentId() << ","
+        << GetPositionX() << ","
+        << GetPositionY() << ","
+        << GetPositionZ() << ","
+        << GetOrientation() << ","
+        << m_respawnDelay << ","                            //respawn time
+        << (float)m_respawnradius << ","                    //spawn distance (float)
+        << (uint32)(0) << ","                               //currentwaypoint
+        << GetHealth() << ","                               //curhealth
+        << GetPower(POWER_MANA) << ","                      //curmana
+        << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
+        << GetDefaultMovementType() << ","                  //default movement generator type
+        << m_isActiveObject << ","
+        << "0,"                                             //patch_min
+        << "10)";                                           //patch_max
+       
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
@@ -2371,7 +2398,7 @@ void Creature::SendZoneUnderAttackMessage(Player* attacker)
     sWorld.SendGlobalMessage(&data, nullptr, (enemy_team == ALLIANCE ? HORDE : ALLIANCE));
 }
 
-void Creature::SetInCombatWithZone()
+void Creature::SetInCombatWithZone(bool initialPulse)
 {
     if (!CanHaveThreatList())
     {
@@ -2392,11 +2419,17 @@ void Creature::SetInCombatWithZone()
     if (PlList.isEmpty())
         return;
 
+    if (!m_combatWithZoneState)
+        UpdateCombatWithZoneState(true);
+
     for (Map::PlayerList::const_iterator i = PlList.begin(); i != PlList.end(); ++i)
     {
         if (Player* pPlayer = i->getSource())
         {
             if (pPlayer->isGameMaster())
+                continue;
+
+            if (!initialPulse && pPlayer->isInCombat())
                 continue;
 
             if (pPlayer->isAlive() && !IsFriendlyTo(pPlayer))
@@ -3028,6 +3061,7 @@ void Creature::SetHomePosition(float x, float y, float z, float o)
 void Creature::OnLeaveCombat()
 {
     UpdateCombatState(false);
+    UpdateCombatWithZoneState(false);
 
     if (_creatureGroup)
         _creatureGroup->OnLeaveCombat(this);
@@ -3058,6 +3092,7 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
 
         SetStandState(UNIT_STAND_STATE_STAND);
         _pacifiedTimer = 0;
+        m_combatPulseTimer = 0;
 
         if (m_zoneScript)
             m_zoneScript->OnCreatureEnterCombat(this);

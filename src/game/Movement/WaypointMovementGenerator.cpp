@@ -277,8 +277,12 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     if (player.m_taxi.empty())
     {
         player.getHostileRefManager().setOnlineOfflineState(true);
-        if (player.pvpInfo.inHostileArea)
+        if (player.pvpInfo.inHostileArea) 
+        {
             player.CastSpell(&player, 2479, true);
+            if (!player.IsPvP())
+                player.UpdatePvP(true, true);
+        }
 
         // update z position to ground and orientation for landing point
         // this prevent cheating with landing  point at lags
