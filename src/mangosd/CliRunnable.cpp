@@ -104,24 +104,59 @@ bool ChatHandler::HandleAccountDeleteCommand(char* args)
  * Collects all GUIDs (and related info) from deleted characters which are still in the database.
  *
  * @param foundList    a reference to an std::list which will be filled with info data
+ * @param useName      use a name/guid search (true) or an account name / account id search (false)
  * @param searchString the search string which either contains a player GUID (low part) or a part of the character-name
  * @return             returns false if there was a problem while selecting the characters (e.g. player name not normalizeable)
  */
-bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, std::string searchString)
+bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool useName, std::string searchString)
 {
     QueryResult* resultChar;
     if (!searchString.empty())
     {
-        // search by GUID
-        if (isNumeric(searchString))
-            resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND guid = %u LIMIT 0,50", uint32(atoi(searchString.c_str())));
-        // search by name
+        if (useName)
+        {
+            // search by GUID
+            if (isNumeric(searchString))
+                resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND guid = %u LIMIT 0,50", uint32(atoi(searchString.c_str())));
+            // search by name
+            else
+            {
+                if (!normalizePlayerName(searchString))
+                    return false;
+
+                resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " LIMIT 0,50", searchString.c_str());
+            }
+        }
         else
         {
-            if(!normalizePlayerName(searchString))
-                return false;
+            // search by account id
+            if (isNumeric(searchString))
+                resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Account = %u LIMIT 0,50", uint32(atoi(searchString.c_str())));
+            // search by account name
+            else
+            {
+                if (!AccountMgr::normalizeString(searchString))
+                    return false;
 
-            resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " LIMIT 0,50", searchString.c_str());
+                LoginDatabase.escape_string(searchString);
+                QueryResult* result = LoginDatabase.PQuery("SELECT id FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), searchString.c_str());
+                std::list<uint32> list = {};
+                do
+                {
+                    Field* fields = result->Fetch();
+                    uint32 acc_id = fields[0].GetUInt32();
+                    list.push_back(acc_id);
+                } while (result->NextRow());
+
+                delete result;
+                if (list.size() < 1)
+                    return false;
+                std::stringstream accountStream;
+                std::copy(list.begin(), list.end(), std::ostream_iterator<int>(accountStream, ","));
+                std::string accounts = accountStream.str();
+                accounts.pop_back();
+                resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Account IN (%s) LIMIT 0,50", accounts.c_str());
+            }
         }
     }
     else
@@ -229,10 +264,18 @@ void ChatHandler::HandleCharacterDeletedListHelper(DeletedInfoList const& foundL
  *
  * @param args the search string which either contains a player GUID or a part of the character-name
  */
-bool ChatHandler::HandleCharacterDeletedListCommand(char* args)
+bool ChatHandler::HandleCharacterDeletedListNameCommand(char * args)
+{
+    return HandleCharacterDeletedListCommand(args, true);
+}
+bool ChatHandler::HandleCharacterDeletedListAccountCommand(char * args)
+{
+    return HandleCharacterDeletedListCommand(args, false);
+}
+bool ChatHandler::HandleCharacterDeletedListCommand(char* args, bool useName)
 {
     DeletedInfoList foundList;
-    if (!GetDeletedCharacterInfoList(foundList, args))
+    if (!GetDeletedCharacterInfoList(foundList, useName, args))
         return false;
 
     // if no characters have been found, output a warning
@@ -308,7 +351,7 @@ bool ChatHandler::HandleCharacterDeletedRestoreCommand(char* args)
     params >> searchString >> newCharName >> newAccount;
 
     DeletedInfoList foundList;
-    if (!GetDeletedCharacterInfoList(foundList, searchString))
+    if (!GetDeletedCharacterInfoList(foundList, true, searchString))
         return false;
 
     if (foundList.empty())

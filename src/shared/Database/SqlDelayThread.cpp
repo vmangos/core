@@ -23,7 +23,8 @@
 #include "Database/SqlOperations.h"
 #include "DatabaseEnv.h"
 
-SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn) : m_dbEngine(db), m_dbConnection(conn), m_running(true)
+SqlDelayThread::SqlDelayThread(Database* db, SqlConnection* conn, int workerId)
+    : m_dbEngine(db), m_dbConnection(conn), m_running(true), m_workerId(workerId)
 {
 }
 
@@ -76,6 +77,13 @@ void SqlDelayThread::ProcessRequests()
 {
     SqlOperation* s = NULL;
     while (m_dbEngine->NextDelayedOperation(s))
+    {
+        s->Execute(m_dbConnection);
+        delete s;
+    }
+
+    // Process any serial operations for this worker
+    while (m_dbEngine->NextSerialDelayedOperation(m_workerId, s))
     {
         s->Execute(m_dbConnection);
         delete s;

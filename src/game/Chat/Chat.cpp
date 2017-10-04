@@ -155,14 +155,21 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 
+    static ChatCommand characterDeletedListCommandTable[] =
+    {
+        { NODE, "account",         SEC_ADMINISTRATOR, true, &ChatHandler::HandleCharacterDeletedListAccountCommand, "", nullptr },
+        { NODE, "name",            SEC_ADMINISTRATOR, true, &ChatHandler::HandleCharacterDeletedListNameCommand, "", nullptr }
+    };
+
     static ChatCommand characterDeletedCommandTable[] =
     {
         { NODE, "delete",         SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeletedDeleteCommand, "", nullptr },
-        { NODE, "list",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleCharacterDeletedListCommand, "", nullptr },
+        { NODE, "list",           SEC_ADMINISTRATOR,  true, nullptr                                         , "", characterDeletedListCommandTable },
         { NODE, "restore",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleCharacterDeletedRestoreCommand, "", nullptr },
         { NODE, "old",            SEC_CONSOLE,        true,  &ChatHandler::HandleCharacterDeletedOldCommand, "", nullptr },
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
+
 
     static ChatCommand characterCleanCommandTable[] =
     {

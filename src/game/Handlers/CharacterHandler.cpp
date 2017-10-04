@@ -61,7 +61,7 @@ private:
     ObjectGuid m_guid;
 public:
     LoginQueryHolder(uint32 accountId, ObjectGuid guid)
-        : m_accountId(accountId), m_guid(guid) { }
+        : SqlQueryHolder(guid.GetCounter()), m_accountId(accountId), m_guid(guid) { }
     ~LoginQueryHolder()
     {
         // Queries should NOT be deleted by user

@@ -517,6 +517,17 @@ uint32 instance_temple_of_ahnqiraj::GetData(uint32 uiType)
     return m_auiEncounter[uiType];
 }
 
+bool instance_temple_of_ahnqiraj::CheckConditionCriteriaMeet(Player const* player, uint32 map_id, WorldObject const* source, uint32 instance_condition_id) const
+{
+    if (instance_condition_id >= MAX_ENCOUNTER)
+        return false;
+
+    if (m_auiEncounter[instance_condition_id] == DONE)
+        return true;
+    else
+        return false;
+}
+
 bool AreaTrigger_at_temple_ahnqiraj(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
     if (pAt->id == AREATRIGGER_TWIN_EMPERORS || pAt->id == AREATRIGGER_SARTURA)

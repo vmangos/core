@@ -671,16 +671,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     uint32 spell_id = 0;
                     uint32 roll = urand(0, 99);
                     if (roll < 25)                          // Fireball (25% chance)
-                        spell_id = 15662;
+                        spell_id = 11921;
                     else if (roll < 50)                     // Frostbolt (25% chance)
-                        spell_id = 11538;
+                        spell_id = 13322;
                     else if (roll < 70)                     // Chain Lighting (20% chance)
                         spell_id = 21179;
                     else if (roll < 77)                     // Polymorph (10% chance, 7% to target)
-                        spell_id = 14621;
+                        spell_id = 13323;
                     else if (roll < 80)                     // Polymorph (10% chance, 3% to self, backfire)
                     {
-                        spell_id = 14621;
+                        spell_id = 13323;
                         newTarget = m_caster;
                     }
                     else if (roll < 95)                     // Enveloping Winds (15% chance)
@@ -2939,7 +2939,8 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         SpellAuraHolder *holder = itr->second;
         if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
         {
-            if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC)
+            if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC || 
+                holder->GetSpellProto()->Dispel == DISPEL_POISON)
             {
                 if (checkFaction)
                 {
@@ -3320,6 +3321,8 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 
     if (m_spellInfo->Id == 9515) // Exception for 'Summon Tracking Hound'
         level = m_spellInfo->spellLevel;
+    if (m_spellInfo->Id == 14642 && level > cInfo->maxlevel) // Felhound Minion level cap
+        level = cInfo->maxlevel;
 
     // select center of summon position
     float center_x = m_targets.m_destX;
@@ -3633,7 +3636,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
         duration = 1800;                                    // 30 mins
     // some fishing pole bonuses
     else if (m_spellInfo->SpellVisual == 563)
-        duration = 600;                                     // 10 mins
+        duration = enchant_id == 266 ? 300 : 600;           // 10 or 5 mins
     // shaman Rockbiter enchantments
     else if (m_spellInfo->SpellVisual == 58)
         duration = 300;                                     // 5 mins (Ustaag <Nostalrius> : 30 mn post 1.12)
@@ -5253,6 +5256,12 @@ void Spell::EffectFeedPet(SpellEffectIndex eff_idx)
 
     if (!pet->isAlive())
         return;
+
+    if (!pet->IsWithinLOSInMap(_player))
+    {
+        SendCastResult(SPELL_FAILED_LINE_OF_SIGHT);
+        return;
+    }
 
     int32 benefit = pet->GetCurrentFoodBenefitLevel(foodItem->GetProto()->ItemLevel);
     if (benefit <= 0)

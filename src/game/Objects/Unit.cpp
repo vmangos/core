@@ -464,6 +464,7 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType)
     {
         if (!(*iter))
         {
+            sLog.outError("Unit::RemoveSpellsCausingAura nullptr in m_modAuras[%d]", (int)auraType);
             ++iter;
             continue;
         }
@@ -1954,6 +1955,20 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
                 alreadyDone.insert(*i);
                 uint32 damage = (*i)->GetModifier()->m_amount;
                 SpellEntry const *i_spellProto = (*i)->GetSpellProto();
+
+                // Apply damage percentage modifiers (#1601)
+                float DoneTotalMod = 1.0f;
+                AuraList const& mModDamagePercentDone = pVictim->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+                for (AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+                {
+                    if (((*i)->GetModifier()->m_miscvalue & GetSpellSchoolMask(i_spellProto)) &&
+                        (*i)->GetSpellProto()->EquippedItemClass == -1 &&
+                        (*i)->GetSpellProto()->EquippedItemInventoryTypeMask == 0)
+                    {
+                        DoneTotalMod *= ((*i)->GetModifier()->m_amount + 100.0f) / 100.0f;
+                    }
+                }
+                damage *= DoneTotalMod;
 
                 // apply SpellBaseDamageBonusTaken for mobs only
                 // for example, Death Talon Seethers with Aura of Flames reflect 1200 damage to tanks with Mark of Flame
@@ -8438,6 +8453,14 @@ bool Unit::isInvisibleForAlive() const
     if (m_AuraFlags & UNIT_AURAFLAG_ALIVE_INVISIBLE)
         return true;
     // TODO: maybe spiritservices also have just an aura
+    return isSpiritService();
+}
+
+/// returns true if creature can be seen by dead units
+bool Unit::isVisibleForDead() const
+{
+    if (GetTypeId() == TYPEID_UNIT && ToCreature()->GetCreatureInfo()->type_flags & CREATURE_TYPEFLAGS_GHOST_VISIBLE)
+        return true;
     return isSpiritService();
 }
 

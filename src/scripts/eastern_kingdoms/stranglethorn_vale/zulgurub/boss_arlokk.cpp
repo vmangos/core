@@ -157,8 +157,7 @@ struct boss_arlokkAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
 
         m_creature->RemoveAurasDueToSpell(SPELL_PANTHER_TRANSFORM);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
-        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+        m_creature->LeaveVanish();
         m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
 
         if (m_pInstance)

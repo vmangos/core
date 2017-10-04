@@ -14799,6 +14799,9 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
 
     if (s.remaintime != -1 && !IsPositiveSpell(spellproto))
     {
+        if (timediff > (INT_MAX / IN_MILLISECONDS))
+            return;
+
         if (s.remaintime <= int32(timediff) * IN_MILLISECONDS)
             return;
 
@@ -15578,7 +15581,7 @@ void Player::SaveToDB(bool online, bool force)
     //DEBUG_FILTER_LOG(LOG_FILTER_PLAYER_STATS, "The value of player %s at save: ", m_name.c_str());
     //outDebugStatsValues();
 
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(GetGUIDLow());
 
     m_honorMgr.Update();
 
@@ -15761,8 +15764,17 @@ void Player::SaveToDB(bool online, bool force)
 // fast save function for item/money cheating preventing - save only inventory and money state
 void Player::SaveInventoryAndGoldToDB()
 {
+    bool haveTransaction = CharacterDatabase.InTransaction();
+    if (!haveTransaction)
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
+    else if (CharacterDatabase.GetTransactionSerialId() != GetGUIDLow())
+        sLog.outError("[PLAYER SAVE] Player %s items are being saved in a transaction that is not serialized with its own GUID... potential dupe avenue", GetGuidStr().c_str());
+
     _SaveInventory();
     SaveGoldToDB();
+
+    if (!haveTransaction)
+        CharacterDatabase.CommitTransaction();
 }
 
 void Player::SaveGoldToDB()
@@ -18342,7 +18354,7 @@ void Player::AutoUnequipOffhandIfNeed()
     else
     {
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_OFFHAND, true);
-        CharacterDatabase.BeginTransaction();
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
         offItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
         offItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
         CharacterDatabase.CommitTransaction();
@@ -18369,7 +18381,7 @@ void Player::AutoUnequipMainHandIfNeed()
     else
     {
         MoveItemFromInventory(INVENTORY_SLOT_BAG_0, EQUIPMENT_SLOT_MAINHAND, true);
-        CharacterDatabase.BeginTransaction();
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
         mainItem->DeleteFromInventoryDB();                   // deletes item from character's inventory
         mainItem->SaveToDB();                                // recursive and not have transaction guard into self, item not in inventory and can be save standalone
         CharacterDatabase.CommitTransaction();

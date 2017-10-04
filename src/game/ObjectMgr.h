@@ -847,6 +847,7 @@ class ObjectMgr
         uint32 GenerateGroupId() { return m_GroupIds.Generate(); }
         uint32 GenerateItemTextID() { return m_ItemGuids.Generate(); }
         uint32 GenerateMailID() { return m_MailIds.Generate(); }
+        uint32 GeneratePetitionID() { return m_PetitionIds.Generate(); }
         uint32 GeneratePetNumber();
 
         void GenerateItemLowGuidRange(uint32& first, uint32& last) { m_ItemGuids.GenerateRange(first, last); }
@@ -1224,6 +1225,7 @@ class ObjectMgr
         IdGenerator<uint32> m_ItemTextIds;
         IdGenerator<uint32> m_MailIds;
         IdGenerator<uint32> m_GroupIds;
+        IdGenerator<uint32> m_PetitionIds;
         uint32              m_NextPetNumber;
         std::set<uint32>    m_AuctionsIds;
         uint32              m_NextAuctionId;

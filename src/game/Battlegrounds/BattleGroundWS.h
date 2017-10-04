@@ -139,6 +139,7 @@ class BattleGroundWS : public BattleGround
         bool IsHordeFlagPickedup() const            { return !m_FlagKeepers[BG_TEAM_HORDE].IsEmpty(); }
         void RespawnFlag(Team team, bool captured);
         void RespawnFlagAfterDrop(Team team);
+        void ForceFlagAreaTrigger(Team team);
         uint8 GetFlagState(Team team)             { return m_FlagState[GetTeamIndexByTeamId(team)]; }
 
         /* Battleground Events */

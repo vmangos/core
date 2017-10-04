@@ -128,6 +128,7 @@ ObjectMgr::ObjectMgr() :
     m_ItemTextIds("Item text ids"),
     m_MailIds("Mail ids"),
     m_GroupIds("Group ids"),
+    m_PetitionIds("Petition ids"),
     // Nostalrius
     DBCLocaleIndex(0)
 {
@@ -5504,6 +5505,13 @@ void ObjectMgr::SetHighestGuids()
     if (result)
     {
         m_GroupIds.Set((*result)[0].GetUInt32() + 1);
+        delete result;
+    }
+
+    result = CharacterDatabase.Query("SELECT MAX(petitionguid) FROM petition");
+    if (result)
+    {
+        m_PetitionIds.Set((*result)[0].GetUInt32() + 1);
         delete result;
     }
 
