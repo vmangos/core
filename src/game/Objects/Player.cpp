@@ -15764,8 +15764,17 @@ void Player::SaveToDB(bool online, bool force)
 // fast save function for item/money cheating preventing - save only inventory and money state
 void Player::SaveInventoryAndGoldToDB()
 {
+    bool haveTransaction = CharacterDatabase.InTransaction();
+    if (!haveTransaction)
+        CharacterDatabase.BeginTransaction(GetGUIDLow());
+    else if (CharacterDatabase.GetTransactionSerialId() != GetGUIDLow())
+        sLog.outError("[PLAYER SAVE] Player %s items are being saved in a transaction that is not serialized with its own GUID... potential dupe avenue", GetGuidStr().c_str());
+
     _SaveInventory();
     SaveGoldToDB();
+
+    if (!haveTransaction)
+        CharacterDatabase.CommitTransaction();
 }
 
 void Player::SaveGoldToDB()

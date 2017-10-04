@@ -503,11 +503,9 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
         delete trader->m_trade;
         trader->m_trade = NULL;
 
-        // desynchronized with the other saves here (SaveInventoryAndGoldToDB() not have own transaction guards)
-        CharacterDatabase.BeginTransaction();
+        // desynchronized with the other saves here, let players save gold per their own serialized transaction
         _player->SaveInventoryAndGoldToDB();
         trader->SaveInventoryAndGoldToDB();
-        CharacterDatabase.CommitTransaction();
 
         trader->GetSession()->SendTradeStatus(TRADE_STATUS_TRADE_COMPLETE);
         SendTradeStatus(TRADE_STATUS_TRADE_COMPLETE);
