@@ -462,13 +462,6 @@ void Unit::RemoveSpellsCausingAura(AuraType auraType)
 {
     for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
     {
-        if (!(*iter))
-        {
-            sLog.outError("Unit::RemoveSpellsCausingAura nullptr in m_modAuras[%d]", (int)auraType);
-            ++iter;
-            continue;
-        }
-
         RemoveAurasDueToSpell((*iter)->GetId());
         iter = m_modAuras[auraType].begin();
     }
@@ -1063,9 +1056,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 
     // before the stop of combat, the auras of type CM are withdrawn. We must be able to redirect the mobs to the caster.
     // You should specify 'AURA_REMOVE_BY_DEATH', but this is not useful for these auras.
-    pVictim->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-    pVictim->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-    pVictim->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
+    pVictim->RemoveCharmAuras();
     // stop combat
     pVictim->CombatStop();
     pVictim->getHostileRefManager().deleteReferences();
@@ -5941,11 +5932,17 @@ void Unit::Uncharm()
 {
     if (Unit* charm = GetCharm())
     {
-        charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-        charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+        charm->RemoveCharmAuras();
+        // Pet posses is not a typical charm
         charm->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS_PET);
-        charm->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
     }
+}
+
+void Unit::RemoveCharmAuras()
+{
+    RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+    RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
+    RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
 }
 
 float Unit::GetCombatDistance(const Unit* target) const
