@@ -2013,9 +2013,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             //remove auras before removing from map...
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
-            RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-            RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
+            RemoveCharmAuras();
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packet to display load screen
