@@ -295,12 +295,10 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
 
         if (!Pcontroller->isAlive())
         {
-            me->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-            me->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            me->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
-            Pcontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-            Pcontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            Pcontroller->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
+            me->RemoveCharmAuras();
+            // Note that we CANNOT continue after this point since this object has been deleted
+            // Pcontroller is a local var on the stack, not a member object, so it is safe to use
+            Pcontroller->RemoveCharmAuras();
             return;
         }
 
@@ -329,7 +327,7 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
     }
     else // If controller is a creature
     {
-        Creature* Ccontroller = ((Creature*)controller);
+        Creature* Ccontroller = controller ? controller->ToCreature() : nullptr;
 
         // Unit * victim = controller-> getVictim ();
         // Ivina <Nostalrius>: chooses the target randomly and not always the target of the controller.
@@ -340,12 +338,10 @@ void PlayerControlledAI::UpdateAI(const uint32 uiDiff)
 
         if (Ccontroller && (!Ccontroller->isAlive() || !Ccontroller->isInCombat()))
         {
-            me->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-            me->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            me->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
-            Ccontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-            Ccontroller->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            Ccontroller->RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
+            me->RemoveCharmAuras();
+            // Note that we CANNOT continue after this point since this object has been deleted
+            // Ccontroller is a local var on the stack, not a member object, so it is safe to use
+            Ccontroller->RemoveCharmAuras();
             return;
         }
 

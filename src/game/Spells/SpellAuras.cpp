@@ -3093,19 +3093,14 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 pTargetCrea->AttackedBy(caster);
         }
         else if (Player* pPlayer = target->ToPlayer())
+        {
             pPlayer->RemoveAI();
 
-        // todo: what causes friendly players to randomly see the "target" as hostile
-        // after the charm effect has ended, even if we restore faction below.
-        // --- this is a hacky attempt at solving hostile bug -_-
-        if (target->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (Player* pPlayer = target->ToPlayer())
-            {
-                pPlayer->setFactionForRace(target->getRace());
-                if(pPlayer->GetGroup())
-                    pPlayer->GetGroup()->BroadcastGroupUpdate();
-            }
+            // Charmed players are seen as hostile and not in the group for other clients, restore
+            // group upon charm end
+            pPlayer->setFactionForRace(target->getRace());
+            if(pPlayer->GetGroup())
+                pPlayer->GetGroup()->BroadcastGroupUpdate();
         }
     }
 }
