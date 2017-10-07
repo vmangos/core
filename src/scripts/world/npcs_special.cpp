@@ -878,6 +878,142 @@ CreatureAI* GetAI_npc_guardian(Creature* pCreature)
     return new npc_guardianAI(pCreature);
 }
 
+/*######
+## npc_tonk_mine
+######*/
+
+#define SPELL_TONK_MINE_DETONATE 25099
+#define NPC_DARKMOON_STEAM_TONK  15328
+
+struct npc_tonk_mineAI : public ScriptedAI
+{
+    npc_tonk_mineAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiArmTimer;
+    bool m_bArmed;
+
+    void Reset()
+    {
+        m_uiArmTimer = 3000;
+        m_bArmed = false;
+    }
+
+    void Aggro(Unit* pWho) override {}
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        if (!m_bArmed || !pWho)
+            return;
+
+        if ((m_creature->GetDistance(pWho) < 2.0f) && (pWho->GetEntry()== NPC_DARKMOON_STEAM_TONK))
+        {
+            m_creature->CastSpell(pWho, SPELL_TONK_MINE_DETONATE, true);
+            m_creature->ForcedDespawn();
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_bArmed)
+            if (m_uiArmTimer < uiDiff)
+            {
+                m_bArmed = true;
+            }
+            else
+                m_uiArmTimer -= uiDiff;
+    }
+};
+
+CreatureAI* GetAI_npc_tonk_mine(Creature* pCreature)
+{
+    return new npc_tonk_mineAI(pCreature);
+}
+
+/*######
+## npc_tonk_mortar
+######*/
+
+#define SPELL_TONK_MORTAR_EXPLOSION 27745
+
+struct npc_tonk_mortarAI : public ScriptedAI
+{
+    npc_tonk_mortarAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiExplosionTimer;
+    bool m_bExploded;
+
+    void Reset()
+    {
+        m_uiExplosionTimer = 1500;
+        m_bExploded = false;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiExplosionTimer < uiDiff)
+        {
+            if (m_bExploded)
+                m_creature->ForcedDespawn();
+
+            m_creature->CastSpell(m_creature, SPELL_TONK_MORTAR_EXPLOSION, true);
+            m_uiExplosionTimer = 5000;
+            m_bExploded = true;
+        }
+        else
+            m_uiExplosionTimer -= uiDiff;
+    }
+};
+
+CreatureAI* GetAI_npc_tonk_mortar(Creature* pCreature)
+{
+    return new npc_tonk_mortarAI(pCreature);
+}
+
+/*######
+## npc_steam_tonk
+######*/
+
+struct npc_steam_tonkAI : public ScriptedAI
+{
+    npc_steam_tonkAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiPossesedCheck;
+
+    void Reset()
+    {
+        m_uiPossesedCheck = 3000;
+    }
+
+    void Aggro(Unit* /*pWho*/) override {}
+    void MoveInLineOfSight(Unit* /*pWho*/) override {}
+    void AttackStart(Unit* /*pWho*/) override {}
+    void EnterCombat(Unit* /*pWho*/) override {};
+
+    void UpdateAI(const uint32 uiDiff) override
+    {
+        if (m_uiPossesedCheck < uiDiff)
+        {
+            if (!m_creature->GetCharmer())
+                m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
+        }
+        else
+            m_uiPossesedCheck -= uiDiff;
+    }
+};
+
+CreatureAI* GetAI_npc_steam_tonk(Creature* pCreature)
+{
+    return new npc_steam_tonkAI(pCreature);
+}
 
 /*######
 ## npc_lunaclaw_spirit
@@ -2746,6 +2882,21 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_guardian";
     newscript->GetAI = &GetAI_npc_guardian;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_tonk_mine";
+    newscript->GetAI = &GetAI_npc_tonk_mine;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_tonk_mortar";
+    newscript->GetAI = &GetAI_npc_tonk_mortar;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_steam_tonk";
+    newscript->GetAI = &GetAI_npc_steam_tonk;
     newscript->RegisterSelf();
 
     newscript = new Script;
