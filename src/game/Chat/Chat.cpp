@@ -985,6 +985,15 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, nullptr,              0,                    false, nullptr,                                       "", nullptr }
     };
 
+    static ChatCommand AntiSpamCommandTable[] =
+    {
+        { MSTR, "add",                SEC_GAMEMASTER,       true,  &ChatHandler::HandleAntiSpamAdd,                "", nullptr },
+        { MSTR, "remove",             SEC_ADMINISTRATOR,    true,  &ChatHandler::HandleAntiSpamRemove,             "", nullptr },
+        { MSTR, "replace",            SEC_GAMEMASTER,       true,  &ChatHandler::HandleAntiSpamReplace,            "", nullptr },
+        { MSTR, "removereplace",      SEC_ADMINISTRATOR,    true,  &ChatHandler::HandleAntiSpamRemoveReplace,      "", nullptr },
+        { MSTR, nullptr,              0,                    false, nullptr,                                        "", nullptr }
+    };
+
     static ChatCommand goldCommandTable[] =
     {
         { MSTR, "remove",            SEC_GAMEMASTER,        true,  &ChatHandler::HandleGoldRemoval,               "", nullptr },
@@ -1113,6 +1122,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, "runtest",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleRunTestCommand,             "", nullptr },
         { MSTR, "log",            SEC_GAMEMASTER,     true,  &ChatHandler::HandleViewLogCommand,             "", nullptr },
         { MSTR, "spamer",         SEC_GAMEMASTER,     true, nullptr,                                           "", spamerCommandTable },
+        { MSTR, "antispam",       SEC_GAMEMASTER,     true, nullptr,                                           "", AntiSpamCommandTable },
         { MSTR, "gold",           SEC_GAMEMASTER,     true, nullptr,                                           "", goldCommandTable },
         { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
