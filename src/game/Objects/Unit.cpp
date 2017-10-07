@@ -1204,8 +1204,15 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 
         // Dungeon specific stuff, only applies to players killing creatures
         if (creature->GetInstanceId() && creature->GetMapId() > 1)
-            if (Player* playerKiller = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            Player* playerKiller = GetCharmerOrOwnerPlayerOrPlayerItself();
+
+            if (!playerKiller && this == creature && player_tap)
+                playerKiller = player_tap;
+
+            if (playerKiller)
                 creature->GetMap()->BindToInstanceOrRaid(playerKiller, creature->GetRespawnTimeEx(), creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
+        }
     }
 
     // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
