@@ -1,6 +1,6 @@
-DELIMITER |
 DROP PROCEDURE IF EXISTS add_migration;
-CREATE PROCEDURE add_migration()
+delimiter ??
+CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
 SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171005193854');
@@ -30,7 +30,7 @@ REPLACE INTO `reference_loot_template` VALUES (330068, 22722, 0, 3, 1, 1, 0);
 
 -- End of migration.
 END IF;
-END;
-|
-CALL add_migration;
+END??
+delimiter ; 
+CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;

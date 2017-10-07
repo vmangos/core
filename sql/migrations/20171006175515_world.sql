@@ -1,6 +1,6 @@
-DELIMITER |
 DROP PROCEDURE IF EXISTS add_migration;
-CREATE PROCEDURE add_migration()
+delimiter ??
+CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
 SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171006175515');
@@ -111,7 +111,7 @@ UPDATE `creature` SET `patch_min`=7 WHERE `id` = 15693;
 
 -- End of migration.
 END IF;
-END;
-|
-CALL add_migration;
+END??
+delimiter ; 
+CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;
