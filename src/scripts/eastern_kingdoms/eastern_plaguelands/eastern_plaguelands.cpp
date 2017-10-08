@@ -30,32 +30,6 @@ EndContentData */
 
 #include "scriptPCH.h"
 
-//id8530 - cannibal ghoul
-//id8531 - gibbering ghoul
-//id8532 - diseased flayer
-
-struct mobs_ghoul_flayerAI : public ScriptedAI
-{
-    mobs_ghoul_flayerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() { }
-
-    void JustDied(Unit* Killer)
-    {
-        if (Killer->GetTypeId() == TYPEID_PLAYER)
-            m_creature->SummonCreature(11064, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 60000);
-    }
-
-};
-
-CreatureAI* GetAI_mobs_ghoul_flayer(Creature* pCreature)
-{
-    return new mobs_ghoul_flayerAI(pCreature);
-}
-
 /*######
 ## npc_augustus_the_touched
 ######*/
@@ -2113,11 +2087,6 @@ bool EffectDummyGameObj_go_mark_of_detonation(Unit* pCaster, uint32 uiSpellId, S
 void AddSC_eastern_plaguelands()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "mobs_ghoul_flayer";
-    newscript->GetAI = &GetAI_mobs_ghoul_flayer;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_augustus_the_touched";
