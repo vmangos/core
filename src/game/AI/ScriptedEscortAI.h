@@ -84,6 +84,11 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
         void SetRun(bool bRun = true);
         void SetEscortPaused(bool uPaused);
 
+        //! Enables/disables pathfinding between waypoints. Pathfinding is enabled by default.
+        void SetPathfindingEnabledBetweenWaypoints(bool bEnabled) { m_bIsPathfindingEnabledBetweenWaypoints = bEnabled; }
+        //! Controls a delay for before the first waypoint(in milliseconds). 0: prevents waypoint path to start. Default: 2500.
+        void SetDelayBeforeTheFirstWaypoint(uint32 uiWPDelayMs) { m_uiDelayBeforeTheFirstWaypoint = uiWPDelayMs; }
+
         bool HasEscortState(uint32 uiEscortState) const { return m_uiEscortState & uiEscortState; }
         void SetMaxPlayerDistance(float dist) { m_MaxPlayerDistance = dist;}
         void SetMaxAssistDistance(float dist) { m_MaxAssistDistance = dist;}
@@ -111,6 +116,7 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
         uint32 m_uiWPWaitTimer;
         uint32 m_uiPlayerCheckTimer;
         uint32 m_uiEscortState;
+        uint32 m_uiDelayBeforeTheFirstWaypoint;
 
         const Quest* m_pQuestForEscort;                     //generally passed in Start() when regular escort script.
 
@@ -121,6 +127,7 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
         bool m_bIsRunning;                                  //all creatures are walking by default (has flag SPLINEFLAG_WALKMODE)
         bool m_bCanInstantRespawn;                          //if creature should respawn instantly after escort over (if not, database respawntime are used)
         bool m_bCanReturnToStart;                           //if creature can walk same path (loop) without despawn. Not for regular escort quests.
+        bool m_bIsPathfindingEnabledBetweenWaypoints;       //all creatures are using pathfinding between waypoints by default
 
         float m_MaxPlayerDistance;
         float m_MaxAssistDistance;
