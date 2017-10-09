@@ -385,6 +385,9 @@ class PlayerCondition
         // Checks if the player meets the condition
         bool Meets(Player const* pPlayer, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
 
+        // Checks if the patch is valid
+        bool PlayerCondition::CheckPatch() const;
+
         Team GetTeam() const
         {
             return m_condition == CONDITION_TEAM ? Team(m_value1) : TEAM_CROSSFACTION;
