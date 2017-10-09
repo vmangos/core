@@ -1074,6 +1074,9 @@ struct npc_private_hendelAI : public ScriptedAI
 
 bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
 {
+    if (!pPlayer || !pCreature || !pQuest)
+        return false;
+
     // if player accepts a quest id Missing Diplomat(1324)
     if (pQuest->GetQuestId() == QUEST_MISSING_DIPLO_PT16)
     {
@@ -1271,6 +1274,9 @@ struct npc_archmage_tervoshAI : public ScriptedAI
 
 bool QuestRewarded_npc_archmage_tervosh(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
+    if (!pPlayer || !pCreature || !pQuest)
+        return false;
+
     if (pQuest->GetQuestId() == QUEST_MISSING_DIPLO_PT14)
     {
         npc_archmage_tervoshAI* pTervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(pCreature->AI());
@@ -1300,7 +1306,7 @@ CreatureAI* GetAI_npc_archmage_tervosh(Creature* pCreature)
 bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
     // If player is dead, GM mode is ON, quest complete or no quest
-    if (!pPlayer->isAlive() || pPlayer->isGameMaster() ||
+    if (!pPlayer || !pPlayer->isAlive() || pPlayer->isGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_MISSING_DIPLO_PT14) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_MISSING_DIPLO_PT14) == QUEST_STATUS_NONE)
         return false;
@@ -1932,6 +1938,17 @@ void AddSC_dustwallow_marsh()
     newscript->pGossipSelect = &GossipSelect_npc_lady_jaina_proudmoore;
     newscript->RegisterSelf();
     
+    newscript = new Script;
+    newscript->Name = "npc_archmage_tervosh";
+    newscript->GetAI = &GetAI_npc_archmage_tervosh;
+    newscript->pQuestRewardedNPC = &QuestRewarded_npc_archmage_tervosh;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "at_sentry_point";
+    newscript->pAreaTrigger = &AreaTrigger_at_sentry_point;
+    newscript->RegisterSelf();
+
     newscript = new Script;
     newscript->Name = "npc_stinky_ignatz";
     newscript->GetAI = &GetAI_npc_stinky_ignatz;

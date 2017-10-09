@@ -58,10 +58,7 @@ struct npc_bartlebyAI : public ScriptedAI
 
     void AttackedBy(Unit* pAttacker)
     {
-        if (m_creature->getVictim())
-            return;
-
-        if (m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
@@ -69,6 +66,9 @@ struct npc_bartlebyAI : public ScriptedAI
 
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
     {
+        if (!pDoneBy)
+            return;
+
         if (uiDamage > m_creature->GetHealth() || ((m_creature->GetHealth() - uiDamage) * 100 / m_creature->GetMaxHealth() < 15))
         {
             uiDamage = 0;
@@ -83,6 +83,9 @@ struct npc_bartlebyAI : public ScriptedAI
 
 bool QuestAccept_npc_bartleby(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
 {
+    if (!pPlayer || !pCreature || !pQuest)
+        return false;
+
     if (pQuest->GetQuestId() == QUEST_BEAT)
     {
         pCreature->setFaction(FACTION_ENEMY);
@@ -162,10 +165,7 @@ struct npc_dashel_stonefistAI : public ScriptedAI
     // Prevent Reset() call after Dashel has been defeated.
     void AttackedBy(Unit* pAttacker)
     {
-        if (m_creature->getVictim())
-            return;
-
-        if (m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
@@ -411,6 +411,9 @@ struct npc_dashel_stonefistAI : public ScriptedAI
 
 bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
 {
+    if (!pPlayer || !pCreature || !pQuest)
+        return false;
+
     if (pQuest->GetQuestId() == QUEST_MISSING_DIPLO_PT8)
     {
         npc_dashel_stonefistAI* dashelStonefistAI = dynamic_cast<npc_dashel_stonefistAI*>(pCreature->AI());
@@ -431,6 +434,10 @@ bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, cons
             // spawn thugs and make them focus player.
             // thug 1
             dashelStonefistAI->m_thugs[0] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8676.075195f, 443.744019f, 99.632210f, 3.981758f, TEMPSUMMON_DEAD_DESPAWN);
+
+            if (!dashelStonefistAI->m_thugs[0])
+                return false;
+
             // make thug focus player
             dashelStonefistAI->m_thugs[0]->AI()->AttackStart(pPlayer);
             // Initial flag is passive, which prevents from chasing or putting wrong targets into a combat mode on summon.

@@ -95,7 +95,7 @@ public:
 
     void AttackedBy(Unit* pAttacker)
     {
-        if (m_creature->getVictim())
+        if (!pAttacker || m_creature->getVictim())
             return;
 
         if (m_creature->GetCharmInfo() && m_creature->CanReachWithMeleeAttack(pAttacker))
@@ -301,10 +301,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
     void AttackedBy(Unit* pAttacker)
     {
-        if (m_creature->getVictim())
-            return;
-
-        if (m_creature->IsFriendlyTo(pAttacker))
+        if (!pAttacker || m_creature->getVictim() || m_creature->IsFriendlyTo(pAttacker))
             return;
 
         AttackStart(pAttacker);
@@ -466,6 +463,9 @@ CreatureAI* GetAI_npc_tapoke_slim_jahn(Creature* pCreature)
 // Mikhail gossip scripts
 bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
 {
+    if (!pPlayer || !pCreature || !pQuest)
+        return false;
+
     if (pQuest->GetQuestId() == QUEST_MISSING_DIPLOMAT_PART11)
     {
         // distance between Mikhail and Tapoke "Slim" Jahn is about 16 yards, 20 used for "safety".
