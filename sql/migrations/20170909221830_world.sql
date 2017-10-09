@@ -1,4 +1,13 @@
-INSERT INTO `migrations` VALUES ('20170909221830'); 
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20170909221830');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20170909221830');
+-- Add your query below.
+
 
 -- Clean up some wrong data.
 DELETE FROM `npc_gossip` WHERE `textid` = 8455;
@@ -55,3 +64,11 @@ INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inv
  ('853101', '8531', '6', '0', '100','0','0','0','0','0','12','11064','0','60000','0','0','0','0','0','0','0','0','Gibbering Ghoul - Summon Darrowshire Spirit on Death'),
 -- Defenders of Darrowshire(quest id:5211) related.
  ('853001', '8530', '6', '0', '100', '0', '0', '0', '0', '0', '12', '11064', '0', '60000', '0', '0', '0', '0', '0', '0', '0', '0', 'Cannibal Ghoul - Summon Darrowshire Spirit on Death');
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;

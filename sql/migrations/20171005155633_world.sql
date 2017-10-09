@@ -1,12 +1,13 @@
-DELIMITER |
 DROP PROCEDURE IF EXISTS add_migration;
-CREATE PROCEDURE add_migration()
+delimiter ??
+CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
 SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171005155633');
 IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20171005155633');
 -- Add your query below.
+
 
 -- Heartseeking Crossbow
 UPDATE `item_template` SET `patch`=10 WHERE  `entry`=13040 AND `patch`=0;
@@ -130,9 +131,10 @@ UPDATE `item_template` SET `ItemLevel`=60, `RequiredLevel`=60, `BuyPrice`=100000
 -- Evergreen Pouch
 UPDATE `item_template` SET `RequiredLevel`=0 WHERE  `entry`=11020 AND `patch`=0;
 
+
 -- End of migration.
 END IF;
-END;
-|
-CALL add_migration;
+END??
+delimiter ; 
+CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;

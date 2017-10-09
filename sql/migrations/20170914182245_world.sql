@@ -1,4 +1,12 @@
-INSERT INTO `migrations` VALUES ('20170914182245'); 
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20170914182245');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20170914182245');
+-- Add your query below.
 
 -- ----------------------------------------------------------------------------
 -- Missing Diplomat id: 1447
@@ -70,3 +78,11 @@ UPDATE `quest_template` SET  `DetailsEmote1` = '6', `DetailsEmote2` = '1', `Deta
 -- Apply a script for Slim's friend
 DELETE FROM `creature_ai_scripts` WHERE `creature_id` = 4971;
 UPDATE `creature_template` SET  `AIName` = '', `ScriptName` = 'npc_slims_friend' WHERE `entry` = 4971;
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;

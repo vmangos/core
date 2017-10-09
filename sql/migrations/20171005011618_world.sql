@@ -8,6 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20171005011618');
 -- Add your query below.
 
+
 -- Add gossip for Selina Dourman.
 DELETE FROM `npc_gossip` WHERE `npc_guid`=56499;
 DELETE FROM `gossip_menu` WHERE `entry` IN (6582, 6577, 6578, 6579, 6581, 7093, 7095, 8848);

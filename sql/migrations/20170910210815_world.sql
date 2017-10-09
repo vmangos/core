@@ -1,4 +1,13 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20170910210815');
+IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20170910210815');
+-- Add your query below.
+
 
 -- Renamed from french
 UPDATE `creature_template`
@@ -32,3 +41,12 @@ VALUES (10808, 1, 3614.7, -3187.64, 131.406, 11, 100),
        (10808, 17, 3678.39, -3174.43, 126.348, 0, 100),
        (10808, 18, 3692.2, -3176.01, 126.915, 0, 100),
        (10808, 19, 3694.37, -3153.05, 127.531, 1026404, 100);
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
+
