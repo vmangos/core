@@ -72,7 +72,7 @@ enum BattleGroundMarks
 {
     SPELL_WS_ALLY_WINNER            = 23661,
     SPELL_WS_HORDE_WINNER           = 23702,
-    SPELL_OLD_ARATHI_WINNER         = 24017,
+    SPELL_AB_OLD_WINNER             = 24017,
     SPELL_WS_OLD_LOSER              = 24637,
     SPELL_WS_MARK_LOSER             = 24950,
     SPELL_WS_MARK_WINNER            = 24951,

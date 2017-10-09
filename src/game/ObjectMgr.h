@@ -386,7 +386,7 @@ class PlayerCondition
         bool Meets(Player const* pPlayer, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
 
         // Checks if the patch is valid
-        bool PlayerCondition::CheckPatch() const;
+        bool CheckPatch() const;
 
         Team GetTeam() const
         {

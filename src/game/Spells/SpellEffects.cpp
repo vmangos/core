@@ -2330,7 +2330,7 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
         case SPELL_WS_MARK_LOSER:
             bgType = BATTLEGROUND_WS;
             break;
-        case SPELL_OLD_ARATHI_WINNER:
+        case SPELL_AB_OLD_WINNER:
         case SPELL_AB_MARK_WINNER:
         case SPELL_AB_MARK_LOSER:
             bgType = BATTLEGROUND_AB;
