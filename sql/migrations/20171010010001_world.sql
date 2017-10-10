@@ -19,6 +19,9 @@ REPLACE INTO `spell_target_position` (`id`, `target_map`, `target_position_x`, `
 -- Fixes https://github.com/elysium-project/server/issues/3076
 REPLACE INTO `page_text` (`entry`, `text`, `next_page`) VALUES (1471, 'Solomon,$B$BThe carrier of this decree has been granted official status as an acting deputy of Stormwind. You may use $g him:her; to find proof of the black dragonflight\'s involvement with the Blackrock orcs. Should such proof be found, this deputy shall return said proof to me in Stormwind, at which time I shall release the order to dispense sufficient millitary force to aid Lakeshire.$B$BRegards,$B$BHighlord Bolvar Fordragon', 0);
 
+-- Fixes https://github.com/elysium-project/server/issues/1803
+UPDATE `creature` SET `curhealth`=1830, `curmana`=5013 WHERE `guid`=1179376;
+UPDATE `creature_template` SET `minlevel`=55, `maxlevel`=55, `minhealth`=1830, `maxhealth`=1830, `minmana`=5013, `maxmana`=5013, `mindmg`=67, `maxdmg`=93, `attackpower`=101, `ScriptName`='npc_emerald_dragon_whelp' WHERE `entry`=8776;
 
 -- End of migration.
 END IF;

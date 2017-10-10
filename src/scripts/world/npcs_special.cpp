@@ -1584,6 +1584,55 @@ CreatureAI* GetAI_npc_arcanite_dragonling(Creature* pCreature)
 }
 
 /*######
+## Emerald Dragon Whelp
+######*/
+
+enum
+{
+    SPELL_ACID_SPIT = 9591
+};
+
+struct npc_emerald_dragon_whelpAI : ScriptedPetAI
+{
+    explicit npc_emerald_dragon_whelpAI(Creature* pCreature) : ScriptedPetAI(pCreature)
+    {
+        m_creature->SetCanModifyStats(true);
+
+        if (m_creature->GetCharmInfo())
+        {
+            m_creature->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
+        }
+
+        Reset();
+    }
+
+    uint32 m_uiAcidSpitTimer;
+
+    void Reset() override
+    {
+        m_uiAcidSpitTimer = 1000;
+    }
+
+    void UpdatePetAI(const uint32 uiDiff) override
+    {
+        if (m_uiAcidSpitTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPIT) == CAST_OK)
+                m_uiAcidSpitTimer = 2000;
+        }
+        else
+            m_uiAcidSpitTimer -= uiDiff;
+
+        ScriptedPetAI::UpdatePetAI(uiDiff);
+    }
+};
+
+CreatureAI* GetAI_npc_emerald_dragon_whelp(Creature* pCreature)
+{
+    return new npc_emerald_dragon_whelpAI(pCreature);
+}
+
+/*######
 ## Timbermaw Ancestor
 ######*/
 enum
@@ -3568,6 +3617,11 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_arcanite_dragonling";
     newscript->GetAI = &GetAI_npc_arcanite_dragonling;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_emerald_dragon_whelp";
+    newscript->GetAI = &GetAI_npc_emerald_dragon_whelp;
     newscript->RegisterSelf();
 
     newscript = new Script;

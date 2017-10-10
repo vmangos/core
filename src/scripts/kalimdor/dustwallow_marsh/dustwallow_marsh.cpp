@@ -1461,7 +1461,7 @@ struct npc_lady_jaina_proudmooreAI : public ScriptedAI
                 {
                     if (Unit* pTarget = m_creature->SelectRandomUnfriendlyTarget(nullptr, 25.0f))
                     {
-                        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_BLIZZARD) == CAST_OK)
+                        if (DoCastSpellIfCan(pTarget, SPELL_JAINA_BLIZZARD) == CAST_OK)
                             m_uiSpellTimer = urand(1, 3)*IN_MILLISECONDS;
                     }
                     break;
