@@ -1378,12 +1378,107 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
 
 enum
 {
-    QUEST_JAINAS_AUTOGRAPH = 558,
-    QUEST_MISSING_DIPLO_PT17 = 1267,
-    SPELL_JAINAS_AUTOGRAPH = 23122
+    QUEST_JAINAS_AUTOGRAPH       = 558,
+    QUEST_MISSING_DIPLO_PT17     = 1267,
+    NPC_SUMMONED_WATER_ELEMENTAL = 10955,
+    SPELL_JAINA_FIREBALL         = 20678,
+    SPELL_JAINA_FIREBLAST        = 20679,
+    SPELL_JAINA_BLIZZARD         = 20680,
+    SPELL_JAINA_WATER_ELEMENTAL  = 20681,
+    SPELL_JAINA_TELEPORT         = 20682,
+    SPELL_JAINAS_AUTOGRAPH       = 23122
 };
 
 #define GOSSIP_ITEM_JAINA "I know this is rather silly but i have a young ward who is a bit shy and would like your autograph."
+
+struct npc_lady_jaina_proudmooreAI : public ScriptedAI
+{
+    npc_lady_jaina_proudmooreAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiSpellTimer;
+    uint32 m_uiSpecialTimer;
+
+    void Reset()
+    {
+        m_uiSpellTimer = 3000;
+        m_uiSpecialTimer = 15000;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim() || m_creature->IsNonMeleeSpellCasted())
+            return;
+
+        if (m_uiSpecialTimer < uiDiff)
+        {
+            if (!urand(0, 4) && !m_creature->GetGuardianCountWithEntry(NPC_SUMMONED_WATER_ELEMENTAL))
+            {
+                if (DoCastSpellIfCan(m_creature, SPELL_JAINA_WATER_ELEMENTAL) == CAST_OK)
+                    m_uiSpecialTimer = urand(10, 20)*IN_MILLISECONDS;
+            }
+            else
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_TELEPORT) == CAST_OK)
+                { 
+                    m_uiSpecialTimer = urand(10, 30)*IN_MILLISECONDS;
+
+                    if (m_creature->GetDistance2d(-4018.1f, -4525.24f) > 40.0f)
+                    {
+                        // If we don't remove target from threat list after teleporting,
+                        // Jaina will try to chase him and evade despite having other targets.
+                        Unit* pOldVictim = m_creature->getVictim();
+                        m_creature->_removeAttacker(pOldVictim);
+                        m_creature->getThreatManager().modifyThreatPercent(pOldVictim, -101.0f);
+                    }
+                }
+            }
+        }
+        else
+            m_uiSpecialTimer -= uiDiff;
+
+        if (m_uiSpellTimer < uiDiff)
+        {
+            switch (urand(0, 4))
+            {
+                case 0:
+                case 1:
+                {
+                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_FIREBALL) == CAST_OK)
+                        m_uiSpellTimer = urand(3, 10)*IN_MILLISECONDS;
+                    break;
+                }
+                case 2:
+                case 3:
+                {
+                    if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_FIREBLAST) == CAST_OK)
+                        m_uiSpellTimer = urand(3, 10)*IN_MILLISECONDS;
+                    break;
+                }
+                case 4:
+                {
+                    if (Unit* pTarget = m_creature->SelectRandomUnfriendlyTarget(nullptr, 25.0f))
+                    {
+                        if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_JAINA_BLIZZARD) == CAST_OK)
+                            m_uiSpellTimer = urand(1, 3)*IN_MILLISECONDS;
+                    }
+                    break;
+                }
+            }
+        }
+        else
+            m_uiSpellTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_npc_lady_jaina_proudmoore(Creature* pCreature)
+{
+    return new npc_lady_jaina_proudmooreAI(pCreature);
+}
 
 bool GossipHello_npc_lady_jaina_proudmoore(Player* pPlayer, Creature* pCreature)
 {
@@ -1934,6 +2029,7 @@ void AddSC_dustwallow_marsh()
 
     newscript = new Script;
     newscript->Name = "npc_lady_jaina_proudmoore";
+    newscript->GetAI = &GetAI_npc_lady_jaina_proudmoore;
     newscript->pGossipHello = &GossipHello_npc_lady_jaina_proudmoore;
     newscript->pGossipSelect = &GossipSelect_npc_lady_jaina_proudmoore;
     newscript->RegisterSelf();
