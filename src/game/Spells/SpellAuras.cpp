@@ -1218,10 +1218,28 @@ void Aura::TriggerSpell()
 //                    case 27601: break;
 //                    // Five Fat Finger Exploding Heart Technique
 //                    case 27673: break;
-//                    // Nitrous Boost
-//                    case 27746: break;
-//                    // Steam Tank Passive
-//                    case 27747: break;
+                    // Nitrous Boost
+                    case 27746:
+                    {
+                        if (target->GetPower(POWER_MANA) >= 10)
+                        {
+                            target->ModifyPower(POWER_MANA, -10);
+                            target->SendEnergizeSpellLog(target, 27746, -10, POWER_MANA);
+                        }
+                        else
+                            target->RemoveAurasDueToSpell(27746);
+                        return;
+                    }
+                    // Steam Tank Passive
+                    case 27747:
+                    {
+                        uint32 tonkmana = target->GetPower(POWER_MANA);
+                        if (tonkmana < 100)
+                        {
+                            target->ModifyPower(POWER_MANA, tonkmana > 90 ? (100 - tonkmana) : 10);
+                        }
+                        return;
+                    }
                     case 27808:                             // Frost Blast
                     {
                         int32 bpDamage = triggerTarget->GetMaxHealth() * 26 / 100;
@@ -1447,6 +1465,30 @@ void Aura::TriggerSpell()
                 // Pour le talent hunt 'Piege' par exemple (chances de stun)
                 caster->ProcDamageAndSpell(target, (PROC_FLAG_ON_TRAP_ACTIVATION | PROC_FLAG_SUCCESSFUL_AOE), PROC_FLAG_NONE, PROC_EX_NORMAL_HIT, 1, BASE_ATTACK, GetSpellProto());
                 return;
+            }
+            // Activate MG Turret
+            case 25026:
+            {
+                if (target->GetPower(POWER_MANA) >= 10)
+                {
+                    target->ModifyPower(POWER_MANA, -10);
+                    target->SendEnergizeSpellLog(target, 25026, -10, POWER_MANA);
+                }
+                else
+                    target->RemoveAurasDueToSpell(25026);
+                break;
+            }
+            // Flamethrower
+            case 25027:
+            {
+                if (target->GetPower(POWER_MANA) >= 10)
+                {
+                    target->ModifyPower(POWER_MANA, -10);
+                    target->SendEnergizeSpellLog(target, 25027, -10, POWER_MANA);
+                }
+                else
+                    target->RemoveAurasDueToSpell(25027);
+                break;;
             }
         }
     }
@@ -2674,6 +2716,13 @@ void Aura::HandleModPossess(bool apply, bool Real)
         return;
     caster->ModPossess(target, apply, m_removeMode);
     target->AddThreat(caster,target->GetHealth(), false, GetSpellSchoolMask(GetSpellProto()));
+
+    if (!apply && GetId() == 24937) // Controlling Steam Tonk
+    {
+        target->CastSpell(target, 27771, true); // Cast Damaged Tonk
+        caster->CastSpell(caster, 9179, true); // Cast 3 sec Stun on self
+        caster->RemoveAurasDueToSpell(24935); // Unroot player
+    }
 }
 
 void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
@@ -4241,8 +4290,8 @@ void Aura::HandleModPowerRegen(bool apply, bool Real)       // drinking
 
     m_periodicTimer = 5000;
 
-    if (GetTarget()->GetTypeId() == TYPEID_PLAYER && m_modifier.m_miscvalue == POWER_MANA)
-        ((Player*)GetTarget())->UpdateManaRegen();
+    if (m_modifier.m_miscvalue == POWER_MANA)
+        (GetTarget())->UpdateManaRegen();
 
     m_isPeriodic = apply;
 }
@@ -4253,12 +4302,9 @@ void Aura::HandleModPowerRegenPCT(bool /*apply*/, bool Real)
     if (!Real)
         return;
 
-    if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
-        return;
-
     // Update manaregen value
     if (m_modifier.m_miscvalue == POWER_MANA)
-        ((Player*)GetTarget())->UpdateManaRegen();
+        (GetTarget())->UpdateManaRegen();
 }
 
 void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
@@ -5015,6 +5061,10 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
             DoneActualBenefit *= caster->CalculateLevelPenalty(GetSpellProto());
 
             m_modifier.m_amount += (int32)DoneActualBenefit;
+
+            // Power Word: Shield generates half the threat as healing for the same amount
+            if (spellProto->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_POWER_WORD_SHIELD>() && spellProto->Id != 27779)
+                caster->getHostileRefManager().threatAssist(caster, float(m_modifier.m_amount) * 0.25, spellProto);
         }
     }
 }

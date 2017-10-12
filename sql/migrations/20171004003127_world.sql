@@ -1,6 +1,6 @@
-DELIMITER |
 DROP PROCEDURE IF EXISTS add_migration;
-CREATE PROCEDURE add_migration()
+delimiter ??
+CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
 SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171004003127');
@@ -14,7 +14,7 @@ UPDATE `game_event` SET `start_time`='2015-03-30 04:00:00' WHERE `entry`=155;
 
 -- End of migration.
 END IF;
-END;
-|
-CALL add_migration;
+END??
+delimiter ; 
+CALL add_migration();
 DROP PROCEDURE IF EXISTS add_migration;

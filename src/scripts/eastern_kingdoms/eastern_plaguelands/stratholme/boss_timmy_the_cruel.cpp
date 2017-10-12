@@ -37,26 +37,27 @@ struct boss_timmy_the_cruelAI : public ScriptedAI
         Reset();
     }
 
-    uint32 RavenousClaw_Timer;
+    uint32 m_uiRavenousClawTimer;
 
     void Reset()
     {
-        RavenousClaw_Timer = 7000;
+        m_uiRavenousClawTimer = 7000;
     }
 
     void UpdateAI(const uint32 diff)
     {
-        //Return since we have no target
+        // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //RavenousClaw
-        if (RavenousClaw_Timer < diff)
+        // Ravenous Claw
+        if (m_uiRavenousClawTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_RAVENOUSCLAW) == CAST_OK)
-                RavenousClaw_Timer = 12000;
+                m_uiRavenousClawTimer = 12000;
         }
-        else RavenousClaw_Timer -= diff;
+        else
+            m_uiRavenousClawTimer -= diff;
 
         if (m_creature->GetHealthPercent() < 10.0f && !m_creature->HasAura(SPELL_ENRAGE))
             m_creature->CastSpell(m_creature, SPELL_ENRAGE, true);
@@ -75,94 +76,99 @@ CreatureAI* GetAI_boss_timmy_the_cruel(Creature* pCreature)
     return new boss_timmy_the_cruelAI(pCreature);
 }
 
-struct npc_gardien_cramoisiAI : public ScriptedAI
+struct npc_crimson_guardsmanAI : public ScriptedAI
 {
-    npc_gardien_cramoisiAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_crimson_guardsmanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
         if (pCreature->GetDBTableGUIDLow() == 54070)
-            bIsTimmySpawner = true;
+            m_bIsTimmySpawner = true;
         else
-            bIsTimmySpawner = false;
+            m_bIsTimmySpawner = false;
     }
 
-    uint32 uiDesarmerTimer;
-    uint32 uiCoupBouclierTimer;
-    uint32 uiShieldChargeTimer;
-    bool bIsTimmySpawner;
+    bool m_bIsTimmySpawner;
+    uint32 m_uiDisarmTimer;
+    uint32 m_uiShieldBashTimer;
+    uint32 m_uiShieldChargeTimer;
 
     void Reset()
     {
-        uiDesarmerTimer     = 6000;
-        uiCoupBouclierTimer = 4000;
-        uiShieldChargeTimer = 1000;
+        m_uiDisarmTimer = 6000;
+        m_uiShieldBashTimer = 4000;
+        m_uiShieldChargeTimer = 1000;
     }
 
     void JustDied(Unit* pKiller)
     {
-        if (bIsTimmySpawner)
+        if (m_bIsTimmySpawner)
         {
-            Creature* pTimmy = m_creature->SummonCreature(TIMMY_ENTRY,
-                               3671.0f, -3187.67f, 126.0f, 1.84f, TEMPSUMMON_MANUAL_DESPAWN, 0
-                                                         );
+            Creature* pTimmy =
+                    m_creature->SummonCreature(TIMMY_ENTRY, 3614.7f, -3187.64f,
+                                               131.406f, 0.0f,
+                                               TEMPSUMMON_MANUAL_DESPAWN, 0);
+
             if (pTimmy)
             {
                 pTimmy->MonsterYell(SAY_SPAWN, 0, pKiller);
                 pTimmy->SetRespawnTime(9999999);
             }
-            bIsTimmySpawner = false;
+
+            m_bIsTimmySpawner = false;
             m_creature->DeleteLater();
         }
     }
+
     void UpdateAI(const uint32 diff)
     {
-        //Return since we have no target
+        // Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (uiDesarmerTimer < diff)
+        if (m_uiDisarmTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), 6713) == CAST_OK)
-                uiDesarmerTimer = 15000;
+                m_uiDisarmTimer = 15000;
         }
         else
-            uiDesarmerTimer -= diff;
+            m_uiDisarmTimer -= diff;
 
-        if (uiCoupBouclierTimer < diff)
+        if (m_uiShieldBashTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), 11972) == CAST_OK)
-                uiCoupBouclierTimer = 8000;
+                m_uiShieldBashTimer = 8000;
         }
         else
-            uiCoupBouclierTimer -= diff;
+            m_uiShieldBashTimer -= diff;
 
-        if (uiShieldChargeTimer < diff)
+        if (m_uiShieldChargeTimer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), 15749) == CAST_OK)
-                uiShieldChargeTimer = 12000;
+                m_uiShieldChargeTimer = 12000;
         }
         else
-            uiShieldChargeTimer -= diff;
+            m_uiShieldChargeTimer -= diff;
 
         DoMeleeAttackIfReady();
     }
 };
 
-CreatureAI* GetAI_npc_gardien_cramoisi(Creature* pCreature)
+CreatureAI* GetAI_npc_crimson_guardsman(Creature* pCreature)
 {
-    return new npc_gardien_cramoisiAI(pCreature);
+    return new npc_crimson_guardsmanAI(pCreature);
 }
 
 void AddSC_boss_timmy_the_cruel()
 {
-    Script *newscript;
+    Script* newscript;
+
     newscript = new Script;
     newscript->Name = "boss_timmy_the_cruel";
     newscript->GetAI = &GetAI_boss_timmy_the_cruel;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "npc_gardien_cramoisi";
-    newscript->GetAI = &GetAI_npc_gardien_cramoisi;
+    newscript->Name = "npc_crimson_guardsman";
+    newscript->GetAI = &GetAI_npc_crimson_guardsman;
     newscript->RegisterSelf();
 }

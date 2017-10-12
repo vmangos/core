@@ -84,7 +84,6 @@ struct instance_stratholme : public ScriptedInstance
     uint32 m_auiEncounter[STRAT_MAX_ENCOUNTER];
     bool IsSilverHandDead[5];
     bool m_ChantelogeFosrestin_pop;
-    bool m_timmy_pop;
 
     uint8 m_phaseBaron;
     uint32 m_uiBaronRun_Timer;
@@ -140,7 +139,6 @@ struct instance_stratholme : public ScriptedInstance
             IsSilverHandDead[i] = false;
 
         m_ChantelogeFosrestin_pop = false;
-        m_timmy_pop = false;
 
         m_phaseBaron = 0;
         m_uiBaronRun_Timer = 0;
@@ -673,7 +671,7 @@ struct instance_stratholme : public ScriptedInstance
                 // No need to save anything here, so return
                 return;
             }
-            
+
         }
         if (uiData == DONE)
         {

@@ -385,6 +385,9 @@ class PlayerCondition
         // Checks if the player meets the condition
         bool Meets(Player const* pPlayer, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
 
+        // Checks if the patch is valid
+        bool CheckPatch() const;
+
         Team GetTeam() const
         {
             return m_condition == CONDITION_TEAM ? Team(m_value1) : TEAM_CROSSFACTION;
@@ -1210,6 +1213,7 @@ class ObjectMgr
         void LoadFactionChangeItems();
         void LoadFactionChangeQuests();
         void LoadFactionChangeMounts();
+        void RestoreDeletedItems();
         bool GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountNum) const;
         uint32 GetMountItemEntry(Races race, uint8 num) const;
         uint32 GetRandomMountForRace(Races race) const;

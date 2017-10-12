@@ -1056,6 +1056,8 @@ LootStoreItem const * LootTemplate::LootGroup::Roll(Loot const& loot) const
                 Team conditionTeam = condition->GetTeam();
                 if ((conditionTeam == ALLIANCE || conditionTeam == HORDE) && conditionTeam != loot.GetTeam())
                     continue;
+                if (!condition->CheckPatch())
+                    continue;
             }
             indexesOk.push_back(i);
         }
