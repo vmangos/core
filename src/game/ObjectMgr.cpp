@@ -8694,7 +8694,59 @@ void ObjectMgr::LoadFactionChangeMounts()
     delete result;
     sLog.outString(">> %u montures de races chargees", count);
 }
+void ObjectMgr::RestoreDeletedItems()
+{
+    QueryResult* result = CharacterDatabase.Query("SELECT id, player_guid, item_entry, stack_count FROM character_deleted_items");
 
+    if (!result)
+    {
+        sLog.outString();
+        sLog.outString(">> Restored 0 prevously deleted items.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        uint32 memberGuidlow = fields[1].GetUInt32();
+        uint32 itemEntry = fields[2].GetUInt32();
+        uint32 stackCount = fields[3].GetUInt32();
+        
+        if (ItemPrototype const* itemProto = GetItemPrototype(itemEntry))
+        {
+            ObjectGuid memberGuid = ObjectGuid(HIGHGUID_PLAYER, memberGuidlow);
+            Player* pPlayer = ObjectAccessor::FindPlayerNotInWorld(memberGuid);
+
+            if (Item* restoredItem = Item::CreateItem(itemEntry, stackCount ? stackCount : 1, pPlayer ? pPlayer : (const Player *) 0))
+            {
+                // save new item before send
+                restoredItem->SaveToDB();
+
+                // subject
+                std::string subject = itemProto->Name1;
+
+                // text
+                std::string textFormat = GetMangosString(LANG_RESTORED_ITEM, LOCALE_enUS);
+                
+                MailDraft(subject, textFormat)
+                    .AddItem(restoredItem)
+                    .SendMailTo(MailReceiver(memberGuid), MailSender(MAIL_NORMAL, memberGuid.GetCounter(), MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED, 0, 30 * DAY);
+
+                CharacterDatabase.PExecute("DELETE FROM character_deleted_items WHERE id = %u", id);
+
+                count++;
+            }
+        }
+    } while (result->NextRow());
+
+    delete result;
+    sLog.outString();
+    sLog.outString(">> Restored %u previously deleted items to players.", count);
+}
 uint32 GetRealMountEntry(uint32 entry)
 {
     switch (entry)

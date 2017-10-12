@@ -1617,6 +1617,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading spell group stack rules ...");
     sSpellMgr.LoadSpellGroupStackRules();
 
+    sLog.outString("Restoring deleted items to players ...");
+    sObjectMgr.RestoreDeletedItems();
+
     sAutoTestingMgr->Load();
 
     m_broadcaster =

@@ -1214,6 +1214,7 @@ class ObjectMgr
         void LoadFactionChangeItems();
         void LoadFactionChangeQuests();
         void LoadFactionChangeMounts();
+        void RestoreDeletedItems();
         bool GetMountDataByEntry(uint32 itemEntry, Races& race, uint8& mountNum) const;
         uint32 GetMountItemEntry(Races race, uint8 num) const;
         uint32 GetRandomMountForRace(Races race) const;
