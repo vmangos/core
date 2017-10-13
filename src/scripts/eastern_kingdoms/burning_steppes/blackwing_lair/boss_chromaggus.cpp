@@ -450,8 +450,8 @@ struct boss_chromaggusAI : public ScriptedAI
         // Enrage if not already enraged and below 20%
         if (!m_bEnraged && m_creature->GetHealthPercent() < 20.0f)
         {
-            DoCastSpellIfCan(m_creature, SPELL_ENRAGE);
-            m_bEnraged = true;
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE) == CAST_OK)
+                m_bEnraged = true;
         }
 
         DoMeleeAttackIfReady();
