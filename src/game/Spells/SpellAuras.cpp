@@ -5287,17 +5287,15 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (!pCaster)
                 return;
 
-            // Don't heal target if it is already at max health
+            // Don't heal target if it is already at max health. We still need
+            // to do procs on the tick, however
             if (target->GetHealth() == target->GetMaxHealth())
             {
-                // Trigger Improved Mend Pet even if health is full
-                if (spellProto->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_MEND_PET>())
-                {
-                    uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
-                    uint32 procVictim = PROC_FLAG_ON_TAKE_PERIODIC;
-                    uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
-                    pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto);
-                }
+                uint32 procAttacker = PROC_FLAG_ON_DO_PERIODIC;
+                uint32 procVictim = PROC_FLAG_ON_TAKE_PERIODIC;
+                uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
+                pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, 1, BASE_ATTACK, spellProto);
+
                 return;
             }
 
@@ -5330,36 +5328,6 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             uint32 procEx = PROC_EX_NORMAL_HIT | PROC_EX_PERIODIC_POSITIVE;
             pCaster->ProcDamageAndSpell(target, procAttacker, procVictim, procEx, gain, BASE_ATTACK, spellProto);
 
-            // Grande tenue de marchereve (Druide T3)
-            if (spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION, CF_DRUID_REGROWTH>())
-            {
-                Unit::AuraList const& auraClassScripts = pCaster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
-                for (Unit::AuraList::const_iterator itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
-                {
-                    uint32 triggered_spell_id = 0;
-
-                    // Aura giving mana / health at recuperation tick
-                    if ((*itr)->GetModifier()->m_miscvalue == 4533 && spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION>() && roll_chance_i(50))
-                    {
-                        switch (target->getPowerType())
-                        {
-                            case POWER_MANA:
-                                triggered_spell_id = 28722;
-                                break;
-                            case POWER_RAGE:
-                                triggered_spell_id = 28723;
-                                break;
-                            case POWER_ENERGY:
-                                triggered_spell_id = 28724;
-                                break;
-                        }
-                    }
-                    else if ((*itr)->GetModifier()->m_miscvalue == 4537 && spellProto->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REGROWTH>())
-                        triggered_spell_id = 28750;
-                    if (triggered_spell_id)
-                        pCaster->CastSpell(target, triggered_spell_id, true);
-                }
-            }
             target->getHostileRefManager().threatAssist(pCaster, float(gain) * 0.5f * sSpellMgr.GetSpellThreatMultiplier(spellProto), spellProto);
 
             // heal for caster damage, warlock's health funnel aldready cost hps
