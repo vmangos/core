@@ -74,6 +74,12 @@ void Totem::Update(uint32 update_diff, uint32 time)
         return;
     }
 
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
+        GetMotionMaster()->MoveIdle();
+
+    // Do final update before unsummon, or we lose ticks on the totem's spell
+    Creature::Update(update_diff, time);
+
     if (m_duration <= update_diff)
     {
         UnSummon();                                         // remove self
@@ -81,11 +87,6 @@ void Totem::Update(uint32 update_diff, uint32 time)
     }
     else
         m_duration -= update_diff;
-
-    if (GetMotionMaster()->GetCurrentMovementGeneratorType() != IDLE_MOTION_TYPE)
-        GetMotionMaster()->MoveIdle();
-
-    Creature::Update(update_diff, time);
 }
 
 void Totem::Summon(Unit* owner)
