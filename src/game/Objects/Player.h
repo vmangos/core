@@ -1537,6 +1537,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void UpdateArmor();
         void UpdateMaxHealth();
         void UpdateMaxPower(Powers power);
+        void UpdateManaRegen() override;
         void UpdateAttackPowerAndDamage(bool ranged = false);
         void UpdateDamagePhysical(WeaponAttackType attType);
         void UpdateSpellDamageAndHealingBonus();
@@ -1558,7 +1559,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         void UpdateAllSpellCritChances();
         void UpdateSpellCritChance(uint32 school);
-        void UpdateManaRegen();
 
         ObjectGuid const& GetLootGuid() const { return m_lootGuid; }
         void SetLootGuid(ObjectGuid const& guid) { m_lootGuid = guid; }

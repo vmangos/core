@@ -261,7 +261,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
         data << m_strTarget;
 }
 
-Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim):
+Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
     m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
@@ -271,6 +271,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_destroyed = false;
     m_spellInfo = info;
     m_triggeredBySpellInfo = triggeredBy;
+    m_triggeredByParentSpellInfo = triggeredByParent;
     m_caster = caster;
     m_selfContainer = nullptr;
     m_referencedFromCurrentSpell = false;
@@ -1438,18 +1439,17 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
         return;
     }
 
-    // Nostalrius: IsAuraResist pour les ModMechanicResistance des effets.
-    if (IsSpellAppliesAura(m_spellInfo, effectMask) && unit->IsAuraResist(m_spellInfo))
-        for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
-            if (m_spellInfo->Effect[eff] == SPELL_EFFECT_APPLY_AURA)
-            {
-                if ((realCaster && realCaster->IsPlayer() && realCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-                    (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-                    break;
-                effectMask &= ~(1 << eff);
-                if (!effectMask)
-                    return;
-            }
+    // Check mechanic resistance for each effect
+    for (int eff = 0; eff < MAX_EFFECT_INDEX; ++eff)
+        if (unit->IsEffectResist(m_spellInfo, eff))
+        {
+            if ((realCaster && realCaster->IsPlayer() && realCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
+                (unit->IsPlayer() && unit->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
+                break;
+            effectMask &= ~(1 << eff);
+            if (!effectMask)
+                return;
+        }
 
     // Recheck immune (only for delayed spells)
     if (m_caster != unit && m_spellInfo->speed && (
@@ -3893,6 +3893,17 @@ void Spell::update(uint32 difftime)
                     ++iter;
 
                     SpellAuraHolder *holder = *curr;
+                    // Holder deleted before updating, but not removed from list. Clear usage
+                    // and remove. Use case: Cannot find caster in world to remove holder from
+                    // channeled spell in RemoveSpellAuraHolder
+                    if (holder->IsDeleted())
+                    {
+                        // TODO: Is this a leak if we don't delete it here? Unit probably removed from world
+                        holder->SetInUse(false);
+                        m_channeledHolders.erase(curr);
+                        continue;
+                    }
+
                     holder->UpdateHolder(difftime);
 
                     // Spell cast was interrupted on holder update. Unit likely died, targetted buff was
@@ -3913,7 +3924,6 @@ void Spell::update(uint32 difftime)
                             (holder->IsDeleted() && (remove == AURA_REMOVE_BY_RANGE || remove == AURA_REMOVE_BY_GROUP)))
                     {
                         holder->SetInUse(false);
-
                         m_channeledHolders.erase(curr);
                     }
                 }
@@ -4951,6 +4961,9 @@ void Spell::CastPreCastSpells(Unit* target)
 
 void Spell::AddChanneledAuraHolder(SpellAuraHolder *holder)
 {
+    if (!holder || !holder->IsChanneled())
+        return;
+
     // Set and hold in use until clean up to prevent any delete calls destroying
     // the object before we can handle it
     holder->SetInUse(true);
@@ -5944,6 +5957,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                     if (!go->IsUseRequirementMet())
                         return SPELL_FAILED_TRY_AGAIN;
 
+                    // Prevent looting chests while totally immune
+                    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && m_caster->ToPlayer()->isTotalImmune())
+                        return SPELL_FAILED_DAMAGE_IMMUNE;
                 }
                 else if (Item* item = m_targets.getItemTarget())
                 {

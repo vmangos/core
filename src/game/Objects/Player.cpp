@@ -12129,23 +12129,17 @@ void Player::SendPreparedQuest(ObjectGuid guid)
         // need pet case for some quests
         if (Creature *pCreature = GetMap()->GetAnyTypeCreature(guid))
         {
-            uint32 textid = GetGossipTextId(pCreature);
+            uint32 textid = sObjectMgr.GetNpcGossip(pCreature->GetGUIDLow());
 
             GossipText const* gossiptext = sObjectMgr.GetGossipText(textid);
-            if (!gossiptext)
-            {
-                qe._Delay = 0;                              //TEXTEMOTE_MESSAGE;              //zyg: player emote
-                qe._Emote = 0;                              //TEXTEMOTE_HELLO;                //zyg: NPC emote
-                title = "";
-            }
-            else
+            if (gossiptext)
             {
                 qe = gossiptext->Options[0].Emotes[0];
 
                 if (!gossiptext->Options[0].Text_0.empty())
                 {
                     title = gossiptext->Options[0].Text_0;
-
+                    
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                     {
@@ -12160,7 +12154,7 @@ void Player::SendPreparedQuest(ObjectGuid guid)
                 else
                 {
                     title = gossiptext->Options[0].Text_1;
-
+                    
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
                     if (loc_idx >= 0)
                     {
@@ -14839,7 +14833,8 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
         if (s.caster_guid != GetObjectGuid() && holder->IsSingleTarget())
             holder->SetIsSingleTarget(false);
 
-        AddSpellAuraHolder(holder);
+        if (!AddSpellAuraHolder(holder))
+            holder = nullptr;
         DETAIL_LOG("Added auras from spellid %u", spellproto->Id);
     }
     else
@@ -14895,6 +14890,7 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
             {
                 CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item = '%u'", item_lowguid);
                 CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_lowguid);
+                CharacterDatabase.PExecute("INSERT INTO character_deleted_items (player_guid, item_entry, stack_count) VALUES ('%u', '%u', '%u')", GetGUIDLow(), item_id, fields[2].GetUInt32());
                 sLog.outError("Player::_LoadInventory: Player %s has an unknown item (id: #%u) in inventory, deleted.", GetName(), item_id);
                 continue;
             }
@@ -19008,6 +19004,33 @@ void Player::UpdateUnderwaterState()
         else
             m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
     }
+
+    // cast any spells associated with this liquid type (only used in Naxxramas)
+    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_status.entry))
+    {
+        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(liq->SpellId);
+
+        if (spellInfo)
+        {
+            SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, this, nullptr);
+
+            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            {
+                uint8 eff = spellInfo->Effect[i];
+                if (eff >= TOTAL_SPELL_EFFECTS)
+                    continue;
+                if (IsAreaAuraEffect(eff) ||
+                    eff == SPELL_EFFECT_APPLY_AURA ||
+                    eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+                {
+                    Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, this);
+                    holder->AddAura(aur, SpellEffectIndex(i));
+                }
+            }
+            if (!AddSpellAuraHolder(holder))
+                holder = nullptr;
+        }
+    }
 }
 
 void Player::SetCanParry(bool value)
@@ -19068,7 +19091,15 @@ bool Player::CanCaptureTowerPoint()
 
 bool Player::isTotalImmune()
 {
-    return IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_ALL);
+    AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
+
+    uint32 immuneMask = 0;
+    for (AuraList::const_iterator itr = immune.begin(); itr != immune.end(); ++itr)
+    {
+        immuneMask |= (*itr)->GetModifier()->m_miscvalue;
+    }
+
+    return (immuneMask == SPELL_SCHOOL_MASK_ALL);
 }
 
 void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)

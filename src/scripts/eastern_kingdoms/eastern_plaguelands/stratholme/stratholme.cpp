@@ -51,6 +51,7 @@ bool GOHello_go_entree_de_service(Player* pPlayer, GameObject* pGo)
             continue;
 
         (*itr)->AI()->ReceiveEmote(pPlayer, 1000);
+        (*itr)->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
     pGo->UseDoorOrButton(5);
 

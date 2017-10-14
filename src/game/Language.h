@@ -698,6 +698,7 @@ enum MangosStrings
     //LANG_BG_EY_DROPPED_FLAG           = 686,
     //LANG_BG_EY_RESETED_FLAG           = 687,
 
+    LANG_RESTORED_ITEM                  = 699,
     //LANG_ARENA_ONE_TOOLOW             = 700,
     //LANG_ARENA_ONE_MINUTE             = 701,
     //LANG_ARENA_THIRTY_SECONDS         = 702,

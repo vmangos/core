@@ -322,7 +322,7 @@ class Spell
         void EffectNostalrius(SpellEffectIndex eff_idx);
         void HandleAddTargetTriggerAuras();
 
-        Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL, Unit* victim = NULL);
+        Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID = ObjectGuid(), SpellEntry const* triggeredBy = NULL, Unit* victim = NULL, SpellEntry const* triggeredByParent = NULL);
         ~Spell();
 
         void prepare(SpellCastTargets targets, Aura* triggeredByAura = nullptr);
@@ -401,6 +401,7 @@ class Spell
 
         SpellEntry const* m_spellInfo;
         SpellEntry const* m_triggeredBySpellInfo;
+        SpellEntry const* m_triggeredByParentSpellInfo;     // Spell that triggered the spell that triggered this
         int32 m_currentBasePoints[MAX_EFFECT_INDEX];        // cache SpellEntry::CalculateSimpleValue and use for set custom base points
         Item* m_CastItem;
         SpellCastTargets m_targets;

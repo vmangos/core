@@ -80,10 +80,10 @@ CreatureAI* GetAI_npc_primordial_behemoth(Creature* pCreature)
 
 void AddSC_maraudon()
 {
-    Script* pNewScript;
+    //Script* pNewScript;
 
-    pNewScript = new Script;
-    pNewScript->Name = "npc_primordial_behemoth";
-    pNewScript->GetAI = &GetAI_npc_primordial_behemoth;
-    pNewScript->RegisterSelf();
+    //pNewScript = new Script;
+    //pNewScript->Name = "npc_primordial_behemoth";
+    //pNewScript->GetAI = &GetAI_npc_primordial_behemoth;
+    //pNewScript->RegisterSelf();
 }

@@ -165,7 +165,7 @@ bool CreatureCreatePos::Relocate(Creature* cr) const
 Creature::Creature(CreatureSubtype subtype) :
     Unit(), i_AI(nullptr),
     loot(this), lootForPickPocketed(false), lootForBody(false), lootForSkin(false), skinningForOthersTimer(5000), m_TargetNotReachableTimer(0),
-    _pacifiedTimer(0), _manaRegen(true),
+    _pacifiedTimer(0), _manaRegen(true), m_manaRegen(0),
     m_groupLootTimer(0), m_groupLootId(0), m_lootMoney(0), m_lootGroupRecipientId(0), m_corpseDecayTimer(0),
     m_respawnTime(0), m_respawnDelay(25), m_corpseDelay(60),
     m_respawnradius(5.0f), m_combatStartTime(0), m_combatState(false), m_combatResetCount(0), m_subtype(subtype),
@@ -879,12 +879,7 @@ void Creature::RegenerateMana()
     if (isInCombat() || GetCharmerOrOwnerGuid())
     {
         if (!IsUnderLastManaUseEffect())
-        {
-            float ManaIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_MANA);
-            float Spirit = GetStat(STAT_SPIRIT);
-
-            addvalue = uint32((Spirit / 5.0f + 17.0f) * ManaIncreaseRate);
-        }
+            addvalue = m_manaRegen;
     }
     else
         addvalue = maxValue / 3;
@@ -1387,7 +1382,9 @@ void Creature::SaveToDB(uint32 mapid)
        << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
        << GetDefaultMovementType() << ","                 //default movement generator type
        << m_isActiveObject << ","
-       << m_visibilityModifier << ")";
+       << m_visibilityModifier << ","
+       << "0,"                                             //patch_min
+       << "10)";                                           //patch_max
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 

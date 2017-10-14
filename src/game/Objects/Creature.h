@@ -585,6 +585,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void UpdateArmor() override;
         void UpdateMaxHealth() override;
         void UpdateMaxPower(Powers power) override;
+        void UpdateManaRegen() override;
         void UpdateAttackPowerAndDamage(bool ranged = false) override;
         void UpdateDamagePhysical(WeaponAttackType attType) override;
         uint32 GetCurrentEquipmentId() const { return m_equipmentId; }
@@ -782,6 +783,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 _pacifiedTimer;
         void AllowManaRegen(bool v) { _manaRegen = v; }
         bool _manaRegen;
+        uint32 m_manaRegen;
 
         void RegenerateHealth();
         void RegenerateMana();

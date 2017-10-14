@@ -158,7 +158,8 @@ ChatCommand * ChatHandler::getCommandTable()
     static ChatCommand characterDeletedListCommandTable[] =
     {
         { NODE, "account",         SEC_ADMINISTRATOR, true, &ChatHandler::HandleCharacterDeletedListAccountCommand, "", nullptr },
-        { NODE, "name",            SEC_ADMINISTRATOR, true, &ChatHandler::HandleCharacterDeletedListNameCommand, "", nullptr }
+        { NODE, "name",            SEC_ADMINISTRATOR, true, &ChatHandler::HandleCharacterDeletedListNameCommand, "", nullptr },
+        { MSTR, nullptr,       0,                  false, nullptr,                                           "", nullptr }
     };
 
     static ChatCommand characterDeletedCommandTable[] =

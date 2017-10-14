@@ -162,6 +162,15 @@ struct boss_jeklikAI : public ScriptedAI
         //ScriptedAI::JustDied(Killer);
     }
 
+    void EnterEvadeMode() override
+    {
+        ScriptedAI::EnterEvadeMode();
+        m_creature->Respawn();
+        float x, y, z, o;
+        m_creature->GetHomePosition(x, y, z, o);
+        m_creature->NearTeleportTo(x, y, z, o);
+    }
+
     void UpdateAI(const uint32 lastDiff)
     {
         if (!m_pInstance || !m_creature->SelectHostileTarget() || !m_creature->getVictim())

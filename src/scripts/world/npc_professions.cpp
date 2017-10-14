@@ -719,29 +719,32 @@ bool GossipHello_npc_prof_leather(Player* pPlayer, Creature* pCreature)
     if (pCreature->isTrainer())
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_TRAINER, GOSSIP_TEXT_TRAIN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRAIN);
 
-    uint32 eCreature = pCreature->GetEntry();
+    
 
-    if (pPlayer->HasSkill(SKILL_LEATHERWORKING) && pPlayer->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 250 && pPlayer->getLevel() > 49)
-    {
-        switch (eCreature)
-        {
-            case 7866:                                      //Peter Galen
-            case 7867:                                      //Thorkaf Dragoneye
-                if (pPlayer->HasSpell(S_DRAGON))
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_DRAGON,      GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 1);
-                break;
-            case 7868:                                      //Sarah Tanner
-            case 7869:                                      //Brumn Winterhoof
-                if (pPlayer->HasSpell(S_ELEMENTAL))
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_ELEMENTAL,   GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 2);
-                break;
-            case 7870:                                      //Caryssia Moonhunter
-            case 7871:                                      //Se'Jib
-                if (pPlayer->HasSpell(S_TRIBAL))
-                    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_TRIBAL,      GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 3);
-                break;
-        }
-    }
+    // Unlearning specializations introduced in 2.0.3
+
+    // uint32 eCreature = pCreature->GetEntry();
+    //if (pPlayer->HasSkill(SKILL_LEATHERWORKING) && pPlayer->GetBaseSkillValue(SKILL_LEATHERWORKING) >= 250 && pPlayer->getLevel() > 49)
+    //{
+    //    switch (eCreature)
+    //    {
+    //        case 7866:                                      //Peter Galen
+    //        case 7867:                                      //Thorkaf Dragoneye
+    //            if (pPlayer->HasSpell(S_DRAGON))
+    //                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_DRAGON,      GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 1);
+    //            break;
+    //        case 7868:                                      //Sarah Tanner
+    //        case 7869:                                      //Brumn Winterhoof
+    //            if (pPlayer->HasSpell(S_ELEMENTAL))
+    //                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_ELEMENTAL,   GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 2);
+    //            break;
+    //        case 7870:                                      //Caryssia Moonhunter
+    //        case 7871:                                      //Se'Jib
+    //            if (pPlayer->HasSpell(S_TRIBAL))
+    //                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UNLEARN_TRIBAL,      GOSSIP_SENDER_UNLEARN, GOSSIP_ACTION_INFO_DEF + 3);
+    //            break;
+    //    }
+    //}
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
     return true;

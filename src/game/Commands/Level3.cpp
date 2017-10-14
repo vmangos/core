@@ -3740,7 +3740,9 @@ bool ChatHandler::HandleFearCommand(char* /*args*/)
         }
     }
 
-    target->AddSpellAuraHolder(holder);
+    if (!target->AddSpellAuraHolder(holder))
+        holder = nullptr;
+
     return true;
 }
 
@@ -3886,7 +3888,8 @@ bool ChatHandler::HandleAuraCommand(char* args)
             holder->AddAura(aur, SpellEffectIndex(i));
         }
     }
-    target->AddSpellAuraHolder(holder);
+    if (!target->AddSpellAuraHolder(holder))
+        holder = nullptr;
 
     return true;
 }

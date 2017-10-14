@@ -26,6 +26,7 @@
 #include "SharedDefines.h"
 #include "SpellAuras.h"
 #include "ObjectMgr.h"
+#include "World.h"
 
 /*#######################################
 ########                         ########
@@ -692,6 +693,9 @@ bool Creature::UpdateAllStats()
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
 
+    if (GetMaxPower(POWER_MANA))
+        UpdateManaRegen();
+
     return true;
 }
 
@@ -724,6 +728,18 @@ void Creature::UpdateMaxPower(Powers power)
 
     float value  = GetTotalAuraModValue(unitMod);
     SetMaxPower(power, uint32(value));
+}
+
+void Creature::UpdateManaRegen()
+{
+    float ManaIncreaseRate = sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_MANA);
+    float Spirit = GetStat(STAT_SPIRIT);
+    // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
+    float power_regen = GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
+    // Mana regen from SPELL_AURA_MOD_POWER_REGEN aura
+    float power_regen_mp5 = GetTotalAuraModifierByMiscValue(SPELL_AURA_MOD_POWER_REGEN, POWER_MANA) / 5.0f;
+    
+    m_manaRegen = uint32(((Spirit / 5.0f + 17.0f) * power_regen + power_regen_mp5) * ManaIncreaseRate);
 }
 
 void Creature::UpdateAttackPowerAndDamage(bool ranged)
@@ -833,6 +849,9 @@ bool Pet::UpdateStats(Stats stat)
             break;
     }
 
+    if (GetMaxPower(POWER_MANA))
+        UpdateManaRegen();
+
     return true;
 }
 
@@ -846,6 +865,9 @@ bool Pet::UpdateAllStats()
 
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
+
+    if (GetMaxPower(POWER_MANA))
+        UpdateManaRegen();
 
     return true;
 }

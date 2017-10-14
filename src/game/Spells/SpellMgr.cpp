@@ -1850,8 +1850,8 @@ void SpellMgr::LoadSpellGroupStackRules()
 
 bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) const
 {
-    // Trouver le groupid du sort.
-    SpellGroup spellGroupId = SPELL_GROUP_NULL;
+    std::vector<uint32> spellGroupIds;
+    std::vector<uint32>::iterator spellGroupIdsIt;
     // first = groupid, second = spellId
     for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
     {
@@ -1865,34 +1865,36 @@ bool SpellMgr::ListMorePowerfullSpells(uint32 spellId, std::list<uint32>& list) 
             SpellGroupStackRule stackRule = found->second;
             if (stackRule == SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN)
             {
-                spellGroupId = itr->first;
-                break;
+                spellGroupIds.push_back(itr->first);
             }
         }
     }
-    if (spellGroupId == SPELL_GROUP_NULL)
+    if (spellGroupIds.size() == 0)
         return false;
-    bool spellPassed = false;
-    for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+    for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
-        if (itr->first != spellGroupId)
-            continue;
-        if (!spellPassed)
+        bool spellPassed = false;
+        for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
         {
-            if (itr->second == spellId)
-                spellPassed = true;
-            continue;
+            if (itr->first != *(spellGroupIdsIt))
+                continue;
+            if (!spellPassed)
+            {
+                if (itr->second == spellId)
+                    spellPassed = true;
+                continue;
+            }
+            list.push_back(itr->second);
         }
-        list.push_back(itr->second);
+        MANGOS_ASSERT(spellPassed == true);
     }
-    MANGOS_ASSERT(spellPassed == true);
     return !list.empty();
 }
 
 bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) const
 {
-    // Trouver le groupid du sort.
-    SpellGroup spellGroupId = SPELL_GROUP_NULL;
+    std::vector<uint32> spellGroupIds;
+    std::vector<uint32>::iterator spellGroupIdsIt;
     // first = groupid, second = spellId
     for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
     {
@@ -1906,20 +1908,22 @@ bool SpellMgr::ListLessPowerfullSpells(uint32 spellId, std::list<uint32>& list) 
             SpellGroupStackRule stackRule = found->second;
             if (stackRule == SPELL_GROUP_STACK_RULE_POWERFULL_CHAIN)
             {
-                spellGroupId = itr->first;
-                break;
+                spellGroupIds.push_back(itr->first);
             }
         }
     }
-    if (spellGroupId == SPELL_GROUP_NULL)
+    if (spellGroupIds.size() == 0)
         return false;
-    for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+    for (spellGroupIdsIt = spellGroupIds.begin(); spellGroupIdsIt != spellGroupIds.end(); ++spellGroupIdsIt)
     {
-        if (itr->first != spellGroupId)
-            continue;
-        if (itr->second == spellId)
-            break;
-        list.push_back(itr->second);
+        for (SpellGroupSpellMap::const_iterator itr = mSpellGroupSpell.begin(); itr != mSpellGroupSpell.end(); ++itr)
+        {
+            if (itr->first != *(spellGroupIdsIt))
+                continue;
+            if (itr->second == spellId)
+                break;
+            list.push_back(itr->second);
+        }
     }
     return !list.empty();
 }

@@ -120,6 +120,7 @@ class SQLStorage : public SQLStorageBase
         }
 
         void Load(bool error_at_empty = true);
+        void LoadProgressive(uint8 wow_patch, bool error_at_empty = true);
 
         void EraseEntry(uint32 id);
 
@@ -251,6 +252,7 @@ class SQLStorageLoaderBase
 {
     public:
         void Load(StorageClass& storage, bool error_at_empty = true);
+        void LoadProgressive(StorageClass& storage, uint8 wow_patch, bool error_at_empty = true);
 
         template<class S, class D>
         void convert(uint32 field_pos, S src, D& dst);

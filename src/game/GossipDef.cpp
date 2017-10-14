@@ -385,12 +385,12 @@ void QuestMenu::ClearMenu()
     m_qItems.clear();
 }
 
-void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, ObjectGuid npcGUID)
+void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title, ObjectGuid guid)
 {
     WorldPacket data(SMSG_QUESTGIVER_QUEST_LIST, 100);      // guess size
-    data << ObjectGuid(npcGUID);
+    data << ObjectGuid(guid);
 
-    if (QuestGreetingLocale const *questGreeting = sObjectMgr.GetQuestGreetingLocale(npcGUID.GetEntry()))
+    if (QuestGreetingLocale const *questGreeting = sObjectMgr.GetQuestGreetingLocale(guid.GetEntry(), (guid.IsAnyTypeCreature() ? 0 : 1)))
     {
         int locale_idx = GetMenuSession()->GetSessionDbLocaleIndex();
 
@@ -440,7 +440,7 @@ void PlayerMenu::SendQuestGiverQuestList(QEmote eEmote, const std::string& Title
     }
     data.put<uint8>(count_pos, count);
     GetMenuSession()->SendPacket(&data);
-    //DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid = %s", npcGUID.GetString().c_str());
+    //DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_LIST NPC Guid = %s", guid.GetString().c_str());
 }
 
 void PlayerMenu::SendQuestGiverStatus(uint8 questStatus, ObjectGuid npcGUID)

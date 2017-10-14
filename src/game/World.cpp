@@ -487,9 +487,11 @@ void World::LoadConfigSettings(bool reload)
         }
     }
 
+    m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
+
     ///- Read the player limit and the Message of the day from the config file
     SetPlayerLimit(sConfig.GetIntDefault("PlayerLimit", DEFAULT_PLAYER_LIMIT), true);
-    SetMotd(sConfig.GetStringDefault("Motd", "Welcome to the Massive Network Game Object Server."));
+    SetMotd(sConfig.GetStringDefault("Motd", "Welcome to the Massive Network Game Object Server.") + std::string("\n") + std::string(ObjectMgr::GetPatchName()) + std::string(" is now live!"));
 
     ///- Read all rates from the config file
     setConfigPos(CONFIG_FLOAT_RATE_HEALTH, "Rate.Health", 1.0f);
@@ -906,7 +908,6 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_IS_MAPSERVER,                             "IsMapServer", false);
 
     m_timeZoneOffset = sConfig.GetIntDefault("TimeZoneOffset", 0) * HOUR;
-    m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
 
     LoadNostalriusConfig(reload);
 
@@ -1628,6 +1629,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading spell group stack rules ...");
     sSpellMgr.LoadSpellGroupStackRules();
 
+    sLog.outString("Restoring deleted items to players ...");
+    sObjectMgr.RestoreDeletedItems();
+
     sAutoTestingMgr->Load();
 
     m_broadcaster =
@@ -1637,7 +1641,13 @@ void World::SetInitialWorldSettings()
     if (!isMapServer)
         m_charDbWorkerThread = new ACE_Based::Thread(new CharactersDatabaseWorkerThread());
 
-    sLog.outString("%s initialized", isMapServer ? "Node" : "World");
+    sLog.outString();
+    sLog.outString("==========================================================");
+    sLog.outString("Current content is set to %s.", ObjectMgr::GetPatchName());
+    sLog.outString("==========================================================");
+    sLog.outString();
+
+    sLog.outString("%s initialized.", isMapServer ? "Node" : "World");
 
     uint32 uStartInterval = WorldTimer::getMSTimeDiff(uStartTime, WorldTimer::getMSTime());
     sLog.outString("SERVER STARTUP TIME: %i minutes %i seconds", uStartInterval / 60000, (uStartInterval % 60000) / 1000);
