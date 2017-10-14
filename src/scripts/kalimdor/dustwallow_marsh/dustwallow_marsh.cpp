@@ -636,12 +636,9 @@ struct npc_private_hendelAI : public ScriptedAI
         // reset his guards faction
         for (ptrdiff_t i = 0; i < 2; ++i)
         {
-            // if guard is valid
-            if (m_guards[i])
+            if (m_guards[i] && m_guards[i]->isAlive())
             {
-                // if guard is alive, set his faction to hostile
-                if (m_guards[i]->isAlive())
-                    m_guards[i]->setFaction(FACTION_THERAMORE); // theramore faction
+                m_guards[i]->setFaction(FACTION_THERAMORE); // theramore faction
             }
         }
         // reset phase flags
@@ -730,46 +727,24 @@ struct npc_private_hendelAI : public ScriptedAI
             // 2 guard has a random text
             const int guardTexts[3] = { SAY_PROGRESS_5_SEN, SAY_PROGRESS_6_SEN, SAY_PROGRESS_7_SEN };
 
-            ptrdiff_t guardIndex;
             // check if there one of the guards is available
-            for (guardIndex = 0; guardIndex < 2; ++guardIndex)
+            bool first = true;
+            for (ptrdiff_t guardIndex = 0; guardIndex < 2; ++guardIndex)
             {
                 Creature* guard = m_guards[guardIndex];
                 // if guard is valid
-                if (guard)
+                if (guard && guard->isAlive())
                 {
-                    if (guard->isAlive())
-                    {
+                    if (first)
                         DoScriptText(guardTexts[0], guard);
-                        // if Creature has stun aura MoveFleeing will break, so remove all of them
-                        guard->RemoveAllAuras();
-                        // Stop combat, removes combat animation
-                        guard->CombatStop();
-                        // flee/running from Archmage Tervosh
-                        guard->GetMotionMaster()->MoveFleeing(tervosh, 0);
-                        break;
-                    }
-                }
-            }
-
-            // if a first guard was found, then what about about the second one?
-            if (!guardIndex)
-            {
-                Creature* guard = m_guards[1];
-                // if guard is valid
-                if (guard)
-                {
-                    if (guard->isAlive())
-                    {
-                        // second guard has a random text
+                    else
                         DoScriptText(guardTexts[urand(1, 2)], guard);
-                        // if Creature has stun aura MoveFleeing will break, so remove all of them
-                        guard->RemoveAllAuras();
-                        // Stop combat, removes combat animation
-                        guard->CombatStop();
-                        // flee/running from Archmage Tervosh
-                        guard->GetMotionMaster()->MoveFleeing(tervosh, 0);
-                    }
+
+                    guard->RemoveAllAuras();
+                    guard->CombatStop();
+                    guard->GetMotionMaster()->MoveFleeing(tervosh, 0);
+
+                    first = false;
                 }
             }
 
@@ -856,14 +831,9 @@ struct npc_private_hendelAI : public ScriptedAI
             // private hendel, too injured, gives up the chase.
             DoScriptText(EMOTE_SURRENDER, m_creature);
 
-            // remove all dots, etc
             m_creature->RemoveAllAuras();
-            // rare case: players from the opposite faction can pull Private Hendel here, so making him non pvp attackable and passive at this stage
-            // faction id:35 is friendly to everyone.
             m_creature->setFaction(35);
-            // clean thread list
             m_creature->DeleteThreatList();
-            // stop combat
             m_creature->CombatStop();
 
             // NPC runs to spawn point
@@ -1070,6 +1040,22 @@ struct npc_private_hendelAI : public ScriptedAI
         }break;
         }
     }
+
+    void SummonedCreatureDespawn(Creature* creature) override 
+    {
+        // No dangling pointers
+        for (ptrdiff_t i = 0; i < 3; ++i)
+        {
+            if (m_allies[i] == creature)
+                m_allies[i] = 0;
+        }
+
+        for (ptrdiff_t i = 0; i < 2; ++i)
+        {
+            if (m_guards[i] == creature)
+                m_guards[i] = 0;
+        }
+    }
 };
 
 bool QuestAccept_npc_private_hendel(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
@@ -1223,7 +1209,6 @@ struct npc_archmage_tervoshAI : public ScriptedAI
                     // make guards face private hendel
                     for (auto const& g : guards)
                     {
-                        // if guard is not in combat and alive, make him face Tervosh
                         if (!g->isInCombat() && g->isAlive())
                         {
                             g->StopMoving(); // Movement will be restored automatically in the core
@@ -1233,7 +1218,6 @@ struct npc_archmage_tervoshAI : public ScriptedAI
                         }
                     }
 
-                    // switch to waiting phase
                     m_eventPhase = MDQP_WAITING;
                 }
                 else
@@ -1279,8 +1263,7 @@ bool QuestRewarded_npc_archmage_tervosh(Player* pPlayer, Creature* pCreature, Qu
 
     if (pQuest->GetQuestId() == QUEST_MISSING_DIPLO_PT14)
     {
-        npc_archmage_tervoshAI* pTervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(pCreature->AI());
-        if (pTervoshAI)
+        if (npc_archmage_tervoshAI* pTervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(pCreature->AI()))
         {
             // Tervosh says: Go with grace, and may the Lady's magic protect you.
             DoScriptText(TERVOSH_SAY_ON_QUEST_MD_PT14, pCreature);
@@ -1288,10 +1271,6 @@ bool QuestRewarded_npc_archmage_tervosh(Player* pPlayer, Creature* pCreature, Qu
             // rare case: if two players are completing this quest at the same time, then only the last one will receive a buff.
             // i am pretty sure that, this bug existed on retail, so handle this case, by making cast triggered/instant.
             pCreature->CastSpell(pPlayer, SPELL_PROUDMOORES_DEFENSE, true);
-        }
-        else // ScriptName is empty.
-        {
-            return false;
         }
     }
 
@@ -1305,7 +1284,6 @@ CreatureAI* GetAI_npc_archmage_tervosh(Creature* pCreature)
 
 bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
-    // If player is dead, GM mode is ON, quest complete or no quest
     if (!pPlayer || !pPlayer->isAlive() || pPlayer->isGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_MISSING_DIPLO_PT14) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_MISSING_DIPLO_PT14) == QUEST_STATUS_NONE)
@@ -1329,20 +1307,12 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
         // rare case: players from the opposite faction can attack the NPC during event. Set him unattackable like on official.
         tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
 
-        // start the event.
-        npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI());
-        if (tervoshAI)
+        if (npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
             tervoshAI->m_eventStarted = true;
-        else // ScriptName is empty.
-        {
-            static_cast<TemporarySummon*>(tervosh)->UnSummon();
-            return false;
-        }
     }
-    else // Multiple players are doing quest at the same time
+    else if (npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
     {
-        // check: if tervosh is in waiting phase, then reset event duration.
-        npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()); // pointer check not needed here
+        // If we're already waiting, let him wait longer
         if (tervoshAI->getCurrentPhase() == MDQP_WAITING)
         {
             tervoshAI->resetDespawnDelay();
@@ -1361,11 +1331,13 @@ bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*
             tervosh->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_ATTACKABLE_1 | UNIT_FLAG_PASSIVE);
             tervosh->SetVisibility(VISIBILITY_OFF);
             // start the event.
-            npc_archmage_tervoshAI* tervoshAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()); // pointer check not needed here
-            // set inital phase to MDQP_PREPARE_TO_ARRIVE
-            tervoshAI->m_nextPhaseDelayTimer = 3000;
-            tervoshAI->m_eventPhase = MDQP_PREPARE_TO_ARRIVE;
-            tervoshAI->m_eventStarted = true;
+            if (npc_archmage_tervoshAI* tervoshNewAI = dynamic_cast<npc_archmage_tervoshAI*>(tervosh->AI()))
+            {
+                // set inital phase to MDQP_PREPARE_TO_ARRIVE
+                tervoshNewAI->m_nextPhaseDelayTimer = 3000;
+                tervoshNewAI->m_eventPhase = MDQP_PREPARE_TO_ARRIVE;
+                tervoshNewAI->m_eventStarted = true;
+            }
         }
     }
 
