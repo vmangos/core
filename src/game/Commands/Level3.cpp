@@ -8128,7 +8128,7 @@ bool ChatHandler::HandleSpamerList(char* args)
 
 bool ChatHandler::HandleAntiSpamAdd(char* args)
 {
-    if (!*args)
+    if (!*args || !sAnticheatLib->GetAntispam())
         return false;
 
     char* wordStr = ExtractQuotedArg(&args);
@@ -8154,7 +8154,7 @@ bool ChatHandler::HandleAntiSpamAdd(char* args)
 
 bool ChatHandler::HandleAntiSpamRemove(char* args)
 {
-    if (!*args)
+    if (!*args || !sAnticheatLib->GetAntispam())
         return false;
 
     char* wordStr = ExtractQuotedArg(&args);
@@ -8174,7 +8174,7 @@ bool ChatHandler::HandleAntiSpamRemove(char* args)
 
 bool ChatHandler::HandleAntiSpamReplace(char* args)
 {
-    if (!*args)
+    if (!*args || !sAnticheatLib->GetAntispam())
         return false;
 
     char* fromStr = ExtractQuotedArg(&args);
@@ -8203,7 +8203,7 @@ bool ChatHandler::HandleAntiSpamReplace(char* args)
 
 bool ChatHandler::HandleAntiSpamRemoveReplace(char* args)
 {
-    if (!*args)
+    if (!*args || !sAnticheatLib->GetAntispam())
         return false;
 
     char* fromStr = ExtractQuotedArg(&args);
