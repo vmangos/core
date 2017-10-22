@@ -502,7 +502,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     switch(unitTarget->getPowerType())
                     {
                         case POWER_RAGE :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 10, POWER_RAGE);
+                            unitTarget->EnergizeBySpell(unitTarget, 27798, 100, POWER_RAGE);
                         return;
                         case POWER_ENERGY :
                             unitTarget->EnergizeBySpell(unitTarget, 27798, 40, POWER_ENERGY);
