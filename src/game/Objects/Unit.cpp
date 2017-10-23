@@ -1042,12 +1042,14 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
                 creature->lootForPickPocketed = false;
 
             loot->clear();
-            if (creature->AI() || !creature->AI()->FillLoot(loot, looter))
+            if (!(creature->AI() && creature->AI()->FillLoot(loot, looter)))
+            {
                 if (uint32 lootid = creature->GetCreatureInfo()->lootid)
                 {
                     loot->SetTeam(group_tap ? group_tap->GetTeam() : looter->GetTeam());
                     loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature);
                 }
+            }
 
             loot->generateMoneyLoot(creature->GetCreatureInfo()->mingold, creature->GetCreatureInfo()->maxgold);
         }
