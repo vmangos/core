@@ -81,6 +81,7 @@ struct AuctionEntry
     bool BuildAuctionInfo(WorldPacket & data) const;
     void DeleteFromDB() const;
     void SaveToDB() const;
+    bool IsAvailableFor(std::string const& ip);
 };
 
 struct AuctionHouseClientQuery
