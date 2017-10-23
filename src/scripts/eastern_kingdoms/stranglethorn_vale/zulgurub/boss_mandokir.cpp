@@ -465,7 +465,7 @@ struct boss_mandokirAI : public ScriptedAI
         {
             if ((m_uiGlobalCooldown == 0) && (!m_uiWatchTarget))
             {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1, nullptr, SELECT_FLAG_PLAYER))
                 {
                     if (Player* pPlayer = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
                     {
