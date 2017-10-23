@@ -6259,17 +6259,13 @@ int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int3
         }
         // Nostalrius.
         bool bUsePenalty = true;
-        // Eclair lumineux
+        // Flash of Light
         if (spellProto->Id == 19993)
         {
             bUsePenalty = false;
-            // Libram de divinite
-            if (HasAura(28853))
-                total += 53.0f;
+            if (HasAura(28853)) total += 53.0f;  // Libram of Divinity
+            if (HasAura(28851)) total += 83.0f;  // Libram of Light
         }
-        // Lumiere sacree
-        //else if (spellProto->Id == 19968)
-            //bUsePenalty = false;
 
         // Dragonbreath Chili
         if (spellProto->Id == 15851)
@@ -6737,9 +6733,6 @@ uint32 Unit::SpellHealingBonusTaken(Unit *pCaster, SpellEntry const *spellProto,
         AuraList const& mDummyAuras = GetAurasByType(SPELL_AURA_DUMMY);
         for (AuraList::const_iterator i = mDummyAuras.begin(); i != mDummyAuras.end(); ++i)
         {
-            // Libram of Divinity
-            if ((*i)->GetSpellProto()->Id == 28851 && spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT1>())
-                TakenTotal += (*i)->GetModifier()->m_amount;
             if ((*i)->GetSpellProto()->IsFitToFamilyMask<CF_PALADIN_BLESSINGS>() && (*i)->GetSpellProto()->SpellVisual == 300)
             {
                 // Holy Light
