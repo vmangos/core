@@ -33,11 +33,6 @@ EndContentData */
 // Author: Kampeador
 //-----------------------------------------------------------------------------
 
-// On elysium core, JustRespawned() isn't called on spawn. Only on respawn.
-// if it is safe to reduce a hardcoded 2500ms delay before the first waypoint to 750ms-1000ms,
-// then this and setDelayBeforeTheFirstWaypoint(750) function can be removed.
-#define ELYSIUM_CORE_JUST_RESPAWNED
-
 enum
 {
     // ids from "script_texts" table
@@ -188,9 +183,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
     // respawn delay from DB
     uint32 m_respawnDelay;
 
-#ifdef ELYSIUM_CORE_JUST_RESPAWNED  
     bool m_justCreated;
-#endif
 
     npc_tapoke_slim_jahnAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
@@ -205,9 +198,7 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
         m_slimsFriend = nullptr;
 
-#ifdef ELYSIUM_CORE_JUST_RESPAWNED
         m_justCreated = true;
-#endif
 
         Reset();
     }
@@ -309,13 +300,12 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
     void UpdateEscortAI(const uint32 uiDiff)
     {
-#ifdef ELYSIUM_CORE_JUST_RESPAWNED
         if (m_justCreated)
         {
             m_justCreated = false;
             JustRespawned();
         }
-#endif
+
         if (m_isBeaten)
         {
             if (m_nextPhaseDelay < uiDiff)
@@ -332,11 +322,8 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
                     {
                         m_creature->SetFacingToObject(player);
 
-                        if (m_slimsFriend)
-                        {
-                            if (m_slimsFriend->isAlive())
-                                m_slimsFriend->SetFacingToObject(player);
-                        }
+                        if (m_slimsFriend && m_slimsFriend->isAlive())
+                            m_slimsFriend->SetFacingToObject(player);
 
                     }
                     m_nextPhaseDelay = 2000;
@@ -421,37 +408,30 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
 
             m_isBeaten = true;
 
-            if (m_slimsFriend)
+            if (m_slimsFriend && m_slimsFriend->isAlive())
             {
-                if (m_slimsFriend->isAlive())
-                {
-                    // stop combat
-                    m_slimsFriend->CombatStop(true);
-                    // remove all dots, etc
-                    m_slimsFriend->RemoveAllAuras();
-                    // clean thread list
-                    m_slimsFriend->DeleteThreatList();
-                    // make him unattackable
-                    m_slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                m_slimsFriend->CombatStop(true);
+                m_slimsFriend->RemoveAllAuras();
+                m_slimsFriend->DeleteThreatList();
+                m_slimsFriend->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
 
-                    DoScriptText(SAY_PROGRESS_2_FRI, m_slimsFriend);
-                }
+                DoScriptText(SAY_PROGRESS_2_FRI, m_slimsFriend);
             }
 
-            // pause escort
             SetEscortPaused(true);
 
-            // prevent an inconsistent behavior
             m_creature->setFaction(FACTION_FRIENDLY_TO_ALL);
-            // remove all dots, etc
             m_creature->RemoveAllAuras();
-            // clean thread list
             m_creature->DeleteThreatList();
-            // stop combat
             m_creature->CombatStop(true);
 
             SetRun(false);
         }
+    }
+
+    void SummonedCreatureDespawn(Creature* creature) override
+    {
+        m_slimsFriend = nullptr;
     }
 };
 
