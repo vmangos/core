@@ -13,3 +13,4 @@ The development branch is used as the basis for the QA and PTR realms. To ensure
 Once the development branch has been tested by QA, it will be merged with the stable branch to become the next revision for the live realms. The only changes accepted to the stable branch, outside of the merge window, will be critical hotfixes to resolve game-breaking and stability issues.
 
 As with any open source project, the workflow is subject to change as we receive feedback and discover what works best for the project and its contributors.
+
