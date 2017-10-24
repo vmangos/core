@@ -12728,12 +12728,12 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
     if (uint32 mail_template_id = pQuest->GetRewMailTemplateId())
         MailDraft(mail_template_id).SendMailTo(this, questGiver, MAIL_CHECK_MASK_HAS_BODY, pQuest->GetRewMailDelaySecs());
 
+    q_status.m_rewarded = true;
     if (!pQuest->IsRepeatable())
         SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
     else
         SetQuestStatus(quest_id, QUEST_STATUS_NONE);
 
-    q_status.m_rewarded = true;
     if (q_status.uState != QUEST_NEW)
         q_status.uState = QUEST_CHANGED;
 
