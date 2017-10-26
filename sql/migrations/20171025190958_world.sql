@@ -56,7 +56,7 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (85633, 12);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (85634, 12);
 INSERT INTO `game_event_creature` (`guid`, `event`) VALUES (99966, 12);
 
--- Add add gameobject template for Wickerman Guardian Ember.
+-- Add gameobject template for Wickerman Guardian Ember.
 INSERT INTO `gameobject_template` (`entry`, `type`, `displayId`, `name`, `faction`, `flags`, `size`, `data0`, `data1`, `data2`, `data3`, `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11`, `data12`, `data13`, `data14`, `data15`, `data16`, `data17`, `data18`, `data19`, `data20`, `data21`, `data22`, `data23`, `mingold`, `maxgold`) VALUES (180574, 2, 6421, 'Wickerman Guardian Ember', 0, 0, 5, 43, 0, 0, 6535, 0, 0, 19700, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
 -- Adding Hallow's End quests to the event.
