@@ -34,7 +34,6 @@ npc_doctor              100%    Gustaf Vanhowzen and Gregory Victor, quest 6622 
 npc_lunaclaw_spirit     100%    Appears at two different locations, quest 6001/6002
 npc_mount_vendor        100%    Regular mount vendors all over the world. Display gossip if player doesn't meet the requirements to buy
 npc_sayge               100%    Darkmoon event fortune teller, buff player based on answers given
-npc_training_dummy      100%    Custom training dummy script for dps tests
 npc_event_fireworks     100%    Shoots fireworks every hour. Used for New Year's Eve event.
 EndContentData */
 
@@ -2914,60 +2913,6 @@ CreatureAI* GetAI_npc_explosive_sheep(Creature* pCreature)
 }
 
 /*
-* Custom training dummy script
-*/
-
-struct npc_training_dummyAI : ScriptedAI
-{
-    explicit npc_training_dummyAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        npc_training_dummyAI::Reset();
-    }
-
-    uint32 m_uiCombatTimer;
-
-    void Reset() override
-    {
-        m_uiCombatTimer = 15000;
-    }
-
-    void AttackStart(Unit* /*pWho*/) override {}
-
-    void Aggro(Unit* pWho) override
-    {
-        SetCombatMovement(false);
-    }
-
-    void DamageTaken(Unit* pWho, uint32& uiDamage) override
-    {
-        m_uiCombatTimer = 15000;
-    }
-
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
-    {
-        m_uiCombatTimer = 15000;
-    }
-
-    void UpdateAI(const uint32 diff) override
-    {
-        if (m_creature->isInCombat())
-        {
-            if (m_uiCombatTimer <= diff)
-            {
-                EnterEvadeMode();
-                m_uiCombatTimer = 15000;
-            }
-            else
-                m_uiCombatTimer -= diff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_training_dummy(Creature* pCreature)
-{
-    return new npc_training_dummyAI(pCreature);
-}
-/*
     New Year's Eve Fireworks Event
 */
 
@@ -3753,11 +3698,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_explosive_sheep";
     newscript->GetAI = &GetAI_npc_explosive_sheep;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_training_dummy";
-    newscript->GetAI = &GetAI_npc_training_dummy;
     newscript->RegisterSelf();
 
     newscript = new Script;

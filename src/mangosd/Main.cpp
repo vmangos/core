@@ -190,7 +190,7 @@ extern int main(int argc, char **argv)
         "MM   MM MM  MMM MM   MM  MMMMMM  MMMM   MMMMM\n"
         "        MM  MMM http://getmangos.com\n"
         "        MMMMMM\n\n");
-    sLog.outString("Elysium Project : https://elysium-project.org/");
+    sLog.outString("Light's Hope : https://lightshope.org/");
     sLog.outString("Using configuration file %s.", cfg_file);
 
 #define STR(s) #s

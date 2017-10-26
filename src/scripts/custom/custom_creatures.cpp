@@ -950,6 +950,61 @@ bool GossipSelect_ProfessionNPC(Player* player, Creature* creature, uint32 sende
     return true;
 }
 
+/*
+* Custom training dummy script
+*/
+
+struct npc_training_dummyAI : ScriptedAI
+{
+    explicit npc_training_dummyAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        npc_training_dummyAI::Reset();
+    }
+
+    uint32 m_uiCombatTimer;
+
+    void Reset() override
+    {
+        m_uiCombatTimer = 15000;
+    }
+
+    void AttackStart(Unit* /*pWho*/) override {}
+
+    void Aggro(Unit* pWho) override
+    {
+        SetCombatMovement(false);
+    }
+
+    void DamageTaken(Unit* pWho, uint32& uiDamage) override
+    {
+        m_uiCombatTimer = 15000;
+    }
+
+    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    {
+        m_uiCombatTimer = 15000;
+    }
+
+    void UpdateAI(const uint32 diff) override
+    {
+        if (m_creature->isInCombat())
+        {
+            if (m_uiCombatTimer <= diff)
+            {
+                EnterEvadeMode();
+                m_uiCombatTimer = 15000;
+            }
+            else
+                m_uiCombatTimer -= diff;
+        }
+    }
+};
+
+CreatureAI* GetAI_npc_training_dummy(Creature* pCreature)
+{
+    return new npc_training_dummyAI(pCreature);
+}
+
 void AddSC_custom_creatures()
 {
     Script *newscript;
@@ -959,6 +1014,8 @@ void AddSC_custom_creatures()
     newscript->pGossipHello = &GossipHello_TeleportNPC;
     newscript->pGossipSelect = &GossipSelect_TeleportNPC;
     newscript->RegisterSelf(true);
+    /*
+    Commented out to prevent startup error about unused script.
 
     newscript = new Script;
     newscript->Name = "custom_EnchantNPC";
@@ -972,4 +1029,9 @@ void AddSC_custom_creatures()
     newscript->pGossipSelect = &GossipSelect_ProfessionNPC;
     newscript->RegisterSelf(true);
 
+    newscript = new Script;
+    newscript->Name = "npc_training_dummy";
+    newscript->GetAI = &GetAI_npc_training_dummy;
+    newscript->RegisterSelf();
+    */
 }

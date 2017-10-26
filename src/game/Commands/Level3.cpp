@@ -7112,6 +7112,9 @@ bool ChatHandler::HandleModifyStaminaCommand(char *args)
     player->SetModifierValue(UNIT_MOD_STAT_STAMINA, BASE_VALUE, (float)amount);
     player->UpdateAllStats();
 
+    if (player->isAlive())
+        player->SetHealth(player->GetMaxHealth());
+
     PSendSysMessage(LANG_YOU_CHANGE_STA, player->GetName(), amount);
 
     if (needReportToTarget(player))
