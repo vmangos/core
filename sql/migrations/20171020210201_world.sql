@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20171020210201');
 -- Add your query below.
 
 -- Katrina Shimmerstar
-REPLACE INTO `creature` VALUES (86235, 15353, 0, 15390, 0, -4918.6, -982.868, 501.455, 2.17977, 840, 0, 0, 1605, 0, 0, 0, 0, 0, 10);
+REPLACE INTO `creature` VALUES (86235, 15353, 0, 15390, 0, -4918.6, -982.868, 501.455, 2.17977, 840, 0, 0, 1605, 0, 0, 0, 0, 0, 0, 10);
 REPLACE INTO `game_event_creature` (`guid`, `event`) VALUES (86235, 12);
 
 -- Bobbing Apple
