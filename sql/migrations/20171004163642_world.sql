@@ -1,4 +1,13 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171004163642');
+IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20171004163642');
+-- Add your query below.
+
 
 --
 -- Table structure for table `creature_linking`
@@ -22,3 +31,11 @@ CREATE TABLE `creature_linking_template` (
   `search_range` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'search_range - describing in which range (spawn-coords) master and slave are linked together',
   PRIMARY KEY (`entry`,`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature Linking System';
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;

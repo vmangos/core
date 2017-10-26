@@ -135,12 +135,12 @@ INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
 INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `patch_min`, `patch_max`) VALUES
-(@CGUID_BOSS+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Sever - Level 21 - Shadowfang Keep
-(@CGUID_BOSS+1, 14693, 189, 0, 0, 1797.17, 1308.18, 18.6715, 4.71688, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Scorn - Level 32 - Scarlet Monestary
-(@CGUID_BOSS+2, 14686, 129, 0, 0, 2582.66, 695.779, 56.871, 2.04211, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Lady Falther'ess - Level 37 - Razorfen Downs
-(@CGUID_BOSS+3, 14690, 429, 0, 0, 29.7657, 547.141, -4.39526, 6.27435, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Revanchion - Level 60 - Dire Maul
-(@CGUID_BOSS+4, 14695, 289, 0, 1, 200.29, 151.785, 109.795, 3.19581, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Lord Blackwood - Level 60 - Scholomance
-(@CGUID_BOSS+5, 14684, 329, 0, 1, 3503.92, -3313.75, 130.357, 4.65155, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10); -- Balzaphon - Level 60 - Stratholme
+(@CGUID_BOSS+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0, 9, 10), -- Sever - Level 21 - Shadowfang Keep
+(@CGUID_BOSS+1, 14693, 189, 0, 0, 1797.17, 1308.18, 18.6715, 4.71688, 300, 0, 0, 1, 0, 0, 0, 0, 9, 10), -- Scorn - Level 32 - Scarlet Monestary
+(@CGUID_BOSS+2, 14686, 129, 0, 0, 2582.66, 695.779, 56.871, 2.04211, 300, 0, 0, 1, 0, 0, 0, 0, 9, 10), -- Lady Falther'ess - Level 37 - Razorfen Downs
+(@CGUID_BOSS+3, 14690, 429, 0, 0, 29.7657, 547.141, -4.39526, 6.27435, 300, 0, 0, 1, 0, 0, 0, 0, 9, 10), -- Revanchion - Level 60 - Dire Maul
+(@CGUID_BOSS+4, 14695, 289, 0, 1, 200.29, 151.785, 109.795, 3.19581, 300, 0, 0, 1, 0, 0, 0, 0, 9, 10), -- Lord Blackwood - Level 60 - Scholomance
+(@CGUID_BOSS+5, 14684, 329, 0, 1, 3503.92, -3313.75, 130.357, 4.65155, 300, 0, 0, 1, 0, 0, 0, 0, 9, 10); -- Balzaphon - Level 60 - Stratholme
 
 -- Add instance bosses
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
@@ -151,19 +151,6 @@ INSERT INTO `game_event_creature` (`guid`, `event`) VALUES
 (@CGUID_BOSS+3, 81),
 (@CGUID_BOSS+4, 81),
 (@CGUID_BOSS+5, 81);
-
--- Add ghost glow
-DELETE FROM `creature_template_addon` WHERE `entry` IN (14682, 14693, 14686, 14690, 14695, 14684, 16380, 16379, 14697);
-INSERT INTO `creature_template_addon` (`entry`, `mount`, `bytes1`, `b2_0_sheath`, `b2_1_flags`, `emote`, `moveflags`, `auras`) VALUES
-(14682, 0, 0, 0, 0, 0, 0, '50596'),
-(14693, 0, 0, 0, 0, 0, 0, '50596'),
-(14686, 0, 0, 0, 0, 0, 0, '50596'),
-(14690, 0, 0, 0, 0, 0, 0, '50596'),
-(14695, 0, 0, 0, 0, 0, 0, '50596'),
-(14684, 0, 0, 0, 0, 0, 0, '50596'),
-(16380, 0, 0, 0, 0, 0, 0, '50596'),
-(16379, 0, 0, 0, 0, 0, 0, '50596'),
-(14697, 0, 0, 0, 0, 0, 0, '50596');
 
 -- Creature id: 14682
 -- Sever
@@ -1334,9 +1321,6 @@ UPDATE `game_event` SET `hardcoded`='1' WHERE `entry`='17';
 
 -- boss in scholomance
 UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE `entry`=16383;
-
--- Make sure max patch is set for newly added creatures
-UPDATE `creature` SET `patch_max` = 10 WHERE `patch_max` = 0;
 
 
 -- End of migration.

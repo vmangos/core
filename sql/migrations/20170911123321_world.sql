@@ -1,4 +1,13 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20170911123321');
+IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20170911123321');
+-- Add your query below.
+
 
 --
 -- Table structure for table `instance_buff_removal`
@@ -45,3 +54,11 @@ CREATE TABLE `instance_custom_counters` (
   `count` int(10) unsigned NOT NULL COMMENT 'counter',
   PRIMARY KEY (`index`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
