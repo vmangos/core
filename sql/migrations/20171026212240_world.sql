@@ -88,7 +88,7 @@ DELETE FROM `creature_movement` WHERE `id` IN (88192, 88194);
 DELETE FROM `creature_movement_scripts` WHERE `id` IN (2, 3);
 
 -- ERROR:CreatureEventAI:  Creature 15978 are using percentage event(1597802) with param1 <= param2 (MaxPercent <= MinPercent). Event will never trigger! 
-UPDATE `creature_ai_scripts` SET `event_param1`=45 WHERE `id`=1597802;
+UPDATE `creature_ai_scripts` SET `event_param2`=45 WHERE `id`=1597802;
 
 -- Fix texts for chicken escort quests.
 REPLACE INTO `script_texts` (`entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `sound`, `type`, `language`, `emote`, `comment`) VALUES (-1000287, 'Emergency power activated!  Initializing ambulatory motor!  CLUCK!', '비상 동력 가동 완료! 이동식 발동기 초기화 중! 꼬꼬댁!', 'Énergie de réserve activée ! Initialisation du moteur ambulatoire ! CLIC !', 'Notfallenergie aktiviert! Ambulatorenantrieb wird gestartet! GLUCK!', '备用动力启动！启动流动电机！咯咯嗒！', '備用動力啟動!啟動流動電機!咯咯嗒!', '¡Alimentación de emergencia activada! ¡Inicializando motor ambulatorio! ¡CLUC!', '¡Alimentación de emergencia activada! ¡Inicializando motor ambulatorio! ¡CLUC!', 'Запуск аварийного генератора! Инициализация временного мотора! ЩЕЛК!', 0, 0, 0, 0, 'oox SAY_OOX_START');
