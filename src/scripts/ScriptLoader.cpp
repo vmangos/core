@@ -117,6 +117,8 @@ void AddSC_boss_maexxna();
 void AddSC_boss_noth();
 void AddSC_boss_heigan();
 void AddSC_boss_patchwerk();
+void AddSC_boss_grobbulus();
+void AddSC_boss_thaddius();
 void AddSC_boss_razuvious();
 void AddSC_boss_sapphiron();
 void AddSC_instance_naxxramas();
@@ -384,6 +386,8 @@ void AddScripts()
     AddSC_boss_noth();
     AddSC_boss_heigan();
     AddSC_boss_patchwerk();
+    AddSC_boss_grobbulus();
+    AddSC_boss_thaddius();
     AddSC_boss_razuvious();
     AddSC_boss_sapphiron();
     AddSC_instance_naxxramas();

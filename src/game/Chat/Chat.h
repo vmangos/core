@@ -192,6 +192,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleWhisperRestrictionCommand(char* args);
         bool HandleUnstuckCommand(char* args);
         bool HandleGoldRemoval(char* args);
+        bool HandleAntiSpamAdd(char* args);
+        bool HandleAntiSpamRemove(char* args);
+        bool HandleAntiSpamReplace(char* args);
+        bool HandleAntiSpamRemoveReplace(char* args);
 
         // Packet dump
         bool HandleReplayPlayCommand(char *);
@@ -285,7 +289,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugUpdateCommand(char *args) { return true; }
         // Formations
         bool HandleNpcGroupAddCommand(char *args);
+        bool HandleNpcGroupAddRelCommand(char *args);
         bool HandleNpcGroupDelCommand(char *args);
+        bool HandleNpcGroupLinkCommand(char* args);
+
         bool HandleReloadCreatureGroupsCommand(char *args);
         // Characters
         bool HandleCharacterChangeRaceCommand(char *args);
@@ -328,6 +335,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadAccountBanList(char* args);
         bool HandleReloadCreatureCommand(char* args);
         bool HandleReloadGameObjectCommand(char* args);
+        bool HandleReloadInstanceBuffRemoval(char* args);
         // Channel
         bool HandleChannelJoinCommand(char* );
         bool HandleChannelLeaveCommand(char* );
@@ -398,8 +406,9 @@ class MANGOS_DLL_SPEC ChatHandler
 
         bool HandleDebugPlayCinematicCommand(char* args);
         bool HandleDebugPlaySoundCommand(char* args);
+        bool HandleDebugPlayScriptText(char* args);
         bool HandleDebugPlayMusicCommand(char* args);
-
+        
         bool HandleDebugSendBuyErrorCommand(char* args);
         bool HandleDebugSendChannelNotifyCommand(char* args);
         bool HandleDebugSendChatMsgCommand(char* args);

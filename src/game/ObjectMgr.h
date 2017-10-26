@@ -485,15 +485,6 @@ typedef std::vector<FactionChangeMountData> FactionChangeMountsData;
 
 enum PermVariables
 {
-    VARIABLE_NAXX_ATTACK_ZONE1  = 10,
-    VARIABLE_NAXX_ATTACK_ZONE2  = 11,
-    VARIABLE_NAXX_ATTACK_TIME1  = 12,
-    VARIABLE_NAXX_ATTACK_TIME2  = 13,
-    VARIABLE_NAXX_ATTACK_COUNT  = 14,
-    VARIABLE_NAXX_ELITE_ID      = 15,
-    VARIABLE_NAXX_ELITE_PYLON   = 16,
-    VARIABLE_NAXX_ELITE_SPAWNTIME=17,
-
     // ITEM ID RANGES ARE USED FOR AQ WAR EFFORT
 
     // Dragons of Nightmare support

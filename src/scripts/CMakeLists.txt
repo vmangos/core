@@ -288,6 +288,7 @@ set (SCRIPTS_SRCS
 	world/spell_scripts.cpp
 	world/totems.cpp
 	world/world_event_naxxramas.cpp
+	world/world_event_naxxramas.h
 	world/dragons_of_nightmare/boss_dragon_of_nightmare.cpp
 	world/dragons_of_nightmare/boss_emeriss.cpp
 	world/dragons_of_nightmare/boss_lethon.cpp

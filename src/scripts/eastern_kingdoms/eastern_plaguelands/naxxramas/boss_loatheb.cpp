@@ -14,65 +14,258 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Loatheb
-SD%Complete: 100
-SDComment:
-SDCategory: Naxxramas
-EndScriptData */
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
 
 enum
 {
-    SPELL_CORRUPTED_MIND  = 29198,
+    // No emotes in vanilla afaik
+    //EMOTE_AURA_BLOCKING = -1533143,
+    //EMOTE_AURA_FADING   = -1533145,
+    //EMOTE_AURA_WANE     = -1533144,
+
+    SPELL_CORRUPTED_MIND  = 29201, // this triggers the following spells on targets (based on class): 29185, 29194, 29196, 29198
     SPELL_POISON_AURA     = 29865,
     SPELL_INEVITABLE_DOOM = 29204,
-    SPELL_REMOVE_CURSE    = 30281
+    SPELL_REMOVE_CURSE    = 30281, // He periodically removes all curses on himself
+
+    NPC_SPORE             = 16286,
 };
 
-#define ADD_1X 2957.040f
-#define ADD_1Y -3997.590f
-#define ADD_1Z 274.280f
+enum Events
+{
+    EVENT_SUMMON_SPORE = 1,
+    EVENT_CORRUPTED_MIND,
+    EVENT_POISON_AURA,
+    EVENT_INEVITABLE_DOOM,
+    EVENT_REMOVE_CURSE
+};
 
-#define ADD_2X 2909.130f
-#define ADD_2Y -4042.970f
-#define ADD_2Z 274.280f
+// Can't really see much of a system in where the spores spawn.
+// In guides it say "oposite side of where the majority of the raid stands".
+// Unless this is a snapshot check by the boss on pull, which it dosent seem to be based on videos,
+// it simply seems like one of 2 (potentially 4) location is chosed at random on pull, after that it's
+// constantly spawning there throughout the fight.
+// Presumably spell 29234 was used, it has a radius of 70yd. Can't figure out exactly how it would have been used though.
+static constexpr float SporeLocs[2][3] = 
+{
+    {2951.0f, -4016.0f, 274.0f},
+    {2870.0f, -3978.0f, 274.0f}
+};
 
-#define ADD_3X 2861.102f
-#define ADD_3Y -3997.901f
-#define ADD_3Z 274.280f
+static constexpr uint8 MAX_STALKS_UP = 6;
+struct EyeStalkInfo
+{
+    enum eState
+    {
+        COOLDOWN,
+        UP
+    };
+    eState currentState;
+    uint32 timer;
+    ObjectGuid guid;
+    uint8 myIndex;
+};
+
+
+struct mob_rottingMaggotAI : public ScriptedAI
+{
+    mob_rottingMaggotAI(Creature* pCreature, bool isDiseased) :
+        ScriptedAI(pCreature),
+        isDiseased(isDiseased)
+    {
+        m_creature->SetNoCallAssistance(true);
+        // call for help radius includes bounding radius, so we need this tiny to not chain aggro
+        // the whole damn room
+        m_creature->SetCallForHelpDist(0.5f);
+        Reset();
+    }
+    const bool isDiseased;
+    WorldLocation aggroPossition;
+    static constexpr uint32 SPELL_RETCHING_PLAGUE = 30079;
+
+    void Reset() override
+    {
+    }
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        // Custom, tiny aggro radius
+        if (!m_creature->IsWithinDistInMap(pWho, 1.5f))
+            return;
+
+        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        {
+            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            {
+                m_creature->SetNoCallAssistance(true);
+
+                if (!m_creature->getVictim())
+                    AttackStart(pWho);
+                else if (m_creature->GetMap()->IsDungeon())
+                {
+                    pWho->SetInCombatWith(m_creature);
+                    m_creature->AddThreat(pWho);
+                }
+            }
+        }
+    }
+
+    void Aggro(Unit*) override
+    {
+        m_creature->SetNoCallAssistance(true);
+        m_creature->GetPosition(aggroPossition);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+        if (isDiseased)
+        {
+            if (!m_creature->HasAura(SPELL_RETCHING_PLAGUE))
+                m_creature->CastSpell(m_creature, SPELL_RETCHING_PLAGUE, true);
+        }
+        if (m_creature->GetDistance(aggroPossition.coord_x, aggroPossition.coord_y, aggroPossition.coord_z) > 40.0f)
+        {
+            EnterEvadeMode();
+        }
+        else
+        {
+            DoMeleeAttackIfReady();
+        }
+    }
+};
+
+struct mob_eyeStalkAI : public ScriptedAI
+{
+    mob_eyeStalkAI(Creature* pCreature) :
+        ScriptedAI(pCreature)
+    {
+        m_creature->SetCallForHelpDist(1.0f);
+        m_creature->SetNoCallAssistance(true);
+        SetCombatMovement(false);
+        timeSinceSpawn = 0;
+        haveSubmerged = false;
+        haveCastSubmerge = false;
+    }
+    uint32 timeSinceSpawn;
+    bool haveSubmerged;
+    bool haveCastSubmerge;
+    static constexpr uint32 SPELL_MIND_FLAY = 29407;
+
+    void Reset() override
+    {
+        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->StopMoving();
+        m_creature->SetMovement(MOVE_ROOT);
+        m_creature->SetNoCallAssistance(true);
+    }
+
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        if (timeSinceSpawn < 3000)
+            return;
+
+        if (!m_creature->IsWithinDistInMap(pWho, 19.0f))
+            return;
+
+        if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+        {
+            if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+            {
+                m_creature->SetNoCallAssistance(true);
+                if (!m_creature->getVictim())
+                    AttackStart(pWho);
+                else if (m_creature->GetMap()->IsDungeon())
+                {
+                    pWho->SetInCombatWith(m_creature);
+                    m_creature->AddThreat(pWho);
+                }
+            }
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        m_creature->SetNoCallAssistance(true);
+        timeSinceSpawn += std::min(uiDiff, std::numeric_limits<uint32>::max() - timeSinceSpawn);
+
+        if (haveSubmerged)
+        {
+            if (!haveCastSubmerge)
+            {
+                haveCastSubmerge = true;
+                m_creature->CastSpell(m_creature, 26234, false);
+            }
+            return;
+        }
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (!m_creature->IsNonMeleeSpellCasted())
+        {
+            if (m_creature->GetDistance(m_creature->getVictim()) < 35.0f)
+                DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIND_FLAY);
+            else
+                DoStopAttack();
+        }
+
+        DoMeleeAttackIfReady();
+    }
+};
+
 
 struct boss_loathebAI : public ScriptedAI
 {
     boss_loathebAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        int randLoc = urand(0, 1);
+        for (int i = 0; i < 3; i++)
+            SporeLoc[i] = SporeLocs[randLoc][i];
+
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
+
+        for (int i = 0; i < MAX_STALKS_UP; i++)
+        {
+            eyeStalks[i].currentState = EyeStalkInfo::COOLDOWN;
+            eyeStalks[i].timer = urand(0, 10000);
+            eyeStalks[i].guid = 0;
+        }
+        availableEyeLocs.clear();
+        for (uint8 i = 0; i < max_stalks; i++)
+            availableEyeLocs.push_back(i);
     }
 
     instance_naxxramas* m_pInstance;
 
-    uint32 m_uiCorruptedMindTimer;
-    uint32 m_uiPoisonAuraTimer;
-    uint32 m_uiInevitableDoomTimer;
-    uint32 m_uiInevitableDoom5minsTimer;
-    uint32 m_uiRemoveCurseTimer;
     uint32 m_uiSummonTimer;
+
+    EventMap events;
+    uint32 numDooms;
+    float SporeLoc[3];
+
+    uint32 stalkSpawnCooldowns[20];
+    std::vector<uint8> availableEyeLocs;
+    EyeStalkInfo eyeStalks[MAX_STALKS_UP];
 
     void Reset()
     {
-        m_uiCorruptedMindTimer = 4000;
-        m_uiPoisonAuraTimer = 2500;
-        m_uiInevitableDoomTimer = 120000;
-        m_uiInevitableDoom5minsTimer = 300000;
-        m_uiRemoveCurseTimer = 30000;
-        m_uiSummonTimer = 8000;
+        events.Reset();
+        numDooms = 0;
     }
 
     void Aggro(Unit* pWho)
     {
+        numDooms = 0;
+        events.ScheduleEvent(EVENT_SUMMON_SPORE,    Seconds(13));
+        events.ScheduleEvent(EVENT_CORRUPTED_MIND,  Seconds(5));
+        events.ScheduleEvent(EVENT_POISON_AURA,     Seconds(5));
+        events.ScheduleEvent(EVENT_INEVITABLE_DOOM, Minutes(2));
+        events.ScheduleEvent(EVENT_REMOVE_CURSE,    Seconds(5));
         if (m_pInstance)
             m_pInstance->SetData(TYPE_LOATHEB, IN_PROGRESS);
     }
@@ -83,81 +276,218 @@ struct boss_loathebAI : public ScriptedAI
             m_pInstance->SetData(TYPE_LOATHEB, DONE);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void JustReachedHome()
     {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_LOATHEB, FAIL);
+    }
 
-        // Corrupted Mind
-        if (m_uiCorruptedMindTimer < uiDiff)
+
+    /*
+    10 stalks
+    rand 10-20 up
+    rand 10-20 down
+    avg 15 up, avg 15 down
+    avg 5 up at any given time
+    when killed, down time becomes rand 10-20 + additional 10 seconds
+
+    we want an eyestalk to submerge and a new one to pop up every 4sec on avg.
+    That means we need all 20 to have an average cd of 80sec.
+    We also want, when no stalks are killed, on average
+    when an eyestalk comes off coldown, it forces the oldest alive eyestalk to die, then summons itself. The dead eye stalk gets a 60-90sec cooldown
+    with 20 stalks, and an avg cd of 75sec, this means one eye stalk switches with another one every 3.75 seconds on avg.
+
+    */
+    void WhackAStalk(uint32 diff)
+    {
+        for (int i = 0; i < MAX_STALKS_UP; i++)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_CORRUPTED_MIND);
-            m_uiCorruptedMindTimer = 62000;
-        }
-        else
-            m_uiCorruptedMindTimer -= uiDiff;
+            if (eyeStalks[i].timer >= diff)
+                eyeStalks[i].timer -= diff;
 
-        // Poison Aura
-        if (m_uiPoisonAuraTimer < uiDiff)
+            switch (eyeStalks[i].currentState)
+            {
+            case EyeStalkInfo::COOLDOWN:
+            {
+                // Summoning a new eye
+                if (eyeStalks[i].timer < diff)
+                {
+                    if (availableEyeLocs.size() == 0)
+                    {
+                        sLog.outError("boss_loatheb.cpp - availableEyeLocs size 0, should not happen!");
+                        return;
+                    }
+                    uint8 availableIndex = urand(0, availableEyeLocs.size() - 1);
+                    uint8 newEyeIdx = availableEyeLocs[availableIndex];
+                    availableEyeLocs.erase(availableEyeLocs.begin() + availableIndex);
+
+                    eyeStalks[i].myIndex = newEyeIdx;
+                    const float* pos = eyeStalkPossitions[newEyeIdx];
+
+                    Creature* pStalk = m_creature->SummonCreature(NPC_EyeStalk, pos[0], pos[1], pos[2], pos[3], TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+                    if (!pStalk)
+                    {
+                        sLog.outError("Heigans WhackAStalk failed to summon eye stalk");
+                        return;
+                    }
+                    eyeStalks[i].guid = pStalk->GetObjectGuid();
+                    eyeStalks[i].currentState = EyeStalkInfo::UP;
+                    eyeStalks[i].timer = urand(15000, 20000);
+                }
+                break;
+            }
+            case EyeStalkInfo::UP:
+                // Initiating unsummon
+                if (eyeStalks[i].timer < diff)
+                {
+                    if (Creature* pCreature = m_pInstance->GetCreature(eyeStalks[i].guid))
+                    {
+                        // If the eye is currently channeling mind flay we wait with unsummoning it
+                        if (!pCreature->IsNonMeleeSpellCasted())
+                        {
+                            mob_eyeStalkAI* ai = static_cast<mob_eyeStalkAI*>(pCreature->AI());
+                            if (!ai->haveSubmerged)
+                            {
+                                ai->haveSubmerged = true;
+                                if (TemporarySummon* ts = static_cast<TemporarySummon*>(pCreature))
+                                    ts->UnSummon(1100);
+                            }
+                        }
+                    }
+                }
+                break;
+            }
+        }
+    }
+
+    void SummonedCreatureDespawn(Creature* pCreature) override
+    {
+        if (pCreature->GetEntry() == NPC_EyeStalk)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_POISON_AURA);
-            m_uiPoisonAuraTimer = 60000;
+            for (int i = 0; i < MAX_STALKS_UP; i++)
+            {
+                if (eyeStalks[i].guid == pCreature->GetObjectGuid())
+                {
+                    // if currentState already is COOLDOWN it means it was killed
+                    if (eyeStalks[i].currentState != EyeStalkInfo::COOLDOWN)
+                    {
+                        eyeStalks[i].currentState = EyeStalkInfo::COOLDOWN;
+                        eyeStalks[i].timer = urand(1000, 5000);
+                    }
+                    eyeStalks[i].guid = 0;
+                    availableEyeLocs.push_back(eyeStalks[i].myIndex);
+                    break;
+                }
+            }
         }
-        else
-            m_uiPoisonAuraTimer -= uiDiff;
+    }
 
-        // Inevitable Doom
-        if (m_uiInevitableDoomTimer < uiDiff)
+    virtual void SummonedCreatureJustDied(Creature* pCreature)
+    {
+        if (pCreature->GetEntry() == NPC_EyeStalk)
         {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_INEVITABLE_DOOM);
-            m_uiInevitableDoomTimer = 120000;
+            // was killed, so it receives an additional 10 seconds cooldown
+            for (int i = 0; i < MAX_STALKS_UP; i++)
+            {
+                if (eyeStalks[i].guid == pCreature->GetObjectGuid())
+                {
+                    eyeStalks[i].currentState = EyeStalkInfo::COOLDOWN;
+                    eyeStalks[i].timer = urand(1000, 5000) + 20000;
+                    break;
+                }
+            }
         }
-        else
-            m_uiInevitableDoomTimer -= uiDiff;
+    }
 
-        // Inevitable Doom 5mins
-        if (m_uiInevitableDoom5minsTimer < uiDiff)
-        {
-            DoCastSpellIfCan(m_creature->getVictim(), SPELL_INEVITABLE_DOOM);
-            m_uiInevitableDoom5minsTimer = 15000;
-        }
-        else
-            m_uiInevitableDoom5minsTimer -= uiDiff;
-
-        // Remove Curse
-        if (m_uiRemoveCurseTimer < uiDiff)
+    void SpellHit(Unit*, const SpellEntry* pSpell) override 
+    {
+        if (pSpell->Id == 15286) // vamperic embrace
         {
             DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE);
-            m_uiRemoveCurseTimer = 30000;
         }
-        else
-            m_uiRemoveCurseTimer -= uiDiff;
+    }
 
-        // Summon
-        if (m_uiSummonTimer < uiDiff)
+    void UpdateAI(const uint32 uiDiff)
+    {
+
+        WhackAStalk(uiDiff);
+
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+        
+        if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+            return;
+
+        events.Update(uiDiff);
+        while (uint32 eventId = events.ExecuteEvent())
         {
-            Unit* pSummonedSpores = NULL;
-
-            pSummonedSpores = m_creature->SummonCreature(16286, ADD_1X, ADD_1Y, ADD_1Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 80000);
-            pSummonedSpores = m_creature->SummonCreature(16286, ADD_2X, ADD_2Y, ADD_2Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 80000);
-            pSummonedSpores = m_creature->SummonCreature(16286, ADD_3X, ADD_3Y, ADD_3Z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 80000);
-            if (pSummonedSpores)
+            switch (eventId)
             {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    pSummonedSpores->AddThreat(pTarget);
+            case EVENT_SUMMON_SPORE:
+                if (Creature* pSpore = m_creature->SummonCreature(NPC_SPORE, SporeLoc[0], SporeLoc[1], SporeLoc[2], 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+                {
+                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
+                        pSpore->AddThreat(pTarget);
+                }
+                events.Repeat(Seconds(13));
+                break;
+            case EVENT_CORRUPTED_MIND:
+                // https://www.youtube.com/watch?v=a0z9qjLxD98&list=PLYsWP02PY54A3RkEJv_VaT-0ZhfMs5zxN&index=4
+                // shows it refreshing every ~10 sec
+                if (DoCastSpellIfCan(m_creature, SPELL_CORRUPTED_MIND) == CAST_OK)
+                    events.Repeat(Seconds(10));
+                else
+                    events.Repeat(Milliseconds(100));
+                break;
+            case EVENT_POISON_AURA:
+                if (DoCastSpellIfCan(m_creature, SPELL_POISON_AURA) == CAST_OK)
+                    events.Repeat(Seconds(12));
+                else
+                    events.Repeat(Milliseconds(100));
+                break;
+            case EVENT_INEVITABLE_DOOM:
+                if (DoCastSpellIfCan(m_creature, SPELL_INEVITABLE_DOOM) == CAST_OK)
+                {
+                    ++numDooms;
+                    // 2, 2:30, 3, 3:30, 4, 4:30, 5
+                    // after 7 dooms, or 5 minutes into the fight,
+                    // the doom timer becomes 15 instead of 30 seconds.
+                    if (numDooms > 6)
+                        events.Repeat(Seconds(15));
+                    else
+                        events.Repeat(Seconds(30));
+                }
+                else
+                    events.Repeat(Milliseconds(100));
+                break;
+            case EVENT_REMOVE_CURSE:
+                if (DoCastSpellIfCan(m_creature, SPELL_REMOVE_CURSE) == CAST_OK)
+                    events.Repeat(Seconds(30));
+                else
+                    events.Repeat(100);
+                break;
             }
-
-            m_uiSummonTimer = 28000;
         }
-        else
-            m_uiSummonTimer -= uiDiff;
-
         DoMeleeAttackIfReady();
     }
 };
+
 CreatureAI* GetAI_boss_loatheb(Creature* pCreature)
 {
     return new boss_loathebAI(pCreature);
+}
+
+CreatureAI* GetAI_mob_rottingMaggot(Creature* pCreature)
+{
+    return new mob_rottingMaggotAI(pCreature, false);
+}
+CreatureAI* GetAI_mob_diseasedMaggot(Creature* pCreature)
+{
+    return new mob_rottingMaggotAI(pCreature, true);
+}
+CreatureAI* GetAI_mob_eyeStalk(Creature* pCreature)
+{
+    return new mob_eyeStalkAI(pCreature);
 }
 
 void AddSC_boss_loatheb()
@@ -166,5 +496,20 @@ void AddSC_boss_loatheb()
     NewScript = new Script;
     NewScript->Name = "boss_loatheb";
     NewScript->GetAI = &GetAI_boss_loatheb;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "mob_rotting_maggot";
+    NewScript->GetAI = &GetAI_mob_rottingMaggot;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "mob_diseased_maggot";
+    NewScript->GetAI = &GetAI_mob_diseasedMaggot;
+    NewScript->RegisterSelf();
+
+    NewScript = new Script;
+    NewScript->Name = "mob_eye_stalk";
+    NewScript->GetAI = &GetAI_mob_eyeStalk;
     NewScript->RegisterSelf();
 }

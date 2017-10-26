@@ -14,12 +14,19 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-/* ScriptData
-SDName: Boss_Heigan
-SD%Complete: 65
-SDComment: Missing traps dance
-SDCategory: Naxxramas
-EndScriptData */
+/*
+Full rewrite by Gemt
+
+Current semi-unknowns:
+The aoe manaburn; not seen it used in videos, despite all original vanilla guides mentioning it.
+Probably because its pretty much a wipe if ranged/healers are hit by it. 
+While Decrepit fever is very aggressive on its cooldown after a dance phase, the mana burn does not seem to be,
+so we should give "plenty" of time for casters to get to the platform, and tank to move the boss away.
+
+Chain pull radius for adds in encounter gauntlet is a bit of a guesswork with some hacks to override
+the default, static, callForHelp radius.
+
+*/
 
 #include "scriptPCH.h"
 #include "naxxramas.h"
@@ -33,22 +40,78 @@ enum
     SAY_AGGRO2              = -1533110,
     SAY_AGGRO3              = -1533111,
     SAY_SLAY                = -1533112,
+    
     SAY_TAUNT1              = -1533113,
     SAY_TAUNT2              = -1533114,
     SAY_TAUNT3              = -1533115,
     SAY_TAUNT4              = -1533117,
     SAY_CHANNELING          = -1533116,
     SAY_DEATH               = -1533118,
+
     EMOTE_TELEPORT          = -1533136,
     EMOTE_RETURN            = -1533137,
 
-    SPELL_ERUPTION          = 29371,                        //Spell used by floor pieces to cause damage to players
+    SPELL_ERUPTION          = 29371,
 
     //Spells by boss
-    SPELL_DECREPIT_FEVER_N  = 29998,
-    SPELL_DISRUPTION        = 29310,
-    SPELL_TELEPORT          = 30211,
-    SPELL_PLAGUE_CLOUD      = 29350
+    SPELL_DECREPIT_FEVER    = 29998,
+    SPELL_PLAGUE_CLOUD      = 29350,
+    SPELL_TELEPORT_SELF     = 30211,
+    SPELL_MANABURN          = 29310,
+
+    NPC_PLAGUE_FISSURE      = 533001,
+    NPC_PLAGUE_CLOUD        = 533002,
+};
+
+enum Events
+{
+    EVENT_FEVER = 1,
+    EVENT_ERUPT,
+    EVENT_DANCE,
+    EVENT_DANCE_END,
+    EVENT_TAUNT,
+    EVENT_DOOR_CLOSE,
+    EVENT_MANABURN,
+    EVENT_PORT_PLAYER
+};
+
+enum Phases
+{
+    PHASE_FIGHT = 1,
+    PHASE_DANCE
+};
+
+
+static const uint32 firstEruptionDBGUID = 533048;
+static const uint8 numSections = 4;
+static const uint8 numEruptions[numSections] = { // count of sequential GO DBGUIDs in the respective section of the room
+    15,
+    25,
+    23,
+    13
+};
+
+// in tunnel
+static constexpr float safespotFissures[3][3] = 
+{   
+    {2747.0f, -3754.0f, 274.0f},
+    {2805.8f, -3695.88f, 273.61f},
+    {2812.95f, -3703.52f, 273.61f},
+};
+
+static constexpr float sect1SafeSpot[3][3] = 
+{
+    { 2799.5f, -3691.0f, 273.62f },
+    { 2810.67f, -3706.06f, 275.0f },
+    { 2803.51f, -3697.42f, 274.1f }
+};
+static constexpr float sect2SafeSpot[3] = { 2790.51f, -3690.45f, 273.622f };
+static constexpr float sect3SafeSpot[3] = { 2778.40f, -3702.645f, 273.621f };
+static constexpr float sect4SafeSpot[3][3] = 
+{
+    { 2777.2f, -3712.41f, 273.63f },
+    { 2783.06f, -3717.7f, 273.63f },
+    { 2791.62f, -3726.04f, 273.63f },
 };
 
 struct boss_heiganAI : public ScriptedAI
@@ -57,61 +120,82 @@ struct boss_heiganAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
+        pCreature->SetLootAndXPModDist(300.0f);
     }
-
     instance_naxxramas* m_pInstance;
 
-    uint8 m_uiPhase;
-    uint8 m_uiPhaseEruption;
-
-    uint32 m_uiFeverTimer;
-    uint32 m_uiDisruptionTimer;
-    uint32 m_uiEruptionTimer;
-    uint32 m_uiPhaseTimer;
-    uint32 m_uiTauntTimer;
-    uint32 m_uiStartChannelingTimer;
-
-    void ResetPhase()
-    {
-        m_uiPhaseEruption = 0;
-        m_uiFeverTimer = 4000;
-        m_uiEruptionTimer = m_uiPhase == PHASE_GROUND ? urand(8000, 12000) : urand(2000, 3000);
-        m_uiDisruptionTimer = 5000;
-        m_uiStartChannelingTimer = 1000;
-        m_uiPhaseTimer = m_uiPhase == PHASE_GROUND ? 90000 : 45000;
-    }
+    Phases currentPhase;
+    EventMap m_events;
+    uint8 eruptionPhase;
+    std::vector<ObjectGuid> _eruptTiles[numSections];
+    uint32 killCooldown;
+    std::vector<ObjectGuid> portedPlayersThisPhase;
 
     void Reset()
     {
-        m_uiPhase = PHASE_GROUND;
-        m_uiTauntTimer = urand(20000, 60000);               // TODO, find information
-        ResetPhase();
+        portedPlayersThisPhase.clear();
+        
+        m_events.Reset();
+        killCooldown = 10000;
+        currentPhase = PHASE_FIGHT;
     }
 
     void Aggro(Unit* pWho)
     {
         m_creature->SetInCombatWithZone();
+        
+        eruptionPhase = 0;
+        currentPhase = PHASE_FIGHT;
+        m_events.ScheduleEvent(EVENT_FEVER,      Seconds(30), 0, PHASE_FIGHT);
+        m_events.ScheduleEvent(EVENT_DANCE,      Seconds(90), 0, PHASE_FIGHT);
+        m_events.ScheduleEvent(EVENT_ERUPT,      Seconds(15), 0, PHASE_FIGHT);
+        m_events.ScheduleEvent(EVENT_MANABURN,   Seconds(15), 0, PHASE_FIGHT);
+        m_events.ScheduleEvent(EVENT_TAUNT,      randtime(Seconds(20), Seconds(70)));
+        m_events.ScheduleEvent(EVENT_DOOR_CLOSE, Seconds(15));
+        m_events.ScheduleEvent(EVENT_PORT_PLAYER,Seconds(40));
 
-        switch (urand(0, 2))
-        {
-            case 0:
-                DoScriptText(SAY_AGGRO1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_AGGRO2, m_creature);
-                break;
-            case 2:
-                DoScriptText(SAY_AGGRO3, m_creature);
-                break;
-        }
+        DoScriptText(irand(SAY_AGGRO3, SAY_AGGRO1), m_creature);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_HEIGAN, IN_PROGRESS);
     }
 
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        if (currentPhase == PHASE_DANCE)
+            return;
+        else
+        {
+            if (pWho->GetPositionX() > 2825.0f)
+                return;
+            if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() && m_creature->IsHostileTo(pWho))
+            {
+                if (pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+                {
+                    if (!m_creature->getVictim())
+                        AttackStart(pWho);
+                    else if (m_creature->GetMap()->IsDungeon())
+                    {
+                        pWho->SetInCombatWith(m_creature);
+                        m_creature->AddThreat(pWho);
+                    }
+                }
+            }
+        }
+    }
+    
+    void AttackStart(Unit* pWho) override
+    {
+        if (currentPhase == PHASE_DANCE)
+            return;
+        else
+            ScriptedAI::AttackStart(pWho);
+    }
+
     void KilledUnit(Unit* pVictim)
     {
-        DoScriptText(SAY_SLAY, m_creature);
+        if(!killCooldown)
+            DoScriptText(SAY_SLAY, m_creature);
     }
 
     void JustDied(Unit* pKiller)
@@ -119,114 +203,330 @@ struct boss_heiganAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
 
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_HEIGAN, DONE);
+            m_pInstance->UpdateAutomaticBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, DONE);
+        }
+
     }
 
     void JustReachedHome()
     {
         if (m_pInstance)
+        {
             m_pInstance->SetData(TYPE_HEIGAN, FAIL);
+            m_pInstance->UpdateAutomaticBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, FAIL);
+        }
+        
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void SendEruptCustomLocation(float x, float y, float z)
     {
+        if (Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, x, y, z, 0, TEMPSUMMON_TIMED_DESPAWN, 50))
+        {
+            fissureCreature->CastSpell(fissureCreature, SPELL_ERUPTION, true);
+        }
+    }
+    void UpdateEruption()
+    {
+        if (!m_pInstance)
+            return;
+        Creature* fissureCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, 2773.0f, -3684.0f, 292.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000);
+        if (!fissureCreature)
+        {
+            sLog.outError("Heigan: failed spawning fissure creature");
+            return;
+        }
+
+        for (uint8 uiArea = 0; uiArea < 4; ++uiArea)
+        {
+            // Actually this is correct :P
+            if (uiArea == (eruptionPhase % 6) || uiArea == 6 - (eruptionPhase % 6))
+                continue;
+
+            for (GuidList::const_iterator itr = m_pInstance->m_alHeiganTrapGuids[uiArea].begin();
+                itr != m_pInstance->m_alHeiganTrapGuids[uiArea].end(); ++itr)
+            {
+                if (GameObject* pTrap = m_pInstance->GetGameObject(*itr))
+                {
+                    pTrap->Use(fissureCreature);
+                    pTrap->SendGameObjectCustomAnim(pTrap->GetObjectGuid());
+                }
+            }
+
+            switch (uiArea)
+            {
+            case 0:
+                for (int i = 0; i < 3; i++)
+                    SendEruptCustomLocation(sect1SafeSpot[i][0], sect1SafeSpot[i][1], sect1SafeSpot[i][2]);
+                break;
+            case 1:
+                SendEruptCustomLocation(sect2SafeSpot[0], sect2SafeSpot[1], sect2SafeSpot[2]);
+                break;
+            case 2:
+                SendEruptCustomLocation(sect3SafeSpot[0], sect3SafeSpot[1], sect3SafeSpot[2]);
+                break;
+            case 3:
+                for (int i = 0; i < 3; i++)
+                    SendEruptCustomLocation(sect4SafeSpot[i][0], sect4SafeSpot[i][1], sect4SafeSpot[i][2]);
+                break;
+            }
+        }
+
+        // safespot avoidance in tunnel
+        if (currentPhase == PHASE_DANCE)
+        {
+            for (int i = 0; i < 3; i++)
+                SendEruptCustomLocation(safespotFissures[i][0], safespotFissures[i][1], safespotFissures[i][2]);
+        }
+
+        ++eruptionPhase;
+    }
+
+    void SummmonPlagueCloud(float x, float y, float z, float o)
+    {
+        if (Creature* pCloud = m_creature->SummonCreature(NPC_PLAGUE_CLOUD, x, y, z, o,
+            TEMPSUMMON_TIMED_DESPAWN, 45000))
+        {
+            pCloud->CastSpell((Unit*)nullptr, SPELL_PLAGUE_CLOUD, true);
+        }
+    }
+
+    void EventStartDance()
+    {
+        portedPlayersThisPhase.clear();
+
+        if (DoCastSpellIfCan(m_creature, SPELL_TELEPORT_SELF, CAST_TRIGGERED) != CAST_OK)
+        {
+            return;
+        }
+        currentPhase = PHASE_DANCE;
+
+        m_creature->SetReactState(REACT_PASSIVE);
+        m_creature->AttackStop();
+        m_creature->StopMoving();
+        m_creature->GetMotionMaster()->MoveIdle();
+        DoStopAttack();
+        DoCastAOE(SPELL_PLAGUE_CLOUD);
+        
+        uint32 tauntStash = m_events.GetTimeUntilEvent(EVENT_TAUNT);
+        m_events.Reset();
+        m_events.ScheduleEvent(EVENT_TAUNT, tauntStash);
+        m_events.ScheduleEvent(EVENT_DANCE_END, Seconds(45), 0, PHASE_DANCE);
+        m_events.ScheduleEvent(EVENT_ERUPT, Seconds(4));
+        
+        // the regular ones
+        for (int i = 0; i < max_stalks; i++)
+        {
+            SummmonPlagueCloud(eyeStalkPossitions[i][0], eyeStalkPossitions[i][1], eyeStalkPossitions[i][2], eyeStalkPossitions[i][3]);
+        }
+        
+        DoScriptText(SAY_CHANNELING, m_creature);
+        eruptionPhase = 0;
+    }
+
+    void EventDanceEnd()
+    {
+        currentPhase = PHASE_FIGHT;
+
+        uint32 tauntStash = m_events.GetTimeUntilEvent(EVENT_TAUNT);
+        m_events.Reset();
+        m_events.ScheduleEvent(EVENT_TAUNT,     tauntStash);
+        m_events.ScheduleEvent(EVENT_FEVER,     Seconds(5)); // videos confirm this, unless raid moves perfectly, more or less everyone is hit.
+        m_events.ScheduleEvent(EVENT_DANCE,     Seconds(90));
+        m_events.ScheduleEvent(EVENT_ERUPT,     Seconds(10));
+        m_events.ScheduleEvent(EVENT_MANABURN,  Seconds(10));
+        m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(18));
+        m_events.ScheduleEvent(EVENT_PORT_PLAYER, Seconds(48));
+        m_creature->CastStop();
+        m_creature->SetReactState(REACT_AGGRESSIVE);
+        eruptionPhase = 0;
+
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
 
-        if (m_uiPhase == PHASE_GROUND)
-        {
-            // Teleport to platform
-            if (m_uiPhaseTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_TELEPORT) == CAST_OK)
-                {
-                    DoScriptText(EMOTE_TELEPORT, m_creature);
-                    m_creature->GetMotionMaster()->MoveIdle();
-
-                    m_uiPhase = PHASE_PLATFORM;
-                    ResetPhase();
-                    return;
-                }
-            }
-            else
-                m_uiPhaseTimer -= uiDiff;
-
-            // Fever
-            if (m_uiFeverTimer < uiDiff)
-            {
-                DoCastSpellIfCan(m_creature, SPELL_DECREPIT_FEVER_N);
-                m_uiFeverTimer = 21000;
-            }
-            else
-                m_uiFeverTimer -= uiDiff;
-
-            // Disruption
-            if (m_uiDisruptionTimer < uiDiff)
-            {
-                DoCastSpellIfCan(m_creature, SPELL_DISRUPTION);
-                m_uiDisruptionTimer = 10000;
-            }
-            else
-                m_uiDisruptionTimer -= uiDiff;
-        }
-        else                                                //Platform Phase
-        {
-            if (m_uiPhaseTimer <= uiDiff)                   // return to fight
-            {
-                m_creature->InterruptNonMeleeSpells(true);
-                DoScriptText(EMOTE_RETURN, m_creature);
-                m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-
-                m_uiPhase = PHASE_GROUND;
-                ResetPhase();
-                return;
-            }
-            else
-                m_uiPhaseTimer -= uiDiff;
-
-            if (m_uiStartChannelingTimer)
-            {
-                if (m_uiStartChannelingTimer <= uiDiff)
-                {
-                    DoScriptText(SAY_CHANNELING, m_creature);
-                    DoCastSpellIfCan(m_creature, SPELL_PLAGUE_CLOUD);
-                    m_uiStartChannelingTimer = 0;           // no more
-                }
-                else
-                    m_uiStartChannelingTimer -= uiDiff;
-            }
-        }
-
-        // Taunt
-        if (m_uiTauntTimer < uiDiff)
-        {
-            switch (urand(0, 3))
-            {
-                case 0:
-                    DoScriptText(SAY_TAUNT1, m_creature);
-                    break;
-                case 1:
-                    DoScriptText(SAY_TAUNT2, m_creature);
-                    break;
-                case 2:
-                    DoScriptText(SAY_TAUNT3, m_creature);
-                    break;
-                case 3:
-                    DoScriptText(SAY_TAUNT4, m_creature);
-                    break;
-            }
-            m_uiTauntTimer = urand(20000, 70000);
-        }
-        else
-            m_uiTauntTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
     }
+
+    void EventPortPlayer()
+    {
+        const ThreatList& tl = m_creature->getThreatManager().getThreatList();
+        std::vector<Unit*> candidates;
+        auto it = tl.begin();
+        ++it; // skip the tank
+        for (it; it != tl.end(); it++)
+        {
+            if (Unit* pUnit = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
+            {
+                // Candidates are only alive players who have not yet been ported during this phase rotation
+                if (pUnit->IsPlayer() && pUnit->isAlive()
+                    && std::find(portedPlayersThisPhase.begin(), portedPlayersThisPhase.end(), pUnit->GetObjectGuid()) == portedPlayersThisPhase.end())
+                {
+                    candidates.push_back(pUnit);
+                }
+            }
+        }
+
+        for (int i = 0; i < 3; i++)
+        {
+            if (candidates.size() == 0)
+                break;
+
+            uint32 idx = urand(0, candidates.size() - 1);
+            Unit* target = candidates[idx];
+            candidates.erase(candidates.begin() + idx);
+            portedPlayersThisPhase.push_back(target->GetObjectGuid());
+            // getting the spell visual to show both where you were TPed from and where you are TPed too
+            if (Creature* pCreature = m_creature->SummonCreature(NPC_PLAGUE_FISSURE, 
+                target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), target->GetOrientation(),
+                TEMPSUMMON_TIMED_DESPAWN, 2000))
+            {
+                pCreature->SendSpellGo(pCreature, 30211);
+            }
+            target->SendSpellGo(target, 30211);
+            target->NearTeleportTo(2917.43f, -3769.18f, 273.62f, 3.1415f);
+        }
+    }
+
+    void EventTaunt()
+    {
+        // Taunt
+        switch (urand(0, 3))
+        {
+        case 0:
+            DoScriptText(SAY_TAUNT1, m_creature);
+            break;
+        case 1:
+            DoScriptText(SAY_TAUNT2, m_creature);
+            break;
+        case 2:
+            DoScriptText(SAY_TAUNT3, m_creature);
+            break;
+        case 3:
+            DoScriptText(SAY_TAUNT4, m_creature);
+            break;
+        }
+
+        //DoScriptText(irand(SAY_TAUNT4, SAY_TAUNT1), m_creature);
+        m_events.Repeat(randtime(Seconds(20), Seconds(70)));
+    }
+
+    void CheckManausersAndRepeat()
+    {
+        // Looking for anyone with a manabar, currently excluded pets and totems
+        // within 25yd range (radius of SPELL_MANABURN). If there is one we cast SPELL_MANABURN
+        const auto& tl = m_creature->getThreatManager().getThreatList();
+        bool found_mana_in_range = false;
+        for (auto it = tl.begin(); it != tl.end(); ++it)
+        {
+            if (Unit* pTarget = m_creature->GetMap()->GetUnit((*it)->getUnitGuid()))
+            {
+                if (pTarget->getPowerType() == POWER_MANA && pTarget->GetTypeId() == TYPEID_PLAYER && pTarget->isAlive())
+                {
+                    if (m_creature->GetDistanceToCenter((*it)->getTarget()) < 28.0f)
+                    {
+                        found_mana_in_range = true;
+                        break;
+                    }
+                }
+            }
+        }
+     
+        if (found_mana_in_range && DoCastSpellIfCan(m_creature, SPELL_MANABURN) == CAST_OK)
+            m_events.Repeat(Seconds(3));
+        else
+            m_events.Repeat(Seconds(1));
+    }
+   
+    void UpdateAI(const uint32 uiDiff)
+    {
+        // This will avoid him running off the platform during dance phase.
+        if (currentPhase == PHASE_FIGHT)
+        {
+            if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+                return;
+            if (!m_pInstance->HandleEvadeOutOfHome(m_creature))
+                return;
+        }
+        else {
+            // If wipe, we force the dance phase to end so above code runs and he evades.
+            if (m_creature->getThreatManager().isThreatListEmpty())
+                EventDanceEnd();
+        }
+        
+        m_events.Update(uiDiff);
+        while (uint32 eventId = m_events.ExecuteEvent())
+        {
+            switch (eventId)
+            {
+            case EVENT_FEVER:
+                DoCastAOE(SPELL_DECREPIT_FEVER);
+                m_events.Repeat(randtime(Seconds(20), Seconds(25)));
+                break;
+            case EVENT_DANCE:
+                EventStartDance();
+                break;
+            case EVENT_DANCE_END:
+                EventDanceEnd();
+                break;
+            case EVENT_ERUPT:
+                UpdateEruption();
+                m_events.Repeat(currentPhase == PHASE_DANCE ? Seconds(3) : Seconds(10));
+                break;
+            case EVENT_TAUNT:
+                EventTaunt();
+                break;
+            case EVENT_DOOR_CLOSE:
+                if(m_pInstance)
+                    m_pInstance->UpdateAutomaticBossEntranceDoor(GO_PLAG_HEIG_ENTRY_DOOR, IN_PROGRESS);
+                break;
+            case EVENT_MANABURN:
+                CheckManausersAndRepeat();
+                break;
+            case EVENT_PORT_PLAYER:
+                EventPortPlayer();
+                break;
+            }
+        }
+        
+        if (killCooldown < uiDiff)
+            killCooldown = 0;
+        else
+            killCooldown -= uiDiff;
+
+        if (currentPhase == PHASE_FIGHT)
+            DoMeleeAttackIfReady();
+    }
+};
+
+struct mob_plague_cloudAI : public ScriptedAI
+{
+    mob_plague_cloudAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+    void Reset() override
+    {
+        m_creature->addUnitState(UNIT_STAT_ROOT);
+        m_creature->StopMoving();
+        m_creature->SetMovement(MOVE_ROOT);
+    }
+
+    void AttackStart(Unit*) { }
+    void MoveInLineOfSight(Unit*) { }
+
+    void UpdateAI(const uint32) override { }
 };
 
 CreatureAI* GetAI_boss_heigan(Creature* pCreature)
 {
     return new boss_heiganAI(pCreature);
+}
+
+CreatureAI* GetAI_mob_plagueCloud(Creature* pCreature)
+{
+    return new mob_plague_cloudAI(pCreature);
 }
 
 void AddSC_boss_heigan()
@@ -236,5 +536,9 @@ void AddSC_boss_heigan()
     NewScript->Name = "boss_heigan";
     NewScript->GetAI = &GetAI_boss_heigan;
     NewScript->RegisterSelf();
-}
 
+    NewScript = new Script;
+    NewScript->Name = "mob_plague_cloud";
+    NewScript->GetAI = &GetAI_mob_plagueCloud;
+    NewScript->RegisterSelf();
+}

@@ -81,6 +81,8 @@
 #include "NodeSession.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include "GameEventMgr.h"
+#include "world/world_event_naxxramas.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -483,6 +485,8 @@ Player::Player(WorldSession *session) : Unit(),
 
     PlayerTalkClass = new PlayerMenu(GetSession());
     m_currentBuybackSlot = BUYBACK_SLOT_START;
+
+    m_lastLiquid = nullptr;
 
     for (int i = 0; i < MAX_TIMERS; ++i)
         m_MirrorTimer[i] = DISABLED_MIRROR_TIMER;
@@ -1804,6 +1808,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
     RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
     RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+    RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
     DisableSpline();
     SetMover(this);
 
@@ -2008,9 +2013,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             //remove auras before removing from map...
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
-            RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-
+            RemoveCharmAuras();
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packet to display load screen
@@ -6382,6 +6385,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
 
     UpdateZoneDependentAuras();
+    SetZoneScript();
 }
 
 //If players are too far way of duel flag... then player loose the duel
@@ -7848,6 +7852,36 @@ void Player::SendInitWorldStates(uint32 zoneid)
     data << uint32(zoneid);                             // zone id
     size_t count_pos = data.wpos();
     data << uint16(0);                                  // count of uint32 blocks, placeholder
+
+    // Scourge Invasion - Patch 1.11
+    if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
+    {
+        int ATTACK_ZONE1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
+        int ATTACK_ZONE2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+        int REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+        int REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+        int REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+        int REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
+        int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
+        int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
+
+        data << uint32(WORLDSTATE_AZSHARA)              << uint32(REMAINING_AZSHARA > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_BLASTED_LANDS)        << uint32(REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_BURNING_STEPPES)      << uint32(REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS)  << uint32(REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_TANARIS)              << uint32(REMAINING_TANARIS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_WINTERSPRING)         << uint32(REMAINING_WINTERSPRING > 0 ? 1 : 0);
+
+        // Battles & remaining necropolisses
+        data << uint32(WORLDSTATE_SI_BATTLES_WON) << uint32(VICTORIES);
+        data << uint32(WORLDSTATE_SI_AZSHARA_REMAINING) << uint32(REMAINING_AZSHARA);
+        data << uint32(WORLDSTATE_SI_BLASTED_LANDS_REMAINING) << uint32(REMAINING_BLASTED_LANDS);
+        data << uint32(WORLDSTATE_SI_BURNING_STEPPES_REMAINING) << uint32(REMAINING_BURNING_STEPPES);
+        data << uint32(WORLDSTATE_SI_EASTERN_PLAGUELANDS) << uint32(REMAINING_EASTERN_PLAGUELANDS);
+        data << uint32(WORLDSTATE_SI_TANARIS) << uint32(REMAINING_TANARIS);
+        data << uint32(WORLDSTATE_SI_WINTERSPRING) << uint32(REMAINING_WINTERSPRING);
+    }
 
     for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
     {
@@ -14332,6 +14366,15 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
                 Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
                 SetLocationMapId(at->target_mapId);
             }
+            else if (GetMapId() == 533) // Naxxramas
+            {
+                // There exist no exit areatrigger for Naxxramas. Not sure how Blizzard handled this in 
+                // the original version of Naxx, but to keep the usual logic of being TPed outside the instance
+                // we have the following special-case. Using areatriggers is not possible without even uglier hacking
+                // as sObjectMgr.GetGoBackTrigger() requires the areatrigger to exist in the DBC files, not just in the DB
+                Relocate(3120.16f, -3725.0f, 137.7f, 5.83f); // Just outside Naxxramas
+                SetLocationMapId(0);                         // Eastern Kingdoms
+            }
         }
     }
 
@@ -17610,6 +17653,7 @@ template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Creature*
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Corpse*        target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObject*    target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject*   target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
 void Player::InitPrimaryProfessions()
 {
@@ -18892,10 +18936,40 @@ void Player::UpdateUnderwaterState()
     if (!res)
     {
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
+        
+        if (m_lastLiquid && m_lastLiquid->SpellId)
+            RemoveAurasDueToSpell(m_lastLiquid->SpellId);
+        m_lastLiquid = nullptr;
+
         // Small hack for enable breath in WMO
         /* if (IsInWater())
             m_MirrorTimerFlags|=UNDERWATER_INWATER; */
         return;
+    }
+
+    if (uint32 liqEntry = liquid_status.entry)
+    {
+        LiquidTypeEntry const* liquid = sLiquidTypeStore.LookupEntry(liqEntry);
+        if (m_lastLiquid && m_lastLiquid->SpellId && m_lastLiquid->Id != liqEntry)
+            RemoveAurasDueToSpell(m_lastLiquid->SpellId);
+
+        if (liquid && liquid->SpellId)
+        {
+            if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER))
+            {
+                if (!HasAura(liquid->SpellId))
+                    CastSpell(this, liquid->SpellId, true);
+            }
+            else
+                RemoveAurasDueToSpell(liquid->SpellId);
+        }
+
+        m_lastLiquid = liquid;
+    }
+    else if (m_lastLiquid && m_lastLiquid->SpellId)
+    {
+        RemoveAurasDueToSpell(m_lastLiquid->SpellId);
+        m_lastLiquid = nullptr;
     }
 
     // All liquids type - check under water position
@@ -18921,6 +18995,7 @@ void Player::UpdateUnderwaterState()
         else
             m_MirrorTimerFlags &= ~UNDERWATER_INLAVA;
     }
+    
     // in slime check, anywhere in slime level
     if (liquid_status.type_flags & MAP_LIQUID_TYPE_SLIME)
     {

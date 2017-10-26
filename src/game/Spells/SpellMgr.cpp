@@ -714,8 +714,6 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
             // some explicitly required dummy effect sets
             switch (spellproto->Id)
             {
-                case 28441:                                 // AB Effect 000
-                    return false;
                 case 10258:                                 // Awaken Vault Warder
                 case 18153:                                 // Kodo Kombobulator
                     return true;

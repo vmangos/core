@@ -50,6 +50,7 @@
 #include "PathFinder.h"
 #include "CharacterDatabaseCache.h"
 #include "GameObjectAI.h"
+#include "ZoneScript.h"
 
 #define SPELL_CHANNEL_UPDATE_INTERVAL (1 * IN_MILLISECONDS)
 
@@ -526,15 +527,30 @@ void Spell::FillTargetMap()
                         {
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetB[i], tmpUnitMap);
-                            // Exception: Intimidating Shout
-                            // The AoE fear does not apply to spell main target (that is stunned by another aura)
-                            if (m_spellInfo->Id == 5246)
-                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end(); ++itr)
+                            switch (m_spellInfo->Id)
+                            {
+                            case 5246:
+                                // Exception: Intimidating Shout
+                                // The AoE fear does not apply to spell main target (that is stunned by another aura)
+                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
+                                {
                                     if (*itr == m_targets.getUnitTarget())
-                                    {
-                                        tmpUnitMap.erase(itr);
-                                        itr = tmpUnitMap.begin();
-                                    }
+                                        itr = tmpUnitMap.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+                                break;
+                            case 27831:
+                                // Shadow Bolt volley which should only target players with the Shadow Mark debuff
+                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
+                                {
+                                    if (!(*itr)->HasAura(27825)) // Shadow Mark
+                                        itr = tmpUnitMap.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+                                break;
+                            }
                         }
                         break;
                     case 0:
@@ -647,6 +663,8 @@ void Spell::prepareDataForTriggerSystem()
         m_canTrigger = false;         // Explicitly not allowed to trigger
     else if (m_CastItem)
         m_canTrigger = false;         // Do not trigger from item cast spell
+    else if (m_originalCasterGUID.IsGameObject())   // Do not trigger anything if the spell is casted by using a game object (eg. Lightwell)
+        m_canTrigger = false;
     else if (!m_IsTriggeredSpell)
         m_canTrigger = true;          // Normal cast - can trigger
     else if (!m_triggeredByAuraSpell)
@@ -750,7 +768,7 @@ void Spell::prepareDataForTriggerSystem()
                     m_procVictim = PROC_FLAG_TAKEN_NONE_POSITIVE_SPELL;
                 }
 
-                if (IsDispelSpell(m_spellInfo))
+                if (m_spellInfo->IsDispel())
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_CURE_SPELL_CAST;
 
                 if (aoe)
@@ -831,6 +849,9 @@ void Spell::CleanupTargetList()
 void Spell::AddUnitTarget(Unit* pVictim, SpellEffectIndex effIndex)
 {
     if (m_spellInfo->Effect[effIndex] == 0)
+        return;
+
+    if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_CANT_TARGET_SELF && pVictim->GetObjectGuid() == m_originalCaster->GetObjectGuid())
         return;
 
     // Check for effect immune skip if immuned
@@ -1228,6 +1249,14 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
 
         caster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
+        
+        // terribly ugly hack for Gluth Decimate to not be affected by any damage modifiers.
+        // SPELL_ATTR_EX3_UNK29 is probably meant to make the spell ignore any damage modifiers,
+        // but until implemented, this is the best we can do.
+        if (m_spellInfo->Id == 28375)
+        {
+            damageInfo.damage = m_damage;
+        }
 
         // Send log damage message to client
         caster->SendSpellNonMeleeDamageLog(&damageInfo);
@@ -1299,6 +1328,8 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
     }
     else if (m_canTrigger && (procAttacker || procVictim))
     {
+        // TODO: Allow all procs, and explicitly deny some rather than denying all and
+        // explicitly allowing some
         bool foundDamageOrHealAura = false;
         // m_spellAuraHolder is null for non-stacking periodic effects that are already
         // on the target - they simply refresh. However, they should still proc on
@@ -1316,6 +1347,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                     case SPELL_AURA_PERIODIC_HEAL:
                     case SPELL_AURA_OBS_MOD_HEALTH:
                     case SPELL_AURA_POWER_BURN_MANA:
+                    case SPELL_AURA_SCHOOL_ABSORB:
                         foundDamageOrHealAura = true;
                         break;
                 }
@@ -1340,7 +1372,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             dmg = 1;
 
         // Proc for dispels (or "cures")
-        if (IsDispelSpell(m_spellInfo))
+        if (m_spellInfo->IsDispel())
         {
             dmg = 1;
             // Override proc flags for offensive dispel
@@ -1369,8 +1401,12 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             if (Player* p = real_caster->GetCharmerOrOwnerPlayerOrPlayerItself())
                 p->RewardPlayerAndGroupAtCast(unit, m_spellInfo->Id);
 
-        if (((Creature*)unit)->AI())
+        if (((Creature*)unit)->AI())    
             ((Creature*)unit)->AI()->SpellHit(m_caster, m_spellInfo);
+        
+        if (ZoneScript* pZoneScript = unit->GetZoneScript()) {
+            pZoneScript->OnCreatureSpellHit(m_caster, unit->ToCreature(), m_spellInfo);
+        }
     }
 
     // Tell any pets to stop attacking the target on application of breakable crowd control spells
@@ -1855,12 +1891,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 case 804:                                   // Explode Bug (AQ40, Emperor Vek'lor)
                 case 23138:                                 // Gate of Shazzrah (MC, Shazzrah)
                 case 24781:                                 // Dream Fog (Emerald Dragons)
-                case 28560:                                 // Summon Blizzard (Naxx, Sapphiron)
+                //case 28560:                                 // Summon Blizzard (Naxx, Sapphiron)
                     unMaxTargets = 1;
                     break;
                 case 10258:                                 // Awaken Vault Warder (Uldaman)
-                case 28542:                                 // Life Drain (Naxx, Sapphiron)
                     unMaxTargets = 2;
+                    break;
+                case 28542:                                 // Life Drain (Naxx, Sapphiron)
+                    unMaxTargets = urand(7, 10);
                     break;
                 case 28796:                                 // Poison Bolt Volley (Naxx, Faerlina)
                     unMaxTargets = 10;
@@ -1881,10 +1919,22 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             {
                 case 28241:                                 // Poison (Naxxramas, Grobbulus Cloud)
                 {
+                    // Spell states 30yd radius, which you would think is the max radius once its all grown,
+                    // however, the visual of the spell goes no further than ~20yd, so lets stop it there.
+                    // It will instantly get a 2(?) yd radius, and grow to 20 from there
                     if (SpellAuraHolder* auraHolder = m_caster->GetSpellAuraHolder(28158))
-                        radius = 0.5f * (60000 - auraHolder->GetAuraDuration()) * 0.001f;
+                    {
+                        const int maxDur = auraHolder->GetAuraMaxDuration();
+                        const int currTick = maxDur - auraHolder->GetAuraDuration();
+                        radius = 18.0f / maxDur*currTick + 2;
+                        //radius = 0.5f * (60000 - auraHolder->GetAuraDuration()) * 0.001f;
+                    }
                     break;
                 }
+                case 29310:                                 // Mana Burn (Heigan, naxxramas)
+                    // Without a bigger raidus its possible to tank heigan in one corner of the platform, and have ranged stay in the other corner
+                    radius = 28.0f;
+                    break;
                 default:
                     break;
             }
@@ -1904,6 +1954,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             switch (m_spellInfo->Id)
             {
                 case 26052:                                 // Poison Bolt Volley (AQ40, Princess Huhuran)
+                case 29213:                                 // Curse of the Plaguebringer (Naxxramas, Noth the Plaguebringer)
                     SelectClosestTargets = true;
                     break;
             }
@@ -2158,14 +2209,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if ((*itr)->IsWithinDist(m_caster, minDist))
                         targetUnitMap.erase(itr);
                 }
-	    }
+	        }
             if (SelectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
-	    {
+	        {
                 targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
                 UnitList::iterator itr = targetUnitMap.begin();
                 advance(itr, unMaxTargets);
                 targetUnitMap.erase(itr, targetUnitMap.end());
-	    }
+	        }
             break;
         }
         case TARGET_AREAEFFECT_INSTANT:
@@ -2266,6 +2317,25 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             }
             break;
         }
+        case TARGET_AREAEFFECT_GO_AROUND_SOURCE:
+            // Despawn Ice Block (sapphiron)
+            if (m_spellInfo->Id == 30132) 
+            {
+                float x, y, z;
+                m_caster->GetPosition(x, y, z);
+                std::list<GameObject*> tempTargetGOList;
+                // search all GO's with entry, within range of caster
+                MaNGOS::GameObjectEntryInPosRangeCheck go_check(*m_caster, 181247/*Ice BLock*/, x , y, z, radius);
+                MaNGOS::GameObjectListSearcher<MaNGOS::GameObjectEntryInPosRangeCheck> checker(tempTargetGOList, go_check);
+                Cell::VisitGridObjects(m_caster, checker, radius);
+                
+                if (!tempTargetGOList.empty())
+                {
+                    for (std::list<GameObject*>::iterator iter = tempTargetGOList.begin(); iter != tempTargetGOList.end(); ++iter)
+                        AddGOTarget(*iter, effIndex);
+                }
+            }
+            break;
         case TARGET_AREAEFFECT_GO_AROUND_DEST:
         {
             // It may be possible to fill targets for some spell effects
@@ -2414,6 +2484,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     pushType = PUSH_IN_BACK;
                     break;
                 case 7441:
+                    pushType = PUSH_IN_FRONT_15;
+                    break;
+                case 7619: // anub impale
                     pushType = PUSH_IN_FRONT_15;
                     break;
             }
@@ -2665,7 +2738,9 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             if (currentTarget)
             {
                 targetUnitMap.push_back(currentTarget);
-                if (m_spellInfo->Id != 18392)   // Onyxia's Fireball - without a destination the spell uses its original spell visuals
+                if (m_spellInfo->Id == 28863)        // Void Zone creature often end up below ground
+                    m_targets.setDestination(currentTarget->GetPositionX(), currentTarget->GetPositionY(), currentTarget->GetPositionZ()+0.3f);
+                else if (m_spellInfo->Id != 18392)   // Onyxia's Fireball - without a destination the spell uses its original spell visuals
                     m_targets.setDestination(currentTarget->GetPositionX(), currentTarget->GetPositionY(), currentTarget->GetPositionZ());
             }
             break;
@@ -3538,7 +3613,7 @@ void Spell::handle_immediate()
 
         // a channeled spell could be interrupted already because the aura on target
         // was diminished to duration=0 see Spell::DoSpellHitOnUnit
-        if (m_channeled && m_spellState != SPELL_STATE_CASTING)
+        if (IsChanneledSpell(m_spellInfo) && m_spellState != SPELL_STATE_CASTING)
             return;
     }
 
@@ -5067,6 +5142,29 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
         }
+
+        // Loatheb Corrupted Mind spell failed
+        if (!m_IsCastByItem && !m_IsTriggeredSpell)
+        {
+            Unit::AuraList const& auraClassScripts = m_caster->GetAurasByType(SPELL_AURA_OVERRIDE_CLASS_SCRIPTS);
+            for (auto itr = auraClassScripts.begin(); itr != auraClassScripts.end(); ++itr)
+            {
+                if ((*itr)->GetModifier()->m_miscvalue == 4327)
+                {
+                    if ((m_spellInfo->SpellFamilyName == SPELLFAMILY_DRUID ||
+                         m_spellInfo->SpellFamilyName == SPELLFAMILY_PRIEST ||
+                         m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN ||
+                         m_spellInfo->SpellFamilyName == SPELLFAMILY_PALADIN) &&
+                        (IsHealSpell(m_spellInfo) ||
+                         m_spellInfo->IsDispel() || // don't really care if the target is non-friendly, there's nothing to purge on Loatheb
+                         m_spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_HOLY_NOVA1>() || // prevent holy nova cast (casted spell is damage part, heal is triggered)
+                         m_spellInfo->IsFitToFamily<SPELLFAMILY_PRIEST, CF_PRIEST_POWER_WORD_SHIELD>())) // prevent PW:Shield cast
+                    {
+                        return SPELL_FAILED_FIZZLE;
+                    }
+                }
+            }
+        }
     }
 
     if (Unit *target = m_targets.getUnitTarget())
@@ -5114,8 +5212,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (strict && m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER && target->GetTypeId() != TYPEID_PLAYER && !IsAreaOfEffectSpell(m_spellInfo))
                     return SPELL_FAILED_BAD_TARGETS;
             }
-            // Can't help a friend in duel
-            if (IsPositiveSpell(m_spellInfo))
+            // Can't help a friend in duel   |  sorry, not enough time to figure out why this is necessary
+            if (IsPositiveSpell(m_spellInfo) && m_spellInfo->Id != 28697)
             {
                 Player* casterOwner = m_caster->GetCharmerOrOwnerPlayerOrPlayerItself();
                 Player* targetOwner = target->GetCharmerOrOwnerPlayerOrPlayerItself();
@@ -6034,7 +6132,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
-    if (m_spellInfo->IsDispel() && !m_IsTriggeredSpell) // Buff Abolir le poison non concerne par exemple (Debuff a chaque tic)
+    if (m_spellInfo->IsNonPeriodicDispel() && !m_IsTriggeredSpell) // Buff Abolir le poison non concerne par exemple (Debuff a chaque tic)
     {
         uint32 dispelMask     = 0;
         bool bFoundOneDispell = false;

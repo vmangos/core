@@ -24,7 +24,7 @@
 #include "CreatureAI.h"
 
 TemporarySummon::TemporarySummon(ObjectGuid summoner) :
-    Creature(CREATURE_SUBTYPE_TEMPORARY_SUMMON), m_type(TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN), m_timer(0), m_lifetime(0), m_summoner(summoner)
+    Creature(CREATURE_SUBTYPE_TEMPORARY_SUMMON), m_type(TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN), m_timer(0), m_lifetime(0), m_summoner(summoner), m_forceTargetUpdateTimer(1000)
 {
 }
 
@@ -62,7 +62,6 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
 
             break;
         }
-
         case TEMPSUMMON_CORPSE_TIMED_DESPAWN:
         {
             if (IsCorpse())
@@ -200,6 +199,20 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
             break;
     }
 
+    if (isAlive() && isInCombat())
+    {
+        if (m_forceTargetUpdateTimer <= diff)
+        {
+            m_forceTargetUpdateTimer = 3000;
+            ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
+        }
+        else
+            m_forceTargetUpdateTimer -= diff;
+    }
+    else {
+        m_forceTargetUpdateTimer = 1000;
+    }
+
     Creature::Update(update_diff, diff);
 }
 
@@ -213,16 +226,24 @@ void TemporarySummon::Summon(TempSummonType type, uint32 lifetime)
     GetMap()->Add((Creature*)this);
 }
 
-void TemporarySummon::UnSummon()
+void TemporarySummon::UnSummon(uint32 delayDespawnTime /*= 0*/)
 {
-    CombatStop();
+    if (delayDespawnTime)
+    {
+        m_type = TEMPSUMMON_TIMED_DESPAWN;
+        m_timer = delayDespawnTime;
+    }
+    else
+    {
+        CombatStop();
 
-    if (GetSummonerGuid().IsCreature())
-        if (Creature* sum = GetMap()->GetCreature(GetSummonerGuid()))
-            if (sum->AI())
-                sum->AI()->SummonedCreatureDespawn(this);
+        if (GetSummonerGuid().IsCreature())
+            if (Creature* sum = GetMap()->GetCreature(GetSummonerGuid()))
+                if (sum->AI())
+                    sum->AI()->SummonedCreatureDespawn(this);
 
-    AddObjectToRemoveList();
+        AddObjectToRemoveList();
+    }
 }
 
 void TemporarySummon::SaveToDB()

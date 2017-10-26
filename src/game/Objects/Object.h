@@ -40,6 +40,7 @@
 #define DEFAULT_VISIBILITY_DISTANCE 90.0f       // default visible distance, 90 yards on continents
 #define DEFAULT_VISIBILITY_INSTANCE 120.0f      // default visible distance in instances, 120 yards
 #define DEFAULT_VISIBILITY_BG       180.0f      // default visible distance in BG, 180 yards
+#define DEFAULT_VISIBILITY_MODIFIER 0.0f        // default visibility modifier on some units that should be seen beyond normal visibility distances
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // currently used (correctly?) for any non Unit world objects. This is actually the bounding_radius, like player/creature from creature_model_data
 #define DEFAULT_OBJECT_SCALE        1.0f                    // player/item scale as default, npc/go from database, pets from dbc
@@ -917,12 +918,19 @@ m_obj->m_updateTracker.Reset();
         // if player should be eligible for loot and XP from this object.
         void SetLootAndXPModDist(float val);
 
+        float GetVisibilityModifier() const;
+        void SetVisibilityModifier(float f);
+
     protected:
         explicit WorldObject();
 
         std::string m_name;
         ZoneScript* m_zoneScript;
         bool m_isActiveObject;
+        // Extra visibility distance for this unit, only used if it is an active object.
+        // c.f. GetVisibilityModifier(). Be very conservative using this - a large
+        // draw distance can be expensive for updates with lots of players
+        float m_visibilityModifier;
 
         Map * m_currMap;                                    //current object's Map location
 

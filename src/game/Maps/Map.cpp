@@ -49,6 +49,7 @@
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GridSearchers.h"
+#include "AuraRemovalMgr.h"
 
 #define MAX_GRID_LOAD_TIME      50
 
@@ -368,6 +369,9 @@ bool Map::Add(Player *player)
     if (i_data)
         i_data->OnPlayerEnter(player);
 
+    // Remove any buffs defined in instance_aura_removal for the new map
+    sAuraRemovalMgr.PlayerEnterMap(i_id, player);
+
     player->GetSession()->ClearIncomingPacketsByType(PACKET_PROCESS_MOVEMENT);
     player->m_broadcaster->SetInstanceId(GetInstanceId());
     return true;
@@ -657,8 +661,6 @@ public:
     virtual void run()
     {
         map->UpdateActiveCellsCallback(diff, now, threadIdx, nThreads, step);
-
-        MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();
     }
     int threadIdx;
     int nThreads;
@@ -1351,10 +1353,63 @@ const char* Map::GetMapName() const
 
 void Map::UpdateObjectVisibility(WorldObject* obj, Cell cell, CellPair cellpair)
 {
+    // Update visibility of objects in cells within draw distance
     cell.SetNoCreate();
     MaNGOS::VisibleChangesNotifier notifier(*obj);
     TypeContainerVisitor<MaNGOS::VisibleChangesNotifier, WorldTypeMapContainer > player_notifier(notifier);
     cell.Visit(cellpair, player_notifier, *this, *obj, GetVisibilityDistance());
+
+    // Update visibility of active objects within the map.
+    // Important performance note: if continents are not instantiated
+    // the list of active objects can be large (~360 total in the world)
+    if (Player *player = obj->ToPlayer())
+        UpdateActiveObjectVisibility(player);
+}
+
+void Map::UpdateActiveObjectVisibility(Player *player)
+{
+    // Params for compressed data set - will only be compressed if packet size > 100 (multiple units)
+    ObjectGuidSet guids;
+    UpdateData data;
+    std::set<WorldObject*> visibleNow;
+
+    UpdateActiveObjectVisibility(player, guids, data, visibleNow);
+
+    if (data.HasData())
+        data.Send(player->GetSession());
+}
+
+// Not compressed
+void Map::UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids)
+{
+    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    {
+        WorldObject *obj = *m_activeNonPlayersIter;
+        if (obj->IsInWorld())
+        {
+            player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj);
+            visibleGuids.erase(obj->GetObjectGuid());
+        }
+
+        ++m_activeNonPlayersIter;
+    }
+}
+
+// Support for compressed data packet
+void Map::UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids, UpdateData &data, std::set<WorldObject*> &visibleNow)
+{
+    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    {
+        WorldObject *obj = *m_activeNonPlayersIter;
+        if (obj->IsInWorld())
+        {
+            // TODO: Why is this templated? Why not just base class WorldObject for the target...?
+            player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj, data, visibleNow);
+            visibleGuids.erase(obj->GetObjectGuid());
+        }
+
+        ++m_activeNonPlayersIter;
+    }
 }
 
 void Map::SendInitSelf(Player * player)
@@ -2372,15 +2427,26 @@ void Map::ScriptsProcess()
                 }
 
                 WorldObject* pSource = (WorldObject*)source;
-
+                
                 // flag_target_as_source            0x01
 
                 // If target is Unit* and should do the emote (or should be source of searcher below)
                 if (target && target->isType(TYPEMASK_UNIT) && step.script->emote.flags & 0x01)
+                {
                     pSource = (WorldObject*)target;
-
-                // If step has a buddy entry defined, search for it.
-                if (step.script->emote.creatureEntry)
+                }
+                // Step has flag SCRIPT_FLAG_BUDDY_BY_GUID, so we look for the creature with guid as defined in searchRadius
+                else if (step.script->emote.flags & 0x10) 
+                {
+                    pSource = pSource->GetMap()->GetCreature(ObjectGuid(HIGHGUID_UNIT, step.script->emote.creatureEntry, step.script->emote.searchRadius));
+                    if (!pSource)
+                    {
+                        sLog.outError("SCRIPT_COMMAND_EMOTE (script id %u) had flag SCRIPT_FLAG_BUDDY_BY_GUID, but could not find buddy with entry %u, guid %u", step.script->id, step.script->emote.creatureEntry, step.script->emote.searchRadius);
+                        break;
+                    }
+                }
+                // If step has a buddy entry defined, but not flag SCRIPT_FLAG_BUDDY_BY_GUID, search for it.
+                else if (step.script->emote.creatureEntry)
                 {
                     Creature* pBuddy = NULL;
                     MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->emote.creatureEntry, true, step.script->emote.searchRadius);
@@ -2394,9 +2460,19 @@ void Map::ScriptsProcess()
                     else
                         break;
                 }
+                
+                // find the emote
+                std::vector<uint32> emotes;
+                emotes.push_back(step.script->emote.emoteId);
+                for (int i = 0; i < MAX_EMOTE_ID; ++i)
+                {
+                    if (!step.script->emote.randomEmotes[i])
+                        continue;
+                    emotes.push_back(uint32(step.script->emote.randomEmotes[i]));
+                }
 
                 // Must be safe cast to Unit*
-                ((Unit*)pSource)->HandleEmote(step.script->emote.emoteId);
+                ((Unit*)pSource)->HandleEmote(emotes[urand(0, emotes.size() - 1)]);
                 break;
             }
             case SCRIPT_COMMAND_FIELD_SET:

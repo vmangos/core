@@ -81,6 +81,8 @@
 #include "MovementBroadcaster.h"
 #include "HonorMgr.h"
 #include "Anticheat/Anticheat.h"
+#include "AuraRemovalMgr.h"
+#include "InstanceStatistics.h"
 
 #include <chrono>
 
@@ -1116,9 +1118,13 @@ void World::SetInitialWorldSettings()
         exit(1);                                            // Error message displayed in function already
     }
 
+    sLog.outString("Loading Instance Statistics...");
+    sInstanceStatistics.LoadFromDB();
+
     ///- Chargements des variables (necessaire pour le OutdoorJcJ)
     sLog.outString("Loading saved variables ...");
     sObjectMgr.LoadSavedVariable();
+
 
     ///- Update the realm entry in the database with the realm type from the config file
     //No SQL injection as values are treated as integers
@@ -1280,6 +1286,9 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Loading Gameobject Requirements...");
     sObjectMgr.LoadGameobjectsRequirements();
+
+    sLog.outString("Loading CreatureLinking Data...");      // must be after Creatures
+    sCreatureLinkingMgr.LoadFromDB();
 
     sLog.outString("Loading Objects Pooling Data...");
     sPoolMgr.LoadFromDB();
@@ -1506,6 +1515,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Initializing Scripts...");
     sScriptMgr.Initialize();
     sLog.outString();
+
+    sLog.outString("Loading aura removal on map change definitions");
+    sAuraRemovalMgr.LoadFromDB();
 
     ///- Initialize game time and timers
     sLog.outString("DEBUG:: Initialize game time and timers");

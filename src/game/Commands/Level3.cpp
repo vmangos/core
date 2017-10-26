@@ -4106,6 +4106,7 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
     PSendSysMessage(LANG_NPCINFO_LOOT,  cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
     PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
     PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
+    PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->isActiveObject(), target->GetVisibilityModifier());
 
     if ((npcflags & UNIT_NPC_FLAG_VENDOR))
         SendSysMessage(LANG_NPCINFO_VENDOR);
@@ -8127,6 +8128,102 @@ bool ChatHandler::HandleSpamerList(char* args)
         a->showMuted(GetSession());
     return true;
 }
+
+bool ChatHandler::HandleAntiSpamAdd(char* args)
+{
+    if (!*args || !sAnticheatLib->GetAntispam())
+        return false;
+
+    char* wordStr = ExtractQuotedArg(&args);
+    if (!wordStr)
+    {
+        PSendSysMessage("[AntiSpam]: No word given.");
+        return false;
+    }
+    std::string word = wordStr;
+
+    uint32 ban = 0;
+    if (!ExtractUInt32(&args, ban))
+    {
+        PSendSysMessage("[AntiSpam]: No ban value given.");
+        return false;
+    }
+
+    LoginDatabase.PExecute("INSERT INTO `antispam_blacklist` (`word`, `ban`) VALUES('%s', %u);", word.c_str(), ban);
+    PSendSysMessage("[AntiSpam]: Word %s with ban value %u added to antispam_blacklist table.", word.c_str(), ban);
+
+    return true;
+}
+
+bool ChatHandler::HandleAntiSpamRemove(char* args)
+{
+    if (!*args || !sAnticheatLib->GetAntispam())
+        return false;
+
+    char* wordStr = ExtractQuotedArg(&args);
+    if (!wordStr)
+    {
+        PSendSysMessage("[AntiSpam]: No word given.");
+        return false;
+    }
+    std::string word = wordStr;
+
+    LoginDatabase.PExecute("DELETE FROM `antispam_blacklist` WHERE `word`='%s';", word.c_str());
+
+    PSendSysMessage("[AntiSpam]: Word %s has been removed from antispam_blacklist table.", word.c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleAntiSpamReplace(char* args)
+{
+    if (!*args || !sAnticheatLib->GetAntispam())
+        return false;
+
+    char* fromStr = ExtractQuotedArg(&args);
+    if (!fromStr)
+    {
+        PSendSysMessage("[AntiSpam]: No from given.");
+        return false;
+    }
+
+    std::string from = fromStr;
+
+    char* toStr = ExtractQuotedArg(&args);
+    if (!toStr)
+    {
+        PSendSysMessage("[AntiSpam]: No to given.");
+        return false;
+    }
+
+    std::string to = toStr;
+
+    LoginDatabase.PExecute("INSERT INTO `antispam_replacement` (`from`, `to`) VALUES('%s', '%s');", from.c_str(), to.c_str());
+    PSendSysMessage("[AntiSpam]: Added replace letter %s to %s added to antispam_replacement table.", from.c_str(), to.c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleAntiSpamRemoveReplace(char* args)
+{
+    if (!*args || !sAnticheatLib->GetAntispam())
+        return false;
+
+    char* fromStr = ExtractQuotedArg(&args);
+    if (!fromStr)
+    {
+        PSendSysMessage("[AntiSpam]: No from given.");
+        return false;
+    }
+
+    std::string from = fromStr;
+
+    LoginDatabase.PExecute("DELETE FROM `antispam_replacement` WHERE `from`='%s';", from.c_str());
+    PSendSysMessage("[AntiSpam]: From word %s is removed from antispam_replacement table.", from.c_str());
+
+    return true;
+}
+
 
 //#UNDONE !!!
 bool ChatHandler::HandleDebugShowNearestGOInfo(char* args)

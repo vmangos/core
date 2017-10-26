@@ -133,17 +133,9 @@ void SpellModMgr::LoadSpellMods()
                     {
                         OUT_ERR("Impossible de charger le sort %u. Passe.", spellid);
                         delete newSpell;
-
-                        for (uint32 i = 0; i < 8; ++i)
-                            delete[] loader->SpellName[i];
-
                         delete loader;
                         continue;
                     }
-
-                    for (uint32 i = 0; i < 8; ++i)
-                        delete[] loader->SpellName[i];
-
                     delete loader;
                 }
             }

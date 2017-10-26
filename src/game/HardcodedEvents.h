@@ -256,3 +256,57 @@ private:
     std::vector <Creature*> SummonedMobs;
     const WorldLocation EventPos = WorldLocation(1, -8065.42f, 1527.93f, 2.61001f);
 };
+
+struct ScourgeInvasionEvent : WorldEvent
+{
+    ScourgeInvasionEvent();
+
+    void Update() override;
+    void Enable() override;
+    void Disable() override;
+
+private:
+    struct InvasionXYZ {
+        InvasionXYZ(float x, float y, float z)
+            : x(x), y(y), z(z) {}
+        float x, y, z;
+    };
+
+    struct InvasionNecropolis {
+        InvasionNecropolis(float x, float y, float z, float o)
+            : x(x), y(y), z(z), o(o) {}
+        float x, y, z, o;
+        std::vector<InvasionXYZ> shards;
+
+        ObjectGuid relayGuid;
+    };
+
+    struct InvasionZone
+    {
+        uint32 map;
+        uint32 zoneId;
+        uint32 remainingVar;
+        std::vector<InvasionNecropolis> points;
+    };
+
+    bool invasion1Loaded;
+    bool invasion2Loaded;
+
+    void HandleActiveZone(uint32 attackTimeVar, uint32 attackZoneVar, uint32 remainingVar, time_t now, uint32 zoneId);
+
+    bool OnEnable(uint32 attackZoneVar, uint32 attackTimeVar);
+
+    void StartNewInvasionIfTime(uint32 timeVariable, uint32 zoneVariable);
+    bool ResumeInvasion(uint32 zoneId);
+    bool SummonNecropolis(Map* pMap, InvasionNecropolis& point);
+
+    Map* GetMap(uint32 mapId, const InvasionNecropolis& invZone);
+    bool isValidZoneId(uint32 zoneId);
+    InvasionZone* GetZone(uint32 zoneId);
+    uint32 GetNewRandomZone(uint32 curr1, uint32 curr2);
+
+    void UpdateWorldState();
+
+    std::vector<InvasionZone> invasionPoints;
+    int previousRemainingCounts[6];
+};

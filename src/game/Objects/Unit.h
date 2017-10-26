@@ -1374,6 +1374,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* GetCharmer() const;
         Unit* GetCharm() const;
         void Uncharm();
+        void RemoveCharmAuras();
         Unit* GetCharmerOrOwner() const { return GetCharmerGuid() ? GetCharmer() : GetOwner(); }
         Unit* GetCharmerOrOwnerOrSelf()
         {
@@ -1639,7 +1640,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // at any changes to scale and/or displayId
         void UpdateModelData();
-
+        void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
         DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex);
         DynamicObject* GetDynObject(uint32 spellId);
         void AddDynObject(DynamicObject* dynObj);
@@ -1779,6 +1780,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // group updates
         void UpdateAuraForGroup(uint8 slot);
+        
+        bool IsLinkingEventTrigger() { return m_isCreatureLinkingTrigger; }
 
         // pet auras
         typedef std::set<PetAura const*> PetAuraSet;
@@ -1967,9 +1970,15 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         SpellCooldowns m_spellCooldowns;
         GlobalCooldownMgr m_GlobalCooldownMgr;
+
+        bool m_isCreatureLinkingTrigger;
+        bool m_isSpawningLinked;
+
     public:
         void DisableSpline();
         void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }
+        void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
+        float GetMeleeZLimit() const { return m_meleeZLimit; }
 
     protected:
         typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
@@ -2014,6 +2023,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
+
+        float m_meleeZLimit;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

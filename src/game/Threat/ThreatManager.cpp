@@ -549,3 +549,11 @@ void ThreatManager::processThreatEvent(ThreatRefStatusChangeEvent* threatRefStat
             break;
     }
 }
+
+void ThreatManager::setCurrentVictimIfCan(Unit * pVictim)
+{
+    if (HostileReference* pHRef = iThreatContainer.getReferenceByTarget(pVictim))
+    {
+        setCurrentVictim(pHRef);
+    }
+}
