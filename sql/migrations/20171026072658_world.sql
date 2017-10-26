@@ -1,3 +1,21 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171026072658');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20171026072658');
+-- Add your query below.
+
+-- -------------------------------
+-- 
+-- NAXXRAMAS PATCH 3
+-- 
+-- Damage and stat adjustments
+--
+-- -------------------------------
+
 -- 4HM hp fix based on Bestiary guide
 UPDATE `creature_template` SET `minhealth`=533984, `maxhealth`=533984 WHERE `entry`=16062; -- Mograine
 UPDATE `creature_template` SET `minhealth`=499987, `maxhealth`=499987 WHERE `entry`=16063; -- Zeliek
@@ -19,3 +37,10 @@ UPDATE `creature_template` SET `minlevel`=61, `maxlevel`=61, `minhealth`=5030, `
 UPDATE `creature_template` SET `mindmg`=2197, `maxdmg`=2912 WHERE `entry`=16150; -- Soectral Rider
 UPDATE `creature_template` SET `minhealth`=19185, `maxhealth`=19185, `mindmg`=2589, `maxdmg`=3435 WHERE `entry`=16148; -- Spectral Deathknight
 UPDATE `creature_template` SET `minhealth`=31500, `maxhealth`=31500, `mindmg`=2997, `maxdmg`=3712 WHERE `entry`=16149; -- Spectral Horse
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;

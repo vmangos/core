@@ -1,4 +1,21 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171026072558');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20171026072558');
+-- Add your query below.
 
+-- -------------------------------
+-- 
+-- NAXXRAMAS PATCH 2
+-- 
+-- Kel'Thuzad's Guardians are no longer immune to slow effects
+-- Corrected some creature links
+--
+-- -------------------------------
 -- Guardian of Icecrown
 UPDATE `creature_template` SET `mindmg`=2258, `maxdmg`=2759, `MechanicImmuneMask`=1019427442 WHERE `entry`=16441;
 
@@ -19,3 +36,10 @@ insert into creature_linking (`guid`,`master_guid`,`flag`)  VALUES
 (2530329, 15952, 3072),
 (2530330, 15952, 3072),
 (88623  , 15952, 3072);
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;

@@ -1,3 +1,23 @@
+DROP PROCEDURE IF EXISTS add_migration;
+delimiter ??
+CREATE PROCEDURE `add_migration`()
+BEGIN
+DECLARE v INT DEFAULT 1;
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171026070619');
+IF v=0 THEN
+INSERT INTO `migrations` VALUES ('20171026070619');
+-- Add your query below.
+
+-- -------------------------------
+--
+-- SCOURGE INVASION
+--
+-- Event logic is hard coded in scripts for necrop spawns and related spawns
+-- Quests, creature and other event objects are defined here.
+--
+-- -------------------------------
+
+
 SET @CGUID_BOSS:=2349;
 SET @CGUID_GENERAL:=12410;
 SET @OGUID_GENERAL:=1267;
@@ -114,13 +134,13 @@ INSERT INTO `creature_questrelation` (`id`, `quest`) VALUES
 (16255, 9154);
 
 DELETE FROM `creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
-INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`) VALUES
-(@CGUID_BOSS+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0), -- Sever - Level 21 - Shadowfang Keep
-(@CGUID_BOSS+1, 14693, 189, 0, 0, 1797.17, 1308.18, 18.6715, 4.71688, 300, 0, 0, 1, 0, 0, 0, 0), -- Scorn - Level 32 - Scarlet Monestary
-(@CGUID_BOSS+2, 14686, 129, 0, 0, 2582.66, 695.779, 56.871, 2.04211, 300, 0, 0, 1, 0, 0, 0, 0), -- Lady Falther'ess - Level 37 - Razorfen Downs
-(@CGUID_BOSS+3, 14690, 429, 0, 0, 29.7657, 547.141, -4.39526, 6.27435, 300, 0, 0, 1, 0, 0, 0, 0), -- Revanchion - Level 60 - Dire Maul
-(@CGUID_BOSS+4, 14695, 289, 0, 1, 200.29, 151.785, 109.795, 3.19581, 300, 0, 0, 1, 0, 0, 0, 0), -- Lord Blackwood - Level 60 - Scholomance
-(@CGUID_BOSS+5, 14684, 329, 0, 1, 3503.92, -3313.75, 130.357, 4.65155, 300, 0, 0, 1, 0, 0, 0, 0); -- Balzaphon - Level 60 - Stratholme
+INSERT INTO `creature` (`guid`, `id`, `map`, `modelid`, `equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecs`, `spawndist`, `currentwaypoint`, `curhealth`, `curmana`, `DeathState`, `MovementType`, `spawnFlags`, `patch_min`, `patch_max`) VALUES
+(@CGUID_BOSS+0, 14682, 33, 0, 0, -225.113, 2303.42, 94.6767, 5.91654, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Sever - Level 21 - Shadowfang Keep
+(@CGUID_BOSS+1, 14693, 189, 0, 0, 1797.17, 1308.18, 18.6715, 4.71688, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Scorn - Level 32 - Scarlet Monestary
+(@CGUID_BOSS+2, 14686, 129, 0, 0, 2582.66, 695.779, 56.871, 2.04211, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Lady Falther'ess - Level 37 - Razorfen Downs
+(@CGUID_BOSS+3, 14690, 429, 0, 0, 29.7657, 547.141, -4.39526, 6.27435, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Revanchion - Level 60 - Dire Maul
+(@CGUID_BOSS+4, 14695, 289, 0, 1, 200.29, 151.785, 109.795, 3.19581, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10), -- Lord Blackwood - Level 60 - Scholomance
+(@CGUID_BOSS+5, 14684, 329, 0, 1, 3503.92, -3313.75, 130.357, 4.65155, 300, 0, 0, 1, 0, 0, 0, 0, 0, 10); -- Balzaphon - Level 60 - Stratholme
 
 -- Add instance bosses
 DELETE FROM `game_event_creature` WHERE `guid` BETWEEN @CGUID_BOSS+0 AND @CGUID_BOSS+5;
@@ -495,15 +515,15 @@ DELETE FROM `creature` WHERE `guid` IN (1242996, 1242997, 1243011, 1242995, 1242
 -- Game Events
 -- ----------------------
 
-UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `disabled` = 1 WHERE `entry`=17; -- Scourge Invasion
-UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `disabled` = 1 WHERE `entry`=155; -- Argent Dawn Spawns
-UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `disabled` = 1, `description`='Scourge Invasion - Phase 2 - Invasion Stormwind' WHERE  `entry`=129;
-UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `disabled` = 1, `description`='Scourge Invasion - Phase 2 - Invasion Undercity' WHERE  `entry`=130;
+UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `patch_min` = 9, `patch_max` = 10, `disabled` = 1 WHERE `entry`=17; -- Scourge Invasion
+UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `patch_min` = 9, `patch_max` = 10, `disabled` = 1 WHERE `entry`=155; -- Argent Dawn Spawns
+UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `patch_min` = 9, `patch_max` = 10, `disabled` = 1, `description`='Scourge Invasion - Phase 2 - Invasion Stormwind' WHERE  `entry`=129;
+UPDATE `game_event` SET `start_time`='0000-00-00 00:00:00', `end_time`='0000-00-00 00:00:00', `length`=999999999, `patch_min` = 9, `patch_max` = 10, `disabled` = 1, `description`='Scourge Invasion - Phase 2 - Invasion Undercity' WHERE  `entry`=130;
 
 DELETE FROM `game_event` WHERE `entry` IN (110, 111, 112, 113, 114, 115, 116, 117, 118, 80, 81, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128);
-INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`) VALUES
-(80, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11', 0, 1),
-(81, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Boss in instance activation', 0, 1);
+INSERT INTO `game_event` (`entry`, `start_time`, `end_time`, `occurence`, `length`, `holiday`, `description`, `hardcoded`, `disabled`, `patch_min`, `patch_max`) VALUES
+(80, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Skeleton spawn / Quest activation lvl 9-11', 0, 1, 9, 10),
+(81, '0000-00-00 00:00:00', '0000-00-00 00:00:00', 525600, 999999999, 0, 'Scourge Invasion - Boss in instance activation', 0, 1, 9, 10);
 
 -- Objects
 INSERT INTO `game_event_gameobject` (`guid`, `event`) VALUES
@@ -1314,3 +1334,14 @@ UPDATE `game_event` SET `hardcoded`='1' WHERE `entry`='17';
 
 -- boss in scholomance
 UPDATE `creature_template` SET `faction_A`=14, `faction_H`=14 WHERE `entry`=16383;
+
+-- Make sure max patch is set for newly added creatures
+UPDATE `creature` SET `patch_max` = 10 WHERE `patch_max` = 0;
+
+
+-- End of migration.
+END IF;
+END??
+delimiter ; 
+CALL add_migration();
+DROP PROCEDURE IF EXISTS add_migration;
