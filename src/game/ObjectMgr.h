@@ -567,7 +567,7 @@ class ObjectMgr
 
         typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
 
-        typedef UNORDERED_MAP<uint32, AreaTrigger> AreaTriggerMap;
+        typedef std::map<uint32, AreaTrigger> AreaTriggerMap;
         typedef UNORDERED_MAP<uint32, BattlegroundEntranceTrigger> BGEntranceTriggerMap;
 
         typedef UNORDERED_MAP<uint32, RepRewardRate > RepRewardRateMap;
