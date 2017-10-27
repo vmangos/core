@@ -825,8 +825,11 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
                     if (spellproto->Id == 24740)            // Wisp Costume
                         return true;
                     return false;
-                case SPELL_AURA_MOD_ROOT:
                 case SPELL_AURA_MOD_SILENCE:
+                    if (spellproto->Id == 24732)            // Bat Costume
+                        return true;
+                    return false;
+                case SPELL_AURA_MOD_ROOT:
                 case SPELL_AURA_GHOST:
                 case SPELL_AURA_PERIODIC_LEECH:
                 case SPELL_AURA_MOD_STALKED:
