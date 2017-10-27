@@ -333,7 +333,7 @@ struct go_pedestal_of_immol_tharAI: public GameObjectAI
                         {
                             gobj->SetSpawnedByDefault(true);
                             gobj->Refresh();
-                            gobj->SendGameObjectCustomAnim(gobj->GetObjectGuid());
+                            gobj->SendGameObjectCustomAnim();
                         }
                         gobjTimer = 0;
                         gobjStep++;

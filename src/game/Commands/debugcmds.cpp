@@ -57,7 +57,7 @@ bool ChatHandler::HandleDebugSendSpellFailCommand(char* args)
     char* unk = strtok(NULL, " ");
     uint8 unkI = unk ? (uint8)atoi(unk) : 2;
 
-    WorldPacket data(SMSG_CAST_FAILED, 4 + 1 + 1);
+    WorldPacket data(SMSG_CAST_RESULT, 4 + 1 + 1);
     data << uint32(133);
     data << uint8(unkI);
     data << uint8(failnum);
@@ -192,6 +192,20 @@ bool ChatHandler::HandleDebugSendBuyErrorCommand(char* args)
 
     uint8 msg = atoi(args);
     m_session->GetPlayer()->SendBuyError(BuyResult(msg), 0, 0, 0);
+    return true;
+}
+
+bool ChatHandler::HandleDebugSendOpenBagCommand(char *args)
+{
+    Player *pTarget = getSelectedPlayer();
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pTarget->SendOpenContainer();
     return true;
 }
 
@@ -431,8 +445,10 @@ bool ChatHandler::HandleDebugSendQuestPartyMsgCommand(char* args)
     uint32 msg;
     if (!ExtractUInt32(&args, msg))
         return false;
+    if (msg > 0xFF)
+        return false;
 
-    m_session->GetPlayer()->SendPushToPartyResponse(m_session->GetPlayer(), msg);
+    m_session->GetPlayer()->SendPushToPartyResponse(m_session->GetPlayer(), uint8(msg));
     return true;
 }
 

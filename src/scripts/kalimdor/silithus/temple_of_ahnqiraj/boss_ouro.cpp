@@ -614,7 +614,7 @@ struct go_sandworm_baseAI: public GameObjectAI
         if (m_bActive)
         {
             m_bActive = false;
-            me->SendGameObjectCustomAnim(me->GetObjectGuid());
+            me->SendGameObjectCustomAnim();
         }
         else
         {

@@ -186,6 +186,11 @@ class Channel
         void JoinNotify(ObjectGuid guid);                                       // invisible notify
         void LeaveNotify(ObjectGuid guid);                                      // invisible notify
 
+        /**
+        * This creates the packet informing client that the player is not on requested \ref name channel.
+        * See also \ref MakeNotMember for non-static version.
+        */
+        static void MakeNotOnPacket(WorldPacket* data, const std::string &name);
     private:
         // initial packet data (notify type and channel name)
         void MakeNotifyPacket(WorldPacket *data, uint8 notify_type);

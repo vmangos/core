@@ -730,8 +730,8 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     Creature *pCreature = GetPlayer()->GetNPCIfCanInteractWith(vendorGuid, UNIT_NPC_FLAG_TABARDDESIGNER);
     if (!pCreature)
     {
-        //"That's not an emblem vendor!"
-        SendSaveGuildEmblem(ERR_GUILDEMBLEM_INVALIDVENDOR);
+        //[-ZERO] fails silently, not "That's not an emblem vendor!"
+        SendSaveGuildEmblem(ERR_GUILDEMBLEM_FAIL_NO_MESSAGE);
         DEBUG_LOG("WORLD: HandleSaveGuildEmblemOpcode - %s not found or you can't interact with him.", vendorGuid.GetString().c_str());
         return;
     }
@@ -769,16 +769,6 @@ void WorldSession::HandleSaveGuildEmblemOpcode(WorldPacket& recvPacket)
     SendSaveGuildEmblem(ERR_GUILDEMBLEM_SUCCESS);
 
     guild->Query(this);
-}
-
-void WorldSession::HandleGuildEventLogQueryOpcode(WorldPacket& /* recvPacket */)
-{
-    // empty
-    DEBUG_LOG("WORLD: Received (MSG_GUILD_EVENT_LOG_QUERY)");
-
-    if (uint32 GuildId = GetPlayer()->GetGuildId())
-        if (Guild* pGuild = sGuildMgr.GetGuildById(GuildId))
-            pGuild->DisplayGuildEventLog(this);
 }
 
 void WorldSession::SendSaveGuildEmblem(uint32 msg)

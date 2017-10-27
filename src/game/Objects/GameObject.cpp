@@ -274,7 +274,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
 
 			    // Play splash sound
 			    PlayDistanceSound(3355);
-                            SendGameObjectCustomAnim(GetObjectGuid());
+                            SendGameObjectCustomAnim();
                         }
 
                         m_lootState = GO_READY;             // can be successfully open with some chance
@@ -333,9 +333,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                                 m_respawnDelayTime = -1; //spawn animation
                                 GetMap()->Add(this);
                                 m_respawnDelayTime = 0;
-                                WorldPacket data(SMSG_GAMEOBJECT_RESET_STATE, 8);
-                                data << GetObjectGuid();
-                                SendObjectMessageToSet(&data,true);
+                                SendGameObjectReset();
                             }
                             else
                                 GetMap()->Add(this);
@@ -444,7 +442,7 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             case 4491:
                             case 6785:
                             case 6747: //sapphiron birth
-                                SendGameObjectCustomAnim(GetObjectGuid());
+                                SendGameObjectCustomAnim();
                                 break;
                         }
                     }
@@ -1430,7 +1428,7 @@ void GameObject::Use(Unit* user)
 
             // this appear to be ok, however others exist in addition to this that should have custom (ex: 190510, 188692, 187389)
             if (time_to_restore && info->goober.customAnim)
-                SendGameObjectCustomAnim(GetObjectGuid());
+                SendGameObjectCustomAnim();
             else
                 SetGoState(GO_STATE_ACTIVE);
 
@@ -2220,6 +2218,21 @@ void GameObject::UpdateModelPosition()
 GameObjectData const * GameObject::GetGOData() const
 {
     return sObjectMgr.GetGOData(GetGUIDLow());
+}
+
+void GameObject::SendGameObjectCustomAnim(uint32 animId /*= 0*/)
+{
+    WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8 + 4);
+    data << GetObjectGuid();
+    data << uint32(animId);
+    SendMessageToSet(&data, true);
+}
+
+void GameObject::SendGameObjectReset()
+{
+    WorldPacket data(SMSG_GAMEOBJECT_RESET_STATE, 8);
+    data << GetObjectGuid();
+    SendMessageToSet(&data, true);
 }
 
 void GameObject::Despawn()

@@ -145,7 +145,7 @@ struct NecropolisRelayAI : public ScriptedAI
                         necropolis->SendObjectDeSpawnAnim(necropolis->GetObjectGuid());
                     }
                     else
-                        necropolis->SendGameObjectCustomAnim(necropolis->GetObjectGuid());
+                        necropolis->SendGameObjectCustomAnim();
                 }
             }
         }
@@ -307,6 +307,8 @@ struct npc_necrotic_shard : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
+        if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
+            necropolis->SendGameObjectCustomAnim();
         // buff players around 
         DoCastSpellIfCan(m_creature, SPELL_DMG_BOOST_AT_PYLON_DEATH, CAST_TRIGGERED);
 

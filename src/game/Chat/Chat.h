@@ -419,6 +419,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugSendQuestInvalidMsgCommand(char* args);
         bool HandleDebugSendSellErrorCommand(char* args);
         bool HandleDebugSendSpellFailCommand(char* args);
+        bool HandleDebugSendOpenBagCommand(char* args);
 
         /*
         Send the visual of the next channeled spell after args, suggested macro :

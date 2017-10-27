@@ -2006,14 +2006,6 @@ void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
     SendObjectMessageToSet(&data, true);
 }
 
-void WorldObject::SendGameObjectCustomAnim(ObjectGuid guid, uint32 animId /*= 0*/)
-{
-    WorldPacket data(SMSG_GAMEOBJECT_CUSTOM_ANIM, 8 + 4);
-    data << ObjectGuid(guid);
-    data << uint32(animId);
-    SendObjectMessageToSet(&data, true);
-}
-
 bool WorldObject::isWithinVisibilityDistanceOf(Unit const* viewer, WorldObject const* viewPoint, bool inVisibleList) const
 {
     if (viewer->IsTaxiFlying())

@@ -995,7 +995,7 @@ struct go_engin_suppressionAI: public GameObjectAI
 
     void ApplyAura()
     {
-        me->SendGameObjectCustomAnim(me->GetObjectGuid());
+        me->SendGameObjectCustomAnim();
         Map::PlayerList const &liste = me->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
