@@ -1798,7 +1798,8 @@ bool DungeonMap::CanEnter(Player *player)
     Group *pGroup = player->GetGroup();
     if (pGroup && pGroup->InCombatToInstance(GetInstanceId()) && player->isAlive() && player->GetMapId() != GetId())
     {
-        if (GetId() == 249 || GetId() == 531)        // Hack : Ustaag <Nostalrius> : concerne uniquement Onyxia's Lair
+		
+        if (GetId() == 249 || GetId() == 531 || GetId() == 533)        // Hack : Ustaag <Nostalrius> : concerne uniquement Onyxia's Lair
         {
             player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
             return false;
