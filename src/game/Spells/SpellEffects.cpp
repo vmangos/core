@@ -4442,10 +4442,21 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    if (roll_chance_i(14))                  // Trick (can be different critter models). 14% since below can have 1 of 6
-                        m_caster->CastSpell(m_caster, 24753, true);
-                    else                                    // Random Costume, 6 different (plus add. for gender)
-                        m_caster->CastSpell(m_caster, 24720, true);
+                    bool gender = unitTarget->getGender();
+                    uint32 spellId = 0;
+                    uint32 spells[8] = { 
+                        gender == GENDER_MALE ? 24708 : 24709,   // Pirate
+                        gender == GENDER_MALE ? 24711 : 24710,   // Ninja
+                        gender == GENDER_MALE ? 24712 : 24713,   // Leper
+                        gender == GENDER_MALE ? 24735 : 24736,   // Ghost
+                        24723,                                   // Skeleton
+                        24732,                                   // Bat
+                        24740,                                   // Wisp
+                        24753                                    // Critter
+                    };
+
+                    spellId = spells[urand(0, 7)];
+                    m_caster->CastSpell(m_caster, spellId, true);
 
                     return;
                 }
