@@ -6004,6 +6004,26 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
                 break;
             }
+            case SPELL_EFFECT_ACTIVATE_OBJECT:
+            {
+                if (m_spellInfo->Id == 15958)
+                { 
+                    if (m_UniqueGOTargetInfo.size())
+                    {
+                        ObjectGuid eggGuid = m_UniqueGOTargetInfo.back().targetGUID;
+                        if (GameObject* pRookeryEgg = m_caster->GetMap()->GetGameObject(eggGuid))
+                        {
+                            if (pRookeryEgg->GetGoState() != GO_STATE_ACTIVE_ALTERNATIVE)
+                                return SPELL_FAILED_BAD_TARGETS;
+                        }
+                        else
+                            return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                    }
+                    else
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                }
+                break;
+            }
             case SPELL_EFFECT_SUMMON_DEAD_PET:
             {
                 Creature *pet = m_caster->GetPet();

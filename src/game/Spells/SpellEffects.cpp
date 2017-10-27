@@ -2574,6 +2574,12 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)
                     gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
                     return;
                 }
+                else if ((m_spellInfo->Id == 15748) || (m_spellInfo->Id == 16028)) // Freeze Rookery Egg
+                {
+                    if (gameObjTarget->getLootState() == GO_READY)
+                        gameObjTarget->UseDoorOrButton(0, true);
+                    return;
+                }
                 sLog.outError("Spell::SendLoot unhandled locktype %u for GameObject trap (entry %u) for spell %u.", lockType, gameObjTarget->GetEntry(), m_spellInfo->Id);
                 return;
             default:
@@ -5103,6 +5109,12 @@ void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
 {
     if (!gameObjTarget)
         return;
+
+    if (m_spellInfo->Id == 15958) // Collect Rookery Egg
+    {
+        gameObjTarget->AddObjectToRemoveList();
+        return;
+    }
 
     static ScriptInfo activateCommand = generateActivateCommand();
 
