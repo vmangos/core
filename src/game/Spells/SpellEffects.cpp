@@ -544,13 +544,13 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     switch(unitTarget->getPowerType())
                     {
                         case POWER_RAGE :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 100, POWER_RAGE);
+                            unitTarget->CastSpell(unitTarget, 27783, true);
                         return;
                         case POWER_ENERGY :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 40, POWER_ENERGY);
+                            unitTarget->CastSpell(unitTarget, 27784, true);
                         return;
                         case POWER_MANA :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 300, POWER_MANA);
+                            unitTarget->CastSpell(unitTarget, 27782, true);
                         return;
                     }
                     return;
