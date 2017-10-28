@@ -4100,12 +4100,16 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
 
     PSendSysMessage(LANG_NPCINFO_CHAR, target->GetGuidStr().c_str(), faction, npcflags, Entry, displayid, nativeid);
     PSendSysMessage(LANG_NPCINFO_LEVEL, target->getLevel());
+    PSendSysMessage(LANG_NPCINFO_EQUIPMENT, target->GetCurrentEquipmentId());
     PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
+    PSendSysMessage(LANG_NPCINFO_INHABIT_TYPE, cInfo->InhabitType);
     PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUInt32Value(UNIT_FIELD_FLAGS), target->GetUInt32Value(UNIT_DYNAMIC_FLAGS), target->getFaction());
     PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(), curRespawnDelayStr.c_str());
-    PSendSysMessage(LANG_NPCINFO_LOOT,  cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
+    PSendSysMessage(LANG_NPCINFO_LOOT, cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
+    PSendSysMessage(LANG_NPCINFO_ARMOR, target->GetArmor());
     PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
     PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));
+    PSendSysMessage(LANG_NPCINFO_AIINFO, target->GetAIName().c_str(), target->GetScriptName().c_str());
     PSendSysMessage(LANG_NPCINFO_ACTIVE_VISIBILITY, target->isActiveObject(), target->GetVisibilityModifier());
 
     if ((npcflags & UNIT_NPC_FLAG_VENDOR))
