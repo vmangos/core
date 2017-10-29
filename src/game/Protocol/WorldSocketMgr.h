@@ -29,18 +29,15 @@
 #define __WORLDSOCKETMGR_H
 
 #include "MangosSocketMgr.h"
-#include "Policies/SingletonImp.h"
-#include "Policies/ThreadingModel.h"
-
+#include "ace/Singleton.h"
+#include "ace/Thread_Mutex.h"
 class WorldSocket;
-
 
 /// Manages all sockets connected to peers and network threads
 class WorldSocketMgr: public MangosSocketMgr<WorldSocket>
 {
-    using Lock = MaNGOS::ClassLevelLockable<WorldSocketMgr, std::mutex>;
     public:
-        friend class MaNGOS::Singleton<WorldSocketMgr, Lock>;
+        friend class ACE_Singleton<WorldSocketMgr, ACE_Thread_Mutex>;
         friend class WorldSocket;
 
         static WorldSocketMgr* Instance();
