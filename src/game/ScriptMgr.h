@@ -590,7 +590,7 @@ struct Script
     CreatureAI* (*GetAI)(Creature*);
     InstanceData* (*GetInstanceData)(Map*);
 
-    void RegisterSelf(bool custom = false);
+    void RegisterSelf(bool reportUnused = true);
 };
 
 class ScriptMgr

@@ -339,6 +339,9 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
 
     m_spellAuraHolder = nullptr;
     m_delayed = false;
+    // Must initialize to an element in the list or bad things happen,
+    // begin changes so use end
+    m_channeledUpdateIterator = m_channeledHolders.end();
 
     CleanupTargetList();
 }
@@ -3884,20 +3887,30 @@ void Spell::update(uint32 difftime)
 
                 // Must update target holder since the target will not update it. Used to keep it in sync
                 // If the cast is interrupted mid-iteration (i.e. unit dies), break
-                SpellAuraHolderList::iterator iter = m_channeledHolders.begin();
+                // Note that we cannot ensure that only 1 aura holder is removed from the list at a time
+                // during iteration, since some creature scripts force all summoned adds to despawn on
+                // death, which means that multiple units will have their auras removed at once. So
+                // we maintain an iter that points to the next holder and increment it on removals
+                m_channeledUpdateIterator = m_channeledHolders.begin();
                 SpellAuraHolderList::iterator curr;
-                while (iter != m_channeledHolders.end())
+                while (m_channeledUpdateIterator != m_channeledHolders.end())
                 {
-                    // increment now, current holder may be removed from the list externally so we need to step
-                    curr = iter;
-                    ++iter;
+                    // Store current and increment, since m_channeledUpdateIterator
+                    // may be changed externally but we still need a way to step in
+                    // this loop
+                    curr = m_channeledUpdateIterator;
+                    ++m_channeledUpdateIterator;
 
                     SpellAuraHolder *holder = *curr;
                     // Holder deleted before updating, but not removed from list. Clear usage
-                    // and remove. Use case: Cannot find caster in world to remove holder from
-                    // channeled spell in RemoveSpellAuraHolder
+                    // and remove
                     if (holder->IsDeleted())
                     {
+                        Unit *target = m_targets.getUnitTarget();
+                        sLog.outError("[Spell] - Channeled update still maintains ref to deleted holder, caster: %s. Target: %s",
+                            m_caster->GetGuidStr().c_str(), 
+                            target ? target->GetGuidStr().c_str() : "");
+
                         // TODO: Is this a leak if we don't delete it here? Unit probably removed from world
                         holder->SetInUse(false);
                         m_channeledHolders.erase(curr);
@@ -3908,19 +3921,14 @@ void Spell::update(uint32 difftime)
 
                     // Spell cast was interrupted on holder update. Unit likely died, targetted buff was
                     // dispelled, or unit ran out of range. Return since we cleaned up in
-                    // SendChannelUpdate(0) on cancel. Continuing equals segfault due to deleted
-                    // holders
+                    // SendChannelUpdate(0) on cancel. Similarly, if AoE and unit died the holder
+                    // was already removed.
                     if (m_spellState == SPELL_STATE_FINISHED)
                         return;
 
-                    // Handle typical removal modes for aura updates here for efficiency,
-                    // RemoveChanneledAuraHolder will ignore these modes. Have to check deleted
-                    // for expired holder as well, because the unit can die on the last tick
-                    // and have a non-checked remove mode. Expired holders will be cleaned up
-                    // on the unit's own update if it's from AoE. Single target cleaned up in
-                    // SendChannelUpdate(0)
+                    // We can handle typical remove modes here
                     AuraRemoveMode remove = holder->GetRemoveMode();
-                    if ((holder->GetAuraDuration() == 0 && !holder->IsDeleted()) || 
+                    if ((holder->GetAuraDuration() == 0 && !holder->IsDeleted()) ||
                             (holder->IsDeleted() && (remove == AURA_REMOVE_BY_RANGE || remove == AURA_REMOVE_BY_GROUP)))
                     {
                         holder->SetInUse(false);
@@ -4533,6 +4541,8 @@ void Spell::SendChannelUpdate(uint32 time)
             iter = m_channeledHolders.erase(iter);
         }
 
+        m_channeledUpdateIterator = m_channeledHolders.end();
+
         // Remove single target auras on caster now if they expired
         m_caster->RemoveAurasByCasterSpell(m_spellInfo->Id, m_caster->GetObjectGuid(), AURA_REMOVE_BY_CHANNEL);
 
@@ -4973,21 +4983,26 @@ void Spell::AddChanneledAuraHolder(SpellAuraHolder *holder)
 // Occurs when an aura should be removed from handling due to deletion or expiration
 void Spell::RemoveChanneledAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
 {
-    // AURA_REMOVE_BY_CHANNEL comes from here, don't want to double erase. other modes are handled in holder update
+    // AURA_REMOVE_BY_CHANNEL comes from here, don't want to double erase
+    // AURA_REMOVE_BY_RANGE and AURA_REMOVE_BY_GROUP are handled in Spell::update
     if (!holder || mode == AURA_REMOVE_BY_CHANNEL || mode == AURA_REMOVE_BY_GROUP || mode == AURA_REMOVE_BY_RANGE)
         return;
 
-    SpellAuraHolderList::iterator iter = m_channeledHolders.begin();
-    while (iter != m_channeledHolders.end())
+    SpellAuraHolderList::iterator iter = std::find(m_channeledHolders.begin(), m_channeledHolders.end(), holder);
+    if (iter != m_channeledHolders.end())
     {
-        if (*iter == holder)
-        {
-            (*iter)->SetInUse(false);
-            m_channeledHolders.erase(iter);
-            break;
-        }
+        (*iter)->SetInUse(false);
+
+        // If removing the aura currently being updated, increment the
+        // update iter. If this is the last element, the update iterator
+        // will be set to end() and Spell::Update will finish. If not,
+        // it will seemlessly handle the case of multiple auras being
+        // removed in a single update.
+        // Micro opt - update iter in removal rather than increment
+        if (iter == m_channeledUpdateIterator)
+            m_channeledUpdateIterator = m_channeledHolders.erase(iter);
         else
-            ++iter;
+            m_channeledHolders.erase(iter);
     }
 }
 
