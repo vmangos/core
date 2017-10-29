@@ -171,7 +171,10 @@ std::vector<uint8> BigNumber::AsByteArray(int minSize, bool reverse)
     if (length > GetNumBytes())
         memset((void*)byteArray.data(), 0, length);
 
-    BN_bn2bin(_bn, (unsigned char *)byteArray.data());
+    // Padding should add leading zeroes, not trailing
+    int paddingOffset = length - GetNumBytes();
+
+    BN_bn2bin(_bn, (unsigned char *)byteArray.data() + paddingOffset);
 
     if (reverse)
         std::reverse(byteArray.begin(), byteArray.end());
