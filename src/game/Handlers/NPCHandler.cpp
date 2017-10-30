@@ -306,7 +306,8 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
 
     GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
     // Player must get off her high horse before learning
-    _player->Unmount();
+    if (_player->IsMounted())
+        _player->Unmount();
     _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     _player->ModifyMoney(-int32(nSpellCost));
