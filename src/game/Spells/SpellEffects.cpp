@@ -2357,6 +2357,7 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || damage < 0)
         return;
 
+    int32 initialDamage = damage;
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
@@ -2366,7 +2367,6 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
     if (Player *modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, healMultiplier);
 
-    m_damage += damage;
     // get max possible damage, don't count overkill for heal
     uint32 healthGain = uint32(damage);
     if (healthGain > unitTarget->GetHealth())
@@ -2377,6 +2377,12 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
     {
         m_caster->DealHeal(m_caster, uint32(healthGain), m_spellInfo);
     }
+
+    // Non delayed spells bonus damage is added later
+    if (!m_delayed)
+        damage = initialDamage;
+
+    m_damage += damage;
 }
 
 void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)

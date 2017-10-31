@@ -3095,8 +3095,7 @@ void Spell::prepare(Aura* triggeredByAura)
 
     m_spellState = SPELL_STATE_PREPARING;
     m_delayed = m_spellInfo->speed > 0.0f 
-        || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer())
-        || IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_HEALTH_LEECH);
+        || (m_spellInfo->IsCCSpell() && m_targets.getUnitTarget() && m_targets.getUnitTarget()->IsPlayer());
 
     if (m_caster->GetTransport())
     {
