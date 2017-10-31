@@ -317,7 +317,7 @@ struct Loot
 	   clear(false);
     }
 
-    bool empty() const { return items.empty() && gold == 0; }
+    bool empty() const { return items.empty() && m_questItems.empty() && gold == 0; }
     bool isLooted() const { return gold == 0 && unlootedCount == 0; }
 
     void NotifyItemRemoved(uint8 lootIndex);
