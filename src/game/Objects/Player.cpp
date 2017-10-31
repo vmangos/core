@@ -17162,7 +17162,28 @@ void Player::Mount(uint32 mount, uint32 spellId)
 {
     if (!mount)
     {
+        RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
         SendMountResult(MOUNTRESULT_NOTMOUNTABLE);
+        return;
+    }
+
+    if (IsMounted())
+    {
+        SendMountResult(MOUNTRESULT_ALREADYMOUNTED);
+        return;
+    }
+
+    if (!spellId && IsInDisallowedMountForm())
+    {
+        RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+        SendMountResult(MOUNTRESULT_SHAPESHIFTED);
+        return;
+    }
+
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING))
+    {
+        RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+        SendMountResult(MOUNTRESULT_LOOTING);
         return;
     }
 
@@ -17192,7 +17213,9 @@ void Player::Unmount(bool from_aura)
 {
     if (!IsMounted())
     {
-        SendDismountResult(DISMOUNTRESULT_NOTMOUNTED);
+        if (!from_aura)
+            SendDismountResult(DISMOUNTRESULT_NOTMOUNTED);
+
         return;
     }
 
