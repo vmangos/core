@@ -3875,6 +3875,12 @@ bool ChatHandler::HandleAuraCommand(char* args)
 
     SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer());
 
+    // Aura duration in seconds
+    int32 duration = 0;
+    ExtractInt32(&args, duration);
+    if (duration > 0)
+        holder->SetAuraDuration(duration * IN_MILLISECONDS);
+
     for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         uint8 eff = spellInfo->Effect[i];
