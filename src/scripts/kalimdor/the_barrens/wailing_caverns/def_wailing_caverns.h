@@ -20,7 +20,11 @@ enum
     DATA_NARALEX                        = 6,
 
     YELL_AFTER_GOSSIP                   = -1614999,
-    SERPENTIS_YELL                      = -1614981
+    SERPENTIS_YELL                      = -1614981,
+
+    GO_DMF_CHEST                        = 180055,
+
+    QUEST_FORTUNE_AWAITS                = 7944
 };
 
 #endif

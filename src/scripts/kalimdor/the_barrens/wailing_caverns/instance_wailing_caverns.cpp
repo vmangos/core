@@ -41,6 +41,7 @@ struct instance_wailing_caverns : public ScriptedInstance
     uint64 m_uiAnacondraGUID;
     //uint64 m_uiVerdanGUID;
     uint64 m_uiSerpentisGUID;
+    uint64 m_uiDMFChestGUID;
     bool Assaulted;
 
     // to be despawn when the nightmare is over
@@ -86,6 +87,28 @@ struct instance_wailing_caverns : public ScriptedInstance
             pCreature->getFaction() != 35 && // the 2 druids
             pCreature->GetEntry() != 3653) // Kresh is cool
             vNightmareMonsters.push_back(pCreature->GetGUID());
+    }
+
+    void OnObjectCreate(GameObject* pGo)
+    {
+        if (pGo->GetEntry() == GO_DMF_CHEST)
+        {
+            pGo->SetVisible(false);
+            m_uiDMFChestGUID = pGo->GetGUID();
+        }
+    }
+
+    void OnPlayerEnter(Player* pPlayer)
+    {
+        if (!pPlayer)
+            return;
+
+        // Darkmoon chest visible only for players on the quest
+        if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
+        {
+            if (GameObject* pGo = instance->GetGameObject(m_uiDMFChestGUID))
+                pGo->SetVisible(true);
+        }
     }
 
     void SetData(uint32 uiType, uint32 uiData)
