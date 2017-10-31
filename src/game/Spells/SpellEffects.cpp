@@ -4053,7 +4053,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     float weaponDamagePercentMod = 1.0f;                    // applied to weapon damage (and to fixed effect damage bonus if customBonusDamagePercentMod not set
     bool normalized = false;
 
-    int32 spell_bonus = 0;                                  // bonus specific for spell
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_ROGUE:
@@ -4066,29 +4065,19 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
             }
             break;
         }
-        case SPELLFAMILY_PALADIN:
-        {
-            // Seal of Command - receive benefit from Spell Damage and Healing
-            if (m_spellInfo->Id == 20424)
-            {
-                spell_bonus += int32(0.20f * m_caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellInfo)));
-                spell_bonus += int32(0.29f * unitTarget->SpellBaseDamageBonusTaken(GetSpellSchoolMask(m_spellInfo)));
-            }
-            break;
-        }
     }
 
-    int32 fixed_bonus = 0;
+    int32 bonus = 0;
     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch (m_spellInfo->Effect[j])
         {
             case SPELL_EFFECT_WEAPON_DAMAGE:
             case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-                fixed_bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
+                bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
                 break;
             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                fixed_bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
+                bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
                 normalized = true;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
@@ -4096,17 +4085,14 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
 
                 // applied only to prev.effects fixed damage
                 if (customBonusDamagePercentMod)
-                    fixed_bonus = int32(fixed_bonus * bonusDamagePercentMod);
+                    bonus = int32(bonus * bonusDamagePercentMod);
                 else
-                    fixed_bonus = int32(fixed_bonus * weaponDamagePercentMod);
+                    bonus = int32(bonus * weaponDamagePercentMod);
                 break;
             default:
                 break;                                      // not weapon damage effect, just skip
         }
     }
-
-    // non-weapon damage
-    int32 bonus = spell_bonus + fixed_bonus;
 
     // apply to non-weapon bonus weapon total pct effect, weapon total flat effect included in weapon damage
     if (bonus)
@@ -4133,16 +4119,27 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     // + weapon damage with applied weapon% dmg to base weapon damage in call
     bonus += int32(m_caster->CalculateDamage(m_attackType, normalized) * weaponDamagePercentMod);
 
+    // Seal of Command
+    if (m_spellInfo->School == SPELL_SCHOOL_HOLY)
+    {
+        // Prevent Vengeance double dipping
+        Unit::AuraList const& mModDamagePercentDone = m_caster->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        for (Unit::AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+        {
+            if ((*i)->GetSpellProto()->SpellVisual == 6597)
+            {
+                bonus /= 1.0f + (*i)->GetModifier()->m_amount / 100.0f;
+                break;
+            }
+        }
+
+        // Add spell gear bonus and spell modifiers
+        bonus = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
+        bonus = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
+    }
+
     // prevent negative damage
     m_damage += uint32(bonus > 0 ? bonus : 0);
-
-     // Sanctity Aura addition mod (HACK) for SoC
-    if (m_spellInfo->Id == 20424)
-    {
-        // + Sanctity Aura
-        if (m_caster->HasAura(20218))
-            m_damage *= 1.1f;
-    }
 }
 
 void Spell::EffectThreat(SpellEffectIndex eff_idx)

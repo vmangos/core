@@ -284,7 +284,7 @@ float CalculateDefaultCoefficient(SpellEntry const *spellProto, DamageEffectType
 }
 
 
-float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell)
+float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart)
 {
     if (!caster)
         return coeff;
@@ -313,6 +313,11 @@ float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caste
                     speed /= 1000.0f;
 
                     return speed * coeff;
+                }
+                // Seal of Command
+                if (spellProto->Id == 20424)
+                {
+                    return donePart ? 0.20f : 0.29f;
                 }
             }
             case SPELLFAMILY_SHAMAN:
