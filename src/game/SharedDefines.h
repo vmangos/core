@@ -1947,6 +1947,15 @@ enum SkillCategory
     SKILL_CATEGORY_PROFESSION    = 11,                      // primary professions
     SKILL_CATEGORY_GENERIC       = 12
 };
+
+// These errors are only printed in client console.
+enum TrainingFailureReason
+{
+    TRAIN_FAIL_UNAVAILABLE      = 0,                        // Trainer service %d unavailable.
+    TRAIN_FAIL_NOT_ENOUGH_MONEY = 1,                        // Not enough money for trainer service %d.
+    TRAIN_FAIL_NOT_ENOUGH_SKILL = 2                         // Not enough skill points for trainer service %d.
+};
+
 /*[-ZERO]
 enum TotemCategory
 {

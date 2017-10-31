@@ -350,6 +350,8 @@ class MANGOS_DLL_SPEC WorldSession
 
         void SendTrainerList(ObjectGuid guid);
         void SendTrainerList(ObjectGuid guid, const std::string& strTitle );
+        void SendTrainingSuccess(ObjectGuid guid, uint32 spellId);
+        void SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32 errorCode);
 
         void SendListInventory(ObjectGuid guid);
         bool CheckBanker(ObjectGuid guid);
