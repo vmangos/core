@@ -212,22 +212,16 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
     }
 
     // This function is also called when NPC runs away from player/group range.
-    void JustDied(Unit*) override
+    void JustDied(Unit*)
     {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
+        // remove slim's friend
+        if (m_slimsFriend)
         {
-            // Quest will also fail if Tapoke "Slim" Jahn ran away from player / group range.
-            Player* player = GetPlayerForEscort();
-            if (player)
-                player->GroupEventFailHappens(QUEST_MISSING_DIPLOMAT_PART11);
-
-            // remove slim's friend
-            if (m_slimsFriend)
-            {
-                static_cast<TemporarySummon*>(m_slimsFriend)->UnSummon();
-                m_slimsFriend = nullptr;
-            }
+            static_cast<TemporarySummon*>(m_slimsFriend)->UnSummon();
+            m_slimsFriend = nullptr;
         }
+        // Let escort ai do all checks for players and quests.
+        npc_escortAI::JustDied(nullptr);
     }
 
     void JustRespawned()
@@ -238,6 +232,9 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
         m_creature->SetRespawnDelay(m_respawnDelay);
         // restore faction, which usually getting restored automatically, but in rare cases it still can fail.
         m_creature->setFaction(FACTION_FRIENDLY);
+        // check to prevent a crash in case JustDied() wasn't called after the pervious event and pointer was not reset.
+        if (m_slimsFriend)
+            m_slimsFriend = nullptr;
         // "announce" that Tapoke Slim Jahn is back and event is ready to start.
         // distance between Mikhail and Tapoke "Slim" Jahn is about 16 yards, 20 used for "safety".
         Creature* npcMikhail = GetClosestCreatureWithEntry(m_creature, NPC_MIKHAIL, 20.0f);
@@ -262,26 +259,28 @@ struct npc_tapoke_slim_jahnAI : public npc_escortAI
             Player* player = GetPlayerForEscort();
             if (player)
                 player->GroupEventFailHappens(QUEST_MISSING_DIPLOMAT_PART11);
-
-            m_creature->ForcedDespawn(5000);
+            
+            // Note: JustDied() will not be called after this, but all other states will reset.
+            // Sometimes Slim's friend will not despawn automatically(if he was killed previously)
+            if (m_slimsFriend)
+            {
+                static_cast<TemporarySummon*>(m_slimsFriend)->UnSummon();
+                m_slimsFriend = nullptr;
+            }
         }break;
         }
     }
 
     void Aggro(Unit* pWho)
     {
-        if (HasEscortState(STATE_ESCORT_ESCORTING))
+        // This function is also called when Tapoke Slim Jahn has been defeated!
+        if (!m_slimsFriend)
         {
-            // This function is also called when Tapoke Slim Jahn has been defeated!
-            if (!m_slimsFriend)
-            {
-                // calls a friend
-                CanCastResult castResult = DoCastSpellIfCan(m_creature, SPELL_CALL_FRIENDS);
-                if (castResult == CAST_OK)
-                {
-                    DoScriptText(SAY_PROGRESS_1_TAP, m_creature);
-                }
-            }
+            // calls a friend
+            CanCastResult castResult = DoCastSpellIfCan(m_creature, SPELL_CALL_FRIENDS);
+            // He says this phrase only during the event
+            if (HasEscortState(STATE_ESCORT_ESCORTING) && (castResult == CAST_OK))
+                DoScriptText(SAY_PROGRESS_1_TAP, m_creature);
         }
     }
 
@@ -459,6 +458,13 @@ bool QuestAccept_npc_mikhail(Player* pPlayer, Creature* pCreature, const Quest* 
         npc_tapoke_slim_jahnAI* tapokeSlimJahnAI = dynamic_cast<npc_tapoke_slim_jahnAI*>(pSlim->AI());
         if (tapokeSlimJahnAI)
         {
+            // despawn Slim's friend if he was summoned previously(attacked by the opposite faction)
+            if (tapokeSlimJahnAI->m_slimsFriend)
+            {
+                static_cast<TemporarySummon*>(tapokeSlimJahnAI->m_slimsFriend)->UnSummon();
+                tapokeSlimJahnAI->m_slimsFriend = nullptr;
+            }
+
             // start escort
             tapokeSlimJahnAI->Start(false, pPlayer->GetGUID(), pQuest);
         }
