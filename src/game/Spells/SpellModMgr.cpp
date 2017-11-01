@@ -89,7 +89,7 @@ void SpellModMgr::LoadSpellMods()
                               "Attributes, AttributesEx, AttributesEx2, AttributesEx3, AttributesEx4, "
                               "InterruptFlags, AuraInterruptFlags, ChannelInterruptFlags, Dispel, "
                               "Stances, StancesNot, SpellVisual, ManaCostPercentage, StartRecoveryCategory, StartRecoveryTime, MaxTargetLevel, MaxAffectedTargets, DmgClass, "
-                              "rangeIndex, RecoveryTime, CategoryRecoveryTime, procCharges, SpellFamilyName, SpellFamilyFlags, Mechanic "
+                              "rangeIndex, RecoveryTime, CategoryRecoveryTime, procCharges, SpellFamilyName, SpellFamilyFlags, Mechanic, EquippedItemClass "
                               "FROM spell_mod");
     uint32 total_count = 0;
     if (!result)
@@ -198,13 +198,14 @@ void SpellModMgr::LoadSpellMods()
             ModUInt32ValueIfExplicit(fields[31], spell->CategoryRecoveryTime);
             ModUInt32ValueIfExplicit(fields[32], spell->procCharges);
 
-            // 33               34                35
-            // SpellFamilyName, SpellFamilyFlags, Mechanic
+            // 33               34                35        36
+            // SpellFamilyName, SpellFamilyFlags, Mechanic, EquippedItemClass
             ModUInt32ValueIfExplicit(fields[33], spell->SpellFamilyName);
             uint64 flags = fields[34].GetUInt64();
             if (flags)
                 spell->SpellFamilyFlags.Flags = flags;
             ModUInt32ValueIfExplicit(fields[35], spell->Mechanic);
+            ModInt32ValueIfExplicit(fields[36], spell->EquippedItemClass);
 
             spell->InitCachedValues();
             ++total_count;
