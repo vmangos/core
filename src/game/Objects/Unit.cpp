@@ -7601,8 +7601,8 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
             return bVisible;
     }
 
-    // Visible units, always are visible for all units, except for units under invisibility
-    if (m_Visibility == VISIBILITY_ON && u->m_invisibilityMask == 0)
+    // Visible units are always visible for all units
+    if (m_Visibility == VISIBILITY_ON)
         return true;
 
     // GMs see any players, not higher GMs and all units
@@ -7620,14 +7620,14 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
     // raw invisibility
     bool invisible = m_invisibilityMask != 0;
 
-    // detectable invisibility case
+    // Detectable invisibility case
     if (invisible && (
-                // Invisible units, always are visible for units under same invisibility type
-                m_invisibilityMask & u->m_invisibilityMask ||
-                // Invisible units, always are visible for unit that can detect this invisibility (have appropriate level for detect)
-                u->canDetectInvisibilityOf(this) ||
-                // Units that can detect invisibility always are visible for units that can be detected
-                canDetectInvisibilityOf(u)))
+            // Invisible units are always visible for units under same
+            // invisibility type
+            (m_invisibilityMask & u->m_invisibilityMask) ||
+            // Invisible units are always visible for units that can detect the
+            // appropriate invisibility level
+            u->canDetectInvisibilityOf(this)))
         invisible = false;
 
     // special cases for always overwrite invisibility/stealth
@@ -7721,10 +7721,7 @@ void Unit::SetVisibility(UnitVisibility x)
 
 bool Unit::canDetectInvisibilityOf(Unit const* u) const
 {
-    if (!u->m_invisibilityMask && m_detectInvisibilityMask)
-        return true;
-
-    if (const Creature* worldBoss = u->ToCreature())
+    if (const Creature* worldBoss = ToCreature())
         if (worldBoss->IsWorldBoss())
             return true;
 
