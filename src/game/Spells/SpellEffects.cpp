@@ -4754,6 +4754,12 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         unitTarget->RemoveAurasDueToSpell(28522); // Icebolt stun/damage spell
                     }
                 }
+                case 28352:									// Atiesh - Breath of Sargeras 
+                {
+                    if (unitTarget && m_caster)
+                        m_caster->CastSpell(unitTarget, 28342, true);
+                    return;
+                }
             }
             break;
         }

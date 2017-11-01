@@ -134,6 +134,7 @@ set (SCRIPTS_SRCS
 	eastern_kingdoms/eastern_plaguelands/stratholme/boss_postmaster_malown.cpp
 	eastern_kingdoms/eastern_plaguelands/stratholme/boss_ramstein_the_gorger.cpp
 	eastern_kingdoms/eastern_plaguelands/stratholme/boss_timmy_the_cruel.cpp
+	eastern_kingdoms/eastern_plaguelands/stratholme/boss_atiesh.cpp
 	eastern_kingdoms/eastern_plaguelands/stratholme/instance_stratholme.cpp
 	eastern_kingdoms/eastern_plaguelands/stratholme/stratholme.cpp
 	eastern_kingdoms/elwynn_forest/elwynn_forest.cpp
