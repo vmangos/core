@@ -857,7 +857,7 @@ namespace MaNGOS
                     return false;
 
                 // ignore totems as AoE targets
-                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem())
+                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsImmuneToAoe())
                     return false;
 
                 // check visibility only for unit-like original casters
@@ -898,7 +898,7 @@ namespace MaNGOS
                 if (!u->isTargetableForAttack())
                     return false;
 
-                if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsTotem())
+                if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsImmuneToAoe())
                     return false;
 
                 if(!u->CanSeeInWorld(i_obj))
