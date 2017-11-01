@@ -479,10 +479,41 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             m_alHeiganTrapGuids[0].push_back(pGo->GetObjectGuid());
         else if ((uiGoEntry >= 181510 && uiGoEntry <= 181516) || (uiGoEntry >= 181525 && uiGoEntry <= 181531) || uiGoEntry == 181533 || uiGoEntry == 181676)
             m_alHeiganTrapGuids[1].push_back(pGo->GetObjectGuid());
-        else if ((uiGoEntry >= 181534 && uiGoEntry <= 181544) || uiGoEntry == 181532 || uiGoEntry == 181677)
-            m_alHeiganTrapGuids[2].push_back(pGo->GetObjectGuid());
-        else if ((uiGoEntry >= 181545 && uiGoEntry <= 181552) || uiGoEntry == 181695)
-            m_alHeiganTrapGuids[3].push_back(pGo->GetObjectGuid());
+		else if ((uiGoEntry >= 181534 && uiGoEntry <= 181544) || uiGoEntry == 181532 || uiGoEntry == 181677)
+		{
+			m_alHeiganTrapGuids[2].push_back(pGo->GetObjectGuid());
+		}
+		else if (uiGoEntry >= 181545 && uiGoEntry <= 181552)
+		{
+			if(pGo->GetDBTableGUIDLow() != 533119 && pGo->GetDBTableGUIDLow() != 533123) // duplicates
+				m_alHeiganTrapGuids[3].push_back(pGo->GetObjectGuid());
+		}
+		switch (pGo->GetDBTableGUIDLow())
+		{
+			case 533181:
+			case 533182:
+			case 533183:
+			case 533184:
+			case 533187:
+			case 533188:
+			case 533189:
+			case 533190:
+			case 533191:
+			case 533192:
+			case 533193:
+			case 533194:
+			case 533195:
+			case 533197:
+			case 533199:
+			case 533200:
+				m_alHeiganTrapGuids[3].push_back(pGo->GetObjectGuid());
+				break;
+			case 533185:
+			case 533196:
+			case 533198:
+				m_alHeiganTrapGuids[2].push_back(pGo->GetObjectGuid());
+			///case 533186:
+		}
     }
 
     switch (pGo->GetEntry())
