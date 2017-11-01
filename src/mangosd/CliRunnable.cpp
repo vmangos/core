@@ -37,6 +37,8 @@
 #include "Player.h"
 #include "Chat.h"
 
+#include <iterator>
+
 void utf8print(void* arg, const char* str)
 {
 #if PLATFORM == PLATFORM_WINDOWS
