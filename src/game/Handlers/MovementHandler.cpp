@@ -424,7 +424,17 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    if (_player->GetMover()->GetObjectGuid() != guid)
+    if (!_player)
+    {
+        // Player disconnected before this opcode was received, likely kicked
+        // or invalid packet due to ModPossess disconnect
+        sLog.outError("HandleSetActiveMoverOpcode: received packet for null player, new mover: %s",
+            guid.GetString().c_str());
+
+        return;
+    }
+
+    if (_player->GetMover() && _player->GetMover()->GetObjectGuid() != guid)
     {
         sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
                       _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());
@@ -433,7 +443,9 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     }
 
     // mover swap after Eyes of the Beast, PetAI::UpdateAI handle the pet's return
-    if (_player->GetPetGuid() == _clientMoverGuid)
+    // Check if we actually have a pet before looking up
+    if (_player->GetPetGuid() && _player->GetPetGuid() == _clientMoverGuid)
+    {
         if (Pet* pet = _player->GetPet())
         {
             pet->clearUnitState(UNIT_STAT_CONTROLLED);
@@ -442,6 +454,7 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
             if (!pet->IsWithinDistInMap(_player, pet->GetMap()->GetGridActivationDistance()))
                 _player->RemovePet(PET_SAVE_REAGENTS);
         }
+    }
 
     _clientMoverGuid = guid;
 }
