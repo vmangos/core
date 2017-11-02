@@ -401,11 +401,11 @@ WowPatch = 0
 
 LogSQL = 1
 PidFile = ""
-LogLevel = 3
+LogLevel = 1
 LogTime = 0
 LogFile = "Server.log"
 LogTimestamp = 0
-LogFileLevel = 0
+LogFileLevel = 1
 LogFilter_TransportMoves = 1
 LogFilter_CreatureMoves = 1
 LogFilter_VisibilityChanges = 1
@@ -807,7 +807,7 @@ Event.Announce = 0
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
-Motd = "Welcome to Elysium Project!"
+Motd = "Welcome to Light's Hope!"
 
 ###################################################################################################################
 # PLAYER INTERACTION
@@ -1720,8 +1720,8 @@ MapUpdate.VisibilityUpdate.MaxThreads   = 4
 MapUpdate.VisibilityUpdate.Timeout      = 100
 
 # Hardcode multithreading options
-MapUpdate.UpdatePacketsDiff             = 0
-MapUpdate.UpdatePlayersDiff             = 0
+MapUpdate.UpdatePacketsDiff             = 100
+MapUpdate.UpdatePlayersDiff             = 100
 MapUpdate.UpdateCellsDiff               = 100
 
 # Parallelized execution of cells from same map
@@ -1736,8 +1736,8 @@ AsyncTasks.Threads                      = 1
 
 # Recommended value: 1. Else, can cause crashes if 'MapUpdate.Threads' > 1 (one map loads a tile, while the other uses pathfinding etc ...)
 # Disable on dev realms (speedup startup by 90%)
-Terrain.Preload.Continents = 1
-Terrain.Preload.Instances  = 1
+Terrain.Preload.Continents = 0
+Terrain.Preload.Instances  = 0
 
 AsyncQueriesTickTimeout = 0
 
