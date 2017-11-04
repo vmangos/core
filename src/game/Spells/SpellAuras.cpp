@@ -2305,6 +2305,12 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
 
             break;
         }
+        case FORM_BERSERKERSTANCE:
+        {
+            // do nothing when removing Nefarian warrior call
+            if (!apply && GetSpellProto()->Id == 23397)
+                return;
+        }
         default:
             break;
     }
