@@ -1024,6 +1024,32 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
                 if (group_tap->GetLooterGuid())
                 {
                     looter = ObjectAccessor::FindPlayer(group_tap->GetLooterGuid());
+
+                    // Master looter offline or on loading screen
+                    if (!looter && group_tap->GetLootMethod() == MASTER_LOOT)
+                    {
+                        // give master looter to the leader / assistants if possible, otherwise switch to group loot
+                        for (Group::member_citerator itr = group_tap->GetMemberSlots().begin(); itr != group_tap->GetMemberSlots().end(); ++itr)
+                        {
+                            if (itr->guid != group_tap->GetLooterGuid() && (itr->guid == group_tap->GetLeaderGuid() || itr->assistant))
+                                if (looter = ObjectAccessor::FindPlayer(itr->guid))
+                                    break;
+                        }
+
+                        if (!looter)
+                        {
+                            group_tap->SetLootMethod(GROUP_LOOT);
+                            group_tap->SetLootThreshold(ITEM_QUALITY_UNCOMMON);
+                            group_tap->UpdateLooterGuid(creature);
+                            looter = ObjectAccessor::FindPlayer(group_tap->GetLooterGuid());
+                        }
+                        else
+                        {
+                            group_tap->SetLooterGuid(looter->GetGUID());
+                            group_tap->SendUpdate();
+                        }
+                    }
+                    
                     if (looter)
                     {
                         creature->SetLootRecipient(looter);   // update creature loot recipient to the allowed looter.
