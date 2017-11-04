@@ -4677,6 +4677,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
         sLog.outInfo("[Crash/Auras] Removing aura holder *not* in holders map ! Aura %u on %s", holder->GetId(), GetName());
     holder->SetRemoveMode(mode);
     holder->UnregisterSingleCastHolder();
+    holder->HandleCastOnAuraRemoval();
 
     for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
@@ -4704,21 +4705,6 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
     else
         delete holder;
 
-    uint32 uiTriggeredSpell = 0;
-
-    // Spell that trigger another spell on dispell
-    if (mode == AURA_REMOVE_BY_DISPEL)
-    {
-        switch (auraSpellId)
-        {
-        case 26180:    // Wyvern Sting (AQ40, Princess Huhuran)
-            uiTriggeredSpell = 26233;
-            break;
-        default:
-            break;
-        }
-    }
-
     if (isChanneled && caster)
     {
         Spell *channeled = caster->GetCurrentSpell(CURRENT_CHANNELED_SPELL);
@@ -4731,14 +4717,6 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
             else
                 channeled->RemoveChanneledAuraHolder(holder, mode);
         }
-    }
-
-    if (uiTriggeredSpell)
-    {
-        if (caster)
-            caster->CastSpell(this, uiTriggeredSpell, true);
-        else
-            CastSpell(this, uiTriggeredSpell, true);
     }
 }
 

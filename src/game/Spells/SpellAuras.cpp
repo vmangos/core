@@ -6450,6 +6450,39 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
     SetInUse(false);
 }
 
+void SpellAuraHolder::HandleCastOnAuraRemoval() const
+{
+    uint32 uiTriggeredSpell = 0;
+    AuraRemoveMode mode = GetRemoveMode();
+
+    switch (GetId())
+    {
+        case 26180:
+        {
+            if (mode == AURA_REMOVE_BY_DISPEL)
+                uiTriggeredSpell = 26233;        // Wyvern Sting (AQ40, Princess Huhuran)
+            break;
+        }
+        case 24002:
+        case 24003:
+        {
+            if (mode == AURA_REMOVE_BY_EXPIRE)
+                uiTriggeredSpell = 24004;        // Tranquilizing Poison (ZG, Razzashi Serpent)
+            break;
+        }
+        default:
+            return;
+    }
+
+    if (uiTriggeredSpell)
+    {
+        if (Unit* caster = GetCaster())
+            caster->CastSpell(GetTarget(), uiTriggeredSpell, true);
+        else
+            GetTarget()->CastSpell(GetTarget(), uiTriggeredSpell, true);
+    }
+}
+
 void Aura::HandleAuraSafeFall(bool Apply, bool Real)
 {
     // implemented in WorldSession::HandleMovementOpcodes
