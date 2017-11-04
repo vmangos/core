@@ -1,7 +1,7 @@
-[![Build Status](https://travis-ci.org/elysium-project/server.svg?branch=development)](https://travis-ci.org/elysium-project/server)
+[![Build Status](https://travis-ci.org/LightsHope/server.svg?branch=development)](https://travis-ci.org/LightsHope/server)
 
 # Bug reporting:
-Before opening any bug reports on the issue tracker, please read the guidelines [located here](https://github.com/elysium-project/server/blob/development/docs/).
+Before opening any bug reports on the issue tracker, please read the guidelines [located here](https://github.com/LightsHope/server/blob/development/docs/).
 
 # Development process overview:
 Any development work should be done in local feature branches rather than on the main branches used for QA/live builds. For example, if you were working on a boss script, rather than committing directly to the development branch, you should first create a new branch with a descriptive name.

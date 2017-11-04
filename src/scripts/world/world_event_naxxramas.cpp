@@ -1,119 +1,27 @@
 /*
-Script NOSTALRIUS - World event Naxxramas
-Tout ce qui concerne les pop exterieurs de necropoles.
-*/
+ * Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+ * Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
+ * Copyright (C) 2011-2016 Nostalrius <https://nostalrius.org>
+ * Copyright (C) 2016-2017 Elysium Project <https://github.com/elysium-project>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+ */
 
 #include "scriptPCH.h"
+#include "world_event_naxxramas.h"
 
-//#define DEBUG_WORLD_EVENT
-
-enum
-{
-    /** SPELLS */
-    SPELL_COMMUNICATION_NAXXRAMAS       = 28395, // Periodically triggers SPELL_COMMUNICATION_TRIGGER
-    SPELL_COMMUNICATION_TRIGGER         = 28373, // Send visual on all nearby targets
-    SPELL_DUMMY_PYLON                   = 28351, // [Communication Camp-Relais, Mort]. Effect DUMMY
-    SPELL_DAMAGE_PYLON                  = 28032, // [Zapper Cristal]. 15 de degats.
-    SPELL_COM_RECEPTION                 = 28449, // [Camp reçoit communication]. Effect DUMMY.
-    SPELL_ENGINEER_REPAIR               = 28078,
-    SPELL_PURPLE_VISUAL                 = 28126,
-
-    // Unused ?
-    SPELL_SUMMON_CRYSTAL                = 28344,
-    SPELL_SUMMON_BROKEN_CRYSTAL         = 28424,
-    SPELL_SUMMON_NAXXRAMAS_GHOST        = 28389,
-    SPELL_VISUAL_VOILE_TENEBRES         = 28350,
-
-    // Sorts des trashs
-    SPELL_ENRAGE                        = 8599,
-    SPELL_CONTAGION_OF_ROT              = 7102,
-    SPELL_SUNDER_ARMOR                  = 11971,
-    SPELL_DEMORALIZING_SHOUT            = 27579,
-    SPELL_BONE_SHARDS                   = 17014,
-    SPELL_CLEAVE                        = 15496,
-    SPELL_SHADOW_WORD_PAIN              = 589,
-
-    SPELL_CREATE_INF_MARK               = 28319,
-    SPELL_CREATE_MARK                   = 28320,
-    SPELL_CREATE_SUP_MARK               = 28321,
-
-    SPELL_DMG_BOOST_AT_PYLON_DEATH      = 28681,
-
-    /** NPC */
-    NPC_PYLON_ENTRY                     = 16136,
-    NPC_DAMAGED_PYLON                   = 16172,
-    NPC_CULTIST_ENGINEER                = 16230,
-    NPC_SHADOW_DOOM                     = 16143,
-    NPC_NECROPOLIS_RELAY                = 16386,
-
-    NPC_SKELETAL_SHOCKTROOPER           = 16299,
-    NPC_GHOUL_BERSERKER                 = 16141,
-    NPC_SPECTRAL_SOLDIER                = 16298,
-
-    NPC_PYLON_RARE_1                    = 16379, // TODO
-    NPC_PYLON_RARE_2                    = 16380,
-    NPC_PYLON_RARE_3                    = 14697,
-
-    NPC_ARGENT_DAWN_REW_GIVER_1H        = 16384,
-    NPC_ARGENT_DAWN_REW_GIVER_2H        = 16435,
-    NPC_ARGENT_DAWN_REW_GIVER_3H        = 16436,
-    NPC_ARGENT_DAWN_REW_GIVER_1A        = 16395,
-    NPC_ARGENT_DAWN_REW_GIVER_2A        = 16433,
-    NPC_ARGENT_DAWN_REW_GIVER_3A        = 16434,
-
-    /** OTHER */
-    ITEM_NECROTIC_RUNE                  = 22484,
-
-    GOBJ_SUMMON_CIRCLE                  = 181227,
-    GOBJ_NECROPOLIS                     = 181223,
-    MODELID_PYLON_RESET                 = 16135,
-    MODELID_PYLON_DAMAGED               = 16136,
-
-    FACTIONID_GHOULS                    = 38,
-    FACTIONID_FRIENDLY                  = 35,
-
-    ENGINEER_MOD_HEALTH_PER_SEC         = 15,
-
-#ifdef DEBUG_WORLD_EVENT
-    NECROPOLIS_RESPAWN_TIME             = 60 * 5, // 5 min
-    NECROPOLIS_ATTACK_TIMER             = 10,
-    DELAY_ELITE_RESPAWN                 = 10,
-#else
-    NECROPOLIS_RESPAWN_TIME             = 4 * 24 * 60 * 60, // 4j
-    // Le changement de zone prend 4h
-    NECROPOLIS_ATTACK_TIMER             = 4 * 60 * 60,
-    DELAY_ELITE_RESPAWN                 = 1 * 60 * 60, // 1heure
-#endif
-    LANG_CULTIST_ENGINEER_OPTION        = NOST_TEXT(120),
-    LANG_SURE_OPTION                    = NOST_TEXT(121),
-    LANG_VICTORIES_COUNT_OPTION         = NOST_TEXT(127),
-    LANG_TANARIS_ATTACKED_OPTION        = NOST_TEXT(128),
-    LANG_AZSHARA_ATTACKED_OPTION        = NOST_TEXT(129),
-    LANG_EP_ATTACKED_OPTION             = NOST_TEXT(130),
-    LANG_WINTERSPRING_ATTACKED_OPTION   = NOST_TEXT(131),
-    LANG_BL_ATTACKED_OPTION             = NOST_TEXT(132),
-    LANG_BS_ATTACKED_OPTION             = NOST_TEXT(133),
-    LANG_NO_ATTACK_OPTION               = NOST_TEXT(134),
-
-    LANG_CULTIST_ENGINEER_MENU          = 20100,
-    LANG_ARGENT_DAWN_GOSSIP             = 20101,
-    LANG_ARGENT_EMISSARY_GOSSIP         = 20102,
-
-    ZONEID_TANARIS                      = 440,
-    ZONEID_AZSHARA                      = 16,
-    ZONEID_EASTERN_PLAGUELANDS          = 139,
-    ZONEID_WINTERSPRING                 = 618,
-    ZONEID_BLASTED_LANDS                = 4,
-    ZONEID_BURNING_STEPPES              = 46,
-};
-
-enum
-{
-    ENGINEER_AI_ACTION_SET_PYLON,
-    ENGINEER_AI_ACTION_ATTACK_START,
-};
-
-/******************/
 bool IsPermanent(uint32 zone)
 {
     switch (zone)
@@ -125,89 +33,14 @@ bool IsPermanent(uint32 zone)
         case ZONEID_BLASTED_LANDS:
         case ZONEID_BURNING_STEPPES:
             return false;
-        /*case 14:    // Durotar
-        case 85:    // Clairieres de Tirisfal
-        case 215:   // Mulgore
-        case 141:   // Teldrassil*/
         default:
             return true;
     }
 }
-class NecropolisRelatedObject
-{
-public:
-    NecropolisRelatedObject(WorldObject* me)
-    {
-        _zone = me->GetZoneId();
-        if (IsPermanent(_zone))
-            _zone = 0;
-        _enabledNow = true;
-    }
-    virtual ~NecropolisRelatedObject() {}
-    bool IsZoneEnabled() const
-    {
-        return _enabledNow;
-    }
-    virtual void Enable() = 0;
-    virtual void Disable() = 0;
-    void Update()
-    {
-        if (!_zone)
-            return;
-        bool nowStatus = false;
-        time_t now = time(NULL);
-        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1) == _zone && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < now)
-            nowStatus = true;
-        else if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2) == _zone && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < now)
-            nowStatus = true;
-
-        if (!nowStatus && _enabledNow)
-        {
-            Disable();
-            _enabledNow = false;
-        }
-        if (nowStatus && !_enabledNow)
-        {
-            Enable();
-            _enabledNow = true;
-        }
-    }
-    void ChangeAttackZone()
-    {
-        // Deplacement de la necropole
-        uint32 zone1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
-        uint32 zone2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
-        std::vector<uint32> possibleZones;
-        if (zone1 != ZONEID_TANARIS && zone2 != ZONEID_TANARIS)
-            possibleZones.push_back(ZONEID_TANARIS);
-        if (zone1 != ZONEID_AZSHARA && zone2 != ZONEID_AZSHARA)
-            possibleZones.push_back(ZONEID_AZSHARA);
-        if (zone1 != ZONEID_EASTERN_PLAGUELANDS && zone2 != ZONEID_EASTERN_PLAGUELANDS)
-            possibleZones.push_back(ZONEID_EASTERN_PLAGUELANDS);
-        if (zone1 != ZONEID_BLASTED_LANDS && zone2 != ZONEID_BLASTED_LANDS)
-            possibleZones.push_back(ZONEID_BLASTED_LANDS);
-        if (zone1 != ZONEID_BURNING_STEPPES && zone2 != ZONEID_BURNING_STEPPES)
-            possibleZones.push_back(ZONEID_BURNING_STEPPES);
-        if (zone1 != ZONEID_WINTERSPRING && zone2 != ZONEID_WINTERSPRING)
-            possibleZones.push_back(ZONEID_WINTERSPRING);
-        uint32 newZone = possibleZones[urand(0, possibleZones.size() - 1)];
-        if (zone1 == _zone)
-        {
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, newZone, true);
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL) + NECROPOLIS_RESPAWN_TIME, true);
-        }
-        else if (zone2 == _zone)
-        {
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, newZone, true);
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL) + NECROPOLIS_RESPAWN_TIME, true);
-        }
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT) + 1, true);
-    }
-    uint32 _zone;
-    bool   _enabledNow;
-};
-
-// Pour transmettre la communication plus loin
+/*
+Necropolis Proxy
+Notes: For communiation between necropolis and the shard
+*/
 struct NecropolisProxyAI : public ScriptedAI
 {
     NecropolisProxyAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -229,11 +62,13 @@ struct NecropolisProxyAI : public ScriptedAI
     {
         _necropolisGuid = necropolis;
     }
+
     void SpellHit(Unit* caster, const SpellEntry* spell)
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && caster != m_creature)
             DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_TRIGGER);
     }
+
     void SpellHitTarget(Unit* target, const SpellEntry* spell)
     {
         if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
@@ -251,154 +86,130 @@ CreatureAI* GetAI_NecropolisProxy(Creature* pCreature)
     return new NecropolisProxyAI(pCreature);
 }
 
-class naxx_go_necropolis : public GameObjectAI, public NecropolisRelatedObject
+/*
+Necropolis Relay
+Notes: For communiation between necropolis and the shard
+*/
+struct NecropolisRelayAI : public ScriptedAI
 {
-public:
-    naxx_go_necropolis(GameObject* go) : GameObjectAI(go), NecropolisRelatedObject(go)
+    NecropolisRelayAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        _checkPylonsTimer = 1000;
-        _animationTimer = 1000;
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
+        Reset();
+        despawnTimer = 0;
     }
 
-    std::set<ObjectGuid> _pylons;
-    std::vector<ObjectGuid> _necropolisList;
-    uint32 _checkPylonsTimer;
-    uint32 _animationTimer;
+    uint32 despawnTimer;
 
-    bool ZoneNecropolisDestroyed()
+    uint32     _checkStatusTimer;
+    ObjectGuid _necropolisGuid;
+    std::vector<ObjectGuid> SpawnedShards;
+
+    void Reset()
     {
-        for (std::vector<ObjectGuid>::iterator it = _necropolisList.begin(); it != _necropolisList.end(); ++it)
-        {
-            GameObject* necropolis = me->GetMap()->GetGameObject(*it);
-            if (!necropolis)
-                continue;
-            if (necropolis->GetZoneId() != _zone)
-            {
-                _necropolisList.erase(it);
-                return false;
-            }
-            if (necropolis->isSpawned())
-                return false;
-        }
-        return true;
+        m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
     }
-    // Necropoles visibles de l'infini
-    void UpdateVisibility(bool visible)
+
+    void JustSummoned(GameObject* pGobj) override
     {
-        Map::PlayerList const& list = me->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator it = list.begin(); it != list.end(); ++it)
+        _necropolisGuid = pGobj->GetObjectGuid();
+    }
+    
+    void JustSummoned(Creature* pCreature) override
+    {
+        SpawnedShards.push_back(pCreature->GetObjectGuid());
+    }
+    void SpellHitTarget(Unit* target, const SpellEntry* spell)
+    {
+        if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
         {
-            Player* player = it->getSource();
-            if (visible)
-            {
-                UpdateData data;
-                me->BuildCreateUpdateBlockForPlayer(&data, player);
-                WorldPacket packet;
-                data.BuildPacket(&packet, false);
-                player->GetSession()->SendPacket(&packet);
-            }
-            else if (!visible)
-                me->DestroyForPlayer(player);
+            if (Creature* crea = target->ToCreature())
+                crea->AI()->InformGuid(_necropolisGuid);
         }
     }
-    void Enable()
+    
+    void SpellHit(Unit* caster, const SpellEntry* spell) override
     {
-        me->Respawn();
-        me->SetVisible(true);
-        _animationTimer = 1000;
-        _checkPylonsTimer = 5000; // On laisse 5sec pour que les pylones spawn
-        sLog.outInfo("[NAXX] Necropolis %u zone %u enabled", me->GetGUIDLow(), _zone);
-    }
-
-    void Disable()
-    {
-        me->SetVisible(false);
-        UpdateVisibility(false);
-        sLog.outInfo("[NAXX] Necropolis %u zone %u disabled", me->GetGUIDLow(), _zone);
-    }
-
-    bool OnUse(Unit* pylon)
-    {
-        _pylons.insert(pylon->GetObjectGuid());
-        return false;
-    }
-
-    bool AllPylonsDead()
-    {
-        if (!_pylons.size())
-            return false;
-        for (std::set<ObjectGuid>::const_iterator it = _pylons.begin(); it != _pylons.end(); ++it)
-            if (Creature* pylon = me->GetMap()->GetCreature(*it))
-                if (pylon->isAlive())
-                    return false;
-        return true;
-    }
-    void SetPylonsRespawnTime(uint32 time)
-    {
-        for (std::set<ObjectGuid>::const_iterator it = _pylons.begin(); it != _pylons.end(); ++it)
-            if (Creature* pylon = me->GetMap()->GetCreature(*it))
+        if (spell->Id == SPELL_COMMUNICATION_CAMP_RELAY)
+        {
+            auto it = std::find(SpawnedShards.begin(), SpawnedShards.end(), caster->GetObjectGuid());
+            if (it != SpawnedShards.end())
             {
-                pylon->DoKillUnit(); // Normalement c'est deja fait. on sait jamais.
-                pylon->RemoveCorpse(); // Pour que le cooldown de respawn soit bien synchro avec la necropole
-                pylon->SetRespawnTime(time);
-                pylon->SaveRespawnTime();
-            }
-    }
-    void UpdateAI(const uint32 diff)
-    {
-        NecropolisRelatedObject::Update();
-        if (!IsZoneEnabled())
-            return;
-        if (!me->isSpawned())
-        {
-            if (ZoneNecropolisDestroyed())
-                ChangeAttackZone();
-            return;
-        }
-
-        if (_animationTimer < diff)
-        {
-            // Petite animation pour redevenir visible
-            UpdateVisibility(true);
-            me->SendGameObjectCustomAnim(me->GetObjectGuid());
-            // Je m'identifie aupres du relay (pour qu'il transmette mon GUID jusqu'aux pylones)
-            if (Creature* crea = me->FindNearestCreature(NPC_NECROPOLIS_RELAY, 100.0f))
-                crea->AI()->InformGuid(me->GetObjectGuid());
-            _animationTimer = urand(20000, 30000);
-        }
-        else
-            _animationTimer -= diff;
-
-        if (_checkPylonsTimer < diff)
-        {
-            if (AllPylonsDead())
-            {
-                me->SendObjectDeSpawnAnim(me->GetObjectGuid());
-                me->SetRespawnTime(NECROPOLIS_RESPAWN_TIME);
-                me->SaveRespawnTime();
-                SetPylonsRespawnTime(NECROPOLIS_RESPAWN_TIME - 20); // Si les pylones resp apres, la necropole va despawn instant.
-                _animationTimer = 1000;
+                SpawnedShards.erase(it);
+                if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
+                {
+                    if (SpawnedShards.empty())
+                    {
+                        despawnTimer = 20000;
+                        necropolis->SendObjectDeSpawnAnim(necropolis->GetObjectGuid());
+                    }
+                    else
+                        necropolis->SendGameObjectCustomAnim();
+                }
             }
         }
-        else
-            _checkPylonsTimer -= diff;
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (despawnTimer)
+        {
+            if (despawnTimer <= uiDiff)
+            {
+                if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
+                    necropolis->Delete();
+                
+                me->DeleteLater();
+                despawnTimer = 0;
+            }
+            else
+                despawnTimer -= uiDiff;
+        }
     }
 };
 
-GameObjectAI* GetAI_naxx_go_necropolis(GameObject* go)
+CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
 {
-    return new naxx_go_necropolis(go);
+    return new NecropolisRelayAI(pCreature);
 }
 
-//#########"
+/*
+Necropolis
+*/
 
-struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
+class go_necropolis : public GameObjectAI
 {
-    NecropolisPylonAI(Creature* creature) : ScriptedAI(creature), NecropolisRelatedObject(creature)
+public:
+    go_necropolis(GameObject* go) : GameObjectAI(go)
     {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
+    }
+    void UpdateAI(const uint32 diff)
+    {
+    }
+};
+
+GameObjectAI* GetAI_go_necropolis(GameObject* go)
+{
+    return new go_necropolis(go);
+}
+
+/*
+Necrotic Shard
+*/
+struct npc_necrotic_shard : public ScriptedAI
+{
+    npc_necrotic_shard(Creature* creature) : ScriptedAI(creature)
+    {
+        me->SetActiveObjectState(true);
+        me->SetVisibilityModifier(3000.0f);
+
         creature->SetHealth(creature->GetMaxHealth());
         SetCombatMovement(false);
-        switch (creature->GetGUIDLow() % 3)
+
+        switch (urand(0,2))
         {
             case 0:
                 _spawnEntry1 = NPC_SKELETAL_SHOCKTROOPER;
@@ -413,37 +224,26 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
                 _spawnEntry2 = NPC_SPECTRAL_SOLDIER;
                 break;
         }
+
         SpawnAdds();
         Reset();
-        _checkSpecialAddTimer = urand(1000, 5000);
+        
+        eliteSpawnTimer = urand(ELITE_SPAWN_MINIMUM, ELITE_SPAWN_MAXIMUM);
+        if(m_creature->isAlive())
+            me->SetVisibility(VISIBILITY_ON);
     }
 
     ObjectGuid _necropolisGuid;
     uint32 _spawnEntry1;
     uint32 _spawnEntry2;
-    uint32 _checkSpecialAddTimer;
+    uint32 eliteSpawnTimer;
     std::set<ObjectGuid> _adds;
 
-    void Enable()
-    {
-        me->Respawn();
-        me->SetVisibility(VISIBILITY_ON);
-        JustRespawned();
-    }
-    void Disable()
-    {
-        me->SetVisibility(VISIBILITY_RESPAWN);
-        JustDied(NULL);
-        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) == m_creature->GetGUIDLow())
-        {
-            sLog.outInfo("[NAXX] Elite despawned by pylon disable");
-            sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0, true);
-        }
-    }
     void OnRemoveFromWorld()
     {
         DespawnAdds();
     }
+
     void DespawnAdds()
     {
         for (std::set<ObjectGuid>::iterator it = _adds.begin(); it != _adds.end(); ++it)
@@ -451,10 +251,12 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
                 add->AddObjectToRemoveList();
         _adds.clear();
     }
+
     uint32 GenerateAddEntry()
     {
         return urand(0, 1) ? _spawnEntry1 : _spawnEntry2;
     }
+
     void SpawnAdds()
     {
         for (int i = 0; i < 30; ++i)
@@ -468,26 +270,11 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
             m_creature->UpdateGroundPositionZ(x, y, z);
             if (Creature* add = m_creature->SummonCreature(GenerateAddEntry(), x, y, z, 0.0f, TEMPSUMMON_MANUAL_DESPAWN))
             {
-                add->SetRespawnTime(30);
+                add->SetCorpseDelay(120);  // 2 min for corpse to despawn
+                add->SetRespawnDelay(30); // 30 sec to respawn after despawn(?)
+                add->SetRespawnRadius(20.0f);
                 _adds.insert(add->GetObjectGuid());
             }
-        }
-        SpawnSpecialAdd();
-    }
-    void SpawnSpecialAdd()
-    {
-        if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME) < time(NULL) && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) == m_creature->GetGUIDLow())
-        {
-            float a = rand_norm_f() * 2 * M_PI;
-            float d = urand(10, 30);
-            float x, y, z;
-            m_creature->GetPosition(x, y, z);
-            x += d * cos(a);
-            y += d * sin(a);
-            m_creature->UpdateGroundPositionZ(x, y, z);
-            Creature* c = m_creature->SummonCreature(sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_ID), x, y, z, 0.0f, TEMPSUMMON_DEAD_DESPAWN);
-            if (c)
-                _adds.insert(c->GetObjectGuid());
         }
     }
 
@@ -501,37 +288,47 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
 
     void AttackStart(Unit* who)
     {
-        // Empeche de bouger et entrer en combat
-    }
-    void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
-    {
-        _necropolisGuid = necropolis;
-        if (GameObject* gobjNecropolis = m_creature->GetMap()->GetGameObject(necropolis))
-            gobjNecropolis->AI()->OnUse(m_creature);
     }
 
+    void SummonedCreatureJustDied(Creature* unit) override {
+        //switch (unit->GetEntry())
+        //{
+        //case NPC_SKELETAL_SHOCKTROOPER:
+        //case NPC_SPECTRAL_SOLDIER:
+        //case NPC_GHOUL_BERSERKER:
+        //    //unit->SetRespawnTime(150);
+        //    break;
+        //}
+    }
     void JustRespawned()
     {
-        m_creature->UpdateEntry(NPC_PYLON_ENTRY);
-        SpawnAdds(); // Pour spawn les adds
+        m_creature->UpdateEntry(NPC_NECROTIC_SHARD);
     }
+
     void JustDied(Unit* pKiller)
     {
         if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
-            necropolis->SendGameObjectCustomAnim(necropolis->GetObjectGuid());
+            necropolis->SendGameObjectCustomAnim();
+        // buff players around 
+        DoCastSpellIfCan(m_creature, SPELL_DMG_BOOST_AT_PYLON_DEATH, CAST_TRIGGERED);
+
+        // send death to relay
+        DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_CAMP_RELAY, CAST_TRIGGERED);
         DespawnAdds();
     }
+
     void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
     {
-        if (pSpell->Id == SPELL_COMMUNICATION_TRIGGER || pSpell->Id == SPELL_DAMAGE_PYLON)
-            DoCastSpellIfCan(m_creature, SPELL_COM_RECEPTION);
+        if (pSpell->Id == SPELL_COMMUNICATION_TRIGGER || pSpell->Id == SPELL_ZAP_CRYSTAL)
+            DoCastSpellIfCan(m_creature, SPELL_CAMP_RECEIVES_COMMUNIQUE);
     }
+
     void DamageTaken(Unit* doneBy, uint32& damage)
     {
         if (m_creature->GetHealth() < damage + 1)
         {
             damage = 0;
-            if (m_creature->GetEntry() == NPC_DAMAGED_PYLON)
+            if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD)
                 return;
 
             m_creature->AddAura(SPELL_VISUAL_VOILE_TENEBRES, ADD_AURA_PASSIVE | ADD_AURA_PERMANENT);
@@ -549,54 +346,57 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
                                              TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1000 * m_creature->GetMaxHealth() / ENGINEER_MOD_HEALTH_PER_SEC))
                         engineer->AI()->DoAction(m_creature, ENGINEER_AI_ACTION_SET_PYLON);
                 }
-            m_creature->UpdateEntry(NPC_DAMAGED_PYLON);
+            m_creature->UpdateEntry(NPC_DAMAGED_NECROTIC_SHARD);
         }
     }
 
+    void HealedBy(Unit* pHealer, uint32& uiAmountHealed) override
+    {
+        if (pHealer->GetEntry() != 16230)
+            uiAmountHealed = 0;
+    }
 
     void UpdateAI(const uint32 diff)
     {
-        NecropolisRelatedObject::Update();
-        if (!IsZoneEnabled())
-            return;
-
-        if (_checkSpecialAddTimer < diff)
+        if (eliteSpawnTimer < diff)
         {
-            if (!sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_PYLON) && sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME) < time(NULL))
-            {
                 uint32 entry = 0;
                 switch (urand(0, 2))
                 {
                     case 0:
-                        entry = NPC_PYLON_RARE_1;
+                        entry = NPC_SPIRIT_OF_THE_DAMNED;
                         break;
                     case 1:
-                        entry = NPC_PYLON_RARE_2;
+                        entry = NPC_BONE_WITCH;
                         break;
                     case 2:
-                        entry = NPC_PYLON_RARE_3;
+                        entry = NPC_LUMBERING_HORROR;
                         break;
                 }
-                sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_ID, entry, true);
-                sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, m_creature->GetGUIDLow(), true);
-                SpawnSpecialAdd();
-            }
-            _checkSpecialAddTimer = urand(1000, 5000);
+                float a = rand_norm_f() * 2 * M_PI;
+                float d = urand(10, 30);
+                float x, y, z;
+                m_creature->GetPosition(x, y, z);
+                x += d * cos(a);
+                y += d * sin(a);
+                m_creature->UpdateGroundPositionZ(x, y, z);
+                m_creature->SummonCreature(entry, x, y, z, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, ELITE_DESPAWN);
+
+                eliteSpawnTimer = ELITE_DESPAWN + urand(ELITE_SPAWN_MINIMUM,ELITE_SPAWN_MAXIMUM);
         }
         else
-            _checkSpecialAddTimer -= diff;
+            eliteSpawnTimer -= diff;
 
-        if (m_creature->GetEntry() == NPC_DAMAGED_PYLON && m_creature->GetHealth() == m_creature->GetMaxHealth())
+        if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD && m_creature->GetHealth() == m_creature->GetMaxHealth())
         {
-            m_creature->UpdateEntry(NPC_PYLON_ENTRY);
+            m_creature->UpdateEntry(NPC_NECROTIC_SHARD);
             m_creature->RemoveAurasDueToSpell(SPELL_VISUAL_VOILE_TENEBRES);
         }
 
-        /* If all 4 Cultists Engineers died or their transformation into Shadow of Doom died too,
-           damaged pylon is destroyed */
-        if (m_creature->GetEntry() == NPC_DAMAGED_PYLON &&
+        /* If all 4 Cultists Engineers died or their transformation into Shadow of Doom died too, damaged shard is destroyed */
+        if (m_creature->GetEntry() == NPC_DAMAGED_NECROTIC_SHARD &&
                 !m_creature->FindNearestCreature(NPC_CULTIST_ENGINEER, 100.0f, true) &&
-                !m_creature->FindNearestCreature(NPC_SHADOW_DOOM, 100.0f, true))
+                !m_creature->FindNearestCreature(NPC_SHADOW_OF_DOOM, 100.0f, true))
         {
             m_creature->CastSpell(m_creature, SPELL_DMG_BOOST_AT_PYLON_DEATH, true);
             m_creature->DoKillUnit();
@@ -604,80 +404,23 @@ struct NecropolisPylonAI : public ScriptedAI, public NecropolisRelatedObject
     }
 };
 
-CreatureAI* GetAI_NecropolisPylon(Creature* pCreature)
+CreatureAI* GetAI_necrotic_shard(Creature* pCreature)
 {
-    return new NecropolisPylonAI(pCreature);
+    return new npc_necrotic_shard(pCreature);
 }
 
-enum
+/*
+npc_cultist_engineer
+*/
+struct npc_cultist_engineer : public ScriptedAI
 {
-    SPELL_FEAR          =   27990,
-    SPELL_MINDFLAY      =   22919,
-};
-
-/*****************/
-struct ShadowOfDoomAI : public ScriptedAI
-{
-
-    uint32 m_uiFear_Timer;
-    uint32 m_uiMindFlay_Timer;
-
-    ShadowOfDoomAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset()
-    {
-        m_uiFear_Timer = 10000;
-        m_uiMindFlay_Timer = 6000;
-    }
-
-    void Aggro(Unit* pWho)
-    {
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiFear_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
-                m_uiFear_Timer = 10000;
-        }
-        else
-            m_uiFear_Timer -= uiDiff;
-
-        if (m_uiMindFlay_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDFLAY) == CAST_OK)
-                m_uiMindFlay_Timer = 10000;
-        }
-        else
-            m_uiMindFlay_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_ShadowOfDoom(Creature* pCreature)
-{
-    return new ShadowOfDoomAI(pCreature);
-}
-
-
-/*****************/
-struct PylonEngineerAI : public ScriptedAI
-{
-    PylonEngineerAI(Creature* pCreature) : ScriptedAI(pCreature)
+    npc_cultist_engineer(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
 
     uint32 _healTimer;
-    ObjectGuid _pylonGuid;
+    ObjectGuid _shardGuid;
 
     void Reset()
     {
@@ -687,7 +430,12 @@ struct PylonEngineerAI : public ScriptedAI
     void JustReachedHome()
     {
         m_creature->SetUInt32Value(UNIT_CHANNEL_SPELL, SPELL_ENGINEER_REPAIR);
-        m_creature->SetChannelObjectGuid(_pylonGuid);
+        m_creature->SetChannelObjectGuid(_shardGuid);
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+
     }
 
     void DoAction(Unit* unit, uint32 action)
@@ -695,13 +443,16 @@ struct PylonEngineerAI : public ScriptedAI
         if (action == ENGINEER_AI_ACTION_SET_PYLON)
         {
             ASSERT(unit);
-            _pylonGuid = unit->GetObjectGuid();
-            JustReachedHome(); // Actualiser canalisation
+            _shardGuid = unit->GetObjectGuid();
+            JustReachedHome();
         }
         else if (action == ENGINEER_AI_ACTION_ATTACK_START)
         {
             ASSERT(unit);
-            if (Unit* invoked = m_creature->SummonCreature(NPC_SHADOW_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
+
+            //DoCastSpellIfCan(m_creature, SPELL_SUMMON_BOSS); // Boss summon spell 
+
+            if (Unit* invoked = m_creature->SummonCreature(NPC_SHADOW_OF_DOOM, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation()))
             {
                 invoked->AI()->AttackStart(unit);
                 invoked->ToCreature()->SetLootRecipient(unit);
@@ -709,19 +460,20 @@ struct PylonEngineerAI : public ScriptedAI
             }
         }
     }
+
     void UpdateAI(const uint32 diff)
     {
         if (_healTimer < diff)
         {
             _healTimer = 1000;
-            if (Creature* pylon = m_creature->GetMap()->GetCreature(_pylonGuid))
+            if (Creature* shard = m_creature->GetMap()->GetCreature(_shardGuid))
             {
-                if (pylon->GetHealth() == pylon->GetMaxHealth() || pylon->GetDisplayId() != MODELID_PYLON_DAMAGED)
+                if (shard->GetHealth() == shard->GetMaxHealth() || shard->GetDisplayId() != MODELID_PYLON_DAMAGED)
                     m_creature->AddObjectToRemoveList();
                 else
-                    pylon->ModifyHealth(ENGINEER_MOD_HEALTH_PER_SEC);
+                    shard->ModifyHealth(ENGINEER_MOD_HEALTH_PER_SEC);
             }
-            else // Perdu le pylone !
+            else // Shard died
                 m_creature->AddObjectToRemoveList();
         }
         else
@@ -729,12 +481,12 @@ struct PylonEngineerAI : public ScriptedAI
     }
 };
 
-CreatureAI* GetAI_PylonEngineerAI(Creature* pCreature)
+CreatureAI* GetAI_npc_cultist_engineer(Creature* pCreature)
 {
-    return new PylonEngineerAI(pCreature);
+    return new npc_cultist_engineer(pCreature);
 }
 
-bool GossipSelect_pylon_engineer(Player* player, Creature* creature, uint32 sender, uint32 action)
+bool GossipSelect_npc_cultist_engineer(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
     if (action == GOSSIP_ACTION_INFO_DEF + 1 && player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
     {
@@ -746,17 +498,100 @@ bool GossipSelect_pylon_engineer(Player* player, Creature* creature, uint32 send
     return true;
 }
 
-bool GossipHello_pylon_engineer(Player* player, Creature* creature)
+bool GossipHello_npc_cultist_engineer(Player* player, Creature* creature)
 {
     if (player->HasItemCount(ITEM_NECROTIC_RUNE, 8))
         player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_CULTIST_ENGINEER_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    player->SEND_GOSSIP_MENU(LANG_CULTIST_ENGINEER_MENU, creature->GetGUID());
+    player->SEND_GOSSIP_MENU(LANG_CULTIST_ENGINEER_GOSSIP, creature->GetGUID());
+
     return true;
 }
 
-struct NecropolisGouleAI : public ScriptedAI
+/*
+Shadow of Doom
+Notes: mini boss
+*/
+struct ShadowOfDoomAI : public ScriptedAI
 {
-    NecropolisGouleAI(Creature* pCreature) : ScriptedAI(pCreature)
+    uint32 m_uiFear_Timer;
+    uint32 m_uiMindFlay_Timer;
+    uint32 m_uiScourgeStrike_Timer;
+
+    ShadowOfDoomAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    void Reset()
+    {
+        m_uiFear_Timer = 10000;
+        m_uiMindFlay_Timer = 6000;
+        m_uiScourgeStrike_Timer = 120000;
+    }
+
+    void Aggro(Unit* pWho)
+    {
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        uint32 rnd;
+        rnd = urand(0, 1);
+        if (rnd)
+            creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_0, LANG_UNIVERSAL, 0);
+        else
+            creature->MonsterSay(LANG_SHADOW_OF_DOOM_TEST_1, LANG_UNIVERSAL, 0);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        // Fear
+        if (m_uiFear_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FEAR) == CAST_OK)
+                m_uiFear_Timer = 10000;
+        }
+        else
+            m_uiFear_Timer -= uiDiff;
+
+        // Mind Flay
+        if (m_uiMindFlay_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MINDFLAY) == CAST_OK)
+                m_uiMindFlay_Timer = 10000;
+        }
+        else
+            m_uiMindFlay_Timer -= uiDiff;
+
+        // Scourge Strike
+        if (m_uiScourgeStrike_Timer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                m_uiScourgeStrike_Timer = 120000;
+        }
+        else
+            m_uiScourgeStrike_Timer -= uiDiff;
+
+
+        DoMeleeAttackIfReady();
+    }
+};
+
+CreatureAI* GetAI_ShadowOfDoom(Creature* pCreature)
+{
+    return new ShadowOfDoomAI(pCreature);
+}
+
+/*
+npc_ghoul_berserker
+Notes: Shard trash
+*/
+struct GhoulBerserker : public ScriptedAI
+{
+    GhoulBerserker(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
@@ -769,6 +604,11 @@ struct NecropolisGouleAI : public ScriptedAI
         _enrageTimer = 0;
     }
 
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
+    }
+
     void Aggro(Unit* pWho)
     {
     }
@@ -779,8 +619,8 @@ struct NecropolisGouleAI : public ScriptedAI
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_PYLON_ENTRY, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -810,11 +650,15 @@ struct NecropolisGouleAI : public ScriptedAI
     }
 };
 
-CreatureAI* GetAI_NecropolisGoule(Creature* pCreature)
+CreatureAI* GetAI_GhoulBerserker(Creature* pCreature)
 {
-    return new NecropolisGouleAI(pCreature);
+    return new GhoulBerserker(pCreature);
 }
 
+/*
+Spectral Soldier
+Notes: Shard trash
+*/
 struct SpectralSoldierAI : public ScriptedAI
 {
     SpectralSoldierAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -832,10 +676,15 @@ struct SpectralSoldierAI : public ScriptedAI
         _sunderArmorTimer = 10000;
     }
 
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
+    }
+
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_PYLON_ENTRY, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -868,6 +717,10 @@ CreatureAI* GetAI_SpectralSoldierAI(Creature* pCreature)
     return new SpectralSoldierAI(pCreature);
 }
 
+/*
+Skeletal Shock Trooper
+Notes: Shard trash
+*/
 struct SkeletalShocktrooperAI : public ScriptedAI
 {
     SkeletalShocktrooperAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -885,10 +738,15 @@ struct SkeletalShocktrooperAI : public ScriptedAI
         _cleaveTimer = 8000;
     }
 
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
+    }
+
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_PYLON_ENTRY, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -920,6 +778,10 @@ CreatureAI* GetAI_SkeletalShocktrooperAI(Creature* pCreature)
     return new SkeletalShocktrooperAI(pCreature);
 }
 
+/*
+Skeletal Trooper
+Notes: Low level mobs in starting area's
+*/
 struct SkeletalTrooperAI : public ScriptedAI
 {
     SkeletalTrooperAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -927,21 +789,47 @@ struct SkeletalTrooperAI : public ScriptedAI
         Reset();
     }
 
+    uint32 _ShadowWordPainTimer;
+    uint32 _ScourgeStrikeTimer;
+
     void Reset()
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
+        _ScourgeStrikeTimer = 120000; // 2 min
+        _ShadowWordPainTimer = 15000; // 15 sec
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPAWN_SMOKE_1);
     }
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_PYLON_ENTRY, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        if (_ShadowWordPainTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD_PAIN) == CAST_OK)
+                _ShadowWordPainTimer = 30000; // 30 sec
+        }
+        else
+            _ShadowWordPainTimer -= uiDiff;
+
+        if (_ScourgeStrikeTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                _ScourgeStrikeTimer = 120000; // 2 min
+        }
+        else
+            _ScourgeStrikeTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
@@ -952,6 +840,10 @@ CreatureAI* GetAI_SkeletalTrooperAI(Creature* pCreature)
     return new SkeletalTrooperAI(pCreature);
 }
 
+/*
+Spectral Spirit
+Notes: Low level mobs in starting area's
+*/
 struct SpectralSpiritAI : public ScriptedAI
 {
     SpectralSpiritAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -959,18 +851,20 @@ struct SpectralSpiritAI : public ScriptedAI
         Reset();
     }
 
-    uint32 _shadowWordPainTimer;
-
     void Reset()
     {
         m_creature->AddAura(SPELL_PURPLE_VISUAL);
-        _shadowWordPainTimer = 15000;
+    }
+
+    void JustSummoned(Creature* creature)
+    {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
     }
 
     void JustDied(Unit*)
     {
-        if (Unit* pylon = m_creature->FindNearestCreature(NPC_PYLON_ENTRY, 100.0f))
-            DoCastSpellIfCan(pylon, SPELL_DAMAGE_PYLON);
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -978,13 +872,6 @@ struct SpectralSpiritAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        if (_shadowWordPainTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_WORD_PAIN) == CAST_OK)
-                _shadowWordPainTimer = 30000;
-        }
-        else
-            _shadowWordPainTimer -= uiDiff;
         DoMeleeAttackIfReady();
     }
 };
@@ -993,45 +880,62 @@ CreatureAI* GetAI_SpectralSpiritAI(Creature* pCreature)
 {
     return new SpectralSpiritAI(pCreature);
 }
-// NPC invisible dans la necropole
-struct NecropolisRelayAI : public ScriptedAI
+
+/*
+Spectral Apparition
+Notes: Low level mobs in starting area's
+*/
+struct SpectralApparitionAI : public ScriptedAI
 {
-    NecropolisRelayAI(Creature* pCreature) : ScriptedAI(pCreature)
+    SpectralApparitionAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
 
-    uint32     _checkStatusTimer;
-    ObjectGuid _necropolisGuid;
+    uint32 _ScourgeStrikeTimer;
 
     void Reset()
     {
-        m_creature->CastSpell(m_creature, SPELL_COMMUNICATION_NAXXRAMAS, true);
-    }
-    // On transmet le GUID de la necropole
-    void InformGuid(const ObjectGuid necropolis, uint32 type = 0)
-    {
-        _necropolisGuid = necropolis;
-    }
-    void SpellHitTarget(Unit* target, const SpellEntry* spell)
-    {
-        if (spell->Id == SPELL_COMMUNICATION_TRIGGER && target != m_creature)
-            if (Creature* crea = target->ToCreature())
-                crea->AI()->InformGuid(_necropolisGuid);
+        m_creature->AddAura(SPELL_PURPLE_VISUAL);
+        _ScourgeStrikeTimer = 120000; // 2 min
     }
 
-    void UpdateAI(const uint32 diff)
+    void JustSummoned(Creature* creature)
     {
+        DoCastSpellIfCan(creature, SPELL_SPIRIT_SPAWN_IN);
+    }
+
+    void JustDied(Unit*)
+    {
+        if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+
+        if (_ScourgeStrikeTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCOURGE_STRIKE) == CAST_OK)
+                _ScourgeStrikeTimer = 120000;
+        }
+        else
+            _ScourgeStrikeTimer -= uiDiff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
-CreatureAI* GetAI_NecropolisRelay(Creature* pCreature)
+CreatureAI* GetAI_SpectralApparitionAI(Creature* pCreature)
 {
-    return new NecropolisRelayAI(pCreature);
+    return new SpectralApparitionAI(pCreature);
 }
 
-
-/***/
+/*
+naxx_event_rewards_giver
+*/
 struct naxx_event_rewards_giverAI : public ScriptedAI
 {
     naxx_event_rewards_giverAI(Creature* c) : ScriptedAI(c)
@@ -1097,19 +1001,9 @@ bool GossipSelect_naxx_event_rewards_giver(Player* player, Creature* creature, u
 
 bool GossipHello_naxx_event_rewards_giver(Player* player, Creature* creature)
 {
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_SURE_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP, creature->GetGUID());
-    return true;
-}
+    // Add Item
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_GIVE_MAGIC_ITEM_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
 
-bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32 sender, uint32 action)
-{
-    player->CLOSE_GOSSIP_MENU();
-    return true;
-}
-
-bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
-{
     uint32 attacked1 = 0;
     uint32 attacked2 = 0;
     if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME1) < time(NULL))
@@ -1117,112 +1011,214 @@ bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
     if (sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_TIME2) < time(NULL))
         attacked2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
 
-    uint32 loc = player->GetSession()->GetSessionDbLocaleIndex();
-    const char* victoriesFormat    = sObjectMgr.GetMangosString(LANG_VICTORIES_COUNT_OPTION, loc);
-    char victories[200];
-    sprintf(victories, victoriesFormat, sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT));
-    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, victories, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    if (attacked1 == ZONEID_TANARIS || attacked2 == ZONEID_TANARIS)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_TANARIS_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    if (attacked1 == ZONEID_AZSHARA || attacked2 == ZONEID_AZSHARA)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_AZSHARA_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-    if (attacked1 == ZONEID_EASTERN_PLAGUELANDS || attacked2 == ZONEID_EASTERN_PLAGUELANDS)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_EP_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
-    if (attacked1 == ZONEID_WINTERSPRING || attacked2 == ZONEID_WINTERSPRING)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_WINTERSPRING_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
-    if (attacked1 == ZONEID_BLASTED_LANDS || attacked2 == ZONEID_BLASTED_LANDS)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_BL_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
-    if (attacked1 == ZONEID_BURNING_STEPPES || attacked2 == ZONEID_BURNING_STEPPES)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_BS_ATTACKED_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+    // No invasion happening
     if (!attacked1 && !attacked2)
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, LANG_NO_ATTACK_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
-    player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+    {
+        player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_0, creature->GetGUID());
+    }
+    else
+    {
+        uint32 rnd = urand(0, 1); // Random text selection
+        if (rnd)
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_1, creature->GetGUID());
+        else
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_DAWN_GOSSIP_2, creature->GetGUID());
+    }
     return true;
 }
 
-
-/***/
-/*struct npc_naxx_rareeliteAI : public CreatureEventAI
+/*
+Argent Emissary
+Notes: NPC thats tells what is going on and shows what locations are under attack.
+*/
+bool GossipSelect_npc_argent_emissary(Player* player, Creature* creature, uint32 sender, uint32 action)
 {
-    npc_naxx_rareeliteAI(Creature* c) : CreatureEventAI(c)
+    switch (action)
     {
+        case GOSSIP_ACTION_INFO_DEF + 1:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_0, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 2:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_1, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 3:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 10);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 8);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 9);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 7);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 11);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 6);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 4:
+        {
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 5);
+
+            uint32 random_text = urand(0, 2); // Random text selection
+            if (random_text == 1)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_0, creature->GetGUID());
+            else if (random_text == 2)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_1, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWBSER_3_2, creature->GetGUID());
+            break;
+        }
+        case GOSSIP_ACTION_INFO_DEF + 5:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+
+            // Send General Gossip
+            player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 6:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            if (sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING) > 0)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_0, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 7:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            if (sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING) > 0)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_1, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 8:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            if (sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING) > 0)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_2, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 9:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            if (sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING) > 0)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_3, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 10:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            if (sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING) > 0)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_4, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+            break;
+        case GOSSIP_ACTION_INFO_DEF + 11:
+            player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+            if (sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING) > 0)
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_AWNSER_2_SUB_OPTION_5, creature->GetGUID());
+            else
+                player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_FREE_OF_SCOURGE, creature->GetGUID());
+            break;
     }
+    //player->CLOSE_GOSSIP_MENU();
+    return true;
+}
 
-
-    void JustDied(Unit* killer)
-    {
-        sLog.outString("[NAXX] RareElite %u killed by guid=%u", m_creature->GetEntry(), killer ? killer->GetGUIDLow() : 0);
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, time(NULL) + DELAY_ELITE_RESPAWN, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_ID, 0, true);
-        sObjectMgr.SetSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0, true);
-        CreatureEventAI::JustDied(killer);
-    }
-};
-
-CreatureAI* GetAI_npc_naxx_rareeliteAI(Creature* c)
+bool GossipHello_npc_argent_emissary(Player* player, Creature* creature)
 {
-    return new npc_naxx_rareeliteAI(c);
-}*/
+    // Get current values
+    uint32 VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+    uint32 REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+    uint32 REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+    uint32 REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+    uint32 REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
+    uint32 REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
+    uint32 REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
+
+    // Send to client
+    player->SendUpdateWorldState(WORLDSTATE_SI_BATTLES_WON, VICTORIES);
+    player->SendUpdateWorldState(WORLDSTATE_SI_AZSHARA_REMAINING, REMAINING_AZSHARA);
+    player->SendUpdateWorldState(WORLDSTATE_SI_BLASTED_LANDS_REMAINING, REMAINING_BLASTED_LANDS);
+    player->SendUpdateWorldState(WORLDSTATE_SI_BURNING_STEPPES_REMAINING, REMAINING_BURNING_STEPPES);
+    player->SendUpdateWorldState(WORLDSTATE_SI_EASTERN_PLAGUELANDS, REMAINING_EASTERN_PLAGUELANDS);
+    player->SendUpdateWorldState(WORLDSTATE_SI_TANARIS, REMAINING_TANARIS);
+    player->SendUpdateWorldState(WORLDSTATE_SI_WINTERSPRING, REMAINING_WINTERSPRING);
+
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_0, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_2, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
+    player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, LANG_ARGENT_EMISSARY_OPTION_3, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 4);
+
+    // Send General Gossip
+    player->SEND_GOSSIP_MENU(LANG_ARGENT_EMISSARY_GOSSIP, creature->GetGUID());
+
+    return true;
+}
+
 
 void AddSC_world_event_naxxramas()
 {
     Script* newscript;
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_relay";
+    newscript->Name = "npc_necropolis_relay";
     newscript->GetAI = &GetAI_NecropolisRelay;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_proxy";
+    newscript->Name = "npc_necropolis_proxy";
     newscript->GetAI = &GetAI_NecropolisProxy;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_pylon";
-    newscript->GetAI = &GetAI_NecropolisPylon;
+    newscript->Name = "npc_necrotic_shard";
+    newscript->GetAI = &GetAI_necrotic_shard;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_pylon_engineer";
-    newscript->GetAI = &GetAI_PylonEngineerAI;
-    newscript->pGossipHello = &GossipHello_pylon_engineer;
-    newscript->pGossipSelect = &GossipSelect_pylon_engineer;
+    newscript->Name = "npc_cultist_engineer";
+    newscript->GetAI = &GetAI_npc_cultist_engineer;
+    newscript->pGossipHello = &GossipHello_npc_cultist_engineer;
+    newscript->pGossipSelect = &GossipSelect_npc_cultist_engineer;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_necropolis_goule";
-    newscript->GetAI = &GetAI_NecropolisGoule;
+    newscript->Name = "npc_ghoul_berserker";
+    newscript->GetAI = &GetAI_GhoulBerserker;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_spectral_soldier";
+    newscript->Name = "npc_spectral_soldier";
     newscript->GetAI = &GetAI_SpectralSoldierAI;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_skeletal_shocktrooper";
+    newscript->Name = "npc_skeletal_shocktrooper";
     newscript->GetAI = &GetAI_SkeletalShocktrooperAI;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_skeletal_trooper";
+    newscript->Name = "npc_skeletal_trooper";
     newscript->GetAI = &GetAI_SkeletalTrooperAI;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_spectral_spirit";
+    newscript->Name = "npc_spectral_spirit";
     newscript->GetAI = &GetAI_SpectralSpiritAI;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_shadow_of_doom";
+    newscript->Name = "npc_spectral_apparition";
+    newscript->GetAI = &GetAI_SpectralApparitionAI;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_shadow_of_doom";
     newscript->GetAI = &GetAI_ShadowOfDoom;
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "go_world_event_naxx_necropolis";
-    newscript->GOGetAI = &GetAI_naxx_go_necropolis;
+    newscript->Name = "go_necropolis";
+    newscript->GOGetAI = &GetAI_go_necropolis;
     newscript->RegisterSelf();
 
     newscript = new Script;
@@ -1238,17 +1234,20 @@ void AddSC_world_event_naxxramas()
     newscript->pGossipSelect = &GossipSelect_npc_argent_emissary;
     newscript->RegisterSelf();
 
-    //newscript = new Script;
-    //newscript->Name = "npc_naxx_rareelite";
-    //newscript->GetAI = &GetAI_npc_naxx_rareeliteAI;
-    //newscript->RegisterSelf();
-
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
+    // At start up
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME1, time(NULL));
-    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_AZSHARA);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1, ZONEID_TANARIS);
+    sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2, ZONEID_BLASTED_LANDS);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_TIME2, time(NULL));
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ATTACK_COUNT, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_ID, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_PYLON, 0);
     sObjectMgr.InitSavedVariable(VARIABLE_NAXX_ELITE_SPAWNTIME, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_AZSHARA_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_TANARIS_REMAINING, 0);
+    sObjectMgr.InitSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING, 0);
 }

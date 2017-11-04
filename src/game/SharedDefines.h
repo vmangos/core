@@ -368,7 +368,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK26                      = 0x04000000,            // 26
     SPELL_ATTR_EX3_DRAIN_SOUL                 = 0x08000000,            // 27
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
-    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29
+    SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
     SPELL_ATTR_EX3_UNK31                      = 0x80000000            // 31
 };
@@ -924,6 +924,7 @@ enum Targets
     TARGET_DYNAMIC_OBJECT_BEHIND       = 48,
     TARGET_DYNAMIC_OBJECT_LEFT_SIDE    = 49,
     TARGET_DYNAMIC_OBJECT_RIGHT_SIDE   = 50,
+    TARGET_AREAEFFECT_GO_AROUND_SOURCE = 51,
     TARGET_AREAEFFECT_GO_AROUND_DEST   = 52,                // gameobject around destination, select by spell_script_target
     TARGET_CURRENT_ENEMY_COORDINATES   = 53,                // set unit coordinates as dest, only 16 target B imlemented
     TARGET_LARGE_FRONTAL_CONE          = 54,
@@ -1946,6 +1947,15 @@ enum SkillCategory
     SKILL_CATEGORY_PROFESSION    = 11,                      // primary professions
     SKILL_CATEGORY_GENERIC       = 12
 };
+
+// These errors are only printed in client console.
+enum TrainingFailureReason
+{
+    TRAIN_FAIL_UNAVAILABLE      = 0,                        // Trainer service %d unavailable.
+    TRAIN_FAIL_NOT_ENOUGH_MONEY = 1,                        // Not enough money for trainer service %d.
+    TRAIN_FAIL_NOT_ENOUGH_SKILL = 2                         // Not enough skill points for trainer service %d.
+};
+
 /*[-ZERO]
 enum TotemCategory
 {
@@ -2241,7 +2251,6 @@ enum ResponseCodes
     AUTH_DB_BUSY                                           = 0x1F,
     AUTH_SUSPENDED                                         = 0x20,
     AUTH_PARENTAL_CONTROL                                  = 0x21,
-    AUTH_LOCKED_ENFORCED                                   = 0x02, /// Unsure
 
     REALM_LIST_IN_PROGRESS                                 = 0x22,
     REALM_LIST_SUCCESS                                     = 0x23,
@@ -2262,47 +2271,42 @@ enum ResponseCodes
     CHAR_CREATE_ERROR                                      = 0x2F,
     CHAR_CREATE_FAILED                                     = 0x30,
     CHAR_CREATE_NAME_IN_USE                                = 0x31,
-    CHAR_CREATE_DISABLED                                   = 0x3A,
+    CHAR_CREATE_DISABLED                                   = 0x32,
     CHAR_CREATE_PVP_TEAMS_VIOLATION                        = 0x33,
     CHAR_CREATE_SERVER_LIMIT                               = 0x34,
     CHAR_CREATE_ACCOUNT_LIMIT                              = 0x35,
-    CHAR_CREATE_SERVER_QUEUE                               = 0x30,/// UNSURE
-    CHAR_CREATE_ONLY_EXISTING                              = 0x30,/// UNSURE
+    CHAR_CREATE_SERVER_QUEUE                               = 0x36,
+    CHAR_CREATE_ONLY_EXISTING                              = 0x37,
 
     CHAR_DELETE_IN_PROGRESS                                = 0x38,
     CHAR_DELETE_SUCCESS                                    = 0x39,
     CHAR_DELETE_FAILED                                     = 0x3A,
-    CHAR_DELETE_FAILED_LOCKED_FOR_TRANSFER                 = 0x3A,/// UNSURE
-    CHAR_DELETE_FAILED_GUILD_LEADER                        = 0x3A,/// UNSURE
+    CHAR_DELETE_FAILED_LOCKED_FOR_TRANSFER                 = 0x3B,
 
-    CHAR_LOGIN_IN_PROGRESS                                 = 0x3B,
-    CHAR_LOGIN_SUCCESS                                     = 0x3C,
-    CHAR_LOGIN_NO_WORLD                                    = 0x3D,
-    CHAR_LOGIN_DUPLICATE_CHARACTER                         = 0x3E,
-    CHAR_LOGIN_NO_INSTANCES                                = 0x3F,
-    CHAR_LOGIN_FAILED                                      = 0x40,
-    CHAR_LOGIN_DISABLED                                    = 0x41,
-    CHAR_LOGIN_NO_CHARACTER                                = 0x42,
-    CHAR_LOGIN_LOCKED_FOR_TRANSFER                         = 0x40, ///UNSURE
-    CHAR_LOGIN_LOCKED_BY_BILLING                           = 0x40, ///UNSURE
+    CHAR_LOGIN_IN_PROGRESS                                 = 0x3C,
+    CHAR_LOGIN_SUCCESS                                     = 0x3D,
+    CHAR_LOGIN_NO_WORLD                                    = 0x3E,
+    CHAR_LOGIN_DUPLICATE_CHARACTER                         = 0x3F,
+    CHAR_LOGIN_NO_INSTANCES                                = 0x40,
+    CHAR_LOGIN_FAILED                                      = 0x41,
+    CHAR_LOGIN_DISABLED                                    = 0x42,
+    CHAR_LOGIN_NO_CHARACTER                                = 0x43,
+    CHAR_LOGIN_LOCKED_FOR_TRANSFER                         = 0x44,
 
-    CHAR_NAME_SUCCESS                                      = 0x50,
-    CHAR_NAME_FAILURE                                      = 0x4F,
-    CHAR_NAME_NO_NAME                                      = 0x43,
-    CHAR_NAME_TOO_SHORT                                    = 0x44,
-    CHAR_NAME_TOO_LONG                                     = 0x45,
-    CHAR_NAME_INVALID_CHARACTER                            = 0x46,
-    CHAR_NAME_MIXED_LANGUAGES                              = 0x47,
-    CHAR_NAME_PROFANE                                      = 0x48,
-    CHAR_NAME_RESERVED                                     = 0x49,
-    CHAR_NAME_INVALID_APOSTROPHE                           = 0x4A,
-    CHAR_NAME_MULTIPLE_APOSTROPHES                         = 0x4B,
-    CHAR_NAME_THREE_CONSECUTIVE                            = 0x4C,
-    CHAR_NAME_INVALID_SPACE                                = 0x4D,
-    CHAR_NAME_CONSECUTIVE_SPACES                           = 0x4E,
-    CHAR_NAME_RUSSIAN_CONSECUTIVE_SILENT_CHARACTERS        = 0x4E,///UNSURE
-    CHAR_NAME_RUSSIAN_SILENT_CHARACTER_AT_BEGINNING_OR_END = 0x4E,///UNSURE
-    CHAR_NAME_DECLENSION_DOESNT_MATCH_BASE_NAME            = 0x4E,///UNSURE
+    CHAR_NAME_NO_NAME                                      = 0x45,
+    CHAR_NAME_TOO_SHORT                                    = 0x46,
+    CHAR_NAME_TOO_LONG                                     = 0x47,
+    CHAR_NAME_INVALID_CHARACTER                            = 0x48,
+    CHAR_NAME_MIXED_LANGUAGES                              = 0x49,
+    CHAR_NAME_PROFANE                                      = 0x4A,
+    CHAR_NAME_RESERVED                                     = 0x4B,
+    CHAR_NAME_INVALID_APOSTROPHE                           = 0x4C,
+    CHAR_NAME_MULTIPLE_APOSTROPHES                         = 0x4D,
+    CHAR_NAME_THREE_CONSECUTIVE                            = 0x4E,
+    CHAR_NAME_INVALID_SPACE                                = 0x4F,
+    CHAR_NAME_CONSECUTIVE_SPACES                           = 0x50,
+    CHAR_NAME_FAILURE                                      = 0x51,
+    CHAR_NAME_SUCCESS                                      = 0x52,
 };
 
 /// Ban function modes
@@ -2425,11 +2429,11 @@ enum TradeStatus
     TRADE_STATUS_NO_TARGET      = 6,
     TRADE_STATUS_BACK_TO_TRADE  = 7,
     TRADE_STATUS_TRADE_COMPLETE = 8,
-    // 9?
+    TRADE_STATUS_TRADE_REJECTED = 9,
     TRADE_STATUS_TARGET_TO_FAR  = 10,
     TRADE_STATUS_WRONG_FACTION  = 11,
     TRADE_STATUS_CLOSE_WINDOW   = 12,
-    // 13?
+    TRADE_STATUS_UNKNOWN_13     = 13,                       // handled with TRADE_STATUS_TRADE_CANCELED
     TRADE_STATUS_IGNORE_YOU     = 14,
     TRADE_STATUS_YOU_STUNNED    = 15,
     TRADE_STATUS_TARGET_STUNNED = 16,

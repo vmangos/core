@@ -33,7 +33,7 @@ class TemporarySummon : public Creature
 
         void Update(uint32 update_diff, uint32 time) override;
         void Summon(TempSummonType type, uint32 lifetime);
-        void MANGOS_DLL_SPEC UnSummon();
+        void MANGOS_DLL_SPEC UnSummon(uint32 delayDespawnTime = 0);
         void SaveToDB();
         ObjectGuid const& GetSummonerGuid() const { return m_summoner ; }
         Unit* GetSummoner() const { return ObjectAccessor::GetUnit(*this, m_summoner); }
@@ -43,5 +43,6 @@ class TemporarySummon : public Creature
         uint32 m_lifetime;
         ObjectGuid m_summoner;
         bool m_justDied = false;
+        uint32 m_forceTargetUpdateTimer;
 };
 #endif

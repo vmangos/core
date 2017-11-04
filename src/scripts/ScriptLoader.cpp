@@ -117,6 +117,8 @@ void AddSC_boss_maexxna();
 void AddSC_boss_noth();
 void AddSC_boss_heigan();
 void AddSC_boss_patchwerk();
+void AddSC_boss_grobbulus();
+void AddSC_boss_thaddius();
 void AddSC_boss_razuvious();
 void AddSC_boss_sapphiron();
 void AddSC_instance_naxxramas();
@@ -157,6 +159,7 @@ void AddSC_boss_timmy_the_cruel();
 void AddSC_boss_postmaster_malown();
 void AddSC_boss_baron_rivendare();
 void AddSC_boss_dathrohan_balnazzar();
+void AddSC_boss_atiesh();
 void AddSC_instance_stratholme();
 void AddSC_stratholme();
 void AddSC_instance_sunken_temple();                 //sunken_temple
@@ -384,6 +387,8 @@ void AddScripts()
     AddSC_boss_noth();
     AddSC_boss_heigan();
     AddSC_boss_patchwerk();
+    AddSC_boss_grobbulus();
+    AddSC_boss_thaddius();
     AddSC_boss_razuvious();
     AddSC_boss_sapphiron();
     AddSC_instance_naxxramas();
@@ -424,6 +429,7 @@ void AddScripts()
     AddSC_boss_postmaster_malown();
     AddSC_boss_baron_rivendare();
     AddSC_boss_dathrohan_balnazzar();
+    AddSC_boss_atiesh();
     AddSC_instance_stratholme();
     AddSC_stratholme();
     AddSC_instance_sunken_temple();                         //sunken_temple

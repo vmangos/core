@@ -1409,7 +1409,7 @@ struct go_mortarAI : GameObjectAI
 
     bool OnUse(Unit* pCaster) override
     {
-        me->SendGameObjectCustomAnim(me->GetObjectGuid());
+        me->SendGameObjectCustomAnim();
 
         return true;
     }

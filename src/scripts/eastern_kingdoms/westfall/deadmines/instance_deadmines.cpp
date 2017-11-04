@@ -38,6 +38,7 @@ struct instance_deadmines : public ScriptedInstance
     uint64 m_uiSmiteGUID;
     uint64 m_uiRhahkGUID;
     uint64 m_uiGilnidGUID;
+    uint64 m_uiDMFChestGUID;
 
     uint64 m_uiDoor1GUID;
     uint64 m_uiDoor2GUID;
@@ -140,6 +141,25 @@ struct instance_deadmines : public ScriptedInstance
             m_uiDoor2GUID = pGo->GetGUID();
         if (pGo->GetEntry() == GO_DOOR2 && pGo->GetPositionX() > -169.0f && pGo->GetPositionX() < -168.0f)
             m_uiDoor3GUID = pGo->GetGUID();
+
+        if (pGo->GetEntry() == GO_DMF_CHEST)
+        {
+            pGo->SetVisible(false);
+            m_uiDMFChestGUID = pGo->GetGUID();
+        }
+    }
+
+    void OnPlayerEnter(Player* pPlayer)
+    {
+        if (!pPlayer)
+            return;
+
+        // Darkmoon chest visible only for players on the quest
+        if (pPlayer->GetQuestStatus(QUEST_FORTUNE_AWAITS) == QUEST_STATUS_COMPLETE)
+        {
+            if (GameObject* pGo = instance->GetGameObject(m_uiDMFChestGUID))
+                pGo->SetVisible(true);
+        }
     }
 
     void SetData(uint32 uiType, uint32 uiData)

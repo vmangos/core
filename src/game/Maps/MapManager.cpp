@@ -208,7 +208,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         if (!player->CheckInstanceCount(instanceId))
         {
             DEBUG_LOG("MAP: Player '%s' can't enter instance %u on map %u. Has already entered too many instances.", player->GetName(), instanceId, mapid);
-            player->SendTransferAborted(mapid, TRANSFER_ABORT_TOO_MANY_INSTANCES, 0);
+            player->SendTransferAborted(TRANSFER_ABORT_TOO_MANY_INSTANCES);
             return false;
         }
 
@@ -216,7 +216,7 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
         /*if(i_data && i_data->IsEncounterInProgress())
         {
             DEBUG_LOG("MAP: Player '%s' can't enter instance '%s' while an encounter is in progress.", player->GetName(), GetMapName());
-            player->SendTransferAborted(GetId(), TRANSFER_ABORT_ZONE_IN_COMBAT);
+            player->SendTransferAborted(TRANSFER_ABORT_ZONE_IN_COMBAT);
             return(false);
         }*/
     }

@@ -81,6 +81,8 @@
 #include "NodeSession.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
+#include "GameEventMgr.h"
+#include "world/world_event_naxxramas.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -483,6 +485,8 @@ Player::Player(WorldSession *session) : Unit(),
 
     PlayerTalkClass = new PlayerMenu(GetSession());
     m_currentBuybackSlot = BUYBACK_SLOT_START;
+
+    m_lastLiquid = nullptr;
 
     for (int i = 0; i < MAX_TIMERS; ++i)
         m_MirrorTimer[i] = DISABLED_MIRROR_TIMER;
@@ -1804,6 +1808,7 @@ bool Player::SwitchInstance(uint32 newInstanceId)
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
     RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
     RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
+    RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
     DisableSpline();
     SetMover(this);
 
@@ -2008,9 +2013,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
 
             //remove auras before removing from map...
             RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
-            RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-            RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-
+            RemoveCharmAuras();
             if (!GetSession()->PlayerLogout())
             {
                 // send transfer packet to display load screen
@@ -6382,6 +6385,7 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
         SetGroupUpdateFlag(GROUP_UPDATE_FLAG_ZONE);
 
     UpdateZoneDependentAuras();
+    SetZoneScript();
 }
 
 //If players are too far way of duel flag... then player loose the duel
@@ -7848,6 +7852,36 @@ void Player::SendInitWorldStates(uint32 zoneid)
     data << uint32(zoneid);                             // zone id
     size_t count_pos = data.wpos();
     data << uint16(0);                                  // count of uint32 blocks, placeholder
+
+    // Scourge Invasion - Patch 1.11
+    if (sGameEventMgr.IsActiveEvent(GAME_EVENT_SCOURGE_INVASION))
+    {
+        int ATTACK_ZONE1 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE1);
+        int ATTACK_ZONE2 = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_ZONE2);
+        int VICTORIES = sObjectMgr.GetSavedVariable(VARIABLE_NAXX_ATTACK_COUNT);
+        int REMAINING_AZSHARA = sObjectMgr.GetSavedVariable(VARIABLE_SI_AZSHARA_REMAINING);
+        int REMAINING_BLASTED_LANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_BLASTED_LANDS_REMAINING);
+        int REMAINING_BURNING_STEPPES = sObjectMgr.GetSavedVariable(VARIABLE_SI_BURNING_STEPPES_REMAINING);
+        int REMAINING_EASTERN_PLAGUELANDS = sObjectMgr.GetSavedVariable(VARIABLE_SI_EASTERN_PLAGUELANDS_REMAINING);
+        int REMAINING_TANARIS = sObjectMgr.GetSavedVariable(VARIABLE_SI_TANARIS_REMAINING);
+        int REMAINING_WINTERSPRING = sObjectMgr.GetSavedVariable(VARIABLE_SI_WINTERSPRING_REMAINING);
+
+        data << uint32(WORLDSTATE_AZSHARA)              << uint32(REMAINING_AZSHARA > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_BLASTED_LANDS)        << uint32(REMAINING_BLASTED_LANDS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_BURNING_STEPPES)      << uint32(REMAINING_BURNING_STEPPES > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_EASTERN_PLAGUELANDS)  << uint32(REMAINING_EASTERN_PLAGUELANDS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_TANARIS)              << uint32(REMAINING_TANARIS > 0 ? 1 : 0);
+        data << uint32(WORLDSTATE_WINTERSPRING)         << uint32(REMAINING_WINTERSPRING > 0 ? 1 : 0);
+
+        // Battles & remaining necropolisses
+        data << uint32(WORLDSTATE_SI_BATTLES_WON) << uint32(VICTORIES);
+        data << uint32(WORLDSTATE_SI_AZSHARA_REMAINING) << uint32(REMAINING_AZSHARA);
+        data << uint32(WORLDSTATE_SI_BLASTED_LANDS_REMAINING) << uint32(REMAINING_BLASTED_LANDS);
+        data << uint32(WORLDSTATE_SI_BURNING_STEPPES_REMAINING) << uint32(REMAINING_BURNING_STEPPES);
+        data << uint32(WORLDSTATE_SI_EASTERN_PLAGUELANDS) << uint32(REMAINING_EASTERN_PLAGUELANDS);
+        data << uint32(WORLDSTATE_SI_TANARIS) << uint32(REMAINING_TANARIS);
+        data << uint32(WORLDSTATE_SI_WINTERSPRING) << uint32(REMAINING_WINTERSPRING);
+    }
 
     for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
     {
@@ -11217,26 +11251,34 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item *pItem2, uint
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 param)
+void Player::SendOpenContainer()
+{
+    DEBUG_LOG("WORLD: Sent SMSG_OPEN_CONTAINER");
+    WorldPacket data(SMSG_OPEN_CONTAINER, 8);   // opens the main bag in the UI
+    data << GetObjectGuid();
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 /*param*/)
 {
     DEBUG_LOG("WORLD: Sent SMSG_BUY_FAILED");
-    WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 4 + 1));
+    WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 1));
     data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
     data << uint32(item);
-    if (param > 0)
-        data << uint32(param);
+    //if (param > 0)
+    //    data << uint32(param);    // [-ZERO]
     data << uint8(msg);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 param)
+void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 /*param*/)
 {
     DEBUG_LOG("WORLD: Sent SMSG_SELL_ITEM");
-    WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + (param ? 4 : 0) + 1));  // last check 2.0.10
+    WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + /*(param ? 4 : 0) +*/ 1)); // last check [ZERO]
     data << (pCreature ? pCreature->GetObjectGuid() : ObjectGuid());
     data << ObjectGuid(itemGuid);
-    if (param > 0)
-        data << uint32(param);
+    //if (param > 0)
+    //    data << uint32(param);    // [-ZERO]
     data << uint8(msg);
     GetSession()->SendPacket(&data);
 }
@@ -11574,7 +11616,7 @@ void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, 
     data << uint32(item->GetItemSuffixFactor());            // SuffixFactor
     data << uint32(item->GetItemRandomPropertyId());        // random item property id
     data << uint32(count);                                  // count of items
-    data << uint32(GetItemCount(item->GetEntry()));         // count of items in inventory
+    //data << uint32(GetItemCount(item->GetEntry()));       // [-ZERO] count of items in inventory
 
     if (broadcast && GetGroup())
         GetGroup()->BroadcastPacket(&data, true);
@@ -12728,12 +12770,12 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
     if (uint32 mail_template_id = pQuest->GetRewMailTemplateId())
         MailDraft(mail_template_id).SendMailTo(this, questGiver, MAIL_CHECK_MASK_HAS_BODY, pQuest->GetRewMailDelaySecs());
 
+    q_status.m_rewarded = true;
     if (!pQuest->IsRepeatable())
         SetQuestStatus(quest_id, QUEST_STATUS_COMPLETE);
     else
         SetQuestStatus(quest_id, QUEST_STATUS_NONE);
 
-    q_status.m_rewarded = true;
     if (q_status.uState != QUEST_NEW)
         q_status.uState = QUEST_CHANGED;
 
@@ -13154,28 +13196,43 @@ bool Player::CanGiveQuestSourceItemIfNeed(Quest const *pQuest, ItemPosCountVec* 
 {
     if (uint32 srcitem = pQuest->GetSrcItemId())
     {
-        uint32 count = pQuest->GetSrcItemCount();
-
-        // player already have max amount required item (including bank), just report success
-        uint32 has_count = GetItemCount(srcitem, true);
-        if (has_count >= count)
-            return true;
-
-        count -= has_count;                                 // real need amount
-
-        InventoryResult msg;
-        if (!dest)
+        
+        if (ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(srcitem))
         {
-            ItemPosCountVec destTemp;
-            msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, destTemp, srcitem, count);
-        }
-        else
-            msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, *dest, srcitem, count);
+            uint32 count = pQuest->GetSrcItemCount();
+            uint32 has_count = GetItemCount(srcitem, true);
 
-        if (msg == EQUIP_ERR_OK)
-            return true;
-        else
-            SendEquipError(msg, NULL, NULL, srcitem);
+            if (pProto->MaxCount && pProto->StartQuest != pQuest->GetQuestId() && (has_count >= pProto->MaxCount))
+            {
+                // player already have max amount of source item (including bank)
+                SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
+                return false;
+            }
+
+            count -= has_count;                                 // real need amount
+
+            InventoryResult msg;
+            if (!dest)
+            {
+                ItemPosCountVec destTemp;
+                msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, destTemp, srcitem, count);
+            }
+            else
+                msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, *dest, srcitem, count);
+
+            if (msg == EQUIP_ERR_OK)
+                return true;
+            else
+            {
+                if (msg == EQUIP_ERR_INVENTORY_FULL)
+                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+                else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
+                else
+                    SendEquipError(msg, NULL, NULL, srcitem);
+            }
+        }
+
         return false;
     }
 
@@ -13868,14 +13925,29 @@ void Player::SendQuestReward(Quest const *pQuest, uint32 XP, Object * questGiver
     GetSession()->SendPacket(&data);
 }
 
+/// Sent when a quest is failed to be given off at questtaker. Specifically handled reasons:
+/// INVALIDREASON_QUEST_FAILED_INVENTORY_FULL=4 (or 50)
+/// INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM=17
+void Player::SendQuestFailedAtTaker(uint32 quest_id, uint32 reason) const
+{
+    if (quest_id)
+    {
+        WorldPacket data(SMSG_QUESTGIVER_QUEST_FAILED, 8);
+        data << uint32(quest_id);
+        data << uint32(reason);
+        GetSession()->SendPacket(&data);
+        DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
+    }
+}
+
 void Player::SendQuestFailed(uint32 quest_id)
 {
     if (quest_id)
     {
-        WorldPacket data(SMSG_QUESTGIVER_QUEST_FAILED, 4);
+        WorldPacket data(SMSG_QUESTUPDATE_FAILED, 4);
         data << quest_id;
         GetSession()->SendPacket(&data);
-        DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_FAILED");
+        DEBUG_LOG("WORLD: Sent SMSG_QUESTUPDATE_FAILED");
     }
 }
 
@@ -13925,14 +13997,13 @@ void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver)
     }
 }
 
-void Player::SendPushToPartyResponse(Player *pPlayer, uint32 msg)
+void Player::SendPushToPartyResponse(Player *pPlayer, uint8 msg)
 {
     if (pPlayer)
     {
-        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 4 + 1));
+        WorldPacket data(MSG_QUEST_PUSH_RESULT, (8 + 1));
         data << pPlayer->GetObjectGuid();
-        data << uint32(msg);                                 // valid values: 0-8
-        data << uint8(0);
+        data << uint8(msg);                                 // enum QuestShareMessages
         GetSession()->SendPacket(&data);
         DEBUG_LOG("WORLD: Sent MSG_QUEST_PUSH_RESULT");
     }
@@ -14331,6 +14402,15 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
             {
                 Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
                 SetLocationMapId(at->target_mapId);
+            }
+            else if (GetMapId() == 533) // Naxxramas
+            {
+                // There exist no exit areatrigger for Naxxramas. Not sure how Blizzard handled this in 
+                // the original version of Naxx, but to keep the usual logic of being TPed outside the instance
+                // we have the following special-case. Using areatriggers is not possible without even uglier hacking
+                // as sObjectMgr.GetGoBackTrigger() requires the areatrigger to exist in the DBC files, not just in the DB
+                Relocate(3120.16f, -3725.0f, 137.7f, 5.83f); // Just outside Naxxramas
+                SetLocationMapId(0);                         // Eastern Kingdoms
             }
         }
     }
@@ -15391,7 +15471,7 @@ void Player::SendSavedInstances()
     }
 
     //Send opcode 811. true or false means, whether you have current raid instances
-    data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP);
+    data.Initialize(SMSG_UPDATE_INSTANCE_OWNERSHIP, 4);
     data << uint32(hasBeenSaved);
     GetSession()->SendPacket(&data);
 
@@ -15402,7 +15482,7 @@ void Player::SendSavedInstances()
     {
         if (itr->second.perm)
         {
-            data.Initialize(SMSG_UPDATE_LAST_INSTANCE);
+            data.Initialize(SMSG_UPDATE_LAST_INSTANCE, 4);
             data << uint32(itr->second.state->GetMapId());
             GetSession()->SendPacket(&data);
         }
@@ -16271,8 +16351,8 @@ void Player::SendResetInstanceSuccess(uint32 MapId)
 
 void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
 {
-    // TODO: find what other fail reasons there are besides players in the instance
-    WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 4);
+    // reason: see enum InstanceResetFailReason
+    WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 8);
     data << uint32(reason);
     data << uint32(MapId);
     GetSession()->SendPacket(&data);
@@ -17078,6 +17158,94 @@ void Player::ContinueTaxiFlight()
     GetSession()->SendDoFlight(mountDisplayId, path, startNode);
 }
 
+void Player::Mount(uint32 mount, uint32 spellId)
+{
+    if (!mount)
+    {
+        RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+        SendMountResult(MOUNTRESULT_NOTMOUNTABLE);
+        return;
+    }
+
+    if (IsMounted())
+    {
+        SendMountResult(MOUNTRESULT_ALREADYMOUNTED);
+        return;
+    }
+
+    if (!spellId && IsInDisallowedMountForm())
+    {
+        RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+        SendMountResult(MOUNTRESULT_SHAPESHIFTED);
+        return;
+    }
+
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING))
+    {
+        RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
+        SendMountResult(MOUNTRESULT_LOOTING);
+        return;
+    }
+
+    Unit::Mount(mount, spellId);
+
+    // Called by Taxi system / GM command
+    if (!spellId)
+        UnsummonPetTemporaryIfAny();
+    // Called by mount aura
+    else
+    {
+        // Normal case (Unsummon only permanent pet)
+        if (Pet* pet = GetPet())
+        {
+            if (pet->IsPermanentPetFor((Player*)this) &&
+                sWorld.getConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT))
+                UnsummonPetTemporaryIfAny();
+            else
+                pet->SetEnabled(false);
+        }
+    }
+
+    SendMountResult(MOUNTRESULT_OK);
+}
+
+void Player::Unmount(bool from_aura)
+{
+    if (!IsMounted())
+    {
+        if (!from_aura)
+            SendDismountResult(DISMOUNTRESULT_NOTMOUNTED);
+
+        return;
+    }
+
+    Unit::Unmount(from_aura);
+
+    // only resummon old pet if the player is already added to a map
+    // this prevents adding a pet to a not created map which would otherwise cause a crash
+    // (it could probably happen when logging in after a previous crash)
+    if (Pet* pet = GetPet())
+        pet->SetEnabled(true);
+    else
+        ResummonPetTemporaryUnSummonedIfAny();
+
+    SendDismountResult(DISMOUNTRESULT_OK);
+}
+
+void Player::SendMountResult(PlayerMountResult result)
+{
+    WorldPacket data(SMSG_MOUNTRESULT, 4);
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendDismountResult(PlayerDismountResult result)
+{
+    WorldPacket data(SMSG_DISMOUNTRESULT, 4);
+    data << uint32(result);
+    GetSession()->SendPacket(&data);
+}
+
 void Player::InitDataForForm(bool reapplyMods)
 {
     ShapeshiftForm form = GetShapeshiftForm();
@@ -17290,7 +17458,7 @@ void Player::UpdateHomebindTime(uint32 time)
             // hide reminder
             WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
             data << uint32(0);
-            data << uint32(ERR_RAID_GROUP_NONE);            // error used only when timer = 0
+            data << uint32(ERR_RAID_GROUP_REQUIRED);            // error used only when timer = 0
             GetSession()->SendPacket(&data);
         }
         // instance is valid, reset homebind timer
@@ -17301,7 +17469,7 @@ void Player::UpdateHomebindTime(uint32 time)
         if (time >= m_HomebindTimer)
         {
             // teleport to homebind location
-            TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation());
+            TeleportToHomebind();
         }
         else
             m_HomebindTimer -= time;
@@ -17313,7 +17481,7 @@ void Player::UpdateHomebindTime(uint32 time)
         // send message to player
         WorldPacket data(SMSG_RAID_GROUP_ONLY, 4 + 4);
         data << uint32(m_HomebindTimer);
-        data << uint32(ERR_RAID_GROUP_NONE);                // error used only when timer = 0
+        data << uint32(ERR_RAID_GROUP_REQUIRED);                // error used only when timer = 0
         GetSession()->SendPacket(&data);
         DEBUG_LOG("PLAYER: Player '%s' (GUID: %u) will be teleported to homebind in 60 seconds", GetName(), GetGUIDLow());
     }
@@ -17610,6 +17778,7 @@ template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Creature*
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, Corpse*        target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, GameObject*    target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, DynamicObject* target, UpdateData& data, std::set<WorldObject*>& visibleNow);
+template void Player::UpdateVisibilityOf(WorldObject const* viewPoint, WorldObject*   target, UpdateData& data, std::set<WorldObject*>& visibleNow);
 
 void Player::InitPrimaryProfessions()
 {
@@ -17695,7 +17864,7 @@ void Player::SetGroup(Group *group, int8 subgroup)
 void Player::SendInitialPacketsBeforeAddToMap()
 {
     WorldPacket data(SMSG_SET_REST_START, 4);
-    data << uint32(0);                                      // unknown, may be rest state time or experience
+    data << uint32(0);                                      // rest state time
     GetSession()->SendPacket(&data);
 
     // Homebind
@@ -17789,12 +17958,10 @@ void Player::SendUpdateToOutOfRangeGroupMembers()
         pet->ResetAuraUpdateMask();
 }
 
-void Player::SendTransferAborted(uint32 mapid, uint8 reason, uint8 arg)
+void Player::SendTransferAborted(uint8 reason)
 {
-    WorldPacket data(SMSG_TRANSFER_ABORTED, 4 + 2);
-    data << uint32(mapid);
+    WorldPacket data(SMSG_TRANSFER_ABORTED, 1);
     data << uint8(reason);                                  // transfer abort reason
-    data << uint8(0);                                       // arg. not used
     GetSession()->SendPacket(&data);
 }
 
@@ -18892,10 +19059,40 @@ void Player::UpdateUnderwaterState()
     if (!res)
     {
         m_MirrorTimerFlags &= ~(UNDERWATER_INWATER | UNDERWATER_INLAVA | UNDERWATER_INSLIME | UNDERWATER_INDARKWATER);
+
+        if (m_lastLiquid && m_lastLiquid->SpellId)
+            RemoveAurasDueToSpell(m_lastLiquid->SpellId);
+        m_lastLiquid = nullptr;
+
         // Small hack for enable breath in WMO
         /* if (IsInWater())
-            m_MirrorTimerFlags|=UNDERWATER_INWATER; */
+        m_MirrorTimerFlags|=UNDERWATER_INWATER; */
         return;
+    }
+
+    if (uint32 liqEntry = liquid_status.entry)
+    {
+        LiquidTypeEntry const* liquid = sLiquidTypeStore.LookupEntry(liqEntry);
+        if (m_lastLiquid && m_lastLiquid->SpellId && m_lastLiquid->Id != liqEntry)
+            RemoveAurasDueToSpell(m_lastLiquid->SpellId);
+
+        if (liquid && liquid->SpellId)
+        {
+            if (res & (LIQUID_MAP_UNDER_WATER | LIQUID_MAP_IN_WATER))
+            {
+                if (!HasAura(liquid->SpellId))
+                    CastSpell(this, liquid->SpellId, true);
+            }
+            else
+                RemoveAurasDueToSpell(liquid->SpellId);
+        }
+
+        m_lastLiquid = liquid;
+    }
+    else if (m_lastLiquid && m_lastLiquid->SpellId)
+    {
+        RemoveAurasDueToSpell(m_lastLiquid->SpellId);
+        m_lastLiquid = nullptr;
     }
 
     // All liquids type - check under water position
@@ -18921,6 +19118,7 @@ void Player::UpdateUnderwaterState()
         else
             m_MirrorTimerFlags &= ~UNDERWATER_INLAVA;
     }
+
     // in slime check, anywhere in slime level
     if (liquid_status.type_flags & MAP_LIQUID_TYPE_SLIME)
     {
@@ -18928,33 +19126,6 @@ void Player::UpdateUnderwaterState()
             m_MirrorTimerFlags |= UNDERWATER_INSLIME;
         else
             m_MirrorTimerFlags &= ~UNDERWATER_INSLIME;
-    }
-
-    // cast any spells associated with this liquid type (only used in Naxxramas)
-    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_status.entry))
-    {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(liq->SpellId);
-
-        if (spellInfo)
-        {
-            SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, this, nullptr);
-
-            for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-            {
-                uint8 eff = spellInfo->Effect[i];
-                if (eff >= TOTAL_SPELL_EFFECTS)
-                    continue;
-                if (IsAreaAuraEffect(eff) ||
-                    eff == SPELL_EFFECT_APPLY_AURA ||
-                    eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
-                {
-                    Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, this);
-                    holder->AddAura(aur, SpellEffectIndex(i));
-                }
-            }
-            if (!AddSpellAuraHolder(holder))
-                holder = nullptr;
-        }
     }
 }
 
@@ -19016,7 +19187,15 @@ bool Player::CanCaptureTowerPoint()
 
 bool Player::isTotalImmune()
 {
-    return IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_ALL);
+    AuraList const& immune = GetAurasByType(SPELL_AURA_SCHOOL_IMMUNITY);
+
+    uint32 immuneMask = 0;
+    for (AuraList::const_iterator itr = immune.begin(); itr != immune.end(); ++itr)
+    {
+        immuneMask |= (*itr)->GetModifier()->m_miscvalue;
+    }
+
+    return (immuneMask == SPELL_SCHOOL_MASK_ALL);
 }
 
 void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
@@ -19484,6 +19663,14 @@ void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
     // update sql homebind
     CharacterDatabase.PExecute("UPDATE character_homebind SET map = '%u', zone = '%u', position_x = '%f', position_y = '%f', position_z = '%f' WHERE guid = '%u'",
                                m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, GetGUIDLow());
+}
+
+bool Player::TeleportToHomebind(uint32 options) 
+{
+    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
+    AddSpellAndCategoryCooldowns(spellInfo, 6948);   // Initiate hearthstone cooldown
+
+    return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); 
 }
 
 Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)

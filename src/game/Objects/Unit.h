@@ -531,7 +531,7 @@ enum NPCFlags
 {
     UNIT_NPC_FLAG_NONE                  = 0x00000000,
     UNIT_NPC_FLAG_GOSSIP                = 0x00000001,       // 100%
-    UNIT_NPC_FLAG_QUESTGIVER            = 0x00000002,       // guessed, probably ok
+    UNIT_NPC_FLAG_QUESTGIVER            = 0x00000002,       // 100%
     UNIT_NPC_FLAG_VENDOR                = 0x00000004,       // 100%
     UNIT_NPC_FLAG_FLIGHTMASTER          = 0x00000008,       // 100%
     UNIT_NPC_FLAG_TRAINER               = 0x00000010,       // 100%
@@ -1163,8 +1163,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsMounted() const { return (GetMountID() != 0); }
         uint32 GetMountID() const { return GetUInt32Value(UNIT_FIELD_MOUNTDISPLAYID); }
-        void Mount(uint32 mount, uint32 spellId = 0);
-        void Unmount(bool from_aura = false);
+        virtual void Mount(uint32 mount, uint32 spellId = 0);
+        virtual void Unmount(bool from_aura = false);
 
         // Tuer cette unite.
         void DoKillUnit(Unit *victim = nullptr);
@@ -1356,6 +1356,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
+        ObjectGuid const& GetPossessorGuid() { return m_possessorGuid; }
+        void SetPossesorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+
         virtual Pet* GetMiniPet() const { return nullptr; }    // overwrited in Player
 
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
@@ -1374,6 +1377,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Unit* GetCharmer() const;
         Unit* GetCharm() const;
         void Uncharm();
+        void RemoveCharmAuras();
         Unit* GetCharmerOrOwner() const { return GetCharmerGuid() ? GetCharmer() : GetOwner(); }
         Unit* GetCharmerOrOwnerOrSelf()
         {
@@ -1516,12 +1520,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
             return form == FORM_CAT || form == FORM_BEAR || form == FORM_DIREBEAR;
         }
 
-        bool IsInDisallowedMountForm() const
-        {
-            ShapeshiftForm form = GetShapeshiftForm();
-            return form != FORM_NONE && form != FORM_BATTLESTANCE && form != FORM_BERSERKERSTANCE && form != FORM_DEFENSIVESTANCE &&
-                form != FORM_SHADOW && form != FORM_STEALTH;
-        }
+        bool IsInDisallowedMountForm() const;
 
         float m_modMeleeHitChance;
         float m_modRangedHitChance;
@@ -1639,7 +1638,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // at any changes to scale and/or displayId
         void UpdateModelData();
-
+        void GetDynObjects(uint32 spellId, SpellEffectIndex effectIndex, std::vector<DynamicObject*>& dynObjsOut);
         DynamicObject* GetDynObject(uint32 spellId, SpellEffectIndex effIndex);
         DynamicObject* GetDynObject(uint32 spellId);
         void AddDynObject(DynamicObject* dynObj);
@@ -1779,6 +1778,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // group updates
         void UpdateAuraForGroup(uint8 slot);
+        
+        bool IsLinkingEventTrigger() { return m_isCreatureLinkingTrigger; }
 
         // pet auras
         typedef std::set<PetAura const*> PetAuraSet;
@@ -1954,6 +1955,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_speed_rate[MAX_MOVE_TYPE];
 
         CharmInfo *m_charmInfo;
+        ObjectGuid m_possessorGuid; // Guid of unit possessing this one
 
         virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
 
@@ -1967,9 +1969,15 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         SpellCooldowns m_spellCooldowns;
         GlobalCooldownMgr m_GlobalCooldownMgr;
+
+        bool m_isCreatureLinkingTrigger;
+        bool m_isSpawningLinked;
+
     public:
         void DisableSpline();
         void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }
+        void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
+        float GetMeleeZLimit() const { return m_meleeZLimit; }
 
     protected:
         typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
@@ -2014,6 +2022,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         GuardianPetList m_guardianPets;
 
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
+
+        float m_meleeZLimit;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

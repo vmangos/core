@@ -158,7 +158,7 @@ void PlayerMenu::SendGossipMenu(uint32 TitleTextId, ObjectGuid objectGuid)
     WorldPacket data(SMSG_GOSSIP_MESSAGE, (100));           // guess size
     data << ObjectGuid(objectGuid);
     data << uint32(TitleTextId);
-    data << uint32(mGossipMenu.MenuItemCount());            // max count 0x20
+    data << uint32(mGossipMenu.MenuItemCount());            // [ZERO] max count 15
 
     for (uint32 iI = 0; iI < mGossipMenu.MenuItemCount(); ++iI)
     {
@@ -811,7 +811,7 @@ void PlayerMenu::SendQuestGiverRequestItems(Quest const *pQuest, ObjectGuid npcG
 
     data << uint32(0x04);                                   // flags2
     data << uint32(0x08);                                   // flags3
-    data << uint32(0x10);                                   // flags4
+    //data << uint32(0x10);                                 // [-ZERO] flags4
 
     GetMenuSession()->SendPacket(&data);
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_REQUEST_ITEMS NPCGuid = %s, questid = %u", npcGUID.GetString().c_str(), pQuest->GetQuestId());

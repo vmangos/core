@@ -129,7 +129,7 @@ struct ChrClassesEntry
 struct ChrRacesEntry
 {
     uint32      RaceID;                                     // 0        m_ID
-                                                            // 1        m_flags
+    uint32      Flags;                                      // 1        m_flags
     uint32      FactionID;                                  // 2        m_factionID
                                                             // 3        m_ExplorationSoundID
     uint32      model_m;                                    // 4        m_MaleDisplayId
@@ -172,7 +172,7 @@ struct CinematicSequencesEntry
 struct CreatureDisplayInfoEntry
 {
     uint32      Displayid;                                  // 0        m_ID
-                                                            // 1        m_modelID
+    uint32      ModelId;                                    // 1        m_modelID
                                                             // 2        m_soundID
     uint32      ExtendedDisplayInfoID;                      // 3        m_extendedDisplayInfoID -> CreatureDisplayInfoExtraEntry::DisplayExtraId
     float       scale;                                      // 4        m_creatureModelScale
@@ -195,6 +195,26 @@ struct CreatureDisplayInfoExtraEntry
     //uint32    BeardStyle;                                 // 7        m_FacialHairID
     //uint32    Equipment[10];                              // 8-17     m_NPCItemDisplay equipped static items EQUIPMENT_SLOT_HEAD..EQUIPMENT_SLOT_HANDS, client show its by self
     //char*                                                 // 18       m_BakeName CreatureDisplayExtra-*.blp
+};
+
+struct CreatureModelDataEntry
+{
+    uint32_t ID;                                            // 0        m_ID
+    uint32_t flags;                                         // 1        m_flags
+    //char* modelName;                                      // 2        m_modelName
+    //uint32 sizeClass;                                     // 3        m_sizeClass
+    //float modelScale;                                     // 4        m_modelScale
+    //uint32 blood;                                         // 5        m_blood
+    //uint32 footprintTexture;                              // 6        m_footprintTexture
+    //float footprintTextureLength;                         // 7        m_footprintTextureLength
+    //float footprintTextureWidth;                          // 8        m_footprintTextureWidth
+    //float footprintTextureScale;                          // 9        m_footprintTextureScale
+    //uint32 foleyMaterial;                                 // 10       m_foleyMaterial
+    //uint32 footstepShakeSize;                             // 11       m_footstepShakeSize
+    //uint32 deathThudShakeSize;                            // 12       m_deathThudShakeSize
+    //float collisionWidth;                                 // 13       m_collisionWidth
+    //float collisionHeight;                                // 14       m_collisionHeight
+    //float mountHeight;                                    // 15       m_mountHeight
 };
 
 struct CreatureFamilyEntry

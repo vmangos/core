@@ -130,7 +130,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!target->isAlive() || target->IsTaxiFlying() )
         return;
 
-    if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsTotem())
+    if (target->GetTypeId() == TYPEID_UNIT && ((Creature*)target)->IsImmuneToAoe())
         return;
 
     if (!i_dynobject.IsWithinDistInMap(target, i_dynobject.GetRadius()))

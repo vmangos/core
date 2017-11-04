@@ -188,7 +188,7 @@ bool changeGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, uint
         return true;                                        // not an error
 
     uint32 newGuid = registerNewGuid(oldGuid, guidMap, hiGuid);
-    snprintf(chritem, 20, "%d", newGuid);
+    snprintf(chritem, 20, "%u", newGuid);
 
     return changenth(str, n, chritem, false, nonzero);
 }
@@ -201,7 +201,7 @@ bool changetokGuid(std::string &str, int n, std::map<uint32, uint32> &guidMap, u
         return true;                                        // not an error
 
     uint32 newGuid = registerNewGuid(oldGuid, guidMap, hiGuid);
-    snprintf(chritem, 20, "%d", newGuid);
+    snprintf(chritem, 20, "%u", newGuid);
 
     return changetoknth(str, n, chritem, false, nonzero);
 }
@@ -488,9 +488,9 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
     // name encoded or empty
 
-    snprintf(newguid, 20, "%d", guid);
-    snprintf(chraccount, 20, "%d", account);
-    snprintf(newpetid, 20, "%d", sObjectMgr.GeneratePetNumber());
+    snprintf(newguid, 20, "%u", guid);
+    snprintf(chraccount, 20, "%u", account);
+    snprintf(newpetid, 20, "%u", sObjectMgr.GeneratePetNumber());
     snprintf(lastpetid, 20, "%s", "");
 
     std::map<uint32, uint32> items;
@@ -644,7 +644,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
 
                 if (strcmp(lastpetid, currpetid) != 0)
                 {
-                    snprintf(newpetid, 20, "%d", sObjectMgr.GeneratePetNumber());
+                    snprintf(newpetid, 20, "%u", sObjectMgr.GeneratePetNumber());
                     snprintf(lastpetid, 20, "%s", currpetid);
                 }
 
@@ -669,7 +669,7 @@ DumpReturn PlayerDumpReader::LoadDump(const std::string& file, uint32 account, s
                 if (petids_iter == petids.end())            // couldn't find new inserted id
                     ROLLBACK(DUMP_FILE_BROKEN);
 
-                snprintf(newpetid, 20, "%d", petids_iter->second);
+                snprintf(newpetid, 20, "%u", petids_iter->second);
 
                 if (!changenth(line, 1, newpetid))          // pet_*.guid -> petid in fact
                     ROLLBACK(DUMP_FILE_BROKEN);

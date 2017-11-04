@@ -779,6 +779,18 @@ class World
         };
         uint32 InsertLog(std::string const& message, AccountTypes sec);
         ArchivedLogMessage* GetLog(uint32 logId, AccountTypes my_sec);
+
+        /**
+        * \brief: force all client to request player data
+        * \param: ObjectGuid guid : guid of the specified player
+        * \returns: void
+        *
+        * Description: InvalidatePlayerDataToAllClient force all connected clients to clear specified player cache
+        * FullName: World::InvalidatePlayerDataToAllClient
+        * Access: public
+        **/
+        void InvalidatePlayerDataToAllClient(ObjectGuid guid);
+
     protected:
         void _UpdateGameTime();
         // callback for UpdateRealmCharacters

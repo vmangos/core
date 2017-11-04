@@ -849,6 +849,9 @@ bool Pet::UpdateStats(Stats stat)
             break;
     }
 
+    if (GetMaxPower(POWER_MANA))
+        UpdateManaRegen();
+
     return true;
 }
 
@@ -862,6 +865,9 @@ bool Pet::UpdateAllStats()
 
     for (int i = SPELL_SCHOOL_NORMAL; i < MAX_SPELL_SCHOOL; ++i)
         UpdateResistances(i);
+
+    if (GetMaxPower(POWER_MANA))
+        UpdateManaRegen();
 
     return true;
 }

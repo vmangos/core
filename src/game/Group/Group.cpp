@@ -1644,7 +1644,7 @@ void Group::SwapMembersGroup(Player *player, Player *swapPlayer)
     }
 }
 
-uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount)
+uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGroundQueueTypeId bgQueueTypeId, uint32 MinPlayerCount, uint32 MaxPlayerCount, Player* Leader, std::vector<uint32>* excludedMembers)
 {
     // check for min / max count
     uint32 memberscount = GetMembersCount();
@@ -1653,14 +1653,12 @@ uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGround
     if (memberscount > MaxPlayerCount)
         return BG_JOIN_ERR_GROUP_TOO_MANY;
 
-    // get a player as reference, to compare other players' stats to (queue id based on level, etc.)
-    Player * reference = GetFirstMember()->getSource();
     // no reference found, can't join this way
-    if (!reference)
+    if (!Leader)
         return BG_JOIN_ERR_OFFLINE_MEMBER;
 
-    BattleGroundBracketId bracket_id = reference->GetBattleGroundBracketIdFromLevel(bgTypeId);
-    Team team = reference->GetTeam();
+    BattleGroundBracketId bracket_id = Leader->GetBattleGroundBracketIdFromLevel(bgTypeId);
+    Team team = Leader->GetTeam();
 
     // check every member of the group to be able to join
     for (GroupReference *itr = GetFirstMember(); itr != NULL; itr = itr->next())
@@ -1674,7 +1672,10 @@ uint32 Group::CanJoinBattleGroundQueue(BattleGroundTypeId bgTypeId, BattleGround
             return BG_JOIN_ERR_MIXED_FACTION;
         // not in the same battleground level bracket, don't let join
         if (member->GetBattleGroundBracketIdFromLevel(bgTypeId) != bracket_id)
-            return BG_JOIN_ERR_MIXED_LEVELS;
+        {
+            if (excludedMembers && (std::find(excludedMembers->begin(), excludedMembers->end(), member->GetGUIDLow()) == excludedMembers->end()))
+                excludedMembers->push_back(member->GetGUIDLow());
+        }
         // don't let join if someone from the group is already in that bg queue
         if (member->InBattleGroundQueueForBattleGroundQueueType(bgQueueTypeId))
             return BG_JOIN_ERR_GROUP_MEMBER_ALREADY_IN_QUEUE;
@@ -1726,6 +1727,27 @@ void Group::ResetInstances(InstanceResetMethod method, Player* SendMsgTo)
                 ++itr;
                 continue;
             }
+
+            if (SendMsgTo)
+            {
+                bool offline_players = false;
+                for (member_citerator citr = m_memberSlots.begin(); citr != m_memberSlots.end(); ++citr)
+                {
+                    Player *pl = sObjectMgr.GetPlayer(citr->guid);
+                    if (!pl || !pl->GetSession())
+                    {
+                        offline_players = true;
+                        break;
+                    }
+                }
+
+                if (offline_players)
+                {
+                    SendMsgTo->SendResetInstanceFailed(INSTANCERESET_FAIL_OFFLINE, state->GetMapId());
+                    ++itr;
+                    continue;
+                }
+            }
         }
 
         bool isEmpty = true;
@@ -1739,7 +1761,7 @@ void Group::ResetInstances(InstanceResetMethod method, Player* SendMsgTo)
             if (isEmpty)
                 SendMsgTo->SendResetInstanceSuccess(state->GetMapId());
             else
-                SendMsgTo->SendResetInstanceFailed(0, state->GetMapId());
+                SendMsgTo->SendResetInstanceFailed(INSTANCERESET_FAIL_GENERAL, state->GetMapId());
         }
 
         if (isEmpty || method == INSTANCE_RESET_GROUP_DISBAND)

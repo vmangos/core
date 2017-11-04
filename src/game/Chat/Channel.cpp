@@ -468,13 +468,12 @@ void Channel::List(PlayerPointer player)
     }
     else
     {
-        WorldPacket data(SMSG_CHANNEL_LIST, 1 + (GetName().size() + 1) + 1 + 4 + m_players.size() * (8 + 1));
-        data << uint8(1);                                   // channel type?
+        WorldPacket data(SMSG_CHANNEL_LIST, (GetName().size() + 1) + 1 + 4 + m_players.size() * (8 + 1));   // guess size
         data << GetName();                                  // channel name
         data << uint8(GetFlags());                          // channel flags?
 
         size_t pos = data.wpos();
-        data << uint32(0);                                  // size of list, placeholder
+        data << int32(0);                                   // size of list, placeholder
 
         AccountTypes gmLevelInWhoList = (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_WHO_LIST);
 
@@ -510,7 +509,7 @@ void Channel::List(PlayerPointer player)
             }
         }
 
-        data.put<uint32>(pos, count);
+        data.put<int32>(pos, count);
 
         SendToOne(&data, p);
     }
@@ -772,17 +771,17 @@ void Channel::MakeLeft(WorldPacket *data, ObjectGuid guid)
 void Channel::MakeYouJoined(WorldPacket *data)
 {
     MakeNotifyPacket(data, CHAT_YOU_JOINED_NOTICE);
-    *data << uint8(GetFlags());
-    *data << uint32(GetChannelId());
-    *data << uint32(0);
+    *data << uint32(GetFlags());
+    *data << uint32(0);                                     // the non-zero number will be appended to the channel name
+    *data << uint8(0);                                      // CString max length 512, conditional read
 }
 
 // done 0x03
 void Channel::MakeYouLeft(WorldPacket *data)
 {
     MakeNotifyPacket(data, CHAT_YOU_LEFT_NOTICE);
-    *data << uint32(GetChannelId());
-    *data << uint8(0);                                      // can be 0x00 and 0x01
+    //*data << uint32(GetChannelId());                        //[-ZERO]
+    //*data << uint8(0);                                      //[-ZERO] can be 0x00 and 0x01 (bool)
 }
 
 // done 0x04
@@ -795,6 +794,12 @@ void Channel::MakeWrongPassword(WorldPacket *data)
 void Channel::MakeNotMember(WorldPacket *data)
 {
     MakeNotifyPacket(data, CHAT_NOT_MEMBER_NOTICE);
+}
+
+void Channel::MakeNotOnPacket(WorldPacket* data, const std::string &name)
+{
+    data->Initialize(SMSG_CHANNEL_NOTIFY, (1 + name.length() + 1));
+    (*data) << (uint8)CHAT_NOT_MEMBER_NOTICE << name;
 }
 
 // done 0x06

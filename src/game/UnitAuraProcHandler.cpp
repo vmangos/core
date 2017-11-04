@@ -274,7 +274,13 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
                 return true;
             return false;
         }
-
+        // Wrath of Cenarius - Spell Blasting
+        if (spellProto->Id == 25906)
+        {
+            // Should be able to proc when negative magical effect lands on a target.
+            if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !IsPositiveSpell(procSpell) && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(IsSpellAppliesAura(procSpell) && (procFlag & PROC_FLAG_ON_DO_PERIODIC)))
+                return roll_chance_f((float)spellProto->procChance);
+        }
         // DRUID
         // Omen of Clarity
         if (spellProto->Id == 16864)
@@ -1554,6 +1560,32 @@ SpellAuraProcResult Unit::HandleOverrideClassScriptAuraProc(Unit *pVictim, uint3
             // only proc on direct healing
             if (IsSpellHaveEffect(procSpell, SPELL_EFFECT_HEAL))
                 triggered_spell_id = 23402;
+            break;
+        }
+        case 4533: // Druid T3 Bonus: 28716 (50% chance)
+        {
+            if (procSpell->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REJUVENATION>())
+            {
+                switch (pVictim->getPowerType())
+                {
+                case POWER_MANA:
+                    triggered_spell_id = 28722;
+                    break;
+                case POWER_RAGE:
+                    triggered_spell_id = 28723;
+                    break;
+                case POWER_ENERGY:
+                    triggered_spell_id = 28724;
+                    break;
+                }
+            }
+            break;
+        }
+        case 4537: // Druid T3 Bonus: 28744
+        {
+            if (procSpell->IsFitToFamily<SPELLFAMILY_DRUID, CF_DRUID_REGROWTH>())
+                triggered_spell_id = 28750;
+
             break;
         }
     }

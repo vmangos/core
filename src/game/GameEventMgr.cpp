@@ -51,6 +51,9 @@ uint32 GameEventMgr::NextCheck(uint16 entry) const
 {
     time_t currenttime = time(nullptr);
 
+    if (entry == 17)      // Scourge Invasion Event, update every 20s
+        return 20;
+
     // outdated event: we return max
     if (currenttime > mGameEvent[entry].end)
         return max_ge_check_delay;
@@ -696,12 +699,17 @@ void GameEventMgr::Initialize(MapPersistentState* state)
 uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= NULL*/)
 {
     // process hardcoded events
-    for (auto hEvent_iter = mGameEventHardcodedList.begin(); hEvent_iter != mGameEventHardcodedList.end(); ++hEvent_iter)
-        if (!mGameEvent[(*hEvent_iter)->m_eventId].disabled)
-            (*hEvent_iter)->Update();
-
     time_t currenttime = time(nullptr);
     uint32 nextEventDelay = max_ge_check_delay;             // 1 day
+
+    for (auto hEvent_iter = mGameEventHardcodedList.begin(); hEvent_iter != mGameEventHardcodedList.end(); ++hEvent_iter)
+    {
+        if (!mGameEvent[(*hEvent_iter)->m_eventId].disabled)
+        {
+            (*hEvent_iter)->Update();
+            nextEventDelay = NextCheck((*hEvent_iter)->m_eventId);
+        }
+    }
 
     for (uint16 itr = 1; itr < mGameEvent.size(); ++itr)
     {

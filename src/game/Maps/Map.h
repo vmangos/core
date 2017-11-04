@@ -41,6 +41,7 @@
 #include "MoveSplineInitArgs.h"
 #include "WorldSession.h"
 #include "SQLStorages.h"
+#include "CreatureLinkingMgr.h"
 
 #include <bitset>
 #include <list>
@@ -309,6 +310,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
 
         void UpdateObjectVisibility(WorldObject* obj, Cell cell, CellPair cellpair);
 
+        void UpdateActiveObjectVisibility(Player *player);
+        void UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids);
+        void UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids, UpdateData &data, std::set<WorldObject*> &visibleNow);
+
         void resetMarkedCells() { marked_cells.reset(); }
         bool isCellMarked(uint32 pCellId) { return marked_cells.test(pCellId); }
         void markCell(uint32 pCellId) { marked_cells.set(pCellId); }
@@ -411,6 +416,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         uint32 GetUpdateDiffMod() const { return m_updateDiffMod; }
         void BindToInstanceOrRaid(Player* player, time_t objectResetTime, bool permBindToRaid);
         void TeleportAllPlayersToHomeBind();
+
+        // Get Holder for Creature Linking
+        CreatureLinkingHolder* GetCreatureLinkingHolder() { return &m_creatureLinkingHolder; }
 
     private:
         void LoadMapAndVMap(int gx, int gy);
@@ -542,6 +550,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         uint32 _lastCellsUpdate;
 
         int8 _updateIdx;
+
+        // Holder for information about linked mobs
+        CreatureLinkingHolder m_creatureLinkingHolder;
+
     public:
         CreatureGroupHolderType CreatureGroupHolder;
         uint32 GetLastPlayerLeftTime() const { return _lastPlayerLeftTime; }

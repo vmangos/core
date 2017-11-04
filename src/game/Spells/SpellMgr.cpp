@@ -284,7 +284,7 @@ float CalculateDefaultCoefficient(SpellEntry const *spellProto, DamageEffectType
 }
 
 
-float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell)
+float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caster, DamageEffectType const damageType, float coeff, Spell* spell, bool donePart)
 {
     if (!caster)
         return coeff;
@@ -313,6 +313,11 @@ float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caste
                     speed /= 1000.0f;
 
                     return speed * coeff;
+                }
+                // Seal of Command
+                if (spellProto->Id == 20424)
+                {
+                    return donePart ? 0.20f : 0.29f;
                 }
             }
             case SPELLFAMILY_SHAMAN:
@@ -714,8 +719,6 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
             // some explicitly required dummy effect sets
             switch (spellproto->Id)
             {
-                case 28441:                                 // AB Effect 000
-                    return false;
                 case 10258:                                 // Awaken Vault Warder
                 case 18153:                                 // Kodo Kombobulator
                     return true;
@@ -827,8 +830,11 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
                     if (spellproto->Id == 24740)            // Wisp Costume
                         return true;
                     return false;
-                case SPELL_AURA_MOD_ROOT:
                 case SPELL_AURA_MOD_SILENCE:
+                    if (spellproto->Id == 24732)            // Bat Costume
+                        return true;
+                    return false;
+                case SPELL_AURA_MOD_ROOT:
                 case SPELL_AURA_GHOST:
                 case SPELL_AURA_PERIODIC_LEECH:
                 case SPELL_AURA_MOD_STALKED:

@@ -63,6 +63,7 @@ class MANGOS_DLL_SPEC SpellAuraHolder
         void _AddSpellAuraHolder();
         void _RemoveSpellAuraHolder();
         void HandleSpellSpecificBoosts(bool apply);
+        void HandleCastOnAuraRemoval() const;
         void CleanupTriggeredSpells();
 
         void setDiminishGroup(DiminishingGroup group) { m_AuraDRGroup = group; }
@@ -374,6 +375,7 @@ class MANGOS_DLL_SPEC Aura
         void HandleAuraModAttackPowerPercent(bool apply, bool Real);
         void HandleAuraModRangedAttackPowerPercent(bool apply, bool Real);
         void HandleSpiritOfRedemption(bool apply, bool Real);
+        void HandleAuraAoeCharm(bool apply, bool real);
         void HandleShieldBlockValue(bool apply, bool Real);
         void HandleModSpellCritChanceShool(bool apply, bool Real);
         void HandleAuraRetainComboPoints(bool apply, bool Real);

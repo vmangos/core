@@ -255,7 +255,7 @@ bool Corpse::LoadFromDB(uint32 lowguid, Field *fields)
 
 bool Corpse::isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const
 {
-    return IsInWorld() && u->IsInWorld() && IsWithinDist(viewPoint, u->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f), false);
+    return IsInWorld() && u->IsInWorld() && IsWithinDist(viewPoint, u->GetMap()->GetVisibilityDistance() + (inVisibleList ? World::GetVisibleObjectGreyDistance() : 0.0f) + GetVisibilityModifier(), false);
 }
 
 ReputationRank Corpse::GetReactionTo(Unit const* unit) const

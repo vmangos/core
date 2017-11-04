@@ -278,7 +278,7 @@ void Opcodes::BuildOpcodeList()
     /*0x0DE*/  StoreOpcode(SMSG_MOVE_WATER_WALK,              "SMSG_MOVE_WATER_WALK",             STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x0DF*/  StoreOpcode(SMSG_MOVE_LAND_WALK,               "SMSG_MOVE_LAND_WALK",              STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x0E0*/  StoreOpcode(MSG_MOVE_SET_RAW_POSITION_ACK,     "MSG_MOVE_SET_RAW_POSITION_ACK",    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
-    /*0x0E1*/  StoreOpcode(CMSG_MOVE_SET_RAW_POSITION,        "CMSG_MOVE_SET_RAW_POSITION",       STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
+    /*0x0E1*/  StoreOpcode(CMSG_MOVE_SET_RAW_POSITION,        "CMSG_MOVE_SET_RAW_POSITION",       STATUS_LOGGEDIN,  PACKET_PROCESS_MAP,           &WorldSession::HandleMoveSetRawPosition);
     /*0x0E2*/  StoreOpcode(SMSG_FORCE_RUN_SPEED_CHANGE,       "SMSG_FORCE_RUN_SPEED_CHANGE",      STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x0E3*/  StoreOpcode(CMSG_FORCE_RUN_SPEED_CHANGE_ACK,   "CMSG_FORCE_RUN_SPEED_CHANGE_ACK",  STATUS_LOGGEDIN,  PACKET_PROCESS_MOVEMENT,      &WorldSession::HandleForceSpeedChangeAckOpcodes);
     /*0x0E4*/  StoreOpcode(SMSG_FORCE_RUN_BACK_SPEED_CHANGE,  "SMSG_FORCE_RUN_BACK_SPEED_CHANGE", STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
@@ -357,7 +357,7 @@ void Opcodes::BuildOpcodeList()
     /*0x12D*/  StoreOpcode(CMSG_NEW_SPELL_SLOT,               "CMSG_NEW_SPELL_SLOT",              STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_NULL);
     /*0x12E*/  StoreOpcode(CMSG_CAST_SPELL,                   "CMSG_CAST_SPELL",                  STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,   &WorldSession::HandleCastSpellOpcode);
     /*0x12F*/  StoreOpcode(CMSG_CANCEL_CAST,                  "CMSG_CANCEL_CAST",                 STATUS_LOGGEDIN,  PACKET_PROCESS_SPELLS,   &WorldSession::HandleCancelCastOpcode);
-    /*0x130*/  StoreOpcode(SMSG_CAST_FAILED,                  "SMSG_CAST_FAILED",                 STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
+    /*0x130*/  StoreOpcode(SMSG_CAST_RESULT,                  "SMSG_CAST_RESULT",                 STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x131*/  StoreOpcode(SMSG_SPELL_START,                  "SMSG_SPELL_START",                 STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x132*/  StoreOpcode(SMSG_SPELL_GO,                     "SMSG_SPELL_GO",                    STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);
     /*0x133*/  StoreOpcode(SMSG_SPELL_FAILURE,                "SMSG_SPELL_FAILURE",               STATUS_NEVER,     PACKET_PROCESS_MAX_TYPE,      &WorldSession::Handle_ServerSide);

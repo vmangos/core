@@ -19,6 +19,7 @@ set (game_SRCS
 	AdvancedPlayerBotAI.h
 	AdvancedPlayerBotAI.cpp
 	AccountMgr.cpp
+	AuraRemovalMgr.cpp
 	AutoBroadCastMgr.cpp
 	Camera.cpp
 	CreatureGroups.cpp
@@ -27,6 +28,7 @@ set (game_SRCS
 	GossipDef.cpp
 	HardcodedEvents.cpp
 	HonorMgr.cpp
+	InstanceStatistics.cpp
 	ItemEnchantmentMgr.cpp
 	LootMgr.cpp
 	ObjectAccessor.cpp
@@ -102,6 +104,7 @@ set (game_SRCS
 	Database/CharacterDatabaseCleaner.cpp
 	Database/DBCStores.cpp
 	Database/SQLStorages.cpp
+	Group/CreatureLinkingMgr.cpp
 	Group/Group.cpp
 	Group/GroupReference.cpp
 	Guild/Guild.cpp
@@ -222,6 +225,7 @@ set (game_SRCS
 	vmap/VMapManager2.cpp
 	vmap/WorldModel.cpp
 	AccountMgr.h
+	AuraRemovalMgr.h
 	AutoBroadCastMgr.h
 	Camera.h
 	CreatureGroups.h
@@ -231,6 +235,7 @@ set (game_SRCS
 	GossipDef.h
 	HardcodedEvents.h
 	HonorMgr.h
+	InstanceStatistics.h
 	ItemEnchantmentMgr.h
 	Language.h
 	LootMgr.h
@@ -296,6 +301,7 @@ set (game_SRCS
 	Database/DBCStores.h
 	Database/DBCStructure.h
 	Database/SQLStorages.h
+	Group/CreatureLinkingMgr.h
 	Group/Group.h
 	Group/GroupReference.h
 	Group/GroupRefManager.h

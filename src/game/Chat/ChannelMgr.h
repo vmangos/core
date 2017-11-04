@@ -48,7 +48,6 @@ class ChannelMgr
         static void AnnounceBothFactionsChannel(std::string channelName, ObjectGuid playerGuid, const char* message);
     private:
         ChannelMap channels;
-        void MakeNotOnPacket(WorldPacket *data, std::string name);
 };
 
 class AllianceChannelMgr : public ChannelMgr {};

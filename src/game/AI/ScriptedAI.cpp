@@ -381,7 +381,9 @@ void ScriptedAI::SetCombatMovement(bool bCombatMove)
 enum
 {
     NPC_BROODLORD   = 12017,
-    NPC_VISCIDUS    = 15299
+    NPC_VISCIDUS    = 15299,
+    NPC_SYLVANAS    = 10181,
+    NPC_VARIMATHRAS = 2425
 };
 
 bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
@@ -409,6 +411,11 @@ bool ScriptedAI::EnterEvadeIfOutOfCombatArea(const uint32 uiDiff)
             break;
         case NPC_VISCIDUS:
             if (fZ < -30.0f)
+                return false;
+            break;
+        case NPC_SYLVANAS:
+        case NPC_VARIMATHRAS:
+            if (m_creature->GetDistance(fX, fY, fZ) < 120.0f)
                 return false;
             break;
         default:

@@ -373,6 +373,48 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             damage *= 0.25;
                          break;
                     }
+                    // Thaddius positive charge tick
+                    case 28062:
+                    {
+                        // Target also has positive charge, so no damage
+                        if (unitTarget->HasAura(28059))
+                            damage = 0;
+                        break;
+                    }
+                    // Thaddius negative charge tick
+                    case 28085:
+                    {
+                        // Target also has negative charge, so no damage
+                        if (unitTarget->HasAura(28084))
+                            damage = 0;
+                        break;
+                    }
+                    case 28375: // Gluth decimate
+                    {
+                        // damage should put target at maximum 5% hp, but not reduce it below that
+                        damage = std::max(0, int32(unitTarget->GetHealth() - uint32(unitTarget->GetMaxHealth() * 0.05f)));
+                        break;
+                    }
+                    case 28206: // Grobbulus Mutagen Explosion
+                    {
+                        // All sources say the explosion should do around 4.5k physical dmg if it runs out,
+                        // but "less" if dispelled. I have been able to find different variations of this spell,
+                        // so the hack has become to set m_triggeredBySpellInfo when casting this spell from Aura::HandleAuraDummy 
+                        // when 28169 expires, and NOT set m_triggeredBySpellInfo 28169 is dispelled.
+                        if (m_triggeredBySpellInfo)
+                            damage = uint32(damage * 1.5f);
+                        else
+                            damage = uint32(damage / 1.5f);
+                    }
+                    case 27812: // Kel'Thuzad Void Blast
+                    {
+                        // If target has the chains of kel'thuzad aura the spell should not do any damage.
+                        // This check should not be necessary as you should be friendly to the caster of
+                        // the spell, but some bug caused players to take damage anyway, and even if that is fixed,
+                        // this is a safetycheck.
+                        if (unitTarget->HasAura(28410))
+                            damage = 0;
+                    }
                     case 24933:                             // Cannon (Darkmoon Steam Tonk)
                     {
                         m_caster->CastSpell(unitTarget, 27766, true);
@@ -447,6 +489,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 // Hammer of Wrath - receive bonus from spell damage
                 if (m_spellInfo->SpellIconID == 42)
                 {
+                    m_attackType = BASE_ATTACK;    // Set as base attack to benefit from melee crit
                     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
                     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
                 }
@@ -502,13 +545,13 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     switch(unitTarget->getPowerType())
                     {
                         case POWER_RAGE :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 10, POWER_RAGE);
+                            unitTarget->CastSpell(unitTarget, 27783, true);
                         return;
                         case POWER_ENERGY :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 40, POWER_ENERGY);
+                            unitTarget->CastSpell(unitTarget, 27784, true);
                         return;
                         case POWER_MANA :
-                            unitTarget->EnergizeBySpell(unitTarget, 27798, 300, POWER_MANA);
+                            unitTarget->CastSpell(unitTarget, 27782, true);
                         return;
                     }
                     return;
@@ -1364,6 +1407,27 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 28414:                                 // Call of the Ashbringer
+                {
+                    if (!m_caster || !m_caster->IsPlayer())
+                        return;
+                    static constexpr uint32 AshbringerSounds[12] = { 8906,8907,8908,8920,8921,8922,8923,8924,8925,8926,8927,8928};
+                    m_caster->PlayDirectSound(AshbringerSounds[urand(0, 11)], m_caster->ToPlayer());
+                    return;
+                }
+                case 28441:                                 // AB Effect 000
+                {
+
+                    return;
+                }
+                case 28697:                                 // Forgiveness (SM Ashbringer event)
+                {
+                    if (unitTarget && m_caster)
+                    {
+                        m_caster->Kill(unitTarget, nullptr);
+                    }
+                    return;
+                }
             }
 
             //All IconID Check in there
@@ -1569,6 +1633,22 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 5229:                                  // Enrage
                 {
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
+                }
+                case 29201: // Loatheb Corrupted Mind triggered sub spells
+                {
+                    uint32 spellid;
+                    switch (unitTarget->getClass())
+                    {
+                        // priests should be getting 29185, but it triggers on dmg effects as well, don't know why.
+                        // stealing druid version for priests until anyone has a reason priests cant smite.s
+                    case CLASS_PRIEST:  spellid = 29194; break;//29185; break;
+                    case CLASS_DRUID:   spellid = 29194; break;
+                    case CLASS_PALADIN: spellid = 29196; break;
+                    case CLASS_SHAMAN:  spellid = 29198; break;
+                    default: break;
+                    }
+                    if (spellid != 0)
+                        m_caster->CastSpell(unitTarget, spellid, true);
                 }
             }
             break;
@@ -2278,6 +2358,7 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
     if (!unitTarget || !unitTarget->isAlive() || damage < 0)
         return;
 
+    int32 initialDamage = damage;
     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, uint32(damage), SPELL_DIRECT_DAMAGE);
 
@@ -2287,7 +2368,6 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
     if (Player *modOwner = m_caster->GetSpellModOwner())
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, healMultiplier);
 
-    m_damage += damage;
     // get max possible damage, don't count overkill for heal
     uint32 healthGain = uint32(damage);
     if (healthGain > unitTarget->GetHealth())
@@ -2298,6 +2378,12 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
     {
         m_caster->DealHeal(m_caster, uint32(healthGain), m_spellInfo);
     }
+
+    // Non delayed spells bonus damage is added later
+    if (!m_delayed)
+        damage = initialDamage;
+
+    m_damage += damage;
 }
 
 void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
@@ -2493,6 +2579,12 @@ void Spell::SendLoot(ObjectGuid guid, LootType loottype, LockType lockType)
                 if (lockType == LOCKTYPE_DISARM_TRAP)
                 {
                     gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
+                    return;
+                }
+                else if ((m_spellInfo->Id == 15748) || (m_spellInfo->Id == 16028)) // Freeze Rookery Egg
+                {
+                    if (gameObjTarget->getLootState() == GO_READY)
+                        gameObjTarget->UseDoorOrButton(0, true);
                     return;
                 }
                 sLog.outError("Spell::SendLoot unhandled locktype %u for GameObject trap (entry %u) for spell %u.", lockType, gameObjTarget->GetEntry(), m_spellInfo->Id);
@@ -3890,7 +3982,22 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
 
     // Also use this effect to set the taunter's threat to the taunted creature's highest value
     if (unitTarget->CanHaveThreatList() && unitTarget->getThreatManager().getCurrentVictim())
+    {
         unitTarget->getThreatManager().addThreat(m_caster, unitTarget->getThreatManager().getCurrentVictim()->getThreat());
+
+        // Patch 1.11 notes
+        // https://web.archive.org/web/20061109034626/http://evilempireguild.org:80/guides/kenco2.php
+        // Recently(1.11.x), the behaviour of Taunt has been buffed slightly.It now does three things :
+
+        // Taunt debuff.The mob is forced to attack you for 3 seconds.Later taunts by other players override this. 
+        // You are given threat equal to the mob's previous aggro target, permanently. Importantly, you won't necessarily get as much threat 
+        // as the highest person on the mob's list, only as much as whoever is currently tanking it. 
+        // You gain complete aggro on the mob at the instant you taunt.Usually you would need 10 % more threat to gain aggro(see section 3), 
+        // but a taunt now gives you instant aggro on the mob.
+        // Of course if other people are generating significant threat on the mob, they could exceed your threat by more than 10 % before the taunt debuff wears off, 
+        // and will gain aggro as soon as it does.There is no limit to the amount of threat you can gain from Taunt.
+        unitTarget->getThreatManager().setCurrentVictimIfCan(m_caster);
+    }
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }
@@ -3953,7 +4060,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     float weaponDamagePercentMod = 1.0f;                    // applied to weapon damage (and to fixed effect damage bonus if customBonusDamagePercentMod not set
     bool normalized = false;
 
-    int32 spell_bonus = 0;                                  // bonus specific for spell
     switch (m_spellInfo->SpellFamilyName)
     {
         case SPELLFAMILY_ROGUE:
@@ -3966,29 +4072,19 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
             }
             break;
         }
-        case SPELLFAMILY_PALADIN:
-        {
-            // Seal of Command - receive benefit from Spell Damage and Healing
-            if (m_spellInfo->Id == 20424)
-            {
-                spell_bonus += int32(0.20f * m_caster->SpellBaseDamageBonusDone(GetSpellSchoolMask(m_spellInfo)));
-                spell_bonus += int32(0.29f * unitTarget->SpellBaseDamageBonusTaken(GetSpellSchoolMask(m_spellInfo)));
-            }
-            break;
-        }
     }
 
-    int32 fixed_bonus = 0;
+    int32 bonus = 0;
     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
         switch (m_spellInfo->Effect[j])
         {
             case SPELL_EFFECT_WEAPON_DAMAGE:
             case SPELL_EFFECT_WEAPON_DAMAGE_NOSCHOOL:
-                fixed_bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
+                bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
                 break;
             case SPELL_EFFECT_NORMALIZED_WEAPON_DMG:
-                fixed_bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
+                bonus += CalculateDamage(SpellEffectIndex(j), unitTarget);
                 normalized = true;
                 break;
             case SPELL_EFFECT_WEAPON_PERCENT_DAMAGE:
@@ -3996,17 +4092,14 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
 
                 // applied only to prev.effects fixed damage
                 if (customBonusDamagePercentMod)
-                    fixed_bonus = int32(fixed_bonus * bonusDamagePercentMod);
+                    bonus = int32(bonus * bonusDamagePercentMod);
                 else
-                    fixed_bonus = int32(fixed_bonus * weaponDamagePercentMod);
+                    bonus = int32(bonus * weaponDamagePercentMod);
                 break;
             default:
                 break;                                      // not weapon damage effect, just skip
         }
     }
-
-    // non-weapon damage
-    int32 bonus = spell_bonus + fixed_bonus;
 
     // apply to non-weapon bonus weapon total pct effect, weapon total flat effect included in weapon damage
     if (bonus)
@@ -4033,16 +4126,27 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     // + weapon damage with applied weapon% dmg to base weapon damage in call
     bonus += int32(m_caster->CalculateDamage(m_attackType, normalized) * weaponDamagePercentMod);
 
+    // Seal of Command
+    if (m_spellInfo->School == SPELL_SCHOOL_HOLY)
+    {
+        // Prevent Vengeance double dipping
+        Unit::AuraList const& mModDamagePercentDone = m_caster->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
+        for (Unit::AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
+        {
+            if ((*i)->GetSpellProto()->SpellVisual == 6597)
+            {
+                bonus /= 1.0f + (*i)->GetModifier()->m_amount / 100.0f;
+                break;
+            }
+        }
+
+        // Add spell gear bonus and spell modifiers
+        bonus = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
+        bonus = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
+    }
+
     // prevent negative damage
     m_damage += uint32(bonus > 0 ? bonus : 0);
-
-     // Sanctity Aura addition mod (HACK) for SoC
-    if (m_spellInfo->Id == 20424)
-    {
-        // + Sanctity Aura
-        if (m_caster->HasAura(20218))
-            m_damage *= 1.1f;
-    }
 }
 
 void Spell::EffectThreat(SpellEffectIndex eff_idx)
@@ -4161,6 +4265,12 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     }
 
     int32 duration = GetSpellDuration(m_spellInfo);
+    
+    // Sapphirons summoned iceblocks have a duration *just* long enough to dissapear before the ice bomb.
+    // Since they are despawned by another spell anyway, I make the gobj add slightly longer to avoid any lag
+    // causing the gobj to despawn before the bomb goes off
+    if (m_spellInfo->Id == 28535)
+        duration = 30000;
 
     pGameObj->SetRespawnTime(duration > 0 ? duration / IN_MILLISECONDS : 0);
     pGameObj->SetSpellId(m_spellInfo->Id);
@@ -4342,10 +4452,21 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    if (roll_chance_i(14))                  // Trick (can be different critter models). 14% since below can have 1 of 6
-                        m_caster->CastSpell(m_caster, 24753, true);
-                    else                                    // Random Costume, 6 different (plus add. for gender)
-                        m_caster->CastSpell(m_caster, 24720, true);
+                    bool gender = unitTarget->getGender();
+                    uint32 spellId = 0;
+                    uint32 spells[8] = { 
+                        gender == GENDER_MALE ? 24708 : 24709,   // Pirate
+                        gender == GENDER_MALE ? 24711 : 24710,   // Ninja
+                        gender == GENDER_MALE ? 24712 : 24713,   // Leper
+                        gender == GENDER_MALE ? 24735 : 24736,   // Ghost
+                        24723,                                   // Skeleton
+                        24732,                                   // Bat
+                        24740,                                   // Wisp
+                        24753                                    // Critter
+                    };
+
+                    spellId = spells[urand(0, 7)];
+                    m_caster->CastSpell(m_caster, spellId, true);
 
                     return;
                 }
@@ -4539,12 +4660,62 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 }
                 case 28374:                                 // Decimate (Naxxramas: Gluth)
                 {
+                //implemented in SpellEffects::EffectSchoolDMG  instead, under case 28375
+                /*
                     if (!unitTarget)
                         return;
+                    // Should only affect players and zombies
+                    if (unitTarget->IsPlayer() || unitTarget->GetEntry() == 16360)
+                    {
+                        int32 damage = unitTarget->GetHealth() - unitTarget->GetMaxHealth() * 0.05f;
+                        if (damage > 0)
+                            m_caster->CastCustomSpell(unitTarget, 28375, &damage, nullptr, nullptr, true);
+                    }
+                */
+                    return;
+                }
+                case 28408:                                 // Chains of Kel'Thuzad (Naxxramas: Kel'thuzad)
+                {
+                    if (!m_caster)
+                        return;
 
-                    int32 damage = unitTarget->GetHealth() - unitTarget->GetMaxHealth() * 0.05f;
-                    if (damage > 0)
-                        m_caster->CastCustomSpell(unitTarget, 28375, &damage, nullptr, nullptr, true);
+                    // Select maintank + 4 random targets
+                    std::vector<Unit*> viableTargets;
+                    const ThreatList& tl = m_caster->getThreatManager().getThreatList();
+                    for (auto it = tl.begin(); it != tl.end(); it++)
+                    {
+                        if ((*it)->getUnitGuid().IsPlayer())
+                        {
+                            if (Unit* pUnit = m_caster->GetMap()->GetUnit((*it)->getUnitGuid()))
+                            {
+                                if (pUnit->isAlive())
+                                    viableTargets.push_back(pUnit);
+                            }
+                        }
+                    }
+
+                    int num_targets = std::min(int(viableTargets.size()), 5)-1; // leaving 1 target not MCed to avoid reset due to all MCed
+                    
+                    // always MC maintank
+                    if (Unit* maintank = m_caster->getVictim())
+                    {
+                        auto it = std::find(viableTargets.begin(), viableTargets.end(), maintank);
+                        if (it != viableTargets.end())
+                            viableTargets.erase(it);
+                        num_targets -= 1;
+                        maintank->CastSpell(maintank, 28409, true); // modifies scale
+                        m_caster->CastSpell(maintank, 28410, true); // applies dmg and healing mod, as well as the charm itself
+                    }
+
+                    for (int i = 0; i < num_targets; i++)
+                    {
+                        int rand = irand(0, viableTargets.size() - 1);
+                        Unit* target = viableTargets[rand];
+                        viableTargets.erase(viableTargets.begin() + rand);
+                        
+                        target->CastSpell(target, 28409, true); // modifies scale
+                        m_caster->CastSpell(target, 28410, true); // applies dmg and healing mod, as well as the charm itself
+                    }
                     return;
                 }
                 case 28560:                                 // Summon Blizzard
@@ -4574,6 +4745,20 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                 {
                     if (unitTarget && unitTarget->IsPlayer())
                         unitTarget->CastSpell(unitTarget, 29190, true);
+                    return;
+                }
+                case 30132:                                 // Despawn Ice Block
+                {
+                    if (unitTarget && unitTarget->IsPlayer())
+                    {
+                        unitTarget->RemoveAurasDueToSpell(31800); // Icebolt immunity spell
+                        unitTarget->RemoveAurasDueToSpell(28522); // Icebolt stun/damage spell
+                    }
+                }
+                case 28352:									// Atiesh - Breath of Sargeras 
+                {
+                    if (unitTarget && m_caster)
+                        m_caster->CastSpell(unitTarget, 28342, true);
                     return;
                 }
             }
@@ -4934,6 +5119,12 @@ void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
 {
     if (!gameObjTarget)
         return;
+
+    if (m_spellInfo->Id == 15958) // Collect Rookery Egg
+    {
+        gameObjTarget->AddObjectToRemoveList();
+        return;
+    }
 
     static ScriptInfo activateCommand = generateActivateCommand();
 
@@ -5543,16 +5734,53 @@ void Spell::EffectSendTaxi(SpellEffectIndex eff_idx)
     ((Player*)unitTarget)->ActivateTaxiPathTo(m_spellInfo->EffectMiscValue[eff_idx], m_spellInfo->Id, true);
 }
 
+
 void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
+    
+    switch (m_spellInfo->Id)
+    {
+    case 28337: // thaddius Magnetic Pull
+    {
+        float speedXY = float(m_spellInfo->EffectMiscValue[eff_idx]) * 0.1f;
+        float speedZ = unitTarget->GetDistance(m_caster) / speedXY * 0.5f * 20.0f;
+        unitTarget->KnockBackFrom(m_caster, -speedXY, speedZ);
+        break;
+    }
+    case 28434: // Spider Web
+    {
+        // see boss_maexxnaAI::DoCastWebWrap() for some info on this rather weird implementation
+        float dx = unitTarget->GetPositionX() - m_caster->GetPositionX();
+        float dy = unitTarget->GetPositionY() - m_caster->GetPositionY();
+        float dist = sqrt((dx * dx) + (dy * dy));
+        const float  distXY = (dist > 0 ? dist : 0);
+        float yDist = m_caster->GetPositionZ() - unitTarget->GetPositionZ();
+        float horizontalSpeed = dist / 1.5f;
+        float verticalSpeed = 12.0f + (yDist*0.5f);
+        float angle = unitTarget->GetAngle(m_caster->GetPositionX(), m_caster->GetPositionY());
 
-    float dist = unitTarget->GetDistance2d(m_caster);
-    if (damage && dist > damage)
-        dist = float(damage);
+        // set immune anticheat and calculate speed
+        if (Player* plr = unitTarget->ToPlayer())
+        {
+            plr->SetLaunched(true);
+            plr->SetXYSpeed(horizontalSpeed);
+        }
 
-    unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[eff_idx]) / 10);
+        unitTarget->KnockBack(angle, horizontalSpeed, verticalSpeed);
+        break;
+    }
+    default:
+    {
+        // Todo: this implementation seems very wrong. Gives terrible results for maexxna web-wrap and
+        // thaddius magnetic pull
+        float dist = unitTarget->GetDistance2d(m_caster);
+        if (damage && dist > damage)
+            dist = float(damage);
+        unitTarget->KnockBackFrom(m_caster, -dist, float(m_spellInfo->EffectMiscValue[eff_idx]) / 10);
+    }
+    }
 }
 
 void Spell::EffectDispelMechanic(SpellEffectIndex eff_idx)
@@ -5955,7 +6183,7 @@ void Spell::EffectBind(SpellEffectIndex eff_idx)
 
     // zone update
     data.Initialize(SMSG_PLAYERBOUND, 8 + 4);
-    data << player->GetObjectGuid();
+    data << m_caster->GetObjectGuid();
     data << uint32(area_id);
     player->SendDirectMessage(&data);
 }
