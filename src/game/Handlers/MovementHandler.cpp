@@ -263,6 +263,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
     DEBUG_LOG("WORLD: Recvd %s (%u, 0x%X) opcode", LookupOpcodeName(opcode), opcode, opcode);
 
     Unit *mover = _player->GetMover();
+
     if (mover->GetObjectGuid() != _clientMoverGuid)
         return;
         
@@ -423,16 +424,6 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
 
     ObjectGuid guid;
     recv_data >> guid;
-
-    if (!_player)
-    {
-        // Player disconnected before this opcode was received, likely kicked
-        // or invalid packet due to ModPossess disconnect
-        sLog.outError("HandleSetActiveMoverOpcode: received packet for null player, new mover: %s",
-            guid.GetString().c_str());
-
-        return;
-    }
 
     if (_player->GetMover() && _player->GetMover()->GetObjectGuid() != guid)
     {

@@ -270,6 +270,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
         uint64  m_auraUpdateMask;
         bool    m_loading;
         CharacterPetCache* m_pTmpCache;
+        bool    m_unSummoned;                               // If this pet has already been unsummoned
 
     private:
         bool m_enabled;

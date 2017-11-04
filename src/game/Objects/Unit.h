@@ -1356,6 +1356,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid const& GetChannelObjectGuid() const { return GetGuidValue(UNIT_FIELD_CHANNEL_OBJECT); }
         void SetChannelObjectGuid(ObjectGuid targetGuid) { SetGuidValue(UNIT_FIELD_CHANNEL_OBJECT, targetGuid); }
 
+        ObjectGuid const& GetPossessorGuid() { return m_possessorGuid; }
+        void SetPossesorGuid(ObjectGuid possession) { m_possessorGuid = possession; }
+
         virtual Pet* GetMiniPet() const { return nullptr; }    // overwrited in Player
 
         ObjectGuid const& GetCharmerOrOwnerGuid() const { return GetCharmerGuid() ? GetCharmerGuid() : GetOwnerGuid(); }
@@ -1952,6 +1955,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float m_speed_rate[MAX_MOVE_TYPE];
 
         CharmInfo *m_charmInfo;
+        ObjectGuid m_possessorGuid; // Guid of unit possessing this one
 
         virtual SpellSchoolMask GetMeleeDamageSchoolMask() const;
 

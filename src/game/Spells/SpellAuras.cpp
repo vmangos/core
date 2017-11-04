@@ -1771,10 +1771,7 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 if (Unit* caster = GetCaster())
                     if (Player* casterPlayer = caster->ToPlayer())
                         if (Pet* guardian = caster->FindGuardianWithEntry(4277))
-                        {
-                            casterPlayer->ModPossessPet(guardian, false, AURA_REMOVE_BY_DEFAULT);
-                            guardian->DisappearAndDie();
-                        }
+                            guardian->DisappearAndDie(); // Removes mod posses
                 return;
             case 10255:                                     // Stoned
             {
@@ -1791,10 +1788,8 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 if (Unit* caster = GetCaster())
                     if (Player* casterPlayer = caster->ToPlayer())
                         if (Pet* guardian = caster->FindGuardianWithEntry(7863))
-                        {
-                            casterPlayer->ModPossessPet(guardian, false, AURA_REMOVE_BY_DEFAULT);
                             guardian->DisappearAndDie();
-                        }
+
                 return;
             case 11826:
                 if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
@@ -2998,6 +2993,7 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
 
         pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         pet->SetCharmerGuid(p_caster->GetObjectGuid());
+        pet->SetPossesorGuid(p_caster->GetObjectGuid());
 
         pet->StopMoving();
         pet->GetMotionMaster()->Clear(false);
@@ -3022,6 +3018,7 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
         camera.ResetView();
         pet->UpdateControl();
         pet->SetCharmerGuid(ObjectGuid());
+        pet->SetPossesorGuid(ObjectGuid());
 
         // To avoid moving the wrong unit on server side between cancellation and mover swap
         // the pet has the controlled state removed in WorldSession::HandleSetActiveMoverOpcode
