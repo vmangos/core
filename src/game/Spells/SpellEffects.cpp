@@ -489,6 +489,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 // Hammer of Wrath - receive bonus from spell damage
                 if (m_spellInfo->SpellIconID == 42)
                 {
+                    m_attackType = BASE_ATTACK;    // Set as base attack to benefit from melee crit
                     damage = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
                     damage = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, damage, SPELL_DIRECT_DAMAGE);
                 }
