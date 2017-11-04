@@ -3660,26 +3660,6 @@ void Aura::HandleAuraModSilence(bool apply, bool Real)
                 if (spell->m_spellInfo->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
                     // Stop spells on prepare or casting state
                     target->InterruptSpell(CurrentSpellTypes(i), false);
-
-        switch (GetId())
-        {
-            // Arcane Torrent (Energy)
-            case 25046:
-            {
-                Unit * caster = GetCaster();
-                if (!caster)
-                    return;
-
-                // Search Mana Tap auras on caster
-                Aura * dummy = caster->GetDummyAura(28734);
-                if (dummy)
-                {
-                    int32 bp = dummy->GetStackAmount() * 10;
-                    caster->CastCustomSpell(caster, 25048, &bp, nullptr, nullptr, true);
-                    caster->RemoveAurasDueToSpell(28734);
-                }
-            }
-        }
     }
     else
     {
@@ -4496,7 +4476,6 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
     switch (GetId())
     {
         case 12976:                                         // Warrior Last Stand triggered spell
-        case 28726:                                         // Nightmare Seed ( Nightmare Seed )
         {
             if (Real)
             {

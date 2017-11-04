@@ -339,10 +339,6 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
         {
             case SPELLFAMILY_GENERIC:
             {
-                //Gore
-                if (m_spellInfo->SpellIconID == 2269)
-                    damage += (rand() % 2) ? damage : 0;
-
                 switch (m_spellInfo->Id)                    // better way to check unknown
                 {
                     // Meteor like spells (divided damage to targets)
@@ -405,6 +401,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             damage = uint32(damage * 1.5f);
                         else
                             damage = uint32(damage / 1.5f);
+                        break;
                     }
                     case 27812: // Kel'Thuzad Void Blast
                     {
@@ -414,6 +411,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         // this is a safetycheck.
                         if (unitTarget->HasAura(28410))
                             damage = 0;
+                        break;
                     }
                     case 24933:                             // Cannon (Darkmoon Steam Tonk)
                     {
@@ -1652,50 +1650,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
             }
             break;
-        /*
-        case SPELLFAMILY_ROGUE:
-        {
-            switch (m_spellInfo->Id)
-            {
-                case 5938:                                  // Shiv
-                {
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    Player *pCaster = ((Player*)m_caster);
-
-                    Item *item = pCaster->GetWeaponForAttack(OFF_ATTACK);
-                    if (!item)
-                        return;
-
-                    // all poison enchantments is temporary
-                    uint32 enchant_id = item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
-                    if (!enchant_id)
-                        return;
-
-                    SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-                    if (!pEnchant)
-                        return;
-
-                    for (int s = 0; s < 3; ++s)
-                    {
-                        if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
-                            continue;
-
-                        SpellEntry const* combatEntry = sSpellMgr.GetSpellEntry(pEnchant->spellid[s]);
-                        if (!combatEntry || combatEntry->Dispel != DISPEL_POISON)
-                            continue;
-
-                        m_caster->CastSpell(unitTarget, combatEntry, true, item);
-                    }
-
-                    m_caster->CastSpell(unitTarget, 5940, true);
-                    return;
-                }
-            }
-            break;
-        }
-        */
         case SPELLFAMILY_HUNTER:
         {
             switch (m_spellInfo->Id)
