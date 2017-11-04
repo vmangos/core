@@ -470,10 +470,8 @@ struct go_pierre_ventsAI: public GameObjectAI
         }
 
         ///- Summon the creature
-        if (Creature* pInvoc = me->SummonCreature(summonEntry, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), me->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3600000))
+        if (Creature* pInvoc = me->SummonCreature(summonEntry, player->GetPositionX(), player->GetPositionY(), player->GetPositionZ(), me->GetAngle(player), TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3600000, false, 5000))
         {
-            pInvoc->SetTempPacified(5000);
-            pInvoc->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
             player->CastSpell(player, SPELL_RED_LIGHTNING, true);
             pInvoc->CastSpell(pInvoc, SPELL_APPARITION, true);
             pInvoc->SetLootRecipient(player); // Force tag for summoner
