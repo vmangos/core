@@ -293,8 +293,7 @@ void MapManager::Update(uint32 diff)
         m_continentThreads->start<>();
     }
     std::future<void> continents = m_continentThreads->processWorkload(std::move(continentsUpdaters),
-                                                                       ThreadPool::Callable(),
-                                                                       [](){MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();});
+                                                                       ThreadPool::Callable());
 
     SwitchPlayersInstances();
 
@@ -302,8 +301,7 @@ void MapManager::Update(uint32 diff)
     do {
         start = std::chrono::high_resolution_clock::now();
         std::future<void> f = m_threads->processWorkload(instancesUpdaters,
-                                                         ThreadPool::Callable(),
-                                                         [](){MMAP::MMapFactory::createOrGetMMapManager()->CleanUpCurrentThreadNavQuery();});
+                                                         ThreadPool::Callable());
 
         if (f.valid())
             f.wait();
