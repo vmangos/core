@@ -4083,17 +4083,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     // Seal of Command
     if (m_spellInfo->School == SPELL_SCHOOL_HOLY)
     {
-        // Prevent Vengeance double dipping
-        Unit::AuraList const& mModDamagePercentDone = m_caster->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        for (Unit::AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
-        {
-            if ((*i)->GetSpellProto()->SpellVisual == 6597)
-            {
-                bonus /= 1.0f + (*i)->GetModifier()->m_amount / 100.0f;
-                break;
-            }
-        }
-
         // Add spell gear bonus and spell modifiers
         bonus = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
         bonus = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
