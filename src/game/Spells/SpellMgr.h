@@ -463,6 +463,27 @@ inline bool IsTotemSummonSpell(SpellEntry const* spellInfo)
     return spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4;
 }
 
+// Spell effects require a specific power type on the target
+inline bool IsTargetPowerTypeValid(SpellEntry const *spellInfo, Powers powerType)
+{
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (spellInfo->Effect[i] == SPELL_EFFECT_NONE)
+            continue;
+
+        if ((spellInfo->Effect[i] == SPELL_EFFECT_POWER_BURN ||
+            spellInfo->Effect[i] == SPELL_EFFECT_POWER_DRAIN ||
+            spellInfo->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_MANA_LEECH ||
+            spellInfo->EffectApplyAuraName[i] == SPELL_AURA_POWER_BURN_MANA) &&
+            int32(powerType) != spellInfo->EffectMiscValue[i])
+        {
+            continue;
+        }
+        return true;
+    }
+    return false;
+}
+
 inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)
 {
     return GetSchoolMask(spellInfo->School);
