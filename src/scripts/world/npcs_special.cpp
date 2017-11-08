@@ -24,6 +24,7 @@ EndScriptData
 
 #include "scriptPCH.h"
 #include "../kalimdor/moonglade/boss_omen.h"
+#include <array>
 
 /* ContentData
 npc_chicken_cluck       100%    support for quest 3861 (Cluck!)
@@ -3434,8 +3435,9 @@ struct FireworkLocations
     std::vector<Location> m_pPositions;
 };
 
-const FireworkLocations FireworkLoc[] =
-{
+const std::array<FireworkLocations, 7> FireworkLoc 
+{{
+
     { STRANGLETHORN_VALE, BootyBayPos },
     { ORGRIMMAR, OrgrimmarPos },
     { UNDERCITY, UndercityPos },
@@ -3443,7 +3445,7 @@ const FireworkLocations FireworkLoc[] =
     { THUNDERBLUFF, ThunderBluffPos },
     { DUN_MOROGH, IronforgePos },
     { STORMWIND, StormwindPos }
-};
+}};
 
 struct npc_event_fireworksAI : public ScriptedAI
 {
@@ -3468,12 +3470,12 @@ struct npc_event_fireworksAI : public ScriptedAI
 
     void IsUsable()
     {
-        for (uint8 i = 0; i < 25; ++i)
+        for (auto i = 0; i < FireworkLoc.size(); ++i)
         {
             if (FireworkLoc[i].m_zoneId == m_creature->GetZoneId())
             {
                 m_bExist = true;
-                m_uiIndex = i;
+                m_uiIndex = static_cast<uint8>(i);
                 break;
             }
         }

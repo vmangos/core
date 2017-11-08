@@ -430,9 +430,9 @@ struct ScriptAction
     bool IsSameScript(uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid, ObjectGuid ownerGuid) const
     {
         return id == script->id &&
-            (sourceGuid == sourceGuid || !sourceGuid) &&
-            (targetGuid == targetGuid || !targetGuid) &&
-            (ownerGuid == ownerGuid || !ownerGuid);
+            (sourceGuid == this->sourceGuid || !sourceGuid) &&
+            (targetGuid == this->targetGuid || !targetGuid) &&
+            (ownerGuid == this->ownerGuid || !ownerGuid);
     }
 };
 

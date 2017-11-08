@@ -368,7 +368,6 @@ struct instance_uldaman : public ScriptedInstance
                 }
                 break;
             case DATA_ANCIENT_DOOR:
-                m_auiEncounter[DATA_ANCIENT_DOOR] = uiData;
                 if (uiData == DONE) //archeadas defeat
                 {
                     DoOpenDoor(uiArchaedasTempleDoor); //re open entrance

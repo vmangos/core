@@ -567,7 +567,7 @@ struct npc_disciple_of_naralexAI : public npc_escortAI
 
         if (Potion_Timer < diff)
         {
-            if ((m_creature->GetHealth() / m_creature->GetMaxHealth()) < 0.8)
+            if ((static_cast<double>(m_creature->GetHealth()) / m_creature->GetMaxHealth()) < 0.8)
                 m_creature->CastSpell(m_creature, SPELL_POTION, false);
             Potion_Timer = 45000;
         }
