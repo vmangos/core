@@ -190,6 +190,7 @@ bool GameObject::Create(uint32 guidlow, uint32 name_id, Map *map, float x, float
     SetGoType(GameobjectTypes(goinfo->type));
 
     SetGoAnimProgress(animprogress);
+    SetName(goinfo->name);
 
     //Notify the map's instance data.
     //Only works if you create the object in it, not if it is moves to that map.

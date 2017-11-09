@@ -1188,6 +1188,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr.SetHighestGuids();                           // must be after packing instances
     sLog.outString();
 
+    sLog.outString("Loading Broadcast Texts...");
+    sObjectMgr.LoadBroadcastTexts();
+
     sLog.outString("Loading Page Texts...");
     sObjectMgr.LoadPageTexts();
 
@@ -1434,6 +1437,7 @@ void World::SetInitialWorldSettings()
 
     ///- Loading localization data
     sLog.outString("Loading Localization strings...");
+    sObjectMgr.LoadBroadcastTextLocales();
     sObjectMgr.LoadCreatureLocales();                       // must be after CreatureInfo loading
     sObjectMgr.LoadGameObjectLocales();                     // must be after GameobjectInfo loading
     sObjectMgr.LoadItemLocales();                           // must be after ItemPrototypes loading

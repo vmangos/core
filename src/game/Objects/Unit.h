@@ -1072,7 +1072,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 getRaceMask() const { return getRace() ? 1 << (getRace()-1) : 0x0; }
         uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
         uint32 getClassMask() const { return getClass() ? 1 << (getClass()-1) : 0x0; }
-        uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
+        uint8 getGender() const override { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
 
         /**
          * @brief Inits display id to player display ID, depending on race, class, gender
@@ -1913,6 +1913,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void resetTransformScale();
         float getNativeScale() const;
         void setNativeScale(float scale);
+
     protected:
         explicit Unit ();
 

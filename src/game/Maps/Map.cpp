@@ -2344,7 +2344,7 @@ void Map::ScriptsProcess()
                             pSource = (WorldObject*)pBuddy;
                     }
                 }
-
+                
                 // If we should talk to the original source instead of target
                 if (step.script->talk.flags & 0x02)
                     target = source;
@@ -2366,42 +2366,21 @@ void Map::ScriptsProcess()
                     textId = step.script->talk.textId[rand() % i];
                 }
 
-                switch (step.script->talk.chatType)
+                if (step.script->talk.gameobjectGuid)
                 {
-                    case CHAT_TYPE_SAY:
-                        pSource->MonsterSay(textId, step.script->talk.language, unitTarget);
-                        break;
-                    case CHAT_TYPE_YELL:
-                        pSource->MonsterYell(textId, step.script->talk.language, unitTarget);
-                        break;
-                    case CHAT_TYPE_TEXT_EMOTE:
-                        pSource->MonsterTextEmote(textId, unitTarget);
-                        break;
-                    case CHAT_TYPE_BOSS_EMOTE:
-                        pSource->MonsterTextEmote(textId, unitTarget, true);
-                        break;
-                    case CHAT_TYPE_WHISPER:
-                        if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                        {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTarget ? unitTarget->GetGuidStr().c_str() : "<no target>");
-                            break;
-                        }
-                        pSource->MonsterWhisper(textId, unitTarget);
-                        break;
-                    case CHAT_TYPE_BOSS_WHISPER:
-                        if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
-                        {
-                            sLog.outError("SCRIPT_COMMAND_TALK (script id %u) attempt to whisper (%u) to %s, skipping.", step.script->id, step.script->talk.chatType, unitTarget ? unitTarget->GetGuidStr().c_str() : "<no target>");
-                            break;
-                        }
-                        pSource->MonsterWhisper(textId, unitTarget, true);
-                        break;
-                    case CHAT_TYPE_ZONE_YELL:
-                        pSource->MonsterYellToZone(textId, step.script->talk.language, unitTarget);
-                        break;
-                    default:
-                        break;                              // must be already checked at load
+                    uint32 guidlow = step.script->talk.gameobjectGuid;
+                    GameObjectData const* goData = sObjectMgr.GetGOData(guidlow);
+                    if (!goData)
+                        break;                                  // checked at load
+
+                    GameObject *go = pSource->GetMap()->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, goData->id, guidlow));
+
+                    if (go)
+                        pSource = go;
                 }
+
+                DoScriptText(textId, pSource, unitTarget, step.script->talk.chatType);
+                
                 break;
             }
             case SCRIPT_COMMAND_EMOTE:
@@ -2507,13 +2486,27 @@ void Map::ScriptsProcess()
                 }
 
                 Unit * unit = (Unit*)source;
+                float x = step.script->x;
+                float y = step.script->y;
+                float z = step.script->z;
+
+                if (step.script->moveTo.relativeToTarget && target && target->isType(TYPEMASK_WORLDOBJECT))
+                {
+                    if (WorldObject* pTarget = (WorldObject*)target)
+                    {
+                        x += pTarget->GetPositionX();
+                        y += pTarget->GetPositionY();
+                        z += pTarget->GetPositionZ();
+                    }
+                }
+
                 if (step.script->moveTo.travelTime != 0)
                 {
-                    float speed = unit->GetDistance(step.script->x, step.script->y, step.script->z) / ((float)step.script->moveTo.travelTime * 0.001f);
-                    unit->MonsterMoveWithSpeed(step.script->x, step.script->y, step.script->z, speed);
+                    float speed = unit->GetDistance(x, y, z) / ((float)step.script->moveTo.travelTime * 0.001f);
+                    unit->MonsterMoveWithSpeed(x, y, z, speed);
                 }
                 else
-                    unit->GetMotionMaster()->MovePoint(0, step.script->x, step.script->y, step.script->z, MOVE_PATHFINDING);
+                    unit->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
                 break;
             }
             case SCRIPT_COMMAND_FLAG_SET:
@@ -4384,7 +4377,7 @@ public:
     }
     void operator()(WorldPacket& data, int32 loc_idx)
     {
-        char const* text = sObjectMgr.GetMangosString(i_textId, loc_idx);
+        char const* text = i_textId > 0 ? sObjectMgr.GetBroadcastText(i_textId, loc_idx) : sObjectMgr.GetMangosString(i_textId, loc_idx);
 
         std::string nameForLocale = "";
         if (loc_idx >= 0)
@@ -4400,7 +4393,7 @@ public:
         if (nameForLocale.empty())
             nameForLocale = i_cInfo->Name;
 
-        WorldObject::BuildMonsterChat(&data, i_senderGuid, i_msgtype, text, i_language, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid());
+        WorldObject::BuildWorldObjectChat(&data, i_senderGuid, i_msgtype, text, i_language, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid());
     }
 
 private:

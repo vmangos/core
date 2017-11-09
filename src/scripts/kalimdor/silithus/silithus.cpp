@@ -3371,9 +3371,10 @@ struct scarab_gongAI: public GameObjectAI
                 go_aq_barrier->ResetDoorOrButton();
                 go_aq_barrier->UseDoorOrButton();
 
-                me->MonsterScriptToZone(TEXT_COLOSSUS_ASHI, CHAT_MSG_MONSTER_EMOTE);
-                me->MonsterScriptToZone(TEXT_COLOSSUS_REGAL, CHAT_MSG_MONSTER_EMOTE);
-                me->MonsterScriptToZone(TEXT_COLOSSUS_ZORA, CHAT_MSG_MONSTER_EMOTE);
+                // Incorrect implementation! Texts must be send by the creatures themselves.
+                //me->MonsterScriptToZone(TEXT_COLOSSUS_ASHI, CHAT_MSG_MONSTER_EMOTE);
+                //me->MonsterScriptToZone(TEXT_COLOSSUS_REGAL, CHAT_MSG_MONSTER_EMOTE);
+                //me->MonsterScriptToZone(TEXT_COLOSSUS_ZORA, CHAT_MSG_MONSTER_EMOTE);
 
                 return NextStage(10000);
 

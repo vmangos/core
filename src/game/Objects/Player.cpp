@@ -12714,8 +12714,8 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
     RemoveTimedQuest(quest_id);
 
     if (BattleGround* bg = GetBattleGround())
-        if (bg->GetTypeID() == BATTLEGROUND_AV)
-            ((BattleGroundAV*)bg)->HandleQuestComplete(questGiver, pQuest->GetQuestId(), this);
+        if ((bg->GetTypeID() == BATTLEGROUND_AV) && (questGiver->GetTypeId() == TYPEID_UNIT))
+            ((BattleGroundAV*)bg)->HandleQuestComplete(questGiver->ToUnit(), pQuest->GetQuestId(), this);
 
     if (pQuest->GetRewChoiceItemsCount() > 0)
     {

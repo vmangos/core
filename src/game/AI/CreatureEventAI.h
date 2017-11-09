@@ -120,6 +120,7 @@ enum EventAI_ActionType
     ACTION_T_SET_STAND_STATE            = 47,               // StandState, unused, unused
     ACTION_T_CHANGE_MOVEMENT            = 48,               // MovementType, WanderDistance, unused
     ACTION_T_SET_VARIABLE               = 49,               // VariableEntry, Value, unused
+    ACTION_T_EVENT_SCRIPT               = 50,               // EventScriptId
     ACTION_T_END,
 };
 
@@ -414,6 +415,11 @@ struct CreatureEventAI_Action
             uint32 value;
             uint32 unused1;
         } setVariable;
+        // ACTION_T_EVENT_SCRIPT                            = 50
+        struct
+        {
+            uint32 eventScriptId;
+        } eventScript;
         // RAW
         struct
         {
@@ -636,7 +642,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         inline int32 GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3);
         inline Unit* GetTargetByType(uint32 Target, Unit* pActionInvoker) const;
 
-        void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target);
+        void DoScriptText(int32 textEntry, Unit* pSource, Unit* target);
         bool CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered);
 
         bool SpawnedEventConditionsCheck(CreatureEventAI_Event const& event);

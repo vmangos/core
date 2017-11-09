@@ -186,13 +186,10 @@ void WaypointManager::Load()
             {
                 be.textid[i]    = fields[7 + i].GetUInt32();
 
-                if (be.textid[i])
+                if (be.textid[i] < 0)
                 {
-                    if (be.textid[i] < MIN_DB_SCRIPT_STRING_ID || be.textid[i] >= MAX_DB_SCRIPT_STRING_ID)
-                    {
-                        sLog.outErrorDb("Table `db_script_string` not have string id  %u", be.textid[i]);
-                        continue;
-                    }
+                    sLog.outErrorDb("Broadcast text %u used in table `creature_movement` does not exist.", be.textid[i]);
+                    continue;
                 }
             }
 
@@ -349,13 +346,10 @@ void WaypointManager::Load()
             {
                 be.textid[i]    = fields[7 + i].GetUInt32();
 
-                if (be.textid[i])
+                if (be.textid[i] < 0)
                 {
-                    if (be.textid[i] < MIN_DB_SCRIPT_STRING_ID || be.textid[i] >= MAX_DB_SCRIPT_STRING_ID)
-                    {
-                        sLog.outErrorDb("Table `db_script_string` not have string id %u", be.textid[i]);
-                        continue;
-                    }
+                    sLog.outErrorDb("Broadcast text %u used in table `creature_movement_template` does not exist.", be.textid[i]);
+                    continue;
                 }
             }
 
@@ -561,7 +555,7 @@ void WaypointManager::SetNodeText(uint32 id, uint32 point, const char *text_fiel
     }
 }
 
-void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
+void WaypointManager::CheckTextsExistance()
 {
     WaypointPathMap::const_iterator pmItr = m_pathMap.begin();
     for (; pmItr != m_pathMap.end(); ++pmItr)
@@ -585,15 +579,13 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
                 }
                 else
                 {
-                    if (!sObjectMgr.GetMangosStringLocale(be->textid[j]))
+                    if (!sObjectMgr.GetBroadcastTextLocale(be->textid[j]))
                     {
-                        sLog.outErrorDb("Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
+                        sLog.outErrorDb("Some waypoint has textid%u with not existing %u broadcast text.", j, be->textid[j]);
                         be->textid[j] = 0;
                         ++zeroCount;
                         continue;
                     }
-                    else
-                        ids.erase(be->textid[j]);
 
                     // Shifting check
                     if (zeroCount)
@@ -629,15 +621,13 @@ void WaypointManager::CheckTextsExistance(std::set<int32>& ids)
                 }
                 else
                 {
-                    if (!sObjectMgr.GetMangosStringLocale(be->textid[j]))
+                    if (!sObjectMgr.GetBroadcastTextLocale(be->textid[j]))
                     {
-                        sLog.outErrorDb("Some waypoint has textid%u with not existing %u text.", j, be->textid[j]);
+                        sLog.outErrorDb("Some waypoint has textid%u with not existing %u broadcast text.", j, be->textid[j]);
                         be->textid[j] = 0;
                         ++zeroCount;
                         continue;
                     }
-                    else
-                        ids.erase(be->textid[j]);
 
                     // Shifting check
                     if (zeroCount)

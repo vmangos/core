@@ -467,7 +467,7 @@ class BattleGroundAV : public BattleGround
         void   initializeChallengeInvocationGoals (void);
         void   setChallengeInvocationCounter (uint32 faction_id, uint32 challenge_type, uint32 effort_done);
 
-        void HandleQuestComplete(WorldObject* questGiver, uint32 questid, Player *player);
+        void HandleQuestComplete(Unit* questGiver, uint32 questid, Player *player);
         bool PlayerCanDoMineQuest(int32 GOId, Team team);
 
         void EndBattleGround(Team winner);

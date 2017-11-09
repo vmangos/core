@@ -86,6 +86,31 @@ struct BattlegroundEntranceTrigger
     float  exit_Orientation;
 };
 
+struct BroadcastText
+{
+    BroadcastText() : Id(0), SoundId(0), Type(0), Language(0), EmoteId0(0), EmoteId1(0), EmoteId2(0),
+        EmoteDelay0(0), EmoteDelay1(0), EmoteDelay2(0)
+    {
+        MaleText.resize(LOCALE_enUS + 1);
+        FemaleText.resize(LOCALE_enUS + 1);
+    }
+
+    uint32 Id;
+    std::vector<std::string> MaleText;
+    std::vector<std::string> FemaleText;
+    uint32 SoundId;
+    uint8  Type;
+    uint32 Language;
+    uint32 EmoteId0;
+    uint32 EmoteId1;
+    uint32 EmoteId2;
+    uint32 EmoteDelay0;
+    uint32 EmoteDelay1;
+    uint32 EmoteDelay2;
+};
+
+typedef std::unordered_map<uint32, BroadcastText> BroadcastTextLocaleMap;
+
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
 {
@@ -99,9 +124,7 @@ typedef UNORDERED_MAP<uint32/*mapid*/,CellObjectGuidsMap> MapObjectGuids;
 // mangos string ranges
 #define MIN_MANGOS_STRING_ID           1                    // 'mangos_string'
 #define MAX_MANGOS_STRING_ID           2000000000
-#define MIN_DB_SCRIPT_STRING_ID        MAX_MANGOS_STRING_ID // 'db_script_string'
-#define MAX_DB_SCRIPT_STRING_ID        2000010000
-#define MIN_NOSTALRIUS_STRING_ID       MAX_DB_SCRIPT_STRING_ID
+#define MIN_NOSTALRIUS_STRING_ID       2000010000
 #define MAX_NOSTALRIUS_STRING_ID       2000090000
 #define MIN_CREATURE_AI_TEXT_STRING_ID (-1)                 // 'creature_ai_texts'
 #define MAX_CREATURE_AI_TEXT_STRING_ID (-1200000)
@@ -764,6 +787,8 @@ class ObjectMgr
         bool LoadMangosStrings(DatabaseType& db, char const* table, int32 min_value, int32 max_value, bool extra_content);
         bool LoadMangosStrings() { return LoadMangosStrings(WorldDatabase,"mangos_string",MIN_MANGOS_STRING_ID,MAX_MANGOS_STRING_ID, false); }
         bool LoadNostalriusStrings();
+        void LoadBroadcastTexts();
+        void LoadBroadcastTextLocales();
         bool LoadQuestGreetings();
         void LoadPetCreateSpells();
         void LoadCreatureLocales();
@@ -1005,6 +1030,16 @@ class ObjectMgr
                 if (worker(*itr))                           // arg = GameObjectDataPair
                     break;
         }
+
+        BroadcastText const* GetBroadcastTextLocale(uint32 id) const
+        {
+            BroadcastTextLocaleMap::const_iterator itr = mBroadcastTextLocaleMap.find(id);
+            if (itr != mBroadcastTextLocaleMap.end())
+                return &itr->second;
+            return nullptr;
+        }
+
+        const char *GetBroadcastText(uint32 id, int locale_idx = LOCALE_enUS, uint8 gender = GENDER_MALE, bool forceGender = false) const;
 
         MangosStringLocale const* GetMangosStringLocale(int32 entry) const
         {
@@ -1355,6 +1390,7 @@ class ObjectMgr
         NpcTextLocaleMap mNpcTextLocaleMap;
         PageTextLocaleMap mPageTextLocaleMap;
         MangosStringLocaleMap mMangosStringLocaleMap;
+        BroadcastTextLocaleMap mBroadcastTextLocaleMap;
         QuestGreetingLocaleMap mQuestGreetingLocaleMap[QUESTGIVER_TYPE_MAX];
         GossipMenuItemsLocaleMap mGossipMenuItemsLocaleMap;
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;

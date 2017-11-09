@@ -6957,6 +6957,190 @@ void ObjectMgr::LoadGameObjectForQuests()
     sLog.outString(">> Loaded %u GameObjects for quests", count);
 }
 
+void ObjectMgr::LoadBroadcastTexts()
+{
+    mBroadcastTextLocaleMap.clear(); // for reload case
+
+                                 //                    0     1         2         3      4        5        6         7         8          9            10           11
+    QueryResult *result = WorldDatabase.Query("SELECT ID, MaleText, FemaleText, Sound, Type, Language, EmoteId0, EmoteId1, EmoteId2, EmoteDelay0, EmoteDelay1, EmoteDelay2 FROM broadcast_text");
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
+        return;
+    }
+
+    mBroadcastTextLocaleMap.rehash(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        BroadcastText bct;
+
+        bct.Id = fields[0].GetUInt32();
+        bct.MaleText[LOCALE_enUS] = fields[1].GetString();
+        bct.FemaleText[LOCALE_enUS] = fields[2].GetString();
+        bct.SoundId = fields[3].GetUInt32();
+        bct.Type = fields[4].GetUInt32();
+        bct.Language = fields[5].GetUInt32();
+        bct.EmoteId0 = fields[6].GetUInt32();
+        bct.EmoteId1 = fields[7].GetUInt32();
+        bct.EmoteId2 = fields[8].GetUInt32();
+        bct.EmoteDelay0 = fields[9].GetUInt32();
+        bct.EmoteDelay1 = fields[10].GetUInt32();
+        bct.EmoteDelay2 = fields[11].GetUInt32();
+        
+
+        if (bct.SoundId)
+        {
+            if (!sSoundEntriesStore.LookupEntry(bct.SoundId))
+            {
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has SoundId %u but sound does not exist.", bct.Id, bct.SoundId);
+                bct.SoundId = 0;
+            }
+        }
+
+        if (!GetLanguageDescByID(bct.Language))
+        {
+            sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` using Language %u but Language does not exist.", bct.Id, bct.Language);
+            bct.Language = LANG_UNIVERSAL;
+        }
+
+        if (bct.Type > CHAT_TYPE_ZONE_YELL)
+        {
+            sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has Type %u but this Chat Type does not exist.", bct.Id, bct.Type);
+            bct.Type = CHAT_TYPE_SAY;
+        }
+
+        if (bct.EmoteId0)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId0))
+            {
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId0 %u but emote does not exist.", bct.Id, bct.EmoteId0);
+                bct.EmoteId0 = 0;
+            }
+        }
+
+        if (bct.EmoteId1)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId1))
+            {
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId1 %u but emote does not exist.", bct.Id, bct.EmoteId1);
+                bct.EmoteId1 = 0;
+            }
+        }
+
+        if (bct.EmoteId2)
+        {
+            if (!sEmotesStore.LookupEntry(bct.EmoteId2))
+            {
+                sLog.outErrorDb("BroadcastText (Id: %u) in table `broadcast_text` has EmoteId2 %u but emote does not exist.", bct.Id, bct.EmoteId2);
+                bct.EmoteId2 = 0;
+            }
+        }
+
+        mBroadcastTextLocaleMap[bct.Id] = bct;
+    } while (result->NextRow());
+
+    sLog.outString(">> Loaded %lu broadcast texts.", (unsigned long)mBroadcastTextLocaleMap.size());
+    sLog.outString();
+}
+
+void ObjectMgr::LoadBroadcastTextLocales()
+{
+    //                                                 0        1              2              3              4              5              6              7              8              9                10               11               12               13               14               15               16
+    QueryResult *result = WorldDatabase.Query("SELECT Id, MaleText_loc1, MaleText_loc2, MaleText_loc3, MaleText_loc4, MaleText_loc5, MaleText_loc6, MaleText_loc7, MaleText_loc8, FemaleText_loc1, FemaleText_loc2, FemaleText_loc3, FemaleText_loc4, FemaleText_loc5, FemaleText_loc6, FemaleText_loc7, FemaleText_loc8 FROM locales_broadcast_text");
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 broadcast text locales. DB table `locales_broadcast_text` is empty.");
+        return;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field* fields = result->Fetch();
+
+        uint32 id = fields[0].GetUInt32();
+        BroadcastTextLocaleMap::iterator bct = mBroadcastTextLocaleMap.find(id);
+
+        if (bct == mBroadcastTextLocaleMap.end())
+        {
+            sLog.outErrorDb("BroadcastText (Id: %u) in table `locales_broadcast_text` does not exist. Skipped!", id);
+            continue;
+        }
+
+        BroadcastText& data = mBroadcastTextLocaleMap[id];
+
+        // Load MaleText
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[i].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    // 0 -> default, idx in to idx+1
+                    if ((int32)data.MaleText.size() <= idx + 1)
+                        data.MaleText.resize(idx + 2);
+
+                    data.MaleText[idx + 1] = str;
+                }
+            }
+        }
+
+        // Load FemaleText
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[8 + i].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    // 0 -> default, idx in to idx+1
+                    if ((int32)data.FemaleText.size() <= idx + 1)
+                        data.FemaleText.resize(idx + 2);
+
+                    data.FemaleText[idx + 1] = str;
+                }
+            }
+        }
+
+        ++count;
+    } while (result->NextRow());
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u broadcast text locales.", count);
+}
+
+const char *ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
+{
+    if (BroadcastText const* bct = GetBroadcastTextLocale(id))
+    {
+        if ((gender == GENDER_FEMALE || gender == GENDER_NONE) && (forceGender || !bct->FemaleText[LOCALE_enUS].empty()))
+        {
+            if ((int32)bct->FemaleText.size() > locale_index + 1 && !bct->FemaleText[locale_index + 1].empty())
+                return bct->FemaleText[locale_index + 1].c_str();
+            else
+                return bct->FemaleText[0].c_str();
+        }
+        // else if (gender == GENDER_MALE)
+        {
+            if ((int32)bct->MaleText.size() > locale_index + 1 && !bct->MaleText[locale_index + 1].empty())
+                return bct->MaleText[locale_index + 1].c_str();
+            else
+                return bct->MaleText[0].c_str();
+        }
+    }
+
+    sLog.outErrorDb("Broadcast text id %i not found in DB.", id);
+    return "<error>";
+}
+
 bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min_value, int32 max_value, bool extra_content)
 {
     int32 start_value = min_value;
@@ -7197,9 +7381,7 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
             return msl->Content[0].c_str();
     }
 
-    if (entry > MIN_DB_SCRIPT_STRING_ID)
-        sLog.outErrorDb("Entry %i not found in `db_script_string` table.", entry);
-    else if (entry > 0)
+    if (entry > 0)
         sLog.outErrorDb("Entry %i not found in `mangos_string` table.", entry);
     else if (entry > MAX_CREATURE_AI_TEXT_STRING_ID)
         sLog.outErrorDb("Entry %i not found in `creature_ai_texts` table.", entry);
