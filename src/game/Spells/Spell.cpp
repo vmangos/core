@@ -456,10 +456,11 @@ void Spell::FillTargetMap()
                         // Arcane Missiles have strange targeting for auras
                         if (m_spellInfo->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_ARCANE_MISSILES_CHANNEL>())
                         {
-                            if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                                if (Unit *target = ObjectAccessor::Instance().GetUnit(*m_caster, ((Player*)m_caster)->GetSelectionGuid()))
-                                    if (m_caster->IsValidAttackTarget(target))
-                                        tmpUnitMap.push_back(target);
+                            if (Unit* pUnitTarget = m_caster->SelectMagnetTarget(m_targets.getUnitTarget(), this, SpellEffectIndex(i)))
+                            {
+                                if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsValidAttackTarget(pUnitTarget))
+                                    tmpUnitMap.push_back(pUnitTarget);
+                            }
                         }
                         else
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
