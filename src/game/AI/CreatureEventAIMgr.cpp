@@ -836,6 +836,15 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                             continue;
                         }
                         break;
+                    case ACTION_T_EVENT_SCRIPT:
+                    {
+                        if (sEventScripts.find(action.eventScript.eventScriptId) == sEventScripts.end())
+                        {
+                            sLog.outErrorDb("Event %u uses invalid event script id %u.", i, action.eventScript.eventScriptId);
+                            continue;
+                        }
+                        break;
+                    }
                     default:
                         sLog.outErrorDb("CreatureEventAI:  Event %u Action %u have currently not checked at load action type (%u). Need check code update?", i, j + 1, temp.action[j].type);
                         break;

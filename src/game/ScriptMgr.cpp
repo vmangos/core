@@ -1635,6 +1635,52 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
             }
         }
     }
+
+    // Load all possible script entries from EventAI.
+    // Has to be done with a query because it's loaded later.
+    QueryResult* result = WorldDatabase.Query("SELECT action1_param1 FROM creature_ai_scripts WHERE action1_type=50");
+
+    Field* fields;
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 eventId = fields[0].GetUInt32();
+            if (eventId)
+             eventIds.insert(eventId);
+        } while (result->NextRow());
+        delete result;
+    }
+
+    result = WorldDatabase.Query("SELECT action2_param1 FROM creature_ai_scripts WHERE action2_type=50");
+    
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 eventId = fields[0].GetUInt32();
+            if (eventId)
+                eventIds.insert(eventId);
+        } while (result->NextRow());
+        delete result;
+    }
+
+    result = WorldDatabase.Query("SELECT action3_param1 FROM creature_ai_scripts WHERE action3_type=50");
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 eventId = fields[0].GetUInt32();
+            if (eventId)
+                eventIds.insert(eventId);
+        } while (result->NextRow());
+        delete result;
+    }
 }
 
 void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, uint32 chatTypeOverride)
