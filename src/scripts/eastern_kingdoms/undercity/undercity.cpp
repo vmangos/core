@@ -33,13 +33,6 @@ EndContentData */
 ## npc_lady_sylvanas_windrunner
 ######*/
 
-#define SAY_LAMENT_END              -1000196
-#define EMOTE_LAMENT_END            -1000197
-
-#define SOUND_CREDIT                10896
-#define ENTRY_HIGHBORNE_LAMENTER    21628
-#define ENTRY_HIGHBORNE_BUNNY       21641
-
 enum eSpells
 {
     // Varimathras
@@ -243,15 +236,6 @@ CreatureAI* GetAI_boss_sylvanas(Creature* pCreature)
     return new boss_sylvanasAI(pCreature);
 }
 
-bool GossipHello_npc_lady_sylvanas_windrunner(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
 bool GossipHello_npc_estelle_gendry(Player* pPlayer, Creature* pCreature)
 {
     if ((pPlayer->GetQuestStatus(1999) == QUEST_STATUS_INCOMPLETE))
@@ -341,7 +325,6 @@ void AddSC_undercity()
     newscript = new Script;
     newscript->Name = "npc_lady_sylvanas_windrunner";
     newscript->GetAI = &GetAI_boss_sylvanas;
-    newscript->pGossipHello = &GossipHello_npc_lady_sylvanas_windrunner;
     newscript->RegisterSelf();
 
     newscript = new Script;
