@@ -1518,8 +1518,8 @@ CreatureAI* GetAI_npc_gnomish_battle_chicken(Creature* pCreature)
 
 enum
 {
-    SPELL_Flame_Buffet = 9574,
-    SPELL_Flame_Breath = 20712
+    SPELL_FLAME_BUFFET = 9658,
+    SPELL_FLAME_BREATH = 8873
 };
 
 struct npc_arcanite_dragonlingAI : ScriptedPetAI
@@ -1527,53 +1527,36 @@ struct npc_arcanite_dragonlingAI : ScriptedPetAI
     explicit npc_arcanite_dragonlingAI(Creature* pCreature) : ScriptedPetAI(pCreature)
     {
         m_creature->SetCanModifyStats(true);
-
-        if (m_creature->GetCharmInfo())
-        {
-            if (sWorld.GetWowPatch() < WOW_PATCH_109)
-                m_creature->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
-            else 
-                m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
-        }
-
-
-        m_firebuffetTimer = urand(0, 10000);
-        m_flamebreathTimer = urand(0, 20000);
-
+        m_creature->GetCharmInfo()->SetReactState(REACT_AGGRESSIVE);
         npc_arcanite_dragonlingAI::Reset();
     }
 
     uint32 m_firebuffetTimer;
     uint32 m_flamebreathTimer;
 
-
-    void Reset() override { }
-
-    void DamageTaken(Unit* pDoneBy, uint32 &uiDamage) override
-    {
-        ScriptedPetAI::DamageTaken(pDoneBy, uiDamage);
+    void Reset() override 
+    { 
+        m_firebuffetTimer = 5000;
+        m_flamebreathTimer = urand(10000, 60000);
     }
 
     void UpdatePetAI(const uint32 uiDiff) override
     {
         if (m_firebuffetTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_Flame_Buffet) == CAST_OK)
-                m_firebuffetTimer = urand(5000, 10000);
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BUFFET) == CAST_OK)
+                m_firebuffetTimer = 22500;
         }
         else
             m_firebuffetTimer -= uiDiff;
 
         if (m_flamebreathTimer < uiDiff)
         {
-            int32 damage = 300;
-            m_creature->CastCustomSpell(m_creature->getVictim(), SPELL_Flame_Breath, &damage, nullptr, nullptr, true);
-            m_flamebreathTimer = urand(5000, 20000);
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_FLAME_BREATH) == CAST_OK)
+                m_flamebreathTimer = urand(10000, 60000);
         }
         else
             m_flamebreathTimer -= uiDiff;
-
-
 
         ScriptedPetAI::UpdatePetAI(uiDiff);
     }
