@@ -413,6 +413,11 @@ inline bool HasAuraWithSpellTriggerEffect(SpellEntry const *spellInfo)
     return false;
 }
 
+inline bool IsCharmSpell(SpellEntry const *spellInfo)
+{
+    return IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CHARM) || IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_POSSESS);
+}
+
 inline bool IsDispelSpell(SpellEntry const *spellInfo)
 {
     return IsSpellHaveEffect(spellInfo, SPELL_EFFECT_DISPEL);

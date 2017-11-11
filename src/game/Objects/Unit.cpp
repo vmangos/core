@@ -3096,7 +3096,7 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell
 
     // All positive spells can`t miss
     // TODO: client not show miss log for this spells - so need find info for this in dbc and use it!
-    if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex))
+    if (IsPositiveSpell(spell->Id, this, pVictim) || IsPositiveEffect(spell, effIndex, this, pVictim))
         return SPELL_MISS_NONE;
 
     // Check for immune (use charges)
@@ -4734,7 +4734,7 @@ void Unit::RemoveSpellAuraHolder(SpellAuraHolder *holder, AuraRemoveMode mode)
         {
             // If single target, interrupt cast. If not, notify the spell caster so we
             // can stop processing this holder
-            if (channeled->m_targets.getUnitTarget() == this && mode != AURA_REMOVE_BY_CHANNEL && (mode != AURA_REMOVE_BY_EXPIRE || caster->IsControlledByPlayer()))
+            if (!IsAreaOfEffectSpell(channeled->m_spellInfo) && mode != AURA_REMOVE_BY_CHANNEL && (mode != AURA_REMOVE_BY_EXPIRE || caster->IsControlledByPlayer()))
                 caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
             else
                 channeled->RemoveChanneledAuraHolder(holder, mode);
@@ -9025,7 +9025,7 @@ CharmInfo* Unit::InitCharmInfo(Unit *charm)
 CharmInfo::CharmInfo(Unit* unit)
     : m_unit(unit), m_CommandState(COMMAND_FOLLOW), m_reactState(REACT_PASSIVE), m_petnumber(0),
       _isCommandAttack(false), _isAtStay(false), _isFollowing(false), _isReturning(false),
-      _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f), _isCommandFollow(false)
+      _stayX(0.0f), _stayY(0.0f), _stayZ(0.0f), _isCommandFollow(false), m_originalFactionTemplate(nullptr)
 {
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_charmspells[i].SetActionAndType(0, ACT_DISABLED);

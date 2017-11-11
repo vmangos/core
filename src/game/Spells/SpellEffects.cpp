@@ -2899,6 +2899,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         return;
 
     // Fill possible dispel list
+    int32 priority_dispel = -1;
     std::list <std::pair<SpellAuraHolder* , uint32> > dispel_list;
 
     bool checkFaction = true;
@@ -2922,8 +2923,16 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
                 {
                     bool positive = holder->IsPositive();
                     // do not remove positive auras if friendly target
-                    //               negative auras if non-friendly target
-                    if (positive == friendly)
+                    // do not remove negative auras if non-friendly target
+                    // when removing charm auras ignore hostile reaction from the charm
+                    if (!friendly && IsCharmSpell(holder->GetSpellProto()))
+                    {
+                        if (CharmInfo *charm = unitTarget->GetCharmInfo())
+                            if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                                if (ft->IsFriendlyTo(*m_caster->getFactionTemplateEntry()))
+                                    priority_dispel = dispel_list.size();
+                    }
+                    else if (positive == friendly)
                         continue;
                 }
             }
@@ -2944,8 +2953,16 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         for (int32 count = 0; count < damage && !dispel_list.empty(); ++count)
         {
             // Random select buff for dispel
-            std::list<std::pair<SpellAuraHolder* , uint32> >::iterator dispel_itr = dispel_list.begin();
-            std::advance(dispel_itr, urand(0, dispel_list.size() - 1));
+            std::list<std::pair<SpellAuraHolder*, uint32> >::iterator dispel_itr = dispel_list.begin();
+            if (priority_dispel >= 0) 
+            {
+                std::advance(dispel_itr, priority_dispel);
+                priority_dispel = -1;
+            }
+            else
+            {
+                std::advance(dispel_itr, urand(0, dispel_list.size() - 1));
+            }
 
             SpellAuraHolder *holder = dispel_itr->first;
 

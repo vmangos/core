@@ -800,6 +800,9 @@ struct CharmInfo
     ReactStates GetReactState() const { return m_reactState; }
     bool HasReactState(ReactStates state) const { return m_reactState == state; }
 
+    FactionTemplateEntry const* GetOriginalFactionTemplate() const { return m_originalFactionTemplate; }
+    void SetOriginalFactionTemplate(FactionTemplateEntry const* ft) { m_originalFactionTemplate = ft; }
+
     void InitPossessCreateSpells();
     void InitCharmCreateSpells();
     void InitPetActionBar();
@@ -836,6 +839,7 @@ struct CharmInfo
 private:
 
     Unit* m_unit;
+    FactionTemplateEntry const* m_originalFactionTemplate;
 
     UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
     CharmSpellEntry m_charmspells[CREATURE_MAX_SPELLS];

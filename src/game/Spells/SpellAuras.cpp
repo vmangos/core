@@ -2863,6 +2863,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
     if (apply)
     {
+        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
         target->addUnitState(UNIT_STAT_CONTROLLED);
 
         target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_PVP_ATTACKABLE);
@@ -2883,6 +2884,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
             charmInfo->InitPossessCreateSpells();
             charmInfo->SetReactState(REACT_PASSIVE);
             charmInfo->SetCommandState(COMMAND_STAY);
+            charmInfo->SetOriginalFactionTemplate(origFactionTemplate);
         }
 
         p_caster->PossessSpellInitialize();
@@ -3049,6 +3051,8 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (!caster)
             return;
 
+        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
+
         // is it really need after spell check checks?
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM, GetHolder());
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS, GetHolder());
@@ -3074,6 +3078,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         charmInfo->SetIsReturning(true);
         charmInfo->SetIsCommandFollow(true);
         charmInfo->SetIsFollowing(false);
+        charmInfo->SetOriginalFactionTemplate(origFactionTemplate);
 
         target->AttackStop();
         target->InterruptNonMeleeSpells(false);

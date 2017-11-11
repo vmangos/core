@@ -743,8 +743,12 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
         // Dispel can be positive or negative depending on the target
         case SPELL_EFFECT_DISPEL:
             if (caster && victim)
+            {
+                if (CharmInfo *charm = victim->GetCharmInfo())
+                    if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                        return ft->IsFriendlyTo(*caster->getFactionTemplateEntry());
                 return caster->IsFriendlyTo(victim);
-
+            }
         // non-positive aura use
         case SPELL_EFFECT_APPLY_AURA:
         {
