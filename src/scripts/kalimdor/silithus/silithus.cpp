@@ -25,7 +25,6 @@
  npc_highlord_demitrian
  npcs_rutgar_and_frankal
  go_pierre_vents
- npc_cenarion_scout_azenel
  EndContentData */
 
 #include "scriptPCH.h"
@@ -503,37 +502,6 @@ bool GossipSelect_go_pierre_vents(Player* user, GameObject* gobj, uint32 sender,
     user->CLOSE_GOSSIP_MENU();
     if (go_pierre_ventsAI* ai = dynamic_cast<go_pierre_ventsAI*>(gobj->AI()))
         ai->GossipSelect(user, action);
-    return true;
-}
-
-/*###
- ## npc_cenarion_scout_azenel
- ###*/
-
-#define GOSSIP_ITEM_REPORT "Your report, please!"
-
-#define SAY_COMPLETE "Quickly, bring my report to Cenarion Hold!"
-
-#define SPELL_CREATE_HIVE_ZORA_SCOUT_REPORT    25843
-
-bool GossipHello_npc_cenarion_scout_azenel(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(8534) == QUEST_STATUS_INCOMPLETE)
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_REPORT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-    pPlayer->SEND_GOSSIP_MENU(pCreature->GetEntry(), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_cenarion_scout_azenel(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, SPELL_CREATE_HIVE_ZORA_SCOUT_REPORT, false);
-        pCreature->MonsterWhisper(SAY_COMPLETE, pPlayer);
-    }
     return true;
 }
 
@@ -4292,13 +4260,6 @@ void AddSC_silithus()
     pNewScript->pGOGossipSelect =  &GossipSelect_go_pierre_vents;
     pNewScript->GOGetAI = &GetAIgo_pierre_vents;
     pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_cenarion_scout_azenel";
-    pNewScript->pGossipHello =  &GossipHello_npc_cenarion_scout_azenel;
-    pNewScript->pGossipSelect = &GossipSelect_npc_cenarion_scout_azenel;
-    pNewScript->RegisterSelf();
-
 
     /*########################
     ##      Nostalrius      ##
