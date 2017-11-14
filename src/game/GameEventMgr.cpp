@@ -40,7 +40,7 @@ INSTANTIATE_SINGLETON_1(GameEventMgr);
 bool GameEventMgr::CheckOneGameEvent(uint16 entry, time_t currenttime) const
 {
     // Get the event information
-    if (mGameEvent[entry].start < currenttime && currenttime < mGameEvent[entry].end &&
+    if (mGameEvent[entry].start <= currenttime && currenttime < mGameEvent[entry].end &&
             (currenttime - mGameEvent[entry].start) % (mGameEvent[entry].occurence * MINUTE) < mGameEvent[entry].length * MINUTE)
         return true;
 
@@ -50,9 +50,6 @@ bool GameEventMgr::CheckOneGameEvent(uint16 entry, time_t currenttime) const
 uint32 GameEventMgr::NextCheck(uint16 entry) const
 {
     time_t currenttime = time(nullptr);
-
-    if (entry == 17)      // Scourge Invasion Event, update every 20s
-        return 20;
 
     // outdated event: we return max
     if (currenttime > mGameEvent[entry].end)
@@ -707,7 +704,9 @@ uint32 GameEventMgr::Update(ActiveEvents const* activeAtShutdown /*= NULL*/)
         if (!mGameEvent[(*hEvent_iter)->m_eventId].disabled)
         {
             (*hEvent_iter)->Update();
-            nextEventDelay = NextCheck((*hEvent_iter)->m_eventId);
+            uint32 calcDelay = (*hEvent_iter)->GetNextUpdateDelay();
+            if (calcDelay < nextEventDelay)
+                nextEventDelay = calcDelay;
         }
     }
 

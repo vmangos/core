@@ -1438,6 +1438,7 @@ Corpses.UpdateMinutes = 20
 Bones.ExpireMinutes   = 60
 Death.Ghost.RunSpeed.World = 1.0
 Death.Ghost.RunSpeed.Battleground = 1.0
+Rate.WarEffortResourceComplete = 0.0
 
 ###################################################################################################################
 # BATTLEGROUND CONFIG

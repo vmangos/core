@@ -264,6 +264,7 @@ struct ScourgeInvasionEvent : WorldEvent
     void Update() override;
     void Enable() override;
     void Disable() override;
+    uint32 GetNextUpdateDelay() override;
 
 private:
     struct InvasionXYZ {
@@ -309,4 +310,63 @@ private:
 
     std::vector<InvasionZone> invasionPoints;
     int previousRemainingCounts[6];
+};
+
+enum WarEffortEventStage
+{
+    WAR_EFFORT_STAGE_COLLECTION     = 0,
+    WAR_EFFORT_STAGE_READY          = 1,
+    WAR_EFFORT_STAGE_MOVE_1         = 2,
+    WAR_EFFORT_STAGE_MOVE_2         = 3,
+    WAR_EFFORT_STAGE_MOVE_3         = 4,
+    WAR_EFFORT_STAGE_MOVE_4         = 5,
+    WAR_EFFORT_STAGE_MOVE_5         = 6,
+    WAR_EFFORT_STAGE_GONG_WAIT      = 7,
+    WAR_EFFORT_STAGE_GONG_RUNG      = 8,
+    WAR_EFFORT_STAGE_BATTLE         = 9,
+    WAR_EFFORT_STAGE_CH_ATTACK      = 10,
+    WAR_EFFORT_STAGE_FINALBATTLE    = 11,
+    WAR_EFFORT_STAGE_COMPLETE       = 12
+};
+
+enum WarEffortEnums
+{
+    WAR_EFFORT_COLLECTION_TRANSITION_TIME   = 10 * MINUTE,  // 10 minutes between the event ending and starting the transition (what is the blizzlike thing here?)
+    WAR_EFFORT_MOVE_TRANSITION_TIME         = DAY,          // 1 day transition time default when the effort is moving to Silithus
+    WAR_EFFORT_GONG_DURATION                = 10 * HOUR,    // gong lasts 10 hours after the first dong
+    WAR_EFFORT_CH_ATTACK_TIME               = 4 * HOUR,     // 4h after gong bang, CH gets attacked
+    WAR_EFFORT_FINAL_BATTLE_TIME            = 4 * HOUR,     // 4h after CH attack, final battle begins
+    WAR_EFFORT_AUTOCOMPLETE_PERIOD          = 1 * DAY,      // How often progress is auto completed for the war effort collection
+    WAR_EFFORT_TEXT_CRYSTALS                = -1000008,     // Crystals emerge from the ground...
+    WAR_EFFORT_TEXT_BATTLE_OVER             = -1780312,     // The Might of Kalimdor is victorious...
+    WAR_EFFORT_ASHI_REWARD                  = 0x01,
+    WAR_EFFORT_ZORA_REWARD                  = 0x02,
+    WAR_EFFORT_REGAL_REWARD                 = 0x04
+};
+
+struct WarEffortEvent : WorldEvent
+{
+    WarEffortEvent();
+
+    WarEffortEventStage stage;
+    uint32 lastStageTransitionTime;
+    uint32 gongRingTime;
+    uint32 lastAutoCompleteTime;
+
+    void Update() override;
+    void Enable() override;
+    void Disable() override;
+    uint32 GetNextUpdateDelay() override;
+
+private:
+    void UpdateWarEffortCollection(uint32 now);
+    void UpdateStageTransitionTime();
+    void IncrementWarEffortTransition();
+    void UpdateVariables();
+    void BeginWar();
+    void CompleteWarEffort();
+    void UpdateStageEvents();
+    void EnableAndStartEvent(uint16 event_id);
+    void DisableAndStopEvent(uint16 event_id);
+    void UpdateHiveColossusEvents();
 };

@@ -29,6 +29,7 @@
 
 #include "scriptPCH.h"
 #include "Database/DatabaseEnv.h"
+#include "HardcodedEvents.h"
 
 /*###
  ## npc_highlord_demitrian
@@ -915,13 +916,37 @@ CreatureAI* GetAI_npc_prince_thunderaan(Creature* pCreature)
 
 enum
 {
-    SPELL_COLOSSAL_SMASH            = 26167 // Maxi KB
+    SPELL_COLOSSAL_SMASH            = 26167, // Maxi KB
+    NPC_COLOSSUS_ZORA               = 15740,
+    NPC_COLOSSUS_REGAL              = 15741,
+    NPC_COLOSSUS_ASHI               = 15742,
+
+    TEXT_COLOSSUS_ASHI = -1000009,
+    TEXT_COLOSSUS_REGAL = -1000016,
+    TEXT_COLOSSUS_ZORA = -1000017,
 };
 
 struct npc_colossusAI : public ScriptedAI
 {
     npc_colossusAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        int text = 0;
+        switch (m_creature->GetEntry())
+        {
+            case NPC_COLOSSUS_ASHI:
+                text = TEXT_COLOSSUS_ASHI;
+                break;
+            case NPC_COLOSSUS_REGAL:
+                text = TEXT_COLOSSUS_REGAL;
+                break;
+            case NPC_COLOSSUS_ZORA:
+                text = TEXT_COLOSSUS_ZORA;
+                break;
+        }
+
+        if (text)
+            m_creature->MonsterScriptToZone(text, CHAT_MSG_MONSTER_EMOTE);
+
         Reset();
     }
 
@@ -985,6 +1010,38 @@ struct npc_colossusAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
+
+    void JustDied(Unit* pKiller)
+    {
+        // Spawn the event quest that lets players attain a reward for the
+        // death of the colossus.
+        // Note that it is not thread-safe to start events inside a map update.
+        // Instead, set a saved var and the event update will read it
+        uint32 eventFlag = sObjectMgr.GetSavedVariable(VAR_WE_HIVE_REWARD, 0);
+        switch (m_creature->GetEntry())
+        {
+            case NPC_COLOSSUS_ZORA:
+                eventFlag |= WAR_EFFORT_ZORA_REWARD;
+                break;
+            case NPC_COLOSSUS_ASHI:
+                eventFlag |= WAR_EFFORT_ASHI_REWARD;
+                break;
+            case NPC_COLOSSUS_REGAL:
+                eventFlag |= WAR_EFFORT_REGAL_REWARD;
+                break;
+        }
+
+        // Don't save to DB - event will not resume on crash, requires colossus to be
+        // slain again
+        if (eventFlag)
+        {
+            sObjectMgr.SetSavedVariable(VAR_WE_HIVE_REWARD, eventFlag);
+            // Trigger event update on next world tick
+            sWorld.SetWorldUpdateTimer(WUPDATE_EVENTS, sWorld.GetWorldUpdateTimerInterval(WUPDATE_EVENTS)+1);
+        }
+
+        ScriptedAI::JustDied(pKiller);
+    }
 };
 
 CreatureAI* GetAI_npc_colossus(Creature* pCreature)
@@ -992,780 +1049,6 @@ CreatureAI* GetAI_npc_colossus(Creature* pCreature)
     return new npc_colossusAI(pCreature);
 }
 
-
-/*#####
- ## npc_resonating_Crystal
- ######*/
-
-// UPDATE `creature_template` SET `ScriptName` = 'npc_resonating_Crystal' WHERE `entry` = 15769;
-
-enum
-{
-    GO_RESONATING_CRYSTAL_FORMATION     = 180810,
-
-    MAX_SIGHT_DISTANCE                  = 55,
-
-    // C'Thun's Mind Control has varying strengths based on location
-    WHISPERINGS_OF_CTHUN_0              = 26259, // (10-21) Barrens
-    WHISPERINGS_OF_CTHUN_1              = 26258, // (21-41) 1K Needles
-    WHISPERINGS_OF_CTHUN_2              = 26195, // (30-41) Desolace?
-    WHISPERINGS_OF_CTHUN_3              = 26197, // (41-51) Feralas/Tanaris/Un'Goro
-    WHISPERINGS_OF_CTHUN_4              = 26198, // (51-71) Silithus
-
-    ZONE_BARRENS                        = 17,
-    ZONE_THOUSAND_NEEDLES               = 400,
-    ZONE_DESOLACE                       = 405,
-    ZONE_FERALAS                        = 357,
-    ZONE_TANARIS                        = 440,
-    ZONE_UN_GORO                        = 490,
-    ZONE_SILITHUS                       = 1377,
-};
-
-struct npc_resonating_CrystalAI : public ScriptedAI
-{
-    npc_resonating_CrystalAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        SPELL_WHISPERINGS = GetMCSpellForZone();
-    }
-
-    bool playerDetected;
-    uint32 m_uiCheckTimer;
-    uint32 m_uiWisperingsTimer;
-    uint32 SPELL_WHISPERINGS;
-
-    void Reset()
-    {
-        SetCombatMovement(false);
-        playerDetected      = false;
-        m_uiCheckTimer      = 2000;
-        m_uiWisperingsTimer = 1000;
-    }
-
-    uint32 GetMCSpellForZone()
-    {
-        switch (m_creature->GetZoneId())
-        {
-            case ZONE_BARRENS:
-                return WHISPERINGS_OF_CTHUN_0;
-
-            case ZONE_THOUSAND_NEEDLES:
-                return WHISPERINGS_OF_CTHUN_1;
-
-            case ZONE_DESOLACE:
-                return WHISPERINGS_OF_CTHUN_2;
-
-            case ZONE_FERALAS:
-            case ZONE_TANARIS:
-            case ZONE_UN_GORO:
-                return WHISPERINGS_OF_CTHUN_3;
-
-            default:
-                // ZONE_SILITHUS
-                return WHISPERINGS_OF_CTHUN_4;
-        }
-    }
-
-    void MoveInLineOfSight(Unit* who)
-    {
-        if (who->GetTypeId() != TYPEID_PLAYER || who->ToPlayer()->isGameMaster())
-            return;
-
-        if (!who->isAlive())
-            return;
-
-        playerDetected = m_creature->IsWithinDistInMap(who, MAX_SIGHT_DISTANCE) ? true : false;
-    }
-
-    bool MoreThanOnePlayerNear()
-    {
-        Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-        int var = 0;
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->isGameMaster())
-                ++var;
-
-            if (var > 1)
-                return true;
-        }
-        return false;
-    }
-
-    void AggroAllPlayerNear()
-    {
-        Map::PlayerList const& players = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
-        {
-            Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->isGameMaster())
-            {
-                m_creature->AddThreat(pPlayer);
-                m_creature->SetInCombatWith(pPlayer);
-            }
-        }
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (playerDetected)
-        {
-            if (m_uiCheckTimer < uiDiff)
-            {
-                if (MoreThanOnePlayerNear())
-                    AggroAllPlayerNear();
-                else
-                    EnterEvadeMode();
-                m_uiCheckTimer = 2000;
-            }
-            else
-                m_uiCheckTimer -= uiDiff;
-        }
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        // Whisperings of C'Thun (MC)
-        if (MoreThanOnePlayerNear())
-        {
-            if (m_uiWisperingsTimer < uiDiff || (m_creature->GetCharm() && m_creature->GetCharm()->IsPolymorphed()))
-            {
-                if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS, CAST_AURA_NOT_PRESENT) == CAST_OK)
-                        m_uiWisperingsTimer = 20000;
-            }
-            else
-                m_uiWisperingsTimer -= uiDiff;
-        }
-    }
-};
-
-CreatureAI* GetAI_npc_resonating_Crystal(Creature* pCreature)
-{
-    return new npc_resonating_CrystalAI(pCreature);
-}
-
-
-/*###
- ## npc_AQwar_effort
- ###*/
-
-enum WarEffortItemType
-{
-    WAREFFORT_BAR,
-    WAREFFORT_HERBS,
-    WAREFFORT_SKINS,
-    WAREFFORT_COOKING,
-    WAREFFORT_BANDAGES,
-};
-
-struct WarEffort
-{
-    uint32 itemID, reqCount;
-    uint32 saveVarID;           // = itemID / This variable is left in case the ID of the item is not an appropriate choice.
-    char itemName[50];
-    WarEffortItemType type;
-};
-
-/*
- -- SQL a executer pour RESET l'event.
- -- Le champ 'comment' sert pour le site.
- REPLACE INTO variables (`index`, value, `comment`) VALUES
- -- Neutre
- (2840, 0, "AQ|N|Barre de cuivre|90000"),
- (8831, 0, "AQ|N|Lotus pourpre|26000"),
- (4304, 0, "AQ|N|Cuir epais|80000"),
- (6887, 0, "AQ|N|Jaune-queue tachete|17000"),
- (14529, 0, "AQ|N|Bandage en etoffe runique|400000"),
- -- Alliance
- (3575, 0, "AQ|A|Barre de fer|28000"),
- (12359, 0, "AQ|A|Barre de thorium|24000"),
- (8836, 0, "AQ|A|Larmes d'Arthas|20000"),
- (3820, 0, "AQ|A|Etouffante|33000"),
- (2318, 0, "AQ|A|Cuir leger|180000"),
- (2319, 0, "AQ|A|Cuir moyen|110000"),
- (12210, 0, "AQ|A|Roti de raptor|20000"),
- (5095, 0, "AQ|A|Thon arc-en-ciel|14000"),
- (1251, 0, "AQ|A|Bandage en lin|800000"),
- (6450, 0, "AQ|A|Bandage en soie|600000"),
- -- Horde
- (3576, 0, "AQ|H|Barre d'etain|22000"),
- (3860, 0, "AQ|H|Barre de mithril|18000"),
- (2447, 0, "AQ|H|Pacifique|96000"),
- (4625, 0, "AQ|H|Fleur de feu|19000"),
- (4234, 0, "AQ|H|Cuir lourd|60000"),
- (8170, 0, "AQ|H|Cuir robuste|60000"),
- (12209, 0, "AQ|H|Steak de loup|10000"),
- (13935, 0, "AQ|H|Pain de saumon|10000"),
- (3530, 0, "AQ|H|Bandage en laine|250000"),
- (8544, 0, "AQ|H|Bandage en tisse-mage|250000");
- */
-
-static const WarEffort SharedObjectives[5] =
-{
-    {2840,  90000,  2840,  "Copper Bar", WAREFFORT_BAR},
-    {8831,  26000,  8831,  "Purple Lotus", WAREFFORT_HERBS},
-    {4304,  80000,  4304,  "Thick Leather", WAREFFORT_SKINS},
-    {6887,  17000,  6887,  "Spotted Yellowtail", WAREFFORT_COOKING},
-    {14529, 400000, 14529, "Runecloth Bandage", WAREFFORT_BANDAGES}
-};
-
-static const WarEffort AllianceObjectives[10] =
-{
-    {3575,  28000,  3575,   "Iron Bar", WAREFFORT_BAR},
-    {12359, 24000,  12359,  "Thorium Bar", WAREFFORT_BAR},
-    {8836,  20000,  8836,   "Arthas' Tears", WAREFFORT_HERBS},
-    {3820,  33000,  3820,   "Stranglekelp", WAREFFORT_HERBS},
-    {2318,  180000, 2318,   "Light Leather", WAREFFORT_SKINS},
-    {2319,  110000, 2319,   "Medium Leather", WAREFFORT_SKINS},
-    {12210, 20000,  12210,  "Roast Raptor", WAREFFORT_COOKING},
-    {5095,  14000,  5095,   "Rainbow Fin Albacore", WAREFFORT_COOKING},
-    {1251,  800000, 1251,   "Linen Bandage", WAREFFORT_BANDAGES},
-    {6450,  600000, 6450,   "Silk Bandage", WAREFFORT_BANDAGES}
-};
-
-static const WarEffort HordeObjectives[10] =
-{
-    {3576,  22000,  3576,   "Tin Bar", WAREFFORT_BAR},
-    {3860,  18000,  3860,   "Mithril Bar", WAREFFORT_BAR},
-    {2447,  96000,  2447,   "Peacebloom", WAREFFORT_HERBS},
-    {4625,  19000,  4625,   "Firebloom", WAREFFORT_HERBS},
-    {4234,  60000,  4234,   "Heavy Leather", WAREFFORT_SKINS},
-    {8170,  60000,  8170,   "Rugged Leather", WAREFFORT_SKINS},
-    {12209, 10000,  12209,  "Lean Wolf Steak", WAREFFORT_COOKING},
-    {13935, 10000,  13935,  "Baked Salmon", WAREFFORT_COOKING},
-    {3530,  250000, 3530,   "Wool Bandage", WAREFFORT_BANDAGES},
-    {8544,  250000, 8544,   "Mageweave Bandage", WAREFFORT_BANDAGES}
-};
-
-enum
-{
-    // Alliance
-    NPC_FIELD_MARSHAL_SNOWFALL  = 15701,
-    NPC_COMMANDER_STRONGHAMMER  = 15458,
-
-    // Horde
-    NPC_WARLORD_GORCHUK         = 15700,
-    NPC_GENERAL_ZOG             = 15539
-};
-
-// UPDATE `creature_template` SET `ScriptName` = 'npc_AQwar_effort' WHERE `entry` IN (15701, 15458, 15700, 15539);
-
-bool GossipHello_npc_AQwar_effort(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    switch (pCreature->GetEntry())
-    {
-        case NPC_FIELD_MARSHAL_SNOWFALL:    // Shared + Alliance
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Shared War Effort", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        // no break
-        case NPC_COMMANDER_STRONGHAMMER:    // Alliance only
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Alliance War Effort", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-            break;
-        case NPC_WARLORD_GORCHUK:           // Shared + Horde
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Shared War Effort", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-        // no break
-        case NPC_GENERAL_ZOG:               // Horde only
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Horde War Effort", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-            break;
-        default:
-            break;
-    }
-
-    pPlayer->SEND_GOSSIP_MENU(1, pCreature->GetObjectGuid()); // Text to put here the state of the resources
-    return true;
-}
-
-bool GossipSelect_npc_AQwar_effort(Player* pPlayer, Creature* pCreature, uint32 sender, uint32 action)
-{
-    if (sender != GOSSIP_SENDER_MAIN)
-        return false;
-
-    switch (action)
-    {
-        case GOSSIP_ACTION_INFO_DEF:
-        {
-            // Shared War Effort
-            for (int i = 0; i < 5; i++)
-            {
-                uint32 stock = sObjectMgr.GetSavedVariable(SharedObjectives[i].saveVarID, 0);
-                uint32 objectif = SharedObjectives[i].reqCount;
-                if (stock > objectif)
-                    stock = objectif;
-
-                char sMessage[200] = "";
-                sprintf(sMessage, "%s: %u / %u", SharedObjectives[i].itemName, stock, objectif);
-
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, sMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            }
-            break;
-        }
-        case GOSSIP_ACTION_INFO_DEF+1:
-        {
-            // Alliance War Effort
-            for (int i = 0; i < 10; i++)
-            {
-                uint32 stock = sObjectMgr.GetSavedVariable(AllianceObjectives[i].saveVarID, 0);
-                uint32 objectif = AllianceObjectives[i].reqCount;
-
-                if (stock > objectif)
-                    stock = objectif;
-
-                char sMessage[200] = "";
-                sprintf(sMessage, "%s: %u / %u", AllianceObjectives[i].itemName, stock, objectif);
-
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, sMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            }
-            break;
-        }
-        case GOSSIP_ACTION_INFO_DEF+2:
-        {
-            // Horde War Effort
-            for (int i = 0; i < 10; i++)
-            {
-                uint32 stock = sObjectMgr.GetSavedVariable(HordeObjectives[i].saveVarID, 0);
-                uint32 objectif = HordeObjectives[i].reqCount;
-
-                if (stock > objectif)
-                    stock = objectif;
-
-                char sMessage[200] = "";
-                sprintf(sMessage, "%s: %u / %u", HordeObjectives[i].itemName, stock, objectif);
-
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_BATTLE, sMessage, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-            }
-            break;
-        }
-        case GOSSIP_ACTION_INFO_DEF+3:
-            pPlayer->CLOSE_GOSSIP_MENU();
-            return true;
-        default:
-            break;
-    }
-
-    pPlayer->SEND_GOSSIP_MENU(1, pCreature->GetObjectGuid());
-    return true;
-}
-
-/*###
- ## npc_AQwar_collector
- ###*/
-
-// UPDATE `creature_template` SET `ScriptName` = 'npc_AQwar_collector' WHERE `subname` like '%collector%' and subname not like '%ancestry%';
-
-bool GossipHello_npc_AQwar_collector(Player* pPlayer, Creature* pCreature)
-{
-    bool objectiveReached = false;
-    char itemNameReqReached[51] = "";
-
-    QuestRelationsMapBounds bounds = sObjectMgr.GetCreatureQuestRelationsMapBounds(pCreature->GetEntry());
-    for (QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
-    {
-        uint32 quest_id = itr->second;
-        if (!quest_id)
-            continue;
-        Quest const *pQuest = sObjectMgr.GetQuestTemplate(quest_id);
-        if (!pQuest)
-            continue;
-
-        for (uint8 i = 0; i < 5; i++)
-        {
-            if (pQuest->ReqItemId[0] == SharedObjectives[i].itemID)
-            {
-                uint32 stock = sObjectMgr.GetSavedVariable(SharedObjectives[i].saveVarID, 0);
-                uint32 objectif = SharedObjectives[i].reqCount;
-                if (stock >= objectif)
-                {
-                    objectiveReached = true;
-                    strcat(itemNameReqReached, SharedObjectives[i].itemName);
-                    break;
-                }
-            }
-        }
-        for (uint8 i = 0; i < 10; i++)
-        {
-            if (pQuest->ReqItemId[0] == AllianceObjectives[i].itemID)
-            {
-                uint32 stock = sObjectMgr.GetSavedVariable(AllianceObjectives[i].saveVarID, 0);
-                uint32 objectif = AllianceObjectives[i].reqCount;
-                if (stock >= objectif)
-                {
-                    objectiveReached = true;
-                    strcat(itemNameReqReached, AllianceObjectives[i].itemName);
-                    break;
-                }
-            }
-        }
-        for (uint8 i = 0; i < 10; i++)
-        {
-            if (pQuest->ReqItemId[0] == HordeObjectives[i].itemID)
-            {
-                uint32 stock = sObjectMgr.GetSavedVariable(HordeObjectives[i].saveVarID, 0);
-                uint32 objectif = HordeObjectives[i].reqCount;
-                if (stock >= objectif)
-                {
-                    objectiveReached = true;
-                    strcat(itemNameReqReached, HordeObjectives[i].itemName);
-                    break;
-                }
-            }
-        }
-
-        if (objectiveReached)
-            break;
-    }
-
-
-    if (objectiveReached)
-    {
-        if (pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
-            pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-
-        if (pCreature->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-        char sMessage[200] = "";
-        sprintf(sMessage, "The collection of %s is no longer necessary.", itemNameReqReached);
-
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->MonsterSay(sMessage, 0, 0);
-        pCreature->HandleEmote(EMOTE_ONESHOT_BOW);
-        return true;
-    }
-
-    if (pCreature->isQuestGiver())
-    {
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-    }
-    return true;
-}
-
-struct GOWarEffort
-{
-    int Tiers;      // A titre informatif uniquement
-    uint32 GOEntry;
-    int faction;    // = GetTeamId() // Alliance = 0 Horde = 1
-};
-
-static const GOWarEffort GOBars[10] =
-{
-    // Alliance
-    {1, 180780, 0},
-    {2, 180781, 0},
-    {3, 180782, 0},
-    {4, 180783, 0},
-    {5, 180784, 0},
-    // Horde
-    {1, 180839, 1},
-    {2, 180840, 1},
-    {3, 180841, 1},
-    {4, 180842, 1},
-    {5, 180843, 1}
-};
-
-static const GOWarEffort GOCooking[10] =
-{
-    // Alliance
-    {1, 180800, 0},
-    {2, 180806, 0},
-    {3, 180807, 0},
-    {4, 180808, 0},
-    {5, 180809, 0},
-    // Horde
-    {1, 180833, 1},
-    {2, 180834, 1},
-    {3, 180835, 1},
-    {4, 180836, 1},
-    {5, 180837, 1}
-};
-
-static const GOWarEffort GOHerbs[10] =
-{
-    // Alliance
-    {1, 180801, 0},
-    {2, 180802, 0},
-    {3, 180803, 0},
-    {4, 180804, 0},
-    {5, 180805, 0},
-    // Horde
-    {1, 180819, 1},
-    {2, 180820, 1},
-    {3, 180821, 1},
-    {4, 180822, 1},
-    {5, 180823, 1}
-};
-
-static const GOWarEffort GOSkins[10] =
-{
-    // Alliance
-    {1, 180692, 0},
-    {2, 180693, 0},
-    {3, 180694, 0},
-    {4, 180695, 0},
-    {5, 180696, 0},
-    // Horde
-    {1, 180813, 1},
-    {2, 180814, 1},
-    {3, 180815, 1},
-    {4, 180816, 1},
-    {5, 180817, 1}
-};
-
-static const GOWarEffort GOBandages[10] =
-{
-    // Alliance
-    {1, 180674, 0},
-    {2, 180675, 0},
-    {3, 180676, 0},
-    {4, 180677, 0},
-    {5, 180678, 0},
-    // Horde
-    {1, 180827, 1},
-    {2, 180828, 1},
-    {3, 180829, 1},
-    {4, 180830, 1},
-    {5, 180831, 1}
-};
-
-void HandleWarEffortGameObject(GOWarEffort const* gameobjects, Creature* questGiver, TeamId team, WarEffortItemType type)
-{
-    uint32 Objective    = 0;
-    uint32 current      = 0;
-
-    // Counting
-    for (int i = 0; i < 5; ++i)
-    {
-        if (SharedObjectives[i].type == type)
-        {
-            Objective += SharedObjectives[i].reqCount;
-            current   += sObjectMgr.GetSavedVariable(SharedObjectives[i].saveVarID, 0);
-        }
-    }
-    for (int i = 0; i < 10; ++i)
-    {
-        if (team == TEAM_HORDE && HordeObjectives[i].type == type)
-        {
-            Objective += HordeObjectives[i].reqCount;
-            current   += sObjectMgr.GetSavedVariable(HordeObjectives[i].saveVarID, 0);
-        }
-        if (team == TEAM_ALLIANCE && AllianceObjectives[i].type == type)
-        {
-            Objective += AllianceObjectives[i].reqCount;
-            current   += sObjectMgr.GetSavedVariable(AllianceObjectives[i].saveVarID, 0);
-        }
-    }
-
-    // Showing gameobjects
-    uint32 tempCount = Objective;
-    for (int j = 9; j >= 0; j--)
-    {
-        if (gameobjects[j].faction != team)
-            continue;
-        if (current >= tempCount)
-        {
-            if (GameObject* go = questGiver->FindNearestGameObject(gameobjects[j].GOEntry, 50.0f))
-            {
-                if (!go->isSpawned())
-                {
-                    go->SetRespawnTime(1209600); // 14 days
-                    go->SaveToDB();
-                }
-            }
-        }
-        tempCount -= Objective / 5;
-    }
-}
-
-bool QuestComplete_npc_AQwar_collector(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
-{
-    if (!pQuest->ReqItemId[0] || !pQuest->ReqItemCount[0])
-        return false;
-
-    uint32 var = sObjectMgr.GetSavedVariable(pQuest->ReqItemId[0], 0);
-    var += pQuest->ReqItemCount[0];
-    sObjectMgr.SetSavedVariable(pQuest->ReqItemId[0], var, true);
-
-    // Gestion des UNIT_NPC_FLAG_QUESTGIVER and UNIT_NPC_FLAG_GOSSIP des PNJ "collector"
-    char itemName[51] = "";
-    bool objectiveReached = false;
-
-    for (int i = 0; i < 5; i++)
-    {
-        if (pQuest->ReqItemId[0] == SharedObjectives[i].itemID)
-        {
-            if (var >= SharedObjectives[i].reqCount)
-            {
-                strcat(itemName, SharedObjectives[i].itemName);
-                objectiveReached = true;
-                break;
-            }
-        }
-    }
-
-    // Gestion apparition des GO
-    // GO Bars
-    HandleWarEffortGameObject(GOBars, pQuestGiver, pPlayer->GetTeamId(), WAREFFORT_BAR);
-    // GO Herbs
-    HandleWarEffortGameObject(GOHerbs, pQuestGiver, pPlayer->GetTeamId(), WAREFFORT_HERBS);
-    // GO Skins
-    HandleWarEffortGameObject(GOSkins, pQuestGiver, pPlayer->GetTeamId(), WAREFFORT_SKINS);
-    // GO Cooking
-    HandleWarEffortGameObject(GOCooking, pQuestGiver, pPlayer->GetTeamId(), WAREFFORT_COOKING);
-    // GO Bandages
-    HandleWarEffortGameObject(GOBandages, pQuestGiver, pPlayer->GetTeamId(), WAREFFORT_BANDAGES);
-
-    switch (pPlayer->GetTeam())
-    {
-        case HORDE:
-        {
-            // Gestion des UNIT_NPC_FLAG_QUESTGIVER et UNIT_NPC_FLAG_GOSSIP des PNJ "collector"
-            if (objectiveReached)
-                break;
-
-            for (int i = 0; i < 10; i++)
-            {
-                if (pQuest->ReqItemId[0] == HordeObjectives[i].itemID)
-                {
-                    if (var >= HordeObjectives[i].reqCount)
-                    {
-                        strcat(itemName, HordeObjectives[i].itemName);
-                        objectiveReached = true;
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        case ALLIANCE:
-        {
-            // Gestion des UNIT_NPC_FLAG_QUESTGIVER et UNIT_NPC_FLAG_GOSSIP des PNJ "collector"
-            if (objectiveReached)
-                break;
-
-            for (int i = 0; i < 10; i++)
-            {
-                if (pQuest->ReqItemId[0] == AllianceObjectives[i].itemID)
-                {
-                    if (var >= AllianceObjectives[i].reqCount)
-                    {
-                        strcat(itemName, AllianceObjectives[i].itemName);
-                        objectiveReached = true;
-                        break;
-                    }
-                }
-            }
-            break;
-        }
-        default:
-            break;
-    }
-
-    if (objectiveReached)
-    {
-        if (pQuestGiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
-            pQuestGiver->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-
-        if (pQuestGiver->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP))
-            pQuestGiver->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-
-        char sMessage[200] = "";
-        sprintf(sMessage, "Congratulations %s! The collection of %s is finally finished!", pPlayer->GetName(), itemName);
-        pQuestGiver->MonsterSay(sMessage, 0, 0);
-        pQuestGiver->HandleEmote(EMOTE_ONESHOT_CHEER);
-    }
-    return true;
-}
-
-const WarEffort* InternalGetResource(char* ResourceName, const WarEffort* InArray, int ArrSize)
-{
-    for (int i = 0; i < ArrSize; ++i)
-    {
-        const WarEffort* SharedRes = &InArray[i];
-        if (strcmp(ResourceName, SharedRes->itemName) == 0)
-        {
-            return SharedRes;
-        }
-    }
-
-    return nullptr;
-}
-
-const WarEffort* GetResourceIDFromString(char* ResourceName)
-{
-    if (ResourceName == nullptr) return nullptr;
-
-    const WarEffort* SharedWarEffortSup = InternalGetResource(ResourceName, SharedObjectives, sizeof(SharedObjectives) / sizeof(WarEffort));
-    if (SharedWarEffortSup != nullptr) return SharedWarEffortSup;
-
-    const WarEffort* AlliaceWarEffortSup = InternalGetResource(ResourceName, AllianceObjectives, sizeof(AllianceObjectives) / sizeof(WarEffort));
-    if (AlliaceWarEffortSup != nullptr) return AlliaceWarEffortSup;
-
-    const WarEffort* HordeWarEffortSup = InternalGetResource(ResourceName, HordeObjectives, sizeof(HordeObjectives) / sizeof(WarEffort));
-    if (HordeWarEffortSup != nullptr) return HordeWarEffortSup;
-
-    return nullptr;
-}
-
-
-bool ChatHandler::HandleGetWarEffortResource(char* args)
-{
-    char* pResourceName = ExtractQuotedArg(&args);
-
-    auto PrintResources = [this] (const WarEffort* Resource)
-    {
-        uint32 CurrentResourceCount = sObjectMgr.GetSavedVariable(Resource->saveVarID);
-        double Progress = (double)CurrentResourceCount / (double)Resource->reqCount;
-        PSendSysMessage("\"%s\"[%u] Current [%u] Required [%u] Completed: %.03f", Resource->itemName, Resource->itemID, CurrentResourceCount, Resource->reqCount, Progress);
-    };
-
-    if (const WarEffort* pResource = GetResourceIDFromString(pResourceName))
-    {
-        PrintResources(pResource);
-        return true;
-    }
-    else
-    {
-        PSendSysMessage("Error: resource with name \"%s\" not found", pResourceName);
-    }
-
-    return false;
-}
-
-bool ChatHandler::HandleSetWarEffortResource(char* args)
-{
-    char* pResourceName = ExtractQuotedArg(&args);
-    if (pResourceName == nullptr)
-    {
-        PSendSysMessage("Usage example .wareffortset \"Iron Bar\" 1245");
-        return false;
-    }
-    uint32 NewResourceCount = 0;
-    if (!ExtractUInt32(&args, NewResourceCount))
-    {
-        PSendSysMessage("Usage example .wareffortset \"Iron Bar\" 1245");
-        return false;
-    }
-
-    if (const WarEffort* pResource = GetResourceIDFromString(pResourceName))
-    {
-        uint32 PreviousResourceCount = sObjectMgr.GetSavedVariable(pResource->saveVarID);
-        sObjectMgr.SetSavedVariable(pResource->saveVarID, NewResourceCount, true);
-        double Progress = (double)NewResourceCount / (double)pResource->reqCount;
-        PSendSysMessage("\"%s\" Previous count [%u] New count [%u] Completed: %.03f", pResourceName, PreviousResourceCount, NewResourceCount, Progress);
-        return true;
-    }
-    else
-    {
-        PSendSysMessage("Error: resource with name \"%s\" not found", pResourceName);
-    }
-
-
-    return false;
-}
 
 
 /*###
@@ -2717,6 +2000,7 @@ struct npc_anachronos_the_ancientAI : public ScriptedAI
         {
             case POINT_ID_GATE:
                 // Cast time stop when he reaches the gate
+                DoScriptText(SAY_ANACHRONOS_SEAL_4, m_creature);
                 DoCastSpellIfCan(m_creature, SPELL_TIME_STOP);
                 DoTimeStopArmy();
                 m_uiEventTimer = 7000;
@@ -3233,34 +2517,18 @@ bool QuestAcceptGO_crystalline_tear(Player* pPlayer, GameObject* pGo, const Ques
 
 enum
 {
-    MAX_QIRAJI_CRYSTALS     = 6,
-    VAR_CRYSTALS_AWARDED    = 1,
-
-    QUEST_MIGHT_OF_KALIMDOR = 8742,
     QUEST_BANG_A_GONG       = 8743,
 
     GLOBAL_TEXT_CHAMPION    = -1000007,
-    GLOBAL_TEXT_CRYSTALS    = -1000008,
-
-    TEXT_COLOSSUS_ASHI      = -1000009,
-    TEXT_COLOSSUS_REGAL     = -1000016,
-    TEXT_COLOSSUS_ZORA      = -1000017,
-
-    GAME_EVENT_AQ_WAR       = 61,
-    GAME_EVENT_ASHI         = 62,
-    GAME_EVENT_REGAL        = 63,
-    GAME_EVENT_ZORA         = 64,
-    GAME_EVENT_CRYSTALS     = 65,
-
 
     STAGE_OPEN_GATES        = 0,
     STAGE_WAR               = 1,
     STAGE_RESET             = 2,
 
-    NPC_RAJAXX              = 15341,
+    SOUND_ROOTS_OPEN        = 7114,
+    SOUND_DOOR_OPEN         = 7115,
+    SOUND_RUNES_OPEN        = 7116
 };
-
-static const EventLocations rajaxxSpawnPoint = { -8106.35f, 1523.41f, 2.61f, 0.06166f, 0 };
 
 struct scarab_gongAI: public GameObjectAI
 {
@@ -3314,62 +2582,37 @@ struct scarab_gongAI: public GameObjectAI
             case 0:
                 go_aq_gate_roots->ResetDoorOrButton();
                 go_aq_gate_roots->UseDoorOrButton();
+                me->PlayDirectSound(SOUND_ROOTS_OPEN);
 
-                // Remove invisible barrier
-                go_aq_ghost_gate->SetSpawnedByDefault(false);
-                go_aq_ghost_gate->Despawn();
-                go_aq_ghost_gate->SaveToDB();
                 eventTimer = 5000;
                 break;
 
             case 1:
                 go_aq_gate_runes->ResetDoorOrButton();
                 go_aq_gate_runes->UseDoorOrButton();
+                me->PlayDirectSound(SOUND_RUNES_OPEN);
 
-                eventTimer = 3000;
+                eventTimer = 8000;
                 break;
-
             case 2:
-                sWorld.SendWorldText(GLOBAL_TEXT_CRYSTALS);
-                eventTimer = 5000;
-
-                break;
-
-            case 3:
                 go_aq_barrier->ResetDoorOrButton();
                 go_aq_barrier->UseDoorOrButton();
+                me->PlayDirectSound(SOUND_DOOR_OPEN);
 
-                // Incorrect implementation! Texts must be send by the creatures themselves.
-                //me->MonsterScriptToZone(TEXT_COLOSSUS_ASHI, CHAT_MSG_MONSTER_EMOTE);
-                //me->MonsterScriptToZone(TEXT_COLOSSUS_REGAL, CHAT_MSG_MONSTER_EMOTE);
-                //me->MonsterScriptToZone(TEXT_COLOSSUS_ZORA, CHAT_MSG_MONSTER_EMOTE);
-
-                return NextStage(10000);
-
+                NextStage(10000);
+                return;
         }
 
         eventStep++;
-
     }
 
     void HandleWarStage()
     {
-        switch (eventStep)
-        {
-            case 0:
-                sGameEventMgr.StartEvent(GAME_EVENT_CRYSTALS, true);
-                eventTimer = 10000;
+        sObjectMgr.SetSavedVariable(VAR_WE_GONG_TIME, time(nullptr), true);
+        // Trigger a game event update asap so we can start the next events
+        sWorld.SetWorldUpdateTimer(WUPDATE_EVENTS, sWorld.GetWorldUpdateTimerInterval(WUPDATE_EVENTS) + 1);
 
-                break;
-
-            // Summon Rajaxx
-            case 1:
-                me->SummonCreature(NPC_RAJAXX, rajaxxSpawnPoint.m_fX, rajaxxSpawnPoint.m_fY, rajaxxSpawnPoint.m_fZ, rajaxxSpawnPoint.m_fO, TEMPSUMMON_CORPSE_DESPAWN, 0);
-
-                return EventDone();
-        }
-
-        eventStep++;
+        EventDone();
     }
 
 
@@ -3414,7 +2657,6 @@ struct scarab_gongAI: public GameObjectAI
     }
 
     void ResetAQGates()
-    // For debugging
     {
         go_aq_ghost_gate->SetGoState(GO_STATE_READY);
         go_aq_barrier->SetGoState(GO_STATE_READY);
@@ -3436,12 +2678,6 @@ bool GOHello_scarab_gong(Player* player, GameObject* go)
     if (go->GetGoType() != GAMEOBJECT_TYPE_QUESTGIVER)
         return false;
 
-    //uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
-
-    // Not used since we moved to time-based window
-    //if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
-    //    return false;
-
     player->PrepareQuestMenu(go->GetObjectGuid());
     player->SendPreparedQuest(go->GetObjectGuid());
 
@@ -3453,15 +2689,10 @@ bool QuestRewarded_scarab_gong(Player* player, GameObject* go, Quest const* ques
     if (quest->GetQuestId() != QUEST_BANG_A_GONG)
         return false;
 
-    uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_CRYSTALS_AWARDED, MAX_QIRAJI_CRYSTALS);
-
-    // Just to be sure
-    // Not used since we moved to time-based window
-    //if (crystalsAwarded >= MAX_QIRAJI_CRYSTALS)
-    //    return false;
+    uint32 crystalsAwarded = sObjectMgr.GetSavedVariable(VAR_WE_GONG_BANG_TIMES, 0);
 
     // Increment number of black crystals given
-    sObjectMgr.SetSavedVariable(VAR_CRYSTALS_AWARDED, crystalsAwarded + 1, true);
+    sObjectMgr.SetSavedVariable(VAR_WE_GONG_BANG_TIMES, crystalsAwarded + 1, true);
 
     // Special case for first to ring the Gong
     if (0 == crystalsAwarded)
@@ -4274,23 +3505,6 @@ void AddSC_silithus()
     pNewScript = new Script;
     pNewScript->Name = "npc_colossus";
     pNewScript->GetAI = &GetAI_npc_colossus;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_resonating_Crystal";
-    pNewScript->GetAI = &GetAI_npc_resonating_Crystal;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_AQwar_effort";
-    pNewScript->pGossipHello = &GossipHello_npc_AQwar_effort;
-    pNewScript->pGossipSelect = &GossipSelect_npc_AQwar_effort;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "npc_AQwar_collector";
-    pNewScript->pGossipHello = &GossipHello_npc_AQwar_collector;
-    pNewScript->pQuestRewardedNPC = &QuestComplete_npc_AQwar_collector;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

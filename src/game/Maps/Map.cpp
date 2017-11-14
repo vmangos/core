@@ -50,6 +50,8 @@
 #include "PlayerBroadcaster.h"
 #include "GridSearchers.h"
 #include "AuraRemovalMgr.h"
+#include "GameEventMgr.h"
+#include "world/world_event_wareffort.h"
 
 #define MAX_GRID_LOAD_TIME      50
 
@@ -1805,6 +1807,16 @@ bool DungeonMap::CanEnter(Player *player)
             return false;
         }
     }
+
+    if (GetId() == 509 || GetId() == 531)
+    {
+        if (sGameEventMgr.IsActiveEvent(EVENT_AQ_GATE))
+        {
+            player->SendTransferAborted(TRANSFER_ABORT_SILENTLY);
+            return false;
+        }
+    }
+
 
     return Map::CanEnter(player);
 }

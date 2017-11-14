@@ -67,6 +67,9 @@ struct AreaTrigger
     uint32 requiredItem;
     uint32 requiredItem2;
     uint32 requiredQuest;
+    int required_event;
+    uint8 required_pvp_rank;
+    uint8 required_team;
     std::string requiredFailedText;
     uint32 target_mapId;
     float  target_X;
@@ -375,6 +378,8 @@ enum ConditionType
                                                             // value2: if != 0 only consider players in range of this value
     CONDITION_WOW_PATCH             = 37,                   // value1: wow patch setting from config (0-10)
                                                             // value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_NPC_ENTRY             = 38,                   // NPC value1: the npc entry to check     2: 0 (not equal), 1 (equal)
+    CONDITION_WAR_EFFORT_STAGE      = 39,                   // value1: the stage                      value2: 0 : >=, 1: ==, 2 <=
 };
 
 enum ConditionSource                                        // From where was the condition called?
@@ -560,6 +565,26 @@ enum PermVariables
     VAR_TOURNAMENT  = 30021,    // last quest completion time
     VAR_TOURN_GOES  = 30022,    // tournament was started already
     VAR_TOURN_OVER  = 30023,    // tournament is over
+
+    // War Effort shared contributions
+    VAR_WE_ALLIANCE_COPPER          = 30024,
+    VAR_WE_HORDE_COPPER             = 30025,
+    VAR_WE_ALLIANCE_PURPLELOTUS     = 30026,
+    VAR_WE_HORDE_PURPLELOTUS        = 30027,
+    VAR_WE_ALLIANCE_THICKLEATHER    = 30028,
+    VAR_WE_HORDE_THICKLEATHER       = 30029,
+    VAR_WE_ALLIANCE_SPOTYELLOW      = 30030,
+    VAR_WE_HORDE_SPOTYELLOW         = 30031,
+    VAR_WE_ALLIANCE_RUNEBANDAGE     = 30032,
+    VAR_WE_HORDE_RUNEBANDAGE        = 30033,
+
+    // War Effort stage and event control
+    VAR_WE_STAGE                    = 30050,
+    VAR_WE_STAGE_TRANSITION_TIME    = 30051,    // The time that the stage transitioned
+    VAR_WE_GONG_TIME                = 30052,    // The time at which the gong was rung
+    VAR_WE_GONG_BANG_TIMES          = 30053,    // Track how many times the gong has been rung
+    VAR_WE_AUTOCOMPLETE_TIME        = 30054,    // The last time the progress auto complete was performed
+    VAR_WE_HIVE_REWARD              = 30055,    // A mask of slain colossus events to start
 };
 
 class GameObjectUseRequirement

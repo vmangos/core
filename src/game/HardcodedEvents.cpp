@@ -9,6 +9,7 @@
 #include "CinematicStuff.h"
 #include "MapManager.h"
 #include "world/world_event_naxxramas.h"
+#include "world/world_event_wareffort.h"
 #include "GridSearchers.h"
 
 /*
@@ -866,6 +867,11 @@ void ScourgeInvasionEvent::Update()
     UpdateWorldState();
 }
 
+uint32 ScourgeInvasionEvent::GetNextUpdateDelay()
+{
+    return 20;
+}
+
 void ScourgeInvasionEvent::Enable()
 {
     invasion1Loaded = OnEnable(VARIABLE_NAXX_ATTACK_ZONE1, VARIABLE_NAXX_ATTACK_TIME1);
@@ -1205,6 +1211,425 @@ void ScourgeInvasionEvent::UpdateWorldState()
 }
 
 /*
+world_event_wareffort
+The Gates of Ahn'Qiraj War Effort. Automatic transition from collection through
+to gong ringing, gate opening and battle
+*/
+
+// Per-stage enabled events
+static const uint32 warEffortStageEvents[][10] = {
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_AQ_GATE },                     // 0
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 1
+        EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 2
+        EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 3
+        EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2, EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 4
+        EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2, EVENT_WAR_EFFORT_TRANSITION_DAY3, EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 5
+        EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2, EVENT_WAR_EFFORT_TRANSITION_DAY3,
+        EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_COLLECT_OBJ, EVENT_WAR_EFFORT_COLLECT_QUESTS, EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS,           // 6
+        EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2, EVENT_WAR_EFFORT_TRANSITION_DAY3,
+        EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_WAR_EFFORT_TRANSITION_DAY5, EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS, EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2,      // 7
+        EVENT_WAR_EFFORT_TRANSITION_DAY3, EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_WAR_EFFORT_TRANSITION_DAY5,
+        EVENT_WAR_EFFORT_GONG, EVENT_AQ_GATE },
+    { EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS, EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2,      // 8
+        EVENT_WAR_EFFORT_TRANSITION_DAY3, EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_WAR_EFFORT_TRANSITION_DAY5,
+        EVENT_WAR_EFFORT_GONG },
+    { EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS, EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2,      // 9
+        EVENT_WAR_EFFORT_TRANSITION_DAY3, EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_WAR_EFFORT_TRANSITION_DAY5,
+        EVENT_WAR_EFFORT_GONG, EVENT_WAR_EFFORT_WORLD_CRYSTALS },
+    { EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS, EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2,      // 10
+        EVENT_WAR_EFFORT_TRANSITION_DAY3, EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_WAR_EFFORT_TRANSITION_DAY5,
+        EVENT_WAR_EFFORT_GONG, EVENT_WAR_EFFORT_WORLD_CRYSTALS, EVENT_WAR_EFFORT_CH_ATTACK },
+    { EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS, EVENT_WAR_EFFORT_TRANSITION_DAY1, EVENT_WAR_EFFORT_TRANSITION_DAY2,      // 11
+        EVENT_WAR_EFFORT_TRANSITION_DAY3, EVENT_WAR_EFFORT_TRANSITION_DAY4, EVENT_WAR_EFFORT_TRANSITION_DAY5,
+        EVENT_WAR_EFFORT_GONG, EVENT_WAR_EFFORT_WORLD_CRYSTALS, EVENT_WAR_EFFORT_FINALBATTLE },
+    { EVENT_WAR_EFFORT_REP, EVENT_WAR_EFFORT_OFFICERS, EVENT_WAR_EFFORT_POST_WAR }                                              // 12
+};
+
+WarEffortEvent::WarEffortEvent() : WorldEvent(EVENT_WAR_EFFORT)
+{
+    UpdateVariables();
+}
+
+void WarEffortEvent::UpdateVariables()
+{
+    stage = WarEffortEventStage(sObjectMgr.GetSavedVariable(VAR_WE_STAGE, WAR_EFFORT_STAGE_COLLECTION));
+    lastStageTransitionTime = sObjectMgr.GetSavedVariable(VAR_WE_STAGE_TRANSITION_TIME, 0);
+    gongRingTime = sObjectMgr.GetSavedVariable(VAR_WE_GONG_TIME, 0);
+    lastAutoCompleteTime = sObjectMgr.GetSavedVariable(VAR_WE_AUTOCOMPLETE_TIME, 0);
+}
+
+void WarEffortEvent::Update()
+{
+    UpdateVariables();
+    UpdateStageEvents();
+
+    if (stage == WAR_EFFORT_STAGE_COMPLETE)
+    {
+        if (sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
+            sGameEventMgr.StopEvent(EVENT_WAR_EFFORT);
+
+        CompleteWarEffort();
+
+        return;
+    }
+
+    if (!sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
+        sGameEventMgr.StartEvent(EVENT_WAR_EFFORT);
+
+    // Check Hive colossus flags
+    UpdateHiveColossusEvents();
+
+    uint32 now = time(nullptr);
+    switch (stage)
+    {
+        case WAR_EFFORT_STAGE_COLLECTION:
+        {
+            UpdateWarEffortCollection(now);
+            break;
+        }
+        case WAR_EFFORT_STAGE_READY:
+        {
+            if (now - lastStageTransitionTime > WAR_EFFORT_COLLECTION_TRANSITION_TIME)
+            {
+                stage = WAR_EFFORT_STAGE_MOVE_1;
+
+                UpdateStageTransitionTime();
+            }
+            break;
+        }
+        case WAR_EFFORT_STAGE_MOVE_1:
+        case WAR_EFFORT_STAGE_MOVE_2:
+        case WAR_EFFORT_STAGE_MOVE_3:
+        case WAR_EFFORT_STAGE_MOVE_4:
+        case WAR_EFFORT_STAGE_MOVE_5:
+        {
+            if (now - lastStageTransitionTime > WAR_EFFORT_MOVE_TRANSITION_TIME)
+                IncrementWarEffortTransition();
+
+            break;
+        }
+        case WAR_EFFORT_STAGE_GONG_WAIT:
+        {
+            // Just waiting for a player to ring the Gong at this point.
+            // The events continue as usual
+            if (gongRingTime)
+            {
+                stage = WAR_EFFORT_STAGE_GONG_RUNG;
+                UpdateStageTransitionTime();
+            }
+
+            break;
+        }
+        case WAR_EFFORT_STAGE_GONG_RUNG:
+        {
+            if (!gongRingTime)
+            {
+                gongRingTime = now;
+                sObjectMgr.SetSavedVariable(VAR_WE_GONG_TIME, gongRingTime, true);
+            }
+
+            // Open the gates, transition to battle
+            DisableAndStopEvent(EVENT_AQ_GATE);
+
+            stage = WAR_EFFORT_STAGE_BATTLE;
+            // Update events immediately, we don't want a delay before
+            // mobs spawn
+            UpdateStageTransitionTime();
+
+            sWorld.SendWorldText(WAR_EFFORT_TEXT_CRYSTALS);
+
+            BeginWar();
+
+            break;
+        }
+        case WAR_EFFORT_STAGE_BATTLE:
+        {
+            // WAR!
+            BeginWar();
+            if (now - lastStageTransitionTime > WAR_EFFORT_CH_ATTACK_TIME)
+            {
+                stage = WAR_EFFORT_STAGE_CH_ATTACK;
+                UpdateStageTransitionTime();
+            }
+            break;
+        }
+        case WAR_EFFORT_STAGE_CH_ATTACK:
+        {
+            if (now - lastStageTransitionTime > WAR_EFFORT_FINAL_BATTLE_TIME)
+            {
+                stage = WAR_EFFORT_STAGE_FINALBATTLE;
+                UpdateStageTransitionTime();
+            }
+            break;
+        }
+        case WAR_EFFORT_STAGE_FINALBATTLE:
+        {
+            // 10 hours have passed, it's all over
+            if (now - gongRingTime > WAR_EFFORT_GONG_DURATION)
+            {
+                sWorld.SendWorldText(WAR_EFFORT_TEXT_BATTLE_OVER);
+
+                stage = WAR_EFFORT_STAGE_COMPLETE;
+                UpdateStageTransitionTime();
+                UpdateStageEvents();
+            }
+            break;
+        }
+        // case WAR_EFFORT_STAGE_COMPLETE: handled above
+        default:
+        {
+            sLog.outError("[WarEffortEvent] Stuck in invalid stage %u", stage);
+            break;
+        }
+    }
+
+    sObjectMgr.SetSavedVariable(VAR_WE_STAGE, stage, true);
+}
+
+void WarEffortEvent::UpdateWarEffortCollection(uint32 now)
+{
+    if (now - lastAutoCompleteTime > WAR_EFFORT_AUTOCOMPLETE_PERIOD)
+    {
+        AutoCompleteWarEffortProgress();
+        lastAutoCompleteTime = now;
+        sObjectMgr.SetSavedVariable(VAR_WE_AUTOCOMPLETE_TIME, lastAutoCompleteTime, true);
+    }
+
+    uint32 completedObjectives = 0, objectiveGoal = 2*NUM_SHARED_OBJECTIVES+2*NUM_FACTION_OBJECTIVES;
+    // Check all totals. If we're at the limit, start the moving.
+    for (int i = 0; i < NUM_SHARED_OBJECTIVES; ++i)
+    {
+        WarEffortStockInfo info;
+        if (GetWarEffortStockInfo(SharedObjectives[i].itemId, info, TEAM_ALLIANCE))
+        {
+            if (info.count >= info.required)
+                ++completedObjectives;
+        }
+
+        if (GetWarEffortStockInfo(SharedObjectives[i].itemId, info, TEAM_HORDE))
+        {
+            if (info.count >= info.required)
+                ++completedObjectives;
+        }
+    }
+
+    for (int i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
+    {
+        WarEffortStockInfo info;
+        if (GetWarEffortStockInfo(AllianceObjectives[i].itemId, info))
+        {
+            if (info.count >= info.required)
+                ++completedObjectives;
+        }
+
+        if (GetWarEffortStockInfo(HordeObjectives[i].itemId, info))
+        {
+            if (info.count >= info.required)
+                ++completedObjectives;
+        }
+    }
+
+    // Collection is over - should there be a world announcement...?
+    if (completedObjectives == objectiveGoal)
+    {
+        stage = WAR_EFFORT_STAGE_READY;
+        UpdateStageTransitionTime();
+    }
+}
+
+void WarEffortEvent::UpdateStageTransitionTime()
+{
+    lastStageTransitionTime = time(nullptr);
+    sObjectMgr.SetSavedVariable(VAR_WE_STAGE_TRANSITION_TIME, lastStageTransitionTime, true);
+}
+
+void WarEffortEvent::IncrementWarEffortTransition()
+{
+    stage = WarEffortEventStage(stage + 1);
+
+    UpdateStageTransitionTime();
+}
+
+void WarEffortEvent::BeginWar()
+{
+    // Make sure war events are active, and any that should be active prior to this
+    UpdateStageEvents();
+}
+
+void WarEffortEvent::CompleteWarEffort()
+{
+    // Basically just ensure all events are disabled except the ones
+    // we want to have active post-war
+    std::array<WarEffortGameEvents, 4> stopEvents = { {
+        EVENT_AQ_GATE,
+        EVENT_WAR_EFFORT_BATTLE_ASHI,
+        EVENT_WAR_EFFORT_BATTLE_REGAL,
+        EVENT_WAR_EFFORT_BATTLE_ZORA
+    } };
+
+    for (int i = 0; i < stopEvents.size(); ++i)
+        DisableAndStopEvent(stopEvents[i]);
+
+    stage = WAR_EFFORT_STAGE_COMPLETE;
+    sObjectMgr.SetSavedVariable(VAR_WE_STAGE, stage, true);
+}
+
+void WarEffortEvent::UpdateStageEvents()
+{
+    static WarEffortGameEvents events[20] = {
+        EVENT_WAR_EFFORT_COLLECT_OBJ,
+        EVENT_WAR_EFFORT_COLLECT_QUESTS,
+
+        EVENT_WAR_EFFORT_REP,
+        EVENT_WAR_EFFORT_OFFICERS,
+
+        EVENT_WAR_EFFORT_TRANSITION_DAY1,
+        EVENT_WAR_EFFORT_TRANSITION_DAY2,
+        EVENT_WAR_EFFORT_TRANSITION_DAY3,
+        EVENT_WAR_EFFORT_TRANSITION_DAY4,
+        EVENT_WAR_EFFORT_TRANSITION_DAY5,
+
+        EVENT_WAR_EFFORT_CH_ATTACK,
+        EVENT_WAR_EFFORT_TROOPS2,
+
+        EVENT_WAR_EFFORT_FINALBATTLE,
+
+        EVENT_WAR_EFFORT_WORLD_CRYSTALS,
+
+        EVENT_AQ_GATE,
+        EVENT_WAR_EFFORT_GONG,
+        EVENT_WAR_EFFORT_POST_WAR
+    };
+
+    std::vector<uint16> active;
+    std::vector<uint16> required;
+
+    // Required events for the current stage
+    for (int i = 0; i < 10; ++i)
+    {
+        if (!warEffortStageEvents[stage][i])
+            continue;
+
+        required.push_back(warEffortStageEvents[stage][i]);
+    }
+
+    for (int i = 0; i < 20; ++i)
+    {
+        if (!events[i])
+            continue;
+
+        if (sGameEventMgr.IsActiveEvent(events[i]))
+            active.push_back(events[i]);
+    }
+
+    // Find which events need to be activated, or disabled. Any active events not in
+    // the required list must be disabled, while any already active events don't need
+    // to be re-activated
+    for (std::vector<uint16>::iterator iter = required.begin(); iter != required.end();)
+    {
+        std::vector<uint16>::iterator exists = std::find(active.begin(), active.end(), *iter);
+        if (exists != active.end())
+        {
+            iter = required.erase(iter);
+            active.erase(exists);
+        }
+        else
+            ++iter;
+    }
+
+    // Disable any remaining events
+    for (std::vector<uint16>::iterator iter = active.begin(); iter != active.end(); ++iter)
+        DisableAndStopEvent(*iter);
+
+    // Enable any events that need to be enabled
+    for (std::vector<uint16>::const_iterator iter = required.begin(); iter != required.end(); ++iter)
+    {
+        // Just double check in case our lists are inconsistent
+        if (!sGameEventMgr.IsActiveEvent(*iter))
+            EnableAndStartEvent(*iter);
+        else
+        {
+            sLog.outError("[WarEffortEvent] Event %u is already active for stage %u, but not defined in overall event list",
+                *iter, stage);
+        }
+    }
+}
+
+void WarEffortEvent::Enable()
+{
+
+}
+
+void WarEffortEvent::Disable()
+{
+
+}
+
+uint32 WarEffortEvent::GetNextUpdateDelay()
+{
+    switch (stage)
+    {
+        // Update quickly in these stages so we can detect and progress
+        // the event virtually in real time as the gong is banged
+        case WAR_EFFORT_STAGE_GONG_RUNG:
+        case WAR_EFFORT_STAGE_GONG_WAIT:
+            return 10;
+        default:
+            return max_ge_check_delay;
+    }
+
+    return max_ge_check_delay;
+}
+
+void WarEffortEvent::EnableAndStartEvent(uint16 event_id)
+{
+    if (!sGameEventMgr.IsActiveEvent(event_id))
+    {
+        if (!sGameEventMgr.IsEnabled(event_id))
+            sGameEventMgr.EnableEvent(event_id, true);
+
+        sGameEventMgr.StartEvent(event_id);
+    }
+}
+
+void WarEffortEvent::DisableAndStopEvent(uint16 event_id)
+{
+    if (sGameEventMgr.IsActiveEvent(event_id))
+        sGameEventMgr.StopEvent(event_id);
+
+    if (sGameEventMgr.IsEnabled(event_id))
+        sGameEventMgr.EnableEvent(event_id, false);
+}
+
+
+void WarEffortEvent::UpdateHiveColossusEvents()
+{
+    uint32 colossusMask = sObjectMgr.GetSavedVariable(VAR_WE_HIVE_REWARD, 0);
+    std::list<WarEffortGameEvents> events;
+
+    if (colossusMask & WAR_EFFORT_ASHI_REWARD)
+        events.push_back(EVENT_WAR_EFFORT_BATTLE_ASHI);
+
+    if (colossusMask & WAR_EFFORT_ZORA_REWARD)
+        events.push_back(EVENT_WAR_EFFORT_BATTLE_ZORA);
+
+    if (colossusMask & WAR_EFFORT_REGAL_REWARD)
+        events.push_back(EVENT_WAR_EFFORT_BATTLE_REGAL);
+
+    for (std::list<WarEffortGameEvents>::const_iterator iter = events.begin(); iter != events.end(); ++iter)
+    {
+        if (!sGameEventMgr.IsActiveEvent(*iter))
+            sGameEventMgr.StartEvent(*iter, true);
+    }
+}
+
+/*
 *
 */
 
@@ -1218,7 +1643,8 @@ void GameEventMgr::LoadHardcodedEvents(HardcodedEventList& eventList)
     auto lunarfw = new LunarFestivalFirework();
     auto silithusWarEffortBattle = new SilithusWarEffortBattle();
     auto scourge_invasion = new ScourgeInvasionEvent();
-    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, lunarfw, silithusWarEffortBattle, scourge_invasion };
+    auto war_effort = new WarEffortEvent();
+    eventList = { invasion, leprithus, moonbrook, nightmare, darkmoon, lunarfw, silithusWarEffortBattle, scourge_invasion, war_effort };
 }
 
 

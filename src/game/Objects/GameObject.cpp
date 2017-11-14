@@ -800,7 +800,7 @@ void GameObject::SaveToDB(uint32 mapid)
        << GetFloatValue(GAMEOBJECT_ROTATION + 1) << ", "
        << GetFloatValue(GAMEOBJECT_ROTATION + 2) << ", "
        << GetFloatValue(GAMEOBJECT_ROTATION + 3) << ", "
-       << m_respawnDelayTime << ", "
+       << data.spawntimesecs << ", " // PRESERVE SPAWNED BY DEFAULT
        << uint32(GetGoAnimProgress()) << ", "
        << uint32(GetGoState()) << ","
        << m_isActiveObject << ","
@@ -2160,8 +2160,10 @@ struct SpawnGameObjectInMapsWorker
                 delete pGameobject;
             else
             {
-                if (pGameobject->isSpawnedByDefault())
+                //if (pGameobject->isSpawnedByDefault())
                     map->Add(pGameobject);
+                //else
+                //    delete pGameobject;
             }
         }
     }
@@ -2240,7 +2242,17 @@ void GameObject::Despawn()
 {
     SendObjectDeSpawnAnim(GetObjectGuid());
     if (GameObjectData const* data = GetGOData())
-        SetRespawnTime(data->spawntimesecs);
+    {
+        if (m_spawnedByDefault)
+        {
+            SetRespawnTime(data->spawntimesecs);
+        }
+        else
+        {
+            m_respawnTime = 0;
+            m_respawnDelayTime = data->spawntimesecs < 0 ? -data->spawntimesecs : data->spawntimesecs;
+        }
+    }
     else
         AddObjectToRemoveList();
 }

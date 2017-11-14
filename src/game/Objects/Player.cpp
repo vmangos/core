@@ -83,6 +83,7 @@
 #include "PlayerBroadcaster.h"
 #include "GameEventMgr.h"
 #include "world/world_event_naxxramas.h"
+#include "world/world_event_wareffort.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -7891,6 +7892,8 @@ void Player::SendInitWorldStates(uint32 zoneid)
         data << uint32(WORLDSTATE_SI_EASTERN_PLAGUELANDS) << uint32(REMAINING_EASTERN_PLAGUELANDS);
         data << uint32(WORLDSTATE_SI_TANARIS) << uint32(REMAINING_TANARIS);
         data << uint32(WORLDSTATE_SI_WINTERSPRING) << uint32(REMAINING_WINTERSPRING);
+
+        count += 13;
     }
 
     for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
@@ -7910,6 +7913,12 @@ void Player::SendInitWorldStates(uint32 zoneid)
             if (BattleGround* bg = GetBattleGround())
                 bg->FillInitialWorldStates(data, count);
             break;
+    }
+
+    // Ahn'Qiraj War Effort
+    if (sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
+    {
+        count += BuildWarEffortWorldStates(data);
     }
 
     data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
@@ -11649,6 +11658,10 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
 
     // prepares quest menu when true
     bool canSeeQuests = menuId == GetDefaultGossipMenuForSource(pSource);
+
+    // If we're not a quest giver, don't show quests in the gossip
+    if (canSeeQuests && pSource->IsCreature() && !pSource->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+        canSeeQuests = false;
 
     // if canSeeQuests (the default, top level menu) and no menu options exist for this, use options from default options
     if (pMenuItemBounds.first == pMenuItemBounds.second && canSeeQuests)
@@ -19212,6 +19225,9 @@ void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
     for (uint32 i = 0; i < max_slot; ++i)
     {
         LootItem* lootItem = loot.LootItemInSlot(i, GetGUIDLow());
+        // Don't bypass conditions
+        if (lootItem->conditionId && !lootItem->AllowedForPlayer(this, loot.GetLootTarget()))
+            continue;
 
         ItemPosCountVec dest;
         InventoryResult msg = CanStoreNewItem(bag, slot, dest, lootItem->itemid, lootItem->count);

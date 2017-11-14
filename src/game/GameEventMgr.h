@@ -88,6 +88,7 @@ struct WorldEvent
     virtual void Update() {}
     virtual void Enable() {}
     virtual void Disable() {}
+    virtual uint32 GetNextUpdateDelay() { return max_ge_check_delay; }
 };
 
 typedef std::pair<uint32, GameEventCreatureData> GameEventCreatureDataPair;
@@ -100,7 +101,7 @@ class GameEventMgr
         ~GameEventMgr() {}
         typedef std::set<uint16> ActiveEvents;
         typedef std::vector<GameEventData> GameEventDataMap;
-        ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; }
+        ActiveEvents const& GetActiveEventList() const { return m_ActiveEvents; } // not thread-safe to use outside of world update
         GameEventDataMap const& GetEventMap() const { return mGameEvent; }
         bool CheckOneGameEvent(uint16 entry, time_t currenttime) const;
         uint32 NextCheck(uint16 entry) const;

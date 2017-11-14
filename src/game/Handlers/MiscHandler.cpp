@@ -48,6 +48,7 @@
 #include "Anticheat.h"
 #include "MasterPlayer.h"
 #include "GossipDef.h"
+#include "GameEventMgr.h"
 
 void WorldSession::HandleRepopRequestOpcode(WorldPacket & /*recv_data*/)
 {
@@ -818,44 +819,32 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     if (!targetMapEntry)
         return;
 
+    if (at->required_event)
+    {
+        if (at->required_event > 0 && !sGameEventMgr.IsActiveEvent((uint16)(at->required_event)))
+            return;
+        else if (at->required_event < 0 && sGameEventMgr.IsActiveEvent((uint16)(-at->required_event)))
+            return;
+    }
+
     auto playerRank = sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS) ?
         GetPlayer()->GetHonorMgr().GetRank().visualRank
         : GetPlayer()->GetHonorMgr().GetHighestRank().visualRank;
 
     if (!pl->isGameMaster())
     {
-        // (Hack) : Entree dans les zones de recompenses JcJ
-        if (Trigger_ID == 2527) // Hall des Champions
+        bool missingRank = false;
+        if (at->required_pvp_rank)
         {
-            if (GetPlayer()->GetTeam() == HORDE)
-            {
-                if (playerRank < 6)
-                {
-                    SendAreaTriggerMessage("You must have the rank Stone Guard to enter");
-                    return;
-                }
-            }
-            else
-            {
-                SendAreaTriggerMessage("Only Horde member can enter");
-                return;
-            }
+            if (playerRank < at->required_pvp_rank)
+                missingRank = true;
         }
-        else if (Trigger_ID == 2532)
+
+        bool missingTeam = false;
+        if (at->required_team)
         {
-            if (GetPlayer()->GetTeam() == ALLIANCE)
-            {
-                if (playerRank < 6)
-                {
-                    SendAreaTriggerMessage("You must have the rank Knight to enter");
-                    return;
-                }
-            }
-            else
-            {
-                SendAreaTriggerMessage("Only Alliance member can enter");
-                return;
-            }
+            if (GetPlayer()->GetTeam() != at->required_team)
+                missingTeam = true;
         }
 
         // ghost resurrected at enter attempt to dungeon with corpse (including fail enter cases)
@@ -924,15 +913,19 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         if (at->requiredQuest && !GetPlayer()->GetQuestRewardStatus(at->requiredQuest))
             missingQuest = at->requiredQuest;
 
-        if (missingLevel || missingItem || missingQuest)
+        if (missingLevel || missingItem || missingQuest || missingRank || missingTeam)
         {
             if (missingItem)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED_AND_ITEM), at->requiredLevel, ObjectMgr::GetItemPrototype(missingItem)->Name1);
-
             else if (missingQuest)
                 SendAreaTriggerMessage("%s", at->requiredFailedText.c_str());
             else if (missingLevel)
                 SendAreaTriggerMessage(GetMangosString(LANG_LEVEL_MINREQUIRED), missingLevel);
+            else if (missingRank)
+                SendAreaTriggerMessage("You must be at least rank %u to enter", at->required_pvp_rank);
+            else if (missingTeam)
+                SendAreaTriggerMessage("Only %s may enter here", at->required_team == HORDE ? "Horde" : "Alliance");
+
             return;
         }
     }

@@ -51,6 +51,7 @@
 #include "Formulas.h"
 #include "InstanceData.h"
 #include "CharacterDatabaseCache.h"
+#include "HardcodedEvents.h"
 
 #include <limits>
 
@@ -5276,8 +5277,14 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     uint32 count = 0;
 
-    //                                                0   1               2              3               4                    5                      6                    7                     8           9                  10
-    QueryResult *result = WorldDatabase.PQuery("SELECT id, required_level, required_item, required_item2, required_quest_done, required_failed_text, target_map, target_position_x, target_position_y, target_position_z, target_orientation FROM areatrigger_teleport t1 WHERE patch=(SELECT max(patch) FROM areatrigger_teleport t2 WHERE t1.id=t2.id && patch <= %u)", sWorld.GetWowPatch());
+    QueryResult *result = WorldDatabase.PQuery(
+        //      0   1               2              3               4                    5
+        "SELECT id, required_level, required_item, required_item2, required_quest_done, required_failed_text, "
+        //  6                    7                     8           9                  10            11
+        "target_map, target_position_x, target_position_y, target_position_z, target_orientation, required_event, "
+        //  12                  13
+        "required_pvp_rank, required_team "
+        "FROM areatrigger_teleport t1 WHERE patch=(SELECT max(patch) FROM areatrigger_teleport t2 WHERE t1.id=t2.id && patch <= %u)", sWorld.GetWowPatch());
     if (!result)
     {
 
@@ -5314,12 +5321,23 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.target_Y           = fields[8].GetFloat();
         at.target_Z           = fields[9].GetFloat();
         at.target_Orientation = fields[10].GetFloat();
+        at.required_event     = fields[11].GetInt32();
+        at.required_pvp_rank  = fields[12].GetUInt8();
+        at.required_team      = fields[13].GetUInt8();
 
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if (!atEntry)
         {
             sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
             continue;
+        }
+
+
+        uint16 eventId = abs(at.required_event);
+        if (eventId && !sGameEventMgr.IsValidEvent(eventId))
+        {
+            sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent event %u defined for trigger %u, ignoring", eventId, Trigger_ID);
+            at.required_event = 0;
         }
 
         if (at.requiredItem)
@@ -9349,6 +9367,33 @@ bool PlayerCondition::Meets(Player const* player, Map const* map, WorldObject co
             }
             return false;
         }
+        case CONDITION_NPC_ENTRY:
+        {
+            switch (m_value2)
+            {
+                case 0:
+                    return source->GetEntry() != m_value1;
+                case 1:
+                    return source->GetEntry() == m_value1;
+            }
+
+            return false;
+        }
+        case CONDITION_WAR_EFFORT_STAGE:
+        {
+            uint32 stage = sObjectMgr.GetSavedVariable(VAR_WE_STAGE, 0);
+            switch (m_value2)
+            {
+                case 0:
+                    return stage >= m_value1;
+                case 1:
+                    return stage == m_value1;
+                case 2:
+                    return stage <= m_value1;
+            }
+
+            return false;
+        }
         default:
             return false;
     }
@@ -9787,6 +9832,34 @@ bool PlayerCondition::IsValid(uint16 entry, ConditionType condition, uint32 valu
             }
             break;
         }
+        case CONDITION_NPC_ENTRY:
+        {
+            if (!sObjectMgr.GetCreatureTemplate(value1))
+            {
+                sLog.outErrorDb("NPC Entry condition (entry %u, type %u) has invalid nonexistent NPC entry %u", entry, condition, value2);
+                return false;
+            }
+            if (value2 < 0 || value2 > 1)
+            {
+                sLog.outErrorDb("NPC Entry condition (entry %u, type %u) has invalid criteria %u (must be 0 or 1)", entry, condition, value1);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_WAR_EFFORT_STAGE:
+        {
+            if (value1 < 0 || value1 > WAR_EFFORT_STAGE_COMPLETE)
+            {
+                sLog.outErrorDb("War Effort stage condition condition (entry %u, type %u) has invalid stage %u", entry, condition, value1);
+                return false;
+            }
+            if (value2 < 0 || value2 > 2)
+            {
+                sLog.outErrorDb("War Effort stage condition condition (entry %u, type %u) has invalid equality %u", entry, condition, value2);
+                return false;
+            }
+            break;
+        }
         case CONDITION_NONE:
             break;
         default:
@@ -9821,6 +9894,8 @@ bool PlayerCondition::CanBeUsedWithoutPlayer(uint16 entry)
         case CONDITION_SOURCE_AURA:
         case CONDITION_LAST_WAYPOINT:
         case CONDITION_WOW_PATCH:
+        case CONDITION_NPC_ENTRY:
+        case CONDITION_WAR_EFFORT_STAGE:
             return true;
         default:
             return false;
