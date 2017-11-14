@@ -476,7 +476,7 @@ struct go_pierre_ventsAI: public GameObjectAI
             pInvoc->CastSpell(pInvoc, SPELL_APPARITION, true);
             pInvoc->SetLootRecipient(player); // Force tag for summoner
             if (textId)
-                pInvoc->MonsterSay(textId);
+                pInvoc->MonsterSay(textId, 0, player);
         }
 
         ///- Mark stone as used.

@@ -2518,7 +2518,7 @@ void Map::ScriptsProcess()
                     unit->MonsterMoveWithSpeed(x, y, z, speed);
                 }
                 else
-                    unit->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
+                    unit->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING, 0.0f, step.script->o ? step.script->o : -10.0f);
                 break;
             }
             case SCRIPT_COMMAND_FLAG_SET:
