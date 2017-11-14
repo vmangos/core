@@ -30,8 +30,8 @@ UPDATE `npc_text` SET `ID`=8555 WHERE `ID`=20117;
 -- Those are duplicates. Replaced use of them in core with correct ids.
 DELETE FROM `npc_text` WHERE `ID` BETWEEN 20000 AND 20118;
 
--- Nostalrius strings can no longer be said by creatures. We need to replace them with broadcast.
-DELETE FROM `nostalrius_string` WHERE `entry` IN (122, 123, 124, 125, 126, 135, 136);
+-- Nostalrius strings can no longer be said by creatures. We need to replace them with broadcast ids.
+DELETE FROM `nostalrius_string` WHERE `entry` IN (10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 40, 41, 42, 43, 44, 45, 50, 51, 52, 53, 54, 55, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 106, 107, 108, 109, 110, 111, 112, 113, 115, 116, 117, 122, 123, 124, 125, 126, 135, 136, 151, 153, 154, 155, 156, 157, 158, 159, 160, 161, 162, 163, 164, 165, 166, 167, 168, 235);
 
 
 -- End of migration.

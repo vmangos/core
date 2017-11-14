@@ -9,11 +9,11 @@
 
 enum
 {
-    TEXT_1 = NOST_TEXT(50),
-    TEXT_2 = NOST_TEXT(51),
-    TEXT_3 = NOST_TEXT(52),
-    TEXT_4 = NOST_TEXT(53),
-    TEXT_5 = NOST_TEXT(54),
+    TEXT_1 = 9349,
+    TEXT_2 = 9353,
+    TEXT_3 = 9357,
+    TEXT_4 = 9360,
+    TEXT_5 = 9363,
     MOVE_SPEED       =  20,
 };
 /*

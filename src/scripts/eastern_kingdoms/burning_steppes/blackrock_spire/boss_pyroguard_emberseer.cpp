@@ -43,7 +43,7 @@ enum
     DOOR_OPEN_ID                = 175705,
 
     REQUIRED_SUMMONERS          = 3,
-    SAY_BOSS_FREE               = NOST_TEXT(151),
+    SAY_BOSS_FREE               = 5268
 };
 
 struct boss_pyroguard_emberseerAI : public ScriptedAI

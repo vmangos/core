@@ -421,13 +421,13 @@ struct go_pierre_ventsAI: public GameObjectAI
         switch (stoneType)
         {
             case GO_TYPE_PIERRE_SUP:
-                textId = 116;
+                textId = 10805;
                 break;
             case GO_TYPE_PIERRE_MOYENNE:
-                textId = 115;
+                textId = 10802;
                 break;
             case GO_TYPE_PIERRE_INF:
-                textId = 105 + (player->getRace());
+                textId = 10686;
                 break;
         }
         for (int i = 0; i < sizeof(windStonesBosses) / sizeof(windStonesBosses[0]); ++i)
@@ -476,7 +476,7 @@ struct go_pierre_ventsAI: public GameObjectAI
             pInvoc->CastSpell(pInvoc, SPELL_APPARITION, true);
             pInvoc->SetLootRecipient(player); // Force tag for summoner
             if (textId)
-                pInvoc->MonsterSay(NOST_TEXT(textId));
+                pInvoc->MonsterSay(textId);
         }
 
         ///- Mark stone as used.
@@ -1109,7 +1109,7 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             case 1:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(77));
+                m_creature->MonsterSay(10762);
                 uiNextActionTimer = 4000;
                 break;
             }
@@ -1126,166 +1126,167 @@ struct npc_Geologist_LarksbaneAI : public ScriptedAI
             case 3:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(78));
+                m_creature->MonsterSay(10829);
                 uiNextActionTimer = 7000;
                 break;
             }
             case 4:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(79));
+                m_creature->MonsterSay(10830);
                 uiNextActionTimer = 11000;
                 break;
             }
             case 5:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(80));
+                m_creature->MonsterSay(10831);
                 uiNextActionTimer = 9000;
                 break;
             }
             case 6:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(81));
+                m_creature->MonsterSay(10832);
                 uiNextActionTimer = 11000;
                 break;
             }
             case 7:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(82));
+                m_creature->MonsterSay(10833);
                 uiNextActionTimer = 11000;
                 break;
             }
             case 8:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-                m_creature->MonsterSay(NOST_TEXT(83));
+                m_creature->MonsterSay(10836);
                 uiNextActionTimer = 9000;
                 break;
             }
             case 9:
             {
-                m_creature->MonsterTextEmote(NOST_TEXT(84), NULL, false);
+                m_creature->MonsterTextEmote(10837, NULL, false);
                 uiNextActionTimer = 3000;
                 break;
             }
             case 10:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(85));
+                m_creature->MonsterSay(10838);
                 uiNextActionTimer = 4000;
                 break;
             }
             case 11:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(86));
+                m_creature->MonsterSay(10839);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 12:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_EXCLAMATION);
-                m_creature->MonsterSay(NOST_TEXT(87));
+                m_creature->MonsterSay(10840);
                 uiNextActionTimer = 9000;
                 break;
             }
             case 13:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(88));
+                m_creature->MonsterSay(10841);
                 uiNextActionTimer = 9000;
                 break;
             }
             case 14:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(89));
+                m_creature->MonsterSay(10842);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 15:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(90));
+                m_creature->MonsterSay(10843);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 16:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(91));
+                m_creature->MonsterSay(10844);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 17:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(92));
+                m_creature->MonsterSay(10845);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 18:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(93));
+                m_creature->MonsterSay(10846);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 19:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(94));
+                m_creature->MonsterSay(10847);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 20:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(95));
+                m_creature->MonsterSay(10848);
                 uiNextActionTimer = 9000;
                 break;
             }
             case 21:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(96));
+                m_creature->MonsterSay(10849);
                 uiNextActionTimer = 3000;
                 break;
             }
             case 22:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(97));
+                m_creature->MonsterSay(10850);
                 uiNextActionTimer = 12000;
                 break;
             }
             case 23:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(98));
+                m_creature->MonsterSay(10851);
                 uiNextActionTimer = 9000;
                 break;
             }
             case 24:
             {
                 m_creature->HandleEmote(EMOTE_ONESHOT_TALK);
-                m_creature->MonsterSay(NOST_TEXT(99));
+                m_creature->MonsterSay(10852);
                 uiNextActionTimer = 3000;
                 break;
             }
             case 25:
             {
-                m_creature->MonsterTextEmote(NOST_TEXT(100), NULL, false);
+                if (Creature* Crea = m_creature->FindNearestCreature(15180, 50.0f))    // Baristolth of the Shifting Sands
+                    Crea->MonsterTextEmote(10853, NULL, false);
                 uiNextActionTimer = 4000;
                 break;
             }
             case 26:
             {
                 if (Creature* Crea = m_creature->FindNearestCreature(15180, 50.0f))    // Baristolth of the Shifting Sands
-                    m_creature->MonsterSay(NOST_TEXT(101));
+                    Crea->MonsterSay(10854);
                 uiNextActionTimer = 5000;
                 break;
             }
