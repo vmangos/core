@@ -35,11 +35,12 @@ enum
     SPELL_FLAMESHOCKERS_VISUAL  = 28330,
     SPELL_PURPLE_VISUAL         = 28126,
 
-    LANG_PALLID_HORROR_YELL1    = NOST_TEXT(122), // The Lich King says to tell you... DIE!
-    LANG_PALLID_HORROR_YELL2    = NOST_TEXT(123), // No worry, we find you
-    LANG_SCOURGE_ATTACK_UC      = NOST_TEXT(124), // Scourge in the Sewers! We need help!
-    LANG_SCOURGE_ATTACK_SW      = NOST_TEXT(125), // Scourge in the Cathedral! We need help!
-    LANG_SCOURGE_ATTACK_YELL    = NOST_TEXT(126), // Stop them before they go any further
+    LANG_PALLID_HORROR_YELL1    = 12326, // The Lich King say to tell you... DIE!
+    LANG_PALLID_HORROR_YELL2    = 12343, // No worry, we find you.
+    LANG_SCOURGE_ATTACK_UC      = 12334, // Scourge in the Sewers! We need help!
+    LANG_SCOURGE_ATTACK_SW      = 12310, // To arms!  Scourge spotted in the Cathedral of Light!
+    LANG_SCOURGE_ATTACK_H_YELL  = 12356, // I just saw a Scourge!  Kill it!
+    LANG_SCOURGE_ATTACK_A_YELL  = 12367, // I just saw a Scourge!  Kill it!
 };
 
 struct npc_flameshocker_spawn_pointAI : public ScriptedAI
@@ -316,12 +317,12 @@ struct ScourgeInvasion_RandomAttackerAI : public ScriptedAI
         uint32 summonEntry = 0;
         if (_alliance)
         {
-            text = urand(0, 1) ? LANG_SCOURGE_ATTACK_SW : LANG_SCOURGE_ATTACK_YELL;
+            text = urand(0, 1) ? LANG_SCOURGE_ATTACK_SW : LANG_SCOURGE_ATTACK_A_YELL;
             summonEntry = NPC_STORMWIND_GARNISON_GUARD;
         }
         else
         {
-            text = urand(0, 1) ? LANG_SCOURGE_ATTACK_UC : LANG_SCOURGE_ATTACK_YELL;
+            text = urand(0, 1) ? LANG_SCOURGE_ATTACK_UC : LANG_SCOURGE_ATTACK_H_YELL;
             summonEntry = NPC_UNDERCITY_GARNISON_GUARD;
         }
         if (urand(0, 1))
