@@ -5196,6 +5196,10 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (!m_IsTriggeredSpell && IsDeathOnlySpell(m_spellInfo) && target->isAlive())
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
+        // Check spell max target level
+        if (m_spellInfo->MaxTargetLevel > 0 && int32(target->getLevel()) > m_spellInfo->MaxTargetLevel)
+            return SPELL_FAILED_HIGHLEVEL;
+
         bool non_caster_target = target != m_caster && !IsSpellWithCasterSourceTargetsOnly(m_spellInfo);
 
         if (non_caster_target)
