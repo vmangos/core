@@ -948,7 +948,7 @@ void Creature::DoFleeToGetAssistance()
             GetMotionMaster()->MoveSeekAssistance(pCreature->GetPositionX(), pCreature->GetPositionY(), pCreature->GetPositionZ());
             SetTargetGuid(ObjectGuid());
         }
-        MonsterTextEmote(LANG_FLEE, getVictim());
+        MonsterTextEmote(CREATURE_FLEE_TEXT, getVictim());
         UpdateSpeed(MOVE_RUN, false);
         InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
     }

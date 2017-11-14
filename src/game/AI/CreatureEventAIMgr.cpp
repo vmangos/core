@@ -529,16 +529,27 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
 
                                 if (!action.text.TextId[k])
                                     not_set = true;
-                                // range negative
-                                else if (action.text.TextId[k] > MIN_CREATURE_AI_TEXT_STRING_ID || action.text.TextId[k] <= MAX_CREATURE_AI_TEXT_STRING_ID)
+                                else if (action.text.TextId[k] > 0)
                                 {
-                                    sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references out-of-range entry (%i) in texts table.", i, j + 1, k + 1, action.text.TextId[k]);
-                                    action.text.TextId[k] = 0;
+                                    if (!sObjectMgr.GetBroadcastTextLocale(action.text.TextId[k]))
+                                    {
+                                        sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references non-existent broadcast text (%u).", i, j + 1, k + 1, action.text.TextId[k]);
+                                        action.text.TextId[k] = 0;
+                                    }
                                 }
-                                else if (m_CreatureEventAI_TextMap.find(action.text.TextId[k]) == m_CreatureEventAI_TextMap.end())
+                                else
                                 {
-                                    sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references non-existing entry (%i) in texts table.", i, j + 1, k + 1, action.text.TextId[k]);
-                                    action.text.TextId[k] = 0;
+                                    // range negative
+                                    if (action.text.TextId[k] > MIN_CREATURE_AI_TEXT_STRING_ID || action.text.TextId[k] <= MAX_CREATURE_AI_TEXT_STRING_ID)
+                                    {
+                                        sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references out-of-range entry (%i) in texts table.", i, j + 1, k + 1, action.text.TextId[k]);
+                                        action.text.TextId[k] = 0;
+                                    }
+                                    else if (m_CreatureEventAI_TextMap.find(action.text.TextId[k]) == m_CreatureEventAI_TextMap.end())
+                                    {
+                                        sLog.outErrorDb("CreatureEventAI:  Event %u Action %u param%d references non-existing entry (%i) in texts table.", i, j + 1, k + 1, action.text.TextId[k]);
+                                        action.text.TextId[k] = 0;
+                                    }
                                 }
                             }
                         }
