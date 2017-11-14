@@ -1817,7 +1817,7 @@ bool Spell::HasValidUnitPresentInTargetList()
 // Spell target first
 // Raidmates then descending by injury suffered (MaxHealth - Health)
 // Other players/mobs then descending by injury suffered (MaxHealth - Health)
-struct ChainHealingOrder : public std::binary_function<const Unit*, const Unit*, bool>
+struct ChainHealingOrder
 {
     const Unit* MainTarget;
     ChainHealingOrder(Unit const* Target) : MainTarget(Target) {};
@@ -1843,7 +1843,7 @@ struct ChainHealingOrder : public std::binary_function<const Unit*, const Unit*,
     }
 };
 
-class ChainHealingFullHealth: std::unary_function<const Unit*, bool>
+class ChainHealingFullHealth
 {
 public:
     const Unit* MainTarget;
@@ -1857,7 +1857,7 @@ public:
 
 // Helper for targets nearest to the spell target
 // The spell target is always first unless there is a target at _completely_ the same position (unbelievable case)
-struct TargetDistanceOrderNear : public std::binary_function<const Unit, const Unit, bool>
+struct TargetDistanceOrderNear
 {
     const Unit* MainTarget;
     TargetDistanceOrderNear(const Unit* Target) : MainTarget(Target) {};

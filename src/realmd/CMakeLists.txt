@@ -27,7 +27,6 @@ set (EXECUTABLE_SRCS
 	Main.cpp
 	PatchHandler.cpp
 	RealmList.cpp
-
 )
 
 

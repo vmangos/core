@@ -110,12 +110,12 @@ class MassMailMgr
             }
 
             MassMail(MassMail const& massmail)
-                : m_protoMail(const_cast<MassMail&>(massmail).m_protoMail), m_sender(massmail.m_sender)
+                : m_protoMail(std::move(const_cast<MassMail&>(massmail).m_protoMail)), m_sender(massmail.m_sender)
             {
             }
 
             /// m_protoMail is owned by MassMail, so at copy original MassMail field set to NULL
-            std::auto_ptr<MailDraft> m_protoMail;
+            std::unique_ptr<MailDraft> m_protoMail;
 
             MailSender m_sender;
             ReceiversList m_receivers;

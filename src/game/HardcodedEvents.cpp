@@ -11,6 +11,8 @@
 #include "world/world_event_naxxramas.h"
 #include "world/world_event_wareffort.h"
 #include "GridSearchers.h"
+#include <chrono>
+#include <random>
 
 /*
  * Elemental Invasion
@@ -393,7 +395,8 @@ bool DragonsOfNightmare::LoadDragons(std::vector<ObjectGuid> &dragonGUIDs)
 void DragonsOfNightmare::PermutateDragons()
 {
     std::vector<uint32> permutation = { NPC_LETHON, NPC_EMERISS, NPC_YSONDRE, NPC_TAERAR };
-    std::random_shuffle(permutation.begin(), permutation.end());
+    auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+    std::shuffle(permutation.begin(), permutation.end(), std::default_random_engine(seed));
 
     sObjectMgr.SetSavedVariable(VAR_PERM_1, permutation[0], true);
     sObjectMgr.SetSavedVariable(VAR_PERM_2, permutation[1], true);

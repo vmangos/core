@@ -44,6 +44,11 @@
 #include <ace/Acceptor.h>
 #include <ace/SOCK_Acceptor.h>
 
+#ifdef USE_SENDGRID
+#include "MailerService.h"
+#include <curl/curl.h>
+#endif
+
 #ifdef WIN32
 #include "ServiceWin32.h"
 char serviceName[] = "realmd";
@@ -212,6 +217,14 @@ extern int main(int argc, char **argv)
 
     DETAIL_LOG("Using ACE: %s", ACE_VERSION);
 
+#ifdef USE_SENDGRID
+    DETAIL_LOG("Using CURL version %s", curl_version());
+
+    // not checking the SendMail config option here to make sure config reloads will work (in the future?)
+    MailerService mailer;
+    MailerService::set_global_mailer(&mailer);
+#endif
+
 #if defined (ACE_HAS_EVENT_POLL) || defined (ACE_HAS_DEV_POLL)
     ACE_Reactor::instance(new ACE_Reactor(new ACE_Dev_Poll_Reactor(ACE::max_handles(), 1), 1), true);
 #else
@@ -240,6 +253,18 @@ extern int main(int argc, char **argv)
     {
         Log::WaitBeforeContinueIfNeed();
         return 1;
+    }
+
+    // Ensure the table used for geolocking has some data in it, if enabled
+    if (sConfig.GetBoolDefault("GeoLocking", false))
+    {
+        auto result = std::unique_ptr<QueryResult>(LoginDatabase.Query("SELECT 1 FROM geoip LIMIT 1"));
+
+        if (!result)
+        {
+            sLog.outError("The geoip table cannot be empty when geolocking is enabled.");
+            return 1;
+        }
     }
 
     ///- Get the list of realms for the server

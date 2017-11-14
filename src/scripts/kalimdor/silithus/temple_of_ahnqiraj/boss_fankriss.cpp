@@ -12,6 +12,8 @@ Stryg comments:
 #include <algorithm>
 #include <utility>
 #include <vector>
+#include <chrono>
+#include <random>
 
 enum
 {
@@ -255,7 +257,8 @@ struct boss_fankrissAI : public ScriptedAI
         ReinitializeWebTimers(8000);
         aliveHatchlings = 0;
         hatchlingVec.clear();
-        std::random_shuffle(vIndex.begin(), vIndex.end());
+        auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::shuffle(vIndex.begin(), vIndex.end(), std::default_random_engine(seed));
     }
 
     void MoveInLineOfSight(Unit* pWho) override
@@ -316,7 +319,8 @@ struct boss_fankrissAI : public ScriptedAI
 
     void ReinitializeWebTimers(uint32 add = 0)
     {
-        std::random_shuffle(entangleSpells.begin(), entangleSpells.end());
+        auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::shuffle(entangleSpells.begin(), entangleSpells.end(), std::default_random_engine(seed));
         // it's possible the longest cooldown should be able to reach more than the 
         // 45 seconds max that it is here. Old nost code was 45sec. Cmangos use 75sec.
         // Should it also be possible that two players are webbed at the same time?
@@ -471,7 +475,8 @@ struct boss_fankrissAI : public ScriptedAI
 
         if (allWormsSpawned) 
         {
-            std::random_shuffle(vIndex.begin(), vIndex.end());
+            auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::shuffle(vIndex.begin(), vIndex.end(), std::default_random_engine(seed));
             uint32 spawnCount = urand(1, 3);
             for (size_t i = 0; i < 3; i++) 
             {

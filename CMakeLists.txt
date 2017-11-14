@@ -31,6 +31,25 @@ set(CMAKE_MODULE_PATH
   ${CMAKE_SOURCE_DIR}/cmake
 )
 
+option(DEBUG "Debug mode" 0)
+option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
+option(TBB_DEBUG "Use TBB debug librairies" 0)
+option(USE_ANTICHEAT "Use anticheat" 0)
+option(SCRIPTS "Compile scripts" 1)
+option(USE_EXTRACTORS "Compile extractors" 0)
+option(USE_UTILITY "Compile additional utility's" 0)
+option(USE_LIBCURL "Compile with libcurl for email support" 0)
+
+find_package(PCHSupport)
+
+if(USE_LIBCURL)
+  find_package(CURL REQUIRED)
+  add_definitions(-DUSE_SENDGRID)
+  #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
+  #set(CMAKE_CXX_STANDARD 17)
+  #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
+endif()
+
 # Added by Giperion, in WIN32 output all compiled files in one directory
 if (WIN32)
 	set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
@@ -83,16 +102,6 @@ if(WIN32)
     set(DEP_ARCH x64)
   endif()
 endif()
-
-option(DEBUG "Debug mode" 0)
-option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
-option(TBB_DEBUG "Use TBB debug librairies" 0)
-option(USE_ANTICHEAT "Use anticheat" 0)
-option(SCRIPTS "Compile scripts" 1)
-option(USE_EXTRACTORS "Compile extractors" 0)
-option(USE_UTILITY "Compile additional utility's" 0)
-
-find_package(PCHSupport)
 
 # Add options for compile of mangos
 if(PCHSupport_FOUND)
