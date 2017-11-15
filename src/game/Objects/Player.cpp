@@ -18637,8 +18637,15 @@ void Player::RemoveItemDependentAurasAndCasts(Item * pItem)
     // currently casted spells can be dependent from item
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
         if (Spell* spell = GetCurrentSpell(CurrentSpellTypes(i)))
-            if (spell->getState() != SPELL_STATE_DELAYED && !HasItemFitToSpellReqirements(spell->m_spellInfo, pItem))
-                InterruptSpell(CurrentSpellTypes(i));
+            if (spell->getState() != SPELL_STATE_DELAYED)
+            {
+                if (!HasItemFitToSpellReqirements(spell->m_spellInfo, pItem))
+                    InterruptSpell(CurrentSpellTypes(i));
+                else
+                    for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+                        if (itemProto->Spells[j].SpellId == spell->m_spellInfo->Id && itemProto->Spells[j].SpellTrigger == 0)
+                            InterruptSpell(CurrentSpellTypes(i));
+            }
 }
 
 uint32 Player::GetResurrectionSpellId()
