@@ -74,6 +74,7 @@ enum CreatureFlagsExtra
 
 #define MAX_KILL_CREDIT 2
 #define MAX_CREATURE_MODEL 4                                // only single send to client in static data
+#define CREATURE_FLEE_TEXT 1150
 
 // from `creature_template` table
 struct CreatureInfo

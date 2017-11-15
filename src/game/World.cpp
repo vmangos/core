@@ -1046,6 +1046,8 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_RESPEC_MIN_MULTIPLIER,                      "Rate.RespecMinMultiplier",      2);
     setConfig(CONFIG_UINT32_RESPEC_MAX_MULTIPLIER,                      "Rate.RespecMaxMultiplier",      10);
 
+    setConfig(CONFIG_FLOAT_RATE_WAR_EFFORT_RESOURCE,                    "Rate.WarEffortResourceComplete", 0.0f);
+
     if (getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT))
         setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS, false);
 
@@ -1180,6 +1182,9 @@ void World::SetInitialWorldSettings()
     sObjectMgr.SetHighestGuids();                           // must be after packing instances
     sLog.outString();
 
+    sLog.outString("Loading Broadcast Texts...");
+    sObjectMgr.LoadBroadcastTexts();
+
     sLog.outString("Loading Page Texts...");
     sObjectMgr.LoadPageTexts();
 
@@ -1301,7 +1306,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadQuestGreetings();
     sLog.outString();
 
-    sLog.outString("Loading Game Event Data...");           // must be after sPoolMgr.LoadFromDB and quests to properly load pool events and quests for events
+    sLog.outString("Loading Game Event Data...");           // must be after sPoolMgr.LoadFromDB and quests to properly load pool events and quests for events, but before area trigger teleports
     sLog.outString();
     sGameEventMgr.LoadFromDB();
     sLog.outString(">>> Game Event Data loaded");
@@ -1426,6 +1431,7 @@ void World::SetInitialWorldSettings()
 
     ///- Loading localization data
     sLog.outString("Loading Localization strings...");
+    sObjectMgr.LoadBroadcastTextLocales();
     sObjectMgr.LoadCreatureLocales();                       // must be after CreatureInfo loading
     sObjectMgr.LoadGameObjectLocales();                     // must be after GameobjectInfo loading
     sObjectMgr.LoadItemLocales();                           // must be after ItemPrototypes loading
@@ -2787,4 +2793,28 @@ World::ArchivedLogMessage* World::GetLog(uint32 logId, AccountTypes my_sec)
     if (it == m_logMessages.end() || it->second.sec > my_sec)
         return nullptr;
     return &(it->second);
+}
+
+void World::SetWorldUpdateTimer(WorldTimers timer, uint32 current)
+{
+    if (timer >= WUPDATE_COUNT)
+        return;
+
+    m_timers[timer].SetCurrent(current);
+}
+
+time_t World::GetWorldUpdateTimer(WorldTimers timer)
+{
+    if (timer >= WUPDATE_COUNT)
+        return 0;
+
+    return m_timers[timer].GetCurrent();
+}
+
+time_t World::GetWorldUpdateTimerInterval(WorldTimers timer)
+{
+    if (timer >= WUPDATE_COUNT)
+        return 0;
+
+    return m_timers[timer].GetInterval();
 }

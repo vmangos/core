@@ -13,7 +13,7 @@
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
 
-struct ObjectDistanceOrder : public std::binary_function<const WorldObject, const WorldObject, bool>
+struct ObjectDistanceOrder
 {
     const Unit* m_pSource;
 
@@ -25,7 +25,7 @@ struct ObjectDistanceOrder : public std::binary_function<const WorldObject, cons
     }
 };
 
-struct ObjectDistanceOrderReversed : public std::binary_function<const WorldObject, const WorldObject, bool>
+struct ObjectDistanceOrderReversed
 {
     const Unit* m_pSource;
 

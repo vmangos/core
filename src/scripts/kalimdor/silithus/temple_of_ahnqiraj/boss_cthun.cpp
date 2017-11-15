@@ -183,7 +183,6 @@ protected:
     uint32 cooldown;
     std::function<uint32()> resetCD;
     bool triggered;
-    bool onlyOnce;
     bool retryOnFail;
     uint32 timeSinceLast;
     SpellTarSelectFunction targetSelectFunc;

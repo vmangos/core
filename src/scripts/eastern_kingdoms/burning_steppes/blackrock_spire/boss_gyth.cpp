@@ -193,25 +193,25 @@ struct boss_gythAI : public ScriptedAI
             --waveRemainingCount;
 
         if (uiWaveNum == 1 && waveRemainingCount == 2)
-            NefarianSay(NOST_TEXT(156));
+            NefarianSay(5665);
         else if (uiWaveNum == 3 && waveRemainingCount == 3)
-            NefarianSay(NOST_TEXT(157));
+            NefarianSay(5671);
         else if (uiWaveNum == 3 && waveRemainingCount == 2)
-            NefarianSay(NOST_TEXT(158));
+            NefarianSay(5666);
         else if (uiWaveNum == 3 && waveRemainingCount == 1)
-            NefarianSay(NOST_TEXT(159));
+            NefarianSay(5667);
         else if (uiWaveNum == 4 && waveRemainingCount == 2)
-            RendSay(NOST_TEXT(160));
+            RendSay(5678);
         else if (uiWaveNum == 4 && waveRemainingCount == 1)
-            RendSay(NOST_TEXT(161));
+            RendSay(5673);
         else if (uiWaveNum == 5 && waveRemainingCount == 1)
-            NefarianSay(NOST_TEXT(162));
+            NefarianSay(5668);
         else if (uiWaveNum == 6 && waveRemainingCount == 2)
-            NefarianSay(NOST_TEXT(163));
+            NefarianSay(5709);
         else if (uiWaveNum == 6 && waveRemainingCount == 1)
-            RendSay(NOST_TEXT(164));
+            RendSay(5722);
         else if (summ && summ->GetEntry() == NPC_REND_BLACKHAND)
-            NefarianSay(NOST_TEXT(165));
+            NefarianSay(5824);
 #ifdef DEBUG_ON
         sLog.outString("Creature %u morte. Vague %u / reste %u", summ->GetEntry(), uiWaveNum, waveRemainingCount);
 #endif
@@ -347,7 +347,7 @@ struct boss_gythAI : public ScriptedAI
             if (uiAggroTimer < uiDiff)
             {
                 m_bAggro = true;
-                NefarianSay(NOST_TEXT(166));
+                NefarianSay(5720);
                 // Visible now!
                 //m_creature->Relocate(SPAWN_X, SPAWN_Y, SPAWN_Z, SPAWN_O);
                 m_creature->GetMap()->CreatureRelocation(m_creature, SPAWN_X, SPAWN_Y, SPAWN_Z, SPAWN_O);
@@ -413,9 +413,9 @@ struct boss_gythAI : public ScriptedAI
         {
             ++uiWaveNum;
             if (uiWaveNum == 1)
-                NefarianSay(NOST_TEXT(167));
+                NefarianSay(5640);
             else if (uiWaveNum == 3)
-                RendSay(NOST_TEXT(168));
+                RendSay(5672);
         }
 
         // we take part in the fight

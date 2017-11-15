@@ -127,7 +127,7 @@ struct boss_victor_nefariusAI : ScriptedAI
         boss_victor_nefariusAI::Reset();
     }
 
-    const uint32 MAX_SCEPTER_RUN_TIME = 90 * MINUTE * IN_MILLISECONDS;
+    const uint32 MAX_SCEPTER_RUN_TIME = 5 * HOUR * IN_MILLISECONDS;
     const uint32 SCEPTER_TAUNT_INTERVAL = MAX_SCEPTER_RUN_TIME / MAX_SCEPTER_TAUNTS;
     const uint32 SCEPTER_TAUNT_OFFSET = SCEPTER_TAUNT_INTERVAL / 2;
 

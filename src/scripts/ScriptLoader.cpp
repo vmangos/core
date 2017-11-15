@@ -272,6 +272,7 @@ void AddSC_thousand_needles();
 void AddSC_thunder_bluff();
 void AddSC_ungoro_crater();
 void AddSC_winterspring();
+void AddSC_war_effort();
 
 void AddSC_npc_j_eevee();                            // J'Eevee, the Imp in a Jar
 
@@ -317,6 +318,8 @@ void AddScripts()
     AddSC_world_event_naxxramas();
     AddSC_event_scourge_invasion();
     AddSC_spell_scripts();
+
+    AddSC_war_effort();
 
     //eastern kingdoms
     AddSC_blackrock_depths();                               //blackrock_depths

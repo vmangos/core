@@ -38,19 +38,20 @@ enum eEvents
 
 struct boss_atiesh : public ScriptedAI
 {
-    boss_atiesh(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
     EventMap events;
     bool hasBeenDisarmed;
     bool hasDoneSpawnCast;
+    
+    boss_atiesh(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        hasDoneSpawnCast = false;
+        Reset();
+    }
+
     void Reset() override
     {
         events.Reset();
         hasBeenDisarmed = false;
-        hasDoneSpawnCast = false;
         m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 22738);
     }
 
@@ -65,6 +66,7 @@ struct boss_atiesh : public ScriptedAI
         // look for disarm, drop a weapon
         if (!hasBeenDisarmed && spell->IsAuraAddedBySpell(SPELL_AURA_MOD_DISARM))
         {
+            hasBeenDisarmed = true;
             // Summon the gobj with the sword
             m_creature->CastSpell(m_creature, SPELL_REAPER_OF_SOULS_DND, true);
             m_creature->SetVirtualItem(VIRTUAL_ITEM_SLOT_0, 0);
@@ -105,7 +107,7 @@ struct boss_atiesh : public ScriptedAI
                 {
                     if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_BOLT) == CAST_OK)
                     {
-                        events.Repeat(Seconds(urand(13, 19)));
+                        events.Repeat(Seconds(urand(13, 18)));
                         break;
                     }
                 }

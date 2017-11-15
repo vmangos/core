@@ -35,6 +35,11 @@
 #include "PatchHandler.h"
 #include "Util.h"
 
+#ifdef USE_SENDGRID
+#include "MailerService.h"
+#include "SendgridMail.h"
+#endif
+
 #include <openssl/md5.h>
 #include <ctime>
 //#include "Util.h" -- for commented utf8ToUpperOnlyLatin
@@ -168,7 +173,8 @@ typedef struct AuthHandler
 #define AUTH_TOTAL_COMMANDS sizeof(table)/sizeof(AuthHandler)
 
 /// Constructor - set the N and g values for SRP6
-AuthSocket::AuthSocket() : gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0)
+AuthSocket::AuthSocket() : gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0),
+_geoUnlockPIN(0)
 {
     N.SetHexStr("894B645E89E1535BBDAD5B8B290650530801B18EBFBF5E8FAB3C82872A3E9BB7");
     g.SetDword(7);
@@ -410,8 +416,7 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         ///- Get the account details from the account table
         // No SQL injection (escaped user name)
-
-        result = LoginDatabase.PQuery("SELECT sha_pass_hash,id,locked,last_ip,v,s,security,email_verif FROM account WHERE username = '%s'",_safelogin.c_str ());
+        result = LoginDatabase.PQuery("SELECT sha_pass_hash,id,locked,last_ip,v,s,security,email_verif,geolock_pin,email FROM account WHERE username = '%s'",_safelogin.c_str ());
         if (result)
         {
             Field* fields = result->Fetch();
@@ -432,13 +437,16 @@ bool AuthSocket::_HandleLogonChallenge()
             bool locked = false;
             lockFlags = (LockFlag)(*result)[2].GetUInt32();
             securityInfo = (*result)[6].GetCppString();
+            _lastIP = fields[3].GetString();
+            _geoUnlockPIN = fields[8].GetUInt32();
+            _email = fields[9].GetCppString();
 
-            if((lockFlags & IP_LOCK) == IP_LOCK)
+            if (lockFlags & IP_LOCK)
             {
-                const char* last_ip = fields[3].GetString();
-                DEBUG_LOG("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), last_ip);
+                DEBUG_LOG("[AuthChallenge] Account '%s' is locked to IP - '%s'", _login.c_str(), _lastIP.c_str());
                 DEBUG_LOG("[AuthChallenge] Player address is '%s'", get_remote_address().c_str());
-                if (strcmp(last_ip, get_remote_address().c_str()))
+
+                if (_lastIP != get_remote_address())
                 {
                     DEBUG_LOG("[AuthChallenge] Account IP differs");
 
@@ -458,7 +466,7 @@ bool AuthSocket::_HandleLogonChallenge()
                 DEBUG_LOG("[AuthChallenge] Account '%s' is not locked to ip", _login.c_str());
             }
 
-            if (!locked || (locked && ((lockFlags & FIXED_PIN) == FIXED_PIN || (lockFlags & TOTP) == TOTP)))
+            if (!locked || (locked && (lockFlags & FIXED_PIN || lockFlags & TOTP)))
             {
                 uint32 account_id = fields[1].GetUInt32();
                 ///- If the account is banned, reject the logon attempt
@@ -523,14 +531,14 @@ bool AuthSocket::_HandleLogonChallenge()
                     // figure out whether we need to display the PIN grid
                     promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
 
-                    if (!locked && ((lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE))
+                    if (!locked && ((lockFlags & ALWAYS_ENFORCE) == ALWAYS_ENFORCE) || _geoUnlockPIN)
                     {
                         promptPin = true; // prompt if the lock hasn't been triggered but ALWAYS_ENFORCE is set
                     }
 
                     if (promptPin)
                     {
-                        BASIC_LOG("[AuthChallenge] account %s is using PIN authentication", _login.c_str());
+                        BASIC_LOG("[AuthChallenge] account %s requires PIN authentication", _login.c_str());
 
                         uint32 gridSeedPkt = gridSeed = static_cast<uint32>(rand32());
                         EndianConvert(gridSeedPkt);
@@ -755,7 +763,11 @@ bool AuthSocket::_HandleLogonProof()
                 if ((pinResult = VerifyPinData(pin, pinData)))
                     break;
             }
-        } 
+        }
+        else if (_geoUnlockPIN)
+        {
+            pinResult = VerifyPinData(_geoUnlockPIN, pinData);
+        }
         else
         {
             pinResult = false;
@@ -769,6 +781,63 @@ bool AuthSocket::_HandleLogonProof()
     ///- Check if SRP6 results match (password is correct), else send an error
     if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult && approvedBuild)
     {
+        // Geolocking checks must be done after an otherwise successful login to prevent lockout attacks
+        if (_geoUnlockPIN) // remove the PIN to unlock the account since login succeeded
+        {
+            auto result = LoginDatabase.PExecute("UPDATE account SET geolock_pin = 0 WHERE username = '%s'",
+                _safelogin.c_str());
+
+            if (!result)
+            {
+                sLog.outError("Unable to remove geolock PIN for %s - account has not been unlocked", _safelogin.c_str());
+            }
+        }
+        else if (GeographicalLockCheck())
+        {
+            BASIC_LOG("Account %s (%u) has been geolocked", _login.c_str(), _accountId); // todo, add additional logging info
+            
+            auto pin = urand(100000, 999999); // check rand32_max
+            auto result = LoginDatabase.PExecute("UPDATE account SET geolock_pin = %u WHERE username = '%s'",
+                pin, _safelogin.c_str());
+
+            if (!result)
+            {
+                sLog.outError("Unable to write geolock PIN for %s - account has not been locked", _safelogin.c_str());
+
+                char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_DB_BUSY };
+                send(data, sizeof(data));
+                return true;
+            }
+
+#ifdef USE_SENDGRID
+            if (sConfig.GetBoolDefault("SendMail", false))
+            {
+                auto mail = std::make_unique<SendgridMail>
+                (
+                    sConfig.GetStringDefault("SendGridKey", ""),
+                    sConfig.GetStringDefault("GeolockGUID", "")
+                );
+
+                mail->recipient(_email);
+                mail->from(sConfig.GetStringDefault("MailFrom", ""));
+                mail->substitution("%username%", _login);
+                mail->substitution("%unlock_pin%", std::to_string(pin));
+                mail->substitution("%originating_ip%", get_remote_address());
+
+                MailerService::get_global_mailer()->send(std::move(mail),
+                    [](SendgridMail::Result res)
+                    {
+                        DEBUG_LOG("Mail result: %d", res);
+                    }
+                );
+            }
+#endif
+
+            char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_PARENTCONTROL };
+            send(data, sizeof(data));
+            return true;
+        }
+
         BASIC_LOG("User '%s' successfully authenticated", _login.c_str());
 
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
@@ -1330,4 +1399,79 @@ void AuthSocket::LoadAccountSecurityLevels(uint32 accountId)
     } while (result->NextRow());
 
     delete result;
+}
+
+bool AuthSocket::GeographicalLockCheck()
+{
+    if (!sConfig.GetBoolDefault("GeoLocking"), false)
+    {
+        return false;
+    }
+
+    if (_lastIP.empty() || _lastIP == get_remote_address())
+    {
+        return false;
+    }
+
+    if ((lockFlags & GEO_CITY) == 0 && (lockFlags & GEO_COUNTRY) == 0)
+    {
+        return false;
+    }
+
+    auto result = std::unique_ptr<QueryResult>(LoginDatabase.PQuery(
+        "SELECT INET_ATON('%s') AS ip, network_start_integer, geoname_id, registered_country_geoname_id "
+        "FROM geoip "
+        "WHERE network_last_integer >= INET_ATON('%s') "
+        "ORDER BY network_last_integer ASC LIMIT 1",
+        get_remote_address().c_str(), get_remote_address().c_str())
+        );
+
+    auto result_prev = std::unique_ptr<QueryResult>(LoginDatabase.PQuery(
+        "SELECT INET_ATON('%s') AS ip, network_start_integer, geoname_id, registered_country_geoname_id "
+        "FROM geoip "
+        "WHERE network_last_integer >= INET_ATON('%s') "
+        "ORDER BY network_last_integer ASC LIMIT 1",
+        _lastIP.c_str(), _lastIP.c_str())
+        );
+
+    if (!result && !result_prev)
+    {
+        return false;
+    }
+
+    // If only one of the queries returns a result, assume location has changed
+    if ((result && !result) || (!result && result))
+    {
+        return true;
+    }
+
+    uint32_t net_start = result->Fetch()[1].GetUInt32();
+    uint32_t net_start_prev = result_prev->Fetch()[1].GetUInt32();
+    uint32_t ip = result->Fetch()[0].GetUInt32();
+    uint32_t ip_prev = result_prev->Fetch()[0].GetUInt32();
+
+    /* The optimised query will return the next highest range in the event
+     * of the address not being found in the database. Therefore, we need
+     * to perform a second check to ensure our address falls within
+     * the returned range.
+     * See: https://blog.jcole.us/2007/11/24/on-efficiently-geo-referencing-ips-with-maxmind-geoip-and-mysql-gis/
+     */
+    if (net_start > ip || net_start_prev > ip_prev)
+    {
+        return false;
+    }
+
+    std::string geoname_id = result->Fetch()[2].GetString();
+    std::string country_geoname_id = result->Fetch()[3].GetString();
+    std::string prev_geoname_id = result_prev->Fetch()[2].GetString();
+    std::string prev_country_geoname_id = result_prev->Fetch()[3].GetString();
+
+    if (lockFlags & GEO_CITY)
+    {
+        return geoname_id != prev_geoname_id;
+    }
+    else
+    {
+        return country_geoname_id != prev_country_geoname_id;
+    }
 }

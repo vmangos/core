@@ -339,10 +339,6 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
         {
             case SPELLFAMILY_GENERIC:
             {
-                //Gore
-                if (m_spellInfo->SpellIconID == 2269)
-                    damage += (rand() % 2) ? damage : 0;
-
                 switch (m_spellInfo->Id)                    // better way to check unknown
                 {
                     // Meteor like spells (divided damage to targets)
@@ -405,6 +401,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                             damage = uint32(damage * 1.5f);
                         else
                             damage = uint32(damage / 1.5f);
+                        break;
                     }
                     case 27812: // Kel'Thuzad Void Blast
                     {
@@ -414,6 +411,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         // this is a safetycheck.
                         if (unitTarget->HasAura(28410))
                             damage = 0;
+                        break;
                     }
                     case 24933:                             // Cannon (Darkmoon Steam Tonk)
                     {
@@ -1652,50 +1650,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
             }
             break;
-        /*
-        case SPELLFAMILY_ROGUE:
-        {
-            switch (m_spellInfo->Id)
-            {
-                case 5938:                                  // Shiv
-                {
-                    if (m_caster->GetTypeId() != TYPEID_PLAYER)
-                        return;
-
-                    Player *pCaster = ((Player*)m_caster);
-
-                    Item *item = pCaster->GetWeaponForAttack(OFF_ATTACK);
-                    if (!item)
-                        return;
-
-                    // all poison enchantments is temporary
-                    uint32 enchant_id = item->GetEnchantmentId(TEMP_ENCHANTMENT_SLOT);
-                    if (!enchant_id)
-                        return;
-
-                    SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
-                    if (!pEnchant)
-                        return;
-
-                    for (int s = 0; s < 3; ++s)
-                    {
-                        if (pEnchant->type[s] != ITEM_ENCHANTMENT_TYPE_COMBAT_SPELL)
-                            continue;
-
-                        SpellEntry const* combatEntry = sSpellMgr.GetSpellEntry(pEnchant->spellid[s]);
-                        if (!combatEntry || combatEntry->Dispel != DISPEL_POISON)
-                            continue;
-
-                        m_caster->CastSpell(unitTarget, combatEntry, true, item);
-                    }
-
-                    m_caster->CastSpell(unitTarget, 5940, true);
-                    return;
-                }
-            }
-            break;
-        }
-        */
         case SPELLFAMILY_HUNTER:
         {
             switch (m_spellInfo->Id)
@@ -2945,6 +2899,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         return;
 
     // Fill possible dispel list
+    int32 priority_dispel = -1;
     std::list <std::pair<SpellAuraHolder* , uint32> > dispel_list;
 
     bool checkFaction = true;
@@ -2968,8 +2923,16 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
                 {
                     bool positive = holder->IsPositive();
                     // do not remove positive auras if friendly target
-                    //               negative auras if non-friendly target
-                    if (positive == friendly)
+                    // do not remove negative auras if non-friendly target
+                    // when removing charm auras ignore hostile reaction from the charm
+                    if (!friendly && IsCharmSpell(holder->GetSpellProto()))
+                    {
+                        if (CharmInfo *charm = unitTarget->GetCharmInfo())
+                            if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                                if (ft->IsFriendlyTo(*m_caster->getFactionTemplateEntry()))
+                                    priority_dispel = dispel_list.size();
+                    }
+                    else if (positive == friendly)
                         continue;
                 }
             }
@@ -2990,8 +2953,16 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         for (int32 count = 0; count < damage && !dispel_list.empty(); ++count)
         {
             // Random select buff for dispel
-            std::list<std::pair<SpellAuraHolder* , uint32> >::iterator dispel_itr = dispel_list.begin();
-            std::advance(dispel_itr, urand(0, dispel_list.size() - 1));
+            std::list<std::pair<SpellAuraHolder*, uint32> >::iterator dispel_itr = dispel_list.begin();
+            if (priority_dispel >= 0) 
+            {
+                std::advance(dispel_itr, priority_dispel);
+                priority_dispel = -1;
+            }
+            else
+            {
+                std::advance(dispel_itr, urand(0, dispel_list.size() - 1));
+            }
 
             SpellAuraHolder *holder = dispel_itr->first;
 
@@ -4129,17 +4100,6 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     // Seal of Command
     if (m_spellInfo->School == SPELL_SCHOOL_HOLY)
     {
-        // Prevent Vengeance double dipping
-        Unit::AuraList const& mModDamagePercentDone = m_caster->GetAurasByType(SPELL_AURA_MOD_DAMAGE_PERCENT_DONE);
-        for (Unit::AuraList::const_iterator i = mModDamagePercentDone.begin(); i != mModDamagePercentDone.end(); ++i)
-        {
-            if ((*i)->GetSpellProto()->SpellVisual == 6597)
-            {
-                bonus /= 1.0f + (*i)->GetModifier()->m_amount / 100.0f;
-                break;
-            }
-        }
-
         // Add spell gear bonus and spell modifiers
         bonus = m_caster->SpellDamageBonusDone(unitTarget, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
         bonus = unitTarget->SpellDamageBonusTaken(m_caster, m_spellInfo, bonus, SPELL_DIRECT_DAMAGE);
@@ -4600,9 +4560,9 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    uint32 spells[3] = {26206, 26207, 45036};
+                    uint32 spells[2] = {26206, 26207};
 
-                    m_caster->CastSpell(unitTarget, spells[urand(0, 2)], true);
+                    m_caster->CastSpell(unitTarget, spells[urand(0, 1)], true);
                     return;
                 }
                 case 26275:                                 // PX-238 Winter Wondervolt TRAP

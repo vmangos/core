@@ -413,6 +413,11 @@ inline bool HasAuraWithSpellTriggerEffect(SpellEntry const *spellInfo)
     return false;
 }
 
+inline bool IsCharmSpell(SpellEntry const *spellInfo)
+{
+    return IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CHARM) || IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_POSSESS);
+}
+
 inline bool IsDispelSpell(SpellEntry const *spellInfo)
 {
     return IsSpellHaveEffect(spellInfo, SPELL_EFFECT_DISPEL);
@@ -461,6 +466,27 @@ inline bool NeedsComboPoints(SpellEntry const* spellInfo)
 inline bool IsTotemSummonSpell(SpellEntry const* spellInfo)
 {
     return spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4;
+}
+
+// Spell effects require a specific power type on the target
+inline bool IsTargetPowerTypeValid(SpellEntry const *spellInfo, Powers powerType)
+{
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if (spellInfo->Effect[i] == SPELL_EFFECT_NONE)
+            continue;
+
+        if ((spellInfo->Effect[i] == SPELL_EFFECT_POWER_BURN ||
+            spellInfo->Effect[i] == SPELL_EFFECT_POWER_DRAIN ||
+            spellInfo->EffectApplyAuraName[i] == SPELL_AURA_PERIODIC_MANA_LEECH ||
+            spellInfo->EffectApplyAuraName[i] == SPELL_AURA_POWER_BURN_MANA) &&
+            int32(powerType) != spellInfo->EffectMiscValue[i])
+        {
+            continue;
+        }
+        return true;
+    }
+    return false;
 }
 
 inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)

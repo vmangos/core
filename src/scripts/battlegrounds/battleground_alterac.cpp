@@ -2947,7 +2947,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
         //        if (pCreature->isVendor())
         //            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-        //       pPlayer->SEND_GOSSIP_MENU(20011, pCreature->GetGUID());
+        //       pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
         //       return true;
     }
 
@@ -3006,7 +3006,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                                      GOSSIP_ACTION_INFO_DEF + 500 + 1);
                         }
 
-                        pPlayer->SEND_GOSSIP_MENU(20001, pCreature->GetGUID());
+                        pPlayer->SEND_GOSSIP_MENU(6073, pCreature->GetGUID());
                         break;
                     case AV_NPC_SEASONED:
                         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
@@ -3023,7 +3023,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                                      GOSSIP_ACTION_INFO_DEF + 1000 + 1);
                         }
 
-                        pPlayer->SEND_GOSSIP_MENU(20002, pCreature->GetGUID());
+                        pPlayer->SEND_GOSSIP_MENU(6217, pCreature->GetGUID());
                         break;
                     case AV_NPC_VETERAN:
                         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
@@ -3040,7 +3040,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                                      GOSSIP_ACTION_INFO_DEF + 1500 + 1);
                         }
 
-                        pPlayer->SEND_GOSSIP_MENU(20003, pCreature->GetGUID());
+                        pPlayer->SEND_GOSSIP_MENU(6218, pCreature->GetGUID());
                         break;
                     case AV_NPC_CHAMPION:
                         pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
@@ -3363,7 +3363,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                 if (pCreature->isVendor())
                     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-                pPlayer->SEND_GOSSIP_MENU(20011, pCreature->GetGUID());
+                pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
 
                 return true;
             }
@@ -3384,7 +3384,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             if (pCreature->isVendor())
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
-            pPlayer->SEND_GOSSIP_MENU(20011, pCreature->GetGUID());
+            pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
             return true;
         }
 
@@ -3887,34 +3887,34 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
 
                         break;
                     case BG_AV_NB_CHALLENGES:
-                        pPlayer->SEND_GOSSIP_MENU(20004, pCreature->GetGUID()); //I barely have any supplies for upgrades.
+                        pPlayer->SEND_GOSSIP_MENU(6784, pCreature->GetGUID()); //I barely have any supplies for upgrades.
                         break;
                     case BG_AV_NB_CHALLENGES+1:
-                        pPlayer->SEND_GOSSIP_MENU(20005, pCreature->GetGUID()); //I have about half the supplies needed to upgrade to seasoned units.
+                        pPlayer->SEND_GOSSIP_MENU(6780, pCreature->GetGUID()); //I have about half the supplies needed to upgrade to seasoned units.
                         break;
                     case BG_AV_NB_CHALLENGES+2:
-                        pPlayer->SEND_GOSSIP_MENU(20006, pCreature->GetGUID()); //I have about half the supplies needed to upgrade to veteran units.
+                        pPlayer->SEND_GOSSIP_MENU(6781, pCreature->GetGUID()); //I have about half the supplies needed to upgrade to veteran units.
                         break;
                     case BG_AV_NB_CHALLENGES+3:
-                        pPlayer->SEND_GOSSIP_MENU(20007, pCreature->GetGUID()); //I have about half the supplies needed to upgrade to champion units.
+                        pPlayer->SEND_GOSSIP_MENU(6783, pCreature->GetGUID()); //I have about half the supplies needed to upgrade to champion units.
                         break;
                     case BG_AV_NB_CHALLENGES+4:
-                        pPlayer->SEND_GOSSIP_MENU(20008, pCreature->GetGUID()); //I almost have enough supplies to upgrade our troops to seasoned.
+                        pPlayer->SEND_GOSSIP_MENU(6778, pCreature->GetGUID()); //I almost have enough supplies to upgrade our troops to seasoned.
                         break;
                     case BG_AV_NB_CHALLENGES+5:
-                        pPlayer->SEND_GOSSIP_MENU(20009, pCreature->GetGUID()); //I almost have enough supplies to upgrade our troops to veteran.
+                        pPlayer->SEND_GOSSIP_MENU(6779, pCreature->GetGUID()); //I almost have enough supplies to upgrade our troops to veteran.
                         break;
                     case BG_AV_NB_CHALLENGES+6:
-                        pPlayer->SEND_GOSSIP_MENU(20010, pCreature->GetGUID()); //I almost have enough supplies to upgrade our troops to champion.
+                        pPlayer->SEND_GOSSIP_MENU(6782, pCreature->GetGUID()); //I almost have enough supplies to upgrade our troops to champion.
                         break;
                     case BG_AV_NB_CHALLENGES+13:
-                        pPlayer->SEND_GOSSIP_MENU(20013, pCreature->GetGUID());
+                        pPlayer->SEND_GOSSIP_MENU(6733, pCreature->GetGUID());
                         break;
                     case BG_AV_NB_CHALLENGES+12:
-                        pPlayer->SEND_GOSSIP_MENU(20012, pCreature->GetGUID());
+                        pPlayer->SEND_GOSSIP_MENU(6732, pCreature->GetGUID());
                         break;
                     case BG_AV_NB_CHALLENGES+14:
-                        pPlayer->SEND_GOSSIP_MENU(20014, pCreature->GetGUID());
+                        pPlayer->SEND_GOSSIP_MENU(6731, pCreature->GetGUID());
                         break;
                     case 500:
                         ((BattleGroundAV*)bg)->UpgradeArmor(pCreature, pPlayer);

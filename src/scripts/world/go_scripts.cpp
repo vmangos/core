@@ -378,7 +378,7 @@ bool GOHello_go_Hive_Glyphed_Crystal(Player* pPlayer, GameObject* pGo)
         !pPlayer->HasItemCount(REWARD_ITEM, 1))
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "<Use the transcription device to gather a rubbing.>", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
-    pPlayer->SEND_GOSSIP_MENU(20000, pGo->GetGUID());
+    pPlayer->SEND_GOSSIP_MENU(7770, pGo->GetGUID());
     return true;
 }
 

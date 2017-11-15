@@ -240,6 +240,19 @@ CREATE TABLE IF NOT EXISTS `character_bgqueue` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table characters.character_deleted_items
+DROP TABLE IF EXISTS `character_deleted_items`;
+CREATE TABLE IF NOT EXISTS `character_deleted_items` (
+  `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+  `player_guid` int(11) unsigned NOT NULL DEFAULT '0',
+  `item_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `stack_count` mediumint(8) unsigned NOT NULL DEFAULT '1',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table characters.character_duplicate_account
 DROP TABLE IF EXISTS `character_duplicate_account`;
 CREATE TABLE IF NOT EXISTS `character_duplicate_account` (
@@ -797,7 +810,7 @@ CREATE TABLE IF NOT EXISTS `item_instance` (
   `enchantments` text NOT NULL,
   `randomPropertyId` smallint(5) NOT NULL DEFAULT '0',
   `durability` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text` int(10) NOT NULL DEFAULT '0',
+  `text` int(10) unsigned NOT NULL DEFAULT '0',
   `generated_loot` tinyint(4) DEFAULT '0',
   PRIMARY KEY (`guid`),
   KEY `idx_owner_guid` (`owner_guid`),

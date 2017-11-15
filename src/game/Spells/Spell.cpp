@@ -456,10 +456,11 @@ void Spell::FillTargetMap()
                         // Arcane Missiles have strange targeting for auras
                         if (m_spellInfo->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_ARCANE_MISSILES_CHANNEL>())
                         {
-                            if (m_caster->GetTypeId() == TYPEID_PLAYER)
-                                if (Unit *target = ObjectAccessor::Instance().GetUnit(*m_caster, ((Player*)m_caster)->GetSelectionGuid()))
-                                    if (m_caster->IsValidAttackTarget(target))
-                                        tmpUnitMap.push_back(target);
+                            if (Unit* pUnitTarget = m_caster->SelectMagnetTarget(m_targets.getUnitTarget(), this, SpellEffectIndex(i)))
+                            {
+                                if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsValidAttackTarget(pUnitTarget))
+                                    tmpUnitMap.push_back(pUnitTarget);
+                            }
                         }
                         else
                             SetTargetMap(SpellEffectIndex(i), m_spellInfo->EffectImplicitTargetA[i], tmpUnitMap);
@@ -1151,7 +1152,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
                 // can cause back attack (if detected)
                 bool backAttack = m_spellInfo->Id != 3600 && // Earthbind never set in combat
                     !IsPositiveSpell(m_spellInfo->Id) && m_caster->isVisibleForOrDetect(unit, unit, false);
-                if (IsSpellHaveAura(m_spellInfo, SPELL_AURA_MOD_POSSESS))
+                if (IsSpellHaveAura(m_spellInfo, SPELL_AURA_MOD_POSSESS) || m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO)
                     backAttack = false;
                 // Pickpocket can cause back attack if failed
                 if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_IS_PICKPOCKET)
@@ -1816,7 +1817,7 @@ bool Spell::HasValidUnitPresentInTargetList()
 // Spell target first
 // Raidmates then descending by injury suffered (MaxHealth - Health)
 // Other players/mobs then descending by injury suffered (MaxHealth - Health)
-struct ChainHealingOrder : public std::binary_function<const Unit*, const Unit*, bool>
+struct ChainHealingOrder
 {
     const Unit* MainTarget;
     ChainHealingOrder(Unit const* Target) : MainTarget(Target) {};
@@ -1842,7 +1843,7 @@ struct ChainHealingOrder : public std::binary_function<const Unit*, const Unit*,
     }
 };
 
-class ChainHealingFullHealth: std::unary_function<const Unit*, bool>
+class ChainHealingFullHealth
 {
 public:
     const Unit* MainTarget;
@@ -1856,7 +1857,7 @@ public:
 
 // Helper for targets nearest to the spell target
 // The spell target is always first unless there is a target at _completely_ the same position (unbelievable case)
-struct TargetDistanceOrderNear : public std::binary_function<const Unit, const Unit, bool>
+struct TargetDistanceOrderNear
 {
     const Unit* MainTarget;
     TargetDistanceOrderNear(const Unit* Target) : MainTarget(Target) {};
@@ -5195,6 +5196,10 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (!m_IsTriggeredSpell && IsDeathOnlySpell(m_spellInfo) && target->isAlive())
             return SPELL_FAILED_TARGET_NOT_DEAD;
 
+        // Check spell max target level
+        if (m_spellInfo->MaxTargetLevel > 0 && int32(target->getLevel()) > m_spellInfo->MaxTargetLevel)
+            return SPELL_FAILED_HIGHLEVEL;
+
         bool non_caster_target = target != m_caster && !IsSpellWithCasterSourceTargetsOnly(m_spellInfo);
 
         if (non_caster_target)
@@ -5359,7 +5364,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             }
         }
 
-        if (IsPositiveSpell(m_spellInfo->Id))
+        if (IsPositiveSpell(m_spellInfo->Id, m_caster, target))
             if (target->IsImmuneToSpell(m_spellInfo, target == m_caster))
                 return SPELL_FAILED_TARGET_AURASTATE;
 
@@ -6200,7 +6205,13 @@ SpellCastResult Spell::CheckCast(bool strict)
                     {
                         bool positive = holder->IsPositive();
                         // do not remove positive auras if friendly target
-                        //               negative auras if non-friendly target
+                        // do not remove negative auras if non-friendly target
+                        // when removing charm auras ignore hostile reaction from the charm
+                        if (!friendly_dispel && !positive && IsCharmSpell(holder->GetSpellProto()))
+                            if (CharmInfo *charm = unit_target->GetCharmInfo())
+                                if (FactionTemplateEntry const* ft = charm->GetOriginalFactionTemplate())
+                                    if (charm->GetOriginalFactionTemplate()->IsFriendlyTo(*m_caster->getFactionTemplateEntry()))
+                                        bFoundOneDispell = true;
                         if (positive == friendly_dispel)
                             continue;
                     }
@@ -7091,7 +7102,6 @@ SpellCastResult Spell::CheckItems()
         case  5699:
         case 11729:
         case 11730:
-        case 27230:
         {
             if (!p_caster)
                 break;
@@ -7112,14 +7122,13 @@ SpellCastResult Spell::CheckItems()
                 }
             }
 
-            static uint32 const itypes[6][3] =
+            static uint32 const itypes[5][3] =
             {
                 { 5512, 19004, 19005},              // Minor Healthstone
                 { 5511, 19006, 19007},              // Lesser Healthstone
                 { 5509, 19008, 19009},              // Healthstone
                 { 5510, 19010, 19011},              // Greater Healthstone
                 { 9421, 19012, 19013},              // Major Healthstone
-                {22103, 22104, 22105}               // Master Healthstone
             };
 
             switch (m_spellInfo->Id)
@@ -7139,9 +7148,6 @@ SpellCastResult Spell::CheckItems()
                 case 11730:
                     itemtype = itypes[4][rank];
                     break; // Major Healthstone
-                case 27230:
-                    itemtype = itypes[5][rank];
-                    break; // Master Healthstone
             }
 
             ItemPosCountVec dest;

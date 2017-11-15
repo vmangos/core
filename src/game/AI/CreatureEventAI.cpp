@@ -879,6 +879,11 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             sObjectMgr.SetSavedVariable(action.setVariable.variableEntry, action.setVariable.value, true);
             break;
         }
+        case ACTION_T_EVENT_SCRIPT:
+        {
+            m_creature->GetMap()->ScriptsStart(sEventScripts, action.eventScript.eventScriptId, m_creature, pActionInvoker ? pActionInvoker : m_creature);
+            break;
+        }
     }
 }
 
@@ -1311,7 +1316,7 @@ void CreatureEventAI::DoFindFriendlyMissingBuff(std::list<Creature*>& _list, flo
 //*********************************
 //*** Functions used globally ***
 
-void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target)
+void CreatureEventAI::DoScriptText(int32 textEntry, Unit* pSource, Unit* target)
 {
     if (!pSource)
     {
@@ -1319,53 +1324,76 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
         return;
     }
 
+    uint8 Type;
+    uint32 Emote;
+    uint32 Language;
+    uint32 SoundId;
+
     if (textEntry >= 0)
     {
-        sLog.outErrorDb("CreatureEventAI: DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process text entry %i, but text entry must be negative.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textEntry);
-        return;
-    }
-
-    CreatureEventAI_TextMap::const_iterator i = sEventAIMgr.GetCreatureEventAITextMap().find(textEntry);
-
-    if (i == sEventAIMgr.GetCreatureEventAITextMap().end())
-    {
-        sLog.outErrorDb("CreatureEventAI: DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textEntry);
-        return;
-    }
-
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "CreatureEventAI: DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u", textEntry, (*i).second.SoundId, (*i).second.Type, (*i).second.Language, (*i).second.Emote);
-
-    if ((*i).second.SoundId)
-    {
-        if (GetSoundEntriesStore()->LookupEntry((*i).second.SoundId))
+        if (const BroadcastText* bct = sObjectMgr.GetBroadcastTextLocale(textEntry))
         {
-            if((*i).second.Type == CHAT_TYPE_ZONE_YELL)
-            {
-                if(Map* pZone = pSource->GetMap())
-                    pZone->PlayDirectSoundToMap((*i).second.SoundId);
-            }
-            else
-                pSource->PlayDirectSound((*i).second.SoundId);
+            Type = bct->Type;
+            Emote = bct->EmoteId0;
+            Language = bct->Language;
+            SoundId = bct->SoundId;
         }
         else
-            sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process invalid sound id %u.", textEntry, (*i).second.SoundId);
+        {
+            sLog.outErrorDb("CreatureEventAI: DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process broadcast text id %i, but text id does not exist.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textEntry);
+            return;
+        }
+    }
+    else
+    {
+        CreatureEventAI_TextMap::const_iterator i = sEventAIMgr.GetCreatureEventAITextMap().find(textEntry);
+        if (i == sEventAIMgr.GetCreatureEventAITextMap().end())
+        {
+            sLog.outErrorDb("CreatureEventAI: DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textEntry);
+            return;
+        }
+        else
+        {
+            Type = (*i).second.Type;
+            Emote = (*i).second.Emote;
+            Language = (*i).second.Language;
+            SoundId = (*i).second.SoundId;
+        }
     }
 
-    if ((*i).second.Emote)
+    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "CreatureEventAI: DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u", textEntry, SoundId, Type, Language, Emote);
+
+    if (SoundId)
+    {
+        if (GetSoundEntriesStore()->LookupEntry(SoundId))
+        {
+            if(Type == CHAT_TYPE_ZONE_YELL)
+            {
+                if(Map* pZone = pSource->GetMap())
+                    pZone->PlayDirectSoundToMap(SoundId);
+            }
+            else
+                pSource->PlayDirectSound(SoundId);
+        }
+        else
+            sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process invalid sound id %u.", textEntry, SoundId);
+    }
+
+    if (Emote)
     {
         if (pSource->GetTypeId() == TYPEID_UNIT || pSource->GetTypeId() == TYPEID_PLAYER)
-            ((Unit*)pSource)->HandleEmote((*i).second.Emote);
+            ((Unit*)pSource)->HandleEmote(Emote);
         else
             sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process emote for invalid TypeId (%u).", textEntry, pSource->GetTypeId());
     }
 
-    switch ((*i).second.Type)
+    switch (Type)
     {
         case CHAT_TYPE_SAY:
-            pSource->MonsterSay(textEntry, (*i).second.Language, target);
+            pSource->MonsterSay(textEntry, Language, target);
             break;
         case CHAT_TYPE_YELL:
-            pSource->MonsterYell(textEntry, (*i).second.Language, target);
+            pSource->MonsterYell(textEntry, Language, target);
             break;
         case CHAT_TYPE_TEXT_EMOTE:
             pSource->MonsterTextEmote(textEntry, target);
@@ -1388,7 +1416,7 @@ void CreatureEventAI::DoScriptText(int32 textEntry, WorldObject* pSource, Unit* 
         }
         break;
         case CHAT_TYPE_ZONE_YELL:
-            pSource->MonsterYellToZone(textEntry, (*i).second.Language, target);
+            pSource->MonsterYellToZone(textEntry, Language, target);
             break;
     }
 }

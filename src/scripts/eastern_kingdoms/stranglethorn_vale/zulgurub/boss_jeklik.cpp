@@ -368,7 +368,6 @@ struct boss_jeklikAI : public ScriptedAI
                     m_creature->InterruptNonMeleeSpells(false);
                     if (DoCastSpellIfCan(m_creature, SPELL_GREATER_HEAL) == CAST_OK)
                     {
-                        //m_creature->MonsterTextEmote(NOST_TEXT(TEXTE_GRAND_SORT_SOIN), NULL, true);
                         DoScriptText(TEXTE_GRAND_SORT_SOIN, m_creature);
                         skillStarted = true;
                         GreaterHeal_Timer = urand(20000, 25000);

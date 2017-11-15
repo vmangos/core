@@ -800,6 +800,9 @@ struct CharmInfo
     ReactStates GetReactState() const { return m_reactState; }
     bool HasReactState(ReactStates state) const { return m_reactState == state; }
 
+    FactionTemplateEntry const* GetOriginalFactionTemplate() const { return m_originalFactionTemplate; }
+    void SetOriginalFactionTemplate(FactionTemplateEntry const* ft) { m_originalFactionTemplate = ft; }
+
     void InitPossessCreateSpells();
     void InitCharmCreateSpells();
     void InitPetActionBar();
@@ -836,6 +839,7 @@ struct CharmInfo
 private:
 
     Unit* m_unit;
+    FactionTemplateEntry const* m_originalFactionTemplate;
 
     UnitActionBarEntry PetActionBar[MAX_UNIT_ACTION_BAR_INDEX];
     CharmSpellEntry m_charmspells[CREATURE_MAX_SPELLS];
@@ -1072,7 +1076,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 getRaceMask() const { return getRace() ? 1 << (getRace()-1) : 0x0; }
         uint8 getClass() const { return GetByteValue(UNIT_FIELD_BYTES_0, 1); }
         uint32 getClassMask() const { return getClass() ? 1 << (getClass()-1) : 0x0; }
-        uint8 getGender() const { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
+        uint8 getGender() const override { return GetByteValue(UNIT_FIELD_BYTES_0, 2); }
 
         /**
          * @brief Inits display id to player display ID, depending on race, class, gender
@@ -1913,6 +1917,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void resetTransformScale();
         float getNativeScale() const;
         void setNativeScale(float scale);
+
     protected:
         explicit Unit ();
 

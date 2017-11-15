@@ -83,6 +83,7 @@
 #include "PlayerBroadcaster.h"
 #include "GameEventMgr.h"
 #include "world/world_event_naxxramas.h"
+#include "world/world_event_wareffort.h"
 
 #define ZONE_UPDATE_INTERVAL (1*IN_MILLISECONDS)
 
@@ -4759,6 +4760,13 @@ void Player::RepopAtGraveyard()
     else
         ClosestGrave = sObjectMgr.GetClosestGraveYard(GetPositionX(), GetPositionY(), GetPositionZ(), GetMapId(), GetTeam());
 
+    if (isAlive())
+    {
+        if (ClosestGrave)
+            TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation(), 0, std::move(recover));
+        return;
+    }
+
     // Interrupt resurrect spells
     InterruptSpellsCastedOnMe(false, true);
 
@@ -6697,6 +6705,9 @@ void Player::_ApplyItemBonuses(ItemPrototype const *proto, uint8 slot, bool appl
 
 void Player::_ApplyWeaponDependentAuraMods(Item *item, WeaponAttackType attackType, bool apply)
 {
+    if (apply && !CanUseEquippedWeapon(attackType))
+        return;
+
     AuraList const& auraCritList = GetAurasByType(SPELL_AURA_MOD_CRIT_PERCENT);
     for (AuraList::const_iterator itr = auraCritList.begin(); itr != auraCritList.end(); ++itr)
         _ApplyWeaponDependentAuraCritMod(item, attackType, *itr, apply);
@@ -7881,6 +7892,8 @@ void Player::SendInitWorldStates(uint32 zoneid)
         data << uint32(WORLDSTATE_SI_EASTERN_PLAGUELANDS) << uint32(REMAINING_EASTERN_PLAGUELANDS);
         data << uint32(WORLDSTATE_SI_TANARIS) << uint32(REMAINING_TANARIS);
         data << uint32(WORLDSTATE_SI_WINTERSPRING) << uint32(REMAINING_WINTERSPRING);
+
+        count += 13;
     }
 
     for (WorldStatePair const* itr = def_world_states; itr->state; ++itr)
@@ -7900,6 +7913,12 @@ void Player::SendInitWorldStates(uint32 zoneid)
             if (BattleGround* bg = GetBattleGround())
                 bg->FillInitialWorldStates(data, count);
             break;
+    }
+
+    // Ahn'Qiraj War Effort
+    if (sGameEventMgr.IsActiveEvent(EVENT_WAR_EFFORT))
+    {
+        count += BuildWarEffortWorldStates(data);
     }
 
     data << uint32(0) << uint32(0);     // [-ZERO] Add terminator to prevent repeating audio bug.
@@ -11640,6 +11659,10 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
     // prepares quest menu when true
     bool canSeeQuests = menuId == GetDefaultGossipMenuForSource(pSource);
 
+    // If we're not a quest giver, don't show quests in the gossip
+    if (canSeeQuests && pSource->IsCreature() && !pSource->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+        canSeeQuests = false;
+
     // if canSeeQuests (the default, top level menu) and no menu options exist for this, use options from default options
     if (pMenuItemBounds.first == pMenuItemBounds.second && canSeeQuests)
         pMenuItemBounds = sObjectMgr.GetGossipMenuItemsMapBounds(0);
@@ -12714,8 +12737,8 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
     RemoveTimedQuest(quest_id);
 
     if (BattleGround* bg = GetBattleGround())
-        if (bg->GetTypeID() == BATTLEGROUND_AV)
-            ((BattleGroundAV*)bg)->HandleQuestComplete(questGiver, pQuest->GetQuestId(), this);
+        if ((bg->GetTypeID() == BATTLEGROUND_AV) && (questGiver->GetTypeId() == TYPEID_UNIT))
+            ((BattleGroundAV*)bg)->HandleQuestComplete(questGiver->ToUnit(), pQuest->GetQuestId(), this);
 
     if (pQuest->GetRewChoiceItemsCount() > 0)
     {
@@ -16387,7 +16410,7 @@ void Player::UpdatePvPFlag(time_t currTime)
 {
     if (!IsPvP())
         return;
-    if (pvpInfo.endTimer == 0 || currTime < (pvpInfo.endTimer + 300))
+    if (pvpInfo.endTimer == 0 || currTime < (pvpInfo.endTimer + 300) || pvpInfo.inHostileArea || HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
         return;
 
     UpdatePvP(false);
@@ -17496,10 +17519,8 @@ void Player::UpdatePvP(bool state, bool ovrride)
     }
     else
     {
-        if (pvpInfo.endTimer != 0)
-            pvpInfo.endTimer = time(NULL);
-        else
-            SetPvP(state);
+        pvpInfo.endTimer = time(NULL);
+        SetPvP(state);
     }
 }
 void Player::SetBattleGroundEntryPoint(uint32 mapId, float x, float y, float z, float o)
@@ -18616,8 +18637,15 @@ void Player::RemoveItemDependentAurasAndCasts(Item * pItem)
     // currently casted spells can be dependent from item
     for (uint32 i = 0; i < CURRENT_MAX_SPELL; ++i)
         if (Spell* spell = GetCurrentSpell(CurrentSpellTypes(i)))
-            if (spell->getState() != SPELL_STATE_DELAYED && !HasItemFitToSpellReqirements(spell->m_spellInfo, pItem))
-                InterruptSpell(CurrentSpellTypes(i));
+            if (spell->getState() != SPELL_STATE_DELAYED)
+            {
+                if (!HasItemFitToSpellReqirements(spell->m_spellInfo, pItem))
+                    InterruptSpell(CurrentSpellTypes(i));
+                else
+                    for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+                        if (itemProto->Spells[j].SpellId == spell->m_spellInfo->Id && itemProto->Spells[j].SpellTrigger == 0)
+                            InterruptSpell(CurrentSpellTypes(i));
+            }
 }
 
 uint32 Player::GetResurrectionSpellId()
@@ -19204,6 +19232,9 @@ void Player::AutoStoreLoot(Loot& loot, bool broadcast, uint8 bag, uint8 slot)
     for (uint32 i = 0; i < max_slot; ++i)
     {
         LootItem* lootItem = loot.LootItemInSlot(i, GetGUIDLow());
+        // Don't bypass conditions
+        if (lootItem->conditionId && !lootItem->AllowedForPlayer(this, loot.GetLootTarget()))
+            continue;
 
         ItemPosCountVec dest;
         InventoryResult msg = CanStoreNewItem(bag, slot, dest, lootItem->itemid, lootItem->count);

@@ -4639,12 +4639,16 @@ bool ChatHandler::ShowAccountListHelper(QueryResult* result, uint32* limit, bool
             lastIp = "-";
         }
 
+        std::string acc_name = fields[1].GetCppString();
+        if (sAccountMgr.IsAccountBanned(account))
+            acc_name = acc_name + " [BANNED]";
+
         if (m_session)
             PSendSysMessage(LANG_ACCOUNT_LIST_LINE_CHAT,
-                            account, fields[1].GetString(), char_name, playerLink(lastIp).c_str(), security, fields[4].GetUInt32());
+                            account, acc_name.c_str(), char_name, playerLink(lastIp).c_str(), security, fields[4].GetUInt32());
         else
             PSendSysMessage(LANG_ACCOUNT_LIST_LINE_CONSOLE,
-                            account, fields[1].GetString(), char_name, playerLink(lastIp).c_str(), security, fields[4].GetUInt32());
+                            account, acc_name.c_str(), char_name, playerLink(lastIp).c_str(), security, fields[4].GetUInt32());
 
     }
     while (result->NextRow());

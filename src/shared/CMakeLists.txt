@@ -91,9 +91,17 @@ set (shared_SRCS
 	Database/SqlOperations.cpp
 	Database/SqlPreparedStatement.cpp
 	Database/SQLStorage.cpp
-
 )
 
+if(USE_LIBCURL)
+  set (shared_SRCS 
+    ${shared_SRCS}
+	SendgridMail.h
+	MailerService.h
+	SendgridMail.cpp
+	MailerService.cpp
+  )
+endif()
 
 # Exclude Win32 files
 if(WIN32)

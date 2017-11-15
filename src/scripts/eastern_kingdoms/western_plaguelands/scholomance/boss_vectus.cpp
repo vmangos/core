@@ -31,7 +31,7 @@ enum
     NPC_STUDENT                                     = 10475,
     NPC_MARDUK_BLACKPOOL                            = 10433,
 
-    VECTUS_SPEECH_GAMBIT_EVENT_START                = NOST_TEXT(117),
+    VECTUS_SPEECH_GAMBIT_EVENT_START                = 6883,
 
     GO_DAWN_S_GAMBIT                                = 177304,
 

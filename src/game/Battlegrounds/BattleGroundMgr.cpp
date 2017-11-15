@@ -35,8 +35,9 @@
 #include "WorldPacket.h"
 #include "Language.h"
 #include "GameEventMgr.h"
-
 #include "Policies/SingletonImp.h"
+#include <chrono>
+#include <random>
 
 INSTANTIATE_SINGLETON_1(BattleGroundMgr);
 
@@ -680,8 +681,13 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
 
     if (sWorld.getConfig(CONFIG_BOOL_BATTLEGROUND_RANDOMIZE))
     {
-        std::random_shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end());
-        std::random_shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end());
+        auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+        std::shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin(),
+            m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].end(),
+            std::default_random_engine(seed));
+        std::shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin(),
+            m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].end(),
+            std::default_random_engine(seed));
     }
 
     //battleground with free slot for player should be always in the beginning of the queue
@@ -750,9 +756,16 @@ void BattleGroundQueue::Update(BattleGroundTypeId bgTypeId, BattleGroundBracketI
         else
         {
             // Now randomize
-            std::random_shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin() + minPlayersInQueue);
-            std::random_shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin() + minPlayersInQueue);
-            sLog.out(LOG_BG, "Alterac queue randomized (%u alliance vs %u horde)", m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].size(), m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].size());
+            auto seed = std::chrono::system_clock::now().time_since_epoch().count();
+            std::shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin(),
+                m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].begin() + minPlayersInQueue,
+                std::default_random_engine(seed));
+            std::shuffle(m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin(),
+                m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].begin() + minPlayersInQueue,
+                std::default_random_engine(seed));
+            sLog.out(LOG_BG, "Alterac queue randomized (%u alliance vs %u horde)",
+                m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_ALLIANCE].size(),
+                m_QueuedGroups[bracket_id][BG_QUEUE_NORMAL_HORDE].size());
         }
     }
     if (bgTypeId == BATTLEGROUND_AV && sWorld.getConfig(CONFIG_UINT32_AV_INITIAL_MAX_PLAYERS) && !sBattleGroundMgr.isTesting() && normalMatchesCreationAttempts)

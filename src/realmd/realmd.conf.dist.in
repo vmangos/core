@@ -1,4 +1,4 @@
-############################################
+##################################4##########
 # MaNGOS realmd configuration file         #
 ############################################
 
@@ -114,6 +114,32 @@ ConfVersion=2010062001
 #        Default: 0 (No verification required)
 #                 1 (Verification required)
 #
+#    GeoLocking
+#        Blocks account logins when a change in geographical location is detected
+#        Default: 0
+#
+#    SendMail
+#        Whether the server is allowed to send emails
+#        The server must have been compiled with USE_SENDGRID
+#        Default: 0 (Do not send mail)
+#
+#    MailFrom
+#        Specify the email address to send mail from
+#        Default: ""
+#
+#    MailCertChecks
+#        Whether to validate the certificates of the mail server
+#        Default: 1 (Recommended)
+#
+#    SendGridKey
+#        If SendGrid is being used for emailing, specify your API key here
+#        This option must be set if SendGrid is enabled
+#        Default: ""
+#
+#    GeolockGUID
+#        The SendGrid template GUID for geolocking emails
+#        Default: ""
+#
 ###################################################################################################################
 
 LoginDatabaseInfo = "127.0.0.1;3306;mangos;mangos;realmd"
@@ -137,3 +163,9 @@ WrongPass.MaxCount = 0
 WrongPass.BanTime = 600
 WrongPass.BanType = 0
 ReqEmailVerification = 0
+GeoLocking = 0
+SendMail = 0
+MailFrom = ""
+MailCertChecks = 1
+SendGridKey = ""
+GeolockGUID = ""

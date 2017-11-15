@@ -731,6 +731,7 @@ m_obj->m_updateTracker.Reset();
         void SetName(const std::string& newname) { m_name=newname; }
 
         virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
+        virtual uint8 getGender() const { return 0; } // used in chat builder
 
         float GetExactDistance( const WorldObject* obj ) const;
         float GetExactDistance(float x, float y, float z) const;
@@ -817,6 +818,10 @@ m_obj->m_updateTracker.Reset();
         void SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver);
         void DirectSendPublicValueUpdate(uint32 index);
 
+        void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
+        void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
+        void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
+
         void PMonsterSay(const char* text, ...);
         void PMonsterSay(int32 text, ...) const;
         void PMonsterYell(const char* text, ...);
@@ -832,11 +837,7 @@ m_obj->m_updateTracker.Reset();
         void MonsterWhisper(int32 textId, Unit* receiver, bool IsBossWhisper = false) const;
         void MonsterYellToZone(int32 textId, uint32 language = 0, Unit* target = nullptr) const;
         void MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language = 0, Unit* target = nullptr) const;
-        static void BuildMonsterChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid);
-
-        void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
-        void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
-        void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
+        static void BuildWorldObjectChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid);
 
         void SendObjectDeSpawnAnim(ObjectGuid guid);
 

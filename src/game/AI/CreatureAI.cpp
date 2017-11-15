@@ -60,6 +60,10 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
     if (pSpell->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, m_creature))
         return CAST_FAIL_OTHER;
 
+    // If the spell requires the target having a specific power type
+    if (!IsTargetPowerTypeValid(pSpell, pTarget->getPowerType()))
+        return CAST_FAIL_OTHER;
+
     // If the unit is disarmed and the skill requires a weapon, it cannot be cast
     if (m_creature->HasWeapon() && !m_creature->CanUseEquippedWeapon(BASE_ATTACK))
     {

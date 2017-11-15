@@ -45,7 +45,9 @@ enum LockFlag
     IP_LOCK         = 0x01,
     FIXED_PIN       = 0x02,
     TOTP            = 0x04,
-    ALWAYS_ENFORCE  = 0x08
+    ALWAYS_ENFORCE  = 0x08,
+    GEO_COUNTRY     = 0x10,
+    GEO_CITY        = 0x20
 };
 
 /// Handle login commands
@@ -100,10 +102,14 @@ class AuthSocket: public BufferedSocket
         std::string _login;
         std::string _safelogin;
         std::string securityInfo;
+        std::string _lastIP;
+        std::string _email;
 
         BigNumber serverSecuritySalt;
         LockFlag lockFlags;
         uint32 gridSeed;
+        bool _geolocked;
+        uint32_t _geoUnlockPIN;
 
         static constexpr uint32 Win = 'Win';
         static constexpr uint32 OSX = 'OSX';
@@ -123,6 +129,7 @@ class AuthSocket: public BufferedSocket
 
         AccountTypes GetSecurityOn(uint32 realmId) const;
         void LoadAccountSecurityLevels(uint32 accountId);
+        bool GeographicalLockCheck();
 
         AccountTypes _accountDefaultSecurityLevel;
         typedef std::map<uint32, AccountTypes> AccountSecurityMap;

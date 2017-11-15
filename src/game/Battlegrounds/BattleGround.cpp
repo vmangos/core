@@ -110,7 +110,7 @@ public:
 private:
     void do_helper(WorldPacket& data, char const* text)
     {
-        //copyied from BuildMonsterChat
+        //copyied from BuildWorldObjectChat
         data << uint8(CHAT_MSG_MONSTER_YELL);
         data << uint32(i_language);
         data << ObjectGuid(i_source->GetObjectGuid());
@@ -174,7 +174,7 @@ public:
 
         char str [2048];
         snprintf(str, 2048, text, arg1str, arg2str);
-        //copyied from BuildMonsterChat
+        //copyied from BuildWorldObjectChat
         data << uint8(CHAT_MSG_MONSTER_YELL);
         data << uint32(i_language);
         data << ObjectGuid(i_source->GetObjectGuid());
