@@ -11688,8 +11688,11 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
     bool canSeeQuests = menuId == GetDefaultGossipMenuForSource(pSource);
 
     // If we're not a quest giver, don't show quests in the gossip
-    if (canSeeQuests && pSource->IsCreature() && !pSource->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER))
+    if (canSeeQuests && pSource->IsCreature() &&
+        !pSource->HasFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_BATTLEMASTER))
+    {
         canSeeQuests = false;
+    }
 
     // if canSeeQuests (the default, top level menu) and no menu options exist for this, use options from default options
     if (pMenuItemBounds.first == pMenuItemBounds.second && canSeeQuests)
