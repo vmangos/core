@@ -130,7 +130,8 @@ ObjectMgr::ObjectMgr() :
     m_GroupIds("Group ids"),
     m_PetitionIds("Petition ids"),
     // Nostalrius
-    DBCLocaleIndex(0)
+    DBCLocaleIndex(0),
+    m_OldMailCounter(0)
 {
     // Only zero condition left, others will be added while loading DB tables
     mConditions.resize(1);
@@ -4669,6 +4670,7 @@ public:
     {
         if (!result)
         {
+            sObjectMgr.ResetOldMailCounter();
             if (!serverUp)
             {
                 BarGoLink bar(1);
@@ -4681,7 +4683,7 @@ public:
         }
 
         BarGoLink bar(result->GetRowCount());
-        uint32 count = 0;
+        uint32 skippedCount = 0;
         Field *fields;
 
         do
@@ -4704,6 +4706,7 @@ public:
             if (serverUp && sObjectAccessor.FindPlayerNotInWorld(m->receiverGuid))
             {
                 // Online player. We wait for him to logout to send the mail back (ie next call)
+                ++skippedCount;
                 delete m;
                 continue;
             }
@@ -4734,9 +4737,10 @@ public:
             // delmails << m->messageID << ", ";
             CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", m->messageID);
             delete m;
-            ++count;
+            
         }
         while (result->NextRow());
+        sObjectMgr.IncrementOldMailCounter(skippedCount);
         delete result;
         delete this;
     }
@@ -4754,7 +4758,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
     cb->serverUp = serverUp;
     cb->basetime = basetime;
     uint32 limit = serverUp ? 5 : 1000;
-    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT id,messageType,sender,receiver,itemTextId,has_items,expire_time,cod,checked,mailTemplateId FROM mail WHERE expire_time < '" UI64FMTD "' LIMIT 0,%u", (uint64)basetime, limit);
+    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT id,messageType,sender,receiver,itemTextId,has_items,expire_time,cod,checked,mailTemplateId FROM mail WHERE expire_time < '" UI64FMTD "' ORDER BY expire_time LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
 }
 
 void ObjectMgr::LoadQuestAreaTriggers()

@@ -1293,6 +1293,9 @@ class ObjectMgr
 
         QuestRelationsMap& GetCreatureQuestRelationsMap() { return m_CreatureQuestRelations; }
 
+        void ResetOldMailCounter() { m_OldMailCounter = 0; }
+        void IncrementOldMailCounter(uint32 count) { m_OldMailCounter += count; }
+
     protected:
 
         // first free id for selected id type
@@ -1373,6 +1376,8 @@ class ObjectMgr
         QuestRelationsMap       m_GOQuestInvolvedRelations;
 
         int DBCLocaleIndex;
+
+        uint32 m_OldMailCounter;
 
     private:
         void LoadCreatureAddons(SQLStorage& creatureaddons, char const* entryName, char const* comment);
