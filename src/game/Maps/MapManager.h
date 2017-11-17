@@ -72,6 +72,8 @@ struct MANGOS_DLL_DECL MapID
     uint32 nInstanceId;
 };
 
+struct ScheduledTeleportData;
+
 class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::ClassLevelLockable<MapManager, ACE_Recursive_Thread_Mutex> >
 {
     friend class MaNGOS::OperatorNew<MapManager>;
@@ -178,6 +180,11 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         void ScheduleInstanceSwitch(Player* player, uint16 newInstance);
         void SwitchPlayersInstances();
 
+        void ScheduleFarTeleport(Player *player, ScheduledTeleportData *data);
+        void ExecuteDelayedPlayerTeleports();
+        void ExecuteSingleDelayedTeleport(Player *player);
+        void CancelDelayedPlayerTeleport(Player *player);
+
         void MarkContinentUpdateFinished(int idx)
         {
             ASSERT(idx < i_maxContinentThread);
@@ -228,6 +235,12 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         const static int LAST_CONTINENT_ID = 2;
         ACE_Thread_Mutex    m_scheduledInstanceSwitches_lock[LAST_CONTINENT_ID];
         std::map<Player*, uint16 /* new instance */> m_scheduledInstanceSwitches[LAST_CONTINENT_ID]; // 2 continents
+
+        ACE_Thread_Mutex m_scheduledFarTeleportsLock;
+        typedef std::map<Player*, ScheduledTeleportData*> ScheduledTeleportMap;
+        ScheduledTeleportMap m_scheduledFarTeleports;
+
+        void ExecuteSingleDelayedTeleport(ScheduledTeleportMap::iterator iter);
 };
 
 template<typename Do>

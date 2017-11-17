@@ -473,6 +473,7 @@ Player::Player(WorldSession *session) : Unit(),
 
     mSemaphoreTeleport_Near = false;
     mSemaphoreTeleport_Far = false;
+    mPendingFarTeleport = false;
 
     m_DelayedOperations = 0;
     m_bCanDelayTeleport = false;
@@ -614,6 +615,12 @@ Player::~Player()
     // clean up player-instance binds, may unload some instance saves
     for (BoundInstancesMap::iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
         itr->second.state->RemovePlayer(this);
+
+    // Cleanup delayed teleport if it was not executed before object deletion
+    // This shouldn't actually happen, but if someone does a bad we need to
+    // clean up anyway
+    sMapMgr.CancelDelayedPlayerTeleport(this);
+
     ASSERT(!m_groupInvite);
 }
 
@@ -1874,6 +1881,7 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     if (!(options & TELE_TO_NOT_LEAVE_TRANSPORT) || !m_transport)
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
 
+    // Near teleport, let it happen immediately since we remain in the same map
     if ((GetMapId() == mapid) && (!m_transport) && !(options & TELE_TO_FORCE_MAP_CHANGE))
     {
         //lets reset far teleport flag if it wasn't reset during chained teleports
@@ -1938,7 +1946,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
     }
     else
     {
-        // far teleport to another map
         Map* oldmap = IsInWorld() ? GetMap() : NULL;
         // check if we can enter before stopping combat / removing pet / totems / interrupting spells
 
@@ -1947,8 +1954,6 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         if (!sMapMgr.CanPlayerEnter(mapid, this))
             return false;
 
-        // If the map is not created, assume it is possible to enter it.
-        // It will be created in the WorldPortAck.
         DungeonPersistentState* state = GetBoundInstanceSaveForSelfOrGroup(mapid);
         uint32 instanceId = 0;
         if (state)
@@ -1956,129 +1961,152 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         if (mapid <= 1)
             instanceId = sMapMgr.GetContinentInstanceId(mapid, x, y);
         Map *map = sMapMgr.FindMap(mapid, instanceId);
-        if (!map || map->CanEnter(this))
+        if (map && !map->CanEnter(this))
+            return false;
+
+        // Far teleport to another map. We can't do this right now since it means
+        // we need to remove from this map mid-update. Instead, schedule it for
+        // after updates are complete
+        ScheduledTeleportData *data = new ScheduledTeleportData(mapid, x, y, z, orientation, options, recover);
+
+        sMapMgr.ScheduleFarTeleport(this, data);
+    }
+    return true;
+}
+
+bool Player::ExecuteTeleportFar(ScheduledTeleportData *data)
+{
+    Map* oldmap = IsInWorld() ? GetMap() : NULL;
+    // check if we can enter before stopping combat / removing pet / totems / interrupting spells
+
+    // Check enter rights before map getting to avoid creating instance copy for player
+    // this check not dependent from map instance copy and same for all instance copies of selected map
+    uint32 mapid = data->targetMapId;
+    if (!sMapMgr.CanPlayerEnter(mapid, this))
+        return false;
+
+    // If the map is not created, assume it is possible to enter it.
+    // It will be created in the WorldPortAck.
+    DungeonPersistentState* state = GetBoundInstanceSaveForSelfOrGroup(mapid);
+    uint32 instanceId = 0;
+    if (state)
+        instanceId = state->GetInstanceId();
+    if (mapid <= 1)
+        instanceId = sMapMgr.GetContinentInstanceId(mapid, data->x, data->y);
+    Map *map = sMapMgr.FindMap(mapid, instanceId);
+    if (!map || map->CanEnter(this))
+    {
+        //lets reset near teleport flag if it wasn't reset during chained teleports
+        SetSemaphoreTeleportNear(false);
+
+        SetSelectionGuid(ObjectGuid());
+        CombatStop();
+        ResetContestedPvP();
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+
+        // reset extraAttack counter
+        ResetExtraAttacks();
+
+        /*
+        * Fix exploit:
+        * 1. Use summoning ritual to teleport a player
+        * 2. The teleported player tp to homebind <- Should remove teleport invitation
+        * 3. And accepts teleport to come back to the instance
+        */
+        m_summon_expire = 0;
+
+        // remove player from battleground on far teleport (when changing maps)
+        if (BattleGround const* bg = GetBattleGround())
         {
-            //lets reset near teleport flag if it wasn't reset during chained teleports
-            SetSemaphoreTeleportNear(false);
-            //setup delayed teleport flag
-            //if teleport spell is casted in Unit::Update() func
-            //then we need to delay it until update process will be finished
-            if (SetDelayedTeleportFlagIfCan())
+            // Note: at battleground join battleground id set before teleport
+            // and we already will found "current" battleground
+            // just need check that this is targeted map or leave
+            if (bg->GetMapId() != mapid)
+                LeaveBattleground(false);                   // don't teleport to entry point
+        }
+
+        // remove pet on map change
+        Pet* pet = GetPet();
+        if (pet)
+            UnsummonPetTemporaryIfAny();
+
+        // remove all dyn objects
+        RemoveAllDynObjects();
+
+        // stop spellcasting
+        // not attempt interrupt teleportation spell at caster teleport
+        if (!(data->options & TELE_TO_SPELL))
+            if (IsNonMeleeSpellCasted(true))
+                InterruptNonMeleeSpells(true);
+
+        //remove auras before removing from map...
+        RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
+        RemoveCharmAuras();
+
+        if (!GetSession()->PlayerLogout())
+        {
+            // send transfer packet to display load screen
+            WorldPacket data(SMSG_TRANSFER_PENDING, (4 + 4 + 4));
+            data << uint32(mapid);
+            if (m_transport)
             {
-                SetSemaphoreTeleportFar(true);
-                //lets save teleport destination for player
-                m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
-                m_teleport_options = options;
-                m_teleportRecoverDelayed = recover;
-                return true;
+                data << uint32(m_transport->GetEntry());
+                data << uint32(GetMapId());
             }
+            GetSession()->SendPacket(&data);
+        }
 
-            SetSelectionGuid(ObjectGuid());
-            CombatStop();
-            ResetContestedPvP();
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
+        // remove from old map now
+        if (oldmap)
+            oldmap->Remove(this, false);
 
-            // reset extraAttack counter
-            ResetExtraAttacks();
+        m_teleport_dest = WorldLocation(mapid, data->x, data->y, data->z, data->orientation);
+        DisableSpline();
+        SetFallInformation(0, data->z);
+        ScheduleDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
 
-            /*
-             * Fix exploit:
-             * 1. Use summoning ritual to teleport a player
-             * 2. The teleported player tp to homebind <- Should remove teleport invitation
-             * 3. And accepts teleport to come back to the instance
-             */
-            m_summon_expire = 0;
+        // if the player is saved before worldport ack (at logout for example)
+        // this will be used instead of the current location in SaveToDB
 
-            // remove player from battleground on far teleport (when changing maps)
-            if (BattleGround const* bg = GetBattleGround())
-            {
-                // Note: at battleground join battleground id set before teleport
-                // and we already will found "current" battleground
-                // just need check that this is targeted map or leave
-                if (bg->GetMapId() != mapid)
-                    LeaveBattleground(false);                   // don't teleport to entry point
-            }
+        // move packet sent by client always after far teleport
+        // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
+        SetSemaphoreTeleportFar(true);
 
-            // remove pet on map change
-            if (pet)
-                UnsummonPetTemporaryIfAny();
-
-            // remove all dyn objects
-            RemoveAllDynObjects();
-
-            // stop spellcasting
-            // not attempt interrupt teleportation spell at caster teleport
-            if (!(options & TELE_TO_SPELL))
-                if (IsNonMeleeSpellCasted(true))
-                    InterruptNonMeleeSpells(true);
-
-            //remove auras before removing from map...
-            RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
-            RemoveCharmAuras();
-            if (!GetSession()->PlayerLogout())
-            {
-                // send transfer packet to display load screen
-                WorldPacket data(SMSG_TRANSFER_PENDING, (4 + 4 + 4));
+        if (!GetSession()->PlayerLogout())
+        {
+            const auto wps = [this, mapid]() {
+                // transfer finished, inform client to start load
+                WorldPacket data(SMSG_NEW_WORLD, (20));
                 data << uint32(mapid);
                 if (m_transport)
                 {
-                    data << uint32(m_transport->GetEntry());
-                    data << uint32(GetMapId());
+                    data << m_movementInfo.GetTransportPos()->x;
+                    data << m_movementInfo.GetTransportPos()->y;
+                    data << m_movementInfo.GetTransportPos()->z;
+                    data << m_movementInfo.GetTransportPos()->o;
+                }
+                else
+                {
+                    data << m_teleport_dest.coord_x;
+                    data << m_teleport_dest.coord_y;
+                    data << m_teleport_dest.coord_z;
+                    data << m_teleport_dest.orientation;
                 }
                 GetSession()->SendPacket(&data);
-            }
-
-            // remove from old map now
-            if (oldmap)
-                oldmap->Remove(this, false);
-
-            m_teleport_dest = WorldLocation(mapid, x, y, z, orientation);
-            DisableSpline();
-            SetFallInformation(0, z);
-            ScheduleDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
-
-            // if the player is saved before worldport ack (at logout for example)
-            // this will be used instead of the current location in SaveToDB
-
-            // move packet sent by client always after far teleport
-            // code for finish transfer to new map called in WorldSession::HandleMoveWorldportAckOpcode at client packet
-            SetSemaphoreTeleportFar(true);
-
-            if (!GetSession()->PlayerLogout())
-            {
-                const auto wps = [this, mapid](){
-                    // transfer finished, inform client to start load
-                    WorldPacket data(SMSG_NEW_WORLD, (20));
-                    data << uint32(mapid);
-                    if (m_transport)
-                    {
-                        data << m_movementInfo.GetTransportPos()->x;
-                        data << m_movementInfo.GetTransportPos()->y;
-                        data << m_movementInfo.GetTransportPos()->z;
-                        data << m_movementInfo.GetTransportPos()->o;
-                    }
-                    else
-                    {
-                        data << m_teleport_dest.coord_x;
-                        data << m_teleport_dest.coord_y;
-                        data << m_teleport_dest.coord_z;
-                        data << m_teleport_dest.orientation;
-                    }
-                    GetSession()->SendPacket(&data);
-                    SendMovementMessageToSet(std::move(data), true);
-                    SendSavedInstances();
-                };
-                if (recover)
-                    m_teleportRecover = recover;
-                else
-                    m_teleportRecover = wps;
-                wps();
-            }
+                SendMovementMessageToSet(std::move(data), true);
+                SendSavedInstances();
+            };
+            if (data->recover)
+                m_teleportRecover = data->recover;
+            else
+                m_teleportRecover = wps;
+            wps();
         }
-        else
-            return false;
+
+        return true;
     }
-    return true;
+
+    return false;
 }
 
 void Player::restorePendingTeleport()
@@ -18400,11 +18428,15 @@ bool Player::HasQuestForGO(int32 GOId) const
     return false;
 }
 
-// Not multithreaded
 void Player::UpdateForQuestWorldObjects()
 {
+    // Don't process updates if we're not in the world (map is NULL)
+    if (!IsInWorld() || !FindMap())
+        return;
+
     uint32 count = 0;
     UpdateData upd;
+    m_visibleGUIDs_lock.acquire_read();
     for (ObjectGuidSet::const_iterator itr = m_visibleGUIDs.begin(); itr != m_visibleGUIDs.end(); ++itr)
     {
         if (itr->IsGameObject())
@@ -18418,6 +18450,7 @@ void Player::UpdateForQuestWorldObjects()
                     }
         }
     }
+    m_visibleGUIDs_lock.release();
     if (count)
         upd.Send(GetSession());
 }

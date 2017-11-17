@@ -1133,7 +1133,7 @@ void Object::ExecuteDelayedActions()
 
 bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
 {
-    if (objToLoot && IsInMap(objToLoot) && objToLoot->GetMap()->IsRaid())
+    if (objToLoot && objToLoot->GetMap()->IsRaid() && IsInMap(objToLoot))
         return true;
 
     return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->m_lootAndXPRangeModifier, false);
@@ -1343,6 +1343,11 @@ bool WorldObject::IsWithinDist2d(float x, float y, float dist2compare) const
     float maxdist = dist2compare + sizefactor;
 
     return distsq < maxdist * maxdist;
+}
+
+bool WorldObject::IsInMap(const WorldObject* obj) const
+{
+    return IsInWorld() && obj->IsInWorld() && (GetMap() == obj->GetMap());
 }
 
 bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const
@@ -1822,6 +1827,12 @@ void WorldObject::SetMap(Map * map)
 
     // Order is important, must be done after m_currMap is set
     SetZoneScript();
+}
+
+Map* WorldObject::GetMap() const
+{
+    MANGOS_ASSERT(m_currMap);
+    return m_currMap;
 }
 
 void WorldObject::ResetMap()

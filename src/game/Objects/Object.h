@@ -741,10 +741,7 @@ m_obj->m_updateTracker.Reset();
         float GetDistance2d(float x, float y) const;
         float GetDistanceZ(const WorldObject* obj) const;
         float GetDistanceSqr(float x, float y, float z) const;
-        bool IsInMap(const WorldObject* obj) const
-        {
-            return IsInWorld() && obj->IsInWorld() && (GetMap() == obj->GetMap());
-        }
+        bool IsInMap(const WorldObject* obj) const;
         bool IsWithinDist3d(float x, float y, float z, float dist2compare) const;
         bool IsWithinDist2d(float x, float y, float dist2compare) const;
         bool _IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const;
@@ -861,7 +858,7 @@ m_obj->m_updateTracker.Reset();
         virtual bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const = 0;
 
         void SetMap(Map * map);
-        Map * GetMap() const { MANGOS_ASSERT(m_currMap); return m_currMap; }
+        Map * GetMap() const;
         Map * FindMap() const { return m_currMap; }
 
         //used to check all object's GetMap() calls when object is not in world!

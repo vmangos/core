@@ -651,6 +651,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
         else
             pCurrChar->TeleportToHomebind();
+
+        sMapMgr.ExecuteSingleDelayedTeleport(pCurrChar);
     }
 
     if (alreadyOnline)
