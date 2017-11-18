@@ -865,21 +865,6 @@ InstanceData* GetInstanceData_instance_temple_of_ahnqiraj(Map* pMap)
     return new instance_temple_of_ahnqiraj(pMap);
 }
 
-bool GossipHello_npc_Caelestrasz(Player* pPlayer, Creature* pCreature)
-{
-    pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-    if (InstanceData* instData = pCreature->GetInstanceData()) {
-        if (instData->GetData(TYPE_CTHUN) == DONE) {
-            pPlayer->SEND_GOSSIP_MENU(40101, pCreature->GetGUID());
-        }
-        else {
-            pPlayer->SEND_GOSSIP_MENU(40100, pCreature->GetGUID());
-        }
-        return true;
-    }
-    return false;
-}
-
 CreatureAI* GetAI_qirajiMindslayer(Creature* pCreature)
 {
     return new AI_QirajiMindslayer(pCreature);
@@ -897,11 +882,6 @@ void AddSC_instance_temple_of_ahnqiraj()
     pNewScript = new Script;
     pNewScript->Name = "at_temple_ahnqiraj";
     pNewScript->pAreaTrigger = &AreaTrigger_at_temple_ahnqiraj;
-    pNewScript->RegisterSelf();
-
-    pNewScript = new Script;
-    pNewScript->Name = "aq_caelestrasz_ai";
-    pNewScript->pGossipHello = &GossipHello_npc_Caelestrasz;
     pNewScript->RegisterSelf();
 
     pNewScript = new Script;

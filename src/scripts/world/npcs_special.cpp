@@ -221,47 +221,6 @@ const uint32 HordeSoldierId[3] =
 ## npc_doctor (handles both Gustaf Vanhowzen and Gregory Victor)
 ######*/
 
-bool GossipHello_npc_doctor(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetObjectGuid());
-
-    if ((pPlayer->GetTeam() == ALLIANCE && pPlayer->GetQuestStatus(QUEST_TRIAGE_A) == QUEST_STATUS_COMPLETE) || (pPlayer->GetTeam() == HORDE && pPlayer->GetQuestStatus(QUEST_TRIAGE_H) == QUEST_STATUS_COMPLETE))
-    {
-        if (pPlayer->GetSkillValue(SKILL_FIRST_AID) >= 240 && !pPlayer->HasSpell(10841))
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, -3100005, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        if (pPlayer->GetSkillValue(SKILL_FIRST_AID) >= 260 && !pPlayer->HasSpell(18629))
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, -3100006, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-        if (pPlayer->GetSkillValue(SKILL_FIRST_AID) >= 290 && !pPlayer->HasSpell(18630))
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, -3100007, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 3);
-    }
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetObjectGuid());
-    return true;
-}
-
-bool GossipSelect_npc_doctor(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    switch (uiAction)
-    {
-    case GOSSIP_ACTION_INFO_DEF + 1:
-        pPlayer->CastSpell(pPlayer, 10843, true);
-        pPlayer->CLOSE_GOSSIP_MENU();
-        break;
-    case GOSSIP_ACTION_INFO_DEF + 2:
-        pPlayer->CastSpell(pPlayer, 18631, true);
-        pPlayer->CLOSE_GOSSIP_MENU();
-        break;
-    case GOSSIP_ACTION_INFO_DEF + 3:
-        pPlayer->CastSpell(pPlayer, 18632, true);
-        pPlayer->CLOSE_GOSSIP_MENU();
-        break;
-    }
-    return true;
-}
-
 struct npc_doctorAI : public ScriptedAI
 {
     npc_doctorAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -3537,8 +3496,6 @@ void AddSC_npcs_special()
     newscript->GetAI = &GetAI_npc_doctor;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_doctor;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_doctor;
-    newscript->pGossipHello = &GossipHello_npc_doctor;
-    newscript->pGossipSelect = &GossipSelect_npc_doctor;
     newscript->RegisterSelf();
 
     newscript = new Script;

@@ -39,12 +39,10 @@ enum AshbringerEventMisc
     NPC_COMMANDER_MOGRAINE = 3976,
     NPC_HIGHLORD_MOGRAINE = 16062,
 
-    SAY_HAVE_YOU_COME = -1999927,
     SAY_AND_SO_IT_BEG = -1999928,
     SAY_ASHBRINGER    = -1999916,
     SAY_KNEEL_BEFORE  = -1999917,
     SAY_MY_LORD       = -1999918,
-    SAY_TAKE_ME_WITH  = -1999919,
     GO_CHAPPEL_DOOR   = 104591,
 
     SAY_COMMANDER1  = -1999920,
@@ -171,6 +169,26 @@ struct instance_scarlet_monastery : ScriptedInstance
         return 0;
     }
 
+    uint32 GetRandomScarletText()
+    {
+        switch (urand(0, 6))
+        {
+            case 0:
+                return 12378;
+            case 1:
+                return 12379;
+            case 2:
+                return 12380;
+            case 3:
+                return 12381;
+            case 4:
+                return 12382;
+            case 5:
+                return 12383;
+        }
+        return 12384;
+    }
+
     void OnCreatureSpellHit(Unit* pCaster, Creature* receiver, const SpellEntry* spell) override
     {
         if (!m_ashbringerActive || !pCaster || !receiver || !spell)
@@ -204,7 +222,7 @@ struct instance_scarlet_monastery : ScriptedInstance
             if (!m_ashbringerSayTimer && urand(0,1))
             {
                 m_ashbringerSayTimer = 2000;
-                DoScriptText(irand(SAY_TAKE_ME_WITH, SAY_HAVE_YOU_COME), receiver);
+                DoScriptText(GetRandomScarletText(), receiver);
             }
             break;
         }

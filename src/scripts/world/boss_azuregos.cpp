@@ -28,8 +28,8 @@ enum
     ITEM_MAGICAL_LEDGER         = 20949,
 
     TEXT_HARM                   = 7880,
-    TEXT_SAVING_WORLD           = 1548114,
-    TEXT_SCEPTER_0              = 1548101,
+    TEXT_SAVING_WORLD           = 7901,
+    TEXT_SCEPTER_0              = 7885,
     PLAYER_SAY_0                = -3100013,
     MAX_SCEPTER_DIALOGUE        = 13,
 
