@@ -110,6 +110,24 @@ struct BroadcastText
     uint32 EmoteDelay0;
     uint32 EmoteDelay1;
     uint32 EmoteDelay2;
+
+    std::string const& GetText(int locale_index, uint8 gender, bool forceGender) const
+    {
+        if ((gender == GENDER_FEMALE || gender == GENDER_NONE) && (forceGender || !FemaleText[LOCALE_enUS].empty()))
+        {
+            if ((int32)FemaleText.size() > locale_index + 1 && !FemaleText[locale_index + 1].empty())
+                return FemaleText[locale_index + 1];
+            else
+                return FemaleText[0];
+        }
+        // else if (gender == GENDER_MALE)
+        {
+            if ((int32)MaleText.size() > locale_index + 1 && !MaleText[locale_index + 1].empty())
+                return MaleText[locale_index + 1];
+            else
+                return MaleText[0];
+        }
+    }
 };
 
 typedef std::unordered_map<uint32, BroadcastText> BroadcastTextLocaleMap;
@@ -209,7 +227,6 @@ typedef UNORDERED_MAP<uint32,CreatureLocale> CreatureLocaleMap;
 typedef UNORDERED_MAP<uint32,GameObjectLocale> GameObjectLocaleMap;
 typedef UNORDERED_MAP<uint32,ItemLocale> ItemLocaleMap;
 typedef UNORDERED_MAP<uint32,QuestLocale> QuestLocaleMap;
-typedef UNORDERED_MAP<uint32,NpcTextLocale> NpcTextLocaleMap;
 typedef UNORDERED_MAP<uint32,PageTextLocale> PageTextLocaleMap;
 typedef UNORDERED_MAP<int32,MangosStringLocale> MangosStringLocaleMap;
 typedef UNORDERED_MAP<uint32,QuestGreetingLocale> QuestGreetingLocaleMap;
@@ -430,7 +447,7 @@ class PlayerCondition
 
 // NPC gossip text id
 typedef UNORDERED_MAP<uint32, uint32> CacheNpcTextIdMap;
-
+typedef UNORDERED_MAP<uint32, NpcText> NpcTextMap;
 typedef UNORDERED_MAP<uint32, VendorItemData> CacheVendorItemMap;
 typedef UNORDERED_MAP<uint32, TrainerSpellData> CacheTrainerSpellMap;
 
@@ -726,8 +743,6 @@ class ObjectMgr
 
         static char* const GetPatchName();
 
-        GossipText const* GetGossipText(uint32 Text_ID) const;
-
         WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team);
         bool AddGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = true);
         void RemoveGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = false);
@@ -830,7 +845,6 @@ class ObjectMgr
         void LoadItemRequiredTarget();
         void LoadItemLocales();
         void LoadQuestLocales();
-        void LoadGossipTextLocales();
         void LoadPageTextLocales();
         void LoadGossipMenuItemsLocales();
         void LoadPointOfInterestLocales();
@@ -839,7 +853,7 @@ class ObjectMgr
         void LoadAreaTemplate();
         void LoadAreaLocales();
 
-        void LoadGossipText();
+        void LoadNPCText();
 
         void LoadAreaTriggerTeleports();
         void LoadQuestAreaTriggers();
@@ -996,10 +1010,10 @@ class ObjectMgr
             return &itr->second;
         }
 
-        NpcTextLocale const* GetNpcTextLocale(uint32 entry) const
+        NpcText const* GetNpcText(uint32 entry) const
         {
-            auto itr = mNpcTextLocaleMap.find(entry);
-            if(itr==mNpcTextLocaleMap.end()) return nullptr;
+            auto itr = mNpcTextMap.find(entry);
+            if(itr==mNpcTextMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1323,7 +1337,6 @@ class ObjectMgr
 
         QuestMap            mQuestTemplates;
 
-        typedef UNORDERED_MAP<uint32, GossipText> GossipTextMap;
         typedef UNORDERED_MAP<uint32, uint32> QuestAreaTriggerMap;
         typedef UNORDERED_MAP<uint32, std::string> ItemTextMap;
         // Map quest_id->id of start item
@@ -1338,7 +1351,6 @@ class ObjectMgr
         QuestAreaTriggerMap mQuestAreaTriggerMap;
         TavernAreaTriggerSet mTavernAreaTriggerSet;
         GameObjectForQuestSet mGameObjectForQuestSet;
-        GossipTextMap       mGossipText;
         AreaTriggerMap      mAreaTriggers;
         QuestStartingItemMap   mQuestStartingItems;
         BGEntranceTriggerMap mBGEntranceTriggers;
@@ -1417,7 +1429,7 @@ class ObjectMgr
         GameObjectLocaleMap mGameObjectLocaleMap;
         ItemLocaleMap mItemLocaleMap;
         QuestLocaleMap mQuestLocaleMap;
-        NpcTextLocaleMap mNpcTextLocaleMap;
+        NpcTextMap mNpcTextMap;
         PageTextLocaleMap mPageTextLocaleMap;
         MangosStringLocaleMap mMangosStringLocaleMap;
         BroadcastTextLocaleMap mBroadcastTextLocaleMap;

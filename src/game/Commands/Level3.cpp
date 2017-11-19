@@ -193,7 +193,6 @@ bool ChatHandler::HandleReloadAllLocalesCommand(char* /*args*/)
     HandleReloadLocalesGameobjectCommand((char*)"a");
     HandleReloadLocalesGossipMenuOptionCommand((char*)"a");
     HandleReloadLocalesItemCommand((char*)"a");
-    HandleReloadLocalesNpcTextCommand((char*)"a");
     HandleReloadLocalesPageTextCommand((char*)"a");
     HandleReloadLocalesPointsOfInterestCommand((char*)"a");
     HandleReloadLocalesQuestCommand((char*)"a");
@@ -435,7 +434,7 @@ bool ChatHandler::HandleReloadNpcGossipCommand(char* /*args*/)
 bool ChatHandler::HandleReloadNpcTextCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading `npc_text` Table!");
-    sObjectMgr.LoadGossipText();
+    sObjectMgr.LoadNPCText();
     SendSysMessage("DB table `npc_text` reloaded.");
     return true;
 }
@@ -833,14 +832,6 @@ bool ChatHandler::HandleReloadLocalesItemCommand(char* /*args*/)
     sLog.outString("Re-Loading Locales Item ... ");
     sObjectMgr.LoadItemLocales();
     SendSysMessage("DB table `locales_item` reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadLocalesNpcTextCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Locales NPC Text ... ");
-    sObjectMgr.LoadGossipTextLocales();
-    SendSysMessage("DB table `locales_npc_text` reloaded.");
     return true;
 }
 

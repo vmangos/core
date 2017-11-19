@@ -248,7 +248,7 @@ void PlayerMenu::SendPointOfInterest(uint32 poi_id)
 
 void PlayerMenu::SendTalking(uint32 textID)
 {
-    GossipText const* pGossip = sObjectMgr.GetGossipText(textID);
+    NpcText const* pGossip = sObjectMgr.GetNpcText(textID);
 
     WorldPacket data(SMSG_NPC_TEXT_UPDATE, 100);            // guess size
     data << textID;                                         // can be < 0
@@ -272,45 +272,48 @@ void PlayerMenu::SendTalking(uint32 textID)
     else
     {
         std::string Text_0[8], Text_1[8];
-        for (int i = 0; i < 8; ++i)
-        {
-            Text_0[i] = pGossip->Options[i].Text_0;
-            Text_1[i] = pGossip->Options[i].Text_1;
-        }
         int loc_idx = GetMenuSession()->GetSessionDbLocaleIndex();
-        if (loc_idx >= 0)
-        {
-            if (NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textID))
-            {
-                for (int i = 0; i < 8; ++i)
-                {
-                    if (nl->Text_0[i].size() > (size_t)loc_idx && !nl->Text_0[i][loc_idx].empty())
-                        Text_0[i] = nl->Text_0[i][loc_idx];
-                    if (nl->Text_1[i].size() > (size_t)loc_idx && !nl->Text_1[i][loc_idx].empty())
-                        Text_1[i] = nl->Text_1[i][loc_idx];
-                }
-            }
-        }
         for (int i = 0; i < 8; ++i)
         {
-            data << pGossip->Options[i].Probability;
-
-            if (Text_0[i].empty())
-                data << Text_1[i];
-            else
-                data << Text_0[i];
-
-            if (Text_1[i].empty())
-                data << Text_0[i];
-            else
-                data << Text_1[i];
-
-            data << pGossip->Options[i].Language;
-
-            for (int j = 0; j < 3; ++j)
+            BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(pGossip->Options[i].BroadcastTextID);
+            if (bct)
             {
-                data << pGossip->Options[i].Emotes[j]._Delay;
-                data << pGossip->Options[i].Emotes[j]._Emote;
+                Text_0[i] = bct->GetText(loc_idx, GENDER_MALE, true);
+                Text_1[i] = bct->GetText(loc_idx, GENDER_FEMALE, true);
+
+                data << pGossip->Options[i].Probability;
+
+                if (Text_0[i].empty())
+                    data << Text_1[i];
+                else
+                    data << Text_0[i];
+
+                if (Text_1[i].empty())
+                    data << Text_0[i];
+                else
+                    data << Text_1[i];
+
+                data << bct->Language;
+
+                data << bct->EmoteDelay0;
+                data << bct->EmoteId0;
+                data << bct->EmoteDelay1;
+                data << bct->EmoteId1;
+                data << bct->EmoteDelay2;
+                data << bct->EmoteId2;
+            }
+            else
+            {
+                data << float(0);
+                data << "Greetings $N";
+                data << "Greetings $N";
+                data << uint32(0);
+                data << uint32(0);
+                data << uint32(0);
+                data << uint32(0);
+                data << uint32(0);
+                data << uint32(0);
+                data << uint32(0);
             }
         }
     }

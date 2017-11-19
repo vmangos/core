@@ -12195,41 +12195,17 @@ void Player::SendPreparedQuest(ObjectGuid guid)
         {
             uint32 textid = sObjectMgr.GetNpcGossip(pCreature->GetGUIDLow());
 
-            GossipText const* gossiptext = sObjectMgr.GetGossipText(textid);
-            if (gossiptext)
+            NpcText const* gossiptext = sObjectMgr.GetNpcText(textid);
+            if (gossiptext && gossiptext->Options[0].BroadcastTextID)
             {
-                qe = gossiptext->Options[0].Emotes[0];
-
-                if (!gossiptext->Options[0].Text_0.empty())
+                if (BroadcastText const* bct = sObjectMgr.GetBroadcastTextLocale(gossiptext->Options[0].BroadcastTextID))
                 {
-                    title = gossiptext->Options[0].Text_0;
-                    
+                    qe._Emote = bct->EmoteId0;
+                    qe._Delay = bct->EmoteDelay0;
                     int loc_idx = GetSession()->GetSessionDbLocaleIndex();
-                    if (loc_idx >= 0)
-                    {
-                        NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textid);
-                        if (nl)
-                        {
-                            if ((int32)nl->Text_0[0].size() > loc_idx && !nl->Text_0[0][loc_idx].empty())
-                                title = nl->Text_0[0][loc_idx];
-                        }
-                    }
+                    title = bct->GetText(loc_idx, pCreature->getGender(), false);
                 }
-                else
-                {
-                    title = gossiptext->Options[0].Text_1;
-                    
-                    int loc_idx = GetSession()->GetSessionDbLocaleIndex();
-                    if (loc_idx >= 0)
-                    {
-                        NpcTextLocale const *nl = sObjectMgr.GetNpcTextLocale(textid);
-                        if (nl)
-                        {
-                            if ((int32)nl->Text_1[0].size() > loc_idx && !nl->Text_1[0][loc_idx].empty())
-                                title = nl->Text_1[0][loc_idx];
-                        }
-                    }
-                }
+                
             }
         }
         PlayerTalkClass->SendQuestGiverQuestList(qe, title, guid);

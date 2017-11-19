@@ -49,13 +49,7 @@ struct PageTextLocale
     std::vector<std::string> Text;
 };
 
-struct NpcTextLocale
-{
-    NpcTextLocale() { Text_0.resize(8); Text_1.resize(8); }
-
-    std::vector<std::vector<std::string> > Text_0;
-    std::vector<std::vector<std::string> > Text_1;
-};
+#define MAX_NPC_TEXT_OPTIONS 8
 
 struct QEmote
 {
@@ -63,18 +57,15 @@ struct QEmote
     uint32 _Delay;
 };
 
-struct GossipTextOption
+struct NpcTextOption
 {
-    std::string Text_0;
-    std::string Text_1;
-    uint32 Language;
     float Probability;
-    QEmote Emotes[3];
+    uint32 BroadcastTextID;
 };
 
-struct GossipText
+struct NpcText
 {
-    GossipTextOption Options[8];
+    NpcTextOption Options[8];
 };
 
 #endif

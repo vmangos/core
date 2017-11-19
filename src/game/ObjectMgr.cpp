@@ -4459,17 +4459,14 @@ struct SQLWorldLoader : public SQLStorageLoaderBase<SQLWorldLoader, SQLStorage>
     }
 };
 
-GossipText const *ObjectMgr::GetGossipText(uint32 Text_ID) const
+void ObjectMgr::LoadNPCText()
 {
-    GossipTextMap::const_iterator itr = mGossipText.find(Text_ID);
-    if (itr != mGossipText.end())
-        return &itr->second;
-    return NULL;
-}
+    mNpcTextMap.clear();                           // need for reload case
 
-void ObjectMgr::LoadGossipText()
-{
-    QueryResult *result = WorldDatabase.Query("SELECT * FROM npc_text");
+    QueryResult *result = WorldDatabase.Query("SELECT ID, "
+        "Probability0, Probability1, Probability2, Probability3, Probability4, Probability5, Probability6, Probability7, "
+        "BroadcastTextID0, BroadcastTextID1, BroadcastTextID2, BroadcastTextID3, BroadcastTextID4, BroadcastTextID5, BroadcastTextID6, BroadcastTextID7"
+        " FROM npc_text");
 
     int count = 0;
     if (!result)
@@ -4482,40 +4479,49 @@ void ObjectMgr::LoadGossipText()
         return;
     }
 
-    int cic;
-
     BarGoLink bar(result->GetRowCount());
 
     do
     {
         ++count;
-        cic = 0;
 
         Field *fields = result->Fetch();
 
         bar.step();
 
-        uint32 Text_ID    = fields[cic++].GetUInt32();
-        if (!Text_ID)
+        uint32 textID = fields[0].GetUInt32();
+        if (!textID)
         {
             sLog.outErrorDb("Table `npc_text` has record wit reserved id 0, ignore.");
             continue;
         }
 
-        GossipText& gText = mGossipText[Text_ID];
+        NpcText& npcText = mNpcTextMap[textID];
 
-        for (int i = 0; i < 8; ++i)
+        for (uint8 i = 0; i < MAX_NPC_TEXT_OPTIONS; ++i)
         {
-            gText.Options[i].Text_0           = fields[cic++].GetCppString();
-            gText.Options[i].Text_1           = fields[cic++].GetCppString();
+            npcText.Options[i].Probability = fields[1 + i].GetFloat();
+            npcText.Options[i].BroadcastTextID = fields[9 + i].GetUInt32();
+        }
 
-            gText.Options[i].Language         = fields[cic++].GetUInt32();
-            gText.Options[i].Probability      = fields[cic++].GetFloat();
-
-            for (int j = 0; j < 3; ++j)
+        for (uint8 i = 0; i < MAX_NPC_TEXT_OPTIONS; i++)
+        {
+            if (npcText.Options[i].BroadcastTextID)
             {
-                gText.Options[i].Emotes[j]._Delay  = fields[cic++].GetUInt32();
-                gText.Options[i].Emotes[j]._Emote  = fields[cic++].GetUInt32();
+                if (!GetBroadcastTextLocale(npcText.Options[i].BroadcastTextID))
+                {
+                    sLog.outErrorDb("NPCText (ID: %u) has a non-existing or incompatible BroadcastText (ID: %u, Index: %u)", textID, npcText.Options[i].BroadcastTextID, i);
+                    npcText.Options[i].BroadcastTextID = 0;
+                }
+            }
+        }
+
+        for (uint8 i = 0; i < MAX_NPC_TEXT_OPTIONS; i++)
+        {
+            if (npcText.Options[i].Probability > 0 && npcText.Options[i].BroadcastTextID == 0)
+            {
+                sLog.outErrorDb("NPCText (ID: %u) has a probability (Index: %u) set, but no BroadcastTextID to go with it", textID, i);
+                npcText.Options[i].Probability = 0;
             }
         }
     }
@@ -4524,88 +4530,6 @@ void ObjectMgr::LoadGossipText()
     sLog.outString();
     sLog.outString(">> Loaded %u npc texts", count);
     delete result;
-}
-
-void ObjectMgr::LoadGossipTextLocales()
-{
-    mNpcTextLocaleMap.clear();                              // need for reload case
-
-    QueryResult *result = WorldDatabase.Query("SELECT entry,"
-                          "Text0_0_loc1,Text0_1_loc1,Text1_0_loc1,Text1_1_loc1,Text2_0_loc1,Text2_1_loc1,Text3_0_loc1,Text3_1_loc1,Text4_0_loc1,Text4_1_loc1,Text5_0_loc1,Text5_1_loc1,Text6_0_loc1,Text6_1_loc1,Text7_0_loc1,Text7_1_loc1,"
-                          "Text0_0_loc2,Text0_1_loc2,Text1_0_loc2,Text1_1_loc2,Text2_0_loc2,Text2_1_loc2,Text3_0_loc2,Text3_1_loc1,Text4_0_loc2,Text4_1_loc2,Text5_0_loc2,Text5_1_loc2,Text6_0_loc2,Text6_1_loc2,Text7_0_loc2,Text7_1_loc2,"
-                          "Text0_0_loc3,Text0_1_loc3,Text1_0_loc3,Text1_1_loc3,Text2_0_loc3,Text2_1_loc3,Text3_0_loc3,Text3_1_loc1,Text4_0_loc3,Text4_1_loc3,Text5_0_loc3,Text5_1_loc3,Text6_0_loc3,Text6_1_loc3,Text7_0_loc3,Text7_1_loc3,"
-                          "Text0_0_loc4,Text0_1_loc4,Text1_0_loc4,Text1_1_loc4,Text2_0_loc4,Text2_1_loc4,Text3_0_loc4,Text3_1_loc1,Text4_0_loc4,Text4_1_loc4,Text5_0_loc4,Text5_1_loc4,Text6_0_loc4,Text6_1_loc4,Text7_0_loc4,Text7_1_loc4,"
-                          "Text0_0_loc5,Text0_1_loc5,Text1_0_loc5,Text1_1_loc5,Text2_0_loc5,Text2_1_loc5,Text3_0_loc5,Text3_1_loc1,Text4_0_loc5,Text4_1_loc5,Text5_0_loc5,Text5_1_loc5,Text6_0_loc5,Text6_1_loc5,Text7_0_loc5,Text7_1_loc5,"
-                          "Text0_0_loc6,Text0_1_loc6,Text1_0_loc6,Text1_1_loc6,Text2_0_loc6,Text2_1_loc6,Text3_0_loc6,Text3_1_loc1,Text4_0_loc6,Text4_1_loc6,Text5_0_loc6,Text5_1_loc6,Text6_0_loc6,Text6_1_loc6,Text7_0_loc6,Text7_1_loc6,"
-                          "Text0_0_loc7,Text0_1_loc7,Text1_0_loc7,Text1_1_loc7,Text2_0_loc7,Text2_1_loc7,Text3_0_loc7,Text3_1_loc1,Text4_0_loc7,Text4_1_loc7,Text5_0_loc7,Text5_1_loc7,Text6_0_loc7,Text6_1_loc7,Text7_0_loc7,Text7_1_loc7, "
-                          "Text0_0_loc8,Text0_1_loc8,Text1_0_loc8,Text1_1_loc8,Text2_0_loc8,Text2_1_loc8,Text3_0_loc8,Text3_1_loc1,Text4_0_loc8,Text4_1_loc8,Text5_0_loc8,Text5_1_loc8,Text6_0_loc8,Text6_1_loc8,Text7_0_loc8,Text7_1_loc8 "
-                          " FROM locales_npc_text");
-
-    if (!result)
-    {
-        BarGoLink bar(1);
-
-        bar.step();
-
-        sLog.outString();
-        sLog.outString(">> Loaded 0 Quest locale strings. DB table `locales_npc_text` is empty.");
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
-
-    do
-    {
-        Field *fields = result->Fetch();
-        bar.step();
-
-        uint32 entry = fields[0].GetUInt32();
-
-        if (!GetGossipText(entry))
-        {
-            ERROR_DB_STRICT_LOG("Table `locales_npc_text` has data for nonexistent gossip text entry %u, skipped.", entry);
-            continue;
-        }
-
-        NpcTextLocale& data = mNpcTextLocaleMap[entry];
-
-        for (int i = 1; i < MAX_LOCALE; ++i)
-        {
-            for (int j = 0; j < 8; ++j)
-            {
-                std::string str0 = fields[1 + 8 * 2 * (i - 1) + 2 * j].GetCppString();
-                if (!str0.empty())
-                {
-                    int idx = GetOrNewIndexForLocale(LocaleConstant(i));
-                    if (idx >= 0)
-                    {
-                        if ((int32)data.Text_0[j].size() <= idx)
-                            data.Text_0[j].resize(idx + 1);
-
-                        data.Text_0[j][idx] = str0;
-                    }
-                }
-                std::string str1 = fields[1 + 8 * 2 * (i - 1) + 2 * j + 1].GetCppString();
-                if (!str1.empty())
-                {
-                    int idx = GetOrNewIndexForLocale(LocaleConstant(i));
-                    if (idx >= 0)
-                    {
-                        if ((int32)data.Text_1[j].size() <= idx)
-                            data.Text_1[j].resize(idx + 1);
-
-                        data.Text_1[j][idx] = str1;
-                    }
-                }
-            }
-        }
-    }
-    while (result->NextRow());
-
-    delete result;
-
-    sLog.outString();
-    sLog.outString(">> Loaded %lu NpcText locale strings", (unsigned long)mNpcTextLocaleMap.size());
 }
 
 class SingleMailReturner
@@ -7000,8 +6924,8 @@ void ObjectMgr::LoadBroadcastTexts()
         BroadcastText bct;
 
         bct.Id = fields[0].GetUInt32();
-        bct.MaleText[LOCALE_enUS] = fields[1].GetString();
-        bct.FemaleText[LOCALE_enUS] = fields[2].GetString();
+        bct.MaleText[LOCALE_enUS] = fields[1].GetString() ? fields[1].GetString() : std::string();
+        bct.FemaleText[LOCALE_enUS] = fields[2].GetString() ? fields[2].GetString() : std::string();
         bct.SoundId = fields[3].GetUInt32();
         bct.Type = fields[4].GetUInt32();
         bct.Language = fields[5].GetUInt32();
@@ -7992,7 +7916,7 @@ void ObjectMgr::LoadNpcGossips()
             sLog.outErrorDb("Table `npc_gossip` have nonexistent creature (GUID: %u) entry, ignore. ", guid);
             continue;
         }
-        if (!GetGossipText(textid))
+        if (!GetNpcText(textid))
         {
             sLog.outErrorDb("Table `npc_gossip` for creature (GUID: %u) have wrong Textid (%u), ignore. ", guid, textid);
             continue;
@@ -8043,7 +7967,7 @@ void ObjectMgr::LoadGossipMenu()
         gMenu.text_id           = fields[1].GetUInt32();
         gMenu.conditionId       = fields[2].GetUInt16();
 
-        if (!GetGossipText(gMenu.text_id))
+        if (!GetNpcText(gMenu.text_id))
         {
             sLog.outErrorDb("Table gossip_menu entry %u are using non-existing text_id %u", gMenu.entry, gMenu.text_id);
             continue;
