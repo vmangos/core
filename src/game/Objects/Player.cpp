@@ -18417,7 +18417,7 @@ void Player::UpdateForQuestWorldObjects()
 
     uint32 count = 0;
     UpdateData upd;
-    m_visibleGUIDs_lock.acquire_read();
+    std::shared_lock<std::shared_timed_mutex> lock(m_visibleGUIDs_lock);
     for (ObjectGuidSet::const_iterator itr = m_visibleGUIDs.begin(); itr != m_visibleGUIDs.end(); ++itr)
     {
         if (itr->IsGameObject())
@@ -18431,7 +18431,7 @@ void Player::UpdateForQuestWorldObjects()
                     }
         }
     }
-    m_visibleGUIDs_lock.release();
+    lock.unlock();
     if (count)
         upd.Send(GetSession());
 }
