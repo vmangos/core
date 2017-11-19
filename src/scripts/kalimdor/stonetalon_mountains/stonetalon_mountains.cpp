@@ -207,25 +207,25 @@ struct npc_piznikAI : public ScriptedAI
         {
             if (EventPhase == EVENT_PHASE_INIT)
             {
-                m_creature->SummonCreature(3998, 935.6930f, -262.0789f, -2.1552f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
-                m_creature->SummonCreature(4001, 931.6735f, -261.3967f, -2.0203f, 6.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
+                m_creature->SummonCreature(3998, 935.6930f, -262.0789f, -2.1552f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
+                m_creature->SummonCreature(4001, 931.6735f, -261.3967f, -2.0203f, 6.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
                 EventPhase = EVENT_PHASE_SECOND_WAVE;
             }
-            if (EventTimer > 5000 && EventPhase == EVENT_PHASE_SECOND_WAVE)
+            if (EventTimer > 60000 && EventPhase == EVENT_PHASE_SECOND_WAVE)
             {
-                m_creature->SummonCreature(3998, 935.6930f, -262.0789f, -2.1552f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
-                m_creature->SummonCreature(4001, 931.6735f, -261.3967f, -2.0203f, 6.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
-                m_creature->SummonCreature(3998, 930.4216f, -266.4603f, -1.6689f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
+                m_creature->SummonCreature(3998, 935.6930f, -262.0789f, -2.1552f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
+                m_creature->SummonCreature(4001, 931.6735f, -261.3967f, -2.0203f, 6.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
+                m_creature->SummonCreature(3998, 930.4216f, -266.4603f, -1.6689f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
                 EventPhase = EVENT_PHASE_THIRD_WAVE;
             }
-            if (EventTimer > 10000 && EventPhase == EVENT_PHASE_THIRD_WAVE)
+            if (EventTimer > 120000 && EventPhase == EVENT_PHASE_THIRD_WAVE)
             {
-                m_creature->SummonCreature(3998, 935.6930f, -262.0789f, -2.1552f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
-                m_creature->SummonCreature(4001, 931.6735f, -261.3967f, -2.0203f, 6.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
-                m_creature->SummonCreature(4003, 930.4216f, -266.4603f, -1.6689f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 60000);
+                m_creature->SummonCreature(3998, 935.6930f, -262.0789f, -2.1552f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
+                m_creature->SummonCreature(4001, 931.6735f, -261.3967f, -2.0203f, 6.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
+                m_creature->SummonCreature(4003, 930.4216f, -266.4603f, -1.6689f, 0.5f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000);
                 EventPhase = EVENT_PHASE_END;
             }
-            if (EventTimer > 20000 && EventPhase == EVENT_PHASE_END)
+            if (EventTimer > 180000 && EventPhase == EVENT_PHASE_END)
             {
                 if (Player *pPlayer = m_creature->GetMap()->GetPlayer(pGuid))
                     pPlayer->GroupEventHappens(QUEST_GERENOS_ORDERS, m_creature);
