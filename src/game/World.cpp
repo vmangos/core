@@ -103,6 +103,8 @@ float World::m_VisibleObjectGreyDistance      = 0;
 float  World::m_relocation_lower_limit_sq     = 10.f * 10.f;
 uint32 World::m_relocation_ai_notify_delay    = 1000u;
 
+uint32 World::m_creatureSummonCountLimit      = DEFAULT_CREATURE_SUMMON_LIMIT;
+
 void LoadGameObjectModelList();
 
 World& GetSWorld()
@@ -915,6 +917,10 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_ACCURATE_PVP_EQUIP_REQUIREMENTS, "PvP.AccurateEquipRequirements", false);
     setConfig(CONFIG_BOOL_ACCURATE_PVP_PURCHASE_REQUIREMENTS, "PvP.AccuratePurchaseRequirements", false);
     setConfig(CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS, "PvP.AccurateZoneRequirements", false);
+
+    setConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT, "MaxCreatureSummonLimit", DEFAULT_CREATURE_SUMMON_LIMIT);
+
+    m_creatureSummonCountLimit = getConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT);
 
     // Smartlog data
     sLog.InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));

@@ -41,6 +41,7 @@
 #define DEFAULT_VISIBILITY_INSTANCE 120.0f      // default visible distance in instances, 120 yards
 #define DEFAULT_VISIBILITY_BG       180.0f      // default visible distance in BG, 180 yards
 #define DEFAULT_VISIBILITY_MODIFIER 0.0f        // default visibility modifier on some units that should be seen beyond normal visibility distances
+#define DEFAULT_CREATURE_SUMMON_LIMIT  100      // default maximum number of creatures an object can have summoned at once
 
 #define DEFAULT_WORLD_OBJECT_SIZE   0.388999998569489f      // currently used (correctly?) for any non Unit world objects. This is actually the bounding_radius, like player/creature from creature_model_data
 #define DEFAULT_OBJECT_SCALE        1.0f                    // player/item scale as default, npc/go from database, pets from dbc
@@ -918,6 +919,12 @@ m_obj->m_updateTracker.Reset();
         float GetVisibilityModifier() const;
         void SetVisibilityModifier(float f);
 
+        uint32 GetCreatureSummonCount() { return m_creatureSummonCount; }
+        inline void DecrementSummonCounter() {
+            if (m_creatureSummonCount) 
+                --m_creatureSummonCount;
+        }
+
     protected:
         explicit WorldObject();
 
@@ -941,6 +948,8 @@ m_obj->m_updateTracker.Reset();
         WorldUpdateCounter m_updateTracker;
         
         float m_lootAndXPRangeModifier;
+
+        uint32 m_creatureSummonCount;
 };
 
 #endif

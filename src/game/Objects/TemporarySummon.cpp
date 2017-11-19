@@ -237,10 +237,14 @@ void TemporarySummon::UnSummon(uint32 delayDespawnTime /*= 0*/)
     {
         CombatStop();
 
-        if (GetSummonerGuid().IsCreature())
-            if (Creature* sum = GetMap()->GetCreature(GetSummonerGuid()))
-                if (sum->AI())
-                    sum->AI()->SummonedCreatureDespawn(this);
+        if (WorldObject* pSummoner = GetMap()->GetWorldObject(GetSummonerGuid()))
+        {
+            pSummoner->DecrementSummonCounter();
+
+            if (Creature* cOwner = pSummoner->ToCreature())
+                if (cOwner->AI())
+                    cOwner->AI()->SummonedCreatureDespawn(this);
+        }
 
         AddObjectToRemoveList();
     }

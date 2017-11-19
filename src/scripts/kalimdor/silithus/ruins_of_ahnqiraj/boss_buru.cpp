@@ -279,8 +279,8 @@ struct boss_buruAI : public ScriptedAI
             {
                 for (int i = 0; i < 3; i++)
                 {
-                    Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, AddPop[i].x, AddPop[i].y, AddPop[i].z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                    summoned->SetInCombatWithZone();
+                    if (Creature* summoned = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, AddPop[i].x, AddPop[i].y, AddPop[i].z, 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+                        summoned->SetInCombatWithZone();
                 }
                 m_HatchPop = true;
             }
@@ -336,8 +336,11 @@ struct mob_buru_eggAI : public ScriptedAI
         // Explose et fait pop une creature quand il meurs
         m_creature->CastSpell(m_creature, SPELL_EXPLODE, false);
 
-        Creature* add = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-        add->SetInCombatWithZone();
+        if (Creature* add = m_creature->SummonCreature(NPC_HIVEZARA_HATCHLING, m_creature->GetPositionX(), m_creature->GetPositionY(),
+            m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000))
+        {
+            add->SetInCombatWithZone();
+        }
 
         // Si Buru est a portee, il inflige des degats a celui-ci et changement de cible
         if (Creature* pBuru = m_pInstance->GetCreature(m_pInstance->GetData64(DATA_BURU)))

@@ -525,8 +525,8 @@ struct npc_ranshallaAI : public npc_escortAI
     {
         m_creature->SummonGameObject(177414, 5514.490234f, -4917.569824f, 852, 0, 0, 0, 0, 0, 90); //gemme
         m_creature->SummonGameObject(177486, 5514.490234f, -4917.569824f, 845, 0, 0, 0, 0, 0, 90); //lumi�re bleue
-        Creature* pVoice = m_creature->SummonCreature(12152, 5514.890137f, -4918.169922f, 845.538025f, 5.3f, TEMPSUMMON_TIMED_DESPAWN, 90000); //voix d'elune
-        guidVoice = pVoice->GetGUID();
+        if (Creature* pVoice = m_creature->SummonCreature(12152, 5514.890137f, -4918.169922f, 845.538025f, 5.3f, TEMPSUMMON_TIMED_DESPAWN, 90000))
+            guidVoice = pVoice->GetGUID();
     }
 
     bool PopPrietesses()
@@ -566,10 +566,12 @@ struct npc_ranshallaAI : public npc_escortAI
 
     void PopMoonkin()
     {
-        Creature* pMoonkin = m_creature->SummonCreature(12140, xyzm[0].x, xyzm[0].y, xyzm[0].z, 6.01f, TEMPSUMMON_TIMED_DESPAWN, 240000);
-        pMoonkin->SetWalk(true);
-        pMoonkin->GetMotionMaster()->MovePoint(1, xyzm[1].x, xyzm[1].y, xyzm[1].z);
-        guidMoonkin = pMoonkin->GetGUID();
+        if (Creature* pMoonkin = m_creature->SummonCreature(12140, xyzm[0].x, xyzm[0].y, xyzm[0].z, 6.01f, TEMPSUMMON_TIMED_DESPAWN, 240000))
+        {
+            pMoonkin->SetWalk(true);
+            pMoonkin->GetMotionMaster()->MovePoint(1, xyzm[1].x, xyzm[1].y, xyzm[1].z);
+            guidMoonkin = pMoonkin->GetGUID();
+        }
     }
 
     void SummonedMovementInform(Creature* pSummoned, uint32 uiType, uint32 uiPointId)
