@@ -785,11 +785,11 @@ bool GossipHello_npc_reginald_windsor(Player* pPlayer, Creature* pCreature)
     if (auto pWindsorEventAI = static_cast<npc_reginald_windsorAI*>(pCreature->AI()))
     {
         if (pPlayer == pWindsorEventAI->GetPlayer() && pWindsorEventAI->QuestAccepted)
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Me and my friends are ready. Let's stop this masquerade!", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr.GetBroadcastText(8256, pPlayer->GetSession()->GetSessionDbLocaleIndex(), pPlayer->getGender()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         else if (pCreature->isQuestGiver())
             pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
-        pPlayer->SEND_GOSSIP_MENU(125800, pCreature->GetGUID());
+        pPlayer->SEND_GOSSIP_MENU(5633, pCreature->GetGUID());
     }
     return true;
 }

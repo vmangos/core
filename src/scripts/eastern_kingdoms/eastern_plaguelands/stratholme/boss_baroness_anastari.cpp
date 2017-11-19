@@ -82,6 +82,7 @@ struct boss_baroness_anastariAI : public ScriptedAI
 
         m_creature->SetVisibility(VISIBILITY_ON);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
+        m_creature->ApplySpellImmune(0, IMMUNITY_DAMAGE, SPELL_SCHOOL_MASK_ALL, false);
 
         /** Memorize old position of the Banshee */
         old_Position.x = m_creature->GetPositionX();

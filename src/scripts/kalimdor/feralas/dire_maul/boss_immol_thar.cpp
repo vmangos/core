@@ -101,14 +101,16 @@ struct boss_immol_tharAI : public ScriptedAI
 
         if (ManageTimer(uiDiff, &m_uiEyeOfImmolTharTimer,       urand(15000, 22000)))
         {
-            Creature* tmp = m_creature->SummonCreature(14396,
-                                               m_creature->GetPositionX(),
-                                               m_creature->GetPositionY(),
-                                               m_creature->GetPositionZ(),
-                                               m_creature->GetOrientation(),
-                                               TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000);
-            m_creature->SendSpellGo(tmp, 25681);
-            tmp->Attack(m_creature->getVictim(),true);
+            if (Creature* tmp = m_creature->SummonCreature(14396,
+                m_creature->GetPositionX(),
+                m_creature->GetPositionY(),
+                m_creature->GetPositionZ(),
+                m_creature->GetOrientation(),
+                TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
+            {
+                m_creature->SendSpellGo(tmp, 25681);
+                tmp->Attack(m_creature->getVictim(), true);
+            }
         }
 
         if (ManageTimer(uiDiff, &m_uiPortalOfImmolTharTimer,    urand(17000, 24000)))

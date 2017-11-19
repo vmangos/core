@@ -1090,8 +1090,8 @@ bool QuestAccept_npc_nathanos(Player* pPlayer, Creature* pCreature, const Quest*
 {
     if (pQuest->GetQuestId() == QUEST_THE_SCARLET_ORACLE_DEMETRIA)
     {
-        Creature* demetria = pCreature->SummonCreature(NPC_DEMETRIA, 1629.34f, -5492.59f, 100.728f, 1.08793f, TEMPSUMMON_CORPSE_DESPAWN, 0);
-        demetria->SetActiveObjectState(true);
+        if (Creature* demetria = pCreature->SummonCreature(NPC_DEMETRIA, 1629.34f, -5492.59f, 100.728f, 1.08793f, TEMPSUMMON_CORPSE_DESPAWN, 0, true))
+            demetria->SetActiveObjectState(true);
     }
     return true;
 }

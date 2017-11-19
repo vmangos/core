@@ -104,6 +104,8 @@ float World::m_VisibleObjectGreyDistance      = 0;
 float  World::m_relocation_lower_limit_sq     = 10.f * 10.f;
 uint32 World::m_relocation_ai_notify_delay    = 1000u;
 
+uint32 World::m_creatureSummonCountLimit      = DEFAULT_CREATURE_SUMMON_LIMIT;
+
 void LoadGameObjectModelList();
 
 World& GetSWorld()
@@ -916,6 +918,10 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_ACCURATE_PVP_PURCHASE_REQUIREMENTS, "PvP.AccuratePurchaseRequirements", false);
     setConfig(CONFIG_BOOL_ACCURATE_PVP_ZONE_REQUIREMENTS, "PvP.AccurateZoneRequirements", false);
 
+    setConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT, "MaxCreatureSummonLimit", DEFAULT_CREATURE_SUMMON_LIMIT);
+
+    m_creatureSummonCountLimit = getConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT);
+
     // Smartlog data
     sLog.InitSmartlogEntries(sConfig.GetStringDefault("Smartlog.ExtraEntries", ""));
     sLog.InitSmartlogGuids(sConfig.GetStringDefault("Smartlog.ExtraGuids", ""));
@@ -1225,7 +1231,7 @@ void World::SetInitialWorldSettings()
     sSpellMgr.LoadSpellThreats();
 
     sLog.outString("Loading NPC Texts...");
-    sObjectMgr.LoadGossipText();
+    sObjectMgr.LoadNPCText();
 
     sLog.outString("Loading Item Random Enchantments Table...");
     LoadRandomEnchantmentsTable();
@@ -1403,7 +1409,7 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadFishingBaseSkillLevel();
 
     sLog.outString("Loading Npc Text Id...");
-    sObjectMgr.LoadNpcGossips();                            // must be after load Creature and LoadGossipText
+    sObjectMgr.LoadNpcGossips();                            // must be after load Creature and LoadNPCText
 
     sLog.outString("Loading Gossip scripts...");
     sScriptMgr.LoadGossipScripts();                         // must be before gossip menu options
@@ -1436,7 +1442,6 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadGameObjectLocales();                     // must be after GameobjectInfo loading
     sObjectMgr.LoadItemLocales();                           // must be after ItemPrototypes loading
     sObjectMgr.LoadQuestLocales();                          // must be after QuestTemplates loading
-    sObjectMgr.LoadGossipTextLocales();                     // must be after LoadGossipText
     sObjectMgr.LoadPageTextLocales();                       // must be after PageText loading
     sObjectMgr.LoadGossipMenuItemsLocales();                // must be after gossip menu items loading
     sObjectMgr.LoadPointOfInterestLocales();                // must be after POI loading

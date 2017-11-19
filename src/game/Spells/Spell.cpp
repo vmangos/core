@@ -783,6 +783,12 @@ void Spell::prepareDataForTriggerSystem()
                 if (aoe)
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_AOE;
 
+                if (IsSpellAppliesPeriodicAura(m_spellInfo))
+                {
+                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT;
+                    m_procVictim |= PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT;
+                }
+
                 // Always proc with PROC_FLAG_SUCCESSFUL_SPELL_CAST if not AoE or triggered spell
                 if (!aoe && !IsTriggered())
                 {
@@ -812,6 +818,12 @@ void Spell::prepareDataForTriggerSystem()
 
                 if (aoe)
                     m_procAttacker |= PROC_FLAG_SUCCESSFUL_AOE;
+
+                if (IsSpellAppliesPeriodicAura(m_spellInfo))
+                {
+                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT;
+                    m_procVictim |= PROC_FLAG_TAKEN_PERIODIC_SPELL_HIT;
+                }
 
                 if (!aoe && !IsTriggered())
                 {

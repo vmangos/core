@@ -883,6 +883,10 @@ TalentsInspecting = 1
 #        Reduce for better performances.
 #        Default: 15 yards
 #
+#    MaxCreatureSummonLimit
+#       Game objects (and other creatures) won't be able to summon more creatures than this limit
+#       Default: 100
+#
 #    Rate.Creature.Aggro
 #        Aggro radius percent or off.
 #        Default: 1   - 100%
@@ -979,6 +983,7 @@ Rate.Creature.Aggro = 1
 MaxCreaturesAttackRadius = 40
 MaxPlayersStealthDetectRange = 40
 MaxCreaturesStealthDetectRange = 15
+MaxCreatureSummonLimit = 100
 CreatureFamilyFleeAssistanceRadius = 30
 CreatureFamilyAssistanceRadius = 10
 CreatureFamilyAssistanceDelay = 1500

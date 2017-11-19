@@ -672,7 +672,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadLocalesGameobjectCommand(char* args);
         bool HandleReloadLocalesGossipMenuOptionCommand(char* args);
         bool HandleReloadLocalesItemCommand(char* args);
-        bool HandleReloadLocalesNpcTextCommand(char* args);
         bool HandleReloadLocalesPageTextCommand(char* args);
         bool HandleReloadLocalesPointsOfInterestCommand(char* args);
         bool HandleReloadLocalesQuestCommand(char* args);

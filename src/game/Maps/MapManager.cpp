@@ -248,6 +248,10 @@ void MapManager::Update(uint32 diff)
     if (!i_timer.Passed())
         return;
 
+    // Execute any teleports scheduled in the main thread prior to map update
+    // eg. area triggers, world port acks
+    ExecuteDelayedPlayerTeleports();
+
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
 
     int continentsIdx = 0;
@@ -312,6 +316,9 @@ void MapManager::Update(uint32 diff)
 
     if (continents.valid())
         continents.wait();
+
+    // Execute far teleports after all map updates have finished
+    ExecuteDelayedPlayerTeleports();
 
     MapMapType::iterator crashedMapsIter = i_maps.begin();
     while (crashedMapsIter != i_maps.end())
@@ -764,6 +771,66 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
         }
     }
     return 0;
+}
+
+void MapManager::ScheduleFarTeleport(Player *player, ScheduledTeleportData *data)
+{
+    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+    player->SetPendingFarTeleport(true);
+    m_scheduledFarTeleports[player] = data;
+}
+
+// Execute all delayed teleports at the end of a map update
+void MapManager::ExecuteDelayedPlayerTeleports()
+{
+    ScheduledTeleportMap::iterator iter;
+    for (iter = m_scheduledFarTeleports.begin(); iter != m_scheduledFarTeleports.end(); ++iter)
+    {
+        ExecuteSingleDelayedTeleport(iter);
+    }
+
+    m_scheduledFarTeleports.clear();
+}
+
+// Execute a single delayed teleport for the given player (if there are any). It should
+// only be necessary to call this in teleports performed outside of an update (i.e.
+// player logout and login).
+void MapManager::ExecuteSingleDelayedTeleport(Player *player)
+{
+    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+    ScheduledTeleportMap::iterator iter = m_scheduledFarTeleports.find(player);
+
+    if (iter != m_scheduledFarTeleports.end())
+    {
+        ExecuteSingleDelayedTeleport(iter);
+
+        m_scheduledFarTeleports.erase(iter);
+    }
+}
+
+void MapManager::ExecuteSingleDelayedTeleport(ScheduledTeleportMap::iterator iter)
+{
+    // Execute the teleport. If it fails, clear the semaphore
+    if (!iter->first->ExecuteTeleportFar(iter->second))
+        iter->first->SetSemaphoreTeleportFar(false);
+
+    iter->first->SetPendingFarTeleport(false);
+
+    delete iter->second; // don't leak tele data
+}
+
+void MapManager::CancelDelayedPlayerTeleport(Player *player)
+{
+    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+    ScheduledTeleportMap::iterator iter = m_scheduledFarTeleports.find(player);
+
+    if (iter != m_scheduledFarTeleports.end())
+    {
+        iter->first->SetPendingFarTeleport(false);
+        delete iter->second;
+
+        m_scheduledFarTeleports.erase(iter);
+    }
 }
 
 void MapManager::ScheduleInstanceSwitch(Player* player, uint16 newInstance)

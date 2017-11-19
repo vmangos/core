@@ -430,33 +430,26 @@ bool QuestAccept_npc_dashel_stonefist(Player* pPlayer, Creature* pCreature, cons
             // Dashel says: Now you're gonna get it good, "PlayerName".
             DoScriptText(SAY_PROGRESS_1_DAS, pCreature, pPlayer);
 
-            // set dashel stonefist's faction to neutral
             pCreature->setFaction(FACTION_NEUTRAL);
-            // prevents random player pick up a quest during event
             pCreature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
 
-            // save player guid for later use(to trigger a quest completed)
             dashelStonefistAI->m_playerGuid = pPlayer->GetObjectGuid();
 
             // spawn thugs and make them focus player.
-            // thug 1
             dashelStonefistAI->m_thugs[0] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8676.075195f, 443.744019f, 99.632210f, 3.981758f, TEMPSUMMON_DEAD_DESPAWN);
 
-            if (!dashelStonefistAI->m_thugs[0])
+            if (!dashelStonefistAI->m_thugs[0] || !dashelStonefistAI->m_thugs[0]->AI())
                 return false;
 
-            // make thug focus player
             dashelStonefistAI->m_thugs[0]->AI()->AttackStart(pPlayer);
-            // Initial flag is passive, which prevents from chasing or putting wrong targets into a combat mode on summon.
             dashelStonefistAI->m_thugs[0]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
 
             // thug 2
-            dashelStonefistAI->m_thugs[1] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8685.416992f, 443.130829f, 99.526917f, 5.759635f, TEMPSUMMON_DEAD_DESPAWN);
-            // make thugs focus player
-            dashelStonefistAI->m_thugs[1]->AI()->AttackStart(pPlayer);
-            // Initial flag is passive, which prevents from chasing or putting wrong targets into a combat mode on summon.
-            dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
-
+            if (dashelStonefistAI->m_thugs[1] = pCreature->SummonCreature(NPC_OLD_TOWN_THUG, -8685.416992f, 443.130829f, 99.526917f, 5.759635f, TEMPSUMMON_DEAD_DESPAWN))
+            {
+                dashelStonefistAI->m_thugs[1]->AI()->AttackStart(pPlayer);
+                dashelStonefistAI->m_thugs[1]->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+            }
             // start quest fight.
             dashelStonefistAI->startQuestFight();
             // make Dashel focus player.

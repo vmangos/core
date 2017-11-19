@@ -1132,7 +1132,7 @@ void Object::ExecuteDelayedActions()
 
 bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
 {
-    if (objToLoot && IsInMap(objToLoot) && objToLoot->GetMap()->IsRaid())
+    if (objToLoot && objToLoot->GetMap()->IsRaid() && IsInMap(objToLoot))
         return true;
 
     return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->m_lootAndXPRangeModifier, false);
@@ -1161,7 +1161,7 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0),
-        m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER)
+        m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_creatureSummonCount(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;
@@ -1342,6 +1342,11 @@ bool WorldObject::IsWithinDist2d(float x, float y, float dist2compare) const
     float maxdist = dist2compare + sizefactor;
 
     return distsq < maxdist * maxdist;
+}
+
+bool WorldObject::IsInMap(const WorldObject* obj) const
+{
+    return IsInWorld() && obj->IsInWorld() && (GetMap() == obj->GetMap());
 }
 
 bool WorldObject::_IsWithinDist(WorldObject const* obj, float dist2compare, bool is3D) const
@@ -1823,6 +1828,12 @@ void WorldObject::SetMap(Map * map)
     SetZoneScript();
 }
 
+Map* WorldObject::GetMap() const
+{
+    MANGOS_ASSERT(m_currMap);
+    return m_currMap;
+}
+
 void WorldObject::ResetMap()
 {
     m_currMap = nullptr;
@@ -1885,6 +1896,14 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
         return nullptr;
     }
 
+    if (m_creatureSummonCount >= sWorld.GetCreatureSummonCountLimit())
+    {
+        sLog.outInfo("WorldObject::SummonCreature: %s in (map %u, instance %u) attempted to summon Creature (Entry: %u), but already has %u active summons",
+            GetGuidStr().c_str(), GetMapId(), GetInstanceId(), id, m_creatureSummonCount);
+
+        return nullptr;
+    }
+
     TemporarySummon* pCreature = new TemporarySummon(GetObjectGuid());
 
     Team team = TEAM_NONE;
@@ -1919,6 +1938,8 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
 
     pCreature->SetWorldMask(GetWorldMask());
     // return the creature therewith the summoner has access to it
+
+    ++m_creatureSummonCount;
     return pCreature;
 }
 // Nostalrius

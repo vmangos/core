@@ -574,7 +574,9 @@ struct npc_thrall_warchiefAI : public ScriptedAI
                     case 0:
                         // Spawn Herald of Thrall in the Crossroads
                         m_pHerald = m_creature->SummonCreature(NPC_HERALD_THRALL, -462.404f, -2637.68f, 96.0656f, 5.8606f, TEMPSUMMON_TIMED_DESPAWN, WARCHIEF_BLESSING_COOLDOWN);
-                        m_pHerald->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+                        if (m_pHerald)
+                            m_pHerald->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_PASSIVE);
+
                         m_uiBlessingEventTimer = 3000;
                         m_uiTick++;
                         break;
