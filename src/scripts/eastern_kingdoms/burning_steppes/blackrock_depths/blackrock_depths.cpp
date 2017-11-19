@@ -1458,12 +1458,15 @@ bool GOHello_go_relic_coffer_door(Player* pPlayer, GameObject* pGo)
 
     if (pInstance->GetData(TYPE_RELIC_COFFER) == DONE)
     {
-        Creature* pCreature = pPlayer->SummonCreature(RUINEPOIGNE_ENTRY,
-                              819.45f, -348.96f, -50.49f, 0.35f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000);
-//        pCreature->MonsterYell("Ne les laissez pas s'emparer du Coeur de la montagne!!", 0, pPlayer);
-        pCreature->MonsterYell("Don't let them take the moutain hearth!", 0, pPlayer);
-       // pCreature->MonsterYell(NOST_TEXT(153), 0, pPlayer); // seems to be custom
-        pCreature->AI()->AttackStart(pPlayer);
+        if (Creature* pCreature = pPlayer->SummonCreature(RUINEPOIGNE_ENTRY,
+            819.45f, -348.96f, -50.49f, 0.35f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 300000))
+        {
+            // pCreature->MonsterYell("Ne les laissez pas s'emparer du Coeur de la montagne!!", 0, pPlayer);
+            pCreature->MonsterYell("Don't let them take the moutain hearth!", 0, pPlayer);
+            // pCreature->MonsterYell(NOST_TEXT(153), 0, pPlayer); // seems to be custom
+            pCreature->AI()->AttackStart(pPlayer);
+        }
+
     }
 
     return false;
@@ -1953,7 +1956,7 @@ bool AreaTrigger_at_shadowforge_bridge(Player* pPlayer, AreaTriggerEntry const* 
         if (pPlayer->isGameMaster() || !pPlayer->isAlive() || pInstance->GetData(TYPE_BRIDGE) == DONE)
             return false;
 
-        if (Creature* pMasterGuard = ((Creature*)pPlayer)->SummonCreature(NPC_ANVILRAGE_GUARDMAN, aGuardSpawnPositions[0][0], aGuardSpawnPositions[0][1], aGuardSpawnPositions[0][2], aGuardSpawnPositions[0][3], TEMPSUMMON_DEAD_DESPAWN, 0))
+        if (Creature* pMasterGuard = pPlayer->SummonCreature(NPC_ANVILRAGE_GUARDMAN, aGuardSpawnPositions[0][0], aGuardSpawnPositions[0][1], aGuardSpawnPositions[0][2], aGuardSpawnPositions[0][3], TEMPSUMMON_DEAD_DESPAWN, 0))
         {
             pMasterGuard->SetWalk(false);
             pMasterGuard->GetMotionMaster()->MoveWaypoint();
@@ -1962,7 +1965,7 @@ bool AreaTrigger_at_shadowforge_bridge(Player* pPlayer, AreaTriggerEntry const* 
             pPlayer->GetContactPoint(pMasterGuard, fX, fY, fZ);
             pMasterGuard->GetMotionMaster()->MovePoint(1,fX, fY, fZ);
 
-            if (Creature* pSlaveGuard = ((Creature*)pPlayer)->SummonCreature(NPC_ANVILRAGE_GUARDMAN, aGuardSpawnPositions[1][0], aGuardSpawnPositions[1][1], aGuardSpawnPositions[1][2], aGuardSpawnPositions[1][3], TEMPSUMMON_DEAD_DESPAWN, 0))
+            if (Creature* pSlaveGuard = pPlayer->SummonCreature(NPC_ANVILRAGE_GUARDMAN, aGuardSpawnPositions[1][0], aGuardSpawnPositions[1][1], aGuardSpawnPositions[1][2], aGuardSpawnPositions[1][3], TEMPSUMMON_DEAD_DESPAWN, 0))
             {
                 pSlaveGuard->GetMotionMaster()->MoveFollow(pMasterGuard, 2.0f, 0);
             }

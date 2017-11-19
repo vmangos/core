@@ -262,6 +262,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_RESPEC_MIN_MULTIPLIER,
     CONFIG_UINT32_RESPEC_MAX_MULTIPLIER,
     CONFIG_UINT32_BATTLEGROUND_GROUP_LIMIT,
+    CONFIG_UINT32_CREATURE_SUMMON_LIMIT,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -733,6 +734,8 @@ class World
         static float GetRelocationLowerLimitSq()            { return m_relocation_lower_limit_sq; }
         static uint32 GetRelocationAINotifyDelay()          { return m_relocation_ai_notify_delay; }
 
+        static uint32 GetCreatureSummonCountLimit()         { return m_creatureSummonCountLimit; }
+
         void ProcessCliCommands();
         void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
 
@@ -870,6 +873,8 @@ class World
 
         static float  m_relocation_lower_limit_sq;
         static uint32 m_relocation_ai_notify_delay;
+
+        static uint32 m_creatureSummonCountLimit;
 
         // CLI command holder to be thread safe
         ACE_Based::LockedQueue<CliCommandHolder*,ACE_Thread_Mutex> cliCmdQueue;

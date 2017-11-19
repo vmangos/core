@@ -722,6 +722,9 @@ struct npc_private_hendelAI : public ScriptedAI
 
             // Tervosh is index 0
             Creature* tervosh = m_allies[0];
+            if (!tervosh)
+                return;
+
             // Fleeing guards
             // 1 guard always says: It's Proudmoore! Get out of here!
             // 2 guard has a random text

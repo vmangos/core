@@ -240,15 +240,12 @@ struct boss_ayamissAI : public ScriptedAI
                 if (DoCastSpellIfCan(pTarget, SPELL_PARALYZE) == CAST_OK)
                 {
                     uint32 random = urand(0, 1);
-                    Creature * m_larva = m_creature->SummonCreature(NPC_HIVEZARA_LARVA,
-                                         Larva[random].x,
-                                         Larva[random].y,
-                                         Larva[random].z,
-                                         0,
-                                         TEMPSUMMON_TIMED_DESPAWN,
-                                         15000);
-                    m_larva->SetFly(false);
-                    m_larva->SetWalk(true);
+                    if (Creature *m_larva = m_creature->SummonCreature(NPC_HIVEZARA_LARVA,
+                        Larva[random].x, Larva[random].y, Larva[random].z, 0, TEMPSUMMON_TIMED_DESPAWN, 15000))
+                    {
+                        m_larva->SetFly(false);
+                        m_larva->SetWalk(true);
+                    }
 
                     m_uiSummonPlayer_Timer = 15000;
                     m_uiSacrifice_Timer = 10000;
