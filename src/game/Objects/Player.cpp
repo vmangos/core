@@ -12281,7 +12281,7 @@ bool Player::CanSeeStartQuest(Quest const *pQuest) const
 
 bool Player::CanTakeQuest(Quest const *pQuest, bool msg, bool skipStatusCheck /*false*/) const
 {
-    if (pQuest->GetType() == QUEST_TYPE_PVP && pQuest->GetQuestLevel() && pQuest->GetQuestLevel() < getLevel())
+    if (pQuest->GetMaxLevel() && pQuest->GetMaxLevel() < getLevel())
         return false;
 
     return (skipStatusCheck || SatisfyQuestStatus(pQuest, msg)) && SatisfyQuestExclusiveGroup(pQuest, msg) &&

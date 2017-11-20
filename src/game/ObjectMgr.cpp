@@ -3350,8 +3350,8 @@ void ObjectMgr::LoadQuests()
                           "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
                           //   119                     120                     121                     122
                           "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
-                          //   123          124
-                          "StartScript, CompleteScript"
+                          //   123          124         125
+                          "StartScript, CompleteScript, MaxLevel"
                           " FROM quest_template t1 WHERE patch=(SELECT max(patch) FROM quest_template t2 WHERE t1.entry=t2.entry && patch <= %u)", sWorld.GetWowPatch());
     if (!result)
     {
