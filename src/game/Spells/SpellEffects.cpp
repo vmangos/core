@@ -5630,7 +5630,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     if (old_critter)
         player->RemoveMiniPet();
 
-    CreatureCreatePos pos(m_caster->GetMap(), m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
+    CreatureCreatePos pos(m_caster, m_caster->GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
         pos = CreatureCreatePos(m_caster, m_caster->GetOrientation());
 
