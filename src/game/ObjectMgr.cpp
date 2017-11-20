@@ -5251,7 +5251,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.target_Orientation = fields[10].GetFloat();
         at.required_event     = fields[11].GetInt32();
         at.required_pvp_rank  = fields[12].GetUInt8();
-        at.required_team      = fields[13].GetUInt8();
+        at.required_team      = fields[13].GetUInt16();
 
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if (!atEntry)
