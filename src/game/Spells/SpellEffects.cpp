@@ -4876,6 +4876,7 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     unitTarget->InterruptSpellsCastedOnMe(true);   
     unitTarget->CombatStop();
     unitTarget->getHostileRefManager().deleteReferences();  // stop all fighting
+    unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_VANISH>())

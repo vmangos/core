@@ -1589,6 +1589,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         SingleCastSpellTargetMap      & GetSingleCastSpellTargets()       { return m_singleCastSpellTargets; }
         SingleCastSpellTargetMap const& GetSingleCastSpellTargets() const { return m_singleCastSpellTargets; }
         SpellImmuneList m_spellImmune[MAX_SPELL_IMMUNITY];
+        uint32 m_lastSanctuaryTime;
 
         // Threat related methods
         bool CanHaveThreatList() const;
@@ -1714,7 +1715,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
         void ApplySpellDispelImmunity(const SpellEntry * spellProto, DispelType type, bool apply);
         virtual bool IsImmuneToSpell(SpellEntry const* spellInfo, bool castOnSelf);
-        virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask);
+        virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr);
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
 
         float GetSpellResistChance(Unit* victim, uint32 schoolMask, bool innateResists) const;

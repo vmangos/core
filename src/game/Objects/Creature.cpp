@@ -1944,12 +1944,12 @@ bool Creature::IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf)
     return Unit::IsImmuneToSpell(spellInfo, castOnSelf);
 }
 
-bool Creature::IsImmuneToDamage(SpellSchoolMask meleeSchoolMask)
+bool Creature::IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo)
 {
     if (GetCreatureInfo()->SchoolImmuneMask & meleeSchoolMask)
         return true;
 
-    return Unit::IsImmuneToDamage(meleeSchoolMask);
+    return Unit::IsImmuneToDamage(meleeSchoolMask, spellInfo);
 }
 
 // hacky - seems to be the only way of doing this without wasting more time

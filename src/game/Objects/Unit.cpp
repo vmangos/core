@@ -106,7 +106,7 @@ Unit::Unit()
     : WorldObject(), i_motionMaster(this), m_ThreatManager(this), m_HostileRefManager(this),
       movespline(new Movement::MoveSpline()), _debugFlags(0), m_needUpdateVisibility(false),
       m_AutoRepeatFirstCast(true), m_castingSpell(0), m_regenTimer(0), _lastDamageTaken(0),
-      m_meleeZLimit(MELEE_Z_LIMIT)
+      m_meleeZLimit(MELEE_Z_LIMIT), m_lastSanctuaryTime(0)
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -3110,11 +3110,8 @@ SpellMissInfo Unit::SpellHitResult(Unit *pVictim, SpellEntry const *spell, Spell
     else
         schoolMask = GetSpellSchoolMask(spell);
 
-    if (!spell->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
-    {
-        if (pVictim != this && pVictim->IsImmuneToDamage(schoolMask))
-            return SPELL_MISS_IMMUNE;
-    }
+    if (pVictim != this && pVictim->IsImmuneToDamage(schoolMask, spell))
+        return SPELL_MISS_IMMUNE;
 
     // Try victim reflect spell
     if (CanReflect)
@@ -6855,17 +6852,23 @@ int32 Unit::SpellBaseHealingBonusTaken(SpellSchoolMask schoolMask)
     return AdvertisedBenefit;
 }
 
-bool Unit::IsImmuneToDamage(SpellSchoolMask shoolMask)
+bool Unit::IsImmuneToDamage(SpellSchoolMask shoolMask, SpellEntry const* spellInfo)
 {
-    // If m_immuneToSchool type contain this school type, IMMUNE damage.
-    SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
-    for (SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
-        if (itr->type & shoolMask)
-            return true;
+    if (spellInfo && spellInfo->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+        return false;
 
     // If m_immuneToDamage type contain magic, IMMUNE damage.
     SpellImmuneList const& damageList = m_spellImmune[IMMUNITY_DAMAGE];
     for (SpellImmuneList::const_iterator itr = damageList.begin(); itr != damageList.end(); ++itr)
+        if (itr->type & shoolMask)
+            return true;
+
+    if (spellInfo && spellInfo->Attributes & SPELL_ATTR_EX_UNAFFECTED_BY_SCHOOL_IMMUNE)
+        return false;
+
+    // If m_immuneToSchool type contain this school type, IMMUNE damage.
+    SpellImmuneList const& schoolList = m_spellImmune[IMMUNITY_SCHOOL];
+    for (SpellImmuneList::const_iterator itr = schoolList.begin(); itr != schoolList.end(); ++itr)
         if (itr->type & shoolMask)
             return true;
 

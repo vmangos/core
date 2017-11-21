@@ -539,7 +539,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void FillGuidsListFromThreatList(std::vector<ObjectGuid>& guids, uint32 maxamount = 0);
 
         bool IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf) override;
-        bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask) override;
+        bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr) override;
         bool IsImmuneToSpellEffect(SpellEntry const *spellInfo, SpellEffectIndex index, bool castOnSelf) const override;
 
         bool IsElite() const
