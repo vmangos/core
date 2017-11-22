@@ -41,6 +41,7 @@
 #include "CellImpl.h"
 #include "GridNotifiers.h"
 #include "GridNotifiersImpl.h"
+#include "Language.h"
 
 #include "ObjectPosSelector.h"
 
@@ -1162,13 +1163,14 @@ void WorldObject::SetVisibilityModifier(float f)
 
 WorldObject::WorldObject()
     :   m_isActiveObject(false), m_currMap(nullptr), m_mapId(0), m_InstanceId(0), m_lootAndXPRangeModifier(0),
-        m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_creatureSummonCount(0)
+        m_visibilityModifier(DEFAULT_VISIBILITY_MODIFIER), m_creatureSummonCount(0), m_summonLimitAlert(0)
 {
     // Phasing
     worldMask = WORLD_DEFAULT_OBJECT;
     m_zoneScript = nullptr;
     m_transport = nullptr;
     m_movementInfo.time = WorldTimer::getMSTime();
+    m_creatureSummonLimit = sWorld.GetCreatureSummonCountLimit();
 }
 
 void WorldObject::CleanupsBeforeDelete()
@@ -1897,10 +1899,14 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
         return nullptr;
     }
 
-    if (m_creatureSummonCount >= sWorld.GetCreatureSummonCountLimit())
+    if (m_creatureSummonCount >= m_creatureSummonLimit)
     {
         sLog.outInfo("WorldObject::SummonCreature: %s in (map %u, instance %u) attempted to summon Creature (Entry: %u), but already has %u active summons",
             GetGuidStr().c_str(), GetMapId(), GetInstanceId(), id, m_creatureSummonCount);
+
+        // Alert GMs in the next tick if we don't already have an alert scheduled
+        if (!m_summonLimitAlert)
+            m_summonLimitAlert = 1;
 
         return nullptr;
     }
@@ -1943,6 +1949,23 @@ Creature* WorldObject::SummonCreature(uint32 id, float x, float y, float z, floa
     ++m_creatureSummonCount;
     return pCreature;
 }
+
+void WorldObject::SetCreatureSummonLimit(uint32 limit)
+{
+    //sLog.outInfo("[WorldObject]: Object %s is changing summon limit to %u", GetGuidStr().c_str(), limit);
+    m_creatureSummonLimit = limit;
+}
+
+void WorldObject::DecrementSummonCounter()
+{
+    if (m_creatureSummonCount)
+        --m_creatureSummonCount;
+
+    // Stop the alert if all the minions despawned
+    if (!m_creatureSummonCount)
+        m_summonLimitAlert = 0;
+}
+
 // Nostalrius
 GameObject* WorldObject::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, bool attach)
 {
@@ -2856,8 +2879,25 @@ void WorldObject::GetPosition(float &x, float &y, float &z, Transport* t) const
         t->CalculatePassengerOffset(x, y, z);
 }
 
-void WorldObject::Update(uint32 /*update_diff*/, uint32 /*time_diff*/)
+void WorldObject::Update(uint32 update_diff, uint32 /*time_diff*/)
 {
+    if (m_summonLimitAlert)
+    {
+        if (m_summonLimitAlert <= update_diff)
+        {
+            std::stringstream message;
+            message << "SummonCreature: " << GetGuidStr().c_str()
+                    << " in (map " << GetMapId() << ", instance " << GetInstanceId() << ")"
+                    << " has " << m_creatureSummonCount << " active summons,"
+                    << " and the limit is " << m_creatureSummonLimit;
+            sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "SummonAlert", message.str().c_str());
+
+            m_summonLimitAlert = 5 * MINUTE * IN_MILLISECONDS;
+        }
+        else
+            m_summonLimitAlert -= update_diff;
+    }
+
     ExecuteDelayedActions();
 }
 
