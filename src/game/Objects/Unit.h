@@ -1839,7 +1839,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual void OnMoveTo(float, float, float) {}
 
         // Appele dans SpellEffects::EffectSummonPet et apres un rez en BG.
-        void EffectSummonPet(uint32 spellId, uint32 petEntry);
+        ObjectGuid EffectSummonPet(uint32 spellId, uint32 petEntry);
         void ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode = AURA_REMOVE_BY_DEFAULT);
 
         // Caster ?
