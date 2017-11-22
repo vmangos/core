@@ -19710,10 +19710,14 @@ void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
                                m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, GetGUIDLow());
 }
 
-bool Player::TeleportToHomebind(uint32 options) 
+bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown) 
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
-    AddSpellAndCategoryCooldowns(spellInfo, 6948);   // Initiate hearthstone cooldown
+    if (hearthCooldown)
+    {
+        // Initiate hearthstone cooldown
+        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
+        AddSpellAndCategoryCooldowns(spellInfo, 6948);
+    }
 
     return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); 
 }
