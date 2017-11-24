@@ -623,10 +623,86 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
     delete auction;
 }
 
+
+class AuctionHouseClientQueryTask : public AsyncTask, public AuctionHouseClientQuery
+{
+public:
+    AuctionHouseClientQueryTask(AuctionClientQueryType type) : _queryType(type)
+    {
+    }
+    void run()
+    {
+        if (WorldSession* sess = sWorld.FindSession(accountId))
+        {
+            sess->SetReceivedAHListRequest(false);
+
+            Player *player = sess->GetPlayer();
+            if (!player || !player->IsInWorld())
+                return;
+
+            WorldPacket data(0, 12);
+            uint32 count = 0;
+            uint32 totalcount = 0;
+            size_t countPos = data.wpos();
+            data << uint32(count);
+            switch (_queryType)
+            {
+                case AUCTION_QUERY_LIST:
+                {
+                    data.SetOpcode(SMSG_AUCTION_LIST_RESULT);
+                    auctionHouse->BuildListAuctionItems(data, player, *this, count, totalcount);
+
+                    break;
+                }
+                case AUCTION_QUERY_LIST_BIDDER:
+                {
+                    data.SetOpcode(SMSG_AUCTION_BIDDER_LIST_RESULT);
+                    for (std::vector<uint32>::iterator itr = outbiddedAuctionIds.begin(); itr != outbiddedAuctionIds.end(); ++itr)
+                    {
+                        --outbiddedCount;
+                        AuctionEntry *auction = auctionHouse->GetAuction(*itr);
+                        if (auction)
+                        {
+                            ++totalcount;
+
+                            if (count < 50 && totalcount > listfrom)
+                                if (auction->BuildAuctionInfo(data))
+                                    ++count;
+                        }
+                    }
+
+                    auctionHouse->BuildListBidderItems(data, player, listfrom, count, totalcount);
+                    break;
+                }
+                case AUCTION_QUERY_LIST_OWNER:
+                {
+                    data.SetOpcode(SMSG_AUCTION_OWNER_LIST_RESULT);
+                    auctionHouse->BuildListOwnerItems(data, player, listfrom, count, totalcount);
+                    break;
+                }
+                default:
+                {
+                    sLog.outError("[AsyncAuctionQuery] Invalid query type %u", _queryType);
+                    return;
+                }
+            }
+
+            data.put<uint32>(countPos, count);
+            data << uint32(totalcount);
+
+            sess->SendPacket(&data);
+        }
+    }
+    AuctionHouseObject* auctionHouse;
+    AuctionClientQueryType _queryType;
+};
+
 // called when player lists his bids
 void WorldSession::HandleAuctionListBidderItems(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionListBidderItems");
+    if (ReceivedAHListRequest())
+        return;
 
     ObjectGuid auctioneerGuid;                              // NPC guid
     uint32 listfrom;                                        // page of auctions
@@ -645,44 +721,32 @@ void WorldSession::HandleAuctionListBidderItems(WorldPacket & recv_data)
     if (!auctionHouseEntry)
         return;
 
-    // always return pointer
-    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
-
     // remove fake death
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    WorldPacket data(SMSG_AUCTION_BIDDER_LIST_RESULT, (4 + 4 + 4));
-    Player *pl = GetPlayer();
-    data << uint32(0);                                      // add 0 as count
-    uint32 count = 0;
-    uint32 totalcount = 0;
-    while (outbiddedCount > 0)                              // add all data, which client requires
+    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask(AUCTION_QUERY_LIST_BIDDER);
+    task->auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
+    uint32 outbiddedAuctionId;
+    for (int i = outbiddedCount; i > 0; --i)
     {
-        --outbiddedCount;
-        uint32 outbiddedAuctionId;
         recv_data >> outbiddedAuctionId;
-        AuctionEntry *auction = auctionHouse->GetAuction(outbiddedAuctionId);
-        if (auction)
-        {
-            ++totalcount;
-
-            if (count < 50 && totalcount > listfrom)
-                if (auction->BuildAuctionInfo(data))
-                    ++count;
-        }
+        task->outbiddedAuctionIds.push_back(outbiddedAuctionId);
     }
 
-    auctionHouse->BuildListBidderItems(data, pl, listfrom, count, totalcount);
-    data.put<uint32>(0, count);                             // add count to placeholder
-    data << uint32(totalcount);
-    SendPacket(&data);
+    task->accountId = GetAccountId();
+    task->listfrom = listfrom;
+    task->outbiddedCount = outbiddedCount;
+    SetReceivedAHListRequest(true);
+    sWorld.AddAsyncTask(task);
 }
 
 // this void sends player info about his auctions
 void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recv_data)
 {
     DEBUG_LOG("WORLD: HandleAuctionListOwnerItems");
+    if (ReceivedAHListRequest())
+        return;
 
     ObjectGuid auctioneerGuid;
     uint32 listfrom;
@@ -694,50 +758,17 @@ void WorldSession::HandleAuctionListOwnerItems(WorldPacket & recv_data)
     if (!auctionHouseEntry)
         return;
 
-    // always return pointer
-    AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
-
     // remove fake death
     if (GetPlayer()->hasUnitState(UNIT_STAT_DIED))
         GetPlayer()->RemoveSpellsCausingAura(SPELL_AURA_FEIGN_DEATH);
 
-    WorldPacket data(SMSG_AUCTION_OWNER_LIST_RESULT, (4 + 4));
-    data << (uint32) 0;                                     // amount place holder
-
-    uint32 count = 0;
-    uint32 totalcount = 0;
-
-    auctionHouse->BuildListOwnerItems(data, _player, listfrom, count, totalcount);
-    data.put<uint32>(0, count);
-    data << uint32(totalcount);
-    SendPacket(&data);
+    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask(AUCTION_QUERY_LIST_OWNER);
+    task->auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);;
+    task->accountId = GetAccountId();
+    task->listfrom = listfrom;
+    SetReceivedAHListRequest(true);
+    sWorld.AddAsyncTask(task);
 }
-
-// this void is called when player clicks on search button
-class AuctionHouseClientQueryTask: public AsyncTask, public AuctionHouseClientQuery
-{
-public:
-    void run()
-    {
-        if (WorldSession* sess = sWorld.FindSession(accountId))
-        {
-            sess->SetReceivedAHListRequest(false);
-            if (Player* player = sess->GetPlayer())
-                if (player->IsInWorld())
-                {
-                    WorldPacket data(SMSG_AUCTION_LIST_RESULT, (4 + 4));
-                    uint32 count = 0;
-                    uint32 totalcount = 0;
-                    data << uint32(0);
-                    auctionHouse->BuildListAuctionItems(data, player, *this, count, totalcount);
-                    data.put<uint32>(0, count);
-                    data << uint32(totalcount);
-                    sess->SendPacket(&data);
-                }
-        }
-    }
-    AuctionHouseObject* auctionHouse;
-};
 
 void WorldSession::HandleAuctionListItems(WorldPacket & recv_data)
 {
@@ -747,7 +778,7 @@ void WorldSession::HandleAuctionListItems(WorldPacket & recv_data)
 
     ObjectGuid auctioneerGuid;
     std::string searchedname;
-    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask();
+    AuctionHouseClientQueryTask* task = new AuctionHouseClientQueryTask(AUCTION_QUERY_LIST);
     task->accountId = GetAccountId();
 
     recv_data >> auctioneerGuid;
