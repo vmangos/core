@@ -1134,7 +1134,7 @@ void Object::ExecuteDelayedActions()
 
 bool WorldObject::IsWithinLootXPDist(WorldObject const * objToLoot) const
 {
-    if (objToLoot && objToLoot->GetMap()->IsRaid() && IsInMap(objToLoot))
+    if (objToLoot && IsInMap(objToLoot) && objToLoot->GetMap()->IsRaid())
         return true;
 
     return objToLoot && IsInMap(objToLoot) && _IsWithinDist(objToLoot, sWorld.getConfig(CONFIG_FLOAT_GROUP_XP_DISTANCE) + objToLoot->m_lootAndXPRangeModifier, false);
