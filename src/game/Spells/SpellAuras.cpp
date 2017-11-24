@@ -5849,7 +5849,7 @@ void Aura::HandlePreventFleeing(bool apply, bool Real)
         if (apply)
             GetTarget()->SetFeared(false, fearAuras.front()->GetCasterGuid());
         else
-            GetTarget()->SetFeared(true);
+            GetTarget()->SetFeared(true, fearAuras.front()->GetCasterGuid(), fearAuras.front()->GetId());
     }
 }
 
