@@ -230,6 +230,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         uint32 i_MaxInstanceId;
         int             i_maxContinentThread;
         volatile bool*  i_continentUpdateFinished;
+        bool asyncMapUpdating;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;
