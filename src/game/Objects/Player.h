@@ -2009,7 +2009,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         void SetHomebindToLocation(WorldLocation const& loc, uint32 area_id);
         void RelocateToHomebind() { SetLocationMapId(m_homebindMapId); Relocate(m_homebindX, m_homebindY, m_homebindZ); }
-        bool TeleportToHomebind(uint32 options = 0);
+        bool TeleportToHomebind(uint32 options = 0, bool hearthCooldown = true);
 
         Object* GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask);
 

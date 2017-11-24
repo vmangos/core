@@ -2020,7 +2020,8 @@ void Spell::EffectTeleportUnits(SpellEffectIndex eff_idx)
             if (unitTarget->GetTypeId() != TYPEID_PLAYER)
                 return;
 
-            ((Player*)unitTarget)->TeleportToHomebind(unitTarget == m_caster ? TELE_TO_SPELL : 0);
+            bool hearthCooldown = m_spellInfo->Id != 556;   // Astral Recall doesn't set HS on cooldown
+            ((Player*)unitTarget)->TeleportToHomebind(unitTarget == m_caster ? TELE_TO_SPELL : 0, hearthCooldown);
             return;
         }
         case TARGET_AREAEFFECT_INSTANT:                     // in all cases first TARGET_TABLE_X_Y_Z_COORDINATES
@@ -2866,6 +2867,8 @@ void Spell::EffectSummon(SpellEffectIndex eff_idx)
 
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned((Creature*)spawnCreature);
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
 }
 
 void Spell::EffectLearnSpell(SpellEffectIndex eff_idx)
@@ -3255,6 +3258,9 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
             // UNIT_FIELD_CREATEDBY are not set for these kind of spells.
             // Does exceptions exist? If so, what are they?
             // summon->SetCreatorGuid(m_caster->GetObjectGuid());
+
+            if (count == 0)
+                AddExecuteLogInfo(eff_idx, ExecuteLogInfo(summon->GetObjectGuid()));
         }
     }
 }
@@ -3445,6 +3451,9 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                 break;
             }
         }
+
+        if (count == 0)
+            AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
     }
 }
 
@@ -3762,10 +3771,12 @@ void Spell::EffectTameCreature(SpellEffectIndex /*eff_idx*/)
 
 void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
 {
-    m_caster->EffectSummonPet(m_spellInfo->Id, m_spellInfo->EffectMiscValue[eff_idx]);
+    ObjectGuid petGuid = m_caster->EffectSummonPet(m_spellInfo->Id, m_spellInfo->EffectMiscValue[eff_idx]);
+    if (petGuid)
+        AddExecuteLogInfo(eff_idx, ExecuteLogInfo(petGuid));
 }
 
-void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
+ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
 {
     Pet *OldSummon = GetPet();
 
@@ -3779,7 +3790,7 @@ void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
                 if (petentry) // Warlock pet
                     OldSummon->Unsummon(PET_SAVE_NOT_IN_SLOT);
                 else
-                    return; // pet in corpse state can't be summoned
+                    return ObjectGuid(); // pet in corpse state can't be summoned
             }
             else
                 OldSummon->GetMap()->Remove((Creature*)OldSummon, false);
@@ -3787,7 +3798,7 @@ void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
         else if (GetTypeId() == TYPEID_PLAYER)
             OldSummon->Unsummon(OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, this);
         else
-            return;
+            return ObjectGuid();
     }
 
     CreatureInfo const* cInfo = petentry ? sCreatureStorage.LookupEntry<CreatureInfo>(petentry) : NULL;
@@ -3796,7 +3807,7 @@ void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
     if (petentry && !cInfo)
     {
         sLog.outErrorDb("EffectSummonPet: creature entry %u not found for spell %u.", petentry, spellId);
-        return;
+        return ObjectGuid();
     }
 
     Pet* NewSummon = new Pet;
@@ -3819,14 +3830,14 @@ void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
                     ++itr;
             }
         }
-        return;
+        return NewSummon->GetObjectGuid();
     }
 
     // not error in case fail hunter call pet
     if (!petentry)
     {
         delete NewSummon;
-        return;
+        return ObjectGuid();
     }
 
     CreatureCreatePos pos(this, GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
@@ -3836,7 +3847,7 @@ void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
     if (!NewSummon->Create(map->GenerateLocalLowGuid(HIGHGUID_PET), pos, cInfo, pet_number))
     {
         delete NewSummon;
-        return;
+        return ObjectGuid();
     }
 
     uint32 petlevel = getLevel();
@@ -3909,6 +3920,8 @@ void Unit::EffectSummonPet(uint32 spellId, uint32 petentry)
         caster->m_petEntry = NewSummon->GetEntry();
         caster->m_petSpell = NewSummon->GetUInt32Value(UNIT_CREATED_BY_SPELL);
     }
+
+    return NewSummon->GetObjectGuid();
 }
 
 void Spell::EffectLearnPetSpell(SpellEffectIndex eff_idx)
@@ -4265,6 +4278,8 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
 
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
 }
 
 void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
@@ -4876,6 +4891,7 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     unitTarget->InterruptSpellsCastedOnMe(true);   
     unitTarget->CombatStop();
     unitTarget->getHostileRefManager().deleteReferences();  // stop all fighting
+    unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_VANISH>())
@@ -5169,6 +5185,8 @@ void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
         pTotem->SetPvP(true);
 
     pTotem->Summon(m_caster);
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pTotem->GetObjectGuid()));
 }
 
 void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
@@ -5400,6 +5418,8 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
 
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
 }
 
 void Spell::EffectResurrect(SpellEffectIndex eff_idx)
@@ -5630,7 +5650,7 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     if (old_critter)
         player->RemoveMiniPet();
 
-    CreatureCreatePos pos(m_caster->GetMap(), m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
+    CreatureCreatePos pos(m_caster, m_caster->GetOrientation(), PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
     if (!(m_targets.m_targetMask & TARGET_FLAG_DEST_LOCATION))
         pos = CreatureCreatePos(m_caster, m_caster->GetOrientation());
 
@@ -5672,6 +5692,8 @@ void Spell::EffectSummonCritter(SpellEffectIndex eff_idx)
     // Notify Summoner
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(critter);
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(critter->GetObjectGuid()));
 }
 
 void Spell::EffectKnockBack(SpellEffectIndex eff_idx)
@@ -6022,6 +6044,8 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
 
     if (m_caster->GetTypeId() == TYPEID_UNIT && ((Creature*)m_caster)->AI())
         ((Creature*)m_caster)->AI()->JustSummoned(pGameObj);
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(pGameObj->GetObjectGuid()));
 }
 
 void Spell::EffectSkill(SpellEffectIndex /*eff_idx*/)
@@ -6057,6 +6081,8 @@ void Spell::EffectSummonDemon(SpellEffectIndex eff_idx)
         // Inferno effect
         Charmed->CastSpell(Charmed, 22703, true, nullptr);
     }
+
+    AddExecuteLogInfo(eff_idx, ExecuteLogInfo(Charmed->GetObjectGuid()));
 }
 
 void Spell::EffectSpiritHeal(SpellEffectIndex /*eff_idx*/)

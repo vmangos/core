@@ -923,19 +923,19 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         {
             pDefender = NULL;
             if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseOneGuards[i]))
-                pDefender->AddObjectToRemoveList();
+                static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
         for (int i = 0; i < 8; i++)
         {
             pDefender = NULL;
             if (pDefender = m_creature->GetMap()->GetCreature(GuidPhaseTwoGuards[i]))
-                pDefender->AddObjectToRemoveList();
+                static_cast<TemporarySummon*>(pDefender)->UnSummon();
         }
         while (!AllKolkars.empty())
         {
             pDefender = NULL;
             if (pDefender = m_creature->GetMap()->GetCreature(AllKolkars.front()))
-                pDefender->AddObjectToRemoveList();
+                static_cast<TemporarySummon*>(pDefender)->UnSummon();
             AllKolkars.pop_front();
         }
     }
@@ -979,22 +979,22 @@ struct npc_regthar_deathgateAI : public ScriptedAI
                 }
                 SecondPhaseGuards();
 
+                if (phaseTimer < 200000)
+                    phaseTimer = 200000;
                 //summon  NPC_KROMZAR + 2 adds en deaddespawn.
-                if (Creature* kromzar = m_creature->SummonCreature(NPC_KROMZAR, -288.344f, -1852.846f, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
+                if (Creature* kromzar = m_creature->SummonCreature(NPC_KROMZAR, -288.344f, -1852.846f, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, phaseTimer))
                 {
                     kromzar->JoinCreatureGroup(kromzar, 3, 0, (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER));
                     kromzar->SetRespawnDelay(120000);
                     for (int i = 0; i < 2; i++)
                     {
-                        if (Creature* c = m_creature->SummonCreature(NPC_KOLKAR_INVADER, -288.344f + i, -1852.846f + i, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 60000))
+                        if (Creature* c = m_creature->SummonCreature(NPC_KOLKAR_INVADER, -288.344f + i, -1852.846f + i, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, phaseTimer))
                         {
                             c->JoinCreatureGroup(kromzar, 3.0f, (3.0f + i) - kromzar->GetOrientation(), (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER));
                             c->SetRespawnDelay(120000);
                         }
                     }
                     DoScriptText(YELL_KOLKAR_STRONGEST, kromzar);
-                    if (phaseTimer < 200000)
-                        phaseTimer = 200000;
                 }
             }
         }

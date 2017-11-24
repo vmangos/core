@@ -3026,7 +3026,24 @@ void Player::SendInitialSpells()
         data << uint16(itr->first);
 
         data << uint16(itr->second.itemid);                 // cast item id
-        data << uint16(sEntry->Category);                   // spell category
+
+        uint32 category = sEntry->Category;
+        if (itr->second.itemid && !category)
+        {
+            if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(itr->second.itemid))
+            {
+                for (int idx = 0; idx < MAX_ITEM_PROTO_SPELLS; ++idx)
+                {
+                    if (proto->Spells[idx].SpellId == itr->first)
+                    {
+                        category = proto->Spells[idx].SpellCategory;
+                        break;
+                    }
+                }
+            }
+        }
+
+        data << uint16(category);                           // spell category
 
         // send infinity cooldown in special format
         if (itr->second.end >= infTime)
@@ -3699,7 +3716,23 @@ void Player::_LoadSpellCooldowns(QueryResult *result)
             if (db_time <= curTime)
                 continue;
 
-            AddSpellCooldown(spell_id, item_id, db_time, db_cat_time, spell->Category);
+            uint32 category = spell->Category;
+            if (item_id && !category)
+            {
+                if (ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item_id))
+                {
+                    for (int idx = 0; idx < MAX_ITEM_PROTO_SPELLS; ++idx)
+                    {
+                        if (proto->Spells[idx].SpellId == spell->Id)
+                        {
+                            category = proto->Spells[idx].SpellCategory;
+                            break;
+                        }
+                    }
+                }
+            }
+
+            AddSpellCooldown(spell_id, item_id, db_time, db_cat_time, category);
 
             DEBUG_LOG("Player (GUID: %u) spell %u, item %u cooldown loaded (%u secs).", GetGUIDLow(), spell_id, item_id, uint32(db_time - curTime));
         }
@@ -12281,7 +12314,7 @@ bool Player::CanSeeStartQuest(Quest const *pQuest) const
 
 bool Player::CanTakeQuest(Quest const *pQuest, bool msg, bool skipStatusCheck /*false*/) const
 {
-    if (pQuest->GetType() == QUEST_TYPE_PVP && pQuest->GetQuestLevel() && pQuest->GetQuestLevel() < getLevel())
+    if (pQuest->GetMaxLevel() && pQuest->GetMaxLevel() < getLevel())
         return false;
 
     return (skipStatusCheck || SatisfyQuestStatus(pQuest, msg)) && SatisfyQuestExclusiveGroup(pQuest, msg) &&
@@ -19710,10 +19743,14 @@ void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
                                m_homebindMapId, m_homebindAreaId, m_homebindX, m_homebindY, m_homebindZ, GetGUIDLow());
 }
 
-bool Player::TeleportToHomebind(uint32 options) 
+bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown) 
 {
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
-    AddSpellAndCategoryCooldowns(spellInfo, 6948);   // Initiate hearthstone cooldown
+    if (hearthCooldown)
+    {
+        // Initiate hearthstone cooldown
+        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
+        AddSpellAndCategoryCooldowns(spellInfo, 6948);
+    }
 
     return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); 
 }

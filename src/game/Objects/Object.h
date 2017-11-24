@@ -920,10 +920,10 @@ m_obj->m_updateTracker.Reset();
         void SetVisibilityModifier(float f);
 
         uint32 GetCreatureSummonCount() { return m_creatureSummonCount; }
-        inline void DecrementSummonCounter() {
-            if (m_creatureSummonCount) 
-                --m_creatureSummonCount;
-        }
+        void DecrementSummonCounter();
+
+        uint32 GetCreatureSummonLimit() const { return m_creatureSummonLimit; }
+        void SetCreatureSummonLimit(uint32 limit);
 
     protected:
         explicit WorldObject();
@@ -949,7 +949,9 @@ m_obj->m_updateTracker.Reset();
         
         float m_lootAndXPRangeModifier;
 
-        uint32 m_creatureSummonCount;
+        uint32 m_creatureSummonCount;   // Current summon count
+        uint32 m_creatureSummonLimit;   // Hard limit on creature summons
+        uint32 m_summonLimitAlert;      // Timer to alert GMs if a creature is at the summon limit
 };
 
 #endif

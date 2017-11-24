@@ -554,6 +554,16 @@ void Spell::FillTargetMap()
                                         ++itr;
                                 }
                                 break;
+                            case 29484:
+                                // Maexxna Web Spray should not hit players under Web Wrap or Petrification
+                                for (UnitList::iterator itr = tmpUnitMap.begin(); itr != tmpUnitMap.end();)
+                                {
+                                    if ((*itr)->HasAura(17624) || (*itr)->HasAura(28622))
+                                        itr = tmpUnitMap.erase(itr);
+                                    else
+                                        ++itr;
+                                }
+                                break;
                             }
                         }
                         break;
@@ -970,7 +980,7 @@ void Spell::CheckAtDelay(TargetInfo* pInf)
         }
     }
     if (pTarget != m_caster &&
-            (pTarget->IsImmuneToDamage(GetSpellSchoolMask(m_spellInfo)) || pTarget->IsImmuneToSpell(m_spellInfo, pTarget == m_caster)))
+            (pTarget->IsImmuneToDamage(GetSpellSchoolMask(m_spellInfo), m_spellInfo) || pTarget->IsImmuneToSpell(m_spellInfo, pTarget == m_caster)))
         pInf->missCondition = SPELL_MISS_IMMUNE;
 }
 
@@ -1073,6 +1083,9 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
     Unit* unit = m_caster->GetObjectGuid() == target->targetGUID ? m_caster : ObjectAccessor::GetUnit(*m_caster, target->targetGUID);
     if (!unit)
+        return;
+
+    if (getState() == SPELL_STATE_DELAYED && (WorldTimer::getMSTime() - target->timeDelay) <= unit->m_lastSanctuaryTime && !IsPositiveSpell(m_spellInfo))
         return;
 
     // Get original caster (if exist) and calculate damage/healing from him data
@@ -1474,7 +1487,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
 
     // Recheck immune (only for delayed spells)
     if (m_caster != unit && m_spellInfo->speed && (
-                unit->IsImmuneToDamage(GetSpellSchoolMask(m_spellInfo)) ||
+                unit->IsImmuneToDamage(GetSpellSchoolMask(m_spellInfo), m_spellInfo) ||
                 unit->IsImmuneToSpell(m_spellInfo, unit == realCaster)))
     {
         if (realCaster)
@@ -4475,6 +4488,24 @@ void Spell::SendLogExecute()
                 case SPELL_EFFECT_OPEN_LOCK:
                 case SPELL_EFFECT_OPEN_LOCK_ITEM:
                 case SPELL_EFFECT_DISMISS_PET:
+                case SPELL_EFFECT_TRANS_DOOR:
+                case SPELL_EFFECT_SUMMON:
+                case SPELL_EFFECT_SUMMON_PET:
+                case SPELL_EFFECT_SUMMON_WILD:
+                case SPELL_EFFECT_SUMMON_GUARDIAN:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT1:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT2:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT3:
+                case SPELL_EFFECT_SUMMON_TOTEM_SLOT4:
+                case SPELL_EFFECT_SUMMON_POSSESSED:
+                case SPELL_EFFECT_SUMMON_TOTEM:
+                case SPELL_EFFECT_SUMMON_CRITTER:
+                case SPELL_EFFECT_SUMMON_OBJECT_WILD:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT1:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT2:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT3:
+                case SPELL_EFFECT_SUMMON_OBJECT_SLOT4:
+                case SPELL_EFFECT_SUMMON_DEMON:
                     data << info.targetGuid;
                      break;
                  default:

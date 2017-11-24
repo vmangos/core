@@ -44,7 +44,8 @@ MapManager::MapManager()
     i_GridStateErrorCount(0),
     i_continentUpdateFinished(0),
     i_maxContinentThread(0),
-    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)))
+    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS))),
+    asyncMapUpdating(false)
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
     m_threads->start<ThreadPool::MySQL<>>();
@@ -253,6 +254,7 @@ void MapManager::Update(uint32 diff)
     ExecuteDelayedPlayerTeleports();
 
     uint32 mapsDiff = (uint32)i_timer.GetCurrent();
+    asyncMapUpdating = true;
 
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
@@ -317,6 +319,8 @@ void MapManager::Update(uint32 diff)
     if (continents.valid())
         continents.wait();
 
+    asyncMapUpdating = false;
+
     // Execute far teleports after all map updates have finished
     ExecuteDelayedPlayerTeleports();
 
@@ -379,6 +383,10 @@ void MapManager::UnloadAll()
 {
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
         iter->second->UnloadAll(true);
+
+    // Execute any delayed teleports scheduled during unloading. Must be done before
+    // the maps are deleted
+    ExecuteDelayedPlayerTeleports();
 
     while (!i_maps.empty())
     {
@@ -775,9 +783,19 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
 
 void MapManager::ScheduleFarTeleport(Player *player, ScheduledTeleportData *data)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
-    player->SetPendingFarTeleport(true);
-    m_scheduledFarTeleports[player] = data;
+    // If we're not in the middle of an async update, it's safe to execute the
+    // teleport immediately.
+    if (!asyncMapUpdating)
+    {
+        player->ExecuteTeleportFar(data);
+        delete data;
+    }
+    else
+    {
+        ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+        player->SetPendingFarTeleport(true);
+        m_scheduledFarTeleports[player] = data;
+    }
 }
 
 // Execute all delayed teleports at the end of a map update

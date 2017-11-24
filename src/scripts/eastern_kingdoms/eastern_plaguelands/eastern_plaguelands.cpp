@@ -217,6 +217,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     {
         Reset();
         m_creature->CastSpell(m_creature, SPELL_FUFU, true);
+        m_creature->SetCreatureSummonLimit(200);
     }
 
     uint32 Vague;
@@ -1349,6 +1350,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
     {
         DefenderFaction = 113;  // Faction Escortee : heal possible mais... n'attaque pas à vue malgré les bons flags :/
         Reset();
+        m_creature->SetCreatureSummonLimit(200);
     }
 
     uint32 PhaseStep;

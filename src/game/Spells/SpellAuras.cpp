@@ -5267,7 +5267,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune (not use charges)
-            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto)) && !(spellProto->Attributes & SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY))
+            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto), spellProto))
                 return;
 
             uint32 absorb = 0;
@@ -5389,7 +5389,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune
-            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto)))
+            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto), spellProto))
                 return;
 
             uint32 absorb = 0;
@@ -5559,7 +5559,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune (not use charges)
-            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto)))
+            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto), spellProto))
                 return;
 
             // ignore non positive values (can be result apply spellmods to aura damage
@@ -5683,7 +5683,7 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
                 return;
 
             // Check for immune (not use charges)
-            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto)))
+            if (target->IsImmuneToDamage(GetSpellSchoolMask(spellProto), spellProto))
                 return;
 
             int32 pdamage = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
@@ -5849,7 +5849,7 @@ void Aura::HandlePreventFleeing(bool apply, bool Real)
         if (apply)
             GetTarget()->SetFeared(false, fearAuras.front()->GetCasterGuid());
         else
-            GetTarget()->SetFeared(true);
+            GetTarget()->SetFeared(true, fearAuras.front()->GetCasterGuid(), fearAuras.front()->GetId());
     }
 }
 
@@ -7114,6 +7114,7 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 25661: // Bouffe +25 Endu
         case 24427: // Diamond Flask
         case 17528: // Mighty Rage Potion
+        case 23697: // Alterac Spring Water
             return false;
 
         case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.

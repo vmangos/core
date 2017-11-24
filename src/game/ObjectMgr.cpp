@@ -3346,8 +3346,8 @@ void ObjectMgr::LoadQuests()
                           "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
                           //   119                     120                     121                     122
                           "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
-                          //   123          124
-                          "StartScript, CompleteScript"
+                          //   123          124         125
+                          "StartScript, CompleteScript, MaxLevel"
                           " FROM quest_template t1 WHERE patch=(SELECT max(patch) FROM quest_template t2 WHERE t1.entry=t2.entry && patch <= %u)", sWorld.GetWowPatch());
     if (!result)
     {
@@ -5247,7 +5247,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.target_Orientation = fields[10].GetFloat();
         at.required_event     = fields[11].GetInt32();
         at.required_pvp_rank  = fields[12].GetUInt8();
-        at.required_team      = fields[13].GetUInt8();
+        at.required_team      = fields[13].GetUInt16();
 
         AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
         if (!atEntry)

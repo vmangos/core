@@ -215,12 +215,14 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         uint32 i_MaxInstanceId;
         int             i_maxContinentThread;
+
         mutable std::mutex      m_continentMutex;
         mutable std::condition_variable      m_continentCV;
         std::atomic<int> i_continentUpdateFinished;
 
         std::unique_ptr<ThreadPool> m_threads;
         std::unique_ptr<ThreadPool> m_continentThreads;
+        bool asyncMapUpdating;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;
