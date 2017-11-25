@@ -896,14 +896,7 @@ HonorRankInfo HonorMgr::CalculateRank(float rankPoints, uint32 totalHK)
 
     // rank none
     if (rankPoints == 0)
-    {
-        if (totalHK >= sWorld.getConfig(CONFIG_UINT32_MIN_HONOR_KILLS))
-        {
-            prk.rank = NEGATIVE_HONOR_RANK_COUNT + 1;
-            CalculateRankInfo(prk);
-        }
         return prk;
-    }
 
     prk.positive = rankPoints > 0;
     if (!prk.positive)
