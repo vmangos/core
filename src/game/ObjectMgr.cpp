@@ -7877,6 +7877,24 @@ void ObjectMgr::LoadVendorTemplates()
         }
     }
 
+    // We need to use a query to get all used vendor ids because of progression.
+    // It might be used by a creature that is not loaded in this patch.
+    QueryResult* result = WorldDatabase.Query("SELECT vendor_id FROM creature_template WHERE vendor_id > 0");
+
+    Field* fields;
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 vendorId = fields[0].GetUInt32();
+            if (vendor_ids.find(vendorId) != vendor_ids.end())
+                vendor_ids.erase(vendorId);
+        } while (result->NextRow());
+        delete result;
+    }
+
     for (std::set<uint32>::const_iterator vItr = vendor_ids.begin(); vItr != vendor_ids.end(); ++vItr)
         sLog.outErrorDb("Table `npc_vendor_template` has vendor template %u not used by any vendors ", *vItr);
 }
