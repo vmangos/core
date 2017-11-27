@@ -1384,33 +1384,29 @@ void Map::UpdateActiveObjectVisibility(Player *player)
 // Not compressed
 void Map::UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids)
 {
-    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    for (auto iter = m_activeNonPlayers.cbegin(); iter != m_activeNonPlayers.cend(); ++iter)
     {
-        WorldObject *obj = *m_activeNonPlayersIter;
+        WorldObject *obj = *iter;
         if (obj->IsInWorld())
         {
             player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj);
             visibleGuids.erase(obj->GetObjectGuid());
         }
-
-        ++m_activeNonPlayersIter;
     }
 }
 
 // Support for compressed data packet
 void Map::UpdateActiveObjectVisibility(Player *player, ObjectGuidSet &visibleGuids, UpdateData &data, std::set<WorldObject*> &visibleNow)
 {
-    for (m_activeNonPlayersIter = m_activeNonPlayers.begin(); m_activeNonPlayersIter != m_activeNonPlayers.end();)
+    for (auto iter = m_activeNonPlayers.cbegin(); iter != m_activeNonPlayers.cend(); ++iter)
     {
-        WorldObject *obj = *m_activeNonPlayersIter;
+        WorldObject *obj = *iter;
         if (obj->IsInWorld())
         {
             // TODO: Why is this templated? Why not just base class WorldObject for the target...?
             player->UpdateVisibilityOf(player->GetCamera().GetBody(), obj, data, visibleNow);
             visibleGuids.erase(obj->GetObjectGuid());
         }
-
-        ++m_activeNonPlayersIter;
     }
 }
 
