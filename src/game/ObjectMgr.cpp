@@ -3933,7 +3933,7 @@ void ObjectMgr::LoadQuests()
 
             if (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT))
             {
-                sLog.outErrorDb("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE for quest %u , but quest does not have SpecialFlags QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT (2) set. Quest SpecialFlags should be corrected to enable this objective.", spellInfo->Id, quest_id);
+                sLog.outDetail("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE for quest %u , but quest does not have SpecialFlags QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT (2) set. Quest SpecialFlags should be corrected to enable this objective.", spellInfo->Id, quest_id);
 
                 // The below forced alteration has been disabled because of spell 33824 / quest 10162.
                 // A startup error will still occur with proper data in quest_template, but it will be possible to sucessfully complete the quest with the expected data.
@@ -6580,7 +6580,7 @@ void ObjectMgr::LoadCreatureQuestRelations()
         if (!cInfo)
             sLog.outErrorDb("Table `creature_questrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr->first, itr->second);
         else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.outErrorDb("Table `creature_questrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
+            sLog.outDetail("Table `creature_questrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
     }
 }
 
@@ -6594,7 +6594,7 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
         if (!cInfo)
             sLog.outErrorDb("Table `creature_involvedrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr->first, itr->second);
         else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.outErrorDb("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
+            sLog.outDetail("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
     }
 }
 
@@ -8151,7 +8151,7 @@ void ObjectMgr::LoadGossipMenuItems()
             }
 
             if (found_menu_uses && !found_flags_uses)
-                sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding`npcflag`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
+                sLog.outDetail("Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding`npcflag`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
         }
 
         if (gMenuItem.action_poi_id && !GetPointOfInterest(gMenuItem.action_poi_id))
