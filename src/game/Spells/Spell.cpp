@@ -982,6 +982,9 @@ void Spell::CheckAtDelay(TargetInfo* pInf)
     if (pTarget != m_caster &&
             (pTarget->IsImmuneToDamage(GetSpellSchoolMask(m_spellInfo), m_spellInfo) || pTarget->IsImmuneToSpell(m_spellInfo, pTarget == m_caster)))
         pInf->missCondition = SPELL_MISS_IMMUNE;
+
+    if (pTarget->GetTypeId() == TYPEID_UNIT && ((Creature*)pTarget)->IsInEvadeMode())
+        pInf->missCondition = SPELL_MISS_EVADE;
 }
 
 void Spell::AddGOTarget(GameObject* pVictim, SpellEffectIndex effIndex)
