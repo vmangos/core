@@ -1033,14 +1033,6 @@ struct npc_nathanosAI : public ScriptedAI
         else
             Backhand_Timer -= diff;
 
-        if (MultiShot_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MULTI_SHOT) == CAST_OK)
-                MultiShot_Timer = urand(8000, 15000);
-        }
-        else
-            MultiShot_Timer -= diff;
-
         if (PsychicScream_Timer < diff)
         {
             if (DoCastSpellIfCan(m_creature, SPELL_PSYCHIC_SCREAM) == CAST_OK)
@@ -1049,10 +1041,26 @@ struct npc_nathanosAI : public ScriptedAI
         else
             PsychicScream_Timer -= diff;
 
+        if (MultiShot_Timer < diff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MULTI_SHOT) == CAST_OK)
+            {
+                MultiShot_Timer = urand(8000, 15000);
+                Shoot_Timer = std::max(Shoot_Timer, 1500u);
+                ShadowShoot_Timer = std::max(ShadowShoot_Timer, 1500u);
+            }
+        }
+        else
+            MultiShot_Timer -= diff;
+
         if (ShadowShoot_Timer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_SHOOT) == CAST_OK)
+            {
                 ShadowShoot_Timer = urand(8000, 15000);
+                Shoot_Timer = std::max(Shoot_Timer, 1500u);
+                MultiShot_Timer = std::max(MultiShot_Timer, 1500u);
+            }
         }
         else
             ShadowShoot_Timer -= diff;
@@ -1060,7 +1068,11 @@ struct npc_nathanosAI : public ScriptedAI
         if (Shoot_Timer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT) == CAST_OK)
+            {
                 Shoot_Timer = urand(4000, 6000);
+                MultiShot_Timer = std::max(MultiShot_Timer, 1500u);
+                ShadowShoot_Timer = std::max(ShadowShoot_Timer, 1500u);
+            }
         }
         else
             Shoot_Timer -= diff;

@@ -7673,6 +7673,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                                 break;
                         }
                     }
+                    else if (Group* group = recipient->GetGroup())
+                    {
+                        if (group->isBGGroup() && group->GetLootMethod() == GROUP_LOOT)
+                            group->GroupLoot(creature, loot);
+                    }
                 }
 
                 // possible only if creature->lootForBody && loot->empty() at spell cast check
@@ -17391,7 +17396,7 @@ bool Player::BuyItemFromVendor(ObjectGuid vendorGuid, uint32 item, uint8 count, 
     uint32 vCount = vItems ? vItems->GetItemCount() : 0;
     uint32 tCount = tItems ? tItems->GetItemCount() : 0;
 
-    size_t vendorslot = vItems ? vItems->FindItemSlot(item) : vCount;
+    size_t vendorslot = vItems ? vItems->FindItemSlot(item) : tItems ? tItems->FindItemSlot(item) : vCount;
     if (vendorslot > vCount)
         vendorslot = vCount + (tItems ? tItems->FindItemSlot(item) : tCount);
 
