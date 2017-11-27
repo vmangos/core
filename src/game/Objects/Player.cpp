@@ -7673,6 +7673,11 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                                 break;
                         }
                     }
+                    else if (Group* group = recipient->GetGroup())
+                    {
+                        if (group->isBGGroup() && group->GetLootMethod() == GROUP_LOOT)
+                            group->GroupLoot(creature, loot);
+                    }
                 }
 
                 // possible only if creature->lootForBody && loot->empty() at spell cast check
