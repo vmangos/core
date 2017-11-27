@@ -146,9 +146,9 @@ private:
 enum DarkmoonState
 {
     DARKMOON_NONE = 0,
-    DARKMOON_A2_INSTALLATION = 100, // TODO (spawns, game_event)
+    DARKMOON_A2_INSTALLATION = 23, // TODO (spawns, game_event)
     DARKMOON_A2 = 4,
-    DARKMOON_H2_INSTALLATION = 101, // TODO (spawns, game_event)
+    DARKMOON_H2_INSTALLATION = 24, // TODO (spawns, game_event)
     DARKMOON_H2 = 5,
 };
 
