@@ -219,6 +219,7 @@ void AddSC_boss_landslide();
 void AddSC_boss_noxxion();
 void AddSC_boss_ptheradras();
 void AddSC_maraudon();
+void AddSC_instance_maraudon();
 void AddSC_boss_onyxia();                            //onyxias_lair
 void AddSC_boss_amnennar_the_coldbringer();          //razorfen_downs
 void AddSC_razorfen_downs();
@@ -492,6 +493,7 @@ void AddScripts()
     AddSC_boss_noxxion();
     AddSC_boss_ptheradras();
     AddSC_maraudon();
+    AddSC_instance_maraudon();
     AddSC_boss_onyxia();                                    //onyxias_lair
     AddSC_boss_amnennar_the_coldbringer();                  //razorfen_downs
     AddSC_razorfen_downs();
