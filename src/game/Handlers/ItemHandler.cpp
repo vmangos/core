@@ -1203,7 +1203,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
         return;
     }
 
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(_player->GetGUIDLow());
     CharacterDatabase.PExecute("INSERT INTO character_gifts VALUES ('%u', '%u', '%u', '%u')", item->GetOwnerGuid().GetCounter(), item->GetGUIDLow(), item->GetEntry(), item->GetUInt32Value(ITEM_FIELD_FLAGS));
     item->SetEntry(gift->GetEntry());
 
@@ -1234,9 +1234,7 @@ void WorldSession::HandleWrapItemOpcode(WorldPacket& recv_data)
 
     if (item->GetState() == ITEM_NEW)                       // save new item, to have alway for `character_gifts` record in `item_instance`
     {
-        // after save it will be impossible to remove the item from the queue
-        item->RemoveFromUpdateQueueOf(_player);
-        item->SaveToDB();                                   // item gave inventory record unchanged and can be save standalone
+        _player->SaveInventoryAndGoldToDB();
     }
     CharacterDatabase.CommitTransaction();
 
