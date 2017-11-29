@@ -467,15 +467,15 @@ void WorldSession::HandlePushQuestToParty(WorldPacket& recvPacket)
                     continue;
                 }
 
-                if (!pPlayer->SatisfyQuestStatus(pQuest, false))
-                {
-                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_HAVE_QUEST);
-                    continue;
-                }
-
                 if (pPlayer->GetQuestStatus(questId) == QUEST_STATUS_COMPLETE)
                 {
                     _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_FINISH_QUEST);
+                    continue;
+                }
+
+                if (!pPlayer->SatisfyQuestStatus(pQuest, false))
+                {
+                    _player->SendPushToPartyResponse(pPlayer, QUEST_PARTY_MSG_HAVE_QUEST);
                     continue;
                 }
 
