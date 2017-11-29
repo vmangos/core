@@ -52,6 +52,7 @@
 #include "AuraRemovalMgr.h"
 #include "GameEventMgr.h"
 #include "world/world_event_wareffort.h"
+#include "LFGMgr.h"
 
 #define MAX_GRID_LOAD_TIME      50
 
@@ -3989,6 +3990,26 @@ void Map::ScriptsProcess()
                     sLog.outError("SCRIPT_COMMAND_TURN_TO (script id %u) unsupported call with value datalong=%i.", step.script->id, step.script->turnTo.facingLogic);
                     break;
                 }
+                break;
+            }
+            case SCRIPT_COMMAND_MEETINGSTONE:
+            {
+                Player* pPlayer = nullptr;
+
+                if (target && target->IsPlayer())
+                    pPlayer = (Player*)target;
+                else if (source && source->IsPlayer())
+                    pPlayer = (Player*)source;
+
+                // only Player
+                if (!pPlayer)
+                {
+                    sLog.outError("SCRIPT_COMMAND_MEETINGSTONE (script id %u) call for non-player, skipping.", step.script->id);
+                    break;
+                }
+
+                if (!sLFGMgr.IsPlayerInQueue(pPlayer->GetObjectGuid()))
+                    sLFGMgr.AddToQueue(pPlayer, step.script->meetingstone.areaId);
                 break;
             }
             default:

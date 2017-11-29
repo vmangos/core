@@ -121,6 +121,7 @@ set (game_SRCS
 	Handlers/GroupHandler.cpp
 	Handlers/GuildHandler.cpp
 	Handlers/ItemHandler.cpp
+	Handlers/LFGHandler.cpp
 	Handlers/LootHandler.cpp
 	Handlers/MailHandler.cpp
 	Handlers/MiscHandler.cpp
@@ -134,6 +135,7 @@ set (game_SRCS
 	Handlers/SpellHandler.cpp
 	Handlers/TaxiHandler.cpp
 	Handlers/TradeHandler.cpp
+	LFG/LFGMgr.cpp
 	Mail/Mail.cpp
 	Mail/MassMailMgr.cpp
 	MapNodes/AbstractPlayer.cpp
@@ -309,6 +311,8 @@ set (game_SRCS
 	Guild/GuildMgr.h
 	Handlers/AddonHandler.h
 	Handlers/NPCHandler.h
+	Handlers/LFGHandler.h
+	LFG/LFGMgr.h
 	Mail/Mail.h
 	Mail/MassMailMgr.h
 	MapNodes/AbstractPlayer.h
@@ -476,6 +480,7 @@ include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}/Group
   ${CMAKE_CURRENT_SOURCE_DIR}/Guild
   ${CMAKE_CURRENT_SOURCE_DIR}/Handlers
+  ${CMAKE_CURRENT_SOURCE_DIR}/LFG
   ${CMAKE_CURRENT_SOURCE_DIR}/Mail
   ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes
   ${CMAKE_CURRENT_SOURCE_DIR}/MapNodes/Handlers

@@ -614,6 +614,28 @@ Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
     return TEAM_NONE;
 }
 
+uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
+{
+    // prevent DB access for online player
+    if (Player* player = GetPlayer(guid))
+    {
+        return player->getClass();
+    }
+
+    uint32 lowguid = guid.GetCounter();
+
+    QueryResult* result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid = '%u'", lowguid);
+
+    if (result)
+    {
+        uint8 pClass = (*result)[0].GetUInt8();
+        delete result;
+        return pClass;
+    }
+
+    return 0;
+}
+
 uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
 {
     if (auto player = GetPlayer(guid))
@@ -1635,8 +1657,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
     QueryResult *result = WorldDatabase.Query("SELECT gameobject.guid, gameobject.id, map, position_x, position_y, position_z, orientation,"
                           //   7          8          9          10         11             12            13     14
                           "rotation0, rotation1, rotation2, rotation3, spawntimesecs, animprogress, state, event, "
-                          //   15                          16                                   17          18
-                          "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry, spawnFlags, visibilitymod "
+                          //   15                          16                                   17          18             19        20
+                          "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry, spawnFlags, visibilitymod, patch_min, patch_max "
                           "FROM gameobject "
                           "LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
                           "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid "
@@ -1662,6 +1684,19 @@ void ObjectMgr::LoadGameobjects(bool reload)
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
+        uint8 patch_min     = fields[19].GetUInt8();
+        uint8 patch_max     = fields[20].GetUInt8();
+
+        if ((patch_min > patch_max) || (patch_max > 10))
+        {
+            sLog.outErrorDb("Table `gameobject` GUID %u (entry %u) has invalid values min_patch=%u, max_patch=%u.", guid, entry, patch_min, patch_max);
+            sLog.out(LOG_DBERRFIX, "UPDATE gameobject SET min_patch=0, max_patch=10 WHERE guid=%u AND id=%u;", guid, entry);
+            patch_min = 0;
+            patch_max = 10;
+        }
+
+        if (!((sWorld.GetWowPatch() >= patch_min) && (sWorld.GetWowPatch() <= patch_max)))
+            continue;
 
         GameObjectInfo const* gInfo = GetGameObjectInfo(entry);
         if (!gInfo)
