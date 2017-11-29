@@ -172,6 +172,11 @@ INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch`) VALUES (15701, 
 INSERT INTO `creature_involvedrelation` (`id`, `quest`, `patch`) VALUES (15701, 8797, 7);
 -- Fix exclusive group for The Horde Needs Your Help!.
 UPDATE `quest_template` SET `ExclusiveGroup`=8792 WHERE `entry` IN (8792, 8793, 8794);
+-- Add quests to the war effort event.
+INSERT INTO `game_event_quest` (`quest`, `event`, `patch`) VALUES (8792, 22, 7);
+INSERT INTO `game_event_quest` (`quest`, `event`, `patch`) VALUES (8793, 22, 7);
+INSERT INTO `game_event_quest` (`quest`, `event`, `patch`) VALUES (8796, 22, 7);
+INSERT INTO `game_event_quest` (`quest`, `event`, `patch`) VALUES (8797, 22, 7);
 
 
 -- End of migration.
