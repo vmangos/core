@@ -254,6 +254,13 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
                 return DIMINISHING_CONTROL_ROOT;
             break;
         }
+        case SPELLFAMILY_MAGE:
+        {
+            // Ice Block
+            if (SpellVisual == 4325)
+                return DIMINISHING_NONE;
+            break;
+        }
         case SPELLFAMILY_GENERIC:
         {
             if (Id == 12355) // Impact
