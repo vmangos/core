@@ -4111,7 +4111,13 @@ void Spell::EffectWeaponDmg(SpellEffectIndex eff_idx)
     }
 
     // + weapon damage with applied weapon% dmg to base weapon damage in call
-    bonus += int32(m_caster->CalculateDamage(m_attackType, normalized) * weaponDamagePercentMod);
+    for (uint8 i = 0; i < m_caster->GetWeaponDamageCount(m_attackType); i++)
+    {
+        if (unitTarget->IsImmuneToDamage(GetSchoolMask(m_caster->GetWeaponDamageSchool(m_attackType, i))))
+            continue;
+
+        bonus += int32(m_caster->CalculateDamage(m_attackType, normalized, i) * weaponDamagePercentMod);
+    }
 
     // Seal of Command
     if (m_spellInfo->School == SPELL_SCHOOL_HOLY)
