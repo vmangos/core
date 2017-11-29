@@ -395,7 +395,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                     {
                         // All sources say the explosion should do around 4.5k physical dmg if it runs out,
                         // but "less" if dispelled. I have been able to find different variations of this spell,
-                        // so the hack has become to set m_triggeredBySpellInfo when casting this spell from Aura::HandleAuraDummy 
+                        // so the hack has become to set m_triggeredBySpellInfo when casting this spell from Aura::HandleAuraDummy
                         // when 28169 expires, and NOT set m_triggeredBySpellInfo 28169 is dispelled.
                         if (m_triggeredBySpellInfo)
                             damage = uint32(damage * 1.5f);
@@ -1634,6 +1634,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 5229:                                  // Enrage
                 {
                     // Reduce base armor by 27% in Bear Form and 16% in Dire Bear Form
+                    break;
                 }
                 case 29201: // Loatheb Corrupted Mind triggered sub spells
                 {
@@ -1650,6 +1651,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     if (spellid != 0)
                         m_caster->CastSpell(unitTarget, spellid, true);
+
+                    break;
                 }
             }
             break;
@@ -2922,7 +2925,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         SpellAuraHolder *holder = itr->second;
         if ((1 << holder->GetSpellProto()->Dispel) & dispelMask)
         {
-            if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC || 
+            if (holder->GetSpellProto()->Dispel == DISPEL_MAGIC ||
                 holder->GetSpellProto()->Dispel == DISPEL_POISON)
             {
                 if (checkFaction)
@@ -2960,7 +2963,7 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         {
             // Random select buff for dispel
             std::list<std::pair<SpellAuraHolder*, uint32> >::iterator dispel_itr = dispel_list.begin();
-            if (priority_dispel >= 0) 
+            if (priority_dispel >= 0)
             {
                 std::advance(dispel_itr, priority_dispel);
                 priority_dispel = -1;
@@ -3695,7 +3698,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
                         item_owner->GetName(), item_owner->GetSession()->GetAccountId());
     }
 
-    // remove old enchant before applying new 
+    // remove old enchant before applying new
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, false);
 
     itemTarget->SetEnchantment(TEMP_ENCHANTMENT_SLOT, enchant_id, duration * 1000, charges);
@@ -3976,12 +3979,12 @@ void Spell::EffectTaunt(SpellEffectIndex eff_idx)
         // https://web.archive.org/web/20061109034626/http://evilempireguild.org:80/guides/kenco2.php
         // Recently(1.11.x), the behaviour of Taunt has been buffed slightly.It now does three things :
 
-        // Taunt debuff.The mob is forced to attack you for 3 seconds.Later taunts by other players override this. 
-        // You are given threat equal to the mob's previous aggro target, permanently. Importantly, you won't necessarily get as much threat 
-        // as the highest person on the mob's list, only as much as whoever is currently tanking it. 
-        // You gain complete aggro on the mob at the instant you taunt.Usually you would need 10 % more threat to gain aggro(see section 3), 
+        // Taunt debuff.The mob is forced to attack you for 3 seconds.Later taunts by other players override this.
+        // You are given threat equal to the mob's previous aggro target, permanently. Importantly, you won't necessarily get as much threat
+        // as the highest person on the mob's list, only as much as whoever is currently tanking it.
+        // You gain complete aggro on the mob at the instant you taunt.Usually you would need 10 % more threat to gain aggro(see section 3),
         // but a taunt now gives you instant aggro on the mob.
-        // Of course if other people are generating significant threat on the mob, they could exceed your threat by more than 10 % before the taunt debuff wears off, 
+        // Of course if other people are generating significant threat on the mob, they could exceed your threat by more than 10 % before the taunt debuff wears off,
         // and will gain aggro as soon as it does.There is no limit to the amount of threat you can gain from Taunt.
         unitTarget->getThreatManager().setCurrentVictimIfCan(m_caster);
     }
@@ -4247,7 +4250,7 @@ void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
     }
 
     int32 duration = GetSpellDuration(m_spellInfo);
-    
+
     // Sapphirons summoned iceblocks have a duration *just* long enough to dissapear before the ice bomb.
     // Since they are despawned by another spell anyway, I make the gobj add slightly longer to avoid any lag
     // causing the gobj to despawn before the bomb goes off
@@ -4679,7 +4682,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
 
                     int num_targets = std::min(int(viableTargets.size()), 5)-1; // leaving 1 target not MCed to avoid reset due to all MCed
-                    
+
                     // always MC maintank
                     if (Unit* maintank = m_caster->getVictim())
                     {
@@ -4696,7 +4699,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         int rand = irand(0, viableTargets.size() - 1);
                         Unit* target = viableTargets[rand];
                         viableTargets.erase(viableTargets.begin() + rand);
-                        
+
                         target->CastSpell(target, 28409, true); // modifies scale
                         m_caster->CastSpell(target, 28410, true); // applies dmg and healing mod, as well as the charm itself
                     }
@@ -4739,7 +4742,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         unitTarget->RemoveAurasDueToSpell(28522); // Icebolt stun/damage spell
                     }
                 }
-                case 28352:									// Atiesh - Breath of Sargeras 
+                case 28352:									// Atiesh - Breath of Sargeras
                 {
                     if (unitTarget && m_caster)
                         m_caster->CastSpell(unitTarget, 28342, true);
@@ -4897,7 +4900,7 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     if (!unitTarget)
         return;
 
-    unitTarget->InterruptSpellsCastedOnMe(true);   
+    unitTarget->InterruptSpellsCastedOnMe(true);
     unitTarget->CombatStop();
     unitTarget->getHostileRefManager().deleteReferences();  // stop all fighting
     unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
@@ -4907,7 +4910,7 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     {
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
         unitTarget->InterruptAttacksOnMe();
-        
+
         if (auto pPlayer = m_caster->ToPlayer())
         {
             pPlayer->SetCannotBeDetectedTimer(1000);
@@ -5730,7 +5733,7 @@ void Spell::EffectPlayerPull(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
-    
+
     switch (m_spellInfo->Id)
     {
     case 28337: // thaddius Magnetic Pull
