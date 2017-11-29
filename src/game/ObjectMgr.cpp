@@ -4390,7 +4390,7 @@ struct SQLMapLoader : public SQLStorageLoaderBase<SQLMapLoader, SQLStorage>
 void ObjectMgr::LoadMapTemplate()
 {
     SQLMapLoader loader;
-    loader.Load(sMapStorage);
+    loader.LoadProgressive(sMapStorage, sWorld.GetWowPatch());
 
     for (auto itr = sMapStorage.begin<MapEntry>(); itr < sMapStorage.end<MapEntry>(); ++itr)
     {

@@ -803,17 +803,20 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         return;
 
                     uint32 spell_id = 0;
-                    switch (urand(1, 2))
-                    {
-                        // Flip Out - ninja
-                        case 1:
-                            spell_id = (m_caster->getGender() == GENDER_MALE ? 8219 : 8220);
-                            break;
-                        // Yaaarrrr - pirate
-                        case 2:
-                            spell_id = (m_caster->getGender() == GENDER_MALE ? 8221 : 8222);
-                            break;
-                    }
+                    uint32 spells[6] = {
+                        (m_caster->getGender() == GENDER_MALE ? 8219u : 8220u), // Flip Out - ninja
+                        (m_caster->getGender() == GENDER_MALE ? 8221u : 8222u), // Yaaarrrr - pirate
+                        8223u, // Oops - goo
+                        8215u, // Rapid Cast
+                        8224u, // Cowardice
+                        8226u  // Fake Death
+                    };
+
+                    // Had additional effects before BWL patch.
+                    if (sWorld.GetWowPatch() < WOW_PATCH_106)
+                        spell_id = spells[urand(0, 5)];
+                    else
+                        spell_id = spells[urand(0, 1)];
 
                     m_caster->CastSpell(m_caster, spell_id, true, nullptr);
                     return;
@@ -4430,14 +4433,14 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     bool gender = unitTarget->getGender();
                     uint32 spellId = 0;
                     uint32 spells[8] = { 
-                        gender == GENDER_MALE ? 24708 : 24709,   // Pirate
-                        gender == GENDER_MALE ? 24711 : 24710,   // Ninja
-                        gender == GENDER_MALE ? 24712 : 24713,   // Leper
-                        gender == GENDER_MALE ? 24735 : 24736,   // Ghost
-                        24723,                                   // Skeleton
-                        24732,                                   // Bat
-                        24740,                                   // Wisp
-                        24753                                    // Critter
+                        gender == GENDER_MALE ? 24708u : 24709u,   // Pirate
+                        gender == GENDER_MALE ? 24711u : 24710u,   // Ninja
+                        gender == GENDER_MALE ? 24712u : 24713u,   // Leper
+                        gender == GENDER_MALE ? 24735u : 24736u,   // Ghost
+                        24723u,                                    // Skeleton
+                        24732u,                                    // Bat
+                        24740u,                                    // Wisp
+                        24753u                                     // Critter
                     };
 
                     spellId = spells[urand(0, 7)];
