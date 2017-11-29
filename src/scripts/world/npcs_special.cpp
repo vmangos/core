@@ -2210,9 +2210,7 @@ enum TargetDummyEntry
 struct npc_target_dummyAI : ScriptedAI
 {
     uint32 m_uiStayTime;
-    uint32 m_uiAggroTimer;
     bool m_bActive;
-    bool m_bIsAggro;
     TargetDummySpells m_spawnEffect;
     TargetDummySpells m_passiveSpell;
 
@@ -2220,7 +2218,7 @@ struct npc_target_dummyAI : ScriptedAI
     {
         m_bActive = true;
         m_uiStayTime = TARGET_DUMMY_DURATION;
-        m_creature->addUnitState(UNIT_STAT_ROOT);
+        SetCombatMovement(false);
 
         switch (m_creature->GetEntry())
         {
@@ -2245,13 +2243,13 @@ struct npc_target_dummyAI : ScriptedAI
             }
         }
 
+        m_creature->AddAura(m_passiveSpell, ADD_AURA_PERMANENT);
         DoCastSpellIfCan(m_creature, m_spawnEffect, false);
     }
 
     void Reset() override
     {
-        m_bIsAggro = false;
-        m_uiAggroTimer = 3000;
+        
     }
 
     void Aggro(Unit* /*pWho*/) override
@@ -2277,22 +2275,6 @@ struct npc_target_dummyAI : ScriptedAI
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
-
-        if (!m_creature->hasUnitState(UNIT_STAT_ROOT))
-            m_creature->addUnitState(UNIT_STAT_ROOT);
-
-        if (m_uiAggroTimer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), m_passiveSpell, false) == CAST_OK)
-            {
-                m_uiAggroTimer = 3000;
-                m_bIsAggro = true;
-            }
-        }
-        else
-            m_uiAggroTimer -= diff;
     }
 };
 
