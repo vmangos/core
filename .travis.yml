@@ -19,6 +19,9 @@ before_script:
   - sudo apt-get install -y libtbb-dev
   - export TBB_ROOT_DIR=/usr/include/tbb/
 
+  # Libcurl
+  - sudo apt-get install -qq libcurl4-openssl-dev
+
   # BEGIN Install ACE
 
   ## BEGIN Backup ACE install
@@ -43,6 +46,6 @@ before_script:
 
   - mkdir build
   - cd build
-  - cmake -DDEBUG=0 ..
+  - cmake -DDEBUG=0 -DUSE_LIBCURL=1 ..
 
 script: make
