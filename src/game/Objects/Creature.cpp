@@ -972,7 +972,7 @@ void Creature::DoFleeToGetAssistance()
 float Creature::GetFleeingSpeed() const
 {
     //TODO: There are different speeds for the different mobs, isn't there?
-    return GetSpeed(MOVE_WALK) * 1.7f;
+    return GetSpeed(MOVE_RUN) * 0.6f;
 }
 
 bool Creature::AIM_Initialize()
