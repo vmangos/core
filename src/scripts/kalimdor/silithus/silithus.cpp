@@ -46,16 +46,22 @@
 enum
 {
     QUEST_EXAMINE_THE_VESSEL        =   7785,
+    QUEST_THUNDERAAN_WINDSEEKER     =   7786,
+    QUEST_RISE_THUNDERFURY          =   7787,
     ITEM_BINDINGS_WINDSEEKER_LEFT   =   18563,
     ITEM_BINDINGS_WINDSEEKER_RIGHT  =   18564,
     ITEM_VESSEL_OF_REBIRTH          =   19016,
+    ITEM_DORMANT_BLADE              =   19018,
     GOSSIP_TEXTID_DEMITRIAN1        =   6842,
     GOSSIP_TEXTID_DEMITRIAN2        =   6843,
     GOSSIP_TEXTID_DEMITRIAN3        =   6844,
     GOSSIP_TEXTID_DEMITRIAN4        =   6867,
     GOSSIP_TEXTID_DEMITRIAN5        =   6868,
     GOSSIP_TEXTID_DEMITRIAN6        =   6869,
-    GOSSIP_TEXTID_DEMITRIAN7        =   6870
+    GOSSIP_TEXTID_DEMITRIAN7        =   6870,
+    GOSSIP_TEXTID_DEMITRIAN8        =   6984,
+    BROADCAST_TEXTID_DEMITRIAN      =   9574,
+    NPC_PRINCE_THUNDERAAN           =   14435
 };
 
 bool GossipHello_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature)
@@ -66,6 +72,10 @@ bool GossipHello_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature)
     if (pPlayer->GetQuestStatus(QUEST_EXAMINE_THE_VESSEL) == QUEST_STATUS_NONE &&
             (pPlayer->HasItemCount(ITEM_BINDINGS_WINDSEEKER_LEFT, 1, false) || pPlayer->HasItemCount(ITEM_BINDINGS_WINDSEEKER_RIGHT, 1, false)))
         pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_DEMITRIAN1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+
+    if (pPlayer->GetQuestStatus(QUEST_THUNDERAAN_WINDSEEKER) == QUEST_STATUS_COMPLETE && pPlayer->GetQuestStatus(QUEST_RISE_THUNDERFURY) == QUEST_STATUS_NONE &&
+        !pPlayer->HasItemCount(ITEM_DORMANT_BLADE, 1, true))
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr.GetBroadcastText(BROADCAST_TEXTID_DEMITRIAN, pPlayer->GetSession()->GetSessionDbLocaleIndex(), pPlayer->getGender()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7);
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
@@ -101,6 +111,7 @@ bool GossipSelect_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature, u
             pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN6, pCreature->GetGUID());
             break;
         case GOSSIP_ACTION_INFO_DEF+6:
+        {
             pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN7, pCreature->GetGUID());
 
             ItemPosCountVec dest;
@@ -108,6 +119,17 @@ bool GossipSelect_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature, u
             if (msg == EQUIP_ERR_OK)
                 pPlayer->StoreNewItem(dest, ITEM_VESSEL_OF_REBIRTH, true);
             break;
+        }
+        case GOSSIP_ACTION_INFO_DEF+7:
+        {
+            pPlayer->SEND_GOSSIP_MENU(GOSSIP_TEXTID_DEMITRIAN8, pCreature->GetGUID());
+
+            if (Creature* pThunderaan = GetClosestCreatureWithEntry(pCreature, NPC_PRINCE_THUNDERAAN, 200.0f))
+                return true;
+
+            pCreature->SummonCreature(NPC_PRINCE_THUNDERAAN, -6255.0f, 1706.59f, 6.137f, 1.323f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
+            break;
+        }
     }
     return true;
 }
