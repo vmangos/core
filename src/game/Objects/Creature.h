@@ -679,6 +679,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsDeadByDefault() const { return m_isDeadByDefault; };
 
         void ForcedDespawn(uint32 timeMSToDespawn = 0);
+        void DespawnOrUnsummon(uint32 msTimeToDespawn = 0);
 
         time_t const& GetRespawnTime() const { return m_respawnTime; }
         time_t GetRespawnTimeEx() const;
