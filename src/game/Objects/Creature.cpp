@@ -924,6 +924,19 @@ void Creature::RegenerateHealth()
     ModifyHealth(addvalue);
 }
 
+void Creature::DoFlee()
+{
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        return;
+
+    SetNoSearchAssistance(true);
+
+    SetFleeing(true, getVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
+    MonsterTextEmote(CREATURE_FLEE_TEXT, getVictim());
+    UpdateSpeed(MOVE_RUN, false);
+    InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+}
+
 void Creature::DoFleeToGetAssistance()
 {
     if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))

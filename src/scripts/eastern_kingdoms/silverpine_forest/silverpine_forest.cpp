@@ -636,7 +636,7 @@ struct npc_human_worgenAI : public ScriptedAI
                 }
 
                 if (m_creature->GetHealthPercent() <= 15.0f)
-                    m_creature->DoFleeToGetAssistance();
+                    m_creature->DoFlee();
 
                 if (m_uiShieldBlock_Timer < uiDiff)
                 {

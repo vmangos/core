@@ -816,7 +816,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         }
                         break;
                     case ACTION_T_EVADE:                    //No Params
-                    case ACTION_T_FLEE_FOR_ASSIST:          //No Params
+                    case ACTION_T_FLEE:                     //No Params
                     case ACTION_T_DIE:                      //No Params
                     case ACTION_T_ZONE_COMBAT_PULSE:        //No Params
                     case ACTION_T_FORCE_DESPAWN:            //Delay

@@ -653,6 +653,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SendAIReaction(AiReaction reactionType);
 
+        void DoFlee();
         void DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
         void CallForHelp(float fRadius);
