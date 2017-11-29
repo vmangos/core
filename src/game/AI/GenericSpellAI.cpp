@@ -489,6 +489,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
             switch (spellInfos->Effect[i])
             {
                 case SPELL_EFFECT_APPLY_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
                 {
                     switch (spellInfos->EffectApplyAuraName[i])
                     {
