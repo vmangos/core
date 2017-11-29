@@ -2866,7 +2866,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
         target->addUnitState(UNIT_STAT_CONTROLLED);
 
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_PVP_ATTACKABLE);
+        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         target->SetCharmerGuid(caster->GetObjectGuid());
         target->setFaction(caster->getFaction());
 
@@ -2928,9 +2928,6 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         target->clearUnitState(UNIT_STAT_CONTROLLED);
 
         target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-        // removing UNIT_FLAG_PVP_ATTACKABLE from a player now has weird consequences like walking underwater
-        if (!target->GetAffectingPlayer())
-            target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
 
         target->SetCharmerGuid(ObjectGuid());
 
