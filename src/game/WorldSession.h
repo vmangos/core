@@ -424,6 +424,10 @@ class MANGOS_DLL_SPEC WorldSession
         void SendSaveGuildEmblem( uint32 msg );
         void SendBattleGroundJoinError(uint8 err);
 
+        // Meetingstone
+        void SendMeetingstoneFailed(uint8 status);
+        void SendMeetingstoneSetqueue(uint32 areaid, uint8 status);
+
         void BuildPartyMemberStatsChangedPacket(Player *player, WorldPacket *data);
         void BuildPartyMemberStatsPacket(Player* player, WorldPacket* data, uint32 updateMask, bool sendAllAuras);
 
@@ -630,6 +634,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         void HandleGameObjectUseOpcode(WorldPacket& recPacket);
         void HandleMeetingStoneJoinOpcode(WorldPacket& recPacket);
+        void HandleMeetingStoneLeaveOpcode(WorldPacket& recPacket);
         void HandleMeetingStoneInfoOpcode(WorldPacket& recPacket);
 
         void HandleNameQueryOpcode(WorldPacket& recvPacket);

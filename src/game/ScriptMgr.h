@@ -129,6 +129,7 @@ enum eScriptCommand
                                                             // datalong2 = 0, change source's orientation, ELSE change traget's orientation
                                                             // datalong3 = search for npc entry if provided
                                                             // datalong4 = search distance
+    SCRIPT_COMMAND_MEETINGSTONE             = 36,           // datalong = area id
 
 };
 
@@ -395,6 +396,11 @@ struct ScriptInfo
             uint32 creatureEntry;                           // datalong3
             uint32 searchRadius;                            // datalong4
         } turnTo;
+
+        struct                                              // SCRIPT_COMMAND_MEETINGSTONE (36)
+        {
+            uint32 areaId;                                  // datalong
+        } meetingstone;
 
         struct
         {

@@ -64,7 +64,7 @@
 #include "GMTicketMgr.h"
 #include "Util.h"
 #include "CharacterDatabaseCleaner.h"
-
+#include "LFGMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "AuctionHouseBotMgr.h"
 #include "AutoTesting/AutoTestingMgr.h"
@@ -1806,6 +1806,7 @@ void World::Update(uint32 diff)
 
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
+    sLFGMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
     sAutoTestingMgr->Update(diff);
     sNodesMgr->OnWorldUpdate(diff);

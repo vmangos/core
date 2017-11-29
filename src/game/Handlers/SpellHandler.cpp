@@ -281,30 +281,6 @@ void WorldSession::HandleGameObjectUseOpcode(WorldPacket & recv_data)
     }
 }
 
-void WorldSession::HandleMeetingStoneJoinOpcode(WorldPacket & recv_data)
-{
-    ObjectGuid guid;
-
-    recv_data >> guid;
-
-    DEBUG_LOG("WORLD: Recvd CMSG_MEETINGSTONE_JOIN Message guid: %s", guid.GetString().c_str());
-
-    // ignore for remote control state
-    if (!_player->IsSelfMover())
-        return;
-
-    GameObject *obj = GetPlayer()->GetMap()->GetGameObject(guid);
-    if (!obj)
-        return;
-
-    // Never expect this opcode for some type GO's
-    if (obj->GetGoType() != GAMEOBJECT_TYPE_MEETINGSTONE)
-        return;
-
-    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_USE);
-    obj->Use(_player);
-}
-
 void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
 {
     uint32 spellId;
