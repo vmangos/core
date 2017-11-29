@@ -29,6 +29,8 @@
 #include <string>
 #include <thread>
 
+#include "SendgridMail.h"
+
 class SendgridMail;
 
 /*
@@ -37,7 +39,7 @@ class SendgridMail;
 class MailerService
 {
 public:
-    typedef std::function<void(int)> SendCallback;
+    typedef std::function<void(SendgridMail::Result)> SendCallback;
 
     struct MailDetail
     {
