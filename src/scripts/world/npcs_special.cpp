@@ -2466,7 +2466,7 @@ struct npc_goblin_land_mineAI : ScriptedAI
 
     void Reset() override
     {
-        m_creature->GetMotionMaster()->MoveIdle();
+        SetCombatMovement(false);
     }
 
     void MoveInLineOfSight(Unit* pWho) override
