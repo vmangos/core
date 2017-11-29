@@ -642,10 +642,15 @@ bool ChatHandler::HandleModifyHPCommand(char* args)
     if (!*args)
         return false;
 
-    int32 hp = atoi(args);
-    int32 hpm = atoi(args);
+    int32 hp = 0;
+    int32 hpm = 0;
+    ExtractInt32(&args, hp);
+    ExtractInt32(&args, hpm);
 
-    if (hp <= 0 || hpm <= 0 || hpm < hp)
+    if (hpm < hp)
+        hpm = hp;
+
+    if (hp <= 0)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);
@@ -680,10 +685,15 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
     if (!*args)
         return false;
 
-    int32 mana = atoi(args);
-    int32 manam = atoi(args);
+    int32 mana = 0;
+    int32 manam = 0;
+    ExtractInt32(&args, mana);
+    ExtractInt32(&args, manam);
 
-    if (mana <= 0 || manam <= 0 || manam < mana)
+    if (manam < mana)
+        manam = mana;
+
+    if (mana <= 0)
     {
         SendSysMessage(LANG_BAD_VALUE);
         SetSentErrorMessage(true);
