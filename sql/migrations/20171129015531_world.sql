@@ -84,7 +84,7 @@ INSERT INTO `map_template` (`Entry`, `patch`, `Parent`, `MapType`, `LinkedZone`,
 	(349, 0, 0, 1, 2100, 46, 55, 40, 0, 1, -1432.7, 2924.98, 'Maraudon', 'instance_maraudon'),
 	(349, 1, 0, 1, 2100, 46, 55, 10, 0, 1, -1432.7, 2924.98, 'Maraudon', 'instance_maraudon'),
 	(369, 0, 0, 0, 2257, 0, 0, 0, 0, -1, 0, 0, 'Deeprun Tram', ''),
-	(389, 0, 0, 1, 2437, 13, 18, 40, 0, 1, 1816.76, -4423.37, 'Ragefire Chasm', '');
+	(389, 0, 0, 1, 2437, 13, 18, 40, 0, 1, 1816.76, -4423.37, 'Ragefire Chasm', ''),
 	(389, 1, 0, 1, 2437, 13, 18, 10, 0, 1, 1816.76, -4423.37, 'Ragefire Chasm', ''),
 	(409, 0, 0, 2, 2717, 60, 0, 40, 7, 0, -7510.56, -1036.7, 'Molten Core', 'instance_molten_core'),
 	(429, 0, 0, 1, 2557, 55, 0, 5, 0, 1, -3908.03, 1130, 'Dire Maul', 'instance_dire_maul'),
@@ -96,7 +96,7 @@ INSERT INTO `map_template` (`Entry`, `patch`, `Parent`, `MapType`, `LinkedZone`,
 	(509, 0, 0, 2, 3429, 60, 0, 20, 3, 1, -8114.46, 1526.37, 'Ruins of Ahn\'Qiraj', 'instance_ruins_of_ahnqiraj'),
 	(529, 0, 0, 3, 3358, 20, 60, 15, 0, -1, 0, 0, 'Arathi Basin', ''),
 	(531, 0, 0, 2, 3428, 60, 0, 40, 7, 1, -8111.72, 1526.79, 'Ahn\'Qiraj Temple', 'instance_temple_of_ahnqiraj'),
-	(533, 0, 0, 2, 3456, 60, 0, 40, 7, -1, 0, 0, 'Naxxramas', 'instance_naxxramas'),
+	(533, 0, 0, 2, 3456, 60, 0, 40, 7, -1, 0, 0, 'Naxxramas', 'instance_naxxramas');
 	
 
 -- The portal inside BRD should not require being attuned.
@@ -105,7 +105,7 @@ INSERT INTO `map_template` (`Entry`, `patch`, `Parent`, `MapType`, `LinkedZone`,
 -- "The Molten Core discovery quest has had its objective moved from inside the Molten Core to Blackrock Depths" 
 -- https://web.archive.org/web/20060524065200/http://wow.allakhazam.com:80/db/object.html?wobject=410
 -- Found in Dungeons: The Molten Core
-UPDATE `areatrigger_teleport` SET `required_quest_done`=0 WHERE `entry`=2886;
+UPDATE `areatrigger_teleport` SET `required_quest_done`=0 WHERE `id`=2886;
 UPDATE `gameobject` SET `patch_min`=2 WHERE `guid` IN (234739, 234743, 234741, 234745, 234747);
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES (234778, 179553, 409, 1062.83, -476.046, -107.245, 3.05847, 0, 0, 0.999136, 0.0415495, 25, 100, 1, 0, 0, 1, 1);
 
