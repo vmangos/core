@@ -13271,8 +13271,8 @@ bool Player::CanGiveQuestSourceItemIfNeed(Quest const *pQuest, ItemPosCountVec* 
         {
             uint32 count = pQuest->GetSrcItemCount();
             uint32 has_count = GetItemCount(srcitem, true);
-
-            if (pProto->MaxCount && pProto->StartQuest != pQuest->GetQuestId() && (has_count >= pProto->MaxCount))
+            
+            if (pProto->MaxCount && (has_count >= pProto->MaxCount) && (pProto->Class == ITEM_CLASS_QUEST) && (pProto->Bonding == BIND_QUEST_ITEM) && (pProto->StartQuest != pQuest->GetQuestId()))
             {
                 // player already have max amount of source item (including bank)
                 SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
