@@ -760,11 +760,13 @@ void AreaAura::Update(uint32 diff)
         // or caster is (no longer) friendly
         bool needFriendly = (m_areaAuraType == AREA_AURA_ENEMY ? false : true);
         if (!caster || caster->hasUnitState(UNIT_STAT_ISOLATED) ||
-                !caster->IsWithinDistInMap(target, m_radius)        ||
-                !caster->HasAura(GetId(), GetEffIndex())            ||
+                !caster->IsWithinDistInMap(target, m_radius) ||
+                !caster->HasAura(GetId(), GetEffIndex()) ||
                 caster->IsFriendlyTo(target) != needFriendly
-           )
+            )
+        {
             target->RemoveSingleAuraFromSpellAuraHolder(GetId(), GetEffIndex(), GetCasterGuid(), AURA_REMOVE_BY_RANGE);
+        }
         else if (m_areaAuraType == AREA_AURA_PARTY)         // check if in same sub group
         {
             // not check group if target == owner or target == pet
@@ -817,10 +819,13 @@ void PersistentAreaAura::Update(uint32 diff)
         }
     }
 
-    Aura::Update(diff);
-
+    // Note: Unit may have been removed from the world (mid-teleport) during this
+    // update (since the caster updates area auras). We shouldn't be ticking it
+    // when the target is out of range anyway.
     if (remove)
         GetTarget()->RemoveSingleAuraFromSpellAuraHolder(GetHolder(), m_effIndex, AURA_REMOVE_BY_RANGE);
+    else
+        Aura::Update(diff);
 }
 
 void Aura::ApplyModifier(bool apply, bool Real, bool skipCheckExclusive)
