@@ -12500,7 +12500,12 @@ bool Player::CanRewardQuest(Quest const *pQuest, uint32 reward, bool msg) const
             InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pQuest->RewChoiceItemId[reward], pQuest->RewChoiceItemCount[reward]);
             if (res != EQUIP_ERR_OK)
             {
-                SendEquipError(res, NULL, NULL, pQuest->RewChoiceItemId[reward]);
+                if (res == EQUIP_ERR_INVENTORY_FULL)
+                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+                else if (res == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
+                else
+                    SendEquipError(res, NULL, NULL, pQuest->RewChoiceItemId[reward]);
                 return false;
             }
         }
@@ -12516,7 +12521,12 @@ bool Player::CanRewardQuest(Quest const *pQuest, uint32 reward, bool msg) const
                 InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pQuest->RewItemId[i], pQuest->RewItemCount[i]);
                 if (res != EQUIP_ERR_OK)
                 {
-                    SendEquipError(res, NULL, NULL);
+                    if (res == EQUIP_ERR_INVENTORY_FULL)
+                        SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+                    else if (res == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+                        SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
+                    else
+                        SendEquipError(res, NULL, NULL);
                     return false;
                 }
                 numRewardedItems += dest.size();
@@ -13266,41 +13276,34 @@ bool Player::CanGiveQuestSourceItemIfNeed(Quest const *pQuest, ItemPosCountVec* 
 {
     if (uint32 srcitem = pQuest->GetSrcItemId())
     {
-        
-        if (ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(srcitem))
+        uint32 count = pQuest->GetSrcItemCount();
+
+        // player already have max amount required item (including bank), just report success
+        uint32 has_count = GetItemCount(srcitem, true);
+        if (has_count >= count)
+            return true;
+
+        count -= has_count;                                 // real need amount
+
+        InventoryResult msg;
+        if (!dest)
         {
-            uint32 count = pQuest->GetSrcItemCount();
-            uint32 has_count = GetItemCount(srcitem, true);
-            
-            if (pProto->MaxCount && (has_count >= pProto->MaxCount) && (pProto->Class == ITEM_CLASS_QUEST) && (pProto->Bonding == BIND_QUEST_ITEM) && (pProto->StartQuest != pQuest->GetQuestId()))
-            {
-                // player already have max amount of source item (including bank)
+            ItemPosCountVec destTemp;
+            msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, destTemp, srcitem, count);
+        }
+        else
+            msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, *dest, srcitem, count);
+
+        if (msg == EQUIP_ERR_OK)
+            return true;
+        else
+        {
+            if (msg == EQUIP_ERR_INVENTORY_FULL)
+                SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+            else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
                 SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
-                return false;
-            }
-
-            count -= has_count;                                 // real need amount
-
-            InventoryResult msg;
-            if (!dest)
-            {
-                ItemPosCountVec destTemp;
-                msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, destTemp, srcitem, count);
-            }
             else
-                msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, *dest, srcitem, count);
-
-            if (msg == EQUIP_ERR_OK)
-                return true;
-            else
-            {
-                if (msg == EQUIP_ERR_INVENTORY_FULL)
-                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
-                else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
-                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
-                else
-                    SendEquipError(msg, NULL, NULL, srcitem);
-            }
+                SendEquipError(msg, NULL, NULL, srcitem);
         }
 
         return false;
