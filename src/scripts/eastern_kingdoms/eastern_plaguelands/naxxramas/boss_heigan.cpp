@@ -250,7 +250,7 @@ struct boss_heiganAI : public ScriptedAI
                 if (GameObject* pTrap = m_pInstance->GetGameObject(*itr))
                 {
                     pTrap->Use(fissureCreature);
-                    pTrap->SendGameObjectCustomAnim(pTrap->GetObjectGuid());
+                    pTrap->SendGameObjectCustomAnim();
                 }
             }
 
