@@ -5060,6 +5060,12 @@ void Aura::HandleShapeshiftBoosts(bool apply)
             else
                 ++itr;
         }
+
+        // Interrupt current shape specific spells
+        for (uint32 i = CURRENT_MELEE_SPELL; i < CURRENT_MAX_SPELL; ++i)
+            if (Spell* spell = target->GetCurrentSpell(CurrentSpellTypes(i)))
+                if (IsRemovedOnShapeLostSpell(spell->m_spellInfo))
+                    target->InterruptSpell(CurrentSpellTypes(i), false);
     }
 }
 
@@ -5914,10 +5920,8 @@ SpellAuraHolder::SpellAuraHolder(SpellEntry const* spellproto, Unit *target, Wor
     m_procCharges    = spellproto->procCharges;
     m_isChanneled    = IsChanneledSpell(spellproto);
 
-    m_isRemovedOnShapeLost = (m_casterGuid == m_target->GetObjectGuid() &&
-                              (m_spellProto->Stances || m_spellProto->Id == 24864) &&
-                              !(m_spellProto->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) &&
-                              !(m_spellProto->Attributes & SPELL_ATTR_NOT_SHAPESHIFT));
+    m_isRemovedOnShapeLost = m_casterGuid == m_target->GetObjectGuid() && IsRemovedOnShapeLostSpell(m_spellProto);
+
     // Exceptions
     // Attaques circulaires
     if (m_spellProto->Id == 12292)
