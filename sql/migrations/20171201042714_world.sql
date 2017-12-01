@@ -3,11 +3,13 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171118231056');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20171201042714');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20171118231056');
+INSERT INTO `migrations` VALUES ('20171201042714');
 -- Add your query below.
 
+
+DELETE FROM `migrations` WHERE `id`='20171118231056';
 
 DELETE FROM `gameobject` WHERE id=165658 and map=0;
 DELETE FROM `pool_template` WHERE entry IN (1337,1338);
@@ -127,7 +129,7 @@ REPLACE INTO `pool_gameobject` (`guid`, `pool_entry`, `description`) VALUES
 (3998627, 1338, 'Dark Iron'),
 (3998628, 1338, 'Dark Iron');
 
-REPLACE INTO `gameobject` VALUES 
+REPLACE INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecs`, `animprogress`, `state`, `spawnFlags`, `visibilitymod`, `patch_min`, `patch_max`) VALUES
 (3998521, 165658, 0, -7619.58, -708.261, 182.643, 3.19139, 0, 0, 0.99969, -0.0248984, 2700, 100, 1, 12, 0, 5, 10),
 (3998522, 165658, 0, -7865.73, -874.299, 150.645, 0.0812068, 0, 0, 0.0405922, 0.999176, 2700, 100, 1, 12, 0, 5, 10),
 (3998523, 165658, 0, -8397.83, -1014.33, 188.953, 6.08949, 0, 0, 0.0966964, -0.995314, 2700, 100, 1, 12, 0, 5, 10),
