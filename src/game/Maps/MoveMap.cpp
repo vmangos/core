@@ -318,7 +318,7 @@ dtNavMeshQuery const* MMapManager::GetNavMeshQuery(uint32 mapId)
     dtNavMeshQuery* navMeshQuery = nullptr;
     if (it == mmap->navMeshQueries.end())
     {
-        mmap->navMeshQueries_lock.unlock();
+        lock.unlock();
         std::unique_lock<std::shared_timed_mutex> ulock(mmap->navMeshQueries_lock);
 
         // allocate mesh query
