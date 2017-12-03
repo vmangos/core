@@ -3551,7 +3551,7 @@ void Spell::cast(bool skipCheck)
     {
         uint32 procAttacker = 0;
         // Blizzard case. Should trigger at launch for clearcast.
-        if (m_spellInfo->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_BLIZZARD, CF_MAGE_MISC_FROST>())
+        if (m_spellInfo->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_BLIZZARD>())
             procAttacker = m_procAttacker;
         else
             procAttacker = (m_procAttacker & PROC_FLAG_ON_TRAP_ACTIVATION);
