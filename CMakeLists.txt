@@ -44,7 +44,6 @@ find_package(PCHSupport)
 
 if(USE_LIBCURL)
   find_package(CURL REQUIRED)
-  add_definitions(-DUSE_SENDGRID)
   #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
   #set(CMAKE_CXX_STANDARD 17)
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
@@ -456,6 +455,10 @@ endif()
 
 if(USE_STD_MALLOC)
   set(DEFINITIONS ${DEFINITIONS} USE_STANDARD_MALLOC)
+endif()
+
+if (USE_LIBCURL)
+  set(DEFINITIONS ${DEFINITIONS} USE_SENDGRID)
 endif()
 
 set_directory_properties(PROPERTIES COMPILE_DEFINITIONS "${DEFINITIONS}")

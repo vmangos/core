@@ -78,6 +78,10 @@ if(UNIX)
   )
 endif()
 
+if (USE_LIBCURL)
+  target_link_libraries(${EXECUTABLE_NAME} curl)
+endif()
+
 set(EXECUTABLE_LINK_FLAGS "")
 
 if(UNIX)
