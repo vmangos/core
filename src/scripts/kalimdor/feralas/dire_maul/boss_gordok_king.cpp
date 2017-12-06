@@ -8,8 +8,6 @@ enum
     SPELL_MORTAL_STRIKE     = 15708,
     SPELL_WAR_STOMP         = 16727,
     SPELL_SUNDER_ARMOR      = 15572,
-
-    SPELL_SUMMON_PLAYER     = 20477,
     
     SAY_AGGRO               = -1900045,
 };
@@ -31,9 +29,7 @@ struct boss_king_gordokAI : public ScriptedAI
     uint32 m_uiPhase;
     
     uint32 m_uiLinkCheckTimer;
-    uint32 m_uiAntiKiteTimer;
     
-    uint8 m_uiNumPlayers;
     
     void Reset()
     {
@@ -42,9 +38,7 @@ struct boss_king_gordokAI : public ScriptedAI
         m_uiSunderArmor_Timer     = urand(4000, 8000);
         m_uiBerserkerCharge_Timer = urand(9000, 12000);
         m_uiPhase = 0;
-        
-        m_uiNumPlayers = 0;        
-        m_uiAntiKiteTimer = 15000;
+              
         m_uiLinkCheckTimer = 2500;
     }
 
@@ -121,42 +115,6 @@ struct boss_king_gordokAI : public ScriptedAI
         else
             m_uiLinkCheckTimer -= uiDiff;
             
-        // Anti-kite mechanic
-        // After 15 seconds of fighting, King checks # of players on threat list. If the number is < 3, he gains Summon Player spell.
-        if (m_uiAntiKiteTimer)
-        {
-            if (m_uiAntiKiteTimer <= uiDiff)
-            {
-                if (m_uiNumPlayers == 0)
-                {
-                    ThreatList const& tList = m_creature->getThreatManager().getThreatList();
-                    for (ThreatList::const_iterator itr = tList.begin();itr != tList.end(); ++itr)
-                    {
-                        if (Unit* pTarget = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid()))
-                        {
-                            if (pTarget->GetTypeId() == TYPEID_PLAYER)
-                                ++m_uiNumPlayers;
-                        }
-                    }
-                }
-                
-                if (m_uiNumPlayers < 3)
-                {
-                    if (Unit* pUnit = m_creature->getVictim())
-                    {
-                        if (m_creature->GetDistance2d(pUnit) > 8.0f)
-                        {
-                            DoCastSpellIfCan(pUnit, SPELL_SUMMON_PLAYER);
-                            m_uiAntiKiteTimer = 10000;      
-                        }                        
-                    }
-                }                                    
-                else
-                    m_uiAntiKiteTimer = 0;
-            }
-            else
-                m_uiAntiKiteTimer -= uiDiff;
-        }
     }
 };
 
