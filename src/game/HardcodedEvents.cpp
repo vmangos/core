@@ -1397,7 +1397,7 @@ void WarEffortEvent::Update()
 
 void WarEffortEvent::UpdateWarEffortCollection(uint32 now)
 {
-    if (now - lastAutoCompleteTime > WAR_EFFORT_AUTOCOMPLETE_PERIOD)
+    if (now - lastAutoCompleteTime > sWorld.getConfig(CONFIG_UINT32_WAR_EFFORT_AUTOCOMPLETE_PERIOD))
     {
         AutoCompleteWarEffortProgress();
         lastAutoCompleteTime = now;

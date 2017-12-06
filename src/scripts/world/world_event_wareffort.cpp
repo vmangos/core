@@ -84,7 +84,7 @@ uint32 BuildWarEffortWorldStates(WorldPacket &data)
 // which can be adjusted by a multiplier in the world config
 void AutoCompleteWarEffortProgress()
 {
-    float rate = 0.1 * sWorld.getConfig(CONFIG_FLOAT_RATE_WAR_EFFORT_RESOURCE);
+    float rate = sWorld.getConfig(CONFIG_FLOAT_RATE_WAR_EFFORT_RESOURCE);
 
     if (!rate)
         return;
@@ -127,7 +127,13 @@ void AutoCompleteWarEffortResource(uint32 resourceId, uint32 required, uint32 sa
     }
 
     uint32 amount = sObjectMgr.GetSavedVariable(savedVar, 0);
+    if (amount >= required)
+        return;
+
     uint32 increase = (uint32)(required * rate);
+    if (amount + increase > required)
+        increase = required - amount;
+
     amount += increase;
 
     sObjectMgr.SetSavedVariable(savedVar, amount, true);
