@@ -5200,6 +5200,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                 if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTraget(REACTIVE_HUNTER_PARRY))
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
+            // Reindeer Transformation only castable while mounted
+            case 25860:
+                if (!m_caster->HasAuraType(SPELL_AURA_MOUNTED))
+                    return SPELL_FAILED_ONLY_MOUNTED;
+                break; 
         }
 
         // Loatheb Corrupted Mind spell failed
