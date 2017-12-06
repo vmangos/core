@@ -4230,6 +4230,8 @@ void Spell::EffectInterruptCast(SpellEffectIndex eff_idx)
 
 void Spell::EffectSummonObjectWild(SpellEffectIndex eff_idx)
 {
+    // TODO: Objects summoned here should probably be _removed from the map_ once their
+    // duration has expired, rather than simply made invisible
     uint32 gameobject_id = m_spellInfo->EffectMiscValue[eff_idx];
 
     GameObject* pGameObj = new GameObject;

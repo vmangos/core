@@ -759,7 +759,8 @@ enum
     YELL_KOLKAR_STRONGEST   = -1780218,
     YELL_RETREATING         = -1780219,
 
-    QUEST_COUNTERATTACK     = 4021
+    QUEST_COUNTERATTACK     = 4021,
+    GO_KOLKAR_BANNER        = 164690
 };
 struct sSummonInformation
 {
@@ -813,6 +814,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         memset(&TimerTable, 0x0, sizeof(TimerTable));
         memset(&GuidPhaseOneGuards, 0x0, sizeof(GuidPhaseOneGuards));
         memset(&GuidPhaseTwoGuards, 0x0, sizeof(GuidPhaseTwoGuards));
+        kromzarGUID = ObjectGuid();
     }
     uint8 eventPhase;//0:nothing, 1: phase1 being the first half.
     //2: phase2 being the second half 3: phase3 being the boss
@@ -824,6 +826,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
     uint32 TimerTable[12];
     uint64 GuidPhaseOneGuards[9];
     uint64 GuidPhaseTwoGuards[8];
+    ObjectGuid kromzarGUID;
 
     void DoSummonKolkars()
     {
@@ -982,19 +985,25 @@ struct npc_regthar_deathgateAI : public ScriptedAI
                 if (phaseTimer < 200000)
                     phaseTimer = 200000;
                 //summon  NPC_KROMZAR + 2 adds en deaddespawn.
-                if (Creature* kromzar = m_creature->SummonCreature(NPC_KROMZAR, -288.344f, -1852.846f, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, phaseTimer))
+                if (Creature* kromzar = m_creature->SummonCreature(NPC_KROMZAR, -288.344f, -1852.846f, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                 {
                     kromzar->JoinCreatureGroup(kromzar, 3, 0, (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER));
-                    kromzar->SetRespawnDelay(120000);
+                    kromzar->SetRespawnDelay(120);
+                    kromzarGUID = kromzar->GetObjectGuid();
                     for (int i = 0; i < 2; i++)
                     {
-                        if (Creature* c = m_creature->SummonCreature(NPC_KOLKAR_INVADER, -288.344f + i, -1852.846f + i, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, phaseTimer))
+                        if (Creature* c = m_creature->SummonCreature(NPC_KOLKAR_INVADER, -288.344f + i, -1852.846f + i, 92.497f, 4.64f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 120000))
                         {
                             c->JoinCreatureGroup(kromzar, 3.0f, (3.0f + i) - kromzar->GetOrientation(), (OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER | OPTION_EVADE_TOGETHER));
-                            c->SetRespawnDelay(120000);
+                            c->SetRespawnDelay(120);
                         }
                     }
                     DoScriptText(YELL_KOLKAR_STRONGEST, kromzar);
+                }
+                else
+                {
+                    // Couldn't summon Kromzar for some reason, end the event
+                    endEvent();
                 }
             }
         }
@@ -1003,6 +1012,24 @@ struct npc_regthar_deathgateAI : public ScriptedAI
             eventPhase = 4;
             phaseTimer = 30000;
             DoScriptText(YELL_RETREATING, m_creature);
+        }
+    }
+
+    void SummonedCreatureDespawn(Creature *pCreature) override
+    {
+        // Despawn any banners in the vicinity or we end up with a shitload leftover
+        // after the quest has been completed a few times
+        if (pCreature->GetEntry() == NPC_KROMZAR)
+        {
+            std::list<GameObject*> banners;
+
+            GetGameObjectListWithEntryInGrid(banners, pCreature, GO_KOLKAR_BANNER, 5.0f);
+
+            for (auto banner : banners)
+            {
+                if (!banner->isSpawned()) // looted, safe to remove
+                    banner->AddObjectToRemoveList();
+            }
         }
     }
     void UpdateAI(const uint32 uiDiff)

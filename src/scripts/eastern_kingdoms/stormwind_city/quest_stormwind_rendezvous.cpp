@@ -59,7 +59,7 @@ void npc_reginald_windsorAI::ResetCreature()
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)
 {
     PokeRowe();
-    m_creature->ForcedDespawn(1500);
+    m_creature->DespawnOrUnsummon(1500);
 }
 
 void npc_reginald_windsorAI::PokeRowe()
@@ -254,7 +254,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
     if (m_uiDespawnTimer < uiDiff)
     {
         PokeRowe();
-        m_creature->ForcedDespawn();
+        m_creature->DespawnOrUnsummon();
     }
     else
         m_uiDespawnTimer -= uiDiff;

@@ -1902,6 +1902,12 @@ void Creature::Respawn()
 
 void Creature::ForcedDespawn(uint32 timeMSToDespawn)
 {
+    if (IsTemporarySummon())
+    {
+        static_cast<TemporarySummon*>(this)->UnSummon(timeMSToDespawn);
+        return;
+    }
+
     if (timeMSToDespawn)
     {
         ForcedDespawnDelayEvent *pEvent = new ForcedDespawnDelayEvent(*this);
