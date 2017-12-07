@@ -28,23 +28,31 @@ Vanndar: Thunderclap (about 200-300 nature damage per player in range not been u
 ## npc_Vanndar
 ######*/
 
-#define NPC_VANNDAR         11948
-#define SPELL_AVATAR        19135
-#define SPELL_STORMBOLT     19136
-#define SPELL_THUNDERCLAP   15588
-#define VANNDAR_CENTER_X        722.4f
-#define VANNDAR_CENTER_Y        -11.0f
-#define    VANNDAR_AGGRO       -1050020
-#define    VANNDAR_RESET       -1050021
-#define    VANNDAR_BUFF1       -1050022
-#define    VANNDAR_BUFF2       -1050023
-#define    VANNDAR_RAID_WIPE   -1050024
-#define    VANNDAR_FIGHT1      -1050025
-#define    VANNDAR_FIGHT2      -1050026
-#define    VANNDAR_FIGHT3      -1050027
-#define    VANNDAR_FIGHT4      -1050028
-#define    VANNDAR_FIGHT5      -1050029
-#define    VANNDAR_FIGHT6      -1050030
+enum
+{
+    NPC_VANNDAR           = 11948,
+
+    SPELL_AVATAR          = 19135,
+    SPELL_STORMBOLT       = 19136,
+    SPELL_THUNDERCLAP     = 15588,
+
+    SAY_VANNDAR_AGGRO     = 10243,
+    SAY_VANNDAR_RESET     = 10373,
+    SAY_VANNDAR_BUFF1     = 12351,
+    SAY_VANNDAR_BUFF2     = 12352,
+    SAY_VANNDAR_RAID_WIPE = 10374,
+    SAY_VANNDAR_FIGHT1    = 8838,
+    SAY_VANNDAR_FIGHT2    = 8839,
+    SAY_VANNDAR_FIGHT3    = 8840,
+    SAY_VANNDAR_FIGHT4    = 8841,
+    SAY_VANNDAR_FIGHT5    = 8842,
+    SAY_VANNDAR_FIGHT6    = 8843
+};
+
+const uint16 vandar_fight_texts[] = { SAY_VANNDAR_FIGHT1 , SAY_VANNDAR_FIGHT2, SAY_VANNDAR_FIGHT3, SAY_VANNDAR_FIGHT4, SAY_VANNDAR_FIGHT5,  SAY_VANNDAR_FIGHT6 };
+
+#define POSITION_VANNDAR_CENTER_X        722.4f
+#define POSITION_VANNDAR_CENTER_Y        -11.0f
 
 class npc_alterac_bossHelper
 {
@@ -103,7 +111,6 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat3;
     bool m_bCombat4;
     bool m_bCombat5;
-    int32 m_uiRandomSpeech;
     bool m_bLeashed;
 
     void Reset()
@@ -121,15 +128,14 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_bCombat3 = true;
         m_bCombat4 = true;
         m_bCombat5 = true;
-        m_uiRandomSpeech = 0;
     }
 
     void EnterEvadeMode()
     {
         if (m_bLeashed)
-            m_creature->MonsterYellToZone(VANNDAR_RESET, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_VANNDAR_RESET, m_creature);
         else
-            m_creature->MonsterYellToZone(VANNDAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_VANNDAR_RAID_WIPE, m_creature);
 
         m_bLeashed = false;
         ScriptedAI::EnterEvadeMode();
@@ -139,7 +145,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_bAggro)
         {
-            m_creature->MonsterYellToZone(VANNDAR_AGGRO, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_VANNDAR_AGGRO, m_creature);
             m_bAggro = false;
         }
     }
@@ -156,7 +162,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     void UpdateAI(const uint32 diff)
     {
         if (m_creature->GetMapId() == 30)
-            if (m_creature->GetDistance2d(VANNDAR_CENTER_X, VANNDAR_CENTER_Y) > 35.0f)
+            if (m_creature->GetDistance2d(POSITION_VANNDAR_CENTER_X, POSITION_VANNDAR_CENTER_Y) > 35.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -227,36 +233,31 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat5 = false;
         }
 
@@ -275,20 +276,29 @@ CreatureAI* GetAI_npc_Vanndar(Creature* m_creature)
 ## npc_DrekThar
 ######*/
 
-#define    NPC_DREAKTHAR         11946
-#define    SPELL_FRENZY          28747
-#define    SPELL_WHIRLWIND_DKT   13736
-#define    SPELL_KNOCKDOWN       19128
+enum
+{
+    NPC_DREAKTHAR          = 11946,
+
+    SPELL_FRENZY           = 28747,
+    SPELL_WHIRLWIND_DKT    = 13736,
+    SPELL_KNOCKDOWN        = 19128,
+
+    SAY_DREKTHAR_AGGRO     = 10245,
+    SAY_DREKTHAR_RESET     = 10377,
+    SAY_DREKTHAR_RAID_WIPE = 10376,
+    SAY_DREKTHAR_FIGHT1    = 8844,
+    SAY_DREKTHAR_FIGHT2    = 8845,
+    SAY_DREKTHAR_FIGHT3    = 8846,
+    SAY_DREKTHAR_FIGHT4    = 8847,
+    SAY_DREKTHAR_FIGHT5    = 8848,
+    SAY_DREKTHAR_FIGHT6    = 8849
+};
+
+const uint16 drekthar_fight_texts[] = { SAY_DREKTHAR_FIGHT1, SAY_DREKTHAR_FIGHT2, SAY_DREKTHAR_FIGHT3, SAY_DREKTHAR_FIGHT4, SAY_DREKTHAR_FIGHT5, SAY_DREKTHAR_FIGHT6 };
+
 #define    DKT_CENTER_X         -1370.9f
 #define    DKT_CENTER_Y          -219.8f
-#define    DREKTHAR_AGGRO       -1050006
-#define    DREKTHAR_RESET       -1050007
-#define    DREKTHAR_RAID_WIPE   -1050008
-#define    DREKTHAR_FIGHT1      -1050009 // 80%
-#define    DREKTHAR_FIGHT2      -1050010 // 60%
-#define    DREKTHAR_FIGHT3      -1050011 // 40%
-#define    DREKTHAR_FIGHT4      -1050012 // 20%
-#define    DREKTHAR_FIGHT5      -1050013 // 5%
 
 // Duros 12121 Drakan 12122
 
@@ -342,7 +352,6 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat3;
     bool m_bCombat4;
     bool m_bCombat5;
-    int32 m_uiRandomSpeech;
     bool m_bLeashed;
 
     void Reset()
@@ -361,7 +370,6 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         m_bCombat3 = true;
         m_bCombat4 = true;
         m_bCombat5 = true;
-        m_uiRandomSpeech = 0;
         m_creature->RemoveAurasDueToSpell(SPELL_FRENZY);
 
         std::list<Creature*> m_Wolf;
@@ -382,9 +390,9 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     void EnterEvadeMode()
     {
         if (m_bLeashed)
-            m_creature->MonsterYellToZone(DREKTHAR_RESET, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_DREKTHAR_RESET, m_creature);
         else
-            m_creature->MonsterYellToZone(DREKTHAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_DREKTHAR_RAID_WIPE, m_creature);
 
         m_bLeashed = false;
         ScriptedAI::EnterEvadeMode();
@@ -394,7 +402,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_bAggro)
         {
-            m_creature->MonsterYellToZone(DREKTHAR_AGGRO, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_DREKTHAR_AGGRO, m_creature);
             m_bAggro = false;
         }
     }
@@ -501,36 +509,31 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0,5)], m_creature);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat5 = false;
         }
 
@@ -549,18 +552,23 @@ CreatureAI* GetAI_npc_DrekThar(Creature* m_creature)
 ## npc_Balinda
 ######*/
 
-#define NPC_BALINDA        11949
-#define SPELL_FIREBALL     20420
-#define SPELL_FROSTBOLT    5530
-#define SPELL_CONEOFCOLD   22746
-#define SPELL_ARCANEEXPLO  19712
-#define SPELL_POLYMORPH    15534
+enum
+{
+    NPC_BALINDA         = 11949,
+
+    SPELL_FIREBALL      = 20420,
+    SPELL_FROSTBOLT     = 5530,
+    SPELL_CONEOFCOLD    = 22746,
+    SPELL_ARCANEEXPLO   = 19712,
+    SPELL_POLYMORPH     = 15534,
+
+    SAY_BALINDA_AGGRO   = 10054,
+    SAY_BALINDA_HALF_HP = 10056,
+    SAY_BALINDA_RESET   = 10375
+};
+
 #define BAL_CENTER_X       -57.7f
 #define BAL_CENTER_Y       -286.6f
-#define SAY_AGGRO          -1050003
-#define SAY_BALINDA        -1050004
-#define SAY_RESET          -1050005
-
 
 struct npc_BalindaAI : public ScriptedAI
 {
@@ -594,7 +602,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_uiPolymorph_Timer = 1750;
         m_creature->clearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
-            m_creature->MonsterYellToZone(SAY_RESET, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_BALINDA_RESET, m_creature);
         m_bReset = true;
         m_sayBalinda = true;
         m_bSayAggro = true;
@@ -613,7 +621,7 @@ struct npc_BalindaAI : public ScriptedAI
     {
         if (m_bSayAggro)
         {
-            m_creature->MonsterYellToZone(SAY_AGGRO, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_BALINDA_AGGRO, m_creature);
             m_bSayAggro = false;
         }
     }
@@ -637,7 +645,7 @@ struct npc_BalindaAI : public ScriptedAI
         {
             if (m_creature->GetHealthPercent() < 50.0f)
             {
-                m_creature->MonsterYellToZone(SAY_BALINDA, LANG_UNIVERSAL, 0);
+                DoScriptText(SAY_BALINDA_HALF_HP, m_creature);
                 m_sayBalinda = false;
             }
         }
@@ -787,16 +795,22 @@ CreatureAI* GetAI_npc_Balinda(Creature* m_creature)
 ## npc_Galvangar
 ######*/
 
-#define NPC_GALVANGAR            11947
-#define SPELL_WHIRLWIND_GAL      13736
-#define SPELL_MORTALSTRIKE       16856
-#define SPELL_CLEAVE             15284
-#define SPELL_FRIGHTSHOUT        19134
+enum
+{
+    NPC_GALVANGAR         = 11947,
+
+    SPELL_WHIRLWIND_GAL   = 13736,
+    SPELL_MORTALSTRIKE    = 16856,
+    SPELL_CLEAVE          = 15284,
+    SPELL_FRIGHTSHOUT     = 19134,
+
+    SAY_GALVANGAR_AGGRO   = 10055,
+    SAY_GALVANGAR_HALF_HP = 10057,
+    SAY_GALVANGAR_RESET   = 10378
+};
+
 #define GAL_CENTER_X            -545.2f
 #define GAL_CENTER_Y            -165.3f
-#define SAY_AGGRO_GALVANGAR     -1050001
-#define SAY_HALF_LIFE_GALVANGAR -1050002
-#define SAY_RESET_GALVANGAR     -1050000
 
 struct npc_GalvangarAI : public ScriptedAI
 {
@@ -821,7 +835,7 @@ struct npc_GalvangarAI : public ScriptedAI
     {
         if (m_bSayAggro)
         {
-            m_creature->MonsterYellToZone(SAY_AGGRO_GALVANGAR, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_GALVANGAR_AGGRO, m_creature);
             m_bSayAggro = false;
         }
     }
@@ -837,7 +851,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_uiFrighteningShout_Timer = m_uiWhirlwind_Timer + urand(1000, 5000);
         m_creature->clearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
-            m_creature->MonsterYellToZone(SAY_RESET_GALVANGAR, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_GALVANGAR_RESET, m_creature);
         m_bReset = true;
         m_bSayGalvangar = true;
         m_bSayAggro     = true;
@@ -880,7 +894,7 @@ struct npc_GalvangarAI : public ScriptedAI
         {
             if (m_creature->GetHealthPercent() < 50.0f)
             {
-                m_creature->MonsterYellToZone(SAY_HALF_LIFE_GALVANGAR, LANG_UNIVERSAL, 0);
+                DoScriptText(SAY_GALVANGAR_HALF_HP, m_creature);
                 m_bSayGalvangar = false;
             }
         }
@@ -1000,11 +1014,15 @@ CreatureAI* GetAI_npc_Galvangar(Creature* m_creature)
 ######*/
 
 // #define NPC_WARMASTER   14762 to 14769 (ally)
-#define SPELL_CHARGE           22911
-#define SPELL_CLEAVE_WM        20684
-#define SPELL_DEMORALSHOUT     23511
-#define SPELL_ENRAGE_WM         8599
-#define SPELL_WHIRLWIND_WM     13736
+
+enum
+{
+    SPELL_CHARGE       = 22911,
+    SPELL_CLEAVE_WM    = 20684,
+    SPELL_DEMORALSHOUT = 23511,
+    SPELL_ENRAGE_WM    = 8599,
+    SPELL_WHIRLWIND_WM = 13736
+};
 
 struct npc_WarMasterAI : public ScriptedAI
 {
@@ -1277,9 +1295,6 @@ CreatureAI* GetAI_npc_AlteracBowman(Creature* m_creature)
 /*######
 ## npc_AlteracDardosh
 ######*/
-
-#define SPELL_CLEAVE          15284
-
 
 struct npc_AlteracDardoshAI : public ScriptedAI
 {
@@ -1762,6 +1777,11 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
     }
 };
 
+enum
+{
+    SAY_KORRAK_SPAWN = 9038
+};
+
 /** Korrak should appear after 2 hours of battle */
 class npc_korrak_the_bloodragerAI: public ScriptedAI
 {
@@ -1787,7 +1807,7 @@ class npc_korrak_the_bloodragerAI: public ScriptedAI
             {
                 if (!m_yell)
                 {
-                    m_creature->MonsterYell("KORRAK HAS ARRIVED! Snowfall belongs Winterax!", 0, 0);
+                    DoScriptText(SAY_KORRAK_SPAWN, m_creature);
                     m_yell = true;
                 }
             }
@@ -1799,21 +1819,26 @@ class npc_korrak_the_bloodragerAI: public ScriptedAI
         bool        m_appeared;
         bool        m_yell;
 };
-enum
-{
-    SPELL_CHAIN_LIGHTNING =   16006,
-    SPELL_EARTHBIND_TOTEM =   15786,
-    SPELL_FLAME_SHOCK     =   15616,
-    SPELL_LIGHNING_BOLT   =   15234,
-    SPELL_HEALING_WAVE    =   12492,
-};
 
 enum
 {
+    SPELL_CHAIN_LIGHTNING  =   16006,
+    SPELL_EARTHBIND_TOTEM  =   15786,
+    SPELL_FLAME_SHOCK      =   15616,
+    SPELL_LIGHNING_BOLT    =   15234,
+    SPELL_HEALING_WAVE     =   12492,
     SPELL_ENTANGLING_ROOTS =  22127,
     SPELL_STARFIRE         =  21668,
     SPELL_THORNS           =  22128,
     SPELL_REJUVENATION     =  15981,
+
+    SAY_LOKHOLAR_SPAWNED   = 8626,
+    SAY_PRIMALIST_THURLOGA = 8632,
+    SAY_ARCHDRUID_RENFERAL = 8735,
+    SAY_WOLFRIDER_CMD      = 8890,
+    SAY_WARCRY_HORDE       = 8891,
+    SAY_RAMRIDER_CMD       = 8906,
+    SAY_WARCRY_ALIANCE     = 8908
 };
 
 struct AV_NpcEventAI : public npc_escortAI
@@ -2285,8 +2310,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (m_creature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Grunts. Today could be your greatest day, for today, you fight for the glory of Frostwolf! Ride unto the field and grant your enemies no mercy! Strike the savages down and let their Warchief sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_WOLFRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
@@ -2309,8 +2333,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (m_creature->GetEntry() == AV_NPC_RAMRIDER_CMD)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Lads and ladies. Today could be your greatest day, for today, you fight for the glory of Stormpike! Ride unto the field and grant your enemies no mercy! Strike the savages down and let their Warchief sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_RAMRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
@@ -2347,8 +2370,7 @@ struct AV_NpcEventAI : public npc_escortAI
             case 43:
                 if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
                 {
-                    m_creature->MonsterSay("Channel your energies into the Altar!", 0, 0);
-
+                    DoScriptText(SAY_PRIMALIST_THURLOGA, m_creature);
                     m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
 
                     std::list<Creature*> m_RamRiderList;
@@ -2381,8 +2403,7 @@ struct AV_NpcEventAI : public npc_escortAI
             case 49:
                 if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
                 {
-                    m_creature->MonsterSay("We must focus our thoughts upon the Circle of Calling if the Forest Lord is to come! We must hurry! Concentrate your energies!", 0, 0);
-
+                    DoScriptText(SAY_ARCHDRUID_RENFERAL, m_creature);
                     m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
 
                     std::list<Creature*> m_RamRiderList;
@@ -2690,7 +2711,7 @@ struct AV_NpcEventAI : public npc_escortAI
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 50.0f);
                             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
                             {
-                                (*it)->MonsterSay("For the Horde!", 0, 0);
+                                DoScriptText(SAY_WARCRY_HORDE, (*it));
                                 (*it)->SetWalk(false);
                                 (*it)->JoinCreatureGroup(m_creature,
                                                          m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
@@ -2714,7 +2735,7 @@ struct AV_NpcEventAI : public npc_escortAI
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_RAMRIDER, 20.0f);
                             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
                             {
-                                (*it)->MonsterSay("Hail to the King!", 0, 0);
+                                DoScriptText(SAY_WARCRY_ALIANCE, (*it));
                                 (*it)->SetWalk(false);
                                 (*it)->JoinCreatureGroup(m_creature,
                                                          m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
@@ -2742,7 +2763,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (m_bThurlogaBoss == false)
                 {
                     m_bThurlogaBoss = true;
-                    m_creature->MonsterYell("It is done! Lok'holar has arrived! Bow to the might of the Horde, fools!", 0, 0);
+                    DoScriptText(SAY_LOKHOLAR_SPAWNED, m_creature);
                     m_uiDespawn_Timer = 600000;
                 }
             }
@@ -3438,16 +3459,14 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                 if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Lads and ladies. Today could be your greatest day, for today, you fight for the glory of Stormpike! Charge unto the field and grant your enemies no mercy! Strike the savages down and let their Warchief sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_RAMRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
                 else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Grunts. Today could be your greatest day, for today, you fight for the glory of Frostwolf! Charge unto the field and grant your enemies no mercy! Strike the savages down and let their King sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_WOLFRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
@@ -3506,17 +3525,17 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
     void UpdateEscortAI(const uint32 uiDiff)
     {
         uint32 m_uiTroopsType = 0;
-        char sMessage[200]                 = "";
+        uint16 m_uiWarcryBC;
 
         if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
         {
             m_uiTroopsType = AV_NPC_STORMPIKE_COMMANDO;
-            snprintf(sMessage, 200, "Hail to the King !");
+            m_uiWarcryBC = SAY_WARCRY_ALIANCE;
         }
         else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
         {
             m_uiTroopsType = AV_NPC_FROSTWOLF_REAVER;
-            snprintf(sMessage, 200, "For the Horde !");
+            m_uiWarcryBC = SAY_WARCRY_HORDE;
         }
 
         if (Event_Timer <= uiDiff)
@@ -3537,7 +3556,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_uiTroopsType + i, 40.0f);
                             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
                             {
-                                (*it)->MonsterSay(sMessage, 0, 0);
+                                DoScriptText(m_uiWarcryBC, (*it));
                                 (*it)->SetWalk(false);
 
                                 /** Link all the troops to the leader */
