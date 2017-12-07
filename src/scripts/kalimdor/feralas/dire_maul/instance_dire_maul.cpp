@@ -1345,15 +1345,15 @@ enum
 {
     GOSSIP_MENU_MOLDAR_1                    = 6907,
     GOSSIP_MENU_MOLDAR_2                    = 6908,    
-    GOSSIP_ITEM_MOLDAR                      = -3100010,
+    GOSSIP_ITEM_MOLDAR                      = 9401,
     
     GOSSIP_MENU_FENGUS_1                    = 6903,
     GOSSIP_MENU_FENGUS_2                    = 6904, 
-    GOSSIP_ITEM_FENGUS                      = -3100011,
+    GOSSIP_ITEM_FENGUS                      = 9394,
     
     GOSSIP_MENU_SLIPKIK_1                   = 6905,
     GOSSIP_MENU_SLIPKIK_2                   = 6906,
-    GOSSIP_ITEM_SLIPKIK                     = -3100012
+    GOSSIP_ITEM_SLIPKIK                     = 9398
 };
 
 bool GossipHello_boss_guards(Player* pPlayer, Creature * pCreature) 

@@ -75,7 +75,7 @@ bool GossipHello_npc_highlord_demitrian(Player* pPlayer, Creature* pCreature)
 
     if (pPlayer->GetQuestStatus(QUEST_THUNDERAAN_WINDSEEKER) == QUEST_STATUS_COMPLETE && pPlayer->GetQuestStatus(QUEST_RISE_THUNDERFURY) == QUEST_STATUS_NONE &&
         !pPlayer->HasItemCount(ITEM_DORMANT_BLADE, 1, true))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr.GetBroadcastText(BROADCAST_TEXTID_DEMITRIAN, pPlayer->GetSession()->GetSessionDbLocaleIndex(), pPlayer->getGender()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, BROADCAST_TEXTID_DEMITRIAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF+7);
 
     pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
 
@@ -287,7 +287,7 @@ enum
     AURA_ACCES_PIERRE_SUP     = 24782,
 
     GOSSIP_STONE_FIRST_HELLO    = 69,
-    GOSSIP_STONE_FIRST_OPTION   = NOST_TEXT(220)
+    GOSSIP_STONE_FIRST_OPTION   = 10684
 };
 
 struct Silithus_WindStonesBossData
@@ -300,20 +300,20 @@ struct Silithus_WindStonesBossData
 };
 static Silithus_WindStonesBossData const windStonesBosses[] =
 {
-    {GO_TYPE_PIERRE_INF,    1,  15209,  20416, NOST_TEXT(223) },
-    {GO_TYPE_PIERRE_INF,    2,  15307,  20419, NOST_TEXT(224) },
-    {GO_TYPE_PIERRE_INF,    3,  15212,  20418, NOST_TEXT(225) },
-    {GO_TYPE_PIERRE_INF,    4,  15211,  20420, NOST_TEXT(226) },
+    {GO_TYPE_PIERRE_INF,    1,  15209,  20416, 10685 },
+    {GO_TYPE_PIERRE_INF,    2,  15307,  20419, 10691 },
+    {GO_TYPE_PIERRE_INF,    3,  15212,  20418, 10690 },
+    {GO_TYPE_PIERRE_INF,    4,  15211,  20420, 10692 },
 
-    {GO_TYPE_PIERRE_MOYENNE,1,  15206,  20432, NOST_TEXT(227) },
-    {GO_TYPE_PIERRE_MOYENNE,2,  15208,  20435, NOST_TEXT(228) },
-    {GO_TYPE_PIERRE_MOYENNE,3,  15220,  20433, NOST_TEXT(229) },
-    {GO_TYPE_PIERRE_MOYENNE,4,  15207,  20436, NOST_TEXT(230) },
+    {GO_TYPE_PIERRE_MOYENNE,1,  15206,  20432, 10699 },
+    {GO_TYPE_PIERRE_MOYENNE,2,  15208,  20435, 10701 },
+    {GO_TYPE_PIERRE_MOYENNE,3,  15220,  20433, 10700 },
+    {GO_TYPE_PIERRE_MOYENNE,4,  15207,  20436, 10702 },
 
-    {GO_TYPE_PIERRE_SUP,    1,  15203,  20447, NOST_TEXT(231) },
-    {GO_TYPE_PIERRE_SUP,    2,  15205,  20449, NOST_TEXT(232) },
-    {GO_TYPE_PIERRE_SUP,    3,  15204,  20448, NOST_TEXT(233) },
-    {GO_TYPE_PIERRE_SUP,    4,  15305,  20450, NOST_TEXT(234) },
+    {GO_TYPE_PIERRE_SUP,    1,  15203,  20447, 10708 },
+    {GO_TYPE_PIERRE_SUP,    2,  15205,  20449, 10710 },
+    {GO_TYPE_PIERRE_SUP,    3,  15204,  20448, 10709 },
+    {GO_TYPE_PIERRE_SUP,    4,  15305,  20450, 10711 },
 };
 
 struct go_pierre_ventsAI: public GameObjectAI
@@ -416,7 +416,9 @@ struct go_pierre_ventsAI: public GameObjectAI
 
         uint32 stoneType = GetStoneType();
         player->PlayerTalkClass->ClearMenus();
-        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION + stoneType - 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        //FixMe: Positive ID is broadcast text. I don't understand the thing below.
+        //player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION + stoneType - 1, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+        player->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_STONE_FIRST_OPTION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
 
         for (int i = 0; i < sizeof(windStonesBosses) / sizeof(windStonesBosses[0]); ++i)
             if (windStonesBosses[i].stoneType == stoneType)

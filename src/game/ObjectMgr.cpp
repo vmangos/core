@@ -8065,8 +8065,8 @@ void ObjectMgr::LoadGossipMenuItems()
     m_mGossipMenuItemsMap.clear();
 
     QueryResult* result = WorldDatabase.Query(
-                              "SELECT menu_id, id, option_icon, option_text, option_id, npc_option_npcflag, "
-                              "action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text, "
+                              "SELECT menu_id, id, option_icon, option_text, OptionBroadcastTextID, option_id, npc_option_npcflag, "
+                              "action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text, BoxBroadcastTextID, "
                               "condition_id "
                               "FROM gossip_menu_option ORDER BY menu_id, id");
 
@@ -8124,16 +8124,19 @@ void ObjectMgr::LoadGossipMenuItems()
         gMenuItem.id                    = fields[1].GetUInt32();
         gMenuItem.option_icon           = fields[2].GetUInt8();
         gMenuItem.option_text           = fields[3].GetCppString();
-        gMenuItem.option_id             = fields[4].GetUInt32();
-        gMenuItem.npc_option_npcflag    = fields[5].GetUInt32();
-        gMenuItem.action_menu_id        = fields[6].GetInt32();
-        gMenuItem.action_poi_id         = fields[7].GetUInt32();
-        gMenuItem.action_script_id      = fields[8].GetUInt32();
-        gMenuItem.box_coded             = fields[9].GetUInt8() != 0;
-        //gMenuItem.box_money             = fields[10].GetUInt32();
-        gMenuItem.box_text              = fields[11].GetCppString();
+        gMenuItem.OptionBroadcastTextID = fields[4].GetUInt32();
 
-        gMenuItem.conditionId           = fields[12].GetUInt16();
+        gMenuItem.option_id             = fields[5].GetUInt32();
+        gMenuItem.npc_option_npcflag    = fields[6].GetUInt32();
+        gMenuItem.action_menu_id        = fields[7].GetInt32();
+        gMenuItem.action_poi_id         = fields[8].GetUInt32();
+        gMenuItem.action_script_id      = fields[9].GetUInt32();
+        gMenuItem.box_coded             = fields[10].GetUInt8() != 0;
+        //gMenuItem.box_money             = fields[11].GetUInt32();
+        gMenuItem.box_text              = fields[12].GetCppString();
+        gMenuItem.BoxBroadcastTextID    = fields[13].GetUInt32();
+
+        gMenuItem.conditionId           = fields[14].GetUInt16();
 
         if (gMenuItem.menu_id)                              // == 0 id is special and not have menu_id data
         {
@@ -8156,6 +8159,24 @@ void ObjectMgr::LoadGossipMenuItems()
         {
             sLog.outErrorDb("Table gossip_menu_option for menu %u, id %u has unknown icon id %u. Replacing with GOSSIP_ICON_CHAT", gMenuItem.menu_id, gMenuItem.id, gMenuItem.option_icon);
             gMenuItem.option_icon = GOSSIP_ICON_CHAT;
+        }
+
+        if (gMenuItem.OptionBroadcastTextID)
+        {
+            if (!GetBroadcastTextLocale(gMenuItem.OptionBroadcastTextID))
+            {
+                sLog.outErrorDb("Table `gossip_menu_option` for MenuId %u, OptionID %u has non-existing or incompatible OptionBroadcastTextID %u, ignoring.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.OptionBroadcastTextID);
+                gMenuItem.OptionBroadcastTextID = 0;
+            }
+        }
+
+        if (gMenuItem.BoxBroadcastTextID)
+        {
+            if (!GetBroadcastTextLocale(gMenuItem.BoxBroadcastTextID))
+            {
+                sLog.outErrorDb("Table `gossip_menu_option` for MenuId %u, OptionID %u has non-existing or incompatible BoxBroadcastTextId %u, ignoring.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.BoxBroadcastTextID);
+                gMenuItem.BoxBroadcastTextID = 0;
+            }
         }
 
         if (gMenuItem.option_id == GOSSIP_OPTION_NONE)

@@ -813,7 +813,7 @@ bool GossipSelect_npc_lokhtos_darkbargainer(Player* pPlayer, Creature* pCreature
 
 enum
 {
-    GOSSIP_ITEM_NAGMARA         = -3230003,
+    GOSSIP_ITEM_NAGMARA         = 5040,
     GOSSIP_ID_NAGMARA           = 2727,
     GOSSIP_ID_NAGMARA_2         = 2729,
     SPELL_POTION_LOVE           = 14928,

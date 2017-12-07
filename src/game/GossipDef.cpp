@@ -85,8 +85,8 @@ void GossipMenu::AddMenuItem(uint8 Icon, int32 itemText, uint32 dtSender, uint32
 {
     uint32 loc_idx = m_session->GetSessionDbLocaleIndex();
 
-    char const* item_text = itemText ? sObjectMgr.GetMangosString(itemText, loc_idx) : "";
-    char const* box_text = boxText ? sObjectMgr.GetMangosString(boxText, loc_idx) : "";
+    char const* item_text = itemText ? (itemText > 0 ? sObjectMgr.GetBroadcastText(itemText, loc_idx, GetMenuSession()->GetPlayer()->getGender()) : sObjectMgr.GetMangosString(itemText, loc_idx)) : "";
+    char const* box_text = boxText ? (boxText > 0 ? sObjectMgr.GetBroadcastText(boxText, loc_idx, GetMenuSession()->GetPlayer()->getGender()) : sObjectMgr.GetMangosString(boxText, loc_idx)) : "";
 
     AddMenuItem(Icon, std::string(item_text), dtSender, dtAction, std::string(box_text), Coded);
 }
