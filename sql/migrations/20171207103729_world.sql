@@ -31,6 +31,8 @@ UPDATE `broadcast_text` SET `Type`=1 WHERE `ID`=9038;
 -- Text when Lok'Holar spawns.
 UPDATE `broadcast_text` SET `Type`=1 WHERE `ID`=8626;
 
+UPDATE `broadcast_text` SET `Type`=1 WHERE `ID` IN (8887, 8905, 8907, 8913, 10339, 10342, 10347, 10357, 10358);
+
 
 -- End of migration.
 END IF;
