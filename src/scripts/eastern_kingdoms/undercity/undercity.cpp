@@ -236,45 +236,6 @@ CreatureAI* GetAI_boss_sylvanas(Creature* pCreature)
     return new boss_sylvanasAI(pCreature);
 }
 
-bool GossipHello_npc_estelle_gendry(Player* pPlayer, Creature* pCreature)
-{
-    if ((pPlayer->GetQuestStatus(1999) == QUEST_STATUS_INCOMPLETE))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                 "I need the tools Mennet Carkad told me about.",
-                                 GOSSIP_SENDER_MAIN,
-                                 GOSSIP_ACTION_INFO_DEF + 10);
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature),
-                                  pCreature->GetObjectGuid());
-    }
-    return true;
-}
-
-bool GossipSelect_npc_estelle_gendry(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction >= GOSSIP_ACTION_INFO_DEF + 10)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (!pPlayer->HasItemCount(5060, 1, true))
-        {
-            uint32 noSpaceForCount = 0;
-            ItemPosCountVec dest;
-            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT,
-                                                 dest, 5060, 1, &noSpaceForCount);
-
-            if (msg == EQUIP_ERR_OK)
-            {
-                Item* pItem = pPlayer->StoreNewItem(dest, 5060,
-                                                    true, Item::GenerateItemRandomPropertyId(5060));
-                pPlayer->SendNewItem(pItem, 1, true, false);
-            }
-        }
-    }
-    return true;
-}
-
-
-
 /*######
 ## npc_parqual_fintallas
 ######*/
@@ -331,12 +292,6 @@ void AddSC_undercity()
     newscript->Name = "npc_parqual_fintallas";
     newscript->pGossipHello = &GossipHello_npc_parqual_fintallas;
     newscript->pGossipSelect = &GossipSelect_npc_parqual_fintallas;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_estelle_gendry";
-    newscript->pGossipHello = &GossipHello_npc_estelle_gendry;
-    newscript->pGossipSelect = &GossipSelect_npc_estelle_gendry;
     newscript->RegisterSelf();
 
     newscript = new Script;
