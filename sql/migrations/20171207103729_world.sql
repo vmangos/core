@@ -31,7 +31,17 @@ UPDATE `broadcast_text` SET `Type`=1 WHERE `ID`=9038;
 -- Text when Lok'Holar spawns.
 UPDATE `broadcast_text` SET `Type`=1 WHERE `ID`=8626;
 
+-- Various npc texts.
 UPDATE `broadcast_text` SET `Type`=1 WHERE `ID` IN (8887, 8905, 8907, 8913, 10339, 10342, 10347, 10357, 10358);
+
+-- Ivus and Lokholar texts.
+UPDATE `broadcast_text` SET `Type`=1 WHERE `ID` IN (8616, 8617, 8618, 8736, 8737, 8739, 8740);
+
+-- Add gossip text to Arch Druid Renferal.
+INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES (150112, 6174);
+
+-- Add gossip text to Primalist Thurloga.
+INSERT INTO `npc_gossip` (`npc_guid`, `textid`) VALUES (150106, 6093);
 
 
 -- End of migration.

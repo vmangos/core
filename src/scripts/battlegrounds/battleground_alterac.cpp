@@ -5,19 +5,7 @@ SDComment:
 SDCategory: BG
 EndScriptData */
 
-/*
-[SQL]
-
-*/
-
 #include "scriptPCH.h"
-
-// Common definitions
-// ------------------
-
-#define IMMOBILIZE         23973
-
-// 722.4 , -11
 
 /*
 Vanndar: Thunderclap (about 200-300 nature damage per player in range not been upgraded since vanilla, Time between attacks increased by 33%, movement speed reduced by 40%.) Storm Bolt (about 450 nature damage, stuns for 8 seconds, dispellable, used on non tanks) Avatar (50% increased damage and armor, up for 15 seconds, comes back up about 15-20 seconds later) Drek'thar: Whirlwind (2 second cast time, weapon damage to all in range) Frenzy (167% damage increase and attack speed increase by 50%, lasts 2 minutes, goes up after about 15-20 seconds from the start of fight) Knockdown (Infli
@@ -1212,6 +1200,7 @@ enum
     NPC_STROMPIKEBOWMAN     = 13358,
     NPC_FROSTWOLFBOWMAN     = 13359,
     SPELL_SHOOT             = 22121,
+    SPELL_ROOT_SELF         = 23973,
     SHOOT_SPEED             = 1700,
 };
 
@@ -1219,7 +1208,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 {
     npc_AlteracBowmanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->AddAura(23973, ADD_AURA_PERMANENT);
+        m_creature->AddAura(SPELL_ROOT_SELF, ADD_AURA_PERMANENT);
         SetCombatMovement(false);
         Reset();
     }
@@ -1229,7 +1218,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 
     void JustReachedHome()
     {
-        m_creature->AddAura(23973, ADD_AURA_PERMANENT);
+        m_creature->AddAura(SPELL_ROOT_SELF, ADD_AURA_PERMANENT);
     }
     void Reset()
     {
@@ -2965,12 +2954,10 @@ enum
     GOSSIP_THURLOGA_BOSS2 = 8643,
     GOSSIP_THURLOGA_BOSS3 = 8645,
 
-    NPCTEXT_RENFERAL_DEFAULT = 6174,
     NPCTEXT_RENFERAL_BOSS1 = 6175,
     NPCTEXT_RENFERAL_BOSS2 = 6176,
     NPCTEXT_RENFERAL_BOSS3 = 6177,
 
-    NPCTEXT_THURLOGA_DEFAULT = 6093,
     NPCTEXT_THURLOGA_BOSS1 = 6098,
     NPCTEXT_THURLOGA_BOSS2 = 6099,
     NPCTEXT_THURLOGA_BOSS3 = 6100,
@@ -3467,27 +3454,24 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             if (BattleGround* bg = pPlayer->GetBattleGround())
             {
                 uint32 currentCounter = ((BattleGroundAV*)bg)->getChallengeInvocationCounter(m_faction_id, BG_AV_BLOOD_WORLDBOSS_ASSAULT);
-                uint32 gossipOption = 0;
-                uint8 gossipNumber;
+                uint32 gossipOptionBroadcastID = 0;
+                uint8 gossipOptionID = 0;
+
                 if (currentCounter >= 160)
                 {
-                    gossipNumber = 2;
-                    gossipOption = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS3 : GOSSIP_THURLOGA_BOSS3;
+                    gossipOptionID = 2;
+                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS3 : GOSSIP_THURLOGA_BOSS3;
                 }
-                else if (currentCounter >= 80)
+                else if (currentCounter >= 100)
                 {
-                    gossipNumber = 1;
-                    gossipOption = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS2 : GOSSIP_THURLOGA_BOSS2;
+                    gossipOptionID = 1;
+                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS2 : GOSSIP_THURLOGA_BOSS2;
                 }
                 else
-                    gossipOption = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS1 : GOSSIP_THURLOGA_BOSS1;
+                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS1 : GOSSIP_THURLOGA_BOSS1;
 
-                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, gossipOption, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + BG_AV_BLOOD_WORLDBOSS_ASSAULT + 200 + gossipNumber);
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, gossipOptionBroadcastID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + BG_AV_BLOOD_WORLDBOSS_ASSAULT + 200 + gossipOptionID);
             }
-            
-            pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-            pPlayer->SEND_GOSSIP_MENU((m_faction_id == BG_TEAM_ALLIANCE) ? NPCTEXT_RENFERAL_DEFAULT : NPCTEXT_THURLOGA_DEFAULT, pCreature->GetObjectGuid());
-            return true;
         }
 
         /** NPC keep is gossip menu */
@@ -3670,7 +3654,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
 
 bool QuestComplete_AV_npc_ram_wolf(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
-    if (pQuestGiver->GetEntry() == 13617)
+    if (pQuestGiver->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
         pPlayer->SetQuestStatus(pQuest->GetQuestId(), QUEST_STATUS_NONE);
     return false;
 }
@@ -4356,6 +4340,14 @@ class av_world_boss_baseai: public npc_escortAI
         }
 };
 
+enum
+{
+    SAY_LOKHOLAR_SPAWN_1 = 8616,
+    SAY_LOKHOLAR_SPAWN_2 = 8617,
+    SAY_LOKHOLAR_KILLED_PLAYER = 8618,
+    SAY_LOKHOLAR_REACHED_BASE = 8740,
+};
+
 struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
 {
     AV_NpcEventWorldBoss_H_AI(Creature* pCreature) : av_world_boss_baseai(pCreature, BG_AV_BOSS_LOKHOLAR_H)
@@ -4441,7 +4433,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         switch (i)
         {
             case 30:
-                m_creature->MonsterYell("Your base is forfeit, puny mortals!", 0, 0);
+                DoScriptText(SAY_LOKHOLAR_REACHED_BASE, m_creature);
                 m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
                 break;
             case 31:
@@ -4456,7 +4448,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         {
             /** Each time a player is killed, cast Swell of Souls spell.
              * Maximum of 20 stacks allowed. */
-            m_creature->MonsterYell("I drink in your suffering! Let your essence congeal with Lokholar!", 0, 0);
+            DoScriptText(SAY_LOKHOLAR_KILLED_PLAYER, m_creature);
             DoCastSpellIfCan(m_creature, SPELL_WB_SWELLOFSOULS, true);
         }
     }
@@ -4465,7 +4457,13 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
     {
         if (!isYelling)
         {
-            m_creature->MonsterYell("WHO DARES SUMMON LOKHOLAR? The blood of a thousand Alliance soldiers I shall spill...none shall stand against the might of the Ice Lord!", LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_LOKHOLAR_SPAWN_1, m_creature);
+
+            static ScriptInfo si;
+            si.command = SCRIPT_COMMAND_TALK;
+            si.talk.textId[0] = SAY_LOKHOLAR_SPAWN_2;
+            m_creature->GetMap()->ScriptCommandStart(si, 3, m_creature, m_creature);
+
             isYelling = true;
         }
 
@@ -4551,6 +4549,10 @@ enum
     SPELL_WB_MOONFIRE      = 21669,
     SPELL_WB_STARFIRE      = 21668,
     SPELL_WB_WRATH         = 21667,
+
+    SAY_IVUS_SPAWNED       = 8736,
+    SAY_IVUS_PAST_FIELD    = 8737,
+    SAY_IVUS_REACHED_BASE  = 8739,
 };
 
 struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
@@ -4633,9 +4635,11 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
     void WaypointReached(uint32 i)
     {
-        if (i == 21)
+        if (i == 1)
+            DoScriptText(SAY_IVUS_PAST_FIELD, m_creature);
+        else if (i == 21)
         {
-            m_creature->MonsterYell("I come to raze your bases, Frostwolf Clan. Ivus punishes you for your treachery!", 0, 0);
+            DoScriptText(SAY_IVUS_REACHED_BASE, m_creature);
             Stop();
         }
     }
@@ -4644,7 +4648,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
     {
         if (isInvocated == false)
         {
-            m_creature->MonsterYell("Wicked, wicked, mortals! The forest weeps. The elements recoil at the destruction. Ivus must purge you from this world!", 0, 0);
+            DoScriptText(SAY_IVUS_SPAWNED, m_creature);
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
             m_creature->SetRespawnRadius(55.0f);
@@ -4664,9 +4668,6 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        if (!m_creature->getVictim()->isAlive())
-            m_creature->MonsterYell("The forest weeps. The elements recoil at the destruction. Ivus must purge you from this world!", 0, 0);
 
         if (m_uiRootsTimer < uiDiff)
         {
@@ -4714,6 +4715,13 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
 enum
 {
+    COMMANDER_RANDOLPH          = 13139,
+    COMMANDER_DARDOSH           = 13140,
+    COMMANDER_MULFORT           = 13153,
+    COMMANDER_LOUIS             = 13154,
+    COMMANDER_DUFFY             = 13319,
+    COMMANDER_KARL              = 13320,
+
     LIEUTENANT_SPENCER          = 13138,
     LIEUTENANT_LARGENT          = 13296,
     LIEUTENANT_STOUTHANDLE      = 13297,
@@ -4758,12 +4766,12 @@ struct AV_CommanderAI : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-            case 13139:
-            case 13140:
-            case 13153:
-            case 13154:
-            case 13319:
-            case 13320:
+            case COMMANDER_RANDOLPH:
+            case COMMANDER_DARDOSH:
+            case COMMANDER_MULFORT:
+            case COMMANDER_LOUIS:
+            case COMMANDER_DUFFY:
+            case COMMANDER_KARL:
                 // Aura of command
                 if (m_uiGripOfCommand_Timer < uiDiff)
                 {
@@ -4841,8 +4849,8 @@ struct AV_DismountAI : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-            case 13152:
-            case 13318:
+            case COMMANDER_MALGOR:
+            case COMMANDER_MORTIMER:
                 // Aura of command
                 if (m_uiGripOfCommand_Timer < uiDiff)
                 {
