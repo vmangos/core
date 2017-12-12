@@ -7985,30 +7985,30 @@ float Unit::GetSpeed(UnitMoveType mtype) const
     return m_speed_rate[mtype] * baseMoveSpeed[mtype];
 }
 
-float Unit::GetXZFlagBasedSpeed(const Unit *unit) const
+float Unit::GetXZFlagBasedSpeed() const
 {
-    if (!unit->HasUnitMovementFlag(MOVEFLAG_MASK_XZ))
+    if (!HasUnitMovementFlag(MOVEFLAG_MASK_XZ))
         return 0.0f;
 
-    if (unit->IsSwimming())
+    if (IsSwimming())
     {
-        if (unit->HasUnitMovementFlag(MOVEFLAG_BACKWARD))
-            return unit->GetSpeed(MOVE_SWIM_BACK);
+        if (HasUnitMovementFlag(MOVEFLAG_BACKWARD)) 
+            return GetSpeed(MOVE_SWIM_BACK);
 
-        return unit->GetSpeed(MOVE_SWIM);
+        return GetSpeed(MOVE_SWIM);
     }
 
-    if (unit->IsWalking())
+    if (IsWalking())
     {
         // Seems to always be same speed forward and backward when walking
-        return unit->GetSpeed(MOVE_WALK);
+        return GetSpeed(MOVE_WALK);
     }
 
     // Presumably only running left when IsMoving is true
-    if (unit->HasUnitMovementFlag(MOVEFLAG_BACKWARD))
-        return unit->GetSpeed(MOVE_RUN_BACK);
+    if (HasUnitMovementFlag(MOVEFLAG_BACKWARD)) 
+        return GetSpeed(MOVE_RUN_BACK);
 
-    return unit->GetSpeed(MOVE_RUN);
+    return GetSpeed(MOVE_RUN);
 }
 
 struct SetSpeedRateHelper
@@ -10762,7 +10762,7 @@ float Unit::GetCombatReach(Unit const* pVictim, bool forMeleeRange /*=true*/, fl
     if (IsPlayer())
     {
         static const float leewayMinSpeed = 4.97f;
-        if (GetXZFlagBasedSpeed(this) > leewayMinSpeed && GetXZFlagBasedSpeed(pVictim) > leewayMinSpeed)
+        if (GetXZFlagBasedSpeed() > leewayMinSpeed && pVictim->GetXZFlagBasedSpeed() > leewayMinSpeed)
             reach += 2.5f;
     }
 
