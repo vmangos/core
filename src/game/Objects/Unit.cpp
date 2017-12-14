@@ -7987,25 +7987,33 @@ float Unit::GetSpeed(UnitMoveType mtype) const
 
 float Unit::GetXZFlagBasedSpeed() const
 {
-    if (!HasUnitMovementFlag(MOVEFLAG_MASK_XZ))
-        return 0.0f;
+    return GetXZFlagBasedSpeed(m_movementInfo.moveFlags);
+}
 
-    if (IsSwimming())
+float Unit::GetXZFlagBasedSpeed(uint32 moveFlags) const
+{
+    // not moving laterally? zero!
+    if (!(moveFlags & MOVEFLAG_MASK_XZ))
+        return 0.f;
+
+    // swimming?
+    if (!!(moveFlags & MOVEFLAG_SWIMMING))
     {
-        if (HasUnitMovementFlag(MOVEFLAG_BACKWARD)) 
+        if (!!(moveFlags & MOVEFLAG_BACKWARD))
             return GetSpeed(MOVE_SWIM_BACK);
 
         return GetSpeed(MOVE_SWIM);
     }
 
-    if (IsWalking())
+    // walking?
+    if (!!(moveFlags & MOVEFLAG_WALK_MODE))
     {
         // Seems to always be same speed forward and backward when walking
         return GetSpeed(MOVE_WALK);
     }
 
     // Presumably only running left when IsMoving is true
-    if (HasUnitMovementFlag(MOVEFLAG_BACKWARD)) 
+    if (!!(moveFlags & MOVEFLAG_BACKWARD))
         return GetSpeed(MOVE_RUN_BACK);
 
     return GetSpeed(MOVE_RUN);
