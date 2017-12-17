@@ -1434,7 +1434,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (unitTarget && m_caster && unitTarget->IsPlayer() && m_caster->IsPlayer())
                     {
                         if (!unitTarget->HasAura(21354) &&                                      // Has no Snowball Resistant aura
-                            unitTarget->ToPlayer()->IsInSameGroupWith(m_caster->ToPlayer()))    // Is grouped with target
+                            unitTarget->ToPlayer()->IsInSameRaidWith(m_caster->ToPlayer()))     // Is grouped with target
                         {
                             unitTarget->CastSpell(unitTarget, 21167, true);
                         }
