@@ -41,11 +41,13 @@ enum
     MAP0_STORMWIND_AREA = 5,    // Stormwind, Elwynn forest, Redridge Mts
     MAP0_SOUTH          = 6,    // Southern phase of the continent
 
-    MAP1_NORTH          = 11,
-    MAP1_DUROTAR        = 12,
-    MAP1_MIDDLE_EST     = 13,   // Mulgore, Barrens, Dustwallow Marsh
-    MAP1_SOUTH          = 14,   // Feralas and south
+    MAP1_NORTH          = 11,   // Stonetalon, Ashenvale, Darkshore, Felwood, Moonglade, Winterspring, Azshara, Desolace
+    MAP1_DUROTAR        = 12,   // Durotar
+    MAP1_UPPER_MIDDLE   = 13,   // Mulgore, Barrens, Dustwallow Marsh
+    MAP1_LOWER_MIDDLE   = 14,   // Feralas, 1K needles
     MAP1_VALLEY         = 15,   // Orc and Troll starting area
+    MAP1_ORGRIMMAR      = 16,   // Orgrimmar (on its own)
+    MAP1_SOUTH          = 17,   // Silithus, Un'goro and Tanaris
 
     MAP0_FIRST          = 1,
     MAP0_LAST           = 10,

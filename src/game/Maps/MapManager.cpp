@@ -815,14 +815,60 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                     -5459.449707f, -4920.155273f, // Tanaris
                         -5437.00f,     -5863.00f
             };
+
+            const static float orgrimmarSouthLimit[] = {
+                    2132.5076f, -3912.2478f,
+                    1944.4298f, -3855.2583f,
+                    1735.6906f, -3834.2417f,
+                    1654.3671f, -3380.9902f,
+                    1593.9861f, -3975.5413f,
+                    1439.2548f, -4249.6923f,
+                    1436.3106f, -4007.8950f,
+                    1393.3199f, -4196.0625f,
+                    1445.2428f, -4373.9052f,
+                    1407.2349f, -4429.4145f,
+                    1464.7142f, -4545.2875f,
+                    1584.1331f, -4596.8764f,
+                    1716.8065f, -4601.1323f,
+                    1875.8312f, -4788.7187f,
+                    1979.7647f, -4883.4585f,
+                    2219.1562f, -4854.3330f
+            };
+
+            const static float feralasThousandNeedlesSouthLimit[] = {
+                    -6495.4995, -4711.981,
+                    -6674.9995, -4515.0019,
+                    -6769.5717, -4122.4272,
+                    -6838.2651, -3874.2792,
+                    -6851.1314, -3659.1179,
+                    -6624.6845, -3063.3843,
+                    -6416.9067, -2570.1301,
+                    -5959.8466, -2287.2634,
+                    -5947.9135, -1866.5028,
+                    -5947.9135,  -820.4881,
+                    -5876.7114,    -3.5138,
+                    -5876.7114,   917.6407,
+                    -6099.3603,  1153.2884,
+                    -6021.8989,  1638.1809,
+                    -6091.6176,  2335.8892,
+                    -6744.9946,  2393.4855,
+                    -6973.8608,  3077.0281,
+                    -7068.7241,  4376.2304,
+                    -7142.1211,  4808.4331
+            };
+
             if (IsNorthTo(x, y, northMiddleLimit, sizeof(northMiddleLimit) / (2 * sizeof(float))))
                 return MAP1_NORTH;
+            if (IsNorthTo(x, y, orgrimmarSouthLimit, sizeof(orgrimmarSouthLimit) / (2 * sizeof(float))))
+                return MAP1_ORGRIMMAR;
             if (IsNorthTo(x, y, durotarSouthLimit, sizeof(durotarSouthLimit) / (2 * sizeof(float))))
                 return MAP1_DUROTAR;
             if (IsNorthTo(x, y, valleyoftrialsSouthLimit, sizeof(valleyoftrialsSouthLimit) / (2 * sizeof(float))))
                 return MAP1_VALLEY;
             if (IsNorthTo(x, y, middleToSouthLimit, sizeof(middleToSouthLimit) / (2 * sizeof(float))))
-                return MAP1_MIDDLE_EST;
+                return MAP1_UPPER_MIDDLE;
+            if (IsNorthTo(x, y, feralasThousandNeedlesSouthLimit, sizeof(feralasThousandNeedlesSouthLimit) / (2 * sizeof(float))))
+                return MAP1_LOWER_MIDDLE;
             return MAP1_SOUTH;
         }
     }
