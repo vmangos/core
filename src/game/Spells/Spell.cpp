@@ -6215,6 +6215,30 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_NOT_ON_TRANSPORT;
                 break;
             }
+            case SPELL_EFFECT_SCRIPT_EFFECT:
+            {
+                // Black Qiraji Battle Tank
+                if (m_spellInfo->Id == 26656)
+                {
+                    if (m_caster->IsInWater())
+                        return SPELL_FAILED_ONLY_ABOVEWATER;
+
+                    if (m_caster->GetTypeId() == TYPEID_PLAYER && ((Player*)m_caster)->GetTransport())
+                        return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+
+                    if (m_caster->GetMapId() != 531 && m_caster->GetTypeId() == TYPEID_PLAYER && !sMapStorage.LookupEntry<MapEntry>(m_caster->GetMapId())->IsMountAllowed() && !m_IsTriggeredSpell)
+                        return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+
+                    if (m_caster->GetAreaId() == 35)
+                        return SPELL_FAILED_NO_MOUNTS_ALLOWED;
+
+                    if (m_caster->IsInDisallowedMountForm())
+                        return SPELL_FAILED_NOT_SHAPESHIFT;
+
+                    if (m_caster->GetMapId() == 531)
+                        break;
+                }
+            }
             default:
                 break;
         }
