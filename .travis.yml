@@ -48,4 +48,4 @@ before_script:
   - cd build
   - cmake -DDEBUG=0 -DUSE_LIBCURL=1 ..
 
-script: make
+script: make -j4
