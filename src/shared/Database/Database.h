@@ -175,6 +175,10 @@ class MANGOS_DLL_SPEC Database
             bool AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql);
         template<typename ParamType1, typename ParamType2, typename ParamType3>
             bool AsyncQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *sql);
+        template<typename ParamType1>
+            bool AsyncQueryUnsafe(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char *sql);
+        template<typename ParamType1, typename ParamType2>
+            bool AsyncQueryUnsafe(void(*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *sql);
         // PQuery / member
         template<class Class>
             bool AsyncPQuery(Class *object, void (Class::*method)(QueryResult*), const char *format,...) ATTR_PRINTF(4,5);
@@ -195,13 +199,23 @@ class MANGOS_DLL_SPEC Database
             bool AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *format,...) ATTR_PRINTF(5,6);
         template<typename ParamType1, typename ParamType2, typename ParamType3>
             bool AsyncPQuery(void (*method)(QueryResult*, ParamType1, ParamType2, ParamType3), ParamType1 param1, ParamType2 param2, ParamType3 param3, const char *format,...) ATTR_PRINTF(6,7);
-        template<class Class>
+        template<typename ParamType1>
+            bool AsyncPQueryUnsafe(void (*method)(QueryResult*, ParamType1), ParamType1 param1, const char *format, ...) ATTR_PRINTF(4, 5);
+        template<typename ParamType1, typename ParamType2>
+            bool AsyncPQueryUnsafe(void (*method)(QueryResult*, ParamType1, ParamType2), ParamType1 param1, ParamType2 param2, const char *format, ...) ATTR_PRINTF(5, 6);
         // QueryHolder
+        template<class Class>
             bool DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder);
         template<class Class>
             bool DelayQueryHolderUnsafe(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*), SqlQueryHolder *holder);
         template<class Class, typename ParamType1>
             bool DelayQueryHolder(Class *object, void (Class::*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
+
+        // QueryHolder / static
+        template<typename ParamType1>
+            bool DelayQueryHolder(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
+        template<typename ParamType1>
+            bool DelayQueryHolderUnsafe(void (*method)(QueryResult*, SqlQueryHolder*, ParamType1), SqlQueryHolder *holder, ParamType1 param1);
 
         bool Execute(const char *sql);
         bool PExecute(const char *format,...) ATTR_PRINTF(2,3);

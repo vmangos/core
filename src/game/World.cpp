@@ -1712,26 +1712,19 @@ void World::DetectDBCLang()
 class WorldAsyncTasksExecutor : public ACE_Based::Runnable
 {
 public:
-    WorldAsyncTasksExecutor(int me, int total): me(me), total(total) {}
+    WorldAsyncTasksExecutor() {}
     void run()
     {
         WorldDatabase.ThreadStart();
-        sWorld.HandleAsyncTasks(me, total);
+        AsyncTask* task;
+        while (sWorld.GetNextAsyncTask(task))
+        {
+            task->run();
+            delete task;
+        }
         WorldDatabase.ThreadEnd();
     }
-protected:
-    int me;
-    int total;
 };
-
-void World::HandleAsyncTasks(int me, int total)
-{
-    for (int i = me; i < _asyncTasks.size(); i += total)
-    {
-        _asyncTasks[i]->run();
-        delete _asyncTasks[i];
-    }
-}
 
 /// Update the World !
 void World::Update(uint32 diff)
@@ -1803,7 +1796,7 @@ void World::Update(uint32 diff)
     std::vector<ACE_Based::Thread*> asyncTaskThreads;
     int threadsCount = getConfig(CONFIG_UINT32_ASYNC_TASKS_THREADS_COUNT);
     for (int i = 0; i < threadsCount; ++i)
-        asyncTaskThreads.push_back(new ACE_Based::Thread(new WorldAsyncTasksExecutor(i, threadsCount)));
+        asyncTaskThreads.push_back(new ACE_Based::Thread(new WorldAsyncTasksExecutor()));
 
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
@@ -1829,7 +1822,6 @@ void World::Update(uint32 diff)
         asyncTaskThreads[i]->wait();
         delete asyncTaskThreads[i];
     }
-    _asyncTasks.clear();
 
     updateMapSystemTime = WorldTimer::getMSTimeDiffToNow(updateMapSystemTime);
     if (getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE) && updateMapSystemTime > getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAPSYSTEM_UPDATE))
@@ -2144,6 +2136,96 @@ void World::BanAccount(uint32 accountId, uint32 duration, std::string reason, st
     }
 }
 
+class BanQueryHolder : public SqlQueryHolder
+{
+public:
+    BanQueryHolder(BanMode mode, std::string banTarget, uint32 duration, std::string reason, uint32 realmId, std::string author,
+        uint32 authorAccountId)
+        : m_mode(mode), m_banTarget(banTarget), m_duration(duration), m_reason(reason), m_realmId(realmId), m_author(author),
+          m_accountId(authorAccountId)
+    {
+    }
+
+    BanMode GetBanMode() const { return m_mode; }
+    uint32 GetDuration() const { return m_duration; }
+    std::string& GetReason() { return m_reason; }
+    uint32 GetRealmId() const { return m_realmId; }
+    std::string& GetAuthor() { return m_author; }
+    std::string& GetBanTarget() { return m_banTarget; }
+    uint32 GetAuthorAccountId() const { return m_accountId; }
+
+private:
+    BanMode m_mode;
+    uint32 m_duration;
+    std::string m_reason;
+    uint32 m_realmId;
+    std::string m_author;
+    std::string m_banTarget;
+    uint32 m_accountId;
+};
+
+// Not thread-safe, performed in async unsafe callback
+class BanAccountHandler
+{
+public:
+    void HandleAccountSelectResult(QueryResult*, SqlQueryHolder* queryHolder)
+    {
+        BanQueryHolder* holder = static_cast<BanQueryHolder*>(queryHolder);
+        if (!holder)
+            return;
+
+        BanReturn banResult = BAN_SUCCESS;
+
+        WorldSession* session = sWorld.FindSession(holder->GetAuthorAccountId());
+
+        QueryResult* result = holder->GetResult(0);
+        if (!result)
+        {
+            if (session)
+                ChatHandler(session).SendBanResult(holder->GetBanMode(), BAN_NOTFOUND, holder->GetBanTarget(), holder->GetDuration(), holder->GetReason());
+            delete holder;
+            return;
+        }
+
+        ///- Disconnect all affected players (for IP it can be several)
+        do
+        {
+            Field* fieldsAccount = result->Fetch();
+            uint32 account = fieldsAccount->GetUInt32();
+
+            if (holder->GetBanMode() != BAN_IP)
+            {
+                //No SQL injection as strings are escaped
+                LoginDatabase.PExecute("INSERT INTO account_banned (id, bandate, unbandate, bannedby, banreason, active, realm) VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+%u, '%s', '%s', '1', %u)",
+                    account, holder->GetDuration(), holder->GetAuthor().c_str(), holder->GetReason().c_str(), holder->GetRealmId());
+                if (holder->GetDuration() > 0)
+                    sAccountMgr.BanAccount(account, time(nullptr) + holder->GetDuration());
+                else
+                    sAccountMgr.BanAccount(account, 0xFFFFFFFF);
+            }
+            // Don't immediately kick if we're banning ourselves (destroys session, crash)
+            if (account != holder->GetAuthorAccountId())
+            {
+                if (WorldSession* sess = sWorld.FindSession(account))
+                {
+                    sess->LogoutPlayer(true);
+                    sess->KickPlayer();
+                }
+            }
+        } while (result->NextRow());
+
+        banResult = BAN_SUCCESS;
+
+        if (session)
+        {
+            ChatHandler(session).SendBanResult(holder->GetBanMode(), banResult, holder->GetBanTarget(), holder->GetDuration(), holder->GetReason());
+        }
+
+        holder->DeleteAllResults();
+        delete holder;
+    }
+} banHandler;
+
 /// Ban an account or ban an IP address, duration_secs if it is positive used, otherwise permban
 BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_secs, std::string reason, std::string author)
 {
@@ -2152,15 +2234,24 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
     std::string safe_author = author;
     LoginDatabase.escape_string(safe_author);
 
-    QueryResult *resultAccounts = nullptr;                     //used for kicking
+    PlayerCacheData* authorData = sObjectMgr.GetPlayerDataByName(author);
 
+    BanQueryHolder* holder = new BanQueryHolder(mode, nameOrIP, duration_secs, reason, realmID, safe_author,
+        authorData ? authorData->uiAccount : 0);
+
+    holder->SetSize(1);
+
+    DatabaseType* db = nullptr;
     ///- Update the database with ban information
     switch (mode)
     {
         case BAN_IP:
             //No SQL injection as strings are escaped
-            resultAccounts = LoginDatabase.PQuery("SELECT id FROM account WHERE last_ip = '%s'", nameOrIP.c_str());
+            db = &LoginDatabase;
+
+            holder->SetPQuery(0, "SELECT id FROM account WHERE last_ip = '%s'", nameOrIP.c_str());
             LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+%u,'%s','%s')", nameOrIP.c_str(), duration_secs, safe_author.c_str(), reason.c_str());
+
             if (duration_secs > 0)
                 sAccountMgr.BanIP(nameOrIP, time(nullptr) + duration_secs);
             else
@@ -2168,56 +2259,23 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
             break;
         case BAN_ACCOUNT:
             //No SQL injection as string is escaped
-            resultAccounts = LoginDatabase.PQuery("SELECT id FROM account WHERE username = '%s'", nameOrIP.c_str());
+            db = &LoginDatabase;
+            holder->SetPQuery(0, "SELECT id FROM account WHERE username = '%s'", nameOrIP.c_str());
             break;
         case BAN_CHARACTER:
         {
+            db = &CharacterDatabase;
             if (uint32 guid = sObjectMgr.GetPlayerGuidByName(nameOrIP))
-                resultAccounts = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = %u", guid);
+                holder->SetPQuery(0, "SELECT account FROM characters WHERE guid = %u", guid);
             break;
         }
         default:
             return BAN_SYNTAX_ERROR;
     }
 
-    if (!resultAccounts)
-    {
-        if (mode == BAN_IP)
-            return BAN_SUCCESS;                             // ip correctly banned but nobody affected (yet)
-        else
-            return BAN_NOTFOUND;                                // Nobody to ban
-    }
+    db->DelayQueryHolderUnsafe(&banHandler, &BanAccountHandler::HandleAccountSelectResult, holder);
 
-    ///- Disconnect all affected players (for IP it can be several)
-    do
-    {
-        Field* fieldsAccount = resultAccounts->Fetch();
-        uint32 account = fieldsAccount->GetUInt32();
-
-        if (mode != BAN_IP)
-        {
-            //No SQL injection as strings are escaped
-            LoginDatabase.PExecute("INSERT INTO account_banned (id, bandate, unbandate, bannedby, banreason, active, realm) VALUES ('%u', UNIX_TIMESTAMP(), UNIX_TIMESTAMP()+%u, '%s', '%s', '1', %u)",
-                                   account, duration_secs, safe_author.c_str(), reason.c_str(), realmID);
-            if (duration_secs > 0)
-                sAccountMgr.BanAccount(account, time(nullptr) + duration_secs);
-            else
-                sAccountMgr.BanAccount(account, 0xFFFFFFFF);
-        }
-
-        if (WorldSession* sess = FindSession(account))
-        {
-            if (std::string(sess->GetPlayerName()) != author)
-            {
-                sess->LogoutPlayer(true);
-                sess->KickPlayer();
-            }
-        }
-    }
-    while (resultAccounts->NextRow());
-
-    delete resultAccounts;
-    return BAN_SUCCESS;
+    return BAN_INPROGRESS;
 }
 
 /// Remove a ban from an account or IP address
@@ -2847,4 +2905,12 @@ time_t World::GetWorldUpdateTimerInterval(WorldTimers timer)
         return 0;
 
     return m_timers[timer].GetInterval();
+}
+
+void SessionPacketSendTask::run()
+{
+    if (WorldSession* session = sWorld.FindSession(m_accountId))
+    {
+        session->SendPacket(&m_data);
+    }
 }

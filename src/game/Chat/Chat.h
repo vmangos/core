@@ -128,6 +128,8 @@ class MANGOS_DLL_SPEC ChatHandler
 
         GameObject* GetGameObjectWithGuid(uint32 lowguid,uint32 entry);
         WorldSession* GetSession() { return m_session; }
+
+        void SendBanResult(BanMode mode, BanReturn result, std::string& banTarget, uint32 duration_secs, std::string& reason);
     protected:
         explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_master(true), m_cluster_is_node(true) {}      // for CLI subclass
 
@@ -910,11 +912,9 @@ class MANGOS_DLL_SPEC ChatHandler
 
         // Utility methods for commands
         bool ShowAccountIpListHelper(char* args, bool onlineonly);
-        bool ShowAccountListHelper(QueryResult* result, uint32* limit = nullptr, bool title = true, bool error = true);
         void ShowFactionListHelper(FactionEntry const * factionEntry, LocaleConstant loc, FactionState const* repState = nullptr, Player * target = nullptr );
         void ShowItemListHelper(uint32 itemId, int loc_idx, Player* target = nullptr);
         void ShowQuestListHelper(uint32 questId, int32 loc_idx, Player* target = nullptr);
-        bool ShowPlayerListHelper(QueryResult* result, uint32* limit = nullptr, bool title = true, bool error = true);
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         void ShowPoolListHelper(uint16 pool_id);
         void ShowTriggerListHelper(AreaTriggerEntry const * atEntry);

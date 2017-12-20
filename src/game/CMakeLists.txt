@@ -91,6 +91,7 @@ set (game_SRCS
 	Chat/Channel.cpp
 	Chat/ChannelMgr.cpp
 	Chat/Chat.cpp
+	Chat/AsyncCommandHandlers.cpp
 	CinematicStuff/CinematicStuff.cpp
 	CinematicStuff/CinematicStuff.h
 	Commands/debugcmds.cpp
@@ -295,6 +296,7 @@ set (game_SRCS
 	Chat/Channel.h
 	Chat/ChannelMgr.h
 	Chat/Chat.h
+	Chat/AsyncCommandHandlers.h
 	Commands/Nostalrius.h
 	Database/CharacterDatabaseCache.h
 	Database/CharacterDatabaseCleaner.h

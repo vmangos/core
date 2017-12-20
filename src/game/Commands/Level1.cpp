@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "Database/DatabaseImpl.h"
 #include "DBCStores.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
@@ -39,6 +40,7 @@
 #include "Util.h"
 #include "Anticheat.h"
 #include "SQLStorages.h"
+#include "AsyncCommandHandlers.h"
 #ifdef _DEBUG_VMAPS
 #include "VMapFactory.h"
 #endif
@@ -2272,45 +2274,25 @@ bool ChatHandler::HandleGoldRemoval(char* args)
 
     Player* player = sObjectMgr.GetPlayer(name.c_str());
 
+    uint32 removalAmount = (gold * GOLD) + (silver * SILVER) + copper;
+
     if (player)
     {
         prevMoney = player->GetMoney();
-        player->ModifyMoney(-static_cast<int32>((gold * GOLD) + (silver * SILVER) + copper));
+        player->ModifyMoney(-static_cast<int32>(removalAmount));
         newMoney = player->GetMoney();
+
+        PSendSysMessage("Removed %ug %us %uc from %s", gold, silver, copper, name.c_str());
+        PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
+        PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
     }
     else
     {
         CharacterDatabase.escape_string(name);
-        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT money FROM characters WHERE name = '%s'", name.c_str()));
-
-        if (!result)
-        {
-            PSendSysMessage(LANG_PLAYER_NOT_FOUND);
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        Field *fields = result->Fetch();
-        prevMoney = fields[0].GetUInt32();
-        newMoney = prevMoney - ((gold * GOLD) + (silver * SILVER) + copper);
-
-        if (newMoney > prevMoney)
-        {
-            newMoney = 0;
-        }
-
-        auto res = CharacterDatabase.PExecute("UPDATE characters SET money = %u WHERE name = '%s'", newMoney, name.c_str());
-
-        if (!res)
-        {
-            PSendSysMessage("Encountered a database error during gold removal - see log for details");
-            SetSentErrorMessage(true);
-            return false;
-        }
+        CharacterDatabase.AsyncPQueryUnsafe(&PlayerGoldRemovalHandler::HandleGoldLookupResult,
+            GetAccountId(), removalAmount,
+            "SELECT money, guid, name FROM characters WHERE name = '%s'",
+            name.c_str());
     }
-
-    PSendSysMessage("Removed %ug %us %uc from %s", gold, silver, copper, name.c_str());
-    PSendSysMessage("%s previously had %ug %us %uc", name.c_str(), prevMoney / GOLD, (prevMoney % GOLD) / SILVER, (prevMoney % GOLD) % SILVER);
-    PSendSysMessage("%s now has %ug %us %uc", name.c_str(), newMoney / GOLD, (newMoney % GOLD) / SILVER, (newMoney % GOLD) % SILVER);
     return true;
 }

@@ -21,6 +21,7 @@
 
 #include "Common.h"
 #include "Database/DatabaseEnv.h"
+#include "Database/DatabaseImpl.h"
 #include "ObjectMgr.h"
 #include "ObjectGuid.h"
 #include "Item.h"
@@ -55,6 +56,7 @@
 #include <map>
 #include <typeinfo>
 #include "Formulas.h"
+#include "AsyncCommandHandlers.h"
 
 #include "TargetedMovementGenerator.h"                      // for HandleNpcUnFollowCommand
 
@@ -2538,134 +2540,11 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
         return false;
 
-    uint8 race, class_;
-    uint32 accId = 0;
-    uint32 money = 0;
-    uint32 mail_gold_inbox = 0;
-    uint32 mail_gold_outbox = 0;
-    uint32 total_player_time = 0;
-    uint32 level = 0;
-    uint32 latency = 0;
-    uint32 security_flag = 0;
-    LocaleConstant loc = LOCALE_enUS;
-
-    // get additional information from Player object
-    if (target)
-    {
-        // check online security
-        if (HasLowerSecurity(target))
-            return false;
-
-        accId = target->GetSession()->GetAccountId();
-        money = target->GetMoney();
-        total_player_time = target->GetTotalPlayedTime();
-        level = target->getLevel();
-        latency = target->GetSession()->GetLatency();
-        loc = target->GetSession()->GetSessionDbcLocale();
-        race = target->getRace();
-        class_ = target->getClass();
-
-    }
-    // get additional information from DB
-    else
-    {
-        // check offline security
-        if (HasLowerSecurity(NULL, target_guid))
-            return false;
-
-        //                                                     0          1      2      3        4     5
-        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT totaltime, level, money, account, race, class FROM characters WHERE guid = '%u'", target_guid.GetCounter()));
-
-        if (!result)
-            return false;
-
-        Field *fields = result->Fetch();
-        total_player_time = fields[0].GetUInt32();
-        level = fields[1].GetUInt32();
-        money = fields[2].GetUInt32();
-        accId = fields[3].GetUInt32();
-        race  = fields[4].GetUInt8();
-        class_= fields[5].GetUInt8();
-    }
-
-    std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT SUM(money) FROM mail WHERE sender = %u", target_guid.GetCounter()));
-
-    if (!result)
-        return false;
-  
-    Field *fields = result->Fetch();
-    mail_gold_outbox = fields[0].GetUInt32();
-
-    result.reset(CharacterDatabase.PQuery("SELECT SUM(money) FROM mail WHERE receiver = %u", target_guid.GetCounter()));
-
-    if (!result)
+    if (HasLowerSecurity(target, target ? ObjectGuid() : target_guid))
         return false;
 
-    fields = result->Fetch();
-    mail_gold_inbox = fields[0].GetUInt32();
+    PInfoHandler::HandlePInfoCommand(m_session, target, target_guid, target_name);
 
-    std::string username = GetMangosString(LANG_ERROR);
-    std::string last_ip = GetMangosString(LANG_ERROR);
-    AccountTypes security = SEC_PLAYER;
-    std::string last_login = GetMangosString(LANG_ERROR);
-    const char* raceName = GetRaceName(race, GetSessionDbcLocale());
-    const char* className = GetClassName(class_, GetSessionDbcLocale());
-
-    if (!raceName)
-        raceName = "";
-    if (!className)
-        className = "";
-
-    result.reset(LoginDatabase.PQuery("SELECT username,last_ip,last_login,locale,locked FROM account WHERE id = '%u'", accId));
-
-    if (result)
-    {
-        Field* fields = result->Fetch();
-        username = fields[0].GetCppString();
-        security = sAccountMgr.GetSecurity(accId);
-        loc = LocaleConstant(fields[3].GetUInt8());
-        security_flag = fields[4].GetUInt8();
-
-        bool showIp = true;
-        if (GetAccessLevel() < security)
-            showIp = false;
-        else if (GetAccessLevel() < SEC_ADMINISTRATOR && security > SEC_PLAYER) // Only admins can see GM IPs
-            showIp = false;
-        if (showIp)
-        {
-            last_ip = fields[1].GetCppString();
-            last_login = fields[2].GetCppString();
-        }
-        else
-        {
-            last_ip = "-";
-            last_login = "-";
-        }
-    }
-
-    if (loc > LOCALE_esMX)
-        loc = LOCALE_enUS;
-
-    std::string nameLink = playerLink(target_name);
-    std::string two_factor_enabled = security_flag & 4? "Enabled" : "Disabled";
-
-    PSendSysMessage(LANG_PINFO_ACCOUNT, raceName, className, (target ? "" : GetMangosString(LANG_OFFLINE)), nameLink.c_str(), target_guid.GetCounter(), playerLink(username).c_str(), accId, sAccountMgr.IsAccountBanned(accId) ? ", banned" : "",
-                    security, playerLink(last_ip).c_str(), sAccountMgr.IsIPBanned(last_ip) ? " [BANIP]" : "", last_login.c_str(), latency,
-                    localeNames[loc], two_factor_enabled.c_str());
-
-    std::string timeStr = secsToTimeString(total_player_time, true, true);
-    uint32 gold = money / GOLD;
-    uint32 silv = (money % GOLD) / SILVER;
-    uint32 copp = (money % GOLD) % SILVER;
-    uint32 gold_in = mail_gold_inbox / GOLD;
-    uint32 silv_in = (mail_gold_inbox % GOLD) / SILVER;
-    uint32 copp_in = (mail_gold_inbox % GOLD) % SILVER;
-    uint32 gold_out = mail_gold_outbox / GOLD;
-    uint32 silv_out = (mail_gold_outbox % GOLD) / SILVER;
-    uint32 copp_out = (mail_gold_outbox % GOLD) % SILVER;
-    PSendSysMessage(LANG_PINFO_LEVEL,  timeStr.c_str(), level, gold, silv, copp, gold_in, silv_in, silv_out, gold_out, silv_out, copp_out);
-    if (Guild* guild = sGuildMgr.GetPlayerGuild(target_guid))
-        PSendSysMessage("Guild: %s", playerLink(guild->GetName()).c_str());
     return true;
 }
 
@@ -4529,10 +4408,13 @@ bool ChatHandler::HandleLookupAccountEmailCommand(char* args)
 
     std::string email = emailStr;
     LoginDatabase.escape_string(email);
-    //                                                 0   1         2        3        4
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, 0, expansion FROM account WHERE email " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), email.c_str());
 
-    return ShowAccountListHelper(result, &limit);
+    // No wildcard in front, cannot use table index
+    LoginDatabase.AsyncPQuery(AccountSearchHandler::HandleAccountLookupResult, GetAccountId(), limit,
+        //      0   1         2        3        4
+        "SELECT id, username, last_ip, 0, expansion FROM account WHERE email " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u",
+        email.c_str(), limit);
+
 }
 
 bool ChatHandler::HandleLookupAccountIpCommand(char* args)
@@ -4560,10 +4442,13 @@ bool ChatHandler::HandleLookupAccountNameCommand(char* args)
         return false;
 
     LoginDatabase.escape_string(account);
-    //                                                 0   1         2        3        4
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, 0, expansion FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
 
-    return ShowAccountListHelper(result, &limit);
+    LoginDatabase.AsyncPQuery(AccountSearchHandler::HandleAccountLookupResult, GetAccountId(), limit,
+        //      0   1         2        3        4
+        "SELECT id, username, last_ip, 0, expansion FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " LIMIT %u",
+        account.c_str(), limit);
+
+    return true;
 }
 
 bool ChatHandler::ShowAccountIpListHelper(char* args, bool onlineonly)
@@ -4580,83 +4465,10 @@ bool ChatHandler::ShowAccountIpListHelper(char* args, bool onlineonly)
     LoginDatabase.escape_string(ip);
 
     const char *query = onlineonly
-        ? "SELECT id, username, last_ip, 0, expansion FROM account WHERE online = 1 AND last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'")
-        : "SELECT id, username, last_ip, 0, expansion FROM account WHERE                last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'");
+        ? "SELECT id, username, last_ip, 0, expansion FROM account WHERE online = 1 AND last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u"
+        : "SELECT id, username, last_ip, 0, expansion FROM account WHERE                last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u";
 
-    QueryResult *result = LoginDatabase.PQuery(query, ip.c_str());
-
-    return ShowAccountListHelper(result, &limit);
-}
-
-bool ChatHandler::ShowAccountListHelper(QueryResult* result, uint32* limit, bool title, bool error)
-{
-    if (!result)
-    {
-        if (error)
-            SendSysMessage(LANG_ACCOUNT_LIST_EMPTY);
-        return true;
-    }
-
-    ///- Display the list of account/characters online
-    if (!m_session && title)                                // not output header for online case
-    {
-        SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-        SendSysMessage(LANG_ACCOUNT_LIST_HEADER);
-        SendSysMessage(LANG_ACCOUNT_LIST_BAR);
-    }
-
-    ///- Circle through accounts
-    do
-    {
-        // check limit
-        if (limit)
-        {
-            if (*limit == 0)
-                break;
-            --*limit;
-        }
-
-        Field *fields = result->Fetch();
-        uint32 account = fields[0].GetUInt32();
-
-        WorldSession* session = sWorld.FindSession(account);
-        Player* player = session ? session->GetPlayer() : NULL;
-        char const* char_name = player ? player->GetName() : " - ";
-        
-        std::string lastIp = GetMangosString(LANG_ERROR);
-        bool showIp = true;
-        AccountTypes security = sAccountMgr.GetSecurity(account);
-        if (GetAccessLevel() < security)
-            showIp = false;
-        else if (GetAccessLevel() < SEC_ADMINISTRATOR && security > SEC_PLAYER) // Only admins can see GM IPs
-            showIp = false;
-        if (showIp)
-        {
-            lastIp = fields[2].GetCppString();
-        }
-        else
-        {
-            lastIp = "-";
-        }
-
-        std::string acc_name = fields[1].GetCppString();
-        if (sAccountMgr.IsAccountBanned(account))
-            acc_name = acc_name + " [BANNED]";
-
-        if (m_session)
-            PSendSysMessage(LANG_ACCOUNT_LIST_LINE_CHAT,
-                            account, acc_name.c_str(), char_name, playerLink(lastIp).c_str(), security, fields[4].GetUInt32());
-        else
-            PSendSysMessage(LANG_ACCOUNT_LIST_LINE_CONSOLE,
-                            account, acc_name.c_str(), char_name, playerLink(lastIp).c_str(), security, fields[4].GetUInt32());
-
-    }
-    while (result->NextRow());
-
-    delete result;
-
-    if (!m_session)                                         // not output header for online case
-        SendSysMessage(LANG_ACCOUNT_LIST_BAR);
+    LoginDatabase.AsyncPQuery(AccountSearchHandler::HandleAccountLookupResult, GetAccountId(), limit, query, ip.c_str(), limit);
 
     return true;
 }
@@ -4674,7 +4486,7 @@ bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
     QueryResult* result = NULL;
     std::string ip = ipStr;
     LoginDatabase.escape_string(ip);
-    result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
+    result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), ip.c_str());
 
     return LookupPlayerSearchCommand(result, &limit);
 }
@@ -4695,7 +4507,7 @@ bool ChatHandler::HandleLookupPlayerAccountCommand(char* args)
 
     LoginDatabase.escape_string(account);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), account.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE username " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), account.c_str());
 
     return LookupPlayerSearchCommand(result, &limit);
 }
@@ -4713,7 +4525,7 @@ bool ChatHandler::HandleLookupPlayerEmailCommand(char* args)
     std::string email = emailStr;
     LoginDatabase.escape_string(email);
 
-    QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE email " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), email.c_str());
+    QueryResult* result = LoginDatabase.PQuery("SELECT id,username FROM account WHERE email " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), email.c_str());
 
     return LookupPlayerSearchCommand(result, &limit);
 }
@@ -4732,14 +4544,10 @@ bool ChatHandler::HandleLookupPlayerNameCommand(char* args)
     std::string name = nameStr;
     LoginDatabase.escape_string(name);
 
-    QueryResult* chars = CharacterDatabase.PQuery("SELECT guid, name, race, class, level FROM characters WHERE name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), name.c_str());
-    if (chars)
-    {
-        if (chars->GetRowCount())
-            ShowPlayerListHelper(chars, &limit, true, true);
-        else
-            delete chars;
-    }
+    CharacterDatabase.AsyncPQuery(&PlayerSearchHandler::HandlePlayerCharacterLookupResult,
+        GetAccountId(), limit_original,
+        "SELECT guid, name, race, class, level FROM characters WHERE name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"),
+        name.c_str());
 
     return true;
 }
@@ -4770,7 +4578,7 @@ bool ChatHandler::HandleLookupPlayerCharacterCommand(char* args)
                     return LookupPlayerSearchCommand(NULL, &limit);
 
                 LoginDatabase.escape_string(ip);
-                result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), ip.c_str());
+                result = LoginDatabase.PQuery("SELECT id, username FROM account WHERE last_ip = '%s'", ip.c_str());
             }
 
     return LookupPlayerSearchCommand(result, &limit);
@@ -4792,46 +4600,28 @@ bool ChatHandler::LookupPlayerSearchCommand(QueryResult* result, uint32* limit)
     if (!limit)
         limit = &limit_local;
 
+    PlayerSearchQueryHolder* holder = new PlayerSearchQueryHolder(m_session ? m_session->GetAccountId() : 0, limit_local);
+    holder->SetSize(result->GetRowCount());
+    uint32 count = 0;
     do
     {
-        if (limit && *limit == 0)
+        // Definitely can't stay below the limit if we've found beyond the limit in accounts
+        if (limit && count == *limit)
             break;
 
         Field* fields = result->Fetch();
         uint32 acc_id = fields[0].GetUInt32();
         std::string acc_name = fields[1].GetCppString();
 
-        ///- Get the characters for account id
-        QueryResult *chars = CharacterDatabase.PQuery("SELECT guid, name, race, class, level FROM characters WHERE account = %u", acc_id);
-        if (chars)
-        {
-            if (chars->GetRowCount())
-            {
-                AccountTypes security = sAccountMgr.GetSecurity(acc_id);
-                if (GetAccessLevel() < security || (GetAccessLevel() < SEC_ADMINISTRATOR && security > SEC_PLAYER))
-                    continue;
+        holder->SetPQuery(count, "SELECT guid, name, race, class, level FROM characters WHERE account = %u", acc_id);
+        holder->AddAccountInfo(count, acc_id, acc_name);
 
-                bool banned = sAccountMgr.IsAccountBanned(acc_id);
-                if (banned)
-                    acc_name = acc_name + " [BANNED]";
-                PSendSysMessage(LANG_LOOKUP_PLAYER_ACCOUNT, acc_name.c_str(), acc_id);
-                ShowPlayerListHelper(chars, limit, true, false);
-            }
-            else
-                delete chars;
-        }
+        ++count;
     }
     while (result->NextRow());
-
     delete result;
 
-    if (*limit == limit_original)                           // empty accounts only
-    {
-        PSendSysMessage(LANG_NO_PLAYERS_FOUND);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
+    CharacterDatabase.DelayQueryHolder(&PlayerSearchHandler::HandlePlayerAccountSearchResult, holder, 0);
     return true;
 }
 
