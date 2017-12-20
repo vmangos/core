@@ -1471,6 +1471,9 @@ void World::SetInitialWorldSettings()
         sLog.outString("Loading Guilds...");
         sGuildMgr.LoadGuilds();
 
+        sLog.outString("Loading Petitions...");
+        sGuildMgr.LoadPetitions();
+
         sLog.outString("Loading Groups...");
         sObjectMgr.LoadGroups();
 

@@ -28,6 +28,7 @@
 #include "SharedDefines.h"
 
 class Item;
+class Petition;
 
 #define GUILD_RANKS_MIN_COUNT   5
 #define GUILD_RANKS_MAX_COUNT   10
@@ -213,6 +214,7 @@ class Guild
         ~Guild();
 
         bool Create(Player* leader, std::string gname);
+        bool Create(Petition* petition, Player* leader);
         void CreateDefaultGuildRanks(int locale_idx);
         void Disband();
 

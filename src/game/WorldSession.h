@@ -420,7 +420,7 @@ class MANGOS_DLL_SPEC WorldSession
 
         // Guild Team
         void SendGuildCommandResult(uint32 typecmd, const std::string& str, uint32 cmdresult);
-        void SendPetitionShowList(ObjectGuid guid);
+        void SendPetitionShowList(ObjectGuid& guid);
         void SendSaveGuildEmblem( uint32 msg );
         void SendBattleGroundJoinError(uint8 err);
 
