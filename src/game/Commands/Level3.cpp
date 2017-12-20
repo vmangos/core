@@ -5355,9 +5355,11 @@ bool ChatHandler::HandleBanHelper(BanMode mode, char* args)
 
     uint32 duration_secs = TimeStringToSecs(duration);
 
-    char* reason = ExtractArg(&args);
-    if (!reason)
+    char* cReason = ExtractArg(&args);
+    if (!cReason)
         return false;
+
+    std::string reason(cReason);
 
     switch (mode)
     {
@@ -5394,9 +5396,9 @@ void ChatHandler::SendBanResult(BanMode mode, BanReturn result, std::string& ban
     {
         case BAN_SUCCESS:
             if (duration_secs > 0)
-                PSendSysMessage(LANG_BAN_YOUBANNED, banTarget.c_str(), secsToTimeString(duration_secs, true).c_str(), reason);
+                PSendSysMessage(LANG_BAN_YOUBANNED, banTarget.c_str(), secsToTimeString(duration_secs, true).c_str(), reason.c_str());
             else
-                PSendSysMessage(LANG_BAN_YOUPERMBANNED, banTarget.c_str(), reason);
+                PSendSysMessage(LANG_BAN_YOUPERMBANNED, banTarget.c_str(), reason.c_str());
             break;
         case BAN_SYNTAX_ERROR:
             return;
