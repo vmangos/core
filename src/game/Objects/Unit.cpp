@@ -8604,6 +8604,11 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
         case UNIT_MOD_DAMAGE_RANGED:
             UpdateDamagePhysical(RANGED_ATTACK);
             break;
+        case UNIT_MOD_DAMAGE_PHYSICAL:
+            UpdateDamagePhysical(BASE_ATTACK);
+            UpdateDamagePhysical(OFF_ATTACK);
+            UpdateDamagePhysical(RANGED_ATTACK);
+            break;
 
         default:
             break;
