@@ -36,6 +36,7 @@
 #include "MapManager.h"
 #include "Player.h"
 #include "Chat.h"
+#include "Chat/AsyncCommandHandlers.h"
 
 #include <iterator>
 
@@ -126,7 +127,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
                 if (!normalizePlayerName(searchString))
                     return false;
 
-                resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Name " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'") " LIMIT 0,50", searchString.c_str());
+                resultChar = CharacterDatabase.PQuery("SELECT guid, deleteInfos_Name, deleteInfos_Account, deleteDate FROM characters WHERE deleteDate IS NOT NULL AND deleteInfos_Name " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT 0,50", searchString.c_str());
             }
         }
         else
@@ -141,7 +142,7 @@ bool ChatHandler::GetDeletedCharacterInfoList(DeletedInfoList& foundList, bool u
                     return false;
 
                 LoginDatabase.escape_string(searchString);
-                QueryResult* result = LoginDatabase.PQuery("SELECT id FROM account WHERE username " _LIKE_ " " _CONCAT3_("'%%'", "'%s'", "'%%'"), searchString.c_str());
+                QueryResult* result = LoginDatabase.PQuery("SELECT id FROM account WHERE username " _LIKE_ " " _CONCAT2_("'%s'", "'%%'"), searchString.c_str());
                 std::list<uint32> list = {};
                 do
                 {
@@ -509,9 +510,15 @@ bool ChatHandler::HandleAccountOnlineListCommand(char* args)
 
     ///- Get the list of accounts ID logged to the realm
     //                                                 0   1         2        3        4
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u", realmID);
+    QueryResult *result = LoginDatabase.PQuery("SELECT id, username, last_ip, gmlevel, expansion FROM account WHERE current_realm = %u LIMIT %u", realmID, limit);
 
-    return ShowAccountListHelper(result,&limit);
+    uint32 count = 0;
+    AccountSearchHandler::ShowAccountListHelper(result, *this, count, limit, true);
+
+    if (result)
+        delete result;
+
+    return true;
 }
 
 /// Create an account

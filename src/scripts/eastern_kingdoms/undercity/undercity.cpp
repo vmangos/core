@@ -236,84 +236,6 @@ CreatureAI* GetAI_boss_sylvanas(Creature* pCreature)
     return new boss_sylvanasAI(pCreature);
 }
 
-bool GossipHello_npc_estelle_gendry(Player* pPlayer, Creature* pCreature)
-{
-    if ((pPlayer->GetQuestStatus(1999) == QUEST_STATUS_INCOMPLETE))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                 "I need the tools Mennet Carkad told me about.",
-                                 GOSSIP_SENDER_MAIN,
-                                 GOSSIP_ACTION_INFO_DEF + 10);
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature),
-                                  pCreature->GetObjectGuid());
-    }
-    return true;
-}
-
-bool GossipSelect_npc_estelle_gendry(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction >= GOSSIP_ACTION_INFO_DEF + 10)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (!pPlayer->HasItemCount(5060, 1, true))
-        {
-            uint32 noSpaceForCount = 0;
-            ItemPosCountVec dest;
-            uint8 msg = pPlayer->CanStoreNewItem(NULL_BAG, NULL_SLOT,
-                                                 dest, 5060, 1, &noSpaceForCount);
-
-            if (msg == EQUIP_ERR_OK)
-            {
-                Item* pItem = pPlayer->StoreNewItem(dest, 5060,
-                                                    true, Item::GenerateItemRandomPropertyId(5060));
-                pPlayer->SendNewItem(pItem, 1, true, false);
-            }
-        }
-    }
-    return true;
-}
-
-
-
-/*######
-## npc_parqual_fintallas
-######*/
-
-#define SPELL_MARK_OF_SHAME 6767
-
-bool GossipHello_npc_parqual_fintallas(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(6628) == QUEST_STATUS_INCOMPLETE && !pPlayer->HasAura(SPELL_MARK_OF_SHAME, EFFECT_INDEX_0))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Gul'dan", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Kel'Thuzad", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ner'zhul", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-        pPlayer->SEND_GOSSIP_MENU(5822, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(5821, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_parqual_fintallas(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, SPELL_MARK_OF_SHAME, false);
-    }
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pPlayer->AreaExploredOrEventHappens(6628);
-    }
-    return true;
-}
-
 /*######
 ## AddSC
 ######*/
@@ -325,18 +247,6 @@ void AddSC_undercity()
     newscript = new Script;
     newscript->Name = "npc_lady_sylvanas_windrunner";
     newscript->GetAI = &GetAI_boss_sylvanas;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_parqual_fintallas";
-    newscript->pGossipHello = &GossipHello_npc_parqual_fintallas;
-    newscript->pGossipSelect = &GossipSelect_npc_parqual_fintallas;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_estelle_gendry";
-    newscript->pGossipHello = &GossipHello_npc_estelle_gendry;
-    newscript->pGossipSelect = &GossipSelect_npc_estelle_gendry;
     newscript->RegisterSelf();
 
     newscript = new Script;

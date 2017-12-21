@@ -7919,8 +7919,9 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
 
     if (GetTypeId() == TYPEID_UNIT)
     {
+        // Before patch 1.9 pets should retain their wild speed, after that they are normalised
         Creature* pCreature = (Creature*)this;
-        if (!(pCreature->IsPet() && pCreature->GetOwnerGuid().IsPlayer()))      // don't use DB values for player controlled pets
+        if (!(pCreature->IsPet() && pCreature->GetOwnerGuid().IsPlayer()) || (sWorld.GetWowPatch() < WOW_PATCH_109))
         {
             switch (mtype)
             {
@@ -8601,6 +8602,11 @@ bool Unit::HandleStatModifier(UnitMods unitMod, UnitModifierType modifierType, f
             UpdateDamagePhysical(OFF_ATTACK);
             break;
         case UNIT_MOD_DAMAGE_RANGED:
+            UpdateDamagePhysical(RANGED_ATTACK);
+            break;
+        case UNIT_MOD_DAMAGE_PHYSICAL:
+            UpdateDamagePhysical(BASE_ATTACK);
+            UpdateDamagePhysical(OFF_ATTACK);
             UpdateDamagePhysical(RANGED_ATTACK);
             break;
 

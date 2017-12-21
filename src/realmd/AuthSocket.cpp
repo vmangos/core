@@ -1440,7 +1440,7 @@ bool AuthSocket::GeographicalLockCheck()
     }
 
     // If only one of the queries returns a result, assume location has changed
-    if ((result && !result) || (!result && result))
+    if ((result && !result_prev) || (!result && result_prev))
     {
         return true;
     }

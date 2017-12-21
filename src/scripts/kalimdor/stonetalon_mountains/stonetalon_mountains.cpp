@@ -17,52 +17,11 @@
 /* ScriptData
 SDName: Stonetalon_Mountains
 SD%Complete: 95
-SDComment: Quest support: 6627 (Braug Dimspirits questions/'answers' might have more to it, need more info), 6523, 1090
+SDComment: Quest support: 6523, 1090
 SDCategory: Stonetalon Mountains
 EndScriptData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_braug_dimspirit
-######*/
-
-bool GossipHello_npc_braug_dimspirit(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pPlayer->GetQuestStatus(6627) == QUEST_STATUS_INCOMPLETE)
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Ysera", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Neltharion", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Nozdormu", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Alexstrasza", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Malygos", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-
-        pPlayer->SEND_GOSSIP_MENU(5820, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(5819, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_braug_dimspirit(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, 6766, false);
-
-    }
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pPlayer->AreaExploredOrEventHappens(6627);
-    }
-    return true;
-}
 
 /*######
 ## npc_kaya
@@ -265,12 +224,6 @@ bool QuestAccept_npc_piznik(Player *pPlayer, Creature *pCreature, const Quest *p
 void AddSC_stonetalon_mountains()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_braug_dimspirit";
-    newscript->pGossipHello = &GossipHello_npc_braug_dimspirit;
-    newscript->pGossipSelect = &GossipSelect_npc_braug_dimspirit;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_kaya";

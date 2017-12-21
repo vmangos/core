@@ -10484,6 +10484,14 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
         pItem->SetSlot(NULL_SLOT);
         pItem->SetState(ITEM_REMOVED, this);
+
+        // If destroying a charter, destroy the petition too
+        if (pItem->IsCharter())
+        {
+            uint32 petitionId = pItem->GetEnchantmentId(EnchantmentSlot(0));
+            if (Petition* petition = sGuildMgr.GetPetitionById(petitionId))
+                sGuildMgr.DeletePetition(petition);
+        }
     }
 }
 
@@ -11851,23 +11859,32 @@ void Player::PrepareGossipMenu(WorldObject *pSource, uint32 menuId)
 
         if (hasMenuItem)
         {
-            std::string strOptionText = itr->second.option_text;
-            std::string strBoxText = itr->second.box_text;
-
+            std::string strOptionText, strBoxText;
             int loc_idx = GetSession()->GetSessionDbLocaleIndex();
+
+            if (itr->second.OptionBroadcastTextID)
+                strOptionText = sObjectMgr.GetBroadcastTextLocale(itr->second.OptionBroadcastTextID)->GetText(loc_idx, getGender(), false);
+            else
+                strOptionText = itr->second.option_text;
+
+            if (itr->second.BoxBroadcastTextID)
+                strBoxText = sObjectMgr.GetBroadcastTextLocale(itr->second.BoxBroadcastTextID)->GetText(loc_idx, getGender(), false);
+            else
+                strBoxText = itr->second.box_text;
 
             if (loc_idx >= 0)
             {
                 uint32 idxEntry = MAKE_PAIR32(menuId, itr->second.id);
 
-                if (GossipMenuItemsLocale const *no = sObjectMgr.GetGossipMenuItemsLocale(idxEntry))
-                {
-                    if (no->OptionText.size() > (size_t)loc_idx && !no->OptionText[loc_idx].empty())
-                        strOptionText = no->OptionText[loc_idx];
+                if (!itr->second.OptionBroadcastTextID)
+                    if (GossipMenuItemsLocale const *no = sObjectMgr.GetGossipMenuItemsLocale(idxEntry))
+                        if (no->OptionText.size() > (size_t)loc_idx && !no->OptionText[loc_idx].empty())
+                            strOptionText = no->OptionText[loc_idx];
 
-                    if (no->BoxText.size() > (size_t)loc_idx && !no->BoxText[loc_idx].empty())
-                        strBoxText = no->BoxText[loc_idx];
-                }
+                if (!itr->second.BoxBroadcastTextID)
+                    if (GossipMenuItemsLocale const *no = sObjectMgr.GetGossipMenuItemsLocale(idxEntry))
+                        if (no->BoxText.size() > (size_t)loc_idx && !no->BoxText[loc_idx].empty())
+                            strBoxText = no->BoxText[loc_idx];
             }
 
             if (isGMSkipConditionCheck)
@@ -12500,7 +12517,12 @@ bool Player::CanRewardQuest(Quest const *pQuest, uint32 reward, bool msg) const
             InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pQuest->RewChoiceItemId[reward], pQuest->RewChoiceItemCount[reward]);
             if (res != EQUIP_ERR_OK)
             {
-                SendEquipError(res, NULL, NULL, pQuest->RewChoiceItemId[reward]);
+                if (res == EQUIP_ERR_INVENTORY_FULL)
+                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+                else if (res == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
+                else
+                    SendEquipError(res, NULL, NULL, pQuest->RewChoiceItemId[reward]);
                 return false;
             }
         }
@@ -12516,7 +12538,12 @@ bool Player::CanRewardQuest(Quest const *pQuest, uint32 reward, bool msg) const
                 InventoryResult res = CanStoreNewItem(NULL_BAG, NULL_SLOT, dest, pQuest->RewItemId[i], pQuest->RewItemCount[i]);
                 if (res != EQUIP_ERR_OK)
                 {
-                    SendEquipError(res, NULL, NULL);
+                    if (res == EQUIP_ERR_INVENTORY_FULL)
+                        SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+                    else if (res == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
+                        SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
+                    else
+                        SendEquipError(res, NULL, NULL);
                     return false;
                 }
                 numRewardedItems += dest.size();
@@ -13266,41 +13293,34 @@ bool Player::CanGiveQuestSourceItemIfNeed(Quest const *pQuest, ItemPosCountVec* 
 {
     if (uint32 srcitem = pQuest->GetSrcItemId())
     {
-        
-        if (ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(srcitem))
+        uint32 count = pQuest->GetSrcItemCount();
+
+        // player already have max amount required item (including bank), just report success
+        uint32 has_count = GetItemCount(srcitem, true);
+        if (has_count >= count)
+            return true;
+
+        count -= has_count;                                 // real need amount
+
+        InventoryResult msg;
+        if (!dest)
         {
-            uint32 count = pQuest->GetSrcItemCount();
-            uint32 has_count = GetItemCount(srcitem, true);
+            ItemPosCountVec destTemp;
+            msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, destTemp, srcitem, count);
+        }
+        else
+            msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, *dest, srcitem, count);
 
-            if (pProto->MaxCount && pProto->StartQuest != pQuest->GetQuestId() && (has_count >= pProto->MaxCount))
-            {
-                // player already have max amount of source item (including bank)
+        if (msg == EQUIP_ERR_OK)
+            return true;
+        else
+        {
+            if (msg == EQUIP_ERR_INVENTORY_FULL)
+                SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
+            else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
                 SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
-                return false;
-            }
-
-            count -= has_count;                                 // real need amount
-
-            InventoryResult msg;
-            if (!dest)
-            {
-                ItemPosCountVec destTemp;
-                msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, destTemp, srcitem, count);
-            }
             else
-                msg = CanStoreNewItem(NULL_BAG, NULL_SLOT, *dest, srcitem, count);
-
-            if (msg == EQUIP_ERR_OK)
-                return true;
-            else
-            {
-                if (msg == EQUIP_ERR_INVENTORY_FULL)
-                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_INVENTORY_FULL);
-                else if (msg == EQUIP_ERR_CANT_CARRY_MORE_OF_THIS)
-                    SendQuestFailedAtTaker(pQuest->GetQuestId(), INVALIDREASON_QUEST_FAILED_DUPLICATE_ITEM);
-                else
-                    SendEquipError(msg, NULL, NULL, srcitem);
-            }
+                SendEquipError(msg, NULL, NULL, srcitem);
         }
 
         return false;
@@ -13784,7 +13804,8 @@ void Player::TalkedToCreature(uint32 entry, ObjectGuid guid)
 
         if (q_status.m_status == QUEST_STATUS_INCOMPLETE)
         {
-            if (qInfo->HasSpecialFlag(QuestSpecialFlags(QUEST_SPECIAL_FLAG_KILL_OR_CAST | QUEST_SPECIAL_FLAG_SPEAKTO)))
+            if (qInfo->HasSpecialFlag(QuestSpecialFlags(QUEST_SPECIAL_FLAG_KILL_OR_CAST | QUEST_SPECIAL_FLAG_SPEAKTO)) 
+                && !qInfo->HasSpecialFlag(QuestSpecialFlags(QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT)))
             {
                 for (int j = 0; j < QUEST_OBJECTIVES_COUNT; ++j)
                 {
@@ -17138,6 +17159,9 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
         return false;
     }
 
+    // Remove pvp flag when starting a flight
+    UpdatePvP(false);
+
     //Checks and preparations done, DO FLIGHT
     ModifyMoney(-(int32)totalcost);
 
@@ -20465,6 +20489,10 @@ void Player::LootMoney(int32 money, Loot* loot)
 
 void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
 {
+    // Honor System was added in 1.4.
+    if (sWorld.GetWowPatch() < WOW_PATCH_104)
+        return;
+
     if (!uVictim)
         return;
 
@@ -20478,6 +20506,10 @@ void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
         if (cVictim->IsCivilian() && !isHonorOrXPTarget(cVictim))
         {
             if (!sWorld.getConfig(CONFIG_BOOL_ENABLE_VD))
+                return;
+
+            // Dishonorable kills were added in 1.5.
+            if (sWorld.GetWowPatch() < WOW_PATCH_105)
                 return;
 
             m_honorMgr.Add(HonorMgr::DishonorableKillPoints(getLevel()), DISHONORABLE, cVictim);
@@ -20497,6 +20529,10 @@ void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
 
 void Player::RewardHonorOnDeath()
 {
+    // Honor System was added in 1.4.
+    if (sWorld.GetWowPatch() < WOW_PATCH_104)
+        return;
+
     if (GetAura(2479, EFFECT_INDEX_0))             // Honorless Target
         return;
 

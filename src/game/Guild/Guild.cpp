@@ -101,6 +101,25 @@ Guild::~Guild()
 {
 }
 
+bool Guild::Create(Petition* petition, Player* leader)
+{
+    if (!Create(leader, petition->GetName()))
+        return false;
+
+    PetitionSignatureList signatures = petition->GetSignatureList();
+    for (auto iter = signatures.cbegin(); iter != signatures.cend(); ++iter)
+    {
+        PetitionSignature* signature = *iter;
+
+        if (signature->GetSignatureGuid().IsEmpty())
+            continue;
+
+        AddMember(signature->GetSignatureGuid(), GetLowestRank());
+    }
+
+    return true;
+}
+
 bool Guild::Create(Player* leader, std::string gname)
 {
     if (sGuildMgr.GetGuildByName(gname))

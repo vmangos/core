@@ -328,8 +328,19 @@ float CalculateCustomCoefficient(SpellEntry const *spellProto, Unit const* caste
                 // Chain Lightning / Chain Heal / Healing Wave (T1 8/8 bonus)
                 if (spellProto->IsFitToFamilyMask(UI64LIT(0x00000000142)))
                 {
+                    float multiplier = spellProto->DmgMultiplier[0];
+
+                    if (spell->GetTargetNum() > 1)
+                    {
+                        if (Player* modOwner = caster->GetSpellModOwner())
+                        {
+                            // Improved Chain Heal (T2 3/8 bonus) / Gift of the Gathering Storm Chain Lightning Bonus
+                            modOwner->ApplySpellMod(spell->m_spellInfo->Id, SPELLMOD_EFFECT_PAST_FIRST, multiplier, spell);
+                        }
+                    }
+
                     for (uint8 i = 1; i < spell->GetTargetNum(); ++i)
-                        coeff *= spellProto->DmgMultiplier[0];
+                        coeff *= multiplier;
                     return coeff;
                 }
             }

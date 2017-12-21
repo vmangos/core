@@ -390,6 +390,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     float base_pct    = GetModifierValue(unitMod, BASE_PCT);
     float total_value = GetModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetModifierValue(unitMod, TOTAL_PCT);
+    float total_phys  = GetTotalAuraModValue(UNIT_MOD_DAMAGE_PHYSICAL);
 
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE, index);
     float weapon_maxdamage = GetWeaponDamageRange(attType, MAXDAMAGE, index);
@@ -414,14 +415,16 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
 
             weapon_mindamage = lvl * 0.85f * att_speed;
             weapon_maxdamage = lvl * 1.25f * att_speed;
+            total_value = 0.0f;                             // remove benefit from weapon enchants
         }
     }
     else if (!CanUseEquippedWeapon(attType))                // check if player not in form but still can't use weapon (broken/etc)
     {
         weapon_mindamage = BASE_MINDAMAGE;
         weapon_maxdamage = BASE_MAXDAMAGE;
+        total_value = 0.0f;
     }
-    else if (attType == RANGED_ATTACK)                      // add ammo DPS to ranged damage
+    else if (attType == RANGED_ATTACK && index == 0)        // add ammo DPS to ranged damage
     {
         weapon_mindamage += GetAmmoDPS() * att_speed;
         weapon_maxdamage += GetAmmoDPS() * att_speed;
@@ -433,8 +436,8 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
         total_value = 0.0f;
     }
 
-    min_damage = ((base_value + weapon_mindamage) * base_pct + total_value) * total_pct;
-    max_damage = ((base_value + weapon_maxdamage) * base_pct + total_value) * total_pct;
+    min_damage = ((base_value + weapon_mindamage) * base_pct + total_value + total_phys) * total_pct;
+    max_damage = ((base_value + weapon_maxdamage) * base_pct + total_value + total_phys) * total_pct;
 }
 
 void Player::UpdateDamagePhysical(WeaponAttackType attType)
@@ -783,6 +786,7 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
     float base_pct    = GetModifierValue(unitMod, BASE_PCT);
     float total_value = GetModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetModifierValue(unitMod, TOTAL_PCT);
+    float total_phys  = GetTotalAuraModValue(UNIT_MOD_DAMAGE_PHYSICAL);
     float dmg_multiplier = GetCreatureInfo()->dmg_multiplier;
 
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE);
@@ -807,8 +811,8 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
         weapon_maxdamage = weapon_maxdamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
     }
 
-    float mindamage = ((base_value + weapon_mindamage) * dmg_multiplier * base_pct + total_value) * total_pct;
-    float maxdamage = ((base_value + weapon_maxdamage) * dmg_multiplier * base_pct + total_value) * total_pct;
+    float mindamage = ((base_value + weapon_mindamage) * dmg_multiplier * base_pct + total_value + total_phys) * total_pct;
+    float maxdamage = ((base_value + weapon_maxdamage) * dmg_multiplier * base_pct + total_value + total_phys) * total_pct;
 
     SetStatFloatValue(attType == BASE_ATTACK ? UNIT_FIELD_MINDAMAGE : UNIT_FIELD_MINOFFHANDDAMAGE, mindamage);
     SetStatFloatValue(attType == BASE_ATTACK ? UNIT_FIELD_MAXDAMAGE : UNIT_FIELD_MAXOFFHANDDAMAGE, maxdamage);
@@ -967,6 +971,7 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
     float base_pct    = GetModifierValue(unitMod, BASE_PCT);
     float total_value = GetModifierValue(unitMod, TOTAL_VALUE);
     float total_pct   = GetModifierValue(unitMod, TOTAL_PCT);
+    float total_phys  = GetTotalAuraModValue(UNIT_MOD_DAMAGE_PHYSICAL);
     float dmg_multiplier = getPetType() == HUNTER_PET ? 1.0f : GetCreatureInfo()->dmg_multiplier;
 
     float weapon_mindamage = GetWeaponDamageRange(attType, MINDAMAGE);
@@ -987,8 +992,8 @@ void Pet::UpdateDamagePhysical(WeaponAttackType attType)
         weapon_maxdamage = weapon_maxdamage * (0.7f + 0.3f * attackPowerNow / createAttackPower);
     }
 
-    float mindamage = ((base_value + weapon_mindamage) * dmg_multiplier * base_pct + total_value) * total_pct;
-    float maxdamage = ((base_value + weapon_maxdamage) * dmg_multiplier * base_pct + total_value) * total_pct;
+    float mindamage = ((base_value + weapon_mindamage) * dmg_multiplier * base_pct + total_value + total_phys) * total_pct;
+    float maxdamage = ((base_value + weapon_maxdamage) * dmg_multiplier * base_pct + total_value + total_phys) * total_pct;
 
     //  Pet's base damage changes depending on happiness
     if (getPetType() == HUNTER_PET)

@@ -34,6 +34,7 @@
 #include "CharacterDatabaseCache.h"
 #include "LootMgr.h"
 #include "AuraRemovalMgr.h"
+#include "GuildMgr.h"
 
 #include "Formulas.h"
 #include "Nostalrius.h"
@@ -3308,6 +3309,13 @@ bool ChatHandler::HandleReloadAccountBanList(char*)
 bool ChatHandler::HandleReloadInstanceBuffRemoval(char*)
 {
     sAuraRemovalMgr.LoadFromDB();
-    SendSysMessage(">> Table `account_banned` reloaded.");
+    SendSysMessage(">> Table `instance_buff_removal` reloaded.");
+    return true;
+}
+
+bool ChatHandler::HandleReloadPetitions(char*)
+{
+    sGuildMgr.LoadPetitions();
+    SendSysMessage(">> Table `petition` reloaded.");
     return true;
 }

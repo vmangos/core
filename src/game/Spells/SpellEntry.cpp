@@ -254,10 +254,21 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
                 return DIMINISHING_CONTROL_ROOT;
             break;
         }
+        case SPELLFAMILY_MAGE:
+        {
+            // Ice Block
+            if (SpellVisual == 4325)
+                return DIMINISHING_NONE;
+            break;
+        }
         case SPELLFAMILY_GENERIC:
         {
-            if (Id == 12355) // Impact
+            // Impact
+            if (Id == 12355)
                 return DIMINISHING_TRIGGER_STUN; // avant 'DIMINISHING_NONE' (MaNGOSZero)
+            // Pyroclasm
+            if (Id == 18093)
+                return DIMINISHING_NONE; // No diminishing returns (Patch 1.9)
             break;
         }
         default:

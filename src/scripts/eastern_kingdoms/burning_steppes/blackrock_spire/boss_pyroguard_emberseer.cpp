@@ -405,7 +405,7 @@ struct npc_geolier_main_noireAI : public ScriptedAI
             Frappe_Timer -= uiDiff;
         if (!fled && m_creature->GetHealthPercent() < 15.0f)
         {
-            m_creature->DoFleeToGetAssistance();
+            m_creature->DoFlee();
             fled = true;
         }
 

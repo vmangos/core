@@ -665,8 +665,8 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
         case ACTION_T_EVADE:
             EnterEvadeMode();
             break;
-        case ACTION_T_FLEE_FOR_ASSIST:
-            m_creature->DoFleeToGetAssistance();
+        case ACTION_T_FLEE:
+            m_creature->DoFlee();
             break;
         case ACTION_T_QUEST_EVENT_ALL:
             if (pActionInvoker && pActionInvoker->GetTypeId() == TYPEID_PLAYER)

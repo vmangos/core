@@ -146,9 +146,9 @@ private:
 enum DarkmoonState
 {
     DARKMOON_NONE = 0,
-    DARKMOON_A2_INSTALLATION = 100, // TODO (spawns, game_event)
+    DARKMOON_A2_INSTALLATION = 23, // TODO (spawns, game_event)
     DARKMOON_A2 = 4,
-    DARKMOON_H2_INSTALLATION = 101, // TODO (spawns, game_event)
+    DARKMOON_H2_INSTALLATION = 24, // TODO (spawns, game_event)
     DARKMOON_H2 = 5,
 };
 
@@ -336,7 +336,6 @@ enum WarEffortEnums
     WAR_EFFORT_GONG_DURATION                = 10 * HOUR,    // gong lasts 10 hours after the first dong
     WAR_EFFORT_CH_ATTACK_TIME               = 4 * HOUR,     // 4h after gong bang, CH gets attacked
     WAR_EFFORT_FINAL_BATTLE_TIME            = 4 * HOUR,     // 4h after CH attack, final battle begins
-    WAR_EFFORT_AUTOCOMPLETE_PERIOD          = 1 * DAY,      // How often progress is auto completed for the war effort collection
     WAR_EFFORT_TEXT_CRYSTALS                = -1000008,     // Crystals emerge from the ground...
     WAR_EFFORT_TEXT_BATTLE_OVER             = -1780312,     // The Might of Kalimdor is victorious...
     WAR_EFFORT_ASHI_REWARD                  = 0x01,

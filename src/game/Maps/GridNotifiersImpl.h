@@ -144,11 +144,6 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (target->GetTypeId()==TYPEID_UNIT && ((Creature*)target)->IsInEvadeMode())
         return;
 
-    // Must check LoS with the target to prevent casting through objects by targeting
-    // the floor
-    if (!i_dynobject.IsWithinLOSInMap(target))
-        return;
-
     //Check player targets and remove if in GM mode or GM invisibility (for not self casting case)
     if (target->GetTypeId() == TYPEID_PLAYER && target != i_check && (((Player*)target)->isGameMaster() || ((Player*)target)->GetVisibility() == VISIBILITY_OFF))
         return;
@@ -156,6 +151,11 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     if (!i_positive && !i_check->IsValidAttackTarget(target))
         return;
     if (i_positive && !i_check->IsFriendlyTo(target))
+        return;
+
+    // Must check LoS with the target to prevent casting through objects by targeting
+    // the floor. Let creatures cheat
+    if (i_dynobject.GetCasterGuid().IsPlayer() && !i_dynobject.IsWithinLOSInMap(target))
         return;
 
     if (!i_dynobject.NeedsRefresh(target))

@@ -33,6 +33,7 @@
 #include "Nostalrius.h"
 #include "ObjectGuid.h"
 #include "MapNodes/AbstractPlayer.h"
+#include "WorldPacket.h"
 
 #include <map>
 #include <set>
@@ -43,7 +44,6 @@
 #include <thread>
 
 class Object;
-class WorldPacket;
 class WorldSession;
 class Player;
 class Weather;
@@ -263,6 +263,7 @@ enum eConfigUInt32Values
     CONFIG_UINT32_RESPEC_MAX_MULTIPLIER,
     CONFIG_UINT32_BATTLEGROUND_GROUP_LIMIT,
     CONFIG_UINT32_CREATURE_SUMMON_LIMIT,
+    CONFIG_UINT32_WAR_EFFORT_AUTOCOMPLETE_PERIOD,
     CONFIG_UINT32_VALUE_COUNT
 };
 
@@ -522,11 +523,15 @@ enum RealmZone
     REALM_ZONE_CN9           = 29                           // basic-Latin at create, any at login
 };
 
-class AsyncTask
+class SessionPacketSendTask
 {
+    SessionPacketSendTask(const SessionPacketSendTask&) = delete;
 public:
-    virtual ~AsyncTask() {}
-    virtual void run() = 0;
+    SessionPacketSendTask(uint32 accountId, WorldPacket& data) : m_accountId(accountId), m_data(data) {}
+    void operator ()();
+private:
+    uint32 m_accountId;
+    WorldPacket m_data;
 };
 
 struct TransactionPart
@@ -759,11 +764,14 @@ class World
         uint32 GetAnticrashRearmTimer() const { return m_anticrashRearmTimer; }
 
         /**
-         * These async tasks should be added from THREADUNSAFE opcode handlers (since AddAsyncTask is *not* threadsafe)
+         * Async tasks, allow safe access to sessions (but not players themselves)
          * The tasks will be executed *while* maps are updated. So don't touch the mobs, pets, etc ...
+         * includes reading, unless the read itself is serialized
          */
-        void AddAsyncTask(AsyncTask* task);
-        void HandleAsyncTasks(int currThreadIdx, int threadsCount);
+        void AddAsyncTask(std::function<void ()> task);
+        std::mutex m_asyncTaskQueueMutex;
+        std::vector<std::function<void()>> _asyncTasks;
+        std::vector<std::function<void()>> _asyncTasksBusy;
         /**
          * Database logs system
          */

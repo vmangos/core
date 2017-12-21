@@ -271,14 +271,12 @@ struct boss_viscidusAI : public ScriptedAI
         if (pDealer->IsCreature() && ((Creature*)pDealer)->GetEntry() == NPC_VISCIDUS)
             return;
 
-        const uint32 uiViscidusHealth = m_creature->GetHealth();
-
         // Prevent Viscidus dying to the damage taken. We cannot modify the damage to be less,
         // because it eventually hits 0. At which point any damage dealt will be considered
         // 'absorbed' and have no effect. i.e. won't be able to shatter or freeze the
         // boss once he hits 1 hp.
-        if (damage >= uiViscidusHealth)
-            m_creature->SetHealth(damage + 1);
+        if (m_creature->GetHealthPercent() < 1.0f)
+            m_creature->SetHealthPercent(1.0f);
     }
 
     void JustSummoned(Creature* pSummoned)

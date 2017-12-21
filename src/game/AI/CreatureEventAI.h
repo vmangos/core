@@ -97,7 +97,7 @@ enum EventAI_ActionType
     ACTION_T_SET_PHASE                  = 22,               // Phase
     ACTION_T_INC_PHASE                  = 23,               // Value (may be negative to decrement phase, should not be 0)
     ACTION_T_EVADE                      = 24,               // No Params
-    ACTION_T_FLEE_FOR_ASSIST            = 25,               // No Params
+    ACTION_T_FLEE                       = 25,               // No Params
     ACTION_T_QUEST_EVENT_ALL            = 26,               // QuestID
     ACTION_T_CAST_EVENT_ALL             = 27,               // CreatureId, SpellId
     ACTION_T_REMOVEAURASFROMSPELL       = 28,               // Target, Spellid

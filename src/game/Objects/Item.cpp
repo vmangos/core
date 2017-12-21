@@ -25,6 +25,7 @@
 #include "WorldPacket.h"
 #include "Database/DatabaseEnv.h"
 #include "ItemEnchantmentMgr.h"
+#include "GuildMgr.h"
 
 void AddItemsSetItem(Player* player, Item* item)
 {
@@ -533,8 +534,9 @@ void Item::DeleteAllFromDB(uint32 guidLow)
     CharacterDatabase.PExecute("DELETE FROM auction WHERE itemguid = '%u'", guidLow);
     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid = '%u'", guidLow);
     // Petitions
-    CharacterDatabase.PExecute("DELETE FROM petition WHERE petitionguid = '%u'", guidLow);
-    CharacterDatabase.PExecute("DELETE FROM petition_sign WHERE petitionguid = '%u'", guidLow);
+    if (Petition* petition = sGuildMgr.GetPetitionByCharterGuid(ObjectGuid(guidLow)))
+        sGuildMgr.DeletePetition(petition);
+
     CharacterDatabase.PExecute("DELETE FROM character_gifts WHERE item_guid = '%u'", guidLow);
 }
 

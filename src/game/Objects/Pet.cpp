@@ -1284,6 +1284,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     SetLevel(petlevel);
 
+    // Before 1.9 pets retain their wild damage type
     if (sWorld.GetWowPatch() < WOW_PATCH_109)
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
     else
@@ -1316,7 +1317,8 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     int32 createResistance[MAX_SPELL_SCHOOL] = {0, 0, 0, 0, 0, 0, 0};
 
-    if (getPetType() != HUNTER_PET)
+    // Before 1.9 pets retain their wild resistances
+    if (getPetType() != HUNTER_PET || sWorld.GetWowPatch() < WOW_PATCH_109)
     {
         createResistance[SPELL_SCHOOL_HOLY]   = cinfo->resistance1;
         createResistance[SPELL_SCHOOL_FIRE]   = cinfo->resistance2;

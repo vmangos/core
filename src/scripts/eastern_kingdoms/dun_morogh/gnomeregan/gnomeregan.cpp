@@ -62,7 +62,7 @@ enum
 
     SAY_GRUBBIS_SPAWN           = -1090023,
 
-    GOSSIP_ITEM_START           = -3090000,
+    GOSSIP_ITEM_START           = 4084,
 
     SPELL_EXPLOSION_NORTH       = 12159,
     SPELL_EXPLOSION_SOUTH       = 12158,

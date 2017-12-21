@@ -531,6 +531,13 @@ inline bool IsTargetPowerTypeValid(SpellEntry const *spellInfo, Powers powerType
     return false;
 }
 
+inline bool IsRemovedOnShapeLostSpell(SpellEntry const *spellInfo)
+{
+    return (spellInfo->Stances || spellInfo->Id == 24864) &&
+           !(spellInfo->AttributesEx2 & SPELL_ATTR_EX2_NOT_NEED_SHAPESHIFT) &&
+           !(spellInfo->Attributes & SPELL_ATTR_NOT_SHAPESHIFT);
+}
+
 inline SpellSchoolMask GetSpellSchoolMask(SpellEntry const* spellInfo)
 {
     return GetSchoolMask(spellInfo->School);

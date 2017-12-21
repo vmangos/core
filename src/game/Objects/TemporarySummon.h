@@ -45,7 +45,7 @@ class TemporarySummon : public Creature
         ObjectGuid m_summoner;
         bool m_justDied = false;
         uint32 m_forceTargetUpdateTimer;
-        bool m_unSummoned;
+        bool m_unSummonInformed;
         void InformSummonerOfDespawn();
 };
 #endif

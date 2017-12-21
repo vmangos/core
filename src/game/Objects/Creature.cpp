@@ -56,6 +56,7 @@
 #include "MoveSpline.h"
 #include "Anticheat.h"
 #include "CreatureLinkingMgr.h"
+#include "TemporarySummon.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -426,7 +427,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
      * types and it works (mostly) fine until the different creature entries have different
      * creature_template_aura entries. What we want to do is ensure auras belonging to
      * the previous creature entry are removed and auras belonging to the new creature
-     * entry are applied. This complication is that this function is also called 
+     * entry are applied. This complication is that this function is also called
      * from several other spots, including Creature::Create, which causes a
      * few problems if not handled correctly, for some definition of correct.
      *
@@ -441,15 +442,15 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
         auto prevAddonData = ObjectMgr::GetCreatureTemplateAddon(m_creatureInfo->Entry);
         auto creaAddonData = ObjectMgr::GetCreatureAddon(GetGUIDLow());
 
-        /* 
-         * Auras listed in creature_addon override anything contained in creature_template_addon, 
+        /*
+         * Auras listed in creature_addon override anything contained in creature_template_addon,
          * so we don't want to unload GUID-based auras, even if we're changing the template entry
          */
         if (!creaAddonData && prevAddonData != newAddonData)
         {
             addonReload = true;
 
-            /* 
+            /*
              * Looks like we're changing the creature's entry ID, so remove any auras
              * coming from the creature_template_auras table
              */
@@ -511,7 +512,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
         float(GetCreatureInfo()->resistance5),
         float(GetCreatureInfo()->resistance6)
     };
-    
+
     // set spell school immunity if resistance to that element = -1 in db
     m_spellImmune[IMMUNITY_SCHOOL].clear();
     for (int i = 0; i < 6; ++i)
@@ -599,7 +600,6 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             break;
         case DEAD:
         {
-
             if (m_respawnTime <= time(nullptr) && (!m_isSpawningLinked || GetMap()->GetCreatureLinkingHolder()->CanSpawn(this)))
             {
                 DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Respawning...");
@@ -924,6 +924,19 @@ void Creature::RegenerateHealth()
     ModifyHealth(addvalue);
 }
 
+void Creature::DoFlee()
+{
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+        return;
+
+    SetNoSearchAssistance(true);
+
+    SetFleeing(true, getVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
+    MonsterTextEmote(CREATURE_FLEE_TEXT, getVictim());
+    UpdateSpeed(MOVE_RUN, false);
+    InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
+}
+
 void Creature::DoFleeToGetAssistance()
 {
     if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
@@ -958,7 +971,7 @@ void Creature::DoFleeToGetAssistance()
 float Creature::GetFleeingSpeed() const
 {
     //TODO: There are different speeds for the different mobs, isn't there?
-    return GetSpeed(MOVE_WALK) * 1.7f;
+    return GetSpeed(MOVE_RUN) * 0.6f;
 }
 
 bool Creature::AIM_Initialize()
@@ -1008,14 +1021,14 @@ bool Creature::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo cons
             m_corpseDelay = sWorld.getConfig(CONFIG_UINT32_CORPSE_DECAY_NORMAL);
             break;
     }
-    
+
     // Apply Poison & Disease immunities for Elemental and Mechanical type creatures
     if (GetCreatureInfo()->type == CREATURE_TYPE_ELEMENTAL || (GetCreatureInfo()->type == CREATURE_TYPE_MECHANICAL))
     {
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_DISEASE, true);
         ApplySpellImmune(0, IMMUNITY_DISPEL, DISPEL_POISON, true);
     }
-    
+
     // Add to CreatureLinkingHolder if needed
     if (sCreatureLinkingMgr.GetLinkedTriggerInformation(this))
         cPos.GetMap()->GetCreatureLinkingHolder()->AddSlaveToHolder(this);
@@ -1690,7 +1703,7 @@ void Creature::DeleteFromDB()
 void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
 {
     auto instanceId = sMapMgr.GetContinentInstanceId(data->mapid, data->posX, data->posY);
-    CreatureRespawnDeleteWorker worker(lowguid); 
+    CreatureRespawnDeleteWorker worker(lowguid);
     sMapPersistentStateMgr.DoForAllStatesWithMapId(data->mapid, instanceId, worker);
 
     sObjectMgr.DeleteCreatureData(lowguid);
@@ -1912,12 +1925,12 @@ bool Creature::IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf)
     {
         if (spellInfo->Mechanic && GetCreatureInfo()->MechanicImmuneMask & (1 << (spellInfo->Mechanic - 1)))
             return true;
-        
+
         if (GetCreatureInfo()->SchoolImmuneMask & (1 << spellInfo->School))
             return true;
     }
-        
-    // HACK! Bosses are immune to cast speed debuffs like Curse of Tongues 
+
+    // HACK! Bosses are immune to cast speed debuffs like Curse of Tongues
     if (IsWorldBoss())
     {
         if (IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CASTING_SPEED_NOT_STACK) && !IsPositiveSpell(spellInfo->Id))
@@ -2582,7 +2595,7 @@ void Creature::LogDeath(Unit* pKiller) const
         {
             pUnit = SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER);
             lasthit = false;
-            
+
             if (pUnit)
                 pPlayer = static_cast<Player*>(pUnit);
         }
@@ -2620,7 +2633,7 @@ void Creature::LogDeath(Unit* pKiller) const
     {
         logStmt.addString("Unknown death reason (no argument passed).");
     }
-    
+
     logStmt.Execute();
 }
 
@@ -2744,7 +2757,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
                     }
                 }
             }
-            
+
             return suitableTarget;
         }
         case ATTACKING_TARGET_FARTHEST:
@@ -2768,7 +2781,7 @@ Unit* Creature::SelectAttackingTarget(AttackingTarget target, uint32 position, S
                     }
                 }
             }
-            
+
             return suitableTarget;
         }
     }
@@ -3628,4 +3641,12 @@ bool Creature::HasWeapon() const
         return true;
 
     return false;
+}
+
+void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
+{
+    if (IsTemporarySummon())
+        ((TemporarySummon*)this)->UnSummon(msTimeToDespawn);
+    else
+        ForcedDespawn(msTimeToDespawn);
 }

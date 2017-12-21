@@ -333,6 +333,7 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/src/game/Group
   ${CMAKE_SOURCE_DIR}/src/game/Guild
   ${CMAKE_SOURCE_DIR}/src/game/Handlers
+  ${CMAKE_SOURCE_DIR}/src/game/LFG
   ${CMAKE_SOURCE_DIR}/src/game/Mail
   ${CMAKE_SOURCE_DIR}/src/game/Maps
   ${CMAKE_SOURCE_DIR}/src/game/Maps/Pool

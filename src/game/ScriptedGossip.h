@@ -9,9 +9,9 @@
 #include "GossipDef.h"
 #include "QuestDef.h"
 
-// Cf mangos_string
-#define GOSSIP_TEXT_BROWSE_GOODS    2000
-#define GOSSIP_TEXT_TRAIN           2001
+// broadcast texts
+#define GOSSIP_TEXT_BROWSE_GOODS    3370
+#define GOSSIP_TEXT_TRAIN           3266
 
 enum
 {

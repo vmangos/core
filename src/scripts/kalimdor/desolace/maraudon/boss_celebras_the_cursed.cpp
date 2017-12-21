@@ -22,19 +22,41 @@ SDCategory: Maraudon
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "maraudon.h"
 
 #define SPELL_WRATH                 21807
 #define SPELL_ENTANGLINGROOTS       12747
 #define SPELL_CORRUPT_FORCES        21968
 
-#define GO_CELEBRAS_BLUE_AURA       178964
+enum
+{
+    GO_CREATOR = 178560,
+    GO_CELEBRAS_BLUE_AURA = 178964,
+    GO_TOME = 178965,
+
+    SAY_WP_1 = 8953,
+    SAY_WP_3 = 8954,
+    SAY_WP_5 = 8949,
+    SAY_WP_6 = 8955,
+    SAY_ACCEPT = 8952,
+    SAY_PRE_READ = 8950,
+    SAY_POST_READ = 8948,
+
+    SPELL_CHANNEL = 21916,
+    EMOTE_CHANNEL = 8951,
+
+    QUEST_SCEPTER = 7046
+};
 
 struct celebras_the_cursedAI : public ScriptedAI
 {
     celebras_the_cursedAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
+
+    ScriptedInstance* m_pInstance;
 
     uint32 Wrath_Timer;
     uint32 EntanglingRoots_Timer;
@@ -49,7 +71,8 @@ struct celebras_the_cursedAI : public ScriptedAI
 
     void JustDied(Unit* Killer)
     {
-        m_creature->SummonCreature(13716, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ() + 1, 0, TEMPSUMMON_TIMED_DESPAWN, 600000);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_CELEBRAS, DONE);
     }
 
     void UpdateAI(const uint32 diff)
@@ -100,35 +123,23 @@ struct celebrasSpiritAI : public npc_escortAI
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Event_Timer = 0;
-        Point = 0;
-        underEvent = false;
         SetEscortPaused(true);
-        isFirstWaypoint = false;
-        isWaitingTomeRead = false;
-        isLinked = false;
         auraGUID = 0;
-        isQuestCompleted = false;
         Reset();
     }
 
     ScriptedInstance* m_pInstance;
+    uint8 m_uiPhase;
     uint32 Event_Timer;
-    uint32 Point;
-    uint64 playerGUID;
     uint64 auraGUID;
-    bool underEvent;
-    bool isFirstWaypoint;
-    bool isWaitingTomeRead;
-    bool isLinked;
-    bool isQuestCompleted;
+    bool m_bBookRead;
 
     void Reset()
     {
-    }
-
-    void Aggro(Unit* pWho)
-    {
-        SetEscortPaused(true);
+        m_uiPhase = 0;
+        Event_Timer = 0;
+        auraGUID = 0;
+        m_bBookRead = false;
     }
 
     void WaypointReached(uint32 i)
@@ -136,19 +147,20 @@ struct celebrasSpiritAI : public npc_escortAI
         std::list<GameObject*> scepterList;
         switch (i)
         {
-            case 1:
+            case 0:
                 m_creature->SetOrientation(5.342044f);
-                m_creature->MonsterSay("For so long I have drifted in my cursed from. You have freed me... Your hard work shall be repaid.", 0, 0);
+                m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation());
+                break;
+
+            case 1:
+                DoScriptText(SAY_WP_1, m_creature);
                 SetRun(false);
-                Event_Timer = 8000;
-                SetEscortPaused(true);
-                Point = i;
                 break;
 
             case 3:
-                m_creature->MonsterSay("Please do as I instruct you.", 0, 0);
+                if (Player* pPlayer = GetPlayerForEscort())
+                    DoScriptText(SAY_WP_3, m_creature, pPlayer);
                 Event_Timer = 4000;
-                Point = i;
                 break;
 
             case 4:
@@ -163,139 +175,112 @@ struct celebrasSpiritAI : public npc_escortAI
                     pGo->SetRespawnTime(6*MINUTE);
                     pGo->Refresh();
                 }
-                m_creature->MonsterSay("Shal myrinan ishnu daldorah...", 0, 0);
-                if (GameObject* obj = m_creature->SummonGameObject(178964, 652.463013f, 74.085098f, -85.335297f, 3.054616f, 0, 0, 0, 0, -1, false))
+                DoScriptText(SAY_WP_5, m_creature);
+                if (GameObject* obj = m_creature->SummonGameObject(GO_CELEBRAS_BLUE_AURA, 652.463013f, 74.085098f, -85.335297f, 3.054616f, 0, 0, 0, 0, -1, false))
                     auraGUID = obj->GetGUID();
-                Event_Timer = 4000;
-                SetEscortPaused(true);
-                Point = i;
                 break;
 
             case 6:
-                m_creature->MonsterSay("My scepter will once again become whole!", 0, 0);
+                DoScriptText(SAY_WP_6, m_creature);
 
-                GetGameObjectListWithEntryInGrid(scepterList, m_creature, 178560, 40.0f);
+                GetGameObjectListWithEntryInGrid(scepterList, m_creature, GO_CREATOR, 40.0f);
                 for (std::list<GameObject*>::iterator it = scepterList.begin(); it != scepterList.end(); ++it)
                     (*it)->UseDoorOrButton(0, false);
                 scepterList.clear();
 
-                Point = i;
                 break;
             case 9:
-                SetEscortPaused(true);
                 if (GameObject* pAura = m_creature->GetMap()->GetGameObject(auraGUID))
                     pAura->Delete();
-                Event_Timer = 3000;
-                Point = i;
                 break;
             case 13:
-                SetEscortPaused(true);
+                Stop();
                 Event_Timer = 3000;
-                Point = i;
-                break;
-            default:
                 break;
         }
     }
 
-    void QuestCompleted(Player* pPlayer, Quest const* pQuest)
+    void QuestAccepted(Player* pPlayer, Quest const* pQuest)
     {
-        if (!underEvent)
-        {
-            isQuestCompleted = false;
-            playerGUID = pPlayer->GetGUID();
-            m_creature->MonsterSay("You wish to learn of the stone? Follow me.", 0, 0);
-            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-            Event_Timer = 5000;
-            SetRun();
-            underEvent = true;
-            isFirstWaypoint = true;
-        }
+        Reset();
+        DoScriptText(SAY_ACCEPT, m_creature);
+        Start(true, pPlayer->GetGUID(), pQuest);
+    }
+
+    void JustStartedEscort() override
+    {
+        SetEscortPaused(true);
+        Event_Timer = 5000;
+        m_uiPhase = 1;
     }
 
     void BookRead()
     {
-        SetEscortPaused(false);
+        m_bBookRead = true;
+        if (Event_Timer > 1000)
+            Event_Timer = 1000;
     }
 
     void UpdateEscortAI(const uint32 uiDiff)
     {
-        if (Event_Timer <= uiDiff)
+        if (Event_Timer && !m_creature->getVictim())
         {
-            if (isFirstWaypoint)
+            if (Event_Timer <= uiDiff)
             {
-                Start(true, NULL, NULL, false);
-                isFirstWaypoint = false;
-            }
+                Event_Timer = 0;
 
-            switch (Point)
-            {
-                case 1:
-                    SetEscortPaused(false);
-                    SetRun(false);
-                    break;
-                case 3:
-                    if (!isWaitingTomeRead)
-                    {
-                        m_creature->SetOrientation(3.009412f);
-                        isWaitingTomeRead = true;
-                        m_creature->MonsterSay("Read this tome I have placed before you, and speak the words aloud.", 0, 0);
-                        //CastSpell Renew druid
-                        m_creature->SummonGameObject(178965, 652.175f, 74.069f, -85.334327f, 5.6635f, 0, 0, 0, 0, -1, false);
-                        isLinked = true;
-                        Event_Timer = 4000;
+                switch (m_uiPhase)
+                {
+                    case 1:
+                        SetEscortPaused(false);
+                        break;
+                    case 2:
+                        DoScriptText(SAY_PRE_READ, m_creature);
+                        Event_Timer = 1000;
+                        break;
+                    case 3:
+                        m_creature->SummonGameObject(GO_TOME, 652.175f, 74.069f, -85.334327f, 5.6635f, 0, 0, 0, 0, -1, false);
+                        Event_Timer = 1000;
+                        break;
+                    case 4:
+                        // m_creature->CastSpell(m_creature, SPELL_CHANNEL, true);
+                        DoScriptText(EMOTE_CHANNEL, m_creature, 0, CHAT_TYPE_TEXT_EMOTE);
                         SetEscortPaused(true);
-                        m_creature->SetOrientation(3.009412f);
-                    }
-                    else if (isLinked)
-                    {
-                        m_creature->MonsterSay("Together, the two parts shall become one, one again.", 0, 0);
-                        isLinked = false;
-                    }
-                    break;
-                case 5:
-                    SetEscortPaused(false);
-                    break;
-                case 9:
-                    SetEscortPaused(false);
-                    break;
-                case 13:
-                    if (!isQuestCompleted)
-                    {
-                        isQuestCompleted = true;
-                        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
-
-                        if (Player* player = m_creature->GetMap()->GetPlayer(playerGUID))
+                        Event_Timer = m_bBookRead ? 1000 : 30000;
+                        break;
+                    case 5:
+                        if (!m_bBookRead)
                         {
-                            if (player->GetQuestStatus(7046) == QUEST_STATUS_INCOMPLETE)
-                                player->AreaExploredOrEventHappens(7046);
-
-
-                            if (m_creature->isQuestGiver())
-                            {
-                                player->PrepareQuestMenu(m_creature->GetGUID());
-                                player->SEND_GOSSIP_MENU(player->GetGossipTextId(m_creature), m_creature->GetGUID());
-                            }
+                            // timed out waiting for book to be read
+                            ResetEscort();
+                            return;
                         }
 
-                        Event_Timer = 0;
-                        Point = 0;
-                        underEvent = false;
-                        SetEscortPaused(true);
-                        isFirstWaypoint = false;
-                        isWaitingTomeRead = false;
-                        isLinked = false;
-                        auraGUID = 0;
-                        playerGUID = 0;
-                        Stop();
-                    }
-                    break;
-                default:
-                    break;
+                        DoScriptText(SAY_POST_READ, m_creature);
+                        Event_Timer = 1000;
+                        break;
+                    case 6:
+                        SetEscortPaused(false);
+                        break;
+                    case 7:
+                        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER | UNIT_NPC_FLAG_GOSSIP);
+
+                        if (Player* player = GetPlayerForEscort())
+                        {
+                            if (player->GetQuestStatus(QUEST_SCEPTER) == QUEST_STATUS_INCOMPLETE)
+                            {
+                                player->AreaExploredOrEventHappens(QUEST_SCEPTER);
+                                player->PrepareGossipMenu(m_creature, m_creature->GetCreatureInfo()->GossipMenuId);
+                                player->SendPreparedGossip(m_creature);
+                            }
+                        }
+                        break;
+                }
+                m_uiPhase++;
             }
+            else
+                Event_Timer -= uiDiff;
         }
-        else
-            Event_Timer -= uiDiff;
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -304,27 +289,15 @@ struct celebrasSpiritAI : public npc_escortAI
     }
 };
 
-bool GossipHello_spirit_celebras(Player* pPlayer, Creature* pCreature)
-{
-    ScriptedInstance* m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-    if (pCreature->isQuestGiver())
-    {
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-        pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    }
-    return true;
-}
-
 bool GOHello_go_book_celebras(Player* pPlayer, GameObject* pGo)
 {
-    if (pPlayer->GetQuestStatus(7046) == QUEST_STATUS_INCOMPLETE)
+    if (pPlayer->GetQuestStatus(QUEST_SCEPTER) == QUEST_STATUS_INCOMPLETE)
     {
         pPlayer->Say("Shal myrinan ishnu daldorah...", 0);
         pGo->Delete();
 
         std::list<Creature*> celebrasList;
-        GetCreatureListWithEntryInGrid(celebrasList, pPlayer, 13716, 40.0f);
+        GetCreatureListWithEntryInGrid(celebrasList, pPlayer, NPC_CELEBRAS_REDEEMED, 40.0f);
         for (std::list<Creature*>::iterator it = celebrasList.begin(); it != celebrasList.end(); ++it)
         {
             if (celebrasSpiritAI* pcelebrasSpirit = dynamic_cast<celebrasSpiritAI*>((*it)->AI()))
@@ -337,10 +310,10 @@ bool GOHello_go_book_celebras(Player* pPlayer, GameObject* pGo)
 
 bool QuestAccept_celebras_spirit(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
-    if (pQuest->GetQuestId() != 7046)
+    if (pQuest->GetQuestId() != QUEST_SCEPTER)
         return false;
     if (celebrasSpiritAI* pcelebrasSpirit = dynamic_cast<celebrasSpiritAI*>(pQuestGiver->AI()))
-        pcelebrasSpirit->QuestCompleted(pPlayer, pQuest);
+        pcelebrasSpirit->QuestAccepted(pPlayer, pQuest);
     return true;
 }
 
@@ -361,7 +334,6 @@ void AddSC_boss_celebras_the_cursed()
     newscript = new Script;
     newscript->Name = "celebras_spirit";
     newscript->GetAI = &GetAI_celebras_spirit;
-    newscript->pGossipHello =  &GossipHello_spirit_celebras;
     newscript->pQuestAcceptNPC = &QuestAccept_celebras_spirit;
     newscript->RegisterSelf();
 

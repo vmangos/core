@@ -45,7 +45,7 @@ public:
 
     SendgridMail(std::string api_key, std::string template_name)
         : _api_key(std::move(api_key)), _template_name(std::move(template_name)),
-        _extended_error(0) { }
+        _extended_error(CURLE_OK) { }
 
     void substitution(const std::string& key, const std::string& value);
     void recipient(std::string recipient);

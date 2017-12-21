@@ -210,29 +210,29 @@ enum ScourgeInvasionEngineerAI
 
 enum ScourgeInvasionLang
 {
-    LANG_CULTIST_ENGINEER_OPTION = NOST_TEXT(120), // Use 8 necrotic runes and disrupt his ritual.
-    LANG_GIVE_MAGIC_ITEM_OPTION = NOST_TEXT(121), // Give me one of your magic items.
-    LANG_VICTORIES_COUNT_OPTION = NOST_TEXT(127), // Unused
-    LANG_TANARIS_ATTACKED_OPTION = NOST_TEXT(128), // Unused
-    LANG_AZSHARA_ATTACKED_OPTION = NOST_TEXT(129), // Unused
-    LANG_EP_ATTACKED_OPTION = NOST_TEXT(130), // Unused
-    LANG_WINTERSPRING_ATTACKED_OPTION = NOST_TEXT(131), // Unused
-    LANG_BL_ATTACKED_OPTION = NOST_TEXT(132), // Unused
-    LANG_BS_ATTACKED_OPTION = NOST_TEXT(133), // Unused
-    LANG_NO_ATTACK_OPTION = NOST_TEXT(134), // Unused
+    LANG_CULTIST_ENGINEER_OPTION = 12112, // Use 8 necrotic runes and disrupt his ritual.
+    LANG_GIVE_MAGIC_ITEM_OPTION = 12302, // Give me one of your magic items.
+    //LANG_VICTORIES_COUNT_OPTION = NOST_TEXT(127), // Unused
+    //LANG_TANARIS_ATTACKED_OPTION = NOST_TEXT(128), // Unused
+    //LANG_AZSHARA_ATTACKED_OPTION = NOST_TEXT(129), // Unused
+    //LANG_EP_ATTACKED_OPTION = NOST_TEXT(130), // Unused
+    //LANG_WINTERSPRING_ATTACKED_OPTION = NOST_TEXT(131), // Unused
+    //LANG_BL_ATTACKED_OPTION = NOST_TEXT(132), // Unused
+    //LANG_BS_ATTACKED_OPTION = NOST_TEXT(133), // Unused
+    //LANG_NO_ATTACK_OPTION = NOST_TEXT(134), // Unused
     LANG_SHADOW_OF_DOOM_TEST_0 = 12420, // 12420 - Our dark master has noticed your trifling, and sends me to bring a message... of doom!
     LANG_SHADOW_OF_DOOM_TEST_1 = 12422, // 12422 - Your battle here is but the smallest mote of a world wide invasion, whelp!  It is time you learned of the powers you face!
-    LANG_ARGENT_EMISSARY_OPTION_0 = NOST_TEXT(137), // 12176 - What's happening?
-    LANG_ARGENT_EMISSARY_OPTION_1 = NOST_TEXT(138), // 12207 - What can I do?
-    LANG_ARGENT_EMISSARY_OPTION_2 = NOST_TEXT(139), // 12434 - Where are we battling the Scourge?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0 = NOST_TEXT(140), // 12198 - Is Winterspring currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1 = NOST_TEXT(141), // 12201 - Is Tanaris currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2 = NOST_TEXT(142), // 12203 - Are the Blasted Lands currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3 = NOST_TEXT(143), // 12205 - Are the Burning Steppes currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4 = NOST_TEXT(144), // 12476 - Is Azshara currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5 = NOST_TEXT(145), // 12477 - Are the Eastern Plaguelands currently under attack?
-    LANG_ARGENT_EMISSARY_OPTION_3 = NOST_TEXT(146), // 12398 - How many battles have we won?
-    LANG_ARGENT_EMISSARY_OPTION = NOST_TEXT(147), // 12478 - I have another question.
+    LANG_ARGENT_EMISSARY_OPTION_0 = 12176, // 12176 - What's happening?
+    LANG_ARGENT_EMISSARY_OPTION_1 = 12207, // 12207 - What can I do?
+    LANG_ARGENT_EMISSARY_OPTION_2 = 12434, // 12434 - Where are we battling the Scourge?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_0 = 12198, // 12198 - Is Winterspring currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_1 = 12201, // 12201 - Is Tanaris currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_2 = 12203, // 12203 - Are the Blasted Lands currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_3 = 12205, // 12205 - Are the Burning Steppes currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_4 = 12476, // 12476 - Is Azshara currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_2_SUB_OPTION_5 = 12477, // 12477 - Are the Eastern Plaguelands currently under attack?
+    LANG_ARGENT_EMISSARY_OPTION_3 = 12398, // 12398 - How many battles have we won?
+    LANG_ARGENT_EMISSARY_OPTION = 12478, // 12478 - I have another question.
 
     LANG_CULTIST_ENGINEER_GOSSIP = 8436, // 12111 - This cultist is in a deep trance...
     LANG_ARGENT_DAWN_GOSSIP_0 = 8525, // 12299 - The battle is won. For the time being, the Scourge threat has been pushed back. Our resources can be channeled into aiding you, in thanks and preparation for the future.

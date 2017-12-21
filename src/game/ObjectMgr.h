@@ -296,6 +296,7 @@ struct GossipMenuItems
     uint32          id;
     uint8           option_icon;
     std::string     option_text;
+    uint32          OptionBroadcastTextID;
     uint32          option_id;
     uint32          npc_option_npcflag;
     int32           action_menu_id;
@@ -303,6 +304,7 @@ struct GossipMenuItems
     uint32          action_script_id;
     bool            box_coded;
     std::string     box_text;
+    uint32          BoxBroadcastTextID;
     uint16          conditionId;
 };
 
@@ -706,6 +708,7 @@ class ObjectMgr
         ObjectGuid GetPlayerGuidByName(const std::string& name) const;
         bool GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const;
         Team GetPlayerTeamByGUID(ObjectGuid guid) const;
+        uint8 GetPlayerClassByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByGUID(ObjectGuid guid) const;
         uint32 GetPlayerAccountIdByPlayerName(const std::string& name) const;
 

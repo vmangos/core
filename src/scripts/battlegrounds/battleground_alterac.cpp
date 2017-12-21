@@ -5,19 +5,7 @@ SDComment:
 SDCategory: BG
 EndScriptData */
 
-/*
-[SQL]
-
-*/
-
 #include "scriptPCH.h"
-
-// Common definitions
-// ------------------
-
-#define IMMOBILIZE         23973
-
-// 722.4 , -11
 
 /*
 Vanndar: Thunderclap (about 200-300 nature damage per player in range not been upgraded since vanilla, Time between attacks increased by 33%, movement speed reduced by 40%.) Storm Bolt (about 450 nature damage, stuns for 8 seconds, dispellable, used on non tanks) Avatar (50% increased damage and armor, up for 15 seconds, comes back up about 15-20 seconds later) Drek'thar: Whirlwind (2 second cast time, weapon damage to all in range) Frenzy (167% damage increase and attack speed increase by 50%, lasts 2 minutes, goes up after about 15-20 seconds from the start of fight) Knockdown (Infli
@@ -28,23 +16,31 @@ Vanndar: Thunderclap (about 200-300 nature damage per player in range not been u
 ## npc_Vanndar
 ######*/
 
-#define NPC_VANNDAR         11948
-#define SPELL_AVATAR        19135
-#define SPELL_STORMBOLT     19136
-#define SPELL_THUNDERCLAP   15588
-#define VANNDAR_CENTER_X        722.4f
-#define VANNDAR_CENTER_Y        -11.0f
-#define    VANNDAR_AGGRO       -1050020
-#define    VANNDAR_RESET       -1050021
-#define    VANNDAR_BUFF1       -1050022
-#define    VANNDAR_BUFF2       -1050023
-#define    VANNDAR_RAID_WIPE   -1050024
-#define    VANNDAR_FIGHT1      -1050025
-#define    VANNDAR_FIGHT2      -1050026
-#define    VANNDAR_FIGHT3      -1050027
-#define    VANNDAR_FIGHT4      -1050028
-#define    VANNDAR_FIGHT5      -1050029
-#define    VANNDAR_FIGHT6      -1050030
+enum
+{
+    NPC_VANNDAR           = 11948,
+
+    SPELL_AVATAR          = 19135,
+    SPELL_STORMBOLT       = 19136,
+    SPELL_THUNDERCLAP     = 15588,
+
+    SAY_VANNDAR_AGGRO     = 10243,
+    SAY_VANNDAR_RESET     = 10373,
+    SAY_VANNDAR_BUFF1     = 12351,
+    SAY_VANNDAR_BUFF2     = 12352,
+    SAY_VANNDAR_RAID_WIPE = 10374,
+    SAY_VANNDAR_FIGHT1    = 8838,
+    SAY_VANNDAR_FIGHT2    = 8839,
+    SAY_VANNDAR_FIGHT3    = 8840,
+    SAY_VANNDAR_FIGHT4    = 8841,
+    SAY_VANNDAR_FIGHT5    = 8842,
+    SAY_VANNDAR_FIGHT6    = 8843
+};
+
+const uint16 vandar_fight_texts[] = { SAY_VANNDAR_FIGHT1 , SAY_VANNDAR_FIGHT2, SAY_VANNDAR_FIGHT3, SAY_VANNDAR_FIGHT4, SAY_VANNDAR_FIGHT5,  SAY_VANNDAR_FIGHT6 };
+
+#define POSITION_VANNDAR_CENTER_X        722.4f
+#define POSITION_VANNDAR_CENTER_Y        -11.0f
 
 class npc_alterac_bossHelper
 {
@@ -103,7 +99,6 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat3;
     bool m_bCombat4;
     bool m_bCombat5;
-    int32 m_uiRandomSpeech;
     bool m_bLeashed;
 
     void Reset()
@@ -121,15 +116,14 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
         m_bCombat3 = true;
         m_bCombat4 = true;
         m_bCombat5 = true;
-        m_uiRandomSpeech = 0;
     }
 
     void EnterEvadeMode()
     {
         if (m_bLeashed)
-            m_creature->MonsterYellToZone(VANNDAR_RESET, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_VANNDAR_RESET, m_creature);
         else
-            m_creature->MonsterYellToZone(VANNDAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_VANNDAR_RAID_WIPE, m_creature);
 
         m_bLeashed = false;
         ScriptedAI::EnterEvadeMode();
@@ -139,7 +133,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_bAggro)
         {
-            m_creature->MonsterYellToZone(VANNDAR_AGGRO, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_VANNDAR_AGGRO, m_creature);
             m_bAggro = false;
         }
     }
@@ -156,7 +150,7 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
     void UpdateAI(const uint32 diff)
     {
         if (m_creature->GetMapId() == 30)
-            if (m_creature->GetDistance2d(VANNDAR_CENTER_X, VANNDAR_CENTER_Y) > 35.0f)
+            if (m_creature->GetDistance2d(POSITION_VANNDAR_CENTER_X, POSITION_VANNDAR_CENTER_Y) > 35.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -227,36 +221,31 @@ struct npc_VanndarAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
-            m_uiRandomSpeech = urand(1050025, 1050030);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(vandar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat5 = false;
         }
 
@@ -275,20 +264,29 @@ CreatureAI* GetAI_npc_Vanndar(Creature* m_creature)
 ## npc_DrekThar
 ######*/
 
-#define    NPC_DREAKTHAR         11946
-#define    SPELL_FRENZY          28747
-#define    SPELL_WHIRLWIND_DKT   13736
-#define    SPELL_KNOCKDOWN       19128
-#define    DKT_CENTER_X         -1370.9f
-#define    DKT_CENTER_Y          -219.8f
-#define    DREKTHAR_AGGRO       -1050006
-#define    DREKTHAR_RESET       -1050007
-#define    DREKTHAR_RAID_WIPE   -1050008
-#define    DREKTHAR_FIGHT1      -1050009 // 80%
-#define    DREKTHAR_FIGHT2      -1050010 // 60%
-#define    DREKTHAR_FIGHT3      -1050011 // 40%
-#define    DREKTHAR_FIGHT4      -1050012 // 20%
-#define    DREKTHAR_FIGHT5      -1050013 // 5%
+enum
+{
+    NPC_DREAKTHAR          = 11946,
+
+    SPELL_FRENZY           = 28747,
+    SPELL_WHIRLWIND_DKT    = 13736,
+    SPELL_KNOCKDOWN        = 19128,
+
+    SAY_DREKTHAR_AGGRO     = 10245,
+    SAY_DREKTHAR_RESET     = 10377,
+    SAY_DREKTHAR_RAID_WIPE = 10376,
+    SAY_DREKTHAR_FIGHT1    = 8844,
+    SAY_DREKTHAR_FIGHT2    = 8845,
+    SAY_DREKTHAR_FIGHT3    = 8846,
+    SAY_DREKTHAR_FIGHT4    = 8847,
+    SAY_DREKTHAR_FIGHT5    = 8848,
+    SAY_DREKTHAR_FIGHT6    = 8849
+};
+
+const uint16 drekthar_fight_texts[] = { SAY_DREKTHAR_FIGHT1, SAY_DREKTHAR_FIGHT2, SAY_DREKTHAR_FIGHT3, SAY_DREKTHAR_FIGHT4, SAY_DREKTHAR_FIGHT5, SAY_DREKTHAR_FIGHT6 };
+
+#define    POSITION_DKT_CENTER_X         -1370.9f
+#define    POSITION_DKT_CENTER_Y          -219.8f
 
 // Duros 12121 Drakan 12122
 
@@ -342,7 +340,6 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     bool m_bCombat3;
     bool m_bCombat4;
     bool m_bCombat5;
-    int32 m_uiRandomSpeech;
     bool m_bLeashed;
 
     void Reset()
@@ -361,7 +358,6 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
         m_bCombat3 = true;
         m_bCombat4 = true;
         m_bCombat5 = true;
-        m_uiRandomSpeech = 0;
         m_creature->RemoveAurasDueToSpell(SPELL_FRENZY);
 
         std::list<Creature*> m_Wolf;
@@ -382,9 +378,9 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     void EnterEvadeMode()
     {
         if (m_bLeashed)
-            m_creature->MonsterYellToZone(DREKTHAR_RESET, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_DREKTHAR_RESET, m_creature);
         else
-            m_creature->MonsterYellToZone(DREKTHAR_RAID_WIPE, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_DREKTHAR_RAID_WIPE, m_creature);
 
         m_bLeashed = false;
         ScriptedAI::EnterEvadeMode();
@@ -394,7 +390,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_bAggro)
         {
-            m_creature->MonsterYellToZone(DREKTHAR_AGGRO, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_DREKTHAR_AGGRO, m_creature);
             m_bAggro = false;
         }
     }
@@ -412,7 +408,7 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
     {
         if (m_creature->GetMapId() == 30)
         {
-            if (m_creature->GetDistance2d(DKT_CENTER_X, DKT_CENTER_Y) > 33.0f)
+            if (m_creature->GetDistance2d(POSITION_DKT_CENTER_X, POSITION_DKT_CENTER_Y) > 33.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -501,36 +497,31 @@ struct npc_DrekTharAI : public ScriptedAI, public npc_alterac_bossHelper
 
         if (m_creature->GetHealthPercent() < 80.0f && m_bCombat1)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0,5)], m_creature);
             m_bCombat1 = false;
         }
 
         if (m_creature->GetHealthPercent() < 60.0f && m_bCombat2)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat2 = false;
         }
 
         if (m_creature->GetHealthPercent() < 40.0f && m_bCombat3)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat3 = false;
         }
 
         if (m_creature->GetHealthPercent() < 20.0f && m_bCombat4)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat4 = false;
         }
 
         if (m_creature->GetHealthPercent() < 5.0f && m_bCombat5)
         {
-            m_uiRandomSpeech = urand(1050009, 1050013);
-            m_creature->MonsterYellToZone(-m_uiRandomSpeech, LANG_UNIVERSAL, 0);
+            DoScriptText(drekthar_fight_texts[urand(0, 5)], m_creature);
             m_bCombat5 = false;
         }
 
@@ -549,18 +540,23 @@ CreatureAI* GetAI_npc_DrekThar(Creature* m_creature)
 ## npc_Balinda
 ######*/
 
-#define NPC_BALINDA        11949
-#define SPELL_FIREBALL     20420
-#define SPELL_FROSTBOLT    5530
-#define SPELL_CONEOFCOLD   22746
-#define SPELL_ARCANEEXPLO  19712
-#define SPELL_POLYMORPH    15534
-#define BAL_CENTER_X       -57.7f
-#define BAL_CENTER_Y       -286.6f
-#define SAY_AGGRO          -1050003
-#define SAY_BALINDA        -1050004
-#define SAY_RESET          -1050005
+enum
+{
+    NPC_BALINDA         = 11949,
 
+    SPELL_FIREBALL      = 20420,
+    SPELL_FROSTBOLT     = 5530,
+    SPELL_CONEOFCOLD    = 22746,
+    SPELL_ARCANEEXPLO   = 19712,
+    SPELL_POLYMORPH     = 15534,
+
+    SAY_BALINDA_AGGRO   = 10054,
+    SAY_BALINDA_HALF_HP = 10056,
+    SAY_BALINDA_RESET   = 10375
+};
+
+#define POSITION_BAL_CENTER_X       -57.7f
+#define POSITION_BAL_CENTER_Y       -286.6f
 
 struct npc_BalindaAI : public ScriptedAI
 {
@@ -594,7 +590,7 @@ struct npc_BalindaAI : public ScriptedAI
         m_uiPolymorph_Timer = 1750;
         m_creature->clearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
-            m_creature->MonsterYellToZone(SAY_RESET, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_BALINDA_RESET, m_creature);
         m_bReset = true;
         m_sayBalinda = true;
         m_bSayAggro = true;
@@ -613,7 +609,7 @@ struct npc_BalindaAI : public ScriptedAI
     {
         if (m_bSayAggro)
         {
-            m_creature->MonsterYellToZone(SAY_AGGRO, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_BALINDA_AGGRO, m_creature);
             m_bSayAggro = false;
         }
     }
@@ -624,7 +620,7 @@ struct npc_BalindaAI : public ScriptedAI
             return;
 
         if (m_creature->GetMapId() == 30)
-            if (m_creature->GetDistance2d(BAL_CENTER_X, BAL_CENTER_Y) > 45.0f)
+            if (m_creature->GetDistance2d(POSITION_BAL_CENTER_X, POSITION_BAL_CENTER_Y) > 45.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -637,7 +633,7 @@ struct npc_BalindaAI : public ScriptedAI
         {
             if (m_creature->GetHealthPercent() < 50.0f)
             {
-                m_creature->MonsterYellToZone(SAY_BALINDA, LANG_UNIVERSAL, 0);
+                DoScriptText(SAY_BALINDA_HALF_HP, m_creature);
                 m_sayBalinda = false;
             }
         }
@@ -787,16 +783,22 @@ CreatureAI* GetAI_npc_Balinda(Creature* m_creature)
 ## npc_Galvangar
 ######*/
 
-#define NPC_GALVANGAR            11947
-#define SPELL_WHIRLWIND_GAL      13736
-#define SPELL_MORTALSTRIKE       16856
-#define SPELL_CLEAVE             15284
-#define SPELL_FRIGHTSHOUT        19134
-#define GAL_CENTER_X            -545.2f
-#define GAL_CENTER_Y            -165.3f
-#define SAY_AGGRO_GALVANGAR     -1050001
-#define SAY_HALF_LIFE_GALVANGAR -1050002
-#define SAY_RESET_GALVANGAR     -1050000
+enum
+{
+    NPC_GALVANGAR         = 11947,
+
+    SPELL_WHIRLWIND_GAL   = 13736,
+    SPELL_MORTALSTRIKE    = 16856,
+    SPELL_CLEAVE          = 15284,
+    SPELL_FRIGHTSHOUT     = 19134,
+
+    SAY_GALVANGAR_AGGRO   = 10055,
+    SAY_GALVANGAR_HALF_HP = 10057,
+    SAY_GALVANGAR_RESET   = 10378
+};
+
+#define POSITION_GAL_CENTER_X            -545.2f
+#define POSITION_GAL_CENTER_Y            -165.3f
 
 struct npc_GalvangarAI : public ScriptedAI
 {
@@ -821,7 +823,7 @@ struct npc_GalvangarAI : public ScriptedAI
     {
         if (m_bSayAggro)
         {
-            m_creature->MonsterYellToZone(SAY_AGGRO_GALVANGAR, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_GALVANGAR_AGGRO, m_creature);
             m_bSayAggro = false;
         }
     }
@@ -837,7 +839,7 @@ struct npc_GalvangarAI : public ScriptedAI
         m_uiFrighteningShout_Timer = m_uiWhirlwind_Timer + urand(1000, 5000);
         m_creature->clearUnitState(UNIT_STAT_ROOT);
         if (m_bReset)
-            m_creature->MonsterYellToZone(SAY_RESET_GALVANGAR, LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_GALVANGAR_RESET, m_creature);
         m_bReset = true;
         m_bSayGalvangar = true;
         m_bSayAggro     = true;
@@ -860,7 +862,7 @@ struct npc_GalvangarAI : public ScriptedAI
 
         if (m_creature->GetMapId() == 30)
         {
-            if (m_creature->GetDistance2d(GAL_CENTER_X, GAL_CENTER_Y) > 45.0f)
+            if (m_creature->GetDistance2d(POSITION_GAL_CENTER_X, POSITION_GAL_CENTER_Y) > 45.0f)
             {
                 m_creature->CombatStop();
                 m_creature->SetHealth(m_creature->GetMaxHealth());
@@ -880,7 +882,7 @@ struct npc_GalvangarAI : public ScriptedAI
         {
             if (m_creature->GetHealthPercent() < 50.0f)
             {
-                m_creature->MonsterYellToZone(SAY_HALF_LIFE_GALVANGAR, LANG_UNIVERSAL, 0);
+                DoScriptText(SAY_GALVANGAR_HALF_HP, m_creature);
                 m_bSayGalvangar = false;
             }
         }
@@ -1000,11 +1002,15 @@ CreatureAI* GetAI_npc_Galvangar(Creature* m_creature)
 ######*/
 
 // #define NPC_WARMASTER   14762 to 14769 (ally)
-#define SPELL_CHARGE           22911
-#define SPELL_CLEAVE_WM        20684
-#define SPELL_DEMORALSHOUT     23511
-#define SPELL_ENRAGE_WM         8599
-#define SPELL_WHIRLWIND_WM     13736
+
+enum
+{
+    SPELL_CHARGE       = 22911,
+    SPELL_CLEAVE_WM    = 20684,
+    SPELL_DEMORALSHOUT = 23511,
+    SPELL_ENRAGE_WM    = 8599,
+    SPELL_WHIRLWIND_WM = 13736
+};
 
 struct npc_WarMasterAI : public ScriptedAI
 {
@@ -1194,6 +1200,7 @@ enum
     NPC_STROMPIKEBOWMAN     = 13358,
     NPC_FROSTWOLFBOWMAN     = 13359,
     SPELL_SHOOT             = 22121,
+    SPELL_ROOT_SELF         = 23973,
     SHOOT_SPEED             = 1700,
 };
 
@@ -1201,7 +1208,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 {
     npc_AlteracBowmanAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_creature->AddAura(23973, ADD_AURA_PERMANENT);
+        m_creature->AddAura(SPELL_ROOT_SELF, ADD_AURA_PERMANENT);
         SetCombatMovement(false);
         Reset();
     }
@@ -1211,7 +1218,7 @@ struct npc_AlteracBowmanAI : public ScriptedAI
 
     void JustReachedHome()
     {
-        m_creature->AddAura(23973, ADD_AURA_PERMANENT);
+        m_creature->AddAura(SPELL_ROOT_SELF, ADD_AURA_PERMANENT);
     }
     void Reset()
     {
@@ -1277,9 +1284,6 @@ CreatureAI* GetAI_npc_AlteracBowman(Creature* m_creature)
 /*######
 ## npc_AlteracDardosh
 ######*/
-
-#define SPELL_CLEAVE          15284
-
 
 struct npc_AlteracDardoshAI : public ScriptedAI
 {
@@ -1617,6 +1621,8 @@ enum
     AV_NPC_ENTRY_MULVERICK   = 13181,
     AV_NPC_ENTRY_JEZTOR      = 13180,
     AV_NPC_ENTRY_GUSE        = 13179,
+    AV_NPC_ENTRY_REGZAR      = 13176,
+    AV_NPC_ENTRY_MURGOT      = 13257,
     AV_NPC_ENTRY_SLIDORE     = 13438,
     AV_NPC_ENTRY_ICHMAN      = 13437,
     AV_NPC_ENTRY_VIPORE      = 13439,
@@ -1762,6 +1768,11 @@ struct AV_NpcEventTroopsAI : public npc_escortAI
     }
 };
 
+enum
+{
+    SAY_KORRAK_SPAWN = 9038
+};
+
 /** Korrak should appear after 2 hours of battle */
 class npc_korrak_the_bloodragerAI: public ScriptedAI
 {
@@ -1787,7 +1798,7 @@ class npc_korrak_the_bloodragerAI: public ScriptedAI
             {
                 if (!m_yell)
                 {
-                    m_creature->MonsterYell("KORRAK HAS ARRIVED! Snowfall belongs Winterax!", 0, 0);
+                    DoScriptText(SAY_KORRAK_SPAWN, m_creature);
                     m_yell = true;
                 }
             }
@@ -1799,21 +1810,26 @@ class npc_korrak_the_bloodragerAI: public ScriptedAI
         bool        m_appeared;
         bool        m_yell;
 };
-enum
-{
-    SPELL_CHAIN_LIGHTNING =   16006,
-    SPELL_EARTHBIND_TOTEM =   15786,
-    SPELL_FLAME_SHOCK     =   15616,
-    SPELL_LIGHNING_BOLT   =   15234,
-    SPELL_HEALING_WAVE    =   12492,
-};
 
 enum
 {
+    SPELL_CHAIN_LIGHTNING  =   16006,
+    SPELL_EARTHBIND_TOTEM  =   15786,
+    SPELL_FLAME_SHOCK      =   15616,
+    SPELL_LIGHNING_BOLT    =   15234,
+    SPELL_HEALING_WAVE     =   12492,
     SPELL_ENTANGLING_ROOTS =  22127,
     SPELL_STARFIRE         =  21668,
     SPELL_THORNS           =  22128,
     SPELL_REJUVENATION     =  15981,
+
+    SAY_LOKHOLAR_SPAWNED   = 8626,
+    SAY_PRIMALIST_THURLOGA = 8632,
+    SAY_ARCHDRUID_RENFERAL = 8735,
+    SAY_WOLFRIDER_CMD      = 8890,
+    SAY_WARCRY_HORDE       = 8891,
+    SAY_RAMRIDER_CMD       = 8906,
+    SAY_WARCRY_ALIANCE     = 8908
 };
 
 struct AV_NpcEventAI : public npc_escortAI
@@ -2285,8 +2301,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (m_creature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Grunts. Today could be your greatest day, for today, you fight for the glory of Frostwolf! Ride unto the field and grant your enemies no mercy! Strike the savages down and let their Warchief sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_WOLFRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
@@ -2309,8 +2324,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (m_creature->GetEntry() == AV_NPC_RAMRIDER_CMD)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Lads and ladies. Today could be your greatest day, for today, you fight for the glory of Stormpike! Ride unto the field and grant your enemies no mercy! Strike the savages down and let their Warchief sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_RAMRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
@@ -2347,8 +2361,7 @@ struct AV_NpcEventAI : public npc_escortAI
             case 43:
                 if (m_creature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
                 {
-                    m_creature->MonsterSay("Channel your energies into the Altar!", 0, 0);
-
+                    DoScriptText(SAY_PRIMALIST_THURLOGA, m_creature);
                     m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
 
                     std::list<Creature*> m_RamRiderList;
@@ -2381,8 +2394,7 @@ struct AV_NpcEventAI : public npc_escortAI
             case 49:
                 if (m_creature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
                 {
-                    m_creature->MonsterSay("We must focus our thoughts upon the Circle of Calling if the Forest Lord is to come! We must hurry! Concentrate your energies!", 0, 0);
-
+                    DoScriptText(SAY_ARCHDRUID_RENFERAL, m_creature);
                     m_creature->CastSpell(m_creature, AV_INVOCATION_SPELL, false);
 
                     std::list<Creature*> m_RamRiderList;
@@ -2690,7 +2702,7 @@ struct AV_NpcEventAI : public npc_escortAI
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_WOLFRIDER, 50.0f);
                             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
                             {
-                                (*it)->MonsterSay("For the Horde!", 0, 0);
+                                DoScriptText(SAY_WARCRY_HORDE, (*it));
                                 (*it)->SetWalk(false);
                                 (*it)->JoinCreatureGroup(m_creature,
                                                          m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
@@ -2714,7 +2726,7 @@ struct AV_NpcEventAI : public npc_escortAI
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, AV_NPC_RAMRIDER, 20.0f);
                             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
                             {
-                                (*it)->MonsterSay("Hail to the King!", 0, 0);
+                                DoScriptText(SAY_WARCRY_ALIANCE, (*it));
                                 (*it)->SetWalk(false);
                                 (*it)->JoinCreatureGroup(m_creature,
                                                          m_creature->GetAngle((*it)) - (*it)->GetOrientation(),
@@ -2742,7 +2754,7 @@ struct AV_NpcEventAI : public npc_escortAI
                 if (m_bThurlogaBoss == false)
                 {
                     m_bThurlogaBoss = true;
-                    m_creature->MonsterYell("It is done! Lok'holar has arrived! Bow to the might of the Horde, fools!", 0, 0);
+                    DoScriptText(SAY_LOKHOLAR_SPAWNED, m_creature);
                     m_uiDespawn_Timer = 600000;
                 }
             }
@@ -2883,10 +2895,73 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                 m_faction_id,
                 m_challenge,
                 m_ressources_delivered);
+
+            if ((m_challenge == BG_AV_BLOOD_WORLDBOSS_ASSAULT) && ((BattleGroundAV*)bg)->isWorldBossChallengeInvocationReady(m_faction_id))
+            {
+                uint32 playerFactionId = (pPlayer->GetTeam() == ALLIANCE) ? BG_TEAM_ALLIANCE : BG_TEAM_HORDE;
+                ((BattleGroundAV*)bg)->resetWorldBossChallengeInvocation(playerFactionId);
+                /** World Boss challenge is unique, won't give opportunity to
+                complete quest once again in the current battleground */
+                ((BattleGroundAV*)bg)->
+                    setPlayerGoStatus(playerFactionId, BG_AV_WORLDBOSS_ASSAULT, true);
+
+                /** Start NPC movement for World Boss event */
+                if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pQuestGiver->AI()))
+                {
+                    pEscortAI->Start(true, NULL, NULL, false);
+                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                    pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
+                }
+            }
+
         }
     }
     return true;
 }
+
+enum
+{
+    GOSSIP_UPGRADE_SEASONED = 8718,
+    GOSSIP_UPGRADE_VETERAN = 8719,
+    GOSSIP_UPGRADE_CHAMPION = 8723,
+    GOSSIP_GROUND_ASSAULT = 9128,
+    GOSSIP_NEXT_UPGRADE = 9130,
+
+    GOSSIP_BEACON_WEST_HORDE = 8669,
+    GOSSIP_BEACON_WEST_ALLY = 8799,
+    GOSSIP_BEACON_EAST_ALLY = 8796,
+    GOSSIP_BEACON_EAST_HORDE = 8667,
+    GOSSIP_BEACON_SNOWFALL_HORDE = 8671,
+    GOSSIP_BEACON_SNOWFALL_ALLY = 8793,
+    GOSSIP_BEACON_NEUTRAL = 8702,
+
+    GOSSIP_ASSAULT_CAVALRY = 8903,
+    GOSSIP_ASSAULT_GROUND = 9050,
+    
+    GOSSIP_ASSAULT_AIR_GUSE = 10341,
+    GOSSIP_ASSAULT_AIR_SLIDORE = 10351,
+    GOSSIP_ASSAULT_AIR_JEZTOR = 10343,
+    GOSSIP_ASSAULT_AIR_VIPORE = 10353,
+    GOSSIP_ASSAULT_AIR_MULV = 10346,
+    GOSSIP_ASSAULT_AIR_ICH = 10349,
+
+    GOSSIP_RENFERAL_BOSS1 = 8757,
+    GOSSIP_RENFERAL_BOSS2 = 8759,
+    GOSSIP_RENFERAL_BOSS3 = 8761,
+
+    GOSSIP_THURLOGA_BOSS1 = 8641,
+    GOSSIP_THURLOGA_BOSS2 = 8643,
+    GOSSIP_THURLOGA_BOSS3 = 8645,
+
+    NPCTEXT_RENFERAL_BOSS1 = 6175,
+    NPCTEXT_RENFERAL_BOSS2 = 6176,
+    NPCTEXT_RENFERAL_BOSS3 = 6177,
+
+    NPCTEXT_THURLOGA_BOSS1 = 6098,
+    NPCTEXT_THURLOGA_BOSS2 = 6099,
+    NPCTEXT_THURLOGA_BOSS3 = 6100,
+};
 
 /** Check status of items / NPC completion for Alterac Valley quests challenges :
  * Aerial assault, Cavalry assault, Troops assault or World Boss Assault.
@@ -2905,11 +2980,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     uint32 m_challenge;
     uint32 m_minRepAssault;
 
-    char sMessage[200]                 = "";
-    char sMessageGlobalAirAssault[200] = "";
-    char sMessageRemaining[200]        = "";
+    uint16 uiMessage = 0;
+    uint16 uiMessageGlobalAirAssault = 0;
 
-    if (pCreature->GetEntry() == 12096 || pCreature->GetEntry() == 12097)
+    if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A || pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
     {
         m_challenge = BG_AV_NB_CHALLENGES;
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
@@ -2939,10 +3013,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
 
 
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                 "How many more supplies are needed to send ground assaults?",
-                                 GOSSIP_SENDER_MAIN,
-                                 GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_GROUND_ASSAULT, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
 
         //        if (pCreature->isVendor())
         //            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
@@ -2952,7 +3023,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     }
 
 
-    if (pCreature->GetEntry() == 13257 || pCreature->GetEntry() == 13176)
+    if (pCreature->GetEntry() == AV_NPC_ENTRY_MURGOT || pCreature->GetEntry() == AV_NPC_ENTRY_REGZAR)
     {
         m_challenge = BG_AV_NB_CHALLENGES;
         pPlayer->PrepareQuestMenu(pCreature->GetGUID());
@@ -2992,52 +3063,34 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                 switch (bg->getReinforcementLevelGroundUnit(m_faction_id))
                 {
                     case AV_NPC_BASIC:
-                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                                 "How many more supplies are needed for the next upgrade?",
-                                                 GOSSIP_SENDER_MAIN,
-                                                 GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
 
                         if ((pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= REP_HONORED ||
                              pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && m_actual_ressources >= 500)
                         {
-                            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                                     "Upgrade to seasoned units!",
-                                                     GOSSIP_SENDER_MAIN,
-                                                     GOSSIP_ACTION_INFO_DEF + 500 + 1);
+                            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UPGRADE_SEASONED, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 500 + 1);
                         }
 
                         pPlayer->SEND_GOSSIP_MENU(6073, pCreature->GetGUID());
                         break;
                     case AV_NPC_SEASONED:
-                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                                 "How many more supplies are needed for the next upgrade?",
-                                                 GOSSIP_SENDER_MAIN,
-                                                 GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
 
                         if ((pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= REP_HONORED ||
                              pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && m_actual_ressources >= 1000)
                         {
-                            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                                     "Upgrade to veteran units!",
-                                                     GOSSIP_SENDER_MAIN,
-                                                     GOSSIP_ACTION_INFO_DEF + 1000 + 1);
+                            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UPGRADE_VETERAN, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1000 + 1);
                         }
 
                         pPlayer->SEND_GOSSIP_MENU(6217, pCreature->GetGUID());
                         break;
                     case AV_NPC_VETERAN:
-                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                                 "How many more supplies are needed for the next upgrade?",
-                                                 GOSSIP_SENDER_MAIN,
-                                                 GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
+                        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_NEXT_UPGRADE, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
 
                         if ((pPlayer->GetReputationRank(ID_REPUTATION_FROSTWOLF) >= REP_HONORED ||
                              pPlayer->GetReputationRank(ID_REPUTATION_STORMPIKE) >= REP_HONORED) && m_actual_ressources >= 1500)
                         {
-                            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                                     "Upgrade to champion units!",
-                                                     GOSSIP_SENDER_MAIN,
-                                                     GOSSIP_ACTION_INFO_DEF + 1500 + 1);
+                            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_UPGRADE_CHAMPION, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1500 + 1);
                         }
 
                         pPlayer->SEND_GOSSIP_MENU(6218, pCreature->GetGUID());
@@ -3145,12 +3198,6 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                     {
                         switch (pQuest->ReqItemId[0])
                         {
-                            case ITEM_STORMPIKE_BLOOD_HORDE:
-                            case ITEM_STORM_CRYSTAL:
-                                m_challenge = BG_AV_BLOOD_WORLDBOSS_ASSAULT;
-                                m_minRepAssault = ((BattleGroundAV*)bg)->
-                                                  getMinReputationNeeded(BG_AV_WORLDBOSS_ASSAULT);
-                                break;
                             case ITEM_FROSTWOLF_HIDE:
                             case ITEM_ALTERAC_RAM_HIDE:
                                 m_challenge = BG_AV_HIDE_CAVALRY_ASSAULT;
@@ -3210,9 +3257,6 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                     {
                         m_actual_ressources = 0;
                         m_objective_ressources = 1;
-                        snprintf(sMessageRemaining, 200,
-                                 "Error, quest item %d isn't linked to any Alterac event.",
-                                 pQuest->ReqItemId[0]);
                     }
 
                     /** Check if the corresponding amount of ressources is OK pour an assault */
@@ -3224,41 +3268,49 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                                 b_objectiveReached = ((BattleGroundAV*)bg)->
                                                      isAerialChallengeInvocationReady(m_faction_id,
                                                              BG_AV_AIR_ASSAULT_BEACON_SOLDIER);
-                                snprintf(sMessage, 200, "Give me a beacon for air support at East Field of Strife Crater !");
+
+                                if (pPlayer->GetTeam() == ALLIANCE)
+                                    uiMessage = GOSSIP_BEACON_EAST_ALLY;
+                                else
+                                    uiMessage = GOSSIP_BEACON_EAST_HORDE;
                                 break;
 
                             case BG_AV_LIEUTENANT_AIR_ASSAULT:
                                 b_objectiveReached = ((BattleGroundAV*)bg)->
                                                      isAerialChallengeInvocationReady(m_faction_id,
                                                              BG_AV_AIR_ASSAULT_BEACON_LIEUTENANT);
-                                snprintf(sMessage, 200, "Give me a beacon for air support at West Field of Strife Crater !");
+
+                                if (pPlayer->GetTeam() == ALLIANCE)
+                                    uiMessage = GOSSIP_BEACON_WEST_ALLY;
+                                else
+                                    uiMessage = GOSSIP_BEACON_WEST_HORDE;
                                 break;
 
                             case BG_AV_COMMANDER_AIR_ASSAULT:
                                 b_objectiveReached = ((BattleGroundAV*)bg)->
                                                      isAerialChallengeInvocationReady(m_faction_id,
                                                              BG_AV_AIR_ASSAULT_BEACON_COMMANDER);
-                                snprintf(sMessage, 200, "Give me a beacon for air support at Snowfall graveyard !");
+
+                                if (pPlayer->GetTeam() == ALLIANCE)
+                                    uiMessage = GOSSIP_BEACON_SNOWFALL_ALLY;
+                                else
+                                    uiMessage = GOSSIP_BEACON_SNOWFALL_HORDE;
                                 break;
 
                             case BG_AV_HIDE_CAVALRY_ASSAULT:
                             case BG_AV_TAMED_CAVALRY_ASSAULT:
                                 b_objectiveReached = ((BattleGroundAV*)bg)->
                                                      isCavalryChallengeInvocationReady(m_faction_id);
-                                snprintf(sMessage, 200, "YAW! Er, to the front lines with you!");
+
+                                uiMessage = GOSSIP_ASSAULT_CAVALRY;
                                 break;
 
                             case BG_AV_IRONDEEP_GROUND_ASSAULT:
                             case BG_AV_COLDTOOTH_GROUND_ASSAULT:
                                 b_objectiveReached = ((BattleGroundAV*)bg)->
                                                      isGroundChallengeInvocationReady(m_faction_id);
-                                snprintf(sMessage, 200, "Launch a ground assault !");
-                                break;
 
-                            case BG_AV_BLOOD_WORLDBOSS_ASSAULT:
-                                b_objectiveReached = ((BattleGroundAV*)bg)->
-                                                     isWorldBossChallengeInvocationReady(m_faction_id);
-                                snprintf(sMessage, 200, "Unleash enemy's doom !");
+                                uiMessage = GOSSIP_ASSAULT_GROUND;
                                 break;
 
                             default:
@@ -3272,7 +3324,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                          pCreature->GetEntry() == AV_NPC_ENTRY_SLIDORE))
                     {
                         b_objectiveGlobalAirAssaultSoldier = true;
-                        snprintf(sMessageGlobalAirAssault, 200, "I want a surgical strike. Carpet the road with fire!");
+                        if (pCreature->GetEntry() == AV_NPC_ENTRY_GUSE)
+                            uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_GUSE;
+                        else
+                            uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_SLIDORE;
                     }
                     if (((BattleGroundAV*)bg)->
                         isAerialChallengeInvocationReady(m_faction_id,
@@ -3281,7 +3336,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                          pCreature->GetEntry() == AV_NPC_ENTRY_VIPORE))
                     {
                         b_objectiveGlobalAirAssaultLieutenant = true;
-                        snprintf(sMessageGlobalAirAssault, 200, "Tactical suppression fire. Lay it on thick.");
+                        if (pCreature->GetEntry() == AV_NPC_ENTRY_JEZTOR)
+                            uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_JEZTOR;
+                        else
+                            uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_VIPORE;
                     }
                     if (((BattleGroundAV*)bg)->
                         isAerialChallengeInvocationReady(m_faction_id,
@@ -3290,7 +3348,10 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                          pCreature->GetEntry() == AV_NPC_ENTRY_ICHMAN))
                     {
                         b_objectiveGlobalAirAssaultCommander = true;
-                        snprintf(sMessageGlobalAirAssault, 200, "Take the base. We'll be sieging it from the ground.");
+                        if (pCreature->GetEntry() == AV_NPC_ENTRY_MULVERICK)
+                            uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_MULV;
+                        else
+                            uiMessageGlobalAirAssault = GOSSIP_ASSAULT_AIR_ICH;
                     }
                 }
             }
@@ -3299,7 +3360,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
     if (pCreature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
     {
-        snprintf(sMessage, 200, "YAW! Er, to the front lines with you!");
+        uiMessage = GOSSIP_ASSAULT_CAVALRY;
         b_objectiveReached = true;
         m_challenge = BG_AV_IRONDEEP_GROUND_ASSAULT;
     }
@@ -3323,7 +3384,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
 
             /** Add new gossip for launching order */
             pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                     sMessage,
+                                     uiMessage,
                                      GOSSIP_SENDER_MAIN,
                                      GOSSIP_ACTION_INFO_DEF + m_challenge + 1);
 
@@ -3333,7 +3394,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             {
                 /** Add new gossip for launching order */
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                         sMessageGlobalAirAssault,
+                                         uiMessageGlobalAirAssault,
                                          GOSSIP_SENDER_MAIN,
                                          GOSSIP_ACTION_INFO_DEF + BG_AV_AIR_ASSAULT_GLOBAL_SOLDIER + 1 + 50);
             }
@@ -3343,7 +3404,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             {
                 /** Add new gossip for launching order */
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                         sMessageGlobalAirAssault,
+                                         uiMessageGlobalAirAssault,
                                          GOSSIP_SENDER_MAIN,
                                          GOSSIP_ACTION_INFO_DEF + BG_AV_AIR_ASSAULT_GLOBAL_LIEUTENANT + 1 + 50);
             }
@@ -3353,12 +3414,12 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
             {
                 /** Add new gossip for launching order */
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT,
-                                         sMessageGlobalAirAssault,
+                                         uiMessageGlobalAirAssault,
                                          GOSSIP_SENDER_MAIN,
                                          GOSSIP_ACTION_INFO_DEF + BG_AV_AIR_ASSAULT_GLOBAL_COMMANDER + 1 + 50);
             }
 
-            if (pCreature->GetEntry() == 12096 || pCreature->GetEntry() == 12097)
+            if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A || pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
             {
                 if (pCreature->isVendor())
                     pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
@@ -3379,13 +3440,38 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
     }
     else if (pCreature->isQuestGiver())
     {
-        if (pCreature->GetEntry() == 12096 || pCreature->GetEntry() == 12097)
+        if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A || pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
         {
             if (pCreature->isVendor())
                 pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
 
             pPlayer->SEND_GOSSIP_MENU(6255, pCreature->GetGUID());
             return true;
+        }
+
+        if (pCreature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL || pCreature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
+        {
+            if (BattleGround* bg = pPlayer->GetBattleGround())
+            {
+                uint32 currentCounter = ((BattleGroundAV*)bg)->getChallengeInvocationCounter(m_faction_id, BG_AV_BLOOD_WORLDBOSS_ASSAULT);
+                uint32 gossipOptionBroadcastID = 0;
+                uint8 gossipOptionID = 0;
+
+                if (currentCounter >= 160)
+                {
+                    gossipOptionID = 2;
+                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS3 : GOSSIP_THURLOGA_BOSS3;
+                }
+                else if (currentCounter >= 100)
+                {
+                    gossipOptionID = 1;
+                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS2 : GOSSIP_THURLOGA_BOSS2;
+                }
+                else
+                    gossipOptionBroadcastID = (m_faction_id == BG_TEAM_ALLIANCE) ? GOSSIP_RENFERAL_BOSS1 : GOSSIP_THURLOGA_BOSS1;
+
+                pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, gossipOptionBroadcastID, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + BG_AV_BLOOD_WORLDBOSS_ASSAULT + 200 + gossipOptionID);
+            }
         }
 
         /** NPC keep is gossip menu */
@@ -3438,16 +3524,14 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                 if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Lads and ladies. Today could be your greatest day, for today, you fight for the glory of Stormpike! Charge unto the field and grant your enemies no mercy! Strike the savages down and let their Warchief sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_RAMRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
                 else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
                 {
                     SetEscortPaused(true);
-                    m_creature->MonsterSay("Grunts. Today could be your greatest day, for today, you fight for the glory of Frostwolf! Charge unto the field and grant your enemies no mercy! Strike the savages down and let their King sort em out!",
-                                           0, 0);
+                    DoScriptText(SAY_WOLFRIDER_CMD, m_creature);
                     Event_Timer = 6000;
                     Point = i;
                 }
@@ -3506,17 +3590,17 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
     void UpdateEscortAI(const uint32 uiDiff)
     {
         uint32 m_uiTroopsType = 0;
-        char sMessage[200]                 = "";
+        uint16 m_uiWarcryBC;
 
         if (m_creature->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
         {
             m_uiTroopsType = AV_NPC_STORMPIKE_COMMANDO;
-            snprintf(sMessage, 200, "Hail to the King !");
+            m_uiWarcryBC = SAY_WARCRY_ALIANCE;
         }
         else if (m_creature->GetEntry() == AV_NPC_WARMASTER_CMD)
         {
             m_uiTroopsType = AV_NPC_FROSTWOLF_REAVER;
-            snprintf(sMessage, 200, "For the Horde !");
+            m_uiWarcryBC = SAY_WARCRY_HORDE;
         }
 
         if (Event_Timer <= uiDiff)
@@ -3537,7 +3621,7 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
                             GetCreatureListWithEntryInGrid(m_RamRiderList, m_creature, m_uiTroopsType + i, 40.0f);
                             for (std::list<Creature*>::iterator it = m_RamRiderList.begin(); it != m_RamRiderList.end(); ++it)
                             {
-                                (*it)->MonsterSay(sMessage, 0, 0);
+                                DoScriptText(m_uiWarcryBC, (*it));
                                 (*it)->SetWalk(false);
 
                                 /** Link all the troops to the leader */
@@ -3570,15 +3654,13 @@ struct AV_npc_troops_chief_EventAI : public npc_escortAI
 
 bool QuestComplete_AV_npc_ram_wolf(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
-    if (pQuestGiver->GetEntry() == 13617)
+    if (pQuestGiver->GetEntry() == NPC_TAME_MASTER_ALLIANCE)
         pPlayer->SetQuestStatus(pQuest->GetQuestId(), QUEST_STATUS_NONE);
     return false;
 }
 
 bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Quest const* pQuest)
 {
-    char sMessage[200] = "";
-
     /** Check if NPC is linked to a quest */
     if (!pQuest->ReqItemId[0] || !pQuest->ReqItemCount[0])
         return false;
@@ -3588,14 +3670,10 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
 
     if (pQuestGiver->GetEntry() == AV_NPC_MARSHAL_TERAVAINE)
     {
-        snprintf(sMessage, 200, "Crush them !");
-        pQuestGiver->MonsterYell(sMessage, 0, 0);
         pQuestGiver->HandleEmote(EMOTE_ONESHOT_SHOUT);
     }
     else if (pQuestGiver->GetEntry() == AV_NPC_WARMASTER_CMD)
     {
-        snprintf(sMessage, 200, "Show no mercy !");
-        pQuestGiver->MonsterYell(sMessage, 0, 0);
         pQuestGiver->HandleEmote(EMOTE_ONESHOT_SHOUT);
     }
 
@@ -3630,9 +3708,22 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
 
 /***************/
 
+enum
+{
+    SAY_WOLFRIDER = 8887,
+    SAY_RAMRIDER  = 8905,
+    SAY_PATROL    = 8907,
+    SAY_REAVERS   = 8913,
+    SAY_GUSE      = 10339,
+    SAY_JEZTOR    = 10342,
+    SAY_MULV      = 10347,
+    SAY_VIPORE    = 10357,
+    SAY_ICHMAN    = 10358,
+};
+
 bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
 {
-    char sMessage[200] = "";
+    uint16 uiMessage = 0;
     uint32 challenge  = uiAction - (GOSSIP_ACTION_INFO_DEF + 1);
 
     if (uiAction == GOSSIP_ACTION_TRADE)
@@ -3640,37 +3731,34 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
     else if (uiAction >= GOSSIP_ACTION_INFO_DEF + 1)
     {
 
-        if (pCreature->GetEntry() != 13257 && pCreature->GetEntry() != 13176 &&
+        if (pCreature->GetEntry() != AV_NPC_ENTRY_MURGOT && pCreature->GetEntry() != AV_NPC_ENTRY_REGZAR &&
             challenge < BG_AV_NB_CHALLENGES + 10)
             pPlayer->CLOSE_GOSSIP_MENU();
 
         /** Emote message */
         if (pCreature->GetEntry() == AV_NPC_RAMRIDER_CMD)
-            snprintf(sMessage, 200, "Ram Riders, REGULATE!");
+            uiMessage = SAY_RAMRIDER;
         else if (pCreature->GetEntry() == AV_NPC_WOLFRIDER_CMD)
-            snprintf(sMessage, 200, "Wolf Riders, REGULATE!");
+            uiMessage = SAY_WOLFRIDER;
         else if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER_A)
-            snprintf(sMessage, 200, "Commandos, REGULATE!");
+            uiMessage = SAY_PATROL;
         else if (pCreature->GetEntry() == AV_NPC_QUARTERMASTER)
-            snprintf(sMessage, 200, "Reavers, REGULATE!");
-        else if (pCreature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
-            snprintf(sMessage, 200, "Soldiers of Frostwolf, come to my aid! The Ice Lord has granted us his protection. He's accepted the offering! The time has come to unleash him upon the Stormpike Army!");
-        else if (pCreature->GetEntry() == AV_NPC_ARCHDRUID_RENFERAL)
-            snprintf(sMessage, 200, "Soldiers of Stormpike, aid and protect us! The Forest Lord has granted us his protection. The portal must now be opened!");
-        else if (pCreature->GetEntry() == AV_NPC_ENTRY_JEZTOR || pCreature->GetEntry() == AV_NPC_ENTRY_GUSE)
-            snprintf(sMessage, 200, "Incoming air support to Dun Baldar! Stormpike bow down! ");
+            uiMessage = SAY_REAVERS;
+        else if (pCreature->GetEntry() == AV_NPC_ENTRY_JEZTOR)
+            uiMessage = SAY_JEZTOR;
+        else if (pCreature->GetEntry() == AV_NPC_ENTRY_GUSE)
+            uiMessage = SAY_GUSE;
         else if (pCreature->GetEntry() == AV_NPC_ENTRY_MULVERICK)
-            snprintf(sMessage, 200, "I come for you, puny Alliance!");
+            uiMessage = SAY_MULV;
         else if (pCreature->GetEntry() == AV_NPC_ENTRY_ICHMAN)
-            snprintf(sMessage, 200, "Drek'Thar, I'm coming for you!");
+            uiMessage = SAY_ICHMAN;
         else if (pCreature->GetEntry() == AV_NPC_ENTRY_VIPORE)
-            snprintf(sMessage, 200, "Senior Wing Commander Vipore launching. Pray for a swift death, Frostwolf.");
+            uiMessage = SAY_VIPORE;
 
-
-        if (pCreature->GetEntry() != 13257 && pCreature->GetEntry() != 13176 &&
+        if (pCreature->GetEntry() != AV_NPC_ENTRY_MURGOT && pCreature->GetEntry() != AV_NPC_ENTRY_REGZAR &&
             challenge < BG_AV_NB_CHALLENGES + 10)
         {
-            pCreature->MonsterYell(sMessage, 0, 0);
+            DoScriptText(uiMessage, pCreature);
             pCreature->HandleEmote(EMOTE_ONESHOT_SHOUT);
         }
 
@@ -3867,25 +3955,6 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
                             }
                         }
                         break;
-
-                    case BG_AV_BLOOD_WORLDBOSS_ASSAULT:
-                        ((BattleGroundAV*)bg)->
-                        resetWorldBossChallengeInvocation(playerFactionId);
-                        /** World Boss challenge is unique, won't give opportunity to
-                                            complete quest once again in the current battleground */
-                        ((BattleGroundAV*)bg)->
-                        setPlayerGoStatus(playerFactionId, BG_AV_WORLDBOSS_ASSAULT, true);
-
-                        /** Start NPC movement for World Boss event */
-                        if (AV_NpcEventAI* pEscortAI = dynamic_cast<AV_NpcEventAI*>(pCreature->AI()))
-                        {
-                            pEscortAI->Start(true, NULL, NULL, false);
-                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
-                            pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
-                        }
-
-                        break;
                     case BG_AV_NB_CHALLENGES:
                         pPlayer->SEND_GOSSIP_MENU(6784, pCreature->GetGUID()); //I barely have any supplies for upgrades.
                         break;
@@ -3915,6 +3984,24 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
                         break;
                     case BG_AV_NB_CHALLENGES+14:
                         pPlayer->SEND_GOSSIP_MENU(6731, pCreature->GetGUID());
+                        break;
+                    case BG_AV_BLOOD_WORLDBOSS_ASSAULT + 199:
+                        if (pCreature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
+                            pPlayer->SEND_GOSSIP_MENU(NPCTEXT_THURLOGA_BOSS1, pCreature->GetGUID());
+                        else
+                            pPlayer->SEND_GOSSIP_MENU(NPCTEXT_RENFERAL_BOSS1, pCreature->GetGUID());
+                        break;
+                    case BG_AV_BLOOD_WORLDBOSS_ASSAULT + 200:
+                        if (pCreature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
+                            pPlayer->SEND_GOSSIP_MENU(NPCTEXT_THURLOGA_BOSS2, pCreature->GetGUID());
+                        else
+                            pPlayer->SEND_GOSSIP_MENU(NPCTEXT_RENFERAL_BOSS2, pCreature->GetGUID());
+                        break;
+                    case BG_AV_BLOOD_WORLDBOSS_ASSAULT + 201:
+                        if (pCreature->GetEntry() == AV_NPC_PRIMALIST_THURLOGA)
+                            pPlayer->SEND_GOSSIP_MENU(NPCTEXT_THURLOGA_BOSS3, pCreature->GetGUID());
+                        else
+                            pPlayer->SEND_GOSSIP_MENU(NPCTEXT_RENFERAL_BOSS3, pCreature->GetGUID());
                         break;
                     case 500:
                         ((BattleGroundAV*)bg)->UpgradeArmor(pCreature, pPlayer);
@@ -4253,6 +4340,14 @@ class av_world_boss_baseai: public npc_escortAI
         }
 };
 
+enum
+{
+    SAY_LOKHOLAR_SPAWN_1 = 8616,
+    SAY_LOKHOLAR_SPAWN_2 = 8617,
+    SAY_LOKHOLAR_KILLED_PLAYER = 8618,
+    SAY_LOKHOLAR_REACHED_BASE = 8740,
+};
+
 struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
 {
     AV_NpcEventWorldBoss_H_AI(Creature* pCreature) : av_world_boss_baseai(pCreature, BG_AV_BOSS_LOKHOLAR_H)
@@ -4338,7 +4433,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         switch (i)
         {
             case 30:
-                m_creature->MonsterYell("Your base is forfeit, puny mortals!", 0, 0);
+                DoScriptText(SAY_LOKHOLAR_REACHED_BASE, m_creature);
                 m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0.0f);
                 break;
             case 31:
@@ -4353,7 +4448,7 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
         {
             /** Each time a player is killed, cast Swell of Souls spell.
              * Maximum of 20 stacks allowed. */
-            m_creature->MonsterYell("I drink in your suffering! Let your essence congeal with Lokholar!", 0, 0);
+            DoScriptText(SAY_LOKHOLAR_KILLED_PLAYER, m_creature);
             DoCastSpellIfCan(m_creature, SPELL_WB_SWELLOFSOULS, true);
         }
     }
@@ -4362,7 +4457,13 @@ struct AV_NpcEventWorldBoss_H_AI : public av_world_boss_baseai
     {
         if (!isYelling)
         {
-            m_creature->MonsterYell("WHO DARES SUMMON LOKHOLAR? The blood of a thousand Alliance soldiers I shall spill...none shall stand against the might of the Ice Lord!", LANG_UNIVERSAL, 0);
+            DoScriptText(SAY_LOKHOLAR_SPAWN_1, m_creature);
+
+            static ScriptInfo si;
+            si.command = SCRIPT_COMMAND_TALK;
+            si.talk.textId[0] = SAY_LOKHOLAR_SPAWN_2;
+            m_creature->GetMap()->ScriptCommandStart(si, 3, m_creature, m_creature);
+
             isYelling = true;
         }
 
@@ -4448,6 +4549,10 @@ enum
     SPELL_WB_MOONFIRE      = 21669,
     SPELL_WB_STARFIRE      = 21668,
     SPELL_WB_WRATH         = 21667,
+
+    SAY_IVUS_SPAWNED       = 8736,
+    SAY_IVUS_PAST_FIELD    = 8737,
+    SAY_IVUS_REACHED_BASE  = 8739,
 };
 
 struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
@@ -4530,9 +4635,11 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
     void WaypointReached(uint32 i)
     {
-        if (i == 21)
+        if (i == 1)
+            DoScriptText(SAY_IVUS_PAST_FIELD, m_creature);
+        else if (i == 21)
         {
-            m_creature->MonsterYell("I come to raze your bases, Frostwolf Clan. Ivus punishes you for your treachery!", 0, 0);
+            DoScriptText(SAY_IVUS_REACHED_BASE, m_creature);
             Stop();
         }
     }
@@ -4541,7 +4648,7 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
     {
         if (isInvocated == false)
         {
-            m_creature->MonsterYell("Wicked, wicked, mortals! The forest weeps. The elements recoil at the destruction. Ivus must purge you from this world!", 0, 0);
+            DoScriptText(SAY_IVUS_SPAWNED, m_creature);
             m_creature->SetHomePosition(-260.0f, -290.0f, 6.7f, 0.0f);
             m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
             m_creature->SetRespawnRadius(55.0f);
@@ -4561,9 +4668,6 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
-
-        if (!m_creature->getVictim()->isAlive())
-            m_creature->MonsterYell("The forest weeps. The elements recoil at the destruction. Ivus must purge you from this world!", 0, 0);
 
         if (m_uiRootsTimer < uiDiff)
         {
@@ -4611,6 +4715,13 @@ struct AV_NpcEventWorldBoss_A_AI : public av_world_boss_baseai
 
 enum
 {
+    COMMANDER_RANDOLPH          = 13139,
+    COMMANDER_DARDOSH           = 13140,
+    COMMANDER_MULFORT           = 13153,
+    COMMANDER_LOUIS             = 13154,
+    COMMANDER_DUFFY             = 13319,
+    COMMANDER_KARL              = 13320,
+
     LIEUTENANT_SPENCER          = 13138,
     LIEUTENANT_LARGENT          = 13296,
     LIEUTENANT_STOUTHANDLE      = 13297,
@@ -4655,12 +4766,12 @@ struct AV_CommanderAI : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-            case 13139:
-            case 13140:
-            case 13153:
-            case 13154:
-            case 13319:
-            case 13320:
+            case COMMANDER_RANDOLPH:
+            case COMMANDER_DARDOSH:
+            case COMMANDER_MULFORT:
+            case COMMANDER_LOUIS:
+            case COMMANDER_DUFFY:
+            case COMMANDER_KARL:
                 // Aura of command
                 if (m_uiGripOfCommand_Timer < uiDiff)
                 {
@@ -4738,8 +4849,8 @@ struct AV_DismountAI : public ScriptedAI
     {
         switch (m_creature->GetEntry())
         {
-            case 13152:
-            case 13318:
+            case COMMANDER_MALGOR:
+            case COMMANDER_MORTIMER:
                 // Aura of command
                 if (m_uiGripOfCommand_Timer < uiDiff)
                 {

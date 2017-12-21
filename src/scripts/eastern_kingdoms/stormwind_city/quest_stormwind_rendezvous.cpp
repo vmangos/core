@@ -59,7 +59,7 @@ void npc_reginald_windsorAI::ResetCreature()
 void npc_reginald_windsorAI::JustDied(Unit* /*pKiller*/)
 {
     PokeRowe();
-    m_creature->ForcedDespawn(1500);
+    m_creature->DespawnOrUnsummon(1500);
 }
 
 void npc_reginald_windsorAI::PokeRowe()
@@ -254,7 +254,7 @@ void npc_reginald_windsorAI::UpdateAI(const uint32 uiDiff)
     if (m_uiDespawnTimer < uiDiff)
     {
         PokeRowe();
-        m_creature->ForcedDespawn();
+        m_creature->DespawnOrUnsummon();
     }
     else
         m_uiDespawnTimer -= uiDiff;
@@ -785,7 +785,7 @@ bool GossipHello_npc_reginald_windsor(Player* pPlayer, Creature* pCreature)
     if (auto pWindsorEventAI = static_cast<npc_reginald_windsorAI*>(pCreature->AI()))
     {
         if (pPlayer == pWindsorEventAI->GetPlayer() && pWindsorEventAI->QuestAccepted)
-            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, sObjectMgr.GetBroadcastText(8256, pPlayer->GetSession()->GetSessionDbLocaleIndex(), pPlayer->getGender()), GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
+            pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, 8256, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
         else if (pCreature->isQuestGiver())
             pPlayer->PrepareQuestMenu(pCreature->GetGUID());
 
