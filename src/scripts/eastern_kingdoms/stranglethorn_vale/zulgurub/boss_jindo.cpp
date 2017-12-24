@@ -287,32 +287,6 @@ struct boss_jindoAI : public ScriptedAI
     }
 };
 
-struct mob_lava_spout_wardAI : public ScriptedAI
-{
-    mob_lava_spout_wardAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_creature->AddAura(8266, ADD_AURA_PERMANENT);
-        Reset();
-    }
-
-    void Reset()
-    {
-        m_creature->CastSpell(m_creature, 8266, true);
-        m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        m_creature->SetDefaultMovementType(IDLE_MOTION_TYPE);
-    }
-};
-
-CreatureAI* GetAI_mob_lava_spout_ward(Creature* pCreature)
-{
-    return new mob_lava_spout_wardAI(pCreature);
-}
-
-
 //Shade of Jindo
 struct mob_shade_of_jindoAI : public ScriptedAI
 {
@@ -471,11 +445,6 @@ void AddSC_boss_jindo()
     newscript = new Script;
     newscript->Name = "boss_jindo";
     newscript->GetAI = &GetAI_boss_jindo;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_lava_spout_ward";
-    newscript->GetAI = &GetAI_mob_lava_spout_ward;
     newscript->RegisterSelf();
 
     newscript = new Script;
