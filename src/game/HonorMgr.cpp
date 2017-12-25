@@ -951,44 +951,8 @@ float HonorMgr::HonorableKillPoints(Player* killer, Player* victim, uint32 group
     uint32 victimRank = victim->GetHonorMgr().GetRank().visualRank;
     uint8 killerLevel = killer->getLevel();
     uint8 victimLevel = victim->getLevel();
-
-    // Penalty due to level diff
-    float diffLevelPenalty = MaNGOS::XP::BaseGainLevelFactor(killerLevel, victimLevel);
-    
-    double sameVictimPenalty = totalKills >= 10 ? 0 : 1 - double(totalKills) / 10;
-
-    // Same unit killing penalty
-    // [-PROGRESSIVE] Total kills per day cahnged in 1.12 (http://wow.gamepedia.com/Patch_1.12.0#General)
-    // Honorable Kills now diminish at a rate 10% per kill rather than 25% per kill.
-    if (sWorld.GetWowPatch() < WOW_PATCH_112)
-        sameVictimPenalty = totalKills >= 5 ? 0 : 1 - double(totalKills) / 4;
-    
-    // Level related coefficient
-    double levelCoeff;
-
-    if (killerLevel >= 60)
-        levelCoeff = 1;
-    else if ((killerLevel <= 59) && (killerLevel >= 50))
-        levelCoeff = 0.9545;
-    else if ((killerLevel <= 49) && (killerLevel >= 40))
-        levelCoeff = 0.5707;
-    else if ((killerLevel <= 39) && (killerLevel >= 30))
-        levelCoeff = 0.3434;
-    else if ((killerLevel <= 29) && (killerLevel >= 20))
-        levelCoeff = 0.2070;
-    else if (killerLevel <= 19)
-        levelCoeff = 0.1212;
-    else
-        levelCoeff = 0.1212; // Not sure
-
-    float expFactor = 188.3f;
-
-    // [-PROGRESSIVE] Honor gain per victim rank changed in 1.8
-    // Values from http://www.wowwiki.com/Honor_system_(pre-2.0_formulas)
-    if (sWorld.GetWowPatch() < WOW_PATCH_108)
-        expFactor = 157.4f;
         
-    return ceil(levelCoeff * sameVictimPenalty * (expFactor * exp(0.05331 * victimRank)) * diffLevelPenalty / groupSize);
+    return MaNGOS::Honor::GetHonorGain(killerLevel, victimLevel, victimRank, totalKills, groupSize);
 }
 
 void HonorMgr::SendPVPCredit(Unit* victim, float honor)

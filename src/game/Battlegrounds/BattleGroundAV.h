@@ -37,7 +37,7 @@
 
 // description: KILL = bonushonor kill one kill is 21honor worth at 0
 // REP reputation, RES = ressources a team will lose
-#define BG_AV_KILL_BOSS                     4
+#define BG_AV_KILL_BOSS                     6
 #define BG_AV_REP_BOSS                      350
 #define BG_AV_REP_BOSS_HOLIDAY              525
 
@@ -46,7 +46,11 @@
 #define BG_AV_REP_CAPTAIN_HOLIDAY           185
 #define BG_AV_RES_CAPTAIN                   100
 
-#define BG_AV_KILL_TOWER                    3
+#define BG_AV_KILL_COMMANDER                1
+#define BG_AV_REP_COMMANDER                 12
+#define BG_AV_REP_COMMANDER_HOLIDAY         18
+
+#define BG_AV_KILL_TOWER                    2
 #define BG_AV_REP_TOWER                     12
 #define BG_AV_REP_TOWER_HOLIDAY             18
 #define BG_AV_RES_TOWER                     75
@@ -54,20 +58,22 @@
 #define BG_AV_KILL_GET_COMMANDER            1               // for a safely returned wingcommander TODO implement it
 
 // bonushonor at the end
-#define BG_AV_KILL_SURVIVING_TOWER          2
+#define BG_AV_KILL_SURVIVING_TOWER          3
 #define BG_AV_REP_SURVIVING_TOWER           12
 #define BG_AV_REP_SURVIVING_TOWER_HOLIDAY   18
 
-#define BG_AV_KILL_SURVIVING_CAPTAIN        2
+#define BG_AV_KILL_SURVIVING_CAPTAIN        3
 #define BG_AV_REP_SURVIVING_CAPTAIN         125
 #define BG_AV_REP_SURVIVING_CAPTAIN_HOLIDAY 175
 
 #define BG_AV_KILL_MAP_COMPLETE             0
 #define BG_AV_KILL_MAP_COMPLETE_HOLIDAY     4
 
+#define BG_AV_KILL_SURVIVING_GRAVE          1
 #define BG_AV_REP_OWNED_GRAVE               12
 #define BG_AV_REP_OWNED_GRAVE_HOLIDAY       18
 
+#define BG_AV_KILL_SURVIVING_MINE           1
 #define BG_AV_REP_OWNED_MINE                24
 #define BG_AV_REP_OWNED_MINE_HOLIDAY        36
 
@@ -211,6 +217,9 @@ enum BG_AV_Events
     BG_AV_COMMANDER_H_MALGOR       = 59,
     BG_AV_EXPLOSIVES_EXPERT_A      = 66,
     BG_AV_EXPLOSIVES_EXPERT_H      = 67,
+    BG_AV_LIEUTENANT_A             = 68,
+    BG_AV_LIEUTENANT_H             = 69,
+
 
     BG_AV_HERALD                = 60,
     BG_AV_BOSS_A                = 61,
@@ -519,6 +528,7 @@ class BattleGroundAV : public BattleGround
 
         uint32 m_HonorMapComplete;
         uint32 m_RepTowerDestruction;
+        uint32 m_RepCommander;
         uint32 m_RepCaptain;
         uint32 m_RepBoss;
         uint32 m_RepOwnedGrave;
