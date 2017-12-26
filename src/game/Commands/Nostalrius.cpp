@@ -640,6 +640,112 @@ bool ChatHandler::HandleCinematicListWpCommand(char *args)
     return true;
 }
 
+bool ChatHandler::HandleEscortShowWpCommand(char *args)
+{
+    DEBUG_LOG("DEBUG: HandleEscortShowWpCommand");
+
+    auto waypointInfo = ObjectMgr::GetCreatureTemplate(VISUAL_WAYPOINT);
+    if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
+        return false; // must exist as normal creature in mangos.sql 'creature_template'
+
+    const CreatureInfo *cInfo = nullptr;
+    const Creature *pCreature = getSelectedCreature();
+    uint32 cr_id;
+
+    // optional number or [name] Shift-click form |color|Hcreature_entry:creature_id|h[name]|h|r
+    if (*args && ExtractUint32KeyFromLink(&args, "Hcreature_entry", cr_id))
+        cInfo = ObjectMgr::GetCreatureTemplate(cr_id);
+    else if (pCreature)
+        cInfo = pCreature->GetCreatureInfo();
+
+    if (!cInfo)
+    {
+        if (cr_id)
+            PSendSysMessage(LANG_COMMAND_INVALIDCREATUREID, cr_id);
+        else
+            SendSysMessage(LANG_SELECT_CREATURE);
+
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    const auto pPlayer = m_session->GetPlayer();
+    auto map = pPlayer->GetMap();
+
+    auto &scriptPoints = sScriptMgr.GetPointMoveList(cInfo->Entry);
+
+    if (scriptPoints.empty())
+    {
+        PSendSysMessage(LANG_WAYPOINT_NOTFOUND, cInfo->Entry);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (const auto &wp : scriptPoints)
+    {
+        CreatureCreatePos pos{map, wp.fX, wp.fY, wp.fZ, pPlayer->GetOrientation()};
+        Creature* wpCreature = new Creature;
+
+        if (!wpCreature->Create(map->GenerateLocalLowGuid(HIGHGUID_UNIT), pos, waypointInfo))
+        {
+            PSendSysMessage(LANG_WAYPOINT_VP_NOTCREATED, VISUAL_WAYPOINT);
+            delete wpCreature;
+            return false;
+        }
+
+        wpCreature->SetVisibility(VISIBILITY_OFF);
+
+        wpCreature->SaveToDB(map->GetId());
+        wpCreature->LoadFromDB(wpCreature->GetGUIDLow(), map);
+        map->Add(wpCreature);
+    }
+
+    return true;
+}
+
+bool ChatHandler::HandleEscortHideWpCommand(char* /*args*/)
+{
+    DEBUG_LOG("DEBUG: HandleEscortHideWpCommand");
+
+    auto map = m_session->GetPlayer()->GetMap();
+
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT guid FROM creature WHERE id=%u AND map=%u", VISUAL_WAYPOINT, map->GetId()));
+    if (!result)
+    {
+        SendSysMessage(LANG_WAYPOINT_VP_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    bool hasError = false;
+    do
+    {
+        Field *fields = result->Fetch();
+        uint32 wpGuid = fields[0].GetUInt32();
+        Creature* pCreature = map->GetCreature(ObjectGuid(HIGHGUID_UNIT, VISUAL_WAYPOINT, wpGuid));
+        if (!pCreature)
+        {
+            hasError = true;
+            WorldDatabase.PExecuteLog("DELETE FROM creature WHERE guid=%u", wpGuid);
+        }
+        else
+        {
+            pCreature->DeleteFromDB();
+            pCreature->AddObjectToRemoveList();
+        }
+    } while (result->NextRow());
+
+    if (hasError)
+    {
+        PSendSysMessage(LANG_WAYPOINT_TOOFAR1);
+        PSendSysMessage(LANG_WAYPOINT_TOOFAR2);
+        PSendSysMessage(LANG_WAYPOINT_TOOFAR3);
+    }
+
+    SendSysMessage(LANG_WAYPOINT_VP_ALLREMOVED);
+
+    return true;
+}
+
 bool ChatHandler::HandleEscortAddWpCommand(char *args)
 {
     uint32 creatureEntry = 0;

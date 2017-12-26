@@ -260,6 +260,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleEscortModifyWpCommand(char *args);
         bool HandleEscortClearWpCommand(char *args);
         bool HandleEscortCreateCommand(char *args);
+        bool HandleEscortShowWpCommand(char *args);
+        bool HandleEscortHideWpCommand(char *args);
         // World Gestion
         bool HandleWorldUpdateCommand(char *args);
         bool HandleWorldTestCommand(char *args);

@@ -852,6 +852,8 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "addwp",             SEC_ADMINISTRATOR,        false, &ChatHandler::HandleEscortAddWpCommand,      "", nullptr},
         { NODE, "modwp",             SEC_ADMINISTRATOR,        false, &ChatHandler::HandleEscortModifyWpCommand,   "", nullptr},
         { NODE, "clearwp",           SEC_ADMINISTRATOR,        false, &ChatHandler::HandleEscortClearWpCommand,    "", nullptr},
+        { NODE, "showwp",            SEC_ADMINISTRATOR,        false, &ChatHandler::HandleEscortShowWpCommand,     "", nullptr},
+        { NODE, "hidewp",            SEC_ADMINISTRATOR,        false, &ChatHandler::HandleEscortHideWpCommand,     "", nullptr},
         { MSTR, nullptr,          0,                        false, nullptr,                                        "", nullptr}
     };
     static ChatCommand worldStateCommandTable[] =
