@@ -698,6 +698,9 @@ GameObjectAI* GetAIgo_pedestal_of_immol_thar(GameObject *pGo)
 }
 bool ProcessEventId_event_dreadsteed_ritual_start(uint32 eventId, Object* source, Object* target, bool isStart)
 {
+    if (!target || !source)
+        return true;
+
     if (go_pedestal_of_immol_tharAI* pPedestalAI = dynamic_cast<go_pedestal_of_immol_tharAI*>(((GameObject*) target)->AI()))
         pPedestalAI->EventStart(source->GetGUID());
     return true;//to always override what could be in DB.
@@ -794,6 +797,9 @@ GameObjectAI* GetAIgo_ritual_bell(GameObject *pGo)
 }
 bool ProcessEventId_event_dreadsteed_ritual_second_part(uint32 eventId, Object* source, Object* target, bool isStart)
 {
+    if (!target)
+        return true;
+
     if (GameObject* pedestal = ((GameObject*) target)->FindNearestGameObject(GOBJ_PEDESTAL, 10.000))
         if (go_pedestal_of_immol_tharAI* pPedestalAI = dynamic_cast<go_pedestal_of_immol_tharAI*>(pedestal->AI()))
             pPedestalAI->EventSecondPartStart();

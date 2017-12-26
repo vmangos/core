@@ -923,6 +923,9 @@ CreatureAI* GetAI_npc_enraged_foulweald(Creature* pCreature)
 }
 bool ProcessEventId_event_king_of_the_foulweald(uint32 eventId, Object* source, Object* target, bool isStart)
 {
+    if (!target || !source)
+        return true;
+
     if (go_foulweald_totem_moundAI* pMoundAI = dynamic_cast<go_foulweald_totem_moundAI*>(((GameObject*) target)->AI()))
         pMoundAI->EventStart(source->GetGUID());
     return true;//return the result of EventStart or true? true because otherwise it'll get the event in the DB.

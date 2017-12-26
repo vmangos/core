@@ -2210,8 +2210,13 @@ void Spell::EffectSendEvent(SpellEffectIndex eff_idx)
     */
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "Spell ScriptStart %u for spellid %u in EffectSendEvent ", m_spellInfo->EffectMiscValue[eff_idx], m_spellInfo->Id);
 
-    if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[eff_idx], m_caster, focusObject, true))
-        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[eff_idx], m_caster, focusObject);
+    // In some cases, the spell does not require a focus but still uses a game object
+    // eg. using an Altar or similar GO.
+    // Therefore, pass the GO as the target if this is the case.
+    GameObject* gObject = focusObject ? focusObject : m_targets.getGOTarget();
+
+    if (!sScriptMgr.OnProcessEvent(m_spellInfo->EffectMiscValue[eff_idx], m_caster, gObject, true))
+        m_caster->GetMap()->ScriptsStart(sEventScripts, m_spellInfo->EffectMiscValue[eff_idx], m_caster, gObject);
 }
 
 void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)

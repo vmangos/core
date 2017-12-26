@@ -1860,6 +1860,10 @@ void GameObject::Use(Unit* user)
         return;
     }
 
+    // NOTE: Some of the spells used by GOs are considered triggered, but have cast times.
+    // Ensure that the spell you are using, and any event it may trigger, is checking
+    // pointer validity (i.e. instance, GO, etc) since the caster may have moved maps
+    // or the GO might be gone by the time the spell is executed.
     Spell *spell = new Spell(spellCaster, spellInfo, triggered, GetObjectGuid());
 
     SpellCastTargets targets;

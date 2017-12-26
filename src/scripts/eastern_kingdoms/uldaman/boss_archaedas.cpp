@@ -50,8 +50,14 @@ bool ProcessEventId_event_awaken_archaedas(uint32 eventId, Object* source, Objec
 {
     if (!source || source->GetTypeId() != TYPEID_PLAYER)
         return true;
-    ScriptedInstance* instance = (ScriptedInstance*)((Player*)source)->GetInstanceData();
-    instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS);
+
+    // Couldn't get Altar, block event
+    if (!target)
+        return true;
+
+    if (ScriptedInstance* instance = dynamic_cast<ScriptedInstance*>(((Player*)source)->GetInstanceData()))
+        instance->SetData(ULDAMAN_ENCOUNTER_ARCHAEDAS, IN_PROGRESS);
+
     return true;
 }
 

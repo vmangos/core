@@ -1555,6 +1555,9 @@ bool ProcessEventId_event_the_principle_source(uint32 eventId, Object* pSource, 
     if (eventId != EVENT_THE_PRINCIPLE_SOURCE)
         return true;
 
+    if (!pSource)
+        return true;
+
     auto pPlayer = pSource->ToPlayer();
 
     if (!pPlayer)

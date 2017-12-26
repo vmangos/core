@@ -557,6 +557,9 @@ CreatureAI* GetAI_npc_grenka_bloodscreech(Creature* pCreature)
 
 bool ProcessEventId_event_test_of_endurance(uint32 eventId, Object* pSource, Object* pTarget, bool isStart)
 {
+    if (!pSource || !pTarget)
+        return true;
+
     auto pGO = pTarget->ToGameObject();
     auto pPlayer = pSource->ToPlayer();
 

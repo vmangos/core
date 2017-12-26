@@ -57,8 +57,13 @@ bool ProcessEventId_event_awaken_stone_keeper(uint32 eventId, Object* source, Ob
 {
     if (!source || source->GetTypeId() != TYPEID_PLAYER)
         return true;
-    ScriptedInstance* instance = (ScriptedInstance*)((Player*)source)->GetInstanceData();
-    instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
+
+    if (!target)
+        return true;
+
+    if (ScriptedInstance* instance = dynamic_cast<ScriptedInstance*>(((Player*)source)->GetInstanceData()))
+        instance->SetData(ULDAMAN_ENCOUNTER_STONE_KEEPERS, IN_PROGRESS);
+
     return true;
 }
 
