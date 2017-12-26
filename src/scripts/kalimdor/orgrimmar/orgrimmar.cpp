@@ -371,6 +371,29 @@ struct npc_overlord_saurfangAI : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
     }
 
+    void MovementInform(uint32 uiType, uint32 uiPointId) override
+    {
+        if (uiType != POINT_MOTION_TYPE)
+            return;
+
+        switch (uiPointId)
+        {
+            case 0:
+                m_creature->GetMotionMaster()->MovePoint(1, 1542.73f, -4425.55f, 10.87f);
+                break;
+            case 1:
+                m_uiDialogueTimer = 1000;
+                m_uiTick++;
+                break;
+            case 2:
+                m_creature->GetMotionMaster()->MovePoint(3, 1565.79f, -4395.27f, 6.9866f);
+                break;
+            case 3:
+                Reset();
+                break;
+        }
+    }
+
     void UpdateAI(const uint32 diff)
     {
       if (m_bRallyingCryEvent)
@@ -380,14 +403,19 @@ struct npc_overlord_saurfangAI : public ScriptedAI
                 switch (m_uiTick)
                 {
                     case 0:
+                        m_creature->GetMotionMaster()->MovePoint(0, 1540.54f, -4427.2f, 11.29f, MOVE_PATHFINDING);
+                        m_uiDialogueTimer = 30000; //handled by MovementInform
+                        break;
+                    case 1:
                         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
                         {
                             m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
                             m_creature->MonsterYellToZone(YELL_NEF_REWARD_1_HORDE, 0, pPlayer);
                         }
                         m_uiDialogueTimer = 10000;
+                        m_uiTick++;
                         break;
-                    case 1:
+                    case 2:
                         if (Player* pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
                         {
                             m_creature->HandleEmote(EMOTE_ONESHOT_SHOUT);
@@ -401,26 +429,32 @@ struct npc_overlord_saurfangAI : public ScriptedAI
                                 pGo->Refresh();
                             }
                         }
-                        m_uiDialogueTimer = 2000;
+                        m_uiDialogueTimer = 8000;
+                        m_uiTick++;
                         break;
-                    case 2:
+                    case 3:
                         if (GameObject* pGo = m_creature->FindNearestGameObject(GO_NEFARIANS_HEAD_HORDE, 150.0f))
                         {
                             pGo->SetGoState(GO_STATE_ACTIVE);
                         }
                         m_uiDialogueTimer = 5000;
+                        m_uiTick++;
                         break;
-                    case 3:
+                    case 4:
                         m_creature->CastSpell(m_creature, SPELL_RALLYING_CRY_DRAGONSLAYER, true);
                         for (uint8 i = 0; i < MAX_RALLY_GENERATORS; ++i)
                         {
                             if (Creature* pGenerator = m_creature->SummonCreature(NPC_RALLY_CRY_GENERATOR_HORDE, aRallyGeneratorLocs[i].m_fX, aRallyGeneratorLocs[i].m_fY, aRallyGeneratorLocs[i].m_fZ, 0.0f, TEMPSUMMON_TIMED_DESPAWN, 1000))
                                 pGenerator->CastSpell(pGenerator, SPELL_RALLYING_CRY_DRAGONSLAYER, true);
                         }
-                        Reset();
+                        m_uiDialogueTimer = 10000;
+                        m_uiTick++;
+                        break;
+                    case 5:
+                        m_creature->GetMotionMaster()->MovePoint(2, 1567.39f, -4394.9f, 6.89f);
+                        m_uiDialogueTimer = 30000; //handled by MovementInform
                         return;
                 }
-                m_uiTick++;
             }
             else
                 m_uiDialogueTimer -= diff;
