@@ -16,15 +16,12 @@
 
 /* ScriptData
 SDName: Undercity
-SD%Complete: 95
-SDComment: Quest support: 6628(Parqual Fintallas questions/'answers' might have more to it, need more info), 9180(post-event).
+SD%Complete: 100
 SDCategory: Undercity
 EndScriptData */
 
 /* ContentData
 npc_lady_sylvanas_windrunner
-npc_highborne_lamenter
-npc_parqual_fintallas
 EndContentData */
 
 #include "scriptPCH.h"
@@ -35,11 +32,6 @@ EndContentData */
 
 enum eSpells
 {
-    // Varimathras
-    SPELL_SUMMONED              = 7741,
-    SPELL_DRAIN_LIFE            = 20743,
-    SPELL_SHADOW_BOLT_VOLLEY    = 20741,
-    SPELL_MIND_CONTROL          = 20740,
     // Sylvanas
     SPELL_SUMMON_SKEL   = 20464,
     SPELL_FADE          = 20672,
@@ -47,85 +39,6 @@ enum eSpells
     SPELL_MULTI_SHOT    = 20735,
     SPELL_SHOOT         = 20463,
 };
-
-struct boss_varimathrasAI : public ScriptedAI
-{
-public:
-    boss_varimathrasAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() override
-    {
-        DoCastSpellIfCan(m_creature, SPELL_SUMMONED);
-        m_uiDrainLifeTimer = 15000;
-        m_uiShadowBoltVolleyTimer = 25000;
-        m_uiMindControlTimer = 20000;
-        m_bIsCastingDrain = false;
-    }
-
-    void UpdateAI(const uint32 uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_bIsCastingDrain)
-        {
-            if (m_uiDrainLifeTimer > uiDiff)
-            {
-                m_uiDrainLifeTimer -= uiDiff;
-                return;
-            }
-            m_bIsCastingDrain = false;
-            m_uiDrainLifeTimer = 20000;
-        }
-
-        if (m_uiDrainLifeTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_DRAIN_LIFE, CAST_TRIGGERED) == CAST_OK)
-            {
-                m_uiDrainLifeTimer = 5000;
-                m_bIsCastingDrain = true;
-            }
-        }
-        else
-            m_uiDrainLifeTimer -= uiDiff;
-
-        if (m_uiShadowBoltVolleyTimer <= uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature, SPELL_SHADOW_BOLT_VOLLEY) == CAST_OK)
-                m_uiShadowBoltVolleyTimer = 20000;
-        }
-        else
-            m_uiShadowBoltVolleyTimer -= uiDiff;
-
-        if (m_uiMindControlTimer <= uiDiff)
-        {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_MIND_CONTROL) == CAST_OK)
-                    m_uiMindControlTimer = urand(15000, 25000);
-            }
-        }
-        else
-            m_uiMindControlTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-        EnterEvadeIfOutOfCombatArea(uiDiff);
-    }
-
-private:
-    uint32 m_uiDrainLifeTimer;
-    uint32 m_uiShadowBoltVolleyTimer;
-    uint32 m_uiMindControlTimer;
-    bool m_bIsCastingDrain;
-};
-
-CreatureAI* GetAI_boss_varimathras(Creature* pCreature)
-{
-    return new boss_varimathrasAI(pCreature);
-}
 
 /*
 TODO : TIMERS TO CHECK
@@ -247,10 +160,5 @@ void AddSC_undercity()
     newscript = new Script;
     newscript->Name = "npc_lady_sylvanas_windrunner";
     newscript->GetAI = &GetAI_boss_sylvanas;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "boss_varimathras";
-    newscript->GetAI = &GetAI_boss_varimathras;
     newscript->RegisterSelf();
 }

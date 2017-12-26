@@ -791,7 +791,7 @@ void ScriptMgr::LoadCreatureMovementScripts()
     // checks are done in WaypointManager::Load
 }
 
-void ScriptMgr::LoadDbScriptStrings()
+void ScriptMgr::CheckAllScriptTexts()
 {
     CheckScriptTexts(sQuestEndScripts);
     CheckScriptTexts(sQuestStartScripts);

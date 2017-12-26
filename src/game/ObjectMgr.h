@@ -132,6 +132,23 @@ struct BroadcastText
 
 typedef std::unordered_map<uint32, BroadcastText> BroadcastTextLocaleMap;
 
+struct CreatureSpellsEntry
+{
+    const uint16 spellId;
+    const uint8  probability;
+    const uint8  castTarget;
+    const uint8  castFlags;
+    const uint32 delayInitialMin;
+    const uint32 delayInitialMax;
+    const uint32 delayRepeatMin;
+    const uint32 delayRepeatMax;
+    CreatureSpellsEntry(uint16 Id, uint8 Probability, uint8 CastTarget, uint8 CastFlags, uint32 InitialMin, uint32 InitialMax, uint32 RepeatMin, uint32 RepeatMax) : spellId(Id), probability(Probability), castTarget(CastTarget), castFlags(CastFlags), delayInitialMin(InitialMin), delayInitialMax(InitialMax), delayRepeatMin(RepeatMin), delayRepeatMax(RepeatMax) {}
+};
+
+typedef std::vector<CreatureSpellsEntry> CreatureSpellsTemplate;
+
+typedef std::unordered_map<uint32, CreatureSpellsTemplate> CreatureSpellsMap;
+
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
 {
@@ -750,8 +767,6 @@ class ObjectMgr
             return mGameObjectForQuestSet.find(entry) != mGameObjectForQuestSet.end();
         }
 
-        static char* const GetPatchName();
-
         WorldSafeLocsEntry const *GetClosestGraveYard(float x, float y, float z, uint32 MapId, Team team);
         bool AddGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = true);
         void RemoveGraveYardLink(uint32 id, uint32 zone, Team team, bool inDB = false);
@@ -847,6 +862,7 @@ class ObjectMgr
         void LoadCreatures(bool reload = false);
         void LoadCreatureAddons();
         void LoadCreatureModelInfo();
+        void LoadCreatureSpells();
         void LoadEquipmentTemplates();
         void LoadGameObjectLocales();
         void LoadGameobjects(bool reload = false);
@@ -995,6 +1011,13 @@ class ObjectMgr
         {
             auto itr = mCreatureLocaleMap.find(entry);
             if(itr==mCreatureLocaleMap.end()) return nullptr;
+            return &itr->second;
+        }
+
+        CreatureSpellsTemplate const* GetCreatureSpellsTemplate(uint32 entry) const
+        {
+            auto itr = mCreatureSpellsMap.find(entry);
+            if (itr == mCreatureSpellsMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1440,6 +1463,7 @@ class ObjectMgr
 
         CreatureDataMap mCreatureDataMap;
         CreatureLocaleMap mCreatureLocaleMap;
+        CreatureSpellsMap mCreatureSpellsMap;
         GameObjectDataMap mGameObjectDataMap;
         GameObjectLocaleMap mGameObjectLocaleMap;
         ItemLocaleMap mItemLocaleMap;

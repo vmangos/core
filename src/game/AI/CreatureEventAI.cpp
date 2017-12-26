@@ -34,6 +34,7 @@
 #include "Chat.h"
 #include "Language.h"
 #include "ScriptMgr.h"
+#include "CreatureAI.h"
 
 bool CreatureEventAIHolder::UpdateRepeatTimer(Creature* creature, uint32 repeatMin, uint32 repeatMax)
 {
@@ -884,6 +885,11 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             m_creature->GetMap()->ScriptsStart(sEventScripts, action.eventScript.eventScriptId, m_creature, pActionInvoker ? pActionInvoker : m_creature);
             break;
         }
+        case ACTION_T_SET_SPELLS_TEMPLATE:
+        {
+            SetSpellsTemplate(action.setSpellsTemplate.spellsTemplateId);
+            break;
+        }
     }
 }
 
@@ -1228,6 +1234,9 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
             m_EventUpdateTime -= diff;
         }
     }
+
+    if (Combat && !m_CreatureSpells.empty())
+        DoSpellTemplateCasts(diff);
 
     //Melee Auto-Attack
     if (Combat && m_MeleeEnabled && m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))

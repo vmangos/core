@@ -4415,6 +4415,7 @@ bool ChatHandler::HandleLookupAccountEmailCommand(char* args)
         "SELECT id, username, last_ip, 0, expansion FROM account WHERE email " _LIKE_ " " _CONCAT2_("'%s'", "'%%'") " LIMIT %u",
         email.c_str(), limit);
 
+    return true;
 }
 
 bool ChatHandler::HandleLookupAccountIpCommand(char* args)

@@ -24,6 +24,7 @@
 #include "DBCStores.h"
 #include "Spell.h"
 #include "Totem.h"
+#include "GridSearchers.h"
 
 CreatureAI::~CreatureAI()
 {
@@ -62,6 +63,10 @@ CanCastResult CreatureAI::CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, 
 
     // If the spell requires the target having a specific power type
     if (!IsAreaOfEffectSpell(pSpell) && !IsTargetPowerTypeValid(pSpell, pTarget->getPowerType()))
+        return CAST_FAIL_OTHER;
+
+    // Mind control abilities can't be used with just 1 attacker or mob will reset.
+    if ((m_creature->getThreatManager().getThreatList().size() == 1) && IsCharmSpell(pSpell))
         return CAST_FAIL_OTHER;
 
     // If the unit is disarmed and the skill requires a weapon, it cannot be cast
@@ -143,6 +148,102 @@ CanCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32
     }
 
     return CAST_FAIL_IS_CASTING;
+}
+
+
+Unit* CreatureAI::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent) const
+{
+    Unit* pUnit = nullptr;
+
+    MaNGOS::MostHPMissingInRangeCheck u_check(m_creature, fRange, uiMinHPDiff, bPercent);
+    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
+
+    Cell::VisitGridObjects(m_creature, searcher, fRange);
+
+    return pUnit;
+}
+
+inline Unit* CreatureAI::GetTargetByType(uint32 CastTarget, uint16 SpellId) const
+{
+    switch (CastTarget)
+    {
+        case TARGET_T_SELF:
+            return m_creature;
+        case TARGET_T_HOSTILE:
+            return m_creature->getVictim();
+        case TARGET_T_HOSTILE_SECOND_AGGRO:
+            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
+        case TARGET_T_HOSTILE_LAST_AGGRO:
+            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0);
+        case TARGET_T_HOSTILE_RANDOM:
+            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+        case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
+            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+        case TARGET_T_FRIENDLY:
+        case TARGET_T_FRIENDLY_NOT_SELF:
+        case TARGET_T_FRIENDLY_INJURED:
+        {
+            const SpellEntry* pSpell = sSpellMgr.GetSpellEntry(SpellId);
+            const SpellRangeEntry *pSpellRange = sSpellRangeStore.LookupEntry(pSpell->rangeIndex);
+            switch (CastTarget)
+            {
+                case TARGET_T_FRIENDLY:
+                    return m_creature->SelectRandomFriendlyTarget(nullptr, pSpellRange->maxRange);
+                case TARGET_T_FRIENDLY_NOT_SELF:
+                    return m_creature->SelectRandomFriendlyTarget(m_creature, pSpellRange->maxRange);
+                case TARGET_T_FRIENDLY_INJURED:
+                    return DoSelectLowestHpFriendly(pSpellRange->maxRange, 50, true);
+            }
+        }
+    }
+    return nullptr;
+}
+
+void CreatureAI::SetSpellsTemplate(uint32 entry)
+{
+    if (entry == 0)
+        m_CreatureSpells.clear();
+    else if (const CreatureSpellsTemplate* pSpellsTemplate = sObjectMgr.GetCreatureSpellsTemplate(entry))
+        SetSpellsTemplate(pSpellsTemplate);
+    else
+        sLog.outError("CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
+}
+
+void CreatureAI::SetSpellsTemplate(const CreatureSpellsTemplate *SpellsTemplate)
+{
+    m_CreatureSpells.clear();
+    for (const auto & entry : *SpellsTemplate)
+    {
+        m_CreatureSpells.push_back(CreatureAISpellsEntry(entry));
+    }
+    m_CreatureSpells.shrink_to_fit();
+}
+
+void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
+{
+    for (auto & spell : m_CreatureSpells)
+    {
+        if (spell.cooldown <= uiDiff)
+        {
+            // we roll to see if we cast this time
+            if (spell.probability <= rand() % 100)
+            {
+                spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
+                continue;
+            }
+
+            Unit* spellTarget = GetTargetByType(spell.castTarget, spell.spellId);
+
+            // no valid target
+            if (!spellTarget)
+                continue;
+
+            if (DoCastSpellIfCan(spellTarget, spell.spellId, spell.castFlags) == CAST_OK)
+                spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
+        }
+        else
+            spell.cooldown -= uiDiff;
+    }
 }
 
 void CreatureAI::ClearTargetIcon()
@@ -288,6 +389,9 @@ struct EnterEvadeModeHelper
 
 void CreatureAI::EnterEvadeMode()
 {
+    // Reset back to default spells template. This also resets timers.
+    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+
     if (!m_creature->isAlive())
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, he is dead [guid=%u]", m_creature->GetGUIDLow());
