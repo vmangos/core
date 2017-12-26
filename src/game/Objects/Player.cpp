@@ -10431,6 +10431,8 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
     }
 }
 
+// It should be assumed that the item is deleted after calling this. No further
+// access to any item pointer referencing the item in this slot can be performed
 void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
 {
     Item *pItem = GetItemByPos(bag, slot);
@@ -10497,11 +10499,6 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             pItem->DestroyForPlayer(this);
         }
 
-        //pItem->SetOwnerGUID(0);
-        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
-        pItem->SetSlot(NULL_SLOT);
-        pItem->SetState(ITEM_REMOVED, this);
-
         // If destroying a charter, destroy the petition too
         if (pItem->IsCharter())
         {
@@ -10509,6 +10506,12 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             if (Petition* petition = sGuildMgr.GetPetitionById(petitionId))
                 sGuildMgr.DeletePetition(petition);
         }
+
+        //pItem->SetOwnerGUID(0);
+        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
+        pItem->SetSlot(NULL_SLOT);
+        // NOTE: Will delete the data pointed to by pItem if it is ITEM_NEW
+        pItem->SetState(ITEM_REMOVED, this);
     }
 }
 
