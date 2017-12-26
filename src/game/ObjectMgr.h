@@ -518,7 +518,13 @@ struct PlayerCacheData
     uint32 uiClass;
     uint32 uiGender;
     uint32 uiZoneId;
+    uint32 uiMapId;
     std::string sName;
+    float fPosX;
+    float fPosY;
+    float fPosZ;
+    float fOrientation;
+    bool bInFlight;
 };
 typedef std::map<uint32 /*guid*/, PlayerCacheData*> PlayerCacheDataMap;
 
@@ -1256,12 +1262,18 @@ class ObjectMgr
 
         // Caching Player Data
         void LoadPlayerCacheData();
-        PlayerCacheData* GetPlayerDataByGUID(uint32 lowGuid);
-        PlayerCacheData* GetPlayerDataByName(const std::string& name);
-        void InsertPlayerInCache(Player *pPlayer);
-        void InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, const std::string& name, uint32 level, uint32 zoneId);
+        PlayerCacheData* GetPlayerDataByGUID(uint32 lowGuid) const;
+        PlayerCacheData* GetPlayerDataByName(const std::string& name) const;
+        void GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData*>& data) const;
+        PlayerCacheData* InsertPlayerInCache(Player *pPlayer);
+        PlayerCacheData* InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 uiGender, uint32 account, const std::string& name, uint32 level, uint32 zoneId);
         void DeletePlayerFromCache(uint32 lowGuid);
         void ChangePlayerNameInCache(uint32 lowGuid, const std::string& oldName, const std::string& newName);
+        void UpdatePlayerCachedPosition(Player *pPlayer);
+        void UpdatePlayerCachedPosition(uint32 lowGuid, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
+        void UpdatePlayerCachedPosition(PlayerCacheData* data, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight);
+        void UpdatePlayerCache(Player* pPlayer);
+        void UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId);
 
         PlayerCacheDataMap m_playerCacheData;
         std::map<std::string, uint32> m_playerNameToGuid;
