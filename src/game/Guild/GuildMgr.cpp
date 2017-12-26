@@ -383,11 +383,16 @@ void Petition::SaveToDB()
 PetitionSignature* Petition::GetSignatureForPlayer(Player* player)
 {
     PetitionSignature* signature = nullptr;
+    // Note that in pretty much any case if the player has a signature on
+    // this petition, then the account has a signature. Therefore, it will
+    // return here
     if (signature = GetSignatureForAccount(player->GetSession()->GetAccountId()))
         return signature;
 
     if (signature = GetSignatureForPlayerGuid(player->GetObjectGuid()))
         return signature;
+
+    return nullptr;
 }
 
 PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
@@ -396,7 +401,7 @@ PetitionSignature* Petition::GetSignatureForAccount(uint32 accountId)
     {
         PetitionSignature* signature = *iter;
         if (signature->GetSignatureAccountId() == accountId)
-            return *iter;
+            return signature;
     }
 
     return nullptr;
@@ -408,7 +413,7 @@ PetitionSignature* Petition::GetSignatureForPlayerGuid(const ObjectGuid& guid)
     {
         PetitionSignature* signature = *iter;
         if (signature->GetSignatureGuid() == guid)
-            return *iter;
+            return signature;
     }
 
     return nullptr;

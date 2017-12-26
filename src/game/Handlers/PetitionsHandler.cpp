@@ -340,7 +340,7 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
 
     //client doesn't allow to sign petition two times by one character, but not check sign by another character from same account
     //not allow sign another player from already sign player account
-    if (petition->GetSignatureForPlayer(_player))
+    if (PetitionSignature* signature = petition->GetSignatureForPlayer(_player))
     {
         WorldPacket data(SMSG_PETITION_SIGN_RESULTS, (8 + 8 + 4));
         data << ObjectGuid(itemGuid);
