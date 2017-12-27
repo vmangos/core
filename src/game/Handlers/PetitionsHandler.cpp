@@ -518,9 +518,6 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
 
     // OK!
 
-    // delete charter item
-    _player->DestroyItem(charter->GetBagSlot(), charter->GetSlot(), true);
-
     // signs
     uint8 signs = petition->GetSignatureCount();
 
@@ -536,6 +533,12 @@ void WorldSession::HandleTurnInPetitionOpcode(WorldPacket & recv_data)
 
     sGuildMgr.DeletePetition(petition);
     petition = nullptr; // deleted in GuildMgr::DeletePetition
+
+    // Delete the charter item now. Deleting the charter deletes the petition
+    // if it still exists, so we do not want to do it before the guild is
+    // created.
+    _player->DestroyItem(charter->GetBagSlot(), charter->GetSlot(), true);
+
     // created
     DEBUG_LOG("TURN IN PETITION %u", petitionguid);
 
