@@ -313,7 +313,12 @@ bool ProcessEventId_event_free_pyroguard_emberseer(uint32 eventId, Object* sourc
 {
     if (!source || source->GetTypeId() != TYPEID_PLAYER)
         return true;
-    if (ScriptedInstance* instance = (ScriptedInstance*)((Player*)source)->GetInstanceData())
+
+    // Cannot find altar
+    if (!target)
+        return true;
+
+    if (ScriptedInstance* instance = dynamic_cast<ScriptedInstance*>(((Player*)source)->GetInstanceData()))
         if (Creature* pyroguardEmberseer = source->ToPlayer()->GetMap()->GetCreature(instance->GetData64(NPC_PYROGUARD_EMBERSEER)))
             if (boss_pyroguard_emberseerAI* bossAI = dynamic_cast<boss_pyroguard_emberseerAI*>(pyroguardEmberseer->AI()))
                 bossAI->StartWarlocksCombat();

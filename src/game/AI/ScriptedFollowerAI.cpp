@@ -183,6 +183,9 @@ void FollowerAI::EnterEvadeMode()
             m_creature->GetMotionMaster()->MoveTargetedHome();
     }
 
+    // Reset back to default spells template. This also resets timers.
+    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+
     Reset();
 }
 
@@ -257,6 +260,9 @@ void FollowerAI::UpdateFollowerAI(const uint32 uiDiff)
 {
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
+
+    if (!m_CreatureSpells.empty())
+        DoSpellTemplateCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }

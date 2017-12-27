@@ -614,7 +614,7 @@ class ScriptMgr
         void LoadGossipScripts();
         void LoadCreatureMovementScripts();
 
-        void LoadDbScriptStrings();
+        void CheckAllScriptTexts();
 
         void LoadScriptNames();
         void LoadAreaTriggerScripts();

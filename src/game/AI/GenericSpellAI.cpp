@@ -68,7 +68,7 @@ std::vector<MobSpellEntry> GenericSpellMobData;
 CreatureAI* GetAI_GenericSpellAI(Creature* pCreature);
 GenericAISpell BuildGenericAISpell(uint32 spellId, uint32 minCD, uint32 maxCD, uint32 target);
 void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellInfos);
-void LoadGenericAISpellsData();
+//void LoadGenericAISpellsData();
 
 struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
 {
@@ -531,7 +531,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
 #endif
     }
 }
-
+/* this was never used
 void LoadGenericAISpellsData()
 {
     GenericSpellMobData.clear();
@@ -573,7 +573,7 @@ void LoadGenericAISpellsData()
         sLog.outString(">> Loaded 0 mob spells datas. DB table `creature_spells` is empty.");
     }
 }
-
+*/
 void AddSC_generic_spell_ai()
 {
     Script *newscript;
@@ -582,5 +582,5 @@ void AddSC_generic_spell_ai()
     newscript->Name = "generic_spell_ai";
     newscript->GetAI = &GetAI_GenericSpellAI;
     newscript->RegisterSelf();
-    LoadGenericAISpellsData();
+    //LoadGenericAISpellsData();
 }

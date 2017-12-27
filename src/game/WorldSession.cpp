@@ -760,6 +760,9 @@ void WorldSession::LogoutPlayer(bool Save)
         if (Group* group = _player->GetGroup())
             group->UpdatePlayerOnlineStatus(_player, false);
 
+        ///- Update cached data at logout
+        sObjectMgr.UpdatePlayerCache(_player);
+
         ///- Remove the player from the world
         // the player may not be in the world when logging out
         // e.g if he got disconnected during a transfer to another map

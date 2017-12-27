@@ -61,11 +61,14 @@ bool GuardAI::IsVisible(Unit *pl) const
         && pl->isVisibleForOrDetect(m_creature, m_creature, true);
 }
 
-void GuardAI::UpdateAI(const uint32 /*diff*/)
+void GuardAI::UpdateAI(const uint32 uiDiff)
 {
     // update i_victimGuid if i_creature.getVictim() !=0 and changed
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
+
+    if (!m_CreatureSpells.empty())
+        DoSpellTemplateCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }

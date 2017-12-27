@@ -856,6 +856,16 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Scripts()
                         }
                         break;
                     }
+                    case ACTION_T_SET_SPELLS_TEMPLATE:
+                    {
+                        if (action.setSpellsTemplate.spellsTemplateId)
+                            if (!sObjectMgr.GetCreatureSpellsTemplate(action.setSpellsTemplate.spellsTemplateId))
+                            {
+                                sLog.outErrorDb("Event %u uses invalid creature_spells id %u.", i, action.setSpellsTemplate.spellsTemplateId);
+                                continue;
+                            }
+                        break;
+                    }
                     default:
                         sLog.outErrorDb("CreatureEventAI:  Event %u Action %u have currently not checked at load action type (%u). Need check code update?", i, j + 1, temp.action[j].type);
                         break;

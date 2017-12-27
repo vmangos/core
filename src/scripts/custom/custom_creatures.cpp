@@ -1039,7 +1039,7 @@ struct npc_summon_debugAI : ScriptedAI
         Reset();
     }
 
-    void UpdateAI(uint32 diff) override
+    void UpdateAI(const uint32 diff) override
     {
         if (!m_creature->getVictim())
             return;

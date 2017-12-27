@@ -734,8 +734,14 @@ void BattleGround::EndBattleGround(Team winner)
 
 uint32 BattleGround::GetBonusHonorFromKill(uint32 kills) const
 {
-    //variable kills means how many honorable kills you scored (so we need kills * honor_for_one_kill)
-    return (uint32)MaNGOS::Honor::hk_honor_at_level(GetMaxLevel(), kills);
+    // BHU is determined by the CP that would be awarded to the highest level in the range
+    // if they made an honorable kill on a Rank 1 target
+    return kills * (uint32)MaNGOS::Honor::GetHonorGain(GetMaxLevel(), GetMaxLevel(), 1);
+}
+
+float BattleGround::GetHonorModifier() {
+    // If the game ends in under one hour, less Bonus Honor will be earned from control of mines, graveyards and for the General kill (win).
+    return GetStartTime() < HOUR * IN_MILLISECONDS ? 0.5f : 1.0f;
 }
 
 uint32 BattleGround::GetBattlemasterEntry() const

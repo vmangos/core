@@ -170,37 +170,6 @@ ObjectMgr::~ObjectMgr()
         delete itr->second;
 }
 
-char* const ObjectMgr::GetPatchName()
-{
-    switch(sWorld.GetWowPatch())
-    {
-        case 0:
-            return "Patch 1.2: Mysteries of Maraudon";
-        case 1:
-            return "Patch 1.3: Ruins of the Dire Maul";
-        case 2:
-            return "Patch 1.4: The Call to War";
-        case 3:
-            return "Patch 1.5: Battlegrounds";
-        case 4:
-            return "Patch 1.6: Assault on Blackwing Lair";
-        case 5:
-            return "Patch 1.7: Rise of the Blood God";
-        case 6:
-            return "Patch 1.8: Dragons of Nightmare";
-        case 7:
-            return "Patch 1.9: The Gates of Ahn'Qiraj";
-        case 8:
-            return "Patch 1.10: Storms of Azeroth";
-        case 9:
-            return "Patch 1.11: Shadow of the Necropolis";
-        case 10:
-            return "Patch 1.12: Drums of War";
-    }
-
-    return "Invalid Patch!";
-}
-
 // Nostalrius
 void ObjectMgr::LoadSpellDisabledEntrys()
 {
@@ -542,7 +511,9 @@ void ObjectMgr::LoadPlayerCacheData()
     m_playerCacheData.clear();
     m_playerNameToGuid.clear();
 
-    QueryResult* result = CharacterDatabase.Query("SELECT guid, race, class, gender, account, name, level, zone FROM characters;");
+    QueryResult* result = CharacterDatabase.Query(
+        //      0     1     2      3       4        5     6      7     8    9           10          11          12           13
+        "SELECT guid, race, class, gender, account, name, level, zone, map, position_x, position_y, position_z, orientation, taxi_path FROM characters;");
 
     uint32 total_count = 0;
 
@@ -560,7 +531,13 @@ void ObjectMgr::LoadPlayerCacheData()
         // guid, race, class, gender, account, name
         std::string name = fields[5].GetCppString();
         if (normalizePlayerName(name))
-            InsertPlayerInCache(fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(), fields[3].GetUInt32(), fields[4].GetUInt32(), name, fields[6].GetUInt32(), fields[7].GetUInt32());
+        {
+            PlayerCacheData* data = InsertPlayerInCache(fields[0].GetUInt32(), fields[1].GetUInt32(), fields[2].GetUInt32(),
+                fields[3].GetUInt32(), fields[4].GetUInt32(), name, fields[6].GetUInt32(), fields[7].GetUInt32());
+
+            UpdatePlayerCachedPosition(data, fields[8].GetUInt32(), fields[9].GetFloat(), fields[10].GetFloat(),
+                fields[11].GetFloat(), fields[12].GetFloat(), !fields[13].GetCppString().empty());
+        }
         ++total_count;
     }
     while (result->NextRow());
@@ -570,7 +547,7 @@ void ObjectMgr::LoadPlayerCacheData()
     delete result;
 }
 
-PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow)
+PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const
 {
     auto itr = m_playerCacheData.find(guidLow);
     if (itr != m_playerCacheData.end())
@@ -578,7 +555,7 @@ PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow)
     return nullptr;
 }
 
-PlayerCacheData* ObjectMgr::GetPlayerDataByName(const std::string& name)
+PlayerCacheData* ObjectMgr::GetPlayerDataByName(const std::string& name) const
 {
     if (ObjectGuid guid = GetPlayerGuidByName(name))
         return GetPlayerDataByGUID(guid.GetCounter());
@@ -624,15 +601,21 @@ uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
 
     uint32 lowguid = guid.GetCounter();
 
-    QueryResult* result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid = '%u'", lowguid);
-
-    if (result)
+    if (PlayerCacheData* data = GetPlayerDataByGUID(lowguid))
     {
-        uint8 pClass = (*result)[0].GetUInt8();
-        delete result;
-        return pClass;
+        return data->uiClass;
     }
+    else
+    {
+        QueryResult* result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid = '%u'", lowguid);
 
+        if (result)
+        {
+            uint8 pClass = (*result)[0].GetUInt8();
+            delete result;
+            return pClass;
+        }
+    }
     return 0;
 }
 
@@ -654,29 +637,89 @@ uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
     return 0;
 }
 
-void ObjectMgr::InsertPlayerInCache(Player *pPlayer)
+PlayerCacheData* ObjectMgr::InsertPlayerInCache(Player *pPlayer)
 {
     auto pSession = pPlayer->GetSession();
     if (!pSession)
-        return;
+        return nullptr;
     auto accountId = pSession->GetAccountId();
-    InsertPlayerInCache(pPlayer->GetGUIDLow(), pPlayer->getRace(), pPlayer->getClass(), pPlayer->getGender(), accountId, pPlayer->GetName(), pPlayer->getLevel(), pPlayer->GetCachedZoneId());
+
+    return InsertPlayerInCache(pPlayer->GetGUIDLow(), pPlayer->getRace(), pPlayer->getClass(), pPlayer->getGender(), accountId, pPlayer->GetName(), pPlayer->getLevel(), pPlayer->GetCachedZoneId());
 }
 
-void ObjectMgr::InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId)
+void ObjectMgr::UpdatePlayerCachedPosition(Player *pPlayer)
+{
+    auto iter = m_playerCacheData.find(pPlayer->GetGUIDLow());
+    PlayerCacheData* data = nullptr;
+    if (iter == m_playerCacheData.end())
+        data = InsertPlayerInCache(pPlayer);
+    else
+        data = iter->second;
+
+    if (!data)
+        return;
+
+    UpdatePlayerCachedPosition(data, pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(),
+        pPlayer->GetPositionZ(), pPlayer->GetOrientation(), pPlayer->IsTaxiFlying());
+}
+
+void ObjectMgr::UpdatePlayerCachedPosition(uint32 lowGuid, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight)
+{
+    auto iter = m_playerCacheData.find(lowGuid);
+    if (iter == m_playerCacheData.end())
+        return;
+
+    UpdatePlayerCachedPosition(iter->second, mapId, posX, posY, posZ, o, inFlight);
+}
+
+void ObjectMgr::UpdatePlayerCachedPosition(PlayerCacheData* data, uint32 mapId, float posX, float posY, float posZ, float o, bool inFlight)
+{
+    data->uiMapId = mapId;
+    data->fPosX = posX;
+    data->fPosY = posY;
+    data->fPosZ = posZ;
+    data->fOrientation = o;
+    data->bInFlight = inFlight;
+}
+
+void ObjectMgr::UpdatePlayerCache(Player* pPlayer)
+{
+    auto iter = m_playerCacheData.find(pPlayer->GetGUIDLow());
+    PlayerCacheData* data = nullptr;
+    if (iter == m_playerCacheData.end())
+        data = InsertPlayerInCache(pPlayer);
+    else
+        data = iter->second;
+
+    if (!data)
+        return;
+    if (pPlayer->GetSession())
+        UpdatePlayerCache(data, pPlayer->getRace(), pPlayer->getClass(), pPlayer->getGender(), pPlayer->GetSession()->GetAccountId(), pPlayer->GetName(), pPlayer->getLevel(), pPlayer->GetCachedZoneId());
+
+    UpdatePlayerCachedPosition(data, pPlayer->GetMapId(), pPlayer->GetPositionX(), pPlayer->GetPositionY(), pPlayer->GetPositionZ(), pPlayer->GetOrientation(), pPlayer->IsTaxiFlying());
+}
+
+void ObjectMgr::UpdatePlayerCache(PlayerCacheData* data, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId)
+{
+    data->uiAccount = accountId;
+    data->uiRace = race;
+    data->uiClass = _class;
+    data->uiGender = gender;
+    data->uiLevel = level;
+    data->sName = name;
+    data->uiZoneId = zoneId;
+}
+
+PlayerCacheData* ObjectMgr::InsertPlayerInCache(uint32 lowGuid, uint32 race, uint32 _class, uint32 gender, uint32 accountId, const std::string& name, uint32 level, uint32 zoneId)
 {
     auto data = new PlayerCacheData;
-    data->uiGuid    = lowGuid;
-    data->uiAccount = accountId;
-    data->uiRace    = race;
-    data->uiClass   = _class;
-    data->uiGender  = gender;
-    data->uiLevel   = level;
-    data->sName     = name;
-    data->uiZoneId  = zoneId;
+    data->uiGuid = lowGuid;
+    UpdatePlayerCache(data, race, _class, gender, accountId, name, level, zoneId);
 
     m_playerCacheData[lowGuid] = data;
     m_playerNameToGuid[name] = lowGuid;
+
+    return data;
 }
 
 void ObjectMgr::DeletePlayerFromCache(uint32 lowGuid)
@@ -699,6 +742,15 @@ void ObjectMgr::ChangePlayerNameInCache(uint32 guidLow, const std::string& oldNa
         m_playerNameToGuid.erase(oldName);
         m_playerNameToGuid[newName] = guidLow;
         itr->second->sName = newName;
+    }
+}
+
+void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheData*>& data) const
+{
+    for (auto iter = m_playerCacheData.cbegin(); iter != m_playerCacheData.cend(); ++iter)
+    {
+        if (iter->second->uiAccount == accountId)
+            data.push_back(iter->second);
     }
 }
 
@@ -1076,6 +1128,16 @@ void ObjectMgr::CheckCreatureTemplates()
                 sLog.outErrorDb("Creature (Entry: %u) has non-existing PetSpellDataId (%u)", cInfo->Entry, cInfo->PetSpellDataId);
         }
 
+        if (cInfo->spells_template)
+        {
+            CreatureSpellsTemplate const* spellsTemplate = GetCreatureSpellsTemplate((cInfo->spells_template));
+            if (!spellsTemplate)
+            {
+                sLog.outErrorDb("Creature (Entry: %u) has non-existing spells template (%u)", cInfo->Entry, cInfo->spells_template);
+                const_cast<CreatureInfo*>(cInfo)->spells_template = 0;
+            }
+        }
+
         for (int j = 0; j < CREATURE_MAX_SPELLS; ++j)
         {
             if (cInfo->spells[j] && !sSpellMgr.GetSpellEntry(cInfo->spells[j]))
@@ -1442,6 +1504,104 @@ void ObjectMgr::LoadCreatureModelInfo()
     }
 
     sLog.outString(">> Loaded %u creature model based info", sCreatureModelStorage.GetRecordCount());
+    sLog.outString();
+}
+
+void ObjectMgr::LoadCreatureSpells()
+{
+    mCreatureSpellsMap.clear(); // for reload case
+
+                                               //       0       1           2               3            4               5                  6                 7                  8
+    QueryResult *result = WorldDatabase.Query("SELECT entry, spellId_1, probability_1, castTarget_1, castFlags_1, delayInitialMin_1, delayInitialMax_1, delayRepeatMin_1, delayRepeatMax_1, "
+                                               //               9           10             11            12              13                14                 15                16
+                                                             "spellId_2, probability_2, castTarget_2, castFlags_2, delayInitialMin_2, delayInitialMax_2, delayRepeatMin_2, delayRepeatMax_2, "
+                                               //              17           18             19            20              21                22                 23                24
+                                                             "spellId_3, probability_3, castTarget_3, castFlags_3, delayInitialMin_3, delayInitialMax_3, delayRepeatMin_3, delayRepeatMax_3, "
+                                               //              25           26             27            28              29                30                 31                32
+                                                             "spellId_4, probability_4, castTarget_4, castFlags_4, delayInitialMin_4, delayInitialMax_4, delayRepeatMin_4, delayRepeatMax_4, "
+                                               //              33           34             35            36              37                38                 39                40
+                                                             "spellId_5, probability_5, castTarget_5, castFlags_5, delayInitialMin_5, delayInitialMax_5, delayRepeatMin_5, delayRepeatMax_5, "
+                                               //              41           42             43            44              45                46                 47                48
+                                                             "spellId_6, probability_6, castTarget_6, castFlags_6, delayInitialMin_6, delayInitialMax_6, delayRepeatMin_6, delayRepeatMax_6, "
+                                               //              49           50             51            52              53                54                 55                56
+                                                             "spellId_7, probability_7, castTarget_7, castFlags_7, delayInitialMin_7, delayInitialMax_7, delayRepeatMin_7, delayRepeatMax_7, "
+                                               //              57           58             59            60              61                62                 63                64
+                                                             "spellId_8, probability_8, castTarget_8, castFlags_8, delayInitialMin_8, delayInitialMax_8, delayRepeatMin_8, delayRepeatMax_8 FROM creature_spells");
+    if (!result)
+    {
+        BarGoLink bar(1);
+
+        bar.step();
+
+        sLog.outString(">> Loaded 0 creature spell templates. DB table `creature_spells` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field* fields = result->Fetch();
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();;
+
+        CreatureSpellsTemplate spellsTemplate;
+
+        for (uint8 i = 0; i < 8; i++)
+        {
+            uint16 spellId = fields[1 + i * 8].GetUInt16();
+            if (spellId)
+            {
+                if (!sSpellMgr.GetSpellEntry(spellId))
+                {
+                    sLog.outErrorDb("Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i);
+                    continue;
+                }
+
+                uint8 probability      = fields[2 + i * 8].GetUInt8();
+
+                if ((probability == 0) || (probability > 100))
+                {
+                    sLog.outErrorDb("Entry %u in table `creature_spells` has invalid probability_%u value %u, setting it to 100 instead.", entry, i, probability);
+                    probability = 100;
+                }
+
+                uint8 castTarget       = fields[3 + i * 8].GetUInt8();
+                uint8 castFlags        = fields[4 + i * 8].GetUInt8();
+
+                // in the database we store timers as seconds
+                // based on screenshot of blizzard creature spells editor
+                uint32 delayInitialMin = fields[5 + i * 8].GetUInt16() * IN_MILLISECONDS;
+                uint32 delayInitialMax = fields[6 + i * 8].GetUInt16() * IN_MILLISECONDS;
+
+                if (delayInitialMin > delayInitialMax)
+                {
+                    sLog.outErrorDb("Entry %u in table `creature_spells` has invalid initial timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i, delayInitialMin, i, delayInitialMax);
+                    continue;
+                }
+
+                uint32 delayRepeatMin  = fields[7 + i * 8].GetUInt16() * IN_MILLISECONDS;
+                uint32 delayRepeatMax  = fields[8 + i * 8].GetUInt16() * IN_MILLISECONDS;
+
+                if (delayRepeatMin > delayRepeatMax)
+                {
+                    sLog.outErrorDb("Entry %u in table `creature_spells` has invalid repeat timers (Min_%u = %u, Max_%u = %u), skipping spell.", entry, i, delayRepeatMin, i, delayRepeatMax);
+                    continue;
+                }
+
+                spellsTemplate.emplace_back(spellId, probability, castTarget, castFlags, delayInitialMin, delayInitialMax, delayRepeatMin, delayRepeatMax);
+            }
+        }
+
+        if (!spellsTemplate.empty())
+            mCreatureSpellsMap.insert(CreatureSpellsMap::value_type(entry, spellsTemplate));
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)mCreatureSpellsMap.size());
     sLog.outString();
 }
 
@@ -7020,6 +7180,7 @@ void ObjectMgr::LoadBroadcastTexts()
 
     sLog.outString(">> Loaded %lu broadcast texts.", (unsigned long)mBroadcastTextLocaleMap.size());
     sLog.outString();
+    delete result;
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
@@ -7091,6 +7252,7 @@ void ObjectMgr::LoadBroadcastTextLocales()
 
     sLog.outString();
     sLog.outString(">> Loaded %u broadcast text locales.", count);
+    delete result;
 }
 
 const char *ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const

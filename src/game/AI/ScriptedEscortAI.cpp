@@ -209,6 +209,9 @@ void npc_escortAI::EnterEvadeMode()
     if (!HasEscortState(STATE_ESCORT_ESCORTING))
         ResetCreature();
 
+    // Reset back to default spells template. This also resets timers.
+    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+
     ReturnToCombatStartPosition();
     Reset();
 }
@@ -338,6 +341,9 @@ void npc_escortAI::UpdateEscortAI(const uint32 uiDiff)
     // Check if we have a current target
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
+
+    if (!m_CreatureSpells.empty())
+        DoSpellTemplateCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }

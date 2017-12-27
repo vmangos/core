@@ -6270,32 +6270,42 @@ uint32 Player::GetRankFromDB(ObjectGuid guid)
 uint32 Player::GetZoneIdFromDB(ObjectGuid guid)
 {
     uint32 lowguid = guid.GetCounter();
-    QueryResult *result = CharacterDatabase.PQuery("SELECT zone FROM characters WHERE guid='%u'", lowguid);
-    if (!result)
-        return 0;
-    Field* fields = result->Fetch();
-    uint32 zone = fields[0].GetUInt32();
-    delete result;
-
-    if (!zone)
+    uint32 zone = 0;
+    if (PlayerCacheData* data = sObjectMgr.GetPlayerDataByGUID(guid))
     {
-        // stored zone is zero, use generic and slow zone detection
-        result = CharacterDatabase.PQuery("SELECT map,position_x,position_y,position_z FROM characters WHERE guid='%u'", lowguid);
+        if (data->uiZoneId)
+            zone = data->uiZoneId;
+        else
+            zone = sTerrainMgr.GetZoneId(data->uiMapId, data->fPosX, data->fPosY, data->fPosZ);
+    }
+    else
+    {
+        QueryResult *result = CharacterDatabase.PQuery("SELECT zone FROM characters WHERE guid='%u'", lowguid);
         if (!result)
             return 0;
-        fields = result->Fetch();
-        uint32 map = fields[0].GetUInt32();
-        float posx = fields[1].GetFloat();
-        float posy = fields[2].GetFloat();
-        float posz = fields[3].GetFloat();
+        Field* fields = result->Fetch();
+        zone = fields[0].GetUInt32();
         delete result;
 
-        zone = sTerrainMgr.GetZoneId(map, posx, posy, posz);
+        if (!zone)
+        {
+            // stored zone is zero, use generic and slow zone detection
+            result = CharacterDatabase.PQuery("SELECT map,position_x,position_y,position_z FROM characters WHERE guid='%u'", lowguid);
+            if (!result)
+                return 0;
+            fields = result->Fetch();
+            uint32 map = fields[0].GetUInt32();
+            float posx = fields[1].GetFloat();
+            float posy = fields[2].GetFloat();
+            float posz = fields[3].GetFloat();
+            delete result;
 
-        if (zone > 0)
-            CharacterDatabase.PExecute("UPDATE characters SET zone='%u' WHERE guid='%u'", zone, lowguid);
+            zone = sTerrainMgr.GetZoneId(map, posx, posy, posz);
+
+            if (zone > 0)
+                CharacterDatabase.PExecute("UPDATE characters SET zone='%u' WHERE guid='%u'", zone, lowguid);
+        }
     }
-
     return zone;
 }
 
@@ -6303,15 +6313,22 @@ uint32 Player::GetLevelFromDB(ObjectGuid guid)
 {
     uint32 lowguid = guid.GetCounter();
 
-    QueryResult *result = CharacterDatabase.PQuery("SELECT level FROM characters WHERE guid='%u'", lowguid);
-    if (!result)
-        return 0;
+    if (PlayerCacheData* data = sObjectMgr.GetPlayerDataByGUID(lowguid))
+    {
+        return data->uiLevel;
+    }
+    else
+    {
+        QueryResult *result = CharacterDatabase.PQuery("SELECT level FROM characters WHERE guid='%u'", lowguid);
+        if (!result)
+            return 0;
 
-    Field* fields = result->Fetch();
-    uint32 level = fields[0].GetUInt32();
-    delete result;
+        Field* fields = result->Fetch();
+        uint32 level = fields[0].GetUInt32();
+        delete result;
 
-    return level;
+        return level;
+    }
 }
 
 void Player::DismountCheck()
@@ -10414,6 +10431,8 @@ void Player::MoveItemToInventory(ItemPosCountVec const& dest, Item* pItem, bool 
     }
 }
 
+// It should be assumed that the item is deleted after calling this. No further
+// access to any item pointer referencing the item in this slot can be performed
 void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
 {
     Item *pItem = GetItemByPos(bag, slot);
@@ -10480,11 +10499,6 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             pItem->DestroyForPlayer(this);
         }
 
-        //pItem->SetOwnerGUID(0);
-        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
-        pItem->SetSlot(NULL_SLOT);
-        pItem->SetState(ITEM_REMOVED, this);
-
         // If destroying a charter, destroy the petition too
         if (pItem->IsCharter())
         {
@@ -10492,6 +10506,12 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
             if (Petition* petition = sGuildMgr.GetPetitionById(petitionId))
                 sGuildMgr.DeletePetition(petition);
         }
+
+        //pItem->SetOwnerGUID(0);
+        pItem->SetGuidValue(ITEM_FIELD_CONTAINED, ObjectGuid());
+        pItem->SetSlot(NULL_SLOT);
+        // NOTE: Will delete the data pointed to by pItem if it is ITEM_NEW
+        pItem->SetState(ITEM_REMOVED, this);
     }
 }
 
@@ -14165,20 +14185,32 @@ void Player::_LoadBGData(QueryResult* result)
 
 bool Player::LoadPositionFromDB(ObjectGuid guid, uint32& mapid, float& x, float& y, float& z, float& o, bool& in_flight)
 {
-    QueryResult *result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'", guid.GetCounter());
-    if (!result)
-        return false;
+    if (PlayerCacheData* data = sObjectMgr.GetPlayerDataByGUID(guid.GetCounter()))
+    {
+        x = data->fPosX;
+        y = data->fPosY;
+        z = data->fPosZ;
+        o = data->fOrientation;
+        mapid = data->uiMapId;
+        in_flight = data->bInFlight;
+    }
+    else
+    {
+        QueryResult *result = CharacterDatabase.PQuery("SELECT position_x,position_y,position_z,orientation,map,taxi_path FROM characters WHERE guid = '%u'", guid.GetCounter());
+        if (!result)
+            return false;
 
-    Field *fields = result->Fetch();
+        Field *fields = result->Fetch();
 
-    x = fields[0].GetFloat();
-    y = fields[1].GetFloat();
-    z = fields[2].GetFloat();
-    o = fields[3].GetFloat();
-    mapid = fields[4].GetUInt32();
-    in_flight = !fields[5].GetCppString().empty();
+        x = fields[0].GetFloat();
+        y = fields[1].GetFloat();
+        z = fields[2].GetFloat();
+        o = fields[3].GetFloat();
+        mapid = fields[4].GetUInt32();
+        in_flight = !fields[5].GetCppString().empty();
 
-    delete result;
+        delete result;
+    }
     return true;
 }
 

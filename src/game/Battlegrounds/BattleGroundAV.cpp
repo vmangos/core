@@ -308,14 +308,14 @@ void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
         case BG_AV_BOSS_A:
             CastSpellOnTeam(BG_AV_BOSS_KILL_QUEST_SPELL, HORDE);   // this is a spell which finishes a quest where a player has to kill the boss
             RewardReputationToTeam(BG_AV_FACTION_H, m_RepBoss, HORDE);
-            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_BOSS), HORDE);
+            RewardHonorToTeam(uint32(GetBonusHonorFromKill(BG_AV_KILL_BOSS) * GetHonorModifier()), HORDE);
             SendYellToAll(LANG_BG_AV_A_GENERAL_DEAD, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0));
             EndBattleGround(HORDE);
             break;
         case BG_AV_BOSS_H:
             CastSpellOnTeam(BG_AV_BOSS_KILL_QUEST_SPELL, ALLIANCE); // this is a spell which finishes a quest where a player has to kill the boss
             RewardReputationToTeam(BG_AV_FACTION_A, m_RepBoss, ALLIANCE);
-            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_BOSS), ALLIANCE);
+            RewardHonorToTeam(uint32(GetBonusHonorFromKill(BG_AV_KILL_BOSS) * GetHonorModifier()), ALLIANCE);
             SendYellToAll(LANG_BG_AV_H_GENERAL_DEAD, LANG_UNIVERSAL, GetSingleCreatureGuid(BG_AV_HERALD, 0));
             EndBattleGround(ALLIANCE);
             break;
@@ -338,46 +338,46 @@ void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
             SpawnEvent(BG_AV_NodeEventCaptainDead_H, 0, true, true);
             break;
         case BG_AV_COMMANDER_A_MORTIMER:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
-            SetSpawnEventMode(BG_AV_COMMANDER_A_MORTIMER, 0, RESPAWN_STOP);
+            RewardReputationToTeam(BG_AV_FACTION_H, m_RepCommander, HORDE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), HORDE);
+            SetSpawnEventMode(BG_AV_COMMANDER_A_MORTIMER, 0, RESPAWN_STOP); // despawn mobs
             break;
         case BG_AV_COMMANDER_A_DUFFY:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
-            SetSpawnEventMode(BG_AV_COMMANDER_A_DUFFY, 0, RESPAWN_STOP); // despawn mobs
+            RewardReputationToTeam(BG_AV_FACTION_H, m_RepCommander, HORDE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), HORDE);
+            SetSpawnEventMode(BG_AV_COMMANDER_A_DUFFY, 0, RESPAWN_STOP);
             break;
         case BG_AV_COMMANDER_A_KARLPHILIPS:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
+            RewardReputationToTeam(BG_AV_FACTION_H, m_RepCommander, HORDE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), HORDE);
             SetSpawnEventMode(BG_AV_COMMANDER_A_KARLPHILIPS, 0, RESPAWN_STOP);
             CompleteQuestForAll(7281);
             break;
         case BG_AV_COMMANDER_A_RANDOLPH:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
+            RewardReputationToTeam(BG_AV_FACTION_H, m_RepCommander, HORDE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), HORDE);
             SetSpawnEventMode(BG_AV_COMMANDER_A_RANDOLPH, 0, RESPAWN_STOP);
             break;
         case BG_AV_COMMANDER_H_DARDOSH:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
+            RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
             SetSpawnEventMode(BG_AV_COMMANDER_H_DARDOSH, 0, RESPAWN_STOP);
             break;
         case BG_AV_COMMANDER_H_LOUISPHILIPS:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
+            RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
             SetSpawnEventMode(BG_AV_COMMANDER_H_LOUISPHILIPS, 0, RESPAWN_STOP);
             CompleteQuestForAll(7282);
             break;
         case BG_AV_COMMANDER_H_MULFORT:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
+            RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
             SetSpawnEventMode(BG_AV_COMMANDER_H_MULFORT, 0, RESPAWN_STOP);
             break;
         case BG_AV_COMMANDER_H_MALGOR:
-            //RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
-            //RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
-            SetSpawnEventMode(BG_AV_COMMANDER_H_MALGOR, 0, RESPAWN_STOP); // despawn mobs
+            RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
+            SetSpawnEventMode(BG_AV_COMMANDER_H_MALGOR, 0, RESPAWN_STOP);
             break;
         case BG_AV_MINE_BOSSES_NORTH:
             if (killer->GetTeam() == ALLIANCE)
@@ -414,6 +414,14 @@ void BattleGroundAV::HandleKillUnit(Creature *creature, Player *killer)
         case BG_AV_EXPLOSIVES_EXPERT_H:
             CompleteQuestForAll(7368);
             SetSpawnEventMode(BG_AV_EXPLOSIVES_EXPERT_H, 0, RESPAWN_STOP);
+            break;
+        case BG_AV_LIEUTENANT_A:
+            RewardReputationToTeam(BG_AV_FACTION_H, m_RepCommander, HORDE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), HORDE);
+            break;
+        case BG_AV_LIEUTENANT_H:
+            RewardReputationToTeam(BG_AV_FACTION_A, m_RepCommander, ALLIANCE);
+            RewardHonorToTeam(GetBonusHonorFromKill(BG_AV_KILL_COMMANDER), ALLIANCE);
             break;
     }
 }
@@ -936,7 +944,8 @@ void BattleGroundAV::EndBattleGround(Team winner)
 
     // graves all controlled
     for (BG_AV_Nodes i = BG_AV_NODES_FIRSTAID_STATION; i < BG_AV_NODES_MAX; ++i)
-        if (m_Nodes[i].State == POINT_CONTROLLED && m_Nodes[i].Owner != BG_AV_TEAM_NEUTRAL)
+        if (m_Nodes[i].State == POINT_CONTROLLED && m_Nodes[i].Owner != BG_AV_TEAM_NEUTRAL &&
+            i != BG_AV_NODES_FROSTWOLF_HUT && i != BG_AV_NODES_FIRSTAID_STATION)
             ++graves_owned[m_Nodes[i].Owner];
 
     for (uint32 i = 0; i < BG_AV_MAX_MINES; ++i)
@@ -955,9 +964,15 @@ void BattleGroundAV::EndBattleGround(Team winner)
         }
         DEBUG_LOG("BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, tower_survived[i], GetBonusHonorFromKill(tower_survived[i] * BG_AV_KILL_SURVIVING_TOWER), tower_survived[i] * BG_AV_REP_SURVIVING_TOWER);
         if (graves_owned[i])
+        {
             RewardReputationToTeam(faction[i], graves_owned[i] * m_RepOwnedGrave, team[i]);
+            RewardHonorToTeam(uint32(GetBonusHonorFromKill(graves_owned[i] * BG_AV_KILL_SURVIVING_GRAVE) * GetHonorModifier()), team[i]);
+        }
         if (mines_owned[i])
+        {
             RewardReputationToTeam(faction[i], mines_owned[i] * m_RepOwnedMine, team[i]);
+            RewardHonorToTeam(uint32(GetBonusHonorFromKill(mines_owned[i] * BG_AV_KILL_SURVIVING_MINE)  * GetHonorModifier()), team[i]);
+        }
         // captain survived?:
         if (!IsActiveEvent(BG_AV_NodeEventCaptainDead_A + GetTeamIndexByTeamId(team[i]), 0))
         {
@@ -1555,14 +1570,15 @@ void BattleGroundAV::Reset()
     // set the reputation and honor variables:
     bool isBGWeekend = BattleGroundMgr::IsBGWeekend(GetTypeID());
 
-    m_HonorMapComplete    = (isBGWeekend) ? BG_AV_KILL_MAP_COMPLETE_HOLIDAY : BG_AV_KILL_MAP_COMPLETE;
-    m_RepTowerDestruction = (isBGWeekend) ? BG_AV_REP_TOWER_HOLIDAY         : BG_AV_REP_TOWER;
-    m_RepCaptain          = (isBGWeekend) ? BG_AV_REP_CAPTAIN_HOLIDAY       : BG_AV_REP_CAPTAIN;
-    m_RepBoss             = (isBGWeekend) ? BG_AV_REP_BOSS_HOLIDAY          : BG_AV_REP_BOSS;
-    m_RepOwnedGrave       = (isBGWeekend) ? BG_AV_REP_OWNED_GRAVE_HOLIDAY   : BG_AV_REP_OWNED_GRAVE;
-    m_RepSurviveCaptain   = (isBGWeekend) ? BG_AV_REP_SURVIVING_CAPTAIN_HOLIDAY : BG_AV_REP_SURVIVING_CAPTAIN;
-    m_RepSurviveTower     = (isBGWeekend) ? BG_AV_REP_SURVIVING_TOWER_HOLIDAY : BG_AV_REP_SURVIVING_TOWER;
-    m_RepOwnedMine        = (isBGWeekend) ? BG_AV_REP_OWNED_MINE_HOLIDAY    : BG_AV_REP_OWNED_MINE;
+    m_HonorMapComplete    = (isBGWeekend) ? BG_AV_KILL_MAP_COMPLETE_HOLIDAY      : BG_AV_KILL_MAP_COMPLETE;
+    m_RepTowerDestruction = (isBGWeekend) ? BG_AV_REP_TOWER_HOLIDAY              : BG_AV_REP_TOWER;
+    m_RepCommander        = (isBGWeekend) ? BG_AV_REP_COMMANDER_HOLIDAY          : BG_AV_REP_COMMANDER;
+    m_RepCaptain          = (isBGWeekend) ? BG_AV_REP_CAPTAIN_HOLIDAY            : BG_AV_REP_CAPTAIN;
+    m_RepBoss             = (isBGWeekend) ? BG_AV_REP_BOSS_HOLIDAY               : BG_AV_REP_BOSS;
+    m_RepOwnedGrave       = (isBGWeekend) ? BG_AV_REP_OWNED_GRAVE_HOLIDAY        : BG_AV_REP_OWNED_GRAVE;
+    m_RepSurviveCaptain   = (isBGWeekend) ? BG_AV_REP_SURVIVING_CAPTAIN_HOLIDAY  : BG_AV_REP_SURVIVING_CAPTAIN;
+    m_RepSurviveTower     = (isBGWeekend) ? BG_AV_REP_SURVIVING_TOWER_HOLIDAY    : BG_AV_REP_SURVIVING_TOWER;
+    m_RepOwnedMine        = (isBGWeekend) ? BG_AV_REP_OWNED_MINE_HOLIDAY         : BG_AV_REP_OWNED_MINE;
 
     for (uint8 i = 0; i < BG_TEAMS_COUNT; i++)
     {
@@ -1582,14 +1598,18 @@ void BattleGroundAV::Reset()
         m_Mine_Timer[i] = BG_AV_MINE_TICK_TIMER;
     }
 
-    m_ActiveEvents[BG_AV_CAPTAIN_A]         = 0;
-    m_ActiveEvents[BG_AV_CAPTAIN_H]         = 0;
-    m_ActiveEvents[BG_AV_HERALD]            = 0;
-    m_ActiveEvents[BG_AV_SNIVVLE]           = 0;
-    m_ActiveEvents[BG_AV_BOSS_A]            = 0;
-    m_ActiveEvents[BG_AV_BOSS_H]            = 0;
-    m_ActiveEvents[BG_AV_LANDMINES_ALLIANCE]= 0;
-    m_ActiveEvents[BG_AV_LANDMINES_HORDE]   = 0;
+    m_ActiveEvents[BG_AV_CAPTAIN_A]           = 0;
+    m_ActiveEvents[BG_AV_CAPTAIN_H]           = 0;
+    m_ActiveEvents[BG_AV_HERALD]              = 0;
+    m_ActiveEvents[BG_AV_SNIVVLE]             = 0;
+    m_ActiveEvents[BG_AV_BOSS_A]              = 0;
+    m_ActiveEvents[BG_AV_BOSS_H]              = 0;
+    m_ActiveEvents[BG_AV_LANDMINES_ALLIANCE]  = 0;
+    m_ActiveEvents[BG_AV_LANDMINES_HORDE]     = 0;
+    m_ActiveEvents[BG_AV_EXPLOSIVES_EXPERT_A] = 0;
+    m_ActiveEvents[BG_AV_EXPLOSIVES_EXPERT_H] = 0;
+    m_ActiveEvents[BG_AV_LIEUTENANT_A]        = 0;
+    m_ActiveEvents[BG_AV_LIEUTENANT_H]        = 0;
 
     for (BG_AV_Nodes i = BG_AV_NODES_DUNBALDAR_SOUTH; i <= BG_AV_NODES_FROSTWOLF_WTOWER; ++i)  // towers
         m_ActiveEvents[BG_AV_COMMANDER_A_MORTIMER + i - BG_AV_NODES_DUNBALDAR_SOUTH] = 0; // Commanders are alive

@@ -492,17 +492,21 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
 
 bool ProcessEventId_event_summon_gahzranka(uint32 uiEventId, Object* pSource, Object* pTarget, bool bIsStart)
 {
-    if (!pSource->IsPlayer())
+    // No target or source, block event
+    if (!pSource)
+        return true;
+
+    Player* pPlayer = pSource->ToPlayer();
+    if (!pPlayer)
         return false;
 
-    if (ScriptedInstance* m_pInstance = (ScriptedInstance*)((Player*)pSource)->GetInstanceData())
+    if (ScriptedInstance* m_pInstance = dynamic_cast<ScriptedInstance*>(pPlayer->GetInstanceData()))
     {
         // return if already summoned
         if (m_pInstance->GetData(TYPE_GAHZRANKA) == DONE)
             return false;
 
-        if (pSource)
-            ((Player*)pSource)->CastSpell(((Player*)pSource), 12816, true);
+        pPlayer->CastSpell(pPlayer, 12816, true);
 
         if (Creature* pCreature = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_GAHZRANKA)))
         {

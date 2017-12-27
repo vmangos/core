@@ -121,34 +121,8 @@ enum EventAI_ActionType
     ACTION_T_CHANGE_MOVEMENT            = 48,               // MovementType, WanderDistance, unused
     ACTION_T_SET_VARIABLE               = 49,               // VariableEntry, Value, unused
     ACTION_T_EVENT_SCRIPT               = 50,               // EventScriptId
+    ACTION_T_SET_SPELLS_TEMPLATE        = 51,               // Entry from creature_spells table.
     ACTION_T_END,
-};
-
-enum Target
-{
-    //Self (m_creature)
-    TARGET_T_SELF = 0,                                      //Self cast
-
-    //Hostile targets (if pet then returns pet owner)
-    TARGET_T_HOSTILE,                                       //Our current target (ie: highest aggro)
-    TARGET_T_HOSTILE_SECOND_AGGRO,                          //Second highest aggro (generaly used for cleaves and some special attacks)
-    TARGET_T_HOSTILE_LAST_AGGRO,                            //Dead last on aggro (no idea what this could be used for)
-    TARGET_T_HOSTILE_RANDOM,                                //Just any random target on our threat list
-    TARGET_T_HOSTILE_RANDOM_NOT_TOP,                        //Any random target except top threat
-
-    //Invoker targets (if pet then returns pet owner)
-    TARGET_T_ACTION_INVOKER,                                //Unit who caused this Event to occur (only works for EVENT_T_AGGRO, EVENT_T_KILL, EVENT_T_DEATH, EVENT_T_SPELLHIT, EVENT_T_OOC_LOS, EVENT_T_FRIENDLY_HP, EVENT_T_FRIENDLY_IS_CC, EVENT_T_FRIENDLY_MISSING_BUFF)
-
-    //Hostile targets (including pets)
-    TARGET_T_HOSTILE_WPET,                                  //Current target (can be a pet)
-    TARGET_T_HOSTILE_WPET_SECOND_AGGRO,                     //Second highest aggro (generaly used for cleaves and some special attacks)
-    TARGET_T_HOSTILE_WPET_LAST_AGGRO,                       //Dead last on aggro (no idea what this could be used for)
-    TARGET_T_HOSTILE_WPET_RANDOM,                           //Just any random target on our threat list
-    TARGET_T_HOSTILE_WPET_RANDOM_NOT_TOP,                   //Any random target except top threat
-
-    TARGET_T_ACTION_INVOKER_WPET,
-
-    TARGET_T_END
 };
 
 enum EventFlags
@@ -420,6 +394,11 @@ struct CreatureEventAI_Action
         {
             uint32 eventScriptId;
         } eventScript;
+        // ACTION_T_SET_SPELLS_TEMPLATE                     = 51
+        struct
+        {
+            uint32 spellsTemplateId;
+        } setSpellsTemplate;
         // RAW
         struct
         {

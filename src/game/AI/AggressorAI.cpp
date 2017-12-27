@@ -68,11 +68,15 @@ AggressorAI::MoveInLineOfSight(Unit *u)
 
 
 void
-AggressorAI::UpdateAI(const uint32 /*diff*/)
+AggressorAI::UpdateAI(const uint32 uiDiff)
 {
     // update i_victimGuid if m_creature->getVictim() !=0 and changed
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
+
+    if (!m_CreatureSpells.empty())
+        DoSpellTemplateCasts(uiDiff);
+
     DoMeleeAttackIfReady();
 }
 

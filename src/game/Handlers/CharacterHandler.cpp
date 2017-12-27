@@ -291,14 +291,15 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     bool have_same_race = false;
     if (!AllowTwoSideAccounts || skipCinematics == CINEMATICS_SKIP_SAME_RACE)
     {
-        QueryResult *result2 = CharacterDatabase.PQuery("SELECT race FROM characters WHERE account = '%u' %s",
-                               GetAccountId(), (skipCinematics == CINEMATICS_SKIP_SAME_RACE) ? "" : "LIMIT 1");
-        if (result2)
+        std::list<PlayerCacheData*> characters;
+        sObjectMgr.GetPlayerDataForAccount(GetAccountId(), characters);
+
+        if (characters.size() > 0)
         {
+            PlayerCacheData* cData = characters.front();
             Team team_ = Player::TeamForRace(race_);
 
-            Field* field = result2->Fetch();
-            uint8 acc_race  = field[0].GetUInt32();
+            uint8 acc_race = cData->uiRace;
 
             // need to check team only for first character
             // TODO: what to if account already has characters of both races?
@@ -308,24 +309,20 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
                 {
                     data << (uint8)CHAR_CREATE_PVP_TEAMS_VIOLATION;
                     SendPacket(&data);
-                    delete result2;
                     return;
                 }
             }
 
             // search same race for cinematic or same class if need
             // TODO: check if cinematic already shown? (already logged in?; cinematic field)
-            while (skipCinematics == CINEMATICS_SKIP_SAME_RACE && !have_same_race)
+            std::list<PlayerCacheData*>::iterator iter = characters.begin();
+            while (iter != characters.end() && skipCinematics == CINEMATICS_SKIP_SAME_RACE && !have_same_race)
             {
-                if (!result2->NextRow())
-                    break;
-
-                field = result2->Fetch();
-                acc_race = field[0].GetUInt32();
+                acc_race = (*iter)->uiRace;
 
                 have_same_race = race_ == acc_race;
+                ++iter;
             }
-            delete result2;
         }
     }
 
@@ -353,6 +350,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     masterPlayer.SaveToDB();
 
     sObjectMgr.InsertPlayerInCache(pNewChar);
+    sObjectMgr.UpdatePlayerCachedPosition(pNewChar);
     _charactersCount += 1;
 
     LoginDatabase.PExecute("DELETE FROM realmcharacters WHERE acctid= '%u' AND realmid = '%u'", GetAccountId(), realmID);
@@ -769,6 +767,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
             pCurrChar->KillPlayer();
     }
     pCurrChar->restorePendingTeleport();
+
+    sObjectMgr.UpdatePlayerCachedPosition(pCurrChar);
 
     // Update warden speeds
     //if (GetWarden())

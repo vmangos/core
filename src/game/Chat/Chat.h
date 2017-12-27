@@ -260,6 +260,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleEscortModifyWpCommand(char *args);
         bool HandleEscortClearWpCommand(char *args);
         bool HandleEscortCreateCommand(char *args);
+        bool HandleEscortShowWpCommand(char *args);
+        bool HandleEscortHideWpCommand(char *args);
         // World Gestion
         bool HandleWorldUpdateCommand(char *args);
         bool HandleWorldTestCommand(char *args);
@@ -657,9 +659,9 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadCommandCommand(char* args);
         bool HandleReloadBattleEventCommand(char* args);
         bool HandleReloadConditionsCommand(char* args);
+        bool HandleReloadCreatureSpellsCommand(char* args);
         bool HandleReloadCreatureQuestRelationsCommand(char* args);
         bool HandleReloadCreatureQuestInvRelationsCommand(char* args);
-        bool HandleReloadDbScriptStringCommand(char* args);
         bool HandleReloadGameGraveyardZoneCommand(char* args);
         bool HandleReloadGameObjectScriptsCommand(char* args);
         bool HandleReloadGameTeleCommand(char* args);

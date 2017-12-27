@@ -799,6 +799,12 @@ struct Formation
     float distance, angle;
 };
 
+struct CaravanMember
+{
+    Coords coords;
+    Formation form;
+};
+
 const Coords Ambusher[] = 
 {
     { NPC_DOOMWARDER,       -1814.41f, 1983.18f, 58.9549f, 0.0f },
@@ -823,31 +829,23 @@ const Coords Ambusher[] =
     { NPC_KOLKAR_WAYLAYER,  -1073.62f, 1186.33f, 89.7398f, 0.0f }
 };
 
-const Coords Caravan[] = 
+const CaravanMember Caravan[] =
 {
-    { NPC_CARAVAN_KODO,     -1887.26f, 2465.12f, 59.8224f, 4.48f },
-    { NPC_RIGGER_GIZELTON,  -1883.63f, 2471.68f, 59.8224f, 4.48f },
-    { NPC_CARAVAN_KODO,     -1882.11f, 2476.80f, 59.8224f, 4.48f }
-};
-
-const Formation CaravanFormation[] =
-{
-    { 32.0f, 6.28f },
-    { 26.0f, 3.14f },
-    { 18.0f, 3.14f },
-    { 8.0f,  3.14f }
+    { NPC_CARAVAN_KODO,     -1887.26f, 2465.12f, 59.8224f, 4.48f, { 26.0f, 3.14f } },
+    { NPC_RIGGER_GIZELTON,  -1883.63f, 2471.68f, 59.8224f, 4.48f, { 18.0f, 3.14f } },
+    { NPC_CARAVAN_KODO,     -1882.11f, 2476.80f, 59.8224f, 4.48f, { 8.0f,  3.14f } }
 };
 
 struct npc_cork_gizeltonAI : npc_escortAI
 {
+    const Formation FORMATION_CORK = { 32.0f, 6.28f };
+
     explicit npc_cork_gizeltonAI(Creature* pCreature) : npc_escortAI(pCreature)
     {
-        npc_cork_gizeltonAI::Reset();
-        npc_cork_gizeltonAI::ResetCreature();
+        ResetCreature();
     }
 
-    std::list<ObjectGuid> m_lCaravanGuid;
-    ObjectGuid m_currentGuid;
+    std::vector<ObjectGuid> m_lCaravanGuid;
     ObjectGuid m_RiggerGuid;
     ObjectGuid m_playerGuid;
     uint8 m_uiEnemiesCount;
@@ -870,7 +868,6 @@ struct npc_cork_gizeltonAI : npc_escortAI
     void ResetCreature() override
     {
         m_lCaravanGuid.clear();
-        m_currentGuid.Clear();
         m_RiggerGuid.Clear();
         m_playerGuid.Clear();
         m_uiEnemiesCount = 0;
@@ -889,17 +886,17 @@ struct npc_cork_gizeltonAI : npc_escortAI
     void SummonCaravan()
     {
         m_lCaravanGuid.push_back(m_creature->GetObjectGuid());
-        AddToFormation(m_creature, 0);
+        AddToFormation(m_creature, FORMATION_CORK);
 
-        for (uint8 i = 0; i < 3; ++i)
+        for (const auto &member : Caravan)
         {
-            if (auto pCreature = m_creature->SummonCreature(Caravan[i].entry,
-                Caravan[i].x,
-                Caravan[i].y,
-                Caravan[i].z,
-                Caravan[i].o, TEMPSUMMON_DEAD_DESPAWN, 30000, true))
+            if (const auto pCreature = m_creature->SummonCreature(member.coords.entry,
+                member.coords.x,
+                member.coords.y,
+                member.coords.z,
+                member.coords.o, TEMPSUMMON_DEAD_DESPAWN, 30000, true))
             {
-                AddToFormation(pCreature, i + 1);
+                AddToFormation(pCreature, member.form);
             }
             else
             {
@@ -916,10 +913,13 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void FailEscort()
     {
-        if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
-            pPlayer->FailQuest(m_bRigger ? QUEST_BOTTOM : QUEST_TOP);
-
         DespawnCaravan();
+
+        if (!m_playerGuid)
+            return;
+
+        if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
+            pPlayer->GroupEventFailHappens(m_bRigger ? QUEST_BOTTOM : QUEST_TOP);
     }
 
     void DespawnCaravan()
@@ -929,7 +929,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
             if (*itr != m_creature->GetObjectGuid())
             {
                 if (auto pKillMe = m_creature->GetMap()->GetCreature(*itr))
-                    pKillMe->RemoveFromWorld();
+                    pKillMe->DespawnOrUnsummon();
             }
         }
 
@@ -1017,9 +1017,9 @@ struct npc_cork_gizeltonAI : npc_escortAI
         }
     }
 
-    void AddToFormation(Creature* pWho, uint8 index) const
+    void AddToFormation(Creature* const pWho, const Formation &form) const
     {
-        pWho->JoinCreatureGroup(m_creature, CaravanFormation[index].distance, CaravanFormation[index].angle,
+        pWho->JoinCreatureGroup(m_creature, form.distance, form.angle,
             OPTION_FORMATION_MOVE | OPTION_AGGRO_TOGETHER);
     }
 
@@ -1027,48 +1027,39 @@ struct npc_cork_gizeltonAI : npc_escortAI
     {
         switch (pSummoned->GetEntry())
         {
-        case NPC_RIGGER_GIZELTON:
-            m_RiggerGuid = pSummoned->GetObjectGuid();
-            m_currentGuid = m_RiggerGuid;
-        case NPC_CARAVAN_KODO:
-            m_lCaravanGuid.push_back(pSummoned->GetObjectGuid());
-            return;
-        }
+            case NPC_RIGGER_GIZELTON:
+                m_RiggerGuid = pSummoned->GetObjectGuid();
+                pSummoned->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+            case NPC_CARAVAN_KODO:
+                m_lCaravanGuid.push_back(pSummoned->GetObjectGuid());
+                break;
+            default:
+                ++m_uiEnemiesCount;
 
-        ++m_uiEnemiesCount;
+                // pick random caravan target
+                uint8 targetIndex = urand(0, m_lCaravanGuid.size() - 1);
 
-        // pick random caravan target
-        uint8 targetIndex = urand(0, 3);
+                auto targetGuid = m_lCaravanGuid[targetIndex];
 
-        if (!targetIndex)
-            pSummoned->AI()->AttackStart(m_creature);
-        else
-        {
-            if (m_lCaravanGuid.size() > targetIndex)
-            {
-                auto itr = m_lCaravanGuid.begin();
-                std::advance(itr, targetIndex);
-
-                if (auto pCreature = m_creature->GetMap()->GetCreature(*itr))
+                if (auto pCreature = m_creature->GetMap()->GetCreature(targetGuid))
                     pSummoned->AI()->AttackStart(pCreature);
-            }            
-        }       
+        }
     }
 
     void SummonedCreatureJustDied(Creature* pSummoned) override
     {
         switch (pSummoned->GetEntry())
         {
-        case NPC_RIGGER_GIZELTON:
-        case NPC_CARAVAN_KODO:
-            FailEscort();
-            return;
+            case NPC_RIGGER_GIZELTON:
+            case NPC_CARAVAN_KODO:
+                FailEscort();
+                break;
+            default:
+                --m_uiEnemiesCount;
+
+                if (!m_uiEnemiesCount)
+                    SetEscortPaused(false);
         }
-
-        --m_uiEnemiesCount;
-
-        if (!m_uiEnemiesCount)
-            SetEscortPaused(false);
     }
 
     void PlayerHere(Player* pPlayer)
@@ -1108,10 +1099,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
     void CaravanWalk(bool walk) const
     {
-        auto pLeader = m_bRigger ? m_creature->GetMap()->GetCreature(m_RiggerGuid) : m_creature;
-
-        if (pLeader)
-            pLeader->SetWalk(walk);
+        m_creature->SetWalk(walk);
     }
 
     void DoVendor(bool visible) const
@@ -1153,7 +1141,7 @@ struct npc_cork_gizeltonAI : npc_escortAI
             SetEscortPaused(true);
             Ambush(uiPoint);
             break;
-        case POINT_BOT_COMPLETE:           
+        case POINT_BOT_COMPLETE:
         case POINT_TOP_COMPLETE:
             {
             DoTalk(CaravanTalk[m_bRigger ? 0 : 1].onComplete);
@@ -1161,9 +1149,10 @@ struct npc_cork_gizeltonAI : npc_escortAI
             if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
             {
                 if (pPlayer->IsInRange(m_creature, 0.0f, 100.0f))
-                    pPlayer->GroupEventHappens(m_bRigger ? QUEST_BOTTOM : QUEST_TOP, m_creature);                
+                    pPlayer->GroupEventHappens(m_bRigger ? QUEST_BOTTOM : QUEST_TOP, m_creature);
             }
 
+            m_playerGuid.Clear();
             CaravanFaction(false);
             CaravanWalk(false);
             m_bRigger = !m_bRigger;

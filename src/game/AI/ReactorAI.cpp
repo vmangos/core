@@ -62,13 +62,16 @@ ReactorAI::AttackStart(Unit *p)
 }
 
 void
-ReactorAI::UpdateAI(const uint32 /*time_diff*/)
+ReactorAI::UpdateAI(const uint32 uiDiff)
 {
     // update i_victimGuid if i_creature.getVictim() !=0 and changed
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
     i_victimGuid = m_creature->getVictim()->GetObjectGuid();
+
+    if (!m_CreatureSpells.empty())
+        DoSpellTemplateCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }
