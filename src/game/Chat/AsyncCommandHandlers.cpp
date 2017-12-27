@@ -284,6 +284,10 @@ void PlayerAccountSearchDisplayTask::run()
 
             PlayerSearchHandler::ShowPlayerListHelper(query, cHandler, count, holder->GetLimit(), true);
         }
+
+        // Don't show any further accounts now that we're at the limit
+        if (count == holder->GetLimit())
+            break;
     }
 
     if (count == 0)

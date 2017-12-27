@@ -807,14 +807,22 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         eventPhase = 0;
         deadKolkarCount = 0;
         phaseTimer = 120000;
+
+        ResetVars();
     }
     void Reset()
+    {
+
+    }
+
+    void ResetVars()
     {
         memset(&GuidKolkar, 0x0, sizeof(GuidKolkar));
         memset(&TimerTable, 0x0, sizeof(TimerTable));
         memset(&GuidPhaseOneGuards, 0x0, sizeof(GuidPhaseOneGuards));
         memset(&GuidPhaseTwoGuards, 0x0, sizeof(GuidPhaseTwoGuards));
         kromzarGUID = ObjectGuid();
+        AllKolkars.clear();
     }
     uint8 eventPhase;//0:nothing, 1: phase1 being the first half.
     //2: phase2 being the second half 3: phase3 being the boss
@@ -941,6 +949,8 @@ struct npc_regthar_deathgateAI : public ScriptedAI
                 static_cast<TemporarySummon*>(pDefender)->UnSummon();
             AllKolkars.pop_front();
         }
+
+        ResetVars();
     }
     void SummonedCreatureJustDied(Creature* pSummoned)
     {
@@ -1023,7 +1033,7 @@ struct npc_regthar_deathgateAI : public ScriptedAI
         {
             std::list<GameObject*> banners;
 
-            GetGameObjectListWithEntryInGrid(banners, pCreature, GO_KOLKAR_BANNER, 5.0f);
+            GetGameObjectListWithEntryInGrid(banners, pCreature, GO_KOLKAR_BANNER, 15.0f);
 
             for (auto banner : banners)
             {
