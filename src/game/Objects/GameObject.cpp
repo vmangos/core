@@ -804,9 +804,11 @@ void GameObject::SaveToDB(uint32 mapid)
        << data.spawntimesecsmin << ", " // PRESERVE SPAWNED BY DEFAULT
        << data.spawntimesecsmax << ", "
        << uint32(GetGoAnimProgress()) << ", "
-       << uint32(GetGoState()) << ","
-       << m_isActiveObject << ","
-       << m_visibilityModifier << ")";
+       << uint32(GetGoState()) << ", "
+       << m_isActiveObject << ", "
+       << m_visibilityModifier << ", "
+       << 0 << ", "  // patch_min
+       << 10 << ")"; // patch_max
 
     WorldDatabase.BeginTransaction();
     WorldDatabase.PExecuteLog("DELETE FROM gameobject WHERE guid = '%u'", GetGUIDLow());
