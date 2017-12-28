@@ -1359,7 +1359,8 @@ void Creature::SaveToDB(uint32 mapid)
     data.posY = GetPositionY();
     data.posZ = GetPositionZ();
     data.orientation = GetOrientation();
-    data.spawntimesecs = m_respawnDelay;
+    data.spawntimesecsmin = m_respawnDelay;
+    data.spawntimesecsmax = m_respawnDelay;
     // prevent add data integrity problems
     data.spawndist = GetDefaultMovementType() == IDLE_MOTION_TYPE ? 0 : m_respawnradius;
     data.currentwaypoint = 0;
@@ -1387,7 +1388,8 @@ void Creature::SaveToDB(uint32 mapid)
        << GetPositionY() << ","
        << GetPositionZ() << ","
        << GetOrientation() << ","
-       << m_respawnDelay << ","                            //respawn time
+       << data.spawntimesecsmin << ","                     // respawn time minimum
+       << data.spawntimesecsmax << ","                     // respawn time maximum
        << (float) m_respawnradius << ","                   //spawn distance (float)
        << (uint32)(0) << ","                               //currentwaypoint
        << GetHealth() << ","                               //curhealth
@@ -1563,7 +1565,7 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
 
     m_respawnradius = data->spawndist;
 
-    m_respawnDelay = data->spawntimesecs;
+    m_respawnDelay = data->GetRandomRespawnTime();
     m_isDeadByDefault = data->is_dead;
     m_deathState = m_isDeadByDefault ? DEAD : ALIVE;
     m_isActiveObject = data->spawnFlags & SPAWN_FLAG_ACTIVE;

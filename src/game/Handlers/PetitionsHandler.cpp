@@ -285,7 +285,6 @@ void WorldSession::HandlePetitionSignOpcode(WorldPacket & recv_data)
     DEBUG_LOG("Received opcode CMSG_PETITION_SIGN");    // ok
     //recv_data.hexlike();
 
-    Field *fields;
     ObjectGuid itemGuid;
     uint8 unk;
     recv_data >> itemGuid;                              // item guid

@@ -4249,7 +4249,7 @@ class go_av_landmineAI: public GameObjectAI
                     break;
             }
             if (GameObjectData const* info = me->GetGOData())
-                m_respawnTimer = info->spawntimesecs;
+                m_respawnTimer = info->GetRandomRespawnTime();
         }
         void UpdateAI(uint32 const diff)
         {
