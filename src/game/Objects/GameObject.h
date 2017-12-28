@@ -28,6 +28,7 @@
 #include "LootMgr.h"
 #include "Database/DatabaseEnv.h"
 #include <mutex>
+#include "Util.h"
 
 // GCC have alternative #pragma pack(N) syntax and old gcc version not support pack(push,N), also any gcc version not support it at some platform
 #if defined( __GNUC__ )
