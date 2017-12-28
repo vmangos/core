@@ -834,10 +834,10 @@ class World
 
         static volatile bool m_stopEvent;
         static uint8 m_ExitCode;
-        uint32 m_ShutdownTimer;
-        uint32 m_ShutdownMask;
+        uint32 m_ShutdownTimer = 0;
+        uint32 m_ShutdownMask = 0;
 
-        uint32 m_MaintenanceTimeChecker;
+        uint32 m_MaintenanceTimeChecker = 0;
 
         time_t m_startTime;
         time_t m_gameTime;
@@ -852,8 +852,8 @@ class World
         std::map<uint32 /*accountId*/, time_t /*last logout*/> m_accountsLastLogout;
         bool CanSkipQueue(WorldSession const* session);
 
-        uint32 m_maxActiveSessionCount;
-        uint32 m_maxQueuedSessionCount;
+        uint32 m_maxActiveSessionCount = 0;
+        uint32 m_maxQueuedSessionCount = 0;
 
         uint32 m_configUint32Values[CONFIG_UINT32_VALUE_COUNT];
         int32 m_configInt32Values[CONFIG_INT32_VALUE_COUNT];
@@ -865,7 +865,7 @@ class World
         uint8 m_wowPatch;
 
         LocaleConstant m_defaultDbcLocale;                     // from config for one from loaded DBC locales
-        uint32 m_availableDbcLocaleMask;                       // by loaded DBC
+        uint32 m_availableDbcLocaleMask = 0;                       // by loaded DBC
         void DetectDBCLang();
         bool m_allowMovement;
         std::string m_motd;
@@ -896,7 +896,7 @@ class World
         LockedQueue<WorldSession*, std::mutex> addSessQueue;
 
         //used versions
-        uint32      m_anticrashRearmTimer;
+        uint32      m_anticrashRearmTimer = 0;
         std::unique_ptr<std::thread> m_charDbWorkerThread;
 
         typedef std::unordered_map<uint32, ArchivedLogMessage> LogMessagesMap;

@@ -90,17 +90,13 @@ void Map::LoadMapAndVMap(int gx, int gy)
 
 Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
     : i_mapEntry(sMapStorage.LookupEntry<MapEntry>(id)),
-      i_id(id), i_InstanceId(InstanceId), m_unloadTimer(0),
-      m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE), m_persistentState(NULL),
+      i_id(id), i_InstanceId(InstanceId),
+      m_VisibleDistance(DEFAULT_VISIBILITY_DISTANCE),
       m_activeNonPlayersIter(m_activeNonPlayers.end()), _transportsUpdateIter(_transports.end()),
       i_gridExpiry(expiry), m_TerrainData(sTerrainMgr.LoadTerrain(id)),
-      i_data(NULL), i_script_id(0), m_unloading(false), m_crashed(false),
-      _processingSendObjUpdates(false), _processingUnitsRelocation(false),
-      m_updateFinished(false), m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
+      m_updateDiffMod(0), m_GridActivationDistance(DEFAULT_VISIBILITY_DISTANCE),
       _lastPlayersUpdate(WorldTimer::getMSTime()), _lastMapUpdate(WorldTimer::getMSTime()),
-      _lastCellsUpdate(WorldTimer::getMSTime()), _inactivePlayersSkippedUpdates(0),
-      _objUpdatesThreads(0), _unitRelocationThreads(0), _lastPlayerLeftTime(0),
-      m_lastMvtSpellsUpdate(0)
+      _lastCellsUpdate(WorldTimer::getMSTime())
 {
     m_CreatureGuids.Set(sObjectMgr.GetFirstTemporaryCreatureLowGuid());
     m_GameObjectGuids.Set(sObjectMgr.GetFirstTemporaryGameObjectLowGuid());

@@ -458,13 +458,13 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void SendObjectUpdates();
         void UpdateVisibilityForRelocations();
 
-        bool                    _processingSendObjUpdates;
-        uint32                  _objUpdatesThreads;
+        bool                    _processingSendObjUpdates = false;
+        uint32                  _objUpdatesThreads = 0;
         mutable std::mutex              i_objectsToClientUpdate_lock;
         std::set<Object *>      i_objectsToClientUpdate;
 
-        bool                    _processingUnitsRelocation;
-        uint32                  _unitRelocationThreads;
+        bool                    _processingUnitsRelocation = false;
+        uint32                  _unitRelocationThreads = 0;
         mutable std::mutex    i_unitsRelocated_lock;
         std::set<Unit* >        i_unitsRelocated;
 
@@ -479,14 +479,14 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         MapEntry const* i_mapEntry;
         uint32 i_id;
         uint32 i_InstanceId;
-        uint32 m_unloadTimer;
+        uint32 m_unloadTimer = 0;
         float m_VisibleDistance;
         float m_GridActivationDistance;
 
         mutable std::shared_timed_mutex   _dynamicTree_lock;
         DynamicMapTree _dynamicTree;
 
-        MapPersistentState* m_persistentState;
+        MapPersistentState* m_persistentState = nullptr;
 
         MapRefManager m_mapRefManager;
         MapRefManager::iterator m_mapRefIter;
@@ -503,11 +503,11 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         typedef std::set<Transport*> TransportsContainer;
         TransportsContainer _transports;
         TransportsContainer::iterator _transportsUpdateIter;
-        bool m_unloading;
-        bool m_crashed;
-        bool m_updateFinished;
+        bool m_unloading = false;
+        bool m_crashed = false;
+        bool m_updateFinished = false;
         uint32 m_updateDiffMod;
-        uint32 m_lastMvtSpellsUpdate;
+        uint32 m_lastMvtSpellsUpdate = 0;
     private:
         time_t i_gridExpiry;
 
@@ -526,8 +526,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         mutable MapMutexType      m_scriptSchedule_lock;
         ScriptScheduleMap m_scriptSchedule;
 
-        InstanceData* i_data;
-        uint32 i_script_id;
+        InstanceData* i_data = nullptr;
+        uint32 i_script_id = 0;
 
         // Map local low guid counters
         mutable std::mutex m_guidGenerators_lock;
@@ -543,10 +543,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         template<class T>
             void RemoveFromGrid(T*, NGridType *, Cell const&);
         // Custom
-        uint32 _lastMapUpdate;
-        uint32 _lastPlayerLeftTime;
+        uint32 _lastMapUpdate = 0;
+        uint32 _lastPlayerLeftTime = 0;
         uint32 _lastPlayersUpdate;
-        uint32 _inactivePlayersSkippedUpdates;
+        uint32 _inactivePlayersSkippedUpdates = 0;
         uint32 _lastCellsUpdate;
 
         int8 _updateIdx;

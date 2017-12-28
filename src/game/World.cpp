@@ -117,23 +117,13 @@ World& GetSWorld()
 World::World():
     m_playerLimit(0),
     m_allowMovement(true),
-    m_ShutdownMask(0),
-    m_ShutdownTimer(0),
     m_gameTime(time(nullptr)),
     m_timeZoneOffset(0),
     m_gameDay((m_gameTime + m_timeZoneOffset) / DAY),
     m_startTime(m_gameTime),
-    m_maxActiveSessionCount(0),
-    m_maxQueuedSessionCount(0),
-    m_MaintenanceTimeChecker(0),
-    m_anticrashRearmTimer(0),
-    m_MaintenanceTimeChecker(0),
-    m_anticrashRearmTimer(0),
     m_wowPatch(WOW_PATCH_102),
     m_defaultDbcLocale(LOCALE_enUS),
-    m_availableDbcLocaleMask(0),
-    m_timeRate(1.0f),
-    m_charDbWorkerThread(nullptr)
+    m_timeRate(1.0f)
 {
     for (int i = 0; i < CONFIG_NOSTALRIUS_MAX; ++i)
         m_configNostalrius[i] = 0;

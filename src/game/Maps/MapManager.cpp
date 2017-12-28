@@ -41,11 +41,7 @@ INSTANTIATE_CLASS_MUTEX(MapManager, std::recursive_mutex);
 MapManager::MapManager()
     : i_gridCleanUpDelay(sWorld.getConfig(CONFIG_UINT32_INTERVAL_GRIDCLEAN)),
     i_MaxInstanceId(RESERVED_INSTANCES_LAST),
-    i_GridStateErrorCount(0),
-    i_continentUpdateFinished(0),
-    i_maxContinentThread(0),
-    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS))),
-    asyncMapUpdating(false)
+    m_threads(new ThreadPool(sWorld.getConfig(CONFIG_UINT32_MAPUPDATE_INSTANCED_UPDATE_THREADS)))
 {
     i_timer.SetInterval(sWorld.getConfig(CONFIG_UINT32_INTERVAL_MAPUPDATE));
     m_threads->start<ThreadPool::MySQL<>>();

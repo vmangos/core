@@ -194,7 +194,7 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
 
         // debugging code, should be deleted some day
         GridState* si_GridStates[MAX_GRID_STATE];
-        int i_GridStateErrorCount;
+        int i_GridStateErrorCount = 0;
 
     private:
 
@@ -216,15 +216,15 @@ class MANGOS_DLL_DECL MapManager : public MaNGOS::Singleton<MapManager, MaNGOS::
         IntervalTimer i_timer;
 
         uint32 i_MaxInstanceId;
-        int             i_maxContinentThread;
+        int             i_maxContinentThread = 0;
 
         mutable std::mutex      m_continentMutex;
         mutable std::condition_variable      m_continentCV;
-        std::atomic<int> i_continentUpdateFinished;
+        std::atomic<int> i_continentUpdateFinished{0};
 
         std::unique_ptr<ThreadPool> m_threads;
         std::unique_ptr<ThreadPool> m_continentThreads;
-        bool asyncMapUpdating;
+        bool asyncMapUpdating = false;
 
         // Instanced continent zones
         const static int LAST_CONTINENT_ID = 2;
