@@ -208,7 +208,7 @@ class MANGOS_DLL_SPEC Referencable
         Countable m_count;
 };
 
-using AtomicLong = std::atomic<int>;
+using AtomicLong = std::atomic<long>;
 
 // class for sharing and managin GridMap objects
 class MANGOS_DLL_SPEC TerrainInfo : public Referencable<AtomicLong>
