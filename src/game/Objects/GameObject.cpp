@@ -801,8 +801,8 @@ void GameObject::SaveToDB(uint32 mapid)
        << GetFloatValue(GAMEOBJECT_ROTATION + 1) << ", "
        << GetFloatValue(GAMEOBJECT_ROTATION + 2) << ", "
        << GetFloatValue(GAMEOBJECT_ROTATION + 3) << ", "
-       << m_respawnDelayTime << ", " // PRESERVE SPAWNED BY DEFAULT
-       << m_respawnDelayTime << ", "
+       << data.spawntimesecsmin << ", " // PRESERVE SPAWNED BY DEFAULT
+       << data.spawntimesecsmax << ", "
        << uint32(GetGoAnimProgress()) << ", "
        << uint32(GetGoState()) << ","
        << m_isActiveObject << ","
