@@ -35,6 +35,7 @@ ScriptVector m_scripts;
 ScriptMapMap sQuestEndScripts;
 ScriptMapMap sQuestStartScripts;
 ScriptMapMap sSpellScripts;
+ScriptMapMap sCreatureSpellScripts;
 ScriptMapMap sGameObjectScripts;
 ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
@@ -777,6 +778,13 @@ void ScriptMgr::LoadEventScripts()
     }
 }
 
+void ScriptMgr::LoadCreatureSpellScripts()
+{
+    LoadScripts(sCreatureSpellScripts, "creature_spells_scripts");
+
+    // checks are done in LoadCreatureSpells
+}
+
 void ScriptMgr::LoadGossipScripts()
 {
     LoadScripts(sGossipScripts, "gossip_scripts");
@@ -796,6 +804,7 @@ void ScriptMgr::CheckAllScriptTexts()
     CheckScriptTexts(sQuestEndScripts);
     CheckScriptTexts(sQuestStartScripts);
     CheckScriptTexts(sSpellScripts);
+    CheckScriptTexts(sCreatureSpellScripts);
     CheckScriptTexts(sGameObjectScripts);
     CheckScriptTexts(sEventScripts);
     CheckScriptTexts(sGossipScripts);

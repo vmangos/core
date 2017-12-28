@@ -534,6 +534,10 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     SetCanModifyStats(true);
     UpdateAllStats();
 
+    // Bosses have increased loot distance.
+    if (GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS)
+        SetLootAndXPModDist(150.0f);
+
     // checked and error show at loading templates
     if (FactionTemplateEntry const* factionTemplate = sFactionTemplateStore.LookupEntry(GetCreatureInfo()->faction_A))
     {

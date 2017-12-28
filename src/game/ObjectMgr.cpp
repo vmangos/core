@@ -1511,22 +1511,22 @@ void ObjectMgr::LoadCreatureSpells()
 {
     mCreatureSpellsMap.clear(); // for reload case
 
-                                               //       0       1           2               3            4               5                  6                 7                  8
-    QueryResult *result = WorldDatabase.Query("SELECT entry, spellId_1, probability_1, castTarget_1, castFlags_1, delayInitialMin_1, delayInitialMax_1, delayRepeatMin_1, delayRepeatMax_1, "
-                                               //               9           10             11            12              13                14                 15                16
-                                                             "spellId_2, probability_2, castTarget_2, castFlags_2, delayInitialMin_2, delayInitialMax_2, delayRepeatMin_2, delayRepeatMax_2, "
-                                               //              17           18             19            20              21                22                 23                24
-                                                             "spellId_3, probability_3, castTarget_3, castFlags_3, delayInitialMin_3, delayInitialMax_3, delayRepeatMin_3, delayRepeatMax_3, "
-                                               //              25           26             27            28              29                30                 31                32
-                                                             "spellId_4, probability_4, castTarget_4, castFlags_4, delayInitialMin_4, delayInitialMax_4, delayRepeatMin_4, delayRepeatMax_4, "
-                                               //              33           34             35            36              37                38                 39                40
-                                                             "spellId_5, probability_5, castTarget_5, castFlags_5, delayInitialMin_5, delayInitialMax_5, delayRepeatMin_5, delayRepeatMax_5, "
-                                               //              41           42             43            44              45                46                 47                48
-                                                             "spellId_6, probability_6, castTarget_6, castFlags_6, delayInitialMin_6, delayInitialMax_6, delayRepeatMin_6, delayRepeatMax_6, "
-                                               //              49           50             51            52              53                54                 55                56
-                                                             "spellId_7, probability_7, castTarget_7, castFlags_7, delayInitialMin_7, delayInitialMax_7, delayRepeatMin_7, delayRepeatMax_7, "
-                                               //              57           58             59            60              61                62                 63                64
-                                                             "spellId_8, probability_8, castTarget_8, castFlags_8, delayInitialMin_8, delayInitialMax_8, delayRepeatMin_8, delayRepeatMax_8 FROM creature_spells");
+                                               //       0       1           2               3            4               5                  6                 7                  8             9
+    QueryResult *result = WorldDatabase.Query( "SELECT entry, spellId_1, probability_1, castTarget_1, castFlags_1, delayInitialMin_1, delayInitialMax_1, delayRepeatMin_1, delayRepeatMax_1, scriptId_1, "
+                                               //              10           11             12            13              14                15                 16                17             18
+                                                             "spellId_2, probability_2, castTarget_2, castFlags_2, delayInitialMin_2, delayInitialMax_2, delayRepeatMin_2, delayRepeatMax_2, scriptId_2, "
+                                               //              19           20             21            22              23                24                 25                26             27
+                                                             "spellId_3, probability_3, castTarget_3, castFlags_3, delayInitialMin_3, delayInitialMax_3, delayRepeatMin_3, delayRepeatMax_3, scriptId_3, "
+                                               //              28           29             30            31              32                33                 34                35             36
+                                                             "spellId_4, probability_4, castTarget_4, castFlags_4, delayInitialMin_4, delayInitialMax_4, delayRepeatMin_4, delayRepeatMax_4, scriptId_4, "
+                                               //              37           38             39            40              41                42                 43                44             45
+                                                             "spellId_5, probability_5, castTarget_5, castFlags_5, delayInitialMin_5, delayInitialMax_5, delayRepeatMin_5, delayRepeatMax_5, scriptId_5, "
+                                               //              46           47             48            49              50                51                 52                53             54
+                                                             "spellId_6, probability_6, castTarget_6, castFlags_6, delayInitialMin_6, delayInitialMax_6, delayRepeatMin_6, delayRepeatMax_6, scriptId_6, "
+                                               //              55           56             57            58              59                60                 61                62             63
+                                                             "spellId_7, probability_7, castTarget_7, castFlags_7, delayInitialMin_7, delayInitialMax_7, delayRepeatMin_7, delayRepeatMax_7, scriptId_7, "
+                                               //              64           65             66            67              68                69                 70                71             72
+                                                             "spellId_8, probability_8, castTarget_8, castFlags_8, delayInitialMin_8, delayInitialMax_8, delayRepeatMin_8, delayRepeatMax_8, scriptId_8 FROM creature_spells");
     if (!result)
     {
         BarGoLink bar(1);
@@ -1536,6 +1536,11 @@ void ObjectMgr::LoadCreatureSpells()
         sLog.outString(">> Loaded 0 creature spell templates. DB table `creature_spells` is empty.");
         return;
     }
+
+    std::set<uint32> spellScriptSet;
+
+    for (ScriptMapMap::const_iterator itr = sCreatureSpellScripts.begin(); itr != sCreatureSpellScripts.end(); ++itr)
+        spellScriptSet.insert(itr->first);
 
     BarGoLink bar(result->GetRowCount());
 
@@ -1550,7 +1555,7 @@ void ObjectMgr::LoadCreatureSpells()
 
         for (uint8 i = 0; i < 8; i++)
         {
-            uint16 spellId = fields[1 + i * 8].GetUInt16();
+            uint16 spellId = fields[1 + i * 9].GetUInt16();
             if (spellId)
             {
                 if (!sSpellMgr.GetSpellEntry(spellId))
@@ -1559,7 +1564,7 @@ void ObjectMgr::LoadCreatureSpells()
                     continue;
                 }
 
-                uint8 probability      = fields[2 + i * 8].GetUInt8();
+                uint8 probability      = fields[2 + i * 9].GetUInt8();
 
                 if ((probability == 0) || (probability > 100))
                 {
@@ -1567,13 +1572,13 @@ void ObjectMgr::LoadCreatureSpells()
                     probability = 100;
                 }
 
-                uint8 castTarget       = fields[3 + i * 8].GetUInt8();
-                uint8 castFlags        = fields[4 + i * 8].GetUInt8();
+                uint8 castTarget       = fields[3 + i * 9].GetUInt8();
+                uint8 castFlags        = fields[4 + i * 9].GetUInt8();
 
                 // in the database we store timers as seconds
                 // based on screenshot of blizzard creature spells editor
-                uint32 delayInitialMin = fields[5 + i * 8].GetUInt16() * IN_MILLISECONDS;
-                uint32 delayInitialMax = fields[6 + i * 8].GetUInt16() * IN_MILLISECONDS;
+                uint32 delayInitialMin = fields[5 + i * 9].GetUInt16() * IN_MILLISECONDS;
+                uint32 delayInitialMax = fields[6 + i * 9].GetUInt16() * IN_MILLISECONDS;
 
                 if (delayInitialMin > delayInitialMax)
                 {
@@ -1581,8 +1586,8 @@ void ObjectMgr::LoadCreatureSpells()
                     continue;
                 }
 
-                uint32 delayRepeatMin  = fields[7 + i * 8].GetUInt16() * IN_MILLISECONDS;
-                uint32 delayRepeatMax  = fields[8 + i * 8].GetUInt16() * IN_MILLISECONDS;
+                uint32 delayRepeatMin  = fields[7 + i * 9].GetUInt16() * IN_MILLISECONDS;
+                uint32 delayRepeatMax  = fields[8 + i * 9].GetUInt16() * IN_MILLISECONDS;
 
                 if (delayRepeatMin > delayRepeatMax)
                 {
@@ -1590,7 +1595,20 @@ void ObjectMgr::LoadCreatureSpells()
                     continue;
                 }
 
-                spellsTemplate.emplace_back(spellId, probability, castTarget, castFlags, delayInitialMin, delayInitialMax, delayRepeatMin, delayRepeatMax);
+                uint32 scriptId = fields[9 + i * 9].GetUInt32();
+
+                if (scriptId)
+                {
+                    if (sCreatureSpellScripts.find(scriptId) == sCreatureSpellScripts.end())
+                    {
+                        sLog.outErrorDb("Entry %u in table `creature_spells` has non-existent scriptId_%u = %u, setting it to 0 instead.", entry, i, scriptId);
+                        scriptId = 0;
+                    }
+                    else
+                        spellScriptSet.erase(scriptId);
+                }
+
+                spellsTemplate.emplace_back(spellId, probability, castTarget, castFlags, delayInitialMin, delayInitialMax, delayRepeatMin, delayRepeatMax, scriptId);
             }
         }
 
@@ -1600,6 +1618,9 @@ void ObjectMgr::LoadCreatureSpells()
     } while (result->NextRow());
 
     delete result;
+
+    for (std::set<uint32>::const_iterator itr = spellScriptSet.begin(); itr != spellScriptSet.end(); ++itr)
+        sLog.outErrorDb("Table `creature_spells_scripts` contains unused script, id %u.", *itr);
 
     sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)mCreatureSpellsMap.size());
     sLog.outString();

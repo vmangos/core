@@ -22,7 +22,6 @@ enum
 
 boss_emerissAI::boss_emerissAI(Creature* pCreature) : boss_dragon_of_nightmareAI(pCreature)
 {
-    pCreature->SetLootAndXPModDist(150.0f);
     boss_emerissAI::Reset();
 }
 

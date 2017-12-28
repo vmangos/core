@@ -55,7 +55,6 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
 {
     boss_darkmaster_gandlingAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        pCreature->SetLootAndXPModDist(100.0f);
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
         DoScriptText(SAY_GANDLING_SPAWN, m_creature);

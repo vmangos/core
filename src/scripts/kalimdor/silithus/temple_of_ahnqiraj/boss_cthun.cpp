@@ -1270,7 +1270,6 @@ struct cthunAI : public ScriptedAI
         wipeRespawnEyeTimer(0)
     {
         SetCombatMovement(false);
-        m_creature->SetLootAndXPModDist(800.0f); // Players in stomach should get rep too, poor bastards
 
         m_pInstance = (instance_temple_of_ahnqiraj*)pCreature->GetInstanceData();
         if (!m_pInstance)

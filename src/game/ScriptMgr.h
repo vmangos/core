@@ -449,6 +449,7 @@ typedef std::map<uint32, ScriptMap > ScriptMapMap;
 extern ScriptMapMap sQuestEndScripts;
 extern ScriptMapMap sQuestStartScripts;
 extern ScriptMapMap sSpellScripts;
+extern ScriptMapMap sCreatureSpellScripts;
 extern ScriptMapMap sGameObjectScripts;
 extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sGossipScripts;
@@ -611,6 +612,7 @@ class ScriptMgr
         void LoadQuestStartScripts();
         void LoadEventScripts();
         void LoadSpellScripts();
+        void LoadCreatureSpellScripts();
         void LoadGossipScripts();
         void LoadCreatureMovementScripts();
 

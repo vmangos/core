@@ -279,7 +279,6 @@ struct boss_kelthuzadAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
-        pCreature->SetLootAndXPModDist(100.0f);
         pCreature->SetCreatureSummonLimit(240);
     }
 

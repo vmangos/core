@@ -84,7 +84,6 @@ struct boss_faerlinaAI : public ScriptedAI
             sLog.outError("boss_faerlinaAI::ctor failed to cast instanceData to instance_naxxramas");
         CheckRespawnAdds();
         Reset();
-        pCreature->SetLootAndXPModDist(150.0f);
     }
 
     instance_naxxramas* m_pInstance;
