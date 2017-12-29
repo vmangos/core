@@ -294,6 +294,13 @@ inline bool isEastAsianString(std::wstring wstr, bool numericOrSpace)
     return true;
 }
 
+inline bool isLeapYear(int year)
+{
+    if (year % 400 == 0) return true;
+    if ((year % 4 == 0) && (year % 100 != 0)) return true;
+    return false;
+}
+
 inline void strToUpper(std::string& str)
 {
     std::transform( str.begin(), str.end(), str.begin(), toupper );
