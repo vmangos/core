@@ -1288,9 +1288,6 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Equipment templates...");
     sObjectMgr.LoadEquipmentTemplates();
 
-    sLog.outString("Loading Creature spell scripts...");
-    sScriptMgr.LoadCreatureSpellScripts();
-
     sLog.outString("Loading Creature spells...");
     sObjectMgr.LoadCreatureSpells();
 
@@ -1547,6 +1544,7 @@ void World::SetInitialWorldSettings()
     sScriptMgr.LoadQuestStartScripts();                     // must be after load Creature/Gameobject(Template/Data) and QuestTemplate
     sScriptMgr.LoadQuestEndScripts();                       // must be after load Creature/Gameobject(Template/Data) and QuestTemplate
     sScriptMgr.LoadSpellScripts();                          // must be after load Creature/Gameobject(Template/Data)
+    sScriptMgr.LoadCreatureSpellScripts();
     sScriptMgr.LoadGameObjectScripts();                     // must be after load Creature/Gameobject(Template/Data)
     sScriptMgr.LoadEventScripts();                          // must be after load Creature/Gameobject(Template/Data)
     sLog.outString(">>> Scripts loaded");
