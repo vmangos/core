@@ -91,7 +91,6 @@ void AutoCompleteWarEffortProgress()
 
     sLog.outInfo("[WarEffortEvent] Auto-completing war effort progress. Rate: %0.2f", rate);
 
-    WarEffortStockInfo info;
     for (int i = 0; i < NUM_FACTION_OBJECTIVES; ++i)
     {
         AutoCompleteWarEffortResource(AllianceObjectives[i].itemId, AllianceObjectives[i].required,
