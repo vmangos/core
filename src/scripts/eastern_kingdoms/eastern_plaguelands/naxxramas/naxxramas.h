@@ -26,7 +26,7 @@ enum NAXX_ENCOUNTERS_TYPES
 
     TYPE_SAPPHIRON              = 13,
     TYPE_KELTHUZAD              = 14,
-    
+
     MAX_ENCOUNTER               = 15,
 };
 
@@ -46,8 +46,8 @@ enum NaxxNPCs : uint32
 
     NPC_NOTH                    = 15954,
     NPC_HEIGAN                  = 15936,
-    NPC_LOATHEB                 = 16011, 
-    
+    NPC_LOATHEB                 = 16011,
+
     NPC_RAZUVIOUS               = 16061,
     NPC_GOTHIK                  = 16060,
     NPC_MOGRAINE                = 16062,
@@ -73,10 +73,10 @@ enum NaxxNPCs : uint32
     NPC_UNSTOPPABLE_ABOM        = 16428,
     NPC_SOUL_WEAVER             = 16429,
     NPC_GUARDIAN                = 16441,
-    
+
     NPC_MR_BIGGLESWORTH         = 16998,
     NPC_LICH_KING               = 16980,
-   
+
     NPC_PatchworkGolem	        = 16017,
     NPC_BileRetcher	            = 16018,
     NPC_SludgeBelcher	        = 16029,
@@ -145,12 +145,12 @@ enum NaxxAreaTriggers : uint32
     AREATRIGGER_FAERLINA        = 4115,     // Used for faerlinas greet message
     AREATRIGGER_GOTHIK          = 4116,
     AREATRIGGER_ANUB            = 4119,     // Triggers the greet-message from anub
-    
-    // AREATRIGGER_EXIT_NAXXRAMAS      = 
+
+    // AREATRIGGER_EXIT_NAXXRAMAS      =
     AREATRIGGER_BEHIND_FROSTWYRM_TP = 4120, // not sure why this one is there.
     AREATRIGGER_FROSTWYRM_TP        = 4167,
     AREATRIGGER_HUB_TO_FROSTWYRM    = 4156,     // Teleport to sapphiron from center of naxx
-    
+
     AREATRIGGER_THADDIUS_ENTRANCE   = 4113,
 
     AREATRIGGER_START_DK_WING       = 4117,
@@ -164,7 +164,7 @@ enum NaxxGOs : uint32
 {
     // Arachnid Quarter
     GO_ARAC_ANUB_DOOR           = 181126,   //encounter door - open on click after click auto open/close on encounter pull/kill/reset
-    GO_ARAC_ANUB_GATE           = 181195,   //open after boss is dead 
+    GO_ARAC_ANUB_GATE           = 181195,   //open after boss is dead
     GO_ARAC_FAER_WEB            = 181235,   //encounter door
     GO_ARAC_FAER_DOOR           = 194022,   //after faerlina, to outer ring
     GO_ARAC_MAEX_INNER_DOOR     = 181197,   //encounter door
@@ -218,7 +218,7 @@ enum NaxxGOs : uint32
     GO_ARAC_EYE_BOSS            = 181233,
 
     // Kel'Thuzad window portals. "opening" on 40%
-    // NOTE: the ids are used to loop over the GObjs, 
+    // NOTE: the ids are used to loop over the GObjs,
     // so if they change, update code in instance_naxxramas::ToggleKelThuzadWindows
     GO_KT_WINDOW_1              = 181402,
     GO_KT_WINDOW_2              = 181403,
@@ -302,12 +302,12 @@ public:
 
     void Initialize();
 
-    bool IsEncounterInProgress();
+    bool IsEncounterInProgress() const;
 
     void OnCreatureCreate(Creature* pCreature) override;
     void OnObjectCreate(GameObject* pGo) override;
     void OnCreatureRespawn(Creature * pCreature) override;
-     
+
     void SetData(uint32 uiType, uint32 uiData);
     uint32 GetData(uint32 uiType);
     uint64 GetData64(uint32 uiData);
@@ -349,7 +349,7 @@ public:
 
     uint8 GetNumEndbossDead();
     GuidList m_alHeiganTrapGuids[4];
-    
+
     bool HandleEvadeOutOfHome(Creature* pWho);
 
     void OnCreatureEnterCombat(Creature * creature) override;
@@ -369,7 +369,7 @@ protected:
 
     std::list<uint64> m_lGothTriggerList;
     UNORDERED_MAP<uint64, GothTrigger> m_mGothTriggerMap;
-   
+
     float m_fChamberCenterX;
     float m_fChamberCenterY;
     float m_fChamberCenterZ;

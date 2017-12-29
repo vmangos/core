@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Instance_Naxxramas
-SD%Complete: 
+SD%Complete:
 SDComment:
 SDCategory: Naxxramas
 EndScriptData */
@@ -30,7 +30,7 @@ enum NaxxEvents
     EVENT_BIGGLESWORTH_DIED_YELL = 1,
     EVENT_THADDIUS_SCREAM,
     EVENT_WINGBOSS_DEAD,
-    
+
     EVENT_KT_LK_DIALOGUE_1,
     EVENT_KT_LK_DIALOGUE_2,
     EVENT_KT_LK_DIALOGUE_3,
@@ -72,7 +72,7 @@ void instance_naxxramas::Initialize()
     memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
     m_events.Reset();
     // 2-5min, no idea if it's correct
-    m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5)); 
+    m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, urand(1000 * 60 * 2, 1000 * 60 * 5));
 
     m_events.ScheduleEvent(EVENT_SUMMON_FROGGER_WAVE, Seconds(6));
 }
@@ -224,7 +224,7 @@ void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 u
 {
     if (requiredPreBossData > -1 && requiredPreBossData != DONE)
         return;
-  
+
     if (GameObject* pGo = GetSingleGameObjectFromStorage(which))
     {
         UpdateAutomaticBossEntranceDoor(pGo, uiData, requiredPreBossData);
@@ -347,7 +347,7 @@ void instance_naxxramas::UpdateTeleporters(uint32 uiType, uint32 uiData)
             pGO->SetGoState(GO_STATE_ACTIVE);
         }
     }
-    else 
+    else
     {
         if (GameObject* pGO = GetSingleGameObjectFromStorage(GO_HUB_PORTAL))
         {
@@ -405,7 +405,7 @@ void instance_naxxramas::OnCreatureCreate(Creature* pCreature)
             }
         }
     }
-    // 4hm 
+    // 4hm
     if (pCreature->GetEntry() >= 16062 && pCreature->GetEntry() <= 16065)
     {
         if (m_auiEncounter[TYPE_FOUR_HORSEMEN] != DONE && pCreature->isDead())
@@ -535,7 +535,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             UpdateManualDoor(pGo, m_auiEncounter[TYPE_FAERLINA]);
             // todo: unable to get the door to be properly locked.
             // It has the locked flags, and it displays as locked ingame,
-            // but with green text, aka it can be clicked and opened. 
+            // but with green text, aka it can be clicked and opened.
             // hackfix by setting no interract flag unless it should be openable.
             if (m_auiEncounter[TYPE_FAERLINA] == DONE)
                 pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
@@ -548,8 +548,8 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_ARAC_MAEX_INNER_DOOR:
             pGo->SetGoState(GO_STATE_ACTIVE);
             break;
-        
-            
+
+
         // Plague wing
         case GO_PLAG_NOTH_ENTRY_DOOR:
             UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_NOTH]);
@@ -565,7 +565,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
         case GO_PLAG_LOAT_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_HEIGAN]);
             break;
-        
+
         // -- Millitary wing
         case GO_MILI_GOTH_ENTRY_GATE:
             UpdateAutomaticBossEntranceDoor(pGo, m_auiEncounter[TYPE_RAZUVIOUS]);
@@ -583,8 +583,8 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             //todo: anything to be done?
             break;
 
-        
-        // -- Cons wing doors 
+
+        // -- Cons wing doors
         case GO_CONS_PATH_EXIT_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_PATCHWERK]);
             break;
@@ -595,7 +595,7 @@ void instance_naxxramas::OnObjectCreate(GameObject* pGo)
             break;
 
 
-        // -- Frostwyrm lair 
+        // -- Frostwyrm lair
         case GO_KELTHUZAD_WATERFALL_DOOR:
         case GO_KELTHUZAD_DOOR:
             UpdateBossGate(pGo, m_auiEncounter[TYPE_SAPPHIRON]);
@@ -716,7 +716,7 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
     // Something, probably silly, makes gothik respawn, thus the trash
     // linked to him gets a chance to respawn as well. Force-despawning his
     // trash like this as well to prevent that. There should be no deathknight captains,
-    // deathknight cavaliers or necro knights after gothik, so this works. 
+    // deathknight cavaliers or necro knights after gothik, so this works.
     // The hardcoded dbGUID is a lonely shade of naxxramas
     if (GetData(TYPE_GOTHIK) == DONE)
     {
@@ -731,7 +731,7 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
         {
             forcedDespawn = true;
         }
-        
+
     }
 
     if (forcedDespawn)
@@ -740,7 +740,7 @@ void instance_naxxramas::OnCreatureRespawn(Creature * pCreature)
     }
 }
 
-bool instance_naxxramas::IsEncounterInProgress()
+bool instance_naxxramas::IsEncounterInProgress() const
 {
     for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
         if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
@@ -752,8 +752,8 @@ bool instance_naxxramas::IsEncounterInProgress()
 void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 {
     ASSERT(this)
-    
-    bool sameStateAsLast = false; 
+
+    bool sameStateAsLast = false;
     if (uiType < MAX_ENCOUNTER)
         sameStateAsLast = (m_auiEncounter[uiType] == uiData);
 
@@ -773,12 +773,12 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         case TYPE_FAERLINA:
             m_auiEncounter[uiType] = uiData;
             UpdateAutomaticBossEntranceDoor(GO_ARAC_FAER_WEB, uiData);
-            
+
             UpdateManualDoor(GO_ARAC_FAER_DOOR, uiData);
             UpdateBossGate(GO_ARAC_MAEX_OUTER_DOOR, uiData);
             // todo: unable to get the door to be properly locked.
             // It has the locked flags, and it displays as locked ingame,
-            // but with green text, aka it can be clicked and opened. 
+            // but with green text, aka it can be clicked and opened.
             // hackfix by setting no interract flag unless it should be openable.
 
             if (GameObject* pGo = GetSingleGameObjectFromStorage(GO_ARAC_FAER_DOOR))
@@ -849,7 +849,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             if(uiData == DONE)
                 m_events.ScheduleEvent(EVENT_WINGBOSS_DEAD, 10000);
             m_auiEncounter[uiType] = uiData;
-            
+
             UpdateAutomaticBossEntranceDoor(GO_MILI_HORSEMEN_DOOR, uiData, m_auiEncounter[TYPE_GOTHIK]);
             UpdateTeleporters(uiType, uiData);
             if (uiData == SPECIAL)
@@ -882,7 +882,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
 
                 // reputation
                 FactionEntry const *factionEntry = sFactionStore.LookupEntry(529); // Argent Dawn
-                if (factionEntry) 
+                if (factionEntry)
                 {
                     Map::PlayerList const &liste = GetMap()->GetPlayers();
                     for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
@@ -899,8 +899,8 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
                     sLog.outError("4hm just died. Unable to find Argent Dawn faction for reputation ");
                 }
             }
-            
-                
+
+
             break;
         case TYPE_PATCHWERK:
             m_auiEncounter[uiType] = uiData;
@@ -925,7 +925,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             m_auiEncounter[uiType] = uiData;
 
             UpdateAutomaticBossEntranceDoor(GO_CONS_THAD_DOOR, uiData, m_auiEncounter[TYPE_GLUTH]);
-            
+
             UpdateTeleporters(uiType, uiData);
             break;
         case TYPE_SAPPHIRON:
@@ -938,7 +938,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
             break;
         case TYPE_KELTHUZAD:
             UpdateAutomaticBossEntranceDoor(GO_KELTHUZAD_DOOR, uiData, m_auiEncounter[TYPE_SAPPHIRON]);
-            switch (uiData) 
+            switch (uiData)
             {
                 case SPECIAL:
                 {
@@ -1021,7 +1021,7 @@ void instance_naxxramas::SetData(uint32 uiType, uint32 uiData)
         case TYPE_THADDIUS:
             entry = NPC_THADDIUS;
         break;
-            
+
         case TYPE_SAPPHIRON:
             entry = NPC_SAPPHIRON;
         break;
@@ -1240,7 +1240,7 @@ void instance_naxxramas::OnCreatureDeath(Creature* pCreature)
             m_events.ScheduleEvent(EVENT_BIGGLESWORTH_DIED_YELL, 1000);
             sInstanceStatistics.IncrementCustomCounter(MR_BIGGLESWORTH_KILLS, true);
         }
-        break;  
+        break;
     }
     case NPC_FrenziedBat:
     case NPC_PlaguedBat:
@@ -1271,7 +1271,7 @@ void instance_naxxramas::Update(uint32 diff)
             if (m_auiEncounter[TYPE_THADDIUS] != DONE)
             {
                 if (m_auiEncounter[TYPE_THADDIUS] != IN_PROGRESS && m_auiEncounter[TYPE_THADDIUS] != SPECIAL)
-                    DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM4 + urand(0, 3), NPC_THADDIUS); 
+                    DoOrSimulateScriptTextForThisInstance(THADDIUS_SAY_SCREAM4 + urand(0, 3), NPC_THADDIUS);
                 m_events.ScheduleEvent(EVENT_THADDIUS_SCREAM, Minutes(urand(5,10)));
             }
             break;
@@ -1311,7 +1311,7 @@ void instance_naxxramas::Update(uint32 diff)
             {3129.630f, -3157.652f, 293.32f, 4.73893f},
             {3144.894f, -3159.587f, 293.32f, 4.43020f},
             {3159.510f, -3166.001f, 293.27f, 4.24492f} };
-            
+
             for (int i = 0; i < 3; i++)
             {
                 if (Creature* frogger = instance->SummonCreature(NPC_LivingPoison, pos[i][0], pos[i][1], pos[i][2], pos[i][3], TEMPSUMMON_TIMED_DESPAWN, 13000))
@@ -1433,13 +1433,13 @@ bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
 
 struct mob_spiritOfNaxxramasAI : public ScriptedAI
 {
-    mob_spiritOfNaxxramasAI(Creature* pCreature) 
+    mob_spiritOfNaxxramasAI(Creature* pCreature)
         : ScriptedAI(pCreature)
     {
         Reset();
         m_creature->CastSpell(m_creature, 18950, true); // stealth detection
     }
-    
+
     ObjectGuid portal;
     uint32 portalTimer;
     uint32 shadowboltVolleyTimer;
@@ -1513,11 +1513,11 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     {
         Reset();
         goStoneform();
-        
+
         if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
             m_creature->CastSpell(m_creature, 18950, true); // stealth detection
     }
-    
+
     void goStoneform()
     {
         if (m_creature->GetDefaultMovementType() == IDLE_MOTION_TYPE && m_creature->GetEntry() == 16168)
@@ -1532,7 +1532,7 @@ struct mob_naxxramasGarboyleAI : public ScriptedAI
     {
         acidVolleyTimer = 4000;
     }
-    
+
     void JustReachedHome() override
     {
         goStoneform();
@@ -1661,7 +1661,7 @@ struct mob_toxic_tunnelAI : public ScriptedAI
     void AttackStart(Unit*) { }
     void MoveInLineOfSight(Unit*) { }
 
-    void UpdateAI(const uint32 diff) override 
+    void UpdateAI(const uint32 diff) override
     {
         if (checktime < diff)
         {
@@ -1702,7 +1702,7 @@ struct mob_dark_touched_warriorAI : public ScriptedAI
         {
             m_creature->GetMotionMaster()->MoveSeekAssistance(pNearest->GetPositionX(), pNearest->GetPositionY(), pNearest->GetPositionZ());
             m_creature->SetTargetGuid(ObjectGuid());
-           
+
             m_creature->UpdateSpeed(MOVE_RUN, false);
             m_creature->InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
         }
@@ -1776,14 +1776,14 @@ enum OmarionMisc {
     GOSSIP_SELECT_BS      = GOSSIP_ACTION_INFO_DEF + 2,
     GOSSIP_SELECT_LW      = GOSSIP_ACTION_INFO_DEF + 3,
     GOSSIP_SELECT_NOCRAFT = GOSSIP_ACTION_INFO_DEF + 4,
-    
+
     GOSSIP_SELECT_CRAFT_BEGIN     = GOSSIP_ACTION_INFO_DEF + 10,
 
     GOSSIP_SELECT_GLACIAL_GLOVES  = GOSSIP_SELECT_CRAFT_BEGIN + 1,  // tailor honored
     GOSSIP_SELECT_GLACIAL_WRISTS  = GOSSIP_SELECT_CRAFT_BEGIN + 2,  // tailor honored
     GOSSIP_SELECT_GLACIAL_CHEST   = GOSSIP_SELECT_CRAFT_BEGIN + 3,  // tailor exalted
     GOSSIP_SELECT_GLACIAL_CLOAK   = GOSSIP_SELECT_CRAFT_BEGIN + 4,  // tailor exalted
-                                  
+
     GOSSIP_SELECT_POLAR_GLOVES    = GOSSIP_SELECT_CRAFT_BEGIN + 5,  // LW honored
     GOSSIP_SELECT_POLAR_WRISTS    = GOSSIP_SELECT_CRAFT_BEGIN + 6, // LW honored
     GOSSIP_SELECT_POLAR_CHEST     = GOSSIP_SELECT_CRAFT_BEGIN + 7, // LW exalted
@@ -1819,7 +1819,7 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
     uint32 blacksmithSkill  = pPlayer->GetSkillValue(SKILL_BLACKSMITHING);
     uint32 leatherworkSkill = pPlayer->GetSkillValue(SKILL_LEATHERWORKING);
     uint32 argentDawnRep    = pPlayer->GetReputationRank(529);
-    
+
     ReputationRank BOOK_REQ_RANK   = REP_REVERED;
     ReputationRank CRACT1_REQ_RANK = REP_REVERED;
     ReputationRank CRAFT2_REQ_RANK = REP_EXALTED;
@@ -1897,12 +1897,12 @@ bool GossipSelect_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreatur
         }
         return true;
     }
-    
-    
-    /*************************** 
+
+
+    /***************************
     *       Craft spells
     ****************************/
-    
+
     case GOSSIP_SELECT_GLACIAL_GLOVES:
     {
         LearnCraftIfCan(28212, 28205, pPlayer, CRACT1_REQ_RANK, tailorSkill);
@@ -1997,25 +1997,25 @@ bool GossipHello_npc_MasterCraftsmanOmarion(Player* pPlayer, Creature* pCreature
 
     /*
     send GOSSIP_INTRO
-    
+
     if player has 300/300 blacksmithing/leatherworking/taloring
         add option "I am master <profession>, Omarion."
         when clicked
-            if <300 in your crafting skill OR less than Honored with AD 
-                /spits on you 
-            else 
+            if <300 in your crafting skill OR less than Honored with AD
+                /spits on you
+            else
                 say "Perhaps I can teach you something..."
                 if revered with AD, give option for bracers and gloves
                 if exalted with AD, give option for chest
                 exit dialogue "I need to go. Evil stirs. Die well, Omarion."
 
-        
+
     regardless of any profession, present option:
         "Omarion, I am not a craftsman. Can you still help me?"
         if player reputation < honored
             /spit on you
-        else 
-            send gossip GOSSIP_REPLY_NOT_CRAFTSMAN 
+        else
+            send gossip GOSSIP_REPLY_NOT_CRAFTSMAN
             add item 22719 (book) to player
             add exit text "Thank you, Omarion. You have taken a fatal blow for the team on this day."
     */
@@ -2059,7 +2059,7 @@ void AddSC_instance_naxxramas()
     pNewScript = new Script;
     pNewScript->Name = "dark_touched_warriorAI";
     pNewScript->GetAI = &GetAI_dark_touched_warrior;
-    pNewScript->RegisterSelf();   
+    pNewScript->RegisterSelf();
 
     pNewScript = new Script;
     pNewScript->Name = "npc_archmage_tarsis";
