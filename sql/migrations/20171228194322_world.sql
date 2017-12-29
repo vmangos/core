@@ -60,10 +60,10 @@ UPDATE `gossip_menu_option` SET `action_menu_id`=-1, `action_script_id`=7 WHERE 
 DELETE FROM `gossip_menu_option` WHERE `menu_id`=15000 && `id`=1;
 DELETE FROM `gossip_menu` WHERE `entry`=15000 && `text_id`!=7880;
 DELETE FROM `gossip_scripts` WHERE `id`=15000;
-INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `dataint`, `comments`) VALUES
-(7, 0, 0, 0, 11017, 'Azuregos - Say Text 1'),
-(7, 0, 22, 168, 0, 'Azuregos - Set Faction to Enemy'),
-(7, 1, 26, 0, 0, 'Azuregos - Attack Player');
+INSERT INTO `gossip_scripts` (`id`, `delay`, `command`, `datalong`, `dataint`, `data_flags`, `comments`) VALUES
+(7, 0, 0, 0, 11017, 0, 'Azuregos - Say Text 1'),
+(7, 0, 22, 168, 0, 2, 'Azuregos - Set Faction to Enemy'),
+(7, 1, 26, 0, 0, 0, 'Azuregos - Attack Player');
 
 -- EventAI script for Azuregos.
 INSERT INTO `creature_ai_scripts` (`id`, `creature_id`, `event_type`, `event_inverse_phase_mask`, `event_chance`, `event_flags`, `event_param1`, `event_param2`, `event_param3`, `event_param4`, `action1_type`, `action1_param1`, `action1_param2`, `action1_param3`, `action2_type`, `action2_param1`, `action2_param2`, `action2_param3`, `action3_type`, `action3_param1`, `action3_param2`, `action3_param3`, `comment`) VALUES (610900, 6109, 4, 0, 100, 0, 0, 0, 0, 0, 1, 9072, 0, 0, 11, 23184, 0, 34, 0, 0, 0, 0, 'Azuregos - Aggro - Say Text and Cast Mark of Frost');
