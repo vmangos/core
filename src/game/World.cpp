@@ -1807,8 +1807,9 @@ void World::Update(uint32 diff)
     uint32 updateMapSystemTime = WorldTimer::getMSTime();
     std::unique_lock<std::mutex> lock(m_asyncTaskQueueMutex);
     _asyncTasks.swap(_asyncTasksBusy);
-    lock.unlock();
     std::future<void> job = m_updateThreads->processWorkload(_asyncTasksBusy);
+    _asyncTasks.clear();
+    lock.unlock();
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
     sLFGMgr.Update(diff);
