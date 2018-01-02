@@ -55,7 +55,10 @@ enum eScriptCommand
                                                             // datalong2 = creature entry (searching for a buddy, closest to source), datalong3 = creature search radius
                                                             // data_flags = flag_target_as_source           = 0x01
     SCRIPT_COMMAND_FIELD_SET                = 2,            // source = any, datalong = field_id, datalong2 = value
-    SCRIPT_COMMAND_MOVE_TO                  = 3,            // source = Creature, datalong = 1 if coordinates are relative to target, datalong2 = time, x/y/z
+    SCRIPT_COMMAND_MOVE_TO                  = 3,            // source = Creature
+                                                            // datalong: 1 = coordinates are relative to target, 2 = x is distance from target
+                                                            // datalong2 = time, x/y/z
+                                                            // data_flags & 0x1 = force movement even if creature cant move
     SCRIPT_COMMAND_FLAG_SET                 = 4,            // source = any, datalong = field_id, datalong2 = bitmask
     SCRIPT_COMMAND_FLAG_REMOVE              = 5,            // source = any, datalong = field_id, datalong2 = bitmask
     SCRIPT_COMMAND_TELEPORT_TO              = 6,            // source or target with Player, datalong = map_id, x/y/z
@@ -143,6 +146,11 @@ enum SummonCreatureFlags
     SUMMON_CREATURE_UNIQUE_TEMP = 0x4,                      // same as 0x2 but check for TempSummon only creatures
 };
 
+enum MoveToFlags
+{
+    MOVE_FORCED  = 0x1                                      // No check if creature can move.
+};
+
 struct ScriptInfo
 {
     uint32 id;
@@ -179,8 +187,11 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_MOVE_TO (3)
         {
-            uint32 relativeToTarget;                        // datalong
+            uint32 coordinatesType;                         // datalong
             uint32 travelTime;                              // datalong2
+            uint32 unused1;                                 // datalong3
+            uint32 unused2;                                 // datalong4
+            uint32 flags;                                   // data_flags
         } moveTo;
 
         struct                                              // SCRIPT_COMMAND_FLAG_SET (4)

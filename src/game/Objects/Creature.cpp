@@ -1629,6 +1629,9 @@ bool Creature::LoadFromDB(uint32 guidlow, Map *map)
     if (m_isCreatureLinkingTrigger && isAlive())
         GetMap()->GetCreatureLinkingHolder()->DoCreatureLinkingEvent(LINKING_EVENT_RESPAWN, this);
 
+    if (data->spawnFlags & SPAWN_FLAG_NOT_VISIBLE)
+        SetVisibility(VISIBILITY_OFF);
+
     return true;
 }
 

@@ -2499,15 +2499,32 @@ void Map::ScriptsProcess()
                 float y = step.script->y;
                 float z = step.script->z;
 
-                if (step.script->moveTo.relativeToTarget && target && target->isType(TYPEMASK_WORLDOBJECT))
+                if (step.script->moveTo.coordinatesType && target && target->isType(TYPEMASK_WORLDOBJECT))
                 {
                     if (WorldObject* pTarget = (WorldObject*)target)
                     {
-                        x += pTarget->GetPositionX();
-                        y += pTarget->GetPositionY();
-                        z += pTarget->GetPositionZ();
+                        switch (step.script->moveTo.coordinatesType)
+                        {
+                            case 1: // relative to target coordinates
+                            {
+                                x += pTarget->GetPositionX();
+                                y += pTarget->GetPositionY();
+                                z += pTarget->GetPositionZ();
+                                break;
+                            }
+                            case 2: // nearby point
+                            {
+                                float distance = x;
+                                pTarget->GetNearPoint(unit, x, y, z, 0, distance, frand(0, 2 * M_PI_F));
+                            }
+                        }
                     }
+
                 }
+
+                // Only move if we can move.
+                if (unit->hasUnitState(UNIT_STAT_NOT_MOVE) && !(step.script->moveTo.flags & MOVE_FORCED))
+                    break;
 
                 if (step.script->moveTo.travelTime != 0)
                 {
@@ -2516,6 +2533,7 @@ void Map::ScriptsProcess()
                 }
                 else
                     unit->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING, 0.0f, step.script->o ? step.script->o : -10.0f);
+                
                 break;
             }
             case SCRIPT_COMMAND_FLAG_SET:
@@ -2980,6 +2998,9 @@ void Map::ScriptsProcess()
                 }
 
                 Unit* spellSource = (Unit*)cmdSource;
+
+                if ((step.script->castSpell.flags & 0x08) && spellSource->IsNonMeleeSpellCasted(false))
+                    spellSource->InterruptNonMeleeSpells(false);
 
                 //TODO: when GO cast implemented, code below must be updated accordingly to also allow GO spell cast
                 spellSource->CastSpell(spellTarget, step.script->castSpell.spellId, (step.script->castSpell.flags & 0x04) != 0);

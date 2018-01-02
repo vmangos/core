@@ -16,7 +16,7 @@
 
 /* ScriptData
 SDName: Instance_Shadowfang_Keep
-SD%Complete: 90
+SD%Complete: 100
 SDComment:
 SDCategory: Shadowfang Keep
 EndScriptData */
@@ -28,23 +28,28 @@ enum
 {
     MAX_ENCOUNTER           = 6,
 
-    SAY_BOSS_DIE_AD         = -1033007,
-    SAY_BOSS_DIE_AS         = -1033008,
+    SAY_BOSS_DIE_AD         = 1328,
+    SAY_BOSS_DIE_AS         = 1329,
+    SAY_FENRUS_DEAD         = 1435,
+    SAY_WOLVES_DEAD         = 2086,
 
     NPC_BARON_SILVERLAINE   = 3887,
     NPC_CMD_SPRINGVALE      = 4278,
     NPC_ASH                 = 3850,
     NPC_ADA                 = 3849,
-    NPC_ARUGAL              = 10000,                        //"Arugal" says intro text, not used (Ustaag <Nostalrius>  : utilisé pour l'event de Fenrus)
+    NPC_ARUGAL              = 10000,                        //"Arugal" says intro text
     NPC_ARCHMAGE_ARUGAL     = 4275,                         //"Archmage Arugal" does Fenrus event
     NPC_FENRUS              = 4274,                         //used to summon Arugal in Fenrus event
     NPC_VINCENT             = 4444,                         //Vincent should be "dead" is Arugal is done the intro already
     NPC_NANDOS              = 3927,
 
     GO_COURTYARD_DOOR       = 18895,                        //door to open when talking to NPC's
-    GO_SORCERER_DOOR        = 18972,                        //door to open when Fenrus the Devourer
-    GO_ARUGAL_DOOR          = 18971,                        //door to open when Wolf Master Nandos
-    GO_ARUGAL_FOCUS         = 18973                         //this generates the lightning visual in the Fenrus event
+    GO_SORCERER_DOOR        = 18972,                        //door to open when Fenrus the Devourer dies
+    GO_ARUGAL_DOOR          = 18971,                        //door to open when Wolf Master Nandos dies
+    GO_ARUGAL_FOCUS         = 18973,                        //this generates the lightning visual in the Fenrus event
+
+    SPELL_ARUGAL_SPAWN      = 6422,
+    SPELL_VOID_EVENT        = 33019,
 };
 
 struct instance_shadowfang_keep : public ScriptedInstance
@@ -78,6 +83,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
     uint32 m_uiSpawnPatrolOnCmdDeath;
 
     uint32 m_uiCountDeadWolf;
+    uint32 m_bNandosYelled;
 
     bool isBaronDead;
     bool isCmdDead;
@@ -90,6 +96,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
         m_uiAdaGUID = 0;
 
         m_uiCountDeadWolf = 0;
+        m_bNandosYelled = false;
 
         m_uiDoorCourtyardGUID = 0;
         m_uiDoorSorcererGUID  = 0;
@@ -122,6 +129,11 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 break;
             case NPC_FENRUS:
                 m_uiFenrusGUID = pCreature->GetGUID();
+                break;
+            case NPC_ARUGAL:
+                //if Arugal has done the intro, make him invisible!
+                if (m_auiEncounter[4] == DONE)
+                    pCreature->SetVisibility(VISIBILITY_OFF);
                 break;
             case NPC_VINCENT:
                 m_uiVincentGUID = pCreature->GetGUID();
@@ -174,9 +186,22 @@ struct instance_shadowfang_keep : public ScriptedInstance
             {
                 if (pNandos->isAlive())
                 {
-                    pNandos->MonsterYell("I can't believe it! You've destroyed my pack... Now face my wrath!", 0);
-                    pNandos->SetWalk(false);
-                    pNandos->GetMotionMaster()->MovePoint(0, -171.0f, 2182.22f, 151.9f, MOVE_PATHFINDING);
+                    if (!m_bNandosYelled)
+                    {
+                        DoScriptText(SAY_WOLVES_DEAD, pNandos);
+                        pNandos->SetWalk(false);
+                        pNandos->GetMotionMaster()->MovePoint(0, -171.0f, 2182.22f, 151.9f, MOVE_PATHFINDING);
+                        m_bNandosYelled = true;
+                    }
+                    else if (Unit* victim = pNandos->getVictim())
+                    {
+                        // Once MovePoint has been used the movement generator type becomes idle.
+                        // If he has a target make him chase it.
+                        pNandos->SendMeleeAttackStart(victim);
+                        pNandos->GetMotionMaster()->Clear(false);
+                        pNandos->GetMotionMaster()->MoveChase(victim);
+                    }
+                    
                 }
             }
         }
@@ -288,7 +313,28 @@ struct instance_shadowfang_keep : public ScriptedInstance
             case TYPE_FENRUS:
                 if (uiData == DONE)
                     if (Creature* pFenrus = instance->GetCreature(m_uiFenrusGUID))
-                        pFenrus->SummonCreature(NPC_ARUGAL, -137.29f, 2169.588f, 136.57f, 2.810f, TEMPSUMMON_TIMED_DESPAWN, 10000);
+                        if (Creature* pArugal = pFenrus->SummonCreature(NPC_ARCHMAGE_ARUGAL, -137.29f, 2169.588f, 136.57f, 2.810f, TEMPSUMMON_TIMED_DESPAWN, 12000))
+                        {
+                            // Say text and cast event spell when fenrus is killed.
+                            pArugal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+                            DoScriptText(SAY_FENRUS_DEAD, pArugal);
+                            pArugal->CastSpell(pArugal, SPELL_VOID_EVENT, true);
+
+                            // After 2 seconds cast fire spell.
+                            static ScriptInfo si;
+                            si.command = SCRIPT_COMMAND_CAST_SPELL;
+                            si.castSpell.spellId = SPELL_ARUGAL_SPAWN;
+                            si.castSpell.flags = 0x1;
+                            pArugal->GetMap()->ScriptCommandStart(si, 2, pArugal, pArugal);
+                            
+                            // After 8 seconds create lightning.
+                            if (GameObject* pLightning = instance->GetGameObject(GetData64(DATA_LIGHTNING)))
+                            {
+                                static ScriptInfo si2;
+                                si2.command = SCRIPT_COMMAND_ACTIVATE_OBJECT;
+                                pArugal->GetMap()->ScriptCommandStart(si2, 8, pArugal, pLightning);
+                            }
+                        }
                 m_auiEncounter[2] = uiData;
                 break;
             case TYPE_NANDOS:

@@ -107,7 +107,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectTeleUnitsFaceCaster,                      // 43 SPELL_EFFECT_TELEPORT_UNITS_FACE_CASTER
     &Spell::EffectLearnSkill,                               // 44 SPELL_EFFECT_SKILL_STEP
     &Spell::EffectAddHonor,                                 // 45 SPELL_EFFECT_ADD_HONOR                honor/pvp related
-    &Spell::EffectNULL,                                     // 46 SPELL_EFFECT_SPAWN                    spawn/login animation, expected by spawn unit cast, also base points store some dynflags
+    &Spell::EffectSpawn,                                    // 46 SPELL_EFFECT_SPAWN                    spawn/login animation, expected by spawn unit cast, also base points store some dynflags
     &Spell::EffectTradeSkill,                               // 47 SPELL_EFFECT_TRADE_SKILL
     &Spell::EffectUnused,                                   // 48 SPELL_EFFECT_STEALTH                  one spell: Base Stealth
     &Spell::EffectUnused,                                   // 49 SPELL_EFFECT_DETECT                   one spell: Detect
@@ -522,6 +522,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         {
             switch (m_spellInfo->Id)
             {
+                case 6700: // Dimensional Portal (Used by Arugal)
+                {
+                    if (unitTarget->GetTypeId() == TYPEID_UNIT)
+                    {
+                        if (InstanceData* m_pInstance = unitTarget->GetInstanceData())
+                            m_pInstance->SetData(5, 3);
+
+                        unitTarget->SetVisibility(VISIBILITY_OFF);
+                    }
+                    break;
+                }
                 case 11885: // Capture Treant
                 case 11886: // Capture Wildkin
                 case 11887: // Capture Hippogryph
@@ -3537,6 +3548,14 @@ void Spell::EffectAddHonor(SpellEffectIndex /*eff_idx*/)
     // also we must use damage (spelldescription says +25 honor but damage is only 24)
     ((Player*)unitTarget)->GetHonorMgr().Add(float(damage), QUEST);
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "SpellEffect::AddHonor (spell_id %u) rewards %u honor points (non scale) for player: %u", m_spellInfo->Id, damage, ((Player*)unitTarget)->GetGUIDLow());
+}
+
+void Spell::EffectSpawn(SpellEffectIndex /*eff_idx*/)
+{
+    if (!unitTarget || (unitTarget->GetTypeId() != TYPEID_UNIT))
+        return;
+
+    unitTarget->SetVisibility(VISIBILITY_ON);
 }
 
 void Spell::EffectTradeSkill(SpellEffectIndex /*eff_idx*/)
