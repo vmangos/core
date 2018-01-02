@@ -16,16 +16,13 @@
 
 /* ScriptData
 SDName: Shadowfang_Keep
-SD%Complete: 75
+SD%Complete: 100
 SDComment: npc_shadowfang_prisoner using escortAI for movement to door.
 SDCategory: Shadowfang Keep
 EndScriptData */
 
 /* ContentData
 npc_shadowfang_prisoner
-mob_arugal_voidwalker
-npc_arugal
-boss_arugal
 npc_deathstalker_vincent
 EndContentData */
 
