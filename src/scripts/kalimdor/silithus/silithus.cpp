@@ -3059,7 +3059,7 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
     void SummonedCreatureDespawn(Creature* pSummoned)
     {
-        if (pSummoned->GetObjectGuid() == m_uiHunterKillerGUID)
+        if (pSummoned->GetObjectGuid() == m_uiHunterKillerGUID && eEventStatus != EVENT_COMPLETE)
         {
             // m_creature->MonsterTextEmote("SumCreaDespawn", NULL); // pour debug
             ResetEvent();
