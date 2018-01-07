@@ -113,8 +113,8 @@ struct boss_skeramAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         m_creature->SetRespawnDelay(7 * DAY);
 
-        if (Killer->IsPlayer())
-            m_creature->GetMap()->BindToInstanceOrRaid(Killer->ToPlayer(), m_creature->GetRespawnTimeEx(), true);
+        if (Player* player = Killer->GetCharmerOrOwnerPlayerOrPlayerItself())
+            m_creature->GetMap()->BindToInstanceOrRaid(player, m_creature->GetRespawnTimeEx(), true);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_SKERAM, DONE);
