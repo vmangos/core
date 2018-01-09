@@ -191,6 +191,8 @@ typedef ACE_Thread_Mutex MapMutexType; // Use ACE_Null_Mutex to disable locks
 // Instance IDs reserved for internal use (instanced continent parts, ...)
 #define RESERVED_INSTANCES_LAST 100
 
+typedef bool(Map::*ScriptCommandFunction) (ScriptAction& step, Object* source, Object* target);
+
 class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
 {
     friend class MapReference;
@@ -326,6 +328,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         //per-map script storage
         void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
         void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
+        void TerminateScript(ScriptAction& step);
 
         // must called with AddToWorld
         void AddToActive(WorldObject* obj);
@@ -623,6 +626,87 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         // Holder for information about linked mobs
         CreatureLinkingHolder m_creatureLinkingHolder;
+
+        // Functions to handle all db script commands.
+        bool ScriptCommand_Talk(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_Emote(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_FieldSet(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_MoveTo(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_FlagSet(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_FlagRemove(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_TeleportTo(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_QuestExplored(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_KillCredit(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_RespawnGameObject(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SummonCreature(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_OpenDoor(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_CloseDoor(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_ActivateGameObject(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_RemoveAura(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_CastSpell(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_PlaySound(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_CreateItem(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_DespawnCreature(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetEquipment(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetMovementType(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetActiveObject(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetFaction(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_Morph(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_Mount(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetRun(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_AttackStart(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetLockState(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetStandState(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_ModifyNpcFlags(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SendTaxiPath(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_TerminateScript(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_TerminateCondition(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_Evade(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetHomePosition(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_TurnTo(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_MeetingStone(ScriptAction& step, Object* source, Object* target);
+
+        // Add any new script command functions to the array.
+        const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
+        {
+            &Map::ScriptCommand_Talk,                   // 0
+            &Map::ScriptCommand_Emote,                  // 1
+            &Map::ScriptCommand_FieldSet,               // 2
+            &Map::ScriptCommand_MoveTo,                 // 3
+            &Map::ScriptCommand_FlagSet,                // 4
+            &Map::ScriptCommand_FlagRemove,             // 5
+            &Map::ScriptCommand_TeleportTo,             // 6
+            &Map::ScriptCommand_QuestExplored,          // 7
+            &Map::ScriptCommand_KillCredit,             // 8
+            &Map::ScriptCommand_RespawnGameObject,      // 9
+            &Map::ScriptCommand_SummonCreature,         // 10
+            &Map::ScriptCommand_OpenDoor,               // 11
+            &Map::ScriptCommand_CloseDoor,              // 12
+            &Map::ScriptCommand_ActivateGameObject,     // 13
+            &Map::ScriptCommand_RemoveAura,             // 14
+            &Map::ScriptCommand_CastSpell,              // 15
+            &Map::ScriptCommand_PlaySound,              // 16
+            &Map::ScriptCommand_CreateItem,             // 17
+            &Map::ScriptCommand_DespawnCreature,        // 18
+            &Map::ScriptCommand_SetEquipment,           // 19
+            &Map::ScriptCommand_SetMovementType,        // 20
+            &Map::ScriptCommand_SetActiveObject,        // 21
+            &Map::ScriptCommand_SetFaction,             // 22
+            &Map::ScriptCommand_Morph,                  // 23
+            &Map::ScriptCommand_Mount,                  // 24
+            &Map::ScriptCommand_SetRun,                 // 25
+            &Map::ScriptCommand_AttackStart,            // 26
+            &Map::ScriptCommand_SetLockState,           // 27
+            &Map::ScriptCommand_SetStandState,          // 28
+            &Map::ScriptCommand_ModifyNpcFlags,         // 29
+            &Map::ScriptCommand_SendTaxiPath,           // 30
+            &Map::ScriptCommand_TerminateScript,        // 31
+            &Map::ScriptCommand_TerminateCondition,     // 32
+            &Map::ScriptCommand_Evade,                  // 33
+            &Map::ScriptCommand_SetHomePosition,        // 34
+            &Map::ScriptCommand_TurnTo,                 // 35
+            &Map::ScriptCommand_MeetingStone            // 36
+        };
 
     public:
         CreatureGroupHolderType CreatureGroupHolder;
