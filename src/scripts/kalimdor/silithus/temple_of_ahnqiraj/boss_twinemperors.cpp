@@ -187,7 +187,6 @@ struct boss_twinemperorsAI : public ScriptedAI
     boss_twinemperorsAI(Creature* pCreature) : 
         ScriptedAI(pCreature)
     {
-        pCreature->SetLootAndXPModDist(150.0f);
 
         instance_temple_of_ahnqiraj* tmpPTr = dynamic_cast<instance_temple_of_ahnqiraj*>(pCreature->GetInstanceData());
         if (!tmpPTr) {

@@ -120,7 +120,6 @@ struct boss_heiganAI : public ScriptedAI
     {
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
-        pCreature->SetLootAndXPModDist(300.0f);
     }
     instance_naxxramas* m_pInstance;
 

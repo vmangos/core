@@ -252,7 +252,6 @@ void AddSC_instance_zulfarrak();
 
 void AddSC_ashenvale();
 void AddSC_azshara();
-void AddSC_boss_azuregos();
 void AddSC_boss_anachronos();
 void AddSC_darkshore();
 void AddSC_desolace();
@@ -526,7 +525,6 @@ void AddScripts()
 
     AddSC_ashenvale();
     AddSC_azshara();
-    AddSC_boss_azuregos();
     AddSC_boss_anachronos();
     AddSC_darkshore();
     AddSC_desolace();

@@ -3619,7 +3619,7 @@ void Spell::cast(bool skipCheck)
 void Spell::handle_immediate()
 {
     bool sendGoBefore = true;
-    if (IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_INSTAKILL))
+    if (IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_INSTAKILL) || IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_SPAWN))
         sendGoBefore = false;
     if (sendGoBefore)
         SendSpellGo();

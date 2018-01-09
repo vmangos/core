@@ -122,7 +122,6 @@ struct boss_razuviousAI : public ScriptedAI
         m_pInstance = (instance_naxxramas*)pCreature->GetInstanceData();
         Reset();
         RespawnAdds();
-        pCreature->SetLootAndXPModDist(150.0f);
     }
 
     instance_naxxramas* m_pInstance;

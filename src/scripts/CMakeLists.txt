@@ -277,7 +277,6 @@ set (SCRIPTS_SRCS
 	PrecompiledHeaders/scriptPCH.cpp
 	world/areatrigger_scripts.cpp
 	world/boss_anachronos.cpp
-	world/boss_azuregos.cpp
 	world/boss_lord_kazzak.cpp
 	world/elemental_invasions.cpp
 	world/event_scourge_invasion.cpp

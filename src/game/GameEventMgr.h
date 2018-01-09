@@ -28,6 +28,7 @@
 #include "Policies/Singleton.h"
 
 #define max_ge_check_delay 86400                            // 1 day in seconds
+#define default_year_length 525600                          // 365 days in minutes
 
 class Creature;
 class GameObject;
@@ -41,7 +42,7 @@ enum SilithusPVPEventState
 
 struct GameEventData
 {
-    GameEventData() : start(1), end(0), occurence(0), length(0), holiday_id(HOLIDAY_NONE), hardcoded(0), disabled(0)
+    GameEventData() : start(1), end(0), occurence(0), length(0), holiday_id(HOLIDAY_NONE), hardcoded(0), disabled(0), leapDays(0)
     {
     }
 
@@ -53,6 +54,7 @@ struct GameEventData
     std::string description;
     uint8 hardcoded;
     uint8 disabled;
+    uint8 leapDays;                                         // Leap days between current and start date
 
     bool isValid() const { return length > 0; }
 };

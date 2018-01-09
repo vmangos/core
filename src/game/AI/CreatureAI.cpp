@@ -239,7 +239,13 @@ void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
                 continue;
 
             if (DoCastSpellIfCan(spellTarget, spell.spellId, spell.castFlags) == CAST_OK)
+            {
                 spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
+
+                // If there is a script for this spell, run it.
+                if (spell.scriptId)
+                    m_creature->GetMap()->ScriptsStart(sCreatureSpellScripts, spell.scriptId, m_creature, spellTarget);
+            }
         }
         else
             spell.cooldown -= uiDiff;

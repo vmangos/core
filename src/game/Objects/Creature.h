@@ -32,6 +32,7 @@
 #include "Database/DatabaseEnv.h"
 #include "CreatureGroups.h"
 #include "Cell.h"
+#include "Util.h"
 
 #include <list>
 
@@ -197,7 +198,8 @@ struct CreatureData
     float posY;
     float posZ;
     float orientation;
-    uint32 spawntimesecs;
+    uint32 spawntimesecsmin;
+    uint32 spawntimesecsmax;
     float spawndist;
     uint32 currentwaypoint;
     uint32 curhealth;
@@ -210,6 +212,7 @@ struct CreatureData
     uint32 instanciatedContinentInstanceId;
     // helper function
     ObjectGuid GetObjectGuid(uint32 lowguid) const { return ObjectGuid(CreatureInfo::GetHighGuid(), id, lowguid); }
+    uint32 GetRandomRespawnTime() const { return urand(spawntimesecsmin, spawntimesecsmax); }
 };
 
 // from `creature_addon` and `creature_template_addon`tables

@@ -1430,36 +1430,6 @@ void CreatureEventAI::DoScriptText(int32 textEntry, Unit* pSource, Unit* target)
     }
 }
 
-bool CreatureEventAI::CanCast(Unit* Target, SpellEntry const *Spell, bool Triggered)
-{
-    //No target so we can't cast
-    if (!Target || !Spell)
-        return false;
-
-    //Silenced so we can't cast
-    if (!Triggered && (m_creature->hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL) ||
-                       m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED)))
-        return false;
-
-    //Check for power
-    if (!Triggered && m_creature->GetPower((Powers)Spell->powerType) < Spell::CalculatePowerCost(Spell, m_creature))
-        return false;
-
-    SpellRangeEntry const *TempRange = nullptr;
-
-    TempRange = GetSpellRangeStore()->LookupEntry(Spell->rangeIndex);
-
-    //Spell has invalid range store so we can't use it
-    if (!TempRange)
-        return false;
-
-    //Unit is out of range of this spell
-    if (!m_creature->IsInRange(Target, TempRange->minRange, TempRange->maxRange))
-        return false;
-
-    return true;
-}
-
 void CreatureEventAI::ReceiveEmote(Player* pPlayer, uint32 text_emote)
 {
     if (m_bEmptyList)

@@ -405,7 +405,7 @@ struct boss_rajaxxAQWarAI : public boss_rajaxxAI
         DoScriptText(SAY_AQ_WAR_START, m_creature);
     }
 
-    void UpdateAI(uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         return;
     }

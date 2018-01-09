@@ -254,33 +254,6 @@ SpellEntry const* ScriptedAI::SelectSpell(Unit* pTarget, int32 uiSchool, int32 u
     return apSpell[rand()%uiSpellCount];
 }
 
-bool ScriptedAI::CanCast(Unit* pTarget, SpellEntry const* pSpellEntry, bool bTriggered)
-{
-    //No target so we can't cast
-    if (!pTarget || !pSpellEntry)
-        return false;
-
-    //Silenced so we can't cast
-    if (!bTriggered && m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-        return false;
-
-    //Check for power
-    if (!bTriggered && m_creature->GetPower((Powers)pSpellEntry->powerType) < pSpellEntry->manaCost)
-        return false;
-
-    SpellRangeEntry const* pTempRange = GetSpellRangeStore()->LookupEntry(pSpellEntry->rangeIndex);
-
-    //Spell has invalid range store so we can't use it
-    if (!pTempRange)
-        return false;
-
-    //Unit is out of range of this spell
-    if (!m_creature->IsInRange(pTarget, pTempRange->minRange, pTempRange->maxRange))
-        return false;
-
-    return true;
-}
-
 void ScriptedAI::DoResetThreat()
 {
     if (!m_creature->CanHaveThreatList() || m_creature->getThreatManager().isThreatListEmpty())

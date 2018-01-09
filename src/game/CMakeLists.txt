@@ -163,6 +163,7 @@ set (game_SRCS
 	Maps/MapPersistentStateMgr.cpp
 	Maps/MoveMap.cpp
 	Maps/PathFinder.cpp
+	Maps/ScriptCommands.cpp
 	Maps/ZoneScript.cpp
 	Maps/ZoneScriptMgr.cpp
 	Maps/Pool/PoolManager.cpp
