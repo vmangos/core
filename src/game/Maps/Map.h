@@ -665,6 +665,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_SetHomePosition(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_TurnTo(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_MeetingStone(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetData(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_SetData64(ScriptAction& step, Object* source, Object* target);
 
         // Add any new script command functions to the array.
         const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -705,7 +707,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_Evade,                  // 33
             &Map::ScriptCommand_SetHomePosition,        // 34
             &Map::ScriptCommand_TurnTo,                 // 35
-            &Map::ScriptCommand_MeetingStone            // 36
+            &Map::ScriptCommand_MeetingStone,           // 36
+            &Map::ScriptCommand_SetData,                // 37
+            &Map::ScriptCommand_SetData64,              // 38
         };
 
     public:

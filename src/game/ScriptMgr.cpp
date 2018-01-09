@@ -632,6 +632,24 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_SET_INST_DATA:
+            {
+                if (tmp.setData.type >= SO_INSTDATA_MAX)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid option datalong3 = %u in SCRIPT_COMMAND_SET_INST_DATA for script id %u.", tablename, tmp.setData.type, tmp.id);
+                    continue;
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_SET_INST_DATA64:
+            {
+                if (tmp.setData64.type >= SO_INSTDATA64_MAX)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid option datalong3 = %u in SCRIPT_COMMAND_SET_INST_DATA64 for script id %u.", tablename, tmp.setData64.type, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

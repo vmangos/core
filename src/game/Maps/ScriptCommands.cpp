@@ -19,6 +19,7 @@
 #include "Map.h"
 #include "ScriptMgr.h"
 #include "GridSearchers.h"
+#include "InstanceData.h"
 
 // Script commands should return false by default.
 // If they return true the rest of the script is aborted.
@@ -1271,6 +1272,85 @@ bool Map::ScriptCommand_MeetingStone(ScriptAction& step, Object* source, Object*
 
     if (!sLFGMgr.IsPlayerInQueue(pPlayer->GetObjectGuid()))
         sLFGMgr.AddToQueue(pPlayer, step.script->meetingstone.areaId);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_SET_INST_DATA (37)
+bool Map::ScriptCommand_SetData(ScriptAction& step, Object* source, Object* target)
+{
+    InstanceData* pInst = GetInstanceData();
+    
+    if (!pInst)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_INST_DATA (script id %u) call for map without an instance script, skipping.", step.script->id);
+        return ShouldAbortScript(step);
+    }
+
+    uint32 uiData = step.script->setData.data;
+    switch (step.script->setData.type)
+    {
+        case SO_INSTDATA_RAW:
+        {
+            break;
+        }
+        case SO_INSTDATA_INCREMENT:
+        {
+            uiData+= pInst->GetData(step.script->setData.field);
+            break;
+        }
+        case SO_INSTDATA_DECREMENT:
+        {
+            uint32 uiOldData = pInst->GetData(step.script->setData.field);
+            uiData = (uiData < uiOldData) ? (uiOldData - uiData) : 0;
+            break;
+        }
+        default:
+        {
+            sLog.outError("SCRIPT_COMMAND_SET_INST_DATA (script id %u) call for an invalid type (datalong3=%u), skipping.", step.script->id, step.script->setData.type);
+            return ShouldAbortScript(step);
+        }
+    }
+
+    pInst->SetData(step.script->setData.field, uiData);
+    return false;
+}
+
+// SCRIPT_COMMAND_SET_INST_DATA64 (38)
+bool Map::ScriptCommand_SetData64(ScriptAction& step, Object* source, Object* target)
+{
+    InstanceData* pInst = GetInstanceData();
+    
+    if (!pInst)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_INST_DATA64 (script id %u) call for map without an instance script, skipping.", step.script->id);
+        return ShouldAbortScript(step);
+    }
+
+    switch (step.script->setData64.type)
+    {
+        case SO_INSTDATA64_RAW:
+        {
+            pInst->SetData64(step.script->setData64.field, step.script->setData64.data);
+            break;
+        }
+        case SO_INSTDATA64_SOURCE_GUID:
+        {
+            if (source)
+                pInst->SetData64(step.script->setData64.field, source->GetGUID());
+            else
+            {
+                sLog.outError("SCRIPT_COMMAND_SET_INST_DATA64 (script id %u) call for a NULL source, skipping.", step.script->id);
+                return ShouldAbortScript(step);
+            }
+            break;
+        }
+        default:
+        {
+            sLog.outError("SCRIPT_COMMAND_SET_INST_DATA64 (script id %u) call for an invalid type (datalong3=%u), skipping.", step.script->id, step.script->setData64.type);
+            return ShouldAbortScript(step);
+        }
+    }
 
     return false;
 }

@@ -176,7 +176,15 @@ enum eScriptCommand
                                                             // datalong = eTurnToFacingOptions
     SCRIPT_COMMAND_MEETINGSTONE             = 36,           // source = Player
                                                             // datalong = area_id
-
+    SCRIPT_COMMAND_SET_INST_DATA            = 37,           // source = Map
+                                                            // datalong = field
+                                                            // datalong2 = data
+                                                            // datalong3 = eSetInstDataOptions
+    SCRIPT_COMMAND_SET_INST_DATA64          = 38,           // source = Map
+                                                            // target = Object (when saving guid)
+                                                            // datalong = field
+                                                            // datalong2 = data
+                                                            // datalong3 = eSetInstData64Options
     SCRIPT_COMMAND_MAX
 
 };
@@ -267,6 +275,25 @@ enum eTurnToFacingOptions
 {
     SO_TURNTO_FACE_TARGET          = 0,
     SO_TURNTO_PROVIDED_ORIENTATION = 1
+};
+
+// Possible datalong3 values for SCRIPT_COMMAND_SET_INST_DATA
+enum eSetInstDataOptions
+{
+    SO_INSTDATA_RAW       = 0,
+    SO_INSTDATA_INCREMENT = 1,
+    SO_INSTDATA_DECREMENT = 2,
+
+    SO_INSTDATA_MAX
+};
+
+// Possible datalong3 values for SCRIPT_COMMAND_SET_INST_DATA64
+enum eSetInstData64Options
+{
+    SO_INSTDATA64_RAW         = 0,
+    SO_INSTDATA64_SOURCE_GUID = 1,
+
+    SO_INSTDATA64_MAX
 };
 
 // Values used in buddy_type column
@@ -516,6 +543,20 @@ struct ScriptInfo
         {
             uint32 areaId;                                  // datalong
         } meetingstone;
+
+        struct                                              // SCRIPT_COMMAND_SET_INST_DATA (37)
+        {
+            uint32 field;
+            uint32 data;
+            uint32 type;
+        } setData;
+
+        struct                                              // SCRIPT_COMMAND_SET_INST_DATA64 (38)
+        {
+            uint32 field;
+            uint32 data;
+            uint32 type;
+        } setData64;
 
         struct
         {

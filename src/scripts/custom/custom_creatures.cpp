@@ -1015,7 +1015,7 @@ struct npc_summon_debugAI : ScriptedAI
     npc_summon_debugAI(Creature *pCreature) : ScriptedAI(pCreature)
     {
         m_summonCount = 0;
-        for (int i = 0; i < m_maxSummonCount; ++i)
+        for (uint32 i = 0; i < m_maxSummonCount; ++i)
             m_summons[i] = nullptr;
 
         Reset();
@@ -1024,7 +1024,7 @@ struct npc_summon_debugAI : ScriptedAI
     void Reset() override
     {
         m_summonCount = 0;
-        for (int i = 0; i < m_maxSummonCount; ++i)
+        for (uint32 i = 0; i < m_maxSummonCount; ++i)
         {
             if (m_summons[i])
                 ((TemporarySummon*)m_summons[i])->UnSummon();
