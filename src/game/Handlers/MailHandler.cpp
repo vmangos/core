@@ -420,7 +420,10 @@ void WorldSession::HandleMailMarkAsRead(WorldPacket & recv_data)
         m->checked = m->checked | MAIL_CHECK_MASK_READ;
         pl->MarkMailsUpdated();
         m->state = MAIL_STATE_CHANGED;
-        m->expire_time = time(NULL) + (3 * DAY);
+
+        time_t time_now = time(NULL);
+        if ((m->expire_time - time_now) > (3 * DAY))
+            m->expire_time = time_now + (3 * DAY);
     }
 }
 
