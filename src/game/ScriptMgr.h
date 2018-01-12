@@ -80,7 +80,7 @@ enum eScriptCommand
                                                             // datalong2 = bitmask
     SCRIPT_COMMAND_TELEPORT_TO              = 6,            // source = Unit
                                                             // datalong = map_id (only used for players but still required)
-                                                            // datalong2 = eTeleportToFlags
+                                                            // datalong2 = teleport_options (see enum TeleportToOptions)
                                                             // x/y/z/o = coordinates
     SCRIPT_COMMAND_QUEST_EXPLORED           = 7,            // source = Player (from provided source or target)
                                                             // target = WorldObject (from provided source or target)
@@ -372,6 +372,7 @@ struct ScriptInfo
         struct                                              // SCRIPT_COMMAND_TELEPORT_TO (6)
         {
             uint32 mapId;                                   // datalong
+            uint32 teleportOptions;                          // datalong2
         } teleportTo;
 
         struct                                              // SCRIPT_COMMAND_QUEST_EXPLORED (7)

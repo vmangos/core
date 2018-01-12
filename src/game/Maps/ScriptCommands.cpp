@@ -244,9 +244,9 @@ bool Map::ScriptCommand_TeleportTo(ScriptAction& step, Object* source, Object* t
     Unit* pSource = static_cast<Unit*>(source);
 
     if (pSource->GetTypeId() == TYPEID_PLAYER)
-        (static_cast<Player*>(pSource))->TeleportTo(step.script->teleportTo.mapId, step.script->x, step.script->y, step.script->z, step.script->o);
+        (static_cast<Player*>(pSource))->TeleportTo(step.script->teleportTo.mapId, step.script->x, step.script->y, step.script->z, step.script->o, step.script->teleportTo.teleportOptions);
     else
-        pSource->NearTeleportTo(step.script->x, step.script->y, step.script->z, step.script->o);
+        pSource->NearTeleportTo(step.script->x, step.script->y, step.script->z, step.script->o, step.script->teleportTo.teleportOptions);
 
     return false;
 }
