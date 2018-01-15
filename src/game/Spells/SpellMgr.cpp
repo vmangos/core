@@ -1437,7 +1437,7 @@ void SpellMgr::LoadSpellProcEvents()
         spe.spellFamilyName = fields[2].GetUInt32();
 
         for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-            spe.spellFamilyMask[i] = ClassFamilyMask(fields[3 + i].GetUInt64());
+            spe.spellFamilyMask[i] = fields[3 + i].GetUInt64();
 
         spe.procFlags       = fields[6].GetUInt32();
         spe.procEx          = fields[7].GetUInt32();
@@ -3087,8 +3087,8 @@ void SpellMgr::LoadSpellLearnSkills()
 
     // search auto-learned skills and add its to map also for use in unlearn spells/talents
     uint32 dbc_count = 0;
-    BarGoLink bar(sSpellStore.GetNumRows());
-    for (uint32 spell = 0; spell < sSpellStore.GetNumRows(); ++spell)
+    BarGoLink bar(sSpellMgr.GetMaxSpellId());
+    for (uint32 spell = 0; spell < sSpellMgr.GetMaxSpellId(); ++spell)
     {
         bar.step();
         SpellEntry const* entry = sSpellMgr.GetSpellEntry(spell);
@@ -3180,7 +3180,7 @@ void SpellMgr::LoadSpellLearnSpells()
 
     // search auto-learned spells and add its to map also for use in unlearn spells/talents
     uint32 dbc_count = 0;
-    for (uint32 spell = 0; spell < sSpellStore.GetNumRows(); ++spell)
+    for (uint32 spell = 0; spell < sSpellMgr.GetMaxSpellId(); ++spell)
     {
         SpellEntry const* entry = sSpellMgr.GetSpellEntry(spell);
 
@@ -3348,7 +3348,7 @@ void SpellMgr::LoadSpellScriptTarget()
 
     // Check all spells
     /* Disabled (lot errors at this moment)
-    for(uint32 i = 1; i < sSpellStore.nCount; ++i)
+    for(uint32 i = 1; i < sSpellMgr.GetMaxSpellId; ++i)
     {
         SpellEntry const * spellInfo = sSpellMgr.GetSpellEntry(i);
         if(!spellInfo)
@@ -4056,7 +4056,7 @@ void SpellMgr::CheckUsedSpells(char const* table)
             ++countMasks;
 
             bool found = false;
-            for (uint32 spellId = 1; spellId < sSpellStore.GetNumRows(); ++spellId)
+            for (uint32 spellId = 1; spellId < sSpellMgr.GetMaxSpellId(); ++spellId)
             {
                 SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellId);
                 if (!spellEntry)
@@ -4261,7 +4261,7 @@ void SpellMgr::LoadSpellAffects()
     sLog.outString();
     sLog.outString(">> Loaded %u spell affect definitions", count);
 
-    for (uint32 id = 0; id < sSpellStore.GetNumRows(); ++id)
+    for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); ++id)
     {
         SpellEntry const* spellInfo = sSpellMgr.GetSpellEntry(id);
         if (!spellInfo)
@@ -4335,20 +4335,252 @@ void SpellMgr::LoadSpells()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
     sLog.outString("Loading spells ...");
-    mSpellEntryMap.resize(sSpellStore.GetNumRows(), nullptr);
 
-    for (uint32 i = 0; i < sSpellStore.GetNumRows(); ++i)
+    // Getting the maximum ID.
+    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM spell_template");
+
+    if (!result)
     {
-        if (DBCSpellEntry const* spellEntry = sSpellStore.LookupEntry(i))
-        {
-            SpellEntry* newSpell = new SpellEntry();
-            if (!newSpell->Load(spellEntry))
-            {
-                delete newSpell;
-                continue;
-            }
-            mSpellEntryMap[i] = newSpell;
-        }
+        sLog.outString(">> Loaded 0 spells. DB table `spell_template` is empty.");
+        return;
     }
-    sLog.outString("%u spells loaded in %ums.", mSpellEntryMap.size(), WorldTimer::getMSTimeDiffToNow(oldMSTime));
+    auto fields = result->Fetch();
+    uint32 maxEntry = fields[0].GetUInt32() + 1;
+    delete result;
+
+    // Actually loading the spells.
+    result = WorldDatabase.Query("SELECT * FROM spell_template");
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 spells. DB table `spell_template` is empty.");
+        return;
+    }
+    
+    mSpellEntryMap.resize(maxEntry, nullptr);
+
+    do
+    {
+        fields = result->Fetch();
+
+        SpellEntry* spell = new SpellEntry();
+
+        uint32 spellId = fields[0].GetUInt32();
+
+        spell->Id = spellId;
+        spell->School = fields[1].GetUInt32();
+        spell->Category = fields[2].GetUInt32();
+        //spell->castUI = fields[3].GetUInt32(); not used
+        spell->Dispel = fields[4].GetUInt32();
+        spell->Mechanic = fields[5].GetUInt32();
+        spell->Attributes = fields[6].GetUInt32();
+        spell->AttributesEx = fields[7].GetUInt32();
+        spell->AttributesEx2 = fields[8].GetUInt32();
+        spell->AttributesEx3 = fields[9].GetUInt32();
+        spell->AttributesEx4 = fields[10].GetUInt32();
+        spell->Stances = fields[11].GetUInt32();
+        spell->StancesNot = fields[12].GetUInt32();
+        spell->Targets = fields[13].GetUInt32();
+        spell->TargetCreatureType = fields[14].GetUInt32();
+        spell->RequiresSpellFocus = fields[15].GetUInt32();
+        spell->CasterAuraState = fields[16].GetUInt32();
+        spell->TargetAuraState = fields[17].GetUInt32();
+        spell->CastingTimeIndex = fields[18].GetUInt32();
+        spell->RecoveryTime = fields[19].GetUInt32();
+        spell->CategoryRecoveryTime = fields[20].GetUInt32();
+        spell->InterruptFlags = fields[21].GetUInt32();
+        spell->AuraInterruptFlags = fields[22].GetUInt32();
+        spell->ChannelInterruptFlags = fields[23].GetUInt32();
+        spell->procFlags = fields[24].GetUInt32();
+        spell->procChance = fields[25].GetUInt32();
+        spell->procCharges = fields[26].GetUInt32();
+        spell->maxLevel = fields[27].GetUInt32();
+        spell->baseLevel = fields[28].GetUInt32();
+        spell->spellLevel = fields[29].GetUInt32();
+        spell->DurationIndex = fields[30].GetUInt32();
+        spell->powerType = fields[31].GetUInt32();
+        spell->manaCost = fields[32].GetUInt32();
+        spell->manaCostPerlevel = fields[33].GetUInt32();
+        spell->manaPerSecond = fields[34].GetUInt32();
+        spell->manaPerSecondPerLevel = fields[35].GetUInt32();
+        spell->rangeIndex = fields[36].GetUInt32();
+        spell->speed = fields[37].GetFloat();
+        //spell->modalNextSpell = fields[38].GetUInt32(); not used
+        spell->StackAmount = fields[39].GetUInt32();
+        spell->Totem[0] = fields[40].GetUInt32();
+        spell->Totem[1] = fields[41].GetUInt32();
+        spell->Reagent[0] = fields[42].GetInt32();
+        spell->Reagent[1] = fields[43].GetInt32();
+        spell->Reagent[2] = fields[44].GetInt32();
+        spell->Reagent[3] = fields[45].GetInt32();
+        spell->Reagent[4] = fields[46].GetInt32();
+        spell->Reagent[5] = fields[47].GetInt32();
+        spell->Reagent[6] = fields[48].GetInt32();
+        spell->Reagent[7] = fields[49].GetInt32();
+        spell->ReagentCount[0] = fields[50].GetUInt32();
+        spell->ReagentCount[1] = fields[51].GetUInt32();
+        spell->ReagentCount[2] = fields[52].GetUInt32();
+        spell->ReagentCount[3] = fields[53].GetUInt32();
+        spell->ReagentCount[4] = fields[54].GetUInt32();
+        spell->ReagentCount[5] = fields[55].GetUInt32();
+        spell->ReagentCount[6] = fields[56].GetUInt32();
+        spell->ReagentCount[7] = fields[57].GetUInt32();
+        spell->EquippedItemClass = fields[58].GetInt32();
+        spell->EquippedItemSubClassMask = fields[59].GetInt32();
+        spell->EquippedItemInventoryTypeMask = fields[60].GetInt32();
+        spell->Effect[0] = fields[61].GetUInt32();
+        spell->Effect[1] = fields[62].GetUInt32();
+        spell->Effect[2] = fields[63].GetUInt32();
+        spell->EffectDieSides[0] = fields[64].GetInt32();
+        spell->EffectDieSides[1] = fields[65].GetInt32();
+        spell->EffectDieSides[2] = fields[66].GetInt32();
+        spell->EffectBaseDice[0] = fields[67].GetUInt32();
+        spell->EffectBaseDice[1] = fields[68].GetUInt32();
+        spell->EffectBaseDice[2] = fields[69].GetUInt32();
+        spell->EffectDicePerLevel[0] = fields[70].GetFloat();
+        spell->EffectDicePerLevel[1] = fields[71].GetFloat();
+        spell->EffectDicePerLevel[2] = fields[72].GetFloat();
+        spell->EffectRealPointsPerLevel[0] = fields[73].GetFloat();
+        spell->EffectRealPointsPerLevel[1] = fields[74].GetFloat();
+        spell->EffectRealPointsPerLevel[2] = fields[75].GetFloat();
+        spell->EffectBasePoints[0] = fields[76].GetInt32();
+        spell->EffectBasePoints[1] = fields[77].GetInt32();
+        spell->EffectBasePoints[2] = fields[78].GetInt32();
+        spell->EffectMechanic[0] = fields[79].GetUInt32();
+        spell->EffectMechanic[1] = fields[80].GetUInt32();
+        spell->EffectMechanic[2] = fields[81].GetUInt32();
+        spell->EffectImplicitTargetA[0] = fields[82].GetUInt32();
+        spell->EffectImplicitTargetA[1] = fields[83].GetUInt32();
+        spell->EffectImplicitTargetA[2] = fields[84].GetUInt32();
+        spell->EffectImplicitTargetB[0] = fields[85].GetUInt32();
+        spell->EffectImplicitTargetB[1] = fields[86].GetUInt32();
+        spell->EffectImplicitTargetB[2] = fields[87].GetUInt32();
+        spell->EffectRadiusIndex[0] = fields[88].GetUInt32();
+        spell->EffectRadiusIndex[1] = fields[89].GetUInt32();
+        spell->EffectRadiusIndex[2] = fields[90].GetUInt32();
+        spell->EffectApplyAuraName[0] = fields[91].GetUInt32();
+        spell->EffectApplyAuraName[1] = fields[92].GetUInt32();
+        spell->EffectApplyAuraName[2] = fields[93].GetUInt32();
+        spell->EffectAmplitude[0] = fields[94].GetUInt32();
+        spell->EffectAmplitude[1] = fields[95].GetUInt32();
+        spell->EffectAmplitude[2] = fields[96].GetUInt32();
+        spell->EffectMultipleValue[0] = fields[97].GetFloat();
+        spell->EffectMultipleValue[1] = fields[98].GetFloat();
+        spell->EffectMultipleValue[2] = fields[99].GetFloat();
+        spell->EffectChainTarget[0] = fields[100].GetUInt32();
+        spell->EffectChainTarget[1] = fields[101].GetUInt32();
+        spell->EffectChainTarget[2] = fields[102].GetUInt32();
+        spell->EffectItemType[0] = fields[103].GetUInt32();
+        spell->EffectItemType[1] = fields[104].GetUInt32();
+        spell->EffectItemType[2] = fields[105].GetUInt32();
+        spell->EffectMiscValue[0] = fields[106].GetInt32();
+        spell->EffectMiscValue[1] = fields[107].GetInt32();
+        spell->EffectMiscValue[2] = fields[108].GetInt32();
+        spell->EffectTriggerSpell[0] = fields[109].GetUInt32();
+        spell->EffectTriggerSpell[1] = fields[110].GetUInt32();
+        spell->EffectTriggerSpell[2] = fields[111].GetUInt32();
+        spell->EffectPointsPerComboPoint[0] = fields[112].GetFloat();
+        spell->EffectPointsPerComboPoint[1] = fields[113].GetFloat();
+        spell->EffectPointsPerComboPoint[2] = fields[114].GetFloat();
+        spell->SpellVisual = fields[115].GetUInt32();
+        //spell->SpellVisual2 = fields[116].GetUInt32(); not used
+        spell->SpellIconID = fields[117].GetUInt32();
+        spell->activeIconID = fields[118].GetUInt32();
+        spell->spellPriority = fields[119].GetUInt32();
+        spell->SpellName[0] = new char[strlen(fields[120].GetString()) + 1];
+        strcpy(spell->SpellName[0], fields[120].GetString());
+        spell->SpellName[1] = new char[strlen(fields[121].GetString()) + 1];
+        strcpy(spell->SpellName[1], fields[121].GetString());
+        spell->SpellName[2] = new char[strlen(fields[122].GetString()) + 1];
+        strcpy(spell->SpellName[2], fields[122].GetString());
+        spell->SpellName[3] = new char[strlen(fields[123].GetString()) + 1];
+        strcpy(spell->SpellName[3], fields[123].GetString());
+        spell->SpellName[4] = new char[strlen(fields[124].GetString()) + 1];
+        strcpy(spell->SpellName[4], fields[124].GetString());
+        spell->SpellName[5] = new char[strlen(fields[125].GetString()) + 1];
+        strcpy(spell->SpellName[5], fields[125].GetString());
+        spell->SpellName[6] = new char[strlen(fields[126].GetString()) + 1];
+        strcpy(spell->SpellName[6], fields[126].GetString());
+        spell->SpellName[7] = new char[strlen(fields[127].GetString()) + 1];
+        strcpy(spell->SpellName[7], fields[127].GetString());
+        //spell->SpellNameFlag = fields[128].GetUInt32(); not used
+        spell->Rank[0] = new char[strlen(fields[129].GetString()) + 1];
+        strcpy(spell->Rank[0], fields[129].GetString());
+        spell->Rank[1] = new char[strlen(fields[130].GetString()) + 1];
+        strcpy(spell->Rank[1], fields[130].GetString());
+        spell->Rank[2] = new char[strlen(fields[131].GetString()) + 1];
+        strcpy(spell->Rank[2], fields[131].GetString());
+        spell->Rank[3] = new char[strlen(fields[132].GetString()) + 1];
+        strcpy(spell->Rank[3], fields[132].GetString());
+        spell->Rank[4] = new char[strlen(fields[133].GetString()) + 1];
+        strcpy(spell->Rank[4], fields[133].GetString());
+        spell->Rank[5] = new char[strlen(fields[134].GetString()) + 1];
+        strcpy(spell->Rank[5], fields[134].GetString());
+        spell->Rank[6] = new char[strlen(fields[135].GetString()) + 1];
+        strcpy(spell->Rank[6], fields[135].GetString());
+        spell->Rank[7] = new char[strlen(fields[136].GetString()) + 1];
+        strcpy(spell->Rank[7], fields[136].GetString());
+        /* not used
+        spell->RankFlags = fields[137].GetUInt32();
+        spell->Description[0] = new char[strlen(fields[138].GetString()) + 1];
+        strcpy(spell->Description[0], fields[138].GetString());
+        spell->Description[1] = new char[strlen(fields[139].GetString()) + 1];
+        strcpy(spell->Description[1], fields[139].GetString());
+        spell->Description[2] = new char[strlen(fields[140].GetString()) + 1];
+        strcpy(spell->Description[2], fields[140].GetString());
+        spell->Description[3] = new char[strlen(fields[141].GetString()) + 1];
+        strcpy(spell->Description[3], fields[141].GetString());
+        spell->Description[4] = new char[strlen(fields[142].GetString()) + 1];
+        strcpy(spell->Description[4], fields[142].GetString());
+        spell->Description[5] = new char[strlen(fields[143].GetString()) + 1];
+        strcpy(spell->Description[5], fields[143].GetString());
+        spell->Description[6] = new char[strlen(fields[144].GetString()) + 1];
+        strcpy(spell->Description[6], fields[144].GetString());
+        spell->Description[7] = new char[strlen(fields[145].GetString()) + 1];
+        strcpy(spell->Description[7], fields[145].GetString());
+        spell->DescriptionFlags = fields[146].GetUInt32();
+        spell->ToolTip[0] = new char[strlen(fields[147].GetString()) + 1];
+        strcpy(spell->ToolTip[0], fields[147].GetString());
+        spell->ToolTip[1] = new char[strlen(fields[148].GetString()) + 1];
+        strcpy(spell->ToolTip[1], fields[148].GetString());
+        spell->ToolTip[2] = new char[strlen(fields[149].GetString()) + 1];
+        strcpy(spell->ToolTip[2], fields[149].GetString());
+        spell->ToolTip[3] = new char[strlen(fields[150].GetString()) + 1];
+        strcpy(spell->ToolTip[3], fields[150].GetString());
+        spell->ToolTip[4] = new char[strlen(fields[151].GetString()) + 1];
+        strcpy(spell->ToolTip[4], fields[151].GetString());
+        spell->ToolTip[5] = new char[strlen(fields[152].GetString()) + 1];
+        strcpy(spell->ToolTip[5], fields[152].GetString());
+        spell->ToolTip[6] = new char[strlen(fields[153].GetString()) + 1];
+        strcpy(spell->ToolTip[6], fields[153].GetString());
+        spell->ToolTip[7] = new char[strlen(fields[154].GetString()) + 1];
+        strcpy(spell->ToolTip[7], fields[154].GetString());
+        spell->ToolTipFlags = fields[155].GetUInt32();
+        */
+        spell->ManaCostPercentage = fields[156].GetUInt32();
+        spell->StartRecoveryCategory = fields[157].GetUInt32();
+        spell->StartRecoveryTime = fields[158].GetUInt32();
+        spell->MaxTargetLevel = fields[159].GetUInt32();
+        spell->SpellFamilyName = fields[160].GetUInt32();
+        spell->SpellFamilyFlags = fields[161].GetUInt64();
+        spell->MaxAffectedTargets = fields[162].GetUInt32();
+        spell->DmgClass = fields[163].GetUInt32();
+        spell->PreventionType = fields[164].GetUInt32();
+        //spell->StanceBarOrder = fields[165].GetInt32();
+        spell->DmgMultiplier[0] = fields[166].GetFloat();
+        spell->DmgMultiplier[1] = fields[167].GetFloat();
+        spell->DmgMultiplier[2] = fields[168].GetFloat();
+        //spell->MinFactionId = fields[169].GetUInt32();
+        //spell->MinReputation = fields[170].GetUInt32();
+        //spell->RequiredAuraVision = fields[171].GetUInt32();
+        spell->Custom = 0;
+
+        spell->InitCachedValues();
+        mSpellEntryMap[spellId] = spell;
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString(">> Loaded %u spells in %ums.", mSpellEntryMap.size(), WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }

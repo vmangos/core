@@ -69,20 +69,8 @@ void SpellModMgr::LoadSpellMods()
 {
     OUT_LOG();
     OUT_LOG("Loading spell mods ...");
-    // 1 : Reset des champs "Custom" pour tous les sorts charges des DBC
-    for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
-    {
-        SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
-        if (spellInfo)
-        {
-            SpellEntry* modif = ((SpellEntry*)spellInfo);
-            modif->Custom = 0;
-        }
-    }
-    OUT_LOG();
-    OUT_LOG(">> Reseted %u spell", sSpellStore.GetNumRows());
 
-    // 2 : Table spell_mod
+    // 1 : Table spell_mod
     QueryResult* result = WorldDatabase.Query(
                               "SELECT Id, procChance, procFlags, Custom, DurationIndex, "
                               "Category, CastingTimeIndex, StackAmount, SpellIconID, activeIconID, manaCost, "
@@ -110,40 +98,31 @@ void SpellModMgr::LoadSpellMods()
                 SpellEntry* newSpell = new SpellEntry;
                 if (!sSpellMgr.SetSpellEntry(spellid, newSpell))
                 {
-                    OUT_ERR("Impossible de creer le sort %u. Passe.", spellid);
+                    OUT_ERR("Unable to create spell %u, skipping.", spellid);
                     delete newSpell;
                     continue;
                 }
                 else
                 {
-                    DBCSpellEntry* loader = new DBCSpellEntry;
-                    memset(loader, 0, sizeof(DBCSpellEntry));
                     // Certaines valeurs sont a -1 par defaut.
-                    loader->EquippedItemClass = -1;
+                    newSpell->EquippedItemClass = -1;
                     for (uint32 i = 0; i < 8; ++i)
                     {
                         std::stringstream name;
                         name << "CustomSpell";
-                        loader->SpellName[i] = new char[name.str().size() + 1];
-                        strcpy(loader->SpellName[i], name.str().c_str());
+                        newSpell->SpellName[i] = new char[name.str().size() + 1];
+                        strcpy(newSpell->SpellName[i], name.str().c_str());
                         //sprintf (loader->SpellName[i], "CustomSpell%u", spellid);
                         //sprintf (loader->Rank[i], "Custom");
                     }
-                    if (!newSpell->Load(loader))
-                    {
-                        OUT_ERR("Impossible de charger le sort %u. Passe.", spellid);
-                        delete newSpell;
-                        delete loader;
-                        continue;
-                    }
-                    delete loader;
+                    newSpell->InitCachedValues();
                 }
             }
 #endif
             SpellEntry* spell = ((SpellEntry*)sSpellMgr.GetSpellEntry(spellid));
             if (!spell)
             {
-                OUT_ERR("Spell entry %u from `spell_mod` doesn't exist in dbc, ignoring.", spellid);
+                OUT_ERR("Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
             //    0        1         2            3                4
@@ -203,7 +182,7 @@ void SpellModMgr::LoadSpellMods()
             ModUInt32ValueIfExplicit(fields[33], spell->SpellFamilyName);
             uint64 flags = fields[34].GetUInt64();
             if (flags)
-                spell->SpellFamilyFlags.Flags = flags;
+                spell->SpellFamilyFlags = flags;
             ModUInt32ValueIfExplicit(fields[35], spell->Mechanic);
             ModInt32ValueIfExplicit(fields[36], spell->EquippedItemClass);
 
@@ -216,7 +195,7 @@ void SpellModMgr::LoadSpellMods()
         OUT_LOG(">> Loaded %u spell modifications", total_count);
     }
 
-    // 3 : Table spell_effect_mod
+    // 2 : Table spell_effect_mod
     OUT_LOG();
     OUT_LOG("Loading spell effect mods ...");
     result = WorldDatabase.Query(
@@ -231,7 +210,7 @@ void SpellModMgr::LoadSpellMods()
     if (!result)
     {
         OUT_LOG();
-        OUT_LOG(">> Loaded %u spell effect modifications. Table spell_effect_mod vide ou inexistante ?", total_count);
+        OUT_LOG(">> Loaded %u spell effect modifications. Table spell_effect_mod is empty.", total_count);
     }
     else
     {
@@ -244,12 +223,12 @@ void SpellModMgr::LoadSpellMods()
             SpellEntry* spell = ((SpellEntry*)sSpellMgr.GetSpellEntry(spellid));
             if (!spell)
             {
-                OUT_ERR("Spell entry %u from `spell_effect_mod` doesn't exist in dbc, ignoring.", spellid);
+                OUT_ERR("Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
             if (effect_idx >= MAX_EFFECT_INDEX)
             {
-                OUT_ERR("Erreur : Le sort %u a une definition pour l'effet %u, alors que le max est %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
+                OUT_ERR("Erreur : Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
                 continue;
             }
             //0   1            2       3                    4               5                      6

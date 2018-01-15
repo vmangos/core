@@ -1609,7 +1609,7 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
     void ChangeColor()
     {
         uint32 spell = urand(28987, 28990);
-        if(const DBCSpellEntry* entry = sSpellStore.LookupEntry(spell))
+        if(const SpellEntry* entry = sSpellMgr.GetSpellEntry(spell))
             m_creature->UpdateEntry(entry->EffectMiscValue[0]);
         if (prev_spell)
             m_creature->RemoveAurasDueToSpell(prev_spell);

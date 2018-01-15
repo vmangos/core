@@ -122,10 +122,6 @@ struct SpellModifier
         : op(_op), type(_type), charges(_charges), value(_value), mask(_mask), spellId(_spellId), ownerAura(NULL)
     {}
 
-    SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, uint32 _spellId, ClassFamilyMask _mask, int16 _charges = 0)
-        : op(_op), type(_type), charges(_charges), value(_value), mask(_mask), spellId(_spellId), ownerAura(NULL)
-    {}
-
     SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, SpellEntry const* spellEntry, SpellEffectIndex eff, int16 _charges = 0);
 
     SpellModifier(SpellModOp _op, SpellModType _type, int32 _value, Aura* aura, int16 _charges = 0);
@@ -136,7 +132,7 @@ struct SpellModifier
     SpellModType type : 8;
     int16 charges     : 16; // 0 = infini, negatif = plus de charge.
     int32 value;
-    ClassFamilyMask mask;
+    uint64 mask;
     uint32 spellId;
     Aura* ownerAura;
 };

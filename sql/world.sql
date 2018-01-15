@@ -1,38 +1,18 @@
-/*
-SQLyog Ultimate
-MySQL - 5.7.14-log : Database - world
-*********************************************************************
-*/
+-- --------------------------------------------------------
+-- Хост:                         127.0.0.1
+-- Server version:               5.5.53 - MySQL Community Server (GPL)
+-- Server OS:                    Win32
+-- HeidiSQL Версия:              9.3.0.4998
+-- --------------------------------------------------------
 
-/*!40101 SET NAMES utf8 */;
-
-/*!40101 SET SQL_MODE=''*/;
-
-/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET NAMES utf8mb4 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
-/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
-/*Table structure for table `area_template` */
 
-DROP TABLE IF EXISTS `area_template`;
-
-CREATE TABLE `area_template` (
-  `Entry` mediumint(8) NOT NULL DEFAULT '0',
-  `MapId` mediumint(8) NOT NULL DEFAULT '0',
-  `ZoneId` mediumint(8) NOT NULL DEFAULT '0',
-  `ExploreFlag` mediumint(8) NOT NULL DEFAULT '0',
-  `Flags` mediumint(8) NOT NULL DEFAULT '0',
-  `AreaLevel` mediumint(8) NOT NULL DEFAULT '0',
-  `Name` varchar(100) NOT NULL DEFAULT '',
-  `Team` tinyint(3) NOT NULL DEFAULT '0',
-  `LiquidTypeId` tinyint(3) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`Entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `areatrigger_bg_entrance` */
-
+-- Dumping structure for table mangos.areatrigger_bg_entrance
 DROP TABLE IF EXISTS `areatrigger_bg_entrance`;
-
-CREATE TABLE `areatrigger_bg_entrance` (
+CREATE TABLE IF NOT EXISTS `areatrigger_bg_entrance` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `name` text,
   `team` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -45,72 +25,100 @@ CREATE TABLE `areatrigger_bg_entrance` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `areatrigger_involvedrelation` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.areatrigger_involvedrelation
 DROP TABLE IF EXISTS `areatrigger_involvedrelation`;
-
-CREATE TABLE `areatrigger_involvedrelation` (
+CREATE TABLE IF NOT EXISTS `areatrigger_involvedrelation` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
-/*Table structure for table `areatrigger_tavern` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.areatrigger_tavern
 DROP TABLE IF EXISTS `areatrigger_tavern`;
-
-CREATE TABLE `areatrigger_tavern` (
+CREATE TABLE IF NOT EXISTS `areatrigger_tavern` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `name` text,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
-/*Table structure for table `areatrigger_teleport` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.areatrigger_teleport
 DROP TABLE IF EXISTS `areatrigger_teleport`;
-
-CREATE TABLE `areatrigger_teleport` (
+CREATE TABLE IF NOT EXISTS `areatrigger_teleport` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `name` text,
   `required_level` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `required_item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `required_item2` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `required_quest_done` int(11) unsigned NOT NULL DEFAULT '0',
+  `required_event` int(11) DEFAULT '0',
+  `required_pvp_rank` mediumint(8) unsigned DEFAULT '0',
+  `required_team` mediumint(8) unsigned DEFAULT '0',
   `required_failed_text` text,
   `target_map` smallint(5) unsigned NOT NULL DEFAULT '0',
   `target_position_x` float NOT NULL DEFAULT '0',
   `target_position_y` float NOT NULL DEFAULT '0',
   `target_position_z` float NOT NULL DEFAULT '0',
   `target_orientation` float NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Trigger System';
 
-/*Table structure for table `auctionhousebot` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.area_template
+DROP TABLE IF EXISTS `area_template`;
+CREATE TABLE IF NOT EXISTS `area_template` (
+  `Entry` mediumint(8) NOT NULL DEFAULT '0',
+  `MapId` mediumint(8) NOT NULL DEFAULT '0',
+  `ZoneId` mediumint(8) NOT NULL DEFAULT '0',
+  `ExploreFlag` mediumint(8) NOT NULL DEFAULT '0',
+  `Flags` mediumint(8) NOT NULL DEFAULT '0',
+  `AreaLevel` mediumint(8) NOT NULL DEFAULT '0',
+  `Name` varchar(100) NOT NULL DEFAULT '',
+  `Team` tinyint(3) NOT NULL DEFAULT '0',
+  `LiquidTypeId` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`Entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.auctionhousebot
 DROP TABLE IF EXISTS `auctionhousebot`;
-
-CREATE TABLE `auctionhousebot` (
+CREATE TABLE IF NOT EXISTS `auctionhousebot` (
   `item` int(11) DEFAULT NULL COMMENT 'ID de l''item',
   `stack` int(11) DEFAULT NULL COMMENT 'Empillement',
   `bid` int(11) DEFAULT NULL COMMENT 'Prix a encherir',
   `buyout` int(11) DEFAULT NULL COMMENT 'Achat immediat'
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `autobroadcast` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.autobroadcast
 DROP TABLE IF EXISTS `autobroadcast`;
-
-CREATE TABLE `autobroadcast` (
+CREATE TABLE IF NOT EXISTS `autobroadcast` (
   `delay` int(11) DEFAULT NULL,
   `commentaire` varchar(255) DEFAULT NULL,
   `stringId` int(11) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `battleground_events` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.battleground_events
 DROP TABLE IF EXISTS `battleground_events`;
-
-CREATE TABLE `battleground_events` (
+CREATE TABLE IF NOT EXISTS `battleground_events` (
   `map` smallint(5) NOT NULL,
   `event1` tinyint(3) unsigned NOT NULL,
   `event2` tinyint(3) unsigned NOT NULL,
@@ -118,38 +126,67 @@ CREATE TABLE `battleground_events` (
   PRIMARY KEY (`map`,`event1`,`event2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `battleground_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.battleground_template
 DROP TABLE IF EXISTS `battleground_template`;
-
-CREATE TABLE `battleground_template` (
+CREATE TABLE IF NOT EXISTS `battleground_template` (
   `id` mediumint(8) unsigned NOT NULL,
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `MinPlayersPerTeam` smallint(5) unsigned NOT NULL DEFAULT '0',
   `MaxPlayersPerTeam` smallint(5) unsigned NOT NULL DEFAULT '0',
   `MinLvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `MaxLvl` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `AllianceWinSpell` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `AllianceLoseSpell` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `HordeWinSpell` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `HordeLoseSpell` smallint(5) unsigned NOT NULL DEFAULT '0',
   `AllianceStartLoc` mediumint(8) unsigned NOT NULL,
   `AllianceStartO` float NOT NULL,
   `HordeStartLoc` mediumint(8) unsigned NOT NULL,
   `HordeStartO` float NOT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `battlemaster_entry` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.battlemaster_entry
 DROP TABLE IF EXISTS `battlemaster_entry`;
-
-CREATE TABLE `battlemaster_entry` (
+CREATE TABLE IF NOT EXISTS `battlemaster_entry` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Entry of a creature',
   `bg_template` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Battleground template id',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `cinematic_waypoints` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.broadcast_text
+DROP TABLE IF EXISTS `broadcast_text`;
+CREATE TABLE IF NOT EXISTS `broadcast_text` (
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `MaleText` longtext,
+  `FemaleText` longtext,
+  `Sound` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Type` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Language` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `EmoteId0` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `EmoteId1` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `EmoteId2` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay0` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay1` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay2` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.cinematic_waypoints
 DROP TABLE IF EXISTS `cinematic_waypoints`;
-
-CREATE TABLE `cinematic_waypoints` (
+CREATE TABLE IF NOT EXISTS `cinematic_waypoints` (
   `cinematic` int(11) DEFAULT '0',
   `timer` int(11) DEFAULT '0',
   `posx` float DEFAULT NULL,
@@ -158,11 +195,12 @@ CREATE TABLE `cinematic_waypoints` (
   `comment` varchar(255) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `command` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.command
 DROP TABLE IF EXISTS `command`;
-
-CREATE TABLE `command` (
+CREATE TABLE IF NOT EXISTS `command` (
   `name` varchar(50) NOT NULL DEFAULT '',
   `security` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `help` longtext,
@@ -170,11 +208,12 @@ CREATE TABLE `command` (
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Chat System';
 
-/*Table structure for table `conditions` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.conditions
 DROP TABLE IF EXISTS `conditions`;
-
-CREATE TABLE `conditions` (
+CREATE TABLE IF NOT EXISTS `conditions` (
   `condition_entry` mediumint(8) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `type` tinyint(3) NOT NULL DEFAULT '0' COMMENT 'Type of the condition',
   `value1` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'data field one for the condition',
@@ -183,11 +222,12 @@ CREATE TABLE `conditions` (
   UNIQUE KEY `unique_conditions` (`type`,`value1`,`value2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Condition System';
 
-/*Table structure for table `creature` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature
 DROP TABLE IF EXISTS `creature`;
-
-CREATE TABLE `creature` (
+CREATE TABLE IF NOT EXISTS `creature` (
   `guid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Global Unique Identifier',
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Creature Identifier',
   `map` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
@@ -197,7 +237,8 @@ CREATE TABLE `creature` (
   `position_y` float NOT NULL DEFAULT '0',
   `position_z` float NOT NULL DEFAULT '0',
   `orientation` float NOT NULL DEFAULT '0',
-  `spawntimesecs` int(10) unsigned NOT NULL DEFAULT '120',
+  `spawntimesecsmin` int(10) unsigned NOT NULL DEFAULT '120',
+  `spawntimesecsmax` int(10) unsigned NOT NULL DEFAULT '120',
   `spawndist` float NOT NULL DEFAULT '5',
   `currentwaypoint` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `curhealth` int(10) unsigned NOT NULL DEFAULT '1',
@@ -205,17 +246,22 @@ CREATE TABLE `creature` (
   `DeathState` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `MovementType` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `spawnFlags` int(10) unsigned NOT NULL DEFAULT '0',
+  `visibilitymod` float DEFAULT '0',
+  `patch_min` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `patch_max` tinyint(3) unsigned NOT NULL DEFAULT '10',
   PRIMARY KEY (`guid`),
   KEY `idx_map` (`map`),
   KEY `idx_id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature System';
 
-/*Table structure for table `creature_addon` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_addon
 DROP TABLE IF EXISTS `creature_addon`;
-
-CREATE TABLE `creature_addon` (
+CREATE TABLE IF NOT EXISTS `creature_addon` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mount` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `bytes1` int(10) unsigned NOT NULL DEFAULT '0',
   `b2_0_sheath` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -223,14 +269,15 @@ CREATE TABLE `creature_addon` (
   `emote` int(10) unsigned NOT NULL DEFAULT '0',
   `moveflags` int(10) unsigned NOT NULL DEFAULT '0',
   `auras` text,
-  PRIMARY KEY (`guid`)
+  PRIMARY KEY (`guid`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `creature_ai_scripts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_ai_scripts
 DROP TABLE IF EXISTS `creature_ai_scripts`;
-
-CREATE TABLE `creature_ai_scripts` (
+CREATE TABLE IF NOT EXISTS `creature_ai_scripts` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Identifier',
   `creature_id` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Creature Template Identifier',
   `event_type` tinyint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Event Type',
@@ -257,11 +304,12 @@ CREATE TABLE `creature_ai_scripts` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='EventAI Scripts';
 
-/*Table structure for table `creature_ai_summons` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_ai_summons
 DROP TABLE IF EXISTS `creature_ai_summons`;
-
-CREATE TABLE `creature_ai_summons` (
+CREATE TABLE IF NOT EXISTS `creature_ai_summons` (
   `id` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Location Identifier',
   `position_x` float NOT NULL DEFAULT '0',
   `position_y` float NOT NULL DEFAULT '0',
@@ -272,11 +320,12 @@ CREATE TABLE `creature_ai_summons` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='EventAI Summoning Locations';
 
-/*Table structure for table `creature_ai_texts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_ai_texts
 DROP TABLE IF EXISTS `creature_ai_texts`;
-
-CREATE TABLE `creature_ai_texts` (
+CREATE TABLE IF NOT EXISTS `creature_ai_texts` (
   `entry` mediumint(8) NOT NULL,
   `content_default` text NOT NULL,
   `content_loc1` text,
@@ -295,35 +344,40 @@ CREATE TABLE `creature_ai_texts` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Script Texts';
 
-/*Table structure for table `creature_battleground` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_battleground
 DROP TABLE IF EXISTS `creature_battleground`;
-
-CREATE TABLE `creature_battleground` (
+CREATE TABLE IF NOT EXISTS `creature_battleground` (
   `guid` int(10) unsigned NOT NULL COMMENT 'Creature''s GUID',
   `event1` tinyint(3) unsigned NOT NULL COMMENT 'main event',
   `event2` tinyint(3) unsigned NOT NULL COMMENT 'sub event',
   PRIMARY KEY (`guid`,`event1`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature battleground indexing system';
 
-/*Table structure for table `creature_equip_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_equip_template
 DROP TABLE IF EXISTS `creature_equip_template`;
-
-CREATE TABLE `creature_equip_template` (
+CREATE TABLE IF NOT EXISTS `creature_equip_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Unique entry',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `equipentry1` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `equipentry2` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `equipentry3` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`)
+  PRIMARY KEY (`entry`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Equipment)';
 
-/*Table structure for table `creature_equip_template_raw` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_equip_template_raw
 DROP TABLE IF EXISTS `creature_equip_template_raw`;
-
-CREATE TABLE `creature_equip_template_raw` (
+CREATE TABLE IF NOT EXISTS `creature_equip_template_raw` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Unique entry',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `equipmodel1` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `equipmodel2` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `equipmodel3` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -333,14 +387,15 @@ CREATE TABLE `creature_equip_template_raw` (
   `equipslot1` int(11) NOT NULL DEFAULT '0',
   `equipslot2` int(11) NOT NULL DEFAULT '0',
   `equipslot3` int(11) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`)
+  PRIMARY KEY (`entry`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Equipment)';
 
-/*Table structure for table `creature_groups` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_groups
 DROP TABLE IF EXISTS `creature_groups`;
-
-CREATE TABLE `creature_groups` (
+CREATE TABLE IF NOT EXISTS `creature_groups` (
   `leaderGUID` int(11) unsigned NOT NULL,
   `memberGUID` int(11) unsigned NOT NULL,
   `dist` float unsigned NOT NULL,
@@ -349,34 +404,36 @@ CREATE TABLE `creature_groups` (
   PRIMARY KEY (`memberGUID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
+-- Data exporting was unselected.
 
---
--- Table structure for table `creature_linking`
---
 
+-- Dumping structure for table mangos.creature_involvedrelation
+DROP TABLE IF EXISTS `creature_involvedrelation`;
+CREATE TABLE IF NOT EXISTS `creature_involvedrelation` (
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
+  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`quest`,`patch`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.creature_linking
 DROP TABLE IF EXISTS `creature_linking`;
-CREATE TABLE `creature_linking` (
+CREATE TABLE IF NOT EXISTS `creature_linking` (
   `guid` int(10) unsigned NOT NULL COMMENT 'creature.guid of the slave mob that is linked',
   `master_guid` int(10) unsigned NOT NULL COMMENT 'master to trigger events',
   `flag` mediumint(8) unsigned NOT NULL COMMENT 'flag - describing what should happen when',
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature Linking System';
 
---
--- Dumping data for table `creature_linking`
---
+-- Data exporting was unselected.
 
-LOCK TABLES `creature_linking` WRITE;
-/*!40000 ALTER TABLE `creature_linking` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creature_linking` ENABLE KEYS */;
-UNLOCK TABLES;
 
---
--- Table structure for table `creature_linking_template`
---
-
+-- Dumping structure for table mangos.creature_linking_template
 DROP TABLE IF EXISTS `creature_linking_template`;
-CREATE TABLE `creature_linking_template` (
+CREATE TABLE IF NOT EXISTS `creature_linking_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'creature_template.entry of the slave mob that is linked',
   `map` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Id of map of the mobs',
   `master_entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'master to trigger events',
@@ -385,30 +442,12 @@ CREATE TABLE `creature_linking_template` (
   PRIMARY KEY (`entry`,`map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature Linking System';
 
---
--- Dumping data for table `creature_linking_template`
---
+-- Data exporting was unselected.
 
-LOCK TABLES `creature_linking_template` WRITE;
-/*!40000 ALTER TABLE `creature_linking_template` DISABLE KEYS */;
-/*!40000 ALTER TABLE `creature_linking_template` ENABLE KEYS */;
-UNLOCK TABLES;
 
-/*Table structure for table `creature_involvedrelation` */
-
-DROP TABLE IF EXISTS `creature_involvedrelation`;
-
-CREATE TABLE `creature_involvedrelation` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
-  PRIMARY KEY (`id`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
-
-/*Table structure for table `creature_loot_template` */
-
+-- Dumping structure for table mangos.creature_loot_template
 DROP TABLE IF EXISTS `creature_loot_template`;
-
-CREATE TABLE `creature_loot_template` (
+CREATE TABLE IF NOT EXISTS `creature_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'entry 0 used for player insignia loot',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -416,14 +455,15 @@ CREATE TABLE `creature_loot_template` (
   `mincountOrRef` mediumint(9) NOT NULL DEFAULT '1',
   `maxcount` tinyint(3) unsigned NOT NULL DEFAULT '1',
   `condition_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`,`item`)
+  PRIMARY KEY (`entry`,`item`,`groupid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Loot System';
 
-/*Table structure for table `creature_model_info` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_model_info
 DROP TABLE IF EXISTS `creature_model_info`;
-
-CREATE TABLE `creature_model_info` (
+CREATE TABLE IF NOT EXISTS `creature_model_info` (
   `modelid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `bounding_radius` float NOT NULL DEFAULT '0',
   `combat_reach` float NOT NULL DEFAULT '0',
@@ -433,11 +473,12 @@ CREATE TABLE `creature_model_info` (
   PRIMARY KEY (`modelid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Creature System (Model related info)';
 
-/*Table structure for table `creature_movement` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_movement
 DROP TABLE IF EXISTS `creature_movement`;
-
-CREATE TABLE `creature_movement` (
+CREATE TABLE IF NOT EXISTS `creature_movement` (
   `id` int(10) unsigned NOT NULL COMMENT 'Creature GUID',
   `point` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `position_x` float NOT NULL DEFAULT '0',
@@ -459,11 +500,12 @@ CREATE TABLE `creature_movement` (
   PRIMARY KEY (`id`,`point`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
 
-/*Table structure for table `creature_movement_scripts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_movement_scripts
 DROP TABLE IF EXISTS `creature_movement_scripts`;
-
-CREATE TABLE `creature_movement_scripts` (
+CREATE TABLE IF NOT EXISTS `creature_movement_scripts` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `delay` int(10) unsigned NOT NULL DEFAULT '0',
   `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -471,6 +513,9 @@ CREATE TABLE `creature_movement_scripts` (
   `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `dataint` int(11) NOT NULL DEFAULT '0',
   `dataint2` int(11) NOT NULL DEFAULT '0',
@@ -483,11 +528,12 @@ CREATE TABLE `creature_movement_scripts` (
   `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `creature_movement_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_movement_template
 DROP TABLE IF EXISTS `creature_movement_template`;
-
-CREATE TABLE `creature_movement_template` (
+CREATE TABLE IF NOT EXISTS `creature_movement_template` (
   `entry` mediumint(8) unsigned NOT NULL COMMENT 'Creature entry',
   `point` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `position_x` float NOT NULL DEFAULT '0',
@@ -509,11 +555,12 @@ CREATE TABLE `creature_movement_template` (
   PRIMARY KEY (`entry`,`point`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature waypoint system';
 
-/*Table structure for table `creature_onkill_reputation` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_onkill_reputation
 DROP TABLE IF EXISTS `creature_onkill_reputation`;
-
-CREATE TABLE `creature_onkill_reputation` (
+CREATE TABLE IF NOT EXISTS `creature_onkill_reputation` (
   `creature_id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Creature Identifier',
   `RewOnKillRepFaction1` smallint(6) NOT NULL DEFAULT '0',
   `RewOnKillRepFaction2` smallint(6) NOT NULL DEFAULT '0',
@@ -527,35 +574,137 @@ CREATE TABLE `creature_onkill_reputation` (
   PRIMARY KEY (`creature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Creature OnKill Reputation gain';
 
-/*Table structure for table `creature_questrelation` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_questrelation
 DROP TABLE IF EXISTS `creature_questrelation`;
-
-CREATE TABLE `creature_questrelation` (
+CREATE TABLE IF NOT EXISTS `creature_questrelation` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
-  PRIMARY KEY (`id`,`quest`)
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`quest`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
 
-/*Table structure for table `creature_spells` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_spells
 DROP TABLE IF EXISTS `creature_spells`;
-
-CREATE TABLE `creature_spells` (
-  `entry` int(11) NOT NULL DEFAULT '0',
-  `spell` int(11) NOT NULL DEFAULT '0',
-  `minCD` int(11) NOT NULL DEFAULT '0',
-  `maxCD` int(11) NOT NULL DEFAULT '0',
-  `target` int(11) NOT NULL DEFAULT '0',
-  `comment` varchar(255) NOT NULL DEFAULT ''
+CREATE TABLE IF NOT EXISTS `creature_spells` (
+  `entry` int(11) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(255) NOT NULL DEFAULT '',
+  `spellId_1` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_1` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_1` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_1` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_1` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_1` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_1` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_1` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_1` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_2` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_2` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_2` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_2` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_2` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_3` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_3` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_3` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_3` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_3` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_4` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_4` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_4` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_4` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_4` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_4` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_4` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_4` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_4` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_5` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_5` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_5` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_5` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_5` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_5` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_5` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_5` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_5` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_6` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_6` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_6` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_6` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_6` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_6` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_6` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_6` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_6` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_7` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_7` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_7` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_7` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_7` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_7` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_7` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_7` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_7` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spellId_8` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `probability_8` tinyint(3) unsigned NOT NULL DEFAULT '100',
+  `castTarget_8` tinyint(2) unsigned NOT NULL DEFAULT '1',
+  `castFlags_8` tinyint(2) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMin_8` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayInitialMax_8` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMin_8` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `delayRepeatMax_8` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `scriptId_8` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `creature_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_spells_scripts
+DROP TABLE IF EXISTS `creature_spells_scripts`;
+CREATE TABLE IF NOT EXISTS `creature_spells_scripts` (
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `delay` int(10) unsigned NOT NULL DEFAULT '0',
+  `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `datalong` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
+  `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
+  `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `dataint` int(11) NOT NULL DEFAULT '0',
+  `dataint2` int(11) NOT NULL DEFAULT '0',
+  `dataint3` int(11) NOT NULL DEFAULT '0',
+  `dataint4` int(11) NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `o` float NOT NULL DEFAULT '0',
+  `comments` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.creature_template
 DROP TABLE IF EXISTS `creature_template`;
-
-CREATE TABLE `creature_template` (
+CREATE TABLE IF NOT EXISTS `creature_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `KillCredit1` int(11) unsigned NOT NULL DEFAULT '0',
   `KillCredit2` int(11) unsigned NOT NULL DEFAULT '0',
   `modelid_1` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -612,6 +761,7 @@ CREATE TABLE `creature_template` (
   `spell2` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spell3` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spell4` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spells_template` int(11) unsigned NOT NULL DEFAULT '0',
   `PetSpellDataId` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `mingold` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `maxgold` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -628,15 +778,17 @@ CREATE TABLE `creature_template` (
   `SchoolImmuneMask` int(10) unsigned NOT NULL DEFAULT '0',
   `flags_extra` int(10) unsigned NOT NULL DEFAULT '0',
   `ScriptName` char(64) NOT NULL DEFAULT '',
-  PRIMARY KEY (`entry`)
+  PRIMARY KEY (`entry`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Creature System';
 
-/*Table structure for table `creature_template_addon` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.creature_template_addon
 DROP TABLE IF EXISTS `creature_template_addon`;
-
-CREATE TABLE `creature_template_addon` (
+CREATE TABLE IF NOT EXISTS `creature_template_addon` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `mount` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `bytes1` int(10) unsigned NOT NULL DEFAULT '0',
   `b2_0_sheath` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -644,14 +796,15 @@ CREATE TABLE `creature_template_addon` (
   `emote` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `moveflags` int(10) unsigned NOT NULL DEFAULT '0',
   `auras` text,
-  PRIMARY KEY (`entry`)
+  PRIMARY KEY (`entry`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `custom_texts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.custom_texts
 DROP TABLE IF EXISTS `custom_texts`;
-
-CREATE TABLE `custom_texts` (
+CREATE TABLE IF NOT EXISTS `custom_texts` (
   `entry` mediumint(8) NOT NULL,
   `content_default` text NOT NULL,
   `content_loc1` text,
@@ -670,29 +823,12 @@ CREATE TABLE `custom_texts` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Custom Texts';
 
-/*Table structure for table `db_script_string` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `db_script_string`;
 
-CREATE TABLE `db_script_string` (
-  `entry` int(11) unsigned NOT NULL DEFAULT '0',
-  `content_default` text NOT NULL,
-  `content_loc1` text,
-  `content_loc2` text,
-  `content_loc3` text,
-  `content_loc4` text,
-  `content_loc5` text,
-  `content_loc6` text,
-  `content_loc7` text,
-  `content_loc8` text,
-  PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `disenchant_loot_template` */
-
+-- Dumping structure for table mangos.disenchant_loot_template
 DROP TABLE IF EXISTS `disenchant_loot_template`;
-
-CREATE TABLE `disenchant_loot_template` (
+CREATE TABLE IF NOT EXISTS `disenchant_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Recommended id selection: item_level*100 + item_quality',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -703,11 +839,12 @@ CREATE TABLE `disenchant_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-/*Table structure for table `event_scripts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.event_scripts
 DROP TABLE IF EXISTS `event_scripts`;
-
-CREATE TABLE `event_scripts` (
+CREATE TABLE IF NOT EXISTS `event_scripts` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `delay` int(10) unsigned NOT NULL DEFAULT '0',
   `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -715,6 +852,9 @@ CREATE TABLE `event_scripts` (
   `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `dataint` int(11) NOT NULL DEFAULT '0',
   `dataint2` int(11) NOT NULL DEFAULT '0',
@@ -727,21 +867,23 @@ CREATE TABLE `event_scripts` (
   `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `exploration_basexp` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.exploration_basexp
 DROP TABLE IF EXISTS `exploration_basexp`;
-
-CREATE TABLE `exploration_basexp` (
+CREATE TABLE IF NOT EXISTS `exploration_basexp` (
   `level` tinyint(4) NOT NULL DEFAULT '0',
   `basexp` mediumint(9) NOT NULL DEFAULT '0',
   PRIMARY KEY (`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Exploration System';
 
-/*Table structure for table `fishing_loot_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.fishing_loot_template
 DROP TABLE IF EXISTS `fishing_loot_template`;
-
-CREATE TABLE `fishing_loot_template` (
+CREATE TABLE IF NOT EXISTS `fishing_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'entry 0 used for junk loot at fishing fail (if allowed by config option)',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -752,133 +894,24 @@ CREATE TABLE `fishing_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Loot System';
 
-/*Table structure for table `game_event` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `game_event`;
 
-CREATE TABLE `game_event` (
-  `entry` mediumint(8) unsigned NOT NULL COMMENT 'Entry of the game event',
-  `start_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Absolute start date, the event will never start before',
-  `end_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Absolute end date, the event will never start afler',
-  `occurence` bigint(20) unsigned NOT NULL DEFAULT '5184000' COMMENT 'Delay in minutes between occurences of the event',
-  `length` bigint(20) unsigned NOT NULL DEFAULT '2592000' COMMENT 'Length in minutes of the event',
-  `holiday` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Client side holiday id',
-  `description` varchar(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
-  `hardcoded` tinyint(3) NOT NULL DEFAULT '0',
-  `disabled` tinyint(3) NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`)
+-- Dumping structure for table mangos.forbidden_items
+DROP TABLE IF EXISTS `forbidden_items`;
+CREATE TABLE IF NOT EXISTS `forbidden_items` (
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `AfterOrBefore` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`entry`,`AfterOrBefore`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `game_event_creature` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `game_event_creature`;
 
-CREATE TABLE `game_event_creature` (
-  `guid` int(10) unsigned NOT NULL,
-  `event` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Put negatives values to remove during event',
-  PRIMARY KEY (`guid`,`event`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `game_event_creature_data` */
-
-DROP TABLE IF EXISTS `game_event_creature_data`;
-
-CREATE TABLE `game_event_creature_data` (
-  `guid` int(10) unsigned NOT NULL DEFAULT '0',
-  `entry_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `modelid` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `equipment_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `spell_start` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `spell_end` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `event` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`guid`,`event`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `game_event_gameobject` */
-
-DROP TABLE IF EXISTS `game_event_gameobject`;
-
-CREATE TABLE `game_event_gameobject` (
-  `guid` int(10) unsigned NOT NULL,
-  `event` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Put negatives values to remove during event',
-  PRIMARY KEY (`guid`,`event`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `game_event_mail` */
-
-DROP TABLE IF EXISTS `game_event_mail`;
-
-CREATE TABLE `game_event_mail` (
-  `event` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Negatives value to send at event stop, positive value for send at event start.',
-  `raceMask` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `mailTemplateId` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `senderEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`event`,`raceMask`,`quest`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Game event system';
-
-/*Table structure for table `game_event_quest` */
-
-DROP TABLE IF EXISTS `game_event_quest`;
-
-CREATE TABLE `game_event_quest` (
-  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'entry from quest_template',
-  `event` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'entry from game_event',
-  PRIMARY KEY (`quest`,`event`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Game event system';
-
-/*Table structure for table `game_graveyard_zone` */
-
-DROP TABLE IF EXISTS `game_graveyard_zone`;
-
-CREATE TABLE `game_graveyard_zone` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `ghost_zone` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `faction` smallint(5) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`id`,`ghost_zone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Trigger System';
-
-/*Table structure for table `game_tele` */
-
-DROP TABLE IF EXISTS `game_tele`;
-
-CREATE TABLE `game_tele` (
-  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
-  `position_x` float NOT NULL DEFAULT '0',
-  `position_y` float NOT NULL DEFAULT '0',
-  `position_z` float NOT NULL DEFAULT '0',
-  `orientation` float NOT NULL DEFAULT '0',
-  `map` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `name` varchar(100) NOT NULL DEFAULT '',
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Tele Command';
-
-/*Table structure for table `game_weather` */
-
-DROP TABLE IF EXISTS `game_weather`;
-
-CREATE TABLE `game_weather` (
-  `zone` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `spring_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `spring_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `spring_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `summer_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `summer_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `summer_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `fall_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `fall_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `fall_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `winter_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `winter_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  `winter_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
-  PRIMARY KEY (`zone`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Weather System';
-
-/*Table structure for table `gameobject` */
-
+-- Dumping structure for table mangos.gameobject
 DROP TABLE IF EXISTS `gameobject`;
-
-CREATE TABLE `gameobject` (
+CREATE TABLE IF NOT EXISTS `gameobject` (
   `guid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Global Unique Identifier',
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Gameobject Identifier',
   `map` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'Map Identifier',
@@ -890,41 +923,49 @@ CREATE TABLE `gameobject` (
   `rotation1` float NOT NULL DEFAULT '0',
   `rotation2` float NOT NULL DEFAULT '0',
   `rotation3` float NOT NULL DEFAULT '0',
-  `spawntimesecs` int(11) NOT NULL DEFAULT '0',
+  `spawntimesecsmin` int(11) NOT NULL DEFAULT '0',
+  `spawntimesecsmax` int(11) NOT NULL DEFAULT '0',
   `animprogress` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `state` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `spawnFlags` int(10) unsigned NOT NULL DEFAULT '0',
+  `visibilitymod` float DEFAULT '0',
+  `patch_min` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `patch_max` tinyint(3) unsigned NOT NULL DEFAULT '10',
   PRIMARY KEY (`guid`),
   KEY `idx_map` (`map`),
   KEY `idx_id` (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Gameobject System';
 
-/*Table structure for table `gameobject_battleground` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_battleground
 DROP TABLE IF EXISTS `gameobject_battleground`;
-
-CREATE TABLE `gameobject_battleground` (
+CREATE TABLE IF NOT EXISTS `gameobject_battleground` (
   `guid` int(10) unsigned NOT NULL COMMENT 'GameObject''s GUID',
   `event1` tinyint(3) unsigned NOT NULL COMMENT 'main event',
   `event2` tinyint(3) unsigned NOT NULL COMMENT 'sub event',
-  PRIMARY KEY (`guid`)
+  PRIMARY KEY (`guid`,`event1`,`event2`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='GameObject battleground indexing system';
 
-/*Table structure for table `gameobject_involvedrelation` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_involvedrelation
 DROP TABLE IF EXISTS `gameobject_involvedrelation`;
-
-CREATE TABLE `gameobject_involvedrelation` (
+CREATE TABLE IF NOT EXISTS `gameobject_involvedrelation` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
-  PRIMARY KEY (`id`,`quest`)
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`quest`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `gameobject_loot_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_loot_template
 DROP TABLE IF EXISTS `gameobject_loot_template`;
-
-CREATE TABLE `gameobject_loot_template` (
+CREATE TABLE IF NOT EXISTS `gameobject_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -935,32 +976,36 @@ CREATE TABLE `gameobject_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Loot System';
 
-/*Table structure for table `gameobject_questrelation` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_questrelation
 DROP TABLE IF EXISTS `gameobject_questrelation`;
-
-CREATE TABLE `gameobject_questrelation` (
+CREATE TABLE IF NOT EXISTS `gameobject_questrelation` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Quest Identifier',
-  PRIMARY KEY (`id`,`quest`)
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`quest`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `gameobject_requirement` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_requirement
 DROP TABLE IF EXISTS `gameobject_requirement`;
-
-CREATE TABLE `gameobject_requirement` (
+CREATE TABLE IF NOT EXISTS `gameobject_requirement` (
   `guid` int(10) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Global Unique Identifier',
   `reqType` int(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Gameobject Identifier',
   `reqGuid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Gameobject Identifier',
   PRIMARY KEY (`guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Gameobject System';
 
-/*Table structure for table `gameobject_scripts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_scripts
 DROP TABLE IF EXISTS `gameobject_scripts`;
-
-CREATE TABLE `gameobject_scripts` (
+CREATE TABLE IF NOT EXISTS `gameobject_scripts` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `delay` int(10) unsigned NOT NULL DEFAULT '0',
   `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -968,6 +1013,9 @@ CREATE TABLE `gameobject_scripts` (
   `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `dataint` int(11) NOT NULL DEFAULT '0',
   `dataint2` int(11) NOT NULL DEFAULT '0',
@@ -980,11 +1028,12 @@ CREATE TABLE `gameobject_scripts` (
   `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `gameobject_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gameobject_template
 DROP TABLE IF EXISTS `gameobject_template`;
-
-CREATE TABLE `gameobject_template` (
+CREATE TABLE IF NOT EXISTS `gameobject_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `displayId` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1022,11 +1071,146 @@ CREATE TABLE `gameobject_template` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Gameobject System';
 
-/*Table structure for table `gm_subsurveys` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.game_event
+DROP TABLE IF EXISTS `game_event`;
+CREATE TABLE IF NOT EXISTS `game_event` (
+  `entry` mediumint(8) unsigned NOT NULL COMMENT 'Entry of the game event',
+  `start_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Absolute start date, the event will never start before',
+  `end_time` timestamp NOT NULL DEFAULT '0000-00-00 00:00:00' COMMENT 'Absolute end date, the event will never start afler',
+  `occurence` bigint(20) unsigned NOT NULL DEFAULT '5184000' COMMENT 'Delay in minutes between occurences of the event',
+  `length` bigint(20) unsigned NOT NULL DEFAULT '2592000' COMMENT 'Length in minutes of the event',
+  `holiday` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Client side holiday id',
+  `description` varchar(255) DEFAULT NULL COMMENT 'Description of the event displayed in console',
+  `hardcoded` tinyint(3) NOT NULL DEFAULT '0',
+  `disabled` tinyint(3) NOT NULL DEFAULT '0',
+  `patch_min` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `patch_max` tinyint(3) unsigned NOT NULL DEFAULT '10',
+  PRIMARY KEY (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_event_creature
+DROP TABLE IF EXISTS `game_event_creature`;
+CREATE TABLE IF NOT EXISTS `game_event_creature` (
+  `guid` int(10) unsigned NOT NULL,
+  `event` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Put negatives values to remove during event',
+  PRIMARY KEY (`guid`,`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_event_creature_data
+DROP TABLE IF EXISTS `game_event_creature_data`;
+CREATE TABLE IF NOT EXISTS `game_event_creature_data` (
+  `guid` int(10) unsigned NOT NULL DEFAULT '0',
+  `entry_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `modelid` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `equipment_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spell_start` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spell_end` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `event` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`guid`,`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_event_gameobject
+DROP TABLE IF EXISTS `game_event_gameobject`;
+CREATE TABLE IF NOT EXISTS `game_event_gameobject` (
+  `guid` int(10) unsigned NOT NULL,
+  `event` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Put negatives values to remove during event',
+  PRIMARY KEY (`guid`,`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_event_mail
+DROP TABLE IF EXISTS `game_event_mail`;
+CREATE TABLE IF NOT EXISTS `game_event_mail` (
+  `event` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Negatives value to send at event stop, positive value for send at event start.',
+  `raceMask` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `mailTemplateId` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `senderEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`event`,`raceMask`,`quest`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Game event system';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_event_quest
+DROP TABLE IF EXISTS `game_event_quest`;
+CREATE TABLE IF NOT EXISTS `game_event_quest` (
+  `quest` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'entry from quest_template',
+  `event` smallint(5) unsigned NOT NULL DEFAULT '0' COMMENT 'entry from game_event',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`quest`,`event`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Game event system';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_graveyard_zone
+DROP TABLE IF EXISTS `game_graveyard_zone`;
+CREATE TABLE IF NOT EXISTS `game_graveyard_zone` (
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `ghost_zone` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `faction` smallint(5) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`ghost_zone`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Trigger System';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_tele
+DROP TABLE IF EXISTS `game_tele`;
+CREATE TABLE IF NOT EXISTS `game_tele` (
+  `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
+  `position_x` float NOT NULL DEFAULT '0',
+  `position_y` float NOT NULL DEFAULT '0',
+  `position_z` float NOT NULL DEFAULT '0',
+  `orientation` float NOT NULL DEFAULT '0',
+  `map` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `name` varchar(100) NOT NULL DEFAULT '',
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Tele Command';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.game_weather
+DROP TABLE IF EXISTS `game_weather`;
+CREATE TABLE IF NOT EXISTS `game_weather` (
+  `zone` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `spring_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `spring_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `spring_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `summer_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `summer_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `summer_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `fall_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `fall_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `fall_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `winter_rain_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `winter_snow_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  `winter_storm_chance` tinyint(3) unsigned NOT NULL DEFAULT '25',
+  PRIMARY KEY (`zone`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Weather System';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.gm_subsurveys
 DROP TABLE IF EXISTS `gm_subsurveys`;
-
-CREATE TABLE `gm_subsurveys` (
+CREATE TABLE IF NOT EXISTS `gm_subsurveys` (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `subsurveyId` int(10) unsigned NOT NULL DEFAULT '0',
   `rank` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1034,11 +1218,12 @@ CREATE TABLE `gm_subsurveys` (
   PRIMARY KEY (`surveyId`,`subsurveyId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
 
-/*Table structure for table `gm_surveys` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gm_surveys
 DROP TABLE IF EXISTS `gm_surveys`;
-
-CREATE TABLE `gm_surveys` (
+CREATE TABLE IF NOT EXISTS `gm_surveys` (
   `surveyId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
   `mainSurvey` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1047,11 +1232,12 @@ CREATE TABLE `gm_surveys` (
   PRIMARY KEY (`surveyId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
 
-/*Table structure for table `gm_tickets` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gm_tickets
 DROP TABLE IF EXISTS `gm_tickets`;
-
-CREATE TABLE `gm_tickets` (
+CREATE TABLE IF NOT EXISTS `gm_tickets` (
   `ticketId` int(10) unsigned NOT NULL AUTO_INCREMENT,
   `guid` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Global Unique Identifier of ticket creator',
   `name` varchar(12) NOT NULL COMMENT 'Name of ticket creator',
@@ -1075,26 +1261,29 @@ CREATE TABLE `gm_tickets` (
   PRIMARY KEY (`ticketId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Player System';
 
-/*Table structure for table `gossip_menu` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gossip_menu
 DROP TABLE IF EXISTS `gossip_menu`;
-
-CREATE TABLE `gossip_menu` (
+CREATE TABLE IF NOT EXISTS `gossip_menu` (
   `entry` smallint(6) unsigned NOT NULL DEFAULT '0',
   `text_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `condition_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`,`text_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `gossip_menu_option` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gossip_menu_option
 DROP TABLE IF EXISTS `gossip_menu_option`;
-
-CREATE TABLE `gossip_menu_option` (
+CREATE TABLE IF NOT EXISTS `gossip_menu_option` (
   `menu_id` smallint(6) unsigned NOT NULL DEFAULT '0',
   `id` smallint(6) unsigned NOT NULL DEFAULT '0',
   `option_icon` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `option_text` text CHARACTER SET utf8,
+  `OptionBroadcastTextID` mediumint(6) unsigned NOT NULL DEFAULT '0',
   `option_id` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `npc_option_npcflag` int(10) unsigned NOT NULL DEFAULT '0',
   `action_menu_id` mediumint(8) NOT NULL DEFAULT '0',
@@ -1103,15 +1292,17 @@ CREATE TABLE `gossip_menu_option` (
   `box_coded` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `box_money` int(11) unsigned NOT NULL DEFAULT '0',
   `box_text` text CHARACTER SET utf8,
+  `BoxBroadcastTextID` mediumint(6) unsigned NOT NULL DEFAULT '0',
   `condition_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`menu_id`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `gossip_scripts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gossip_scripts
 DROP TABLE IF EXISTS `gossip_scripts`;
-
-CREATE TABLE `gossip_scripts` (
+CREATE TABLE IF NOT EXISTS `gossip_scripts` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `delay` int(10) unsigned NOT NULL DEFAULT '0',
   `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1119,6 +1310,9 @@ CREATE TABLE `gossip_scripts` (
   `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `dataint` int(11) NOT NULL DEFAULT '0',
   `dataint2` int(11) NOT NULL DEFAULT '0',
@@ -1131,11 +1325,12 @@ CREATE TABLE `gossip_scripts` (
   `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `gossip_texts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.gossip_texts
 DROP TABLE IF EXISTS `gossip_texts`;
-
-CREATE TABLE `gossip_texts` (
+CREATE TABLE IF NOT EXISTS `gossip_texts` (
   `entry` mediumint(8) NOT NULL,
   `content_default` text NOT NULL,
   `content_loc1` text,
@@ -1150,31 +1345,84 @@ CREATE TABLE `gossip_texts` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Gossip Texts';
 
-/*Table structure for table `item_display_info` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.instance_buff_removal
+DROP TABLE IF EXISTS `instance_buff_removal`;
+CREATE TABLE IF NOT EXISTS `instance_buff_removal` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to remove aura from',
+  `auraId` int(10) unsigned NOT NULL COMMENT 'aura id to remove on entering MapId',
+  `enabled` tinyint(1) NOT NULL COMMENT 'aura removal enabled or not',
+  `flags` int(10) NOT NULL COMMENT 'flags, see AuraRemovalMgr.h',
+  `comment` varchar(256) NOT NULL COMMENT 'description, what is removed',
+  PRIMARY KEY (`mapId`,`auraId`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Aura removal on map entry';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.instance_creature_kills
+DROP TABLE IF EXISTS `instance_creature_kills`;
+CREATE TABLE IF NOT EXISTS `instance_creature_kills` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
+  `creatureEntry` int(10) unsigned NOT NULL COMMENT 'entry of the creature who performed the kill',
+  `spellEntry` int(10) NOT NULL COMMENT 'entry of spell which did the kill. 0 for melee or unknown',
+  `count` int(10) unsigned NOT NULL COMMENT 'number of kills',
+  PRIMARY KEY (`mapId`,`creatureEntry`,`spellEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.instance_custom_counters
+DROP TABLE IF EXISTS `instance_custom_counters`;
+CREATE TABLE IF NOT EXISTS `instance_custom_counters` (
+  `index` int(10) unsigned NOT NULL COMMENT 'index as defined in InstanceStatistics.h',
+  `count` int(10) unsigned NOT NULL COMMENT 'counter',
+  PRIMARY KEY (`index`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.instance_wipes
+DROP TABLE IF EXISTS `instance_wipes`;
+CREATE TABLE IF NOT EXISTS `instance_wipes` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
+  `creatureEntry` int(10) unsigned NOT NULL COMMENT 'creature which the wipe occured against',
+  `count` int(10) unsigned NOT NULL COMMENT 'number of wipes',
+  PRIMARY KEY (`mapId`,`creatureEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='players wiping against creatures statistics';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.item_display_info
 DROP TABLE IF EXISTS `item_display_info`;
-
-CREATE TABLE `item_display_info` (
+CREATE TABLE IF NOT EXISTS `item_display_info` (
   `field0` int(11) NOT NULL,
   `field5` varchar(255) DEFAULT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `item_enchantment_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.item_enchantment_template
 DROP TABLE IF EXISTS `item_enchantment_template`;
-
-CREATE TABLE `item_enchantment_template` (
+CREATE TABLE IF NOT EXISTS `item_enchantment_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ench` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `chance` float unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`,`ench`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item Random Enchantment System';
 
-/*Table structure for table `item_loot_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.item_loot_template
 DROP TABLE IF EXISTS `item_loot_template`;
-
-CREATE TABLE `item_loot_template` (
+CREATE TABLE IF NOT EXISTS `item_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -1185,23 +1433,26 @@ CREATE TABLE `item_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-/*Table structure for table `item_required_target` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.item_required_target
 DROP TABLE IF EXISTS `item_required_target`;
-
-CREATE TABLE `item_required_target` (
+CREATE TABLE IF NOT EXISTS `item_required_target` (
   `entry` mediumint(8) unsigned NOT NULL,
   `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `targetEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   UNIQUE KEY `entry_type_target` (`entry`,`type`,`targetEntry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
-/*Table structure for table `item_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.item_template
 DROP TABLE IF EXISTS `item_template`;
-
-CREATE TABLE `item_template` (
+CREATE TABLE IF NOT EXISTS `item_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `subclass` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `name` varchar(255) NOT NULL DEFAULT '',
@@ -1330,15 +1581,16 @@ CREATE TABLE `item_template` (
   `Duration` int(11) unsigned NOT NULL DEFAULT '0',
   `ExtraFlags` tinyint(1) unsigned NOT NULL DEFAULT '0',
   `OtherTeamEntry` int(11) unsigned DEFAULT '1',
-  PRIMARY KEY (`entry`),
+  PRIMARY KEY (`entry`,`patch`),
   KEY `items_index` (`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item System';
 
-/*Table structure for table `locales_area` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_area
 DROP TABLE IF EXISTS `locales_area`;
-
-CREATE TABLE `locales_area` (
+CREATE TABLE IF NOT EXISTS `locales_area` (
   `Entry` mediumint(8) NOT NULL DEFAULT '0',
   `NameLoc1` varchar(100) NOT NULL DEFAULT '',
   `NameLoc2` varchar(100) NOT NULL DEFAULT '',
@@ -1351,11 +1603,39 @@ CREATE TABLE `locales_area` (
   PRIMARY KEY (`Entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_creature` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_broadcast_text
+DROP TABLE IF EXISTS `locales_broadcast_text`;
+CREATE TABLE IF NOT EXISTS `locales_broadcast_text` (
+  `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `MaleText_loc1` longtext,
+  `MaleText_loc2` longtext,
+  `MaleText_loc3` longtext,
+  `MaleText_loc4` longtext,
+  `MaleText_loc5` longtext,
+  `MaleText_loc6` longtext,
+  `MaleText_loc7` longtext,
+  `MaleText_loc8` longtext,
+  `FemaleText_loc1` longtext,
+  `FemaleText_loc2` longtext,
+  `FemaleText_loc3` longtext,
+  `FemaleText_loc4` longtext,
+  `FemaleText_loc5` longtext,
+  `FemaleText_loc6` longtext,
+  `FemaleText_loc7` longtext,
+  `FemaleText_loc8` longtext,
+  `VerifiedBuild` smallint(5) DEFAULT '0',
+  PRIMARY KEY (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.locales_creature
 DROP TABLE IF EXISTS `locales_creature`;
-
-CREATE TABLE `locales_creature` (
+CREATE TABLE IF NOT EXISTS `locales_creature` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `name_loc1` varchar(100) NOT NULL DEFAULT '',
   `name_loc2` varchar(100) NOT NULL DEFAULT '',
@@ -1376,11 +1656,12 @@ CREATE TABLE `locales_creature` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_gameobject` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_gameobject
 DROP TABLE IF EXISTS `locales_gameobject`;
-
-CREATE TABLE `locales_gameobject` (
+CREATE TABLE IF NOT EXISTS `locales_gameobject` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `name_loc1` varchar(100) NOT NULL DEFAULT '',
   `name_loc2` varchar(100) NOT NULL DEFAULT '',
@@ -1393,11 +1674,12 @@ CREATE TABLE `locales_gameobject` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_gossip_menu_option` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_gossip_menu_option
 DROP TABLE IF EXISTS `locales_gossip_menu_option`;
-
-CREATE TABLE `locales_gossip_menu_option` (
+CREATE TABLE IF NOT EXISTS `locales_gossip_menu_option` (
   `menu_id` smallint(6) unsigned NOT NULL DEFAULT '0',
   `id` smallint(6) unsigned NOT NULL DEFAULT '0',
   `option_text_loc1` text,
@@ -1419,11 +1701,12 @@ CREATE TABLE `locales_gossip_menu_option` (
   PRIMARY KEY (`menu_id`,`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_item` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_item
 DROP TABLE IF EXISTS `locales_item`;
-
-CREATE TABLE `locales_item` (
+CREATE TABLE IF NOT EXISTS `locales_item` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `name_loc1` varchar(100) NOT NULL DEFAULT '',
   `name_loc2` varchar(100) NOT NULL DEFAULT '',
@@ -1444,148 +1727,12 @@ CREATE TABLE `locales_item` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_npc_text` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `locales_npc_text`;
 
-CREATE TABLE `locales_npc_text` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Text0_0_loc1` longtext,
-  `Text0_0_loc2` longtext,
-  `Text0_0_loc3` longtext,
-  `Text0_0_loc4` longtext,
-  `Text0_0_loc5` longtext,
-  `Text0_0_loc6` longtext,
-  `Text0_0_loc7` longtext,
-  `Text0_0_loc8` longtext,
-  `Text0_1_loc1` longtext,
-  `Text0_1_loc2` longtext,
-  `Text0_1_loc3` longtext,
-  `Text0_1_loc4` longtext,
-  `Text0_1_loc5` longtext,
-  `Text0_1_loc6` longtext,
-  `Text0_1_loc7` longtext,
-  `Text0_1_loc8` longtext,
-  `Text1_0_loc1` longtext,
-  `Text1_0_loc2` longtext,
-  `Text1_0_loc3` longtext,
-  `Text1_0_loc4` longtext,
-  `Text1_0_loc5` longtext,
-  `Text1_0_loc6` longtext,
-  `Text1_0_loc7` longtext,
-  `Text1_0_loc8` longtext,
-  `Text1_1_loc1` longtext,
-  `Text1_1_loc2` longtext,
-  `Text1_1_loc3` longtext,
-  `Text1_1_loc4` longtext,
-  `Text1_1_loc5` longtext,
-  `Text1_1_loc6` longtext,
-  `Text1_1_loc7` longtext,
-  `Text1_1_loc8` longtext,
-  `Text2_0_loc1` longtext,
-  `Text2_0_loc2` longtext,
-  `Text2_0_loc3` longtext,
-  `Text2_0_loc4` longtext,
-  `Text2_0_loc5` longtext,
-  `Text2_0_loc6` longtext,
-  `Text2_0_loc7` longtext,
-  `Text2_0_loc8` longtext,
-  `Text2_1_loc1` longtext,
-  `Text2_1_loc2` longtext,
-  `Text2_1_loc3` longtext,
-  `Text2_1_loc4` longtext,
-  `Text2_1_loc5` longtext,
-  `Text2_1_loc6` longtext,
-  `Text2_1_loc7` longtext,
-  `Text2_1_loc8` longtext,
-  `Text3_0_loc1` longtext,
-  `Text3_0_loc2` longtext,
-  `Text3_0_loc3` longtext,
-  `Text3_0_loc4` longtext,
-  `Text3_0_loc5` longtext,
-  `Text3_0_loc6` longtext,
-  `Text3_0_loc7` longtext,
-  `Text3_0_loc8` longtext,
-  `Text3_1_loc1` longtext,
-  `Text3_1_loc2` longtext,
-  `Text3_1_loc3` longtext,
-  `Text3_1_loc4` longtext,
-  `Text3_1_loc5` longtext,
-  `Text3_1_loc6` longtext,
-  `Text3_1_loc7` longtext,
-  `Text3_1_loc8` longtext,
-  `Text4_0_loc1` longtext,
-  `Text4_0_loc2` longtext,
-  `Text4_0_loc3` longtext,
-  `Text4_0_loc4` longtext,
-  `Text4_0_loc5` longtext,
-  `Text4_0_loc6` longtext,
-  `Text4_0_loc7` longtext,
-  `Text4_0_loc8` longtext,
-  `Text4_1_loc1` longtext,
-  `Text4_1_loc2` longtext,
-  `Text4_1_loc3` longtext,
-  `Text4_1_loc4` longtext,
-  `Text4_1_loc5` longtext,
-  `Text4_1_loc6` longtext,
-  `Text4_1_loc7` longtext,
-  `Text4_1_loc8` longtext,
-  `Text5_0_loc1` longtext,
-  `Text5_0_loc2` longtext,
-  `Text5_0_loc3` longtext,
-  `Text5_0_loc4` longtext,
-  `Text5_0_loc5` longtext,
-  `Text5_0_loc6` longtext,
-  `Text5_0_loc7` longtext,
-  `Text5_0_loc8` longtext,
-  `Text5_1_loc1` longtext,
-  `Text5_1_loc2` longtext,
-  `Text5_1_loc3` longtext,
-  `Text5_1_loc4` longtext,
-  `Text5_1_loc5` longtext,
-  `Text5_1_loc6` longtext,
-  `Text5_1_loc7` longtext,
-  `Text5_1_loc8` longtext,
-  `Text6_0_loc1` longtext,
-  `Text6_0_loc2` longtext,
-  `Text6_0_loc3` longtext,
-  `Text6_0_loc4` longtext,
-  `Text6_0_loc5` longtext,
-  `Text6_0_loc6` longtext,
-  `Text6_0_loc7` longtext,
-  `Text6_0_loc8` longtext,
-  `Text6_1_loc1` longtext,
-  `Text6_1_loc2` longtext,
-  `Text6_1_loc3` longtext,
-  `Text6_1_loc4` longtext,
-  `Text6_1_loc5` longtext,
-  `Text6_1_loc6` longtext,
-  `Text6_1_loc7` longtext,
-  `Text6_1_loc8` longtext,
-  `Text7_0_loc1` longtext,
-  `Text7_0_loc2` longtext,
-  `Text7_0_loc3` longtext,
-  `Text7_0_loc4` longtext,
-  `Text7_0_loc5` longtext,
-  `Text7_0_loc6` longtext,
-  `Text7_0_loc7` longtext,
-  `Text7_0_loc8` longtext,
-  `Text7_1_loc1` longtext,
-  `Text7_1_loc2` longtext,
-  `Text7_1_loc3` longtext,
-  `Text7_1_loc4` longtext,
-  `Text7_1_loc5` longtext,
-  `Text7_1_loc6` longtext,
-  `Text7_1_loc7` longtext,
-  `Text7_1_loc8` longtext,
-  PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `locales_page_text` */
-
+-- Dumping structure for table mangos.locales_page_text
 DROP TABLE IF EXISTS `locales_page_text`;
-
-CREATE TABLE `locales_page_text` (
+CREATE TABLE IF NOT EXISTS `locales_page_text` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `Text_loc1` longtext,
   `Text_loc2` longtext,
@@ -1598,11 +1745,12 @@ CREATE TABLE `locales_page_text` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_points_of_interest` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_points_of_interest
 DROP TABLE IF EXISTS `locales_points_of_interest`;
-
-CREATE TABLE `locales_points_of_interest` (
+CREATE TABLE IF NOT EXISTS `locales_points_of_interest` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `icon_name_loc1` text,
   `icon_name_loc2` text,
@@ -1615,11 +1763,12 @@ CREATE TABLE `locales_points_of_interest` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `locales_quest` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.locales_quest
 DROP TABLE IF EXISTS `locales_quest`;
-
-CREATE TABLE `locales_quest` (
+CREATE TABLE IF NOT EXISTS `locales_quest` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `Title_loc1` text,
   `Title_loc2` text,
@@ -1704,11 +1853,12 @@ CREATE TABLE `locales_quest` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `mail_loot_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.mail_loot_template
 DROP TABLE IF EXISTS `mail_loot_template`;
-
-CREATE TABLE `mail_loot_template` (
+CREATE TABLE IF NOT EXISTS `mail_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -1719,11 +1869,12 @@ CREATE TABLE `mail_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-/*Table structure for table `mangos_string` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.mangos_string
 DROP TABLE IF EXISTS `mangos_string`;
-
-CREATE TABLE `mangos_string` (
+CREATE TABLE IF NOT EXISTS `mangos_string` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `content_default` text NOT NULL,
   `content_loc1` text,
@@ -1737,22 +1888,25 @@ CREATE TABLE `mangos_string` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `map_loot_disabled` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.map_loot_disabled
 DROP TABLE IF EXISTS `map_loot_disabled`;
-
-CREATE TABLE `map_loot_disabled` (
+CREATE TABLE IF NOT EXISTS `map_loot_disabled` (
   `mapid` int(11) NOT NULL DEFAULT '0',
   `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`mapid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `map_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.map_template
 DROP TABLE IF EXISTS `map_template`;
-
-CREATE TABLE `map_template` (
+CREATE TABLE IF NOT EXISTS `map_template` (
   `Entry` smallint(5) unsigned NOT NULL,
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `Parent` int(10) unsigned NOT NULL DEFAULT '0',
   `MapType` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `LinkedZone` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1765,23 +1919,25 @@ CREATE TABLE `map_template` (
   `GhostEntranceY` float NOT NULL DEFAULT '0',
   `MapName` varchar(128) NOT NULL DEFAULT '',
   `ScriptName` varchar(128) NOT NULL DEFAULT '',
-  PRIMARY KEY (`Entry`)
+  PRIMARY KEY (`Entry`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `migrations` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.migrations
 DROP TABLE IF EXISTS `migrations`;
-
-CREATE TABLE `migrations` (
+CREATE TABLE IF NOT EXISTS `migrations` (
   `id` varchar(255) NOT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `nostalrius_string` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.nostalrius_string
 DROP TABLE IF EXISTS `nostalrius_string`;
-
-CREATE TABLE `nostalrius_string` (
+CREATE TABLE IF NOT EXISTS `nostalrius_string` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `content_default` text NOT NULL,
   `content_loc1` text,
@@ -1795,110 +1951,49 @@ CREATE TABLE `nostalrius_string` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `npc_gossip` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.npc_gossip
 DROP TABLE IF EXISTS `npc_gossip`;
-
-CREATE TABLE `npc_gossip` (
+CREATE TABLE IF NOT EXISTS `npc_gossip` (
   `npc_guid` int(10) unsigned NOT NULL DEFAULT '0',
   `textid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`npc_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `npc_text` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.npc_text
 DROP TABLE IF EXISTS `npc_text`;
-
-CREATE TABLE `npc_text` (
+CREATE TABLE IF NOT EXISTS `npc_text` (
   `ID` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `text0_0` longtext,
-  `text0_1` longtext,
-  `lang0` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob0` float NOT NULL DEFAULT '0',
-  `em0_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em0_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em0_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em0_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em0_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em0_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text1_0` longtext,
-  `text1_1` longtext,
-  `lang1` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob1` float NOT NULL DEFAULT '0',
-  `em1_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em1_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em1_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em1_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em1_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em1_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text2_0` longtext,
-  `text2_1` longtext,
-  `lang2` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob2` float NOT NULL DEFAULT '0',
-  `em2_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em2_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em2_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em2_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em2_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em2_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text3_0` longtext,
-  `text3_1` longtext,
-  `lang3` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob3` float NOT NULL DEFAULT '0',
-  `em3_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em3_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em3_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em3_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em3_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em3_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text4_0` longtext,
-  `text4_1` longtext,
-  `lang4` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob4` float NOT NULL DEFAULT '0',
-  `em4_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em4_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em4_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em4_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em4_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em4_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text5_0` longtext,
-  `text5_1` longtext,
-  `lang5` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob5` float NOT NULL DEFAULT '0',
-  `em5_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em5_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em5_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em5_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em5_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em5_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text6_0` longtext,
-  `text6_1` longtext,
-  `lang6` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob6` float NOT NULL DEFAULT '0',
-  `em6_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em6_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em6_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em6_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em6_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em6_5` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `text7_0` longtext,
-  `text7_1` longtext,
-  `lang7` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `prob7` float NOT NULL DEFAULT '0',
-  `em7_0` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em7_1` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em7_2` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em7_3` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em7_4` smallint(5) unsigned NOT NULL DEFAULT '0',
-  `em7_5` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `BroadcastTextID0` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability0` float NOT NULL DEFAULT '0',
+  `BroadcastTextID1` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability1` float NOT NULL DEFAULT '0',
+  `BroadcastTextID2` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability2` float NOT NULL DEFAULT '0',
+  `BroadcastTextID3` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability3` float NOT NULL DEFAULT '0',
+  `BroadcastTextID4` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability4` float NOT NULL DEFAULT '0',
+  `BroadcastTextID5` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability5` float NOT NULL DEFAULT '0',
+  `BroadcastTextID6` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability6` float NOT NULL DEFAULT '0',
+  `BroadcastTextID7` mediumint(6) unsigned NOT NULL DEFAULT '0',
+  `Probability7` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`ID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `npc_trainer` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.npc_trainer
 DROP TABLE IF EXISTS `npc_trainer`;
-
-CREATE TABLE `npc_trainer` (
+CREATE TABLE IF NOT EXISTS `npc_trainer` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spell` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spellcost` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1908,11 +2003,12 @@ CREATE TABLE `npc_trainer` (
   UNIQUE KEY `entry_spell` (`entry`,`spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `npc_trainer_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.npc_trainer_template
 DROP TABLE IF EXISTS `npc_trainer_template`;
-
-CREATE TABLE `npc_trainer_template` (
+CREATE TABLE IF NOT EXISTS `npc_trainer_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spell` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `spellcost` int(10) unsigned NOT NULL DEFAULT '0',
@@ -1922,11 +2018,12 @@ CREATE TABLE `npc_trainer_template` (
   UNIQUE KEY `entry_spell` (`entry`,`spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `npc_vendor` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.npc_vendor
 DROP TABLE IF EXISTS `npc_vendor`;
-
-CREATE TABLE `npc_vendor` (
+CREATE TABLE IF NOT EXISTS `npc_vendor` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `maxcount` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1934,11 +2031,12 @@ CREATE TABLE `npc_vendor` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Npc System';
 
-/*Table structure for table `npc_vendor_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.npc_vendor_template
 DROP TABLE IF EXISTS `npc_vendor_template`;
-
-CREATE TABLE `npc_vendor_template` (
+CREATE TABLE IF NOT EXISTS `npc_vendor_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `maxcount` tinyint(3) unsigned NOT NULL DEFAULT '0',
@@ -1946,22 +2044,38 @@ CREATE TABLE `npc_vendor_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Npc System';
 
-/*Table structure for table `page_text` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.page_text
 DROP TABLE IF EXISTS `page_text`;
-
-CREATE TABLE `page_text` (
+CREATE TABLE IF NOT EXISTS `page_text` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `text` longtext NOT NULL,
   `next_page` mediumint(8) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Item System';
 
-/*Table structure for table `pet_levelstats` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.petcreateinfo_spell
+DROP TABLE IF EXISTS `petcreateinfo_spell`;
+CREATE TABLE IF NOT EXISTS `petcreateinfo_spell` (
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Spell1` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Spell2` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Spell3` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `Spell4` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet Create Spells';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.pet_levelstats
 DROP TABLE IF EXISTS `pet_levelstats`;
-
-CREATE TABLE `pet_levelstats` (
+CREATE TABLE IF NOT EXISTS `pet_levelstats` (
   `creature_entry` mediumint(8) unsigned NOT NULL,
   `level` tinyint(3) unsigned NOT NULL,
   `hp` smallint(5) unsigned NOT NULL,
@@ -1975,11 +2089,12 @@ CREATE TABLE `pet_levelstats` (
   PRIMARY KEY (`creature_entry`,`level`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores pet levels stats.';
 
-/*Table structure for table `pet_name_generation` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pet_name_generation
 DROP TABLE IF EXISTS `pet_name_generation`;
-
-CREATE TABLE `pet_name_generation` (
+CREATE TABLE IF NOT EXISTS `pet_name_generation` (
   `id` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
   `word` tinytext NOT NULL,
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -1987,24 +2102,12 @@ CREATE TABLE `pet_name_generation` (
   PRIMARY KEY (`id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `petcreateinfo_spell` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `petcreateinfo_spell`;
 
-CREATE TABLE `petcreateinfo_spell` (
-  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Spell1` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Spell2` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Spell3` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `Spell4` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Pet Create Spells';
-
-/*Table structure for table `pickpocketing_loot_template` */
-
+-- Dumping structure for table mangos.pickpocketing_loot_template
 DROP TABLE IF EXISTS `pickpocketing_loot_template`;
-
-CREATE TABLE `pickpocketing_loot_template` (
+CREATE TABLE IF NOT EXISTS `pickpocketing_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -2015,115 +2118,24 @@ CREATE TABLE `pickpocketing_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-/*Table structure for table `player_classlevelstats` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `player_classlevelstats`;
 
-CREATE TABLE `player_classlevelstats` (
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `basehp` smallint(5) unsigned NOT NULL,
-  `basemana` smallint(5) unsigned NOT NULL,
-  PRIMARY KEY (`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
-
-/*Table structure for table `player_factionchange_items` */
-
-DROP TABLE IF EXISTS `player_factionchange_items`;
-
-CREATE TABLE `player_factionchange_items` (
-  `alliance_id` int(8) NOT NULL,
-  `horde_id` int(8) NOT NULL,
-  `comment` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `player_factionchange_mounts` */
-
-DROP TABLE IF EXISTS `player_factionchange_mounts`;
-
-CREATE TABLE `player_factionchange_mounts` (
-  `RaceId` int(8) NOT NULL,
-  `MountNum` int(8) NOT NULL,
-  `ItemEntry` int(8) NOT NULL,
-  `Comment` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`RaceId`,`MountNum`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `player_factionchange_quests` */
-
-DROP TABLE IF EXISTS `player_factionchange_quests`;
-
-CREATE TABLE `player_factionchange_quests` (
-  `alliance_id` int(8) NOT NULL,
-  `horde_id` int(8) NOT NULL,
-  `comment` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `player_factionchange_reputations` */
-
-DROP TABLE IF EXISTS `player_factionchange_reputations`;
-
-CREATE TABLE `player_factionchange_reputations` (
-  `alliance_id` int(8) NOT NULL,
-  `horde_id` int(8) NOT NULL,
-  PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `player_factionchange_spells` */
-
-DROP TABLE IF EXISTS `player_factionchange_spells`;
-
-CREATE TABLE `player_factionchange_spells` (
-  `alliance_id` int(8) NOT NULL,
-  `horde_id` int(8) NOT NULL,
-  `comment` varchar(255) NOT NULL DEFAULT '',
-  PRIMARY KEY (`alliance_id`,`horde_id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `player_levelstats` */
-
-DROP TABLE IF EXISTS `player_levelstats`;
-
-CREATE TABLE `player_levelstats` (
-  `race` tinyint(3) unsigned NOT NULL,
-  `class` tinyint(3) unsigned NOT NULL,
-  `level` tinyint(3) unsigned NOT NULL,
-  `str` tinyint(3) unsigned NOT NULL,
-  `agi` tinyint(3) unsigned NOT NULL,
-  `sta` tinyint(3) unsigned NOT NULL,
-  `inte` tinyint(3) unsigned NOT NULL,
-  `spi` tinyint(3) unsigned NOT NULL,
-  PRIMARY KEY (`race`,`class`,`level`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
-
-/*Table structure for table `player_xp_for_level` */
-
-DROP TABLE IF EXISTS `player_xp_for_level`;
-
-CREATE TABLE `player_xp_for_level` (
-  `lvl` int(3) unsigned NOT NULL,
-  `xp_for_next_level` int(10) unsigned NOT NULL,
-  PRIMARY KEY (`lvl`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `playerbot` */
-
+-- Dumping structure for table mangos.playerbot
 DROP TABLE IF EXISTS `playerbot`;
-
-CREATE TABLE `playerbot` (
+CREATE TABLE IF NOT EXISTS `playerbot` (
   `char_guid` bigint(20) unsigned NOT NULL,
   `chance` int(10) unsigned NOT NULL DEFAULT '10',
   `comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`char_guid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `playercreateinfo` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.playercreateinfo
 DROP TABLE IF EXISTS `playercreateinfo`;
-
-CREATE TABLE `playercreateinfo` (
+CREATE TABLE IF NOT EXISTS `playercreateinfo` (
   `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `map` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -2135,11 +2147,12 @@ CREATE TABLE `playercreateinfo` (
   PRIMARY KEY (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `playercreateinfo_action` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.playercreateinfo_action
 DROP TABLE IF EXISTS `playercreateinfo_action`;
-
-CREATE TABLE `playercreateinfo_action` (
+CREATE TABLE IF NOT EXISTS `playercreateinfo_action` (
   `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `button` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -2149,11 +2162,12 @@ CREATE TABLE `playercreateinfo_action` (
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `playercreateinfo_item` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.playercreateinfo_item
 DROP TABLE IF EXISTS `playercreateinfo_item`;
-
-CREATE TABLE `playercreateinfo_item` (
+CREATE TABLE IF NOT EXISTS `playercreateinfo_item` (
   `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `itemid` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -2161,11 +2175,12 @@ CREATE TABLE `playercreateinfo_item` (
   KEY `playercreateinfo_race_class_index` (`race`,`class`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `playercreateinfo_spell` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.playercreateinfo_spell
 DROP TABLE IF EXISTS `playercreateinfo_spell`;
-
-CREATE TABLE `playercreateinfo_spell` (
+CREATE TABLE IF NOT EXISTS `playercreateinfo_spell` (
   `race` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `class` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `Spell` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -2173,11 +2188,113 @@ CREATE TABLE `playercreateinfo_spell` (
   PRIMARY KEY (`race`,`class`,`Spell`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `points_of_interest` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.player_classlevelstats
+DROP TABLE IF EXISTS `player_classlevelstats`;
+CREATE TABLE IF NOT EXISTS `player_classlevelstats` (
+  `class` tinyint(3) unsigned NOT NULL,
+  `level` tinyint(3) unsigned NOT NULL,
+  `basehp` smallint(5) unsigned NOT NULL,
+  `basemana` smallint(5) unsigned NOT NULL,
+  PRIMARY KEY (`class`,`level`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_factionchange_items
+DROP TABLE IF EXISTS `player_factionchange_items`;
+CREATE TABLE IF NOT EXISTS `player_factionchange_items` (
+  `alliance_id` int(8) NOT NULL,
+  `horde_id` int(8) NOT NULL,
+  `comment` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`alliance_id`,`horde_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_factionchange_mounts
+DROP TABLE IF EXISTS `player_factionchange_mounts`;
+CREATE TABLE IF NOT EXISTS `player_factionchange_mounts` (
+  `RaceId` int(8) NOT NULL,
+  `MountNum` int(8) NOT NULL,
+  `ItemEntry` int(8) NOT NULL,
+  `Comment` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`RaceId`,`MountNum`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_factionchange_quests
+DROP TABLE IF EXISTS `player_factionchange_quests`;
+CREATE TABLE IF NOT EXISTS `player_factionchange_quests` (
+  `alliance_id` int(8) NOT NULL,
+  `horde_id` int(8) NOT NULL,
+  `comment` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`alliance_id`,`horde_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_factionchange_reputations
+DROP TABLE IF EXISTS `player_factionchange_reputations`;
+CREATE TABLE IF NOT EXISTS `player_factionchange_reputations` (
+  `alliance_id` int(8) NOT NULL,
+  `horde_id` int(8) NOT NULL,
+  PRIMARY KEY (`alliance_id`,`horde_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_factionchange_spells
+DROP TABLE IF EXISTS `player_factionchange_spells`;
+CREATE TABLE IF NOT EXISTS `player_factionchange_spells` (
+  `alliance_id` int(8) NOT NULL,
+  `horde_id` int(8) NOT NULL,
+  `comment` varchar(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (`alliance_id`,`horde_id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_levelstats
+DROP TABLE IF EXISTS `player_levelstats`;
+CREATE TABLE IF NOT EXISTS `player_levelstats` (
+  `race` tinyint(3) unsigned NOT NULL,
+  `class` tinyint(3) unsigned NOT NULL,
+  `level` tinyint(3) unsigned NOT NULL,
+  `str` tinyint(3) unsigned NOT NULL,
+  `agi` tinyint(3) unsigned NOT NULL,
+  `sta` tinyint(3) unsigned NOT NULL,
+  `inte` tinyint(3) unsigned NOT NULL,
+  `spi` tinyint(3) unsigned NOT NULL,
+  PRIMARY KEY (`race`,`class`,`level`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 PACK_KEYS=0 COMMENT='Stores levels stats.';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.player_xp_for_level
+DROP TABLE IF EXISTS `player_xp_for_level`;
+CREATE TABLE IF NOT EXISTS `player_xp_for_level` (
+  `lvl` int(3) unsigned NOT NULL,
+  `xp_for_next_level` int(10) unsigned NOT NULL,
+  PRIMARY KEY (`lvl`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.points_of_interest
 DROP TABLE IF EXISTS `points_of_interest`;
-
-CREATE TABLE `points_of_interest` (
+CREATE TABLE IF NOT EXISTS `points_of_interest` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `x` float NOT NULL DEFAULT '0',
   `y` float NOT NULL DEFAULT '0',
@@ -2188,11 +2305,12 @@ CREATE TABLE `points_of_interest` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `pool_creature` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pool_creature
 DROP TABLE IF EXISTS `pool_creature`;
-
-CREATE TABLE `pool_creature` (
+CREATE TABLE IF NOT EXISTS `pool_creature` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
   `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `chance` float unsigned NOT NULL DEFAULT '0',
@@ -2202,11 +2320,12 @@ CREATE TABLE `pool_creature` (
   KEY `pool_idx` (`pool_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `pool_creature_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pool_creature_template
 DROP TABLE IF EXISTS `pool_creature_template`;
-
-CREATE TABLE `pool_creature_template` (
+CREATE TABLE IF NOT EXISTS `pool_creature_template` (
   `id` int(10) unsigned NOT NULL DEFAULT '0',
   `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `chance` float unsigned NOT NULL DEFAULT '0',
@@ -2216,11 +2335,12 @@ CREATE TABLE `pool_creature_template` (
   KEY `pool_idx` (`pool_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `pool_gameobject` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pool_gameobject
 DROP TABLE IF EXISTS `pool_gameobject`;
-
-CREATE TABLE `pool_gameobject` (
+CREATE TABLE IF NOT EXISTS `pool_gameobject` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
   `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `chance` float unsigned NOT NULL DEFAULT '0',
@@ -2230,11 +2350,12 @@ CREATE TABLE `pool_gameobject` (
   KEY `pool_idx` (`pool_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `pool_gameobject_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pool_gameobject_template
 DROP TABLE IF EXISTS `pool_gameobject_template`;
-
-CREATE TABLE `pool_gameobject_template` (
+CREATE TABLE IF NOT EXISTS `pool_gameobject_template` (
   `id` int(10) unsigned NOT NULL DEFAULT '0',
   `pool_entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `chance` float unsigned NOT NULL DEFAULT '0',
@@ -2244,11 +2365,12 @@ CREATE TABLE `pool_gameobject_template` (
   KEY `pool_idx` (`pool_entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `pool_pool` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pool_pool
 DROP TABLE IF EXISTS `pool_pool`;
-
-CREATE TABLE `pool_pool` (
+CREATE TABLE IF NOT EXISTS `pool_pool` (
   `pool_id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `mother_pool` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `chance` float NOT NULL DEFAULT '0',
@@ -2258,11 +2380,12 @@ CREATE TABLE `pool_pool` (
   KEY `pool_idx` (`mother_pool`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `pool_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.pool_template
 DROP TABLE IF EXISTS `pool_template`;
-
-CREATE TABLE `pool_template` (
+CREATE TABLE IF NOT EXISTS `pool_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Pool entry',
   `max_limit` int(10) unsigned NOT NULL DEFAULT '0' COMMENT 'Max number of objects (0) is no limit',
   `description` varchar(255) NOT NULL,
@@ -2271,11 +2394,12 @@ CREATE TABLE `pool_template` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `quest_end_scripts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.quest_end_scripts
 DROP TABLE IF EXISTS `quest_end_scripts`;
-
-CREATE TABLE `quest_end_scripts` (
+CREATE TABLE IF NOT EXISTS `quest_end_scripts` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `delay` int(10) unsigned NOT NULL DEFAULT '0',
   `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -2283,6 +2407,9 @@ CREATE TABLE `quest_end_scripts` (
   `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `dataint` int(11) NOT NULL DEFAULT '0',
   `dataint2` int(11) NOT NULL DEFAULT '0',
@@ -2295,39 +2422,68 @@ CREATE TABLE `quest_end_scripts` (
   `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `quest_start_scripts` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `quest_start_scripts`;
 
-CREATE TABLE `quest_start_scripts` (
-  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `delay` int(10) unsigned NOT NULL DEFAULT '0',
-  `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `datalong` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
-  `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
-  `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
-  `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `dataint` int(11) NOT NULL DEFAULT '0',
-  `dataint2` int(11) NOT NULL DEFAULT '0',
-  `dataint3` int(11) NOT NULL DEFAULT '0',
-  `dataint4` int(11) NOT NULL DEFAULT '0',
-  `x` float NOT NULL DEFAULT '0',
-  `y` float NOT NULL DEFAULT '0',
-  `z` float NOT NULL DEFAULT '0',
-  `o` float NOT NULL DEFAULT '0',
-  `comments` varchar(255) NOT NULL
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `quest_template` */
-
-DROP TABLE IF EXISTS `quest_template`;
-
-CREATE TABLE `quest_template` (
+-- Dumping structure for table mangos.quest_greeting
+DROP TABLE IF EXISTS `quest_greeting`;
+CREATE TABLE IF NOT EXISTS `quest_greeting` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `content_default` text NOT NULL,
+  `content_loc1` text,
+  `content_loc2` text,
+  `content_loc3` text,
+  `content_loc4` text,
+  `content_loc5` text,
+  `content_loc6` text,
+  `content_loc7` text,
+  `content_loc8` text,
+  `Emote` smallint(5) unsigned NOT NULL DEFAULT '0',
+  `EmoteDelay` int(10) unsigned NOT NULL DEFAULT '0',
+  PRIMARY KEY (`entry`,`type`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.quest_start_scripts
+DROP TABLE IF EXISTS `quest_start_scripts`;
+CREATE TABLE IF NOT EXISTS `quest_start_scripts` (
+  `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `delay` int(10) unsigned NOT NULL DEFAULT '0',
+  `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `datalong` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
+  `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
+  `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `dataint` int(11) NOT NULL DEFAULT '0',
+  `dataint2` int(11) NOT NULL DEFAULT '0',
+  `dataint3` int(11) NOT NULL DEFAULT '0',
+  `dataint4` int(11) NOT NULL DEFAULT '0',
+  `x` float NOT NULL DEFAULT '0',
+  `y` float NOT NULL DEFAULT '0',
+  `z` float NOT NULL DEFAULT '0',
+  `o` float NOT NULL DEFAULT '0',
+  `comments` varchar(255) NOT NULL
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.quest_template
+DROP TABLE IF EXISTS `quest_template`;
+CREATE TABLE IF NOT EXISTS `quest_template` (
+  `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  `patch` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `Method` tinyint(3) unsigned NOT NULL DEFAULT '2',
   `ZoneOrSort` smallint(6) NOT NULL DEFAULT '0',
   `MinLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `MaxLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `QuestLevel` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `Type` smallint(5) unsigned NOT NULL DEFAULT '0',
   `RequiredClasses` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -2449,14 +2605,15 @@ CREATE TABLE `quest_template` (
   `OfferRewardEmoteDelay4` int(11) unsigned NOT NULL DEFAULT '0',
   `StartScript` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `CompleteScript` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  PRIMARY KEY (`entry`)
+  PRIMARY KEY (`entry`,`patch`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Quest System';
 
-/*Table structure for table `reference_loot_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.reference_loot_template
 DROP TABLE IF EXISTS `reference_loot_template`;
-
-CREATE TABLE `reference_loot_template` (
+CREATE TABLE IF NOT EXISTS `reference_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -2467,11 +2624,12 @@ CREATE TABLE `reference_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-/*Table structure for table `reputation_reward_rate` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.reputation_reward_rate
 DROP TABLE IF EXISTS `reputation_reward_rate`;
-
-CREATE TABLE `reputation_reward_rate` (
+CREATE TABLE IF NOT EXISTS `reputation_reward_rate` (
   `faction` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `quest_rate` float NOT NULL DEFAULT '1',
   `creature_rate` float NOT NULL DEFAULT '1',
@@ -2479,11 +2637,12 @@ CREATE TABLE `reputation_reward_rate` (
   PRIMARY KEY (`faction`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `reputation_spillover_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.reputation_spillover_template
 DROP TABLE IF EXISTS `reputation_spillover_template`;
-
-CREATE TABLE `reputation_spillover_template` (
+CREATE TABLE IF NOT EXISTS `reputation_spillover_template` (
   `faction` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT 'faction entry',
   `faction1` smallint(6) unsigned NOT NULL DEFAULT '0' COMMENT 'faction to give spillover for',
   `rate_1` float NOT NULL DEFAULT '0' COMMENT 'the given rep points * rate',
@@ -2500,31 +2659,56 @@ CREATE TABLE `reputation_spillover_template` (
   PRIMARY KEY (`faction`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Reputation spillover reputation gain';
 
-/*Table structure for table `reserved_name` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.reserved_name
 DROP TABLE IF EXISTS `reserved_name`;
-
-CREATE TABLE `reserved_name` (
+CREATE TABLE IF NOT EXISTS `reserved_name` (
   `name` varchar(12) NOT NULL DEFAULT '',
   PRIMARY KEY (`name`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player Reserved Names';
 
-/*Table structure for table `script_escort_data` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.scripted_areatrigger
+DROP TABLE IF EXISTS `scripted_areatrigger`;
+CREATE TABLE IF NOT EXISTS `scripted_areatrigger` (
+  `entry` mediumint(8) NOT NULL,
+  `ScriptName` char(64) NOT NULL,
+  PRIMARY KEY (`entry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.scripted_event_id
+DROP TABLE IF EXISTS `scripted_event_id`;
+CREATE TABLE IF NOT EXISTS `scripted_event_id` (
+  `id` mediumint(8) NOT NULL,
+  `ScriptName` char(64) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Script library scripted events';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.script_escort_data
 DROP TABLE IF EXISTS `script_escort_data`;
-
-CREATE TABLE `script_escort_data` (
+CREATE TABLE IF NOT EXISTS `script_escort_data` (
   `creature_id` int(11) DEFAULT NULL,
   `quest` int(11) DEFAULT NULL,
   `escort_faction` int(11) DEFAULT NULL,
   UNIQUE KEY `creature_id` (`creature_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1 ROW_FORMAT=DYNAMIC;
 
-/*Table structure for table `script_texts` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.script_texts
 DROP TABLE IF EXISTS `script_texts`;
-
-CREATE TABLE `script_texts` (
+CREATE TABLE IF NOT EXISTS `script_texts` (
   `entry` mediumint(8) NOT NULL,
   `content_default` text NOT NULL,
   `content_loc1` text,
@@ -2543,11 +2727,12 @@ CREATE TABLE `script_texts` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Script Texts';
 
-/*Table structure for table `script_waypoint` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.script_waypoint
 DROP TABLE IF EXISTS `script_waypoint`;
-
-CREATE TABLE `script_waypoint` (
+CREATE TABLE IF NOT EXISTS `script_waypoint` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'creature_template entry',
   `pointid` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `location_x` float NOT NULL DEFAULT '0',
@@ -2558,42 +2743,24 @@ CREATE TABLE `script_waypoint` (
   PRIMARY KEY (`entry`,`pointid`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Script Creature waypoints';
 
-/*Table structure for table `scripted_areatrigger` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `scripted_areatrigger`;
 
-CREATE TABLE `scripted_areatrigger` (
-  `entry` mediumint(8) NOT NULL,
-  `ScriptName` char(64) NOT NULL,
-  PRIMARY KEY (`entry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8;
-
-/*Table structure for table `scripted_event_id` */
-
-DROP TABLE IF EXISTS `scripted_event_id`;
-
-CREATE TABLE `scripted_event_id` (
-  `id` mediumint(8) NOT NULL,
-  `ScriptName` char(64) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Script library scripted events';
-
-/*Table structure for table `skill_discovery_template` */
-
+-- Dumping structure for table mangos.skill_discovery_template
 DROP TABLE IF EXISTS `skill_discovery_template`;
-
-CREATE TABLE `skill_discovery_template` (
+CREATE TABLE IF NOT EXISTS `skill_discovery_template` (
   `spellId` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the discoverable spell',
   `reqSpell` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'spell requirement',
   `chance` float NOT NULL DEFAULT '0' COMMENT 'chance to discover',
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Skill Discovery System';
 
-/*Table structure for table `skill_extra_item_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.skill_extra_item_template
 DROP TABLE IF EXISTS `skill_extra_item_template`;
-
-CREATE TABLE `skill_extra_item_template` (
+CREATE TABLE IF NOT EXISTS `skill_extra_item_template` (
   `spellId` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of the item creation spell',
   `requiredSpecialization` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Specialization spell id',
   `additionalCreateChance` float NOT NULL DEFAULT '0' COMMENT 'chance to create add',
@@ -2601,21 +2768,23 @@ CREATE TABLE `skill_extra_item_template` (
   PRIMARY KEY (`spellId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Skill Specialization System';
 
-/*Table structure for table `skill_fishing_base_level` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.skill_fishing_base_level
 DROP TABLE IF EXISTS `skill_fishing_base_level`;
-
-CREATE TABLE `skill_fishing_base_level` (
+CREATE TABLE IF NOT EXISTS `skill_fishing_base_level` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Area identifier',
   `skill` smallint(6) NOT NULL DEFAULT '0' COMMENT 'Base skill level requirement',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Fishing system';
 
-/*Table structure for table `skinning_loot_template` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.skinning_loot_template
 DROP TABLE IF EXISTS `skinning_loot_template`;
-
-CREATE TABLE `skinning_loot_template` (
+CREATE TABLE IF NOT EXISTS `skinning_loot_template` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `item` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `ChanceOrQuestChance` float NOT NULL DEFAULT '100',
@@ -2626,22 +2795,24 @@ CREATE TABLE `skinning_loot_template` (
   PRIMARY KEY (`entry`,`item`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Loot System';
 
-/*Table structure for table `spell_affect` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_affect
 DROP TABLE IF EXISTS `spell_affect`;
-
-CREATE TABLE `spell_affect` (
+CREATE TABLE IF NOT EXISTS `spell_affect` (
   `entry` smallint(5) unsigned NOT NULL DEFAULT '0',
   `effectId` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `SpellFamilyMask` bigint(20) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`,`effectId`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_area` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_area
 DROP TABLE IF EXISTS `spell_area`;
-
-CREATE TABLE `spell_area` (
+CREATE TABLE IF NOT EXISTS `spell_area` (
   `spell` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `area` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `quest_start` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -2654,11 +2825,12 @@ CREATE TABLE `spell_area` (
   PRIMARY KEY (`spell`,`area`,`quest_start`,`quest_start_active`,`aura_spell`,`racemask`,`gender`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_bonus_data` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_bonus_data
 DROP TABLE IF EXISTS `spell_bonus_data`;
-
-CREATE TABLE `spell_bonus_data` (
+CREATE TABLE IF NOT EXISTS `spell_bonus_data` (
   `entry` smallint(5) unsigned NOT NULL,
   `direct_bonus` float NOT NULL DEFAULT '0',
   `dot_bonus` float NOT NULL DEFAULT '0',
@@ -2668,11 +2840,12 @@ CREATE TABLE `spell_bonus_data` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_chain` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_chain
 DROP TABLE IF EXISTS `spell_chain`;
-
-CREATE TABLE `spell_chain` (
+CREATE TABLE IF NOT EXISTS `spell_chain` (
   `spell_id` mediumint(9) NOT NULL DEFAULT '0',
   `prev_spell` mediumint(9) NOT NULL DEFAULT '0',
   `first_spell` mediumint(9) NOT NULL DEFAULT '0',
@@ -2681,11 +2854,12 @@ CREATE TABLE `spell_chain` (
   PRIMARY KEY (`spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell Additinal Data';
 
-/*Table structure for table `spell_check` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_check
 DROP TABLE IF EXISTS `spell_check`;
-
-CREATE TABLE `spell_check` (
+CREATE TABLE IF NOT EXISTS `spell_check` (
   `spellid` mediumint(7) unsigned NOT NULL DEFAULT '0',
   `SpellFamilyName` smallint(5) NOT NULL DEFAULT '-1',
   `SpellFamilyMask` bigint(30) NOT NULL DEFAULT '-1',
@@ -2700,20 +2874,22 @@ CREATE TABLE `spell_check` (
   PRIMARY KEY (`spellid`,`SpellFamilyName`,`SpellFamilyMask`,`SpellIcon`,`SpellVisual`,`SpellCategory`,`Code`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_disabled` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_disabled
 DROP TABLE IF EXISTS `spell_disabled`;
-
-CREATE TABLE `spell_disabled` (
+CREATE TABLE IF NOT EXISTS `spell_disabled` (
   `entry` int(10) unsigned NOT NULL COMMENT 'Disabled spell',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `spell_effect_mod` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_effect_mod
 DROP TABLE IF EXISTS `spell_effect_mod`;
-
-CREATE TABLE `spell_effect_mod` (
+CREATE TABLE IF NOT EXISTS `spell_effect_mod` (
   `Id` int(10) unsigned NOT NULL DEFAULT '0',
   `EffectIndex` int(3) unsigned NOT NULL DEFAULT '0',
   `Effect` int(3) NOT NULL DEFAULT '-1',
@@ -2738,31 +2914,34 @@ CREATE TABLE `spell_effect_mod` (
   PRIMARY KEY (`Id`,`EffectIndex`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `spell_elixir` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_elixir
 DROP TABLE IF EXISTS `spell_elixir`;
-
-CREATE TABLE `spell_elixir` (
+CREATE TABLE IF NOT EXISTS `spell_elixir` (
   `entry` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'SpellId of potion',
   `mask` tinyint(1) unsigned NOT NULL DEFAULT '0' COMMENT 'Mask 0x1 battle 0x2 guardian 0x3 flask 0x7 unstable flasks 0xB shattrath flasks',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell System';
 
-/*Table structure for table `spell_facing` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_facing
 DROP TABLE IF EXISTS `spell_facing`;
-
-CREATE TABLE `spell_facing` (
+CREATE TABLE IF NOT EXISTS `spell_facing` (
   `entry` int(11) unsigned NOT NULL DEFAULT '0' COMMENT 'Spell ID',
   `facingcasterflag` tinyint(1) NOT NULL DEFAULT '1' COMMENT 'flag for facing state, usually 1',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `spell_group` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_group
 DROP TABLE IF EXISTS `spell_group`;
-
-CREATE TABLE `spell_group` (
+CREATE TABLE IF NOT EXISTS `spell_group` (
   `group_id` int(11) unsigned NOT NULL DEFAULT '0',
   `group_spell_id` int(11) unsigned NOT NULL DEFAULT '0',
   `spell_id` int(11) NOT NULL DEFAULT '0',
@@ -2770,32 +2949,35 @@ CREATE TABLE `spell_group` (
   UNIQUE KEY `group_id` (`group_id`,`group_spell_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell System';
 
-/*Table structure for table `spell_group_stack_rules` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_group_stack_rules
 DROP TABLE IF EXISTS `spell_group_stack_rules`;
-
-CREATE TABLE `spell_group_stack_rules` (
+CREATE TABLE IF NOT EXISTS `spell_group_stack_rules` (
   `group_id` int(11) unsigned NOT NULL DEFAULT '0',
   `stack_rule` tinyint(3) NOT NULL DEFAULT '1',
   PRIMARY KEY (`group_id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_learn_spell` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_learn_spell
 DROP TABLE IF EXISTS `spell_learn_spell`;
-
-CREATE TABLE `spell_learn_spell` (
+CREATE TABLE IF NOT EXISTS `spell_learn_spell` (
   `entry` smallint(5) unsigned NOT NULL DEFAULT '0',
   `SpellID` smallint(5) unsigned NOT NULL DEFAULT '0',
   `Active` tinyint(3) unsigned NOT NULL DEFAULT '1',
   PRIMARY KEY (`entry`,`SpellID`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Item System';
 
-/*Table structure for table `spell_mod` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_mod
 DROP TABLE IF EXISTS `spell_mod`;
-
-CREATE TABLE `spell_mod` (
+CREATE TABLE IF NOT EXISTS `spell_mod` (
   `Id` int(11) NOT NULL DEFAULT '0',
   `procChance` int(11) DEFAULT '-1',
   `procFlags` int(11) DEFAULT '-1',
@@ -2831,26 +3013,30 @@ CREATE TABLE `spell_mod` (
   `CategoryRecoveryTime` int(11) NOT NULL DEFAULT '-1',
   `SpellFamilyName` int(11) NOT NULL DEFAULT '-1',
   `SpellFamilyFlags` bigint(20) unsigned DEFAULT '0',
+  `Mechanic` int(2) DEFAULT '-1',
+  `EquippedItemClass` int(2) DEFAULT '-1',
   `Comment` varchar(255) DEFAULT NULL,
   PRIMARY KEY (`Id`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `spell_pet_auras` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_pet_auras
 DROP TABLE IF EXISTS `spell_pet_auras`;
-
-CREATE TABLE `spell_pet_auras` (
+CREATE TABLE IF NOT EXISTS `spell_pet_auras` (
   `spell` mediumint(8) unsigned NOT NULL COMMENT 'dummy spell id',
   `pet` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'pet id; 0 = all',
   `aura` mediumint(8) unsigned NOT NULL COMMENT 'pet aura id',
   PRIMARY KEY (`spell`,`pet`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*Table structure for table `spell_proc_event` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_proc_event
 DROP TABLE IF EXISTS `spell_proc_event`;
-
-CREATE TABLE `spell_proc_event` (
+CREATE TABLE IF NOT EXISTS `spell_proc_event` (
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `SchoolMask` tinyint(4) unsigned NOT NULL DEFAULT '0',
   `SpellFamilyName` smallint(5) unsigned NOT NULL DEFAULT '0',
@@ -2865,32 +3051,23 @@ CREATE TABLE `spell_proc_event` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_proc_item_enchant` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_proc_item_enchant
 DROP TABLE IF EXISTS `spell_proc_item_enchant`;
-
-CREATE TABLE `spell_proc_item_enchant` (
+CREATE TABLE IF NOT EXISTS `spell_proc_item_enchant` (
   `entry` mediumint(8) unsigned NOT NULL,
   `ppmRate` float NOT NULL DEFAULT '0',
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_script_target` */
+-- Data exporting was unselected.
 
-DROP TABLE IF EXISTS `spell_script_target`;
 
-CREATE TABLE `spell_script_target` (
-  `entry` mediumint(8) unsigned NOT NULL,
-  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
-  `targetEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
-  UNIQUE KEY `entry_type_target` (`entry`,`type`,`targetEntry`)
-) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Spell System';
-
-/*Table structure for table `spell_scripts` */
-
+-- Dumping structure for table mangos.spell_scripts
 DROP TABLE IF EXISTS `spell_scripts`;
-
-CREATE TABLE `spell_scripts` (
+CREATE TABLE IF NOT EXISTS `spell_scripts` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `delay` int(10) unsigned NOT NULL DEFAULT '0',
   `command` mediumint(8) unsigned NOT NULL DEFAULT '0',
@@ -2898,6 +3075,9 @@ CREATE TABLE `spell_scripts` (
   `datalong2` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong3` int(10) unsigned NOT NULL DEFAULT '0',
   `datalong4` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_id` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_radius` int(10) unsigned NOT NULL DEFAULT '0',
+  `buddy_type` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `data_flags` tinyint(3) unsigned NOT NULL DEFAULT '0',
   `dataint` int(11) NOT NULL DEFAULT '0',
   `dataint2` int(11) NOT NULL DEFAULT '0',
@@ -2910,11 +3090,24 @@ CREATE TABLE `spell_scripts` (
   `comments` varchar(255) NOT NULL
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8;
 
-/*Table structure for table `spell_target_position` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_script_target
+DROP TABLE IF EXISTS `spell_script_target`;
+CREATE TABLE IF NOT EXISTS `spell_script_target` (
+  `entry` mediumint(8) unsigned NOT NULL,
+  `type` tinyint(3) unsigned NOT NULL DEFAULT '0',
+  `targetEntry` mediumint(8) unsigned NOT NULL DEFAULT '0',
+  UNIQUE KEY `entry_type_target` (`entry`,`type`,`targetEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COMMENT='Spell System';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.spell_target_position
 DROP TABLE IF EXISTS `spell_target_position`;
-
-CREATE TABLE `spell_target_position` (
+CREATE TABLE IF NOT EXISTS `spell_target_position` (
   `id` mediumint(8) unsigned NOT NULL DEFAULT '0' COMMENT 'Identifier',
   `target_map` smallint(5) unsigned NOT NULL DEFAULT '0',
   `target_position_x` float NOT NULL DEFAULT '0',
@@ -2924,11 +3117,194 @@ CREATE TABLE `spell_target_position` (
   PRIMARY KEY (`id`,`target_map`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Spell System';
 
-/*Table structure for table `spell_threat` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.spell_template
+DROP TABLE IF EXISTS `spell_template`;
+CREATE TABLE IF NOT EXISTS `spell_template` (
+  `ID` int(4) unsigned NOT NULL DEFAULT '0',
+  `school` int(4) unsigned DEFAULT '0' COMMENT 'Resistances.dbc',
+  `category` int(4) unsigned DEFAULT '0' COMMENT 'SpellCategory.dbc',
+  `castUI` int(4) unsigned DEFAULT '0',
+  `dispel` int(4) unsigned DEFAULT '0' COMMENT 'SpellDispelType.dbc',
+  `mechanic` int(4) unsigned DEFAULT '0' COMMENT 'SpellMechanic.dbc',
+  `attributes` int(4) unsigned DEFAULT '0',
+  `attributesEx` int(4) unsigned DEFAULT '0',
+  `attributesEx2` int(4) unsigned DEFAULT '0',
+  `attributesEx3` int(4) unsigned DEFAULT '0',
+  `attributesEx4` int(4) unsigned DEFAULT '0',
+  `stances` int(4) unsigned DEFAULT '0' COMMENT 'SpellShapeshiftForm.dbc',
+  `stancesNot` int(4) unsigned DEFAULT '0' COMMENT 'SpellShapeshiftForm.dbc',
+  `targets` int(4) unsigned DEFAULT '0',
+  `targetCreatureType` int(4) unsigned DEFAULT '0' COMMENT 'CreatureType.dbc',
+  `requiresSpellFocus` int(4) unsigned DEFAULT '0' COMMENT 'SpellFocusObject.dbc',
+  `casterAuraState` int(4) unsigned DEFAULT '0',
+  `targetAuraState` int(4) unsigned DEFAULT '0',
+  `castingTimeIndex` int(4) unsigned DEFAULT '0' COMMENT 'SpellCastTimes.dbc',
+  `recoveryTime` int(4) unsigned DEFAULT '0',
+  `categoryRecoveryTime` int(4) unsigned DEFAULT '0',
+  `interruptFlags` int(4) unsigned DEFAULT '0',
+  `auraInterruptFlags` int(4) unsigned DEFAULT '0',
+  `channelInterruptFlags` int(4) unsigned DEFAULT '0',
+  `procFlags` int(4) unsigned DEFAULT '0',
+  `procChance` int(4) unsigned DEFAULT '0',
+  `procCharges` int(4) unsigned DEFAULT '0',
+  `maxLevel` int(4) unsigned DEFAULT '0',
+  `baseLevel` int(4) unsigned DEFAULT '0',
+  `spellLevel` int(4) unsigned DEFAULT '0',
+  `durationIndex` int(4) unsigned DEFAULT '0' COMMENT 'SpellDuration.dbc',
+  `powerType` int(4) unsigned DEFAULT '0',
+  `manaCost` int(4) unsigned DEFAULT '0',
+  `manCostPerLevel` int(4) unsigned DEFAULT '0',
+  `manaPerSecond` int(4) unsigned DEFAULT '0',
+  `manaPerSecondPerLevel` int(4) unsigned DEFAULT '0',
+  `rangeIndex` int(4) unsigned DEFAULT '0' COMMENT 'SpellRange.dbc',
+  `speed` float DEFAULT '0',
+  `modelNextSpell` int(4) unsigned DEFAULT '0',
+  `stackAmount` int(4) unsigned DEFAULT '0',
+  `totem1` int(4) unsigned DEFAULT '0',
+  `totem2` int(4) unsigned DEFAULT '0',
+  `reagent1` int(4) DEFAULT '0',
+  `reagent2` int(4) DEFAULT '0',
+  `reagent3` int(4) DEFAULT '0',
+  `reagent4` int(4) DEFAULT '0',
+  `reagent5` int(4) DEFAULT '0',
+  `reagent6` int(4) DEFAULT '0',
+  `reagent7` int(4) DEFAULT '0',
+  `reagent8` int(4) DEFAULT '0',
+  `reagentCount1` int(4) unsigned DEFAULT '0',
+  `reagentCount2` int(4) unsigned DEFAULT '0',
+  `reagentCount3` int(4) unsigned DEFAULT '0',
+  `reagentCount4` int(4) unsigned DEFAULT '0',
+  `reagentCount5` int(4) unsigned DEFAULT '0',
+  `reagentCount6` int(4) unsigned DEFAULT '0',
+  `reagentCount7` int(4) unsigned DEFAULT '0',
+  `reagentCount8` int(4) unsigned DEFAULT '0',
+  `equippedItemClass` int(4) DEFAULT '0' COMMENT 'ItemClass.dbc',
+  `equippedItemSubClassMask` int(4) DEFAULT '0' COMMENT 'ItemSubClass.dbc',
+  `equippedItemInventoryTypeMask` int(4) DEFAULT '0',
+  `effect1` int(4) unsigned DEFAULT '0',
+  `effect2` int(4) unsigned DEFAULT '0',
+  `effect3` int(4) unsigned DEFAULT '0',
+  `effectDieSides1` int(4) DEFAULT '0',
+  `effectDieSides2` int(4) DEFAULT '0',
+  `effectDieSides3` int(4) DEFAULT '0',
+  `effectBaseDice1` int(4) unsigned DEFAULT '0',
+  `effectBaseDice2` int(4) unsigned DEFAULT '0',
+  `effectBaseDice3` int(4) unsigned DEFAULT '0',
+  `effectDicePerLevel1` float DEFAULT '0',
+  `effectDicePerLevel2` float DEFAULT '0',
+  `effectDicePerLevel3` float DEFAULT '0',
+  `effectRealPointsPerLevel1` float DEFAULT '0',
+  `effectRealPointsPerLevel2` float DEFAULT '0',
+  `effectRealPointsPerLevel3` float DEFAULT '0',
+  `effectBasePoints1` int(4) DEFAULT '0',
+  `effectBasePoints2` int(4) DEFAULT '0',
+  `effectBasePoints3` int(4) DEFAULT '0',
+  `effectMechanic1` int(4) unsigned DEFAULT '0',
+  `effectMechanic2` int(4) unsigned DEFAULT '0',
+  `effectMechanic3` int(4) unsigned DEFAULT '0',
+  `effectImplicitTargetA1` int(4) unsigned DEFAULT '0',
+  `effectImplicitTargetA2` int(4) unsigned DEFAULT '0',
+  `effectImplicitTargetA3` int(4) unsigned DEFAULT '0',
+  `effectImplicitTargetB1` int(4) unsigned DEFAULT '0',
+  `effectImplicitTargetB2` int(4) unsigned DEFAULT '0',
+  `effectImplicitTargetB3` int(4) unsigned DEFAULT '0',
+  `effectRadiusIndex1` int(4) unsigned DEFAULT '0' COMMENT 'SpellRadius.dbc',
+  `effectRadiusIndex2` int(4) unsigned DEFAULT '0' COMMENT 'SpellRadius.dbc',
+  `effectRadiusIndex3` int(4) unsigned DEFAULT '0' COMMENT 'SpellRadius.dbc',
+  `effectApplyAuraName1` int(4) unsigned DEFAULT '0',
+  `effectApplyAuraName2` int(4) unsigned DEFAULT '0',
+  `effectApplyAuraName3` int(4) unsigned DEFAULT '0',
+  `effectAmplitude1` int(4) unsigned DEFAULT '0',
+  `effectAmplitude2` int(4) unsigned DEFAULT '0',
+  `effectAmplitude3` int(4) unsigned DEFAULT '0',
+  `effectMultipleValue1` float DEFAULT '0',
+  `effectMultipleValue2` float DEFAULT '0',
+  `effectMultipleValue3` float DEFAULT '0',
+  `effectChainTarget1` int(4) unsigned DEFAULT '0',
+  `effectChainTarget2` int(4) unsigned DEFAULT '0',
+  `effectChainTarget3` int(4) unsigned DEFAULT '0',
+  `effectItemType1` int(4) unsigned DEFAULT '0',
+  `effectItemType2` int(4) unsigned DEFAULT '0',
+  `effectItemType3` int(4) unsigned DEFAULT '0',
+  `effectMiscValue1` int(4) DEFAULT '0',
+  `effectMiscValue2` int(4) DEFAULT '0',
+  `effectMiscValue3` int(4) DEFAULT '0',
+  `effectTriggerSpell1` int(4) unsigned DEFAULT '0',
+  `effectTriggerSpell2` int(4) unsigned DEFAULT '0',
+  `effectTriggerSpell3` int(4) unsigned DEFAULT '0',
+  `effectPointsPerComboPoint1` float DEFAULT '0',
+  `effectPointsPerComboPoint2` float DEFAULT '0',
+  `effectPointsPerComboPoint3` float DEFAULT '0',
+  `spellVisual1` int(4) unsigned DEFAULT '0' COMMENT 'SpellVisual.dbc',
+  `spellVisual2` int(4) unsigned DEFAULT '0' COMMENT 'SpellVisual.dbc',
+  `spellIconId` int(4) unsigned DEFAULT '0' COMMENT 'SpellIcon.dbc',
+  `activeIconId` int(4) unsigned DEFAULT '0' COMMENT 'SpellIcon.dbc',
+  `spellPriority` int(4) unsigned DEFAULT '0',
+  `name1` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name2` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name3` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name4` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name5` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name6` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name7` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `name8` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameFlags` int(4) unsigned DEFAULT '0',
+  `nameSubtext1` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext2` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext3` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext4` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext5` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext6` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext7` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtext8` varchar(256) COLLATE utf8_unicode_ci DEFAULT '',
+  `nameSubtextFlags` int(4) unsigned DEFAULT '0',
+  `description1` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description2` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description3` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description4` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description5` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description6` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description7` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `description8` varchar(1024) COLLATE utf8_unicode_ci DEFAULT '',
+  `descriptionFlags` int(4) unsigned DEFAULT '0',
+  `auraDescription1` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription2` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription3` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription4` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription5` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription6` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription7` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescription8` varchar(512) COLLATE utf8_unicode_ci DEFAULT '',
+  `auraDescriptionFlags` int(4) unsigned DEFAULT '0',
+  `manaCostPercentage` int(4) unsigned DEFAULT '0',
+  `startRecoveryCategory` int(4) unsigned DEFAULT '0',
+  `startRecoveryTime` int(4) unsigned DEFAULT '0',
+  `maxTargetLevel` int(4) unsigned DEFAULT '0',
+  `spellFamilyName` int(4) unsigned DEFAULT '0' COMMENT 'ChrClasses.dbc',
+  `spellFamilyFlags` bigint(20) unsigned DEFAULT '0',
+  `maxAffectedTargets` int(4) unsigned DEFAULT '0',
+  `dmgClass` int(4) unsigned DEFAULT '0',
+  `preventionType` int(4) unsigned DEFAULT '0',
+  `stanceBarOrder` int(4) DEFAULT '0',
+  `dmgMultiplier1` float DEFAULT '0',
+  `dmgMultiplier2` float DEFAULT '0',
+  `dmgMultiplier3` float DEFAULT '0',
+  `minFactionId` int(4) unsigned DEFAULT '0',
+  `minReputation` int(4) unsigned DEFAULT '0',
+  `requiredAuraVision` int(4) unsigned DEFAULT '0',
+  PRIMARY KEY (`ID`),
+  UNIQUE KEY `ID` (`ID`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci;
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table mangos.spell_threat
 DROP TABLE IF EXISTS `spell_threat`;
-
-CREATE TABLE `spell_threat` (
+CREATE TABLE IF NOT EXISTS `spell_threat` (
   `entry` mediumint(8) unsigned NOT NULL,
   `Threat` smallint(6) NOT NULL,
   `multiplier` float NOT NULL DEFAULT '1' COMMENT 'threat multiplier for damage/healing',
@@ -2936,11 +3312,12 @@ CREATE TABLE `spell_threat` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED;
 
-/*Table structure for table `transports` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.transports
 DROP TABLE IF EXISTS `transports`;
-
-CREATE TABLE `transports` (
+CREATE TABLE IF NOT EXISTS `transports` (
   `guid` int(10) unsigned NOT NULL DEFAULT '0',
   `entry` mediumint(8) unsigned NOT NULL DEFAULT '0',
   `name` text,
@@ -2948,16 +3325,18 @@ CREATE TABLE `transports` (
   PRIMARY KEY (`entry`)
 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=FIXED COMMENT='Transports';
 
-/*Table structure for table `variables` */
+-- Data exporting was unselected.
 
+
+-- Dumping structure for table mangos.variables
 DROP TABLE IF EXISTS `variables`;
-
-CREATE TABLE `variables` (
+CREATE TABLE IF NOT EXISTS `variables` (
   `index` int(10) unsigned NOT NULL DEFAULT '0',
   `value` int(10) unsigned NOT NULL DEFAULT '0',
   PRIMARY KEY (`index`)
 ) ENGINE=MyISAM DEFAULT CHARSET=latin1;
 
-/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
-/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
-/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+-- Data exporting was unselected.
+/*!40101 SET SQL_MODE=IFNULL(@OLD_SQL_MODE, '') */;
+/*!40014 SET FOREIGN_KEY_CHECKS=IF(@OLD_FOREIGN_KEY_CHECKS IS NULL, 1, @OLD_FOREIGN_KEY_CHECKS) */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

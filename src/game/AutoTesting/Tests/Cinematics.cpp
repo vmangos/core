@@ -53,7 +53,7 @@ public:
                 familyName = SPELLFAMILY_SHAMAN;
                 break;
         }
-        for (uint32 id = 0; id < sSpellStore.GetNumRows(); id++)
+        for (uint32 id = 0; id < sSpellMgr.GetMaxSpellId(); id++)
         {
             SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
             if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())

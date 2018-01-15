@@ -30,21 +30,19 @@ bool IsDiminishingReturnsGroupDurationLimited(DiminishingGroup group);
 DiminishingReturnsType GetDiminishingReturnsGroupType(DiminishingGroup group);
 float GetDiminishingRate(uint32 type);
 
-
 class SpellEntry
 {
     public:
         SpellEntry() {}
         ~SpellEntry();
         void InitCachedValues();
-        bool Load(DBCSpellEntry const* dbcEntry);
 
 
         /// DBC DATA:
-        uint32    Id;                                           // 0 normally counted from 0 field (but some tools start counting from 1, check this before tool use for data view!)
-        uint32    School;                                       // 1 not schoolMask from 2.x - just school type so everything linked with SpellEntry::SchoolMask must be rewrited
+        uint32    Id;                                           // 0
+        uint32    School;                                       // 1
         uint32    Category;                                     // 2
-        uint32    castUI;                                       // 3 not used
+      //uint32    castUI;                                       // 3 not used
         uint32    Dispel;                                       // 4
         uint32    Mechanic;                                     // 5
         uint32    Attributes;                                   // 6
@@ -79,7 +77,7 @@ class SpellEntry
         uint32    manaPerSecondPerLevel;                        // 35
         uint32    rangeIndex;                                   // 36
         float     speed;                                        // 37
-        uint32    modalNextSpell;                               // 38 not used
+      //uint32    modalNextSpell;                               // 38 not used
         uint32    StackAmount;                                  // 39
         uint32    Totem[MAX_SPELL_TOTEMS];                      // 40-41
         int32     Reagent[MAX_SPELL_REAGENTS];                  // 42-49
@@ -92,11 +90,11 @@ class SpellEntry
         uint32    EffectBaseDice[MAX_EFFECT_INDEX];             // 67-69
         float     EffectDicePerLevel[MAX_EFFECT_INDEX];         // 70-72
         float     EffectRealPointsPerLevel[MAX_EFFECT_INDEX];   // 73-75
-        int32     EffectBasePoints[MAX_EFFECT_INDEX];           // 76-78 (don't must be used in spell/auras explicitly, must be used cached Spell::m_currentBasePoints)
+        int32     EffectBasePoints[MAX_EFFECT_INDEX];           // 76-78 
         uint32    EffectMechanic[MAX_EFFECT_INDEX];             // 79-81
         uint32    EffectImplicitTargetA[MAX_EFFECT_INDEX];      // 82-84
         uint32    EffectImplicitTargetB[MAX_EFFECT_INDEX];      // 85-87
-        uint32    EffectRadiusIndex[MAX_EFFECT_INDEX];          // 88-90 - spellradius.dbc
+        uint32    EffectRadiusIndex[MAX_EFFECT_INDEX];          // 88-90
         uint32    EffectApplyAuraName[MAX_EFFECT_INDEX];        // 91-93
         uint32    EffectAmplitude[MAX_EFFECT_INDEX];            // 94-96
         float     EffectMultipleValue[MAX_EFFECT_INDEX];        // 97-99
@@ -106,25 +104,34 @@ class SpellEntry
         uint32    EffectTriggerSpell[MAX_EFFECT_INDEX];         // 109-111
         float     EffectPointsPerComboPoint[MAX_EFFECT_INDEX];  // 112-114
         uint32    SpellVisual;                                  // 115
-        uint32    SpellVisual2;                                // 116 not used
+      //uint32    SpellVisual2;                                 // 116 not used
         uint32    SpellIconID;                                  // 117
         uint32    activeIconID;                                 // 118
-        uint32    spellPriority;                              // 119
+        uint32    spellPriority;                                // 119
         char*     SpellName[8];                                 // 120-127
-        uint32    SpellNameFlag;                              // 128
+      //uint32    SpellNameFlag;                                // 128     not used
         char*     Rank[8];                                      // 129-136
+      //uint32    RankFlags;                                    // 137     not used
+      //char*     Description[8];                               // 138-145 not used
+      //uint32    DescriptionFlags;                             // 146     not used
+      //char*     ToolTip[8];                                   // 147-154 not used
+      //uint32    ToolTipFlags;                                 // 155     not used
         uint32    ManaCostPercentage;                           // 156
         uint32    StartRecoveryCategory;                        // 157
         uint32    StartRecoveryTime;                            // 158
         uint32    MaxTargetLevel;                               // 159
         uint32    SpellFamilyName;                              // 160
-        ClassFamilyMask SpellFamilyFlags;                       // 161+162
+        uint64    SpellFamilyFlags;                             // 161+162
         uint32    MaxAffectedTargets;                           // 163
-        uint32    DmgClass;                                     // 164 defenseType
+        uint32    DmgClass;                                     // 164
         uint32    PreventionType;                               // 165
+      //int32     StanceBarOrder;                               // 166 not used
         float     DmgMultiplier[MAX_EFFECT_INDEX];              // 167-169
+      //uint32    MinFactionId;                                 // 170 not used
+      //uint32    MinReputation;                                // 171 not used
+      //uint32    RequiredAuraVision;                           // 172 not used
 
-        /// CHAMPS SUPPLEMENTAIRES
+        /// CUSTOM FIELDS:
         uint32 Custom;
     protected:
         bool _isBinary;
@@ -146,7 +153,7 @@ class SpellEntry
 
         bool IsFitToFamilyMask(uint64 familyFlags) const
         {
-            return SpellFamilyFlags.IsFitToFamilyMask(familyFlags);
+            return !!(SpellFamilyFlags & familyFlags);
         }
 
         bool IsFitToFamily(SpellFamily family, uint64 familyFlags) const
@@ -154,26 +161,16 @@ class SpellEntry
             return SpellFamily(SpellFamilyName) == family && IsFitToFamilyMask(familyFlags);
         }
 
-        bool IsFitToFamilyMask(ClassFamilyMask const& mask) const
-        {
-            return SpellFamilyFlags.IsFitToFamilyMask(mask);
-        }
-
-        bool IsFitToFamily(SpellFamily family, ClassFamilyMask const& mask) const
-        {
-            return SpellFamily(SpellFamilyName) == family && IsFitToFamilyMask(mask);
-        }
-
         template <SpellFamily family, ClassFlag... Args>
         bool IsFitToFamily() const
         {
-            return SpellFamily(SpellFamilyName) == family && SpellFamilyFlags.test<Args...>();
+            return SpellFamily(SpellFamilyName) == family && !!(SpellFamilyFlags & BitMask<uint64, Args...>::value);
         }
 
         template <ClassFlag... Args>
         bool IsFitToFamilyMask() const
         {
-            return SpellFamilyFlags.test<Args...>();
+            return !!(SpellFamilyFlags & BitMask<uint64, Args...>::value);
         }
 
         bool IsAuraAddedBySpell(uint32 auraType) const
@@ -210,7 +207,23 @@ class SpellEntry
         uint32 GetEffectImplicitTargetBByIndex(SpellEffectIndex j) const { return EffectImplicitTargetB[j];}
         uint32 GetEffectApplyAuraNameByIndex(SpellEffectIndex j) const { return EffectApplyAuraName[j];}
         uint32 GetEffectMiscValue(SpellEffectIndex j) const { return EffectMiscValue[j];}
-        ClassFamilyMask GetSpellFamilyFlags() const { return SpellFamilyFlags; }
+        uint64 GetSpellFamilyFlags() const { return SpellFamilyFlags; }
+        template <typename T, int Val>
+        struct Shift
+        {
+            static T const value = T(1) << Val;
+        };
+        template <typename T, int N1, int N2 = -1, int N3 = -1, int N4 = -1, int N5 = -1, int N6 = -1, int N7 = -1, int N8 = -1, int N9 = -1, int N10 = -1>
+        struct BitMask
+        {
+            static T const value = Shift<T, N1>::value | BitMask<T, N2, N3, N4, N5, N6, N7, N8, N9, N10, -1>::value;
+        };
+
+        template <typename T>
+        struct BitMask<T, -1, -1, -1, -1, -1, -1, -1, -1, -1, -1>
+        {
+            static T const value = 0;
+        };
 };
 
 #endif
