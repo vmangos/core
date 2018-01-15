@@ -26,6 +26,7 @@
 #include "Map.h"
 #include "SQLStorages.h"
 #include "DBCfmt.h"
+#include "SpellMgr.h"
 
 #include <map>
 
