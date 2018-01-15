@@ -583,9 +583,12 @@ void Guild::BroadcastToGuild(WorldSession *session, const std::string& msg, uint
 
         for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
         {
+            if (!HasRankRight(itr->second.RankId, GR_RIGHT_GCHATLISTEN))
+                continue;
+
             MasterPlayer *pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
-            if (pl && pl->GetSession() && HasRankRight(pl->GetRank(), GR_RIGHT_GCHATLISTEN) && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
+            if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
                 pl->GetSession()->SendPacket(&data);
         }
     }
@@ -595,14 +598,17 @@ void Guild::BroadcastToOfficers(WorldSession *session, const std::string& msg, u
 {
     if (session && session->GetMasterPlayer() && HasRankRight(session->GetMasterPlayer()->GetRank(), GR_RIGHT_OFFCHATSPEAK))
     {
+        WorldPacket data;
+        ChatHandler::FillMessageData(&data, session, CHAT_MSG_OFFICER, language, msg.c_str());
+
         for (MemberList::const_iterator itr = members.begin(); itr != members.end(); ++itr)
         {
-            WorldPacket data;
-            ChatHandler::FillMessageData(&data, session, CHAT_MSG_OFFICER, language, msg.c_str());
+            if (!HasRankRight(itr->second.RankId, GR_RIGHT_OFFCHATLISTEN))
+                continue;
 
             MasterPlayer *pl = ObjectAccessor::FindMasterPlayer(ObjectGuid(HIGHGUID_PLAYER, itr->first));
 
-            if (pl && pl->GetSession() && HasRankRight(pl->GetRank(), GR_RIGHT_OFFCHATLISTEN) && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
+            if (pl && pl->GetSession() && !pl->GetSocial()->HasIgnore(session->GetMasterPlayer()->GetObjectGuid()))
                 pl->GetSession()->SendPacket(&data);
         }
     }

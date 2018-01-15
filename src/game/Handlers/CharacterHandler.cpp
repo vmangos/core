@@ -586,44 +586,16 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         DEBUG_LOG("WORLD: Sent motd (SMSG_MOTD)");
     }
 
-    if (!alreadyOnline)
+    if (Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId()))
     {
-        //QueryResult *result = CharacterDatabase.PQuery("SELECT guildid,rank FROM guild_member WHERE guid = '%u'",pCurrChar->GetGUIDLow());
-        QueryResult *resultGuild = holder->GetResult(PLAYER_LOGIN_QUERY_LOADGUILD);
+        WorldPacket data(SMSG_GUILD_EVENT, (2 + guild->GetMOTD().size() + 1));
+        data << uint8(GE_MOTD);
+        data << uint8(1);
+        data << guild->GetMOTD();
+        SendPacket(&data);
+        DEBUG_LOG("WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
 
-        if (resultGuild)
-        {
-            Field *fields = resultGuild->Fetch();
-            pCurrChar->SetInGuild(fields[0].GetUInt32());
-            pCurrChar->SetRank(fields[1].GetUInt32());
-        }
-        else if (pCurrChar->GetGuildId())                       // clear guild related fields in case wrong data about nonexistent membership
-        {
-            pCurrChar->SetInGuild(0);
-            pCurrChar->SetRank(0);
-        }
-
-        if (pCurrChar->GetGuildId() != 0)
-        {
-            Guild* guild = sGuildMgr.GetGuildById(pCurrChar->GetGuildId());
-            if (guild)
-            {
-                data.Initialize(SMSG_GUILD_EVENT, (2 + guild->GetMOTD().size() + 1));
-                data << uint8(GE_MOTD);
-                data << uint8(1);
-                data << guild->GetMOTD();
-                SendPacket(&data);
-                DEBUG_LOG("WORLD: Sent guild-motd (SMSG_GUILD_EVENT)");
-
-                guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
-            }
-            else
-            {
-                // remove wrong guild data
-                sLog.outError("Player %s (GUID: %u) marked as member of nonexistent guild (id: %u), removing guild membership for player.", pCurrChar->GetName(), pCurrChar->GetGUIDLow(), pCurrChar->GetGuildId());
-                pCurrChar->SetInGuild(0);
-            }
-        }
+        guild->BroadcastEvent(GE_SIGNED_ON, pCurrChar->GetObjectGuid(), pCurrChar->GetName());
     }
 
     if (!pCurrChar->isAlive())

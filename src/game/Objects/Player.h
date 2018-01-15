@@ -2250,6 +2250,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool _LoadHomeBind(QueryResult *result);
         void _LoadBGData(QueryResult* result);
         void _LoadIntoDataField(const char* data, uint32 startOffset, uint32 count);
+        void _LoadGuild(QueryResult* result);
 
         /*********************************************************/
         /***                   SAVE SYSTEM                     ***/
