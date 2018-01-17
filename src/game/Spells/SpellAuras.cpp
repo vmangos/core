@@ -6822,6 +6822,11 @@ void SpellAuraHolder::CalculateForDebuffLimit()
                 case 24323:
                 case 24322:
                 case 28732: // Faerlina Widow's Embrace
+                case 25181: // Ossirian Arcane Weakness
+                case 25177: // Ossirian Fire Weakness
+                case 25178: // Ossirian Frost Weakness
+                case 25180: // Ossirian Nature Weakness
+                case 25183: // Ossirian Shadow Weakness
                     m_debuffLimitScore = 4;
                     return;
             }
