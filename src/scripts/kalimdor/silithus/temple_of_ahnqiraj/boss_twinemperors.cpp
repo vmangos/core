@@ -45,7 +45,8 @@ enum eSpells {
     SPELL_UPPERCUT              = 26007,
     SPELL_UNBALANCING_STRIKE    = 26613,
     SPELL_MUTATE_BUG            = 802,
-    
+    SPELL_DOUBLE_ATTACK         = 18943, // 50% chance. Based on sniff provided by Tobschinski (https://github.com/LightsHope/server/pull/1208#issuecomment-356985526)
+
     // Vek'lor
     SPELL_SHADOWBOLT            = 26006,
     SPELL_BLIZZARD              = 26607,
@@ -54,6 +55,9 @@ enum eSpells {
 
     BUG_TYPE_1                  = 15316,
     BUG_TYPE_2                  = 15317,
+
+    SPELL_PIERCE_ARMOR          = 6016,
+    SPELL_ACID_SPIT             = 26050,
 
     // bugs, seems to be defined in db?
     // Virulet Posion
@@ -131,6 +135,9 @@ struct mob_TwinsBug : public ScriptedAI {
         Reset();
     }
 
+    uint32 pierceArmorTimer;
+    uint32 acidSpitTimer;
+
     void GoBeBadBug(uint32 whatKindOfbad)
     {
         m_creature->AddAura(whatKindOfbad);
@@ -151,11 +158,31 @@ struct mob_TwinsBug : public ScriptedAI {
     {
         m_creature->setFaction(7);
         m_creature->RemoveAllAuras();
+        pierceArmorTimer = 5000;
+        acidSpitTimer = 6000;
+
     }
 
     virtual void UpdateAI(const uint32 diff) override
     {
-        ScriptedAI::UpdateAI(diff);
+        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
+            return;
+        
+        if (pierceArmorTimer < diff) {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PIERCE_ARMOR) == CAST_OK)
+                pierceArmorTimer = urand(5000, 9000);
+        }
+        else
+            pierceArmorTimer -= diff;
+
+        if (acidSpitTimer < diff) {
+            if(DoCastSpellIfCan(m_creature->getVictim(), SPELL_ACID_SPIT) == CAST_OK)
+                acidSpitTimer = urand(6000, 12000);
+        }
+        else 
+            acidSpitTimer -= diff;
+
+        DoMeleeAttackIfReady();
     }
 };
 
@@ -848,6 +875,8 @@ struct boss_veknilashAI : public boss_twinemperorsAI
             DoScriptText(irand(SAY_VEKNILASH_AGGRO_4, SAY_VEKNILASH_AGGRO_1), m_creature);
         }
 
+        if(!m_creature->HasAura(SPELL_DOUBLE_ATTACK))
+            m_creature->CastSpell(m_creature, SPELL_DOUBLE_ATTACK, true);
 
         //UnbalancingStrike_Timer
         if (UnbalancingStrike_Timer < diff) {
