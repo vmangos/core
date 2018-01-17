@@ -17,6 +17,11 @@
 
 //#define DEBUG_MODE
 
+struct SpawnLocations
+{
+    float x, y, z;
+};
+
 enum
 {
     TYPE_KURINNAXX          = 0,

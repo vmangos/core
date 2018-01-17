@@ -48,11 +48,6 @@ enum
 
 const float THREAT_LOCK = FLT_MAX;
 
-struct SpawnLocations
-{
-    float x, y, z;
-};
-
 static SpawnLocations AddPop[] =
 {
     { -9312.0f, 1281.0f, -62.0f },

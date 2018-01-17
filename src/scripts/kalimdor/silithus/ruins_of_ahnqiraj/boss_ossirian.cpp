@@ -24,6 +24,8 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "ruins_of_ahnqiraj.h"
 
+#include <array>
+
 enum
 {
     SAY_SURPREME1               =    -1509018,
@@ -51,23 +53,38 @@ enum
     SPELL_SANDSTORM             =  25160
 };
 
-const uint32 SpellWeakness[] =
+const std::array<uint32, 5> SpellWeakness =
 {
-    25177, //Fire weakness
-    25178, //Frost weakness
-    25180, //Nature weakness
-    25183, //Shadow weakness
-    25181  //Arcane weakness
+    25177u, //Fire weakness
+    25178u, //Frost weakness
+    25180u, //Nature weakness
+    25183u, //Shadow weakness
+    25181u  //Arcane weakness
 };
 
+const std::array<SpawnLocations, 2> TornadoSpawn =
+{{
+    { -9444.0f, 1857.0f, 85.55f },
+    { -9352.0f, 2012.0f, 85.55f }
+}};
+
+const std::array<SpawnLocations, 11> CrystalSpawn =
+{{
+    { -9407.164062f, 1959.240845f, 85.558998f },
+    { -9357.931641f, 1930.596802f, 85.556198f },
+    { -9383.113281f, 2011.042725f, 85.556389f },
+    { -9243.36f, 1979.04f, 85.556f },
+    { -9281.68f, 1886.66f, 85.5558f },
+    { -9241.8f, 1806.39f, 85.5557f },
+    { -9366.78f, 1781.76f, 85.5561f },
+    { -9297.668945f, 1747.256348f, 85.5566f },
+    { -9430.37f, 1786.86f, 85.557f },
+    { -9187.087891f, 1940.501099f, 85.5564f },
+    { -9406.73f, 1863.13f, 85.5558f }
+}};
 
 struct boss_ossirianAI : public ScriptedAI
 {
-    struct SpawnLocations
-    {
-        float x, y, z;
-    };
-
     boss_ossirianAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
@@ -95,12 +112,6 @@ struct boss_ossirianAI : public ScriptedAI
         m_bAggro = false;
 
         DoCast(m_creature, SPELL_STRENGTH_OF_OSSIRIAN);
-
-        m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_02, 1000);     // Fire
-        m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_03, 1000);     // Nature
-        m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_05, 1000);     // Shadow
-        m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_04, 1000);     // Frost
-        m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_06, 1000);     // Arcane
 
         m_uiSpeed_Timer = 10000;
         m_creature->SetSpeedRate(MOVE_RUN,  1.0f, true);
@@ -159,45 +170,29 @@ struct boss_ossirianAI : public ScriptedAI
 
     void SpellHit(Unit* pUnit, const SpellEntry* pSpell)
     {
-        for (int i = 0; i < sizeof(SpellWeakness)/sizeof(SpellWeakness[0]); ++i)
+        for (int i = 0; i < SpellWeakness.size(); ++i)
         {
             if (pSpell->Id == SpellWeakness[i])
             {
                 m_uiStrengthOfOssirian_Timer = 45000;
 
-                if(pSpell->Id == 25177) //Fire weakness
-                    m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_02, 15);     // Fire
-                else if (pSpell->Id == 25178) //Frost weakness
-                    m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_04, 15);     // Frost
-                else if (pSpell->Id == 25180) //Nature weakness
-                    m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_03, 15);     // Nature
-                else if (pSpell->Id == 25181) //Arcane weakness
-                    m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_06, 15);     // Arcane
-                else if (pSpell->Id == 25183)  //Shadow weakness
-                    m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_05, 15);     // Shadow
-
-                if (m_bIsEnraged)
+                if (m_bIsEnraged || m_creature->HasAura(SPELL_STRENGTH_OF_OSSIRIAN))
                 {
                     m_creature->RemoveAurasDueToSpell(SPELL_STRENGTH_OF_OSSIRIAN);
-//                    m_creature->SetSpeedRate(MOVE_RUN, 2.0f, true);
                     m_bIsEnraged = false;
                 }
+
+                break;
             }
         }
     }
 
     void Aggro(Unit* pWho)
     {
-        static SpawnLocations TornadoSpawn[] =
-        {
-            { -9444.0f, 1857.0f, 85.55f},
-            { -9352.0f, 2012.0f, 85.55f}
-        };
-
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_STRENGTH_OF_OSSIRIAN);
-        for (uint8 i = 0; i < 2; ++i)
+        for (uint8 i = 0; i < TornadoSpawn.size(); ++i)
         {
             Creature *pCreature = m_creature->SummonCreature(NPC_TORNADO,
                                   TornadoSpawn[i].x,
@@ -229,21 +224,6 @@ struct boss_ossirianAI : public ScriptedAI
 
     void SpawnCrystal(uint32 pylonIdx)
     {
-        static SpawnLocations CrystalSpawn[] =
-        {
-            { -9407.164062f, 1959.240845f, 85.558998f },
-            { -9357.931641f, 1930.596802f, 85.556198f },
-            { -9383.113281f, 2011.042725f, 85.556389f },
-            { -9243.36f, 1979.04f, 85.556f },
-            { -9281.68f, 1886.66f, 85.5558f },
-            { -9241.8f, 1806.39f, 85.5557f },
-            { -9366.78f, 1781.76f, 85.5561f },
-            { -9297.668945f, 1747.256348f, 85.5566f },
-            { -9430.37f, 1786.86f, 85.557f },
-            { -9187.087891f, 1940.501099f, 85.5564f },
-            { -9406.73f, 1863.13f, 85.5558f }
-        };
-
         GameObject* pCrystal = m_creature->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
                                CrystalSpawn[pylonIdx].x,
                                CrystalSpawn[pylonIdx].y,
@@ -282,8 +262,10 @@ struct boss_ossirianAI : public ScriptedAI
 
     void DoAction(const uint32 action)
     {
+        // First crystal spawn is reserved for the start of the encounter
+        // just below the ramp
         if (action == 0xBEEF)
-            SpawnCrystal(urand(1, 10));
+            SpawnCrystal(urand(1, CrystalSpawn.size()-1));
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -299,10 +281,7 @@ struct boss_ossirianAI : public ScriptedAI
         else
             m_uiCurseOfTongues_Timer -= uiDiff;
 
-        if (m_uiSpeed_Timer < uiDiff)
-        {
-        }
-        else
+        if (m_uiSpeed_Timer >= uiDiff)
         {
             m_uiSpeed_Timer -= uiDiff;
             m_creature->SetSpeedRate(MOVE_RUN, (2.0f - m_uiSpeed_Timer*1.0f/10000), true);
@@ -313,11 +292,6 @@ struct boss_ossirianAI : public ScriptedAI
             if (DoCastSpellIfCan(m_creature, SPELL_STRENGTH_OF_OSSIRIAN) == CAST_OK)
             {
                 m_bIsEnraged = true;
-                m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_02, 1000);     // Fire
-                m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_03, 1000);     // Nature
-                m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_05, 1000);     // Shadow
-                m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_04, 1000);     // Frost
-                m_creature->SetUInt32Value(UNIT_FIELD_RESISTANCES_06, 1000);     // Arcane
             }
         }
         else
@@ -432,7 +406,7 @@ struct ossirian_crystalAI : public GameObjectAI
             return false;
         }
 
-        Creature* ossirian = me->GetMap()->GetCreature(m_pInstance->GetData64(DATA_OSSIRIAN));
+        Creature* ossirian = GetClosestCreatureWithEntry(me, NPC_OSSIRIAN, 50.0f);
 
         if (!ossirian)
         {
@@ -440,17 +414,13 @@ struct ossirian_crystalAI : public GameObjectAI
             return false;
         }
 
+        // Encounter not started
         if (!ossirian->SelectHostileTarget() || !ossirian->getVictim())
-        {
-            sLog.outInfo("[OSSIRIAN/Crystal][Inst %03u] ERROR: Ossirian not in combat", user->GetInstanceId(), m_pInstance->GetData64(DATA_OSSIRIAN));
             return true;
-        }
 
+        // Already used
         if (me->FindNearCreature(CRYSTAL_TRIGGER, 10.0f))
-        {
-            sLog.outInfo("[OSSIRIAN/Crystal][Inst %03u] ERROR: Crystal already activated. Race condition attempt.", user->GetInstanceId());
             return true;
-        }
 
         Creature* triggerCrystalPylons = me->SummonCreature(CRYSTAL_TRIGGER,
                                          me->GetPositionX(),

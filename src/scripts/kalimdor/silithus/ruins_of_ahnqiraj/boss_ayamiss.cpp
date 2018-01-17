@@ -43,11 +43,6 @@ enum
     NPC_HIVEZARA_SWARMER        =  15546
 };
 
-struct SpawnLocations
-{
-    float x, y, z;
-};
-
 struct MoveLocations
 {
     float x, y, z, an;
