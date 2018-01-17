@@ -2879,9 +2879,9 @@ void World::LogTransaction(PlayerTransactionData const& data)
     for (int i = 0; i < 2; ++i)
     {
         TransactionPart const& part = data.parts[i];
-        logStmt.addInt32(part.lowGuid);
-        logStmt.addInt32(part.money);
-        logStmt.addInt16(part.spell);
+        logStmt.addUInt32(part.lowGuid);
+        logStmt.addUInt32(part.money);
+        logStmt.addUInt32(part.spell);
         std::stringstream items;
         for (int i = 0; i < TransactionPart::MAX_TRANSACTION_ITEMS; ++i)
             if (part.itemsEntries[i])

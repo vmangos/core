@@ -1589,6 +1589,26 @@ void ChatHandler::ExecuteCommand(const char* text)
                 }
             }
             SetSentErrorMessage(false);
+
+            // Always log GM commands, regardless of success
+            if (command->SecurityLevel > SEC_PLAYER)
+            {
+                // chat case
+                if (m_session && m_session->GetPlayer())
+                {
+                    Player* p = m_session->GetPlayer();
+                    ObjectGuid sel_guid = p->GetSelectionGuid();
+                    sLog.outCommand(GetAccountId(), "Command: %s [Player: %s (Group Leader \"%s\", Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
+                        realCommandFull.c_str(), p->GetName(), p->GetGroup() ? p->GetGroup()->GetLeaderGuid().GetString().c_str() : "NULL", GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
+                        sel_guid.GetString().c_str());
+                }
+                else                                        // 0 account -> console
+                {
+                    sLog.outCommand(GetAccountId(), "Command: %s [Account: %u from %s]",
+                        realCommandFull.c_str(), GetAccountId(), GetAccountId() ? "RA-connection" : "Console");
+                }
+            }
+
             if ((this->*(command->Handler))((char*)text))   // text content destroyed at call
             {
                 if (m_session && command->Flags & COMMAND_FLAGS_CRITICAL)
@@ -1597,23 +1617,6 @@ void ChatHandler::ExecuteCommand(const char* text)
                         sLog.out(LOG_GM_CRITICAL, "%s: %s. Selected %s. Map %u", m_session->GetUsername().c_str(), realCommandFull.c_str(), target->GetObjectGuid().GetString().c_str(), target->GetMapId());
                     else
                         sLog.out(LOG_GM_CRITICAL, "%s: %s.", m_session->GetUsername().c_str(), realCommandFull.c_str());
-                }
-                if (command->SecurityLevel > SEC_PLAYER)
-                {
-                    // chat case
-                    if (m_session && m_session->GetPlayer())
-                    {
-                        Player* p = m_session->GetPlayer();
-                        ObjectGuid sel_guid = p->GetSelectionGuid();
-                        sLog.outCommand(GetAccountId(), "Command: %s [Player: %s (Group Leader \"%s\", Account: %u) X: %f Y: %f Z: %f Map: %u Selected: %s]",
-                                realCommandFull.c_str(), p->GetName(), p->GetGroup() ? p->GetGroup()->GetLeaderGuid().GetString().c_str() : "NULL", GetAccountId(), p->GetPositionX(), p->GetPositionY(), p->GetPositionZ(), p->GetMapId(),
-                                        sel_guid.GetString().c_str());
-                    }
-                    else                                        // 0 account -> console
-                    {
-                        sLog.outCommand(GetAccountId(), "Command: %s [Account: %u from %s]",
-                                realCommandFull.c_str(), GetAccountId(), GetAccountId() ? "RA-connection" : "Console");
-                    }
                 }
             }
             // some commands have custom error messages. Don't send the default one in these cases.

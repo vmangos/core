@@ -4543,7 +4543,7 @@ bool ChatHandler::HandleLookupPlayerNameCommand(char* args)
 
     uint32 limit_original = limit;
     std::string name = nameStr;
-    LoginDatabase.escape_string(name);
+    CharacterDatabase.escape_string(name);
 
     CharacterDatabase.AsyncPQuery(&PlayerSearchHandler::HandlePlayerCharacterLookupResult,
         GetAccountId(), limit_original,

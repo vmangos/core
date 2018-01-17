@@ -2722,11 +2722,16 @@ void Player::GiveLevel(uint32 level)
     if (level == getLevel())
         return;
 
+    uint32 numInstanceMembers = 0;
+    uint32 numGroupMembers = 0;
+
+    // Record who is in the group
     std::stringstream groupInfo;
-    if (GetGroup())
+    if (Group* group = GetGroup())
     {
         bool first = true;
-        for (GroupReference* itr = GetGroup()->GetFirstMember(); itr != nullptr; itr = itr->next())
+        numGroupMembers = group->GetMembersCount();
+        for (GroupReference* itr = group->GetFirstMember(); itr != nullptr; itr = itr->next())
         {
             if (Player *player = itr->getSource())
             {
@@ -2734,7 +2739,6 @@ void Player::GiveLevel(uint32 level)
                     groupInfo << ", ";
 
                 groupInfo << player->GetName();
-
                 first = false;
             }
         }
@@ -2742,9 +2746,48 @@ void Player::GiveLevel(uint32 level)
     else
         groupInfo << "None";
 
-    sLog.out(LOG_LEVELUP, "Character %s:%u [c%u r%u] reaches level %2u, zone %u, pos: [%0.2f, %0.2f, %0.2f] [Group: %s]",
+    // Record who is in the instance if we're in one
+    std::stringstream instanceInfo;
+    Map* map = FindMap();
+    if (map && (GetMap()->IsDungeon() || GetMap()->IsRaid()))
+    {
+        bool first = true;
+        for (auto itr = map->GetPlayers().getFirst(); itr != nullptr; itr = itr->next())
+        {
+            if (auto player = itr->getSource())
+            {
+                if (!first)
+                    instanceInfo << ", ";
+
+                instanceInfo << player->GetName();
+                first = false;
+            }
+
+            // This is a raid. Don't log anymore
+            if (++numInstanceMembers >= 10)
+                break;
+        }
+    }
+    else
+        instanceInfo << "None";
+
+    sLog.out(LOG_LEVELUP, "Character %s:%u [c%u r%u] reaches level %2u, zone %u, pos: [%0.2f, %0.2f, %0.2f] [Group: %s] [Instance: %s]",
         GetName(), GetGUIDLow(), getClass(), getRace(), level, GetZoneId(), GetPositionX(), GetPositionY(), GetPositionZ(),
-        groupInfo.str().c_str());
+        groupInfo.str().c_str(), instanceInfo.str().c_str());
+
+    // If we have instance members, and the number of players in the instance is not
+    // equal to the number of group members, then the player is likely mob tagging
+    // and dropping group. Or they are soloing a dungeon, which is questionable.
+    // Alert GMs
+    if (!!numInstanceMembers && numInstanceMembers > numGroupMembers)
+    {
+        std::stringstream message;
+        message << GetGuidStr() << " levelup in dungeon with "
+                << numInstanceMembers << " instance members, but "
+                << numGroupMembers << " group members";
+
+        sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "LevelUpAlert", message.str().c_str());
+    }
 
     PlayerLevelInfo info;
     sObjectMgr.GetPlayerLevelInfo(getRace(), getClass(), level, &info);
