@@ -747,7 +747,7 @@ enum
     NPC_KOLKAR_INVADER      = 9524,
     NPC_LANTIGAH            = 9990,
 
-    GOSSIP_ITEM_START       = -3090001,
+    GOSSIP_ITEM_START       = 4793,
 
     SAY_BEWARE              = -1780211,
     SAY_DEFENDER_FALLEN     = -1780212,

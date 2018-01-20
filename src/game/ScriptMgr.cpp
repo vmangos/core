@@ -1319,7 +1319,6 @@ void ScriptMgr::LoadDatabase()
 {
     LoadScriptTexts();
     LoadScriptTextsCustom();
-    LoadScriptGossipTexts();
     LoadScriptWaypoints();
     LoadEscortData();
 }
@@ -1329,7 +1328,7 @@ void ScriptMgr::LoadScriptTexts()
     sLog.outString("Loading Script Texts...");
     LoadMangosStrings(WorldDatabase, "script_texts", TEXT_SOURCE_TEXT_START, TEXT_SOURCE_TEXT_END, true);
 
-    QueryResult* result = WorldDatabase.PQuery("SELECT entry, sound, type, language, emote FROM script_texts WHERE entry BETWEEN %i AND %i", TEXT_SOURCE_GOSSIP_END, TEXT_SOURCE_TEXT_START);
+    QueryResult* result = WorldDatabase.PQuery("SELECT entry, sound, type, language, emote FROM script_texts WHERE entry BETWEEN %i AND %i", TEXT_SOURCE_TEXT_END, TEXT_SOURCE_TEXT_START);
 
     sLog.outString("Loading Script Texts additional data...");
 
@@ -1446,12 +1445,6 @@ void ScriptMgr::LoadScriptTextsCustom()
         sLog.outString("");
         sLog.outString(">> Loaded 0 additional Custom Texts data. DB table `custom_texts` is empty.");
     }
-}
-
-void ScriptMgr::LoadScriptGossipTexts()
-{
-    sLog.outString("Loading Gossip Texts...");
-    LoadMangosStrings(WorldDatabase, "gossip_texts", TEXT_SOURCE_GOSSIP_START, TEXT_SOURCE_GOSSIP_END);
 }
 
 void ScriptMgr::LoadScriptWaypoints()

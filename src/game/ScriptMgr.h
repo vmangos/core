@@ -627,9 +627,6 @@ extern ScriptMapMap sCreatureMovementScripts;
 #define TEXT_SOURCE_CUSTOM_START    TEXT_SOURCE_RANGE*2
 #define TEXT_SOURCE_CUSTOM_END      TEXT_SOURCE_RANGE*3 + 1
 
-#define TEXT_SOURCE_GOSSIP_START    TEXT_SOURCE_RANGE*3
-#define TEXT_SOURCE_GOSSIP_END      TEXT_SOURCE_RANGE*4 + 1
-
 //Spell targets used by SelectSpell
 enum SelectTarget
 {
@@ -798,7 +795,6 @@ class ScriptMgr
 
         void LoadScriptTexts();
         void LoadScriptTextsCustom();
-        void LoadScriptGossipTexts();
         void LoadScriptWaypoints();
         void LoadEscortData();
 
