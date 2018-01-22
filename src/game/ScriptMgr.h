@@ -72,12 +72,13 @@ enum eScriptCommand
                                                             // datalong3 = movement_options (see enum MoveOptions)
                                                             // datalong4 = eMoveToFlags
                                                             // x/y/z/o = coordinates
-    SCRIPT_COMMAND_FLAG_SET                 = 4,            // source = Object
+    SCRIPT_COMMAND_MODIFY_FLAGS             = 4,            // source = Object
                                                             // datalong = field_id
                                                             // datalong2 = bitmask
-    SCRIPT_COMMAND_FLAG_REMOVE              = 5,            // source = Object
-                                                            // datalong = field_id
-                                                            // datalong2 = bitmask
+                                                            // datalong3 = eModifyFlagsOptions
+    SCRIPT_COMMAND_INTERRUPT_CASTS          = 5,            // source = Unit
+                                                            // datalong = (bool) with_delayed
+                                                            // datalong2 = spell_id (optional)
     SCRIPT_COMMAND_TELEPORT_TO              = 6,            // source = Unit
                                                             // datalong = map_id (only used for players but still required)
                                                             // datalong2 = teleport_options (see enum TeleportToOptions)
@@ -96,9 +97,12 @@ enum eScriptCommand
     SCRIPT_COMMAND_TEMP_SUMMON_CREATURE     = 10,           // source = WorldObject (from provided source or buddy)
                                                             // datalong = creature_entry
                                                             // datalong2 = despawn_delay
+                                                            // datalong3 = unique_limit
+                                                            // datalong4 = unique_distance
                                                             // data_flags = eSummonCreatureFlags
                                                             // dataint = (bool) setRun; 0 = off (default), 1 = on
                                                             // dataint2 = eSummonCreatureFacingOptions
+                                                            // x/y/z/o = coordinates
     SCRIPT_COMMAND_OPEN_DOOR                = 11,           // source = GameObject (from datalong, provided source or target)
                                                             // If provided target is BUTTON GameObject, command is run on it too.
                                                             // datalong = db_guid
@@ -139,7 +143,7 @@ enum eScriptCommand
                                                             // datalong = (bool) 0=off, 1=on
     SCRIPT_COMMAND_SET_FACTION              = 22,           // source = Creature
                                                             // datalong = faction_Id,
-                                                            // datalong2= see enum TemporaryFactionFlags
+                                                            // datalong2 = see enum TemporaryFactionFlags
     SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // source = Creature
                                                             // datalong = creature entry/modelid (depend on datalong2)
                                                             // datalong2 = (bool) is_display_id
@@ -150,13 +154,14 @@ enum eScriptCommand
                                                             // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_ATTACK_START             = 26,           // source = Creature
                                                             // target = Player
-    SCRIPT_COMMAND_GO_LOCK_STATE            = 27,           // source = GameObject
-                                                            // datalong = eGoLockStateFlags
+    SCRIPT_COMMAND_UPDATE_ENTRY             = 27,           // source = Creature
+                                                            // datalong = creature_entry
+                                                            // datalong2 = team for display_id (0 = alliance, 1 = horde)
     SCRIPT_COMMAND_STAND_STATE              = 28,           // source = Unit
                                                             // datalong = stand_state (enum UnitStandStateType)
-    SCRIPT_COMMAND_MODIFY_NPC_FLAGS         = 29,           // source = Creature
-                                                            // datalong = see enum NPCFlags
-                                                            // datalong2 = eModifyNpcFlagOptions
+    SCRIPT_COMMAND_MODIFY_THREAT            = 29,           // source = Creature
+                                                            // datalong = eModifyThreatTargets
+                                                            // x = percent
     SCRIPT_COMMAND_SEND_TAXI_PATH           = 30,           // source = Player
                                                             // datalong = taxi_path_id
     SCRIPT_COMMAND_TERMINATE_SCRIPT         = 31,           // source = Any
@@ -208,6 +213,14 @@ enum eMoveToCoordinateTypes
     MOVETO_COORDINATES_MAX
 };
 
+// Possible datalong3 values for SCRIPT_COMMAND_MODIFY_FLAGS
+enum eModifyFlagsOptions
+{
+    SO_MODIFYFLAGS_TOGGLE = 0,
+    SO_MODIFYFLAGS_SET    = 1,
+    SO_MODIFYFLAGS_REMOVE = 2
+};
+
 // Flags used by SCRIPT_COMMAND_TEMP_SUMMON_CREATURE
 // Must start from 0x8 because of target selection flags.
 enum eSummonCreatureFlags
@@ -238,23 +251,14 @@ enum ePlaySoundFlags
     SF_PLAYSOUND_DISTANCE_DEPENDENT = 0x2
 };
 
-// Flags used by SCRIPT_COMMAND_GO_LOCK_STATE
-enum eGoLockStateFlags
+// Possible datalong values for SCRIPT_COMMAND_MODIFY_THREAT
+enum eModifyThreatTargets
 {
-    SF_GOLOCKSTATE_LOCK        = 0x1,
-    SF_GOLOCKSTATE_UNLOCK      = 0x2,
-    SF_GOLOCKSTATE_NO_INTERACT = 0x4,
-    SF_GOLOCKSTATE_INTERACT    = 0x8,
+    SO_MODIFYTHREAT_PROVIDED_TARGET = 0,
+    SO_MODIFYTHREAT_CURRENT_VICTIM  = 1,
+    SO_MODIFYTHREAT_ALL_ATTACKERS   = 2,
 
-    SF_GOLOCKSTATE_MAX         = 0x10
-};
-
-// Possible datalong2 values for SCRIPT_COMMAND_MODIFY_NPC_FLAGS
-enum eModifyNpcFlagOptions
-{
-    SO_NPCFLAG_SET    = 1,
-    SO_NPCFLAG_REMOVE = 2,
-    SO_NPCFLAG_TOGGLE = 3
+    SO_MODIFYTHREAT_MAX_TARGETS
 };
 
 // Possible datalong3 values for SCRIPT_COMMAND_TERMINATE_SCRIPT
@@ -357,22 +361,23 @@ struct ScriptInfo
             uint32 flags;                                   // datalong4
         } moveTo;
 
-        struct                                              // SCRIPT_COMMAND_FLAG_SET (4)
+        struct                                              // SCRIPT_COMMAND_MODIFY_FLAGS (4)
         {
             uint32 fieldId;                                 // datalong
             uint32 fieldValue;                              // datalong2
-        } setFlag;
+            uint32 mode;                                    // datalong3
+        } modFlags;
 
-        struct                                              // SCRIPT_COMMAND_FLAG_REMOVE (5)
+        struct                                              // SCRIPT_COMMAND_INTERRUPT_CASTS (5)
         {
-            uint32 fieldId;                                 // datalong
-            uint32 fieldValue;                              // datalong2
-        } removeFlag;
+            uint32 withDelayed;                             // datalong
+            uint32 spellId;                                 // datalong2
+        } interruptCasts;
 
         struct                                              // SCRIPT_COMMAND_TELEPORT_TO (6)
         {
             uint32 mapId;                                   // datalong
-            uint32 teleportOptions;                          // datalong2
+            uint32 teleportOptions;                         // datalong2
         } teleportTo;
 
         struct                                              // SCRIPT_COMMAND_QUEST_EXPLORED (7)
@@ -493,21 +498,21 @@ struct ScriptInfo
 
                                                             // SCRIPT_COMMAND_ATTACK_START (26)
 
-        struct                                              // SCRIPT_COMMAND_GO_LOCK_STATE (27)
+        struct                                              // SCRIPT_COMMAND_UPDATE_ENTRY (27)
         {
-            uint32 lockState;                               // datalong
-        } goLockState;
+            uint32 creatureEntry;                           // datalong
+            uint32 team;                                    // datalong2
+        } updateEntry;
 
         struct                                              // SCRIPT_COMMAND_STAND_STATE (28)
         {
             uint32 stand_state;                             // datalong
         } standState;
 
-        struct                                              // SCRIPT_COMMAND_MODIFY_NPC_FLAGS (29)
+        struct                                              // SCRIPT_COMMAND_MODIFY_THREAT (29)
         {
-            uint32 flag;                                    // datalong
-            uint32 change_flag;                             // datalong2
-        } npcFlag;
+            uint32 target;                                  // datalong
+        } modThreat;
 
         struct                                              // SCRIPT_COMMAND_SEND_TAXI_PATH (30)
         {

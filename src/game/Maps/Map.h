@@ -632,8 +632,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_Emote(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_FieldSet(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_MoveTo(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_FlagSet(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_FlagRemove(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_ModifyFlags(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_InterruptCasts(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_TeleportTo(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_QuestExplored(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_KillCredit(ScriptAction& step, Object* source, Object* target);
@@ -655,9 +655,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_Mount(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_SetRun(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_AttackStart(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetLockState(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_UpdateEntry(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_SetStandState(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_ModifyNpcFlags(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_ModifyThreat(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_SendTaxiPath(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_TerminateScript(ScriptAction& step, Object* source, Object* target);
         bool ScriptCommand_TerminateCondition(ScriptAction& step, Object* source, Object* target);
@@ -675,8 +675,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_Emote,                  // 1
             &Map::ScriptCommand_FieldSet,               // 2
             &Map::ScriptCommand_MoveTo,                 // 3
-            &Map::ScriptCommand_FlagSet,                // 4
-            &Map::ScriptCommand_FlagRemove,             // 5
+            &Map::ScriptCommand_ModifyFlags,            // 4
+            &Map::ScriptCommand_InterruptCasts,         // 5
             &Map::ScriptCommand_TeleportTo,             // 6
             &Map::ScriptCommand_QuestExplored,          // 7
             &Map::ScriptCommand_KillCredit,             // 8
@@ -698,9 +698,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_Mount,                  // 24
             &Map::ScriptCommand_SetRun,                 // 25
             &Map::ScriptCommand_AttackStart,            // 26
-            &Map::ScriptCommand_SetLockState,           // 27
+            &Map::ScriptCommand_UpdateEntry,            // 27
             &Map::ScriptCommand_SetStandState,          // 28
-            &Map::ScriptCommand_ModifyNpcFlags,         // 29
+            &Map::ScriptCommand_ModifyThreat,         // 29
             &Map::ScriptCommand_SendTaxiPath,           // 30
             &Map::ScriptCommand_TerminateScript,        // 31
             &Map::ScriptCommand_TerminateCondition,     // 32

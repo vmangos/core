@@ -237,6 +237,16 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
 
                 break;
             }
+            case SCRIPT_COMMAND_INTERRUPT_CASTS:
+            {
+                if (tmp.interruptCasts.spellId && !sSpellMgr.GetSpellEntry(tmp.interruptCasts.spellId))
+                {
+                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_INTERRUPT_CASTS for script id %u", tablename, tmp.interruptCasts.spellId, tmp.id);
+                    continue;
+                }
+
+                break;
+            }
             case SCRIPT_COMMAND_TELEPORT_TO:
             {
                 if (!sMapStorage.LookupEntry<MapEntry>(tmp.teleportTo.mapId))
@@ -540,20 +550,14 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 break;
             }
-            case SCRIPT_COMMAND_GO_LOCK_STATE:
+            case SCRIPT_COMMAND_UPDATE_ENTRY:
             {
-                if (// lock(0x01) and unlock(0x02) together
-                    ((tmp.goLockState.lockState & SF_GOLOCKSTATE_LOCK) && (tmp.goLockState.lockState & SF_GOLOCKSTATE_UNLOCK)) ||
-                    // non-interact (0x4) and interact (0x08) together
-                    ((tmp.goLockState.lockState & SF_GOLOCKSTATE_NO_INTERACT) && (tmp.goLockState.lockState & SF_GOLOCKSTATE_INTERACT)) ||
-                    // no setting
-                    !tmp.goLockState.lockState ||
-                    // invalid number
-                    tmp.goLockState.lockState >= SF_GOLOCKSTATE_MAX)
+                if (!ObjectMgr::GetCreatureTemplate(tmp.updateEntry.creatureEntry))
                 {
-                    sLog.outErrorDb("Table `%s` has invalid lock state (datalong = %u) in SCRIPT_COMMAND_GO_LOCK_STATE for script id %u.", tablename, tmp.goLockState.lockState, tmp.id);
+                    sLog.outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_UPDATE_ENTRY for script id %u", tablename, tmp.updateEntry.creatureEntry, tmp.id);
                     continue;
                 }
+
                 break;
             }
             case SCRIPT_COMMAND_STAND_STATE:
@@ -565,8 +569,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
-            case SCRIPT_COMMAND_MODIFY_NPC_FLAGS:
+            case SCRIPT_COMMAND_MODIFY_THREAT:
             {
+                if (tmp.modThreat.target >= SO_MODIFYTHREAT_MAX_TARGETS)
+                {
+                    sLog.outErrorDb("Table `%s` has invalid target type (datalong = %u) in SCRIPT_COMMAND_MODIFY_THREAT for script id %u", tablename, tmp.modThreat.target, tmp.id);
+                    continue;
+                }
                 break;
             }
             case SCRIPT_COMMAND_SEND_TAXI_PATH:

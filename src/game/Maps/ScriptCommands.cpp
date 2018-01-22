@@ -184,44 +184,58 @@ bool Map::ScriptCommand_MoveTo(ScriptAction& step, Object* source, Object* targe
     return false;
 }
 
-// SCRIPT_COMMAND_FLAG_SET (4)
-bool Map::ScriptCommand_FlagSet(ScriptAction& step, Object* source, Object* target)
+// SCRIPT_COMMAND_MODIFY_FLAGS (4)
+bool Map::ScriptCommand_ModifyFlags(ScriptAction& step, Object* source, Object* target)
 {
     if (!source)
     {
-        sLog.outError("SCRIPT_COMMAND_FLAG_SET (script id %u) call for a NULL object, skipping.", step.script->id);
+        sLog.outError("SCRIPT_COMMAND_MODIFY_FLAGS (script id %u) call for a NULL object, skipping.", step.script->id);
         return ShouldAbortScript(step);
     }
 
-    if (step.script->setFlag.fieldId <= OBJECT_FIELD_ENTRY || step.script->setFlag.fieldId >= source->GetValuesCount())
+    if (step.script->modFlags.fieldId <= OBJECT_FIELD_ENTRY || step.script->modFlags.fieldId >= source->GetValuesCount())
     {
-        sLog.outError("SCRIPT_COMMAND_FLAG_SET (script id %u) call for wrong field %u (max count: %u) in object (TypeId: %u).",
-            step.script->id, step.script->setFlag.fieldId, source->GetValuesCount(), source->GetTypeId());
+        sLog.outError("SCRIPT_COMMAND_MODIFY_FLAGS (script id %u) call for wrong field %u (max count: %u) in object (TypeId: %u).",
+            step.script->id, step.script->modFlags.fieldId, source->GetValuesCount(), source->GetTypeId());
         return ShouldAbortScript(step);
     }
 
-    source->SetFlag(step.script->setFlag.fieldId, step.script->setFlag.fieldValue);
+    // Add Flags
+    if (step.script->modFlags.mode == SO_MODIFYFLAGS_SET)
+        source->SetFlag(step.script->modFlags.fieldId, step.script->modFlags.fieldValue);
+    // Remove Flags
+    else if (step.script->modFlags.mode == SO_MODIFYFLAGS_REMOVE)
+        source->RemoveFlag(step.script->modFlags.fieldId, step.script->modFlags.fieldValue);
+    // Toggle Flags
+    else
+    {
+        if (source->HasFlag(step.script->modFlags.fieldId, step.script->modFlags.fieldValue))
+            source->RemoveFlag(step.script->modFlags.fieldId, step.script->modFlags.fieldValue);
+        else
+            source->SetFlag(step.script->modFlags.fieldId, step.script->modFlags.fieldValue);
+    }
 
     return false;
 }
 
-// SCRIPT_COMMAND_FLAG_REMOVE (5)
-bool Map::ScriptCommand_FlagRemove(ScriptAction& step, Object* source, Object* target)
+// SCRIPT_COMMAND_INTERRUPT_CASTS (5)
+bool Map::ScriptCommand_InterruptCasts(ScriptAction& step, Object* source, Object* target)
 {
     if (!source)
     {
-        sLog.outError("SCRIPT_COMMAND_FLAG_REMOVE (script id %u) call for a NULL object, skipping.", step.script->id);
+        sLog.outError("SCRIPT_COMMAND_INTERRUPT_CAST (script id %u) call for a NULL object, skipping.", step.script->id);
         return ShouldAbortScript(step);
     }
 
-    if (step.script->removeFlag.fieldId <= OBJECT_FIELD_ENTRY || step.script->removeFlag.fieldId >= source->GetValuesCount())
+    if (!source->isType(TYPEMASK_UNIT))
     {
-        sLog.outError("SCRIPT_COMMAND_FLAG_REMOVE (script id %u) call for wrong field %u (max count: %u) in object (TypeId: %u).",
-            step.script->id, step.script->removeFlag.fieldId, source->GetValuesCount(), source->GetTypeId());
+        sLog.outError("SCRIPT_COMMAND_INTERRUPT_CAST (script id %u) call for a non-unit source (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
         return ShouldAbortScript(step);
     }
 
-    source->RemoveFlag(step.script->removeFlag.fieldId, step.script->removeFlag.fieldValue);
+    Unit* pSource = static_cast<Unit*>(source);
+
+    pSource->InterruptNonMeleeSpells(step.script->interruptCasts.withDelayed, step.script->interruptCasts.spellId);
 
     return false;
 }
@@ -797,55 +811,55 @@ bool Map::ScriptCommand_SetMovementType(ScriptAction& step, Object* source, Obje
 
     switch (step.script->movement.movementType)
     {
-    case IDLE_MOTION_TYPE:
-        pSource->GetMotionMaster()->MoveIdle();
-        break;
-    case RANDOM_MOTION_TYPE:
-        pSource->GetMotionMaster()->MoveRandom();
-        break;
-    case WAYPOINT_MOTION_TYPE:
-        pSource->GetMotionMaster()->MoveWaypoint(step.script->movement.boolParam);
-        break;
-    case CONFUSED_MOTION_TYPE:
-        pSource->GetMotionMaster()->MoveConfused();
-        break;
-    case CHASE_MOTION_TYPE:
-        if (step.script->movement.boolParam) // chase victim
-        {
-            if (Unit* pVictim = pSource->getVictim())
-                pSource->GetMotionMaster()->MoveChase(pVictim, step.script->x, step.script->o);
+        case IDLE_MOTION_TYPE:
+            pSource->GetMotionMaster()->MoveIdle();
             break;
-        }
-        else if (pTarget)
-            pSource->GetMotionMaster()->MoveChase(pTarget, step.script->x, step.script->o);
-        break;
-    case HOME_MOTION_TYPE:
-        pSource->GetMotionMaster()->MoveTargetedHome();
-        break;
-    case FLEEING_MOTION_TYPE:
-        if (step.script->movement.boolParam) // flee from victim
-        {
-            if (Unit* pVictim = pSource->getVictim())
-                pSource->GetMotionMaster()->MoveFleeing(pVictim, step.script->movement.intParam);
+        case RANDOM_MOTION_TYPE:
+            pSource->GetMotionMaster()->MoveRandom();
             break;
-        }
-        else if (pTarget)
-            pSource->GetMotionMaster()->MoveFleeing(pTarget, step.script->movement.intParam);
-        break;
-    case DISTRACT_MOTION_TYPE:
-        pSource->GetMotionMaster()->MoveDistract(step.script->movement.intParam);
-        break;
-    case FOLLOW_MOTION_TYPE:
-        if (pTarget)
-            pSource->GetMotionMaster()->MoveFollow(pTarget, step.script->x, step.script->o);
-        break;
-    case CHARGE_MOTION_TYPE:
-        if (pTarget)
-            pSource->GetMotionMaster()->MoveCharge(pTarget, step.script->movement.intParam, step.script->movement.boolParam);
-        break;
-    default:
-        sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for an invalid motion type (MotionType: %u), skipping.", step.script->id, step.script->movement.movementType);
-        return ShouldAbortScript(step);
+        case WAYPOINT_MOTION_TYPE:
+            pSource->GetMotionMaster()->MoveWaypoint(step.script->movement.boolParam);
+            break;
+        case CONFUSED_MOTION_TYPE:
+            pSource->GetMotionMaster()->MoveConfused();
+            break;
+        case CHASE_MOTION_TYPE:
+            if (step.script->movement.boolParam) // chase victim
+            {
+                if (Unit* pVictim = pSource->getVictim())
+                    pSource->GetMotionMaster()->MoveChase(pVictim, step.script->x, step.script->o);
+                break;
+            }
+            else if (pTarget)
+                pSource->GetMotionMaster()->MoveChase(pTarget, step.script->x, step.script->o);
+            break;
+        case HOME_MOTION_TYPE:
+            pSource->GetMotionMaster()->MoveTargetedHome();
+            break;
+        case FLEEING_MOTION_TYPE:
+            if (step.script->movement.boolParam) // flee from victim
+            {
+                if (Unit* pVictim = pSource->getVictim())
+                    pSource->GetMotionMaster()->MoveFleeing(pVictim, step.script->movement.intParam);
+                break;
+            }
+            else if (pTarget)
+                pSource->GetMotionMaster()->MoveFleeing(pTarget, step.script->movement.intParam);
+            break;
+        case DISTRACT_MOTION_TYPE:
+            pSource->GetMotionMaster()->MoveDistract(step.script->movement.intParam);
+            break;
+        case FOLLOW_MOTION_TYPE:
+            if (pTarget)
+                pSource->GetMotionMaster()->MoveFollow(pTarget, step.script->x, step.script->o);
+            break;
+        case CHARGE_MOTION_TYPE:
+            if (pTarget)
+                pSource->GetMotionMaster()->MoveCharge(pTarget, step.script->movement.intParam, step.script->movement.boolParam);
+            break;
+        default:
+            sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for an invalid motion type (MotionType: %u), skipping.", step.script->id, step.script->movement.movementType);
+            return ShouldAbortScript(step);
     }
 
     return false;
@@ -997,31 +1011,25 @@ bool Map::ScriptCommand_AttackStart(ScriptAction& step, Object* source, Object* 
     return false;
 }
 
-// SCRIPT_COMMAND_GO_LOCK_STATE (27)
-bool Map::ScriptCommand_SetLockState(ScriptAction& step, Object* source, Object* target)
+// SCRIPT_COMMAND_UPDATE_ENTRY (27)
+bool Map::ScriptCommand_UpdateEntry(ScriptAction& step, Object* source, Object* target)
 {
-    GameObject* pGo = nullptr;
-
-    if (source && source->GetTypeId() == TYPEID_GAMEOBJECT)
-        pGo = static_cast<GameObject*>(source);
-    else if (target && target->GetTypeId() == TYPEID_GAMEOBJECT)
-        pGo = static_cast<GameObject*>(target);
-    else
+    if (!source)
     {
-        sLog.outError("SCRIPT_COMMAND_GO_LOCK_STATE (script id %u) call for a NULL or non-worldobject source and target, skipping.", step.script->id);
+        sLog.outError("SCRIPT_COMMAND_UPDATE_ENTRY (script id %u) call for a NULL source, skipping.", step.script->id);
         return ShouldAbortScript(step);
     }
 
-    // Lock or Unlock
-    if (step.script->goLockState.lockState & SF_GOLOCKSTATE_LOCK)
-        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-    else if (step.script->goLockState.lockState & SF_GOLOCKSTATE_UNLOCK)
-        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
-    // Set Non Interactable or Set Interactable
-    if (step.script->goLockState.lockState & SF_GOLOCKSTATE_NO_INTERACT)
-        pGo->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
-    else if (step.script->goLockState.lockState & SF_GOLOCKSTATE_INTERACT)
-        pGo->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+    if (source->GetTypeId() != TYPEID_UNIT)
+    {
+        sLog.outError("SCRIPT_COMMAND_UPDATE_ENTRY (script id %u) call for a non-creature source (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+        return ShouldAbortScript(step);
+    }
+
+    Creature* pSource = static_cast<Creature*>(source);
+
+    if (pSource->GetEntry() != step.script->updateEntry.creatureEntry)
+        pSource->UpdateEntry(step.script->updateEntry.creatureEntry, step.script->updateEntry.team ? HORDE : ALLIANCE);
 
     return false;
 }
@@ -1048,34 +1056,45 @@ bool Map::ScriptCommand_SetStandState(ScriptAction& step, Object* source, Object
     return false;
 }
 
-// SCRIPT_COMMAND_MODIFY_NPC_FLAGS (29)
-bool Map::ScriptCommand_ModifyNpcFlags(ScriptAction& step, Object* source, Object* target)
+// SCRIPT_COMMAND_MODIFY_THREAT (29)
+bool Map::ScriptCommand_ModifyThreat(ScriptAction& step, Object* source, Object* target)
 {
-    Creature* pSource = nullptr;
-
-    if (source && source->GetTypeId() == TYPEID_UNIT)
-        pSource = static_cast<Creature*>(source);
-    else if (target && target->GetTypeId() == TYPEID_UNIT)
-        pSource = static_cast<Creature*>(target);
-    else
+    if (!source)
     {
-        sLog.outError("SCRIPT_COMMAND_MODIFY_NPC_FLAGS (script id %u) call for a NULL or non-creature source and target, skipping.", step.script->id);
+        sLog.outError("SCRIPT_COMMAND_MODIFY_THREAT (script id %u) call for a NULL source, skipping.", step.script->id);
         return ShouldAbortScript(step);
     }
 
-    // Add Flags
-    if (step.script->npcFlag.change_flag & SO_NPCFLAG_SET)
-        pSource->SetFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
-    // Remove Flags
-    else if (step.script->npcFlag.change_flag & SO_NPCFLAG_REMOVE)
-        pSource->RemoveFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
-    // Toggle Flags
-    else
+    if (source->GetTypeId() != TYPEID_UNIT)
     {
-        if (pSource->HasFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag))
-            pSource->RemoveFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
-        else
-            pSource->SetFlag(UNIT_NPC_FLAGS, step.script->npcFlag.flag);
+        sLog.outError("SCRIPT_COMMAND_MODIFY_THREAT (script id %u) call for a non-creature source (TypeId: %u), skipping.", step.script->id, source->GetTypeId());
+        return ShouldAbortScript(step);
+    }
+
+    Creature* pSource = static_cast<Creature*>(source);
+
+    switch (step.script->modThreat.target)
+    {
+        case SO_MODIFYTHREAT_PROVIDED_TARGET:
+        {
+            if (target && target->isType(TYPEMASK_UNIT))
+                pSource->getThreatManager().modifyThreatPercent(static_cast<Unit*>(target), step.script->x);
+            break;
+        }
+        case SO_MODIFYTHREAT_CURRENT_VICTIM:
+        {
+            if (Unit* pVictim = pSource->getVictim())
+                pSource->getThreatManager().modifyThreatPercent(pVictim, step.script->x);
+            break;
+        }
+        case SO_MODIFYTHREAT_ALL_ATTACKERS:
+        {
+            ThreatList const& threatList = pSource->getThreatManager().getThreatList();
+            for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
+                if (Unit* Temp = pSource->GetMap()->GetUnit((*i)->getUnitGuid()))
+                    pSource->getThreatManager().modifyThreatPercent(Temp, step.script->x);
+            break;
+        }
     }
 
     return false;
