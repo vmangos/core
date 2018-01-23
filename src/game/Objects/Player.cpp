@@ -1525,7 +1525,7 @@ void Player::SetDeathState(DeathState s)
         clearResurrectRequestData();
 
         // remove form before other mods to prevent incorrect stats calculation
-        RemoveSpellsCausingAura(SPELL_AURA_MOD_SHAPESHIFT);
+        RemoveAuraTypeOnDeath(SPELL_AURA_MOD_SHAPESHIFT);
 
         RemovePet(PET_SAVE_REAGENTS);
 
@@ -1554,9 +1554,6 @@ void Player::SetDeathState(DeathState s)
         //clear aura case after resurrection by another way (spells will be applied before next death)
         SetUInt32Value(PLAYER_SELF_RES_SPELL, 0);
 
-        // restore default warrior stance
-        if (getClass() == CLASS_WARRIOR)
-            CastSpell(this, SPELL_ID_PASSIVE_BATTLE_STANCE, true);
         ResetContestedPvP();
     }
 }

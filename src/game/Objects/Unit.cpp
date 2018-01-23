@@ -4838,6 +4838,20 @@ void Unit::RemoveAurasAtReset(AuraRemoveMode mode /*= AURA_REMOVE_BY_DEFAULT*/)
     RemoveAllAuras(mode);
 }
 
+void Unit::RemoveAuraTypeOnDeath(AuraType auraType)
+{
+    for (AuraList::const_iterator iter = m_modAuras[auraType].begin(); iter != m_modAuras[auraType].end();)
+    {
+        if (!(*iter)->GetHolder()->IsPassive() && !(*iter)->GetHolder()->IsDeathPersistent())
+        {
+            RemoveSpellAuraHolder((*iter)->GetHolder(), AURA_REMOVE_BY_DEATH);
+            iter = m_modAuras[auraType].begin();
+        }
+        else
+            ++iter;
+    }
+}
+
 void Unit::RemoveAllAurasOnDeath()
 {
     // used just after dieing to remove all visible auras
