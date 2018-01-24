@@ -333,20 +333,7 @@ class MANGOS_DLL_SPEC Group
         bool isInLFG()                   { return (m_LFGAreaId > 0) ? true : false; }
 
         void CalculateLFGRoles(LFGGroupQueueInfo& data);
-        void FillPremadeLFG(ObjectGuid plrGuid, ClassRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::vector<ObjectGuid>& playersProcessed);
-
-        bool inLFGGroup(std::vector<ObjectGuid> processed, ObjectGuid plr)
-        {
-            for (uint32 i = 0; i < processed.size(); ++i)
-            {
-                if (processed[i] == plr)
-                {
-                    return true;
-                }
-            }
-
-            return false;
-        }
+        bool FillPremadeLFG(const ObjectGuid& plrGuid, Classes playerClass, ClassRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::list<ObjectGuid>& processed);
 
         /*********************************************************/
         /***                   LOOT SYSTEM                     ***/

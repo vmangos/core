@@ -38,12 +38,43 @@
 #include "LFGMgr.h"
 #include "LFGHandler.h"
 
+#include <array>
+
 INSTANTIATE_SINGLETON_1(LFGQueue);
 
-// Add group or player into queue. If player has group and he's a leader then whole party will be added to queue.
-void LFGQueue::AddToQueue(Player* leader, uint32 queAreaID)
+std::array<ClassRoles, 3> PotentialRoles =
 {
-    if(!leader)
+    LFG_ROLE_TANK,
+    LFG_ROLE_HEALER,
+    LFG_ROLE_DPS
+};
+
+void LFGPlayerQueueInfo::CalculateRoles(Classes playerClass)
+{
+    roleMask = LFGQueue::CalculateRoles(playerClass);
+
+    // Determine role priority
+    for (ClassRoles role : PotentialRoles)
+    {
+        rolePriority.emplace_back(std::pair<ClassRoles, RolesPriority>(role, LFGQueue::getPriority(playerClass, role)));
+    }
+}
+
+RolesPriority LFGPlayerQueueInfo::GetRolePriority(ClassRoles role)
+{
+    for (auto iter = rolePriority.cbegin(); iter != rolePriority.cend(); ++iter)
+    {
+        if (iter->first == role)
+            return iter->second;
+    }
+
+    return LFG_PRIORITY_NONE;
+}
+
+// Add group or player into queue. If player has group and he's a leader then whole party will be added to queue.
+void LFGQueue::AddToQueue(Player* leader, uint32 queueAreaID)
+{
+    if (!leader)
         return;
 
     if (sWorld.GetWowPatch() < WOW_PATCH_103)
@@ -60,49 +91,47 @@ void LFGQueue::AddToQueue(Player* leader, uint32 queAreaID)
 
         grp->CalculateLFGRoles(i_Group);
         i_Group.team = leader->GetTeam();
-        i_Group.areaId = queAreaID;
+        i_Group.areaId = queueAreaID;
         i_Group.groupTimer = 5 * MINUTE * IN_MILLISECONDS; // Minute timer for SMSG_MEETINGSTONE_IN_PROGRESS
 
-        grp->SetLFGAreaId(queAreaID);
+        grp->SetLFGAreaId(queueAreaID);
 
         WorldPacket data;
-        BuildSetQueuePacket(data, queAreaID, MEETINGSTONE_STATUS_JOINED_QUEUE);
+        BuildSetQueuePacket(data, queueAreaID, MEETINGSTONE_STATUS_JOINED_QUEUE);
 
         grp->BroadcastPacket(&data, true);
     }
-    else if(!grp)
+    else if (!grp)
     {
         // Add player to queued players list
         LFGPlayerQueueInfo& i_Player = m_QueuedPlayers[leader->GetObjectGuid()];
 
-        i_Player.roleMask = CalculateRoles((Classes)leader->getClass());
         i_Player.team = leader->GetTeam();
-        i_Player.areaId = queAreaID;
+        i_Player.areaId = queueAreaID;
         i_Player.hasQueuePriority = false;
+        i_Player.CalculateRoles(static_cast<Classes>(leader->getClass()));
+        i_Player.name = leader->GetName();
 
-        leader->GetSession()->SendMeetingstoneSetqueue(queAreaID, MEETINGSTONE_STATUS_JOINED_QUEUE);
+        leader->GetSession()->SendMeetingstoneSetqueue(queueAreaID, MEETINGSTONE_STATUS_JOINED_QUEUE);
     }
 }
 
-void LFGQueue::RestoreOfflinePlayer(ObjectGuid plrGuid)
+void LFGQueue::RestoreOfflinePlayer(Player* player)
 {
-    Player* plr = sObjectMgr.GetPlayer(plrGuid);
-
-    // Should not happen, but there's always chance of quick disconnection
-    if(!plr)
+    if (!player || !player->GetSession())
         return;
 
-    QueuedPlayersMap::iterator offlinePlr = m_OfflinePlayers.find(plrGuid);
+    QueuedPlayersMap::iterator offlinePlr = m_OfflinePlayers.find(player->GetObjectGuid());
 
-    if(offlinePlr != m_OfflinePlayers.end())
+    if (offlinePlr != m_OfflinePlayers.end())
     {
-        plr->GetSession()->SendMeetingstoneSetqueue(offlinePlr->second.areaId, MEETINGSTONE_STATUS_JOINED_QUEUE);
-        m_QueuedPlayers[plrGuid] = offlinePlr->second;
+        player->GetSession()->SendMeetingstoneSetqueue(offlinePlr->second.areaId, MEETINGSTONE_STATUS_JOINED_QUEUE);
+        m_QueuedPlayers[player->GetObjectGuid()] = offlinePlr->second;
         m_OfflinePlayers.erase(offlinePlr);
     }
     else
     {
-        plr->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
+        player->GetSession()->SendMeetingstoneSetqueue(0, MEETINGSTONE_STATUS_NONE);
     }
 }
 
@@ -179,118 +208,107 @@ void LFGQueue::UpdateGroup(uint32 groupId)
 {
     QueuedGroupsMap::iterator qGroup = m_QueuedGroups.find(groupId);
 
-    if(qGroup != m_QueuedGroups.end())
+    if (qGroup != m_QueuedGroups.end())
     {
-        Group* grp = sObjectMgr.GetGroupById(qGroup->first);
-
-        if(grp)
+        if (Group* grp = sObjectMgr.GetGroupById(qGroup->first))
         {
-            grp->CalculateLFGRoles(qGroup->second);
+            // If the group is full, we don't care about the roles
+            if (!grp->IsFull())
+                grp->CalculateLFGRoles(qGroup->second);
         }
-
     }
 }
 
 void LFGQueue::Update(uint32 diff)
 {
-    if(m_QueuedGroups.empty() && m_QueuedPlayers.empty())
+    if (m_QueuedGroups.empty() && m_QueuedPlayers.empty())
         return;
 
     // Iterate over QueuedPlayersMap to update players timers and remove offline/disconnected players.
-    for(QueuedPlayersMap::iterator qPlayer = m_QueuedPlayers.begin(); qPlayer != m_QueuedPlayers.end(); ++qPlayer)
+    for (QueuedPlayersMap::iterator iter = m_QueuedPlayers.begin(); iter != m_QueuedPlayers.end();)
     {
-        Player* plr = sObjectMgr.GetPlayer(qPlayer->first);
+        Player* plr = sObjectMgr.GetPlayer(iter->first);
 
         // Player could have been disconnected
-        if(!plr ||!plr->IsInWorld())
+        if (!plr || !plr->IsInWorld())
         {
-            m_OfflinePlayers[qPlayer->first] = qPlayer->second;
-            m_QueuedPlayers.erase(qPlayer);
-            break;
+            m_OfflinePlayers[iter->first] = iter->second;
+            iter = m_QueuedPlayers.erase(iter);
+            continue;
         }
 
-        qPlayer->second.timeInLFG += diff;
+        iter->second.timeInLFG += diff;
 
         // Update player timer and give him queue priority.
-        if(qPlayer->second.timeInLFG >= (30 * MINUTE * IN_MILLISECONDS))
-        {
-            qPlayer->second.hasQueuePriority = true;
-        }
+        if (iter->second.timeInLFG >= (30 * MINUTE * IN_MILLISECONDS))
+            iter->second.hasQueuePriority = true;
+
+        ++iter;
     }
 
-    if(!m_QueuedGroups.empty())
+    if (!m_QueuedGroups.empty())
     {
         // Iterate over QueuedGroupsMap to fill groups with roles they're missing.
-        for(QueuedGroupsMap::iterator qGroup = m_QueuedGroups.begin(); qGroup != m_QueuedGroups.end(); ++qGroup)
+        for (QueuedGroupsMap::iterator qGroup = m_QueuedGroups.begin(); qGroup != m_QueuedGroups.end();)
         {
             Group* grp = sObjectMgr.GetGroupById(qGroup->first);
 
             // Safe check
-            if(!grp)
-                return;
+            if (!grp)
+            {
+                qGroup = m_QueuedGroups.erase(qGroup);
+                continue;
+            }
 
-            // Remove group from Queue if it's full
-            if(grp->IsFull())
+            // Remove group from queue if it has been filled by players manually inviting.
+            // We fill 1 group per update since removing it from the queue invalidates
+            // the iterator and we can save on performance a little.
+            if (grp->IsFull())
             {
                 RemoveGroupFromQueue(qGroup->first, GROUP_SYSTEM_LEAVE);
                 break;
             }
 
             // Iterate over QueuedPlayersMap to find suitable player to join group
-            for(QueuedPlayersMap::iterator qPlayer = m_QueuedPlayers.begin(); qPlayer != m_QueuedPlayers.end(); ++qPlayer)
+            QueuedPlayersMap::iterator next = m_QueuedPlayers.begin();
+            for (QueuedPlayersMap::iterator qPlayer = next; next != m_QueuedPlayers.end(); qPlayer = next)
             {
-                Player* plr = sObjectMgr.GetPlayer(qPlayer->first);
+                // Pre-increment iterator here since FindRoleToGroup() may remove qPlayer
+                // from the map
+                ++next;
 
                 // Check here that players team and areaId they're in queue are same
-                if(qPlayer->second.team == qGroup->second.team &&
+                if (qPlayer->second.team == qGroup->second.team &&
                    qPlayer->second.areaId == qGroup->second.areaId)
                 {
-                    // Check if player can perform tank role
-                    if((canPerformRole(qPlayer->second.roleMask, LFG_ROLE_TANK) & qGroup->second.availableRoles) == LFG_ROLE_TANK)
+                    bool groupFound = false;
+                    // Find any role that this player matches and that the group requires. If none,
+                    // then continue onto the next group.
+                    for (ClassRoles role : PotentialRoles)
                     {
-                        if(FindRoleToGroup(plr, grp, LFG_ROLE_TANK))
-                        {
-                            break;
-                        }
-                        else
-                        {
+                        if (!(qPlayer->second.roleMask & role))
                             continue;
+
+                        if ((role & qGroup->second.availableRoles) == role && FindRoleToGroup(qPlayer->first, grp, role))
+                        {
+                            groupFound = true;
+                            break;
                         }
                     }
 
-                    // Check if player can perform healer role
-                    if((canPerformRole(qPlayer->second.roleMask, LFG_ROLE_HEALER) & qGroup->second.availableRoles) == LFG_ROLE_HEALER)
+                    // If we found a group and it's now full, break. If it's not full,
+                    // go onto the next player and maybe they can fill it.
+                    if (groupFound && grp->IsFull())
                     {
-                        if(FindRoleToGroup(plr, grp, LFG_ROLE_HEALER))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-
-                    // Check if player can perform dps role
-                    if((canPerformRole(qPlayer->second.roleMask, LFG_ROLE_DPS) & qGroup->second.availableRoles) == LFG_ROLE_DPS)
-                    {
-                        if(FindRoleToGroup(plr, grp, LFG_ROLE_DPS))
-                        {
-                            break;
-                        }
-                        else
-                        {
-                            continue;
-                        }
-                    }
-
-                    // Check if group is full, no need to try to iterate same group if it's already full.
-                    if(grp->IsFull())
-                    {
-                        RemoveGroupFromQueue(qGroup->first, GROUP_SYSTEM_LEAVE);
                         break;
                     }
                 }
+            }
+
+            if (grp->IsFull())
+            {
+                RemoveGroupFromQueue(qGroup->first, GROUP_SYSTEM_LEAVE);
+                break;
             }
 
             // Update group timer. After each 5 minutes group will be broadcasted they're still waiting more members.
@@ -307,280 +325,222 @@ void LFGQueue::Update(uint32 diff)
             {
                 qGroup->second.groupTimer -= diff;
             }
+
+            ++qGroup;
         }
     }
 
     // Pick first 2 players and form group out of them also inserting them into queue as group.
-    if(m_QueuedPlayers.size() > 5)
+    if (m_QueuedPlayers.size() >= _groupSize)
     {
         // Pick Leader as first target.
-        QueuedPlayersMap::iterator nPlayer1 = m_QueuedPlayers.begin();
+        QueuedPlayersMap::iterator leader = m_QueuedPlayers.begin();
 
-        if(findInArea(nPlayer1->second.areaId) > 5)
+        std::list<ObjectGuid> playersInArea;
+        FindInArea(playersInArea, leader->second.areaId, leader->second.team, leader->first);
+
+        // 4 players + the leader
+        if (playersInArea.size() >= _groupSize-1)
         {
+            Player* pLeader = sObjectMgr.GetPlayer(leader->first);
+            Player* pMember = sObjectMgr.GetPlayer(playersInArea.front());
+
+            if (!pLeader || !pMember)
+            {
+                sLog.outError("LFGQueue::Update - null leader or member when forming group from queued players");
+                return;
+            }
+
             Group* newQueueGroup = new Group;
-
-            // Iterate of QueuedPlayersMap and pick first member to accompany leader.
-            for(QueuedPlayersMap::iterator nPlayer2 = m_QueuedPlayers.begin(); nPlayer2 != m_QueuedPlayers.end(); ++nPlayer2)
+            if (!newQueueGroup->IsCreated())
             {
-                if(nPlayer1->first == nPlayer2->first)
-                    continue;
-
-                if(nPlayer1->second.team == nPlayer2->second.team &&
-                    nPlayer1->second.areaId == nPlayer2->second.areaId)
-                {
-                    Player* leader = sObjectMgr.GetPlayer(nPlayer1->first);
-                    Player* member = sObjectMgr.GetPlayer(nPlayer2->first);
-                    uint32 areaId = nPlayer1->second.areaId;
-
-                    if(!newQueueGroup->IsCreated())
-                    {
-                        if(newQueueGroup->Create(leader->GetObjectGuid(), leader->GetName()))
-                            sObjectMgr.AddGroup(newQueueGroup);
-                        else
-                            return;
-                    }
-
-                    WorldPacket data;
-                    BuildMemberAddedPacket(data, member->GetObjectGuid());
-
-                    leader->GetSession()->SendPacket(&data);
-
-                    // Add member to the group. Leader is already added upon creation of group.
-                    newQueueGroup->AddMember(member->GetObjectGuid(), member->GetName(), GROUP_LFG);
-
-                    // Add this new group to GroupQueue now and remove players from PlayerQueue
-                    RemovePlayerFromQueue(nPlayer1->first, PLAYER_SYSTEM_LEAVE);
-                    RemovePlayerFromQueue(nPlayer2->first, PLAYER_SYSTEM_LEAVE);
-                    AddToQueue(leader, areaId);
-
-                    break;
-                }
-            }
-        }
-    }
-}
-
-bool LFGQueue::FindRoleToGroup(Player* plr, Group* grp, ClassRoles role)
-{
-    // Safe check
-    if(!plr || !grp)
-        return false;
-
-    QueuedGroupsMap::iterator qGroup = m_QueuedGroups.find(grp->GetId());
-    QueuedPlayersMap::iterator qPlayer = m_QueuedPlayers.find(plr->GetObjectGuid());
-
-    if(qGroup != m_QueuedGroups.end() && qPlayer != m_QueuedPlayers.end())
-    {
-        if (getPriority((Classes)plr->getClass(), role) >= LFG_PRIORITY_HIGH || qPlayer->second.hasQueuePriority)
-        {
-            bool hasBeenLongerInQueue = false;
-
-            // Iterate over QueuedPlayersMap to find if players have been longer in Queue.
-            for (QueuedPlayersMap::iterator qPlayer_loop = m_QueuedPlayers.begin(); qPlayer_loop != m_QueuedPlayers.end(); ++qPlayer_loop)
-            {
-                if (qPlayer->first == qPlayer_loop->first)
-                    continue;
-
-                if(qPlayer->second.timeInLFG > qPlayer_loop->second.timeInLFG)
-                    hasBeenLongerInQueue = true;
-            }
-
-            if(hasBeenLongerInQueue)
-            {
-                switch(role)
-                {
-                    case LFG_ROLE_TANK:
-                    {
-                        // Remove tank flag if player can perform tank role.
-                        qGroup->second.availableRoles &= ~LFG_ROLE_TANK;
-                        break;
-                    }
-
-                    case LFG_ROLE_HEALER:
-                    {
-                        // Remove healer flag if player can perform healer role.
-                        qGroup->second.availableRoles &= ~LFG_ROLE_HEALER;
-                        break;
-                    }
-
-                    case LFG_ROLE_DPS:
-                    {
-                        if(qGroup->second.dpsCount < 3)
-                        {
-                            // Update dps count first.
-                            ++qGroup->second.dpsCount;
-
-                            // Remove dps flag if there is enough dps in group.
-                            if(qGroup->second.dpsCount >= 3)
-                                qGroup->second.availableRoles &= ~LFG_ROLE_DPS;
-                        }
-                        break;
-                    }
-
-                    default:
-                    {
-                        return false;
-                    }
-                }
+                if (newQueueGroup->Create(pLeader->GetObjectGuid(), pLeader->GetName()))
+                    sObjectMgr.AddGroup(newQueueGroup);
+                else
+                    return;
             }
 
             WorldPacket data;
-            BuildMemberAddedPacket(data, plr->GetObjectGuid());
-            grp->BroadcastPacket(&data, true);
+            BuildMemberAddedPacket(data, pMember->GetObjectGuid());
 
-            // Add member to the group.
-            grp->AddMember(plr->GetObjectGuid(), plr->GetName(), GROUP_LFG);
+            pLeader->GetSession()->SendPacket(&data);
 
-            // Remove player from queue.
-            RemovePlayerFromQueue(qPlayer->first, PLAYER_SYSTEM_LEAVE);
+            // Add member to the group. Leader is already added upon creation of group.
+            newQueueGroup->AddMember(pMember->GetObjectGuid(), pMember->GetName(), GROUP_LFG);
 
-            // Found player return true.
-            return true;
-        }
-        else if (getPriority((Classes)plr->getClass(), role) < LFG_PRIORITY_HIGH)
-        {
-            bool hasFoundPriority = false;
-            bool hasBeenLongerInQueue = false;
+            // Add this new group to GroupQueue now and remove players from PlayerQueue
+            AddToQueue(pLeader, leader->second.areaId);
 
-            // Iterate over QueuedPlayersMap to find if players in queue have higher priority or they have been longer in Queue.
-            for (QueuedPlayersMap::iterator qPlayer_loop = m_QueuedPlayers.begin(); qPlayer_loop != m_QueuedPlayers.end(); ++qPlayer_loop)
-            {
-                if (qPlayer->first == qPlayer_loop->first)
-                    continue;
-
-                Player* m_loopMember = sObjectMgr.GetPlayer(qPlayer_loop->first);
-
-                // If there is anyone in group for class with higher priority then ignore current member.
-                if (getPriority((Classes)plr->getClass(), role) < getPriority((Classes)m_loopMember->getClass(), role))
-                    hasFoundPriority = true;
-
-                if(qPlayer->second.timeInLFG > qPlayer_loop->second.timeInLFG)
-                    hasBeenLongerInQueue = true;
-            }
-
-            // If there were no one in group for role with higher priority add this member to group
-            if(!hasFoundPriority && hasBeenLongerInQueue)
-            {
-                switch(role)
-                {
-                    case LFG_ROLE_TANK:
-                    {
-                        // Remove tank flag if player can perform tank role.
-                        qGroup->second.availableRoles &= ~LFG_ROLE_TANK;
-                        break;
-                    }
-
-                    case LFG_ROLE_HEALER:
-                    {
-                        // Remove healer flag if player can perform healer role.
-                        qGroup->second.availableRoles &= ~LFG_ROLE_HEALER;
-                        break;
-                    }
-
-                    case LFG_ROLE_DPS:
-                    {
-                        if(qGroup->second.dpsCount < 3)
-                        {
-                            // Update dps count first.
-                            ++qGroup->second.dpsCount;
-
-                            // Remove dps flag if there is enough dps in group.
-                            if(qGroup->second.dpsCount >= 3)
-                                qGroup->second.availableRoles &= ~LFG_ROLE_DPS;
-                        }
-                        break;
-                    }
-
-                    // This is impossible...
-                    default:
-                    {
-                        return false;
-                    }
-                }
-
-                WorldPacket data;
-                BuildMemberAddedPacket(data, plr->GetObjectGuid());
-                grp->BroadcastPacket(&data, true);
-
-                // Add member to the group.
-                grp->AddMember(plr->GetObjectGuid(), plr->GetName(), GROUP_LFG);
-
-                // Now remove player from queue
-                RemovePlayerFromQueue(qPlayer->first, PLAYER_SYSTEM_LEAVE);
-
-                // found player return true
-                return true;
-            }
+            RemovePlayerFromQueue(leader->first, PLAYER_SYSTEM_LEAVE);
+            RemovePlayerFromQueue(pMember->GetObjectGuid(), PLAYER_SYSTEM_LEAVE);
         }
     }
-
-    return false;
 }
 
-bool LFGQueue::IsPlayerInQueue(ObjectGuid plrGuid) const
+// Don't pass playerGuid by ref since we may destroy it in RemovePlayerFromQueue
+bool LFGQueue::FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles role)
 {
-    if (m_QueuedPlayers.find(plrGuid) != m_QueuedPlayers.end())
+    QueuedGroupsMap::iterator qGroup = m_QueuedGroups.find(group->GetId());
+    QueuedPlayersMap::iterator qPlayer = m_QueuedPlayers.find(playerGuid);
+
+    if (qGroup != m_QueuedGroups.end() && qPlayer != m_QueuedPlayers.end())
+    {
+        bool queueTimePriority = qPlayer->second.hasQueuePriority;
+        bool classPriority = qPlayer->second.GetRolePriority(role);
+        // Iterate over QueuedPlayersMap to find if players have been longer in Queue.
+        for (QueuedPlayersMap::iterator iter = m_QueuedPlayers.begin(); iter != m_QueuedPlayers.end(); ++iter)
+        {
+            if (qPlayer->first == iter->first)
+                continue;
+
+            // Ignore players queuing for a different dungeon or from opposite factions
+            if (qPlayer->second.areaId != iter->second.areaId || qPlayer->second.team != iter->second.team)
+                continue;
+
+            // Compare priority/queue time to players that can fill the same role
+            if ((iter->second.roleMask & role) == role)
+            {
+                bool otherTimePriority = iter->second.hasQueuePriority;
+                bool otherClassPriority = iter->second.GetRolePriority(role);
+                bool otherLongerInQueue = iter->second.timeInLFG > qPlayer->second.timeInLFG;
+
+                // Another player is more valuable in this role, they have priority
+                if (otherClassPriority > classPriority)
+                    return false;
+
+                // If the other player has time priority and has spent longer in the queue,
+                // they are ahead of us
+                if (otherTimePriority && otherLongerInQueue)
+                    return false;
+
+                // We do not have priority in the queue and they have spent longer
+                // in the queue, that means they are ahead
+                if (!queueTimePriority && otherLongerInQueue)
+                    return false;
+            }
+        }
+
+        switch (role)
+        {
+            case LFG_ROLE_TANK:
+            {
+                // Remove tank flag if player can perform tank role.
+                qGroup->second.availableRoles &= ~LFG_ROLE_TANK;
+                break;
+            }
+
+            case LFG_ROLE_HEALER:
+            {
+                // Remove healer flag if player can perform healer role.
+                qGroup->second.availableRoles &= ~LFG_ROLE_HEALER;
+                break;
+            }
+
+            case LFG_ROLE_DPS:
+            {
+                if (qGroup->second.dpsCount < LFGQueue::GetMaximumDPSSlots())
+                {
+                    // Update dps count first.
+                    ++qGroup->second.dpsCount;
+
+                    // Remove dps flag if there is enough dps in group.
+                    if (qGroup->second.dpsCount >= LFGQueue::GetMaximumDPSSlots())
+                        qGroup->second.availableRoles &= ~LFG_ROLE_DPS;
+                }
+                break;
+            }
+
+            default:
+            {
+                return false;
+            }
+        }
+
+        WorldPacket data;
+        BuildMemberAddedPacket(data, playerGuid);
+        group->BroadcastPacket(&data, true);
+
+        // Add member to the group.
+        group->AddMember(playerGuid, qPlayer->second.name.c_str(), GROUP_LFG);
+
+        // Remove player from queue.
+        RemovePlayerFromQueue(qPlayer->first, PLAYER_SYSTEM_LEAVE);
+
+        // Found player return true.
         return true;
+    }
 
     return false;
 }
 
-void LFGQueue::RemovePlayerFromQueue(ObjectGuid plrGuid, PlayerLeaveMethod leaveMethod)
+bool LFGQueue::IsPlayerInQueue(const ObjectGuid& plrGuid) const
 {
-    Player * plr = sObjectMgr.GetPlayer(plrGuid);
+    return m_QueuedPlayers.find(plrGuid) != m_QueuedPlayers.end();
+}
 
-    if(!plr)
-        return;
-
-    QueuedPlayersMap::iterator qPlayer;
-    qPlayer = m_QueuedPlayers.find(plrGuid);
-
-    if(qPlayer != m_QueuedPlayers.end())
+void LFGQueue::RemovePlayerFromQueue(const ObjectGuid& plrGuid, PlayerLeaveMethod leaveMethod)
+{
+    QueuedPlayersMap::iterator iter = m_QueuedPlayers.find(plrGuid);
+    if (iter != m_QueuedPlayers.end())
     {
-        if(leaveMethod == PLAYER_CLIENT_LEAVE)
+        if (leaveMethod == PLAYER_CLIENT_LEAVE)
         {
-            WorldPacket data;
-            BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
-            plr->GetSession()->SendPacket(&data);
+            Player* player = sObjectMgr.GetPlayer(plrGuid);
+
+            if (player && player->GetSession())
+            {
+                WorldPacket data;
+                BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
+                player->GetSession()->SendPacket(&data);
+            }
         }
 
-        m_QueuedPlayers.erase(qPlayer);
+        m_QueuedPlayers.erase(iter);
     }
 }
 
 void LFGQueue::RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod)
 {
-    Group* grp = sObjectMgr.GetGroupById(groupId);
+    QueuedGroupsMap::iterator iter = m_QueuedGroups.find(groupId);
 
-    if(!grp)
-        return;
-
-    QueuedGroupsMap::iterator qGroup;
-    qGroup = m_QueuedGroups.find(groupId);
-
-    if(qGroup != m_QueuedGroups.end())
+    if (iter != m_QueuedGroups.end())
     {
-        if(leaveMethod == GROUP_CLIENT_LEAVE)
+        if (Group* grp = sObjectMgr.GetGroupById(groupId))
         {
-            WorldPacket data;
-            BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
-            grp->BroadcastPacket(&data, true);
-        }
-        else
-        {
-            // Send complete information to party
-            WorldPacket data;
-            BuildCompletePacket(data);
-            grp->BroadcastPacket(&data, true);
+            if (leaveMethod == GROUP_CLIENT_LEAVE)
+            {
+                WorldPacket data;
+                BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_LEAVE_QUEUE);
+                grp->BroadcastPacket(&data, true);
+            }
+            else
+            {
+                // Send complete information to party
+                WorldPacket data;
+                BuildCompletePacket(data);
+                grp->BroadcastPacket(&data, true);
 
-            // Reset UI for party
-            BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_NONE);
-            grp->BroadcastPacket(&data, true);
+                // Reset UI for party
+                BuildSetQueuePacket(data, 0, MEETINGSTONE_STATUS_NONE);
+                grp->BroadcastPacket(&data, true);
+            }
+
+            grp->SetLFGAreaId(0);
         }
 
-        grp->SetLFGAreaId(0);
-        m_QueuedGroups.erase(qGroup);
+        m_QueuedGroups.erase(iter);
+    }
+}
+
+void LFGQueue::FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude)
+{
+    for (QueuedPlayersMap::iterator itr = m_QueuedPlayers.begin(); itr != m_QueuedPlayers.end(); ++itr)
+    {
+        if (itr->first == exclude)
+            continue;
+
+        if (itr->second.areaId == area && itr->second.team == team)
+            players.push_back(itr->first);
     }
 }
 

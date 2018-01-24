@@ -68,6 +68,11 @@ struct LFGPlayerQueueInfo
     uint32 areaId;
     uint32 timeInLFG;
     bool hasQueuePriority;
+    std::string name;
+    std::list<std::pair<ClassRoles, RolesPriority>> rolePriority;
+
+    void CalculateRoles(Classes playerClass);
+    RolesPriority GetRolePriority(ClassRoles role);
 };
 
 struct LFGGroupQueueInfo
@@ -86,10 +91,9 @@ class LFGQueue
         ~LFGQueue() {}
 
         void AddToQueue(Player* leader, uint32 queAreaID);
-        void RestoreOfflinePlayer(ObjectGuid plrGuid);
-        bool FindRoleToGroup(Player* plr, Group* grp, ClassRoles role);
-        bool IsPlayerInQueue(ObjectGuid plrGuid) const;
-        void RemovePlayerFromQueue(ObjectGuid plrGuid, PlayerLeaveMethod leaveMethod = PLAYER_CLIENT_LEAVE); // 0 == by default system (cmsg, leader leave), 1 == by lfg system (no need report text you left queu)
+        void RestoreOfflinePlayer(Player* player);
+        bool IsPlayerInQueue(const ObjectGuid& plrGuid) const;
+        void RemovePlayerFromQueue(const ObjectGuid& plrGuid, PlayerLeaveMethod leaveMethod = PLAYER_CLIENT_LEAVE); // 0 == by default system (cmsg, leader leave), 1 == by lfg system (no need report text you left queu)
         void RemoveGroupFromQueue(uint32 groupId, GroupLeaveMethod leaveMethod = GROUP_CLIENT_LEAVE);
         void Update(uint32 diff);
         void UpdateGroup(uint32 groupId);
@@ -99,16 +103,10 @@ class LFGQueue
         static void BuildInProgressPacket(WorldPacket &data);
         static void BuildCompletePacket(WorldPacket &data);
 
-        ClassRoles CalculateRoles(Classes playerClass);
-        ClassRoles canPerformRole(ClassRoles playerRole, ClassRoles requiredRole)
-        {
-            if ((playerRole & requiredRole) == requiredRole)
-                return requiredRole;
+        static ClassRoles CalculateRoles(Classes playerClass);
+        static RolesPriority getPriority(Classes playerClass, ClassRoles playerRoles);
 
-            return playerRole;
-        }
-
-        RolesPriority getPriority(Classes playerClass, ClassRoles playerRoles);
+        static uint32 GetMaximumDPSSlots() { return 3u; }
 
     private:
         typedef std::map<ObjectGuid, LFGPlayerQueueInfo> QueuedPlayersMap;
@@ -118,18 +116,10 @@ class LFGQueue
         typedef std::map<uint32, LFGGroupQueueInfo> QueuedGroupsMap;
         QueuedGroupsMap m_QueuedGroups;
 
-        uint32 findInArea(uint32 areaId)
-        {
-            uint32 m_QueueSize = 0;
+        void FindInArea(std::list<ObjectGuid>& players, uint32 area, uint32 team, ObjectGuid const& exclude);
+        bool FindRoleToGroup(ObjectGuid playerGuid, Group* group, ClassRoles role);
 
-            for(QueuedPlayersMap::iterator itr = m_QueuedPlayers.begin(); itr != m_QueuedPlayers.end(); ++itr)
-            {
-                if(itr->second.areaId == areaId)
-                    ++m_QueueSize;
-            }
-
-            return m_QueueSize;
-        }
+        uint32 _groupSize = 5;
 };
 
 #define sLFGMgr MaNGOS::Singleton<LFGQueue>::Instance()

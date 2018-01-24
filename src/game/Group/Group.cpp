@@ -39,6 +39,8 @@
 #include "LFGMgr.h"
 #include "LFGHandler.h"
 
+#include <array>
+
 GroupMemberStatus GetGroupMemberStatus(const Player *member = nullptr)
 {
     uint8 flags = MEMBER_STATUS_OFFLINE;
@@ -341,11 +343,7 @@ bool Group::AddMember(ObjectGuid guid, const char* name, uint8 joinMethod)
 
         if (isInLFG())
         {
-            if (joinMethod == GROUP_LFG)
-            {
-
-            }
-            else
+            if (joinMethod != GROUP_LFG)
             {
                 player->GetSession()->SendMeetingstoneSetqueue(m_LFGAreaId, MEETINGSTONE_STATUS_JOINED_QUEUE);
 
@@ -543,28 +541,34 @@ void Group::Disband(bool hideDestroy)
 void Group::CalculateLFGRoles(LFGGroupQueueInfo& data)
 {
     uint32 m_initRoles = (LFG_ROLE_TANK | LFG_ROLE_DPS | LFG_ROLE_HEALER);
-    std::vector<ObjectGuid> m_processed;
     uint32 dpsCount = 0;
+
+    static std::array<ClassRoles, 3> PotentialRoles =
+    {
+        LFG_ROLE_TANK,
+        LFG_ROLE_HEALER,
+        LFG_ROLE_DPS
+    };
+
+    std::list<ObjectGuid> processed;
 
     for (member_citerator citr = GetMemberSlots().begin(); citr != GetMemberSlots().end(); ++citr)
     {
-        ClassRoles lfgRole;
+        Classes playerClass = (Classes)sObjectMgr.GetPlayerClassByGUID(citr->guid);
+        ClassRoles lfgRole = LFGQueue::CalculateRoles(playerClass);
 
-        lfgRole = sLFGMgr.CalculateRoles((Classes)sObjectMgr.GetPlayerClassByGUID(citr->guid));
-
-        if ((sLFGMgr.canPerformRole(lfgRole, LFG_ROLE_TANK) & m_initRoles) == LFG_ROLE_TANK && !inLFGGroup(m_processed, citr->guid))
+        for (ClassRoles role : PotentialRoles)
         {
-            FillPremadeLFG(citr->guid, LFG_ROLE_TANK, m_initRoles, dpsCount, m_processed);
-        }
+            // We can't fulfill this role as our class, skip it
+            if (!(lfgRole & role))
+                continue;
 
-        if ((sLFGMgr.canPerformRole(lfgRole, LFG_ROLE_HEALER) & m_initRoles) == LFG_ROLE_HEALER && !inLFGGroup(m_processed, citr->guid))
-        {
-            FillPremadeLFG(citr->guid, LFG_ROLE_HEALER, m_initRoles, dpsCount, m_processed);
-        }
-
-        if ((sLFGMgr.canPerformRole(lfgRole, LFG_ROLE_DPS) & m_initRoles) == LFG_ROLE_DPS && !inLFGGroup(m_processed, citr->guid))
-        {
-            FillPremadeLFG(citr->guid, LFG_ROLE_DPS, m_initRoles, dpsCount, m_processed);
+            if ((role & m_initRoles) == role)
+            {
+                // If we occupy the slot, don't test other roles
+                if (FillPremadeLFG(citr->guid, playerClass, role, m_initRoles, dpsCount, processed))
+                    break;
+            }
         }
     }
 
@@ -572,94 +576,59 @@ void Group::CalculateLFGRoles(LFGGroupQueueInfo& data)
     data.dpsCount = dpsCount;
 }
 
-void Group::FillPremadeLFG(ObjectGuid plrGuid, ClassRoles requiredRole, uint32& InitRoles, uint32& DpsCount, std::vector<ObjectGuid>& playersProcessed)
+bool Group::FillPremadeLFG(const ObjectGuid& plrGuid, Classes playerClass, ClassRoles requiredRole, uint32& InitRoles,
+    uint32& DpsCount, std::list<ObjectGuid>& processed)
 {
-    Classes plrClass = (Classes)sObjectMgr.GetPlayerClassByGUID(plrGuid);
+    // We grant the role unless someone else in the group has higher priority for it
+    bool grantRole = true;
 
-    if (sLFGMgr.getPriority(plrClass, requiredRole) >= LFG_PRIORITY_HIGH && !inLFGGroup(playersProcessed, plrGuid))
+    RolesPriority priority = LFGQueue::getPriority(playerClass, requiredRole);
+
+    for (member_citerator citr = GetMemberSlots().begin(); citr != GetMemberSlots().end(); ++citr)
     {
-        switch (requiredRole)
-        {
+        if (plrGuid == citr->guid)
+            continue;
+
+        // Player is already allocated
+        if (std::find(std::begin(processed), std::end(processed), citr->guid) != processed.end())
+            continue;
+
+        Classes memberClass = (Classes)sObjectMgr.GetPlayerClassByGUID(citr->guid);
+
+        // Someone else has higher prio
+        if (priority < LFGQueue::getPriority(memberClass, requiredRole))
+            return false;
+    }
+
+    switch (requiredRole)
+    {
         case LFG_ROLE_TANK:
         {
             InitRoles &= ~LFG_ROLE_TANK;
             break;
         }
-
         case LFG_ROLE_HEALER:
         {
             InitRoles &= ~LFG_ROLE_HEALER;
             break;
         }
-
         case LFG_ROLE_DPS:
         {
-            if (DpsCount < 3)
+            if (DpsCount < LFGQueue::GetMaximumDPSSlots())
             {
                 ++DpsCount;
 
-                if (DpsCount >= 3)
+                if (DpsCount >= LFGQueue::GetMaximumDPSSlots())
                     InitRoles &= ~LFG_ROLE_DPS;
             }
             break;
         }
         default:
             break;
-        }
-        playersProcessed.push_back(plrGuid);
     }
-    else if (sLFGMgr.getPriority(plrClass, requiredRole) < LFG_PRIORITY_HIGH && !inLFGGroup(playersProcessed, plrGuid))
-    {
-        bool hasFoundPriority = false;
+    processed.push_back(plrGuid);
 
-        for (member_citerator citr = GetMemberSlots().begin(); citr != GetMemberSlots().end(); ++citr)
-        {
-            if (plrGuid == citr->guid)
-                continue;
-
-            Classes memberClass = (Classes)sObjectMgr.GetPlayerClassByGUID(plrGuid);
-
-            if (sLFGMgr.getPriority(plrClass, requiredRole) < sLFGMgr.getPriority(memberClass, requiredRole) && !inLFGGroup(playersProcessed, plrGuid))
-            {
-                hasFoundPriority = true;
-            }
-        }
-
-        if (!hasFoundPriority)
-        {
-            switch (requiredRole)
-            {
-            case LFG_ROLE_TANK:
-            {
-                InitRoles &= ~LFG_ROLE_TANK;
-                break;
-            }
-
-            case LFG_ROLE_HEALER:
-            {
-                InitRoles &= ~LFG_ROLE_HEALER;
-                break;
-
-            }
-
-            case LFG_ROLE_DPS:
-            {
-                if (DpsCount < 3)
-                {
-                    ++DpsCount;
-
-                    if (DpsCount >= 3)
-                        InitRoles &= ~LFG_ROLE_DPS;
-                }
-                break;
-            }
-            default:
-                break;
-            }
-
-            playersProcessed.push_back(plrGuid);
-        }
-    }
+    return true;
 }
 
 /*********************************************************/
