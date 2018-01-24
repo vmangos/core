@@ -57,8 +57,10 @@ void MasterPlayer::LoadPlayer(Player* player)
 
 void MasterPlayer::SaveToDB()
 {
+    CharacterDatabase.BeginTransaction(GetGUIDLow());
     SaveActions();
     SaveMails();
+    CharacterDatabase.CommitTransaction();
 }
 
 void MasterPlayer::Update()

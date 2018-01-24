@@ -496,7 +496,7 @@ void WorldSession::HandleMailReturnToSender(WorldPacket & recv_data)
 
     //we can return mail now
     //so firstly delete the old one
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(pl->GetGUIDLow());
     CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", mailId);
     // needed?
     CharacterDatabase.PExecute("DELETE FROM mail_items WHERE mail_id = '%u'", mailId);
@@ -688,7 +688,7 @@ void WorldSession::HandleMailTakeMoney(WorldPacket & recv_data)
     pl->MarkMailsUpdated();
 
     // save money and mail to prevent cheating
-    CharacterDatabase.BeginTransaction();
+    CharacterDatabase.BeginTransaction(loadedPlayer->GetGUIDLow());
     loadedPlayer->SaveGoldToDB();
     pl->SaveMails();
     CharacterDatabase.CommitTransaction();

@@ -393,8 +393,6 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     it->SaveToDB();                                         // recursive and not have transaction guard into self, not in inventiory and can be save standalone
     AH->SaveToDB();
     pl->SaveInventoryAndGoldToDB();
-    // Note that if the player relogs before the transaction executes, the item will both
-    // be on the AH and in their inventory. Must check this on relog
     CharacterDatabase.CommitTransaction();
 
     SendAuctionCommandResult(AH, AUCTION_STARTED, AUCTION_OK);
