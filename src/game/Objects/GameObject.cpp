@@ -2253,7 +2253,13 @@ void GameObject::Despawn()
     {
         if (m_spawnedByDefault)
         {
-            SetRespawnTime(GetRespawnDelay());
+            // TODO: Research this more. Some GOBJs don't set a respawn delay time, but call ::Despawn
+            // If this happens, they will respawn instantly which is most likely undesired behaviour
+            uint32 respawnTime = GetRespawnDelay();
+            if (!respawnTime)
+                respawnTime = data->GetRandomRespawnTime();
+
+            SetRespawnTime(respawnTime);
         }
         else
         {
