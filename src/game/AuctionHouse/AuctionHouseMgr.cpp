@@ -631,45 +631,53 @@ void AuctionHouseObject::Update()
     time_t curTime = sWorld.GetGameTime();
     ///- Handle expired auctions
     AuctionEntryMap::iterator next;
+    // Store a ref to the entry and use it rather than derefencing the itr.
+    // Also required to properly erase the itr and delete the entry if
+    // necessary
+    AuctionEntry* entry = nullptr;
     for (AuctionEntryMap::iterator itr = AuctionsMap.begin(); itr != AuctionsMap.end(); itr = next)
     {
-        if (itr->second->depositTime + 5*60 < curTime) // Locked for 5 minutes on IP to prevent AH snipping
-            itr->second->lockedIpAddress.clear();
+        entry = itr->second;
+        if (entry->depositTime + 5*60 < curTime) // Locked for 5 minutes on IP to prevent AH snipping
+            entry->lockedIpAddress.clear();
 
         next = itr;
         ++next;
-        if (curTime > (itr->second->expireTime))
+        if (curTime > (entry->expireTime))
         {
             ///- Either cancel the auction if there was no bidder
-            if (itr->second->bidder == 0)
-                sAuctionMgr.SendAuctionExpiredMail(itr->second);
+            if (entry->bidder == 0)
+                sAuctionMgr.SendAuctionExpiredMail(entry);
             ///- Or perform the transaction
             else
             {
                 PlayerTransactionData data;
                 data.type = "Bid";
-                data.parts[0].lowGuid = itr->second->owner;
-                data.parts[0].itemsEntries[0] = itr->second->itemTemplate;
-                Item* item = sAuctionMgr.GetAItem(itr->second->itemGuidLow);
+                data.parts[0].lowGuid = entry->owner;
+                data.parts[0].itemsEntries[0] = entry->itemTemplate;
+                Item* item = sAuctionMgr.GetAItem(entry->itemGuidLow);
                 data.parts[0].itemsCount[0] = item ? item->GetCount() : 0;
-                data.parts[0].itemsGuid[0] = itr->second->itemGuidLow;
-                data.parts[1].lowGuid = itr->second->bidder;
-                data.parts[1].money = itr->second->bid;
+                data.parts[0].itemsGuid[0] = entry->itemGuidLow;
+                data.parts[1].lowGuid = entry->bidder;
+                data.parts[1].money = entry->bid;
                 sWorld.LogTransaction(data);
 
                 //we should send an "item sold" message if the seller is online
                 //we send the item to the winner
                 //we send the money to the seller
-                sAuctionMgr.SendAuctionSuccessfulMail(itr->second);
-                sAuctionMgr.SendAuctionWonMail(itr->second);
+                sAuctionMgr.SendAuctionSuccessfulMail(entry);
+                sAuctionMgr.SendAuctionWonMail(entry);
             }
 
             ///- In any case clear the auction
-            itr->second->DeleteFromDB();
-            sAuctionMgr.RemoveAItem(itr->second->itemGuidLow);
-            RemoveAuction(itr->second);
+            entry->DeleteFromDB();
+            sAuctionMgr.RemoveAItem(entry->itemGuidLow);
+            // Invalidates the ref to itr, cannot call delete on itr->second
+            // after removal
+            RemoveAuction(entry);
 
-            delete itr->second;
+            delete entry;
+            entry = nullptr;
         }
     }
 }
