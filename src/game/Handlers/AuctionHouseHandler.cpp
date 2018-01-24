@@ -281,6 +281,14 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     // always return pointer
     AuctionHouseObject* auctionHouse = sAuctionMgr.GetAuctionsMap(auctionHouseEntry);
 
+    uint32 limit = sWorld.getConfig(CONFIG_UINT32_ACCOUNT_CONCURRENT_AUCTION_LIMIT);
+    if (!!limit && auctionHouse->GetAccountAuctionCount(GetAccountId()) >= limit)
+    {
+        ChatHandler(this).SendSysMessage("You have reached the limit of active auctions on your account.");
+        SendAuctionCommandResult(NULL, AUCTION_STARTED, AUCTION_ERR_DATABASE);
+        return;
+    }
+
     // client send time in minutes, convert to common used sec time
     etime *= MINUTE;
 
@@ -357,6 +365,7 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
     AH->itemGuidLow = it->GetObjectGuid().GetCounter();
     AH->itemTemplate = it->GetEntry();
     AH->owner = pl->GetGUIDLow();
+    AH->ownerAccount = pl->GetSession()->GetAccountId();
     AH->startbid = bid;
     AH->bidder = 0;
     AH->bid = 0;
@@ -536,7 +545,7 @@ void WorldSession::HandleAuctionPlaceBid(WorldPacket & recv_data)
         SendAuctionCommandResult(auction, AUCTION_BID_PLACED, AUCTION_OK);
 
         sAuctionMgr.RemoveAItem(auction->itemGuidLow);
-        auctionHouse->RemoveAuction(auction->Id);
+        auctionHouse->RemoveAuction(auction);
         auction->DeleteFromDB();
 
         delete auction;
@@ -617,7 +626,7 @@ void WorldSession::HandleAuctionRemoveItem(WorldPacket & recv_data)
     pl->SaveInventoryAndGoldToDB();
     CharacterDatabase.CommitTransaction();
     sAuctionMgr.RemoveAItem(auction->itemGuidLow);
-    auctionHouse->RemoveAuction(auction->Id);
+    auctionHouse->RemoveAuction(auction);
     delete auction;
 }
 

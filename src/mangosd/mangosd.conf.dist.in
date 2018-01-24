@@ -1257,6 +1257,10 @@ Visibility.AIRelocationNotifyDelay = 1000
 #        Minimum auction deposit size in copper
 #        Default: 0
 #
+#    Auction.AccountConcurrentLimit
+#        Maximum auctions (per auction house, including shared) an account can have posted at once. eg. limit of 100 -> 100 on Alliance auction house, 100 on Neutral auction house
+#        Default: 0
+#
 #    Rate.Honor
 #        Honor gain rate
 #
@@ -1405,6 +1409,7 @@ Rate.Auction.Time = 1
 Rate.Auction.Deposit = 1
 Rate.Auction.Cut = 1
 Auction.Deposit.Min = 0
+Auction.AccountConcurrentLimit = 0
 Rate.Honor = 1
 Rate.Mining.Amount = 1
 Rate.Mining.Next   = 1
