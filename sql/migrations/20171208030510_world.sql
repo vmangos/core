@@ -138,7 +138,7 @@ update creature set position_x = '-7388.353516', position_y = '-956.313293', pos
 
 UPDATE `creature_groups` SET `leaderGUID`=1177494 WHERE `leaderGUID`=1177488;
 UPDATE `creature` SET `spawndist`=0, `MovementType`=2 WHERE `guid` IN (84558, 84625, 84840, 1177486, 1177487);
-
+DELETE FROM `creature_groups` WHERE `memberGUID` IN (84538, 84533);
 
 -- End of migration.
 END IF;
