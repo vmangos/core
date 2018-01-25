@@ -402,6 +402,29 @@ bool LootItem::AllowedForPlayer(Player const* player, WorldObject const* lootTar
     return true;
 }
 
+// Check for group wide item compatibility
+bool LootStoreItem::AllowedForTeam(Loot const& loot) const
+{
+    if (conditionId)
+    {
+        PlayerCondition const* condition = sConditionStorage.LookupEntry<PlayerCondition>(conditionId);
+        if (!condition)
+            return false;
+
+        // Team check
+        Team conditionTeam = condition->GetTeam();
+        if ((conditionTeam == ALLIANCE || conditionTeam == HORDE) && conditionTeam != loot.GetTeam())
+            return false;
+
+        // Check non-player dependant conditions
+        if (PlayerCondition::CanBeUsedWithoutPlayer(conditionId))
+            if (!condition->Meets(nullptr, nullptr, loot.GetLootTarget(), CONDITION_FROM_LOOT))
+                return false;
+    }
+
+    return true;
+}
+
 LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Player* viewer, WorldObject const* lootTarget, bool condition_ok /*= false*/) const
 {
     // ignore looted, FFA (each player get own copy) and not allowed items
@@ -1030,6 +1053,9 @@ LootStoreItem const * LootTemplate::LootGroup::Roll(Loot const& loot) const
 
         for (uint32 i = 0; i < ExplicitlyChanced.size(); ++i) //check each explicitly chanced entry in the template and modify its chance based on quality.
         {
+            if (!ExplicitlyChanced[i].AllowedForTeam(loot))
+                continue;
+
             if (ExplicitlyChanced[i].chance >= 100.0f)
                 return &ExplicitlyChanced[i];
 
@@ -1047,18 +1073,8 @@ LootStoreItem const * LootTemplate::LootGroup::Roll(Loot const& loot) const
         indexesOk.reserve(EqualChanced.size());
         for (size_t i = 0; i < EqualChanced.size(); ++i)
         {
-            uint32 conditionId = EqualChanced[i].conditionId;
-            if (conditionId)
-            {
-                PlayerCondition const* condition = sConditionStorage.LookupEntry<PlayerCondition>(conditionId);
-                if (!condition)
-                    continue;
-                Team conditionTeam = condition->GetTeam();
-                if ((conditionTeam == ALLIANCE || conditionTeam == HORDE) && conditionTeam != loot.GetTeam())
-                    continue;
-                if (!condition->CheckPatch())
-                    continue;
-            }
+            if (!EqualChanced[i].AllowedForTeam(loot))
+                continue;
             indexesOk.push_back(i);
         }
         if (indexesOk.size())

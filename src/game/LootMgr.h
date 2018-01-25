@@ -86,6 +86,7 @@ enum LootSlotType
 class Player;
 class WorldObject;
 class LootStore;
+struct Loot;
 
 struct LootStoreItem
 {
@@ -104,9 +105,9 @@ struct LootStoreItem
         group(_group), needs_quest(_chanceOrQuestChance < 0), maxcount(_maxcount), conditionId(_conditionId)
          {}
 
-    bool Roll(bool rate) const;                             // Checks if the entry takes it's chance (at loot generation)
-    bool IsValid(LootStore const& store, uint32 entry) const;
-                                                            // Checks correctness of values
+    bool Roll(bool rate) const;                                // Checks if the entry takes it's chance (at loot generation)
+    bool IsValid(LootStore const& store, uint32 entry) const;  // Checks correctness of values
+    bool AllowedForTeam(Loot const& loot) const;               // Checks item group compatibility
 };
 
 typedef std::set<uint32> AllowedLooterSet;
@@ -150,7 +151,6 @@ struct QuestItem
         : index(_index), is_looted(_islooted) {}
 };
 
-struct Loot;
 class LootTemplate;
 
 typedef std::vector<QuestItem> QuestItemList;

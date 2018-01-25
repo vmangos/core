@@ -9618,25 +9618,6 @@ bool PlayerCondition::Meets(Player const* player, Map const* map, WorldObject co
     }
 }
 
-// Checks if the patch is valid
-bool PlayerCondition::CheckPatch() const
-{
-    if (m_condition == CONDITION_WOW_PATCH)
-    {
-        switch (m_value2)
-        {
-            case 0:
-                return sWorld.GetWowPatch() == m_value1;
-            case 1:
-                return sWorld.GetWowPatch() >= m_value1;
-            case 2:
-                return sWorld.GetWowPatch() <= m_value1;
-        }
-        return false;
-    }
-    return true;
-}
-
 // Which params must be provided to a Condition
 bool PlayerCondition::CheckParamRequirements(Player const* pPlayer, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const
 {
@@ -9650,6 +9631,7 @@ bool PlayerCondition::CheckParamRequirements(Player const* pPlayer, Map const* m
         case CONDITION_NOT_ACTIVE_GAME_EVENT:
         case CONDITION_ACTIVE_HOLIDAY:
         case CONDITION_NOT_ACTIVE_HOLIDAY:
+        case CONDITION_WOW_PATCH:
             break;
         case CONDITION_AREAID:
         case CONDITION_AREA_FLAG:
