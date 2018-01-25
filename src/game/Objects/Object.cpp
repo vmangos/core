@@ -1604,13 +1604,14 @@ bool WorldObject::GetRandomPoint(float x, float y, float z, float distance, floa
         uint32 moveAllowed = NAV_GROUND | NAV_WATER;
         if (GetTypeId() != TYPEID_PLAYER)
             moveAllowed |= NAV_MAGMA | NAV_SLIME;
-        bool is_water_ok = isType(TYPEMASK_UNIT) ? ((Unit*)this)->CanSwim() : false;
         rand_x = x;
         rand_y = y;
         rand_z = z;
         if (map->GetWalkRandomPosition(GetTransport(), rand_x, rand_y, rand_z, distance, moveAllowed))
         {
-            if (!is_water_ok)
+            // Giant type creatures walk underwater
+            if (isType(TYPEMASK_UNIT) && !ToUnit()->CanSwim() ||
+                IsCreature() && ToCreature()->GetCreatureInfo()->type == CREATURE_TYPE_GIANT)
                 return true;
             // La position renvoyee par le pathfinding est tout au fond de l'eau. On randomise ca un peu ...
             float ground = 0.0f;

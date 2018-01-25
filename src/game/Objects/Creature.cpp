@@ -495,7 +495,8 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT))
         unitFlags |= UNIT_FLAG_IN_COMBAT;
     // Nostalrius: we need this flag to get a proper animation
-    if (CanSwim())
+    // Giant type creatures walk underwater
+    if (CanSwim() && GetCreatureInfo()->type != CREATURE_TYPE_GIANT)
         unitFlags |= UNIT_FLAG_USE_SWIM_ANIMATION;
     SetUInt32Value(UNIT_FIELD_FLAGS, unitFlags);
 
