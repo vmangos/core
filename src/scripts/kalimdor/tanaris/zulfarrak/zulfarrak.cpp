@@ -420,7 +420,8 @@ struct npc_weegli_blastfuseAI : public ScriptedAI
                         pBoom->UseDoorOrButton(explosiveGUID);
                     }
                     uint64 EndDoorGUID = pInstance->GetData64(GO_END_DOOR);
-                    pInstance->DoUseDoorOrButton(EndDoorGUID);
+                    pInstance->DoUseDoorOrButton(EndDoorGUID, 0, true);
+                    pInstance->SetData(EVENT_END_DOOR, DONE);
                     if (Creature* pChief = m_creature->GetMap()->GetCreature(pInstance->GetData64(ENTRY_UKORZ)))
                         DoScriptText(SAY_CHIEF_UKORZ_DOOR, pChief);
                     RunAfterExplosion2();

@@ -18,7 +18,8 @@ enum zfEntries
     GO_END_DOOR = 146084,
 
     EVENT_PYRAMID = 1,
-    EVENT_GAHZRILLA
+    EVENT_GAHZRILLA,
+    EVENT_END_DOOR,
 };
 
 enum zfPyramidPhases

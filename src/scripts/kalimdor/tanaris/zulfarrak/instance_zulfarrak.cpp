@@ -97,6 +97,9 @@ public:
     };
 
     uint32 GahzRillaEncounter;
+    uint32 EndDoorEncounter;
+    std::string strInstData;
+
     uint64 UkorzGUID;
     uint64 ZumrahGUID;
     uint64 BlyGUID;
@@ -113,6 +116,7 @@ public:
 
     void Initialize()
     {
+        EndDoorEncounter = NOT_STARTED;
         GahzRillaEncounter = NOT_STARTED;
     }
 
@@ -161,6 +165,8 @@ public:
         {
             case GO_END_DOOR:
                 EndDoorGUID = pGo->GetGUID();
+                if (EndDoorEncounter == DONE)
+                    pGo->UseDoorOrButton(0, true);
                 break;
         }
     }
@@ -206,7 +212,20 @@ public:
             case EVENT_PYRAMID:
                 PyramidPhase = data;
                 break;
+            case EVENT_END_DOOR:
+                EndDoorEncounter = data;
+                break;
         };
+
+        if (type == EVENT_END_DOOR && data == DONE)
+        {
+            OUT_SAVE_INST_DATA;
+            std::ostringstream saveStream;
+            saveStream << EndDoorEncounter;
+            strInstData = saveStream.str();
+            SaveToDB();
+            OUT_SAVE_INST_DATA_COMPLETE;
+        }
     }
 
     virtual void Update(uint32 diff)
@@ -357,6 +376,27 @@ public:
             }
             addsAtBase.erase(addsAtBase.begin());
         }
+    }
+
+    const char* Save() override
+    {
+        return strInstData.c_str();
+    }
+
+    void Load(const char* chrIn) override
+    {
+        if (!chrIn)
+        {
+            OUT_LOAD_INST_DATA_FAIL;
+            return;
+        }
+
+        OUT_LOAD_INST_DATA(chrIn);
+        std::istringstream loadStream(chrIn);
+        loadStream >> EndDoorEncounter;
+        if (EndDoorEncounter != DONE)
+            EndDoorEncounter = NOT_STARTED;
+        OUT_LOAD_INST_DATA_COMPLETE;
     }
 };
 
