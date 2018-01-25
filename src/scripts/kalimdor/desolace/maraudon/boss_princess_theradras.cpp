@@ -39,6 +39,7 @@ struct boss_ptheradrasAI : public ScriptedAI
     uint32 Boulder_Timer;
     uint32 Thrash_Timer;
     uint32 RepulsiveGaze_Timer;
+    uint32 RestoreTargetTimer;
 
     void Reset()
     {
@@ -46,6 +47,7 @@ struct boss_ptheradrasAI : public ScriptedAI
         Boulder_Timer = 2000;
         Thrash_Timer = 5000;
         RepulsiveGaze_Timer = 23000;
+        RestoreTargetTimer = 0;
     }
 
     void JustDied(Unit* Killer)
@@ -57,6 +59,22 @@ struct boss_ptheradrasAI : public ScriptedAI
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
+
+        // Restore target after casting Boulder
+        if (RestoreTargetTimer)
+        {
+            if (RestoreTargetTimer <= diff)
+            {
+                if (Unit *pTarget = m_creature->getVictim())
+                {
+                    m_creature->SetInFront(pTarget);
+                    m_creature->SetTargetGuid(pTarget->GetObjectGuid());
+                    RestoreTargetTimer = 0;
+                }
+            }
+            else
+                RestoreTargetTimer -= diff;
+        }
 
         //Dustfield_Timer
         if (Dustfield_Timer < diff)
@@ -72,7 +90,12 @@ struct boss_ptheradrasAI : public ScriptedAI
             Unit* target = NULL;
             target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
             if (target)
-                DoCastSpellIfCan(target, SPELL_BOULDER);
+                if (DoCastSpellIfCan(target, SPELL_BOULDER) == CAST_OK)
+                {
+                    m_creature->SetInFront(target);
+                    m_creature->SetTargetGuid(target->GetObjectGuid());
+                    RestoreTargetTimer = 2000 + 750; // cast time + 1/2 gcd ?
+                }
             Boulder_Timer = 10000;
         }
         else Boulder_Timer -= diff;

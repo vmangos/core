@@ -3,6 +3,7 @@
  */
 
 #include "scriptPCH.h"
+#include "maraudon.h"
 
  /*
  * Primordial Behemoth
@@ -78,12 +79,33 @@ CreatureAI* GetAI_npc_primordial_behemoth(Creature* pCreature)
     return new npc_primordial_behemothAI(pCreature);
 }
 
+bool GOHello_go_larva_spewer(Player* pPlayer, GameObject* pGo)
+{
+    ScriptedInstance* pInstance = (ScriptedInstance*)pGo->GetInstanceData();
+
+    if (pGo && pInstance)
+    {
+        // Alternative state = destroyed
+        pGo->SetGoState(GO_STATE_ACTIVE_ALTERNATIVE);
+        // Save state
+        pInstance->SetData(TYPE_LARVA_SPEWER, DONE);
+    }
+
+    // Always return true to avoid continuing GameObject::Use
+    return true;
+}
+
 void AddSC_maraudon()
 {
-    //Script* pNewScript;
+    Script* pNewScript;
 
     //pNewScript = new Script;
     //pNewScript->Name = "npc_primordial_behemoth";
     //pNewScript->GetAI = &GetAI_npc_primordial_behemoth;
     //pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "go_larva_spewer";
+    pNewScript->pGOHello = &GOHello_go_larva_spewer;
+    pNewScript->RegisterSelf();
 }
