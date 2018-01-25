@@ -457,7 +457,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (procSpell && procSpell->Id == 1680)
                         radius = 8.0f;
 
-                    target = SelectRandomUnfriendlyTarget(pVictim, radius);
+                    target = SelectRandomUnfriendlyTarget(pVictim, radius, false, true);
                     if (!target)
                         return SPELL_AURA_PROC_FAILED;
 
@@ -784,7 +784,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
             // Attaques circulaires
             if (dummySpell->Id == 12292)
             {
-                target = SelectRandomUnfriendlyTarget();
+                target = SelectRandomUnfriendlyTarget(nullptr, 5.0f, false, true);
                 if (!target)
                     return SPELL_AURA_PROC_FAILED;
                 triggered_spell_id = 26654;
@@ -882,7 +882,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     if (procSpell && procSpell->Id == 22482)
                         return SPELL_AURA_PROC_FAILED;
 
-                    target = SelectRandomUnfriendlyTarget(pVictim);
+                    target = SelectRandomUnfriendlyTarget(pVictim, 5.0f, false, true);
 
                     if (!target)
                         return SPELL_AURA_PROC_FAILED;

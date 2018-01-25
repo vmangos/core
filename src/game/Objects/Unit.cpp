@@ -9895,7 +9895,7 @@ void Unit::UpdateReactives(uint32 p_time)
     }
 }
 
-Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= NULL*/, float radius /*= ATTACK_DISTANCE*/, bool inFront) const
+Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= NULL*/, float radius /*= ATTACK_DISTANCE*/, bool inFront /*= false*/, bool isValidAttackTarget /*= false*/) const
 {
     std::list<Unit *> targets;
 
@@ -9910,7 +9910,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= NULL*/, float radius /
     // remove not LoS targets
     for (std::list<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if ((!IsWithinLOSInMap(*tIter)) || (inFront && !this->HasInArc(M_PI_F / 2, *tIter)))
+        if ((!IsWithinLOSInMap(*tIter)) || (inFront && !this->HasInArc(M_PI_F / 2, *tIter)) || (isValidAttackTarget && !IsValidAttackTarget(*tIter)))
         {
             std::list<Unit *>::iterator tIter2 = tIter;
             ++tIter;
