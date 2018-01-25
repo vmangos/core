@@ -213,7 +213,10 @@ void WorldSession::HandleMoveWorldportAckOpcode()
     // ignores any movement from the transport object. Triggering
     // `SMSG_STANDSTATE_UPDATE' with its current state resets the camera
     // (implemented in `WorldSession::HandleZoneUpdateOpcode').
-    GetPlayer()->SendHeartBeat(true);
+    if (_clientOS == CLIENT_OS_MAC && GetPlayer()->m_movementInfo.HasMovementFlag(MOVEFLAG_ONTRANSPORT))
+    {
+        GetPlayer()->SendHeartBeat(true);
+    }
 }
 
 void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
