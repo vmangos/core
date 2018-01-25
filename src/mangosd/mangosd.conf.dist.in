@@ -915,6 +915,11 @@ TalentsInspecting = 1
 #        Difference for boss dynamic level with target
 #        Default: 3
 #
+#    SendLootRollUponReconnect
+#         Send active loot roll windows when a player reconnects
+#         Default: 0  - not send
+#                  1  - send
+#
 #    Corpse.EmptyLootShow
 #        If target can have loot (or can be skining after loot) but no loot generated still show loot window
 #        Default: 1 (show)
@@ -996,6 +1001,7 @@ Corpse.Decay.ELITE = 600
 Corpse.Decay.RAREELITE = 1200
 Corpse.Decay.WORLDBOSS = 3600
 Rate.Corpse.Decay.Looted = 0.0
+SendLootRollUponReconnect = 0
 Rate.Creature.Normal.Damage = 1
 Rate.Creature.Elite.Elite.Damage = 1
 Rate.Creature.Elite.RAREELITE.Damage = 1

@@ -341,6 +341,7 @@ class MANGOS_DLL_SPEC Group
 
         void SendLooter(Creature* creature, Player* pLooter);
         void SendLootStartRoll(uint32 CountDown, const Roll &r);
+        void SendLootStartRollsForPlayer(Player* player); // send every active rolls
         void SendLootRoll(ObjectGuid const& targetGuid, uint8 rollNumber, uint8 rollType, const Roll &r);
         void SendLootRollWon(ObjectGuid const& targetGuid, uint8 rollNumber, RollVote rollType, const Roll &r);
         void SendLootAllPassed(const Roll &r);

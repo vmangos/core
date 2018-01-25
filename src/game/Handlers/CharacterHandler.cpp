@@ -742,6 +742,10 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
 
     sObjectMgr.UpdatePlayerCachedPosition(pCurrChar);
 
+    if (sWorld.getConfig(CONFIG_BOOL_SEND_LOOT_ROLL_UPON_RECONNECT) && alreadyOnline)
+        if (Group* pGroup = pCurrChar->GetGroup())
+            pGroup->SendLootStartRollsForPlayer(pCurrChar);
+
     // Update warden speeds
     //if (GetWarden())
         //for (int i = 0; i < MAX_MOVE_TYPE; ++i)

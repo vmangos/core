@@ -834,6 +834,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
             m_callForHelpDist = dist;
         }
 
+        // (msecs)timer used for group loot
+        uint32 GetGroupLootTimer() { return m_groupLootTimer; }
+
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 

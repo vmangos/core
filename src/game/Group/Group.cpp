@@ -925,6 +925,43 @@ void Group::StartLootRoll(Creature* lootTarget, LootMethod method, Loot* loot, u
         delete r;
 }
 
+void Group::SendLootStartRollsForPlayer(Player* pPlayer)
+{
+    if (!pPlayer || !pPlayer->GetSession())
+        return;
+
+    for (Rolls::const_iterator itrRoll = RollId.begin(); itrRoll != RollId.end(); ++itrRoll)
+    {
+        Roll* roll = *itrRoll;
+
+        if (!roll->isValid())
+            continue;
+
+        for (Roll::PlayerVote::const_iterator itrVote = roll->playerVote.begin(); itrVote != roll->playerVote.end(); ++itrVote)
+        {
+            if (itrVote->first != pPlayer->GetObjectGuid() || itrVote->second != ROLL_NOT_EMITED_YET)
+                continue;
+
+            uint32 countDown = 0;
+            if (Creature* pCreature = pPlayer->GetMap()->GetCreature(roll->lootedTargetGUID))
+                countDown = pCreature->GetGroupLootTimer();
+
+            if (!countDown)
+                continue;
+
+            WorldPacket data(SMSG_LOOT_START_ROLL, (8 + 4 + 4 + 4 + 4 + 4));
+            data << roll->lootedTargetGUID;                   // creature guid what we're looting
+            data << uint32(roll->itemSlot);                   // item slot in loot
+            data << uint32(roll->itemid);                     // the itemEntryId for the item that shall be rolled for
+            data << uint32(0);                                // randomSuffix - not used ?
+            data << uint32(roll->itemRandomPropId);           // item random property ID
+            data << uint32(countDown);                        // the countdown time to choose "need" or "greed"
+
+            pPlayer->GetSession()->SendPacket(&data);
+        }
+    }
+}
+
 // called when roll timer expires
 void Group::EndRoll(Loot* loot)
 {
