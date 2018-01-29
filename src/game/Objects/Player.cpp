@@ -19885,13 +19885,13 @@ void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
 
 bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown) 
 {
+    ResetContestedPvP();
     if (hearthCooldown)
     {
         // Initiate hearthstone cooldown
         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
         AddSpellAndCategoryCooldowns(spellInfo, 6948);
     }
-
     return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); 
 }
 

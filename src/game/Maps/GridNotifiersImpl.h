@@ -177,8 +177,7 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
             pAi->AttackedBy(i_check);
         i_check->SetInCombatWith(target);
         target->SetInCombatWith(i_check);
-        if (Player *attackedPlayer = target->GetCharmerOrOwnerPlayerOrPlayerItself())
-            i_check->SetContestedPvP(attackedPlayer);
+        i_check->SetContestedPvP(target);
     }
     // Check target immune to spell or aura
     if (target->IsImmuneToSpell(spellInfo, false) || target->IsImmuneToSpellEffect(spellInfo, eff_index, false))
