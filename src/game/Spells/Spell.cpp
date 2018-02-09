@@ -1566,8 +1566,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                 if (Unit* owner = realCaster->GetOwner())
                     owner->SetInCombatWith(unit);
 
-                if (Player *attackedPlayer = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                    realCaster->SetContestedPvP(attackedPlayer);
+                realCaster->SetContestedPvP(unit);
             }
         }
         else

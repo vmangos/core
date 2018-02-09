@@ -699,8 +699,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             }
 
             //PMonsterSay("-> Absorb %5u | Resist %5u. AttackType %u", cleanDamage->absorb, cleanDamage->resist, cleanDamage->hitOutCome);
-            if (Player* attackedPlayer = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself())
-                SetContestedPvP(attackedPlayer);
+            SetContestedPvP(pVictim);
         }
         return 0;
     }
@@ -779,8 +778,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_UNIT)
             pVictim->ToCreature()->ResetLastDamageTakenTime();
 
-        if (Player* attackedPlayer = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself())
-            SetContestedPvP(attackedPlayer);
+        SetContestedPvP(pVictim);
     }
     if (pVictim->GetTypeId() == TYPEID_UNIT)
         pVictim->ToCreature()->CountDamageTaken(damage, GetCharmerOrOwnerOrOwnGuid().IsPlayer() || pVictim == this);
@@ -10104,11 +10102,14 @@ Aura* Unit::GetDummyAura(uint32 spell_id) const
     return nullptr;
 }
 
-void Unit::SetContestedPvP(Player *attackedPlayer)
+void Unit::SetContestedPvP(Unit *attackedUnit)
 {
     Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
 
-    if (!player || (attackedPlayer && (attackedPlayer == player || player->IsInDuelWith(attackedPlayer))))
+    if (!player || (attackedUnit && attackedUnit->IsPlayer() && (attackedUnit == player || player->IsInDuelWith(attackedUnit->ToPlayer()))))
+        return;
+
+    if (attackedUnit && attackedUnit->GetTypeId() == TYPEID_UNIT && !attackedUnit->IsPvP())
         return;
 
     player->SetContestedPvPTimer(30000);

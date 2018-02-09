@@ -191,6 +191,48 @@ void guardAI::UpdateAI(const uint32 diff)
     }
 }
 
+void guardAI::MoveInLineOfSight(Unit* pWho)
+{
+    if (!m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho)))
+        return;
+
+    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack())
+    {
+        // Attack hostile targets
+        if (m_creature->IsHostileTo(pWho) && pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+        {
+            if (!m_creature->getVictim())
+                AttackStart(pWho);
+            else if (m_creature->GetMap()->IsDungeon())
+            {
+                pWho->SetInCombatWith(m_creature);
+                m_creature->AddThreat(pWho);
+            }
+        }
+        // Protect nearby friendly NPCs
+        else if (!m_creature->getVictim() && pWho->isInCombat() && pWho->GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            if (pWho->getVictim() && pWho->getVictim()->IsCreature() && m_creature->IsFriendlyTo(pWho->getVictim()))
+            {
+                pWho->SetContestedPvP();
+            }
+            else if (!pWho->getAttackers().empty())
+            {
+                for (Unit::AttackerSet::const_iterator itr = pWho->getAttackers().begin(); itr != pWho->getAttackers().end();)
+                {
+                    if ((*itr)->IsCreature() && m_creature->IsFriendlyTo((*itr)))
+                    {
+                        pWho->SetContestedPvP();
+                        break;
+                    }
+                    else
+                        ++itr;
+                }
+            }
+        }
+    }
+}
+
 void guardAI::DoReplyToTextEmote(uint32 em)
 {
     switch(em)
