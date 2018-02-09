@@ -253,67 +253,39 @@ ObjectAccessor::AddCorpsesToGrid(GridPair const& gridpair, GridType& grid, Map* 
     }
 }
 
-Corpse*
-ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, bool insignia)
+void ObjectAccessor::ConvertCorpseForPlayer(ObjectGuid player_guid, Player* looter)
 {
     ASSERT(player_guid.IsPlayer());
 
     Corpse *corpse = GetCorpseForPlayerGUID(player_guid);
     if (!corpse)
-        return NULL;
+        return;
 
     // remove corpse from player_guid -> corpse map
     RemoveCorpse(corpse);
 
     // remove resurrectable corpse from grid object registry (loaded state checked into call)
     // do not load the map if it's not loaded
-    //Map *map = corpse->FindMap();
     Map *map = sMapMgr.FindMap(corpse->GetMapId(), corpse->GetInstanceId());
+
+    // If the corpse is not in the same map as the player, then we cannot safely remove
+    // the corpse now. Instead, add it to a list in the map for delayed processing.
+    // This is because the map the corpse belongs to may be peforming grid operations
+    // such as visibility updates and removing it here will destroy the grid ref,
+    // causing a crash.
     if (map)
-        map->Remove(corpse, false);
-
-    // remove corpse from DB
-    corpse->DeleteFromDB();
-
-    Corpse *bones = NULL;
-    // create the bones only if the map and the grid is loaded at the corpse's location
-    // ignore bones creating option in case insignia
-    if (map && (insignia ||
-                (map->IsBattleGround() ? sWorld.getConfig(CONFIG_BOOL_DEATH_BONES_BG) : sWorld.getConfig(CONFIG_BOOL_DEATH_BONES_WORLD))) &&
-            !map->IsRemovalGrid(corpse->GetPositionX(), corpse->GetPositionY()))
     {
-        // Create bones, don't change Corpse
-        bones = new Corpse;
-        bones->Create(corpse->GetGUIDLow());
-        if (Player* owner = FindPlayer(player_guid))
-            bones->SetFactionTemplate(owner->getFactionTemplateEntry());
-
-        for (int i = 3; i < CORPSE_END; ++i)                    // don't overwrite guid and object type
-            bones->SetUInt32Value(i, corpse->GetUInt32Value(i));
-
-        bones->SetGrid(corpse->GetGrid());
-        bones->Relocate(corpse->GetPositionX(), corpse->GetPositionY(), corpse->GetPositionZ(), corpse->GetOrientation());
-
-        bones->SetUInt32Value(CORPSE_FIELD_FLAGS, CORPSE_FLAG_UNK2 | CORPSE_FLAG_BONES);
-        bones->SetGuidValue(CORPSE_FIELD_OWNER, player_guid);
-
-        for (int i = 0; i < EQUIPMENT_SLOT_END; ++i)
-        {
-            if (corpse->GetUInt32Value(CORPSE_FIELD_ITEM + i))
-                bones->SetUInt32Value(CORPSE_FIELD_ITEM + i, 0);
-        }
-
-        // add bones in grid store if grid loaded where corpse placed
-        map->Add(bones);
-        Guard guard(i_corpseGuard);
-        i_player2corpse[bones->GetObjectGuid()] = bones;
-        AddObject(bones);
+        map->AddCorpseToRemove(corpse, looter ? looter->GetObjectGuid() : ObjectGuid());
     }
+    else
+    {
+        // all references to the corpse should be removed at this point if it is
+        // not being deleted in the map itself
+        // remove corpse from DB
+        corpse->DeleteFromDB();
 
-    // all references to the corpse should be removed at this point
-    delete corpse;
-
-    return bones;
+        delete corpse;
+    }
 }
 
 void ObjectAccessor::RemoveOldCorpses()
@@ -325,26 +297,9 @@ void ObjectAccessor::RemoveOldCorpses()
         next = itr;
         ++next;
 
-        if (itr->first.IsCorpse())
-        {
-            Corpse* corpse = HashMapHolder<Corpse>::Find(itr->first);
-            if (corpse)
-            {
-                if (!corpse->IsExpired(now))
-                    continue;
-                RemoveObject(corpse);
-                Map *map = sMapMgr.FindMap(corpse->GetMapId(), corpse->GetInstanceId());
-                if (map)
-                    map->Remove(corpse, true);
-            }
-            i_player2corpse.erase(itr);
-        }
-        else
-        {
-            if (!itr->second->IsExpired(now))
-                continue;
-            ConvertCorpseForPlayer(itr->first);
-        }
+        if (!itr->second->IsExpired(now))
+            continue;
+        ConvertCorpseForPlayer(itr->first);
     }
 }
 

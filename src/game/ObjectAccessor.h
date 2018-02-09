@@ -144,7 +144,7 @@ class MANGOS_DLL_DECL ObjectAccessor : public MaNGOS::Singleton<ObjectAccessor, 
         void RemoveCorpse(Corpse *corpse);
         void AddCorpse(Corpse* corpse);
         void AddCorpsesToGrid(GridPair const& gridpair,GridType& grid,Map* map);
-        Corpse* ConvertCorpseForPlayer(ObjectGuid player_guid, bool insignia = false);
+        void ConvertCorpseForPlayer(ObjectGuid player_guid, Player* looter = nullptr);
         void RemoveOldCorpses();
 
         // For call from Player/Corpse AddToWorld/RemoveFromWorld only

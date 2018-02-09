@@ -6200,7 +6200,8 @@ void Spell::EffectSpiritHeal(SpellEffectIndex /*eff_idx*/)
 void Spell::EffectSkinPlayerCorpse(SpellEffectIndex eff_idx)
 {
     DEBUG_LOG("Effect: SkinPlayerCorpse");
-    if (m_caster->GetTypeId() != TYPEID_PLAYER)
+    Player* playerCaster = m_caster->ToPlayer();
+    if (!playerCaster)
         return;
 
     Unit *target = unitTarget;
@@ -6209,8 +6210,8 @@ void Spell::EffectSkinPlayerCorpse(SpellEffectIndex eff_idx)
     if (!target)
     {
         ASSERT(corpseTarget);
-        Corpse *bones = sObjectAccessor.ConvertCorpseForPlayer(corpseTarget->GetOwnerGuid(), true);
-        m_caster->ToPlayer()->SendLoot((bones?bones:corpseTarget)->GetObjectGuid(), LOOT_INSIGNIA);
+        sObjectAccessor.ConvertCorpseForPlayer(corpseTarget->GetOwnerGuid(), playerCaster);
+        playerCaster->SendLoot(corpseTarget->GetObjectGuid(), LOOT_INSIGNIA);
         DEBUG_LOG("Effect SkinPlayerCorpse: corpse owner was not found");
         return;
     }
@@ -6218,7 +6219,7 @@ void Spell::EffectSkinPlayerCorpse(SpellEffectIndex eff_idx)
     if (target->GetTypeId() != TYPEID_PLAYER || target->isAlive())
         return;
 
-    ((Player*)target)->RemovedInsignia((Player*)m_caster, corpseTarget);
+    ((Player*)target)->RemovedInsignia(playerCaster, corpseTarget);
 
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(target->GetObjectGuid()));
 }
