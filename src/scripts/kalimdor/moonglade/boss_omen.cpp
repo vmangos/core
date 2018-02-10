@@ -72,7 +72,7 @@ void boss_omenAI::OnFireworkLaunch(Unit* pSummoner)
     {
         ++OmenData.m_uiFireworksCount;
 
-        if (OmenData.m_uiFireworksCount < 30)
+        if (OmenData.m_uiFireworksCount < 20)
             return;
 
         if (OmenData.m_uiNextRespawn < time(nullptr))

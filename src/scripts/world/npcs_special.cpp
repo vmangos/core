@@ -1763,8 +1763,8 @@ struct FireworkStruct
     bool m_bIsCluster;
 };
 
-const FireworkStruct Fireworks[] =
-{
+const std::array<FireworkStruct, 25> Fireworks =
+{{
     { 15872, {26357, 26303, 26302, 26300, 26301}, true }, // Blue Firework Cluster
     { 15873, {26360, 26308, 26307, 26306, 26305}, true }, // Red Firework Cluster
     { 15874, {26358, 26312, 26311, 26310, 26309}, true }, // Green Firework Cluster
@@ -1790,9 +1790,9 @@ const FireworkStruct Fireworks[] =
     { 15915, {26510, 26509, 26508, 26507, 26506}, true }, // Large White Firework Cluster
     { 15916, {26515, 26514, 26513, 26512, 26511}, true }, // Large Yellow Firework Cluster
     { 15918, {26487, 26509, 26508, 26507, 26483}, true }, // Lucky Rocket Cluster
-};
+}};
 
-const uint32 Launcher[] = { 180772, 180859, 180869, 180874, 180771, 180850, 180868 };
+const std::array<uint32, 7> Launcher = {{ 180772, 180859, 180869, 180874, 180771, 180850, 180868 }};
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1824,7 +1824,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
 
     void IsUsable()
     {
-        for (uint8 i = 0; i < 25; ++i)
+        for (uint8 i = 0; i < Fireworks.size(); ++i)
         {
             if (Fireworks[i].m_uiNpcEntry == m_creature->GetEntry())
             {
@@ -1841,7 +1841,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
         if (!m_bExist || m_bDone)
             return;
 
-        for (uint8 l = 0; l < 7; ++l)
+        for (uint8 l = 0; l < Launcher.size(); ++l)
         {
             if (auto pGo = GetClosestGameObjectWithEntry(m_creature, Launcher[l], CONTACT_DISTANCE))
             {
@@ -1892,7 +1892,7 @@ struct npc_pats_firework_guyAI : ScriptedAI
                 pSummoner->CastedCreatureOrGO(Fireworks[m_uiIndex].m_bIsCluster ? GO_CLUSTER_LAUNCHER : GO_FIREWORK_LAUNCHER, ObjectGuid(), 0);
         }
 
-        if (GetClosestGameObjectWithEntry(m_creature, GO_OMEN_CLUSTER_LAUNCHER, CONTACT_DISTANCE))
+        if (GetClosestGameObjectWithEntry(m_creature, GO_OMEN_CLUSTER_LAUNCHER, INTERACTION_DISTANCE))
             boss_omenAI::OnFireworkLaunch(m_creature);
 
         m_bDone = true;
