@@ -2834,14 +2834,22 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
     mob_HiveRegal_HunterKillerAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
+        m_bReachedCamp = false;
+        m_uiMoveTimer = 0;
+        m_uiWaypoint = 0;
+        pCreature->setFaction(35);
     }
 
     uint32 m_uiThunderClapTimer;
     uint32 m_uiChargeTimer;
     uint32 m_uiCleaveTimer;
     uint32 m_uiFearTimer;
+    uint32 m_uiMoveTimer;
+    uint32 m_uiWaypoint;
 
-    void Reset()
+    bool m_bReachedCamp;
+
+    void Reset() override
     {
         m_uiThunderClapTimer = 17000;
         m_uiChargeTimer = urand(15000, 20000);
@@ -2867,8 +2875,39 @@ struct mob_HiveRegal_HunterKillerAI : public ScriptedAI
         return NULL;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
+        if (!m_bReachedCamp)
+        {
+            if (m_uiMoveTimer < uiDiff)
+            {
+                if (m_uiWaypoint == HUNTERKILLER_WAYPOINTS_NUMBER)
+                {
+                    m_creature->setFaction(14);
+                    if (Creature* krug = GetClosestCreatureWithEntry(m_creature, NPC_KRUG_SKULLSPLIT, 50.0f))
+                        AttackStart(krug);
+
+                    // Update home position to the camp in the case that the killer evades for whatever reason
+                    m_creature->SetHomePosition(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), m_creature->GetOrientation());
+                    m_bReachedCamp = true;
+                }
+                else
+                {
+                    float X = 0.0f;
+                    float Y = 0.0f;
+                    m_creature->GetMotionMaster()->MovePoint(0, HunterKillerWaypoint[m_uiWaypoint].X, HunterKillerWaypoint[m_uiWaypoint].Y, HunterKillerWaypoint[m_uiWaypoint].Z);
+                    X = m_creature->GetPositionX() - HunterKillerWaypoint[m_uiWaypoint].X;
+                    Y = m_creature->GetPositionY() - HunterKillerWaypoint[m_uiWaypoint].Y;
+                    m_uiMoveTimer = sqrt((X * X) + (Y * Y)) / (m_creature->GetSpeed(MOVE_WALK) * 0.003f);
+                }
+                m_uiWaypoint++;
+            }
+            else
+                m_uiMoveTimer -= uiDiff;
+
+            return;
+        }
+
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
@@ -2933,10 +2972,13 @@ typedef enum
     EVENT_COMPLETE
 } FieldDutyPaperEventStatus;
 
+/**
+ * Originally written by Ivina & Malkins < Nostalrius >
+ * Various improvements by additional authors
+ */
 
 struct npc_Krug_SkullSplitAI : public ScriptedAI
 {
-    /* Written by Ivina & Malkins < Nostalrius > */
     npc_Krug_SkullSplitAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
@@ -2945,24 +2987,21 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
     FieldDutyPaperEventStatus eEventStatus;
     uint32 m_uiEventResetTimer;
-    uint32 m_uiSpeachNum;
+    uint32 m_uiSpeechNum;
     uint32 m_uiGruntSpeachTimer;
     uint32 m_uiMoveTimer;
     uint32 InitTimer;
-    uint32 m_uiSpeachTimer;
+    uint32 m_uiSpeechTimer;
     bool m_bAlreadyMoved;
     bool m_bIsDoingSpeach;
     bool m_bGruntSpeech;
     ObjectGuid m_uiShaiGUID;
     ObjectGuid m_uiMerokGUID;
     ObjectGuid m_uiHunterKillerGUID;
-    int waypoint;
 
-    void Reset()
+    void Reset() override
     {
     }
-
-    /* Custom methods */
 
     FieldDutyPaperEventStatus GetEventStatus()
     {
@@ -2971,15 +3010,14 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
 
     void ResetEvent()
     {
-        // m_creature->MonsterTextEmote("reset", NULL); // pour debug
         eEventStatus = EVENT_NOT_STARTED;
         if (Creature* pHunterKiller = m_creature->GetMap()->GetCreature(m_uiHunterKillerGUID))
         {
             pHunterKiller->ForcedDespawn();
             pHunterKiller->AddObjectToRemoveList();
         }
-        m_uiSpeachTimer = 0;
-        m_uiSpeachNum = 0;
+        m_uiSpeechTimer = 0;
+        m_uiSpeechNum = 0;
         m_uiHunterKillerGUID.Clear();
         m_uiEventResetTimer = 120000;
         m_bAlreadyMoved = true;
@@ -2988,7 +3026,8 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         m_uiMoveTimer = 10000;
         ResetOtherNPCsPosition();
         InitTimer = 2000;
-        waypoint = 0;
+
+        //m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
     void StartEvent()
@@ -2998,8 +3037,8 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
             DoScriptText(SAY_LINE_1, m_creature);
 
             m_uiGruntSpeachTimer = 3000;
-            m_uiSpeachTimer = 10000;
-            m_uiSpeachNum = 0;
+            m_uiSpeechTimer = 10000;
+            m_uiSpeechNum = 0;
             m_bIsDoingSpeach = true;
             m_bGruntSpeech = false;
 
@@ -3008,12 +3047,15 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
                                       TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 450000, true);
             if (pHunterKiller)
             {
+                pHunterKiller->SetRespawnDelay(460);
                 eEventStatus = EVENT_STARTED;
                 m_bAlreadyMoved = false;
                 m_uiHunterKillerGUID = pHunterKiller->GetObjectGuid();
                 InitOtherNPCsGuids();
                 pHunterKiller->setFaction(35);
             }
+
+            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         }
     }
 
@@ -3023,6 +3065,8 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         eEventStatus = EVENT_COMPLETE;
         m_bIsDoingSpeach = false;
         m_bGruntSpeech = true;
+
+        m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
     }
 
     void InitOtherNPCsGuids()
@@ -3046,40 +3090,38 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
             pShai->GetMotionMaster()->MovePoint(0, SHAI_SPAWN_POS_X, SHAI_SPAWN_POS_Y, SHAI_SPAWN_POS_Z);
     }
 
-    /* Standart AI methods */
-    void SummonedCreatureJustDied(Creature* pSummoned)
+    void SummonedCreatureJustDied(Creature* pSummoned) override
     {
-
         if (pSummoned->GetObjectGuid() == m_uiHunterKillerGUID)
         {
-            // m_creature->MonsterTextEmote("SumCreaJustDied", NULL); // pour debug
             CompleteEvent();
         }
     }
 
-    void SummonedCreatureDespawn(Creature* pSummoned)
+    void SummonedCreatureDespawn(Creature* pSummoned) override
     {
         if (pSummoned->GetObjectGuid() == m_uiHunterKillerGUID && eEventStatus != EVENT_COMPLETE)
         {
-            // m_creature->MonsterTextEmote("SumCreaDespawn", NULL); // pour debug
             ResetEvent();
         }
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
-        // m_creature->MonsterTextEmote("JustDied", NULL); // pour debug
         ResetEvent();
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
-        /* Event complete state is lasting 30 sec then event is reset */
+        /**
+         * Note: The blizzlike behaviour here is probably to require the Hunter-Killer
+         * to be killed much more often than our current timers. It'd be pretty aids
+         * killing it every run though or requiring many players to wait each attempt.
+         */
         if (eEventStatus == EVENT_COMPLETE)
         {
             if (m_uiEventResetTimer <= uiDiff)
             {
-                // m_creature->MonsterTextEmote("CompleteEnd", NULL); // pour debug
                 ResetEvent();
             }
             else
@@ -3089,39 +3131,39 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         /* Speech */
         if (m_bIsDoingSpeach)
         {
-            if (m_uiSpeachTimer < uiDiff)
+            if (m_uiSpeechTimer < uiDiff)
             {
-                switch (m_uiSpeachNum)
+                switch (m_uiSpeechNum)
                 {
                     case 0:
                         // 8 seconds till next line
                         DoScriptText(SAY_LINE_2, m_creature);
-                        m_uiSpeachTimer = 10000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 10000;
+                        ++m_uiSpeechNum;
                         break;
                     case 1:
                         // 8 seconds till next line
                         DoScriptText(SAY_LINE_3, m_creature);
-                        m_uiSpeachTimer = 10000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 10000;
+                        ++m_uiSpeechNum;
                         break;
                     case 2:
                         // 8 seconds till next line
                         DoScriptText(SAY_LINE_4, m_creature);
-                        m_uiSpeachTimer = 10000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 10000;
+                        ++m_uiSpeechNum;
                         break;
                     case 3:
                         // 6,5 seconds till next line
                         DoScriptText(SAY_LINE_5, m_creature);
-                        m_uiSpeachTimer = 6500;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 6500;
+                        ++m_uiSpeechNum;
                         break;
                     case 4:
                         // 2 seconds till next line
                         DoScriptText(SAY_LINE_6, m_creature);
-                        m_uiSpeachTimer = 1000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 1000;
+                        ++m_uiSpeechNum;
                         break;
                     case 5:
                         if (Creature* pMerok = m_creature->GetMap()->GetCreature(m_uiMerokGUID))
@@ -3131,17 +3173,17 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
                             pShai->GetMotionMaster()->MovePoint(0, SHAI_DEST_POS_X, SHAI_DEST_POS_Y, SHAI_DEST_POS_Z);
                         // 7 seconds till next line
                         DoScriptText(SAY_LINE_7, m_creature);
-                        m_uiSpeachTimer = 6000;
-                        ++m_uiSpeachNum;
+                        m_uiSpeechTimer = 6000;
+                        ++m_uiSpeechNum;
                         break;
                     case 6:
                         DoScriptText(SAY_LINE_8, m_creature);
-                        ++m_uiSpeachNum;
+                        ++m_uiSpeechNum;
                         break;
                 }
             }
             else
-                m_uiSpeachTimer -= uiDiff;
+                m_uiSpeechTimer -= uiDiff;
         }
 
         /* Grunt */
@@ -3166,34 +3208,6 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
                 m_uiGruntSpeachTimer -= uiDiff;
         }
 
-        /* Move */
-        if ((eEventStatus == EVENT_STARTED) && (waypoint <= HUNTERKILLER_WAYPOINTS_NUMBER))
-        {
-            if (m_uiMoveTimer < uiDiff)
-            {
-                if (Creature* pHunterKiller = m_creature->GetMap()->GetCreature(m_uiHunterKillerGUID))
-                {
-                    if (waypoint == HUNTERKILLER_WAYPOINTS_NUMBER)
-                    {
-                        pHunterKiller->setFaction(14);
-                        pHunterKiller->AI()->AttackStart(m_creature);
-                    }
-                    else
-                    {
-                        float X = 0.0f;
-                        float Y = 0.0f;
-                        pHunterKiller->GetMotionMaster()->MovePoint(0, HunterKillerWaypoint[waypoint].X, HunterKillerWaypoint[waypoint].Y, HunterKillerWaypoint[waypoint].Z);
-                        X = pHunterKiller->GetPositionX() - HunterKillerWaypoint[waypoint].X;
-                        Y = pHunterKiller->GetPositionY() - HunterKillerWaypoint[waypoint].Y;
-                        m_uiMoveTimer = sqrt((X * X) + (Y * Y)) / (m_creature->GetSpeed(MOVE_WALK) * 0.003f);
-                    }
-                    waypoint++;
-                }
-            }
-            else
-                m_uiMoveTimer -= uiDiff;
-        }
-
         /* Clean unwanted states */
         if (Creature* pHunterKiller = m_creature->GetMap()->GetCreature(m_uiHunterKillerGUID))
         {
@@ -3207,7 +3221,6 @@ struct npc_Krug_SkullSplitAI : public ScriptedAI
         {
             if (eEventStatus == EVENT_STARTED)
             {
-                // m_creature->MonsterTextEmote("Clean2", NULL); // pour debug
                 ResetEvent();
             }
         }
@@ -3281,12 +3294,12 @@ struct npc_MerokAI : public ScriptedAI
 
     uint32 m_uiHealingWave;
 
-    void Reset()
+    void Reset() override
     {
         m_uiHealingWave = 12000;
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
