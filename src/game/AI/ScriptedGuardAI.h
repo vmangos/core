@@ -26,8 +26,6 @@ struct MANGOS_DLL_DECL guardAI : public ScriptedAI
 
     void JustDied(Unit *Killer);
 
-    void MoveInLineOfSight(Unit* pWho);
-
     void UpdateAI(const uint32 diff);
 
     void MoveInLineOfSight(Unit* pWho);

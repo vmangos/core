@@ -81,17 +81,6 @@ void guardAI::JustDied(Unit *Killer)
         m_creature->SendZoneUnderAttackMessage(pKiller);
 }
 
-void guardAI::MoveInLineOfSight(Unit* pWho)
-{
-    // Valentine Event Aura
-    if (CapitalGuard && sGameEventMgr.IsActiveEvent(EVENT_VALENTINES) && m_creature->HasAura(SPELL_AMOROUS))
-    {
-        if (Gender == GENDER_FEMALE && pWho->HasAura(SPELL_COLOGNE) || (Gender != GENDER_FEMALE && pWho->HasAura(SPELL_PERFUME)))
-            m_creature->AddAura(SPELL_LOVE_IN_AIR, ADD_AURA_PERMANENT);
-    }
-    ScriptedAI::MoveInLineOfSight(pWho);
-}
-
 void guardAI::UpdateAI(const uint32 diff)
 {
     //Always decrease our global cooldown first
@@ -217,6 +206,13 @@ void guardAI::MoveInLineOfSight(Unit* pWho)
 {
     if (!m_creature->IsWithinDistInMap(pWho, m_creature->GetAttackDistance(pWho)))
         return;
+
+    // Valentine Event Aura
+    if (CapitalGuard && sGameEventMgr.IsActiveEvent(EVENT_VALENTINES) && m_creature->HasAura(SPELL_AMOROUS))
+    {
+        if (Gender == GENDER_FEMALE && pWho->HasAura(SPELL_COLOGNE) || (Gender != GENDER_FEMALE && pWho->HasAura(SPELL_PERFUME)))
+            m_creature->AddAura(SPELL_LOVE_IN_AIR, ADD_AURA_PERMANENT);
+    }
 
     if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack())
     {
