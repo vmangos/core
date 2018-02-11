@@ -3457,6 +3457,162 @@ CreatureAI* GetAI_npc_event_fireworks(Creature* pCreature)
     return new npc_event_fireworksAI(pCreature);
 }
 
+enum
+{
+    EVENT_VALENTINE_KWEE = 140,
+
+    SPELL_SMITTEN       = 27572,
+    QUEST_GIFT_H        = 8981,
+    QUEST_GIFT_A        = 8993,
+
+    VAR_KWEE_THRALL     = 2200,
+    VAR_KWEE_CAIRNE     = 2201,
+    VAR_KWEE_SYLVANAS   = 2202,
+    VAR_KWEE_HORDE      = 2207,
+
+    VAR_KWEE_BOLVAR     = 2203,
+    VAR_KWEE_MAGNI      = 2204,
+    VAR_KWEE_TYRANDE    = 2205,
+    VAR_KWEE_ALLIANCE   = 2206,
+
+    TEXT_ID_VICTORY_A   = 8315,
+    TEXT_ID_VICTORY_H   = 8316,
+    TEXT_ID_TIE         = 8318,
+
+};
+
+const uint32 CityZones[6] =
+{
+    1637, // Orgrimmar
+    1638, // Thunder Bluff
+    1497, // Undercity
+    1519, // Stormwind
+    1537, // Ironforge
+    1657  // Darnassus
+};
+
+struct npc_kwee_peddlefeetAI : public ScriptedAI
+{
+    npc_kwee_peddlefeetAI(Creature* pCreature) : ScriptedAI(pCreature), winningFaction(0), winningZone(0)
+    {
+        if (sGameEventMgr.CheckOneGameEvent(EVENT_VALENTINE_KWEE, time(nullptr)))
+        {
+            SetVariables();
+            if (m_creature->GetZoneId() != winningZone && winningZone != 0)
+                m_creature->DespawnOrUnsummon();
+        }
+        Reset();
+    }
+
+    uint32 winningFaction;
+    uint32 winningZone;
+
+    void Reset() { }
+
+    void SetVariables() 
+    {
+        uint32 firstBoss = 0;
+        uint32 horde = sObjectMgr.GetSavedVariable(VAR_KWEE_HORDE, 0);
+        uint32 alliance = sObjectMgr.GetSavedVariable(VAR_KWEE_ALLIANCE, 0);
+
+        if (horde > alliance)
+        {
+            winningFaction = VAR_KWEE_HORDE;
+            firstBoss = VAR_KWEE_THRALL;
+        }
+        else if (alliance > horde)
+        {
+            winningFaction = VAR_KWEE_ALLIANCE;
+            firstBoss = VAR_KWEE_BOLVAR;
+        }
+
+        if (firstBoss)
+        {
+            uint32 count = 0;
+            for (uint32 i = firstBoss; i < firstBoss + 3; i++)
+            {
+                uint32 savedVar = sObjectMgr.GetSavedVariable(i, 0);
+                if (savedVar > count)
+                {
+                    count = savedVar;
+                    winningZone = CityZones[i - VAR_KWEE_THRALL];
+                }
+            }
+        }
+    }
+
+    void ReceiveEmote(Player* pPlayer, uint32 uiEmote)
+    {
+        if (uiEmote == TEXTEMOTE_KISS)
+        {
+            if (pPlayer)
+                m_creature->CastSpell(pPlayer, SPELL_SMITTEN, false);
+        }
+    }
+};
+
+CreatureAI* GetAI_npc_kwee_peddlefeet(Creature* pCreature)
+{
+    return new npc_kwee_peddlefeetAI(pCreature);
+}
+
+bool GossipHello_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature)
+{
+    pPlayer->SendUpdateWorldState(VAR_KWEE_THRALL, sObjectMgr.GetSavedVariable(VAR_KWEE_THRALL, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_CAIRNE, sObjectMgr.GetSavedVariable(VAR_KWEE_CAIRNE, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_SYLVANAS, sObjectMgr.GetSavedVariable(VAR_KWEE_SYLVANAS, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_HORDE, sObjectMgr.GetSavedVariable(VAR_KWEE_HORDE, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_BOLVAR, sObjectMgr.GetSavedVariable(VAR_KWEE_BOLVAR, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_MAGNI, sObjectMgr.GetSavedVariable(VAR_KWEE_MAGNI, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_TYRANDE, sObjectMgr.GetSavedVariable(VAR_KWEE_TYRANDE, 0));
+    pPlayer->SendUpdateWorldState(VAR_KWEE_ALLIANCE, sObjectMgr.GetSavedVariable(VAR_KWEE_ALLIANCE, 0));
+
+    if (sGameEventMgr.IsActiveEvent(EVENT_VALENTINE_KWEE))
+    {
+        if (npc_kwee_peddlefeetAI* kweeAI = dynamic_cast<npc_kwee_peddlefeetAI*>(pCreature->AI()))
+        {
+            uint32 faction = kweeAI->winningFaction;
+            uint32 textId = faction == VAR_KWEE_HORDE ? TEXT_ID_VICTORY_H : faction == VAR_KWEE_ALLIANCE ? TEXT_ID_VICTORY_A : TEXT_ID_TIE;
+            pPlayer->PlayerTalkClass->SendGossipMenu(textId, pCreature->GetObjectGuid());
+            return true;
+        }
+    }
+    
+    return false;
+}
+
+bool QuestRewarded_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
+{
+    if (pQuest->GetQuestId() != QUEST_GIFT_A && pQuest->GetQuestId() != QUEST_GIFT_H)
+        return true;
+
+    uint32 bossVar = 0, factionVar = 0;
+    for (uint32 i = VAR_KWEE_THRALL; i <= VAR_KWEE_TYRANDE; i++)
+    {
+        if (pCreature->GetZoneId() == CityZones[i - VAR_KWEE_THRALL])
+        {
+            bossVar = i;
+            factionVar = i < VAR_KWEE_BOLVAR ? VAR_KWEE_HORDE : VAR_KWEE_ALLIANCE;
+        }
+    }
+
+    if (bossVar)
+    {
+        uint32 count = sObjectMgr.GetSavedVariable(bossVar, 0);
+        count += pQuest->ReqItemCount[0];
+        sObjectMgr.SetSavedVariable(bossVar, count, true);
+    }
+
+    if (factionVar)
+    {
+        uint32 count = sObjectMgr.GetSavedVariable(factionVar, 0);
+        count += pQuest->ReqItemCount[0];
+        sObjectMgr.SetSavedVariable(factionVar, count, true);
+    }
+
+    return true;
+}
+
 void AddSC_npcs_special()
 {
     Script *newscript;
@@ -3627,5 +3783,12 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_event_fireworks";
     newscript->GetAI = &GetAI_npc_event_fireworks;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_kwee_peddlefeet";
+    newscript->GetAI = &GetAI_npc_kwee_peddlefeet;
+    newscript->pGossipHello = &GossipHello_npc_kwee_peddlefeet;
+    newscript->pQuestRewardedNPC = &QuestRewarded_npc_kwee_peddlefeet;
     newscript->RegisterSelf();
 }

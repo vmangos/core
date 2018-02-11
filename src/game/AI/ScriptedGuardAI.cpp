@@ -27,6 +27,7 @@ EndScriptData */
 #include "MovementGenerator.h"
 #include "Player.h"
 #include "Util.h"
+#include "GameEventMgr.h"
 
 // **** This script is for use within every single guard to save coding time ****
 
@@ -36,10 +37,20 @@ EndScriptData */
 #define SAY_GUARD_SIL_AGGRO2        -1000199
 #define SAY_GUARD_SIL_AGGRO3        -1000200
 
-guardAI::guardAI(Creature* pCreature) : ScriptedAI(pCreature),
+#define EVENT_VALENTINES             8
+#define SPELL_COLOGNE                26681
+#define SPELL_PERFUME                26682
+#define SPELL_LOVE_IN_AIR            27741
+#define SPELL_AMOROUS                26869
+
+guardAI::guardAI(Creature* pCreature, bool isCapitalGuard) : ScriptedAI(pCreature),
     GlobalCooldown(0),
-    BuffTimer(0)
-{}
+    BuffTimer(0),
+    CapitalGuard(isCapitalGuard)
+{
+    Gender = sObjectMgr.GetCreatureModelInfo(pCreature->GetDisplayId())->gender;
+    Reset();
+}
 
 void guardAI::Reset()
 {
@@ -68,6 +79,17 @@ void guardAI::JustDied(Unit *Killer)
     //Send Zone Under Attack message to the LocalDefense and WorldDefense Channels
     if (Player* pKiller = Killer->GetCharmerOrOwnerPlayerOrPlayerItself())
         m_creature->SendZoneUnderAttackMessage(pKiller);
+}
+
+void guardAI::MoveInLineOfSight(Unit* pWho)
+{
+    // Valentine Event Aura
+    if (CapitalGuard && sGameEventMgr.IsActiveEvent(EVENT_VALENTINES) && m_creature->HasAura(SPELL_AMOROUS))
+    {
+        if (Gender == GENDER_FEMALE && pWho->HasAura(SPELL_COLOGNE) || (Gender != GENDER_FEMALE && pWho->HasAura(SPELL_PERFUME)))
+            m_creature->AddAura(SPELL_LOVE_IN_AIR, ADD_AURA_PERMANENT);
+    }
+    ScriptedAI::MoveInLineOfSight(pWho);
 }
 
 void guardAI::UpdateAI(const uint32 diff)

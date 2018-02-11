@@ -55,6 +55,7 @@
 #include "Util.h"
 #include "TemporarySummon.h"
 #include "MoveMapSharedDefines.h"
+#include "GameEventMgr.h"
 
 #include "InstanceData.h"
 #include "ScriptMgr.h"
@@ -1464,6 +1465,25 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         {
                             unitTarget->CastSpell(unitTarget, 21167, true);
                         }
+                    }
+                    return;
+                }
+                case 26899: // Friendship Bracelet
+                {
+                    if (unitTarget && m_caster && unitTarget->HasAura(26898))
+                    {
+                        unitTarget->RemoveAurasDueToSpell(26898);        // Remove Heartbroken
+                        unitTarget->CastSpell(unitTarget, 26921, true);  // Create Bracelet
+                        m_caster->CastSpell(m_caster, 26664, true);      // Cast The Power of Friendship
+                    }
+                    return;
+                }
+                case 27662: // Silver Shafted Arrow
+                {
+                    if (unitTarget && m_caster && unitTarget->IsPlayer()) 
+                    {
+                        if (!unitTarget->GetMiniPet())
+                            unitTarget->CastSpell(unitTarget, 27570, true);
                     }
                     return;
                 }
@@ -4819,6 +4839,22 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             return;
                         }
                     }
+                }
+                case 26678:                                 // Bag of Candies
+                {
+                    uint32 candySpells[8] = { 26668, 26670, 26671, 26672, 26673, 26674, 26675, 26676 };
+                    if (m_caster)
+                        m_caster->CastSpell(m_caster, candySpells[urand(0, 7)], true);
+                    return;
+                }
+                case 27657:                                 // Valentine End Check
+                {
+                    if (unitTarget && !sGameEventMgr.IsActiveEvent(8))
+                    {
+                        unitTarget->RemoveAurasDueToSpell(26869);
+                        unitTarget->RemoveAurasDueToSpell(27741);
+                    }
+                    return;
                 }
             }
             break;
