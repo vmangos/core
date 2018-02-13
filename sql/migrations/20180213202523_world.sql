@@ -30,10 +30,6 @@ UPDATE `reference_loot_template` SET `condition_id`=2 WHERE item in (23199,23200
 -- https://github.com/LightsHope/server/issues/1277
 REPLACE INTO `spell_mod` (`Id`, `SpellVisual`, `Comment`) VALUES (25889, 52, 'Brain Food: Change Visual to allow stacking with 25888');
 
--- Long Forgotten Dreams
--- https://github.com/LightsHope/server/issues/1323
-REPLACE INTO `creature_involvedrelation` (`id`, `quest`, `patch`) VALUES (15192, 8305, 7);
-
 -- Arikara
 -- https://github.com/LightsHope/server/issues/1245
 UPDATE `creature_template` SET `type_flags`=1 WHERE `entry`=10882;
