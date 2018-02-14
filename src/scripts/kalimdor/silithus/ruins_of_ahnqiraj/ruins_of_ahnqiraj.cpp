@@ -1324,13 +1324,34 @@ struct SwarmguardNeedlerAI : public ScriptedAI
     }
 };
 
+struct OssirianAgroTriggerAI : public ScriptedAI
+{
+    OssirianAgroTriggerAI(Creature* pCreature) : ScriptedAI(pCreature)
+    {
+        Reset();
+    }
+
+    void Reset()
+    {
+    }
+
+    void MoveInLineOfSight(Unit* who)
+    {
+        if (who->GetTypeId() == TYPEID_PLAYER && m_creature->IsWithinDistInMap(who, 9.0f))
+        {
+            if (Creature* Crea = m_creature->FindNearestCreature(NPC_OSSIRIAN, 200.0f))
+                if (!Crea->isInCombat())
+                    Crea->AI()->AttackStart(who);
+        }
+    }
+};
+
 /*******************/
 
 CreatureAI* GetAI_AntiIntrusion(Creature* pCreature)
 {
     return new npc_antiIntrusionAI(pCreature);
 }
-
 
 CreatureAI* GetAI_Zerran(Creature* pCreature)
 {
@@ -1416,6 +1437,11 @@ CreatureAI* GetAI_QirajiGladiator(Creature* pCreature)
 CreatureAI* GetAI_QirajiSwarmguard(Creature* pCreature)
 {
     return new QirajiSwarmguardAI(pCreature);
+}
+
+CreatureAI* GetAI_OssirianAgroTrigger(Creature* pCreature)
+{
+    return new OssirianAgroTriggerAI(pCreature);
 }
 
 void AddSC_ruins_of_ahnqiraj()
@@ -1509,5 +1535,10 @@ void AddSC_ruins_of_ahnqiraj()
     newscript = new Script;
     newscript->Name = "boss_zerran";
     newscript->GetAI = &GetAI_Zerran;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_ossirian_agro_trigger";
+    newscript->GetAI = &GetAI_OssirianAgroTrigger;
     newscript->RegisterSelf();
 }
