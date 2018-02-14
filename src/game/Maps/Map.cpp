@@ -3169,6 +3169,7 @@ VMAP::ModelInstance* Map::FindCollisionModel(float x1, float y1, float z1, float
 
 void Map::CrashUnload()
 {
+    sLog.outError("Map %u (instance %u) crashed. Has players: %d", GetId(), GetInstanceId(), HavePlayers());
     /// Logout players
     for (m_mapRefIter = m_mapRefManager.begin(); m_mapRefIter != m_mapRefManager.end(); ++m_mapRefIter)
     {
@@ -3183,7 +3184,11 @@ void Map::CrashUnload()
             player->UninviteFromGroup();
 
             if (player->GetSocial())
+            {
                 sSocialMgr.RemovePlayerSocial(player->GetGUIDLow());
+                session->GetMasterPlayer()->SetSocial(nullptr);
+            }
+
             if (false)
                 delete player; // May crash if player is corrupted
             else
