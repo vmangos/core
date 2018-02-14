@@ -420,6 +420,8 @@ enum UnitState
     UNIT_STAT_RUNNING            = 0x02000000,
     UNIT_STAT_IGNORE_MOVE_LOS    = 0x04000000,
 
+    UNIT_STAT_ALLOW_INCOMPLETE_PATH = 0x08000000, // allow movement with incomplete or partial paths
+    UNIT_STAT_ALLOW_LOS_ATTACK      = 0x10000000, // allow melee attacks without LoS
     // masks (only for check)
 
     // can't move currently
@@ -1986,6 +1988,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void UnitDamaged(ObjectGuid from, uint32 damage) { _damageTakenHistory[from] += damage; _lastDamageTaken = 0; }
         void SetMeleeZLimit(float newZLimit) { m_meleeZLimit = newZLimit; }
         float GetMeleeZLimit() const { return m_meleeZLimit; }
+        void SetMeleeZReach(float newZReach) { m_meleeZReach = newZReach; }
+        float GetMeleeZReach() const { return m_meleeZReach; }
 
     protected:
         typedef std::map<ObjectGuid /*attackerGuid*/, uint32 /*damage*/ > DamageTakenHistoryMap;
@@ -2032,6 +2036,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         ObjectGuid m_TotemSlot[MAX_TOTEM_SLOT];
 
         float m_meleeZLimit;
+        float m_meleeZReach;
 
         // Error traps for some wrong args using
         // this will catch and prevent build for any cases when all optional args skipped and instead triggered used non boolean type

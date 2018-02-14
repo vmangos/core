@@ -31,6 +31,32 @@ EndScriptData */
 
 #define SPELL_SUMMON_IMAGES         747
 
+/**
+* Source videos for Skeram behaviour:
+* https://www.youtube.com/watch?v=K-A9l8bL_Fw
+* https://www.youtube.com/watch?v=q9XHXbFEniw
+* https://www.youtube.com/watch?v=xh5wbv3yRH4
+* https://www.youtube.com/watch?v=YpQwYIr1wFY
+*
+* Skeram's maximum health is 556509
+* Skeram's illusions gain health each subsequent split
+* Skeram mind controls the CLOSEST target, including tanks
+* Skeram only casts Arcane Explosion if more than 4 targets are in melee range of him
+* Earthshock is spammed on his current target if they are not in melee range
+* Earthshock has a slight delay after teleports and splits before it is casted
+* *** There is possibly a mechanic where Skeram is pacified for ~500ms after teleporting,
+* however in the above videos he is seen to sometimes move immediately, and sometimes
+* remain stationary ***
+*
+* ILLUSION HEALTH:
+* https://www.youtube.com/watch?v=0-8zXfKmPvY (From 4.x when exact HP values were networked)
+* This video puts the image percentages around 7.27%, 9.87% and 11.6% (or 7.5, 10 and 12.5)
+* Estimating health from Vanilla based on % changes and spell damage, we can
+* get values approximately 5% higher. eg. a Frostbolt damage of 700 reduces
+* slightly less than 1% in the 2nd split, indicating it has slightly more than
+* 70k health.
+* From this, we can estimate that the illusions have 12.5%, 15% and 17.5% per split
+*/
 struct boss_skeramAI : public ScriptedAI
 {
     boss_skeramAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -57,7 +83,7 @@ struct boss_skeramAI : public ScriptedAI
     void Reset()
     {
         ArcaneExplosion_Timer = urand(6000, 8000);
-        EarthShock_Timer = 100;
+        EarthShock_Timer = 1000;
         FullFillment_Timer = urand(10000, 15000);
         Blink_Timer = urand(15000, 20000);
 
@@ -68,6 +94,14 @@ struct boss_skeramAI : public ScriptedAI
         ImageA = nullptr;
         ImageA = nullptr;
         ControlledPlayerGUID.Clear();
+
+        // The raised ledges around Skeram's platforms are a pathing nightmare, there is no
+        // reasonable way to get onto them with our current implementation (imo Blizzard had
+        // an mmap system that let them add invisible ramps for creatures). However, we can
+        // obtain partial paths next to it. Normally, these are ignored, but we can set a
+        // flag to allow them. They may put us out of LoS so allow autos through them too.
+        m_creature->addUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH | UNIT_STAT_ALLOW_LOS_ATTACK);
+        m_creature->SetMeleeZReach(74.0f);
     }
 
     void CancelFulfillment()
@@ -162,8 +196,15 @@ struct boss_skeramAI : public ScriptedAI
 
         if (ArcaneExplosion_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
-                ArcaneExplosion_Timer = urand(6000, 14000);
+            // Only cast arcane explosion if there are more than 4 units within melee reach
+            std::list<Player*> players;
+            GetPlayersWithinRange(players, m_creature->GetMeleeReach());
+
+            if (players.size() > 4)
+            {
+                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_EXPLOSION) == CAST_OK)
+                    ArcaneExplosion_Timer = urand(6000, 14000);
+            }
         }
         else ArcaneExplosion_Timer -= diff;
 
@@ -184,20 +225,20 @@ struct boss_skeramAI : public ScriptedAI
 
         if (FullFillment_Timer < diff)
         {
-            // Get random target excluding highest threat who is not MCed
-            if (Unit* MCTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
+            // Get closest target
+            if (Player* target = GetNearestPlayer(40.0f))
             {
-                if (DoCastSpellIfCan(MCTarget, SPELL_TRUE_FULFILLMENT, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                if (DoCastSpellIfCan(target, SPELL_TRUE_FULFILLMENT, CAST_AURA_NOT_PRESENT) == CAST_OK)
                 {
                     // Cancel buffs on previous victim
                     CancelFulfillment();
 
-                    m_creature->CastSpell(MCTarget, SPELL_TF_HASTE, true);
-                    m_creature->CastSpell(MCTarget, SPELL_TF_MOD_HEAL, true);
-                    m_creature->CastSpell(MCTarget, SPELL_TF_IMMUNITY, true);
+                    m_creature->CastSpell(target, SPELL_TF_HASTE, true);
+                    m_creature->CastSpell(target, SPELL_TF_MOD_HEAL, true);
+                    m_creature->CastSpell(target, SPELL_TF_IMMUNITY, true);
 
                     FullFillment_Timer = urand(20500, 25000);
-                    ControlledPlayerGUID = MCTarget->GetObjectGuid();
+                    ControlledPlayerGUID = target->GetObjectGuid();
                 }
             }
         }
@@ -231,13 +272,19 @@ struct boss_skeramAI : public ScriptedAI
         if (boss_skeramAI* imageAI = dynamic_cast<boss_skeramAI*>(skeramImage->AI()))
             imageAI->IsImage = true;
 
-        float skeramPercent = m_creature->GetHealthPercent();
+        float skeramPercent = m_creature->GetHealthPercent()/100.0f;
 
-        // Set health to look like the True Prophet. Will have 12.5%, 25%, finally 50% of max Skeram HP.
-        skeramImage->SetMaxHealth(m_creature->GetMaxHealth() * (12.5f / skeramPercent) * (100 / (int)skeramPercent));
-        skeramImage->SetHealthPercent(skeramPercent);
+        // Set health to look like the True Prophet. Will have 12.5%, 15% and 17.5% of max Skeram HP.
+        float percent = 0.2 * (1 - skeramPercent) + 0.1 * skeramPercent;
+        float maxHealth = m_creature->GetMaxHealth() * percent / skeramPercent;
+
+        skeramImage->SetMaxHealth(maxHealth);
+        skeramImage->SetHealthPercent(skeramPercent*100.0f);
         skeramImage->SetInCombatWithZone();
         skeramImage->SetVisibility(VISIBILITY_OFF);
+
+        // Set illusion mana to be the same as the real one
+        skeramImage->SetPower(POWER_MANA, m_creature->GetPower(POWER_MANA));
 
         if (!ImageA)
             ImageA = skeramImage;
@@ -246,7 +293,6 @@ struct boss_skeramAI : public ScriptedAI
             ImageB = skeramImage;
             UnisonBlink();
         }
-
     }
 
     void UnisonBlink()

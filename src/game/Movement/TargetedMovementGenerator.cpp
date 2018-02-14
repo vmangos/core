@@ -105,7 +105,12 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     path.SetTransport(transport);
     path.calculate(x, y, z, petFollowing);
 
-    i_reachable = path.getPathType() & PATHFIND_NORMAL;
+    PathType pathType = path.getPathType();
+    i_reachable = pathType & PATHFIND_NORMAL;
+    if (!i_reachable && !!(pathType & PATHFIND_INCOMPLETE) && owner.hasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH))
+    {
+        i_reachable = true;
+    }
 
     // Enforce stricter checking inside dungeons
     if (i_reachable && owner.GetMap() && owner.GetMap()->IsDungeon())
@@ -129,7 +134,8 @@ void TargetedMovementGeneratorMedium<T, D>::_setTargetLocation(T &owner)
     float pathLength = path.Length();
     if (pathLength < 0.4f ||
             (pathLength < 4.0f && (i_target->GetPositionZ() - owner.GetPositionZ()) > 10.0f) || // He is flying too high for me. Moving a few meters wont change anything.
-            ((path.getPathType() & (PATHFIND_NOPATH | PATHFIND_INCOMPLETE)) && !petFollowing) ||
+            (pathType & PATHFIND_NOPATH && !petFollowing) ||
+            (pathType & PATHFIND_INCOMPLETE && !owner.hasUnitState(UNIT_STAT_ALLOW_INCOMPLETE_PATH) && !petFollowing) ||
             (!petFollowing && !i_reachable))
     {
         if (!losChecked)

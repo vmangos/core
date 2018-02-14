@@ -130,6 +130,12 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     //Return a player with at least minimumRange from m_creature
     Player* GetPlayerAtMinimumRange(float fMinimumRange);
 
+    // Get a list of all players within range of m_creature
+    void GetPlayersWithinRange(std::list<Player*>& players, float range);
+
+    // Get the nearest player target within range
+    Player* GetNearestPlayer(float range);
+
     //Spawns a creature relative to m_creature
     Creature* DoSpawnCreature(uint32 uiId, float fX, float fY, float fZ, float fAngle, uint32 uiType, uint32 uiDespawntime);
 

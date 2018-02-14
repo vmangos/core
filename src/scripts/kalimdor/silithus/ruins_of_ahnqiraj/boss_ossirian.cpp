@@ -68,30 +68,21 @@ const std::array<SpawnLocations, 2> TornadoSpawn =
     { -9352.0f, 2012.0f, 85.55f }
 }};
 
-const std::array<SpawnLocations, 11> CrystalSpawn =
-{{
-    { -9407.164062f, 1959.240845f, 85.558998f },
-    { -9357.931641f, 1930.596802f, 85.556198f },
-    { -9383.113281f, 2011.042725f, 85.556389f },
-    { -9243.36f, 1979.04f, 85.556f },
-    { -9281.68f, 1886.66f, 85.5558f },
-    { -9241.8f, 1806.39f, 85.5557f },
-    { -9366.78f, 1781.76f, 85.5561f },
-    { -9297.668945f, 1747.256348f, 85.5566f },
-    { -9430.37f, 1786.86f, 85.557f },
-    { -9187.087891f, 1940.501099f, 85.5564f },
-    { -9406.73f, 1863.13f, 85.5558f }
-}};
-
 struct boss_ossirianAI : public ScriptedAI
 {
     boss_ossirianAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
+        m_pInstance = dynamic_cast<instance_ruins_of_ahnqiraj*>(pCreature->GetInstanceData());
+        if (!m_pInstance)
+        {
+            m_creature->AddObjectToRemoveList();
+            return;
+        }
+
         Reset();
     }
 
-    ScriptedInstance* m_pInstance;
+    instance_ruins_of_ahnqiraj* m_pInstance;
 
     uint32 m_uiSpeed_Timer;
     uint32 m_uiCurseOfTongues_Timer;
@@ -103,7 +94,7 @@ struct boss_ossirianAI : public ScriptedAI
     std::vector<float> TmpThreatVal;
     std::vector<uint64> TornadoGUIDs;
 
-    std::list<ObjectGuid> crystalGuids;
+    std::list<uint32> pylonIndexHistory;
     bool m_bIsEnraged;
     bool m_bAggro;
 
@@ -146,16 +137,7 @@ struct boss_ossirianAI : public ScriptedAI
         if (wth)
             wth->SetWeather(WeatherType(0), 0);
 
-        while (!crystalGuids.empty())
-        {
-            ObjectGuid guid = crystalGuids.front();
-            crystalGuids.pop_front();
-            if (GameObject* invoc = m_creature->GetMap()->GetGameObject(guid))
-                invoc->AddObjectToRemoveList();
-        }
-        crystalGuids.clear();
-
-        SpawnCrystal(0);
+        m_pInstance->SetData(TYPE_OSSIRIAN, FAIL);
     }
 
     void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
@@ -214,29 +196,12 @@ struct boss_ossirianAI : public ScriptedAI
         {
             m_bAggro = true;
             m_uiSpeed_Timer = 10000;
-            SpawnCrystal(urand(1, 10));
+            m_pInstance->SpawnNewCrystals(ObjectGuid());
         }
 
         uint32 zoneid = m_creature->GetZoneId();
         if (Weather* wth = sWorld.FindWeather(zoneid))
             wth->SetWeather(WeatherType(3), 2);
-    }
-
-    void SpawnCrystal(uint32 pylonIdx)
-    {
-        GameObject* pCrystal = m_creature->SummonGameObject(GO_OSSIRIAN_CRYSTAL,
-                               CrystalSpawn[pylonIdx].x,
-                               CrystalSpawn[pylonIdx].y,
-                               CrystalSpawn[pylonIdx].z,
-                               0, 0, 0, 0, 0, -1, false);
-
-        if (!pCrystal)
-        {
-            sLog.outError("[OSSIRIAN] Unable to spawn crystal %u at position #%u", GO_OSSIRIAN_CRYSTAL, pylonIdx);
-            return;
-        }
-
-        crystalGuids.push_back(pCrystal->GetObjectGuid());
     }
 
     void JustDied(Unit* pKiller)
@@ -252,20 +217,14 @@ struct boss_ossirianAI : public ScriptedAI
                     Crea->ForcedDespawn();
             }
         }
+
+        m_pInstance->SetData(TYPE_OSSIRIAN, DONE);
     }
 
     void KilledUnit(Unit* pVictim)
     {
         if (pVictim->GetTypeId() == TYPEID_PLAYER)
             DoScriptText(SAY_SLAY, m_creature);
-    }
-
-    void DoAction(const uint32 action)
-    {
-        // First crystal spawn is reserved for the start of the encounter
-        // just below the ramp
-        if (action == 0xBEEF)
-            SpawnCrystal(urand(1, CrystalSpawn.size()-1));
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -398,19 +357,26 @@ struct ossirian_crystalAI : public GameObjectAI
 
     bool OnUse(Unit* user)
     {
-        ScriptedInstance* m_pInstance = (ScriptedInstance*)me->GetInstanceData();
+        instance_ruins_of_ahnqiraj* pInstance = dynamic_cast<instance_ruins_of_ahnqiraj*>(me->GetInstanceData());
 
-        if (!m_pInstance)
+        if (!pInstance)
         {
             sLog.outInfo("[OSSIRIAN/Crystal][Inst %03u] ERROR: No instance", user->GetInstanceId());
             return false;
         }
 
-        Creature* ossirian = GetClosestCreatureWithEntry(me, NPC_OSSIRIAN, 50.0f);
+        // Already used
+        if (Creature* trigger = GetClosestCreatureWithEntry(me, CRYSTAL_TRIGGER, 5.0f))
+            return true;
+
+        // Spawn new crystals even if Ossirian is out of range
+        pInstance->SpawnNewCrystals(me->GetObjectGuid());
+
+        Creature* ossirian = GetClosestCreatureWithEntry(me, NPC_OSSIRIAN, 300.0f);
 
         if (!ossirian)
         {
-            sLog.outInfo("[OSSIRIAN/Crystal][Inst %03u] ERROR: No Ossirian found (guid %u)", user->GetInstanceId(), m_pInstance->GetData64(DATA_OSSIRIAN));
+            sLog.outInfo("[OSSIRIAN/Crystal][Inst %03u] ERROR: No Ossirian found (guid %u)", user->GetInstanceId(), pInstance->GetData64(DATA_OSSIRIAN));
             return false;
         }
 
@@ -418,23 +384,17 @@ struct ossirian_crystalAI : public GameObjectAI
         if (!ossirian->SelectHostileTarget() || !ossirian->getVictim())
             return true;
 
-        // Already used
-        if (me->FindNearCreature(CRYSTAL_TRIGGER, 10.0f))
-            return true;
-
         Creature* triggerCrystalPylons = me->SummonCreature(CRYSTAL_TRIGGER,
-                                         me->GetPositionX(),
-                                         me->GetPositionY(),
-                                         me->GetPositionZ(),
-                                         me->GetOrientation(),
-                                         TEMPSUMMON_TIMED_DESPAWN,
-                                        8000);
+                                            me->GetPositionX(),
+                                            me->GetPositionY(),
+                                            me->GetPositionZ(),
+                                            me->GetOrientation(),
+                                            TEMPSUMMON_TIMED_DESPAWN,
+                                            8000);
 
         if (triggerCrystalPylons)
-        {
             triggerCrystalPylons->CastSpell(ossirian, SpellWeakness[urand(0, 4)], true);
-            ossirian->AI()->DoAction(0xBEEF);
-        }
+
         return false;
     }
 };

@@ -3370,3 +3370,25 @@ void Map::RemoveOldBones(const uint32 diff)
             ++iter;
     }
 }
+
+GameObject* Map::SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask)
+{
+    GameObjectInfo const* goinfo = sObjectMgr.GetGameObjectInfo(entry);
+    if (!goinfo)
+    {
+        sLog.outErrorDb("Gameobject template %u not found in database!", entry);
+        return nullptr;
+    }
+    GameObject *go = new GameObject();
+    if (!go->Create(GenerateLocalLowGuid(HIGHGUID_GAMEOBJECT), entry, this, x, y, z, ang, rotation0, rotation1, rotation2, rotation3, 100, GO_STATE_READY))
+    {
+        delete go;
+        return nullptr;
+    }
+    go->SetRespawnTime(respawnTime);
+    go->SetSpawnedByDefault(false);
+
+    Add(go);
+    go->SetWorldMask(worldMask);
+    return go;
+}

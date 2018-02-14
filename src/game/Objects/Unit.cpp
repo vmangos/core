@@ -106,7 +106,7 @@ Unit::Unit()
     : WorldObject(), i_motionMaster(this), m_ThreatManager(this), m_HostileRefManager(this),
       movespline(new Movement::MoveSpline()), _debugFlags(0), m_needUpdateVisibility(false),
       m_AutoRepeatFirstCast(true), m_castingSpell(0), m_regenTimer(0), _lastDamageTaken(0),
-      m_meleeZLimit(MELEE_Z_LIMIT), m_lastSanctuaryTime(0)
+      m_meleeZLimit(MELEE_Z_LIMIT), m_meleeZReach(MELEE_Z_LIMIT), m_lastSanctuaryTime(0)
 {
     m_objectType |= TYPEMASK_UNIT;
     m_objectTypeId = TYPEID_UNIT;
@@ -2455,7 +2455,7 @@ void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool ext
         return;                                             // ignore ranged case
 
     // Nostalrius: check ligne de vision
-    if (!IsWithinLOSInMap(pVictim))
+    if (!hasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK) && !IsWithinLOSInMap(pVictim))
         return;
 
     if (GetExtraAttacks() && !extra)
@@ -10766,7 +10766,11 @@ bool Unit::CanReachWithMeleeAttackAtPosition(Unit const* pVictim, float x, float
     float dy = y - pVictim->GetPositionY();
     float dz = z - pVictim->GetPositionZ();
 
-    return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < pVictim->GetMeleeZLimit());
+    // Some units have long Z reach (tall), use whichever is highest of the victim Z limit or
+    // the unit's Z reach
+    float victimZLimit = pVictim->GetMeleeZLimit();
+    float zReach = m_meleeZReach > victimZLimit ? m_meleeZReach : victimZLimit;
+    return (dx * dx + dy * dy < reach * reach) && ((dz * dz) < zReach);
 }
 
 bool Unit::CanReachWithMeleeSpellAttack(Unit const* pVictim, float flat_mod /*= 0.0f*/) const
