@@ -3519,6 +3519,11 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                 }
                 break;
             }
+            case 26391: // Vanquished Tentacle
+            {
+                spawnCreature->GetCharmInfo()->SetCommandState(COMMAND_STAY);
+                break;
+            }
         }
 
         if (count == 0)
