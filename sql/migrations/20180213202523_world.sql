@@ -257,6 +257,21 @@ UPDATE `quest_template` SET `RewMoneyMaxLevel`=315 WHERE `entry`=2750;
 UPDATE `quest_template` SET `RewMoneyMaxLevel`=1260 WHERE `entry`=2748;
 UPDATE `quest_template` SET `RewMoneyMaxLevel`=2520 WHERE `entry`=2747;
 
+-- Sathrah's Sacrifice event
+-- https://github.com/LightsHope/server/issues/641
+UPDATE `creature_template` SET `MovementType`=2, `speed_walk`=0.70 WHERE `entry`=7411;
+REPLACE INTO `creature_movement_template` VALUES 
+(7411, 1, 9641.96,2521.98,1331.73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 2, 9639.39,2529.28,1331.73, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 3, 9633.71,2533.33,1331.6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 4, 9627.38,2528.75,1331.64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 5, 9624.93,2525.26,1331.62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 6, 9627.89,2518.1,1331.68, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 7, 9631.27,2514.43,1331.79, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 8, 9637.92,2516.34,1331.63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
+(7411, 9, 9642.14,2522.07,1331.62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+UPDATE `event_scripts` SET `x`=9641.96, `y`=2521.98, `z`=1331.73, `o`=1.6194, `datalong2`=30000 WHERE `id`=2313;
+
 
 -- End of migration.
 END IF;
