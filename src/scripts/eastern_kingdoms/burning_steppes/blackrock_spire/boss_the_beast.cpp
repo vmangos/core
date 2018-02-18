@@ -104,7 +104,7 @@ struct boss_thebeastAI : public ScriptedAI
             m_uiTerrifyingRoarTimer -= uiDiff;
 
         // Berserker Charge
-        if (m_uiBeserkerChargeTimer < uiDiff)
+        if (m_uiBeserkerChargeTimer <= uiDiff)
         {
             Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
             if (m_uiBeserkerChargeTimer == 0) pTarget = m_creature->getVictim();
