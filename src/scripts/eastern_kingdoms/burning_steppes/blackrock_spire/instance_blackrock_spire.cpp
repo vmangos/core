@@ -244,6 +244,9 @@ void instance_blackrock_spire::OnCreatureCreate(Creature* pCreature)
         case NPC_DRAKKISATH:
             m_uiDrakkisathGUID = pCreature->GetGUID();
             break;
+        case NPC_THE_BEAST:
+            m_uiBeastGUID = pCreature->GetGUID();
+            break;
 
         case NPC_BLACKHAND_SUMMONER:
         case NPC_BLACKHAND_VETERAN:
@@ -527,6 +530,8 @@ uint64 instance_blackrock_spire::GetData64(uint32 uiType)
             return m_uiGythCombatDoorGUID;
         case NPC_DRAKKISATH:
             return m_uiDrakkisathGUID;
+        case NPC_THE_BEAST:
+            return m_uiBeastGUID;
     }
     return 0;
 }
@@ -836,6 +841,19 @@ GameObjectAI* GetAIgo_rookey_egg(GameObject *pGo)
     return new go_rookey_eggAI(pGo);
 }*/
 
+bool AreaTrigger_at_ubrs_the_beast(Player* pPlayer, const AreaTriggerEntry* pAt)
+{
+    if (pPlayer->isDead())
+        return false;
+
+    if (instance_blackrock_spire* pInstance = (instance_blackrock_spire*)pPlayer->GetInstanceData())
+        if (Creature* pBeast = pInstance->instance->GetCreature(pInstance->GetData64(NPC_THE_BEAST)))
+            if (pBeast->isAlive() && !pBeast->isInCombat())
+                pBeast->AI()->AttackStart(pPlayer);
+
+    return false;
+}
+
 void AddSC_instance_blackrock_spire()
 {
     Script* pNewScript;
@@ -862,6 +880,11 @@ void AddSC_instance_blackrock_spire()
     pNewScript = new Script;
     pNewScript->Name = "npc_rookery_hatcher";
     pNewScript->GetAI = &GetAI_npc_rookery_hatcher;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "at_ubrs_the_beast";
+    pNewScript->pAreaTrigger = &AreaTrigger_at_ubrs_the_beast;
     pNewScript->RegisterSelf();
 
     /*    pNewScript = new Script;
