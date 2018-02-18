@@ -272,6 +272,10 @@ REPLACE INTO `creature_movement_template` VALUES
 (7411, 9, 9642.14,2522.07,1331.62, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 UPDATE `event_scripts` SET `x`=9641.96, `y`=2521.98, `z`=1331.73, `o`=1.6194, `datalong2`=30000 WHERE `id`=2313;
 
+-- Abercrombie not attackable
+-- https://github.com/LightsHope/server/issues/977
+UPDATE `creature_template` SET `unit_flags`=4610 WHERE `entry`=289;
+
 
 -- End of migration.
 END IF;
