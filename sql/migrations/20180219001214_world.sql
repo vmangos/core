@@ -19,6 +19,9 @@ VALUES (17190, 11, 'Ras Frostwhisper Visual Dummy Range');
 REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`) VALUES (5466, 32, 17186);
 UPDATE `creature_loot_template` SET `condition_id`=5466 WHERE `item`=13626;
 
+-- The Unforgiven invisibility
+UPDATE `creature_ai_scripts` SET `action1_param1`=8203 WHERE `id`=1051601;
+
 -- End of migration.
 END IF;
 END??
