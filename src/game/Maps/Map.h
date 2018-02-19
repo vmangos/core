@@ -559,7 +559,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         uint32                  _bonesCleanupTimer;
         std::list<Corpse*>      _bones;
 
-        void RemoveCorpses();
+        void RemoveCorpses(bool unload = false);
         void RemoveOldBones(const uint32 diff);
 
     protected:

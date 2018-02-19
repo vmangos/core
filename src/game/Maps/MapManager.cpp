@@ -379,7 +379,7 @@ void MapManager::Update(uint32 diff)
         {
             sZoneScriptMgr.OnMapCrashed(crashedMapsIter->second);
             crashedMapsIter->second->CrashUnload();
-            i_maps.erase(crashedMapsIter++);
+            crashedMapsIter = i_maps.erase(crashedMapsIter);
         }
         else
             ++crashedMapsIter;
@@ -397,7 +397,7 @@ void MapManager::Update(uint32 diff)
             pMap->UnloadAll(true);
             delete pMap;
 
-            i_maps.erase(iter++);
+            iter = i_maps.erase(iter);
         }
         else
             ++iter;
