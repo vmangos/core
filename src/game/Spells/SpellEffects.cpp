@@ -1487,6 +1487,15 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 17190: // Ras Frostwhisper Visual Dummy
+                {
+                    if (unitTarget)
+                    {
+                        unitTarget->CastSpell(unitTarget, 17186, true);    // Human form
+                        unitTarget->SetHealth(unitTarget->GetMaxHealth()); // Back to full health
+                    }
+                    return;
+                }
             }
 
             //All IconID Check in there
