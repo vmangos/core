@@ -22,6 +22,10 @@ UPDATE `creature_loot_template` SET `condition_id`=5466 WHERE `item`=13626;
 -- The Unforgiven invisibility
 UPDATE `creature_ai_scripts` SET `action1_param1`=8203 WHERE `id`=1051601;
 
+-- Remove wrong Death Pact targetting
+DELETE FROM `spell_effect_mod` WHERE `Id`=17471;
+
+
 -- End of migration.
 END IF;
 END??

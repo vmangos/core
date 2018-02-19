@@ -2402,15 +2402,11 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, healMultiplier);
 
     // get max possible damage, don't count overkill for heal
-    uint32 healthGain = uint32(damage);
-    if (healthGain > unitTarget->GetHealth())
+    if (damage > unitTarget->GetHealth())
         damage = unitTarget->GetHealth();
-    damage *= healMultiplier;
 
     if (m_caster->isAlive())
-    {
-        m_caster->DealHeal(m_caster, uint32(healthGain), m_spellInfo);
-    }
+        m_caster->DealHeal(m_caster, uint32(damage * healMultiplier), m_spellInfo);
 
     // Non delayed spells bonus damage is added later
     if (!m_delayed)
