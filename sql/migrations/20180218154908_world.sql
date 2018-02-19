@@ -13,7 +13,7 @@ INSERT INTO `migrations` VALUES ('20180218154908');
 UPDATE `item_template` SET `Duration`=864000, `ExtraFlags`=1 WHERE entry in (21812,22239,22236,22238,22237,22218,22261,22200,22218,22178,22160,22159,22161,22163,22162,21975,22154,22155,22156,22157,22158,22170,22168,22167,22169,22172,22171,21981,21980,21979,22164,22166,22165);
 
 -- Black dress patch number
-UPDATE `forbidden_items` SET `patch`=7 WHERE `entry`=22279;
+UPDATE `forbidden_items` SET `patch`=6 WHERE `entry`=22279;
 
 -- Remove citizen scripts
 UPDATE `creature_template` SET `ScriptName`='' WHERE `ScriptName` like '%npc%citizen%'
