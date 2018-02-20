@@ -105,7 +105,7 @@ UPDATE `creature` SET `position_x`=9.320, `position_y`=285.08, `orientation`=2.3
 UPDATE `creature` SET `position_x`=6.100, `position_y`=277.30, `orientation`=3.14 WHERE `guid`=84239;
 UPDATE `creature` SET `position_x`=9.320, `position_y`=269.52, `orientation`=3.93 WHERE `guid`=339621;
 UPDATE `creature` SET `position_x`=17.10, `position_y`=266.30, `position_z`=-6.50, `orientation`=4.71 WHERE `guid`=339622;
-UPDATE `creature` SET `position_x`=24.88, `position_y`=269.52, `orientation`=5.50 WHERE `guid`=84230;
+UPDATE `creature` SET `position_x`=24.88, `position_y`=269.52, `position_z`=-7.84, `orientation`=5.50 WHERE `guid`=84230;
 
 -- Above stairs
 -- Center coordinate 111.5 435.8
@@ -218,6 +218,7 @@ UPDATE `quest_template` SET `RequestItemsText`='Did you find the Syndicate Shado
 -- https://github.com/elysium-project/bug-tracker/issues/450
 -- Source: https://web.archive.org/web/20060614155851/http://thottbot.com:80/?qu=7862
 UPDATE `quest_template` SET `ReqCreatureOrGOCount1`=20, `ReqCreatureOrGOCount2`=20, `ReqCreatureOrGOCount3`=20, `ReqCreatureOrGOCount4`=20 WHERE `entry`=7862 AND `patch`=3;
+UPDATE `quest_template` SET `Objectives`='You have been tasked with the decimation of 20 Vilebranch Berserkers, 20 Vilebranch Shadow Hunters, 20 Vilebranch Blood Drinkers, and 20 Vilebranch Soul Eaters.$B$BShould you complete this task, return to Primal Torntusk at Revantusk Village in the Hinterlands.' WHERE `entry`=7862 AND `patch`=3;
 
 -- End of migration.
 END IF;
