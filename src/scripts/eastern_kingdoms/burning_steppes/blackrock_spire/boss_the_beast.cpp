@@ -31,7 +31,8 @@ enum
     SPELL_TERRIFYINGROAR   = 14100,
     SPELL_BERSERKER_CHARGE = 16636,
     SPELL_FIREBALL         = 16788,
-    SPELL_FIREBLAST        = 14144
+    SPELL_FIREBLAST        = 14144,
+    SPELL_SUMMON_FINKLE    = 16710,
 };
 
 struct boss_thebeastAI : public ScriptedAI
@@ -53,9 +54,15 @@ struct boss_thebeastAI : public ScriptedAI
         m_uiFlamebreakTimer     = urand(8000, 12000);
         //m_uiImmolateTimer       = 3000;
         m_uiTerrifyingRoarTimer = 13000;
-        m_uiBeserkerChargeTimer = 12000;
+        m_uiBeserkerChargeTimer = 0;
         m_uiFireballTimer       = 10000;
         m_uiFireBlastTimer      = urand(8000, 11000);
+    }
+
+    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
+    {
+        if (pSpell->Effect[0] == SPELL_EFFECT_SKINNING)
+            pCaster->CastSpell(pCaster, SPELL_SUMMON_FINKLE, true);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -97,13 +104,13 @@ struct boss_thebeastAI : public ScriptedAI
             m_uiTerrifyingRoarTimer -= uiDiff;
 
         // Berserker Charge
-        if (m_uiBeserkerChargeTimer < uiDiff)
+        if (m_uiBeserkerChargeTimer <= uiDiff)
         {
-            if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-            {
-                if (DoCastSpellIfCan(pTarget, SPELL_BERSERKER_CHARGE) == CAST_OK)
-                    m_uiBeserkerChargeTimer = urand(15000, 20000);
-            }
+            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+            if (m_uiBeserkerChargeTimer == 0) pTarget = m_creature->getVictim();
+
+            if (DoCastSpellIfCan(pTarget, SPELL_BERSERKER_CHARGE) == CAST_OK)
+                m_uiBeserkerChargeTimer = urand(15000, 20000);
         }
         else
             m_uiBeserkerChargeTimer -= uiDiff;

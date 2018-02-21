@@ -30,6 +30,7 @@ enum
     NPC_ROOKERY_HATCHER         = 10683,
     NPC_SOLAKAR_TRIGGER         = 160014,
     NPC_DRAKKISATH              = 10363,
+    NPC_THE_BEAST               = 10430,
 
     NPC_FIREBRAND_GRUNT         = 9259,
     NPC_BANNOK_GRIMAXE          = 9596,
@@ -109,6 +110,7 @@ class instance_blackrock_spire : public ScriptedInstance
         uint64 m_uiGythGUID;
         uint64 m_uiInfiltratorGUID;
         uint64 m_uiDrakkisathGUID;
+        uint64 m_uiBeastGUID;
 
         uint64 m_uiEmberseerInDoorGUID;
         uint64 m_uiEmberseerCombatDoorGUID;
