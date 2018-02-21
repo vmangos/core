@@ -16,7 +16,7 @@ UPDATE `item_template` SET `Duration`=864000, `ExtraFlags`=1 WHERE entry in (218
 UPDATE `forbidden_items` SET `patch`=6 WHERE `entry`=22279;
 
 -- Remove citizen scripts
-UPDATE `creature_template` SET `ScriptName`='' WHERE `ScriptName` like '%npc%citizen%'
+UPDATE `creature_template` SET `ScriptName`='' WHERE `ScriptName` like '%npc%citizen%';
 
 
 -- End of migration.
