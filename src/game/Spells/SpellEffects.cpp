@@ -429,7 +429,12 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             {
                 // Bloodthirst
                 if (m_spellInfo->SpellIconID == 38 && m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_MORTAL_STRIKE>())
-                    damage = uint32(damage * (m_caster->GetTotalAttackPowerValue(BASE_ATTACK)) / 100);
+                {
+                    float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
+                    if (unitTarget) 
+                        attackPower += m_caster->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS, unitTarget->GetCreatureTypeMask());
+                    damage = uint32(damage * attackPower / 100);
+                }
                 // Shield Slam
                 else if (m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_SHIELD_SLAM>())
                     damage += int32(m_caster->GetShieldBlockValue());
