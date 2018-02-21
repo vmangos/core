@@ -4828,6 +4828,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         unitTarget->RemoveAurasDueToSpell(31800); // Icebolt immunity spell
                         unitTarget->RemoveAurasDueToSpell(28522); // Icebolt stun/damage spell
                     }
+                    return;
                 }
                 case 28352:									// Atiesh - Breath of Sargeras
                 {
@@ -4849,6 +4850,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             return;
                         }
                     }
+                    return;
                 }
                 case 26678:                                 // Bag of Candies
                 {
