@@ -220,6 +220,30 @@ UPDATE `quest_template` SET `RequestItemsText`='Did you find the Syndicate Shado
 UPDATE `quest_template` SET `ReqCreatureOrGOCount1`=20, `ReqCreatureOrGOCount2`=20, `ReqCreatureOrGOCount3`=20, `ReqCreatureOrGOCount4`=20 WHERE `entry`=7862 AND `patch`=3;
 UPDATE `quest_template` SET `Objectives`='You have been tasked with the decimation of 20 Vilebranch Berserkers, 20 Vilebranch Shadow Hunters, 20 Vilebranch Blood Drinkers, and 20 Vilebranch Soul Eaters.$B$BShould you complete this task, return to Primal Torntusk at Revantusk Village in the Hinterlands.' WHERE `entry`=7862 AND `patch`=3;
 
+
+-- Correct static name - http://web.archive.org/web/20070315150520/http://www.thottbot.com:80/q6571
+UPDATE `quest_template` SET `OfferRewardText`='Excellent, $N. You\'ve saved me a lot of work!$b$bBut don\'t think that I\'m not grateful!' WHERE `entry`=6571 AND `patch`=0;
+
+
+-- Prereq for quests
+-- https://github.com/cmangos/classic-db/commit/54d798b9c9d039c89c364b03a8d34a8d8d2d9a03
+-- The Everstill Bridge Confirmed - http://web.archive.org/web/20070317172531/http://www.thottbot.com:80/q89
+UPDATE `quest_template` SET `NextQuestInChain`=89 WHERE `entry`=125 AND `patch`=0;
+UPDATE `quest_template` SET `PrevQuestId`=125 WHERE `entry`=89 AND `patch`=0;
+
+
+-- https://github.com/classicdb/database/pull/485
+-- Confirmed for npc: 14229 - Give NPC same sword as nearby Naga QAkvast
+-- Add Accursed Slitherblade's missing weapon.
+UPDATE `creature_template` SET `equipment_id`=639 WHERE entry=14229;
+
+
+-- Quest item can only be obtained with pickpocketing
+-- https://github.com/cmangos/classic-db/commit/6e501c3da4e03cd0568f3579cbeee93bedfa64c7
+-- Confirmed: http://web.archive.org/web/20070315145928/http://www.thottbot.com:80/q2206
+-- Still works well item is re-spawning  
+DELETE FROM `creature_loot_template` WHERE `entry`=6846 AND `item`=7675 AND `groupid`=0; 
+
 -- End of migration.
 END IF;
 END??
