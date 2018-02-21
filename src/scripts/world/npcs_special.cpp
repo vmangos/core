@@ -3498,6 +3498,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
         if (sGameEventMgr.CheckOneGameEvent(EVENT_VALENTINE_KWEE, time(nullptr)))
         {
             SetVariables();
+            m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
             if (m_creature->GetZoneId() != winningZone && winningZone != 0)
                 m_creature->DespawnOrUnsummon();
         }
