@@ -276,6 +276,10 @@ UPDATE `event_scripts` SET `x`=9641.96, `y`=2521.98, `z`=1331.73, `o`=1.6194, `d
 -- https://github.com/LightsHope/server/issues/977
 UPDATE `creature_template` SET `unit_flags`=4610 WHERE `entry`=289;
 
+-- Secret safe groupid
+-- https://github.com/LightsHope/issues/issues/23
+UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`=0, `groupid`=1 WHERE `entry`=11104;
+
 
 -- End of migration.
 END IF;
