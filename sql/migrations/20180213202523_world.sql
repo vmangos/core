@@ -293,6 +293,11 @@ REPLACE INTO `npc_vendor` (`entry`, `item`) VALUES (6028, 11363),(2685, 11363);
 -- https://github.com/LightsHope/issues/issues/36
 UPDATE `creature` SET `position_x`=4651.41, `position_y`=612.556, `position_z`=8.58061, `orientation`=1.13913 WHERE `guid`=37093;
 
+-- Stratholme Holy Water
+-- https://github.com/LightsHope/issues/issues/28
+REPLACE INTO `spell_bonus_data` VALUES (17291, 1, 0, 0, 0, 'Stratholme Holy Water 100% coefficient');
+
+
 
 -- End of migration.
 END IF;
