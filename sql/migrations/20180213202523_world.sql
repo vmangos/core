@@ -285,7 +285,13 @@ UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`=0, `groupid`=1 WHERE
 UPDATE `quest_template` SET `Method`=2, `SpecialFlags`=2, `StartScript`=8305 WHERE `entry`=8305;
 REPLACE INTO `quest_start_scripts` VALUES (8305, 0, 7, 8305, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Long Forgotten Memories: Complete Quest');
 
+-- Added Medium Shot Pouch to vendors
+-- https://github.com/LightsHope/issues/issues/33
+REPLACE INTO `npc_vendor` (`entry`, `item`) VALUES (6028, 11363),(2685, 11363);
 
+-- Moved Golem out of Remtravel's range
+-- https://github.com/LightsHope/issues/issues/36
+UPDATE `creature` SET `position_x`=4651.41, `position_y`=612.556, `position_z`=8.58061, `orientation`=1.13913 WHERE `guid`=37093;
 
 
 -- End of migration.
