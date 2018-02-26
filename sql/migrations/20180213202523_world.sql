@@ -23,8 +23,8 @@ UPDATE `creature` SET `position_z`=103.8 WHERE  `guid`=19944;
 
 -- Faction exclusive loot
 UPDATE `creature_loot_template` SET `condition_id`=3 WHERE `item`=21889;
-UPDATE `reference_loot_template` SET `condition_id`=3 WHERE item in (22400,22401,23203,23201,23006,22402);
-UPDATE `reference_loot_template` SET `condition_id`=2 WHERE item in (23199,23200,22345,22395,22396,23005);
+UPDATE `reference_loot_template` SET `condition_id`=3 WHERE item in (22400,22401,23203,23201,23006,22402,21288,21289,21290);
+UPDATE `reference_loot_template` SET `condition_id`=2 WHERE item in (23199,23200,22345,22395,22396,23005,21291,21292,21293);
 
 -- Sagefish Delight
 -- https://github.com/LightsHope/server/issues/1277
