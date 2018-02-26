@@ -865,7 +865,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 m_respawnDelay;                              // (secs) delay between corpse disappearance and respawning
         uint32 m_corpseDelay;                               // (secs) delay between death and corpse disappearance
         float m_respawnradius;
-        uint32 m_combatPulseTimer;
 
         time_t m_combatStartTime;
         bool m_combatState;
