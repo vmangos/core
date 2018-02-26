@@ -55,7 +55,6 @@ struct boss_ramstein_the_gorgerAI : public ScriptedAI
 
     void Aggro(Unit *who)
     {
-        m_creature->MonsterYell("Du Hast!", 0, who);
         Engaged = true;
         if (m_pInstance)
             m_pInstance->SetData(TYPE_RAMSTEIN, IN_PROGRESS);

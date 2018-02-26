@@ -209,7 +209,7 @@ struct npc_spectral_tutorAI : public ScriptedAI
             // Image Projection
             if (m_uiImageTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_PROJECTION, CAST_TRIGGERED, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_PROJECTION, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
                 {
                     DoCastSpellIfCan(m_creature, SPELL_IMAGE_PROJECTION, CAST_TRIGGERED);
                     m_uiImageTimer = urand(17700, 25300);

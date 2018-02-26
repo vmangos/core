@@ -128,7 +128,7 @@ struct boss_vectusAI : public ScriptedAI
                     m_creature->GetCreatureListWithEntryInGrid(creatures, NPC_STUDENT, 100.0f);
                     for (std::list<Creature*>::iterator it = creatures.begin(); it != creatures.end(); ++it)
                     {
-                        (*it)->CastSpell((*it), SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, false);
+                        (*it)->CastSpell((*it), SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, true);
                         if (CreatureGroup* myGroup = (*it)->GetCreatureGroup())
                         {
                             myGroup->RemoveMember((*it)->GetGUID());
