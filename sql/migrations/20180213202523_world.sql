@@ -297,6 +297,9 @@ UPDATE `creature` SET `position_x`=4651.41, `position_y`=612.556, `position_z`=8
 -- https://github.com/LightsHope/issues/issues/28
 REPLACE INTO `spell_bonus_data` VALUES (17291, 1, 0, 0, 0, 'Stratholme Holy Water 100% coefficient');
 
+-- Wolfrunner Shoes agility
+-- https://github.com/LightsHope/issues/issues/45
+UPDATE `item_template` SET `stat_type4`=3, `stat_value4`=11 WHERE `entry`=13101 AND `patch`=0;
 
 
 -- End of migration.
