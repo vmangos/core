@@ -8229,7 +8229,8 @@ void Spell::OnSpellLaunch()
         m_caster->setAttackTimer(OFF_ATTACK,  m_caster->getAttackTimer(OFF_ATTACK)  + 200 + 40 * m_caster->GetDistance(unitTarget));
     }
     
-    m_caster->GetMotionMaster()->MoveCharge(unitTarget, sWorld.getConfig(CONFIG_UINT32_SPELLS_CCDELAY), unitTarget != m_caster && !IsPositiveSpell(m_spellInfo->Id));
+    bool triggerAutoAttack = unitTarget != m_caster && !IsPositiveSpell(m_spellInfo->Id) && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
+    m_caster->GetMotionMaster()->MoveCharge(unitTarget, sWorld.getConfig(CONFIG_UINT32_SPELLS_CCDELAY), triggerAutoAttack);
 }
 
 bool Spell::HasModifierApplied(SpellModifier* mod)
