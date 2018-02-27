@@ -4551,19 +4551,28 @@ void Aura::HandleAuraModIncreaseEnergy(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModIncreaseEnergyPercent(bool apply, bool /*Real*/)
 {
+    Unit *target = GetTarget();
     Powers powerType = Powers(m_modifier.m_miscvalue);
+    float powerPercent = target->GetPowerPercent(powerType);
 
     UnitMods unitMod = UnitMods(UNIT_MOD_POWER_START + powerType);
+    target->HandleStatModifier(unitMod, TOTAL_PCT, float(m_modifier.m_amount), apply);
 
-    GetTarget()->HandleStatModifier(unitMod, TOTAL_PCT, float(m_modifier.m_amount), apply);
+    if (target->isAlive())
+        target->SetPower(powerType, target->GetMaxPower(powerType) * powerPercent / 100.0f);
 }
 
 void Aura::HandleAuraModIncreaseHealthPercent(bool apply, bool /*Real*/)
 {
-    GetTarget()->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(m_modifier.m_amount), apply);
+    Unit *target = GetTarget();
+    float healthPercent = target->GetHealthPercent();
+    target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_PCT, float(m_modifier.m_amount), apply);
 
-    if (GetTarget()->GetMaxHealth() == 1)
-        GetTarget()->DoKillUnit(GetTarget());
+    if (target->isAlive())
+        target->SetHealthPercent(healthPercent);
+
+    if (target->GetMaxHealth() == 1)
+        target->DoKillUnit(target);
 }
 
 /********************************/
