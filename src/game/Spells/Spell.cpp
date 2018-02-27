@@ -6706,7 +6706,7 @@ SpellCastResult Spell::CheckCasterAuras() const
     return SPELL_CAST_OK;
 }
 
-bool Spell::CanAutoCast(Unit* target)
+bool Spell::CanAutoCast(Unit* target, bool isPositive)
 {
     ObjectGuid targetguid = target->GetObjectGuid();
 
@@ -6724,6 +6724,8 @@ bool Spell::CanAutoCast(Unit* target)
     bool fullHealSpell = true;
     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
+        if (!isPositive)
+            break;
         if (m_spellInfo->Effect[j] && m_spellInfo->EffectApplyAuraName[j] != SPELL_AURA_PERIODIC_HEAL)
             fullHealSpell = false;
         if (m_spellInfo->Effect[j] == SPELL_EFFECT_APPLY_AURA)
