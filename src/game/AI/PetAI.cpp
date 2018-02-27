@@ -136,7 +136,11 @@ void PetAI::UpdateAI(const uint32 diff)
             if (m_creature->GetCharmInfo()->HasCommandState(COMMAND_STAY))
             {
                 if (m_creature->GetCharmInfo()->IsCommandAttack() || (m_creature->GetCharmInfo()->IsAtStay() && m_creature->CanReachWithMeleeAttack(m_creature->getVictim())))
+                {
+                    if (!m_creature->HasInArc(M_PI_F, m_creature->getVictim()))
+                        m_creature->SetInFront(m_creature->getVictim());
                     attacked = DoMeleeAttackIfReady();
+                }
             }
             else
                 attacked = DoMeleeAttackIfReady();
