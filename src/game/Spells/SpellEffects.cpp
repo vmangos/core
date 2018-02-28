@@ -3383,24 +3383,39 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
     // in another case summon new
     uint32 level = m_caster->getLevel();
 
-    // level of pet summoned using engineering item based at engineering skill level
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_CastItem)
+    // Summoned by unit: use creature level but cap at owner level
+    if (m_caster->GetTypeId() == TYPEID_UNIT)
     {
-        ItemPrototype const *proto = m_CastItem->GetProto();
-        if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
+        uint32 creaturelevel = cInfo->minlevel == cInfo->maxlevel ? cInfo->minlevel : urand(cInfo->minlevel, cInfo->maxlevel);
+        if (creaturelevel < level) level = creaturelevel;
+    }
+    // Summoned by player
+    else
+    {
+        // Use spell level if possible
+        if (m_spellInfo->spellLevel > 1)
         {
-            uint16 engiLevel = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING);
-            if (engiLevel)
+            level = m_spellInfo->spellLevel;
+        }
+        // Else match with owner level but cap at creature max
+        else if (cInfo->maxlevel < level)
+        {
+            level = cInfo->maxlevel;
+        }
+        // Engineering summons always scale with skill points
+        if (m_CastItem)
+        {
+            ItemPrototype const *proto = m_CastItem->GetProto();
+            if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
             {
-                level = engiLevel / 5;
+                uint16 engiLevel = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING);
+                if (engiLevel)
+                {
+                    level = engiLevel / 5;
+                }
             }
         }
     }
-
-    if (m_spellInfo->Id == 9515) // Exception for 'Summon Tracking Hound'
-        level = m_spellInfo->spellLevel;
-    if (m_spellInfo->Id == 14642 && level > cInfo->maxlevel) // Felhound Minion level cap
-        level = cInfo->maxlevel;
 
     // select center of summon position
     float center_x = m_targets.m_destX;

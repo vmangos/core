@@ -1363,20 +1363,19 @@ struct npc_felhound_minionAI : public ScriptedPetAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->getVictim())
-            return;
-
-        if (m_uiManaBurnTimer < uiDiff)
+        if (m_creature->getVictim())
         {
-            if (m_creature->getVictim()->getPowerType() == POWER_MANA)
-                DoCastSpellIfCan(m_creature->getVictim(), 15980);
-            m_uiManaBurnTimer = urand(9800, 15200);
-            return;
+            if (m_uiManaBurnTimer < uiDiff)
+            {
+                if (m_creature->getVictim()->getPowerType() == POWER_MANA)
+                    DoCastSpellIfCan(m_creature->getVictim(), 15980);
+                m_uiManaBurnTimer = urand(9800, 15200);
+                return;
+            }
+            else
+                m_uiManaBurnTimer -= uiDiff;
         }
-        else
-            m_uiManaBurnTimer -= uiDiff;
-
-        ScriptedPetAI::UpdatePetAI(uiDiff);
+        ScriptedPetAI::UpdateAI(uiDiff);
     }
 };
 
