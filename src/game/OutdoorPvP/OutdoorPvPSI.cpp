@@ -152,7 +152,7 @@ bool OutdoorPvPSI::HandleAreaTrigger(Player *plr, uint32 trigger)
 
     plr->CastSpell(plr, SI_TRACES_OF_SILITHYST, true);                           /** Reward animation */
     plr->GetHonorMgr().Add(19, BONUS);                                       /** Instant honor reward */
-    plr->GetReputationMgr().ModifyReputation(sFactionStore.LookupEntry(609), 10); /** Cenarian faction */
+    plr->GetReputationMgr().ModifyReputation(sObjectMgr.GetFactionEntry(609), 10); /** Cenarian faction */
 
     sLog.out(LOG_BG, "%s [%u:%u:'%s'] added a Silithyst to its faction",
              plr->GetName(),

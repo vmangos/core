@@ -1156,6 +1156,16 @@ Map::PlayerRelocation(Player *player, float x, float y, float z, float orientati
 
     player->OnRelocated();
 
+
+    // Ornate Spyglass case, the player's camera is at range in front of him
+    // When the player turns, keep it in front of the player
+    if (!player->m_movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN))
+        if (player->GetLongSight())
+        {
+            player->UpdateLongSight();
+            player->GetCamera().UpdateVisibilityForOwner();
+        }
+
     NGridType* newGrid = getNGrid(new_cell.GridX(), new_cell.GridY());
     if (!same_cell && newGrid->GetGridState() != GRID_STATE_ACTIVE)
     {
@@ -1808,7 +1818,7 @@ bool DungeonMap::CanEnter(Player *player)
     Group *pGroup = player->GetGroup();
     if (pGroup && pGroup->InCombatToInstance(GetInstanceId()) && player->isAlive() && player->GetMapId() != GetId())
     {
-		
+        
         if (GetId() == 249 || GetId() == 531 || GetId() == 533)        // Hack : Ustaag <Nostalrius> : concerne uniquement Onyxia's Lair
         {
             player->SendTransferAborted(TRANSFER_ABORT_ZONE_IN_COMBAT);
@@ -2226,6 +2236,190 @@ void Map::ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* sou
     m_scriptSchedule_lock.release();
 }
 
+bool Map::FindScriptTargets(Object*& source, Object*& target, const ScriptAction& step)
+{
+    if (step.sourceGuid)
+    {
+        switch (step.sourceGuid.GetHigh())
+        {
+            case HIGHGUID_ITEM:
+            {
+                // case HIGHGUID_CONTAINER: ==HIGHGUID_ITEM
+                if (Player* player = HashMapHolder<Player>::Find(step.ownerGuid))
+                    source = player->GetItemByGuid(step.sourceGuid);
+                break;
+            }
+            case HIGHGUID_UNIT:
+                source = GetCreature(step.sourceGuid);
+                break;
+            case HIGHGUID_PET:
+                source = GetPet(step.sourceGuid);
+                break;
+            case HIGHGUID_PLAYER:
+                source = HashMapHolder<Player>::Find(step.sourceGuid);
+                break;
+            case HIGHGUID_GAMEOBJECT:
+                source = GetGameObject(step.sourceGuid);
+                break;
+            case HIGHGUID_CORPSE:
+                source = HashMapHolder<Corpse>::Find(step.sourceGuid);
+                break;
+            default:
+                sLog.outError("*_script source with unsupported guid %s", step.sourceGuid.GetString().c_str());
+                return false;
+        }
+    }
+
+    if (source && !source->IsInWorld())
+        source = nullptr;
+
+    if (step.targetGuid)
+    {
+        switch (step.targetGuid.GetHigh())
+        {
+            case HIGHGUID_UNIT:
+                target = GetCreature(step.targetGuid);
+                break;
+            case HIGHGUID_PET:
+                target = GetPet(step.targetGuid);
+                break;
+            case HIGHGUID_PLAYER:
+                target = HashMapHolder<Player>::Find(step.targetGuid);
+                break;
+            case HIGHGUID_GAMEOBJECT:
+                target = GetGameObject(step.targetGuid);
+                break;
+            case HIGHGUID_CORPSE:
+                target = HashMapHolder<Corpse>::Find(step.targetGuid);
+                break;
+            default:
+                sLog.outError("*_script target with unsupported guid %s", step.targetGuid.GetString().c_str());
+                return false;
+        }
+    }
+
+    if (target && !target->IsInWorld())
+        target = nullptr;
+
+    // we swap target and source if data_flags & 0x1
+    if (step.script->raw.data[4] & SF_GENERAL_SWAP_INITIAL_TARGETS)
+        std::swap(source, target);
+
+    // If we have a buddy lets find it.
+    if (step.script->buddy_id)
+    {
+        Object* pBuddy = nullptr;
+        switch (step.script->buddy_type)
+        {
+        case BUDDY_TYPE_CREATURE_ENTRY:
+        {
+            if (source && source->isType(TYPEMASK_WORLDOBJECT))
+            {
+                WorldObject* pSource = (WorldObject*)source;
+                Creature* pCreatureBuddy = nullptr;
+
+                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->buddy_id, true, step.script->buddy_radius);
+                MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreatureBuddy, u_check);
+
+                Cell::VisitGridObjects(pSource, searcher, step.script->buddy_radius);
+
+                if (pCreatureBuddy)
+                    pBuddy = pCreatureBuddy;
+            }
+            else
+                sLog.outError("FindScriptTargets: Attempt to search for nearby creature in script with id %u but source is not a world object.", step.script->id);
+            break;
+        }
+        case BUDDY_TYPE_CREATURE_GUID:
+        {
+            const CreatureData* pCreatureData = sObjectMgr.GetCreatureData(step.script->buddy_id);
+            if (pCreatureData)
+            {
+                Creature* pCreatureBuddy = this->GetCreature(ObjectGuid(HIGHGUID_UNIT, pCreatureData->id, step.script->buddy_id));
+
+                if (pCreatureBuddy)
+                    pBuddy = pCreatureBuddy;
+            }
+            break;
+        }
+        case BUDDY_TYPE_CREATURE_INSTANCE_DATA:
+        {
+            InstanceData* pInstanceData = this->GetInstanceData();
+            if (pInstanceData)
+            {
+                Creature* pCreatureBuddy = pInstanceData->GetCreature(pInstanceData->GetData64(step.script->buddy_id));
+
+                if (pCreatureBuddy)
+                    pBuddy = pCreatureBuddy;
+            }
+            break;
+        }
+        case BUDDY_TYPE_GAMEOBJECT_ENTRY:
+        {
+            if (source && source->isType(TYPEMASK_WORLDOBJECT))
+            {
+                WorldObject* pSource = (WorldObject*)source;
+                GameObject* pGameObjectBuddy = nullptr;
+
+                MaNGOS::NearestGameObjectEntryInObjectRangeCheck u_check(*pSource, step.script->buddy_id, step.script->buddy_radius);
+                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> searcher(pGameObjectBuddy, u_check);
+
+                Cell::VisitGridObjects(pSource, searcher, step.script->buddy_radius);
+
+                if (pGameObjectBuddy)
+                    pBuddy = pGameObjectBuddy;
+            }
+            else
+                sLog.outError("FindScriptTargets: Attempt to search for nearby gameobject in script with id %u but source is not a world object.", step.script->id);
+            break;
+        }
+        case BUDDY_TYPE_GAMEOBJECT_GUID:
+        {
+            GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(step.script->buddy_id);
+            if (pGameObjectData)
+            {
+                GameObject* pGameObjectBuddy = this->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, step.script->buddy_id));
+
+                if (pGameObjectBuddy)
+                    pBuddy = pGameObjectBuddy;
+            }
+            break;
+        }
+        case BUDDY_TYPE_GAMEOBJECT_INSTANCE_DATA:
+        {
+            InstanceData* pInstanceData = this->GetInstanceData();
+            if (pInstanceData)
+            {
+                GameObject* pGameObjectBuddy = pInstanceData->GetGameObject(pInstanceData->GetData64(step.script->buddy_id));
+
+                if (pGameObjectBuddy)
+                    pBuddy = pGameObjectBuddy;
+            }
+            break;
+        }
+        }
+
+        if (pBuddy)
+            source = pBuddy;
+        else
+        {
+            sLog.outError("FindScriptTargets: Failed to find buddy for script with id %u (buddy_id: %u), (buddy_radius: %u), (buddy_type: %u).", step.script->id, step.script->buddy_id, step.script->buddy_radius, step.script->buddy_type);
+            return false;
+        }
+    }
+
+    // we swap target and source again if data_flags & 0x2
+    // this way we have all possible combinations with 3 targets
+    if (step.script->raw.data[4] & SF_GENERAL_SWAP_FINAL_TARGETS)
+        std::swap(source, target);
+
+    // we replace the target with the source if data_flags & 0x4
+    if (step.script->raw.data[4] & SF_GENERAL_TARGET_SELF)
+        target = source;
+
+    return true;
+}
+
 // Removes all parts of script from the queue.
 void Map::TerminateScript(ScriptAction& step)
 {
@@ -2260,191 +2454,14 @@ void Map::ScriptsProcess()
         m_scriptSchedule_lock.release();
 
         Object* source = nullptr;
-
-        if (step.sourceGuid)
-        {
-            switch (step.sourceGuid.GetHigh())
-            {
-                case HIGHGUID_ITEM:
-                    // case HIGHGUID_CONTAINER: ==HIGHGUID_ITEM
-                {
-                    if (Player* player = HashMapHolder<Player>::Find(step.ownerGuid))
-                        source = player->GetItemByGuid(step.sourceGuid);
-                    break;
-                }
-                case HIGHGUID_UNIT:
-                    source = GetCreature(step.sourceGuid);
-                    break;
-                case HIGHGUID_PET:
-                    source = GetPet(step.sourceGuid);
-                    break;
-                case HIGHGUID_PLAYER:
-                    source = HashMapHolder<Player>::Find(step.sourceGuid);
-                    break;
-                case HIGHGUID_GAMEOBJECT:
-                    source = GetGameObject(step.sourceGuid);
-                    break;
-                case HIGHGUID_CORPSE:
-                    source = HashMapHolder<Corpse>::Find(step.sourceGuid);
-                    break;
-                default:
-                    sLog.outError("*_script source with unsupported guid %s", step.sourceGuid.GetString().c_str());
-                    break;
-            }
-        }
-
-        if (source && !source->IsInWorld())
-            source = nullptr;
-
         Object* target = nullptr;
 
-        if (step.targetGuid)
-        {
-            switch (step.targetGuid.GetHigh())
-            {
-                case HIGHGUID_UNIT:
-                    target = GetCreature(step.targetGuid);
-                    break;
-                case HIGHGUID_PET:
-                    target = GetPet(step.targetGuid);
-                    break;
-                case HIGHGUID_PLAYER:
-                    target = HashMapHolder<Player>::Find(step.targetGuid);
-                    break;
-                case HIGHGUID_GAMEOBJECT:
-                    target = GetGameObject(step.targetGuid);
-                    break;
-                case HIGHGUID_CORPSE:
-                    target = HashMapHolder<Corpse>::Find(step.targetGuid);
-                    break;
-                default:
-                    sLog.outError("*_script target with unsupported guid %s", step.targetGuid.GetString().c_str());
-                    break;
-            }
-        }
+        bool scriptResultOk = FindScriptTargets(source, target, step) && (step.script->command != SCRIPT_COMMAND_DISABLED);
 
-        if (target && !target->IsInWorld())
-            target = nullptr;
-
-        // we swap target and source if data_flags & 0x1
-        if (step.script->raw.data[4] & SF_GENERAL_SWAP_INITIAL_TARGETS)
-            std::swap(source, target);
-
-        bool scriptResultOk = true;
-
-        // If we have a buddy lets find it.
-        if (step.script->buddy_id)
-        {
-            Object* pBuddy = nullptr;
-            switch (step.script->buddy_type)
-            {
-                case BUDDY_TYPE_CREATURE_ENTRY:
-                {
-                    if (source && source->isType(TYPEMASK_WORLDOBJECT))
-                    {
-                        WorldObject* pSource = (WorldObject*)source;
-                        Creature* pCreatureBuddy = nullptr;
-
-                        MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSource, step.script->buddy_id, true, step.script->buddy_radius);
-                        MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreatureBuddy, u_check);
-
-                        Cell::VisitGridObjects(pSource, searcher, step.script->buddy_radius);
-
-                        if (pCreatureBuddy)
-                            pBuddy = pCreatureBuddy;
-                    }
-                    else
-                        sLog.outError("ScriptsProcess: Attempt to search for nearby creature in script with id %u but source is not a world object.", step.script->id);
-                    break;
-                }
-                case BUDDY_TYPE_CREATURE_GUID:
-                {
-                    const CreatureData* pCreatureData = sObjectMgr.GetCreatureData(step.script->buddy_id);
-                    if (pCreatureData)
-                    {
-                        Creature* pCreatureBuddy = this->GetCreature(ObjectGuid(HIGHGUID_UNIT, pCreatureData->id, step.script->buddy_id));
-
-                        if (pCreatureBuddy)
-                            pBuddy = pCreatureBuddy;
-                    }
-                    break;
-                }
-                case BUDDY_TYPE_CREATURE_INSTANCE_DATA:
-                {
-                    InstanceData* pInstanceData = this->GetInstanceData();
-                    if (pInstanceData)
-                    {
-                        Creature* pCreatureBuddy = pInstanceData->GetCreature(pInstanceData->GetData64(step.script->buddy_id));
-
-                        if (pCreatureBuddy)
-                            pBuddy = pCreatureBuddy;
-                    }
-                    break;
-                }
-                case BUDDY_TYPE_GAMEOBJECT_ENTRY:
-                {
-                    if (source && source->isType(TYPEMASK_WORLDOBJECT))
-                    {
-                        WorldObject* pSource = (WorldObject*)source;
-                        GameObject* pGameObjectBuddy = nullptr;
-
-                        MaNGOS::NearestGameObjectEntryInObjectRangeCheck u_check(*pSource, step.script->buddy_id, step.script->buddy_radius);
-                        MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> searcher(pGameObjectBuddy, u_check);
-
-                        Cell::VisitGridObjects(pSource, searcher, step.script->buddy_radius);
-
-                        if (pGameObjectBuddy)
-                            pBuddy = pGameObjectBuddy;
-                    }
-                    else
-                        sLog.outError("ScriptsProcess: Attempt to search for nearby gameobject in script with id %u but source is not a world object.", step.script->id);
-                    break;
-                }
-                case BUDDY_TYPE_GAMEOBJECT_GUID:
-                {
-                    GameObjectData const* pGameObjectData = sObjectMgr.GetGOData(step.script->buddy_id);
-                    if (pGameObjectData)
-                    {
-                        GameObject* pGameObjectBuddy = this->GetGameObject(ObjectGuid(HIGHGUID_GAMEOBJECT, pGameObjectData->id, step.script->buddy_id));
-
-                        if (pGameObjectBuddy)
-                            pBuddy = pGameObjectBuddy;
-                    }
-                    break;
-                }
-                case BUDDY_TYPE_GAMEOBJECT_INSTANCE_DATA:
-                {
-                    InstanceData* pInstanceData = this->GetInstanceData();
-                    if (pInstanceData)
-                    {
-                        GameObject* pGameObjectBuddy = pInstanceData->GetGameObject(pInstanceData->GetData64(step.script->buddy_id));
-
-                        if (pGameObjectBuddy)
-                            pBuddy = pGameObjectBuddy;
-                    }
-                    break;
-                }
-            }
-
-            if (pBuddy)
-                source = pBuddy;
-            else
-            {
-                sLog.outError("ScriptsProcess: Failed to find buddy for script with id %u (buddy_id: %u), (buddy_radius: %u), (buddy_type: %u).", step.script->id, step.script->buddy_id, step.script->buddy_radius, step.script->buddy_type);
+        if (step.script->condition)
+            if (!sObjectMgr.IsConditionSatisfied(step.script->condition, ToWorldObject(target), this, ToWorldObject(source), CONDITION_FROM_DBSCRIPTS))
                 scriptResultOk = false;
-            }
-        }
 
-        // we swap target and source again if data_flags & 0x2
-        // this way we have all possible combinations with 3 targets
-        if (step.script->raw.data[4] & SF_GENERAL_SWAP_FINAL_TARGETS)
-            std::swap(source, target);
-        
-        // we replace the target with the source if data_flags & 0x4
-        if (step.script->raw.data[4] & SF_GENERAL_TARGET_SELF)
-            target = source;
-        
-        
         if (scriptResultOk)
             scriptResultOk = (this->*(m_ScriptCommands[step.script->command]))(step, source, target);
 

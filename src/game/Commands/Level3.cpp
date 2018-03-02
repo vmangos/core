@@ -146,7 +146,6 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllEventAICommand(char* /*args*/)
 {
-    HandleReloadEventAITextsCommand((char*)"a");
     HandleReloadEventAISummonsCommand((char*)"a");
     HandleReloadEventAIScriptsCommand((char*)"a");
     return true;
@@ -696,15 +695,6 @@ bool ChatHandler::HandleReloadEventScriptsCommand(char* args)
     if (*args != 'a')
         SendSysMessage("DB table `event_scripts` reloaded.");
 
-    return true;
-}
-
-bool ChatHandler::HandleReloadEventAITextsCommand(char* /*args*/)
-{
-
-    sLog.outString("Re-Loading Texts from `creature_ai_texts`...");
-    sEventAIMgr.LoadCreatureEventAI_Texts(true);
-    SendSysMessage("DB table `creature_ai_texts` reloaded.");
     return true;
 }
 

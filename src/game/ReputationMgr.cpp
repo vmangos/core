@@ -41,7 +41,7 @@ ReputationRank ReputationMgr::ReputationToRank(int32 standing)
 
 int32 ReputationMgr::GetReputation(uint32 faction_id) const
 {
-    FactionEntry const *factionEntry = sFactionStore.LookupEntry(faction_id);
+    FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(faction_id);
 
     if (!factionEntry)
     {
@@ -202,9 +202,9 @@ void ReputationMgr::Initialize()
 {
     m_factions.clear();
 
-    for (unsigned int i = 1; i < sFactionStore.GetNumRows(); i++)
+    for (unsigned int i = 1; i < sObjectMgr.GetMaxFactionId(); i++)
     {
-        FactionEntry const *factionEntry = sFactionStore.LookupEntry(i);
+        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(i);
 
         if (factionEntry && (factionEntry->reputationListID >= 0))
         {
@@ -235,7 +235,7 @@ bool ReputationMgr::SetReputation(FactionEntry const* factionEntry, int32 standi
                 {
                     // bonuses are already given, so just modify standing by rate
                     int32 spilloverRep = standing * repTemplate->faction_rate[i];
-                    SetOneFactionReputation(sFactionStore.LookupEntry(repTemplate->faction[i]), spilloverRep, incremental);
+                    SetOneFactionReputation(sObjectMgr.GetFactionEntry(repTemplate->faction[i]), spilloverRep, incremental);
                 }
             }
         }
@@ -287,7 +287,7 @@ void ReputationMgr::SetVisible(FactionTemplateEntry const*factionTemplateEntry)
     if (!factionTemplateEntry->faction)
         return;
 
-    if (FactionEntry const *factionEntry = sFactionStore.LookupEntry(factionTemplateEntry->faction))
+    if (FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(factionTemplateEntry->faction))
         SetVisible(factionEntry);
 }
 
@@ -393,7 +393,7 @@ void ReputationMgr::LoadFromDB(QueryResult *result)
         {
             Field *fields = result->Fetch();
 
-            FactionEntry const *factionEntry = sFactionStore.LookupEntry(fields[0].GetUInt32());
+            FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(fields[0].GetUInt32());
             if (factionEntry && (factionEntry->reputationListID >= 0))
             {
                 FactionState* faction = &m_factions[factionEntry->reputationListID];

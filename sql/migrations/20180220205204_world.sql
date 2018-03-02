@@ -8,6 +8,7 @@ IF v=0 THEN
 INSERT INTO `migrations` VALUES ('20180220205204');
 -- Add your query below.
 
+
 -- Melon in a moonwell
 -- https://github.com/LightsHope/server/issues/800
 
@@ -242,7 +243,12 @@ UPDATE `creature_template` SET `equipment_id`=639 WHERE entry=14229;
 -- https://github.com/cmangos/classic-db/commit/6e501c3da4e03cd0568f3579cbeee93bedfa64c7
 -- Confirmed: http://web.archive.org/web/20070315145928/http://www.thottbot.com:80/q2206
 -- Still works well item is re-spawning  
-DELETE FROM `creature_loot_template` WHERE `entry`=6846 AND `item`=7675 AND `groupid`=0; 
+DELETE FROM `creature_loot_template` WHERE `entry`=6846 AND `item`=7675 AND `groupid`=0;
+
+-- Fix startup error introduced by this migration.
+UPDATE `creature` SET `curmana`=1926 WHERE `guid`=590004;
+DELETE FROM `creature_groups` WHERE `memberGUID`=1176471;
+
 
 -- End of migration.
 END IF;

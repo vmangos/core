@@ -756,7 +756,7 @@ struct instance_blackwing_lair : public ScriptedInstance
                         {
                             bYelled = true;
                         }
-                        pCreature->MonsterMoveWithSpeed(-7608.0f, -888.0f, 432.0f, pCreature->GetSpeed(MOVE_RUN), true);
+                        pCreature->MonsterMoveWithSpeed(-7608.0f, -888.0f, 432.0f, 10.0f, pCreature->GetSpeed(MOVE_RUN), uint32(MOVE_PATHFINDING));
                     }
                 }
             }

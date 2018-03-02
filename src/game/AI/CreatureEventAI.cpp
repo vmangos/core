@@ -132,6 +132,9 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     if (pHolder.Event.event_inverse_phase_mask & (1 << m_Phase))
         return false;
 
+    if (pHolder.Event.condition_id && !sObjectMgr.IsConditionSatisfied(pHolder.Event.condition_id, pActionInvoker, m_creature->GetMap(), m_creature, CONDITION_FROM_EVENTAI))
+        return false;
+
     CreatureEventAI_Event const& event = pHolder.Event;
 
     //Check event conditions based on the event type, also reset events
@@ -352,6 +355,12 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
 
             //Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.buffed.repeatMin, event.buffed.repeatMax);
+            break;
+        }
+        case EVENT_T_MOVEMENT_INFORM:
+        {
+            //Repeat Timers
+            pHolder.UpdateRepeatTimer(m_creature, event.move_inform.repeatMin, event.move_inform.repeatMax);
             break;
         }
         default:
@@ -602,13 +611,25 @@ void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32
             break;
         }
         case ACTION_T_SET_UNIT_FLAG:
+        {
+            // not allow modify important for integrity object fields
+            if (action.unit_flag.field < OBJECT_END || action.unit_flag.field >= UNIT_END)
+                return;
+
             if (Unit* target = GetTargetByType(action.unit_flag.target, pActionInvoker))
-                target->SetFlag(UNIT_FIELD_FLAGS, action.unit_flag.value);
+                target->SetFlag(action.unit_flag.field, action.unit_flag.value);
             break;
+        }
         case ACTION_T_REMOVE_UNIT_FLAG:
+        {
+            // not allow modify important for integrity object fields
+            if (action.set_unit_field.field < OBJECT_END || action.set_unit_field.field >= UNIT_END)
+                return;
+
             if (Unit* target = GetTargetByType(action.unit_flag.target, pActionInvoker))
-                target->RemoveFlag(UNIT_FIELD_FLAGS, action.unit_flag.value);
+                target->RemoveFlag(action.unit_flag.field, action.unit_flag.value);
             break;
+        }
         case ACTION_T_AUTO_ATTACK:
             m_MeleeEnabled = action.auto_attack.state != 0;
             break;
@@ -1160,6 +1181,17 @@ void CreatureEventAI::SpellHit(Unit* pUnit, const SpellEntry* pSpell)
                     ProcessEvent(*i, pUnit);
 }
 
+void CreatureEventAI::MovementInform(uint32 type, uint32 id)
+{
+    if (m_bEmptyList)
+        return;
+
+    for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
+        if ((*i).Event.event_type == EVENT_T_MOVEMENT_INFORM)
+            if ((*i).Event.move_inform.motionType == type && (*i).Event.move_inform.pointId == id)
+                ProcessEvent(*i);
+}
+
 void CreatureEventAI::UpdateAI(const uint32 diff)
 {
     //Check if we are in combat (also updates calls threat update code)
@@ -1325,111 +1357,6 @@ void CreatureEventAI::DoFindFriendlyMissingBuff(std::list<Creature*>& _list, flo
 //*********************************
 //*** Functions used globally ***
 
-void CreatureEventAI::DoScriptText(int32 textEntry, Unit* pSource, Unit* target)
-{
-    if (!pSource)
-    {
-        sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i, invalid Source pointer.", textEntry);
-        return;
-    }
-
-    uint8 Type;
-    uint32 Emote;
-    uint32 Language;
-    uint32 SoundId;
-
-    if (textEntry >= 0)
-    {
-        if (const BroadcastText* bct = sObjectMgr.GetBroadcastTextLocale(textEntry))
-        {
-            Type = bct->Type;
-            Emote = bct->EmoteId0;
-            Language = bct->Language;
-            SoundId = bct->SoundId;
-        }
-        else
-        {
-            sLog.outErrorDb("CreatureEventAI: DoScriptText with source entry %u (TypeId=%u, guid=%u) attempts to process broadcast text id %i, but text id does not exist.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textEntry);
-            return;
-        }
-    }
-    else
-    {
-        CreatureEventAI_TextMap::const_iterator i = sEventAIMgr.GetCreatureEventAITextMap().find(textEntry);
-        if (i == sEventAIMgr.GetCreatureEventAITextMap().end())
-        {
-            sLog.outErrorDb("CreatureEventAI: DoScriptText with source entry %u (TypeId=%u, guid=%u) could not find text entry %i.", pSource->GetEntry(), pSource->GetTypeId(), pSource->GetGUIDLow(), textEntry);
-            return;
-        }
-        else
-        {
-            Type = (*i).second.Type;
-            Emote = (*i).second.Emote;
-            Language = (*i).second.Language;
-            SoundId = (*i).second.SoundId;
-        }
-    }
-
-    DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "CreatureEventAI: DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u", textEntry, SoundId, Type, Language, Emote);
-
-    if (SoundId)
-    {
-        if (GetSoundEntriesStore()->LookupEntry(SoundId))
-        {
-            if(Type == CHAT_TYPE_ZONE_YELL)
-            {
-                if(Map* pZone = pSource->GetMap())
-                    pZone->PlayDirectSoundToMap(SoundId);
-            }
-            else
-                pSource->PlayDirectSound(SoundId);
-        }
-        else
-            sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process invalid sound id %u.", textEntry, SoundId);
-    }
-
-    if (Emote)
-    {
-        if (pSource->GetTypeId() == TYPEID_UNIT || pSource->GetTypeId() == TYPEID_PLAYER)
-            ((Unit*)pSource)->HandleEmote(Emote);
-        else
-            sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i tried to process emote for invalid TypeId (%u).", textEntry, pSource->GetTypeId());
-    }
-
-    switch (Type)
-    {
-        case CHAT_TYPE_SAY:
-            pSource->MonsterSay(textEntry, Language, target);
-            break;
-        case CHAT_TYPE_YELL:
-            pSource->MonsterYell(textEntry, Language, target);
-            break;
-        case CHAT_TYPE_TEXT_EMOTE:
-            pSource->MonsterTextEmote(textEntry, target);
-            break;
-        case CHAT_TYPE_BOSS_EMOTE:
-            pSource->MonsterTextEmote(textEntry, target, true);
-            break;
-        case CHAT_TYPE_WHISPER:
-        {
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
-                pSource->MonsterWhisper(textEntry, target);
-            else sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textEntry);
-        }
-        break;
-        case CHAT_TYPE_BOSS_WHISPER:
-        {
-            if (target && target->GetTypeId() == TYPEID_PLAYER)
-                pSource->MonsterWhisper(textEntry, target, true);
-            else sLog.outErrorDb("CreatureEventAI: DoScriptText entry %i cannot whisper without target unit (TYPEID_PLAYER).", textEntry);
-        }
-        break;
-        case CHAT_TYPE_ZONE_YELL:
-            pSource->MonsterYellToZone(textEntry, Language, target);
-            break;
-    }
-}
-
 void CreatureEventAI::ReceiveEmote(Player* pPlayer, uint32 text_emote)
 {
     if (m_bEmptyList)
@@ -1442,12 +1369,7 @@ void CreatureEventAI::ReceiveEmote(Player* pPlayer, uint32 text_emote)
             if ((*itr).Event.receive_emote.emoteId != text_emote)
                 continue;
 
-            PlayerCondition pcon(0, (*itr).Event.receive_emote.condition, (*itr).Event.receive_emote.conditionValue1, (*itr).Event.receive_emote.conditionValue2);
-            if (pcon.Meets(pPlayer, m_creature->GetMap(), m_creature, CONDITION_FROM_EVENTAI))
-            {
-                DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "CreatureEventAI: ReceiveEmote CreatureEventAI: Condition ok, processing");
-                ProcessEvent(*itr, pPlayer);
-            }
+            ProcessEvent(*itr, pPlayer);
         }
     }
 }

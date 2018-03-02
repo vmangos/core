@@ -43,6 +43,7 @@ EndScriptData */
 #define SPELL_LOVE_IN_AIR            27741
 #define SPELL_AMOROUS                26869
 
+
 guardAI::guardAI(Creature* pCreature, bool isCapitalGuard) : ScriptedAI(pCreature),
     GlobalCooldown(0),
     BuffTimer(0),
@@ -54,6 +55,7 @@ guardAI::guardAI(Creature* pCreature, bool isCapitalGuard) : ScriptedAI(pCreatur
 
 void guardAI::Reset()
 {
+    
     GlobalCooldown = 0;
     BuffTimer = 0;                                          //Rebuff as soon as we can
 }
@@ -250,6 +252,7 @@ void guardAI::MoveInLineOfSight(Unit* pWho)
         }
     }
 }
+
 
 void guardAI::DoReplyToTextEmote(uint32 em)
 {

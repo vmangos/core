@@ -127,6 +127,13 @@ enum Poi_Icon
     ICON_POI_REDHORSE           =   40                      // Red Horse
 };
 
+enum OptionVendorMenuType
+{
+    VENDOR_MENU_NORMAL   = 0x1,
+    VENDOR_MENU_TEMPLATE = 0x2,
+    VENDOR_MENU_ALL      = 0x3,
+};
+
 struct GossipMenuItem
 {
     uint8       m_gIcon;

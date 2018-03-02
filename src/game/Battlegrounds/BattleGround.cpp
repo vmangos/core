@@ -571,7 +571,7 @@ void BattleGround::RewardHonorToTeam(uint32 Honor, Team teamId)
 
 void BattleGround::RewardReputationToTeam(uint32 faction_id, uint32 Reputation, Team teamId)
 {
-    FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
+    FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(faction_id);
 
     if (!factionEntry)
         return;

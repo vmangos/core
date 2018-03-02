@@ -536,7 +536,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
                     break;              // everlook, neutral
                 default:                                    // for unknown case
                 {
-                    FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
+                    FactionTemplateEntry const* u_entry = sObjectMgr.GetFactionTemplateEntry(factionTemplateId);
                     if (!u_entry)
                         houseid = 7;                        // goblin auction house
                     else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
@@ -610,7 +610,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTem
             break;              // everlook, neutral
         default:                                    // for unknown case
         {
-            FactionTemplateEntry const* u_entry = sFactionTemplateStore.LookupEntry(factionTemplateId);
+            FactionTemplateEntry const* u_entry = sObjectMgr.GetFactionTemplateEntry(factionTemplateId);
             if (!u_entry)
                 houseid = 7;                        // goblin auction house
             else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)

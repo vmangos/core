@@ -20,6 +20,7 @@ struct MANGOS_DLL_DECL guardAI : public ScriptedAI
     uint8 Gender;
     bool CapitalGuard;
 
+
     void Reset();
 
     void Aggro(Unit *who);

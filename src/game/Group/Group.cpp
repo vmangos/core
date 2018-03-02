@@ -2061,13 +2061,13 @@ static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 co
                 Player *pPVictim = (Player *)pVictim;
                 if ((pGroupGuy->GetTeam() == ALLIANCE) && (pPVictim->GetTeam() == HORDE))
                 {
-                    FactionEntry const* factionEntry = sFactionStore.LookupEntry(730);
+                    FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(730);
                     if (factionEntry)
                         pGroupGuy->GetReputationMgr().ModifyReputation(factionEntry, 1);
                 }
                 if ((pGroupGuy->GetTeam() == HORDE) && (pPVictim->GetTeam() == ALLIANCE))
                 {
-                    FactionEntry const* factionEntry = sFactionStore.LookupEntry(729);
+                    FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(729);
                     if (factionEntry)
                         pGroupGuy->GetReputationMgr().ModifyReputation(factionEntry, 1);
                 }

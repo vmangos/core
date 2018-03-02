@@ -215,9 +215,15 @@ void CreatureGroupsManager::Load()
         ObjectGuid leaderGuid = ConvertDBGuid(fields[0].GetUInt32());
         ObjectGuid memberGuid = ConvertDBGuid(fields[1].GetUInt32());
         if (leaderGuid.IsEmpty())
-            sLog.outErrorDb("CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+        {
+            if (!sObjectMgr.IsExistingCreatureGuid(fields[0].GetUInt32()))
+                sLog.outErrorDb("CREATURE GROUPS: Bad leader guid %u", fields[0].GetUInt32());
+        }
         else if (memberGuid.IsEmpty())
-            sLog.outErrorDb("CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
+        {
+            if (!sObjectMgr.IsExistingCreatureGuid(fields[1].GetUInt32()))
+                sLog.outErrorDb("CREATURE GROUPS: Bad member guid %u", fields[1].GetUInt32());
+        }
         else
         {
             if (!currentGroup || leaderGuid != currentGroup->GetLeaderGuid())

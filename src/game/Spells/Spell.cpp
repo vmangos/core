@@ -2304,7 +2304,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
                 break;
-            else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_SUMMON)
+            else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_SUMMON || m_spellInfo->Effect[effIndex] == SPELL_EFFECT_SUMMON_OBJECT_WILD)
             {
                 targetUnitMap.push_back(m_caster);
                 break;
@@ -7117,7 +7117,7 @@ SpellCastResult Spell::CheckItems()
                     {
                         // CastItem will be used up and does not count as reagent
                         int32 charges = m_CastItem->GetSpellCharges(s);
-						if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2 && itemcount > 1)
+                        if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2 && itemcount > 1)
                         {
                             ++itemcount;
                             break;

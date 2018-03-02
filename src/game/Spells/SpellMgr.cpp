@@ -3311,7 +3311,8 @@ void SpellMgr::LoadSpellScriptTarget()
 
                 if (!sGOStorage.LookupEntry<GameObjectInfo>(targetEntry))
                 {
-                    sLog.outErrorDb("Table `spell_script_target`: gameobject template entry %u does not exist.", targetEntry);
+                    if (!sObjectMgr.IsExistingGameObjectId(targetEntry))
+                        sLog.outErrorDb("Table `spell_script_target`: gameobject template entry %u does not exist.", targetEntry);
                     continue;
                 }
                 break;
@@ -3332,7 +3333,8 @@ void SpellMgr::LoadSpellScriptTarget()
                 }
                 else
                 {
-                    sLog.outErrorDb("Table `spell_script_target`: creature template entry %u does not exist.", targetEntry);
+                    if (!sObjectMgr.IsExistingCreatureId(targetEntry))
+                        sLog.outErrorDb("Table `spell_script_target`: creature template entry %u does not exist.", targetEntry);
                     continue;
                 }
                 break;

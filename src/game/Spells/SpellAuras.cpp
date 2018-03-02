@@ -2784,11 +2784,10 @@ void Aura::HandleFarSight(bool apply, bool /*Real*/)
     if (!caster || caster->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    Camera& camera = ((Player*)caster)->GetCamera();
     if (apply)
-        camera.SetView(GetTarget());
+        caster->ToPlayer()->SetLongSight(this);
     else
-        camera.ResetView();
+        caster->ToPlayer()->SetLongSight();
 }
 
 void Aura::HandleAuraTrackCreatures(bool apply, bool /*Real*/)
@@ -7145,6 +7144,13 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
         case 24427: // Diamond Flask
         case 17528: // Mighty Rage Potion
         case 23697: // Alterac Spring Water
+        // Love is in the Air buffs
+        case 27664:
+        case 27665:
+        case 27666:
+        case 27669:
+        case 27670:
+        case 27671:
             return false;
 
         case 17538: // Le +crit du buff de l'Elixir de la Mangouste 17538, devrait se stack avec TOUT.

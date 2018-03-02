@@ -2030,6 +2030,10 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         Camera& GetCamera() { return m_camera; }
 
+        uint32 GetLongSight() const { return m_longSightSpell; }
+        void SetLongSight(const Aura* aura = nullptr);
+        void UpdateLongSight();
+
         bool HasAtLoginFlag(AtLoginFlags f) const { return m_atLoginFlags & f; }
         void SetAtLoginFlag(AtLoginFlags f) { m_atLoginFlags |= f; }
         void RemoveAtLoginFlag(AtLoginFlags f, bool in_db_also = false);
@@ -2418,6 +2422,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         Unit *m_mover;
         Camera m_camera;
+
+        float m_longSightRange;
+        uint32 m_longSightSpell;
 
         GridReference<Player> m_gridRef;
         MapReference m_mapRef;

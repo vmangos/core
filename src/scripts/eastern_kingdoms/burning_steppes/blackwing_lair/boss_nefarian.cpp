@@ -299,7 +299,7 @@ struct boss_nefarianAI : ScriptedAI
 
                         m_creature->GetMotionMaster()->MovePoint(1, -7449.145f, -1320.647f, 476.795f);
                         //m_creature->MonsterMove(-7449.145f, -1320.647f, 476.795f);
-                        m_creature->MonsterMoveWithSpeed(-7449.145f, -1320.647f, 476.795f, 17, false, true);
+                        m_creature->MonsterMoveWithSpeed(-7449.145f, -1320.647f, 476.795f, -10.0f, 17, uint32(MOVE_FORCE_DESTINATION));
                         m_uiTransitionTimer = 0;
                         break;
                     case 1:

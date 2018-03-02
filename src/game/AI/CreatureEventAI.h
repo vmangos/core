@@ -66,6 +66,7 @@ enum EventAI_Type
     EVENT_T_SUMMONED_JUST_DESPAWN   = 26,                   // CreatureId, RepeatMin, RepeatMax
     EVENT_T_MISSING_AURA            = 27,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
+    EVENT_T_MOVEMENT_INFORM         = 29,                   // Param1 = motion type, Param2 = point ID, RepeatMin, RepeatMax
 
     EVENT_T_END,
 };
@@ -144,9 +145,6 @@ enum SpawnedEventMode
     SPAWNED_EVENT_MAP   = 1,
     SPAWNED_EVENT_ZONE  = 2
 };
-
-// Text Maps
-typedef UNORDERED_MAP<int32, StringTextData> CreatureEventAI_TextMap;
 
 struct CreatureEventAI_Action
 {
@@ -245,6 +243,7 @@ struct CreatureEventAI_Action
         {
             uint32 value;
             uint32 target;
+            uint32 field;
         } unit_flag;
         // ACTION_T_AUTO_ATTACK                             = 20
         struct
@@ -415,6 +414,8 @@ struct CreatureEventAI_Event
 
     uint32 creature_id;
 
+    uint32 condition_id;
+
     uint32 event_inverse_phase_mask;
 
     EventAI_Type event_type : 16;
@@ -528,9 +529,6 @@ struct CreatureEventAI_Event
         struct
         {
             uint32 emoteId;
-            uint32 condition;
-            uint32 conditionValue1;
-            uint32 conditionValue2;
         } receive_emote;
         // EVENT_T_AURA                                     = 23
         // EVENT_T_TARGET_AURA                              = 24
@@ -543,6 +541,14 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } buffed;
+        // EVENT_T_MOVEMENT_INFORM                          = 29
+        struct
+        {
+            uint32 motionType;
+            uint32 pointId;
+            uint32 repeatMin;
+            uint32 repeatMax;
+        } move_inform;
         // RAW
         struct
         {
@@ -607,6 +613,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void AttackStart(Unit *who) override;
         void MoveInLineOfSight(Unit *who) override;
         void SpellHit(Unit* pUnit, const SpellEntry* pSpell) override;
+        void MovementInform(uint32 type, uint32 id) override;
         void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(const uint32 diff) override;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
@@ -620,8 +627,6 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         inline uint32 GetRandActionParam(uint32 rnd, uint32 param1, uint32 param2, uint32 param3);
         inline int32 GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3);
         inline Unit* GetTargetByType(uint32 Target, Unit* pActionInvoker) const;
-
-        void DoScriptText(int32 textEntry, Unit* pSource, Unit* target);
 
         bool SpawnedEventConditionsCheck(CreatureEventAI_Event const& event);
 

@@ -837,7 +837,7 @@ bool ChatHandler::HandleModifyFactionCommand(char* args)
     if (!ExtractUint32KeyFromLink(&args, "Hfaction", factionid))
         return false;
 
-    if (!sFactionTemplateStore.LookupEntry(factionid))
+    if (!sObjectMgr.GetFactionTemplateEntry(factionid))
     {
         PSendSysMessage(LANG_WRONG_FACTION, factionid);
         SetSentErrorMessage(true);
@@ -1606,6 +1606,49 @@ bool ChatHandler::HandleLookupTeleCommand(char * args)
         SendSysMessage(LANG_COMMAND_TELE_NOLOCATION);
     else
         PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str().c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleLookupSoundCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    std::string namepart = args;
+
+    // converting string that we try to find to lower case
+    strToLower(namepart);
+
+    uint32 counter = 0;                                     // Counter for figure out that we found smth.
+
+    for (uint32 id = 0; id < sObjectMgr.GetMaxSoundId(); ++id)
+    {
+        SoundEntriesEntry const *soundEntry = sObjectMgr.GetSoundEntry(id);
+        if (soundEntry)
+        {
+            int loc = GetSessionDbcLocale();
+            std::string name = soundEntry->Name;
+
+            if (name.empty())
+                continue;
+
+            strToLower(name);
+
+            if (name.find(namepart) == std::string::npos)
+                continue;
+
+            if (m_session)
+                PSendSysMessage(LANG_COMMAND_SOUND_LIST, id, id, soundEntry->Name.c_str());
+            else
+                PSendSysMessage("%u - %s", id, soundEntry->Name.c_str());
+
+            counter++;
+        }
+    }
+
+    if (counter == 0)
+        SendSysMessage(LANG_COMMAND_SOUND_NOT_FOUND);
 
     return true;
 }
