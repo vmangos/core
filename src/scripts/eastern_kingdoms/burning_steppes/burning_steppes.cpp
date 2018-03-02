@@ -267,7 +267,7 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                 m_creature->SummonCreature(NPC_FLAMESCALE_DRAGONSPAWN, -8007.1f, -1219.4f, 140.1f, 3.9f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 200000);
                 break;
             case 28:
-                m_creature->SummonCreature(NPC_SEARSCALE_DRAKE, -7897.8f, -1123.1f, 233.4f, 3.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 200000);
+                m_creature->SummonCreature(NPC_SEARSCALE_DRAKE, -7900.1f, -1133.14f, 193.98f, 3.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 200000);
                 m_creature->SummonCreature(NPC_SEARSCALE_DRAKE, -7898.8f, -1125.1f, 193.9f, 3.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 200000);
                 m_creature->SummonCreature(NPC_SEARSCALE_DRAKE, -7895.6f, -1119.5f, 194.5f, 3.1f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 200000);
                 break;
@@ -399,7 +399,7 @@ struct npc_grark_lorkrubAI : public npc_escortAI/*, private DialogueHelper*/
                     // ToDo: this guy should fly in circles above the creature
                     //pSummoned->SetDefaultMovementType(IDLE_MOTION_TYPE); //Probably should be enough, OR NOT
                     //pSummoned->GetMotionMaster()->MoveIdle();
-                    pSummoned->GetMotionMaster()->MoveRandom();
+                    //pSummoned->GetMotionMaster()->MoveRandom();
                     //if(pSummoned->CanFly())
                     //sLog.nostalrius("creature can fly");
                 }
