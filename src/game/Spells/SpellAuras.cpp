@@ -5218,20 +5218,6 @@ void Aura::HandleSchoolAbsorb(bool apply, bool Real)
             float DoneActualBenefit = 0.0f;
             switch (spellProto->SpellFamilyName)
             {
-                case SPELLFAMILY_GENERIC:
-                {
-                    // Gnomish Harm Prevention Belt
-                    if (spellProto->Id == 13234)
-                    {
-                        if (urand(0, 9) == 0) // Unknown backfire chance
-                        {
-                            target->CastSpell(target, 13235, true);
-                            GetHolder()->SetAuraDuration(0);
-                            return;
-                        }
-                    }
-                    break;
-                }
                 case SPELLFAMILY_PRIEST:
                     // Power Word: Shield
                     if (spellProto->IsFitToFamilyMask<CF_PRIEST_POWER_WORD_SHIELD>())
