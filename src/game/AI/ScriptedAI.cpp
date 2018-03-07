@@ -96,7 +96,9 @@ void ScriptedAI::EnterEvadeMode()
     if (m_creature->isAlive())
         m_creature->GetMotionMaster()->MoveTargetedHome();
 
-    m_creature->SetLootRecipient(nullptr);
+    // Prevent raid loot loss on grid unload
+    if (!m_creature->IsWorldBoss() || !m_creature->isDead())
+        m_creature->SetLootRecipient(nullptr);
 
     // Reset back to default spells template. This also resets timers.
     SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
