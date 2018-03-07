@@ -282,7 +282,7 @@ struct boss_rajaxxAI : public ScriptedAI
 
     void OnKillReputationReward()
     {
-        FactionEntry const *factionEntry = sFactionStore.LookupEntry(609); // Cenarion Circle
+        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(609); // Cenarion Circle
         if (!factionEntry) {
             sLog.outError("Rajaxx justDied, unable to find Cenarion Circle faction");
             return;

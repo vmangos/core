@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20180222004055');
 
 
 -- Dearest Natalia incomplete
-REPLACE INTO `conditions` VALUES (550, 9, 8304, 1);
+REPLACE INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES (550, 9, 8304, 1);
 
 -- Frankal
 UPDATE `creature_template` SET `gossip_menu_id`=5450, `ScriptName`='' WHERE `entry`=15171;
@@ -33,7 +33,7 @@ REPLACE INTO `gossip_menu_option` VALUES
 (5456, 0, 0, 'What a story! So she went into Hive\'Regal and that was the last you saw of her?', 10739, 1, 1, 5457, 0, 0, 0, 0, '', 0, 0),
 (5457, 0, 0, 'Thanks for the information, Frankal.', 10741, 1, 1, -1, 0, 5450, 0, 0, '', 0, 0);
 DELETE FROM `gossip_scripts` WHERE `id`=5450;
-REPLACE INTO `gossip_scripts` VALUES (5450, 0, 8, 15221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dearest Natalia - Frankal quest credit');
+REPLACE INTO `gossip_scripts` VALUES (5450, 0, 8, 15221, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dearest Natalia - Frankal quest credit');
 
 -- Rutgar
 UPDATE `creature_template` SET `gossip_menu_id`=5460, `ScriptName`='' WHERE `entry`=15170;
@@ -56,7 +56,7 @@ REPLACE INTO `gossip_menu_option` VALUES
 (5466, 0, 0, 'Possessed by what?', 10724, 1, 1, 5467, 0, 0, 0, 0, '', 0, 0),
 (5467, 0, 0, 'I\'ll be back once I straighten this mess out.', 10726, 1, 1, -1, 0, 5460, 0, 0, '', 0, 0);
 DELETE FROM `gossip_scripts` WHERE `id`=5460;
-REPLACE INTO `gossip_scripts` VALUES (5460, 0, 8, 15222, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dearest Natalia - Rutgar quest credit');
+REPLACE INTO `gossip_scripts` VALUES (5460, 0, 8, 15222, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dearest Natalia - Rutgar quest credit');
 
 
 -- End of migration.

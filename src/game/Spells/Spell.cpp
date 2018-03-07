@@ -2304,7 +2304,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_PERSISTENT_AREA_AURA)
                 break;
-            else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_SUMMON)
+            else if (m_spellInfo->Effect[effIndex] == SPELL_EFFECT_SUMMON || m_spellInfo->Effect[effIndex] == SPELL_EFFECT_SUMMON_OBJECT_WILD)
             {
                 targetUnitMap.push_back(m_caster);
                 break;
@@ -6706,7 +6706,7 @@ SpellCastResult Spell::CheckCasterAuras() const
     return SPELL_CAST_OK;
 }
 
-bool Spell::CanAutoCast(Unit* target)
+bool Spell::CanAutoCast(Unit* target, bool isPositive)
 {
     ObjectGuid targetguid = target->GetObjectGuid();
 
@@ -6724,6 +6724,8 @@ bool Spell::CanAutoCast(Unit* target)
     bool fullHealSpell = true;
     for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
     {
+        if (!isPositive)
+            break;
         if (m_spellInfo->Effect[j] && m_spellInfo->EffectApplyAuraName[j] != SPELL_AURA_PERIODIC_HEAL)
             fullHealSpell = false;
         if (m_spellInfo->Effect[j] == SPELL_EFFECT_APPLY_AURA)
@@ -7115,7 +7117,7 @@ SpellCastResult Spell::CheckItems()
                     {
                         // CastItem will be used up and does not count as reagent
                         int32 charges = m_CastItem->GetSpellCharges(s);
-						if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2 && itemcount > 1)
+                        if (proto->Spells[s].SpellCharges < 0 && abs(charges) < 2 && itemcount > 1)
                         {
                             ++itemcount;
                             break;

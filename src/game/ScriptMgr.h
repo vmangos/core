@@ -190,8 +190,17 @@ enum eScriptCommand
                                                             // datalong = field
                                                             // datalong2 = data
                                                             // datalong3 = eSetInstData64Options
-    SCRIPT_COMMAND_MAX
+    SCRIPT_COMMAND_START_SCRIPT             = 39,           // source = Map
+                                                            // datalong1-4 = event_script id
+                                                            // dataint1-4 = chance (total cant be above 100)
+    SCRIPT_COMMAND_REMOVE_ITEM              = 40,           // source = Player (from provided source or target)
+                                                            // datalong = item_entry
+                                                            // datalong2 = amount
+    SCRIPT_COMMAND_REMOVE_OBJECT            = 41,           // source = GameObject
+                                                            // target = Unit
+    SCRIPT_COMMAND_MAX,
 
+    SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
 };
 
 #define MAX_TEXT_ID 4                                       // used for SCRIPT_COMMAND_TALK
@@ -200,7 +209,8 @@ static constexpr uint32 MAX_EMOTE_ID = 4;                   // used for SCRIPT_C
 // Flags used by SCRIPT_COMMAND_MOVE_TO
 enum eMoveToFlags
 {
-    SF_MOVETO_FORCED = 0x1,                                // No check if creature can move.
+    SF_MOVETO_FORCED        = 0x1,                          // No check if creature can move.
+    SF_MOVETO_POINT_MOVEGEN = 0x2,                          // Changes movement generator to point movement.
 };
 
 // Possible datalong3 values for SCRIPT_COMMAND_MOVE_TO
@@ -324,6 +334,7 @@ struct ScriptInfo
     uint32 id;
     uint32 delay;
     uint32 command;
+    uint32 condition;
 
     union
     {
@@ -552,17 +563,32 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_SET_INST_DATA (37)
         {
-            uint32 field;
-            uint32 data;
-            uint32 type;
+            uint32 field;                                   // datalong
+            uint32 data;                                    // datalong2
+            uint32 type;                                    // datalong3
         } setData;
 
         struct                                              // SCRIPT_COMMAND_SET_INST_DATA64 (38)
         {
-            uint32 field;
-            uint32 data;
-            uint32 type;
+            uint32 field;                                   // datalong
+            uint32 data;                                    // datalong2
+            uint32 type;                                    // datalong3
         } setData64;
+
+        struct                                              // SCRIPT_COMMAND_START_SCRIPT (39)
+        {
+            uint32 scriptId[4];                             // datalong to datalong4
+            uint32 unused;                                  // data_flags
+            int32 chance[4];                                // dataint to dataint4
+        } startScript;
+
+        struct                                              // SCRIPT_COMMAND_REMOVE_ITEM (40)
+        {
+            uint32 itemEntry;                               // datalong
+            uint32 amount;                                  // datalong2
+        } removeItem;
+
+                                                            // SCRIPT_COMMAND_REMOVE_OBJECT (41)
 
         struct
         {
@@ -579,7 +605,7 @@ struct ScriptInfo
     float z;
     float o;
 
-    ScriptInfo() : id(0), delay(0), command(0), buddy_id(0), buddy_radius(0), buddy_type(0), x(0), y(0), z(0), o(0)
+    ScriptInfo() : id(0), delay(0), command(0), condition(0), buddy_id(0), buddy_radius(0), buddy_type(0), x(0), y(0), z(0), o(0)
     {
         memset(raw.data, 0, sizeof(raw.data));
     }
@@ -874,6 +900,7 @@ class ScriptMgr
         void CollectPossibleEventIds(std::set<uint32>& eventIds);
         void LoadScripts(ScriptMapMap& scripts, const char* tablename);
         void CheckScriptTexts(ScriptMapMap const& scripts);
+        void DisableScriptAction(ScriptInfo& script);
 
         typedef std::vector<std::string> ScriptNameMap;
         typedef UNORDERED_MAP<uint32, uint32> AreaTriggerScriptMap;

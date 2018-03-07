@@ -1363,20 +1363,19 @@ struct npc_felhound_minionAI : public ScriptedPetAI
 
     void UpdateAI(const uint32 uiDiff)
     {
-        if (!m_creature->getVictim())
-            return;
-
-        if (m_uiManaBurnTimer < uiDiff)
+        if (m_creature->getVictim())
         {
-            if (m_creature->getVictim()->getPowerType() == POWER_MANA)
-                DoCastSpellIfCan(m_creature->getVictim(), 15980);
-            m_uiManaBurnTimer = urand(9800, 15200);
-            return;
+            if (m_uiManaBurnTimer < uiDiff)
+            {
+                if (m_creature->getVictim()->getPowerType() == POWER_MANA)
+                    DoCastSpellIfCan(m_creature->getVictim(), 15980);
+                m_uiManaBurnTimer = urand(9800, 15200);
+                return;
+            }
+            else
+                m_uiManaBurnTimer -= uiDiff;
         }
-        else
-            m_uiManaBurnTimer -= uiDiff;
-
-        ScriptedPetAI::UpdatePetAI(uiDiff);
+        ScriptedPetAI::UpdateAI(uiDiff);
     }
 };
 
@@ -1749,8 +1748,8 @@ enum
 {
     NPC_FIREWORK_GUY_ELUNE          = 15918,
 
-    GO_FIREWORK_LAUNCHER            = 180771,
-    GO_CLUSTER_LAUNCHER             = 180772,
+    NPC_FIREWORK_CREDIT_MARKER      = 15893,
+    NPC_CLUSTER_CREDIT_MARKER       = 15894,
     GO_OMEN_CLUSTER_LAUNCHER        = 180874,
 
     SPELL_LUNAR_FORTUNE             = 26522
@@ -1764,7 +1763,7 @@ struct FireworkStruct
 };
 
 const std::array<FireworkStruct, 25> Fireworks =
-{{
+{ {
     { 15872, {26357, 26303, 26302, 26300, 26301}, true }, // Blue Firework Cluster
     { 15873, {26360, 26308, 26307, 26306, 26305}, true }, // Red Firework Cluster
     { 15874, {26358, 26312, 26311, 26310, 26309}, true }, // Green Firework Cluster
@@ -1792,7 +1791,7 @@ const std::array<FireworkStruct, 25> Fireworks =
     { 15918, {26487, 26509, 26508, 26507, 26483}, true }, // Lucky Rocket Cluster
 }};
 
-const std::array<uint32, 7> Launcher = {{ 180772, 180859, 180869, 180874, 180771, 180850, 180868 }};
+const std::array<uint32, 7> Launcher = { { 180772, 180859, 180869, 180874, 180771, 180850, 180868 } };
 
 struct npc_pats_firework_guyAI : ScriptedAI
 {
@@ -1886,10 +1885,9 @@ struct npc_pats_firework_guyAI : ScriptedAI
 
         if (m_creature->IsTemporarySummon())
         {
-            Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid());
-
-            if (pSummoner)
-                pSummoner->CastedCreatureOrGO(Fireworks[m_uiIndex].m_bIsCluster ? GO_CLUSTER_LAUNCHER : GO_FIREWORK_LAUNCHER, ObjectGuid(), 0);
+            if (Player* pSummoner = m_creature->GetMap()->GetPlayer(static_cast<TemporarySummon*>(m_creature)->GetSummonerGuid()))
+                if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(Fireworks[m_uiIndex].m_bIsCluster ? NPC_CLUSTER_CREDIT_MARKER : NPC_FIREWORK_CREDIT_MARKER))
+                    pSummoner->KilledMonster(cInfo, ObjectGuid());
         }
 
         if (GetClosestGameObjectWithEntry(m_creature, GO_OMEN_CLUSTER_LAUNCHER, INTERACTION_DISTANCE))
@@ -3461,23 +3459,23 @@ enum
 {
     EVENT_VALENTINE_KWEE = 140,
 
-    SPELL_SMITTEN       = 27572,
-    QUEST_GIFT_H        = 8981,
-    QUEST_GIFT_A        = 8993,
+    SPELL_SMITTEN = 27572,
+    QUEST_GIFT_H = 8981,
+    QUEST_GIFT_A = 8993,
 
-    VAR_KWEE_THRALL     = 2200,
-    VAR_KWEE_CAIRNE     = 2201,
-    VAR_KWEE_SYLVANAS   = 2202,
-    VAR_KWEE_HORDE      = 2207,
+    VAR_KWEE_THRALL = 2200,
+    VAR_KWEE_CAIRNE = 2201,
+    VAR_KWEE_SYLVANAS = 2202,
+    VAR_KWEE_HORDE = 2207,
 
-    VAR_KWEE_BOLVAR     = 2203,
-    VAR_KWEE_MAGNI      = 2204,
-    VAR_KWEE_TYRANDE    = 2205,
-    VAR_KWEE_ALLIANCE   = 2206,
+    VAR_KWEE_BOLVAR = 2203,
+    VAR_KWEE_MAGNI = 2204,
+    VAR_KWEE_TYRANDE = 2205,
+    VAR_KWEE_ALLIANCE = 2206,
 
-    TEXT_ID_VICTORY_A   = 8315,
-    TEXT_ID_VICTORY_H   = 8316,
-    TEXT_ID_TIE         = 8318,
+    TEXT_ID_VICTORY_A = 8315,
+    TEXT_ID_VICTORY_H = 8316,
+    TEXT_ID_TIE = 8318,
 
 };
 
@@ -3510,7 +3508,7 @@ struct npc_kwee_peddlefeetAI : public ScriptedAI
 
     void Reset() { }
 
-    void SetVariables() 
+    void SetVariables()
     {
         uint32 firstBoss = 0;
         uint32 horde = sObjectMgr.GetSavedVariable(VAR_KWEE_HORDE, 0);
@@ -3578,7 +3576,7 @@ bool GossipHello_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature)
             return true;
         }
     }
-    
+
     return false;
 }
 
@@ -3612,6 +3610,72 @@ bool QuestRewarded_npc_kwee_peddlefeet(Player* pPlayer, Creature* pCreature, con
     }
 
     return true;
+}
+
+enum
+{
+    OBJECT_DARK_IRON_MUG = 165578,
+    SPELL_DARK_IRON_MUG = 14813,
+    EMOTE_GUZZLE_ALE = 10167,
+};
+
+struct npc_oozeling_jubjubAI : public ScriptedPetAI
+{
+    npc_oozeling_jubjubAI(Creature* pCreature) : ScriptedPetAI(pCreature)
+    {
+        Reset();
+    }
+
+    uint32 m_uiReturnTimer;
+    void Reset()
+    {
+        m_uiReturnTimer = 0;
+    }
+
+    void SpellHit(Unit* pUnit, const SpellEntry* pSpell)
+    {
+        if (pSpell->Id == SPELL_DARK_IRON_MUG)
+            m_uiReturnTimer = 10000;
+    }
+
+    void MovementInform(uint32 type, uint32 id)
+    {
+        if (type == POINT_MOTION_TYPE && id == 1)
+        {
+            m_creature->MonsterTextEmote(EMOTE_GUZZLE_ALE);
+            m_creature->addUnitState(UNIT_STAT_ROOT);
+            m_uiReturnTimer = 3000;
+        }
+    }
+
+    void UpdateAI(const uint32 uiDiff)
+    {
+        if (m_uiReturnTimer > 0)
+        {
+            if (m_uiReturnTimer <= uiDiff)
+            {
+                m_uiReturnTimer = 0;
+                m_creature->clearUnitState(UNIT_STAT_ROOT);
+
+                if (GameObject* pMug = m_creature->FindNearestGameObject(OBJECT_DARK_IRON_MUG, 1.0f))
+                {
+                    pMug->SetLootState(GO_JUST_DEACTIVATED);
+                    pMug->AddObjectToRemoveList();
+                }
+            }
+            else
+                m_uiReturnTimer -= uiDiff;
+        }
+        else
+        {
+            ScriptedPetAI::UpdateAI(uiDiff);
+        }
+    }
+};
+
+CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
+{
+    return new npc_oozeling_jubjubAI(pCreature);
 }
 
 void AddSC_npcs_special()
@@ -3791,5 +3855,10 @@ void AddSC_npcs_special()
     newscript->GetAI = &GetAI_npc_kwee_peddlefeet;
     newscript->pGossipHello = &GossipHello_npc_kwee_peddlefeet;
     newscript->pQuestRewardedNPC = &QuestRewarded_npc_kwee_peddlefeet;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_oozeling_jubjub";
+    newscript->GetAI = &GetAI_npc_oozeling_jubjub;
     newscript->RegisterSelf();
 }

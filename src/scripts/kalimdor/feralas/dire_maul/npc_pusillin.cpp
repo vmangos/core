@@ -118,19 +118,19 @@ struct npc_pusillinAI : public ScriptedAI
         {
             case 0:
                 ME->MonsterSay(TEXT_1, 0, 0);
-                ME->MonsterMoveWithSpeed(-145.0f, -296.9f, -4.12f, MOVE_SPEED, true, true);
+                ME->MonsterMoveWithSpeed(-145.0f, -296.9f, -4.12f, -10.0f, MOVE_SPEED, uint32(MOVE_PATHFINDING | MOVE_FORCE_DESTINATION));
                 break;
             case 1:
                 ME->MonsterSay(TEXT_2, 0, 0);
-                ME->MonsterMoveWithSpeed(112.7f, -353.87f, -4.12f, MOVE_SPEED, true, true);
+                ME->MonsterMoveWithSpeed(112.7f, -353.87f, -4.12f, -10.0f, MOVE_SPEED, uint32(MOVE_PATHFINDING | MOVE_FORCE_DESTINATION));
                 break;
             case 2:
                 ME->MonsterSay(TEXT_3, 0, 0);
-                ME->MonsterMoveWithSpeed(50.99f, -632.68f, -25.12f, MOVE_SPEED, true, true);
+                ME->MonsterMoveWithSpeed(50.99f, -632.68f, -25.12f, 10.0f, MOVE_SPEED, uint32(MOVE_PATHFINDING | MOVE_FORCE_DESTINATION));
                 break;
             case 3:
                 ME->MonsterSay(TEXT_4, 0, 0);
-                ME->MonsterMoveWithSpeed(19.091084f, -704.739746f, -12.642583f, MOVE_SPEED, true, true);
+                ME->MonsterMoveWithSpeed(19.091084f, -704.739746f, -12.642583f, -10.0f, MOVE_SPEED, uint32(MOVE_PATHFINDING | MOVE_FORCE_DESTINATION));
                 break;
             case 4:
                 ME->SetHomePosition(18.19f, -701.15f, -12.64f, 0);

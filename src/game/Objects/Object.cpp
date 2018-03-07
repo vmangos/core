@@ -2427,7 +2427,7 @@ void WorldObject::DestroyForNearbyPlayers()
     }
 }
 
-Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool alive)
+Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool alive) const
 {
     Creature* pCreature = nullptr;
 
@@ -2445,7 +2445,7 @@ Creature* WorldObject::FindNearestCreature(uint32 uiEntry, float range, bool ali
     return pCreature;
 }
 
-GameObject* WorldObject::FindNearestGameObject(uint32 uiEntry, float fMaxSearchRange)
+GameObject* WorldObject::FindNearestGameObject(uint32 uiEntry, float fMaxSearchRange) const
 {
     GameObject* pGo = nullptr;
 

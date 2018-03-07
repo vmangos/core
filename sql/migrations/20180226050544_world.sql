@@ -3,9 +3,9 @@ delimiter ??
 CREATE PROCEDURE `add_migration`()
 BEGIN
 DECLARE v INT DEFAULT 1;
-SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20180213202523');
+SET v = (SELECT COUNT(*) FROM `migrations` WHERE `id`='20180226050544');
 IF v=0 THEN
-INSERT INTO `migrations` VALUES ('20180213202523');
+INSERT INTO `migrations` VALUES ('20180226050544');
 -- Add your query below.
 
 
@@ -16,10 +16,6 @@ UPDATE `creature_template` SET `modelid_1`=14938 WHERE  `entry`=14878 AND `patch
 -- Searing Needle
 -- https://github.com/LightsHope/server/issues/957
 REPLACE INTO `spell_effect_mod` (`Id`, `EffectIndex`, `EffectApplyAuraName`, `Comment`) VALUES (16454, 1, 14, 'Searing Blast damage taken');
-
--- Barrens underground mob
--- https://github.com/LightsHope/server/issues/1123
-UPDATE `creature` SET `position_z`=103.8 WHERE  `guid`=19944;
 
 -- Faction exclusive loot
 UPDATE `creature_loot_template` SET `condition_id`=3 WHERE `item`=21889;
@@ -283,7 +279,7 @@ UPDATE `gameobject_loot_template` SET `ChanceOrQuestChance`=0, `groupid`=1 WHERE
 -- Long Forgotten Memories
 -- https://github.com/LightsHope/issues/issues/34
 UPDATE `quest_template` SET `Method`=2, `SpecialFlags`=2, `StartScript`=8305 WHERE `entry`=8305;
-REPLACE INTO `quest_start_scripts` VALUES (8305, 0, 7, 8305, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Long Forgotten Memories: Complete Quest');
+REPLACE INTO `quest_start_scripts` VALUES (8305, 0, 7, 8305, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Long Forgotten Memories: Complete Quest');
 
 -- Added Medium Shot Pouch to vendors
 -- https://github.com/LightsHope/issues/issues/33
@@ -300,6 +296,12 @@ REPLACE INTO `spell_bonus_data` VALUES (17291, 1, 0, 0, 0, 'Stratholme Holy Wate
 -- Wolfrunner Shoes agility
 -- https://github.com/LightsHope/issues/issues/45
 UPDATE `item_template` SET `stat_type4`=3, `stat_value4`=11 WHERE `entry`=13101 AND `patch`=0;
+
+-- Startup errors introduced by this migration.
+UPDATE `creature` SET `curhealth`=2768 WHERE `guid` IN (47699, 47698, 47649, 47645, 47671, 47670, 47658, 47657);
+UPDATE `creature` SET `curhealth`=7151 WHERE `guid` IN (47692, 47683, 47675, 47666);
+UPDATE `creature` SET `MovementType`=0 WHERE `guid`=38975;
+UPDATE `creature` SET `curhealth`=5945, `curmana`=4026 WHERE `guid` IN (47669, 47656);
 
 
 -- End of migration.

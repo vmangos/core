@@ -338,12 +338,6 @@ class MANGOS_DLL_SPEC Object
         void SetObjectScale(float newScale);
 
         uint8 GetTypeId() const { return m_objectTypeId; }
-        // Fonctions nostalrius :
-        bool IsCreature() const { return m_objectTypeId == TYPEID_UNIT;   }
-        bool IsPlayer()   const { return m_objectTypeId == TYPEID_PLAYER; }
-        bool IsGameObject()   const { return m_objectTypeId == TYPEID_GAMEOBJECT; }
-        bool IsPet()      const;
-
         bool isType(TypeMask mask) const { return (mask & m_objectType); }
 
         virtual void BuildCreateUpdateBlockForPlayer( UpdateData *data, Player *target ) const;
@@ -559,40 +553,30 @@ class MANGOS_DLL_SPEC Object
         bool IsDeleted() const { return _deleted; }
 
         // Convertions
-        Unit* ToUnit()
-        {
-            if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER)
-                return (Unit*)this;
-            return nullptr;
-        }
+        inline bool IsPlayer() const { return GetTypeId() == TYPEID_PLAYER; }
+        Player* ToPlayer() { if (IsPlayer()) return reinterpret_cast<Player*>(this); else return nullptr; }
+        Player const* ToPlayer() const { if (IsPlayer()) return reinterpret_cast<Player const*>(this); else return nullptr; }
 
-        Unit const* ToUnit() const
-        {
-            if (GetTypeId() == TYPEID_UNIT || GetTypeId() == TYPEID_PLAYER)
-                return (Unit const*)this;
-            return nullptr;
-        }
-        #define DO_CONVERT(fnctn, type, typeid) \
-        inline type* fnctn()\
-        {\
-            if (GetTypeId() == typeid)\
-                return (type*)this;\
-            return NULL;\
-        } \
-        inline type const* fnctn() const\
-        {\
-            if (GetTypeId() == typeid)\
-                return (type const*)this;\
-            return NULL;\
-        }
+        inline bool IsCreature() const { return GetTypeId() == TYPEID_UNIT; }
+        Creature* ToCreature() { if (IsCreature()) return reinterpret_cast<Creature*>(this); else return nullptr; }
+        Creature const* ToCreature() const { if (IsCreature()) return reinterpret_cast<Creature const*>(this); else return nullptr; }
 
-        DO_CONVERT(ToGameObject, GameObject, TYPEID_GAMEOBJECT)
-        DO_CONVERT(ToCreature, Creature, TYPEID_UNIT)
-        DO_CONVERT(ToPlayer, Player, TYPEID_PLAYER)
-        DO_CONVERT(ToCorpse, Corpse, TYPEID_CORPSE)
+        inline bool IsUnit() const { return isType(TYPEMASK_UNIT); }
+        Unit* ToUnit() { if (IsUnit()) return reinterpret_cast<Unit*>(this); else return nullptr; }
+        Unit const* ToUnit() const { if (IsUnit()) return reinterpret_cast<Unit const*>(this); else return nullptr; }
 
+        inline bool IsGameObject() const { return GetTypeId() == TYPEID_GAMEOBJECT; }
+        GameObject* ToGameObject() { if (IsGameObject()) return reinterpret_cast<GameObject*>(this); else return nullptr; }
+        GameObject const* ToGameObject() const { if (IsGameObject()) return reinterpret_cast<GameObject const*>(this); else return nullptr; }
+
+        inline bool IsCorpse() const { return GetTypeId() == TYPEID_CORPSE; }
+        Corpse* ToCorpse() { if (IsCorpse()) return reinterpret_cast<Corpse*>(this); else return nullptr; }
+        Corpse const* ToCorpse() const { if (IsCorpse()) return reinterpret_cast<Corpse const*>(this); else return nullptr; }
+
+        bool IsPet()      const;
         Pet const* ToPet() const;
         Pet* ToPet();
+
         virtual bool HasQuest(uint32 /* quest_id */) const { return false; }
         virtual bool HasInvolvedQuest(uint32 /* quest_id */) const { return false; }
     protected:
@@ -880,8 +864,8 @@ m_obj->m_updateTracker.Reset();
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0 = 0.0f, float rotation1 = 0.0f, float rotation2 = 0.0f, float rotation3 = 0.0f, uint32 respawnTime = 25000, bool attach = true);
 
         // Recherche par entry
-        Creature* FindNearestCreature(uint32 entry, float range, bool alive = true);
-        GameObject* FindNearestGameObject(uint32 entry, float range);
+        Creature* FindNearestCreature(uint32 entry, float range, bool alive = true) const;
+        GameObject* FindNearestGameObject(uint32 entry, float range) const;
         void GetGameObjectListWithEntryInGrid(std::list<GameObject*>& lList, uint32 uiEntry, float fMaxSearchRange);
         void GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, uint32 uiEntry, float fMaxSearchRange);
 
@@ -954,5 +938,31 @@ m_obj->m_updateTracker.Reset();
         uint32 m_creatureSummonLimit;   // Hard limit on creature summons
         uint32 m_summonLimitAlert;      // Timer to alert GMs if a creature is at the summon limit
 };
+
+// Helper functions to cast between different Object pointers. Useful when unsure that your object* is valid at all.
+inline WorldObject* ToWorldObject(Object* object)
+{
+    return object && object->isType(TYPEMASK_WORLDOBJECT) ? static_cast<WorldObject*>(object) : nullptr;
+}
+
+inline GameObject* ToGameObject(Object* object)
+{
+    return object && object->GetTypeId() == TYPEID_GAMEOBJECT ? reinterpret_cast<GameObject*>(object) : nullptr;
+}
+
+inline Unit* ToUnit(Object* object)
+{
+    return object && object->isType(TYPEMASK_UNIT) ? reinterpret_cast<Unit*>(object) : nullptr;
+}
+
+inline Creature* ToCreature(Object* object)
+{
+    return object && object->GetTypeId() == TYPEID_UNIT ? reinterpret_cast<Creature*>(object) : nullptr;
+}
+
+inline Player* ToPlayer(Object* object)
+{
+    return object && object->GetTypeId() == TYPEID_PLAYER ? reinterpret_cast<Player*>(object) : nullptr;
+}
 
 #endif

@@ -31,6 +31,7 @@
 #include "ObjectGuid.h"
 #include "AuctionHouseMgr.h"
 #include "Item.h"
+#include "GossipDef.h"
 #include "MapNodes/AbstractPlayer.h"
 
 struct ItemPrototype;
@@ -353,7 +354,7 @@ class MANGOS_DLL_SPEC WorldSession
         void SendTrainingSuccess(ObjectGuid guid, uint32 spellId);
         void SendTrainingFailure(ObjectGuid guid, uint32 serviceId, uint32 errorCode);
 
-        void SendListInventory(ObjectGuid guid);
+        void SendListInventory(ObjectGuid guid, uint8 menu_type = VENDOR_MENU_ALL);
         bool CheckBanker(ObjectGuid guid);
         void SendShowBank(ObjectGuid guid);
         bool CheckMailBox(ObjectGuid guid);

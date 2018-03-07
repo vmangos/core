@@ -572,7 +572,7 @@ void ReputationMgr::Serialize(MaNGOS::Serializer::ReadSerializer& buf)
         if (!f_id)
             break;
 
-        FactionEntry const *factionEntry = sFactionStore.LookupEntry(f_id);
+        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(f_id);
         ASSERT(factionEntry);
         FactionState& faction = m_factions[factionEntry->reputationListID];
 

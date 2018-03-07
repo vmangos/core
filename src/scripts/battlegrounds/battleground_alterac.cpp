@@ -2159,7 +2159,7 @@ struct AV_NpcEventAI : public npc_escortAI
         isAggro = false;
         Point = 0;
 
-        DoTeleportTo(av_x, av_y, av_z, 0);
+        DoTeleportTo(av_x, av_y, av_z);
         m_creature->SetHomePosition(av_x, av_y, av_z, 0.0f);
         m_creature->GetMotionMaster()->MovePoint(POINT_LAST_POINT, av_x, av_y, av_z);
 

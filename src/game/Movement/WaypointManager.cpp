@@ -119,7 +119,8 @@ void WaypointManager::Load()
 
             if (!cData)
             {
-                sLog.outErrorDb("Table creature_movement contain path for creature guid %u, but this creature guid does not exist. Skipping.", id);
+                if (!sObjectMgr.IsExistingCreatureGuid(id))
+                    sLog.outErrorDb("Table creature_movement contain path for creature guid %u, but this creature guid does not exist. Skipping.", id);
                 continue;
             }
 
@@ -292,7 +293,8 @@ void WaypointManager::Load()
 
             if (!cInfo)
             {
-                sLog.outErrorDb("Table creature_movement_template references unknown creature template %u. Skipping.", entry);
+                if (!sObjectMgr.IsExistingCreatureId(entry))
+                    sLog.outErrorDb("Table creature_movement_template references unknown creature template %u. Skipping.", entry);
                 continue;
             }
 

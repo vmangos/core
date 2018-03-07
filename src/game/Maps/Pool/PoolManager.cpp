@@ -674,7 +674,7 @@ void PoolManager::LoadFromDB()
 
     mPoolTemplate.resize(max_pool_id + 1);
 
-    result = WorldDatabase.Query("SELECT entry, max_limit, flags, description, instance FROM pool_template");
+    result = WorldDatabase.PQuery("SELECT entry, max_limit, flags, description, instance FROM pool_template WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch());
     if (!result)
     {
         mPoolTemplate.clear();
@@ -717,11 +717,11 @@ void PoolManager::LoadFromDB()
     mPoolCreatureGroups.resize(max_pool_id + 1);
     mCreatureSearchMap.clear();
 
-    result = WorldDatabase.Query(
-            "SELECT guid, pool_entry, chance, 0, flags FROM pool_creature "
+    result = WorldDatabase.PQuery(
+            "SELECT guid, pool_entry, chance, 0, flags FROM pool_creature WHERE ((%u >= patch_min) && (%u <= patch_max)) "
             "UNION "
             " SELECT guid, pool_entry, chance, pool_creature_template.id, pool_creature_template.flags "
-                "FROM pool_creature_template LEFT JOIN creature ON creature.id = pool_creature_template.id;");
+                "FROM pool_creature_template LEFT JOIN creature ON creature.id = pool_creature_template.id;", sWorld.GetWowPatch(), sWorld.GetWowPatch());
 
     count = 0;
     if (!result)
@@ -791,10 +791,10 @@ void PoolManager::LoadFromDB()
     mPoolGameobjectGroups.resize(max_pool_id + 1);
     mGameobjectSearchMap.clear();
     //                                   1     2           3       4  5
-    result = WorldDatabase.Query("SELECT guid, pool_entry, chance, 0, flags FROM pool_gameobject "
+    result = WorldDatabase.PQuery("SELECT guid, pool_entry, chance, 0, flags FROM pool_gameobject WHERE ((%u >= patch_min) && (%u <= patch_max)) "
         "UNION "
         "SELECT guid, pool_entry, chance, pool_gameobject_template.id, pool_gameobject_template.flags "
-        "FROM pool_gameobject_template LEFT JOIN gameobject ON gameobject.id = pool_gameobject_template.id");
+        "FROM pool_gameobject_template LEFT JOIN gameobject ON gameobject.id = pool_gameobject_template.id", sWorld.GetWowPatch(), sWorld.GetWowPatch());
 
     count = 0;
     if (!result)

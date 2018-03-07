@@ -1399,9 +1399,9 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
 
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
-    for (uint32 id = 0; id < sFactionStore.GetNumRows(); ++id)
+    for (uint32 id = 0; id < sObjectMgr.GetMaxFactionId(); ++id)
     {
-        FactionEntry const *factionEntry = sFactionStore.LookupEntry(id);
+        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(id);
         if (factionEntry)
         {
             int loc = GetSessionDbcLocale();
@@ -1515,7 +1515,7 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
         }
     }
 
-    FactionEntry const *factionEntry = sFactionStore.LookupEntry(factionId);
+    FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(factionId);
 
     if (!factionEntry)
     {
@@ -2079,7 +2079,7 @@ bool ChatHandler::HandleNpcFactionIdCommand(char* args)
 
     uint32 factionId = (uint32) atoi(args);
 
-    if (!sFactionTemplateStore.LookupEntry(factionId))
+    if (!sObjectMgr.GetFactionTemplateEntry(factionId))
     {
         PSendSysMessage(LANG_WRONG_FACTION, factionId);
         SetSentErrorMessage(true);
@@ -3675,7 +3675,7 @@ bool ChatHandler::HandleCharacterReputationCommand(char* args)
     FactionStateList const& targetFSL = target->GetReputationMgr().GetStateList();
     for (FactionStateList::const_iterator itr = targetFSL.begin(); itr != targetFSL.end(); ++itr)
     {
-        FactionEntry const *factionEntry = sFactionStore.LookupEntry(itr->second.ID);
+        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(itr->second.ID);
 
         ShowFactionListHelper(factionEntry, loc, &itr->second, target);
     }

@@ -736,7 +736,7 @@ void WorldSession::HandleListInventoryOpcode(WorldPacket & recv_data)
     SendListInventory(guid);
 }
 
-void WorldSession::SendListInventory(ObjectGuid vendorguid)
+void WorldSession::SendListInventory(ObjectGuid vendorguid, uint8 menu_type)
 {
     DEBUG_LOG("WORLD: Sent SMSG_LIST_INVENTORY");
 
@@ -757,8 +757,8 @@ void WorldSession::SendListInventory(ObjectGuid vendorguid)
     if (!pCreature->IsStopped())
         pCreature->StopMoving();
 
-    VendorItemData const* vItems = pCreature->GetVendorItems();
-    VendorItemData const* tItems = pCreature->GetVendorTemplateItems();
+    VendorItemData const* vItems = menu_type & VENDOR_MENU_NORMAL ? pCreature->GetVendorItems() : nullptr;
+    VendorItemData const* tItems = menu_type & VENDOR_MENU_TEMPLATE ? pCreature->GetVendorTemplateItems() : nullptr;
 
     if (!vItems && !tItems)
     {

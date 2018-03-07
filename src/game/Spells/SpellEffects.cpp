@@ -431,7 +431,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 if (m_spellInfo->SpellIconID == 38 && m_spellInfo->IsFitToFamilyMask<CF_WARRIOR_MORTAL_STRIKE>())
                 {
                     float attackPower = m_caster->GetTotalAttackPowerValue(BASE_ATTACK);
-                    if (unitTarget) 
+                    if (unitTarget)
                         attackPower += m_caster->GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_MELEE_ATTACK_POWER_VERSUS, unitTarget->GetCreatureTypeMask());
                     damage = uint32(damage * attackPower / 100);
                 }
@@ -1485,11 +1485,45 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 27662: // Silver Shafted Arrow
                 {
-                    if (unitTarget && m_caster && unitTarget->IsPlayer()) 
+                    if (unitTarget && m_caster && unitTarget->IsPlayer())
                     {
                         if (!unitTarget->GetMiniPet())
                             unitTarget->CastSpell(unitTarget, 27570, true);
                     }
+                    return;
+                }
+                case 14813: // Dark Iron Drunk Mug
+                {
+                    if (unitTarget->HasAura(14823) || unitTarget->GetEntry() == 14871)
+                        return;
+
+                    if (m_originalCasterGUID && m_originalCasterGUID.IsGameObject())
+                    {
+                        if (GameObject* pMug = unitTarget->GetMap()->GetGameObject(m_originalCasterGUID))
+                        {
+                            float fX, fY, fZ;
+                            pMug->GetContactPoint(unitTarget, fX, fY, fZ);
+                            unitTarget->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_WALK_MODE);
+                            m_caster->SummonGameObject(165738, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 30000);
+                        }
+                    }
+                    return;
+                }
+                case 23845: // Attract Jubjub
+                {
+                    if (GameObject* pMug = m_caster->FindNearestGameObject(165578, 3.0f))
+                    {
+                        float fX, fY, fZ;
+                        pMug->GetContactPoint(unitTarget, fX, fY, fZ);
+                        unitTarget->GetMotionMaster()->MovePoint(1, fX, fY, fZ, MOVE_WALK_MODE);
+                    }
+                    return;
+                }
+                case 23852: // Jubling Cooldown
+                {
+                    // Trigger 7 day cooldown
+                    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(23851);
+                    unitTarget->AddSpellAndCategoryCooldowns(spellInfo, 19462);
                     return;
                 }
                 case 17190: // Ras Frostwhisper Visual Dummy
@@ -1498,6 +1532,17 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     {
                         unitTarget->CastSpell(unitTarget, 17186, true);    // Human form
                         unitTarget->SetHealth(unitTarget->GetMaxHealth()); // Back to full health
+                    }
+                    return;
+                }
+                case 16032: // Merging Oozes
+                {
+                    if (unitTarget && m_caster && unitTarget->IsCreature() && m_caster->IsCreature())
+                    {
+                        // Summon Gargantuan Ooze
+                        m_caster->SummonCreature(9621, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000);
+                        ((Creature*)m_caster)->DespawnOrUnsummon();
+                        ((Creature*)unitTarget)->DespawnOrUnsummon();
                     }
                     return;
                 }
@@ -3383,24 +3428,39 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
     // in another case summon new
     uint32 level = m_caster->getLevel();
 
-    // level of pet summoned using engineering item based at engineering skill level
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_CastItem)
+    // Summoned by unit: use creature level but cap at owner level
+    if (m_caster->GetTypeId() == TYPEID_UNIT)
     {
-        ItemPrototype const *proto = m_CastItem->GetProto();
-        if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
+        uint32 creaturelevel = cInfo->minlevel == cInfo->maxlevel ? cInfo->minlevel : urand(cInfo->minlevel, cInfo->maxlevel);
+        if (creaturelevel < level) level = creaturelevel;
+    }
+    // Summoned by player
+    else
+    {
+        // Use spell level if possible
+        if (m_spellInfo->spellLevel > 1)
         {
-            uint16 engiLevel = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING);
-            if (engiLevel)
+            level = m_spellInfo->spellLevel;
+        }
+        // Else match with owner level but cap at creature max
+        else if (cInfo->maxlevel < level)
+        {
+            level = cInfo->maxlevel;
+        }
+        // Engineering summons always scale with skill points
+        if (m_CastItem)
+        {
+            ItemPrototype const *proto = m_CastItem->GetProto();
+            if (proto && proto->RequiredSkill == SKILL_ENGINEERING)
             {
-                level = engiLevel / 5;
+                uint16 engiLevel = ((Player*)m_caster)->GetSkillValue(SKILL_ENGINEERING);
+                if (engiLevel)
+                {
+                    level = engiLevel / 5;
+                }
             }
         }
     }
-
-    if (m_spellInfo->Id == 9515) // Exception for 'Summon Tracking Hound'
-        level = m_spellInfo->spellLevel;
-    if (m_spellInfo->Id == 14642 && level > cInfo->maxlevel) // Felhound Minion level cap
-        level = cInfo->maxlevel;
 
     // select center of summon position
     float center_x = m_targets.m_destX;
@@ -4859,7 +4919,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                             return;
                         }
                     }
-                    return;
+                    break;
                 }
                 case 26678:                                 // Bag of Candies
                 {
@@ -5674,7 +5734,7 @@ void Spell::EffectReputation(SpellEffectIndex eff_idx)
     int32  rep_change = m_currentBasePoints[eff_idx];
     uint32 faction_id = m_spellInfo->EffectMiscValue[eff_idx];
 
-    FactionEntry const* factionEntry = sFactionStore.LookupEntry(faction_id);
+    FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(faction_id);
 
     if (!factionEntry)
         return;

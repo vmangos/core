@@ -114,7 +114,6 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     //Plays a sound to all nearby players
     void DoPlaySoundToSet(WorldObject* pSource, uint32 uiSoundId);
 
-    void SendMonsterMoveWithSpeed(float x, float y, float z, uint32 MovementFlags, uint32 transitTime = 0, Player* player = nullptr);
     //Drops all threat to 0%. Does not remove players from the threat list
     void DoResetThreat();
 
@@ -158,7 +157,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
 
     float DoGetThreat(Unit* pUnit);
     void DoModifyThreatPercent(Unit* pUnit, int32 pct);
-    void DoTeleportTo(float fX, float fY, float fZ, uint32 uiTime);
+    void DoTeleportTo(float fX, float fY, float fZ);
     void DoTeleportTo(const float fPos[4]);
     void DoTeleportAll(float fX, float fY, float fZ, float fO);
     Creature* me;

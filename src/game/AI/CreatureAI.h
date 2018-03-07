@@ -233,7 +233,6 @@ class MANGOS_DLL_SPEC CreatureAI
         void DoCastVictim(uint32 spellId, bool triggered = false);
         void DoCastAOE(uint32 spellId, bool triggered = false);
         bool UpdateVictim();
-        bool UpdateCombatState();
         bool UpdateVictimWithGaze();
         void SetGazeOn(Unit *target);
 

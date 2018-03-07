@@ -303,28 +303,6 @@ bool CreatureAI::UpdateVictimWithGaze()
     return m_creature->getVictim();
 }
 
-bool CreatureAI::UpdateCombatState()
-{
-    if (!m_creature->isInCombat())
-        return false;
-
-    if (!m_creature->HasReactState(REACT_PASSIVE))
-    {
-        if (m_creature->SelectHostileTarget())
-            if (Unit *victim = m_creature->getVictim())
-                AttackStart(victim);
-        return m_creature->getVictim();
-    }
-
-    if (m_creature->getThreatManager().isThreatListEmpty())
-    {
-        EnterEvadeMode();
-        return false;
-    }
-
-    return true;
-}
-
 bool CreatureAI::UpdateVictim()
 {
     if (!m_creature->isInCombat())

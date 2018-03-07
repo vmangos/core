@@ -418,53 +418,48 @@ CreatureAI* GetAI_eggs_trigger(Creature* pCreature)
 enum
 {
 	SPELL_MERGING_OOZES = 16032,
-	NPC_PRIMAL_OOZE = 6557,
-	NPC_CAPTURED_OOZE = 10290,
-	NPC_GARGANTUAN_OOZE = 9621
+	NPC_PRIMAL_OOZE = 6557
 };
-//melding of influences (Alita)
-bool EffectDummyCreature_primal_ooze(Unit* pCaster, uint32 uiSpellId, SpellEffectIndex uiEffIndex, Creature* pCreatureTarget)/*, ObjectGuid*/ /*originalCasterGuid*//*)*/
-{
-    if (uiSpellId == SPELL_MERGING_OOZES && uiEffIndex == EFFECT_INDEX_0)
-    {
-        if (pCaster->GetTypeId() != TYPEID_PLAYER && pCreatureTarget->GetTypeId() != TYPEID_PLAYER)
-        {
-            pCaster->SummonCreature(NPC_GARGANTUAN_OOZE, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 420000);
-            ((Creature*)pCaster)->DisappearAndDie();
-            ((Creature*)pCreatureTarget)->DisappearAndDie();
-        }
-        return true;
-    }
-    return true;
-}
+
 struct mob_captured_felwood_oozeAI : public ScriptedAI
 {
     mob_captured_felwood_oozeAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         Reset();
     }
+    uint32 initialTimer;
+    bool mergeDone;
+
     void Reset()
     {
-        initialTimer=5000;
+        initialTimer = 1000;
+        mergeDone = false;
     }
-    uint32 initialTimer;
+
     void UpdateAI(const uint32 uiDiff)
     {
         if (initialTimer < uiDiff)
         {
-            if( Creature* primalOoze = m_creature->FindNearestCreature(NPC_PRIMAL_OOZE, 5.0f))
-            {
-                DoCastSpellIfCan(primalOoze, SPELL_MERGING_OOZES);
-            }
-            initialTimer = 5000;
+            // If no Primal Ooze found within 30yd, instant despawn
+            if (Creature* primalOoze = m_creature->FindNearestCreature(NPC_PRIMAL_OOZE, 30.0f))
+                m_creature->GetMotionMaster()->MoveFollow(primalOoze, 2.0f, 0);
+            else
+                m_creature->DespawnOrUnsummon();
+
+            initialTimer = 2000;
         }
         else
             initialTimer -= uiDiff;
+    }
 
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        DoMeleeAttackIfReady();
+    void MovementInform(uint32 type, uint32 id)
+    {
+        if (type == FOLLOW_MOTION_TYPE && !mergeDone)
+        {
+            if (Creature* primalOoze = m_creature->FindNearestCreature(NPC_PRIMAL_OOZE, 5.0f))
+                if (DoCastSpellIfCan(primalOoze, SPELL_MERGING_OOZES))
+                    mergeDone = true;
+        }
     }
 };
 
