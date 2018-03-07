@@ -89,6 +89,8 @@ enum SpellSpecific
     SPELL_FOOD              = 20,
     SPELL_DRINK             = 21,
     SPELL_FOOD_AND_DRINK    = 22,
+    SPELL_NEGATIVE_HASTE    = 23,
+    SPELL_SNARE             = 24,
 };
 
 SpellSpecific GetSpellSpecific(uint32 spellId);
@@ -217,6 +219,17 @@ inline bool IsSpellHaveAura(SpellEntry const *spellInfo, AuraType aura)
     return false;
 }
 
+inline bool IsSpellHaveSingleAura(SpellEntry const *spellInfo, AuraType aura)
+{
+    bool hasAura = false;
+    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        if (AuraType(spellInfo->EffectApplyAuraName[i]) == aura)
+            hasAura = true;
+        else if (spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA)
+            return false;
+    return hasAura;
+}
+
 inline bool IsSpellLastAuraEffect(SpellEntry const *spellInfo, SpellEffectIndex effecIdx)
 {
     for(int i = effecIdx+1; i < MAX_EFFECT_INDEX; ++i)
@@ -240,6 +253,7 @@ inline bool IsElementalShield(SpellEntry const *spellInfo)
 }
 
 int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2);
+bool CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry const* spellInfo_2);
 
 // order from less to more strict
 bool IsSingleFromSpellSpecificPerTargetPerCaster(SpellSpecific spellSpec1,SpellSpecific spellSpec2);

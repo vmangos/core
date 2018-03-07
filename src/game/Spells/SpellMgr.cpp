@@ -436,6 +436,31 @@ int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2)
     return 0;
 }
 
+bool CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry const* spellInfo_2)
+{
+    if (!spellInfo_1 || !spellInfo_2) return 0;
+    if (spellInfo_1 == spellInfo_2) return 0;
+
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        for (int32 j = 0; j < MAX_EFFECT_INDEX; ++j)
+        {
+            if (spellInfo_1->Effect[i] == SPELL_EFFECT_APPLY_AURA
+                && spellInfo_1->EffectApplyAuraName[i] == spellInfo_2->EffectApplyAuraName[j])
+            {
+                if (spellInfo_1->EffectBasePoints[i] < spellInfo_2->EffectBasePoints[j] && spellInfo_2->EffectBasePoints[j] < 0)
+                    return true;
+                else if (spellInfo_1->EffectBasePoints[i] > spellInfo_2->EffectBasePoints[j] && spellInfo_2->EffectBasePoints[j] >= 0)
+                    return true;
+                else if (spellInfo_1->EffectBasePoints[i] == spellInfo_2->EffectBasePoints[j] && GetSpellDuration(spellInfo_1) >= GetSpellDuration(spellInfo_2))
+                    return true;
+            }
+        }
+    }
+
+    return false;
+}
+
 SpellSpecific GetSpellSpecific(uint32 spellId)
 {
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
@@ -582,6 +607,16 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
     if (SpellSpecific sp = sSpellMgr.GetSpellElixirSpecific(spellInfo->Id))
         return sp;
 
+    // Attack speed reduction
+    if (IsSpellHaveSingleAura(spellInfo, SPELL_AURA_MOD_MELEE_HASTE))
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+            if (AuraType(spellInfo->EffectApplyAuraName[i]) == SPELL_AURA_MOD_MELEE_HASTE && spellInfo->EffectBasePoints[i] < 0)
+                return SPELL_NEGATIVE_HASTE;
+
+    // Movement speed reduction
+    if (IsSpellHaveSingleAura(spellInfo, SPELL_AURA_MOD_DECREASE_SPEED))
+        return SPELL_SNARE;
+
     return SPELL_NORMAL;
 }
 
@@ -631,6 +666,8 @@ bool IsSingleFromSpellSpecificPerTarget(SpellSpecific spellSpec1, SpellSpecific 
         case SPELL_ELEMENTAL_SHIELD:
         case SPELL_MAGE_POLYMORPH:
         case SPELL_WELL_FED:
+        case SPELL_NEGATIVE_HASTE:
+        case SPELL_SNARE:
             return spellSpec1 == spellSpec2;
         case SPELL_BATTLE_ELIXIR:
             return spellSpec2 == SPELL_BATTLE_ELIXIR
