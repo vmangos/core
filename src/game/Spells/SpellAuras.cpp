@@ -2320,9 +2320,13 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         }
         case FORM_BERSERKERSTANCE:
         {
-            // do nothing when removing Nefarian warrior call
+            // cast regular berserker stance when removing Nefarian warrior call
             if (!apply && GetSpellProto()->Id == 23397)
+            {
+                HandleShapeshiftBoosts(apply);
+                target->CastSpell(target, 2458, true);
                 return;
+            }
         }
         default:
             break;
