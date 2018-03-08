@@ -4424,10 +4424,9 @@ void Spell::SendLogExecute()
 
     uint32 effectCount = 0;
 
-    /* for (std::vector<ExecuteLogInfo> effectInfo : m_executeLogInfo) */
-    for (std::vector<ExecuteLogInfo>::const_iterator it = m_executeLogInfo->begin(); it != m_executeLogInfo->end(); ++it)
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
-        if (it != m_executeLogInfo->end())
+        if (!m_executeLogInfo[i].empty())
             effectCount++;
     }
 
@@ -4444,9 +4443,9 @@ void Spell::SendLogExecute()
         data << uint32(m_spellInfo->Effect[i]);
         data << uint32(m_executeLogInfo[i].size());
 
-        for (std::vector<ExecuteLogInfo>::const_iterator it = m_executeLogInfo->begin(); it != m_executeLogInfo->end(); ++it)
+        for (uint32 j = 0; j < m_executeLogInfo[i].size(); ++j)
         {
-            ExecuteLogInfo info = *it;
+            ExecuteLogInfo info = m_executeLogInfo[i][j];
             switch (m_spellInfo->Effect[i])
             {
                 case SPELL_EFFECT_POWER_DRAIN:
