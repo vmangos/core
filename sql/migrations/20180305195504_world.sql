@@ -179,13 +179,16 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 (950, 7, 0, 0, 0, 0, 0, 0, 0, 1218, 0, 0, 0, 0, 0, 0, 0, 'Onu: Say text 1'),
 (950, 8, 4, 147, 2, 1, 3616, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu: npc_flag questgiver added');
 
--- End script for quest 1062 (Goblin Invaders) - ok
+-- End script for quest 1062 (Goblin Invaders) - ok - 20180310 added emote and npc_flag removal per source
 -- Source: https://www.youtube.com/watch?v=5UWZaZjKS14&feature=youtu.be&list=PL49Ga_-r7iKkxrbckm9CkUhWzxqrOnw-n&t=3736
 UPDATE `quest_template` SET `CompleteScript`=1062 WHERE `entry`=1062 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1062;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1062, 1, 0, 0, 0, 0, 0, 0, 1425, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Say text 1'),
-(1062, 3, 0, 0, 0, 0, 0, 0, 1426, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Say text 2');
+INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
+(1062, 0, 4, 147, 2, 2, 4049, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: npc_flag questgiver removed'),
+(1062, 1, 0, 0, 0, 0, 0, 0,  0, 1425, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Say text 1'),
+(1062, 3, 0, 0, 0, 0, 0, 0,  0, 1426, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Say text 2'),
+(1062, 3, 1, 15, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Roar emote'),
+(1062, 4, 4, 147, 2, 1, 4049, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: npc_flag questgiver added');
 
 -- End script for quest 1063 (The Elder Crone) - ok
 UPDATE `quest_template` SET `CompleteScript`=1063 WHERE `entry`=1063 AND `patch`=0;
