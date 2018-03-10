@@ -613,17 +613,17 @@ BattleGroundMap* MapManager::CreateBattleGroundMap(uint32 id, uint32 InstanceId,
 
 bool IsNorthTo(float x, float y, float const* limits, int count /* last case is limits[2*count - 1] */)
 {
-    bool isNorth = false;
+    int insideCount = 0;
     for (int i = 0; i < count - 1; ++i)
     {
         if ((limits[2*i + 1] < y && y < limits[2*i + 3]) || (limits[2*i + 1] > y && y > limits[2*i + 3]))
         {
             float threshold = limits[2*i] + (limits[2*i + 2] - limits[2*i]) * (y - limits[2*i + 1]) / (limits[2*i + 3] - limits[2*i + 1]);
             if (x > threshold)
-                isNorth = !isNorth;
+                ++insideCount;
         }
     }
-    return isNorth;
+    return insideCount % 2 == 1;
 }
 
 uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* transitionArea)
@@ -767,8 +767,8 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                     1184.00f, -3915.00f,
                      737.00f, -3782.00f,
                      -75.00f, -3742.00f,
-                    -288.30f, -3863.80f, // Northwest path for shaman quest "Call of Fire"
-                    -282.30f, -4050.90f,
+                    -263.00f, -3836.00f,
+                    -173.00f, -4064.00f,
                      -81.00f, -4091.00f,
                      -49.00f, -4089.00f,
                      -16.00f, -4187.00f,
@@ -799,10 +799,9 @@ uint32 MapManager::GetContinentInstanceId(uint32 mapId, float x, float y, bool* 
                     -3472.819580f,   182.522476f, // Feralas
                     -4365.006836f, -1602.575439f, // the Barrens
                     -4515.219727f, -1681.356079f,
-                    -4703.36035f , -2166.91016f, // Thousand Needles
-                    -4849.61377f  , -2176.16284f,  // Razorfen Downs outsides
-                    -4863.11377f , -2185.06274f,
-                    -5043.4502f  , -2431.94971f,
+                    -4543.093750f, -1882.869385f, // Thousand Needles
+                        -4824.16f,     -2310.11f,
+                    -5102.913574f, -2647.062744f,
                     -5248.286621f, -3034.536377f,
                     -5246.920898f, -3339.139893f,
                     -5459.449707f, -4920.155273f, // Tanaris
@@ -944,7 +943,6 @@ void MapManager::ScheduleInstanceSwitch(Player* player, uint16 newInstance)
     ASSERT(mapId < LAST_CONTINENT_ID);
     m_scheduledInstanceSwitches_lock[mapId].acquire();
     m_scheduledInstanceSwitches[mapId][player] = newInstance;
-    player->SetPendingInstanceSwitch(true);
     m_scheduledInstanceSwitches_lock[mapId].release();
 }
 
@@ -958,7 +956,6 @@ void MapManager::SwitchPlayersInstances()
             Player* player = it->first;
             if (player->IsInWorld() && player->GetMapId() == continent)
                 player->SwitchInstance(it->second);
-            player->SetPendingInstanceSwitch(false);
         }
         m_scheduledInstanceSwitches[continent].clear();
     }

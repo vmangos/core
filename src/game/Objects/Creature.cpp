@@ -3199,13 +3199,6 @@ void Creature::OnLeaveCombat()
     UpdateCombatState(false);
     UpdateCombatWithZoneState(false);
 
-    // a delayed spell event could set the creature in combat again
-    auto itEvent = m_Events.GetEvents().begin();
-    for (; itEvent != m_Events.GetEvents().end(); ++itEvent)
-        if (SpellEvent* event = dynamic_cast<SpellEvent*>(itEvent->second))
-            if (event->GetSpell()->getState() != SPELL_STATE_FINISHED)
-                event->GetSpell()->cancel();
-
     if (_creatureGroup)
         _creatureGroup->OnLeaveCombat(this);
 
