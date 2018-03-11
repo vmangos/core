@@ -4319,6 +4319,11 @@ bool Unit::RemoveNoStackAurasDueToAuraHolder(SpellAuraHolder *holder)
 
         if (is_spellSpecPerTarget || (is_spellSpecPerTargetPerCaster && holder->GetCasterGuid() == (*i).second->GetCasterGuid()))
         {
+            // cannot remove stronger snare / haste debuff
+            if (spellId_spec == SPELL_SNARE || spellId_spec == SPELL_NEGATIVE_HASTE)
+                if (!CompareSpellSpecificAuras(spellProto, i_spellProto))
+                    return false;
+
             // cannot remove higher rank
             if (sSpellMgr.IsRankSpellDueToSpell(spellProto, i_spellId))
                 if (CompareAuraRanks(spellId, i_spellId) < 0)

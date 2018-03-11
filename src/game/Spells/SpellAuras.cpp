@@ -7213,6 +7213,12 @@ bool _IsExclusiveSpellAura(SpellEntry const* spellproto, SpellEffectIndex eff, A
                     spellproto->SpellFamilyName == SPELLFAMILY_PRIEST)
                 return false;
             return true;
+        case SPELL_AURA_MOD_MELEE_HASTE:
+        case SPELL_AURA_MOD_DECREASE_SPEED:
+            // Attack and movement speed reduction
+            if (spellproto->EffectBasePoints[eff] >= 0)
+                return false;
+            return true;
         default:
             return false;
     }
@@ -7222,7 +7228,7 @@ void Aura::ComputeExclusive()
 {
     m_exclusive = false;
     //return;
-    if (GetHolder()->IsPassive() || !GetHolder()->IsPositive())
+    if (GetHolder()->IsPassive())
         return;
     m_exclusive = _IsExclusiveSpellAura(GetSpellProto(), GetEffIndex(), GetModifier()->m_auraname);
 }
@@ -7244,8 +7250,11 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 0;
 
     // Lui est mieux
-    if (other->GetModifier()->m_amount > GetModifier()->m_amount)
+    if (other->GetModifier()->m_amount > GetModifier()->m_amount && GetModifier()->m_amount >= 0)
         return 2;
+    else if (other->GetModifier()->m_amount < GetModifier()->m_amount && GetModifier()->m_amount < 0)
+        return 2;
+    
     return 1;
 }
 
