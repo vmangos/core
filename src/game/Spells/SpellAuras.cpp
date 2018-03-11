@@ -1072,8 +1072,8 @@ void Aura::TriggerSpell()
 
     uint32 spellRandom;
 
-    // not in reactive state
-    if (m_modifier.m_amount == 0 && triggerTarget->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+    // not in banished state
+    if (triggerTarget->hasUnitState(UNIT_STAT_ISOLATED))
         return;
 
     // specific code for cases with no trigger spell provided in field
