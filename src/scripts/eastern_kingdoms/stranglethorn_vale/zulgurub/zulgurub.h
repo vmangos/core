@@ -11,7 +11,7 @@ enum
 
     NPC_LORKHAN             = 11347,
     NPC_ZATH                = 11348,
-    NPC_THEKAL              = 14509,
+    NPC_THEKAL              = 14599,
     NPC_JINDO               = 11380,
     NPC_HAKKAR              = 14834,
     NPC_VENOXIS             = 14507,
