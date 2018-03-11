@@ -308,21 +308,29 @@ struct boss_twinemperorsAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        if (m_pInstance) {
+        if (m_pInstance) 
+        {
             if (m_pInstance->GetData(TYPE_TWINS) == IN_PROGRESS) {
                 return;
             }
             m_pInstance->SetData(TYPE_TWINS, IN_PROGRESS);
         }
+        bool bOpenEntrance = false;
         std::list<Creature*> lst;
         GetCreatureListWithEntryInGrid(lst, m_creature, NPC_ANUBISATH_DEFENDER, 800);
         for (auto it = lst.begin(); it != lst.end(); it++)
         {
             Creature* pC = *it;
             if (pC->isDead()) continue;
+            pC->SetActiveObjectState(true);
             pC->SetInCombatWithZone();
             pC->AI()->AttackStart(pWho);
+            bOpenEntrance = true;
         }
+        
+        if (m_pInstance && !bOpenEntrance)
+            if (GameObject* pGo = m_pInstance->GetSingleGameObjectFromStorage(GO_TWINS_ENTER_DOOR))
+                m_pInstance->DoResetDoor(pGo->GetGUID());
 
         m_creature->SetInCombatWithZone();
 
