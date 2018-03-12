@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/LightsHope/server.svg?branch=development)](https://travis-ci.org/LightsHope/server)
+[![Build Status](https://travis-ci.org/lh-server/core.svg?branch=development)](https://travis-ci.org/lh-server/core)
 
 # Bug reporting:
 Before opening any bug reports on the issue tracker, please read the guidelines [located here](https://github.com/LightsHope/server/blob/development/docs/).
