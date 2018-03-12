@@ -132,7 +132,7 @@ struct npc_va_jashniAI : public ScriptedAI
     {
         if (m_uiFlashHealTimer < diff)
         {
-            Unit *target = DoSelectLowestHpFriendly(40.0f, 1);
+            Unit *target = m_creature->DoSelectLowestHpFriendly(40.0f, 1);
 
             if (target && DoCastSpellIfCan(target, SPELL_VA_JASHNI_FLASH_HEAL) == CAST_OK)
                 m_uiFlashHealTimer = urand(8000, 14000);
@@ -142,7 +142,7 @@ struct npc_va_jashniAI : public ScriptedAI
 
         if (m_uiShieldTimer < diff)
         {
-            Unit *target = DoSelectLowestHpFriendly(40.0f, 1);
+            Unit *target = m_creature->DoSelectLowestHpFriendly(40.0f, 1);
 
             if (target && DoCastSpellIfCan(target, SPELL_VA_JASHNI_SHIELD) == CAST_OK)
                 m_uiShieldTimer = urand(40000, 50000);
@@ -152,7 +152,7 @@ struct npc_va_jashniAI : public ScriptedAI
 
         if (m_uiRenewTimer < diff)
         {
-            Unit *target = DoSelectLowestHpFriendly(40.0f, 1);
+            Unit *target = m_creature->DoSelectLowestHpFriendly(40.0f, 1);
 
             if (target && DoCastSpellIfCan(target, SPELL_VA_JASHNI_RENEW) == CAST_OK)
                 m_uiRenewTimer = urand(55000, 65000);
@@ -443,7 +443,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
             // Feign death, lay trap, re-acquire target
             Unit *currentTarget = m_creature->getVictim();
 
-            if (DoCastSpellIfCan(m_creature, SPELL_MALGEN_LONGSPEAR_FEIGN_DEATH, CAST_TRIGGERED) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_MALGEN_LONGSPEAR_FEIGN_DEATH, CF_TRIGGERED) == CAST_OK)
             {
                 // Feign for 1 secs, then trap and repop
                 m_bIsFeigned = true;
@@ -460,7 +460,7 @@ struct npc_malgen_longspearAI : public ScriptedAI
             {
                 m_creature->RemoveAurasDueToSpell(SPELL_MALGEN_LONGSPEAR_FEIGN_DEATH);
                 
-                DoCastSpellIfCan(m_creature, SPELL_MALGEN_LONGSPEAR_FROST_TRAP, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_MALGEN_LONGSPEAR_FROST_TRAP, CF_TRIGGERED);
                 m_uiFrostTrapTimer = 0;
 
                 m_bIsFeigned = false;

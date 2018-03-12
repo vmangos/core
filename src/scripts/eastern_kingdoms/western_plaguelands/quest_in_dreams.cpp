@@ -90,7 +90,7 @@ void npc_tirion_fordring_in_dreamsAI::DoAttack(const uint32 uiDiff)
 {
     if (m_uiDevotionAuraTimer < uiDiff)
     {
-        DoCastSpellIfCan(m_creature, SPELL_DEVOTION_AURA, CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_DEVOTION_AURA, CF_AURA_NOT_PRESENT);
         m_uiDevotionAuraTimer = 5000;
     }
     else
@@ -651,7 +651,7 @@ void npc_isillienAI::Event4KillTaelan(const uint32 uiDiff)
                     m_creature->getThreatManager().clearReferences();
                     m_creature->AttackStop();
 
-                    if (DoCastSpellIfCan(pTaelan, SPELL_TAELAN_DEATH, CAST_TRIGGERED | CAST_INTERRUPT_PREVIOUS | CAST_FORCE_CAST) == CAST_OK)
+                    if (DoCastSpellIfCan(pTaelan, SPELL_TAELAN_DEATH, CF_TRIGGERED | CF_INTERRUPT_PREVIOUS | CF_FORCE_CAST) == CAST_OK)
                     {
                         GuardsDoAttack(nullptr, true, false);
                         GuardsDoAttack(nullptr, false, false);
@@ -1098,7 +1098,7 @@ void npc_taelanAI::Reset()
     m_uiHolyCleaveTimer = urand(5000, 10000);
     m_uiCrusaderStrikeTimer = urand(7000, 9000);   
 
-    DoCastSpellIfCan(m_creature, SPELL_MURDER, CAST_AURA_NOT_PRESENT);
+    DoCastSpellIfCan(m_creature, SPELL_MURDER, CF_AURA_NOT_PRESENT);
 }
 
 void npc_taelanAI::ResetCreature()
@@ -1278,7 +1278,7 @@ void npc_taelanAI::Event2FightCavaliers(const uint32 uiDiff)
 
         DoScriptText(SAY_TAELAN_NOO, m_creature);
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
-        DoCastSpellIfCan(m_creature, SPELL_TAELAN_SUFFERING, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_TAELAN_SUFFERING, CF_TRIGGERED);
         m_creature->SetFactionTemporary(FACTION_ESCORT_N_FRIEND_PASSIVE, TEMPFACTION_RESTORE_RESPAWN);
 
         bool fight = false;
@@ -1470,7 +1470,7 @@ void npc_taelanAI::TimerSayAndGo(const uint32 uiDiff, uint32 uiUpd, int32 textId
 
 void npc_taelanAI::DoAttack(const uint32 uiDiff)
 {
-    DoCastSpellIfCan(m_creature, SPELL_DEVOTION_AURA, CAST_AURA_NOT_PRESENT);
+    DoCastSpellIfCan(m_creature, SPELL_DEVOTION_AURA, CF_AURA_NOT_PRESENT);
 
     DoHeal(uiDiff);
 
@@ -1498,7 +1498,7 @@ void npc_taelanAI::DoAttack(const uint32 uiDiff)
 void npc_taelanAI::DoHeal(const uint32 uiDiff)
 {
     // heals himself or friendly creatures around
-    if (auto pHealMe = DoSelectLowestHpFriendly(40.0f, 40, true))
+    if (auto pHealMe = m_creature->DoSelectLowestHpFriendly(40.0f, 40, true))
     {
         if (pHealMe->GetHealthPercent() < 20.0f)
         {
@@ -1595,7 +1595,7 @@ void npc_crimson_eliteAI::DoAttack(const uint32 uiDiff)
 {
     if (m_uiRetributionAuraCheckTimer < uiDiff)
     {
-        DoCastSpellIfCan(m_creature, SPELL_RETRIBUTION_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_RETRIBUTION_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
         m_uiRetributionAuraCheckTimer = 5000;
     }
     else

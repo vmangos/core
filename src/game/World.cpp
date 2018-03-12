@@ -1562,17 +1562,15 @@ void World::SetInitialWorldSettings()
     sScriptMgr.LoadCreatureSpellScripts();
     sScriptMgr.LoadGameObjectScripts();                     // must be after load Creature/Gameobject(Template/Data)
     sScriptMgr.LoadEventScripts();                          // must be after load Creature/Gameobject(Template/Data)
+    sScriptMgr.LoadCreatureEventAIScripts();
     sLog.outString(">>> Scripts loaded");
     sLog.outString();
 
     sLog.outString("Checking all script texts...");         // must be after Load*Scripts calls
     sScriptMgr.CheckAllScriptTexts();
 
-    sLog.outString("Loading CreatureEventAI Summons...");
-    sEventAIMgr.LoadCreatureEventAI_Summons(false);         // false, will checked in LoadCreatureEventAI_Scripts
-
-    sLog.outString("Loading CreatureEventAI Scripts...");
-    sEventAIMgr.LoadCreatureEventAI_Scripts();
+    sLog.outString("Loading CreatureEventAI Events...");
+    sEventAIMgr.LoadCreatureEventAI_Events();
 
     sLog.outString("Initializing Scripts...");
     sScriptMgr.Initialize();

@@ -280,7 +280,8 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
 {
     Map const* oldMap = GetMap();
 
-    SetLocationInstanceId(sMapMgr.GetContinentInstanceId(newMapid, x, y));
+    uint32 newInstanceId = sMapMgr.GetContinentInstanceId(newMapid, x, y);
+    SetLocationInstanceId(newInstanceId);
     Map* newMap = sMapMgr.CreateMap(newMapid, this);
     GetMap()->Remove<Transport>(this, false);
     SetMap(newMap);
@@ -328,8 +329,17 @@ bool Transport::TeleportTransport(uint32 newMapid, float x, float y, float z, fl
                 player->RemoveSpellsCausingAura(SPELL_AURA_MOD_FEAR);
                 player->CombatStopWithPets(true);
 
-                player->TeleportTo(newMapid, destX, destY, destZ, destO,
-                                   TELE_TO_NOT_LEAVE_TRANSPORT);
+                // No need for teleport packet if no map change
+                // The client still shows the correct loading screen when one is needed (Grom'Gol-Undercity)
+                if (newMapid == player->GetMapId())
+                {
+                    player->TeleportPositionRelocation(destX, destY, destZ, destO);
+                    if (newInstanceId != player->GetInstanceId())
+                        sMapMgr.ScheduleInstanceSwitch(player, newInstanceId);
+                }
+                else
+                    player->TeleportTo(newMapid, destX, destY, destZ, destO,
+                        TELE_TO_NOT_LEAVE_TRANSPORT);
 
                 break;
             }

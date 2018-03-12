@@ -184,7 +184,7 @@ struct mob_flamewaker_priestAI : public ScriptedAI
         //Casting Heal to Sulfuron or other Guards.
         if (Heal_Timer < diff)
         {
-            Unit* pUnit = DoSelectLowestHpFriendly(60.0f, 1);
+            Unit* pUnit = m_creature->DoSelectLowestHpFriendly(60.0f, 1);
             if (!pUnit)
                 return;
 

@@ -371,7 +371,7 @@ struct boss_sapphironAI : public ScriptedAI
         
         iceboltTargets.push_back(target->GetObjectGuid());
         m_creature->SetFacingToObject(target);
-        DoCastSpellIfCan(target, SPELL_ICEBOLT, CAST_TRIGGERED);
+        DoCastSpellIfCan(target, SPELL_ICEBOLT, CF_TRIGGERED);
         
         RescheduleIcebolt();
     }
@@ -592,7 +592,7 @@ struct boss_sapphironAI : public ScriptedAI
             {
                 // Looks like the wing buffet dissapears as he starts casting frost breath
                 UnSummonWingBuffet();
-                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH_DUMMY, CAST_TRIGGERED) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_FROST_BREATH_DUMMY, CF_TRIGGERED) == CAST_OK)
                     events.ScheduleEvent(EVENT_FROST_BREATH_CAST, 500);
                 else
                     events.Repeat(100);

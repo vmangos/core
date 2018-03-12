@@ -310,10 +310,10 @@ struct npc_necrotic_shard : public ScriptedAI
         if (GameObject* necropolis = m_creature->GetMap()->GetGameObject(_necropolisGuid))
             necropolis->SendGameObjectCustomAnim();
         // buff players around 
-        DoCastSpellIfCan(m_creature, SPELL_DMG_BOOST_AT_PYLON_DEATH, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_DMG_BOOST_AT_PYLON_DEATH, CF_TRIGGERED);
 
         // send death to relay
-        DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_CAMP_RELAY, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_COMMUNICATION_CAMP_RELAY, CF_TRIGGERED);
         DespawnAdds();
     }
 
@@ -620,7 +620,7 @@ struct GhoulBerserker : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -684,7 +684,7 @@ struct SpectralSoldierAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -746,7 +746,7 @@ struct SkeletalShocktrooperAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -807,7 +807,7 @@ struct SkeletalTrooperAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -864,7 +864,7 @@ struct SpectralSpiritAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)
@@ -908,7 +908,7 @@ struct SpectralApparitionAI : public ScriptedAI
     void JustDied(Unit*)
     {
         if (Unit* shard = m_creature->FindNearestCreature(NPC_NECROTIC_SHARD, 100.0f))
-            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(me, SPELL_ZAP_CRYSTAL, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)

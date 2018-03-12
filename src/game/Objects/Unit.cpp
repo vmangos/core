@@ -7405,8 +7405,20 @@ bool Unit::isTargetableForAttack(bool inverseAlive /*=false*/) const
     if (!CanBeDetected())
         return false;
 
-    if (GetTypeId() == TYPEID_PLAYER && (((Player *)this)->isGameMaster() || ((Player*)this)->watching_cinematic_entry != 0))
-        return false;
+    if (const Player* player = GetCharmerOrOwnerPlayerOrPlayerItself())
+    {
+        if (player->isGameMaster())
+            return false;
+
+        // in such case, unlike a creature, a charmed Player can be targeted even if his charmer can't
+        if (const Player* charmedPlayer = ToPlayer())
+            player = charmedPlayer;
+
+        if (player->watching_cinematic_entry != 0 ||
+            player->IsPendingFarTeleport() ||
+            player->IsPendingInstanceSwitch())
+            return false;
+    }
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
         return false;

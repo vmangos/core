@@ -728,13 +728,15 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // AI helpers
         Unit* SelectNearestHostileUnitInAggroRange(bool useLOS) const;
         Unit* SelectNearestTargetInAttackDistance(float dist) const;
-        // - Selection de victime (dans la liste d'aggro)
+        Unit* DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false) const;
+        // - Victim selection (from aggro list)
         Unit* GetNearestVictimInRange(float min, float max);
         Unit* GetFarthestVictimInRange(float min, float max);
         Unit* GetVictimInRange(float min, float max);
         Unit* GetHostileCasterInRange(float min, float max);
         Unit* GetHostileCaster();
-        // - Selection generique
+
+        // - Generic Selection
         void ProcessThreatList(ThreatListProcesser* f);
 
         // Spell Launch :

@@ -551,7 +551,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         m_uiMarkFlamesTimer         = 6000;
         m_uiCommandingShoutTimer    = urand(12000, 25000);
         m_uiCleaveTimer             = urand(4000, 8000);
-        DoCastSpellIfCan(m_creature, SPELL_AURA_FLAMES, CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_AURA_FLAMES, CF_AURA_NOT_PRESENT);
         SetAuraFlames(false);
     }
 
@@ -570,7 +570,7 @@ struct npc_death_talon_CaptainAI : public ScriptedAI
         if (!m_creature->HasAura(SPELL_AURA_FLAMES))
             m_creature->AddAura(SPELL_AURA_FLAMES, ADD_AURA_PERMANENT);
 
-        DoCastSpellIfCan(m_creature, SPELL_COMMANDING_SHOUT, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_COMMANDING_SHOUT, CF_TRIGGERED);
     }
 
     void JustDied(Unit* /*pKiller*/)

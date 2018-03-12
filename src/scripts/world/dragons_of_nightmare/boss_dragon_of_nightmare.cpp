@@ -40,7 +40,7 @@ void boss_dragon_of_nightmareAI::Reset()
 
 void boss_dragon_of_nightmareAI::Aggro(Unit* /*pWho*/)
 {
-    DoCastSpellIfCan(m_creature, SPELL_MARK_OF_NATURE, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+    DoCastSpellIfCan(m_creature, SPELL_MARK_OF_NATURE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
 }
 
 void boss_dragon_of_nightmareAI::EnterEvadeMode()
@@ -85,7 +85,7 @@ void boss_dragon_of_nightmareAI::UpdateAI(const uint32 uiDiff)
 
         if (m_uiSummonPlayerTimer > 6000)
         {
-            if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_PLAYER, CAST_TRIGGERED) == CAST_OK)
+            if (DoCastSpellIfCan(pTarget, SPELL_SUMMON_PLAYER, CF_TRIGGERED) == CAST_OK)
                 m_uiSummonPlayerTimer = 0;
         }
     }
@@ -94,8 +94,8 @@ void boss_dragon_of_nightmareAI::UpdateAI(const uint32 uiDiff)
 
     if (m_uiSeepingFogTimer <= uiDiff)
     {
-        DoCastSpellIfCan(m_creature, SPELL_SEEPING_FOG_RIGHT, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_SEEPING_FOG_LEFT, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SEEPING_FOG_RIGHT, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SEEPING_FOG_LEFT, CF_TRIGGERED);
 
         m_uiSeepingFogTimer = 2 * MINUTE*IN_MILLISECONDS + 300;
     }
@@ -145,7 +145,7 @@ struct npc_dream_fogAI : ScriptedPetAI
 
     void ResetCreature() override
     {
-        DoCastSpellIfCan(m_creature, SPELL_DREAM_FOG_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_DREAM_FOG_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 
     void AttackedBy(Unit*) override {}

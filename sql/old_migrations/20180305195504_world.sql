@@ -12,28 +12,28 @@ INSERT INTO `migrations` VALUES ('20180305195504');
 UPDATE `quest_template` SET `CompleteScript`=637 WHERE `entry`=637 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=637;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(637, 0, 0, 0, 0, 0, 0, 0, 792, 0, 0, 0, 0, 0, 0, 0, 'Sara Balloo: Emote text 1'), 
-(637, 3, 0, 0, 0, 0, 0, 0, 793, 0, 0, 0, 0, 0, 0, 0, 'Sara Balloo: Say text 1');
+(637, 0, 0, 0, 0, 0, 0, 0, 792, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloos Letter - Sara Balloo: Emote text 1'), 
+(637, 3, 0, 0, 0, 0, 0, 0, 793, 0, 0, 0, 0, 0, 0, 0, 'Sully Balloos Letter - Sara Balloo: Say text 1');
 
 
 -- Add emotes and text on quest Sara Balloo's Plea - ok
 UPDATE `quest_template` SET `CompleteScript`=683 WHERE `entry`=683 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=683;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(683, 1, 0, 0, 0, 0, 0, 0, 860, 0, 0, 0, 0, 0, 0, 0, 'King Magni Bronzebeard: Emote text 1'); 
+(683, 1, 0, 0, 0, 0, 0, 0, 860, 0, 0, 0, 0, 0, 0, 0, 'Sara Balloos Plea - King Magni Bronzebeard: Emote text 1'); 
 
 
 -- Add emotes and script to quest Brother Anton - ok
 UPDATE `quest_template` SET `CompleteScript`=1052 WHERE `entry`=1052 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1052;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1052, 0, 4, 147, 2, 2, 3980, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout: npc_flag questgiver removed'),
-(1052, 1, 0, 0, 0, 0, 0, 0, 0, 1377, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout: Emote text 1'), 
-(1052, 4, 0, 0, 0, 0, 0, 0, 0, 1378, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout: Say text 1'), 
-(1052, 5, 0, 0, 0, 0, 0, 0, 0, 1379, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout: Emote text 2'),
-(1052, 5, 1, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout: Throw emote'),
-(1052, 5, 9, 20263, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'resp gobject'), -- add object spawn
-(1052, 6, 4, 147, 2, 1, 3980, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Raleigh the Devout: npc_flag questgiver added');
+(1052, 0, 4, 147, 2, 2, 3980, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Raleigh the Devout: npc_flag questgiver removed'),
+(1052, 1, 0, 0, 0, 0, 0, 0, 0, 1377, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Raleigh the Devout: Emote text 1'), 
+(1052, 4, 0, 0, 0, 0, 0, 0, 0, 1378, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Raleigh the Devout: Say text 1'), 
+(1052, 5, 0, 0, 0, 0, 0, 0, 0, 1379, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Raleigh the Devout: Emote text 2'),
+(1052, 5, 1, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Raleigh the Devout: Throw emote'),
+(1052, 5, 9, 20263, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Respawn Antons Letter of Commendation'), -- add object spawn
+(1052, 6, 4, 147, 2, 1, 3980, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Down the Scarlet Path - Raleigh the Devout: npc_flag questgiver added');
 
 DELETE FROM `gameobject` WHERE `guid`=20263; -- Empty guid
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES 
@@ -58,17 +58,17 @@ UPDATE `quest_template` SET `RequiredRaces`=0 WHERE `entry`=863 AND `patch`=0;
 -- Emote and some delay added rest are LH script
 DELETE FROM `quest_end_scripts` WHERE `id`=502;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(502, 0, 0, 0, 0, 0, 0, 0, 580, 0, 0, 0, 0, 0, 0, 0, 'Stanley: Emote text 1');
+(502, 0, 0, 0, 0, 0, 0, 0, 580, 0, 0, 0, 0, 0, 0, 0, 'Elixir of Pain - Stanley: Emote text 1');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `data_flags`, `comments`) VALUES 
-(502, 3, 15, 17673, 4, 'Stanley: Visual transformation');
+(502, 3, 15, 17673, 4, 'Elixir of Pain - Stanley: Visual transformation');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(502, 4, 16, 1108, 'Stanley: Sound transformation');
+(502, 4, 16, 1108, 'Elixir of Pain - Stanley: Sound transformation');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `comments`) VALUES 
-(502, 5, 18, 'Stanley: Despawn');
+(502, 5, 18, 'Elixir of Pain - Stanley: Despawn');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `x`, `y`, `z`, `o`, `comments`) VALUES 
-(502, 5, 10, 2275, 30000, -353.534, 21.4088, 54.6594, 3.68102, 'Stanley: Enraged Stanley spawn');
+(502, 5, 10, 2275, 30000, -353.534, 21.4088, 54.6594, 3.68102, 'Elixir of Pain - Stanley: Enraged Stanley spawn');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `buddy_id`, `buddy_radius`, `comments`) VALUES 
-(502, 6, 22, 38, 2275, 5, 'Stanley: Enraged Stanley set agressive');
+(502, 6, 22, 38, 2275, 5, 'Elixir of Pain - Stanley: Enraged Stanley set agressive');
 
 
 -- [0104] Updated quest_template for many quests - (2/6 ported) - ok 
@@ -77,20 +77,20 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `buddy_id
 UPDATE `quest_template` SET `StartScript`=993 WHERE `entry`=993 AND `patch`=0;
 DELETE FROM `quest_start_scripts` WHERE `id`=993;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(993, 1, 0, 0, 0, 0, 0, 0, 1249, 0, 0, 0, 0, 0, 0, 0, 'Terenthis: Say text 1'), 
-(993, 1, 15, 4093, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Terenthis: Cast spell (Not correct one)'),
-(993, 4, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Terenthis: Talk emote'), 
-(993, 4, 0, 0, 0, 0, 0, 0, 1289, 0, 0, 0, 0, 0, 0, 0, 'Terenthis: Say text 2'); 
+(993, 1, 0, 0, 0, 0, 0, 0, 1249, 0, 0, 0, 0, 0, 0, 0, 'A Lost Master 2 - Terenthis: Say text 1'), 
+(993, 1, 15, 4093, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'A Lost Master 2 - Terenthis: Cast spell (Not correct one)'),
+(993, 4, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'A Lost Master 2 - Terenthis: Talk emote'), 
+(993, 4, 0, 0, 0, 0, 0, 0, 1289, 0, 0, 0, 0, 0, 0, 0, 'A Lost Master 2 - Terenthis: Say text 2'); 
 
 -- Adds start script to quest 1221 (Blueleaf Tubers)
 UPDATE `quest_template` SET `StartScript`=1221 WHERE `entry`=1221 AND `patch`=0;
 DELETE FROM `quest_start_scripts` WHERE `id`=1221;
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1221, 0, 0, 0, 0, 0, 0, 0, 1788, 0, 0, 0, 0, 0, 0, 0, 'Mebok Mizzyrix: Say text 1'), 
-(1221, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mebok Mizzyrix: Wave emote'), 
-(1221, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -929.023, -3696.98, 7.97395, 1.7352, 'Mebok Mizzyrix: Rotate towards objects'), 
-(1221, 4, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mebok Mizzyrix: Point emote'), 
-(1221, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -928.982, -3697.23, 8.06642, 3.08923, 'Mebok Mizzyrix: Walk back');
+(1221, 0, 0, 0, 0, 0, 0, 0, 1788, 0, 0, 0, 0, 0, 0, 0, 'Blueleaf Tubers - Mebok Mizzyrix: Say text 1'), 
+(1221, 0, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blueleaf Tubers - Mebok Mizzyrix: Wave emote'), 
+(1221, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -929.023, -3696.98, 7.97395, 1.7352, 'Blueleaf Tubers - Mebok Mizzyrix: Rotate towards objects'), 
+(1221, 4, 1, 25, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blueleaf Tubers - Mebok Mizzyrix: Point emote'), 
+(1221, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -928.982, -3697.23, 8.06642, 3.08923, 'Blueleaf Tubers - Mebok Mizzyrix: Walk back');
 
 
 -- [0168] Added end script for 25 quests - 23/25 ported
@@ -100,124 +100,124 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalo
 UPDATE `quest_template` SET `CompleteScript`=621 WHERE `entry`=621 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=621;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(621, 1, 0, 0, 0, 0, 0, 0, 1469, 0, 0, 0, 0, 0, 0, 0, 'Crank Fizzlebub: Say text 1'),
-(621, 2, 0, 0, 0, 0, 0, 0, 1470, 0, 0, 0, 0, 0, 0, 0, 'Crank Fizzlebub: Say text 2');
+(621, 1, 0, 0, 0, 0, 0, 0, 1469, 0, 0, 0, 0, 0, 0, 0, 'Zanzils Secret - Crank Fizzlebub: Say text 1'),
+(621, 2, 0, 0, 0, 0, 0, 0, 1470, 0, 0, 0, 0, 0, 0, 0, 'Zanzils Secret - Crank Fizzlebub: Say text 2');
 
 -- End script for quest 630 (Message in a bottle) - ok
 UPDATE `quest_template` SET `CompleteScript`=630 WHERE `entry`=630 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=630;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(630, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Princess Poobah: Wave emote on quest end'),
-(630, 5, 0, 0, 0, 0, 0, 0, 765, 0, 0, 0, 0, 0, 0, 0, 'Princess Poobah: Say text 1');
+(630, 2, 1, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Message in a Bottle - Princess Poobah: Wave emote on quest end'),
+(630, 5, 0, 0, 0, 0, 0, 0, 765, 0, 0, 0, 0, 0, 0, 0, 'Message in a Bottle - Princess Poobah: Say text 1');
 
 -- End script for quest 640 (The Broken Sigil) - ok
 UPDATE `quest_template` SET `CompleteScript`=640 WHERE `entry`=640 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=640;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(640, 0, 4, 147, 2, 2, 2706, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tor\'gan: npc_flag questgiver removed'),
-(640, 1, 15, 4093, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tor\'gan: Cast spell'),
-(640, 6, 0, 0, 0, 0, 0, 0, 0, 798, 0, 0, 0, 0, 0, 0, 0, 'Tor\'gan: Say text 1'),
-(640, 6, 4, 147, 2, 1, 2706, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tor\'gan: npc_flag questgiver added');
+(640, 0, 4, 147, 2, 2, 2706, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Broken Sigil - Tor\'gan: npc_flag questgiver removed'),
+(640, 1, 15, 4093, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Broken Sigil - Tor\'gan: Cast spell'),
+(640, 6, 0, 0, 0, 0, 0, 0, 0, 798, 0, 0, 0, 0, 0, 0, 0, 'The Broken Sigil - Tor\'gan: Say text 1'),
+(640, 6, 4, 147, 2, 1, 2706, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Broken Sigil - Tor\'gan: npc_flag questgiver added');
 
 -- End script for quest 670 (Sunken Treasure) - ok
 UPDATE `quest_template` SET `CompleteScript`=670 WHERE `entry`=670 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=670;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(670, 1, 0, 0, 0, 0, 0, 0, 857, 0, 0, 0, 0, 0, 0, 0, 'Shakes O\'Breen: Say text 1');
+(670, 1, 0, 0, 0, 0, 0, 0, 857, 0, 0, 0, 0, 0, 0, 0, 'Sunken Treasure - Shakes O\'Breen: Say text 1');
 
 -- End script for quest 702 (Guile of the Raptor) - ok
 UPDATE `quest_template` SET `CompleteScript`=702 WHERE `entry`=702 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=702;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(702, 0, 4, 147, 2, 2, 2792, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: npc_flag questgiver removed'),
-(702, 0, 15, 4153, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: Cast spell on himself'),
-(702, 5, 0, 0, 0, 0, 0, 0, 0, 1020, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: Emote text 1'),
-(702, 6, 4, 147, 2, 1, 2792, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: npc_flag questgiver added'),
-(702, 9, 0, 0, 0, 0, 0, 0, 0, 861, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: Say text 1'),
-(702, 13, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: Roar emote on quest end'),
-(702, 14, 0, 0, 0, 0, 0, 0, 0, 862, 0, 0, 0, 0, 0, 0, 0, 'Gor\'mul: Say text 2');
+(702, 0, 4, 147, 2, 2, 2792, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: npc_flag questgiver removed'),
+(702, 0, 15, 4153, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: Cast spell on himself'),
+(702, 5, 0, 0, 0, 0, 0, 0, 0, 1020, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: Emote text 1'),
+(702, 6, 4, 147, 2, 1, 2792, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: npc_flag questgiver added'),
+(702, 9, 0, 0, 0, 0, 0, 0, 0, 861, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: Say text 1'),
+(702, 13, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: Roar emote on quest end'),
+(702, 14, 0, 0, 0, 0, 0, 0, 0, 862, 0, 0, 0, 0, 0, 0, 0, 'Guile of the Raptor - Gor\'mul: Say text 2');
 
 -- End script for quest 748 (Poison Water) - ok
 UPDATE `quest_template` SET `CompleteScript`=748 WHERE `entry`=748 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=748;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(748, 0, 4, 147, 2, 2, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: npc_flag questgiver removed'),
-(748, 0, 15, 4983, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Cast spell'),
-(748, 0, 0, 0, 0, 0, 0, 0, 0, 952, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Emote text 1'),
-(748, 8, 0, 0, 3, 0, 0, 0, 0, 1009, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Say text 1'),
-(748, 9, 4, 147, 2, 1, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: npc_flag questgiver added');
+(748, 0, 4, 147, 2, 2, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Poison Water - Mull Thunderhorn: npc_flag questgiver removed'),
+(748, 0, 15, 4983, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Poison Water - Mull Thunderhorn: Cast spell'),
+(748, 0, 0, 0, 0, 0, 0, 0, 0, 952, 0, 0, 0, 0, 0, 0, 0, 'Poison Water - Mull Thunderhorn: Emote text 1'),
+(748, 8, 0, 0, 3, 0, 0, 0, 0, 1009, 0, 0, 0, 0, 0, 0, 0, 'Poison Water - Mull Thunderhorn: Say text 1'),
+(748, 9, 4, 147, 2, 1, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Poison Water - Mull Thunderhorn: npc_flag questgiver added');
 
 -- End script for quest 756 (Thunderhorn Totem) - ok
 UPDATE `quest_template` SET `CompleteScript`=756 WHERE `entry`=756 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=756;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(756, 0, 4, 147, 2, 2, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: npc_flag questgiver removed'),
-(756, 0, 15, 4983, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Cast spell'),
-(756, 0, 0, 0, 0, 0, 0, 0, 0, 1004, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Emote text 1'),
-(756, 8, 0, 0, 3, 0, 0, 0, 0, 954, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Say text 1'), -- Remove 3
-(756, 9, 4, 147, 2, 1, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: npc_flag questgiver added');
+(756, 0, 4, 147, 2, 2, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunderhorn Totem - Mull Thunderhorn: npc_flag questgiver removed'),
+(756, 0, 15, 4983, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunderhorn Totem - Mull Thunderhorn: Cast spell'),
+(756, 0, 0, 0, 0, 0, 0, 0, 0, 1004, 0, 0, 0, 0, 0, 0, 0, 'Thunderhorn Totem - Mull Thunderhorn: Emote text 1'),
+(756, 8, 0, 0, 3, 0, 0, 0, 0, 954, 0, 0, 0, 0, 0, 0, 0, 'Thunderhorn Totem - Mull Thunderhorn: Say text 1'), -- Remove 3
+(756, 9, 4, 147, 2, 1, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Thunderhorn Totem - Mull Thunderhorn: npc_flag questgiver added');
 
 -- End script for quest 759 (Wildmane Totem) - ok
 UPDATE `quest_template` SET `CompleteScript`=759 WHERE `entry`=759 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=759;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(759, 0, 4, 147, 2, 2, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: npc_flag questgiver removed'),
-(759, 0, 15, 4983, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Cast spell'),
-(759, 0, 0, 0, 0, 0, 0, 0, 0, 1003, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Emote text 1'),
-(759, 8, 0, 0, 3, 0, 0, 0, 0, 1006, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: Say text 1'), -- Remove 3
-(759, 9, 4, 147, 2, 1, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mull Thunderhorn: npc_flag questgiver added');
+(759, 0, 4, 147, 2, 2, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wildmane Totem - Mull Thunderhorn: npc_flag questgiver removed'),
+(759, 0, 15, 4983, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wildmane Totem - Mull Thunderhorn: Cast spell'),
+(759, 0, 0, 0, 0, 0, 0, 0, 0, 1003, 0, 0, 0, 0, 0, 0, 0, 'Wildmane Totem - Mull Thunderhorn: Emote text 1'),
+(759, 8, 0, 0, 3, 0, 0, 0, 0, 1006, 0, 0, 0, 0, 0, 0, 0, 'Wildmane Totem - Mull Thunderhorn: Say text 1'), -- Remove 3
+(759, 9, 4, 147, 2, 1, 2948, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Wildmane Totem - Mull Thunderhorn: npc_flag questgiver added');
 
 -- End script for quest 950 (Return to Onu) - ok
 UPDATE `quest_template` SET `CompleteScript`=950 WHERE `entry`=950 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=950;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(950, 0, 4, 147, 2, 2, 3616, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu: npc_flag questgiver removed'),
-(950, 1, 0, 0, 0, 0, 0, 0, 0, 1216, 0, 0, 0, 0, 0, 0, 0, 'Onu: Emote text 1'),
-(950, 4, 0, 0, 0, 0, 0, 0, 0, 1217, 0, 0, 0, 0, 0, 0, 0, 'Onu: Emote text 2'),
-(950, 4, 1, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu: Emote wound'),
-(950, 4, 15, 4947, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu: Cast spell (guessed spell)'),
-(950, 7, 0, 0, 0, 0, 0, 0, 0, 1218, 0, 0, 0, 0, 0, 0, 0, 'Onu: Say text 1'),
-(950, 8, 4, 147, 2, 1, 3616, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Onu: npc_flag questgiver added');
+(950, 0, 4, 147, 2, 2, 3616, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: npc_flag questgiver removed'),
+(950, 1, 0, 0, 0, 0, 0, 0, 0, 1216, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: Emote text 1'),
+(950, 4, 0, 0, 0, 0, 0, 0, 0, 1217, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: Emote text 2'),
+(950, 4, 1, 33, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: Emote wound'),
+(950, 4, 15, 4947, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: Cast spell (guessed spell)'),
+(950, 7, 0, 0, 0, 0, 0, 0, 0, 1218, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: Say text 1'),
+(950, 8, 4, 147, 2, 1, 3616, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Onu - Onu: npc_flag questgiver added');
 
 -- End script for quest 1062 (Goblin Invaders) - ok - 20180310 added emote and npc_flag removal per source
 -- Source: https://www.youtube.com/watch?v=5UWZaZjKS14&feature=youtu.be&list=PL49Ga_-r7iKkxrbckm9CkUhWzxqrOnw-n&t=3736
 UPDATE `quest_template` SET `CompleteScript`=1062 WHERE `entry`=1062 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1062;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1062, 0, 4, 147, 2, 2, 4049, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: npc_flag questgiver removed'),
-(1062, 1, 0, 0, 0, 0, 0, 0,  0, 1425, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Say text 1'),
-(1062, 3, 0, 0, 0, 0, 0, 0,  0, 1426, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Say text 2'),
-(1062, 3, 1, 15, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: Roar emote'),
-(1062, 4, 4, 147, 2, 1, 4049, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Seereth Stonebreak: npc_flag questgiver added');
+(1062, 0, 4, 147, 2, 2, 4049, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Goblin Invaders - Seereth Stonebreak: npc_flag questgiver removed'),
+(1062, 1, 0, 0, 0, 0, 0, 0,  0, 1425, 0, 0, 0, 0, 0, 0, 0, 'Goblin Invaders - Seereth Stonebreak: Say text 1'),
+(1062, 3, 0, 0, 0, 0, 0, 0,  0, 1426, 0, 0, 0, 0, 0, 0, 0, 'Goblin Invaders - Seereth Stonebreak: Say text 2'),
+(1062, 3, 1, 15, 0, 0, 0,  0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Goblin Invaders - Seereth Stonebreak: Roar emote'),
+(1062, 4, 4, 147, 2, 1, 4049, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Goblin Invaders - Seereth Stonebreak: npc_flag questgiver added');
 
 -- End script for quest 1063 (The Elder Crone) - ok
 UPDATE `quest_template` SET `CompleteScript`=1063 WHERE `entry`=1063 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1063;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1063, 0, 0, 0, 0, 0, 0, 0, 1416, 0, 0, 0, 0, 0, 0, 0, 'Magatha Grimtotem: Emote text 1'),
-(1063, 2, 0, 0, 0, 0, 0, 0, 1417, 0, 0, 0, 0, 0, 0, 0, 'Magatha Grimtotem: Say text 1');
+(1063, 0, 0, 0, 0, 0, 0, 0, 1416, 0, 0, 0, 0, 0, 0, 0, 'The Elder Crone - Magatha Grimtotem: Emote text 1'),
+(1063, 2, 0, 0, 0, 0, 0, 0, 1417, 0, 0, 0, 0, 0, 0, 0, 'The Elder Crone - Magatha Grimtotem: Say text 1');
 
 -- End script for quest 1066 (Blood of Innocents) - ok
 UPDATE `quest_template` SET `CompleteScript`=1066 WHERE `entry`=1066 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1066;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1066, 0, 4, 147, 2, 2, 2216, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Lydon: npc_flag questgiver removed'),
-(1066, 0, 0, 0, 0, 0, 0, 0, 0, 1421, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Lydon: Emote text 1'),
-(1066, 0, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Lydon: Emote use'),
-(1066, 4, 0, 0, 0, 0, 0, 0, 0, 1422, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Lydon: Say text 1'),
-(1066, 4, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Lydon: Emote normal'),
-(1066, 4, 4, 147, 2, 1, 2216, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Lydon: npc_flag questgiver added');
+(1066, 0, 4, 147, 2, 2, 2216, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blood of Innocents - Apothecary Lydon: npc_flag questgiver removed'),
+(1066, 0, 0, 0, 0, 0, 0, 0, 0, 1421, 0, 0, 0, 0, 0, 0, 0, 'Blood of Innocents - Apothecary Lydon: Emote text 1'),
+(1066, 0, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blood of Innocents - Apothecary Lydon: Emote use'),
+(1066, 4, 0, 0, 0, 0, 0, 0, 0, 1422, 0, 0, 0, 0, 0, 0, 0, 'Blood of Innocents - Apothecary Lydon: Say text 1'),
+(1066, 4, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blood of Innocents - Apothecary Lydon: Emote normal'),
+(1066, 4, 4, 147, 2, 1, 2216, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Blood of Innocents - Apothecary Lydon: npc_flag questgiver added');
 
 -- End script for quest 1067 (Return to Thunder Bluff) - ok
 UPDATE `quest_template` SET `CompleteScript`=1067 WHERE `entry`=1067 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1067;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1067, 0, 4, 147, 2, 2, 3419, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Zamah: npc_flag questgiver removed'),
-(1067, 0, 0, 0, 0, 0, 0, 0, 0, 1423, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Zamah: Emote text 1'),
-(1067, 0, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Zamah: Emote use'),
-(1067, 4, 0, 0, 0, 0, 0, 0, 0, 1424, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Zamah: Say text 1'),
-(1067, 4, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Zamah: Emote normal'),
-(1067, 4, 4, 147, 2, 1, 3419, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Zamah: npc_flag questgiver added');
+(1067, 0, 4, 147, 2, 2, 3419, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Thunder Bluff - Apothecary Zamah: npc_flag questgiver removed'),
+(1067, 0, 0, 0, 0, 0, 0, 0, 0, 1423, 0, 0, 0, 0, 0, 0, 0, 'Return to Thunder Bluff - Apothecary Zamah: Emote text 1'),
+(1067, 0, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Thunder Bluff - Apothecary Zamah: Emote use'),
+(1067, 4, 0, 0, 0, 0, 0, 0, 0, 1424, 0, 0, 0, 0, 0, 0, 0, 'Return to Thunder Bluff - Apothecary Zamah: Say text 1'),
+(1067, 4, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Thunder Bluff - Apothecary Zamah: Emote normal'),
+(1067, 4, 4, 147, 2, 1, 3419, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Return to Thunder Bluff - Apothecary Zamah: npc_flag questgiver added');
 
 -- End script for quest 1112 (Parts for Kravel) - ok
 -- Source: https://www.youtube.com/watch?v=VBlnzRNTatI&feature=youtu.be&list=PL49Ga_-r7iKkxrbckm9CkUhWzxqrOnw-n&t=305
@@ -226,14 +226,14 @@ UPDATE `creature_addon` SET `bytes1`=0 WHERE `guid`=21570 AND `patch`=0; -- Krav
 UPDATE `quest_template` SET `CompleteScript`=1112 WHERE `entry`=1112 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1112;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1112, 0, 4, 147, 2, 2, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: npc_flag questgiver removed'),
-(1112, 1, 0, 0, 0, 0, 0, 0, 0, 1479, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Emote text 1'),
-(1112, 2, 9, 20837, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'resp gobject'),
-(1112, 3, 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Kneel start'),
-(1112, 4, 0, 0, 0, 0, 0, 0, 0, 1477, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Emote text 2'),
-(1112, 7, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Kneel end'),
-(1112, 8, 0, 0, 0, 0, 0, 0, 0, 1478, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Say text 1'),
-(1112, 8, 4, 147, 2, 1, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: npc_flag questgiver added');
+(1112, 0, 4, 147, 2, 2, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: npc_flag questgiver removed'),
+(1112, 1, 0, 0, 0, 0, 0, 0, 0, 1479, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: Emote text 1'),
+(1112, 2, 9, 20837, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Respawn Parts Crate'),
+(1112, 3, 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: Kneel start'),
+(1112, 4, 0, 0, 0, 0, 0, 0, 0, 1477, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: Emote text 2'),
+(1112, 7, 1, 30, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: Kneel end'),
+(1112, 8, 0, 0, 0, 0, 0, 0, 0, 1478, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: Say text 1'),
+(1112, 8, 4, 147, 2, 1, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Parts for Kravel - Kravel Koalbeard: npc_flag questgiver added');
 
 DELETE FROM `gameobject` WHERE `guid`=20837; -- Empty guid
 INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`) VALUES 
@@ -243,112 +243,112 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 UPDATE `quest_template` SET `CompleteScript`=1116 WHERE `entry`=1116 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1116;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1116, 0, 4, 147, 2, 2, 773, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krazek: npc_flag questgiver removed'),
-(1116, 0, 0, 0, 0, 0, 0, 0, 0, 1548, 0, 0, 0, 0, 0, 0, 0, 'Krazek: Emote text 1'),
-(1116, 1, 0, 0, 0, 0, 0, 0, 0, 1549, 0, 0, 0, 0, 0, 0, 0, 'Krazek: Emote text 2'),
-(1116, 1, 15, 6903, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Krazek: Stunned'),
-(1116, 4, 0, 0, 0, 0, 0, 0, 0, 1550, 0, 0, 0, 0, 0, 0, 0, 'Krazek: Say text 1'),
-(1116, 7, 0, 0, 0, 0, 0, 0, 0, 1550, 0, 0, 0, 0, 0, 0, 0, 'Krazek: Say text 1 again'),
-(1116, 9, 0, 0, 0, 0, 0, 0, 0, 1551, 0, 0, 0, 0, 0, 0, 0, 'Krazek: Say text 2'),
-(1116, 9, 4, 147, 2, 1, 773, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Krazek: npc_flag questgiver added');
+(1116, 0, 4, 147, 2, 2, 773, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: npc_flag questgiver removed'),
+(1116, 0, 0, 0, 0, 0, 0, 0, 0, 1548, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: Emote text 1'),
+(1116, 1, 0, 0, 0, 0, 0, 0, 0, 1549, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: Emote text 2'),
+(1116, 1, 15, 6903, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: Stunned'),
+(1116, 4, 0, 0, 0, 0, 0, 0, 0, 1550, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: Say text 1'),
+(1116, 7, 0, 0, 0, 0, 0, 0, 0, 1550, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: Say text 1 again'),
+(1116, 9, 0, 0, 0, 0, 0, 0, 0, 1551, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: Say text 2'),
+(1116, 9, 4, 147, 2, 1, 773, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Dream Dust in the Swamp - Krazek: npc_flag questgiver added');
 
 -- End script for quest 1117 (Rumors for Kravel) - ok
 UPDATE `quest_template` SET `CompleteScript`=1117 WHERE `entry`=1117 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1117;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1117, 0, 4, 147, 2, 2, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: npc_flag questgiver removed'),
-(1117, 1, 0, 0, 0, 0, 0, 0, 0, 1480, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Emote text 1'),
-(1117, 1, 1, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Emote dance state'),
-(1117, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Emote normal (stop dance)'),
-(1117, 7, 0, 0, 0, 0, 0, 0, 0, 1481, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: Emote text 1'),
-(1117, 7, 4, 147, 2, 1, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Kravel Koalbeard: npc_flag questgiver added');
+(1117, 0, 4, 147, 2, 2, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Rumors for Kravel - Kravel Koalbeard: npc_flag questgiver removed'),
+(1117, 1, 0, 0, 0, 0, 0, 0, 0, 1480, 0, 0, 0, 0, 0, 0, 0, 'Rumors for Kravel - Kravel Koalbeard: Emote text 1'),
+(1117, 1, 1, 94, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Rumors for Kravel - Kravel Koalbeard: Emote dance state'),
+(1117, 6, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Rumors for Kravel - Kravel Koalbeard: Emote normal (stop dance)'),
+(1117, 7, 0, 0, 0, 0, 0, 0, 0, 1481, 0, 0, 0, 0, 0, 0, 0, 'Rumors for Kravel - Kravel Koalbeard: Emote text 1'),
+(1117, 7, 4, 147, 2, 1, 4452, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Rumors for Kravel - Kravel Koalbeard: npc_flag questgiver added');
 
 -- End script for quest 1169 (Identifying the Brood) - ok
 UPDATE `quest_template` SET `CompleteScript`=1169 WHERE `entry`=1169 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1169;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1169, 0, 4, 147, 2, 2, 4501, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draz\'Zilb: npc_flag questgiver removed'),
-(1169, 0, 0, 0, 0, 0, 0, 0, 0, 1511, 0, 0, 0, 0, 0, 0, 0, 'Draz\'Zilb: Emote text 1'),
-(1169, 1, 15, 6741, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draz\'Zilb: cast spell'),
-(1169, 11, 0, 0, 0, 0, 0, 0, 0, 1512, 0, 0, 0, 0, 0, 0, 0, 'Draz\'Zilb: Say text 1'),
-(1169, 11, 4, 147, 2, 1, 4501, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Draz\'Zilb: npc_flag questgiver added');
+(1169, 0, 4, 147, 2, 2, 4501, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Identifying the Brood - Draz\'Zilb: npc_flag questgiver removed'),
+(1169, 0, 0, 0, 0, 0, 0, 0, 0, 1511, 0, 0, 0, 0, 0, 0, 0, 'Identifying the Brood - Draz\'Zilb: Emote text 1'),
+(1169, 1, 15, 6741, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Identifying the Brood - Draz\'Zilb: cast spell'),
+(1169, 11, 0, 0, 0, 0, 0, 0, 0, 1512, 0, 0, 0, 0, 0, 0, 0, 'Identifying the Brood - Draz\'Zilb: Say text 1'),
+(1169, 11, 4, 147, 2, 1, 4501, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Identifying the Brood - Draz\'Zilb: npc_flag questgiver added');
 
 -- End script for quest 1176 (Load Lightening) - ok
 UPDATE `quest_template` SET `CompleteScript`=1176 WHERE `entry`=1176 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1176;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1176, 2, 0, 0, 0, 0, 0, 0, 1526, 0, 0, 0, 0, 0, 0, 0, 'Pozzik: Say text');
+(1176, 2, 0, 0, 0, 0, 0, 0, 1526, 0, 0, 0, 0, 0, 0, 0, 'Load Lightening - Pozzik: Say text');
 
 -- End script for quest 1383 (Nothing But The Truth) - ok
 UPDATE `quest_template` SET `CompleteScript`=1383 WHERE `entry`=1383 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1383;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1383, 0, 4, 147, 2, 2, 5414, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: npc_flag questgiver removed'),
-(1383, 1, 0, 0, 0, 0, 0, 0, 0, 1848, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: Say text 1'),
-(1383, 4, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -10351.1, -1527.88, 92.7248, 6.23291, 'Apothecary Faustin: Face away'),
-(1383, 6, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: Emote use start'),
-(1383, 10, 0, 0, 0, 0, 0, 0, 0, 1849, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: Say text 2'),
-(1383, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: Emote normal '),
-(1383, 15, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -10351.1, -1527.88, 92.7248, 3.14159, 'Apothecary Faustin: Face back'),
-(1383, 16, 0, 0, 0, 0, 0, 0, 0, 1850, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: Say text 3'),
-(1383, 16, 4, 147, 2, 1, 5414, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Apothecary Faustin: npc_flag questgiver added');
+(1383, 0, 4, 147, 2, 2, 5414, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: npc_flag questgiver removed'),
+(1383, 1, 0, 0, 0, 0, 0, 0, 0, 1848, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: Say text 1'),
+(1383, 4, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -10351.1, -1527.88, 92.7248, 6.23291, 'Nothing But The Truth - Apothecary Faustin: Face away'),
+(1383, 6, 1, 69, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: Emote use start'),
+(1383, 10, 0, 0, 0, 0, 0, 0, 0, 1849, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: Say text 2'),
+(1383, 10, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: Emote normal '),
+(1383, 15, 3, 0, 0, 0, 0, 0, 8, 0, 0, 0, 0, -10351.1, -1527.88, 92.7248, 3.14159, 'Nothing But The Truth - Apothecary Faustin: Face back'),
+(1383, 16, 0, 0, 0, 0, 0, 0, 0, 1850, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: Say text 3'),
+(1383, 16, 4, 147, 2, 1, 5414, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Apothecary Faustin: npc_flag questgiver added');
 
 -- End script for quest 1391 (Nothing But The Truth) - ok
 UPDATE `quest_template` SET `CompleteScript`=1391 WHERE `entry`=1391 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1391;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1391, 0, 0, 0, 0, 0, 0, 0, 1857, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Emote text 1'),
-(1391, 2, 0, 0, 0, 0, 0, 0, 1858, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Say text 1'),
-(1391, 7, 0, 0, 0, 0, 0, 0, 1859, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Say text 2'),
-(1391, 8, 1, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Stunned'),
-(1391, 13, 0, 0, 0, 0, 0, 0, 1860, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Emote text 2'),
-(1391, 14, 0, 0, 0, 0, 0, 0, 1861, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Say text 3'),
-(1391, 14, 15, 7293, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Morph to undead (with spell)'),
-(1391, 15, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Normal'),
-(1391, 16, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10423.5, -3240.63, 20.1786, 4.68979, 'Infiltrator Marksen: Wander'),
-(1391, 17, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10420.6, -3240.03, 20.1786, 2.11212, 'Infiltrator Marksen: Wander'),
-(1391, 19, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10422.1, -3237.58, 20.1786, 3.80072, 'Infiltrator Marksen: Wander'),
-(1391, 20, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10424.4, -3239.73, 20.1786, 3.8633, 'Infiltrator Marksen: Wander'),
-(1391, 22, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10422.4, -3238.96, 20.1786, 0.236333, 'Infiltrator Marksen: Wander'),
-(1391, 26, 15, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Infiltrator Marksen: Die (with spell)');
+(1391, 0, 0, 0, 0, 0, 0, 0, 1857, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Emote text 1'),
+(1391, 2, 0, 0, 0, 0, 0, 0, 1858, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Say text 1'),
+(1391, 7, 0, 0, 0, 0, 0, 0, 1859, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Say text 2'),
+(1391, 8, 1, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Stunned'),
+(1391, 13, 0, 0, 0, 0, 0, 0, 1860, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Emote text 2'),
+(1391, 14, 0, 0, 0, 0, 0, 0, 1861, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Say text 3'),
+(1391, 14, 15, 7293, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Morph to undead (with spell)'),
+(1391, 15, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Normal'),
+(1391, 16, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10423.5, -3240.63, 20.1786, 4.68979, 'Nothing But The Truth - Infiltrator Marksen: Wander'),
+(1391, 17, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10420.6, -3240.03, 20.1786, 2.11212, 'Nothing But The Truth - Infiltrator Marksen: Wander'),
+(1391, 19, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10422.1, -3237.58, 20.1786, 3.80072, 'Nothing But The Truth - Infiltrator Marksen: Wander'),
+(1391, 20, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10424.4, -3239.73, 20.1786, 3.8633, 'Nothing But The Truth - Infiltrator Marksen: Wander'),
+(1391, 22, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, -10422.4, -3238.96, 20.1786, 0.236333, 'Nothing But The Truth - Infiltrator Marksen: Wander'),
+(1391, 26, 15, 5, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Nothing But The Truth - Infiltrator Marksen: Die (with spell)');
 
 -- End script for quest 1445 (The Temple of Atal'Hakkar) - ok
 UPDATE `quest_template` SET `CompleteScript`=1445 WHERE `entry`=1445 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=1445;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`,  `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1445, 0, 4, 147, 2, 2, 1443, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel\'zerul: npc_flag questgiver removed'),
-(1445, 0, 0, 0, 0, 0, 0, 0, 0, 1949, 0, 0, 0, 0, 0, 0, 0, 'Fel\'zerul: Say text 1'),
-(1445, 3, 15, 7437, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel\'zerul: Cast spell destroy stuff'),
-(1445, 5, 4, 147, 2, 1, 1443, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Fel\'zerul: npc_flag questgiver added');
+(1445, 0, 4, 147, 2, 2, 1443, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Temple of Atal Hakkar - Fel\'zerul: npc_flag questgiver removed'),
+(1445, 0, 0, 0, 0, 0, 0, 0, 0, 1949, 0, 0, 0, 0, 0, 0, 0, 'The Temple of Atal Hakkar - Fel\'zerul: Say text 1'),
+(1445, 3, 15, 7437, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 'The Temple of Atal Hakkar - Fel\'zerul: Cast spell destroy stuff'),
+(1445, 5, 4, 147, 2, 1, 1443, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'The Temple of Atal Hakkar - Fel\'zerul: npc_flag questgiver added');
 
 -- End script for quest 3908 (It's a Secret to Everybody) - ok
 UPDATE `quest_template` SET `CompleteScript`=3908 WHERE `entry`=3908 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=3908;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(3908, 1, 0, 0, 0, 0, 0, 0, 0, 6153, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Say text 1'),
-(3908, 1, 4, 147, 3, 2, 9298, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: npc_flag quest giver and gossip removed'),
-(3908, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6384.54, -2527.25, 538.736, 2.52438, 'Donova Snowden: Move 1'),
-(3908, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6370.12, -2525.52, 532.268, 2.82283, 'Donova Snowden: Move 2'),
-(3908, 15, 0, 0, 0, 0, 0, 0, 0, 6154, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Say text 2'),
-(3908, 20, 1, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Throw emote'),
-(3908, 21, 0, 0, 0, 0, 0, 0, 0, 6155, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Emote text 1'),
-(3908, 23, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6364.25, -2524, 527.058, 2.9265, 'Donova Snowden: Move 3'),
-(3908, 26, 0, 0, 0, 0, 0, 0, 0, 6156, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Say text 3'),
-(3908, 27, 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Kneel emote'),
-(3908, 30, 0, 0, 0, 0, 0, 0, 0, 6157, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Say text 4'),
-(3908, 31, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6370.3, -2524.19, 532.27, 6.26836, 'Donova Snowden: Move 4'),
-(3908, 34, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6385.99, -2529.26, 539.03, 5.66753, 'Donova Snowden: Move 5'),
-(3908, 42, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6395.57, -2536.75, 541.548, 5.66753, 'Donova Snowden: Move 6'),
-(3908, 47, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6395.57, -2536.75, 541.548, 2.86475, 'Donova Snowden: Move 7'),
-(3908, 48, 0, 0, 0, 0, 0, 0, 0, 6158, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: Say text 5'),
-(3908, 49, 4, 147, 3, 1, 9298, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Donova Snowden: npc_flag quest giver and gossip added');
+(3908, 1, 0, 0, 0, 0, 0, 0, 0, 6153, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Say text 1'),
+(3908, 1, 4, 147, 3, 2, 9298, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: npc_flag quest giver and gossip removed'),
+(3908, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6384.54, -2527.25, 538.736, 2.52438, 'Its a Secret to Everybody - Donova Snowden: Move 1'),
+(3908, 8, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6370.12, -2525.52, 532.268, 2.82283, 'Its a Secret to Everybody - Donova Snowden: Move 2'),
+(3908, 15, 0, 0, 0, 0, 0, 0, 0, 6154, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Say text 2'),
+(3908, 20, 1, 61, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Throw emote'),
+(3908, 21, 0, 0, 0, 0, 0, 0, 0, 6155, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Emote text 1'),
+(3908, 23, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6364.25, -2524, 527.058, 2.9265, 'Its a Secret to Everybody - Donova Snowden: Move 3'),
+(3908, 26, 0, 0, 0, 0, 0, 0, 0, 6156, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Say text 3'),
+(3908, 27, 1, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Kneel emote'),
+(3908, 30, 0, 0, 0, 0, 0, 0, 0, 6157, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Say text 4'),
+(3908, 31, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6370.3, -2524.19, 532.27, 6.26836, 'Its a Secret to Everybody - Donova Snowden: Move 4'),
+(3908, 34, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6385.99, -2529.26, 539.03, 5.66753, 'Its a Secret to Everybody - Donova Snowden: Move 5'),
+(3908, 42, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6395.57, -2536.75, 541.548, 5.66753, 'Its a Secret to Everybody - Donova Snowden: Move 6'),
+(3908, 47, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 6395.57, -2536.75, 541.548, 2.86475, 'Its a Secret to Everybody - Donova Snowden: Move 7'),
+(3908, 48, 0, 0, 0, 0, 0, 0, 0, 6158, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: Say text 5'),
+(3908, 49, 4, 147, 3, 1, 9298, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Its a Secret to Everybody - Donova Snowden: npc_flag quest giver and gossip added');
 
 -- End script for quest 5341 (Barov Family Fortune) - ok
 UPDATE `quest_template` SET `CompleteScript`=5341 WHERE `entry`=5341 AND `patch`=0;
 DELETE FROM `quest_end_scripts` WHERE `id`=5341;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(5341, 1, 0, 0, 0, 0, 0, 0, 6554, 0, 0, 0, 0, 0, 0, 0, 'Alexi Barov: Say text 1'),
-(5341, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Alexi Barov: Talk emote');
+(5341, 1, 0, 0, 0, 0, 0, 0, 6554, 0, 0, 0, 0, 0, 0, 0, 'Barov Family Fortune - Alexi Barov: Say text 1'),
+(5341, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Barov Family Fortune - Alexi Barov: Talk emote');
 
 
 -- [0265] Fixes from ProjectSilverpine - ok
@@ -359,8 +359,8 @@ UPDATE `quest_template` SET `StartScript`=7041 WHERE `entry`=7041 AND `patch`=0;
 
 DELETE FROM `quest_start_scripts` WHERE `id` IN (7029, 7041);
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(7029, 0, 0, 0, 0, 0, 0, 0, 8923, 0, 0, 0, 0, 0, 0, 0, 'Vark Battlescar: Say text 1'),
-(7041, 0, 0, 0, 0, 0, 0, 0, 8923, 0, 0, 0, 0, 0, 0, 0, 'Talendria: Say text 1');
+(7029, 0, 0, 0, 0, 0, 0, 0, 8923, 0, 0, 0, 0, 0, 0, 0, 'Vyletongue Corruption - Vark Battlescar: Say text 1'),
+(7041, 0, 0, 0, 0, 0, 0, 0, 8923, 0, 0, 0, 0, 0, 0, 0, 'Vyletongue Corruption - Talendria: Say text 1');
 
 
 -- [0285] Fix typo, replace "guage" with "gauge"
@@ -380,14 +380,14 @@ DELETE FROM `creature_ai_scripts` WHERE `creature_id`=3946;
 -- Tome of Mel'Thandris starts event 663
 DELETE FROM `event_scripts` WHERE `id`=663;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(663, 0, 10, 3946, 22000, 0, 0, 0, 0, 0, 0, 0, 3161.682, -1211.122, 214.949, 4.669, 'Velinde Starsong: Spawn'),
-(663, 2, 28, 8, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Kneel emote'),
-(663, 5, 0, 0, 0, 3946, 10, 0, 1356, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Say text 1'),
-(663, 5, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Talk emote 1'),
-(663, 10, 0, 0, 0, 3946, 10, 0, 1357, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Say text 2'),
-(663, 10, 1, 20, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Beg emote 1'),
-(663, 15, 0, 0, 0, 3946, 10, 0, 1358, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Say text 3'),
-(663, 15, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Talk emote 2');
+(663, 0, 10, 3946, 22000, 0, 0, 0, 0, 0, 0, 0, 3161.682, -1211.122, 214.949, 4.669, 'Tome of MelThandris - Velinde Starsong: Spawn'),
+(663, 2, 28, 8, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Kneel emote'),
+(663, 5, 0, 0, 0, 3946, 10, 0, 1356, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Say text 1'),
+(663, 5, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Talk emote 1'),
+(663, 10, 0, 0, 0, 3946, 10, 0, 1357, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Say text 2'),
+(663, 10, 1, 20, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Beg emote 1'),
+(663, 15, 0, 0, 0, 3946, 10, 0, 1358, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Say text 3'),
+(663, 15, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Tome of MelThandris - Velinde Starsong: Talk emote 2');
 
 -- Added script for quest 1043 (The Scythe of Elune)
 -- Source: http://www.wowwiki.com/Quest:The_Scythe_of_Elune
@@ -395,23 +395,23 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 -- Mound of Dirt starts event 664
 DELETE FROM `event_scripts` WHERE `id`=664;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(664, 0, 10, 3946, 22000, 0, 0, 0, 0, 0, 0, 0, -11142.509, -1151.725, 43.598, 4.849, 'Velinde Starsong: Spawn'),
-(664, 5, 0, 0, 0, 3946, 10, 0, 1359, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Say text 1'),
-(664, 5, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Talk emote 1'),
-(664, 10, 0, 0, 0, 3946, 10, 0, 1360, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Say text 2'),
-(664, 10, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Talk emote 2'),
-(664, 15, 1, 18, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Velinde Starsong: Cry emote');
+(664, 0, 10, 3946, 22000, 0, 0, 0, 0, 0, 0, 0, -11142.509, -1151.725, 43.598, 4.849, 'Mound of Dirt - Velinde Starsong: Spawn'),
+(664, 5, 0, 0, 0, 3946, 10, 0, 1359, 0, 0, 0, 0, 0, 0, 0, 'Mound of Dirt - Velinde Starsong: Say text 1'),
+(664, 5, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mound of Dirt - Velinde Starsong: Talk emote 1'),
+(664, 10, 0, 0, 0, 3946, 10, 0, 1360, 0, 0, 0, 0, 0, 0, 0, 'Mound of Dirt - Velinde Starsong: Say text 2'),
+(664, 10, 1, 1, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mound of Dirt - Velinde Starsong: Talk emote 2'),
+(664, 15, 1, 18, 0, 3946, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Mound of Dirt - Velinde Starsong: Cry emote');
 
 
 -- [0878] Improved script for quest 656 - Ok
 -- https://github.com/cmangos/classic-db/commit/c6d88fa9e8590c249bafbdfe3fb7ffe1b9cc0f6e
 DELETE FROM `event_scripts` WHERE `id`=420;
 INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(420, 0, 10, 2755, 3000000, 0, 0, 0, 0, 0, 0, 0, -931.73, -3111.81, 48.517, 3.27404, 'Myzrael: Spawn for quest 656'),
-(420, 2, 0, 0, 0, 2755, 50, 1, 842, 0, 0, 0, 0, 0, 0, 0, 'Myzrael: Say text 1'),
-(420, 5, 0, 0, 0, 2755, 50, 1, 843, 0, 0, 0, 0, 0, 0, 0, 'Myzrael: Say text 2'),
-(420, 10, 0, 0, 0, 2755, 50, 1, 844, 0, 0, 0, 0, 0, 0, 0, 'Myzrael: Say text 3'),
-(420, 11, 26, 0, 0, 2755, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Myzrael: Attack');
+(420, 0, 10, 2755, 3000000, 0, 0, 0, 0, 0, 0, 0, -931.73, -3111.81, 48.517, 3.27404, 'Summoning the Princess - Myzrael: Spawn for quest 656'),
+(420, 2, 0, 0, 0, 2755, 50, 1, 842, 0, 0, 0, 0, 0, 0, 0, 'Summoning the Princess - Myzrael: Say text 1'),
+(420, 5, 0, 0, 0, 2755, 50, 1, 843, 0, 0, 0, 0, 0, 0, 0, 'Summoning the Princess - Myzrael: Say text 2'),
+(420, 10, 0, 0, 0, 2755, 50, 1, 844, 0, 0, 0, 0, 0, 0, 0, 'Summoning the Princess - Myzrael: Say text 3'),
+(420, 11, 26, 0, 0, 2755, 50, 1, 0, 0, 0, 0, 0, 0, 0, 0, 'Summoning the Princess - Myzrael: Attack');
 
 
 -- [1194] Backported UDB updates
@@ -421,31 +421,31 @@ INSERT INTO `event_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, 
 DELETE FROM `quest_end_scripts` WHERE `id`=4129;
 UPDATE `quest_template` SET `CompleteScript`=4129 WHERE `entry`=4129 AND `patch`=0;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(4129,0,4,147,6,2,0,0,0,0,0,0,0,0,0,0,0,'Quintis Jonespyre: npcflag removed (LH flag is 6)'),
-(4129,2,0,0,0,0,0,0,0,5148,0,0,0,0,0,0,0,'Quintis Jonespyre: Say text 1'),
-(4129,3,15,15050,0,0,0,0,0,0,0,0,0,0,0,0,0,'Quintis Jonespyre: Cast Psychometry spell'),
-(4129,10,0,0,0,0,0,0,0,5149,0,0,0,0,0,0,0,'Quintis Jonespyre: Say text 2'),
-(4129,12,4,147,6,1,0,0,0,0,0,0,0,0,0,0,0,'Quintis Jonespyre: npcflag added again');
+(4129,0,4,147,6,2,0,0,0,0,0,0,0,0,0,0,0,'The Knife Revealed - Quintis Jonespyre: npcflag removed (LH flag is 6)'),
+(4129,2,0,0,0,0,0,0,0,5148,0,0,0,0,0,0,0,'The Knife Revealed - Quintis Jonespyre: Say text 1'),
+(4129,3,15,15050,0,0,0,0,0,0,0,0,0,0,0,0,0,'The Knife Revealed - Quintis Jonespyre: Cast Psychometry spell'),
+(4129,10,0,0,0,0,0,0,0,5149,0,0,0,0,0,0,0,'The Knife Revealed - Quintis Jonespyre: Say text 2'),
+(4129,12,4,147,6,1,0,0,0,0,0,0,0,0,0,0,0,'The Knife Revealed - Quintis Jonespyre: npcflag added again');
 
 -- q.2943 'Return to Troyas' - ok
 DELETE FROM `quest_end_scripts` WHERE id=2943;
 UPDATE `quest_template` SET `CompleteScript`=2943 WHERE `entry`=2943 AND `patch`=0;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(2943,0,4,147,2,2,0,0,0,0,0,0,0,0,0,0,0,'Troyas Moonbreeze: npcFlags removed (LH flag is 2)'),
-(2943,1,0,0,0,0,0,0,0,4039,0,0,0,0,0,0,0,'Troyas Moonbreeze: Say text 1'),
-(2943,2,3,0,0,0,0,0,0,0,0,0,0,-4476.23,3230.55,13.7301,4.20931,'Troyas Moonbreeze: Move to table'),
-(2943,4,3,0,0,0,0,0,0,0,0,0,0,-4476.23,3230.55,13.7301,4.99471,'Troyas Moonbreeze: Rotate'),
-(2943,5,0,0,0,0,0,0,0,4040,0,0,0,0,0,0,0,'Troyas Moonbreeze: Emote text 1'),
-(2943,10,0,0,0,0,0,0,0,4041,0,0,0,0,0,0,0,'Troyas Moonbreeze: Say text 2'),
-(2943,12,3,0,0,0,0,0,0,0,0,0,0,-4474.9,3232.88,13.7295,0.951991,'Troyas Moonbreeze: Move back'),
-(2943,14,4,147,2,1,0,0,0,0,0,0,0,0,0,0,0,'Troyas Moonbreeze: npcFlags added (LH flag is 2)');
+(2943,0,4,147,2,2,0,0,0,0,0,0,0,0,0,0,0,'Return to Troyas - Troyas Moonbreeze: npcFlags removed (LH flag is 2)'),
+(2943,1,0,0,0,0,0,0,0,4039,0,0,0,0,0,0,0,'Return to Troyas - Troyas Moonbreeze: Say text 1'),
+(2943,2,3,0,0,0,0,0,0,0,0,0,0,-4476.23,3230.55,13.7301,4.20931,'Return to Troyas - Troyas Moonbreeze: Move to table'),
+(2943,4,3,0,0,0,0,0,0,0,0,0,0,-4476.23,3230.55,13.7301,4.99471,'Return to Troyas - Troyas Moonbreeze: Rotate'),
+(2943,5,0,0,0,0,0,0,0,4040,0,0,0,0,0,0,0,'Return to Troyas - Troyas Moonbreeze: Emote text 1'),
+(2943,10,0,0,0,0,0,0,0,4041,0,0,0,0,0,0,0,'Return to Troyas - Troyas Moonbreeze: Say text 2'),
+(2943,12,3,0,0,0,0,0,0,0,0,0,0,-4474.9,3232.88,13.7295,0.951991,'Return to Troyas - Troyas Moonbreeze: Move back'),
+(2943,14,4,147,2,1,0,0,0,0,0,0,0,0,0,0,0,'Return to Troyas - Troyas Moonbreeze: npcFlags added (LH flag is 2)');
 
 -- q.3463 'Set Them Ablaze!' - ok
 DELETE FROM `quest_end_scripts` WHERE id=3463;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `buddy_id`, `buddy_radius`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(3463,1,31,8479,100,0,0,0,0,0,0,0,0,0,0,0,'search for Kalaran Windblade'), 
-(3463,2,18,0,0,8479,5921,1 | 0x10,0,0,0,0,0,0,0,0,'despawn Kalaran Windblade'),
-(3463,3,10,8480,54000,0,0,0,0,0,0,0,-6679.93,-1194.36,240.297,2.96706,'summon Kalaran the Deceiver');
+(3463,1,31,8479,100,0,0,0,0,0,0,0,0,0,0,0,'Set Them Ablaze - Search for Kalaran Windblade'), 
+(3463,2,18,0,0,8479,5921,1 | 0x10,0,0,0,0,0,0,0,0,'Set Them Ablaze - Despawn Kalaran Windblade'),
+(3463,3,10,8480,54000,0,0,0,0,0,0,0,-6679.93,-1194.36,240.297,2.96706,'Set Them Ablaze - Summon Kalaran the Deceiver');
 UPDATE `quest_template` SET `CompleteScript`=3463 WHERE `entry`=3463;
 
 -- Kalaran Windblade set lower respawn since he will be despawned
@@ -547,6 +547,11 @@ INSERT INTO `quest_greeting` (`entry`, `content_default`, `content_loc1`, `conte
 -- (7777, ' ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0), -- Rok Orhan
 -- (7825, ' ', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0), -- Oran Snakewrithe
 (9536, 'The quest for wealth is the only goal for a respectable goblin.$B$BWell, maybe wealth... and a big, loud death!', NULL, NULL, NULL, NULL, NULL, NULL, NULL, NULL, 0, 0); -- Maxwort Uberglint
+
+-- Unrelated startup error.
+-- ERROR:Table `creature` have creature (GUID: 590004 Entry: 6228) with low current mana (1926), `creature_template`.`minmana`=2457.
+UPDATE `creature` SET `curmana`=2457 WHERE `guid`=590004;
+
 
 -- End of migration.
 END IF;

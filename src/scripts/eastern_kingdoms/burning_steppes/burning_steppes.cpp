@@ -669,7 +669,7 @@ struct npc_klinfranAI : public ScriptedAI
         if (pSpell && pSpell->Id == 14277)   // Scorpid Sting (Rank 4)
         {
             m_creature->RemoveAurasDueToSpell(SPELL_DEMONIC_FRENZY);
-            DoCastSpellIfCan(m_creature, SPELL_ENTROPIC_STING, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_ENTROPIC_STING, CF_TRIGGERED);
         }
     }
 

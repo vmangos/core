@@ -219,7 +219,7 @@ struct MANGOS_DLL_DECL GenericSpellMob : public ScriptedAI
                     }
                     case GENERIC_TARGET_FRIEND_NEED_HEAL:
                     {
-                        target = DoSelectLowestHpFriendly(it->maxRange, it->healValue / 4);
+                        target = m_creature->DoSelectLowestHpFriendly(it->maxRange, it->healValue / 4);
                         break;
                     }
                     case GENERIC_TARGET_FRIEND_DISPELL_CC:

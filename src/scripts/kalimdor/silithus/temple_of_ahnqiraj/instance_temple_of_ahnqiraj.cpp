@@ -809,7 +809,7 @@ struct AI_QirajiMindslayer : public ScriptedAI {
             }
         }
         if (closestPlayer) {
-            DoCastSpellIfCan(closestPlayer, 26049, CAST_TRIGGERED | CAST_INTERRUPT_PREVIOUS);
+            DoCastSpellIfCan(closestPlayer, 26049, CF_TRIGGERED | CF_INTERRUPT_PREVIOUS);
         }
     }
 

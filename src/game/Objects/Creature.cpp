@@ -3118,6 +3118,13 @@ void Creature::OnLeaveCombat()
     UpdateCombatState(false);
     UpdateCombatWithZoneState(false);
 
+    // a delayed spell event could set the creature in combat again
+    auto itEvent = m_Events.GetEvents().begin();
+    for (; itEvent != m_Events.GetEvents().end(); ++itEvent)
+        if (SpellEvent* event = dynamic_cast<SpellEvent*>(itEvent->second))
+            if (event->GetSpell()->getState() != SPELL_STATE_FINISHED)
+                event->GetSpell()->cancel();
+
     if (_creatureGroup)
         _creatureGroup->OnLeaveCombat(this);
 
@@ -3392,6 +3399,19 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
     cell.Visit(p, grid_unit_searcher, *GetMap(), *this, MAX_VISIBILITY_DISTANCE);
 
     return target;
+}
+
+// Returns friendly unit with the most amount of hp missing from max hp
+Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent) const
+{
+    Unit* pUnit = nullptr;
+
+    MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
+    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
+
+    Cell::VisitGridObjects(this, searcher, fRange);
+
+    return pUnit;
 }
 
 // use this function to avoid having hostile creatures attack

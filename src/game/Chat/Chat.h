@@ -642,7 +642,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadAllNpcCommand(char* args);
         bool HandleReloadAllQuestCommand(char* args);
         bool HandleReloadAllScriptsCommand(char* args);
-        bool HandleReloadAllEventAICommand(char* args);
         bool HandleReloadAllSpellCommand(char* args);
         bool HandleReloadAllLocalesCommand(char* args);
 
@@ -651,8 +650,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadAreaTriggerTavernCommand(char* args);
         bool HandleReloadAreaTriggerTeleportCommand(char* args);
         bool HandleReloadEventScriptsCommand(char* args);
-        bool HandleReloadEventAISummonsCommand(char* args);
-        bool HandleReloadEventAIScriptsCommand(char* args);
+        bool HandleReloadEventAIEventsCommand(char* args);
         bool HandleReloadCommandCommand(char* args);
         bool HandleReloadBattleEventCommand(char* args);
         bool HandleReloadConditionsCommand(char* args);

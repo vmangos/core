@@ -31,17 +31,13 @@ class CreatureEventAIMgr
         CreatureEventAIMgr(){};
         ~CreatureEventAIMgr(){};
 
-        void LoadCreatureEventAI_Summons(bool check_entry_use);
-        void LoadCreatureEventAI_Scripts();
+        void LoadCreatureEventAI_Events();
+        void ClearEventData() { m_CreatureEventAI_Event_Map.clear(); }
 
         CreatureEventAI_Event_Map  const& GetCreatureEventAIMap()       const { return m_CreatureEventAI_Event_Map; }
-        CreatureEventAI_Summon_Map const& GetCreatureEventAISummonMap() const { return m_CreatureEventAI_Summon_Map; }
 
     private:
-        void CheckUnusedAISummons();
-
         CreatureEventAI_Event_Map  m_CreatureEventAI_Event_Map;
-        CreatureEventAI_Summon_Map m_CreatureEventAI_Summon_Map;
 };
 
 #define sEventAIMgr MaNGOS::Singleton<CreatureEventAIMgr>::Instance()

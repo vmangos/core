@@ -12,20 +12,6 @@ INSERT INTO `migrations` VALUES ('20180306191347');
 -- Your Place In The World
 UPDATE `quest_template` SET `DetailsEmote1`=1, `CompleteEmote`=0, `OfferRewardEmote1`=6 WHERE `entry`=4641 AND `patch`=0;
 
--- Cutting Teeth
-UPDATE `quest_template` SET `CompleteEmote`=0, `CompleteScript`=788 WHERE `entry`=788 AND `patch`=0;
-
-DELETE FROM `quest_end_scripts` WHERE `id`=788;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(788, 1, 1, 11, 'Gornek: Laugh emote on quest end');
-
--- Sting of the Scorpid
-UPDATE `quest_template` SET `StartScript`=789, `CompleteEmote`=0 WHERE `entry`=789 AND `patch`=0;
-
-DELETE FROM `quest_start_scripts` WHERE `id`=789;
-INSERT INTO `quest_start_scripts` (`id`, `command`, `datalong`, `comments`) VALUES 
-(789, 1, 1, 'Gornek: Talk emote on quest accept');
-
 -- Class quests: Should have race requirement (Otherwise both Orc and Troll version would be available in video) - CHECK
 -- Assumption: All class quest will be given same emotes, cause fair
 -- 11/11
@@ -82,13 +68,6 @@ INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `datain
 INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `buddy_id`, `buddy_radius`, `comments`) VALUES
 (804, 15, 28, 7, 3287, 5, 'Hana\'zua: Kneel state off');
 
--- Galgar's Cactus Apple Surprise
-UPDATE `quest_template` SET `StartScript`=4402, `DetailsEmote1`=5, `CompleteEmote`=6, `OfferRewardEmote1`=1 WHERE `entry`=4402 AND `patch`=0;
-
-DELETE FROM `quest_start_scripts` WHERE `id`=4402;
-INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(4402, 2, 1, 1, 'Galgar: Talk emote on quest accept');
-
 -- Throwables present on LH
 
 -- Burning Blade Medallion
@@ -117,17 +96,10 @@ UPDATE `quest_template` SET `DetailsEmote1`=1, `CompleteEmote`=1, `OfferRewardEm
 UPDATE `quest_template` SET `DetailsEmote1`=1, `CompleteEmote`=1, `OfferRewardEmote1`=1 WHERE `entry`=817;
 
 -- A Peon's Burden
-UPDATE `quest_template` SET `CompleteScript`=2161, `DetailsEmote1`=6, `OfferRewardEmote1`=6 WHERE `entry`=2161;
-
-DELETE FROM `quest_end_scripts` WHERE `id`=2161;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(2161, 0, 1, 1, 'Innkeeper Grosk: Talk emote on quest end');
+UPDATE `quest_template` SET `DetailsEmote1`=6, `OfferRewardEmote1`=6, `OfferRewardEmote2`=1 WHERE `entry`=2161;
 
 -- Vanquish the Betrayers
 UPDATE `quest_template` SET `DetailsEmote1`=5, `IncompleteEmote`=25, `OfferRewardEmote1`=66 WHERE `entry`=784 AND `patch`=0;
-
--- Break a Few Eggs
-UPDATE `quest_template` SET `DetailsEmote1`=5 WHERE `entry`=815 AND `patch`=0;
 
 -- Carry Your Weight
 UPDATE `quest_template` SET `DetailsEmote1`=2, `OfferRewardEmote1`=4 WHERE `entry`=791 AND `patch`=0;
@@ -143,13 +115,6 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `dataint`, `comments`) VALUES
 (806, 4, 984, 'Orgnil Soulscar: Emote text 1');
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
 (806, 4, 1, 61, 'Orgnil Soulscar: Throw emote');
-
--- From the Wreckage....
-UPDATE `quest_template` SET `DetailsEmote1`=1, `CompleteEmote`=1, `IncompleteEmote`=1, `CompleteScript`=825 WHERE entry=825 AND `patch`=0;
-
-DELETE FROM `quest_end_scripts` WHERE `id`=825;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(825, 0, 1, 66, 'Gar\'Thok: Salute emote on quest end');
 
 -- The Admiral's Orders
 UPDATE `quest_template` SET `CompleteEmote`=6, `OfferRewardEmote1`=1 WHERE `entry`=830 AND `patch`=0;
@@ -182,14 +147,7 @@ UPDATE `quest_template` SET `DetailsEmote1`=1, CompleteEmote=0, `OfferRewardEmot
 UPDATE `quest_template` SET `DetailsEmote1`=1, `OfferRewardEmote1`=273 WHERE `entry`=6081 AND `patch`=0;
 
 -- Need for a Cure
-UPDATE `quest_template` SET `DetailsEmote1`=1, CompleteEmote=1, `OfferRewardEmote1`=2,`CompleteScript`=812 WHERE `entry`=812 AND `patch`=0;
-
-DELETE FROM `quest_end_scripts` WHERE `id`=812;
-INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(812, 1, 1, 1, 'Rhinag: Talk emote on quest end');
-
--- The Admiral's Orders 2
-UPDATE `quest_template` SET `OfferRewardEmote1`=5 WHERE `entry`=831 AND `patch`=0;
+UPDATE `quest_template` SET `DetailsEmote1`=1, CompleteEmote=1, `OfferRewardEmote1`=2, `OfferRewardEmote2`=1 WHERE `entry`=812 AND `patch`=0;
 
 -- Hidden Enemies
 UPDATE `quest_template` SET `DetailsEmote1`=1,`CompleteEmote`=6, `OfferRewardEmote1`=15 WHERE entry=5726;
@@ -253,11 +211,55 @@ INSERT INTO `gameobject` (`guid`, `id`, `map`, `position_x`, `position_y`, `posi
 (12468, 3240, 1, -1520.69, -5293.85, 7.05261, 2.21025, 0.89352, 0.449022, 300, 300, 100, 1, 8);
 
 -- Conscript of the Horde
-UPDATE `quest_template` SET `StartScript`=840,`DetailsEmote1`=0, `CompleteEmote`=15, `OfferRewardEmote1`=6 WHERE `entry`=840 AND `patch`=0;
+UPDATE `quest_template` SET `DetailsEmote1`=25, `DetailsEmoteDelay1`=3000, `CompleteEmote`=15, `OfferRewardEmote1`=6 WHERE `entry`=840 AND `patch`=0;
 
-DELETE FROM `quest_start_scripts` WHERE `id`=840;
-INSERT INTO `quest_start_scripts` (`id`, `delay`, `command`, `datalong`, `comments`) VALUES 
-(840, 0, 1, 25, 'Takrin Pathseeker: Point emote on quest start');
+
+-- More emote fixes by brotalnia below.
+
+
+-- Kaltunk should do two talk emotes, followed by a laugh and point emote when offering quest Your Place In The World
+-- Gornek should do shrug emote when turning in quest Your Place In The World
+UPDATE `quest_template` SET `DetailsEmote1`=1, `DetailsEmote2`=1, `DetailsEmote3`=11, `DetailsEmote4`=25, `OfferRewardEmote1`=6 WHERE `entry`=4641;
+
+-- Gornek should do talk emote when offering quest Cutting Teeth.
+-- Gornek should do laugh emote when turning in quest Cutting Teeth.
+UPDATE `quest_template` SET `DetailsEmote1`=1, `OfferRewardEmote1`=1, `OfferRewardEmoteDelay1`=2000 WHERE `entry`=788;
+
+-- Gornek should do talk emote when offering quest Sting of the Scorpid
+UPDATE `quest_template` SET `DetailsEmote1`=1,`DetailsEmoteDelay1`=1000 WHERE `entry`=789;
+
+-- Galgar should do shout emote when offering quest Galgar's Cactus Apple Surprise
+-- Galgar should do shrug emote on completed quest Galgar's Cactus Apple Surprise
+-- Galgar should do talk emote when turning in quest Galgar's Cactus Apple Surprise
+UPDATE `quest_template` SET `DetailsEmote1`=5, `CompleteEmote`=6, `OfferRewardEmote1`=1 WHERE `entry`=4402;
+
+-- Master Gadrin should do talk emote when turning in quest Report to Sen'Jin Village
+UPDATE `quest_template` SET `OfferRewardEmote1`=1 WHERE `entry`=805;
+
+-- Cook Torka should do shout emote, followed by two talk emotes when offering quest Break a Few Eggs
+-- Cook Torka should not do an emote on completed quest Break a Few Eggs
+-- Cook Torka should do two talk emotes when turning in quest Break a Few Eggs
+UPDATE `quest_template` SET `DetailsEmote1`=5, `DetailsEmote2`=1, `DetailsEmote3`=1, `CompleteEmote`=0, `OfferRewardEmote1`=1, `OfferRewardEmote2`=1 WHERE `entry`=815;
+
+-- Gar'Thok should do talk emote when offering quest From The Wreckage
+-- Gar'Thok should do talk emote on incomplete quest From The Wreckage
+-- Gar'Thok should do salute emote when turning in quest From The Wreckage
+UPDATE `quest_template` SET `DetailsEmote1`=1, `IncompleteEmote`=1, `OfferRewardEmote1`=66, `OfferRewardEmoteDelay1`=3000 WHERE `entry`=825;
+
+-- Gar'Thok should do cheer emote when offering quest The Admiral's Orders 2
+-- Nazgrel should do shrug emote on completed quest The Admiral's Orders 2
+-- Nazgrel should do yell emote when turning in quest The Admiral's Orders 2
+UPDATE `quest_template` SET `DetailsEmote1`=4, `DetailsEmoteDelay1`=2000, `CompleteEmote`=6, `OfferRewardEmote1`=5 WHERE `entry`=831;
+
+-- Lar Prowltusk should do salute emote when turning in quest Thwarting Kolkar Aggression
+UPDATE `quest_template` SET `OfferRewardEmote1`=66 WHERE `entry`=786;
+
+-- Master Gadrin should not do an emote on completed quest Zalazane
+UPDATE `quest_template` SET `CompleteEmote`=0 WHERE `entry`=826;
+
+-- Sentinel Elissa Starbreeze should do bow emote when offering quest The Tower of Althalaxx
+UPDATE `quest_template` SET `DetailsEmote1`=2 WHERE `entry`=965;
+
 
 -- End of migration.
 END IF;

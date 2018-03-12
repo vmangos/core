@@ -35,7 +35,7 @@ void boss_lethonAI::Aggro(Unit* pWho)
 {
     boss_dragon_of_nightmareAI::Aggro(pWho);
 
-    DoCastSpellIfCan(m_creature, SPELL_SHADOW_BOLT_WHIRL, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+    DoCastSpellIfCan(m_creature, SPELL_SHADOW_BOLT_WHIRL, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     DoScriptText(SAY_LETHON_AGGRO, m_creature);
 }
 

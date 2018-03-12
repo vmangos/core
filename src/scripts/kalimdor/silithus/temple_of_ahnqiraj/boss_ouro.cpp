@@ -199,8 +199,8 @@ struct boss_ouroAI : public Scripted_NoMovementAI
         {
             if (!isReset)
             {
-                DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CAST_TRIGGERED);
-                DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO_MOUNDS, CF_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_SUMMON_TRIGGER, CF_TRIGGERED);
             }
 
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
@@ -385,7 +385,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
 
                 if (DoCastSpellIfCan(m_creature, SPELL_BIRTH) == CAST_OK)
                 {
-                    //DoCastSpellIfCan(m_creature, SPELL_SUMMON_SCARABS, CAST_TRIGGERED);
+                    //DoCastSpellIfCan(m_creature, SPELL_SUMMON_SCARABS, CF_TRIGGERED);
 
                     m_creature->RemoveAurasDueToSpell(SPELL_SUBMERGE_VISUAL);
                     m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

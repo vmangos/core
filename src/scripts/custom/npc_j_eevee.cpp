@@ -70,7 +70,7 @@ void npc_j_eevee_dreadsteedAI::MovementInform(uint32 uiType, uint32 uiPointId)
         if (Player* player = m_creature->GetMap()->GetPlayer(guidPlayer))
             DoScriptText(SAY_J_EEVEE_DREADSTEED_4, m_creature, player);
 
-        DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CF_TRIGGERED);
         break;
 
     }
@@ -189,7 +189,7 @@ void npc_j_eevee_scholomanceAI::MovementInform(uint32 uiType, uint32 uiPointId)
         attackRepeatTimer = 1000;
         break;
     case 13:
-        DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_J_EEVEE_TELEPORT, CF_TRIGGERED);
         finished = true;
         break;
     }

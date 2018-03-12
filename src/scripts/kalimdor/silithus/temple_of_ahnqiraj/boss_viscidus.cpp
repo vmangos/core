@@ -230,8 +230,8 @@ struct boss_viscidusAI : public ScriptedAI
         m_creature->SetObjectScale(m_initialScale);
         track.reset();
 
-        DoCastSpellIfCan(m_creature, SPELL_MEMBRANE_VISCIDUS, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_WEAKNESS, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_MEMBRANE_VISCIDUS, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_WEAKNESS, CF_TRIGGERED);
 
         ResetViscidusState();
     }
@@ -257,7 +257,7 @@ struct boss_viscidusAI : public ScriptedAI
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VISCIDUS, FAIL);
 
-        DoCastSpellIfCan(m_creature, SPELL_DESPAWN_GLOBS, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_DESPAWN_GLOBS, CF_TRIGGERED);
     }
 
     void JustDied(Unit* /*pKiller*/)
@@ -316,7 +316,7 @@ struct boss_viscidusAI : public ScriptedAI
         if (pSummoned->GetEntry() == NPC_GLOB_OF_VISCIDUS)
         {
             // should be a spell script!
-            if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SHRINKS_HP, CAST_TRIGGERED) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SHRINKS_HP, CF_TRIGGERED) == CAST_OK)
             {
                 auto health = m_creature->GetHealth() - static_cast<uint32>((m_creature->GetMaxHealth() * 0.05f));
 
@@ -364,7 +364,7 @@ struct boss_viscidusAI : public ScriptedAI
             {
                 m_creature->SetVisibility(VISIBILITY_ON);
 
-                if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SUICIDE, CAST_TRIGGERED) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SUICIDE, CF_TRIGGERED) == CAST_OK)
                     m_creature->DealDamage(m_creature, m_creature->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NONE, nullptr, false);
 
                 return;
@@ -375,7 +375,7 @@ struct boss_viscidusAI : public ScriptedAI
             uint32 uiGlobeCount = m_creature->GetHealthPercent() / 5.0f;
 
             for (uint8 i = 0; i < uiGlobeCount; ++i)
-                DoCastSpellIfCan(m_creature, auiGlobSummonSpells[i], CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, auiGlobSummonSpells[i], CF_TRIGGERED);
 
             m_uiExplodeDelayTimer = 2500; // 2500(instead of 1000) makes glob summon effect more visible
             return;
@@ -417,7 +417,7 @@ struct boss_viscidusAI : public ScriptedAI
 
                 DoScriptText(EMOTE_FROZEN, m_creature);
                 m_creature->RemoveAurasDueToSpell(SPELL_VISCIDUS_SLOWED_MORE);
-                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_FREEZE, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_FREEZE, CF_TRIGGERED);
             }
             else if (m_uiHitCount >= HITCOUNT_SLOW_MORE)
             {
@@ -426,7 +426,7 @@ struct boss_viscidusAI : public ScriptedAI
                     DoScriptText(EMOTE_FREEZE, m_creature);
                     m_creature->RemoveAurasDueToSpell(SPELL_VISCIDUS_SLOWED);
                 }
-                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SLOWED_MORE, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SLOWED_MORE, CF_TRIGGERED);
             }
             else if (m_uiHitCount >= HITCOUNT_SLOW)
             {
@@ -434,7 +434,7 @@ struct boss_viscidusAI : public ScriptedAI
                 {
                     DoScriptText(EMOTE_SLOW, m_creature);
                 }
-                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SLOWED, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_SLOWED, CF_TRIGGERED);
             }
         }
     }
@@ -472,7 +472,7 @@ struct boss_viscidusAI : public ScriptedAI
         {
             if (m_uiGrowCount)
             {
-                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_GROWS, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_VISCIDUS_GROWS, CF_TRIGGERED);
                 m_creature->SetObjectScale(m_creature->GetObjectScale() + 0.04f);
                 --m_uiGrowCount;
             }

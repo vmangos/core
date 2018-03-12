@@ -343,7 +343,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                             if (i->getSource() && i->getSource()->isAlive())
                                 m_creature->AddThreat(i->getSource(), 10000.0f);
 
-                        DoCastSpellIfCan(m_creature, SPELL_ROOT, CAST_TRIGGERED); // root
+                        DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED); // root
                         break;
                 }
             }
@@ -432,7 +432,7 @@ struct boss_victor_nefariusAI : ScriptedAI
             m_creature->InterruptNonMeleeSpells(false);
 
             //Root self
-            DoCastSpellIfCan(m_creature, SPELL_ROOT, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);
 
             //Make super invis
             if (m_creature->GetVisibility() != VISIBILITY_OFF)
@@ -516,7 +516,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                 m_creature->SendSpellGo(m_creature, SPELL_VISUAL_EFFECT);
                 AttackStart(pTarget);
                 m_creature->SetInCombatWithZone();
-                DoCastSpellIfCan(m_creature, SPELL_ROOT, CAST_TRIGGERED);    // Root Self
+                DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);    // Root Self
                 m_uiShadowBlinkTimer = urand(20000, 25000);
                 m_uiShadowBoltTimer = urand(3000, 6000);
                 Smoke = false;
@@ -533,7 +533,7 @@ struct boss_victor_nefariusAI : ScriptedAI
                 {
                     m_creature->getThreatManager().modifyThreatPercent(pTarget, -100);
                     m_creature->getThreatManager().addThreatDirectly(pTarget, m_uiMindControledPlayerAggro);
-                    DoCastSpellIfCan(m_creature, SPELL_ROOT, CAST_TRIGGERED);    // Root self
+                    DoCastSpellIfCan(m_creature, SPELL_ROOT, CF_TRIGGERED);    // Root self
                     m_uiMindControledPlayerGuid.Clear();
                     m_uiMindControledPlayerAggro = 0;
                 }
@@ -552,7 +552,7 @@ struct boss_victor_nefariusAI : ScriptedAI
             {
                 m_uiMindControledPlayerGuid = pTarget->GetObjectGuid();
                 m_uiMindControledPlayerAggro = m_creature->getThreatManager().getThreat(pTarget);
-                if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_COMMAND, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_SHADOW_COMMAND, CF_AURA_NOT_PRESENT) == CAST_OK)
                     m_uiMindControlTimer = urand(25000, 40000);
             }
         }

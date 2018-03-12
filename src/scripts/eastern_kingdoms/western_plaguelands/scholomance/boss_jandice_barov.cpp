@@ -94,7 +94,7 @@ struct boss_jandicebarovAI : public ScriptedAI
 
         if (sWorld.GetWowPatch() > WOW_PATCH_108)
         {
-            DoCastSpellIfCan(m_creature, SPELL_DROP_JOURNAL, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_DROP_JOURNAL, CF_TRIGGERED);
         }
     }
 

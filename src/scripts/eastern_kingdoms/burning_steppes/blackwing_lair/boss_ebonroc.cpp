@@ -119,7 +119,7 @@ struct boss_ebonrocAI : public ScriptedAI
         // Shadow of Ebonroc Timer
         if (m_uiShadowOfEbonrocTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_OF_EBONROC, CAST_AURA_NOT_PRESENT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_OF_EBONROC, CF_AURA_NOT_PRESENT) == CAST_OK)
                 m_uiShadowOfEbonrocTimer = 8000;
         }
         else

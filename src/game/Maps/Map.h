@@ -191,7 +191,7 @@ typedef ACE_Thread_Mutex MapMutexType; // Use ACE_Null_Mutex to disable locks
 // Instance IDs reserved for internal use (instanced continent parts, ...)
 #define RESERVED_INSTANCES_LAST 100
 
-typedef bool(Map::*ScriptCommandFunction) (ScriptAction& step, Object* source, Object* target);
+typedef bool(Map::*ScriptCommandFunction) (const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
 class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::ObjectLevelLockable<Map, ACE_Thread_Mutex>
 {
@@ -325,10 +325,14 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         typedef MapRefManager PlayerList;
         PlayerList const& GetPlayers() const { return m_mapRefManager; }
 
-        //per-map script storage
-        void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, Object* source, Object* target);
-        void ScriptCommandStart(ScriptInfo const& script, uint32 delay, Object* source, Object* target);
-        void TerminateScript(ScriptAction& step);
+        // Adds all commands that are part of the provided script id to the queue.
+        void ScriptsStart(std::map<uint32, std::multimap<uint32, ScriptInfo> > const& scripts, uint32 id, WorldObject* source, WorldObject* target);
+        // Adds the provided command to the queue. Will be handled by ScriptsProcess.
+        void ScriptCommandStart(ScriptInfo const& script, uint32 delay, WorldObject* source, WorldObject* target);
+        // Immediately executes the provided command.
+        void ScriptCommandStartDirect(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        // Removes all parts of script from the queue.
+        void TerminateScript(const ScriptAction& step);
 
         // must called with AddToWorld
         void AddToActive(WorldObject* obj);
@@ -534,7 +538,8 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
 
         void setNGrid(NGridType* grid, uint32 x, uint32 y);
         void ScriptsProcess();
-        bool FindScriptTargets(Object*& source, Object*& target, const ScriptAction& step);
+        bool FindScriptInitialTargets(WorldObject*& source, WorldObject*& target, const ScriptAction& step);
+        bool FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, const ScriptInfo& step);
 
         void SendObjectUpdates();
         void UpdateVisibilityForRelocations();
@@ -643,48 +648,61 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         CreatureLinkingHolder m_creatureLinkingHolder;
 
         // Functions to handle all db script commands.
-        bool ScriptCommand_Talk(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_Emote(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_FieldSet(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_MoveTo(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_ModifyFlags(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_InterruptCasts(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_TeleportTo(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_QuestExplored(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_KillCredit(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_RespawnGameObject(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SummonCreature(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_OpenDoor(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_CloseDoor(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_ActivateGameObject(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_RemoveAura(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_CastSpell(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_PlaySound(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_CreateItem(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_DespawnCreature(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetEquipment(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetMovementType(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetActiveObject(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetFaction(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_Morph(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_Mount(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetRun(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_AttackStart(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_UpdateEntry(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetStandState(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_ModifyThreat(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SendTaxiPath(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_TerminateScript(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_TerminateCondition(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_Evade(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetHomePosition(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_TurnTo(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_MeetingStone(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetData(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_SetData64(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_StartScript(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_RemoveItem(ScriptAction& step, Object* source, Object* target);
-        bool ScriptCommand_RemoveGameObject(ScriptAction& step, Object* source, Object* target);
+        bool ScriptCommand_Talk(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_Emote(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_FieldSet(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_MoveTo(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_ModifyFlags(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_InterruptCasts(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_TeleportTo(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_QuestExplored(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_KillCredit(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_RespawnGameObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SummonCreature(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_OpenDoor(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_CloseDoor(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_ActivateGameObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_RemoveAura(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_CastSpell(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_PlaySound(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_CreateItem(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_DespawnCreature(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetEquipment(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetActiveObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetFaction(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_Morph(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_Mount(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetRun(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_AttackStart(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_UpdateEntry(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetStandState(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_ModifyThreat(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SendTaxiPath(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_TerminateScript(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_TerminateCondition(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_Evade(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetHomePosition(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_TurnTo(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_MeetingStone(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetData(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetData64(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_StartScript(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_RemoveItem(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_RemoveGameObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetMeleeAttack(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetCombatMovement(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetPhase(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetPhaseRandom(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetPhaseRange(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_Flee(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_DealDamage(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_ZoneCombatPulse(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_CallForHelp(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SetSheath(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_Invincibility(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_GameEvent(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_ServerVariable(const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -731,6 +749,19 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_StartScript,            // 39
             &Map::ScriptCommand_RemoveItem,             // 40
             &Map::ScriptCommand_RemoveGameObject,       // 41
+            &Map::ScriptCommand_SetMeleeAttack,         // 42
+            &Map::ScriptCommand_SetCombatMovement,      // 43
+            &Map::ScriptCommand_SetPhase,               // 44
+            &Map::ScriptCommand_SetPhaseRandom,         // 45
+            &Map::ScriptCommand_SetPhaseRange,          // 46
+            &Map::ScriptCommand_Flee,                   // 47
+            &Map::ScriptCommand_DealDamage,             // 48
+            &Map::ScriptCommand_ZoneCombatPulse,        // 49
+            &Map::ScriptCommand_CallForHelp,            // 50
+            &Map::ScriptCommand_SetSheath,              // 51
+            &Map::ScriptCommand_Invincibility,          // 52
+            &Map::ScriptCommand_GameEvent,              // 53
+            &Map::ScriptCommand_ServerVariable,         // 54
         };
 
     public:

@@ -82,7 +82,7 @@ struct boss_renatakiAI : public ScriptedAI
             return;
 
         if (m_creature->GetHealthPercent() < 30)
-            DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CAST_AURA_NOT_PRESENT);
+            DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_AURA_NOT_PRESENT);
 
         if (Invisible)
         {

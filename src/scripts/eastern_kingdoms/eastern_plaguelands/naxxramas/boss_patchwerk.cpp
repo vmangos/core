@@ -165,7 +165,7 @@ struct boss_patchwerkAI : public ScriptedAI
             m_creature->SetTargetGuid(pTarget->GetObjectGuid());
             previousTarget = pTarget->GetObjectGuid();
         }
-        DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CAST_TRIGGERED);
+        DoCastSpellIfCan(pTarget, SPELL_HATEFULSTRIKE, CF_TRIGGERED);
     }
 
     bool CustomGetTarget()

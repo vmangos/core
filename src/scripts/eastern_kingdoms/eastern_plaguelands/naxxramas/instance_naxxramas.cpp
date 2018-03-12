@@ -1613,7 +1613,7 @@ struct mob_naxxramasPlagueSlimeAI : public ScriptedAI
             m_creature->UpdateEntry(entry->EffectMiscValue[0]);
         if (prev_spell)
             m_creature->RemoveAurasDueToSpell(prev_spell);
-        DoCastSpellIfCan(m_creature, spell, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, spell, CF_TRIGGERED);
         m_creature->SetObjectScale(2.0f); // updateentry and the actual spells screws up the scale...
         prev_spell = spell;
     }

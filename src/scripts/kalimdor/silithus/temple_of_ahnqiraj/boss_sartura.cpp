@@ -231,7 +231,7 @@ struct boss_sarturaAI : public ScriptedAI
         // If she is <25% enrage
         if (!m_bIsEnraged && m_creature->GetHealthPercent() <= 20.0f)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE, m_uiWhirlWindEndTimer ? CAST_TRIGGERED : 0) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_ENRAGE, m_uiWhirlWindEndTimer ? CF_TRIGGERED : 0) == CAST_OK)
             {
                 DoScriptText(EMOTE_ENRAGE, m_creature);
                 m_bIsEnraged = true;
@@ -243,7 +243,7 @@ struct boss_sarturaAI : public ScriptedAI
         {
             if (m_uiEnrageHardTimer <= uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_ENRAGEHARD, m_uiWhirlWindEndTimer ? CAST_TRIGGERED : 0) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_ENRAGEHARD, m_uiWhirlWindEndTimer ? CF_TRIGGERED : 0) == CAST_OK)
                 {
                     DoScriptText(EMOTE_ENRAGEHARD, m_creature);
                     m_uiEnrageHardTimer = 0;

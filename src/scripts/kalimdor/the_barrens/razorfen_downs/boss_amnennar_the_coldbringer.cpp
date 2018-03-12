@@ -64,7 +64,7 @@ struct boss_amnennar_the_coldbringerAI : public ScriptedAI
         Spectrals60 = false;
         Hp = false;
         aggro = false;
-        DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FROST, CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_IMMUNE_FROST, CF_AURA_NOT_PRESENT);
     }
 
     void Aggro(Unit *who)

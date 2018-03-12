@@ -53,40 +53,8 @@ enum CanCastResult
     CAST_FAIL_TOO_CLOSE         = 4,
     CAST_FAIL_POWER             = 5,
     CAST_FAIL_STATE             = 6,
-    CAST_FAIL_TARGET_AURA       = 7
-};
-
-enum CastFlags
-{
-    CAST_INTERRUPT_PREVIOUS     = 0x01,                     //Interrupt any spell casting
-    CAST_TRIGGERED              = 0x02,                     //Triggered (this makes spell cost zero mana and have no cast time)
-    CAST_FORCE_CAST             = 0x04,                     //Forces cast even if creature is out of mana or out of range
-    CAST_NO_MELEE_IF_OOM        = 0x08,                     //Prevents creature from entering melee if out of mana or out of range
-    CAST_FORCE_TARGET_SELF      = 0x10,                     //Forces the target to cast this spell on itself
-    CAST_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
-};
-
-enum Target
-{
-    //Self (m_creature)
-    TARGET_T_SELF = 0,                                      //Self cast
-
-    //Hostile targets (if pet then returns pet owner)
-    TARGET_T_HOSTILE,                                       //Our current target (ie: highest aggro)
-    TARGET_T_HOSTILE_SECOND_AGGRO,                          //Second highest aggro (generaly used for cleaves and some special attacks)
-    TARGET_T_HOSTILE_LAST_AGGRO,                            //Dead last on aggro (no idea what this could be used for)
-    TARGET_T_HOSTILE_RANDOM,                                //Just any random target on our threat list
-    TARGET_T_HOSTILE_RANDOM_NOT_TOP,                        //Any random target except top threat
-
-    //Invoker targets (if pet then returns pet owner)
-    TARGET_T_ACTION_INVOKER,                                //Unit who caused this Event to occur (only works for EVENT_T_AGGRO, EVENT_T_KILL, EVENT_T_DEATH, EVENT_T_SPELLHIT, EVENT_T_OOC_LOS, EVENT_T_FRIENDLY_HP, EVENT_T_FRIENDLY_IS_CC, EVENT_T_FRIENDLY_MISSING_BUFF)
-
-    //Friendly targets
-    TARGET_T_FRIENDLY,                                      //Random friendly unit.
-    TARGET_T_FRIENDLY_NOT_SELF,                             //Random friendly unit but not self.
-    TARGET_T_FRIENDLY_INJURED,                              //Friendly unit missing the most health.
-
-    TARGET_T_END
+    CAST_FAIL_TARGET_AURA       = 7,
+    CAST_FAIL_NOT_IN_LOS        = 8
 };
 
 struct CreatureAISpellsEntry : CreatureSpellsEntry
@@ -98,7 +66,7 @@ struct CreatureAISpellsEntry : CreatureSpellsEntry
 class MANGOS_DLL_SPEC CreatureAI
 {
     public:
-        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0)
+        explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0), m_MeleeEnabled(true), m_CombatMovementEnabled(true)
         {
             SetSpellsTemplate(creature->GetCreatureInfo()->spells_template);
         }
@@ -214,6 +182,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called when filling loot table
         virtual bool FillLoot(Loot* loot, Player* looter) const { return false; }
 
+        // Does creature chase its target ?
+        bool IsCombatMovement() const { return m_CombatMovementEnabled; }
+
         /**
         * Check if unit is visible for MoveInLineOfSight
         * Note: This check is by default only the state-depending (visibility, range), NOT LineOfSight
@@ -247,9 +218,6 @@ class MANGOS_DLL_SPEC CreatureAI
         // Clears any group/raid icons this creature may have
         void ClearTargetIcon();
 
-        // Returns a target based on the type specified.
-        inline Unit* GetTargetByType(uint32 CastTarget, uint16 Spellid) const;
-
         // Assigns a creature_spells template to the AI.
         void SetSpellsTemplate(uint32 entry);
         void SetSpellsTemplate(const CreatureSpellsTemplate *SpellsTemplate);
@@ -257,17 +225,21 @@ class MANGOS_DLL_SPEC CreatureAI
         // Goes through the creature_spells template to update timers and cast spells.
         void DoSpellTemplateCasts(const uint32 uiDiff);
 
-        // Returns friendly unit with the most amount of hp missing from max hp
-        Unit* DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false) const;
+        // Enables or disables melee attacks.
+        void SetMeleeAttack(bool enabled);
 
-        ///== Fields =======================================
-
+        // Enables or disabled combat movement.
+        void SetCombatMovement(bool enabled);
+        
         // Pointer to controlled by AI creature
         Creature* const m_creature;
         bool SwitchAiAtControl() const { return !m_bUseAiAtControl; }
         void SetUseAiAtControl(bool v) { m_bUseAiAtControl = v; }
     protected:
-        bool m_bUseAiAtControl;
+        ///== Fields =======================================
+        bool   m_bUseAiAtControl;
+        bool   m_MeleeEnabled;                              // If we allow melee auto attack
+        bool   m_CombatMovementEnabled;                     // If we allow targeted movement gen (chasing target)
         uint32 m_uLastAlertTime;
         std::vector<CreatureAISpellsEntry> m_CreatureSpells;
 };

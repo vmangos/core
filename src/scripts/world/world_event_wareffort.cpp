@@ -863,7 +863,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
             if (m_uiWisperingsTimer < uiDiff || (m_creature->GetCharm() && m_creature->GetCharm()->IsPolymorphed()))
             {
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                    if (DoCastSpellIfCan(pTarget, SPELL_WHISPERINGS, CF_AURA_NOT_PRESENT) == CAST_OK)
                         m_uiWisperingsTimer = 20000;
             }
             else

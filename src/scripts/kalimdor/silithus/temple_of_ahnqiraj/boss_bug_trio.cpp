@@ -208,7 +208,7 @@ struct boss_kriAI : public boss_bug_trioAI
     void JustDied(Unit* pKiller) override
     {
         // Spawn Poison Cloud on death
-        DoCastSpellIfCan(m_creature, SPELL_SUMMON_CLOUD, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUMMON_CLOUD, CF_TRIGGERED);
         boss_bug_trioAI::JustDied(pKiller);
     }
 
@@ -320,7 +320,7 @@ struct boss_yaujAI : public boss_bug_trioAI
                 if (DoCastSpellIfCan(m_creature, SPELL_HEAL) == CAST_OK)
                     m_uiHealTimer = 12000;
             }
-            else if (Unit* pTarget = DoSelectLowestHpFriendly(100.0f))
+            else if (Unit* pTarget = m_creature->DoSelectLowestHpFriendly(100.0f))
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_HEAL) == CAST_OK)
                     m_uiHealTimer = 12000;
@@ -364,7 +364,7 @@ struct boss_vemAI : public boss_bug_trioAI
     void JustDied(Unit* pKiller) override
     {
         // Enrage the other bugs on death
-        DoCastSpellIfCan(m_creature, SPELL_VENGEANCE, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_VENGEANCE, CF_TRIGGERED);
         boss_bug_trioAI::JustDied(pKiller);
     }
 

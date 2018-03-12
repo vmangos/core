@@ -366,7 +366,7 @@ struct boss_chromaggusAI : public ScriptedAI
                 if (Player* pPlayer = m_creature->GetMap()->GetPlayer(*it))
                 {
                     // Cast affliction
-                    if (DoCastSpellIfCan(pPlayer, m_uiSpellAfflict, CAST_TRIGGERED) == CAST_OK)
+                    if (DoCastSpellIfCan(pPlayer, m_uiSpellAfflict, CF_TRIGGERED) == CAST_OK)
                     {
                         if (m_uiSpellAfflict == SPELL_BROODAF_RED)
                             m_lRedAfflictionPlayerGUID.push_back(pPlayer->GetObjectGuid());

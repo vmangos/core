@@ -186,9 +186,9 @@ struct boss_nothAI : public ScriptedAI
     {
         DoScriptText(SAY_SUMMON, m_creature);
 
-        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_SW, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_NW, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_NE, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_SW, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_NW, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SUM_WARR_NE, CF_TRIGGERED);
 
         m_events.Repeat(Seconds(30));
     }
@@ -200,8 +200,8 @@ struct boss_nothAI : public ScriptedAI
             SPELL_BLINK_1, SPELL_BLINK_2, SPELL_BLINK_3, SPELL_BLINK_4
         };
 
-        DoCastSpellIfCan(m_creature, SPELL_CRIPPLE, CAST_TRIGGERED | CAST_FORCE_CAST);
-        DoCastSpellIfCan(m_creature, auiSpellBlink[urand(0, 3)], CAST_TRIGGERED|CAST_FORCE_CAST);
+        DoCastSpellIfCan(m_creature, SPELL_CRIPPLE, CF_TRIGGERED | CF_FORCE_CAST);
+        DoCastSpellIfCan(m_creature, auiSpellBlink[urand(0, 3)], CF_TRIGGERED|CF_FORCE_CAST);
         m_events.Repeat(Seconds(urand(30, 40)));
         DoResetThreat();
         if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -225,7 +225,7 @@ struct boss_nothAI : public ScriptedAI
 
     void TeleportToBalc()
     {
-        if (DoCastSpellIfCan(m_creature, SPELL_TP_BALC, CAST_TRIGGERED|CAST_FORCE_CAST) != CAST_OK)
+        if (DoCastSpellIfCan(m_creature, SPELL_TP_BALC, CF_TRIGGERED|CF_FORCE_CAST) != CAST_OK)
         {
             m_events.Repeat(100); // try again
             return;
@@ -259,7 +259,7 @@ struct boss_nothAI : public ScriptedAI
 
     void TeleportFromBalc()
     {
-        if (DoCastSpellIfCan(m_creature, SPELL_TP_CENTER, CAST_TRIGGERED) != CAST_OK)
+        if (DoCastSpellIfCan(m_creature, SPELL_TP_CENTER, CF_TRIGGERED) != CAST_OK)
         {
             m_events.Repeat(100); // try again
             return;
@@ -286,20 +286,20 @@ struct boss_nothAI : public ScriptedAI
         std::remove(champs.begin(), champs.end(), champ3);
 
         // Summoning the selected 3 guardians
-        DoCastSpellIfCan(m_creature, champ1, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, champ2, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, champ3, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, champ1, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, champ2, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, champ3, CF_TRIGGERED);
         
         // Choosing the final champion at random between the remaining 7 locations
         uint32 champ4 = champs[urand(0, 6)];
-        DoCastSpellIfCan(m_creature, champ4, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, champ4, CF_TRIGGERED);
     }
 
     void Summon2Guardians()
     {
         // Choose one of two locations south-west, and either the north-east or north-west location
-        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW1, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_NE : SPELL_SUM_GUARD_NW, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_SW1 : SPELL_SUM_GUARD_SW1, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, urand(0, 1) ? SPELL_SUM_GUARD_NE : SPELL_SUM_GUARD_NW, CF_TRIGGERED);
     }
 
     void Summon3Constructs()

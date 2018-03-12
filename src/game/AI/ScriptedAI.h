@@ -146,10 +146,6 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
 
     void SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand = EQUIP_NO_CHANGE, int32 uiOffHand = EQUIP_NO_CHANGE, int32 uiRanged = EQUIP_NO_CHANGE);
 
-    //Generally used to control if MoveChase() is to be used or not in AttackStart(). Some creatures does not chase victims
-    void SetCombatMovement(bool bCombatMove);
-    bool IsCombatMovement() const { return m_bCombatMovement; }
-
     bool EnterEvadeIfOutOfCombatArea(const uint32 uiDiff);
     void EnterEvadeIfOutOfHomeArea();
 
@@ -163,7 +159,6 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     Creature* me;
 
     private:
-        bool   m_bCombatMovement;
         uint32 m_uiEvadeCheckCooldown;
 
         bool m_bEvadeOutOfHomeArea;

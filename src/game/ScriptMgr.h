@@ -25,22 +25,19 @@
 #include "ObjectGuid.h"
 #include "DBCEnums.h"
 #include "ace/Atomic_Op.h"
+#include "SpellMgr.h"
+#include "Creature.h"
 
 struct AreaTriggerEntry;
 class Aura;
-class Creature;
 class CreatureAI;
 class GameObject;
 class GameObjectAI;
 class InstanceData;
 class Item;
 class Map;
-class Object;
-class Player;
 class Quest;
 class SpellCastTargets;
-class Unit;
-class WorldObject;
 
 // Legend:
 // source - the type of object which executes the command
@@ -99,9 +96,10 @@ enum eScriptCommand
                                                             // datalong2 = despawn_delay
                                                             // datalong3 = unique_limit
                                                             // datalong4 = unique_distance
-                                                            // data_flags = eSummonCreatureFlags
-                                                            // dataint = (bool) setRun; 0 = off (default), 1 = on
+                                                            // dataint = eSummonCreatureFlags
                                                             // dataint2 = eSummonCreatureFacingOptions
+                                                            // dataint3 = attack_target (see enum Target)
+                                                            // dataint4 = despawn_type (see enum TempSummonType)
                                                             // x/y/z/o = coordinates
     SCRIPT_COMMAND_OPEN_DOOR                = 11,           // source = GameObject (from datalong, provided source or target)
                                                             // If provided target is BUTTON GameObject, command is run on it too.
@@ -198,6 +196,40 @@ enum eScriptCommand
                                                             // datalong2 = amount
     SCRIPT_COMMAND_REMOVE_OBJECT            = 41,           // source = GameObject
                                                             // target = Unit
+    SCRIPT_COMMAND_SET_MELEE_ATTACK         = 42,           // source = Creature
+                                                            // datalong = (bool) 0 = off, 1 = on
+    SCRIPT_COMMAND_SET_COMBAT_MOVEMENT      = 43,           // source = Creature
+                                                            // datalong = (bool) 0 = off, 1 = on
+    SCRIPT_COMMAND_SET_PHASE                = 44,           // source = Creature
+                                                            // datalong = phase
+                                                            // datalong2 = eSetPhaseOptions
+    SCRIPT_COMMAND_SET_PHASE_RANDOM         = 45,           // source = Creature
+                                                            // datalong1-4 = phase
+    SCRIPT_COMMAND_SET_PHASE_RANGE          = 46,           // source = Creature
+                                                            // datalong = phase_min
+                                                            // datalong2 = phase_max
+    SCRIPT_COMMAND_FLEE                     = 47,           // source = Creature
+                                                            // datalong = seek_assistance (bool) 0 = off, 1 = on
+    SCRIPT_COMMAND_DEAL_DAMAGE              = 48,           // source = Unit
+                                                            // target = Unit
+                                                            // datalong = damage
+                                                            // datalong2 = (bool) is_percent
+    SCRIPT_COMMAND_ZONE_COMBAT_PULSE        = 49,           // source = Creature
+                                                            // datalong = (bool) initialPulse
+    SCRIPT_COMMAND_CALL_FOR_HELP            = 50,           // source = Creature
+                                                            // x = radius
+    SCRIPT_COMMAND_SET_SHEATH               = 51,           // source = Unit
+                                                            // datalong = see enum SheathState
+    SCRIPT_COMMAND_INVINCIBILITY            = 52,           // source = Creature
+                                                            // datalong = health
+                                                            // datalong2 = (bool) is_percent
+    SCRIPT_COMMAND_GAME_EVENT               = 53,           // source = None
+                                                            // datalong = event_id
+                                                            // datalong2 = (bool) start
+                                                            // datalong3 = (bool) overwrite
+    SCRIPT_COMMAND_SET_SERVER_VARIABLE      = 54,           // source = None
+                                                            // datalong = index
+                                                            // datalong2 = value
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -235,9 +267,10 @@ enum eModifyFlagsOptions
 // Must start from 0x8 because of target selection flags.
 enum eSummonCreatureFlags
 {
-    SF_SUMMONCREATURE_ACTIVE      = 0x10,                     // active creatures are always updated
-    SF_SUMMONCREATURE_UNIQUE      = 0x20,                     // not actually unique, just checks for same entry in certain range
-    SF_SUMMONCREATURE_UNIQUE_TEMP = 0x40                      // same as 0x10 but check for TempSummon only creatures
+    SF_SUMMONCREATURE_SET_RUN      = 0x1,                         // makes creature move at run speed
+    SF_SUMMONCREATURE_ACTIVE      = 0x2,                         // active creatures are always updated
+    SF_SUMMONCREATURE_UNIQUE      = 0x4,                         // not actually unique, just checks for same entry in certain range
+    SF_SUMMONCREATURE_UNIQUE_TEMP = 0x8                          // same as 0x10 but check for TempSummon only creatures
 };
 
 // Possible dataint2 values for SCRIPT_COMMAND_TEMP_SUMMON_CREATURE
@@ -245,13 +278,6 @@ enum eSummonCreatureFacingOptions
 {
     SO_SUMMONCREATURE_FACE_SUMMONER = 1,                         // Creature will face the summoner.
     SO_SUMMONCREATURE_FACE_TARGET   = 2                          // Creature will face the provided target object.
-};
-
-// Flags used by SCRIPT_COMMAND_CAST_SPELL
-enum eCastSpellFlags
-{
-    SF_CASTSPELL_TRIGGERED          = 0x1,                    // Triggered spells skip checks.
-    SF_CASTSPELL_INTERRUPT_PREVIOUS = 0x2                     // Will interrupt the current spell cast.
 };
 
 // Flags used by SCRIPT_COMMAND_PLAY_SOUND
@@ -264,11 +290,8 @@ enum ePlaySoundFlags
 // Possible datalong values for SCRIPT_COMMAND_MODIFY_THREAT
 enum eModifyThreatTargets
 {
-    SO_MODIFYTHREAT_PROVIDED_TARGET = 0,
-    SO_MODIFYTHREAT_CURRENT_VICTIM  = 1,
-    SO_MODIFYTHREAT_ALL_ATTACKERS   = 2,
-
-    SO_MODIFYTHREAT_MAX_TARGETS
+    // 0 to 5 from Target enum.
+    SO_MODIFYTHREAT_ALL_ATTACKERS   = 6
 };
 
 // Possible datalong3 values for SCRIPT_COMMAND_TERMINATE_SCRIPT
@@ -310,15 +333,14 @@ enum eSetInstData64Options
     SO_INSTDATA64_MAX
 };
 
-// Values used in buddy_type column
-enum eBuddyType
+// Possible datalong values for SCRIPT_COMMAND_SET_PHASE
+enum eSetPhaseOptions
 {
-    BUDDY_TYPE_CREATURE_ENTRY           = 0,
-    BUDDY_TYPE_CREATURE_GUID            = 1,
-    BUDDY_TYPE_CREATURE_INSTANCE_DATA   = 2,
-    BUDDY_TYPE_GAMEOBJECT_ENTRY         = 3,
-    BUDDY_TYPE_GAMEOBJECT_GUID          = 4,
-    BUDDY_TYPE_GAMEOBJECT_INSTANCE_DATA = 5,
+    SO_SETPHASE_RAW = 0,
+    SO_SETPHASE_INCREMENT = 1,
+    SO_SETPHASE_DECREMENT = 2,
+
+    SO_SETPHASE_MAX
 };
 
 enum eDataFlags
@@ -415,9 +437,11 @@ struct ScriptInfo
             uint32 despawnDelay;                            // datalong2
             uint32 uniqueLimit;                             // datalong3
             uint32 uniqueDistance;                          // datalong4
-            uint32 flags;                                   // data_flags
-            int32 setRun;                                   // dataint
+            uint32 unused;                                  // data_flags
+            int32 flags;                                    // dataint
             int32 facingLogic;                              // dataint2
+            int32 attackTarget;                             // dataint3
+            int32 despawnType;                              // dataint4
         } summonCreature;
 
         struct                                              // SCRIPT_COMMAND_OPEN_DOOR (11)
@@ -590,22 +614,91 @@ struct ScriptInfo
 
                                                             // SCRIPT_COMMAND_REMOVE_OBJECT (41)
 
+        struct                                              // SCRIPT_COMMAND_SET_MELEE_ATTACK (42)
+        {
+            uint32 enabled;                                 // datalong
+        } enableMelee;
+
+        struct                                              // SCRIPT_COMMAND_SET_COMBAT_MOVEMENT (43)
+        {
+            uint32 enabled;                                 // datalong
+        } combatMovement;
+
+        struct                                              // SCRIPT_COMMAND_SET_PHASE (44)
+        {
+            uint32 phase;                                   // datalong
+            uint32 mode;                                    // datalong2
+        } setPhase;
+
+        struct                                              // SCRIPT_COMMAND_SET_PHASE_RANDOM (45)
+        {
+            uint32 phase[MAX_TEXT_ID];                      // datalong
+        } setPhaseRandom;
+
+        struct                                              // SCRIPT_COMMAND_SET_PHASE_RANGE (46)
+        {
+            uint32 phaseMin;                                // datalong
+            uint32 phaseMax;                                // datalong2
+        } setPhaseRange;
+
+        struct                                              // SCRIPT_COMMAND_FLEE (47)
+        {
+            uint32 seekAssistance;                          // datalong
+        } flee;
+
+        struct                                              // SCRIPT_COMMAND_DEAL_DAMAGE (48)
+        {
+            uint32 damage;                                  // datalong
+            uint32 isPercent;                               // datalong2
+        } dealDamage;
+
+        struct                                              // SCRIPT_COMMAND_ZONE_COMBAT_PULSE (49)
+        {
+            uint32 initialPulse;                            // datalong
+        } combatPulse;
+
+                                                            // SCRIPT_COMMAND_CALL_FOR_HELP (50)
+
+        struct                                              // SCRIPT_COMMAND_SET_SHEATH (51)
+        {
+            uint32 sheathState;                             // datalong
+        } setSheath;
+
+        struct                                              // SCRIPT_COMMAND_INVINCIBILITY (52)
+        {
+            uint32 health;                                  // datalong
+            uint32 isPercent;                               // datalong2
+        } invincibility;
+
+        struct                                              // SCRIPT_COMMAND_GAME_EVENT (53)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 start;                                   // datalong2
+            uint32 overwrite;                               // datalong3
+        } gameEvent;
+
+        struct                                              // SCRIPT_COMMAND_SET_SERVER_VARIABLE (54)
+        {
+            uint32 index;                                   // datalong
+            uint32 value;                                   // datalong2
+        } serverVariable;
+
         struct
         {
             uint32 data[9];
         } raw;
     };
 
-    uint32 buddy_id;
-    uint32 buddy_radius;
-    uint8 buddy_type;
+    uint32 target_param1;
+    uint32 target_param2;
+    uint8 target_type;
 
     float x;
     float y;
     float z;
     float o;
 
-    ScriptInfo() : id(0), delay(0), command(0), condition(0), buddy_id(0), buddy_radius(0), buddy_type(0), x(0), y(0), z(0), o(0)
+    ScriptInfo() : id(0), delay(0), command(0), condition(0), target_param1(0), target_param2(0), target_type(0), x(0), y(0), z(0), o(0)
     {
         memset(raw.data, 0, sizeof(raw.data));
     }
@@ -627,15 +720,13 @@ struct ScriptAction
 {
     ObjectGuid sourceGuid;
     ObjectGuid targetGuid;
-    ObjectGuid ownerGuid;                                   // owner of source if source is item
     ScriptInfo const* script;                               // pointer to static script data
 
-    bool IsSameScript(uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid, ObjectGuid ownerGuid) const
+    bool IsSameScript(uint32 id, ObjectGuid sourceGuid, ObjectGuid targetGuid) const
     {
         return id == script->id &&
             (sourceGuid == this->sourceGuid || !sourceGuid) &&
-            (targetGuid == this->targetGuid || !targetGuid) &&
-            (ownerGuid == this->ownerGuid || !ownerGuid);
+            (targetGuid == this->targetGuid || !targetGuid);
     }
 };
 
@@ -650,6 +741,7 @@ extern ScriptMapMap sGameObjectScripts;
 extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sCreatureMovementScripts;
+extern ScriptMapMap sCreatureAIScripts;
 
 #define MAX_SCRIPTS         5000                            //72 bytes each (approx 351kb)
 #define VISIBLE_RANGE       (166.0f)                        //MAX visible range (size of grid)
@@ -662,6 +754,112 @@ extern ScriptMapMap sCreatureMovementScripts;
 
 #define TEXT_SOURCE_CUSTOM_START    TEXT_SOURCE_RANGE*2
 #define TEXT_SOURCE_CUSTOM_END      TEXT_SOURCE_RANGE*3 + 1
+
+enum CastFlags
+{
+    CF_INTERRUPT_PREVIOUS     = 0x01,                     //Interrupt any spell casting
+    CF_TRIGGERED              = 0x02,                     //Triggered (this makes spell cost zero mana and have no cast time)
+    CF_FORCE_CAST             = 0x04,                     //Forces cast even if creature is out of mana or out of range
+    CF_MAIN_RANGED_SPELL      = 0x08,                     //To be used by ranged mobs only. Creature will not chase target until cast fails.
+    CF_TARGET_CASTS_ON_SELF   = 0x10,                     //Forces the target to cast this spell on itself
+    CF_AURA_NOT_PRESENT       = 0x20,                     //Only casts the spell if the target does not have an aura from the spell
+};
+
+#define ALL_CAST_FLAGS (CF_INTERRUPT_PREVIOUS | CF_TRIGGERED | CF_FORCE_CAST | CF_MAIN_RANGED_SPELL | CF_TARGET_CASTS_ON_SELF | CF_AURA_NOT_PRESENT)
+
+// Values used in target_type column
+enum ScriptTarget
+{
+    TARGET_T_PROVIDED_TARGET                = 0,            //Object that was provided to the command
+
+    TARGET_T_HOSTILE                        = 1,            //Our current target (ie: highest aggro)
+    TARGET_T_HOSTILE_SECOND_AGGRO           = 2,            //Second highest aggro (generaly used for cleaves and some special attacks)
+    TARGET_T_HOSTILE_LAST_AGGRO             = 3,            //Dead last on aggro (no idea what this could be used for)
+    TARGET_T_HOSTILE_RANDOM                 = 4,            //Just any random target on our threat list
+    TARGET_T_HOSTILE_RANDOM_NOT_TOP         = 5,            //Any random target except top threat
+
+    TARGET_T_OWNER_OR_SELF                  = 6,            //Either self or owner if pet or controlled
+    TARGET_T_OWNER                          = 7,            //The owner of the source
+    
+
+    TARGET_T_CREATURE_WITH_ENTRY            = 8,            //Searches for nearby creature with the given entry
+                                                            //Param1 = creature_entry
+                                                            //Param2 = search_radius
+
+    TARGET_T_CREATURE_WITH_GUID             = 9,            //The creature with this database guid
+                                                            //Param1 = db_guid
+
+    TARGET_T_CREATURE_FROM_INSTANCE_DATA    = 10,           //Find creature by guid stored in instance data
+                                                            //Param1 = instance_data_field
+
+    TARGET_T_GAMEOBJECT_WITH_ENTRY          = 11,           //Searches for nearby gameobject with the given entry
+                                                            //Param1 = gameobject_entry
+                                                            //Param2 = search_radius
+
+    TARGET_T_GAMEOBJECT_WITH_GUID           = 12,           //The gameobject with this database guid
+                                                            //Param1 = db_guid
+
+    TARGET_T_GAMEOBJECT_FROM_INSTANCE_DATA  = 13,           //Find gameobject by guid stored in instance data
+                                                            //Param1 = instance_data_field
+
+    TARGET_T_FRIENDLY                       = 14,           //Random friendly unit.
+                                                            //Param1 = spell_id (for range check)
+                                                            //Param2 = (bool) exclude_self
+
+    TARGET_T_FRIENDLY_INJURED               = 15,           //Friendly unit missing the most health.
+                                                            //Param1 = spell_id (for range check)
+                                                            //Param2 = hp_percent
+    TARGET_T_END
+};
+
+//Generic scripting functions
+void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, uint32 chatTypeOverride = 0);
+void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
+
+// Returns a target based on the type specified.
+inline WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1 = 0u, uint32 Param2 = 0u)
+{
+    switch (TargetType)
+    {
+        case TARGET_T_PROVIDED_TARGET:
+            return pTarget;
+        case TARGET_T_HOSTILE:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->getVictim();
+            break;
+        case TARGET_T_HOSTILE_SECOND_AGGRO:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
+            break;
+        case TARGET_T_HOSTILE_LAST_AGGRO:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0);
+            break;
+        case TARGET_T_HOSTILE_RANDOM:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+            break;
+        case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+            break;
+        case TARGET_T_OWNER_OR_SELF:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->GetCharmerOrOwnerOrSelf();
+            break;
+        case TARGET_T_OWNER:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->GetOwner();
+            break;
+        case TARGET_T_FRIENDLY:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->SelectRandomFriendlyTarget(Param2 ? pUnitSource : nullptr, Param1 ? sSpellRangeStore.LookupEntry(sSpellMgr.GetSpellEntry(Param1)->rangeIndex)->maxRange : 30);
+        case TARGET_T_FRIENDLY_INJURED:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? sSpellRangeStore.LookupEntry(sSpellMgr.GetSpellEntry(Param1)->rangeIndex)->maxRange : 30, Param2 ? Param2 : 50, true);
+    }
+    return nullptr;
+}
 
 //Spell targets used by SelectSpell
 enum SelectTarget
@@ -808,6 +1006,7 @@ class ScriptMgr
         void LoadCreatureSpellScripts();
         void LoadGossipScripts();
         void LoadCreatureMovementScripts();
+        void LoadCreatureEventAIScripts();
 
         void CheckAllScriptTexts();
 
@@ -925,10 +1124,6 @@ class ScriptMgr
         //atomic op counter for active scripts amount
         ACE_Atomic_Op<ACE_Thread_Mutex, int> m_scheduledScripts;
 };
-
-//Generic scripting text function
-void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, uint32 chatTypeOverride = 0);
-void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 #define sScriptMgr MaNGOS::Singleton<ScriptMgr>::Instance()
 

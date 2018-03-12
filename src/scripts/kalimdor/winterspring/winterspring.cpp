@@ -292,7 +292,7 @@ struct npc_artoriusAI : public ScriptedAI
     {
         if (pSpell->Id == 13555 || pSpell->Id == 25295)             // Serpent Sting (Rank 8 or Rank 9)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_STINGING_TRAUMA, CAST_TRIGGERED) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_STINGING_TRAUMA, CF_TRIGGERED) == CAST_OK)
                 DoScriptText(EMOTE_POISON, m_creature);
         }
     }

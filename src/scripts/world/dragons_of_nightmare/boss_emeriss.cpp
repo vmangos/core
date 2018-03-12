@@ -67,7 +67,7 @@ bool boss_emerissAI::UpdateDragonAI(const uint32 uiDiff)
     if (m_uiVolatileInfectionTimer <= uiDiff)
     {
         Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER_NOT_GM);
-        if (pTarget && DoCastSpellIfCan(pTarget, SPELL_VOLATILE_INFECTION, CAST_AURA_NOT_PRESENT) == CAST_OK)
+        if (pTarget && DoCastSpellIfCan(pTarget, SPELL_VOLATILE_INFECTION, CF_AURA_NOT_PRESENT) == CAST_OK)
             m_uiVolatileInfectionTimer = urand(10000, 16000);
     }
     else

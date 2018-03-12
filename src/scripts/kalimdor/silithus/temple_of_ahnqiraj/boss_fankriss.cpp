@@ -104,7 +104,7 @@ struct creature_spawn_fankrissAI : public ScriptedAI
 
         if (enrageTimer < diff)
         {
-            DoCastSpellIfCan(m_creature, SPELL_SPAWN_ENRAGE, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_SPAWN_ENRAGE, CF_TRIGGERED);
             enrageTimer = std::numeric_limits<uint32>::max();
         }
         else 

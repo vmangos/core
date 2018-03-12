@@ -106,8 +106,6 @@ CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
 
     m_bEmptyList = m_CreatureEventAIList.empty();
     m_Phase = 0;
-    m_CombatMovementEnabled = true;
-    m_MeleeEnabled = true;
     m_AttackDistance = 0.0f;
     m_AttackAngle = 0.0f;
 
@@ -117,7 +115,7 @@ CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
     if (!m_bEmptyList)
     {
         for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
-            if (SpawnedEventConditionsCheck((*i).Event))
+            if (i->Event.event_type == EVENT_T_SPAWNED)
                 ProcessEvent(*i);
     }
     Reset();
@@ -383,7 +381,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
     if (!(pHolder.Event.event_flags & EFLAG_RANDOM_ACTION))
     {
         for (uint32 j = 0; j < MAX_ACTIONS; ++j)
-            ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
+            ProcessAction(pHolder.Event.action[j], pHolder.Event.event_id, pActionInvoker);
     }
     //Process actions, random case
     else
@@ -391,7 +389,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         // amount of real actions
         uint32 count = 0;
         for (uint32 j = 0; j < MAX_ACTIONS; j++)
-            if (pHolder.Event.action[j].type != ACTION_T_NONE)
+            if (pHolder.Event.action[j])
                 ++count;
 
         if (count)
@@ -403,7 +401,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             uint32 j = 0;
             for (; ; ++j)
             {
-                if (pHolder.Event.action[j].type != ACTION_T_NONE)
+                if (pHolder.Event.action[j])
                 {
                     if (!idx)
                         break;
@@ -411,506 +409,23 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
                 }
             }
 
-            ProcessAction(pHolder.Event.action[j], rnd, pHolder.Event.event_id, pActionInvoker);
+            ProcessAction(pHolder.Event.action[j], pHolder.Event.event_id, pActionInvoker);
         }
     }
     return true;
 }
 
-void CreatureEventAI::ProcessAction(CreatureEventAI_Action const& action, uint32 rnd, uint32 EventId, Unit* pActionInvoker)
+void CreatureEventAI::ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker)
 {
-    switch (action.type)
+    if (!action)
+        return;
+
+    WorldObject* target = pActionInvoker ? pActionInvoker : m_creature->getVictim();
+    Map* map = m_creature->GetMap();
+
+    for (const auto& x : *action)
     {
-        case ACTION_T_TEXT:
-        {
-            if (!action.text.TextId[0])
-                return;
-
-            int32 temp = 0;
-
-            if (action.text.TextId[1] && action.text.TextId[2])
-                temp = action.text.TextId[rand() % 3];
-            else if (action.text.TextId[1] && urand(0, 1))
-                temp = action.text.TextId[1];
-            else
-                temp = action.text.TextId[0];
-
-            if (temp)
-            {
-                Unit* target = nullptr;
-
-                if (pActionInvoker)
-                {
-                    if (pActionInvoker->GetTypeId() == TYPEID_PLAYER)
-                        target = pActionInvoker;
-                    else if (Unit* owner = pActionInvoker->GetOwner())
-                    {
-                        if (owner->GetTypeId() == TYPEID_PLAYER)
-                            target = owner;
-                    }
-                }
-                else if ((target = m_creature->getVictim()))
-                {
-                    if (target->GetTypeId() != TYPEID_PLAYER)
-                        if (Unit* owner = target->GetOwner())
-                            if (owner->GetTypeId() == TYPEID_PLAYER)
-                                target = owner;
-                }
-
-                DoScriptText(temp, m_creature, target);
-            }
-            break;
-        }
-        case ACTION_T_SET_FACTION:
-        {
-            if (action.set_faction.factionId)
-                m_creature->SetFactionTemporary(action.set_faction.factionId, action.set_faction.factionFlags);
-            else                                            // no id provided, assume reset and then use default
-                m_creature->ClearTemporaryFaction();
-
-            break;
-        }
-        case ACTION_T_MORPH_TO_ENTRY_OR_MODEL:
-        {
-            if (action.morph.creatureId || action.morph.modelId)
-            {
-                //set model based on entry from creature_template
-                if (action.morph.creatureId)
-                {
-                    if (CreatureInfo const* ci = ObjectMgr::GetCreatureTemplate(action.morph.creatureId))
-                    {
-                        uint32 display_id = Creature::ChooseDisplayId(ci);
-                        m_creature->SetDisplayId(display_id);
-                    }
-                }
-                //if no param1, then use value from param2 (modelId)
-                else
-                    m_creature->SetDisplayId(action.morph.modelId);
-            }
-            else
-                m_creature->DeMorph();
-            break;
-        }
-        case ACTION_T_SOUND:
-            m_creature->PlayDirectSound(action.sound.soundId);
-            break;
-        case ACTION_T_EMOTE:
-            m_creature->HandleEmote(action.emote.emoteId);
-            break;
-        case ACTION_T_RANDOM_SOUND:
-        {
-            int32 temp = GetRandActionParam(rnd, action.random_sound.soundId1, action.random_sound.soundId2, action.random_sound.soundId3);
-            if (temp >= 0)
-                m_creature->PlayDirectSound(temp);
-            break;
-        }
-        case ACTION_T_RANDOM_EMOTE:
-        {
-            int32 temp = GetRandActionParam(rnd, action.random_emote.emoteId1, action.random_emote.emoteId2, action.random_emote.emoteId3);
-            if (temp >= 0)
-                m_creature->HandleEmote(temp);
-            break;
-        }
-        case ACTION_T_CAST:
-        {
-            Unit* target = GetTargetByType(action.cast.target, pActionInvoker);
-
-            if (!target)
-            {
-                sLog.outDebug("CreatureEventAI: NULL target for ACTION_T_CAST creature entry %u casting spell id %u", m_creature->GetEntry(), action.cast.spellId);
-                return;
-            }
-
-            CanCastResult castResult = DoCastSpellIfCan(target, action.cast.spellId, action.cast.castFlags);
-
-            SpellEntry const* pSpell = sSpellMgr.GetSpellEntry(action.cast.spellId);
-            if (!pSpell)
-            {
-                sLog.outError("CreatureEventAI: creature entry %u uses non-existent spell %u", m_creature->GetEntry(), action.cast.spellId);
-                return;
-            }
-
-            bool bGoMelee = false;
-            if (!(action.cast.castFlags & CAST_NO_MELEE_IF_OOM)) // Add specific flag if silenced?
-            {
-                if (castResult == CAST_FAIL_POWER || castResult == CAST_FAIL_TOO_FAR)
-                    bGoMelee = true;
-                if (castResult == CAST_FAIL_STATE && pSpell->PreventionType == SPELL_PREVENTION_TYPE_SILENCE)
-                    bGoMelee = true;
-            }
-            if (bGoMelee)
-            {
-                switch (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType())
-                {
-                    case CHASE_MOTION_TYPE:
-                    case FOLLOW_MOTION_TYPE:
-                        m_AttackDistance = 0.0f;
-                        m_AttackAngle = 0.0f;
-
-                        m_creature->GetMotionMaster()->Clear(false);
-                        m_creature->SetCasterChaseDistance(0.0f);
-                        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
-                        break;
-                    default:
-                        break;
-                }
-            }
-
-            break;
-        }
-        case ACTION_T_SUMMON:
-        {
-            Unit* target = GetTargetByType(action.summon.target, pActionInvoker);
-
-            Creature* pCreature = nullptr;
-
-            if (action.summon.duration)
-                pCreature = m_creature->SummonCreature(action.summon.creatureId, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, action.summon.duration);
-            else
-                pCreature = m_creature->SummonCreature(action.summon.creatureId, 0.0f, 0.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 0);
-
-            if (!pCreature)
-                sLog.outErrorDb("CreatureEventAI: failed to spawn creature %u. Spawn event %d is on creature %d", action.summon.creatureId, EventId, m_creature->GetEntry());
-            else if (action.summon.target != TARGET_T_SELF && target)
-                pCreature->AI()->AttackStart(target);
-            break;
-        }
-        case ACTION_T_THREAT_SINGLE_PCT:
-            if (Unit* target = GetTargetByType(action.threat_single_pct.target, pActionInvoker))
-                m_creature->getThreatManager().modifyThreatPercent(target, action.threat_single_pct.percent);
-            break;
-        case ACTION_T_THREAT_ALL_PCT:
-        {
-            ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
-            for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                if (Unit* Temp = m_creature->GetMap()->GetUnit((*i)->getUnitGuid()))
-                    m_creature->getThreatManager().modifyThreatPercent(Temp, action.threat_all_pct.percent);
-            break;
-        }
-        case ACTION_T_QUEST_EVENT:
-            if (Unit* target = GetTargetByType(action.quest_event.target, pActionInvoker))
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)target)->AreaExploredOrEventHappens(action.quest_event.questId);
-            break;
-        case ACTION_T_CAST_EVENT:
-            if (Unit* target = GetTargetByType(action.cast_event.target, pActionInvoker))
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)target)->CastedCreatureOrGO(action.cast_event.creatureId, m_creature->GetObjectGuid(), action.cast_event.spellId);
-            break;
-        case ACTION_T_SET_UNIT_FIELD:
-        {
-            Unit* target = GetTargetByType(action.set_unit_field.target, pActionInvoker);
-
-            // not allow modify important for integrity object fields
-            if (action.set_unit_field.field < OBJECT_END || action.set_unit_field.field >= UNIT_END)
-                return;
-
-            if (target)
-                target->SetUInt32Value(action.set_unit_field.field, action.set_unit_field.value);
-
-            break;
-        }
-        case ACTION_T_SET_UNIT_FLAG:
-        {
-            // not allow modify important for integrity object fields
-            if (action.unit_flag.field < OBJECT_END || action.unit_flag.field >= UNIT_END)
-                return;
-
-            if (Unit* target = GetTargetByType(action.unit_flag.target, pActionInvoker))
-                target->SetFlag(action.unit_flag.field, action.unit_flag.value);
-            break;
-        }
-        case ACTION_T_REMOVE_UNIT_FLAG:
-        {
-            // not allow modify important for integrity object fields
-            if (action.set_unit_field.field < OBJECT_END || action.set_unit_field.field >= UNIT_END)
-                return;
-
-            if (Unit* target = GetTargetByType(action.unit_flag.target, pActionInvoker))
-                target->RemoveFlag(action.unit_flag.field, action.unit_flag.value);
-            break;
-        }
-        case ACTION_T_AUTO_ATTACK:
-            m_MeleeEnabled = action.auto_attack.state != 0;
-            break;
-        case ACTION_T_COMBAT_MOVEMENT:
-            // ignore no affect case
-            if (m_CombatMovementEnabled == (action.combat_movement.state != 0) || m_creature->IsNonMeleeSpellCasted(false))
-                return;
-
-            m_CombatMovementEnabled = action.combat_movement.state != 0;
-
-            //Allow movement (create new targeted movement gen only if idle)
-            if (m_CombatMovementEnabled)
-            {
-                if (action.combat_movement.melee && m_creature->isInCombat())
-                    if (Unit* victim = m_creature->getVictim())
-                        m_creature->SendMeleeAttackStart(victim);
-                m_creature->SetCasterChaseDistance(0.0f);
-                // Ustaag <Nostalrius> : le mob pourra de nouveau poursuivre le joueur s'il reste bloqué
-                if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE ||
-                        (!m_creature->IsMoving() && (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)))
-                {
-                    m_creature->GetMotionMaster()->Clear(false);
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
-                }
-            }
-            else
-            {
-                if (action.combat_movement.melee && m_creature->isInCombat())
-                    if (Unit* victim = m_creature->getVictim())
-                        m_creature->SendMeleeAttackStop(victim);
-                m_creature->SetCasterChaseDistance(25.0f);
-            }
-            break;
-        case ACTION_T_SET_PHASE:
-            m_Phase = action.set_phase.phase;
-            break;
-        case ACTION_T_INC_PHASE:
-        {
-            int32 new_phase = int32(m_Phase) + action.set_inc_phase.step;
-            if (new_phase < 0)
-            {
-                sLog.outErrorDb("CreatureEventAI: Event %d decrease Phase under 0. CreatureEntry = %d", EventId, m_creature->GetEntry());
-                m_Phase = 0;
-            }
-            else if (new_phase >= MAX_PHASE)
-            {
-                sLog.outErrorDb("CreatureEventAI: Event %d incremented Phase above %u. Phase mask cannot be used with phases past %u. CreatureEntry = %d", EventId, MAX_PHASE - 1, MAX_PHASE - 1, m_creature->GetEntry());
-                m_Phase = MAX_PHASE - 1;
-            }
-            else
-                m_Phase = new_phase;
-
-            break;
-        }
-        case ACTION_T_EVADE:
-            EnterEvadeMode();
-            break;
-        case ACTION_T_FLEE:
-            m_creature->DoFlee();
-            break;
-        case ACTION_T_QUEST_EVENT_ALL:
-            if (pActionInvoker && pActionInvoker->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)pActionInvoker)->GroupEventHappens(action.quest_event_all.questId, m_creature);
-            break;
-        case ACTION_T_CAST_EVENT_ALL:
-        {
-            ThreatList const& threatList = m_creature->getThreatManager().getThreatList();
-            for (ThreatList::const_iterator i = threatList.begin(); i != threatList.end(); ++i)
-                if (Player* temp = m_creature->GetMap()->GetPlayer((*i)->getUnitGuid()))
-                    temp->CastedCreatureOrGO(action.cast_event_all.creatureId, m_creature->GetObjectGuid(), action.cast_event_all.spellId);
-            break;
-        }
-        case ACTION_T_REMOVEAURASFROMSPELL:
-            if (Unit* target = GetTargetByType(action.remove_aura.target, pActionInvoker))
-                target->RemoveAurasDueToSpell(action.remove_aura.spellId);
-            break;
-        case ACTION_T_RANGED_MOVEMENT:
-            m_AttackDistance = (float)action.ranged_movement.distance;
-            m_AttackAngle = action.ranged_movement.angle / 180.0f * M_PI_F;
-
-            if (m_CombatMovementEnabled)
-            {
-                if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE)
-                {
-                    //Drop current movement gen
-                    m_creature->GetMotionMaster()->Clear(false);
-                    m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim(), m_AttackDistance, m_AttackAngle);
-                }
-            }
-            break;
-        case ACTION_T_RANDOM_PHASE:
-            m_Phase = GetRandActionParam(rnd, action.random_phase.phase1, action.random_phase.phase2, action.random_phase.phase3);
-            break;
-        case ACTION_T_RANDOM_PHASE_RANGE:
-            if (action.random_phase_range.phaseMax > action.random_phase_range.phaseMin)
-                m_Phase = action.random_phase_range.phaseMin + (rnd % (action.random_phase_range.phaseMax - action.random_phase_range.phaseMin));
-            else
-                sLog.outErrorDb("CreatureEventAI: ACTION_T_RANDOM_PHASE_RANGE cannot have Param2 <= Param1. Divide by Zero. Event = %d. CreatureEntry = %d", EventId, m_creature->GetEntry());
-            break;
-        case ACTION_T_SUMMON_ID:
-        {
-            Unit* target = GetTargetByType(action.summon_id.target, pActionInvoker);
-
-            CreatureEventAI_Summon_Map::const_iterator i = sEventAIMgr.GetCreatureEventAISummonMap().find(action.summon_id.spawnId);
-            if (i == sEventAIMgr.GetCreatureEventAISummonMap().end())
-            {
-                sLog.outErrorDb("CreatureEventAI: failed to spawn creature %u. Summon map index %u does not exist. EventID %d. CreatureID %d", action.summon_id.creatureId, action.summon_id.spawnId, EventId, m_creature->GetEntry());
-                return;
-            }
-
-            Creature* pCreature = nullptr;
-            if ((*i).second.SpawnTimeSecs)
-                pCreature = m_creature->SummonCreature(action.summon_id.creatureId, (*i).second.position_x, (*i).second.position_y, (*i).second.position_z, (*i).second.orientation, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, (*i).second.SpawnTimeSecs);
-            else
-                pCreature = m_creature->SummonCreature(action.summon_id.creatureId, (*i).second.position_x, (*i).second.position_y, (*i).second.position_z, (*i).second.orientation, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 0);
-
-            if (!pCreature)
-                sLog.outErrorDb("CreatureEventAI: failed to spawn creature %u. EventId %d.Creature %d", action.summon_id.creatureId, EventId, m_creature->GetEntry());
-            else if (action.summon_id.target != TARGET_T_SELF && target)
-                pCreature->AI()->AttackStart(target);
-
-            break;
-        }
-        case ACTION_T_KILLED_MONSTER:
-            //first attempt player/group who tapped creature
-            if (Player* pPlayer = m_creature->GetLootRecipient())
-                pPlayer->RewardPlayerAndGroupAtEvent(action.killed_monster.creatureId, m_creature);
-            else
-            {
-                //if not available, use pActionInvoker
-                if (Unit* pTarget = GetTargetByType(action.killed_monster.target, pActionInvoker))
-                    if (Player* pPlayer2 = pTarget->GetCharmerOrOwnerPlayerOrPlayerItself())
-                        pPlayer2->RewardPlayerAndGroupAtEvent(action.killed_monster.creatureId, m_creature);
-            }
-            break;
-        case ACTION_T_SET_INST_DATA:
-        {
-            InstanceData* pInst = m_creature->GetInstanceData();
-            if (!pInst)
-            {
-                sLog.outErrorDb("CreatureEventAI: Event %d attempt to set instance data without instance script. Creature %d", EventId, m_creature->GetEntry());
-                return;
-            }
-
-            pInst->SetData(action.set_inst_data.field, action.set_inst_data.value);
-            break;
-        }
-        case ACTION_T_SET_INST_DATA64:
-        {
-            Unit* target = GetTargetByType(action.set_inst_data64.target, pActionInvoker);
-            if (!target)
-            {
-                sLog.outErrorDb("CreatureEventAI: Event %d attempt to set instance data64 but Target == NULL. Creature %d", EventId, m_creature->GetEntry());
-                return;
-            }
-
-            InstanceData* pInst = m_creature->GetInstanceData();
-            if (!pInst)
-            {
-                sLog.outErrorDb("CreatureEventAI: Event %d attempt to set instance data64 without instance script. Creature %d", EventId, m_creature->GetEntry());
-                return;
-            }
-
-            pInst->SetData64(action.set_inst_data64.field, target->GetObjectGuid().GetRawValue());
-            break;
-        }
-        case ACTION_T_UPDATE_TEMPLATE:
-            if (m_creature->GetEntry() == action.update_template.creatureId)
-            {
-
-                sLog.outErrorDb("CreatureEventAI: Event %d ACTION_T_UPDATE_TEMPLATE call with param1 == current entry. Creature %d", EventId, m_creature->GetEntry());
-                return;
-            }
-
-            m_creature->UpdateEntry(action.update_template.creatureId, action.update_template.team ? HORDE : ALLIANCE);
-            break;
-        case ACTION_T_DIE:
-            if (m_creature->isDead())
-            {
-
-                sLog.outErrorDb("CreatureEventAI: Event %d ACTION_T_DIE on dead creature. Creature %d", EventId, m_creature->GetEntry());
-                return;
-            }
-            m_creature->DealDamage(m_creature, m_creature->GetMaxHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
-            break;
-        case ACTION_T_ZONE_COMBAT_PULSE:
-        {
-            m_creature->SetInCombatWithZone();
-            break;
-        }
-        case ACTION_T_CALL_FOR_HELP:
-        {
-            m_creature->CallForHelp((float)action.call_for_help.radius);
-            break;
-        }
-        case ACTION_T_SET_SHEATH:
-        {
-            m_creature->SetSheath(SheathState(action.set_sheath.sheath));
-            break;
-        }
-        case ACTION_T_FORCE_DESPAWN:
-        {
-            m_creature->ForcedDespawn(action.forced_despawn.msDelay);
-            break;
-        }
-        case ACTION_T_SET_INVINCIBILITY_HP_LEVEL:
-        {
-            if (action.invincibility_hp_level.is_percent)
-                m_InvinceabilityHpLevel = m_creature->GetMaxHealth() * action.invincibility_hp_level.hp_level / 100;
-            else
-                m_InvinceabilityHpLevel = action.invincibility_hp_level.hp_level;
-            break;
-        }
-        case ACTION_T_MOUNT_TO_ENTRY_OR_MODEL:
-        {
-            if (action.mount.creatureId || action.mount.modelId)
-            {
-                // set model based on entry from creature_template
-                if (action.mount.creatureId)
-                {
-                    if (CreatureInfo const* cInfo = ObjectMgr::GetCreatureTemplate(action.mount.creatureId))
-                    {
-                        uint32 display_id = Creature::ChooseDisplayId(cInfo);
-                        m_creature->Mount(display_id);
-                    }
-                }
-                //if no param1, then use value from param2 (modelId)
-                else
-                    m_creature->Mount(action.mount.modelId);
-            }
-            else
-                m_creature->Unmount();
-
-            break;
-        }
-        case ACTION_T_SET_GAME_EVENT:
-        {
-            uint32 event_id = action.set_game_event.eventId;
-            bool overwrite = (action.set_game_event.eventOverwrite > 0);
-            if (action.set_game_event.eventStart > 0)
-                sGameEventMgr.StartEvent(event_id, overwrite);
-            else
-                sGameEventMgr.StopEvent(event_id, overwrite);
-            break;
-        }
-        case ACTION_T_SET_STAND_STATE:
-        {
-            m_creature->SetStandState(action.setStandState.standState);
-            break;
-        }
-        case ACTION_T_CHANGE_MOVEMENT:
-        {
-            switch (action.changeMovement.movementType)
-            {
-                case IDLE_MOTION_TYPE:
-                    m_creature->GetMotionMaster()->MoveIdle();
-                    break;
-                case RANDOM_MOTION_TYPE:
-                    m_creature->GetMotionMaster()->MoveRandom();
-                    break;
-                case WAYPOINT_MOTION_TYPE:
-                    m_creature->GetMotionMaster()->MoveWaypoint();
-                    break;
-            }
-            break;
-        }
-        case ACTION_T_SET_VARIABLE:
-        {
-            sObjectMgr.SetSavedVariable(action.setVariable.variableEntry, action.setVariable.value, true);
-            break;
-        }
-        case ACTION_T_EVENT_SCRIPT:
-        {
-            m_creature->GetMap()->ScriptsStart(sEventScripts, action.eventScript.eventScriptId, m_creature, pActionInvoker ? pActionInvoker : m_creature);
-            break;
-        }
-        case ACTION_T_SET_SPELLS_TEMPLATE:
-        {
-            SetSpellsTemplate(action.setSpellsTemplate.spellsTemplateId);
-            break;
-        }
+        map->ScriptCommandStartDirect(x.second, m_creature, target);
     }
 }
 
@@ -923,7 +438,7 @@ void CreatureEventAI::JustRespawned()
 
     //Handle Spawned Events
     for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
-        if (SpawnedEventConditionsCheck((*i).Event))
+        if (i->Event.event_type == EVENT_T_SPAWNED)
             ProcessEvent(*i);
 }
 
@@ -1271,7 +786,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
         DoSpellTemplateCasts(diff);
 
     //Melee Auto-Attack
-    if (Combat && m_MeleeEnabled && m_creature->CanReachWithMeleeAttack(m_creature->getVictim()))
+    if (Combat)
         DoMeleeAttackIfReady();
 }
 
@@ -1303,26 +818,9 @@ inline int32 CreatureEventAI::GetRandActionParam(uint32 rnd, int32 param1, int32
     return 0;
 }
 
-inline Unit* CreatureEventAI::GetTargetByType(uint32 Target, Unit* pActionInvoker) const
+void CreatureEventAI::SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent)
 {
-    switch (Target)
-    {
-        case TARGET_T_SELF:
-            return m_creature;
-        case TARGET_T_HOSTILE:
-            return m_creature->getVictim();
-        case TARGET_T_HOSTILE_SECOND_AGGRO:
-            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
-        case TARGET_T_HOSTILE_LAST_AGGRO:
-            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0);
-        case TARGET_T_HOSTILE_RANDOM:
-            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-        case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
-            return m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
-        case TARGET_T_ACTION_INVOKER:
-            return pActionInvoker;
-    }
-    return nullptr;
+    m_InvinceabilityHpLevel = is_percent ? m_creature->GetMaxHealth() * hp_level / 100 : hp_level;
 }
 
 Unit* CreatureEventAI::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
@@ -1383,31 +881,4 @@ void CreatureEventAI::DamageTaken(Unit* /*done_by*/, uint32& damage)
         else
             damage = m_creature->GetHealth() - m_InvinceabilityHpLevel;
     }
-}
-
-bool CreatureEventAI::SpawnedEventConditionsCheck(CreatureEventAI_Event const& event)
-{
-    if (event.event_type != EVENT_T_SPAWNED)
-        return false;
-
-    switch (event.spawned.condition)
-    {
-        case SPAWNED_EVENT_ALWAY:
-            // always
-            return true;
-        case SPAWNED_EVENT_MAP:
-            // map ID check
-            return m_creature->GetMapId() == event.spawned.conditionValue1;
-        case SPAWNED_EVENT_ZONE:
-        {
-            // zone ID check
-            uint32 zone, area;
-            m_creature->GetZoneAndAreaId(zone, area);
-            return zone == event.spawned.conditionValue1 || area == event.spawned.conditionValue1;
-        }
-        default:
-            break;
-    }
-
-    return false;
 }

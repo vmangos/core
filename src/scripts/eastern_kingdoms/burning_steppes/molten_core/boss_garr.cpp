@@ -90,7 +90,7 @@ struct boss_garrAI : ScriptedAI
 
         std::ostringstream log;
 
-        CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CAST_TRIGGERED);
+        CanCastResult result = DoCastSpellIfCan(m_creature, SPELL_ENRAGE, CF_TRIGGERED);
 
         if (result == CAST_OK)
         {
@@ -192,8 +192,8 @@ struct mob_fireswornAI : ScriptedAI
 
     void Aggro(Unit* /*pWho*/) override
     {
-        DoCastSpellIfCan(m_creature, SPELL_THRASH, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
-        DoCastSpellIfCan(m_creature, SPELL_IMMOLATE, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_THRASH, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_IMMOLATE, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
 
         m_creature->SetInCombatWithZone();
     }

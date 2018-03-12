@@ -894,7 +894,7 @@ struct boss_thaddiusAI : public ScriptedAI
             switch (l_EventId)
             {
             case EVENT_SHIFT:
-                if (DoCastSpellIfCan(m_creature, SPELL_POLARITY_SHIFT, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_POLARITY_SHIFT, CF_INTERRUPT_PREVIOUS) == CAST_OK)
                 {
                     m_events.Repeat(30000);
                     m_events.ScheduleEvent(EVENT_POLARITY_CHANGE, 3000);

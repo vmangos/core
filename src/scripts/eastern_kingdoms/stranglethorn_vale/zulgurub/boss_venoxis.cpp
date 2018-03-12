@@ -273,7 +273,7 @@ struct boss_venoxisAI : public ScriptedAI
         // FRENZY
         if (!bFrenzy)
             if (m_creature->GetHealthPercent() < 20.0f)
-                if (DoCastSpellIfCan(m_creature, SPELL_FRENZY, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_FRENZY, CF_AURA_NOT_PRESENT) == CAST_OK)
                     bFrenzy = true;
 
         DoMeleeAttackIfReady();

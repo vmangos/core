@@ -123,7 +123,7 @@ void npc_demented_druidAI::UpdateAI(const uint32 uiDiff)
 
         if (target && !target->HasAura(SPELL_CURSE_OF_THORNS))
         {    
-            if (DoCastSpellIfCan(target, SPELL_CURSE_OF_THORNS, CAST_AURA_NOT_PRESENT) == CAST_OK)
+            if (DoCastSpellIfCan(target, SPELL_CURSE_OF_THORNS, CF_AURA_NOT_PRESENT) == CAST_OK)
                 m_uiCurseOfThornsTimer = urand(13000, 16000);
         }
     }
@@ -144,7 +144,7 @@ void npc_demented_druidAI::UpdateAI(const uint32 uiDiff)
     {
         Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER_NOT_GM | SELECT_FLAG_POWER_MANA);
 
-        if (target && DoCastSpellIfCan(target, SPELL_SILENCE, CAST_AURA_NOT_PRESENT) == CAST_OK)
+        if (target && DoCastSpellIfCan(target, SPELL_SILENCE, CF_AURA_NOT_PRESENT) == CAST_OK)
             m_uiSilenceTimer = urand(10000, 14000);
     }
     else 

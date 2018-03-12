@@ -67,7 +67,7 @@ bool ChatHandler::HandleReloadAllCommand(char* /*args*/)
     HandleReloadSkillFishingBaseLevelCommand((char*)"");
 
     HandleReloadAllAreaCommand((char*)"");
-    HandleReloadAllEventAICommand((char*)"");
+    HandleReloadEventAIEventsCommand((char*)"");
     HandleReloadAllLootCommand((char*)"");
     HandleReloadAllNpcCommand((char*)"");
     HandleReloadAllQuestCommand((char*)"");
@@ -141,13 +141,6 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
     HandleReloadCreatureSpellScriptsCommand((char*)"a");
     SendSysMessage("DB tables `*_scripts` reloaded.");
     sScriptMgr.CheckAllScriptTexts();
-    return true;
-}
-
-bool ChatHandler::HandleReloadAllEventAICommand(char* /*args*/)
-{
-    HandleReloadEventAISummonsCommand((char*)"a");
-    HandleReloadEventAIScriptsCommand((char*)"a");
     return true;
 }
 
@@ -698,19 +691,23 @@ bool ChatHandler::HandleReloadEventScriptsCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleReloadEventAISummonsCommand(char* /*args*/)
+// Do not add separate reload command for scripts!
+// EventAI events must be loaded right after.
+bool ChatHandler::HandleReloadEventAIEventsCommand(char* args)
 {
-    sLog.outString("Re-Loading Summons from `creature_ai_summons`...");
-    sEventAIMgr.LoadCreatureEventAI_Summons(true);
-    SendSysMessage("DB table `creature_ai_summons` reloaded.");
-    return true;
-}
+    sEventAIMgr.ClearEventData();
 
-bool ChatHandler::HandleReloadEventAIScriptsCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Scripts from `creature_ai_scripts`...");
-    sEventAIMgr.LoadCreatureEventAI_Scripts();
-    SendSysMessage("DB table `creature_ai_scripts` reloaded.");
+    if (*args != 'a')
+        sLog.outString("Re-Loading Scripts from `creature_ai_scripts`...");
+
+    sScriptMgr.LoadCreatureEventAIScripts();
+
+    if (*args != 'a')
+        SendSysMessage("DB table `creature_ai_scripts` reloaded.");
+
+    sLog.outString("Re-Loading Events from `creature_ai_events`...");
+    sEventAIMgr.LoadCreatureEventAI_Events();
+    SendSysMessage("DB table `creature_ai_events` reloaded.");
     return true;
 }
 

@@ -134,7 +134,7 @@ struct boss_huhuranAI : public ScriptedAI
             m_uiNoxiousPoisonTimer -= uiDiff;
 
         if (m_bBerserk)
-            DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT);
+            DoCastSpellIfCan(m_creature, SPELL_BERSERK, CF_AURA_NOT_PRESENT);
         else if (m_creature->GetHealthPercent() < 31.0f || m_uiBerserkTimer < uiDiff)
         {
             DoScriptText(EMOTE_GENERIC_BERSERK, m_creature);

@@ -95,7 +95,7 @@ struct boss_gehennasAI : public ScriptedAI
         //GehennasCurse_Timer
         if (GehennasCurse_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GEHENNASCURSE, CAST_AURA_NOT_PRESENT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GEHENNASCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
                 GehennasCurse_Timer = urand(22000, 30000);
         }
         else GehennasCurse_Timer -= diff;

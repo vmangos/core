@@ -27,7 +27,7 @@ struct npc_unstable_corpseAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/)
     {
-        DoCastSpellIfCan(m_creature, SPELL_DARK_PLAGUE_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);        
+        DoCastSpellIfCan(m_creature, SPELL_DARK_PLAGUE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
     }
 
     void JustDied(Unit* pKiller)
@@ -72,7 +72,7 @@ struct npc_reanimated_corpseAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/)
     {
-        DoCastSpellIfCan(m_creature, SPELL_DARK_PLAGUE_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);        
+        DoCastSpellIfCan(m_creature, SPELL_DARK_PLAGUE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
     }
 
     void Resurrect()
@@ -209,9 +209,9 @@ struct npc_spectral_tutorAI : public ScriptedAI
             // Image Projection
             if (m_uiImageTimer < uiDiff)
             {
-                if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_PROJECTION, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_PROJECTION, CF_INTERRUPT_PREVIOUS) == CAST_OK)
                 {
-                    DoCastSpellIfCan(m_creature, SPELL_IMAGE_PROJECTION, CAST_TRIGGERED);
+                    DoCastSpellIfCan(m_creature, SPELL_IMAGE_PROJECTION, CF_TRIGGERED);
                     m_uiImageTimer = urand(17700, 25300);
                     m_uiHideTimer = 5800;
                     m_isProjection = true;
@@ -227,7 +227,7 @@ struct npc_spectral_tutorAI : public ScriptedAI
             {
                 if (!m_creature->HasAura(SPELL_IMAGE_PROJECTION))
                 {
-                    if (DoCastSpellIfCan(m_creature, SPELL_PROJECTION_LEECH, CAST_TRIGGERED | CAST_INTERRUPT_PREVIOUS) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature, SPELL_PROJECTION_LEECH, CF_TRIGGERED | CF_INTERRUPT_PREVIOUS) == CAST_OK)
                     {
                         m_isProjection = false;
                         return;

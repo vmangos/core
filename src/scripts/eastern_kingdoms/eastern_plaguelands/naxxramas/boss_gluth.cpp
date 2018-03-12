@@ -159,7 +159,7 @@ struct boss_gluthAI : public ScriptedAI
                 Player* pPlayer = (*it).getSource();
                 if (!pPlayer) continue;
                 if (pPlayer->isDead()) continue;
-                DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CAST_TRIGGERED);
+                DoCastSpellIfCan(pPlayer, SPELL_DECIMATE_OTHER, CF_TRIGGERED);
             }
         }
     }
@@ -338,7 +338,7 @@ struct mob_zombieChow : public ScriptedAI
         {
             if (ChaseGluth())
             {
-                DoCastSpellIfCan(m_creature, SPELL_DECIMATE_OTHER, CAST_TRIGGERED);
+                DoCastSpellIfCan(m_creature, SPELL_DECIMATE_OTHER, CF_TRIGGERED);
                 isHitByDecimate = true;
             }
         }

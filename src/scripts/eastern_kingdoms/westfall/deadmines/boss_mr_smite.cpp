@@ -75,7 +75,7 @@ struct boss_mr_smiteAI : public ScriptedAI
         m_uiSlamTimer = 9000;
         m_uiThrashTimer = 4000;
 
-        //DoCastSpellIfCan(m_creature, SPELL_NIBLE_REFLEXES, CAST_TRIGGERED);//in creature_addon now
+        //DoCastSpellIfCan(m_creature, SPELL_NIBLE_REFLEXES, CF_TRIGGERED);//in creature_addon now
 
 
         m_creature->LoadEquipment(31000, 0);

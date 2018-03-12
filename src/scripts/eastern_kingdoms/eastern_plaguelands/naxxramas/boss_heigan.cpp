@@ -295,7 +295,7 @@ struct boss_heiganAI : public ScriptedAI
     {
         portedPlayersThisPhase.clear();
 
-        if (DoCastSpellIfCan(m_creature, SPELL_TELEPORT_SELF, CAST_TRIGGERED) != CAST_OK)
+        if (DoCastSpellIfCan(m_creature, SPELL_TELEPORT_SELF, CF_TRIGGERED) != CAST_OK)
         {
             return;
         }

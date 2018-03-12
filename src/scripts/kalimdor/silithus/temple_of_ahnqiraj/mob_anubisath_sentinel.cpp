@@ -310,7 +310,7 @@ struct aqsentinelAI : public ScriptedAI
             if (sent->isDead())
                 continue;
             m_bAlone = false;
-            DoCastSpellIfCan(sent, SPELL_TRANSFER, CAST_TRIGGERED);
+            DoCastSpellIfCan(sent, SPELL_TRANSFER, CF_TRIGGERED);
             uint32 h = sent->GetHealth() + (sent->GetMaxHealth() / 2);
             if (h > sent->GetMaxHealth())
                 h = sent->GetMaxHealth();

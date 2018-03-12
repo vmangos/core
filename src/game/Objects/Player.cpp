@@ -409,7 +409,8 @@ UpdateMask Player::updateVisualBits;
 Player::Player(WorldSession *session) : Unit(),
     m_mover(this), m_camera(this), m_reputationMgr(this),
     m_enableInstanceSwitch(true), m_currentTicketCounter(0),
-    m_honorMgr(this), m_bNextRelocationsIgnored(0)
+    m_honorMgr(this), m_bNextRelocationsIgnored(0),
+    m_pendingInstanceSwitch(false)
 {
     m_objectType |= TYPEMASK_PLAYER;
     m_objectTypeId = TYPEID_PLAYER;
@@ -1151,6 +1152,20 @@ void Player::SetDrunkValue(uint16 newDrunkenValue, uint32 itemId)
         m_detectInvisibilityMask &= ~(1 << 6);
 }
 
+// Used to update attacker creatures (including pets' attackers) combat status when a player switches map
+struct UpdateAttackersCombatHelper
+{
+    explicit UpdateAttackersCombatHelper(Player* _player) : player(_player) {}
+    void operator()(Unit* unit) const
+    {
+        for (Unit* attacker : unit->getAttackers())
+            if (Creature* creature = attacker->ToCreature())
+                if (attacker->getVictim() == unit)
+                    creature->SelectHostileTarget();
+    }
+    Player* player;
+};
+
 void Player::Update(uint32 update_diff, uint32 p_time)
 {
     if (!IsInWorld())
@@ -1359,7 +1374,14 @@ void Player::Update(uint32 update_diff, uint32 p_time)
         uint16 newInstanceId = sMapMgr.GetContinentInstanceId(GetMap()->GetId(), GetPositionX(), GetPositionY(), &transition);
         if (newInstanceId != GetInstanceId())
             if (!transition || !isInCombat())
+            {
                 sMapMgr.ScheduleInstanceSwitch(this, newInstanceId);
+
+                // Update attacker creatures combat status if needed
+                UpdateAttackersCombatHelper helper(this);
+                helper(this);
+                CallForAllControlledUnits(helper, CONTROLLED_PET | CONTROLLED_TOTEMS | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
+            }
     }
     if (IsInWorld())
     {
@@ -1778,18 +1800,20 @@ bool Player::SwitchInstance(uint32 newInstanceId)
 
     Map* oldmap = GetMap();
 
-    // Leave transport
-    if (m_transport)
+    // Leave transport if absent from new instance
+    // normally it should have switched before the player
+    if (m_transport && m_transport->GetInstanceId() != newInstanceId)
     {
         m_transport->RemovePassenger(this);
         m_movementInfo.ClearTransportData();
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_ONTRANSPORT);
     }
     // Stop duel
     if (duel)
         if (GameObject* obj = GetMap()->GetGameObject(GetGuidValue(PLAYER_DUEL_ARBITER)))
             DuelComplete(DUEL_FLED);
     // Fix movement flags
-    m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN | MOVEFLAG_ONTRANSPORT);
+    m_movementInfo.RemoveMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN);
 
     SetSelectionGuid(ObjectGuid());
     CombatStop();
@@ -1970,6 +1994,11 @@ bool Player::TeleportTo(uint32 mapid, float x, float y, float z, float orientati
         ScheduledTeleportData *data = new ScheduledTeleportData(mapid, x, y, z, orientation, options, recover);
 
         sMapMgr.ScheduleFarTeleport(this, data);
+
+        // Update attacker creatures combat status if needed
+        UpdateAttackersCombatHelper helper(this);
+        helper(this);
+        CallForAllControlledUnits(helper, CONTROLLED_PET | CONTROLLED_TOTEMS | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
     }
     return true;
 }
@@ -12701,7 +12730,8 @@ void Player::AddQuest(Quest const *pQuest, Object *questGiver)
 
         // starting initial DB quest script
         if (pQuest->GetQuestStartScript() != 0)
-            GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), questGiver, this);
+            if (WorldObject* pQuestGiver = questGiver->ToWorldObject())
+                GetMap()->ScriptsStart(sQuestStartScripts, pQuest->GetQuestStartScript(), pQuestGiver, this);
 
     }
 

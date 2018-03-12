@@ -228,7 +228,7 @@ struct boss_skeramAI : public ScriptedAI
             // Get closest target
             if (Player* target = GetNearestPlayer(40.0f))
             {
-                if (DoCastSpellIfCan(target, SPELL_TRUE_FULFILLMENT, CAST_AURA_NOT_PRESENT) == CAST_OK)
+                if (DoCastSpellIfCan(target, SPELL_TRUE_FULFILLMENT, CF_AURA_NOT_PRESENT) == CAST_OK)
                 {
                     // Cancel buffs on previous victim
                     CancelFulfillment();

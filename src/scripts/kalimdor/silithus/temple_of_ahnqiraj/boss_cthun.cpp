@@ -150,7 +150,7 @@ public:
             Unit* target = targetSelectFunc(m_creature);
             bool didCast = false;
             if (target) {
-                if(m_creature->AI()->DoCastSpellIfCan(target, spellID, triggered ? CAST_TRIGGERED : 0) == CAST_OK) {
+                if(m_creature->AI()->DoCastSpellIfCan(target, spellID, triggered ? CF_TRIGGERED : 0) == CAST_OK) {
                     didCast = true;
                 }
             }
@@ -565,7 +565,7 @@ public:
             if (birthTimer > diff) {
                 // Only want to cast it once, and it cant be done in ctor because groundRupture interrupts the animation.
                 if (birthTimer == TENTACLE_BIRTH_DURATION) {
-                    DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH, CAST_FORCE_TARGET_SELF);
+                    DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH, CF_TARGET_CASTS_ON_SELF);
                 }
                 birthTimer -= diff;
             }

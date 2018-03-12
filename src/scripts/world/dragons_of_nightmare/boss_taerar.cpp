@@ -63,9 +63,9 @@ bool boss_taerarAI::DoSpecialAbility()
 {
     if (DoCastSpellIfCan(m_creature, SPELL_SELF_STUN) == CAST_OK)
     {
-        DoCastSpellIfCan(m_creature, SPELL_SHADE_OF_TAERAR_LEFT,  CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_SHADE_OF_TAERAR_RIGHT, CAST_TRIGGERED);
-        DoCastSpellIfCan(m_creature, SPELL_SHADE_OF_TAERAR_FRONT, CAST_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SHADE_OF_TAERAR_LEFT,  CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SHADE_OF_TAERAR_RIGHT, CF_TRIGGERED);
+        DoCastSpellIfCan(m_creature, SPELL_SHADE_OF_TAERAR_FRONT, CF_TRIGGERED);
 
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 

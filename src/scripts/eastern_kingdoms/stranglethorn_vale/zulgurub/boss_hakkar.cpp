@@ -213,7 +213,7 @@ struct boss_hakkarAI : public ScriptedAI
         // if ((Berserk_Timer < diff) || (m_creature->GetHealthPercent() < 5.0f))
         if (Berserk_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK, CAST_AURA_NOT_PRESENT) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_BERSERK, CF_AURA_NOT_PRESENT) == CAST_OK)
                 Berserk_Timer = 2000;
         }
         else

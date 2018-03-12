@@ -89,7 +89,7 @@ struct boss_shazzrahAI : public ScriptedAI
         //ShazzrahCurse_Timer
         if (ShazzrahCurse_Timer < diff)
         {
-			if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHAZZRAHCURSE, CAST_AURA_NOT_PRESENT) == CAST_OK)
+			if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHAZZRAHCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
 				ShazzrahCurse_Timer = 20000;
         }
         else ShazzrahCurse_Timer -= diff;
@@ -114,7 +114,7 @@ struct boss_shazzrahAI : public ScriptedAI
         if (Blink_Timer < diff)
         {
             // Teleporting him to a random gamer and casting Arcane Explosion after that.
-            if (DoCastSpellIfCan(m_creature, SPELL_GATE_DUMMY, CAST_TRIGGERED) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_GATE_DUMMY, CF_TRIGGERED) == CAST_OK)
             {
                 // manual, until added effect of dummy properly
                 if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))

@@ -12,7 +12,6 @@
 
 ScriptedAI::ScriptedAI(Creature* pCreature) : CreatureAI(pCreature),
     me(pCreature),
-    m_bCombatMovement(true),
     m_uiEvadeCheckCooldown(2500),
     m_uiHomeArea(m_creature->GetAreaId())
 {
@@ -56,7 +55,7 @@ void ScriptedAI::AttackStart(Unit* pWho)
         m_creature->SetInCombatWith(pWho);
         pWho->SetInCombatWith(m_creature);
 
-        if (IsCombatMovement())
+        if (m_CombatMovementEnabled)
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
     else
@@ -357,11 +356,6 @@ void ScriptedAI::SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand, int32 ui
 
     if (uiRanged >= 0)
         m_creature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY + 2, uint32(uiRanged));
-}
-
-void ScriptedAI::SetCombatMovement(bool bCombatMove)
-{
-    m_bCombatMovement = bCombatMove;
 }
 
 // Hacklike storage used for misc creatures that are expected to evade of outside of a certain area.

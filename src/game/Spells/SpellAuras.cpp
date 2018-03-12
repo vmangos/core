@@ -7258,7 +7258,7 @@ int Aura::CheckExclusiveWith(Aura const* other) const
         return 2;
     else if (other->GetModifier()->m_amount < GetModifier()->m_amount && GetModifier()->m_amount < 0)
         return 2;
-    
+
     return 1;
 }
 

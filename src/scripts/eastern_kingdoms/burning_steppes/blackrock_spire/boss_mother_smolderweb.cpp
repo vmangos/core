@@ -49,7 +49,7 @@ struct boss_mothersmolderwebAI : public ScriptedAI
     void DamageTaken(Unit* pDoneBy, uint32 &uiDamage)
     {
         if (m_creature->GetHealth() <= uiDamage)
-            DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIRE_SPIDERLING, CAST_TRIGGERED);
+            DoCastSpellIfCan(m_creature, SPELL_SUMMON_SPIRE_SPIDERLING, CF_TRIGGERED);
     }
 
     void UpdateAI(const uint32 uiDiff)

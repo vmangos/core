@@ -191,8 +191,8 @@ struct boss_ragnarosAI : ScriptedAI
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
         m_creature->SetInCombatWithZone();
-        DoCastSpellIfCan(m_creature, SPELL_MELT_WEAPON_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT | CAST_FORCE_TARGET_SELF);        
-        DoCastSpellIfCan(m_creature, SPELL_ELEMENTAL_FIRE_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_MELT_WEAPON_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT | CF_TARGET_CASTS_ON_SELF);        
+        DoCastSpellIfCan(m_creature, SPELL_ELEMENTAL_FIRE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 
     void SpellHitTarget(Unit* pTarget, const SpellEntry* pSpell) override
@@ -448,7 +448,7 @@ struct boss_ragnarosAI : ScriptedAI
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
             m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
 
-            if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, CAST_INTERRUPT_PREVIOUS) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_SUBMERGE_VISUAL, CF_INTERRUPT_PREVIOUS) == CAST_OK)
             {
                 //Root self
                 DoCastSpellIfCan(m_creature, 23973);

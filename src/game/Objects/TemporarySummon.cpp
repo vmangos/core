@@ -200,19 +200,20 @@ void TemporarySummon::Update(uint32 update_diff,  uint32 diff)
             break;
     }
 
-    /* Potential hack to force updates at target index if it is not networked normally
-    if (isAlive() && isInCombat() && m_forceTargetUpdateTimer)
+    if (isAlive() && isInCombat())
     {
         if (m_forceTargetUpdateTimer <= diff)
         {
-            m_forceTargetUpdateTimer = 0;
-            // 64bit value, so it fills two indexes in the 32bit value mapping
+            m_forceTargetUpdateTimer = 3000;
             ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
-            ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET+1)
         }
         else
             m_forceTargetUpdateTimer -= diff;
-    }*/
+    }
+    else {
+        m_forceTargetUpdateTimer = 1000;
+    }
+
     Creature::Update(update_diff, diff);
 }
 

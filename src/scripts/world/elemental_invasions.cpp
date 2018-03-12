@@ -214,7 +214,7 @@ struct npc_invaderAI : ScriptedAI
         case EVENT_IND_FIRE:
             if (m_uiShieldTimer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature, SPELL_FIRE_SHIELD, CAST_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_FIRE_SHIELD, CF_AURA_NOT_PRESENT);
                 m_uiShieldTimer = urand(6000, 8000);
             }
             else
@@ -235,7 +235,7 @@ struct npc_invaderAI : ScriptedAI
         case EVENT_IND_AIR:
             if (m_uiShieldTimer < uiDiff)
             {
-                DoCastSpellIfCan(m_creature, SPELL_LIGHTN_SHIELD, CAST_AURA_NOT_PRESENT);
+                DoCastSpellIfCan(m_creature, SPELL_LIGHTN_SHIELD, CF_AURA_NOT_PRESENT);
                 m_uiShieldTimer = urand(10000, 12000);
             }
             else

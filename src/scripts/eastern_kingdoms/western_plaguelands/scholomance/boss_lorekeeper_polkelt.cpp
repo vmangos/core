@@ -50,7 +50,7 @@ struct boss_lorekeeperpolkeltAI : public ScriptedAI
 
     void Aggro(Unit* /*pWho*/)
     {
-        DoCastSpellIfCan(m_creature, SPELL_DARKPLAGUE_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);        
+        DoCastSpellIfCan(m_creature, SPELL_DARKPLAGUE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
     }
     
     void JustDied(Unit *killer)

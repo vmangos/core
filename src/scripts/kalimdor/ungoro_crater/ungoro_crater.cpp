@@ -745,7 +745,7 @@ struct npc_simone_seductressAI : public ScriptedAI
     {
         if (pSpell && pSpell->Id == 14280)   // Viper Sting (Rank 3)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_SILENCE, CAST_TRIGGERED) == CAST_OK)
+            if (DoCastSpellIfCan(m_creature, SPELL_SILENCE, CF_TRIGGERED) == CAST_OK)
                 DoScriptText(EMOTE_SILENCE, m_creature);
         }
     }

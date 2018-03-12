@@ -735,7 +735,7 @@ struct npc_keeper_remulosAI : public npc_escortAI
 
             if (m_uiHealTimer < uiDiff)
             {
-                if (Unit* pTarget = DoSelectLowestHpFriendly(DEFAULT_VISIBILITY_DISTANCE))
+                if (Unit* pTarget = m_creature->DoSelectLowestHpFriendly(DEFAULT_VISIBILITY_DISTANCE))
                 {
                     switch (urand(0, 2))
                     {

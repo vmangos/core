@@ -363,7 +363,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     if (m_uiSpellTimers[3] < uiDiff) 
     {
         Unit* pTarget = NULL;
-        if (pTarget = DoSelectLowestHpFriendly(40.0f, 15000));
+        if (pTarget = m_creature->DoSelectLowestHpFriendly(40.0f, 15000));
         else if  (m_creature->GetHealthPercent() < 50.0f)
             pTarget = m_creature;
 
@@ -423,7 +423,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     if (m_uiSpellTimers[3] < uiDiff) 
     {
         Unit* pTarget = NULL;
-        if (pTarget = DoSelectLowestHpFriendly(40.0f, 15000));
+        if (pTarget = m_creature->DoSelectLowestHpFriendly(40.0f, 15000));
         else if  (m_creature->GetHealthPercent() < 50.0f)
             pTarget = m_creature;
 
@@ -446,7 +446,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     // Power Word Shield
     if (m_uiSpellTimers[1] < uiDiff)
     {
-        if (Unit* pTarget = DoSelectLowestHpFriendly(40.0f))
+        if (Unit* pTarget = m_creature->DoSelectLowestHpFriendly(40.0f))
         {
             if (DoCastSpellIfCan(pTarget, SPELL_POWER_WORD_SHIELD) == CAST_OK)
                 m_uiSpellTimers[1] = urand(17000, 22000);

@@ -602,7 +602,7 @@ struct mob_zealot_lorkhanAI : public zg_rez_add
                 if (DoCastSpellIfCan(m_creature, SPELL_GREATERHEAL) == CAST_OK)
                     GreaterHeal_Timer = 12000;
             }
-            else if (Unit* pTarget = DoSelectLowestHpFriendly(100.0f, 9500))
+            else if (Unit* pTarget = m_creature->DoSelectLowestHpFriendly(100.0f, 9500))
             {
                 if (DoCastSpellIfCan(pTarget, SPELL_GREATERHEAL) == CAST_OK)
                     GreaterHeal_Timer = 12000;

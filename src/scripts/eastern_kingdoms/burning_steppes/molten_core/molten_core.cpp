@@ -366,7 +366,7 @@ struct mob_core_houndAI : public ScriptedAI
                 if (m_bResurrectionOkay)
                 {
                     ResurrectSelf();
-                    DoCastSpellIfCan(m_creature, SPELL_FIRE_NOVA_VISUAL, CAST_TRIGGERED);
+                    DoCastSpellIfCan(m_creature, SPELL_FIRE_NOVA_VISUAL, CF_TRIGGERED);
                     m_creature->MonsterTextEmote("Core Hound reignites from the heat of another Core Hound!");
                 }
                 else
@@ -430,7 +430,7 @@ struct mob_firelordAI : public ScriptedAI
 
     void Aggro(Unit* pWho) override
     {
-        DoCastSpellIfCan(m_creature, SPELL_INCINERATE_AURA, CAST_TRIGGERED | CAST_AURA_NOT_PRESENT);
+        DoCastSpellIfCan(m_creature, SPELL_INCINERATE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
     
     void JustSummoned(Creature* pSummoned) override
@@ -457,7 +457,7 @@ struct mob_firelordAI : public ScriptedAI
         {
             if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
             {
-                if (DoCastSpellIfCan(pTarget, SPELL_SOULBURN, CAST_TRIGGERED) == CAST_OK)
+                if (DoCastSpellIfCan(pTarget, SPELL_SOULBURN, CF_TRIGGERED) == CAST_OK)
                     m_uiSoulBurnTimer = urand(3000, 4000);
             }
         }

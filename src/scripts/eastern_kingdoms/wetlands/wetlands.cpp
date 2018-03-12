@@ -102,7 +102,7 @@ public:
         // slowing poison timer
         if (m_slowingPoisonTimer < uiDiff)
         {
-            CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLOWING_POISON, CAST_AURA_NOT_PRESENT);
+            CanCastResult castResult = DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLOWING_POISON, CF_AURA_NOT_PRESENT);
             if (castResult == CAST_OK)
                 m_slowingPoisonTimer = urand(8400, 15300);
         }

@@ -78,7 +78,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_PLAYER,      //  29
     CONDITION_REQ_TARGET_PLAYER,      //  30
     CONDITION_REQ_SOURCE_WORLDOBJECT, //  31
-    CONDITION_REQ_SOURCE_CREATURE,    //  32 
+    CONDITION_REQ_SOURCE_CREATURE,    //  32
+    CONDITION_REQ_MAP_OR_WORLDOBJECT, //  33
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -435,6 +436,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                 case 2:
                     return m_value1 > lastReachedWp;
             }
+            return false;
+        }
+        case CONDITION_MAP_ID:
+        {
+            uint32 mapId = map ? map->GetId() : (source ? source->GetMapId() : target->GetMapId());
+
+            if (mapId == m_value1)
+                return true;
+
             return false;
         }
     }
@@ -922,6 +932,15 @@ bool ConditionEntry::IsValid()
             if (m_value2 < 0 || m_value2 > 2)
             {
                 sLog.outErrorDb("War Effort stage condition (entry %u, type %u) has invalid equality %u", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_MAP_ID:
+        {
+            if (!sMapStorage.LookupEntry<MapEntry>(m_value1))
+            {
+                sLog.outErrorDb("Current map condition (entry %u, type %u) has invalid Map ID %u", m_entry, m_condition, m_value1);
                 return false;
             }
             break;

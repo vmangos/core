@@ -57,7 +57,8 @@ ReactorAI::AttackStart(Unit *p)
         m_creature->SetInCombatWith(p);
         p->SetInCombatWith(m_creature);
 
-        m_creature->GetMotionMaster()->MoveChase(p);
+        if (m_CombatMovementEnabled)
+            m_creature->GetMotionMaster()->MoveChase(p);
     }
 }
 
