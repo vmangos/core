@@ -867,8 +867,23 @@ void Object::SetUInt64Value(uint16 index, const uint64 &value)
     MANGOS_ASSERT(index + 1 < m_valuesCount || PrintIndexError(index, true));
     if (*((uint64*) & (m_uint32Values[ index ])) != value)
     {
-        m_uint32Values[ index ] = *((uint32*)&value);
-        m_uint32Values[ index + 1 ] = *(((uint32*)&value) + 1);
+        uint32 first = m_uint32Values[index] = *((uint32*)&value);
+        uint32 second = m_uint32Values[index + 1] = *(((uint32*)&value) + 1);
+
+        // Force an update at both mirrored values, even if only one index was changed
+        // If we don't update the second index, it may become perpetually stuck and
+        // lead to weird client behaviour such as not displaying a target (only the
+        // first part is networked). This is typically only an issue for units which
+        // have these values set at create time, as the client will ignore unpacked
+        // 64bit values that arent fully networked in the create stage, yet accept
+        // them in the update stage (presumably it defaults to 0 for both bytes if
+        // not present, making it "OK" if we only send one in the future).
+        // Note that this behaviour is inconsistent as well, sometimes it works
+        // with only one part whereas other times it does not. It appears to be
+        // related to the number of (player) units in the vicinity.
+        // The first update will correct any malformed 64bit data.
+        m_uint32Values_mirror[index] = first + 1;
+        m_uint32Values_mirror[index + 1] = second + 1;
         MarkForClientUpdate();
     }
 }
