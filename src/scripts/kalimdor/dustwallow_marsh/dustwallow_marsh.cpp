@@ -24,7 +24,6 @@ EndScriptData */
 /* ContentData
 npc_lady_jaina_proudmoore
 npc_morokk
-npc_nat_pagle
 npc_ogron
 npc_private_hendel
 npc_cassa_crimsonwing
@@ -148,38 +147,6 @@ bool QuestAccept_npc_morokk(Player* pPlayer, Creature* pCreature, const Quest* p
     }
 
     return false;
-}
-/*######
-## npc_nat_pagle
-######*/
-
-enum
-{
-    QUEST_NATS_MEASURING_TAPE = 8227
-};
-
-bool GossipHello_npc_nat_pagle(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pCreature->isVendor() && pPlayer->GetQuestRewardStatus(QUEST_NATS_MEASURING_TAPE))
-    {
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-        pPlayer->SEND_GOSSIP_MENU(7640, pCreature->GetGUID());
-    }
-    else
-        pPlayer->SEND_GOSSIP_MENU(7638, pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_nat_pagle(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_TRADE)
-        pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-
-    return true;
 }
 
 /*######
@@ -1982,12 +1949,6 @@ void AddSC_dustwallow_marsh()
     newscript->Name = "npc_morokk";
     newscript->GetAI = &GetAI_npc_morokk;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_morokk;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_nat_pagle";
-    newscript->pGossipHello = &GossipHello_npc_nat_pagle;
-    newscript->pGossipSelect = &GossipSelect_npc_nat_pagle;
     newscript->RegisterSelf();
 
     newscript = new Script;
