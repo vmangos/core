@@ -894,6 +894,51 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                     sLog.outErrorDb("Table `%s` has datalong = %u for a non-existing game event in SCRIPT_COMMAND_GAME_EVENT for script id %u.", tablename, tmp.gameEvent.eventId, tmp.id);
                     continue;
                 }
+                break;
+            }
+            case SCRIPT_COMMAND_CREATURE_SPELLS:
+            {
+                if (100 < (tmp.creatureSpells.chance[0] + tmp.creatureSpells.chance[1] + tmp.creatureSpells.chance[2] + tmp.creatureSpells.chance[3]))
+                {
+                    sLog.outErrorDb("Table `%s` has a total chance exceeding 100%% in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, tmp.id);
+                    continue;
+                }
+                bool abort = false;
+                for (uint8 i = 0; i < 4; i++)
+                {
+                    if (tmp.creatureSpells.chance[i] < 0)
+                    {
+                        abort = true;
+                        sLog.outErrorDb("Table `%s` has dataint%u with negative chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.id);
+                        break;
+                    }
+                    else if (!tmp.creatureSpells.spells_template[i] && (tmp.creatureSpells.chance[i] > 0))
+                    {
+                        abort = true;
+                        sLog.outErrorDb("Table `%s` has dataint%u=%i but no provided creature spells id in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.chance[i], tmp.id);
+                        break;
+                    }
+                    else if (tmp.creatureSpells.spells_template[i])
+                    {
+                        if (!sObjectMgr.GetCreatureSpellsTemplate(tmp.creatureSpells.spells_template[i]))
+                        {
+                            abort = true;
+                            sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spells_template[i], tmp.id);
+                            break;
+                        }
+                        if (!tmp.creatureSpells.chance[i])
+                        {
+                            abort = true;
+                            sLog.outErrorDb("Table `%s` has datalong%u=%u with 0%% chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spells_template[i], tmp.id);
+                            break;
+                        }
+                    }
+                }
+
+                if (abort)
+                    continue;
+
+                break;
             }
         }
 

@@ -703,6 +703,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_Invincibility(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_GameEvent(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_ServerVariable(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -762,6 +763,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_Invincibility,          // 52
             &Map::ScriptCommand_GameEvent,              // 53
             &Map::ScriptCommand_ServerVariable,         // 54
+            &Map::ScriptCommand_CreatureSpells,         // 55
         };
 
     public:

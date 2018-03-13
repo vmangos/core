@@ -1483,3 +1483,44 @@ bool Map::ScriptCommand_ServerVariable(const ScriptInfo& script, WorldObject* so
 
     return false;
 }
+
+// SCRIPT_COMMAND_CREATURE_SPELLS (55)
+bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_CREATURE_SPELLS (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    const uint32 roll = urand(1, 100);
+    uint32 sum = 0;
+    uint32 chosenId = 0;
+
+    for (int i = 0; i < 4; i++)
+    {
+        const uint32 currentId = script.creatureSpells.spells_template[i];
+
+        if (!currentId)
+            continue;
+
+        const uint32 currentChance = script.creatureSpells.chance[i];
+
+        if ((roll > sum) && (roll <= (sum + currentChance)))
+        {
+            chosenId = currentId;
+            break;
+        }
+
+        sum += currentChance;
+    }
+
+    if (chosenId && pSource->AI())
+        pSource->AI()->SetSpellsTemplate(chosenId);
+    else
+        return ShouldAbortScript(script);
+
+    return false;
+}
