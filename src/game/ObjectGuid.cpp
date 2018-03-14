@@ -72,6 +72,11 @@ std::string ObjectGuid::GetString() const
     return str.str();
 }
 
+void ObjectGuid::Set(uint64 const& guid)
+{
+    m_guid = guid;
+}
+
 template<HighGuid high>
 uint32 ObjectGuidGenerator<high>::Generate()
 {
@@ -111,7 +116,9 @@ ByteBuffer& operator<< (ByteBuffer& buf, ObjectGuid const& guid)
 
 ByteBuffer &operator>>(ByteBuffer& buf, ObjectGuid& guid)
 {
-    guid.Set(buf.read<uint64>());
+    uint64 value = buf.read<uint64>();
+    ObjectGuid::ClampPlayerGuid(value);
+    guid.Set(value);
     return buf;
 }
 
@@ -123,8 +130,22 @@ ByteBuffer& operator<< (ByteBuffer& buf, PackedGuid const& guid)
 
 ByteBuffer &operator>>(ByteBuffer& buf, PackedGuidReader const& guid)
 {
-    guid.m_guidPtr->Set(buf.readPackGUID());
+    uint64 value = buf.readPackGUID();
+    ObjectGuid::ClampPlayerGuid(value);
+    guid.m_guidPtr->Set(value);
     return buf;
+}
+
+// If the GUID is a player GUID, clamp it to the low guid or we open
+// ourselves to packet manipulation where a player can send their low
+// guid with a mutple of 0xFFFFFFFF+1 added to it, causing hashing to
+// fail but some other functionality to succeed
+void ObjectGuid::ClampPlayerGuid(uint64& value)
+{
+    if (ObjectGuid::GetHigh(value) == HIGHGUID_PLAYER)
+    {
+        value = static_cast<uint64>(GetCounter(value, HasEntry(HIGHGUID_PLAYER)));
+    }
 }
 
 template class ObjectGuidGenerator<HIGHGUID_ITEM>;
