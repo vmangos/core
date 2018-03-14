@@ -141,19 +141,26 @@ class MANGOS_DLL_SPEC ObjectGuid
     public:                                                 // modifiers
         PackedGuidReader ReadAsPacked() { return PackedGuidReader(*this); }
 
-        void Set(uint64 const& guid) { m_guid = guid; }
+        void Set(uint64 const& guid);
         void Clear() { m_guid = 0; }
 
         PackedGuid WriteAsPacked() const;
     public:                                                 // accessors
         uint64 const& GetRawValue() const { return m_guid; }
-        HighGuid GetHigh() const { return HighGuid((m_guid >> 48) & 0x0000FFFF); }
+        static HighGuid GetHigh(uint64 guid) { return HighGuid((guid >> 48) & 0x0000FFFF); }
+        static void ClampPlayerGuid(uint64& value);
+        HighGuid GetHigh() const { return GetHigh(m_guid); }
         uint32   GetEntry() const { return HasEntry() ? uint32((m_guid >> 24) & UI64LIT(0x0000000000FFFFFF)) : 0; }
         uint32   GetCounter()  const
         {
-            return HasEntry()
-                ? uint32(m_guid & UI64LIT(0x0000000000FFFFFF))
-                : uint32(m_guid & UI64LIT(0x00000000FFFFFFFF));
+            return GetCounter(m_guid, HasEntry());
+        }
+
+        static uint32 GetCounter(uint64 guid, bool hasEntry)
+        {
+            return hasEntry
+                ? uint32(guid & UI64LIT(0x0000000000FFFFFF))
+                : uint32(guid & UI64LIT(0x00000000FFFFFFFF));
         }
 
         static uint32 GetMaxCounter(HighGuid high)
