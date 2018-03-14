@@ -1247,8 +1247,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                         m_caster->CastSpell(m_caster, 23444, true);
                     else if (r < 100)                       // Evil Twin               - 4/6 evil twin
                         m_caster->CastSpell(m_caster, 23445, true);
-                    else                                    // Transporter Malfunction - 1/6 miss the target
-                        m_caster->CastSpell(m_caster, 36902, true);
 
                     return;
                 }
