@@ -2303,6 +2303,9 @@ bool Map::FindScriptInitialTargets(WorldObject*& source, WorldObject*& target, c
 
 bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, const ScriptInfo& script)
 {
+    // Used when searching for nearby object as target.
+    WorldObject* original_source = source;
+
     // we swap target and source if data_flags & 0x1
     if (script.raw.data[4] & SF_GENERAL_SWAP_INITIAL_TARGETS)
         std::swap(source, target);
@@ -2314,7 +2317,9 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
         {
             case TARGET_T_CREATURE_WITH_ENTRY:
             {
-                if (!source)
+                WorldObject* pSearcher;
+
+                if (!((pSearcher = source) || (pSearcher = original_source)))
                 {
                     sLog.outError("FindScriptTargets: Attempt to search for nearby creature in script with id %u but source is a NULL object.", script.id);
                     return false;
@@ -2322,10 +2327,10 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
 
                 Creature* pCreatureBuddy = nullptr;
 
-                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*source, script.target_param1, true, script.target_param2);
+                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*pSearcher, script.target_param1, true, script.target_param2);
                 MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(pCreatureBuddy, u_check);
 
-                Cell::VisitGridObjects(source, searcher, script.target_param2);
+                Cell::VisitGridObjects(pSearcher, searcher, script.target_param2);
 
                 if (pCreatureBuddy)
                     target = pCreatureBuddy;
@@ -2372,7 +2377,9 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
             }
             case TARGET_T_GAMEOBJECT_WITH_ENTRY:
             {
-                if (!source)
+                WorldObject* pSearcher;
+
+                if (!((pSearcher = source) || (pSearcher = original_source)))
                 {
                     sLog.outError("FindScriptTargets: Attempt to search for nearby gameobject in script with id %u but source is a NULL object.", script.id);
                     return false;
@@ -2380,10 +2387,10 @@ bool Map::FindScriptFinalTargets(WorldObject*& source, WorldObject*& target, con
 
                 GameObject* pGameObjectBuddy = nullptr;
 
-                MaNGOS::NearestGameObjectEntryInObjectRangeCheck u_check(*source, script.target_param1, script.target_param2);
+                MaNGOS::NearestGameObjectEntryInObjectRangeCheck u_check(*pSearcher, script.target_param1, script.target_param2);
                 MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> searcher(pGameObjectBuddy, u_check);
 
-                Cell::VisitGridObjects(source, searcher, script.target_param2);
+                Cell::VisitGridObjects(pSearcher, searcher, script.target_param2);
 
                 if (pGameObjectBuddy)
                     target = pGameObjectBuddy;
