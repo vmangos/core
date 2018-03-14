@@ -37,6 +37,7 @@ instance_dire_maul::instance_dire_maul(Map* pMap) : ScriptedInstance(pMap),
     m_uiGordokTribute5GUID(0),
     m_uiGordokTribute6GUID(0),
     m_bIsGordokTributeRespawned(false),
+    m_bIsTanninLooted(false),
     m_uiSlipKikGUID(0),
     m_uiCaptainKromcrushGUID(0),
     m_uiKingGordokGUID(0),
@@ -416,7 +417,12 @@ void instance_dire_maul::SetData(uint32 uiType, uint32 uiData)
                 }
             }
             m_auiEncounter[uiType] = uiData;
-            break; 
+            break;
+        case DATA_TANNIN_LOOTED:
+        {
+            m_bIsTanninLooted = uiData;
+            break;
+        }
     }
 
     if (uiData == DONE)
@@ -493,6 +499,9 @@ void instance_dire_maul::Load(const char* chrIn)
 
 uint32 instance_dire_maul::GetData(uint32 uiType)
 {
+    if (uiType == DATA_TANNIN_LOOTED)
+        return m_bIsTanninLooted;
+
     ASSERT(uiType < INSTANCE_DIRE_MAUL_MAX_ENCOUNTER);
     return m_auiEncounter[uiType];
 }

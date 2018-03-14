@@ -80,6 +80,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_SOURCE_WORLDOBJECT, //  31
     CONDITION_REQ_SOURCE_CREATURE,    //  32
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  33
+    CONDITION_REQ_MAP_OR_WORLDOBJECT, //  34
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -444,6 +445,18 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             if (mapId == m_value1)
                 return true;
+
+            return false;
+        }
+        case CONDITION_INSTANCE_DATA_EQUAL:
+        {
+            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+
+            if (!pMap)
+                return false;
+
+            if (InstanceData const* data = map->GetInstanceData())
+                return const_cast<InstanceData*>(data)->GetData(m_value1) == m_value2;
 
             return false;
         }
@@ -946,6 +959,7 @@ bool ConditionEntry::IsValid()
             break;
         }
         case CONDITION_NONE:
+        case CONDITION_INSTANCE_DATA_EQUAL:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

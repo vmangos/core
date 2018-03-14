@@ -23,6 +23,8 @@ enum
 
     INSTANCE_DIRE_MAUL_MAX_ENCOUNTER = 12,
 
+    DATA_TANNIN_LOOTED     = 13,
+
     // DM East
     NPC_OLD_IRONBARK       = 11491,
     NPC_ZEVRIM             = 11490, // Non utilise
@@ -172,6 +174,7 @@ class instance_dire_maul : public ScriptedInstance
         uint64 m_uiKnotsBallandChainGUID;
         uint64 m_uiBrokenTrapGUID;
         bool m_bIsGordokTributeRespawned;
+        bool m_bIsTanninLooted;
 };
 
 #endif

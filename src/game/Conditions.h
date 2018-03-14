@@ -70,6 +70,7 @@ enum ConditionType
     CONDITION_HAS_FLAG              = 31,                   // field_id     flag
     CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 = exact, 1: wp <= waypointId, 2: wp > waypointId  Use to check what waypoint was last reached
     CONDITION_MAP_ID                = 33,                   // map_id
+    CONDITION_INSTANCE_DATA_EQUAL   = 34,                   // index        data
 };
 
 enum ConditionFlags
