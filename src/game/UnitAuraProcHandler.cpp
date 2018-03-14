@@ -1143,8 +1143,8 @@ SpellAuraProcResult Unit::HandleProcTriggerSpellAuraProc(Unit *pVictim, uint32 d
                 case 31255:                                 // Deadly Swiftness (Rank 1)
                 {
                     // whenever you deal damage to a target who is below 20% health.
-                    if (pVictim->GetHealth() > pVictim->GetMaxHealth() / 5)
-                        return SPELL_AURA_PROC_FAILED;
+                    //if (pVictim->GetHealth() > pVictim->GetMaxHealth() / 5)
+                        //return SPELL_AURA_PROC_FAILED;
 
                     target = this;
                     trigger_spell_id = 22588;

@@ -5305,6 +5305,10 @@ void Unit::HandleTriggers(Unit *pVictim, uint32 procExtra, uint32 amount, SpellE
                     continue;
             }
 
+            // Spells that require target to be below 20%, like Deadly Swiftness (31255).
+            if ((triggeredByAura->GetSpellProto()->TargetAuraState == AURA_STATE_HEALTHLESS_20_PERCENT) && (!itr->target || !itr->target->HasAuraState(AURA_STATE_HEALTHLESS_20_PERCENT)))
+                continue;
+
             SpellAuraProcResult procResult = (*caster.*AuraProcHandler[auraModifier->m_auraname])(itr->target, amount, triggeredByAura, procSpell, itr->procFlag, procExtra, cooldown);
             switch (procResult)
             {
