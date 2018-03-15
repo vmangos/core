@@ -912,12 +912,6 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                         sLog.outErrorDb("Table `%s` has dataint%u with negative chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.id);
                         break;
                     }
-                    else if (!tmp.creatureSpells.spells_template[i] && (tmp.creatureSpells.chance[i] > 0))
-                    {
-                        abort = true;
-                        sLog.outErrorDb("Table `%s` has dataint%u=%i but no provided creature spells id in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.chance[i], tmp.id);
-                        break;
-                    }
                     else if (tmp.creatureSpells.spells_template[i])
                     {
                         if (!sObjectMgr.GetCreatureSpellsTemplate(tmp.creatureSpells.spells_template[i]))

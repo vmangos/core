@@ -30,6 +30,12 @@ CreatureAI::~CreatureAI()
 {
 }
 
+void CreatureAI::JustRespawned()
+{
+    // Reset spells template to default on respawn.
+    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+}
+
 void CreatureAI::AttackedBy(Unit* attacker)
 {
     if (!m_creature->getVictim())

@@ -1502,11 +1502,10 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
     for (int i = 0; i < 4; i++)
     {
         const uint32 currentId = script.creatureSpells.spells_template[i];
-
-        if (!currentId)
-            continue;
-
         const uint32 currentChance = script.creatureSpells.chance[i];
+
+        if (!currentChance)
+            continue;
 
         if ((roll > sum) && (roll <= (sum + currentChance)))
         {
@@ -1517,7 +1516,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
         sum += currentChance;
     }
 
-    if (chosenId && pSource->AI())
+    if (pSource->AI())
         pSource->AI()->SetSpellsTemplate(chosenId);
     else
         return ShouldAbortScript(script);

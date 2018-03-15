@@ -433,6 +433,8 @@ void CreatureEventAI::JustRespawned()
 {
     Reset();
 
+    CreatureAI::JustRespawned();
+
     if (m_bEmptyList)
         return;
 
