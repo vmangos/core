@@ -1128,7 +1128,10 @@ void Pet::DelayedUnsummon(uint32 timeMSToDespawn, PetSaveMode mode)
         UnsummonPetDelayEvent *pEvent = new UnsummonPetDelayEvent(*this, mode);
         
         m_Events.AddEvent(pEvent, m_Events.CalculateTime(timeMSToDespawn));
+        return;
     }
+
+    Unsummon(mode);
 }
 
 void Pet::GivePetXP(uint32 xp)

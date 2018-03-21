@@ -3670,7 +3670,9 @@ bool Creature::HasWeapon() const
 void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
 {
     if (IsTemporarySummon())
-        ((TemporarySummon*)this)->UnSummon(msTimeToDespawn);
+        static_cast<TemporarySummon*>(this)->UnSummon(msTimeToDespawn);
+    else if (IsPet())
+        static_cast<Pet*>(this)->DelayedUnsummon(msTimeToDespawn, PET_SAVE_AS_DELETED);
     else
         ForcedDespawn(msTimeToDespawn);
 }
