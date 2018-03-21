@@ -329,7 +329,7 @@ void Unit::Update(uint32 update_diff, uint32 p_time)
 
         while (m_extraAttacks)
         {
-            AttackerStateUpdate(victim, BASE_ATTACK, true);
+            AttackerStateUpdate(victim, BASE_ATTACK, true, true);
             if (m_extraAttacks > 0)
                 --m_extraAttacks;
         }
@@ -385,7 +385,7 @@ bool Unit::UpdateMeleeAttackingState()
         return false;
 
     uint8 swingError = 0;
-    if (!CanReachWithMeleeAttack(victim))
+    if (!CanReachWithMeleeAttack(victim) || (!IsWithinLOSInMap(victim) && !hasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK)))
     {
         if (isAttackReady(BASE_ATTACK))
             setAttackTimer(BASE_ATTACK, 100);
@@ -412,7 +412,7 @@ bool Unit::UpdateMeleeAttackingState()
                 if (getAttackTimer(OFF_ATTACK) < ATTACK_DISPLAY_DELAY)
                     setAttackTimer(OFF_ATTACK, ATTACK_DISPLAY_DELAY);
             }
-            AttackerStateUpdate(victim, BASE_ATTACK);
+            AttackerStateUpdate(victim, BASE_ATTACK, false);
             resetAttackTimer(BASE_ATTACK);
         }
         if (haveOffhandWeapon() && isAttackReady(OFF_ATTACK))
@@ -422,7 +422,7 @@ bool Unit::UpdateMeleeAttackingState()
             if (base_att < ATTACK_DISPLAY_DELAY)
                 setAttackTimer(BASE_ATTACK, ATTACK_DISPLAY_DELAY);
             // do attack
-            AttackerStateUpdate(victim, OFF_ATTACK);
+            AttackerStateUpdate(victim, OFF_ATTACK, false);
             resetAttackTimer(OFF_ATTACK);
         }
     }
@@ -2435,7 +2435,7 @@ void Unit::CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damage
     damageInfo->damage -= damageInfo->absorb + damageInfo->resist;
 }
 
-void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool extra)
+void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool checkLoS, bool extra)
 {
     if (hasUnitState(UNIT_STAT_CAN_NOT_REACT) || HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED))
         return;
@@ -2455,7 +2455,7 @@ void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool ext
         return;                                             // ignore ranged case
 
     // Nostalrius: check ligne de vision
-    if (!hasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK) && !IsWithinLOSInMap(pVictim))
+    if (checkLoS && !hasUnitState(UNIT_STAT_ALLOW_LOS_ATTACK) && !IsWithinLOSInMap(pVictim))
         return;
 
     if (GetExtraAttacks() && !extra)
