@@ -118,6 +118,21 @@ public:
     {
         EndDoorEncounter = NOT_STARTED;
         GahzRillaEncounter = NOT_STARTED;
+
+        PyramidPhase = 0;
+        major_wave_Timer = 0;
+        minor_wave_Timer = 0;
+        addGroupSize = 0;
+        waypoint = 0;
+
+        UkorzGUID = 0;
+        ZumrahGUID = 0;
+        BlyGUID = 0;
+        WeegliGUID = 0;
+        OroGUID = 0;
+        RavenGUID = 0;
+        MurtaGUID = 0;
+        EndDoorGUID = 0;
     }
 
     void OnCreatureCreate(Creature* pCreature)
