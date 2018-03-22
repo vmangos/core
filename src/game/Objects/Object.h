@@ -56,6 +56,9 @@
 #define NOMINAL_MELEE_RANGE         5.0f
 #define MELEE_RANGE                 (NOMINAL_MELEE_RANGE - MIN_MELEE_REACH * 2)
 
+#define LEEWAY_MIN_MOVE_SPEED       4.97f
+#define LEEWAY_BONUS_RANGE          2.66f
+
 enum TempSummonType
 {
     TEMPSUMMON_TIMED_OR_DEAD_DESPAWN          = 1,             // despawns after a specified time (out of combat) OR when the creature disappears

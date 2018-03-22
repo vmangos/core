@@ -1404,6 +1404,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         Player* GetAffectingPlayer() const;
         float GetCombatDistance( const Unit* target ) const;
         float GetDistanceToCenter( const Unit* target ) const;
+        float GetLeewayBonusRange(const Unit* target) const;
+        float GetLeewayBonusRadius() const;
 
         void SetPet(Pet* pet);
         void SetCharm(Unit* pet);
