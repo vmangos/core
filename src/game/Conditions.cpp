@@ -85,6 +85,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  36
     CONDITION_REQ_SOURCE_AND_TARGET,  //  37
     CONDITION_REQ_SOURCE_AND_TARGET,  //  38
+    CONDITION_REQ_TARGET_WORLDOBJECT, //  39
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -497,6 +498,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                     return distance <= m_value1;
             }
             return false;
+        }
+        case CONDITION_IS_MOVING:
+        {
+            return target->IsMoving();
         }
     }
     return false;
@@ -1011,6 +1016,7 @@ bool ConditionEntry::IsValid()
         case CONDITION_INSTANCE_DATA_GREATER:
         case CONDITION_INSTANCE_DATA_LESS:
         case CONDITION_LINE_OF_SIGHT:
+        case CONDITION_IS_MOVING:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

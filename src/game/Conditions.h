@@ -75,6 +75,7 @@ enum ConditionType
     CONDITION_INSTANCE_DATA_LESS    = 36,                   // index        data
     CONDITION_LINE_OF_SIGHT         = 37,                   // 0            0
     CONDITION_DISTANCE              = 38,                   // distance     0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_IS_MOVING             = 39,                   // 0            0
 };
 
 enum ConditionFlags
