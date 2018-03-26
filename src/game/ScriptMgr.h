@@ -695,7 +695,7 @@ struct ScriptInfo
             int32 chance[4];                                // dataint to dataint4
         } creatureSpells;
 
-                                                            // SCRIPT_COMMAND_SET_REMOVE_GUARDIANS (56)
+                                                            // SCRIPT_COMMAND_REMOVE_GUARDIANS (56)
 
         struct
         {
