@@ -558,9 +558,9 @@ bool ConditionEntry::CheckParamRequirements(WorldObject const* target, Map const
                 return true;
             return false;
         case CONDITION_REQ_SOURCE_AND_TARGET:
-            if (!source || !target)
-                return false;
-            return true;
+            if (source && target)
+                return true;
+            return false;
     }
     
     return true;

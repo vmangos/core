@@ -934,6 +934,10 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
 
                 break;
             }
+            case SCRIPT_COMMAND_REMOVE_GUARDIANS:
+            {
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
