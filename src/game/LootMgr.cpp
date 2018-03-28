@@ -835,7 +835,7 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         case GROUP_PERMISSION:
         {
             // if you are not the round-robin group looter, you can only see
-            // blocked rolled items and quest items, and !ffa items
+            // blocked rolled items and !ffa items
             for (uint8 i = 0; i < l.items.size(); ++i)
             {
                 if (!l.items[i].is_looted && !l.items[i].freeforall && l.items[i].AllowedForPlayer(lv.viewer, l.GetLootTarget()))
@@ -923,13 +923,20 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
         for (QuestItemList::const_iterator qi = q_list->begin() ; qi != q_list->end(); ++qi)
         {
             LootItem &item = l.m_questItems[qi->index];
-            if (!qi->is_looted && !item.is_looted)
-            {
-                b << uint8(l.items.size() + (qi - q_list->begin()));
-                b << item;
-                b << uint8(slot_type);                      // allow loot
-                ++itemsShown;
-            }
+
+            if (qi->is_looted || item.is_looted)
+                continue;
+
+            // Allow only the round robin player unless that player is not elligible for item
+            if (!item.freeforall && l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer
+                && lootPlayerQuestItems.find(l.roundRobinPlayer) != lootPlayerQuestItems.end())
+                continue;
+
+            // allow loot
+            b << uint8(l.items.size() + (qi - q_list->begin()));
+            b << item;
+            b << uint8(slot_type);
+            ++itemsShown;
         }
     }
 
@@ -961,6 +968,11 @@ ByteBuffer& operator<<(ByteBuffer& b, LootView const& lv)
 
             slot_type = item.GetSlotTypeForSharedLoot(lv.permission, lv.viewer, l.GetLootTarget(), !ci->is_looted);
             if (slot_type >= MAX_LOOT_SLOT_TYPE)
+                continue;
+
+            // Allow only the round robin player unless that player is not elligible for item
+            if (!item.freeforall && l.roundRobinPlayer != 0 && lv.viewer->GetGUID() != l.roundRobinPlayer
+                && lootPlayerNonQuestNonFFAConditionalItems.find(l.roundRobinPlayer) != lootPlayerNonQuestNonFFAConditionalItems.end())
                 continue;
 
             b << uint8(ci->index) << item;
