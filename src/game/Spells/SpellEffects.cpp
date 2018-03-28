@@ -3788,44 +3788,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
         return;
     }
 
-    // select enchantment duration
-    uint32 duration;
-
-    // other rogue family enchantments always 1 hour (some have spell damage=0, but some have wrong data in EffBasePoints)
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        duration = 1800;                                    // 30 mins (Ustaag <Nostalrius> : 1h post 2.3)
-    // shaman family enchantments
-    else if (m_spellInfo->SpellFamilyName == SPELLFAMILY_SHAMAN)
-        duration = 300;                                     // 5 mins (Ustaag <Nostalrius> : 30 mn post 1.12)
-    // other cases with this SpellVisual already selected
-    else if (m_spellInfo->SpellVisual == 215)
-        duration = 1800;                                    // 30 mins
-    // some fishing pole bonuses
-    else if (m_spellInfo->SpellVisual == 563)
-        duration = enchant_id == 266 ? 300 : 600;           // 10 or 5 mins
-    // shaman Rockbiter enchantments
-    else if (m_spellInfo->SpellVisual == 58)
-        duration = 300;                                     // 5 mins (Ustaag <Nostalrius> : 30 mn post 1.12)
-    // shaman Flametongue enchantments
-    else if (m_spellInfo->SpellVisual == 290)
-        duration = 300;                                     // 5 mins (Ustaag <Nostalrius> : 30 mn post 1.12)
-    // shaman Frostbrand enchantments
-    else if (m_spellInfo->SpellVisual == 291)
-        duration = 300;                                     // 5 mins (Ustaag <Nostalrius> : 30 mn post 1.12)
-    // Sharpen Blade enchantments
-    else if (m_spellInfo->SpellVisual == 3324)
-        duration = 1800;                                    // 30 mins (Ustaag <Nostalrius> : Sharpening Stone)
-    // Enhance Blunt enchantments
-    else if (m_spellInfo->SpellVisual == 3325)
-        duration = 1800;                                    // 30 mins (Ustaag <Nostalrius> : Weightstone)
-    // Oil enchantments
-    else if (m_spellInfo->SpellVisual == 3182)
-        duration = 1800;                                    // 30 mins (Ustaag <Nostalrius> : Oil)
-    // default case
-    else
-        duration = 3600;                                    // 1 hour
-
-    // Calcul du nombre de charges
+    // Calculate number of charges
     // Poisons :
     if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
         charges = GetPoisonCharges(m_spellInfo->Id);
@@ -3849,7 +3812,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
     // remove old enchant before applying new
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, false);
 
-    itemTarget->SetEnchantment(TEMP_ENCHANTMENT_SLOT, enchant_id, duration * 1000, charges);
+    itemTarget->SetEnchantment(TEMP_ENCHANTMENT_SLOT, enchant_id, damage * 1000, charges);
 
     // add new enchanting if equipped
     item_owner->ApplyEnchantment(itemTarget, TEMP_ENCHANTMENT_SLOT, true);
