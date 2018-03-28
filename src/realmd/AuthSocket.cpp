@@ -409,7 +409,7 @@ bool AuthSocket::_HandleLogonChallenge()
     if (result)
     {
         pkt << (uint8)WOW_FAIL_DB_BUSY;
-        BASIC_LOG("[AuthChallenge] Banned ip %s tries to login!", get_remote_address().c_str());
+        BASIC_LOG("[AuthChallenge] Banned ip '%s' tries to login with account '%s'!", get_remote_address().c_str(), _login.c_str());
         delete result;
     }
     else
@@ -421,17 +421,17 @@ bool AuthSocket::_HandleLogonChallenge()
         {
             Field* fields = result->Fetch();
 
-			// Prevent login if the user's email address has not been verified
-			bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
-			bool verified = (*result)[7].GetBool();
+            // Prevent login if the user's email address has not been verified
+            bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
+            bool verified = (*result)[7].GetBool();
 
-			if (requireVerification && !verified)
-			{
-				BASIC_LOG("[AuthChallenge] Account's email address requires email verification - rejecting login");
-				pkt << (uint8)WOW_FAIL_UNKNOWN_ACCOUNT;
-				send((char const*)pkt.contents(), pkt.size());
-				return true;
-			}
+            if (requireVerification && !verified)
+            {
+                 BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", _login.c_str(), get_remote_address().c_str());
+                pkt << (uint8)WOW_FAIL_UNKNOWN_ACCOUNT;
+                send((char const*)pkt.contents(), pkt.size());
+                return true;
+            }
 
             ///- If the IP is 'locked', check that the player comes indeed from the correct IP address
             bool locked = false;
@@ -477,12 +477,12 @@ bool AuthSocket::_HandleLogonChallenge()
                     if((*banresult)[0].GetUInt64() == (*banresult)[1].GetUInt64())
                     {
                         pkt << (uint8) WOW_FAIL_BANNED;
-                        BASIC_LOG("[AuthChallenge] Banned account %s tries to login!",_login.c_str ());
+                        BASIC_LOG("[AuthChallenge] Banned account '%s' using IP '%s' tries to login!",_login.c_str (), get_remote_address().c_str());
                     }
                     else
                     {
                         pkt << (uint8) WOW_FAIL_SUSPENDED;
-                        BASIC_LOG("[AuthChallenge] Temporarily banned account %s tries to login!",_login.c_str ());
+                        BASIC_LOG("[AuthChallenge] Temporarily banned account '%s' using IP '%s' tries to login!",_login.c_str (), get_remote_address().c_str());
                     }
 
                     delete banresult;
@@ -538,7 +538,7 @@ bool AuthSocket::_HandleLogonChallenge()
 
                     if (promptPin)
                     {
-                        BASIC_LOG("[AuthChallenge] account %s requires PIN authentication", _login.c_str());
+                        BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' requires PIN authentication", _login.c_str(), get_remote_address().c_str());
 
                         uint32 gridSeedPkt = gridSeed = static_cast<uint32>(rand32());
                         EndianConvert(gridSeedPkt);
@@ -559,7 +559,7 @@ bool AuthSocket::_HandleLogonChallenge()
                         _localizationName[i] = ch->country[4-i-1];
 
                     LoadAccountSecurityLevels(account_id);
-                    BASIC_LOG("[AuthChallenge] account %s is using '%c%c%c%c' locale (%u)", _login.c_str (), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
+                    BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' is using '%c%c%c%c' locale (%u)", _login.c_str (), get_remote_address().c_str(), ch->country[3], ch->country[2], ch->country[1], ch->country[0], GetLocaleByName(_localizationName));
 
                     _accountId = account_id;
 
@@ -749,7 +749,7 @@ bool AuthSocket::_HandleLogonProof()
         if ((lockFlags & FIXED_PIN) == FIXED_PIN)
         {
             pinResult = VerifyPinData(std::stoi(securityInfo), pinData);
-            BASIC_LOG("PIN result: %u", pinResult);
+            BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' PIN result: %u", _login.c_str(), get_remote_address().c_str(), pinResult);
         }
         else if ((lockFlags & TOTP) == TOTP)
         {
@@ -794,7 +794,7 @@ bool AuthSocket::_HandleLogonProof()
         }
         else if (GeographicalLockCheck())
         {
-            BASIC_LOG("Account %s (%u) has been geolocked", _login.c_str(), _accountId); // todo, add additional logging info
+            BASIC_LOG("Account '%s' (%u) using IP '%s' has been geolocked", _login.c_str(), _accountId, get_remote_address().c_str()); // todo, add additional logging info
             
             auto pin = urand(100000, 999999); // check rand32_max
             auto result = LoginDatabase.PExecute("UPDATE account SET geolock_pin = %u WHERE username = '%s'",
@@ -838,7 +838,7 @@ bool AuthSocket::_HandleLogonProof()
             return true;
         }
 
-        BASIC_LOG("User '%s' successfully authenticated", _login.c_str());
+        BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' successfully authenticated", _login.c_str(), get_remote_address().c_str());
 
         ///- Update the sessionkey, last_ip, last login time and reset number of failed logins in the account table for this account
         // No SQL injection (escaped user name) and IP address as received by socket
@@ -872,7 +872,7 @@ bool AuthSocket::_HandleLogonProof()
             char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_UNKNOWN_ACCOUNT};
             send(data, sizeof(data));
         }
-        BASIC_LOG("[AuthChallenge] account %s tried to login with wrong password!",_login.c_str ());
+        BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s' tried to login with wrong password!", _login.c_str (), get_remote_address().c_str());
 
         uint32 MaxWrongPassCount = sConfig.GetIntDefault("WrongPass.MaxCount", 0);
         if(MaxWrongPassCount > 0)
@@ -895,8 +895,8 @@ bool AuthSocket::_HandleLogonProof()
                         uint32 acc_id = fields[0].GetUInt32();
                         LoginDatabase.PExecute("INSERT INTO account_banned VALUES ('%u',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban',1,1,0)",
                             acc_id, WrongPassBanTime);
-                        BASIC_LOG("[AuthChallenge] account %s got banned for '%u' seconds because it failed to authenticate '%u' times",
-                            _login.c_str(), WrongPassBanTime, failed_logins);
+                        BASIC_LOG("[AuthChallenge] Account '%s' using  IP '%s' got banned for '%u' seconds because it failed to authenticate '%u' times",
+                            _login.c_str(), get_remote_address().c_str(), WrongPassBanTime, failed_logins);
                     }
                     else
                     {
@@ -904,7 +904,7 @@ bool AuthSocket::_HandleLogonProof()
                         LoginDatabase.escape_string(current_ip);
                         LoginDatabase.PExecute("INSERT INTO ip_banned VALUES ('%s',UNIX_TIMESTAMP(),UNIX_TIMESTAMP()+'%u','MaNGOS realmd','Failed login autoban')",
                             current_ip.c_str(), WrongPassBanTime);
-                        BASIC_LOG("[AuthChallenge] IP %s got banned for '%u' seconds because account %s failed to authenticate '%u' times",
+                        BASIC_LOG("[AuthChallenge] IP '%s' got banned for '%u' seconds because account '%s' failed to authenticate '%u' times",
                             current_ip.c_str(), WrongPassBanTime, _login.c_str(), failed_logins);
                     }
                 }
