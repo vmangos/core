@@ -367,7 +367,7 @@ struct mob_zara_larvaAI : public ScriptedAI
                 m_creature->MonsterMove(LarvaMove[3].x, LarvaMove[3].y, LarvaMove[3].z);
                 ++m_waypoint;
             }
-            else if (m_waypoint == 0)
+            else if (i->getSource()->HasAura(SPELL_PARALYZE) && m_waypoint == 0)
             {
                 m_creature->MonsterMove(LarvaMove[m_waypoint].x,
                                         LarvaMove[m_waypoint].y,
