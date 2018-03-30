@@ -795,8 +795,28 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         ((Player*)this)->RewardRage(damage, true);
 
     if (Creature* creaVictim = pVictim->ToCreature())
-        if (!creaVictim->IsPet() && !creaVictim->HasLootRecipient())
-            creaVictim->SetLootRecipient(this);
+    {
+        if (!creaVictim->IsPet())
+        {
+            if (!creaVictim->HasLootRecipient())
+                creaVictim->SetLootRecipient(this);
+            else if (ObjectGuid recipient = creaVictim->GetLootRecipientGuid())
+            {
+                // Replace loot recipient if current recipient is pet and attacker is owner or grouped with owner
+                if (recipient.IsPet() && GetTypeId() == TYPEID_PLAYER)
+                {
+                    if (GetPetGuid() == recipient)
+                        creaVictim->SetLootRecipient(this);
+                    else if (Group *group = creaVictim->GetGroupLootRecipient())
+                    {
+                        if (group == ToPlayer()->GetGroup())
+                            creaVictim->SetLootRecipient(this);
+                    }
+                }
+            }
+        }
+    }
+
     if (health <= damage)
     {
         // Can't kill gods
@@ -986,6 +1006,9 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 
             if (Player* recipient = creature->GetOriginalLootRecipient())
                 player_tap = recipient;
+            else if (ObjectGuid recipient = creature->GetLootRecipientGuid())
+                if (recipient.IsPet())
+                    player_tap = nullptr;
             // Set correct group_tap if player entered a group
             if (player_tap && !group_tap)
                 group_tap = player_tap->GetGroup();

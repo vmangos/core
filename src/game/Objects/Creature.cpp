@@ -1286,7 +1286,10 @@ void Creature::SetLootRecipient(Unit *unit)
         return;
 
     // set player for non group case or if group will disbanded
-    m_lootRecipientGuid = player->GetObjectGuid();
+    if (unit->IsPet())
+        m_lootRecipientGuid = unit->GetObjectGuid();
+    else
+        m_lootRecipientGuid = player->GetObjectGuid();
 
     // set group for group existing case including if player will leave group at loot time
     if (Group* group = player->GetGroup())
@@ -1301,6 +1304,9 @@ bool Creature::IsTappedBy(Player const* player) const
     ASSERT(player);
 
     if (player->GetObjectGuid() == m_lootRecipientGuid)
+        return true;
+
+    if (m_lootRecipientGuid && player->GetPetGuid() == m_lootRecipientGuid)
         return true;
 
     Group const* playerGroup = player->GetGroup();
