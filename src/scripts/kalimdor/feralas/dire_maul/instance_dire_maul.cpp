@@ -554,7 +554,7 @@ void instance_dire_maul::DoSortCristalsEventMobs()
             {
                 if (Creature* pCreature = instance->GetCreature(*itr))
                 {
-                    if (pCreature->isAlive() && pCreature->GetDistance(pRune) < 10.0f)
+                    if (pCreature->isAlive() && pCreature->GetDistance(pRune) < 20.0f)
                         m_alCristalsEventtMobGUIDSorted[i].push_back(*itr);
                 }
             }
