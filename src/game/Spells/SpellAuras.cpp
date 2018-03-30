@@ -2906,8 +2906,9 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         p_caster->PossessSpellInitialize();
 
         if (Creature* pTargetCrea = target->ToCreature())
-            if (pTargetCrea->AI()->SwitchAiAtControl())
-                pTargetCrea->AIM_Initialize();
+            if (!pTargetCrea->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+                if (pTargetCrea->AI()->SwitchAiAtControl())
+                    pTargetCrea->AIM_Initialize();
 
         if (target->IsPlayer() && !caster->IsPlayer())
                 target->ToPlayer()->SetControlledBy(caster);
@@ -2918,6 +2919,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         if (target->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))
             target->SetMovement(MOVE_ROOT);
         target->StopMoving();
+        target->SetWalk(p_caster->IsWalking());
     }
     else
     {
@@ -2956,16 +2958,23 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
         target->RestoreFaction();
         target->CombatStop(true);
-        target->StopMoving(true);
         target->UpdateControl();
+        target->SetWalk(false);
 
         if (Creature* pCreature = target->ToCreature())
         {
-            if (pCreature->AI() && pCreature->AI()->SwitchAiAtControl())
-                pCreature->AIM_Initialize();
+            if (!pCreature->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
+            {
+                target->StopMoving(true);
+                if (pCreature->AI() && pCreature->AI()->SwitchAiAtControl())
+                    pCreature->AIM_Initialize();
 
-            pCreature->AttackedBy(caster);
+                pCreature->AttackedBy(caster);
+            }
         }
+        else
+            target->StopMoving(true);
+
         // cast mind exhaustion on self when the posess possess ends if the creature
         // is death knight understudy (razuvious). 
         // todo: if there is a way to know a possess has ended through scriptAI, fix this.
