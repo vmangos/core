@@ -1158,9 +1158,10 @@ struct UpdateAttackersCombatHelper
     explicit UpdateAttackersCombatHelper(Player* _player) : player(_player) {}
     void operator()(Unit* unit) const
     {
-        for (Unit* attacker : unit->getAttackers())
-            if (Creature* creature = attacker->ToCreature())
-                if (attacker->getVictim() == unit)
+        Unit::AttackerSet const attackers = unit->getAttackers();
+        for (Unit::AttackerSet::const_iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+            if (Creature* creature = (*itr)->ToCreature())
+                if (creature->getVictim() == unit)
                     creature->SelectHostileTarget();
     }
     Player* player;
