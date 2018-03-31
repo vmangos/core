@@ -6113,6 +6113,7 @@ void Spell::EffectTransmitted(SpellEffectIndex eff_idx)
             // but this is not proper, we really need to ignore not materialized objects
             SendCastResult(SPELL_FAILED_NOT_FISHABLE);
             SendChannelUpdate(0);
+            finish();
             return;
         }
 
