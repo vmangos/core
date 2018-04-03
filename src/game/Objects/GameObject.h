@@ -690,6 +690,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
 
         void SummonLinkedTrapIfAny();
         void TriggerLinkedGameObject(Unit* target);
+        void RespawnLinkedGameObject();
 
         bool isVisibleForInState(Player const* u, WorldObject const* viewPoint, bool inVisibleList) const;
 

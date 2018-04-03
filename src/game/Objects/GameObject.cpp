@@ -318,7 +318,12 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             //we need to open doors if they are closed (add there another condition if this code breaks some usage, but it need to be here for battlegrounds)
                             if (GetGoState() != GO_STATE_READY)
                                 ResetDoorOrButton();
-                        //flags in AB are type_button and we need to add them here so no break!
+                            //flags in AB are type_button and we need to add them here so no break!
+                        case GAMEOBJECT_TYPE_CHEST:
+                        case GAMEOBJECT_TYPE_SPELL_FOCUS:
+                        case GAMEOBJECT_TYPE_GOOBER:
+                            // Respawn linked trap if any exists
+                            RespawnLinkedGameObject();
                         default:
                             if (!m_spawnedByDefault)        // despawn timer
                             {
@@ -1161,8 +1166,36 @@ void GameObject::TriggerLinkedGameObject(Unit* target)
     }
 
     // found correct GO
-    if (trapGO)
+    if (trapGO && trapGO->isSpawned())
         trapGO->Use(target);
+}
+
+void GameObject::RespawnLinkedGameObject()
+{
+    uint32 trapEntry = GetGOInfo()->GetLinkedGameObjectEntry();
+
+    if (!trapEntry)
+        return;
+
+    GameObjectInfo const* trapInfo = sGOStorage.LookupEntry<GameObjectInfo>(trapEntry);
+    if (!trapInfo || trapInfo->type != GAMEOBJECT_TYPE_TRAP)
+        return;
+
+    float range = 0.5f;
+
+    // search nearest linked GO
+    GameObject* trapGO = NULL;
+    {
+        // search closest with base of used GO, using max range of trap spell as search radius
+        MaNGOS::NearestGameObjectEntryInObjectRangeCheck go_check(*this, trapEntry, range);
+        MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(trapGO, go_check);
+
+        Cell::VisitGridObjects(this, checker, range);
+    }
+
+    // Respawn the trap
+    if (trapGO && !trapGO->isSpawned())
+        trapGO->Respawn();
 }
 
 GameObject* GameObject::LookupFishingHoleAround(float range)
@@ -1301,6 +1334,16 @@ void GameObject::Use(Unit* user)
             // FIXME: when GO casting will be implemented trap must cast spell to target
             if (uint32 spellId = GetGOInfo()->trap.spellId)
                 user->CastSpell(user, spellId, true, NULL, NULL, GetObjectGuid());
+
+            if (uint32 max_charges = GetGOInfo()->GetCharges())
+            {
+                AddUse();
+                if (m_useTimes >= max_charges)
+                {
+                    m_useTimes = 0;
+                    SetLootState(GO_JUST_DEACTIVATED);
+                }
+            }
 
             return;
         }
