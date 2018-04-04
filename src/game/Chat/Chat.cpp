@@ -422,6 +422,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "account",        SEC_GAMEMASTER,     true, nullptr,                                           "", lookupAccountCommandTable },
         { NODE, "area",           SEC_MODERATOR,      true,  &ChatHandler::HandleLookupAreaCommand,          "", nullptr },
         { NODE, "creature",       SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupCreatureCommand,      "", nullptr },
+        { NODE, "creaturemodel",  SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupCreatureModelCommand, "", nullptr },
         { NODE, "event",          SEC_GAMEMASTER,     true,  &ChatHandler::HandleLookupEventCommand,         "", nullptr },
         { NODE, "faction",        SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupFactionCommand,       "", nullptr },
         { NODE, "item",           SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleLookupItemCommand,          "", nullptr },

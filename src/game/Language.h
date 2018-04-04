@@ -986,7 +986,9 @@ enum MangosStrings
     LANG_REMOVE_RIDING_NOT_HAVE         = 1173,
     LANG_REMOVE_RIDING_ERROR            = 1174,
     LANG_REMOVE_RIDING_SUCCESS          = 1175,
-    // Room for more level 3              1176-1199 not used
+    LANG_CREATURE_MODEL_ENTRY           = 1176,
+    LANG_NO_CREATURE_MODEL_ENTRY_FOUND  = 1177,
+    // Room for more level 3              1178-1199 not used
 
     // Debug commands
     LANG_CINEMATIC_NOT_EXIST            = 1200,

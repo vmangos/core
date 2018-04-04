@@ -518,6 +518,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLookupAccountNameCommand(char* args);
         bool HandleLookupAreaCommand(char* args);
         bool HandleLookupCreatureCommand(char* args);
+        bool HandleLookupCreatureModelCommand(char* args);
         bool HandleLookupEventCommand(char* args);
         bool HandleLookupFactionCommand(char* args);
         bool HandleLookupItemCommand(char* args);

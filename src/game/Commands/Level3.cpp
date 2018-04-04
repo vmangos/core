@@ -3308,6 +3308,123 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    bool fileExport = false;
+    if (ExtractLiteralArg(&args, "export"))
+        fileExport = true;
+
+    uint32 modelId = 0;
+    std::string namepart;
+    std::wstring wnamepart;
+
+    if (!ExtractOptUInt32(&args, modelId, 0))
+    {
+        namepart = args;
+        if (!Utf8toWStr(namepart, wnamepart))
+            return false;
+        wstrToLower(wnamepart);
+    }
+
+    std::stringstream  toExport;
+    uint32 lastSearchId = 0;
+    uint32 creatureCounter = 0;
+    uint32 modelCounter = 0;
+    while (true)
+    {
+        // try to find a model from the given string
+        if (!modelId && !wnamepart.empty())
+        {
+            for (; lastSearchId < sCreatureModelDataStore.GetNumRows(); ++lastSearchId)
+                if (CreatureModelDataEntry const* model = sCreatureModelDataStore.LookupEntry(lastSearchId))
+                {
+                    std::string name = model->modelName;
+                    if (Utf8FitTo(name, wnamepart))
+                    {
+                        modelCounter++;
+                        modelId = lastSearchId;
+                        if (fileExport)
+                            toExport << "-- model id " << modelId << " " << model->modelName << "\n";
+                        PSendSysMessage(LANG_CREATURE_MODEL_ENTRY, modelId, modelId, model->modelName);
+                        lastSearchId++;
+                        break;
+                    }
+                }
+            if (!modelId && !modelCounter)
+            {
+                if (fileExport)
+                    toExport << "-- No creature model found.\n";
+                SendSysMessage(LANG_NO_CREATURE_MODEL_ENTRY_FOUND);
+                return false;
+            }
+
+        }
+
+        if (!modelId)
+            break;
+
+        for (uint32 id = 0; id < sCreatureStorage.GetMaxEntry(); ++id)
+        {
+            CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(id);
+            if (!cInfo)
+                continue;
+
+            uint32 foundModelCounter = 0;
+            uint32 totalModelCounter = 0;
+            for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
+                if (cInfo->ModelId[i])
+                    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[i]))
+                    {
+                        if (display->ModelId)
+                            totalModelCounter++;
+                        if (display->ModelId == modelId)
+                        {
+                            if (!foundModelCounter)
+                            {
+                                // Custom filter
+                                //if (cInfo->InhabitType & INHABIT_WATER)
+                                {
+                                    creatureCounter++;
+                                    if (fileExport)
+                                        toExport << id << ", /* " << cInfo->Name << " */\n";
+                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, cInfo->Name);
+                                }
+                            }
+                            foundModelCounter++;
+                        }
+                    }
+            if (fileExport && foundModelCounter && totalModelCounter != foundModelCounter)
+                toExport << "-- WARNING " << id << " " << cInfo->Name << " uses more than one model !\n";
+        }
+        modelId = 0;
+    }
+    if (!creatureCounter)
+    {
+        if (fileExport)
+            toExport << "-- No creature found.\n";
+        SendSysMessage(LANG_COMMAND_NOCREATUREFOUND);
+    }
+
+    if (fileExport)
+    {
+        FILE* f = fopen("creature_export.sql", "w");
+        if (!f)
+        {
+            sLog.outError("File creation failed.");
+            return false;
+        }
+        std::string exportStr = toExport.str();
+        sLog.outInfo(exportStr.c_str());
+        fputs(exportStr.c_str(), f);
+        fclose(f);
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleLookupObjectCommand(char* args)
 {
     if (!*args)

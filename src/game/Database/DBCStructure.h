@@ -201,7 +201,7 @@ struct CreatureModelDataEntry
 {
     uint32_t ID;                                            // 0        m_ID
     uint32_t flags;                                         // 1        m_flags
-    //char* modelName;                                      // 2        m_modelName
+    char* modelName;                                        // 2        m_modelName
     //uint32 sizeClass;                                     // 3        m_sizeClass
     //float modelScale;                                     // 4        m_modelScale
     //uint32 blood;                                         // 5        m_blood
