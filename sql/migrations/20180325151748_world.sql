@@ -33,7 +33,7 @@ UPDATE `quest_template` SET `DetailsEmote1`=4, `CompleteEmote`=11, `CompleteScri
 
 DELETE FROM `quest_end_scripts` WHERE `id`=1058;
 INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong2`, `datalong3`, `target_param1`, `target_param2`, `target_type`, `data_flags`, `dataint`, `dataint2`, `dataint3`, `dataint4`, `x`, `y`, `z`, `o`, `comments`) VALUES
-(1058, 0, 4, 147, 2, 2, 3995, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: npc_flag questgiver removed'),
+(1058, 0, 4, 147, 2, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: npc_flag questgiver removed'),
 (1058, 2, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -272.48, -394.084, 17.2051, 4.0078, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: Turn'),
 (1058, 3, 1, 15, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: Roar emote'),
 (1058, 3, 0, 0, 0, 0, 0, 0, 0, 0, 1405, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: Say text 1'),
@@ -49,7 +49,7 @@ INSERT INTO `quest_end_scripts` (`id`, `delay`, `command`, `datalong`, `datalong
 (1058, 12, 0, 0, 0, 0, 0, 0, 0, 0, 1407, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: Say text 3'),
 (1058, 13, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -272.48, -394.084, 17.2051, 3.053, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: Walk back'),
 (1058, 16, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, -272.48, -394.084, 17.2051, 6.19592, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: Turn'),
-(1058, 17, 4, 147, 2, 1, 3995, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: npc_flag questgiver added');
+(1058, 17, 4, 147, 2, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 'Jin\'Zil\'s Forest Magic - Jin\'Zil\'s: npc_flag questgiver added');
 
 -- Respawn prisoners quicker
 UPDATE `creature` SET `spawntimesecsmin`=30, `spawntimesecsmax`=30 WHERE `guid` IN (32292, 32293, 32294);
