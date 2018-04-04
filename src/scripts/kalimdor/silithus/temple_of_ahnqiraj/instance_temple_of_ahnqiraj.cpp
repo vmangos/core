@@ -652,7 +652,7 @@ bool instance_temple_of_ahnqiraj::KillPlayersInStomach()
             }
 
             if (p->isAlive()) {
-                p->KillPlayer();
+                p->DealDamage(p, p->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
             }
             if (p->HasAura(SPELL_DIGESTIVE_ACID)) {
                 p->RemoveAurasDueToSpell(SPELL_DIGESTIVE_ACID);
