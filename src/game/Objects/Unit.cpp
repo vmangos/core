@@ -495,6 +495,18 @@ uint64 Unit::GetAuraApplicationMask() const
         return 0;
 
     uint64 mask = 0x0;
+    for (uint64 i = 0; i < MAX_AURAS; ++i)
+        if (GetUInt32Value(UNIT_FIELD_AURA + i))
+            mask |= uint64(1) << i;
+    return mask;
+}
+
+uint64 Unit::GetNegativeAuraApplicationMask() const
+{
+    if (!IsInWorld())
+        return 0;
+
+    uint64 mask = 0x0;
     for (uint64 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
         if (GetUInt32Value(UNIT_FIELD_AURA + i))
             mask |= uint64(1) << i;

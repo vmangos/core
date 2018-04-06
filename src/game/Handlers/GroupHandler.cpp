@@ -669,7 +669,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
 
     if (mask & GROUP_UPDATE_FLAG_AURAS_NEGATIVE)
     {
-        uint64 auramask = sendAllAuras ? player->GetAuraApplicationMask() : player->GetAuraUpdateMask();
+        uint64 auramask = sendAllAuras ? player->GetNegativeAuraApplicationMask() : player->GetAuraUpdateMask();
         uint16 maskForClient = uint16(auramask >> 32);
         *data << maskForClient;
         for (uint64 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
@@ -757,7 +757,7 @@ void WorldSession::BuildPartyMemberStatsPacket(Player* player, WorldPacket* data
     {
         if (pet)
         {
-            uint64 auramask = sendAllAuras ? pet->GetAuraApplicationMask() : pet->GetAuraUpdateMask();
+            uint64 auramask = sendAllAuras ? pet->GetNegativeAuraApplicationMask() : pet->GetAuraUpdateMask();
             *data << uint16(auramask >> 32);
             for (uint32 i = MAX_POSITIVE_AURAS; i < MAX_AURAS; ++i)
             {

@@ -1260,6 +1260,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 GetFirstAuraBySpellIconAndVisual(uint32 spellIconId, uint32 spellVisual) const;
 
         uint64 GetAuraApplicationMask() const;
+        uint64 GetNegativeAuraApplicationMask() const;
 
         SpellAuraHolderBounds GetSpellAuraHolderBounds(uint32 spell_id)
         {
