@@ -236,54 +236,51 @@ struct npc_prospector_remtravelAI : public npc_escortAI
 
         switch (i)
         {
-            case 0:
-                DoScriptText(SAY_REM_START, m_creature, pPlayer);
-                break;
             case 5:
                 DoScriptText(SAY_REM_RAMP1_1, m_creature, pPlayer);
                 break;
-            case 6:
-                DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                break;
             case 9:
                 DoScriptText(SAY_REM_RAMP1_2, m_creature, pPlayer);
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                 break;
-            case 14:
-                //depend quest rewarded?
+            case 10:
+                m_creature->SummonCreature(NPC_GRAVEL_SCOUT, 4639.86f, 631.96f, 7.48f, 4.7f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                break;
+            case 13:
                 DoScriptText(SAY_REM_BOOK, m_creature, pPlayer);
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                 break;
-            case 15:
+            case 18:
                 DoScriptText(SAY_REM_TENT1_1, m_creature, pPlayer);
                 break;
-            case 16:
-                DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                DoSpawnCreature(NPC_GRAVEL_BONE, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                break;
-            case 17:
+            case 19:
                 DoScriptText(SAY_REM_TENT1_2, m_creature, pPlayer);
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                 break;
-            case 26:
+            case 20:
+                DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                DoSpawnCreature(NPC_GRAVEL_SCOUT, -10.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                break;
+            case 30:
                 DoScriptText(SAY_REM_MOSS, m_creature, pPlayer);
-                break;
-            case 27:
                 DoScriptText(EMOTE_REM_MOSS, m_creature, pPlayer);
                 break;
-            case 28:
+            case 31:
                 DoScriptText(SAY_REM_MOSS_PROGRESS, m_creature, pPlayer);
                 break;
-            case 29:
-                DoSpawnCreature(NPC_GRAVEL_SCOUT, -15.0f, 3.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                DoSpawnCreature(NPC_GRAVEL_BONE, -15.0f, 5.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                DoSpawnCreature(NPC_GRAVEL_GEO, -15.0f, 7.0f, 0.0f, 0.0f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
-                break;
-            case 31:
+            case 36:
                 DoScriptText(SAY_REM_PROGRESS, m_creature, pPlayer);
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
                 break;
-            case 41:
+            case 37:
+                m_creature->SummonCreature(NPC_GRAVEL_BONE, 4564.11f, 553.67f, 5.21f, 2.26f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                m_creature->SummonCreature(NPC_GRAVEL_GEO, 4569.33f, 549.43f, 5.61f, 2.4f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 30000);
+                break;
+            case 47:
                 DoScriptText(SAY_REM_REMEMBER, m_creature, pPlayer);
+                m_creature->HandleEmoteCommand(EMOTE_ONESHOT_TALK);
                 break;
-            case 42:
+            case 48:
                 DoScriptText(EMOTE_REM_END, m_creature, pPlayer);
                 pPlayer->GroupEventHappens(QUEST_ABSENT_MINDED_PT2, m_creature);
                 break;
@@ -300,8 +297,8 @@ struct npc_prospector_remtravelAI : public npc_escortAI
 
     void JustSummoned(Creature* pSummoned) override
     {
-        //unsure if it should be any
-        //pSummoned->AI()->AttackStart(m_creature);
+        if (Player* pPlayer = GetPlayerForEscort())
+            pSummoned->AI()->AttackStart(pPlayer);
     }
 };
 
@@ -317,7 +314,11 @@ bool QuestAccept_npc_prospector_remtravel(Player* pPlayer, Creature* pCreature, 
         pCreature->setFaction(FACTION_ESCORT_A_NEUTRAL_PASSIVE);
 
         if (npc_prospector_remtravelAI* pEscortAI = dynamic_cast<npc_prospector_remtravelAI*>(pCreature->AI()))
+        {
+            DoScriptText(SAY_REM_START, pCreature, pPlayer);
+            pCreature->HandleEmoteCommand(EMOTE_ONESHOT_QUESTION);
             pEscortAI->Start(false, pPlayer->GetGUID(), pQuest, true);
+        }
     }
 
     return true;
