@@ -2861,14 +2861,12 @@ float Unit::MeleeSpellMissChance(Unit *pVictim, WeaponAttackType attType, int32 
     float hitChance = 0.0f;
 
     // PvP - PvE melee chances
-    if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
-        hitChance = 95.0f + skillDiff * 0.04f;  // PvP misschance base is 5.00%
-    else if (pVictim->GetTypeId() == TYPEID_PLAYER)
-        hitChance = 94.4f + skillDiff * 0.04f;
+    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+        hitChance = 95.0f + skillDiff * 0.04f;
     else if (skillDiff < -10)
-        hitChance = 93.4f + (skillDiff + 10) * 0.4f;        // 7% ~ 6.60% base chance to miss for big skill diff
+        hitChance = 93.0f + (skillDiff + 10) * 0.4f;        // 7% base chance to miss for big skill diff
     else
-        hitChance = 94.4f + skillDiff * 0.1f;
+        hitChance = 95.0f + skillDiff * 0.1f;
 
     // Hit chance depends from victim auras
     if (attType == RANGED_ATTACK)
@@ -3195,13 +3193,8 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (!pVictim || !pVictim->IsStandState())
         return 0.0f;
 
-    float missChance = 5.60f; // The base chance to miss is 5.60%
-
-    // The base chance to miss in PvP is 5%
-    if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_PLAYER)
-    {
-        missChance = 5.00f;
-    }
+    // Base misschance 5%
+    float missChance = 5.0f;
 
     // DualWield - white damage has an additional 19% miss penalty
     if (haveOffhandWeapon() && attType != RANGED_ATTACK)
@@ -3225,9 +3218,9 @@ float Unit::MeleeMissChanceCalc(const Unit *pVictim, WeaponAttackType attType) c
     if (pVictim->GetTypeId() == TYPEID_PLAYER)
         missChance -= skillDiff * 0.04f;
     else if (skillDiff < -10)
-        missChance -= (skillDiff + 10) * 0.4f - 1.0f;       // 7% ~ 6.60% base chance to miss for big skill diff
+        missChance -= (skillDiff + 10) * 0.4f - 2.0f;       // 7% base chance to miss for big skill diff
     else
-        missChance -=  skillDiff * 0.1f;
+        missChance -= skillDiff * 0.1f;
 
     // Hit chance bonus from attacker based on ratings and auras
     if (attType == RANGED_ATTACK)
