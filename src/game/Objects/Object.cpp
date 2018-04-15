@@ -1393,13 +1393,17 @@ bool WorldObject::IsWithinLOSInMap(const WorldObject* obj, bool checkDynLos) con
         return true;
     float ox, oy, oz;
     obj->GetPosition(ox, oy, oz);
-    return (IsWithinLOS(ox, oy, oz, checkDynLos));
+    float targetHeight = obj->IsUnit() ? obj->ToUnit()->GetCollisionHeight() : 2.f;
+    return (IsWithinLOS(ox, oy, oz, checkDynLos, targetHeight));
 }
 
-bool WorldObject::IsWithinLOS(float ox, float oy, float oz, bool checkDynLos) const
+bool WorldObject::IsWithinLOS(float ox, float oy, float oz, bool checkDynLos, float targetHeight) const
 {
     if (IsInWorld())
-        return GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ() + 2.f, ox, oy, oz + 2.f, checkDynLos);
+    {
+        float height = IsUnit() ? ToUnit()->GetCollisionHeight() : 2.f;
+        return GetMap()->isInLineOfSight(GetPositionX(), GetPositionY(), GetPositionZ() + height, ox, oy, oz + targetHeight, checkDynLos);
+    }
 
     return true;
 }

@@ -203,7 +203,7 @@ struct CreatureModelDataEntry
     uint32_t flags;                                         // 1        m_flags
     char* modelName;                                        // 2        m_modelName
     //uint32 sizeClass;                                     // 3        m_sizeClass
-    //float modelScale;                                     // 4        m_modelScale
+    float modelScale;                                       // 4        m_modelScale
     //uint32 blood;                                         // 5        m_blood
     //uint32 footprintTexture;                              // 6        m_footprintTexture
     //float footprintTextureLength;                         // 7        m_footprintTextureLength
@@ -212,9 +212,9 @@ struct CreatureModelDataEntry
     //uint32 foleyMaterial;                                 // 10       m_foleyMaterial
     //uint32 footstepShakeSize;                             // 11       m_footstepShakeSize
     //uint32 deathThudShakeSize;                            // 12       m_deathThudShakeSize
-    //float collisionWidth;                                 // 13       m_collisionWidth
-    //float collisionHeight;                                // 14       m_collisionHeight
-    //float mountHeight;                                    // 15       m_mountHeight
+    //uint32 creatureSoundId                                // 13       m_soundId
+    //float collisionWidth;                                 // 14       m_collisionWidth
+    float collisionHeight;                                  // 15       m_collisionHeight
 };
 
 struct CreatureFamilyEntry

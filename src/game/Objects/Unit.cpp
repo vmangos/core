@@ -147,6 +147,7 @@ Unit::Unit()
     m_invisibilityMask = 0;
     m_transform = 0;
     m_canModifyStats = false;
+    m_modelCollisionHeight = 2.f;
 
     for (int i = 0; i < MAX_SPELL_IMMUNITY; ++i)
         m_spellImmune[i].clear();
@@ -9898,6 +9899,12 @@ void Unit::UpdateModelData()
             SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
         else
             SetFloatValue(UNIT_FIELD_COMBATREACH, (GetObjectScale() / displayEntry->scale) * modelInfo->combat_reach);
+
+        if (CreatureModelDataEntry const* modelData = sCreatureModelDataStore.LookupEntry(displayEntry->ModelId))
+            if (modelData->collisionHeight > 0.f && modelData->modelScale > 0.f)
+                m_modelCollisionHeight = modelData->collisionHeight / modelData->modelScale;
+            else
+                m_modelCollisionHeight = 2.f;
     }
     else
     {
