@@ -257,7 +257,7 @@ bool TargetedMovementGeneratorMedium<T, D>::Update(T &owner, const uint32 & time
 
     bool interrupted = false;
     i_recheckDistance.Update(time_diff);
-    if (i_recheckDistance.Passed())
+    if (!i_backing_up && i_recheckDistance.Passed())
     {
         i_recheckDistance.Reset(100);
         //More distance let have better performance, less distance let have more sensitive reaction at target move.
@@ -283,6 +283,7 @@ bool TargetedMovementGeneratorMedium<T, D>::Update(T &owner, const uint32 & time
 
             if (!targetMoved)
                 targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
+
             // Chase movement may be interrupted
             if (!targetMoved)
                 if (owner.movespline->Finalized())
@@ -305,6 +306,9 @@ bool TargetedMovementGeneratorMedium<T, D>::Update(T &owner, const uint32 & time
 
     if (owner.movespline->Finalized())
     {
+        if (i_backing_up)
+            i_backing_up = false;
+
         if (owner.GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE || 
             owner.GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
             static_cast<D*>(this)->MovementInform(owner);
@@ -319,6 +323,21 @@ bool TargetedMovementGeneratorMedium<T, D>::Update(T &owner, const uint32 & time
         }
         if (interrupted)
             owner.StopMoving();
+
+        if (i_recalculateTravel && (this->GetMovementGeneratorType() == CHASE_MOTION_TYPE))
+        {
+                i_recheckBoundingRadius.Update(time_diff);
+                if (i_recheckBoundingRadius.Passed())
+                {
+                    i_recheckBoundingRadius.Reset(3000);
+                    if (Creature* creature = owner.ToCreature())
+                    {
+                        if (!(creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_CHASE_GEN_NO_BACKING) && !creature->IsPet() && !i_target.getTarget()->IsMoving() && TargetDeepInBounds(owner, i_target.getTarget()))
+                            DoBackMovement(owner, i_target.getTarget());
+                    }
+                }
+        }
+        
     }
     else if (i_recalculateTravel)
         owner.GetMotionMaster()->SetNeedAsyncUpdate();
@@ -340,6 +359,38 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
     // Lock async updates for safety, see Unit::asyncMovesplineLock doc
     ACE_Guard<ACE_Thread_Mutex> guard(owner.asyncMovesplineLock);
     _setTargetLocation(owner);
+}
+
+template<class T, typename D>
+bool TargetedMovementGeneratorMedium<T, D>::TargetDeepInBounds(T &owner, Unit* target) const
+{
+    return TargetWithinBoundsPercentDistance(owner, target, 0.8f);
+}
+
+template<class T, typename D>
+bool TargetedMovementGeneratorMedium<T, D>::TargetWithinBoundsPercentDistance(T &owner, Unit* target, float pct) const
+{
+    float radius =
+        (target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius());
+    radius *= pct;
+
+    float dx = target->GetPositionX() - owner.GetPositionX();
+    float dy = target->GetPositionY() - owner.GetPositionY();
+    float dz = target->GetPositionZ() - owner.GetPositionZ();
+
+    return dx * dx + dy * dy + dz * dz < radius * radius;
+}
+
+template<class T, typename D>
+void TargetedMovementGeneratorMedium<T, D>::DoBackMovement(T &owner, Unit* target)
+{
+    float x, y, z;
+    i_backing_up = true;
+    target->GetClosePoint(x, y, z, target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius(), 1.0f, i_angle, &owner);
+    Movement::MoveSplineInit init(owner, "TargetedMovementGenerator");
+    init.MoveTo(x, y, z, MOVE_WALK_MODE);
+    init.SetWalk(true);
+    init.Launch();
 }
 
 //-----------------------------------------------//
