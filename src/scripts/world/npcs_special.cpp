@@ -1610,7 +1610,7 @@ struct npc_timbermaw_ancestorAI : ScriptedPetAI
                 if (DoCastSpellIfCan(m_creature->GetOwner(), SPELL_HEALING_TOUCH, false) == CAST_OK)
                     m_healingTouchTimer = 7000;
             }
-            else if (Unit* pTarget = m_creature->SelectRandomFriendlyTarget(m_creature->GetOwner(), 30.0f))
+            else if (Unit* pTarget = m_creature->SelectRandomFriendlyTarget(m_creature->GetOwner(), 30.0f, true))
             {
                 if (pTarget->HealthBelowPct(50))
                 {

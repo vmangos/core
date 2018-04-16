@@ -10013,7 +10013,7 @@ Unit* Unit::SelectRandomUnfriendlyTarget(Unit* except /*= NULL*/, float radius /
     return *tcIter;
 }
 
-Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= NULL*/, float radius /*= ATTACK_DISTANCE*/) const
+Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= NULL*/, float radius /*= ATTACK_DISTANCE*/, bool inCombat) const
 {
     std::list<Unit *> targets;
 
@@ -10026,13 +10026,10 @@ Unit* Unit::SelectRandomFriendlyTarget(Unit* except /*= NULL*/, float radius /*=
     if (except)
         targets.remove(except);
 
-    // remove self
-    targets.remove((Unit *) this);
-
     // remove not LoS targets
     for (std::list<Unit *>::iterator tIter = targets.begin(); tIter != targets.end();)
     {
-        if (!IsWithinLOSInMap(*tIter))
+        if (!IsWithinLOSInMap(*tIter) || (inCombat && !(*tIter)->isInCombat()))
         {
             std::list<Unit *>::iterator tIter2 = tIter;
             ++tIter;

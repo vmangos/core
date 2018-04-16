@@ -468,6 +468,16 @@ inline bool HasAuraWithSpellTriggerEffect(SpellEntry const *spellInfo)
     return false;
 }
 
+inline bool IsDismountSpell(SpellEntry const *spellInfo)
+{
+    for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        if ((spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA) && (spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MECHANIC_IMMUNITY) && (spellInfo->EffectMiscValue[i] == MECHANIC_MOUNT))
+            return true;
+    }
+    return false;
+}
+
 inline bool IsCharmSpell(SpellEntry const *spellInfo)
 {
     return IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CHARM) || IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_POSSESS);

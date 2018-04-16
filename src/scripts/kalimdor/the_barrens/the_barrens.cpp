@@ -1218,69 +1218,6 @@ CreatureAI* GetAI_npc_kolkar_invader(Creature* pCreature)
 {
     return new npc_kolkar_invaderAI(pCreature);
 }
-struct npc_kolkar_stormseerAI : public ScriptedAI
-{
-    npc_kolkar_stormseerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-    void Reset()
-    {
-        // torchTimer=15000;
-        boltTimer = 0;
-        stormTimer = urand(2000, 10000);
-    }
-    // uint32 torchTimer;
-    uint32 boltTimer;
-    uint32 stormTimer;
-    void MovementInform(uint32 movementType, uint32 moveId)
-    {
-        if (movementType != POINT_MOTION_TYPE || moveId != 2)
-            return;
-        // m_creature->CastSpell(x, y, z, SPELL_DESTROY_KARANG_S_BANNER_1, false);
-        // m_creature->CastSpell( m_creature->GetPositionX() + 10*cos( m_creature->GetOrientation()),  m_creature->GetPositionY() + 10*sin( m_creature->GetOrientation()),  m_creature->GetPositionZ(), SPELL_TORCH, false);
-    }
-    void UpdateAI(const uint32 uiDiff)
-    {
-
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-        {
-            // if (torchTimer < uiDiff)
-            // {
-            // //if (DoCastSpellIfCan(m_creature, SPELL_TORCH , true) == CAST_OK)
-            // float x,y,z;
-            // m_creature->GetRandomPoint(m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 10.0f, x, y, z);
-            // m_creature->GetMotionMaster()->MovePoint(2, x,y,z, MOVE_PATHFINDING);
-            // torchTimer=urand(40000,80000);
-            // }
-            // else
-            // torchTimer -= uiDiff;
-            return;
-        }
-
-        if (boltTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_BOLT, false) == CAST_OK)
-                boltTimer = 4000;
-        }
-        else
-            boltTimer -= uiDiff;
-
-        if (stormTimer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0), SPELL_STORM, false) == CAST_OK)
-                stormTimer = 20000;
-        }
-        else
-            stormTimer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-CreatureAI* GetAI_npc_kolkar_stormseer(Creature* pCreature)
-{
-    return new npc_kolkar_stormseerAI(pCreature);
-}
 struct npc_axe_throwerAI : public ScriptedAI
 {
     npc_axe_throwerAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -1653,11 +1590,6 @@ void AddSC_the_barrens()
     newscript = new Script;
     newscript->Name = "npc_kolkar_invader";
     newscript->GetAI = &GetAI_npc_kolkar_invader;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_kolkar_stormseer";
-    newscript->GetAI = &GetAI_npc_kolkar_stormseer;
     newscript->RegisterSelf();
 
     newscript = new Script;

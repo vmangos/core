@@ -51,7 +51,6 @@ enum
     NPC_ABOM_VENOM              = 10417,
     NPC_BLACK_GUARD             = 10394,
     NPC_YSIDA                   = 16031,
-    NPC_CHANTELOGE_FORRESTIN    = 10558,
     NPC_RAT                     = 10441,
     NPC_ASTICOT                 = 10536,
     NPC_INSECTE                 = 10461,
@@ -83,7 +82,6 @@ struct instance_stratholme : public ScriptedInstance
 
     uint32 m_auiEncounter[STRAT_MAX_ENCOUNTER];
     bool IsSilverHandDead[5];
-    bool m_ChantelogeFosrestin_pop;
 
     uint8 m_phaseBaron;
     uint32 m_uiBaronRun_Timer;
@@ -137,8 +135,6 @@ struct instance_stratholme : public ScriptedInstance
 
         for (uint8 i = 0; i < 5; ++i)
             IsSilverHandDead[i] = false;
-
-        m_ChantelogeFosrestin_pop = false;
 
         m_phaseBaron = 0;
         m_uiBaronRun_Timer = 0;
@@ -269,9 +265,6 @@ struct instance_stratholme : public ScriptedInstance
             case NPC_RAMSTEIN:
                 m_uiRamsteinGUID = pCreature->GetGUID();
                 break;
-            case NPC_CHANTELOGE_FORRESTIN:
-                m_ChantelogeFosrestin_pop = true;
-                break;
             case NPC_TIMMY:
                 m_uiTimmyGUID = pCreature->GetGUID();
                 break;
@@ -285,25 +278,6 @@ struct instance_stratholme : public ScriptedInstance
 
         // on add tous les pnj (le tri sera fait chaque uptade) sinon on a un probleme de coodon�e (il nous donne x, y et z = 0)
         npc_placeEcarlateGUID.insert(pCreature->GetGUID());
-
-        if (!m_ChantelogeFosrestin_pop)
-        {
-            switch (urand(1, 4))
-            {
-                case 1:
-                    pCreature->SummonCreature(NPC_CHANTELOGE_FORRESTIN, 3717.1f, -3499.8f, 130.6f, 2.14583f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    break;
-                case 2:
-                    pCreature->SummonCreature(NPC_CHANTELOGE_FORRESTIN, 3696.47f, -3370.6f, 131.71f, 3.354f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    break;
-                case 3:
-                    pCreature->SummonCreature(NPC_CHANTELOGE_FORRESTIN, 3556.1f, -3397.61f, 134.1f, 3.147f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    break;
-                default:
-                    pCreature->SummonCreature(NPC_CHANTELOGE_FORRESTIN, 3595.75f, -3509.93f, 137.6f, 5.74213f, TEMPSUMMON_DEAD_DESPAWN, 0);
-                    break;
-            }
-        }
     }
 
     void OnGameObjectCreate(GameObject* pGo)

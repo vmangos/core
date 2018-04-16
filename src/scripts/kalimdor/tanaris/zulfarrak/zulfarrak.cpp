@@ -899,96 +899,6 @@ CreatureAI* GetAI_alarmOMatic(Creature* pCreature)
     return new alarmOMaticAI(pCreature);
 }
 
-
-enum
-{
-    SPELL_SHOOT_FURY        =   15547, /* Distance spell */
-    SPELL_HEX               =   11641,
-    SPELL_DISMOUNT_SHOT     =   18395, /* Distance spell */
-};
-
-struct SandfuryShadowhunterAI : public ScriptedAI
-{
-    SandfuryShadowhunterAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    bool   m_bIsOutOfRange;
-    uint32 m_uiShoot_Timer;
-    uint32 m_uiHex_Timer;
-
-    void Reset()
-    {
-        m_creature->clearUnitState(UNIT_STAT_ROOT);
-        m_bIsOutOfRange           = false;
-        m_uiShoot_Timer           = 3000;
-        m_uiHex_Timer             = 6600;
-    }
-
-    void Aggro(Unit* pWho)
-    {
-        m_creature->SetInCombatWithZone();
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        /** Techniques changes depending on the distance of his target */
-        if (m_creature->GetDistance2d(m_creature->getVictim()) > 5.0f &&
-                m_creature->GetDistance2d(m_creature->getVictim()) < 31.0f)
-        {
-            m_creature->addUnitState(UNIT_STAT_ROOT);
-            m_bIsOutOfRange = true;
-        }
-        else
-        {
-            m_creature->clearUnitState(UNIT_STAT_ROOT);
-            m_bIsOutOfRange = false;
-        }
-
-        if (m_uiHex_Timer < uiDiff)
-        {
-            Unit* target = NULL;
-            target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-
-            if (DoCastSpellIfCan(target, SPELL_HEX) == CAST_OK)
-                m_uiHex_Timer = urand(6600, 6900);
-        }
-        else
-            m_uiHex_Timer -= uiDiff;
-
-        switch (m_bIsOutOfRange)
-        {
-            case 0:
-                break;
-            case 1:
-                if (m_uiShoot_Timer < uiDiff)
-                {
-                    /** Classic shoot */
-                    if (!m_creature->getVictim()->IsMounted())
-                        DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT_FURY);
-                    else
-                        /** Dismount shot if the player is mounted */
-                        DoCastSpellIfCan(m_creature->getVictim(), SPELL_DISMOUNT_SHOT);
-
-                    m_uiShoot_Timer = 3000;
-                }
-                else
-                    m_uiShoot_Timer -= uiDiff;
-                break;
-        }
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_SandfuryShadowhunterAI(Creature* pCreature)
-{
-    return new SandfuryShadowhunterAI(pCreature);
-}
-
 void AddSC_at_zumrah()
 {
     Script* pNewScript;
@@ -1007,11 +917,6 @@ void AddSC_zulfarrak()
     AddSC_go_troll_cage();
 
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "zf_sandfury_shadow_hunter";
-    newscript->GetAI = &GetAI_SandfuryShadowhunterAI;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "alarm_o_matic";

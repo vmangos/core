@@ -285,11 +285,6 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker);
         inline uint32 GetRandActionParam(uint32 rnd, uint32 param1, uint32 param2, uint32 param3);
         inline int32 GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3);
-
-        Unit* DoSelectLowestHpFriendly(float range, uint32 MinHPDiff);
-        void DoFindFriendlyMissingBuff(std::list<Creature*>& _list, float range, uint32 spellid);
-        void DoFindFriendlyCC(std::list<Creature*>& _list, float range);
-
         void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases

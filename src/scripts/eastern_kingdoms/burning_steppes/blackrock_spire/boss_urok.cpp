@@ -349,45 +349,13 @@ struct urokOgreMagusAI : public urokUnderlingAI
 {
     urokOgreMagusAI(Creature* pCreature) : urokUnderlingAI(pCreature)
     {
-        abilityReset();
     }
-    void abilityReset()
-    {
-        m_uiBloodlust_Timer = 200;
-        m_uiSlow_Timer = urand(8000, 11000);
-        m_uiArcaneBolt_Timer = 0;
-    }
-    uint32 m_uiStrike_Timer;
-    uint32 m_uiBloodlust_Timer;
-    uint32 m_uiArcaneBolt_Timer;
-    uint32 m_uiSlow_Timer;
+
     void abilityCombatUpdate(uint32 uiDiff)
     {
-        if (m_uiArcaneBolt_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANE_BOLT ) == CAST_OK)
-                m_uiArcaneBolt_Timer = urand(2400,3800);
-        }
-        else
-            m_uiArcaneBolt_Timer -= uiDiff;
-        if (m_uiSlow_Timer < uiDiff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SLOW ) == CAST_OK)
-                m_uiSlow_Timer = urand(17000, 24000);
-        }
-        else
-            m_uiSlow_Timer -= uiDiff;
+        if (!m_CreatureSpells.empty())
+            DoSpellTemplateCasts(uiDiff);
 
-        if(m_creature->GetHealthPercent() < 30.0f)
-        {
-            if (m_uiBloodlust_Timer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature, SPELL_BLOODLUST ) == CAST_OK)
-                    m_uiBloodlust_Timer = urand(35000, 50000);
-            }
-            else
-                m_uiStrike_Timer -= uiDiff;
-        }
         DoMeleeAttackIfReady();
     }
 };

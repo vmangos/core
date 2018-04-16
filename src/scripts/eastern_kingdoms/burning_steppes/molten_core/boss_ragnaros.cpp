@@ -191,7 +191,7 @@ struct boss_ragnarosAI : ScriptedAI
                 m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
         }
         m_creature->SetInCombatWithZone();
-        DoCastSpellIfCan(m_creature, SPELL_MELT_WEAPON_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT | CF_TARGET_CASTS_ON_SELF);        
+        DoCastSpellIfCan(m_creature, SPELL_MELT_WEAPON_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);        
         DoCastSpellIfCan(m_creature, SPELL_ELEMENTAL_FIRE_AURA, CF_TRIGGERED | CF_AURA_NOT_PRESENT);
     }
 

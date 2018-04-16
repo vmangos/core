@@ -231,7 +231,8 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            Unit* pUnit = DoSelectLowestHpFriendly((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
+            Unit* pUnit = m_creature->DoSelectLowestHpFriendly((float)event.friendly_hp.radius, event.friendly_hp.hpDeficit);
+
             if (!pUnit)
                 return false;
 
@@ -246,15 +247,12 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             if (!m_creature->isInCombat())
                 return false;
 
-            std::list<Creature*> pList;
-            DoFindFriendlyCC(pList, (float)event.friendly_is_cc.radius);
+            Unit* pUnit = m_creature->DoFindFriendlyCC((float)event.friendly_is_cc.radius);
 
-            //List is empty
-            if (pList.empty())
+            if (!pUnit)
                 return false;
 
-            //We don't really care about the whole list, just return first available
-            pActionInvoker = *(pList.begin());
+            pActionInvoker = pUnit;
 
             //Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.friendly_is_cc.repeatMin, event.friendly_is_cc.repeatMax);
@@ -262,15 +260,12 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         }
         case EVENT_T_FRIENDLY_MISSING_BUFF:
         {
-            std::list<Creature*> pList;
-            DoFindFriendlyMissingBuff(pList, (float)event.friendly_buff.radius, event.friendly_buff.spellId);
+            Unit* pUnit = m_creature->DoFindFriendlyMissingBuff((float)event.friendly_buff.radius, event.friendly_buff.spellId);
 
-            //List is empty
-            if (pList.empty())
+            if (!pUnit)
                 return false;
 
-            //We don't really care about the whole list, just return first available
-            pActionInvoker = *(pList.begin());
+            pActionInvoker = pUnit;
 
             //Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.friendly_buff.repeatMin, event.friendly_buff.repeatMax);
@@ -619,8 +614,8 @@ void CreatureEventAI::AttackStart(Unit *who)
         m_creature->SetInCombatWith(who);
         who->SetInCombatWith(m_creature);
 
-        if (!m_CombatMovementEnabled)
-            m_creature->SetCasterChaseDistance(25.0f);
+        //if (!m_CombatMovementEnabled)
+        //    m_creature->SetCasterChaseDistance(25.0f);
         m_creature->GetMotionMaster()->MoveChase(who, m_AttackDistance, m_AttackAngle);
     }
 }
@@ -823,35 +818,6 @@ inline int32 CreatureEventAI::GetRandActionParam(uint32 rnd, int32 param1, int32
 void CreatureEventAI::SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent)
 {
     m_InvinceabilityHpLevel = is_percent ? m_creature->GetMaxHealth() * hp_level / 100 : hp_level;
-}
-
-Unit* CreatureEventAI::DoSelectLowestHpFriendly(float range, uint32 MinHPDiff)
-{
-    Unit* pUnit = nullptr;
-
-    MaNGOS::MostHPMissingInRangeCheck u_check(m_creature, range, MinHPDiff);
-    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
-
-    /*
-    typedef TYPELIST_4(GameObject, Creature*except pets*, DynamicObject, Corpse*Bones*) AllGridObjectTypes;
-    This means that if we only search grid then we cannot possibly return pets or players so this is safe
-    */
-    Cell::VisitGridObjects(m_creature, searcher, range);
-    return pUnit;
-}
-
-void CreatureEventAI::DoFindFriendlyCC(std::list<Creature*>& _list, float range)
-{
-    MaNGOS::FriendlyCCedInRangeCheck u_check(m_creature, range);
-    MaNGOS::CreatureListSearcher<MaNGOS::FriendlyCCedInRangeCheck> searcher(_list, u_check);
-    Cell::VisitGridObjects(m_creature, searcher, range);
-}
-
-void CreatureEventAI::DoFindFriendlyMissingBuff(std::list<Creature*>& _list, float range, uint32 spellid)
-{
-    MaNGOS::FriendlyMissingBuffInRangeCheck u_check(m_creature, range, spellid);
-    MaNGOS::CreatureListSearcher<MaNGOS::FriendlyMissingBuffInRangeCheck> searcher(_list, u_check);
-    Cell::VisitGridObjects(m_creature, searcher, range);
 }
 
 //*********************************

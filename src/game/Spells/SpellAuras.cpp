@@ -2205,10 +2205,16 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
     switch (form)
     {
     case FORM_CAT:
-        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-            modelid = 892;
+        
+        if (target->IsPlayer())
+        {
+            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+                modelid = 892;
+            else
+                modelid = 8571;
+        }
         else
-            modelid = 8571;
+            modelid = 892;
         mod = 0.80f;
         break;
     case FORM_TRAVEL:
@@ -2220,20 +2226,20 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
         mod = 0.80f;
         break;
     case FORM_BEAR:
-        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-            modelid = 2281;
+    case FORM_DIREBEAR:
+        if (target->IsPlayer())
+        {
+            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+                modelid = 2281;
+            else
+                modelid = 2289;
+        }
         else
-            modelid = 2289;
+            modelid = 2281;
         break;
     case FORM_GHOUL:
         if (Player::TeamForRace(target->getRace()) == ALLIANCE)
             modelid = 10045;
-        break;
-    case FORM_DIREBEAR:
-        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-            modelid = 2281;
-        else
-            modelid = 2289;
         break;
     case FORM_CREATUREBEAR:
         modelid = 902;
@@ -2243,10 +2249,15 @@ std::pair<unsigned int, float> getShapeshiftModelInfo(ShapeshiftForm form, Unit 
         mod = 0.80f;
         break;
     case FORM_MOONKIN:
-        if (Player::TeamForRace(target->getRace()) == ALLIANCE)
-            modelid = 15374;
+        if (target->IsPlayer())
+        {
+            if (Player::TeamForRace(target->getRace()) == ALLIANCE)
+                modelid = 15374;
+            else
+                modelid = 15375;
+        }
         else
-            modelid = 15375;
+            modelid = 15374;
         break;
     case FORM_TREE:
         modelid = 864;

@@ -276,95 +276,13 @@ CreatureAI* GetAI_boss_cannon_master_willey(Creature* pCreature)
 }
 
 /*######
-## Crimson Rifleman
-######*/
-
-enum
-{
-    SPELL_SHOOT_2     = 17353,
-    SPELL_CANNON_FIRE = 17278
-};
-
-struct mob_crimson_riflemanAI : public ScriptedAI
-{
-    mob_crimson_riflemanAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    bool m_bInMelee;    
-    uint32 m_uiShootTimer;
-    
-    void Reset() override
-    {
-        SetCombatMovement(false);
-
-        m_bInMelee      = false;
-        m_uiShootTimer  = 1000;
-    }
-    
-    void SpellHit(Unit* /*pCaster*/, const SpellEntry* pSpell) override
-    {
-        if (pSpell && pSpell->Id == SPELL_CANNON_FIRE) 
-        {
-            m_creature->DealDamage(m_creature, m_creature->GetHealth(), NULL, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, NULL, false);
-        }
-    }
-
-    void UpdateAI(const uint32 diff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        // Shoot
-        if (m_uiShootTimer < diff)
-        {
-            if (m_creature->GetDistance2d(m_creature->getVictim()) >= 5.0f && DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT_2) == CAST_OK)
-                m_uiShootTimer = urand(2500, 3500);
-        }
-        else 
-            m_uiShootTimer -= diff;
-
-        if (!IsCombatMovement())
-        { //Melee
-            if (!m_bInMelee && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 95.0f || !m_creature->IsWithinLOSInMap(m_creature->getVictim())))
-            {
-                SetCombatMovement(true);
-                DoStartMovement(m_creature->getVictim());
-                m_bInMelee = true;
-                return;
-            }
-        }
-        else
-        { //Range
-            if (m_bInMelee && m_creature->GetDistance2d(m_creature->getVictim()) >= 5.0f && m_creature->GetDistance2d(m_creature->getVictim()) <= 95.0f && m_creature->IsWithinLOSInMap(m_creature->getVictim()))
-            {
-                SetCombatMovement(false);
-                m_bInMelee = false;
-                DoStartNoMovement(m_creature->getVictim());
-                return;
-            }
-        }
-        
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_mob_crimson_rifleman(Creature* pCreature)
-{
-    return new mob_crimson_riflemanAI(pCreature);
-}
-
-/*######
 ## GO_scarlet_cannon
 ######*/
 
 enum
 {
     NPC_CANNONBALL    = 160018,
+    SPELL_CANNON_FIRE = 17278
 };
 
 bool GO_scarlet_cannon(Player* pPlayer, GameObject* pGo)
@@ -383,11 +301,6 @@ void AddSC_boss_cannon_master_willey()
     newscript = new Script;
     newscript->Name = "boss_cannon_master_willey";
     newscript->GetAI = &GetAI_boss_cannon_master_willey;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_crimson_rifleman";
-    newscript->GetAI = &GetAI_mob_crimson_rifleman;
     newscript->RegisterSelf();
 
     newscript = new Script;

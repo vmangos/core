@@ -481,9 +481,6 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                                     tablename, tmp.castSpell.flags, tmp.id);
                     continue;
                 }
-                // Cast is always triggered if target is forced to cast on self
-                if (tmp.castSpell.flags & CF_TARGET_CASTS_ON_SELF)
-                    tmp.castSpell.flags |= CF_TRIGGERED;
                 break;
             }
             case SCRIPT_COMMAND_REMOVE_ITEM:

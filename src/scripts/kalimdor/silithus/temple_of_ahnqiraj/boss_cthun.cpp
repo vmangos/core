@@ -565,7 +565,7 @@ public:
             if (birthTimer > diff) {
                 // Only want to cast it once, and it cant be done in ctor because groundRupture interrupts the animation.
                 if (birthTimer == TENTACLE_BIRTH_DURATION) {
-                    DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH, CF_TARGET_CASTS_ON_SELF);
+                    DoCastSpellIfCan(m_creature, SPELL_TENTACLE_BIRTH);
                 }
                 birthTimer -= diff;
             }

@@ -458,7 +458,7 @@ void Spell::FillTargetMap()
                         {
                             if (Unit* pUnitTarget = m_caster->SelectMagnetTarget(m_targets.getUnitTarget(), this, SpellEffectIndex(i)))
                             {
-                                if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->IsValidAttackTarget(pUnitTarget))
+                                if (m_caster->IsValidAttackTarget(pUnitTarget))
                                     tmpUnitMap.push_back(pUnitTarget);
                             }
                         }
@@ -3129,13 +3129,13 @@ bool IsAcceptableAutorepeatError(SpellCastResult result)
     return false;
 }
 
-void Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura)
+SpellCastResult Spell::prepare(SpellCastTargets targets, Aura* triggeredByAura, uint32 chance)
 {
     m_targets = std::move(targets);
-    prepare(triggeredByAura);
+    return prepare(triggeredByAura, chance);
 }
 
-void Spell::prepare(Aura* triggeredByAura)
+SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 {
 
     m_spellState = SPELL_STATE_PREPARING;
@@ -3175,14 +3175,14 @@ void Spell::prepare(Aura* triggeredByAura)
             {
                 SendCastResult(SPELL_FAILED_SPELL_IN_PROGRESS);
                 finish(false);
-                return;
+                return SPELL_FAILED_SPELL_IN_PROGRESS;
             }
         }
         if (sObjectMgr.IsSpellDisabled(m_spellInfo->Id))
         {
             SendCastResult(SPELL_FAILED_SPELL_UNAVAILABLE);
             finish(false);
-            return;
+            return SPELL_FAILED_SPELL_UNAVAILABLE;
         }
 
         // Fill cost data
@@ -3210,10 +3210,21 @@ void Spell::prepare(Aura* triggeredByAura)
                     SendCastResult(result);
                     //SendInterrupted(0);
                     finish(false);
-                    return;
+                    return result;
                 }
             }
         }
+
+        // Roll chance to cast from script (must be after cast checks, this is why its here)
+        if (chance)
+        {
+            if (chance <= rand() % 100)
+            {
+                finish(false);
+                return SPELL_FAILED_TRY_AGAIN;
+            } 
+        }
+
         // Prepare data for triggers
         prepareDataForTriggerSystem();
 
@@ -3276,8 +3287,10 @@ void Spell::prepare(Aura* triggeredByAura)
         sLog.outInfo("[Spell/Crash] 'prepare()' [%u:%s:%u:{%f:%f:%f}]", m_spellInfo->Id, m_caster->GetName(), m_caster->GetGUIDLow(), m_castPositionX, m_castPositionY, m_castPositionZ);
         sLog.outInfo(e.what());
         finish(false);
-        return;
+        return SPELL_FAILED_UNKNOWN;
     }
+
+    return SPELL_CAST_OK;
 }
 
 void Spell::cancel()

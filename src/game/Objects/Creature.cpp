@@ -3408,16 +3408,146 @@ Unit* Creature::SelectNearestHostileUnitInAggroRange(bool useLOS) const
 }
 
 // Returns friendly unit with the most amount of hp missing from max hp
-Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent) const
+Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool bPercent, Unit* except) const
 {
-    Unit* pUnit = nullptr;
+    std::list<Unit *> targets;
 
     MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
-    MaNGOS::UnitLastSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(pUnit, u_check);
+    MaNGOS::UnitListSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(targets, u_check);
 
     Cell::VisitGridObjects(this, searcher, fRange);
 
+    // remove current target
+    if (except)
+        targets.remove(except);
+
+    // no appropriate targets
+    if (targets.empty())
+        return nullptr;
+
+    return *targets.begin();
+}
+
+// Returns friendly unit that does not have an aura from the provided spellid
+Unit* Creature::DoFindFriendlyMissingBuff(float range, uint32 spellid, Unit* except) const
+{
+    std::list<Unit *> targets;
+
+    MaNGOS::FriendlyMissingBuffInRangeCheck u_check(this, range, spellid);
+    MaNGOS::UnitListSearcher<MaNGOS::FriendlyMissingBuffInRangeCheck> searcher(targets, u_check);
+
+    Cell::VisitGridObjects(this, searcher, range);
+
+    // remove current target
+    if (except)
+        targets.remove(except);
+
+    // no appropriate targets
+    if (targets.empty())
+        return nullptr;
+
+    return *targets.begin();
+}
+
+// Returns friendly unit that is under a crowd control effect
+Unit* Creature::DoFindFriendlyCC(float range) const
+{
+    Unit* pUnit = nullptr;
+
+    MaNGOS::FriendlyCCedInRangeCheck u_check(this, range);
+    MaNGOS::UnitSearcher<MaNGOS::FriendlyCCedInRangeCheck> searcher(pUnit, u_check);
+
+    Cell::VisitGridObjects(this, searcher, range);
+
     return pUnit;
+}
+
+SpellCastResult Creature::TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags, uint8 uiChance)
+{
+    if (IsNonMeleeSpellCasted(false) && !(uiCastFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS)))
+        return SPELL_FAILED_SPELL_IN_PROGRESS;
+
+    const SpellEntry* pSpellInfo = sSpellMgr.GetSpellEntry(uiSpell);
+
+    if (!pSpellInfo)
+    {
+        sLog.outError("TryToCast: attempt to cast unknown spell %u by creature with entry: %u", uiSpell, GetEntry());
+        return SPELL_FAILED_SPELL_UNAVAILABLE;
+    }
+
+    return TryToCast(pTarget, pSpellInfo, uiCastFlags, uiChance);
+}
+
+SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo, uint32 uiCastFlags, uint8 uiChance)
+{
+    if (!pTarget)
+        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+
+    // This spell should only be cast when target does not have the aura it applies.
+    if ((uiCastFlags & CF_AURA_NOT_PRESENT) && pTarget->HasAura(pSpellInfo->Id))
+        return SPELL_FAILED_AURA_BOUNCED;
+
+    // Can't cast while fleeing.
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() == TIMED_FLEEING_MOTION_TYPE)
+        return SPELL_FAILED_NOT_WHILE_FATIGUED;
+
+    // This spell is only used when target is in melee range.
+    if ((uiCastFlags & CF_ONLY_IN_MELEE) && !CanReachWithMeleeAttack(pTarget))
+        return SPELL_FAILED_OUT_OF_RANGE;
+
+    // This spell should not be used if target is in melee range.
+    if ((uiCastFlags & CF_NOT_IN_MELEE) && CanReachWithMeleeAttack(pTarget))
+        return SPELL_FAILED_TOO_CLOSE;
+
+    // This spell should only be cast when we cannot get into melee range.
+    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(hasUnitState(UNIT_STAT_NOT_MOVE) || !GetMotionMaster()->operator->()->IsReachable())))
+        return SPELL_FAILED_MOVING;
+
+    // Custom checks
+    if (!(uiCastFlags & CF_FORCE_CAST))
+    {
+        // ToDo: Remove this check when checking for stuns is fixed in Spell.cpp
+        if (!(uiCastFlags & CF_TRIGGERED) && hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
+            return SPELL_FAILED_PREVENTED_BY_MECHANIC;
+
+        // If the spell requires to be behind the target.
+        if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
+            return SPELL_FAILED_UNIT_NOT_BEHIND;
+
+        // If the spell requires the target having a specific power type.
+        if (!IsAreaOfEffectSpell(pSpellInfo) && !IsTargetPowerTypeValid(pSpellInfo, pTarget->getPowerType()))
+            return SPELL_FAILED_UNKNOWN;
+
+        // Mind control abilities can't be used with just 1 attacker or mob will reset.
+        if ((getThreatManager().getThreatList().size() == 1) && IsCharmSpell(pSpellInfo))
+            return SPELL_FAILED_UNKNOWN;
+
+        // Do not use dismounting spells when target is not mounted (there are 4 such spells).
+        if (!pTarget->IsMounted() && IsDismountSpell(pSpellInfo))
+            return SPELL_FAILED_ONLY_MOUNTED;
+    }
+
+    // Interrupt any previous spell
+    if ((uiCastFlags & CF_INTERRUPT_PREVIOUS) && IsNonMeleeSpellCasted(false))
+        InterruptNonMeleeSpells(false);
+
+    Spell *spell = new Spell(this, pSpellInfo, uiCastFlags & CF_TRIGGERED);
+
+    SpellCastTargets targets;
+
+    // Don't set unit target on destination target based spells, otherwise the spell will cancel
+    // as soon as the target dies or leaves the area of the effect
+    if (pSpellInfo->Targets & TARGET_FLAG_DEST_LOCATION)
+        targets.setDestination(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ());
+    else
+        targets.setUnitTarget(pTarget);
+
+    if (pSpellInfo->Targets & TARGET_FLAG_SOURCE_LOCATION)
+        if (WorldObject* caster = spell->GetCastingObject())
+            targets.setSource(caster->GetPositionX(), caster->GetPositionY(), caster->GetPositionZ());
+
+    spell->SetCastItem(nullptr);
+    return spell->prepare(std::move(targets), nullptr, uiChance);
 }
 
 // use this function to avoid having hostile creatures attack

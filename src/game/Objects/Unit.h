@@ -1056,7 +1056,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void StopAttackFaction(uint32 faction_id);
         Unit* SelectNearestTarget(float dist) const;
         Unit* SelectRandomUnfriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE, bool inFront = false, bool isValidAttackTarget = false) const;
-        Unit* SelectRandomFriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE) const;
+        Unit* SelectRandomFriendlyTarget(Unit* except = nullptr, float radius = ATTACK_DISTANCE, bool inCombat = false) const;
         Unit* SummonCreatureAndAttack(uint32 creatureEntry, Unit* pVictim= nullptr);
         bool IsSecondaryThreatTarget();
         bool hasNegativeAuraWithInterruptFlag(uint32 flag);
