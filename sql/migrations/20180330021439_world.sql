@@ -67,6 +67,7 @@ UPDATE creature SET MovementType=1 WHERE guid=37099;
 
 -- Remove an extra Cracked Golem
 DELETE FROM creature where guid=37090;
+DELETE FROM `creature_addon` WHERE `guid`=37090;
 
 -- End of migration.
 END IF;
