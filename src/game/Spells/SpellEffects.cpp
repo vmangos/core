@@ -3458,6 +3458,9 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                 }
             }
         }
+        // Eye of Kilrog
+        if (m_spellInfo->Effect[eff_idx] == SPELL_EFFECT_SUMMON_POSSESSED)
+            level = m_caster->getLevel();
     }
 
     // select center of summon position
