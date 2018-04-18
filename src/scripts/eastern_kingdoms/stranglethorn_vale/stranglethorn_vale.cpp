@@ -545,9 +545,9 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
         m_creature->ClearTemporaryFaction();
     }
 
-    void SummonedCreatureDespawn(Creature* /*pCreature*/) override
+    void SummonedCreatureDespawn(Creature* pCreature) override
     {
-        if (!m_bStartEvent)
+        if (!m_bStartEvent || !pCreature->isAlive())
             return;
 
         m_bResetEvent = true;
@@ -586,6 +586,7 @@ struct npc_witch_doctor_unbagwaAI : ScriptedAI
         m_creature->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
         m_creature->SetFactionTemporary(FACTION_ESCORT_N_NEUTRAL_PASSIVE, TEMPFACTION_NONE);
         m_bStartEvent = true;
+        m_bResetEvent = false;
     }
 
     void UpdateAI(const uint32 uiDiff) override
