@@ -12,6 +12,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "ScriptedEscortAI.h"
 #include "Chat.h"
+#include "PointMovementGenerator.h"
 
 const float DEFAULT_MAX_PLAYER_DISTANCE = 100.0f;
 const float DEFAULT_MAX_ASSIST_DISTANCE =  40.0f;
@@ -279,12 +280,18 @@ void npc_escortAI::UpdateAI(const uint32 uiDiff)
 
             if (!HasEscortState(STATE_ESCORT_PAUSED))
             {
-                uint32 options = m_bIsPathfindingEnabledBetweenWaypoints ? MOVE_PATHFINDING : 0;
-                options |= m_bIsRunning ? MOVE_RUN_MODE : MOVE_WALK_MODE;
-                m_creature->GetMotionMaster()->MovePoint(CurrentWP->id, CurrentWP->x, CurrentWP->y, CurrentWP->z, options);
-                sLog.outDebug("EscortAI start waypoint %u (%f, %f, %f).", CurrentWP->id, CurrentWP->x, CurrentWP->y, CurrentWP->z);
+                // If the creature has just returned from combat there's a motion to resume
+                if (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == POINT_MOTION_TYPE)
+                    m_creature->GetMotionMaster()->top()->Initialize(*m_creature);
+                else
+                {
+                    uint32 options = m_bIsPathfindingEnabledBetweenWaypoints ? MOVE_PATHFINDING : 0;
+                    options |= m_bIsRunning ? MOVE_RUN_MODE : MOVE_WALK_MODE;
+                    m_creature->GetMotionMaster()->MovePoint(CurrentWP->id, CurrentWP->x, CurrentWP->y, CurrentWP->z, options);
+                    sLog.outDebug("EscortAI start waypoint %u (%f, %f, %f).", CurrentWP->id, CurrentWP->x, CurrentWP->y, CurrentWP->z);
 
-                WaypointStart(CurrentWP->id);
+                    WaypointStart(CurrentWP->id);
+                }
 
                 m_uiWPWaitTimer = 0;
             }
