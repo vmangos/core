@@ -756,6 +756,11 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             if (!isAlive())
                 break;
 
+            float hpPercent = GetHealthPercent();
+            ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, hpPercent < 16.0f);
+            ModifyAuraState(AURA_STATE_HEALTHLESS_10_PERCENT, hpPercent < 11.0f);
+            ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, hpPercent < 6.0f);
+
             bool unreachableTarget = !i_motionMaster.empty() &&
                                      getVictim() &&
                                      GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
@@ -929,6 +934,11 @@ void Creature::DoFlee()
     if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
         return;
 
+    float hpPercent = GetHealthPercent();
+    ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, hpPercent < 16.0f);
+    ModifyAuraState(AURA_STATE_HEALTHLESS_10_PERCENT, hpPercent < 11.0f);
+    ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, hpPercent < 6.0f);
+
     SetNoSearchAssistance(true);
 
     SetFleeing(true, getVictim()->GetObjectGuid(), 0, sWorld.getConfig(CONFIG_UINT32_CREATURE_FAMILY_FLEE_DELAY));
@@ -971,7 +981,7 @@ void Creature::DoFleeToGetAssistance()
 float Creature::GetFleeingSpeed() const
 {
     //TODO: There are different speeds for the different mobs, isn't there?
-    return GetSpeed(MOVE_RUN) * 0.6f;
+    return GetSpeed(MOVE_RUN);
 }
 
 bool Creature::AIM_Initialize()

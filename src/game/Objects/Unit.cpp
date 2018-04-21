@@ -5935,6 +5935,17 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
                         CastSpell(this, itr->first, true, nullptr);
                 }
             }
+            else 
+            {
+                switch (flag) 
+                {
+                    case AURA_STATE_HEALTHLESS_15_PERCENT:
+                    case AURA_STATE_HEALTHLESS_10_PERCENT:
+                    case AURA_STATE_HEALTHLESS_5_PERCENT:
+                        UpdateSpeed(MOVE_RUN, true);
+                        break;
+                }
+            }
         }
     }
     else
@@ -5954,6 +5965,17 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
                 }
                 else
                     ++itr;
+            }
+            if (GetTypeId() == TYPEID_UNIT)
+            {
+                switch (flag) 
+                {
+                    case AURA_STATE_HEALTHLESS_15_PERCENT:
+                    case AURA_STATE_HEALTHLESS_10_PERCENT:
+                    case AURA_STATE_HEALTHLESS_5_PERCENT:
+                        UpdateSpeed(MOVE_RUN, true);
+                        break;
+                }
             }
         }
     }
@@ -7982,14 +8004,8 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
             break;
     }
 
-    // for creature case, we check explicit if mob searched for assistance
-    if (GetTypeId() == TYPEID_UNIT)
-    {
-        if (((Creature*)this)->HasSearchedAssistance())
-            speed *= 0.66f;                                 // best guessed value, so this will be 33% reduction. Based off initial speed, mob can then "run", "walk fast" or "walk".
-    }
     // for player case, we look for some custom rates
-    else
+    if (GetTypeId() == TYPEID_PLAYER)
     {
         if (getDeathState() == CORPSE)
             speed *= sWorld.getConfig(((Player*)this)->InBattleGround() ? CONFIG_FLOAT_GHOST_RUN_SPEED_BG : CONFIG_FLOAT_GHOST_RUN_SPEED_WORLD);
@@ -8020,6 +8036,17 @@ void Unit::UpdateSpeed(UnitMoveType mtype, bool forced, float ratio)
         }
         else
             speed *= 1.14286f;  // normalized player pet runspeed
+
+        // Speed reduction at low health percentages
+        if (!pCreature->IsPet() && !pCreature->IsWorldBoss())
+        {
+            if (HasAuraState(AURA_STATE_HEALTHLESS_5_PERCENT))
+                speed *= SPEED_REDUCTION_HP_5;
+            else if (HasAuraState(AURA_STATE_HEALTHLESS_10_PERCENT))
+                speed *= SPEED_REDUCTION_HP_10;
+            else if (HasAuraState(AURA_STATE_HEALTHLESS_15_PERCENT))
+                speed *= SPEED_REDUCTION_HP_15;
+        }
     }
 
     SetSpeedRate(mtype, speed * ratio, forced);
@@ -8156,6 +8183,9 @@ void Unit::SetDeathState(DeathState s)
         StopMoving(true);
 
         ModifyAuraState(AURA_STATE_HEALTHLESS_20_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_10_PERCENT, false);
+        ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, false);
         // remove aurastates allowing special moves
         ClearAllReactives();
         ClearDiminishings();

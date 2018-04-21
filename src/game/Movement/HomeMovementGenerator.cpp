@@ -38,6 +38,11 @@ void HomeMovementGenerator<Creature>::_setTargetLocation(Creature & owner)
     if (owner.hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         return;
 
+    // Remove speed reductions from low hp
+    owner.ModifyAuraState(AURA_STATE_HEALTHLESS_15_PERCENT, false);
+    owner.ModifyAuraState(AURA_STATE_HEALTHLESS_10_PERCENT, false);
+    owner.ModifyAuraState(AURA_STATE_HEALTHLESS_5_PERCENT, false);
+
     Movement::MoveSplineInit init(owner, "HomeMovementGenerator");
     float x, y, z, o;
     // at apply we can select more nice return points base at current movegen

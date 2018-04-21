@@ -781,7 +781,11 @@ enum AuraState
     AURA_STATE_JUDGEMENT                    = 5,            // C   |
     //AURA_STATE_UNKNOWN6                   = 6,            //     | not used
     AURA_STATE_HUNTER_PARRY                 = 7,            // C   |
-    AURA_STATE_ROGUE_ATTACK_FROM_STEALTH    = 7,            // C   | FIX ME: not implemented yet!
+    AURA_STATE_ROGUE_ATTACK_FROM_STEALTH    = 8,            // C   | FIX ME: not implemented yet!
+    // Custom aura states - not based on spell data:
+    AURA_STATE_HEALTHLESS_15_PERCENT        = 9,
+    AURA_STATE_HEALTHLESS_10_PERCENT        = 10,
+    AURA_STATE_HEALTHLESS_5_PERCENT         = 11,
 };
 
 // Spell mechanics
