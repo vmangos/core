@@ -163,7 +163,7 @@ bool instance_temple_of_ahnqiraj::IsEncounterInProgress() const
 {
     for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
     {
-        if (m_auiEncounter[i] == IN_PROGRESS)
+        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
             return true;
     }
 
@@ -332,12 +332,12 @@ void instance_temple_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         if (uiData == SPECIAL)
         {
             ++m_uiBugTrioDeathCount;
-            if (m_uiBugTrioDeathCount == 2)
+            if (m_uiBugTrioDeathCount >= 3)
                 SetData(TYPE_BUG_TRIO, DONE);
             // don't store any special data
             break;
         }
-        if (uiData == FAIL)
+        if (uiData == IN_PROGRESS)
             m_uiBugTrioDeathCount = 0;
         m_auiEncounter[uiType] = uiData;
         break;

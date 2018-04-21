@@ -202,6 +202,8 @@ struct boss_ossirianAI : public ScriptedAI
         uint32 zoneid = m_creature->GetZoneId();
         if (Weather* wth = sWorld.FindWeather(zoneid))
             wth->SetWeather(WeatherType(3), 2);
+
+        m_pInstance->SetData(TYPE_OSSIRIAN, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)

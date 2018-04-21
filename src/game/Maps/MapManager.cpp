@@ -208,14 +208,6 @@ bool MapManager::CanPlayerEnter(uint32 mapid, Player* player)
             player->SendTransferAborted(TRANSFER_ABORT_TOO_MANY_INSTANCES);
             return false;
         }
-
-        // TODO: move this to a map dependent location
-        /*if(i_data && i_data->IsEncounterInProgress())
-        {
-            DEBUG_LOG("MAP: Player '%s' can't enter instance '%s' while an encounter is in progress.", player->GetName(), GetMapName());
-            player->SendTransferAborted(TRANSFER_ABORT_ZONE_IN_COMBAT);
-            return(false);
-        }*/
     }
 
     return true;

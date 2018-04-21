@@ -7,7 +7,7 @@
 
 enum
 {
-    ZULGURUB_MAX_ENCOUNTER  = 11,
+    ZULGURUB_MAX_ENCOUNTER  = 13,
 
     NPC_LORKHAN             = 11347,
     NPC_ZATH                = 11348,
@@ -33,15 +33,15 @@ enum
     TYPE_LORKHAN            = 8,
     TYPE_HAKKAR             = 9,
     TYPE_RANDOM_BOSS        = 10,
+    TYPE_JINDO              = 11,
+    TYPE_GAHZRANKA          = 12,
 
-    DATA_JINDO              = 11,
-    DATA_LORKHAN            = 12,
-    DATA_THEKAL             = 13,
-    DATA_ZATH               = 14,
-    DATA_HAKKAR             = 15,
-
-    TYPE_GAHZRANKA          = 16,
-    DATA_GAHZRANKA          = 17
+    DATA_JINDO              = 13,
+    DATA_LORKHAN            = 14,
+    DATA_THEKAL             = 15,
+    DATA_ZATH               = 16,
+    DATA_HAKKAR             = 17,
+    DATA_GAHZRANKA          = 18
 };
 
 class instance_zulgurub : public ScriptedInstance
@@ -50,15 +50,15 @@ class instance_zulgurub : public ScriptedInstance
         instance_zulgurub(Map* pMap) : ScriptedInstance(pMap), m_randomBossSpawned(false) {Initialize();};
 
         void Initialize();
-                void Create();
+        void Create();
 
-        bool IsEncounterInProgress();
+        bool IsEncounterInProgress() const override;
         void OnCreatureCreate(Creature* pCreature);
-                void OnCreatureDeath(Creature * pCreature);
+        void OnCreatureDeath(Creature * pCreature);
         void SetData(uint32 uiType, uint32 uiData);
         const char* Save();
         void Load(const char* chrIn);
-                void HandleLoadCreature(uint32 dataType, uint64 &storeGuid, Creature* pCrea); // Nostalrius
+        void HandleLoadCreature(uint32 dataType, uint64 &storeGuid, Creature* pCrea); // Nostalrius
 
         uint32 GetData(uint32 uiType);
         uint64 GetData64(uint32 uiData);
@@ -71,8 +71,8 @@ class instance_zulgurub : public ScriptedInstance
 
     protected:
         std::string strInstData;
-                bool m_randomBossSpawned;
-                uint32 randomBossEntry;
+        bool m_randomBossSpawned;
+        uint32 randomBossEntry;
         // If all High Priest bosses were killed. Lorkhan, Zath and Ohgan are added too.
         uint32 m_auiEncounter[ZULGURUB_MAX_ENCOUNTER];
 
@@ -85,7 +85,7 @@ class instance_zulgurub : public ScriptedInstance
         uint64 m_uiGahzrankaGUID;
 
         uint64 m_uiMarliGUID;
-                std::list<uint64> m_lMarliTrashGUIDList;
+        std::list<uint64> m_lMarliTrashGUIDList;
 };
 
 #endif

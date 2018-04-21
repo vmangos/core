@@ -22,6 +22,7 @@ SDCategory: Ruins of Ahn'Qiraj
 EndScriptData */
 
 #include "scriptPCH.h"
+#include "ruins_of_ahnqiraj.h"
 
 enum
 {
@@ -43,8 +44,11 @@ struct boss_moamAI : public ScriptedAI
 {
     boss_moamAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
+        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
         Reset();
     }
+
+    ScriptedInstance* m_pInstance;
 
     uint32 m_uiTrample_Timer;
     uint32 m_uiSummonManaFiend_Timer;
@@ -72,6 +76,9 @@ struct boss_moamAI : public ScriptedAI
         m_uiArmorValue = m_creature->GetArmor();
 
         m_OGvictim.Clear();
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_MOAM, NOT_STARTED);
     }
 
     void Aggro(Unit* pWho)
@@ -83,6 +90,9 @@ struct boss_moamAI : public ScriptedAI
             m_creature->SetPower(POWER_MANA, 0);
             m_bIsInCombat = true;
         }
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_MOAM, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)
@@ -93,6 +103,9 @@ struct boss_moamAI : public ScriptedAI
                                 m_creature->GetPositionZ(),
                                 0, 0, 0, 0, 0, -1, false);
         pObsidian->SetRespawnTime(345600);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_MOAM, DONE);
     }
 
     /** This function seems to be unused, kept as it is in case of...*/

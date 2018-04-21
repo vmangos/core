@@ -20,12 +20,12 @@ enum
     TYPE_KURINNAXX          = 0,
     TYPE_GENERAL_ANDOROV    = 1,
     TYPE_RAJAXX             = 2,
-    INSTANCE_RUINS_AQ_MAX_ENCOUNTER           = 3,
+    TYPE_BURU               = 3,
+    TYPE_MOAM               = 4,
+    TYPE_AYAMISS            = 5,
+    TYPE_OSSIRIAN           = 6,
+    INSTANCE_RUINS_AQ_MAX_ENCOUNTER = 7,
 
-    TYPE_BURU               = 4,
-    TYPE_MOAM               = 5,
-    TYPE_AYAMISS            = 6,
-    TYPE_OSSIRIAN           = 7,
     TYPE_QIRAJI_GLADIATOR   = 8,
 };
 

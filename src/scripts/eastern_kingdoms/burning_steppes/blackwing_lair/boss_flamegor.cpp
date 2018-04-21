@@ -50,11 +50,6 @@ struct boss_flamegorAI : public ScriptedAI
     uint32 m_uiWingBuffetTimer;
     uint32 m_uiFrenzyTimer;
 
-    void EnterCombat(Unit* /*pWho*/)
-    {
-        m_creature->SetInCombatWithZone();
-    }
-
     void Reset()
     {
         m_uiShadowFlameTimer = 16000;                        // These times are probably wrong

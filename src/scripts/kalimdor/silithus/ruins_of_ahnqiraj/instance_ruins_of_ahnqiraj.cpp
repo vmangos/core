@@ -75,7 +75,7 @@ void instance_ruins_of_ahnqiraj::Initialize()
 bool instance_ruins_of_ahnqiraj::IsEncounterInProgress() const
 {
     for (uint8 i = 0; i < INSTANCE_RUINS_AQ_MAX_ENCOUNTER; ++i)
-        if (m_auiEncounter[i] == IN_PROGRESS)
+        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
             return true;
     return false;
 }
@@ -376,6 +376,10 @@ uint32 instance_ruins_of_ahnqiraj::GetData(uint32 uiType)
         case TYPE_KURINNAXX:
         case TYPE_GENERAL_ANDOROV:
         case TYPE_RAJAXX:
+        case TYPE_BURU:
+        case TYPE_MOAM:
+        case TYPE_AYAMISS:
+        case TYPE_OSSIRIAN:
             return m_auiEncounter[uiType];
         case TYPE_WAVE1:
         case TYPE_WAVE2:
@@ -468,6 +472,13 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                 crystalIndexes.clear();
                 crystalIndexHistory.clear();
             }
+            m_auiEncounter[TYPE_OSSIRIAN] = uiData;
+            break;
+        case TYPE_BURU:
+        case TYPE_MOAM:
+        case TYPE_AYAMISS:
+            m_auiEncounter[uiType] = uiData;
+            break;
         default:
             return;
     }
@@ -478,7 +489,8 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
         OUT_SAVE_INST_DATA;
 
         std::ostringstream saveStream;
-        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " ";
+        saveStream << m_auiEncounter[0] << " " << m_auiEncounter[1] << " " << m_auiEncounter[2] << " "
+            << m_auiEncounter[3] << " " << m_auiEncounter[4] << " " << m_auiEncounter[5] << " " << m_auiEncounter[6];
 
         strInstData = saveStream.str();
 
@@ -504,7 +516,8 @@ void instance_ruins_of_ahnqiraj::Load(const char* chrIn)
 
     std::istringstream loadStream(chrIn);
 
-    loadStream    >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2];
+    loadStream >> m_auiEncounter[0] >> m_auiEncounter[1] >> m_auiEncounter[2] >> m_auiEncounter[3]
+        >> m_auiEncounter[4] >> m_auiEncounter[5] >> m_auiEncounter[6];
 
     for (uint8 i = 0; i < INSTANCE_RUINS_AQ_MAX_ENCOUNTER; ++i)
         if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] > SPECIAL)           // Do not load an encounter as "In Progress" - reset it instead.

@@ -70,6 +70,18 @@ struct boss_huhuranAI : public ScriptedAI
         ScriptedAI::MoveInLineOfSight(pWho);
     }
 
+    void Aggro(Unit* /*pWho*/) override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_HUHURAN, IN_PROGRESS);
+    }
+
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_HUHURAN, FAIL);
+    }
+
     void JustDied(Unit*) override
     {
         if (m_pInstance)

@@ -92,6 +92,10 @@ struct instance_molten_core : ScriptedInstance
 
     bool IsEncounterInProgress() const override
     {
+        for (uint8 i = 0; i < INSTANCE_MC_MAX_ENCOUNTER; ++i)
+            if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+                return true;
+
         return false;
     }
 

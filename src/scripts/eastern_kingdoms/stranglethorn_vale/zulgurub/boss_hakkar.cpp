@@ -115,6 +115,22 @@ struct boss_hakkarAI : public ScriptedAI
         AspectOfArlokk_Timer = 18000;
 
         Enraged = false;
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_HAKKAR, NOT_STARTED);
+    }
+
+    void Aggro(Unit *who)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_HAKKAR, IN_PROGRESS);
+        ScriptedAI::Aggro(who);
+    }
+
+    void JustDied(Unit* Killer)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_HAKKAR, DONE);
     }
 
     void UpdateAI(const uint32 diff)

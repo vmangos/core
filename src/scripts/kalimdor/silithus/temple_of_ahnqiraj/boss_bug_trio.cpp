@@ -56,6 +56,12 @@ struct boss_bug_trioAI : public ScriptedAI
         m_uiEvadeCheckTimer = 2500;
     }
 
+    void JustReachedHome() override
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_BUG_TRIO, FAIL);
+    }
+
     void EnterEvadeMode() override
     {
         // If somehow a raid wipes during devour phase, restore normal speed/behavior
@@ -67,7 +73,7 @@ struct boss_bug_trioAI : public ScriptedAI
     {
         // Reset the slain bug count on pull
         if (m_pInstance)
-            m_pInstance->SetData(TYPE_BUG_TRIO, FAIL);
+            m_pInstance->SetData(TYPE_BUG_TRIO, IN_PROGRESS);
     }
 
     void MoveInLineOfSight(Unit* pWho) override

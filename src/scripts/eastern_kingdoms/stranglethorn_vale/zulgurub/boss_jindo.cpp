@@ -119,6 +119,9 @@ struct boss_jindoAI : public ScriptedAI
         BrainWashedPlayerAggro.clear();
 
         DespawnAllSummons();
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_JINDO, NOT_STARTED);
     }
 
     void SpellHitTarget(Unit* pCaster, const SpellEntry* pSpell)
@@ -138,11 +141,15 @@ struct boss_jindoAI : public ScriptedAI
     void JustDied(Unit* pKiller)
     {
         DespawnAllSummons();
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_JINDO, DONE);
     }
 
     void Aggro(Unit *who)
     {
         DoScriptText(SAY_AGGRO, m_creature);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_JINDO, IN_PROGRESS);
     }
 
     void DoSummonSkeleton(float addx, float addy, Unit* initialTarget)

@@ -59,9 +59,11 @@ void instance_zulgurub::LowerHakkarHitPoints()
     }
 }
 
-bool instance_zulgurub::IsEncounterInProgress()
+bool instance_zulgurub::IsEncounterInProgress() const
 {
-    //not active in Zul'Gurub
+    for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
+        if (m_auiEncounter[i] == IN_PROGRESS || m_auiEncounter[i] == SPECIAL)
+            return true;
     return false;
 }
 
@@ -192,15 +194,18 @@ void instance_zulgurub::SetData(uint32 uiType, uint32 uiData)
             else
                 m_auiEncounter[9] = uiData;
             break;
-        case TYPE_GAHZRANKA:
+        case TYPE_JINDO:
             m_auiEncounter[10] = uiData;
+            break;
+        case TYPE_GAHZRANKA:
+            m_auiEncounter[11] = uiData;
             break;
     }
 
     if (uiData == DONE)
     {
         OUT_SAVE_INST_DATA;
-        strInstData = GenSaveData(m_auiEncounter, 10);
+        strInstData = GenSaveData(m_auiEncounter, 11);
         SaveToDB();
         OUT_SAVE_INST_DATA_COMPLETE;
     }
@@ -221,7 +226,7 @@ void instance_zulgurub::Load(const char* chrIn)
 
     OUT_LOAD_INST_DATA(chrIn);
 
-    LoadSaveData(chrIn, m_auiEncounter, 10);
+    LoadSaveData(chrIn, m_auiEncounter, 11);
 
     for (uint8 i = 0; i < ZULGURUB_MAX_ENCOUNTER; ++i)
     {
@@ -260,8 +265,10 @@ uint32 instance_zulgurub::GetData(uint32 uiType)
             if (m_auiEncounter[9] >= 15080 && m_auiEncounter[9] <= 15085)
                 return m_auiEncounter[9];
             return 0;
-        case TYPE_GAHZRANKA:
+        case TYPE_JINDO:
             return m_auiEncounter[10];
+        case TYPE_GAHZRANKA:
+            return m_auiEncounter[11];
     }
     return 0;
 }
@@ -289,7 +296,7 @@ uint64 instance_zulgurub::GetData64(uint32 uiData)
 void instance_zulgurub::Create()
 {
     m_auiEncounter[9] = GenerateRandomBoss();
-    strInstData = GenSaveData(m_auiEncounter, 10);
+    strInstData = GenSaveData(m_auiEncounter, 11);
     SaveToDB();
     if (!m_randomBossSpawned)
         SpawnRandomBoss();
@@ -503,15 +510,15 @@ bool ProcessEventId_event_summon_gahzranka(uint32 uiEventId, Object* pSource, Ob
     if (ScriptedInstance* m_pInstance = dynamic_cast<ScriptedInstance*>(pPlayer->GetInstanceData()))
     {
         // return if already summoned
-        if (m_pInstance->GetData(TYPE_GAHZRANKA) == DONE)
+        if (m_pInstance->GetData(TYPE_GAHZRANKA) != NOT_STARTED)
             return false;
 
         pPlayer->CastSpell(pPlayer, 12816, true);
 
         if (Creature* pCreature = m_pInstance->instance->GetCreature(m_pInstance->GetData64(DATA_GAHZRANKA)))
         {
+            m_pInstance->SetData(TYPE_GAHZRANKA, IN_PROGRESS);
             pCreature->Respawn();
-            m_pInstance->SetData(TYPE_GAHZRANKA, DONE);
             return true;
         }
     }

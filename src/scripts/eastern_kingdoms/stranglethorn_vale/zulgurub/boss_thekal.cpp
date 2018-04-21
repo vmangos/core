@@ -121,6 +121,12 @@ struct zg_rez_add : public ScriptedAI
     {
         return _realyDead;
     }
+    void Aggro(Unit *who)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(m_uiInstMobType, IN_PROGRESS);
+        ScriptedAI::Aggro(who);
+    }
 
     void JustDied(Unit* Killer)
     {
@@ -130,7 +136,6 @@ struct zg_rez_add : public ScriptedAI
         m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         if (m_pInstance)
         {
-            m_pInstance->SetData(m_uiInstMobType, SPECIAL);
             pRezzer = m_pInstance->Thekal_GetUnitThatCanRez();
         }
         if (pRezzer)
@@ -213,6 +218,8 @@ struct zg_rez_add : public ScriptedAI
     }
     void Reset()
     {
+        if (m_pInstance)
+            m_pInstance->SetData(m_uiInstMobType, NOT_STARTED);
     }
 
     uint32 m_uiInstMobType;
@@ -299,11 +306,6 @@ struct boss_thekalAI : public zg_rez_add
 
         Enraged = false;
 
-        if (m_pInstance)
-        {
-            m_pInstance->SetData(TYPE_LORKHAN, SPECIAL);
-            m_pInstance->SetData(TYPE_ZATH, SPECIAL);
-        }
         // Si en phase 2 avant de reset, faut repop les 2 adds.
         m_creature->RespawnNearCreaturesByEntry(ZELOTH_LOR_KHAN, 100.0f);
         m_creature->RespawnNearCreaturesByEntry(ZELOTH_ZATH, 100.0f);
@@ -320,7 +322,11 @@ struct boss_thekalAI : public zg_rez_add
             DEBUG_UNIT(m_creature, DEBUG_AI, "Thekal is dead for real");
 
             if (m_pInstance)
+            {
+                m_pInstance->SetData(TYPE_LORKHAN, DONE);
+                m_pInstance->SetData(TYPE_ZATH, DONE);
                 m_pInstance->SetData(TYPE_THEKAL, DONE);
+            }
 
             ScriptedAI::JustDied(Killer);
         }
@@ -370,6 +376,8 @@ struct boss_thekalAI : public zg_rez_add
 
     void Aggro(Unit *who)
     {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_THEKAL, IN_PROGRESS);
         if (PhaseTwo)
             DoScriptText(SAY_AGGRO, m_creature);
         m_creature->SetInCombatWithZone();
@@ -392,12 +400,6 @@ struct boss_thekalAI : public zg_rez_add
         NoTargetReset_Timer = 5000;
         m_creature->DespawnNearCreaturesByEntry(ZELOTH_LOR_KHAN, 100.0f);
         m_creature->DespawnNearCreaturesByEntry(ZELOTH_ZATH, 100.0f);
-    }
-
-    void JustReachedHome()
-    {
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_THEKAL, NOT_STARTED);
     }
 
     void CheckTiger(uint64& guid)
@@ -552,9 +554,6 @@ struct mob_zealot_lorkhanAI : public zg_rez_add
         Resurrect_Timer = 10000;
         uiRezzeurGUID = 0;
 
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_LORKHAN, NOT_STARTED);
-
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);
         zg_rez_add::Reset();
@@ -652,9 +651,6 @@ struct mob_zealot_zathAI : public zg_rez_add
 
         Resurrect_Timer = 10000;
         uiRezzeurGUID = 0;
-
-        if (m_pInstance)
-            m_pInstance->SetData(TYPE_ZATH, NOT_STARTED);
 
         m_creature->SetStandState(UNIT_STAND_STATE_STAND);
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE);

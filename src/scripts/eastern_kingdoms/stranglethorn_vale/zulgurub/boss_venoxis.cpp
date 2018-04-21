@@ -117,6 +117,12 @@ struct boss_venoxisAI : public ScriptedAI
         }
     }
 
+    void Aggro(Unit* pWho)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_VENOXIS, IN_PROGRESS);
+    }
+
     void JustReachedHome()
     {
         std::list<Creature*> m_lCobras;
@@ -132,6 +138,9 @@ struct boss_venoxisAI : public ScriptedAI
                     (*iter)->Respawn();
             }
         }
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_VENOXIS, NOT_STARTED);
     }
 
     void JustDied(Unit* pKiller)

@@ -619,6 +619,8 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
         AreaTrigger const* at = sObjectMgr.GetGoBackTrigger(pCurrChar->GetMapId());
         if (at)
             pCurrChar->TeleportTo(at->target_mapId, at->target_X, at->target_Y, at->target_Z, pCurrChar->GetOrientation());
+        else if (pCurrChar->GetMapId() == 533)
+            pCurrChar->TeleportTo(0, 3120.16f, -3724.93f, 137.66f, 5.83567f); // Naxxramas has no exit trigger
         else
             pCurrChar->TeleportToHomebind();
 

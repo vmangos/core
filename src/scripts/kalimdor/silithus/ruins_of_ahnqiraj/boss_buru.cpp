@@ -109,6 +109,9 @@ struct boss_buruAI : public ScriptedAI
             if (Creature* egg = m_creature->SummonCreature(NPC_BURU_EGG, Eggs[i].x, Eggs[i].y, Eggs[i].z, 0))
                 m_eggsGUID[i] = egg->GetGUID();
         }
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_BURU, NOT_STARTED);
     }
 
     void Aggro(Unit *pWho)
@@ -116,6 +119,8 @@ struct boss_buruAI : public ScriptedAI
         m_creature->SetInCombatWithZone();
         DoCast(m_creature, SPELL_THORNS);
         m_creature->SetArmor(20000);
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_BURU, IN_PROGRESS);
     }
 
     void JustDied(Unit* pKiller)
@@ -124,6 +129,9 @@ struct boss_buruAI : public ScriptedAI
         Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
             i->getSource()->RemoveAurasDueToSpell(SPELL_CREEPING_PLAGUE);
+
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_BURU, DONE);
     }
 
     void UpdateAI(const uint32 uiDiff)

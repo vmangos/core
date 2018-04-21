@@ -159,6 +159,9 @@ struct boss_sapphironAI : public ScriptedAI
         setHover(false, true);
         SetCombatMovement(true);
         m_TargetNotReachableTimer = 0;
+
+        if (m_pInstance && m_pInstance->GetData(TYPE_SAPPHIRON) != DONE)
+            m_pInstance->SetData(TYPE_SAPPHIRON, NOT_STARTED);
     }
 
     void UnSummonWingBuffet()

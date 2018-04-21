@@ -61,6 +61,19 @@ struct boss_gahzrankaAI : public ScriptedAI
         Frostbreath_Timer = 8000;
         MassiveGeyser_Timer = 25000;
         Slam_Timer = 17000;
+
+        if (m_pInstance && m_pInstance->GetData(TYPE_GAHZRANKA) != DONE)
+            m_pInstance->SetData(TYPE_GAHZRANKA, NOT_STARTED);
+    }
+    void Aggro(Unit *who)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_GAHZRANKA, IN_PROGRESS);
+    }
+    void JustDied(Unit* Killer)
+    {
+        if (m_pInstance)
+            m_pInstance->SetData(TYPE_GAHZRANKA, DONE);
     }
 
     void JustRespawned()
@@ -73,7 +86,7 @@ struct boss_gahzrankaAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        if (m_pInstance->GetData(TYPE_GAHZRANKA) != DONE)
+        if (m_pInstance->GetData(TYPE_GAHZRANKA) != IN_PROGRESS)
         {
             m_creature->DisappearAndDie();
             m_creature->SetRespawnTime(259200);
