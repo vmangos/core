@@ -960,7 +960,7 @@ void BattleGroundAV::EndBattleGround(Team winner)
         if (tower_survived[i])
         {
             RewardReputationToTeam(faction[i], tower_survived[i] * m_RepSurviveTower, team[i]);
-            RewardHonorToTeam(GetBonusHonorFromKill(tower_survived[i] * BG_AV_KILL_SURVIVING_TOWER), team[i]);
+            RewardHonorToTeam(uint32(GetBonusHonorFromKill(tower_survived[i] * BG_AV_KILL_SURVIVING_TOWER) * GetHonorModifier()), team[i]);
         }
         DEBUG_LOG("BattleGroundAV: EndbattleGround: bgteam: %u towers:%u honor:%u rep:%u", i, tower_survived[i], GetBonusHonorFromKill(tower_survived[i] * BG_AV_KILL_SURVIVING_TOWER), tower_survived[i] * BG_AV_REP_SURVIVING_TOWER);
         if (graves_owned[i])
@@ -989,13 +989,6 @@ void BattleGroundAV::EndBattleGround(Team winner)
             RewardHonorToTeam(396, HORDE);
         if (winner == ALLIANCE)
             RewardHonorToTeam(396, ALLIANCE);
-    }
-
-    // both teams:
-    if (m_HonorMapComplete)
-    {
-        RewardHonorToTeam(m_HonorMapComplete, ALLIANCE);
-        RewardHonorToTeam(m_HonorMapComplete, HORDE);
     }
     BattleGround::EndBattleGround(winner);
 }
@@ -1570,7 +1563,6 @@ void BattleGroundAV::Reset()
     // set the reputation and honor variables:
     bool isBGWeekend = BattleGroundMgr::IsBGWeekend(GetTypeID());
 
-    m_HonorMapComplete    = (isBGWeekend) ? BG_AV_KILL_MAP_COMPLETE_HOLIDAY      : BG_AV_KILL_MAP_COMPLETE;
     m_RepTowerDestruction = (isBGWeekend) ? BG_AV_REP_TOWER_HOLIDAY              : BG_AV_REP_TOWER;
     m_RepCommander        = (isBGWeekend) ? BG_AV_REP_COMMANDER_HOLIDAY          : BG_AV_REP_COMMANDER;
     m_RepCaptain          = (isBGWeekend) ? BG_AV_REP_CAPTAIN_HOLIDAY            : BG_AV_REP_CAPTAIN;

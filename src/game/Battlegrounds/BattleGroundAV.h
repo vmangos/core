@@ -526,7 +526,6 @@ class BattleGroundAV : public BattleGround
 
         bool m_IsInformedNearLose[BG_TEAMS_COUNT];
 
-        uint32 m_HonorMapComplete;
         uint32 m_RepTowerDestruction;
         uint32 m_RepCommander;
         uint32 m_RepCaptain;
