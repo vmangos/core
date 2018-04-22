@@ -9,7 +9,7 @@ INSERT INTO `migrations` VALUES ('20180420134157');
 -- Add your query below.
 
 -- Bloodseeker bats can actually fly
-UPDATE `creature_template` set `InhabitType` = 4 WHERE `entry` = 11368;
+UPDATE `creature_template` set `InhabitType` = 5 WHERE `entry` = 11368;
 
 -- End of migration.
 END IF;
