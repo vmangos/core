@@ -8228,18 +8228,24 @@ void ObjectMgr::LoadTrainerTemplates()
     for (CacheTrainerSpellMap::const_iterator tItr = m_mCacheTrainerTemplateSpellMap.begin(); tItr != m_mCacheTrainerTemplateSpellMap.end(); ++tItr)
         trainer_ids.insert(tItr->first);
 
-    for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
+    // We need to use a query to get all used trainer ids because of progression.
+    // It might be used by a creature that is not loaded in this patch.
+    QueryResult* result = WorldDatabase.Query("SELECT entry, trainer_id FROM creature_template WHERE trainer_id != 0");
+
+    if (result)
     {
-        if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+        Field* fields;
+        do
         {
-            if (cInfo->trainerId)
-            {
-                if (m_mCacheTrainerTemplateSpellMap.find(cInfo->trainerId) != m_mCacheTrainerTemplateSpellMap.end())
-                    trainer_ids.erase(cInfo->trainerId);
-                else
-                    sLog.outErrorDb("Creature (Entry: %u) has trainer_id = %u for nonexistent trainer template", cInfo->Entry, cInfo->trainerId);
-            }
-        }
+            fields = result->Fetch();
+            uint32 creature_id = fields[0].GetUInt32();
+            uint32 trainer_id = fields[1].GetUInt32();
+            if (m_mCacheTrainerTemplateSpellMap.find(trainer_id) != m_mCacheTrainerTemplateSpellMap.end())
+                trainer_ids.erase(trainer_id);
+            else
+                sLog.outErrorDb("Creature (Entry: %u) has trainer_id = %u for nonexistent trainer template", creature_id, trainer_id);
+        } while (result->NextRow());
+        delete result;
     }
 
     for (std::set<uint32>::const_iterator tItr = trainer_ids.begin(); tItr != trainer_ids.end(); ++tItr)
@@ -8309,34 +8315,22 @@ void ObjectMgr::LoadVendorTemplates()
     for (CacheVendorItemMap::const_iterator vItr = m_mCacheVendorTemplateItemMap.begin(); vItr != m_mCacheVendorTemplateItemMap.end(); ++vItr)
         vendor_ids.insert(vItr->first);
 
-    for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
-    {
-        if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-        {
-            if (cInfo->vendorId)
-            {
-                if (m_mCacheVendorTemplateItemMap.find(cInfo->vendorId) !=  m_mCacheVendorTemplateItemMap.end())
-                    vendor_ids.erase(cInfo->vendorId);
-                else
-                    sLog.outErrorDb("Creature (Entry: %u) has vendor_id = %u for nonexistent vendor template", cInfo->Entry, cInfo->vendorId);
-            }
-        }
-    }
-
     // We need to use a query to get all used vendor ids because of progression.
     // It might be used by a creature that is not loaded in this patch.
-    QueryResult* result = WorldDatabase.Query("SELECT vendor_id FROM creature_template WHERE vendor_id > 0");
-
-    Field* fields;
+    QueryResult* result = WorldDatabase.Query("SELECT entry, vendor_id FROM creature_template WHERE vendor_id != 0");
 
     if (result)
     {
+        Field* fields;
         do
         {
             fields = result->Fetch();
-            uint32 vendorId = fields[0].GetUInt32();
-            if (vendor_ids.find(vendorId) != vendor_ids.end())
-                vendor_ids.erase(vendorId);
+            uint32 creature_id = fields[0].GetUInt32();
+            uint32 vendor_id = fields[1].GetUInt32();
+            if (m_mCacheVendorTemplateItemMap.find(vendor_id) != m_mCacheVendorTemplateItemMap.end())
+                vendor_ids.erase(vendor_id);
+            else
+                sLog.outErrorDb("Creature (Entry: %u) has vendor_id = %u for nonexistent vendor template", creature_id, vendor_id);
         } while (result->NextRow());
         delete result;
     }
