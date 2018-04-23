@@ -14732,7 +14732,8 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     // must be before inventory (some items required reputation check)
     m_reputationMgr.LoadFromDB(holder->GetResult(PLAYER_LOGIN_QUERY_LOADREPUTATION));
 
-    _LoadInventory(holder->GetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY), time_diff);
+    bool has_epic_mount = false; // Needed for riding skill replacement in patch 1.12.
+    _LoadInventory(holder->GetResult(PLAYER_LOGIN_QUERY_LOADINVENTORY), time_diff, has_epic_mount);
     _LoadItemLoot(holder->GetResult(PLAYER_LOGIN_QUERY_LOADITEMLOOT));
 
     // update items with duration and realtime
@@ -14887,7 +14888,79 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     LoadCustomFlags();
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
     CreatePacketBroadcaster();
+
+    if (sWorld.GetWowPatch() >= WOW_PATCH_112)
+        UpdateOldRidingSkillToNew(has_epic_mount);
+
     return true;
+}
+
+// The new riding skills (Apprentice/Journeyman) were added in patch 1.12.
+// Prior to that there was a separate skill of each type of mount.
+// All players who have the old skill need to have it swapped for the new one.
+void Player::UpdateOldRidingSkillToNew(bool has_epic_mount)
+{
+    // Already has the new skill, no need to do anything.
+    if (HasSkill(SKILL_RIDING))
+        return;
+
+    bool has_old_riding_skill = false;
+
+    if (HasSkill(SKILL_RIDING_HORSE))
+    {
+        SetSkill(SKILL_RIDING_HORSE, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_WOLF))
+    {
+        SetSkill(SKILL_RIDING_WOLF, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_TIGER))
+    {
+        SetSkill(SKILL_RIDING_TIGER, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_RAM))
+    {
+        SetSkill(SKILL_RIDING_RAM, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_RAPTOR))
+    {
+        SetSkill(SKILL_RIDING_RAPTOR, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_MECHANOSTRIDER))
+    {
+        SetSkill(SKILL_RIDING_MECHANOSTRIDER, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_UNDEAD_HORSE))
+    {
+        SetSkill(SKILL_RIDING_UNDEAD_HORSE, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (HasSkill(SKILL_RIDING_KODO))
+    {
+        SetSkill(SKILL_RIDING_KODO, 0, 0);
+        has_old_riding_skill = true;
+    }
+
+    if (!has_old_riding_skill)
+        return;
+    
+    if (has_epic_mount)
+        learnSpell(33391, false); // Journeyman Riding
+    else
+        learnSpell(33388, false); // Apprentice Riding
 }
 
 void Player::SendPacketsAtRelogin()
@@ -15078,7 +15151,7 @@ void Player::LoadCorpse()
     }
 }
 
-void Player::_LoadInventory(QueryResult *result, uint32 timediff)
+void Player::_LoadInventory(QueryResult *result, uint32 timediff, bool &has_epic_mount)
 {
     //               0                1      2         3        4      5             6                 7           8     9    10    11   12    13              14
     //SELECT creatorGuid, giftCreatorGuid, count, duration, charges, flags, enchantments, randomPropertyId, durability, text, bag, slot, item, itemEntry, generated_loot
@@ -15115,6 +15188,10 @@ void Player::_LoadInventory(QueryResult *result, uint32 timediff)
                 sLog.outError("Player::_LoadInventory: Player %s has an unknown item (id: #%u) in inventory, deleted.", GetName(), item_id);
                 continue;
             }
+
+            // Needed for riding skill replacement in patch 1.12.
+            if ((proto->RequiredSkill == SKILL_RIDING) && (proto->RequiredSkillRank == 150))
+                has_epic_mount = true;
 
             // Duplicate check. Player listed item in AH and then immediately relogged, before the item
             // was deleted from the inventory in the DB

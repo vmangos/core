@@ -2241,7 +2241,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void _LoadActions(QueryResult *result);
         void _LoadAuras(QueryResult *result, uint32 timediff);
         void _LoadBoundInstances(QueryResult *result);
-        void _LoadInventory(QueryResult *result, uint32 timediff);
+        void _LoadInventory(QueryResult *result, uint32 timediff, bool& has_epic_mount);
         void _LoadItemLoot(QueryResult *result);
         void _LoadMails(QueryResult *result);
         void _LoadMailedItems(QueryResult *result);
@@ -2400,6 +2400,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         void UpdateKnownCurrencies(uint32 itemId, bool apply);
         void AdjustQuestReqItemCount( Quest const* pQuest, QuestStatusData& questStatusData );
+        void UpdateOldRidingSkillToNew(bool has_epic_mount);
 
         void SetCanDelayTeleport(bool setting) { m_bCanDelayTeleport = setting; }
         bool IsHasDelayedTeleport() const
