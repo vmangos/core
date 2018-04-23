@@ -275,14 +275,14 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
 
     Creature *unit = GetPlayer()->GetNPCIfCanInteractWith(guid, UNIT_NPC_FLAG_TRAINER);
 
-    if (!unit || !unit->IsTrainerOf(_player, true) || !unit->IsWithinLOSInMap(_player) || _player->IsNonMeleeSpellCasted())
+    if (!unit || !unit->IsTrainerOf(_player, true) || !unit->IsWithinLOSInMap(_player))
     {
         SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
         DEBUG_LOG("WORLD: HandleTrainerBuySpellOpcode - %s not found or you can't interact with him.", guid.GetString().c_str());
         return;
     }
 
-    // check present spell in trainer spell list
+    // Check if the spell is present in the trainer's spell list.
     TrainerSpellData const* cSpells = unit->GetTrainerSpells();
     TrainerSpellData const* tSpells = unit->GetTrainerTemplateSpells();
 
@@ -292,10 +292,10 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
         return;
     }
         
-    // Try find spell in npc_trainer
+    // Try to find the spell in npc_trainer.
     TrainerSpell const* trainer_spell = cSpells ? cSpells->Find(spellId) : NULL;
 
-    // Not found, try find in npc_trainer_template
+    // Not found, try find it in npc_trainer_template.
     if (!trainer_spell && tSpells)
         trainer_spell = tSpells->Find(spellId);
 
@@ -306,7 +306,7 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
         return;
     }
     
-    // can't be learn, cheat? Or double learn with lags...
+    // Can't be learned, cheat? Or double learn with lags...
     if (_player->GetTrainerSpellState(trainer_spell) != TRAINER_SPELL_GREEN)
     {
         SendTrainingFailure(guid, spellId, TRAIN_FAIL_NOT_ENOUGH_SKILL);
@@ -315,28 +315,19 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
 
     SpellEntry const *proto = sSpellMgr.GetSpellEntry(trainer_spell->spell);
 
-    // apply reputation discount
+    // Apply reputation discount.
     uint32 nSpellCost = uint32(floor(trainer_spell->spellCost * _player->GetReputationPriceDiscount(unit)));
 
-    // check money requirement
+    // Check money requirement.
     if (_player->GetMoney() < nSpellCost)
     {
         SendTrainingFailure(guid, spellId, TRAIN_FAIL_NOT_ENOUGH_MONEY);
         return;
     }
 
-    // All is good. Spell will be learned if we reach this point.
-    GetPlayer()->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK); // Removes stealth, feign death ...
-
-    // Player must get off her high horse before learning
-    if (_player->IsMounted())
-        _player->Unmount();
-
+    // All is good. Spell can be learned if we reach this point.
+    _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TALK);
     _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
-
-    _player->ModifyMoney(-int32(nSpellCost));
-
-    SendTrainingSuccess(guid, spellId);
 
     Spell *spell;
     if (proto->SpellVisual == 222)
@@ -347,8 +338,17 @@ void WorldSession::HandleTrainerBuySpellOpcode(WorldPacket & recv_data)
     SpellCastTargets targets;
     targets.setUnitTarget(_player);
 
-    spell->prepare(std::move(targets));
+    SpellCastResult cast_result = spell->prepare(std::move(targets));
     spell->update(1); // Update the spell right now. Prevents desynch => take twice the money if you click really fast.
+
+    // Only charge player if cast of learning spell was successful.
+    if (cast_result == SPELL_CAST_OK)
+    {
+        _player->ModifyMoney(-int32(nSpellCost));
+        SendTrainingSuccess(guid, spellId);
+    }
+    else
+        SendTrainingFailure(guid, spellId, TRAIN_FAIL_UNAVAILABLE);
 }
 
 void WorldSession::HandleGossipHelloOpcode(WorldPacket & recv_data)
