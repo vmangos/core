@@ -373,10 +373,13 @@ void CreatureAI::SetMeleeAttack(bool enabled)
 
     m_MeleeEnabled = enabled;
 
-    if (enabled)
-        m_creature->SendMeleeAttackStart(m_creature->getVictim());
-    else
-        m_creature->SendMeleeAttackStop(m_creature->getVictim());
+    if (Unit* pVictim = m_creature->getVictim())
+    { 
+        if (enabled)
+            m_creature->SendMeleeAttackStart(pVictim);
+        else
+            m_creature->SendMeleeAttackStop(pVictim);
+    }
 }
 
 void CreatureAI::SetCombatMovement(bool enabled)
