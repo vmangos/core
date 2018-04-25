@@ -234,6 +234,12 @@ enum eScriptCommand
                                                             // datalong1-4 = creature_spells id
                                                             // dataint1-4 = chance (total cant be above 100)
     SCRIPT_COMMAND_REMOVE_GUARDIANS         = 56,           // source = Unit
+                                                            // datalong = creature_id
+    SCRIPT_COMMAND_ADD_SPELL_COOLDOWN       = 57,           // source = Unit
+                                                            // datalong = spell_id
+                                                            // datalong2 = cooldown
+    SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN    = 58,           // source = Unit
+                                                            // datalong = spell_id
 
     SCRIPT_COMMAND_MAX,
 
@@ -695,7 +701,21 @@ struct ScriptInfo
             int32 chance[4];                                // dataint to dataint4
         } creatureSpells;
 
-                                                            // SCRIPT_COMMAND_REMOVE_GUARDIANS (56)
+        struct                                              // SCRIPT_COMMAND_REMOVE_GUARDIANS (56)
+        {
+            uint32 creatureId;                              // datalong
+        } removeGuardian;
+
+        struct                                              // SCRIPT_COMMAND_ADD_SPELL_COOLDOWN (57)
+        {
+            uint32 spellId;                                 // datalong
+            uint32 cooldown;                                // datalong2
+        } addCooldown;
+
+        struct                                              // SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN (58)
+        {
+            uint32 spellId;                                 // datalong
+        } removeCooldown;
 
         struct
         {

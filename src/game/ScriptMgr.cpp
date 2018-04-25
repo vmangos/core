@@ -933,6 +933,45 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             }
             case SCRIPT_COMMAND_REMOVE_GUARDIANS:
             {
+                if (tmp.removeGuardian.creatureId)
+                {
+                    if (!ObjectMgr::GetCreatureTemplate(tmp.removeGuardian.creatureId))
+                    {
+                        if (!sObjectMgr.IsExistingCreatureId(tmp.removeGuardian.creatureId))
+                        {
+                            sLog.outErrorDb("Table `%s` has invalid creature (Entry: %u) in SCRIPT_COMMAND_REMOVE_GUARDIANS for script id %u", tablename, tmp.removeGuardian.creatureId, tmp.id);
+                            continue;
+                        }
+                        else
+                            DisableScriptAction(tmp);
+                    }
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_ADD_SPELL_COOLDOWN:
+            {
+                if (!sSpellMgr.GetSpellEntry(tmp.addCooldown.spellId))
+                {
+                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_ADD_SPELL_COOLDOWN for script id %u", tablename, tmp.addCooldown.spellId, tmp.id);
+                    continue;
+                }
+                if (tmp.addCooldown.cooldown == 0)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_ADD_SPELL_COOLDOWN for script id %u.", tablename, tmp.addCooldown.cooldown, tmp.id);
+                    continue;
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN:
+            {
+                if (tmp.removeCooldown.spellId)
+                {
+                    if (!sSpellMgr.GetSpellEntry(tmp.removeCooldown.spellId))
+                    {
+                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN for script id %u", tablename, tmp.removeCooldown.spellId, tmp.id);
+                        continue;
+                    }
+                }
                 break;
             }
         }

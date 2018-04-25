@@ -1524,7 +1524,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
     return false;
 }
 
-// SCRIPT_COMMAND_REMOVE_GUARDIANS (56)
+// SCRIPT_COMMAND_REMOVE_GUARDIANSS (56)
 bool Map::ScriptCommand_RemoveGuardians(const ScriptInfo& script, WorldObject* source, WorldObject* target)
 {
     Unit* pSource = ToUnit(source);
@@ -1534,8 +1534,50 @@ bool Map::ScriptCommand_RemoveGuardians(const ScriptInfo& script, WorldObject* s
         sLog.outError("SCRIPT_COMMAND_REMOVE_GUARDIANS (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
+    
+    if (script.removeGuardian.creatureId)
+    {
+        pSource->RemoveGuardiansWithEntry(script.removeGuardian.creatureId);
+    }
+    else
+        pSource->RemoveGuardians();
 
-    pSource->RemoveGuardians();
+    return false;
+}
+
+// SCRIPT_COMMAND_ADD_SPELL_COOLDOWN (57)
+bool Map::ScriptCommand_AddSpellCooldown(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Unit* pSource = ToUnit(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_ADD_SPELL_COOLDOWN (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->AddSpellCooldown(script.addCooldown.spellId, 0, time(nullptr) + script.addCooldown.cooldown);
+    if (Player* pPlayer = pSource->ToPlayer())
+        pPlayer->SendSpellCooldown(script.addCooldown.spellId, script.addCooldown.cooldown * IN_MILLISECONDS, pPlayer->GetObjectGuid());
+
+    return false;
+}
+
+// SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN (58)
+bool Map::ScriptCommand_RemoveSpellCooldown(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Unit* pSource = ToUnit(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    if (script.removeCooldown.spellId)
+        pSource->RemoveSpellCooldown(script.removeCooldown.spellId, true);
+    else
+        pSource->RemoveAllSpellCooldown();
 
     return false;
 }

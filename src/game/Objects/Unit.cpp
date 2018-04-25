@@ -6194,6 +6194,14 @@ void Unit::RemoveGuardians()
     }
 }
 
+void Unit::RemoveGuardiansWithEntry(uint32 entry)
+{
+    while (Pet* pGuardian = FindGuardianWithEntry(entry))
+    {
+        pGuardian->Unsummon(PET_SAVE_AS_DELETED, this);
+    }
+}
+
 Pet* Unit::FindGuardianWithEntry(uint32 entry)
 {
     for (GuardianPetList::const_iterator itr = m_guardianPets.begin(); itr != m_guardianPets.end(); ++itr)
