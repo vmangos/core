@@ -869,6 +869,7 @@ public:
         if (GameObject* cleansed = me->SummonGameObject(cleansedEntry, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), 0.0, 0.0, 0.0, 0.0, 0.0, CLEANSED_PLANT_RESPAWN_TIMER))
         {
             cleansedGuid = cleansed->GetObjectGuid();
+            cleansed->SetSpawnedByDefault(true);
         }
 
         if (const GameObjectData* data = me->GetGOData())
