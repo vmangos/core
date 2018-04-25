@@ -20,11 +20,9 @@ BuildContext::BuildContext() :
 	m_messageCount(0),
 	m_textPoolSize(0)
 {
-	resetTimers();
-}
+	memset(m_messages, 0, sizeof(char*) * MAX_MESSAGES);
 
-BuildContext::~BuildContext()
-{
+	resetTimers();
 }
 
 // Virtual functions for custom implementations.
@@ -79,7 +77,7 @@ void BuildContext::doStopTimer(const rcTimerLabel label)
 
 int BuildContext::doGetAccumulatedTime(const rcTimerLabel label) const
 {
-	return m_accTime[label];
+	return getPerfTimeUsec(m_accTime[label]);
 }
 
 void BuildContext::dumpLog(const char* format, ...)

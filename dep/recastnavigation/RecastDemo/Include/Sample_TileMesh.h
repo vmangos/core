@@ -69,8 +69,8 @@ protected:
 	float m_tileSize;
 	
 	unsigned int m_tileCol;
-	float m_tileBmin[3];
-	float m_tileBmax[3];
+	float m_lastBuiltTileBmin[3];
+	float m_lastBuiltTileBmax[3];
 	float m_tileBuildTime;
 	float m_tileMemUsage;
 	int m_tileTriCount;
@@ -81,6 +81,7 @@ protected:
 	
 	void saveAll(const char* path, const dtNavMesh* mesh);
 	dtNavMesh* loadAll(const char* path);
+    dtNavMesh* loadWoWNavMesh (const char* path);
 	
 public:
 	Sample_TileMesh();
@@ -91,8 +92,9 @@ public:
 	virtual void handleDebugMode();
 	virtual void handleRender();
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
-	virtual void handleMeshChanged(class InputGeom* geom);
+	virtual void handleMeshChanged(class InputGeom* geom, std::string InMeshName);
 	virtual bool handleBuild();
+	virtual void collectSettings(struct BuildSettings& settings);
 	
 	void getTilePos(const float* pos, int& tx, int& ty);
 	
@@ -100,6 +102,11 @@ public:
 	void removeTile(const float* pos);
 	void buildAllTiles();
 	void removeAllTiles();
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	Sample_TileMesh(const Sample_TileMesh&);
+	Sample_TileMesh& operator=(const Sample_TileMesh&);
 };
 
 

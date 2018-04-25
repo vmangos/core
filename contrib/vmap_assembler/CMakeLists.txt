@@ -12,25 +12,52 @@
 cmake_minimum_required (VERSION 2.6)
 project (MANGOS_VMAP_ASSEMB_IO)
 
-if(!WIN32)
-set(CMAKE_VERBOSE_MAKEFILE true)
+#set(CMAKE_VERBOSE_MAKEFILE true)
 
 # uncomment next line to disable debug mode
-ADD_DEFINITIONS("-DIOMAP_DEBUG")
-ADD_DEFINITIONS("-DNO_CORE_FUNCS")
+# ADD_DEFINITIONS("-DIOMAP_DEBUG")
 
-ADD_DEFINITIONS("-Wall")
-ADD_DEFINITIONS("-ggdb")
-ADD_DEFINITIONS("-O3")
+if (NOT MSVC)
+    ADD_DEFINITIONS("-Wall")
+    ADD_DEFINITIONS("-ggdb")
+    ADD_DEFINITIONS("-O3")
 endif()
 
 include_directories(../../src/shared)
+include_directories(../../src/game/)
 include_directories(../../src/game/vmap/)
+include_directories(../../src/game/Commands/)
 include_directories(../../dep/include/g3dlite/)
 include_directories(../../src/framework/)
+include_directories(${ACE_INCLUDE_DIR})
+
+add_library(vmap
+	../../src/game/vmap/BIH.cpp
+	../../src/game/vmap/VMapManager2.cpp
+	../../src/game/vmap/MapTree.cpp
+	../../src/game/vmap/TileAssembler.cpp
+	../../src/game/vmap/WorldModel.cpp
+	../../src/game/vmap/ModelInstance.cpp
+	)
+SET_TARGET_PROPERTIES (vmap PROPERTIES FOLDER "Game Libs")
+
+if(UNIX)
+  find_package(ZLIB REQUIRED)
+  if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    target_link_libraries(vmap g3dlite ${ZLIB_LIBRARIES})
+  endif(ZLIB_FOUND)
+else()
+  target_link_libraries(vmap g3dlite zlib)
+endif(UNIX)
 
 add_executable(vmap_assembler vmap_assembler.cpp)
-target_link_libraries(vmap_assembler vmap ${ACE_LIBRARIES})
+SET_TARGET_PROPERTIES (vmap_assembler PROPERTIES FOLDER Extractors)
+target_link_libraries(vmap_assembler 
+                    vmap
+                    ${ACE_LIBRARIES}
+                    shared
+                    framework
+)
 
-# add_executable(vmap_test coordinate_test.cpp)
-# target_link_libraries(vmap_test vmap)
+install(TARGETS vmap_assembler DESTINATION ${BIN_DIR})

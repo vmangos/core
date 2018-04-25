@@ -206,7 +206,7 @@ static int getNeighbours(const float* pos, const float height, const float range
 		// Check for overlap.
 		float diff[3];
 		dtVsub(diff, pos, ag->npos);
-		if (dtMathFabs(diff[1]) >= (height+ag->params.height)/2.0f)
+		if (dtMathFabsf(diff[1]) >= (height+ag->params.height)/2.0f)
 			continue;
 		diff[1] = 0;
 		const float distSqr = dtVlenSqr(diff);
@@ -653,6 +653,7 @@ bool dtCrowd::resetMoveTarget(const int idx)
 	// Initialize request.
 	ag->targetRef = 0;
 	dtVset(ag->targetPos, 0,0,0);
+	dtVset(ag->dvel, 0,0,0);
 	ag->targetPathqRef = DT_PATHQ_INVALID;
 	ag->targetReplan = false;
 	ag->targetState = DT_CROWDAGENT_TARGET_NONE;

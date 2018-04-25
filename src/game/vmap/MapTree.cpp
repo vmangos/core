@@ -113,8 +113,8 @@ std::string StaticMapTree::getTileFileName(uint32 mapID, uint32 tileX, uint32 ti
     std::stringstream tilefilename;
     tilefilename.fill('0');
     tilefilename << std::setw(3) << mapID << "_";
-    // tilefilename << std::setw(2) << tileX << "_" << std::setw(2) << tileY << ".vmtile";
-    tilefilename << std::setw(2) << tileY << "_" << std::setw(2) << tileX << ".vmtile";
+    //tilefilename << std::setw(2) << tileY << "_" << std::setw(2) << tileX << ".vmtile";
+    tilefilename << std::setw(2) << tileX << "_" << std::setw(2) << tileY << ".vmtile";
     return tilefilename.str();
 }
 

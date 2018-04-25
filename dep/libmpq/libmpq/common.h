@@ -1,7 +1,7 @@
 /*
- *  common.h -- defines and structs used by the config files.
+ *  common.h -- header functions used by mpq-tools.
  *
- *  Copyright (C) 2003 Maik Broemme <mbroemme@plusserver.de>
+ *  Copyright (c) 2003-2008 Maik Broemme <mbroemme@plusserver.de>
  *
  *  This program is free software; you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
@@ -16,59 +16,45 @@
  *  You should have received a copy of the GNU General Public License
  *  along with this program; if not, write to the Free Software
  *  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
- *
- *  $Id: common.h,v 1.4 2004/02/12 00:41:55 mbroemme Exp $
- */
+ */       
 
-#define LIBMPQ_CONF_FL_INCREMENT    512         /* i hope we did not need more :) */
-#define LIBMPQ_CONF_EXT         ".conf"         /* listdb file seems to be valid with this extension */
-#define LIBMPQ_CONF_HEADER      "LIBMPQ_VERSION"    /* listdb file must include this entry to be valid */
-#define LIBMPQ_CONF_BUFSIZE     4096            /* maximum number of bytes a line in the file could contain */
+#ifndef _COMMON_H
+#define _COMMON_H
 
-#define LIBMPQ_CONF_TYPE_CHAR       1           /* value in config file is from type char */
-#define LIBMPQ_CONF_TYPE_INT        2           /* value in config file is from type int */
+/* function to return the hash to a given string. */
+uint32_t libmpq__hash_string(
+	const char	*key,
+	uint32_t	offset
+);
 
-#define LIBMPQ_CONF_EOPEN_DIR       -1          /* error on open directory */
-#define LIBMPQ_CONF_EVALUE_NOT_FOUND    -2          /* value for the option was not found */
+/* function to encrypt a block. */
+int32_t libmpq__encrypt_block(
+	uint32_t	*in_buf,
+	uint32_t	in_size,
+	uint32_t	seed
+);
 
-#if defined( __GNUC__ )
-#include <sys/types.h>
-#include <unistd.h>
+/* function to decrypt a block. */
+int32_t libmpq__decrypt_block(
+	uint32_t	*in_buf,
+	uint32_t	in_size,
+	uint32_t	seed
+);
 
-#define _lseek  lseek
-#define _read   read
-#define _open   open
-#define _write  write
-#define _close  close
-#define _strdup strdup
+/* function to detect decryption key. */
+int32_t libmpq__decrypt_key(
+	uint8_t		*in_buf,
+	uint32_t	in_size,
+	uint32_t	block_size
+);
 
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
-#else
-#include <io.h>
-#endif
+/* function to decompress or explode block from archive. */
+int32_t libmpq__decompress_block(
+	uint8_t		*in_buf,
+	uint32_t	in_size,
+	uint8_t		*out_buf,
+	uint32_t	out_size,
+	uint32_t	compression_type
+);
 
-#ifdef O_LARGEFILE
-#define MPQ_FILE_OPEN_FLAGS (O_RDONLY | O_BINARY | O_LARGEFILE)
-#else
-#define MPQ_FILE_OPEN_FLAGS (O_RDONLY | O_BINARY)
-#endif
-
-#ifndef min
-#define min(a, b) ((a < b) ? a : b)
-#endif
-
-int libmpq_init_buffer(mpq_archive* mpq_a);
-int libmpq_read_hashtable(mpq_archive* mpq_a);
-int libmpq_read_blocktable(mpq_archive* mpq_a);
-int libmpq_file_read_file(mpq_archive* mpq_a, mpq_file* mpq_f, unsigned int filepos, char* buffer, unsigned int toread);
-int libmpq_read_listfile(mpq_archive* mpq_a, FILE* fp);
-
-int libmpq_conf_get_value(FILE* fp, char* search_value, void* return_value, int type, int size);
-char* libmpq_conf_delete_char(char* buf, char* chars);
-int libmpq_conf_get_array(FILE* fp, char* search_value, char** *filelist, int* entries);
-int libmpq_free_listfile(char** filelist);
-int libmpq_read_listfile(mpq_archive* mpq_a, FILE* fp);
-
-unsigned int libmpq_lseek(mpq_archive* mpq_a, unsigned int pos);
+#endif						/* _COMMON_H */

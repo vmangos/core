@@ -29,3 +29,5 @@ include_directories(
 add_library(gsoap STATIC
   ${gsoap_SRCS}
 )
+
+SET_TARGET_PROPERTIES (gsoap PROPERTIES FOLDER "3rd Party")

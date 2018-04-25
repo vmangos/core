@@ -80,7 +80,7 @@ class WMORoot
 
         bool open();
         bool ConvertToVMAPRootWmo(FILE* output);
-        Model* GetDoodadModel(int i)
+        Model* GetDoodadModel(unsigned int i)
         {
             if (i >= nModels)
                 return NULL;

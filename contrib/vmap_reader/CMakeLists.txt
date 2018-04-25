@@ -34,21 +34,23 @@ include_directories(
     ../../dep/src/zlib
 )
 
-add_library(zlib
-    ../../dep/src/zlib/adler32.c
-    ../../dep/src/zlib/compress.c
-    ../../dep/src/zlib/crc32.c
-    ../../dep/src/zlib/deflate.c
-    ../../dep/src/zlib/example.c
-    ../../dep/src/zlib/gzio.c
-    ../../dep/src/zlib/infback.c
-    ../../dep/src/zlib/inffast.c
-    ../../dep/src/zlib/inflate.c
-    ../../dep/src/zlib/inftrees.c
-    ../../dep/src/zlib/trees.c
-    ../../dep/src/zlib/uncompr.c
-    ../../dep/src/zlib/zutil.c
-)
+if(WIN32)
+  add_library(zlib
+      ../../dep/src/zlib/adler32.c
+      ../../dep/src/zlib/compress.c
+      ../../dep/src/zlib/crc32.c
+      ../../dep/src/zlib/deflate.c
+      ../../dep/src/zlib/example.c
+      ../../dep/src/zlib/gzio.c
+      ../../dep/src/zlib/infback.c
+      ../../dep/src/zlib/inffast.c
+      ../../dep/src/zlib/inflate.c
+      ../../dep/src/zlib/inftrees.c
+      ../../dep/src/zlib/trees.c
+      ../../dep/src/zlib/uncompr.c
+      ../../dep/src/zlib/zutil.c
+  )
+endif(WIN32)
 
 add_library(g3dlite
     ../../dep/src/g3dlite/AABox.cpp
@@ -132,7 +134,15 @@ add_library(g3dlite
     ../../dep/src/g3dlite/WinMain.cpp
 )
 
-target_link_libraries(g3dlite zlib)
+if(UNIX)
+  find_package(ZLIB REQUIRED)
+  if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    target_link_libraries(g3dlite ${ZLIB_LIBRARIES})
+  endif(ZLIB_FOUND)
+else()
+  target_link_libraries(g3dlite zlib)
+endif(UNIX)
 
 add_library(vmap
 	../../src/game/vmap/BIH.cpp
@@ -143,7 +153,15 @@ add_library(vmap
 	../../src/game/vmap/ModelInstance.cpp
 )
 
-target_link_libraries(vmap zlib g3dlite)
+if(UNIX)
+  find_package(ZLIB REQUIRED)
+  if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    target_link_libraries(vmap ${ZLIB_LIBRARIES} g3dlite)
+  endif(ZLIB_FOUND)
+else()
+  target_link_libraries(vmap zlib g3dlite)
+endif(UNIX)
 
 set(SOURCES
     main.cpp
@@ -152,4 +170,12 @@ set(SOURCES
 
 add_executable(vmaps_reader ${SOURCES} )
 
-target_link_libraries(vmaps_reader g3dlite vmap zlib )
+if(UNIX)
+  find_package(ZLIB REQUIRED)
+  if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    target_link_libraries(vmaps_reader g3dlite vmap ${ZLIB_LIBRARIES})
+  endif(ZLIB_FOUND)
+else()
+  target_link_libraries(vmaps_reader g3dlite vmap zlib)
+endif(UNIX)

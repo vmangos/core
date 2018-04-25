@@ -160,3 +160,9 @@ add_library(shared STATIC
   ${shared_SRCS}
 )
 
+if(UNIX)
+  find_package(Threads)
+  target_link_libraries(shared ${ACE_LIBRARIES} ${CMAKE_THREAD_LIBS_INIT})
+endif(UNIX)
+
+SET_TARGET_PROPERTIES (shared PROPERTIES FOLDER "Game Libs")

@@ -37,7 +37,6 @@ option(TBB_DEBUG "Use TBB debug librairies" 0)
 option(USE_ANTICHEAT "Use anticheat" 0)
 option(SCRIPTS "Compile scripts" 1)
 option(USE_EXTRACTORS "Compile extractors" 0)
-option(USE_UTILITY "Compile additional utility's" 0)
 option(USE_LIBCURL "Compile with libcurl for email support" 0)
 
 find_package(PCHSupport)
@@ -47,12 +46,6 @@ if(USE_LIBCURL)
   #add_definitions(-D_HAS_AUTO_PTR_ETC) # for VS2017 ACE support, won't do any harm to other compilers
   #set(CMAKE_CXX_STANDARD 17)
   #set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /std:c++17")
-endif()
-
-# Added by Giperion, in WIN32 output all compiled files in one directory
-if (WIN32)
-	set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
-	set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
 endif()
 
 # Force out-of-source build
@@ -69,6 +62,12 @@ if(WIN32)
   elseif(MSVC_VERSION LESS 1900)
     message(FATAL_ERROR "Only Visual Studio 2015 or newer is supported")
   endif()
+  
+  # Added by Giperion, in WIN32 output all compiled files in one directory
+  set( CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/bin )
+  set( CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_SOURCE_DIR}/lib )
+  # Allow creating folders in solution
+  set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 endif()
 
 find_package(Platform REQUIRED)
@@ -210,15 +209,15 @@ if(UNIX)
 endif()
 
 # Add uninstall script and target
-configure_file(
-  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
-  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-  IMMEDIATE @ONLY
-)
+#configure_file(
+#  "${CMAKE_CURRENT_SOURCE_DIR}/cmake/cmake_uninstall.cmake.in"
+#  "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+#  IMMEDIATE @ONLY
+#)
 
-add_custom_target(uninstall
-  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
-)
+#add_custom_target(uninstall
+#  "${CMAKE_COMMAND}" -P "${CMAKE_CURRENT_BINARY_DIR}/cmake_uninstall.cmake"
+#)
 
 # Find core revision
 if(NOT GIT_EXECUTABLE)
@@ -428,15 +427,8 @@ endif()
 
 add_subdirectory(dep)
 
-#TODO: need fully implementation
 if (USE_EXTRACTORS)
-	add_subdirectory(dep/loadlib)
-	add_subdirectory(dep/libmpq)
-	add_subdirectory(dep/src/bzip2)
-	add_subdirectory(contrib/extractor)
-	add_subdirectory(contrib/vmap_extractor)
-	add_subdirectory(contrib/vmap_assembler)
-	add_subdirectory(contrib/mmap)
+    add_subdirectory(contrib)
 endif()
 
 # Add definitions for all build types

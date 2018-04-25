@@ -1,4 +1,3 @@
-
 #include "model.h"
 #include "dbcfile.h"
 #include "adtfile.h"

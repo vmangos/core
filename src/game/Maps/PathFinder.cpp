@@ -293,13 +293,14 @@ void PathInfo::BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos)
 
         // we need any point on our suffix start poly to generate poly-path, so we need last poly in prefix data
         float suffixEndPoint[VERTEX_SIZE];
-        if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint)))
+		bool PosOverBody = false;
+        if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, &PosOverBody)))
         {
             // we can hit offmesh connection as last poly - closestPointOnPoly() don't like that
             // try to recover by using prev polyref
             --prefixPolyLength;
             suffixStartPoly = m_pathPolyRefs[prefixPolyLength - 1];
-            if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint)))
+            if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, &PosOverBody)))
             {
                 // suffixStartPoly is still invalid, error state
                 BuildShortcut();
@@ -346,8 +347,8 @@ void PathInfo::BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos)
 
         unsigned int const threadId = ACE_Based::Thread::currentId();
 
-        if (threadId != m_navMeshQuery->m_owningThread)
-            sLog.outError("CRASH: We are using a dtNavMeshQuery from thread %u which belongs to thread %u!", threadId, m_navMeshQuery->m_owningThread);
+        //if (threadId != m_navMeshQuery->m_owningThread)
+            //sLog.outError("CRASH: We are using a dtNavMeshQuery from thread %u which belongs to thread %u!", threadId, m_navMeshQuery->m_owningThread);
 
         dtStatus dtResult = m_navMeshQuery->findPath(
                                 startPoly,          // start polygon
@@ -560,7 +561,7 @@ bool PathInfo::HaveTiles(const Vector3& p) const
 
     // check if the start and end point have a .mmtile loaded
     m_navMesh->calcTileLoc(point, &tx, &ty);
-    return (m_navMesh->getTileAt(tx, ty) != NULL);
+    return (m_navMesh->getTileAt(tx, ty, 0) != NULL);
 }
 
 uint32 PathInfo::fixupCorridor(dtPolyRef* path, const uint32 npath, const uint32 maxPath,
@@ -766,7 +767,7 @@ dtStatus PathInfo::findSmoothPath(const float* startPos, const float* endPos,
         // Find movement delta.
         float delta[VERTEX_SIZE];
         dtVsub(delta, steerPos, iterPos);
-        float len = dtSqrt(dtVdot(delta, delta));
+        float len = sqrtf(dtVdot(delta, delta));
         // If the steer target is end of path or off-mesh link, do not move past the location.
         if ((endOfPath || offMeshConnection) && len < SMOOTH_PATH_STEP_SIZE)
             len = 1.0f;

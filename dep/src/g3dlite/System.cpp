@@ -32,10 +32,6 @@
 #include <cstring>
 #include <cstdio>
 
-#if defined(_MSC_VER) && _MSC_VER >= 1910
-#include <intrin.h>
-#endif
-
 // Uncomment the following line to turn off G3D::System memory
 // allocation and use the operating system's malloc.
 //#define NO_BUFFERPOOL

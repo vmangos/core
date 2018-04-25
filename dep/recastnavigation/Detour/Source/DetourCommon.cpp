@@ -21,11 +21,6 @@
 
 //////////////////////////////////////////////////////////////////////////////////////////
 
-float dtSqrt(float x)
-{
-	return dtMathSqrtf(x);
-}
-
 void dtClosestPtPointTriangle(float* closest, const float* p,
 							  const float* a, const float* b, const float* c)
 {
@@ -335,7 +330,6 @@ bool dtOverlapPolyPoly2D(const float* polya, const int npolya,
 
 // Returns a random point in a convex polygon.
 // Adapted from Graphics Gems article.
-// ... Given @s and @t 2 random numbers between 0 and 1
 void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 							   const float s, const float t, float* out)
 {
@@ -347,9 +341,9 @@ void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 	}
 	// Find sub triangle weighted by area.
 	const float thr = s*areasum;
-    float acc = 0.0f;
-    float u = 0.0f;
-    int tri = 2; // Nostalrius: fixed crash here. Do not rely on float comparaisons !
+	float acc = 0.0f;
+	float u = 0.0f;
+	int tri = 0;
 	for (int i = 2; i < npts; i++) {
 		const float dacc = areas[i];
 		if (thr >= acc && thr < (acc+dacc))
@@ -361,7 +355,7 @@ void dtRandomPointInConvexPoly(const float* pts, const int npts, float* areas,
 		acc += dacc;
 	}
 	
-	float v = dtSqrt(t);
+	float v = dtMathSqrtf(t);
 	
 	const float a = 1 - v;
 	const float b = (1 - u) * v;

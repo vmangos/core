@@ -238,6 +238,7 @@ namespace MMAP
 
         fclose(objFile);
 
+        #if 0
         printf("%sWriting debug output...                       \r", filename.c_str());
 
         realFileName = "meshes/" + filename + ".map";
@@ -274,5 +275,6 @@ namespace MMAP
         fflush(objFile);
 
         fclose(objFile);
+        #endif
     }
 }

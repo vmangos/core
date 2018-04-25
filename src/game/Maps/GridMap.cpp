@@ -606,7 +606,7 @@ bool GridMap::ExistMap(uint32 mapid, int gx, int gy)
 {
     int len = sWorld.GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
     char* tmp = new char[len];
-    snprintf(tmp, len, (char*)(sWorld.GetDataPath() + "maps/%03u%02u%02u.map").c_str(), mapid, gx, gy);
+    snprintf(tmp, len, (char*)(sWorld.GetDataPath() + "maps/%03u%02u%02u.map").c_str(), mapid, gy, gx);
 
     FILE* pf = fopen(tmp, "rb");
 
@@ -1102,9 +1102,9 @@ float TerrainInfo::GetWaterOrGroundLevel(float x, float y, float z, float* pGrou
 
 GridMap* TerrainInfo::GetGrid(const float x, const float y)
 {
-    // half opt method
-    int gx = (int)(32 - x / SIZE_OF_GRIDS);                 // grid x
-    int gy = (int)(32 - y / SIZE_OF_GRIDS);                 // grid y
+    // Giperion Elysium: It's reversed. That's ok
+    int gx = (int)(32 - y / SIZE_OF_GRIDS);                 // grid x
+    int gy = (int)(32 - x / SIZE_OF_GRIDS);                 // grid y
 
     // quick check if GridMap already loaded
     GridMap* pMap = m_GridMaps[gx][gy];
@@ -1128,7 +1128,7 @@ GridMap* TerrainInfo::LoadMapAndVMap(const uint32 x, const uint32 y)
             // map file name
             int len = sWorld.GetDataPath().length() + strlen("maps/%03u%02u%02u.map") + 1;
             char* tmp = new char[len];
-            snprintf(tmp, len, (char*)(sWorld.GetDataPath() + "maps/%03u%02u%02u.map").c_str(), m_mapId, x, y);
+            snprintf(tmp, len, (char*)(sWorld.GetDataPath() + "maps/%03u%02u%02u.map").c_str(), m_mapId, y, x);
 
             if (!map->loadData(tmp))
             {

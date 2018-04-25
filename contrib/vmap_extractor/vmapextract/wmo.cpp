@@ -27,9 +27,8 @@
 #include <fstream>
 #undef min
 #undef max
-#include <libmpq\mpq_libmpq.h>
+#include "mpq_libmpq04.h"
 #include "adtfile.h" // for fixnamen
-
 using namespace std;
 extern uint16* LiqType;
 

@@ -17,16 +17,31 @@
 cmake_minimum_required (VERSION 2.6)
 project (MANGOS_VMAP_EXTRACT_IO)
 
-include_directories (../../dep)
 
-if(!WIN32)
 # uncomment next line to disable debug mode
-ADD_DEFINITIONS("-DIOMAP_DEBUG")
+#ADD_DEFINITIONS("-DIOMAP_DEBUG")
 # build setup currently only supports libmpq 0.4.x
 ADD_DEFINITIONS("-DUSE_LIBMPQ04")
-ADD_DEFINITIONS("-Wall")
-ADD_DEFINITIONS("-ggdb")
-ADD_DEFINITIONS("-O3")
+if (NOT MSVC)
+	ADD_DEFINITIONS("-Wall")
+	ADD_DEFINITIONS("-ggdb")
+	ADD_DEFINITIONS("-O3")
 endif()
+
+add_library(bz2
+	../../dep/src/bzip2/blocksort.c
+	../../dep/src/bzip2/bzlib.c
+	../../dep/src/bzip2/bzlib.h
+	../../dep/src/bzip2/bzlib_private.h
+	../../dep/src/bzip2/compress.c
+	../../dep/src/bzip2/crctable.c
+    ../../dep/src/bzip2/decompress.c
+    ../../dep/src/bzip2/huffman.c
+    ../../dep/src/bzip2/randtable
+)
+
+SET_TARGET_PROPERTIES (bz2 PROPERTIES FOLDER "3rd Party")
+
+include_directories(../../dep/libmpq)
 
 add_subdirectory(vmapextract)

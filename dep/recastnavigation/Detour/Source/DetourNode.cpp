@@ -21,7 +21,6 @@
 #include "DetourAssert.h"
 #include "DetourCommon.h"
 #include <string.h>
-#include <stdexcept>
 
 #ifdef DT_POLYREF64
 // From Thomas Wang, https://gist.github.com/badboy/6267743
@@ -58,7 +57,9 @@ dtNodePool::dtNodePool(int maxNodes, int hashSize) :
 	m_nodeCount(0)
 {
 	dtAssert(dtNextPow2(m_hashSize) == (unsigned int)m_hashSize);
-	dtAssert(m_maxNodes > 0);
+	// pidx is special as 0 means "none" and 1 is the first node. For that reason
+	// we have 1 fewer nodes available than the number of values it can contain.
+	dtAssert(m_maxNodes > 0 && m_maxNodes <= DT_NULL_IDX && m_maxNodes <= (1 << DT_NODE_PARENT_BITS) - 1);
 
 	m_nodes = (dtNode*)dtAlloc(sizeof(dtNode)*m_maxNodes, DT_ALLOC_PERM);
 	m_next = (dtNodeIndex*)dtAlloc(sizeof(dtNodeIndex)*m_maxNodes, DT_ALLOC_PERM);
@@ -170,9 +171,6 @@ dtNodeQueue::~dtNodeQueue()
 
 void dtNodeQueue::bubbleUp(int i, dtNode* node)
 {
-    if (!node)
-        throw std::runtime_error("bubbleUp with nil node");
-
 	int parent = (i-1)/2;
 	// note: (index > 0) means there is a parent
 	while ((i > 0) && (m_heap[parent]->total > node->total))
@@ -186,9 +184,6 @@ void dtNodeQueue::bubbleUp(int i, dtNode* node)
 
 void dtNodeQueue::trickleDown(int i, dtNode* node)
 {
-    if (!node)
-        throw std::runtime_error("trickleDown with nil node");
-
 	int child = (i*2)+1;
 	while (child < m_size)
 	{
@@ -201,9 +196,5 @@ void dtNodeQueue::trickleDown(int i, dtNode* node)
 		i = child;
 		child = (i*2)+1;
 	}
-
-    if (!node)
-        throw std::runtime_error("trickleDown finished with nil node");
-
 	bubbleUp(i, node);
 }

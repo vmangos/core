@@ -70,7 +70,7 @@ public:
 	virtual void handleDebugMode();
 	virtual void handleRender();
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
-	virtual void handleMeshChanged(class InputGeom* geom);
+	virtual void handleMeshChanged(class InputGeom* geom, std::string InMeshName);
 	virtual bool handleBuild();
 	virtual void handleUpdate(const float dt);
 
@@ -82,6 +82,16 @@ public:
 	void addTempObstacle(const float* pos);
 	void removeTempObstacle(const float* sp, const float* sq);
 	void clearAllTempObstacles();
+
+	void saveAll(const char* path);
+	void loadAll(const char* path);
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	Sample_TempObstacles(const Sample_TempObstacles&);
+	Sample_TempObstacles& operator=(const Sample_TempObstacles&);
+
+	int rasterizeTileLayers(const int tx, const int ty, const rcConfig& cfg, struct TileCacheData* tiles, const int maxTiles);
 };
 
 

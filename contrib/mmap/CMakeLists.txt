@@ -10,11 +10,9 @@
 
 cmake_minimum_required (VERSION 2.6)
 
-message ("Mmap extractor included")
-
 project( MoveMapGen )
 
-ADD_DEFINITIONS(-DMMAP_GENERATOR -DNO_CORE_FUNCS -DDEBUG)
+ADD_DEFINITIONS(-DMMAP_GENERATOR -DDEBUG)
 
 # zlib
 ADD_DEFINITIONS( -DNO_vsnprintf )
@@ -29,37 +27,14 @@ include_directories(
     ../../src/shared
     ../../src/game
     ../../src/game/vmap
+    ../../src/game/Commands
     ../../dep/include/g3dlite
     ../../src/framework
-    ../../dep/ACE_wrappers
-    ../../objdir/dep/ACE_wrappers
+    ${ACE_INCLUDE_DIR}
+    ../../dep/recastnavigation/
     ../../dep/recastnavigation/Detour/Include
     ../../dep/recastnavigation/Recast/Include
     ../../dep/src/zlib
-)
-
-
-add_library(vmap
-	../../src/game/vmap/BIH.cpp
-	../../src/game/vmap/VMapManager2.cpp
-	../../src/game/vmap/MapTree.cpp
-	../../src/game/vmap/TileAssembler.cpp
-	../../src/game/vmap/WorldModel.cpp
-	../../src/game/vmap/ModelInstance.cpp
-)
-
-target_link_libraries(vmap g3dlite zlib)
-
-add_library(Recast
-    ../../dep/recastnavigation/Recast/Source/Recast.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastAlloc.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastArea.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastContour.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastFilter.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastMesh.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastMeshDetail.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastRasterization.cpp
-    ../../dep/recastnavigation/Recast/Source/RecastRegion.cpp
 )
 
 set(SOURCES
@@ -70,6 +45,16 @@ set(SOURCES
     ./src/VMapExtensions.cpp
 )
 
-add_executable( MoveMapGen ${SOURCES} )
+add_executable(MoveMapGen ${SOURCES})
+SET_TARGET_PROPERTIES (MoveMapGen PROPERTIES FOLDER Extractors)
 
-target_link_libraries( MoveMapGen g3dlite vmap Recast detour zlib ${ACE_LIBRARIES} )
+target_link_libraries(MoveMapGen 
+                        vmap 
+                        detour
+                        Recast
+                        ${ACE_LIBRARIES}
+                        shared
+                        framework
+                        )
+
+install(TARGETS MoveMapGen DESTINATION ${BIN_DIR})

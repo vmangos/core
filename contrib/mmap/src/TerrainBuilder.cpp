@@ -603,7 +603,7 @@ namespace MMAP
         /// Add models to terrain
         for (uint32 i = 0; i < count; ++i)
         {
-            ModelInstance instance = models[i];
+            ModelInstance& instance = models[i];
 
             // model instances exist in tree even though there are instances of that model in this tile
             WorldModel* worldModel = instance.getWorldModel();
@@ -725,8 +725,8 @@ namespace MMAP
         meshData.vmapLastTriangle = meshData.solidTris.size() / 3;
         if (m_quick)
             return true;
-        float* terrainInsideModelsVerts = new float[mapVertsCount];
-        for (int i = 0; i < mapVertsCount; ++i)
+        float* terrainInsideModelsVerts = new float[meshData.solidVerts.size()];
+        for (int i = 0; i < meshData.solidVerts.size(); ++i)
             terrainInsideModelsVerts[i] = -1.0f;
         for (uint32 i = 0; i < count; ++i)
         {
@@ -773,7 +773,7 @@ namespace MMAP
                 }
         }
         /// Correct triangles partially under models
-        for (int i = 0; i < meshData.solidTris.size()/3; ++i)
+        for (int i = 0; i < mapTrisCount / 3; ++i)
         {
             Vector3 tri[3];
             uint32 vertIdx[3];

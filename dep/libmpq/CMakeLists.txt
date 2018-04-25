@@ -1,4 +1,5 @@
-# This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
+# Copyright (C) 2005-2011 MaNGOS <http://getmangos.com/>
+# Copyright (C) 2009-2011 MaNGOSZero <https://github.com/mangos/zero>
 #
 # This program is free software; you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -14,16 +15,44 @@
 # along with this program; if not, write to the Free Software
 # Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
 
-add_library (libmpq mpq_libmpq.cpp libmpq/common.cpp libmpq/explode.cpp libmpq/extract.cpp libmpq/huffman.cpp libmpq/mpq.cpp libmpq/parser.cpp libmpq/wave.cpp )
+
+set (libMPQ_SRCS
+	libmpq/common.c
+	libmpq/common.h
+	libmpq/crypt_buf.h
+	libmpq/explode.c
+	libmpq/explode.h
+	libmpq/extract.c
+	libmpq/extract.h
+	libmpq/huffman.c
+	libmpq/huffman.h
+	libmpq/mpq.c
+	libmpq/mpq.h
+	libmpq/mpq-internal.h
+	libmpq/pack_begin.h
+	libmpq/pack_end.h
+	libmpq/platform.h
+	libmpq/wave.c
+	libmpq/wave.h
+)
 
 include_directories(
   ${CMAKE_CURRENT_SOURCE_DIR}
-  ${CMAKE_SOURCE_DIR}/dep
-  ${CMAKE_SOURCE_DIR}/dep/include
+  ${CMAKE_SOURCE_DIR}/dep/include/bzip2
 )
 
-if(WIN32)
-  target_link_libraries(libmpq loadlib
-    zlib
-  )
+add_library(libmpq STATIC
+	${libMPQ_SRCS}
+)
+
+if(UNIX)
+  find_package(ZLIB REQUIRED)
+  if(ZLIB_FOUND)
+    include_directories(${ZLIB_INCLUDE_DIRS})
+    target_link_libraries(libmpq ${ZLIB_LIBRARIES})
+  endif(ZLIB_FOUND)
+else()
+  include_directories(${CMAKE_SOURCE_DIR}/dep/include/zlib)
 endif()
+
+SET_TARGET_PROPERTIES (libmpq PROPERTIES FOLDER "3rd Party")

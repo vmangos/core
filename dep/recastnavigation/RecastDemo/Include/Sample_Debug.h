@@ -47,11 +47,16 @@ public:
 	virtual void handleToggle();
 	virtual void handleRender();
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
-	virtual void handleMeshChanged(class InputGeom* geom);
+	virtual void handleMeshChanged(class InputGeom* geom, std::string InMeshName);
 	virtual bool handleBuild();
 
 	virtual const float* getBoundsMin();
 	virtual const float* getBoundsMax();
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	Sample_Debug(const Sample_Debug&);
+	Sample_Debug& operator=(const Sample_Debug&);
 };
 
 

@@ -37,3 +37,5 @@ include_directories(
 add_library(zlib STATIC
   ${zlib_SRCS}
 )
+
+SET_TARGET_PROPERTIES (zlib PROPERTIES FOLDER "3rd Party")
