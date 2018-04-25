@@ -12,6 +12,8 @@ INSERT INTO `migrations` VALUES ('20180425163101');
 -- Make doors in Twin Emperors room active objects.
 UPDATE `gameobject` SET `spawnFlags`=1 WHERE `guid` IN (21783, 21784);
 
+-- Delete custom teleport npc.
+DELETE FROM `creature_template` WHERE `entry`=20008;
 
 -- End of migration.
 END IF;

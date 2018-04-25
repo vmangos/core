@@ -17,7 +17,7 @@
 #include "scriptPCH.h"
 #include "custom.h"
 #include "ScriptedAI.h"
-
+#include <ctime>
 
 // TELEPORT NPC
 
@@ -963,10 +963,12 @@ struct npc_training_dummyAI : ScriptedAI
     }
 
     uint32 m_uiCombatTimer;
+    std::unordered_map<Unit*, time_t> attackers;
 
     void Reset() override
     {
         m_uiCombatTimer = 15000;
+        attackers.clear();
     }
 
     void AttackStart(Unit* /*pWho*/) override {}
@@ -976,14 +978,29 @@ struct npc_training_dummyAI : ScriptedAI
         SetCombatMovement(false);
     }
 
-    void DamageTaken(Unit* pWho, uint32& uiDamage) override
+    void AddAttackerToList(Unit* pWho)
     {
-        m_uiCombatTimer = 15000;
+        auto itr = attackers.find(pWho);
+        if (itr != attackers.end())
+        {
+            itr->second = std::time(nullptr);
+        }
+        else
+        {
+            attackers.emplace(pWho, std::time(nullptr));
+        }
     }
 
-    void SpellHit(Unit* pWho, const SpellEntry* pSpell) override
+    void DamageTaken(Unit* pWho, uint32& /*uiDamage*/) override
     {
-        m_uiCombatTimer = 15000;
+        if (pWho)
+            AddAttackerToList(pWho);
+    }
+
+    void SpellHit(Unit* pWho, const SpellEntry* /*pSpell*/) override
+    {
+        if (pWho)
+            AddAttackerToList(pWho);
     }
 
     void UpdateAI(const uint32 diff) override
@@ -992,7 +1009,25 @@ struct npc_training_dummyAI : ScriptedAI
         {
             if (m_uiCombatTimer <= diff)
             {
-                EnterEvadeMode();
+                for (auto itr = attackers.begin(); itr != attackers.end();)
+                {
+                    if (!itr->first && !itr->first->IsInWorld())
+                    {
+                        itr = attackers.erase(itr);
+                        continue;
+                    }
+                    if (itr->second + 10 < std::time(nullptr))
+                    {
+                        m_creature->_removeAttacker(itr->first);
+                        m_creature->getThreatManager().modifyThreatPercent(itr->first, -101.0f);
+                        itr = attackers.erase(itr);
+                    }
+                    ++itr;
+                }
+
+                if (m_creature->getThreatManager().isThreatListEmpty())
+                    EnterEvadeMode();
+
                 m_uiCombatTimer = 15000;
             }
             else
@@ -1061,30 +1096,27 @@ void AddSC_custom_creatures()
     Script *newscript;
 
     newscript = new Script;
-    newscript->Name = "custom_TeleportNPC";
+    newscript->Name = "custom_teleport_npc";
     newscript->pGossipHello = &GossipHello_TeleportNPC;
     newscript->pGossipSelect = &GossipSelect_TeleportNPC;
     newscript->RegisterSelf(false);
-    /*
-    Commented out to prevent startup error about unused script.
 
     newscript = new Script;
-    newscript->Name = "custom_EnchantNPC";
+    newscript->Name = "custom_enchant_npc";
     newscript->pGossipHello = &GossipHello_EnchantNPC;
     newscript->pGossipSelect = &GossipSelect_EnchantNPC;
-    newscript->RegisterSelf(true);
+    newscript->RegisterSelf(false);
 
     newscript = new Script;
-    newscript->Name = "custom_ProfessionsNPC";
+    newscript->Name = "custom_professions_npc";
     newscript->pGossipHello = &GossipHello_ProfessionNPC;
     newscript->pGossipSelect = &GossipSelect_ProfessionNPC;
-    newscript->RegisterSelf(true);
+    newscript->RegisterSelf(false);
 
     newscript = new Script;
-    newscript->Name = "npc_training_dummy";
+    newscript->Name = "custom_npc_training_dummy";
     newscript->GetAI = &GetAI_npc_training_dummy;
-    newscript->RegisterSelf();
-    */
+    newscript->RegisterSelf(false);
 
     newscript = new Script;
     newscript->Name = "custom_npc_summon_debugAI";
