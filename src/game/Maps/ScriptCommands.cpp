@@ -1524,7 +1524,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
     return false;
 }
 
-// SCRIPT_COMMAND_REMOVE_GUARDIANSS (56)
+// SCRIPT_COMMAND_REMOVE_GUARDIANS (56)
 bool Map::ScriptCommand_RemoveGuardians(const ScriptInfo& script, WorldObject* source, WorldObject* target)
 {
     Unit* pSource = ToUnit(source);
