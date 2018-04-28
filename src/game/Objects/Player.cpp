@@ -4473,6 +4473,16 @@ void Player::DeleteOldCharacters(uint32 keepDays)
     }
 }
 
+void Player::SetFly(bool enable)
+{
+    if (enable)
+        m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING);
+    else
+        m_movementInfo.moveFlags = (MOVEFLAG_NONE);
+
+    SendHeartBeat(true);
+}
+
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world

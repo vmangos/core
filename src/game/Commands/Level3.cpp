@@ -5954,13 +5954,10 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
     if (!target)
         target = m_session->GetPlayer();
 
+    target->SetFly(value);
+
     if (value)
-    {
         SendSysMessage("WARNING: Do not jump or flying mode will be removed.");
-        target->m_movementInfo.moveFlags = (MOVEFLAG_LEVITATING | MOVEFLAG_SWIMMING | MOVEFLAG_CAN_FLY | MOVEFLAG_FLYING);
-    }
-    else
-        target->m_movementInfo.moveFlags = (MOVEFLAG_NONE);
 
     if (m_session->IsReplaying())
     {
@@ -5971,8 +5968,7 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
         data << movementInfo;
         m_session->SendPacket(&data);
     }
-    else
-        target->SendHeartBeat(true);
+
     PSendSysMessage(LANG_COMMAND_FLYMODE_STATUS, GetNameLink(target).c_str(), args);
     return true;
 }
