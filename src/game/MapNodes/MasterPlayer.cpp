@@ -259,6 +259,7 @@ void MasterPlayer::LoadMailedItems(QueryResult *result)
         if (!proto)
         {
             sLog.outError("Player %u has unknown item_template (ProtoType) in mailed items(GUID: %u template: %u) in mail (%u), deleted.", GetGUIDLow(), item_guid_low, item_template, mail->messageID);
+            CharacterDatabase.PExecute("INSERT INTO character_deleted_items (player_guid, item_entry, stack_count) VALUES ('%u', '%u', '%u')", GetGUIDLow(), item_template, fields[2].GetUInt32());
             CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid = '%u'", item_guid_low);
             CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_guid_low);
             continue;
