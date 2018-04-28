@@ -67,6 +67,7 @@ enum EventAI_Type
     EVENT_T_MISSING_AURA            = 27,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_MOVEMENT_INFORM         = 29,                   // Param1 = motion type, Param2 = point ID, RepeatMin, RepeatMax
+    EVENT_T_LEAVE_COMBAT            = 30,                   // NONE
 
     EVENT_T_END,
 };
@@ -266,6 +267,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void JustReachedHome() override;
         void EnterCombat(Unit *enemy) override;
         void EnterEvadeMode() override;
+        void OnCombatStop() override;
         void JustDied(Unit* killer) override;
         void KilledUnit(Unit* victim) override;
         void JustSummoned(Creature* pUnit) override;
@@ -283,8 +285,6 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
 
         bool ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pActionInvoker = nullptr);
         void ProcessAction(ScriptMap* action, uint32 EventId, Unit* pActionInvoker);
-        inline uint32 GetRandActionParam(uint32 rnd, uint32 param1, uint32 param2, uint32 param3);
-        inline int32 GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3);
         void SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent);
 
         uint8  m_Phase;                                     // Current phase, max 32 phases
@@ -300,6 +300,9 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         float  m_AttackDistance;                            // Distance to attack from
         float  m_AttackAngle;                               // Angle of attack
         uint32 m_InvinceabilityHpLevel;                     // Minimal health level allowed at damage apply
+
+        void UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat);
+        void UpdateEventsOn_MoveInLineOfSight(Unit* pWho);
 };
 
 #endif

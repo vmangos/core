@@ -240,6 +240,8 @@ enum eScriptCommand
                                                             // datalong2 = cooldown
     SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN    = 58,           // source = Unit
                                                             // datalong = spell_id
+    SCRIPT_COMMAND_SET_REACT_STATE          = 59,           // source = Creature
+                                                            // datalong = see enum ReactStates
 
     SCRIPT_COMMAND_MAX,
 
@@ -716,6 +718,11 @@ struct ScriptInfo
         {
             uint32 spellId;                                 // datalong
         } removeCooldown;
+
+        struct                                              // SCRIPT_COMMAND_SET_REACT_STATE (59)
+        {
+            uint32 state;                                   // datalong
+        } setReactState;
 
         struct
         {

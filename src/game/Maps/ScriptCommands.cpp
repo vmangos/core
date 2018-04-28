@@ -1581,3 +1581,19 @@ bool Map::ScriptCommand_RemoveSpellCooldown(const ScriptInfo& script, WorldObjec
 
     return false;
 }
+
+// SCRIPT_COMMAND_SET_REACT_STATE (59)
+bool Map::ScriptCommand_SetReactState(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_REACT_STATE (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->SetReactState(ReactStates(script.setReactState.state));
+
+    return false;
+}

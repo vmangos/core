@@ -60,6 +60,10 @@ CreatureAI* selectAI(Creature *creature)
     else if (creature->IsTotem())
         ai_factory = ai_registry.GetRegistryItem("TotemAI");
 
+    // EventAI assigned but creature is Pet.
+    if (!ai_factory && !ainame.empty() && creature->IsPet() && (ainame == "EventAI"))
+        ai_factory = ai_registry.GetRegistryItem("PetEventAI");
+
     // select by script name
     if (!ai_factory && !ainame.empty())
         ai_factory = ai_registry.GetRegistryItem(ainame.c_str());

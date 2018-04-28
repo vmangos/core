@@ -60,6 +60,7 @@ set (game_SRCS
 	AI/GuardAI.cpp
 	AI/NullCreatureAI.cpp
 	AI/PetAI.cpp
+	AI/PetEventAI.cpp
 	AI/PlayerAI.cpp
 	AI/ReactorAI.cpp
 	AI/ScriptedAI.cpp
@@ -275,6 +276,7 @@ set (game_SRCS
 	AI/GuardAI.h
 	AI/NullCreatureAI.h
 	AI/PetAI.h
+	AI/PetEventAI.h
 	AI/PlayerAI.h
 	AI/ReactorAI.h
 	AI/ScriptedAI.h

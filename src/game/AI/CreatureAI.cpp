@@ -398,7 +398,7 @@ void CreatureAI::SetCombatMovement(bool enabled)
     }
 }
 
-void CreatureAI::EnterEvadeMode()
+void CreatureAI::OnCombatStop()
 {
     // Reset back to default spells template. This also resets timers.
     SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
@@ -406,10 +406,12 @@ void CreatureAI::EnterEvadeMode()
     // Reset combat movement and melee attack.
     m_CombatMovementEnabled = true;
     m_MeleeEnabled = true;
+}
 
+void CreatureAI::EnterEvadeMode()
+{
     if (!m_creature->isAlive())
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature stopped attacking, he is dead [guid=%u]", m_creature->GetGUIDLow());
         m_creature->CombatStop(true);
         m_creature->DeleteThreatList();
         return;

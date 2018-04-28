@@ -188,6 +188,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             break;
         case EVENT_T_DEATH:
         case EVENT_T_EVADE:
+        case EVENT_T_LEAVE_COMBAT:
             break;
         case EVENT_T_SPELLHIT:
             //Spell hit is special case, param1 and param2 handled within CreatureEventAI::SpellHit
@@ -498,6 +499,21 @@ void CreatureEventAI::EnterEvadeMode()
     }
 }
 
+void CreatureEventAI::OnCombatStop()
+{
+    CreatureAI::OnCombatStop();
+
+    if (m_bEmptyList)
+        return;
+
+    //Handle Combat Stop events
+    for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
+    {
+        if ((*i).Event.event_type == EVENT_T_LEAVE_COMBAT)
+            ProcessEvent(*i);
+    }
+}
+
 void CreatureEventAI::JustDied(Unit* killer)
 {
     Reset();
@@ -614,39 +630,19 @@ void CreatureEventAI::AttackStart(Unit *who)
         m_creature->SetInCombatWith(who);
         who->SetInCombatWith(m_creature);
 
-        //if (!m_CombatMovementEnabled)
-        //    m_creature->SetCasterChaseDistance(25.0f);
-        m_creature->GetMotionMaster()->MoveChase(who, m_AttackDistance, m_AttackAngle);
+        if (m_CombatMovementEnabled)
+            m_creature->GetMotionMaster()->MoveChase(who, m_AttackDistance, m_AttackAngle);
     }
 }
 
-void CreatureEventAI::MoveInLineOfSight(Unit *who)
+void CreatureEventAI::MoveInLineOfSight(Unit *pWho)
 {
-    if (!who)
+    if (!pWho)
         return;
 
     //Check for OOC LOS Event
     if (!m_bEmptyList && !m_creature->getVictim())
-    {
-        for (CreatureEventAIList::iterator itr = m_CreatureEventAIList.begin(); itr != m_CreatureEventAIList.end(); ++itr)
-        {
-            if ((*itr).Event.event_type == EVENT_T_OOC_LOS)
-            {
-                //can trigger if closer than fMaxAllowedRange
-                float fMaxAllowedRange = (float)(*itr).Event.ooc_los.maxRange;
-
-                //if range is ok and we are actually in LOS
-                if (m_creature->IsWithinDistInMap(who, fMaxAllowedRange))
-                {
-                    //if friendly event&&who is not hostile OR hostile event&&who is hostile
-                    if ((*itr).Event.ooc_los.noHostile && !m_creature->IsHostileTo(who) ||
-                            !(*itr).Event.ooc_los.noHostile && m_creature->IsHostileTo(who))
-                        if (m_creature->IsWithinLOSInMap(who))
-                            ProcessEvent(*itr, who);
-                }
-            }
-        }
-    }
+        UpdateEventsOn_MoveInLineOfSight(pWho);
 
     if (m_creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO || m_creature->IsNeutralToAll())
         return;
@@ -655,26 +651,48 @@ void CreatureEventAI::MoveInLineOfSight(Unit *who)
     if (m_creature->getVictim() && !m_creature->GetMap()->IsDungeon())
         return;
 
-    if (!m_creature->CanFly() && m_creature->GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE)
+    if (!m_creature->CanFly() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
         return;
 
-    if (m_creature->CanInitiateAttack() && who->isTargetableForAttack())
+    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack())
     {
-        float attackRadius = m_creature->GetAttackDistance(who);
-        if (m_creature->IsWithinDistInMap(who, attackRadius) && m_creature->IsHostileTo(who))
+        float attackRadius = m_creature->GetAttackDistance(pWho);
+        if (m_creature->IsWithinDistInMap(pWho, attackRadius) && m_creature->IsHostileTo(pWho))
         {
             if (!m_creature->getVictim())
             {
-                if (m_creature->IsWithinLOSInMap(who) && who->isInAccessablePlaceFor(m_creature))
-                    AttackStart(who);
+                if (m_creature->IsWithinLOSInMap(pWho) && pWho->isInAccessablePlaceFor(m_creature))
+                    AttackStart(pWho);
             }
             else if (m_creature->GetMap()->IsDungeon())
             {
-                if (m_creature->IsWithinLOSInMap(who) && who->isInAccessablePlaceFor(m_creature))
+                if (m_creature->IsWithinLOSInMap(pWho) && pWho->isInAccessablePlaceFor(m_creature))
                 {
-                    m_creature->AddThreat(who);
-                    who->SetInCombatWith(m_creature);
+                    m_creature->AddThreat(pWho);
+                    pWho->SetInCombatWith(m_creature);
                 }
+            }
+        }
+    }
+}
+
+void CreatureEventAI::UpdateEventsOn_MoveInLineOfSight(Unit* pWho)
+{
+    for (CreatureEventAIList::iterator itr = m_CreatureEventAIList.begin(); itr != m_CreatureEventAIList.end(); ++itr)
+    {
+        if ((*itr).Event.event_type == EVENT_T_OOC_LOS)
+        {
+            //can trigger if closer than fMaxAllowedRange
+            float fMaxAllowedRange = (float)(*itr).Event.ooc_los.maxRange;
+
+            //if range is ok and we are actually in LOS
+            if (m_creature->IsWithinDistInMap(pWho, fMaxAllowedRange))
+            {
+                //if friendly event&&who is not hostile OR hostile event&&who is hostile
+                if ((*itr).Event.ooc_los.noHostile && !m_creature->IsHostileTo(pWho) ||
+                    !(*itr).Event.ooc_los.noHostile && m_creature->IsHostileTo(pWho))
+                    if (m_creature->IsWithinLOSInMap(pWho))
+                        ProcessEvent(*itr, pWho);
             }
         }
     }
@@ -715,104 +733,80 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
         return;
 
     if (!m_bEmptyList)
+        UpdateEventsOn_UpdateAI(diff, Combat);
+
+    if (Combat)
     {
-        //Events are only updated once every EVENT_UPDATE_TIME ms to prevent lag with large amount of events
-        if (m_EventUpdateTime < diff)
+        if (!m_CreatureSpells.empty())
+            DoSpellTemplateCasts(diff);
+
+        DoMeleeAttackIfReady();
+    }
+}
+
+void CreatureEventAI::UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat)
+{
+    //Events are only updated once every EVENT_UPDATE_TIME ms to prevent lag with large amount of events
+    if (m_EventUpdateTime < diff)
+    {
+        m_EventDiff += diff;
+
+        //Check for time based events
+        for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
         {
-            m_EventDiff += diff;
-
-            //Check for time based events
-            for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
+            //Decrement Timers
+            if ((*i).Time)
             {
-                //Decrement Timers
-                if ((*i).Time)
+                if ((*i).Time > m_EventDiff)
                 {
-                    if ((*i).Time > m_EventDiff)
-                    {
-                        //Do not decrement timers if event cannot trigger in this phase
-                        if (!((*i).Event.event_inverse_phase_mask & (1 << m_Phase)))
-                            (*i).Time -= m_EventDiff;
+                    //Do not decrement timers if event cannot trigger in this phase
+                    if (!((*i).Event.event_inverse_phase_mask & (1 << m_Phase)))
+                        (*i).Time -= m_EventDiff;
 
-                        //Skip processing of events that have time remaining
-                        continue;
-                    }
-                    else (*i).Time = 0;
+                    //Skip processing of events that have time remaining
+                    continue;
                 }
-
-                //Events that are updated every EVENT_UPDATE_TIME
-                switch ((*i).Event.event_type)
-                {
-                    case EVENT_T_TIMER_OOC:
-                        ProcessEvent(*i);
-                        break;
-                    case EVENT_T_TIMER:
-                    case EVENT_T_MANA:
-                    case EVENT_T_HP:
-                    case EVENT_T_TARGET_HP:
-                    case EVENT_T_TARGET_CASTING:
-                    case EVENT_T_FRIENDLY_HP:
-                    case EVENT_T_AURA:
-                    case EVENT_T_TARGET_AURA:
-                    case EVENT_T_MISSING_AURA:
-                    case EVENT_T_TARGET_MISSING_AURA:
-                        if (Combat)
-                            ProcessEvent(*i);
-                        break;
-                    case EVENT_T_RANGE:
-                        if (Combat)
-                        {
-                            if (m_creature->getVictim() && m_creature->IsInMap(m_creature->getVictim()))
-                                if (m_creature->IsInRange(m_creature->getVictim(), (float)(*i).Event.range.minDist, (float)(*i).Event.range.maxDist))
-                                    ProcessEvent(*i);
-                        }
-                        break;
-                }
+                else (*i).Time = 0;
             }
 
-            m_EventDiff = 0;
-            m_EventUpdateTime = EVENT_UPDATE_TIME;
+            //Events that are updated every EVENT_UPDATE_TIME
+            switch ((*i).Event.event_type)
+            {
+            case EVENT_T_TIMER_OOC:
+                ProcessEvent(*i);
+                break;
+            case EVENT_T_TIMER:
+            case EVENT_T_MANA:
+            case EVENT_T_HP:
+            case EVENT_T_TARGET_HP:
+            case EVENT_T_TARGET_CASTING:
+            case EVENT_T_FRIENDLY_HP:
+            case EVENT_T_AURA:
+            case EVENT_T_TARGET_AURA:
+            case EVENT_T_MISSING_AURA:
+            case EVENT_T_TARGET_MISSING_AURA:
+                if (Combat)
+                    ProcessEvent(*i);
+                break;
+            case EVENT_T_RANGE:
+                if (Combat)
+                {
+                    if (m_creature->getVictim() && m_creature->IsInMap(m_creature->getVictim()))
+                        if (m_creature->IsInRange(m_creature->getVictim(), (float)(*i).Event.range.minDist, (float)(*i).Event.range.maxDist))
+                            ProcessEvent(*i);
+                }
+                break;
+            }
         }
-        else
-        {
-            m_EventDiff += diff;
-            m_EventUpdateTime -= diff;
-        }
+
+        m_EventDiff = 0;
+        m_EventUpdateTime = EVENT_UPDATE_TIME;
     }
-
-    if (Combat && !m_CreatureSpells.empty())
-        DoSpellTemplateCasts(diff);
-
-    //Melee Auto-Attack
-    if (Combat)
-        DoMeleeAttackIfReady();
-}
-
-inline uint32 CreatureEventAI::GetRandActionParam(uint32 rnd, uint32 param1, uint32 param2, uint32 param3)
-{
-    switch (rnd % 3)
+    else
     {
-        case 0:
-            return param1;
-        case 1:
-            return param2;
-        case 2:
-            return param3;
+        m_EventDiff += diff;
+        m_EventUpdateTime -= diff;
     }
-    return 0;
-}
-
-inline int32 CreatureEventAI::GetRandActionParam(uint32 rnd, int32 param1, int32 param2, int32 param3)
-{
-    switch (rnd % 3)
-    {
-        case 0:
-            return param1;
-        case 1:
-            return param2;
-        case 2:
-            return param3;
-    }
-    return 0;
 }
 
 void CreatureEventAI::SetInvincibilityHealthLevel(uint32 hp_level, bool is_percent)

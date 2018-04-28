@@ -218,6 +218,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                 case EVENT_T_AGGRO:
                 case EVENT_T_DEATH:
                 case EVENT_T_EVADE:
+                case EVENT_T_LEAVE_COMBAT:
                 case EVENT_T_REACHED_HOME:
                 {
                     if (temp.event_flags & EFLAG_REPEATABLE)

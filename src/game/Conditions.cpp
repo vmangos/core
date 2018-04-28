@@ -87,6 +87,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_SOURCE_AND_TARGET,  //  38
     CONDITION_REQ_TARGET_WORLDOBJECT, //  39
     CONDITION_REQ_TARGET_UNIT,        //  40
+    CONDITION_REQ_TARGET_UNIT,        //  41
+    CONDITION_REQ_TARGET_UNIT,        //  42
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -507,6 +509,36 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_HAS_PET:
         {
             return target->ToUnit()->GetPet();
+        }
+        case CONDITION_HEALTH_PERCENT:
+        {
+            uint32 hp_percent = target->ToUnit()->GetHealthPercent();
+            
+            switch (m_value2)
+            {
+                case 0:
+                    return hp_percent == m_value1;
+                case 1:
+                    return hp_percent >= m_value1;
+                case 2:
+                    return hp_percent <= m_value1;
+            }
+            return false;
+        }
+        case CONDITION_MANA_PERCENT:
+        {
+            uint32 mana_percent = target->ToUnit()->GetPowerPercent(POWER_MANA);
+
+            switch (m_value2)
+            {
+                case 0:
+                    return mana_percent == m_value1;
+                case 1:
+                    return mana_percent >= m_value1;
+                case 2:
+                    return mana_percent <= m_value1;
+            }
+            return false;
         }
     }
     return false;
@@ -1009,6 +1041,21 @@ bool ConditionEntry::IsValid()
             if (m_value2 > 2)
             {
                 sLog.outErrorDb("Distance condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_HEALTH_PERCENT:
+        case CONDITION_MANA_PERCENT:
+        {
+            if ((m_value1 < 1) || (m_value1 > 100))
+            {
+                sLog.outErrorDb("Health or Mana percent condition (entry %u, type %u) has invalid argument %u (must be 1..100), skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            if (m_value2 > 2)
+            {
+                sLog.outErrorDb("Health or Mana percent condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
                 return false;
             }
             break;

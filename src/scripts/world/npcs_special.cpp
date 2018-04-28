@@ -1491,72 +1491,6 @@ CreatureAI* GetAI_npc_emerald_dragon_whelp(Creature* pCreature)
 }
 
 /*######
-## Timbermaw Ancestor
-######*/
-enum
-{
-    SPELL_HEALING_TOUCH = 26097,
-    SPELL_LIGHTNING_BOLT = 9532
-};
-
-struct npc_timbermaw_ancestorAI : ScriptedPetAI
-{
-    explicit npc_timbermaw_ancestorAI(Creature* pCreature) : ScriptedPetAI(pCreature)
-    {
-        m_creature->SetCanModifyStats(true);
-
-        if (m_creature->GetCharmInfo())
-            m_creature->GetCharmInfo()->SetReactState(REACT_DEFENSIVE);
-
-        m_healingTouchTimer = 0;
-
-        npc_timbermaw_ancestorAI::Reset();
-    }
-
-    uint32 m_healingTouchTimer;
-
-    void Reset() override {}
-
-    void UpdatePetAI(const uint32 uiDiff) override
-    {
-        if (m_healingTouchTimer < uiDiff)
-        {
-            if (m_creature->GetOwner()->HealthBelowPct(50))
-            {
-                if (DoCastSpellIfCan(m_creature->GetOwner(), SPELL_HEALING_TOUCH, false) == CAST_OK)
-                    m_healingTouchTimer = 7000;
-            }
-            else if (Unit* pTarget = m_creature->SelectRandomFriendlyTarget(m_creature->GetOwner(), 30.0f, true))
-            {
-                if (pTarget->HealthBelowPct(50))
-                {
-                    if (DoCastSpellIfCan(pTarget, SPELL_HEALING_TOUCH, false) == CAST_OK)
-                        m_healingTouchTimer = 7000;
-                }
-            }
-        }
-        else
-            m_healingTouchTimer -= uiDiff;
-
-        if (!m_creature->IsNonMeleeSpellCasted(false))
-        {
-            if (Unit * pTarget = m_creature->getVictim())
-            {
-                if (!pTarget->HasBreakableByDamageCrowdControlAura() && !pTarget->IsImmuneToSchoolMask(SPELL_SCHOOL_MASK_NATURE))
-                    DoCastSpellIfCan(pTarget, SPELL_LIGHTNING_BOLT, false);
-            }
-        }
-
-        ScriptedPetAI::UpdatePetAI(uiDiff);
-    }
-};
-
-CreatureAI* GetAI_npc_timbermaw_ancestor(Creature* pCreature)
-{
-    return new npc_timbermaw_ancestorAI(pCreature);
-}
-
-/*######
 ## Cannonball Runner
 ######*/
 enum
@@ -3677,11 +3611,6 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_emerald_dragon_whelp";
     newscript->GetAI = &GetAI_npc_emerald_dragon_whelp;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_timbermaw_ancestor";
-    newscript->GetAI = &GetAI_npc_timbermaw_ancestor;
     newscript->RegisterSelf();
 
     newscript = new Script;

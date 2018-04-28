@@ -3425,7 +3425,7 @@ Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool 
     MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
     MaNGOS::UnitListSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(targets, u_check);
 
-    Cell::VisitGridObjects(this, searcher, fRange);
+    Cell::VisitWorldObjects(this, searcher, fRange);
 
     // remove current target
     if (except)
@@ -3524,9 +3524,16 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
 
-        // If the spell requires the target having a specific power type.
-        if (!IsAreaOfEffectSpell(pSpellInfo) && !IsTargetPowerTypeValid(pSpellInfo, pTarget->getPowerType()))
-            return SPELL_FAILED_UNKNOWN;
+        if (!IsAreaOfEffectSpell(pSpellInfo))
+        {
+            // If the spell requires the target having a specific power type.
+            if (!IsTargetPowerTypeValid(pSpellInfo, pTarget->getPowerType()))
+                return SPELL_FAILED_UNKNOWN;
+
+            // No point in casting if target is immune.
+            if (pTarget->IsImmuneToDamage(GetSpellSchoolMask(pSpellInfo), pSpellInfo))
+                return SPELL_FAILED_IMMUNE;
+        }
 
         // Mind control abilities can't be used with just 1 attacker or mob will reset.
         if ((getThreatManager().getThreatList().size() == 1) && IsCharmSpell(pSpellInfo))
