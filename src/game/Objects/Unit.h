@@ -1338,6 +1338,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual void SetFly(bool enable);
         void SetWalk(bool enable, bool asDefault = true);
         void SetLevitate(bool enable);
+        virtual void SetFeatherFall(bool /*enabled*/);
+        virtual void SetHover(bool /*enabled*/);
+        virtual void SetWaterWalk(bool /*enabled*/);
 
         virtual bool CanWalk() const = 0;
         virtual bool CanFly() const = 0;
@@ -1740,7 +1743,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         float GetSpeedRate(UnitMoveType mtype) const { return m_speed_rate[mtype]; }
         void SetSpeedRate(UnitMoveType mtype, float rate, bool forced = false);
 
-        void SetHover(bool on);
         bool isHover() const { return HasAuraType(SPELL_AURA_HOVER); }
 
         void KnockBackFrom(WorldObject* target, float horizontalSpeed, float verticalSpeed);

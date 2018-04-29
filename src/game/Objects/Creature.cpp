@@ -3829,3 +3829,30 @@ void Creature::DespawnOrUnsummon(uint32 msTimeToDespawn /*= 0*/)
     else
         ForcedDespawn(msTimeToDespawn);
 }
+
+void Creature::SetFeatherFall(bool enable)
+{
+    Unit::SetFeatherFall(enable);
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
+}
+
+void Creature::SetHover(bool enable)
+{
+    Unit::SetHover(enable);
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
+    data << GetPackGUID();
+    SendMessageToSet(&data, false);
+}
+
+void Creature::SetWaterWalk(bool enable)
+{
+    Unit::SetWaterWalk(enable);
+
+    WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
+    data << GetPackGUID();
+    SendMessageToSet(&data, true);
+}

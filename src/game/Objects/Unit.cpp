@@ -8163,14 +8163,6 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
     CallForAllControlledUnits(SetSpeedRateHelper(mtype, forced), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM | CONTROLLED_MINIPET);
 }
 
-void Unit::SetHover(bool on)
-{
-    if (on)
-        CastSpell(this, 11010, true);
-    else
-        RemoveAurasDueToSpell(11010);
-}
-
 void Unit::SetDeathState(DeathState s)
 {
     if (s != ALIVE && s != JUST_ALIVED)
@@ -11298,6 +11290,30 @@ void Unit::SetFly(bool enable)
         m_movementInfo.AddMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_FLYING | MOVEFLAG_CAN_FLY);
+}
+
+void Unit::SetFeatherFall(bool enable)
+{
+    if (enable)
+        m_movementInfo.AddMovementFlag(MOVEFLAG_SAFE_FALL);
+    else
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_SAFE_FALL);
+}
+
+void Unit::SetHover(bool enable)
+{
+    if (enable)
+        m_movementInfo.AddMovementFlag(MOVEFLAG_HOVER);
+    else
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_HOVER);
+}
+
+void Unit::SetWaterWalk(bool enable)
+{
+    if (enable)
+        m_movementInfo.AddMovementFlag(MOVEFLAG_WATERWALKING);
+    else
+        m_movementInfo.RemoveMovementFlag(MOVEFLAG_WATERWALKING);
 }
 
 void Unit::DisableSpline()

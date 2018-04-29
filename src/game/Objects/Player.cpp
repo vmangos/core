@@ -4483,6 +4483,53 @@ void Player::SetFly(bool enable)
     SendHeartBeat(true);
 }
 
+void Player::SetWaterWalk(bool enable)
+{
+    Unit::SetWaterWalk(enable);
+
+    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, GetPackGUID().size() + 4);
+    data << GetPackGUID();
+    data << uint32(0);
+    GetSession()->SendPacket(&data);
+    GetCheatData()->OrderSent(&data);
+}
+
+void Player::SetFeatherFall(bool enable)
+{
+    Unit::SetFeatherFall(enable);
+
+    WorldPacket data;
+    if (enable)
+        data.Initialize(SMSG_MOVE_FEATHER_FALL, 8 + 4);
+    else
+        data.Initialize(SMSG_MOVE_NORMAL_FALL, 8 + 4);
+
+    data << GetPackGUID();
+    data << uint32(0);
+    SendMessageToSet(&data, true);
+    GetCheatData()->OrderSent(&data);
+
+    // start fall from current height
+    if (!enable)
+        SetFallInformation(0, GetPositionZ());
+}
+
+void Player::SetHover(bool enable)
+{
+    Unit::SetHover(enable);
+
+    WorldPacket data;
+    if (enable)
+        data.Initialize(SMSG_MOVE_SET_HOVER, 8 + 4);
+    else
+        data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
+
+    data << GetPackGUID();
+    data << uint32(0);
+    SendMovementMessageToSet(std::move(data), true);
+    GetCheatData()->OrderSent(&data);
+}
+
 /* Preconditions:
   - a resurrectable corpse must not be loaded for the player (only bones)
   - the player must be in world
@@ -4523,8 +4570,7 @@ void Player::BuildPlayerRepop()
     // convert player body to ghost
     SetHealth(1);
 
-    m_movementInfo.AddMovementFlag(MOVEFLAG_WATERWALKING);
-    SetMovement(MOVE_WATER_WALK);
+    SetWaterWalk(true);
     if (!GetSession()->isLogingOut())
         SetMovement(MOVE_UNROOT);
 
@@ -4556,8 +4602,7 @@ void Player::ResurrectPlayer(float restore_percent, bool applySickness)
         RemoveAurasDueToSpell(20584);                       // speed bonuses
     RemoveAurasDueToSpell(8326);                            // SPELL_AURA_GHOST
 
-    m_movementInfo.RemoveMovementFlag(MOVEFLAG_WATERWALKING);
-    SetMovement(MOVE_LAND_WALK);
+    SetWaterWalk(false);
     SetMovement(MOVE_UNROOT);
 
     // set health/powers (0- will be set in caller)

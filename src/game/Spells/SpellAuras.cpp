@@ -2132,21 +2132,7 @@ void Aura::HandleAuraWaterWalk(bool apply, bool Real)
     if (!Real)
         return;
 
-    WorldPacket data;
-    if (apply)
-        data.Initialize(SMSG_MOVE_WATER_WALK, 8 + 4);
-    else
-        data.Initialize(SMSG_MOVE_LAND_WALK, 8 + 4);
-    data << GetTarget()->GetPackGUID();
-    data << uint32(0);
-
-    if (Player* t = GetTarget()->ToPlayer())
-    {
-        t->GetSession()->SendPacket(&data);
-        t->GetCheatData()->OrderSent(&data);
-    }
-    else
-        GetTarget()->SendMovementMessageToSet(std::move(data), true);
+    GetTarget()->SetWaterWalk(apply);
 }
 
 void Aura::HandleAuraFeatherFall(bool apply, bool Real)
@@ -2154,24 +2140,8 @@ void Aura::HandleAuraFeatherFall(bool apply, bool Real)
     // only at real add/remove aura
     if (!Real)
         return;
-    WorldPacket data;
-    if (apply)
-        data.Initialize(SMSG_MOVE_FEATHER_FALL, 8 + 4);
-    else
-        data.Initialize(SMSG_MOVE_NORMAL_FALL, 8 + 4);
-    data << GetTarget()->GetPackGUID();
-    data << uint32(0);
 
-    if (Player* t = GetTarget()->ToPlayer())
-    {
-        t->GetSession()->SendPacket(&data);
-        t->GetCheatData()->OrderSent(&data);
-        // start fall from current height
-        if (!apply)
-            t->SetFallInformation(0, t->GetPositionZ());
-    }
-    else
-        GetTarget()->SendMovementMessageToSet(std::move(data), true);
+    GetTarget()->SetFeatherFall(apply);
 }
 
 void Aura::HandleAuraHover(bool apply, bool Real)
@@ -2180,16 +2150,7 @@ void Aura::HandleAuraHover(bool apply, bool Real)
     if (!Real)
         return;
 
-    WorldPacket data;
-    if (apply)
-        data.Initialize(SMSG_MOVE_SET_HOVER, 8 + 4);
-    else
-        data.Initialize(SMSG_MOVE_UNSET_HOVER, 8 + 4);
-    data << GetTarget()->GetPackGUID();
-    data << uint32(0);
-    GetTarget()->SendMovementMessageToSet(std::move(data), true);
-    if (Player* t = GetTarget()->ToPlayer())
-        t->GetCheatData()->OrderSent(&data);
+    GetTarget()->SetHover(apply);
 }
 
 void Aura::HandleWaterBreathing(bool /*apply*/, bool /*Real*/)
