@@ -79,7 +79,8 @@ enum ConditionType
     CONDITION_HAS_PET               = 40,                   // 0            0
     CONDITION_HEALTH_PERCENT        = 41,                   // hp_percent   0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_MANA_PERCENT          = 42,                   // mana_percent 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-
+    CONDITION_IS_IN_COMBAT          = 43,                   // 0            0
+    CONDITION_IS_HOSTILE_TO         = 44,                   // 0            0
 };
 
 enum ConditionFlags
@@ -117,7 +118,10 @@ enum ConditionRequirement
     CONDITION_REQ_SOURCE_PLAYER,
     CONDITION_REQ_ANY_WORLDOBJECT,
     CONDITION_REQ_MAP_OR_WORLDOBJECT,
-    CONDITION_REQ_SOURCE_AND_TARGET,
+    CONDITION_REQ_BOTH_WORLDOBEJCTS,
+    CONDITION_REQ_BOTH_GAMEOBJECTS,
+    CONDITION_REQ_BOTH_UNITS,
+    CONDITION_REQ_BOTH_PLAYERS,
 };
 
 class ConditionEntry
@@ -126,12 +130,12 @@ class ConditionEntry
         // Default constructor, required for SQL Storage (Will give errors if used elsewise)
         ConditionEntry() : m_entry(0), m_condition(CONDITION_AND), m_value1(0), m_value2(0), m_flags(0) {}
 
-        ConditionEntry(uint16 _entry, int16 _condition, uint32 _value1, uint32 _value2, uint8 _flags)
+        ConditionEntry(uint32 _entry, int16 _condition, uint32 _value1, uint32 _value2, uint8 _flags)
             : m_entry(_entry), m_condition(ConditionType(_condition)), m_value1(_value1), m_value2(_value2), m_flags(_flags) {}
 
         // Checks correctness of values
         bool IsValid();
-        static bool CanBeUsedWithoutPlayer(uint16 entry);
+        static bool CanBeUsedWithoutPlayer(uint32 entry);
 
         // Checks if the condition is met
         bool Meets(WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
@@ -143,7 +147,7 @@ class ConditionEntry
     private:
         bool CheckParamRequirements(WorldObject const* target, Map const* map, WorldObject const* source) const;
         bool inline Evaluate(WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
-        uint16 m_entry;                                     // entry of the condition
+        uint32 m_entry;                                     // entry of the condition
         ConditionType m_condition;                          // additional condition type
         uint32 m_value1;                                    // data for the condition - see ConditionType definition
         uint32 m_value2;

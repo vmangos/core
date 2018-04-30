@@ -83,12 +83,14 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  34
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  35
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  36
-    CONDITION_REQ_SOURCE_AND_TARGET,  //  37
-    CONDITION_REQ_SOURCE_AND_TARGET,  //  38
+    CONDITION_REQ_BOTH_WORLDOBEJCTS,  //  37
+    CONDITION_REQ_BOTH_WORLDOBEJCTS,  //  38
     CONDITION_REQ_TARGET_WORLDOBJECT, //  39
     CONDITION_REQ_TARGET_UNIT,        //  40
     CONDITION_REQ_TARGET_UNIT,        //  41
     CONDITION_REQ_TARGET_UNIT,        //  42
+    CONDITION_REQ_TARGET_UNIT,        //  43
+    CONDITION_REQ_BOTH_UNITS,         //  44
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -540,6 +542,14 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             }
             return false;
         }
+        case CONDITION_IS_IN_COMBAT:
+        {
+            return target->ToUnit()->isInCombat();
+        }
+        case CONDITION_IS_HOSTILE_TO:
+        {
+            return target->ToUnit()->IsHostileTo(source->ToUnit());
+        }
     }
     return false;
 }
@@ -599,8 +609,20 @@ bool ConditionEntry::CheckParamRequirements(WorldObject const* target, Map const
             if (map || source || target)
                 return true;
             return false;
-        case CONDITION_REQ_SOURCE_AND_TARGET:
+        case CONDITION_REQ_BOTH_WORLDOBEJCTS:
             if (source && target)
+                return true;
+            return false;
+        case CONDITION_REQ_BOTH_GAMEOBJECTS:
+            if (source && source->IsGameObject() && target && target->IsGameObject())
+                return true;
+            return false;
+        case CONDITION_REQ_BOTH_UNITS:
+            if (source && source->IsUnit() && target && target->IsUnit())
+                return true;
+            return false;
+        case CONDITION_REQ_BOTH_PLAYERS:
+            if (source && source->IsPlayer() && target && target->IsPlayer())
                 return true;
             return false;
     }
@@ -1070,6 +1092,8 @@ bool ConditionEntry::IsValid()
         case CONDITION_LINE_OF_SIGHT:
         case CONDITION_IS_MOVING:
         case CONDITION_HAS_PET:
+        case CONDITION_IS_IN_COMBAT:
+        case CONDITION_IS_HOSTILE_TO:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);
@@ -1079,7 +1103,7 @@ bool ConditionEntry::IsValid()
 }
 
 // Check if a condition can be used without providing a player param
-bool ConditionEntry::CanBeUsedWithoutPlayer(uint16 entry)
+bool ConditionEntry::CanBeUsedWithoutPlayer(uint32 entry)
 {
     ConditionEntry const* condition = sConditionStorage.LookupEntry<ConditionEntry>(entry);
     if (!condition)

@@ -9482,7 +9482,7 @@ void ObjectMgr::LoadConditions()
 
 
 // Check if a player meets condition conditionId
-bool ObjectMgr::IsConditionSatisfied(uint16 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const
+bool ObjectMgr::IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const
 {
     if (const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
         return condition->Meets(target, map, source, conditionSourceType);
