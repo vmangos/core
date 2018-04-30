@@ -83,8 +83,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  34
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  35
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  36
-    CONDITION_REQ_BOTH_WORLDOBEJCTS,  //  37
-    CONDITION_REQ_BOTH_WORLDOBEJCTS,  //  38
+    CONDITION_REQ_BOTH_WORLDOBJECTS,  //  37
+    CONDITION_REQ_BOTH_WORLDOBJECTS,  //  38
     CONDITION_REQ_TARGET_WORLDOBJECT, //  39
     CONDITION_REQ_TARGET_UNIT,        //  40
     CONDITION_REQ_TARGET_UNIT,        //  41
@@ -609,7 +609,7 @@ bool ConditionEntry::CheckParamRequirements(WorldObject const* target, Map const
             if (map || source || target)
                 return true;
             return false;
-        case CONDITION_REQ_BOTH_WORLDOBEJCTS:
+        case CONDITION_REQ_BOTH_WORLDOBJECTS:
             if (source && target)
                 return true;
             return false;
