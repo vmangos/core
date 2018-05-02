@@ -248,7 +248,7 @@ void PetAI::UpdateAI(const uint32 diff)
 
                 if (target)
                 {
-                    if (CanAttack(target) && spell->CanAutoCast(target, false))
+                    if (CanAttack(target) && spell->CanAutoCast(target))
                     {
                         targetSpellStore.push_back(std::make_pair(target, spell));
                         spellUsed = true;
@@ -266,7 +266,7 @@ void PetAI::UpdateAI(const uint32 diff)
                         if (!ally)
                             continue;
 
-                        if (spell->CanAutoCast(ally, true))
+                        if (spell->CanAutoCast(ally))
                         {
                             targetSpellStore.push_back(std::make_pair(ally, spell));
                             spellUsed = true;
@@ -282,7 +282,7 @@ void PetAI::UpdateAI(const uint32 diff)
             else if (m_creature->getVictim() && CanAttack(m_creature->getVictim()) && !IsNonCombatSpell(spellInfo))
             {
                 Spell *spell = new Spell(m_creature, spellInfo, false);
-                if (spell->CanAutoCast(m_creature->getVictim(), false))
+                if (spell->CanAutoCast(m_creature->getVictim()))
                     targetSpellStore.push_back(std::make_pair(m_creature->getVictim(), spell));
                 else
                     spell->Delete();

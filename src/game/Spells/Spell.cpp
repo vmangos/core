@@ -6732,7 +6732,7 @@ SpellCastResult Spell::CheckCasterAuras() const
     return SPELL_CAST_OK;
 }
 
-bool Spell::CanAutoCast(Unit* target, bool isPositive)
+bool Spell::CanAutoCast(Unit* target)
 {
     ObjectGuid targetguid = target->GetObjectGuid();
 
@@ -6747,30 +6747,28 @@ bool Spell::CanAutoCast(Unit* target, bool isPositive)
         if (!target->getAttackerForHelper())
             return false;
 
-    bool fullHealSpell = true;
-    for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
+    if (!IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_SCHOOL_DAMAGE))
     {
-        if (!isPositive)
-            break;
-        if (m_spellInfo->Effect[j] && m_spellInfo->EffectApplyAuraName[j] != SPELL_AURA_PERIODIC_HEAL)
-            fullHealSpell = false;
-        if (m_spellInfo->Effect[j] == SPELL_EFFECT_APPLY_AURA)
+        for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
         {
-            if (m_spellInfo->StackAmount <= 1)
+            if (m_spellInfo->Effect[j] == SPELL_EFFECT_APPLY_AURA)
+            {
+                if (m_spellInfo->StackAmount <= 1)
+                {
+                    if (target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)))
+                        return false;
+                }
+            }
+            else if (IsAreaAuraEffect(m_spellInfo->Effect[j]))
             {
                 if (target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)))
                     return false;
             }
         }
-        else if (IsAreaAuraEffect(m_spellInfo->Effect[j]))
-        {
-            if (target->HasAura(m_spellInfo->Id, SpellEffectIndex(j)))
-                return false;
-        }
     }
 
     // Dont waste mana to heal someone already full life.
-    if (fullHealSpell && target->GetMaxHealth() == target->GetHealth())
+    if (IsHealSpell(m_spellInfo) && target->GetMaxHealth() == target->GetHealth())
         return false;
     SpellCastResult result = CheckPetCast(target);
 
