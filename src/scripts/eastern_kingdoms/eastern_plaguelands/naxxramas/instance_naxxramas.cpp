@@ -1653,24 +1653,44 @@ struct mob_toxic_tunnelAI : public ScriptedAI
         Reset();
     }
     uint32 checktime;
+    uint32 _evadeTimer;
     void Reset() override
     {
         checktime = 0;
+        _evadeTimer = 0;
     }
 
     void AttackStart(Unit*) { }
     void MoveInLineOfSight(Unit*) { }
 
+    void EnterCombat(Unit*) override
+    {
+        // Poison aura is hitting someone. Start a short timer to evade & drop combat
+        if (!_evadeTimer)
+            _evadeTimer = 5000;
+    }
+
     void UpdateAI(const uint32 diff) override
     {
-        if (checktime < diff)
+        if (!!_evadeTimer)
+        {
+            if (_evadeTimer <= diff)
+            {
+                EnterEvadeMode();
+                _evadeTimer = 0;
+            }
+            else
+                _evadeTimer -= diff;
+        }
+
+        /*if (checktime <= diff)
         {
             checktime = 5000;
             if (!m_creature->HasAura(28370))
                 m_creature->CastSpell(m_creature, 28370, true);
         }
         else
-            checktime -= diff;
+            checktime -= diff;*/
     }
 };
 
