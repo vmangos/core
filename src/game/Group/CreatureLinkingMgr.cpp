@@ -530,9 +530,17 @@ void CreatureLinkingHolder::ProcessSlave(CreatureLinkingEvent eventType, Creatur
                 return;
 
             if (pSlave->isInCombat())
-                pSlave->SetInCombatWith(pEnemy);
-            else
+            {
+                if (pSource->GetMap()->IsDungeon() && (pSource->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE))
+                    pSlave->SetInCombatWithZone();
+                else
+                    pSlave->SetInCombatWith(pEnemy);
+            }
+            else {
                 pSlave->AI()->AttackStart(pEnemy);
+                if (pSource->GetMap()->IsDungeon() && (pSource->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_AGGRO_ZONE))
+                    pSlave->SetInCombatWithZone();
+            }
         }
         break;
     case LINKING_EVENT_EVADE:
