@@ -415,7 +415,40 @@ bool StartDB()
         return false;
     }
 
-    sLog.outString("Database: %s", dbstring.c_str() );
+    // Remove password from DB string for log output
+    // format: 127.0.0.1;3306;mangos;mangos;characters
+    // In a properly formatted string, token 4 is the password
+    std::string dbStringLog = dbstring;
+
+    if (std::count(dbStringLog.begin(), dbStringLog.end(), ';') == 4)
+    {
+        // Have correct number of tokens, can replace
+        std::string::iterator start = dbStringLog.end(), end = dbStringLog.end();
+
+        int occurrence = 0;
+        for (std::string::iterator itr = dbStringLog.begin(); itr != dbStringLog.end(); ++itr)
+        {
+            if (*itr == ';')
+                ++occurrence;
+
+            if (occurrence == 3 && start == dbStringLog.end())
+                start = ++itr;
+            else if (occurrence == 4 && end == dbStringLog.end())
+                end = itr;
+
+            if (start != dbStringLog.end() && end != dbStringLog.end())
+                break;
+        }
+
+        dbStringLog.replace(start, end, "*");
+    }
+    else
+    {
+        sLog.outError("Incorrectly formatted database connection string for logon database");
+        return false;
+    }
+
+    sLog.outString("Database: %s", dbStringLog.c_str() );
     if(!LoginDatabase.Initialize(dbstring.c_str()))
     {
         sLog.outError("Cannot connect to database");
