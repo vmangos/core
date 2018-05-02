@@ -17,6 +17,9 @@ INSERT INTO `creature_template_addon` (`entry`, `auras`) VALUES (16400, 28370);
 -- Enable 1.11 Argent Dawn event
 UPDATE `game_event` SET `start_time` = '2015-01-01 01:00:00', `end_time` = '2030-01-01 01:00:00', `disabled` = 0 WHERE `entry` = 155;
 
+-- Delete an extra Necropolis that is not part of the Scourge Invasion
+DELETE FROM `gameobject` WHERE `guid` = 3996867;
+
 -- End of migration.
 END IF;
 END??
