@@ -1011,7 +1011,7 @@ struct npc_training_dummyAI : ScriptedAI
             {
                 for (auto itr = attackers.begin(); itr != attackers.end();)
                 {
-                    if (!itr->first && !itr->first->IsInWorld())
+                    if (!itr->first || !itr->first->IsInWorld())
                     {
                         itr = attackers.erase(itr);
                         continue;
