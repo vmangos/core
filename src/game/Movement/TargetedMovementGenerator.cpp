@@ -257,70 +257,86 @@ bool TargetedMovementGeneratorMedium<T, D>::Update(T &owner, const uint32 & time
 
     bool interrupted = false;
     i_recheckDistance.Update(time_diff);
-    if (!i_backing_up && i_recheckDistance.Passed())
+    if (i_recheckDistance.Passed())
     {
         i_recheckDistance.Reset(100);
-        //More distance let have better performance, less distance let have more sensitive reaction at target move.
-        if (!owner.movespline->Finalized() && i_target->IsWithinDist(&owner, 0.0f) && !i_offset)
+        if (i_backing_up)
         {
-            owner.movespline->_Interrupt();
-            interrupted = true;
+            if (!owner.movespline->Finalized() && !owner.CanReachWithMeleeAttack(i_target.getTarget()))
+            {
+                owner.movespline->_Interrupt();
+                interrupted = true;
+            }
         }
         else
         {
-            float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
-            bool targetMoved = false;
-            G3D::Vector3 dest(_targetLastX, _targetLastY, _targetLastZ);
-            if (Transport* ownerTransport = owner.GetTransport())
+            //More distance let have better performance, less distance let have more sensitive reaction at target move.
+            if (!owner.movespline->Finalized() && i_target->IsWithinDist(&owner, 0.0f) && !i_offset)
             {
-                if (_targetOnTransport)
-                    ownerTransport->CalculatePassengerPosition(dest.x, dest.y, dest.z);
-                else
-                    targetMoved = true;
-            }
-            else if (_targetOnTransport)
-                targetMoved = true;
-
-            if (!targetMoved)
-                targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
-
-            // Chase movement may be interrupted
-            if (!targetMoved)
-                if (owner.movespline->Finalized())
-                    targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist - owner.GetObjectBoundingRadius());
-
-            if (targetMoved)
-            {
-                i_recalculateTravel = true;
-                owner.GetMotionMaster()->SetNeedAsyncUpdate();
+                owner.movespline->_Interrupt();
+                interrupted = true;
             }
             else
             {
-                // Fly-hack
-                if (Player* player = i_target->ToPlayer())
-                    if ((player->GetPositionZ() - allowed_dist - 5.0f) > dest.z)
-                        player->GetCheatData()->Unreachable(&owner);
+                float allowed_dist = owner.GetMaxChaseDistance(i_target.getTarget()) - 0.5f;
+                bool targetMoved = false;
+                G3D::Vector3 dest(_targetLastX, _targetLastY, _targetLastZ);
+                if (Transport* ownerTransport = owner.GetTransport())
+                {
+                    if (_targetOnTransport)
+                        ownerTransport->CalculatePassengerPosition(dest.x, dest.y, dest.z);
+                    else
+                        targetMoved = true;
+                }
+                else if (_targetOnTransport)
+                    targetMoved = true;
+
+                if (!targetMoved)
+                    targetMoved = !i_target->IsWithinDist3d(dest.x, dest.y, dest.z, 0.5f);
+
+                // Chase movement may be interrupted
+                if (!targetMoved)
+                    if (owner.movespline->Finalized())
+                        targetMoved = !owner.IsWithinDist3d(dest.x, dest.y, dest.z, allowed_dist - owner.GetObjectBoundingRadius());
+
+                if (targetMoved)
+                {
+                    i_recalculateTravel = true;
+                    owner.GetMotionMaster()->SetNeedAsyncUpdate();
+                }
+                else
+                {
+                    // Fly-hack
+                    if (Player* player = i_target->ToPlayer())
+                        if ((player->GetPositionZ() - allowed_dist - 5.0f) > dest.z)
+                            player->GetCheatData()->Unreachable(&owner);
+                }
             }
         }
     }
 
     if (owner.movespline->Finalized())
     {
-        if (i_backing_up)
-            i_backing_up = false;
-
-        if (owner.GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE || 
-            owner.GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
-            static_cast<D*>(this)->MovementInform(owner);
-
         if (i_angle == 0.f && !owner.HasInArc(0.01f, i_target.getTarget()))
             owner.SetInFront(i_target.getTarget());
 
-        if (!i_targetReached)
+        if (i_backing_up)
         {
-            i_targetReached = true;
-            static_cast<D*>(this)->_reachTarget(owner);
+            i_backing_up = false;
         }
+        else
+        {
+            if (owner.GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE ||
+                owner.GetMotionMaster()->GetCurrentMovementGeneratorType() == FOLLOW_MOTION_TYPE)
+                static_cast<D*>(this)->MovementInform(owner);
+
+            if (!i_targetReached)
+            {
+                i_targetReached = true;
+                static_cast<D*>(this)->_reachTarget(owner);
+            }
+        }
+
         if (interrupted)
             owner.StopMoving();
 
@@ -364,7 +380,7 @@ void TargetedMovementGeneratorMedium<T, D>::UpdateAsync(T &owner, uint32 /*diff*
 template<class T, typename D>
 bool TargetedMovementGeneratorMedium<T, D>::TargetDeepInBounds(T &owner, Unit* target) const
 {
-    return TargetWithinBoundsPercentDistance(owner, target, 0.8f);
+    return TargetWithinBoundsPercentDistance(owner, target, target->IsPlayer() ? 0.8f : 0.3f);
 }
 
 template<class T, typename D>
@@ -385,8 +401,13 @@ template<class T, typename D>
 void TargetedMovementGeneratorMedium<T, D>::DoBackMovement(T &owner, Unit* target)
 {
     float x, y, z;
-    i_backing_up = true;
     target->GetClosePoint(x, y, z, target->GetObjectBoundingRadius() + owner.GetObjectBoundingRadius(), 1.0f, i_angle, &owner);
+
+    // Don't move beyond attack range.
+    if (!owner.CanReachWithMeleeAttackAtPosition(target, x, y, z, 0.0f))
+        return;
+
+    i_backing_up = true;
     Movement::MoveSplineInit init(owner, "TargetedMovementGenerator");
     init.MoveTo(x, y, z, MOVE_WALK_MODE);
     init.SetWalk(true);
