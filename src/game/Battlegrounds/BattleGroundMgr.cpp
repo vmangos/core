@@ -1668,7 +1668,7 @@ void BattleGroundMgr::LoadBattleEventIndexes()
 // Offline BG queue system
 void BattleGroundMgr::PlayerLoggedIn(Player* player)
 {
-    for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    for (int i = 1; i <= PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
         if (m_BattleGroundQueues[i].PlayerLoggedIn(player))
         {
             GroupQueueInfo groupInfo;
@@ -1689,9 +1689,9 @@ void BattleGroundMgr::PlayerLoggedIn(Player* player)
 
 void BattleGroundMgr::PlayerLoggedOut(Player* player)
 {
-    for (int i = 0; i < PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
+    for (int i = 1; i <= PLAYER_MAX_BATTLEGROUND_QUEUES; ++i)
     {
-        if (BattleGroundQueueTypeId bgQueueTypeId = player->GetBattleGroundQueueTypeId(i))
+        if (BattleGroundQueueTypeId bgQueueTypeId = player->GetBattleGroundQueueTypeId(i-1))
         {
             player->RemoveBattleGroundQueueId(bgQueueTypeId);
             m_BattleGroundQueues[bgQueueTypeId].PlayerLoggedOut(player->GetObjectGuid());
