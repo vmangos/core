@@ -1475,6 +1475,10 @@ Rate.WarEffortResourceComplete = 0.0
 #        Default: 0 (disable)
 #                 1 (enable)
 #
+#    Battleground.QueuesCount
+#        Maximum battleground queues a player can join at the same time
+#        Default: 0 (decide based on current content patch)
+#
 #    Battleground.InvitationType
 #        Set Battleground invitation type
 #        Default: 0 (normal - invite as much players to bg as possible, don't bother with ballance)
@@ -1508,7 +1512,7 @@ Battleground.InvitationType = 0
 BattleGround.PrematureFinishTimer = 300000
 BattleGround.PremadeGroupWaitForMatch = 0
 BattleGround.PremadeQueue.MinGroupSize = 6
-BattleGround.QueuesCount            = 3
+BattleGround.QueuesCount            = 0
 BattleGround.TagInBattleGrounds     = 1
 BattleGround.RandomizeQueues = 0
 BattleGround.GroupQueueLimit = 40

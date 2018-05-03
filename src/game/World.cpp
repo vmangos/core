@@ -1037,7 +1037,17 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_UINT32_CORPSES_UPDATE_MINUTES,                     "Corpses.UpdateMinutes", 20);
     setConfig(CONFIG_UINT32_BONES_EXPIRE_MINUTES,                       "Bones.ExpireMinutes", 60);
     setConfig(CONFIG_BOOL_CONTINENTS_INSTANCIATE,                       "Continents.Instanciate", false);
-    setConfigMinMax(CONFIG_UINT32_BATTLEGROUND_QUEUES_COUNT,            "BattleGround.QueuesCount", 3, 1, 3);
+    setConfigMinMax(CONFIG_UINT32_BATTLEGROUND_QUEUES_COUNT,            "BattleGround.QueuesCount", 0, 0, 3);
+
+    // If max bg queues is at 0, decide based on patch.
+    if (getConfig(CONFIG_UINT32_BATTLEGROUND_QUEUES_COUNT) == 0)
+    {
+        if (GetWowPatch() >= WOW_PATCH_109)
+            setConfig(CONFIG_UINT32_BATTLEGROUND_QUEUES_COUNT, 3);
+        else
+            setConfig(CONFIG_UINT32_BATTLEGROUND_QUEUES_COUNT, 1);
+    }
+
     setConfig(CONFIG_BOOL_TAG_IN_BATTLEGROUNDS,                         "BattleGround.TagInBattleGrounds", true);
     setConfig(CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS,            "GMJoinOppositeFactionChannels", 0);
     setConfig(CONFIG_BOOL_GMTICKETS_ENABLE,                             "GMTickets.Enable", true);
