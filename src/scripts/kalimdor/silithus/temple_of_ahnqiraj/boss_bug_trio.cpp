@@ -89,6 +89,7 @@ struct boss_bug_trioAI : public ScriptedAI
     void JustDied(Unit* /*pKiller*/) override
     {
         // If another bug is still alive, prevent looting and trigger corpse despawn
+        m_pInstance->SetData(TYPE_BUG_TRIO, SPECIAL);
         if (m_pInstance->GetData(TYPE_BUG_TRIO) != DONE)
         {
             m_creature->SetLootRecipient(NULL);
@@ -103,8 +104,6 @@ struct boss_bug_trioAI : public ScriptedAI
             if (Creature* pVem = m_pInstance->GetSingleCreatureFromStorage(NPC_VEM))
                 if (boss_bug_trioAI* pFakerAI = dynamic_cast<boss_bug_trioAI*>(pVem->AI()))
                     pFakerAI->TriggerDevour(m_creature);
-
-            m_pInstance->SetData(TYPE_BUG_TRIO, SPECIAL);
         }
     }
 
