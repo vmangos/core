@@ -34,12 +34,6 @@ EndScriptData */
 #define SPELL_KNOCKDOWN             19780
 #define SPELL_FLAMESPEAR            19781
 
-//Adds Spells
-#define SPELL_HEAL                  19775
-#define SPELL_SHADOWWORDPAIN        19776
-#define SPELL_DARKSTRIKE            19777
-#define SPELL_IMMOLATE              20294
-
 struct boss_sulfuronAI : public ScriptedAI
 {
     boss_sulfuronAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -147,88 +141,9 @@ struct boss_sulfuronAI : public ScriptedAI
     }
 };
 
-struct mob_flamewaker_priestAI : public ScriptedAI
-{
-    mob_flamewaker_priestAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    uint32 Heal_Timer;
-    uint32 ShadowWordPain_Timer;
-    uint32 Immolate_Timer;
-    uint32 DarkStrike_Timer;
-
-    ScriptedInstance* m_pInstance;
-
-    void Reset()
-    {
-        Heal_Timer           = urand(10000, 15000);
-        ShadowWordPain_Timer = 2000;
-        Immolate_Timer       = urand(2500, 12000);
-        DarkStrike_Timer     = urand(6000, 8000);
-    }
-
-    void SpellHit(Unit* pCaster, const SpellEntry* pSpell)
-    {
-        if (pSpell->Id == 1714 || pSpell->Id == 11719)
-            m_creature->RemoveAurasDueToSpell(pSpell->Id);
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        //Casting Heal to Sulfuron or other Guards.
-        if (Heal_Timer < diff)
-        {
-            Unit* pUnit = m_creature->DoSelectLowestHpFriendly(60.0f, 1);
-            if (!pUnit)
-                return;
-
-            if (DoCastSpellIfCan(pUnit, SPELL_HEAL) == CAST_OK)
-                Heal_Timer = urand(5000, 10000);
-        }
-        else Heal_Timer -= diff;
-
-        //ShadowWordPain_Timer
-        if (ShadowWordPain_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOWWORDPAIN) == CAST_OK)
-                ShadowWordPain_Timer = urand(18000, 26000);
-        }
-        else ShadowWordPain_Timer -= diff;
-
-        //Immolate_Timer
-        if (Immolate_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_IMMOLATE) == CAST_OK)
-                Immolate_Timer = urand(15000, 25000);
-        }
-        else Immolate_Timer -= diff;
-
-        //DarkStrike_Timer
-        if (DarkStrike_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_DARKSTRIKE) == CAST_OK)
-                DarkStrike_Timer = urand(4000, 6000);
-        }
-        else DarkStrike_Timer -= diff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
 CreatureAI* GetAI_boss_sulfuron(Creature* pCreature)
 {
     return new boss_sulfuronAI(pCreature);
-}
-
-CreatureAI* GetAI_mob_flamewaker_priest(Creature* pCreature)
-{
-    return new mob_flamewaker_priestAI(pCreature);
 }
 
 void AddSC_boss_sulfuron()
@@ -238,10 +153,5 @@ void AddSC_boss_sulfuron()
     newscript = new Script;
     newscript->Name = "boss_sulfuron";
     newscript->GetAI = &GetAI_boss_sulfuron;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_flamewaker_priest";
-    newscript->GetAI = &GetAI_mob_flamewaker_priest;
     newscript->RegisterSelf();
 }
