@@ -918,23 +918,6 @@ CreatureAI* GetAI_npc_umi_yeti(Creature* pCreature)
     return new npc_umi_yetiAI(pCreature);
 }
 
-enum
-{
-    QUEST_ASCENSION_H2      =   6602,
-    QUEST_ASCENSION_A2      =   6502,
-    SPELL_CREATE_AMULET     =   22207, // [Summon Drakefire Amulet DND]
-    ITEM_DRAKEFIRE_AMULET   =   16309,
-};
-
-bool GossipHello_npc_haleh(Player* player, Creature* creature)
-{
-    if (!player->HasItemCount(ITEM_DRAKEFIRE_AMULET, 1, true))
-        if (player->GetQuestRewardStatus(QUEST_ASCENSION_H2) || player->GetQuestRewardStatus(QUEST_ASCENSION_A2))
-            creature->CastSpell(player, SPELL_CREATE_AMULET, false);
-    return false;
-}
-
-
 void AddSC_winterspring()
 {
     Script *newscript;
@@ -986,9 +969,4 @@ void AddSC_winterspring()
     newscript->pGOHello = &GOHello_go_altar_of_elune;
     newscript->RegisterSelf();
     //---
-
-    newscript = new Script;
-    newscript->Name = "npc_haleh";
-    newscript->pGossipHello = &GossipHello_npc_haleh;
-    newscript->RegisterSelf();
 }
