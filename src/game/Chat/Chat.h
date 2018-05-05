@@ -505,6 +505,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLearnAllMyClassCommand(char* args);
         bool HandleLearnAllMySpellsCommand(char* args);
         bool HandleLearnAllMyTalentsCommand(char* args);
+        bool HandleLearnAllMyTaxisCommand(char* args);
 
         bool HandleListAurasCommand(char* args);
         bool HandleListCreatureCommand(char* args);
@@ -545,6 +546,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleModifyASpeedCommand(char* args);
         bool HandleModifySpeedCommand(char* args);
         bool HandleModifyBWalkCommand(char* args);
+        bool HandleModifyFlyCommand(char* args);
         bool HandleModifySwimCommand(char* args);
         bool HandleModifyScaleCommand(char* args);
         bool HandleModifyMountCommand(char* args);
@@ -662,6 +664,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadGameGraveyardZoneCommand(char* args);
         bool HandleReloadGameObjectScriptsCommand(char* args);
         bool HandleReloadGameTeleCommand(char* args);
+        bool HandleReloadTaxiPathTransitionsCommand(char* args);
         bool HandleReloadGossipMenuCommand(char* args);
         bool HandleReloadGossipMenuOptionCommand(char* args);
         bool HandleReloadGossipScriptsCommand(char* args);

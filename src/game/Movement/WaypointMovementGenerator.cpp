@@ -299,7 +299,7 @@ void FlightPathMovementGenerator::Interrupt(Player & player)
 
 #define PLAYER_FLIGHT_SPEED        32.0f
 
-void FlightPathMovementGenerator::Reset(Player & player)
+void FlightPathMovementGenerator::Reset(Player & player, float modSpeed)
 {
     player.getHostileRefManager().setOnlineOfflineState(false);
     player.addUnitState(UNIT_STAT_TAXI_FLIGHT);
@@ -314,7 +314,7 @@ void FlightPathMovementGenerator::Reset(Player & player)
     }
     init.SetFirstPointId(GetCurrentNode());
     init.SetFly();
-    init.SetVelocity(PLAYER_FLIGHT_SPEED);
+    init.SetVelocity(modSpeed * PLAYER_FLIGHT_SPEED);
     init.Launch();
 }
 
@@ -324,9 +324,14 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
     // currentPathIdx returns lastIdx + 1 at arrive
     while (static_cast <int32>(i_currentNode) < pointId)
     {
-        DoEventIfAny(player, (*i_path)[i_currentNode], true);
-        DoEventIfAny(player, (*i_path)[i_currentNode], false);
+        //DoEventIfAny(player, (*i_path)[i_currentNode], true);
+        //DoEventIfAny(player, (*i_path)[i_currentNode], false);
         ++i_currentNode;
+        if (MovementInProgress() && (*i_path)[i_currentNode + 1].path != (*i_path)[i_currentNode].path)
+        {
+            player.m_taxi.NextTaxiDestination();
+            player.ModifyMoney(-(int32)player.m_taxi.GetCurrentTaxiCost());
+        }
     }
 
     return MovementInProgress();

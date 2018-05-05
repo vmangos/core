@@ -813,6 +813,17 @@ bool ChatHandler::HandleReloadGameTeleCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleReloadTaxiPathTransitionsCommand(char* /*args*/)
+{
+    sLog.outString("Re-Loading Taxi path transitions...");
+
+    sObjectMgr.LoadTaxiPathTransitions();
+
+    SendSysMessage("DB table `taxi_path_transitions` reloaded.");
+
+    return true;
+}
+
 bool ChatHandler::HandleReloadLocalesCreatureCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading Locales Creature ...");
@@ -2107,6 +2118,31 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(char* /*args*/)
     }
 
     SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
+    return true;
+}
+
+bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
+{
+    Player* player = m_session->GetPlayer();
+
+    for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
+    {
+        if (const CreatureInfo *cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
+            if (cInfo->npcflag & UNIT_NPC_FLAG_FLIGHTMASTER)
+            {
+                FindCreatureData worker(cInfo->Entry, player);
+                sObjectMgr.DoCreatureData(worker);
+                if (CreatureDataPair const* dataPair = worker.GetResult())
+                    if (CreatureData const* data = &dataPair->second)
+                        if (uint32 taxiNode = sObjectMgr.GetNearestTaxiNode(data->posX, data->posY, data->posZ, data->mapid, player->GetTeam()))
+                            if (player->m_taxi.SetTaximaskNode(taxiNode))
+                            {
+                                WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
+                                GetSession()->SendPacket(&msg);
+                            }
+            }
+    }
+    SendSysMessage(LANG_COMMAND_LEARN_TAXIS);
     return true;
 }
 

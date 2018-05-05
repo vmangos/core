@@ -481,6 +481,46 @@ void MotionMaster::MoveTaxiFlight(uint32 path, uint32 pathnode)
     }
 }
 
+void MotionMaster::MoveTaxiFlight()
+{
+    if (m_owner->GetTypeId() == TYPEID_PLAYER)
+    {
+        TaxiPathNodeList const& path = m_owner->ToPlayer()->m_taxi.GetTaxiPath();
+        if (path.size())
+        {
+            uint32 foundPath = 0;
+            std::stringstream debugString;
+            debugString << m_owner->GetGuidStr().c_str() << " multiple taxi to ";
+            for (uint32 nodeIndex = 0; nodeIndex < path.size(); ++nodeIndex)
+            {
+                if (path[nodeIndex].path != foundPath)
+                {
+                    foundPath = path[nodeIndex].path;
+                    if (foundPath < sTaxiPathNodesByPath.size())
+                        debugString << "(Path " << foundPath << ")";
+                    else
+                    {
+                        sLog.outError("%s attempt taxi to (nonexistent Path %u)",
+                            m_owner->GetGuidStr().c_str(), foundPath);
+                        return;
+                    }
+                }
+            }
+            DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, debugString.str().c_str());
+            FlightPathMovementGenerator* mgen = new FlightPathMovementGenerator(path);
+            Mutate(mgen);
+        }
+        else
+        {
+            sLog.outError("%s attempt taxi on an empty path", m_owner->GetGuidStr().c_str());
+        }
+    }
+    else
+    {
+        sLog.outError("%s attempt taxi multi path", m_owner->GetGuidStr().c_str());
+    }
+}
+
 void MotionMaster::MoveDistract(uint32 timer)
 {
     DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "%s distracted (timer: %u)", m_owner->GetGuidStr().c_str(), timer);

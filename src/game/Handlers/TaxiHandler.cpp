@@ -126,7 +126,11 @@ void WorldSession::SendDoFlight(uint32 mountDisplayId, uint32 path, uint32 pathN
     if (mountDisplayId)
         GetPlayer()->Mount(mountDisplayId);
 
-    GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
+    // Check if it's a multi path
+    if (GetPlayer()->m_taxi.GetTaxiPath().size())
+        GetPlayer()->GetMotionMaster()->MoveTaxiFlight();
+    else
+        GetPlayer()->GetMotionMaster()->MoveTaxiFlight(path, pathNode);
 }
 
 bool WorldSession::SendLearnNewTaxiNode(Creature* unit)

@@ -7073,6 +7073,85 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
     }
 }
 
+void ObjectMgr::LoadTaxiPathTransitions()
+{
+    m_TaxiPathTransitions.clear();                                            // need for reload case
+
+    uint32 count = 0;
+
+    QueryResult *result = WorldDatabase.PQuery("SELECT inPath, outPath, inNode, outNode FROM taxi_path_transitions");
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 taxi path transition from `taxi_path_transitions.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+        bar.step();
+
+        uint32 inPath = fields[0].GetUInt32();
+        uint32 outPath = fields[1].GetUInt32();
+        uint32 inNode = fields[2].GetUInt32();
+        uint32 outNode = fields[3].GetUInt32();
+
+        if (!sTaxiPathStore.LookupEntry(inPath))
+        {
+            sLog.outErrorDb("Table `taxi_path_transitions`: inPath %u does not exist", inPath);
+            continue;
+        }
+        if (!sTaxiPathStore.LookupEntry(outPath))
+        {
+            sLog.outErrorDb("Table `taxi_path_transitions`: outPath %u does not exist", outPath);
+            continue;
+        }
+        if (inNode >= sTaxiPathNodesByPath[inPath].size())
+        {
+            sLog.outErrorDb("Table `taxi_path_transitions`: inNode %u does not exist in inPath %u", inNode, inPath);
+            continue;
+        }
+        if (outNode >= sTaxiPathNodesByPath[outPath].size())
+        {
+            sLog.outErrorDb("Table `taxi_path_transitions`: outNode %u does not exist in outPath %u", outNode, outPath);
+            continue;
+        }
+
+        auto bounds = m_TaxiPathTransitions.equal_range(inPath);
+        for (auto it = bounds.first; it != bounds.second; ++it)
+        {
+            if (it->second.outPath == outPath)
+            {
+                sLog.outErrorDb("Table `taxi_path_transitions`: duplicate of (inPath %u, outPath %u)", inPath, outPath);
+                continue;
+            }
+        }
+
+        TaxiPathTransition transition;
+
+        transition.inPath = inPath;
+        transition.outPath = outPath;
+        transition.inNode = inNode;
+        transition.outNode = outNode;
+
+        m_TaxiPathTransitions.insert(TaxiPathTransitionsMap::value_type(inPath, transition));
+
+        ++count;
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u taxi path transitions", count);
+}
+
 void ObjectMgr::LoadReservedPlayersNames()
 {
     m_ReservedNames.clear();                                // need for reload case

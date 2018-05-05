@@ -227,12 +227,13 @@ bool PlayerTaxi::LoadTaxiDestinationsFromString(const std::string& values, Team 
 
 std::string PlayerTaxi::SaveTaxiDestinationsToString() const
 {
-    if (m_TaxiDestinations.empty())
+    if (m_TaxiDestinations.size() < 2)
         return "";
 
     std::ostringstream ss;
 
-    for (size_t i = 0; i < m_TaxiDestinations.size(); ++i)
+    // save only the current path
+    for (size_t i = 0; i < 2; ++i)
         ss << m_TaxiDestinations[i] << " ";
 
     return ss.str();
@@ -249,6 +250,19 @@ uint32 PlayerTaxi::GetCurrentTaxiPath() const
     sObjectMgr.GetTaxiPath(m_TaxiDestinations[0], m_TaxiDestinations[1], path, cost);
 
     return path;
+}
+
+uint32 PlayerTaxi::GetCurrentTaxiCost() const
+{
+    if (m_TaxiDestinations.size() < 2)
+        return 0;
+
+    uint32 path;
+    uint32 cost;
+
+    sObjectMgr.GetTaxiPath(m_TaxiDestinations[0], m_TaxiDestinations[1], path, cost);
+
+    return (uint32)ceil(cost * m_discount);
 }
 
 std::ostringstream& operator<< (std::ostringstream& ss, PlayerTaxi const& taxi)
@@ -17361,35 +17375,82 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     // 0 element current node
     m_taxi.AddTaxiDestination(sourcenode);
 
+    float discount = npc ? GetReputationPriceDiscount(npc) : 1.0f;
+    m_taxi.SetDiscount(discount);
+
     // fill destinations path tail
     uint32 sourcepath = 0;
+    uint32 sourceCost = 0;
     uint32 totalcost = 0;
-
-    uint32 prevnode = sourcenode;
-    uint32 lastnode = 0;
-
-    for (uint32 i = 1; i < nodes.size(); ++i)
+    uint32 lastPath = 0;
+    uint32 lastNode = nodes[1];
+    sObjectMgr.GetTaxiPath(sourcenode, lastNode, sourcepath, sourceCost);
+    if (!sourcepath)
     {
-        uint32 path, cost;
+        m_taxi.ClearTaxiDestinations();
+        return false;
+    }
+    lastPath = sourcepath;
+    sourceCost = (uint32)ceil(sourceCost * discount);
+    totalcost += sourceCost;
 
-        lastnode = nodes[i];
-        sObjectMgr.GetTaxiPath(prevnode, lastnode, path, cost);
-
-        if (!path)
+    // multiple path
+    if (nodes.size() > 2)
+    {
+        uint32 nextNode = 0;
+        uint32 nextCost = 0;
+        uint32 nextPath = 0;
+        uint32 lastOutNode = 0;
+        for (uint32 nodeIndex = 2; nodeIndex < nodes.size(); ++nodeIndex)
         {
-            m_taxi.ClearTaxiDestinations();
-            return false;
+            nextNode = nodes[nodeIndex];
+            sObjectMgr.GetTaxiPath(lastNode, nextNode, nextPath, nextCost);
+            if (!nextPath)
+            {
+                m_taxi.ClearTaxiDestinations();
+                return false;
+            }
+            totalcost += (uint32)ceil(nextCost * discount);
+
+            // find a transition
+            uint32 inNode = 0;
+            uint32 outNode = 0;
+            bool transitionFound = false;
+            TaxiPathTransitionsMapBounds bounds = sObjectMgr.GetTaxiPathTransitionsMapBounds(lastPath);
+            for (auto it = bounds.first; it != bounds.second; ++it)
+                if (it->second.outPath == nextPath)
+                {
+                    transitionFound = true;
+                    inNode = it->second.inNode;
+                    outNode = it->second.outNode;
+                    break;
+                }
+            if (!transitionFound)
+                sLog.outErrorDb("Table `taxi_path_transitions` is missing a transition between paths %u and %u", lastPath, nextPath);
+
+            // default values in database, init them to n-1 -> 1
+            if (!inNode)
+                inNode = sTaxiPathNodesByPath[lastPath].size() - 2;
+            if (!outNode)
+                outNode = 1;
+
+            // add previous path nodes
+            for (uint32 i = lastOutNode; i <= inNode; ++i)
+                m_taxi.AddTaxiPathNode(sTaxiPathNodesByPath[lastPath][i]);
+            m_taxi.AddTaxiDestination(lastNode);
+
+            lastNode = nextNode;
+            lastPath = nextPath;
+            lastOutNode = outNode;
         }
 
-        totalcost += cost;
-
-        if (prevnode == sourcenode)
-            sourcepath = path;
-
-        m_taxi.AddTaxiDestination(lastnode);
-
-        prevnode = lastnode;
+        // add last path nodes
+        for (int i = lastOutNode; i < sTaxiPathNodesByPath[lastPath].size(); ++i)
+            m_taxi.AddTaxiPathNode(sTaxiPathNodesByPath[lastPath][i]);
+        m_taxi.AddTaxiDestination(lastNode);
     }
+    else // single path
+        m_taxi.AddTaxiDestination(lastNode);
 
     // get mount model (in case non taximaster (npc==NULL) allow more wide lookup)
     uint32 mount_display_id = sObjectMgr.GetTaxiMountDisplayId(sourcenode, GetTeam(), npc == NULL);
@@ -17406,9 +17467,6 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
 
     uint32 money = GetMoney();
 
-    if (npc)
-        totalcost = (uint32)ceil(totalcost * GetReputationPriceDiscount(npc));
-
     if (money < totalcost)
     {
         WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
@@ -17422,7 +17480,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     UpdatePvP(false);
 
     //Checks and preparations done, DO FLIGHT
-    ModifyMoney(-(int32)totalcost);
+    ModifyMoney(-(int32)sourceCost);
 
     // prevent stealth flight
     RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
@@ -17430,7 +17488,8 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     // reset extraAttacks counter
     ResetExtraAttacks();
 
-    UnsummonPetTemporaryIfAny();
+    if (GetPet())
+        RemovePet(PET_SAVE_REAGENTS);
 
     WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
     data << uint32(ERR_TAXIOK);

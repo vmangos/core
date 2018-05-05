@@ -574,14 +574,17 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                                 }
                             }
 
-                            bounds = sObjectMgr.GetCreatureQuestInvolvedRelationsMapBounds(((Creature*)this)->GetEntry());
-                            for (QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
+                            if (appendValue & UNIT_NPC_FLAG_FLIGHTMASTER)
                             {
-                                Quest const* pQuest = sObjectMgr.GetQuestTemplate(itr->second);
-                                if (target->CanRewardQuest(pQuest, false))
+                                bounds = sObjectMgr.GetCreatureQuestInvolvedRelationsMapBounds(((Creature*)this)->GetEntry());
+                                for (QuestRelationsMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
                                 {
-                                    appendValue &= ~UNIT_NPC_FLAG_FLIGHTMASTER;
-                                    break;
+                                    Quest const* pQuest = sObjectMgr.GetQuestTemplate(itr->second);
+                                    if (target->CanRewardQuest(pQuest, false))
+                                    {
+                                        appendValue &= ~UNIT_NPC_FLAG_FLIGHTMASTER;
+                                        break;
+                                    }
                                 }
                             }
                         }

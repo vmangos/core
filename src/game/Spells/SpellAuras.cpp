@@ -3328,6 +3328,8 @@ void Aura::HandleAuraModStun(bool apply, bool Real)
 
     if (apply)
     {
+        if (target->IsTaxiFlying())
+            return;
         // Stun/roots effects apply at charge end
         bool inCharge = target->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHARGE_MOTION_TYPE;
         // Frost stun aura -> freeze/unfreeze target

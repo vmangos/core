@@ -374,6 +374,17 @@ struct GraveYardData
 typedef std::multimap<uint32, GraveYardData> GraveYardMap;
 typedef std::pair<GraveYardMap::const_iterator, GraveYardMap::const_iterator> GraveYardMapBounds;
 
+struct TaxiPathTransition
+{
+    uint32 inPath;
+    uint32 outPath;
+    uint32 inNode;
+    uint32 outNode;
+};
+
+typedef std::multimap<uint32, TaxiPathTransition> TaxiPathTransitionsMap;
+typedef std::pair<TaxiPathTransitionsMap::const_iterator, TaxiPathTransitionsMap::const_iterator> TaxiPathTransitionsMapBounds;
+
 // NPC gossip text id
 typedef UNORDERED_MAP<uint32, uint32> CacheNpcTextIdMap;
 typedef UNORDERED_MAP<uint32, NpcText> NpcTextMap;
@@ -657,6 +668,12 @@ class ObjectMgr
         uint32 GetNearestTaxiNode( float x, float y, float z, uint32 mapid, Team team );
         void GetTaxiPath( uint32 source, uint32 destination, uint32 &path, uint32 &cost);
         uint32 GetTaxiMountDisplayId( uint32 id, Team team, bool allowed_alt_team = false);
+
+        void LoadTaxiPathTransitions();
+        TaxiPathTransitionsMapBounds GetTaxiPathTransitionsMapBounds(uint32 entry) const
+        {
+            return m_TaxiPathTransitions.equal_range(entry);
+        }
 
         Quest const* GetQuestTemplate(uint32 quest_id) const
         {
@@ -1353,6 +1370,8 @@ class ObjectMgr
         QuestRelationsMap       m_CreatureQuestInvolvedRelations;
         QuestRelationsMap       m_GOQuestRelations;
         QuestRelationsMap       m_GOQuestInvolvedRelations;
+
+        TaxiPathTransitionsMap  m_TaxiPathTransitions;
 
         int DBCLocaleIndex;
 

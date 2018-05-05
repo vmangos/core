@@ -41,6 +41,7 @@
 #include "Anticheat.h"
 #include "SQLStorages.h"
 #include "AsyncCommandHandlers.h"
+#include "WaypointMovementGenerator.h"
 #ifdef _DEBUG_VMAPS
 #include "VMapFactory.h"
 #endif
@@ -1137,6 +1138,50 @@ bool ChatHandler::HandleModifyBWalkCommand(char* args)
         ChatHandler(chr).PSendSysMessage(LANG_YOURS_BACK_SPEED_CHANGED, GetNameLink().c_str(), modSpeed);
 
     chr->UpdateSpeed(MOVE_RUN_BACK, true, modSpeed);
+
+    return true;
+}
+
+//Edit Player Fly Speed, works only while taxi flying
+bool ChatHandler::HandleModifyFlyCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    float modSpeed = (float)atof(args);
+
+    if (modSpeed > 100.0f || modSpeed < 0.1f)
+    {
+        SendSysMessage(LANG_BAD_VALUE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Player *chr = getSelectedPlayer();
+    if (!chr)
+        chr = m_session->GetPlayer();
+    if (!chr)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // check online security
+    if (HasLowerSecurity(chr))
+        return false;
+
+    if (!chr->IsTaxiFlying())
+        return false;
+
+    std::string chrNameLink = GetNameLink(chr);
+
+    PSendSysMessage(LANG_YOU_CHANGE_FLY_SPEED, modSpeed, chrNameLink.c_str());
+    if (needReportToTarget(chr))
+        ChatHandler(chr).PSendSysMessage(LANG_YOURS_FLY_SPEED_CHANGED, GetNameLink().c_str(), modSpeed);
+
+    FlightPathMovementGenerator* flight = (FlightPathMovementGenerator*)(chr->GetMotionMaster()->top());
+    flight->Reset(*chr, modSpeed);
 
     return true;
 }

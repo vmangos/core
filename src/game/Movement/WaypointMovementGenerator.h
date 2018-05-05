@@ -133,7 +133,7 @@ public PathMovementBase<Player,TaxiPathNodeList const*>
         void Initialize(Player &);
         void Finalize(Player &);
         void Interrupt(Player &);
-        void Reset(Player &);
+        void Reset(Player &, float modSpeed = 1.0f);
         bool Update(Player &, const uint32 &);
         MovementGeneratorType GetMovementGeneratorType() const { return FLIGHT_MOTION_TYPE; }
 
