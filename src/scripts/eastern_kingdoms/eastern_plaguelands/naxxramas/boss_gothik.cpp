@@ -51,6 +51,7 @@ enum
     SPELL_SHADOWBOLT            = 29317,
 
     SPELL_IMMUNE_ALL            = 29230,
+    TELEPORT_PACIFY_TIMER       = 1200
 };
 
 enum eSpellDummy
@@ -88,13 +89,15 @@ struct boss_gothikAI : public ScriptedAI
     uint32 m_uiSummonTimer;
 
     uint32 m_uiTeleportTimer;
+    uint32 m_uiTeleportCastDelay;
     uint32 m_uiShadowboltTimer;
     uint32 m_uiHarvestSoulTimer;
     uint32 m_uiNumTP;
     uint32 m_checkAllPlayersOneSideTimer;
-    bool m_IsRightSide;
 
     bool gatesOpened;
+    bool m_bRightSide;
+    bool m_bJustTeleported;
 
     void Reset()
     {
@@ -110,9 +113,11 @@ struct boss_gothikAI : public ScriptedAI
         m_uiShadowboltTimer = 1000;
         m_uiHarvestSoulTimer = 1000;
         m_checkAllPlayersOneSideTimer = 1000;
+        m_uiTeleportCastDelay = 0;
         m_uiNumTP = 0;
         gatesOpened = false;
-        m_IsRightSide = true;
+        m_bRightSide = false;
+        m_bJustTeleported = false;
 
         std::list<Creature*> creaturesToDespawn;
         GetCreatureListWithEntryInGrid(creaturesToDespawn, m_creature, 
@@ -340,8 +345,8 @@ struct boss_gothikAI : public ScriptedAI
         {
             if (const Player* p = playerRef.getSource())
             {
-                // Don't count dead players
-                if (p->isDead())
+                // Don't count dead players, except those feigned
+                if (p->isDead() && !p->HasAura(SPELL_AURA_FEIGN_DEATH))
                     continue;
 
                 if(m_pInstance->IsInRightSideGothArea(p))
@@ -413,8 +418,10 @@ struct boss_gothikAI : public ScriptedAI
                         DoScriptText(SAY_TELEPORT, m_creature);
                         DoScriptText(EMOTE_TO_FRAY, m_creature);
                         DoCastSpellIfCan(m_creature, SPELL_TELEPORT_RIGHT);
-                        DoResetThreat();
-                        m_IsRightSide = false;
+
+                        m_bJustTeleported = true;
+                        m_creature->SetTempPacified(TELEPORT_PACIFY_TIMER);
+
                         // opening the gates when TPing down if all players are considered on the same side
                         if (!gatesOpened && IsAllPlayersOneSide())
                             OpenTheGate();
@@ -466,6 +473,28 @@ struct boss_gothikAI : public ScriptedAI
             }
             case PHASE_GROUND:
             {
+                // If we just teleported
+                if (m_bJustTeleported)
+                {
+                    m_bRightSide = m_pInstance->IsInRightSideGothArea(m_creature);
+                    ResetThreatAndAttackNearestTarget();
+                    m_bJustTeleported = false;
+                }
+
+                // Prevent units in the other side of the room getting aggro from dots
+                if (!gatesOpened)
+                {
+                    if (Unit* victim = m_creature->getVictim())
+                    {
+                        bool unitIsRight = m_pInstance->IsInRightSideGothArea(victim);
+                        if (m_bRightSide && !unitIsRight || !m_bRightSide && unitIsRight)
+                        {
+                            m_creature->getThreatManager().modifyThreatPercent(victim, -100);
+                            m_creature->SelectHostileTarget();
+                        }
+                    }
+                }
+
                 if (!gatesOpened && m_creature->GetHealthPercent() < 30.0f)
                 {
                     OpenTheGate();
@@ -481,46 +510,24 @@ struct boss_gothikAI : public ScriptedAI
                 else
                     m_checkAllPlayersOneSideTimer -= uiDiff;
 
-                // threat reset and new target selection logic to prevent Gothik from running off to other side after 
-                // TP has finished
-                if (!gatesOpened)
-                {
-                    bool isRightSide = m_pInstance->IsInRightSideGothArea(m_creature);
-                    // we are now on right side, but last we checked we were not
-                    if (isRightSide && !m_IsRightSide)
-                    {
-                        m_IsRightSide = true;
-                        DoResetThreat();
-                        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0))
-                        {
-                            AttackStart(pNearest);
-                            m_creature->AddThreat(pNearest, 300.0f);
-                        }
-                    }
-                    // we are now on left side, but last we checked we were not
-                    else if (!isRightSide && m_IsRightSide)
-                    {
-                        m_IsRightSide = false;
-                        DoResetThreat();
-                        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0, nullptr, SELECT_FLAG_IN_LOS))
-                        {
-                            AttackStart(pNearest);
-                            m_creature->AddThreat(pNearest, 300.0f);
-                        }
-                    }
-                }
-
                 if (m_uiTeleportTimer < uiDiff && !gatesOpened) // stop teleporting after gates open
                 {
-                    uint32 uiTeleportSpell = m_pInstance->IsInRightSideGothArea(m_creature) ? SPELL_TELEPORT_LEFT : SPELL_TELEPORT_RIGHT;
+                    uint32 uiTeleportSpell = m_bRightSide ? SPELL_TELEPORT_LEFT : SPELL_TELEPORT_RIGHT;
                         
                     if (DoCastSpellIfCan(m_creature, uiTeleportSpell) == CAST_OK)
                     {
-                        DoResetThreat();
                         m_uiTeleportTimer = urand(15000, 20000);
-                        m_uiShadowboltTimer = 2000;
+                        m_uiShadowboltTimer = 1000;
+                        m_uiTeleportCastDelay = 300; // delay spell timers for ~2s after teleport (inc pacify)
                         if (++m_uiNumTP >= 4 && !gatesOpened)
                             OpenTheGate();
+
+                        // Clear the target and temporarily pacify after the teleport
+                        m_creature->ClearTarget();
+                        m_creature->StopMoving();
+                        m_creature->GetMotionMaster()->Clear();
+                        m_creature->SetTempPacified(TELEPORT_PACIFY_TIMER);
+                        m_bJustTeleported = true;
                         return;
                     }
                 }
@@ -529,30 +536,57 @@ struct boss_gothikAI : public ScriptedAI
                     m_uiTeleportTimer -= std::min(m_uiTeleportTimer, uiDiff);
                 }
 
-                if (m_uiShadowboltTimer < uiDiff)
+                // Delay any other casts if they will occur within 3 seconds of the teleport.
+                // We need this to avoid a client issue where the teleport animation will
+                // break and Gothik will slow walk to the teleport location. This is in place
+                // of having proper recovery times on spells to prevent casts occuring too
+                // close to one another
+                if (!gatesOpened && m_uiTeleportTimer <= 3000)
+                    m_uiTeleportCastDelay = 3000;
+
+                if (m_uiTeleportCastDelay <= uiDiff)
                 {
-                    if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SHADOWBOLT, SELECT_FLAG_IN_LOS))
+                    if (m_uiShadowboltTimer <= uiDiff)
                     {
-                        if (DoCastSpellIfCan(pTarget, SPELL_SHADOWBOLT) == CAST_OK)
+                        if (Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, SPELL_SHADOWBOLT, SELECT_FLAG_IN_LOS))
                         {
-                            m_uiShadowboltTimer = urand(1600, 2000);
+                            if (DoCastSpellIfCan(pTarget, SPELL_SHADOWBOLT) == CAST_OK)
+                            {
+                                m_uiShadowboltTimer = urand(1600, 2000);
+                            }
                         }
                     }
-                }
-                else
-                    m_uiShadowboltTimer -= uiDiff;
+                    else
+                        m_uiShadowboltTimer -= uiDiff;
 
-                if (m_uiHarvestSoulTimer < uiDiff)
-                {
-                    if (DoCastSpellIfCan(m_creature, SPELL_HARVESTSOUL) == CAST_OK)
-                        m_uiHarvestSoulTimer = 20000;
+                    if (m_uiHarvestSoulTimer <= uiDiff)
+                    {
+                        if (DoCastSpellIfCan(m_creature, SPELL_HARVESTSOUL) == CAST_OK)
+                        {
+                            m_uiHarvestSoulTimer = 20000;
+                            if (m_uiTeleportTimer <= 1000)
+                                m_uiTeleportTimer += 1200;
+                        }
+                    }
+                    else
+                        m_uiHarvestSoulTimer -= uiDiff;
                 }
                 else
-                    m_uiHarvestSoulTimer -= uiDiff;
+                    m_uiTeleportCastDelay -= uiDiff;
 
                 DoMeleeAttackIfReady();
                 break;
             }
+        }
+    }
+
+    void ResetThreatAndAttackNearestTarget()
+    {
+        DoResetThreat();
+        if (Unit* pNearest = m_creature->SelectAttackingTarget(ATTACKING_TARGET_NEAREST, 0, nullptr, SELECT_FLAG_IN_LOS))
+        {
+            AttackStart(pNearest);
+            m_creature->AddThreat(pNearest, 300.0f);
         }
     }
 };

@@ -214,10 +214,15 @@ void instance_naxxramas::OnCreatureEnterCombat(Creature * creature)
 
 bool instance_naxxramas::WingsAreCleared()
 {
-    return GetData(TYPE_MAEXXNA) == DONE
-        && GetData(TYPE_THADDIUS) == DONE
-        && GetData(TYPE_LOATHEB) == DONE
-        && GetData(TYPE_FOUR_HORSEMEN) == DONE;
+    // All bosses must be dead, not just the end bosses. Some bosses aren't gated
+    // so we just check them all
+    for (int i = 0; i < TYPE_SAPPHIRON; ++i)
+    {
+        if (GetData(i) != DONE)
+            return false;
+    }
+
+    return true;
 }
 
 void instance_naxxramas::UpdateAutomaticBossEntranceDoor(NaxxGOs which, uint32 uiData, int requiredPreBossData)
@@ -1683,14 +1688,16 @@ struct mob_toxic_tunnelAI : public ScriptedAI
                 _evadeTimer -= diff;
         }
 
-        /*if (checktime <= diff)
+        // creature_template_addons should make this aura permanent, but check anyway due
+        // to some reports of it not recasting
+        if (checktime <= diff)
         {
             checktime = 5000;
             if (!m_creature->HasAura(28370))
                 m_creature->CastSpell(m_creature, 28370, true);
         }
         else
-            checktime -= diff;*/
+            checktime -= diff;
     }
 };
 
