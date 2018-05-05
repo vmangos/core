@@ -5820,8 +5820,14 @@ void Aura::PeriodicDummyTick()
                         target->CastSpell(target, m_modifier.m_amount, true, nullptr, this);
                     return;
                 case 24596:                                 // Intoxicating Venom
-                    if (target->isInCombat() && urand(0, 99) < 7)
-                        target->AddAura(8379); // Disarm
+                    if (target->isInCombat())
+                    {
+                        uint32 rand = urand(0, 99);
+                        if (rand < 7)
+                            target->CastSpell(target, 8379, true, nullptr, this);     // Disarm
+                        else if (rand < 14)
+                            target->CastSpell(target, 6869, true, nullptr, this);     // Fall Down
+                    }
                     return;
             }
             break;
