@@ -4653,7 +4653,7 @@ bool ChatHandler::HandleStableCommand(char* /*args*/)
 
 bool ChatHandler::HandleChangeWeatherCommand(char* args)
 {
-    //Weather is OFF
+    // Weather is OFF
     if (!sWorld.getConfig(CONFIG_BOOL_WEATHER))
     {
         SendSysMessage(LANG_WEATHER_DISABLED);
@@ -4665,33 +4665,28 @@ bool ChatHandler::HandleChangeWeatherCommand(char* args)
     if (!ExtractUInt32(&args, type))
         return false;
 
-    //0 to 3, 0: fine, 1: rain, 2: snow, 3: sand
-    if (type > 3)
+    // see enum WeatherType
+    if (!Weather::IsValidWeatherType(type))
         return false;
 
     float grade;
     if (!ExtractFloat(&args, grade))
         return false;
 
-    //0 to 1, sending -1 is instand good weather
-    if (grade < 0.0f || grade > 1.0f)
-        return false;
+    // clamp grade from 0 to 1
+    if (grade < 0.0f)
+        grade = 0.0f;
+    else if (grade > 1.0f)
+        grade = 1.0f;
 
-    Player *player = m_session->GetPlayer();
-    uint32 zoneid = player->GetZoneId();
-
-    Weather* wth = sWorld.FindWeather(zoneid);
-
-    if (!wth)
-        wth = sWorld.AddWeather(zoneid);
-    if (!wth)
+    Player* player = m_session->GetPlayer();
+    uint32 zoneId = player->GetZoneId();
+    if (!sWeatherMgr.GetWeatherChances(zoneId))
     {
         SendSysMessage(LANG_NO_WEATHER);
         SetSentErrorMessage(true);
-        return false;
     }
-
-    wth->SetWeather(WeatherType(type), grade);
+    player->GetMap()->SetWeather(zoneId, (WeatherType)type, grade, false);
 
     return true;
 }

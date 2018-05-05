@@ -46,6 +46,7 @@
 #include "MoveMap.h"
 #include "SocialMgr.h"
 #include "Chat.h"
+#include "Weather.h"
 #include "MovementBroadcaster.h"
 #include "PlayerBroadcaster.h"
 #include "GridSearchers.h"
@@ -78,6 +79,9 @@ Map::~Map()
 
     if (_corpseToRemove.size() > 0)
         sLog.outError("[MAP] Map %u (instance %u) deleted while there are still corpses to remove", GetId(), GetInstanceId());
+
+    delete m_weatherSystem;
+    m_weatherSystem = NULL;
 }
 
 void Map::LoadMapAndVMap(int gx, int gy)
@@ -125,6 +129,8 @@ Map::Map(uint32 id, time_t expiry, uint32 InstanceId)
 
     m_persistentState = sMapPersistentStateMgr.AddPersistentState(i_mapEntry, GetInstanceId(), 0, IsDungeon());
     m_persistentState->SetUsedByMapState(this);
+
+    m_weatherSystem = new WeatherSystem(this);
 }
 
 // Nostalrius
@@ -944,6 +950,8 @@ void Map::Update(uint32 t_diff)
     if (i_data)
         i_data->Update(t_diff);
 
+    m_weatherSystem->UpdateWeathers(t_diff);
+
     bool packetBroadcastSlow = sWorld.GetBroadcaster()->IsMapSlow(GetInstanceId());
     if (sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE) && updateMapTime > sWorld.getConfig(CONFIG_UINT32_PERFLOG_SLOW_MAP_UPDATE))
         sLog.out(LOG_PERFORMANCE, "Update single map %3u inst %2u: %3ums "
@@ -1572,6 +1580,20 @@ void Map::SendToPlayers(WorldPacket const* data) const
         itr->getSource()->GetSession()->SendPacket(data);
 }
 
+bool Map::SendToPlayersInZone(WorldPacket const* data, uint32 zoneId) const
+{
+    bool foundPlayer = false;
+    for (MapRefManager::const_iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
+    {
+        if (itr->getSource()->GetZoneId() == zoneId)
+        {
+            itr->getSource()->GetSession()->SendPacket(data);
+            foundPlayer = true;
+        }
+    }
+    return foundPlayer;
+}
+
 bool Map::ActiveObjectsNearGrid(uint32 x, uint32 y) const
 {
     MANGOS_ASSERT(x < MAX_NUMBER_OF_GRIDS);
@@ -1741,6 +1763,12 @@ void Map::TeleportAllPlayersToHomeBind()
             plr->GetMapRef().unlink();
         }
     }
+}
+
+void Map::SetWeather(uint32 zoneId, WeatherType type, float grade, bool permanently)
+{
+    Weather* wth = m_weatherSystem->FindOrCreateWeather(zoneId);
+    wth->SetWeather(WeatherType(type), grade, this, permanently);
 }
 
 template void Map::Add(Corpse *);

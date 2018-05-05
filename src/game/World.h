@@ -46,7 +46,6 @@
 class Object;
 class WorldSession;
 class Player;
-class Weather;
 class SqlResultQueue;
 class QueryResult;
 class World;
@@ -81,13 +80,12 @@ enum ShutdownExitCode
 enum WorldTimers
 {
     WUPDATE_AUCTIONS    = 0,
-    WUPDATE_WEATHERS    = 1,
-    WUPDATE_UPTIME      = 2,
-    WUPDATE_CORPSES     = 3,
-    WUPDATE_EVENTS      = 4,
-    WUPDATE_SAVE_VAR    = 5,
-    WUPDATE_GROUPS      = 6,
-    WUPDATE_COUNT       = 7
+    WUPDATE_UPTIME      = 1,
+    WUPDATE_CORPSES     = 2,
+    WUPDATE_EVENTS      = 3,
+    WUPDATE_SAVE_VAR    = 4,
+    WUPDATE_GROUPS      = 5,
+    WUPDATE_COUNT       = 6
 };
 
 /// Configuration elements
@@ -610,11 +608,6 @@ class World
         /// Get the maximum number of parallel sessions on the server since last reboot
         uint32 GetMaxQueuedSessionCount() const { return m_maxQueuedSessionCount; }
         uint32 GetMaxActiveSessionCount() const { return m_maxActiveSessionCount; }
-        Player* FindPlayerInZone(uint32 zone);
-
-        Weather* FindWeather(uint32 id) const;
-        Weather* AddWeather(uint32 zone_id);
-        void RemoveWeather(uint32 zone_id);
 
         /// Get the active session server limit (or security level limitations)
         uint32 GetPlayerAmountLimit() const { return m_playerLimit >= 0 ? m_playerLimit : 0; }
@@ -850,8 +843,6 @@ class World
         int32  m_timeZoneOffset;
         IntervalTimer m_timers[WUPDATE_COUNT];
 
-        typedef UNORDERED_MAP<uint32, Weather*> WeatherMap;
-        WeatherMap m_weathers;
         SessionMap m_sessions;
         SessionSet m_disconnectedSessions;
         std::map<uint32 /*accountId*/, time_t /*last logout*/> m_accountsLastLogout;

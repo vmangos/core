@@ -3024,7 +3024,7 @@ bool ChatHandler::HandleReloadCreatureOnKillReputation(char*)
 
 bool ChatHandler::HandleReloadGameWeather(char*)
 {
-    sObjectMgr.LoadWeatherZoneChances();
+    sWeatherMgr.LoadWeatherZoneChances();
     SendSysMessage(">> Table `game_weather` reloaded.");
     return true;
 }

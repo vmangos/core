@@ -133,9 +133,7 @@ struct boss_ossirianAI : public ScriptedAI
 
         /** weather reseted to normal, seems like after aggro of Ossirian, weather needs to stay in sandstorm mode */
         uint32 zoneid = m_creature->GetZoneId();
-        Weather* wth = sWorld.FindWeather(zoneid);
-        if (wth)
-            wth->SetWeather(WeatherType(0), 0);
+        m_creature->GetMap()->SetWeather(zoneid, WEATHER_TYPE_FINE, 0, false);
 
         m_pInstance->SetData(TYPE_OSSIRIAN, FAIL);
     }
@@ -200,8 +198,7 @@ struct boss_ossirianAI : public ScriptedAI
         }
 
         uint32 zoneid = m_creature->GetZoneId();
-        if (Weather* wth = sWorld.FindWeather(zoneid))
-            wth->SetWeather(WeatherType(3), 2);
+        m_creature->GetMap()->SetWeather(zoneid, WEATHER_TYPE_STORM, 1, false);
 
         m_pInstance->SetData(TYPE_OSSIRIAN, IN_PROGRESS);
     }
