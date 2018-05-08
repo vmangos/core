@@ -251,31 +251,6 @@ CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
 }
 
 /*######
-## npc_marin_noggenfogger
-######*/
-
-bool GossipHello_npc_marin_noggenfogger(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pCreature->isVendor() && pPlayer->GetQuestRewardStatus(2662))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_marin_noggenfogger(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_TRADE)
-        pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-
-    return true;
-}
-
-/*######
 ## npc_oox17tn
 ######*/
 
@@ -861,12 +836,6 @@ void AddSC_tanaris()
     newscript = new Script;
     newscript->Name = "mob_aquementas";
     newscript->GetAI = &GetAI_mob_aquementas;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_marin_noggenfogger";
-    newscript->pGossipHello =  &GossipHello_npc_marin_noggenfogger;
-    newscript->pGossipSelect = &GossipSelect_npc_marin_noggenfogger;
     newscript->RegisterSelf();
 
     newscript = new Script;
