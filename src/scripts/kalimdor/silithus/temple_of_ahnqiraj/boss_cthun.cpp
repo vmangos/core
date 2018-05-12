@@ -22,7 +22,7 @@
 ** Complete: who knows
 ** Comment: so many things
 ** Category: Temple of Ahn'Qiraj
-** Rewrtten by Gemt
+** Rewritten by Gemt
 */
 
 #include "scriptPCH.h"

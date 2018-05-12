@@ -87,7 +87,7 @@ struct boss_lucifronAI : public ScriptedAI
                 }
                 case eEvents::EventShadowShock:
                 {
-                    if (auto l_Target = SELECT_RANDOM_TARGET_POS_0)
+                    if (auto l_Target = me->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
                         if (DoCastSpellIfCan(l_Target, eSpells::SpellShadowShock) == CAST_OK)
                             m_Events.Repeat(Seconds(6));
                     break;
