@@ -42,8 +42,11 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
     void EnterCombat(Unit*) override;
 
-    //Called at stoping attack by any attacker
+    // Called at stoping attack by any attacker
     void EnterEvadeMode() override;
+
+    // Called when the creature leaves combat
+    void OnCombatStop() override {};
 
     //Called at any heal cast/item used (call non implemented in mangos)
     void HealedBy(Unit* /*pHealer*/, uint32& /*uiAmountHealed*/) override {}
