@@ -269,7 +269,7 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                 }
                 case EVENT_T_MOVEMENT_INFORM:
                 {
-                    if (temp.move_inform.motionType > CHARGE_MOTION_TYPE)
+                    if ((temp.move_inform.motionType > CHARGE_MOTION_TYPE) && (temp.move_inform.motionType < WAYPOINT_SPECIAL_REACHED))
                         sLog.outErrorDb("CreatureEventAI:  Creature %u is using an invalid motion type. Event %u will never trigger! ", temp.creature_id, i);
                     if (temp.move_inform.repeatMax < temp.move_inform.repeatMin)
                         sLog.outErrorDb("CreatureEventAI:  Creature %u are using repeatable event(%u) with param4 < param3 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);

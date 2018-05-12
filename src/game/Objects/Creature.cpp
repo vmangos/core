@@ -177,7 +177,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false)
+    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -352,6 +352,9 @@ bool Creature::InitEntry(uint32 Entry, Team team, CreatureData const* data /*=NU
     UpdateSpeed(MOVE_WALK, false);
     UpdateSpeed(MOVE_RUN,  false);
     SetFly(CanFly());
+
+    if (data)
+        m_startwaypoint = data->currentwaypoint;
 
     // checked at loading
     m_defaultMovementType = MovementGeneratorType(cinfo->MovementType);
@@ -766,7 +769,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                                      GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
                                      !HasDistanceCasterMovement() &&
                                      (!CanReachWithMeleeAttack(getVictim()) || !IsWithinLOSInMap(getVictim())) &&
-                                     !GetMotionMaster()->operator->()->IsReachable();
+                                     !GetMotionMaster()->GetCurrent()->IsReachable();
             // No evade mode for pets.
             if (unreachableTarget && GetCharmerOrOwnerGuid().IsPlayer())
                 unreachableTarget = false;
@@ -3501,7 +3504,7 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         return SPELL_FAILED_TOO_CLOSE;
 
     // This spell should only be cast when we cannot get into melee range.
-    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(hasUnitState(UNIT_STAT_NOT_MOVE) || !GetMotionMaster()->operator->()->IsReachable())))
+    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(hasUnitState(UNIT_STAT_NOT_MOVE) || !GetMotionMaster()->GetCurrent()->IsReachable())))
         return SPELL_FAILED_MOVING;
 
     // Custom checks

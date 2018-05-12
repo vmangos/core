@@ -48,4 +48,20 @@ class TemporarySummon : public Creature
         bool m_unSummonInformed;
         void InformSummonerOfDespawn();
 };
+
+class TemporarySummonWaypoint : public TemporarySummon
+{
+    public:
+        explicit TemporarySummonWaypoint(ObjectGuid summoner, uint32 waypoint_id, int32 path_id, uint32 pathOrigin);
+
+        uint32 GetWaypointId() const { return m_waypoint_id; }
+        int32 GetPathId() const { return m_path_id; }
+        uint32 GetPathOrigin() const { return m_pathOrigin; }
+
+    private:
+        uint32 m_waypoint_id;
+        int32 m_path_id;
+        uint32 m_pathOrigin;
+};
+
 #endif

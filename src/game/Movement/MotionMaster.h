@@ -54,6 +54,10 @@ enum MovementGeneratorType
     EFFECT_MOTION_TYPE              = 15,
     PATROL_MOTION_TYPE              = 16,
     CHARGE_MOTION_TYPE              = 17,
+
+    WAYPOINT_SPECIAL_REACHED        = 256,                  // Only used in CreatureAI::MovementInform when a special waypoint is reached. The pathId >= 0 is added as additonal value
+    WAYPOINT_SPECIAL_STARTED        = 512,                  // Only used in CreatureAI::MovementInform when a special waypoint is started. The pathId >= 0 is added as additional value
+    WAYPOINT_SPECIAL_FINISHED_LAST  = 1024,                 // Only used in CreatureAI::MovementInform when the waittime of the last special wp is finished. The pathId >= 0 is added as additional value
 };
 
 enum MMCleanFlag
@@ -89,7 +93,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
 
         void Initialize();
 
-        MovementGenerator* operator->(void) { return top(); }
+        MovementGenerator const* GetCurrent() const { return top(); }
         //MovementGenerator* top() { return std::stack<MovementGenerator *>::top(); }
 
         using Impl::top;
@@ -132,7 +136,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         void MovePoint(uint32 id, float x, float y, float z, uint32 options = MOVE_NONE, float speed = 0.0f, float finalOrientation = -10);
         void MoveSeekAssistance(float x,float y,float z);
         void MoveSeekAssistanceDistract(uint32 timer);
-        void MoveWaypoint(bool repeat = true);
+        void MoveWaypoint(int32 id = 0, uint32 startPoint = 0, uint32 source = 0, uint32 initialDelay = 0, uint32 overwriteEntry = 0, bool repeat = true);
         void MoveTaxiFlight(uint32 path, uint32 pathnode);
         void MoveTaxiFlight();
         void MoveDistract(uint32 timeLimit);
@@ -142,12 +146,15 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
 
         void propagateSpeedChange();
+        bool SetNextWaypoint(uint32 pointId);
+
         uint32 getLastReachedWaypoint() const;
+        void GetWaypointPathInformation(std::ostringstream& oss) const;
+        bool GetDestination(float& x, float& y, float& z);
 
         // will only work in MMgens where we have a target (TARGETED_MOTION_TYPE)
         void UpdateFinalDistanceToTarget(float fDistance);
 
-        bool GetDestination(float &x, float &y, float &z);
         bool NeedsAsyncUpdate() const { return m_needsAsyncUpdate; }
         void SetNeedAsyncUpdate() { m_needsAsyncUpdate = true; }
     private:

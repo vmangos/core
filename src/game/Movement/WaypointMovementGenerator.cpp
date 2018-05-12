@@ -32,45 +32,59 @@
 #include <cassert>
 
 //-----------------------------------------------//
-void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature)
+void WaypointMovementGenerator<Creature>::LoadPath(Creature &creature, int32 pathId, WaypointPathOrigin wpOrigin, uint32 overwriteEntry)
 {
     DETAIL_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "LoadPath: loading waypoint path for %s", creature.GetGuidStr().c_str());
 
-    i_path = sWaypointMgr.GetPath(creature.GetGUIDLow());
+    if (!overwriteEntry)
+        overwriteEntry = creature.GetEntry();
 
-    // We may LoadPath() for several occasions:
+    if (wpOrigin == PATH_NO_PATH && pathId == 0)
+        i_path = sWaypointMgr.GetDefaultPath(overwriteEntry, creature.GetGUIDLow(), &m_PathOrigin);
+    else
+    {
+        m_PathOrigin = wpOrigin == PATH_NO_PATH ? PATH_FROM_ENTRY : wpOrigin;
+        i_path = sWaypointMgr.GetPathFromOrigin(overwriteEntry, creature.GetGUIDLow(), pathId, m_PathOrigin);
+    }
+    m_pathId = pathId;
 
-    // 1: When creature.MovementType=2
-    //    1a) Path is selected by creature.guid == creature_movement.id
-    //    1b) Path for 1a) does not exist and then use path from creature.GetEntry() == creature_movement_template.entry
-
-    // 2: When creature_template.MovementType=2
-    //    2a) Creature is summoned and has creature_template.MovementType=2
-    //        Creators need to be sure that creature_movement_template is always valid for summons.
-    //        Mob that can be summoned anywhere should not have creature_movement_template for example.
-
-    // No movement found for guid
+    // No movement found for entry nor guid
     if (!i_path)
     {
-        i_path = sWaypointMgr.GetPathTemplate(creature.GetEntry());
-
-        // No movement found for entry
-        if (!i_path)
-        {
-            sLog.outErrorDb("WaypointMovementGenerator::LoadPath: creature %s (Entry: %u GUID: %u) doesn't have waypoint path",
-                            creature.GetName(), creature.GetEntry(), creature.GetGUIDLow());
-            return;
-        }
+        sLog.outErrorDb("WaypointMovementGenerator::LoadPath: %s doesn't have waypoint path %i", creature.GetGuidStr().c_str(), pathId);
+        return;
     }
 
-    StartMoveNow(creature);
+    if (i_path->empty())
+    {
+        return;
+    }
+    // Initialize the i_currentNode to point to the first node
+    i_currentNode = i_path->begin()->first;
     m_lastReachedWaypoint = 0;
 }
 
 void WaypointMovementGenerator<Creature>::Initialize(Creature &creature)
 {
-    LoadPath(creature);
     creature.addUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
+}
+
+void WaypointMovementGenerator<Creature>::InitializeWaypointPath(Creature& u, int32 id, uint32 startPoint, WaypointPathOrigin wpSource, uint32 initialDelay, uint32 overwriteEntry, bool repeat)
+{
+    m_repeating = repeat;
+    LoadPath(u, id, wpSource, overwriteEntry);
+
+    if (startPoint)
+    {
+        if (i_path && !i_path->empty() && (i_path->find(startPoint) != i_path->end()))
+            i_currentNode = startPoint;
+        else
+            sLog.outError("WaypointMovementGenerator::InitializeWaypointPath: %s tries to start movement from invalid point id %u", u.GetGuidStr().c_str(), startPoint);
+    }
+
+    i_nextMoveTime.Reset(initialDelay);
+    // Start moving if possible
+    StartMove(u);
 }
 
 void WaypointMovementGenerator<Creature>::Finalize(Creature &creature)
@@ -104,14 +118,18 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
     creature.clearUnitState(UNIT_STAT_ROAMING_MOVE);
     m_isArrivalDone = true;
 
-    if (i_path->at(i_currentNode).script_id)
+    WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
+    MANGOS_ASSERT(currPoint != i_path->end());
+    WaypointNode const& node = currPoint->second;
+
+    if (node.script_id)
     {
-        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for %s.", i_path->at(i_currentNode).script_id, i_currentNode, creature.GetGuidStr().c_str());
-        creature.GetMap()->ScriptsStart(sCreatureMovementScripts, i_path->at(i_currentNode).script_id, &creature, &creature);
+        DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Creature movement start script %u at point %u for %s.", node.script_id, i_currentNode, creature.GetGuidStr().c_str());
+        creature.GetMap()->ScriptsStart(sCreatureMovementScripts, node.script_id, &creature, &creature);
     }
 
     // We have reached the destination and can process behavior
-    if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
+    if (WaypointBehavior* behavior = node.behavior)
     {
         if (behavior->emote != 0)
             creature.HandleEmote(behavior->emote);
@@ -124,6 +142,7 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
 
         if (behavior->textid[0])
         {
+            int32 textId = behavior->textid[0];
             // Not only one text is set
             if (behavior->textid[1])
             {
@@ -135,16 +154,24 @@ void WaypointMovementGenerator<Creature>::OnArrived(Creature& creature)
                         break;
                 }
 
-                creature.MonsterSay(behavior->textid[rand() % i], LANG_UNIVERSAL);
+                textId = behavior->textid[urand(0, i - 1)];
             }
-            else
-                creature.MonsterSay(behavior->textid[0], LANG_UNIVERSAL);
+
+            DoScriptText(textId, &creature);
         }
     }
 
     // Inform script
-    MovementInform(creature);
-    Stop(i_path->at(i_currentNode).delay);
+    if (creature.AI())
+    {
+        uint32 type = WAYPOINT_MOTION_TYPE;
+        if (m_PathOrigin == PATH_FROM_SPECIAL && m_pathId > 0)
+            type = WAYPOINT_SPECIAL_REACHED + m_pathId;
+        creature.AI()->MovementInform(type, i_currentNode);
+    }
+
+    // Wait delay ms
+    Stop(node.delay);
 }
 
 void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
@@ -155,6 +182,9 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
     if (Stopped())
         return;
 
+    WaypointPath::const_iterator currPoint = i_path->find(i_currentNode);
+    MANGOS_ASSERT(currPoint != i_path->end());
+
     if (WaypointBehavior *behavior = i_path->at(i_currentNode).behavior)
     {
         if (behavior->model2 != 0)
@@ -164,27 +194,48 @@ void WaypointMovementGenerator<Creature>::StartMove(Creature &creature)
 
     if (m_isArrivalDone)
     {
-        if ((i_currentNode == i_path->size() - 1) && !m_repeating) // If that's our last waypoint
+        bool reachedLast = false;
+        ++currPoint;
+        if (currPoint == i_path->end())
         {
-            creature.SetHomePosition(i_path->at(i_currentNode).x, i_path->at(i_currentNode).y, i_path->at(i_currentNode).z, i_path->at(i_currentNode).orientation);
-            creature.GetMotionMaster()->Initialize();
-            return;
+            reachedLast = true;
+
+            if (!m_repeating)
+            {
+                creature.SetHomePosition(i_path->at(i_currentNode).x, i_path->at(i_currentNode).y, i_path->at(i_currentNode).z, i_path->at(i_currentNode).orientation);
+                creature.GetMotionMaster()->Initialize();
+                return;
+            }
+
+            currPoint = i_path->begin();
         }
-        i_currentNode = (i_currentNode + 1) % i_path->size();
+
+        // Inform AI
+        if (creature.AI() && m_PathOrigin == PATH_FROM_SPECIAL &&  m_pathId > 0)
+        {
+            if (!reachedLast)
+                creature.AI()->MovementInform(WAYPOINT_SPECIAL_STARTED + m_pathId, currPoint->first);
+            else
+                creature.AI()->MovementInform(WAYPOINT_SPECIAL_FINISHED_LAST + m_pathId, currPoint->first);
+
+            if (creature.isDead() || !creature.IsInWorld()) // Might have happened with above calls
+                return;
+        }
+
+        i_currentNode = currPoint->first;
     }
 
     m_isArrivalDone = false;
 
     creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
 
-    ASSERT(i_currentNode < i_path->size());
-    const WaypointNode &node = i_path->at(i_currentNode);
+    WaypointNode const& nextNode = currPoint->second;;
     creature.SetWalk(!creature.hasUnitState(UNIT_STAT_RUNNING) && !creature.IsLevitating(), false);
     Movement::MoveSplineInit init(creature, "WaypointMovementGenerator<Creature>::StartMove");
-    init.MoveTo(node.x, node.y, node.z, MOVE_PATHFINDING);
+    init.MoveTo(nextNode.x, nextNode.y, nextNode.z, MOVE_PATHFINDING);
 
-    if (node.orientation != 100 && node.delay != 0)
-        init.SetFacing(node.orientation);
+    if (nextNode.orientation != 100 && nextNode.delay != 0)
+        init.SetFacing(nextNode.orientation);
     init.Launch();
 }
 
@@ -221,22 +272,52 @@ bool WaypointMovementGenerator<Creature>::Update(Creature &creature, const uint3
     return true;
 }
 
-void WaypointMovementGenerator<Creature>::MovementInform(Creature &creature)
-{
-    if (creature.AI())
-        creature.AI()->MovementInform(WAYPOINT_MOTION_TYPE, i_currentNode);
-}
-
 bool WaypointMovementGenerator<Creature>::GetResetPosition(Creature&, float& x, float& y, float& z)
 {
     // prevent a crash at empty waypoint path.
     if (!i_path || i_path->empty())
         return false;
 
-    const WaypointNode& node = i_path->at(i_currentNode);
+    const WaypointNode& node = i_path->at(m_lastReachedWaypoint);
     x = node.x;
     y = node.y;
     z = node.z;
+    return true;
+}
+
+void WaypointMovementGenerator<Creature>::GetPathInformation(std::ostringstream& oss) const
+{
+    oss << "WaypointMovement: Last Reached WP: " << m_lastReachedWaypoint << " ";
+    oss << "(Loaded path " << m_pathId << " from " << WaypointManager::GetOriginString(m_PathOrigin) << ")\n";
+}
+
+void WaypointMovementGenerator<Creature>::AddToWaypointPauseTime(int32 waitTimeDiff)
+{
+    if (!i_nextMoveTime.Passed())
+    {
+        // Prevent <= 0, the code in Update requires to catch the change from moving to not moving
+        int32 newWaitTime = i_nextMoveTime.GetExpiry() + waitTimeDiff;
+        i_nextMoveTime.Reset(newWaitTime > 0 ? newWaitTime : 1);
+    }
+}
+
+bool WaypointMovementGenerator<Creature>::SetNextWaypoint(uint32 pointId)
+{
+    if (!i_path || i_path->empty())
+        return false;
+
+    WaypointPath::const_iterator currPoint = i_path->find(pointId);
+    if (currPoint == i_path->end())
+        return false;
+
+    // Allow Moving with next tick
+    // Handle allow movement this way to not interact with PAUSED state.
+    // If this function is called while PAUSED, it will move properly when unpaused.
+    i_nextMoveTime.Reset(1);
+    m_isArrivalDone = false;
+
+    // Set the point
+    i_currentNode = pointId;
     return true;
 }
 
@@ -375,16 +456,6 @@ bool FlightPathMovementGenerator::GetResetPosition(Player&, float& x, float& y, 
     y = node.y;
     z = node.z;
     return true;
-}
-
-void WaypointMovementGenerator<Creature>::AddToWaypointPauseTime(int32 waitTimeDiff)
-{
-    if (!i_nextMoveTime.Passed())
-    {
-        // Prevent <= 0, the code in Update requires to catch the change from moving to not moving
-        int32 newWaitTime = i_nextMoveTime.GetExpiry() + waitTimeDiff;
-        i_nextMoveTime.Reset(newWaitTime > 0 ? newWaitTime : 1);
-    }
 }
 
 // ------------------------------------------------------

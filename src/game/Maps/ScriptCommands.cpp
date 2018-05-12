@@ -165,7 +165,7 @@ bool Map::ScriptCommand_MoveTo(const ScriptInfo& script, WorldObject* source, Wo
     float orientation = script.o ? script.o : -10.0f;
 
     if (script.moveTo.flags & SF_MOVETO_POINT_MOVEGEN)
-        pSource->GetMotionMaster()->MovePoint(0, x, y, z, script.moveTo.movementOptions, speed, orientation);
+        pSource->GetMotionMaster()->MovePoint(script.moveTo.pointId, x, y, z, script.moveTo.movementOptions, speed, orientation);
     else
         pSource->MonsterMoveWithSpeed(x, y, z, orientation, speed, script.moveTo.movementOptions);
 
@@ -706,7 +706,7 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
             pSource->GetMotionMaster()->MoveRandom();
             break;
         case WAYPOINT_MOTION_TYPE:
-            pSource->GetMotionMaster()->MoveWaypoint(script.movement.boolParam);
+            pSource->GetMotionMaster()->MoveWaypoint(0, script.movement.intParam, 0, 0, 0, script.movement.boolParam);
             break;
         case CONFUSED_MOTION_TYPE:
             pSource->GetMotionMaster()->MoveConfused();
@@ -1594,6 +1594,22 @@ bool Map::ScriptCommand_SetReactState(const ScriptInfo& script, WorldObject* sou
     }
 
     pSource->SetReactState(ReactStates(script.setReactState.state));
+
+    return false;
+}
+
+// SCRIPT_COMMAND_START_WAYPOINTS (60)
+bool Map::ScriptCommand_StartWaypoints(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_START_WAYPOINTS (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->GetMotionMaster()->MoveWaypoint(script.startWaypoints.pathId, script.startWaypoints.startPoint, script.startWaypoints.wpSource, script.startWaypoints.initialDelay, script.startWaypoints.overwriteEntry, script.startWaypoints.canRepeat);
 
     return false;
 }

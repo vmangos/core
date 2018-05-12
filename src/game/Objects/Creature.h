@@ -813,6 +813,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool _manaRegen;
         uint32 m_manaRegen;
 
+        uint32 m_startwaypoint;                             // currentwaypoint from creature table
+
         void RegenerateHealth();
         void RegenerateMana();
 

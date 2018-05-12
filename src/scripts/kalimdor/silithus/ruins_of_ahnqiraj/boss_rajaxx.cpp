@@ -482,7 +482,7 @@ struct npc_andorovAI : public ScriptedAI
         {
             DoScriptText(SAY_ANDOROV_INTRO, m_creature);
 
-            m_creature->GetMotionMaster()->MoveWaypoint(false);
+            m_creature->GetMotionMaster()->MoveWaypoint(0, 0, 0, 0, 0, false);
 
             m_pInstance->SetData(TYPE_GENERAL_ANDOROV, IN_PROGRESS);
         }

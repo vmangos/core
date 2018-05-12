@@ -68,6 +68,7 @@ enum eScriptCommand
                                                             // datalong2 = time
                                                             // datalong3 = movement_options (see enum MoveOptions)
                                                             // datalong4 = eMoveToFlags
+                                                            // dataint = path_id
                                                             // x/y/z/o = coordinates
     SCRIPT_COMMAND_MODIFY_FLAGS             = 4,            // source = Object
                                                             // datalong = field_id
@@ -242,6 +243,13 @@ enum eScriptCommand
                                                             // datalong = spell_id
     SCRIPT_COMMAND_SET_REACT_STATE          = 59,           // source = Creature
                                                             // datalong = see enum ReactStates
+    SCRIPT_COMMAND_START_WAYPOINTS          = 60,           // source = Creature
+                                                            // datalong = waypoints_source
+                                                            // datalong2 = start_point
+                                                            // datalong3 = initial_delay
+                                                            // datalong4 = (bool) repeat
+                                                            // dataint = path_id
+                                                            // dataint2 = overwrite_entry
 
     SCRIPT_COMMAND_MAX,
 
@@ -405,6 +413,8 @@ struct ScriptInfo
             uint32 travelTime;                              // datalong2
             uint32 movementOptions;                         // datalong3
             uint32 flags;                                   // datalong4
+            uint32 unused;                                  // data_flags
+            int32 pointId;                                  // dataint
         } moveTo;
 
         struct                                              // SCRIPT_COMMAND_MODIFY_FLAGS (4)
@@ -724,6 +734,17 @@ struct ScriptInfo
             uint32 state;                                   // datalong
         } setReactState;
 
+        struct                                              // SCRIPT_COMMAND_START_WAYPOINTS (60)
+        {
+            uint32 wpSource;                                // datalong
+            uint32 startPoint;                              // datalong2
+            uint32 initialDelay;                            // datalong3
+            uint32 canRepeat;                               // datalong4
+            uint32 unused;                                  // data_flags
+            int32  pathId;                                  // dataint
+            int32  overwriteEntry;                          // dataint2
+        } startWaypoints;
+        
         struct
         {
             uint32 data[9];

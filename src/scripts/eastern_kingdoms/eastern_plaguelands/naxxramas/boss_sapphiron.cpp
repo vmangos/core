@@ -437,7 +437,7 @@ struct boss_sapphironAI : public ScriptedAI
              m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == CHASE_MOTION_TYPE &&
             !m_creature->HasDistanceCasterMovement() &&
            (!m_creature->IsWithinDistInMap(m_creature->getVictim(), m_creature->GetMaxChaseDistance(m_creature->getVictim())) || !m_creature->IsWithinLOSInMap(m_creature->getVictim())) &&
-            !m_creature->GetMotionMaster()->operator->()->IsReachable();
+            !m_creature->GetMotionMaster()->GetCurrent()->IsReachable();
         
         if (unreachableTarget)
         {

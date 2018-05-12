@@ -3566,7 +3566,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                             spawnCreature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
                             pCreature->MonsterSay(-1900171);
                             pCreature->SetWalk(false);
-                            pCreature->GetMotionMaster()->MoveWaypoint(false);
+                            pCreature->GetMotionMaster()->MoveWaypoint(0, 0, 0, 0, 0, false);
                         }
                         break;
                     case 976: // Tanaris
@@ -3575,7 +3575,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                             spawnCreature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
                             pCreature->MonsterTextEmote(-1900172);
                             pCreature->SetWalk(false);
-                            pCreature->GetMotionMaster()->MoveWaypoint(false);
+                            pCreature->GetMotionMaster()->MoveWaypoint(0, 0, 0, 0, 0, false);
                         }
                         break;
                     case 2255: // Winterspring
@@ -3584,7 +3584,7 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
                             spawnCreature->GetMotionMaster()->MoveFollow(pCreature, 0.6f, M_PI_F);
                             pCreature->MonsterTextEmote(-1900173);
                             pCreature->SetWalk(false);
-                            pCreature->GetMotionMaster()->MoveWaypoint(false);
+                            pCreature->GetMotionMaster()->MoveWaypoint(0, 0, 0, 0, 0, false);
                         }
                         break;
                 }

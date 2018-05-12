@@ -974,6 +974,24 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_SET_REACT_STATE:
+            {
+                if (tmp.setReactState.state > REACT_AGGRESSIVE)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong = %u in SCRIPT_COMMAND_SET_REACT_STATE for script id %u.", tablename, tmp.setReactState.state, tmp.id);
+                    continue;
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_START_WAYPOINTS:
+            {
+                if (tmp.startWaypoints.wpSource > PATH_FROM_SPECIAL)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong = %u in SCRIPT_COMMAND_START_WAYPOINTS for script id %u.", tablename, tmp.startWaypoints.wpSource, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
