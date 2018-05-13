@@ -4901,6 +4901,23 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+                case 27686:                                 // Teleport to Razelikh (GROUP)
+                {
+                    if (Player* pPlayerTarget = ToPlayer(unitTarget))
+                    {
+                        if (Group* pGroup = pPlayerTarget->GetGroup())
+                        {
+                            uint32 zone_id = pPlayerTarget->GetCachedZoneId();
+                            for (GroupReference* itr = pGroup->GetFirstMember(); itr != nullptr; itr = itr->next())
+                            {
+                                Player* pGroupMember = itr->getSource();
+                                if (pGroupMember && pGroupMember->IsWithinDistInMap(m_caster, 20.0f))
+                                    pGroupMember->CastSpell(pGroupMember, 13142, true); // Teleport to Razelikh
+                            }
+                        }
+                    }
+                    return;
+                }
             }
             break;
         }

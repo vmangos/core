@@ -17,46 +17,15 @@
 /* ScriptData
 SDName: Blasted_Lands
 SD%Complete: 90
-SDComment: Quest support: 3628. Teleporter to Rise of the Defiler missing group support.
 SDCategory: Blasted Lands
 EndScriptData */
 
 /* ContentData
-npc_deathly_usher
+npc_thadius_grimshade
+go_stone_of_binding
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_deathly_usher
-######*/
-
-#define GOSSIP_ITEM_USHER "I wish to to visit the Rise of the Defiler."
-
-#define SPELL_TELEPORT_SINGLE           12885
-#define SPELL_TELEPORT_SINGLE_IN_GROUP  13142
-#define SPELL_TELEPORT_GROUP            27686
-
-bool GossipHello_npc_deathly_usher(Player* pPlayer, Creature* pCreature)
-{
-    if (pPlayer->GetQuestStatus(3628) == QUEST_STATUS_INCOMPLETE && pPlayer->HasItemCount(10757, 1))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, GOSSIP_ITEM_USHER, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_deathly_usher(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        pCreature->CastSpell(pPlayer, SPELL_TELEPORT_SINGLE, true);
-    }
-
-    return true;
-}
 
 struct ThadiusGrimshadeAI : public ScriptedAI
 {
@@ -186,7 +155,7 @@ bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
 {
 // 141812 <= 7668 Servant of Razelikh   // 141857 <= 7669 Servant of Grol
 // 141858 <= 7670 Servant of Allistarj  // 141859 <= 7671 Servant of Sevine
-    Creature* pCreature = NULL;
+    Creature* pCreature = nullptr;
     switch(pGo->GetEntry())
     {
         case 141812:
@@ -209,12 +178,6 @@ bool GOHello_go_stone_of_binding(Player* pPlayer, GameObject* pGo)
 void AddSC_blasted_lands()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_deathly_usher";
-    newscript->pGossipHello =  &GossipHello_npc_deathly_usher;
-    newscript->pGossipSelect = &GossipSelect_npc_deathly_usher;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_thadius_grimshade";

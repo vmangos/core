@@ -91,6 +91,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_UNIT,        //  42
     CONDITION_REQ_TARGET_UNIT,        //  43
     CONDITION_REQ_BOTH_UNITS,         //  44
+    CONDITION_REQ_TARGET_PLAYER,      //  45
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -321,7 +322,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                         return true;
                     if (Group* grp = ((Player*)pPlayer)->GetGroup())
                     {
-                        for (GroupReference* itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+                        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
                         {
                             Player* pl = itr->getSource();
                             if (pl && pl->isAlive() && !pl->isGameMaster() && (!m_value2 || !source || source->IsWithinDistInMap(pl, m_value2)))
@@ -549,6 +550,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_IS_HOSTILE_TO:
         {
             return target->ToUnit()->IsHostileTo(source->ToUnit());
+        }
+        case CONDITION_IS_IN_GROUP:
+        {
+            return target->ToPlayer()->GetGroup();
         }
     }
     return false;
@@ -1094,6 +1099,7 @@ bool ConditionEntry::IsValid()
         case CONDITION_HAS_PET:
         case CONDITION_IS_IN_COMBAT:
         case CONDITION_IS_HOSTILE_TO:
+        case CONDITION_IS_IN_GROUP:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

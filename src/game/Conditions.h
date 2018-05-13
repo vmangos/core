@@ -81,6 +81,7 @@ enum ConditionType
     CONDITION_MANA_PERCENT          = 42,                   // mana_percent 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_IS_IN_COMBAT          = 43,                   // 0            0
     CONDITION_IS_HOSTILE_TO         = 44,                   // 0            0
+    CONDITION_IS_IN_GROUP           = 45,                   // 0            0
 };
 
 enum ConditionFlags
