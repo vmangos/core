@@ -13,7 +13,7 @@ struct instance_onyxia_lair : public ScriptedInstance
 
     void Initialize() { }
 
-    bool IsEncounterInProgress() const
+    bool IsEncounterInProgress() const override
     {
         for (uint8 i = 0; i < MAX_ENCOUNTER; ++i)
             if (m_auiEncounter[i] == IN_PROGRESS)

@@ -271,7 +271,7 @@ struct instance_blackwing_lair : public ScriptedInstance
         m_auiData[DATA_NEF_COLOR] = urand(0, 19);
     }
 
-    bool IsEncounterInProgress() const
+    bool IsEncounterInProgress() const override
     {
         // Don't include TYPE_SCEPTER_RUN status in encounter progress check
         // TODO: Move scepter run out of encounter ordering

@@ -302,7 +302,7 @@ public:
 
     void Initialize();
 
-    bool IsEncounterInProgress() const;
+    bool IsEncounterInProgress() const override;
 
     void OnCreatureCreate(Creature* pCreature) override;
     void OnObjectCreate(GameObject* pGo) override;
