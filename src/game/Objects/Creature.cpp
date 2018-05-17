@@ -3419,7 +3419,7 @@ Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool 
     MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
     MaNGOS::UnitListSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(targets, u_check);
 
-    Cell::VisitWorldObjects(this, searcher, fRange);
+    Cell::VisitAllObjects(this, searcher, fRange);
 
     // remove current target
     if (except)
