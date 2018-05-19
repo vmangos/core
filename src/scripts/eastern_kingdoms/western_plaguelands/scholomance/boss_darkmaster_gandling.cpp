@@ -72,8 +72,6 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
     bool bShadowPortalCasted;
     uint64 ShadowPortalTargetGUID;
 
-    uint32 m_uiArcaneTriggerTimer;
-
     void Reset()
     {
         ArcaneMissiles_Timer = 4500;
@@ -82,8 +80,6 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         Teleport_Timer = 16000;
         bShadowPortalCasted = false;
         ShadowPortalTargetGUID = 0;
-
-        m_uiArcaneTriggerTimer = 0;
     }
 
     void JustDied(Unit *killer)
@@ -105,26 +101,11 @@ struct boss_darkmaster_gandlingAI : public ScriptedAI
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        // hack fix Gandling Arcane Missiles periodic trigger
-        if (m_creature->GetCurrentSpell(CURRENT_CHANNELED_SPELL))
-        {
-            if (m_uiArcaneTriggerTimer <= diff)
-            {
-                m_creature->CastSpell(m_creature->getVictim(), 15791, true);
-                m_uiArcaneTriggerTimer = 1000;
-            }
-            else
-                m_uiArcaneTriggerTimer -= diff;
-        }
-
         //ArcaneMissiles_Timer
         if (ArcaneMissiles_Timer < diff)
         {
             if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ARCANEMISSILES) == CAST_OK)
-            {
                 ArcaneMissiles_Timer = urand(10000, 16000);
-                m_uiArcaneTriggerTimer = 0;
-            }
         }
         else ArcaneMissiles_Timer -= diff;
 
