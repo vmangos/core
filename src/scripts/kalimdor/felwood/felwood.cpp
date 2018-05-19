@@ -494,7 +494,10 @@ struct npc_captured_arkonarinAI : npc_escortAI
         {
             case 0:
                 if (Player* pPlayer = GetPlayerForEscort())
+                {
                     DoScriptText(SAY_ESCORT_START, m_creature, pPlayer);
+                    m_creature->SetFactionTemporary(250, TEMPFACTION_RESTORE_RESPAWN);
+                }
                 break;
             case 14:
                 DoScriptText(SAY_FIRST_STOP, m_creature);
