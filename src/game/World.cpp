@@ -1147,7 +1147,7 @@ void World::SetInitialWorldSettings()
     LoadDBCStores(m_dataPath);
     DetectDBCLang();
     sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());    // Get once for all the locale index of DBC language (console/broadcasts)
-    
+
     sLog.outString("Loading Script Names...");
     sScriptMgr.LoadScriptNames();
 
@@ -2438,7 +2438,7 @@ void World::UpdateSessions(uint32 diff)
         ///- and remove not active sessions from the list
         WorldSession * pSession = itr->second;
         WorldSessionFilter updater(pSession);
-        
+
         if (!pSession->Update(updater))
         {
             if (pSession->PlayerLoading())
@@ -2815,8 +2815,14 @@ void World::LogTransaction(PlayerTransactionData const& data)
         logStmt.addUInt32(part.spell);
         std::stringstream items;
         for (int i = 0; i < TransactionPart::MAX_TRANSACTION_ITEMS; ++i)
+        {
             if (part.itemsEntries[i])
+            {
+                if (i != 0)
+                    items << ";";
                 items << uint32(part.itemsEntries[i]) << ":" << uint32(part.itemsCount[i]) << ":" << part.itemsGuid[i];
+            }
+        }
         logStmt.addString(items.str());
     }
     logStmt.Execute();
