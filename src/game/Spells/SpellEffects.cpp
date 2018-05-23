@@ -1374,7 +1374,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 }
                 case 26626:                                 // Mana Burn Area
                 {
-                    if (unitTarget->GetTypeId() != TYPEID_UNIT || unitTarget->getPowerType() != POWER_MANA)
+                    if (unitTarget->getPowerType() != POWER_MANA)
                         return;
 
                     m_caster->CastSpell(unitTarget, 25779, true);
