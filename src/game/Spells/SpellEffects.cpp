@@ -2450,7 +2450,7 @@ void Spell::EffectHealthLeech(SpellEffectIndex effIndex)
         modOwner->ApplySpellMod(m_spellInfo->Id, SPELLMOD_MULTIPLE_VALUE, healMultiplier);
 
     // get max possible damage, don't count overkill for heal
-    if (damage > unitTarget->GetHealth())
+    if (damage > static_cast<int32>(unitTarget->GetHealth()))
         damage = unitTarget->GetHealth();
 
     if (m_caster->isAlive())

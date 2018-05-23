@@ -3218,7 +3218,7 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         // Roll chance to cast from script (must be after cast checks, this is why its here)
         if (chance)
         {
-            if (chance <= rand() % 100)
+            if (chance <= urand(0, 100))
             {
                 finish(false);
                 return SPELL_FAILED_TRY_AGAIN;
@@ -7954,65 +7954,65 @@ public:
 
         for (typename GridRefManager<T>::iterator itr = m.begin(); itr != m.end(); ++itr)
         {
+            // The template is only defined for Player and Creature maps. If it is extended
+            // in the future, we should swap to WorldObject. Furthermore, we will have to
+            // ensure all the checks are not using invalid casts.
+            Unit* unit = itr->getSource();
+
             // there are still more spells which can be casted on dead, but
             // they are no AOE and don't have such a nice SPELL_ATTR flag
-            if ((i_TargetType != SPELL_TARGETS_ALL && !itr->getSource()->isAttackableByAOE(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD))
-                    // mostly phase check
-                    || !itr->getSource()->IsInMap(i_originalCaster))
+            if (!unit->IsInMap(i_originalCaster))
                 continue;
+
+            if (i_TargetType != SPELL_TARGETS_ALL)
+            {
+                if (!unit->isAttackableByAOE(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD))
+                    continue;
+            }
 
             switch (i_TargetType)
             {
                 case SPELL_TARGETS_HOSTILE:
-                    if (!i_originalCaster->IsHostileTo(itr->getSource()))
+                    if (!i_originalCaster->IsHostileTo(unit))
                         continue;
                     break;
                 case SPELL_TARGETS_NOT_FRIENDLY:
-                    if (i_originalCaster->IsFriendlyTo(itr->getSource()))
+                    if (i_originalCaster->IsFriendlyTo(unit))
                         continue;
                     break;
                 case SPELL_TARGETS_NOT_HOSTILE:
-                    if (i_originalCaster->IsHostileTo(itr->getSource()))
+                    if (i_originalCaster->IsHostileTo(unit))
                         continue;
                     break;
                 case SPELL_TARGETS_FRIENDLY:
-                    if (!i_originalCaster->IsFriendlyTo(itr->getSource()))
+                    if (!i_originalCaster->IsFriendlyTo(unit))
                         continue;
                     break;
                 case SPELL_TARGETS_AOE_DAMAGE:
                 {
-                    if (itr->getSource()->GetTypeId() == TYPEID_UNIT && ((Creature*)itr->getSource())->IsImmuneToAoe())
+                    if (unit->IsCreature() && static_cast<Creature*>(unit)->IsImmuneToAoe())
                         continue;
 
-                    if (Unit* sourceUnit = itr->getSource()->ToUnit())
-                    {
-                        Unit* casterUnit = i_originalCaster->ToUnit();
-                        if (!casterUnit && i_originalCaster->ToGameObject())
-                            casterUnit = i_originalCaster->ToGameObject()->GetOwner();
-                        if (casterUnit)
-                        {
-                            if (!casterUnit->IsValidAttackTarget(sourceUnit))
-                                continue;
+                    if (i_originalCaster->IsFriendlyTo(unit))
+                        continue;
 
-                            // Negative AoE from non flagged players cannot target other players
-                            if (Player *attackedPlayer = sourceUnit->GetCharmerOrOwnerPlayerOrPlayerItself())
-                                if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
-                                    continue;
-                        }
-                        else if (GameObject* gobj = i_originalCaster->ToGameObject())
-                        {
-                            if (gobj->IsFriendlyTo(sourceUnit))
-                                continue;
-                        }
-                    }
-                    else if (i_playerControlled)
+                    Unit* casterUnit = i_originalCaster->ToUnit();
+                    if (!casterUnit && i_originalCaster->ToGameObject())
+                        casterUnit = i_originalCaster->ToGameObject()->GetOwner();
+
+                    if (casterUnit)
                     {
-                        if (i_originalCaster->IsFriendlyTo(itr->getSource()))
+                        if (!casterUnit->IsValidAttackTarget(unit))
                             continue;
+
+                        // Negative AoE from non flagged players cannot target other players
+                        if (Player *attackedPlayer = unit->GetCharmerOrOwnerPlayerOrPlayerItself())
+                            if (casterUnit->IsPlayer() && !casterUnit->IsPvP() && !((Player*)casterUnit)->IsInDuelWith(attackedPlayer))
+                                continue;
                     }
-                    else
+                    else if (GameObject* gobj = i_originalCaster->ToGameObject())
                     {
-                        if (!i_originalCaster->IsHostileTo(itr->getSource()))
+                        if (gobj->IsFriendlyTo(unit))
                             continue;
                     }
                 }
@@ -8027,32 +8027,32 @@ public:
             switch (i_push_type)
             {
                 case PUSH_IN_FRONT:
-                    if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, 2 * M_PI_F / 3))
-                        i_data->push_back(itr->getSource());
+                    if (i_castingObject->isInFront(unit, i_radius, 2 * M_PI_F / 3))
+                        i_data->push_back(unit);
                     break;
                 case PUSH_IN_FRONT_90:
-                    if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 2))
-                        i_data->push_back(itr->getSource());
+                    if (i_castingObject->isInFront(unit, i_radius, M_PI_F / 2))
+                        i_data->push_back(unit);
                     break;
                 case PUSH_IN_FRONT_15:
-                    if (i_castingObject->isInFront((Unit*)(itr->getSource()), i_radius, M_PI_F / 12))
-                        i_data->push_back(itr->getSource());
+                    if (i_castingObject->isInFront(unit, i_radius, M_PI_F / 12))
+                        i_data->push_back(unit);
                     break;
                 case PUSH_IN_BACK: // 75
-                    if (i_castingObject->isInBack((Unit*)(itr->getSource()), i_radius, 5 * M_PI_F / 12))
-                        i_data->push_back(itr->getSource());
+                    if (i_castingObject->isInBack(unit, i_radius, 5 * M_PI_F / 12))
+                        i_data->push_back(unit);
                     break;
                 case PUSH_SELF_CENTER:
-                    if (i_castingObject->IsWithinDist((Unit*)(itr->getSource()), i_radius))
-                        i_data->push_back(itr->getSource());
+                    if (i_castingObject->IsWithinDist(unit, i_radius))
+                        i_data->push_back(unit);
                     break;
                 case PUSH_DEST_CENTER:
                     if (itr->getSource()->IsWithinDist3d(i_spell.m_targets.m_destX, i_spell.m_targets.m_destY, i_spell.m_targets.m_destZ, i_radius))
-                        i_data->push_back(itr->getSource());
+                        i_data->push_back(unit);
                     break;
                 case PUSH_TARGET_CENTER:
-                    if (i_spell.m_targets.getUnitTarget() && i_spell.m_targets.getUnitTarget()->IsWithinDist((Unit*)(itr->getSource()), i_radius))
-                        i_data->push_back(itr->getSource());
+                    if (i_spell.m_targets.getUnitTarget() && i_spell.m_targets.getUnitTarget()->IsWithinDist(unit, i_radius))
+                        i_data->push_back(unit);
                     break;
             }
         }
