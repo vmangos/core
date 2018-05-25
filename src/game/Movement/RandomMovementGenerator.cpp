@@ -27,17 +27,14 @@
 template<>
 void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
 {
-    float respX, respY, respZ, respO, wander_distance;
-    creature.GetRespawnCoord(respX, respY, respZ, &respO, &wander_distance);
-
     if (creature.CanFly())
     {
         //typedef std::vector<Vector3> PointsArray;
         Movement::PointsArray path;
-        uint32 ptsPerCycle = ceil(wander_distance * 2);
+        uint32 ptsPerCycle = ceil(i_wanderDistance * 2);
         static const uint32 nbCyclesPerPacket = 1;
         for (uint32 i = 0; i <= nbCyclesPerPacket * ptsPerCycle; ++i)
-            path.push_back(Vector3(respX + wander_distance * cos(i * 2 * M_PI / ptsPerCycle), respY + wander_distance * sin(i * 2 * M_PI / ptsPerCycle), respZ));
+            path.push_back(Vector3(i_positionX + i_wanderDistance * cos(i * 2 * M_PI / ptsPerCycle), i_positionY + i_wanderDistance * sin(i * 2 * M_PI / ptsPerCycle), i_positionZ));
         Movement::MoveSplineInit init(creature, "RandomMovementGenerator (CanFly)");
         init.SetFly();
         init.SetWalk(false);
@@ -47,12 +44,12 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
         i_nextMoveTime.Reset(0);
         return;
     }
+
     float destX, destY, destZ;
-    if (!creature.GetRandomPoint(respX, respY, respZ, wander_distance, destX, destY, destZ))
+    if (!creature.GetRandomPoint(i_positionX, i_positionY, i_positionZ, i_wanderDistance, destX, destY, destZ))
         return;
 
     creature.addUnitState(UNIT_STAT_ROAMING_MOVE);
-
     Movement::MoveSplineInit init(creature, "RandomMovementGenerator");
     init.MoveTo(destX, destY, destZ, MOVE_PATHFINDING | MOVE_EXCLUDE_STEEP_SLOPES);
     init.SetWalk(true);
@@ -127,12 +124,15 @@ void RandomMovementGenerator<Creature>::UpdateAsync(Creature &creature, uint32 d
 template<>
 bool RandomMovementGenerator<Creature>::GetResetPosition(Creature& c, float& x, float& y, float& z)
 {
-    float radius;
-    c.GetRespawnCoord(x, y, z, NULL, &radius);
-
     // use current if in range
-    if (c.IsWithinDist2d(x, y, radius))
+    if (c.IsWithinDist2d(i_positionX, i_positionY, i_wanderDistance))
         c.GetPosition(x, y, z);
+    else
+    {
+        x = i_positionX;
+        y = i_positionY;
+        z = i_positionZ;
+    }
 
     return true;
 }

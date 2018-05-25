@@ -26,7 +26,20 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
 : public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
 {
     public:
-        explicit RandomMovementGenerator(const Unit &) : i_nextMoveTime(0), i_nextMove(0) {}
+        explicit RandomMovementGenerator(const Creature &creature, bool use_current_position = false, float wander_distance = 0.0f) : i_nextMoveTime(0), i_nextMove(0)
+        {
+            if (use_current_position)
+            {
+                creature.GetPosition(i_positionX, i_positionY, i_positionZ);
+                i_wanderDistance = wander_distance > 0.0f ? wander_distance : 5.0f;
+            }
+            else
+            {
+                creature.GetRespawnCoord(i_positionX, i_positionY, i_positionZ, nullptr, &i_wanderDistance);
+                if (wander_distance > 0.0f)
+                    i_wanderDistance = wander_distance;
+            }
+        }
 
         void _setRandomLocation(T &);
         void Initialize(T &);
@@ -41,6 +54,11 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
     private:
         ShortTimeTracker i_nextMoveTime;
         uint32 i_nextMove;
+        float i_positionX;
+        float i_positionY;
+        float i_positionZ;
+        float i_positionO;
+        float i_wanderDistance;
 };
 
 #endif

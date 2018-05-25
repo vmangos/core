@@ -703,7 +703,7 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
             pSource->GetMotionMaster()->MoveIdle();
             break;
         case RANDOM_MOTION_TYPE:
-            pSource->GetMotionMaster()->MoveRandom();
+            pSource->GetMotionMaster()->MoveRandom(script.movement.boolParam, script.x);
             break;
         case WAYPOINT_MOTION_TYPE:
             pSource->GetMotionMaster()->MoveWaypoint(0, script.movement.intParam, 0, 0, 0, script.movement.boolParam);
