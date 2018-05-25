@@ -68,6 +68,7 @@ enum EventAI_Type
     EVENT_T_TARGET_MISSING_AURA     = 28,                   // Param1 = SpellID, Param2 = Number of time stacked expected, Param3/4 Repeat Min/Max
     EVENT_T_MOVEMENT_INFORM         = 29,                   // Param1 = motion type, Param2 = point ID, RepeatMin, RepeatMax
     EVENT_T_LEAVE_COMBAT            = 30,                   // NONE
+    EVENT_T_MAP_SCRIPT_EVENT        = 31,                   // Param1 = EventID, Param2 = Data
 
     EVENT_T_END,
 };
@@ -222,6 +223,12 @@ struct CreatureEventAI_Event
             uint32 repeatMin;
             uint32 repeatMax;
         } move_inform;
+        // EVENT_T_MAP_SCRIPT_EVENT                         = 31
+        struct
+        {
+            uint32 eventId;
+            uint32 data;
+        } map_event;
         // RAW
         struct
         {
@@ -280,6 +287,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
         void SummonedCreatureJustDied(Creature* unit) override;
         void SummonedCreatureDespawn(Creature* unit) override;
+        void MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiData) override;
 
         static int Permissible(const Creature *);
 

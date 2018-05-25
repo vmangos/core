@@ -250,7 +250,38 @@ enum eScriptCommand
                                                             // datalong4 = (bool) repeat
                                                             // dataint = path_id
                                                             // dataint2 = overwrite_entry
-
+    SCRIPT_COMMAND_START_MAP_EVENT          = 61,           // source = Map
+                                                            // datalong = event_id
+                                                            // datalong2 = time_limit
+                                                            // dataint = success_condition
+                                                            // dataint2 = success_script
+                                                            // dataint3 = failure_condition
+                                                            // dataint4 = failure_script
+    SCRIPT_COMMAND_END_MAP_EVENT            = 62,           // source = Map
+                                                            // datalong = event_id
+                                                            // datalong2 = (bool) success
+    SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET     = 63,           // source = Map
+                                                            // target = WorldObject
+                                                            // datalong = event_id
+                                                            // dataint = success_condition
+                                                            // dataint2 = success_script
+                                                            // dataint3 = failure_condition
+                                                            // dataint4 = failure_script
+    SCRIPT_COMMAND_REMOVE_MAP_EVENT_TARGET  = 64,           // source = Map
+                                                            // target = WorldObject
+                                                            // datalong = event_id
+                                                            // datalong2 = condition_id
+                                                            // datalong3 = eRemoveMapEventTargetOptions
+    SCRIPT_COMMAND_SET_MAP_EVENT_DATA       = 65,           // source = Map
+                                                            // datalong = event_id
+                                                            // datalong2 = index
+                                                            // datalong3 = data
+                                                            // datalong4 = eSetMapScriptDataOptions
+    SCRIPT_COMMAND_SEND_MAP_EVENT           = 66,           // source = Map
+                                                            // datalong = event_id
+                                                            // datalong2 = data
+                                                            // datalong3 = eSendMapEventOptions
+    
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -357,11 +388,42 @@ enum eSetInstData64Options
 // Possible datalong values for SCRIPT_COMMAND_SET_PHASE
 enum eSetPhaseOptions
 {
-    SO_SETPHASE_RAW = 0,
+    SO_SETPHASE_RAW       = 0,
     SO_SETPHASE_INCREMENT = 1,
     SO_SETPHASE_DECREMENT = 2,
 
     SO_SETPHASE_MAX
+};
+
+// Possible datalong3 values for SCRIPT_COMMAND_REMOVE_MAP_EVENT_TARGET
+enum eRemoveMapEventTargetOptions
+{
+    SO_REMOVETARGET_SELF = 0,
+    SO_REMOVETARGET_ONE_FIT_CONDITION = 1,
+    SO_REMOVETARGET_ALL_FIT_CONDITION = 2,
+    SO_REMOVETARGET_ALL_TARGETS = 3,
+
+    SO_REMOVETARGET_MAX
+};
+
+// Possible datalong4 values for SCRIPT_COMMAND_SET_MAP_EVENT_DATA
+enum eSetMapScriptDataOptions
+{
+    SO_MAPEVENTDATA_RAW       = 0,
+    SO_MAPEVENTDATA_INCREMENT = 1,
+    SO_MAPEVENTDATA_DECREMENT = 2,
+
+    SO_MAPEVENTDATA_MAX
+};
+
+// Possible datalong3 values for SCRIPT_COMMAND_SEND_MAP_EVENT
+enum eSendMapEventOptions
+{
+    SO_SENDMAPEVENT_MAIN_TARGETS_ONLY  = 0,
+    SO_SENDMAPEVENT_EXTRA_TARGETS_ONLY = 1,
+    SO_SENDMAPEVENT_ALL_TARGETS        = 2,
+
+    SO_SENDMAPEVENT_MAX
 };
 
 enum eDataFlags
@@ -564,7 +626,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_STAND_STATE (28)
         {
-            uint32 stand_state;                             // datalong
+            uint32 standState;                             // datalong
         } standState;
 
         struct                                              // SCRIPT_COMMAND_MODIFY_THREAT (29)
@@ -708,7 +770,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_CREATURE_SPELLS (55)
         {
-            uint32 spells_template[4];                      // datalong to datalong4
+            uint32 spellTemplate[4];                        // datalong to datalong4
             uint32 unused;                                  // data_flags
             int32 chance[4];                                // dataint to dataint4
         } creatureSpells;
@@ -745,6 +807,60 @@ struct ScriptInfo
             int32  overwriteEntry;                          // dataint2
         } startWaypoints;
         
+        struct                                              // SCRIPT_COMMAND_START_MAP_EVENT (61)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 timeLimit;                               // datalong2
+            uint32 unused1;                                 // datalong3
+            uint32 unuded2;                                 // datalong4
+            uint32 unused3;                                 // data_flags
+            int32  successCondition;                        // dataint
+            int32  successScript;                           // dataint2
+            int32  failureCondition;                        // dataint3
+            int32  failureScript;                           // dataint4
+        } startMapEvent;
+
+        struct                                              // SCRIPT_COMMAND_END_MAP_EVENT (62)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 success;                                 // datalong2
+        } endMapEvent;
+
+        struct                                              // SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET (63)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 unused1;                                 // datalong2
+            uint32 unuded2;                                 // datalong3
+            uint32 unused3;                                 // datalong4
+            uint32 unused4;                                 // data_flags
+            int32  successCondition;                        // dataint
+            int32  successScript;                           // dataint2
+            int32  failureCondition;                        // dataint3
+            int32  failureScript;                           // dataint4
+        } addMapEventTarget;
+
+        struct                                              // SCRIPT_COMMAND_REMOVE_MAP_EVENT_TARGET (64)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 conditionId;                             // datalong2
+            uint32 targets;                                 // datalong3
+        } removeMapEventTarget;
+
+        struct                                              // SCRIPT_COMMAND_SET_MAP_EVENT_DATA (65)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 index;                                   // datalong2
+            uint32 data;                                    // datalong3
+            uint32 type;                                    // datalong4
+        } setMapEventData;
+
+        struct                                              // SCRIPT_COMMAND_SEND_MAP_EVENT (66)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 data;                                    // datalong2
+            uint32 targets;                                 // datalong3
+        } sendMapEvent;
+
         struct
         {
             uint32 data[9];
@@ -804,6 +920,7 @@ extern ScriptMapMap sEventScripts;
 extern ScriptMapMap sGossipScripts;
 extern ScriptMapMap sCreatureMovementScripts;
 extern ScriptMapMap sCreatureAIScripts;
+extern ScriptMapMap sMapEventScripts;
 
 #define MAX_SCRIPTS         5000                            //72 bytes each (approx 351kb)
 #define VISIBLE_RANGE       (166.0f)                        //MAX visible range (size of grid)
@@ -883,6 +1000,13 @@ enum ScriptTarget
                                                             //Param2 = spell_id
     TARGET_T_FRIENDLY_CC                    = 19,           //Friendly unit under crowd control.
                                                             //Param1 = search_radius
+    TARGET_T_MAP_EVENT_SOURCE               = 20,           //The source WorldObject of a scripted map event.
+                                                            //Param1 = eventId
+    TARGET_T_MAP_EVENT_TARGET               = 21,           //The target WorldObject of a scripted map event.
+                                                            //Param1 = eventId
+    TARGET_T_MAP_EVENT_EXTRA_TARGET         = 22,           //An additional WorldObject target from a scripted map event.
+                                                            //Param1 = eventId
+                                                            //Param2 = creature_entry or gameobject_entry
     TARGET_T_END
 };
 
@@ -891,67 +1015,7 @@ void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr,
 void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 // Returns a target based on the type specified.
-inline WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1 = 0u, uint32 Param2 = 0u)
-{
-    switch (TargetType)
-    {
-        case TARGET_T_PROVIDED_TARGET:
-            return pTarget;
-        case TARGET_T_HOSTILE:
-            if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->getVictim();
-            break;
-        case TARGET_T_HOSTILE_SECOND_AGGRO:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
-            break;
-        case TARGET_T_HOSTILE_LAST_AGGRO:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0);
-            break;
-        case TARGET_T_HOSTILE_RANDOM:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            break;
-        case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
-            break;
-        case TARGET_T_OWNER_OR_SELF:
-            if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->GetCharmerOrOwnerOrSelf();
-            break;
-        case TARGET_T_OWNER:
-            if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->GetOwner();
-            break;
-        case TARGET_T_FRIENDLY:
-            if (Unit* pUnitSource = ToUnit(pSource))
-                return pUnitSource->SelectRandomFriendlyTarget(Param2 ? ToUnit(pTarget) : nullptr, Param1 ? Param1 : 30.0f, true);
-            break;
-        case TARGET_T_FRIENDLY_INJURED:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
-            break;
-        case TARGET_T_FRIENDLY_INJURED_EXCEPT:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
-            break;
-        case TARGET_T_FRIENDLY_MISSING_BUFF:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2);
-            break;
-        case TARGET_T_FRIENDLY_MISSING_BUFF_EXCEPT:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
-            break;
-        case TARGET_T_FRIENDLY_CC:
-            if (Creature* pCreatureSource = ToCreature(pSource))
-                return pCreatureSource->DoFindFriendlyCC(Param1 ? Param1 : 30.0f);
-            break;
-    }
-    return nullptr;
-}
+WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1 = 0u, uint32 Param2 = 0u);
 
 //Spell targets used by SelectSpell
 enum SelectTarget
@@ -1099,6 +1163,7 @@ class ScriptMgr
         void LoadGossipScripts();
         void LoadCreatureMovementScripts();
         void LoadCreatureEventAIScripts();
+        void LoadMapEventScripts();
 
         void CheckAllScriptTexts();
 

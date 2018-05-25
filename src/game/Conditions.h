@@ -25,7 +25,7 @@
 
 enum ConditionType
 {
-    //                                                      // value1       value2  for the Condition enumed
+    //                                                      // value1       value2        value3        value4
     CONDITION_NOT                   = -3,                   // cond-id-1    0          returns !cond-id-1
     CONDITION_OR                    = -2,                   // cond-id-1    cond-id-2  returns cond-id-1 OR cond-id-2
     CONDITION_AND                   = -1,                   // cond-id-1    cond-id-2  returns cond-id-1 AND cond-id-2
@@ -70,9 +70,9 @@ enum ConditionType
     CONDITION_HAS_FLAG              = 31,                   // field_id     flag
     CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 = exact, 1: wp <= waypointId, 2: wp > waypointId  Use to check what waypoint was last reached
     CONDITION_MAP_ID                = 33,                   // map_id
-    CONDITION_INSTANCE_DATA_EQUAL   = 34,                   // index        data
-    CONDITION_INSTANCE_DATA_GREATER = 35,                   // index        data
-    CONDITION_INSTANCE_DATA_LESS    = 36,                   // index        data
+    CONDITION_INSTANCE_DATA         = 34,                   // index        data        0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_MAP_EVENT_DATA        = 35,                   // event_id     index       data       0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
+    CONDITION_MAP_EVENT_ACTIVE      = 36,                   // event_id
     CONDITION_LINE_OF_SIGHT         = 37,                   // 0            0
     CONDITION_DISTANCE              = 38,                   // distance     0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_IS_MOVING             = 39,                   // 0            0
@@ -100,7 +100,7 @@ enum ConditionSource                                        // From where was th
     CONDITION_FROM_HARDCODED        = 5,                    // Used to check a hardcoded event - not actually a condition
     CONDITION_FROM_VENDOR           = 6,                    // Used to check a condition from a vendor
     CONDITION_FROM_SPELL_AREA       = 7,                    // Used to check a condition from spell_area table
-    CONDITION_FROM_RESERVED_1       = 8,                    // reserved for 3.x and later
+    CONDITION_FROM_MAP_EVENT        = 8,                    // Used to check conditions from scripted map events
     CONDITION_FROM_DBSCRIPTS        = 9,                    // Used to check a condition from DB Scripts Engine
 };
 
@@ -129,10 +129,10 @@ class ConditionEntry
 {
     public:
         // Default constructor, required for SQL Storage (Will give errors if used elsewise)
-        ConditionEntry() : m_entry(0), m_condition(CONDITION_AND), m_value1(0), m_value2(0), m_flags(0) {}
+        ConditionEntry() : m_entry(0), m_condition(CONDITION_AND), m_value1(0), m_value2(0), m_value3(0), m_value4(0), m_flags(0) {}
 
-        ConditionEntry(uint32 _entry, int16 _condition, uint32 _value1, uint32 _value2, uint8 _flags)
-            : m_entry(_entry), m_condition(ConditionType(_condition)), m_value1(_value1), m_value2(_value2), m_flags(_flags) {}
+        ConditionEntry(uint32 _entry, int16 _condition, uint32 _value1, uint32 _value2, uint32 _value3, uint32 _value4, uint8 _flags)
+            : m_entry(_entry), m_condition(ConditionType(_condition)), m_value1(_value1), m_value2(_value2), m_value3(_value3), m_value4(_value4), m_flags(_flags) {}
 
         // Checks correctness of values
         bool IsValid();
@@ -152,6 +152,8 @@ class ConditionEntry
         ConditionType m_condition;                          // additional condition type
         uint32 m_value1;                                    // data for the condition - see ConditionType definition
         uint32 m_value2;
+        uint32 m_value3;
+        uint32 m_value4;
         uint8 m_flags;
 };
 

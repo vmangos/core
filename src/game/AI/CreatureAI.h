@@ -171,6 +171,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Comme UpdateAI, mais pour quand le mob est sous forme de corps.
         virtual void UpdateAI_corpse(const uint32 /*uiDiff*/) {}
 
+        // Called by scripted map events
+        virtual void MapScriptEventHappened(ScriptedEvent* /*pEvent*/, uint32 /*uiData*/) {};
+
         ///== State checks =================================
 
         // called when the corpse of this creature gets removed

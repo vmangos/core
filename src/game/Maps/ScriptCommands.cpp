@@ -908,7 +908,7 @@ bool Map::ScriptCommand_SetStandState(const ScriptInfo& script, WorldObject* sou
         return ShouldAbortScript(script);
     }
 
-    pSource->SetStandState(script.standState.stand_state);
+    pSource->SetStandState(script.standState.standState);
 
     return false;
 }
@@ -1501,7 +1501,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
 
     for (int i = 0; i < 4; i++)
     {
-        const uint32 currentId = script.creatureSpells.spells_template[i];
+        const uint32 currentId = script.creatureSpells.spellTemplate[i];
         const uint32 currentChance = script.creatureSpells.chance[i];
 
         if (!currentChance)
@@ -1610,6 +1610,191 @@ bool Map::ScriptCommand_StartWaypoints(const ScriptInfo& script, WorldObject* so
     }
 
     pSource->GetMotionMaster()->MoveWaypoint(script.startWaypoints.pathId, script.startWaypoints.startPoint, script.startWaypoints.wpSource, script.startWaypoints.initialDelay, script.startWaypoints.overwriteEntry, script.startWaypoints.canRepeat);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_START_MAP_EVENT (61)
+bool Map::ScriptCommand_StartMapEvent(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    if (!StartScriptedEvent(script.startMapEvent.eventId, source, target, script.startMapEvent.timeLimit, script.startMapEvent.failureCondition, script.startMapEvent.failureScript, script.startMapEvent.successCondition, script.startMapEvent.successScript))
+        return ShouldAbortScript(script);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_END_MAP_EVENT (62)
+bool Map::ScriptCommand_EndMapEvent(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    auto itr = m_mScriptedEvents.find(script.endMapEvent.eventId);
+
+    if (itr == m_mScriptedEvents.end())
+        return ShouldAbortScript(script);
+
+    itr->second.EndEvent(script.endMapEvent.success);
+
+    m_mScriptedEvents.erase(itr);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET (63)
+bool Map::ScriptCommand_AddMapEventTarget(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    if (!source)
+    {
+        sLog.outError("SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET (script id %u) call for a NULL source, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    ScriptedEvent* pEvent = GetScriptedMapEvent(script.addMapEventTarget.eventId);
+
+    if (!pEvent)
+    {
+        sLog.outError("SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET (script id %u) call for a non-existing scripted map event (EventId: %u), skipping.", script.id, script.addMapEventTarget.eventId);
+        return ShouldAbortScript(script);
+    }
+
+    for (auto& target : pEvent->m_vTargets)
+    {
+        // If target already exists, just update data.
+        if (target.pObject == source)
+        {
+            target.uiFailureCondition = script.addMapEventTarget.failureCondition;
+            target.uiFailureScript = script.addMapEventTarget.failureScript;
+            target.uiSuccessCondition = script.addMapEventTarget.successCondition;
+            target.uiSuccessScript = script.addMapEventTarget.successScript;
+            return false;
+        }
+    }
+
+    pEvent->m_vTargets.emplace_back(source, script.addMapEventTarget.failureCondition, script.addMapEventTarget.failureScript, script.addMapEventTarget.successCondition, script.addMapEventTarget.successScript);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_REMOVE_MAP_EVENT_TARGET (64)
+bool Map::ScriptCommand_RemoveMapEventTarget(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    ScriptedEvent* pEvent = GetScriptedMapEvent(script.removeMapEventTarget.eventId);
+
+    if (!pEvent)
+    {
+        sLog.outError("SCRIPT_COMMAND_REMOVE_MAP_EVENT_TARGET (script id %u) call for a non-existing scripted map event (EventId: %u), skipping.", script.id, script.removeMapEventTarget.eventId);
+        return ShouldAbortScript(script);
+    }
+
+    switch (script.removeMapEventTarget.targets)
+    {
+        case SO_REMOVETARGET_SELF:
+        {
+            if (!source)
+                return ShouldAbortScript(script);
+
+            for (auto itr = pEvent->m_vTargets.begin(); itr != pEvent->m_vTargets.end(); ++itr)
+            {
+                if (itr->pObject == source)
+                {
+                    pEvent->m_vTargets.erase(itr);
+                    return false;
+                }
+            }
+            break;
+        }
+        case SO_REMOVETARGET_ONE_FIT_CONDITION:
+        case SO_REMOVETARGET_ALL_FIT_CONDITION:
+        {
+            if (!script.removeMapEventTarget.conditionId)
+            {
+                sLog.outError("SCRIPT_COMMAND_REMOVE_MAP_EVENT_TARGET (script id %u) call with `datalong3`=%u but without a condition Id, skipping.", script.id, script.removeMapEventTarget.targets);
+                return ShouldAbortScript(script);
+            }
+
+            for (auto itr = pEvent->m_vTargets.begin(); itr != pEvent->m_vTargets.end();)
+            {
+                if (sObjectMgr.IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, itr->pObject, CONDITION_FROM_DBSCRIPTS))
+                {
+                    itr = pEvent->m_vTargets.erase(itr);
+                    if (script.removeMapEventTarget.targets == SO_REMOVETARGET_ONE_FIT_CONDITION)
+                        return false;
+                    continue;
+                }
+                ++itr;
+            }
+            break;
+        }
+        case SO_REMOVETARGET_ALL_TARGETS:
+        {
+            pEvent->m_vTargets.clear();
+            break;
+        }
+    }
+
+    return false;
+}
+
+// SCRIPT_COMMAND_SET_MAP_EVENT_DATA (65)
+bool Map::ScriptCommand_SetMapEventData(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    ScriptedEvent* pEvent = GetScriptedMapEvent(script.setMapEventData.eventId);
+
+    if (!pEvent)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_MAP_EVENT_DATA (script id %u) call for a non-existing scripted map event (EventId: %u), skipping.", script.id, script.setMapEventData.eventId);
+        return ShouldAbortScript(script);
+    }
+
+    switch (script.setMapEventData.type)
+    {
+        case SO_MAPEVENTDATA_RAW:
+        {
+            pEvent->SetData(script.setMapEventData.index, script.setMapEventData.data);
+            break;
+        }
+        case SO_MAPEVENTDATA_INCREMENT:
+        {
+            pEvent->IncrementData(script.setMapEventData.index, script.setMapEventData.data);
+            break;
+        }
+        case SO_MAPEVENTDATA_DECREMENT:
+        {
+            pEvent->DecrementData(script.setMapEventData.index, script.setMapEventData.data);
+            break;
+        }
+    }
+
+    return false;
+}
+
+// SCRIPT_COMMAND_SEND_MAP_EVENT (66)
+bool Map::ScriptCommand_SendMapEvent(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    ScriptedEvent* pEvent = GetScriptedMapEvent(script.sendMapEvent.eventId);
+
+    if (!pEvent)
+    {
+        sLog.outError("SCRIPT_COMMAND_SEND_MAP_EVENT (script id %u) call for a non-existing scripted map event (EventId: %u), skipping.", script.id, script.sendMapEvent.eventId);
+        return ShouldAbortScript(script);
+    }
+
+    switch (script.sendMapEvent.targets)
+    {
+        case SO_SENDMAPEVENT_MAIN_TARGETS_ONLY:
+        {
+            pEvent->SendEventToMainTargets(script.sendMapEvent.data);
+            break;
+        }
+        case SO_SENDMAPEVENT_EXTRA_TARGETS_ONLY:
+        {
+            pEvent->SendEventToAdditionalTargets(script.sendMapEvent.data);
+            break;
+        }
+        case SO_SENDMAPEVENT_ALL_TARGETS:
+        {
+            pEvent->SendEventToAllTargets(script.sendMapEvent.data);
+            break;
+        }
+    }
 
     return false;
 }

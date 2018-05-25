@@ -459,32 +459,47 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
 
             return false;
         }
-        case CONDITION_INSTANCE_DATA_EQUAL:
+        case CONDITION_INSTANCE_DATA:
         {
             const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
             if (InstanceData const* data = map->GetInstanceData())
-                return const_cast<InstanceData*>(data)->GetData(m_value1) == m_value2;
+            {
+                switch (m_value3)
+                {
+                    case 0:
+                        return const_cast<InstanceData*>(data)->GetData(m_value1) == m_value2;
+                    case 1:
+                        return const_cast<InstanceData*>(data)->GetData(m_value1) >= m_value2;
+                    case 2:
+                        return const_cast<InstanceData*>(data)->GetData(m_value1) <= m_value2;
+                }
+            }
 
             return false;
         }
-        case CONDITION_INSTANCE_DATA_GREATER:
+        case CONDITION_MAP_EVENT_DATA:
         {
             const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
 
-            if (InstanceData const* data = map->GetInstanceData())
-                return const_cast<InstanceData*>(data)->GetData(m_value1) >= m_value2;
-
+            if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
+            {
+                switch (m_value4)
+                {
+                    case 0:
+                        return pEvent->GetData(m_value2) == m_value3;
+                    case 1:
+                        return pEvent->GetData(m_value2) >= m_value3;
+                    case 2:
+                        return pEvent->GetData(m_value2) <= m_value3;
+                }
+            }
             return false;
         }
-        case CONDITION_INSTANCE_DATA_LESS:
+        case CONDITION_MAP_EVENT_ACTIVE:
         {
             const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
-
-            if (InstanceData const* data = map->GetInstanceData())
-                return const_cast<InstanceData*>(data)->GetData(m_value1) <= m_value2;
-
-            return false;
+            return pMap->GetScriptedMapEvent(m_value1);
         }
         case CONDITION_LINE_OF_SIGHT:
         {
@@ -1091,9 +1106,9 @@ bool ConditionEntry::IsValid()
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_ACTIVE_HOLIDAY:
         case CONDITION_HAS_FLAG:
-        case CONDITION_INSTANCE_DATA_EQUAL:
-        case CONDITION_INSTANCE_DATA_GREATER:
-        case CONDITION_INSTANCE_DATA_LESS:
+        case CONDITION_INSTANCE_DATA:
+        case CONDITION_MAP_EVENT_DATA:
+        case CONDITION_MAP_EVENT_ACTIVE:
         case CONDITION_LINE_OF_SIGHT:
         case CONDITION_IS_MOVING:
         case CONDITION_HAS_PET:

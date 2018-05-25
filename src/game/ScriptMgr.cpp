@@ -43,6 +43,7 @@ ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
 ScriptMapMap sCreatureMovementScripts;
 ScriptMapMap sCreatureAIScripts;
+ScriptMapMap sMapEventScripts;
 
 INSTANTIATE_SINGLETON_1(ScriptMgr);
 
@@ -663,9 +664,9 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             }
             case SCRIPT_COMMAND_STAND_STATE:
             {
-                if (tmp.standState.stand_state >= MAX_UNIT_STAND_STATE)
+                if (tmp.standState.standState >= MAX_UNIT_STAND_STATE)
                 {
-                    sLog.outErrorDb("Table `%s` has invalid stand state (datalong = %u) in SCRIPT_COMMAND_STAND_STATE for script id %u", tablename, tmp.standState.stand_state, tmp.id);
+                    sLog.outErrorDb("Table `%s` has invalid stand state (datalong = %u) in SCRIPT_COMMAND_STAND_STATE for script id %u", tablename, tmp.standState.standState, tmp.id);
                     continue;
                 }
                 break;
@@ -909,18 +910,18 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                         sLog.outErrorDb("Table `%s` has dataint%u with negative chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.id);
                         break;
                     }
-                    else if (tmp.creatureSpells.spells_template[i])
+                    else if (tmp.creatureSpells.spellTemplate[i])
                     {
-                        if (!sObjectMgr.GetCreatureSpellsTemplate(tmp.creatureSpells.spells_template[i]))
+                        if (!sObjectMgr.GetCreatureSpellsTemplate(tmp.creatureSpells.spellTemplate[i]))
                         {
                             abort = true;
-                            sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spells_template[i], tmp.id);
+                            sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellTemplate[i], tmp.id);
                             break;
                         }
                         if (!tmp.creatureSpells.chance[i])
                         {
                             abort = true;
-                            sLog.outErrorDb("Table `%s` has datalong%u=%u with 0%% chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spells_template[i], tmp.id);
+                            sLog.outErrorDb("Table `%s` has datalong%u=%u with 0%% chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellTemplate[i], tmp.id);
                             break;
                         }
                     }
@@ -1120,6 +1121,11 @@ void ScriptMgr::LoadCreatureMovementScripts()
     LoadScripts(sCreatureMovementScripts, "creature_movement_scripts");
 
     // checks are done in WaypointManager::Load
+}
+
+void ScriptMgr::LoadMapEventScripts()
+{
+    LoadScripts(sMapEventScripts, "map_event_scripts");
 }
 
 void ScriptMgr::LoadCreatureEventAIScripts()
@@ -2362,4 +2368,84 @@ void ScriptMgr::FillSpellSummary()
                 m_spellSummary[i].Effects |= 1 << (SELECT_EFFECT_AURA - 1);
         }
     }
+}
+
+// Returns a target based on the type specified.
+WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 TargetType, uint32 Param1, uint32 Param2)
+{
+    switch (TargetType)
+    {
+        case TARGET_T_PROVIDED_TARGET:
+            return pTarget;
+        case TARGET_T_HOSTILE:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->getVictim();
+            break;
+        case TARGET_T_HOSTILE_SECOND_AGGRO:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1);
+            break;
+        case TARGET_T_HOSTILE_LAST_AGGRO:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_BOTTOMAGGRO, 0);
+            break;
+        case TARGET_T_HOSTILE_RANDOM:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
+            break;
+        case TARGET_T_HOSTILE_RANDOM_NOT_TOP:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1);
+            break;
+        case TARGET_T_OWNER_OR_SELF:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->GetCharmerOrOwnerOrSelf();
+            break;
+        case TARGET_T_OWNER:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->GetOwner();
+            break;
+        case TARGET_T_FRIENDLY:
+            if (Unit* pUnitSource = ToUnit(pSource))
+                return pUnitSource->SelectRandomFriendlyTarget(Param2 ? ToUnit(pTarget) : nullptr, Param1 ? Param1 : 30.0f, true);
+            break;
+        case TARGET_T_FRIENDLY_INJURED:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true);
+            break;
+        case TARGET_T_FRIENDLY_INJURED_EXCEPT:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->DoSelectLowestHpFriendly(Param1 ? Param1 : 30.0f, Param2 ? Param2 : 50, true, ToUnit(pTarget));
+            break;
+        case TARGET_T_FRIENDLY_MISSING_BUFF:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2);
+            break;
+        case TARGET_T_FRIENDLY_MISSING_BUFF_EXCEPT:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->DoFindFriendlyMissingBuff(Param1 ? Param1 : 30.0f, Param2, ToUnit(pTarget));
+            break;
+        case TARGET_T_FRIENDLY_CC:
+            if (Creature* pCreatureSource = ToCreature(pSource))
+                return pCreatureSource->DoFindFriendlyCC(Param1 ? Param1 : 30.0f);
+            break;
+        case TARGET_T_MAP_EVENT_SOURCE:
+            if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
+                if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
+                    pEvent->m_pSource;
+            break;
+        case TARGET_T_MAP_EVENT_TARGET:
+            if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
+                if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
+                    pEvent->m_pTarget;
+            break;
+        case TARGET_T_MAP_EVENT_EXTRA_TARGET:
+            if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
+                if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
+                    for (const auto& target : pEvent->m_vTargets)
+                        if (target.pObject && (target.pObject->GetEntry() == Param2))
+                            return target.pObject;
+            break;
+    }
+    return nullptr;
 }
