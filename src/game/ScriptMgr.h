@@ -136,6 +136,7 @@ enum eScriptCommand
                                                             // datalong = see enum MovementGeneratorType (not all are supported)
                                                             // datalong2 = bool_param (meaning depends on the motion type)
                                                             // datalong3 = int_param (meaning depends on the motion type)
+                                                            // datalong4 = (bool) clear
                                                             // x = distance (only for some motion types)
                                                             // o = angle (only for some motion types)
     SCRIPT_COMMAND_SET_ACTIVEOBJECT         = 21,           // source = Creature
@@ -173,7 +174,7 @@ enum eScriptCommand
                                                             // datalong3 = eTerminateConditionFlags
     SCRIPT_COMMAND_ENTER_EVADE_MODE         = 33,           // source = Creature
     SCRIPT_COMMAND_SET_HOME_POSITION        = 34,           // source = Creature
-                                                            // datalong = (bool) use_current_position
+                                                            // datalong = eSetHomePositionOptions
                                                             // x/y/z/o = coordinates
     SCRIPT_COMMAND_TURN_TO                  = 35,           // source = Unit
                                                             // target = WorldObject
@@ -281,6 +282,10 @@ enum eScriptCommand
                                                             // datalong = event_id
                                                             // datalong2 = data
                                                             // datalong3 = eSendMapEventOptions
+    SCRIPT_COMMAND_SET_DEFAULT_MOVEMENT     = 67,           // source = Creature
+                                                            // datalong = movement_type
+                                                            // datalong = (bool) always_replace
+                                                            // datalong3 = param1
     
     SCRIPT_COMMAND_MAX,
 
@@ -357,6 +362,14 @@ enum eTerminateScriptOptions
 enum eTerminateConditionFlags
 {
     SF_TERMINATECONDITION_WHEN_FALSE = 0x1
+};
+
+// Possible datalong values for SCRIPT_COMMAND_SET_HOME_POSITION
+enum eSetHomePositionOptions
+{
+    SO_SETHOME_PROVIDED_POSITION = 0,
+    SO_SETHOME_CURRENT_POSITION  = 1,
+    SO_SETHOME_DEFAULT_POSITION  = 2
 };
 
 // Possible datalong values for SCRIPT_COMMAND_TURN_TO
@@ -586,6 +599,7 @@ struct ScriptInfo
             uint32 movementType;                            // datalong
             uint32 boolParam;                               // datalong2
             uint32 intParam;                                // datalong3
+            uint32 clear;                                   // datalong4
         } movement;
 
         struct                                              // SCRIPT_COMMAND_SET_ACTIVEOBJECT (21)
@@ -657,7 +671,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_SET_HOME_POSITION (34)
         {
-            uint32 useCurrent;                              // datalong
+            uint32 mode;                                    // datalong
         } setHome;
 
         struct                                              // SCRIPT_COMMAND_TURN_TO (35)
@@ -860,6 +874,13 @@ struct ScriptInfo
             uint32 data;                                    // datalong2
             uint32 targets;                                 // datalong3
         } sendMapEvent;
+
+        struct                                              // SCRIPT_COMMAND_SET_DEFAULT_MOVEMENT (67)
+        {
+            uint32 movementType;                            // datalong
+            uint32 alwaysReplace;                           // datalong2
+            uint32 param1;                                  // datalong3
+        } setDefaultMovement;
 
         struct
         {

@@ -92,6 +92,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_UNIT,        //  43
     CONDITION_REQ_BOTH_UNITS,         //  44
     CONDITION_REQ_TARGET_PLAYER,      //  45
+    CONDITION_REQ_TARGET_UNIT,        //  46
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -569,6 +570,10 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_IS_IN_GROUP:
         {
             return target->ToPlayer()->GetGroup();
+        }
+        case CONDITION_IS_ALIVE:
+        {
+            return target->ToUnit()->isAlive();
         }
     }
     return false;
@@ -1115,6 +1120,7 @@ bool ConditionEntry::IsValid()
         case CONDITION_IS_IN_COMBAT:
         case CONDITION_IS_HOSTILE_TO:
         case CONDITION_IS_IN_GROUP:
+        case CONDITION_IS_ALIVE:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

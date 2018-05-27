@@ -3123,6 +3123,14 @@ void Creature::SetHomePosition(float x, float y, float z, float o)
     m_HomeOrientation = o;
 }
 
+void Creature::ResetHomePosition()
+{
+    if (CreatureData const *data = sObjectMgr.GetCreatureData(GetGUIDLow()))
+        SetHomePosition(data->posX, data->posY, data->posZ, data->orientation);
+    else if (IsTemporarySummon())
+        GetSummonPoint(m_HomeX, m_HomeY, m_HomeZ, m_HomeOrientation);
+}
+
 void Creature::OnLeaveCombat()
 {
     UpdateCombatState(false);

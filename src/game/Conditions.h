@@ -72,7 +72,7 @@ enum ConditionType
     CONDITION_MAP_ID                = 33,                   // map_id
     CONDITION_INSTANCE_DATA         = 34,                   // index        data        0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_MAP_EVENT_DATA        = 35,                   // event_id     index       data       0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_MAP_EVENT_ACTIVE      = 36,                   // event_id
+    CONDITION_MAP_EVENT_ACTIVE      = 36,                   // event_id     0
     CONDITION_LINE_OF_SIGHT         = 37,                   // 0            0
     CONDITION_DISTANCE              = 38,                   // distance     0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_IS_MOVING             = 39,                   // 0            0
@@ -82,6 +82,7 @@ enum ConditionType
     CONDITION_IS_IN_COMBAT          = 43,                   // 0            0
     CONDITION_IS_HOSTILE_TO         = 44,                   // 0            0
     CONDITION_IS_IN_GROUP           = 45,                   // 0            0
+    CONDITION_IS_ALIVE              = 46,                   // 0            0
 };
 
 enum ConditionFlags

@@ -55,8 +55,8 @@ void MotionMaster::Initialize()
     // set new default movement generator
     if (m_owner->GetTypeId() == TYPEID_UNIT && !m_owner->hasUnitState(UNIT_STAT_CONTROLLED))
     {
-        MovementGenerator* movement = FactorySelector::selectMovementGenerator((Creature*)m_owner);
-        push(movement == NULL ? &si_idleMovement : movement);
+        MovementGenerator* movement = FactorySelector::selectMovementGenerator(static_cast<Creature*>(m_owner));
+        push(movement == nullptr ? &si_idleMovement : movement);
         top()->Initialize(*m_owner);
         if (top()->GetMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
             (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(static_cast<Creature*>(m_owner)), 0, static_cast<Creature*>(m_owner)->m_startwaypoint, PATH_NO_PATH, 0, 0, true);
@@ -64,13 +64,72 @@ void MotionMaster::Initialize()
     else
         push(&si_idleMovement);
 
-    // Pet movement after control movement spell
+    // Pet movement after control movement spell.
     if (CharmInfo* ci = m_owner->GetCharmInfo())
     {
         ci->SetIsAtStay(false);
         ci->SetIsReturning(false);
         ci->SetIsFollowing(false);
     }
+}
+
+void MotionMaster::InitializeNewDefault(bool alwaysReplace)
+{
+    // This method changes the creature's default movement type
+    // without interrupting the currently used movement generator
+    
+    if (empty())
+    {
+        Initialize();
+        return;
+    }
+
+    Creature* pCreature = m_owner->ToCreature();
+    if (!pCreature)
+        return;
+
+    MovementGeneratorType new_default = pCreature->GetDefaultMovementType();
+
+    // Already using the same motion type as default
+    if (!alwaysReplace && (size() == 1) && (top()->GetMovementGeneratorType() == new_default))
+        return;
+
+    // Get the current generator and eject it from the stack
+    MovementGenerator *curr = top();
+    pop();
+
+    // Clear ALL other movement generators
+    Clear(false, true);
+
+    if (alwaysReplace || (curr->GetMovementGeneratorType() != new_default))
+    {
+        // Set new default movement generator
+        if (!m_owner->hasUnitState(UNIT_STAT_CONTROLLED))
+        {
+            MovementGenerator* movement = FactorySelector::selectMovementGenerator(pCreature);
+            push(movement == nullptr ? &si_idleMovement : movement);
+            top()->Initialize(*m_owner);
+            if (top()->GetMovementGeneratorType() == WAYPOINT_MOTION_TYPE)
+                (static_cast<WaypointMovementGenerator<Creature>*>(top()))->InitializeWaypointPath(*(pCreature), 0, pCreature->m_startwaypoint, PATH_NO_PATH, 100, 0, true);
+        }
+        else
+            push(&si_idleMovement);
+
+        // Restore the previous current generator, if its different from the new default
+        if (curr->GetMovementGeneratorType() != new_default)
+            push(curr);
+        else
+        {
+            // Same as the new default, so we can delete it
+            if (!m_expList)
+                m_expList = new ExpireList();
+            curr->Finalize(*m_owner);
+            if (!isStatic(curr))
+                m_expList->push_back(curr);
+        }
+    }
+    else
+        push(curr);
 }
 
 MotionMaster::~MotionMaster()
@@ -123,7 +182,7 @@ void MotionMaster::UpdateMotion(uint32 diff)
         }
 
         delete m_expList;
-        m_expList = NULL;
+        m_expList = nullptr;
 
         if (empty())
             Initialize();
@@ -229,7 +288,7 @@ void MotionMaster::DirectExpire(bool reset)
         delete(*it);
     }
     // Store current top MMGen, as Finalize might push a new MMGen
-    MovementGenerator* nowTop = empty() ? NULL : top();
+    MovementGenerator* nowTop = empty() ? nullptr : top();
     // it can add another motions instead
     curr->Finalize(*m_owner);
 
@@ -351,7 +410,13 @@ void MotionMaster::MoveChase(Unit* target, float dist, float angle)
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
         Mutate(new ChaseMovementGenerator<Player>(*target, dist, angle));
     else
+    {
+        // interrupt current movespline
+        if (!m_owner->IsStopped())
+            m_owner->StopMoving();
+
         Mutate(new ChaseMovementGenerator<Creature>(*target, dist, angle));
+    }
 }
 
 void MotionMaster::MoveFollow(Unit* target, float dist, float angle)

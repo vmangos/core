@@ -511,6 +511,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetHomePosition(float x, float y, float z, float o);
         void GetHomePosition(float &x, float &y, float &z, float &o, float* dist = nullptr);
         float GetHomePositionO() const { return m_HomeOrientation; }
+        void ResetHomePosition();
 
         CreatureSubtype GetSubtype() const { return m_subtype; }
         bool IsPet() const { return m_subtype == CREATURE_SUBTYPE_PET; }

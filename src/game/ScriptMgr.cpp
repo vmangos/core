@@ -993,6 +993,15 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_SET_DEFAULT_MOVEMENT:
+            {
+                if (tmp.setDefaultMovement.movementType >= MAX_DB_MOTION_TYPE)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong = %u in SCRIPT_COMMAND_SET_DEFAULT_MOVEMENT for script id %u.", tablename, tmp.setDefaultMovement.movementType, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

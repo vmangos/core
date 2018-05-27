@@ -92,6 +92,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         ~MotionMaster();
 
         void Initialize();
+        void InitializeNewDefault(bool alwaysReplace);
 
         MovementGenerator const* GetCurrent() const { return top(); }
         //MovementGenerator* top() { return std::stack<MovementGenerator *>::top(); }

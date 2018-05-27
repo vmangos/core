@@ -77,7 +77,10 @@ void WaypointMovementGenerator<Creature>::InitializeWaypointPath(Creature& u, in
     if (startPoint)
     {
         if (i_path && !i_path->empty() && (i_path->find(startPoint) != i_path->end()))
+        {
             i_currentNode = startPoint;
+            m_lastReachedWaypoint = startPoint - 1;
+        }
         else
             sLog.outError("WaypointMovementGenerator::InitializeWaypointPath: %s tries to start movement from invalid point id %u", u.GetGuidStr().c_str(), startPoint);
     }
