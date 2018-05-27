@@ -1021,6 +1021,7 @@ struct npc_training_dummyAI : ScriptedAI
                         m_creature->_removeAttacker(itr->first);
                         m_creature->getThreatManager().modifyThreatPercent(itr->first, -101.0f);
                         itr = attackers.erase(itr);
+                        continue;
                     }
                     ++itr;
                 }
