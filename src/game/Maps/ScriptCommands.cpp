@@ -578,8 +578,8 @@ bool Map::ScriptCommand_CastSpell(const ScriptInfo& script, WorldObject* source,
 
     Creature* pCreatureSource = pUnitSource->ToCreature();
 
-    if (pCreatureSource && pCreatureSource->AI())
-        pCreatureSource->AI()->DoCastSpellIfCan(pUnitTarget, script.castSpell.spellId, script.castSpell.flags);
+    if (pCreatureSource)
+        pCreatureSource->TryToCast(pUnitTarget, script.castSpell.spellId, script.castSpell.flags, 0u);
     else
         pUnitSource->CastSpell(pUnitTarget, script.castSpell.spellId, (script.castSpell.flags & CF_TRIGGERED) != 0);
 
