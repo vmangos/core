@@ -16,17 +16,21 @@
 
 /* ScriptData
 SDName: Boss_Gehennas
-SD%Complete: 90
-SDComment: Adds MC NYI
+SD%Complete: 100
+SDComment: -
 SDCategory: Molten Core
 EndScriptData */
 
 #include "scriptPCH.h"
 #include "molten_core.h"
 
-#define SPELL_SHADOWBOLT            19728
-#define SPELL_RAINOFFIRE            19717
-#define SPELL_GEHENNASCURSE         19716
+enum
+{
+    SPELL_GEHENNAS_CURSE        = 19716,
+    SPELL_RAIN_OF_FIRE          = 19717,
+    SPELL_SHADOW_BOLT_RANDOM    = 19728,
+    SPELL_SHADOW_BOLT_TARGET    = 19729,
+};
 
 struct boss_gehennasAI : public ScriptedAI
 {
@@ -36,17 +40,19 @@ struct boss_gehennasAI : public ScriptedAI
         Reset();
     }
 
-    uint32 ShadowBolt_Timer;
-    uint32 RainOfFire_Timer;
-    uint32 GehennasCurse_Timer;
+    uint32 m_uiGehennasCurseTimer;
+    uint32 m_uiRainOfFireTimer;
+    uint32 m_uiShadowBoltRandomTimer;
+    uint32 m_uiShadowBoltTargetTimer;
 
     ScriptedInstance* m_pInstance;
 
     void Reset()
     {
-        ShadowBolt_Timer = 5000;
-        RainOfFire_Timer = 7000;
-        GehennasCurse_Timer = 8000;
+        m_uiGehennasCurseTimer = urand(5 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
+        m_uiRainOfFireTimer = urand(6 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
+        m_uiShadowBoltRandomTimer = urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS);
+        m_uiShadowBoltTargetTimer = urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS);
 
         if (m_pInstance && m_creature->isAlive())
             m_pInstance->SetData(TYPE_GEHENNAS, NOT_STARTED);
@@ -65,40 +71,46 @@ struct boss_gehennasAI : public ScriptedAI
             m_pInstance->SetData(TYPE_GEHENNAS, DONE);
     }
 
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //ShadowBolt_Timer
-        if (ShadowBolt_Timer < diff)
+        // Rain of Fire
+        if (m_uiRainOfFireTimer < uiDiff)
         {
-            if (Unit* bTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 1))
-            {
-                if (DoCastSpellIfCan(bTarget, SPELL_SHADOWBOLT) == CAST_OK)
-                    ShadowBolt_Timer = 2000 + rand() % 3000;
-            }
+            if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0), SPELL_RAIN_OF_FIRE) == CAST_OK)
+                m_uiRainOfFireTimer = urand(6 * IN_MILLISECONDS, 12 * IN_MILLISECONDS);
         }
-        else ShadowBolt_Timer -= diff;
+        else
+            m_uiRainOfFireTimer -= uiDiff;
 
-        //RainOfFire_Timer
-        if (RainOfFire_Timer < diff)
+        // Gehennas' Curse
+        if (m_uiGehennasCurseTimer < uiDiff)
         {
-            if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
-            {
-                if (DoCastSpellIfCan(target, SPELL_RAINOFFIRE) == CAST_OK)
-                    RainOfFire_Timer = urand(8000, 10000);
-            }
+            if (DoCastSpellIfCan(m_creature, SPELL_GEHENNAS_CURSE) == CAST_OK)
+                m_uiGehennasCurseTimer = urand(25 * IN_MILLISECONDS, 30 * IN_MILLISECONDS);
         }
-        else RainOfFire_Timer -= diff;
+        else
+            m_uiGehennasCurseTimer -= uiDiff;
 
-        //GehennasCurse_Timer
-        if (GehennasCurse_Timer < diff)
+        // Shadow Bolt (random)
+        if (m_uiShadowBoltRandomTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_GEHENNASCURSE, CF_AURA_NOT_PRESENT) == CAST_OK)
-                GehennasCurse_Timer = urand(22000, 30000);
+            if (DoCastSpellIfCan(m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0), SPELL_SHADOW_BOLT_RANDOM) == CAST_OK)
+                m_uiShadowBoltRandomTimer = urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS);
         }
-        else GehennasCurse_Timer -= diff;
+        else
+            m_uiShadowBoltRandomTimer -= uiDiff;
+
+        // Shadow Bolt (target)
+        if (m_uiShadowBoltTargetTimer < uiDiff)
+        {
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHADOW_BOLT_TARGET) == CAST_OK)
+                m_uiShadowBoltTargetTimer = urand(3 * IN_MILLISECONDS, 6 * IN_MILLISECONDS);
+        }
+        else
+            m_uiShadowBoltTargetTimer -= uiDiff;
 
         DoMeleeAttackIfReady();
     }
