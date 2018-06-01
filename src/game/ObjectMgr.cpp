@@ -1485,7 +1485,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
 
 void ObjectMgr::LoadCreatureModelInfo()
 {
-    sCreatureModelStorage.Load();
+    sCreatureModelStorage.LoadProgressive(sWorld.GetWowPatch());
 
     // post processing
     for (uint32 i = 1; i < sCreatureModelStorage.GetMaxEntry(); ++i)
@@ -2732,7 +2732,8 @@ void ObjectMgr::LoadPetLevelInfo()
             uint32 creature_id = fields[0].GetUInt32();
             if (!sCreatureStorage.LookupEntry<CreatureInfo>(creature_id))
             {
-                sLog.outErrorDb("Wrong creature id %u in `pet_levelstats` table, ignoring.", creature_id);
+                if (!IsExistingCreatureId(creature_id))
+                    sLog.outErrorDb("Wrong creature id %u in `pet_levelstats` table, ignoring.", creature_id);
                 continue;
             }
 
@@ -5330,7 +5331,7 @@ void ObjectMgr::LoadGraveyardZones()
 {
     mGraveYardMap.clear();                                  // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT id,ghost_zone,faction FROM game_graveyard_zone");
+    QueryResult *result = WorldDatabase.PQuery("SELECT id, ghost_zone, faction FROM game_graveyard_zone WHERE build_min <= %u", SUPPORTED_CLIENT_BUILD);
 
     uint32 count = 0;
 
@@ -7015,7 +7016,7 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT inPath, outPath, inNode, outNode FROM taxi_path_transitions");
+    QueryResult *result = WorldDatabase.PQuery("SELECT inPath, outPath, inNode, outNode FROM taxi_path_transitions WHERE build_min <= %u", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -8722,7 +8723,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         {
             if (pl)
                 ChatHandler(pl).SendSysMessage(LANG_COMMAND_VENDORSELECTION);
-            else
+            else if (!IsExistingCreatureId(vendor_entry))
                 sLog.outErrorDb("Table `%s` has data for nonexistent creature (Entry: %u), ignoring", tableName, vendor_entry);
             return false;
         }
@@ -8747,7 +8748,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     {
         if (pl)
             ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);
-        else
+        else if (!IsExistingItemId(item_id))
             sLog.outErrorDb("Table `%s` for %s %u contain nonexistent item (%u), ignoring",
                             tableName, idStr, vendor_entry, item_id);
         return false;

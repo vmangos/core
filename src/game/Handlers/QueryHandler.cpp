@@ -42,10 +42,16 @@ void WorldSession::SendNameQueryOpcode(Player *p)
         return;
 
     // guess size
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 25 + 1 + 4 + 4 + 4));   // guess size
     data << ObjectGuid(p->GetObjectGuid());
     data << p->GetName();                                   // CString(48): played name
     data << uint8(0);                                       // CString(256): realm name for cross realm BG usage
+#else
+    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + 25 + 4 + 4 + 4));   // guess size
+    data << ObjectGuid(p->GetObjectGuid());
+    data << p->GetName();                                   // CString(48): played name
+#endif
     data << uint32(p->getRace());
     data << uint32(p->getGender());
     data << uint32(p->getClass());
@@ -60,10 +66,16 @@ void WorldSession::SendNameQueryOpcodeFromDB(ObjectGuid guid)
     {
         std::string name = pData->sName;
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 1 + 4 + 4 + 4));
         data << ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
         data << name;
         data << uint8(0);
+#else
+        WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4));
+        data << ObjectGuid(HIGHGUID_PLAYER, pData->uiGuid);
+        data << name;
+#endif
         data << uint32(pData->uiRace);
         data << uint32(pData->uiGender);
         data << uint32(pData->uiClass);
@@ -105,10 +117,16 @@ void WorldSession::SendNameQueryOpcodeFromDBCallBack(QueryResult *result, uint32
     }
 
     // guess size
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 1 + 4 + 4 + 4));
     data << ObjectGuid(HIGHGUID_PLAYER, lowguid);
     data << name;
     data << uint8(0);                                       // realm name for cross realm BG usage
+#else
+    WorldPacket data(SMSG_NAME_QUERY_RESPONSE, (8 + (name.size() + 1) + 4 + 4 + 4));
+    data << ObjectGuid(HIGHGUID_PLAYER, lowguid);
+    data << name;
+#endif
     data << uint32(pRace);                                  // race
     data << uint32(pGender);                                // gender
     data << uint32(pClass);                                 // class
@@ -235,8 +253,12 @@ void WorldSession::HandleGameObjectQueryOpcode(WorldPacket & recv_data)
         data << uint32(info->displayId);
         data << Name;
         data << uint8(0) << uint8(0) << uint8(0);   // name2, name3, name4
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         data << uint8(0);                           // one more name, client handles it a bit differently
         data.append(info->raw.data, 24);            // these are read as int32
+#else
+        data.append(info->raw.data, 16);            // these are read as int32
+#endif    
         //data << float(info->size);                // [-ZERO] go size: not in Zero
         SendPacket(&data);
         DEBUG_LOG("WORLD: Sent SMSG_GAMEOBJECT_QUERY_RESPONSE");

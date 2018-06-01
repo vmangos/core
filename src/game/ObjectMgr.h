@@ -561,12 +561,12 @@ class ObjectMgr
 
         // Stores all existing ids in the database, not necessarily valid or loaded.
         void LoadAllIdentifiers();
-        bool IsExistingItemId(uint32 id) { return (m_ItemIdSet.find(id) != m_ItemIdSet.end()); }
-        bool IsExistingQuestId(uint32 id) { return (m_QuestIdSet.find(id) != m_QuestIdSet.end()); }
-        bool IsExistingCreatureId(uint32 id) { return (m_CreatureIdSet.find(id) != m_CreatureIdSet.end()); }
-        bool IsExistingGameObjectId(uint32 id) { return (m_GameObjectIdSet.find(id) != m_GameObjectIdSet.end()); }
-        bool IsExistingCreatureGuid(uint32 id) { return (m_CreatureGuidSet.find(id) != m_CreatureGuidSet.end()); }
-        bool IsExistingGameObjectGuid(uint32 id) { return (m_GameObjectGuidSet.find(id) != m_GameObjectGuidSet.end()); }
+        bool IsExistingItemId(uint32 id) const { return (m_ItemIdSet.find(id) != m_ItemIdSet.end()); }
+        bool IsExistingQuestId(uint32 id) const { return (m_QuestIdSet.find(id) != m_QuestIdSet.end()); }
+        bool IsExistingCreatureId(uint32 id) const { return (m_CreatureIdSet.find(id) != m_CreatureIdSet.end()); }
+        bool IsExistingGameObjectId(uint32 id) const { return (m_GameObjectIdSet.find(id) != m_GameObjectIdSet.end()); }
+        bool IsExistingCreatureGuid(uint32 id) const { return (m_CreatureGuidSet.find(id) != m_CreatureGuidSet.end()); }
+        bool IsExistingGameObjectGuid(uint32 id) const { return (m_GameObjectGuidSet.find(id) != m_GameObjectGuidSet.end()); }
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 

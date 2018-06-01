@@ -7882,6 +7882,8 @@ bool ChatHandler::HandleModifyCastSpeedCommand(char *args)
     if (!ExtractFloat(&args, amount))
         return false;
 
+    // This field is an Int32 before 1.12.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     if (amount < 0)
     {
         SendSysMessage(LANG_BAD_VALUE);
@@ -7890,6 +7892,9 @@ bool ChatHandler::HandleModifyCastSpeedCommand(char *args)
     }
 
     player->SetFloatValue(UNIT_MOD_CAST_SPEED, amount);
+#else
+    player->SetInt32Value(UNIT_MOD_CAST_SPEED, amount);
+#endif
 
     PSendSysMessage(LANG_YOU_CHANGE_CSPD, player->GetName(), amount);
 

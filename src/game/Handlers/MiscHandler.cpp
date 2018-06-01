@@ -1086,8 +1086,9 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
         data << pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
         // Rank progress bar
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         data << (uint8)pl->GetByteValue(PLAYER_FIELD_BYTES2, 0);
-
+#endif
         SendPacket(&data);
     } else
         DEBUG_LOG("%s not found!", guid.GetString().c_str());

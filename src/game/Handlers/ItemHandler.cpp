@@ -432,7 +432,9 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
         data << pProto->ItemSet;
         data << pProto->MaxDurability;
         data << pProto->Area;
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         data << pProto->Map;                                // Added in 1.12.x & 2.0.1 client branch
+#endif
         data << pProto->BagFamily;
         SendPacket(&data);
     }

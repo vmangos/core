@@ -8181,7 +8181,11 @@ void Spell::TriggerGlobalCooldown()
     if (gcd >= 1000 && gcd <= 1500)
     {
         // apply haste rating
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         gcd = int32(float(gcd) * m_caster->GetFloatValue(UNIT_MOD_CAST_SPEED));
+#else
+        gcd = int32(float(gcd) * (1.0f + m_caster->GetInt32Value(UNIT_MOD_CAST_SPEED)/100.0f));
+#endif
 
         if (gcd < 1000)
             gcd = 1000;

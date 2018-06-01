@@ -422,7 +422,17 @@ void World::LoadConfigSettings(bool reload)
         }
     }
 
+    // Set the available content patch.
     m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+    WowPatch const maxPatch = WOW_PATCH_112;
+#else
+    WowPatch const maxPatch = WOW_PATCH_111;
+#endif
+
+    if (m_wowPatch > maxPatch)
+        m_wowPatch = maxPatch;
 
     ///- Read the player limit and the Message of the day from the config file
     SetPlayerLimit(sConfig.GetIntDefault("PlayerLimit", DEFAULT_PLAYER_LIMIT), true);
@@ -719,8 +729,18 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_UINT32_TIMERBAR_FIRE_MAX,        "TimerBar.Fire.Max", 1);
 
     setConfig(CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,      "PetUnsummonAtMount", false);
-    setConfig(CONFIG_BOOL_OUTDOORPVP_EP_ENABLE,       "OutdoorPvP.EP.Enable", true);
-    setConfig(CONFIG_BOOL_OUTDOORPVP_SI_ENABLE,       "OutdoorPvP.SI.Enable", true);
+
+    if (GetWowPatch() >= WOW_PATCH_112)
+    {
+        setConfig(CONFIG_BOOL_OUTDOORPVP_EP_ENABLE, "OutdoorPvP.EP.Enable", true);
+        setConfig(CONFIG_BOOL_OUTDOORPVP_SI_ENABLE, "OutdoorPvP.SI.Enable", true);
+    }
+    else
+    {
+        setConfig(CONFIG_BOOL_OUTDOORPVP_EP_ENABLE, false);
+        setConfig(CONFIG_BOOL_OUTDOORPVP_SI_ENABLE, false);
+    }
+
     setConfig(CONFIG_UINT32_ANTIFLOOD_SANCTION,       "Antiflood.Sanction", CHEAT_ACTION_KICK);
 
     m_relocation_ai_notify_delay = sConfig.GetIntDefault("Visibility.AIRelocationNotifyDelay", 1000u);
@@ -1645,6 +1665,7 @@ void World::SetInitialWorldSettings()
     sLog.outString();
     sLog.outString("==========================================================");
     sLog.outString("Current content is set to %s.", GetPatchName());
+    sLog.outString("Supported client build is set to %u.", SUPPORTED_CLIENT_BUILD);
     sLog.outString("==========================================================");
     sLog.outString();
 

@@ -122,7 +122,11 @@ uint32 GetSpellCastTime(SpellEntry const* spellInfo, Spell* spell)
                 modOwner->ApplySpellMod(spellInfo->Id, SPELLMOD_CASTING_TIME, castTime, spell);
 
         if (!(spellInfo->Attributes & (SPELL_ATTR_IS_ABILITY | SPELL_ATTR_TRADESPELL)))
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
             castTime = int32(castTime * spell->GetCaster()->GetFloatValue(UNIT_MOD_CAST_SPEED));
+#else
+            castTime = int32(castTime * (1.0f + spell->GetCaster()->GetInt32Value(UNIT_MOD_CAST_SPEED)/100.0f));
+#endif
         else
         {
             if (spell->IsRangedSpell() && !spell->IsAutoRepeat())

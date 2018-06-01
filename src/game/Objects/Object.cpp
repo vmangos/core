@@ -521,7 +521,9 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 IsActivateToQuest = true;
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
             updateMask->SetBit(GAMEOBJECT_ANIMPROGRESS);
+#endif
         }
     }
     if (isType(TYPEMASK_GAMEOBJECT))

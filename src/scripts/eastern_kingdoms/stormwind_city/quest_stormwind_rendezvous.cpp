@@ -971,6 +971,57 @@ CreatureAI* GetAI_npc_squire_rowe(Creature* pCreature)
     return new npc_squire_roweAI(pCreature);
 }
 
+static time_t globalWindsorLastSpawnTime = time_t(0);
+
+bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
+{
+    // Before patch 1.12, Windsor was spawned from the AreaTrigger at the Stormwind gates.
+    // Squire Rowe was added in patch 1.12, confirmed by both Allakhazam and Thottbot comments.
+    // His creature Id is also in the 1.12 range, and his display Id doesn't exist in prior clients.
+    if (sWorld.GetWowPatch() >= WOW_PATCH_112)
+        return false;
+
+    // If player is dead, GM mode is ON, quest complete or no quest.
+    if (!pPlayer || !pPlayer->isAlive() || pPlayer->isGameMaster() || !pPlayer->IsCurrentQuest(QUEST_STORMWIND_RENDEZVOUS))
+        return false;
+
+    // Cooldown before Windsor can be spawned again.
+    if (globalWindsorLastSpawnTime + 15 * MINUTE > sWorld.GetGameTime())
+        return false;
+
+    // Check if Windsor is already spawned.
+    if (GetClosestCreatureWithEntry(pPlayer, NPC_REGINALD_WINDSOR, 200.0f))
+        return false;
+
+    if (Creature* pWindsor = pPlayer->SummonCreature(NPC_REGINALD_WINDSOR,
+        WindsorSummon.x,
+        WindsorSummon.y,
+        WindsorSummon.z,
+        WindsorSummon.o, TEMPSUMMON_MANUAL_DESPAWN, 1.5 * HOUR * IN_MILLISECONDS, true))
+    {
+        auto pWindsorAI = static_cast<npc_reginald_windsorAI*>(pWindsor->AI());
+
+        if (pWindsorAI)
+        {
+            pWindsorAI->playerGUID = pPlayer->GetGUID();
+            pWindsorAI->m_squireRoweGuid = ObjectGuid();
+        }
+
+        pWindsor->Mount(MOUNT_WINDSOR);
+        pWindsor->SetWalk(false);
+        pWindsor->SetSpeedRate(MOVE_RUN, 1.0f, true);
+        pWindsor->GetMotionMaster()->MovePoint(0, WindsorDeplacement[0].x, WindsorDeplacement[0].y, WindsorDeplacement[0].z, MOVE_PATHFINDING);
+        pWindsor->SetRespawnDelay(100000000);
+        pWindsor->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
+
+        globalWindsorLastSpawnTime = sWorld.GetGameTime();
+
+        return true;
+    }
+
+    return false;
+}
+
 void AddSC_quest_stormwind_rendezvous()
 {
     Script *pNewScript;
@@ -988,5 +1039,10 @@ void AddSC_quest_stormwind_rendezvous()
     pNewScript->pQuestAcceptNPC = &QuestAccept_npc_reginald_windsor;
     pNewScript->pGossipHello = &GossipHello_npc_reginald_windsor;
     pNewScript->pGossipSelect = &GossipSelect_npc_reginald_windsor;
+    pNewScript->RegisterSelf();
+
+    pNewScript = new Script;
+    pNewScript->Name = "at_stormwind_gates";
+    pNewScript->pAreaTrigger = &AreaTrigger_at_stormwind_gates;
     pNewScript->RegisterSelf();
 }

@@ -634,10 +634,18 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         void SetGoType(GameobjectTypes type) { SetUInt32Value(GAMEOBJECT_TYPE_ID, type); }
         GOState GetGoState() const { return GOState(GetUInt32Value(GAMEOBJECT_STATE)); }
         void SetGoState(GOState state);
+
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         uint32 GetGoArtKit() const { return GetUInt32Value(GAMEOBJECT_ARTKIT); }
         void SetGoArtKit(uint32 artkit) { SetUInt32Value(GAMEOBJECT_ARTKIT, artkit); }
         uint32 GetGoAnimProgress() const { return GetUInt32Value(GAMEOBJECT_ANIMPROGRESS); }
         void SetGoAnimProgress(uint32 animprogress) { SetUInt32Value(GAMEOBJECT_ANIMPROGRESS, animprogress); }
+#else
+        uint32 GetGoArtKit() const { return 0; }
+        void SetGoArtKit(uint32 artkit) { }
+        uint32 GetGoAnimProgress() const { return 0; }
+        void SetGoAnimProgress(uint32 animprogress) { }
+#endif
         uint32 GetDisplayId() const { return GetUInt32Value(GAMEOBJECT_DISPLAYID); }
         void SetDisplayId(uint32 modelId);
 

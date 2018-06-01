@@ -462,8 +462,14 @@ void LoadDBCStores(const std::string& dataPath)
         exit(1);
     }
 
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+    #define MAX_SKILL_LINE_ABILITY_ENTRY 15030
+#else
+    #define MAX_SKILL_LINE_ABILITY_ENTRY 13817
+#endif
+
     // Check loaded DBC files proper version
-    if (!sSkillLineAbilityStore.LookupEntry(15030))
+    if (!sSkillLineAbilityStore.LookupEntry(MAX_SKILL_LINE_ABILITY_ENTRY))
     {
         sLog.outError("\nYou have _outdated_ DBC files. Please re-extract DBC files for one from client build: %s", AcceptableClientBuildsListStr().c_str());
         Log::WaitBeforeContinueIfNeed();
