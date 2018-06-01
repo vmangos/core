@@ -1485,7 +1485,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
 
 void ObjectMgr::LoadCreatureModelInfo()
 {
-    sCreatureModelStorage.LoadProgressive(sWorld.GetWowPatch());
+    sCreatureModelStorage.LoadProgressive(SUPPORTED_CLIENT_BUILD);
 
     // post processing
     for (uint32 i = 1; i < sCreatureModelStorage.GetMaxEntry(); ++i)

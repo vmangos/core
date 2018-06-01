@@ -140,7 +140,7 @@ void SQLStorage::Load(bool error_at_empty /*= true*/)
     loader.Load(*this, error_at_empty);
 }
 
-void SQLStorage::LoadProgressive(uint8 wow_patch, bool error_at_empty /*= true*/)
+void SQLStorage::LoadProgressive(uint32 wow_patch, bool error_at_empty /*= true*/)
 {
     SQLStorageLoader loader;
     loader.LoadProgressive(*this, wow_patch, error_at_empty);

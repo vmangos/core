@@ -332,7 +332,7 @@ void SQLStorageLoaderBase<DerivedLoader, StorageClass>::Load(StorageClass& store
 }
 
 template<class DerivedLoader, class StorageClass>
-void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageClass& store, uint8 wow_patch, bool error_at_empty /*= true*/)
+void SQLStorageLoaderBase<DerivedLoader, StorageClass>::LoadProgressive(StorageClass& store, uint32 wow_patch, bool error_at_empty /*= true*/)
 {
     // To be used on tables that need to support patch progression. Second column must be the `patch` column.
     Field* fields = nullptr;

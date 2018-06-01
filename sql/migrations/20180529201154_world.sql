@@ -37,10 +37,10 @@ DELETE FROM `gameobject_template` WHERE `entry` IN (181624, 181625, 181626, 1816
 
 -- Add patch key to model info.
 ALTER TABLE `creature_model_info`
-	ADD COLUMN `patch` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `modelid`,
+	ADD COLUMN `patch` SMALLINT(4) UNSIGNED NOT NULL DEFAULT '0' AFTER `modelid`,
 	DROP PRIMARY KEY,
 	ADD PRIMARY KEY (`modelid`, `patch`);
-UPDATE `creature_model_info` SET `patch`=10 WHERE `modelid` IN (16786, 16793, 16794, 16806, 16834, 16835, 16836, 16837, 16908, 16941, 16942, 16943, 17008, 17144, 17146, 17158, 17166, 17202, 17203, 17250, 17251, 17273, 17328, 17404, 17405, 17445, 17548);
+UPDATE `creature_model_info` SET `patch`=5875 WHERE `modelid` IN (16786, 16793, 16794, 16806, 16834, 16835, 16836, 16837, 16908, 16941, 16942, 16943, 17008, 17144, 17146, 17158, 17166, 17202, 17203, 17250, 17251, 17273, 17328, 17404, 17405, 17445, 17548);
 
 -- Remove Felguard TBC pet from pet level stats table.
 DELETE FROM `pet_levelstats` WHERE `creature_entry`=17252;
