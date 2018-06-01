@@ -43,7 +43,6 @@ ScriptMapMap sEventScripts;
 ScriptMapMap sGossipScripts;
 ScriptMapMap sCreatureMovementScripts;
 ScriptMapMap sCreatureAIScripts;
-ScriptMapMap sMapEventScripts;
 
 INSTANTIATE_SINGLETON_1(ScriptMgr);
 
@@ -1188,11 +1187,6 @@ void ScriptMgr::LoadCreatureMovementScripts()
     // checks are done in WaypointManager::Load
 }
 
-void ScriptMgr::LoadMapEventScripts()
-{
-    LoadScripts(sMapEventScripts, "map_event_scripts");
-}
-
 void ScriptMgr::LoadCreatureEventAIScripts()
 {
     LoadScripts(sCreatureAIScripts, "creature_ai_scripts");
@@ -2138,7 +2132,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
             delete result;
         }
 
-        //From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
+        // From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
         result = WorldDatabase.PQuery("SELECT dataint2 FROM %s WHERE command=10 && dataint2!=0", script_tables[i]);
 
         if (result)
@@ -2164,6 +2158,24 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 uint32 event1 = fields[0].GetUInt32();
                 if (event1)
                     eventIds.insert(event1);
+            } while (result->NextRow());
+            delete result;
+        }
+
+        // From SCRIPT_COMMAND_START_MAP_EVENT and SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET.
+        result = WorldDatabase.PQuery("SELECT dataint2, dataint4 FROM %s WHERE command IN (61, 63)", script_tables[i]);
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 event1 = fields[0].GetUInt32();
+                if (event1)
+                    eventIds.insert(event1);
+                uint32 event2 = fields[1].GetUInt32();
+                if (event2)
+                    eventIds.insert(event2);
             } while (result->NextRow());
             delete result;
         }

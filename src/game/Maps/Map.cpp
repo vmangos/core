@@ -1063,16 +1063,16 @@ bool ScriptedEvent::UpdateEvent()
 void ScriptedEvent::EndEvent(bool bSuccess)
 {
     if (bSuccess && m_uiSuccessScript)
-        m_pMap->ScriptsStart(sMapEventScripts, m_uiSuccessScript, m_pSource, m_pTarget);
+        m_pMap->ScriptsStart(sEventScripts, m_uiSuccessScript, m_pSource, m_pTarget);
     else if (!bSuccess && m_uiFailureScript)
-        m_pMap->ScriptsStart(sMapEventScripts, m_uiFailureScript, m_pSource, m_pTarget);
+        m_pMap->ScriptsStart(sEventScripts, m_uiFailureScript, m_pSource, m_pTarget);
 
     for (const auto& target : m_vTargets)
     {
         if (bSuccess && target.uiSuccessScript)
-            m_pMap->ScriptsStart(sMapEventScripts, target.uiSuccessScript, m_pSource, m_pTarget);
+            m_pMap->ScriptsStart(sEventScripts, target.uiSuccessScript, m_pSource, m_pTarget);
         else if (!bSuccess && target.uiFailureScript)
-            m_pMap->ScriptsStart(sMapEventScripts, target.uiFailureScript, m_pSource, m_pTarget);
+            m_pMap->ScriptsStart(sEventScripts, target.uiFailureScript, m_pSource, m_pTarget);
     }
 }
 
