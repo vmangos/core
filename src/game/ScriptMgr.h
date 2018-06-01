@@ -98,7 +98,7 @@ enum eScriptCommand
                                                             // datalong3 = unique_limit
                                                             // datalong4 = unique_distance
                                                             // dataint = eSummonCreatureFlags
-                                                            // dataint2 = eSummonCreatureFacingOptions
+                                                            // dataint2 = script_id
                                                             // dataint3 = attack_target (see enum Target)
                                                             // dataint4 = despawn_type (see enum TempSummonType)
                                                             // x/y/z/o = coordinates
@@ -284,8 +284,13 @@ enum eScriptCommand
                                                             // datalong3 = eSendMapEventOptions
     SCRIPT_COMMAND_SET_DEFAULT_MOVEMENT     = 67,           // source = Creature
                                                             // datalong = movement_type
-                                                            // datalong = (bool) always_replace
+                                                            // datalong2 = (bool) always_replace
                                                             // datalong3 = param1
+    SCRIPT_COMMAND_START_SCRIPT_FOR_ALL     = 68,           // source = WorldObject
+                                                            // datalong = script_id
+                                                            // datalong2 = eStartScriptForAllOptions
+                                                            // datalong3 = object_entry
+                                                            // datalong4 = search_radius
     
     SCRIPT_COMMAND_MAX,
 
@@ -328,13 +333,6 @@ enum eSummonCreatureFlags
     SF_SUMMONCREATURE_ACTIVE      = 0x2,                         // active creatures are always updated
     SF_SUMMONCREATURE_UNIQUE      = 0x4,                         // not actually unique, just checks for same entry in certain range
     SF_SUMMONCREATURE_UNIQUE_TEMP = 0x8                          // same as 0x10 but check for TempSummon only creatures
-};
-
-// Possible dataint2 values for SCRIPT_COMMAND_TEMP_SUMMON_CREATURE
-enum eSummonCreatureFacingOptions
-{
-    SO_SUMMONCREATURE_FACE_SUMMONER = 1,                         // Creature will face the summoner.
-    SO_SUMMONCREATURE_FACE_TARGET   = 2                          // Creature will face the provided target object.
 };
 
 // Flags used by SCRIPT_COMMAND_PLAY_SOUND
@@ -439,6 +437,17 @@ enum eSendMapEventOptions
     SO_SENDMAPEVENT_MAX
 };
 
+// Possible datalong2 values for SCRIPT_COMMAND_START_SCRIPT_FOR_ALL
+enum eStartScriptForAllOptions
+{
+    SO_STARTFORALL_GAMEOBJECTS  = 0,
+    SO_STARTFORALL_UNITS        = 1,
+    SO_STARTFORALL_CREATURES    = 2,
+    SO_STARTFORALL_PLAYERS      = 3,
+
+    SO_STARTFORALL_MAX
+};
+
 enum eDataFlags
 {
     SF_GENERAL_SWAP_INITIAL_TARGETS = 0x1,                  // Swaps the provided source and target, before buddy is checked.
@@ -537,7 +546,7 @@ struct ScriptInfo
             uint32 uniqueDistance;                          // datalong4
             uint32 unused;                                  // data_flags
             int32 flags;                                    // dataint
-            int32 facingLogic;                              // dataint2
+            int32 scriptId;                                 // dataint2
             int32 attackTarget;                             // dataint3
             int32 despawnType;                              // dataint4
         } summonCreature;
@@ -881,6 +890,14 @@ struct ScriptInfo
             uint32 alwaysReplace;                           // datalong2
             uint32 param1;                                  // datalong3
         } setDefaultMovement;
+
+        struct                                              // SCRIPT_COMMAND_START_SCRIPT_FOR_ALL (68)
+        {
+            uint32 scriptId;                                // datalong
+            uint32 objectType;                              // datalong2
+            uint32 objectEntry;                             // datalong3
+            uint32 searchRadius;                            // datalong4
+        } startScriptForAll;
 
         struct
         {

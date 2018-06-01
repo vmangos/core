@@ -1002,6 +1002,62 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_START_SCRIPT_FOR_ALL:
+            {
+                if (!tmp.startScriptForAll.searchRadius)
+                {
+                    sLog.outErrorDb("Table `%s` has datalong4 = %u in SCRIPT_COMMAND_START_SCRIPT_FOR_ALL for script id %u.", tablename, tmp.startScriptForAll.searchRadius, tmp.id);
+                    continue;
+                }
+                switch (tmp.startScriptForAll.objectType)
+                {
+                    case SO_STARTFORALL_GAMEOBJECTS:
+                    {
+                        if (tmp.startScriptForAll.objectEntry)
+                        {
+                            if (!ObjectMgr::GetGameObjectInfo(tmp.startScriptForAll.objectEntry))
+                            {
+                                if (!sObjectMgr.IsExistingGameObjectId(tmp.startScriptForAll.objectEntry))
+                                {
+                                    sLog.outErrorDb("Table `%s` has gameobject with invalid entry (datalong3: %u) in SCRIPT_COMMAND_START_SCRIPT_FOR_ALL for script id %u", tablename, tmp.startScriptForAll.objectEntry, tmp.id);
+                                    continue;
+                                }
+                                else
+                                    DisableScriptAction(tmp);
+                            }
+                        }
+                        break;
+                    }
+                    case SO_STARTFORALL_CREATURES:
+                    {
+                        if (tmp.startScriptForAll.objectEntry)
+                        {
+                            if (!ObjectMgr::GetCreatureTemplate(tmp.startScriptForAll.objectEntry))
+                            {
+                                if (!sObjectMgr.IsExistingCreatureId(tmp.startScriptForAll.objectEntry))
+                                {
+                                    sLog.outErrorDb("Table `%s` has invalid creature (datalong3: %u) in SCRIPT_COMMAND_START_SCRIPT_FOR_ALL for script id %u", tablename, tmp.startScriptForAll.objectEntry, tmp.id);
+                                    continue;
+                                }
+                                else
+                                    DisableScriptAction(tmp);
+                            }
+                        }
+                        break;
+                    }
+                    case SO_STARTFORALL_UNITS:
+                    case SO_STARTFORALL_PLAYERS:
+                    {
+                        break;
+                    } 
+                    default:
+                    {
+                        sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_START_SCRIPT_FOR_ALL for script id %u.", tablename, tmp.startScriptForAll.objectType, tmp.id);
+                        continue;
+                    }
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
@@ -2058,6 +2114,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
 
     for (uint8 i = 0; i < 9; i++)
     {
+        // From SCRIPT_COMMAND_START_SCRIPT.
         result = WorldDatabase.PQuery("SELECT datalong, datalong2, datalong3, datalong4 FROM %s WHERE command=39", script_tables[i]);
 
         if (result)
@@ -2077,6 +2134,36 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 uint32 event4 = fields[3].GetUInt32();
                 if (event4)
                     eventIds.insert(event4);
+            } while (result->NextRow());
+            delete result;
+        }
+
+        //From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
+        result = WorldDatabase.PQuery("SELECT dataint2 FROM %s WHERE command=10 && dataint2!=0", script_tables[i]);
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 event1 = fields[0].GetUInt32();
+                if (event1)
+                    eventIds.insert(event1);
+            } while (result->NextRow());
+            delete result;
+        }
+
+        // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
+        result = WorldDatabase.PQuery("SELECT datalong FROM %s WHERE command=68", script_tables[i]);
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 event1 = fields[0].GetUInt32();
+                if (event1)
+                    eventIds.insert(event1);
             } while (result->NextRow());
             delete result;
         }

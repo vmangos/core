@@ -384,20 +384,7 @@ bool Map::ScriptCommand_SummonCreature(const ScriptInfo& script, WorldObject* so
         }
     }
 
-    float orientation = o;
-
-    if ((script.summonCreature.facingLogic == SO_SUMMONCREATURE_FACE_SUMMONER) || (script.summonCreature.facingLogic == SO_SUMMONCREATURE_FACE_TARGET))
-    {
-        WorldObject* facingTarget = ((script.summonCreature.facingLogic == SO_SUMMONCREATURE_FACE_TARGET) && target && target->isType(TYPEMASK_WORLDOBJECT)) ? static_cast<WorldObject*>(target) : pSummoner;
-
-        float dx = facingTarget->GetPositionX() - x;
-        float dy = facingTarget->GetPositionY() - y;
-
-        orientation = atan2(dy, dx);
-        orientation = (orientation >= 0) ? orientation : 2 * M_PI_F + orientation;
-    }
-
-    Creature* pCreature = pSummoner->SummonCreature(script.summonCreature.creatureEntry, x, y, z, orientation,
+    Creature* pCreature = pSummoner->SummonCreature(script.summonCreature.creatureEntry, x, y, z, o,
         TempSummonType(script.summonCreature.despawnType), script.summonCreature.despawnDelay, script.summonCreature.flags & SF_SUMMONCREATURE_ACTIVE);
 
     if (!pCreature)
@@ -430,6 +417,9 @@ bool Map::ScriptCommand_SummonCreature(const ScriptInfo& script, WorldObject* so
             }
         }
     }
+
+    if (script.summonCreature.scriptId)
+        ScriptsStart(sEventScripts, script.summonCreature.scriptId, pCreature, target);
 
     return false;
 }
@@ -1840,5 +1830,61 @@ bool Map::ScriptCommand_SetDefaultMovement(const ScriptInfo& script, WorldObject
     if (pSource->isAlive())
         pSource->GetMotionMaster()->InitializeNewDefault(script.setDefaultMovement.alwaysReplace);
 
+    return false;
+}
+
+// SCRIPT_COMMAND_START_SCRIPT_FOR_ALL (68)
+bool Map::ScriptCommand_StartScriptForAll(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    if (!source)
+    {
+        sLog.outError("SCRIPT_COMMAND_START_SCRIPT_FOR_ALL (script id %u) call for a NULL source, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    std::list<WorldObject *> targets;
+
+    MaNGOS::AllWorldObjectsInRange u_check(source, script.startScriptForAll.searchRadius);
+    MaNGOS::WorldObjectListSearcher<MaNGOS::AllWorldObjectsInRange> searcher(targets, u_check);
+
+    Cell::VisitAllObjects(source, searcher, script.startScriptForAll.searchRadius);
+
+    for (auto pWorldObject : targets)
+    {
+        if (!pWorldObject)
+            continue;
+
+        switch (script.startScriptForAll.objectType)
+        {
+            case SO_STARTFORALL_GAMEOBJECTS:
+            {
+                if (!pWorldObject->IsGameObject())
+                    continue;
+                break;
+            }
+            case SO_STARTFORALL_UNITS:
+            {
+                if (!pWorldObject->IsUnit())
+                    continue;
+                break;
+            }
+            case SO_STARTFORALL_CREATURES:
+            {
+                if (!pWorldObject->IsCreature())
+                    continue;
+                break;
+            }
+            case SO_STARTFORALL_PLAYERS:
+            {
+                if (!pWorldObject->IsPlayer())
+                    continue;
+                break;
+            }
+        }
+
+        if (!script.startScriptForAll.objectEntry || (pWorldObject->GetEntry() == script.startScriptForAll.objectEntry))
+            ScriptsStart(sEventScripts, script.startScriptForAll.scriptId, pWorldObject, target);
+    }
+    
     return false;
 }
