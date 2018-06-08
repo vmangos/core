@@ -567,6 +567,7 @@ class ObjectMgr
         bool IsExistingGameObjectId(uint32 id) const { return (m_GameObjectIdSet.find(id) != m_GameObjectIdSet.end()); }
         bool IsExistingCreatureGuid(uint32 id) const { return (m_CreatureGuidSet.find(id) != m_CreatureGuidSet.end()); }
         bool IsExistingGameObjectGuid(uint32 id) const { return (m_GameObjectGuidSet.find(id) != m_GameObjectGuidSet.end()); }
+        bool IsExistingSpellId(uint32 id) const { return (m_SpellIdSet.find(id) != m_SpellIdSet.end()); }
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
@@ -1365,6 +1366,7 @@ class ObjectMgr
         std::set<uint32> m_GameObjectIdSet;
         std::set<uint32> m_CreatureGuidSet;
         std::set<uint32> m_GameObjectGuidSet;
+        std::set<uint32> m_SpellIdSet;
 
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
         // PetLevelInfoMap[creature_id][level]

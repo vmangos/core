@@ -35,6 +35,7 @@
 #include "Utilities/UnorderedMapSet.h"
 
 #include <map>
+#include <memory>
 
 class Player;
 class Spell;
@@ -53,7 +54,8 @@ enum SpellAttributeCustom
     SPELL_CUSTOM_CHAN_NO_DIST_LIMIT         = 0x008,
     SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,
     SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
-    SPELL_CUSTOM_FROM_BEHIND                = 0x040     // For spells that require the caster to be behind the target
+    SPELL_CUSTOM_FROM_BEHIND                = 0x040,     // For spells that require the caster to be behind the target
+    SPELL_CUSTOM_FROM_FRONT                 = 0x080,     // For spells that require the target to be in front of the caster
 };
 
 // only used in code
@@ -938,8 +940,7 @@ inline bool IsProfessionOrRidingSkill(uint32 skill)
     return  IsProfessionSkill(skill) || skill == SKILL_RIDING;
 }
 
-typedef std::map<uint32, uint32> SpellFacingFlagMap;
-typedef std::vector<SpellEntry*> SpellEntryMap;
+typedef std::vector<std::unique_ptr<SpellEntry>> SpellEntryMap;
 
 class SpellMgr
 {
@@ -1140,14 +1141,6 @@ class SpellMgr
                 return &itr->second;
 
             return NULL;
-        }
-
-        uint32 GetSpellFacingFlag(uint32 spellId) const
-        {
-            SpellFacingFlagMap::const_iterator itr =  mSpellFacingFlagMap.find(spellId);
-            if(itr != mSpellFacingFlagMap.end())
-                return itr->second;
-            return 0x0;
         }
 
         // Spell target coordinates
@@ -1355,24 +1348,33 @@ class SpellMgr
         void LoadSkillRaceClassInfoMap();
         void LoadSpellPetAuras();
         void LoadSpellAreas();
-        void LoadFacingCasterFlags();
 
         // SPELL GROUPS
         void LoadSpellGroups();
         void LoadSpellGroupStackRules();
         // SpellEntry
         void LoadSpells();
-        SpellEntry const* GetSpellEntry(uint32 spellId) const { return spellId < GetMaxSpellId() ? mSpellEntryMap[spellId] : NULL; }
+        SpellEntry const* GetSpellEntry(uint32 spellId) const { return spellId < GetMaxSpellId() ? mSpellEntryMap[spellId].get() : nullptr; }
         uint32 GetMaxSpellId() const { return mSpellEntryMap.size(); }
             // spell_mod
-        bool SetSpellEntry(uint32 id, SpellEntry* ptr)
+        SpellEntry const*  OverwriteSpellEntry(uint32 id)
         {
             if (id < GetMaxSpellId())
             {
-                mSpellEntryMap[id] = ptr;
-                return true;
+                std::unique_ptr<SpellEntry> newSpell = std::make_unique<SpellEntry>();
+                newSpell->EquippedItemClass = -1;
+                for (uint32 i = 0; i < 8; ++i)
+                {
+                    std::stringstream name;
+                    name << "CustomSpell";
+                    newSpell->SpellName[i] = new char[name.str().size() + 1];
+                    strcpy(newSpell->SpellName[i], name.str().c_str());
+                }
+                newSpell->InitCachedValues();
+                mSpellEntryMap[id] = std::move(newSpell);
+                return mSpellEntryMap[id].get();
             }
-            return false;
+            return nullptr;
         }
 
     private:
@@ -1397,7 +1399,6 @@ class SpellMgr
         SpellAreaForQuestMap mSpellAreaForQuestEndMap;
         SpellAreaForAuraMap  mSpellAreaForAuraMap;
         SpellAreaForAreaMap  mSpellAreaForAreaMap;
-        SpellFacingFlagMap  mSpellFacingFlagMap;
 
         // SPELL GROUPS
         SpellSpellGroupMap mSpellSpellGroup;

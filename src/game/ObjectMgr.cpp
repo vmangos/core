@@ -254,6 +254,20 @@ void ObjectMgr::LoadAllIdentifiers()
         } while (result->NextRow());
         delete result;
     }
+
+    m_SpellIdSet.clear();
+    result = WorldDatabase.Query("SELECT DISTINCT ID FROM spell_template");
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 id = fields[0].GetUInt32();
+            m_SpellIdSet.insert(id);
+        } while (result->NextRow());
+        delete result;
+    }
 }
 
 // Nostalrius
@@ -6423,7 +6437,7 @@ void ObjectMgr::LoadFactions()
     sLog.outString("Loading factions ...");
 
     // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM faction");
+    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM faction WHERE build=%u", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -6435,7 +6449,7 @@ void ObjectMgr::LoadFactions()
     delete result;
 
     // Actually loading the factions.
-    result = WorldDatabase.Query("SELECT * FROM faction");
+    result = WorldDatabase.PQuery("SELECT * FROM faction WHERE build=%u", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -6496,7 +6510,7 @@ void ObjectMgr::LoadFactions()
     delete result;
 
     // Getting the maximum ID.
-    result = WorldDatabase.Query("SELECT MAX(ID) FROM faction_template");
+    result = WorldDatabase.PQuery("SELECT MAX(ID) FROM faction_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -6508,7 +6522,7 @@ void ObjectMgr::LoadFactions()
     delete result;
 
     // Actually loading the faction templates.
-    result = WorldDatabase.Query("SELECT * FROM faction_template");
+    result = WorldDatabase.PQuery("SELECT * FROM faction_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -7473,7 +7487,17 @@ void ObjectMgr::LoadBroadcastTexts()
         bct.EmoteDelay0 = fields[9].GetUInt32();
         bct.EmoteDelay1 = fields[10].GetUInt32();
         bct.EmoteDelay2 = fields[11].GetUInt32();
-        
+
+        // Prior to 1.12, the %s parameter was not used. Emotes have the source object's name automatically appended to the beginning.
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
+        if ((bct.Type == CHAT_TYPE_TEXT_EMOTE))
+        {
+            if ((bct.MaleText[LOCALE_enUS].size() > 3) && (bct.MaleText[LOCALE_enUS].at(0) == '%') && (bct.MaleText[LOCALE_enUS].at(1) == 's'))
+                bct.MaleText[LOCALE_enUS] = bct.MaleText[LOCALE_enUS].substr(3, bct.MaleText[LOCALE_enUS].size() - 3);
+            if ((bct.FemaleText[LOCALE_enUS].size() > 3) && (bct.FemaleText[LOCALE_enUS].at(0) == '%') && (bct.FemaleText[LOCALE_enUS].at(1) == 's'))
+                bct.FemaleText[LOCALE_enUS] = bct.FemaleText[LOCALE_enUS].substr(3, bct.FemaleText[LOCALE_enUS].size() - 3);
+        }
+#endif  
 
         if (bct.SoundId)
         {
@@ -7565,6 +7589,13 @@ void ObjectMgr::LoadBroadcastTextLocales()
             std::string str = fields[i].GetCppString();
             if (!str.empty())
             {
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
+                if ((bct->second.Type == CHAT_TYPE_TEXT_EMOTE))
+                {
+                    if ((str.size() > 3) && (str.at(0) == '%') && (str.at(1) == 's'))
+                        str = str.substr(3, str.size() - 3);
+                }
+#endif  
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if (idx >= 0)
                 {
@@ -7583,6 +7614,13 @@ void ObjectMgr::LoadBroadcastTextLocales()
             std::string str = fields[8 + i].GetCppString();
             if (!str.empty())
             {
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
+                if ((bct->second.Type == CHAT_TYPE_TEXT_EMOTE))
+                {
+                    if ((str.size() > 3) && (str.at(0) == '%') && (str.at(1) == 's'))
+                        str = str.substr(3, str.size() - 3);
+                }
+#endif  
                 int idx = GetOrNewIndexForLocale(LocaleConstant(i));
                 if (idx >= 0)
                 {
@@ -8137,7 +8175,8 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         SpellEntry const *spellinfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellinfo)
         {
-            sLog.outErrorDb("Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
+            if (!IsExistingSpellId(spell))
+                sLog.outErrorDb("Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
             continue;
         }
 

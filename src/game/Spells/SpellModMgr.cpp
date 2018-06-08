@@ -95,27 +95,10 @@ void SpellModMgr::LoadSpellMods()
 #ifdef ENABLE_INSERT_NEW_SPELLS
             if (!sSpellMgr.GetSpellEntry(spellid))
             {
-                SpellEntry* newSpell = new SpellEntry;
-                if (!sSpellMgr.SetSpellEntry(spellid, newSpell))
+                if (!sSpellMgr.OverwriteSpellEntry(spellid))
                 {
                     OUT_ERR("Unable to create spell %u, skipping.", spellid);
-                    delete newSpell;
                     continue;
-                }
-                else
-                {
-                    // Certaines valeurs sont a -1 par defaut.
-                    newSpell->EquippedItemClass = -1;
-                    for (uint32 i = 0; i < 8; ++i)
-                    {
-                        std::stringstream name;
-                        name << "CustomSpell";
-                        newSpell->SpellName[i] = new char[name.str().size() + 1];
-                        strcpy(newSpell->SpellName[i], name.str().c_str());
-                        //sprintf (loader->SpellName[i], "CustomSpell%u", spellid);
-                        //sprintf (loader->Rank[i], "Custom");
-                    }
-                    newSpell->InitCachedValues();
                 }
             }
 #endif

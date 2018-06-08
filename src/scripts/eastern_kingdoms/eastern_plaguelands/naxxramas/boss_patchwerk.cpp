@@ -37,7 +37,7 @@ enum
     SPELL_HATEFULSTRIKE   = 28308,
     SPELL_ENRAGE          = 28131, // 5% enrage soft enrage
     SPELL_BERSERK         = 27680, // 7min hard enrage
-    SPELL_SLIMEBOLT       = 32309
+    SPELL_SLIMEBOLT       = 32309  // Added in patch 1.12
 };
 
 constexpr float MELEE_DISTANCE = 5.0; 
@@ -112,7 +112,9 @@ struct boss_patchwerkAI : public ScriptedAI
             
         m_events.ScheduleEvent(EVENT_BERSERK, BERSERK_TIMER);
         m_events.ScheduleEvent(EVENT_HATEFULSTRIKE, HATEFUL_CD);
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         m_events.ScheduleEvent(EVENT_SLIMEBOLT, SLIMEBOLT_INITIAL);
+#endif
     }
 
     void DoHatefulStrike()

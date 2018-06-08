@@ -201,12 +201,14 @@ bool CreatureLinkingMgr::IsLinkingEntryValid(uint32 slaveEntry, CreatureLinkingI
 
         if (!slaveData)
         {
-            sLog.outErrorDb("`creature_linking` has a non existing slave (guid: %u, master_guid %u), skipped", slaveEntry, pTmp->masterId);
+            if (!sObjectMgr.IsExistingCreatureGuid(slaveEntry))
+                sLog.outErrorDb("`creature_linking` has a non existing slave (guid: %u, master_guid %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
         if (!masterData)
         {
-            sLog.outErrorDb("`creature_linking` has a non existing master (guid: %u,, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
+            if (!sObjectMgr.IsExistingCreatureGuid(pTmp->masterId))
+                sLog.outErrorDb("`creature_linking` has a non existing master (guid: %u,, master_guid: %u), skipped", slaveEntry, pTmp->masterId);
             return false;
         }
         if (slaveData->mapid != masterData->mapid)
