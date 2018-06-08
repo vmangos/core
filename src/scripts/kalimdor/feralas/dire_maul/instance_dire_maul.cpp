@@ -1442,7 +1442,7 @@ struct go_fixed_trap : public GameObjectAI
                 pSlipkik->DeleteThreatList();
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
                 pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                pSlipkik->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pSlipkik->CastSpell(pSlipkik, SPELL_ICE_LOCK, true, NULL);
                 me->SendGameObjectCustomAnim();
                 me->Delete();

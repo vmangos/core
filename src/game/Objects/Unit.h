@@ -497,7 +497,7 @@ enum UnitFlags
     UNIT_FLAG_PET_RENAME            = 0x00000010,           // Old pet rename: moved to UNIT_FIELD_BYTES_2,2 in TBC+
     UNIT_FLAG_PET_ABANDON           = 0x00000020,           // Old pet abandon: moved to UNIT_FIELD_BYTES_2,2 in TBC+
     UNIT_FLAG_UNK_6                 = 0x00000040,
-    UNIT_FLAG_OOC_NOT_ATTACKABLE    = 0x00000100,           // (OOC Out Of Combat) Can not be attacked when not in combat. Removed if unit for some reason enter combat (flag probably removed for the attacked and it's party/group only)
+    UNIT_FLAG_IMMUNE_TO_PLAYER      = 0x00000100,           // Target is immune to players
     UNIT_FLAG_PASSIVE               = 0x00000200,           // makes you unable to attack everything. Almost identical to our "civilian"-term. Will ignore it's surroundings and not engage in combat unless "called upon" or engaged by another unit.
     UNIT_FLAG_PVP                   = 0x00001000,
     UNIT_FLAG_SILENCED              = 0x00002000,           // silenced, 2.1.1
@@ -1295,8 +1295,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         bool IsValidAttackTarget(Unit const* target) const;
         bool _IsValidAttackTarget(Unit const* target, SpellEntry const* bySpell = nullptr, WorldObject const* obj = nullptr) const;
-        bool isTargetableForAttack(bool inversAlive = false) const;
-        bool isAttackableByAOE(bool requireDeadTarget = false) const;
+        bool isTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
+        bool isAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
         bool isPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }
 
         virtual bool IsInWater() const;

@@ -177,7 +177,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0)
+    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -2394,8 +2394,11 @@ bool Creature::LoadCreatureAddon(bool reload)
     if (!cainfo)
         return false;
 
-    if (cainfo->mount != 0)
-        Mount(cainfo->mount);
+    if (!reload)
+        m_mountId = cainfo->mount;
+
+    if (m_mountId != 0)
+        Mount(m_mountId);
 
     if (cainfo->bytes1 != 0)
     {

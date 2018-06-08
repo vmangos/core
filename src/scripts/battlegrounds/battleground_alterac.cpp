@@ -2910,7 +2910,7 @@ bool QuestComplete_npc_AVBlood_collector(Player* pPlayer, Creature* pQuestGiver,
                 {
                     pEscortAI->Start(true, NULL, NULL, false);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 }
             }
@@ -3124,7 +3124,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                 pCreature->setFaction(1194);
                 pEscortAI->Start(true, NULL, NULL, false);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 pCreature->SetWalk(false);
                 pCreature->setFaction(pPlayer->getFaction());
@@ -3151,7 +3151,7 @@ bool GossipHello_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature)
                 pCreature->setFaction(1194);
                 pEscortAI->Start(true, NULL, NULL, false);
                 pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                 pCreature->SetWalk(false);
                 pCreature->setFaction(pPlayer->getFaction());
@@ -3693,7 +3693,7 @@ bool QuestComplete_AV_npc_troops_chief(Player* pPlayer, Creature* pQuestGiver, Q
                 {
                     pEscortAI->Start(true, NULL, NULL, false);
                     pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                    pQuestGiver->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                     pQuestGiver->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                     pQuestGiver->SetWalk(true);
                 }
@@ -3919,7 +3919,7 @@ bool GossipSelect_npc_AVBlood_collector(Player* pPlayer, Creature* pCreature, ui
                             pEscortAI->Start(true, NULL, NULL, false);
                             //pCreature->setFaction(pPlayer->getFaction());
                             pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE);
+                            pCreature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                             pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
                         }
                         break;

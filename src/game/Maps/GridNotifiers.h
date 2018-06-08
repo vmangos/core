@@ -853,7 +853,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-                if (!u->isTargetableForAttack())
+                if (!u->isTargetableForAttack(false, i_originalCaster->IsPlayer()))
                     return false;
 
                 // ignore totems as AoE targets
@@ -895,7 +895,7 @@ namespace MaNGOS
             bool operator()(Unit* u)
             {
                 // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-                if (!u->isTargetableForAttack())
+                if (!u->isTargetableForAttack(false, i_obj->IsPlayer()))
                     return false;
 
                 if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsImmuneToAoe())

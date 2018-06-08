@@ -1069,10 +1069,13 @@ void ScriptedEvent::EndEvent(bool bSuccess)
 
     for (const auto& target : m_vTargets)
     {
+        if (!target.pObject)
+            continue;
+
         if (bSuccess && target.uiSuccessScript)
-            m_pMap->ScriptsStart(sEventScripts, target.uiSuccessScript, m_pSource, m_pTarget);
+            m_pMap->ScriptsStart(sEventScripts, target.uiSuccessScript, target.pObject, m_pTarget);
         else if (!bSuccess && target.uiFailureScript)
-            m_pMap->ScriptsStart(sEventScripts, target.uiFailureScript, m_pSource, m_pTarget);
+            m_pMap->ScriptsStart(sEventScripts, target.uiFailureScript, target.pObject, m_pTarget);
     }
 }
 

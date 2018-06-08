@@ -578,7 +578,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             }
             case SCRIPT_COMMAND_SET_FACTION:
             {
-                if (tmp.faction.factionId && !sObjectMgr.GetFactionEntry(tmp.faction.factionId))
+                if (tmp.faction.factionId && !sObjectMgr.GetFactionTemplateEntry(tmp.faction.factionId))
                 {
                     sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_SET_FACTION for script id %u, but this faction does not exist.", tablename, tmp.faction.factionId, tmp.id);
                     continue;
@@ -1053,6 +1053,23 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                     {
                         sLog.outErrorDb("Table `%s` has datalong2 = %u in SCRIPT_COMMAND_START_SCRIPT_FOR_ALL for script id %u.", tablename, tmp.startScriptForAll.objectType, tmp.id);
                         continue;
+                    }
+                }
+                break;
+            }
+            case SCRIPT_COMMAND_FAIL_QUEST:
+            {
+                if (!sObjectMgr.GetQuestTemplate(tmp.failQuest.questId))
+                {
+                    if (!sObjectMgr.IsExistingQuestId(tmp.failQuest.questId))
+                    {
+                        sLog.outErrorDb("Table `%s` has invalid quest (ID: %u) in SCRIPT_COMMAND_FAIL_QUEST in `datalong` for script id %u", tablename, tmp.failQuest.questId, tmp.id);
+                        continue;
+                    }
+                    else
+                    {
+                        DisableScriptAction(tmp);
+                        break;
                     }
                 }
                 break;
@@ -2162,8 +2179,8 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
             delete result;
         }
 
-        // From SCRIPT_COMMAND_START_MAP_EVENT and SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET.
-        result = WorldDatabase.PQuery("SELECT dataint2, dataint4 FROM %s WHERE command IN (61, 63)", script_tables[i]);
+        // From SCRIPT_COMMAND_START_MAP_EVENT, SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET and SCRIPT_COMMAND_EDIT_MAP_EVENT.
+        result = WorldDatabase.PQuery("SELECT dataint2, dataint4 FROM %s WHERE command IN (61, 63, 69)", script_tables[i]);
 
         if (result)
         {
@@ -2540,12 +2557,12 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
         case TARGET_T_MAP_EVENT_SOURCE:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
                 if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
-                    pEvent->m_pSource;
+                    return pEvent->m_pSource;
             break;
         case TARGET_T_MAP_EVENT_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
                 if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
-                    pEvent->m_pTarget;
+                    return pEvent->m_pTarget;
             break;
         case TARGET_T_MAP_EVENT_EXTRA_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))

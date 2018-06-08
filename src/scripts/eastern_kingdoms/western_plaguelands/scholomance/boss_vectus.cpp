@@ -296,7 +296,7 @@ struct npc_scholomance_studentAI : public ScriptedAI
         m_creature->RemoveAllAuras();
         m_creature->DeleteThreatList();
         m_creature->CombatStop(true);
-        m_creature->LoadCreatureAddon();
+        m_creature->LoadCreatureAddon(true);
 
         if (isTransformed)
             m_creature->AddAura(SPELL_VIEWING_ROOM_STUDENT_TRANSFORM_EFFECT, ADD_AURA_NO_OPTION, m_creature);

@@ -2357,7 +2357,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                 // remove not targetable units if spell has no script targets
                 for (UnitList::iterator itr = targetUnitMap.begin(); itr != targetUnitMap.end();)
                 {
-                    if (!(*itr)->isTargetableForAttack(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD))
+                    if (!(*itr)->isTargetableForAttack(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD, m_caster->IsPlayer()))
                         targetUnitMap.erase(itr++);
                     else
                         ++itr;
@@ -6589,7 +6589,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
 
         if (_target)                                         //for target dead/target not valid
         {
-            if (!_target->isTargetableForAttack())
+            if (!_target->isTargetableForAttack(false, m_caster->IsPlayer()))
                 return SPELL_FAILED_BAD_TARGETS;            // guessed error
 
             // SPELL_EFFECT_DISPEL -> Positive or negative depending on the target
@@ -7966,7 +7966,7 @@ public:
 
             if (i_TargetType != SPELL_TARGETS_ALL)
             {
-                if (!unit->isAttackableByAOE(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD))
+                if (!unit->isAttackableByAOE(i_spell.m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_CAST_ON_DEAD, i_playerControlled))
                     continue;
             }
 

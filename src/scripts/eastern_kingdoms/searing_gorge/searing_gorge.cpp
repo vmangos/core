@@ -271,7 +271,7 @@ struct npc_obsidionAI : public ScriptedAI
         m_playerList.clear();
         m_IsEventRunning = false;
         m_creature->SetStandState(UNIT_STAND_STATE_DEAD);
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_OOC_NOT_ATTACKABLE | UNIT_FLAG_PASSIVE);
+        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER | UNIT_FLAG_PASSIVE);
 
         if (Creature* cr = m_creature->GetMap()->GetCreature(m_Dorius))
             cr->DeleteLater();

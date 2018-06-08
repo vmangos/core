@@ -802,6 +802,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleUnLearnCommand(char* args);
         bool HandleRemoveRidingCommand(char* args);
         bool HandleGetDistanceCommand(char* args);
+        bool HandleGetAngleCommand(char* args);
         bool HandleModifyStandStateCommand(char* args);
         bool HandleDieCommand(char* args);
         bool HandleFearCommand(char* args);

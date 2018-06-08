@@ -1192,7 +1192,7 @@ struct boss_eranikusAI : public ScriptedAI
             m_creature->RemoveAllAuras();
             m_creature->DeleteThreatList();
             m_creature->CombatStop(true);
-            m_creature->LoadCreatureAddon();
+            m_creature->LoadCreatureAddon(true);
 
             m_creature->SetLootRecipient(NULL);
 

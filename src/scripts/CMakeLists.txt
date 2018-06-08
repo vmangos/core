@@ -19,7 +19,6 @@ set (SCRIPTS_SRCS
 	eastern_kingdoms/swamp_of_sorrows/sunken_temple/sunken_temple.h
 	eastern_kingdoms/tirisfal_glades/scarlet_monastery/scarlet_monastery.h
 	eastern_kingdoms/uldaman/uldaman.h
-	eastern_kingdoms/western_plaguelands/quest_in_dreams.h
 	eastern_kingdoms/western_plaguelands/scholomance/scholomance.h
 	eastern_kingdoms/westfall/deadmines/deadmines.h
 	kalimdor/ashenvale/blackfathom_deeps/blackfathom_deeps.h
@@ -185,7 +184,6 @@ set (SCRIPTS_SRCS
 	eastern_kingdoms/uldaman/instance_uldaman.cpp
 	eastern_kingdoms/uldaman/uldaman.cpp
 	eastern_kingdoms/undercity/undercity.cpp
-	eastern_kingdoms/western_plaguelands/quest_in_dreams.cpp
 	eastern_kingdoms/western_plaguelands/western_plaguelands.cpp
 	eastern_kingdoms/western_plaguelands/scholomance/boss_darkmaster_gandling.cpp
 	eastern_kingdoms/western_plaguelands/scholomance/boss_death_knight_darkreaver.cpp

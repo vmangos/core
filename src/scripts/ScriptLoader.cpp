@@ -205,7 +205,6 @@ void AddSC_swamp_of_sorrows();
 void AddSC_tirisfal_glades();
 void AddSC_undercity();
 void AddSC_western_plaguelands();
-void AddSC_quest_in_dreams();
 void AddSC_westfall();
 void AddSC_wetlands();
 
@@ -477,7 +476,6 @@ void AddScripts()
     AddSC_tirisfal_glades();
     AddSC_undercity();
     AddSC_western_plaguelands();
-    AddSC_quest_in_dreams();
     AddSC_westfall();
     AddSC_wetlands();
 

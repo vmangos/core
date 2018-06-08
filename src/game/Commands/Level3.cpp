@@ -3782,7 +3782,7 @@ bool ChatHandler::HandleGuildDeleteCommand(char* args)
 
 bool ChatHandler::HandleGetDistanceCommand(char* args)
 {
-    WorldObject* obj = NULL;
+    WorldObject* obj = nullptr;
 
     if (*args)
     {
@@ -3816,6 +3816,41 @@ bool ChatHandler::HandleGetDistanceCommand(char* args)
     dz = player->GetPositionZ() - obj->GetPositionZ();
 
     PSendSysMessage(LANG_DISTANCE, player->GetDistance(obj), player->GetDistance2d(obj), sqrt(dx * dx + dy * dy + dz * dz));
+
+    return true;
+}
+
+bool ChatHandler::HandleGetAngleCommand(char* args)
+{
+    WorldObject* obj = nullptr;
+
+    if (*args)
+    {
+        if (ObjectGuid guid = ExtractGuidFromLink(&args))
+            obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
+
+        if (!obj)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        obj = getSelectedUnit();
+
+        if (!obj)
+        {
+            SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    Player* player = m_session->GetPlayer();
+    float angle = player->GetAngle(obj);
+    PSendSysMessage("You are at a %f angle to %s.", angle, obj->GetName());
 
     return true;
 }

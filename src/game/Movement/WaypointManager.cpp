@@ -458,24 +458,16 @@ void WaypointManager::Load()
             // prevent using invalid coordinates
             if (!MaNGOS::IsValidMapCoord(node.x, node.y, node.z, node.orientation == 100.0f ? 0.0f : node.orientation))
             {
-                QueryResult *result1 = WorldDatabase.PQuery("SELECT id, map FROM creature WHERE guid = '%u'", id);
-                if (result1)
-                    sLog.outErrorDb("Creature (guidlow %d, entry %d) have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
-                                    id, result1->Fetch()[0].GetUInt32(), point, node.x, node.y);
-                else
-                    sLog.outErrorDb("Waypoint path %d, have invalid coordinates in his waypoint %d (X: %f, Y: %f).",
-                                    id, point, node.x, node.y);
+                sLog.outErrorDb("Table creature_movement_special for Id %u (point %u) are using invalid coordinates position_x: %f, position_y: %f)",
+                    id, point, node.x, node.y);
 
                 MaNGOS::NormalizeMapCoord(node.x);
                 MaNGOS::NormalizeMapCoord(node.y);
 
-                if (result1)
-                {
-                    node.z = sTerrainMgr.LoadTerrain(result1->Fetch()[1].GetUInt32())->GetHeightStatic(node.x, node.y, node.z);
-                    delete result1;
-                }
+                sLog.outErrorDb("Table creature_movement_special for Id %u (point %u) are auto corrected to normalized position_x=%f, position_y=%f",
+                    id, point, node.x, node.y);
 
-                WorldDatabase.PExecute("UPDATE creature_movement_special SET position_x = '%f', position_y = '%f', position_z = '%f' WHERE id = '%u' AND point = '%u'", node.x, node.y, node.z, id, point);
+                WorldDatabase.PExecute("UPDATE creature_movement_special SET position_x = '%f', position_y = '%f' WHERE id = %u AND point = %u", node.x, node.y, id, point);
             }
 
             if (node.script_id)

@@ -55,7 +55,7 @@ enum ConditionType
     CONDITION_ITEM_WITH_BANK        = 23,                   // item_id      count   check present req. amount items in inventory or bank
     CONDITION_WOW_PATCH             = 24,                   // value1: wow patch setting from config (0-10)
                                                             // value2: 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_DEAD_OR_AWAY          = 25,                   // value1: 0=player dead, 1=player is dead (with group dead), 2=player in instance are dead, 3=creature is dead
+    CONDITION_ESCORT                = 25,                   // value1: eEscortConditionFlags value2: distance
                                                             // value2: if != 0 only consider players in range of this value
     CONDITION_ACTIVE_HOLIDAY        = 26,                   // holiday_id   0       preferred use instead CONDITION_ACTIVE_GAME_EVENT when possible
     CONDITION_TARGET_GENDER         = 27,                   // 0=male, 1=female, 2=none (see enum Gender)
@@ -83,6 +83,8 @@ enum ConditionType
     CONDITION_IS_HOSTILE_TO         = 44,                   // 0            0
     CONDITION_IS_IN_GROUP           = 45,                   // 0            0
     CONDITION_IS_ALIVE              = 46,                   // 0            0
+    CONDITION_MAP_EVENT_TARGETS     = 47,                   // event_id     cond_id
+
 };
 
 enum ConditionFlags
@@ -124,6 +126,12 @@ enum ConditionRequirement
     CONDITION_REQ_BOTH_GAMEOBJECTS,
     CONDITION_REQ_BOTH_UNITS,
     CONDITION_REQ_BOTH_PLAYERS,
+};
+
+enum eEscortConditionFlags
+{
+    CF_ESCORT_SOURCE_DEAD = 0x1,
+    CF_ESCORT_TARGET_DEAD = 0x2,
 };
 
 class ConditionEntry

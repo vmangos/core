@@ -85,6 +85,7 @@ enum eScriptCommand
                                                             // target = WorldObject (from provided source or target)
                                                             // datalong = quest_id
                                                             // datalong2 = distance or 0
+                                                            // datalong3 = (bool) group
     SCRIPT_COMMAND_KILL_CREDIT              = 8,            // source = Player (from provided source or target)
                                                             // datalong = creature entry
                                                             // datalong2 = bool (0=personal credit, 1=group credit)
@@ -150,6 +151,7 @@ enum eScriptCommand
     SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL  = 24,           // source = Creature
                                                             // datalong = creature entry/modelid (depend on datalong2)
                                                             // datalong2 = (bool) is_display_id
+                                                            // datalong3 = (bool) permanent
     SCRIPT_COMMAND_SET_RUN                  = 25,           // source = Creature
                                                             // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_ATTACK_START             = 26,           // source = Creature
@@ -291,6 +293,19 @@ enum eScriptCommand
                                                             // datalong2 = eStartScriptForAllOptions
                                                             // datalong3 = object_entry
                                                             // datalong4 = search_radius
+    SCRIPT_COMMAND_EDIT_MAP_EVENT           = 69,           // source = Map
+                                                            // datalong = event_id
+                                                            // dataint = success_condition
+                                                            // dataint2 = success_script
+                                                            // dataint3 = failure_condition
+                                                            // dataint4 = failure_script
+    SCRIPT_COMMAND_FAIL_QUEST               = 70,           // source = Player
+                                                            // datalong = quest_id
+    SCRIPT_COMMAND_RESPAWN_CREATURE         = 71,           // source = Creature
+                                                            // datalong = (bool) even_if_alive
+    SCRIPT_COMMAND_ASSIST_UNIT              = 72,           // source = Creature
+                                                            // target = Unit
+    SCRIPT_COMMAND_COMBAT_STOP              = 73,           // source = Unit
     
     SCRIPT_COMMAND_MAX,
 
@@ -524,6 +539,7 @@ struct ScriptInfo
         {
             uint32 questId;                                 // datalong
             uint32 distance;                                // datalong2
+            uint32 group;                                   // datalong3
         } questExplored;
 
         struct                                              // SCRIPT_COMMAND_KILL_CREDIT (8)
@@ -632,6 +648,7 @@ struct ScriptInfo
         {
             uint32 creatureOrModelEntry;                    // datalong
             uint32 isDisplayId;                             // datalong2
+            uint32 permanent;                               // datalong3
         } mount;
 
         struct                                              // SCRIPT_COMMAND_SET_RUN (25)
@@ -853,7 +870,7 @@ struct ScriptInfo
         {
             uint32 eventId;                                 // datalong
             uint32 unused1;                                 // datalong2
-            uint32 unuded2;                                 // datalong3
+            uint32 unused2;                                 // datalong3
             uint32 unused3;                                 // datalong4
             uint32 unused4;                                 // data_flags
             int32  successCondition;                        // dataint
@@ -898,6 +915,33 @@ struct ScriptInfo
             uint32 objectEntry;                             // datalong3
             uint32 searchRadius;                            // datalong4
         } startScriptForAll;
+
+        struct                                              // SCRIPT_COMMAND_EDIT_MAP_EVENT (69)
+        {
+            uint32 eventId;                                 // datalong
+            uint32 unused1;                                 // datalong2
+            uint32 unused2;                                 // datalong3
+            uint32 unused3;                                 // datalong4
+            uint32 unused4;                                 // data_flags
+            int32  successCondition;                        // dataint
+            int32  successScript;                           // dataint2
+            int32  failureCondition;                        // dataint3
+            int32  failureScript;                           // dataint4
+        } editMapEvent;
+
+        struct                                              // SCRIPT_COMMAND_FAIL_QUEST (70)
+        {
+            uint32 questId;                                 // datalong
+        } failQuest;
+
+        struct                                              // SCRIPT_COMMAND_RESPAWN_CREATURE (71)
+        {
+            uint32 evenAlive;                               // datalong
+        } respawnCreature;
+
+                                                            // SCRIPT_COMMAND_ASSIST_UNIT (72)
+
+                                                            // SCRIPT_COMMAND_COMBAT_STOP (73)
 
         struct
         {

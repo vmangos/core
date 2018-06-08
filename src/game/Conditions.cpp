@@ -93,6 +93,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_BOTH_UNITS,         //  44
     CONDITION_REQ_TARGET_PLAYER,      //  45
     CONDITION_REQ_TARGET_UNIT,        //  46
+    CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -311,47 +312,24 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             }
             return false;
         }
-        case CONDITION_DEAD_OR_AWAY:
+        case CONDITION_ESCORT:
         {
-            Player const* pPlayer = (target && (target->GetTypeId() == TYPEID_PLAYER)) ? static_cast<Player const*>(target) : nullptr;
-            switch (m_value1)
-            {
-                case 0:                                     // Player dead or out of range
-                    return !pPlayer || !pPlayer->isAlive() || (m_value2 && source && !source->IsWithinDistInMap(pPlayer, m_value2));
-                case 1:                                     // All players in Group dead or out of range
-                    if (!pPlayer)
-                        return true;
-                    if (Group* grp = ((Player*)pPlayer)->GetGroup())
-                    {
-                        for (GroupReference* itr = grp->GetFirstMember(); itr != nullptr; itr = itr->next())
-                        {
-                            Player* pl = itr->getSource();
-                            if (pl && pl->isAlive() && !pl->isGameMaster() && (!m_value2 || !source || source->IsWithinDistInMap(pl, m_value2)))
-                                return false;
-                        }
-                        return true;
-                    }
-                    else
-                        return !pPlayer->isAlive() || (m_value2 && source && !source->IsWithinDistInMap(pPlayer, m_value2));
-                case 2:                                     // All players in instance dead or out of range
-                    if (!map && (target || source))
-                        map = source ? source->GetMap() : target->GetMap();
-                    if (!map || !map->Instanceable())
-                    {
-                        sLog.outErrorDb("CONDITION_DEAD_OR_AWAY %u (Player in instance case) - called from %s without map param or from non-instanceable map %i", m_entry, conditionSourceToStr[conditionSourceType], map ? map->GetId() : -1);
-                        return false;
-                    }
-                    for (Map::PlayerList::const_iterator itr = map->GetPlayers().begin(); itr != map->GetPlayers().end(); ++itr)
-                    {
-                        Player const* plr = itr->getSource();
-                        if (plr && plr->isAlive() && !plr->isGameMaster() && (!m_value2 || !source || source->IsWithinDistInMap(plr, m_value2)))
-                            return false;
-                    }
+            const Creature* pSource = ToCreature(source);
+            const Player* pTarget = ToPlayer(target);
+
+            if (m_value1 & CF_ESCORT_SOURCE_DEAD)
+                if (pSource && pSource->isDead())
                     return true;
-                case 3:                                     // Creature source is dead
-                    return !source || source->GetTypeId() != TYPEID_UNIT || !((Unit*)source)->isAlive();
-            }
-            break;
+
+            if (m_value1 & CF_ESCORT_TARGET_DEAD)
+                if (pTarget && (pTarget->isDead() || !pTarget->IsInWorld()))
+                    return true;
+
+            if (m_value2)
+                if (pSource && pTarget && !pSource->IsWithinDistInMap(pTarget, m_value2))
+                    return true;
+
+            return false;
         }
         case CONDITION_ACTIVE_HOLIDAY:
         {
@@ -574,6 +552,23 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_IS_ALIVE:
         {
             return target->ToUnit()->isAlive();
+        }
+        case CONDITION_MAP_EVENT_TARGETS:
+        {
+            bool bSatisfied = true;
+            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
+            {
+                for (const auto& eventTarget : pEvent->m_vTargets)
+                {
+                    if (eventTarget.pObject)
+                        bSatisfied = bSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(eventTarget.pObject, map, source, conditionSourceType);
+
+                    if (!bSatisfied)
+                        return false;
+                }
+            }
+            return bSatisfied;
         }
     }
     return false;
@@ -1014,13 +1009,8 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
-        case CONDITION_DEAD_OR_AWAY:
+        case CONDITION_ESCORT:
         {
-            if (m_value1 >= 4)
-            {
-                sLog.outErrorDb("Dead condition (entry %u, type %u) has an invalid value in value1. (Has %u, must be smaller than 4), skipping.", m_entry, m_condition, m_value1);
-                return false;
-            }
             break;
         }
         case CONDITION_WOW_PATCH:
@@ -1103,6 +1093,16 @@ bool ConditionEntry::IsValid()
             if (m_value2 > 2)
             {
                 sLog.outErrorDb("Health or Mana percent condition (entry %u, type %u) has invalid argument %u (must be 0..2), skipped", m_entry, m_condition, m_value2);
+                return false;
+            }
+            break;
+        }
+        case CONDITION_MAP_EVENT_TARGETS:
+        {
+            const ConditionEntry* condition1 = sConditionStorage.LookupEntry<ConditionEntry>(m_value2);
+            if (!condition1)
+            {
+                sLog.outErrorDb("CONDITION_MAP_EVENT_TARGETS (entry %u, type %d) has value2 %u without proper condition, skipped", m_entry, m_condition, m_value2);
                 return false;
             }
             break;

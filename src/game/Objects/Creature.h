@@ -680,6 +680,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction = true) const;
         bool CanInitiateAttack();
 
+        uint32 GetDefaultMount() { return m_mountId; }
+        void SetDefaultMount(uint32 id) { m_mountId = id; }
+        
         void SetTauntImmunity(bool immune);
 
         MovementGeneratorType GetDefaultMovementType() const { return m_defaultMovementType; }
@@ -898,6 +901,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         MovementGeneratorType m_defaultMovementType;
         Cell m_currentCell;                                 // store current cell where creature listed
         uint32 m_equipmentId;
+        uint32 m_mountId;                                   // display Id to mount
 
         // below fields has potential for optimization
         bool m_AlreadyCallAssistance;
