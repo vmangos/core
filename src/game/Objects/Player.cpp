@@ -18709,8 +18709,9 @@ BattleGroundBracketId Player::GetBattleGroundBracketIdFromLevel(BattleGroundType
 {
     BattleGround *bg = sBattleGroundMgr.GetBattleGroundTemplate(bgTypeId);
     ASSERT(bg);
+
     if (getLevel() < bg->GetMinLevel())
-        return BG_BRACKET_ID_FIRST;
+        return BG_BRACKET_ID_NONE;
 
     uint32 bracket_id = (getLevel() - bg->GetMinLevel()) / 10;
     if (bracket_id > MAX_BATTLEGROUND_BRACKETS)

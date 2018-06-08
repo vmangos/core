@@ -131,16 +131,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
     // ignore if player is already in BG
     if (_player->InBattleGround())
         return;
-    /*
-        Creature *unit = GetPlayer()->GetMap()->GetCreature(guid);
-        if (!unit)
-            return;
-
-        if (!unit->isBattleMaster())                            // it's not battlemaster
-            return;
-    */
+    
     // get bg instance or bg template if instance not found
-    BattleGround *bg = NULL;
+    BattleGround *bg = nullptr;
     if (instanceId)
         bg = sBattleGroundMgr.GetBattleGroundThroughClientInstance(instanceId, bgTypeId);
 
@@ -151,6 +144,9 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
     }
 
     BattleGroundBracketId bgBracketId = _player->GetBattleGroundBracketIdFromLevel(bgTypeId);
+
+    if (bgBracketId == BG_BRACKET_ID_NONE)
+        return;
 
     // check queue conditions
     if (!joinAsGroup)
@@ -175,8 +171,8 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
         // _player->GetGroup() was already checked, grp is already initialized
         BattleGroundQueue& bgQueue = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId];
 
-        GroupQueueInfo * ginfo = bgQueue.AddGroup(_player, NULL, bgTypeId, bgBracketId, isPremade);
-        uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, _player->GetBattleGroundBracketIdFromLevel(bgTypeId));
+        GroupQueueInfo * ginfo = bgQueue.AddGroup(_player, nullptr, bgTypeId, bgBracketId, isPremade);
+        uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bgBracketId);
         // already checked if queueSlot is valid, now just get it
         uint32 queueSlot = _player->AddBattleGroundQueueId(bgQueueTypeId);
         // store entry point coords
@@ -220,7 +216,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
         BattleGroundQueue& bgQueue = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId];
         DEBUG_LOG("Battleground: the following players are joining as group:");
         GroupQueueInfo * ginfo = bgQueue.AddGroup(_player, grp, bgTypeId, bgBracketId, isPremade, &excludedMembers);
-        uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, _player->GetBattleGroundBracketIdFromLevel(bgTypeId));
+        uint32 avgTime = bgQueue.GetAverageQueueWaitTime(ginfo, bgBracketId);
         for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
         {
             Player *member = itr->getSource();
@@ -249,7 +245,7 @@ void WorldSession::HandleBattlemasterJoinOpcode(WorldPacket & recv_data)
         DEBUG_LOG("Battleground: group end");
     }
 
-    sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, _player->GetBattleGroundBracketIdFromLevel(bgTypeId));
+    sBattleGroundMgr.ScheduleQueueUpdate(bgQueueTypeId, bgTypeId, bgBracketId);
 }
 
 void WorldSession::HandleBattleGroundPlayerPositionsOpcode(WorldPacket & /*recv_data*/)

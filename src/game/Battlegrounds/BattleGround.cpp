@@ -209,7 +209,7 @@ BattleGround::BattleGround()
     m_Status            = STATUS_NONE;
     m_ClientInstanceID  = 0;
     m_EndTime           = 0;
-    m_BracketId         = BG_BRACKET_ID_TEMPLATE;        // use as mark bg template
+    m_BracketId         = BG_BRACKET_ID_NONE;        // use as mark bg template
     m_InvitedAlliance   = 0;
     m_InvitedHorde      = 0;
     m_Winner            = 2;
@@ -279,7 +279,7 @@ BattleGround::~BattleGround()
         sLog.out(LOG_BG, "[%u,%u]: winner=%u, duration=%s", GetTypeID(), GetInstanceID(), GetWinner(), secsToTimeString(GetStartTime() / 1000, true).c_str());
 
     // Pas un BG 'template'
-    if (GetBracketId() != BG_BRACKET_ID_TEMPLATE)
+    if (GetBracketId() != BG_BRACKET_ID_NONE)
         sBattleGroundMgr.DeleteClientVisibleInstanceId(GetTypeID(), GetBracketId(), GetClientInstanceID());
 
     // unload map

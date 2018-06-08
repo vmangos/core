@@ -1274,7 +1274,6 @@ bool ChatHandler::HandleBGStatusCommand(char *args)
         uiAllianceCount = 0;
         uiHordeCount    = 0;
 
-        BattleGroundBracketId bracket_id      = chr->GetBattleGroundBracketIdFromLevel(BattleGroundTypeId(bgTypeId));
         BattleGroundQueueTypeId bgQueueTypeId = BattleGroundMgr::BGQueueTypeId(BattleGroundTypeId(bgTypeId));
         // Doit etre une référence (&), sinon crash par la suite ...
         BattleGroundQueue& queue = sBattleGroundMgr.m_BattleGroundQueues[bgQueueTypeId];
