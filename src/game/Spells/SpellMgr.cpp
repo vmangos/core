@@ -35,13 +35,6 @@ SpellMgr::SpellMgr()
 {
 }
 
-SpellMgr::~SpellMgr()
-{
-    // Using unique pointer so not needed.
-    //for (SpellEntryMap::iterator it = mSpellEntryMap.begin(); it != mSpellEntryMap.end(); ++it)
-    //    delete *it;
-}
-
 SpellMgr& SpellMgr::Instance()
 {
     static SpellMgr spellMgr;
@@ -4325,7 +4318,7 @@ void SpellMgr::LoadSpellAffects()
             if (mSpellAffectMap.find((id << 8) + effectId) !=  mSpellAffectMap.end())
                 continue;
 
-            sLog.outErrorDb("Spell %u (%s) misses spell_affect for effect %u", id, spellInfo->SpellName[sWorld.GetDefaultDbcLocale()], effectId);
+            sLog.outErrorDb("Spell %u (%s) misses spell_affect for effect %u", id, spellInfo->SpellName[sWorld.GetDefaultDbcLocale()].c_str(), effectId);
         }
     }
 }
@@ -4486,39 +4479,23 @@ void SpellMgr::LoadSpells()
         spell->SpellIconID = fields[117].GetUInt32();
         spell->activeIconID = fields[118].GetUInt32();
         spell->spellPriority = fields[119].GetUInt32();
-        spell->SpellName[0] = new char[strlen(fields[120].GetString()) + 1];
-        strcpy(spell->SpellName[0], fields[120].GetString());
-        spell->SpellName[1] = new char[strlen(fields[121].GetString()) + 1];
-        strcpy(spell->SpellName[1], fields[121].GetString());
-        spell->SpellName[2] = new char[strlen(fields[122].GetString()) + 1];
-        strcpy(spell->SpellName[2], fields[122].GetString());
-        spell->SpellName[3] = new char[strlen(fields[123].GetString()) + 1];
-        strcpy(spell->SpellName[3], fields[123].GetString());
-        spell->SpellName[4] = new char[strlen(fields[124].GetString()) + 1];
-        strcpy(spell->SpellName[4], fields[124].GetString());
-        spell->SpellName[5] = new char[strlen(fields[125].GetString()) + 1];
-        strcpy(spell->SpellName[5], fields[125].GetString());
-        spell->SpellName[6] = new char[strlen(fields[126].GetString()) + 1];
-        strcpy(spell->SpellName[6], fields[126].GetString());
-        spell->SpellName[7] = new char[strlen(fields[127].GetString()) + 1];
-        strcpy(spell->SpellName[7], fields[127].GetString());
+        spell->SpellName[0] = fields[120].GetCppString();
+        spell->SpellName[1] = fields[121].GetCppString();
+        spell->SpellName[2] = fields[122].GetCppString();
+        spell->SpellName[3] = fields[123].GetCppString();
+        spell->SpellName[4] = fields[124].GetCppString();
+        spell->SpellName[5] = fields[125].GetCppString();
+        spell->SpellName[6] = fields[126].GetCppString();
+        spell->SpellName[7] = fields[127].GetCppString();
         //spell->SpellNameFlag = fields[128].GetUInt32(); not used
-        spell->Rank[0] = new char[strlen(fields[129].GetString()) + 1];
-        strcpy(spell->Rank[0], fields[129].GetString());
-        spell->Rank[1] = new char[strlen(fields[130].GetString()) + 1];
-        strcpy(spell->Rank[1], fields[130].GetString());
-        spell->Rank[2] = new char[strlen(fields[131].GetString()) + 1];
-        strcpy(spell->Rank[2], fields[131].GetString());
-        spell->Rank[3] = new char[strlen(fields[132].GetString()) + 1];
-        strcpy(spell->Rank[3], fields[132].GetString());
-        spell->Rank[4] = new char[strlen(fields[133].GetString()) + 1];
-        strcpy(spell->Rank[4], fields[133].GetString());
-        spell->Rank[5] = new char[strlen(fields[134].GetString()) + 1];
-        strcpy(spell->Rank[5], fields[134].GetString());
-        spell->Rank[6] = new char[strlen(fields[135].GetString()) + 1];
-        strcpy(spell->Rank[6], fields[135].GetString());
-        spell->Rank[7] = new char[strlen(fields[136].GetString()) + 1];
-        strcpy(spell->Rank[7], fields[136].GetString());
+        spell->Rank[0] = fields[129].GetCppString();
+        spell->Rank[1] = fields[130].GetCppString();
+        spell->Rank[2] = fields[131].GetCppString();
+        spell->Rank[3] = fields[132].GetCppString();
+        spell->Rank[4] = fields[133].GetCppString();
+        spell->Rank[5] = fields[134].GetCppString();
+        spell->Rank[6] = fields[135].GetCppString();
+        spell->Rank[7] = fields[136].GetCppString();
         /* not used
         spell->RankFlags = fields[137].GetUInt32();
         spell->Description[0] = new char[strlen(fields[138].GetString()) + 1];

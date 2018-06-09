@@ -104,7 +104,7 @@ bool ChatHandler::HandleDebugSendNextChannelSpellVisualCommand(char *args)
         data << uint32(60000);
         m_session->GetPlayer()->SendDirectMessage(&data);
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, id);
-        PSendSysMessage("Playing channel visual of spell %u %s %s", id, spellInfo->SpellName[0], spellInfo->Rank[0]);
+        PSendSysMessage("Playing channel visual of spell %u %s %s", id, spellInfo->SpellName[0].c_str(), spellInfo->Rank[0].c_str());
         return true;
     }
     PSendSysMessage("Spell Id range 0 to %u, -1 to stop animation", sSpellMgr.GetMaxSpellId());
@@ -126,7 +126,7 @@ bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
         m_session->GetPlayer()->SendDirectMessage(&data);
         m_session->GetPlayer()->SetUInt32Value(UNIT_CHANNEL_SPELL, uiPlayId);
         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(uiPlayId);
-        PSendSysMessage("Playing channel visual of spell %u %s %s", uiPlayId, spellInfo->SpellName[0], spellInfo->Rank[0]);
+        PSendSysMessage("Playing channel visual of spell %u %s %s", uiPlayId, spellInfo->SpellName[0].c_str(), spellInfo->Rank[0].c_str());
         return true;
     }
     else if (!uiPlayId)

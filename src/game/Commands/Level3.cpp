@@ -4802,7 +4802,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
         bool talent = GetTalentSpellCost(itr->second->GetId()) > 0;
 
         SpellAuraHolder *holder = itr->second;
-        char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()];
+        char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()].c_str();
 
         for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
         {

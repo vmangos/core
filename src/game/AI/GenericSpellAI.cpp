@@ -419,7 +419,7 @@ void LoadSpellCacheData(GenericAISpell* spellToModify, SpellEntry const* spellIn
     spellToModify->targetAuraState = spellInfos->TargetAuraState;
 
 #ifdef DEBUG_ON
-    sLog.outString(">> Loading Spell %s (id=%u) !", spellInfos->SpellName[2], spellToModify->spellId);
+    sLog.outString(">> Loading Spell %s (id=%u) !", spellInfos->SpellName[2].c_str(), spellToModify->spellId);
 #endif
 
     // Check de la portee

@@ -2213,7 +2213,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                         bool foundName = false;
                         for (uint8 i = 0; i < MAX_DBC_LOCALE; ++i)
                         {
-                            if (*linkedSpell->SpellName[i] && strcmp(linkedSpell->SpellName[i], buffer) == 0)
+                            if (!linkedSpell->SpellName[i].empty() && strcmp(linkedSpell->SpellName[i].c_str(), buffer) == 0)
                             {
                                 foundName = true;
                                 break;

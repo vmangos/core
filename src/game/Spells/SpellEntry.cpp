@@ -3,17 +3,6 @@
 #include "SpellAuraDefines.h"
 #include "SpellMgr.h"
 
-SpellEntry::~SpellEntry()
-{
-    for (int i = 0; i < MAX_DBC_LOCALE; ++i)
-    {
-        if (SpellName[i])
-            delete[] SpellName[i];
-        if (Rank[i])
-            delete[] Rank[i];
-    }
-}
-
 void SpellEntry::InitCachedValues()
 {
     ComputeBinary();

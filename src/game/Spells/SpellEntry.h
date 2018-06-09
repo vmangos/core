@@ -22,6 +22,7 @@
 #ifndef _SPELLENTRY_H
 #define _SPELLENTRY_H
 
+#include <array>
 #include "DBCStructure.h"
 #include "SharedDefines.h"
 
@@ -34,7 +35,7 @@ class SpellEntry
 {
     public:
         SpellEntry() {}
-        ~SpellEntry();
+        ~SpellEntry() = default;
         void InitCachedValues();
 
 
@@ -108,9 +109,9 @@ class SpellEntry
         uint32    SpellIconID;                                  // 117
         uint32    activeIconID;                                 // 118
         uint32    spellPriority;                                // 119
-        char*     SpellName[8];                                 // 120-127
+        std::array<std::string, MAX_DBC_LOCALE> SpellName{};    // 120-127
       //uint32    SpellNameFlag;                                // 128     not used
-        char*     Rank[8];                                      // 129-136
+        std::array<std::string, MAX_DBC_LOCALE> Rank{};         // 129-136
       //uint32    RankFlags;                                    // 137     not used
       //char*     Description[8];                               // 138-145 not used
       //uint32    DescriptionFlags;                             // 146     not used
