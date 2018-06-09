@@ -476,6 +476,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGuildUninviteCommand(char* args);
         bool HandleGuildRankCommand(char* args);
         bool HandleGuildDeleteCommand(char* args);
+        bool HandleGuildRenameCommand(char* args);
 
         bool HandleHonorShow(char* args);
         bool HandleHonorAddCommand(char* args);
@@ -537,6 +538,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleLookupSoundCommand(char* args);
         bool HandleLookupTaxiNodeCommand(char* args);
         bool HandleLookupTeleCommand(char* args);
+        bool HandleLookupGuildCommand(char* args);
 
         bool HandleModifyHPCommand(char* args);
         bool HandleModifyManaCommand(char* args);

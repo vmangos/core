@@ -28,6 +28,8 @@
 #include "World.h"
 #include "ObjectMgr.h"
 #include "Player.h"
+#include "Guild.h"
+#include "GuildMgr.h"
 #include "Opcodes.h"
 #include "Chat.h"
 #include "Log.h"
@@ -1651,6 +1653,37 @@ bool ChatHandler::HandleLookupTeleCommand(char * args)
         SendSysMessage(LANG_COMMAND_TELE_NOLOCATION);
     else
         PSendSysMessage(LANG_COMMAND_TELE_LOCATION, reply.str().c_str());
+
+    return true;
+}
+
+bool ChatHandler::HandleLookupGuildCommand(char* args)
+{
+    if (!args || !*args)
+        return false;
+
+    char* name = ExtractQuotedArg(&args);
+    if (!name)
+        return false;
+
+    std::string nameStr(name);
+    Guild* guild = sGuildMgr.GetGuildByName(nameStr);
+    if (!guild)
+    {
+        SendSysMessage(LANG_GUILD_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    PSendSysMessage("Guild %s (ID %u):", guild->GetName().c_str(), guild->GetId());
+    std::string leaderName;
+    sObjectMgr.GetPlayerNameByGUID(guild->GetLeaderGuid(), leaderName);
+    PSendSysMessage("- Leader: %s, created: %u-%u-%u", leaderName.c_str(),
+        guild->GetCreatedYear(), guild->GetCreatedMonth(),
+        guild->GetCreatedDay());
+    PSendSysMessage("- Members: %u (%u accounts)", guild->GetMemberSize(), guild->GetAccountsNumber());
+    PSendSysMessage("- MOTD: %s", guild->GetMOTD().c_str());
+    PSendSysMessage("- INFO: %s", guild->GetGINFO().c_str());
 
     return true;
 }

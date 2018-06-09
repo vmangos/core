@@ -227,6 +227,8 @@ class Guild
         std::string const& GetMOTD() const { return MOTD; }
         std::string const& GetGINFO() const { return GINFO; }
 
+        void Rename(std::string& newName);
+
         uint32 GetCreatedYear() const { return m_CreatedYear; }
         uint32 GetCreatedMonth() const { return m_CreatedMonth; }
         uint32 GetCreatedDay() const { return m_CreatedDay; }

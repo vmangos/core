@@ -3780,6 +3780,49 @@ bool ChatHandler::HandleGuildDeleteCommand(char* args)
     return true;
 }
 
+/**
+ * Renames a guild if a guild could be found with the specified name.
+ * Usage: .guild rename "name" "new name"
+ * It is not possible to rename a guild to a name that is already in use.
+ */
+bool ChatHandler::HandleGuildRenameCommand(char* args)
+{
+    if (!args || !*args)
+        return false;
+
+    char* currentName = ExtractQuotedArg(&args);
+    if (!currentName)
+        return false;
+
+    std::string current(currentName);
+
+    char* newName = ExtractQuotedArg(&args);
+    if (!newName)
+        return false;
+
+    std::string newn(newName);
+
+    Guild* target = sGuildMgr.GetGuildByName(currentName);
+    if (!target)
+    {
+        SendSysMessage(LANG_GUILD_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (Guild* existing = sGuildMgr.GetGuildByName(newn))
+    {
+        PSendSysMessage("A guild with the name '%s' already exists", newName);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    target->Rename(newn);
+    PSendSysMessage("Guild '%s' successfully renamed to '%s'. Players must relog to see the changes", currentName, newName);
+    return true;
+}
+
+
 bool ChatHandler::HandleGetDistanceCommand(char* args)
 {
     WorldObject* obj = nullptr;

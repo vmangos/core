@@ -186,6 +186,16 @@ void Guild::CreateDefaultGuildRanks(int locale_idx)
     CreateRank(sObjectMgr.GetMangosString(LANG_GUILD_INITIATE, locale_idx), GR_RIGHT_GCHATLISTEN | GR_RIGHT_GCHATSPEAK);
 }
 
+void Guild::Rename(std::string& newName)
+{
+    m_Name = newName;
+
+    std::string escaped = m_Name;
+    CharacterDatabase.escape_string(escaped);
+
+    CharacterDatabase.PExecute("UPDATE guild SET name = '%s' WHERE guildid = '%u'", escaped.c_str(), m_Id);
+}
+
 GuildAddStatus Guild::AddMember(ObjectGuid plGuid, uint32 plRank)
 {
     if (members.size() >= GUILD_MAX_MEMBERS)
