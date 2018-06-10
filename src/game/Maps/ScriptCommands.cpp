@@ -695,6 +695,8 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
     switch (script.movement.movementType)
     {
         case IDLE_MOTION_TYPE:
+            if (pSource->IsMoving())
+                pSource->StopMoving();
             if (script.movement.clear)
                 pSource->GetMotionMaster()->Clear(false, true);
             pSource->GetMotionMaster()->MoveIdle();
