@@ -56,14 +56,11 @@ INSERT INTO `gossip_menu_option` (`menu_id`, `id`, `option_icon`, `option_text`,
 (11361, 0, 0, 'GOSSIP_OPTION_QUESTGIVER', 0, 2, 2, 0, 0, 0, 0, 0, '', 0, 0),
 (11361, 1, 1, 'Got anything interesting for sale, Zorbin?', 9817, 3, 4, 0, 0, 0, 0, 0, '', 0, 60020);
 
-DELETE FROM `npc_text` WHERE `ID` in (7114);
-INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES (7114, 100004, 1);
+INSERT INTO `npc_text` (`ID`, `BroadcastTextID0`, `Probability0`) VALUES (7114, 9816, 1);
 
 -- The ID for this text was likely 9816 but that ID is used already.
 -- The text likely have changed with cataclysm and blizzard reused the old id.
--- Adding the vanilla text on custom ID
-DELETE FROM `broadcast_text` WHERE `ID` in (100004); 
-INSERT INTO `broadcast_text` (`ID`, `MaleText`, `EmoteId0`) VALUES (100004, 'Maybe this wasn\'t the best place for a shop after all...', 274);
+UPDATE `broadcast_text` SET `MaleText`='Maybe this wasn\'t the best place for a shop after all...' WHERE `ID`=9816;
 
 -- Add needed conditions
 INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`) VALUES 
