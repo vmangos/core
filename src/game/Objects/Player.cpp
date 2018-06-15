@@ -15032,13 +15032,21 @@ void Player::UpdateOldRidingSkillToNew(bool has_epic_mount)
         has_old_riding_skill = true;
     }
 
+    // Paladin and Warlock level 40 mounts
+    if (HasSpell(13819u) || HasSpell(5784u))
+        has_old_riding_skill = true;
+
+    // Paladin and Warlock level 60 mounts
+    if (HasSpell(23214u) || HasSpell(23161u))
+        has_epic_mount = true;
+
     if (!has_old_riding_skill)
         return;
     
     if (has_epic_mount)
-        learnSpell(33391, false); // Journeyman Riding
+        learnSpell(33391u, false); // Journeyman Riding
     else
-        learnSpell(33388, false); // Apprentice Riding
+        learnSpell(33388u, false); // Apprentice Riding
 }
 
 void Player::SendPacketsAtRelogin()

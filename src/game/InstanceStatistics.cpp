@@ -32,7 +32,7 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceWipes.clear();
     sLog.outString("> Loading table `instance_wipes`");
     uint32 count = 0;
-    QueryResult* result = WorldDatabase.Query("SELECT mapId, creatureEntry, count FROM instance_wipes");
+    QueryResult* result = LogsDatabase.Query("SELECT mapId, creatureEntry, count FROM instance_wipes");
     if (!result)
     {
         BarGoLink bar(1);
@@ -68,7 +68,7 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceCreatureKills.clear();
     sLog.outString("> Loading table `instance_creature_kills`");
     count = 0;
-    result = WorldDatabase.Query("SELECT mapId, creatureEntry, spellEntry, count FROM instance_creature_kills");
+    result = LogsDatabase.Query("SELECT mapId, creatureEntry, spellEntry, count FROM instance_creature_kills");
     if (!result)
     {
         BarGoLink bar(1);
@@ -116,7 +116,7 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceCustomCounters.clear();
     sLog.outString("> Loading table `instance_custom_counters`");
     count = 0;
-    result = WorldDatabase.Query("SELECT `index`, `count` FROM instance_custom_counters");
+    result = LogsDatabase.Query("SELECT `index`, `count` FROM instance_custom_counters");
     if (!result)
     {
         BarGoLink bar(1);
@@ -144,7 +144,6 @@ void InstanceStatisticsMgr::LoadFromDB()
 
         delete result;
     }
-
 }
 
 void InstanceStatisticsMgr::IncrementWipeCounter(uint32 mapId, uint32 creatureEntry)
@@ -227,27 +226,27 @@ void InstanceStatisticsMgr::IncrementCustomCounter(eInstanceCustomCounter index,
 
     if (save)
     {
-        WorldDatabase.BeginTransaction();
-        WorldDatabase.PExecute("DELETE FROM `instance_custom_counters` WHERE `index` = %u", index);
-        WorldDatabase.PExecute("INSERT INTO `instance_custom_counters` (`index`, `count`) VALUES (%u, %u)", index, count);
-        WorldDatabase.CommitTransaction();
+        LogsDatabase.BeginTransaction();
+        LogsDatabase.PExecute("DELETE FROM `instance_custom_counters` WHERE `index` = %u", index);
+        LogsDatabase.PExecute("INSERT INTO `instance_custom_counters` (`index`, `count`) VALUES (%u, %u)", index, count);
+        LogsDatabase.CommitTransaction();
     }
 }
 
 void InstanceStatisticsMgr::Save(uint32 mapId, uint32 creatureEntry, uint32 spellId, uint32 count)
 {
-    WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecute("DELETE FROM `instance_creature_kills` WHERE `mapId` = %u and `creatureEntry` = %u and `spellEntry` = %u", 
+    LogsDatabase.BeginTransaction();
+    LogsDatabase.PExecute("DELETE FROM `instance_creature_kills` WHERE `mapId` = %u and `creatureEntry` = %u and `spellEntry` = %u",
         mapId, creatureEntry, spellId);
-    WorldDatabase.PExecute("INSERT INTO `instance_creature_kills` (`mapId`, `creatureEntry`, `spellEntry`, `count`) VALUES (%u, %u, %u, %u)", 
+    LogsDatabase.PExecute("INSERT INTO `instance_creature_kills` (`mapId`, `creatureEntry`, `spellEntry`, `count`) VALUES (%u, %u, %u, %u)",
         mapId, creatureEntry, spellId, count);
-    WorldDatabase.CommitTransaction();
+    LogsDatabase.CommitTransaction();
 }
 
 void InstanceStatisticsMgr::Save(uint32 mapId, uint32 creatureEntry, uint32 count)
 {
-    WorldDatabase.BeginTransaction();
-    WorldDatabase.PExecute("DELETE FROM `instance_wipes` WHERE `mapId` = %u and `creatureEntry` = %u",  mapId, creatureEntry);
-    WorldDatabase.PExecute("INSERT INTO `instance_wipes` (`mapId`, `creatureEntry`, `count`) VALUES (%u, %u, %u)", mapId, creatureEntry, count);
-    WorldDatabase.CommitTransaction();
+    LogsDatabase.BeginTransaction();
+    LogsDatabase.PExecute("DELETE FROM `instance_wipes` WHERE `mapId` = %u and `creatureEntry` = %u",  mapId, creatureEntry);
+    LogsDatabase.PExecute("INSERT INTO `instance_wipes` (`mapId`, `creatureEntry`, `count`) VALUES (%u, %u, %u)", mapId, creatureEntry, count);
+    LogsDatabase.CommitTransaction();
 }

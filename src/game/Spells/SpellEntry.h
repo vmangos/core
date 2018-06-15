@@ -120,9 +120,9 @@ class SpellEntry
         uint32    ManaCostPercentage;                           // 156
         uint32    StartRecoveryCategory;                        // 157
         uint32    StartRecoveryTime;                            // 158
-        uint32    MaxTargetLevel;                               // 159
-        uint32    SpellFamilyName;                              // 160
-        uint64    SpellFamilyFlags;                             // 161+162
+        uint32    MaxTargetLevel;                               // 160
+        uint32    SpellFamilyName;                              // 161
+        uint64    SpellFamilyFlags;                             // 162
         uint32    MaxAffectedTargets;                           // 163
         uint32    DmgClass;                                     // 164
         uint32    PreventionType;                               // 165
@@ -133,7 +133,8 @@ class SpellEntry
       //uint32    RequiredAuraVision;                           // 172 not used
 
         /// CUSTOM FIELDS:
-        uint32 Custom;
+        uint32 MinTargetLevel;                                  // 159
+        uint32 Custom;                                          // 173
     protected:
         bool _isBinary;
         bool _isDispel;

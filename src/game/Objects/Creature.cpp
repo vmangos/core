@@ -3524,10 +3524,6 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
     // Custom checks
     if (!(uiCastFlags & CF_FORCE_CAST))
     {
-        // ToDo: Remove this check when checking for stuns is fixed in Spell.cpp
-        if (!(uiCastFlags & CF_TRIGGERED) && hasUnitState(UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL))
-            return SPELL_FAILED_PREVENTED_BY_MECHANIC;
-
         // If the spell requires to be behind the target.
         if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;
