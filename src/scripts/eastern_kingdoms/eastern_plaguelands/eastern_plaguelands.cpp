@@ -17,41 +17,18 @@
 /* ScriptData
 SDName: Eastern_Plaguelands
 SD%Complete: 100
-SDComment: Quest support: 5211, 5742. Special vendor Augustus the Touched
+SDComment: Quest support: 5211, 5742.
 SDCategory: Eastern Plaguelands
 EndScriptData */
 
 /* ContentData
 mobs_ghoul_flayer
-npc_augustus_the_touched
 npc_darrowshire_spirit
 npc_tirion_fordring
 EndContentData */
 
 #include "scriptPCH.h"
 
-/*######
-## npc_augustus_the_touched
-######*/
-
-bool GossipHello_npc_augustus_the_touched(Player* pPlayer, Creature* pCreature)
-{
-    if (pCreature->isQuestGiver())
-        pPlayer->PrepareQuestMenu(pCreature->GetGUID());
-
-    if (pCreature->isVendor() && pPlayer->GetQuestRewardStatus(6164))
-        pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_VENDOR, GOSSIP_TEXT_BROWSE_GOODS, GOSSIP_SENDER_MAIN, GOSSIP_ACTION_TRADE);
-
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-    return true;
-}
-
-bool GossipSelect_npc_augustus_the_touched(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_TRADE)
-        pPlayer->SEND_VENDORLIST(pCreature->GetGUID());
-    return true;
-}
 
 /*######
 ## npc_darrowshire_spirit
@@ -1884,12 +1861,6 @@ bool EffectDummyGameObj_go_mark_of_detonation(Unit* pCaster, uint32 uiSpellId, S
 void AddSC_eastern_plaguelands()
 {
     Script *newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_augustus_the_touched";
-    newscript->pGossipHello = &GossipHello_npc_augustus_the_touched;
-    newscript->pGossipSelect = &GossipSelect_npc_augustus_the_touched;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_darrowshire_spirit";
