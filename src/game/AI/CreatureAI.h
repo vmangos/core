@@ -120,6 +120,9 @@ class MANGOS_DLL_SPEC CreatureAI
         // Called when the creature summon is killed
         virtual void SummonedCreatureJustDied(Creature* /*unit*/) {}
 
+        // Called when a member of the creature's group is killed
+        virtual void GroupMemberJustDied(Creature* /*unit*/, bool /*isLeader*/) {}
+
         // Called when the creature kills a unit
         virtual void KilledUnit(Unit *) {}
 
@@ -207,7 +210,6 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // TrinityCore
         void DoCast(Unit* victim, uint32 spellId, bool triggered = false);
-        void DoCastVictim(uint32 spellId, bool triggered = false);
         void DoCastAOE(uint32 spellId, bool triggered = false);
         bool UpdateVictim();
         bool UpdateVictimWithGaze();

@@ -32,6 +32,8 @@ enum OptionFlags
     OPTION_RESPAWN_TOGETHER             = 0x008,
     OPTION_RESPAWN_ALL_ON_MASTER_EVADE  = 0x010,
     OPTION_RESPAWN_ALL_ON_ANY_EVADE     = 0x020,
+    OPTION_INFORM_LEADER_ON_MEMBER_DIED = 0x040,
+    OPTION_INFORM_MEMBERS_ON_ANY_DIED   = 0x080,
 };
 
 struct CreatureGroupMember
@@ -61,6 +63,8 @@ class CreatureGroup
         uint32 GetWaitTime(Creature* member);
         void OnMemberAttackStart(Creature* member, Unit* target);
         void MemberAssist(Creature* member, Unit* target);
+
+        void OnMemberDied(Creature* member);
 
         void OnLeaveCombat(Creature* creature);
         void OnRespawn(Creature* member);

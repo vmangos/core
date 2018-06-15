@@ -22,16 +22,16 @@ SDCategory: Shadowfang Keep
 EndScriptData */
 
 #include "scriptPCH.h"
-#include "shadowfang_keep.h"
 
 enum
 {
+    TYPE_FREE_NPC           = 1,
+    TYPE_RETHILGORE         = 2,
+    TYPE_FENRUS             = 3,
+    TYPE_NANDOS             = 4,
+    TYPE_INTRO              = 5,
+    TYPE_VOIDWALKER         = 6,
     MAX_ENCOUNTER           = 6,
-
-    SAY_BOSS_DIE_AD         = 1328,
-    SAY_BOSS_DIE_AS         = 1329,
-    SAY_FENRUS_DEAD         = 1435,
-    SAY_WOLVES_DEAD         = 2086,
 
     NPC_BARON_SILVERLAINE   = 3887,
     NPC_CMD_SPRINGVALE      = 4278,
@@ -47,9 +47,6 @@ enum
     GO_SORCERER_DOOR        = 18972,                        //door to open when Fenrus the Devourer dies
     GO_ARUGAL_DOOR          = 18971,                        //door to open when Wolf Master Nandos dies
     GO_ARUGAL_FOCUS         = 18973,                        //this generates the lightning visual in the Fenrus event
-
-    SPELL_ARUGAL_SPAWN      = 6422,
-    SPELL_VOID_EVENT        = 33019,
 };
 
 struct instance_shadowfang_keep : public ScriptedInstance
@@ -75,28 +72,20 @@ struct instance_shadowfang_keep : public ScriptedInstance
     uint64 m_uiVincentGUID;
     uint64 m_uiNandosGUID;
 
-    uint64 m_uiArugalFocusGUID;
-
     uint32 m_uiVoidWalkerCount;
 
     uint32 m_uiSpawnPatrolOnBaronDeath;
     uint32 m_uiSpawnPatrolOnCmdDeath;
 
-    uint32 m_uiCountDeadWolf;
-    uint32 m_bNandosYelled;
-
     bool isBaronDead;
     bool isCmdDead;
 
-    void Initialize()
+    void Initialize() override
     {
         memset(&m_auiEncounter, 0, sizeof(m_auiEncounter));
 
         m_uiAshGUID = 0;
         m_uiAdaGUID = 0;
-
-        m_uiCountDeadWolf = 0;
-        m_bNandosYelled = false;
 
         m_uiDoorCourtyardGUID = 0;
         m_uiDoorSorcererGUID  = 0;
@@ -112,12 +101,11 @@ struct instance_shadowfang_keep : public ScriptedInstance
         m_uiSpawnPatrolOnCmdDeath   = 6000;
 
         m_uiBaronSilverlaineGUID = 0;
-        m_uiArugalFocusGUID   = 0;
         //Nostalrius
         m_uiVoidWalkerCount   = 0;
     }
 
-    void OnCreatureCreate(Creature* pCreature)
+    void OnCreatureCreate(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -166,7 +154,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
         }
     }
 
-    void OnCreatureDeath(Creature* pCreature)
+    void OnCreatureDeath(Creature* pCreature) override
     {
         switch (pCreature->GetEntry())
         {
@@ -177,38 +165,10 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 isCmdDead = true;
                 break;
         }
-
-        if (pCreature->GetRespawnDelay() == 7205)
-            m_uiCountDeadWolf++;
-        if (m_uiCountDeadWolf == 4)
-        {
-            Creature* pNandos = instance->GetCreature(m_uiNandosGUID);
-            {
-                if (pNandos->isAlive())
-                {
-                    if (!m_bNandosYelled)
-                    {
-                        DoScriptText(SAY_WOLVES_DEAD, pNandos);
-                        pNandos->SetWalk(false);
-                        pNandos->GetMotionMaster()->MovePoint(0, -171.0f, 2182.22f, 151.9f, MOVE_PATHFINDING);
-                        m_bNandosYelled = true;
-                    }
-                    else if (Unit* victim = pNandos->getVictim())
-                    {
-                        // Once MovePoint has been used the movement generator type becomes idle.
-                        // If he has a target make him chase it.
-                        pNandos->SendMeleeAttackStart(victim);
-                        pNandos->GetMotionMaster()->Clear(false);
-                        pNandos->GetMotionMaster()->MoveChase(victim);
-                    }
-                    
-                }
-            }
-        }
     }
 
 
-    void OnObjectCreate(GameObject* pGo)
+    void OnObjectCreate(GameObject* pGo) override
     {
         switch (pGo->GetEntry())
         {
@@ -229,25 +189,10 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 if (m_auiEncounter[3] == DONE)
                     pGo->SetGoState(GO_STATE_ACTIVE);
                 break;
-            case GO_ARUGAL_FOCUS:
-                m_uiArugalFocusGUID = pGo->GetGUID();
-                break;
         }
     }
 
-    void DoSpeech()
-    {
-        Creature* pAda = instance->GetCreature(m_uiAdaGUID);
-        Creature* pAsh = instance->GetCreature(m_uiAshGUID);
-
-        if (pAda && pAda->isAlive() && pAsh && pAsh->isAlive())
-        {
-            DoScriptText(SAY_BOSS_DIE_AD, pAda);
-            DoScriptText(SAY_BOSS_DIE_AS, pAsh);
-        }
-    }
-
-    void Update(uint32 uiDiff)
+    void Update(uint32 uiDiff) override
     {
         if (isBaronDead)
         {
@@ -296,7 +241,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
 
     }
 
-    void SetData(uint32 uiType, uint32 uiData)
+    void SetData(uint32 uiType, uint32 uiData) override
     {
         switch (uiType)
         {
@@ -306,35 +251,9 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 m_auiEncounter[0] = uiData;
                 break;
             case TYPE_RETHILGORE:
-                if (uiData == DONE)
-                    DoSpeech();
                 m_auiEncounter[1] = uiData;
                 break;
             case TYPE_FENRUS:
-                if (uiData == DONE)
-                    if (Creature* pFenrus = instance->GetCreature(m_uiFenrusGUID))
-                        if (Creature* pArugal = pFenrus->SummonCreature(NPC_ARCHMAGE_ARUGAL, -137.29f, 2169.588f, 136.57f, 2.810f, TEMPSUMMON_TIMED_DESPAWN, 12000))
-                        {
-                            // Say text and cast event spell when fenrus is killed.
-                            pArugal->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-                            DoScriptText(SAY_FENRUS_DEAD, pArugal);
-                            pArugal->CastSpell(pArugal, SPELL_VOID_EVENT, true);
-
-                            // After 2 seconds cast fire spell.
-                            static ScriptInfo si;
-                            si.command = SCRIPT_COMMAND_CAST_SPELL;
-                            si.castSpell.spellId = SPELL_ARUGAL_SPAWN;
-                            si.castSpell.flags = 0x1;
-                            pArugal->GetMap()->ScriptCommandStart(si, 2, pArugal, pArugal);
-                            
-                            // After 8 seconds create lightning.
-                            if (GameObject* pLightning = instance->GetGameObject(GetData64(DATA_LIGHTNING)))
-                            {
-                                static ScriptInfo si2;
-                                si2.command = SCRIPT_COMMAND_ACTIVATE_OBJECT;
-                                pArugal->GetMap()->ScriptCommandStart(si2, 8, pArugal, pLightning);
-                            }
-                        }
                 m_auiEncounter[2] = uiData;
                 break;
             case TYPE_NANDOS:
@@ -370,7 +289,7 @@ struct instance_shadowfang_keep : public ScriptedInstance
         }
     }
 
-    uint32 GetData(uint32 uiType)
+    uint32 GetData(uint32 uiType) override
     {
         switch (uiType)
         {
@@ -384,30 +303,18 @@ struct instance_shadowfang_keep : public ScriptedInstance
                 return m_auiEncounter[3];
             case TYPE_INTRO:
                 return m_auiEncounter[4];
-            case DEAD_WOLF:
-                return m_uiCountDeadWolf;
             default:
                 break;
         }
         return 0;
     }
 
-    uint64 GetData64(uint32 uiType)
-    {
-        switch (uiType)
-        {
-            case DATA_LIGHTNING:
-                return m_uiArugalFocusGUID;
-        }
-        return 0;
-    }
-
-    const char* Save()
+    const char* Save() override
     {
         return strInstData.c_str();
     }
 
-    void Load(const char* chrIn)
+    void Load(const char* chrIn) override
     {
         if (!chrIn)
         {

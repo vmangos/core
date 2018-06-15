@@ -359,6 +359,7 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
             break;
         }
         case EVENT_T_MAP_SCRIPT_EVENT:
+        case EVENT_T_GROUP_MEMBER_DIED:
             break;
         default:
             sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
@@ -858,5 +859,23 @@ void CreatureEventAI::MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiDat
         if ((*i).Event.event_type == EVENT_T_MAP_SCRIPT_EVENT)
             if (((*i).Event.map_event.eventId == pEvent->m_uiEventId) && ((*i).Event.map_event.data == uiData))
                 ProcessEvent(*i);
+    }
+}
+
+void CreatureEventAI::GroupMemberJustDied(Creature* pUnit, bool isLeader)
+{
+    if (m_bEmptyList)
+        return;
+
+    for (CreatureEventAIList::iterator i = m_CreatureEventAIList.begin(); i != m_CreatureEventAIList.end(); ++i)
+    {
+        if ((*i).Event.event_type == EVENT_T_GROUP_MEMBER_DIED)
+        {
+            if ((*i).Event.group_member_died.creatureId && ((*i).Event.group_member_died.creatureId != pUnit->GetEntry()))
+                continue;
+
+            if (((bool)(*i).Event.group_member_died.isLeader) == isLeader)
+                ProcessEvent(*i);
+        } 
     }
 }

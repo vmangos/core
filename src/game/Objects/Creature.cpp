@@ -2215,11 +2215,12 @@ void Creature::CallForHelp(float fRadius)
 
 bool Creature::CanAssistTo(const Unit* u, const Unit* enemy, bool checkfaction /*= true*/) const
 {
-    // we don't need help from zombies :)
     if (!isAlive())
         return false;
 
-    // we don't need help from non-combatant ;)
+    if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_ASSIST)
+        return false;
+
     if (GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO)
         return false;
 

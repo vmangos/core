@@ -13,7 +13,6 @@ set (SCRIPTS_SRCS
 	eastern_kingdoms/dun_morogh/gnomeregan/gnomeregan.h
 	eastern_kingdoms/eastern_plaguelands/naxxramas/naxxramas.h
 	eastern_kingdoms/eastern_plaguelands/stratholme/stratholme.h
-	eastern_kingdoms/silverpine_forest/shadowfang_keep/shadowfang_keep.h
 	eastern_kingdoms/stormwind_city/quest_stormwind_rendezvous.h
 	eastern_kingdoms/stranglethorn_vale/zulgurub/zulgurub.h
 	eastern_kingdoms/swamp_of_sorrows/sunken_temple/sunken_temple.h
@@ -145,7 +144,6 @@ set (SCRIPTS_SRCS
 	eastern_kingdoms/searing_gorge/searing_gorge.cpp
 	eastern_kingdoms/silverpine_forest/silverpine_forest.cpp
 	eastern_kingdoms/silverpine_forest/shadowfang_keep/instance_shadowfang_keep.cpp
-	eastern_kingdoms/silverpine_forest/shadowfang_keep/shadowfang_keep.cpp
 	eastern_kingdoms/stormwind_city/quest_stormwind_rendezvous.cpp
 	eastern_kingdoms/stormwind_city/stormwind_city.cpp
 	eastern_kingdoms/stranglethorn_vale/stranglethorn_vale.cpp

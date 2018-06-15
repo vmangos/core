@@ -43,12 +43,31 @@ void CreatureGroup::OnMemberAttackStart(Creature* member, Unit *target)
     if (!(_options & OPTION_AGGRO_TOGETHER))
         return;
 
-    for (std::map<ObjectGuid, CreatureGroupMember*>::iterator itr = _members.begin(); itr != _members.end(); ++itr)
-        if (itr->first != member->GetObjectGuid())
-            MemberAssist(member->GetMap()->GetCreature(itr->first), target);
+    for (const auto& itr : _members)
+        if (itr.first != member->GetObjectGuid())
+            MemberAssist(member->GetMap()->GetCreature(itr.first), target);
 
     if (member->GetObjectGuid() != GetLeaderGuid())
         MemberAssist(member->GetMap()->GetCreature(GetLeaderGuid()), target);
+}
+
+void CreatureGroup::OnMemberDied(Creature* member)
+{
+    if (_options & OPTION_INFORM_LEADER_ON_MEMBER_DIED)
+    {
+        if (member->GetObjectGuid() != GetLeaderGuid())
+            if (Creature* groupLeader = member->GetMap()->GetCreature(GetLeaderGuid()))
+                if (groupLeader->IsInWorld() && groupLeader->isAlive() && groupLeader->AI())
+                    groupLeader->AI()->GroupMemberJustDied(member, false);
+    }
+    if (_options & OPTION_INFORM_MEMBERS_ON_ANY_DIED)
+    {
+        for (const auto& itr : _members)
+            if (itr.first != member->GetObjectGuid())
+                if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
+                    if (otherMember->IsInWorld() && otherMember->isAlive() && otherMember->AI())
+                        otherMember->AI()->GroupMemberJustDied(member, member->GetObjectGuid() == GetLeaderGuid());
+    }
 }
 
 void CreatureGroup::OnLeaveCombat(Creature* member)
@@ -56,9 +75,9 @@ void CreatureGroup::OnLeaveCombat(Creature* member)
     bool masterEvade = member->GetObjectGuid() == GetLeaderGuid();
     if (_options & OPTION_EVADE_TOGETHER)
     {
-        for (std::map<ObjectGuid, CreatureGroupMember*>::iterator itr = _members.begin(); itr != _members.end(); ++itr)
-            if (itr->first != member->GetObjectGuid())
-                if (Creature* otherMember = member->GetMap()->GetCreature(itr->first))
+        for (const auto& itr : _members)
+            if (itr.first != member->GetObjectGuid())
+                if (Creature* otherMember = member->GetMap()->GetCreature(itr.first))
                     if (otherMember->IsInWorld() && otherMember->isAlive() && otherMember->AI())
                         otherMember->AI()->EnterEvadeMode();
 
@@ -85,14 +104,14 @@ void CreatureGroup::OnRespawn(Creature* member)
 
 void CreatureGroup::RespawnAll(Creature* except)
 {
-    for (std::map<ObjectGuid, CreatureGroupMember*>::iterator itr = _members.begin(); itr != _members.end(); ++itr)
-        if (itr->first != except->GetObjectGuid())
-            if (Creature* otherMember = except->GetMap()->GetCreature(itr->first))
-                Respawn(otherMember, itr->second);
+    for (const auto& itr : _members)
+        if (itr.first != except->GetObjectGuid())
+            if (Creature* otherMember = except->GetMap()->GetCreature(itr.first))
+                Respawn(otherMember, itr.second);
 
     if (except->GetObjectGuid() != GetLeaderGuid())
         if (Creature* otherMember = except->GetMap()->GetCreature(GetLeaderGuid()))
-            Respawn(otherMember, NULL);
+            Respawn(otherMember, nullptr);
 }
 
 void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberEntry /* = NULL for leader */)
@@ -102,7 +121,7 @@ void CreatureGroup::Respawn(Creature* member, CreatureGroupMember const* memberE
         return;
 
     _respawnGuard = true;
-    if (member->IsInWorld() && member->GetRespawnTime() > time(NULL))
+    if (member->IsInWorld() && member->GetRespawnTime() > time(nullptr))
     {
         if (memberEntry && memberEntry->memberFlags & OPTION_FORMATION_MOVE)
         {
@@ -159,15 +178,15 @@ void CreatureGroup::DeleteFromDb()
 void CreatureGroup::SaveToDb()
 {
     DeleteFromDb();
-    for (std::map<ObjectGuid, CreatureGroupMember*>::iterator it = _members.begin(); it != _members.end(); ++it)
+    for (const auto& itr : _members)
         WorldDatabase.PExecute("INSERT INTO creature_groups SET leaderGUID=%u, memberGUID=%u, dist='%f', angle='%f', flags=%u",
-                               _leaderGuid.GetCounter(), it->first.GetCounter(), it->second->followDistance, it->second->followAngle, it->second->memberFlags);
+                               _leaderGuid.GetCounter(), itr.first.GetCounter(), itr.second->followDistance, itr.second->followAngle, itr.second->memberFlags);
 }
 
 uint32 CreatureGroup::GetWaitTime(Creature* moving)
 {
-    for (std::map<ObjectGuid, CreatureGroupMember*>::iterator it = _members.begin(); it != _members.end(); ++it)
-        if (Creature* curr = moving->GetMap()->GetCreature(it->first))
+    for (const auto& itr : _members)
+        if (Creature* curr = moving->GetMap()->GetCreature(itr.first))
             if (!curr->movespline->Finalized())
                 return 1;
     return 0;
@@ -205,7 +224,7 @@ void CreatureGroupsManager::Load()
 
     uint32 count = 0;
     Field *fields;
-    CreatureGroup *currentGroup = NULL;
+    CreatureGroup *currentGroup = nullptr;
 
     do
     {
@@ -231,7 +250,7 @@ void CreatureGroupsManager::Load()
                 currentGroup = new CreatureGroup(leaderGuid);
                 RegisterNewGroup(currentGroup);
             }
-            currentGroup->AddMember(memberGuid, fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetUInt8());
+            currentGroup->AddMember(memberGuid, fields[2].GetFloat(), fields[3].GetFloat(), fields[4].GetUInt32());
             ++count;
         }
     }
@@ -244,14 +263,14 @@ void CreatureGroupsManager::Load()
 
 void CreatureGroupsManager::LoadCreatureGroup(Creature* creature, CreatureGroup*& group)
 {
-    group = NULL;
+    group = nullptr;
     if (!creature->HasStaticDBSpawnData())
         return;
-    for (std::map<ObjectGuid, CreatureGroup*>::iterator it = _groups.begin(); it != _groups.end(); ++it)
+    for (const auto& itr : _groups)
     {
-        if (it->first == creature->GetObjectGuid() || it->second->ContainsGuid(creature->GetObjectGuid()))
+        if (itr.first == creature->GetObjectGuid() || itr.second->ContainsGuid(creature->GetObjectGuid()))
         {
-            group = it->second;
+            group = itr.second;
             break;
         }
     }

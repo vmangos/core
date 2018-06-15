@@ -329,11 +329,6 @@ void CreatureAI::DoCast(Unit* victim, uint32 spellId, bool triggered)
     m_creature->CastSpell(victim, spellId, triggered);
 }
 
-void CreatureAI::DoCastVictim(uint32 spellId, bool triggered)
-{
-    m_creature->CastSpell(m_creature->getVictim(), spellId, triggered);
-}
-
 void CreatureAI::DoCastAOE(uint32 spellId, bool triggered)
 {
     if (!triggered && m_creature->IsNonMeleeSpellCasted(false))

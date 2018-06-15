@@ -1251,9 +1251,11 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
                     creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
-        // Call creature just died function
         if (creature->AI())
             creature->AI()->JustDied(this);
+
+        if (CreatureGroup* group = creature->GetCreatureGroup())
+            group->OnMemberDied(creature);
 
         if (creature->IsTemporarySummon())
         {

@@ -204,17 +204,18 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                 case EVENT_T_SUMMONED_JUST_DIED:
                 case EVENT_T_SUMMONED_JUST_DESPAWN:
                     if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.summoned.creatureId))
-                        sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with nonexistent creature template id (%u) in param1, skipped.", temp.creature_id, i, temp.summoned.creatureId);
+                    {
+                        if (!sObjectMgr.IsExistingCreatureId(temp.group_member_died.creatureId))
+                            sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with nonexistent creature template id (%u) in param1, skipped.", temp.creature_id, i, temp.summoned.creatureId);
+                        continue;
+                    }
                     if (temp.summoned.repeatMax < temp.summoned.repeatMin)
                         sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with param2 < param1 (RepeatMax < RepeatMin). Event will never repeat.", temp.creature_id, i);
                     break;
                 case EVENT_T_QUEST_ACCEPT:
                 case EVENT_T_QUEST_COMPLETE:
-                    if (!sObjectMgr.GetQuestTemplate(temp.quest.questId))
-                        sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with nonexistent quest id (%u) in param1, skipped.", temp.creature_id, i, temp.quest.questId);
                     sLog.outErrorDb("CreatureEventAI: Creature %u using not implemented event (%u) in event %u.", temp.creature_id, temp.event_id, i);
                     continue;
-
                 case EVENT_T_AGGRO:
                 case EVENT_T_DEATH:
                 case EVENT_T_EVADE:
@@ -277,6 +278,19 @@ void CreatureEventAIMgr::LoadCreatureEventAI_Events()
                 }
                 case EVENT_T_MAP_SCRIPT_EVENT:
                     break;
+                case EVENT_T_GROUP_MEMBER_DIED:
+                {
+                    if (temp.group_member_died.creatureId)
+                    {
+                        if (!sCreatureStorage.LookupEntry<CreatureInfo>(temp.group_member_died.creatureId))
+                        {
+                            if (!sObjectMgr.IsExistingCreatureId(temp.group_member_died.creatureId))
+                                sLog.outErrorDb("CreatureEventAI:  Creature %u are using event(%u) with nonexistent creature template id (%u) in param1, skipped.", temp.creature_id, i, temp.group_member_died.creatureId);
+                            continue;
+                        }
+                    } 
+                 break;
+                }
                 default:
                     sLog.outErrorDb("CreatureEventAI: Creature %u using not checked at load event (%u) in event %u. Need check code update?", temp.creature_id, temp.event_id, i);
                     break;

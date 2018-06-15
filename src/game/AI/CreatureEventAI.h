@@ -69,6 +69,7 @@ enum EventAI_Type
     EVENT_T_MOVEMENT_INFORM         = 29,                   // Param1 = motion type, Param2 = point ID, RepeatMin, RepeatMax
     EVENT_T_LEAVE_COMBAT            = 30,                   // NONE
     EVENT_T_MAP_SCRIPT_EVENT        = 31,                   // Param1 = EventID, Param2 = Data
+    EVENT_T_GROUP_MEMBER_DIED       = 32,                   // Param1 = CreatureId, Param2 = IsLeader
 
     EVENT_T_END,
 };
@@ -229,6 +230,12 @@ struct CreatureEventAI_Event
             uint32 eventId;
             uint32 data;
         } map_event;
+        // EVENT_T_GROUP_MEMBER_DIED                        = 32
+        struct
+        {
+            uint32 creatureId;
+            uint32 isLeader;
+        } group_member_died;
         // RAW
         struct
         {
@@ -285,6 +292,7 @@ class MANGOS_DLL_SPEC CreatureEventAI : public CreatureAI
         void DamageTaken(Unit* done_by, uint32& damage) override;
         void UpdateAI(const uint32 diff) override;
         void ReceiveEmote(Player* pPlayer, uint32 text_emote) override;
+        void GroupMemberJustDied(Creature* unit, bool isLeader) override;
         void SummonedCreatureJustDied(Creature* unit) override;
         void SummonedCreatureDespawn(Creature* unit) override;
         void MapScriptEventHappened(ScriptedEvent* pEvent, uint32 uiData) override;
