@@ -1196,7 +1196,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         Item* GetItemFromBuyBackSlot( uint32 slot );
         void RemoveItemFromBuyBackSlot( uint32 slot, bool del );
 
-        uint32 GetMaxKeyringSize() const { return KEYRING_SLOT_END-KEYRING_SLOT_START; }
+        uint32 GetMaxKeyringSize() const { return getLevel() < 40 ? 4 : (getLevel() < 50 ? 8 : 12); }
         void SendEquipError( InventoryResult msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 ) const;
         void SendBuyError( BuyResult msg, Creature* pCreature, uint32 item, uint32 param );
         void SendSellError( SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 param );
