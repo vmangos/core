@@ -556,7 +556,7 @@ void BattleGroundWS::Reset()
     m_ReputationCapture = (isBGWeekend) ? 45 : 35;
 
     // [-PROGRESSIVE] < 1.10
-    if (sWorld.GetWowPatch() < WOW_PATCH_110)
+    if (sWorld.GetWowPatch() < WOW_PATCH_110 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_REWARDS))
         m_ReputationCapture = (isBGWeekend) ? 30 : 20;
 
     m_HonorWinKills = (isBGWeekend) ? 3 : 1;

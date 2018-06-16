@@ -978,7 +978,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
     // Before patch 1.12, Windsor was spawned from the AreaTrigger at the Stormwind gates.
     // Squire Rowe was added in patch 1.12, confirmed by both Allakhazam and Thottbot comments.
     // His creature Id is also in the 1.12 range, and his display Id doesn't exist in prior clients.
-    if (sWorld.GetWowPatch() >= WOW_PATCH_112)
+    if (sWorld.GetWowPatch() >= WOW_PATCH_112 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS))
         return false;
 
     // If player is dead, GM mode is ON, quest complete or no quest.

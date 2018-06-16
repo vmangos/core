@@ -255,21 +255,88 @@ MaxCoreStuckTime = 0
 AddonChannel = 1
 CleanCharacterDB = 1
 
-# Server's Wow Patch
+###################################################################################################################
 #
-# 1.2   = 0
-# 1.3   = 1
-# 1.4   = 2
-# 1.5   = 3
-# 1.6   = 4
-# 1.7   = 5
-# 1.8   = 6
-# 1.9   = 7
-# 1.10  = 8
-# 1.11  = 9
-# 1.12  = 10
+# PROGRESSION CONFIG
+#    NOTE: Generally not applicable to database-set progression fields, except for the WowPatch which
+#          defines which data is loaded from the database.
+#
+#
+#    WowPatch
+#        The current patch the server targets for quest, NPC, dungeon and raid availability.
+#        1.2   = 0
+#        1.3   = 1
+#        1.4   = 2
+#        1.5   = 3
+#        1.6   = 4
+#        1.7   = 5
+#        1.8   = 6
+#        1.9   = 7
+#        1.10  = 8
+#        1.11  = 9
+#        1.12  = 10
+#
+#    PvP.AccurateEquipRequirements
+#        Whether to enforce Blizzlike PVP rank requirements to equip PVP gear before patch 1.6.
+#        Default: 1
+#
+#    PvP.AccuratePurchaseRequirements
+#        Whether to enforce Blizzlike PVP rank requirements to purchase PVP gear (i.e. lifetime or current rank).
+#        Default: 1 (require current rank)
+#
+#    PvP.AccurateZoneRequirements
+#        Whether to enforce rank requirements to zone into the Champion and Legends halls.
+#        Default: 1
+#
+#    PvP.AccurateTimeline
+#        Whether to enforce accurate PVP timelines. eg. the honour system was not implemented before patch 1.4.
+#        If set, players will be unable to gain rank until the appropriate patch.
+#        Default: 1
+#
+#    PvP.AccurateRewards
+#        Whether to alter PVP reputation and honorable kill rewards based on patch (changed several times).
+#        Default: 1
+#
+#    Progression.AccurateMountSkillTraining
+#        Whether to use Blizzlike mount skill training.
+#        Before 1.12, players had to acquire individual skills per mount type and the training was the
+#        cheap part. After 1.12, it was homogenized to a single skill.
+#        Default: 1
+#
+#    Progression.AccuratePetStatistics
+#        Whether to allow Blizzlike pet statistic (damage, speed, resists) progression.
+#        Default: 1
+#
+#    Progression.AccurateLFGAvailability
+#        If set, disables the LFG system pre-1.3
+#        Default: 1
+#
+#    Progression.AccuratePVEEvents
+#        Whether to apply progressional changes in PVE events (NOT boss scripts). These are events which
+#        affect quests and other scripted scenes.
+#        Default: 1
+#
+#    Progression.AccurateSpellEffects
+#        Whether to accurately portray changes in spell effects (eg. Deviate Fish). NOT applicable to effects
+#        which change their functionality (eg. spell changed) or values between patches. Only affects
+#        spells which had effects added or removed which still exist in the game client.
+#        Default: 1
+#
+###################################################################################################################
 
 WowPatch = 0
+
+PvP.AccurateEquipRequirements = 1
+PvP.AccuratePurchaseRequirements = 1
+PvP.AccurateZoneRequirements = 1
+PvP.AccurateTimeline = 1
+PvP.AccurateRewards = 1
+
+Progression.AccurateMountSkillTraining = 1
+Progression.AccuratePetStatistics = 1
+Progression.AccurateLFGAvailability = 1
+Progression.AccuratePVEEvents = 1
+Progression.AccurateSpellEffects = 1
 
 ###################################################################################################################
 # SERVER LOGGING

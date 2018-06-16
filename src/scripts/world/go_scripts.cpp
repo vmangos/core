@@ -113,7 +113,7 @@ bool GOHello_go_northern_crystal_pylon(Player* pPlayer, GameObject* pGo)
 
 bool GOHello_go_barov_journal(Player* pPlayer, GameObject* pGo)
 {
-    if (sWorld.GetWowPatch() > WOW_PATCH_108)
+    if (sWorld.GetWowPatch() > WOW_PATCH_108 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS))
     {
         if (pPlayer->HasSkill(SKILL_TAILORING) && pPlayer->GetBaseSkillValue(SKILL_TAILORING) >= 285)
         {

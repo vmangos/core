@@ -1292,7 +1292,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     SetLevel(petlevel);
 
     // Before 1.9 pets retain their wild damage type
-    if (sWorld.GetWowPatch() < WOW_PATCH_109)
+    if (sWorld.GetWowPatch() < WOW_PATCH_109 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS))
         SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
     else
         SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
@@ -1326,8 +1326,10 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     int32 createResistance[MAX_SPELL_SCHOOL] = {0, 0, 0, 0, 0, 0, 0};
 
-    // Before 1.9 pets retain their wild resistances
-    if (getPetType() != HUNTER_PET || sWorld.GetWowPatch() < WOW_PATCH_109)
+    // http://wowwiki.wikia.com/wiki/Patch_1.3.0
+    // Before 1.3 pets retain their wild resistances, however it is mentioned as a bug.
+    // TODO: Do we keep it or remove it?
+    if (getPetType() != HUNTER_PET || (sWorld.GetWowPatch() < WOW_PATCH_103 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS)))
     {
         createResistance[SPELL_SCHOOL_HOLY]   = cinfo->resistance1;
         createResistance[SPELL_SCHOOL_FIRE]   = cinfo->resistance2;

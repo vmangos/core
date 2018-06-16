@@ -14967,7 +14967,9 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
     CreatePacketBroadcaster();
 
-    if (sWorld.GetWowPatch() >= WOW_PATCH_112)
+    // Note, if not using accurate mounts be sure to update all trainer spells in the
+    // database or players will be stuck with the old skill system
+    if (sWorld.GetWowPatch() >= WOW_PATCH_112 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_MOUNTS))
         UpdateOldRidingSkillToNew(has_epic_mount);
 
     return true;
@@ -20875,7 +20877,7 @@ void Player::LootMoney(int32 money, Loot* loot)
 void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
 {
     // Honor System was added in 1.4.
-    if (sWorld.GetWowPatch() < WOW_PATCH_104)
+    if (sWorld.GetWowPatch() < WOW_PATCH_104 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE))
         return;
 
     if (!uVictim)
@@ -20894,7 +20896,7 @@ void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
                 return;
 
             // Dishonorable kills were added in 1.5.
-            if (sWorld.GetWowPatch() < WOW_PATCH_105)
+            if (sWorld.GetWowPatch() < WOW_PATCH_105 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE))
                 return;
 
             m_honorMgr.Add(HonorMgr::DishonorableKillPoints(getLevel()), DISHONORABLE, cVictim);
@@ -20915,7 +20917,7 @@ void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
 void Player::RewardHonorOnDeath()
 {
     // Honor System was added in 1.4.
-    if (sWorld.GetWowPatch() < WOW_PATCH_104)
+    if (sWorld.GetWowPatch() < WOW_PATCH_104 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVP_TIMELINE))
         return;
 
     if (GetAura(2479, EFFECT_INDEX_0))             // Honorless Target
