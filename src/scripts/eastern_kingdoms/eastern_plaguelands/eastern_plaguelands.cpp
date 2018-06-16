@@ -429,7 +429,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
     void EchecEvent(Player* pPlayer, bool npcDespawn)
     {
         if (pPlayer && pPlayer->GetQuestStatus(QUEST_BALANCE_OF_LIGHT) == QUEST_STATUS_INCOMPLETE)
-            pPlayer->SetQuestStatus(QUEST_BALANCE_OF_LIGHT, QUEST_STATUS_FAILED);
+            pPlayer->FailQuest(QUEST_BALANCE_OF_LIGHT);
 
         if (rand() % 2)
             DoScriptText(SAY_ERIS_FAIL_1, m_creature);
@@ -438,6 +438,8 @@ struct npc_eris_havenfireAI : public ScriptedAI
 
         if (GameObject* pLight = m_creature->FindNearestGameObject(GO_LIGHT, 100.0f))
             pLight->AddObjectToRemoveList();
+
+        m_creature->CombatStop();
 
         DespawnAll();
 
@@ -553,12 +555,14 @@ struct npc_eris_havenfireAI : public ScriptedAI
             return;
 
         if (pPlayer->GetQuestStatus(QUEST_BALANCE_OF_LIGHT) == QUEST_STATUS_INCOMPLETE)
-            pPlayer->SetQuestStatus(QUEST_BALANCE_OF_LIGHT, QUEST_STATUS_COMPLETE);
+            pPlayer->AreaExploredOrEventHappens(QUEST_BALANCE_OF_LIGHT);
 
         DoScriptText(SAY_ERIS_END, m_creature);
 
         if (GameObject* pLight = m_creature->FindNearestGameObject(GO_LIGHT, 30.0f))
             pLight->AddObjectToRemoveList();
+
+        m_creature->CombatStop();
 
         DespawnAll();
 
