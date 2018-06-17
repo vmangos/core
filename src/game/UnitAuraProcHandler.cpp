@@ -690,23 +690,26 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 case 12847:
                 case 12848:
                 {
-		    
+                    uint32 totalDamage = damage;
+                    if (Spell* pSpell = GetCurrentSpell(CURRENT_GENERIC_SPELL))
+                        totalDamage += pSpell->GetAbsorbedDamage();
+
                     switch (dummySpell->Id)
                     {
                         case 11119:
-                            basepoints[0] = int32(0.04f * damage);
+                            basepoints[0] = int32(0.04f * totalDamage);
                             break;
                         case 11120:
-                            basepoints[0] = int32(0.08f * damage);
+                            basepoints[0] = int32(0.08f * totalDamage);
                             break;
                         case 12846:
-                            basepoints[0] = int32(0.12f * damage);
+                            basepoints[0] = int32(0.12f * totalDamage);
                             break;
                         case 12847:
-                            basepoints[0] = int32(0.16f * damage);
+                            basepoints[0] = int32(0.16f * totalDamage);
                             break;
                         case 12848:
-                            basepoints[0] = int32(0.20f * damage);
+                            basepoints[0] = int32(0.20f * totalDamage);
                             break;
                         default:
                             sLog.outError("Unit::HandleDummyAuraProc: non handled spell id: %u (IG)", dummySpell->Id);

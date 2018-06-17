@@ -281,6 +281,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_isChannelingVisual = false;
 
     m_applyMultiplierMask = 0;
+    m_absorbed = 0;
 
     // Get data for type of attack
     m_attackType = GetWeaponAttackType(m_spellInfo);
@@ -1284,6 +1285,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         }
 
         unitTarget->CalculateAbsorbResistBlock(caster, &damageInfo, m_spellInfo, BASE_ATTACK, this);
+        m_absorbed = damageInfo.absorb;
 
         caster->DealDamageMods(damageInfo.target, damageInfo.damage, &damageInfo.absorb);
         
@@ -8218,6 +8220,7 @@ void Spell::ResetEffectDamageAndHeal()
 {
     m_damage = 0;
     m_healing = 0;
+    m_absorbed = 0;
 }
 
 void Spell::SetClientStarted(bool bisClientStarted)

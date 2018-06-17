@@ -490,6 +490,8 @@ class Spell
         // For summoning ritual helpers visual spell
         void SetChannelingVisual(bool value) { m_isChannelingVisual = value; }
         bool IsChannelingVisual() const { return m_isChannelingVisual; }
+
+        int32 GetAbsorbedDamage() const { return m_absorbed; }
     protected:
         bool HasGlobalCooldown() const;
         void TriggerGlobalCooldown();
@@ -562,6 +564,7 @@ class Spell
         int32 m_damage;                                     // Damage   in effects count here
         int32 m_healing;                                    // Healing in effects count here
         int32 m_healthLeech;                                // Health leech in effects for all targets count here
+        int32 m_absorbed;
 
         //******************************************
         // Spell trigger system
