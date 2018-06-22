@@ -556,6 +556,13 @@ void WorldSession::HandleMailTakeItem(WorldPacket & recv_data)
         return;
     }
 
+    // Prevent spoofed packet accessing mail that doesn't actually have items
+    if (!m->HasItems() || m->items.size() == 0)
+    {
+        pl->SendMailResult(mailId, MAIL_ITEM_TAKEN, MAIL_ERR_INTERNAL_ERROR);
+        return;
+    }
+
     // prevent cheating with skip client money check
     if (loadedPlayer->GetMoney() < m->COD)
     {
