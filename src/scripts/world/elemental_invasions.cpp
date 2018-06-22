@@ -168,6 +168,9 @@ struct npc_invaderAI : ScriptedAI
 {
     explicit npc_invaderAI(Creature* pCreature, uint32 eventIndex) : ScriptedAI(pCreature), m_uiEventIndex(eventIndex)
     {
+        m_creature->SetRespawnRadius(30.f);
+        m_creature->GetMotionMaster()->Clear(false, true);
+        m_creature->GetMotionMaster()->MoveRandom(true, 30.0f);
         npc_invaderAI::Reset();
     }
 
