@@ -537,7 +537,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                         unitTarget->SetVisibility(VISIBILITY_OFF);
                     }
-                    break;
+                    return;
                 }
                 case 11885: // Capture Treant
                 case 11886: // Capture Wildkin
@@ -548,14 +548,21 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 {
                     if (unitTarget->isDead() && unitTarget->GetTypeId() == TYPEID_UNIT)
                         ((Creature*)unitTarget)->ForcedDespawn(1000);
-                    break;
+                    return;
                 }
-                case 25716 : // Force Self - Bow
+                case 19395: // Gordunni Trap
+                {
+                    if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
+                        unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
+
+                    return;
+                }
+                case 25716: // Force Self - Bow
                 {
                     m_caster->HandleEmote(EMOTE_ONESHOT_BOW);
                     return;
                 }
-                case 27798 : //Nature's Bounty
+                case 27798: //Nature's Bounty
                 {
                     switch(unitTarget->getPowerType())
                     {
