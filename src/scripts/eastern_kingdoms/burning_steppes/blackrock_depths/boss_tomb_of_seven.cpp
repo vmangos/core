@@ -181,6 +181,7 @@ struct boss_doomrelAI : public ScriptedAI
         {
             if (bStartFight && pDwarf->isAlive())
             {
+                pDwarf->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                 pDwarf->setFaction(FACTION_HOSTILE);
                 pDwarf->SetInCombatWithZone();              // attackstart
             }
