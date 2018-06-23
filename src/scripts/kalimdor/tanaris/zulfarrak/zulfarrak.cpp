@@ -628,6 +628,7 @@ struct ZumRahAI : public ScriptedAI
 
     void Aggro(Unit* pWho)
     {
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         m_creature->SetInCombatWithZone();
         DoScriptText(SAY_ZUMRAH_YELL, m_creature);
     }
