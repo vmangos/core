@@ -2116,7 +2116,7 @@ bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
 
     uint32 u_guidlow = pCreature->GetGUIDLow();
 
-    WorldDatabase.PExecuteLog("UPDATE creature SET spawntimesecs=%i WHERE guid=%u", stime, u_guidlow);
+    WorldDatabase.PExecuteLog("UPDATE creature SET spawntimesecsmin=%i WHERE guid=%u", stime, u_guidlow);
     pCreature->SetRespawnDelay(stime);
     PSendSysMessage(LANG_COMMAND_SPAWNTIME, stime);
 
