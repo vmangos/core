@@ -388,7 +388,6 @@ bool GossipSelect_npc_plucky_johnson(Player* pPlayer, Creature* pCreature, uint3
 
 /*
 [SQL]
-UPDATE creature_template SET ScriptName="npc_enraged_panther" WHERE entry=10992;
 UPDATE gameobject_template SET ScriptName="go_panther_cage" WHERE entry=176195;
 */
 
@@ -404,35 +403,13 @@ bool go_panther_cage(Player* pPlayer, GameObject* pGo)
         if (Creature* panther = pGo->FindNearestCreature(ENRAGED_PANTHER, 5.0f, true))
         {
             panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
+            panther->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
             panther->AI()->AttackStart(pPlayer);
         }
     }
 
-    // false pour que le core ouvre la cage. Sinon elle reste fermee.
+    // Must return false for the cage to open.
     return false;
-}
-
-struct npc_enraged_pantherAI : public ScriptedAI
-{
-    npc_enraged_pantherAI(Creature *c) : ScriptedAI(c) {}
-
-    void Reset()
-    {
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE);
-    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-CreatureAI* GetAI_npc_enraged_panther(Creature* pCreature)
-{
-    return new npc_enraged_pantherAI(pCreature);
 }
 
 /*
@@ -609,11 +586,6 @@ void AddSC_thousand_needles()
     newscript->GetAI = &GetAI_npc_plucky_johnson;
     newscript->pGossipHello = &GossipHello_npc_plucky_johnson;
     newscript->pGossipSelect = &GossipSelect_npc_plucky_johnson;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_enraged_panther";
-    newscript->GetAI = &GetAI_npc_enraged_panther;
     newscript->RegisterSelf();
 
     newscript = new Script;
