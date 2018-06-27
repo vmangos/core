@@ -47,7 +47,7 @@ void Initialize()
     (new CreatureAIFactory<PetEventAI>("PetEventAI"))->RegisterSelf();
 
 
-    (new MovementGeneratorFactory<RandomMovementGenerator<Creature> >(RANDOM_MOTION_TYPE))->RegisterSelf();
+    (new MovementGeneratorFactory<RandomMovementGenerator>(RANDOM_MOTION_TYPE))->RegisterSelf();
     (new MovementGeneratorFactory<WaypointMovementGenerator<Creature> >(WAYPOINT_MOTION_TYPE))->RegisterSelf();
     (new MovementGeneratorFactory<PatrolMovementGenerator>(PATROL_MOTION_TYPE))->RegisterSelf();
 }

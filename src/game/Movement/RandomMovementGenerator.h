@@ -21,9 +21,8 @@
 
 #include "MovementGenerator.h"
 
-template<class T>
 class MANGOS_DLL_SPEC RandomMovementGenerator
-: public MovementGeneratorMedium< T, RandomMovementGenerator<T> >
+: public MovementGeneratorMedium< Creature, RandomMovementGenerator >
 {
     public:
         explicit RandomMovementGenerator(const Creature &creature, bool use_current_position = false, float wander_distance = 0.0f) : i_nextMoveTime(0), i_nextMove(0)
@@ -41,16 +40,16 @@ class MANGOS_DLL_SPEC RandomMovementGenerator
             }
         }
 
-        void _setRandomLocation(T &);
-        void Initialize(T &);
-        void Finalize(T &);
-        void Interrupt(T &);
-        void Reset(T &);
-        bool Update(T &, const uint32 &);
-        void UpdateAsync(T &, uint32 diff);
+        void _setRandomLocation(Creature&);
+        void Initialize(Creature&);
+        void Finalize(Creature&);
+        void Interrupt(Creature&);
+        void Reset(Creature&);
+        bool Update(Creature&, const uint32 &);
+        void UpdateAsync(Creature&, uint32 diff);
         MovementGeneratorType GetMovementGeneratorType() const { return RANDOM_MOTION_TYPE; }
 
-        bool GetResetPosition(T&, float& x, float& y, float& z);
+        bool GetResetPosition(Creature&, float& x, float& y, float& z);
     private:
         ShortTimeTracker i_nextMoveTime;
         uint32 i_nextMove;

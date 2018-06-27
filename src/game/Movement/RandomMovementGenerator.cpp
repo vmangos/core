@@ -24,8 +24,7 @@
 #include "MoveSplineInit.h"
 #include "MoveSpline.h"
 
-template<>
-void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
+void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 {
     if (creature.CanFly())
     {
@@ -61,8 +60,7 @@ void RandomMovementGenerator<Creature>::_setRandomLocation(Creature &creature)
         i_nextMoveTime.Reset(urand(3000, 10000));
 }
 
-template<>
-void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
+void RandomMovementGenerator::Initialize(Creature &creature)
 {
     if (!creature.isAlive())
         return;
@@ -71,35 +69,30 @@ void RandomMovementGenerator<Creature>::Initialize(Creature &creature)
     i_nextMoveTime.Reset(50);
 }
 
-template<>
-void RandomMovementGenerator<Creature>::Reset(Creature &creature)
+void RandomMovementGenerator::Reset(Creature &creature)
 {
     Initialize(creature);
 }
 
-template<>
-void RandomMovementGenerator<Creature>::Interrupt(Creature &creature)
+void RandomMovementGenerator::Interrupt(Creature &creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(!creature.hasUnitState(UNIT_STAT_RUNNING), false);
 }
 
-template<>
-void RandomMovementGenerator<Creature>::Finalize(Creature &creature)
+void RandomMovementGenerator::Finalize(Creature &creature)
 {
     creature.clearUnitState(UNIT_STAT_ROAMING | UNIT_STAT_ROAMING_MOVE);
     creature.SetWalk(!creature.hasUnitState(UNIT_STAT_RUNNING), false);
 }
 
-template<>
-bool RandomMovementGenerator<Creature>::Update(Creature &creature, const uint32 &diff)
+bool RandomMovementGenerator::Update(Creature &creature, const uint32 &diff)
 {
     creature.GetMotionMaster()->SetNeedAsyncUpdate();
     return true;
 }
 
-template<>
-void RandomMovementGenerator<Creature>::UpdateAsync(Creature &creature, uint32 diff)
+void RandomMovementGenerator::UpdateAsync(Creature &creature, uint32 diff)
 {
     // Lock async updates for safety, see Unit::asyncMovesplineLock doc
     ACE_Guard<ACE_Thread_Mutex> guard(creature.asyncMovesplineLock);
@@ -121,8 +114,7 @@ void RandomMovementGenerator<Creature>::UpdateAsync(Creature &creature, uint32 d
     }
 }
 
-template<>
-bool RandomMovementGenerator<Creature>::GetResetPosition(Creature& c, float& x, float& y, float& z)
+bool RandomMovementGenerator::GetResetPosition(Creature& c, float& x, float& y, float& z)
 {
     // use current if in range
     if (c.IsWithinDist2d(i_positionX, i_positionY, i_wanderDistance))
