@@ -949,6 +949,8 @@ void World::LoadNostalriusConfig(bool reload)
     setConfig(CONFIG_FLOAT_DYN_RESPAWN_MAX_REDUCTION_RATE,              "DynamicRespawn.MaxReductionRate", 0.0f);
     setConfig(CONFIG_FLOAT_DYN_RESPAWN_PERCENT_PER_PLAYER,              "DynamicRespawn.PercentPerPlayer", 0.0f);
     setConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME,               "DynamicRespawn.MinRespawnTime", 0);
+    setConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME_ELITE,         "DynamicRespawn.MinEliteRespawnTime", 0);
+    setConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME_INDOORS,       "DynamicRespawn.MinIndoorRespawnTime", 0);
     setConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_RESPAWN_TIME_BELOW,      "DynamicRespawn.AffectRespawnTimeBelow", 0);
     setConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW,             "DynamicRespawn.AffectLevelBelow", 0);
     setConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_THRESHOLD,              "DynamicRespawn.PlayersThreshold", 0);

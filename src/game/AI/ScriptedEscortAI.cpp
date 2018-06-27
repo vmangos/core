@@ -42,6 +42,7 @@ npc_escortAI::npc_escortAI(Creature* pCreature) : ScriptedAI(pCreature),
     m_combatStartO(m_creature->GetOrientation())
 {
     m_uiWPWaitTimer = m_uiDelayBeforeTheFirstWaypoint;
+    pCreature->SetEscortable(true);
 }
 
 void npc_escortAI::setCurrentWP (uint32 idx)
@@ -180,6 +181,7 @@ void npc_escortAI::JustDied(Unit* /*pKiller*/)
     if (Player* pPlayer = GetPlayerForEscort())
     {
         pPlayer->GroupEventFailHappens(m_pQuestForEscort->GetQuestId());
+        pPlayer->SetEscortingGuid(ObjectGuid());
     }
 }
 
@@ -272,6 +274,9 @@ void npc_escortAI::UpdateAI(const uint32 uiDiff)
                 }
                 m_creature->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_QUESTGIVER);
                 m_creature->DisappearAndDie();
+
+                if (Player* player = GetPlayerForEscort())
+                    player->SetEscortingGuid(ObjectGuid());
 
                 if (m_bCanInstantRespawn)
                     m_creature->Respawn();
@@ -514,11 +519,17 @@ void npc_escortAI::Start(bool bRun, uint64 uiPlayerGUID, const Quest* pQuest, bo
 
     AddEscortState(STATE_ESCORT_ESCORTING);
 
+    if (Player* player = GetPlayerForEscort())
+        player->SetEscortingGuid(m_creature->GetObjectGuid());
+
     JustStartedEscort();
 }
 
 void npc_escortAI::Stop()
 {
+    if (Player* player = GetPlayerForEscort())
+        player->SetEscortingGuid(ObjectGuid());
+
     RemoveEscortState(STATE_ESCORT_ESCORTING);
     RemoveEscortState(STATE_ESCORT_PAUSED);
 }

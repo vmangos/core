@@ -2258,6 +2258,8 @@ void Player::RemoveFromWorld()
     if (IsInWorld())
         GetCamera().ResetView();
 
+    SetEscortingGuid(ObjectGuid());
+
     Unit::RemoveFromWorld();
 }
 

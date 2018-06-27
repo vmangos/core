@@ -2200,6 +2200,10 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SetAutoInstanceSwitch(bool v) { m_enableInstanceSwitch = v; }
         void SetPendingInstanceSwitch(bool v) { m_pendingInstanceSwitch = v; }
         bool IsPendingInstanceSwitch() const { return m_pendingInstanceSwitch; }
+
+        void SetEscortingGuid(const ObjectGuid& guid) { _escortingGuid = guid; }
+        const ObjectGuid& GetEscortingGuid() const { return _escortingGuid; }
+
     protected:
         bool   m_enableInstanceSwitch;
         bool   m_pendingInstanceSwitch;
@@ -2494,6 +2498,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         int32 m_cannotBeDetectedTimer;
 
         uint32 m_bNextRelocationsIgnored;
+
+        ObjectGuid _escortingGuid;
 
 public:
         /**

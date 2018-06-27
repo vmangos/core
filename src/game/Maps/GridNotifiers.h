@@ -333,6 +333,28 @@ namespace MaNGOS
         template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) {}
     };
 
+    template<class Do>
+    struct MANGOS_DLL_DECL UnitWorker
+    {
+        Do& i_do;
+
+        explicit UnitWorker(Do& _do) : i_do(_do) {}
+
+        void Visit(PlayerMapType &m)
+        {
+            for (PlayerMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+                i_do(itr->getSource());
+        }
+
+        void Visit(CreatureMapType &m)
+        {
+            for (CreatureMapType::iterator itr = m.begin(); itr != m.end(); ++itr)
+                i_do(itr->getSource());
+        }
+
+        template<class NOT_INTERESTED> void Visit(GridRefManager<NOT_INTERESTED> &) {}
+    };
+
     // Last accepted by Check Unit if any (Check can change requirements at each call)
     template<class Check>
         struct MANGOS_DLL_DECL UnitLastSearcher

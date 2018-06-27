@@ -57,6 +57,7 @@
 #include "Anticheat.h"
 #include "CreatureLinkingMgr.h"
 #include "TemporarySummon.h"
+#include "ScriptedEscortAI.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -177,7 +178,8 @@ Creature::Creature(CreatureSubtype subtype) :
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0)
+    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
+    _isEscortable(false)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -998,10 +1000,14 @@ bool Creature::AIM_Initialize()
         return false;
     }
 
+    // Clear flag. Escort AI will set it if this creature is escortable
+    _isEscortable = false;
+
     i_motionMaster.Initialize();
 
     CreatureAI * oldAI = i_AI;
     i_AI = FactorySelector::selectAI(this);
+
     delete oldAI;
     return true;
 }
@@ -2278,18 +2284,35 @@ bool Creature::CanInitiateAttack()
     return true;
 }
 
-class DynamicRespawnRatesPlayerChecker
+class DynamicRespawnRatesChecker
 {
 public:
-    DynamicRespawnRatesPlayerChecker(Creature* crea) : count(0), me(crea) {}
+    DynamicRespawnRatesChecker(Creature* crea) : _count(0), _me(crea), _hasNearbyEscort(false)
+    {
+        _myLevel = crea->getLevel();
+        _maxLevelDiff = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_LEVELDIFF);
+    }
     void operator()(Player* player)
     {
-        if (uint32(abs(int32(player->getLevel() - me->getLevel()))) > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_LEVELDIFF))
+        if (_hasNearbyEscort || player->GetEscortingGuid())
+        {
+            _hasNearbyEscort = true;
             return;
-        ++count;
+        }
+
+        if (uint32(abs(int32(player->getLevel()) - (int32)_myLevel)) > _maxLevelDiff)
+            return;
+
+        ++_count;
     }
-    uint32 count;
-    Creature* me;
+    uint32 GetCount() const { return _count; }
+    bool HasNearbyEscort() const { return _hasNearbyEscort; }
+private:
+    uint32 _count;
+    Creature* _me;
+    uint32 _myLevel;
+    uint32 _maxLevelDiff;
+    bool _hasNearbyEscort;
 };
 
 void Creature::ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data)
@@ -2299,38 +2322,72 @@ void Creature::ApplyDynamicRespawnDelay(uint32& delay, CreatureData const* data)
     // Only affects continents
     if (GetMapId() > 1)
         return;
-    // Affects only elites and rares with force dynamic flag
-    if (GetCreatureInfo()->rank)
+
+    // Only affects rares and above with the forced flag
+    if (GetCreatureInfo()->rank > CREATURE_ELITE_ELITE)
         if (data && !(data->spawnFlags & SPAWN_FLAG_FORCE_DYNAMIC_ELITE) || !data)
             return;
+
     if (getLevel() > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_LEVEL_BELOW))
         return;
     float checkRange = sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_CHECK_RANGE);
-    if (checkRange < 0)
+    if (checkRange <= 0)
         return;
     if (delay > sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_AFFECT_RESPAWN_TIME_BELOW))
         return;
     if (delay < sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME))
         return;
-    uint32 originalDelay = delay;
-    DynamicRespawnRatesPlayerChecker check(this);
-    MaNGOS::PlayerWorker<DynamicRespawnRatesPlayerChecker> searcher(check);
+
+    DynamicRespawnRatesChecker check(this);
+    MaNGOS::PlayerWorker<DynamicRespawnRatesChecker> searcher(check);
     Cell::VisitWorldObjects(this, searcher, checkRange);
 
-    if (check.count < sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_THRESHOLD))
+    // No dynamic respawns around an in progress escort
+    if (check.HasNearbyEscort())
         return;
-    check.count -= sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_THRESHOLD);
 
-    uint32 reduction = check.count * sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_PERCENT_PER_PLAYER) * delay / 100;
-    if (reduction > delay)
+    int32 count = check.GetCount();
+    count -= sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_PLAYERS_THRESHOLD);
+    if (count <= 0)
+        return;
+
+    uint32 originalDelay = delay;
+
+    float maxReductionRate = sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_MAX_REDUCTION_RATE);
+    float reductionRate = count * sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_PERCENT_PER_PLAYER) / 100.0f;
+    if (reductionRate > maxReductionRate)
+        reductionRate = maxReductionRate;
+
+    // Invalid configuration
+    if (reductionRate < 0)
+        return;
+
+    uint32 reduction = static_cast<uint32>(reductionRate * originalDelay);
+    if (reduction >= delay)
         delay = 0;
     else
         delay -= reduction;
 
-    if (delay < sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME))
-        delay = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME);
-    if (delay < originalDelay * sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_MAX_REDUCTION_RATE))
-        delay = originalDelay * sWorld.getConfig(CONFIG_FLOAT_DYN_RESPAWN_MAX_REDUCTION_RATE);
+    uint32 minimum = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME);
+    uint32 indoorMinimum = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME_INDOORS);
+    if (GetCreatureInfo()->rank >= CREATURE_ELITE_ELITE)
+    {
+        uint32 eliteMin = sWorld.getConfig(CONFIG_UINT32_DYN_RESPAWN_MIN_RESPAWN_TIME_ELITE);
+        if (minimum < eliteMin)
+            minimum = eliteMin;
+    }
+    else if (indoorMinimum > 0 && !GetTerrain()->IsOutdoors(GetPositionX(), GetPositionY(), GetPositionZ()))
+    {
+        minimum = indoorMinimum;
+    }
+
+    // Cap the lower-end reduction at the chosen minimum
+    if (delay < minimum)
+        delay = minimum;
+
+    // Prevent bad configs extending the respawn time beyond default
+    if (delay > originalDelay)
+        delay = originalDelay;
 }
 
 void Creature::SaveRespawnTime()

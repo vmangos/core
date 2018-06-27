@@ -864,6 +864,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
         // (msecs)timer used for group loot
         uint32 GetGroupLootTimer() { return m_groupLootTimer; }
 
+        void SetEscortable(bool escortable) { _isEscortable = escortable; }
+        bool IsEscortable() const { return _isEscortable; }
+
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;
 
@@ -938,6 +941,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 _nonPlayerDamageTaken;
         
         float m_callForHelpDist;
+
+        bool _isEscortable;
 
     private:
         GridReference<Creature> m_gridRef;
