@@ -261,6 +261,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
 
         bool    m_removed;                                  // prevent overwrite pet state in DB at next Pet::Update if pet already removed(saved)
     protected:
+        uint32  m_focusTimer;
         uint32  m_happinessTimer;
         uint32  m_loyaltyTimer;
         PetType m_petType;

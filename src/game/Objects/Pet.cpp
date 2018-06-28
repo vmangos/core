@@ -64,10 +64,10 @@ Pet::Pet(PetType type) :
     m_TrainingPoints(0), m_resetTalentsCost(0), m_resetTalentsTime(0),
     m_removed(false), m_happinessTimer(7500), m_loyaltyTimer(12000), m_petType(type), m_duration(0),
     m_loyaltyPoints(0), m_bonusdamage(0), m_auraUpdateMask(0), m_loading(false),
-    m_enabled(true), m_unSummoned(false)
+    m_enabled(true), m_unSummoned(false), m_focusTimer(4000)
 {
     m_name = "Pet";
-    m_regenTimer = 4000;
+    m_regenTimer = REGEN_TIME_FULL;
 
     // pets always have a charminfo, even if they are not actually charmed
     InitCharmInfo(this);
@@ -730,12 +730,8 @@ void Pet::Update(uint32 update_diff, uint32 diff)
 
 void Pet::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 {
-    //regenerate Focus
     if (m_regenTimer <= update_diff)
     {
-        if (getPetType() == HUNTER_PET)
-            RegenerateFocus();
-
         if (!isInCombat() || IsPolymorphed())
             RegenerateHealth();
 
@@ -748,6 +744,14 @@ void Pet::RegenerateAll(uint32 update_diff, bool skipCombatCheck)
 
     if (getPetType() != HUNTER_PET)
         return;
+
+    if (m_focusTimer <= update_diff)
+    {
+        RegenerateFocus();
+        m_focusTimer = 4000;
+    }
+    else
+        m_focusTimer -= update_diff;
 
     if (m_happinessTimer <= update_diff)
     {
@@ -775,7 +779,7 @@ void Pet::RegenerateFocus()
     if (curValue >= maxValue)
         return;
 
-    float addvalue = 24 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
+    float addvalue = 25 * sWorld.getConfig(CONFIG_FLOAT_RATE_POWER_FOCUS);
 
     AuraList const& ModPowerRegenPCTAuras = GetAurasByType(SPELL_AURA_MOD_POWER_REGEN_PERCENT);
     for (AuraList::const_iterator i = ModPowerRegenPCTAuras.begin(); i != ModPowerRegenPCTAuras.end(); ++i)
