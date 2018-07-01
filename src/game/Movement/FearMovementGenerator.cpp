@@ -21,6 +21,8 @@ void FearMovementGenerator<T>::_setTargetLocation(T &owner)
     // ignore in case other no reaction state
     if (owner.hasUnitState((UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED) & ~UNIT_STAT_FLEEING))
         return;
+    if (owner.IsPlayer() && owner.hasUnitState(UNIT_STAT_CLIENT_ROOT))
+        return;
 
     float x, y, z;
     if (!_getPoint(owner, x, y, z))
