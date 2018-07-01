@@ -115,15 +115,12 @@ static SpawnLocations aSpirits[] =
 
 struct boss_mandokirAI : public ScriptedAI
 {
+    const static uint32 START_FLAGS = UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE |
+        UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_IMMUNE_TO_PLAYER;
+
     boss_mandokirAI(Creature* pCreature) : ScriptedAI(pCreature)
     {
         m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-
-        m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-
-        m_creature->Relocate(-12169.2f, -1928.1f, 153.6f);
-        m_creature->GetMap()->CreatureRelocation(m_creature, -12169.2f, -1928.1f, 153.6f, 3.14f);
-        m_VilebranchDead = false;
 
         Reset();
     }
@@ -196,13 +193,7 @@ struct boss_mandokirAI : public ScriptedAI
 
         DespawnSpirits();
 
-        if (!m_VilebranchDead)
-        {
-            m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-            m_creature->Relocate(-12169.2f, -1928.1f, 153.6f);
-            m_creature->GetMap()->CreatureRelocation(m_creature, -12169.2f, -1928.1f, 153.6f, 3.14f);
-        }
-
+        CheckVilebranchState(true);
     }
 
     void KilledUnit(Unit* pVictim)
@@ -258,6 +249,30 @@ struct boss_mandokirAI : public ScriptedAI
                 DoScriptText(EMOTE_RAGE, m_creature);
                 m_bRaptorDead = true;
             }
+        }
+    }
+
+    void CheckVilebranchState(bool reset = false)
+    {
+        // If Vilebranch dies and group wipes, boss should start at the bottom of the stairs
+        // Video: https://www.youtube.com/watch?v=joaWY0wjOXI
+        Creature* vileBranch = m_creature->FindNearestCreature(11391, 100.0f, true);
+        bool isVilebranchDead = !vileBranch || !vileBranch->isAlive();
+        if (reset || m_VilebranchDead != isVilebranchDead)
+        {
+            if (isVilebranchDead)
+            {
+                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, START_FLAGS);
+                m_creature->SetHomePosition(-12195.0f, -1948.0f, 130.0f, 3.14f);
+            }
+            else
+            {
+                m_creature->SetFlag(UNIT_FIELD_FLAGS, START_FLAGS);
+                m_creature->ResetHomePosition();
+            }
+            m_creature->GetMotionMaster()->MoveTargetedHome();
+
+            m_VilebranchDead = isVilebranchDead;
         }
     }
 
@@ -395,17 +410,7 @@ struct boss_mandokirAI : public ScriptedAI
     void UpdateAI(const uint32 diff)
     {
         if (!m_VilebranchDead)
-        {
-            Creature* vileBranch = m_creature->FindNearestCreature(11391, 100.0f, true);
-
-            if (!vileBranch || !vileBranch->isAlive())
-            {
-                m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PACIFIED | UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE);
-                m_creature->GetMotionMaster()->MoveTargetedHome();
-                m_creature->GetMotionMaster()->MovePoint(0, -12195.0f, -1948.0f, 130.0f);
-                m_VilebranchDead = true;
-            }
-        }
+            CheckVilebranchState();
 
         if (!m_VilebranchDead || !m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
