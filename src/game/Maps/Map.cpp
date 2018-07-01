@@ -1004,13 +1004,12 @@ void Map::Update(uint32 t_diff)
 
 void Map::UpdateScriptedEvents()
 {
-    for (auto itr = m_mScriptedEvents.begin(); itr != m_mScriptedEvents.end(); ++itr)
+    for (auto itr = m_mScriptedEvents.begin(); itr != m_mScriptedEvents.end();)
     {
         if (itr->second.UpdateEvent())
-        {
-            itr = m_mScriptedEvents.erase(itr);
-            continue;
-        }
+            m_mScriptedEvents.erase(itr++);
+        else
+            ++itr;
     }
 }
 
