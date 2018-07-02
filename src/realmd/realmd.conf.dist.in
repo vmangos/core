@@ -114,6 +114,11 @@ ConfVersion=2010062001
 #        Default: 0 (No verification required)
 #                 1 (Verification required)
 #
+#    ReqEmailSince
+#        Require the Email Verification Since the Timestamp
+#        Default: 0 (Disabled)
+#                 1530302395 (Timestamp)
+#
 #    GeoLocking
 #        Blocks account logins when a change in geographical location is detected
 #        Default: 0
@@ -163,6 +168,7 @@ WrongPass.MaxCount = 0
 WrongPass.BanTime = 600
 WrongPass.BanType = 0
 ReqEmailVerification = 0
+ReqEmailSince = 0
 GeoLocking = 0
 SendMail = 0
 MailFrom = ""

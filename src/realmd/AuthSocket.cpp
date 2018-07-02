@@ -417,18 +417,26 @@ bool AuthSocket::_HandleLogonChallenge()
     {
         ///- Get the account details from the account table
         // No SQL injection (escaped user name)
-        result = LoginDatabase.PQuery("SELECT sha_pass_hash,id,locked,last_ip,v,s,security,email_verif,geolock_pin,email FROM account WHERE username = '%s'",_safelogin.c_str ());
+        result = LoginDatabase.PQuery("SELECT sha_pass_hash,id,locked,last_ip,v,s,security,email_verif,geolock_pin,email,UNIX_TIMESTAMP(joindate) FROM account WHERE username = '%s'",_safelogin.c_str ());
         if (result)
         {
             Field* fields = result->Fetch();
 
             // Prevent login if the user's email address has not been verified
             bool requireVerification = sConfig.GetBoolDefault("ReqEmailVerification", false);
+            int32 requireEmailSince = sConfig.GetIntDefault("ReqEmailSince", 0);
             bool verified = (*result)[7].GetBool();
+            
+            // Prevent login if the user's join date is bigger than the timestamp in configuration
+            if (requireEmailSince > 0)
+            {
+                uint32 t = (*result)[10].GetUInt32();
+                requireVerification = requireVerification && (t >= requireEmailSince);
+            }
 
             if (requireVerification && !verified)
             {
-                 BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", _login.c_str(), get_remote_address().c_str());
+                BASIC_LOG("[AuthChallenge] Account '%s' using IP '%s 'email address requires email verification - rejecting login", _login.c_str(), get_remote_address().c_str());
                 pkt << (uint8)WOW_FAIL_UNKNOWN_ACCOUNT;
                 send((char const*)pkt.contents(), pkt.size());
                 return true;
@@ -796,7 +804,7 @@ bool AuthSocket::_HandleLogonProof()
         else if (GeographicalLockCheck())
         {
             BASIC_LOG("Account '%s' (%u) using IP '%s' has been geolocked", _login.c_str(), _accountId, get_remote_address().c_str()); // todo, add additional logging info
-            
+
             auto pin = urand(100000, 999999); // check rand32_max
             auto result = LoginDatabase.PExecute("UPDATE account SET geolock_pin = %u WHERE username = '%s'",
                 pin, _safelogin.c_str());
@@ -1295,7 +1303,7 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
 
     // convert the PIN to bytes (for ex. '1234' to {1, 2, 3, 4})
     std::vector<uint8> pinBytes;
-	    
+
     while (pin != 0)
     {
         pinBytes.push_back(pin % 10);
@@ -1324,7 +1332,7 @@ bool AuthSocket::VerifyPinData(uint32 pin, const PINData& clientData)
     sha.UpdateData(serverSecuritySalt.AsByteArray());
     sha.UpdateData(pinBytes.data(), pinBytes.size());
     sha.Finalize();
-    
+
     BigNumber hash, clientHash;
     hash.SetBinary(sha.GetDigest(), sha.GetLength());
     clientHash.SetBinary(clientData.hash, 20);
@@ -1353,7 +1361,7 @@ uint32 AuthSocket::GenerateTotpPin(const std::string& secret, int interval) {
     uint64 now = static_cast<uint64>(time);
     uint64 step = static_cast<uint64>((floor(now / 30))) + interval;
     EndianConvertReverse(step);
-    
+
     HmacHash hmac(decoded_key.data(), key_size);
     hmac.UpdateData((uint8*)&step, sizeof(step));
     hmac.Finalize();
