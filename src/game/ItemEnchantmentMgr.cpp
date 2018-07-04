@@ -29,6 +29,7 @@
 #include <list>
 #include <vector>
 #include "Util.h"
+#include "World.h"
 
 struct EnchStoreItem
 {
@@ -55,7 +56,7 @@ void LoadRandomEnchantmentsTable()
     uint32 entry, ench;
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry, ench, chance FROM item_enchantment_template");
+    QueryResult *result = WorldDatabase.PQuery("SELECT entry, ench, chance FROM item_enchantment_template WHERE ((%u >= patch_min) && (%u <= patch_max))", sWorld.GetWowPatch(), sWorld.GetWowPatch());
 
     if (result)
     {
