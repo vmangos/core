@@ -2269,7 +2269,7 @@ BanReturn World::BanAccount(BanMode mode, std::string nameOrIP, uint32 duration_
 }
 
 /// Remove a ban from an account or IP address
-bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
+bool World::RemoveBanAccount(BanMode mode, const std::string& source, const std::string& message, std::string nameOrIP)
 {
     if (mode == BAN_IP)
     {
@@ -2290,6 +2290,7 @@ bool World::RemoveBanAccount(BanMode mode, std::string nameOrIP)
 
         //NO SQL injection as account is uint32
         LoginDatabase.PExecute("UPDATE account_banned SET active = '0' WHERE id = '%u'", account);
+        WarnAccount(account, source, message, "UNBAN");
         sAccountMgr.UnbanAccount(account);
     }
     return true;

@@ -5682,6 +5682,12 @@ bool ChatHandler::HandleUnBanHelper(BanMode mode, char* args)
 
     std::string nameOrIP = cnameOrIP;
 
+    char* message = ExtractQuotedOrLiteralArg(&args);
+    if (!message)
+        return false;
+
+    std::string unbanMessage(message);
+
     switch (mode)
     {
         case BAN_ACCOUNT:
@@ -5706,8 +5712,10 @@ bool ChatHandler::HandleUnBanHelper(BanMode mode, char* args)
             break;
     }
 
-    if (sWorld.RemoveBanAccount(mode, nameOrIP))
-        PSendSysMessage(LANG_UNBAN_UNBANNED, nameOrIP.c_str());
+    std::string source = m_session ? m_session->GetPlayerName() : "CONSOLE";
+
+    if (sWorld.RemoveBanAccount(mode, source, unbanMessage, nameOrIP))
+        PSendSysMessage(LANG_UNBAN_UNBANNED, nameOrIP.c_str(), unbanMessage.c_str());
     else
         PSendSysMessage(LANG_UNBAN_ERROR, nameOrIP.c_str());
 
