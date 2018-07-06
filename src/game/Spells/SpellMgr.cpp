@@ -612,7 +612,8 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
                 return SPELL_NEGATIVE_HASTE;
 
     // Movement speed reduction
-    if (IsSpellHaveSingleAura(spellInfo, SPELL_AURA_MOD_DECREASE_SPEED))
+    // Dazes are not affected
+    if (IsSpellHaveSingleAura(spellInfo, SPELL_AURA_MOD_DECREASE_SPEED) && !(spellInfo->AttributesEx & SPELL_ATTR_EX_UNK18))
         return SPELL_SNARE;
 
     return SPELL_NORMAL;
