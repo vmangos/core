@@ -10125,10 +10125,6 @@ void Unit::ApplyAttackTimePercentMod(WeaponAttackType att, float val, bool apply
 {
     if (val > 0)
     {
-#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
-        val = -val;
-        apply = !apply;
-#endif
         ApplyPercentModFloatVar(m_modAttackSpeedPct[att], val, !apply);
         ApplyPercentModFloatValue(UNIT_FIELD_BASEATTACKTIME + att, val, !apply);
 
