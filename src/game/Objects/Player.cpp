@@ -518,7 +518,7 @@ Player::Player(WorldSession *session) : Unit(),
     m_deathTimer = 0;
     m_deathExpireTime = 0;
 
-    m_swingErrorMsg = 0;
+    m_swingErrorMsg = ATTACK_RESULT_OK;
 
     for (int j = 0; j < PLAYER_MAX_BATTLEGROUND_QUEUES; ++j)
     {
@@ -1186,6 +1186,14 @@ struct UpdateAttackersCombatHelper
     }
     Player* player;
 };
+
+AutoAttackCheckResult Player::CanAutoAttackTarget(Unit const* pVictim) const
+{
+    if (!IsValidAttackTarget(pVictim))
+        return ATTACK_RESULT_FRIENDLY_TARGET;
+
+    return Unit::CanAutoAttackTarget(pVictim);
+}
 
 void Player::Update(uint32 update_diff, uint32 p_time)
 {

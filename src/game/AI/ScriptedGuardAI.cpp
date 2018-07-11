@@ -154,7 +154,7 @@ void guardAI::UpdateAI(const uint32 diff)
                 //Set our global cooldown
                 GlobalCooldown = GENERIC_CREATURE_COOLDOWN;
             }
-            else m_creature->AttackerStateUpdate(m_creature->getVictim());
+            else DoMeleeAttackIfReady();
 
             m_creature->resetAttackTimer();
         }

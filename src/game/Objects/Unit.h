@@ -551,6 +551,16 @@ enum NPCFlags
     UNIT_NPC_FLAG_OUTDOORPVP            = 0x20000000,       // custom flag for outdoor pvp creatures || Custom flag
 };
 
+enum AutoAttackCheckResult
+{
+    ATTACK_RESULT_OK = 0,
+    ATTACK_RESULT_NOT_IN_RANGE = 1,
+    ATTACK_RESULT_BAD_FACING = 2,
+    ATTACK_RESULT_CANT_ATTACK = 3,
+    ATTACK_RESULT_DEAD = 4,
+    ATTACK_RESULT_FRIENDLY_TARGET = 5,
+};
+
 namespace Movement
 {
     class MoveSpline;
@@ -998,6 +1008,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool isAttackReady(WeaponAttackType type = BASE_ATTACK) const;
         bool haveOffhandWeapon() const;
         bool UpdateMeleeAttackingState();
+        void DelayAutoAttacks();
+        virtual AutoAttackCheckResult CanAutoAttackTarget(Unit const*) const;
         bool CanUseEquippedWeapon(WeaponAttackType attackType) const
         {
             if (IsInFeralForm())
@@ -1294,7 +1306,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, DamageEffectType damagetype);
 
         bool IsValidAttackTarget(Unit const* target) const;
-        bool _IsValidAttackTarget(Unit const* target, SpellEntry const* bySpell = nullptr, WorldObject const* obj = nullptr) const;
         bool isTargetableForAttack(bool inversAlive = false, bool isAttackerPlayer = false) const;
         bool isAttackableByAOE(bool requireDeadTarget = false, bool isCasterPlayer = false) const;
         bool isPassiveToHostile() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE); }

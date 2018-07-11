@@ -218,7 +218,7 @@ public:
         if (!i_trap->CanSeeInWorld(u))
             return false;
         bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
-        if (u->isAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->_IsValidAttackTarget(u))
+        if (u->isAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u))
         {
             i_range = i_trap->GetDistance(u);
             return true;

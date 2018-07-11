@@ -1634,8 +1634,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SendLogXPGain(uint32 GivenXP,Unit* victim,uint32 RestXP);
 
 
-        uint8 LastSwingErrorMsg() const { return m_swingErrorMsg; }
-        void SwingErrorMsg(uint8 val) { m_swingErrorMsg = val; }
+        AutoAttackCheckResult GetLastSwingErrorMsg() const { return m_swingErrorMsg; }
+        void SetSwingErrorMsg(AutoAttackCheckResult val) { m_swingErrorMsg = val; }
 
         // notifiers
         void SendAttackSwingCantAttack();
@@ -1646,6 +1646,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SendAttackSwingBadFacingAttack();
         void SendAutoRepeatCancel();
         void SendExplorationExperience(uint32 Area, uint32 Experience);
+        AutoAttackCheckResult CanAutoAttackTarget(Unit const*) const override;
 
         void ResetInstances(InstanceResetMethod method);
         void SendResetInstanceSuccess(uint32 MapId);
@@ -2374,7 +2375,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool m_canParry;
         bool m_canBlock;
         bool m_canDualWield;
-        uint8 m_swingErrorMsg;
+        AutoAttackCheckResult m_swingErrorMsg;
         float m_ammoDPS;
 
         ////////////////////Rest System/////////////////////
