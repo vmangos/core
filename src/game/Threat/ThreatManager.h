@@ -100,6 +100,8 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
 
         ObjectGuid const& getUnitGuid() const { return iUnitGuid; }
 
+        Unit* getSourceUnit();
+
         //=================================================
         // reference is not needed anymore. realy delete it !
 
@@ -123,7 +125,6 @@ class MANGOS_DLL_SPEC HostileReference : public Reference<Unit, ThreatManager>
         // Inform the source, that the status of that reference was changed
         void fireStatusChanged(ThreatRefStatusChangeEvent& pThreatRefStatusChangeEvent);
 
-        Unit* getSourceUnit();
         float iThreat;
         float iTempThreatModifyer;                          // used for taunt
         ObjectGuid iUnitGuid;

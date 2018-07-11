@@ -3487,10 +3487,30 @@ Unit* Creature::DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff, bool 
 {
     std::list<Unit *> targets;
 
-    MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
-    MaNGOS::UnitListSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(targets, u_check);
+    if (Unit* pVictim = getVictim())
+    {
+        HostileReference* pReference = pVictim->getHostileRefManager().getFirst();
 
-    Cell::VisitAllObjects(this, searcher, fRange);
+        while (pReference)
+        {
+            if (Unit* pTarget = pReference->getSourceUnit())
+            {
+                if (pTarget->isAlive() && IsFriendlyTo(pTarget) && IsWithinDistInMap(pTarget, fRange) &&
+                    ((bPercent && (100 - pTarget->GetHealthPercent() > uiMinHPDiff)) || (!bPercent && (pTarget->GetMaxHealth() - pTarget->GetHealth() > uiMinHPDiff))))
+                {
+                    targets.push_back(pTarget);
+                }
+            }
+            pReference = pReference->next();
+        }
+    }
+    else
+    {
+        MaNGOS::MostHPMissingInRangeCheck u_check(this, fRange, uiMinHPDiff, bPercent);
+        MaNGOS::UnitListSearcher<MaNGOS::MostHPMissingInRangeCheck> searcher(targets, u_check);
+
+        Cell::VisitAllObjects(this, searcher, fRange);
+    }
 
     // remove current target
     if (except)
