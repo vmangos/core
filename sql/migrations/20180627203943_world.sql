@@ -74,7 +74,7 @@ INSERT INTO `reference_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `
 -- Multiple missing items from cmangos and trinity.
 DELETE FROM `item_loot_template` WHERE `entry`=16882;
 INSERT INTO `item_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`) VALUES
-(16882, 1000, 1, 0, -1000, 1, 0),
+(16882, 1000, 0.5, 0, -1000, 1, 0),
 (16882, 1005, 3, 0, -1005, 1, 0),
 (16882, 1006, 3, 0, -1006, 1, 0),
 (16882, 422, 0.05, 0, 1, 1, 0),
