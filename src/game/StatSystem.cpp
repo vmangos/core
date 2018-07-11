@@ -430,6 +430,7 @@ void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, fl
     {
         base_value = 0.0f;
         total_value = 0.0f;
+        total_phys = 0.0f;
     }
 
     min_damage = ((base_value + weapon_mindamage) * base_pct + total_value + total_phys) * total_pct;
