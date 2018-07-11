@@ -172,20 +172,16 @@ void Player::UpdateArmor()
     SetArmor(int32(value));
 }
 
-float Player::GetHealthBonusFromStamina()
+float Player::GetHealthBonusFromStamina(float stamina)
 {
-    float stamina = GetStat(STAT_STAMINA);
-
     float baseStam = stamina < 20 ? stamina : 20;
     float moreStam = stamina - baseStam;
 
     return baseStam + (moreStam * 10.0f);
 }
 
-float Player::GetManaBonusFromIntellect()
+float Player::GetManaBonusFromIntellect(float intellect)
 {
-    float intellect = GetStat(STAT_INTELLECT);
-
     float baseInt = intellect < 20 ? intellect : 20;
     float moreInt = intellect - baseInt;
 
@@ -198,7 +194,7 @@ void Player::UpdateMaxHealth()
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + GetCreateHealth();
     value *= GetModifierValue(unitMod, BASE_PCT);
-    value += GetModifierValue(unitMod, TOTAL_VALUE) + GetHealthBonusFromStamina();
+    value += GetModifierValue(unitMod, TOTAL_VALUE) + GetHealthBonusFromStamina(GetStat(STAT_STAMINA));
     value *= GetModifierValue(unitMod, TOTAL_PCT);
 
     SetMaxHealth(std::max(1, int(value)));
@@ -211,7 +207,7 @@ void Player::UpdateMaxPower(Powers power)
     uint32 create_power = GetCreatePowers(power);
 
     // ignore classes without mana
-    float bonusPower = (power == POWER_MANA && create_power > 0) ? GetManaBonusFromIntellect() : 0;
+    float bonusPower = (power == POWER_MANA && create_power > 0) ? GetManaBonusFromIntellect(GetStat(STAT_INTELLECT)) : 0;
 
     float value = GetModifierValue(unitMod, BASE_VALUE) + create_power;
     value *= GetModifierValue(unitMod, BASE_PCT);
