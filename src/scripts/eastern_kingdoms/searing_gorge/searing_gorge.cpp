@@ -284,6 +284,13 @@ struct npc_obsidionAI : public ScriptedAI
 
     }
 
+    void Aggro(Unit* pWho) override
+    {
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
+        m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PASSIVE);
+        ScriptedAI::Aggro(pWho);
+    }
+
     void StartEvent()
     {
         m_uiTalkTimer = 5000;
@@ -345,7 +352,11 @@ struct npc_obsidionAI : public ScriptedAI
 
                         AttackStart(player);
                         if (Creature* lathoric = m_creature->GetMap()->GetCreature(m_Dorius))
+                        {
+                            lathoric->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
                             lathoric->AI()->AttackStart(player);
+                        }
+                            
                         break;
                     }
                 }
