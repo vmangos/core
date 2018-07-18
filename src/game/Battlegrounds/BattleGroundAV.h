@@ -176,6 +176,7 @@ enum BG_AV_Nodes
     BG_AV_NODES_ERROR                   = 255,
 };
 #define BG_AV_NODES_MAX                 15
+#define BG_AV_TOWERS_MAX                23
 
 
 // for nodeevents we will use event1=node
@@ -195,6 +196,10 @@ enum BG_AV_Nodes
 // towers have special creatures
 // so i use event1=BG_AV_NODES_MAX+node (22-29)
 // and event2=type
+
+// towers defenders are set to (30-37)
+// event2 depends on armor scraps state
+
 
 enum BG_AV_Events
 {
