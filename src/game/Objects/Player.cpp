@@ -20182,7 +20182,7 @@ bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown)
         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(8690);
         AddSpellAndCategoryCooldowns(spellInfo, 6948);
     }
-    return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), options); 
+    return TeleportTo(m_homebindMapId, m_homebindX, m_homebindY, m_homebindZ, GetOrientation(), (options | TELE_TO_FORCE_MAP_CHANGE));
 }
 
 Object* Player::GetObjectByTypeMask(ObjectGuid guid, TypeMask typemask)
