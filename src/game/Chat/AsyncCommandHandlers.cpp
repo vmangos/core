@@ -130,7 +130,8 @@ void PInfoHandler::HandleDelayedMoneyQuery(QueryResult*, SqlQueryHolder *holder,
 void PInfoHandler::HandleAccountInfoResult(QueryResult *result, PInfoData *data)
 {
     WorldSession* session = sWorld.FindSession(data->m_accountId);
-    if (!session)
+    // Caller re-logged mid query. ChatHandler requires a player in the session
+    if (!session || !session->GetPlayer())
     {
         delete data;
 
