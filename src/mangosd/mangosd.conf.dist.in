@@ -285,7 +285,7 @@ CleanCharacterDB = 1
 #        Default: 1 (require current rank)
 #
 #    PvP.AccurateZoneRequirements
-#        Whether to enforce rank requirements to zone into the Champion and Legends halls.
+#        Whether to enforce Blizzlike PVP rank requirements to zone into the Champion and Legends halls.
 #        Default: 1
 #
 #    PvP.AccurateTimeline
@@ -322,6 +322,11 @@ CleanCharacterDB = 1
 #        spells which had effects added or removed which still exist in the game client.
 #        Default: 1
 #
+#    DebuffLimit
+#        How many debuffs can be present on a target simultaneously
+#        Default: 0  - Decide automatically based on patch
+#                      In patch 1.7 the limit was increased from 8 to 16
+#
 ###################################################################################################################
 
 WowPatch = 0
@@ -337,6 +342,8 @@ Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
 Progression.AccurateSpellEffects = 1
+
+DebuffLimit = 0
 
 ###################################################################################################################
 # SERVER LOGGING
@@ -1845,7 +1852,7 @@ VD.Enable = 1
 
 Pet.DefaultLoyalty = 1
 Spells.CCDelay = 200
-DebuffLimit = 16
+
 Movement.MaxPointsPerPacket = 80
 
 # Anticrash configuration
