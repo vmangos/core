@@ -11470,6 +11470,16 @@ void Unit::TransferAttackersThreatTo(Unit* unit)
     Cell::VisitGridObjects(this, worker, 50.0f);
 }
 
+void Unit::RemoveAttackersThreat(Unit* owner)
+{
+    for (AttackerSet::iterator itr = m_attackers.begin(); itr != m_attackers.end(); ++itr)
+    {
+        (*itr)->getThreatManager().modifyThreatPercent(this, -100);
+        if (owner)
+            (*itr)->AddThreat(owner, 1.0f);
+    }
+}
+
 void Unit::SetMovement(UnitMovementType pType)
 {
     switch (pType)

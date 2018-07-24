@@ -2895,8 +2895,8 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
     }
     else
     {
-        // On transfert la menace vers celui qui a CM
-        target->TransferAttackersThreatTo(caster);
+        // Clear threat generated when MC ends
+        target->RemoveAttackersThreat(caster);
 
         // spell is interrupted on channeled aura removal, don't need to interrupt here
         //caster->InterruptSpell(CURRENT_CHANNELED_SPELL);

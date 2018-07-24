@@ -1903,6 +1903,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // Nostalrius - en fin de CM par exemple
         void TransferAttackersThreatTo(Unit* unit);
+        void RemoveAttackersThreat(Unit* owner);
 
         bool IsInPartyWith(Unit const* unit) const;
         bool IsInRaidWith(Unit const* unit) const;
