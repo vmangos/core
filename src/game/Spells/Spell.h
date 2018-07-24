@@ -498,8 +498,11 @@ class Spell
         void CancelGlobalCooldown();
 
         void SendLoot(ObjectGuid guid, LootType loottype, LockType lockType);
-        bool IgnoreItemRequirements() const;                        // some item use spells have unexpected reagent data
+        bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
+
+        // Additional range for non-strict check at end of cast
+        inline float GetRangeExtensionForCaster() const { return m_caster->IsPlayer() ? 6.25f : 2.25f; }
 
         Unit* m_caster;
 
