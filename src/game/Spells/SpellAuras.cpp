@@ -1984,7 +1984,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                     return;
                 }
                 case 10848: // Shroud of Death
-                case 22650: // Ghost Visual
                 case 27978: // Shroud of Death
                     if (apply)
                         target->m_AuraFlags |= UNIT_AURAFLAG_ALIVE_INVISIBLE;
