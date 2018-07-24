@@ -56,6 +56,7 @@ enum SpellAttributeCustom
     SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
     SPELL_CUSTOM_FROM_BEHIND                = 0x040,     // For spells that require the caster to be behind the target
     SPELL_CUSTOM_FROM_FRONT                 = 0x080,     // For spells that require the target to be in front of the caster
+    SPELL_CUSTOM_SINGLE_TARGET_AURA         = 0x100,     // Aura applied by spell can only be on 1 target at a time
 };
 
 // only used in code
@@ -304,7 +305,11 @@ bool IsHealSpell(SpellEntry const *spellProto);
 bool IsExplicitPositiveTarget(uint32 targetA);
 bool IsExplicitNegativeTarget(uint32 targetA);
 
-bool IsSingleTargetSpell(SpellEntry const *spellInfo);
+inline bool HasSingleTargetAura(SpellEntry const *spellInfo)
+{
+    return spellInfo->Custom & SPELL_CUSTOM_SINGLE_TARGET_AURA;
+}
+
 bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellInfo2);
 
 inline bool IsCasterSourceTarget(uint32 target)

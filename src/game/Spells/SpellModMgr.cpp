@@ -83,7 +83,7 @@ void SpellModMgr::LoadSpellMods()
     if (!result)
     {
         OUT_LOG();
-        OUT_LOG(">> Loaded %u spell modifications. Table spell_mod vide ou inexistante ?", total_count);
+        OUT_LOG(">> Loaded %u spell modifications. Table spell_mod is empty.", total_count);
     }
     else
     {
@@ -91,7 +91,8 @@ void SpellModMgr::LoadSpellMods()
         do
         {
             fields = result->Fetch();
-            uint32 spellid = fields[0].GetUInt32();
+            uint32 const spellid = fields[0].GetUInt32();
+
 #ifdef ENABLE_INSERT_NEW_SPELLS
             if (!sSpellMgr.GetSpellEntry(spellid))
             {
@@ -102,23 +103,26 @@ void SpellModMgr::LoadSpellMods()
                 }
             }
 #endif
-            SpellEntry* spell = ((SpellEntry*)sSpellMgr.GetSpellEntry(spellid));
+            SpellEntry* spell = const_cast<SpellEntry*>(sSpellMgr.GetSpellEntry(spellid));
             if (!spell)
             {
                 OUT_ERR("Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
-            //    0        1         2            3                4
-            // Id,        procChance,procFlags,custom, DurationIndex
 
-            spell->Id                  = fields[0].GetUInt32();
+            // 0   1           2          3       4
+            // Id, procChance, procFlags, custom, DurationIndex
+            spell->Id = spellid;
             ModUInt32ValueIfExplicit(fields[1], spell->procChance);
             ModUInt32ValueIfExplicit(fields[2], spell->procFlags);
             ModUInt32ValueIfExplicit(fields[4], spell->DurationIndex);
-            spell->Custom              = fields[3].GetUInt32();
 
-            // 5         6               7          8          9           10
-            // Category,CastingTimeIndex,StackAmount,SpellIconID,activeIconID,manaCost
+            uint32 const customFlags = fields[3].GetUInt32();
+            if (customFlags)
+                spell->Custom = customFlags;
+
+            // 5         6                 7            8            9             10
+            // Category, CastingTimeIndex, StackAmount, SpellIconID, activeIconID, manaCost
             ModUInt32ValueIfExplicit(fields[5],  spell->Category);
             ModUInt32ValueIfExplicit(fields[6], spell->CastingTimeIndex);
             ModUInt32ValueIfExplicit(fields[7], spell->StackAmount);
@@ -141,7 +145,7 @@ void SpellModMgr::LoadSpellMods()
             ModUInt32ValueIfExplicit(fields[18], spell->ChannelInterruptFlags);
             ModUInt32ValueIfExplicit(fields[19], spell->Dispel);
 
-            // 20       21          22          23                  24                     25                26               27                  28
+            // 20       21          22           23                  24                     25                 26              27                  28
             // Stances, StancesNot, SpellVisual, ManaCostPercentage, StartRecoveryCategory, StartRecoveryTime, MaxTargetLevel, MaxAffectedTargets, DmgClass
             ModUInt32ValueIfExplicit(fields[20], spell->Stances);
             ModUInt32ValueIfExplicit(fields[21], spell->StancesNot);
@@ -163,9 +167,9 @@ void SpellModMgr::LoadSpellMods()
             // 33               34                35        36
             // SpellFamilyName, SpellFamilyFlags, Mechanic, EquippedItemClass
             ModUInt32ValueIfExplicit(fields[33], spell->SpellFamilyName);
-            uint64 flags = fields[34].GetUInt64();
-            if (flags)
-                spell->SpellFamilyFlags = flags;
+            uint64 const familyFlags = fields[34].GetUInt64();
+            if (familyFlags)
+                spell->SpellFamilyFlags = familyFlags;
             ModUInt32ValueIfExplicit(fields[35], spell->Mechanic);
             ModInt32ValueIfExplicit(fields[36], spell->EquippedItemClass);
 
@@ -175,7 +179,7 @@ void SpellModMgr::LoadSpellMods()
         while (result->NextRow());
         delete result;
         OUT_LOG();
-        OUT_LOG(">> Loaded %u spell modifications", total_count);
+        OUT_LOG(">> Loaded %u spell modifications.", total_count);
     }
 
     // 2 : Table spell_effect_mod
@@ -211,34 +215,34 @@ void SpellModMgr::LoadSpellMods()
             }
             if (effect_idx >= MAX_EFFECT_INDEX)
             {
-                OUT_ERR("Erreur : Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
+                OUT_ERR("Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
                 continue;
             }
-            //0   1            2       3                    4               5                      6
-            //Id, EffectIndex, Effect, EffectApplyAuraName, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB,
+            // 0   1            2       3                    4               5                      6
+            // Id, EffectIndex, Effect, EffectApplyAuraName, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB,
             ModUInt32ValueIfExplicit(fields[2], spell->Effect[effect_idx]);
             ModUInt32ValueIfExplicit(fields[3], spell->EffectApplyAuraName[effect_idx]);
             ModUInt32ValueIfExplicit(fields[4], spell->EffectMechanic[effect_idx]);
             ModUInt32ValueIfExplicit(fields[5], spell->EffectImplicitTargetA[effect_idx]);
             ModUInt32ValueIfExplicit(fields[6], spell->EffectImplicitTargetB[effect_idx]);
 
-            //7                  8               9                10
-            //EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell
+            // 7                  8               9                10
+            // EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell
             ModUInt32ValueIfExplicit(fields[7], spell->EffectRadiusIndex[effect_idx]);
             ModUInt32ValueIfExplicit(fields[8], spell->EffectItemType[effect_idx]);
             ModInt32ValueIfExplicit(fields[9], spell->EffectMiscValue[effect_idx]);
             ModUInt32ValueIfExplicit(fields[10], spell->EffectTriggerSpell[effect_idx]);
 
-            //   11           12              13                14               15
-            //EffectDieSides, EffectBaseDice, EffectBasePoints, EffectAmplitude, EffectChainTarget
+            // 11              12              13                14               15
+            // EffectDieSides, EffectBaseDice, EffectBasePoints, EffectAmplitude, EffectChainTarget
             ModInt32ValueIfExplicit(fields[11], spell->EffectDieSides[effect_idx]);
             ModUInt32ValueIfExplicit(fields[12], spell->EffectBaseDice[effect_idx]);
             ModInt32ValueIfExplicit(fields[13], spell->EffectBasePoints[effect_idx]);
             ModUInt32ValueIfExplicit(fields[14], spell->EffectAmplitude[effect_idx]);
             ModUInt32ValueIfExplicit(fields[15], spell->EffectChainTarget[effect_idx]);
 
-            //  16                17                       18                          19
-            //EffectDicePerLevel, EffectRealPointsPerLevel, EffectPointsPerComboPoint, EffectMultipleValue
+            // 16                  17                        18                         19
+            // EffectDicePerLevel, EffectRealPointsPerLevel, EffectPointsPerComboPoint, EffectMultipleValue
             ModFloatValueIfExplicit(fields[16], spell->EffectDicePerLevel[effect_idx]);
             ModFloatValueIfExplicit(fields[17], spell->EffectRealPointsPerLevel[effect_idx]);
             ModFloatValueIfExplicit(fields[18], spell->EffectPointsPerComboPoint[effect_idx]);
@@ -249,21 +253,21 @@ void SpellModMgr::LoadSpellMods()
         while (result->NextRow());
         delete result;
         OUT_LOG();
-        OUT_LOG(">> Loaded %u spell effect modifications", total_count);
+        OUT_LOG(">> Loaded %u spell effect modifications.", total_count);
     }
 
     // Other modifications (no 'speed' field in spell_mod)
 
     // Flare
-    if (SpellEntry* fuseeEcl = (SpellEntry*)sSpellMgr.GetSpellEntry(1543))
+    if (SpellEntry* fuseeEcl = const_cast<SpellEntry*>(sSpellMgr.GetSpellEntry(1543)))
         fuseeEcl->speed = 0.0f;
 
     // Seal of Command Trigger minor delay (melee radius 5.0 / 10.0 * 1000 = 0.5sec delay)
-    if (SpellEntry* spellInfo = (SpellEntry*)sSpellMgr.GetSpellEntry(20424))
+    if (SpellEntry* spellInfo = const_cast<SpellEntry*>(sSpellMgr.GetSpellEntry(20424)))
         spellInfo->speed = 10.0f;
 
     // Divine Favor EffectItemMask for Holy Light base spell
     // (HACK) need to modify EffectItemType column in spell_effect_mod to support bigint flags
-    if (SpellEntry* pDivine = (SpellEntry*)sSpellMgr.GetSpellEntry(20216))
+    if (SpellEntry* pDivine = const_cast<SpellEntry*>(sSpellMgr.GetSpellEntry(20216)))
         pDivine->EffectItemType[0] = 0x80202000;
 }
