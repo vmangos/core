@@ -2491,7 +2491,7 @@ bool ChatHandler::HandlePInfoCommand(char* args)
     Player* target;
     ObjectGuid target_guid;
     std::string target_name;
-    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name))
+    if (!ExtractPlayerTarget(&args, &target, &target_guid, &target_name, true))
         return false;
 
     if (HasLowerSecurity(target, target ? ObjectGuid() : target_guid))
