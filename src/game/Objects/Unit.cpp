@@ -5297,7 +5297,7 @@ typedef std::list<RemovedSpellData> RemoveSpellList;
 
 void Unit::ProcDamageAndSpell(Unit *pVictim, uint32 procAttacker, uint32 procVictim, uint32 procExtra, uint32 amount, WeaponAttackType attType, SpellEntry const *procSpell, Spell* spell)
 {
-    if (!IsInWorld())
+    if (!IsInMap(pVictim))
         return;
 
     ProcTriggeredList procTriggered;
