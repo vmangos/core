@@ -23,9 +23,39 @@ EndScriptData */
 
 #include "scriptPCH.h"
 
-#define SPELL_MIGHTYBLOW            14099
-#define SPELL_HAMSTRING             9080
-#define SPELL_CLEAVE                20691
+enum
+{
+    EMOTE_ALARM             = 5286,
+
+    // SPELL_FLURRY          = 15088,       // creature_template_addon
+    // SPELL_ENRAGE          = 15097,       // creature_template_addon
+    SPELL_SUNDER_ARMOR      = 15572,
+
+    NPC_ANVILRAGE_MEDIC     = 8894,
+    NPC_ANVILRAGE_RESERVIST = 8901,
+
+    NPC_ADD_COUNT           = 10,
+};
+
+struct sSpawnLocation
+{
+    uint32 m_uiEntry;
+    float m_fX, m_fY, m_fZ, m_fO;
+};
+
+static sSpawnLocation m_aAddspawnLocs[NPC_ADD_COUNT] =
+{
+    { NPC_ANVILRAGE_RESERVIST,  716.8168f, 23.03471f, -45.34414f, 3.159046f },
+    { NPC_ANVILRAGE_RESERVIST,  719.8195f, 25.44250f, -45.32854f, 3.193953f },
+    { NPC_ANVILRAGE_RESERVIST,  720.0683f, 22.93752f, -45.34140f, 3.159046f },
+    { NPC_ANVILRAGE_RESERVIST,  719.9299f, 19.80474f, -45.35873f, 3.106686f },
+    { NPC_ANVILRAGE_RESERVIST,  724.4819f, 25.27536f, -45.31646f, 3.193953f },
+    { NPC_ANVILRAGE_RESERVIST,  724.4958f, 22.62163f, -45.32786f, 3.159046f },
+    { NPC_ANVILRAGE_RESERVIST,  724.7056f, 19.89114f, -45.33829f, 3.124139f },
+    { NPC_ANVILRAGE_RESERVIST,  728.7010f, 18.92765f, -46.00228f, 3.106686f },
+    { NPC_ANVILRAGE_MEDIC,      728.5464f, 21.52842f, -45.89260f, 3.141593f },
+    { NPC_ANVILRAGE_MEDIC,      728.6478f, 24.58055f, -45.94735f, 3.176499f },
+};
 
 struct boss_general_angerforgeAI : public ScriptedAI
 {
@@ -34,89 +64,49 @@ struct boss_general_angerforgeAI : public ScriptedAI
         Reset();
     }
 
-    uint32 MightyBlow_Timer;
-    uint32 HamString_Timer;
-    uint32 Cleave_Timer;
-    uint32 Adds_Timer;
-    bool Medics;
+    uint32 m_uiSunderArmorTimer;
+    uint32 m_uiAlarmTimer;
 
     void Reset()
     {
-        MightyBlow_Timer = 8000;
-        HamString_Timer = 12000;
-        Cleave_Timer = 16000;
-        Adds_Timer = 0;
-        Medics = false;
+        m_uiSunderArmorTimer = urand(5 * IN_MILLISECONDS, 10 * IN_MILLISECONDS);
+        m_uiAlarmTimer = 0;
     }
 
-    void SummonAdds(Unit* victim)
+    void JustSummoned(Creature* pSummoned)
     {
-        if (Creature* summonedAdd = DoSpawnCreature(8901, 15.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000))
-            if (summonedAdd->AI())
-                summonedAdd->AI()->AttackStart(victim);
+        pSummoned->GetMotionMaster()->MoveFollow(m_creature, 0.0f, 0.0f);
     }
 
-    void SummonMedics(Unit* victim)
-    {
-        if (Creature* summonedMedics = DoSpawnCreature(8894, 10.0f, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 120000))
-            if (summonedMedics->AI())
-                summonedMedics->AI()->AttackStart(victim);
-    }
-
-    void UpdateAI(const uint32 diff)
+    void UpdateAI(const uint32 uiDiff)
     {
         //Return since we have no target
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
 
-        //MightyBlow_Timer
-        if (MightyBlow_Timer < diff)
+        // Sunder Armor
+        if (m_uiSunderArmorTimer < uiDiff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MIGHTYBLOW) == CAST_OK)
-                MightyBlow_Timer = 18000;
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SUNDER_ARMOR) == CAST_OK)
+                m_uiSunderArmorTimer = urand(5 * IN_MILLISECONDS, 15 * IN_MILLISECONDS);
         }
         else
-            MightyBlow_Timer -= diff;
+            m_uiSunderArmorTimer -= uiDiff;
 
-        //HamString_Timer
-        if (HamString_Timer < diff)
+        // Alarm
+        if (m_creature->GetHealthPercent() < 30.0f)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_HAMSTRING) == CAST_OK)
-                HamString_Timer = 15000;
-        }
-        else
-            HamString_Timer -= diff;
-
-        //Cleave_Timer
-        if (Cleave_Timer < diff)
-        {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_CLEAVE) == CAST_OK)
-                Cleave_Timer = 9000;
-        }
-        else
-            Cleave_Timer -= diff;
-
-        //Adds_Timer
-        if (m_creature->GetHealthPercent() < 21.0f)
-        {
-            if (Adds_Timer < diff)
+            if (m_uiAlarmTimer < uiDiff)
             {
-                // summon 3 Adds every 25s
-                for (int i = 0; i < 3; ++i)
-                    SummonAdds(m_creature->getVictim());
+                DoScriptText(EMOTE_ALARM, m_creature);
 
-                Adds_Timer = 25000;
+                for (uint8 i = 0; i < NPC_ADD_COUNT; i++)
+                    m_creature->SummonCreature(m_aAddspawnLocs[i].m_uiEntry, m_aAddspawnLocs[i].m_fX, m_aAddspawnLocs[i].m_fY, m_aAddspawnLocs[i].m_fZ, m_aAddspawnLocs[i].m_fO, TEMPSUMMON_TIMED_OR_CORPSE_DESPAWN, 30 * IN_MILLISECONDS);
+
+                m_uiAlarmTimer = 3 * MINUTE * IN_MILLISECONDS;
             }
             else
-                Adds_Timer -= diff;
-        }
-
-        //Summon Medics
-        if (!Medics && m_creature->GetHealthPercent() < 21.0f)
-        {
-            SummonMedics(m_creature->getVictim());
-            SummonMedics(m_creature->getVictim());
-            Medics = true;
+                m_uiAlarmTimer -= uiDiff;
         }
 
         DoMeleeAttackIfReady();
