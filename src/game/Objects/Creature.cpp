@@ -3037,11 +3037,11 @@ uint32 Creature::GetVendorItemCurrentCount(VendorItem const* vItem)
 
     time_t ptime = time(nullptr);
 
-    if (vCount->lastIncrementTime + vItem->incrtime <= ptime)
+    if (vCount->lastIncrementTime + vCount->restockDelay <= ptime)
     {
         ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(vItem->item);
 
-        uint32 diff = uint32((ptime - vCount->lastIncrementTime) / vItem->incrtime);
+        uint32 diff = uint32((ptime - vCount->lastIncrementTime) / vCount->restockDelay);
         if ((vCount->count + diff * pProto->BuyCount) >= vItem->maxcount)
         {
             m_vendorItemCounts.erase(itr);
@@ -3065,10 +3065,16 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
         if (itr->itemId == vItem->item)
             break;
 
+    uint32 restockDelay = vItem->incrtime;
+    if (vItem->itemflags & VENDOR_ITEM_FLAG_RANDOM_RESTOCK)
+        restockDelay *= float(urand(80, 120)) / 100.0f;
+    if (vItem->itemflags & VENDOR_ITEM_FLAG_DYNAMIC_RESTOCK && sWorld.GetActiveSessionCount() > BLIZZLIKE_REALM_POPULATION)
+        restockDelay *= float(BLIZZLIKE_REALM_POPULATION) / float(sWorld.GetActiveSessionCount());
+
     if (itr == m_vendorItemCounts.end())
     {
         uint32 new_count = vItem->maxcount > used_count ? vItem->maxcount - used_count : 0;
-        m_vendorItemCounts.push_back(VendorItemCount(vItem->item, new_count));
+        m_vendorItemCounts.push_back(VendorItemCount(vItem->item, new_count, restockDelay));
         return new_count;
     }
 
@@ -3076,11 +3082,11 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
 
     time_t ptime = time(nullptr);
 
-    if (vCount->lastIncrementTime + vItem->incrtime <= ptime)
+    if (vCount->lastIncrementTime + vCount->restockDelay <= ptime)
     {
         ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(vItem->item);
 
-        uint32 diff = uint32((ptime - vCount->lastIncrementTime) / vItem->incrtime);
+        uint32 diff = uint32((ptime - vCount->lastIncrementTime) / vCount->restockDelay);
         if ((vCount->count + diff * pProto->BuyCount) < vItem->maxcount)
             vCount->count += diff * pProto->BuyCount;
         else
@@ -3089,6 +3095,7 @@ uint32 Creature::UpdateVendorItemCurrentCount(VendorItem const* vItem, uint32 us
 
     vCount->count = vCount->count > used_count ? vCount->count - used_count : 0;
     vCount->lastIncrementTime = ptime;
+    vCount->restockDelay = restockDelay;
     return vCount->count;
 }
 

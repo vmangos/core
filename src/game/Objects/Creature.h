@@ -317,12 +317,13 @@ enum SelectFlags
 // Vendors
 struct VendorItem
 {
-    VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime)
-        : item(_item), maxcount(_maxcount), incrtime(_incrtime) {}
+    VendorItem(uint32 _item, uint32 _maxcount, uint32 _incrtime, uint32 _itemflags)
+        : item(_item), maxcount(_maxcount), incrtime(_incrtime), itemflags(_itemflags) {}
 
     uint32 item;
     uint32 maxcount;                                        // 0 for infinity item amount
     uint32 incrtime;                                        // time for restore items amount if maxcount != 0
+    uint32 itemflags;
 };
 typedef std::vector<VendorItem*> VendorItemList;
 
@@ -337,9 +338,9 @@ struct VendorItemData
     }
     bool Empty() const { return m_items.empty(); }
     uint8 GetItemCount() const { return m_items.size(); }
-    void AddItem( uint32 item, uint32 maxcount, uint32 ptime)
+    void AddItem( uint32 item, uint32 maxcount, uint32 ptime, uint32 itemflags)
     {
-        m_items.push_back(new VendorItem(item, maxcount, ptime));
+        m_items.push_back(new VendorItem(item, maxcount, ptime, itemflags));
     }
     bool RemoveItem( uint32 item_id );
     VendorItem const* FindItem(uint32 item_id) const;
@@ -355,12 +356,19 @@ struct VendorItemData
 
 struct VendorItemCount
 {
-    explicit VendorItemCount(uint32 _item, uint32 _count)
-        : itemId(_item), count(_count), lastIncrementTime(time(nullptr)) {}
+    explicit VendorItemCount(uint32 _item, uint32 _count, uint32 _restockDelay)
+        : itemId(_item), count(_count), restockDelay(_restockDelay), lastIncrementTime(time(nullptr)) {}
 
     uint32 itemId;
     uint32 count;
+    uint32 restockDelay;
     time_t lastIncrementTime;
+};
+
+enum VendorItemFlags
+{
+    VENDOR_ITEM_FLAG_RANDOM_RESTOCK   = 0x01,
+    VENDOR_ITEM_FLAG_DYNAMIC_RESTOCK  = 0x02,
 };
 
 typedef std::list<VendorItemCount> VendorItemCounts;

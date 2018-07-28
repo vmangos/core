@@ -1631,6 +1631,10 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
     if (!ExtractOptUInt32(&args, incrtime, 0))
         return false;
 
+    uint32 itemflags;
+    if (!ExtractOptUInt32(&args, itemflags, 0))
+        return false;
+
     Creature* vendor = getSelectedCreature();
 
     uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
@@ -1641,7 +1645,7 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
         return false;
     }
 
-    sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime);
+    sObjectMgr.AddVendorItem(vendor_entry, itemId, maxcount, incrtime, itemflags);
 
     ItemPrototype const* pProto = ObjectMgr::GetItemPrototype(itemId);
 
