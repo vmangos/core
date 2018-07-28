@@ -70,6 +70,11 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
 
     // pointer to appropriate target if found any
     Unit* victim = m_creature->GetMap()->GetUnit(i_victimGuid);
+    Unit* owner = m_creature->GetCharmerOrOwner();
+
+    // Check owner's attackers for victims
+    if (!victim && owner)
+        victim = owner->getAttackerForHelper();
 
     // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
     if (!victim || !m_creature->IsWithinDistInMap(victim, max_range) ||
@@ -77,7 +82,7 @@ TotemAI::UpdateAI(const uint32 /*diff*/)
     {
         victim = NULL;
 
-        MaNGOS::NearestAttackableUnitInObjectRangeCheck u_check(m_creature, m_creature, max_range);
+        MaNGOS::NearestAttackableUnitInObjectRangeCheck u_check(m_creature, m_creature, owner, max_range);
         MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck> checker(victim, u_check);
         Cell::VisitAllObjects(m_creature, checker, max_range);
     }

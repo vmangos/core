@@ -840,12 +840,15 @@ namespace MaNGOS
     class NearestAttackableUnitInObjectRangeCheck
     {
         public:
-            NearestAttackableUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, float range) : i_obj(obj), i_funit(funit), i_range(range) {}
+            NearestAttackableUnitInObjectRangeCheck(WorldObject const* obj, Unit const* funit, Unit const* owner, float range) : i_obj(obj), i_funit(funit), i_owner(owner), i_range(range) {}
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
+                if (i_owner && i_owner->IsPlayer() && u->IsPlayer() && !i_owner->IsPvP() && !i_owner->ToPlayer()->IsInDuelWith(u->ToPlayer()))
+                    return false;
+
                 if (i_obj->IsWithinDistInMap(u, i_range) && i_funit->IsValidAttackTarget(u) &&
-                    u->isVisibleForOrDetect(i_funit, i_funit, false))
+                    u->isVisibleForOrDetect(i_funit, i_funit, false) && i_funit->IsHostileTo(u))
                 {
                     i_range = i_obj->GetDistance(u);        // use found unit range as new range limit for next check
                     return true;
@@ -856,6 +859,7 @@ namespace MaNGOS
         private:
             WorldObject const* i_obj;
             Unit const* i_funit;
+            Unit const* i_owner;
             float i_range;
 
             // prevent clone this object
