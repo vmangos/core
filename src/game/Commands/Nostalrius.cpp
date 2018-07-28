@@ -2893,6 +2893,8 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         store = &LootTemplates_Skinning;
     else if (tableName == "disenchant")
         store = &LootTemplates_Disenchant;
+    else if (tableName == "enchant")
+        return HandleDebugItemEnchantCommand(lootid, simCount);
     else
     {
         PSendSysMessage("Error: loot type \"%s\" unknown", tableName.c_str());
@@ -2969,6 +2971,57 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
             else
                 PSendSysMessage(LANG_ITEM_LIST_CONSOLE, it->first, proto->Name1, chance.str().c_str());
         }
+    return true;
+}
+
+bool ChatHandler::HandleDebugItemEnchantCommand(int lootid, unsigned int simCount)
+{
+    std::map<uint32, uint32> lootChances;
+    const unsigned int MAX_TIME = 30;
+    auto startTime = time(nullptr);
+
+    ItemPrototype const *proto = sItemStorage.LookupEntry<ItemPrototype >(lootid);
+    if (!proto)
+    {
+        PSendSysMessage("Error: invalid item id %u", lootid);
+        return false;
+    }
+    if (!proto->RandomProperty)
+    {
+        PSendSysMessage("Error: item %u has no random enchantments", lootid);
+        return false;
+    }
+
+    for (unsigned int i = 0; i < simCount; ++i)
+    {
+        uint32 enchant = GetItemEnchantMod(proto->RandomProperty);
+        lootChances[enchant]++;
+
+        if (i % 1000000 == 0) // check the time every million iterations
+        {
+            if (time(nullptr) - startTime > MAX_TIME)
+            {
+                PSendSysMessage("Error: Aborted loot simulation after %u runs for exceeding max allowed time of %us", i, MAX_TIME);
+                simCount = i;
+                break;
+            }
+        }
+    }
+
+    PSendSysMessage("%u items dropped after %u attempts for item %s.", lootChances.size(), simCount, proto->Name1);
+    for (std::map<uint32, uint32>::const_iterator it = lootChances.begin(); it != lootChances.end(); ++it)
+    {
+        std::stringstream chance;
+        chance << 100 * it->second / float(simCount);
+        chance << "%";
+        ItemRandomPropertiesEntry const* randomProp = sItemRandomPropertiesStore.LookupEntry(it->first);
+        if (!randomProp)
+            continue;
+        if (m_session)
+            PSendSysMessage(LANG_ITEM_LIST_CHAT, it->first, lootid, randomProp->internalName, chance.str().c_str());
+        else
+            PSendSysMessage(LANG_ITEM_LIST_CONSOLE, it->first, randomProp->internalName, chance.str().c_str());
+    }
     return true;
 }
 

@@ -184,6 +184,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugExp(char* );
         bool HandleVideoTurn(char* );
         bool HandleDebugLootTableCommand(char*);
+        bool HandleDebugItemEnchantCommand(int lootid, unsigned int simCount);
         bool HandleServiceDeleteCharacters(char* args);
 
         bool HandleSpamerMute(char* args);

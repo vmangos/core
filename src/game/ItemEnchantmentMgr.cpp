@@ -113,7 +113,7 @@ uint32 GetItemEnchantMod(uint32 entry)
     }
 
     //we could get here only if sum of all enchantment chances is lower than 100%
-    dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100;
+    dRoll = (irand(0, (int)floor(fCount * 100) + 1)) / 100.0f;
     fCount = 0;
 
     for (EnchStoreList::const_iterator ench_iter = tab->second.begin(); ench_iter != tab->second.end(); ++ench_iter)
