@@ -217,8 +217,13 @@ public:
     {
         if (!i_trap->CanSeeInWorld(u))
             return false;
+
+        if (i_trapOwner->IsPlayer() && u->IsPlayer() && !i_trapOwner->IsPvP() && !i_trapOwner->ToPlayer()->IsInDuelWith(u->ToPlayer()))
+            return false;
+
         bool _isTotem = u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsTotem();
-        if (u->isAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u))
+        if (u->isAlive() && i_trap->IsWithinDistInMap(u, _isTotem ? i_range / 3.0f : i_range) && i_trapOwner->IsValidAttackTarget(u) &&
+            (u->isInCombat() || i_trapOwner->IsHostileTo(u)))
         {
             i_range = i_trap->GetDistance(u);
             return true;
