@@ -68,6 +68,14 @@ struct instance_blackrock_depths : ScriptedInstance
     uint64 m_uiGoGolemSGUID;
     uint64 m_uiGoThroneGUID;
 
+    uint64 m_uiDwarfRuneA01GUID;
+    uint64 m_uiDwarfRuneB01GUID;
+    uint64 m_uiDwarfRuneC01GUID;
+    uint64 m_uiDwarfRuneD01GUID;
+    uint64 m_uiDwarfRuneE01GUID;
+    uint64 m_uiDwarfRuneF01GUID;
+    uint64 m_uiDwarfRuneG01GUID;
+
     uint64 m_uiGoMagnusGUID;
 
     uint64 m_uiRocknotGUID;
@@ -399,6 +407,27 @@ struct instance_blackrock_depths : ScriptedInstance
                 break;
             case GO_ARENA_SPOILS:
                 m_uiArenaSpoilsGUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_A01:
+                m_uiDwarfRuneA01GUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_B01:
+                m_uiDwarfRuneB01GUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_C01:
+                m_uiDwarfRuneC01GUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_D01:
+                m_uiDwarfRuneD01GUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_E01:
+                m_uiDwarfRuneE01GUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_F01:
+                m_uiDwarfRuneF01GUID = pGo->GetGUID();
+                break;
+            case GO_DWARF_RUNE_G01:
+                m_uiDwarfRuneG01GUID = pGo->GetGUID();
                 break;
         }
     }
@@ -1036,11 +1065,26 @@ struct instance_blackrock_depths : ScriptedInstance
                 return m_uiGoJailSupplyRoomGUID;
             case GO_JAIL_SUPPLY_CRATE:
                 return m_uiGoJailSupplyCrateGUID; 
+            case GO_DWARF_RUNE_A01:
+                return m_uiDwarfRuneA01GUID;
+            case GO_DWARF_RUNE_B01:
+                return m_uiDwarfRuneB01GUID;
+            case GO_DWARF_RUNE_C01:
+                return m_uiDwarfRuneC01GUID;
+            case GO_DWARF_RUNE_D01:
+                return m_uiDwarfRuneD01GUID;
+            case GO_DWARF_RUNE_E01:
+                return m_uiDwarfRuneE01GUID;
+            case GO_DWARF_RUNE_F01:
+                return m_uiDwarfRuneF01GUID;
+            case GO_DWARF_RUNE_G01:
+                return m_uiDwarfRuneG01GUID;
 
             case DATA_ARENA_CHALLENGER:
                 return m_uiChallengerPlayerGUID;
             case NPC_GRIMSTONE:
                 return m_uiGrimstoneGUID;
+
         }
         return 0;
     }

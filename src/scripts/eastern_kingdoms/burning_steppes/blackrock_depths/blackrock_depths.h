@@ -98,6 +98,15 @@ enum
     GO_JAIL_DOOR_JAZ           = 170568,
     GO_JAIL_DOOR_SHILL         = 170569,
 
+    // Ambassador Flamelash
+    GO_DWARF_RUNE_A01          = 170578,
+    GO_DWARF_RUNE_B01          = 170579,
+    GO_DWARF_RUNE_C01          = 170580,
+    GO_DWARF_RUNE_D01          = 170581,
+    GO_DWARF_RUNE_E01          = 170582,
+    GO_DWARF_RUNE_F01          = 170583,
+    GO_DWARF_RUNE_G01          = 170584,
+
     // Grim Guzzler
     NPC_PLUGGER_SPAZZRING      = 9499,
     NPC_PRIVATE_ROCKNOT        = 9503,
