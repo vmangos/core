@@ -58,7 +58,8 @@ bool PetAI::_needToStop() const
     if (m_creature->IsPet() && !((Pet*)m_creature)->IsEnabled())
         return true;
 
-    return !m_creature->getVictim()->isTargetableForAttack();
+    bool playerPet = m_creature->GetCharmerOrOwnerOrSelf()->IsPlayer();
+    return !m_creature->getVictim()->isTargetableForAttack(false, playerPet);
 }
 
 void PetAI::_stopAttack()

@@ -7527,11 +7527,15 @@ bool Unit::isTargetableForAttack(bool inverseAlive /*=false*/, bool isAttackerPl
     if (isAttackerPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
         return false;
 
+    // Players or their pets can attack feigned players
+    if (!isAttackerPlayer && hasUnitState(UNIT_STAT_DIED))
+        return false;
+
     // inversealive is needed for some spells which need to be casted at dead targets (aoe)
     if (isAlive() == inverseAlive)
         return false;
 
-    return IsInWorld() && !hasUnitState(UNIT_STAT_DIED) && !IsTaxiFlying();
+    return IsInWorld() && !IsTaxiFlying();
 }
 
 // function based on function Unit::CanAttack from 13850 client
