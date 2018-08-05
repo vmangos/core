@@ -23,9 +23,6 @@
 #define MANGOS_REACTORAI_H
 
 #include "CreatureAI.h"
-#include "ObjectGuid.h"
-
-class Unit;
 
 class MANGOS_DLL_DECL ReactorAI : public CreatureAI
 {
@@ -33,14 +30,11 @@ class MANGOS_DLL_DECL ReactorAI : public CreatureAI
 
         explicit ReactorAI(Creature *c) : CreatureAI(c) {}
 
-        void MoveInLineOfSight(Unit *);
-        void AttackStart(Unit *);
-        void EnterEvadeMode();
+        void MoveInLineOfSight(Unit *) override { };
+        void AttackStart(Unit *) override;
+        void UpdateAI(const uint32) override;
 
-        void UpdateAI(const uint32);
         static int Permissible(const Creature *);
-
-    private:
-        ObjectGuid i_victimGuid;
 };
+
 #endif

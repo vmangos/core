@@ -94,6 +94,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_PLAYER,      //  45
     CONDITION_REQ_TARGET_UNIT,        //  46
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
+    CONDITION_REQ_SOURCE_CREATURE,    //  48
+    CONDITION_REQ_TARGET_WORLDOBJECT, //  49
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -569,6 +571,14 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                 }
             }
             return bSatisfied;
+        }
+        case CONDITION_CANT_PATH_TO_VICTIM:
+        {
+            return source->ToCreature()->CantPathToVictim();
+        }
+        case CONDITION_IS_PLAYER:
+        {
+            return target->IsPlayer();
         }
     }
     return false;
@@ -1121,6 +1131,8 @@ bool ConditionEntry::IsValid()
         case CONDITION_IS_HOSTILE_TO:
         case CONDITION_IS_IN_GROUP:
         case CONDITION_IS_ALIVE:
+        case CONDITION_CANT_PATH_TO_VICTIM:
+        case CONDITION_IS_PLAYER:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);

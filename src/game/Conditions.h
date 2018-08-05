@@ -84,7 +84,8 @@ enum ConditionType
     CONDITION_IS_IN_GROUP           = 45,                   // 0            0
     CONDITION_IS_ALIVE              = 46,                   // 0            0
     CONDITION_MAP_EVENT_TARGETS     = 47,                   // event_id     cond_id
-
+    CONDITION_CANT_PATH_TO_VICTIM   = 48,                   // 0            0
+    CONDITION_IS_PLAYER             = 49,                   // 0            0
 };
 
 enum ConditionFlags

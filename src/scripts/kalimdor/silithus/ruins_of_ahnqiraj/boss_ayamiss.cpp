@@ -119,7 +119,7 @@ struct boss_ayamissAI : public ScriptedAI
         /** Configure Ayamiss into flying mode */
         m_creature->SetFly(true);
         m_creature->SetWalk(false);
-        if (IsCombatMovement())
+        if (IsCombatMovementEnabled())
             SetCombatMovement(false);
 
         /** Force despawn of invocated Hornet and Larva from Hive'Zara */

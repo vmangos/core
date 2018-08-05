@@ -62,8 +62,8 @@ int CreatureEventAI::Permissible(const Creature *creature)
 void CreatureEventAI::GetAIInformation(ChatHandler& reader)
 {
     reader.PSendSysMessage(LANG_NPC_EVENTAI_PHASE, (uint32)m_Phase);
-    reader.PSendSysMessage(LANG_NPC_EVENTAI_MOVE, reader.GetOnOffStr(m_CombatMovementEnabled));
-    reader.PSendSysMessage(LANG_NPC_EVENTAI_COMBAT, reader.GetOnOffStr(m_MeleeEnabled));
+    reader.PSendSysMessage(LANG_NPC_EVENTAI_MOVE, reader.GetOnOffStr(m_bCombatMovement));
+    reader.PSendSysMessage(LANG_NPC_EVENTAI_COMBAT, reader.GetOnOffStr(m_bMeleeAttack));
 }
 
 CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)
@@ -522,13 +522,6 @@ void CreatureEventAI::JustDied(Unit* killer)
 {
     Reset();
 
-    if (m_creature->IsGuard())
-    {
-        //Send Zone Under Attack message to the LocalDefense and WorldDefense Channels
-        if (Player* pKiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-            m_creature->SendZoneUnderAttackMessage(pKiller);
-    }
-
     if (m_bEmptyList)
         return;
 
@@ -628,13 +621,13 @@ void CreatureEventAI::AttackStart(Unit *who)
     if (!who)
         return;
 
-    if (m_creature->Attack(who, m_MeleeEnabled))
+    if (m_creature->Attack(who, m_bMeleeAttack))
     {
         m_creature->AddThreat(who);
         m_creature->SetInCombatWith(who);
         who->SetInCombatWith(m_creature);
 
-        if (m_CombatMovementEnabled)
+        if (m_bCombatMovement)
             m_creature->GetMotionMaster()->MoveChase(who, m_AttackDistance, m_AttackAngle);
     }
 }

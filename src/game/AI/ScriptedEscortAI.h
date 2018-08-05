@@ -49,8 +49,6 @@ struct MANGOS_DLL_DECL npc_escortAI : ScriptedAI
         void ResetCreature() override {}
 
         // CreatureAI functions
-        bool IsVisible(Unit*) const override;
-
         void AttackStart(Unit*) override;
 
         void EnterCombat(Unit*) override;

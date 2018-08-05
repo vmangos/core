@@ -328,7 +328,7 @@ struct boss_razorgoreAI : public ScriptedAI
 
     void GetAIInformation(ChatHandler& handler)
     {
-        handler.PSendSysMessage("* CombatMovement : %s", IsCombatMovement() ? "OUI" : "NON");
+        handler.PSendSysMessage("* CombatMovement : %s", IsCombatMovementEnabled() ? "OUI" : "NON");
     }
 };
 

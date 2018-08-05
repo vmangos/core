@@ -20,10 +20,8 @@
  */
 
 #include "GuardAI.h"
-#include "Errors.h"
 #include "Creature.h"
 #include "Player.h"
-#include "World.h"
 
 int GuardAI::Permissible(const Creature *creature)
 {
@@ -37,33 +35,60 @@ GuardAI::GuardAI(Creature *c) : CreatureAI(c)
 {
 }
 
-void GuardAI::MoveInLineOfSight(Unit *u)
+// Returns whether the Unit is currently attacking other players or friendly npcs.
+bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
 {
-    // Ignore Z for flying creatures
-    if (!m_creature->CanFly() && m_creature->GetDistanceZ(u) > CREATURE_Z_ATTACK_RANGE)
+    if (pWho->isAttackingPlayer())
+        return true;
+
+    if (Unit* pVictim = pWho->getVictim())
+    {
+        if (m_creature->IsFriendlyTo(pVictim) || pVictim->isTaxi())
+            return true;
+    }
+
+    return false;
+}
+
+void GuardAI::MoveInLineOfSight(Unit *pWho)
+{
+    if (m_creature->getVictim())
         return;
 
-    float attackRadius = m_creature->GetAttackDistance(u);
-    if (!m_creature->IsWithinDistInMap(u, attackRadius))
+    // Ignore Z for flying creatures
+    if (!m_creature->CanFly() && pWho->IsCreature() && m_creature->GetDistanceZ(pWho) > CREATURE_Z_ATTACK_RANGE)
         return;
-    if (m_creature->CanInitiateAttack() && !m_creature->getVictim() && u->isTargetableForAttack() &&
-            (u->IsHostileToPlayers() || m_creature->IsHostileTo(u)) &&
-            u->isInAccessablePlaceFor(m_creature))
+
+    float attackRadius = m_creature->GetAttackDistance(pWho);
+
+    bool isAttackingFriend = false;
+
+    if (pWho->IsPlayer() && !m_creature->IsFriendlyTo(pWho))
     {
-        //Need add code to let guard support player
-        AttackStart(u);
+        // Assignment, not a typo.
+        if (isAttackingFriend = IsAttackingPlayerOrFriendly(pWho))
+            if ((attackRadius < 30.0f))
+                attackRadius = 30.0f;
+    }
+
+    if (!m_creature->IsWithinDistInMap(pWho, attackRadius))
+        return;
+
+    if (m_creature->CanInitiateAttack() && pWho->isTargetableForAttack() &&
+       (pWho->IsHostileToPlayers() || m_creature->IsHostileTo(pWho) || isAttackingFriend) &&
+        pWho->isInAccessablePlaceFor(m_creature) && m_creature->IsWithinLOSInMap(pWho))
+    {
+        AttackStart(pWho);
     }
 }
 
-bool GuardAI::IsVisible(Unit *pl) const
+void GuardAI::EnterCombat(Unit *)
 {
-    return m_creature->IsWithinDist(pl, sWorld.getConfig(CONFIG_FLOAT_SIGHT_GUARDER))
-        && pl->isVisibleForOrDetect(m_creature, m_creature, true);
+    m_creature->CallForHelp(30.0f);
 }
 
 void GuardAI::UpdateAI(const uint32 uiDiff)
 {
-    // update i_victimGuid if i_creature.getVictim() !=0 and changed
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
 
@@ -73,23 +98,24 @@ void GuardAI::UpdateAI(const uint32 uiDiff)
     DoMeleeAttackIfReady();
 }
 
-void GuardAI::AttackStart(Unit *u)
+void GuardAI::AttackStart(Unit *pWho)
 {
-    if (!u)
+    if (!pWho)
         return;
 
-    if (m_creature->Attack(u, true))
+    if (m_creature->Attack(pWho, m_bMeleeAttack))
     {
-        m_creature->AddThreat(u);
-        m_creature->SetInCombatWith(u);
-        u->SetInCombatWith(m_creature);
+        m_creature->AddThreat(pWho);
+        m_creature->SetInCombatWith(pWho);
+        pWho->SetInCombatWith(m_creature);
 
-        m_creature->GetMotionMaster()->MoveChase(u);
+        if (m_bCombatMovement)
+            m_creature->GetMotionMaster()->MoveChase(pWho);
     }
 }
 
-void GuardAI::JustDied(Unit *killer)
+void GuardAI::JustDied(Unit *pKiller)
 {
-    if (Player* pkiller = killer->GetCharmerOrOwnerPlayerOrPlayerItself())
-        m_creature->SendZoneUnderAttackMessage(pkiller);
+    if (Player* pPlayerKiller = pKiller->GetCharmerOrOwnerPlayerOrPlayerItself())
+        m_creature->SendZoneUnderAttackMessage(pPlayerKiller);
 }

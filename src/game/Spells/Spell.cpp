@@ -1522,7 +1522,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
             if (!(m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH))
             {
                 unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
+                unit->RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
             }
 
             // for delayed spells ignore not visible explicit target
@@ -1544,12 +1544,12 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
                 if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_NOT_BREAK_STEALTH)
                 {
                     unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                    unit->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
+                    unit->RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
                 }
 
                 // caster can be detected but have stealth aura
                 m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_STEALTH);
-                m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
+                m_caster->RemoveNonPassiveSpellsCausingAura(SPELL_AURA_MOD_INVISIBILITY);
 
                 // Fait dans Unit::DealDamage, car etre assis ou debout change le % de critiques par exemple.
                 //if (!unit->IsStandState() && !unit->hasUnitState(UNIT_STAT_STUNNED))

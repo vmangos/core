@@ -151,5 +151,5 @@ void AddSC_npc_escort()
     newscript->Name = "npc_escort";
     newscript->GetAI = &GetAI_npc_escort_genericAI;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_escort_genericAI;
-    newscript->RegisterSelf();
+    newscript->RegisterSelf(false);
 }

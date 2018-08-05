@@ -179,7 +179,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
     m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
-    _isEscortable(false)
+    _isEscortable(false), m_reputationId(-1)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -546,11 +546,14 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     if (GetCreatureInfo()->rank == CREATURE_ELITE_WORLDBOSS)
         SetLootAndXPModDist(150.0f);
 
+    m_reputationId = -1;
     // checked and error show at loading templates
-    if (FactionTemplateEntry const* factionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction_A))
+    if (FactionTemplateEntry const* pFactionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction_A))
     {
-        if (factionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP || IsCivilian())
+        if (pFactionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP || IsCivilian())
             SetPvP(true);
+        if (const FactionEntry* pFaction = sObjectMgr.GetFactionEntry(pFactionTemplate->faction))
+            m_reputationId = pFaction->reputationListID;
     }
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
@@ -3227,7 +3230,6 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
     if (_creatureGroup)
         _creatureGroup->OnMemberAttackStart(this, pWho);
 
-    // Pas encore en combat.
     if (notInCombat)
     {
         ResetCombatTime();
@@ -3244,6 +3246,14 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
 
         if (i_AI)
             i_AI->EnterCombat(pWho);
+
+        // Mark as At War with faction in client so player can attack back.
+        if (GetReputationId() >= 0)
+        {
+            if (Player* pPlayer = pWho->ToPlayer())
+                if (pPlayer->GetReputationMgr().SetAtWar(GetReputationId(), true))
+                    pPlayer->SendFactionAtWar(GetReputationId(), true);
+        }
     }
 }
 
@@ -3646,6 +3656,17 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
 
     spell->SetCastItem(nullptr);
     return spell->prepare(std::move(targets), nullptr, uiChance);
+}
+
+bool Creature::CantPathToVictim() const
+{
+    if (!getVictim())
+        return false;
+
+    if (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE)
+        return false;
+
+    return !GetMotionMaster()->GetCurrent()->IsReachable();
 }
 
 // use this function to avoid having hostile creatures attack

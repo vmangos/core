@@ -57,7 +57,7 @@ class MANGOS_DLL_SPEC MovementGenerator
 
         virtual void UpdateFinalDistance(float /*fDistance*/) { }
 
-        // given destination unreachable? due to pathfinsing or other
+        // given destination unreachable? due to pathfinding or other
         virtual bool IsReachable() const { return true; }
 
         // used by Evade code for select point to evade with expected restart default movement

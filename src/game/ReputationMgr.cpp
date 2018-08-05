@@ -320,28 +320,28 @@ void ReputationMgr::SetVisible(FactionState* faction)
     SendVisible(faction);
 }
 
-void ReputationMgr::SetAtWar(RepListID repListID, bool on)
+bool ReputationMgr::SetAtWar(RepListID repListID, bool on)
 {
     FactionStateList::iterator itr = m_factions.find(repListID);
     if (itr == m_factions.end())
-        return;
+        return false;
 
     // always invisible or hidden faction can't change war state
     if (itr->second.Flags & (FACTION_FLAG_INVISIBLE_FORCED | FACTION_FLAG_HIDDEN))
-        return;
+        return false;
 
-    SetAtWar(&itr->second, on);
+    return SetAtWar(&itr->second, on);
 }
 
-void ReputationMgr::SetAtWar(FactionState* faction, bool atWar)
+bool ReputationMgr::SetAtWar(FactionState* faction, bool atWar)
 {
-    // not allow declare war to faction unless already hated or less
-    if (atWar && (faction->Flags & FACTION_FLAG_PEACE_FORCED) && ReputationToRank(faction->Standing) > REP_HATED)
-        return;
-
     // already set
     if (((faction->Flags & FACTION_FLAG_AT_WAR) != 0) == atWar)
-        return;
+        return false;
+
+    // not allow declare war to faction unless already hated or less
+    if (atWar && (faction->Flags & FACTION_FLAG_PEACE_FORCED) && ReputationToRank(faction->Standing) > REP_HATED)
+        return false;
 
     if (atWar)
         faction->Flags |= FACTION_FLAG_AT_WAR;
@@ -350,6 +350,8 @@ void ReputationMgr::SetAtWar(FactionState* faction, bool atWar)
 
     faction->needSend = true;
     faction->needSave = true;
+
+    return true;
 }
 
 void ReputationMgr::SetInactive(RepListID repListID, bool on)

@@ -26,7 +26,7 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
     //CreatureAI Functions
     //*************
 
-    // Called if IsVisible(Unit *who) is true at each *who move
+    // Called when an unit moves within visibility distance
     void MoveInLineOfSight(Unit*) override;
 
     // Called at each attack of m_creature by any victim
@@ -136,9 +136,6 @@ struct MANGOS_DLL_DECL ScriptedAI : CreatureAI
 
     // Spawns a creature at a random position around m_creature
     Creature* DoSpawnCreature(uint32 id, float dist, uint32 type, uint32 despawntime);
-
-    // Returns spells that meet the specified criteria from the creatures spell list
-    SpellEntry const* SelectSpell(Unit* pTarget, int32 uiSchool, int32 uiMechanic, SelectTarget selectTargets, uint32 uiPowerCostMin, uint32 uiPowerCostMax, float fRangeMin, float fRangeMax, SelectEffect selectEffect);
 
     void SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand = EQUIP_NO_CHANGE, int32 uiOffHand = EQUIP_NO_CHANGE, int32 uiRanged = EQUIP_NO_CHANGE);
 

@@ -24,34 +24,26 @@ EndScriptData */
 #include "scriptPCH.h"
 #include "zulgurub.h"
 
-#define SAY_AGGRO                       -1309014
-
-#define SPELL_BRAINWASHTOTEM            24262
-#define SPELL_POWERFULLHEALINGWARD      24309               //We will not use this spell. We will summon a totem by script cause the spell totems will not cast.
-#define SPELL_HEX                       24053
-#define SPELL_DELUSIONSOFJINDO          24306
-#define SPELL_SHADEOFJINDO              24308               //We will not use this spell. We will summon a shade by script.
-
-//Healing Ward Spell
-#define SPELL_HEAL                      24311               //Totems are not working right. Right heal spell ID is 24311 but this spell is not casting...
-
-//Shade of Jindo Spell
-//#define SPELL_SHADOWSHOCK               19460 // Nostalrius :
-/*
-et qui envoient de temps à autre
-un choc d’ombre de 800-1000 dégâts (ce qui est
-bien plus dangereux).
-19460 fait plus de 2k de dégats, et utilise de la mana, trop de mana -> L'ombre est OOM rapidement.
-D'apres WoWHead, ce serait plutot 24458.
-*/
-#define SPELL_INVISIBLE                 24699
-
 enum
 {
-    NPC_SHADE                = 14986,
-    SPELL_SHADOWSHOCK        = 24458,
-    NPC_BRAINWASHTOTEM       = 15112,
-    NPC_POWERFULLHEALINGWARD = 14987
+    SAY_AGGRO                       = 10449,
+
+    SPELL_BRAIN_WASH_TOTEM          = 24262,
+    SPELL_POWERFULL_HEALING_WARD    = 24309,
+    SPELL_HEX                       = 24053,
+    SPELL_DELUSIONS_OF_JINDO        = 24306,
+    SPELL_SHADE_OF_JINDO            = 24308,
+    // Brainwash Totem spells
+    SPELL_BRAINWASH                 = 24261,
+    // Healing Ward spells
+    SPELL_HEAL                      = 24311,
+    // Shade of Jindo spells
+    SPELL_SHADOWSHOCK               = 24458,
+    SPELL_INVISIBLE                 = 24307,
+
+    NPC_SHADE                       = 14986,
+    NPC_BRAINWASH_TOTEM             = 15112,
+    NPC_POWERFULL_HEALING_WARD      = 14987
 };
 
 struct boss_jindoAI : public ScriptedAI
@@ -87,15 +79,15 @@ struct boss_jindoAI : public ScriptedAI
             summonedCreatures.pop_front();
             switch (g.GetEntry())
             {
-                case NPC_BRAINWASHTOTEM:
+                case NPC_BRAINWASH_TOTEM:
                 case NPC_SHADE:
-                case NPC_POWERFULLHEALINGWARD:
+                case NPC_POWERFULL_HEALING_WARD:
                     if (Creature* c = m_creature->GetMap()->GetCreature(g))
                         c->AddObjectToRemoveList();
                     break;
             }
         }
-        while (Creature* Crea = m_creature->FindNearestCreature(NPC_BRAINWASHTOTEM, 150.0f))
+        while (Creature* Crea = m_creature->FindNearestCreature(NPC_BRAINWASH_TOTEM, 150.0f))
             Crea->DisappearAndDie();
     }
     void JustSummoned(Creature* c)
@@ -182,7 +174,7 @@ struct boss_jindoAI : public ScriptedAI
         {
             // Il faut au moins 2 personnes dans le threatlist de Jin'do, sinon il va reset !
             if (m_creature->SelectAttackingTarget(ATTACKING_TARGET_TOPAGGRO, 1))
-                if (DoCastSpellIfCan(m_creature, SPELL_BRAINWASHTOTEM) == CAST_OK)
+                if (DoCastSpellIfCan(m_creature, SPELL_BRAIN_WASH_TOTEM) == CAST_OK)
                     BrainWashTotem_Timer = urand(18000, 22000);
         }
         else
@@ -238,10 +230,10 @@ struct boss_jindoAI : public ScriptedAI
         //HealingWard_Timer
         if (HealingWard_Timer < diff)
         {
-            if (!m_creature->FindNearestCreature(NPC_POWERFULLHEALINGWARD, 200.0f))
+            if (!m_creature->FindNearestCreature(NPC_POWERFULL_HEALING_WARD, 200.0f))
             {
-                //DoCastSpellIfCan(m_creature, SPELL_POWERFULLHEALINGWARD);
-                m_creature->SummonCreature(NPC_POWERFULLHEALINGWARD, m_creature->GetPositionX() + 3, m_creature->GetPositionY() - 2, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
+                DoCastSpellIfCan(m_creature, SPELL_POWERFULL_HEALING_WARD);
+                //m_creature->SummonCreature(NPC_POWERFULL_HEALING_WARD, m_creature->GetPositionX() + 3, m_creature->GetPositionY() - 2, m_creature->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                 HealingWard_Timer = urand(18000, 22000);
             }
         }
@@ -262,7 +254,7 @@ struct boss_jindoAI : public ScriptedAI
         {
             if (Unit* target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0, nullptr, SELECT_FLAG_PLAYER))
             {
-                if (DoCastSpellIfCan(target, SPELL_DELUSIONSOFJINDO) == CAST_OK)
+                if (DoCastSpellIfCan(target, SPELL_DELUSIONS_OF_JINDO) == CAST_OK)
                 {
                     Creature *Shade = m_creature->SummonCreature(NPC_SHADE, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), 0, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
                     if (Shade)
@@ -315,7 +307,7 @@ struct mob_shade_of_jindoAI : public ScriptedAI
 
     void DamageTaken(Unit *done_by, uint32 &damage)
     {
-        if (done_by && !done_by->HasAura(SPELL_DELUSIONSOFJINDO))
+        if (done_by && !done_by->HasAura(SPELL_DELUSIONS_OF_JINDO))
             damage = 0;
     }
 
@@ -338,29 +330,7 @@ struct mob_shade_of_jindoAI : public ScriptedAI
 
         DoMeleeAttackIfReady();
     }
-
-    bool IsVisibleFor(Unit const* pOther, bool &isVisible) const
-    {
-        if (pOther->IsPlayer() && pOther->ToPlayer()->isGameMaster())
-        {
-            isVisible = true;
-            return true;
-        }
-        if (!pOther->HasAura(SPELL_DELUSIONSOFJINDO))
-        {
-            isVisible = false;
-            return true;
-        }
-        else
-        {
-            isVisible = true;
-            return true;
-        }
-    }
 };
-
-// Brain Wash Totem
-#define SPELL_BRAINWASH 24261
 
 struct mob_brain_wash_totemAI : public ScriptedAI
 {

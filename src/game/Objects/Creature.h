@@ -732,9 +732,9 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetInCombatWithZone(bool initialPulse = true);
         bool canStartAttack(Unit const* who, bool force) const;
-        Unit *SelectVictim();
         bool _IsTargetAcceptable(Unit const *target) const;
         bool canCreatureAttack(Unit const *pVictim, bool force) const;
+        bool CantPathToVictim() const;
 
         // Smartlog
         time_t GetCombatTime(bool total) const;
@@ -807,6 +807,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void SetFactionTemporary(uint32 factionId, uint32 tempFactionFlags = TEMPFACTION_ALL);
         void ClearTemporaryFaction();
         uint32 GetTemporaryFactionFlags() const { return m_temporaryFactionFlags; }
+        int32 GetReputationId() const { return m_reputationId; }
 
         void SendAreaSpiritHealerQueryOpcode(Player *pl);
 
@@ -923,6 +924,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool m_AI_InitializeOnRespawn;
         bool m_isDeadByDefault;
         uint32 m_temporaryFactionFlags;                     // used for real faction changes (not auras etc)
+        int32 m_reputationId;                              // Id of the creature's faction in the client reputations list.
 
         SpellSchoolMask m_meleeDamageSchoolMask;
         uint32 m_originalEntry;

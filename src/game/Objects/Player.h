@@ -1646,12 +1646,13 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SendAttackSwingBadFacingAttack();
         void SendAutoRepeatCancel();
         void SendExplorationExperience(uint32 Area, uint32 Experience);
+        void SendFactionAtWar(uint32 reputationId, bool apply);
         AutoAttackCheckResult CanAutoAttackTarget(Unit const*) const override;
 
         void ResetInstances(InstanceResetMethod method);
         void SendResetInstanceSuccess(uint32 MapId);
         void SendResetInstanceFailed(uint32 reason, uint32 MapId);
-        void SendResetFailedNotify(uint32 mapid);
+        void SendResetFailedNotify();
         bool CheckInstanceCount(uint32 instanceId);
         void AddInstanceEnterTime(uint32 instanceId, time_t enterTime);
 

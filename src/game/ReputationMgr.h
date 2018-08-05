@@ -110,7 +110,7 @@ class ReputationMgr
 
         void SetVisible(FactionTemplateEntry const* factionTemplateEntry);
         void SetVisible(FactionEntry const* factionEntry);
-        void SetAtWar(RepListID repListID, bool on);
+        bool SetAtWar(RepListID repListID, bool on);
         void SetInactive(RepListID repListID, bool on);
 
         void ApplyForceReaction(uint32 faction_id,ReputationRank rank,bool apply);
@@ -128,7 +128,7 @@ class ReputationMgr
         bool SetReputation(FactionEntry const* factionEntry, int32 standing, bool incremental, bool noSpillover = false);
         bool SetOneFactionReputation(FactionEntry const* factionEntry, int32 standing, bool incremental);
         void SetVisible(FactionState* faction);
-        void SetAtWar(FactionState* faction, bool atWar);
+        bool SetAtWar(FactionState* faction, bool atWar);
         void SetInactive(FactionState* faction, bool inactive);
         void SendVisible(FactionState const* faction) const;
     private:

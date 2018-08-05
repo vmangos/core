@@ -2126,7 +2126,7 @@ bool DungeonMap::Reset(InstanceResetMethod method)
         {
             // notify the players to leave the instance so it can be reset
             for (MapRefManager::iterator itr = m_mapRefManager.begin(); itr != m_mapRefManager.end(); ++itr)
-                itr->getSource()->SendResetFailedNotify(GetId());
+                itr->getSource()->SendResetFailedNotify();
         }
         else
         {

@@ -24,18 +24,16 @@
 
 #include "CreatureAI.h"
 
-class Creature;
-
 class MANGOS_DLL_DECL AggressorAI : public CreatureAI
 {
     public:
 
-        explicit AggressorAI(Creature *c);
+        explicit AggressorAI(Creature *c) : CreatureAI(c) {}
 
-        void MoveInLineOfSight(Unit *);
-        void AttackStart(Unit *);
+        void MoveInLineOfSight(Unit *) override;
+        void AttackStart(Unit *) override;
+        void UpdateAI(const uint32) override;
 
-        void UpdateAI(const uint32);
         static int Permissible(const Creature *);
 };
 

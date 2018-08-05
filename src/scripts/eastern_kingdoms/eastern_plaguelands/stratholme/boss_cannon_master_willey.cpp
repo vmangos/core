@@ -246,7 +246,7 @@ struct boss_cannon_master_willeyAI : public ScriptedAI
         else 
             m_uiShootTimer -= diff;
 
-        if (!IsCombatMovement())
+        if (!IsCombatMovementEnabled())
         { //Melee
             if (!m_bInMelee && (m_creature->GetDistance2d(m_creature->getVictim()) < 8.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 27.0f || !m_creature->IsWithinLOSInMap(m_creature->getVictim())))
             {

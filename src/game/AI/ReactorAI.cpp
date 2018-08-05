@@ -19,17 +19,10 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include "ByteBuffer.h"
 #include "ReactorAI.h"
-#include "Errors.h"
 #include "Creature.h"
-#include "Map.h"
-#include "Log.h"
 
-#define REACTOR_VISIBLE_RANGE (26.46f)
-
-int
-ReactorAI::Permissible(const Creature *creature)
+int ReactorAI::Permissible(const Creature *creature)
 {
     if ((creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_AGGRO) || creature->IsNeutralToAll())
         return PERMIT_BASE_REACTIVE;
@@ -37,13 +30,7 @@ ReactorAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-void
-ReactorAI::MoveInLineOfSight(Unit *)
-{
-}
-
-void
-ReactorAI::AttackStart(Unit *p)
+void ReactorAI::AttackStart(Unit *p)
 {
     if (!p)
         return;
@@ -51,35 +38,24 @@ ReactorAI::AttackStart(Unit *p)
     if (m_creature->Attack(p, true))
     {
         DEBUG_FILTER_LOG(LOG_FILTER_AI_AND_MOVEGENSS, "Tag unit GUID: %u (TypeId: %u) as a victim", p->GetGUIDLow(), p->GetTypeId());
-        i_victimGuid = p->GetObjectGuid();
+
         m_creature->AddThreat(p);
 
         m_creature->SetInCombatWith(p);
         p->SetInCombatWith(m_creature);
 
-        if (m_CombatMovementEnabled)
+        if (m_bCombatMovement)
             m_creature->GetMotionMaster()->MoveChase(p);
     }
 }
 
-void
-ReactorAI::UpdateAI(const uint32 uiDiff)
+void ReactorAI::UpdateAI(const uint32 uiDiff)
 {
-    // update i_victimGuid if i_creature.getVictim() !=0 and changed
     if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
         return;
-
-    i_victimGuid = m_creature->getVictim()->GetObjectGuid();
 
     if (!m_CreatureSpells.empty())
         DoSpellTemplateCasts(uiDiff);
 
     DoMeleeAttackIfReady();
-}
-
-void
-ReactorAI::EnterEvadeMode()
-{
-    CreatureAI::EnterEvadeMode();
-    i_victimGuid.Clear();
 }

@@ -55,7 +55,7 @@ void ScriptedAI::AttackStart(Unit* pWho)
         m_creature->SetInCombatWith(pWho);
         pWho->SetInCombatWith(m_creature);
 
-        if (m_CombatMovementEnabled)
+        if (m_bCombatMovement)
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
     else
@@ -165,94 +165,6 @@ Creature* ScriptedAI::DoSpawnCreature(uint32 id, float dist, uint32 type, uint32
     m_creature->GetPosition(x, y, z);
     m_creature->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, dist);
     return m_creature->SummonCreature(id, x, y, z, m_creature->GetAngle(x, y) + M_PI, (TempSummonType)type, despawntime);
-}
-
-SpellEntry const* ScriptedAI::SelectSpell(Unit* pTarget, int32 uiSchool, int32 uiMechanic, SelectTarget selectTargets, uint32 uiPowerCostMin, uint32 uiPowerCostMax, float fRangeMin, float fRangeMax, SelectEffect selectEffects)
-{
-    //No target so we can't cast
-    if (!pTarget)
-        return nullptr;
-
-    //Silenced so we can't cast
-    if (m_creature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_SILENCED))
-        return nullptr;
-
-    //Using the extended script system we first create a list of viable spells
-    SpellEntry const* apSpell[4];
-    memset(apSpell, 0, sizeof(SpellEntry*)*4);
-
-    uint32 uiSpellCount = 0;
-
-    SpellEntry const* pTempSpell;
-    SpellRangeEntry const* pTempRange;
-
-    TSpellSummary* spellSummary = sScriptMgr.GetSpellSummary();
-
-    //Check if each spell is viable(set it to null if not)
-    for (uint32 i = 0; i < 4; ++i)
-    {
-        pTempSpell = sSpellMgr.GetSpellEntry(m_creature->m_spells[i]);
-
-        //This spell doesn't exist
-        if (!pTempSpell)
-            continue;
-
-        // Targets and Effects checked first as most used restrictions
-        //Check the spell targets if specified
-        if (selectTargets && !(spellSummary[m_creature->m_spells[i]].Targets & (1 << (selectTargets-1))))
-            continue;
-
-        //Check the type of spell if we are looking for a specific spell type
-        if (selectEffects && !(spellSummary[m_creature->m_spells[i]].Effects & (1 << (selectEffects-1))))
-            continue;
-
-        //Check for school if specified
-//        if (uiSchool >= 0 && pTempSpell->SchoolMask & uiSchool)
-//            continue;
-
-        //Check for spell mechanic if specified
-        if (uiMechanic >= 0 && pTempSpell->Mechanic != uiMechanic)
-            continue;
-
-        //Make sure that the spell uses the requested amount of power
-        if (uiPowerCostMin &&  pTempSpell->manaCost < uiPowerCostMin)
-            continue;
-
-        if (uiPowerCostMax && pTempSpell->manaCost > uiPowerCostMax)
-            continue;
-
-        //Continue if we don't have the mana to actually cast this spell
-        if (pTempSpell->manaCost > m_creature->GetPower((Powers)pTempSpell->powerType))
-            continue;
-
-        //Get the Range
-        pTempRange = GetSpellRangeStore()->LookupEntry(pTempSpell->rangeIndex);
-
-        //Spell has invalid range store so we can't use it
-        if (!pTempRange)
-            continue;
-
-        //Check if the spell meets our range requirements
-        if (fRangeMin && pTempRange->maxRange < fRangeMin)
-            continue;
-
-        if (fRangeMax && pTempRange->maxRange > fRangeMax)
-            continue;
-
-        //Check if our target is in range
-        if (m_creature->IsWithinDistInMap(pTarget, pTempRange->minRange) || !m_creature->IsWithinDistInMap(pTarget, pTempRange->maxRange))
-            continue;
-
-        //All good so lets add it to the spell list
-        apSpell[uiSpellCount] = pTempSpell;
-        ++uiSpellCount;
-    }
-
-    //We got our usable spells so now lets randomly pick one
-    if (!uiSpellCount)
-        return nullptr;
-
-    return apSpell[rand()%uiSpellCount];
 }
 
 void ScriptedAI::DoResetThreat()

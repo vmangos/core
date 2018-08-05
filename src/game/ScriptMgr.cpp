@@ -46,14 +46,12 @@ ScriptMapMap sCreatureAIScripts;
 
 INSTANTIATE_SINGLETON_1(ScriptMgr);
 
-ScriptMgr::ScriptMgr() : m_scheduledScripts(0), m_spellSummary(nullptr)
+ScriptMgr::ScriptMgr() : m_scheduledScripts(0)
 {
 }
 
 ScriptMgr::~ScriptMgr()
 {
-    delete[] m_spellSummary;
-
     // Free resources before library unload
     for (ScriptVector::iterator itr = m_scripts.begin(); itr != m_scripts.end(); ++itr)
         delete *itr;
@@ -1074,6 +1072,26 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_ADD_AURA:
+            {
+                if (auto pSpellEntry = sSpellMgr.GetSpellEntry(tmp.addAura.spellId))
+                {
+                    if (!IsSpellAppliesAura(pSpellEntry, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
+                        !IsSpellHaveEffect(pSpellEntry, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+                    {
+                        sLog.outErrorDb("Table `%s` has a spell that does not apply any auras (id: %u) in SCRIPT_COMMAND_ADD_AURA for script id %u",
+                            tablename, tmp.addAura.spellId, tmp.id);
+                        continue;
+                    }
+                }
+                else
+                {
+                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_ADD_AURA for script id %u",
+                        tablename, tmp.addAura.spellId, tmp.id);
+                    continue;
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
@@ -1780,8 +1798,6 @@ void ScriptMgr::Initialize()
     // Resize script ids to needed ammount of assigned ScriptNames (from core)
     m_scripts.resize(GetScriptIdsCount(), nullptr);
 
-    FillSpellSummary();
-
     AddScripts();
 
     // Check existance scripts for all registered by core script names
@@ -2399,99 +2415,9 @@ void Script::RegisterSelf(bool bReportError)
     {
         // Don't report unused generic scripts
         if (bReportError)
-        {
-            if (!(strstr(Name.c_str(), "generic") || strstr(Name.c_str(), "npc_escort")))
-                sLog.outError("Script registering but ScriptName %s is not assigned in database. Script will not be used.", Name.c_str());
-        }
+            sLog.outError("Script registering but ScriptName %s is not assigned in database. Script will not be used.", Name.c_str());
 
         delete this;
-    }
-}
-
-void ScriptMgr::FillSpellSummary()
-{
-    delete[] m_spellSummary;
-
-    m_spellSummary = new TSpellSummary[sSpellMgr.GetMaxSpellId()];
-
-    SpellEntry const* pTempSpell;
-
-    for (uint32 i = 0; i < sSpellMgr.GetMaxSpellId(); ++i)
-    {
-        m_spellSummary[i].Effects = 0;
-        m_spellSummary[i].Targets = 0;
-
-        pTempSpell = sSpellMgr.GetSpellEntry(i);
-        // This spell doesn't exist
-        if (!pTempSpell)
-            continue;
-
-        for (uint8 j = 0; j < 3; ++j)
-        {
-            // Spell targets self
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_SELF)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_SELF - 1);
-
-            // Spell targets a single enemy
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_CURRENT_ENEMY_COORDINATES)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_SINGLE_ENEMY - 1);
-
-            // Spell targets AoE at enemy
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_ENEMY_IN_AREA ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_CASTER_COORDINATES ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_AOE_ENEMY - 1);
-
-            // Spell targets an enemy
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_CHAIN_DAMAGE ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_CURRENT_ENEMY_COORDINATES ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_ENEMY_IN_AREA ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_ENEMY_IN_AREA_INSTANT ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_CASTER_COORDINATES ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_ENEMY_IN_AREA_CHANNELED)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_ANY_ENEMY - 1);
-
-            // Spell targets a single friend(or self)
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_SELF ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_SINGLE_FRIEND ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_SINGLE_PARTY)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_SINGLE_FRIEND - 1);
-
-            // Spell targets aoe friends
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_PARTY_AROUND_CASTER ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_AREAEFFECT_PARTY ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_CASTER_COORDINATES)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_AOE_FRIEND - 1);
-
-            // Spell targets any friend(or self)
-            if (pTempSpell->EffectImplicitTargetA[j] == TARGET_SELF ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_SINGLE_FRIEND ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_SINGLE_PARTY ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_ALL_PARTY_AROUND_CASTER ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_AREAEFFECT_PARTY ||
-                pTempSpell->EffectImplicitTargetA[j] == TARGET_CASTER_COORDINATES)
-                m_spellSummary[i].Targets |= 1 << (SELECT_TARGET_ANY_FRIEND - 1);
-
-            // Make sure that this spell includes a damage effect
-            if (pTempSpell->Effect[j] == SPELL_EFFECT_SCHOOL_DAMAGE ||
-                pTempSpell->Effect[j] == SPELL_EFFECT_INSTAKILL ||
-                pTempSpell->Effect[j] == SPELL_EFFECT_ENVIRONMENTAL_DAMAGE ||
-                pTempSpell->Effect[j] == SPELL_EFFECT_HEALTH_LEECH)
-                m_spellSummary[i].Effects |= 1 << (SELECT_EFFECT_DAMAGE - 1);
-
-            // Make sure that this spell includes a healing effect (or an apply aura with a periodic heal)
-            if (pTempSpell->Effect[j] == SPELL_EFFECT_HEAL ||
-                pTempSpell->Effect[j] == SPELL_EFFECT_HEAL_MAX_HEALTH ||
-                pTempSpell->Effect[j] == SPELL_EFFECT_HEAL_MECHANICAL ||
-                (pTempSpell->Effect[j] == SPELL_EFFECT_APPLY_AURA  && pTempSpell->EffectApplyAuraName[j] == 8))
-                m_spellSummary[i].Effects |= 1 << (SELECT_EFFECT_HEALING - 1);
-
-            // Make sure that this spell applies an aura
-            if (pTempSpell->Effect[j] == SPELL_EFFECT_APPLY_AURA)
-                m_spellSummary[i].Effects |= 1 << (SELECT_EFFECT_AURA - 1);
-        }
     }
 }
 

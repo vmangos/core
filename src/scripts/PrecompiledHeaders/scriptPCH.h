@@ -22,7 +22,6 @@
 #include "ScriptedFollowerAI.h"
 #include "ScriptedEscortAI.h"
 #include "ScriptedGossip.h"
-#include "ScriptedGuardAI.h"
 #include "GridSearchers.h"
 #include "ScriptedInstance.h"
 #include "SpellAuras.h"

@@ -313,7 +313,7 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
     else 
         m_uiSpellTimers[2] -= uiDiff;
 
-    if (!IsCombatMovement())
+    if (!IsCombatMovementEnabled())
     { //Melee
         if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f
           || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
@@ -392,7 +392,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     else 
         m_uiSpellTimers[1] -= uiDiff;
 
-    if (!IsCombatMovement())
+    if (!IsCombatMovementEnabled())
     { //Melee
         if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f
           || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))
@@ -474,7 +474,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     else 
         m_uiSpellTimers[2] -= uiDiff;
 
-    if (!IsCombatMovement())
+    if (!IsCombatMovementEnabled())
     { //Melee
         if (!m_bInMeele && (m_creature->GetDistance2d(m_creature->getVictim()) < 5.0f || m_creature->GetDistance2d(m_creature->getVictim()) > 30.0f
             || !m_creature->IsWithinLOSInMap(m_creature->getVictim()) || m_creature->GetPowerPercent(POWER_MANA) < 5.0f))

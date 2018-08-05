@@ -53,14 +53,6 @@ void npc_escortAI::setCurrentWP (uint32 idx)
     m_currentWaypointIdx = idx;
 }
 
-bool npc_escortAI::IsVisible(Unit* pWho) const
-{
-    if (!pWho)
-        return false;
-
-    return m_creature->IsWithinDist(pWho, VISIBLE_RANGE) && pWho->isVisibleForOrDetect(m_creature, m_creature, true);
-}
-
 void npc_escortAI::AttackStart(Unit* pWho)
 {
     if (!pWho)
@@ -75,7 +67,7 @@ void npc_escortAI::AttackStart(Unit* pWho)
         m_creature->SetInCombatWith(pWho);
         pWho->SetInCombatWith(m_creature);
 
-        if (IsCombatMovement())
+        if (IsCombatMovementEnabled())
             m_creature->GetMotionMaster()->MoveChase(pWho);
     }
 }
@@ -189,7 +181,7 @@ void npc_escortAI::JustRespawned()
 {
     m_uiEscortState = STATE_ESCORT_NONE;
 
-    if (!IsCombatMovement())
+    if (!IsCombatMovementEnabled())
         SetCombatMovement(true);
 
     //add a small delay before going to first waypoint.

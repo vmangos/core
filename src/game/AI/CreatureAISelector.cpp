@@ -64,6 +64,10 @@ CreatureAI* selectAI(Creature *creature)
     if (!ai_factory && !ainame.empty() && creature->IsPet() && (ainame == "EventAI"))
         ai_factory = ai_registry.GetRegistryItem("PetEventAI");
 
+    // EventAI assigned but creature is Guard.
+    if (!ai_factory && !ainame.empty() && creature->IsGuard() && (ainame == "EventAI"))
+        ai_factory = ai_registry.GetRegistryItem("GuardEventAI");
+
     // select by script name
     if (!ai_factory && !ainame.empty())
         ai_factory = ai_registry.GetRegistryItem(ainame.c_str());

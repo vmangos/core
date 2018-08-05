@@ -627,7 +627,7 @@ void PetAI::MovementInform(uint32 moveType, uint32 data)
 
 bool PetAI::CanAttack(Unit* target)
 {
-    // Evaluates wether a pet can attack a specific target based on CommandState, ReactState and other flags
+    // Evaluates whether a pet can attack a specific target based on CommandState, ReactState and other flags
     // IMPORTANT: The order in which things are checked is important, be careful if you add or remove checks
 
     // Hmmm...

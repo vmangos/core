@@ -277,8 +277,6 @@ set (SCRIPTS_SRCS
 	world/elemental_invasions.cpp
 	world/event_scourge_invasion.cpp
 	world/go_scripts.cpp
-	world/guards.cpp
-	world/mob_generic_creature.cpp
 	world/npcs_special.cpp
 	world/npc_professions.cpp
 	world/spell_scripts.cpp

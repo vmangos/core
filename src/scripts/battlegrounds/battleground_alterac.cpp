@@ -2095,7 +2095,7 @@ struct AV_NpcEventAI : public npc_escortAI
                                 m_creature->SetDisplayId(AERIAL_GRYPHON_ID);
                             m_creature->SetFly(true);
                             m_creature->SetWalk(false);
-                            if (IsCombatMovement())
+                            if (IsCombatMovementEnabled())
                                 SetCombatMovement(false);
 
                             DoCastSpellIfCan(m_creature, SPELL_AV_VISUALTRANSFORM);

@@ -77,7 +77,7 @@ void PetEventAI::AttackStart(Unit* pWho)
     if (pWho->HasBreakableByDamageCrowdControlAura() && m_creature->GetCharmerOrOwner() && m_creature->GetCharmerOrOwner()->isAlive())
         return;
 
-    if (m_creature->Attack(pWho, m_MeleeEnabled))
+    if (m_creature->Attack(pWho, m_bMeleeAttack))
     {
         m_creature->AddThreat(pWho);
         m_creature->SetInCombatWith(pWho);
@@ -105,7 +105,7 @@ void PetEventAI::AttackStart(Unit* pWho)
             }
         }
 
-        if (m_CombatMovementEnabled)
+        if (m_bCombatMovement)
         {
             if (m_creature->GetCharmInfo())
                 m_creature->GetCharmInfo()->SetIsReturning(false);
