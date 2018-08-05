@@ -255,6 +255,11 @@ inline bool IsElementalShield(SpellEntry const *spellInfo)
     return spellInfo->IsFitToFamilyMask<CF_SHAMAN_LIGHTNING_SHIELD>() || spellInfo->Id == 23552;
 }
 
+inline bool IsFromBehindOnlySpell(SpellEntry const *spellInfo)
+{
+    return ((spellInfo->AttributesEx2 == 0x100000 && (spellInfo->AttributesEx & 0x200) == 0x200) || (spellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND));
+}
+
 int32 CompareAuraRanks(uint32 spellId_1, uint32 spellId_2);
 bool CompareSpellSpecificAuras(SpellEntry const* spellInfo_1, SpellEntry const* spellInfo_2);
 
