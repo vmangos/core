@@ -553,7 +553,16 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                 case 19395: // Gordunni Trap
                 {
                     if (unitTarget && unitTarget->GetTypeId() == TYPEID_PLAYER)
-                        unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
+                    {
+                        // If GameObject casting was implemented, or activating a trap actually despawned it, this wouldn't be needed.
+                        if (GameObject* pObject = unitTarget->FindNearestGameObject(144050, INTERACTION_DISTANCE))
+                        {
+                            if (pObject->HasStaticDBSpawnData())
+                                unitTarget->CastSpell(unitTarget, urand(0, 1) ? 19394 : 11756, true);
+                            else
+                                pObject->AddObjectToRemoveList();
+                        }
+                    }
 
                     return;
                 }
@@ -562,7 +571,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     m_caster->HandleEmote(EMOTE_ONESHOT_BOW);
                     return;
                 }
-                case 27798: //Nature's Bounty
+                case 27798: // Nature's Bounty
                 {
                     switch(unitTarget->getPowerType())
                     {
