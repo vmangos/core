@@ -545,6 +545,11 @@ inline bool IsTotemSummonSpell(SpellEntry const* spellInfo)
     return spellInfo->Effect[0] >= SPELL_EFFECT_SUMMON_TOTEM_SLOT1 && spellInfo->Effect[0] <= SPELL_EFFECT_SUMMON_TOTEM_SLOT4;
 }
 
+inline bool HasRealTimeDuration(SpellEntry const* spellInfo)
+{
+    return spellInfo->AttributesEx4 & SPELL_ATTR_EX4_REAL_TIME_DURATION;
+}
+
 // Spell effects require a specific power type on the target
 inline bool IsTargetPowerTypeValid(SpellEntry const *spellInfo, Powers powerType)
 {

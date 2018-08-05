@@ -468,9 +468,15 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                 // Ferocious Bite
                 if (m_spellInfo->IsFitToFamilyMask<CF_DRUID_RIP_BITE>() && m_spellInfo->SpellVisual == 6587)
                 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+                    // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+                    // - Ferocious Bite: Book of Ferocious Bite (Rank 5) now drops off The
+                    //   Beast in Black Rock Spire. In addition, Ferocious Bite now increases
+                    //   in potency with greater attack power.
                     // ( AP * 3% * combo + energy * 2,7 + damage )
                     if (uint32 combo = ((Player*)m_caster)->GetComboPoints())
                         damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f);
+#endif
                     damage += int32(m_caster->GetPower(POWER_ENERGY) * m_spellInfo->DmgMultiplier[effect_idx]);
                     m_caster->SetPower(POWER_ENERGY, 0);
                 }
@@ -478,12 +484,17 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             }
             case SPELLFAMILY_ROGUE:
             {
-                // Eviscerate
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+                // - Eviscerate: Manual of Eviscerate (Rank 9) now drops off Blackhand
+                //   Assassins in Black Rock Spire.In addition, Eviscerate now increases
+                //   in potency with greater attack power.
                 if (m_spellInfo->IsFitToFamilyMask<CF_ROGUE_EVISCERATE>() && m_caster->GetTypeId() == TYPEID_PLAYER)
                 {
                     if (uint32 combo = ((Player*)m_caster)->GetComboPoints())
                         damage += int32(m_caster->GetTotalAttackPowerValue(BASE_ATTACK) * combo * 0.03f);
                 }
+#endif
                 break;
             }
             case SPELLFAMILY_HUNTER:

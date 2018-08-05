@@ -4090,7 +4090,9 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
             }
             case SPELLFAMILY_ROGUE:
             {
-                // Rupture
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+                // - Rupture: Rupture now increases in potency with greater attack power.
                 if (spellProto->IsFitToFamilyMask<CF_ROGUE_RUPTURE>())
                 {
                     // Dmg/tick = $AP*min(0.01*$cp, 0.03) [Like Rip: only the first three CP increase the contribution from AP]
@@ -4101,6 +4103,13 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
                         m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100);
                     }
                 }
+#elif SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+                // - Garrote: The damage from this ability has been increased. In
+                //   addition, Garrote now increases in potency with greater attack power.
+                if (spellProto->IsFitToFamilyMask<CF_ROGUE_GARROTE>())
+                    return;
+#endif
                 break;
             }
             default:

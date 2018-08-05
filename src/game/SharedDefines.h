@@ -377,7 +377,7 @@ enum SpellAttributesEx4
 {
     SPELL_ATTR_EX4_IGNORE_RESISTANCES         = 0x00000001,            // 0 From TC 3.3.5, but not present in 1.12 native DBCs. Add it with spell_mod to prevent a spell from being resisted.
     SPELL_ATTR_EX4_UNK1                       = 0x00000002,            // 1 proc on finishing move?
-    SPELL_ATTR_EX4_UNK2                       = 0x00000004,            // 2
+    SPELL_ATTR_EX4_REAL_TIME_DURATION         = 0x00000004,            // 2 aura continues to expire while player is offline
     SPELL_ATTR_EX4_UNK3                       = 0x00000008,            // 3
     SPELL_ATTR_EX4_UNK4                       = 0x00000010,            // 4 This will no longer cause guards to attack on use??
     SPELL_ATTR_EX4_UNK5                       = 0x00000020,            // 5

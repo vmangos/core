@@ -15157,7 +15157,7 @@ void Player::LoadAura(AuraSaveStruct& s, uint32 timediff)
         return;
     }
 
-    if (s.remaintime != -1 && !IsPositiveSpell(spellproto))
+    if (s.remaintime != -1 && HasRealTimeDuration(spellproto))
     {
         if (timediff > (INT_MAX / IN_MILLISECONDS))
             return;

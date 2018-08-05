@@ -4196,6 +4196,17 @@ void Spell::finish(bool ok)
         m_caster->AttackStop();
         m_caster->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
     }
+    else if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_MELEE_COMBAT_START))
+    {
+        // Pets should initiate melee combat on spell with this flag. (Growl)
+        if (Pet* pPet = m_caster->ToPet())
+            if (pPet->AI() && pPet->GetCharmInfo())
+                if (Unit* const pTarget = m_targets.getUnitTarget())
+                {
+                    pPet->GetCharmInfo()->SetIsCommandAttack(true);
+                    pPet->AI()->AttackStart(pTarget);
+                }
+    }
 }
 
 void Spell::SendCastResult(SpellCastResult result)
@@ -5279,6 +5290,13 @@ SpellCastResult Spell::CheckCast(bool strict)
         // Check spell max target level
         if ((m_spellInfo->MaxTargetLevel > 0) && (int32(target->getLevel()) > m_spellInfo->MaxTargetLevel))
             return SPELL_FAILED_HIGHLEVEL;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+        // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+        // - Pickpocket can now be used on targets that are in combat, as long as the rogue remains stealthed.
+        if ((m_spellInfo->AttributesEx & SPELL_ATTR_EX_IS_PICKPOCKET) && target->isInCombat())
+            return SPELL_FAILED_TARGET_IN_COMBAT;
+#endif
 
         bool non_caster_target = target != m_caster && !IsSpellWithCasterSourceTargetsOnly(m_spellInfo);
 
