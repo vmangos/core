@@ -1845,11 +1845,12 @@ bool Player::SwitchInstance(uint32 newInstanceId)
 
     //remove auras before removing from map...
     RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_CHANGE_MAP | AURA_INTERRUPT_FLAG_MOVE | AURA_INTERRUPT_FLAG_TURNING);
-    RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM);
-    RemoveSpellsCausingAura(SPELL_AURA_MOD_POSSESS);
-    RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
+    RemoveCharmAuras();
     DisableSpline();
     SetMover(this);
+
+    // Clear hostile refs so that we have no cross-map (and thread) references being maintained
+    getHostileRefManager().deleteReferences();
 
     // remove from old map now
     oldmap->Remove(this, false);
@@ -2095,6 +2096,9 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData *data)
         DisableSpline();
         SetFallInformation(0, data->z);
         ScheduleDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
+
+        // Clear hostile refs so that we have no cross-map (and thread) references being maintained
+        getHostileRefManager().deleteReferences();
 
         // if the player is saved before worldport ack (at logout for example)
         // this will be used instead of the current location in SaveToDB

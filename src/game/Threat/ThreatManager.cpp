@@ -410,9 +410,13 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
     // don't add assist threat to targets under hard CC
     // check for fear, blind, freezing trap, reckless charge, banish, etc.
     if (isAssistThreat)
+    {
         if (getOwner()->hasUnitState(UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING | UNIT_STAT_ISOLATED)
-          || (getOwner()->hasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, NULL)))
+            || (getOwner()->hasUnitState(UNIT_STAT_STUNNED) && getOwner()->HasBreakableByDamageAuraType(SPELL_AURA_MOD_STUN, NULL)))
+        {
             pThreat = 0.0f;
+        }
+    }
 
     float threat = ThreatCalcHelper::CalcThreat(pVictim, iOwner, pThreat, crit, schoolMask, pThreatSpell);
 
@@ -421,7 +425,7 @@ void ThreatManager::addThreat(Unit* pVictim, float pThreat, bool crit, SpellScho
 
 void ThreatManager::addThreatDirectly(Unit* pVictim, float threat)
 {
-    if (!pVictim || pVictim == getOwner() || !pVictim->isAlive())
+    if (!pVictim || pVictim == getOwner() || !pVictim->isAlive() || !pVictim->IsInMap(getOwner()))
         return;
 
     HostileReference* ref = iThreatContainer.addThreat(pVictim, threat);
