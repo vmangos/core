@@ -752,8 +752,8 @@ struct GizeltonStruct
 
 const GizeltonStruct CaravanTalk[] = 
 {
-    { -1001000, -1001001, -1001002, -1001003, -1001004, -1001005 },
-    { -1001006, -1001007, -1001008, -1001009, -1001010, -1001011 }
+    { 7506, 7475, 7330, 7331, 7332, 7333 },
+    { 7505, 7474, 7310, 7311, 7312, 7334 }
 };
 
 enum
@@ -1062,12 +1062,13 @@ struct npc_cork_gizeltonAI : npc_escortAI
         }
     }
 
-    void PlayerHere(Player* pPlayer)
+    void ResumePath(Player* pPlayer)
     {
         m_bWaitingForPlayer = false;
         m_bWaitingForDepart = true;
         m_uiAnnounceCount = 0;
-        m_playerGuid = pPlayer->GetObjectGuid();
+        if (pPlayer)
+            m_playerGuid = pPlayer->GetObjectGuid();
         GiveQuest(false);
     }
 
@@ -1116,51 +1117,62 @@ struct npc_cork_gizeltonAI : npc_escortAI
     {
         switch (uiPoint)
         {
-        case POINT_BOT_CAMP:
-        case POINT_TOP_CAMP:
-            SetEscortPaused(true);
-            CaravanWalk(true);
-            m_uiCampTimer = 10 * MINUTE * IN_MILLISECONDS;
-            m_bCamp = true;
-            DoVendor(true);
-            break;
-        case POINT_BOT_ANNOUNCE:
-        case POINT_TOP_ANNOUNCE:
-            SetEscortPaused(true);
-            GiveQuest(true);
-            m_uiAnnounceTimer = 0;
-            m_uiDepartTimer = 10 * IN_MILLISECONDS;
-            m_bWaitingForPlayer = true;
-            break;
-        case POINT_BOT_AMBUSH_0:
-        case POINT_BOT_AMBUSH_1:
-        case POINT_BOT_AMBUSH_2:
-        case POINT_TOP_AMBUSH_0:
-        case POINT_TOP_AMBUSH_1:
-        case POINT_TOP_AMBUSH_2:
-            SetEscortPaused(true);
-            Ambush(uiPoint);
-            break;
-        case POINT_BOT_COMPLETE:
-        case POINT_TOP_COMPLETE:
+            case POINT_BOT_CAMP:
+            case POINT_TOP_CAMP:
             {
-            DoTalk(CaravanTalk[m_bRigger ? 0 : 1].onComplete);
-
-            if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
+                SetEscortPaused(true);
+                CaravanWalk(true);
+                m_uiCampTimer = 10 * MINUTE * IN_MILLISECONDS;
+                m_bCamp = true;
+                DoVendor(true);
+                break;
+            }
+            case POINT_BOT_ANNOUNCE:
+            case POINT_TOP_ANNOUNCE:
             {
-                if (pPlayer->IsInRange(m_creature, 0.0f, 100.0f))
-                    pPlayer->GroupEventHappens(m_bRigger ? QUEST_BOTTOM : QUEST_TOP, m_creature);
+                SetEscortPaused(true);
+                GiveQuest(true);
+                m_uiAnnounceTimer = 0;
+                m_uiDepartTimer = 10 * IN_MILLISECONDS;
+                m_bWaitingForPlayer = true;
+                break;
             }
+            case POINT_BOT_AMBUSH_0:
+            case POINT_BOT_AMBUSH_1:
+            case POINT_BOT_AMBUSH_2:
+            case POINT_TOP_AMBUSH_0:
+            case POINT_TOP_AMBUSH_1:
+            case POINT_TOP_AMBUSH_2:
+            {
+                if (m_playerGuid)
+                {
+                    SetEscortPaused(true);
+                    Ambush(uiPoint);
+                }
+                break;
+            }
+            case POINT_BOT_COMPLETE:
+            case POINT_TOP_COMPLETE:
+            {
+                if (auto pPlayer = m_creature->GetMap()->GetPlayer(m_playerGuid))
+                {
+                    DoTalk(CaravanTalk[m_bRigger ? 0 : 1].onComplete);
 
-            m_playerGuid.Clear();
-            CaravanFaction(false);
-            CaravanWalk(false);
-            m_bRigger = !m_bRigger;
+                    if (pPlayer->IsInRange(m_creature, 0.0f, 100.0f))
+                        pPlayer->GroupEventHappens(m_bRigger ? QUEST_BOTTOM : QUEST_TOP, m_creature);
+                }
+
+                m_playerGuid.Clear();
+                CaravanFaction(false);
+                CaravanWalk(false);
+                m_bRigger = !m_bRigger;
+                break;
             }
-            break;
-        case POINT_END:
-            DespawnCaravan();
-            break;
+            case POINT_END:
+            {
+                DespawnCaravan();
+                break;
+            }
         }
     }
 
@@ -1206,7 +1218,10 @@ struct npc_cork_gizeltonAI : npc_escortAI
 
                 // caravan stays for 15+ minutes waiting for help
                 if (m_uiAnnounceCount > 5)
-                    DespawnCaravan();
+                {
+                    ResumePath(nullptr);
+                    return;
+                }
 
                 DoTalk(CaravanTalk[m_bRigger ? 0 : 1].onAnnounce, true);
                 m_uiAnnounceTimer = 3 * MINUTE * IN_MILLISECONDS;
@@ -1246,7 +1261,7 @@ bool QuestAccept_npc_cork_gizelton(Player* pPlayer, Creature* pCreature, const Q
     if (pQuest->GetQuestId() == QUEST_TOP)
     {
         if (auto pCorkAI = dynamic_cast<npc_cork_gizeltonAI*>(pCreature->AI()))
-            pCorkAI->PlayerHere(pPlayer);
+            pCorkAI->ResumePath(pPlayer);
     }
 
     return true;
@@ -1259,7 +1274,7 @@ bool QuestAccept_npc_rigger_gizelton(Player* pPlayer, Creature* pCreature, const
         if (auto pCork = pCreature->FindNearestCreature(NPC_CORK_GIZELTON, 100.0f))
         {
             if (auto pCorkAI = dynamic_cast<npc_cork_gizeltonAI*>(pCork->AI()))
-                pCorkAI->PlayerHere(pPlayer);
+                pCorkAI->ResumePath(pPlayer);
         }
     }
 
