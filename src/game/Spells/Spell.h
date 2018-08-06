@@ -501,9 +501,6 @@ class Spell
         bool IgnoreItemRequirements() const;                // some item use spells have unexpected reagent data
         void UpdateOriginalCasterPointer();
 
-        // Additional range for non-strict check at end of cast
-        inline float GetRangeExtensionForCaster() const { return m_caster->IsPlayer() ? 6.25f : 2.25f; }
-
         Unit* m_caster;
 
         ObjectGuid m_originalCasterGUID;                    // real source of cast (aura caster/etc), used for spell targets selection

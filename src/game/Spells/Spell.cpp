@@ -6850,11 +6850,8 @@ SpellCastResult Spell::CheckRange(bool strict)
         }
     }
 
-    // Add up to ~5 yds "give" for non strict (landing) check
-    float range_mod = strict ? 1.25f : GetRangeExtensionForCaster();
-
-    // Add leeway bonus if both units are moving
-    range_mod += m_caster->GetLeewayBonusRange(target);
+    // Add up to ~5 yds "give" for non strict (landing) check and leeway bonus if both units are moving
+    float const range_mod = (strict ? (m_caster->IsPlayer() ? 1.25f : 0.0f) : (m_caster->IsPlayer() ? 6.25f : 2.25f)) + m_caster->GetLeewayBonusRange(target);
 
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(m_spellInfo->rangeIndex);
     float max_range = GetSpellMaxRange(srange);
@@ -6868,7 +6865,7 @@ SpellCastResult Spell::CheckRange(bool strict)
     GameObject* go = m_targets.getGOTarget(); // Check range for gobjects (lock picking)
     if (go)
     {
-        float dist = m_caster->GetDistance(go);
+        float const dist = m_caster->GetDistance(go);
 
         if (dist > max_range)
             return SPELL_FAILED_OUT_OF_RANGE;
@@ -6876,7 +6873,7 @@ SpellCastResult Spell::CheckRange(bool strict)
 
     if (target && target != m_caster)
     {
-        float dist = m_caster->GetCombatDistance(target);
+        float const dist = m_caster->GetCombatDistance(target);
 
         if (dist > max_range)
             return SPELL_FAILED_OUT_OF_RANGE;

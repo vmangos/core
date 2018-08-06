@@ -6132,7 +6132,7 @@ void Unit::RemoveCharmAuras()
 
 float Unit::GetCombatDistance(const Unit* target) const
 {
-    float radius = target->GetObjectBoundingRadius() + GetFloatValue(UNIT_FIELD_COMBATREACH);
+    float radius = target->GetFloatValue(UNIT_FIELD_COMBATREACH) + GetFloatValue(UNIT_FIELD_COMBATREACH);
     float dx = GetPositionX() - target->GetPositionX();
     float dy = GetPositionY() - target->GetPositionY();
     float dz = GetPositionZ() - target->GetPositionZ();
