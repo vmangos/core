@@ -5105,20 +5105,42 @@ void Spell::EffectSanctuary(SpellEffectIndex eff_idx)
     if (!unitTarget)
         return;
 
+    // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+    // - Neutral guards are now able to see through the rogue Vanish ability.
+    bool guard_check = m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_VANISH>() && (sWorld.GetWowPatch() >= WOW_PATCH_112);
+    bool no_guards = true;
+
     unitTarget->InterruptSpellsCastedOnMe(true);
     unitTarget->CombatStop();
-    unitTarget->getHostileRefManager().deleteReferences();  // stop all fighting
+
+    HostileReference* pReference = unitTarget->getHostileRefManager().getFirst();
+
+    while (pReference)
+    {
+        HostileReference* pNextRef = pReference->next();
+        if (!guard_check || !pReference->getSource()->getOwner()->IsContestedGuard())
+        {
+            pReference->removeReference();
+            delete pReference;
+        }
+        else
+            no_guards = false;
+
+        pReference = pNextRef;
+    }
+    
     unitTarget->m_lastSanctuaryTime = WorldTimer::getMSTime();
 
     // Vanish allows to remove all threat and cast regular stealth so other spells can be used
     if (m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_VANISH>())
     {
         m_caster->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
-        unitTarget->InterruptAttacksOnMe();
+        unitTarget->InterruptAttacksOnMe(0.0f, guard_check);
 
         if (auto pPlayer = m_caster->ToPlayer())
         {
-            pPlayer->SetCannotBeDetectedTimer(1000);
+            if (no_guards)
+                pPlayer->SetCannotBeDetectedTimer(1000);
         }
     }
 

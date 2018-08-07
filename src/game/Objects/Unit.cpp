@@ -10684,7 +10684,7 @@ void Unit::InterruptSpellsCastedOnMe(bool killDelayed, bool interruptPositiveSpe
     }
 }
 
-void Unit::InterruptAttacksOnMe(float dist)
+void Unit::InterruptAttacksOnMe(float dist, bool guard_check)
 {
     if (dist == 0.0f)
         dist = GetMap()->GetVisibilityDistance();
@@ -10699,6 +10699,8 @@ void Unit::InterruptAttacksOnMe(float dist)
     for (std::list<Unit*>::iterator iter = targets.begin(); iter != targets.end(); ++iter)
     {
         if ((*iter)->getVictim() != this)
+            continue;
+        if (guard_check && (*iter)->IsContestedGuard())
             continue;
         (*iter)->AttackStop();
         if (Player* pAttacker = (*iter)->ToPlayer())

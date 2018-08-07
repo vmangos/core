@@ -1786,7 +1786,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
         uint32 RespawnNearCreaturesByEntry(uint32 entry, float range);
         uint32 DespawnHostileCreaturesInRange(float range = 0.0f);
-        void InterruptAttacksOnMe(float dist=0.0f); // Interrompt toutes les "auto-attaques"
+        void InterruptAttacksOnMe(float dist=0.0f, bool guard_check = false); // Interrompt toutes les "auto-attaques"
         void CombatStopInRange(float dist=0.0f); // CombatStop tous les ennemis
 
         void AddComboPointHolder(uint32 lowguid) { m_ComboPointHolders.insert(lowguid); }

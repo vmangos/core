@@ -565,17 +565,17 @@ void AddSC_go_shallow_grave()
 
 enum zumrahConsts
 {
-    ZUMRAH_ID = 7271,
-    ZUMRAH_HOSTILE_FACTION = 37
-};
+    NPC_WITCH_DOCTOR_ZUMRAH = 7271,
+    ZUMRAH_HOSTILE_FACTION  = 37,
 
-#define SAY_ZUMRAH_TRIGGER -1900163
-#define SAY_ZUMRAH_YELL    -1900164
-#define SAY_ZUMRAH_KILLED  -1900165
+    SAY_ZUMRAH_TRIGGER      = 3622,
+    SAY_ZUMRAH_YELL         = 6221,
+    SAY_ZUMRAH_KILLED       = 6222
+};
 
 bool OnTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry *at)
 {
-    Creature* pZumrah = pPlayer->FindNearestCreature(ZUMRAH_ID, 30.0f);
+    Creature* pZumrah = pPlayer->FindNearestCreature(NPC_WITCH_DOCTOR_ZUMRAH, 30.0f);
 
     if (!pZumrah)
         return false;
@@ -592,10 +592,14 @@ bool OnTrigger_at_zumrah(Player* pPlayer, const AreaTriggerEntry *at)
 /******************/
 struct ZumRahAI : public ScriptedAI
 {
-    ZumRahAI(Creature* pCreature) : ScriptedAI(pCreature)
+    // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+    // - Witch Doctor Zum'rah will no longer call as many Zul'Farrak Zombies to his aid when aggroed.
+    ZumRahAI(Creature* pCreature) : ScriptedAI(pCreature), m_uiMaxZombies(sWorld.GetWowPatch() < WOW_PATCH_112 ? urand(2, 6) : 2)
     {
         Reset();
     }
+
+    uint8 const m_uiMaxZombies;
 
     uint32 m_uiGraveTimer;
     uint32 m_uiWardTimer;
@@ -605,7 +609,7 @@ struct ZumRahAI : public ScriptedAI
     bool isHealed;
     uint32 m_uiZombiesTimer;
 
-    void Reset()
+    void Reset() override
     {
         zombies = false;
         isHealed = false;
@@ -616,24 +620,24 @@ struct ZumRahAI : public ScriptedAI
         m_uiWardTimer  = 3000;
     }
 
-    void KilledUnit(Unit* pVictim)
+    void KilledUnit(Unit* pVictim) override
     {
         DoScriptText(SAY_ZUMRAH_KILLED, m_creature);
         ScriptedAI::KilledUnit(pVictim);
     }
 
-    void JustDied(Unit* pKiller)
+    void JustDied(Unit* pKiller) override
     {
     }
 
-    void Aggro(Unit* pWho)
+    void Aggro(Unit* pWho) override
     {
         m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER);
         m_creature->SetInCombatWithZone();
         DoScriptText(SAY_ZUMRAH_YELL, m_creature);
     }
 
-    void UpdateAI(const uint32 uiDiff)
+    void UpdateAI(const uint32 uiDiff) override
     {
         if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
             return;
@@ -704,7 +708,7 @@ struct ZumRahAI : public ScriptedAI
 
                 m_uiGraveTimer = 18000;
                 zombieNumber++;
-                if (zombieNumber == 2)
+                if (zombieNumber >= m_uiMaxZombies)
                     return;
             }
             m_GraveList.clear();
