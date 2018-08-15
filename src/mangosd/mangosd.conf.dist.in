@@ -1877,6 +1877,9 @@ DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
 
 WorldChan.MinLevel          = 1
+WorldChan.Cooldown          = 0
+WorldChan.CooldownMaxLevel  = 0
+WorldChan.CooldownScaling   = 0
 WhisperDiffZone.MinLevel    = 1
 YellRange.LinearScale.MaxLevel      = 0
 YellRange.QuadraticScale.MaxLevel   = 0

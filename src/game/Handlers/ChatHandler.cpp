@@ -67,6 +67,37 @@ bool WorldSession::processChatmessageFurtherAfterSecurityChecks(std::string& msg
     return true;
 }
 
+uint32_t WorldSession::ChatCooldown()
+{
+    ASSERT(GetPlayer());
+
+    auto cooldown = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD);
+    const auto minLevel = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_MIN_LEVEL);
+    const auto cooldownMaxLvl = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD_MAX_LEVEL);
+    const auto cooldownScaling = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD_SCALING);
+    const auto cooldownUseAcctLvl = sWorld.getConfig(CONFIG_UINT32_WORLD_CHAN_CD_USE_ACCOUNT_MAX_LEVEL);
+    const auto playerLevel = cooldownUseAcctLvl? GetAccountMaxLevel() : GetPlayer()->getLevel();
+
+    if (cooldown && cooldownMaxLvl > playerLevel)
+    {
+        const auto currTime = time(NULL);
+        const auto delta = currTime - GetLastPubChanMsgTime();
+
+        if (cooldownScaling)
+        {
+            auto factor = static_cast<double>((cooldownMaxLvl - playerLevel)) / (cooldownMaxLvl - minLevel);
+            cooldown *= factor;
+        }
+
+        if (delta < cooldown)
+        {
+            return cooldown - delta;
+        }
+    }
+
+    return 0;
+}
+
 void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 {
     uint32 type;
@@ -145,9 +176,11 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
         if (type != CHAT_MSG_AFK && type != CHAT_MSG_DND)
         {
-            if (m_muteTime > time(NULL)) // Muted
+            auto currTime = time(NULL);
+
+            if (m_muteTime > currTime) // Muted
             {
-                std::string timeStr = secsToTimeString(m_muteTime - time(NULL));
+                std::string timeStr = secsToTimeString(m_muteTime - currTime);
                 SendNotification(GetMangosString(LANG_WAIT_BEFORE_SPEAKING), timeStr.c_str());
                 return;
             }
@@ -256,9 +289,18 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
                                 }
                             }
                         }
+
+                        if (auto cooldown = ChatCooldown())
+                        {
+                            ChatHandler(this).PSendSysMessage(
+                                "Please wait %u seconds before sending another message.", cooldown
+                            );
+                            return;
+                        }
                     }
 
                     chn->Say(playerPointer->GetObjectGuid(), msg.c_str(), lang);
+                    SetLastPubChanMsgTime(time(NULL));
 
                     if (lang != LANG_ADDON && chn->HasFlag(Channel::ChannelFlags::CHANNEL_FLAG_GENERAL))
                         if (AntispamInterface *a = sAnticheatLib->GetAntispam())
