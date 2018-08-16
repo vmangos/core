@@ -2478,10 +2478,10 @@ bool ChatHandler::HandleGroupInfoCommand(char* args)
             stream << ", ";
         }
     }
-
+    
     PSendSysMessage(LANG_GROUP_INFO, (group->isRaidGroup() ? "Raid" : "Party"),
                     playerLink(std::to_string(group->GetId())).c_str(), playerLink(group->GetLeaderName()).c_str(),
-                    playerLink("Test").c_str(), group->GetMembersCount(), stream.str().c_str());
+                    group->GetMembersCount(), stream.str().c_str());
     return true;
 }
 
