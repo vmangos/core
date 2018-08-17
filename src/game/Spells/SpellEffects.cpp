@@ -4473,6 +4473,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     m_caster->CastSpell(m_caster, spell_id, true, nullptr);
                     return;
                 }
+                case 10101:                                 // Knock Away
+                {
+                    if (!unitTarget)
+                        return;
+
+                    m_caster->getThreatManager().modifyThreatPercent(unitTarget, -100);
+
+                    return;
+                }
                 case 17512:                                 // Piccolo of the Flaming Fire
                 {
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
