@@ -3260,16 +3260,13 @@ void Aura::HandleFeignDeath(bool apply, bool Real)
         HostileReference* pReference = pTarget->getHostileRefManager().getFirst();
         while (pReference)
         {
-            if (Unit* refTarget = pReference->getSourceUnit())
+            if (Creature* refTarget = ToCreature(pReference->getSourceUnit()))
             {
-                if (Creature* creature = refTarget->ToCreature())
+                if (!refTarget->GetCharmerOrOwnerOrSelf()->IsPlayer() && refTarget->IsWithinDistInMap(pTarget, refTarget->GetAttackDistance(pTarget))
+                    && pTarget->MagicSpellHitResult(refTarget, GetHolder()->GetSpellProto(), nullptr) != SPELL_MISS_NONE)
                 {
-                    if (!creature->GetCharmerOrOwnerOrSelf()->IsPlayer() && creature->IsWithinDistInMap(pTarget, creature->GetAttackDistance(pTarget))
-                        && pTarget->MagicSpellHitResult(creature, GetHolder()->GetSpellProto(), nullptr) != SPELL_MISS_NONE)
-                    {
-                        success = false;
-                        break;
-                    }
+                    success = false;
+                    break;
                 }
             }
             pReference = pReference->next();
