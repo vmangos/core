@@ -322,6 +322,13 @@ void WorldSession::HandleAuctionSellItem(WorldPacket & recv_data)
         return;
     }
 
+    // prevent selling item in bank slot
+    if (_player->IsBankPos(it->GetPos())) 
+    {
+        SendAuctionCommandResult(NULL, AUCTION_STARTED, AUCTION_ERR_INVENTORY, EQUIP_ERR_ITEM_NOT_FOUND);
+        return;
+    }
+
     // prevent sending bag with items (cheat: can be placed in bag after adding equipped empty bag to auction)
     if (!it)
     {
