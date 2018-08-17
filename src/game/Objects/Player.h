@@ -1645,6 +1645,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SendAttackSwingNotInRange();
         void SendAttackSwingBadFacingAttack();
         void SendAutoRepeatCancel();
+        void SendFeignDeathResisted();
         void SendExplorationExperience(uint32 Area, uint32 Experience);
         void SendFactionAtWar(uint32 reputationId, bool apply);
         AutoAttackCheckResult CanAutoAttackTarget(Unit const*) const override;

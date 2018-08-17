@@ -1780,7 +1780,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetFleeing(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);
         void SetFeared(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0, uint32 time = 0);/*DEPRECATED METHOD*/
         void SetConfused(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0);/*DEPRECATED METHOD*/
-        void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid(), uint32 spellID = 0);/*DEPRECATED METHOD*/
+        void SetFeignDeath(bool apply, ObjectGuid casterGuid = ObjectGuid(), bool success = true);
 
         void InterruptSpellsCastedOnMe(bool killDelayed = false, bool interruptPositiveSpells = false);
         uint32 DespawnNearCreaturesByEntry(uint32 entry, float range);
