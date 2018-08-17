@@ -185,15 +185,6 @@ struct EquipmentInfo
     uint32  equipentry[3];
 };
 
-// depricated old way
-struct EquipmentInfoRaw
-{
-    uint32  entry;
-    uint32  equipmodel[3];
-    uint32  equipinfo[3];
-    uint32  equipslot[3];
-};
-
 // from `creature` table
 struct CreatureData
 {
@@ -834,7 +825,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void RegenerateMana();
 
         void SetVirtualItem(VirtualItemSlot slot, uint32 item_id);
-        void SetVirtualItemRaw(VirtualItemSlot slot, uint32 display_id, uint32 info0, uint32 info1);
 
         void ResetDamageTakenOrigin()
         {

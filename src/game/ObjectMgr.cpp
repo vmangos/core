@@ -1257,9 +1257,9 @@ void ObjectMgr::CheckCreatureTemplates()
 
         if (cInfo->equipmentId > 0)                         // 0 no equipment
         {
-            if (!GetEquipmentInfo(cInfo->equipmentId) && !GetEquipmentInfoRaw(cInfo->equipmentId))
+            if (!GetEquipmentInfo(cInfo->equipmentId))
             {
-                sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template` or `creature_equip_template_raw`, set to no equipment.", cInfo->Entry, cInfo->equipmentId);
+                sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", cInfo->Entry, cInfo->equipmentId);
                 sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `equipment_id`=0 WHERE entry=%u;", cInfo->Entry);
                 const_cast<CreatureInfo*>(cInfo)->equipmentId = 0;
             }
@@ -1402,11 +1402,6 @@ EquipmentInfo const* ObjectMgr::GetEquipmentInfo(uint32 entry)
     return sEquipmentStorage.LookupEntry<EquipmentInfo>(entry);
 }
 
-EquipmentInfoRaw const* ObjectMgr::GetEquipmentInfoRaw(uint32 entry)
-{
-    return sEquipmentStorageRaw.LookupEntry<EquipmentInfoRaw>(entry);
-}
-
 void ObjectMgr::LoadEquipmentTemplates()
 {
     sEquipmentStorage.LoadProgressive(sWorld.GetWowPatch(), true);
@@ -1449,15 +1444,6 @@ void ObjectMgr::LoadEquipmentTemplates()
     }
 
     sLog.outString(">> Loaded %u equipment template", sEquipmentStorage.GetRecordCount());
-    sLog.outString();
-
-    sEquipmentStorageRaw.LoadProgressive(sWorld.GetWowPatch(), false);
-    for (uint32 i = 1; i < sEquipmentStorageRaw.GetMaxEntry(); ++i)
-        if (sEquipmentStorageRaw.LookupEntry<EquipmentInfoRaw>(i))
-            if (sEquipmentStorage.LookupEntry<EquipmentInfo>(i))
-                sLog.outErrorDb("Table 'creature_equip_template_raw` have redundant data for ID %u ('creature_equip_template` already have data)", i);
-
-    sLog.outString(">> Loaded %u equipment template (deprecated format)", sEquipmentStorageRaw.GetRecordCount());
     sLog.outString();
 }
 
@@ -1863,9 +1849,9 @@ void ObjectMgr::LoadCreatures(bool reload)
 
         if (data.equipmentId > 0)                           // -1 no equipment, 0 use default
         {
-            if (!GetEquipmentInfo(data.equipmentId) && !GetEquipmentInfoRaw(data.equipmentId))
+            if (!GetEquipmentInfo(data.equipmentId))
             {
-                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template` or `creature_equip_template_raw`, set to no equipment.", data.id, data.equipmentId);
+                sLog.outErrorDb("Table `creature` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", data.id, data.equipmentId);
                 data.equipmentId = -1;
             }
         }
