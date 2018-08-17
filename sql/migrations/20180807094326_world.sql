@@ -71,6 +71,11 @@ REPLACE INTO `pool_gameobject` (`guid`, `pool_entry`, `chance`, `description`) V
 REPLACE INTO `pool_template` (`entry`, `max_limit`, `description`) VALUES
 ('25622', '6', 'BRD - Dark Iron Deposit');
 
+-- Fix startup errors caused by this.
+DELETE FROM `pool_gameobject` WHERE `pool_entry`=23003;
+DELETE FROM `pool_template` WHERE `entry`=23003;
+
+
 -- End of migration.
 END IF;
 END??
