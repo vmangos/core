@@ -1342,6 +1342,10 @@ void World::SetInitialWorldSettings()
     sObjectMgr.LoadQuestGreetings();
     sLog.outString();
 
+    sLog.outString("Loading Trainer Greetings...");
+    sObjectMgr.LoadTrainerGreetings();
+    sLog.outString();
+
     sLog.outString("Loading Game Event Data...");           // must be after sPoolMgr.LoadFromDB and quests to properly load pool events and quests for events, but before area trigger teleports
     sLog.outString();
     sGameEventMgr.LoadFromDB();

@@ -652,6 +652,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, "quest_start_scripts",         SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestStartScriptsCommand,       "", nullptr },
         { MSTR, "quest_template",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestTemplateCommand,           "", nullptr },
         { MSTR, "quest_greeting",              SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadQuestGreetingCommand,           "", nullptr },
+        { MSTR, "trainer_greeting",            SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadTrainerGreetingCommand,         "", nullptr },
         { MSTR, "reference_loot_template",     SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesReferenceCommand,  "", nullptr },
         { MSTR, "reserved_name",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReservedNameCommand,            "", nullptr },
         { MSTR, "reputation_reward_rate",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReputationRewardRateCommand,    "", nullptr },

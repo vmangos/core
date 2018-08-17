@@ -338,6 +338,14 @@ bool ChatHandler::HandleReloadQuestGreetingCommand(char* /*args*/)
     return true;
 }
 
+bool ChatHandler::HandleReloadTrainerGreetingCommand(char* /*args*/)
+{
+    sLog.outString("Re-Loading Trainer Greetings...");
+    sObjectMgr.LoadTrainerGreetings();
+    SendSysMessage("DB table `npc_trainer_greeting` reloaded.");
+    return true;
+}
+
 bool ChatHandler::HandleReloadLootTemplatesCreatureCommand(char* /*args*/)
 {
     sLog.outString("Re-Loading Loot Tables... (`creature_loot_template`)");

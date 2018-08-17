@@ -703,6 +703,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadQuestStartScriptsCommand(char* args);
         bool HandleReloadQuestTemplateCommand(char* args);
         bool HandleReloadQuestGreetingCommand(char* args);
+        bool HandleReloadTrainerGreetingCommand(char* args);
         bool HandleReloadReservedNameCommand(char* args);
         bool HandleReloadReputationRewardRateCommand(char* args);
         bool HandleReloadReputationSpilloverTemplateCommand(char* args);

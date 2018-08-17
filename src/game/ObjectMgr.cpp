@@ -7913,6 +7913,67 @@ bool ObjectMgr::LoadQuestGreetings()
     return true;
 }
 
+bool ObjectMgr::LoadTrainerGreetings()
+{
+    mTrainerGreetingLocaleMap.clear();
+
+    QueryResult *result = WorldDatabase.Query("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8 FROM npc_trainer_greeting");
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 npc trainer greetings. DB table `npc_trainer_greeting` is empty.");
+        return false;
+    }
+
+    uint32 count = 0;
+
+    do
+    {
+        Field *fields = result->Fetch();
+        uint32 entry = fields[0].GetUInt32();
+
+        if (!ObjectMgr::GetCreatureTemplate(entry))
+        {
+            if (!IsExistingCreatureId(entry))
+                sLog.outErrorDb("Table `npc_trainer_greeting` have entry for nonexistent creature template (Entry: %u), ignore", entry);
+            continue;
+        }
+
+        TrainerGreetingLocale& data = mTrainerGreetingLocaleMap[entry];
+
+        data.Content.resize(1);
+        ++count;
+
+        // 0 -> default, idx in to idx+1
+        data.Content[0] = fields[1].GetCppString();
+
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[i + 1].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    // 0 -> default, idx in to idx+1
+                    if ((int32)data.Content.size() <= idx + 1)
+                        data.Content.resize(idx + 2);
+
+                    data.Content[idx + 1] = str;
+                }
+            }
+        }
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u trainer greetings.", count);
+
+    return true;
+}
+
 void ObjectMgr::LoadFishingBaseSkillLevel()
 {
     mFishingBaseForArea.clear();                            // for reload case

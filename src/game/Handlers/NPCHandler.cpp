@@ -108,13 +108,6 @@ void WorldSession::HandleTrainerListOpcode(WorldPacket & recv_data)
     SendTrainerList(guid);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid)
-{
-    std::string str = GetMangosString(LANG_NPC_TAINER_HELLO);
-    SendTrainerList(guid, str);
-}
-
-
 static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell, uint32 triggerSpell, TrainerSpellState state, float fDiscountMod, bool can_learn_primary_prof)
 {
     SpellEntry const *triggerInfo = sSpellMgr.GetSpellEntry(triggerSpell);
@@ -159,7 +152,7 @@ static void SendTrainerSpellHelper(WorldPacket& data, TrainerSpell const* tSpell
     data << uint32(0);
 }
 
-void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
+void WorldSession::SendTrainerList(ObjectGuid guid)
 {
     DEBUG_LOG("WORLD: SendTrainerList");
 
@@ -190,6 +183,21 @@ void WorldSession::SendTrainerList(ObjectGuid guid, const std::string& strTitle)
 
     uint32 maxcount = (cSpells ? cSpells->spellList.size() : 0) + (tSpells ? tSpells->spellList.size() : 0);
     uint32 trainer_type = cSpells && cSpells->trainerType ? cSpells->trainerType : (tSpells ? tSpells->trainerType : 0);
+
+    std::string strTitle;
+    if (TrainerGreetingLocale const *trainerGreeting = sObjectMgr.GetTrainerGreetingLocale(guid.GetEntry()))
+    {
+        int locale_idx = GetSessionDbLocaleIndex();
+
+        if ((int32)trainerGreeting->Content.size() > locale_idx + 1 && !trainerGreeting->Content[locale_idx + 1].empty())
+            strTitle = trainerGreeting->Content[locale_idx + 1];
+        else
+            strTitle = trainerGreeting->Content[0];
+    }
+    else
+    {
+        strTitle = GetMangosString(LANG_NPC_TAINER_HELLO);
+    }
 
     WorldPacket data(SMSG_TRAINER_LIST, 8 + 4 + 4 + maxcount * 38 + strTitle.size() + 1);
     data << ObjectGuid(guid);

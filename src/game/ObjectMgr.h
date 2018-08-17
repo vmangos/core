@@ -205,6 +205,12 @@ enum
     QUESTGIVER_TYPE_MAX = 2,
 };
 
+struct TrainerGreetingLocale
+{
+    TrainerGreetingLocale() { }
+    std::vector<std::string> Content;                       // 0 -> default, i -> i-1 locale index
+};
+
 typedef UNORDERED_MAP<uint32,CreatureData> CreatureDataMap;
 typedef CreatureDataMap::value_type CreatureDataPair;
 
@@ -261,6 +267,7 @@ typedef UNORDERED_MAP<uint32,QuestGreetingLocale> QuestGreetingLocaleMap;
 typedef UNORDERED_MAP<uint32,GossipMenuItemsLocale> GossipMenuItemsLocaleMap;
 typedef UNORDERED_MAP<uint32,PointOfInterestLocale> PointOfInterestLocaleMap;
 typedef UNORDERED_MAP<uint32,AreaLocale> AreaLocaleMap;
+typedef UNORDERED_MAP<uint32, TrainerGreetingLocale> TrainerGreetingLocaleMap;
 
 typedef std::multimap<int32, uint32> ExclusiveQuestGroupsMap;
 typedef std::multimap<uint32, ItemRequiredTarget> ItemRequiredTargetMap;
@@ -774,6 +781,7 @@ class ObjectMgr
         void LoadBroadcastTexts();
         void LoadBroadcastTextLocales();
         bool LoadQuestGreetings();
+        bool LoadTrainerGreetings();
         void LoadPetCreateSpells();
         void LoadCreatureLocales();
         void LoadCreatureTemplates();
@@ -1039,6 +1047,13 @@ class ObjectMgr
         {
             auto itr = mQuestGreetingLocaleMap[type].find(entry);
             if (itr == mQuestGreetingLocaleMap[type].end()) return nullptr;
+            return &itr->second;
+        }
+
+        TrainerGreetingLocale const* GetTrainerGreetingLocale(uint32 entry) const
+        {
+            auto itr = mTrainerGreetingLocaleMap.find(entry);
+            if (itr == mTrainerGreetingLocaleMap.end()) return nullptr;
             return &itr->second;
         }
 
@@ -1404,6 +1419,8 @@ class ObjectMgr
         MangosStringLocaleMap mMangosStringLocaleMap;
         BroadcastTextLocaleMap mBroadcastTextLocaleMap;
         QuestGreetingLocaleMap mQuestGreetingLocaleMap[QUESTGIVER_TYPE_MAX];
+        TrainerGreetingLocaleMap m_trainerGreetingMap;
+        TrainerGreetingLocaleMap mTrainerGreetingLocaleMap;
         GossipMenuItemsLocaleMap mGossipMenuItemsLocaleMap;
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;
         AreaLocaleMap mAreaLocaleMap;
