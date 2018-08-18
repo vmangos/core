@@ -1973,9 +1973,6 @@ bool Map::ScriptCommand_AssistUnit(const ScriptInfo& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    if (pSource->getVictim())
-        return false;
-
     Unit* pTarget = ToUnit(target);
 
     if (!pTarget)
@@ -1984,10 +1981,23 @@ bool Map::ScriptCommand_AssistUnit(const ScriptInfo& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
-    if (Unit* pAttacker = pTarget->getAttackerForHelper())
+    Unit* pAttacker = pTarget->getAttackerForHelper();
+
+    if (!pAttacker)
+        return false;
+
+    if (Unit* pVictim = pSource->getVictim())
     {
+        if (pVictim == pAttacker)
+            return false;
+
         if (!pSource->IsFriendlyTo(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AddThreat(pAttacker);
+    }
+    else
+    {
+        if (pSource->AI() && !pSource->IsFriendlyTo(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+            pSource->AI()->AttackStart(pAttacker);
     }
 
     return false;
@@ -2025,6 +2035,34 @@ bool Map::ScriptCommand_AddAura(const ScriptInfo& script, WorldObject* source, W
     }
 
     pSource->AddAura(script.addAura.spellId, script.addAura.flags);
+
+    return false;
+}
+
+// SCRIPT_COMMAND_ADD_THREAT (75)
+bool Map::ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Creature* pSource = ToCreature(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_ADD_THREAT (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    if (!pSource->isInCombat() || !pSource->isAlive())
+        return false;
+
+    Unit* pTarget = ToUnit(target);
+
+    if (!pTarget)
+    {
+        sLog.outError("SCRIPT_COMMAND_ADD_THREAT (script id %u) call for a NULL or non-unit target (TypeId: %u), skipping.", script.id, target ? target->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    if (pTarget->isAlive() && !pSource->IsFriendlyTo(pTarget))
+        pSource->AddThreat(pTarget);
 
     return false;
 }

@@ -309,6 +309,8 @@ enum eScriptCommand
     SCRIPT_COMMAND_ADD_AURA                 = 74,           // source = Unit
                                                             // datalong = spell_id
                                                             // datalong2 = flags
+    SCRIPT_COMMAND_ADD_THREAT               = 75,           // source = Creature
+                                                            // target = Unit
     
     SCRIPT_COMMAND_MAX,
 
@@ -952,6 +954,7 @@ struct ScriptInfo
             uint32 flags;                                   // datalong2
         } addAura;
 
+                                                            // SCRIPT_COMMAND_ADD_THREAT (75)
         struct
         {
             uint32 data[9];
