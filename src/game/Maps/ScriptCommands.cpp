@@ -405,20 +405,24 @@ bool Map::ScriptCommand_SummonCreature(const ScriptInfo& script, WorldObject* so
     {
         case TARGET_T_OWNER_OR_SELF:
             break;
-        case TARGET_T_PROVIDED_TARGET:
-        {
-            if (Unit* pAttackTarget = ToUnit(target))
-                if (pCreature->AI())
-                    pCreature->AI()->AttackStart(pAttackTarget);
-            break;
-        }
         default:
         {
             if (Creature* pCreatureSummoner = pSummoner->ToCreature())
             {
-                if (Unit* pAttackTarget = ToUnit(GetTargetByType(pCreatureSummoner, nullptr, script.summonCreature.attackTarget)))
+                if (Unit* pAttackTarget = ToUnit(GetTargetByType(pCreatureSummoner, ToUnit(target), script.summonCreature.attackTarget)))
+                {
                     if (pCreature->AI())
+                    {
+                        // Hack: there is a visual bug where the melee animation
+                        // does not play for summoned units if they enter combat
+                        // immediately and their target is within melee range.
+                        // Sending the packet a second time fixes the animation.
+                        if (pCreature->AI()->IsMeleeAttackEnabled())
+                            pCreature->SendMeleeAttackStart(pAttackTarget);
+
                         pCreature->AI()->AttackStart(pAttackTarget);
+                    }
+                }
             }
         }
     }
