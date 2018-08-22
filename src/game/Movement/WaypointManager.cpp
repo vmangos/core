@@ -116,6 +116,18 @@ void WaypointManager::Load()
             Field *fields = result->Fetch();
             uint32 id           = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
+            uint32 script_id    = fields[6].GetUInt32();
+
+            if (script_id)
+            {
+                if (sCreatureMovementScripts.find(script_id) == sCreatureMovementScripts.end())
+                {
+                    sLog.outErrorDb("Table creature_movement for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, script_id);
+                    continue;
+                }
+
+                movementScriptSet.erase(script_id);
+            }
 
             const CreatureData* cData = sObjectMgr.GetCreatureData(id);
 
@@ -164,17 +176,6 @@ void WaypointManager::Load()
                 }
 
                 WorldDatabase.PExecute("UPDATE creature_movement SET position_x = '%f', position_y = '%f', position_z = '%f' WHERE id = '%u' AND point = '%u'", node.x, node.y, node.z, id, point);
-            }
-
-            if (node.script_id)
-            {
-                if (sCreatureMovementScripts.find(node.script_id) == sCreatureMovementScripts.end())
-                {
-                    sLog.outErrorDb("Table creature_movement for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, node.script_id);
-                    continue;
-                }
-
-                movementScriptSet.erase(node.script_id);
             }
 
             // WaypointBehavior can be dropped in time. Script_id added may 2010 and can handle all the below behavior.
@@ -292,6 +293,18 @@ void WaypointManager::Load()
 
             uint32 entry        = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
+            uint32 script_id    = fields[6].GetUInt32();
+
+            if (script_id)
+            {
+                if (sCreatureMovementScripts.find(script_id) == sCreatureMovementScripts.end())
+                {
+                    sLog.outErrorDb("Table creature_movement_template for entry %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", entry, point, script_id);
+                    continue;
+                }
+
+                movementScriptSet.erase(script_id);
+            }
 
             const CreatureInfo* cInfo = ObjectMgr::GetCreatureTemplate(entry);
 
@@ -329,17 +342,6 @@ void WaypointManager::Load()
                                 entry, point, node.x, node.y);
 
                 WorldDatabase.PExecute("UPDATE creature_movement_template SET position_x = '%f', position_y = '%f' WHERE entry = %u AND point = %u", node.x, node.y, entry, point);
-            }
-
-            if (node.script_id)
-            {
-                if (sCreatureMovementScripts.find(node.script_id) == sCreatureMovementScripts.end())
-                {
-                    sLog.outErrorDb("Table creature_movement_template for entry %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", entry, point, node.script_id);
-                    continue;
-                }
-
-                movementScriptSet.erase(node.script_id);
             }
 
             WaypointBehavior be;
@@ -440,6 +442,18 @@ void WaypointManager::Load()
             Field *fields = result->Fetch();
             uint32 id           = fields[0].GetUInt32();
             uint32 point        = fields[1].GetUInt32();
+            uint32 script_id    = fields[6].GetUInt32();
+
+            if (script_id)
+            {
+                if (sCreatureMovementScripts.find(script_id) == sCreatureMovementScripts.end())
+                {
+                    sLog.outErrorDb("Table creature_movement_special for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, script_id);
+                    continue;
+                }
+
+                movementScriptSet.erase(script_id);
+            }
 
             WaypointPath &path  = m_pathSpecialMap[id];
 
@@ -468,17 +482,6 @@ void WaypointManager::Load()
                     id, point, node.x, node.y);
 
                 WorldDatabase.PExecute("UPDATE creature_movement_special SET position_x = '%f', position_y = '%f' WHERE id = %u AND point = %u", node.x, node.y, id, point);
-            }
-
-            if (node.script_id)
-            {
-                if (sCreatureMovementScripts.find(node.script_id) == sCreatureMovementScripts.end())
-                {
-                    sLog.outErrorDb("Table creature_movement_special for id %u, point %u have script_id %u that does not exist in `creature_movement_scripts`, ignoring", id, point, node.script_id);
-                    continue;
-                }
-
-                movementScriptSet.erase(node.script_id);
             }
 
             // WaypointBehavior can be dropped in time. Script_id added may 2010 and can handle all the below behavior.

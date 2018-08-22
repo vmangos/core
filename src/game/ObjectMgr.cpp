@@ -6913,7 +6913,7 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id,quest FROM %s t1 WHERE patch=(SELECT max(patch) FROM %s t2 WHERE t1.id=t2.id && t1.quest=t2.quest && patch <= %u)", table, table, sWorld.GetWowPatch());
+    QueryResult *result = WorldDatabase.PQuery("SELECT id,quest FROM %s WHERE %u BETWEEN patch_min AND patch_max", table, sWorld.GetWowPatch());
 
     if (!result)
     {

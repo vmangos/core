@@ -207,27 +207,6 @@ bool GOHello_go_field_repair_bot_74A(Player* pPlayer, GameObject* pGo)
 }
 
 /*######
-## go_gilded_brazier
-######*/
-
-enum
-{
-    NPC_STILLBLADE  = 17716,
-};
-
-bool GOHello_go_gilded_brazier(Player* pPlayer, GameObject* pGO)
-{
-    if (pGO->GetGoType() == GAMEOBJECT_TYPE_GOOBER)
-    {
-        if (Creature* pCreature = pPlayer->SummonCreature(NPC_STILLBLADE, 8087.632f, -7542.740f, 151.568f, 0.122f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 5000))
-            pCreature->AI()->AttackStart(pPlayer);
-    }
-
-    return true;
-}
-
-
-/*######
 ## go_orb_of_command
 ######*/
 
@@ -590,11 +569,6 @@ void AddSC_go_scripts()
     newscript = new Script;
     newscript->Name = "go_field_repair_bot_74A";
     newscript->pGOHello =           &GOHello_go_field_repair_bot_74A;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "go_gilded_brazier";
-    newscript->pGOHello =           &GOHello_go_gilded_brazier;
     newscript->RegisterSelf();
 
     newscript = new Script;

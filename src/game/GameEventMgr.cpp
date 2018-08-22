@@ -500,7 +500,8 @@ void GameEventMgr::LoadFromDB()
 
             if (newData.entry_id && !ObjectMgr::GetCreatureTemplate(newData.entry_id))
             {
-                sLog.outErrorDb("Table `game_event_creature_data` have creature (Guid: %u) with event time entry %u not found in table `creature_template`, set to no 0.", guid, newData.entry_id);
+                if (!sObjectMgr.IsExistingCreatureId(newData.entry_id))
+                    sLog.outErrorDb("Table `game_event_creature_data` have creature (Guid: %u) with event time entry %u not found in table `creature_template`, set to no 0.", guid, newData.entry_id);
                 newData.entry_id = 0;
             }
 

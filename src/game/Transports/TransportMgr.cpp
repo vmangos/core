@@ -21,6 +21,7 @@
 #include "MapManager.h"
 #include "ObjectMgr.h"
 #include "MoveMap.h"
+#include "World.h"
 
 TransportTemplate::~TransportTemplate()
 {
@@ -46,7 +47,7 @@ void TransportMgr::LoadTransportTemplates()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
 
-    QueryResult* result = WorldDatabase.Query("SELECT entry FROM gameobject_template WHERE type = 15 ORDER BY entry ASC");
+    QueryResult* result = WorldDatabase.PQuery("SELECT entry FROM gameobject_template t1 WHERE ((type = 15) && (patch=(SELECT max(patch) FROM gameobject_template t2 WHERE t1.entry=t2.entry && patch <= %u))) ORDER BY entry ASC", sWorld.GetWowPatch());
 
     if (!result)
     {
