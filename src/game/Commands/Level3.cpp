@@ -4767,13 +4767,7 @@ bool ChatHandler::HandleChangeWeatherCommand(char* args)
 
     Player* player = m_session->GetPlayer();
     uint32 zoneId = player->GetZoneId();
-    if (!sWeatherMgr.GetWeatherChances(zoneId))
-    {
-        SendSysMessage(LANG_NO_WEATHER);
-        SetSentErrorMessage(true);
-    }
     player->GetMap()->SetWeather(zoneId, (WeatherType)type, grade, false);
-
     return true;
 }
 
