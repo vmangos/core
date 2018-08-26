@@ -924,6 +924,11 @@ Motd = "Welcome to Light's Hope!"
 #        Default: 1 (allow)
 #                 0 (not allow)
 #
+#    ShowHealth.Values
+#        Show real NPC/player health values as opposed to showing only a percentage.
+#        Default: 0 (hide values)
+#                 1 (show values)
+#
 ###################################################################################################################
 
 AllowTwoSide.Accounts = 0
@@ -938,6 +943,7 @@ AllowTwoSide.Interaction.Mail = 0
 AllowTwoSide.WhoList = 0
 AllowTwoSide.AddFriend = 0
 TalentsInspecting = 1
+ShowHealth.Values = 0
 
 ###################################################################################################################
 # CREATURE AND GAMEOBJECT SETTINGS
