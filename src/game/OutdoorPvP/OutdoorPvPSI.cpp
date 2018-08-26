@@ -175,7 +175,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player *plr, uint32 spellId)
         {
             case ALLIANCE:
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_A);
+                AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(SI_AREATRIGGER_A);
                 if (atEntry)
                 {
                     // 5.0f is safe-distance
@@ -203,7 +203,7 @@ bool OutdoorPvPSI::HandleDropFlag(Player *plr, uint32 spellId)
             break;
             case HORDE:
             {
-                AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(SI_AREATRIGGER_H);
+                AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(SI_AREATRIGGER_H);
                 if (atEntry)
                 {
                     // 5.0f is safe-distance

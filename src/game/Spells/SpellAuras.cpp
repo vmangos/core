@@ -634,7 +634,7 @@ void AreaAura::Update(uint32 diff)
                 }
                 case AREA_AURA_ENEMY:
                 {
-                    MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(caster, m_radius); // No GetCharmer in searcher
+                    MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(caster, caster, m_radius); // No GetCharmer in searcher
                     MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(targets, u_check);
                     Cell::VisitAllObjects(caster, searcher, m_radius);
                     break;
@@ -3477,10 +3477,8 @@ void Aura::HandleModStealth(bool apply, bool Real)
         if (Real)
         {
             target->SetByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAGS_CREEP);
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH);
-#endif
             // apply only if not in GM invisibility (and overwrite invisibility state)
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -3508,10 +3506,8 @@ void Aura::HandleModStealth(bool apply, bool Real)
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
                 target->RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAGS_CREEP);
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
                 if (target->GetTypeId() == TYPEID_PLAYER)
                     target->RemoveByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_STEALTH);
-#endif
                 // restore invisibility if any
                 if (target->HasAuraType(SPELL_AURA_MOD_INVISIBILITY))
                 {
@@ -3536,11 +3532,8 @@ void Aura::HandleInvisibility(bool apply, bool Real)
 
         if (Real && target->GetTypeId() == TYPEID_PLAYER)
         {
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
             // apply glow vision
             target->SetByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
-#endif
-
         }
 
         // apply only if not in GM invisibility and not stealth
@@ -3562,11 +3555,9 @@ void Aura::HandleInvisibility(bool apply, bool Real)
         // only at real aura remove and if not have different invisibility auras.
         if (Real && target->m_invisibilityMask == 0)
         {
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
             // remove glow vision
             if (target->GetTypeId() == TYPEID_PLAYER)
                 target->RemoveByteFlag(PLAYER_FIELD_BYTES2, 1, PLAYER_FIELD_BYTE2_INVISIBILITY_GLOW);
-#endif
             // apply only if not in GM invisibility & not stealthed while invisible
             if (target->GetVisibility() != VISIBILITY_OFF)
             {
@@ -4057,8 +4048,15 @@ void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
         Unit *caster = GetCaster();
         if (!caster)
             return;
-
+     
+        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+        // - Periodic Healing: Spells which do periodic healing will now have 
+        //   their strength determined at the moment they are cast.Changing the
+        //   amount of bonus healing you have during the duration of the periodic
+        //   spell will have no impact on how much it heals for.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         m_modifier.m_amount = caster->SpellHealingBonusDone(target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+#endif
     }
 }
 
@@ -5282,8 +5280,9 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 {
     Unit *target = GetTarget();
     SpellEntry const* spellProto = sProto ? sProto : GetSpellProto();
+    AuraType const aura_type = sProto ? auraType : m_modifier.m_auraname;
 
-    switch (sProto ? auraType : m_modifier.m_auraname)
+    switch (aura_type)
     {
         case SPELL_AURA_PERIODIC_DAMAGE:
         case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
@@ -5516,8 +5515,20 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
             if (target != pCaster && spellProto->SpellVisual == 163 && !pCaster->isAlive())
                 return;
 
-            // ignore non positive values (can be result apply spellmods to aura damage
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+            // Ignore non positive values (can be result apply spellmods to aura damage).
             uint32 amount = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
+#else
+            // Before 1.11 the heal bonuses were calculated each tick, not upon initial cast.
+            uint32 amount;
+            if (aura_type == SPELL_AURA_PERIODIC_HEAL)
+            {
+                int32 const intAmount = pCaster->SpellHealingBonusDone(target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
+                amount = intAmount > 0 ? intAmount : 0;
+            }
+            else
+                amount = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
+#endif
 
             uint32 pdamage;
 

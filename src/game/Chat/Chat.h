@@ -26,7 +26,7 @@
 #include "SharedDefines.h"
 #include "ObjectGuid.h"
 
-struct AreaTrigger;
+struct AreaTriggerTeleport;
 struct AreaTriggerEntry;
 struct FactionEntry;
 struct FactionState;
@@ -924,7 +924,7 @@ class MANGOS_DLL_SPEC ChatHandler
         void ShowSpellListHelper(Player* target, SpellEntry const* spellInfo, LocaleConstant loc);
         void ShowPoolListHelper(uint16 pool_id);
         void ShowTriggerListHelper(AreaTriggerEntry const * atEntry);
-        void ShowTriggerTargetListHelper(uint32 id, AreaTrigger const* at, bool subpart = false);
+        void ShowTriggerTargetListHelper(uint32 id, AreaTriggerTeleport const* at, bool subpart = false);
         bool LookupPlayerSearchCommand(QueryResult* result, uint32* limit = nullptr);
         bool HandleBanListHelper(QueryResult* result);
         bool HandleBanHelper(BanMode mode, char* args);

@@ -739,7 +739,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         return;
     }
 
-    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+    AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(Trigger_ID);
     if (!atEntry)
     {
         DEBUG_LOG("Player '%s' (GUID: %u) send unknown (by DBC) Area Trigger ID: %u", GetPlayer()->GetName(), GetPlayer()->GetGUIDLow(), Trigger_ID);
@@ -811,7 +811,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
     }
 
     // NULL if all values default (non teleport trigger)
-    AreaTrigger const* at = sObjectMgr.GetAreaTrigger(Trigger_ID);
+    AreaTriggerTeleport const* at = sObjectMgr.GetAreaTriggerTeleport(Trigger_ID);
     if (!at)
         return;
 
@@ -876,7 +876,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
 
             // need find areatrigger to inner dungeon for landing point
             if (at->target_mapId != corpseMapId)
-                if (AreaTrigger const* corpseAt = sObjectMgr.GetMapEntranceTrigger(corpseMapId))
+                if (AreaTriggerTeleport const* corpseAt = sObjectMgr.GetMapEntranceTrigger(corpseMapId))
                     at = corpseAt;
             // now we can resurrect player, and then check teleport requirements
             pl->ResurrectPlayer(0.5f);
@@ -1086,9 +1086,8 @@ void WorldSession::HandleInspectHonorStatsOpcode(WorldPacket& recv_data) {
         data << pl->GetUInt32Value(PLAYER_FIELD_LAST_WEEK_RANK);
 
         // Rank progress bar
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
         data << (uint8)pl->GetByteValue(PLAYER_FIELD_BYTES2, 0);
-#endif
+
         SendPacket(&data);
     } else
         DEBUG_LOG("%s not found!", guid.GetString().c_str());

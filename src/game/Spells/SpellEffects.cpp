@@ -2398,6 +2398,7 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
         int32 addhealth = damage;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         // Swiftmend - consumes Regrowth or Rejuvenation
         if (m_spellInfo->Id == 18562)
         {
@@ -2440,6 +2441,7 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
             addhealth += tickheal * tickcount;
         }
+#endif
 
         // JoL - Extra heal stored in m_triggeredByAuraBasePoints
         if (m_spellInfo->SpellIconID == 299 && m_spellInfo->SpellVisual == 5560 && m_spellInfo->SpellFamilyFlags == 0 && m_triggeredByAuraBasePoints > 0)

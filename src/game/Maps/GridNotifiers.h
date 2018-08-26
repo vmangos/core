@@ -873,7 +873,6 @@ namespace MaNGOS
                 : i_obj(obj), i_originalCaster(originalCaster), i_range(range)
             {
                 i_targetForUnit = i_originalCaster->isType(TYPEMASK_UNIT);
-                i_targetForPlayer = (i_originalCaster->GetTypeId() == TYPEID_PLAYER);
             }
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
@@ -906,43 +905,43 @@ namespace MaNGOS
             WorldObject const* i_originalCaster;
             float i_range;
             bool i_targetForUnit;
-            bool i_targetForPlayer;
     };
 
     class AnyAoETargetUnitInObjectRangeCheck
     {
         public:
-            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, float range)
-                : i_obj(obj), i_range(range)
+            AnyAoETargetUnitInObjectRangeCheck(WorldObject const* obj, WorldObject const* originalCaster, float range)
+                : i_obj(obj), i_originalCaster(originalCaster), i_range(range)
             {
-                i_targetForPlayer = i_obj->IsControlledByPlayer();
+                i_targetForUnit = i_originalCaster->isType(TYPEMASK_UNIT);
             }
             WorldObject const& GetFocusObject() const { return *i_obj; }
             bool operator()(Unit* u)
             {
                 // Check contains checks for: live, non-selectable, non-attackable flags, flight check and GM check, ignore totems
-                if (!u->isTargetableForAttack(false, i_obj->IsPlayer()))
+                if (!u->isTargetableForAttack(false, i_originalCaster->IsPlayer()))
                     return false;
 
-                if(u->GetTypeId()==TYPEID_UNIT && ((Creature*)u)->IsImmuneToAoe())
+                // ignore totems as AoE targets
+                if (u->GetTypeId() == TYPEID_UNIT && ((Creature*)u)->IsImmuneToAoe())
                     return false;
 
-                if(!u->CanSeeInWorld(i_obj))
+                if (!u->CanSeeInWorld(i_obj))
                     return false;
 
                 if (!i_obj->IsWithinDistInMap(u, i_range))
                     return false;
 
-                if (i_obj->ToUnit())
-                    return i_obj->ToUnit()->IsValidAttackTarget(u);
+                if (i_targetForUnit)
+                    return i_originalCaster->ToUnit()->IsValidAttackTarget(u);
                 else // GameObject / Corpse case
-                    return i_obj->IsHostileTo(u);
+                    return i_originalCaster->IsHostileTo(u);
             }
-
         private:
             WorldObject const* i_obj;
+            WorldObject const* i_originalCaster;
             float i_range;
-            bool i_targetForPlayer;
+            bool i_targetForUnit;
     };
 
     // do attack at call of help to friendly crearture

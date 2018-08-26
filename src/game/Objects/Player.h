@@ -1196,7 +1196,11 @@ class MANGOS_DLL_SPEC Player final: public Unit
         Item* GetItemFromBuyBackSlot( uint32 slot );
         void RemoveItemFromBuyBackSlot( uint32 slot, bool del );
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         uint32 GetMaxKeyringSize() const { return getLevel() < 40 ? 4 : (getLevel() < 50 ? 8 : 12); }
+#else
+        uint32 GetMaxKeyringSize() const { return 0; }
+#endif
         void SendEquipError( InventoryResult msg, Item* pItem, Item *pItem2 = NULL, uint32 itemid = 0 ) const;
         void SendBuyError( BuyResult msg, Creature* pCreature, uint32 item, uint32 param );
         void SendSellError( SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 param );
@@ -1788,10 +1792,10 @@ class MANGOS_DLL_SPEC Player final: public Unit
         }
         float GetPosStat(Stats stat) const { return GetFloatValue(PLAYER_FIELD_POSSTAT0 +stat); }
         float GetNegStat(Stats stat) const { return GetFloatValue(PLAYER_FIELD_NEGSTAT0 +stat); }
-        float GetResistanceBuffMods(SpellSchools school, bool positive) const { return GetFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE+school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE+school ); }
-        void SetResistanceBuffMods(SpellSchools school, bool positive, float val) { SetFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE+school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE+school,val); }
-        void ApplyResistanceBuffModsMod(SpellSchools school, bool positive, float val, bool apply) { ApplyModSignedFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE+school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE+school, val, apply); }
-        void ApplyResistanceBuffModsPercentMod(SpellSchools school, bool positive, float val, bool apply) { ApplyPercentModFloatValue(positive ? PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE+school : PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE+school, val, apply); }
+        float GetResistanceBuffMods(SpellSchools school, bool positive) const { return GetFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE+school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE+school ); }
+        void SetResistanceBuffMods(SpellSchools school, bool positive, float val) { SetFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE+school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE+school,val); }
+        void ApplyResistanceBuffModsMod(SpellSchools school, bool positive, float val, bool apply) { ApplyModSignedFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE+school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE+school, val, apply); }
+        void ApplyResistanceBuffModsPercentMod(SpellSchools school, bool positive, float val, bool apply) { ApplyPercentModFloatValue(positive ? PLAYER_FIELD_RES_BUFF_MODS_POSITIVE+school : PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE+school, val, apply); }
 
         void SetRegularAttackTime(bool resetTimer = true);
         void SetBaseModValue(BaseModGroup modGroup, BaseModType modType, float value) { m_auraBaseMod[modGroup][modType] = value; }

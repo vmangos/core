@@ -603,8 +603,8 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
                 // there are some float values which may be negative or can't get negative due to other checks
                 else if ((index >= PLAYER_FIELD_NEGSTAT0    && index <= PLAYER_FIELD_NEGSTAT4) ||
-                         (index >= PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE  && index <= (PLAYER_FIELD_RESISTANCEBUFFMODSPOSITIVE + 6)) ||
-                         (index >= PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE  && index <= (PLAYER_FIELD_RESISTANCEBUFFMODSNEGATIVE + 6)) ||
+                         (index >= PLAYER_FIELD_RES_BUFF_MODS_POSITIVE  && index <= (PLAYER_FIELD_RES_BUFF_MODS_POSITIVE + 6)) ||
+                         (index >= PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE  && index <= (PLAYER_FIELD_RES_BUFF_MODS_NEGATIVE + 6)) ||
                          (index >= PLAYER_FIELD_POSSTAT0    && index <= PLAYER_FIELD_POSSTAT4))
                     *data << uint32(m_floatValues[index]);
                 // Video maker - hide unit name, etc ...

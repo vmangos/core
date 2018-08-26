@@ -45,7 +45,11 @@ const char GameObjectDisplayInfofmt[]="nsxxxxxxxxxx";
 const char ItemBagFamilyfmt[]="nxxxxxxxxx";
 //const char ItemDisplayTemplateEntryfmt[]="nxxxxxxxxxxixxxxxxxxxxx";
 const char ItemRandomPropertiesfmt[]="nsiiixxssssssssx";
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
 const char ItemSetEntryfmt[]="dssssssssxxxxxxxxxxxxxxxxxxiiiiiiiiiiiiiiiiii";
+#else
+const char ItemSetEntryfmt[] = "dssssssssxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxiiiiiiiiiiiiiiiiii";
+#endif
 const char LiquidTypefmt[]="niii";
 const char LockEntryfmt[]="niiiiiiiiiiiiiiiiiiiiiiiixxxxxxxx";
 const char MailTemplateEntryfmt[]="nxxxxxxxxx";

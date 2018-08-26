@@ -106,7 +106,8 @@ void SpellModMgr::LoadSpellMods()
             SpellEntry* spell = const_cast<SpellEntry*>(sSpellMgr.GetSpellEntry(spellid));
             if (!spell)
             {
-                OUT_ERR("Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
+                if (!sSpellMgr.IsExistingSpellId(spellid))
+                    OUT_ERR("Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
 
@@ -210,7 +211,8 @@ void SpellModMgr::LoadSpellMods()
             SpellEntry* spell = ((SpellEntry*)sSpellMgr.GetSpellEntry(spellid));
             if (!spell)
             {
-                OUT_ERR("Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
+                if (!sSpellMgr.IsExistingSpellId(spellid))
+                    OUT_ERR("Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
             if (effect_idx >= MAX_EFFECT_INDEX)

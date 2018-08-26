@@ -31,6 +31,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <array>
 
 // Structures using to access raw DBC data and required packing to portability
 
@@ -408,6 +409,8 @@ struct ItemSetEntry
 
 struct LiquidTypeEntry
 {
+    LiquidTypeEntry(uint32 id, uint32 liquidid, uint32 type, uint32 spellid) : Id(id), LiquidId(liquidid), Type(type), SpellId(spellid) {}
+    LiquidTypeEntry() = default;
     uint32 Id;
     uint32 LiquidId;                                        // 23: Water; 29: Ocean; 35: Magma; 41: Slime; 47: Naxxramas - Slime.
     uint32 Type;                                            // 0: Magma; 2: Slime; 3: Water
@@ -606,7 +609,7 @@ struct TaxiNodesEntry
     float     x;                                            // 2        m_x
     float     y;                                            // 3        m_y
     float     z;                                            // 4        m_z
-    char*     name[8];                                      // 5-12     m_Name_lang
+    std::array<std::string, MAX_DBC_LOCALE> name{};         // 5-12     m_Name_lang
                                                             // 13 string flags
     uint32    MountCreatureID[2];                           // 14-15    m_MountCreatureID[2] horde[14]-alliance[15]
 };

@@ -255,8 +255,8 @@ void ObjectMgr::LoadAllIdentifiers()
         delete result;
     }
 
-    m_SpellIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT ID FROM spell_template");
+    m_AreaTriggerIdSet.clear();
+    result = WorldDatabase.Query("SELECT DISTINCT ID FROM areatrigger_template");
 
     if (result)
     {
@@ -264,10 +264,26 @@ void ObjectMgr::LoadAllIdentifiers()
         {
             fields = result->Fetch();
             uint32 id = fields[0].GetUInt32();
-            m_SpellIdSet.insert(id);
+            m_AreaTriggerIdSet.insert(id);
         } while (result->NextRow());
         delete result;
     }
+
+    m_CreatureSpellsIdSet.clear();
+    result = WorldDatabase.Query("SELECT DISTINCT entry FROM creature_spells");
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 id = fields[0].GetUInt32();
+            m_CreatureSpellsIdSet.insert(id);
+        } while (result->NextRow());
+        delete result;
+    }
+
+    sSpellMgr.LoadExistingSpellIds();
 }
 
 // Nostalrius
@@ -1404,7 +1420,7 @@ EquipmentInfo const* ObjectMgr::GetEquipmentInfo(uint32 entry)
 
 void ObjectMgr::LoadEquipmentTemplates()
 {
-    sEquipmentStorage.LoadProgressive(sWorld.GetWowPatch(), true);
+    sEquipmentStorage.LoadProgressive(sWorld.GetWowPatch(), "patch", true);
 
     for (uint32 i = 0; i < sEquipmentStorage.GetMaxEntry(); ++i)
     {
@@ -1485,7 +1501,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
 
 void ObjectMgr::LoadCreatureModelInfo()
 {
-    sCreatureModelStorage.LoadProgressive(SUPPORTED_CLIENT_BUILD);
+    sCreatureModelStorage.LoadProgressive(SUPPORTED_CLIENT_BUILD, "build");
 
     // post processing
     for (uint32 i = 1; i < sCreatureModelStorage.GetMaxEntry(); ++i)
@@ -1663,7 +1679,8 @@ void ObjectMgr::LoadCreatureSpells()
             {
                 if (!sSpellMgr.GetSpellEntry(spellId))
                 {
-                    sLog.outErrorDb("Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i);
+                    if (!sSpellMgr.IsExistingSpellId(spellId))
+                        sLog.outErrorDb("Entry %u in table `creature_spells` has non-existent spell %u used as spellId_%u, skipping spell.", entry, spellId, i);
                     continue;
                 }
 
@@ -2520,6 +2537,13 @@ void ObjectMgr::LoadItemPrototypes()
 
         if (proto->BagFamily)
         {
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+            // The keyring was added in 1.11.
+            if (proto->BagFamily == BAG_FAMILY_KEYS)
+                const_cast<ItemPrototype*>(proto)->BagFamily = 0;
+#endif
+
             ItemBagFamilyEntry const* bf = sItemBagFamilyStore.LookupEntry(proto->BagFamily);
             if (!bf)
             {
@@ -5025,6 +5049,64 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
     CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT id,messageType,sender,receiver,itemTextId,has_items,expire_time,cod,checked,mailTemplateId FROM mail WHERE expire_time < '" UI64FMTD "' ORDER BY expire_time LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
 }
 
+void ObjectMgr::LoadAreaTriggers()
+{
+    sLog.outString("Loading area triggers ...");
+
+    // Getting the maximum ID.
+    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM areatrigger_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 area triggers. DB table `areatrigger_template` is empty.");
+        return;
+    }
+
+    auto fields = result->Fetch();
+    uint32 maxAreaTriggerEntry = fields[0].GetUInt32() + 1;
+    delete result;
+
+    // Actually loading the area triggers.
+    result = WorldDatabase.PQuery("SELECT * FROM areatrigger_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 area triggers. DB table `areatrigger_template` is empty.");
+        return;
+    }
+
+    mAreaTriggers.resize(maxAreaTriggerEntry);
+
+    do
+    {
+        fields = result->Fetch();
+
+        std::unique_ptr<AreaTriggerEntry> areaTrigger = std::make_unique<AreaTriggerEntry>();
+
+        uint32 triggerId = fields[0].GetUInt32();
+
+        areaTrigger->id = triggerId;
+        areaTrigger->mapid = fields[2].GetUInt32();
+        areaTrigger->x = fields[3].GetFloat();
+        areaTrigger->y = fields[4].GetFloat();
+        areaTrigger->z = fields[5].GetFloat();
+        areaTrigger->radius = fields[6].GetFloat();
+        areaTrigger->box_x = fields[7].GetFloat();
+        areaTrigger->box_y = fields[8].GetFloat();
+        areaTrigger->box_z = fields[9].GetFloat();
+        areaTrigger->box_orientation = fields[10].GetFloat();
+
+
+        mAreaTriggers[triggerId] = std::move(areaTrigger);
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u area triggers.", maxAreaTriggerEntry);
+}
+
 void ObjectMgr::LoadQuestAreaTriggers()
 {
     mQuestAreaTriggerMap.clear();                           // need for reload case
@@ -5055,7 +5137,7 @@ void ObjectMgr::LoadQuestAreaTriggers()
         uint32 trigger_ID = fields[0].GetUInt32();
         uint32 quest_ID   = fields[1].GetUInt32();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(trigger_ID);
+        AreaTriggerEntry const* atEntry = GetAreaTrigger(trigger_ID);
         if (!atEntry)
         {
             sLog.outErrorDb("Table `areatrigger_involvedrelation` has area trigger (ID: %u) not listed in `AreaTrigger.dbc`.", trigger_ID);
@@ -5095,7 +5177,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 {
     mTavernAreaTriggerSet.clear();                          // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT id FROM areatrigger_tavern");
+    QueryResult *result = WorldDatabase.PQuery("SELECT id FROM areatrigger_tavern WHERE patch_min <= %u", sWorld.GetWowPatch());
 
     uint32 count = 0;
 
@@ -5120,7 +5202,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 
         uint32 Trigger_ID      = fields[0].GetUInt32();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+        AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
         {
             sLog.outErrorDb("Table `areatrigger_tavern` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
@@ -5181,7 +5263,7 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
         bget.exit_Z             = fields[6].GetFloat();
         bget.exit_Orientation   = fields[7].GetFloat();
 
-        AreaTriggerEntry const* bgetEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+        AreaTriggerEntry const* bgetEntry = GetAreaTrigger(Trigger_ID);
         if (!bgetEntry)
         {
             sLog.outErrorDb("Table `areatrigger_bg_entrance` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
@@ -5232,9 +5314,9 @@ uint32 ObjectMgr::GetNearestTaxiNode(float x, float y, float z, uint32 mapid, Te
     float dist = 0.0f;
     uint32 id = 0;
 
-    for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
+    for (uint32 i = 1; i < GetMaxTaxiNodeId(); ++i)
     {
-        TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
+        TaxiNodesEntry const* node = GeTaxiNodeEntry(i);
         if (!node || node->map_id != mapid || !node->MountCreatureID[team == ALLIANCE ? 1 : 0])
             continue;
 
@@ -5294,7 +5376,7 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
     uint16 mount_entry = 0;
 
     // select mount creature id
-    TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(id);
+    TaxiNodesEntry const* node = GeTaxiNodeEntry(id);
     if (node)
     {
         if (team == ALLIANCE)
@@ -5542,7 +5624,7 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
 
 void ObjectMgr::LoadAreaTriggerTeleports()
 {
-    mAreaTriggers.clear();                                  // need for reload case
+    mAreaTriggerTeleports.clear();                                  // need for reload case
 
     uint32 count = 0;
 
@@ -5578,7 +5660,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
         uint32 Trigger_ID = fields[0].GetUInt32();
 
-        AreaTrigger at;
+        AreaTriggerTeleport at;
 
         at.requiredLevel      = fields[1].GetUInt8();
         at.requiredItem       = fields[2].GetUInt32();
@@ -5594,7 +5676,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
         at.required_pvp_rank  = fields[12].GetUInt8();
         at.required_team      = fields[13].GetUInt16();
 
-        AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(Trigger_ID);
+        AreaTriggerEntry const* atEntry = GetAreaTrigger(Trigger_ID);
         if (!atEntry)
         {
             sLog.outErrorDb("Table `areatrigger_teleport` has area trigger (ID:%u) not listed in `AreaTrigger.dbc`.", Trigger_ID);
@@ -5652,7 +5734,7 @@ void ObjectMgr::LoadAreaTriggerTeleports()
             continue;
         }
 
-        mAreaTriggers[Trigger_ID] = at;
+        mAreaTriggerTeleports[Trigger_ID] = at;
 
     }
     while (result->NextRow());
@@ -5666,17 +5748,17 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 /*
  * Searches for the areatrigger which teleports players out of the given map (only direct to continent)
  */
-AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
+AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
 {  
     MapEntry const* mapEntry = sMapStorage.LookupEntry<MapEntry>(map_id);
     if (!mapEntry || !mapEntry->IsDungeon())
         return nullptr;
 
-    for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); ++itr)
+    for (AreaTriggerTeleportMap::const_iterator itr = mAreaTriggerTeleports.begin(); itr != mAreaTriggerTeleports.end(); ++itr)
     {
         if (itr->second.target_mapId == uint32(mapEntry->ghostEntranceMap))
         {
-            AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(itr->first);
+            AreaTriggerEntry const* atEntry = GetAreaTrigger(itr->first);
             if (atEntry && atEntry->mapid == map_id)
                 return &itr->second;
         }
@@ -5687,13 +5769,13 @@ AreaTrigger const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
 /**
  * Searches for the areatrigger which teleports players to the given map
  */
-AreaTrigger const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
+AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 {
-    for (AreaTriggerMap::const_iterator itr = mAreaTriggers.begin(); itr != mAreaTriggers.end(); ++itr)
+    for (AreaTriggerTeleportMap::const_iterator itr = mAreaTriggerTeleports.begin(); itr != mAreaTriggerTeleports.end(); ++itr)
     {
         if (itr->second.target_mapId == Map)
         {
-            AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(itr->first);
+            AreaTriggerEntry const* atEntry = GetAreaTrigger(itr->first);
             if (atEntry)
                 return &itr->second;
         }
@@ -6443,53 +6525,53 @@ void ObjectMgr::LoadFactions()
         return;
     }
 
-    mFactions.resize(maxFactionEntry, nullptr);
+    mFactions.resize(maxFactionEntry);
 
     do
     {
         fields = result->Fetch();
 
-        FactionEntry* faction = new FactionEntry();
+        std::unique_ptr<FactionEntry> faction = std::make_unique<FactionEntry>();
 
         uint32 factionId = fields[0].GetUInt32();
 
         faction->ID = factionId;
-        faction->reputationListID = fields[1].GetInt32();
-        faction->BaseRepRaceMask[0] = fields[2].GetUInt32();
-        faction->BaseRepRaceMask[1] = fields[3].GetUInt32();
-        faction->BaseRepRaceMask[2] = fields[4].GetUInt32();
-        faction->BaseRepRaceMask[3] = fields[5].GetUInt32();
-        faction->BaseRepClassMask[0] = fields[6].GetUInt32();
-        faction->BaseRepClassMask[1] = fields[7].GetUInt32();
-        faction->BaseRepClassMask[2] = fields[8].GetUInt32();
-        faction->BaseRepClassMask[3] = fields[9].GetUInt32();
-        faction->BaseRepValue[0] = fields[10].GetInt32();
-        faction->BaseRepValue[1] = fields[11].GetInt32();
-        faction->BaseRepValue[2] = fields[12].GetInt32();
-        faction->BaseRepValue[3] = fields[13].GetInt32();
-        faction->ReputationFlags[0] = fields[14].GetUInt32();
-        faction->ReputationFlags[1] = fields[15].GetUInt32();
-        faction->ReputationFlags[2] = fields[16].GetUInt32();
-        faction->ReputationFlags[3] = fields[17].GetUInt32();
-        faction->team = fields[18].GetUInt32();
-        faction->name[0] = new char[strlen(fields[19].GetString()) + 1];
-        strcpy(faction->name[0], fields[19].GetString());
-        faction->name[1] = new char[strlen(fields[20].GetString()) + 1];
-        strcpy(faction->name[1], fields[20].GetString());
-        faction->name[2] = new char[strlen(fields[21].GetString()) + 1];
-        strcpy(faction->name[2], fields[21].GetString());
-        faction->name[3] = new char[strlen(fields[22].GetString()) + 1];
-        strcpy(faction->name[3], fields[22].GetString());
-        faction->name[4] = new char[strlen(fields[23].GetString()) + 1];
-        strcpy(faction->name[4], fields[23].GetString());
-        faction->name[5] = new char[strlen(fields[24].GetString()) + 1];
-        strcpy(faction->name[5], fields[24].GetString());
-        faction->name[6] = new char[strlen(fields[25].GetString()) + 1];
-        strcpy(faction->name[6], fields[25].GetString());
-        faction->name[7] = new char[strlen(fields[26].GetString()) + 1];
-        strcpy(faction->name[7], fields[26].GetString());
+        faction->reputationListID = fields[2].GetInt32();
+        faction->BaseRepRaceMask[0] = fields[3].GetUInt32();
+        faction->BaseRepRaceMask[1] = fields[4].GetUInt32();
+        faction->BaseRepRaceMask[2] = fields[5].GetUInt32();
+        faction->BaseRepRaceMask[3] = fields[6].GetUInt32();
+        faction->BaseRepClassMask[0] = fields[7].GetUInt32();
+        faction->BaseRepClassMask[1] = fields[8].GetUInt32();
+        faction->BaseRepClassMask[2] = fields[9].GetUInt32();
+        faction->BaseRepClassMask[3] = fields[10].GetUInt32();
+        faction->BaseRepValue[0] = fields[11].GetInt32();
+        faction->BaseRepValue[1] = fields[12].GetInt32();
+        faction->BaseRepValue[2] = fields[13].GetInt32();
+        faction->BaseRepValue[3] = fields[14].GetInt32();
+        faction->ReputationFlags[0] = fields[15].GetUInt32();
+        faction->ReputationFlags[1] = fields[16].GetUInt32();
+        faction->ReputationFlags[2] = fields[17].GetUInt32();
+        faction->ReputationFlags[3] = fields[18].GetUInt32();
+        faction->team = fields[19].GetUInt32();
+        faction->name[0] = new char[strlen(fields[20].GetString()) + 1];
+        strcpy(faction->name[0], fields[20].GetString());
+        faction->name[1] = new char[strlen(fields[21].GetString()) + 1];
+        strcpy(faction->name[1], fields[21].GetString());
+        faction->name[2] = new char[strlen(fields[22].GetString()) + 1];
+        strcpy(faction->name[2], fields[22].GetString());
+        faction->name[3] = new char[strlen(fields[23].GetString()) + 1];
+        strcpy(faction->name[3], fields[23].GetString());
+        faction->name[4] = new char[strlen(fields[24].GetString()) + 1];
+        strcpy(faction->name[4], fields[24].GetString());
+        faction->name[5] = new char[strlen(fields[25].GetString()) + 1];
+        strcpy(faction->name[5], fields[25].GetString());
+        faction->name[6] = new char[strlen(fields[26].GetString()) + 1];
+        strcpy(faction->name[6], fields[26].GetString());
+        faction->name[7] = new char[strlen(fields[27].GetString()) + 1];
+        strcpy(faction->name[7], fields[27].GetString());
 
-        mFactions[factionId] = faction;
+        mFactions[factionId] = std::move(faction);
 
     } while (result->NextRow());
 
@@ -6516,32 +6598,32 @@ void ObjectMgr::LoadFactions()
         return;
     }
 
-    mFactionTemplates.resize(maxFactionTemplateEntry, nullptr);
+    mFactionTemplates.resize(maxFactionTemplateEntry);
 
     do
     {
         fields = result->Fetch();
 
-        FactionTemplateEntry* faction = new FactionTemplateEntry();
+        std::unique_ptr<FactionTemplateEntry> faction = std::make_unique<FactionTemplateEntry>();
 
         uint32 factionId = fields[0].GetUInt32();
 
         faction->ID = factionId;
-        faction->faction = fields[1].GetUInt32();
-        faction->factionFlags = fields[2].GetUInt32();
-        faction->ourMask = fields[3].GetUInt32();
-        faction->friendlyMask = fields[4].GetUInt32();
-        faction->hostileMask = fields[5].GetUInt32();
-        faction->enemyFaction[0] = fields[6].GetUInt32();
-        faction->enemyFaction[1] = fields[7].GetUInt32();
-        faction->enemyFaction[2] = fields[8].GetUInt32();
-        faction->enemyFaction[3] = fields[9].GetUInt32();
-        faction->friendFaction[0] = fields[10].GetInt32();
-        faction->friendFaction[1] = fields[11].GetInt32();
-        faction->friendFaction[2] = fields[12].GetInt32();
-        faction->friendFaction[3] = fields[13].GetInt32();
+        faction->faction = fields[2].GetUInt32();
+        faction->factionFlags = fields[3].GetUInt32();
+        faction->ourMask = fields[4].GetUInt32();
+        faction->friendlyMask = fields[5].GetUInt32();
+        faction->hostileMask = fields[6].GetUInt32();
+        faction->enemyFaction[0] = fields[7].GetUInt32();
+        faction->enemyFaction[1] = fields[8].GetUInt32();
+        faction->enemyFaction[2] = fields[9].GetUInt32();
+        faction->enemyFaction[3] = fields[10].GetUInt32();
+        faction->friendFaction[0] = fields[11].GetInt32();
+        faction->friendFaction[1] = fields[12].GetInt32();
+        faction->friendFaction[2] = fields[13].GetInt32();
+        faction->friendFaction[3] = fields[14].GetInt32();
 
-        mFactionTemplates[factionId] = faction;
+        mFactionTemplates[factionId] = std::move(faction);
 
     } while (result->NextRow());
 
@@ -7010,6 +7092,68 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
     }
 }
 
+void ObjectMgr::LoadTaxiNodes()
+{
+    sLog.outString("Loading taxi nodes ...");
+
+    // Getting the maximum ID.
+    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM taxi_nodes WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 taxi nodes. DB table `taxi_nodes` is empty.");
+        return;
+    }
+
+    auto fields = result->Fetch();
+    uint32 maxTaxiNodeEntry = fields[0].GetUInt32() + 1;
+    delete result;
+
+    // Actually loading the taxi nodes.
+    result = WorldDatabase.PQuery("SELECT * FROM taxi_nodes WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 taxi nodes. DB table `taxi_nodes` is empty.");
+        return;
+    }
+
+    m_TaxiNodes.resize(maxTaxiNodeEntry);
+
+    do
+    {
+        fields = result->Fetch();
+
+        std::unique_ptr<TaxiNodesEntry> taxiNode = std::make_unique<TaxiNodesEntry>();
+
+        uint32 nodeId = fields[0].GetUInt32();
+
+        taxiNode->ID = nodeId;
+        taxiNode->map_id = fields[2].GetUInt32();
+        taxiNode->x = fields[3].GetFloat();
+        taxiNode->y = fields[4].GetFloat();
+        taxiNode->z = fields[5].GetFloat();
+        taxiNode->name[0] = fields[6].GetCppString();
+        taxiNode->name[1] = fields[7].GetCppString();
+        taxiNode->name[2] = fields[8].GetCppString();
+        taxiNode->name[3] = fields[9].GetCppString();
+        taxiNode->name[4] = fields[10].GetCppString();
+        taxiNode->name[5] = fields[11].GetCppString();
+        taxiNode->name[6] = fields[12].GetCppString();
+        taxiNode->name[7] = fields[13].GetCppString();
+        taxiNode->MountCreatureID[0] = fields[14].GetUInt32();
+        taxiNode->MountCreatureID[1] = fields[15].GetUInt32();
+
+        m_TaxiNodes[nodeId] = std::move(taxiNode);
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u taxi nodes.", maxTaxiNodeEntry);
+}
+
 void ObjectMgr::LoadTaxiPathTransitions()
 {
     m_TaxiPathTransitions.clear();                                            // need for reload case
@@ -7394,6 +7538,62 @@ void ObjectMgr::LoadGameObjectForQuests()
     sLog.outString(">> Loaded %u GameObjects for quests", count);
 }
 
+void ObjectMgr::LoadSkillLineAbility()
+{
+    sLog.outString("Loading skill line abilities ...");
+
+    // Getting the maximum ID.
+    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM skill_line_ability");
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 skill line abilities. DB table `skill_line_ability` is empty.");
+        return;
+    }
+    auto fields = result->Fetch();
+    uint32 maxSkillLineAbilityId = fields[0].GetUInt32() + 1;
+    delete result;
+
+    // Actually loading the sounds.
+    result = WorldDatabase.Query("SELECT * FROM skill_line_ability");
+
+    if (!result)
+    {
+        sLog.outString(">> Loaded 0 skill line abilities. DB table `skill_line_ability` is empty.");
+        return;
+    }
+
+    mSkillLineAbilities.resize(maxSkillLineAbilityId);
+
+    do
+    {
+        fields = result->Fetch();
+
+        std::unique_ptr<SkillLineAbilityEntry> skill = std::make_unique<SkillLineAbilityEntry>();
+        uint32 id = fields[0].GetUInt32();
+
+        skill->id = id;
+        skill->skillId = fields[2].GetUInt32();
+        skill->spellId = fields[3].GetUInt32();
+        skill->racemask = fields[4].GetUInt32();
+        skill->classmask = fields[5].GetUInt32();
+        skill->req_skill_value = fields[6].GetUInt32();
+        skill->forward_spellid = fields[7].GetUInt32();
+        skill->learnOnGetSkill = fields[8].GetUInt32();
+        skill->max_value = fields[9].GetUInt32();
+        skill->min_value = fields[10].GetUInt32();
+        skill->reqtrainpoints = fields[11].GetUInt32();
+
+        mSkillLineAbilities[id] = std::move(skill);
+
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u skill line abilities.", maxSkillLineAbilityId);
+}
+
 void ObjectMgr::LoadSoundEntries()
 {
     sLog.outString("Loading sounds ...");
@@ -7419,19 +7619,19 @@ void ObjectMgr::LoadSoundEntries()
         return;
     }
 
-    mSoundEntries.resize(maxSoundEntry, nullptr);
+    mSoundEntries.resize(maxSoundEntry);
 
     do
     {
         fields = result->Fetch();
 
-        SoundEntriesEntry* sound = new SoundEntriesEntry();
+        std::unique_ptr<SoundEntriesEntry> sound = std::make_unique<SoundEntriesEntry>();
         uint32 soundId = fields[0].GetUInt32();
 
         sound->Id = soundId;
         sound->Name = fields[1].GetCppString();
 
-        mSoundEntries[soundId] = sound;
+        mSoundEntries[soundId] = std::move(sound);
 
     } while (result->NextRow());
 
@@ -8192,7 +8392,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
     std::set<uint32> skip_trainers;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, spell,spellcost,reqskill,reqskillvalue,reqlevel FROM %s", tableName);
+    QueryResult *result = WorldDatabase.PQuery("SELECT entry, spell,spellcost,reqskill,reqskillvalue,reqlevel FROM %s WHERE %u BETWEEN build_min AND build_max", tableName, SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {
@@ -8222,8 +8422,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
         SpellEntry const *spellinfo = sSpellMgr.GetSpellEntry(spell);
         if (!spellinfo)
         {
-            if (!IsExistingSpellId(spell))
-                sLog.outErrorDb("Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
+            sLog.outErrorDb("Table `%s` (Entry: %u ) has non existing spell %u, ignore", tableName, entry, spell);
             continue;
         }
 

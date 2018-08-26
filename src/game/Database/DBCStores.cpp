@@ -27,6 +27,7 @@
 #include "SQLStorages.h"
 #include "DBCfmt.h"
 #include "SpellMgr.h"
+#include "ObjectMgr.h"
 
 #include <map>
 
@@ -51,7 +52,6 @@ typedef std::map<WMOAreaTableTripple, WMOAreaTableEntry const *> WMOAreaInfoByTr
 
 static WMOAreaInfoByTripple sWMOAreaInfoByTripple;
 
-DBCStorage <AreaTriggerEntry> sAreaTriggerStore(AreaTriggerEntryfmt);
 DBCStorage <AuctionHouseEntry> sAuctionHouseStore(AuctionHouseEntryfmt);
 DBCStorage <BankBagSlotPricesEntry> sBankBagSlotPricesStore(BankBagSlotPricesEntryfmt);
 DBCStorage <CharStartOutfitEntry> sCharStartOutfitStore(CharStartOutfitEntryfmt);
@@ -78,7 +78,6 @@ DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 //DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt); -- not used currently
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
 DBCStorage <ItemSetEntry> sItemSetStore(ItemSetEntryfmt);
-DBCStorage <LiquidTypeEntry> sLiquidTypeStore(LiquidTypefmt);
 DBCStorage <LockEntry> sLockStore(LockEntryfmt);
 
 DBCStorage <MailTemplateEntry> sMailTemplateStore(MailTemplateEntryfmt);
@@ -86,7 +85,6 @@ DBCStorage <MailTemplateEntry> sMailTemplateStore(MailTemplateEntryfmt);
 DBCStorage <QuestSortEntry> sQuestSortStore(QuestSortEntryfmt);
 
 DBCStorage <SkillLineEntry> sSkillLineStore(SkillLinefmt);
-DBCStorage <SkillLineAbilityEntry> sSkillLineAbilityStore(SkillLineAbilityfmt);
 DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfofmt);
 SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
 
@@ -112,7 +110,6 @@ static TalentInspectMap sTalentPosInInspect;
 static TalentInspectMap sTalentTabSizeInInspect;
 static uint32 sTalentTabPages[12/*MAX_CLASSES*/][3];
 
-DBCStorage <TaxiNodesEntry> sTaxiNodesStore(TaxiNodesEntryfmt);
 TaxiMask sTaxiNodesMask;
 
 // DBC used only for initialization sTaxiPathSetBySource at startup.
@@ -197,7 +194,7 @@ void LoadDBCStores(const std::string& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    const uint32 DBCFilesCount = 45;
+    const uint32 DBCFilesCount = 41;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -206,7 +203,6 @@ void LoadDBCStores(const std::string& dataPath)
     // bitmask for index of fullLocaleNameList
     uint32 availableDbcLocales = 0xFFFFFFFF;
 
-    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sAreaTriggerStore,         dbcPath, "AreaTrigger.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sAuctionHouseStore,        dbcPath, "AuctionHouse.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sBankBagSlotPricesStore,   dbcPath, "BankBagSlotPrices.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sCharStartOutfitStore,     dbcPath, "CharStartOutfit.dbc");
@@ -226,18 +222,15 @@ void LoadDBCStores(const std::string& dataPath)
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sEmotesStore,              dbcPath, "Emotes.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sEmotesTextStore,          dbcPath, "EmotesText.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sGameObjectDisplayInfoStore, dbcPath, "GameObjectDisplayInfo.dbc");
-
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemBagFamilyStore,       dbcPath, "ItemBagFamily.dbc");
     //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemDisplayInfoStore,     dbcPath,"ItemDisplayInfo.dbc");     -- not used currently
     //LoadDBC(availableDbcLocales,bar,bad_dbc_files,sItemCondExtCostsStore,    dbcPath,"ItemCondExtCosts.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemRandomPropertiesStore, dbcPath, "ItemRandomProperties.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sItemSetStore,             dbcPath, "ItemSet.dbc");
-    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sLiquidTypeStore,          dbcPath, "LiquidType.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sLockStore,                dbcPath, "Lock.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sMailTemplateStore,        dbcPath, "MailTemplate.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sQuestSortStore,           dbcPath, "QuestSort.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillLineStore,           dbcPath, "SkillLine.dbc");
-    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillLineAbilityStore,    dbcPath, "SkillLineAbility.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSkillRaceClassInfoStore,  dbcPath, "SkillRaceClassInfo.dbc");
     for (uint32 i = 1; i < sSpellMgr.GetMaxSpellId(); ++i)
     {
@@ -246,9 +239,9 @@ void LoadDBCStores(const std::string& dataPath)
             sSpellCategoryStore[spell->Category].insert(i);
     }
 
-    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+    for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
-        SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j);
+        SkillLineAbilityEntry const *skillLine = sObjectMgr.GetSkillLineAbility(j);
 
         if (!skillLine)
             continue;
@@ -359,8 +352,6 @@ void LoadDBCStores(const std::string& dataPath)
         }
     }
 
-    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sTaxiNodesStore,           dbcPath, "TaxiNodes.dbc");
-
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sTaxiPathStore,            dbcPath, "TaxiPath.dbc");
     for (uint32 i = 1; i < sTaxiPathStore.GetNumRows(); ++i)
         if (TaxiPathEntry const* entry = sTaxiPathStore.LookupEntry(i))
@@ -398,9 +389,9 @@ void LoadDBCStores(const std::string& dataPath)
                         spellPaths.insert(sInfo->EffectMiscValue[j]);
 
         memset(sTaxiNodesMask, 0, sizeof(sTaxiNodesMask));
-        for (uint32 i = 1; i < sTaxiNodesStore.GetNumRows(); ++i)
+        for (uint32 i = 1; i < sObjectMgr.GetMaxTaxiNodeId(); ++i)
         {
-            TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(i);
+            TaxiNodesEntry const* node = sObjectMgr.GeTaxiNodeEntry(i);
             if (!node)
                 continue;
 
@@ -458,20 +449,6 @@ void LoadDBCStores(const std::string& dataPath)
             str += *i + "\n";
 
         sLog.outError("\nSome required *.dbc files (%u from %d) not found or not compatible:\n%s", (uint32)bad_dbc_files.size(), DBCFilesCount, str.c_str());
-        Log::WaitBeforeContinueIfNeed();
-        exit(1);
-    }
-
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    #define MAX_SKILL_LINE_ABILITY_ENTRY 15030
-#else
-    #define MAX_SKILL_LINE_ABILITY_ENTRY 13817
-#endif
-
-    // Check loaded DBC files proper version
-    if (!sSkillLineAbilityStore.LookupEntry(MAX_SKILL_LINE_ABILITY_ENTRY))
-    {
-        sLog.outError("\nYou have _outdated_ DBC files. Please re-extract DBC files for one from client build: %s", AcceptableClientBuildsListStr().c_str());
         Log::WaitBeforeContinueIfNeed();
         exit(1);
     }

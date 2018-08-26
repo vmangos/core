@@ -425,14 +425,8 @@ void World::LoadConfigSettings(bool reload)
     // Set the available content patch.
     m_wowPatch = sConfig.GetIntDefault("WowPatch", WOW_PATCH_102);
 
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    WowPatch const maxPatch = WOW_PATCH_112;
-#else
-    WowPatch const maxPatch = WOW_PATCH_111;
-#endif
-
-    if (m_wowPatch > maxPatch)
-        m_wowPatch = maxPatch;
+    if (m_wowPatch > MAX_CONTENT_PATCH)
+        m_wowPatch = MAX_CONTENT_PATCH;
 
     ///- Read the player limit and the Message of the day from the config file
     SetPlayerLimit(sConfig.GetIntDefault("PlayerLimit", DEFAULT_PLAYER_LIMIT), true);
@@ -870,6 +864,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_ACCURATE_LFG, "Progression.AccurateLFGAvailability", true);
     setConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS, "Progression.AccuratePVEEvents", true);
     setConfig(CONFIG_BOOL_ACCURATE_SPELL_EFFECTS, "Progression.AccurateSpellEffects", true);
+    setConfig(CONFIG_BOOL_NO_RESPEC_PRICE_DECAY, "Progression.NoRespecPriceDecay", true);
 
     setConfig(CONFIG_UINT32_CREATURE_SUMMON_LIMIT, "MaxCreatureSummonLimit", DEFAULT_CREATURE_SUMMON_LIMIT);
 
@@ -1174,9 +1169,25 @@ void World::SetInitialWorldSettings()
     sLog.outString();
     sObjectMgr.LoadSoundEntries();
 
+    sLog.outString();
+    sObjectMgr.LoadTaxiNodes();
+
+    sLog.outString();
+    sObjectMgr.LoadAreaTriggers();
+
+    sLog.outString();
+    sObjectMgr.LoadSkillLineAbility();
+
     ///- Load the DBC files
     sLog.outString("Initialize data stores...");
-    LoadDBCStores(m_dataPath);
+
+#ifdef _WIN32
+    std::string dbcPath = m_dataPath + std::to_string(SUPPORTED_CLIENT_BUILD) + std::string("\\");
+#else
+    std::string dbcPath = m_dataPath + std::to_string(SUPPORTED_CLIENT_BUILD) + std::string("/");
+#endif
+
+    LoadDBCStores(dbcPath);
     DetectDBCLang();
     sObjectMgr.SetDBCLocaleIndex(GetDefaultDbcLocale());    // Get once for all the locale index of DBC language (console/broadcasts)
 
@@ -1365,7 +1376,7 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading SpellArea Data...");            // must be after quest load
     sSpellMgr.LoadSpellAreas();
 
-    sLog.outString("Loading AreaTrigger definitions...");
+    sLog.outString("Loading AreaTrigger teleports...");
     sObjectMgr.LoadAreaTriggerTeleports();                  // must be after item template load
 
     sLog.outString("Loading Quest Area Triggers...");

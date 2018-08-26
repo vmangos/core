@@ -1354,8 +1354,15 @@ void Player::Update(uint32 update_diff, uint32 p_time)
             HandleSobering();
     }
 
+    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+    // - Release timers have been be removed from instances. This includes 
+    //   dungeons, battlegrounds, and raid instances.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     // not auto-free ghost from body in instances
     if (getDeathState() == CORPSE  && !GetMap()->Instanceable())
+#else
+    if (getDeathState() == CORPSE)
+#endif
     {
         if (p_time >= m_deathTimer)
         {
@@ -3059,9 +3066,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
     RemoveByteFlag(UNIT_FIELD_BYTES_1, 3, UNIT_BYTE1_FLAG_ALL);
 
     // restore if need some important flags
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SetUInt32Value(PLAYER_FIELD_BYTES2, 0);                 // flags empty by default
-#endif
 
     if (reapplyMods)                                        //reapply stats values only on .reset stats (level) command
         _ApplyAllStatBonuses();
@@ -3888,7 +3893,9 @@ void Player::updateResetTalentsMultiplier()
 
 uint32 Player::resetTalentsCost()
 {
-    updateResetTalentsMultiplier(); // decay respec cost
+    // decay respec cost
+    if (!sWorld.getConfig(CONFIG_BOOL_NO_RESPEC_PRICE_DECAY) || (sWorld.GetWowPatch() >= WOW_PATCH_111))
+        updateResetTalentsMultiplier();
 
     if (!m_resetTalentsMultiplier) // initial respec
     {
@@ -4081,10 +4088,9 @@ void Player::InitVisibleBits()
     updateVisualBits.SetBit(PLAYER_GUILD_TIMESTAMP);
 
     // PLAYER_QUEST_LOG_x also visible bit on official (but only on party/raid)...
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     for (uint16 i = PLAYER_QUEST_LOG_1_1; i < PLAYER_QUEST_LOG_LAST_3; i += MAX_QUEST_OFFSET)
         updateVisualBits.SetBit(i);
-#endif
+
     //Players visible items are not inventory stuff
     //431) = 884 (0x374) = main weapon
     for (uint16 i = 0; i < EQUIPMENT_SLOT_END; i++)
@@ -5737,8 +5743,8 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
                 mSkillStatus.erase(itr);
 
             // remove all spells that related to this skill
-            for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
-                if (SkillLineAbilityEntry const *pAbility = sSkillLineAbilityStore.LookupEntry(j))
+            for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
+                if (SkillLineAbilityEntry const *pAbility = sObjectMgr.GetSkillLineAbility(j))
                     if (pAbility->skillId == id)
                         removeSpell(sSpellMgr.GetFirstSpellInChain(pAbility->spellId));
             // remove all quests related to this skill (else the spell will be automatically learned at next login, cf Player::learnQuestRewardedSpells)
@@ -6079,7 +6085,7 @@ void Player::CheckAreaExploreAndOutdoor()
     {
         if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() == REST_TYPE_IN_TAVERN)
         {
-            AreaTriggerEntry const* at = sAreaTriggerStore.LookupEntry(inn_trigger_id);
+            AreaTriggerEntry const* at = sObjectMgr.GetAreaTrigger(inn_trigger_id);
             if (!at || !IsPointInAreaTriggerZone(at, GetMapId(), GetPositionX(), GetPositionY(), GetPositionZ()))
             {
                 // Player left inn (REST_TYPE_IN_CITY overrides REST_TYPE_IN_TAVERN, so just clear rest)
@@ -11854,7 +11860,9 @@ void Player::SendNewItem(Item *item, uint32 count, bool received, bool created, 
     data << uint32(showInChat);                             // showInChat
     data << uint8(item->GetBagSlot());                      // bagslot
     // item slot, but when added to stack: 0xFFFFFFFF
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     data << uint32((item->GetCount() == count) ? item->GetSlot() : -1);
+#endif
     data << uint32(item->GetEntry());                       // item id
     data << uint32(item->GetItemSuffixFactor());            // SuffixFactor
     data << uint32(item->GetItemRandomPropertyId());        // random item property id
@@ -14653,7 +14661,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
         // if the player is in an instance and it has been reset in the meantime teleport him to the entrance
         if (!state)
         {
-            AreaTrigger const* at = sObjectMgr.GetGoBackTrigger(GetMapId());
+            AreaTriggerTeleport const* at = sObjectMgr.GetGoBackTrigger(GetMapId());
             if (at)
             {
                 Relocate(at->target_X, at->target_Y, at->target_Z, at->target_Orientation);
@@ -14816,7 +14824,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
         // problems with taxi path loading
         TaxiNodesEntry const* nodeEntry = NULL;
         if (uint32 node_id = m_taxi.GetTaxiSource())
-            nodeEntry = sTaxiNodesStore.LookupEntry(node_id);
+            nodeEntry = sObjectMgr.GeTaxiNodeEntry(node_id);
 
         if (!nodeEntry)                                     // don't know taxi start node, to homebind
         {
@@ -14843,7 +14851,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     if (uint32 node_id = m_taxi.GetTaxiSource())
     {
         // save source node as recall coord to prevent recall and fall from sky
-        TaxiNodesEntry const* nodeEntry = sTaxiNodesStore.LookupEntry(node_id);
+        TaxiNodesEntry const* nodeEntry = sObjectMgr.GeTaxiNodeEntry(node_id);
         MANGOS_ASSERT(nodeEntry);                           // checked in m_taxi.LoadTaxiDestinationsFromString
         m_recallMap = nodeEntry->map_id;
         m_recallX = nodeEntry->x;
@@ -17355,7 +17363,7 @@ bool Player::ActivateTaxiPathTo(std::vector<uint32> const& nodes, Creature* npc 
     uint32 sourcenode = nodes[0];
 
     // starting node too far away (cheat?)
-    TaxiNodesEntry const* node = sTaxiNodesStore.LookupEntry(sourcenode);
+    TaxiNodesEntry const* node = sObjectMgr.GeTaxiNodeEntry(sourcenode);
     if (!node)
     {
         WorldPacket data(SMSG_ACTIVATETAXIREPLY, 4);
@@ -18629,9 +18637,9 @@ void Player::learnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
 {
     uint32 raceMask  = getRaceMask();
     uint32 classMask = getClassMask();
-    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+    for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
-        SkillLineAbilityEntry const *pAbility = sSkillLineAbilityStore.LookupEntry(j);
+        SkillLineAbilityEntry const *pAbility = sObjectMgr.GetSkillLineAbility(j);
         if (!pAbility || pAbility->skillId != skill_id || pAbility->learnOnGetSkill != ABILITY_LEARNED_ON_GET_PROFESSION_SKILL)
             continue;
         // Check race if set
@@ -19572,7 +19580,7 @@ void Player::UpdateUnderwaterState()
 
     if (uint32 liqEntry = liquid_status.entry)
     {
-        LiquidTypeEntry const* liquid = sLiquidTypeStore.LookupEntry(liqEntry);
+        LiquidTypeEntry const* liquid = sTerrainMgr.GetLiquidType(liqEntry);
         if (m_lastLiquid && m_lastLiquid->SpellId && m_lastLiquid->Id != liqEntry)
             RemoveAurasDueToSpell(m_lastLiquid->SpellId);
 
@@ -21024,7 +21032,7 @@ void Player::TaxiStepFinished()
     if (!curDest)
         return;
 
-    TaxiNodesEntry const* curDestNode = sTaxiNodesStore.LookupEntry(curDest);
+    TaxiNodesEntry const* curDestNode = sObjectMgr.GeTaxiNodeEntry(curDest);
 
     // far teleport case
     if (curDestNode && curDestNode->map_id != GetMapId())

@@ -636,11 +636,27 @@ void Unit::RemoveFearEffectsByDamageTaken(uint32 damage, uint32 exceptSpellId, D
     uint32 max_dmg = getLevel() > 8 ? 25 * getLevel() - 150 : 50;
 
     // Players are 3x more likely to break fears
-    if (GetTypeId() == TYPEID_PLAYER)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    if (IsPlayer())
+#else
+    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+    // - Fear: The calculations to determine if Fear effects should break due 
+    //   to receiving damage have been changed. In addition, Intimidating 
+    //   Shout now follows that player versus non - player distinction, while
+    //   previously it did not.
+    if (IsPlayer() && !HasAura(5246))
+#endif
         max_dmg *= 0.333f;
-    // DOT spells are 3x less likely to break fears
+
+    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+    // - Fear: The calculations to determine if Fear effects should break due 
+    //   to receiving damage have been changed. In addition, the chance for a 
+    //   damage over time spell to break Fear is now significantly lower.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+    // DOT spells are 3x less likely to break fears after 1.11
     if (damagetype == DOT)
         max_dmg *= 3;
+#endif
 
     // for players, this means max_dmg = 450 at level 60, or 1350 if the damage source is a dot
     // for mobs, this means max_dmg = 1350 at level 60, or 4050 if the damage source is a dot
@@ -745,7 +761,13 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             // Degats recus sous bouclier par exemple.
             if (cleanDamage->absorb)
             {
+                // Before 1.11 the calculation whether to break fear used base spell damage.
+                // Calling it from spell class for direct spell damage in this case.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
                 if (!spellProto || !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR))
+#else
+                if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR)))
+#endif
                 {
                     if (!(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsWorldBoss()))
                         pVictim->RemoveFearEffectsByDamageTaken(cleanDamage->absorb, spellProto ? spellProto->Id : 0, damagetype);
@@ -771,10 +793,14 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         }
         return 0;
     }
-    //else if (cleanDamage)
-    //    sLog.outString("[NORMAL] Deal Damage sur %s (Dam%u|Absorb%u|Resist%u)", pVictim->GetName(), cleanDamage->damage, cleanDamage->absorb, cleanDamage->resist);
 
+    // Before 1.11 the calculation whether to break fear used base spell damage.
+    // Calling it from spell class for direct spell damage in this case.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     if (!spellProto || !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR))
+#else
+    if (!spellProto || ((damagetype != SPELL_DIRECT_DAMAGE) && !spellProto->IsAuraAddedBySpell(SPELL_AURA_MOD_FEAR)))
+#endif
     {
         if (!(GetTypeId() == TYPEID_UNIT && ((Creature*)this)->IsWorldBoss()))
             pVictim->RemoveFearEffectsByDamageTaken(damage, spellProto ? spellProto->Id : 0, damagetype);

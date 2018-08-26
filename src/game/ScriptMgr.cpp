@@ -275,8 +275,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 if (tmp.interruptCasts.spellId && !sSpellMgr.GetSpellEntry(tmp.interruptCasts.spellId))
                 {
-                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_INTERRUPT_CASTS for script id %u", tablename, tmp.interruptCasts.spellId, tmp.id);
-                    continue;
+                    if (!sSpellMgr.IsExistingSpellId(tmp.interruptCasts.spellId))
+                    {
+                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_INTERRUPT_CASTS for script id %u", tablename, tmp.interruptCasts.spellId, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
                 }
 
                 break;
@@ -459,9 +464,14 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 if (!sSpellMgr.GetSpellEntry(tmp.removeAura.spellId))
                 {
-                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA or SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                                    tablename, tmp.removeAura.spellId, tmp.id);
-                    continue;
+                    if (!sSpellMgr.IsExistingSpellId(tmp.removeAura.spellId))
+                    {
+                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA or SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                            tablename, tmp.removeAura.spellId, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
                 }
                 break;
             }
@@ -469,9 +479,14 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 if (!sSpellMgr.GetSpellEntry(tmp.castSpell.spellId))
                 {
-                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA or SCRIPT_COMMAND_CAST_SPELL for script id %u",
-                                    tablename, tmp.castSpell.spellId, tmp.id);
-                    continue;
+                    if (!sSpellMgr.IsExistingSpellId(tmp.castSpell.spellId))
+                    {
+                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_AURA or SCRIPT_COMMAND_CAST_SPELL for script id %u",
+                            tablename, tmp.castSpell.spellId, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
                 }
                 if (tmp.castSpell.flags & ~ALL_CAST_FLAGS)
                 {
@@ -911,8 +926,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                     {
                         if (!sObjectMgr.GetCreatureSpellsTemplate(tmp.creatureSpells.spellTemplate[i]))
                         {
-                            abort = true;
-                            sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellTemplate[i], tmp.id);
+                            if (!sObjectMgr.IsExistingCreatureSpellsId(tmp.creatureSpells.spellTemplate[i]))
+                            {
+                                abort = true;
+                                sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellTemplate[i], tmp.id);
+                            }
+                            else
+                                DisableScriptAction(tmp);
                             break;
                         }
                         if (!tmp.creatureSpells.chance[i])
@@ -950,8 +970,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
             {
                 if (!sSpellMgr.GetSpellEntry(tmp.addCooldown.spellId))
                 {
-                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_ADD_SPELL_COOLDOWN for script id %u", tablename, tmp.addCooldown.spellId, tmp.id);
-                    continue;
+                    if (!sSpellMgr.IsExistingSpellId(tmp.addCooldown.spellId))
+                    {
+                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_ADD_SPELL_COOLDOWN for script id %u", tablename, tmp.addCooldown.spellId, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
                 }
                 if (tmp.addCooldown.cooldown == 0)
                 {
@@ -966,8 +991,13 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 {
                     if (!sSpellMgr.GetSpellEntry(tmp.removeCooldown.spellId))
                     {
-                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN for script id %u", tablename, tmp.removeCooldown.spellId, tmp.id);
-                        continue;
+                        if (!sSpellMgr.IsExistingSpellId(tmp.removeCooldown.spellId))
+                        {
+                            sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_REMOVE_SPELL_COOLDOWN for script id %u", tablename, tmp.removeCooldown.spellId, tmp.id);
+                            continue;
+                        }
+                        else
+                            DisableScriptAction(tmp);
                     }
                 }
                 break;
@@ -1086,9 +1116,14 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 else
                 {
-                    sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_ADD_AURA for script id %u",
-                        tablename, tmp.addAura.spellId, tmp.id);
-                    continue;
+                    if (!sSpellMgr.IsExistingSpellId(tmp.addAura.spellId))
+                    {
+                        sLog.outErrorDb("Table `%s` using nonexistent spell (id: %u) in SCRIPT_COMMAND_ADD_AURA for script id %u",
+                            tablename, tmp.addAura.spellId, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
                 }
                 break;
             }
@@ -1159,7 +1194,8 @@ void ScriptMgr::LoadSpellScripts()
 
         if (!spellInfo)
         {
-            sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", itr->first);
+            if (!sSpellMgr.IsExistingSpellId(itr->first))
+                sLog.outErrorDb("Table `spell_scripts` has not existing spell (Id: %u) as script id", itr->first);
             continue;
         }
 
@@ -1337,9 +1373,10 @@ void ScriptMgr::LoadAreaTriggerScripts()
         uint32 triggerId       = fields[0].GetUInt32();
         const char *scriptName = fields[1].GetString();
 
-        if (!sAreaTriggerStore.LookupEntry(triggerId))
+        if (!sObjectMgr.GetAreaTrigger(triggerId))
         {
-            sLog.outErrorDb("Table `scripted_areatrigger` has area trigger (ID: %u) not listed in `AreaTrigger.dbc`.", triggerId);
+            if (!sObjectMgr.IsExistingAreaTriggerId(triggerId))
+                sLog.outErrorDb("Table `scripted_areatrigger` has area trigger (ID: %u) not listed in `AreaTrigger.dbc`.", triggerId);
             continue;
         }
 
@@ -2105,10 +2142,31 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         }
     }
 
+    QueryResult* result;
+    Field* fields;
+
+    // Load all possible script entries from spells.
+    for (uint32 i = 1; i < 4; ++i)
+    {
+        result = WorldDatabase.PQuery("SELECT effectMiscValue%u FROM spell_template WHERE effect%u=61", i, i);
+
+        if (result)
+        {
+            do
+            {
+                fields = result->Fetch();
+                uint32 eventId = fields[0].GetUInt32();
+                if (eventId)
+                    eventIds.insert(eventId);
+            } while (result->NextRow());
+            delete result;
+        }
+    }
+
     // Load all possible script entries from spells.
     for (uint32 i = 1; i < sSpellMgr.GetMaxSpellId(); ++i)
     {
-        SpellEntry* spell = ((SpellEntry*)sSpellMgr.GetSpellEntry(i));
+        const SpellEntry* spell = sSpellMgr.GetSpellEntry(i);
         if (spell)
         {
             for (int j = 0; j < MAX_EFFECT_INDEX; ++j)
@@ -2135,10 +2193,6 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
         "quest_end_scripts",
         "quest_start_scripts"
     };
-
-    QueryResult* result;
-    Field* fields;
-
     for (uint8 i = 0; i < 9; i++)
     {
         // From SCRIPT_COMMAND_START_SCRIPT.

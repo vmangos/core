@@ -1273,6 +1273,17 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
         SpellNonMeleeDamage damageInfo(caster, unitTarget, m_spellInfo->Id, GetFirstSchoolInMask(m_spellSchoolMask));
         damageInfo.spell = this;
 
+        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+        // - Fear: The calculations to determine if Fear effects should break due 
+        //   to receiving damage have been changed.The old calculation used the
+        //   base damage of the ability.The new calculation uses the final amount
+        //   of damage dealt, after all modifiers.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+        // Has to be called from here instead of Unit::DealDamage to calculate with base damage.
+        if ((damage > 0) && unitTarget && !(m_caster->IsCreature() && static_cast<Creature*>(m_caster)->IsWorldBoss()))
+            unitTarget->RemoveFearEffectsByDamageTaken(damage, m_spellInfo->Id, SPELL_DIRECT_DAMAGE);
+#endif
+
         if (m_delayed)
         {
             damageInfo.damage = m_damage;
@@ -2042,7 +2053,7 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
             UnitList tempTargetUnitMap;
 
             {
-                MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(m_caster, max_range);
+                MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(m_caster, m_originalCaster, max_range);
                 MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(tempTargetUnitMap, u_check);
                 Cell::VisitAllObjects(m_caster, searcher, max_range);
             }
@@ -2196,8 +2207,18 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     max_range = radius + unMaxTargets * CHAIN_SPELL_JUMP_RADIUS;
 
                 UnitList tempTargetUnitMap;
+
+                // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+                // - Chain targeted spells and abilities (e.g. Multi-shot, Cleave, Chain 
+                //   Lightning) will no longer land if target cannot be seen by the caster
+                //   due to stealth or invisibility.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
                 MaNGOS::AnyAoEVisibleTargetUnitInObjectRangeCheck u_check(pUnitTarget, originalCaster, max_range);
                 MaNGOS::UnitListSearcher<MaNGOS::AnyAoEVisibleTargetUnitInObjectRangeCheck> searcher(tempTargetUnitMap, u_check);
+#else
+                MaNGOS::AnyAoETargetUnitInObjectRangeCheck u_check(pUnitTarget, originalCaster, max_range);
+                MaNGOS::UnitListSearcher<MaNGOS::AnyAoETargetUnitInObjectRangeCheck> searcher(tempTargetUnitMap, u_check);
+#endif
                 Cell::VisitAllObjects(m_caster, searcher, max_range);
 
                 tempTargetUnitMap.sort(TargetDistanceOrderNear(pUnitTarget));
@@ -2219,6 +2240,12 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         break;
 
                     if (!(m_spellInfo->AttributesEx2 & SPELL_ATTR_EX2_IGNORE_LOS) && !prev->IsWithinLOSInMap(*next))
+                    {
+                        ++next;
+                        continue;
+                    }
+
+                    if ((m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_TARGET_ONLY_PLAYER) && ((*next)->GetTypeId() != TYPEID_PLAYER))
                     {
                         ++next;
                         continue;
@@ -5273,13 +5300,14 @@ SpellCastResult Spell::CheckCast(bool strict)
         if (IsSpellAppliesAura(m_spellInfo) && !IsAreaOfEffectSpell(m_spellInfo) && IsPositiveSpell(m_spellInfo) && target->HasMorePowerfullSpellActive(m_spellInfo))
             return SPELL_FAILED_AURA_BOUNCED;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         // Swiftmend
         if (m_spellInfo->Id == 18562)                       // future versions have special aura state for this
         {
             if (!target->GetAura(SPELL_AURA_PERIODIC_HEAL, SPELLFAMILY_DRUID, UI64LIT(0x50)))
                 return SPELL_FAILED_TARGET_AURASTATE;
         }
-
+#endif
         if (!m_IsTriggeredSpell && IsDeathOnlySpell(m_spellInfo) && target->isAlive())
             return SPELL_FAILED_TARGET_NOT_DEAD;
 

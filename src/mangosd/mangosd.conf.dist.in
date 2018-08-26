@@ -322,6 +322,10 @@ CleanCharacterDB = 1
 #        spells which had effects added or removed which still exist in the game client.
 #        Default: 1
 #
+#    Progression.NoRespecPriceDecay
+#        If set, the talent respec cost will not decay until patch 1.11 when the monthly reduction was added.
+#        Default: 1
+#
 #    DebuffLimit
 #        How many debuffs can be present on a target simultaneously
 #        Default: 0  - Decide automatically based on patch
@@ -342,6 +346,7 @@ Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
 Progression.AccurateSpellEffects = 1
+Progression.NoRespecPriceDecay = 1
 
 DebuffLimit = 0
 

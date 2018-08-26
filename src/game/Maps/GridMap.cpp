@@ -519,7 +519,7 @@ GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 Re
     // ToDo: check if this part requires update for 1.12.1
     if (m_liquidEntry)
     {
-        if (LiquidTypeEntry const* liquidEntry = sLiquidTypeStore.LookupEntry(m_liquidEntry[idx]))
+        if (LiquidTypeEntry const* liquidEntry = sTerrainMgr.GetLiquidType(m_liquidEntry[idx]))
         {
             entry = liquidEntry->Id;
             type &= MAP_LIQUID_TYPE_DARK_WATER;
@@ -538,7 +538,7 @@ GridMapLiquidStatus GridMap::getLiquidStatus(float x, float y, float z, uint8 Re
                             overrideLiquid = areaEntry->LiquidTypeId;
                     }
 
-                    if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(overrideLiquid))
+                    if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(overrideLiquid))
                     {
                         entry = overrideLiquid;
                         liqTypeIdx = liq->Type;
@@ -1004,7 +1004,7 @@ GridMapLiquidStatus TerrainInfo::getLiquidStatus(float x, float y, float z, uint
             if (data)
             {
                 uint32 liquidFlagType = 0;
-                if (LiquidTypeEntry const* liq = sLiquidTypeStore.LookupEntry(liquid_type))
+                if (LiquidTypeEntry const* liq = sTerrainMgr.GetLiquidType(liquid_type))
                 {
                     liquidFlagType = 1 << liq->Type;
                 }
@@ -1192,6 +1192,12 @@ INSTANTIATE_CLASS_MUTEX(TerrainManager, ACE_Thread_Mutex);
 
 TerrainManager::TerrainManager()
 {
+    mLiquidTypes.resize(22);
+    mLiquidTypes[1] = std::make_unique<LiquidTypeEntry>(1, 1, 3, 0);
+    mLiquidTypes[2] = std::make_unique<LiquidTypeEntry>(2, 7, 3, 0);
+    mLiquidTypes[3] = std::make_unique<LiquidTypeEntry>(3, 13, 0, 0);
+    mLiquidTypes[4] = std::make_unique<LiquidTypeEntry>(4, 19, 2, 0);
+    mLiquidTypes[21] = std::make_unique<LiquidTypeEntry>(21, 25, 2, 28801);
 }
 
 TerrainManager::~TerrainManager()

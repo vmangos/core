@@ -62,7 +62,7 @@ struct GameTele
 
 typedef UNORDERED_MAP<uint32, GameTele > GameTeleMap;
 
-struct AreaTrigger
+struct AreaTriggerTeleport
 {
     uint8  requiredLevel;
     uint32 requiredItem;
@@ -378,6 +378,7 @@ struct TaxiPathTransition
 
 typedef std::multimap<uint32, TaxiPathTransition> TaxiPathTransitionsMap;
 typedef std::pair<TaxiPathTransitionsMap::const_iterator, TaxiPathTransitionsMap::const_iterator> TaxiPathTransitionsMapBounds;
+typedef std::vector<std::unique_ptr<TaxiNodesEntry>> TaxiNodesStore;
 
 // NPC gossip text id
 typedef UNORDERED_MAP<uint32, uint32> CacheNpcTextIdMap;
@@ -574,7 +575,8 @@ class ObjectMgr
         bool IsExistingGameObjectId(uint32 id) const { return (m_GameObjectIdSet.find(id) != m_GameObjectIdSet.end()); }
         bool IsExistingCreatureGuid(uint32 id) const { return (m_CreatureGuidSet.find(id) != m_CreatureGuidSet.end()); }
         bool IsExistingGameObjectGuid(uint32 id) const { return (m_GameObjectGuidSet.find(id) != m_GameObjectGuidSet.end()); }
-        bool IsExistingSpellId(uint32 id) const { return (m_SpellIdSet.find(id) != m_SpellIdSet.end()); }
+        bool IsExistingAreaTriggerId(uint32 id) const { return (m_AreaTriggerIdSet.find(id) != m_AreaTriggerIdSet.end()); }
+        bool IsExistingCreatureSpellsId(uint32 id) const { return (m_CreatureSpellsIdSet.find(id) != m_CreatureSpellsIdSet.end()); }
 
         typedef UNORDERED_MAP<uint32, Item*> ItemMap;
 
@@ -582,7 +584,8 @@ class ObjectMgr
 
         typedef UNORDERED_MAP<uint32, Quest*> QuestMap;
 
-        typedef std::map<uint32, AreaTrigger> AreaTriggerMap;
+        typedef std::vector<std::unique_ptr<AreaTriggerEntry>> AreaTriggerStore;
+        typedef std::map<uint32, AreaTriggerTeleport> AreaTriggerTeleportMap;
         typedef UNORDERED_MAP<uint32, BattlegroundEntranceTrigger> BGEntranceTriggerMap;
 
         typedef UNORDERED_MAP<uint32, RepRewardRate > RepRewardRateMap;
@@ -667,6 +670,10 @@ class ObjectMgr
             return m_TaxiPathTransitions.equal_range(entry);
         }
 
+        void LoadTaxiNodes();
+        TaxiNodesEntry const* GeTaxiNodeEntry(uint32 id) const { return id < GetMaxTaxiNodeId() ? m_TaxiNodes[id].get() : nullptr; }
+        uint32 GetMaxTaxiNodeId() const { return m_TaxiNodes.size(); }
+
         Quest const* GetQuestTemplate(uint32 quest_id) const
         {
             auto itr = mQuestTemplates.find(quest_id);
@@ -701,16 +708,20 @@ class ObjectMgr
         void LoadGraveyardZones();
         GraveYardData const* FindGraveYardData(uint32 id, uint32 zone) const;
 
-        AreaTrigger const* GetAreaTrigger(uint32 trigger) const
+        AreaTriggerTeleport const* GetAreaTriggerTeleport(uint32 trigger) const
         {
-            auto itr = mAreaTriggers.find( trigger );
-            if( itr != mAreaTriggers.end( ) )
+            auto itr = mAreaTriggerTeleports.find( trigger );
+            if( itr != mAreaTriggerTeleports.end( ) )
                 return &itr->second;
             return nullptr;
         }
 
-        AreaTrigger const* GetGoBackTrigger(uint32 Map) const;
-        AreaTrigger const* GetMapEntranceTrigger(uint32 Map) const;
+        AreaTriggerTeleport const* GetGoBackTrigger(uint32 Map) const;
+        AreaTriggerTeleport const* GetMapEntranceTrigger(uint32 Map) const;
+
+        void LoadAreaTriggers();
+        AreaTriggerEntry const* GetAreaTrigger(uint32 id) const { return id < GetMaxAreaTriggerId() ? mAreaTriggers[id].get() : nullptr; }
+        uint32 GetMaxAreaTriggerId() const { return mAreaTriggers.size(); }
 
         BattlegroundEntranceTrigger const* GetBattlegroundEntranceTrigger(uint32 trigger) const
         {
@@ -1232,15 +1243,20 @@ class ObjectMgr
 
         // Sound Entries
         void LoadSoundEntries();
-        SoundEntriesEntry const* GetSoundEntry(uint32 id) const { return id < GetMaxSoundId() ? mSoundEntries[id] : nullptr; }
+        SoundEntriesEntry const* GetSoundEntry(uint32 id) const { return id < GetMaxSoundId() ? mSoundEntries[id].get() : nullptr; }
         uint32 GetMaxSoundId() const { return mSoundEntries.size(); }
 
         // Factions
         void LoadFactions();
-        FactionEntry const* GetFactionEntry(uint32 id) const { return id < GetMaxFactionId() ? mFactions[id] : nullptr; }
+        FactionEntry const* GetFactionEntry(uint32 id) const { return id < GetMaxFactionId() ? mFactions[id].get() : nullptr; }
         uint32 GetMaxFactionId() const { return mFactions.size(); }
-        FactionTemplateEntry const* GetFactionTemplateEntry(uint32 id) const { return id < GetMaxFactionTemplateId() ? mFactionTemplates[id] : nullptr; }
+        FactionTemplateEntry const* GetFactionTemplateEntry(uint32 id) const { return id < GetMaxFactionTemplateId() ? mFactionTemplates[id].get() : nullptr; }
         uint32 GetMaxFactionTemplateId() const { return mFactionTemplates.size(); }
+
+        // Skill Line Abilities
+        void LoadSkillLineAbility();
+        SkillLineAbilityEntry const* GetSkillLineAbility(uint32 id) const { return id < GetMaxSkillLineAbilityId() ? mSkillLineAbilities[id].get() : nullptr; }
+        uint32 GetMaxSkillLineAbilityId() const { return mSkillLineAbilities.size(); }
 
         // Changes of faction
         typedef std::map<uint32, uint32> CharacterConversionMap;
@@ -1323,10 +1339,11 @@ class ObjectMgr
 
         ItemTextMap         mItemTexts;
 
+        AreaTriggerStore    mAreaTriggers;
         QuestAreaTriggerMap mQuestAreaTriggerMap;
         TavernAreaTriggerSet mTavernAreaTriggerSet;
         GameObjectForQuestSet mGameObjectForQuestSet;
-        AreaTriggerMap      mAreaTriggers;
+        AreaTriggerTeleportMap      mAreaTriggerTeleports;
         QuestStartingItemMap   mQuestStartingItems;
         BGEntranceTriggerMap mBGEntranceTriggers;
 
@@ -1361,6 +1378,8 @@ class ObjectMgr
         QuestRelationsMap       m_GOQuestInvolvedRelations;
 
         TaxiPathTransitionsMap  m_TaxiPathTransitions;
+        TaxiNodesStore          m_TaxiNodes;
+
 
         int DBCLocaleIndex;
 
@@ -1380,7 +1399,8 @@ class ObjectMgr
         std::set<uint32> m_GameObjectIdSet;
         std::set<uint32> m_CreatureGuidSet;
         std::set<uint32> m_GameObjectGuidSet;
-        std::set<uint32> m_SpellIdSet;
+        std::set<uint32> m_AreaTriggerIdSet;
+        std::set<uint32> m_CreatureSpellsIdSet;
 
         typedef std::map<uint32,PetLevelInfo*> PetLevelInfoMap;
         // PetLevelInfoMap[creature_id][level]
@@ -1425,13 +1445,16 @@ class ObjectMgr
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;
         AreaLocaleMap mAreaLocaleMap;
 
-        typedef std::vector<FactionEntry*> FactionStore;
+        typedef std::vector<std::unique_ptr<FactionEntry>> FactionStore;
         FactionStore mFactions;
-        typedef std::vector<FactionTemplateEntry*> FactionTemplateStore;
+        typedef std::vector<std::unique_ptr<FactionTemplateEntry>> FactionTemplateStore;
         FactionTemplateStore mFactionTemplates;
 
-        typedef std::vector<SoundEntriesEntry*> SoundEntryStore;
+        typedef std::vector<std::unique_ptr<SoundEntriesEntry>> SoundEntryStore;
         SoundEntryStore mSoundEntries;
+
+        typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;
+        SkillLineAbiilityStore mSkillLineAbilities;
 
         CacheNpcTextIdMap m_mCacheNpcTextIdMap;
         CacheVendorItemMap m_mCacheVendorTemplateItemMap;

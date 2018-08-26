@@ -10,6 +10,42 @@
 /*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
 /*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
 
+-- Dumping structure for table logs.instance_creature_kills
+DROP TABLE IF EXISTS `instance_creature_kills`;
+CREATE TABLE IF NOT EXISTS `instance_creature_kills` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
+  `creatureEntry` int(10) unsigned NOT NULL COMMENT 'entry of the creature who performed the kill',
+  `spellEntry` int(10) NOT NULL COMMENT 'entry of spell which did the kill. 0 for melee or unknown',
+  `count` int(10) unsigned NOT NULL COMMENT 'number of kills',
+  PRIMARY KEY (`mapId`,`creatureEntry`,`spellEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='creatures killing players statistics';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table logs.instance_custom_counters
+DROP TABLE IF EXISTS `instance_custom_counters`;
+CREATE TABLE IF NOT EXISTS `instance_custom_counters` (
+  `index` int(10) unsigned NOT NULL COMMENT 'index as defined in InstanceStatistics.h',
+  `count` int(10) unsigned NOT NULL COMMENT 'counter',
+  PRIMARY KEY (`index`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='custom counters for instance statistics';
+
+-- Data exporting was unselected.
+
+
+-- Dumping structure for table logs.instance_wipes
+DROP TABLE IF EXISTS `instance_wipes`;
+CREATE TABLE IF NOT EXISTS `instance_wipes` (
+  `mapId` int(10) unsigned NOT NULL COMMENT 'MapId to where creature exist',
+  `creatureEntry` int(10) unsigned NOT NULL COMMENT 'creature which the wipe occured against',
+  `count` int(10) unsigned NOT NULL COMMENT 'number of wipes',
+  PRIMARY KEY (`mapId`,`creatureEntry`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='players wiping against creatures statistics';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table logs.logs_battleground
 DROP TABLE IF EXISTS `logs_battleground`;
 CREATE TABLE IF NOT EXISTS `logs_battleground` (

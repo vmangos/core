@@ -100,15 +100,19 @@ typedef struct
 } sAuthLogonChallenge_S;
 */
 
-typedef struct AUTH_LOGON_PROOF_C
+struct sAuthLogonProof_C_Base
 {
     uint8   cmd;
     uint8   A[32];
     uint8   M1[20];
     uint8   crc_hash[20];
     uint8   number_of_keys;
+};
+
+struct sAuthLogonProof_C_1_11 : public sAuthLogonProof_C_Base
+{
     uint8   securityFlags;                                  // 0x00-0x04
-} sAuthLogonProof_C;
+};
 /*
 typedef struct
 {
@@ -303,6 +307,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
 {
     switch(_build)
     {
+        case 5302:                                          // 1.10.2
         case 5464:                                          // 1.11.2
         case 5875:                                          // 1.12.1
         case 6005:                                          // 1.12.2
@@ -559,9 +564,9 @@ bool AuthSocket::_HandleLogonChallenge()
                     }
                     else
                     {
-                        pkt << uint8(0);
+                        if (_build > CLIENT_BUILD_1_10_2)
+                            pkt << uint8(0);
                     }
-
 
                     _localizationName.resize(4);
                     for(int i = 0; i < 4; ++i)
@@ -591,10 +596,21 @@ bool AuthSocket::_HandleLogonChallenge()
 bool AuthSocket::_HandleLogonProof()
 {
     DEBUG_LOG("Entering _HandleLogonProof");
+
+    sAuthLogonProof_C_1_11 lp;
+    
     ///- Read the packet
-    sAuthLogonProof_C lp;
-    if(!recv((char *)&lp, sizeof(sAuthLogonProof_C)))
-        return false;
+    if (_build < CLIENT_BUILD_1_11_2)
+    {
+        if (!recv((char *)&lp, sizeof(sAuthLogonProof_C_Base)))
+            return false;
+        lp.securityFlags = 0;
+    }
+    else
+    {
+        if (!recv((char *)&lp, sizeof(sAuthLogonProof_C_1_11)))
+            return false;  
+    }
 
     PINData pinData;
 
@@ -1087,6 +1103,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
     switch(_build)
     {
+        case 5302:                                          // 1.10.2
         case 5464:                                          // 1.11.2
         case 5875:                                          // 1.12.1
         case 6005:                                          // 1.12.2

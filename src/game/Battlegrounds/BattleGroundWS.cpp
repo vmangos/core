@@ -169,7 +169,7 @@ void BattleGroundWS::ForceFlagAreaTrigger(Team team)
 {
     // Is the opposite flag carrier at flag spawn position ?
     Player* oppositeFlagKeeper = GetBgMap()->GetPlayer(team == ALLIANCE ? m_FlagKeepers[BG_TEAM_HORDE] : m_FlagKeepers[BG_TEAM_ALLIANCE]);
-    AreaTriggerEntry const* atEntry = sAreaTriggerStore.LookupEntry(team == ALLIANCE ? AREATRIGGER_ALLIANCE_FLAG_SPAWN : AREATRIGGER_HORDE_FLAG_SPAWN);
+    AreaTriggerEntry const* atEntry = sObjectMgr.GetAreaTrigger(team == ALLIANCE ? AREATRIGGER_ALLIANCE_FLAG_SPAWN : AREATRIGGER_HORDE_FLAG_SPAWN);
     if (!atEntry || !oppositeFlagKeeper || !IsPointInAreaTriggerZone(atEntry, oppositeFlagKeeper->GetMapId(), oppositeFlagKeeper->GetPositionX(), oppositeFlagKeeper->GetPositionY(), oppositeFlagKeeper->GetPositionZ(), 2.0f))
         return;
     HandleAreaTrigger(oppositeFlagKeeper, atEntry->id);

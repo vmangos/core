@@ -805,9 +805,9 @@ void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
 {
     uint32 classmask = player->getClassMask();
 
-    for (uint32 j = 0; j < sSkillLineAbilityStore.GetNumRows(); ++j)
+    for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
     {
-        SkillLineAbilityEntry const *skillLine = sSkillLineAbilityStore.LookupEntry(j);
+        SkillLineAbilityEntry const *skillLine = sObjectMgr.GetSkillLineAbility(j);
         if (!skillLine)
             continue;
 
