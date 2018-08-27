@@ -1634,7 +1634,7 @@ void Player::AutoReSummonPet()
     }
 
     // 3. Execute the pet summon spell effect
-    EffectSummonPet(spell, entry);
+    EffectSummonPet(spell, entry, getLevel());
 
     // 4. We may want to resurrect the pet
     Pet* pet = GetPet();
