@@ -3709,26 +3709,20 @@ void SpellMgr::LoadSpellAreas()
 
 SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spellInfo, Unit const* caster, Player const* player)
 {
-    // bg spell checks
-
     // Spell casted only on battleground
     if ((spellInfo->AttributesEx3 & SPELL_ATTR_EX3_BATTLEGROUND))
         if (!player || !player->InBattleGround())
             return SPELL_FAILED_ONLY_BATTLEGROUNDS;
 
-    uint32 mapId = 0;
-    if (caster)
-        mapId = caster->GetMapId();
-    else if (player)
-        mapId = player->GetMapId();
+    uint32 mapId = caster ? caster->GetMapId() : (player ? player->GetMapId() : 0);
 
     switch (spellInfo->Id)
     {
-                            // Alterac Valley
-        case 22564:                                         // recall
-        case 22563:                                         // recall
-        case 23538:                                         // Battle Standard
-        case 23539:
+        // Alterac Valley
+        case 22564:                                         // Recall (Alliance)
+        case 22563:                                         // Recall (Horde)
+        case 23538:                                         // Battle Standard (Horde)
+        case 23539:                                         // Battle Standard (Alliance)
         {
             if (!player)
                 return SPELL_FAILED_REQUIRES_AREA;
@@ -3738,6 +3732,7 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spell
             return player->GetMapId() == 30 && bg
                    && bg->GetStatus() != STATUS_WAIT_JOIN ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
         }
+        // Warsong Gulch
         case 23333:                                         // Warsong Flag
         case 23335:                                         // Silverwing Flag
             return player && player->GetMapId() == 489 && player->InBattleGround() ? SPELL_CAST_OK : SPELL_FAILED_REQUIRES_AREA;
@@ -3772,6 +3767,36 @@ SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spell
         }
     }
     return SPELL_CAST_OK;
+}
+
+uint32 SpellMgr::GetRequiredAreaForSpell(uint32 spellId)
+{
+    SpellAreaMapBounds saBounds = GetSpellAreaMapBounds(spellId);
+    if (saBounds.first != saBounds.second)
+    {
+        for (SpellAreaMap::const_iterator itr = saBounds.first; itr != saBounds.second; ++itr)
+        {
+            if (itr->second.areaId)
+                return itr->second.areaId;
+        }
+    }
+
+    // Not defined in database.
+    switch (spellId)
+    {
+        // Alterac Valley
+        case 22564: // Recall (Alliance)
+        case 22563: // Recall (Horde)
+        case 23538: // Battle Standard (Horde)
+        case 23539: // Battle Standard (Alliance)
+            return 2597;
+        // Warsong Gulch
+        case 23333: // Warsong Flag
+        case 23335: // Silverwing Flag
+            return 3277;
+    }
+
+    return 0;
 }
 
 SpellCastResult SpellMgr::GetSpellAllowedInLocationError(SpellEntry const *spellInfo, uint32 zone_id, uint32 area_id, Player const* player)
