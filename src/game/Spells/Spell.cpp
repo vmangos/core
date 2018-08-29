@@ -2999,10 +2999,19 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                       else */
                     targetUnitMap.push_back(m_caster);
                     break;
+                case SPELL_EFFECT_TRANS_DOOR:
+                {
+                    if (m_spellInfo->rangeIndex != SPELL_RANGE_IDX_SELF_ONLY)
+                    {
+                        float tmp_x, tmp_y, tmp_z;
+                        m_caster->GetRandomPoint(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), 5.0f, tmp_x, tmp_y, tmp_z);
+                        m_targets.setDestination(tmp_x, tmp_y, tmp_z);
+                    }
+                    //break;
+                }
                 case SPELL_EFFECT_SUMMON_CHANGE_ITEM:
                 case SPELL_EFFECT_SUMMON_WILD:
                 case SPELL_EFFECT_SUMMON_GUARDIAN:
-                case SPELL_EFFECT_TRANS_DOOR:
                 case SPELL_EFFECT_ADD_FARSIGHT:
                 case SPELL_EFFECT_STUCK:
                 case SPELL_EFFECT_DESTROY_ALL_TOTEMS:
