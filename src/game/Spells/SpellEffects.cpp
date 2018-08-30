@@ -3749,59 +3749,6 @@ void Spell::EffectEnchantItemPerm(SpellEffectIndex eff_idx)
     item_owner->ApplyEnchantment(itemTarget, PERM_ENCHANTMENT_SLOT, true);
 }
 
-
-uint32 GetPoisonCharges(uint32 spellId)
-{
-    switch (spellId)
-    {
-        // Instant Poison
-        case 8679:
-            return 40;
-        case 8686:
-            return 55;
-        case 8688:
-            return 70;
-        case 11338:
-            return 85;
-        case 11339:
-            return 100;
-        case 11340:
-            return 115;
-        // Mind-numbing Poison
-        case 5761:
-            return 50;
-        case 8693:
-            return 75;
-        case 11399:
-            return 100;
-        // Deadly Poison
-        case 2823:
-            return 60;
-        case 2824:
-            return 75;
-        case 11355:
-            return 90;
-        case 11356:
-            return 105;
-        case 25351:
-            return 120;
-        // Wound Poison
-        case 13219:
-            return 60;
-        case 13225:
-            return 75;
-        case 13226:
-            return 90;
-        case 13227:
-            return 105;
-            // Crippling poison
-            //case 3408:  return 0;
-            //case 11202: return 0;
-    }
-    return 0;
-}
-
-
 void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
 {
     if (m_caster->GetTypeId() != TYPEID_PLAYER)
@@ -3813,7 +3760,7 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
         return;
 
     uint32 enchant_id = m_spellInfo->EffectMiscValue[eff_idx];
-    uint32 charges    = 0;
+    uint32 charges    = sSpellMgr.GetSpellEnchantCharges(m_spellInfo->Id);
 
     if (!enchant_id)
     {
@@ -3827,11 +3774,6 @@ void Spell::EffectEnchantItemTmp(SpellEffectIndex eff_idx)
         sLog.outError("Spell %u Effect %u (SPELL_EFFECT_ENCHANT_ITEM_TEMPORARY) have nonexistent enchanting id %u ", m_spellInfo->Id, eff_idx, enchant_id);
         return;
     }
-
-    // Calculate number of charges
-    // Poisons :
-    if (m_spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
-        charges = GetPoisonCharges(m_spellInfo->Id);
 
     // item can be in trade slot and have owner diff. from caster
     Player* item_owner = itemTarget->GetOwner();
@@ -5486,15 +5428,23 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
     if (m_spellInfo->EffectMiscValue[eff_idx])
     {
         uint32 enchant_id = m_spellInfo->EffectMiscValue[eff_idx];
-        int32 duration = GetSpellDuration(m_spellInfo);     // Try duration index first...
+
+        // Base points first
+        int32 duration = m_currentBasePoints[eff_idx] * IN_MILLISECONDS;
+
+        // Try duration index next
         if (!duration)
-            duration = m_currentBasePoints[eff_idx];        //Base points after ..
+            duration = GetSpellDuration(m_spellInfo);
+
+        // 10 seconds for enchants which don't have listed duration
         if (!duration)
-            duration = 10;                                  // 10 seconds for enchants which don't have listed duration
+            duration = 10 * IN_MILLISECONDS;
 
         SpellItemEnchantmentEntry const *pEnchant = sSpellItemEnchantmentStore.LookupEntry(enchant_id);
         if (!pEnchant)
             return;
+
+        uint32 charges = sSpellMgr.GetSpellEnchantCharges(m_spellInfo->Id);
 
         // Always go to temp enchantment slot
         EnchantmentSlot slot = TEMP_ENCHANTMENT_SLOT;
@@ -5504,7 +5454,7 @@ void Spell::EffectEnchantHeldItem(SpellEffectIndex eff_idx)
             return;
 
         // Apply the temporary enchantment
-        item->SetEnchantment(slot, enchant_id, duration * IN_MILLISECONDS, 0);
+        item->SetEnchantment(slot, enchant_id, duration, charges);
         item_owner->ApplyEnchantment(item, slot, true);
     }
 }

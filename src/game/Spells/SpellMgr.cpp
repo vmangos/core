@@ -3080,6 +3080,55 @@ void SpellMgr::LoadSpellLearnSkills()
     sLog.outString(">> Loaded %u Spell Learn Skills from DBC", dbc_count);
 }
 
+void SpellMgr::LoadSpellEnchantCharges()
+{
+    mSpellEnchantChargesMap.clear();                              // need for reload case
+
+    uint32 count = 0;
+
+    //                                                0      1
+    QueryResult *result = WorldDatabase.Query("SELECT entry, charges FROM spell_enchant_charges");
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u spell enchant charges", count);
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        Field *fields = result->Fetch();
+
+        bar.step();
+
+        uint32 entry = fields[0].GetUInt32();
+        uint32 charges = fields[1].GetUInt32();
+
+        SpellEntry const* pSpellInfo = GetSpellEntry(entry);
+
+        if (!pSpellInfo)
+        {
+            if (!IsExistingSpellId(entry))
+                sLog.outErrorDb("Spell %u listed in `spell_enchant_charges` does not exist", entry);
+            continue;
+        }
+
+        mSpellEnchantChargesMap[entry] = charges;
+
+        ++count;
+    } while (result->NextRow());
+
+    delete result;
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u spell enchant charges", count);
+}
+
 void SpellMgr::LoadSpellLearnSpells()
 {
     mSpellLearnSpells.clear();                              // need for reload case

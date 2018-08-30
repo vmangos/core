@@ -1270,6 +1270,9 @@ void World::SetInitialWorldSettings()
     sLog.outString("Loading Aggro Spells Definitions...");
     sSpellMgr.LoadSpellThreats();
 
+    sLog.outString("Loading Spell Enchant Charges...");
+    sSpellMgr.LoadSpellEnchantCharges();
+
     sLog.outString("Loading NPC Texts...");
     sObjectMgr.LoadNPCText();
 

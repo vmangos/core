@@ -781,6 +781,7 @@ struct SpellThreatEntry
 };
 
 typedef std::map<uint32, uint8> SpellElixirMap;
+typedef std::map<uint32, uint32> SpellEnchantChargesMap;
 typedef std::map<uint32, float> SpellProcItemEnchantMap;
 typedef std::map<uint32, SpellThreatEntry> SpellThreatMap;
 
@@ -1106,6 +1107,15 @@ class SpellMgr
                 return SPELL_NORMAL;
         }
 
+        uint32 GetSpellEnchantCharges(uint32 spellid) const
+        {
+            auto itr = mSpellEnchantChargesMap.find(spellid);
+            if (itr == mSpellEnchantChargesMap.end())
+                return 0;
+
+            return itr->second;
+        }
+
         SpellThreatEntry const* GetSpellThreatEntry(uint32 spellid) const
         {
             SpellThreatMap::const_iterator itr = mSpellThreatMap.find(spellid);
@@ -1350,6 +1360,7 @@ class SpellMgr
 
         // Loading data at server startup
         void LoadSpellChains();
+        void LoadSpellEnchantCharges();
         void LoadSpellLearnSkills();
         void LoadSpellLearnSpells();
         void LoadSpellScriptTarget();
@@ -1406,6 +1417,7 @@ class SpellMgr
         SpellThreatMap     mSpellThreatMap;
         SpellProcEventMap  mSpellProcEventMap;
         SpellProcItemEnchantMap mSpellProcItemEnchantMap;
+        SpellEnchantChargesMap mSpellEnchantChargesMap;
         SpellBonusMap      mSpellBonusMap;
         SkillLineAbilityMap mSkillLineAbilityMap;
         SkillRaceClassInfoMap mSkillRaceClassInfoMap;
