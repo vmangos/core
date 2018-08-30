@@ -70,6 +70,16 @@ struct boss_kurinnaxxAI : public ScriptedAI
             m_pInstance->SetData(TYPE_KURINNAXX, NOT_STARTED);
     }
 
+    void MoveInLineOfSight(Unit* pWho) override
+    {
+        if (m_creature->canAttack(pWho) && !m_creature->isInCombat() && m_creature->IsWithinDistInMap(pWho, 75.0f) && !pWho->HasAuraType(SPELL_AURA_FEIGN_DEATH))
+        {
+            AttackStart(pWho); 
+        }
+        
+        ScriptedAI::MoveInLineOfSight(pWho);
+    }
+
     void Aggro(Unit* pPuller)
     {
         m_creature->SetInCombatWithZone();
