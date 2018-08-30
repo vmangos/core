@@ -16760,6 +16760,12 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
 /** Implementation of hourly maximum instances per account */
 bool Player::CheckInstanceCount(uint32 instanceId)
 {
+    uint32 MAX_INSTANCE_PER_ACCOUNT_PER_HOUR;
+    if (sWorld.GetWowPatch() >= WOW_PATCH_110)
+        MAX_INSTANCE_PER_ACCOUNT_PER_HOUR = 5;
+    else
+        MAX_INSTANCE_PER_ACCOUNT_PER_HOUR = 999;
+
     return isGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR);
 }
 

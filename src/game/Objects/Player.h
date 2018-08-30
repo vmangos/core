@@ -670,8 +670,6 @@ struct InstancePlayerBind
     InstancePlayerBind() : state(NULL), perm(false) {}
 };
 
-#define MAX_INSTANCE_PER_ACCOUNT_PER_HOUR 5
-
 class MANGOS_DLL_SPEC PlayerTaxi
 {
     public:
