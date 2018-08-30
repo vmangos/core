@@ -808,6 +808,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 0 - not unsummon
 #                 1 - unsummon for any mount
 #
+#    PlayerCommands
+#        Should player chat be parsed for GM commands.
+#        Default: 1 (parse commands)
+#                 0 (ignore commands)
+#
 #    Event.Announce
 #        Default: 0 (false)
 #                 1 (true)
@@ -882,6 +887,7 @@ MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
 MassMailer.SendPerTick = 10
 PetUnsummonAtMount = 0
+PlayerCommands = 1
 Event.Announce = 0
 BeepAtStart = 1
 ShowProgressBars = 0
