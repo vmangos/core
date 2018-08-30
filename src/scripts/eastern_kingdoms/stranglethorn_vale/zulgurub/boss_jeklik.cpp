@@ -21,62 +21,36 @@ SDComment:
 SDCategory: Zul'Gurub
 EndScriptData */
 
-/*
-INSERT INTO creature_template SET entry=14941, name="High Priestess Jeklik Transform Visual", modelid_1=15191, modelid_2=15191;
-UPDATE creature_template SET InhabitType=4 WHERE entry=14965;
-*/
 #include "scriptPCH.h"
 #include "zulgurub.h"
 
 enum
 {
-    // Datas : HP : 333,125 (+20% = 399750), MP : 26,200. Troll form : 550-1000 melee. Bat form : 800-1200 on warrior.
-    NPC_JEKLIK                  = 14517,
+    SAY_AGGRO               = -1309002,
+    SAY_RAIN_FIRE           = -1309003,
+    SAY_DEATH               = -1309004,
+    TEXT_GREAT_HEAL         = -1309025,
+    TEXT_SUMMON_BATS        = -1309026,
 
-    // Emotes
-    // ------
-    SAY_AGGRO                   = -1309002,
-    SAY_RAIN_FIRE               = -1309003,
-    SAY_DEATH                   = -1309004,
-    TEXTE_GRAND_SORT_SOIN       = -1309025,
-    TEXTE_SUMMON_BATS           = -1309026,
-    TEXTE_FAIRE_FEU             = 2,
+    SPELL_GREENCHANNELING   = 13540, // Green Spell. [ChanneledInstant]
+    SPELL_BAT_FORM          = 23966, // Transform to bat. [Instant]
+    SPELL_BOMB              = 19629, // Summon Flames gobject 177764. [Instant]
+    SPELL_THROW_LIQUID_FIRE = 23970, // [Instant] [50000 yd range]
+    SPELL_TRANSFORMVISUAL   = 24085, // [Instant]
+    SPELL_BLOODLEECH        = 22644, // Drains 30 health from nearby enemies, healing the caster for up to three times the amount stolen. [Instant] [Melee Range]
 
-    // Jeklik's spells
-    // ---------------
+    // P1
+    SPELL_SWOOP             = 23919, // Inflicts normal damage plus 500 to enemies in a cone in front of the caster, stunning them for 2 sec. [Instant] [Melee Range]
+    SPELL_CHARGE            = 24408, // Charges an enemy, inflicting normal damage plus 0 and stuns the opponent for 2 sec. [Instant] [40 yd range]
+    SPELL_SONICBURST        = 23918, // Inflicts normal damage plus 1750 to 2251 on nearby enemies, preventing them from spellcasting for 10 sec. [Instant]
+    SPELL_PIERCEARMOR       = 12097, // Reduces an enemy's armor by 75% for 20 sec. [Instant]
 
-    SPELL_GREENCHANNELING       = 13540, //3450
-    SPELL_BAT_FORM              = 23966,
-    SPELL_BOMB                  = 19629,
-    SPELL_THROW_LIQUID_FIRE     = 23970,
-    SPELL_TRANSFORMVISUAL       = 24085,
-    SPELL_BLOODLEECH            = 22644,
-
-    // Jeklik's spells phase 1
-    // -----------------------
-
-    // Swoop - Inflicts normal damage plus 500 (must be total > 1.2k) to enemies in a cone in front of the caster, stunning them for 2 sec (= Rapace).
-    // OK
-    SPELL_SWOOP                 = 23919, // 15 sec
-    // Charge - Charges an enemy, inflicting normal damage plus 75 (total 1k) and stuns the opponent for 2 sec (silence for 5 sec?). Every 10-12 secs.
-    // OK
-    SPELL_CHARGE                = 24408, // 22911 // 15-20 sec
-    // Sonic Burst - Inflicts 1000-1100 damages on nearby enemies, preventing them from spellcasting for 10 sec. Every ~20-30 sec.
-    // OK
-    SPELL_SONICBURST            = 23918,
-    // Pierce Armor
-    // OK
-    SPELL_PIERCEARMOR           = 12097,
-
-    // Jeklik's spells phase 2
-    // -----------------------
-
-    SPELL_SHADOW_WORD_PAIN      = 23952,
-    SPELL_MIND_FLAY             = 23953, // last 10 sec. 15-20 sec
-    // SPELL_CHAIN_MIND_FLAY       = 26044, //Right ID unknown. So disabled - really a chain !
-    SPELL_GREATER_HEAL          = 23954,
-    SPELL_CURSE_OF_BLOOD        = 16098,
-    SPELL_SCREECH               = 6605 // vu une fois juste après transformation?
+    // P2
+    SPELL_SHADOW_WORD_PAIN  = 23952, // Utters a word of darkness, inflicting Shadow damage to an enemy every 3 sec. for 18 sec. [Instant] [60 yd range]
+    SPELL_MIND_FLAY         = 23953, // Inflicts Shadow damage to an enemy and reduces its movement speed for 10 sec. [ChanneledInstant] [100 yd range]
+    SPELL_GREAT_HEAL        = 23954, // Calls upon Holy magic to heal an ally. [4 sec cast] [40 yd range]
+    SPELL_CURSE_OF_BLOOD    = 16098, // Increases the Physical damage take by nearby enemies by 2 for 10 min. [2 sec cast] [20 yd range]
+    SPELL_SCREECH           = 6605   // Causes nearby enemies to flee in fear for 4 sec. [Instant]
 };
 
 struct boss_jeklikAI : public ScriptedAI
@@ -98,50 +72,50 @@ struct boss_jeklikAI : public ScriptedAI
     uint32 ShadowWordPain_Timer;
     uint32 CurseOfBlood_Timer;
     uint32 MindFlay_Timer;
-    uint32 GreaterHeal_Timer;
-    uint32 m_Screech_Timer;
+    uint32 GreatHeal_Timer;
+    uint32 Screech_Timer;
     uint32 SpawnFlyingBats_Timer;
-    uint32 m_uiGlobalCooldown;
-    uint32 m_uiDiff_Add;
+    uint32 GlobalCooldown;
+    uint32 Diff_Add;
     bool skillStarted;
 
     bool PhaseTwo;
 
     void Reset()
     {
-        SpawnBats_Timer = 45000;
-        // TODO: debug
-        SpawnBats_Timer = 1000;
+        SpawnBats_Timer = 40000;
 
-        Charge_Timer = 10000;
-        SonicBurst_Timer = 12000;
-        Swoop_Timer = 8000;
+        Charge_Timer      = 10000;
+        SonicBurst_Timer  = 12000;
+        Swoop_Timer       = 8000;
         PierceArmor_Timer = 9000;
 
-        m_Screech_Timer = 12000;
+        Screech_Timer = 12000;
 
-        ShadowWordPain_Timer = 9000;
-        CurseOfBlood_Timer = 26000;
-        MindFlay_Timer = 2000;
-        GreaterHeal_Timer = 20000;
+        ShadowWordPain_Timer  = 9000;
+        CurseOfBlood_Timer    = 26000;
+        MindFlay_Timer        = 2000;
+        GreatHeal_Timer       = 20000;
         SpawnFlyingBats_Timer = 10000;
 
-        m_uiGlobalCooldown = 0;
-        PhaseTwo = false;
-        skillStarted = false;
+        GlobalCooldown = 0;
+        PhaseTwo       = false;
+        skillStarted   = false;
 
         if (m_pInstance && m_creature->isAlive())
             m_pInstance->SetData(TYPE_JEKLIK, FAIL);
+
         m_creature->SetObjectScale(1.5f);
     }
+
     void JustReachedHome()
     {
         m_creature->CastSpell(m_creature, SPELL_GREENCHANNELING, false);
+        m_creature->SetObjectScale(1.0f);
     }
 
     void Aggro(Unit *who)
     {
-        // Hackfix. Under Bat form, Jeklik keeps its InhabitType = GROUND.
         m_creature->addUnitState(UNIT_STAT_IGNORE_PATHFINDING);
         DoScriptText(SAY_AGGRO, m_creature);
         m_creature->AddAura(SPELL_BAT_FORM);
@@ -159,7 +133,6 @@ struct boss_jeklikAI : public ScriptedAI
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_JEKLIK, DONE);
-        //ScriptedAI::JustDied(Killer);
     }
 
     void EnterEvadeMode() override
@@ -190,7 +163,7 @@ struct boss_jeklikAI : public ScriptedAI
         {
             if (SpawnBats_Timer < lastDiff)
             {
-                DoScriptText(TEXTE_SUMMON_BATS, m_creature);
+                DoScriptText(TEXT_SUMMON_BATS, m_creature);
                 for (uint8 i = 0; i < 6; ++i)
                 {
                     Creature* Bat = m_creature->SummonCreature(11368, -12294.0f + frand(0.0f, 5.0f), -1382.0f + frand(0.0f, 5.0f), 144.8304f, 5.483f, TEMPSUMMON_TIMED_DESPAWN_OUT_OF_COMBAT, 15000);
@@ -200,7 +173,7 @@ struct boss_jeklikAI : public ScriptedAI
                             Bat->AI()->AttackStart(pTarget);
                     }
                 }
-                SpawnBats_Timer = 60000;
+                SpawnBats_Timer = 65000;
             }
             else
                 SpawnBats_Timer -= lastDiff;
@@ -209,7 +182,6 @@ struct boss_jeklikAI : public ScriptedAI
         // SPAWN_FLYING_BAT
         if (PhaseTwo)
         {
-
             if (SpawnFlyingBats_Timer < lastDiff)
             {
                 if (Unit *target = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0))
@@ -229,22 +201,21 @@ struct boss_jeklikAI : public ScriptedAI
 
         if (m_creature->IsNonMeleeSpellCasted(false))
         {
-            m_uiDiff_Add += lastDiff;
+            Diff_Add += lastDiff;
             return;
         }
 
         DoMeleeAttackIfReady();
 
-        // GlobalCD non ecoule.
-        if (m_uiGlobalCooldown > lastDiff)
+        if (GlobalCooldown > lastDiff)
         {
-            m_uiDiff_Add += lastDiff;
-            m_uiGlobalCooldown -= lastDiff;
+            Diff_Add += lastDiff;
+            GlobalCooldown -= lastDiff;
             return;
         }
 
-        uint32 diff = m_uiDiff_Add + lastDiff;
-        m_uiDiff_Add  = 0;
+        uint32 diff = Diff_Add + lastDiff;
+        Diff_Add = 0;
 
         skillStarted = false;
         // BAT FORM COMBAT (PHASE 1)
@@ -257,12 +228,9 @@ struct boss_jeklikAI : public ScriptedAI
                 {
                     if (m_creature->CastSpellOnNearestVictim(SPELL_CHARGE, 10.0f, 40.0f, false))
                     {
-                        skillStarted = true;
-                        Charge_Timer = urand(15000, 30000);
-                        m_uiGlobalCooldown = 1000;
-                        // Suivit d'une explosion sonore.
-                        if (SonicBurst_Timer < 8000)
-                            SonicBurst_Timer = 1000;
+                        skillStarted   = true;
+                        Charge_Timer   = urand(15000, 30000);
+                        GlobalCooldown = 1000;
                     }
                     else
                         Charge_Timer = 2000;
@@ -272,22 +240,22 @@ struct boss_jeklikAI : public ScriptedAI
                 Charge_Timer -= diff;
 
             // SCREECH
-            if (m_Screech_Timer < diff)
+            if (Screech_Timer < diff)
             {
                 if (!skillStarted)
                 {
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SCREECH) == CAST_OK)
                     {
-                        skillStarted = true;
-                        m_Screech_Timer = 30000;
-                        m_uiGlobalCooldown = 1000;
+                        skillStarted   = true;
+                        Screech_Timer  = 30000;
+                        GlobalCooldown = 1000;
                     }
                     else
                         Charge_Timer = 1000;
                 }
             }
             else
-                m_Screech_Timer -= diff;
+                Screech_Timer -= diff;
 
             // SONICBURST
             if (SonicBurst_Timer < diff)
@@ -296,9 +264,9 @@ struct boss_jeklikAI : public ScriptedAI
                 {
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SONICBURST) == CAST_OK)
                     {
-                        skillStarted = true;
+                        skillStarted     = true;
                         SonicBurst_Timer = urand(20000, 24000);
-                        m_uiGlobalCooldown = 1000;
+                        GlobalCooldown   = 1000;
                     }
                 }
             }
@@ -312,9 +280,9 @@ struct boss_jeklikAI : public ScriptedAI
                 {
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SWOOP) == CAST_OK)
                     {
-                        skillStarted = true;
-                        Swoop_Timer = urand(12000, 15000);
-                        m_uiGlobalCooldown = 1000;
+                        skillStarted   = true;
+                        Swoop_Timer    = urand(12000, 15000);
+                        GlobalCooldown = 1000;
                     }
                 }
             }
@@ -328,9 +296,9 @@ struct boss_jeklikAI : public ScriptedAI
                 {
                     if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_PIERCEARMOR) == CAST_OK)
                     {
-                        skillStarted = true;
+                        skillStarted      = true;
                         PierceArmor_Timer = urand(16000, 18000);
-                        m_uiGlobalCooldown = 1000;
+                        GlobalCooldown    = 1000;
                     }
                 }
             }
@@ -338,7 +306,7 @@ struct boss_jeklikAI : public ScriptedAI
                 PierceArmor_Timer -= diff;
 
         }
-        // TROLL FORM COMBAT (PHASE 2)
+        // P2
         else
         {
             // SHADOW_WORD_PAIN
@@ -351,8 +319,8 @@ struct boss_jeklikAI : public ScriptedAI
                         if (DoCastSpellIfCan(target, SPELL_SHADOW_WORD_PAIN) == CAST_OK)
                         {
                             ShadowWordPain_Timer = urand(8000, 12000);
-                            m_uiGlobalCooldown = 1000;
-                            skillStarted = true;
+                            GlobalCooldown       = 1000;
+                            skillStarted         = true;
                         }
                     }
                 }
@@ -360,22 +328,22 @@ struct boss_jeklikAI : public ScriptedAI
             else
                 ShadowWordPain_Timer -= diff;
 
-            // GREATER_HEAL
-            if (GreaterHeal_Timer < diff)
+            // GREAT_HEAL
+            if (GreatHeal_Timer < diff)
             {
                 if (!skillStarted)
                 {
                     m_creature->InterruptNonMeleeSpells(false);
-                    if (DoCastSpellIfCan(m_creature, SPELL_GREATER_HEAL) == CAST_OK)
+                    if (DoCastSpellIfCan(m_creature, SPELL_GREAT_HEAL) == CAST_OK)
                     {
-                        DoScriptText(TEXTE_GRAND_SORT_SOIN, m_creature);
+                        DoScriptText(TEXT_GREAT_HEAL, m_creature);
                         skillStarted = true;
-                        GreaterHeal_Timer = urand(20000, 25000);
+                        GreatHeal_Timer = urand(20000, 25000);
                     }
                 }
             }
             else
-                GreaterHeal_Timer -= diff;
+                GreatHeal_Timer -= diff;
 
             // MIND_FLAY
             if (MindFlay_Timer < diff)
@@ -388,7 +356,7 @@ struct boss_jeklikAI : public ScriptedAI
                         if (DoCastSpellIfCan(target, SPELL_MIND_FLAY) == CAST_OK)
                         {
                             MindFlay_Timer = urand(25000, 30000);
-                            skillStarted = true;
+                            skillStarted   = true;
                         }
                     }
                 }
@@ -418,7 +386,7 @@ struct boss_jeklikAI : public ScriptedAI
     }
 };
 
-//Flying Bat
+// Flying Bat
 struct mob_batriderAI : public ScriptedAI
 {
     mob_batriderAI(Creature* pCreature) : ScriptedAI(pCreature)
@@ -441,7 +409,6 @@ struct mob_batriderAI : public ScriptedAI
     {
     }
 
-    // Changeons de cible de temps en temps :-)
     void MoveInLineOfSight(Unit* pWho)
     {
     }
@@ -450,6 +417,7 @@ struct mob_batriderAI : public ScriptedAI
     {
         if (Bomb_Timer)
             return;
+
         Bomb_Timer = urand(5000, 10000);
 
         if (Creature* pJeklik = m_creature->FindNearestCreature(NPC_JEKLIK, 150.0f))
@@ -463,7 +431,6 @@ struct mob_batriderAI : public ScriptedAI
             sLog.outString("mob_batriderAI: Jeklik not found.");
     }
 
-
     // Called when spell hits creature's target
     virtual void SpellHitTarget(Unit* target, const SpellEntry* spell)
     {
@@ -471,11 +438,12 @@ struct mob_batriderAI : public ScriptedAI
         if (target && spell && spell->Id == SPELL_THROW_LIQUID_FIRE)
             m_creature->CastSpell(target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), SPELL_BOMB, false);
     }
+
     void UpdateAI(const uint32 diff)
     {
         if (!m_pInstance)
             return;
-        //Bomb_Timer
+
         if (Bomb_Timer < diff)
             Bomb_Timer = 0;
         else
@@ -506,11 +474,11 @@ CreatureAI* GetAI_mob_batrider(Creature* pCreature)
 // TRASH
 enum
 {
-    SPELL_EXPLOSION        = 24024,
-    SPELL_CRI_DEMORALISANT = 23511,
-    SPELL_ORDRE_COMBAT     = 5115,
-    SPELL_MORSURE_INFECT   = 16128,
-    SPELL_ROSSER           = 3391,
+    SPELL_EXPLOSION          = 24024, // [3 sec cast]
+    SPELL_DEMORALIZING_SHOUT = 23511, // Reduces the melee attack power of nearby enemies by 40 for 30 sec. [Instant]
+    SPELL_BATTLE_COMBAT      = 5115,  // Increases the attack speed of nearby allies by 50% for 6 sec.
+    SPELL_INFECTED_BITE      = 16128, // Inflicts Nature damage to an enemy every 10 sec. and increases the Physical damage it takes for 3 sec. [Instant] [Melee Range]
+    SPELL_THRASH             = 3391,  // Gives the caster 2 extra attacks. [Instant]
 };
 
 struct npc_guru_bat_riderAI : public ScriptedAI
@@ -521,23 +489,23 @@ struct npc_guru_bat_riderAI : public ScriptedAI
     }
 
     bool GoingToExplose;
-    uint32 DespawnTimer;
-    uint32 OrdreDeCombatTimer;
-    uint32 MorsureInfectueuseTimer;
-    uint32 RosserTimer;
+    uint32 Despawn_Timer;
+    uint32 Combat_Timer;
+    uint32 InfectedBite_Timer;
+    uint32 Thrash_Timer;
 
     void Reset()
     {
-        GoingToExplose              = false;
-        DespawnTimer                = 0;
-        OrdreDeCombatTimer          = 8000;
-        MorsureInfectueuseTimer     = 6500;
-        RosserTimer                 = 6000;
+        GoingToExplose     = false;
+        Despawn_Timer      = 0;
+        Combat_Timer       = 8000;
+        InfectedBite_Timer = 6500;
+        Thrash_Timer       = 6000;
     }
 
     void Aggro(Unit* pWho)
     {
-        m_creature->CastSpell(m_creature, SPELL_CRI_DEMORALISANT, false);
+        m_creature->CastSpell(m_creature, SPELL_DEMORALIZING_SHOUT, false);
         ScriptedAI::Aggro(pWho);
     }
 
@@ -557,29 +525,29 @@ struct npc_guru_bat_riderAI : public ScriptedAI
             m_creature->CastSpell(m_creature, SPELL_EXPLOSION, false);
         }
 
-        if (OrdreDeCombatTimer < diff)
+        if (Combat_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature, SPELL_ORDRE_COMBAT) == CAST_OK)
-                OrdreDeCombatTimer = 25000;
+            if (DoCastSpellIfCan(m_creature, SPELL_BATTLE_COMBAT) == CAST_OK)
+                Combat_Timer = 25000;
         }
         else
-            OrdreDeCombatTimer -= diff;
+            Combat_Timer -= diff;
 
-        if (MorsureInfectueuseTimer < diff)
+        if (InfectedBite_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MORSURE_INFECT) == CAST_OK)
-                MorsureInfectueuseTimer = 15000;
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_INFECTED_BITE) == CAST_OK)
+                InfectedBite_Timer = 15000;
         }
         else
-            MorsureInfectueuseTimer -= diff;
+            InfectedBite_Timer -= diff;
 
-        if (RosserTimer < diff)
+        if (Thrash_Timer < diff)
         {
-            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_ROSSER) == CAST_OK)
-                RosserTimer = 6000;
+            if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_THRASH) == CAST_OK)
+                Thrash_Timer = 6000;
         }
         else
-            RosserTimer -= diff;
+            Thrash_Timer -= diff;
 
         DoMeleeAttackIfReady();
     }
@@ -589,7 +557,6 @@ CreatureAI* GetAI_guru_bat_rider(Creature* pCreature)
 {
     return new npc_guru_bat_riderAI(pCreature);
 }
-
 
 void AddSC_boss_jeklik()
 {
