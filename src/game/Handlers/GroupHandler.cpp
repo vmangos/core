@@ -58,9 +58,9 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recv_data)
     std::string membername;
     recv_data >> membername;
 
-    // attempt add selected player
+    // Attempt add selected player
 
-    // cheating
+    // Cheating
     if (!normalizePlayerName(membername))
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
@@ -69,22 +69,23 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recv_data)
 
     Player *player = sObjectMgr.GetPlayer(membername.c_str());
 
-    // no player
+    // No player
     if (!player)
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_BAD_PLAYER_NAME_S);
         return;
     }
 
-    // can't group with
-    if (!sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP) && GetPlayer()->GetTeam() != player->GetTeam())
+    // Can't group with
+    if (!GetPlayer()->isGameMaster() && !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_GROUP) && GetPlayer()->GetTeam() != player->GetTeam())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_PLAYER_WRONG_FACTION);
         return;
     }
+
     if (GetPlayer()->GetMapId() > 1 && GetPlayer()->GetInstanceId() && player->GetInstanceId() && GetPlayer()->GetInstanceId() != player->GetInstanceId() && GetPlayer()->GetMapId() == player->GetMapId())
-        return; // 1.12: any error message ... ?
-    // just ignore us
+        return;
+    // Just ignore us
     if (player->GetSocial()->HasIgnore(GetPlayer()->GetObjectGuid()))
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_IGNORING_YOU_S);
@@ -98,7 +99,7 @@ void WorldSession::HandleGroupInviteOpcode(WorldPacket & recv_data)
     Group *group2 = player->GetGroup();
     if (group2 && group2->isBGGroup())
         group2 = player->GetOriginalGroup();
-    // player already in another group or invited
+    // Player already in another group or invited
     if (group2 || player->GetGroupInvite())
     {
         SendPartyResult(PARTY_OP_INVITE, membername, ERR_ALREADY_IN_GROUP_S);
