@@ -1047,8 +1047,8 @@ bool AreaTrigger_at_orb_of_command(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
     if (pAt->id == AT_ORB_OF_COMMAND)
     {
-        Corpse *corpse = pPlayer->GetCorpse();
-        if (pPlayer && pPlayer->isDead() && pPlayer->GetQuestRewardStatus(7761) && corpse->GetMapId() == 469)
+        Corpse *pCorpse = pPlayer->GetCorpse();
+        if (pPlayer && pPlayer->isDead() && pPlayer->GetQuestRewardStatus(7761) && pCorpse && (pCorpse->GetMapId() == 469))
         {
             pPlayer->ResurrectPlayer(0.5f);
             pPlayer->SpawnCorpseBones();
