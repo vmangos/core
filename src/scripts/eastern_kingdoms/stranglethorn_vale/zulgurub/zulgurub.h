@@ -22,6 +22,7 @@ enum
     NPC_HAKARI_SHADOWCASTER = 11338,
     NPC_RAZZASHI_BROODWIDOW = 11370,
     NPC_GAHZRANKA           = 15114,
+    NPC_JEKLIK              = 14517,
 
     TYPE_ARLOKK             = 1,
     TYPE_JEKLIK             = 2,
