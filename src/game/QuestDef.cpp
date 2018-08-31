@@ -223,8 +223,5 @@ bool Quest::IsAllowedInRaid() const
     if (m_QuestFlags & QUEST_FLAGS_RAID)
         return true;
 
-    if ((sWorld.GetWowPatch() < WOW_PATCH_103) || sWorld.getConfig(CONFIG_BOOL_QUEST_IGNORE_RAID))
-        return true;
-    
-    return false;
+    return ((sWorld.GetWowPatch() < WOW_PATCH_103) || sWorld.getConfig(CONFIG_BOOL_QUEST_IGNORE_RAID));
 }
