@@ -1295,6 +1295,38 @@ void ObjectMgr::CheckCreatureTemplates()
             else
                 const_cast<CreatureInfo*>(cInfo)->scale = DEFAULT_OBJECT_SCALE;
         }
+
+        if (cInfo->ExperienceMultiplier < 0.0f)
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has negative experience multiplier (%f)", cInfo->Entry, cInfo->ExperienceMultiplier);
+            const_cast<CreatureInfo*>(cInfo)->ExperienceMultiplier = 1.0f;
+        }
+
+        if (cInfo->Detection < 0.0f)
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has negative detection distance (%f)", cInfo->Entry, cInfo->Detection);
+            const_cast<CreatureInfo*>(cInfo)->Detection = 20.0f;
+        }
+
+        if (cInfo->CallForHelp < 0.0f)
+        {
+            sLog.outErrorDb("Creature (Entry: %u) has negative call for help radius (%f)", cInfo->Entry, cInfo->CallForHelp);
+            const_cast<CreatureInfo*>(cInfo)->CallForHelp = 5.0f;
+        }
+
+        if (cInfo->Leash)
+        {
+            if (cInfo->Leash < 0.0f)
+            {
+                sLog.outErrorDb("Creature (Entry: %u) has negative leash distance (%f)", cInfo->Entry, cInfo->Leash);
+                const_cast<CreatureInfo*>(cInfo)->Leash = 0.0f;
+            }
+            else if (cInfo->Leash < cInfo->Detection)
+            {
+                sLog.outErrorDb("Creature (Entry: %u) has leash distance below detection distance (%f)", cInfo->Entry, cInfo->Leash);
+                const_cast<CreatureInfo*>(cInfo)->Leash = 0.0f;
+            }
+        }
     }
 }
 void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* table, char const* guidEntryStr)

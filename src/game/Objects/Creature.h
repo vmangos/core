@@ -106,7 +106,11 @@ struct CreatureInfo
     float   speed_walk;
     float   speed_run;
     float   scale;
+    float   Detection;                                      // Detection Range for Line of Sight aggro
+    float   CallForHelp;                                    // Radius for combat assistance call
+    float   Leash;                                          // Hard limit on allowed chase distance
     uint32  rank;
+    float   ExperienceMultiplier;
     float   mindmg;
     float   maxdmg;
     uint32  dmgschool;
@@ -666,6 +670,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         uint32 m_spells[CREATURE_MAX_SPELLS];
 
         float GetAttackDistance(Unit const* pl) const;
+        float GetDetectionRange() const { return m_detectionDistance; }
 
         void SendAIReaction(AiReaction reactionType);
 
@@ -860,6 +865,16 @@ class MANGOS_DLL_SPEC Creature : public Unit
             m_callForHelpDist = dist;
         }
 
+        void SetLeashDistance(float dist)
+        {
+            m_leashDistance = dist;
+        }
+
+        void SetDetectionDistance(float dist)
+        {
+            m_detectionDistance = dist;
+        }
+
         // (msecs)timer used for group loot
         uint32 GetGroupLootTimer() { return m_groupLootTimer; }
 
@@ -878,8 +893,6 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         // vendor items
         VendorItemCounts m_vendorItemCounts;
-
-        void _RealtimeSetCreatureInfo();
 
         static float _GetHealthMod(int32 Rank);
         static float _GetDamageMod(int32 Rank);
@@ -934,13 +947,14 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         Position m_summonPos;
 
-        float m_CombatDistance;
         uint32 _lastDamageTakenForEvade;
         // Used to compute XP.
         uint32 _playerDamageTaken;
         uint32 _nonPlayerDamageTaken;
         
         float m_callForHelpDist;
+        float m_leashDistance;
+        float m_detectionDistance;
 
         bool _isEscortable;
 

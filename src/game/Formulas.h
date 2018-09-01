@@ -99,33 +99,41 @@ namespace MaNGOS
 
         inline uint32 Gain(Player *pl, Unit *u)
         {
-            // Some objects and totems are marked as pets, need some aditional checks
-            bool isPet = u->GetTypeId() == TYPEID_UNIT && u->IsPet() &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
-                ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
-                ((Creature*)u)->GetCreatureInfo()->minhealth > 50;
-
-            if (u->GetTypeId()==TYPEID_UNIT && (
-                (u->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||
-                (((Creature*)u)->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL) ||
-                u->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD)))
-                return 0;
-
-            uint32 xp_gain= BaseGain(pl->getLevel(), u->getLevel());
-            if (!xp_gain)
-                return 0;
-
-            if (Creature* crea = u->ToCreature())
+            if (Creature* pCreature = ToCreature(u))
             {
-                if (crea->IsElite())
+                // Some objects and totems are marked as pets, need some aditional checks
+                bool isPet = pCreature->IsPet() &&
+                    pCreature->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
+                    pCreature->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
+                    pCreature->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
+                    pCreature->GetCreatureInfo()->minhealth > 50;
+
+                if (pCreature->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet)
+                    return 0;
+
+                if (pCreature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_NO_XP_AT_KILL)
+                    return 0;
+
+                if (pCreature->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NO_KILL_REWARD))
+                    return 0;
+
+                uint32 xp_gain = BaseGain(pl->getLevel(), u->getLevel());
+                if (!xp_gain)
+                    return 0;
+
+                if (pCreature->IsElite())
                     xp_gain *= 2;
+
                 if (isPet)
                     xp_gain *= 0.75f;
-                xp_gain *= crea->GetXPModifierDueToDamageOrigin();
-            }
 
-            return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
+                xp_gain *= pCreature->GetCreatureInfo()->ExperienceMultiplier;
+                xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
+
+                return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
+            }
+            
+            return 0;
         }
 
         inline uint32 PetGain(Pet *pet, Unit *u)

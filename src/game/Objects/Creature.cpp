@@ -177,8 +177,8 @@ Creature::Creature(CreatureSubtype subtype) :
     m_meleeDamageSchoolMask(SPELL_SCHOOL_MASK_NORMAL), m_originalEntry(0), _creatureGroup(nullptr),
     m_combatStartX(0.0f), m_combatStartY(0.0f), m_combatStartZ(0.0f),
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
-    m_CombatDistance(0.0f), _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
-    m_AI_InitializeOnRespawn(false), m_callForHelpDist(5.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
+    _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
+    m_AI_InitializeOnRespawn(false), m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
     _isEscortable(false), m_reputationId(-1)
 {
     m_regenTimer = 200;
@@ -559,6 +559,10 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = GetCreatureInfo()->spells[i];
 
+    SetCallForHelpDist(GetCreatureInfo()->CallForHelp);
+    SetLeashDistance(GetCreatureInfo()->Leash);
+    SetDetectionDistance(GetCreatureInfo()->Detection);
+
     // if eventData set then event active and need apply spell_start
     if (eventData)
         ApplyGameEventSpells(eventData, true);
@@ -794,17 +798,24 @@ void Creature::Update(uint32 update_diff, uint32 diff)
             else
                 m_TargetNotReachableTimer = 0;
 
-            if (m_combatState && GetCombatTime(false) > sWorld.getConfig(CONFIG_UINT32_LONGCOMBAT))
+            bool leash = false;
+            if (m_combatState)
             {
-                LogLongCombat();
-                ResetCombatTime(true);
-            }
+                if (GetCombatTime(false) > sWorld.getConfig(CONFIG_UINT32_LONGCOMBAT))
+                {
+                    LogLongCombat();
+                    ResetCombatTime(true);
+                }
 
-            // Raid bosses do a periodic combat pulse
-            if (m_combatState && m_combatWithZoneState)
-            {
                 if (WorldTimer::tickTime() % 3000 <= update_diff)
-                    SetInCombatWithZone(false);
+                {
+                    // Leash prevents mobs from chasing any further than specified range
+                    if (m_leashDistance && !IsWithinDist3d(m_combatStartX, m_combatStartY, m_combatStartZ, m_leashDistance))
+                        leash = true;
+                    // Raid bosses do a periodic combat pulse
+                    else if (m_combatWithZoneState)
+                        SetInCombatWithZone(false);
+                }
             }
 
             if (AI())
@@ -814,7 +825,7 @@ void Creature::Update(uint32 update_diff, uint32 diff)
                 try
                 {
                     // Reset after 24 secs
-                    if (!GetMap()->IsDungeon() && m_TargetNotReachableTimer > 24000)
+                    if (leash || (!GetMap()->IsDungeon() && m_TargetNotReachableTimer > 24000))
                         AI()->EnterEvadeMode();
                     else if (!IsEvadeBecauseTargetNotReachable())
                         AI()->UpdateAI(diff);   // AI not react good at real update delays (while freeze in non-active part of map)
@@ -1749,12 +1760,12 @@ void Creature::DeleteFromDB(uint32 lowguid, CreatureData const* data)
 
 float Creature::GetAttackDistance(Unit const* pl) const
 {
-    float aggroRate = sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
+    float const aggroRate = sWorld.getConfig(CONFIG_FLOAT_RATE_CREATURE_AGGRO);
     if (aggroRate == 0)
         return 0.0f;
 
-    uint32 playerlevel   = pl->GetLevelForTarget(this);
-    uint32 creaturelevel = GetLevelForTarget(pl);
+    uint32 const playerlevel   = pl->GetLevelForTarget(this);
+    uint32 const creaturelevel = GetLevelForTarget(pl);
 
     int32 leveldif       = int32(playerlevel) - int32(creaturelevel);
 
@@ -1763,31 +1774,31 @@ float Creature::GetAttackDistance(Unit const* pl) const
         leveldif = -25;
 
     // "The aggro radius of a mob having the same level as the player is roughly 20 yards"
-    float RetDistance = 20;
+    float const detectionRange = GetDetectionRange();
+    float finalDistance = detectionRange;
+    if (finalDistance < 1)
+        return 0.0f;
 
     // "Aggro Radius varies with level difference at a rate of roughly 1 yard/level"
     // radius grow if playlevel < creaturelevel
-    RetDistance -= (float)leveldif;
+    finalDistance -= (float)leveldif;
 
     // detect range auras
     // SPELL_AURA_MOD_DETECT_RANGE: Par exemple [2908 - Apaiser les animaux]. Affecte uniquement si niveau < 70 par exemple (rang 3).
     AuraList const& nModDetectRange = GetAurasByType(SPELL_AURA_MOD_DETECT_RANGE);
     for (AuraList::const_iterator i = nModDetectRange.begin(); i != nModDetectRange.end(); ++i)
         if ((*i)->GetSpellProto()->MaxTargetLevel >= getLevel())
-            RetDistance += (*i)->GetModifier()->m_amount;
+            finalDistance += (*i)->GetModifier()->m_amount;
 
     // detected range auras
-    RetDistance += pl->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
+    finalDistance += pl->GetTotalAuraModifier(SPELL_AURA_MOD_DETECTED_RANGE);
 
     // "Minimum Aggro Radius for a mob seems to be combat range (5 yards)"
-    if (RetDistance < 5)
-        RetDistance = 5;
+    float const minDistance = std::min(detectionRange, 5.0f);
+    if (finalDistance < minDistance)
+        finalDistance = minDistance;
 
-    // Youfie <Nostalrius> Baron Rivendare
-    if ((GetEntry() == 10440))
-        RetDistance = 2;
-
-    return (RetDistance * aggroRate);
+    return (finalDistance * aggroRate);
 }
 
 void Creature::SetDeathState(DeathState s)
@@ -3703,7 +3714,7 @@ bool Creature::canCreatureAttack(Unit const *pVictim, bool force) const
         return true;
 
     //Use AttackDistance in distance check if threat radius is lower. This prevents creature bounce in and out of combat every update tick.
-    float dist = std::max(GetAttackDistance(pVictim), 150.0f) + m_CombatDistance;
+    float dist = std::max(GetAttackDistance(pVictim), 150.0f);
 
     if (Unit *unit = GetCharmerOrOwner())
     {
@@ -3740,7 +3751,7 @@ bool Creature::canStartAttack(Unit const* who, bool force) const
     if (IsCivilian())
         return false;
 
-    if (!CanFly() && (GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE + m_CombatDistance))
+    if (!CanFly() && (GetDistanceZ(who) > CREATURE_Z_ATTACK_RANGE))
         //|| who->IsControlledByPlayer() && who->IsFlying()))
         // we cannot check flying for other creatures, too much map/vmap calculation
         // TODO: should switch to range attack
@@ -3756,7 +3767,7 @@ bool Creature::canStartAttack(Unit const* who, bool force) const
                 if (IsWithinDistInMap(victim, 10.0f))
                     force = true;
 
-        if (!force && (IsNeutralToAll() || !IsWithinDistInMap(who, GetAttackDistance(who) + m_CombatDistance)))
+        if (!force && (IsNeutralToAll() || !IsWithinDistInMap(who, GetAttackDistance(who))))
             return false;
     }
 

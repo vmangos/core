@@ -76,9 +76,6 @@ struct mob_rottingMaggotAI : public ScriptedAI
         isDiseased(isDiseased)
     {
         m_creature->SetNoCallAssistance(true);
-        // call for help radius includes bounding radius, so we need this tiny to not chain aggro
-        // the whole damn room
-        m_creature->SetCallForHelpDist(0.5f);
         Reset();
     }
     const bool isDiseased;
@@ -143,7 +140,6 @@ struct mob_eyeStalkAI : public ScriptedAI
     mob_eyeStalkAI(Creature* pCreature) :
         ScriptedAI(pCreature)
     {
-        m_creature->SetCallForHelpDist(1.0f);
         m_creature->SetNoCallAssistance(true);
         SetCombatMovement(false);
         timeSinceSpawn = 0;
