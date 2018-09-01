@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/lh-server/core.svg?branch=development)](https://travis-ci.org/lh-server/core)
+[![Build Status](https://travis-ci.com/vmangos/core.svg?branch=development)](https://travis-ci.com/vmangos/core)
 
 # Progressive Vanilla
 This project is an independent continuation of the Elysium / LightsHope codebases, focused on delivering the most complete and accurate content progression system possible, including support for the patch appropriate game clients.

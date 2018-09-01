@@ -127,12 +127,6 @@ void WorldSession::HandleGMTicketCreateOpcode(WorldPacket& recvData)
         if (ticketType >= GMTICKET_MAX)
             return;
 
-        ChatHandler(this).SendSysMessage("NOTE: Game Masters DO NOT handle bug reports!");
-        ChatHandler(this).SendSysMessage("Please use our bugtracker and provide sources if possible:");
-        ChatHandler(this).SendSysMessage("https://github.com/LightsHope/server");
-        ChatHandler(this).SendSysMessage("For quicker & casual support, visit our forums:");
-        ChatHandler(this).SendSysMessage("https://forum.lightshope.org/viewforum.php?f=9");
-
         ticket = new GmTicket(GetPlayer());
         ticket->SetPosition(mapId, x, y, z);
         ticket->SetMessage(ticketText);
