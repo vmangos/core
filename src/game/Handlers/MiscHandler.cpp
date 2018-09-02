@@ -854,6 +854,19 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
             if (Corpse *corpse = pl->GetCorpse())
                 corpseMapId = corpse->GetMapId();
 
+            // Special case prior Patch 1.3 to revive your corpse if dead in Molten Core
+            if (sWorld.GetWowPatch() <= WOW_PATCH_102)
+            {
+                if (corpseMapId == 409 && Trigger_ID == 1466)
+                {
+                    pl->ResurrectPlayer(0.5f);
+                    pl->SpawnCorpseBones();
+                    GetPlayer()->TeleportTo(230, 458.32f, 26.52f, -70.67f, 4.95f); // Blackrock Depths
+                    // GetPlayer()->TeleportTo(409, 1082.04f, -474.596f, -107.762f, 5.02623f); // Molten Core
+                    return;
+                }
+            }
+
             // check back way from corpse to entrance
             uint32 instance_map = corpseMapId;
             do
