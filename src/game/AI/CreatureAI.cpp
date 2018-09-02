@@ -185,12 +185,20 @@ void CreatureAI::SetSpellsTemplate(const CreatureSpellsTemplate *SpellsTemplate)
 
 void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
 {
+    bool bCasted = false;
     for (auto & spell : m_CreatureSpells)
     {
         if (spell.cooldown <= uiDiff)
         {
-            if (m_creature->IsNonMeleeSpellCasted(false) && !(spell.castFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS)))
+            // Prevent casting multiple spells in the same update. Only update timers.
+            if (bCasted)
                 continue;
+
+            if (m_creature->IsNonMeleeSpellCasted(false) && !(spell.castFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS)))
+            {
+                spell.cooldown = 200;
+                continue;
+            } 
 
             // Checked on startup.
             const SpellEntry* pSpellInfo = sSpellMgr.GetSpellEntry(spell.spellId);
@@ -203,6 +211,7 @@ void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
             {
                 case SPELL_CAST_OK:
                 {
+                    bCasted = true;
                     spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
 
                     if (spell.castFlags & CF_MAIN_RANGED_SPELL)
@@ -228,11 +237,17 @@ void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
                 {
                     // Chance roll failed, so we reset cooldown.
                     spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
-                    // no break
+                    if (spell.castFlags & CF_MAIN_RANGED_SPELL)
+                    {
+                        SetCombatMovement(true);
+                        SetMeleeAttack(true);
+                    }
+                    break;
                 }
                 default:
                 {
                     // other error
+                    spell.cooldown = 500;
                     if (spell.castFlags & CF_MAIN_RANGED_SPELL)
                     {
                         SetCombatMovement(true);
