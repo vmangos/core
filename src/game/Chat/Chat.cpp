@@ -1713,9 +1713,6 @@ bool ChatHandler::ParseCommands(const char* text)
     MANGOS_ASSERT(text);
     MANGOS_ASSERT(*text);
 
-    if (m_session->GetSecurity() == SEC_PLAYER && !sWorld.getConfig(CONFIG_BOOL_PLAYER_COMMANDS))
-        return false;
-
     /// chat case (.command or !command format)
     if (m_session)
     {
@@ -1724,6 +1721,9 @@ bool ChatHandler::ParseCommands(const char* text)
 
         /// ignore single . and ! in line
         if (strlen(text) < 2)
+            return false;
+
+        if (m_session->GetSecurity() == SEC_PLAYER && !sWorld.getConfig(CONFIG_BOOL_PLAYER_COMMANDS))
             return false;
     }
 
