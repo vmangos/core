@@ -237,6 +237,11 @@ UPDATE `creature_loot_template` SET `condition_id`=4215 WHERE `item` IN (16645, 
 INSERT INTO `gameobject_loot_template` (`entry`, `item`, `ChanceOrQuestChance`, `groupid`, `mincountOrRef`, `maxcount`, `condition_id`, `patch_min`, `patch_max`) VALUES (5426, 8426, 13, 0, 1, 1, 0, 0, 10);
 UPDATE `gameobject_template` SET `data1`=5426 WHERE `entry`=123330;
 
+-- Items added in 1.7 and 1.9.
+INSERT INTO `forbidden_items` VALUES (19768, 4, 1);
+INSERT INTO `forbidden_items` VALUES (19767, 4, 1);
+INSERT INTO `forbidden_items` VALUES (21830, 6, 1);
+
 
 -- End of migration.
 END IF;
