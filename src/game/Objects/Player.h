@@ -1494,6 +1494,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         void AddSpellMod(SpellModifier* mod, bool apply);
         void SendSpellMod(SpellModifier const* mod);
+        bool HasInstantCastingSpellMod(SpellEntry const *spellInfo);
         bool IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mod, Spell* spell = NULL);
         template <class T> T ApplySpellMod(uint32 spellId, SpellModOp op, T &basevalue, Spell* spell = NULL);
         SpellModifier* GetSpellMod(SpellModOp op, uint32 spellId) const;
@@ -2570,7 +2571,13 @@ template <class T> T Player::ApplySpellMod(uint32 spellId, SpellModOp op, T &bas
             totalpct += mod->value;
         }
 
-        DropModCharge(mod, spell);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+        // - Nature's Grace: You will no longer consume this effect when casting a 
+        //   spell which was made instant by Nature's Swiftness.
+        if (!((mod->op == SPELLMOD_CASTING_TIME) && (mod->type == SPELLMOD_FLAT) && HasInstantCastingSpellMod(spellInfo)))
+#endif
+            DropModCharge(mod, spell);
 
         // Nostalrius : fix ecorce (22812 - +1sec incant) + rapidite nature (17116 - sorts instant) = 0sec de cast
         if (mod->op == SPELLMOD_CASTING_TIME && mod->type == SPELLMOD_PCT && mod->value == -100)

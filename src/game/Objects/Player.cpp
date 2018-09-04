@@ -17048,6 +17048,16 @@ void Player::RemovePetActionBar()
     SendDirectMessage(&data);
 }
 
+bool Player::HasInstantCastingSpellMod(SpellEntry const *spellInfo)
+{
+    for (const auto& mod : m_spellMods[SPELLMOD_CASTING_TIME])
+    {
+        if ((mod->type == SPELLMOD_PCT) && (mod->value <= -100) && mod->isAffectedOnSpell(spellInfo))
+            return true;
+    }
+    return false;
+}
+
 bool Player::IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mod, Spell* spell)
 {
     if (!mod || !spellInfo)
