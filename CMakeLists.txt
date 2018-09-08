@@ -20,12 +20,6 @@ project(MaNGOS)
 # CMake policies
 cmake_minimum_required(VERSION 3.0)
 
-# CMake policies (can not be handled elsewhere)
-cmake_policy(SET CMP0026 OLD)
-if(POLICY CMP0043)
-  cmake_policy(SET CMP0043 OLD) # Disable 'Ignore COMPILE_DEFINITIONS_<Config> properties'
-endif()
-
 set(CMAKE_MODULE_PATH
   ${CMAKE_MODULE_PATH}
   ${CMAKE_SOURCE_DIR}/cmake
