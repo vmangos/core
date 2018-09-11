@@ -11725,8 +11725,8 @@ bool Unit::HasSpellCategoryCooldown(uint32 cat) const
 
 void Unit::RemoveSpellCategoryCooldown(uint32 cat, bool update /* = false */)
 {
-    SpellCategoryStore::const_iterator ct = sSpellCategoryStore.find(cat);
-    if (ct == sSpellCategoryStore.end())
+    SpellCategoriesStore::const_iterator ct = sSpellCategoriesStore.find(cat);
+    if (ct == sSpellCategoriesStore.end())
         return;
 
     const SpellCategorySet& ct_set = ct->second;

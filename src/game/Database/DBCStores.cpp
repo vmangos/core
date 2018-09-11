@@ -89,7 +89,9 @@ DBCStorage <SkillRaceClassInfoEntry> sSkillRaceClassInfoStore(SkillRaceClassInfo
 SkillRaceClassInfoMap SkillRaceClassInfoBySkill;
 
 DBCStorage <SpellItemEnchantmentEntry> sSpellItemEnchantmentStore(SpellItemEnchantmentfmt);
-SpellCategoryStore sSpellCategoryStore;
+DBCStorage <SpellCategoryEntry> sSpellCategoryStore(SpellCategoryfmt);
+
+SpellCategoriesStore sSpellCategoriesStore;
 PetFamilySpellsStore sPetFamilySpellsStore;
 
 DBCStorage <SpellCastTimesEntry> sSpellCastTimesStore(SpellCastTimefmt);
@@ -194,7 +196,7 @@ void LoadDBCStores(const std::string& dataPath)
 {
     std::string dbcPath = dataPath + "dbc/";
 
-    const uint32 DBCFilesCount = 41;
+    const uint32 DBCFilesCount = 42;
 
     BarGoLink bar(DBCFilesCount);
 
@@ -236,7 +238,7 @@ void LoadDBCStores(const std::string& dataPath)
     {
         SpellEntry const * spell = sSpellMgr.GetSpellEntry(i);
         if (spell && spell->Category)
-            sSpellCategoryStore[spell->Category].insert(i);
+            sSpellCategoriesStore[spell->Category].insert(i);
     }
 
     for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
@@ -265,6 +267,7 @@ void LoadDBCStores(const std::string& dataPath)
         }
     }
 
+    LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSpellCategoryStore,       dbcPath, "SpellCategory.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSpellCastTimesStore,      dbcPath, "SpellCastTimes.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSpellDurationStore,       dbcPath, "SpellDuration.dbc");
     LoadDBC(availableDbcLocales, bar, bad_dbc_files, sSpellFocusObjectStore,    dbcPath, "SpellFocusObject.dbc");

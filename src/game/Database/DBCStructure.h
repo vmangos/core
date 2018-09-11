@@ -516,6 +516,12 @@ struct SpellFocusObjectEntry
                                                             // 9 string flags
 };
 
+struct SpellCategoryEntry
+{
+    uint32    ID;                                           //          m_ID
+    uint32    Flags;                                        //          m_flags
+};
+
 struct SpellRadiusEntry
 {
     uint32    ID;                                           //          m_ID
@@ -704,7 +710,7 @@ struct WorldSafeLocsEntry
 #endif
 
 typedef std::set<uint32> SpellCategorySet;
-typedef std::map<uint32,SpellCategorySet > SpellCategoryStore;
+typedef std::map<uint32,SpellCategorySet > SpellCategoriesStore;
 typedef std::set<uint32> PetFamilySpellsSet;
 typedef std::map<uint32,PetFamilySpellsSet > PetFamilySpellsStore;
 
