@@ -640,7 +640,7 @@ struct CalcDamageInfo
 struct SpellNonMeleeDamage{
     SpellNonMeleeDamage(Unit *_attacker, Unit *_target, uint32 _SpellID, SpellSchools _school)
         : target(_target), attacker(_attacker), SpellID(_SpellID), damage(0), school(_school),
-        absorb(0), resist(0), physicalLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
+        absorb(0), resist(0), periodicLog(false), unused(false), blocked(0), HitInfo(0), spell(nullptr)
     {}
 
     Unit   *target;
@@ -650,7 +650,7 @@ struct SpellNonMeleeDamage{
     SpellSchools school;
     uint32 absorb;
     uint32 resist;
-    bool   physicalLog;
+    bool   periodicLog;
     bool   unused;
     uint32 blocked;
     uint32 HitInfo;
@@ -1333,7 +1333,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount);
         void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log);
-        void SendSpellNonMeleeDamageLog(Unit *target,uint32 SpellID, uint32 Damage, SpellSchoolMask damageSchoolMask, uint32 AbsorbedDamage, uint32 Resist, bool PhysicalDamage, uint32 Blocked, bool CriticalHit = false);
+        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, uint32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE);
         void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
 
