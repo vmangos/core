@@ -27,19 +27,14 @@ struct boss_king_gordokAI : public ScriptedAI
     uint32 m_uiBerserkerCharge_Timer;
     uint32 m_uiSunderArmor_Timer;
     uint32 m_uiPhase;
-    
-    uint32 m_uiLinkCheckTimer;
-    
-    
+
     void Reset()
     {
         m_uiWarStomp_Timer        = urand(7000, 8000);
         m_uiMortalStrike_Timer    = urand(15000, 25000);
         m_uiSunderArmor_Timer     = urand(4000, 8000);
         m_uiBerserkerCharge_Timer = urand(9000, 12000);
-        m_uiPhase = 0;
-              
-        m_uiLinkCheckTimer = 2500;
+        m_uiPhase                 = 0;
     }
 
     void Aggro(Unit* pWho)
@@ -101,20 +96,6 @@ struct boss_king_gordokAI : public ScriptedAI
             m_uiBerserkerCharge_Timer -= uiDiff;
 
         DoMeleeAttackIfReady();
-        
-        // Prevent splitting King from the Observer
-        if (m_uiLinkCheckTimer < uiDiff)
-        {
-            if (Creature* pChorush = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_CHORUSH)))
-            {
-                if (pChorush->isAlive() && !pChorush->isInCombat())
-                    pChorush->AI()->AttackStart(m_creature->getVictim());
-            }
-            m_uiLinkCheckTimer = 2500;
-        }
-        else
-            m_uiLinkCheckTimer -= uiDiff;
-            
     }
 };
 
@@ -137,7 +118,7 @@ enum
     SPELL_HEALING_WAVE      = 15982, // // m_uiSpellTimers[3]
     SPELL_LIGHTNING_BOLT    = 15234, // m_uiSpellTimers[0]
 
-    // Prist
+    // Priest
     SPELL_MIND_BLAST        = 17194, // m_uiSpellTimers[0]
     SPELL_HEAL              = 22883, // m_uiSpellTimers[3]
     SPELL_POWER_WORD_SHIELD = 17139, // m_uiSpellTimers[1]
@@ -171,8 +152,6 @@ struct boss_chorushAI : public ScriptedAI
     uint8 m_uiEquipment;
     uint32 m_uiSpellTimers[MAX_SPELLS];
     bool m_bInMeele;
-    
-    uint32 m_uiLinkCheckTimer;
 
     void EnterCombat(Unit* pWho)
     {
@@ -181,9 +160,9 @@ struct boss_chorushAI : public ScriptedAI
 
     void Reset()
     {
-        m_uiLinkCheckTimer = 2500;
         m_uiEquipment = 0;
         m_bInMeele = true;
+
         if (pInstance)
             m_uiEquipment = pInstance->GetChoRushEquipment();
 
@@ -227,19 +206,6 @@ struct boss_chorushAI : public ScriptedAI
         }
 
         DoMeleeAttackIfReady();
-        
-        // Prevent splitting Observer from the King
-        if (m_uiLinkCheckTimer < uiDiff)
-        {
-            if (Creature* pKing = m_creature->GetMap()->GetCreature(pInstance->GetData64(NPC_KING_GORDOK)))
-            {
-                if (!pKing->isInCombat())
-                    pKing->AI()->AttackStart(m_creature->getVictim());
-            }
-            m_uiLinkCheckTimer = 2500;
-        }
-        else
-            m_uiLinkCheckTimer -= uiDiff;
     }
 };
 
@@ -280,15 +246,24 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->getAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+        {
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
+            {
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
                 {
-                     m_bMeleeAttackers = true;
-                     break;
+                    m_bMeleeAttackers = true;
+                    break;
                 }
+            }
+        }
+
         if (m_bMeleeAttackers)
+        {
             if (DoCastSpellIfCan(m_creature, SPELL_ARCANE_EXPLOSION) == CAST_OK)
+            {
                 m_uiSpellTimers[1] = (m_bInMeele ? urand(9000, 13000) : urand(15000, 25000));
+            }
+        }
     } 
     else 
         m_uiSpellTimers[1] -= uiDiff;
@@ -300,15 +275,24 @@ void boss_chorushAI::UpdateAIMage(const uint32 uiDiff)
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->getAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+        {
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
+            {
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
                 {
-                     m_bMeleeAttackers = true;
-                     break;
+                    m_bMeleeAttackers = true;
+                    break;
                 }
+            }
+        }
+
         if (m_bMeleeAttackers)
+        {
             if (DoCastSpellIfCan(m_creature, SPELL_FROST_NOVA) == CAST_OK)
+            {
                 m_uiSpellTimers[2] = urand(20000, 30000);
+            }
+        }
     } 
     else 
         m_uiSpellTimers[2] -= uiDiff;
@@ -346,15 +330,24 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->getAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+        {
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
+            {
                 if (m_creature->IsInRange(attacker, 0.0f, 6.0f, false)) 
                 {
-                     m_bMeleeAttackers = true;
-                     break;
+                    m_bMeleeAttackers = true;
+                    break;
                 }
+            }
+        }
+
         if (m_bMeleeAttackers)
+        {
             if (DoCastSpellIfCan(m_creature, SPELL_EARTHGRAB_TOTEM) == CAST_OK)
+            {
                 m_uiSpellTimers[2] = urand(20000, 30000);
+            }
+        }
     } 
     else 
         m_uiSpellTimers[2] -= uiDiff;
@@ -364,7 +357,7 @@ void boss_chorushAI::UpdateAIShaman(const uint32 uiDiff)
     {
         Unit* pTarget = NULL;
         if (pTarget = m_creature->DoSelectLowestHpFriendly(40.0f, 15000));
-        else if  (m_creature->GetHealthPercent() < 50.0f)
+        else if (m_creature->GetHealthPercent() < 50.0f)
             pTarget = m_creature;
 
         if (pTarget)
@@ -424,7 +417,7 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
     {
         Unit* pTarget = NULL;
         if (pTarget = m_creature->DoSelectLowestHpFriendly(40.0f, 15000));
-        else if  (m_creature->GetHealthPercent() < 50.0f)
+        else if (m_creature->GetHealthPercent() < 50.0f)
             pTarget = m_creature;
 
         if (pTarget)
@@ -461,15 +454,24 @@ void boss_chorushAI::UpdateAIPrist(const uint32 uiDiff)
         bool m_bMeleeAttackers = false;
         Unit::AttackerSet attackers = m_creature->getAttackers();
         for (Unit::AttackerSet::iterator itr = attackers.begin(); itr != attackers.end(); ++itr)
+        {
             if (Unit* attacker = m_creature->GetMap()->GetUnit((*itr)->GetGUID()))
+            {
                 if (m_creature->IsInRange(attacker, 0.0f, 8.0f, false)) 
                 {
-                     m_bMeleeAttackers = true;
-                     break;
+                    m_bMeleeAttackers = true;
+                    break;
                 }
+            }
+        }
+
         if (m_bMeleeAttackers)
+        {
             if (DoCastSpellIfCan(m_creature, SPELL_PSYCHIC_SCREAM) == CAST_OK)
+            {
                 m_uiSpellTimers[2] = urand(15000, 20000);
+            }
+        }
     } 
     else 
         m_uiSpellTimers[2] -= uiDiff;
