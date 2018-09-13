@@ -4572,6 +4572,15 @@ void SpellMgr::LoadSpells()
         //spell->RequiredAuraVision = fields[173].GetUInt32();
         spell->Custom = fields[174].GetUInt32();
 
+        // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+        for (int i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; ++i)
+        {
+            if (IsEffectAppliesAura(spell->Effect[i]) && (spell->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED))
+                spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
+        }
+#endif
+
         spell->InitCachedValues();
         mSpellEntryMap[spellId] = std::move(spell);
 

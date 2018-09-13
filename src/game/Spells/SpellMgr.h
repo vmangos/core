@@ -121,24 +121,30 @@ inline bool IsSpellHaveEffect(SpellEntry const *spellInfo, SpellEffects effect)
     return false;
 }
 
+inline bool IsEffectAppliesAura(uint32 effectName)
+{
+    switch (effectName)
+    {
+        case SPELL_EFFECT_APPLY_AURA:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+        case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+        case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+        case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+        case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
+            return true;
+    }
+
+    return false;
+}
+
 inline bool IsSpellAppliesAura(SpellEntry const *spellInfo, uint32 effectMask = ((1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)))
 {
     for(int i = 0; i < MAX_EFFECT_INDEX; ++i)
     {
         if (effectMask & (1 << i))
         {
-            switch (spellInfo->Effect[i])
-            {
-                case SPELL_EFFECT_APPLY_AURA:
-                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-                case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-                case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-                case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-                case SPELL_EFFECT_APPLY_AREA_AURA_ENEMY:
-                    if (spellInfo->EffectApplyAuraName[i])
-                        return true;
-                    break;
-            }
+            if (IsEffectAppliesAura(spellInfo->Effect[i]) && spellInfo->EffectApplyAuraName[i])
+                return true;
         }
     }
     return false;
