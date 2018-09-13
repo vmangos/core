@@ -2528,6 +2528,12 @@ void ObjectMgr::LoadItemPrototypes()
                         const_cast<ItemPrototype*>(proto)->Spells[j].SpellId = 0;
                     }
                 }
+
+                if (proto->Spells[j].SpellCategory > 0)
+                {
+                    if (!sSpellCategoryStore.LookupEntry(proto->Spells[j].SpellCategory))
+                        sLog.outErrorDb("Item (Entry: %u) has wrong (not existing) spell category in spellcategory_%d (%u)", i, j + 1, proto->Spells[j].SpellCategory);
+                }
             }
         }
 
