@@ -18,6 +18,10 @@ UPDATE `creature_template` SET `MechanicImmuneMask`=646015775 WHERE `entry`=92;
 -- Fix spawn position of Bruiseweed.
 UPDATE `gameobject` SET `position_z`=3.727536 WHERE `guid`=3440;
 
+-- Kurinnaxx aggro range should be about 50 yards.
+-- https://www.youtube.com/watch?v=Y-ACkUA-Q3w
+UPDATE `creature_template` SET `Detection`=50 WHERE `entry`=15348;
+
 
 -- End of migration.
 END IF;
