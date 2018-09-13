@@ -52,12 +52,13 @@ class MANGOS_DLL_DECL ScriptedInstance : public InstanceData
         // Get a Player from map
         Player* GetPlayerInMap(bool bOnlyAlive = false, bool bCanBeGamemaster = true);
 
-	/// Wrapper for simulating map-wide text in this instance. It is expected that the Creature is stored in m_mNpcEntryGuidStore if loaded.
-	void DoOrSimulateScriptTextForThisInstance(int32 iTextEntry, uint32 uiCreatureEntry)
-	{
-	  // Prevent debug output in GetSingleCreatureFromStorage
-	  DoOrSimulateScriptTextForMap(iTextEntry, uiCreatureEntry, instance, GetSingleCreatureFromStorage(uiCreatureEntry, true));
-	}
+        /// Wrapper for simulating map-wide text in this instance. It is expected that the Creature is stored in m_mNpcEntryGuidStore if loaded.
+        void DoOrSimulateScriptTextForThisInstance(int32 iTextEntry, uint32 uiCreatureEntry)
+        {
+          // Prevent debug output in GetSingleCreatureFromStorage
+          DoOrSimulateScriptTextForMap(iTextEntry, uiCreatureEntry, instance, GetSingleCreatureFromStorage(uiCreatureEntry, true));
+        }
+
     protected:
         // Storage for GO-Guids and NPC-Guids
         typedef std::map<uint32, ObjectGuid> EntryGuidMap;

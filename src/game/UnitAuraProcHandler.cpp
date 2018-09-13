@@ -469,20 +469,20 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                             basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
                             triggered_spell_id = 12723; //Note this SS id deals 1 damage by itself (Cannot crit)
                         }
-                        else if (pVictim->GetHealthPercent() <= 20.0f)	// If only Target A is less or equal than 20% and target B is over 20% do Basic attack damage
+                        else if (pVictim->GetHealthPercent() <= 20.0f)    // If only Target A is less or equal than 20% and target B is over 20% do Basic attack damage
                         {
-                            triggered_spell_id = 26654;	// This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
+                            triggered_spell_id = 26654;    // This SS deals damage equal to AA also this spell ID can crit ?? Maybe this explains the rumor of SS criting since it only scales with spell crit ? = 5% crit.
                         }
                         else // Full damage on anything else (Shouldn't really ever be used) since execute can only be used less or equal than 20% anyway.
                         {
                             basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-                            triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
+                            triggered_spell_id = 12723;    //Note this SS id deals 1 damage by itself (Cannot crit)
                         }
                     }
                     else // Full damage on anything else
                     {
                         basepoints[0] = damage * 100 / CalcArmorReducedDamage(pVictim, 100);
-                        triggered_spell_id = 12723;	//Note this SS id deals 1 damage by itself (Cannot crit)
+                        triggered_spell_id = 12723;    //Note this SS id deals 1 damage by itself (Cannot crit)
                     }
                     break;
                 }
@@ -515,7 +515,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     return SPELL_AURA_PROC_OK;
                 }
                 // Viscidus Frost Weakness
-	        // Disabled for now, handled on Viscidus script
+                // Disabled for now, handled on Viscidus script
                 /*
                 case 25926:
                 {
@@ -537,7 +537,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
 
                     break;
                 }
-		*/
+                */
                 // Viscidus Freeze
                 case 25937:
                 {

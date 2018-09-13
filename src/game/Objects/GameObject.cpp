@@ -278,12 +278,12 @@ void GameObject::Update(uint32 update_diff, uint32 /*p_time*/)
                             SetGoState(GO_STATE_ACTIVE);
                             // SetUInt32Value(GAMEOBJECT_FLAGS, GO_FLAG_NODESPAWN);
 
-			    
-			    
+                
+                
                             SendForcedObjectUpdate();
 
-			    // Play splash sound
-			    PlayDistanceSound(3355);
+                // Play splash sound
+                PlayDistanceSound(3355);
                             SendGameObjectCustomAnim();
                         }
 

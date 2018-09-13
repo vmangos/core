@@ -206,7 +206,6 @@ void AddSC_westfall();
 void AddSC_wetlands();
 
 //kalimdor
-//void AddSC_jcj_tanaris();									//eventjcj
 void AddSC_instance_blackfathom_deeps();             //blackfathom_deeps
 void AddSC_boss_celebras_the_cursed();               //maraudon
 void AddSC_boss_landslide();
@@ -227,7 +226,6 @@ void AddSC_boss_kurinnaxx();
 void AddSC_boss_moam();
 void AddSC_boss_ossirian();
 void AddSC_boss_rajaxx();
-//void AddSC_npc_sandstalker(); 						// trash
 void AddSC_ruins_of_ahnqiraj();
 void AddSC_instance_ruins_of_ahnqiraj();
 void AddSC_boss_cthun();                             //temple_of_ahnqiraj
@@ -474,7 +472,6 @@ void AddScripts()
     AddSC_wetlands();
 
     //kalimdor
-	//AddSC_jcj_tanaris();									//eventjcj
     AddSC_instance_blackfathom_deeps();                     //blackfathom_deeps
     AddSC_boss_celebras_the_cursed();                       //maraudon
     AddSC_boss_landslide();
@@ -489,17 +486,16 @@ void AddScripts()
     AddSC_razorfen_kraul();                                 //razorfen_kraul
     AddSC_instance_razorfen_downs();
     AddSC_instance_razorfen_kraul();
-	AddSC_boss_ayamiss();                                   //ruins_of_ahnqiraj
+    AddSC_boss_ayamiss();                                   //ruins_of_ahnqiraj
     AddSC_boss_buru();
     AddSC_boss_kurinnaxx();
     AddSC_boss_moam();
     AddSC_boss_ossirian();
     AddSC_boss_rajaxx();
     AddSC_ruins_of_ahnqiraj();
-	//AddSC_npc_sandstalker();								//trash
     AddSC_instance_ruins_of_ahnqiraj();
     AddSC_boss_cthun();                                     //temple_of_ahnqiraj
-	AddSC_boss_viscidus();
+    AddSC_boss_viscidus();
     AddSC_boss_fankriss();
     AddSC_boss_huhuran();
     AddSC_bug_trio();

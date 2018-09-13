@@ -609,7 +609,7 @@ class MANGOS_DLL_SPEC GameObject : public WorldObject
         }
         void SetRespawnDelay(time_t respawn)
         {
-        	m_respawnDelayTime = respawn;
+            m_respawnDelayTime = respawn;
         }
         void Respawn();
         bool isSpawned() const

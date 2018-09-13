@@ -73,7 +73,7 @@ class OutdoorPvPSI : public OutdoorPvP
 
         uint32 m_Gathered_A;
         uint32 m_Gathered_H;
-		uint32 m_MaxRessources;
+        uint32 m_MaxRessources;
 
         uint32 m_LastController;
 };

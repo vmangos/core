@@ -518,15 +518,15 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
 //            setReinforcementLevelGroundUnit(teamIdx, m_Team_QuestStatus[teamIdx][0]);
 
             if((m_Team_QuestStatus[teamIdx][0]%100) == 0 && (m_Team_QuestStatus[teamIdx][0]%500) != 0&& questGiver->GetTypeId() == TYPEID_UNIT)
-            	((Creature*)questGiver)->MonsterSay("Great! Let's keep those supplies coming, people!", 0, 0);
+                ((Creature*)questGiver)->MonsterSay("Great! Let's keep those supplies coming, people!", 0, 0);
 
 /*            if(m_Team_QuestStatus[teamIdx][0]%500 == 0 && m_Team_QuestStatus[teamIdx][0] != 0 && questGiver->GetTypeId() == TYPEID_UNIT)
             {
-            	sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
-            	((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
+                sprintf(sMessageRemaining,"Thanks for the supplies, %s",player->GetName());
+                ((Creature*)questGiver)->MonsterSay(sMessageRemaining, 0, 0);
 
-            	if(m_Team_QuestStatus[teamIdx][0] == 500)            		
-            	{
+                if(m_Team_QuestStatus[teamIdx][0] == 500)                    
+                {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28418, ALLIANCE);
                     else
@@ -534,27 +534,27 @@ void BattleGroundAV::HandleQuestComplete(Unit* questGiver, uint32 questid, Playe
 
                    sprintf(sMessageRemaining,"Seasoned units are entering the battle!");
                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
-            	}
-            	else if(m_Team_QuestStatus[teamIdx][0] == 1000)            		
-            	{
+                }
+                else if(m_Team_QuestStatus[teamIdx][0] == 1000)                    
+                {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28419, ALLIANCE);
                     else
                         CastSpellOnTeam(28419, HORDE);
 
-            		sprintf(sMessageRemaining,"Veteran units are entering the battle!");
-            		((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
-            	}
-            	else if(m_Team_QuestStatus[teamIdx][0] == 1500)            		
-            	{
+                    sprintf(sMessageRemaining,"Veteran units are entering the battle!");
+                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
+                }
+                else if(m_Team_QuestStatus[teamIdx][0] == 1500)                    
+                {
                     if (teamIdx == 0)
                         CastSpellOnTeam(28420, ALLIANCE);
                     else
                         CastSpellOnTeam(28420, HORDE);
 
-            		sprintf(sMessageRemaining,"Champion units are entering the battle!");
-            		((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
-            	}
+                    sprintf(sMessageRemaining,"Champion units are entering the battle!");
+                    ((Creature*)questGiver)->MonsterYell(sMessageRemaining, 0, 0);
+                }
 
             }
 */

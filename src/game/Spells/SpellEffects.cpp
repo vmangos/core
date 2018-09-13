@@ -4852,7 +4852,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
-                case 28352:									// Atiesh - Breath of Sargeras
+                case 28352:                                    // Atiesh - Breath of Sargeras
                 {
                     if (unitTarget && m_caster)
                         m_caster->CastSpell(unitTarget, 28342, true);

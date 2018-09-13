@@ -285,14 +285,14 @@ struct Loot
     // void clear()
     void clear(bool clearQuestItems = true)
     {
-	if (clearQuestItems)
-	{
+    if (clearQuestItems)
+    {
             for (QuestItemMap::const_iterator itr = m_playerQuestItems.begin(); itr != m_playerQuestItems.end(); ++itr)
                 delete itr->second;
             m_playerQuestItems.clear();
 
             m_questItems.clear();
-	}
+    }
         for (QuestItemMap::const_iterator itr = m_playerFFAItems.begin(); itr != m_playerFFAItems.end(); ++itr)
             delete itr->second;
         m_playerFFAItems.clear();
@@ -314,7 +314,7 @@ struct Loot
 
     void leaveOnlyQuestItems()
     {
-	   clear(false);
+       clear(false);
     }
 
     bool empty() const { return items.empty() && m_questItems.empty() && gold == 0; }

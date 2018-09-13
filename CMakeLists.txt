@@ -177,9 +177,9 @@ if(NOT USE_STD_MALLOC)
   endif()
   
   if (WIN32)
-	list (GET TBB_LIBRARIES 1 TBB_SINGLE_FILEDIRECTORY)
-	get_filename_component(TBB_LIB_DIRECTORY "${TBB_SINGLE_FILEDIRECTORY}" DIRECTORY)
-	link_directories(${TBB_LIB_DIRECTORY})
+    list (GET TBB_LIBRARIES 1 TBB_SINGLE_FILEDIRECTORY)
+    get_filename_component(TBB_LIB_DIRECTORY "${TBB_SINGLE_FILEDIRECTORY}" DIRECTORY)
+    link_directories(${TBB_LIB_DIRECTORY})
   endif()
   
 endif()

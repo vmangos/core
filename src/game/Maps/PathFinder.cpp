@@ -293,7 +293,7 @@ void PathInfo::BuildPolyPath(const Vector3 &startPos, const Vector3 &endPos)
 
         // we need any point on our suffix start poly to generate poly-path, so we need last poly in prefix data
         float suffixEndPoint[VERTEX_SIZE];
-		bool PosOverBody = false;
+        bool PosOverBody = false;
         if (dtStatusFailed(m_navMeshQuery->closestPointOnPoly(suffixStartPoly, endPoint, suffixEndPoint, &PosOverBody)))
         {
             // we can hit offmesh connection as last poly - closestPointOnPoly() don't like that

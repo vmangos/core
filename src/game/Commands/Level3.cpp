@@ -8189,15 +8189,15 @@ bool ChatHandler::HandleServiceDeleteCharacters(char* args)
     else
     {
         s << "SELECT `characters`.`guid`,"
-	         "    `characters`.`account`,"
-	         "    `characters`.`level` AS `level`,"
-	         "    `characters`.`money` AS `money`,"
-	         "    `characters`.`totaltime` AS `totaltime`,"
-	         "    COUNT(`characters`.`guid`) AS `items`,"
+             "    `characters`.`account`,"
+             "    `characters`.`level` AS `level`,"
+             "    `characters`.`money` AS `money`,"
+             "    `characters`.`totaltime` AS `totaltime`,"
+             "    COUNT(`characters`.`guid`) AS `items`,"
              "    `characters`.`logout_time` AS `logout_time` "
              "FROM `characters` "
-	         "INNER JOIN `character_inventory` USING(`guid`) "
-	         "GROUP BY `characters`.`guid` HAVING ";
+             "INNER JOIN `character_inventory` USING(`guid`) "
+             "GROUP BY `characters`.`guid` HAVING ";
 
         bool _and = false;
         if (flags & SDF_MAX_LEVEL)

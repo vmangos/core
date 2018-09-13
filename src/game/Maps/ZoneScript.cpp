@@ -235,11 +235,12 @@ ZoneScript::ZoneScript() : m_pMap(nullptr)
 
 OutdoorPvP::~OutdoorPvP()
 {
-	// `Map`s should already be unloaded at this point
+    // `Map`s should already be unloaded at this point
     // DeleteSpawns();
     for (OPvPCapturePointMap::iterator it = m_capturePoints.begin(); it != m_capturePoints.end(); ++it)
         delete it->second;
 }
+
 ZoneScript::~ZoneScript()
 {
 }

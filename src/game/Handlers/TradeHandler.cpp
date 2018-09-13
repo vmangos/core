@@ -259,7 +259,7 @@ void WorldSession::HandleAcceptTradeOpcode(WorldPacket& recvPacket)
     double lastModificationTimeInMS = difftime(time(NULL), my_trade->GetLastModificationTime()) * 1000;
     if (lastModificationTimeInMS < my_trade->GetScamPreventionDelay()) // if we are not outside the delay period since last modification
     {
-	    SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
+        SendTradeStatus(TRADE_STATUS_BACK_TO_TRADE);
         return;
     }
 

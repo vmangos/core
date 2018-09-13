@@ -72,8 +72,8 @@ public:
         if (player->GetItemByPos(INVENTORY_SLOT_BAG_0, slot))
             player->DestroyItem(INVENTORY_SLOT_BAG_0, slot, true);
 
-		//if (player->CanUseItem(prototype))
-			player->EquipNewItem(slot, itemId, true);
+        //if (player->CanUseItem(prototype))
+            player->EquipNewItem(slot, itemId, true);
     }
 
     static void Mount(Player* p, uint32 mountItem)
@@ -271,7 +271,7 @@ public:
         }
     }
 
-	static void JumpPlayer(Player* p)
+    static void JumpPlayer(Player* p)
     {
         MovementInfo mi;
         mi.moveFlags = MOVEFLAG_JUMPING;
@@ -342,9 +342,9 @@ public:
 
 enum
 {
-    TARREN_CHARGE_NUM_PLAYERS	= 300,
+    TARREN_CHARGE_NUM_PLAYERS    = 300,
 
-	WAVES_NUM					= 20
+    WAVES_NUM                    = 20
 };
 
 class cinematics_generic_charge : public SingleCinematicTest
@@ -357,8 +357,8 @@ public:
     Vector3 spawnBegin;
     Vector3 spawnEnd;
     uint32 faction;
-	uint16 minlevel;
-	uint16 maxlevel;
+    uint16 minlevel;
+    uint16 maxlevel;
     float spawnOrientation;
 
     virtual void DoMove(Player* p, uint32 step) = 0;
@@ -403,7 +403,7 @@ public:
         for (int i = step % WAVES_NUM; i < TARREN_CHARGE_NUM_PLAYERS; i += WAVES_NUM)
         {
             Player* p = GetTestPlayer(i);
-			DoMove(p, 0);
+            DoMove(p, 0);
         }
         TEST_DELAY(1000)
         TEST_MULTIPLE_STEPS(WAVES_NUM, 500)
@@ -411,7 +411,7 @@ public:
         for (int i = step % WAVES_NUM; i < TARREN_CHARGE_NUM_PLAYERS; i += WAVES_NUM)
         {
             Player* p = GetTestPlayer(i);
-			DoMove(p, 1);
+            DoMove(p, 1);
         }
         TEST_DELAY(1000)
         TEST_MULTIPLE_STEPS(WAVES_NUM, 500)
@@ -614,44 +614,44 @@ enum
 class cinematics_coldridge_valley_fights : public SingleCinematicTest
 {
 public:
-	cinematics_coldridge_valley_fights(const char* sname = "cinematics_coldridge_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
-	{
-	}
+    cinematics_coldridge_valley_fights(const char* sname = "cinematics_coldridge_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    {
+    }
 
-	uint32 summonIndex;
-	uint32 stayOnlineTimer;
+    uint32 summonIndex;
+    uint32 stayOnlineTimer;
 
-	void DoSpawn(float x, float y, float r = 20.0f)
-	{
-		uint32 team = ALLIANCE;
-		uint8 _race, _class;
-		GenerateRandomClassRace(_class, _race, team);
-		float z = GetMap()->GetHeight(x, y, 0.0f, false);
-		while (!GetMap()->GetWalkRandomPosition(nullptr, x, y, z, r, NAV_GROUND));
-		SpawnPlayer(summonIndex, _class, _race, x, y, z);
-		++summonIndex;
-	}
+    void DoSpawn(float x, float y, float r = 20.0f)
+    {
+        uint32 team = ALLIANCE;
+        uint8 _race, _class;
+        GenerateRandomClassRace(_class, _race, team);
+        float z = GetMap()->GetHeight(x, y, 0.0f, false);
+        while (!GetMap()->GetWalkRandomPosition(nullptr, x, y, z, r, NAV_GROUND));
+        SpawnPlayer(summonIndex, _class, _race, x, y, z);
+        ++summonIndex;
+    }
 
-	void DoSpawnCount(uint32 count, float x, float y, float r = 100.0f)
-	{
-		for (uint32 i = 0; i < count; ++i)
-			DoSpawn(x, y, r);
-	}
+    void DoSpawnCount(uint32 count, float x, float y, float r = 100.0f)
+    {
+        for (uint32 i = 0; i < count; ++i)
+            DoSpawn(x, y, r);
+    }
 
-	virtual void JustSpawned(Player* p)
-	{
-		if (p->AI())
-			delete p->AI();
-		p->GiveLevel(urand(2, 4));
-		//AddSpells(p);
-		p->setAI(new PlayerControlledAI(p));
-		//StuffRandom(p);
+    virtual void JustSpawned(Player* p)
+    {
+        if (p->AI())
+            delete p->AI();
+        p->GiveLevel(urand(2, 4));
+        //AddSpells(p);
+        p->setAI(new PlayerControlledAI(p));
+        //StuffRandom(p);
 
-		SearchAndDestroy(p);
-	}
+        SearchAndDestroy(p);
+    }
 
-	static void SearchAndDestroy(Player* p)
-	{
+    static void SearchAndDestroy(Player* p)
+    {
         if (!p->isAlive()) return;
 
         Unit* target = p->getVictim();
@@ -692,135 +692,135 @@ public:
             }
             p->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
         }
-	}
+    }
 
-	void Test() override
-	{
-		TEST_FIRST
-			summonIndex = 0;
-		DoSpawnCount(SUMMON_PER_LOCATION, -6269.0f, 468.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6280.0f, 381.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6331.0f, 293.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6441.0f, 507.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6425.0f, 665.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6302.0f, 770.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6227.0f, 512.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6335.0f, 355.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -6279.0f, 448.0f);
-		WaitPlayerSummon();
-		TEST_DELAY(1000)
-			// Attack start and ding
-			for (uint32 i = 0; i < summonIndex; ++i)
-				if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
-					JustSpawned(p);
-		TEST_MULTIPLE_STEPS((stayOnlineTimer / UPDATE_DELAY - 1), UPDATE_DELAY)
-		for (uint32 i = 0; i < summonIndex; ++i)
-			if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
-				SearchAndDestroy(p);
-		TEST_DELAY(1000)
-			TEST_END
-	}
+    void Test() override
+    {
+        TEST_FIRST
+            summonIndex = 0;
+        DoSpawnCount(SUMMON_PER_LOCATION, -6269.0f, 468.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6280.0f, 381.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6331.0f, 293.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6441.0f, 507.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6425.0f, 665.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6302.0f, 770.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6227.0f, 512.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6335.0f, 355.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -6279.0f, 448.0f);
+        WaitPlayerSummon();
+        TEST_DELAY(1000)
+            // Attack start and ding
+            for (uint32 i = 0; i < summonIndex; ++i)
+                if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
+                    JustSpawned(p);
+        TEST_MULTIPLE_STEPS((stayOnlineTimer / UPDATE_DELAY - 1), UPDATE_DELAY)
+        for (uint32 i = 0; i < summonIndex; ++i)
+            if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
+                SearchAndDestroy(p);
+        TEST_DELAY(1000)
+            TEST_END
+    }
 };
 
 class cinematics_valley_of_trials_charge_horde : public cinematics_generic_charge
 {
 public:
-	cinematics_valley_of_trials_charge_horde() : cinematics_generic_charge("cinematics_valley_of_trials_charge_horde", 1, HORDE, 1, 6)
-	{
-		spawnBegin = Vector3(-596.15f, -4574.41f, 40.9f);
-		spawnEnd = Vector3(-596.15f, -4574.41f, 40.9f);
-		spawnOrientation = 2.5f;
-	}
+    cinematics_valley_of_trials_charge_horde() : cinematics_generic_charge("cinematics_valley_of_trials_charge_horde", 1, HORDE, 1, 6)
+    {
+        spawnBegin = Vector3(-596.15f, -4574.41f, 40.9f);
+        spawnEnd = Vector3(-596.15f, -4574.41f, 40.9f);
+        spawnOrientation = 2.5f;
+    }
 
-	void DoMove(Player* p, uint32 step) override
-	{
-		float x = -596.15f;
-		float y = -4574.41f;
-		float z = 40.9f;
-		if (step == 0)
-		{
-			switch (urand(0, 1))
-			{
-			case 0:
-				x = -622;
-				y = -4680;
-				z = 40;
-				break;
-			case 1:
-				x = -583;
-				y = -4692;
-				z = 39;
-				break;
-			}
-		}
-		if (step == 1)
-		{
-			switch (urand(0, 2))
-			{
-			case 0:
-				x = -560;
-				y = -4735;
-				z = 33.45f;
-				break;
-			case 1:
-				x = -615;
-				y = -4753;
-				z = 31.85f;
-				break;
-			case 2:
-				x = -667;
-				y = -4751;
-				z = 33.68f;
-				break;
-			}
-		}
+    void DoMove(Player* p, uint32 step) override
+    {
+        float x = -596.15f;
+        float y = -4574.41f;
+        float z = 40.9f;
+        if (step == 0)
+        {
+            switch (urand(0, 1))
+            {
+            case 0:
+                x = -622;
+                y = -4680;
+                z = 40;
+                break;
+            case 1:
+                x = -583;
+                y = -4692;
+                z = 39;
+                break;
+            }
+        }
+        if (step == 1)
+        {
+            switch (urand(0, 2))
+            {
+            case 0:
+                x = -560;
+                y = -4735;
+                z = 33.45f;
+                break;
+            case 1:
+                x = -615;
+                y = -4753;
+                z = 31.85f;
+                break;
+            case 2:
+                x = -667;
+                y = -4751;
+                z = 33.68f;
+                break;
+            }
+        }
 
-		while (!p->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, step < 2 ? 50 : 300));
-		p->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
-	}
+        while (!p->GetMap()->GetWalkRandomPosition(nullptr, x, y, z, step < 2 ? 50 : 300));
+        p->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
+    }
 };
 
 class cinematics_northshire_valley_fights : public SingleCinematicTest
 {
 public:
-	cinematics_northshire_valley_fights(const char* sname = "cinematics_northshire_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
-	{
-	}
+    cinematics_northshire_valley_fights(const char* sname = "cinematics_northshire_valley_fights") : SingleCinematicTest(sname, 0), summonIndex(0), stayOnlineTimer(120000)
+    {
+    }
 
-	uint32 summonIndex;
-	uint32 stayOnlineTimer;
+    uint32 summonIndex;
+    uint32 stayOnlineTimer;
 
-	void DoSpawn(float x, float y, float r = 20.0f)
-	{
-		uint32 team = ALLIANCE;
-		uint8 _race, _class;
-		GenerateRandomClassRace(_class, _race, team);
-		float z = GetMap()->GetHeight(x, y, 0.0f, false);
-		while (!GetMap()->GetWalkRandomPosition(nullptr, x, y, z, r, NAV_GROUND));
-		SpawnPlayer(summonIndex, _class, _race, x, y, z);
-		++summonIndex;
-	}
+    void DoSpawn(float x, float y, float r = 20.0f)
+    {
+        uint32 team = ALLIANCE;
+        uint8 _race, _class;
+        GenerateRandomClassRace(_class, _race, team);
+        float z = GetMap()->GetHeight(x, y, 0.0f, false);
+        while (!GetMap()->GetWalkRandomPosition(nullptr, x, y, z, r, NAV_GROUND));
+        SpawnPlayer(summonIndex, _class, _race, x, y, z);
+        ++summonIndex;
+    }
 
-	void DoSpawnCount(uint32 count, float x, float y, float r = 100.0f)
-	{
-		for (uint32 i = 0; i < count; ++i)
-			DoSpawn(x, y, r);
-	}
+    void DoSpawnCount(uint32 count, float x, float y, float r = 100.0f)
+    {
+        for (uint32 i = 0; i < count; ++i)
+            DoSpawn(x, y, r);
+    }
 
-	virtual void JustSpawned(Player* p)
-	{
-		if (p->AI())
-			delete p->AI();
-		p->GiveLevel(urand(2, 4));
-		//AddSpells(p);
-		p->setAI(new PlayerControlledAI(p));
-		//StuffRandom(p);
+    virtual void JustSpawned(Player* p)
+    {
+        if (p->AI())
+            delete p->AI();
+        p->GiveLevel(urand(2, 4));
+        //AddSpells(p);
+        p->setAI(new PlayerControlledAI(p));
+        //StuffRandom(p);
 
-		SearchAndDestroy(p);
-	}
+        SearchAndDestroy(p);
+    }
 
-	static void SearchAndDestroy(Player* p)
-	{
+    static void SearchAndDestroy(Player* p)
+    {
         if (!p->isAlive()) return;
 
         Unit* target = p->getVictim();
@@ -861,36 +861,36 @@ public:
             }
             p->GetMotionMaster()->MovePoint(0, x, y, z, MOVE_PATHFINDING);
         }
-	}
+    }
 
-	void Test() override
-	{
-		TEST_FIRST
-			summonIndex = 0;
-		DoSpawnCount(SUMMON_PER_LOCATION, -8972.0f, -110.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8872.0f, -58.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8770.0f, -68.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8760.0f, -142.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8687.0f, -115.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8757.0f, -170.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8782.0f, -258.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8925.0f, -273.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -8946.0f, -379.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -9060.0f, -367.0f);
-		DoSpawnCount(SUMMON_PER_LOCATION, -9114.0f, -266.0f);
-		WaitPlayerSummon();
-		TEST_DELAY(1000)
-			// Attack start and ding
-			for (uint32 i = 0; i < summonIndex; ++i)
-				if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
-					JustSpawned(p);
-		TEST_MULTIPLE_STEPS((stayOnlineTimer / UPDATE_DELAY - 1), UPDATE_DELAY)
-			for (uint32 i = 0; i < summonIndex; ++i)
-				if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
-					SearchAndDestroy(p);
-		TEST_DELAY(1000)
-			TEST_END
-	}
+    void Test() override
+    {
+        TEST_FIRST
+            summonIndex = 0;
+        DoSpawnCount(SUMMON_PER_LOCATION, -8972.0f, -110.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8872.0f, -58.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8770.0f, -68.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8760.0f, -142.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8687.0f, -115.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8757.0f, -170.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8782.0f, -258.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8925.0f, -273.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -8946.0f, -379.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -9060.0f, -367.0f);
+        DoSpawnCount(SUMMON_PER_LOCATION, -9114.0f, -266.0f);
+        WaitPlayerSummon();
+        TEST_DELAY(1000)
+            // Attack start and ding
+            for (uint32 i = 0; i < summonIndex; ++i)
+                if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
+                    JustSpawned(p);
+        TEST_MULTIPLE_STEPS((stayOnlineTimer / UPDATE_DELAY - 1), UPDATE_DELAY)
+            for (uint32 i = 0; i < summonIndex; ++i)
+                if (Player* p = GetTestPlayer(i, TESTPLAYER_NO_GODMODE))
+                    SearchAndDestroy(p);
+        TEST_DELAY(1000)
+            TEST_END
+    }
 };
 
 enum
@@ -1787,9 +1787,9 @@ void AddTest_cinematics()
     sAutoTestingMgr->AddTest(new cinematics_tarren_mills_charge_horde);
     sAutoTestingMgr->AddTest(new cinematics_tarren_mills_fights);
     sAutoTestingMgr->AddTest(new cinematics_tarren_mills_corpses);
-	sAutoTestingMgr->AddTest(new cinematics_coldridge_valley_fights);
-	sAutoTestingMgr->AddTest(new cinematics_valley_of_trials_charge_horde);
-	sAutoTestingMgr->AddTest(new cinematics_northshire_valley_fights);
+    sAutoTestingMgr->AddTest(new cinematics_coldridge_valley_fights);
+    sAutoTestingMgr->AddTest(new cinematics_valley_of_trials_charge_horde);
+    sAutoTestingMgr->AddTest(new cinematics_northshire_valley_fights);
     sAutoTestingMgr->AddTest(new cinematics_caverns_of_time_spirit_healers);
     sAutoTestingMgr->AddTest(new cinematics_crossroads_crowd);
     sAutoTestingMgr->AddTest(new cinematics_theramore_crowd);

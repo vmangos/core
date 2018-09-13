@@ -197,7 +197,7 @@ class ZoneScript
         // dtor
         virtual ~ZoneScript();
 
-		// Renvoit le nombre de WS
+        // Renvoit le nombre de WS
         virtual uint32 FillInitialWorldStates(WorldPacket& /*data*/) { return 0; }
 
         // called when a player triggers an areatrigger
@@ -276,7 +276,7 @@ class OutdoorPvP : public ZoneScript
 
         typedef std::map<uint32/*lowguid*/, OPvPCapturePoint*> OPvPCapturePointMap;
 
-		// Renvoit le nombre de WS
+        // Renvoit le nombre de WS
         uint32 FillInitialWorldStates(WorldPacket & /*data*/) override { return 0; }
 
         // called when a player triggers an areatrigger

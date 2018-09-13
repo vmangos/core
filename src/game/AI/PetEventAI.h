@@ -28,16 +28,16 @@
 class PetEventAI : public CreatureEventAI
 {
 public:
-	explicit PetEventAI(Creature* pCreature);
-	~PetEventAI() {}
+    explicit PetEventAI(Creature* pCreature);
+    ~PetEventAI() {}
 
-	void MoveInLineOfSight(Unit* /*pWho*/) override;
+    void MoveInLineOfSight(Unit* /*pWho*/) override;
 
-	void AttackStart(Unit* /*pWho*/) override;
+    void AttackStart(Unit* /*pWho*/) override;
 
-	void AttackedBy(Unit* /*pAttacker*/) override;
+    void AttackedBy(Unit* /*pAttacker*/) override;
 
-	void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(const uint32 uiDiff) override;
 
     virtual void OwnerAttackedBy(Unit* /*attacker*/) override;
 

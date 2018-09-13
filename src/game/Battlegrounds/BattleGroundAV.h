@@ -231,7 +231,7 @@ enum BG_AV_Events
     BG_AV_BOSS_H                = 62,
     BG_AV_NodeEventCaptainDead_A= 63,
     BG_AV_NodeEventCaptainDead_H= 64,
-    BG_AV_SNIVVLE		        = 65,
+    BG_AV_SNIVVLE                = 65,
 
     BG_AV_LANDMINES_HORDE       = 100,
     BG_AV_LANDMINES_ALLIANCE    = 101,

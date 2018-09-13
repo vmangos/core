@@ -2472,7 +2472,7 @@ bool ChatHandler::HandleGroupInfoCommand(char* args)
     for (std::size_t i = 0, j = names.size(); i != j; ++i)
     {
         stream << names[i];
-		
+        
         if (i + 1 != j)
         {
             stream << ", ";

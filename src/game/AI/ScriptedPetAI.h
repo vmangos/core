@@ -12,33 +12,33 @@
 class ScriptedPetAI : public CreatureAI
 {
 public:
-	explicit ScriptedPetAI(Creature* pCreature);
-	~ScriptedPetAI() {}
+    explicit ScriptedPetAI(Creature* pCreature);
+    ~ScriptedPetAI() {}
 
-	void MoveInLineOfSight(Unit* /*pWho*/) override;
+    void MoveInLineOfSight(Unit* /*pWho*/) override;
 
-	void AttackStart(Unit* /*pWho*/) override;
+    void AttackStart(Unit* /*pWho*/) override;
 
-	void AttackedBy(Unit* /*pAttacker*/) override;
+    void AttackedBy(Unit* /*pAttacker*/) override;
 
-	void KilledUnit(Unit* /*pVictim*/) override {}
+    void KilledUnit(Unit* /*pVictim*/) override {}
 
-	void OwnerKilledUnit(Unit* /*pVictim*/) override {}
+    void OwnerKilledUnit(Unit* /*pVictim*/) override {}
 
     void JustRespawned() override;
 
-	void UpdateAI(const uint32 uiDiff) override;
+    void UpdateAI(const uint32 uiDiff) override;
 
-	virtual void Reset() {}
+    virtual void Reset() {}
 
     virtual void ResetCreature() {}
 
-	virtual void UpdatePetAI(const uint32 uiDiff);      // while in combat
+    virtual void UpdatePetAI(const uint32 uiDiff);      // while in combat
 
-	virtual void UpdatePetOOCAI(const uint32 uiDiff) {} // when not in combat
+    virtual void UpdatePetOOCAI(const uint32 uiDiff) {} // when not in combat
 
 protected:
-	void ResetPetCombat();
+    void ResetPetCombat();
 };
 
 #endif

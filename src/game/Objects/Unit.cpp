@@ -10903,13 +10903,13 @@ void Unit::GetRandomAttackPoint(const Unit* attacker, float &x, float &y, float 
 
 float Unit::GetMeleeReach() const
 {
-	return GetCombatReach(true);
+    return GetCombatReach(true);
 }
 
 float Unit::GetCombatReach(bool forMeleeRange /*=true*/) const
 {
-	float reach = GetFloatValue(UNIT_FIELD_COMBATREACH);
-	return (forMeleeRange && reach < 1.5f) ? 1.5f : reach;
+    float reach = GetFloatValue(UNIT_FIELD_COMBATREACH);
+    return (forMeleeRange && reach < 1.5f) ? 1.5f : reach;
 }
 
 float Unit::GetCombatReach(Unit const* pVictim, bool forMeleeRange /*=true*/, float flat_mod /*=0.0f*/) const

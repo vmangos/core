@@ -2286,14 +2286,14 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     if ((*itr)->IsWithinDist(m_caster, minDist))
                         targetUnitMap.erase(itr);
                 }
-	        }
+            }
             if (SelectClosestTargets && unMaxTargets && targetUnitMap.size() > unMaxTargets)
-	        {
+            {
                 targetUnitMap.sort(TargetDistanceOrderNear(m_caster));
                 UnitList::iterator itr = targetUnitMap.begin();
                 advance(itr, unMaxTargets);
                 targetUnitMap.erase(itr, targetUnitMap.end());
-	        }
+            }
             break;
         }
         case TARGET_AREAEFFECT_INSTANT:
@@ -5551,7 +5551,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     // TODO: This condition allows an antifear item to be used while stuned for example.
     if (!m_IsTriggeredSpell && !IsSpellAppliesAura(m_spellInfo, SPELL_AURA_SCHOOL_IMMUNITY) && !IsSpellAppliesAura(m_spellInfo, SPELL_AURA_MECHANIC_IMMUNITY) &&
          m_spellInfo->Id != 20594 && // Stoneform
-	 m_caster->hasUnitState(UNIT_STAT_ISOLATED | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
+     m_caster->hasUnitState(UNIT_STAT_ISOLATED | UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING))
         return SPELL_FAILED_DONT_REPORT;
 
     // zone check

@@ -880,7 +880,7 @@ class MANGOS_DLL_SPEC WorldSession
         static void HandleChangePlayerNameOpcodeCallBack(QueryResult *result, uint32 accountId, std::string newname);
 
         //BattleGround
-		void HandleBattlefieldJoinOpcode( WorldPacket &recv_data );
+        void HandleBattlefieldJoinOpcode( WorldPacket &recv_data );
         void HandleBattlemasterHelloOpcode(WorldPacket &recv_data);
         void HandleBattlemasterJoinOpcode(WorldPacket &recv_data);
         void HandleBattleGroundPlayerPositionsOpcode(WorldPacket& recv_data);
