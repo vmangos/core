@@ -5033,7 +5033,8 @@ void Spell::HandleEffects(Unit *pUnitTarget, Item *pItemTarget, GameObject *pGOT
     if (eff < TOTAL_SPELL_EFFECTS)
         (*this.*SpellEffects[eff])(i);
     else
-        sLog.outError("WORLD: Spell FX %d > TOTAL_SPELL_EFFECTS ", eff);
+        sLog.outError("WORLD: Spell %u has effect %d at index %u > TOTAL_SPELL_EFFECTS",
+            m_spellInfo->Id, eff, i);
 }
 
 void Spell::AddTriggeredSpell(uint32 spellId)

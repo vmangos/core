@@ -301,14 +301,13 @@ void MapManager::Update(uint32 diff)
     int mapIdx = 0;
     int continentsIdx = 0;
     uint32 now = WorldTimer::getMSTime();
+    uint32 inactiveTimeLimit = sWorld.getConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME);
     for (MapMapType::iterator iter = i_maps.begin(); iter != i_maps.end(); ++iter)
     {
         // If this map has been empty for too long, we no longer update it.
-        if (!iter->second->HavePlayers() && sWorld.getConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME))
-        {
-            if (WorldTimer::getMSTimeDiff(iter->second->GetLastPlayerLeftTime(), now) > sWorld.getConfig(CONFIG_UINT32_EMPTY_MAPS_UPDATE_TIME))
-                continue;
-        }
+        if (!iter->second->ShouldUpdateInactiveMap(now, inactiveTimeLimit))
+            continue;
+
         iter->second->UpdateSync(mapsDiff);
         iter->second->MarkNotUpdated();
         iter->second->SetMapUpdateIndex(-1);
