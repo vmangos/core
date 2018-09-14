@@ -10,7 +10,7 @@ INSERT INTO `migrations` VALUES ('20180913182518');
 
 
 -- Add Technician in Firemaw room's left alcove group to pull with the rest of the group.
-INSERT INTO `creature_groups` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `flags`) VALUES (`84558`, `84570`, `0`, `0`, `46`);
+INSERT INTO `creature_groups` (`leaderGUID`, `memberGUID`, `dist`, `angle`, `flags`) VALUES (84558, 84570, 0, 0, 46);
 
 -- Correct Rock Elemental snare/root immunity.
 UPDATE `creature_template` SET `MechanicImmuneMask`=646015775 WHERE `entry`=92;

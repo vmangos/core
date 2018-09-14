@@ -723,7 +723,7 @@ struct SpellProcEventEntry
 {
     uint32      schoolMask;
     uint32      spellFamilyName;                            // if nonzero - for matching proc condition based on candidate spell's SpellFamilyNamer value
-    uint64      spellFamilyMask[MAX_EFFECT_INDEX];      // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
+    uint64      spellFamilyMask[MAX_EFFECT_INDEX];          // if nonzero - for matching proc condition based on candidate spell's SpellFamilyFlags  (like auras 107 and 108 do)
     uint32      procFlags;                                  // bitmask for matching proc event
     uint32      procEx;                                     // proc Extend info (see ProcFlagsEx)
     float       ppmRate;                                    // for melee (ranged?) damage spells - proc rate per minute. if zero, falls back to flat chance from Spell.dbc
@@ -749,7 +749,7 @@ typedef UNORDERED_MAP<uint32, SpellBonusEntry>     SpellBonusMap;
 enum SpellGroup
 {
     SPELL_GROUP_NULL = 0,
-    // Inutile pre-BC ?
+    // Not needed pre-BC ?
     /*SPELL_GROUP_ELIXIR_BATTLE = 1,
     SPELL_GROUP_ELIXIR_GUARDIAN = 2,
     SPELL_GROUP_ELIXIR_UNSTABLE = 3,

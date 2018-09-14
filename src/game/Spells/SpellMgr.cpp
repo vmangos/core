@@ -1713,8 +1713,8 @@ void SpellMgr::LoadSpellGroups()
 
     uint32 count = 0;
 
-    //                                                0         1
-    QueryResult* result = WorldDatabase.Query("SELECT group_id, spell_id FROM spell_group ORDER BY group_id, group_spell_id, spell_id");
+    //                                                 0         1
+    QueryResult* result = WorldDatabase.PQuery("SELECT group_id, spell_id FROM spell_group WHERE %u BETWEEN build_min AND build_max ORDER BY group_id, group_spell_id, spell_id", SUPPORTED_CLIENT_BUILD);
     if (!result)
     {
         sLog.outString();
@@ -1791,7 +1791,7 @@ void SpellMgr::LoadSpellGroupStackRules()
     uint32 count = 0;
 
     //                                                       0         1
-    QueryResult* result = WorldDatabase.Query("SELECT group_id, stack_rule FROM spell_group_stack_rules");
+    QueryResult* result = WorldDatabase.PQuery("SELECT group_id, stack_rule FROM spell_group_stack_rules t1 WHERE build=(SELECT max(build) FROM spell_group_stack_rules t2 WHERE t1.group_id=t2.group_id && build <= %u)", SUPPORTED_CLIENT_BUILD);
     if (!result)
     {
         sLog.outString();
