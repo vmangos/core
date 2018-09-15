@@ -754,7 +754,6 @@ template void ChaseMovementGenerator<Player>::Reset(Player &);
 template void ChaseMovementGenerator<Creature>::Reset(Creature &);
 template void ChaseMovementGenerator<Player>::MovementInform(Player&);
 
-
 template bool FollowMovementGenerator<Player>::Update(Player &, const uint32 &);
 template bool FollowMovementGenerator<Creature>::Update(Creature &, const uint32 &);
 template void FollowMovementGenerator<Player>::Finalize(Player &);

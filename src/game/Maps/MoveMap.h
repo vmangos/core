@@ -23,6 +23,8 @@
 #include <ace/Thread_Mutex.h>
 #include <ace/RW_Mutex.h>
 
+#include "Platform/CompilerDefs.h"
+#include "Platform/Define.h"
 #include <unordered_map>
 
 #include "Detour/Include/DetourAlloc.h"

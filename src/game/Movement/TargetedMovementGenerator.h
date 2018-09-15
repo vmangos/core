@@ -111,6 +111,18 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
         void DoSpreadIfNeeded(T &, Unit* target);
         bool TargetDeepInBounds(T &, Unit* target) const;
         bool TargetWithinBoundsPercentDistance(T &, Unit* target, float pct) const;
+
+        // Needed to compile with gcc for some reason.
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::i_target;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_fAngle;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_fOffset;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_fTargetLastX;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_fTargetLastY;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_fTargetLastZ;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_checkDistanceTimer;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bTargetOnTransport;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bRecalculateTravel;
+        using TargetedMovementGeneratorMedium<T, ChaseMovementGenerator<T> >::m_bTargetReached;
 };
 
 template<class T>
@@ -139,6 +151,18 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
         void _reachTarget(T &) {}
     private:
         void _updateSpeed(T &u);
+
+        // Needed to compile with gcc for some reason.
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::i_target;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_fAngle;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_fOffset;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_fTargetLastX;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_fTargetLastY;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_fTargetLastZ;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_checkDistanceTimer;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bTargetOnTransport;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bRecalculateTravel;
+        using TargetedMovementGeneratorMedium<T, FollowMovementGenerator<T> >::m_bTargetReached;
 };
 
 #endif
