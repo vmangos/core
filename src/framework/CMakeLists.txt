@@ -46,7 +46,6 @@ set (framework_SRCS
 	Utilities/EventMap.h
 	Utilities/LinkedList.h
 	Utilities/TypeList.h
-	Utilities/UnorderedMapSet.h
 	Utilities/LinkedReference/Reference.h
 	Utilities/LinkedReference/RefManager.h
 	Policies/MemoryManagement.cpp

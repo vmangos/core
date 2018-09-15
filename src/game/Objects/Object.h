@@ -87,7 +87,7 @@ class TerrainInfo;
 class ZoneScript;
 class Transport;
 
-typedef UNORDERED_MAP<Player*, UpdateData> UpdateDataMapType;
+typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
 struct Position
 {

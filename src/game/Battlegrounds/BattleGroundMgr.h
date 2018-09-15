@@ -34,9 +34,9 @@ typedef std::map<uint32, BattleGround*> BattleGroundSet;
 //this container can't be deque, because deque doesn't like removing the last element - if you remove it, it invalidates next iterator and crash appears
 typedef std::list<BattleGround*> BGFreeSlotQueueType;
 
-typedef UNORDERED_MAP<uint32, BattleGroundTypeId> BattleMastersMap;
-typedef UNORDERED_MAP<uint32, std::vector<BattleGroundEventIdx> > CreatureBattleEventIndexesMap;
-typedef UNORDERED_MAP<uint32, std::vector<BattleGroundEventIdx> > GameObjectBattleEventIndexesMap;
+typedef std::unordered_map<uint32, BattleGroundTypeId> BattleMastersMap;
+typedef std::unordered_map<uint32, std::vector<BattleGroundEventIdx> > CreatureBattleEventIndexesMap;
+typedef std::unordered_map<uint32, std::vector<BattleGroundEventIdx> > GameObjectBattleEventIndexesMap;
 
 #define COUNT_OF_PLAYERS_TO_AVERAGE_WAIT_TIME 10
 #define OFFLINE_BG_QUEUE_TIME                 60*1000 // in ms

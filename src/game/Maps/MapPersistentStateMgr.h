@@ -28,7 +28,7 @@
 #include "ace/Thread_Mutex.h"
 #include <list>
 #include <map>
-#include "Utilities/UnorderedMapSet.h"
+#include <unordered_map>
 #include "Database/DatabaseEnv.h"
 #include "DBCEnums.h"
 #include "DBCStores.h"
@@ -53,7 +53,7 @@ struct MapCellObjectGuids
     CellGuidSet gameobjects;
 };
 
-typedef UNORDERED_MAP<uint32/*cell_id*/,MapCellObjectGuids> MapCellObjectGuidsMap;
+typedef std::unordered_map<uint32/*cell_id*/,MapCellObjectGuids> MapCellObjectGuidsMap;
 
 class MapPersistentStateManager;
 
@@ -124,7 +124,7 @@ class MapPersistentState
         void SetGORespawnTime(uint32 loguid, time_t t);
 
     private:
-        typedef UNORDERED_MAP<uint32, time_t> RespawnTimes;
+        typedef std::unordered_map<uint32, time_t> RespawnTimes;
 
         uint32 m_instanceid;
         uint32 m_mapid;
@@ -348,7 +348,7 @@ class MANGOS_DLL_DECL MapPersistentStateManager : public MaNGOS::Singleton<MapPe
 
         void Update() { m_Scheduler.Update(); }
     protected:
-        typedef UNORDERED_MAP<uint32 /*InstanceId or MapId*/, MapPersistentState*> PersistentStateMap;
+        typedef std::unordered_map<uint32 /*InstanceId or MapId*/, MapPersistentState*> PersistentStateMap;
 
         //  called by scheduler for DungeonPersistentStates
         void _ResetOrWarnAll(uint32 mapid, bool warn, uint32 timeleft);

@@ -77,7 +77,7 @@ public:
     PlayerMails::iterator GetMailBegin() { return m_mail.begin();}
     PlayerMails::iterator GetMailEnd() { return m_mail.end();}
 
-    typedef UNORDERED_MAP<uint32, Item*> ItemMap;
+    typedef std::unordered_map<uint32, Item*> ItemMap;
 
     Item* GetMItem(uint32 id)
     {

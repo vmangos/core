@@ -28,9 +28,9 @@ class ObjectGuid;
 class Petition;
 class PetitionSignature;
 
-typedef UNORDERED_MAP<uint32, Petition*> PetitionMap;
+typedef std::unordered_map<uint32, Petition*> PetitionMap;
 typedef std::list<PetitionSignature*> PetitionSignatureList;
-typedef UNORDERED_MAP<uint32, Guild*> GuildMap;
+typedef std::unordered_map<uint32, Guild*> GuildMap;
 class GuildMgr
 {
     public:

@@ -368,7 +368,7 @@ protected:
     std::string strInstData;
 
     std::list<uint64> m_lGothTriggerList;
-    UNORDERED_MAP<uint64, GothTrigger> m_mGothTriggerMap;
+    std::unordered_map<uint64, GothTrigger> m_mGothTriggerMap;
 
     float m_fChamberCenterX;
     float m_fChamberCenterY;

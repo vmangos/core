@@ -1316,13 +1316,13 @@ class ScriptMgr
         void DisableScriptAction(ScriptInfo& script);
 
         typedef std::vector<std::string> ScriptNameMap;
-        typedef UNORDERED_MAP<uint32, uint32> AreaTriggerScriptMap;
-        typedef UNORDERED_MAP<uint32, uint32> EventIdScriptMap;
+        typedef std::unordered_map<uint32, uint32> AreaTriggerScriptMap;
+        typedef std::unordered_map<uint32, uint32> EventIdScriptMap;
         
         //Maps and lists
-        typedef UNORDERED_MAP<int32, StringTextData> TextDataMap;
-        typedef UNORDERED_MAP<uint32, std::vector<ScriptPointMove> > PointMoveMap;
-        typedef UNORDERED_MAP<int32, CreatureEscortData> EscortDataMap;
+        typedef std::unordered_map<int32, StringTextData> TextDataMap;
+        typedef std::unordered_map<uint32, std::vector<ScriptPointMove> > PointMoveMap;
+        typedef std::unordered_map<int32, CreatureEscortData> EscortDataMap;
 
         AreaTriggerScriptMap    m_AreaTriggerScripts;
         EventIdScriptMap        m_EventIdScripts;
