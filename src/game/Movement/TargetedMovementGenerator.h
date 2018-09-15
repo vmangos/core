@@ -39,46 +39,42 @@ class MANGOS_DLL_SPEC TargetedMovementGeneratorMedium
 {
     protected:
         TargetedMovementGeneratorMedium(Unit &target, float offset, float angle) :
-            TargetedMovementGeneratorBase(target), i_recheckDistance(0), i_recheckBoundingRadius(0), i_offset(offset),
-            i_angle(angle), i_recalculateTravel(false), i_targetReached(false), i_backing_up(false),
-            i_reachable(true), _targetLastX(0), _targetLastY(0), _targetLastZ(0), _targetOnTransport(false)
+            TargetedMovementGeneratorBase(target), m_checkDistanceTimer(0), m_fOffset(offset),
+            m_fAngle(angle), m_bRecalculateTravel(false), m_bTargetReached(false),
+            m_bReachable(true), m_fTargetLastX(0), m_fTargetLastY(0), m_fTargetLastZ(0), m_bTargetOnTransport(false)
         {
         }
         ~TargetedMovementGeneratorMedium() {}
 
     public:
-        bool Update(T &, const uint32 &);
+        
         void UpdateAsync(T&, uint32 diff);
 
         bool IsReachable() const
         {
-            return i_reachable;
+            return m_bReachable;
         }
 
         Unit* GetTarget() const { return i_target.getTarget(); }
 
-        void unitSpeedChanged() { i_recalculateTravel=true; }
+        void unitSpeedChanged() { m_bRecalculateTravel=true; }
         void UpdateFinalDistance(float fDistance);
 
     protected:
         void _setTargetLocation(T &);
 
-        ShortTimeTracker i_recheckDistance;
-        ShortTimeTracker i_recheckBoundingRadius;
-        float i_offset;
-        float i_angle;
-        bool i_recalculateTravel : 1;
-        bool i_targetReached : 1;
-        bool i_reachable;
-        bool i_backing_up;
-        float _targetLastX;
-        float _targetLastY;
-        float _targetLastZ;
-        bool  _targetOnTransport;
-    private:
-        void DoBackMovement(T &, Unit* target);
-        bool TargetDeepInBounds(T &, Unit* target) const;
-        bool TargetWithinBoundsPercentDistance(T &, Unit* target, float pct) const;
+        ShortTimeTracker m_checkDistanceTimer;
+
+        float m_fOffset;
+        float m_fAngle;
+        bool m_bRecalculateTravel : 1;
+        bool m_bTargetReached : 1;
+        bool m_bReachable;
+
+        float m_fTargetLastX;
+        float m_fTargetLastY;
+        float m_fTargetLastZ;
+        bool  m_bTargetOnTransport;
 };
 
 template<class T>
@@ -93,6 +89,7 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
 
         MovementGeneratorType GetMovementGeneratorType() const { return CHASE_MOTION_TYPE; }
 
+        bool Update(T &, const uint32 &);
         void Initialize(T &);
         void Finalize(T &);
         void Interrupt(T &);
@@ -104,6 +101,16 @@ class MANGOS_DLL_SPEC ChaseMovementGenerator : public TargetedMovementGeneratorM
         bool EnableWalking() const { return false;}
         bool _lostTarget(T &u) const { return u.getVictim() != this->GetTarget(); }
         void _reachTarget(T &);
+    private:
+        ShortTimeTracker m_spreadTimer{ 0 };
+        bool m_bIsSpreading = false;
+        bool m_bCanSpread = true;
+        uint8 m_uiSpreadAttempts = 0;
+
+        void DoBackMovement(T &, Unit* target);
+        void DoSpreadIfNeeded(T &, Unit* target);
+        bool TargetDeepInBounds(T &, Unit* target) const;
+        bool TargetWithinBoundsPercentDistance(T &, Unit* target, float pct) const;
 };
 
 template<class T>
@@ -118,6 +125,7 @@ class MANGOS_DLL_SPEC FollowMovementGenerator : public TargetedMovementGenerator
 
         MovementGeneratorType GetMovementGeneratorType() const { return FOLLOW_MOTION_TYPE; }
 
+        bool Update(T &, const uint32 &);
         void Initialize(T &);
         void Finalize(T &);
         void Interrupt(T &);
