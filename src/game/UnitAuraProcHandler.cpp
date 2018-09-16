@@ -281,6 +281,26 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
             if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !IsPositiveSpell(procSpell) && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(IsSpellAppliesAura(procSpell) && (procFlag & PROC_FLAG_ON_DO_PERIODIC)))
                 return roll_chance_f((float)spellProto->procChance);
         }
+        // Zandalarian Hero Charm - Unstable Power
+        if (spellProto->Id == 24658)
+        {
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - The charges from the Zandalarian Hero Charm will now be consumed by
+            //   melee and ranged abilities and spells which do non - physical damage.
+            //   This includes : Hammer of Wrath, Judgement of Righteousness, Seal of
+            //   Command, Judgement of Command, Volley, and Arcane Shot.The trinket
+            //   will also now burn charges from each casting of a damage over time
+            //   spell, heal over time spell, and area aura spells such as Blizzard
+            //   and Consecration. Only one charge will be burned per area spell cast,
+            //   rather than multiple charges per target hit as was previously the case.  
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            if ((procFlag & (PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT | PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT | PROC_FLAG_SUCCESSFUL_AOE | PROC_FLAG_SUCCESSFUL_PERIODIC_SPELL_HIT)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
+                return true;
+#else
+            if ((procFlag & (PROC_FLAG_ON_DO_PERIODIC)) && (procSpell->School != SPELL_SCHOOL_NORMAL))
+                return true;
+#endif
+        }
         // DRUID
         // Omen of Clarity
         if (spellProto->Id == 16864)
@@ -503,8 +523,10 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                 // Unstable Power
                 case 24658:
                 {
-                    // Need remove one 24659 aura
-                    RemoveAuraHolderFromStack(24659);
+                    // Need to remove one 24659 aura
+                    // Holy Nova both heals and damages, so check needed to avoid consuming 2 charges
+                    if (!procSpell->IsFitToFamilyMask<CF_PRIEST_HOLY_NOVA1>())
+                        RemoveAuraHolderFromStack(24659);
                     return SPELL_AURA_PROC_OK;
                 }
                 // Restless Strength

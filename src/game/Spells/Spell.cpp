@@ -761,6 +761,9 @@ void Spell::prepareDataForTriggerSystem()
                     m_procAttacker = PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
                     m_procVictim   = PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
                 }
+
+                if (IsAreaOfEffectSpell(m_spellInfo))
+                    m_procAttacker |= PROC_FLAG_SUCCESSFUL_AOE;
             }
             break;
         default:
