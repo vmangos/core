@@ -135,6 +135,7 @@ class SpellEntry
         /// CUSTOM FIELDS:
         uint32 MinTargetLevel;                                  // 159
         uint32 Custom;                                          // 173
+        uint32 Internal = 0;                                    // Assigned by the core.
     protected:
         bool _isBinary;
         bool _isDispel;

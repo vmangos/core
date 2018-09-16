@@ -334,7 +334,7 @@ Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid or
     m_needAliveTargetMask = 0;
 
     // determine reflection
-    m_canReflect = IsReflectableSpell(m_spellInfo, caster, victim);
+    m_canReflect = victim ? IsReflectableSpell(m_spellInfo, caster, victim) : IsReflectableSpell(m_spellInfo);
 
     m_isClientStarted = false;
 
@@ -1183,7 +1183,7 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
             {
                 // can cause back attack (if detected)
                 bool backAttack = m_spellInfo->Id != 3600 && // Earthbind never set in combat
-                    !IsPositiveSpell(m_spellInfo->Id) && m_caster->isVisibleForOrDetect(unit, unit, false);
+                    !IsPositiveSpell(m_spellInfo) && m_caster->isVisibleForOrDetect(unit, unit, false);
                 if (IsSpellHaveAura(m_spellInfo, SPELL_AURA_MOD_POSSESS) || m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO)
                     backAttack = false;
                 // Pickpocket can cause back attack if failed
@@ -1549,7 +1549,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
             }
 
             // can cause back attack (if detected), stealth removed at Spell::cast if spell break it
-            if (!(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) && (!IsPositiveSpell(m_spellInfo->Id) || IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL)) &&
+            if (!(m_spellInfo->AttributesEx3 & SPELL_ATTR_EX3_NO_INITIAL_AGGRO) && (!IsPositiveSpell(m_spellInfo) || IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL)) &&
                     !m_spellInfo->IsFitToFamily<SPELLFAMILY_ROGUE, CF_ROGUE_SAP>() && // Sap handled somewhere else. Without this, sap will remove stealth if the rogue is visible.
                     (m_spellInfo->Id == 6358 || // Exception to fix succubus seduction.
                      m_caster->isVisibleForOrDetect(unit, unit, false)))
@@ -1588,7 +1588,7 @@ void Spell::DoSpellHitOnUnit(Unit *unit, uint32 effectMask)
         else
         {
             // for delayed spells ignore negative spells (after duel end) for friendly targets
-            if (m_delayed && !IsPositiveSpell(m_spellInfo->Id))
+            if (m_delayed && !IsPositiveSpell(m_spellInfo))
             {
                 realCaster->SendSpellMiss(unit, m_spellInfo->Id, SPELL_MISS_EVADE);
                 ResetEffectDamageAndHeal();
@@ -4186,7 +4186,7 @@ void Spell::finish(bool ok)
     {
         // Not drop combopoints if negative spell and if any miss on enemy exist
         bool needDrop = true;
-        if (!IsPositiveSpell(m_spellInfo->Id))
+        if (!IsPositiveSpell(m_spellInfo))
         {
             for (TargetList::const_iterator ihit = m_UniqueTargetInfo.begin(); ihit != m_UniqueTargetInfo.end(); ++ihit)
             {
@@ -5479,7 +5479,7 @@ SpellCastResult Spell::CheckCast(bool strict)
             if (!explicit_target_mode && m_caster->GetTypeId() == TYPEID_UNIT && m_caster->GetCharmerOrOwnerGuid() && !IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL))
             {
                 // check correctness positive/negative cast target (pet cast real check and cheating check)
-                if (IsPositiveSpell(m_spellInfo->Id))
+                if (IsPositiveSpell(m_spellInfo))
                 {
                     if (!target_hostile_checked)
                         target_hostile = m_caster->IsHostileTo(target);
@@ -6654,7 +6654,7 @@ SpellCastResult Spell::CheckPetCast(Unit* target)
                 return SPELL_FAILED_BAD_TARGETS;            // guessed error
 
             // SPELL_EFFECT_DISPEL -> Positive or negative depending on the target
-            if (IsPositiveSpell(m_spellInfo->Id) && !IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL))
+            if (IsPositiveSpell(m_spellInfo) && !IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_DISPEL))
             {
                 if (m_caster->IsHostileTo(_target))
                     return SPELL_FAILED_BAD_TARGETS;
@@ -7667,7 +7667,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
         if (((Player*)target)->GetVisibility() == VISIBILITY_OFF)
             return false;
 
-        if (((Player*)target)->isGameMaster() && !IsPositiveSpell(m_spellInfo->Id))
+        if (((Player*)target)->isGameMaster() && !IsPositiveSpell(m_spellInfo))
             return false;
     }
 
@@ -8318,7 +8318,7 @@ void Spell::OnSpellLaunch()
         m_caster->setAttackTimer(OFF_ATTACK,  m_caster->getAttackTimer(OFF_ATTACK)  + 200 + 40 * m_caster->GetDistance(unitTarget));
     }
     
-    bool triggerAutoAttack = unitTarget != m_caster && !IsPositiveSpell(m_spellInfo->Id) && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
+    bool triggerAutoAttack = unitTarget != m_caster && !IsPositiveSpell(m_spellInfo) && !(m_spellInfo->Attributes & SPELL_ATTR_STOP_ATTACK_TARGET);
     m_caster->GetMotionMaster()->MoveCharge(unitTarget, sWorld.getConfig(CONFIG_UINT32_SPELLS_CCDELAY), triggerAutoAttack);
 }
 

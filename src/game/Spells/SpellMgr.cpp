@@ -965,6 +965,20 @@ bool IsPositiveEffect(SpellEntry const *spellproto, SpellEffectIndex effIndex, U
     return true;
 }
 
+bool IsPositiveSpell(uint32 spellId)
+{
+    SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
+    if (!spellproto)
+        return false;
+
+    return IsPositiveSpell(spellproto);
+}
+
+bool IsPositiveSpell(SpellEntry const *spellproto)
+{
+    return spellproto->Internal & SPELL_INTERNAL_POSITIVE;
+}
+
 bool IsPositiveSpell(uint32 spellId, Unit* caster, Unit* victim)
 {
     SpellEntry const *spellproto = sSpellMgr.GetSpellEntry(spellId);
@@ -984,42 +998,6 @@ bool IsPositiveSpell(SpellEntry const *spellproto, Unit* caster, Unit* victim)
         if (spellproto->Effect[i] && !IsPositiveEffect(spellproto, SpellEffectIndex(i), caster, victim))
             return false;
     return true;
-}
-
-bool IsHealSpell(SpellEntry const *spellProto)
-{
-    // Holy Light/Flash of Light
-    if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
-    {
-        if (spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>() ||
-            spellProto->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>())
-            return true;
-    }
-
-    for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
-    {
-        switch (spellProto->Effect[i])
-        {
-            case SPELL_EFFECT_HEAL:
-            case SPELL_EFFECT_HEAL_MAX_HEALTH:
-                return true;
-            case SPELL_EFFECT_APPLY_AURA:
-            case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
-            case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
-            case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
-            case SPELL_EFFECT_APPLY_AREA_AURA_PET:
-            {
-                switch (spellProto->EffectApplyAuraName[i])
-                {
-                    case SPELL_AURA_PERIODIC_HEAL:
-                        return true;
-                }
-                break;
-            }
-        }
-    }
-
-    return false;
 }
 
 bool IsSingleTargetSpells(SpellEntry const *spellInfo1, SpellEntry const *spellInfo2)
@@ -4340,6 +4318,211 @@ void SpellMgr::LoadExistingSpellIds()
             mExistingSpellsSet.insert(id);
         } while (result->NextRow());
         delete result;
+    }
+}
+
+namespace SpellInternal
+{
+    bool IsSpellAppliesAura(SpellEntry const *spellInfo)
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (IsEffectAppliesAura(spellInfo->Effect[i]) && spellInfo->EffectApplyAuraName[i])
+                return true;
+        }
+        return false;
+    }
+
+    // Spells that apply damage or heal over time
+    // Returns false for periodic and direct mixed spells (immolate, etc)
+    bool IsSpellAppliesPeriodicAura(SpellEntry const *spellInfo)
+    {
+        bool periodic = false;
+        bool direct = false;
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            switch (spellInfo->Effect[i])
+            {
+                case SPELL_EFFECT_SCHOOL_DAMAGE:
+                case SPELL_EFFECT_POWER_DRAIN:
+                case SPELL_EFFECT_HEALTH_LEECH:
+                case SPELL_EFFECT_ENVIRONMENTAL_DAMAGE:
+                case SPELL_EFFECT_POWER_BURN:
+                case SPELL_EFFECT_HEAL:
+                    direct = true;
+                    break;
+                case SPELL_EFFECT_APPLY_AURA:
+                    switch (spellInfo->EffectApplyAuraName[i])
+                    {
+                        case SPELL_AURA_PERIODIC_DAMAGE:
+                        case SPELL_AURA_PERIODIC_HEAL:
+                        case SPELL_AURA_PERIODIC_ENERGIZE:
+                        case SPELL_AURA_OBS_MOD_HEALTH:
+                        case SPELL_AURA_PERIODIC_LEECH:
+                        case SPELL_AURA_PERIODIC_HEALTH_FUNNEL:
+                        case SPELL_AURA_PERIODIC_MANA_LEECH:
+                        case SPELL_AURA_PERIODIC_DAMAGE_PERCENT:
+                        case SPELL_AURA_POWER_BURN_MANA:
+                        case SPELL_AURA_PERIODIC_TRIGGER_SPELL:
+                            periodic = true;
+                        default:
+                            break;
+                    }
+                default:
+                    break;
+            }
+        }
+        return periodic && !direct;
+    }
+
+    bool IsPassiveSpellStackableWithRanks(SpellEntry const* spellProto)
+    {
+        if (!IsPassiveSpell(spellProto))
+            return false;
+
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if (SpellEffects(spellProto->Effect[i]) == SPELL_EFFECT_APPLY_AURA || SpellEffects(spellProto->Effect[i]) == SPELL_EFFECT_APPLY_AREA_AURA_PARTY)
+                return false;
+        }
+        return true;
+    }
+    
+    bool IsHealSpell(SpellEntry const *spellProto)
+    {
+        // Holy Light/Flash of Light
+        if (spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
+        {
+            if (spellProto->IsFitToFamilyMask<CF_PALADIN_FLASH_OF_LIGHT2>() ||
+                spellProto->IsFitToFamilyMask<CF_PALADIN_HOLY_LIGHT2>())
+                return true;
+        }
+
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            switch (spellProto->Effect[i])
+            {
+                case SPELL_EFFECT_HEAL:
+                case SPELL_EFFECT_HEAL_MAX_HEALTH:
+                    return true;
+                case SPELL_EFFECT_APPLY_AURA:
+                case SPELL_EFFECT_APPLY_AREA_AURA_FRIEND:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PARTY:
+                case SPELL_EFFECT_APPLY_AREA_AURA_RAID:
+                case SPELL_EFFECT_APPLY_AREA_AURA_PET:
+                {
+                    switch (spellProto->EffectApplyAuraName[i])
+                    {
+                        case SPELL_AURA_PERIODIC_HEAL:
+                            return true;
+                    }
+                    break;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    bool IsSpellWithCasterSourceTargetsOnly(SpellEntry const* spellInfo)
+    {
+        for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            uint32 targetA = spellInfo->EffectImplicitTargetA[i];
+            if (targetA && !IsCasterSourceTarget(targetA))
+                return false;
+
+            uint32 targetB = spellInfo->EffectImplicitTargetB[i];
+            if (targetB && !IsCasterSourceTarget(targetB))
+                return false;
+
+            if (!targetA && !targetB)
+                return false;
+        }
+        return true;
+    }
+
+    bool IsAreaOfEffectSpell(SpellEntry const *spellInfo)
+    {
+        return
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_0])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_0])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_1])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_1])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetA[EFFECT_INDEX_2])) ||
+            IsAreaEffectTarget(Targets(spellInfo->EffectImplicitTargetB[EFFECT_INDEX_2]));
+    }
+
+    bool HasAreaAuraEffect(SpellEntry const *spellInfo)
+    {
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+            if (IsAreaAuraEffect(spellInfo->Effect[i]))
+                return true;
+        return false;
+    }
+
+    bool IsDismountSpell(SpellEntry const *spellInfo)
+    {
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            if ((spellInfo->Effect[i] == SPELL_EFFECT_APPLY_AURA) && (spellInfo->EffectApplyAuraName[i] == SPELL_AURA_MECHANIC_IMMUNITY) && (spellInfo->EffectMiscValue[i] == MECHANIC_MOUNT))
+                return true;
+        }
+        return false;
+    }
+
+    bool IsCharmSpell(SpellEntry const *spellInfo)
+    {
+        return IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_CHARM) || IsSpellHaveAura(spellInfo, SPELL_AURA_MOD_POSSESS);
+    }
+
+    bool IsReflectableSpell(SpellEntry const* spellInfo)
+    {
+        return spellInfo->DmgClass == SPELL_DAMAGE_CLASS_MAGIC && !spellInfo->HasAttribute(SPELL_ATTR_IS_ABILITY)
+            && !spellInfo->HasAttribute(SPELL_ATTR_EX_CANT_BE_REFLECTED) && !spellInfo->HasAttribute(SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY)
+            && !spellInfo->HasAttribute(SPELL_ATTR_PASSIVE) && !IsPositiveSpell(spellInfo);
+    }
+}
+
+void SpellMgr::AssignInternalSpellFlags()
+{
+    for (auto& pSpellEntry : mSpellEntryMap)
+    {
+        if (pSpellEntry)
+        {
+            if (SpellInternal::IsSpellAppliesAura(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_APPLIES_AURA;
+
+            if (SpellInternal::IsSpellAppliesPeriodicAura(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_APPLIES_PERIODIC_AURA;
+
+            if (SpellInternal::IsPassiveSpellStackableWithRanks(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_PASSIVE_STACK_WITH_RANKS;
+
+            if (IsPositiveSpell(pSpellEntry.get(), nullptr, nullptr))
+                pSpellEntry->Internal |= SPELL_INTERNAL_POSITIVE;
+
+            if (SpellInternal::IsHealSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_HEAL;
+
+            if (SpellInternal::IsSpellWithCasterSourceTargetsOnly(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_CASTER_SOURCE_TARGETS;
+
+            if (SpellInternal::IsAreaOfEffectSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_AOE;
+
+            if (SpellInternal::HasAreaAuraEffect(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_AOE_AURA;
+
+            if (SpellInternal::IsDismountSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_DISMOUNT;
+
+            if (SpellInternal::IsCharmSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_CHARM;
+
+            if (SpellInternal::IsReflectableSpell(pSpellEntry.get()))
+                pSpellEntry->Internal |= SPELL_INTERNAL_REFLECTABLE;
+        }
     }
 }
 

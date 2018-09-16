@@ -1206,6 +1206,7 @@ void World::SetInitialWorldSettings()
 
     sLog.outString("Loading `spell_mod` and `spell_effect_mod`...");
     sSpellModMgr.LoadSpellMods();
+    sSpellMgr.AssignInternalSpellFlags();
 
     sLog.outString("Loading SkillLineAbilityMultiMap Data...");
     sSpellMgr.LoadSkillLineAbilityMap();
