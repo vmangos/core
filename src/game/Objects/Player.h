@@ -1275,6 +1275,8 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void AddQuest( Quest const *pQuest, Object *questGiver );
         void FullQuestComplete(uint32 questId); // Equivalent to .quest complete
         void CompleteQuest( uint32 quest_id );
+        void RemoveQuest(uint32 quest_id);
+        void RemoveQuestAtSlot(uint32 slot);
         void IncompleteQuest( uint32 quest_id );
         void RewardQuest( Quest const *pQuest, uint32 reward, WorldObject* questGiver, bool announce = true );
 

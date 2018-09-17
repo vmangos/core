@@ -12961,6 +12961,39 @@ void Player::IncompleteQuest(uint32 quest_id)
     }
 }
 
+void Player::RemoveQuest(uint32 quest_id)
+{
+    if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(quest_id))
+    {
+        uint16 slot = FindQuestSlot(quest_id);
+
+        RemoveQuestAtSlot(slot);
+    }
+}
+
+void Player::RemoveQuestAtSlot(uint32 slot)
+{
+    if (slot < MAX_QUEST_LOG_SIZE)
+    {
+        if (uint32 quest = GetQuestSlotQuestId(slot))
+        {
+            // can't un-equip some items, reject quest cancel
+            if (!TakeOrReplaceQuestStartItems(quest, true, true))
+                return;
+
+            if (const Quest *pQuest = sObjectMgr.GetQuestTemplate(quest))
+            {
+                if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
+                    RemoveTimedQuest(quest);
+            }
+
+            SetQuestStatus(quest, QUEST_STATUS_NONE);
+        }
+
+        SetQuestSlot(slot, 0);
+    }
+}
+
 void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questGiver, bool announce)
 {
     uint32 quest_id = pQuest->GetQuestId();
@@ -13118,6 +13151,13 @@ void Player::FailQuest(uint32 questId)
     if (Quest const* pQuest = sObjectMgr.GetQuestTemplate(questId))
     {
         uint16 log_slot = FindQuestSlot(questId);
+        
+        if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_REPEATABLE) && !pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
+        {
+            SendQuestFailed(questId);
+            RemoveQuestAtSlot(log_slot);
+            return;
+        }
 
         if (log_slot < MAX_QUEST_LOG_SIZE)
         {

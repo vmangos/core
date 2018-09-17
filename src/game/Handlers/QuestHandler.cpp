@@ -346,25 +346,7 @@ void WorldSession::HandleQuestLogRemoveQuest(WorldPacket& recv_data)
 
     DEBUG_LOG("WORLD: Received CMSG_QUESTLOG_REMOVE_QUEST slot = %u", slot);
 
-    if (slot < MAX_QUEST_LOG_SIZE)
-    {
-        if (uint32 quest = _player->GetQuestSlotQuestId(slot))
-        {
-            if (!_player->TakeOrReplaceQuestStartItems(quest, true, true))
-            // can't un-equip some items, reject quest cancel
-                return;
-
-            if (const Quest *pQuest = sObjectMgr.GetQuestTemplate(quest))
-            {
-                if (pQuest->HasSpecialFlag(QUEST_SPECIAL_FLAG_TIMED))
-                    _player->RemoveTimedQuest(quest);
-            }
-
-            _player->SetQuestStatus(quest, QUEST_STATUS_NONE);
-        }
-
-        _player->SetQuestSlot(slot, 0);
-    }
+    _player->RemoveQuestAtSlot(slot);
 }
 
 void WorldSession::HandleQuestConfirmAccept(WorldPacket& recv_data)
@@ -592,7 +574,7 @@ uint32 WorldSession::getDialogStatus(Player *pPlayer, Object* questgiver, uint32
             {
                 if (pPlayer->SatisfyQuestLevel(pQuest, false))
                 {
-                    if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && pPlayer->getQuestStatusMap()[quest_id].m_rewarded))
+                    if (pQuest->IsAutoComplete() || (pQuest->IsRepeatable() && !pQuest->HasQuestFlag(QUEST_FLAGS_UNK2) && pPlayer->getQuestStatusMap()[quest_id].m_rewarded))
                         dialogStatusNew = DIALOG_STATUS_REWARD_REP;
                     else if (pPlayer->getLevel() <= pPlayer->GetQuestLevelForPlayer(pQuest) + sWorld.getConfig(CONFIG_UINT32_QUEST_LOW_LEVEL_HIDE_DIFF))
                         dialogStatusNew = DIALOG_STATUS_AVAILABLE;
