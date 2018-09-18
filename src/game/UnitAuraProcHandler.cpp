@@ -281,6 +281,12 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
             if (!isVictim && (procSpell->DmgClass == SPELL_DAMAGE_CLASS_MAGIC) && !IsPositiveSpell(procSpell) && (procExtra & (PROC_EX_NORMAL_HIT | PROC_EX_CRITICAL_HIT)) && !(IsSpellAppliesAura(procSpell) && (procFlag & PROC_FLAG_ON_DO_PERIODIC)))
                 return roll_chance_f((float)spellProto->procChance);
         }
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+        // - Vengeance: Seal of Command critical hits can now trigger this ability
+        if ((procSpell->Id == 20424) && (spellProto->SpellIconID == 84))
+            return false;
+#endif
         // Zandalarian Hero Charm - Unstable Power
         if (spellProto->Id == 24658)
         {
