@@ -7087,6 +7087,11 @@ SpellCastResult Spell::CheckItems()
                 if (m_CastItem->GetSpellCharges(i) == 0)
                     return SPELL_FAILED_NO_CHARGES_REMAIN;
 
+        // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+        // - Rejuvenation Potions: Any type of potion or consumable that grants 
+        //   mana and healing will no longer be consumable unless either your
+        //   health or your mana are below maximum.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
         // consumable cast item checks
         if (proto->Class == ITEM_CLASS_CONSUMABLE && m_targets.getUnitTarget())
         {
@@ -7137,6 +7142,7 @@ SpellCastResult Spell::CheckItems()
             if (failReason != SPELL_CAST_OK)
                 return failReason;
         }
+#endif
     }
 
     // check target item (for triggered case not report error)
