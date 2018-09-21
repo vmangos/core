@@ -18,11 +18,14 @@ ALTER TABLE `spell_group_stack_rules`
 	DROP PRIMARY KEY,
 	ADD PRIMARY KEY (`group_id`, `build`);
 
+
 -- World of Warcraft Client Patch 1.11.0 (2006-06-20)
 --  "Arcane Power: This ability will no longer stack with Power Infusion. 
 --   If you gain both at the same time, Arcane Power will take precedence."
-UPDATE `spell_group` SET `build_min`=5464 WHERE `group_id`=1063;
-UPDATE `spell_group_stack_rules` SET `build`=5464 WHERE `group_id`=1063;
+-- World of Warcraft Client Patch 1.10.2 (2006-05-02)
+--  "Arcane Power: This aura will no longer stack with Power Infusion."
+UPDATE `spell_group` SET `build_min`=5302 WHERE `group_id`=1063;
+UPDATE `spell_group_stack_rules` SET `build`=5302 WHERE `group_id`=1063;
 
 
 -- End of migration.
