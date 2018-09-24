@@ -10228,13 +10228,8 @@ void Unit::ApplyCastTimePercentMod(float val, bool apply)
     else
         SetFloatValue(UNIT_MOD_CAST_SPEED, GetFloatValue(UNIT_MOD_CAST_SPEED) * (apply ? (100.0f - val) / 100.0f : 100.0f / (100.0f - val)));
 #else
-    val = -val;
-    SetInt32Value(UNIT_MOD_CAST_SPEED, (int32)round((((1.0f + GetInt32Value(UNIT_MOD_CAST_SPEED) / 100.0f) * (apply ? (100.0f + val) / 100.0f : 100.0f / (100.0f + val))) - 1.0f)*100.0f));
-    /*
-    Code below will make a 50% positive effect cancel out a 50% negative one exactly. But it shouldn't before 1.12!
     int32 intval = round(val);
     SetInt32Value(UNIT_MOD_CAST_SPEED, (GetInt32Value(UNIT_MOD_CAST_SPEED) + (apply ? -intval : intval)));
-    */
 #endif
 }
 
