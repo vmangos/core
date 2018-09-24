@@ -1954,7 +1954,17 @@ bool DungeonMap::CanEnter(Player *player)
         return false;
     }
 
-    // cannot enter while an encounter is in progress
+    // World of Warcraft Client Patch 1.11.0 (2006-06-20)
+    // - Instituted an anti-exploit measure on certain encounters (almost 
+    //   entirely raid bosses).These encounters will prevent people from
+    //   zoning into the instance while that encounter is engaged.If you
+    //   attempt to zone into the instance while that encounter is engaged,
+    //   you will be resurrected at the outside entrance.We will be making
+    //   adjustments to the entrances to Molten Core and Blackwing Lair to
+    //   accommodate this change.Combat resurrections, soulstones,
+    //   reincarnate, etc.will still work fine.This is primarily to combat
+    //   graveyard rushing in instances.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
     Group *pGroup = player->GetGroup();
     if (IsRaid() && GetInstanceData() && GetInstanceData()->IsEncounterInProgress() && 
         pGroup && pGroup->InCombatToInstance(GetInstanceId()) && player->isAlive() && !player->isGameMaster())
@@ -1962,6 +1972,7 @@ bool DungeonMap::CanEnter(Player *player)
         player->SendTransferAborted(TRANSFER_ABORT_ZONE_IN_COMBAT);
         return false;
     }
+#endif
 
     if (GetId() == 509 || GetId() == 531)
     {
