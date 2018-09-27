@@ -28,8 +28,8 @@ set (shared_SRCS
 	ProgressBar.h
 	revision.h
 	ServiceWin32.h
-	SystemConfig.h
-	Threading.h
+        SystemConfig.h
+        ThreadPool.h
 	Timer.h
 	Util.h
 	WheatyExceptionReport.h
@@ -67,8 +67,8 @@ set (shared_SRCS
 	Log.cpp
 	PosixDaemon.cpp
 	ProgressBar.cpp
-	ServiceWin32.cpp
-	Threading.cpp
+        ServiceWin32.cpp
+        ThreadPool.cpp
 	Util.cpp
 	Duration.h
 	WheatyExceptionReport.cpp

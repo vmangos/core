@@ -89,7 +89,7 @@ class MassMailMgr
          */
         ReceiversList& AddMassMailTask(MailDraft* mailProto, MailSender sender)
         {
-            m_massMails.push_back(MassMail(mailProto, sender));
+            m_massMails.emplace_back(mailProto, sender);
             return m_massMails.rbegin()->m_receivers;
         }
 
@@ -109,12 +109,6 @@ class MassMailMgr
                 MANGOS_ASSERT(mailProto);
             }
 
-            MassMail(MassMail const& massmail)
-                : m_protoMail(std::move(const_cast<MassMail&>(massmail).m_protoMail)), m_sender(massmail.m_sender)
-            {
-            }
-
-            /// m_protoMail is owned by MassMail, so at copy original MassMail field set to NULL
             std::unique_ptr<MailDraft> m_protoMail;
 
             MailSender m_sender;

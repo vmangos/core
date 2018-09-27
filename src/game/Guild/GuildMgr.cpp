@@ -51,49 +51,49 @@ void GuildMgr::CleanUpPetitions()
 
 void GuildMgr::AddGuild(Guild* guild)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
+    std::lock_guard<std::mutex> guard(m_guildMutex);
     m_GuildMap[guild->GetId()] = guild;
 }
 
 void GuildMgr::RemoveGuild(uint32 guildId)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
+    std::lock_guard<std::mutex> guard(m_guildMutex);
     m_GuildMap.erase(guildId);
 }
 
 Guild* GuildMgr::GetGuildById(uint32 guildId) const
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
+    std::lock_guard<std::mutex> guard(m_guildMutex);
     GuildMap::const_iterator itr = m_GuildMap.find(guildId);
     if (itr != m_GuildMap.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 Guild* GuildMgr::GetGuildByName(std::string const& name) const
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
+    std::lock_guard<std::mutex> guard(m_guildMutex);
     for (GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
         if (itr->second->GetName() == name)
             return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 Guild* GuildMgr::GetGuildByLeader(ObjectGuid const& guid) const
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
+    std::lock_guard<std::mutex> guard(m_guildMutex);
     for (GuildMap::const_iterator itr = m_GuildMap.begin(); itr != m_GuildMap.end(); ++itr)
         if (itr->second->GetLeaderGuid() == guid)
             return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 std::string GuildMgr::GetGuildNameById(uint32 guildId) const
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_guildMutex);
+    std::lock_guard<std::mutex> guard(m_guildMutex);
     GuildMap::const_iterator itr = m_GuildMap.find(guildId);
     if (itr != m_GuildMap.end())
         return itr->second->GetName();
@@ -266,13 +266,13 @@ void GuildMgr::CreatePetition(uint32 id, Player* player, const ObjectGuid& chart
     petition->SetTeam(player->GetTeam());
     petition->SaveToDB();
 
-    ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
     m_petitionMap[petition->GetId()] = petition;
 }
 
 void GuildMgr::DeletePetition(Petition* petition)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
     m_petitionMap.erase(petition->GetId());
 
     petition->Delete();
@@ -281,7 +281,7 @@ void GuildMgr::DeletePetition(Petition* petition)
 
 Petition* GuildMgr::GetPetitionById(uint32 id)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
     PetitionMap::iterator iter = m_petitionMap.find(id);
     if (iter != m_petitionMap.end())
         return iter->second;
@@ -291,7 +291,7 @@ Petition* GuildMgr::GetPetitionById(uint32 id)
 
 Petition* GuildMgr::GetPetitionByCharterGuid(const ObjectGuid& charterGuid)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
     for (PetitionMap::iterator iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
     {
         Petition* petition = iter->second;
@@ -304,7 +304,7 @@ Petition* GuildMgr::GetPetitionByCharterGuid(const ObjectGuid& charterGuid)
 
 Petition* GuildMgr::GetPetitionByOwnerGuid(const ObjectGuid& ownerGuid)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_petitionsMutex);
+    std::lock_guard<std::mutex> guard(m_petitionsMutex);
     for (PetitionMap::iterator iter = m_petitionMap.begin(); iter != m_petitionMap.end(); ++iter)
     {
         Petition* petition = iter->second;

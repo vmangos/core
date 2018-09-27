@@ -39,29 +39,29 @@ char const* MAP_LIQUID_MAGIC  = "MLIQ";
 
 GridMap::GridMap()
 {
-    m_flags = 0;
+   // m_flags = 0;
 
     // Area data
-    m_gridArea = 0;
-    m_area_map = NULL;
+    // m_gridArea = 0;
+    // m_area_map = NULL;
 
     // Height level data
-    m_gridHeight = INVALID_HEIGHT_VALUE;
-    m_gridGetHeight = &GridMap::getHeightFromFlat;
-    m_gridIntHeightMultiplier = 0;
-    m_V9 = NULL;
-    m_V8 = NULL;
+    // m_gridHeight = INVALID_HEIGHT_VALUE;
+    // m_gridGetHeight = &GridMap::getHeightFromFlat;
+    // m_gridIntHeightMultiplier = 0;
+    m_V9 = nullptr;
+    m_V8 = nullptr;
 
     // Liquid data
-    m_liquidType    = 0;
-    m_liquid_offX   = 0;
-    m_liquid_offY   = 0;
-    m_liquid_width  = 0;
-    m_liquid_height = 0;
-    m_liquidLevel = INVALID_HEIGHT_VALUE;
-    m_liquidFlags = NULL;
-    m_liquidEntry = NULL;
-    m_liquid_map  = NULL;
+    // m_liquidType    = 0;
+    // m_liquid_offX   = 0;
+    // m_liquid_offY   = 0;
+    // m_liquid_width  = 0;
+    // m_liquid_height = 0;
+    // m_liquidLevel = INVALID_HEIGHT_VALUE;
+    // m_liquidFlags = NULL;
+    // m_liquidEntry = NULL;
+    // m_liquid_map  = NULL;
 }
 
 GridMap::~GridMap()
@@ -1186,9 +1186,9 @@ float TerrainInfo::GetWaterLevel(float x, float y, float z, float* pGround /*= N
 }
 
 //////////////////////////////////////////////////////////////////////////
-typedef MaNGOS::ClassLevelLockable<TerrainManager, ACE_Thread_Mutex> TerrainManagerLock;
+typedef MaNGOS::ClassLevelLockable<TerrainManager, std::mutex> TerrainManagerLock;
 INSTANTIATE_SINGLETON_2(TerrainManager, TerrainManagerLock);
-INSTANTIATE_CLASS_MUTEX(TerrainManager, ACE_Thread_Mutex);
+INSTANTIATE_CLASS_MUTEX(TerrainManager, std::mutex);
 
 TerrainManager::TerrainManager()
 {

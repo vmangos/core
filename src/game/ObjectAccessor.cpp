@@ -36,9 +36,9 @@
 
 #include <cmath>
 
-typedef MaNGOS::ClassLevelLockable<ObjectAccessor, ACE_Thread_Mutex> ObjectAccessorLock;
+typedef MaNGOS::ClassLevelLockable<ObjectAccessor, std::mutex> ObjectAccessorLock;
 INSTANTIATE_SINGLETON_2(ObjectAccessor, ObjectAccessorLock);
-INSTANTIATE_CLASS_MUTEX(ObjectAccessor, ACE_Thread_Mutex);
+INSTANTIATE_CLASS_MUTEX(ObjectAccessor, std::mutex);
 
 ObjectAccessor::ObjectAccessor() {}
 ObjectAccessor::~ObjectAccessor()

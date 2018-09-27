@@ -31,7 +31,6 @@
 #include <ace/Svc_Handler.h>
 #include <ace/SOCK_Acceptor.h>
 #include <ace/Acceptor.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/Semaphore.h>
 
 #define RA_BUFF_SIZE 8192
@@ -75,7 +74,7 @@ class RASocket: protected RAHandler
         char inputBuffer[RA_BUFF_SIZE];
         uint32 inputBufferLen;
 
-        ACE_Thread_Mutex outBufferLock;
+        std::mutex outBufferLock;
         char outputBuffer[RA_BUFF_SIZE];
         uint32 outputBufferLen;
 

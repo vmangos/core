@@ -1885,7 +1885,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // Serialize access to the movespline to prevent thread race conditions in async
         // move spline updates (one thread updates a spline, while another checks the
         // spline for end point with targeted move gen)
-        ACE_Thread_Mutex asyncMovesplineLock;
+        std::mutex asyncMovesplineLock;
 
         void ScheduleAINotify(uint32 delay);
         bool IsAINotifyScheduled() const { return m_AINotifyScheduled;}

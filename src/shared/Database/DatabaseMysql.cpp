@@ -26,7 +26,6 @@
 #include "Util.h"
 #include "Policies/SingletonImp.h"
 #include "Platform/Define.h"
-#include "Threading.h"
 #include "DatabaseEnv.h"
 #include "Timer.h"
 
@@ -161,7 +160,9 @@ bool MySQLConnection::HandleMySQLError(uint32 errNo)
     {
         case CR_SERVER_GONE_ERROR:
         case CR_SERVER_LOST:
+#ifdef CR_INVALID_CONN_HANDLE
         case CR_INVALID_CONN_HANDLE:
+#endif
         case CR_SERVER_LOST_EXTENDED:
         {
             mysql_close(mMysql);

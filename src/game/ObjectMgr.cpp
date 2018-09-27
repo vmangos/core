@@ -1976,10 +1976,9 @@ void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    mMapObjectGuids_lock.acquire();
+    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
     CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
     cell_guids.creatures.insert(guid);
-    mMapObjectGuids_lock.release();
 }
 
 void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
@@ -1987,10 +1986,9 @@ void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    mMapObjectGuids_lock.acquire();
+    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
     CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
     cell_guids.creatures.erase(guid);
-    mMapObjectGuids_lock.release();
 }
 
 void ObjectMgr::LoadGameobjects(bool reload)
@@ -2155,10 +2153,9 @@ void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    mMapObjectGuids_lock.acquire();
+    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
     CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
     cell_guids.gameobjects.insert(guid);
-    mMapObjectGuids_lock.release();
 }
 
 void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data)
@@ -2166,10 +2163,9 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    mMapObjectGuids_lock.acquire();
+    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
     CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
     cell_guids.gameobjects.erase(guid);
-    mMapObjectGuids_lock.release();
 }
 
 // name must be checked to correctness (if received) before call this function
@@ -7014,10 +7010,9 @@ void ObjectMgr::DeleteGOData(uint32 guid)
 void ObjectMgr::AddCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid, uint32 instance)
 {
     // corpses are always added to spawn mode 0 and they are spawned by their instance id
-    mMapObjectGuids_lock.acquire();
+    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
     CellObjectGuids& cell_guids = mMapObjectGuids[mapid][cellid];
     cell_guids.corpses[player_guid] = instance;
-    mMapObjectGuids_lock.release();
 }
 
 void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid)

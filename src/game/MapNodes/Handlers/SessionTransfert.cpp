@@ -41,12 +41,11 @@ void NodeSession::LoadSession(WorldSession* wsess)
         return;
     sock->AddReference();
 
-    m_socketsLock.acquire_write();
+    std::unique_lock<std::shared_timed_mutex> lock(m_socketsLock);
     SocketsMap::iterator it = m_accountSockets.find(wsess->GetAccountId());
     if (it != m_accountSockets.end())
         it->second->RemoveReference();
     m_accountSockets[wsess->GetAccountId()] = sock;
-    m_socketsLock.release();
 }
 
 void NodeSession::HandleLoadSession(WorldPacket& pkt)

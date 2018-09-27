@@ -1071,12 +1071,11 @@ class ObjectMgr
         // global grid objects state (static DB spawns, global spawn mods from gameevent system)
         CellObjectGuids const& GetCellObjectGuids(uint16 mapid, uint32 cell_id)
         {
-            mMapObjectGuids_lock.acquire();
+            std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
             CellObjectGuids const& guids = mMapObjectGuids[mapid][cell_id];
-            mMapObjectGuids_lock.release();
             return guids;
         }
-        ACE_Thread_Mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
+        std::mutex& GetCellLoadingObjectsMutex() // TODO: Mutex per cell?
         {
             return mMapObjectGuids_lock;
         }
@@ -1425,7 +1424,7 @@ class ObjectMgr
         HalfNameMap PetHalfName1;
 
         MapObjectGuids mMapObjectGuids;
-        ACE_Thread_Mutex mMapObjectGuids_lock;
+        std::mutex mMapObjectGuids_lock;
 
         CreatureDataMap mCreatureDataMap;
         CreatureLocaleMap mCreatureLocaleMap;

@@ -16,15 +16,20 @@
  * Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
  */
 
-#include <ace/Singleton.h>
-#include <ace/Thread_Mutex.h>
 #include <ace/Log_Msg.h>
 
 #include "DelayExecutor.h"
+#include "Policies/SingletonImp.h"
+#include "Policies/ThreadingModel.h"
+
+
+using DelayExecutorLock = MaNGOS::ClassLevelLockable<DelayExecutor, std::mutex>;
+INSTANTIATE_SINGLETON_2(DelayExecutor, DelayExecutorLock);
+INSTANTIATE_CLASS_MUTEX(DelayExecutor, std::mutex);
 
 DelayExecutor* DelayExecutor::instance()
 {
-    return ACE_Singleton<DelayExecutor, ACE_Thread_Mutex>::instance();
+    return &MaNGOS::Singleton<DelayExecutor, DelayExecutorLock>::Instance();
 }
 
 DelayExecutor::DelayExecutor()

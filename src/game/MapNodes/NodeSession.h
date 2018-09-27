@@ -8,6 +8,7 @@
 #include "MapSocket.h"
 #include "NodesOpcodes.h"
 #include "ObjectGuid.h"
+#include <shared_mutex>
 
 class MapSocket;
 class WorldSocket;
@@ -119,13 +120,13 @@ protected:
     void ProcessPacket(WorldPacket* packet);
 
     MapSocket*      m_socket;
-    ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> m_recvQueue[NODE_MAX_PROCESS_TYPE];
+    LockedQueue<WorldPacket*, std::mutex> m_recvQueue[NODE_MAX_PROCESS_TYPE];
     uint32          m_lastReceivedPacketTime;
     std::string     m_name;
     bool            m_isConnectedToMaster;
     bool            m_isReady;
 
-    ACE_RW_Mutex    m_socketsLock;
+    std::shared_timed_mutex    m_socketsLock;
     typedef std::unordered_map<uint32, WorldSocket*> SocketsMap;
     SocketsMap      m_accountSockets;
 
