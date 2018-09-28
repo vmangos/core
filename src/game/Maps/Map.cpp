@@ -3452,7 +3452,7 @@ void Map::PrintInfos(ChatHandler& handler)
     handler.PSendSysMessage("Vis:%.1f Act:%.1f", m_VisibleDistance, m_GridActivationDistance);
 }
 
-bool Map::ShouldUpdateInactiveMap(uint32 now, uint32 inactiveTimeLimit)
+bool Map::ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit)
 {
     auto update = true;
 
