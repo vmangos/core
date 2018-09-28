@@ -2572,12 +2572,10 @@ void Map::TerminateScript(const ScriptAction& step)
 /// Process queued scripts
 void Map::ScriptsProcess()
 {
-    m_scriptSchedule_lock.lock();
+    std::unique_lock<std::mutex> lock(m_scriptSchedule_lock);
+
     if (m_scriptSchedule.empty())
-    {
-        m_scriptSchedule_lock.unlock();
         return;
-    }
 
     ///- Process overdue queued scripts
     ScriptScheduleMap::iterator iter = m_scriptSchedule.begin();
@@ -2585,7 +2583,7 @@ void Map::ScriptsProcess()
     while (!m_scriptSchedule.empty() && (iter->first <= sWorld.GetGameTime()))
     {
         const ScriptAction step = iter->second;
-        m_scriptSchedule_lock.unlock();
+        lock.unlock();
 
         WorldObject* source = nullptr;
         WorldObject* target = nullptr;
@@ -2603,6 +2601,7 @@ void Map::ScriptsProcess()
             TerminateScript(step);
         else
         {
+            lock.lock();
             iter = m_scriptSchedule.begin();
 
             if (iter->second.script == step.script)
