@@ -838,15 +838,15 @@ bool Map::ScriptCommand_Mount(const ScriptInfo& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    if (!pSource->isAlive())
-        return ShouldAbortScript(script);
-
     uint32 displayId = script.mount.isDisplayId || !script.mount.creatureOrModelEntry ? script.mount.creatureOrModelEntry : Creature::ChooseDisplayId(ObjectMgr::GetCreatureTemplate(script.mount.creatureOrModelEntry));
 
-    if (displayId)
-        pSource->Mount(displayId);
-    else
-        pSource->Unmount();
+    if (pSource->isAlive())
+    {
+        if (displayId)
+            pSource->Mount(displayId);
+        else
+            pSource->Unmount();
+    }
 
     if (script.mount.permanent)
         pSource->SetDefaultMount(displayId);
