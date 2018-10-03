@@ -17,4 +17,6 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 
 ### Useful Links
 - [Wiki](https://github.com/vmangos/wiki)
+- [Discord](https://discord.gg/rcCKnCw)
 - [Script Editor](https://github.com/brotalnia/scripteditor)
+- [Script Converter](https://github.com/vmangos/ScriptConverter)
