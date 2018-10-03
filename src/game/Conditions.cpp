@@ -320,15 +320,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             const Player* pTarget = ToPlayer(target);
 
             if (m_value1 & CF_ESCORT_SOURCE_DEAD)
-                if (pSource && pSource->isDead())
+                if (!pSource || pSource->isDead())
                     return true;
 
             if (m_value1 & CF_ESCORT_TARGET_DEAD)
-                if (pTarget && (pTarget->isDead() || !pTarget->IsInWorld()))
+                if (!pTarget || pTarget->isDead() || !pTarget->IsInWorld())
                     return true;
 
             if (m_value2)
-                if (pSource && pTarget && !pSource->IsWithinDistInMap(pTarget, m_value2))
+                if (!pSource || !pTarget || !pSource->IsWithinDistInMap(pTarget, m_value2))
                     return true;
 
             return false;
@@ -558,13 +558,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_MAP_EVENT_TARGETS:
         {
             bool bSatisfied = true;
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map* pMap = const_cast<Map*>(map ? map : (source ? source->GetMap() : target->GetMap()));
             if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
                 for (const auto& eventTarget : pEvent->m_vTargets)
                 {
-                    if (eventTarget.pObject)
-                        bSatisfied = bSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(eventTarget.pObject, map, source, conditionSourceType);
+                    WorldObject* pObject = pMap->GetWorldObject(eventTarget.target);
+
+                    if (pObject)
+                        bSatisfied = bSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(pObject, map, source, conditionSourceType);
 
                     if (!bSatisfied)
                         return false;

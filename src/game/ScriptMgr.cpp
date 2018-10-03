@@ -2537,19 +2537,20 @@ WorldObject* GetTargetByType(WorldObject* pSource, WorldObject* pTarget, uint8 T
         case TARGET_T_MAP_EVENT_SOURCE:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
                 if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
-                    return pEvent->m_pSource;
+                    return pEvent->GetSourceObject();
             break;
         case TARGET_T_MAP_EVENT_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
                 if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
-                    return pEvent->m_pTarget;
+                    return pEvent->GetTargetObject();
             break;
         case TARGET_T_MAP_EVENT_EXTRA_TARGET:
             if (Map* pMap = pSource ? pSource->GetMap() : (pTarget ? pTarget->GetMap() : nullptr))
                 if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(Param1))
                     for (const auto& target : pEvent->m_vTargets)
-                        if (target.pObject && (target.pObject->GetEntry() == Param2))
-                            return target.pObject;
+                        if (WorldObject* pObject = pMap->GetWorldObject(target.target))
+                            if (pObject && (pObject->GetEntry() == Param2))
+                                return pObject;
             break;
     }
     return nullptr;

@@ -1018,25 +1018,31 @@ ScriptedEvent* Map::StartScriptedEvent(uint32 id, WorldObject* source, WorldObje
     if (m_mScriptedEvents.find(id) != m_mScriptedEvents.end())
         return nullptr;
     
-    auto itr = m_mScriptedEvents.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(id, source, target, this, time_t(sWorld.GetGameTime() + timelimit), failureCondition, failureScript, successCondition, successScript));
+    auto itr = m_mScriptedEvents.emplace(std::piecewise_construct, std::forward_as_tuple(id), std::forward_as_tuple(id, source ? source->GetObjectGuid() : ObjectGuid(), target ? target->GetObjectGuid() : ObjectGuid(), *this, time_t(sWorld.GetGameTime() + timelimit), failureCondition, failureScript, successCondition, successScript));
 
     return &itr.first->second;
 }
 
 bool ScriptedEvent::UpdateEvent()
 {
+    if (m_bEnded)
+        return true;
+
     if (m_tExpireTime < sWorld.GetGameTime())
     {
         EndEvent(false);
         return true;
     }
 
-    if (m_uiFailureCondition && sObjectMgr.IsConditionSatisfied(m_uiFailureCondition, m_pTarget, m_pMap, m_pSource, CONDITION_FROM_MAP_EVENT))
+    WorldObject* pSource = GetSourceObject();
+    WorldObject* pTarget = GetTargetObject();
+
+    if (m_uiFailureCondition && sObjectMgr.IsConditionSatisfied(m_uiFailureCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(false);
         return true;
     }
-    else if (m_uiSuccessCondition && sObjectMgr.IsConditionSatisfied(m_uiSuccessCondition, m_pTarget, m_pMap, m_pSource, CONDITION_FROM_MAP_EVENT))
+    else if (m_uiSuccessCondition && sObjectMgr.IsConditionSatisfied(m_uiSuccessCondition, pTarget, &m_Map, pSource, CONDITION_FROM_MAP_EVENT))
     {
         EndEvent(true);
         return true;
@@ -1044,12 +1050,17 @@ bool ScriptedEvent::UpdateEvent()
 
     for (const auto& target : m_vTargets)
     {
-        if (target.uiFailureCondition && sObjectMgr.IsConditionSatisfied(target.uiFailureCondition, m_pTarget, m_pMap, target.pObject, CONDITION_FROM_MAP_EVENT))
+        WorldObject* pObject = m_Map.GetWorldObject(target.target);
+
+        if (!pObject || !pObject->IsInWorld())
+            continue;
+
+        if (target.uiFailureCondition && sObjectMgr.IsConditionSatisfied(target.uiFailureCondition, pTarget, &m_Map, pObject, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(false);
             return true;
         }
-        else if (target.uiSuccessCondition && sObjectMgr.IsConditionSatisfied(target.uiSuccessCondition, m_pTarget, m_pMap, target.pObject, CONDITION_FROM_MAP_EVENT))
+        else if (target.uiSuccessCondition && sObjectMgr.IsConditionSatisfied(target.uiSuccessCondition, pTarget, &m_Map, pObject, CONDITION_FROM_MAP_EVENT))
         {
             EndEvent(true);
             return true;
@@ -1061,30 +1072,45 @@ bool ScriptedEvent::UpdateEvent()
 
 void ScriptedEvent::EndEvent(bool bSuccess)
 {
+    m_bEnded = true;
+
     if (bSuccess && m_uiSuccessScript)
-        m_pMap->ScriptsStart(sEventScripts, m_uiSuccessScript, m_pSource, m_pTarget);
+        m_Map.ScriptsStart(sEventScripts, m_uiSuccessScript, GetSourceObject(), GetTargetObject());
     else if (!bSuccess && m_uiFailureScript)
-        m_pMap->ScriptsStart(sEventScripts, m_uiFailureScript, m_pSource, m_pTarget);
+        m_Map.ScriptsStart(sEventScripts, m_uiFailureScript, GetSourceObject(), GetTargetObject());
 
     for (const auto& target : m_vTargets)
     {
-        if (!target.pObject)
+        WorldObject* pObject = m_Map.GetWorldObject(target.target);
+
+        if (!pObject || !pObject->IsInWorld())
             continue;
 
         if (bSuccess && target.uiSuccessScript)
-            m_pMap->ScriptsStart(sEventScripts, target.uiSuccessScript, target.pObject, m_pTarget);
+            m_Map.ScriptsStart(sEventScripts, target.uiSuccessScript, pObject, GetTargetObject());
         else if (!bSuccess && target.uiFailureScript)
-            m_pMap->ScriptsStart(sEventScripts, target.uiFailureScript, target.pObject, m_pTarget);
+            m_Map.ScriptsStart(sEventScripts, target.uiFailureScript, pObject, GetTargetObject());
     }
+}
+
+WorldObject* ScriptedEvent::GetSourceObject() const
+{
+    return m_Map.GetWorldObjectOrPlayer(m_Source);
+
+}
+WorldObject* ScriptedEvent::GetTargetObject() const
+{
+    return m_Map.GetWorldObjectOrPlayer(m_Target);
+
 }
 
 void ScriptedEvent::SendEventToMainTargets(uint32 uiData)
 {
-    if (Creature* pCreatureSource = ToCreature(m_pSource))
+    if (Creature* pCreatureSource = ToCreature(GetSourceObject()))
         if (pCreatureSource->AI())
             pCreatureSource->AI()->MapScriptEventHappened(this, uiData);
 
-    if (Creature* pCreatureTarget = ToCreature(m_pTarget))
+    if (Creature* pCreatureTarget = ToCreature(GetTargetObject()))
         if (pCreatureTarget->AI())
             pCreatureTarget->AI()->MapScriptEventHappened(this, uiData);
 }
@@ -1093,7 +1119,7 @@ void ScriptedEvent::SendEventToAdditionalTargets(uint32 uiData)
 {
     for (const auto& target : m_vTargets)
     {
-        if (Creature* pCreature = ToCreature(target.pObject))
+        if (Creature* pCreature = ToCreature(m_Map.GetWorldObject(target.target)))
             if (pCreature->AI())
                 pCreature->AI()->MapScriptEventHappened(this, uiData);
     }
@@ -2389,58 +2415,12 @@ void Map::ScriptCommandStartDirect(const ScriptInfo& script, WorldObject* source
 
 bool Map::FindScriptInitialTargets(WorldObject*& source, WorldObject*& target, const ScriptAction& step)
 {
-    if (step.sourceGuid)
-    {
-        switch (step.sourceGuid.GetHigh())
-        {
-            case HIGHGUID_UNIT:
-                source = GetCreature(step.sourceGuid);
-                break;
-            case HIGHGUID_PET:
-                source = GetPet(step.sourceGuid);
-                break;
-            case HIGHGUID_PLAYER:
-                source = HashMapHolder<Player>::Find(step.sourceGuid);
-                break;
-            case HIGHGUID_GAMEOBJECT:
-                source = GetGameObject(step.sourceGuid);
-                break;
-            case HIGHGUID_CORPSE:
-                source = HashMapHolder<Corpse>::Find(step.sourceGuid);
-                break;
-            default:
-                sLog.outError("*_script source with unsupported guid %s", step.sourceGuid.GetString().c_str());
-                return false;
-        }
-    }
+    source = GetWorldObjectOrPlayer(step.sourceGuid);
 
     if (source && !source->IsInWorld())
         source = nullptr;
 
-    if (step.targetGuid)
-    {
-        switch (step.targetGuid.GetHigh())
-        {
-            case HIGHGUID_UNIT:
-                target = GetCreature(step.targetGuid);
-                break;
-            case HIGHGUID_PET:
-                target = GetPet(step.targetGuid);
-                break;
-            case HIGHGUID_PLAYER:
-                target = HashMapHolder<Player>::Find(step.targetGuid);
-                break;
-            case HIGHGUID_GAMEOBJECT:
-                target = GetGameObject(step.targetGuid);
-                break;
-            case HIGHGUID_CORPSE:
-                target = HashMapHolder<Corpse>::Find(step.targetGuid);
-                break;
-            default:
-                sLog.outError("*_script target with unsupported guid %s", step.targetGuid.GetString().c_str());
-                return false;
-        }
-    }
+    target = GetWorldObjectOrPlayer(step.targetGuid);
 
     if (target && !target->IsInWorld())
         target = nullptr;
@@ -2746,7 +2726,7 @@ Unit* Map::GetUnit(ObjectGuid guid)
 }
 
 /**
- * Function return world object in world at CURRENT map, so any except transports
+ * Function returns world object in world at CURRENT map, so any except transports
  */
 WorldObject* Map::GetWorldObject(ObjectGuid guid)
 {
@@ -2766,7 +2746,7 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
         {
             // corpse special case, it can be not in world
             Corpse* corpse = GetCorpse(guid);
-            return corpse && corpse->IsInWorld() ? corpse : NULL;
+            return corpse && corpse->IsInWorld() ? corpse : nullptr;
         }
         case HIGHGUID_MO_TRANSPORT:
         case HIGHGUID_TRANSPORT:
@@ -2774,7 +2754,32 @@ WorldObject* Map::GetWorldObject(ObjectGuid guid)
             break;
     }
 
-    return NULL;
+    return nullptr;
+}
+
+/**
+ * Function returns world object in world at CURRENT map, or player anywhere
+ */
+WorldObject* Map::GetWorldObjectOrPlayer(ObjectGuid guid)
+{
+    if (guid)
+    {
+        switch (guid.GetHigh())
+        {
+            case HIGHGUID_UNIT:
+                return GetCreature(guid);
+            case HIGHGUID_PET:
+                return GetPet(guid);
+            case HIGHGUID_PLAYER:
+                return HashMapHolder<Player>::Find(guid);
+            case HIGHGUID_GAMEOBJECT:
+                return GetGameObject(guid);
+            case HIGHGUID_CORPSE:
+                return HashMapHolder<Corpse>::Find(guid);
+        }
+    }
+
+    return nullptr;
 }
 
 class ObjectUpdatePacketBuilder : public ACE_Based::Runnable
