@@ -1321,6 +1321,55 @@ enum GameObjectDynamicLowFlags
     GO_DYNFLAG_LO_NO_INTERACT       = 0x04,                 // appears to disable interaction (not fully verified)
 };
 
+enum class GameObjectActions : uint32
+{                                   // Name from client executable      // Comments
+    None,                           // -NONE-
+    AnimateCustom0,                 // Animate Custom0
+    AnimateCustom1,                 // Animate Custom1
+    AnimateCustom2,                 // Animate Custom2
+    AnimateCustom3,                 // Animate Custom3
+    Disturb,                        // Disturb                          // Triggers trap
+    Unlock,                         // Unlock                           // Resets GO_FLAG_LOCKED
+    Lock,                           // Lock                             // Sets GO_FLAG_LOCKED
+    Open,                           // Open                             // Sets GO_STATE_ACTIVE
+    OpenAndUnlock,                  // Open + Unlock                    // Sets GO_STATE_ACTIVE and resets GO_FLAG_LOCKED
+    Close,                          // Close                            // Sets GO_STATE_READY
+    ToggleOpen,                     // Toggle Open
+    Destroy,                        // Destroy                          // Sets GO_STATE_DESTROYED
+    Rebuild,                        // Rebuild                          // Resets from GO_STATE_DESTROYED
+    Creation,                       // Creation
+    Despawn,                        // Despawn
+    MakeInert,                      // Make Inert                       // Disables interactions
+    MakeActive,                     // Make Active                      // Enables interactions
+    CloseAndLock,                   // Close + Lock                     // Sets GO_STATE_READY and sets GO_FLAG_LOCKED
+    UseArtKit0,                     // Use ArtKit0                      // 46904: 121
+    UseArtKit1,                     // Use ArtKit1                      // 36639: 81, 46903: 122
+    UseArtKit2,                     // Use ArtKit2
+    UseArtKit3,                     // Use ArtKit3
+    SetTapList,                     // Set Tap List
+    GoTo1stFloor,                   // Go to 1st floor
+    GoTo2ndFloor,                   // Go to 2nd floor
+    GoTo3rdFloor,                   // Go to 3rd floor
+    GoTo4thFloor,                   // Go to 4th floor
+    GoTo5thFloor,                   // Go to 5th floor
+    GoTo6thFloor,                   // Go to 6th floor
+    GoTo7thFloor,                   // Go to 7th floor
+    GoTo8thFloor,                   // Go to 8th floor
+    GoTo9thFloor,                   // Go to 9th floor
+    GoTo10thFloor,                  // Go to 10th floor
+    UseArtKit4,                     // Use ArtKit4
+    PlayAnimKit,                    // Play Anim Kit "%s"               // MiscValueB -> Anim Kit ID
+    OpenAndPlayAnimKit,             // Open + Play Anim Kit "%s"        // MiscValueB -> Anim Kit ID
+    CloseAndPlayAnimKit,            // Close + Play Anim Kit "%s"       // MiscValueB -> Anim Kit ID
+    PlayOneshotAnimKit,             // Play One-shot Anim Kit "%s"      // MiscValueB -> Anim Kit ID
+    StopAnimKit,                    // Stop Anim Kit
+    OpenAndStopAnimKit,             // Open + Stop Anim Kit
+    CloseAndStopAnimKit,            // Close + Stop Anim Kit
+    PlaySpellVisual,                // Play Spell Visual "%s"           // MiscValueB -> Spell Visual ID
+    StopSpellVisual,                // Stop Spell Visual
+    SetTappedToChallengePlayers,    // Set Tapped to Challenge Players
+};
+
 enum TextEmotes
 {
     TEXTEMOTE_AGREE                = 1,

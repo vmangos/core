@@ -3220,11 +3220,30 @@ void SpellMgr::LoadSpellLearnSpells()
 
 void SpellMgr::LoadSpellScriptTarget()
 {
+    std::set<uint32> conditions;
+
+    // Load existing condition Ids so we can check for wrong condition Id later.
+    QueryResult *result = WorldDatabase.Query("SELECT condition_entry FROM conditions");
+
+    if (result)
+    {
+        do
+        {
+            Field *fields = result->Fetch();
+
+            uint32 conditionId = fields[0].GetUInt32();
+            conditions.insert(conditionId);
+        }
+        while (result->NextRow());
+
+        delete result;
+    }
+
     mSpellScriptTarget.clear();                             // need for reload case
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,type,targetEntry FROM spell_script_target");
+    result = WorldDatabase.Query("SELECT entry, type, targetEntry, conditionId FROM spell_script_target");
 
     if (!result)
     {
@@ -3247,6 +3266,7 @@ void SpellMgr::LoadSpellScriptTarget()
         uint32 spellId     = fields[0].GetUInt32();
         uint32 type        = fields[1].GetUInt32();
         uint32 targetEntry = fields[2].GetUInt32();
+        uint32 conditionId = fields[3].GetUInt32();
 
         SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(spellId);
 
@@ -3255,6 +3275,15 @@ void SpellMgr::LoadSpellScriptTarget()
             if (!sSpellMgr.IsExistingSpellId(spellId))
                 sLog.outErrorDb("Table `spell_script_target`: spellId %u listed for TargetEntry %u does not exist.", spellId, targetEntry);
             continue;
+        }
+
+        if (conditionId)
+        {
+            if (conditions.find(conditionId) == conditions.end())
+            {
+                sLog.outErrorDb("Table `spell_script_target`: conditionId %u listed for spell %u does not exist.", conditionId, spellId);
+                continue;
+            }
         }
 
         bool targetfound = false;
@@ -3328,7 +3357,7 @@ void SpellMgr::LoadSpellScriptTarget()
                 break;
         }
 
-        mSpellScriptTarget.insert(SpellScriptTarget::value_type(spellId, SpellTargetEntry(SpellTargetType(type), targetEntry)));
+        mSpellScriptTarget.insert(SpellScriptTarget::value_type(spellId, SpellTargetEntry(SpellTargetType(type), targetEntry, conditionId)));
 
         ++count;
     }

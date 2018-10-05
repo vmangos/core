@@ -3010,10 +3010,19 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         m_caster->GetRandomPoint(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), 5.0f, tmp_x, tmp_y, tmp_z);
                         m_targets.setDestination(tmp_x, tmp_y, tmp_z);
                     }
-                    //break;
+                    targetUnitMap.push_back(m_caster);
+                    break;
+                }
+                case SPELL_EFFECT_SUMMON_WILD:
+                {
+                    if (!m_originalCasterGUID.IsEmpty() && m_originalCasterGUID.IsGameObject())
+                    {
+                        if (GameObject* pSummoner = m_caster->GetMap()->GetGameObject(m_originalCasterGUID))
+                            m_targets.setDestination(pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ());
+                    }
+                    // no break
                 }
                 case SPELL_EFFECT_SUMMON_CHANGE_ITEM:
-                case SPELL_EFFECT_SUMMON_WILD:
                 case SPELL_EFFECT_SUMMON_GUARDIAN:
                 case SPELL_EFFECT_ADD_FARSIGHT:
                 case SPELL_EFFECT_STUCK:
@@ -5628,8 +5637,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                             if (i_spellST->second.targetEntry)
                             {
-                                MaNGOS::NearestGameObjectEntryInObjectRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, range);
-                                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(p_GameObject, go_check);
+                                MaNGOS::NearestGameObjectEntryFitConditionInObjectRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, range, i_spellST->second.conditionId);
+                                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryFitConditionInObjectRangeCheck> checker(p_GameObject, go_check);
                                 Cell::VisitGridObjects(m_caster, checker, range);
 
                                 if (p_GameObject)
@@ -5681,8 +5690,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                             // no target provided or it was not valid, so use closest in range
                             if (!targetExplicit)
                             {
-                                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range);
-                                MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(p_Creature, u_check);
+                                MaNGOS::NearestCreatureEntryFitConditionInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range, i_spellST->second.conditionId);
+                                MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryFitConditionInObjectRangeCheck> searcher(p_Creature, u_check);
 
                                 // Visit all, need to find also Pet* objects
                                 Cell::VisitAllObjects(m_caster, searcher, range);

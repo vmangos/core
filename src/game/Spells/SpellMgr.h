@@ -762,9 +762,10 @@ enum SpellTargetType
 
 struct SpellTargetEntry
 {
-    SpellTargetEntry(SpellTargetType type_,uint32 targetEntry_) : type(type_), targetEntry(targetEntry_) {}
+    SpellTargetEntry(SpellTargetType type_, uint32 targetEntry_, uint32 conditionId_) : type(type_), targetEntry(targetEntry_), conditionId(conditionId_) {}
     SpellTargetType type;
     uint32 targetEntry;
+    uint32 conditionId;
 };
 
 typedef std::multimap<uint32,SpellTargetEntry> SpellScriptTarget;
