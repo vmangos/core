@@ -711,6 +711,31 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                         //base->TrackingUpdateSent(index, m_uint32Values[index]);
                     *data << m_uint32Values[index];
                 }
+                // This is done to make creatures face the target they are casting on.
+                else if (index == UNIT_FIELD_TARGET)
+                {
+                    if (Creature const* pCreature = ToCreature())
+                    {
+                        if (pCreature->m_castingTargetGuid)
+                        {
+                            *data << *((uint32*)&pCreature->m_castingTargetGuid);
+                            continue;
+                        }
+                    }
+                    *data << m_uint32Values[index];     
+                }
+                else if (index == UNIT_FIELD_TARGET+1)
+                {
+                    if (Creature const* pCreature = ToCreature())
+                    {
+                        if (pCreature->m_castingTargetGuid)
+                        {
+                            *data << *(((uint32*)&pCreature->m_castingTargetGuid) + 1);
+                            continue;
+                        }
+                    }
+                    *data << m_uint32Values[index];
+                }
                 else
                 {
                     // send in current format (float as float, uint32 as uint32)

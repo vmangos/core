@@ -522,6 +522,8 @@ class Spell
         bool m_isChannelingVisual;                          // For summoning ritual helpers visual spell
                                                             // no effect handled, only channel start/update is sent
 
+        bool m_setCreatureTarget;                           // Set for spell casts that need to make the creature face the target
+
         uint8 m_delayAtDamageCount;
         int32 GetNextDelayAtDamageMsTime() { return m_delayAtDamageCount < 5 ? 1000 - (m_delayAtDamageCount++)* 200 : 200; }
 

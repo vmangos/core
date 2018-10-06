@@ -262,7 +262,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
 }
 
 Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
-    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
+    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false), m_setCreatureTarget(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
@@ -3311,6 +3311,10 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
             if (m_caster->IsPet())
                 m_caster->StopMoving();
 
+        // This is used so that creatures face the target on which they are casting
+        if (m_setCreatureTarget = (m_caster->IsCreature() && (channeled || (!m_IsTriggeredSpell && m_timer)) && m_targets.getUnitTarget() && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0])))
+            static_cast<Creature*>(m_caster)->SetCastingTarget(m_targets.getUnitTarget());
+
         // add non-triggered (with cast time and without)
         if (!m_IsTriggeredSpell || channeled)
             m_caster->SetCurrentCastedSpell(this);
@@ -4146,6 +4150,10 @@ void Spell::finish(bool ok)
         return;
 
     m_spellState = SPELL_STATE_FINISHED;
+
+    // Clear the creature's casting target so it faces victim
+    if (m_setCreatureTarget)
+        static_cast<Creature*>(m_caster)->ClearCastingTarget();
 
     if (!ok && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
     {

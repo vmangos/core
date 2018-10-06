@@ -756,6 +756,29 @@ class MANGOS_DLL_SPEC Creature : public Unit
         SpellCastResult TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags, uint8 uiChance);
         SpellCastResult TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo, uint32 uiCastFlags, uint8 uiChance);
 
+        // Unit on which the creature is currently casting a spell. Used to make mobs face their cast target.
+        // Client makes creatures always face unit sent in UNIT_FIELD_TARGET, orientation doesn't matter.
+        // We send this guid instead when its set, to avoid overwriting the unit field.
+        void SetCastingTarget(Unit const* pTarget)
+        {
+            if (pTarget != getVictim())
+            {
+                m_castingTargetGuid = pTarget->GetGUID();
+                ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
+                ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET + 1);
+            }
+        }
+        void ClearCastingTarget()
+        {
+            if (m_castingTargetGuid)
+            {
+                m_castingTargetGuid = 0;
+                ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET);
+                ForceValuesUpdateAtIndex(UNIT_FIELD_TARGET + 1);
+            }
+        }
+        uint64 m_castingTargetGuid;
+
         // - Victim selection (from aggro list)
         Unit* GetNearestVictimInRange(float min, float max);
         Unit* GetFarthestVictimInRange(float min, float max);
