@@ -259,7 +259,6 @@ set (SCRIPTS_SRCS
 	kalimdor/tanaris/zulfarrak/zulfarrak.cpp
 	kalimdor/teldrassil/teldrassil.cpp
 	kalimdor/the_barrens/the_barrens.cpp
-	kalimdor/the_barrens/razorfen_downs/boss_amnennar_the_coldbringer.cpp
 	kalimdor/the_barrens/razorfen_downs/instance_razorfen_downs.cpp
 	kalimdor/the_barrens/razorfen_downs/razorfen_downs.cpp
 	kalimdor/the_barrens/razorfen_kraul/instance_razorfen_kraul.cpp
