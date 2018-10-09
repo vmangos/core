@@ -42,7 +42,7 @@ enum EventAI_Type
     EVENT_T_HP                      = 2,                    // HPMax%, HPMin%, RepeatMin, RepeatMax
     EVENT_T_MANA                    = 3,                    // ManaMax%,ManaMin% RepeatMin, RepeatMax
     EVENT_T_AGGRO                   = 4,                    // NONE
-    EVENT_T_KILL                    = 5,                    // RepeatMin, RepeatMax
+    EVENT_T_KILL                    = 5,                    // RepeatMin, RepeatMax, PlayerOnly
     EVENT_T_DEATH                   = 6,                    // NONE
     EVENT_T_EVADE                   = 7,                    // NONE
     EVENT_T_SPELLHIT                = 8,                    // SpellID, School, RepeatMin, RepeatMax
@@ -130,6 +130,7 @@ struct CreatureEventAI_Event
         {
             uint32 repeatMin;
             uint32 repeatMax;
+            uint32 playerOnly;
         } kill;
         // EVENT_T_SPELLHIT                                 = 8
         struct

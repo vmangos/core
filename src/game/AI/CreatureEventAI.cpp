@@ -184,9 +184,14 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_AGGRO:
             break;
         case EVENT_T_KILL:
+        {
+            if (event.kill.playerOnly && !pActionInvoker->IsPlayer())
+                return false;
+
             //Repeat Timers
             pHolder.UpdateRepeatTimer(m_creature, event.kill.repeatMin, event.kill.repeatMax);
             break;
+        }
         case EVENT_T_DEATH:
         case EVENT_T_EVADE:
         case EVENT_T_LEAVE_COMBAT:
@@ -769,30 +774,30 @@ void CreatureEventAI::UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat)
             //Events that are updated every EVENT_UPDATE_TIME
             switch ((*i).Event.event_type)
             {
-            case EVENT_T_TIMER_OOC:
-                ProcessEvent(*i);
-                break;
-            case EVENT_T_TIMER:
-            case EVENT_T_MANA:
-            case EVENT_T_HP:
-            case EVENT_T_TARGET_HP:
-            case EVENT_T_TARGET_CASTING:
-            case EVENT_T_FRIENDLY_HP:
-            case EVENT_T_AURA:
-            case EVENT_T_TARGET_AURA:
-            case EVENT_T_MISSING_AURA:
-            case EVENT_T_TARGET_MISSING_AURA:
-                if (Combat)
+                case EVENT_T_TIMER_OOC:
                     ProcessEvent(*i);
-                break;
-            case EVENT_T_RANGE:
-                if (Combat)
-                {
-                    if (m_creature->getVictim() && m_creature->IsInMap(m_creature->getVictim()))
-                        if (m_creature->IsInRange(m_creature->getVictim(), (float)(*i).Event.range.minDist, (float)(*i).Event.range.maxDist))
-                            ProcessEvent(*i);
-                }
-                break;
+                    break;
+                case EVENT_T_TIMER:
+                case EVENT_T_MANA:
+                case EVENT_T_HP:
+                case EVENT_T_TARGET_HP:
+                case EVENT_T_TARGET_CASTING:
+                case EVENT_T_FRIENDLY_HP:
+                case EVENT_T_AURA:
+                case EVENT_T_TARGET_AURA:
+                case EVENT_T_MISSING_AURA:
+                case EVENT_T_TARGET_MISSING_AURA:
+                    if (Combat)
+                        ProcessEvent(*i);
+                    break;
+                case EVENT_T_RANGE:
+                    if (Combat)
+                    {
+                        if (m_creature->getVictim() && m_creature->IsInMap(m_creature->getVictim()))
+                            if (m_creature->IsInRange(m_creature->getVictim(), (float)(*i).Event.range.minDist, (float)(*i).Event.range.maxDist))
+                                ProcessEvent(*i);
+                    }
+                    break;
             }
         }
 
