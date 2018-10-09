@@ -276,7 +276,7 @@ void MotionMaster::DirectExpire(bool reset)
     // also drop stored under top() targeted motions
     typedef std::list<MovementGenerator*> MvtGenList;
     MvtGenList mvtGensToFinalize;
-    while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE))
+    while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE) && (curr->GetMovementGeneratorType() != DISTANCING_MOTION_TYPE))
     {
         MovementGenerator *temp = top();
         pop();
@@ -322,7 +322,7 @@ void MotionMaster::DelayedExpire(bool reset)
     // also drop stored under top() targeted motions
     typedef std::list<MovementGenerator*> MvtGenList;
     MvtGenList mvtGensToFinalize;
-    while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE))
+    while (!empty() && (top()->GetMovementGeneratorType() == CHASE_MOTION_TYPE || top()->GetMovementGeneratorType() == FOLLOW_MOTION_TYPE) && (curr->GetMovementGeneratorType() != DISTANCING_MOTION_TYPE))
     {
         MovementGenerator *temp = top();
         pop();
@@ -605,8 +605,9 @@ void MotionMaster::Mutate(MovementGenerator *m)
         {
             // HomeMovement is not that important, delete it if meanwhile a new comes
             case HOME_MOTION_TYPE:
-            // DistractMovement interrupted by any other movement
+            // Distract and Distancing movememnt interrupted by any other movement
             case DISTRACT_MOTION_TYPE:
+            case DISTANCING_MOTION_TYPE:
                 MovementExpired(false);
             default:
                 break;
@@ -718,6 +719,13 @@ void MotionMaster::MoveCharge(Unit* target, uint32 delay, bool triggerAutoAttack
         Mutate(new ChargeMovementGenerator<Player>(*(m_owner->ToPlayer()), *target, delay, triggerAutoAttack));
     else
         Mutate(new ChargeMovementGenerator<Creature>(*(m_owner->ToCreature()), *target, delay, triggerAutoAttack));
+}
+
+void MotionMaster::MoveDistance(Unit* pTarget, float distance)
+{
+    float x, y, z;
+    pTarget->GetNearPoint(m_owner, x, y, z, 0, distance, pTarget->GetAngle(m_owner));
+    Mutate(new DistancingMovementGenerator(x, y, z));
 }
 
 void MotionMaster::ClearType(MovementGeneratorType moveType)

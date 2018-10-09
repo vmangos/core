@@ -567,6 +567,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                     case DISTRACT_MOTION_TYPE:
                     case FOLLOW_MOTION_TYPE:
                     case CHARGE_MOTION_TYPE:
+                    case DISTANCING_MOTION_TYPE:
                         break;
                     default:
                     {

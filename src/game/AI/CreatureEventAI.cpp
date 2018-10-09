@@ -366,6 +366,14 @@ bool CreatureEventAI::ProcessEvent(CreatureEventAIHolder& pHolder, Unit* pAction
         case EVENT_T_MAP_SCRIPT_EVENT:
         case EVENT_T_GROUP_MEMBER_DIED:
             break;
+        case EVENT_T_VICTIM_ROOTED:
+        {
+            if (!m_creature->getVictim() || !m_creature->getVictim()->hasUnitState(UNIT_STAT_ROOT))
+                return false;
+
+            pHolder.UpdateRepeatTimer(m_creature, event.victim_rooted.repeatMin, event.victim_rooted.repeatMax);
+            break;
+        }
         default:
             sLog.outErrorDb("CreatureEventAI: Creature %u using Event %u has invalid Event Type(%u), missing from ProcessEvent() Switch.", m_creature->GetEntry(), pHolder.Event.event_id, pHolder.Event.event_type);
             break;
@@ -787,6 +795,7 @@ void CreatureEventAI::UpdateEventsOn_UpdateAI(const uint32 diff, bool Combat)
                 case EVENT_T_TARGET_AURA:
                 case EVENT_T_MISSING_AURA:
                 case EVENT_T_TARGET_MISSING_AURA:
+                case EVENT_T_VICTIM_ROOTED:
                     if (Combat)
                         ProcessEvent(*i);
                     break;

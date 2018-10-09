@@ -755,6 +755,10 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
             if (pTarget)
                 pSource->GetMotionMaster()->MoveCharge(pTarget, script.movement.intParam, script.movement.boolParam);
             break;
+        case DISTANCING_MOTION_TYPE:
+            if (pTarget && pSource->AI() && (!script.movement.intParam || (script.movement.intParam <= pSource->GetPowerPercent(POWER_MANA))))
+                pSource->AI()->MoveAwayFromTarget(pTarget, script.x);
+            break;
         default:
             sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for an invalid motion type (MotionType: %u), skipping.", script.id, script.movement.movementType);
             return ShouldAbortScript(script);
@@ -1433,6 +1437,9 @@ bool Map::ScriptCommand_DealDamage(const ScriptInfo& script, WorldObject* source
         sLog.outError("SCRIPT_COMMAND_DEAL_DAMAGE (script id %u) call for a NULL or non-unit target (TypeId: %u), skipping.", script.id, target ? target->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
+
+    if (!pTarget->isAlive())
+        return ShouldAbortScript(script);
 
     uint32 damage = script.dealDamage.isPercent ? pTarget->GetMaxHealth()*(script.dealDamage.damage / 100.0f) : script.dealDamage.damage;
     pSource->DealDamage(pTarget, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);

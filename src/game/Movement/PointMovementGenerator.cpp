@@ -141,6 +141,33 @@ template void PointMovementGenerator<Creature>::Reset(Creature&);
 template bool PointMovementGenerator<Player>::Update(Player &, const uint32 &diff);
 template bool PointMovementGenerator<Creature>::Update(Creature&, const uint32 &diff);
 
+bool DistancingMovementGenerator::Update(Creature &unit, const uint32 &diff)
+{
+    if (!&unit)
+        return false;
+    
+    if (unit.hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+    {
+        unit.clearUnitState(UNIT_STAT_ROAMING_MOVE);
+        return false;
+    }
+    
+    unit.addUnitState(UNIT_STAT_ROAMING_MOVE);
+
+    if (!unit.movespline->Finalized() && _recalculateSpeed)
+    {
+        _recalculateSpeed = false;
+        Initialize(unit);
+    }
+    return !unit.movespline->Finalized();
+}
+
+void DistancingMovementGenerator::MovementInform(Creature &unit)
+{
+    if (unit.AI())
+        unit.AI()->DoSpellTemplateCasts(1);
+}
+
 void AssistanceMovementGenerator::Initialize(Creature& unit)
 {
     if (unit.hasUnitState(UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_CAN_NOT_MOVE))

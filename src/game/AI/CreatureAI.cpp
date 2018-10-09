@@ -185,13 +185,13 @@ void CreatureAI::SetSpellsTemplate(const CreatureSpellsTemplate *SpellsTemplate)
 
 void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
 {
-    bool bCasted = false;
+    bool bDontCast = false;
     for (auto & spell : m_CreatureSpells)
     {
         if (spell.cooldown <= uiDiff)
         {
             // Prevent casting multiple spells in the same update. Only update timers.
-            if (bCasted)
+            if (bDontCast)
                 continue;
 
             if (m_creature->IsNonMeleeSpellCasted(false) && !(spell.castFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS)))
@@ -211,7 +211,7 @@ void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
             {
                 case SPELL_CAST_OK:
                 {
-                    bCasted = true;
+                    bDontCast = true;
                     spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
 
                     if (spell.castFlags & CF_MAIN_RANGED_SPELL)
@@ -228,9 +228,10 @@ void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
                         m_creature->GetMap()->ScriptsStart(sCreatureSpellScripts, spell.scriptId, m_creature, pTarget);
                     break;
                 }
+                case SPELL_FAILED_FLEEING:
                 case SPELL_FAILED_SPELL_IN_PROGRESS:
                 {
-                    // If we are casting, do nothing so it will try again on next update.
+                    // Do nothing so it will try again on next update.
                     break;
                 }
                 case SPELL_FAILED_TRY_AGAIN:
@@ -406,6 +407,16 @@ void CreatureAI::SetCombatMovement(bool enabled)
         else if (enabled && (m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE))
             m_creature->GetMotionMaster()->MoveChase(pVictim);
     }
+}
+
+void CreatureAI::MoveAwayFromTarget(Unit* pOwner, float distance)
+{
+    if (m_creature->hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+        return;
+
+    m_creature->CastStop();
+
+    m_creature->GetMotionMaster()->MoveDistance(pOwner, distance);
 }
 
 void CreatureAI::OnCombatStop()
