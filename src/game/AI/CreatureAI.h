@@ -228,9 +228,6 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Enables or disabled combat movement.
         void SetCombatMovement(bool enabled);
-
-        // Try to get away from a target.
-        void MoveAwayFromTarget(Unit* pTarget, float distance);
         
         // Pointer to controlled by AI creature
         Creature* const m_creature;

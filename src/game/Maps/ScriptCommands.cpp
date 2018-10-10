@@ -756,8 +756,8 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
                 pSource->GetMotionMaster()->MoveCharge(pTarget, script.movement.intParam, script.movement.boolParam);
             break;
         case DISTANCING_MOTION_TYPE:
-            if (pTarget && pSource->AI() && (!script.movement.intParam || (script.movement.intParam <= pSource->GetPowerPercent(POWER_MANA))))
-                pSource->AI()->MoveAwayFromTarget(pTarget, script.x);
+            if (pTarget && (!script.movement.intParam || (script.movement.intParam <= pSource->GetPowerPercent(POWER_MANA))))
+                pSource->MoveAwayFromTarget(pTarget, script.x);
             break;
         default:
             sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for an invalid motion type (MotionType: %u), skipping.", script.id, script.movement.movementType);

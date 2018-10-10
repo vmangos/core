@@ -605,7 +605,7 @@ void MotionMaster::Mutate(MovementGenerator *m)
         {
             // HomeMovement is not that important, delete it if meanwhile a new comes
             case HOME_MOTION_TYPE:
-            // Distract and Distancing movememnt interrupted by any other movement
+            // Distract and Distancing movement interrupted by any other movement
             case DISTRACT_MOTION_TYPE:
             case DISTANCING_MOTION_TYPE:
                 MovementExpired(false);

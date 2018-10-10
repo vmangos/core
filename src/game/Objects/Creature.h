@@ -677,6 +677,7 @@ class MANGOS_DLL_SPEC Creature : public Unit
         void DoFlee();
         void DoFleeToGetAssistance();
         float GetFleeingSpeed() const;
+        void MoveAwayFromTarget(Unit* pTarget, float distance);
         void CallForHelp(float fRadius);
         void CallAssistance();
         void SetNoCallAssistance(bool val) { m_AlreadyCallAssistance = val; }

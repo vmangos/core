@@ -409,16 +409,6 @@ void CreatureAI::SetCombatMovement(bool enabled)
     }
 }
 
-void CreatureAI::MoveAwayFromTarget(Unit* pOwner, float distance)
-{
-    if (m_creature->hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
-        return;
-
-    m_creature->CastStop();
-
-    m_creature->GetMotionMaster()->MoveDistance(pOwner, distance);
-}
-
 void CreatureAI::OnCombatStop()
 {
     // Reset back to default spells template. This also resets timers.

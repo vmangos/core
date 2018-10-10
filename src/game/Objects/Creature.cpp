@@ -952,7 +952,7 @@ void Creature::RegenerateHealth()
 
 void Creature::DoFlee()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float hpPercent = GetHealthPercent();
@@ -970,7 +970,7 @@ void Creature::DoFlee()
 
 void Creature::DoFleeToGetAssistance()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
@@ -1003,6 +1003,15 @@ float Creature::GetFleeingSpeed() const
 {
     //TODO: There are different speeds for the different mobs, isn't there?
     return GetSpeed(MOVE_RUN);
+}
+
+void Creature::MoveAwayFromTarget(Unit* pTarget, float distance)
+{
+    if (hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+        return;
+
+    GetMotionMaster()->MoveDistance(pTarget, distance);
+    InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
 }
 
 bool Creature::AIM_Initialize()
@@ -3615,14 +3624,16 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
     // Custom checks
     if (!(uiCastFlags & CF_FORCE_CAST))
     {
-        // Can't cast while fleeing.
-        switch (GetMotionMaster()->GetCurrentMovementGeneratorType())
+        // Motion Master is not updated when this state is active.
+        if (!hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
         {
-            case TIMED_FLEEING_MOTION_TYPE:
-                return SPELL_FAILED_FLEEING;
-            case DISTANCING_MOTION_TYPE:
-                if (!hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+            // Can't cast while fleeing.
+            switch (GetMotionMaster()->GetCurrentMovementGeneratorType())
+            {
+                case TIMED_FLEEING_MOTION_TYPE:
+                case DISTANCING_MOTION_TYPE:
                     return SPELL_FAILED_FLEEING;
+            }
         }
 
         // If the spell requires to be behind the target.
