@@ -725,7 +725,9 @@ void MotionMaster::MoveDistance(Unit* pTarget, float distance)
 {
     float x, y, z;
     pTarget->GetNearPoint(m_owner, x, y, z, 0, distance, pTarget->GetAngle(m_owner));
-    Mutate(new DistancingMovementGenerator(x, y, z));
+    
+    if (pTarget->IsWithinLOS(x, y, z, true, m_owner->GetCollisionHeight()))
+        Mutate(new DistancingMovementGenerator(x, y, z));
 }
 
 void MotionMaster::ClearType(MovementGeneratorType moveType)
