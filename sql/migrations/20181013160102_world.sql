@@ -9,7 +9,6 @@ INSERT INTO `migrations` VALUES ('20181013160102');
 -- Add your query below.
 
 
-
 -- Gossip menu for Kalaran Windblade.
 DELETE FROM `npc_gossip` WHERE `npc_guid`=5921;
 INSERT INTO `conditions` VALUES (250, 9, 3441, 1, 0, 0, 0); -- Has Incomplete Quest Divine Retribution
