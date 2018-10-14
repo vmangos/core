@@ -38,7 +38,7 @@ class SqlStmtParameters;
 class SqlParamBinder;
 class Database;
 
-#define MAX_QUERY_LEN   32*1024
+#define MAX_QUERY_LEN   (32*1024)
 
 typedef ACE_Based::LockedQueue<SqlOperation*, ACE_Thread_Mutex> SqlQueue;
 
