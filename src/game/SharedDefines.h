@@ -134,20 +134,27 @@ enum Stats
 
 enum Powers
 {
-    POWER_MANA                          = 0,
-    POWER_RAGE                          = 1,
-    POWER_FOCUS                         = 2,
-    POWER_ENERGY                        = 3,
-    POWER_HAPPINESS                     = 4,
-    // POWER_RUNES                         = 5, [-ZERO]WotLK - Deathknights
+    POWER_MANA                          = 0,            // UNIT_FIELD_POWER1
+    POWER_RAGE                          = 1,            // UNIT_FIELD_POWER2
+    POWER_FOCUS                         = 2,            // UNIT_FIELD_POWER3
+    POWER_ENERGY                        = 3,            // UNIT_FIELD_POWER4
+    POWER_HAPPINESS                     = 4,            // UNIT_FIELD_POWER5
     POWER_HEALTH                        = 0xFFFFFFFE    // (-2 as signed value)
 };
 
 #define MAX_POWERS                        5                 // not count POWER_RUNES for now
 
+/**
+ * The different spell schools that are available, used in both damage calculation
+ * and spell casting to decide what should be affected, the SPELL_SCHOOL_NORMAL
+ * is the armor, others should be self explanatory.
+ *
+ * Note that these are the values to use for changing ie, the armor via a
+ * Modifier, and it is the Modifier::m_miscValue that should be set.
+ */
 enum SpellSchools
 {
-    SPELL_SCHOOL_NORMAL                 = 0,
+    SPELL_SCHOOL_NORMAL                 = 0,            // Physical, Armor
     SPELL_SCHOOL_HOLY                   = 1,
     SPELL_SCHOOL_FIRE                   = 2,
     SPELL_SCHOOL_NATURE                 = 3,
@@ -158,6 +165,9 @@ enum SpellSchools
 
 #define MAX_SPELL_SCHOOL                  7
 
+/**
+ * A bitmask of the available SpellSchools. Used for convenience
+ */
 enum SpellSchoolMask
 {
     SPELL_SCHOOL_MASK_NONE    = 0x00,                       // not exist
@@ -187,7 +197,7 @@ enum SpellSchoolMask
       SPELL_SCHOOL_MASK_FROST | SPELL_SCHOOL_MASK_SHADOW | \
       SPELL_SCHOOL_MASK_ARCANE )
 
-// it convert school value into schoolmask missing in 1.12 dbc
+// converts school value into schoolmask missing in 1.12 dbc
 inline SpellSchoolMask GetSchoolMask(uint32 school)
 {
     return SpellSchoolMask(1 << school);
@@ -204,25 +214,25 @@ inline SpellSchools GetFirstSchoolInMask(SpellSchoolMask mask)
 
 enum ItemQualities
 {
-    ITEM_QUALITY_POOR                  = 0,                 //GREY
-    ITEM_QUALITY_NORMAL                = 1,                 //WHITE
-    ITEM_QUALITY_UNCOMMON              = 2,                 //GREEN
-    ITEM_QUALITY_RARE                  = 3,                 //BLUE
-    ITEM_QUALITY_EPIC                  = 4,                 //PURPLE
-    ITEM_QUALITY_LEGENDARY             = 5,                 //ORANGE
-    ITEM_QUALITY_ARTIFACT              = 6                  //LIGHT YELLOW
+    ITEM_QUALITY_POOR                  = 0,                 // GREY
+    ITEM_QUALITY_NORMAL                = 1,                 // WHITE
+    ITEM_QUALITY_UNCOMMON              = 2,                 // GREEN
+    ITEM_QUALITY_RARE                  = 3,                 // BLUE
+    ITEM_QUALITY_EPIC                  = 4,                 // PURPLE
+    ITEM_QUALITY_LEGENDARY             = 5,                 // ORANGE
+    ITEM_QUALITY_ARTIFACT              = 6                  // LIGHT YELLOW
 };
 
 #define MAX_ITEM_QUALITY                 7
 
 const uint32 ItemQualityColors[MAX_ITEM_QUALITY] = {
-    0xff9d9d9d,        //GREY
-    0xffffffff,        //WHITE
-    0xff1eff00,        //GREEN
-    0xff0070dd,        //BLUE
-    0xffa335ee,        //PURPLE
-    0xffff8000,        //ORANGE
-    0xffe6cc80         //LIGHT YELLOW
+    0xff9d9d9d,        // GREY
+    0xffffffff,        // WHITE
+    0xff1eff00,        // GREEN
+    0xff0070dd,        // BLUE
+    0xffa335ee,        // PURPLE
+    0xffff8000,        // ORANGE
+    0xffe6cc80         // LIGHT YELLOW
 };
 
 
@@ -262,7 +272,7 @@ enum SpellAttributes
     SPELL_ATTR_CANT_USED_IN_COMBAT            = 0x10000000,            // 28 Cannot be used in combat
     SPELL_ATTR_UNAFFECTED_BY_INVULNERABILITY  = 0x20000000,            // 29 unaffected by invulnerability (hmm possible not...)
     SPELL_ATTR_DIMINISHING_RETURNS            = 0x40000000,            // 30 breakable by damage?
-    SPELL_ATTR_CANT_CANCEL                    = 0x80000000            // 31 positive aura can't be canceled
+    SPELL_ATTR_CANT_CANCEL                    = 0x80000000             // 31 positive aura can't be canceled
 };
 
 enum SpellAttributesEx
@@ -294,11 +304,11 @@ enum SpellAttributesEx
     SPELL_ATTR_EX_IS_FISHING                  = 0x01000000,            // 24 only fishing spells
     SPELL_ATTR_EX_UNK25                       = 0x02000000,            // 25 not set in 2.4.2
     SPELL_ATTR_EX_UNK26                       = 0x04000000,            // 26
-    SPELL_ATTR_EX_UNK27                       = 0x08000000,            // 27
+    SPELL_ATTR_EX_REFUND_POWER                = 0x08000000,            // 27 All these spells refund power on parry or deflect
     SPELL_ATTR_EX_DONT_DISPLAY_IN_AURA_BAR    = 0x10000000,            // 28 client doesn't display these spells in aura bar
     SPELL_ATTR_EX_CHANNEL_DISPLAY_SPELL_NAME  = 0x20000000,            // 29 spell name is displayed in cast bar instead of 'channeling' text
     SPELL_ATTR_EX_ENABLE_AT_DODGE             = 0x40000000,            // 30 Overpower
-    SPELL_ATTR_EX_UNK31                       = 0x80000000            // 31
+    SPELL_ATTR_EX_UNK31                       = 0x80000000             // 31
 };
 
 enum SpellAttributesEx2
@@ -334,7 +344,7 @@ enum SpellAttributesEx2
     SPELL_ATTR_EX2_UNK28                      = 0x10000000,            // 28 no breaks stealth if it fails??
     SPELL_ATTR_EX2_CANT_CRIT                  = 0x20000000,            // 29 Spell can't crit
     SPELL_ATTR_EX2_TRIGGERED_CAN_TRIGGER_PROC = 0x40000000,            // 30
-    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000            // 31 Food or Drink Buff (like Well Fed)
+    SPELL_ATTR_EX2_FOOD_BUFF                  = 0x80000000             // 31 Food or Drink Buff (like Well Fed)
 };
 
 enum SpellAttributesEx3
@@ -370,7 +380,7 @@ enum SpellAttributesEx3
     SPELL_ATTR_EX3_UNK28                      = 0x10000000,            // 28
     SPELL_ATTR_EX3_UNK29                      = 0x20000000,            // 29 Probably ignore any damage modifiers (determined to be so in trinitycore as well)
     SPELL_ATTR_EX3_DONT_DISPLAY_RANGE         = 0x40000000,            // 30
-    SPELL_ATTR_EX3_UNK31                      = 0x80000000            // 31
+    SPELL_ATTR_EX3_UNK31                      = 0x80000000             // 31
 };
 
 enum SpellAttributesEx4
@@ -447,7 +457,7 @@ enum CharacterSlot
     SLOT_EMPTY                         = 19
 };
 
-// from Languages.dbc (checked for 1.12.1)
+// From Languages.dbc (checked for 1.12.1)
 enum Language
 {
     LANG_UNIVERSAL      = 0,
@@ -1060,7 +1070,7 @@ enum Mechanics
     MECHANIC_FEAR             = 5,
     MECHANIC_FUMBLE           = 6,
     MECHANIC_ROOT             = 7,
-    MECHANIC_PACIFY           = 8,                          //0 spells use this mechanic
+    MECHANIC_PACIFY           = 8,                          // 0 spells use this mechanic
     MECHANIC_SILENCE          = 9,
     MECHANIC_SLEEP            = 10,
     MECHANIC_SNARE            = 11,
@@ -1074,7 +1084,7 @@ enum Mechanics
     MECHANIC_SHIELD           = 19,
     MECHANIC_SHACKLE          = 20,
     MECHANIC_MOUNT            = 21,
-    MECHANIC_PERSUADE         = 22,                         //0 spells use this mechanic
+    MECHANIC_PERSUADE         = 22,                         // 0 spells use this mechanic
     MECHANIC_TURN             = 23,
     MECHANIC_HORROR           = 24,
     MECHANIC_INVULNERABILITY  = 25,
@@ -1125,10 +1135,10 @@ enum DispelType
 
 #define DISPEL_ALL_MASK ( (1<<DISPEL_MAGIC) | (1<<DISPEL_CURSE) | (1<<DISPEL_DISEASE) | (1<<DISPEL_POISON) )
 
-//To all Immune system,if target has immunes,
-//some spell that related to ImmuneToDispel or ImmuneToSchool or ImmuneToDamage type can't cast to it,
-//some spell_effects that related to ImmuneToEffect<effect>(only this effect in the spell) can't cast to it,
-//some aura(related to Mechanics or ImmuneToState<aura>) can't apply to it.
+// To all Immune system,if target has immunes,
+// some spell that related to ImmuneToDispel or ImmuneToSchool or ImmuneToDamage type can't cast to it,
+// some spell_effects that related to ImmuneToEffect<effect>(only this effect in the spell) can't cast to it,
+// some aura(related to Mechanics or ImmuneToState<aura>) can't apply to it.
 enum SpellImmunity
 {
     IMMUNITY_EFFECT                = 0,                     // enum SpellEffects
@@ -1141,11 +1151,11 @@ enum SpellImmunity
 
 #define MAX_SPELL_IMMUNITY           6
 
-enum WeaponAttackType
+enum WeaponAttackType                                       // The different weapon attack-types
 {
-    BASE_ATTACK   = 0,
-    OFF_ATTACK    = 1,
-    RANGED_ATTACK = 2
+    BASE_ATTACK   = 0,                                      // Main-hand weapon
+    OFF_ATTACK    = 1,                                      // Off-hand weapon
+    RANGED_ATTACK = 2                                       // Ranged weapon, bow/wand etc.
 };
 
 #define MAX_ATTACK  3
@@ -1156,11 +1166,13 @@ enum Targets
     TARGET_SELF                        = 1,
     TARGET_RANDOM_ENEMY_CHAIN_IN_AREA  = 2,                 // only one spell has that, but regardless, it's a target type after all
     TARGET_RANDOM_FRIEND_CHAIN_IN_AREA = 3,
+    TARGET_RANDOM_UNIT_CHAIN_IN_AREA   = 4,                 // some plague spells that are infectious - maybe targets not-infected friends inrange
     TARGET_PET                         = 5,
     TARGET_CHAIN_DAMAGE                = 6,
     TARGET_AREAEFFECT_INSTANT          = 7,                 // targets around provided destination point
     TARGET_AREAEFFECT_CUSTOM           = 8,
     TARGET_INNKEEPER_COORDINATES       = 9,                 // uses in teleport to innkeeper spells
+    TARGET_11                          = 11,                // used by spell 4 'Word of Recall Other'
     TARGET_ALL_ENEMY_IN_AREA           = 15,
     TARGET_ALL_ENEMY_IN_AREA_INSTANT   = 16,
     TARGET_TABLE_X_Y_Z_COORDINATES     = 17,                // uses in teleport spells and some other
@@ -1174,6 +1186,7 @@ enum Targets
     TARGET_GAMEOBJECT_ITEM             = 26,
     TARGET_MASTER                      = 27,
     TARGET_ALL_ENEMY_IN_AREA_CHANNELED = 28,
+    TARGET_29                          = 29,
     TARGET_ALL_FRIENDLY_UNITS_AROUND_CASTER = 30,           // select friendly for caster object faction (in different original caster faction) in TargetB used only with TARGET_ALL_AROUND_CASTER and in self casting range in TargetA
     TARGET_ALL_FRIENDLY_UNITS_IN_AREA  = 31,
     TARGET_MINION                      = 32,
@@ -1202,8 +1215,11 @@ enum Targets
     TARGET_DEST_CASTER_FRONT_LEAP      = 55,
     TARGET_ALL_RAID_AROUND_CASTER      = 56,
     TARGET_SINGLE_FRIEND_2             = 57,
+    TARGET_58                          = 58,
+    TARGET_FRIENDLY_FRONTAL_CONE       = 59,
     TARGET_NARROW_FRONTAL_CONE         = 60,
     TARGET_AREAEFFECT_PARTY_AND_CLASS  = 61,
+    TARGET_62                          = 62,
     TARGET_DUELVSPLAYER_COORDINATES    = 63,
 };
 
@@ -1248,12 +1264,12 @@ enum SpellPreventionType
     SPELL_PREVENTION_TYPE_PACIFY    = 2
 };
 
-// indexes from SpellRange.dbc, listed only special and used in code
+// Indexes from SpellRange.dbc, listed only special and used in code
 enum SpellRangeIndex
 {
     SPELL_RANGE_IDX_SELF_ONLY = 1,                          // 0.0
-    SPELL_RANGE_IDX_COMBAT    = 2,                          // 5.5 (but dynamic)
-    SPELL_RANGE_IDX_ANYWHERE  = 13,                         //< 500000 (anywhere)
+    SPELL_RANGE_IDX_COMBAT    = 2,                          // often ~5.5 (but infact dynamic melee combat range)
+    SPELL_RANGE_IDX_ANYWHERE  = 13,                         // 500000 (anywhere)
 };
 
 enum DamageEffectType
@@ -1905,6 +1921,7 @@ enum LockKeyType
 
 enum LockType
 {
+    LOCKTYPE_NONE                  = 0,
     LOCKTYPE_PICKLOCK              = 1,
     LOCKTYPE_HERBALISM             = 2,
     LOCKTYPE_MINING                = 3,
@@ -1952,8 +1969,8 @@ enum CreatureType
     CREATURE_TYPE_TOTEM            = 11,
 };
 
-uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID-1)) | (1 << (CREATURE_TYPE_UNDEAD-1));
-uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL-1)) | (1 << (CREATURE_TYPE_ELEMENTAL-1));
+uint32 const CREATURE_TYPEMASK_HUMANOID_OR_UNDEAD = (1 << (CREATURE_TYPE_HUMANOID - 1)) | (1 << (CREATURE_TYPE_UNDEAD - 1));
+uint32 const CREATURE_TYPEMASK_MECHANICAL_OR_ELEMENTAL = (1 << (CREATURE_TYPE_MECHANICAL - 1)) | (1 << (CREATURE_TYPE_ELEMENTAL - 1));
 
 // CreatureFamily.dbc
 enum CreatureFamily
@@ -2037,7 +2054,7 @@ enum HolidayIds
     HOLIDAY_DARKMOON_FAIRE_SHATTRATH = 376,
 };
 
-// values based at QuestSort.dbc
+// Values based on QuestSort.dbc
 enum QuestSort
 {
     QUEST_SORT_EPIC                = 1,
@@ -2079,7 +2096,7 @@ enum QuestSort
 
 inline uint8 ClassByQuestSort(int32 QuestSort)
 {
-    switch(QuestSort)
+    switch (QuestSort)
     {
         case QUEST_SORT_WARLOCK: return CLASS_WARLOCK;
         case QUEST_SORT_WARRIOR: return CLASS_WARRIOR;
@@ -2228,7 +2245,7 @@ enum SkillType
 
 inline SkillType SkillByLockType(LockType locktype)
 {
-    switch(locktype)
+    switch (locktype)
     {
         case LOCKTYPE_PICKLOCK:    return SKILL_LOCKPICKING;
         case LOCKTYPE_HERBALISM:   return SKILL_HERBALISM;
@@ -2241,7 +2258,7 @@ inline SkillType SkillByLockType(LockType locktype)
 
 inline uint32 SkillByQuestSort(int32 QuestSort)
 {
-    switch(QuestSort)
+    switch (QuestSort)
     {
         case QUEST_SORT_HERBALISM:      return SKILL_HERBALISM;
         case QUEST_SORT_FISHING:        return SKILL_FISHING;
@@ -2467,12 +2484,16 @@ enum DiminishingGroup
     DIMINISHING_LIMITONLY
 };
 
+/**
+ * The different available diminishing return levels.
+ * \see DiminishingReturn
+ */
 enum DiminishingLevels
 {
-    DIMINISHING_LEVEL_1 = 0,
-    DIMINISHING_LEVEL_2 = 1,
-    DIMINISHING_LEVEL_3 = 2,
-    DIMINISHING_LEVEL_IMMUNE = 3
+    DIMINISHING_LEVEL_1             = 0,         // Won't make a difference to stun duration
+    DIMINISHING_LEVEL_2             = 1,         // Reduces stun time by 50%
+    DIMINISHING_LEVEL_3             = 2,         // Reduces stun time by 75%
+    DIMINISHING_LEVEL_IMMUNE        = 3          // The target is immune to the DiminishingGroup
 };
 
 enum SummonType
@@ -2529,6 +2550,17 @@ enum ShapeshiftForm
     FORM_STEALTH            = 0x1E,
     FORM_MOONKIN            = 0x1F,
     FORM_SPIRITOFREDEMPTION = 0x20
+};
+
+enum ShapeshiftFormFlags
+{
+    SHAPESHIFT_FORM_FLAG_ALLOW_ACTIVITY     = 0x00000001,   // Form allows various player activities, which normally cause "You can't X while shapeshifted." errors (npc/go interaction, item use, etc)
+    SHAPESHIFT_FORM_FLAG_UNK2               = 0x00000002,
+    SHAPESHIFT_FORM_FLAG_UNK3               = 0x00000004,
+    SHAPESHIFT_FORM_FLAG_ALLOW_NPC_INTERACT = 0x00000008,   // Form unconditionally allows talking to NPCs while shapeshifted (even if other activities are disabled)
+    SHAPESHIFT_FORM_FLAG_UNK5               = 0x00000010,
+    SHAPESHIFT_FORM_FLAG_UNK6               = 0x00000020,
+    SHAPESHIFT_FORM_FLAG_UNK7               = 0x00000040,
 };
 
 enum ResponseCodes
@@ -2644,7 +2676,7 @@ enum BanReturn
     BAN_INPROGRESS
 };
 
-// indexes of BattlemasterList.dbc
+// Indexes of BattlemasterList.dbc
 enum BattleGroundTypeId
 {
     BATTLEGROUND_TYPE_NONE     = 0,
@@ -2783,7 +2815,7 @@ enum TeamId
     TEAM_NEUTRAL    = 2,
 };
 
-// Cf GMTicketCategory.dbc
+// From GMTicketCategory.dbc
 enum TicketType
 {
     GMTICKET_STUCK                  = 1,
