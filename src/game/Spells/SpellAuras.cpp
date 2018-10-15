@@ -2823,6 +2823,50 @@ void Aura::HandleModPossess(bool apply, bool Real)
     Unit* caster = GetCaster();
     if (!caster || !target)
         return;
+
+    // HACK: Prevent crash when target is controlling summoned unit (Eye of Kilrog)
+    if (apply && target->GetCharmGuid())
+    {
+        Unit::SpellAuraHolderMap& uAuras = target->GetSpellAuraHolderMap();
+        for (Unit::SpellAuraHolderMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
+        {
+            SpellAuraHolder *holder = itr->second;
+            const SpellEntry* pSpellEntry = holder->GetSpellProto();
+            if (IsSpellHaveEffect(pSpellEntry, SPELL_EFFECT_SUMMON_POSSESSED))
+            {
+                holder->SetRemoveMode(AURA_REMOVE_BY_DELETE);
+                holder->UnregisterSingleCastHolder();
+                for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+                {
+                    if (Aura *aura = holder->m_auras[i])
+                        target->RemoveAura(aura, AURA_REMOVE_BY_DELETE);
+                }
+                holder->_RemoveSpellAuraHolder();
+                target->DeleteAuraHolder(holder);
+                uAuras.erase(itr);
+                if (Player* player = target->ToPlayer())
+                {
+                    Unit* possessed = player->GetCharm();
+                    player->SetCharm(nullptr);
+                    if (possessed)
+                        player->SetClientControl(possessed, 0);
+                    player->SetMover(nullptr);
+                    player->GetCamera().ResetView();
+                    player->RemovePetActionBar();
+                    if (possessed)
+                    {
+                        possessed->clearUnitState(UNIT_STAT_CONTROLLED);
+                        possessed->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                        possessed->SetCharmerGuid(ObjectGuid());
+                        if (possessed->GetUInt32Value(UNIT_CREATED_BY_SPELL) == pSpellEntry->Id && possessed->GetTypeId() == TYPEID_UNIT)
+                            ((Creature*)possessed)->DespawnOrUnsummon();
+                    }
+                }
+                break;
+            }
+        }
+    }
+
     caster->ModPossess(target, apply, m_removeMode);
     target->AddThreat(caster,target->GetHealth(), false, GetSpellSchoolMask(GetSpellProto()));
 
