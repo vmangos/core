@@ -385,38 +385,41 @@ HonorScores HonorMaintenancer::GenerateScores(HonorStandingList& standingList)
     // initialize the breakpoint values
     // [-PROGRESSIVE]
     // 1.11- values (source: http://www.wowwiki.com/Honor_system_%28pre-2.0_formulas%29)
-    sc.BRK[13] = 0.002f;
-    sc.BRK[12] = 0.007f;
-    sc.BRK[11] = 0.017f;
-    sc.BRK[10] = 0.032f;
-    sc.BRK[ 9] = 0.057f;
-    sc.BRK[ 8] = 0.097f;
-    sc.BRK[ 7] = 0.156f;
-    sc.BRK[ 6] = 0.225f;
-    sc.BRK[ 5] = 0.324f;
-    sc.BRK[ 4] = 0.433f;
-    sc.BRK[ 3] = 0.553f;
-    sc.BRK[ 2] = 0.687f;
-    sc.BRK[ 1] = 0.835f;
-    sc.BRK[ 0] = 1.000f;
-    
-    /*
-    // 1.12+
-    sc.BRK[13] = 0.003f;
-    sc.BRK[12] = 0.008f;
-    sc.BRK[11] = 0.020f;
-    sc.BRK[10] = 0.035f;
-    sc.BRK[ 9] = 0.060f;
-    sc.BRK[ 8] = 0.100f;
-    sc.BRK[ 7] = 0.159f;
-    sc.BRK[ 6] = 0.228f;
-    sc.BRK[ 5] = 0.327f;
-    sc.BRK[ 4] = 0.436f;
-    sc.BRK[ 3] = 0.566f;
-    sc.BRK[ 2] = 0.697f;
-    sc.BRK[ 1] = 0.845f;
-    sc.BRK[ 0] = 1.000f;
-    */
+    if (sWorld.GetWowPatch() < WOW_PATCH_112)
+    {
+        sc.BRK[13] = 0.002f;
+        sc.BRK[12] = 0.007f;
+        sc.BRK[11] = 0.017f;
+        sc.BRK[10] = 0.032f;
+        sc.BRK[9] = 0.057f;
+        sc.BRK[8] = 0.097f;
+        sc.BRK[7] = 0.156f;
+        sc.BRK[6] = 0.225f;
+        sc.BRK[5] = 0.324f;
+        sc.BRK[4] = 0.433f;
+        sc.BRK[3] = 0.553f;
+        sc.BRK[2] = 0.687f;
+        sc.BRK[1] = 0.835f;
+        sc.BRK[0] = 1.000f;
+    }
+    else
+    {
+        // 1.12+
+        sc.BRK[13] = 0.003f;
+        sc.BRK[12] = 0.008f;
+        sc.BRK[11] = 0.020f;
+        sc.BRK[10] = 0.035f;
+        sc.BRK[9] = 0.060f;
+        sc.BRK[8] = 0.100f;
+        sc.BRK[7] = 0.159f;
+        sc.BRK[6] = 0.228f;
+        sc.BRK[5] = 0.327f;
+        sc.BRK[4] = 0.436f;
+        sc.BRK[3] = 0.566f;
+        sc.BRK[2] = 0.697f;
+        sc.BRK[1] = 0.845f;
+        sc.BRK[0] = 1.000f;
+    }
 
     // get the WS scores at the top of each break point
     for (uint8 group = 0; group < 14; group++)
