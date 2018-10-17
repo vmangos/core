@@ -57,3 +57,29 @@ LocaleConstant GetLocaleByName(const std::string& name)
 
     return LOCALE_enUS;                                     // including enGB case
 }
+
+LocaleConstant GetDbcLocaleFromDbLocale(DBLocaleConstant localeIndex)
+{
+    switch (localeIndex)
+    {
+        case DB_LOCALE_enUS:
+            return LOCALE_enUS;
+        case DB_LOCALE_frFR:
+            return LOCALE_frFR;
+        case DB_LOCALE_deDE:
+            return LOCALE_deDE;
+        case DB_LOCALE_koKR:
+            return LOCALE_koKR;
+        case DB_LOCALE_zhCN:
+            return LOCALE_zhCN;
+        case DB_LOCALE_zhTW:
+            return LOCALE_zhTW;
+        case DB_LOCALE_esES:
+            return LOCALE_esES;
+        case DB_LOCALE_esMX:
+            return LOCALE_esMX;
+        case DB_LOCALE_ruRU:
+            return LOCALE_enUS; // there are no russian dbcs for vanilla
+    }
+    return LOCALE_enUS;
+}

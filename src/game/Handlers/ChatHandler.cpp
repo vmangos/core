@@ -41,7 +41,7 @@
 #include "Anticheat.h"
 #include "AccountMgr.h"
 
-bool WorldSession::processChatmessageFurtherAfterSecurityChecks(std::string& msg, uint32 lang)
+bool WorldSession::ProcessChatMessageAfterSecurityCheck(std::string& msg, uint32 lang, uint32 msgType)
 {
     if (lang != LANG_ADDON)
     {
@@ -197,7 +197,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             recv_data >> channel;
             recv_data >> msg;
 
-            if (!processChatmessageFurtherAfterSecurityChecks(msg, lang))
+            if (!ProcessChatMessageAfterSecurityCheck(msg, lang, type))
                 return;
 
             if (msg.empty())
@@ -218,7 +218,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
         case CHAT_MSG_BATTLEGROUND:
         case CHAT_MSG_BATTLEGROUND_LEADER:
             recv_data >> msg;
-            if (!processChatmessageFurtherAfterSecurityChecks(msg, lang))
+            if (!ProcessChatMessageAfterSecurityCheck(msg, lang, type))
                 return;
             if (msg.empty())
                 return;
