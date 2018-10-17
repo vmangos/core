@@ -525,7 +525,11 @@ void HonorMaintenancer::CheckMaintenanceDay()
     if (sWorld.GetGameDay() >= m_nextMaintenanceDay && !m_markerToStart)
     {
         // Restart 15 minutes after honor weekend by server time
-        sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, SHUTDOWN_EXIT_CODE);
+        if (sWorld.getConfig(CONFIG_BOOL_AUTO_HONOR_RESTART))
+            sWorld.ShutdownServ(900, SHUTDOWN_MASK_RESTART, SHUTDOWN_EXIT_CODE);
+        else
+            sLog.outString("HonorMaintenancer: Server needs to be restarted to perform honor rank calculations.");
+
         ToggleMaintenanceMarker();
     }
 }

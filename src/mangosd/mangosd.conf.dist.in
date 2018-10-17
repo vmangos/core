@@ -1594,6 +1594,10 @@ Rate.WarEffortResourceComplete = 0.0
 #        If the group is bigger than this value, players are queued solo
 #        Default: 40
 #
+#    AutoHonorRestart
+#        Server will schedule a restart on its own when it's time to perform PvP rank calculations.
+#        Default: 1
+#
 ###################################################################################################################
 
 Battleground.CastDeserter = 1
@@ -1607,6 +1611,7 @@ BattleGround.QueuesCount            = 0
 BattleGround.TagInBattleGrounds     = 1
 BattleGround.RandomizeQueues = 0
 BattleGround.GroupQueueLimit = 40
+AutoHonorRestart = 1
 
 ###################################################################################################################
 #
