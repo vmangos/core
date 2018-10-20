@@ -13053,8 +13053,8 @@ void Player::RewardQuest(Quest const *pQuest, uint32 reward, WorldObject* questG
 
     if (getLevel() < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         GiveXP(XP , NULL);
-    else
-        LogModifyMoney(int32(pQuest->GetRewMoneyMaxLevel() * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY)), "QuestMaxLevel", questGiver->GetObjectGuid(), quest_id);
+    else if (int32 money = pQuest->GetRewMoneyMaxLevelAtComplete())
+        LogModifyMoney(money, "QuestMaxLevel", questGiver->GetObjectGuid(), quest_id);
 
     // Give player extra money if GetRewOrReqMoney > 0 and get ReqMoney if negative
     LogModifyMoney(pQuest->GetRewOrReqMoney(), "Quest", questGiver->GetObjectGuid(), quest_id);
@@ -14205,7 +14205,7 @@ void Player::SendQuestReward(Quest const *pQuest, uint32 XP, Object * questGiver
     else
     {
         data << uint32(0);
-        data << uint32(pQuest->GetRewOrReqMoney() + int32(pQuest->GetRewMoneyMaxLevel() * sWorld.getConfig(CONFIG_FLOAT_RATE_DROP_MONEY)));
+        data << uint32(pQuest->GetRewOrReqMoney() + pQuest->GetRewMoneyMaxLevelAtComplete());
     }
     data << uint32(pQuest->GetRewItemsCount());             // max is 5
 

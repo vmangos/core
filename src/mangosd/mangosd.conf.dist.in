@@ -326,6 +326,10 @@ CleanCharacterDB = 1
 #        If set, the talent respec cost will not decay until patch 1.11 when the monthly reduction was added.
 #        Default: 1
 #
+#    Progression.NoQuestXpToGold
+#        If set, quest xp gained at max level will not be converted to gold until patch 1.10 when the feature was added.
+#        Default: 1
+#
 #    DebuffLimit
 #        How many debuffs can be present on a target simultaneously
 #        Default: 0  - Decide automatically based on patch
@@ -347,7 +351,7 @@ Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
 Progression.AccurateSpellEffects = 1
 Progression.NoRespecPriceDecay = 1
-
+Progression.NoQuestXpToGold = 1
 DebuffLimit = 0
 
 ###################################################################################################################
@@ -681,6 +685,10 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Enable or disable instant logout for security level (0..4) or high (NOT in combat/while dueling/while falling)
 #        Default: 1 (Mods/GMs/Admins)
 #
+#    AutoHonorRestart
+#        Server will schedule a restart on its own when it's time to perform PvP rank calculations.
+#        Default: 1
+#
 #    AllFlightPaths
 #        Players will start with all flight paths (Note: ALL flight paths, not only player's team)
 #        Default: 0 (true)
@@ -804,7 +812,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 10
 #
 #    PetUnsummonAtMount
-#        Persmanent pet will unsummoned at player mount
+#        Permanent pet will unsummoned at player mount
 #        Default: 0 - not unsummon
 #                 1 - unsummon for any mount
 #
@@ -861,6 +869,7 @@ StartHonorPoints = 0
 MinHonorKills = 15
 MaintenanceDay = 3
 InstantLogout = 1
+AutoHonorRestart = 1
 AllFlightPaths = 0
 AlwaysMaxSkillForLevel = 0
 ActivateWeather = 1
@@ -1594,10 +1603,6 @@ Rate.WarEffortResourceComplete = 0.0
 #        If the group is bigger than this value, players are queued solo
 #        Default: 40
 #
-#    AutoHonorRestart
-#        Server will schedule a restart on its own when it's time to perform PvP rank calculations.
-#        Default: 1
-#
 ###################################################################################################################
 
 Battleground.CastDeserter = 1
@@ -1611,7 +1616,6 @@ BattleGround.QueuesCount            = 0
 BattleGround.TagInBattleGrounds     = 1
 BattleGround.RandomizeQueues = 0
 BattleGround.GroupQueueLimit = 40
-AutoHonorRestart = 1
 
 ###################################################################################################################
 #
