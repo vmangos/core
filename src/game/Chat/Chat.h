@@ -465,6 +465,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGoGraveyardCommand(char* args);
         bool HandleGoGridCommand(char* args);
         bool HandleGoObjectCommand(char* args);
+        bool HandleGoTargetCommand(char* args);
         bool HandleGoTaxinodeCommand(char* args);
         bool HandleGoTriggerCommand(char* args);
         bool HandleGoXYCommand(char* args);

@@ -303,6 +303,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "graveyard",      SEC_MODERATOR,      false, &ChatHandler::HandleGoGraveyardCommand,         "", nullptr },
         { NODE, "grid",           SEC_MODERATOR,      false, &ChatHandler::HandleGoGridCommand,              "", nullptr },
         { NODE, "object",         SEC_MODERATOR,      false, &ChatHandler::HandleGoObjectCommand,            "", nullptr },
+        { NODE, "target",         SEC_MODERATOR,      false, &ChatHandler::HandleGoTargetCommand,            "", nullptr },
         { NODE, "taxinode",       SEC_MODERATOR,      false, &ChatHandler::HandleGoTaxinodeCommand,          "", nullptr },
         { NODE, "trigger",        SEC_MODERATOR,      false, &ChatHandler::HandleGoTriggerCommand,           "", nullptr },
         { NODE, "zonexy",         SEC_MODERATOR,      false, &ChatHandler::HandleGoZoneXYCommand,            "", nullptr },
