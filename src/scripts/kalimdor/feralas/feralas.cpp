@@ -722,8 +722,6 @@ enum
     REQUEST_SAVED_SPRITE_DARTER     = 6,
 
     SPELL_MANA_BURN                 = 11981,
-    SPELL_SHOOT                     = 6660,
-    SPELL_MULTI_SHOT                = 14443
 };
 
 struct sMovementInformation
@@ -771,8 +769,6 @@ struct npc_kindal_moonweaverAI : public FollowerAI
 
     uint8 m_uiSavedSpriteDarter;
     uint8 m_uiDiedSpriteDarter;
-    uint32 m_uiShootTimer;
-    uint32 m_uiMultiShotTimer;
 
     bool m_eventStarted;
 
@@ -780,9 +776,6 @@ struct npc_kindal_moonweaverAI : public FollowerAI
     {
         if (!HasFollowState(STATE_FOLLOW_INPROGRESS))
             m_eventStarted = false;
-
-        m_uiShootTimer = urand(5, 30);
-        m_uiMultiShotTimer = urand(5, 30);
     }
 
     void JustDied(Unit* pWho) override
@@ -790,45 +783,6 @@ struct npc_kindal_moonweaverAI : public FollowerAI
         FollowerAI::JustDied(pWho);
 
         m_creature->SetRespawnTime(10);
-    }
-
-    void UpdateFollowerAI(const uint32 uiDiff) override
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-            
-        // EventAI also contained info so that Kindal flees at 15% hp; not sure if it's really needed for escort
-        // TO DO - perhaps requires EventAI-like combat movement too (testing)
-        
-        // ranged
-        if (m_creature->IsInRange(m_creature->getVictim(), 25.001f, 54.0f))
-        {
-            m_creature->SetSheath(SHEATH_STATE_RANGED);
-
-            if (m_uiMultiShotTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_MULTI_SHOT) == CAST_OK)
-                    m_uiMultiShotTimer = urand(8000, 11000);
-            }
-            else
-                m_uiMultiShotTimer -= uiDiff;
-
-            if (m_uiShootTimer < uiDiff)
-            {
-                if (DoCastSpellIfCan(m_creature->getVictim(), SPELL_SHOOT) == CAST_OK)
-                    m_uiShootTimer = urand(2300, 3900);
-            }
-            else
-                m_uiShootTimer -= uiDiff;
-        }
-
-        // melee
-        if (m_creature->IsInRange(m_creature->getVictim(), 0.0f, 25.0f))
-        {
-            m_creature->SetSheath(SHEATH_STATE_MELEE);
-
-            DoMeleeAttackIfReady();
-        }
     }
 
     void BeginEvent();
