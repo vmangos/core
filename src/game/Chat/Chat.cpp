@@ -1886,15 +1886,15 @@ bool ChatHandler::isValidChatMessage(const char* message)
     uint32 color = 0;
 
     ItemPrototype const* linkedItem = nullptr;
-    ItemRandomPropertiesEntry const* itemProperty = nullptr;
     const SpellEntry* linkedSpell = nullptr;
+
+    std::list<int> properties;
 
     while (!reader.eof())
     {
         if (validSequence == validSequenceIterator)
         {
             linkedItem = nullptr;
-            itemProperty = nullptr;
 
             reader.ignore(255, '|');
         }
@@ -2000,10 +2000,10 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     }
 
                     // the itementry is followed by several integers which describe an instance of this item
-                    int32 propertyId = 0;
+                    int32 propertyId = 0, propCount = 0;
                     bool negativeNumber = false;
                     char c = 0;
-                    while (reader.peek() != '|' && !reader.eof() && !itemProperty)
+                    while (reader.peek() != '|' && !reader.eof() && propCount < 3)
                     {
                         c = reader.get();
 
@@ -2013,12 +2013,10 @@ bool ChatHandler::isValidChatMessage(const char* message)
                             if (negativeNumber)
                                 propertyId *= -1;
 
+                            ++propCount;
+                            // Only check if it's a non-zero prop
                             if (propertyId > 0)
-                            {
-                                itemProperty = sItemRandomPropertiesStore.LookupEntry(propertyId);
-                                if (!itemProperty)
-                                    return false;
-                            }
+                                properties.push_back(propertyId);
 
                             propertyId = 0;
                             negativeNumber = false;
@@ -2101,34 +2099,87 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     }
                     else if (linkedItem)
                     {
-                        bool validName = true;
+                        bool hasValidRandomProperty = false;
+                        bool hasRandomProperty = linkedItem->RandomProperty > 0;
+                        int enchantCount = 0;
+
+                        // Item has no random property. All properties must be enchants, of which
+                        // there can only be two. One permanent, one temporary
+                        if (!hasRandomProperty && properties.size() > 2)
+                            return false;
+
                         int dbLocale = m_session->GetSessionDbLocaleIndex();
                         LocaleConstant dbcLocale = m_session->GetSessionDbcLocale();
 
-                        std::string expectedName = linkedItem->Name1;
-                        Item::GetNameWithSuffix(expectedName, linkedItem, itemProperty, dbLocale, dbcLocale);
-
-                        if (expectedName != buffer)
+                        const ItemRandomPropertiesEntry* iProp = nullptr;
+                        for (auto iter = properties.begin(); iter != properties.end(); ++iter)
                         {
-                            validName = false;
-                            std::string expectedName = linkedItem->Name1;
+                            auto prop = *iter;
+                            iProp = nullptr;
 
-                            // Player could have copied valid link by a foreign player. Try to find name in other locales.
+                            if (!hasRandomProperty)
+                            {
+                                if (sSpellItemEnchantmentStore.LookupEntry(prop))
+                                    ++enchantCount;
+                                else
+                                    return false;
+                            }
+                            else
+                            {
+                                // This is tricky - some enchants and random properties share IDs!
+                                // do we just compare all of the names?
+                                if (!hasValidRandomProperty)
+                                    iProp = sItemRandomPropertiesStore.LookupEntry(prop);
+
+                                // Check if we have a valid random property with this prop...
+                                if (iProp)
+                                {
+                                    // Compare the name. If the name isn't correct, maybe it's an enchantment instead.
+                                    for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
+                                    {
+                                        std::string expectedName = linkedItem->Name1;
+                                        Item::GetNameWithSuffix(expectedName, linkedItem, iProp, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                        if (expectedName == buffer)
+                                        {
+                                            hasValidRandomProperty = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Still don't have a valid random prop. If it's an enchantment, inc count.
+                                // Else this property is entirely invalid.
+                                if (!hasValidRandomProperty)
+                                {
+                                    if (sSpellItemEnchantmentStore.LookupEntry(prop))
+                                        ++enchantCount;
+                                    else
+                                        return false;
+                                }
+                            }
+
+                            if (enchantCount > 2)
+                                return false;
+                        }
+
+                        if (hasRandomProperty && !hasValidRandomProperty)
+                            return false;
+                        else if (!hasRandomProperty)
+                        {
+                            // Finally compare base name
+                            bool validName = false;
                             for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
                             {
-                                Item::GetNameWithSuffix(expectedName, linkedItem, itemProperty, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                std::string expectedName = linkedItem->Name1;
+                                Item::GetNameWithSuffix(expectedName, linkedItem, nullptr, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
                                 if (expectedName == buffer)
                                 {
                                     validName = true;
                                     break;
                                 }
                             }
-                        }
-                        
-                        if (!validName)
-                        {
-                            DEBUG_LOG("ChatHandler::isValidChatMessage linked item name wasn't found in any localization");
-                            return false;
+                            if (!validName)
+                                return false;
                         }
                     }
                     // that place should never be reached - if nothing linked has been set in |H
