@@ -18139,7 +18139,7 @@ bool Player::IsVisibleGloballyFor(Player* viewer) const
         return true;
 
     // Check Phasing
-    if (sWorld.getConfig(CONFIG_PHASE_WHO) == 0 && !viewer->CanSeeInWorld(this))
+    if (!viewer->CanSeeInWorld(this))
         return false;
 
     // Visible units, always are visible for all players
@@ -20963,7 +20963,7 @@ void Player::RewardHonor(Unit* uVictim, uint32 groupSize)
         Creature* cVictim = (Creature*)uVictim;
         if (cVictim->IsCivilian() && !isHonorOrXPTarget(cVictim))
         {
-            if (!sWorld.getConfig(CONFIG_BOOL_ENABLE_VD))
+            if (!sWorld.getConfig(CONFIG_BOOL_ENABLE_DK))
                 return;
 
             // Dishonorable kills were added in 1.5.

@@ -168,6 +168,13 @@ BindIP = "0.0.0.0"
 #        Default: 1 (only save on logout)
 #                 0 (save on every player save)
 #
+#    Terrain.Preload.Continents
+#    Terrain.Preload.Instances
+#        Enable/Disable to load all terrain data on server startup
+#        Recommended value: 1. Else, can cause crashes if 'MapUpdate.Threads' > 1 (one map loads a tile, while the other uses pathfinding etc ...)
+#        Disable on dev realms to speedup startup by 90%.
+#        Default: 0
+#
 #    vmap.enableLOS
 #    vmap.enableHeight
 #        Enable/Disable VMaps support for line of sight and height calculation
@@ -185,7 +192,12 @@ BindIP = "0.0.0.0"
 #        Default: 1 (Enabled)
 #                 0 (Disabled)
 #
-#   Collision.Models.Unload
+#    mmap.enabled
+#        Enable/Disable pathfinding using mmaps
+#        Default: 1 (Enabled)
+#                 0 (Disabled)
+#
+#    Collision.Models.Unload
 #        Free model when no one uses it anymore
 #        Default: 1 (Enabled)
 #                 0 (Disabled)
@@ -210,6 +222,10 @@ BindIP = "0.0.0.0"
 #        Periodically check if the process got freezed, if this is the case force crash after the specified
 #        amount of seconds. Must be > 0. Recommended > 10 secs if you use this.
 #        Default: 0 (Disabled)
+#
+#    BanListReloadTimer
+#        Time between 'ip_banned' / 'account_banned' reload. Useful in multi realm cases.
+#        Default: 120
 #
 #    AddonChannel
 #        Permit/disable the use of the addon channel through the server
@@ -242,18 +258,84 @@ ChangeWeatherInterval = 600000
 PlayerSave.Interval = 900000
 PlayerSave.Stats.MinLevel = 0
 PlayerSave.Stats.SaveOnlyOnLogout = 1
+Terrain.Preload.Continents = 0
+Terrain.Preload.Instances  = 0
 vmap.enableLOS = 1
 vmap.enableHeight = 1
 vmap.ignoreSpellIds = "7720"
 vmap.enableIndoorCheck = 1
 vmap.petLOS = 1
+mmap.enabled = 1
 Collision.Models.Unload = 1
 DetectPosCollision = 1
 TargetPosRecalculateRange = 1.5
 UpdateUptimeInterval = 10
 MaxCoreStuckTime = 0
+BanListReloadTimer = 120
 AddonChannel = 1
 CleanCharacterDB = 1
+
+# Optimization / load mitigation settings
+Continents.Instanciate						= 0
+Continents.InactivePlayers.SkipUpdates      = 0
+MapUpdate.ReduceGridActivationDist.Tick     = 0
+MapUpdate.IncreaseGridActivationDist.Tick   = 0
+MapUpdate.MinGridActivationDistance         = 0
+MapUpdate.ReduceVisDist.Tick                = 0
+MapUpdate.IncreaseVisDist.Tick              = 0
+MapUpdate.MinVisibilityDistance             = 0
+
+# Maps with no player for more than $UpdateTime (ms) will no longer be updated (0 to disable)
+MapUpdate.Empty.UpdateTime                  = 0
+
+# Per-map threading
+MapUpdate.Instanced.UpdateThreads       = 2
+
+# Per-map subthreads (not for instanced maps)
+MapUpdate.ObjectsUpdate.MaxThreads      = 4
+MapUpdate.ObjectsUpdate.Timeout         = 100
+MapUpdate.VisibilityUpdate.MaxThreads   = 4
+MapUpdate.VisibilityUpdate.Timeout      = 100
+
+# Hardcode multithreading options
+MapUpdate.UpdatePacketsDiff             = 100
+MapUpdate.UpdatePlayersDiff             = 100
+MapUpdate.UpdateCellsDiff               = 100
+
+# Parallelized execution of cells from same map
+#   MTCells.Threads       Number of different cells to update at the sametime
+#   MTCells.SafeDistance  2 cells wont be updated at the same time if they are at an inferior distance from each other (thread race issues)
+MapUpdate.Continents.MTCells.Threads               = 0
+MapUpdate.Continents.MTCells.SafeDistance          = 1066
+Continents.MotionUpdate.Threads         = 0
+
+# Number of threads for async tasks (/who, list AH items ...)
+AsyncTasks.Threads                      = 1
+AsyncQueriesTickTimeout = 0
+
+# Movement interpolation system - not stable now
+Movement.Interpolation = 0
+
+# Delayed repositionning checks (mounts inside / swimming ...). 0 to disable.
+Movement.RelocationVmapsCheckDelay = 0
+Movement.MaxPointsPerPacket = 80
+
+###################################################################################################################
+# ANTICRASH CONFIGURATION
+#
+#    Anticrash.Options
+#        Flag values: 1 announce, 2 save all, 4 crash instances, 8 crash continents, coredump 16
+#        Default: 28
+#
+#    Anticrash.Rearm.Timer
+#        Timer between 2 crashes to be protected by anticrash
+#        Default: 60000
+#                 0 - disable automatic rearm
+#
+###################################################################################################################
+
+Anticrash.Options = 28
+Anticrash.Rearm.Timer = 60000
 
 ###################################################################################################################
 #
@@ -295,6 +377,10 @@ CleanCharacterDB = 1
 #
 #    PvP.AccurateRewards
 #        Whether to alter PVP reputation and honorable kill rewards based on patch (changed several times).
+#        Default: 1
+#
+#    PvP.DishonorableKills
+#        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
 #
 #    Progression.AccurateMountSkillTraining
@@ -344,6 +430,7 @@ PvP.AccuratePurchaseRequirements = 1
 PvP.AccurateZoneRequirements = 1
 PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
+PvP.DishonorableKills = 1
 
 Progression.AccurateMountSkillTraining = 1
 Progression.AccuratePetStatistics = 1
@@ -438,7 +525,7 @@ DebuffLimit = 0
 #                 "" - Empty name disable creating log file
 #
 #    CharLogTimestamp
-#        Logfile with timestamp of server start in name
+#        Log file with timestamp of server start in name
 #        Default: 0 - no timestamp in name
 #                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
 #
@@ -448,6 +535,26 @@ DebuffLimit = 0
 #        line == START DUMP == to line == END DUMP == (without its) in file and load it using loadpdump command
 #        Default: 0 - don't include dumping chars to log
 #                 1 - include dumping chars to log
+#
+#    ChatLogEnable
+#        Enable or disable logging of player chat.
+#        Default: 1
+#
+#    ChatLogFile
+#        Log file for player chat.
+#        Default: "Chat.log"
+#
+#    ChatLogTimestamp
+#        Add time stamp to logged chat messages.
+#        Default: 0
+#
+#    BgLogFile
+#        Log file for battlegrounds system.
+#        Default: "bg.log"
+#
+#    BgLogTimestamp
+#        Add time stamp to battleground logs.
+#        Default: 0
 #
 #    GmLogFile
 #        GM Log file of gm commands
@@ -466,7 +573,13 @@ DebuffLimit = 0
 #                     or form Logname_#ID.Ext
 #
 #    CriticalCommandsLogFile
-#       Log file for commands marked as critical, when used on own character (same IP for example)
+#        Log file for commands marked as critical, when used on own character (same IP for example)
+#        Default: "gm_critical.log"
+#                 "" - Empty name for disable
+#
+#    ExploitsLogFile
+#        Log file for possible exploits for abuse detection
+#        Default: "" - Empty name for disable
 #
 #    RaLogFile
 #        Log file of RA commands
@@ -479,6 +592,26 @@ DebuffLimit = 0
 #                8 - YELLOW, 9 - LRED, 10 - LGREEN, 11 - LBLUE, 12 - LMAGENTA, 13 - LCYAN, 14 - WHITE
 #        Default: "" - none colors
 #        Example: "13 7 11 9"
+#
+#    LogsDB.Chat
+#        Enable or disable database chat logs.
+#        Default: 0
+#
+#    LogsDB.Characters
+#        Enable or disable database character logs.
+#        Default: 0
+#
+#    LogsDB.Trades
+#        Enable or disable database trade logs.
+#        Default: 0
+#
+#    LogsDB.Transactions
+#        Enable or disable database transaction logs.
+#        Default: 0
+#
+#    LogsDB.Battlegrounds
+#        Enable or disable database battleground logs.
+#        Default: 0
 #
 ###################################################################################################################
 
@@ -518,12 +651,26 @@ LogMoneyTreshold = 10000
 CharLogFile = "Char.log"
 CharLogTimestamp = 0
 CharLogDump = 0
+ChatLogFile = "Chat.log"
+ChatLogEnable = 1
+ChatLogTimestamp = 0
+BgLogFile = "bg.log"
+BgLogTimestamp = 0
 GmLogFile = ""
 GmLogTimestamp = 0
 GmLogPerAccount = 0
-CriticalCommandsLogFile = ""
+CriticalCommandsLogFile = "gm_critical.log"
+ExploitsLogFile = ""
 RaLogFile = ""
+NostalriusLogFile = "Info.log"
+NostalriusLogTimestamp = 0
 LogColors = ""
+
+LogsDB.Chat                 = 0
+LogsDB.Characters           = 0
+LogsDB.Trades               = 0
+LogsDB.Transactions         = 0
+LogsDB.Battlegrounds        = 0
 
 PerformanceLog.File                     = "perf.log"
 PerformanceLog.SlowWorldUpdate          = 100
@@ -650,6 +797,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #                 1 - show intro only for first character of selected race
 #                 2 - disable intro in all cases
 #
+#    ShowHealthValues
+#        Show real NPC/player health values instead of percentages.
+#        Default: 0 (hide values)
+#                 1 (show values)
+#
 #    MaxPlayerLevel
 #        Max level that can be reached by a player for experience (in range from 1 to 100).
 #        Change not recommended
@@ -734,6 +886,10 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 1800000 (miliseconds, i.e 30 minutes)
 #                 0 (instance maps are kept in memory until they are reset)
 #
+#    Item.InstantSave.Quality
+#        Save character inventory instantly on receiving item of this quality or higher.
+#        Default: 6 - Artifact
+#
 #    Quests.LowLevelHideDiff
 #        Quest level difference to hide for player low level quests:
 #        if player_level > quest_level + LowLevelQuestsHideDiff then quest "!" mark not show for quest giver
@@ -806,6 +962,11 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Mail delivery delay time for item sending
 #        Default: 3600 sec (1 hour)
 #
+#    Mails.COD.ForceTag.MaxLevel
+#        Prevent COD scam attempts by adding "COD" prefix to the mail subject
+#        Only affects senders below given level
+#        Default: 0
+#
 #    MassMailer.SendPerTick
 #        Max amount mail send each tick from mails list scheduled for mass mailer proccesing.
 #        More mails increase server load but speedup mass mail proccess. Normal tick length: 50 msecs, so 20 ticks in sec and 200 mails in sec by default.
@@ -816,8 +977,12 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 0 - not unsummon
 #                 1 - unsummon for any mount
 #
+#    PetDefaultLoyalty
+#        Initial loyalty level for newly tamed pets
+#        Default: 1
+#
 #    PlayerCommands
-#        Should player chat be parsed for GM commands.
+#        Should player chat be parsed for GM commands
 #        Default: 1 (parse commands)
 #                 0 (ignore commands)
 #
@@ -861,6 +1026,7 @@ CharactersCreatingDisabled = 0
 CharactersPerAccount = 50
 CharactersPerRealm = 10
 SkipCinematics = 0
+ShowHealthValues = 0
 MaxPlayerLevel = 60
 StartPlayerLevel = 1
 StartPlayerMoney = 0
@@ -879,6 +1045,7 @@ Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
+Item.InstantSave.Quality = 6
 Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
 Quests.IgnoreRaid = 0
@@ -894,14 +1061,16 @@ MaxPrimaryTradeSkill = 2
 MinPetitionSigns = 9
 MaxGroupXPDistance = 74
 MailDeliveryDelay = 3600
+Mails.COD.ForceTag.MaxLevel = 0
 MassMailer.SendPerTick = 10
 PetUnsummonAtMount = 0
+PetDefaultLoyalty = 1
 PlayerCommands = 1
 Event.Announce = 0
 BeepAtStart = 1
 ShowProgressBars = 0
 WaitAtStartupError = 0
-Motd = "Welcome to Light's Hope!"
+Motd = "Welcome to World of Warcraft!"
 
 ###################################################################################################################
 # PLAYER INTERACTION
@@ -939,17 +1108,12 @@ Motd = "Welcome to Light's Hope!"
 #        Default: 1 (allow)
 #                 0 (not allow)
 #
-#    ShowHealth.Values
-#        Show real NPC/player health values as opposed to showing only a percentage.
-#        Default: 0 (hide values)
-#                 1 (show values)
-#
 ###################################################################################################################
 
 AllowTwoSide.Accounts = 0
 AllowTwoSide.Interaction.Chat = 0
 AllowTwoSide.Interaction.Channel = 0
-GMJoinOppositeFactionChannels = 0
+GM.JoinOppositeFactionChannels = 0
 AllowTwoSide.Interaction.Group = 0
 AllowTwoSide.Interaction.Guild = 0
 AllowTwoSide.Interaction.Trade = 0
@@ -958,7 +1122,6 @@ AllowTwoSide.Interaction.Mail = 0
 AllowTwoSide.WhoList = 0
 AllowTwoSide.AddFriend = 0
 TalentsInspecting = 1
-ShowHealth.Values = 0
 
 ###################################################################################################################
 # CREATURE AND GAMEOBJECT SETTINGS
@@ -1170,6 +1333,54 @@ GuidReserveSize.GameObject = 1000
 #        Default: 0 (disable)
 #                 1 (enable)
 #
+#    WorldChan.MinLevel
+#        Minimum level to use world channels
+#        Default: 1
+#
+#    WorldChan.Cooldown
+#    WorldChan.CooldownMaxLevel
+#    WorldChan.CooldownScaling
+#        Cooldown between messages on world channels
+#        Default: 0
+#
+#    WhisperDiffZone.MinLevel
+#        Minimum level to whisper players in other zones
+#        Default: 1
+#
+#    YellMinLevel
+#        Minimum level to /yell in chat
+#        Default: 0
+#
+#    YellRange.LinearScale.MaxLevel 
+#    YellRange.QuadraticScale.MaxLevel
+#        Limit yell range based on level
+#        Default: 0
+#
+#    ChannelInvite.MinLevel
+#        Minimum level to invite other players into a private channel
+#        Default: 10
+#
+#    PublicChansMute.BypassLevel
+#        Required character level on account to bypass all chat restrictions
+#        Default: 61
+#
+#    WhisperRestriction
+#        Allow players to disable whispers with .wr command
+#        Default: 0
+#
+#    SayMinLevel
+#        Minimum level to /say in chat
+#        Default: 0
+#
+#    SayEmoteMinLevel
+#        Minimum level to /me in chat
+#        Default: 0
+#
+#    Antiflood.Sanction
+#        Sanction applied to a player if sending too many packets
+#        See enum CheatAction for all flags
+#        Default: 4 - Kick
+#
 ###################################################################################################################
 
 ChatFakeMessagePreventing = 0
@@ -1180,6 +1391,20 @@ ChatFlood.MessageDelay = 1
 ChatFlood.MuteTime = 10
 Channel.SilentlyGMJoin = 0
 Channel.StrictLatinInGeneral = 0
+WorldChan.MinLevel = 1
+WorldChan.Cooldown = 0
+WorldChan.CooldownMaxLevel = 0
+WorldChan.CooldownScaling = 0
+WhisperDiffZone.MinLevel = 1
+YellMinLevel = 0;
+YellRange.LinearScale.MaxLevel = 0
+YellRange.QuadraticScale.MaxLevel = 0
+ChannelInvite.MinLevel = 10
+PublicChansMute.BypassLevel = 61
+WhisperRestriction = 0
+SayMinLevel = 0;
+SayEmoteMinLevel = 0;
+Antiflood.Sanction = 4
 
 ###################################################################################################################
 # GAME MASTER SETTINGS
@@ -1242,6 +1467,30 @@ Channel.StrictLatinInGeneral = 0
 #        Default: 0 (disable)
 #                 1 (enable)
 #
+#    GM.CreditOnDie
+#        Give loot / money / reputation at ".die" command
+#        Default: 1 (enable)
+#
+#    GM.AllowTrades
+#        Allow trades / mails / AH / ...
+#        Default: 1
+#
+#    GM.AllowPublicChannels
+#        Allow to speak in general / world channels
+#        Default: 0
+#
+#    GMTickets.Enable
+#        Allow opening support tickets.
+#        Default: 1
+#
+#    GMTickets.MinLevel
+#        Minimum required character level to open a ticket.
+#        Default: 0
+#
+#    GMTickets.Admin.Security
+#        Required security rank to assign ticket in escalation queue.
+#        Default: 7
+#
 ###################################################################################################################
 
 GM.LoginState            = 2
@@ -1254,6 +1503,12 @@ GM.InWhoList.Level       = 3
 GM.LogTrade              = 1
 GM.StartLevel            = 1
 GM.LowerSecurity         = 0
+GM.CreditOnDie           = 1
+GM.AllowTrades           = 1
+GM.AllowPublicChannels   = 0
+GMTickets.Enable         = 1
+GMTickets.MinLevel       = 0
+GMTickets.Admin.Security = 7
 
 ###################################################################################################################
 # VISIBILITY AND RADIUSES
@@ -1271,7 +1526,7 @@ GM.LowerSecurity         = 0
 #        Visibility on continents on offy ~90 yards. In BG ~180. For instances default ~120.
 #        Max limited by active player zone: ~ 333
 #        Min limit is max aggro radius (45) * Rate.Creature.Aggro
-#   Visibility.Distance.Continents.Min
+#    Visibility.Distance.Continents.Min
 #        If bad performance, visibilityDistance may be reduced
 #
 #    Visibility.Distance.InFlight
@@ -1555,6 +1810,7 @@ Bones.ExpireMinutes   = 60
 Death.Ghost.RunSpeed.World = 1.0
 Death.Ghost.RunSpeed.Battleground = 1.0
 Rate.WarEffortResourceComplete = 0.0
+WarEffortResourceCompletePeriod = 86400
 
 ###################################################################################################################
 # BATTLEGROUND CONFIG
@@ -1581,8 +1837,8 @@ Rate.WarEffortResourceComplete = 0.0
 #
 #    Battleground.InvitationType
 #        Set Battleground invitation type
-#        Default: 0 (normal - invite as much players to bg as possible, don't bother with ballance)
-#                 1 (Experimental - don't allow to invite much more players of one faction)
+#        Default: 1 (Experimental - don't allow to invite much more players of one faction)
+#                 0 (normal - invite as much players to bg as possible, don't bother with ballance)
 #
 #    Battleground.PrematureFinishTimer
 #        The time to end the bg if there are less than MinPlayersPerTeam on one side in milliseconds
@@ -1603,12 +1859,21 @@ Rate.WarEffortResourceComplete = 0.0
 #        If the group is bigger than this value, players are queued solo
 #        Default: 40
 #
+#    Alterac.MinPlayersInQueue
+#       Minimum players in queue per faction before starting a match.
+#       Default: 0 - use database value
+#
+#    Alterac.InitMaxPlayers
+#       Maximum number of players at AV creation.
+#       To be efficient, you should have 'InitMaxPlayers * 2 > MinPlayersInQueue'
+#       Default: 0 - use database value
+#
 ###################################################################################################################
 
 Battleground.CastDeserter = 1
 Battleground.QueueAnnouncer.Join = 0
 Battleground.QueueAnnouncer.Start = 0
-Battleground.InvitationType = 0
+Battleground.InvitationType = 1
 BattleGround.PrematureFinishTimer = 300000
 BattleGround.PremadeGroupWaitForMatch = 0
 BattleGround.PremadeQueue.MinGroupSize = 6
@@ -1616,6 +1881,21 @@ BattleGround.QueuesCount            = 0
 BattleGround.TagInBattleGrounds     = 1
 BattleGround.RandomizeQueues = 0
 BattleGround.GroupQueueLimit = 40
+Alterac.MinPlayersInQueue = 0
+Alterac.InitMaxPlayers = 0
+
+###################################################################################################################
+# OUTDOOR PVP CONFIG
+#
+#    OutdoorPvp.SIEnabled               #Enable Silithus Outdoor pvp
+#    OutdoorPvp.EPEnabled               #Enable Eastern Plaguelands Outdoor pvp
+#        Default: 1 (enable)
+#                 0 (disable)
+#
+###################################################################################################################
+
+OutdoorPvp.SIEnabled = 1
+OutdoorPvp.EPEnabled = 1
 
 ###################################################################################################################
 #
@@ -1730,6 +2010,8 @@ SOAP.IP = 127.0.0.1
 SOAP.Port = 7878
 
 ###################################################################################################################
+# CHARACTER DELETION
+#
 #    CharDelete.Method
 #        Character deletion behavior
 #        Default: 0  - Completely remove the character from the database
@@ -1755,6 +2037,34 @@ SOAP.Port = 7878
 CharDelete.Method = 0
 CharDelete.MinLevel = 0
 CharDelete.KeepDays = 30
+
+###################################################################################################################
+# AUCTION HOUSE BOT
+#
+#    AHBot.Enable
+#        Enable AH bot.
+#        Default: 0 - off
+#                 1 - on
+#
+#    AHBot.ah.id
+#        The ID of the auction house from AuctionHouse.dbc into which to put items.
+#        Default: 7 - Blackwater Auction House
+#
+#    AHBot.ah.fid
+#        The faction template ID of the virtual auctioneer.
+#        Default: 120 - Booty Bay
+#
+#    AHBot.itemcount
+#        How many items to put into the auction house.
+#        Default: 50
+#
+###################################################################################################################
+AHBot.Enable = 0
+AHBot.ah.id = 7
+AHBot.ah.fid = 120
+AHBot.itemcount = 50
+#AHBot.bot.guid = 1123
+#AHBot.bot.account = 32377
 
 ###################################################################################################################
 #    CLUSTERING (Not working, still WIP)
@@ -1787,112 +2097,17 @@ PlayerBot.Refresh = 10000
 PlayerBot.ForceLogoutDelay = 1
 
 ###################################################################################################################
-#    Others settings
+#    Mail flooding mitigation
 ###################################################################################################################
-# Fix duel distance here !
-DuelDist = 80
+MailSpam.ExpireSecs                             = 0
+MailSpam.MaxMails                               = 2
+MailSpam.Level                                  = 1
+MailSpam.Money                                  = 0
+MailSpam.Item                                   = 0
 
-#Info log file (sLog.outInfo)
-NostalriusLogFile = "Info.log"
-NostalriusLogTimestamp = 0
-
-#Chat log file (LOG_CHAT)
-ChatLogFile = "Chat.log"
-ChatLogEnable = 1
-ChatLogTimestamp = 0
-
-# AuctionHouseBot
-AHBot.Enable = 0
-AHBot.ah.id = 7
-AHBot.ah.guid = 23442
-AHBot.ah.fid = 120
-#AHBot.bot.guid = 1123
-#AHBot.bot.account = 32377
-AHBot.itemcount = 50
-
-# Mmaps/pathfinding configuration
-mmap.enabled = 1
-
-
-Phase.Allow.Mail = 1
-Phase.Allow.Item = 1
-Phase.Allow.WhoList = 1
-Phase.Allow.Friend = 1
-
-# Optimization / load mitigation settings
-Continents.InactivePlayers.SkipUpdates      = 0
-MapUpdate.ReduceGridActivationDist.Tick     = 0
-MapUpdate.IncreaseGridActivationDist.Tick   = 0
-MapUpdate.MinGridActivationDistance         = 0
-MapUpdate.ReduceVisDist.Tick                = 0
-MapUpdate.IncreaseVisDist.Tick              = 0
-MapUpdate.MinVisibilityDistance             = 0
-Continents.Instanciate						= 0
-# Maps with no player for more than $UpdateTime (ms) will no longer be updated (0 to disable)
-Maps.Empty.UpdateTime                       = 0
-
-# Per-map threading
-MapUpdate.Instanced.UpdateThreads       = 2
-
-# Per-map subthreads (not for instanced maps)
-MapUpdate.ObjectsUpdate.MaxThreads      = 4
-MapUpdate.ObjectsUpdate.Timeout         = 100
-MapUpdate.VisibilityUpdate.MaxThreads   = 4
-MapUpdate.VisibilityUpdate.Timeout      = 100
-
-# Hardcode multithreading options
-MapUpdate.UpdatePacketsDiff             = 100
-MapUpdate.UpdatePlayersDiff             = 100
-MapUpdate.UpdateCellsDiff               = 100
-
-# Parallelized execution of cells from same map
-#   MTCells.Threads       Number of different cells to update at the sametime
-#   MTCells.SafeDistance  2 cells wont be updated at the same time if they are at an inferior distance from each other (thread race issues)
-MapUpdate.Continents.MTCells.Threads               = 0
-MapUpdate.Continents.MTCells.SafeDistance          = 1066
-Continents.MotionUpdate.Threads         = 0
-
-# Number of threads for async tasks (/who, list AH items ...)
-AsyncTasks.Threads                      = 1
-
-# Recommended value: 1. Else, can cause crashes if 'MapUpdate.Threads' > 1 (one map loads a tile, while the other uses pathfinding etc ...)
-# Disable on dev realms (speedup startup by 90%)
-Terrain.Preload.Continents = 0
-Terrain.Preload.Instances  = 0
-
-AsyncQueriesTickTimeout = 0
-
-Battleground.InvitationType = 1
-ShowProgressBars = 0
-
-# Log BG registrations
-BgLogFile = "bg.log"
-BgLogTimestamp = 0
-
-# Time between 'ip_banned' / 'account_banned' reload.
-# Useful in multi realm cases !
-BanListReloadTimer = 120
-
-# Enable dishonorable kills
-VD.Enable = 1
-
-Pet.DefaultLoyalty = 1
-Spells.CCDelay = 200
-
-Movement.MaxPointsPerPacket = 80
-
-# Anticrash configuration
-Anticrash.Options = 28
-# Timer between 2 crashes to be protected by anticrash. 0 to disable automatic rearm.
-Anticrash.Rearm.Timer = 60000
-
-# OutdoorPvP system
-# Eastern Plaguelands
-OutdoorPvP.EP.Enable = 1
-# Silithus
-OutdoorPvP.SI.Enable = 1
-
-# Dynamic respawn rates - Disabled by default
+###################################################################################################################
+#    Dynamic respawn rates - Disabled by default
+###################################################################################################################
 DynamicRespawn.Range                    = -1
 DynamicRespawn.PercentPerPlayer         = 0
 DynamicRespawn.MaxReductionRate         = 0
@@ -1902,94 +2117,9 @@ DynamicRespawn.AffectLevelBelow         = 0
 DynamicRespawn.PlayersThreshold         = 0
 DynamicRespawn.PlayersMaxLevelDiff      = 0
 
-WorldChan.MinLevel          = 1
-WorldChan.Cooldown          = 0
-WorldChan.CooldownMaxLevel  = 0
-WorldChan.CooldownScaling   = 0
-WhisperDiffZone.MinLevel    = 1
-YellRange.LinearScale.MaxLevel      = 0
-YellRange.QuadraticScale.MaxLevel   = 0
-ChannelInvite.MinLevel = 10
-WhisperRestriction = 0
-SayMinLevel = 0;
-SayEmoteMinLevel = 0;
-YellMinLevel = 0;
+###################################################################################################################
+#    Others settings
+###################################################################################################################
 
-# Database logs
-LogsDB.Chat                 = 0
-LogsDB.Characters           = 0
-LogsDB.Trades               = 0
-LogsDB.Transactions         = 0
-# Data dump for behavior checking supervised learning
-LogsDB.Behavior             = 0
-LogsDB.Battlegrounds        = 0
-LogsDB.TrashCharacters      = 0
-LogsDB.ChatSpam             = 0
+Spells.CCDelay = 200
 
-CharCreation.Enable         = 1
-
-Item.InstantSave.Quality    = 6
-
-# Anti GM power abuse
-# Give loots / money / reputation at ".die" command
-DieCommand.Credits          = 1
-# Allow trades / mails / AH / ...
-GM.AllowTrades              = 1
-# Allow to speak in general / world channels
-GM.AllowPublicChannels      = 0
-CriticalCommandsLogFile     = "gm_critical.log"
-
-# Mail flooding mitigation
-MailSpam.ExpireSecs                             = 0
-MailSpam.MaxMails                               = 2
-MailSpam.Level                                  = 1
-MailSpam.Money                                  = 0
-MailSpam.Item                                   = 0
-
-# Whisper spam mitigation
-WhispSpam.ExpireSecs                            = 0
-WhispSpam.MaxScore.Base                         = 100
-WhispSpam.MaxScore.PerLevel                     = 0
-WhispSpam.Action                                = 0
-# Note: possible action flags:
-#    SPAM_DETECT_NEGATIVE        = 0x00,  // No detection, not blocked
-#    SPAM_DETECT_POSITIVE        = 0x01,  // Detected positive by system
-#    SPAM_DETECT_ALERT_GMS       = 0x02,  // Send an alert to GMs
-#    SPAM_DETECT_DROP_MESSAGE    = 0x04,  // This message should be discarded
-#    SPAM_DETECT_BAN             = 0x10,
-
-PublicChansMute.BypassLevel                     = 61
-
-# We log possible available exploits use for abusers detection
-ExploitsLogFile = ""
-
-# Alterac premade prevention measures
-
-# Alterac: minimum players in queue per faction before starting a match
-#   0 = disable
-Alterac.MinPlayersInQueue       = 0
-
-# Alterac: maximum number of players at AV creation
-#   0 = use database MaxPlayers value
-# Note: to be efficient, you should have 'InitMaxPlayers * 2 > MinPlayersInQueue'
-Alterac.InitMaxPlayers          = 0
-
-
-GMTickets.Enable            = 1
-GMTickets.MinLevel          = 0
-GMTickets.Admin.Security    = 7
-
-# Prevent COD AH scam attempts, and add "(COD)" in prefix of mails with COD
-# Only affects senders below given level
-Mails.COD.ForceTag.MaxLevel = 0
-
-
-# Movement interpolation system - not stable now
-Movement.Interpolation = 0
-
-# Delayed repositionning checks (mounts inside / swimming ...). 0 to disable.
-Movement.RelocationVmapsCheckDelay = 0
-
-# Sanction applied to a player if sending too many packets
-# - By default: Kick
-Antiflood.Sanction = 4

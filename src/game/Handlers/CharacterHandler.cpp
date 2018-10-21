@@ -238,7 +238,7 @@ void WorldSession::HandleCharCreateOpcode(WorldPacket & recv_data)
     ChrClassesEntry const* classEntry = sChrClassesStore.LookupEntry(class_);
     ChrRacesEntry const* raceEntry = sChrRacesStore.LookupEntry(race_);
 
-    if (!classEntry || !raceEntry || !sWorld.getConfig(CONFIG_BOOL_ENABLE_CHAR_CREATION))
+    if (!classEntry || !raceEntry)
     {
         data << (uint8)CHAR_CREATE_FAILED;
         SendPacket(&data);

@@ -68,6 +68,9 @@ bool MMapManager::loadMapData(uint32 mapId)
     }
     loadedMMaps_lock.release();
 
+    if (!sWorld.getConfig(CONFIG_BOOL_MMAP_ENABLED))
+        return false;
+
     // load and init dtNavMesh - read parameters from file
     uint32 pathLen = sWorld.GetDataPath().length() + strlen("mmaps/%03i.mmap") + 1;
     char *fileName = new char[pathLen];

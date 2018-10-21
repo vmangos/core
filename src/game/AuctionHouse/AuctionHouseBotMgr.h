@@ -25,7 +25,6 @@ struct AuctionHouseBotConfig
     uint64 botguid;
     uint32 botaccount;
 
-    uint64 auctionnerguid;
     bool enable;
 };
 

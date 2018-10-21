@@ -306,7 +306,7 @@ void AccountMgr::Update(uint32 diff)
 {
     if (_banlistUpdateTimer < diff)
     {
-        _banlistUpdateTimer = sWorld.getConfig(CONFIG_BANLIST_RELOAD_TIMER) * 1000;
+        _banlistUpdateTimer = sWorld.getConfig(CONFIG_UINT32_BANLIST_RELOAD_TIMER) * 1000;
         LoadIPBanList(true);
         //LoadAccountBanList(true);
     }

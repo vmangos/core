@@ -269,9 +269,15 @@ enum eConfigUInt32Values
     CONFIG_UINT32_CREATURE_SUMMON_LIMIT,
     CONFIG_UINT32_WAR_EFFORT_AUTOCOMPLETE_PERIOD,
     CONFIG_UINT32_ACCOUNT_CONCURRENT_AUCTION_LIMIT,
+    CONFIG_UINT32_PHASE_MAIL,
+    CONFIG_UINT32_PHASE_ITEM,
+    CONFIG_UINT32_PHASE_WHO,
+    CONFIG_UINT32_PHASE_FRIEND,
+    CONFIG_UINT32_BANLIST_RELOAD_TIMER,
     CONFIG_UINT32_VALUE_COUNT
 };
 
+// Content patches, used for loading DB data.
 enum WowPatch
 {
     WOW_PATCH_102  = 0,
@@ -310,7 +316,6 @@ enum eConfigFloatValues
 {
     CONFIG_FLOAT_RATE_HEALTH = 0,
     CONFIG_FLOAT_MAX_CREATURE_ATTACK_RADIUS,
-    CONFIG_FLOAT_MAX_CREATURES_STEALTH_DETECT_RANGE,
     CONFIG_FLOAT_MAX_PLAYERS_STEALTH_DETECT_RANGE,
     CONFIG_FLOAT_DYN_RESPAWN_CHECK_RANGE,
     CONFIG_FLOAT_DYN_RESPAWN_PERCENT_PER_PLAYER,
@@ -397,7 +402,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_GM_JOIN_OPPOSITE_FACTION_CHANNELS,
     CONFIG_BOOL_GM_ALLOW_TRADES,
     CONFIG_BOOL_DIE_COMMAND_CREDIT,
-    CONFIG_BOOL_ENABLE_CHAR_CREATION,
     CONFIG_BOOL_LOGSDB_CHAT,
     CONFIG_BOOL_LOGSDB_TRADES,
     CONFIG_BOOL_LOGSDB_CHARACTERS,
@@ -458,7 +462,7 @@ enum eConfigBoolValues
     CONFIG_BOOL_CLEAN_CHARACTER_DB,
     CONFIG_BOOL_VMAP_INDOOR_CHECK,
     CONFIG_BOOL_PET_UNSUMMON_AT_MOUNT,
-    CONFIG_BOOL_ENABLE_VD,
+    CONFIG_BOOL_ENABLE_DK,
     CONFIG_BOOL_ENABLE_MOVEMENT_INTERP,
     CONFIG_BOOL_WHISPER_RESTRICTION,
     CONFIG_BOOL_MAILSPAM_ITEM,
@@ -478,18 +482,6 @@ enum eConfigBoolValues
     CONFIG_BOOL_NO_QUEST_XP_TO_GOLD,
     CONFIG_BOOL_AUTO_HONOR_RESTART,
     CONFIG_BOOL_VALUE_COUNT
-};
-
-enum NostalriusConfig
-{
-    CONFIG_PHASE_MAIL,
-    CONFIG_PHASE_ITEM,
-    CONFIG_PHASE_WHISP,
-    CONFIG_PHASE_FRIEND,
-    CONFIG_PHASE_WHO,
-
-    CONFIG_BANLIST_RELOAD_TIMER,
-    CONFIG_NOSTALRIUS_MAX
 };
 
 /// Type of server
@@ -686,7 +678,6 @@ class World
 
         void SetInitialWorldSettings();
         void LoadConfigSettings(bool reload = false);
-        void LoadNostalriusConfig(bool reload = false);
 
         void SendWorldText(int32 string_id, ...);
          // Only for GMs with ticket notification ON
@@ -732,8 +723,6 @@ class World
         /// Get a server configuration element (see #eConfigBoolValues)
         bool getConfig(eConfigBoolValues index) const { return m_configBoolValues[index]; }
 
-        // Nostalrius
-        int32 getConfig(NostalriusConfig index) { return m_configNostalrius[index];}
         /// Are we on a "Player versus Player" server?
         bool IsPvPRealm() { return (getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_PVP || getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_RPPVP || getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_FFA_PVP); }
         bool IsFFAPvPRealm() { return getConfig(CONFIG_UINT32_GAME_TYPE) == REALM_TYPE_FFA_PVP; }
@@ -871,7 +860,6 @@ class World
         int32 m_configInt32Values[CONFIG_INT32_VALUE_COUNT];
         float m_configFloatValues[CONFIG_FLOAT_VALUE_COUNT];
         bool m_configBoolValues[CONFIG_BOOL_VALUE_COUNT];
-        int32 m_configNostalrius[CONFIG_NOSTALRIUS_MAX];
 
         int32 m_playerLimit;
         uint8 m_wowPatch;
