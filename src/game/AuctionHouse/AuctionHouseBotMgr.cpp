@@ -79,7 +79,6 @@ void AuctionHouseBotMgr::load()
     config->ahid           = sConfig.GetIntDefault("AHBot.ah.id", 7);
     config->botguid        = sConfig.GetIntDefault("AHBot.bot.guid", 1123);
     config->botaccount     = sConfig.GetIntDefault("AHBot.bot.account", 32377);
-    config->auctionnerguid = sConfig.GetIntDefault("AHBot.ah.guid", 23442);
     config->ahfid          = sConfig.GetIntDefault("AHBot.ah.fid", 120);
     config->itemcount      = sConfig.GetIntDefault("AHBot.itemcount", 2);
 
@@ -175,7 +174,6 @@ void AuctionHouseBotMgr::additem(AuctionHouseBotEntry e, AuctionHouseObject *auc
 
     AuctionEntry* auctionEntry       = new AuctionEntry;
     auctionEntry->Id                 = sObjectMgr.GenerateAuctionID();
-    //auctionEntry->auctioneer       = config->auctionnerguid;
     auctionEntry->auctionHouseEntry  = auctionHouseEntry;
     auctionEntry->itemGuidLow       = item->GetGUIDLow();
     auctionEntry->itemTemplate       = item->GetEntry();

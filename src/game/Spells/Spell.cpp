@@ -262,7 +262,7 @@ void SpellCastTargets::write(ByteBuffer& data) const
 }
 
 Spell::Spell(Unit* caster, SpellEntry const *info, bool triggered, ObjectGuid originalCasterGUID, SpellEntry const* triggeredBy, Unit* victim, SpellEntry const* triggeredByParent):
-    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false)
+    m_immediateHandled(false), m_needSpellLog(false), m_canTrigger(false), m_setCreatureTarget(false)
 {
     MANGOS_ASSERT(caster != NULL && info != NULL);
     MANGOS_ASSERT(info == sSpellMgr.GetSpellEntry(info->Id) && "`info` must be pointer to a sSpellMgr element");
@@ -1209,22 +1209,24 @@ void Spell::DoAllEffectOnTarget(TargetInfo *target)
 
     if (real_caster)
     {
-        // Restauration d'energie sur miss/dodge des sorts rapportant un CP.
-        // Source : http://roguecrap.blogspot.co.uk/2006/03/energy-regeneration-oddities.html, + verifiable en video
-        // Source for Parry: https://youtu.be/aDXXr3ad3is?t=3m07s
-        if ((missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_DODGE || missInfo == SPELL_MISS_PARRY) &&
-                m_spellInfo->powerType == POWER_ENERGY && IsSpellHaveEffect(m_spellInfo, SPELL_EFFECT_ADD_COMBO_POINTS))
+        if (m_spellInfo->AttributesEx & SPELL_ATTR_EX_REFUND_POWER)
         {
-            int32 regen = lroundf(m_powerCost * 0.82f);
-            real_caster->ModifyPower(POWER_ENERGY, regen);
-        }
-        // Warriors and Druids are refunded 80% of the rage cost on dodge/parry
-        // http://blue.mmo-champion.com/topic/69365-18-02-05-kalgans-response-to-warriors/
-        // https://youtu.be/YzPlictRoK8?t=1m45s
-        else if ((missInfo == SPELL_MISS_PARRY || missInfo == SPELL_MISS_DODGE) && m_spellInfo->powerType == POWER_RAGE)
-        {
-            int32 regen = lroundf(m_powerCost * 0.82f);
-            real_caster->ModifyPower(POWER_RAGE, regen);
+            // Restauration d'energie sur miss/dodge des sorts rapportant un CP.
+            // Source : http://roguecrap.blogspot.co.uk/2006/03/energy-regeneration-oddities.html, + verifiable en video
+            // Source for Parry: https://youtu.be/aDXXr3ad3is?t=3m07s
+            if ((missInfo == SPELL_MISS_MISS || missInfo == SPELL_MISS_DODGE || missInfo == SPELL_MISS_PARRY) && m_spellInfo->powerType == POWER_ENERGY)
+            {
+                int32 regen = lroundf(m_powerCost * 0.82f);
+                real_caster->ModifyPower(POWER_ENERGY, regen);
+            }
+            // Warriors and Druids are refunded 80% of the rage cost on dodge/parry
+            // http://blue.mmo-champion.com/topic/69365-18-02-05-kalgans-response-to-warriors/
+            // https://youtu.be/YzPlictRoK8?t=1m45s
+            else if ((missInfo == SPELL_MISS_PARRY || missInfo == SPELL_MISS_DODGE) && m_spellInfo->powerType == POWER_RAGE)
+            {
+                int32 regen = lroundf(m_powerCost * 0.82f);
+                real_caster->ModifyPower(POWER_RAGE, regen);
+            }
         }
     }
 
@@ -3010,10 +3012,19 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                         m_caster->GetRandomPoint(m_caster->GetPositionX(), m_caster->GetPositionY(), m_caster->GetPositionZ(), 5.0f, tmp_x, tmp_y, tmp_z);
                         m_targets.setDestination(tmp_x, tmp_y, tmp_z);
                     }
-                    //break;
+                    targetUnitMap.push_back(m_caster);
+                    break;
+                }
+                case SPELL_EFFECT_SUMMON_WILD:
+                {
+                    if (!m_originalCasterGUID.IsEmpty() && m_originalCasterGUID.IsGameObject())
+                    {
+                        if (GameObject* pSummoner = m_caster->GetMap()->GetGameObject(m_originalCasterGUID))
+                            m_targets.setDestination(pSummoner->GetPositionX(), pSummoner->GetPositionY(), pSummoner->GetPositionZ());
+                    }
+                    // no break
                 }
                 case SPELL_EFFECT_SUMMON_CHANGE_ITEM:
-                case SPELL_EFFECT_SUMMON_WILD:
                 case SPELL_EFFECT_SUMMON_GUARDIAN:
                 case SPELL_EFFECT_ADD_FARSIGHT:
                 case SPELL_EFFECT_STUCK:
@@ -3301,6 +3312,10 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
         if (m_timer && channeled)
             if (m_caster->IsPet())
                 m_caster->StopMoving();
+
+        // This is used so that creatures face the target on which they are casting
+        if (m_setCreatureTarget = (m_caster->IsCreature() && (channeled || (!m_IsTriggeredSpell && m_timer)) && m_targets.getUnitTarget() && IsExplicitlySelectedUnitTarget(m_spellInfo->EffectImplicitTargetA[0])))
+            static_cast<Creature*>(m_caster)->SetCastingTarget(m_targets.getUnitTarget());
 
         // add non-triggered (with cast time and without)
         if (!m_IsTriggeredSpell || channeled)
@@ -4137,6 +4152,10 @@ void Spell::finish(bool ok)
         return;
 
     m_spellState = SPELL_STATE_FINISHED;
+
+    // Clear the creature's casting target so it faces victim
+    if (m_setCreatureTarget)
+        static_cast<Creature*>(m_caster)->ClearCastingTarget();
 
     if (!ok && m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
     {
@@ -5628,8 +5647,8 @@ SpellCastResult Spell::CheckCast(bool strict)
 
                             if (i_spellST->second.targetEntry)
                             {
-                                MaNGOS::NearestGameObjectEntryInObjectRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, range);
-                                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryInObjectRangeCheck> checker(p_GameObject, go_check);
+                                MaNGOS::NearestGameObjectEntryFitConditionInObjectRangeCheck go_check(*m_caster, i_spellST->second.targetEntry, range, i_spellST->second.conditionId);
+                                MaNGOS::GameObjectLastSearcher<MaNGOS::NearestGameObjectEntryFitConditionInObjectRangeCheck> checker(p_GameObject, go_check);
                                 Cell::VisitGridObjects(m_caster, checker, range);
 
                                 if (p_GameObject)
@@ -5681,8 +5700,8 @@ SpellCastResult Spell::CheckCast(bool strict)
                             // no target provided or it was not valid, so use closest in range
                             if (!targetExplicit)
                             {
-                                MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range);
-                                MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryWithLiveStateInObjectRangeCheck> searcher(p_Creature, u_check);
+                                MaNGOS::NearestCreatureEntryFitConditionInObjectRangeCheck u_check(*m_caster, i_spellST->second.targetEntry, i_spellST->second.type != SPELL_TARGET_TYPE_DEAD, range, i_spellST->second.conditionId);
+                                MaNGOS::CreatureLastSearcher<MaNGOS::NearestCreatureEntryFitConditionInObjectRangeCheck> searcher(p_Creature, u_check);
 
                                 // Visit all, need to find also Pet* objects
                                 Cell::VisitAllObjects(m_caster, searcher, range);

@@ -86,6 +86,8 @@ enum ConditionType
     CONDITION_MAP_EVENT_TARGETS     = 47,                   // event_id     cond_id
     CONDITION_CANT_PATH_TO_VICTIM   = 48,                   // 0            0
     CONDITION_IS_PLAYER             = 49,                   // 0            0
+    CONDITION_OBJECT_IS_SPAWNED     = 50,                   // 0            0
+    CONDITION_OBJECT_LOOT_STATE     = 51,                   // state        0
 };
 
 enum ConditionFlags
@@ -166,5 +168,8 @@ class ConditionEntry
         uint32 m_value4;
         uint8 m_flags;
 };
+
+// Check if a player meets condition conditionId
+bool IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType);
 
 #endif

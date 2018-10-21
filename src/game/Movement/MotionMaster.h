@@ -54,6 +54,7 @@ enum MovementGeneratorType
     EFFECT_MOTION_TYPE              = 15,
     PATROL_MOTION_TYPE              = 16,
     CHARGE_MOTION_TYPE              = 17,
+    DISTANCING_MOTION_TYPE          = 18,
 
     WAYPOINT_SPECIAL_REACHED        = 256,                  // Only used in CreatureAI::MovementInform when a special waypoint is reached. The pathId >= 0 is added as additonal value
     WAYPOINT_SPECIAL_STARTED        = 512,                  // Only used in CreatureAI::MovementInform when a special waypoint is started. The pathId >= 0 is added as additional value
@@ -143,6 +144,7 @@ class MANGOS_DLL_SPEC MotionMaster : std::stack<MovementGenerator *>
         void MoveDistract(uint32 timeLimit);
         void MoveJump(float x, float y, float z, float horizontalSpeed, float max_height, uint32 id = 0);
         void MoveCharge(Unit* target, uint32 delay = 0, bool triggerAutoAttack = false);
+        void MoveDistance(Unit* target, float distance);
 
         MovementGeneratorType GetCurrentMovementGeneratorType() const;
 

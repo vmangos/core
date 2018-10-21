@@ -4266,7 +4266,7 @@ class go_av_landmineAI: public GameObjectAI
         }
         bool OnUse(Unit* user)
         {
-            if (me->IsFriendlyTo(user))
+            if (!me->IsHostileTo(user))
                 return true; // Do not attack friends !
             me->Despawn();
             return false; // Deal the damage.

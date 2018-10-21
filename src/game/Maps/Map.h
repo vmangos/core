@@ -194,29 +194,40 @@ using MapMutexType = std::mutex; // can be replaced with a null mutex
 
 typedef bool(Map::*ScriptCommandFunction) (const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
+// Additional target part of a ScriptedEvent. 
 struct ScriptedEventTarget
 {
-    ScriptedEventTarget(WorldObject* object, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript) :
-        pObject(object), uiFailureCondition(failureCondition), uiFailureScript(failureScript), uiSuccessCondition(successCondition), uiSuccessScript(successScript) {}
+    ScriptedEventTarget(ObjectGuid object, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript) :
+        target(object), uiFailureCondition(failureCondition), uiFailureScript(failureScript), uiSuccessCondition(successCondition), uiSuccessScript(successScript) {}
 
-    WorldObject* pObject;
+    ObjectGuid target;
     uint32 uiFailureCondition;
     uint32 uiFailureScript;
     uint32 uiSuccessCondition;
     uint32 uiSuccessScript;
 };
 
+// Used for complex database scripts.
+// - Can hold data.
+// - Updated by the map every 1 second.
+// - Can have success condition and script.
+// - Can have failure condition and script.
+// - Has 2 main targets.
+// - Can have many extra target objects, with their own success/failure conditions and scripts.
+// - Scripts can end the event at any point.
+// - Event targets can be accessed by scripts.
 struct ScriptedEvent
 {
-    ScriptedEvent(uint32 eventId, WorldObject* source, WorldObject* target, Map* map, time_t expireTime, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript) :
-        m_uiEventId(eventId), m_pSource(source), m_pTarget(target), m_pMap(map), m_tExpireTime(expireTime), m_uiFailureCondition(failureCondition), m_uiFailureScript(failureScript), m_uiSuccessCondition(successCondition), m_uiSuccessScript(successScript) {}
+    ScriptedEvent(uint32 eventId, ObjectGuid source, ObjectGuid target, Map& map, time_t expireTime, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript) :
+        m_uiEventId(eventId), m_Source(source), m_Target(target), m_Map(map), m_tExpireTime(expireTime), m_uiFailureCondition(failureCondition), m_uiFailureScript(failureScript), m_uiSuccessCondition(successCondition), m_uiSuccessScript(successScript), m_bEnded(false) {}
     
-    WorldObject* m_pSource;
-    WorldObject* m_pTarget;
-    Map* const m_pMap;
+    ObjectGuid m_Source;
+    ObjectGuid m_Target;
+    Map& m_Map;
 
     const uint32 m_uiEventId;
     time_t m_tExpireTime;
+    bool m_bEnded;
 
     uint32 m_uiFailureCondition;
     uint32 m_uiFailureScript;
@@ -236,6 +247,47 @@ struct ScriptedEvent
     void SendEventToAdditionalTargets(uint32 uiData);
 
     void SendEventToAllTargets(uint32 uiData);
+
+    void SetSourceObject(WorldObject* pSource)
+    {
+        if (pSource && pSource->IsInWorld() && (pSource->GetMap() == &m_Map))
+        {
+            m_Source = pSource->GetObjectGuid();
+        }
+    }
+
+    void SetTargetObject(WorldObject* pTarget)
+    {
+        if (pTarget && pTarget->IsInWorld() && (pTarget->GetMap() == &m_Map))
+        {
+            m_Target = pTarget->GetObjectGuid();
+        }
+    }
+
+    void AddOrUpdateExtraTarget(WorldObject* pObject, uint32 failureCondition, uint32 failureScript, uint32 successCondition, uint32 successScript)
+    {
+        if (!pObject || !pObject->IsInWorld() || (pObject->GetMap() != &m_Map))
+            return;
+
+        for (auto& target : m_vTargets)
+        {
+            // If target already exists, just update data.
+            if (target.target == pObject->GetObjectGuid())
+            {
+                target.uiFailureCondition = failureCondition;
+                target.uiFailureScript = failureScript;
+                target.uiSuccessCondition = successCondition;
+                target.uiSuccessScript = successScript;
+                return;
+            }
+        }
+
+        m_vTargets.emplace_back(pObject->GetObjectGuid(), failureCondition, failureScript, successCondition, successScript);
+    }
+
+    WorldObject* GetSourceObject() const;
+
+    WorldObject* GetTargetObject() const;
 
     uint32 GetData(uint32 uiIndex) const
     {
@@ -446,9 +498,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         Creature* GetAnyTypeCreature(ObjectGuid guid);      // normal creature or pet
         Transport* GetTransport(ObjectGuid guid);
         DynamicObject* GetDynamicObject(ObjectGuid guid);
-        Corpse* GetCorpse(ObjectGuid guid);                 // !!! find corpse can be not in world
-        Unit* GetUnit(ObjectGuid guid);                     // only use if sure that need objects at current map, specially for player case
-        WorldObject* GetWorldObject(ObjectGuid guid);       // only use if sure that need objects at current map, specially for player case
+        Corpse* GetCorpse(ObjectGuid guid);                   // !!! find corpse can be not in world
+        Unit* GetUnit(ObjectGuid guid);                       // only use if sure that need objects at current map, specially for player case
+        WorldObject* GetWorldObject(ObjectGuid guid);         // only use if sure that need objects at current map, specially for player case
+        WorldObject* GetWorldObjectOrPlayer(ObjectGuid guid); // Returns a world object from current map, or player anywhere.
 
         template <typename T> void InsertObject(ObjectGuid const& guid, T* ptr)
         {
@@ -534,7 +587,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void AddCorpseToRemove(Corpse* corpse, ObjectGuid looter_guid);
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask);
 
-        bool ShouldUpdateInactiveMap(uint32 now, uint32 inactiveTimeLimit);
+        bool ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit);
 
     private:
         void LoadMapAndVMap(int gx, int gy);

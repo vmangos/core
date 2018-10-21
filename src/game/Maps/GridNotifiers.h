@@ -33,6 +33,7 @@
 #include "Player.h"
 #include "Unit.h"
 #include "CreatureAI.h"
+#include "Conditions.h"
 
 class Player;
 //class Map;
@@ -638,6 +639,34 @@ namespace MaNGOS
             NearestGameObjectEntryInObjectRangeCheck(NearestGameObjectEntryInObjectRangeCheck const&);
     };
 
+    class NearestGameObjectEntryFitConditionInObjectRangeCheck
+    {
+        public:
+            NearestGameObjectEntryFitConditionInObjectRangeCheck(WorldObject const& obj,uint32 entry, float range, uint32 conditionId) : i_obj(obj), i_entry(entry), i_range(range), i_conditionId(conditionId) {}
+            WorldObject const& GetFocusObject() const { return i_obj; }
+            bool operator()(GameObject* go)
+            {
+                if(go->GetEntry() == i_entry && i_obj.IsWithinDistInMap(go, i_range))
+                {
+                    if (i_conditionId && !IsConditionSatisfied(i_conditionId, go, go->GetMap(), &i_obj, CONDITION_FROM_SPELL_AREA))
+                        return false;
+
+                    i_range = i_obj.GetDistance(go);        // use found GO range as new range limit for next check
+                    return true;
+                }
+                return false;
+            }
+            float GetLastRange() const { return i_range; }
+        private:
+            WorldObject const& i_obj;
+            uint32 i_entry;
+            float  i_range;
+            uint32 i_conditionId;
+
+            // prevent clone this object
+            NearestGameObjectEntryFitConditionInObjectRangeCheck(NearestGameObjectEntryFitConditionInObjectRangeCheck const&);
+    };
+
     // Success at gameobject in range of xyz, range update for next check (this can be use with GameobjectLastSearcher to find nearest GO)
     class NearestGameObjectEntryInPosRangeCheck
     {
@@ -1107,6 +1136,36 @@ namespace MaNGOS
 
             // prevent clone this object
             NearestCreatureEntryWithLiveStateInObjectRangeCheck(NearestCreatureEntryWithLiveStateInObjectRangeCheck const&);
+    };
+
+    class NearestCreatureEntryFitConditionInObjectRangeCheck
+    {
+        public:
+            NearestCreatureEntryFitConditionInObjectRangeCheck(WorldObject const& obj,uint32 entry, bool alive, float range, uint32 conditionId)
+                : i_obj(obj), i_entry(entry), i_alive(alive), i_range(range), i_conditionId(conditionId) {}
+            WorldObject const& GetFocusObject() const { return i_obj; }
+            bool operator()(Creature* u)
+            {
+                if (u->GetEntry() == i_entry && ((i_alive && u->isAlive()) || (!i_alive && u->IsCorpse())) && i_obj.IsWithinDistInMap(u, i_range))
+                {
+                    if (i_conditionId && !IsConditionSatisfied(i_conditionId, u, u->GetMap(), &i_obj, CONDITION_FROM_SPELL_AREA))
+                        return false;
+
+                    i_range = i_obj.GetDistance(u);         // use found unit range as new range limit for next check
+                    return true;
+                }
+                return false;
+            }
+            float GetLastRange() const { return i_range; }
+        private:
+            WorldObject const& i_obj;
+            uint32 i_entry;
+            bool   i_alive;
+            float  i_range;
+            uint32 i_conditionId;
+
+            // prevent clone this object
+            NearestCreatureEntryFitConditionInObjectRangeCheck(NearestCreatureEntryFitConditionInObjectRangeCheck const&);
     };
 
     // Player checks and do

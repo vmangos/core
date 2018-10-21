@@ -2073,6 +2073,22 @@ bool ChatHandler::HandleGoHelper(Player* player, uint32 mapid, float x, float y,
     return true;
 }
 
+bool ChatHandler::HandleGoTargetCommand(char* /*args*/)
+{
+    Unit* pTarget = getSelectedUnit();
+
+    if (!pTarget || !m_session->GetPlayer()->GetSelectionGuid() || !m_session->GetPlayer()->IsInMap(pTarget))
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    m_session->GetPlayer()->NearTeleportTo(pTarget->GetPositionX(), pTarget->GetPositionY(), pTarget->GetPositionZ(), pTarget->GetOrientation(), TELE_TO_GM_MODE);
+
+    return true;
+}
+
 bool ChatHandler::HandleGoTaxinodeCommand(char* args)
 {
     Player* _player = m_session->GetPlayer();
@@ -2127,8 +2143,6 @@ bool ChatHandler::HandleGoCommand(char* args)
 
     return HandleGoHelper(_player, mapid, x, y, &z);
 }
-
-
 
 //teleport at coordinates
 bool ChatHandler::HandleGoXYCommand(char* args)

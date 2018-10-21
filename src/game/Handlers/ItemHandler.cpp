@@ -865,7 +865,7 @@ void WorldSession::HandleAutoStoreBagItemOpcode(WorldPacket & recv_data)
     if (_player->IsBankPos(srcbag, srcslot) || dstbag >= BANK_SLOT_BAG_START && dstbag < BANK_SLOT_BAG_END)
     {
         if (!CanUseBank())
-        return;
+            return;
     }
 
     uint16 src = pItem->GetPos();

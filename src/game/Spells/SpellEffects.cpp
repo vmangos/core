@@ -4670,6 +4670,7 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                         }
                         m_caster->CastSpell(pTonk, 24937, true);
                     }
+                    return;
                 }
                 case 26004:                                 // Mistletoe
                 {
@@ -5277,29 +5278,116 @@ void Spell::EffectSummonPlayer(SpellEffectIndex /*eff_idx*/)
     ((Player*)unitTarget)->GetSession()->SendPacket(&data);
 }
 
-static ScriptInfo generateActivateCommand()
-{
-    ScriptInfo si;
-    si.command = SCRIPT_COMMAND_ACTIVATE_OBJECT;
-    return si;
-}
-
 void Spell::EffectActivateObject(SpellEffectIndex eff_idx)
 {
     if (!gameObjTarget)
         return;
 
-    if (m_spellInfo->Id == 15958) // Collect Rookery Egg
+    GameObjectActions action = (GameObjectActions)m_spellInfo->EffectMiscValue[eff_idx];
+
+    switch (action)
     {
-        gameObjTarget->AddObjectToRemoveList();
-        return;
+        case GameObjectActions::None:
+            sLog.outError("Spell::EffectActivateObject: Incorrect GameObjectActions::None action in spell %u", m_spellInfo->Id);
+            break;
+        case GameObjectActions::AnimateCustom0:
+            gameObjTarget->SendGameObjectCustomAnim(0);
+            break;
+        case GameObjectActions::AnimateCustom1:
+            gameObjTarget->SendGameObjectCustomAnim(1);
+            break;
+        case GameObjectActions::AnimateCustom2:
+            gameObjTarget->SendGameObjectCustomAnim(2);
+            break;
+        case GameObjectActions::AnimateCustom3:
+            gameObjTarget->SendGameObjectCustomAnim(3);
+            break;
+        case GameObjectActions::Disturb:
+            gameObjTarget->Use(m_caster);
+            break;
+        case GameObjectActions::Unlock:
+            gameObjTarget->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+            break;
+        case GameObjectActions::Lock:
+            gameObjTarget->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+            break;
+        case GameObjectActions::Open:
+            gameObjTarget->Use(m_caster);
+            /* Seems like Open can also trigger traps, cause linked trap to trigger, etc... go figure...
+            gameObjTarget->UseDoorOrButton(0, false, m_caster);
+            */
+            break;
+        case GameObjectActions::OpenAndUnlock:
+            gameObjTarget->UseDoorOrButton(0, false);
+            gameObjTarget->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+            break;
+        case GameObjectActions::Close:
+            gameObjTarget->ResetDoorOrButton();
+            break;
+        case GameObjectActions::ToggleOpen:
+            // No use cases, implementation unknown
+            break;
+        case GameObjectActions::Destroy:
+            gameObjTarget->UseDoorOrButton(0, true);
+            break;
+        case GameObjectActions::Rebuild:
+            gameObjTarget->ResetDoorOrButton();
+            break;
+        case GameObjectActions::Creation:
+            // No use cases, implementation unknown
+            break;
+        case GameObjectActions::Despawn:
+            gameObjTarget->Despawn();
+            gameObjTarget->SetLootState(GO_JUST_DEACTIVATED);
+            break;
+        case GameObjectActions::MakeInert:
+            gameObjTarget->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            break;
+        case GameObjectActions::MakeActive:
+            gameObjTarget->RemoveFlag(GAMEOBJECT_FLAGS, GO_FLAG_NO_INTERACT);
+            break;
+        case GameObjectActions::CloseAndLock:
+            gameObjTarget->ResetDoorOrButton();
+            gameObjTarget->SetFlag(GAMEOBJECT_FLAGS, GO_FLAG_LOCKED);
+            break;
+        case GameObjectActions::UseArtKit0:
+            // Source for values unknown
+            /*
+            switch (m_spellInfo->Id)
+            {
+                case 46904: // Light Bonfire (Art Kit)
+                    gameObjTarget->SetGoArtKit(121);
+                    break;
+            }
+            */
+            break;
+        case GameObjectActions::UseArtKit1:
+            // Source for values unknown
+            /*
+            switch (m_spellInfo->Id)
+            {
+                case 36639: // Test Cauldron Bubble
+                    gameObjTarget->SetGoArtKit(81);
+                    break;
+                case 46903: // Stamp Out Bonfire (Art Kit)
+                    gameObjTarget->SetGoArtKit(122);
+                    break;
+            }
+            */
+            break;
+        case GameObjectActions::UseArtKit2:
+            // No use cases, implementation unknown
+            break;
+        case GameObjectActions::UseArtKit3:
+            // No use cases, implementation unknown
+            break;
+        case GameObjectActions::SetTapList:
+            // No use cases, implementation unknown
+            break;
+        default:
+            sLog.outError("Spell::EffectActivateObject: Unhandled GameObjectActions action %u in spell %u", (uint32)action, m_spellInfo->Id);
+            break;
     }
-
-    static ScriptInfo activateCommand = generateActivateCommand();
-
-    int32 delay_secs = m_spellInfo->CalculateSimpleValue(eff_idx);
-
-    gameObjTarget->GetMap()->ScriptCommandStart(activateCommand, delay_secs, m_caster, gameObjTarget);
 }
 
 void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)

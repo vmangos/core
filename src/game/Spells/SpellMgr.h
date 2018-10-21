@@ -297,6 +297,23 @@ inline bool IsHealSpell(SpellEntry const *spellProto)
 bool IsExplicitPositiveTarget(uint32 targetA);
 bool IsExplicitNegativeTarget(uint32 targetA);
 
+// Requires you to manually select an unit as the target.
+inline bool IsExplicitlySelectedUnitTarget(uint32 target)
+{
+    switch (target)
+    {
+        case TARGET_CHAIN_DAMAGE:
+        case TARGET_SINGLE_FRIEND:
+        case TARGET_UNIT_TARGET_ANY:
+        case TARGET_CHAIN_HEAL:
+        case TARGET_CURRENT_ENEMY_COORDINATES :
+        case TARGET_SINGLE_FRIEND_2:
+        //case TARGET_AREAEFFECT_PARTY_AND_CLASS:
+            return true;
+    }
+    return false;
+}
+
 inline bool HasSingleTargetAura(SpellEntry const *spellInfo)
 {
     return spellInfo->Custom & SPELL_CUSTOM_SINGLE_TARGET_AURA;
@@ -762,9 +779,10 @@ enum SpellTargetType
 
 struct SpellTargetEntry
 {
-    SpellTargetEntry(SpellTargetType type_,uint32 targetEntry_) : type(type_), targetEntry(targetEntry_) {}
+    SpellTargetEntry(SpellTargetType type_, uint32 targetEntry_, uint32 conditionId_) : type(type_), targetEntry(targetEntry_), conditionId(conditionId_) {}
     SpellTargetType type;
     uint32 targetEntry;
+    uint32 conditionId;
 };
 
 typedef std::multimap<uint32,SpellTargetEntry> SpellScriptTarget;

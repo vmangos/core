@@ -96,6 +96,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
     CONDITION_REQ_SOURCE_CREATURE,    //  48
     CONDITION_REQ_TARGET_WORLDOBJECT, //  49
+    CONDITION_REQ_TARGET_GAMEOBJECT,  //  50
+    CONDITION_REQ_TARGET_GAMEOBJECT,  //  51
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -320,15 +322,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             const Player* pTarget = ToPlayer(target);
 
             if (m_value1 & CF_ESCORT_SOURCE_DEAD)
-                if (pSource && pSource->isDead())
+                if (!pSource || pSource->isDead())
                     return true;
 
             if (m_value1 & CF_ESCORT_TARGET_DEAD)
-                if (pTarget && (pTarget->isDead() || !pTarget->IsInWorld()))
+                if (!pTarget || pTarget->isDead() || !pTarget->IsInWorld())
                     return true;
 
             if (m_value2)
-                if (pSource && pTarget && !pSource->IsWithinDistInMap(pTarget, m_value2))
+                if (!pSource || !pTarget || !pSource->IsWithinDistInMap(pTarget, m_value2))
                     return true;
 
             return false;
@@ -558,13 +560,15 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_MAP_EVENT_TARGETS:
         {
             bool bSatisfied = true;
-            const Map* pMap = map ? map : (source ? source->GetMap() : target->GetMap());
+            Map* pMap = const_cast<Map*>(map ? map : (source ? source->GetMap() : target->GetMap()));
             if (const ScriptedEvent* pEvent = pMap->GetScriptedMapEvent(m_value1))
             {
                 for (const auto& eventTarget : pEvent->m_vTargets)
                 {
-                    if (eventTarget.pObject)
-                        bSatisfied = bSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(eventTarget.pObject, map, source, conditionSourceType);
+                    WorldObject* pObject = pMap->GetWorldObject(eventTarget.target);
+
+                    if (pObject)
+                        bSatisfied = bSatisfied && sConditionStorage.LookupEntry<ConditionEntry>(m_value2)->Meets(pObject, map, source, conditionSourceType);
 
                     if (!bSatisfied)
                         return false;
@@ -579,6 +583,14 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_IS_PLAYER:
         {
             return target->IsPlayer();
+        }
+        case CONDITION_OBJECT_IS_SPAWNED:
+        {
+            return target->ToGameObject()->isSpawned();
+        }
+        case CONDITION_OBJECT_LOOT_STATE:
+        {
+            return target->ToGameObject()->getLootState() == m_value1;
         }
     }
     return false;
@@ -1117,6 +1129,15 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
+        case CONDITION_OBJECT_LOOT_STATE:
+        {
+            if (m_value1 > GO_JUST_DEACTIVATED)
+            {
+                sLog.outErrorDb("CONDITION_OBJECT_LOOT_STATE (entry %u, type %d) has value1 %u for an invalid loot state, skipped", m_entry, m_condition, m_value1);
+                return false;
+            }
+            break;
+        }
         case CONDITION_NONE:
         case CONDITION_INSTANCE_SCRIPT:
         case CONDITION_ACTIVE_HOLIDAY:
@@ -1133,6 +1154,7 @@ bool ConditionEntry::IsValid()
         case CONDITION_IS_ALIVE:
         case CONDITION_CANT_PATH_TO_VICTIM:
         case CONDITION_IS_PLAYER:
+        case CONDITION_OBJECT_IS_SPAWNED:
             break;
         default:
             sLog.outErrorDb("Condition entry %u has bad type of %d, skipped ", m_entry, m_condition);
@@ -1159,5 +1181,14 @@ bool ConditionEntry::CanBeUsedWithoutPlayer(uint32 entry)
             if (ConditionTargets[condition->m_condition] != CONDITION_REQ_TARGET_PLAYER)
                 return true;
     }
+    return false;
+}
+
+// Check if a player meets condition conditionId
+bool IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType)
+{
+    if (const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
+        return condition->Meets(target, map, source, conditionSourceType);
+
     return false;
 }

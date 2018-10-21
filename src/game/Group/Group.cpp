@@ -358,7 +358,7 @@ bool Group::AddMember(ObjectGuid guid, const char* name, uint8 joinMethod)
             // Compare group and player bind
             InstanceGroupBind* groupBind = GetBoundInstance(map->GetId());
             InstancePlayerBind* playerBind = player->GetBoundInstance(map->GetId());
-            if (playerBind && !player->m_InstanceValid && playerBind->state == groupBind->state && !((DungeonMap*)map)->IsUnloadingBeforeReset())
+            if (playerBind && groupBind && !player->m_InstanceValid && playerBind->state == groupBind->state && !((DungeonMap*)map)->IsUnloadingBeforeReset())
                 player->m_InstanceValid = true;
         }
     }

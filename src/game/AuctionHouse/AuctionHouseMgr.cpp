@@ -747,8 +747,6 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
     // Micro opt on name/suffix initialization
     std::string name;
     name.reserve(140);
-    std::string nameSuffix;
-    nameSuffix.reserve(70);
 
     for (auto itr = OrderedAuctionMap.cbegin(); itr != OrderedAuctionMap.cend(); ++itr)
     {
@@ -794,35 +792,13 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 if (name.empty())
                     continue;
 
-                nameSuffix = "";
                 int32 propertyId = item->GetItemRandomPropertyId();
                 const ItemRandomPropertiesEntry* randomProperty = nullptr;
                 if (propertyId > 0)
                      randomProperty = sItemRandomPropertiesStore.LookupEntry(static_cast<uint32>(propertyId));
 
                 if (randomProperty)
-                    nameSuffix = randomProperty->internalName;
-
-                // local name
-                if (loc_idx >= 0)
-                {
-                    ItemLocale const *il = sObjectMgr.GetItemLocale(proto->ItemId);
-                    if (il)
-                    {
-                        if (il->Name.size() > size_t(loc_idx) && !il->Name[loc_idx].empty())
-                            name = il->Name[loc_idx];
-                    }
-                }
-
-                if (randomProperty && dbc_loc < MAX_DBC_LOCALE)
-                {
-                    std::string localeSuffix = randomProperty->nameSuffix[dbc_loc];
-                    if (localeSuffix.length() > 0)
-                        nameSuffix = localeSuffix;
-                }
-
-                name += " ";
-                name += nameSuffix;
+                    Item::GetNameWithSuffix(name, proto, randomProperty, loc_idx, dbc_loc);
 
                 if (!Utf8FitTo(name, query.wsearchedname))
                     continue;

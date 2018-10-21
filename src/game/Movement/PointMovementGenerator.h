@@ -39,7 +39,7 @@ class MANGOS_DLL_SPEC PointMovementGenerator
         void Reset(T &unit);
         bool Update(T &, const uint32 &diff);
 
-        void MovementInform(T &);
+        virtual void MovementInform(T &);
 
         void unitSpeedChanged() { _recalculateSpeed = true; }
 
@@ -53,6 +53,18 @@ class MANGOS_DLL_SPEC PointMovementGenerator
         uint32 _options;
         float speed;
         bool _recalculateSpeed;
+};
+
+class MANGOS_DLL_SPEC DistancingMovementGenerator
+: public PointMovementGenerator<Creature>
+{
+    public:
+        DistancingMovementGenerator(float _x, float _y, float _z) :
+            PointMovementGenerator<Creature>(0, _x, _y, _z, MOVE_PATHFINDING | MOVE_RUN_MODE) {}
+
+        MovementGeneratorType GetMovementGeneratorType() const { return DISTANCING_MOTION_TYPE; }
+        bool Update(Creature&, const uint32 &diff);
+        void MovementInform(Creature &) override;
 };
 
 class MANGOS_DLL_SPEC AssistanceMovementGenerator

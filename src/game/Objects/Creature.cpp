@@ -179,7 +179,7 @@ Creature::Creature(CreatureSubtype subtype) :
     m_HomeX(0.0f), m_HomeY(0.0f), m_HomeZ(0.0f), m_HomeOrientation(0.0f), m_reactState(REACT_PASSIVE),
     _lastDamageTakenForEvade(0), _playerDamageTaken(0), _nonPlayerDamageTaken(0), m_creatureInfo(nullptr),
     m_AI_InitializeOnRespawn(false), m_detectionDistance(20.0f), m_callForHelpDist(5.0f), m_leashDistance(0.0f), m_combatWithZoneState(false), m_startwaypoint(0), m_mountId(0),
-    _isEscortable(false), m_reputationId(-1)
+    _isEscortable(false), m_reputationId(-1), m_castingTargetGuid(0)
 {
     m_regenTimer = 200;
     m_valuesCount = UNIT_END;
@@ -952,7 +952,7 @@ void Creature::RegenerateHealth()
 
 void Creature::DoFlee()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float hpPercent = GetHealthPercent();
@@ -970,7 +970,7 @@ void Creature::DoFlee()
 
 void Creature::DoFleeToGetAssistance()
 {
-    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING))
+    if (!getVictim() || HasAuraType(SPELL_AURA_PREVENTS_FLEEING) || hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
         return;
 
     float radius = sWorld.getConfig(CONFIG_FLOAT_CREATURE_FAMILY_FLEE_ASSISTANCE_RADIUS);
@@ -1003,6 +1003,15 @@ float Creature::GetFleeingSpeed() const
 {
     //TODO: There are different speeds for the different mobs, isn't there?
     return GetSpeed(MOVE_RUN);
+}
+
+void Creature::MoveAwayFromTarget(Unit* pTarget, float distance)
+{
+    if (hasUnitState(UNIT_STAT_NOT_MOVE | UNIT_STAT_CONFUSED | UNIT_STAT_LOST_CONTROL))
+        return;
+
+    GetMotionMaster()->MoveDistance(pTarget, distance);
+    InterruptSpellsWithInterruptFlags(SPELL_INTERRUPT_FLAG_MOVEMENT);
 }
 
 bool Creature::AIM_Initialize()
@@ -3597,7 +3606,6 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
     if ((uiCastFlags & CF_AURA_NOT_PRESENT) && pTarget->HasAura(pSpellInfo->Id))
         return SPELL_FAILED_AURA_BOUNCED;
 
-    // Can't cast while fleeing.
     if (GetMotionMaster()->GetCurrentMovementGeneratorType() == TIMED_FLEEING_MOTION_TYPE)
         return SPELL_FAILED_FLEEING;
 
@@ -3610,12 +3618,24 @@ SpellCastResult Creature::TryToCast(Unit* pTarget, const SpellEntry* pSpellInfo,
         return SPELL_FAILED_TOO_CLOSE;
 
     // This spell should only be cast when we cannot get into melee range.
-    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(hasUnitState(UNIT_STAT_NOT_MOVE) || !GetMotionMaster()->GetCurrent()->IsReachable())))
+    if ((uiCastFlags & CF_TARGET_UNREACHABLE) && (CanReachWithMeleeAttack(pTarget) || (GetMotionMaster()->GetCurrentMovementGeneratorType() != CHASE_MOTION_TYPE) || !(hasUnitState(UNIT_STAT_ROOT) || !GetMotionMaster()->GetCurrent()->IsReachable())))
         return SPELL_FAILED_MOVING;
 
     // Custom checks
     if (!(uiCastFlags & CF_FORCE_CAST))
     {
+        // Motion Master is not updated when this state is active.
+        if (!hasUnitState(UNIT_STAT_CAN_NOT_MOVE))
+        {
+            // Can't cast while fleeing.
+            switch (GetMotionMaster()->GetCurrentMovementGeneratorType())
+            {
+                case TIMED_FLEEING_MOTION_TYPE:
+                case DISTANCING_MOTION_TYPE:
+                    return SPELL_FAILED_FLEEING;
+            }
+        }
+
         // If the spell requires to be behind the target.
         if (pSpellInfo->Custom & SPELL_CUSTOM_FROM_BEHIND && pTarget->HasInArc(M_PI_F, this))
             return SPELL_FAILED_UNIT_NOT_BEHIND;

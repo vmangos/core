@@ -303,6 +303,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "graveyard",      SEC_MODERATOR,      false, &ChatHandler::HandleGoGraveyardCommand,         "", nullptr },
         { NODE, "grid",           SEC_MODERATOR,      false, &ChatHandler::HandleGoGridCommand,              "", nullptr },
         { NODE, "object",         SEC_MODERATOR,      false, &ChatHandler::HandleGoObjectCommand,            "", nullptr },
+        { NODE, "target",         SEC_MODERATOR,      false, &ChatHandler::HandleGoTargetCommand,            "", nullptr },
         { NODE, "taxinode",       SEC_MODERATOR,      false, &ChatHandler::HandleGoTaxinodeCommand,          "", nullptr },
         { NODE, "trigger",        SEC_MODERATOR,      false, &ChatHandler::HandleGoTriggerCommand,           "", nullptr },
         { NODE, "zonexy",         SEC_MODERATOR,      false, &ChatHandler::HandleGoZoneXYCommand,            "", nullptr },
@@ -1886,18 +1887,15 @@ bool ChatHandler::isValidChatMessage(const char* message)
     uint32 color = 0;
 
     ItemPrototype const* linkedItem = nullptr;
-    Quest const* linkedQuest = nullptr;
-    SpellEntry const *linkedSpell = nullptr;
-    ItemRandomPropertiesEntry const* itemProperty = nullptr;
+    const SpellEntry* linkedSpell = nullptr;
+
+    std::list<int> properties;
 
     while (!reader.eof())
     {
         if (validSequence == validSequenceIterator)
         {
             linkedItem = nullptr;
-            linkedQuest = nullptr;
-            linkedSpell = nullptr;
-            itemProperty = nullptr;
 
             reader.ignore(255, '|');
         }
@@ -2003,144 +2001,48 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     }
 
                     // the itementry is followed by several integers which describe an instance of this item
-
-                    // position relative after itemEntry
-                    const uint8 randomPropertyPosition = 6;
-
-                    int32 propertyId = 0;
+                    int32 propertyId = 0, propCount = 0;
                     bool negativeNumber = false;
-                    char c;
-                    for (uint8 i = 0; i < randomPropertyPosition; ++i)
+                    char c = 0;
+                    while (reader.peek() != '|' && !reader.eof() && propCount < 3)
                     {
-                        propertyId = 0;
-                        negativeNumber = false;
-                        while ((c = reader.get()) != ':')
-                        {
-                            if (c >= '0' && c <= '9')
-                            {
-                                propertyId *= 10;
-                                propertyId += c - '0';
-                            }
-                            else if (c == '-')
-                                negativeNumber = true;
-                            else
-                                return false;
-                        }
-                    }
-                    if (negativeNumber)
-                        propertyId *= -1;
+                        c = reader.get();
 
-                    if (propertyId > 0)
-                    {
-                        itemProperty = sItemRandomPropertiesStore.LookupEntry(propertyId);
-                        if (!itemProperty)
+                        // Reset at the property switch
+                        if (c == ':')
+                        {
+                            if (negativeNumber)
+                                propertyId *= -1;
+
+                            ++propCount;
+                            // Only check if it's a non-zero prop
+                            if (propertyId > 0)
+                                properties.push_back(propertyId);
+
+                            propertyId = 0;
+                            negativeNumber = false;
+
+                            continue;
+                        }
+
+                        if (c >= '0' && c <= '9')
+                        {
+                            propertyId *= 10;
+                            propertyId += c - '0';
+                        }
+                        else if (c == '-')
+                            negativeNumber = true;
+                        else
                             return false;
                     }
 
                     // ignore other integers
-                    while ((c >= '0' && c <= '9') || c == ':')
-                    {
-                        reader.ignore(1);
-                        c = reader.peek();
-                    }
-                }
-                else if (strcmp(buffer, "quest") == 0)
-                {
-                    // no color check for questlinks, each client will adapt it anyway
-                    uint32 questid = 0;
-                    // read questid
-                    char c = reader.peek();
-                    while (c >= '0' && c <= '9')
-                    {
-                        reader.ignore(1);
-                        questid *= 10;
-                        questid += c - '0';
-                        c = reader.peek();
-                    }
-
-                    linkedQuest = sObjectMgr.GetQuestTemplate(questid);
-
-                    if (!linkedQuest)
-                    {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage Questtemplate %u not found", questid);
-                        return false;
-                    }
-
-                    if (c != ':')
-                    {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage Invalid quest link structure");
-                        return false;
-                    }
-
-                    reader.ignore(1);
                     c = reader.peek();
-                    // level
-                    uint32 questlevel = 0;
-                    while (c >= '0' && c <= '9')
-                    {
-                        reader.ignore(1);
-                        questlevel *= 10;
-                        questlevel += c - '0';
-                        c = reader.peek();
-                    }
-
-                    if (questlevel >= STRONG_MAX_LEVEL)
-                    {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage Quest level %u too big", questlevel);
-                        return false;
-                    }
-
-                    if (c != '|')
-                    {
-                        DEBUG_LOG("ChatHandler::isValidChatMessage Invalid quest link structure");
-                        return false;
-                    }
-                }
-                else if (strcmp(buffer, "talent") == 0)
-                {
-                    // talent links are always supposed to be blue
-                    if (color != CHAT_LINK_COLOR_TALENT)
-                        return false;
-
-                    // read talent entry
-                    reader.getline(buffer, 256, ':');
-                    if (reader.eof())                       // : must be
-                        return false;
-
-                    TalentEntry const *talentInfo = sTalentStore.LookupEntry(atoi(buffer));
-                    if (!talentInfo)
-                        return false;
-
-                    linkedSpell = sSpellMgr.GetSpellEntry(talentInfo->RankID[0]);
-                    if (!linkedSpell)
-                        return false;
-
-                    char c = reader.peek();
-                    // skillpoints? whatever, drop it
-                    while (c != '|' && c != '\0')
+                    while (((c >= '0' && c <= '9') || c == ':') && c != '|' && !reader.eof())
                     {
                         reader.ignore(1);
                         c = reader.peek();
                     }
-                }
-                else if (strcmp(buffer, "spell") == 0)
-                {
-                    if (color != CHAT_LINK_COLOR_SPELL)
-                        return false;
-
-                    uint32 spellid = 0;
-                    // read spell entry
-                    char c = reader.peek();
-                    while (c >= '0' && c <= '9')
-                    {
-                        reader.ignore(1);
-                        spellid *= 10;
-                        spellid += c - '0';
-                        c = reader.peek();
-                    }
-                    linkedSpell = sSpellMgr.GetSpellEntry(spellid);
-                    if (!linkedSpell)
-                        return false;
                 }
                 else if (strcmp(buffer, "enchant") == 0)
                 {
@@ -2184,35 +2086,6 @@ bool ChatHandler::isValidChatMessage(const char* message)
                     // verify the link name
                     if (linkedSpell)
                     {
-                        // spells with that flag have a prefix of "$PROFESSION: "
-                        if (linkedSpell->Attributes & SPELL_ATTR_TRADESPELL)
-                        {
-                            // lookup skillid
-                            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(linkedSpell->Id);
-                            if (bounds.first == bounds.second)
-                                return false;
-
-                            SkillLineAbilityEntry const *skillInfo = bounds.first->second;
-
-                            if (!skillInfo)
-                                return false;
-
-                            SkillLineEntry const *skillLine = sSkillLineStore.LookupEntry(skillInfo->skillId);
-                            if (!skillLine)
-                                return false;
-
-                            for (uint8 i = 0; i < MAX_DBC_LOCALE; ++i)
-                            {
-                                uint32 skillLineNameLength = strlen(skillLine->name[i]);
-                                if (skillLineNameLength > 0 && strncmp(skillLine->name[i], buffer, skillLineNameLength) == 0)
-                                {
-                                    // found the prefix, remove it to perform spellname validation below
-                                    // -2 = strlen(": ")
-                                    uint32 spellNameLength = strlen(buffer) - skillLineNameLength - 2;
-                                    memmove(buffer, buffer + skillLineNameLength + 2, spellNameLength + 1);
-                                }
-                            }
-                        }
                         bool foundName = false;
                         for (uint8 i = 0; i < MAX_DBC_LOCALE; ++i)
                         {
@@ -2225,63 +2098,89 @@ bool ChatHandler::isValidChatMessage(const char* message)
                         if (!foundName)
                             return false;
                     }
-                    else if (linkedQuest)
-                    {
-                        if (linkedQuest->GetTitle() != buffer)
-                        {
-                            QuestLocale const *ql = sObjectMgr.GetQuestLocale(linkedQuest->GetQuestId());
-
-                            if (!ql)
-                            {
-                                DEBUG_LOG("ChatHandler::isValidChatMessage default questname didn't match and there is no locale");
-                                return false;
-                            }
-
-                            bool foundName = false;
-                            for (uint8 i = 0; i < ql->Title.size(); i++)
-                            {
-                                if (ql->Title[i] == buffer)
-                                {
-                                    foundName = true;
-                                    break;
-                                }
-                            }
-                            if (!foundName)
-                            {
-                                DEBUG_LOG("ChatHandler::isValidChatMessage no quest locale title matched");
-                                return false;
-                            }
-                        }
-                    }
                     else if (linkedItem)
                     {
-                        std::string expectedName = std::string(linkedItem->Name1);
+                        bool hasValidRandomProperty = false;
+                        bool hasRandomProperty = linkedItem->RandomProperty > 0;
+                        int enchantCount = 0;
 
-                        if (expectedName != buffer)
+                        // Item has no random property. All properties must be enchants, of which
+                        // there can only be two. One permanent, one temporary
+                        if (!hasRandomProperty && properties.size() > 2)
+                            return false;
+
+                        int dbLocale = m_session->GetSessionDbLocaleIndex();
+                        LocaleConstant dbcLocale = m_session->GetSessionDbcLocale();
+
+                        const ItemRandomPropertiesEntry* iProp = nullptr;
+                        for (auto iter = properties.begin(); iter != properties.end(); ++iter)
                         {
-                            ItemLocale const *il = sObjectMgr.GetItemLocale(linkedItem->ItemId);
+                            auto prop = *iter;
+                            iProp = nullptr;
 
-                            bool foundName = false;
-                            for (uint8 i = LOCALE_koKR; i < MAX_LOCALE; ++i)
+                            if (!hasRandomProperty)
                             {
-                                int8 dbIndex = sObjectMgr.GetIndexForLocale(LocaleConstant(i));
-                                if (dbIndex == -1 || il == nullptr || (size_t)dbIndex >= il->Name.size())
-                                    // using strange database/client combinations can lead to this case
-                                    expectedName = linkedItem->Name1;
+                                if (sSpellItemEnchantmentStore.LookupEntry(prop))
+                                    ++enchantCount;
                                 else
-                                    expectedName = il->Name[dbIndex];
+                                    return false;
+                            }
+                            else
+                            {
+                                // This is tricky - some enchants and random properties share IDs!
+                                // do we just compare all of the names?
+                                if (!hasValidRandomProperty)
+                                    iProp = sItemRandomPropertiesStore.LookupEntry(prop);
 
+                                // Check if we have a valid random property with this prop...
+                                if (iProp)
+                                {
+                                    // Compare the name. If the name isn't correct, maybe it's an enchantment instead.
+                                    for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
+                                    {
+                                        std::string expectedName = linkedItem->Name1;
+                                        Item::GetNameWithSuffix(expectedName, linkedItem, iProp, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                        if (expectedName == buffer)
+                                        {
+                                            hasValidRandomProperty = true;
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                // Still don't have a valid random prop. If it's an enchantment, inc count.
+                                // Else this property is entirely invalid.
+                                if (!hasValidRandomProperty)
+                                {
+                                    if (sSpellItemEnchantmentStore.LookupEntry(prop))
+                                        ++enchantCount;
+                                    else
+                                        return false;
+                                }
+                            }
+
+                            if (enchantCount > 2)
+                                return false;
+                        }
+
+                        if (hasRandomProperty && !hasValidRandomProperty)
+                            return false;
+                        else if (!hasRandomProperty)
+                        {
+                            // Finally compare base name
+                            bool validName = false;
+                            for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
+                            {
+                                std::string expectedName = linkedItem->Name1;
+                                Item::GetNameWithSuffix(expectedName, linkedItem, nullptr, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
                                 if (expectedName == buffer)
                                 {
-                                    foundName = true;
+                                    validName = true;
                                     break;
                                 }
                             }
-                            if (!foundName)
-                            {
-                                DEBUG_LOG("ChatHandler::isValidChatMessage linked item name wasn't found in any localization");
+                            if (!validName)
                                 return false;
-                            }
                         }
                     }
                     // that place should never be reached - if nothing linked has been set in |H

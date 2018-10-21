@@ -123,6 +123,9 @@ bool Map::ScriptCommand_MoveTo(const ScriptInfo& script, WorldObject* source, Wo
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
+
     float x = script.x;
     float y = script.y;
     float z = script.z;
@@ -693,8 +696,8 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
-    // Consider add additional checks for cases where creature should not change movementType
-    // (pet? in combat? already using same MMgen as script try to apply?)
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
 
     switch (script.movement.movementType)
     {
@@ -752,6 +755,10 @@ bool Map::ScriptCommand_SetMovementType(const ScriptInfo& script, WorldObject* s
             if (pTarget)
                 pSource->GetMotionMaster()->MoveCharge(pTarget, script.movement.intParam, script.movement.boolParam);
             break;
+        case DISTANCING_MOTION_TYPE:
+            if (pTarget && (!script.movement.intParam || (script.movement.intParam <= pSource->GetPowerPercent(POWER_MANA))))
+                pSource->MoveAwayFromTarget(pTarget, script.x);
+            break;
         default:
             sLog.outError("SCRIPT_COMMAND_MOVEMENT (script id %u) call for an invalid motion type (MotionType: %u), skipping.", script.id, script.movement.movementType);
             return ShouldAbortScript(script);
@@ -806,6 +813,9 @@ bool Map::ScriptCommand_Morph(const ScriptInfo& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
+
     if (!script.morph.creatureOrModelEntry)
         pSource->DeMorph();
     else if (script.morph.isDisplayId)
@@ -834,10 +844,13 @@ bool Map::ScriptCommand_Mount(const ScriptInfo& script, WorldObject* source, Wor
 
     uint32 displayId = script.mount.isDisplayId || !script.mount.creatureOrModelEntry ? script.mount.creatureOrModelEntry : Creature::ChooseDisplayId(ObjectMgr::GetCreatureTemplate(script.mount.creatureOrModelEntry));
 
-    if (displayId)
-        pSource->Mount(displayId);
-    else
-        pSource->Unmount();
+    if (pSource->isAlive())
+    {
+        if (displayId)
+            pSource->Mount(displayId);
+        else
+            pSource->Unmount();
+    }
 
     if (script.mount.permanent)
         pSource->SetDefaultMount(displayId);
@@ -864,8 +877,8 @@ bool Map::ScriptCommand_SetRun(const ScriptInfo& script, WorldObject* source, Wo
 // SCRIPT_COMMAND_ATTACK_START (26)
 bool Map::ScriptCommand_AttackStart(const ScriptInfo& script, WorldObject* source, WorldObject* target)
 {
-    Unit* pTarget = ToUnit(target);
     Creature* pAttacker = ToCreature(source);
+    Unit* pTarget = ToUnit(target);
 
     if (!pAttacker || !pTarget)
     {
@@ -873,9 +886,12 @@ bool Map::ScriptCommand_AttackStart(const ScriptInfo& script, WorldObject* sourc
         return ShouldAbortScript(script);
     }
 
-    if (pAttacker->IsFriendlyTo(pTarget))
+    if (!pAttacker->isAlive())
+        return ShouldAbortScript(script);
+
+    if (pAttacker->IsFriendlyTo(pTarget) || !pTarget->isTargetableForAttack() || !pAttacker->IsInMap(pTarget))
     {
-        sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) attacker is friendly to target, can not attack.", script.id);
+        sLog.outError("SCRIPT_COMMAND_ATTACK_START (script id %u) for an invalid attack target, skipping.", script.id);
         return ShouldAbortScript(script);
     }
 
@@ -912,6 +928,9 @@ bool Map::ScriptCommand_SetStandState(const ScriptInfo& script, WorldObject* sou
         sLog.outError("SCRIPT_COMMAND_STAND_STATE (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping", script.id, source ? source->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
+
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
 
     pSource->SetStandState(script.standState.standState);
 
@@ -956,7 +975,11 @@ bool Map::ScriptCommand_SendTaxiPath(const ScriptInfo& script, WorldObject* sour
         return ShouldAbortScript(script);
     }
 
+    if (!pPlayer->isAlive())
+        return ShouldAbortScript(script);
+
     pPlayer->ActivateTaxiPathTo(script.sendTaxiPath.taxiPathId, 0, true);
+
     return false;
 }
 
@@ -1021,7 +1044,7 @@ bool Map::ScriptCommand_Evade(const ScriptInfo& script, WorldObject* source, Wor
         return ShouldAbortScript(script);
     }
 
-    if (pSource->AI())
+    if (pSource->AI() && pSource->isAlive())
         pSource->AI()->EnterEvadeMode();
 
     return false;
@@ -1070,6 +1093,9 @@ bool Map::ScriptCommand_TurnTo(const ScriptInfo& script, WorldObject* source, Wo
         sLog.outError("SCRIPT_COMMAND_TURN_TO (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
+
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
 
     switch (script.turnTo.facingLogic)
     {
@@ -1382,6 +1408,9 @@ bool Map::ScriptCommand_Flee(const ScriptInfo& script, WorldObject* source, Worl
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
+
     if (script.flee.seekAssistance)
         pSource->DoFleeToGetAssistance();
     else
@@ -1409,6 +1438,9 @@ bool Map::ScriptCommand_DealDamage(const ScriptInfo& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
+    if (!pTarget->isAlive())
+        return ShouldAbortScript(script);
+
     uint32 damage = script.dealDamage.isPercent ? pTarget->GetMaxHealth()*(script.dealDamage.damage / 100.0f) : script.dealDamage.damage;
     pSource->DealDamage(pTarget, damage, nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 
@@ -1426,6 +1458,9 @@ bool Map::ScriptCommand_ZoneCombatPulse(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
+
     pSource->SetInCombatWithZone(script.combatPulse.initialPulse);
 
     return false;
@@ -1441,6 +1476,9 @@ bool Map::ScriptCommand_CallForHelp(const ScriptInfo& script, WorldObject* sourc
         sLog.outError("SCRIPT_COMMAND_CALL_FOR_HELP (script id %u) call for a NULL or non-creature source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
+
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
 
     pSource->CallForHelp(script.x);
 
@@ -1628,6 +1666,9 @@ bool Map::ScriptCommand_StartWaypoints(const ScriptInfo& script, WorldObject* so
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->isAlive())
+        return ShouldAbortScript(script);
+
     pSource->GetMotionMaster()->Clear(false, true);
     pSource->GetMotionMaster()->MoveWaypoint(script.startWaypoints.pathId, script.startWaypoints.startPoint, script.startWaypoints.wpSource, script.startWaypoints.initialDelay, script.startWaypoints.overwriteEntry, script.startWaypoints.canRepeat);
 
@@ -1653,8 +1694,6 @@ bool Map::ScriptCommand_EndMapEvent(const ScriptInfo& script, WorldObject* sourc
 
     itr->second.EndEvent(script.endMapEvent.success);
 
-    m_mScriptedEvents.erase(itr);
-
     return false;
 }
 
@@ -1675,20 +1714,7 @@ bool Map::ScriptCommand_AddMapEventTarget(const ScriptInfo& script, WorldObject*
         return ShouldAbortScript(script);
     }
 
-    for (auto& target : pEvent->m_vTargets)
-    {
-        // If target already exists, just update data.
-        if (target.pObject == source)
-        {
-            target.uiFailureCondition = script.addMapEventTarget.failureCondition;
-            target.uiFailureScript = script.addMapEventTarget.failureScript;
-            target.uiSuccessCondition = script.addMapEventTarget.successCondition;
-            target.uiSuccessScript = script.addMapEventTarget.successScript;
-            return false;
-        }
-    }
-
-    pEvent->m_vTargets.emplace_back(source, script.addMapEventTarget.failureCondition, script.addMapEventTarget.failureScript, script.addMapEventTarget.successCondition, script.addMapEventTarget.successScript);
+    pEvent->AddOrUpdateExtraTarget(source, script.addMapEventTarget.failureCondition, script.addMapEventTarget.failureScript, script.addMapEventTarget.successCondition, script.addMapEventTarget.successScript);
 
     return false;
 }
@@ -1713,7 +1739,7 @@ bool Map::ScriptCommand_RemoveMapEventTarget(const ScriptInfo& script, WorldObje
 
             for (auto itr = pEvent->m_vTargets.begin(); itr != pEvent->m_vTargets.end(); ++itr)
             {
-                if (itr->pObject == source)
+                if (itr->target == source->GetObjectGuid())
                 {
                     pEvent->m_vTargets.erase(itr);
                     return false;
@@ -1732,13 +1758,17 @@ bool Map::ScriptCommand_RemoveMapEventTarget(const ScriptInfo& script, WorldObje
 
             for (auto itr = pEvent->m_vTargets.begin(); itr != pEvent->m_vTargets.end();)
             {
-                if (sObjectMgr.IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, itr->pObject, CONDITION_FROM_DBSCRIPTS))
+                if (WorldObject* pObject = GetWorldObject(itr->target))
                 {
-                    itr = pEvent->m_vTargets.erase(itr);
-                    if (script.removeMapEventTarget.targets == SO_REMOVETARGET_ONE_FIT_CONDITION)
-                        return false;
-                    continue;
+                    if (sObjectMgr.IsConditionSatisfied(script.removeMapEventTarget.conditionId, source, this, pObject, CONDITION_FROM_DBSCRIPTS))
+                    {
+                        itr = pEvent->m_vTargets.erase(itr);
+                        if (script.removeMapEventTarget.targets == SO_REMOVETARGET_ONE_FIT_CONDITION)
+                            return false;
+                        continue;
+                    }
                 }
+                
                 ++itr;
             }
             break;
@@ -1985,6 +2015,9 @@ bool Map::ScriptCommand_AssistUnit(const ScriptInfo& script, WorldObject* source
         return ShouldAbortScript(script);
     }
 
+    if (!pSource->IsInMap(pTarget))
+        return ShouldAbortScript(script);
+
     Unit* pAttacker = pTarget->getAttackerForHelper();
 
     if (!pAttacker)
@@ -1995,12 +2028,12 @@ bool Map::ScriptCommand_AssistUnit(const ScriptInfo& script, WorldObject* source
         if (pVictim == pAttacker)
             return false;
 
-        if (!pSource->IsFriendlyTo(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        if (!pSource->IsFriendlyTo(pAttacker) && pAttacker->isTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AddThreat(pAttacker);
     }
     else
     {
-        if (pSource->AI() && !pSource->IsFriendlyTo(pAttacker) && pSource->IsWithinDistInMap(pAttacker, 40.0f))
+        if (pSource->AI() && !pSource->IsFriendlyTo(pAttacker) && pAttacker->isTargetableForAttack() && pSource->IsWithinDistInMap(pAttacker, 40.0f))
             pSource->AI()->AttackStart(pAttacker);
     }
 
@@ -2065,7 +2098,7 @@ bool Map::ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source,
         return ShouldAbortScript(script);
     }
 
-    if (pTarget->isAlive() && !pSource->IsFriendlyTo(pTarget))
+    if (pTarget->isTargetableForAttack() && pSource->IsInMap(pTarget) && !pSource->IsFriendlyTo(pTarget))
         pSource->AddThreat(pTarget);
 
     return false;

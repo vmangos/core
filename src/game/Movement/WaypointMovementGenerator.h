@@ -34,7 +34,7 @@
 #include <set>
 
 #define FLIGHT_TRAVEL_UPDATE  100
-#define STOP_TIME_FOR_PLAYER  30 * IN_MILLISECONDS
+#define STOP_TIME_FOR_PLAYER  (30 * IN_MILLISECONDS)
 
 struct CreatureGroupMember;
 

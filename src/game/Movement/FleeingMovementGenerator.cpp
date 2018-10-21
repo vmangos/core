@@ -203,8 +203,7 @@ template bool FleeingMovementGenerator<Creature>::Update(Creature &, const uint3
 void TimedFleeingMovementGenerator::Initialize(Unit& owner)
 {
     ASSERT(owner.GetTypeId() == TYPEID_UNIT);
-    _forceWalking = true;
-    _customSpeed = ((Creature*)&owner)->GetFleeingSpeed();
+    _forceWalking = false;
     FleeingMovementGenerator<Creature>::Initialize(*((Creature*)&owner));
 }
 
