@@ -168,7 +168,7 @@ void ThreadPool::worker::loop_wrapper()
         }
         catch (const std::string &e)
         {
-            sLog.outError("A ThreadPool task generated an exception: %s",e);
+            sLog.outError("A ThreadPool task generated an exception: %s", e.c_str());
         }
         catch (...)
         {
