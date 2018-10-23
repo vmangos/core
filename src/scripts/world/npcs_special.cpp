@@ -3544,7 +3544,7 @@ bool QuestRewarded_npc_hunterpetquest(Player* pPlayer, Creature* pCreature, Ques
     for (int i = 0; i < 12; ++i)
         hunterQuestPetEntryRel[hunterQuestEntries[i]] = hunterQuestPetEntries[i];
 
-	if (pPlayer && pQuest && pCreature)
+    if (pPlayer && pQuest && pCreature)
     {
         uint32 m_creatureId = hunterQuestPetEntryRel.find(pQuest->GetQuestId())->second;
         std::list<Creature*> mPossiblePets;
