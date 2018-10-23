@@ -49,6 +49,7 @@
 #include "CellImpl.h"
 #include "MapManager.h"
 #include "MoveSpline.h"
+#include "Pet.h"
 
 #include "ZoneScript.h"
 #include "PlayerAI.h"
@@ -1777,7 +1778,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
             }
 
             if (finalSpellId)
+            {
                 caster->CastSpell(target, finalSpellId, true, nullptr, this);
+                target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
+                target->SetSpeedRate(MOVE_WALK, 1.0f, true);
+            }
 
             return;
         }

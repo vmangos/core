@@ -3528,6 +3528,47 @@ CreatureAI* GetAI_npc_oozeling_jubjub(Creature* pCreature)
     return new npc_oozeling_jubjubAI(pCreature);
 }
 
+static uint32 hunterQuestEntries[12] =
+{
+    6064, 6084, 6085, 6061, 6087, 6088, 6063, 6101, 6102, 6062, 6082, 6083
+};
+
+static uint32 hunterQuestPetEntries [12] =
+{
+    1126, 1201, 1196, 2956, 2959, 2970, 1998, 2043, 1996, 3099, 3126, 3107
+};
+
+bool QuestRewarded_npc_hunterpetquest(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
+{
+    std::map<uint32, uint32> hunterQuestPetEntryRel;
+    for (int i = 0; i < 12; ++i)
+        hunterQuestPetEntryRel[hunterQuestEntries[i]] = hunterQuestPetEntries[i];
+
+	if (pPlayer && pQuest && pCreature)
+    {
+        uint32 m_creatureId = hunterQuestPetEntryRel.find(pQuest->GetQuestId())->second;
+        std::list<Creature*> mPossiblePets;
+        GetCreatureListWithEntryInGrid(mPossiblePets, pPlayer, m_creatureId, 20.0f);
+        for (Creature* pPet : mPossiblePets)
+        {
+            if (pPet)
+            {
+                Unit* pOwner = pPet->GetCharmerOrOwner();
+                if (pOwner)
+                {
+                    if (pOwner->GetGUIDLow() == pPlayer->GetGUIDLow())
+                    {
+                        pPet->ForcedDespawn();
+                        pPet->DoKillUnit();
+                    }
+                }
+            }
+        }
+    }
+
+ 	return true;
+}
+
 void AddSC_npcs_special()
 {
     Script *newscript;
@@ -3699,5 +3740,10 @@ void AddSC_npcs_special()
     newscript = new Script;
     newscript->Name = "npc_oozeling_jubjub";
     newscript->GetAI = &GetAI_npc_oozeling_jubjub;
+    newscript->RegisterSelf();
+
+    newscript = new Script;
+    newscript->Name = "npc_hunterpetquest";
+    newscript->pQuestRewardedNPC = &QuestRewarded_npc_hunterpetquest;
     newscript->RegisterSelf();
 }
