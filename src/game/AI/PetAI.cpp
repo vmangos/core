@@ -58,8 +58,13 @@ bool PetAI::_needToStop() const
     if (m_creature->IsPet() && !((Pet*)m_creature)->IsEnabled())
         return true;
 
-    bool playerPet = m_creature->GetCharmerOrOwnerOrSelf()->IsPlayer();
-    return !m_creature->getVictim()->isTargetableForAttack(false, playerPet);
+    Unit* pOwner = m_creature->GetCharmerOrOwnerOrSelf();
+
+    // Prevent creature pets from chasing forever
+    if (pOwner->IsCreature() && !pOwner->isInCombat() && m_creature->IsOutOfThreatArea(m_creature->getVictim()))
+        return true;
+
+    return !m_creature->getVictim()->isTargetableForAttack(false, pOwner->IsPlayer());
 }
 
 void PetAI::_stopAttack()
