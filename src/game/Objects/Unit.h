@@ -1014,10 +1014,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void CleanupsBeforeDelete() override;               // used in ~Creature/~Player (or before mass creature delete to remove cross-references to already deleted units)
 
-        float GetObjectBoundingRadius() const override
-        {
-            return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; // overwrite WorldObject version
-        }
+        float GetObjectBoundingRadius() const override { return m_floatValues[UNIT_FIELD_BOUNDINGRADIUS]; } // overwrite WorldObject version
+        float GetCombatReach() const override { return m_floatValues[UNIT_FIELD_COMBATREACH]; } // overwrite WorldObject version
 
         /**
          * Gets the current DiminishingLevels for the given group
@@ -1559,8 +1557,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool IsCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetCharmerOrOwnerPlayerOrPlayerItself() const;
         Player* GetAffectingPlayer() const;
-        float GetCombatDistance( const Unit* target ) const;
-        float GetDistanceToCenter( const Unit* target ) const;
         float GetLeewayBonusRange(const Unit* target) const;
         float GetLeewayBonusRadius() const;
 

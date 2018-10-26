@@ -702,6 +702,7 @@ m_obj->m_updateTracker.Reset();
             GetNearPoint(obj, x, y, z, obj->GetObjectBoundingRadius(), distance2d, GetAngle(obj));
         }
         virtual float GetObjectBoundingRadius() const { return DEFAULT_WORLD_OBJECT_SIZE; }
+        virtual float GetCombatReach() const { return 0.f; }
 
         bool IsPositionValid() const;
         void UpdateGroundPositionZ(float x, float y, float &z) const;
@@ -726,6 +727,8 @@ m_obj->m_updateTracker.Reset();
         virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
         virtual uint8 getGender() const { return 0; } // used in chat builder
 
+        float GetCombatDistance(const WorldObject* target) const;
+        float GetDistanceToCenter(const WorldObject* target) const;
         float GetExactDistance( const WorldObject* obj ) const;
         float GetExactDistance(float x, float y, float z) const;
         float GetDistance( const WorldObject* obj ) const;
@@ -748,6 +751,10 @@ m_obj->m_updateTracker.Reset();
         bool IsWithinDistInMap(WorldObject const* obj, float dist2compare, bool is3D = true) const
         {
             return obj && IsInMap(obj) && _IsWithinDist(obj,dist2compare,is3D);
+        }
+        bool IsWithinCombatDistInMap(WorldObject const* obj, float dist2compare) const
+        {
+            return obj && IsInMap(obj) && (GetCombatDistance(obj) <= dist2compare);
         }
         bool IsWithinLOS(float x, float y, float z, bool checkDynLos = true, float targetHeight = 2.f) const;
         bool IsWithinLOSInMap(const WorldObject* obj, bool checkDynLos = true) const;

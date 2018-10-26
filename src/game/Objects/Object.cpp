@@ -1287,6 +1287,24 @@ InstanceData* WorldObject::GetInstanceData() const
     return GetMap()->GetInstanceData();
 }
 
+float WorldObject::GetCombatDistance(const WorldObject* target) const
+{
+    float radius = target->GetCombatReach() + GetCombatReach();
+    float dx = GetPositionX() - target->GetPositionX();
+    float dy = GetPositionY() - target->GetPositionY();
+    float dz = GetPositionZ() - target->GetPositionZ();
+    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz)) - radius;
+    return (dist > 0 ? dist : 0);
+}
+
+float WorldObject::GetDistanceToCenter(const WorldObject* target) const
+{
+    float dx = GetPositionX() - target->GetPositionX();
+    float dy = GetPositionY() - target->GetPositionY();
+    float dz = GetPositionZ() - target->GetPositionZ();
+    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
+    return (dist > 0 ? dist : 0);
+}
 //slow
 
 float WorldObject::GetExactDistance(const WorldObject* obj) const
