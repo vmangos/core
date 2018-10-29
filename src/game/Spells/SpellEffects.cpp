@@ -577,6 +577,13 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
 
                     return;
                 }
+                case 19614: // Despawn Caster
+                {
+                    if (Creature* pCreature = ToCreature(unitTarget))
+                        pCreature->DespawnOrUnsummon();
+
+                    return;
+                }
                 case 25716: // Force Self - Bow
                 {
                     m_caster->HandleEmote(EMOTE_ONESHOT_BOW);

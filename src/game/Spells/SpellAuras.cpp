@@ -1731,6 +1731,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
     {
         if (IsQuestTameSpell(GetId()) && target->isAlive())
         {
+            if (m_removeMode != AURA_REMOVE_BY_CHANNEL)
+                return;
+
             Unit* caster = GetCaster();
             if (!caster || !caster->isAlive())
                 return;
@@ -3123,16 +3126,18 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->AttackStop();
         target->InterruptNonMeleeSpells(false);
-        if (caster->GetTypeId() == TYPEID_PLAYER) // Units will make the controlled player attack (MoveChase)
+
+        if (caster->IsPlayer()) // Units will make the controlled player attack (MoveChase)
             target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-        if (Creature* pCreaTarget = target->ToCreature())
+        if (Creature* pCreatureTarget = target->ToCreature())
         {
-            if (pCreaTarget->AI() && pCreaTarget->AI()->SwitchAiAtControl())
-                pCreaTarget->AIM_Initialize();
-            if (caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK)
+            if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
+                pCreatureTarget->AIM_Initialize();
+
+            if (caster->IsPlayer() && caster->getClass() == CLASS_WARLOCK)
             {
-                CreatureInfo const *cinfo = ((Creature*)target)->GetCreatureInfo();
+                CreatureInfo const *cinfo = pCreatureTarget->GetCreatureInfo();
                 if (cinfo && cinfo->type == CREATURE_TYPE_DEMON)
                 {
                     // creature with pet number expected have class set
@@ -3155,7 +3160,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (Player* pPlayer = target->ToPlayer())
         {
-            if (caster->GetTypeId() == TYPEID_UNIT)
+            if (caster->IsCreature())
             {
                 pPlayer->SetControlledBy(caster);
                 if (pPlayer->i_AI && m_spellAuraHolder->GetId() == 28410)
@@ -3169,19 +3174,23 @@ void Aura::HandleModCharm(bool apply, bool Real)
             }
         }
         target->UpdateControl();
-        if (caster->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)caster)->CharmSpellInitialize();
+
+        if (caster->IsPlayer())
+            static_cast<Player*>(caster)->CharmSpellInitialize();
     }
     else
     {
+        Creature* pCreatureTarget = target->ToCreature();
+        Player* pPlayerTarget = target->ToPlayer();
+
         target->SetCharmerGuid(ObjectGuid());
 
-        if(target->GetTypeId() != TYPEID_PLAYER)
+        if (pCreatureTarget)
         {
-            CreatureInfo const *cinfo = ((Creature*)target)->GetCreatureInfo();
+            CreatureInfo const *cinfo = pCreatureTarget->GetCreatureInfo();
 
             // restore faction
-            if (((Creature*)target)->IsPet())
+            if (target->IsPet())
             {
                 if (Unit* owner = target->GetOwner())
                     target->setFaction(owner->getFaction());
@@ -3192,7 +3201,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 target->setFaction(cinfo->faction_A);
 
             // restore UNIT_FIELD_BYTES_0
-            if (cinfo && caster && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
+            if (cinfo && caster && caster->IsPlayer() && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
             {
                 // DB must have proper class set in field at loading, not req. restore, including workaround case at apply
                 // target->SetByteValue(UNIT_FIELD_BYTES_0, 1, cinfo->unit_class);
@@ -3207,45 +3216,31 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (caster)
         {
             caster->SetCharm(nullptr);
-            if (caster->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)caster)->RemovePetActionBar();
+            if (caster->IsPlayer())
+                static_cast<Player*>(caster)->RemovePetActionBar();
         }
         
         target->UpdateControl();
 
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (pPlayerTarget)
+            pPlayerTarget->setFactionForRace(target->getRace());
+
+        if (pPlayerTarget && pPlayerTarget->isAlive() && caster->isAlive() && caster->isInCombat())
         {
-            Player* pPlayer = target->ToPlayer();
-            ((Player*)target)->setFactionForRace(target->getRace());
-        }
-        // this should possibly be the case for other spells too...
-        // why on earth remove player from combat if, for example, its a boss casting it
-        if (m_spellAuraHolder->GetId() == 28410 && target->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (caster->isAlive() && caster->isInCombat())
-            {
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)target)->SendAttackSwingCancelAttack();
+            pPlayerTarget->SendAttackSwingCancelAttack();
 
-                if (target->IsNonMeleeSpellCasted(false))
-                    target->InterruptNonMeleeSpells(false);
+            if (target->IsNonMeleeSpellCasted(false))
+                target->InterruptNonMeleeSpells(false);
 
-                target->AttackStop();
-                target->RemoveAllAttackers();
-                target->DeleteThreatList();
-                target->getHostileRefManager().deleteReferences();
+            target->AttackStop();
+            target->RemoveAllAttackers();
+            target->DeleteThreatList();
+            target->getHostileRefManager().deleteReferences();
 
-                caster->SetInCombatWith(target);
-                target->SetInCombatWith(caster);
-                
-                target->SetInCombatState(false, caster);
-            }
-            else
-            {
-                target->CombatStop(true);
-                target->DeleteThreatList();
-                target->getHostileRefManager().deleteReferences();
-            }
+            caster->SetInCombatWith(target);
+            target->SetInCombatWith(caster);
+
+            target->SetInCombatState(false, caster);
         }
         else
         {
@@ -3259,22 +3254,27 @@ void Aura::HandleModCharm(bool apply, bool Real)
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
 
-        if (Creature* pTargetCrea = target->ToCreature())
+        if (pCreatureTarget)
         {
-            if (pTargetCrea->AI() && pTargetCrea->AI()->SwitchAiAtControl())
-                pTargetCrea->AIM_Initialize();
-            if (caster)
-                pTargetCrea->AttackedBy(caster);
+            if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
+                pCreatureTarget->AIM_Initialize();
+
+            // For some charm spells, the creature should despawn when the aura is removed.
+            // This is the case for the Taming the Beast hunter quest https://youtu.be/OJ0oPzP0k-A?t=474
+            // Only the charm spells used for those quests have EffectBasePoints = 11 (+1).
+            if (GetBasePoints() == 12)
+                pCreatureTarget->DespawnOrUnsummon();
+            else if (caster)
+                pCreatureTarget->AttackedBy(caster);
         }
-        else if (Player* pPlayer = target->ToPlayer())
+        else if (pPlayerTarget)
         {
-            pPlayer->RemoveAI();
+            pPlayerTarget->RemoveAI();
 
             // Charmed players are seen as hostile and not in the group for other clients, restore
             // group upon charm end
-            pPlayer->setFactionForRace(target->getRace());
-            if(pPlayer->GetGroup())
-                pPlayer->GetGroup()->BroadcastGroupUpdate();
+            if(pPlayerTarget->GetGroup())
+                pPlayerTarget->GetGroup()->BroadcastGroupUpdate();
         }
     }
 }
