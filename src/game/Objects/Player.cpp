@@ -12805,10 +12805,6 @@ void Player::AddQuest(Quest const *pQuest, Object *questGiver)
             case TYPEID_UNIT:
                 sScriptMgr.OnQuestAccept(this, (Creature*)questGiver, pQuest);
                 break;
-            case TYPEID_ITEM:
-            case TYPEID_CONTAINER:
-                sScriptMgr.OnQuestAccept(this, (Item*)questGiver, pQuest);
-                break;
             case TYPEID_GAMEOBJECT:
                 sScriptMgr.OnQuestAccept(this, (GameObject*)questGiver, pQuest);
                 break;

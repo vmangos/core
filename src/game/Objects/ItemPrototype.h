@@ -444,6 +444,7 @@ struct ItemPrototype
     uint32 Class;                                           // id from ItemClass.dbc
     uint32 SubClass;                                        // id from ItemSubClass.dbc
     char*  Name1;
+    char*  Description;
     uint32 DisplayInfoID;                                   // id from ItemDisplayInfo.dbc
     uint32 Quality;
     uint32 Flags;
@@ -466,7 +467,11 @@ struct ItemPrototype
     uint32 Stackable;
     uint32 ContainerSlots;
     _ItemStat ItemStat[MAX_ITEM_PROTO_STATS];
+    uint32 Delay;
+    float  RangedModRange;
+    uint32 AmmoType;
     _Damage Damage[MAX_ITEM_PROTO_DAMAGES];
+    uint32 Block;
     uint32 Armor;
     uint32 HolyRes;
     uint32 FireRes;
@@ -474,12 +479,8 @@ struct ItemPrototype
     uint32 FrostRes;
     uint32 ShadowRes;
     uint32 ArcaneRes;
-    uint32 Delay;
-    uint32 AmmoType;
-    float  RangedModRange;
     _Spell Spells[MAX_ITEM_PROTO_SPELLS];
     uint32 Bonding;
-    char*  Description;
     uint32 PageText;
     uint32 LanguageID;
     uint32 PageMaterial;
@@ -488,18 +489,16 @@ struct ItemPrototype
     uint32 Material;                                        // id from Material.dbc
     uint32 Sheath;
     uint32 RandomProperty;                                  // id from ItemRandomProperties.dbc
-    uint32 Block;
     uint32 ItemSet;                                         // id from ItemSet.dbc
     uint32 MaxDurability;
     uint32 Area;                                            // id from AreaTable.dbc
     uint32 Map;                                             // id from Map.dbc
+    uint32 Duration;
     uint32 BagFamily;
-    uint32 ScriptId;
     uint32 DisenchantID;
     uint32 FoodType;
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
-    uint32 Duration;
     uint32 ExtraFlags;                                      // see ItemExtraFlags
 
     // helpers
