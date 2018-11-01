@@ -13558,7 +13558,7 @@ bool Player::TakeOrReplaceQuestStartItems(uint32 quest_id, bool msg, bool giveQu
     // If nullptr, someone messed up in DB
     ItemPrototype const* pItem = sObjectMgr.GetItemPrototype(srcItemID);
 
-    if (nullptr == pItem)
+    if (!pItem)
         return true;
 
     uint32 count = qInfo->GetSrcItemCount();
