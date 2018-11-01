@@ -73,6 +73,15 @@ ALTER TABLE `item_template`
 ALTER TABLE `item_template`
 	CHANGE COLUMN `block` `block` MEDIUMINT(8) UNSIGNED NOT NULL DEFAULT '0' AFTER `dmg_type5`;
 
+ALTER TABLE `item_template`
+	CHANGE COLUMN `armor` `armor` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `block`,
+	CHANGE COLUMN `holy_res` `holy_res` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `armor`,
+	CHANGE COLUMN `fire_res` `fire_res` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `holy_res`,
+	CHANGE COLUMN `nature_res` `nature_res` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `fire_res`,
+	CHANGE COLUMN `frost_res` `frost_res` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `nature_res`,
+	CHANGE COLUMN `shadow_res` `shadow_res` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `frost_res`,
+	CHANGE COLUMN `arcane_res` `arcane_res` SMALLINT(5) NOT NULL DEFAULT '0' AFTER `shadow_res`;
+
 
 -- End of migration.
 END IF;
