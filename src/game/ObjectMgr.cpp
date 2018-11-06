@@ -2347,6 +2347,37 @@ struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
     }
 };
 
+// In order to keep database item template data correct for each patch, fix changed spell effects used by some items here.
+// For cases where the spell data itself changed and we need to use a substitute spell id in later clients to recreate old item version.
+void ObjectMgr::CorrectItemEffects(ItemPrototype* pItem)
+{
+    for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+    {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        // Blade of Eternal Darkness
+        // The spell data was changed, and the trigger became On Equip instead of On Use in 1.10.
+        if ((pItem->Spells[j].SpellId == 21978) && (pItem->Spells[j].SpellTrigger == 0))
+            pItem->Spells[j].SpellTrigger = 1;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+        // Rhok\'delar, Longbow of the Ancient Keepers
+        // The spell data was changed and the spell id removed from this item in 1.8.
+        if ((pItem->Spells[j].SpellId == 23193) && (pItem->ItemId == 18713))
+            pItem->Spells[j].SpellId = 0;
+        // Lok\'delar, Stave of the Ancient Keepers
+        // The spell data was changed and the spell id removed from this item in 1.8.
+        if ((pItem->Spells[j].SpellId == 23194) && (pItem->ItemId == 18715))
+            pItem->Spells[j].SpellId = 0;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+        // Bonereaver's Edge
+        // The spell data was changed in 1.10, so use a substitute spell id before content patch 1.10 when playing with a newer client.
+        if ((pItem->Spells[j].SpellId == 21153) && (pItem->ItemId == 17076) && (sWorld.GetWowPatch() < WOW_PATCH_110))
+            pItem->Spells[j].SpellId = 15280;
+#endif
+    }
+}
+
 void ObjectMgr::LoadItemPrototypes()
 {
     SQLItemLoader loader;
@@ -2361,6 +2392,8 @@ void ObjectMgr::LoadItemPrototypes()
         ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(i);
         if (!proto)
             continue;
+
+        CorrectItemEffects(const_cast<ItemPrototype*>(proto));
 
         if (proto->Class >= MAX_ITEM_CLASS)
         {
