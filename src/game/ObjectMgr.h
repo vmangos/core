@@ -806,6 +806,7 @@ class ObjectMgr
         void LoadGameObjectLocales();
         void LoadGameobjects(bool reload = false);
         void LoadItemPrototypes();
+        void CorrectItemEffects(ItemPrototype*);
         void LoadItemRequiredTarget();
         void LoadItemLocales();
         void LoadQuestLocales();
