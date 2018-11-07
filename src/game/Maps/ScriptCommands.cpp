@@ -2103,3 +2103,22 @@ bool Map::ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source,
 
     return false;
 }
+
+// SCRIPT_COMMAND_SUMMON_OBJECT (76)
+bool Map::ScriptCommand_SummonObject(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    if (!source)
+    {
+        sLog.outError("SCRIPT_COMMAND_SUMMON_OBJECT (script id %u) call for a NULL source, skipping.", script.id);
+        return ShouldAbortScript(script);
+    }
+
+    float x = script.x ? script.x : source->GetPositionX();
+    float y = script.y ? script.y : source->GetPositionY();
+    float z = script.z ? script.z : source->GetPositionZ();
+    float o = script.o ? script.o : source->GetOrientation();
+
+    source->SummonGameObject(script.summonObject.gameobject_entry, x, y, z, o, 0, 0, 0, 0, script.summonObject.respawn_time);
+
+    return false;
+}

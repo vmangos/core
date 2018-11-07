@@ -1128,6 +1128,20 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_SUMMON_OBJECT:
+            {
+                if (!ObjectMgr::GetGameObjectInfo(tmp.summonObject.gameobject_entry))
+                {
+                    if (!sObjectMgr.IsExistingGameObjectId(tmp.summonObject.gameobject_entry))
+                    {
+                        sLog.outErrorDb("Table `%s` has datalong = %u for script id %u, but this gameobject_template does not exist.", tablename, tmp.summonObject.gameobject_entry, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())

@@ -891,6 +891,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         bool ScriptCommand_CombatStop(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_AddAura(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SummonObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -971,6 +972,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
             &Map::ScriptCommand_CombatStop,             // 73
             &Map::ScriptCommand_AddAura,                // 74
             &Map::ScriptCommand_AddThreat,              // 75
+            &Map::ScriptCommand_SummonObject,           // 76
         };
 
     public:

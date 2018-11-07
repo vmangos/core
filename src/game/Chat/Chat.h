@@ -451,6 +451,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGameObjectResetCommand(char* args);
         bool HandleGameObjectSelectCommand(char* args);
         bool HandleGameObjectRespawnCommand(char* args);
+        bool HandleGameObjectInfoCommand(char* args);
         GameObject* getSelectedGameObject();
 
         bool HandleGMCommand(char* args);

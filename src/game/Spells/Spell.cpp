@@ -6194,6 +6194,11 @@ SpellCastResult Spell::CheckCast(bool strict)
                     else
                         return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
                 }
+                else if (m_spellInfo->Id == 16447)
+                {
+                    if (!m_UniqueGOTargetInfo.size())
+                        return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
+                }
                 break;
             }
             case SPELL_EFFECT_SUMMON_DEAD_PET:

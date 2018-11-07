@@ -311,7 +311,10 @@ enum eScriptCommand
                                                             // datalong2 = flags
     SCRIPT_COMMAND_ADD_THREAT               = 75,           // source = Creature
                                                             // target = Unit
-    
+    SCRIPT_COMMAND_SUMMON_OBJECT            = 76,           // source = WorldObject
+                                                            // datalong = gameobject_entry
+                                                            // datalong2 = respawn_time
+                                                            // x/y/z/o = coordinates
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -955,6 +958,13 @@ struct ScriptInfo
         } addAura;
 
                                                             // SCRIPT_COMMAND_ADD_THREAT (75)
+
+        struct                                              // SCRIPT_COMMAND_ADD_AURA (74)
+        {
+            uint32 gameobject_entry;                        // datalong
+            uint32 respawn_time;                            // datalong2
+        } summonObject;
+
         struct
         {
             uint32 data[9];
