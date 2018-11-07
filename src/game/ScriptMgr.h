@@ -959,7 +959,7 @@ struct ScriptInfo
 
                                                             // SCRIPT_COMMAND_ADD_THREAT (75)
 
-        struct                                              // SCRIPT_COMMAND_ADD_AURA (74)
+        struct                                              // SCRIPT_COMMAND_SUMMON_OBJECT (76)
         {
             uint32 gameobject_entry;                        // datalong
             uint32 respawn_time;                            // datalong2
