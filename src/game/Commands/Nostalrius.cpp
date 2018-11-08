@@ -18,8 +18,6 @@
 #include "Weather.h"
 #include "PointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
-#include "SkillDiscovery.h"
-#include "SkillExtraItems.h"
 #include "SystemConfig.h"
 #include "Config/Config.h"
 #include "Util.h"

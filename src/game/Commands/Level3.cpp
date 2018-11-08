@@ -46,8 +46,6 @@
 #include "Weather.h"
 #include "PointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
-#include "SkillDiscovery.h"
-#include "SkillExtraItems.h"
 #include "SystemConfig.h"
 #include "Config/Config.h"
 #include "Mail.h"
@@ -146,8 +144,6 @@ bool ChatHandler::HandleReloadAllScriptsCommand(char* /*args*/)
 
 bool ChatHandler::HandleReloadAllSpellCommand(char* /*args*/)
 {
-    HandleReloadSkillDiscoveryTemplateCommand((char*)"a");
-    HandleReloadSkillExtraItemTemplateCommand((char*)"a");
     HandleReloadSpellAffectCommand((char*)"a");
     HandleReloadSpellAreaCommand((char*)"a");
     HandleReloadSpellChainCommand((char*)"a");
@@ -504,22 +500,6 @@ bool ChatHandler::HandleReloadReputationSpilloverTemplateCommand(char* /*args*/)
     sLog.outString("Re-Loading `reputation_spillover_template` Table!");
     sObjectMgr.LoadReputationSpilloverTemplate();
     SendSysMessage("DB table `reputation_spillover_template` reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadSkillDiscoveryTemplateCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Skill Discovery Table...");
-    LoadSkillDiscoveryTable();
-    SendSysMessage("DB table `skill_discovery_template` (recipes discovered at crafting) reloaded.");
-    return true;
-}
-
-bool ChatHandler::HandleReloadSkillExtraItemTemplateCommand(char* /*args*/)
-{
-    sLog.outString("Re-Loading Skill Extra Item Table...");
-    LoadSkillExtraItemTable();
-    SendSysMessage("DB table `skill_extra_item_template` (extra item creation when crafting) reloaded.");
     return true;
 }
 

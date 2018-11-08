@@ -31,7 +31,6 @@
 #include "WorldPacket.h"
 #include "WorldSession.h"
 #include "UpdateMask.h"
-#include "SkillDiscovery.h"
 #include "QuestDef.h"
 #include "GossipDef.h"
 #include "UpdateData.h"
@@ -5414,14 +5413,6 @@ bool Player::UpdateCraftSkill(uint32 spellid)
         if (_spell_idx->second->skillId)
         {
             uint32 SkillValue = GetPureSkillValue(_spell_idx->second->skillId);
-
-            // Alchemy Discoveries here
-            SpellEntry const* spellEntry = sSpellMgr.GetSpellEntry(spellid);
-            if (spellEntry && spellEntry->Mechanic == MECHANIC_DISCOVERY)
-            {
-                if (uint32 discoveredSpell = GetSkillDiscoverySpell(_spell_idx->second->skillId, spellid, this))
-                    learnSpell(discoveredSpell, false);
-            }
 
             uint32 craft_skill_gain = sWorld.getConfig(CONFIG_UINT32_SKILL_GAIN_CRAFTING);
 
