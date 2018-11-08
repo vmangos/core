@@ -352,7 +352,7 @@ class MANGOS_DLL_SPEC Item : public Object
         bool HasGeneratedLootSecondary() {  return generatedLoot; } // todo, remove and add condition to HasGeneratedLoot
 
         bool IsCharter() const { return GetEntry() == 5863u; }
-        static void GetNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale);
+        static void GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale);
 
     private:
         bool generatedLoot;

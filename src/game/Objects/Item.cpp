@@ -1161,7 +1161,7 @@ bool Item::ChangeEntry(ItemPrototype const* pNewProto)
     return true;
 }
 
-void Item::GetNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale)
+void Item::GetLocalizedNameWithSuffix(std::string& name, const ItemPrototype* proto, const ItemRandomPropertiesEntry* randomProp, int dbLocale, LocaleConstant dbcLocale)
 {
     // local name
     if (dbLocale >= 0)

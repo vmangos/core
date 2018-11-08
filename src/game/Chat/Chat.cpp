@@ -2138,7 +2138,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                                     for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
                                     {
                                         std::string expectedName = linkedItem->Name1;
-                                        Item::GetNameWithSuffix(expectedName, linkedItem, iProp, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                        Item::GetLocalizedNameWithSuffix(expectedName, linkedItem, iProp, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
                                         if (expectedName == buffer)
                                         {
                                             hasValidRandomProperty = true;
@@ -2171,7 +2171,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                             for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
                             {
                                 std::string expectedName = linkedItem->Name1;
-                                Item::GetNameWithSuffix(expectedName, linkedItem, nullptr, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                Item::GetLocalizedNameWithSuffix(expectedName, linkedItem, nullptr, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
                                 if (expectedName == buffer)
                                 {
                                     validName = true;

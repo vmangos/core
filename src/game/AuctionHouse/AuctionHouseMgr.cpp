@@ -797,8 +797,7 @@ void AuctionHouseObject::BuildListAuctionItems(WorldPacket& data, Player* player
                 if (propertyId > 0)
                      randomProperty = sItemRandomPropertiesStore.LookupEntry(static_cast<uint32>(propertyId));
 
-                if (randomProperty)
-                    Item::GetNameWithSuffix(name, proto, randomProperty, loc_idx, dbc_loc);
+                Item::GetLocalizedNameWithSuffix(name, proto, randomProperty, loc_idx, dbc_loc);
 
                 if (!Utf8FitTo(name, query.wsearchedname))
                     continue;
