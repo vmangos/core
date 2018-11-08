@@ -1377,12 +1377,10 @@ class SpellMgr
             if (id < GetMaxSpellId())
             {
                 std::unique_ptr<SpellEntry> newSpell = std::make_unique<SpellEntry>();
-                newSpell->EquippedItemClass = -1;
                 for (uint32 i = 0; i < 8; ++i)
                 {
                     newSpell->SpellName[i] = "CustomSpell";
                 }
-                newSpell->InitCachedValues();
                 mSpellEntryMap[id] = std::move(newSpell);
                 return mSpellEntryMap[id].get();
             }
