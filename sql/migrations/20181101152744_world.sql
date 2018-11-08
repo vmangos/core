@@ -1115,6 +1115,7 @@ UPDATE `item_template` SET `buy_price`=43629 WHERE `entry`=10567;
 UPDATE `item_template` SET `buy_price`=1276777 WHERE `entry`=19019;
 UPDATE `item_template` SET `buy_price`=10000000 WHERE `entry`=20221;
 UPDATE `item_template` SET `buy_price`=2769, `sell_price`=553 WHERE `entry`=7509 && `patch`=8;
+UPDATE `item_template` SET `buy_price`=5000000 WHERE `entry`=16339 && (`patch` < 10);
 
 -- Wrong sell price.
 UPDATE `item_template` SET `sell_price`=3 WHERE `entry`=2715;
@@ -1886,9 +1887,9 @@ UPDATE `item_template` SET `stat_type1`=7, `stat_value1`=9, `stat_type2`=5, `sta
 UPDATE `item_template` SET `stat_type1`=7, `stat_value1`=46, `stat_type2`=4, `stat_value2`=20 WHERE `entry`=22798;
 
 -- Wrong stats.
-UPDATE `item_template` SET `stat_vale4`=6 WHERE `entry`=20109;
-UPDATE `item_template` SET `stat_vale4`=5 WHERE `entry`=20110;
-UPDATE `item_template` SET `stat_vale4`=4 WHERE `entry`=20111;
+UPDATE `item_template` SET `stat_value4`=6 WHERE `entry`=20109;
+UPDATE `item_template` SET `stat_value4`=5 WHERE `entry`=20110;
+UPDATE `item_template` SET `stat_value4`=4 WHERE `entry`=20111;
 
 -- Current data for those items was from TBC.
 DELETE FROM `item_template` WHERE `entry` IN (20044, 20051, 20056);
@@ -2372,8 +2373,10 @@ UPDATE `item_template` SET `ammo_type`=4 WHERE `entry`=6886;
 
 -- Wrong damage.
 DELETE FROM `item_template` WHERE `entry`=15808 && `patch`=10;
-DELETE FROM `item_template` WHERE `entry`=18582;
+DELETE FROM `item_template` WHERE `entry` IN (18582, 18583, 18584);
 INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_durability`, `max_count`, `stackable`, `bag_family`, `duration`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `page_text`, `start_quest`, `lock_id`, `random_property`, `set_id`, `area_bound`, `map_bound`, `container_slots`, `ammo_type`, `bonding`, `disenchant_id`, `page_language`, `page_material`, `material`, `sheath`) VALUES (18582, 2, 2, 7, 'The Twin Blades of Azzinoth', '', 30936, 6, 33792, 1, 6122369, 1224473, 13, -1, -1, 100, 70, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 75, 7, 100, 5, 150, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1500, 0, 132, 139, 0, 40, 60, 5, 40, 60, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 100, 100, 22988, 1, 0, 0, -1, 0, -1, 22989, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 3);
+INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_durability`, `max_count`, `stackable`, `bag_family`, `duration`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `page_text`, `start_quest`, `lock_id`, `random_property`, `set_id`, `area_bound`, `map_bound`, `container_slots`, `ammo_type`, `bonding`, `disenchant_id`, `page_language`, `page_material`, `material`, `sheath`) VALUES (18583, 2, 2, 7, 'Warglaive of Azzinoth (Right)', '', 30934, 6, 33792, 1, 5559741, 1111948, 13, -1, -1, 100, 70, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 40, 7, 50, 5, 60, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 85, 95, 0, 30, 60, 6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 50, 60, 22990, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
+INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_durability`, `max_count`, `stackable`, `bag_family`, `duration`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `page_text`, `start_quest`, `lock_id`, `random_property`, `set_id`, `area_bound`, `map_bound`, `container_slots`, `ammo_type`, `bonding`, `disenchant_id`, `page_language`, `page_material`, `material`, `sheath`) VALUES (18584, 2, 2, 7, 'Warglaive of Azzinoth (Left)', '', 30935, 6, 32768, 1, 5581336, 1116267, 13, -1, -1, 100, 70, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 3, 60, 7, 50, 5, 40, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1000, 0, 85, 95, 0, 30, 60, 5, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 60, 50, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1);
 
 -- Wrong block.
 UPDATE `item_template` SET `block`=9 WHERE `entry`=2442;
@@ -3640,6 +3643,279 @@ UPDATE `item_template` SET `spellcategorycooldown_1`=0 WHERE `entry`=22192;
 DELETE FROM `item_template` WHERE `entry`=5522 && `patch`=9;
 DELETE FROM `item_template` WHERE `entry`=13602 && `patch`=9;
 DELETE FROM `item_template` WHERE `entry`=13603 && `patch`=9;
+
+-- Wrong bonding.
+UPDATE `item_template` SET `bonding`=0 WHERE `entry`=12286;
+UPDATE `item_template` SET `bonding`=0 WHERE `entry`=12445;
+UPDATE `item_template` SET `bonding`=0 WHERE `entry`=12845;
+UPDATE `item_template` SET `bonding`=1 WHERE `entry`=15754;
+UPDATE `item_template` SET `bonding`=1 WHERE `entry`=18706;
+UPDATE `item_template` SET `bonding`=5 WHERE `entry`=6075;
+UPDATE `item_template` SET `bonding`=1 WHERE `entry`=22737;
+UPDATE `item_template` SET `bonding`=1 WHERE `entry`=9398 && `patch`=9;
+UPDATE `item_template` SET `bonding`=1 WHERE `entry`=22729;
+
+-- Wrong page text.
+UPDATE `item_template` SET `page_text`=324 WHERE `entry`=2007;
+REPLACE INTO `page_text` (`entry`, `text`, `next_page`) VALUES
+(324, 'Rising from the ocean, a tower of water, Neptulon sent the great Krakken to doomed I\'lalai. So huge were their forms that jungles of kelp swayed through their limbs, and leviathans swam through bodies.$B$BThe largest Krakken then raised his arms high and crashed them into the sea, sending waves about him. And they raged toward I\'lalai.', 325),
+(325, 'The Krakken roared, and their voices thundered like an ocean storm:$B$B"We come."$B$BMin\'loth, standing firm, called forth his magic. The waves sent to I\'lalia parted and washed to both sides, and they flooded the jungle beyond. Min\'loth then bade his minions chant spells of binding, and a din rang out as dozens of troll voices rose.$B$BAnd one voice rose above the rest.', 326),
+(326, 'Min\'loth bellowed and his magic gathered the power of his minion\'s spells, and he cast it at the approaching Krakken.$B$BThe seas parted and Min\'loth\'s spell sped toward the servants of Neptulon. Lightning tore the sky and the spell struck them, and a thousand bolts fell, boiling water and burning craters in the earth.$B$BMin\'loth cried in triumph, knowing his spell would fell the great beasts.', 327),
+(327, 'But the Krakken are old, very old. They remembered when the land was first born from the sea.$B$BThey remembered when the Old Ones ruled and when the Travelers came and cast them down. They remembered when magic was new.$B$BThey are old and they hold many secrets. And though Min\'loth\'s spell was strong, it, like the troll, was mortal.$B$BAnd so it failed.', 328),
+(328, 'If failed to bind the Krakken, but it enraged them. Not in aeons had a mortal caused them pain, and the troll\'s spell was painful.$B$BAnd so they shed the bindings of Minloth\'s spell, but then roared and stuck with fury.$B$BA rumble was heard as great waves rose from the deep and raced toward the land. When they reached I\'lalai they cast a shadow on the city.$B$BBut before they destroyed it the Krakken halted, poised.', 329),
+(329, 'The troll witchdoctors trembled and cried out to their master. Min\'loth gazed at the mountains of the sea, doomed and defiant. He turned to his adepts and whispered, and the trolls etched his last words into stone.  Min\'loth then faced the looming Krakken.$B$BHe grimaced and hurled his staff, his last bold act.$B$BThe Krakken then bent their fury upon Min\'loth, and an ocean fell upon I\'lalai.$B$BAnd it was no more.', 330),
+(330, 'And then the waters fell upon the jungle, washing clean all they met. Trolls and beasts cried out as the waters smashed and drowned them.$B$BMany Gurubashi wondered why the ocean swallowed them, but then they died and knew nothing.$B$BAnd finally, when the waters reached the mountains, they stopped. Appeased, they retreated back beyond the shores, and they left a wake of death.$B$BThey retreated, but they surged around I\'lalai and remained, drowning it forever.', 331),
+(331, 'And the chief Var\'gazul, safe behind the mountains in Zul\'Gurub, went out to the jungle and found it washed clean of his people.$B$BAnd he despaired, for his dreams of conquest were thwarted.$B$BAnd never was Min\'loth the Serpent found.', 0),
+(332, 'But Oh Sara if the dead can come back to Azeroth and flit unseen around those they love, I shall always be near you in the gladdest day and in the darkest night amidst your happiest scenes and gloomiest hours always, always and if there be a soft breeze upon your cheeks it shall be my breath, as the cool air fans your throbbing temple, it shall be my spirit passing by.$B$BSara, do not mourn me dead, think I am gone and wait for thee, for we shall meet again.$B$B--Sully', 0);
+
+-- Wrong page material.
+UPDATE `item_template` SET `page_material`=0 WHERE `entry`=21037;
+
+-- Wrong start quest.
+UPDATE `item_template` SET `start_quest`=6922 WHERE `entry`=16782;
+
+-- Wrong material.
+UPDATE `item_template` SET `material`=1 WHERE `entry`=2442;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23060;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23059;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23061;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23062;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23063;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23064;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23065;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23066;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23067;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23040;
+UPDATE `item_template` SET `material`=1 WHERE `entry`=23056;
+UPDATE `item_template` SET `material`=2 WHERE `entry`=22801;
+UPDATE `item_template` SET `material`=2 WHERE `entry`=22800;
+UPDATE `item_template` SET `material`=2 WHERE `entry`=22799;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23038;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23031;
+UPDATE `item_template` SET `material`=6 WHERE `entry`=22819;
+UPDATE `item_template` SET `material`=6 WHERE `entry`=23043;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23053;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23041;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23023;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23025;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23027;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23036;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23042;
+UPDATE `item_template` SET `material`=3 WHERE `entry`=23037;
+UPDATE `item_template` SET `material`=4 WHERE `entry`=23047;
+UPDATE `item_template` SET `material`=1 WHERE `entry`=19296;
+UPDATE `item_template` SET `material`=0 WHERE `entry`=6366;
+
+-- Wrong sheath.
+UPDATE `item_template` SET `sheath`=4 WHERE `entry`=2442;
+UPDATE `item_template` SET `sheath`=1 WHERE `entry`=22736;
+
+-- Wrong durability.
+UPDATE `item_template` SET `max_durability`=80 WHERE `entry`=2442;
+UPDATE `item_template` SET `max_durability`=145 WHERE `entry`=22632;
+UPDATE `item_template` SET `max_durability`=60 WHERE `entry`=23073;
+UPDATE `item_template` SET `max_durability`=0 WHERE `entry`=6836;
+UPDATE `item_template` SET `max_durability`=35 WHERE `entry`=6116;
+
+-- Wrong area bound.
+UPDATE `item_template` SET `area_bound`=2597 WHERE `entry`=17362;
+UPDATE `item_template` SET `area_bound`=2017 WHERE `entry`=22736;
+UPDATE `item_template` SET `area_bound`=0 WHERE `entry`=20225;
+UPDATE `item_template` SET `map_bound`=0 WHERE `entry`=12586;
+DELETE FROM `item_template` WHERE `entry`=18268;
+INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `extra_flags`, `other_team_entry`) VALUES (18268, 1, 13, 0, 'Gordok Inner Door Key', '', 3118, 1, 64, 1, 0, 0, 0, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3366, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 9, 0, 0, 0, 0, 0, 1);
+INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `extra_flags`, `other_team_entry`) VALUES (18268, 9, 13, 0, 'Gordok Inner Door Key', '', 3118, 1, 64, 1, 0, 0, 0, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 3366, 0, -1, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 429, 0, 9, 0, 0, 0, 0, 0, 1);
+
+-- Wrong duration.
+UPDATE `item_template` SET `duration`=2700 WHERE `entry`=5027;
+UPDATE `item_template` SET `duration`=7200 WHERE `entry`=5806;
+UPDATE `item_template` SET `duration`=1800 WHERE `entry`=5810;
+UPDATE `item_template` SET `duration`=900 WHERE `entry`=7119;
+UPDATE `item_template` SET `duration`=900 WHERE `entry`=9189;
+UPDATE `item_template` SET `duration`=7260 WHERE `entry`=9437;
+UPDATE `item_template` SET `duration`=7260 WHERE `entry`=9438;
+UPDATE `item_template` SET `duration`=7260 WHERE `entry`=9439;
+UPDATE `item_template` SET `duration`=7260 WHERE `entry`=9440;
+UPDATE `item_template` SET `duration`=7260 WHERE `entry`=9441;
+UPDATE `item_template` SET `duration`=7260 WHERE `entry`=9442;
+UPDATE `item_template` SET `duration`=1800 WHERE `entry`=10338;
+UPDATE `item_template` SET `duration`=300 WHERE `entry`=10439;
+UPDATE `item_template` SET `duration`=600 WHERE `entry`=10460;
+UPDATE `item_template` SET `duration`=2700 WHERE `entry`=10464;
+UPDATE `item_template` SET `duration`=1200 WHERE `entry`=10684;
+UPDATE `item_template` SET `duration`=7200 WHERE `entry`=10831;
+UPDATE `item_template` SET `duration`=600 WHERE `entry`=10834;
+UPDATE `item_template` SET `duration`=300 WHERE `entry`=11885;
+UPDATE `item_template` SET `duration`=600 WHERE `entry`=12973;
+UPDATE `item_template` SET `duration`=1500 WHERE `entry`=13536;
+UPDATE `item_template` SET `duration`=300 WHERE `entry`=15877;
+UPDATE `item_template` SET `duration`=900 WHERE `entry`=17353;
+UPDATE `item_template` SET `duration`=259200 WHERE `entry`=17384;
+UPDATE `item_template` SET `duration`=900 WHERE `entry`=17442;
+UPDATE `item_template` SET `duration`=1200 WHERE `entry`=18488;
+UPDATE `item_template` SET `duration`=172800 WHERE `entry`=18597;
+UPDATE `item_template` SET `duration`=172800 WHERE `entry`=18598;
+UPDATE `item_template` SET `duration`=86400 WHERE `entry`=20387;
+UPDATE `item_template` SET `duration`=86400 WHERE `entry`=20604;
+UPDATE `item_template` SET `duration`=86400 WHERE `entry`=21171;
+UPDATE `item_template` SET `duration`=86400 WHERE `entry`=21174;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=21212;
+UPDATE `item_template` SET `duration`=86400 WHERE `entry`=21267;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=21960;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=21975;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=21979;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=21980;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=21981;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22117;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22119;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22120;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22121;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22122;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22123;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22131;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22132;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22133;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22134;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22135;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22136;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22140;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22141;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22142;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22143;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22144;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22145;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22154;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22155;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22156;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22157;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22158;
+UPDATE `item_template` SET `duration`=0 WHERE `entry`=22159;
+UPDATE `item_template` SET `duration`=0 WHERE `entry`=22160;
+UPDATE `item_template` SET `duration`=0 WHERE `entry`=22161;
+UPDATE `item_template` SET `duration`=0 WHERE `entry`=22162;
+UPDATE `item_template` SET `duration`=0 WHERE `entry`=22163;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22164;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22165;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22166;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22167;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22168;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22169;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22170;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22171;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22172;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22173;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22174;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22175;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22176;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22177;
+UPDATE `item_template` SET `duration`=0 WHERE `entry`=22178;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22262;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22263;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22283;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22284;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22285;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22286;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22287;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22288;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22289;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22290;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22291;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22292;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22293;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22294;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22295;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22296;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22297;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22298;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22299;
+UPDATE `item_template` SET `duration`=604800 WHERE `entry`=22300;
+UPDATE `item_template` SET `duration`=1209600 WHERE `entry`=23211;
+UPDATE `item_template` SET `duration`=1209600 WHERE `entry`=23326;
+UPDATE `item_template` SET `duration`=1209600 WHERE `entry`=23327;
+UPDATE `item_template` SET `duration`=864000 WHERE `entry`=23379;
+UPDATE `item_template` SET `duration`=1209600 WHERE `entry`=23435;
+UPDATE `item_template` SET `duration`=300 WHERE `entry`=22736;
+UPDATE `item_template` SET `duration`=3600 WHERE `entry`=6182;
+UPDATE `item_template` SET `duration`=3600 WHERE `entry`=14894;
+DELETE FROM `item_template` WHERE `entry`=13320;
+INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `extra_flags`, `other_team_entry`) VALUES (13320, 0, 12, 0, 'Arcane Quickener', 'This is used as a catalyst in transforming the toxins of the Scourge\'s cauldrons.', 23982, 1, 0, 1, 5000, 0, 0, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 900, 0, 0, 0, 0, 0, 0, 1);
+INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `description`, `display_id`, `quality`, `flags`, `buy_count`, `buy_price`, `sell_price`, `inventory_type`, `allowable_class`, `allowable_race`, `item_level`, `required_level`, `required_skill`, `required_skill_rank`, `required_spell`, `required_honor_rank`, `required_city_rank`, `required_reputation_faction`, `required_reputation_rank`, `max_count`, `stackable`, `container_slots`, `stat_type1`, `stat_value1`, `stat_type2`, `stat_value2`, `stat_type3`, `stat_value3`, `stat_type4`, `stat_value4`, `stat_type5`, `stat_value5`, `stat_type6`, `stat_value6`, `stat_type7`, `stat_value7`, `stat_type8`, `stat_value8`, `stat_type9`, `stat_value9`, `stat_type10`, `stat_value10`, `delay`, `range_mod`, `ammo_type`, `dmg_min1`, `dmg_max1`, `dmg_type1`, `dmg_min2`, `dmg_max2`, `dmg_type2`, `dmg_min3`, `dmg_max3`, `dmg_type3`, `dmg_min4`, `dmg_max4`, `dmg_type4`, `dmg_min5`, `dmg_max5`, `dmg_type5`, `block`, `armor`, `holy_res`, `fire_res`, `nature_res`, `frost_res`, `shadow_res`, `arcane_res`, `spellid_1`, `spelltrigger_1`, `spellcharges_1`, `spellppmrate_1`, `spellcooldown_1`, `spellcategory_1`, `spellcategorycooldown_1`, `spellid_2`, `spelltrigger_2`, `spellcharges_2`, `spellppmrate_2`, `spellcooldown_2`, `spellcategory_2`, `spellcategorycooldown_2`, `spellid_3`, `spelltrigger_3`, `spellcharges_3`, `spellppmrate_3`, `spellcooldown_3`, `spellcategory_3`, `spellcategorycooldown_3`, `spellid_4`, `spelltrigger_4`, `spellcharges_4`, `spellppmrate_4`, `spellcooldown_4`, `spellcategory_4`, `spellcategorycooldown_4`, `spellid_5`, `spelltrigger_5`, `spellcharges_5`, `spellppmrate_5`, `spellcooldown_5`, `spellcategory_5`, `spellcategorycooldown_5`, `bonding`, `page_text`, `page_language`, `page_material`, `start_quest`, `lock_id`, `material`, `sheath`, `random_property`, `set_id`, `max_durability`, `area_bound`, `map_bound`, `duration`, `bag_family`, `disenchant_id`, `food_type`, `min_money_loot`, `max_money_loot`, `extra_flags`, `other_team_entry`) VALUES (13320, 1, 12, 0, 'Arcane Quickener', 'This is used as a catalyst in transforming the toxins of the Scourge\'s cauldrons.', 23982, 1, 0, 1, 5000, 0, 0, -1, -1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, -1, 0, -1, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1800, 0, 0, 0, 0, 0, 0, 1);
+
+-- Wrong bag family.
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=2629;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=2719;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=3467;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=3499;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=3704;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=3930;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=4103;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=4483;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=4484;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=4485;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=4882;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5020;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5050;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5089;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5475;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5521;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5687;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5689;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5690;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5691;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=5851;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=6783;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=7208;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=7923;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=8072;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=8444;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=9249;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=9275;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=9472;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=11078;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=11106;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=11197;
+UPDATE `item_template` SET `bag_family`=7 WHERE `entry`=11223;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=11602;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=12301;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=12738;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=12739;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=12942;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13140;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13194;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13195;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13196;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13197;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13302;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13303;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13304;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13305;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13306;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13307;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=13873;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15328;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15767;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15869;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15870;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15871;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15872;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15878;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=15881;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=17242;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=17262;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=18250;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=18266;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=18268;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=19064;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=20022;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=20634;
+UPDATE `item_template` SET `bag_family`=7 WHERE `entry`=20734;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=21761;
+UPDATE `item_template` SET `bag_family`=0 WHERE `entry`=21762;
+UPDATE `item_template` SET `bag_family`=6 WHERE `entry`=5173;
+
+-- Wrong random property.
+UPDATE `item_template` SET `random_property`=3474 WHERE `entry`=17982;
+UPDATE `item_enchantment_template` SET `entry`=3474 WHERE `entry`=453;
 
 
 -- End of migration.
