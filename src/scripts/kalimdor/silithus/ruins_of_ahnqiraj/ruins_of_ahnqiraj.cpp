@@ -29,48 +29,7 @@ EndContentData */
 #include "scriptPCH.h"
 #include "ruins_of_ahnqiraj.h"
 
-struct npc_antiIntrusionAI : public ScriptedAI
-{
-	npc_antiIntrusionAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        m_pInstance = (ScriptedInstance*)pCreature->GetInstanceData();
-        Reset();
-    }
-
-    ScriptedInstance* m_pInstance;
-
-    void Reset()
-    {
-    }
-
-    void Aggro(Unit* pPuller)
-    {
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        Map::PlayerList const &liste = m_creature->GetMap()->GetPlayers();
-        for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
-        {
-            if (i->getSource()->isAlive())
-            {
-                if (m_creature->GetDistance(i->getSource()->GetPositionX(),
-                                            i->getSource()->GetPositionY(),
-                                            i->getSource()->GetPositionZ()) < 20.0f)
-                {
-                    float x, y, z;
-m_creature->MonsterYell("spotted",0,0);
-                    m_creature->SendSpellGo(i->getSource(), 25681);
-                    m_creature->GetRelativePositions(25.0f, 0.0f, 0.0f, x, y, z);
-                    i->getSource()->NearLandTo(x, y, z+3.5f, i->getSource()->GetOrientation());
-                }
-            }
-        }
-    }
-};
-
 // Anubisath guardian
-
 enum
 {
     SPELL_METEOR        =   24340,
@@ -755,155 +714,6 @@ struct QirajiGladiatorAI : public ScriptedAI
     }
 };
 
-/******************/
-enum
-{
-    SPELL_VANISH          =   26381,
-};
-
-struct HiveZaraSandStalkerAI : public ScriptedAI
-{
-    HiveZaraSandStalkerAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiVanish_Timer;
-
-    void Reset()
-    {
-        m_uiVanish_Timer = 5000;
-    }
-
-    void Aggro(Unit* pWho)
-    {
-        m_creature->SetInCombatWithZone();
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiVanish_Timer < uiDiff)
-        {
-            DoResetThreat();
-            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            if (DoCastSpellIfCan(pTarget, SPELL_VANISH) == CAST_OK)
-                m_uiVanish_Timer = urand(6000, 8000);
-        }
-        else
-            m_uiVanish_Timer -= uiDiff;
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-
-enum
-{
-    SPELL_ACID_SPIT          =   24334,
-    SPELL_BERSERKER_CHARGE   =   22886,
-    SPELL_PIERCING_SHRIEK    =   26379,
-};
-
-struct ShriekerScarabAI : public ScriptedAI
-{
-    ShriekerScarabAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiPiercingShriek_Timer;
-    uint32 m_uiBersekerCharge_Timer;
-
-    void Reset()
-    {
-        m_uiPiercingShriek_Timer = urand(3000, 6000);
-        m_uiBersekerCharge_Timer = urand(2000, 8000);
-    }
-
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiBersekerCharge_Timer < uiDiff)
-        {
-            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            if (DoCastSpellIfCan(pTarget, SPELL_BERSERKER_CHARGE) == CAST_OK)
-                m_uiBersekerCharge_Timer = urand(5000, 12000);
-
-        }
-        else
-            m_uiBersekerCharge_Timer -= uiDiff;
-
-        if (m_uiPiercingShriek_Timer < uiDiff)
-        {
-            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            if (DoCastSpellIfCan(pTarget, SPELL_PIERCING_SHRIEK) == CAST_OK)
-                m_uiPiercingShriek_Timer = urand(5000, 10000);
-
-        }
-        else
-            m_uiPiercingShriek_Timer -= uiDiff;
-
-// A particular state from this unit lock its movement : TODO find what is the blocking type
-//        if(m_creature->GetMotionMaster()->GetCurrentMovementGeneratorType() == IDLE_MOTION_TYPE)
-//        {
-        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-//        }
-        DoMeleeAttackIfReady();
-    }
-};
-
-struct SpittingScarabAI : public ScriptedAI
-{
-    SpittingScarabAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiAcidSpit_Timer;
-    uint32 m_uiBersekerCharge_Timer;
-
-    void Reset()
-    {
-        m_uiAcidSpit_Timer = 5000;
-        m_uiBersekerCharge_Timer = 5000;
-    }
-
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiBersekerCharge_Timer < uiDiff)
-        {
-            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            if (DoCastSpellIfCan(pTarget, SPELL_BERSERKER_CHARGE) == CAST_OK)
-                m_uiBersekerCharge_Timer = urand(5000, 10000);
-        }
-        else
-            m_uiBersekerCharge_Timer -= uiDiff;
-
-        if (m_uiAcidSpit_Timer < uiDiff)
-        {
-            Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            if (DoCastSpellIfCan(pTarget, SPELL_ACID_SPIT) == CAST_OK)
-                m_uiAcidSpit_Timer = urand(5000, 10000);
-
-        }
-        else
-            m_uiAcidSpit_Timer -= uiDiff;
-
-        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-        DoMeleeAttackIfReady();
-    }
-};
-
 /*******************/
 enum
 {
@@ -959,88 +769,6 @@ struct HiveZaraStingerAI : public ScriptedAI
         }
 
 //        m_creature->GetMotionMaster()->MoveChase(m_creature->getVictim());
-        DoMeleeAttackIfReady();
-    }
-};
-
-enum
-{
-    SPELL_GIANT   =   25462,
-};
-
-struct ZerranAI : public ScriptedAI
-{
-    ZerranAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-    }
-
-    uint32 m_uiGiant_Timer;
-
-    void Reset()
-    {
-        m_uiGiant_Timer = 4500;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiGiant_Timer < uiDiff)
-        {
-
-            if (DoCastSpellIfCan(m_creature, SPELL_GIANT) == CAST_OK)
-                m_uiGiant_Timer = 10000;
-        }
-        else
-            m_uiGiant_Timer -= uiDiff;
-
-
-        DoMeleeAttackIfReady();
-    }
-};
-
-
-enum
-{
-    SPELL_RAJAXX_SHIELD   =   25282,
-};
-
-struct YeggethAI : public ScriptedAI
-{
-    YeggethAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        Reset();
-        m_pInstance = (ScriptedInstance*)m_creature->GetInstanceData();
-    }
-
-    ScriptedInstance* m_pInstance;
-    uint32 m_uiRajaxxShield_Timer;
-    uint64 m_uiMarkedGUID;
-
-    void Reset()
-    {
-        m_uiMarkedGUID = 0;
-        m_uiRajaxxShield_Timer = 5000;
-    }
-
-    void UpdateAI(const uint32 uiDiff)
-    {
-        if (!m_creature->SelectHostileTarget() || !m_creature->getVictim())
-            return;
-
-        if (m_uiRajaxxShield_Timer < uiDiff)
-        {
-            Unit * victim = m_pInstance ? m_creature->GetMap()->GetUnit(m_pInstance->GetData(DATA_YEGGETH_SHIELD)) : NULL;
-
-            if (victim && DoCastSpellIfCan(victim, SPELL_RAJAXX_SHIELD) == CAST_OK)
-                m_uiRajaxxShield_Timer = 15000;
-        }
-        else
-            m_uiRajaxxShield_Timer -= uiDiff;
-
-
         DoMeleeAttackIfReady();
     }
 };
@@ -1326,21 +1054,6 @@ struct SwarmguardNeedlerAI : public ScriptedAI
 
 /*******************/
 
-CreatureAI* GetAI_AntiIntrusion(Creature* pCreature)
-{
-    return new npc_antiIntrusionAI(pCreature);
-}
-
-CreatureAI* GetAI_Zerran(Creature* pCreature)
-{
-    return new ZerranAI(pCreature);
-}
-
-CreatureAI* GetAI_Yeggeth(Creature* pCreature)
-{
-    return new YeggethAI(pCreature);
-}
-
 CreatureAI* GetAI_Tuubid(Creature* pCreature)
 {
     return new TuubidAI(pCreature);
@@ -1377,24 +1090,9 @@ CreatureAI* GetAI_mob_flesh_hunter(Creature* pCreature)
     return new mob_flesh_hunterAI(pCreature);
 }
 
-CreatureAI* GetAI_HiveZaraSandStalker(Creature* pCreature)
-{
-    return new HiveZaraSandStalkerAI(pCreature);
-}
-
 CreatureAI* GetAI_HiveZaraSoldier(Creature* pCreature)
 {
     return new HiveZaraSoldierAI(pCreature);
-}
-
-CreatureAI* GetAI_ShriekerScarab(Creature* pCreature)
-{
-    return new ShriekerScarabAI(pCreature);
-}
-
-CreatureAI* GetAI_SpittingScarab(Creature* pCreature)
-{
-    return new SpittingScarabAI(pCreature);
 }
 
 CreatureAI* GetAI_ObsidianDestroyer(Creature* pCreature)
@@ -1424,12 +1122,7 @@ void AddSC_ruins_of_ahnqiraj()
     newscript->Name = "mob_anubisath_guardian";
     newscript->GetAI = &GetAI_mob_anubisath_guardian;
     newscript->RegisterSelf();
-    /*
-    newscript = new Script;
-    newscript->Name = "mob_anti_intrusion";
-    newscript->GetAI = &GetAI_AntiIntrusion;
-    newscript->RegisterSelf();
-    */
+
     newscript = new Script;
     newscript->Name = "mob_qiraji_swarmguard";
     newscript->GetAI = &GetAI_QirajiSwarmguard;
@@ -1461,21 +1154,6 @@ void AddSC_ruins_of_ahnqiraj()
     newscript->RegisterSelf();
 
     newscript = new Script;
-    newscript->Name = "mob_hive_zara_sand_stalker";
-    newscript->GetAI = &GetAI_HiveZaraSandStalker;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_shrieker_scarab";
-    newscript->GetAI = &GetAI_ShriekerScarab;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "mob_spitting_scarab";
-    newscript->GetAI = &GetAI_SpittingScarab;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
     newscript->Name = "mob_obsidian_destroyer";
     newscript->GetAI = &GetAI_ObsidianDestroyer;
     newscript->RegisterSelf();
@@ -1498,15 +1176,5 @@ void AddSC_ruins_of_ahnqiraj()
     newscript = new Script;
     newscript->Name = "boss_tuubid";
     newscript->GetAI = &GetAI_Tuubid;
-    newscript->RegisterSelf();
-    /*
-    newscript = new Script;
-    newscript->Name = "boss_yeggeth";
-    newscript->GetAI = &GetAI_Yeggeth;
-    newscript->RegisterSelf();
-    */
-    newscript = new Script;
-    newscript->Name = "boss_zerran";
-    newscript->GetAI = &GetAI_Zerran;
     newscript->RegisterSelf();
 }
