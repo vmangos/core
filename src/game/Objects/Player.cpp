@@ -10571,10 +10571,13 @@ void Player::DestroyItem(uint8 bag, uint8 slot, bool update)
         // This if () prevents item saving crashes if the condition for a bag to be empty before being destroyed was bypassed somehow.
         if (pItem->IsBag())
         {
-            if (!pItem->IsEquipped() && !((Bag*)pItem)->IsEmpty())
+            if (pItem->IsEquipped())
+            {
+                for (int i = 0; i < MAX_BAG_SIZE; ++i)
+                    DestroyItem(slot, i, update);
+            }
+            else if(!((Bag*)pItem)->IsEmpty())
                 GetSession()->ProcessAnticheatAction("ItemsCheck", "Player::DestroyItem: destroying non equipped bag with items inside!", CHEAT_ACTION_LOG);
-            for (int i = 0; i < MAX_BAG_SIZE; ++i)
-                DestroyItem(slot, i, update);
         }
 
         if (pItem->HasFlag(ITEM_FIELD_FLAGS, ITEM_DYNFLAG_WRAPPED))
