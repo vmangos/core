@@ -157,7 +157,7 @@ class SocialMgr
     private:
         SocialMap m_socialMap;
 
-        ACE_Thread_Mutex _socialMapLock;
+        std::mutex _socialMapLock;
 };
 
 #define sSocialMgr MaNGOS::Singleton<SocialMgr>::Instance()

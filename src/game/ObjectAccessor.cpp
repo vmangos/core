@@ -329,7 +329,7 @@ void ObjectAccessor::RemoveObject(MasterPlayer *player)
 /// Define the static member of HashMapHolder
 
 template <class T> typename HashMapHolder<T>::MapType HashMapHolder<T>::m_objectMap;
-template <class T> ACE_RW_Thread_Mutex HashMapHolder<T>::i_lock;
+template <class T> std::shared_timed_mutex HashMapHolder<T>::i_lock;
 
 /// Global definitions for the hashmap storage
 

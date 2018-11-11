@@ -827,7 +827,7 @@ void MapManager::ScheduleFarTeleport(Player *player, ScheduledTeleportData *data
     }
     else
     {
-        ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+        std::unique_lock<std::mutex> guard(m_scheduledFarTeleportsLock);
         player->SetPendingFarTeleport(true);
         m_scheduledFarTeleports[player] = data;
     }
@@ -850,7 +850,7 @@ void MapManager::ExecuteDelayedPlayerTeleports()
 // player logout and login).
 void MapManager::ExecuteSingleDelayedTeleport(Player *player)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+    std::unique_lock<std::mutex> guard(m_scheduledFarTeleportsLock);
     ScheduledTeleportMap::iterator iter = m_scheduledFarTeleports.find(player);
 
     if (iter != m_scheduledFarTeleports.end())
@@ -874,7 +874,7 @@ void MapManager::ExecuteSingleDelayedTeleport(ScheduledTeleportMap::iterator ite
 
 void MapManager::CancelDelayedPlayerTeleport(Player *player)
 {
-    ACE_Guard<ACE_Thread_Mutex> guard(m_scheduledFarTeleportsLock);
+    std::unique_lock<std::mutex> guard(m_scheduledFarTeleportsLock);
     ScheduledTeleportMap::iterator iter = m_scheduledFarTeleports.find(player);
 
     if (iter != m_scheduledFarTeleports.end())

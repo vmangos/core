@@ -50,9 +50,9 @@ class HashMapHolder
     public:
 
         typedef std::unordered_map<ObjectGuid, T*>   MapType;
-        typedef ACE_RW_Thread_Mutex LockType;
-        typedef ACE_Read_Guard<LockType> ReadGuard;
-        typedef ACE_Write_Guard<LockType> WriteGuard;
+        typedef std::shared_timed_mutex LockType;
+        typedef std::shared_lock<LockType> ReadGuard;
+        typedef std::unique_lock<LockType> WriteGuard;
 
         static void Insert(T* o)
         {
