@@ -250,7 +250,7 @@ LoginPerTick = 0
 CharacterScreenMaxIdleTime = 900
 SaveRespawnTimeImmediately = 1
 MaxOverspeedPings = 2
-GridUnload = 1
+GridUnload = 0
 GridCleanUpDelay = 300000
 CleanupTerrain = 1
 MapUpdateInterval = 100
@@ -276,7 +276,7 @@ AddonChannel = 1
 CleanCharacterDB = 1
 
 # Optimization / load mitigation settings
-Continents.Instanciate						= 0
+Continents.Instanciate                      = 0
 Continents.InactivePlayers.SkipUpdates      = 0
 MapUpdate.ReduceGridActivationDist.Tick     = 0
 MapUpdate.IncreaseGridActivationDist.Tick   = 0
@@ -423,7 +423,7 @@ Anticrash.Rearm.Timer = 60000
 #
 ###################################################################################################################
 
-WowPatch = 0
+WowPatch = 10
 
 PvP.AccurateEquipRequirements = 1
 PvP.AccuratePurchaseRequirements = 1
