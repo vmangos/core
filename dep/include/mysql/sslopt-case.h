@@ -1,4 +1,7 @@
-/* Copyright (c) 2000, 2016, Oracle and/or its affiliates. All rights reserved.
+#ifndef SSLOPT_CASE_INCLUDED
+#define SSLOPT_CASE_INCLUDED
+
+/* Copyright (c) 2000, 2017, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -14,50 +17,29 @@
    Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA 02110-1301  USA */
 
 #if defined(HAVE_OPENSSL) && !defined(EMBEDDED_LIBRARY)
-
-#ifndef MYSQL_CLIENT
-#error This header is supposed to be used only in the client
-#endif
-
-    case OPT_SSL_MODE:
-      opt_ssl_mode= find_type_or_exit(argument, &ssl_mode_typelib,
-                                      opt->name);
-      ssl_mode_set_explicitly= TRUE;
-      break;
-    case OPT_SSL_SSL:
-      CLIENT_WARN_DEPRECATED("--ssl", "--ssl-mode");
-      if (!opt_use_ssl_arg)
-        opt_ssl_mode= SSL_MODE_DISABLED;
-      else if (opt_ssl_mode < SSL_MODE_REQUIRED)
-        opt_ssl_mode= SSL_MODE_REQUIRED;
-      break;
-    case OPT_SSL_VERIFY_SERVER_CERT:
-      CLIENT_WARN_DEPRECATED("--ssl-verify-server-cert",
-                             "--ssl-mode=VERIFY_IDENTITY");
-      if (!opt_ssl_verify_server_cert_arg)
-      {
-        if (opt_ssl_mode >= SSL_MODE_VERIFY_IDENTITY)
-          opt_ssl_mode= SSL_MODE_VERIFY_CA;
-      }
-      else
-        opt_ssl_mode= SSL_MODE_VERIFY_IDENTITY;
-      break;
-    case OPT_SSL_CA:
-    case OPT_SSL_CAPATH:
-      /* Don't change ssl-mode if set explicitly. */ 
-      if (!ssl_mode_set_explicitly)
-        opt_ssl_mode= SSL_MODE_VERIFY_CA;
-      break;
     case OPT_SSL_KEY:
     case OPT_SSL_CERT:
+    case OPT_SSL_CA:
+    case OPT_SSL_CAPATH:
     case OPT_SSL_CIPHER:
-    case OPT_SSL_CRL:
-    case OPT_SSL_CRLPATH:
-    case OPT_TLS_VERSION:
-#ifdef HAVE_YASSL
-      /* crl has no effect in yaSSL. */
-      opt_ssl_crl= NULL;
-      opt_ssl_crlpath= NULL;
-#endif /* HAVE_YASSL */
+    /*
+      Enable use of SSL if we are using any ssl option
+      One can disable SSL later by using --skip-ssl or --ssl=0
+    */
+      opt_use_ssl= 1;
       break;
-#endif /* HAVE_OPENSSL */
+#ifdef MYSQL_CLIENT
+    case OPT_SSL_MODE:
+      if (my_strcasecmp(&my_charset_latin1, argument, "required"))
+      {
+        fprintf(stderr,
+                "Unknown value to --ssl-mode: '%s'. Use --ssl-mode=REQUIRED\n",
+                argument);
+        exit(1);
+      }
+      else
+        opt_ssl_mode= SSL_MODE_REQUIRED;
+      break;
+#endif /* MYSQL_CLIENT */
+#endif
+#endif /* SSLOPT_CASE_INCLUDED */
