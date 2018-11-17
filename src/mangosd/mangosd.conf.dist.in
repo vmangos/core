@@ -694,6 +694,7 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #
 #    RealmZone
 #        Server realm zone (set allowed alphabet in character names/etc). See also Strict*Names options.
+#        DO NOT CHANGE THIS UNLESS YOU REALLY KNOW WHAT YOU ARE DOING!
 #
 #    1 Development    - any language (Default)
 #    2 United States  - extended-Latin
