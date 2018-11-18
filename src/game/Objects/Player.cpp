@@ -7032,7 +7032,7 @@ void Player::ApplyItemEquipSpell(Item *item, bool apply, bool form_change)
 
     for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-        _Spell const& spellData = proto->Spells[i];
+        _ItemSpell const& spellData = proto->Spells[i];
 
         // no spell
         if (!spellData.SpellId)
@@ -7163,7 +7163,7 @@ void Player::CastItemCombatSpell(Unit* Target, WeaponAttackType attType)
 
     for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-        _Spell const& spellData = proto->Spells[i];
+        _ItemSpell const& spellData = proto->Spells[i];
 
         // no spell
         if (!spellData.SpellId)
@@ -7260,7 +7260,7 @@ void Player::CastItemUseSpell(Item *item, SpellCastTargets const& targets)
     // item spells casted at use
     for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-        _Spell const& spellData = proto->Spells[i];
+        _ItemSpell const& spellData = proto->Spells[i];
 
         // no spell
         if (!spellData.SpellId)
@@ -18530,7 +18530,7 @@ void Player::ApplyEquipCooldown(Item * pItem)
 
     for (int i = 0; i < MAX_ITEM_PROTO_SPELLS; ++i)
     {
-        _Spell const& spellData = pItem->GetProto()->Spells[i];
+        _ItemSpell const& spellData = pItem->GetProto()->Spells[i];
 
         // no spell
         if (!spellData.SpellId)

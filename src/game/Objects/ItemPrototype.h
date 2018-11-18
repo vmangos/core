@@ -405,7 +405,7 @@ enum ItemExtraFlags
 #pragma pack(push,1)
 #endif
 
-struct _Damage
+struct _ItemDamage
 {
     float   DamageMin;
     float   DamageMax;
@@ -417,7 +417,7 @@ struct _ItemStat
     uint32  ItemStatType;
     int32   ItemStatValue;
 };
-struct _Spell
+struct _ItemSpell
 {
     uint32 SpellId;                                         // id from Spell.dbc
     uint32 SpellTrigger;
@@ -426,12 +426,6 @@ struct _Spell
     int32  SpellCooldown;
     uint32 SpellCategory;                                   // id from SpellCategory.dbc
     int32  SpellCategoryCooldown;
-};
-
-struct _Socket
-{
-    uint32 Color;
-    uint32 Content;
 };
 
 #define MAX_ITEM_PROTO_DAMAGES 5
@@ -470,7 +464,7 @@ struct ItemPrototype
     uint32 Delay;
     float  RangedModRange;
     uint32 AmmoType;
-    _Damage Damage[MAX_ITEM_PROTO_DAMAGES];
+    _ItemDamage Damage[MAX_ITEM_PROTO_DAMAGES];
     uint32 Block;
     int32 Armor;
     int32 HolyRes;
@@ -479,7 +473,7 @@ struct ItemPrototype
     int32 FrostRes;
     int32 ShadowRes;
     int32 ArcaneRes;
-    _Spell Spells[MAX_ITEM_PROTO_SPELLS];
+    _ItemSpell Spells[MAX_ITEM_PROTO_SPELLS];
     uint32 Bonding;
     uint32 PageText;
     uint32 LanguageID;

@@ -2349,33 +2349,1053 @@ struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
 
 // In order to keep database item template data correct for each patch, fix changed spell effects used by some items here.
 // For cases where the spell data itself changed and we need to use a substitute spell id in later clients to recreate old item version.
-void ObjectMgr::CorrectItemEffects(ItemPrototype* pItem)
+void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
 {
-    for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
-    {
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        // Blade of Eternal Darkness
-        // The spell data was changed, and the trigger became On Equip instead of On Use in 1.10.
-        if ((pItem->Spells[j].SpellId == 21978) && (pItem->Spells[j].SpellTrigger == 0))
-            pItem->Spells[j].SpellTrigger = 1;
+    // Blade of Eternal Darkness
+    // The spell data was changed, and the trigger became On Equip instead of On Use in 1.10.
+    if ((itemSpell.SpellId == 21978) && (itemSpell.SpellTrigger == 0))
+        itemSpell.SpellTrigger = 1;
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
-        // Rhok\'delar, Longbow of the Ancient Keepers
-        // The spell data was changed and the spell id removed from this item in 1.8.
-        if ((pItem->Spells[j].SpellId == 23193) && (pItem->ItemId == 18713))
-            pItem->Spells[j].SpellId = 0;
-        // Lok\'delar, Stave of the Ancient Keepers
-        // The spell data was changed and the spell id removed from this item in 1.8.
-        if ((pItem->Spells[j].SpellId == 23194) && (pItem->ItemId == 18715))
-            pItem->Spells[j].SpellId = 0;
+    // Rhok\'delar, Longbow of the Ancient Keepers
+    // The spell data was changed and the spell id removed from this item in 1.8.
+    if ((itemSpell.SpellId == 23193) && (itemId == 18713))
+        itemSpell.SpellId = 0;
+    // Lok\'delar, Stave of the Ancient Keepers
+    // The spell data was changed and the spell id removed from this item in 1.8.
+    if ((itemSpell.SpellId == 23194) && (itemId == 18715))
+        itemSpell.SpellId = 0;
 #endif
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-        // Bonereaver's Edge
-        // The spell data was changed in 1.10, so use a substitute spell id before content patch 1.10 when playing with a newer client.
-        if ((pItem->Spells[j].SpellId == 21153) && (pItem->ItemId == 17076) && (sWorld.GetWowPatch() < WOW_PATCH_110))
-            pItem->Spells[j].SpellId = 15280;
+    // Bonereaver's Edge
+    // The spell data was changed in 1.10, so use a substitute spell id before content patch 1.10 when playing with a newer client.
+    if ((itemSpell.SpellId == 21153) && (itemId == 17076) && (sWorld.GetWowPatch() < WOW_PATCH_110))
+        itemSpell.SpellId = 15280;
 #endif
+    // Substitute spell power spells that were changed in the 1.4 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
+    if (sWorld.GetWowPatch() < WOW_PATCH_104)
+    {
+        switch (itemSpell.SpellId)
+        {
+            case 7678: // Increase Healing 8 (OLD) to Increase Healing 7 (NEW)
+                itemSpell.SpellId = 7677;
+                return;
+            case 7679: // Increase Healing 10 (OLD) to Increase Healing 9 (NEW)
+                itemSpell.SpellId = 7678;
+                return;
+            case 7680: // Increase Healing 12 (OLD) to Increase Healing 11 (NEW)
+                itemSpell.SpellId = 7679;
+                return;
+            case 7681: // Increase Healing 14 (OLD) to Increase Healing 13 (NEW)
+                itemSpell.SpellId = 7680;
+                return;
+            case 7684: // Increase Fire Dam 2 (OLD) to Increase Fire Dam 1 (NEW)
+                itemSpell.SpellId = 7683;
+                return;
+            case 7685: // Increase Fire Dam 3 (OLD) to Increase Fire Dam 3 (NEW)
+                itemSpell.SpellId = 7684;
+                return;
+            case 7686: // Increase Fire Dam 4 (OLD) to Increase Fire Dam 4 (NEW)
+            case 7687: // Increase Fire Dam 5 (OLD) to Increase Fire Dam 4 (NEW)
+                itemSpell.SpellId = 7685;
+                return;
+            case 7688: // Increase Fire Dam 6 (OLD) to Increase Fire Dam 6 (NEW)
+                itemSpell.SpellId = 7686;
+                return;
+            case 7689: // Increase Fire Dam 7 (OLD) to Increase Fire Dam 7 (NEW)
+                itemSpell.SpellId = 7687;
+                return;
+            case 7691: // Increase Nature Dam 2 (OLD) to Increase Nature Dam 1 (NEW)
+                itemSpell.SpellId = 7690;
+                return;
+            case 7692: // Increase Nature Dam 3 (OLD) to Increase Nature Dam 3 (NEW)
+                itemSpell.SpellId = 7691;
+                return;
+            case 7693: // Increase Nature Dam 4 (OLD) to Increase Nature Dam 4 (NEW)
+            case 7694: // Increase Nature Dam 5 (OLD) to Increase Nature Dam 4 (NEW)
+                itemSpell.SpellId = 7692;
+                return;
+            case 7695: // Increase Nature Dam 6 (OLD) to Increase Nature Dam 6 (NEW)
+                itemSpell.SpellId = 7693;
+                return;
+            case 7696: // Increase Nature Dam 7 (OLD) to Increase Nature Dam 7 (NEW)
+                itemSpell.SpellId = 7694;
+                return;
+            case 7698: // Increase Frost Dam 2 (OLD) to Increase Frost Dam 1 (NEW)
+                itemSpell.SpellId = 7697;
+                return;
+            case 7699: // Increase Frost Dam 3 (OLD) to Increase Frost Dam 3 (NEW)
+                itemSpell.SpellId = 7698;
+                return;
+            case 7700: // Increase Frost Dam 4 (OLD) to Increase Frost Dam 4 (NEW)
+            case 7701: // Increase Frost Dam 5 (OLD) to Increase Frost Dam 4 (NEW)
+                itemSpell.SpellId = 7699;
+                return;
+            case 7702: // Increase Frost Dam 6 (OLD) to Increase Frost Dam 6 (NEW)
+                itemSpell.SpellId = 7700;
+                return;
+            case 7703: // Increase Frost Dam 7 (OLD) to Increase Frost Dam 7 (NEW)
+                itemSpell.SpellId = 7701;
+                return;
+            case 7705: // Increase Shadow Dam 2 (OLD) to Increase Shadow Dam 1 (NEW)
+                itemSpell.SpellId = 7704;
+                return;
+            case 7706: // Increase Shadow Dam 3 (OLD) to Increase Shadow Dam 3 (NEW)
+                itemSpell.SpellId = 7705;
+                return;
+            case 7707: // Increase Shadow Dam 4 (OLD) to Increase Shadow Dam 4 (NEW)
+                itemSpell.SpellId = 7706;
+                return;
+            case 7708: // Increase Shadow Dam 5 (OLD) to Increase Shadow Dam 4 (NEW)
+                itemSpell.SpellId = 7706;
+                return;
+            case 7709: // Increase Shadow Dam 7 (OLD) to Increase Shadow Dam 7 (NEW)
+                itemSpell.SpellId = 7708;
+                return;
+            case 7710: // Increase Shadow Dam 6 (OLD) to Increase Shadow Dam 6 (NEW)
+                itemSpell.SpellId = 7707;
+                return;
+            case 9294: // Increase Fire Dam 11 (OLD) to Increase Fire Dam 11 (NEW)
+            case 9295: // Increase Fire Dam 12 (OLD) to Increase Fire Dam 11 (NEW)
+                itemSpell.SpellId = 9399;
+                return;
+            case 9296: // Increase Fire Dam 13 (OLD) to Increase Fire Dam 13 (NEW)
+                itemSpell.SpellId = 9400;
+                return;
+            case 9297: // Increase Fire Dam 14 (OLD) to Increase Fire Dam 14 (NEW)
+            case 9298: // Increase Fire Dam 15 (OLD) to Increase Fire Dam 14 (NEW)
+                itemSpell.SpellId = 9401;
+                return;
+            case 9304: // Increase Frost Dam 11 (OLD) to Increase Frost Dam 11 (NEW)
+            case 9305: // Increase Frost Dam 12 (OLD) to Increase Frost Dam 11 (NEW)
+                itemSpell.SpellId = 9402;
+                return;
+            case 9306: // Increase Frost Dam 13 (OLD) to Increase Frost Dam 13 (NEW)
+                itemSpell.SpellId = 9403;
+                return;
+            case 9307: // Increase Frost Dam 14 (OLD) to Increase Frost Dam 14 (NEW)
+            case 9308: // Increase Frost Dam 15 (OLD) to Increase Frost Dam 14 (NEW)
+                itemSpell.SpellId = 9404;
+                return;
+            case 9314: // Increase Healing 22 (OLD) to Increase Healing 22 (NEW)
+                itemSpell.SpellId = 9408;
+                return;
+            case 9315: // Increase Healing 24 (OLD) to Increase Healing 24 (NEW)
+                itemSpell.SpellId = 9314;
+                return;
+            case 9316: // Increase Healing 26 (OLD) to Increase Healing 26 (NEW)
+            case 9317: // Increase Healing 28 (OLD) to Increase Healing 26 (NEW)
+                itemSpell.SpellId = 9315;
+                return;
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+            case 9318: // Increase Healing 30 (OLD) to Increase Healing 30 (NEW)
+                itemSpell.SpellId = 25067;
+                return;
+    #else
+            case 9318: // Increase Healing 30 (OLD) to Increase Healing 29 (NEW)
+                itemSpell.SpellId = 9316;
+                return;
+    #endif
+            case 9324: // Increase Shadow Dam 11 (OLD) to Increase Shadow Dam 11 (NEW)
+            case 9325: // Increase Shadow Dam 12 (OLD) to Increase Shadow Dam 11 (NEW)
+                itemSpell.SpellId = 9412;
+                return;
+            case 9326: // Increase Shadow Dam 13 (OLD) to Increase Shadow Dam 13 (NEW)
+                itemSpell.SpellId = 9413;
+                return;
+            case 9327: // Increase Shadow Dam 14 (OLD) to Increase Shadow Dam 14 (NEW)
+            case 9328: // Increase Shadow Dam 15 (OLD) to Increase Shadow Dam 14 (NEW)
+                itemSpell.SpellId = 9414;
+                return;
+            case 9342: // Increase Spell Dam 7 (OLD) to Increase Spell Dam 7 (NEW)
+                itemSpell.SpellId = 9397;
+                return;
+            case 9343: // Increase Spell Dam 8 (OLD) to Increase Spell Dam 8 (NEW)
+                itemSpell.SpellId = 9398;
+                return;
+            case 9344: // Increase Spell Dam 9 (OLD) to Increase Spell Dam 9 (NEW)
+            case 9345: // Increase Spell Dam 9 (OLD) to Increase Spell Dam 9 (NEW)
+            case 9346: // Increase Spell Dam 10 (OLD) to Increase Spell Dam 9 (NEW)
+                itemSpell.SpellId = 9415;
+                return;
+            case 9357: // Increase Nature Dam 11 (OLD) to Increase Nature Dam 11 (NEW)
+            case 9358: // Increase Nature Dam 12 (OLD) to Increase Nature Dam 11 (NEW)
+                itemSpell.SpellId = 9409;
+                return;
+            case 9359: // Increase Nature Dam 13 (OLD) to Increase Nature Dam 13 (NEW)
+                itemSpell.SpellId = 9410;
+                return;
+            case 9360: // Increase Nature Dam 14 (OLD) to Increase Nature Dam 14 (NEW)
+            case 9361: // Increase Nature Dam 15 (OLD) to Increase Nature Dam 14 (NEW)
+                itemSpell.SpellId = 9411;
+                return;
+            case 9393: // Increase Spell Dam 1 (OLD) to Increase Spell Dam 1 (NEW)
+                itemSpell.SpellId = 9392;
+                return;
+            case 9394: // Increase Spell Dam 2 (OLD) to Increase Spell Dam 2 (NEW)
+                itemSpell.SpellId = 9393;
+                return;
+            case 9395: // Increase Spell Dam 2 (OLD) to Increase Spell Dam 2 (NEW)
+            case 9396: // Increase Spell Dam 3 (OLD) to Increase Spell Dam 2 (NEW)
+                itemSpell.SpellId = 9393;
+                return;
+            case 9397: // Increase Spell Dam 4 (OLD) to Increase Spell Dam 4 (NEW)
+            case 9398: // Increase Spell Dam 4 (OLD) to Increase Spell Dam 4 (NEW)
+                itemSpell.SpellId = 9394;
+                return;
+            case 9399: // Increase Fire Dam 8 (OLD) to Increase Fire Dam 7 (NEW)
+                itemSpell.SpellId = 7687;
+                return;
+            case 9400: // Increase Fire Dam 9 (OLD) to Increase Fire Dam 9 (NEW)
+                itemSpell.SpellId = 7688;
+                return;
+            case 9401: // Increase Fire Dam 10 (OLD) to Increase Fire Dam 10 (NEW)
+                itemSpell.SpellId = 7689;
+                return;
+            case 9402: // Increase Frost Dam 8 (OLD) to Increase Frost Dam 7 (NEW)
+                itemSpell.SpellId = 7701;
+                return;
+            case 9403: // Increase Frost Dam 9 (OLD) to Increase Frost Dam 9 (NEW)
+                itemSpell.SpellId = 7702;
+                return;
+            case 9404: // Increase Frost Dam 10 (OLD) to Increase Frost Dam 10 (NEW)
+                itemSpell.SpellId = 7703;
+                return;
+            case 9406: // Increase Healing 16 (OLD) to Increase Healing 15 (NEW)
+                itemSpell.SpellId = 7681;
+                return;
+            case 9407: // Increase Healing 18 (OLD) to Increase Healing 18 (NEW)
+                itemSpell.SpellId = 9406;
+                return;
+            case 9408: // Increase Healing 20 (OLD) to Increase Healing 20 (NEW)
+                itemSpell.SpellId = 9407;
+                return;
+            case 9409: // Increase Nature Dam 8 (OLD) to Increase Nature Dam 7 (NEW)
+                itemSpell.SpellId = 7694;
+                return;
+            case 9411: // Increase Nature Dam 10 (OLD) to Increase Nature Dam 10 (NEW)
+                itemSpell.SpellId = 7696;
+                return;
+            case 9412: // Increase Shadow Dam 8 (OLD) to Increase Shadow Dam 7 (NEW)
+                itemSpell.SpellId = 7708;
+                return;
+            case 9413: // Increase Shadow Dam 9 (OLD) to Increase Shadow Dam 9 (NEW)
+                itemSpell.SpellId = 7710;
+                return;
+            case 9414: // Increase Shadow Dam 10 (OLD) to Increase Shadow Dam 10 (NEW)
+                itemSpell.SpellId = 7709;
+                return;
+            case 9415: // Increase Spell Dam 5 (OLD) to Increase Spell Dam 5 (NEW)
+                itemSpell.SpellId = 9395;
+                return;
+            case 9416: // Increase Spell Dam 6 (OLD) to Increase Spell Dam 6 (NEW)
+                itemSpell.SpellId = 9396;
+                return;
+            case 9417: // Increase Spell Dam 7 (OLD) to Increase Spell Dam 7 (NEW)
+                itemSpell.SpellId = 9397;
+                return;
+            case 12019: // Increase Spell Dam 18 Random (OLD) to Increase Spell Dam 9 (NEW)
+                itemSpell.SpellId = 9415;
+                return;
+            case 13591: // Increase Arcane Dam 2 (OLD) to Increase Arcane Dam 1 (NEW)
+                itemSpell.SpellId = 13590;
+                return;
+            case 13592: // Increase Arcane Dam 3 (OLD) to Increase Arcane Dam 3 (NEW)
+                itemSpell.SpellId = 13591;
+                return;
+            case 13593: // Increase Arcane Dam 4 (OLD) to Increase Arcane Dam 4 (NEW)
+            case 13594: // Increase Arcane Dam 5 (OLD) to Increase Arcane Dam 4 (NEW)
+                itemSpell.SpellId = 13592;
+                return;
+            case 13595: // Increase Arcane Dam 6 (OLD) to Increase Arcane Dam 6 (NEW)
+                itemSpell.SpellId = 13593;
+                return;
+            case 13596: // Increase Arcane Dam 7 (OLD) to Increase Arcane Dam 7 (NEW)
+            case 13597: // Increase Arcane Dam 8 (OLD) to Increase Arcane Dam 7 (NEW)
+                itemSpell.SpellId = 13594;
+                return;
+            case 13598: // Increase Arcane Dam 9 (OLD) to Increase Arcane Dam 9 (NEW)
+                itemSpell.SpellId = 13595;
+                return;
+            case 13599: // Increase Arcane Dam 10 (OLD) to Increase Arcane Dam 10 (NEW)
+                itemSpell.SpellId = 13596;
+                return;
+            case 13601: // Increase Arcane Dam 11 (OLD) to Increase Arcane Dam 11 (NEW)
+            case 13602: // Increase Arcane Dam 12 (OLD) to Increase Arcane Dam 11 (NEW)
+                itemSpell.SpellId = 13597;
+                return;
+            case 13603: // Increase Arcane Dam 13 (OLD) to Increase Arcane Dam 13 (NEW)
+                itemSpell.SpellId = 13598;
+                return;
+            case 13604: // Increase Arcane Dam 14 (OLD) to Increase Arcane Dam 14 (NEW)
+            case 13605: // Increase Arcane Dam 15 (OLD) to Increase Arcane Dam 14 (NEW)
+                itemSpell.SpellId = 13599;
+                return;
+            case 13830: // Increase Fire Dam 22 (OLD) to Increase Fire Dam 21 (NEW)
+                itemSpell.SpellId = 9298;
+                return;
+            case 13831: // Increase Frost Dam 22 (OLD) to Increase Frost Dam 21 (NEW)
+                itemSpell.SpellId = 9308;
+                return;
+            case 13881: // Increase Spell Dam 22 (OLD) to Increase Spell Dam 22 (NEW)
+                itemSpell.SpellId = 15714;
+                return;
+            case 14047: // Increase Spell Dam 15 (OLD) to Increase Spell Dam 15 (NEW)
+                itemSpell.SpellId = 9344;
+                return;
+            case 14054: // Increase Spell Dam 19 (OLD) to Increase Spell Dam 19 (NEW)
+                itemSpell.SpellId = 14254;
+                return;
+            case 14055: // Increase Spell Dam 29 (OLD) to Increase Spell Dam 29 (NEW)
+                itemSpell.SpellId = 13881;
+                return;
+            case 14127: // Increase Spell Dam 21 (OLD) to Increase Spell Dam 21 (NEW)
+                itemSpell.SpellId = 14248;
+                return;
+            case 14248: // Increase Spell Dam 12 (OLD) to Increase Spell Dam 12 (NEW)
+                itemSpell.SpellId = 9417;
+                return;
+            case 14254: // Increase Spell Dam 11 (OLD) to Increase Spell Dam 11 (NEW)
+                itemSpell.SpellId = 9416;
+                return;
+            case 14793: // Increase Shadow Dam 16 (OLD) to Increase Shadow Dam 16 (NEW)
+                itemSpell.SpellId = 9324;
+                return;
+            case 14794: // Increase Shadow Dam 17 (OLD) to Increase Shadow Dam 17 (NEW)
+                itemSpell.SpellId = 9325;
+                return;
+            case 14798: // Increase Spell Dam 23 (OLD) to Increase Spell Dam 23 (NEW)
+                itemSpell.SpellId = 14047;
+                return;
+            case 14799: // Increase Spell Dam 11 (OLD) to Increase Spell Dam 11 (NEW)
+                itemSpell.SpellId = 9416;
+                return;
+            case 15696: // Increase Healing 48 (OLD) to Increase Healing 48 (NEW)
+                itemSpell.SpellId = 18034;
+                return;
+            case 15714: // Increase Spell Dam 14 (OLD) to Increase Spell Dam 14 (NEW)
+                itemSpell.SpellId = 9343;
+                return;
+            case 15715: // Increase Spell Dam 16 (OLD) to Increase Spell Dam 16 (NEW)
+                itemSpell.SpellId = 9345;
+                return;
+            case 16638: // Increase Nature Dam 30 (OLD) to Increase Nature Dam 30 (NEW)
+                itemSpell.SpellId = 17991;
+                return;
+            case 17280: // Increase Spell Dam 39 (OLD) to Increase Spell Dam 39 (NEW)
+                itemSpell.SpellId = 18055;
+                return;
+            case 17320: // Increase Healing 76 (OLD) to Increase Healing 75 (NEW)
+                itemSpell.SpellId = 18045;
+                return;
+            case 17367: // Increase Spell Dam 25 (OLD) to Increase Spell Dam 25 (NEW)
+                itemSpell.SpellId = 15715;
+                return;
+            case 17371: // Increase Healing 40 (OLD) to Increase Healing 40 (NEW)
+                itemSpell.SpellId = 18031;
+                return;
+            case 17493: // Increase Spell Dam 40 (OLD) to Increase Spell Dam 40 (NEW)
+                itemSpell.SpellId = 18056;
+                return;
+            case 17684: // Increase Fire Dam 36 (OLD) to Increase Fire Dam 36 (NEW)
+                itemSpell.SpellId = 17873;
+                return;
+            case 17747: // Increase Fire Dam 16 (OLD) to Increase Fire Dam 16 (NEW)
+                itemSpell.SpellId = 9294;
+                return;
+            case 17819: // Increase Nature Dam 22 (OLD) to Increase Nature Dam 21 (NEW)
+                itemSpell.SpellId = 9361;
+                return;
+            case 17821: // Increase Arcane Dam 16 (OLD) to Increase Arcane Dam 16 (NEW)
+                itemSpell.SpellId = 13601;
+                return;
+            case 17823: // Increase Arcane Dam 18 (OLD) to Increase Arcane Dam 17 (NEW)
+                itemSpell.SpellId = 13602;
+                return;
+            case 17824: // Increase Arcane Dam 20 (OLD) to Increase Arcane Dam 20 (NEW)
+                itemSpell.SpellId = 13604;
+                return;
+            case 17825: // Increase Arcane Dam 22 (OLD) to Increase Arcane Dam 21 (NEW)
+                itemSpell.SpellId = 13605;
+                return;
+            case 17826: // Increase Arcane Dam 24 (OLD) to Increase Arcane Dam 24 (NEW)
+                itemSpell.SpellId = 17822;
+                return;
+            case 17827: // Increase Arcane Dam 26 (OLD) to Increase Arcane Dam 26 (NEW)
+                itemSpell.SpellId = 17823;
+                return;
+            case 17828: // Increase Arcane Dam 28 (OLD) to Increase Arcane Dam 27 (NEW)
+                itemSpell.SpellId = 17824;
+                return;
+            case 17829: // Increase Arcane Dam 30 (OLD) to Increase Arcane Dam 30 (NEW)
+                itemSpell.SpellId = 17826;
+                return;
+            case 17830: // Increase Arcane Dam 32 (OLD) to Increase Arcane Dam 31 (NEW)
+                itemSpell.SpellId = 17827;
+                return;
+            case 17832: // Increase Arcane Dam 34 (OLD) to Increase Arcane Dam 34 (NEW)
+                itemSpell.SpellId = 17829;
+                return;
+            case 17837: // Increase Arcane Dam 36 (OLD) to Increase Arcane Dam 36 (NEW)
+                itemSpell.SpellId = 17830;
+                return;
+            case 17838: // Increase Arcane Dam 38 (OLD) to Increase Arcane Dam 37 (NEW)
+                itemSpell.SpellId = 17832;
+                return;
+            case 17839: // Increase Arcane Dam 40 (OLD) to Increase Arcane Dam 40 (NEW)
+                itemSpell.SpellId = 17838;
+                return;
+            case 17840: // Increase Arcane Dam 42 (OLD) to Increase Arcane Dam 41 (NEW)
+                itemSpell.SpellId = 17839;
+                return;
+            case 17844: // Increase Arcane Dam 48 (OLD) to Increase Arcane Dam 47 (NEW)
+                itemSpell.SpellId = 17844;
+                return;
+            case 17845: // Increase Arcane Dam 50 (OLD) to Increase Arcane Dam 50 (NEW)
+                itemSpell.SpellId = 17846;
+                return;
+            case 17846: // Increase Arcane Dam 52 (OLD) to Increase Arcane Dam 51 (NEW)
+                itemSpell.SpellId = 17847;
+                return;
+            case 17847: // Increase Arcane Dam 54 (OLD) to Increase Arcane Dam 54 (NEW)
+                itemSpell.SpellId = 17849;
+                return;
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            case 17848: // Increase Arcane Dam 56 (OLD) to Increase Arcane Dam 56 (NEW)
+                itemSpell.SpellId = 26704;
+                return;
+    #endif
+            case 17866: // Increase Fire Dam 17 (OLD) to Increase Fire Dam 17 (NEW)
+            case 17867: // Increase Fire Dam 18 (OLD) to Increase Fire Dam 17 (NEW)
+                itemSpell.SpellId = 9295;
+                return;
+            case 17868: // Increase Fire Dam 20 (OLD) to Increase Fire Dam 20 (NEW)
+                itemSpell.SpellId = 9297;
+                return;
+            case 17869: // Increase Fire Dam 24 (OLD) to Increase Fire Dam 24 (NEW)
+                itemSpell.SpellId = 17866;
+                return;
+            case 17870: // Increase Fire Dam 26 (OLD) to Increase Fire Dam 26 (NEW)
+                itemSpell.SpellId = 17867;
+                return;
+            case 17871: // Increase Fire Dam 28 (OLD) to Increase Fire Dam 27 (NEW)
+                itemSpell.SpellId = 17868;
+                return;
+            case 17872: // Increase Fire Dam 30 (OLD) to Increase Fire Dam 30 (NEW)
+                itemSpell.SpellId = 17869;
+                return;
+            case 17873: // Increase Fire Dam 32 (OLD) to Increase Fire Dam 31 (NEW)
+                itemSpell.SpellId = 17870;
+                return;
+            case 17874: // Increase Fire Dam 34 (OLD) to Increase Fire Dam 34 (NEW)
+                itemSpell.SpellId = 17872;
+                return;
+            case 17875: // Increase Fire Dam 38 (OLD) to Increase Fire Dam 37 (NEW)
+                itemSpell.SpellId = 17874;
+                return;
+            case 17876: // Increase Fire Dam 40 (OLD) to Increase Fire Dam 40 (NEW)
+                itemSpell.SpellId = 17875;
+                return;
+            case 17878: // Increase Fire Dam 42 (OLD) to Increase Fire Dam 41 (NEW)
+                itemSpell.SpellId = 17876;
+                return;
+            case 17881: // Increase Fire Dam 48 (OLD) to Increase Fire Dam 47 (NEW)
+                itemSpell.SpellId = 17881;
+                return;
+            case 17882: // Increase Fire Dam 50 (OLD) to Increase Fire Dam 50 (NEW)
+                itemSpell.SpellId = 17884;
+                return;
+            case 17884: // Increase Fire Dam 52 (OLD) to Increase Fire Dam 51 (NEW)
+                itemSpell.SpellId = 17885;
+                return;
+            case 17885: // Increase Fire Dam 54 (OLD) to Increase Fire Dam 54 (NEW)
+            case 17886: // Increase Fire Dam 56 (OLD) to Increase Fire Dam 54 (NEW)
+                itemSpell.SpellId = 17887;
+                return;
+            case 17889: // Increase Frost Dam 16 (OLD) to Increase Frost Dam 16 (NEW)
+                itemSpell.SpellId = 9304;
+                return;
+            case 17890: // Increase Frost Dam 17 (OLD) to Increase Frost Dam 17 (NEW)
+            case 17891: // Increase Frost Dam 18 (OLD) to Increase Frost Dam 17 (NEW)
+                itemSpell.SpellId = 9305;
+                return;
+            case 17892: // Increase Frost Dam 20 (OLD) to Increase Frost Dam 20 (NEW)
+                itemSpell.SpellId = 9307;
+                return;
+            case 17893: // Increase Frost Dam 24 (OLD) to Increase Frost Dam 24 (NEW)
+                itemSpell.SpellId = 17890;
+                return;
+            case 17894: // Increase Frost Dam 26 (OLD) to Increase Frost Dam 26 (NEW)
+                itemSpell.SpellId = 17891;
+                return;
+            case 17895: // Increase Frost Dam 28 (OLD) to Increase Frost Dam 27 (NEW)
+                itemSpell.SpellId = 17892;
+                return;
+            case 17896: // Increase Frost Dam 30 (OLD) to Increase Frost Dam 30 (NEW)
+                itemSpell.SpellId = 17893;
+                return;
+            case 17897: // Increase Frost Dam 32 (OLD) to Increase Frost Dam 31 (NEW)
+                itemSpell.SpellId = 17894;
+                return;
+            case 17898: // Increase Frost Dam 34 (OLD) to Increase Frost Dam 34 (NEW)
+                itemSpell.SpellId = 17896;
+                return;
+            case 17899: // Increase Frost Dam 36 (OLD) to Increase Frost Dam 36 (NEW)
+                itemSpell.SpellId = 17897;
+                return;
+            case 17900: // Increase Frost Dam 38 (OLD) to Increase Frost Dam 37 (NEW)
+                itemSpell.SpellId = 17898;
+                return;
+            case 17901: // Increase Frost Dam 40 (OLD) to Increase Frost Dam 40 (NEW)
+                itemSpell.SpellId = 17900;
+                return;
+            case 17902: // Increase Frost Dam 42 (OLD) to Increase Frost Dam 41 (NEW)
+                itemSpell.SpellId = 17901;
+                return;
+            case 17906: // Increase Frost Dam 48 (OLD) to Increase Frost Dam 47 (NEW)
+                itemSpell.SpellId = 17906;
+                return;
+            case 17907: // Increase Frost Dam 50 (OLD) to Increase Frost Dam 50 (NEW)
+                itemSpell.SpellId = 17908;
+                return;
+            case 17908: // Increase Frost Dam 52 (OLD) to Increase Frost Dam 51 (NEW)
+                itemSpell.SpellId = 17909;
+                return;
+            case 17909: // Increase Frost Dam 54 (OLD) to Increase Frost Dam 54 (NEW)
+                itemSpell.SpellId = 17911;
+                return;
+            case 17987: // Increase Nature Dam 16 (OLD) to Increase Nature Dam 16 (NEW)
+                itemSpell.SpellId = 9357;
+                return;
+            case 17988: // Increase Nature Dam 17 (OLD) to Increase Nature Dam 17 (NEW)
+                itemSpell.SpellId = 9358;
+                return;
+            case 17989: // Increase Nature Dam 18 (OLD) to Increase Nature Dam 17 (NEW)
+                itemSpell.SpellId = 9358;
+                return;
+            case 17990: // Increase Nature Dam 20 (OLD) to Increase Nature Dam 20 (NEW)
+                itemSpell.SpellId = 9360;
+                return;
+            case 17991: // Increase Nature Dam 24 (OLD) to Increase Nature Dam 24 (NEW)
+                itemSpell.SpellId = 17988;
+                return;
+            case 17993: // Increase Nature Dam 28 (OLD) to Increase Nature Dam 27 (NEW)
+                itemSpell.SpellId = 17990;
+                return;
+            case 17994: // Increase Nature Dam 32 (OLD) to Increase Nature Dam 33 (NEW)
+                itemSpell.SpellId = 17993;
+                return;
+            case 17995: // Increase Nature Dam 34 (OLD) to Increase Nature Dam 34 (NEW)
+                itemSpell.SpellId = 16638;
+                return;
+            case 17996: // Increase Nature Dam 36 (OLD) to Increase Nature Dam 36 (NEW)
+                itemSpell.SpellId = 17994;
+                return;
+            case 17997: // Increase Nature Dam 38 (OLD) to Increase Nature Dam 37 (NEW)
+                itemSpell.SpellId = 17995;
+                return;
+            case 17998: // Increase Nature Dam 40 (OLD) to Increase Nature Dam 40 (NEW)
+                itemSpell.SpellId = 17997;
+                return;
+            case 17999: // Increase Nature Dam 42 (OLD) to Increase Nature Dam 41 (NEW)
+                itemSpell.SpellId = 17998;
+                return;
+            case 18002: // Increase Nature Dam 48 (OLD) to Increase Nature Dam 47 (NEW)
+                itemSpell.SpellId = 18002;
+                return;
+            case 18003: // Increase Nature Dam 50 (OLD) to Increase Nature Dam 50 (NEW)
+                itemSpell.SpellId = 18004;
+                return;
+            case 18004: // Increase Nature Dam 52 (OLD) to Increase Nature Dam 51 (NEW)
+                itemSpell.SpellId = 18005;
+                return;
+            case 18005: // Increase Nature Dam 54 (OLD) to Increase Nature Dam 54 (NEW)
+                itemSpell.SpellId = 18007;
+                return;
+            case 18006: // Increase Nature Dam 56 (OLD) to Increase Nature Dam 54 (NEW)
+                itemSpell.SpellId = 18007;
+                return;
+            case 18008: // Increase Shadow Dam 18 (OLD) to Increase Shadow Dam 17 (NEW)
+                itemSpell.SpellId = 9325;
+                return;
+            case 18009: // Increase Shadow Dam 20 (OLD) to Increase Shadow Dam 20 (NEW)
+                itemSpell.SpellId = 9327;
+                return;
+            case 18010: // Increase Shadow Dam 22 (OLD) to Increase Shadow Dam 21 (NEW)
+                itemSpell.SpellId = 9328;
+                return;
+            case 18011: // Increase Shadow Dam 24 (OLD) to Increase Shadow Dam 24 (NEW)
+                itemSpell.SpellId = 14794;
+                return;
+            case 18012: // Increase Shadow Dam 26 (OLD) to Increase Shadow Dam 26 (NEW)
+                itemSpell.SpellId = 18008;
+                return;
+            case 18013: // Increase Shadow Dam 28 (OLD) to Increase Shadow Dam 27 (NEW)
+                itemSpell.SpellId = 18009;
+                return;
+            case 18014: // Increase Shadow Dam 30 (OLD) to Increase Shadow Dam 30 (NEW)
+                itemSpell.SpellId = 18011;
+                return;
+            case 18015: // Increase Shadow Dam 32 (OLD) to Increase Shadow Dam 31 (NEW)
+                itemSpell.SpellId = 18012;
+                return;
+            case 18016: // Increase Shadow Dam 34 (OLD) to Increase Shadow Dam 34 (NEW)
+                itemSpell.SpellId = 18014;
+                return;
+            case 18017: // Increase Shadow Dam 36 (OLD) to Increase Shadow Dam 36 (NEW)
+                itemSpell.SpellId = 18015;
+                return;
+            case 18018: // Increase Shadow Dam 38 (OLD) to Increase Shadow Dam 37 (NEW)
+                itemSpell.SpellId = 18016;
+                return;
+            case 18019: // Increase Shadow Dam 40 (OLD) to Increase Shadow Dam 40 (NEW)
+                itemSpell.SpellId = 18018;
+                return;
+            case 18020: // Increase Shadow Dam 42 (OLD) to Increase Shadow Dam 41 (NEW)
+                itemSpell.SpellId = 18019;
+                return;
+            case 18023: // Increase Shadow Dam 48 (OLD) to Increase Shadow Dam 47 (NEW)
+                itemSpell.SpellId = 18023;
+                return;
+            case 18024: // Increase Shadow Dam 50 (OLD) to Increase Shadow Dam 50 (NEW)
+                itemSpell.SpellId = 18025;
+                return;
+            case 18025: // Increase Shadow Dam 52 (OLD) to Increase Shadow Dam 51 (NEW)
+                itemSpell.SpellId = 18026;
+                return;
+            case 18026: // Increase Shadow Dam 54 (OLD) to Increase Shadow Dam 54 (NEW)
+                itemSpell.SpellId = 18028;
+                return;
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            case 18027: // Increase Shadow Dam 56 (OLD) to Increase Shadow Dam 56 (NEW)
+                itemSpell.SpellId = 26728;
+                return;
+            case 18028: // Increase Shadow Dam 58 (OLD) to Increase Shadow Dam 57 (NEW)
+                itemSpell.SpellId = 26729;
+                return;
+    #else
+            case 18027: // Increase Shadow Dam 56 (OLD) to Increase Shadow Dam 54 (NEW)
+                itemSpell.SpellId = 18028;
+                return;
+    #endif
+            case 18029: // Increase Healing 32 (OLD) to Increase Healing 31 (NEW)
+                itemSpell.SpellId = 9317;
+                return;
+            case 18030: // Increase Healing 34 (OLD) to Increase Healing 33 (NEW)
+                itemSpell.SpellId = 9318;
+                return;
+            case 18031: // Increase Healing 36 (OLD) to Increase Healing 35 (NEW)
+                itemSpell.SpellId = 18029;
+                return;
+            case 18032: // Increase Healing 38 (OLD) to Increase Healing 37 (NEW)
+                itemSpell.SpellId = 18030;
+                return;
+            case 18033: // Increase Healing 42 (OLD) to Increase Healing 42 (NEW)
+                itemSpell.SpellId = 18032;
+                return;
+            case 18034: // Increase Healing 44 (OLD) to Increase Healing 44 (NEW)
+                itemSpell.SpellId = 17371;
+                return;
+            case 18035: // Increase Healing 46 (OLD) to Increase Healing 46 (NEW)
+                itemSpell.SpellId = 18033;
+                return;
+            case 18036: // Increase Healing 50 (OLD) to Increase Healing 48 (NEW)
+                itemSpell.SpellId = 18034;
+                return;
+            case 18037: // Increase Healing 52 (OLD) to Increase Healing 51 (NEW)
+                itemSpell.SpellId = 18035;
+                return;
+            case 18038: // Increase Healing 54 (OLD) to Increase Healing 53 (NEW)
+                itemSpell.SpellId = 15696;
+                return;
+            case 18039: // Increase Healing 56 (OLD) to Increase Healing 55 (NEW)
+                itemSpell.SpellId = 18036;
+                return;
+            case 18040: // Increase Healing 58 (OLD) to Increase Healing 57 (NEW)
+                itemSpell.SpellId = 18037;
+                return;
+            case 18041: // Increase Healing 60 (OLD) to Increase Healing 59 (NEW)
+                itemSpell.SpellId = 18038;
+                return;
+            case 18042: // Increase Healing 62 (OLD) to Increase Healing 62 (NEW)
+                itemSpell.SpellId = 18039;
+                return;
+            case 18043: // Increase Healing 64 (OLD) to Increase Healing 64 (NEW)
+                itemSpell.SpellId = 18040;
+                return;
+            case 18044: // Increase Healing 66 (OLD) to Increase Healing 66 (NEW)
+                itemSpell.SpellId = 18041;
+                return;
+            case 18045: // Increase Healing 68 (OLD) to Increase Healing 68 (NEW)
+                itemSpell.SpellId = 18042;
+                return;
+            case 18046: // Increase Healing 70 (OLD) to Increase Healing 70 (NEW)
+                itemSpell.SpellId = 18043;
+                return;
+            case 18047: // Increase Healing 72 (OLD) to Increase Healing 70 (NEW)
+                itemSpell.SpellId = 18043;
+                return;
+            case 18048: // Increase Healing 74 (OLD) to Increase Healing 73 (NEW)
+                itemSpell.SpellId = 18044;
+                return;
+            case 18049: // Increase Spell Dam 18 (OLD) to Increase Spell Dam 18 (NEW)
+                itemSpell.SpellId = 9346;
+                return;
+            case 18050: // Increase Spell Dam 26 (OLD) to Increase Spell Dam 26 (NEW)
+                itemSpell.SpellId = 18049;
+                return;
+            case 18052: // Increase Spell Dam 28 (OLD) to Increase Spell Dam 28 (NEW)
+                itemSpell.SpellId = 14127;
+                return;
+            case 18053: // Increase Spell Dam 30 (OLD) to Increase Spell Dam 30 (NEW)
+                itemSpell.SpellId = 14798;
+                return;
+            case 18054: // Increase Spell Dam 32 (OLD) to Increase Spell Dam 32 (NEW)
+                itemSpell.SpellId = 17367;
+                return;
+            case 18055: // Increase Spell Dam 33 (OLD) to Increase Spell Dam 33 (NEW)
+                itemSpell.SpellId = 18050;
+                return;
+            case 18056: // Increase Spell Dam 35 (OLD) to Increase Spell Dam 35 (NEW)
+                itemSpell.SpellId = 14055;
+                return;
+            case 18057: // Increase Spell Dam 36 (OLD) to Increase Spell Dam 36 (NEW)
+                itemSpell.SpellId = 18053;
+                return;
+            case 18058: // Increase Spell Dam 37 (OLD) to Increase Spell Dam 37 (NEW)
+                itemSpell.SpellId = 18054;
+                return;
+            case 21500: // Increase Holy Dam 2 (OLD) to Increase Holy Dam 1 (NEW)
+                itemSpell.SpellId = 21499;
+                return;
+            case 21501: // Increase Holy Dam 3 (OLD) to Increase Holy Dam 3 (NEW)
+                itemSpell.SpellId = 21500;
+                return;
+            case 21502: // Increase Holy Dam 4 (OLD) to Increase Holy Dam 4 (NEW)
+            case 21503: // Increase Holy Dam 5 (OLD) to Increase Holy Dam 4 (NEW)
+                itemSpell.SpellId = 21501;
+                return;
+            case 21504: // Increase Holy Dam 6 (OLD) to Increase Holy Dam 6 (NEW)
+                itemSpell.SpellId = 21502;
+                return;
+            case 21505: // Increase Holy Dam 7 (OLD) to Increase Holy Dam 7 (NEW)
+            case 21506: // Increase Holy Dam 8 (OLD) to Increase Holy Dam 7 (NEW)
+                itemSpell.SpellId = 21503;
+                return;
+            case 21507: // Increase Holy Dam 9 (OLD) to Increase Holy Dam 9 (NEW)
+                itemSpell.SpellId = 21504;
+                return;
+            case 21508: // Increase Holy Dam 10 (OLD) to Increase Holy Dam 10 (NEW)
+                itemSpell.SpellId = 21505;
+                return;
+            case 21509: // Increase Holy Dam 11 (OLD) to Increase Holy Dam 11 (NEW)
+            case 21510: // Increase Holy Dam 12 (OLD) to Increase Holy Dam 11 (NEW)
+                itemSpell.SpellId = 21506;
+                return;
+            case 21511: // Increase Holy Dam 13 (OLD) to Increase Holy Dam 13 (NEW)
+                itemSpell.SpellId = 21507;
+                return;
+            case 21512: // Increase Holy Dam 14 (OLD) to Increase Holy Dam 14 (NEW)
+            case 21513: // Increase Holy Dam 15 (OLD) to Increase Holy Dam 14 (NEW)
+                itemSpell.SpellId = 21508;
+                return;
+            case 21514: // Increase Holy Dam 16 (OLD) to Increase Holy Dam 16 (NEW)
+                itemSpell.SpellId = 21509;
+                return;
+            case 21515: // Increase Holy Dam 17 (OLD) to Increase Holy Dam 17 (NEW)
+            case 21516: // Increase Holy Dam 18 (OLD) to Increase Holy Dam 17 (NEW)
+                itemSpell.SpellId = 21510;
+                return;
+            case 21517: // Increase Holy Dam 20 (OLD) to Increase Holy Dam 20 (NEW)
+                itemSpell.SpellId = 21512;
+                return;
+            case 21518: // Increase Holy Dam 22 (OLD) to Increase Holy Dam 21 (NEW)
+                itemSpell.SpellId = 21513;
+                return;
+            case 21519: // Increase Holy Dam 24 (OLD) to Increase Holy Dam 24 (NEW)
+                itemSpell.SpellId = 21515;
+                return;
+            case 21520: // Increase Holy Dam 26 (OLD) to Increase Holy Dam 26 (NEW)
+                itemSpell.SpellId = 21516;
+                return;
+            case 21521: // Increase Holy Dam 28 (OLD) to Increase Holy Dam 27 (NEW)
+                itemSpell.SpellId = 21517;
+                return;
+            case 21522: // Increase Holy Dam 30 (OLD) to Increase Holy Dam 30 (NEW)
+                itemSpell.SpellId = 21519;
+                return;
+            case 21523: // Increase Holy Dam 32 (OLD) to Increase Holy Dam 31 (NEW)
+                itemSpell.SpellId = 21520;
+                return;
+            case 21524: // Increase Holy Dam 34 (OLD) to Increase Holy Dam 34 (NEW)
+                itemSpell.SpellId = 21522;
+                return;
+            case 21525: // Increase Holy Dam 36 (OLD) to Increase Holy Dam 36 (NEW)
+                itemSpell.SpellId = 21523;
+                return;
+            case 21526: // Increase Holy Dam 38 (OLD) to Increase Holy Dam 37 (NEW)
+                itemSpell.SpellId = 21524;
+                return;
+            case 21527: // Increase Holy Dam 40 (OLD) to Increase Holy Dam 40 (NEW)
+                itemSpell.SpellId = 21526;
+                return;
+            case 21528: // Increase Holy Dam 42 (OLD) to Increase Holy Dam 41 (NEW)
+                itemSpell.SpellId = 21527;
+                return;
+            case 21531: // Increase Holy Dam 48 (OLD) to Increase Holy Dam 47 (NEW)
+                itemSpell.SpellId = 21531;
+                return;
+            case 21532: // Increase Holy Dam 50 (OLD) to Increase Holy Dam 50 (NEW)
+                itemSpell.SpellId = 21533;
+                return;
+            case 21533: // Increase Holy Dam 52 (OLD) to Increase Holy Dam 51 (NEW)
+                itemSpell.SpellId = 21534;
+                return;
+            case 21534: // Increase Holy Dam 54 (OLD) to Increase Holy Dam 54 (NEW)
+            case 21535: // Increase Holy Dam 56 (OLD) to Increase Holy Dam 54 (NEW)
+                itemSpell.SpellId = 21536;
+                return;
+            case 22747: // Increase Spell Dam 22 (OLD) to Increase Spell Dam 22 (NEW)
+                itemSpell.SpellId = 15714;
+                return;
+            case 22748: // Increase Healing 50 (OLD) to Increase Healing 51 (NEW)
+                itemSpell.SpellId = 18035;
+                return;
+        }
     }
+#endif
+    // Substitute Increased Defense spells that were changed in the 1.7 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    if (sWorld.GetWowPatch() < WOW_PATCH_107)
+    {
+        switch (itemSpell.SpellId)
+        {
+            case 7513: // Increased Defense 2 (OLD) to Increased Defense 2 (NEW)
+                itemSpell.SpellId = 7514;
+                return;
+            case 7514: // Increased Defense 3 (OLD) to Increased Defense 3 (NEW)
+                itemSpell.SpellId = 7515;
+                return;
+            case 7515: // Increased Defense 4 (OLD) to Increased Defense 4 (NEW)
+                itemSpell.SpellId = 7517;
+                return;
+            case 7516: // Increased Defense 5 (OLD) to Increased Defense 5 (NEW)
+                itemSpell.SpellId = 7518;
+                return;
+            case 7517: // Increased Defense 6 (OLD) to Increased Defense 6 (NEW)
+                itemSpell.SpellId = 13384;
+                return;
+            case 7518: // Increased Defense 7 (OLD) to Increased Defense 7 (NEW)
+                itemSpell.SpellId = 13385;
+                return;
+            case 13383: // Increased Defense 8 (OLD) to Increased Defense 8 (NEW)
+                itemSpell.SpellId = 13387;
+                return;
+            case 13384: // Increased Defense 9 (OLD) to Increased Defense 9 (NEW)
+                itemSpell.SpellId = 13388;
+                return;
+            case 13385: // Increased Defense 10 (OLD) to Increased Defense 10 (NEW)
+                itemSpell.SpellId = 13390;
+                return;
+            case 13386: // Increased Defense 11 (OLD) to Increased Defense 11 (NEW)
+                itemSpell.SpellId = 18185;
+                return;
+            case 13387: // Increased Defense 12 (OLD) to Increased Defense 12 (NEW)
+                itemSpell.SpellId = 21408;
+                return;
+            case 13388: // Increased Defense 13 (OLD) to Increased Defense 13 (NEW)
+                itemSpell.SpellId = 14249;
+                return;
+            case 13389: // Increased Defense 25 (OLD) to Increased Defense 25 (NEW)
+                itemSpell.SpellId = 21422;
+                return;
+            case 13390: // Increased Defense 15 (OLD) to Increased Defense 15 (NEW)
+                itemSpell.SpellId = 18196;
+                return;
+            case 14249: // Increased Defense 20 (OLD) to Increased Defense 20 (NEW)
+                itemSpell.SpellId = 21416;
+                return;
+            case 15804: // Increased Defense 100 (OLD) to Increased Defense 80 (NEW)
+                itemSpell.SpellId = 24775;
+                return;
+            case 17513: // Increased Defense 32 (OLD) to Increased Defense 25 (NEW)
+                itemSpell.SpellId = 21423;
+                return;
+            case 18185: // Increased Defense 16 (OLD) to Increased Defense 16 (NEW)
+                itemSpell.SpellId = 21412;
+                return;
+            case 18196: // Increased Defense 22 (OLD) to Increased Defense 22 (NEW)
+                itemSpell.SpellId = 21418;
+                return;
+            case 18369: // Increased Defense 14 (OLD) to Increased Defense 14 (NEW)
+                itemSpell.SpellId = 21410;
+                return;
+            case 21407: // Increased Defense 17 (OLD) to Increased Defense 17 (NEW)
+                itemSpell.SpellId = 13389;
+                return;
+            case 21408: // Increased Defense 18 (OLD) to Increased Defense 18 (NEW)
+                itemSpell.SpellId = 21413;
+                return;
+            case 21409: // Increased Defense 19 (OLD) to Increased Defense 19 (NEW)
+                itemSpell.SpellId = 21414;
+                return;
+            case 21410: // Increased Defense 21 (OLD) to Increased Defense 21 (NEW)
+                itemSpell.SpellId = 17513;
+                return;
+            case 21411: // Increased Defense 23 (OLD) to Increased Defense 23 (NEW)
+                itemSpell.SpellId = 21419;
+                return;
+            case 21412: // Increased Defense 24 (OLD) to Increased Defense 24 (NEW)
+                itemSpell.SpellId = 21421;
+                return;
+            case 21413: // Increased Defense 27 (OLD) to Increased Defense 25 (NEW)
+            case 21414: // Increased Defense 28 (OLD) to Increased Defense 25 (NEW)
+            case 21415: // Increased Defense 29 (OLD) to Increased Defense 25 (NEW)
+            case 21416: // Increased Defense 30 (OLD) to Increased Defense 25 (NEW)
+            case 21417: // Increased Defense 31 (OLD) to Increased Defense 25 (NEW)
+            case 21418: // Increased Defense 33 (OLD) to Increased Defense 25 (NEW)
+            case 21419: // Increased Defense 34 (OLD) to Increased Defense 25 (NEW)
+            case 21420: // Increased Defense 35 (OLD) to Increased Defense 25 (NEW)
+            case 21421: // Increased Defense 36 (OLD) to Increased Defense 25 (NEW)
+            case 21422: // Increased Defense 37 (OLD) to Increased Defense 25 (NEW)
+            case 21423: // Increased Defense 38 (OLD) to Increased Defense 25 (NEW)
+            case 21424: // Increased Defense 26 (OLD) to Increased Defense 25 (NEW)
+                itemSpell.SpellId = 21423;
+                return;
+        }
+    }
+#endif
+    // Substitute Vitality spells that were changed in the 1.8 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    if (sWorld.GetWowPatch() < WOW_PATCH_108)
+    {
+        switch (itemSpell.SpellId)
+        {
+            case 20969: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21168: // Vitality 1
+                itemSpell.SpellId = 21587;
+                return;
+        }
+    }
+#endif
+    // Substitute Vitality spells that were changed in the 1.10 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    if (sWorld.GetWowPatch() < WOW_PATCH_110)
+    {
+        switch (itemSpell.SpellId)
+        {
+            case 20885: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21109: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21345: // Vitality 1
+                itemSpell.SpellId = 21587;
+                return;
+            case 21347: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21348: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21349: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21350: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21590: // Vitality 1
+                itemSpell.SpellId = 21587;
+                return;
+            case 21592: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21593: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21594: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21595: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21596: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21597: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21598: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21599: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21600: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21601: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21602: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21603: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21604: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21605: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21606: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21607: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21608: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21609: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21610: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21611: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21612: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21613: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21614: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21615: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21616: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21617: // Vitality 10
+                itemSpell.SpellId = 21349;
+                return;
+            case 23210: // Vitality 14
+                itemSpell.SpellId = 21350;
+                return;
+        }
+    }
+#endif
 }
 
 void ObjectMgr::LoadItemPrototypes()
@@ -2392,8 +3412,6 @@ void ObjectMgr::LoadItemPrototypes()
         ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(i);
         if (!proto)
             continue;
-
-        CorrectItemEffects(const_cast<ItemPrototype*>(proto));
 
         if (proto->Class >= MAX_ITEM_CLASS)
         {
@@ -2537,8 +3555,11 @@ void ObjectMgr::LoadItemPrototypes()
 
         // normal spell list
         {
-            for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+            for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
             {
+                if (proto->Spells[j].SpellId)
+                    CorrectItemEffects(proto->ItemId, const_cast<ItemPrototype*>(proto)->Spells[j]);
+                
                 if (proto->Spells[j].SpellTrigger >= MAX_ITEM_SPELLTRIGGER)
                 {
                     sLog.outErrorDb("Item (Entry: %u) has wrong item spell trigger value in spelltrigger_%d (%u)", i, j + 1, proto->Spells[j].SpellTrigger);

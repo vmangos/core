@@ -166,6 +166,11 @@ inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
 #define PAIR32_LOPART(x)   (uint16)(uint32(x)         & 0x0000FFFF)
 
 // Game client builds
+#define CLIENT_BUILD_1_2_4 4222
+#define CLIENT_BUILD_1_3_1 4297
+#define CLIENT_BUILD_1_4_2 4375
+#define CLIENT_BUILD_1_5_1 4449
+#define CLIENT_BUILD_1_6_1 4544
 #define CLIENT_BUILD_1_7_1 4695
 #define CLIENT_BUILD_1_8_4 4878
 #define CLIENT_BUILD_1_9_4 5086
