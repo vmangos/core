@@ -228,8 +228,13 @@ void WorldSession::HandleMoveTeleportAckOpcode(WorldPacket& recv_data)
 
     recv_data >> guid;
 
-    uint32 counter, time;
+    uint32 counter = 0;
+    uint32 time = 0;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data >> counter >> time;
+#else
+    recv_data >> time;
+#endif
     DEBUG_LOG("Guid: %s", guid.GetString().c_str());
     DEBUG_LOG("Counter %u, time %u", counter, time / IN_MILLISECONDS);
 
@@ -333,7 +338,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 
     WorldPacket data(opcode, recv_data.size());
     data << _clientMoverGuid.WriteAsPacked();             // write guid
-    movementInfo.Write(data);                               // write data
+    movementInfo.Write(data);                             // write data
 
     mover->SendMovementMessageToSet(std::move(data), true, _player);
 }
@@ -349,7 +354,9 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     float  newspeed;
 
     recv_data >> guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data >> Unused<uint32>();                          // counter or moveEvent
+#endif
     recv_data >> movementInfo;
     recv_data >> newspeed;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
@@ -518,7 +525,9 @@ void WorldSession::HandleMoveKnockBackAck(WorldPacket & recv_data)
     MovementInfo movementInfo;
 
     recv_data >> guid;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data >> Unused<uint32>();                          // knockback packets counter
+#endif
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
@@ -552,7 +561,9 @@ void WorldSession::HandleMoveHoverAck(WorldPacket& recv_data)
     MovementInfo movementInfo;
 
     recv_data >> Unused<uint64>();                          // guid
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data >> Unused<uint32>();                          // unk
+#endif
     recv_data >> movementInfo;
     recv_data >> Unused<uint32>();                          // unk2
 }
@@ -564,7 +575,9 @@ void WorldSession::HandleMoveWaterWalkAck(WorldPacket& recv_data)
     MovementInfo movementInfo;
 
     recv_data.read_skip<uint64>();                          // guid
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data.read_skip<uint32>();                          // unk
+#endif
     recv_data >> movementInfo;
     recv_data >> Unused<uint32>();                          // unk2
 }
@@ -773,7 +786,9 @@ void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
     ObjectGuid guid;
     MovementInfo movementInfo;
     recv_data >> guid; // guid
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data.read_skip<uint32>(); // counter
+#endif
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
@@ -809,7 +824,9 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
         return;
     }
     MovementInfo movementInfo;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data.read_skip<uint32>();                          // unk
+#endif
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 
@@ -845,7 +862,9 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
         return;
     }
     MovementInfo movementInfo;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     recv_data.read_skip<uint32>();                          // unk
+#endif
     recv_data >> movementInfo;
     movementInfo.UpdateTime(recv_data.GetPacketTime());
 

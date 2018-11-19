@@ -2802,8 +2802,10 @@ enum TradeStatus
     #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5875, 6005, 6141, 0}
 #elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_11_2
     #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5464, 0}
-#else
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_10_2
     #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5302, 0}
+#else
+    #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5086, 0}
 #endif
 
 // TrinityCore

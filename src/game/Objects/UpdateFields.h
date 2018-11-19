@@ -102,81 +102,102 @@ enum EUnitFields
     UNIT_VIRTUAL_ITEM_INFO_05                  = 0x27 + OBJECT_END,
     UNIT_FIELD_FLAGS                           = 0x28 + OBJECT_END, // Size:1
     UNIT_FIELD_AURA                            = 0x29 + OBJECT_END, // Size:48
-    UNIT_FIELD_AURA_LAST                       = 0x58 + OBJECT_END,
-    UNIT_FIELD_AURAFLAGS                       = 0x59 + OBJECT_END, // Size:6
-    UNIT_FIELD_AURAFLAGS_01                    = 0x5a + OBJECT_END,
-    UNIT_FIELD_AURAFLAGS_02                    = 0x5b + OBJECT_END,
-    UNIT_FIELD_AURAFLAGS_03                    = 0x5c + OBJECT_END,
-    UNIT_FIELD_AURAFLAGS_04                    = 0x5d + OBJECT_END,
-    UNIT_FIELD_AURAFLAGS_05                    = 0x5e + OBJECT_END,
-    UNIT_FIELD_AURALEVELS                      = 0x5f + OBJECT_END, // Size:12
-    UNIT_FIELD_AURALEVELS_LAST                 = 0x6a + OBJECT_END,
-    UNIT_FIELD_AURAAPPLICATIONS                = 0x6b + OBJECT_END, // Size:12
-    UNIT_FIELD_AURAAPPLICATIONS_LAST           = 0x76 + OBJECT_END,
-    UNIT_FIELD_AURASTATE                       = 0x77 + OBJECT_END, // Size:1
-    UNIT_FIELD_BASEATTACKTIME                  = 0x78 + OBJECT_END, // Size:2
-    UNIT_FIELD_OFFHANDATTACKTIME               = 0x79 + OBJECT_END, // Size:2
-    UNIT_FIELD_RANGEDATTACKTIME                = 0x7a + OBJECT_END, // Size:1
-    UNIT_FIELD_BOUNDINGRADIUS                  = 0x7b + OBJECT_END, // Size:1
-    UNIT_FIELD_COMBATREACH                     = 0x7c + OBJECT_END, // Size:1
-    UNIT_FIELD_DISPLAYID                       = 0x7d + OBJECT_END, // Size:1
-    UNIT_FIELD_NATIVEDISPLAYID                 = 0x7e + OBJECT_END, // Size:1
-    UNIT_FIELD_MOUNTDISPLAYID                  = 0x7f + OBJECT_END, // Size:1
-    UNIT_FIELD_MINDAMAGE                       = 0x80 + OBJECT_END, // Size:1
-    UNIT_FIELD_MAXDAMAGE                       = 0x81 + OBJECT_END, // Size:1
-    UNIT_FIELD_MINOFFHANDDAMAGE                = 0x82 + OBJECT_END, // Size:1
-    UNIT_FIELD_MAXOFFHANDDAMAGE                = 0x83 + OBJECT_END, // Size:1
-    UNIT_FIELD_BYTES_1                         = 0x84 + OBJECT_END, // Size:1
-    UNIT_FIELD_PETNUMBER                       = 0x85 + OBJECT_END, // Size:1
-    UNIT_FIELD_PET_NAME_TIMESTAMP              = 0x86 + OBJECT_END, // Size:1
-    UNIT_FIELD_PETEXPERIENCE                   = 0x87 + OBJECT_END, // Size:1
-    UNIT_FIELD_PETNEXTLEVELEXP                 = 0x88 + OBJECT_END, // Size:1
-    UNIT_DYNAMIC_FLAGS                         = 0x89 + OBJECT_END, // Size:1
-    UNIT_CHANNEL_SPELL                         = 0x8a + OBJECT_END, // Size:1
-    UNIT_MOD_CAST_SPEED                        = 0x8b + OBJECT_END, // Size:1 Represented as Int32 before 1.12, after that it's Float.
-    UNIT_CREATED_BY_SPELL                      = 0x8c + OBJECT_END, // Size:1
-    UNIT_NPC_FLAGS                             = 0x8d + OBJECT_END, // Size:1
-    UNIT_NPC_EMOTESTATE                        = 0x8e + OBJECT_END, // Size:1
-    UNIT_TRAINING_POINTS                       = 0x8f + OBJECT_END, // Size:1
-    UNIT_FIELD_STAT0                           = 0x90 + OBJECT_END, // Size:1
-    UNIT_FIELD_STAT1                           = 0x91 + OBJECT_END, // Size:1
-    UNIT_FIELD_STAT2                           = 0x92 + OBJECT_END, // Size:1
-    UNIT_FIELD_STAT3                           = 0x93 + OBJECT_END, // Size:1
-    UNIT_FIELD_STAT4                           = 0x94 + OBJECT_END, // Size:1
-    UNIT_FIELD_RESISTANCES                     = 0x95 + OBJECT_END, // Size:7
-    UNIT_FIELD_RESISTANCES_01                  = 0x96 + OBJECT_END,
-    UNIT_FIELD_RESISTANCES_02                  = 0x97 + OBJECT_END,
-    UNIT_FIELD_RESISTANCES_03                  = 0x98 + OBJECT_END,
-    UNIT_FIELD_RESISTANCES_04                  = 0x99 + OBJECT_END,
-    UNIT_FIELD_RESISTANCES_05                  = 0x9a + OBJECT_END,
-    UNIT_FIELD_RESISTANCES_06                  = 0x9b + OBJECT_END,
-    UNIT_FIELD_BASE_MANA                       = 0x9c + OBJECT_END, // Size:1
-    UNIT_FIELD_BASE_HEALTH                     = 0x9d + OBJECT_END, // Size:1
-    UNIT_FIELD_BYTES_2                         = 0x9e + OBJECT_END, // Size:1
-    UNIT_FIELD_ATTACK_POWER                    = 0x9f + OBJECT_END, // Size:1
-    UNIT_FIELD_ATTACK_POWER_MODS               = 0xa0 + OBJECT_END, // Size:1
-    UNIT_FIELD_ATTACK_POWER_MULTIPLIER         = 0xa1 + OBJECT_END, // Size:1
-    UNIT_FIELD_RANGED_ATTACK_POWER             = 0xa2 + OBJECT_END, // Size:1
-    UNIT_FIELD_RANGED_ATTACK_POWER_MODS        = 0xa3 + OBJECT_END, // Size:1
-    UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER  = 0xa4 + OBJECT_END, // Size:1
-    UNIT_FIELD_MINRANGEDDAMAGE                 = 0xa5 + OBJECT_END, // Size:1
-    UNIT_FIELD_MAXRANGEDDAMAGE                 = 0xa6 + OBJECT_END, // Size:1
-    UNIT_FIELD_POWER_COST_MODIFIER             = 0xa7 + OBJECT_END, // Size:7
-    UNIT_FIELD_POWER_COST_MODIFIER_01          = 0xa8 + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MODIFIER_02          = 0xa9 + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MODIFIER_03          = 0xaa + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MODIFIER_04          = 0xab + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MODIFIER_05          = 0xac + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MODIFIER_06          = 0xad + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MULTIPLIER           = 0xae + OBJECT_END, // Size:7
-    UNIT_FIELD_POWER_COST_MULTIPLIER_01        = 0xaf + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MULTIPLIER_02        = 0xb0 + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MULTIPLIER_03        = 0xb1 + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MULTIPLIER_04        = 0xb2 + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MULTIPLIER_05        = 0xb3 + OBJECT_END,
-    UNIT_FIELD_POWER_COST_MULTIPLIER_06        = 0xb4 + OBJECT_END,
-    UNIT_FIELD_PADDING                         = 0xb5 + OBJECT_END,
-    UNIT_END                                   = 0xb6 + OBJECT_END,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    UNIT_FIELD_AURA_LAST                       = UNIT_FIELD_AURA + 47,
+#else
+    UNIT_FIELD_AURA_LAST                       = UNIT_FIELD_AURA + 63,
+#endif
+    UNIT_FIELD_AURAFLAGS,                      // Size:6
+    UNIT_FIELD_AURAFLAGS_01,
+    UNIT_FIELD_AURAFLAGS_02,
+    UNIT_FIELD_AURAFLAGS_03,
+    UNIT_FIELD_AURAFLAGS_04,
+    UNIT_FIELD_AURAFLAGS_05,
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    UNIT_FIELD_AURAFLAGS_06,
+    UNIT_FIELD_AURAFLAGS_07,
+#endif
+    UNIT_FIELD_AURALEVELS,                     // Size:12
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    UNIT_FIELD_AURALEVELS_LAST                 = UNIT_FIELD_AURALEVELS + 11,
+#else
+    UNIT_FIELD_AURALEVELS_LAST                 = UNIT_FIELD_AURALEVELS + 7,
+#endif
+    UNIT_FIELD_AURAAPPLICATIONS,               // Size:12
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    UNIT_FIELD_AURAAPPLICATIONS_LAST           = UNIT_FIELD_AURAAPPLICATIONS + 11,
+#else
+    UNIT_FIELD_AURAAPPLICATIONS_LAST           = UNIT_FIELD_AURAAPPLICATIONS + 15,
+#endif
+    UNIT_FIELD_AURASTATE,                      // Size:1
+    UNIT_FIELD_BASEATTACKTIME,                 // Size:1
+    UNIT_FIELD_OFFHANDATTACKTIME,              // Size:1
+    UNIT_FIELD_RANGEDATTACKTIME,               // Size:1
+    UNIT_FIELD_BOUNDINGRADIUS,                 // Size:1
+    UNIT_FIELD_COMBATREACH,                    // Size:1
+    UNIT_FIELD_DISPLAYID,                      // Size:1
+    UNIT_FIELD_NATIVEDISPLAYID,                // Size:1
+    UNIT_FIELD_MOUNTDISPLAYID,                 // Size:1
+    UNIT_FIELD_MINDAMAGE,                      // Size:1
+    UNIT_FIELD_MAXDAMAGE,                      // Size:1
+    UNIT_FIELD_MINOFFHANDDAMAGE,               // Size:1
+    UNIT_FIELD_MAXOFFHANDDAMAGE,               // Size:1
+    UNIT_FIELD_BYTES_1,                        // Size:1
+    UNIT_FIELD_PETNUMBER,                      // Size:1
+    UNIT_FIELD_PET_NAME_TIMESTAMP,             // Size:1
+    UNIT_FIELD_PETEXPERIENCE,                  // Size:1
+    UNIT_FIELD_PETNEXTLEVELEXP,                // Size:1
+    UNIT_DYNAMIC_FLAGS,                        // Size:1
+    UNIT_CHANNEL_SPELL,                        // Size:1
+    UNIT_MOD_CAST_SPEED,                       // Size:1 Represented as Int32 before 1.12, after that it's Float.
+    UNIT_CREATED_BY_SPELL,                     // Size:1
+    UNIT_NPC_FLAGS,                            // Size:1
+    UNIT_NPC_EMOTESTATE,                       // Size:1
+    UNIT_TRAINING_POINTS,                      // Size:1
+    UNIT_FIELD_STAT0,                          // Size:1
+    UNIT_FIELD_STAT1,                          // Size:1
+    UNIT_FIELD_STAT2,                          // Size:1
+    UNIT_FIELD_STAT3,                          // Size:1
+    UNIT_FIELD_STAT4,                          // Size:1
+    UNIT_FIELD_RESISTANCES,                    // Size:7
+    UNIT_FIELD_RESISTANCES_01,
+    UNIT_FIELD_RESISTANCES_02,
+    UNIT_FIELD_RESISTANCES_03,
+    UNIT_FIELD_RESISTANCES_04,
+    UNIT_FIELD_RESISTANCES_05,
+    UNIT_FIELD_RESISTANCES_06,
+    UNIT_FIELD_BASE_MANA,                      // Size:1
+    UNIT_FIELD_BASE_HEALTH,                    // Size:1
+    UNIT_FIELD_BYTES_2,                        // Size:1
+    UNIT_FIELD_ATTACK_POWER,                   // Size:1
+    UNIT_FIELD_ATTACK_POWER_MODS,              // Size:1
+    UNIT_FIELD_ATTACK_POWER_MULTIPLIER,        // Size:1
+    UNIT_FIELD_RANGED_ATTACK_POWER,            // Size:1
+    UNIT_FIELD_RANGED_ATTACK_POWER_MODS,       // Size:1
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, // Size:1
+#endif
+    UNIT_FIELD_MINRANGEDDAMAGE,                // Size:1
+    UNIT_FIELD_MAXRANGEDDAMAGE,                // Size:1
+    UNIT_FIELD_POWER_COST_MODIFIER,            // Size:7
+    UNIT_FIELD_POWER_COST_MODIFIER_01,
+    UNIT_FIELD_POWER_COST_MODIFIER_02,
+    UNIT_FIELD_POWER_COST_MODIFIER_03,
+    UNIT_FIELD_POWER_COST_MODIFIER_04,
+    UNIT_FIELD_POWER_COST_MODIFIER_05,
+    UNIT_FIELD_POWER_COST_MODIFIER_06,
+    UNIT_FIELD_POWER_COST_MULTIPLIER,          // Size:7
+    UNIT_FIELD_POWER_COST_MULTIPLIER_01,
+    UNIT_FIELD_POWER_COST_MULTIPLIER_02,
+    UNIT_FIELD_POWER_COST_MULTIPLIER_03,
+    UNIT_FIELD_POWER_COST_MULTIPLIER_04,
+    UNIT_FIELD_POWER_COST_MULTIPLIER_05,
+    UNIT_FIELD_POWER_COST_MULTIPLIER_06,
+    UNIT_FIELD_PADDING,
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    UNIT_FIELD_PADDING_2,
+#endif
+    UNIT_END,
 
 #if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_12_1
     PLAYER_SELECTION                           = 0x00 + UNIT_END,

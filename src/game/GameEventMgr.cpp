@@ -591,6 +591,7 @@ void GameEventMgr::LoadFromDB()
 
     mGameEventMails.resize(mGameEvent.size() * 2 - 1);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     result = WorldDatabase.Query("SELECT event, raceMask, quest, mailTemplateId, senderEntry FROM game_event_mail");
 
     count = 0;
@@ -669,6 +670,7 @@ void GameEventMgr::LoadFromDB()
         sLog.outString();
         sLog.outString(">> Loaded %u start/end game event mails", count);
     }
+#endif
 }
 
 uint32 GameEventMgr::Initialize()                           // return the next event delay in ms

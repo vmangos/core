@@ -597,8 +597,9 @@ void PlayerMenu::SendQuestQueryResponse(Quest const *pQuest)
     else
         data << uint32(pQuest->GetRewOrReqMoney());
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     data << uint32(pQuest->GetRewMoneyMaxLevel());          // used in XP calculation at client
-
+#endif
     data << uint32(pQuest->GetRewSpell());                  // reward spell, this spell will display (icon) (casted if RewSpellCast==0)
 
     data << uint32(pQuest->GetSrcItemId());                 // source item id

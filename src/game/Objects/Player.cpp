@@ -2858,7 +2858,7 @@ void Player::GiveLevel(uint32 level)
         data << uint32(int32(info.stats[i]) - GetCreateStat(Stats(i)));
 
     GetSession()->SendPacket(&data);
-
+    
     SetUInt32Value(PLAYER_NEXT_LEVEL_XP, sObjectMgr.GetXPForLevel(level));
 
     //update level, max level of skills
@@ -3001,7 +3001,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
     SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, 0.0f);
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER,     0);
     SetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS, 0);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     SetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER, 0.0f);
+#endif
 
     // Base crit values (will be recalculated in UpdateAllStats() at loading and in _ApplyAllStatBonuses() at reset
     SetFloatValue(PLAYER_CRIT_PERCENTAGE, 0.0f);
@@ -20198,7 +20200,9 @@ void Player::BuildTeleportAckMsg(WorldPacket& data, float x, float y, float z, f
     mi.ChangePosition(x, y, z, ang);
     data.Initialize(MSG_MOVE_TELEPORT_ACK, 41);
     data << GetPackGUID();
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     data << uint32(0);                                      // this value increments every time
+#endif
     data << mi;
 }
 

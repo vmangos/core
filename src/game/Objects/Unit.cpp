@@ -8179,9 +8179,14 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
         {
             if (Player* me = GetAffectingPlayer())
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 18);
                 dataForMe << GetPackGUID();
                 dataForMe << uint32(0);
+#else
+                WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 14);
+                dataForMe << GetPackGUID();
+#endif
                 dataForMe << float(GetSpeed(mtype));
                 me->GetSession()->SendPacket(&dataForMe);
                 me->GetCheatData()->OrderSent(&dataForMe);
@@ -8921,7 +8926,11 @@ float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
         int32 ap = GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER) + GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS);
         if (ap < 0)
             return 0.0f;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         return ap * (1.0f + GetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER));
+#else
+        return ap;
+#endif
     }
     else
     {

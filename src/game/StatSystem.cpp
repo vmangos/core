@@ -232,7 +232,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     {
         index = UNIT_FIELD_RANGED_ATTACK_POWER;
         index_mod = UNIT_FIELD_RANGED_ATTACK_POWER_MODS;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         index_mult = UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER;
+#endif
 
         switch (getClass())
         {
@@ -754,7 +756,9 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
     {
         index = UNIT_FIELD_RANGED_ATTACK_POWER;
         index_mod = UNIT_FIELD_RANGED_ATTACK_POWER_MODS;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         index_mult = UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER;
+#endif
     }
 
     float base_attPower  = GetModifierValue(unitMod, BASE_VALUE) * GetModifierValue(unitMod, BASE_PCT);

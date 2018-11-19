@@ -4430,8 +4430,8 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Loading xp per level data
     {
-        mPlayerXPperLevel.resize(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
-        for (uint32 level = 0; level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
+        mPlayerXPperLevel.resize(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)+1);
+        for (uint32 level = 0; level <= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
             mPlayerXPperLevel[level] = 0;
 
         //                                                 0    1
@@ -4459,7 +4459,7 @@ void ObjectMgr::LoadPlayerInfo()
             uint32 current_level = fields[0].GetUInt32();
             uint32 current_xp    = fields[1].GetUInt32();
 
-            if (current_level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+            if (current_level > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
             {
                 if (current_level > STRONG_MAX_LEVEL)       // hardcoded level maximum
                     sLog.outErrorDb("Wrong (> %u) level %u in `player_xp_for_level` table, ignoring.", STRONG_MAX_LEVEL, current_level);
@@ -5307,6 +5307,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RewMailTemplateId)
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             if (!sMailTemplateStore.LookupEntry(qinfo->RewMailTemplateId))
             {
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
@@ -5324,6 +5325,9 @@ void ObjectMgr::LoadQuests()
             }
             else
                 usedMailTemplates[qinfo->RewMailTemplateId] = qinfo->GetQuestId();
+#else
+            qinfo->RewMailTemplateId = 0;
+#endif
         }
 
         if (qinfo->NextQuestInChain)
@@ -7471,9 +7475,10 @@ uint32 ObjectMgr::GetBaseXP(uint32 level) const
 
 uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
-    if (level < mPlayerXPperLevel.size())
-        return mPlayerXPperLevel[level];
-    return 0;
+    if (mPlayerXPperLevel.empty())
+        return 0;
+
+    return mPlayerXPperLevel[std::min(level, uint32(mPlayerXPperLevel.size() - 1))];
 }
 
 void ObjectMgr::LoadPetNames()

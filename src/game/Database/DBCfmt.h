@@ -26,7 +26,11 @@ const char AreaTableEntryfmt[]="niiiixxxxxissssssssxixxxi";
 const char AreaTriggerEntryfmt[]="niffffffff";
 const char AuctionHouseEntryfmt[]="niiixxxxxxxxx";
 const char BankBagSlotPricesEntryfmt[]="ni";
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
 const char ChrClassesEntryfmt[]="nxxixssssssssxxix";
+#else
+const char ChrClassesEntryfmt[] = "nxxixssssssssxxi";
+#endif
 const char ChrRacesEntryfmt[]="niixiixxixxxxxixissssssssxxxx";
 const char CharStartOutfitEntryfmt[]="diiiiiiiiiiiiixxxxxxxxxxxxxxxxxxxxxxxxxxx";
 const char ChatChannelsEntryfmt[]="nixssssssssxxxxxxxxxx";                 // ChatChannelsEntryfmt, index not used (more compact store)

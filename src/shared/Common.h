@@ -184,8 +184,10 @@ inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
 #define MAX_CONTENT_PATCH 10
 #elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
 #define MAX_CONTENT_PATCH 9
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
 #define MAX_CONTENT_PATCH 8
+#else
+#define MAX_CONTENT_PATCH 7
 #endif
 
 enum TimeConstants
