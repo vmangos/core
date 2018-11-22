@@ -6428,10 +6428,16 @@ SpellCastResult Spell::CheckCast(bool strict)
                 }
             }
         }
+        // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+        //  - All spells / abilities that remove existing effects(e.g.Dispel Magic,
+        //    Cleanse, Remove Curse etc...) will now verify that there is an effect
+        //    that can be removed before casting.
+#if SUPPORTED_CLIENT_CLIENT > CLIENT_BUILD_1_9_4
         if (!bFoundOneDispell)
         {
             return SPELL_FAILED_NOTHING_TO_DISPEL;
         }
+#endif
     }
 
     for (int i = 0; i < MAX_EFFECT_INDEX; ++i)
