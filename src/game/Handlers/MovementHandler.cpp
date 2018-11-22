@@ -341,6 +341,21 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
     movementInfo.Write(data);                             // write data
 
     mover->SendMovementMessageToSet(std::move(data), true, _player);
+
+    // Fix movement issue on older clients where if the player jumps while running,
+    // and then lets go of the key while in the air, he appears to continue moving
+    // forward on other people's screen. Once he moves for real, they will see him
+    // teleport back to where he was standing after he jumped.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    if ((opcode == MSG_MOVE_FALL_LAND) && !movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN))
+    {
+        WorldPacket data(MSG_MOVE_STOP, recv_data.size());
+        data << _clientMoverGuid.WriteAsPacked();             // write guid
+        movementInfo.Write(data);                             // write data
+
+        mover->SendMovementMessageToSet(std::move(data), true, _player);
+    }
+#endif
 }
 
 void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
@@ -476,9 +491,10 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
     DEBUG_LOG("WORLD: Recvd CMSG_MOVE_NOT_ACTIVE_MOVER");
     recv_data.hexlike();
 
-    ObjectGuid old_mover_guid;
     MovementInfo mi;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    ObjectGuid old_mover_guid;
     recv_data >> old_mover_guid;
     recv_data >> mi;
     _clientMoverGuid = ObjectGuid();
@@ -493,6 +509,10 @@ void WorldSession::HandleMoveNotActiveMoverOpcode(WorldPacket &recv_data)
         recv_data.rpos(recv_data.wpos());                   // prevent warnings spam
         return;
     }
+#else
+    recv_data >> mi;
+    _clientMoverGuid = ObjectGuid();
+#endif
 
     _player->m_movementInfo = mi;
 }

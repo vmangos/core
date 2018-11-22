@@ -1309,7 +1309,7 @@ INSERT INTO `item_template` (`entry`, `patch`, `class`, `subclass`, `name`, `des
 UPDATE `taxi_path_transitions` SET `build_min`=5302 WHERE `build_min`=0;
 
 -- Missing creature template used by Orange Murloc Egg.
-INSERT INTO `creature_template` (`entry`, `patch`, `modelid_1`, `name`, `faction_A`, `faction_H`, `minlevel`, `maxlevel`, `minhealth`, `maxhealth`, `speed_walk`, `speed_run`, `scale`, `InhabitType`, `type`) VALUES (15361, 6, 15395, 'Murki', 188, 188, 1, 1, 1, 1, 1, 1.14286, 0, 3, 12);
+INSERT INTO `creature_template` (`entry`, `patch`, `modelid_1`, `name`, `faction_A`, `faction_H`, `minlevel`, `maxlevel`, `minhealth`, `maxhealth`, `speed_walk`, `speed_run`, `scale`, `InhabitType`, `type`) VALUES (15361, 6, 15395, 'Murki', 188, 188, 1, 1, 1, 1, 1, 1.14286, 0, 3, 1);
 
 -- Non existing models.
 UPDATE `creature_model_info` SET `build`=5302 WHERE `modelid` IN (15947, 15965, 15966, 15967, 15968, 15972, 15974, 15975, 15976, 15977, 15979, 15980, 15981, 15982, 15985, 15987, 15991, 15993, 15994, 15995, 15996, 15997, 15998, 15999, 16000, 16003, 16004, 16017, 16018, 16019, 16020, 16021, 16022, 16023, 16025, 16031, 16185, 16186, 16187, 16189, 16257, 16259);
