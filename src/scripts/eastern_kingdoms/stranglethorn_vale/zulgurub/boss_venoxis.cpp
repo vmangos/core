@@ -54,8 +54,8 @@ enum
 
 /*
 SELECT * FROM creature_template WHERE entry=14877;
-INSERT INTO creature_template (entry, modelid_1, modelid_2, name, faction_A, faction_H)
-VALUES (14877, 15102, 15102, "High Priest Venoxis Transform Visual", 35, 35);
+INSERT INTO creature_template (entry, modelid_1, modelid_2, name, faction)
+VALUES (14877, 15102, 15102, "High Priest Venoxis Transform Visual", 35);
 */
 
 struct boss_venoxisAI : public ScriptedAI

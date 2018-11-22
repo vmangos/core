@@ -1896,7 +1896,7 @@ void SpellMgr::LoadSpellElixirs()
     uint32 count = 0;
 
     //                                                0      1
-    QueryResult *result = WorldDatabase.Query("SELECT entry, mask FROM spell_elixir");
+    QueryResult *result = WorldDatabase.PQuery("SELECT entry, mask FROM spell_elixir WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD);
     if (!result)
     {
 
@@ -2007,7 +2007,7 @@ void SpellMgr::LoadSpellThreats()
     mSpellThreatMap.clear();                                // need for reload case
 
     //                                                0      1       2           3
-    QueryResult *result = WorldDatabase.Query("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat");
+    QueryResult *result = WorldDatabase.PQuery("SELECT entry, Threat, multiplier, ap_bonus FROM spell_threat WHERE %u BETWEEN build_min AND build_max", SUPPORTED_CLIENT_BUILD);
     if (!result)
     {
         BarGoLink bar(1);

@@ -3195,10 +3195,10 @@ void Aura::HandleModCharm(bool apply, bool Real)
                 if (Unit* owner = target->GetOwner())
                     target->setFaction(owner->getFaction());
                 else if (cinfo)
-                    target->setFaction(cinfo->faction_A);
+                    target->setFaction(cinfo->faction);
             }
             else if (cinfo)                             // normal creature
-                target->setFaction(cinfo->faction_A);
+                target->setFaction(cinfo->faction);
 
             // restore UNIT_FIELD_BYTES_0
             if (cinfo && caster && caster->IsPlayer() && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)

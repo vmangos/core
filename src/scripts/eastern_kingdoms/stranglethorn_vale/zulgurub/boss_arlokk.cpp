@@ -69,7 +69,7 @@ enum
 
 /*
 [SQL]
-INSERT INTO creature_template SET entry=14968, modelid_1=15013, modelid_2=15013, name="High Priestess Arlokk Transform Visual", faction_A=35, faction_H=35;
+INSERT INTO creature_template SET entry=14968, modelid_1=15013, modelid_2=15013, name="High Priestess Arlokk Transform Visual", faction=35
 */
 
 struct boss_arlokkAI : public ScriptedAI

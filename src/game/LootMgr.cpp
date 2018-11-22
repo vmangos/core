@@ -1487,6 +1487,7 @@ void LoadLootTemplates_Pickpocketing()
 
 void LoadLootTemplates_Mail()
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     LootIdSet ids_set;
     LootTemplates_Mail.LoadAndCollectLootIds(ids_set);
 
@@ -1497,6 +1498,7 @@ void LoadLootTemplates_Mail()
 
     // output error for any still listed (not referenced from appropriate table) ids
     LootTemplates_Mail.ReportUnusedIds(ids_set);
+#endif
 }
 
 void LoadLootTemplates_Skinning()

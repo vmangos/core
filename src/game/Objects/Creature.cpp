@@ -484,10 +484,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
 
     SelectLevel(GetCreatureInfo(), preserveHPAndPower ? GetHealthPercent() : 100.0f, 100.0f);
 
-    if (team == HORDE)
-        setFaction(GetCreatureInfo()->faction_H);
-    else
-        setFaction(GetCreatureInfo()->faction_A);
+    setFaction(GetCreatureInfo()->faction);
 
     SetUInt32Value(UNIT_NPC_FLAGS, GetCreatureInfo()->npcflag);
 
@@ -548,7 +545,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
 
     m_reputationId = -1;
     // checked and error show at loading templates
-    if (FactionTemplateEntry const* pFactionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction_A))
+    if (FactionTemplateEntry const* pFactionTemplate = sObjectMgr.GetFactionTemplateEntry(GetCreatureInfo()->faction))
     {
         if (pFactionTemplate->factionFlags & FACTION_TEMPLATE_FLAG_PVP || IsCivilian())
             SetPvP(true);
@@ -3158,7 +3155,7 @@ void Creature::ClearTemporaryFaction()
         return;
 
     m_temporaryFactionFlags = TEMPFACTION_NONE;
-    setFaction(GetCreatureInfo()->faction_A);
+    setFaction(GetCreatureInfo()->faction);
 }
 
 void Creature::SendAreaSpiritHealerQueryOpcode(Player *pl)

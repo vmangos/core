@@ -1140,13 +1140,9 @@ void ObjectMgr::CheckCreatureTemplates()
         if (!cInfo)
             continue;
 
-        FactionTemplateEntry const* factionTemplate = GetFactionTemplateEntry(cInfo->faction_A);
+        FactionTemplateEntry const* factionTemplate = GetFactionTemplateEntry(cInfo->faction);
         if (!factionTemplate)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction_A template (%u)", cInfo->Entry, cInfo->faction_A);
-
-        factionTemplate = GetFactionTemplateEntry(cInfo->faction_H);
-        if (!factionTemplate)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction_H template (%u)", cInfo->Entry, cInfo->faction_H);
+            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction template (%u)", cInfo->Entry, cInfo->faction);
 
         for (int k = 0; k < MAX_KILL_CREDIT; ++k)
         {
@@ -4094,8 +4090,8 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Load playercreate spells
     {
-        //                                                0     1      2
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, Spell FROM playercreateinfo_spell");
+        //                                                  0       1        2
+        QueryResult *result = WorldDatabase.PQuery("SELECT `race`, `class`, `spell` FROM playercreateinfo_spell WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD);
 
         uint32 count = 0;
 
