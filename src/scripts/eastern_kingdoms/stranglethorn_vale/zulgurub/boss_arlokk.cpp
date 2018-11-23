@@ -157,7 +157,7 @@ struct boss_arlokkAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
 
         m_creature->RemoveAurasDueToSpell(SPELL_PANTHER_TRANSFORM);
-        m_creature->LeaveVanish();
+        LeaveVanish();
         m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, 1.0f);
 
         if (m_pInstance)
@@ -314,7 +314,7 @@ struct boss_arlokkAI : public ScriptedAI
         {
             //Invisble Model
             m_creature->RemoveAurasDueToSpell(SPELL_PANTHER_TRANSFORM);
-            m_creature->EnterVanish();
+            EnterVanish();
 
             m_bIsVanished = true;
 
@@ -340,8 +340,8 @@ struct boss_arlokkAI : public ScriptedAI
 
                 // Et embush
                 Unit* pVanishTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-                m_creature->LeaveVanish();
-                m_creature->Ambush(pVanishTarget, SPELL_BACKSTAB);
+                LeaveVanish();
+                Ambush(pVanishTarget, SPELL_BACKSTAB);
 
                 m_bIsPhaseTwo = true;
                 m_bIsVanished = false;

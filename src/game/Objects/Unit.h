@@ -2009,9 +2009,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         // Caster ?
         bool IsCaster();
-        void EnterVanish();
-        void LeaveVanish();
-        void Ambush(Unit* pNewVictim, uint32 embushSpellId = 0);
         CreatureAI* AI() const;
 
         // Auras

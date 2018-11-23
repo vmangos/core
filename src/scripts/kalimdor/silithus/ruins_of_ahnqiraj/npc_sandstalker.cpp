@@ -19,38 +19,38 @@ struct npc_sandstalkerAI : public ScriptedAI
 
     void JustReachedHome()
     {
-        m_creature->EnterVanish();
+        EnterVanish();
     }
 
     void Reset()
     {
-        m_creature->EnterVanish();
+        EnterVanish();
         m_uiBurrow_Timer = 5000;
     }
 
     void Aggro(Unit* pWho)
     {
         Unit* pVanishTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-        m_creature->LeaveVanish();
-        m_creature->Ambush(pVanishTarget, SPELL_BURROW);
+        LeaveVanish();
+        Ambush(pVanishTarget, SPELL_BURROW);
     }
 
     void JustDied(Unit* pKiller)
     {
-        m_creature->LeaveVanish();
+        LeaveVanish();
     }
 
     void UpdateAI(const uint32 uiDiff)
     {
         if (!m_creature->isInCombat())
-            m_creature->EnterVanish();
+            EnterVanish();
 
         if (m_uiBurrow_Timer < uiDiff)
         {
-            m_creature->EnterVanish();
+            EnterVanish();
             Unit* pVanishTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-            m_creature->LeaveVanish();
-            m_creature->Ambush(pVanishTarget, SPELL_BURROW);
+            LeaveVanish();
+            Ambush(pVanishTarget, SPELL_BURROW);
             m_uiBurrow_Timer = urand(5000, 10000);
         }
         else

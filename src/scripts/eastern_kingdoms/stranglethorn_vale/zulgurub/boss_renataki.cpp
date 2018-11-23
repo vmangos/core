@@ -67,7 +67,7 @@ struct boss_renatakiAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        m_creature->LeaveVanish();
+        LeaveVanish();
     }
 
     void UpdateAI(const uint32 diff)
@@ -89,9 +89,9 @@ struct boss_renatakiAI : public ScriptedAI
             if (Visible_Timer < diff)
             {
                 Unit* pTarget = m_creature->SelectAttackingTarget(ATTACKING_TARGET_RANDOM, 0);
-                m_creature->LeaveVanish();
+                LeaveVanish();
                 ASSERT(pTarget);
-                m_creature->Ambush(pTarget, SPELL_AMBUSH);
+                Ambush(pTarget, SPELL_AMBUSH);
 
                 Invisible = false;
                 Visible_Timer = 20000;
@@ -111,7 +111,7 @@ struct boss_renatakiAI : public ScriptedAI
         //Invisible_Timer
         if (Invisible_Timer < diff)
         {
-            m_creature->EnterVanish();
+            EnterVanish();
             Invisible = true;
 
             Invisible_Timer = urand(30000, 42000);

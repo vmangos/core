@@ -11038,56 +11038,6 @@ bool Unit::IsCaster()
     }
 }
 
-void Unit::EnterVanish()
-{
-    SetVisibility(VISIBILITY_OFF);
-    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-    InterruptSpellsCastedOnMe(true);
-    InterruptAttacksOnMe();
-    AttackStop();
-    InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-    // DoResetThreat :
-    if (Creature* pCrea = ToCreature())
-    {
-        if (!pCrea->CanHaveThreatList() || pCrea->getThreatManager().isThreatListEmpty())
-            return;
-
-        ThreatList const& tList = pCrea->getThreatManager().getThreatList();
-        for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-        {
-            Unit* pUnit = pCrea->GetMap()->GetUnit((*itr)->getUnitGuid());
-
-            if (pUnit && pCrea->getThreatManager().getThreat(pUnit))
-                pCrea->getThreatManager().modifyThreatPercent(pUnit, -100);
-        }
-    }
-}
-
-void Unit::LeaveVanish()
-{
-    SetVisibility(VISIBILITY_ON);
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FIELD_FLAGS);
-}
-
-void Unit::Ambush(Unit* pNewVictim, uint32 embushSpellId)
-{
-    if (!pNewVictim)
-        return;
-    if (Creature* pCrea = ToCreature())
-    {
-        // Se position derriere
-        float x, y, z;
-        pNewVictim->GetRelativePositions(-4.0f, 0.0f, 0.0f, x, y, z);
-        pCrea->NearTeleportTo(x, y, z, 0.0f);
-        pCrea->SetFacingToObject(pNewVictim);
-        // Embush
-        if (embushSpellId)
-            pCrea->CastSpell(pNewVictim, embushSpellId, true);
-        if (pCrea->AI())
-            pCrea->AI()->AttackStart(pNewVictim);
-    }
-}
-
 bool Unit::isAttackableByAOE(bool requireDeadTarget, bool isCasterPlayer) const
 {
     if (isAlive() == requireDeadTarget)
