@@ -2334,15 +2334,6 @@ void ObjectMgr::LoadItemLocales()
     sLog.outString(">> Loaded %lu Item locale strings", (unsigned long)mItemLocaleMap.size());
 }
 
-struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
-{
-    template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
-    {
-        dst = D(sScriptMgr.GetScriptId(src));
-    }
-};
-
 // In order to keep database item template data correct for each patch, fix changed spell effects used by some items here.
 // For cases where the spell data itself changed and we need to use a substitute spell id in later clients to recreate old item version.
 void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
@@ -3396,8 +3387,7 @@ void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
 
 void ObjectMgr::LoadItemPrototypes()
 {
-    SQLItemLoader loader;
-    loader.LoadProgressive(sItemStorage, sWorld.GetWowPatch());
+    sItemStorage.LoadProgressive(sWorld.GetWowPatch());
     mQuestStartingItems.clear();
     sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();
