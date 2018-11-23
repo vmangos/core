@@ -2259,7 +2259,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         return;
     }
 
-    // remove polymorph before changing display id to keep new display id
     switch (form)
     {
         case FORM_CAT:
@@ -2270,30 +2269,8 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         case FORM_DIREBEAR:
         case FORM_MOONKIN:
         {
-            // remove movement affects
-            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
-            Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
-            for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
-            {
-                SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
-
-                uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
-
-                // If spell that caused this aura has Croud Control or Daze effect
-                if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
-                        // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
-                        (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
-                        (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
-                {
-                    ++iter;
-                    continue;
-                }
-
-                // All OK, remove aura now
-                target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
-                iter = slowingAuras.begin();
-            }
-
+            // Cast Shapeshift Form Effect to remove slows and roots.
+            target->CastSpell(target, 9033, true);
             break;
         }
         case FORM_BERSERKERSTANCE:
@@ -3871,10 +3848,6 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
 
     if (apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
         target->RemoveAurasAtMechanicImmunity(1 << (misc - 1), GetId());
-
-    // Transfert ne doit pas appliquer d'immunite pendant 1sec, mais simplement dispel
-    if (GetSpellProto()->DurationIndex == 36)
-        return;
 
     target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, misc, apply);
 
