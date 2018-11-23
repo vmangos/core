@@ -7446,31 +7446,39 @@ bool Unit::IsInDisallowedMountForm() const
     return false;
 }
 
-void Unit::SetInCombatWith(Unit* enemy)
+void Unit::SetInCombatWith(Unit* pEnemy)
 {
-    ASSERT(enemy);
-    Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    ASSERT(eOwner);
-    if (eOwner->IsPvP())
+    ASSERT(pEnemy);
+    Unit* pEnemyOwner = pEnemy->GetCharmerOrOwnerOrSelf();
+    ASSERT(pEnemyOwner);
+
+    if (pEnemyOwner->IsPvP())
     {
-        SetInCombatState(true, enemy);
+        SetInCombatState(true, pEnemy);
         return;
     }
 
-    //check for duel
-    if (eOwner->GetTypeId() == TYPEID_PLAYER && ((Player*)eOwner)->duel)
+    if (Player* pEnemyPlayer = pEnemyOwner->ToPlayer())
     {
-        if (Player const* myOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
+        if (pEnemyPlayer->duel)
         {
-            if (myOwner->IsInDuelWith((Player const*)eOwner))
+            if (Player const* myOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
             {
-                SetInCombatState(true, enemy);
-                return;
+                if (myOwner->IsInDuelWith(pEnemyPlayer))
+                {
+                    SetInCombatState(true, pEnemy);
+                    return;
+                }
             }
+        }
+        if (pEnemyPlayer->IsFFAPvP())
+        {
+            SetInCombatState(true, pEnemy);
+            return;
         }
     }
 
-    SetInCombatState(false, enemy);
+    SetInCombatState(false, pEnemy);
 }
 
 void Unit::SetInCombatState(bool PvP, Unit* enemy)
@@ -7631,6 +7639,9 @@ bool Unit::IsValidAttackTarget(Unit const* target) const
 
         if (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP
                 && playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP)
+            return true;
+
+        if (playerAffectingAttacker->IsFFAPvP() && playerAffectingTarget->IsFFAPvP())
             return true;
 
         return (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_UNK1)
