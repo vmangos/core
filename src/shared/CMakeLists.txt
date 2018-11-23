@@ -26,6 +26,7 @@ set (shared_SRCS
 	migrations_list.h
 	PosixDaemon.h
 	ProgressBar.h
+    Progression.h
 	revision.h
 	ServiceWin32.h
 	SystemConfig.h

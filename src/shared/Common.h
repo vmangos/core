@@ -165,30 +165,7 @@ inline float finiteAlways(float f) { return finite(f) ? f : 0.0f; }
 #define PAIR32_HIPART(x)   (uint16)((uint32(x) >> 16) & 0x0000FFFF)
 #define PAIR32_LOPART(x)   (uint16)(uint32(x)         & 0x0000FFFF)
 
-// Game client builds
-#define CLIENT_BUILD_1_2_4 4222
-#define CLIENT_BUILD_1_3_1 4297
-#define CLIENT_BUILD_1_4_2 4375
-#define CLIENT_BUILD_1_5_1 4449
-#define CLIENT_BUILD_1_6_1 4544
-#define CLIENT_BUILD_1_7_1 4695
-#define CLIENT_BUILD_1_8_4 4878
-#define CLIENT_BUILD_1_9_4 5086
-#define CLIENT_BUILD_1_10_2 5302
-#define CLIENT_BUILD_1_11_2 5464
-#define CLIENT_BUILD_1_12_1 5875
-// Change this to define which version players can use
-#define SUPPORTED_CLIENT_BUILD CLIENT_BUILD_1_12_1
-
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-#define MAX_CONTENT_PATCH 10
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-#define MAX_CONTENT_PATCH 9
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-#define MAX_CONTENT_PATCH 8
-#else
-#define MAX_CONTENT_PATCH 7
-#endif
+#include "Progression.h"
 
 enum TimeConstants
 {
