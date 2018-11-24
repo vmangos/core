@@ -32,13 +32,14 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceWipes.clear();
     sLog.outString("> Loading table `instance_wipes`");
     uint32 count = 0;
-    QueryResult* result = LogsDatabase.Query("SELECT mapId, creatureEntry, count FROM instance_wipes");
+    std::unique_ptr<QueryResult> result(LogsDatabase.Query("SELECT `mapId`, `creatureEntry`, `count` FROM `instance_wipes`"));
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString(">> Table instance_wipes is empty.");
+
         sLog.outString();
+        sLog.outString(">> Table instance_wipes is empty.");
     }
     else
     {
@@ -46,7 +47,6 @@ void InstanceStatisticsMgr::LoadFromDB()
         do
         {
             bar.step();
-
             Field* fields = result->Fetch();
 
             uint32 mapId = fields[0].GetUInt32();
@@ -57,24 +57,22 @@ void InstanceStatisticsMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-        sLog.outString(">> Loaded %u entries from instance_wipes", count);
         sLog.outString();
-
-        delete result;
+        sLog.outString(">> Loaded %u entries from `instance_wipes`", count);
     }
-
 
 
     m_instanceCreatureKills.clear();
     sLog.outString("> Loading table `instance_creature_kills`");
     count = 0;
-    result = LogsDatabase.Query("SELECT mapId, creatureEntry, spellEntry, count FROM instance_creature_kills");
+    result.reset(LogsDatabase.Query("SELECT `mapId`, `creatureEntry`, `spellEntry`, `count` FROM `instance_creature_kills`"));
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString(">> Table instance_creature_kills is empty.");
+
         sLog.outString();
+        sLog.outString(">> Table instance_creature_kills is empty.");
     }
     else
     {
@@ -82,7 +80,6 @@ void InstanceStatisticsMgr::LoadFromDB()
         do
         {
             bar.step();
-
             Field* fields = result->Fetch();
 
             uint32 mapId = fields[0].GetUInt32();
@@ -105,10 +102,8 @@ void InstanceStatisticsMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-        sLog.outString(">> Loaded %u entries from instance_creature_kills", count);
         sLog.outString();
-
-        delete result;
+        sLog.outString(">> Loaded %u entries from `instance_creature_kills`", count);
     }
 
 
@@ -116,13 +111,14 @@ void InstanceStatisticsMgr::LoadFromDB()
     m_instanceCustomCounters.clear();
     sLog.outString("> Loading table `instance_custom_counters`");
     count = 0;
-    result = LogsDatabase.Query("SELECT `index`, `count` FROM instance_custom_counters");
+    result.reset(LogsDatabase.Query("SELECT `index`, `count` FROM `instance_custom_counters`"));
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString(">> Table instance_custom_counters is empty.");
+
         sLog.outString();
+        sLog.outString(">> Table `instance_custom_counters` is empty.");
     }
     else
     {
@@ -139,10 +135,8 @@ void InstanceStatisticsMgr::LoadFromDB()
             ++count;
         } while (result->NextRow());
 
-        sLog.outString(">> Loaded %u entries from instance_custom_counters", count);
         sLog.outString();
-
-        delete result;
+        sLog.outString(">> Loaded %u entries from `instance_custom_counters`", count);
     }
 }
 

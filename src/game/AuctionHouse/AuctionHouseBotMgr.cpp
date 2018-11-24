@@ -42,20 +42,25 @@ void AuctionHouseBotMgr::load()
         config = NULL;
     }
     /*2 - LOAD */
-    QueryResult* result = WorldDatabase.Query("SELECT item,stack,bid,buyout FROM auctionhousebot");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `item`, `stack`, `bid`, `buyout` FROM `auctionhousebot`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded 0 AuctionHouseBot item");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     Field *fields;
     do
     {
+        bar.step();
         AuctionHouseBotEntry e;
         fields    = result->Fetch();
         e.item    = fields[0].GetUInt32();
@@ -68,7 +73,6 @@ void AuctionHouseBotMgr::load()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u AuctionHouseBot items", count);
@@ -85,7 +89,7 @@ void AuctionHouseBotMgr::load()
     auctionHouseEntry = sAuctionMgr.GetAuctionHouseEntry(config->ahfid);
     if (!auctionHouseEntry)
     {
-        sLog.outInfo("AuctionHouseBotMgr::load() : Faction de l'AH incorrect : %u", config->ahfid);
+        sLog.outInfo("AuctionHouseBotMgr::load() : Incorrect faction - %u", config->ahfid);
         return;
     }
     m_loaded = true;

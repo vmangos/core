@@ -32,13 +32,13 @@ void AuraRemovalManager::LoadFromDB()
 
     sLog.outString("> Loading table `instance_buff_removal`");
     uint32 count = 0;
-    QueryResult* result = WorldDatabase.Query("SELECT mapId, auraId, enabled, flags, comment FROM instance_buff_removal");
+    QueryResult* result = WorldDatabase.Query("SELECT map_id, spell_id, enabled, flags, comment FROM instance_buff_removal");
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString(">> Table instance_buff_removal is empty.");
         sLog.outString();
+        sLog.outString(">> Table instance_buff_removal is empty.");
     }
     else
     {

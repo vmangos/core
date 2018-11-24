@@ -202,9 +202,9 @@ void ReputationMgr::Initialize()
 {
     m_factions.clear();
 
-    for (unsigned int i = 1; i < sObjectMgr.GetMaxFactionId(); i++)
+    for (auto const& itr : sObjectMgr.GetFactionMap())
     {
-        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(i);
+        FactionEntry const *factionEntry = &itr.second;
 
         if (factionEntry && (factionEntry->reputationListID >= 0))
         {

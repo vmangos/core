@@ -436,15 +436,16 @@ void WeatherMgr::LoadWeatherZoneChances()
 {
     uint32 count = 0;
 
-    //                                                0     1                   2                   3                    4                   5                   6                    7                 8                 9                  10                  11                  12
-    QueryResult* result = WorldDatabase.Query("SELECT zone, spring_rain_chance, spring_snow_chance, spring_storm_chance, summer_rain_chance, summer_snow_chance, summer_storm_chance, fall_rain_chance, fall_snow_chance, fall_storm_chance, winter_rain_chance, winter_snow_chance, winter_storm_chance FROM game_weather");
+    //                                                               0       1                     2                     3                      4                     5                     6                      7                   8                   9                    10                    11                    12
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `zone`, `spring_rain_chance`, `spring_snow_chance`, `spring_storm_chance`, `summer_rain_chance`, `summer_snow_chance`, `summer_storm_chance`, `fall_rain_chance`, `fall_snow_chance`, `fall_storm_chance`, `winter_rain_chance`, `winter_snow_chance`, `winter_storm_chance` FROM `game_weather`"));
 
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outErrorDb(">> Loaded 0 weather definitions. DB table `game_weather` is empty.");
+
         sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 weather definitions. DB table `game_weather` is empty.");
         return;
     }
 
@@ -488,8 +489,6 @@ void WeatherMgr::LoadWeatherZoneChances()
     }
     while (result->NextRow());
 
-    delete result;
-
-    sLog.outString(">> Loaded %u weather definitions", count);
     sLog.outString();
+    sLog.outString(">> Loaded %u weather definitions", count);
 }

@@ -1722,29 +1722,27 @@ bool ChatHandler::HandleLookupSoundCommand(char* args)
 
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
-    for (uint32 id = 0; id < sObjectMgr.GetMaxSoundId(); ++id)
+    for (auto const& itr : sObjectMgr.GetSoundEntriesMap())
     {
-        SoundEntriesEntry const *soundEntry = sObjectMgr.GetSoundEntry(id);
-        if (soundEntry)
-        {
-            int loc = GetSessionDbcLocale();
-            std::string name = soundEntry->Name;
+        uint32 id = itr.first;
+        SoundEntriesEntry const& soundEntry = itr.second;
+        int loc = GetSessionDbcLocale();
+        std::string name = soundEntry.Name;
 
-            if (name.empty())
-                continue;
+        if (name.empty())
+            continue;
 
-            strToLower(name);
+        strToLower(name);
 
-            if (name.find(namepart) == std::string::npos)
-                continue;
+        if (name.find(namepart) == std::string::npos)
+            continue;
 
-            if (m_session)
-                PSendSysMessage(LANG_COMMAND_SOUND_LIST, id, id, soundEntry->Name.c_str());
-            else
-                PSendSysMessage("%u - %s", id, soundEntry->Name.c_str());
+        if (m_session)
+            PSendSysMessage(LANG_COMMAND_SOUND_LIST, id, id, soundEntry.Name.c_str());
+        else
+            PSendSysMessage("%u - %s", id, soundEntry.Name.c_str());
 
-            counter++;
-        }
+        counter++;
     }
 
     if (counter == 0)

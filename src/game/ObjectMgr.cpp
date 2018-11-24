@@ -172,7 +172,7 @@ void ObjectMgr::LoadAllIdentifiers()
     m_ItemIdSet.clear();
 
     Field* fields;
-    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT entry FROM item_template");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `item_template`"));
 
     if (result)
     {
@@ -182,11 +182,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_ItemIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
     
     m_QuestIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM quest_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `quest_template`"));
 
     if (result)
     {
@@ -196,11 +195,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_QuestIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_CreatureIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM creature_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_template`"));
 
     if (result)
     {
@@ -210,11 +208,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_CreatureIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_GameObjectIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM gameobject_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gameobject_template`"));
 
     if (result)
     {
@@ -224,11 +221,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_GameObjectIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_CreatureGuidSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT guid FROM creature");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `guid` FROM `creature`"));
 
     if (result)
     {
@@ -238,11 +234,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_CreatureGuidSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_GameObjectGuidSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT guid FROM gameobject");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `guid` FROM `gameobject`"));
 
     if (result)
     {
@@ -252,11 +247,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_GameObjectGuidSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_AreaTriggerIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT ID FROM areatrigger_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `id` FROM `areatrigger_template`"));
 
     if (result)
     {
@@ -266,11 +260,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_AreaTriggerIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_CreatureSpellsIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM creature_spells");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_spells`"));
 
     if (result)
     {
@@ -280,7 +273,6 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_CreatureSpellsIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     sSpellMgr.LoadExistingSpellIds();
@@ -291,21 +283,27 @@ void ObjectMgr::LoadSpellDisabledEntrys()
 {
     m_DisabledSpells.clear();                                // need for reload case
 
-    QueryResult* result = WorldDatabase.Query("SELECT entry FROM spell_disabled");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry` FROM `spell_disabled`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u disabled spells", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         uint32 spellid = fields[0].GetUInt32();
         if (!sSpellMgr.GetSpellEntry(spellid))
         {
@@ -319,35 +317,33 @@ void ObjectMgr::LoadSpellDisabledEntrys()
 
     sLog.outString();
     sLog.outString(">> Loaded %u disabled spells from `spell_disabled`", total_count);
-    delete result;
 }
-/*
-DROP TABLE IF EXISTS map_loot_disabled;
-CREATE TABLE `map_loot_disabled` (
-  `mapid` int(11) default 0,
-  `comment` varchar(255),
-  PRIMARY KEY (`mapid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-*/
+
 void ObjectMgr::LoadMapLootDisabled()
 {
     m_DisabledMapLoots.clear();                                // need for reload case
 
-    QueryResult* result = WorldDatabase.Query("SELECT mapid FROM map_loot_disabled");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `map_id` FROM `map_loot_disabled`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
-        sLog.outString(">> Loaded %u disabled maps loot", total_count);
+        sLog.outString(">> Loaded %u maps with disabled loot", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         uint32 mapid = fields[0].GetUInt32();
         m_DisabledMapLoots.insert(mapid);
         ++total_count;
@@ -355,29 +351,34 @@ void ObjectMgr::LoadMapLootDisabled()
     while (result->NextRow());
 
     sLog.outString();
-    sLog.outString(">> Loaded %u disabled spells from `map_loot_disabled`", total_count);
-    delete result;
+    sLog.outString(">> Loaded %u maps with disabled loot from `map_loot_disabled`", total_count);
 }
 
 void ObjectMgr::LoadCinematicsWaypoints()
 {
     m_CinematicWaypoints.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT cinematic,timer,posx,posy,posz FROM cinematic_waypoints");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `cinematic`, `timer`, `position_x`, `position_y`, `position_z` FROM `cinematic_waypoints`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
-        sLog.outString(">> Loaded %u disabled cinematic Waypoints", total_count);
+        sLog.outString(">> Loaded %u cinematic waypoints", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         CinematicWaypointEntry tmp;
 
         tmp.cinematic_id = fields[0].GetUInt32();
@@ -390,19 +391,18 @@ void ObjectMgr::LoadCinematicsWaypoints()
         ++total_count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
-    sLog.outString(">> Loaded %u cinematic Waypoints from `cinematic_waypoints`", total_count);
+    sLog.outString(">> Loaded %u cinematic waypoints from `cinematic_waypoints`", total_count);
 }
 
 Position const* ObjectMgr::GetCinematicPosition(uint32 cinematicId, uint32 elapsed_time)
 {
-    // On cherche un waypoint :
-    // 1- Qui correspond a la cinematic_id
-    // 2- Qui soit le plus grand possible
-    // 3- Avec un time < elapsed_time (sinon on reste toujours au meme)
-    Position const* tmpBestPos = NULL;
+    // We are looking for a waypoint :
+    // 1- corresponds to the cinematic_id
+    // 2- biggest possible
+    // 3- With a time < elapsed_time (otherwise we always stay at the same)
+    Position const* tmpBestPos = nullptr;
     uint32 tmpBestTimer  = 0;
     std::vector<CinematicWaypointEntry>::const_iterator it;
     for (it = m_CinematicWaypoints.begin(); it != m_CinematicWaypoints.end(); ++it)
@@ -433,32 +433,37 @@ Position const* ObjectMgr::GetCinematicInitialPosition(uint32 cinematicId)
                 return &(it->position);
         }
     }
-    // Non trouve
-    sLog.outError("Impossible de trouver le point de depart de la cinematique %u", cinematicId);
-    return NULL;
+    // Not found
+    sLog.outError("Can not find the starting point of cinematic %u", cinematicId);
+    return nullptr;
 }
 
-// Systeme de phasing
+// Phasing system
 // ALTER TABLE characters ADD COLUMN world_phase_mask int(11) unsigned not null default 0;
 void ObjectMgr::LoadPlayerPhaseFromDb()
 {
     m_PlayerPhases.clear();
 
-    QueryResult* result = CharacterDatabase.Query("SELECT guid, world_phase_mask FROM characters");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT guid, world_phase_mask FROM characters"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u characters phases", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
         uint32 mask = fields[1].GetUInt32();
@@ -469,7 +474,6 @@ void ObjectMgr::LoadPlayerPhaseFromDb()
 
     sLog.outString();
     sLog.outString(">> Loaded %u character phases", total_count);
-    delete result;
 }
 
 uint32 ObjectMgr::GetPlayerWorldMaskByGUID(const uint64 guid)
@@ -484,15 +488,7 @@ void ObjectMgr::SetPlayerWorldMask(const uint64 guid, uint32 newWorldMask)
     m_PlayerPhases[GUID_LOPART(guid)] = newWorldMask;
     //CharacterDatabase.PQuery("UPDATE characters SET world_phase_mask = %u WHERE guid = %u", newWorldMask, GUID_LOPART(guid));
 }
-/*
-# Pour le moment dans la DB World. Il serait plus judicieux de la deplacer dans characters ... ?
-CREATE TABLE `variables` (
-  `index` int(10) unsigned NOT NULL default '0',
-  `value` int(10) unsigned NOT NULL default '0',
-  `comment` varchar(255),
-  PRIMARY KEY  (`index`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-*/
+
 uint32 ObjectMgr::GetSavedVariable(uint32 index, uint32 defaultValue, bool *exist)
 {
     SavedVariablesVector::iterator it;
@@ -534,7 +530,7 @@ void ObjectMgr::_SaveVariable(const SavedVariable& toSave)
 void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
 {
     SavedVariablesVector::iterator it;
-    // Deja enregistree ?
+    // Already registered?
     for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
         if (it->uiIndex == index)
             return;
@@ -550,7 +546,7 @@ void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
     {
         if (it->uiIndex == index)
         {
-            // Si la valeur n'a pas change
+            // If the value has not changed.
             if (it->uiValue == value)
                 return;
 
@@ -562,7 +558,7 @@ void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
             return;
         }
     }
-    // Si on est la, c'est que la variable n'existe pas.
+    // If we are here, it means that the variable does not exist.
     SavedVariable& variable = _InsertVariable(index, value, autoSave);
     if (autoSave)
         _SaveVariable(variable);
@@ -596,21 +592,26 @@ void ObjectMgr::LoadSavedVariable()
 {
     m_SavedVariables.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT `index`,`value` FROM variables");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `index`, `value` FROM `variables`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u saved variables", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
         _InsertVariable(fields[0].GetUInt32(), fields[1].GetUInt32(), true);
         ++total_count;
     }
@@ -618,32 +619,37 @@ void ObjectMgr::LoadSavedVariable()
 
     sLog.outString();
     sLog.outString(">> Loaded %u saved variables", total_count);
-    delete result;
 }
 
-// Mise en cache de donnees des joueurs
+// Caching player data
 void ObjectMgr::LoadPlayerCacheData()
 {
     m_playerCacheData.clear();
     m_playerNameToGuid.clear();
 
-    QueryResult* result = CharacterDatabase.Query(
-        //      0     1     2      3       4        5     6      7     8    9           10          11          12           13
-        "SELECT guid, race, class, gender, account, name, level, zone, map, position_x, position_y, position_z, orientation, taxi_path FROM characters;");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query(
+        //       0       1       2        3         4          5       6        7       8      9             10            11            12             13
+        "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `taxi_path` FROM `characters`;"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
-        sLog.outString(">> 0 cached player data ...");
+        sLog.outString(">> Loaded 0 cached player data ...");
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         // guid, race, class, gender, account, name
         std::string name = fields[5].GetCppString();
         if (normalizePlayerName(name))
@@ -660,7 +666,6 @@ void ObjectMgr::LoadPlayerCacheData()
 
     sLog.outString();
     sLog.outString(">> Loaded %u players in cache.", total_count);
-    delete result;
 }
 
 PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const
@@ -709,7 +714,7 @@ Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
 
 uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
 {
-    // prevent DB access for online player
+    // Prevent DB access for online player.
     if (Player* player = GetPlayer(guid))
     {
         return player->getClass();
@@ -723,12 +728,11 @@ uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
     }
     else
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid = '%u'", lowguid);
+        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT `class` FROM `characters` WHERE `guid` = '%u'", lowguid));
 
         if (result)
         {
             uint8 pClass = (*result)[0].GetUInt8();
-            delete result;
             return pClass;
         }
     }
@@ -896,12 +900,11 @@ void ObjectMgr::LoadCreatureLocales()
 {
     mCreatureLocaleMap.clear();                              // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,name_loc1,subname_loc1,name_loc2,subname_loc2,name_loc3,subname_loc3,name_loc4,subname_loc4,name_loc5,subname_loc5,name_loc6,subname_loc6,name_loc7,subname_loc7,name_loc8,subname_loc8 FROM locales_creature");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `subname_loc1`, `name_loc2`, `subname_loc2`, `name_loc3`, `subname_loc3`, `name_loc4`, `subname_loc4`, `name_loc5`, `subname_loc5`, `name_loc6`, `subname_loc6`, `name_loc7`, `subname_loc7`, `name_loc8`, `subname_loc8` FROM `locales_creature`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -913,8 +916,8 @@ void ObjectMgr::LoadCreatureLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -956,8 +959,6 @@ void ObjectMgr::LoadCreatureLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %lu creature locale strings", (unsigned long)mCreatureLocaleMap.size());
 }
@@ -966,17 +967,16 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 {
     mGossipMenuItemsLocaleMap.clear();                      // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT menu_id,id,"
-                          "option_text_loc1,box_text_loc1,option_text_loc2,box_text_loc2,"
-                          "option_text_loc3,box_text_loc3,option_text_loc4,box_text_loc4,"
-                          "option_text_loc5,box_text_loc5,option_text_loc6,box_text_loc6,"
-                          "option_text_loc7,box_text_loc7,option_text_loc8,box_text_loc8 "
-                          "FROM locales_gossip_menu_option");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `menu_id`, `id`,"
+                          "`option_text_loc1`, `box_text_loc1`, `option_text_loc2`, `box_text_loc2`,"
+                          "`option_text_loc3`, `box_text_loc3`, `option_text_loc4`, `box_text_loc4`,"
+                          "`option_text_loc5`, `box_text_loc5`, `option_text_loc6`, `box_text_loc6`,"
+                          "`option_text_loc7`, `box_text_loc7`, `option_text_loc8`, `box_text_loc8` "
+                          "FROM `locales_gossip_menu_option`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -988,8 +988,8 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint16 menuId   = fields[0].GetUInt16();
         uint16 id       = fields[1].GetUInt16();
@@ -1047,8 +1047,6 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %lu gossip_menu_option locale strings", (unsigned long)mGossipMenuItemsLocaleMap.size());
 }
@@ -1057,12 +1055,11 @@ void ObjectMgr::LoadPointOfInterestLocales()
 {
     mPointOfInterestLocaleMap.clear();                              // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,icon_name_loc1,icon_name_loc2,icon_name_loc3,icon_name_loc4,icon_name_loc5,icon_name_loc6,icon_name_loc7,icon_name_loc8 FROM locales_points_of_interest");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `icon_name_loc1`, `icon_name_loc2`, `icon_name_loc3`, `icon_name_loc4`, `icon_name_loc5`, `icon_name_loc6`, `icon_name_loc7`, `icon_name_loc8` FROM `locales_points_of_interest`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString("");
@@ -1074,8 +1071,8 @@ void ObjectMgr::LoadPointOfInterestLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -1104,8 +1101,6 @@ void ObjectMgr::LoadPointOfInterestLocales()
         }
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u points_of_interest locale strings", mPointOfInterestLocaleMap.size());
@@ -1509,7 +1504,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
 {
     CreatureModelInfo const *minfo = GetCreatureModelInfo(display_id);
     if (!minfo)
-        return NULL;
+        return nullptr;
 
     // If a model for another gender exists, 50% chance to use it
     if (minfo->modelid_other_gender != 0 && urand(0, 1) == 0)
@@ -1643,7 +1638,7 @@ void ObjectMgr::LoadCreatureSpells()
     // First we need to collect all script ids.
     std::set<uint32> spellScriptSet;
 
-    QueryResult *result = WorldDatabase.Query("SELECT id FROM creature_spells_scripts");
+    std::unique_ptr<QueryResult> result (WorldDatabase.Query("SELECT `id` FROM `creature_spells_scripts`"));
     
     if (result)
     {
@@ -1653,8 +1648,6 @@ void ObjectMgr::LoadCreatureSpells()
             uint32 id = fields[0].GetUInt32();;
             spellScriptSet.insert(id);
         } while (result->NextRow());
-
-        delete result;
     }
 
     std::set<uint32> spellScriptSetFull = spellScriptSet;
@@ -1662,28 +1655,28 @@ void ObjectMgr::LoadCreatureSpells()
     // Now we load creature_spells.
     mCreatureSpellsMap.clear(); // for reload case
 
-                                 //       0       1           2               3              4               5              6               7                  8                  9                10             11
-    result = WorldDatabase.Query("SELECT entry, spellId_1, probability_1, castTarget_1, targetParam1_1, targetParam2_1, castFlags_1, delayInitialMin_1, delayInitialMax_1, delayRepeatMin_1, delayRepeatMax_1, scriptId_1, "
-                                 //               12          13              14             15              16             17              18                 19                 20               21             22
-                                               "spellId_2, probability_2, castTarget_2, targetParam1_2, targetParam2_2, castFlags_2, delayInitialMin_2, delayInitialMax_2, delayRepeatMin_2, delayRepeatMax_2, scriptId_2, "
-                                 //               23          24              25             26              27             28              29                 30                 31               32             33
-                                               "spellId_3, probability_3, castTarget_3, targetParam1_3, targetParam2_3, castFlags_3, delayInitialMin_3, delayInitialMax_3, delayRepeatMin_3, delayRepeatMax_3, scriptId_3, "
-                                 //               34          35              36             37              38             39              40                 41                 42               43             44
-                                               "spellId_4, probability_4, castTarget_4, targetParam1_4, targetParam2_4, castFlags_4, delayInitialMin_4, delayInitialMax_4, delayRepeatMin_4, delayRepeatMax_4, scriptId_4, "
-                                 //               45          46              47             48              49             50              51                 52                 53               54             55
-                                               "spellId_5, probability_5, castTarget_5, targetParam1_5, targetParam2_5, castFlags_5, delayInitialMin_5, delayInitialMax_5, delayRepeatMin_5, delayRepeatMax_5, scriptId_5, "
-                                 //               56          57              58             59              60             61              62                 63                 64               65             66
-                                               "spellId_6, probability_6, castTarget_6, targetParam1_6, targetParam2_6, castFlags_6, delayInitialMin_6, delayInitialMax_6, delayRepeatMin_6, delayRepeatMax_6, scriptId_6, "
-                                 //               67          68              69             70              71             72              73                 74                 75               76             77
-                                               "spellId_7, probability_7, castTarget_7, targetParam1_7, targetParam2_7, castFlags_7, delayInitialMin_7, delayInitialMax_7, delayRepeatMin_7, delayRepeatMax_7, scriptId_7, "
-                                 //               78          79              80             81              82             83              84                 85                 86               87             88
-                                               "spellId_8, probability_8, castTarget_8, targetParam1_8, targetParam2_8, castFlags_8, delayInitialMin_8, delayInitialMax_8, delayRepeatMin_8, delayRepeatMax_8, scriptId_8 FROM creature_spells");
+                                     //       0        1            2                3               4                 5                 6              7                    8                    9                   10                  11
+    result.reset(WorldDatabase.Query("SELECT `entry`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, "
+                                      //               12           13               14              15                16                17             18                   19                   20                  21                  22
+                                                     "`spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, "
+                                     //                23           24               25              26                27                28             29                   30                   31                  32                  33
+                                                     "`spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, "
+                                     //                34           35               36              37                38                39             40                   41                   42                  43                  44
+                                                     "`spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, "
+                                     //                45           46               47              48                49                50             51                   52                   53                  54                  55
+                                                     "`spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, "
+                                     //                56           57               58              59                60                61             62                   63                   64                  65                  66
+                                                     "`spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, "
+                                     //                67           68               69              70                71                72             73                   74                   75                  76                  77
+                                                     "`spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, "
+                                     //                78           79               80              81                82                83             84                   85                   86                  87                  88
+                                                     "`spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8` FROM `creature_spells`"));
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
+        sLog.outString();
         sLog.outString(">> Loaded 0 creature spell templates. DB table `creature_spells` is empty.");
         return;
     }
@@ -1693,8 +1686,8 @@ void ObjectMgr::LoadCreatureSpells()
 
     do
     {
-        Field* fields = result->Fetch();
         bar.step();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();;
 
@@ -1768,35 +1761,32 @@ void ObjectMgr::LoadCreatureSpells()
 
     } while (result->NextRow());
 
-    delete result;
-
     for (std::set<uint32>::const_iterator itr = spellScriptSet.begin(); itr != spellScriptSet.end(); ++itr)
         sLog.outErrorDb("Table `creature_spells_scripts` contains unused script, id %u.", *itr);
 
-    sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)mCreatureSpellsMap.size());
     sLog.outString();
+    sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)mCreatureSpellsMap.size());
 }
 
 void ObjectMgr::LoadCreatures(bool reload)
 {
     uint32 count = 0;
-    //                                                0                       1   2    3
-    QueryResult *result = WorldDatabase.Query("SELECT creature.guid, creature.id, map, modelid,"
-                          //   4             5           6           7            8               9                10            11            12
-                          "equipment_id, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, spawndist, currentwaypoint,"
-                          //   13         14       15          16          17
-                          "curhealth, curmana, DeathState, MovementType, event,"
-                          //   18                        19                                 20          21                  22                 23
-                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, visibilitymod, creature.patch_min, creature.patch_max  "
-                          "FROM creature "
-                          "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
-                          "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid "
-                          "LEFT OUTER JOIN pool_creature_template ON creature.id = pool_creature_template.id");
+    //                                                                          0                  1     2      3
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `map`, `modelid`,"
+    //                      4               5             6             7             8              9                   10                  11           12
+                          "`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`,"
+    //                      13           14         15            16              17
+                          "`curhealth`, `curmana`, `DeathState`, `MovementType`, `event`,"
+    //                                      18                                     19            20            21                          22                      23
+                          "`pool_creature`.`pool_entry`, `pool_creature_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `creature`.`patch_min`, `creature`.`patch_max`  "
+                          "FROM `creature` "
+                          "LEFT OUTER JOIN `game_event_creature` ON `creature`.`guid` = `game_event_creature`.`guid` "
+                          "LEFT OUTER JOIN `pool_creature` ON `creature`.`guid` = `pool_creature`.`guid` "
+                          "LEFT OUTER JOIN `pool_creature_template` ON `creature`.`id` = `pool_creature_template`.`id`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -1804,14 +1794,12 @@ void ObjectMgr::LoadCreatures(bool reload)
         return;
     }
 
-    // build single time for check creature data
-
     BarGoLink bar(result->GetRowCount());
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
@@ -1961,8 +1949,6 @@ void ObjectMgr::LoadCreatures(bool reload)
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %lu creatures", (unsigned long)mCreatureDataMap.size());
 }
@@ -1993,21 +1979,20 @@ void ObjectMgr::LoadGameobjects(bool reload)
 {
     uint32 count = 0;
 
-    //                                                0                           1   2    3           4           5           6
-    QueryResult *result = WorldDatabase.Query("SELECT gameobject.guid, gameobject.id, map, position_x, position_y, position_z, orientation,"
-                          //   7          8          9          10            11                12              13       14      15
-                          "rotation0, rotation1, rotation2, rotation3, spawntimesecsmin, spawntimesecsmax, animprogress, state, event, "
-                          //   16                          17                                   18          19                20                     21
-                          "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry, spawnFlags, visibilitymod, gameobject.patch_min, gameobject.patch_max "
-                          "FROM gameobject "
-                          "LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
-                          "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid "
-                          "LEFT OUTER JOIN pool_gameobject_template ON gameobject.id = pool_gameobject_template.id");
+    //                                                                            0                    1     2      3             4             5             6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `gameobject`.`guid`, `gameobject`.`id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`,"
+    //                      7            8            9            10           11                12              13       14      15
+                          "`rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `event`, "
+    //                                        16                                       17            18            19                            20                        21
+                          "`pool_gameobject`.`pool_entry`, `pool_gameobject_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `gameobject`.`patch_min`, `gameobject`.`patch_max` "
+                          "FROM `gameobject` "
+                          "LEFT OUTER JOIN `game_event_gameobject` ON `gameobject`.`guid` = `game_event_gameobject`.`guid` "
+                          "LEFT OUTER JOIN `pool_gameobject` ON `gameobject`.`guid` = `pool_gameobject`.`guid` "
+                          "LEFT OUTER JOIN `pool_gameobject_template` ON `gameobject`.`id` = `pool_gameobject_template`.`id`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -2019,8 +2004,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
@@ -2140,8 +2125,6 @@ void ObjectMgr::LoadGameobjects(bool reload)
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %lu gameobjects", (unsigned long)mGameObjectDataMap.size());
 }
@@ -2166,172 +2149,6 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
     CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
     cell_guids.gameobjects.erase(guid);
     mMapObjectGuids_lock.release();
-}
-
-// name must be checked to correctness (if received) before call this function
-/*
-ObjectGuid ObjectMgr::GetPlayerGuidByName(std::string name) const
-{
-    ObjectGuid guid;
-
-    CharacterDatabase.escape_string(name);
-
-    // Player name safe to sending to DB (checked at login) and this function using
-    QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s'", name.c_str());
-    if (result)
-    {
-        guid = ObjectGuid(HIGHGUID_PLAYER, (*result)[0].GetUInt32());
-
-        delete result;
-    }
-
-    return guid;
-}
-
-bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const
-{
-    // prevent DB access for online player
-    if(Player* player = GetPlayer(guid))
-    {
-        name = player->GetName();
-        return true;
-    }
-
-    uint32 lowguid = guid.GetCounter();
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", lowguid);
-
-    if(result)
-    {
-        name = (*result)[0].GetCppString();
-        delete result;
-        return true;
-    }
-
-    return false;
-}
-
-Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
-{
-    // prevent DB access for online player
-    if (Player* player = GetPlayer(guid))
-        return Player::TeamForRace(player->getRace());
-
-    uint32 lowguid = guid.GetCounter();
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", lowguid);
-
-    if (result)
-    {
-        uint8 race = (*result)[0].GetUInt8();
-        delete result;
-        return Player::TeamForRace(race);
-    }
-
-    return TEAM_NONE;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
-{
-    // prevent DB access for online player
-    if(Player* player = GetPlayer(guid))
-        return player->GetSession()->GetAccountId();
-
-    uint32 lowguid = guid.GetCounter();
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", lowguid);
-    if (result)
-    {
-        uint32 acc = (*result)[0].GetUInt32();
-        delete result;
-        return acc;
-    }
-
-    return 0;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
-{
-    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'", name.c_str());
-    if(result)
-    {
-        uint32 acc = (*result)[0].GetUInt32();
-        delete result;
-        return acc;
-    }
-
-    return 0;
-}*/
-
-void ObjectMgr::LoadItemLocales()
-{
-    mItemLocaleMap.clear();                                 // need for reload case
-
-    QueryResult *result = WorldDatabase.Query("SELECT entry,name_loc1,description_loc1,name_loc2,description_loc2,name_loc3,description_loc3,name_loc4,description_loc4,name_loc5,description_loc5,name_loc6,description_loc6,name_loc7,description_loc7,name_loc8,description_loc8 FROM locales_item");
-
-    if (!result)
-    {
-        BarGoLink bar(1);
-
-        bar.step();
-
-        sLog.outString();
-        sLog.outString(">> Loaded 0 Item locale strings. DB table `locales_item` is empty.");
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
-
-    do
-    {
-        Field *fields = result->Fetch();
-        bar.step();
-
-        uint32 entry = fields[0].GetUInt32();
-
-        if (!GetItemPrototype(entry))
-        {
-            ERROR_DB_STRICT_LOG("Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
-            continue;
-        }
-
-        ItemLocale& data = mItemLocaleMap[entry];
-
-        for (int i = 1; i < MAX_LOCALE; ++i)
-        {
-            std::string str = fields[1 + 2 * (i - 1)].GetCppString();
-            if (!str.empty())
-            {
-                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
-                if (idx >= 0)
-                {
-                    if ((int32)data.Name.size() <= idx)
-                        data.Name.resize(idx + 1);
-
-                    data.Name[idx] = str;
-                }
-            }
-
-            str = fields[1 + 2 * (i - 1) + 1].GetCppString();
-            if (!str.empty())
-            {
-                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
-                if (idx >= 0)
-                {
-                    if ((int32)data.Description.size() <= idx)
-                        data.Description.resize(idx + 1);
-
-                    data.Description[idx] = str;
-                }
-            }
-        }
-    }
-    while (result->NextRow());
-
-    delete result;
-
-    sLog.outString();
-    sLog.outString(">> Loaded %lu Item locale strings", (unsigned long)mItemLocaleMap.size());
 }
 
 // In order to keep database item template data correct for each patch, fix changed spell effects used by some items here.
@@ -3700,22 +3517,19 @@ void ObjectMgr::LoadItemPrototypes()
         sLog.outErrorDb("Item (Entry: %u) not exist in `item_template` but referenced in `CharStartOutfit.dbc`", *itr);
 }
 
-void ObjectMgr::LoadItemRequiredTarget()
+void ObjectMgr::LoadItemLocales()
 {
-    m_ItemRequiredTarget.clear();                           // needed for reload case
+    mItemLocaleMap.clear();                                 // need for reload case
 
-    uint32 count = 0;
-
-    QueryResult *result = WorldDatabase.Query("SELECT entry,type,targetEntry FROM item_required_target");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `description_loc1`, `name_loc2`, `description_loc2`, `name_loc3`, `description_loc3`, `name_loc4`, `description_loc4`, `name_loc5`, `description_loc5`, `name_loc6`, `description_loc6`, `name_loc7`, `description_loc7`, `name_loc8`, `description_loc8` FROM `locales_item`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
-        sLog.outErrorDb(">> Loaded 0 ItemRequiredTarget. DB table `item_required_target` is empty.");
+        sLog.outString(">> Loaded 0 item locale strings. DB table `locales_item` is empty.");
         return;
     }
 
@@ -3723,8 +3537,78 @@ void ObjectMgr::LoadItemRequiredTarget()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+
+        if (!GetItemPrototype(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
+            continue;
+        }
+
+        ItemLocale& data = mItemLocaleMap[entry];
+
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[1 + 2 * (i - 1)].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    if ((int32)data.Name.size() <= idx)
+                        data.Name.resize(idx + 1);
+
+                    data.Name[idx] = str;
+                }
+            }
+
+            str = fields[1 + 2 * (i - 1) + 1].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    if ((int32)data.Description.size() <= idx)
+                        data.Description.resize(idx + 1);
+
+                    data.Description[idx] = str;
+                }
+            }
+        }
+    }
+    while (result->NextRow());
+
+    sLog.outString();
+    sLog.outString(">> Loaded %lu item locale strings", (unsigned long)mItemLocaleMap.size());
+}
+
+void ObjectMgr::LoadItemRequiredTarget()
+{
+    m_ItemRequiredTarget.clear();                           // needed for reload case
+
+    uint32 count = 0;
+
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `target_entry` FROM `item_required_target`"));
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 item targets. DB table `item_required_target` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        bar.step();
+        Field *fields = result->Fetch();
 
         uint32 uiItemId      = fields[0].GetUInt32();
         uint32 uiType        = fields[1].GetUInt32();
@@ -3799,18 +3683,15 @@ void ObjectMgr::LoadItemRequiredTarget()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u Item required targets", count);
 }
 
 void ObjectMgr::LoadPetLevelInfo()
 {
-    // Loading levels data
     {
-        //                                                 0               1      2   3     4    5    6    7     8    9
-        QueryResult *result  = WorldDatabase.Query("SELECT creature_entry, level, hp, mana, str, agi, sta, inte, spi, armor FROM pet_levelstats");
+        //                                                               0                 1        2     3       4      5      6      7       8      9
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_entry`, `level`, `hp`, `mana`, `str`, `agi`, `sta`, `inte`, `spi`, `armor` FROM `pet_levelstats`"));
 
         uint32 count = 0;
 
@@ -3829,6 +3710,7 @@ void ObjectMgr::LoadPetLevelInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 creature_id = fields[0].GetUInt32();
@@ -3872,12 +3754,9 @@ void ObjectMgr::LoadPetLevelInfo()
             for (int i = 0; i < MAX_STATS; i++)
                 pLevelInfo->stats[i] = fields[i + 4].GetUInt16();
 
-            bar.step();
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u level pet stats definitions", count);
@@ -3922,16 +3801,17 @@ PetLevelInfo const* ObjectMgr::GetPetLevelInfo(uint32 creature_id, uint32 level)
 
 void ObjectMgr::LoadPlayerInfo()
 {
-    // Load playercreate
+    // Load playercreateinfo
     {
-        //                                                0     1      2    3     4           5           6
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, map, zone, position_x, position_y, position_z, orientation FROM playercreateinfo");
+        //                                                               0       1        2      3       4             5             6             7
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `map`, `zone`, `position_x`, `position_y`, `position_z`, `orientation` FROM `playercreateinfo`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create definitions", count);
@@ -3944,6 +3824,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_race  = fields[0].GetUInt32();
@@ -3993,29 +3874,25 @@ void ObjectMgr::LoadPlayerInfo()
 
             pInfo->displayId_m = rEntry->model_m;
             pInfo->displayId_f = rEntry->model_f;
-
-            bar.step();
+            
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u player create definitions", count);
     }
 
-    // Load playercreate items
+    // Load playercreateinfo_item
     {
-        //                                                0     1      2       3
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, itemid, amount FROM playercreateinfo_item");
+        //                                                               0       1        2         3
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `itemid`, `amount` FROM `playercreateinfo_item`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
-
             bar.step();
 
             sLog.outString();
@@ -4027,6 +3904,7 @@ void ObjectMgr::LoadPlayerInfo()
 
             do
             {
+                bar.step();
                 Field* fields = result->Fetch();
 
                 uint32 current_race = fields[0].GetUInt32();
@@ -4066,28 +3944,26 @@ void ObjectMgr::LoadPlayerInfo()
 
                 pInfo->item.push_back(PlayerCreateInfoItem(item_id, amount));
 
-                bar.step();
                 ++count;
             }
             while (result->NextRow());
-
-            delete result;
 
             sLog.outString();
             sLog.outString(">> Loaded %u custom player create items", count);
         }
     }
 
-    // Load playercreate spells
+    // Load playercreateinfo_spell
     {
-        //                                                  0       1        2
-        QueryResult *result = WorldDatabase.PQuery("SELECT `race`, `class`, `spell` FROM playercreateinfo_spell WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD);
+        //                                                                0       1        2
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `race`, `class`, `spell` FROM `playercreateinfo_spell` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create spells", count);
@@ -4099,6 +3975,7 @@ void ObjectMgr::LoadPlayerInfo()
 
             do
             {
+                bar.step();
                 Field* fields = result->Fetch();
 
                 uint32 current_race = fields[0].GetUInt32();
@@ -4128,28 +4005,26 @@ void ObjectMgr::LoadPlayerInfo()
                 PlayerInfo* pInfo = &playerInfo[current_race][current_class];
                 pInfo->spell.push_back(spell_id);
 
-                bar.step();
                 ++count;
             }
             while (result->NextRow());
-
-            delete result;
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create spells", count);
         }
     }
 
-    // Load playercreate actions
+    // Load playercreateinfo_action
     {
-        //                                                0     1      2       3       4
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, button, action, type FROM playercreateinfo_action");
+        //                                                               0       1        2         3         4
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `button`, `action`, `type` FROM `playercreateinfo_action`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create actions", count);
@@ -4161,6 +4036,7 @@ void ObjectMgr::LoadPlayerInfo()
 
             do
             {
+                bar.step();
                 Field* fields = result->Fetch();
 
                 uint32 current_race = fields[0].GetUInt32();
@@ -4190,12 +4066,9 @@ void ObjectMgr::LoadPlayerInfo()
                 PlayerInfo* pInfo = &playerInfo[current_race][current_class];
                 pInfo->action.push_back(PlayerCreateInfoAction(action_button, action, action_type));
 
-                bar.step();
                 ++count;
             }
             while (result->NextRow());
-
-            delete result;
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create actions", count);
@@ -4204,14 +4077,15 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Loading levels data (class only dependent)
     {
-        //                                                 0      1      2       3
-        QueryResult *result  = WorldDatabase.Query("SELECT class, level, basehp, basemana FROM player_classlevelstats");
+        //                                                               0        1        2         3
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `class`, `level`, `basehp`, `basemana` FROM `player_classlevelstats`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u level health/mana definitions", count);
@@ -4224,6 +4098,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_class = fields[0].GetUInt32();
@@ -4261,12 +4136,9 @@ void ObjectMgr::LoadPlayerInfo()
             pClassLevelInfo->basehealth = fields[2].GetUInt16();
             pClassLevelInfo->basemana   = fields[3].GetUInt16();
 
-            bar.step();
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u level health/mana definitions", count);
@@ -4302,14 +4174,15 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Loading levels data (class/race dependent)
     {
-        //                                                 0     1      2      3    4    5    6    7
-        QueryResult *result  = WorldDatabase.Query("SELECT race, class, level, str, agi, sta, inte, spi FROM player_levelstats");
+        //                                                               0       1        2        3      4      5      6       7
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `level`, `str`, `agi`, `sta`, `inte`, `spi` FROM `player_levelstats`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u level stats definitions", count);
@@ -4322,6 +4195,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_race = fields[0].GetUInt32();
@@ -4364,12 +4238,9 @@ void ObjectMgr::LoadPlayerInfo()
             for (int i = 0; i < MAX_STATS; ++i)
                 pLevelInfo->stats[i] = fields[i + 3].GetUInt8();
 
-            bar.step();
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u level stats definitions", count);
@@ -4420,14 +4291,15 @@ void ObjectMgr::LoadPlayerInfo()
         for (uint32 level = 0; level <= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
             mPlayerXPperLevel[level] = 0;
 
-        //                                                 0    1
-        QueryResult *result  = WorldDatabase.Query("SELECT lvl, xp_for_next_level FROM player_xp_for_level");
+        //                                                               0      1
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `lvl`, `xp_for_next_level` FROM `player_xp_for_level`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u xp for level definitions", count);
@@ -4440,6 +4312,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_level = fields[0].GetUInt32();
@@ -4458,12 +4331,9 @@ void ObjectMgr::LoadPlayerInfo()
             }
             //PlayerXPperLevel
             mPlayerXPperLevel[current_level] = current_xp;
-            bar.step();
             ++count;
         }
-        while (result->NextRow());
-
-        delete result;
+        while (result->NextRow());;
 
         sLog.outString();
         sLog.outString(">> Loaded %u xp for level definitions", count);
@@ -4587,13 +4457,12 @@ void ObjectMgr::LoadGroups()
 {
     // -- loading groups --
     uint32 count = 0;
-    //                                                    0         1              2           3           4              5      6      7      8      9      10     11     12     13      14          15
-    QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, leaderGuid, groupId FROM groups");
+    //                                                                   0           1                2             3             4                5        6        7        8        9        10       11       12       13        14            15
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `mainTank`, `mainAssistant`, `lootMethod`, `looterGuid`, `lootThreshold`, `icon1`, `icon2`, `icon3`, `icon4`, `icon5`, `icon6`, `icon7`, `icon8`, `isRaid`, `leaderGuid`, `groupId` FROM `groups`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -4619,15 +4488,14 @@ void ObjectMgr::LoadGroups()
     }
     while (result->NextRow());
 
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u group definitions", count);
 
     // -- loading members --
     count = 0;
-    //                                       0           1          2         3
-    result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, groupId FROM group_member ORDER BY groupId");
+    //                                            0             1            2           3
+    result.reset(CharacterDatabase.Query("SELECT `memberGuid`, `assistant`, `subgroup`, `groupId` FROM `group_member` ORDER BY `groupId`"));
     if (!result)
     {
         BarGoLink bar2(1);
@@ -4635,7 +4503,7 @@ void ObjectMgr::LoadGroups()
     }
     else
     {
-        Group* group = NULL;                                // used as cached pointer for avoid relookup group for each member
+        Group* group = nullptr;                                // used as cached pointer for avoid relookup group for each member
 
         BarGoLink bar2(result->GetRowCount());
         do
@@ -4669,7 +4537,6 @@ void ObjectMgr::LoadGroups()
             }
         }
         while (result->NextRow());
-        delete result;
     }
 
     // clean groups
@@ -4688,15 +4555,15 @@ void ObjectMgr::LoadGroups()
 
     // -- loading instances --
     count = 0;
-    result = CharacterDatabase.Query(
-                 //      0                          1    2         3          4
-                 "SELECT group_instance.leaderGuid, map, instance, permanent, resettime, "
+    result.reset(CharacterDatabase.Query(
+                 //                        0             1      2           3            4
+                 "SELECT `group_instance`.`leaderGuid`, `map`, `instance`, `permanent`, `resettime`, "
                  // 5
-                 "(SELECT COUNT(*) FROM character_instance WHERE guid = group_instance.leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1), "
+                 "(SELECT COUNT(*) FROM `character_instance` WHERE `guid` = `group_instance`.`leaderGuid` AND `instance` = `group_instance`.`instance` AND `permanent` = 1 LIMIT 1), "
                  // 6
-                 " groups.groupId "
-                 "FROM group_instance LEFT JOIN instance ON instance = id LEFT JOIN groups ON groups.leaderGUID = group_instance.leaderGUID ORDER BY leaderGuid"
-             );
+                 " `groups`.`groupId` "
+                 "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leaderGUID` = `group_instance`.`leaderGUID` ORDER BY `leaderGuid`"
+             ));
 
     if (!result)
     {
@@ -4705,7 +4572,7 @@ void ObjectMgr::LoadGroups()
     }
     else
     {
-        Group* group = NULL;                                // used as cached pointer for avoid relookup group for each member
+        Group* group = nullptr;                                // used as cached pointer for avoid relookup group for each member
 
         BarGoLink bar2(result->GetRowCount());
         do
@@ -4740,7 +4607,6 @@ void ObjectMgr::LoadGroups()
             group->BindToInstance(state, fields[3].GetBool(), true);
         }
         while (result->NextRow());
-        delete result;
     }
 
     sLog.outString();
@@ -4760,41 +4626,41 @@ void ObjectMgr::LoadQuests()
 
     m_ExclusiveQuestGroups.clear();
 
-    //                                                0      1       2           3         4           5     6                7              8              9
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, Method, ZoneOrSort, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue,"
-                          //   10                   11                 12                     13                   14                     15                   16                17
-                          "RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, SuggestedPlayers, LimitTime,"
-                          //   18          19            20           21           22              23                24         25            26
-                          "QuestFlags, SpecialFlags, PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestInChain, SrcItemId, SrcItemCount, SrcSpell,"
-                          //   27     28       29          30               31                32       33              34              35              36
-                          "Title, Details, Objectives, OfferRewardText, RequestItemsText, EndText, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4,"
-                          //   37          38          39          40          41             42             43             44
-                          "ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqItemCount1, ReqItemCount2, ReqItemCount3, ReqItemCount4,"
-                          //   45            46            47            48            49               50               51               52
-                          "ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqSourceCount1, ReqSourceCount2, ReqSourceCount3, ReqSourceCount4,"
-                          //   53                  54                  55                  56                  57                     58                     59                     60
-                          "ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqCreatureOrGOCount1, ReqCreatureOrGOCount2, ReqCreatureOrGOCount3, ReqCreatureOrGOCount4,"
-                          //   61             62             63             64
-                          "ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4,"
-                          //   65                66                67                68                69                70
-                          "RewChoiceItemId1, RewChoiceItemId2, RewChoiceItemId3, RewChoiceItemId4, RewChoiceItemId5, RewChoiceItemId6,"
-                          //   71                   72                   73                   74                   75                   76
-                          "RewChoiceItemCount1, RewChoiceItemCount2, RewChoiceItemCount3, RewChoiceItemCount4, RewChoiceItemCount5, RewChoiceItemCount6,"
-                          //   77          78          79          80          81             82             83             84
-                          "RewItemId1, RewItemId2, RewItemId3, RewItemId4, RewItemCount1, RewItemCount2, RewItemCount3, RewItemCount4,"
-                          //   85              86              87              88              89              90            91            92            93            94
-                          "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
-                          //   95             96                97        98            99                 100               101         102     103     104
-                          "RewOrReqMoney, RewMoneyMaxLevel, RewSpell, RewSpellCast, RewMailTemplateId, RewMailDelaySecs, PointMapId, PointX, PointY, PointOpt,"
-                          //   105            106            107            108            109                 110                 111                 112
-                          "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4,"
-                          //   113              114            115                116                117                118
-                          "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
-                          //   119                     120                     121                     122
-                          "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
-                          //   123          124         125
-                          "StartScript, CompleteScript, MaxLevel"
-                          " FROM quest_template t1 WHERE patch=(SELECT max(patch) FROM quest_template t2 WHERE t1.entry=t2.entry && patch <= %u)", sWorld.GetWowPatch());
+    //                                                                0        1         2             3           4             5       6                  7                8                9
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Method`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`,"
+    //                      10                     11                   12                       13                     14                       15                     16                  17
+                          "`RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`,"
+    //                      18            19              20             21             22                23                  24           25              26
+                          "`QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`,"
+    //                      27       28         29            30                 31                  32         33                34                35                36
+                          "`Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`,"
+    //                      37            38            39            40            41               42               43               44
+                          "`ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`,"
+    //                      45              46              47              48              49                 50                 51                 52
+                          "`ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`,"
+    //                      53                    54                    55                    56                    57                       58                       59                       60
+                          "`ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`,"
+    //                      61               62               63               64
+                          "`ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`,"
+    //                      65                  66                  67                  68                  69                  70
+                          "`RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`,"
+    //                      71                     72                     73                     74                     75                     76
+                          "`RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`,"
+    //                      77            78            79            80            81               82               83               84
+                          "`RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`,"
+    //                      85                86                87                88                89                90              91              92              93              94
+                          "`RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`,"
+    //                      95               96                  97          98              99                   100                 101           102       103       104
+                          "`RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`,"
+    //                      105              106              107              108              109                   110                   111                   112
+                          "`DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`,"
+    //                      113                114              115                  116                  117                  118
+                          "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
+    //                      119                       120                       121                       122
+                          "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
+    //                      123            124               125
+                          "`StartScript`, `CompleteScript`, `MaxLevel`"
+                          " FROM `quest_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
     {
         BarGoLink bar(1);
@@ -4810,6 +4676,7 @@ void ObjectMgr::LoadQuests()
     // some quests can have many previous maps set by NextQuestId in previous quest
     // for example set of race quests can lead to single not race specific quest
     BarGoLink bar(result->GetRowCount());
+
     do
     {
         bar.step();
@@ -4819,8 +4686,6 @@ void ObjectMgr::LoadQuests()
         mQuestTemplates[newQuest->GetQuestId()] = newQuest;
     }
     while (result->NextRow());
-
-    delete result;
 
     // Post processing
 
@@ -5408,26 +5273,25 @@ void ObjectMgr::LoadQuestLocales()
 {
     mQuestLocaleMap.clear();                                // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,"
-                          "Title_loc1,Details_loc1,Objectives_loc1,OfferRewardText_loc1,RequestItemsText_loc1,EndText_loc1,ObjectiveText1_loc1,ObjectiveText2_loc1,ObjectiveText3_loc1,ObjectiveText4_loc1,"
-                          "Title_loc2,Details_loc2,Objectives_loc2,OfferRewardText_loc2,RequestItemsText_loc2,EndText_loc2,ObjectiveText1_loc2,ObjectiveText2_loc2,ObjectiveText3_loc2,ObjectiveText4_loc2,"
-                          "Title_loc3,Details_loc3,Objectives_loc3,OfferRewardText_loc3,RequestItemsText_loc3,EndText_loc3,ObjectiveText1_loc3,ObjectiveText2_loc3,ObjectiveText3_loc3,ObjectiveText4_loc3,"
-                          "Title_loc4,Details_loc4,Objectives_loc4,OfferRewardText_loc4,RequestItemsText_loc4,EndText_loc4,ObjectiveText1_loc4,ObjectiveText2_loc4,ObjectiveText3_loc4,ObjectiveText4_loc4,"
-                          "Title_loc5,Details_loc5,Objectives_loc5,OfferRewardText_loc5,RequestItemsText_loc5,EndText_loc5,ObjectiveText1_loc5,ObjectiveText2_loc5,ObjectiveText3_loc5,ObjectiveText4_loc5,"
-                          "Title_loc6,Details_loc6,Objectives_loc6,OfferRewardText_loc6,RequestItemsText_loc6,EndText_loc6,ObjectiveText1_loc6,ObjectiveText2_loc6,ObjectiveText3_loc6,ObjectiveText4_loc6,"
-                          "Title_loc7,Details_loc7,Objectives_loc7,OfferRewardText_loc7,RequestItemsText_loc7,EndText_loc7,ObjectiveText1_loc7,ObjectiveText2_loc7,ObjectiveText3_loc7,ObjectiveText4_loc7,"
-                          "Title_loc8,Details_loc8,Objectives_loc8,OfferRewardText_loc8,RequestItemsText_loc8,EndText_loc8,ObjectiveText1_loc8,ObjectiveText2_loc8,ObjectiveText3_loc8,ObjectiveText4_loc8"
-                          " FROM locales_quest"
-                                             );
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`,"
+                          "`Title_loc1`, `Details_loc1`, `Objectives_loc1`, `OfferRewardText_loc1`, `RequestItemsText_loc1`, `EndText_loc1`, `ObjectiveText1_loc1`, `ObjectiveText2_loc1`, `ObjectiveText3_loc1`, `ObjectiveText4_loc1`,"
+                          "`Title_loc2`, `Details_loc2`, `Objectives_loc2`, `OfferRewardText_loc2`, `RequestItemsText_loc2`, `EndText_loc2`, `ObjectiveText1_loc2`, `ObjectiveText2_loc2`, `ObjectiveText3_loc2`, `ObjectiveText4_loc2`,"
+                          "`Title_loc3`, `Details_loc3`, `Objectives_loc3`, `OfferRewardText_loc3`, `RequestItemsText_loc3`, `EndText_loc3`, `ObjectiveText1_loc3`, `ObjectiveText2_loc3`, `ObjectiveText3_loc3`, `ObjectiveText4_loc3`,"
+                          "`Title_loc4`, `Details_loc4`, `Objectives_loc4`, `OfferRewardText_loc4`, `RequestItemsText_loc4`, `EndText_loc4`, `ObjectiveText1_loc4`, `ObjectiveText2_loc4`, `ObjectiveText3_loc4`, `ObjectiveText4_loc4`,"
+                          "`Title_loc5`, `Details_loc5`, `Objectives_loc5`, `OfferRewardText_loc5`, `RequestItemsText_loc5`, `EndText_loc5`, `ObjectiveText1_loc5`, `ObjectiveText2_loc5`, `ObjectiveText3_loc5`, `ObjectiveText4_loc5`,"
+                          "`Title_loc6`, `Details_loc6`, `Objectives_loc6`, `OfferRewardText_loc6`, `RequestItemsText_loc6`, `EndText_loc6`, `ObjectiveText1_loc6`, `ObjectiveText2_loc6`, `ObjectiveText3_loc6`, `ObjectiveText4_loc6`,"
+                          "`Title_loc7`, `Details_loc7`, `Objectives_loc7`, `OfferRewardText_loc7`, `RequestItemsText_loc7`, `EndText_loc7`, `ObjectiveText1_loc7`, `ObjectiveText2_loc7`, `ObjectiveText3_loc7`, `ObjectiveText4_loc7`,"
+                          "`Title_loc8`, `Details_loc8`, `Objectives_loc8`, `OfferRewardText_loc8`, `RequestItemsText_loc8`, `EndText_loc8`, `ObjectiveText1_loc8`, `ObjectiveText2_loc8`, `ObjectiveText3_loc8`, `ObjectiveText4_loc8`"
+                          " FROM `locales_quest`"
+                                             ));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
-        sLog.outString(">> Loaded 0 Quest locale strings. DB table `locales_quest` is empty.");
+        sLog.outString(">> Loaded 0 quest locale strings. DB table `locales_quest` is empty.");
         return;
     }
 
@@ -5435,8 +5299,8 @@ void ObjectMgr::LoadQuestLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -5541,15 +5405,13 @@ void ObjectMgr::LoadQuestLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu Quest locale strings", (unsigned long)mQuestLocaleMap.size());
+    sLog.outString(">> Loaded %lu quest locale strings", (unsigned long)mQuestLocaleMap.size());
 }
 
 void ObjectMgr::LoadPetCreateSpells()
 {
-    QueryResult *result = WorldDatabase.Query("SELECT entry, Spell1, Spell2, Spell3, Spell4 FROM petcreateinfo_spell");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `spell1`, `spell2`, `spell3`, `spell4` FROM `petcreateinfo_spell`"));
     if (!result)
     {
         BarGoLink bar(1);
@@ -5557,20 +5419,17 @@ void ObjectMgr::LoadPetCreateSpells()
 
         sLog.outString();
         sLog.outString(">> Loaded 0 pet create spells");
-        //sLog.outErrorDb("`petcreateinfo_spell` table is empty!");
         return;
     }
 
     uint32 count = 0;
-
     BarGoLink bar(result->GetRowCount());
-
     mPetCreateSpell.clear();
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 creature_id = fields[0].GetUInt32();
 
@@ -5631,8 +5490,6 @@ void ObjectMgr::LoadPetCreateSpells()
     }
     while (result->NextRow());
 
-    delete result;
-
     // cache spell->learn spell map for use in next loop
     std::map<uint32, uint32> learnCache;
     for (uint32 spell_id = 1; spell_id < sSpellMgr.GetMaxSpellId(); ++spell_id)
@@ -5687,7 +5544,7 @@ void ObjectMgr::LoadPetCreateSpells()
 
 void ObjectMgr::LoadItemTexts()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT id, text FROM item_text");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `text` FROM `item_text`"));
 
     uint32 count = 0;
 
@@ -5703,12 +5560,10 @@ void ObjectMgr::LoadItemTexts()
 
     BarGoLink bar(result->GetRowCount());
 
-    Field* fields;
     do
     {
         bar.step();
-
-        fields = result->Fetch();
+        Field* fields = result->Fetch();
 
         mItemTexts[ fields[0].GetUInt32() ] = fields[1].GetCppString();
 
@@ -5716,8 +5571,6 @@ void ObjectMgr::LoadItemTexts()
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u item texts", count);
@@ -5769,12 +5622,11 @@ void ObjectMgr::LoadPageTextLocales()
 {
     mPageTextLocaleMap.clear();                             // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,text_loc1,text_loc2,text_loc3,text_loc4,text_loc5,text_loc6,text_loc7,text_loc8 FROM locales_page_text");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8` FROM `locales_page_text`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -5786,8 +5638,8 @@ void ObjectMgr::LoadPageTextLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -5817,8 +5669,6 @@ void ObjectMgr::LoadPageTextLocales()
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %lu PageText locale strings", (unsigned long)mPageTextLocaleMap.size());
@@ -5909,10 +5759,10 @@ void ObjectMgr::LoadNPCText()
 {
     mNpcTextMap.clear();                           // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT ID, "
-        "Probability0, Probability1, Probability2, Probability3, Probability4, Probability5, Probability6, Probability7, "
-        "BroadcastTextID0, BroadcastTextID1, BroadcastTextID2, BroadcastTextID3, BroadcastTextID4, BroadcastTextID5, BroadcastTextID6, BroadcastTextID7"
-        " FROM npc_text");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `ID`, "
+        "`Probability0`, `Probability1`, `Probability2`, `Probability3`, `Probability4`, `Probability5`, `Probability6`, `Probability7`, "
+        "`BroadcastTextID0`, `BroadcastTextID1`, `BroadcastTextID2`, `BroadcastTextID3`, `BroadcastTextID4`, `BroadcastTextID5`, `BroadcastTextID6`, `BroadcastTextID7`"
+        " FROM `npc_text`"));
 
     int count = 0;
     if (!result)
@@ -5930,10 +5780,8 @@ void ObjectMgr::LoadNPCText()
     do
     {
         ++count;
-
-        Field *fields = result->Fetch();
-
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 textID = fields[0].GetUInt32();
         if (!textID)
@@ -5975,7 +5823,6 @@ void ObjectMgr::LoadNPCText()
 
     sLog.outString();
     sLog.outString(">> Loaded %u npc texts", count);
-    delete result;
 }
 
 class SingleMailReturner
@@ -6005,24 +5852,24 @@ public:
                 // mail open and then not returned
                 if (item_guid)
                 {
-                    CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_guid);
-                    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE mail_id = '%u'", messageID);
+                    CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `guid` = '%u'", item_guid);
+                    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `mail_id` = '%u'", messageID);
                 }
                 if (itemTextId)
-                    CharacterDatabase.PExecute("DELETE FROM item_text WHERE id = '%u'", itemTextId);
+                    CharacterDatabase.PExecute("DELETE FROM `item_text` WHERE `id` = '%u'", itemTextId);
 
-                CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", messageID);
+                CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `id` = '%u'", messageID);
             }
             else                // Return to sender
             {
                 // mail will be returned:
-                CharacterDatabase.PExecute("UPDATE mail SET sender = '%u', receiver = '%u', expire_time = '" UI64FMTD "', deliver_time = '" UI64FMTD "',cod = '0', checked = '%u' WHERE id = '%u'",
+                CharacterDatabase.PExecute("UPDATE `mail` SET `sender` = '%u', `receiver` = '%u', `expire_time` = '" UI64FMTD "', `deliver_time` = '" UI64FMTD "', `cod` = '0', `checked` = '%u' WHERE `id` = '%u'",
                                            receiverGuid.GetCounter(), returnToLowGuid, (uint64)(basetime + 30 * DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, messageID);
                 if (item_guid)
                 {
                     // update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
-                    CharacterDatabase.PExecute("UPDATE mail_items SET receiver = %u WHERE item_guid = '%u'", returnToLowGuid, item_guid);
-                    CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = %u WHERE guid = '%u'", returnToLowGuid, item_guid);
+                    CharacterDatabase.PExecute("UPDATE `mail_items` SET `receiver` = %u WHERE `item_guid` = '%u'", returnToLowGuid, item_guid);
+                    CharacterDatabase.PExecute("UPDATE `item_instance` SET `owner_guid` = %u WHERE `guid` = '%u'", returnToLowGuid, item_guid);
                 }
             }
         }
@@ -6043,8 +5890,6 @@ public:
             sObjectMgr.ResetOldMailCounter();
             if (!serverUp)
             {
-                BarGoLink bar(1);
-                bar.step();
                 sLog.outString();
                 sLog.outString(">> Only expired mails (need to be return or delete) or DB table `mail` is empty.");
             }
@@ -6052,15 +5897,12 @@ public:
             return;                                             // any mails need to be returned or deleted
         }
 
-        BarGoLink bar(result->GetRowCount());
         uint32 skippedCount = 0;
-        Field *fields;
 
         do
         {
-            bar.step();
+            Field * fields = result->Fetch();
 
-            fields = result->Fetch();
             Mail *m = new Mail;
             m->messageID = fields[0].GetUInt32();
             m->messageType = fields[1].GetUInt8();
@@ -6095,17 +5937,17 @@ public:
                 returner->receiverGuid = m->receiverGuid;
                 returner->itemTextId = m->itemTextId;
                 returner->messageID = m->messageID;
-                CharacterDatabase.AsyncPQueryUnsafe(returner, &SingleMailReturner::Callback, "SELECT item_guid FROM mail_items WHERE mail_id='%u'", m->messageID);
+                CharacterDatabase.AsyncPQueryUnsafe(returner, &SingleMailReturner::Callback, "SELECT `item_guid` FROM `mail_items` WHERE `mail_id`='%u'", m->messageID);
                 delete m;
                 continue;
             }
 
             if (m->itemTextId)
-                CharacterDatabase.PExecute("DELETE FROM item_text WHERE id = '%u'", m->itemTextId);
+                CharacterDatabase.PExecute("DELETE FROM `item_text` WHERE `id` = '%u'", m->itemTextId);
 
             // deletemail = true;
             // delmails << m->messageID << ", ";
-            CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", m->messageID);
+            CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `id` = '%u'", m->messageID);
             delete m;
             
         }
@@ -6123,77 +5965,63 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
     DEBUG_LOG("Returning mails current time: hour: %d, minute: %d, second: %d ", localtime(&basetime)->tm_hour, localtime(&basetime)->tm_min, localtime(&basetime)->tm_sec);
     //delete all old mails without item and without body immediately, if starting server
     if (!serverUp)
-        CharacterDatabase.PExecute("DELETE FROM mail WHERE expire_time < '" UI64FMTD "' AND has_items = '0' AND itemTextId = 0", (uint64)basetime);
+        CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `expire_time` < '" UI64FMTD "' AND `has_items` = '0' AND `itemTextId` = 0", (uint64)basetime);
     OldMailsReturner* cb = new OldMailsReturner();
     cb->serverUp = serverUp;
     cb->basetime = basetime;
     uint32 limit = serverUp ? 5 : 1000;
-    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT id,messageType,sender,receiver,itemTextId,has_items,expire_time,cod,checked,mailTemplateId FROM mail WHERE expire_time < '" UI64FMTD "' ORDER BY expire_time LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
+    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT `id`, `messageType`, `sender`, `receiver`, `itemTextId`, `has_items`, `expire_time`, `cod`, `checked`, `mailTemplateId` FROM `mail` WHERE `expire_time` < '" UI64FMTD "' ORDER BY `expire_time` LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
 }
 
 void ObjectMgr::LoadAreaTriggers()
 {
-    sLog.outString("Loading area triggers ...");
-
-    // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM areatrigger_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `areatrigger_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 area triggers. DB table `areatrigger_template` is empty.");
         return;
     }
 
-    auto fields = result->Fetch();
-    uint32 maxAreaTriggerEntry = fields[0].GetUInt32() + 1;
-    delete result;
-
-    // Actually loading the area triggers.
-    result = WorldDatabase.PQuery("SELECT * FROM areatrigger_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 area triggers. DB table `areatrigger_template` is empty.");
-        return;
-    }
-
-    mAreaTriggers.resize(maxAreaTriggerEntry);
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        auto fields = result->Fetch();
 
-        std::unique_ptr<AreaTriggerEntry> areaTrigger = std::make_unique<AreaTriggerEntry>();
+        AreaTriggerEntry areaTrigger;
 
         uint32 triggerId = fields[0].GetUInt32();
 
-        areaTrigger->id = triggerId;
-        areaTrigger->mapid = fields[2].GetUInt32();
-        areaTrigger->x = fields[3].GetFloat();
-        areaTrigger->y = fields[4].GetFloat();
-        areaTrigger->z = fields[5].GetFloat();
-        areaTrigger->radius = fields[6].GetFloat();
-        areaTrigger->box_x = fields[7].GetFloat();
-        areaTrigger->box_y = fields[8].GetFloat();
-        areaTrigger->box_z = fields[9].GetFloat();
-        areaTrigger->box_orientation = fields[10].GetFloat();
+        areaTrigger.id = triggerId;
+        areaTrigger.mapid = fields[2].GetUInt32();
+        areaTrigger.x = fields[3].GetFloat();
+        areaTrigger.y = fields[4].GetFloat();
+        areaTrigger.z = fields[5].GetFloat();
+        areaTrigger.radius = fields[6].GetFloat();
+        areaTrigger.box_x = fields[7].GetFloat();
+        areaTrigger.box_y = fields[8].GetFloat();
+        areaTrigger.box_z = fields[9].GetFloat();
+        areaTrigger.box_orientation = fields[10].GetFloat();
 
 
-        mAreaTriggers[triggerId] = std::move(areaTrigger);
+        mAreaTriggersMap[triggerId] = areaTrigger;
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %u area triggers.", maxAreaTriggerEntry);
+    sLog.outString(">> Loaded %u area triggers.", (uint32)mAreaTriggersMap.size());
 }
 
 void ObjectMgr::LoadQuestAreaTriggers()
 {
     mQuestAreaTriggerMap.clear();                           // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT id,quest FROM areatrigger_involvedrelation");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `quest` FROM `areatrigger_involvedrelation`"));
 
     uint32 count = 0;
 
@@ -6213,7 +6041,6 @@ void ObjectMgr::LoadQuestAreaTriggers()
     {
         ++count;
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 trigger_ID = fields[0].GetUInt32();
@@ -6249,8 +6076,6 @@ void ObjectMgr::LoadQuestAreaTriggers()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u quest trigger points", count);
 }
@@ -6259,7 +6084,7 @@ void ObjectMgr::LoadTavernAreaTriggers()
 {
     mTavernAreaTriggerSet.clear();                          // need for reload case
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id FROM areatrigger_tavern WHERE patch_min <= %u", sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id` FROM `areatrigger_tavern` WHERE `patch_min` <= %u", sWorld.GetWowPatch()));
 
     uint32 count = 0;
 
@@ -6279,7 +6104,6 @@ void ObjectMgr::LoadTavernAreaTriggers()
     {
         ++count;
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 Trigger_ID      = fields[0].GetUInt32();
@@ -6295,8 +6119,6 @@ void ObjectMgr::LoadTavernAreaTriggers()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u tavern triggers", count);
 }
@@ -6307,13 +6129,12 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
 
     uint32 count = 0;
 
-    //                                                0   1     2            3         4                5                6                7
-    QueryResult *result = WorldDatabase.Query("SELECT id, team, bg_template, exit_map, exit_position_x, exit_position_y, exit_position_z, exit_orientation FROM areatrigger_bg_entrance");
+    //                                                               0     1       2              3           4                  5                  6                  7
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `team`, `bg_template`, `exit_map`, `exit_position_x`, `exit_position_y`, `exit_position_z`, `exit_orientation` FROM `areatrigger_bg_entrance`"));
     if (!result)
     {
 
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6325,11 +6146,9 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
 
     do
     {
-        Field *fields = result->Fetch();
-
-        bar.step();
-
         ++count;
+        bar.step();
+        Field *fields = result->Fetch();
 
         uint32 Trigger_ID = fields[0].GetUInt32();
 
@@ -6380,11 +6199,8 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
         }
 
         mBGEntranceTriggers[Trigger_ID] = bget;
-
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u battleground entrance area trigger definitions", count);
@@ -6495,7 +6311,7 @@ void ObjectMgr::LoadGraveyardZones()
 {
     mGraveYardMap.clear();                                  // need for reload case
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id, ghost_zone, faction FROM game_graveyard_zone WHERE build_min <= %u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `ghost_zone`, `faction` FROM `game_graveyard_zone` WHERE `build_min` <= %u", SUPPORTED_CLIENT_BUILD));
 
     uint32 count = 0;
 
@@ -6515,7 +6331,6 @@ void ObjectMgr::LoadGraveyardZones()
     {
         ++count;
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 safeLocId = fields[0].GetUInt32();
@@ -6552,8 +6367,6 @@ void ObjectMgr::LoadGraveyardZones()
             sLog.outErrorDb("Table `game_graveyard_zone` has a duplicate record for Graveyard (ID: %u) and Zone (ID: %u), skipped.", safeLocId, zoneId);
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u graveyard-zone links", count);
@@ -6697,7 +6510,7 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
     // add link to DB
     if (inDB)
     {
-        WorldDatabase.PExecuteLog("INSERT INTO game_graveyard_zone ( id,ghost_zone,faction) "
+        WorldDatabase.PExecuteLog("INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`) "
                                   "VALUES ('%u', '%u','%u')", id, zoneId, uint32(team));
     }
 
@@ -6710,19 +6523,19 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery(
-        //      0   1               2              3               4                    5
-        "SELECT id, required_level, required_item, required_item2, required_quest_done, required_failed_text, "
-        //  6                    7                     8           9                  10            11
-        "target_map, target_position_x, target_position_y, target_position_z, target_orientation, required_event, "
-        //  12                  13
-        "required_pvp_rank, required_team "
-        "FROM areatrigger_teleport t1 WHERE patch=(SELECT max(patch) FROM areatrigger_teleport t2 WHERE t1.id=t2.id && patch <= %u)", sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery(
+    //           0     1                 2                3                 4                      5
+        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_failed_text`, "
+    //    6             7                    8                    9                    10                    11
+        "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `required_event`, "
+    //    12                   13
+        "`required_pvp_rank`, `required_team` "
+        "FROM `areatrigger_teleport` t1 WHERE `patch`=(SELECT max(`patch`) FROM `areatrigger_teleport` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
+    
     if (!result)
     {
 
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6734,11 +6547,9 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     do
     {
-        Field *fields = result->Fetch();
-
-        bar.step();
-
         ++count;
+        bar.step();
+        Field *fields = result->Fetch();
 
         uint32 Trigger_ID = fields[0].GetUInt32();
 
@@ -6821,8 +6632,6 @@ void ObjectMgr::LoadAreaTriggerTeleports()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u area trigger teleport definitions", count);
 }
@@ -6862,7 +6671,7 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
                 return &itr->second;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void ObjectMgr::PackGroupIds()
@@ -6875,7 +6684,7 @@ void ObjectMgr::PackGroupIds()
     // all valid ids are in the instance table
     // any associations to ids not in this table are assumed to be
     // cleaned already in CleanupInstances
-    QueryResult *result = CharacterDatabase.Query("SELECT groupId FROM groups ORDER BY groupId ASC");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `groupId` FROM `groups` ORDER BY `groupId` ASC"));
     if (result)
     {
         do
@@ -6887,8 +6696,8 @@ void ObjectMgr::PackGroupIds()
             if (id == 0)
             {
                 CharacterDatabase.BeginTransaction();
-                CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId = '%u'", id);
-                CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `groupId` = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `groupId` = '%u'", id);
                 CharacterDatabase.CommitTransaction();
                 continue;
             }
@@ -6896,7 +6705,6 @@ void ObjectMgr::PackGroupIds()
             groupIds.insert(id);
         }
         while (result->NextRow());
-        delete result;
     }
 
     BarGoLink bar(groupIds.size() + 1);
@@ -6910,8 +6718,8 @@ void ObjectMgr::PackGroupIds()
         {
             // remap group id
             CharacterDatabase.BeginTransaction();
-            CharacterDatabase.PExecute("UPDATE groups SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
-            CharacterDatabase.PExecute("UPDATE group_member SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
+            CharacterDatabase.PExecute("UPDATE `groups` SET `groupId` = '%u' WHERE `groupId` = '%u'", groupId, *i);
+            CharacterDatabase.PExecute("UPDATE `group_member` SET `groupId` = '%u' WHERE `groupId` = '%u'", groupId, *i);
             CharacterDatabase.CommitTransaction();
         }
 
@@ -6921,48 +6729,36 @@ void ObjectMgr::PackGroupIds()
 
     m_GroupIds.Set(groupId);
 
-    sLog.outString(">> Group Ids remapped, next group id is %u", groupId);
     sLog.outString();
+    sLog.outString(">> Group Ids remapped, next group id is %u", groupId);
 }
 
 void ObjectMgr::SetHighestGuids()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `characters`"));
     if (result)
-    {
         m_CharGuids.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM creature");
+    result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `creature`"));
     if (result)
-    {
         m_FirstTemporaryCreatureGuid = (*result)[0].GetUInt32() + 1;
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `item_instance`"));
     if (result)
-    {
         m_ItemGuids.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
     // Cleanup other tables from nonexistent guids (>=m_hiItemGuid)
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.PExecute("DELETE FROM auction WHERE itemguid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `itemguid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.CommitTransaction();
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject");
+    result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `gameobject`"));
     if (result)
-    {
         m_FirstTemporaryGameObjectGuid = (*result)[0].GetUInt32() + 1;
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT id FROM auction");
+    result.reset(CharacterDatabase.Query("SELECT `id` FROM `auction`"));
     if (result)
     {
         do
@@ -6970,51 +6766,32 @@ void ObjectMgr::SetHighestGuids()
             Field* fields = result->Fetch();
             m_AuctionsIds.insert(fields[0].GetUInt32());
         } while (result->NextRow());
-        delete result;
     }
     m_NextAuctionId = 1;
 
-    result = CharacterDatabase.Query("SELECT MAX(id) FROM mail");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`id`) FROM `mail`"));
     if (result)
-    {
         m_MailIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(id) FROM item_text");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`id`) FROM `item_text`"));
     if (result)
-    {
         m_ItemTextIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM corpse");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `corpse`"));
     if (result)
-    {
         m_CorpseGuids.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(guildid) FROM guild");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guildid`) FROM `guild`"));
     if (result)
-    {
         m_GuildIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(groupId) FROM groups");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`groupId`) FROM `groups`"));
     if (result)
-    {
         m_GroupIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(petitionguid) FROM petition");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`petitionguid`) FROM `petition`"));
     if (result)
-    {
         m_PetitionIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
     // setup reserved ranges for static guids spawn
     m_StaticCreatureGuids.Set(m_FirstTemporaryCreatureGuid);
@@ -7033,7 +6810,7 @@ uint32 ObjectMgr::CreateItemText(std::string text)
     CharacterDatabase.escape_string(text);
     //any Delete query needed, itemTextId is maximum of all ids
     std::ostringstream query;
-    query << "INSERT INTO item_text (id,text) VALUES ( '" << newItemTextId << "', '" << text << "')";
+    query << "INSERT INTO `item_text` (`id`, `text`) VALUES ( '" << newItemTextId << "', '" << text << "')";
     CharacterDatabase.Execute(query.str().c_str());         //needs to be run this way, because mail body may be more than 1024 characters
     return newItemTextId;
 }
@@ -7042,13 +6819,11 @@ void ObjectMgr::LoadGameObjectLocales()
 {
     mGameObjectLocaleMap.clear();                           // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,"
-                          "name_loc1,name_loc2,name_loc3,name_loc4,name_loc5,name_loc6,name_loc7,name_loc8 FROM locales_gameobject");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `name_loc7`, `name_loc8` FROM `locales_gameobject`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7060,8 +6835,8 @@ void ObjectMgr::LoadGameObjectLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -7091,8 +6866,6 @@ void ObjectMgr::LoadGameObjectLocales()
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %lu gameobject locale strings", (unsigned long)mGameObjectLocaleMap.size());
@@ -7342,13 +7115,12 @@ void ObjectMgr::CheckGameObjectInfos()
 void ObjectMgr::LoadGameobjectsRequirements()
 {
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT guid, reqType, reqGuid FROM gameobject_requirement");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `guid`, `reqType`, `reqGuid` FROM `gameobject_requirement`"));
     _gobjRequirements.clear();
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7361,8 +7133,8 @@ void ObjectMgr::LoadGameobjectsRequirements()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
+
         uint32 guid = fields[0].GetUInt32();
         if (!GetGOData(guid))
         {
@@ -7403,7 +7175,6 @@ void ObjectMgr::LoadGameobjectsRequirements()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u GameObjects requirements", count);
@@ -7414,18 +7185,17 @@ GameObjectUseRequirement const* ObjectMgr::GetGameObjectUseRequirement(ObjectGui
     std::map<uint32, GameObjectUseRequirement>::const_iterator it = _gobjRequirements.find(guid.GetCounter());
     if (it != _gobjRequirements.end())
         return &it->second;
-    return NULL;
+    return nullptr;
 }
 
 void ObjectMgr::LoadExplorationBaseXP()
 {
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT level,basexp FROM exploration_basexp");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `level`, `basexp` FROM `exploration_basexp`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7437,17 +7207,15 @@ void ObjectMgr::LoadExplorationBaseXP()
 
     do
     {
+        ++count;
         bar.step();
-
         Field *fields = result->Fetch();
+
         uint32 level  = fields[0].GetUInt32();
         uint32 basexp = fields[1].GetUInt32();
         mBaseXPTable[level] = basexp;
-        ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u BaseXP definitions", count);
@@ -7470,12 +7238,11 @@ uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 void ObjectMgr::LoadPetNames()
 {
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT word,entry,half FROM pet_name_generation");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `word`, `entry`, `half` FROM `pet_name_generation`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7487,9 +7254,10 @@ void ObjectMgr::LoadPetNames()
 
     do
     {
+        ++count;
         bar.step();
-
         Field *fields = result->Fetch();
+
         std::string word = fields[0].GetString();
         uint32 entry     = fields[1].GetUInt32();
         bool   half      = fields[2].GetBool();
@@ -7497,10 +7265,8 @@ void ObjectMgr::LoadPetNames()
             PetHalfName1[entry].push_back(word);
         else
             PetHalfName0[entry].push_back(word);
-        ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u pet name parts", count);
@@ -7537,17 +7303,16 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 void ObjectMgr::LoadCorpses()
 {
     uint32 count = 0;
-    //                                                    0            1       2                  3                  4                  5                   6
-    QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map, "
-                          //   7     8            9     10      11    12     13           14            15              16       17
-                          "time, corpse_type, instance, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse "
-                          "JOIN characters ON player = characters.guid "
-                          "LEFT JOIN guild_member ON player=guild_member.guid WHERE corpse_type <> 0");
+    //                                                                            0       1                  2                      3                      4                      5                       6
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `corpse`.`guid`, `player`, `corpse`.`position_x`, `corpse`.`position_y`, `corpse`.`position_z`, `corpse`.`orientation`, `corpse`.`map`, "
+    //                      7       8              9           10        11      12       13             14              15                16         17
+                          "`time`, `corpse_type`, `instance`, `gender`, `race`, `class`, `playerBytes`, `playerBytes2`, `equipmentCache`, `guildId`, `playerFlags` FROM `corpse` "
+                          "JOIN `characters` ON `player` = `characters`.`guid` "
+                          "LEFT JOIN `guild_member` ON `player`=`guild_member`.`guid` WHERE `corpse_type` <> 0"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7560,7 +7325,6 @@ void ObjectMgr::LoadCorpses()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
@@ -7577,7 +7341,6 @@ void ObjectMgr::LoadCorpses()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u corpses", count);
@@ -7585,135 +7348,121 @@ void ObjectMgr::LoadCorpses()
 
 void ObjectMgr::LoadFactions()
 {
-    sLog.outString("Loading factions ...");
-
-    // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM faction WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
     {
-        sLog.outString(">> Loaded 0 factions. DB table `faction` is empty.");
-        return;
+        mFactionsMap.clear();
+        sLog.outString("Loading factions ...");
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString();
+            sLog.outString(">> Loaded 0 factions. DB table `faction` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            FactionEntry faction;
+
+            uint32 factionId = fields[0].GetUInt32();
+
+            faction.ID = factionId;
+            faction.reputationListID = fields[2].GetInt32();
+            faction.BaseRepRaceMask[0] = fields[3].GetUInt32();
+            faction.BaseRepRaceMask[1] = fields[4].GetUInt32();
+            faction.BaseRepRaceMask[2] = fields[5].GetUInt32();
+            faction.BaseRepRaceMask[3] = fields[6].GetUInt32();
+            faction.BaseRepClassMask[0] = fields[7].GetUInt32();
+            faction.BaseRepClassMask[1] = fields[8].GetUInt32();
+            faction.BaseRepClassMask[2] = fields[9].GetUInt32();
+            faction.BaseRepClassMask[3] = fields[10].GetUInt32();
+            faction.BaseRepValue[0] = fields[11].GetInt32();
+            faction.BaseRepValue[1] = fields[12].GetInt32();
+            faction.BaseRepValue[2] = fields[13].GetInt32();
+            faction.BaseRepValue[3] = fields[14].GetInt32();
+            faction.ReputationFlags[0] = fields[15].GetUInt32();
+            faction.ReputationFlags[1] = fields[16].GetUInt32();
+            faction.ReputationFlags[2] = fields[17].GetUInt32();
+            faction.ReputationFlags[3] = fields[18].GetUInt32();
+            faction.team = fields[19].GetUInt32();
+            faction.name[0] = new char[strlen(fields[20].GetString()) + 1];
+            strcpy(faction.name[0], fields[20].GetString());
+            faction.name[1] = new char[strlen(fields[21].GetString()) + 1];
+            strcpy(faction.name[1], fields[21].GetString());
+            faction.name[2] = new char[strlen(fields[22].GetString()) + 1];
+            strcpy(faction.name[2], fields[22].GetString());
+            faction.name[3] = new char[strlen(fields[23].GetString()) + 1];
+            strcpy(faction.name[3], fields[23].GetString());
+            faction.name[4] = new char[strlen(fields[24].GetString()) + 1];
+            strcpy(faction.name[4], fields[24].GetString());
+            faction.name[5] = new char[strlen(fields[25].GetString()) + 1];
+            strcpy(faction.name[5], fields[25].GetString());
+            faction.name[6] = new char[strlen(fields[26].GetString()) + 1];
+            strcpy(faction.name[6], fields[26].GetString());
+            faction.name[7] = new char[strlen(fields[27].GetString()) + 1];
+            strcpy(faction.name[7], fields[27].GetString());
+
+            mFactionsMap[factionId] = faction;
+
+        } while (result->NextRow());
     }
-    auto fields = result->Fetch();
-    uint32 maxFactionEntry = fields[0].GetUInt32() + 1;
-    delete result;
-
-    // Actually loading the factions.
-    result = WorldDatabase.PQuery("SELECT * FROM faction WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 factions. DB table `faction` is empty.");
-        return;
-    }
-
-    mFactions.resize(maxFactionEntry);
-
-    do
-    {
-        fields = result->Fetch();
-
-        std::unique_ptr<FactionEntry> faction = std::make_unique<FactionEntry>();
-
-        uint32 factionId = fields[0].GetUInt32();
-
-        faction->ID = factionId;
-        faction->reputationListID = fields[2].GetInt32();
-        faction->BaseRepRaceMask[0] = fields[3].GetUInt32();
-        faction->BaseRepRaceMask[1] = fields[4].GetUInt32();
-        faction->BaseRepRaceMask[2] = fields[5].GetUInt32();
-        faction->BaseRepRaceMask[3] = fields[6].GetUInt32();
-        faction->BaseRepClassMask[0] = fields[7].GetUInt32();
-        faction->BaseRepClassMask[1] = fields[8].GetUInt32();
-        faction->BaseRepClassMask[2] = fields[9].GetUInt32();
-        faction->BaseRepClassMask[3] = fields[10].GetUInt32();
-        faction->BaseRepValue[0] = fields[11].GetInt32();
-        faction->BaseRepValue[1] = fields[12].GetInt32();
-        faction->BaseRepValue[2] = fields[13].GetInt32();
-        faction->BaseRepValue[3] = fields[14].GetInt32();
-        faction->ReputationFlags[0] = fields[15].GetUInt32();
-        faction->ReputationFlags[1] = fields[16].GetUInt32();
-        faction->ReputationFlags[2] = fields[17].GetUInt32();
-        faction->ReputationFlags[3] = fields[18].GetUInt32();
-        faction->team = fields[19].GetUInt32();
-        faction->name[0] = new char[strlen(fields[20].GetString()) + 1];
-        strcpy(faction->name[0], fields[20].GetString());
-        faction->name[1] = new char[strlen(fields[21].GetString()) + 1];
-        strcpy(faction->name[1], fields[21].GetString());
-        faction->name[2] = new char[strlen(fields[22].GetString()) + 1];
-        strcpy(faction->name[2], fields[22].GetString());
-        faction->name[3] = new char[strlen(fields[23].GetString()) + 1];
-        strcpy(faction->name[3], fields[23].GetString());
-        faction->name[4] = new char[strlen(fields[24].GetString()) + 1];
-        strcpy(faction->name[4], fields[24].GetString());
-        faction->name[5] = new char[strlen(fields[25].GetString()) + 1];
-        strcpy(faction->name[5], fields[25].GetString());
-        faction->name[6] = new char[strlen(fields[26].GetString()) + 1];
-        strcpy(faction->name[6], fields[26].GetString());
-        faction->name[7] = new char[strlen(fields[27].GetString()) + 1];
-        strcpy(faction->name[7], fields[27].GetString());
-
-        mFactions[factionId] = std::move(faction);
-
-    } while (result->NextRow());
-
-    delete result;
-
-    // Getting the maximum ID.
-    result = WorldDatabase.PQuery("SELECT MAX(ID) FROM faction_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 faction templates. DB table `faction_template` is empty.");
-        return;
-    }
-    fields = result->Fetch();
-    uint32 maxFactionTemplateEntry = fields[0].GetUInt32() + 1;
-    delete result;
-
-    // Actually loading the faction templates.
-    result = WorldDatabase.PQuery("SELECT * FROM faction_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 faction templates. DB table `faction_template` is empty.");
-        return;
-    }
-
-    mFactionTemplates.resize(maxFactionTemplateEntry);
-
-    do
-    {
-        fields = result->Fetch();
-
-        std::unique_ptr<FactionTemplateEntry> faction = std::make_unique<FactionTemplateEntry>();
-
-        uint32 factionId = fields[0].GetUInt32();
-
-        faction->ID = factionId;
-        faction->faction = fields[2].GetUInt32();
-        faction->factionFlags = fields[3].GetUInt32();
-        faction->ourMask = fields[4].GetUInt32();
-        faction->friendlyMask = fields[5].GetUInt32();
-        faction->hostileMask = fields[6].GetUInt32();
-        faction->enemyFaction[0] = fields[7].GetUInt32();
-        faction->enemyFaction[1] = fields[8].GetUInt32();
-        faction->enemyFaction[2] = fields[9].GetUInt32();
-        faction->enemyFaction[3] = fields[10].GetUInt32();
-        faction->friendFaction[0] = fields[11].GetInt32();
-        faction->friendFaction[1] = fields[12].GetInt32();
-        faction->friendFaction[2] = fields[13].GetInt32();
-        faction->friendFaction[3] = fields[14].GetInt32();
-
-        mFactionTemplates[factionId] = std::move(faction);
-
-    } while (result->NextRow());
-
-    delete result;
-
+    sLog.outString(">> Loaded %u factions.", mFactionsMap.size());
     sLog.outString();
-    sLog.outString(">> Loaded %u factions and %u faction templates.", maxFactionEntry, maxFactionTemplateEntry);
+    {
+        mFactionTemplatesMap.clear();
+        sLog.outString("Loading faction tamplates ...");
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString();
+            sLog.outString(">> Loaded 0 faction templates. DB table `faction_template` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            FactionTemplateEntry faction;
+
+            uint32 factionId = fields[0].GetUInt32();
+
+            faction.ID = factionId;
+            faction.faction = fields[2].GetUInt32();
+            faction.factionFlags = fields[3].GetUInt32();
+            faction.ourMask = fields[4].GetUInt32();
+            faction.friendlyMask = fields[5].GetUInt32();
+            faction.hostileMask = fields[6].GetUInt32();
+            faction.enemyFaction[0] = fields[7].GetUInt32();
+            faction.enemyFaction[1] = fields[8].GetUInt32();
+            faction.enemyFaction[2] = fields[9].GetUInt32();
+            faction.enemyFaction[3] = fields[10].GetUInt32();
+            faction.friendFaction[0] = fields[11].GetInt32();
+            faction.friendFaction[1] = fields[12].GetInt32();
+            faction.friendFaction[2] = fields[13].GetInt32();
+            faction.friendFaction[3] = fields[14].GetInt32();
+
+            mFactionTemplatesMap[factionId] = faction;
+
+        } while (result->NextRow());
+    }
+    sLog.outString(">> Loaded %u faction templates.", mFactionTemplatesMap.size());
+    sLog.outString();
 }
 
 void ObjectMgr::LoadReputationRewardRate()
@@ -7721,12 +7470,11 @@ void ObjectMgr::LoadReputationRewardRate()
     m_RepRewardRateMap.clear();                             // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT faction, quest_rate, creature_rate, spell_rate FROM reputation_reward_rate");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `faction`, `quest_rate`, `creature_rate`, `spell_rate` FROM `reputation_reward_rate`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7739,7 +7487,6 @@ void ObjectMgr::LoadReputationRewardRate()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 factionId        = fields[0].GetUInt32();
@@ -7781,8 +7528,6 @@ void ObjectMgr::LoadReputationRewardRate()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u reputation_reward_rate", count);
 }
@@ -7791,16 +7536,15 @@ void ObjectMgr::LoadReputationOnKill()
 {
     uint32 count = 0;
 
-    //                                                0            1                     2
-    QueryResult *result = WorldDatabase.Query("SELECT creature_id, RewOnKillRepFaction1, RewOnKillRepFaction2,"
-                          //   3             4             5                   6             7             8                   9
-                          "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent "
-                          "FROM creature_onkill_reputation");
+    //                                                               0              1                       2
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`,"
+    //                      3               4               5                     6               7               8                     9
+                          "`IsTeamAward1`, `MaxStanding1`, `RewOnKillRepValue1`, `IsTeamAward2`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent` "
+                          "FROM `creature_onkill_reputation`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7812,8 +7556,8 @@ void ObjectMgr::LoadReputationOnKill()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 creature_id = fields[0].GetUInt32();
 
@@ -7861,8 +7605,6 @@ void ObjectMgr::LoadReputationOnKill()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u creature award reputation definitions", count);
 }
@@ -7872,12 +7614,11 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     m_RepSpilloverTemplateMap.clear();                      // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT faction, faction1, rate_1, rank_1, faction2, rate_2, rank_2, faction3, rate_3, rank_3, faction4, rate_4, rank_4 FROM reputation_spillover_template");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `faction`, `faction1`, `rate_1`, `rank_1`, `faction2`, `rate_2`, `rank_2`, `faction3`, `rate_3`, `rank_3`, `faction4`, `rate_4`, `rank_4` FROM `reputation_spillover_template`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7890,7 +7631,6 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 factionId                = fields[0].GetUInt32();
@@ -7975,8 +7715,6 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u reputation_spillover_template", count);
 }
@@ -7987,13 +7725,12 @@ void ObjectMgr::LoadPointsOfInterest()
 
     uint32 count = 0;
 
-    //                                                0      1  2  3      4     5
-    QueryResult *result = WorldDatabase.Query("SELECT entry, x, y, icon, flags, data, icon_name FROM points_of_interest");
+    //                                                               0        1    2    3       4        5       6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `x`, `y`, `icon`, `flags`, `data`, `icon_name` FROM `points_of_interest`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8005,8 +7742,8 @@ void ObjectMgr::LoadPointsOfInterest()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 point_id = fields[0].GetUInt32();
 
@@ -8029,8 +7766,6 @@ void ObjectMgr::LoadPointsOfInterest()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u Points of Interest definitions", count);
@@ -8078,12 +7813,11 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id,quest FROM %s WHERE %u BETWEEN patch_min AND patch_max", table, sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `quest` FROM %s WHERE %u BETWEEN `patch_min` AND `patch_max`", table, sWorld.GetWowPatch()));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8095,8 +7829,8 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 id    = fields[0].GetUInt32();
         uint32 quest = fields[1].GetUInt32();
@@ -8112,8 +7846,6 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u quest relations from %s", count, table);
@@ -8177,34 +7909,41 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
 
 void ObjectMgr::LoadTaxiNodes()
 {
-    sLog.outString("Loading taxi nodes ...");
-
     // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM taxi_nodes WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT MAX(`id`) FROM `taxi_nodes` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 taxi nodes. DB table `taxi_nodes` is empty.");
         return;
     }
 
     auto fields = result->Fetch();
     uint32 maxTaxiNodeEntry = fields[0].GetUInt32() + 1;
-    delete result;
 
     // Actually loading the taxi nodes.
-    result = WorldDatabase.PQuery("SELECT * FROM taxi_nodes WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `taxi_nodes` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 taxi nodes. DB table `taxi_nodes` is empty.");
         return;
     }
 
+    BarGoLink bar(result->GetRowCount());
     m_TaxiNodes.resize(maxTaxiNodeEntry);
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         std::unique_ptr<TaxiNodesEntry> taxiNode = std::make_unique<TaxiNodesEntry>();
@@ -8231,8 +7970,6 @@ void ObjectMgr::LoadTaxiNodes()
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u taxi nodes.", maxTaxiNodeEntry);
 }
@@ -8243,7 +7980,7 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT inPath, outPath, inNode, outNode FROM taxi_path_transitions WHERE build_min <= %u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `in_path`, `out_path`, `in_node`, `out_node` FROM `taxi_path_transitions` WHERE `build_min` <= %u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -8259,8 +7996,8 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 inPath = fields[0].GetUInt32();
         uint32 outPath = fields[1].GetUInt32();
@@ -8310,8 +8047,6 @@ void ObjectMgr::LoadTaxiPathTransitions()
         ++count;
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u taxi path transitions", count);
 }
@@ -8320,7 +8055,7 @@ void ObjectMgr::LoadReservedPlayersNames()
 {
     m_ReservedNames.clear();                                // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT name FROM reserved_name");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `name` FROM `reserved_name`"));
 
     uint32 count = 0;
 
@@ -8336,13 +8071,12 @@ void ObjectMgr::LoadReservedPlayersNames()
 
     BarGoLink bar(result->GetRowCount());
 
-    Field* fields;
     do
     {
         bar.step();
-        fields = result->Fetch();
-        std::string name = fields[0].GetCppString();
+        Field* fields = result->Fetch();
 
+        std::string name = fields[0].GetCppString();
         std::wstring wstr;
         if (!Utf8toWStr(name, wstr))
         {
@@ -8356,8 +8090,6 @@ void ObjectMgr::LoadReservedPlayersNames()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u reserved player names", count);
@@ -8546,6 +8278,7 @@ void ObjectMgr::LoadGameObjectForQuests()
     {
         BarGoLink bar(1);
         bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded 0 GameObjects for quests");
         return;
@@ -8623,33 +8356,38 @@ void ObjectMgr::LoadGameObjectForQuests()
 
 void ObjectMgr::LoadSkillLineAbility()
 {
-    sLog.outString("Loading skill line abilities ...");
-
     // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM skill_line_ability");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`id`) FROM `skill_line_ability`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 skill line abilities. DB table `skill_line_ability` is empty.");
         return;
     }
     auto fields = result->Fetch();
     uint32 maxSkillLineAbilityId = fields[0].GetUInt32() + 1;
-    delete result;
 
     // Actually loading the sounds.
-    result = WorldDatabase.Query("SELECT * FROM skill_line_ability");
+    result.reset(WorldDatabase.Query("SELECT * FROM skill_line_ability"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 skill line abilities. DB table `skill_line_ability` is empty.");
         return;
     }
 
+    BarGoLink bar(result->GetRowCount());
     mSkillLineAbilities.resize(maxSkillLineAbilityId);
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         std::unique_ptr<SkillLineAbilityEntry> skill = std::make_unique<SkillLineAbilityEntry>();
@@ -8671,75 +8409,66 @@ void ObjectMgr::LoadSkillLineAbility()
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u skill line abilities.", maxSkillLineAbilityId);
 }
 
 void ObjectMgr::LoadSoundEntries()
 {
-    sLog.outString("Loading sounds ...");
-
-    // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM sound_entries");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT * FROM `sound_entries`"));
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 sounds. DB table `sound_entries` is empty.");
-        return;
-    }
-    auto fields = result->Fetch();
-    uint32 maxSoundEntry = fields[0].GetUInt32() + 1;
-    delete result;
+        BarGoLink bar(1);
+        bar.step();
 
-    // Actually loading the sounds.
-    result = WorldDatabase.Query("SELECT * FROM sound_entries");
-
-    if (!result)
-    {
         sLog.outString(">> Loaded 0 sounds. DB table `sound_entries` is empty.");
         return;
     }
 
-    mSoundEntries.resize(maxSoundEntry);
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        auto fields = result->Fetch();
 
-        std::unique_ptr<SoundEntriesEntry> sound = std::make_unique<SoundEntriesEntry>();
+        SoundEntriesEntry sound;
         uint32 soundId = fields[0].GetUInt32();
 
-        sound->Id = soundId;
-        sound->Name = fields[1].GetCppString();
+        sound.Id = soundId;
+        sound.Name = fields[1].GetCppString();
 
-        mSoundEntries[soundId] = std::move(sound);
+        mSoundEntriesMap[soundId] = sound;
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %u sound entries.", maxSoundEntry);
+    sLog.outString(">> Loaded %u sound entries.", (uint32)mSoundEntriesMap.size());
 }
 
 void ObjectMgr::LoadBroadcastTexts()
 {
     mBroadcastTextLocaleMap.clear(); // for reload case
 
-                                 //                    0     1         2         3      4        5        6         7         8          9            10           11
-    QueryResult *result = WorldDatabase.Query("SELECT ID, MaleText, FemaleText, Sound, Type, Language, EmoteId0, EmoteId1, EmoteId2, EmoteDelay0, EmoteDelay1, EmoteDelay2 FROM broadcast_text");
+    //                                                               0     1           2             3        4       5           6           7           8           9              10             11
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `ID`, `MaleText`, `FemaleText`, `Sound`, `Type`, `Language`, `EmoteId0`, `EmoteId1`, `EmoteId2`, `EmoteDelay0`, `EmoteDelay1`, `EmoteDelay2` FROM `broadcast_text`"));
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
         return;
     }
 
     mBroadcastTextLocaleMap.rehash(result->GetRowCount());
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field* fields = result->Fetch();
 
         BroadcastText bct;
@@ -8819,26 +8548,30 @@ void ObjectMgr::LoadBroadcastTexts()
         mBroadcastTextLocaleMap[bct.Id] = bct;
     } while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu broadcast texts.", (unsigned long)mBroadcastTextLocaleMap.size());
     sLog.outString();
-    delete result;
+    sLog.outString(">> Loaded %lu broadcast texts.", (uint32)mBroadcastTextLocaleMap.size());
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
 {
-    //                                                 0        1              2              3              4              5              6              7              8              9                10               11               12               13               14               15               16
-    QueryResult *result = WorldDatabase.Query("SELECT Id, MaleText_loc1, MaleText_loc2, MaleText_loc3, MaleText_loc4, MaleText_loc5, MaleText_loc6, MaleText_loc7, MaleText_loc8, FemaleText_loc1, FemaleText_loc2, FemaleText_loc3, FemaleText_loc4, FemaleText_loc5, FemaleText_loc6, FemaleText_loc7, FemaleText_loc8 FROM locales_broadcast_text");
+    //                                                               0     1                2                3                4                5                6                7                8                9                  10                 11                 12                 13                 14                 15                 16
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Id`, `MaleText_loc1`, `MaleText_loc2`, `MaleText_loc3`, `MaleText_loc4`, `MaleText_loc5`, `MaleText_loc6`, `MaleText_loc7`, `MaleText_loc8`, `FemaleText_loc1`, `FemaleText_loc2`, `FemaleText_loc3`, `FemaleText_loc4`, `FemaleText_loc5`, `FemaleText_loc6`, `FemaleText_loc7`, `FemaleText_loc8` FROM `locales_broadcast_text`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 broadcast text locales. DB table `locales_broadcast_text` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field* fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
@@ -8907,7 +8640,6 @@ void ObjectMgr::LoadBroadcastTextLocales()
 
     sLog.outString();
     sLog.outString(">> Loaded %u broadcast text locales.", count);
-    delete result;
 }
 
 const char *ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
@@ -8970,12 +8702,11 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
             ++itr;
     }
 
-    QueryResult *result = db.PQuery("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8 %s FROM %s", extra_content ? ",sound,type,language,emote" : "", table);
+    std::unique_ptr<QueryResult> result(db.PQuery("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` %s FROM %s", extra_content ? ", `sound`, `type`, `language`, `emote`" : "", table));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8987,13 +8718,12 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     }
 
     uint32 count = 0;
-
     BarGoLink bar(result->GetRowCount());
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         int32 entry = fields[0].GetInt32();
 
@@ -9075,8 +8805,6 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     if (min_value == MIN_MANGOS_STRING_ID)
         sLog.outString(">> Loaded %u MaNGOS strings from table %s", count, table);
@@ -9110,19 +8838,26 @@ bool ObjectMgr::LoadQuestGreetings()
     for (uint32 i = 0; i < QUESTGIVER_TYPE_MAX; i++)
         mQuestGreetingLocaleMap[i].clear(); // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,type,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `Emote`, `EmoteDelay` FROM `quest_greeting`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 quest greetings. DB table `quest_greeting` is empty.");
         return false;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
+
         uint32 entry = fields[0].GetUInt32();
         uint8 type = fields[1].GetUInt8();
 
@@ -9188,8 +8923,6 @@ bool ObjectMgr::LoadQuestGreetings()
         }
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u quest greetings.", count);
 
@@ -9200,18 +8933,24 @@ bool ObjectMgr::LoadTrainerGreetings()
 {
     mTrainerGreetingLocaleMap.clear();
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8 FROM npc_trainer_greeting");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 npc trainer greetings. DB table `npc_trainer_greeting` is empty.");
         return false;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
 
@@ -9249,8 +8988,6 @@ bool ObjectMgr::LoadTrainerGreetings()
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u trainer greetings.", count);
 
@@ -9262,12 +8999,11 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     mFishingBaseForArea.clear();                            // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT entry,skill FROM skill_fishing_base_level");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `skill` FROM `skill_fishing_base_level`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9280,8 +9016,8 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
+
         uint32 entry  = fields[0].GetUInt32();
         int32 skill   = fields[1].GetInt32();
 
@@ -9296,8 +9032,6 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u areas for fishing base skill level", count);
@@ -9341,12 +9075,11 @@ void ObjectMgr::LoadGameTele()
     m_GameTeleMap.clear();                                  // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT id, position_x, position_y, position_z, orientation, map, name FROM game_tele");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name` FROM `game_tele`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9359,11 +9092,9 @@ void ObjectMgr::LoadGameTele()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 id         = fields[0].GetUInt32();
-
         GameTele gt;
 
         gt.position_x     = fields[1].GetFloat();
@@ -9392,7 +9123,6 @@ void ObjectMgr::LoadGameTele()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u GameTeleports", count);
@@ -9403,17 +9133,17 @@ GameTele const* ObjectMgr::GetGameTele(const std::string& name) const
     // explicit name case
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
-        return NULL;
+        return nullptr;
 
     // converting string that we try to find to lower case
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GameTele* alt = NULL;
+    const GameTele* alt = nullptr;
     for (GameTeleMap::const_iterator itr = m_GameTeleMap.begin(); itr != m_GameTeleMap.end(); ++itr)
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == NULL && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
 
     return alt;
@@ -9437,7 +9167,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
 
     m_GameTeleMap[new_id] = tele;
 
-    return WorldDatabase.PExecuteLog("INSERT INTO game_tele (id,position_x,position_y,position_z,orientation,map,name) VALUES (%u,%f,%f,%f,%f,%u,'%s')",
+    return WorldDatabase.PExecuteLog("INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (%u,%f,%f,%f,%f,%u,'%s')",
                                      new_id, tele.position_x, tele.position_y, tele.position_z, tele.orientation, tele.mapId, tele.name.c_str());
 }
 
@@ -9455,7 +9185,7 @@ bool ObjectMgr::DeleteGameTele(const std::string& name)
     {
         if (itr->second.wnameLow == wname)
         {
-            WorldDatabase.PExecuteLog("DELETE FROM game_tele WHERE name = '%s'", itr->second.name.c_str());
+            WorldDatabase.PExecuteLog("DELETE FROM `game_tele` WHERE `name` = '%s'", itr->second.name.c_str());
             m_GameTeleMap.erase(itr);
             return true;
         }
@@ -9475,12 +9205,11 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
     std::set<uint32> skip_trainers;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, spell,spellcost,reqskill,reqskillvalue,reqlevel FROM %s WHERE %u BETWEEN build_min AND build_max", tableName, SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel` FROM %s WHERE %u BETWEEN `build_min` AND `build_max`", tableName, SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9489,14 +9218,12 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
     }
 
     BarGoLink bar(result->GetRowCount());
-
     std::set<uint32> talentIds;
 
     uint32 count = 0;
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         uint32 entry  = fields[0].GetUInt32();
@@ -9596,7 +9323,6 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %d trainer %sspells", count, isTemplates ? "template " : "");
@@ -9614,7 +9340,7 @@ void ObjectMgr::LoadTrainerTemplates()
 
     // We need to use a query to get all used trainer ids because of progression.
     // It might be used by a creature that is not loaded in this patch.
-    QueryResult* result = WorldDatabase.Query("SELECT entry, patch, trainer_id FROM creature_template WHERE trainer_id != 0");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `patch`, `trainer_id` FROM `creature_template` WHERE `trainer_id` != 0"));
 
     if (result)
     {
@@ -9630,7 +9356,6 @@ void ObjectMgr::LoadTrainerTemplates()
             else if (patch <= sWorld.GetWowPatch())
                 sLog.outErrorDb("Creature (Entry: %u) has trainer_id = %u for nonexistent trainer template", creature_id, trainer_id);
         } while (result->NextRow());
-        delete result;
     }
 
     for (std::set<uint32>::const_iterator tItr = trainer_ids.begin(); tItr != trainer_ids.end(); ++tItr)
@@ -9648,11 +9373,10 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
 
     std::set<uint32> skip_vendors;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, item, maxcount, incrtime, itemflags FROM %s WHERE (item NOT IN (SELECT entry FROM forbidden_items WHERE (AfterOrBefore = 0 && patch <= %u) || (AfterOrBefore = 1 && patch >= %u)))", tableName, sWorld.GetWowPatch(), sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `item`, `maxcount`, `incrtime`, `itemflags` FROM %s WHERE (`item` NOT IN (SELECT `entry` FROM `forbidden_items` WHERE (`after_or_before` = 0 && `patch` <= %u) || (`after_or_before` = 1 && `patch` >= %u)))", tableName, sWorld.GetWowPatch(), sWorld.GetWowPatch()));
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9660,9 +9384,9 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
         return;
     }
 
-    BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
+    
     do
     {
         bar.step();
@@ -9684,7 +9408,6 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
 
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u vendor %sitems", count, isTemplates ? "template " : "");
@@ -9703,7 +9426,7 @@ void ObjectMgr::LoadVendorTemplates()
 
     // We need to use a query to get all used vendor ids because of progression.
     // It might be used by a creature that is not loaded in this patch.
-    QueryResult* result = WorldDatabase.Query("SELECT entry, patch, vendor_id FROM creature_template WHERE vendor_id != 0");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `patch`, `vendor_id` FROM `creature_template` WHERE `vendor_id` != 0"));
 
     if (result)
     {
@@ -9719,7 +9442,6 @@ void ObjectMgr::LoadVendorTemplates()
             else if (patch <= sWorld.GetWowPatch())
                 sLog.outErrorDb("Creature (Entry: %u) has vendor_id = %u for nonexistent vendor template", creature_id, vendor_id);
         } while (result->NextRow());
-        delete result;
     }
 
     for (std::set<uint32>::const_iterator vItr = vendor_ids.begin(); vItr != vendor_ids.end(); ++vItr)
@@ -9728,14 +9450,12 @@ void ObjectMgr::LoadVendorTemplates()
 
 void ObjectMgr::LoadNpcGossips()
 {
-
     m_mCacheNpcTextIdMap.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT npc_guid, textid FROM npc_gossip");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `npc_guid`, `textid` FROM `npc_gossip`"));
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9743,14 +9463,13 @@ void ObjectMgr::LoadNpcGossips()
         return;
     }
 
-    BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
     uint32 guid, textid;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         guid   = fields[0].GetUInt32();
@@ -9773,7 +9492,6 @@ void ObjectMgr::LoadNpcGossips()
 
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %d NpcTextId ", count);
@@ -9783,13 +9501,12 @@ void ObjectMgr::LoadGossipMenu()
 {
     m_mGossipMenusMap.clear();
 
-    //                                                0      1        2
-    QueryResult* result = WorldDatabase.Query("SELECT entry, text_id, condition_id FROM gossip_menu");
+    //                                                               0        1          2
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_id`, `condition_id` FROM `gossip_menu`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9797,14 +9514,12 @@ void ObjectMgr::LoadGossipMenu()
         return;
     }
 
-    BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         GossipMenus gMenu;
@@ -9835,8 +9550,6 @@ void ObjectMgr::LoadGossipMenu()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u gossip_menu entries", count);
 
@@ -9857,16 +9570,15 @@ void ObjectMgr::LoadGossipMenuItems()
 {
     m_mGossipMenuItemsMap.clear();
 
-    QueryResult* result = WorldDatabase.Query(
-                              "SELECT menu_id, id, option_icon, option_text, OptionBroadcastTextID, option_id, npc_option_npcflag, "
-                              "action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text, BoxBroadcastTextID, "
-                              "condition_id "
-                              "FROM gossip_menu_option ORDER BY menu_id, id");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query(
+                              "SELECT `menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, "
+                              "`action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, "
+                              "`condition_id` "
+                              "FROM `gossip_menu_option` ORDER BY `menu_id`, `id`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -9908,7 +9620,6 @@ void ObjectMgr::LoadGossipMenuItems()
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         GossipMenuItems gMenuItem;
@@ -10043,8 +9754,6 @@ void ObjectMgr::LoadGossipMenuItems()
     }
     while (result->NextRow());
 
-    delete result;
-
     for (std::set<uint32>::const_iterator itr = gossipScriptSet.begin(); itr != gossipScriptSet.end(); ++itr)
         sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", *itr);
 
@@ -10063,7 +9772,7 @@ void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, uint32 maxcount, uint32
     VendorItemData& vList = m_mCacheVendorItemMap[entry];
     vList.AddItem(item, maxcount, incrtime, itemflags);
 
-    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,itemflags) VALUES('%u','%u','%u','%u','%u')", entry, item, maxcount, incrtime, itemflags);
+    WorldDatabase.PExecuteLog("INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) VALUES('%u','%u','%u','%u','%u')", entry, item, maxcount, incrtime, itemflags);
 }
 
 bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item)
@@ -10076,7 +9785,7 @@ bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item)
         return false;
 
     iter->second.RemoveItem(item);
-    WorldDatabase.PExecuteLog("DELETE FROM npc_vendor WHERE entry='%u' AND item='%u'", entry, item);
+    WorldDatabase.PExecuteLog("DELETE FROM `npc_vendor` WHERE `entry`='%u' AND `item`='%u'", entry, item);
     return true;
 }
 
@@ -10502,7 +10211,7 @@ void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, Team team, bool in
 
     // remove link from DB
     if (inDB)
-        WorldDatabase.PExecute("DELETE FROM game_graveyard_zone WHERE id = '%u' AND ghost_zone = '%u' AND faction = '%u'", id, zoneId, team);
+        WorldDatabase.PExecute("DELETE FROM `game_graveyard_zone` WHERE `id` = '%u' AND `ghost_zone` = '%u' AND `faction` = '%u'", id, zoneId, team);
 
     return;
 }
@@ -10510,18 +10219,24 @@ void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, Team team, bool in
 void ObjectMgr::LoadFactionChangeReputations()
 {
     factionchange_reputations.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_reputations");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_reputations`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 faction change reputation pairs. DB table `player_factionchange_reputations` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -10529,7 +10244,7 @@ void ObjectMgr::LoadFactionChangeReputations()
 
         if (!GetFactionEntry(alliance) || !GetFactionEntry(horde))
         {
-            sLog.outErrorDb("Couple %u/%u erreur. Sort inexistant. Supprime de la DB", alliance, horde);
+            sLog.outErrorDb("Faction change reputation pair %u/%u does not exist.", alliance, horde);
         }
         else
             factionchange_reputations[alliance] = horde;
@@ -10538,26 +10253,32 @@ void ObjectMgr::LoadFactionChangeReputations()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> Loaded %u reputations changes.", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change reputation pairs.", count);
 }
 
 
 void ObjectMgr::LoadFactionChangeSpells()
 {
     factionchange_spells.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_spells");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_spells`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 faction change spell pairs. DB table `player_factionchange_spells` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -10565,7 +10286,7 @@ void ObjectMgr::LoadFactionChangeSpells()
 
         if (!sSpellMgr.GetSpellEntry(alliance) || !sSpellMgr.GetSpellEntry(horde))
         {
-            sLog.outErrorDb("Couple %u/%u erreur. Sort inexistant. Supprime de la DB", alliance, horde);
+            sLog.outErrorDb("Faction change spell pair %u/%u does not exist.", alliance, horde);
         }
         else
             factionchange_spells[alliance] = horde;
@@ -10574,26 +10295,32 @@ void ObjectMgr::LoadFactionChangeSpells()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u equivalences de sorts Alliance/Horde chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change spell pairs.", count);
 }
 
 
 void ObjectMgr::LoadFactionChangeItems()
 {
     factionchange_items.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_items");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_items`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 faction change item pairs. DB table `player_factionchange_spells` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -10602,7 +10329,7 @@ void ObjectMgr::LoadFactionChangeItems()
         if (!GetItemPrototype(alliance) || !GetItemPrototype(horde))
         {
             if (!IsExistingItemId(alliance) || !IsExistingItemId(horde))
-                sLog.outErrorDb("Couple %u/%u erreur. Item inexistant. Supprime de la DB", alliance, horde);
+                sLog.outErrorDb("Faction change item pair %u/%u does not exist", alliance, horde);
         }
         else
             factionchange_items[alliance] = horde;
@@ -10611,25 +10338,31 @@ void ObjectMgr::LoadFactionChangeItems()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u equivalences d'items Alliance/Horde chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change item pairs.", count);
 }
 
 void ObjectMgr::LoadFactionChangeQuests()
 {
     factionchange_quests.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_quests");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_quests`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 change quests pairs. DB table `player_factionchange_quests` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -10638,7 +10371,7 @@ void ObjectMgr::LoadFactionChangeQuests()
         if (!GetQuestTemplate(alliance) || !GetQuestTemplate(horde))
         {
             if (!IsExistingQuestId(alliance) || !IsExistingQuestId(horde))
-                sLog.outErrorDb("Couple %u/%u erreur. Quete inexistante. Supprime de la DB", alliance, horde);
+                sLog.outErrorDb("Faction change quest pair %u/%u does not exist.", alliance, horde);
         }
         else
             factionchange_quests[alliance] = horde;
@@ -10647,25 +10380,31 @@ void ObjectMgr::LoadFactionChangeQuests()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u equivalences de quetes Alliance/Horde chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change quest pairs.", count);
 }
 
 void ObjectMgr::LoadFactionChangeMounts()
 {
     factionchange_mounts.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT RaceId, MountNum, ItemEntry FROM player_factionchange_mounts");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `RaceId`, `MountNum`, `ItemEntry` FROM `player_factionchange_mounts`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 entries. The table `player_factionchange_mounts` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint8 RaceId     = fields[0].GetUInt8();
@@ -10675,7 +10414,7 @@ void ObjectMgr::LoadFactionChangeMounts()
         if (!GetItemPrototype(ItemEntry))
         {
             if (!IsExistingItemId(ItemEntry))
-                sLog.outErrorDb("Couple %u/%u/%u erreur. Quete inexistante. Supprime de la DB", RaceId, MountNum, ItemEntry);
+                sLog.outErrorDb("Faction change mount replacement %u/%u/%u is invalid. The item does not exist.", RaceId, MountNum, ItemEntry);
         }
         else
         {
@@ -10689,24 +10428,29 @@ void ObjectMgr::LoadFactionChangeMounts()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u montures de races chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change mount relacements.", count);
 }
 void ObjectMgr::RestoreDeletedItems()
 {
-    QueryResult* result = CharacterDatabase.Query("SELECT id, player_guid, item_entry, stack_count FROM character_deleted_items");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `player_guid`, `item_entry`, `stack_count` FROM `character_deleted_items`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Restored 0 prevously deleted items.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
@@ -10734,14 +10478,13 @@ void ObjectMgr::RestoreDeletedItems()
                     .AddItem(restoredItem)
                     .SendMailTo(MailReceiver(memberGuid), MailSender(MAIL_NORMAL, memberGuid.GetCounter(), MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED, 0, 30 * DAY);
 
-                CharacterDatabase.PExecute("DELETE FROM character_deleted_items WHERE id = %u", id);
+                CharacterDatabase.PExecute("DELETE FROM `character_deleted_items` WHERE `id` = %u", id);
 
                 count++;
             }
         }
     } while (result->NextRow());
 
-    delete result;
     sLog.outString();
     sLog.outString(">> Restored %u previously deleted items to players.", count);
 }
@@ -10925,12 +10668,13 @@ void ObjectMgr::LoadAreaLocales()
 {
     mAreaLocaleMap.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT Entry, NameLoc1, NameLoc2, NameLoc3, NameLoc4, NameLoc5, NameLoc6, NameLoc7, NameLoc8 FROM locales_area");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Entry`, `NameLoc1`, `NameLoc2`, `NameLoc3`, `NameLoc4`, `NameLoc5`, `NameLoc6`, `NameLoc7`, `NameLoc8` FROM `locales_area`"));
 
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
+
         sLog.outString(">> Loaded 0 area locale strings. DB table `locales_area` is empty.");
         return;
     }
@@ -10939,8 +10683,8 @@ void ObjectMgr::LoadAreaLocales()
 
     do
     {
-        auto fields = result->Fetch();
         bar.step();
+        auto fields = result->Fetch();
 
         auto entry = fields[0].GetUInt32();
 
@@ -10969,8 +10713,6 @@ void ObjectMgr::LoadAreaLocales()
         }
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString(">> Loaded " SIZEFMTD " area locale strings", mAreaLocaleMap.size());
     sLog.outString();

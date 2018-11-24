@@ -819,8 +819,8 @@ void MapPersistentStateManager::PackInstances()
         bar.step();
     }
 
-    sLog.outString(">> Instance numbers remapped, next instance id is %u", InstanceNumber);
     sLog.outString();
+    sLog.outString(">> Instance numbers remapped, next instance id is %u", InstanceNumber);
 }
 
 void MapPersistentStateManager::ScheduleInstanceResets()
@@ -987,7 +987,6 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -999,8 +998,8 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 loguid       = fields[0].GetUInt32();
         uint64 respawn_time = fields[1].GetUInt64();
@@ -1054,8 +1053,8 @@ void MapPersistentStateManager::LoadCreatureRespawnTimes()
 
     delete result;
 
-    sLog.outString(">> Loaded %u creature respawn times", count);
     sLog.outString();
+    sLog.outString(">> Loaded %u creature respawn times", count);
 }
 
 void MapPersistentStateManager::LoadGameobjectRespawnTimes()
@@ -1070,7 +1069,6 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -1082,8 +1080,8 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 loguid       = fields[0].GetUInt32();
         uint64 respawn_time = fields[1].GetUInt64();
@@ -1134,6 +1132,6 @@ void MapPersistentStateManager::LoadGameobjectRespawnTimes()
 
     delete result;
 
-    sLog.outString(">> Loaded %u gameobject respawn times", count);
     sLog.outString();
+    sLog.outString(">> Loaded %u gameobject respawn times", count);
 }

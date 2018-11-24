@@ -234,6 +234,10 @@ class FindCreatureData
         float i_spawnedDist;
 };
 
+typedef std::unordered_map<uint32, FactionEntry> FactionsMap;
+typedef std::unordered_map<uint32, FactionTemplateEntry> FactionTemplatesMap;
+typedef std::unordered_map<uint32, SoundEntriesEntry> SoundEntryMap;
+
 typedef std::unordered_map<uint32,GameObjectData> GameObjectDataMap;
 typedef GameObjectDataMap::value_type GameObjectDataPair;
 
@@ -584,7 +588,7 @@ class ObjectMgr
 
         typedef std::unordered_map<uint32, Quest*> QuestMap;
 
-        typedef std::vector<std::unique_ptr<AreaTriggerEntry>> AreaTriggerStore;
+        typedef std::unordered_map<uint32, AreaTriggerEntry> AreaTriggerMap;
         typedef std::map<uint32, AreaTriggerTeleport> AreaTriggerTeleportMap;
         typedef std::unordered_map<uint32, BattlegroundEntranceTrigger> BGEntranceTriggerMap;
 
@@ -720,8 +724,20 @@ class ObjectMgr
         AreaTriggerTeleport const* GetMapEntranceTrigger(uint32 Map) const;
 
         void LoadAreaTriggers();
-        AreaTriggerEntry const* GetAreaTrigger(uint32 id) const { return id < GetMaxAreaTriggerId() ? mAreaTriggers[id].get() : nullptr; }
-        uint32 GetMaxAreaTriggerId() const { return mAreaTriggers.size(); }
+
+        AreaTriggerEntry const* GetAreaTrigger(uint32 id) const
+        {
+            auto itr = mAreaTriggersMap.find(id);
+            if (itr != mAreaTriggersMap.end())
+                return &itr->second;
+
+            return nullptr;
+        }
+
+        AreaTriggerMap const& GetAreaTriggersMap() const
+        {
+            return mAreaTriggersMap;
+        }
 
         BattlegroundEntranceTrigger const* GetBattlegroundEntranceTrigger(uint32 trigger) const
         {
@@ -1244,15 +1260,46 @@ class ObjectMgr
 
         // Sound Entries
         void LoadSoundEntries();
-        SoundEntriesEntry const* GetSoundEntry(uint32 id) const { return id < GetMaxSoundId() ? mSoundEntries[id].get() : nullptr; }
-        uint32 GetMaxSoundId() const { return mSoundEntries.size(); }
+        SoundEntriesEntry const* GetSoundEntry(uint32 id) const
+        {
+            auto iter = mSoundEntriesMap.find(id);
+            if (iter == mSoundEntriesMap.end())
+                return nullptr;
+
+            return &iter->second;
+        }
+
+        SoundEntryMap const& GetSoundEntriesMap() const
+        {
+            return mSoundEntriesMap;
+        }
 
         // Factions
         void LoadFactions();
-        FactionEntry const* GetFactionEntry(uint32 id) const { return id < GetMaxFactionId() ? mFactions[id].get() : nullptr; }
-        uint32 GetMaxFactionId() const { return mFactions.size(); }
-        FactionTemplateEntry const* GetFactionTemplateEntry(uint32 id) const { return id < GetMaxFactionTemplateId() ? mFactionTemplates[id].get() : nullptr; }
-        uint32 GetMaxFactionTemplateId() const { return mFactionTemplates.size(); }
+        FactionEntry const* GetFactionEntry(uint32 id) const
+        {
+            auto iter = mFactionsMap.find(id);
+            if (iter == mFactionsMap.end())
+                return nullptr;
+
+            return &iter->second;
+        }
+        FactionsMap const& GetFactionMap() const
+        {
+            return mFactionsMap;
+        }
+        FactionTemplateEntry const* GetFactionTemplateEntry(uint32 id) const
+        {
+            auto iter = mFactionTemplatesMap.find(id);
+            if (iter == mFactionTemplatesMap.end())
+                return nullptr;
+
+            return &iter->second;
+        }
+        FactionTemplatesMap const& GetFactionTemplateMap() const
+        {
+            return mFactionTemplatesMap;
+        }
 
         // Skill Line Abilities
         void LoadSkillLineAbility();
@@ -1340,7 +1387,7 @@ class ObjectMgr
 
         ItemTextMap         mItemTexts;
 
-        AreaTriggerStore    mAreaTriggers;
+        AreaTriggerMap    mAreaTriggersMap;
         QuestAreaTriggerMap mQuestAreaTriggerMap;
         TavernAreaTriggerSet mTavernAreaTriggerSet;
         GameObjectForQuestSet mGameObjectForQuestSet;
@@ -1446,13 +1493,10 @@ class ObjectMgr
         PointOfInterestLocaleMap mPointOfInterestLocaleMap;
         AreaLocaleMap mAreaLocaleMap;
 
-        typedef std::vector<std::unique_ptr<FactionEntry>> FactionStore;
-        FactionStore mFactions;
-        typedef std::vector<std::unique_ptr<FactionTemplateEntry>> FactionTemplateStore;
-        FactionTemplateStore mFactionTemplates;
+        FactionsMap mFactionsMap;
+        FactionTemplatesMap mFactionTemplatesMap;
 
-        typedef std::vector<std::unique_ptr<SoundEntriesEntry>> SoundEntryStore;
-        SoundEntryStore mSoundEntries;
+        SoundEntryMap mSoundEntriesMap;
 
         typedef std::vector<std::unique_ptr<SkillLineAbilityEntry>> SkillLineAbiilityStore;
         SkillLineAbiilityStore mSkillLineAbilities;
