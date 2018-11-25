@@ -4962,7 +4962,7 @@ void Player::RepopAtGraveyard()
     // note: this can be called also when the player is alive
     // for example from WorldSession::HandleMovementOpcodes
 
-    WorldSafeLocsEntry const *ClosestGrave = NULL;
+    WorldSafeLocsEntry const *ClosestGrave = nullptr;
 
     // Special handle for battleground maps
     std::function<void()> recover;
@@ -4989,7 +4989,7 @@ void Player::RepopAtGraveyard()
     // stop countdown until repop
     m_deathTimer = 0;
     SetDeathState(DEAD);
-    UpdateObjectVisibility();
+
     // if no grave found, stay at the current location
     // and don't show spirit healer location
     if (ClosestGrave)
@@ -5002,6 +5002,10 @@ void Player::RepopAtGraveyard()
         }
         TeleportTo(ClosestGrave->map_id, ClosestGrave->x, ClosestGrave->y, ClosestGrave->z, GetOrientation(), 0, std::move(recover));
     }
+
+    // Fix invisible spirit healer if you die close to graveyard.
+    if (IsInWorld())
+        UpdateVisibilityAndView();
 }
 
 void Player::JoinedChannel(Channel *c)
