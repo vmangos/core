@@ -1776,7 +1776,7 @@ bool WorldObject::IsPositionValid() const
     return MaNGOS::IsValidMapCoord(m_position.x, m_position.y, m_position.z, m_position.o);
 }
 
-void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/)
+void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/) const
 {
     //if object is in world, map for it already created!
     if (IsInWorld())
@@ -1786,9 +1786,9 @@ void WorldObject::SendMessageToSet(WorldPacket *data, bool /*bToSelf*/)
 struct MANGOS_DLL_DECL ObjectViewersDeliverer
 {
     WorldPacket* i_message;
-    WorldObject* i_sender;
-    WorldObject* i_except;
-    explicit ObjectViewersDeliverer(WorldObject* sender, WorldPacket *msg, WorldObject* except) : i_message(msg), i_sender(sender), i_except(except) {}
+    WorldObject const* i_sender;
+    WorldObject const* i_except;
+    explicit ObjectViewersDeliverer(WorldObject const* sender, WorldPacket *msg, WorldObject const* except) : i_message(msg), i_sender(sender), i_except(except) {}
     void Visit(CameraMapType &m)
     {
         for (auto iter = m.begin(); iter != m.end(); ++iter)
@@ -1800,10 +1800,10 @@ struct MANGOS_DLL_DECL ObjectViewersDeliverer
     template<class SKIP> void Visit(GridRefManager<SKIP> &) {}
 };
 
-void WorldObject::SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject* except)
+void WorldObject::SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject const* except) const
 {
     if (self && this != except)
-        if (Player* me = ToPlayer())
+        if (Player const* me = ToPlayer())
             me->GetSession()->SendPacket(data);
 
     if (!IsInWorld())
@@ -1825,7 +1825,7 @@ void WorldObject::SendObjectMessageToSet(WorldPacket *data, bool self, WorldObje
     cell.Visit(p, message, *GetMap(), *this, GetMap()->GetVisibilityDistance() + GetVisibilityModifier());
 }
 
-void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject* except)
+void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except)
 {
     if (!IsPlayer() || !sWorld.GetBroadcaster()->IsEnabled())
         SendObjectMessageToSet(&data, true, except);
@@ -1838,14 +1838,14 @@ void WorldObject::SendMovementMessageToSet(WorldPacket data, bool self, WorldObj
     }
 }
 
-void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/)
+void WorldObject::SendMessageToSetInRange(WorldPacket *data, float dist, bool /*bToSelf*/) const
 {
     //if object is in world, map for it already created!
     if (IsInWorld())
         GetMap()->MessageDistBroadcast(this, data, dist);
 }
 
-void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver)
+void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver) const
 {
     //if object is in world, map for it already created!
     if (IsInWorld())
@@ -1855,7 +1855,7 @@ void WorldObject::SendMessageToSetExcept(WorldPacket *data, Player const* skippe
     }
 }
 
-void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid)
+void WorldObject::SendObjectDeSpawnAnim(ObjectGuid guid) const
 {
     WorldPacket data(SMSG_GAMEOBJECT_DESPAWN_ANIM, 8);
     data << ObjectGuid(guid);
@@ -2303,7 +2303,7 @@ void WorldObject::GetNearPoint(WorldObject const* searcher, float &x, float &y, 
         UpdateGroundPositionZ(x, y, z);
 }
 
-void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
+void WorldObject::PlayDistanceSound(uint32 sound_id, Player const* target /*= NULL*/) const
 {
     // Nostalrius: ignored by client if unit is not loaded
     WorldPacket data(SMSG_PLAY_OBJECT_SOUND, 4 + 8);
@@ -2315,7 +2315,7 @@ void WorldObject::PlayDistanceSound(uint32 sound_id, Player* target /*= NULL*/)
         SendObjectMessageToSet(&data, true);
 }
 
-void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
+void WorldObject::PlayDirectSound(uint32 sound_id, Player const* target /*= NULL*/) const
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(sound_id);
@@ -2325,7 +2325,7 @@ void WorldObject::PlayDirectSound(uint32 sound_id, Player* target /*= NULL*/)
         SendMessageToSet(&data, true);
 }
 
-void WorldObject::PlayDirectMusic(uint32 music_id, Player* target /*= NULL*/)
+void WorldObject::PlayDirectMusic(uint32 music_id, Player const* target /*= NULL*/) const
 {
     WorldPacket data(SMSG_PLAY_MUSIC, 4);
     data << uint32(music_id);
@@ -2740,7 +2740,7 @@ namespace MaNGOS
     class MonsterChatBuilderFormat
     {
     public:
-        MonsterChatBuilderFormat(WorldObject const& obj, ChatMsg msgtype, int32 textId, uint32 language, Unit* target, va_list* vaList = nullptr)
+        MonsterChatBuilderFormat(WorldObject const& obj, ChatMsg msgtype, int32 textId, uint32 language, Unit const* target, va_list* vaList = nullptr)
             : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target), i_vaList(vaList) {}
         void operator()(WorldPacket& data, int32 loc_idx)
         {
@@ -2758,7 +2758,7 @@ namespace MaNGOS
         ChatMsg i_msgtype;
         int32 i_textId;
         uint32 i_language;
-        Unit* i_target;
+        Unit const* i_target;
         va_list* i_vaList;
     };
 }
@@ -2768,7 +2768,7 @@ namespace MaNGOS
     class MonsterChatBuilder
     {
     public:
-        MonsterChatBuilder(WorldObject const& obj, ChatMsg msgtype, int32 textId, uint32 language, Unit* target)
+        MonsterChatBuilder(WorldObject const& obj, ChatMsg msgtype, int32 textId, uint32 language, Unit const* target)
             : i_source(obj), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target) {}
         void operator()(WorldPacket& data, int32 loc_idx) const
         {
@@ -2783,7 +2783,7 @@ namespace MaNGOS
         ChatMsg i_msgtype;
         int32 i_textId;
         uint32 i_language;
-        Unit* i_target;
+        Unit const* i_target;
     };
 }                                                           // namespace MaNGOS
 
@@ -2799,7 +2799,7 @@ void WorldObject::PMonsterSay(int32 textId, ...) const
     va_end(ap);
 }
 
-void WorldObject::PMonsterSay(const char* text, ...)
+void WorldObject::PMonsterSay(const char* text, ...) const
 {
     va_list ap;
     char str[2048];
@@ -2821,7 +2821,7 @@ void WorldObject::PMonsterYell(int32 textId, ...) const
     va_end(ap);
 }
 
-void WorldObject::PMonsterYell(const char* text, ...)
+void WorldObject::PMonsterYell(const char* text, ...) const
 {
     va_list ap;
     char str[2048];
@@ -2831,21 +2831,21 @@ void WorldObject::PMonsterYell(const char* text, ...)
     MonsterYell(str);
 }
 
-void WorldObject::MonsterSay(const char* text, uint32 language, Unit* target)
+void WorldObject::MonsterSay(const char* text, uint32 language, Unit const* target) const
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildWorldObjectChat(&data, GetObjectGuid(), CHAT_MSG_MONSTER_SAY, text, language, GetName(), target ? target->GetObjectGuid() : ObjectGuid());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), true);
 }
 
-void WorldObject::MonsterYell(const char* text, uint32 language, Unit* target)
+void WorldObject::MonsterYell(const char* text, uint32 language, Unit const* target) const
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildWorldObjectChat(&data, GetObjectGuid(), CHAT_MSG_MONSTER_YELL, text, language, GetName(), target ? target->GetObjectGuid() : ObjectGuid());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_YELL), true);
 }
 
-void WorldObject::MonsterTextEmote(const char* text, Unit* target, bool IsBossEmote)
+void WorldObject::MonsterTextEmote(const char* text, Unit const* target, bool IsBossEmote) const
 {
     WorldPacket data(SMSG_MESSAGECHAT, 200);
     BuildWorldObjectChat(&data, GetObjectGuid(), IsBossEmote ? CHAT_MSG_RAID_BOSS_EMOTE : CHAT_MSG_MONSTER_EMOTE, text, LANG_UNIVERSAL,
@@ -2853,7 +2853,7 @@ void WorldObject::MonsterTextEmote(const char* text, Unit* target, bool IsBossEm
     SendMessageToSetInRange(&data, sWorld.getConfig(IsBossEmote ? CONFIG_FLOAT_LISTEN_RANGE_YELL : CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true);
 }
 
-void WorldObject::MonsterWhisper(const char* text, Unit* target, bool IsBossWhisper) const
+void WorldObject::MonsterWhisper(const char* text, Unit const* target, bool IsBossWhisper) const
 {
     if (!target || target->GetTypeId() != TYPEID_PLAYER)
         return;
@@ -2864,7 +2864,7 @@ void WorldObject::MonsterWhisper(const char* text, Unit* target, bool IsBossWhis
     ((Player*)target)->GetSession()->SendPacket(&data);
 }
 
-void WorldObject::MonsterSay(int32 textId, uint32 language, Unit* target) const
+void WorldObject::MonsterSay(int32 textId, uint32 language, Unit const* target) const
 {
     float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY);
     MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_SAY, textId, language, target);
@@ -2873,7 +2873,7 @@ void WorldObject::MonsterSay(int32 textId, uint32 language, Unit* target) const
     Cell::VisitWorldObjects(this, say_worker, range);
 }
 
-void WorldObject::MonsterYell(int32 textId, uint32 language, Unit* target) const
+void WorldObject::MonsterYell(int32 textId, uint32 language, Unit const* target) const
 {
     float range = sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_YELL);
     MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, target);
@@ -2882,7 +2882,7 @@ void WorldObject::MonsterYell(int32 textId, uint32 language, Unit* target) const
     Cell::VisitWorldObjects(this, say_worker, range);
 }
 
-void WorldObject::MonsterYellToZone(int32 textId, uint32 language, Unit* target) const
+void WorldObject::MonsterYellToZone(int32 textId, uint32 language, Unit const* target) const
 {
     MaNGOS::MonsterChatBuilder say_build(*this, CHAT_MSG_MONSTER_YELL, textId, language, target);
     MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
@@ -2895,7 +2895,7 @@ void WorldObject::MonsterYellToZone(int32 textId, uint32 language, Unit* target)
             say_do(itr->getSource());
 }
 
-void WorldObject::MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language, Unit* target) const
+void WorldObject::MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language, Unit const* target) const
 {
     MaNGOS::MonsterChatBuilder say_build(*this, type, textId, language, target);
     MaNGOS::LocalizedPacketDo<MaNGOS::MonsterChatBuilder> say_do(say_build);
@@ -2908,7 +2908,7 @@ void WorldObject::MonsterScriptToZone(int32 textId, ChatMsg type, uint32 languag
             say_do(itr->getSource());
 }
 
-void WorldObject::MonsterTextEmote(int32 textId, Unit* target, bool IsBossEmote) const
+void WorldObject::MonsterTextEmote(int32 textId, Unit const* target, bool IsBossEmote) const
 {
     float range = sWorld.getConfig(IsBossEmote ? CONFIG_FLOAT_LISTEN_RANGE_YELL : CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE);
 
@@ -2918,7 +2918,7 @@ void WorldObject::MonsterTextEmote(int32 textId, Unit* target, bool IsBossEmote)
     Cell::VisitWorldObjects(this, say_worker, range);
 }
 
-void WorldObject::MonsterWhisper(int32 textId, Unit* target, bool IsBossWhisper) const
+void WorldObject::MonsterWhisper(int32 textId, Unit const* target, bool IsBossWhisper) const
 {
     if (!target || target->GetTypeId() != TYPEID_PLAYER)
         return;

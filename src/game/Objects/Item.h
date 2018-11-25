@@ -313,7 +313,7 @@ class MANGOS_DLL_SPEC Item : public Object
         uint32 GetEnchantmentDuration(EnchantmentSlot slot) const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_DURATION_OFFSET);}
         uint32 GetEnchantmentCharges(EnchantmentSlot slot)  const { return GetUInt32Value(ITEM_FIELD_ENCHANTMENT + slot*MAX_ENCHANTMENT_OFFSET + ENCHANTMENT_CHARGES_OFFSET);}
 
-        void SendTimeUpdate(Player* owner);
+        void SendTimeUpdate(Player const* owner) const;
         void UpdateDuration(Player* owner, uint32 diff);
 
         // spell charges (negative means that once charges are consumed the item should be deleted)

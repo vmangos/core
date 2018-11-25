@@ -2707,7 +2707,7 @@ void Player::RemoveFromGroup(Group* group, ObjectGuid guid)
     }
 }
 
-void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP)
+void Player::SendLogXPGain(uint32 GivenXP, Unit* victim, uint32 RestXP) const
 {
     WorldPacket data(SMSG_LOG_XPGAIN, 21);
     data << (victim ? victim->GetObjectGuid() : ObjectGuid());// guid
@@ -3086,9 +3086,9 @@ void Player::InitStatsForLevel(bool reapplyMods)
         pet->SynchronizeLevelWithOwner();
 }
 
-void Player::SendInitialSpells()
+void Player::SendInitialSpells() const
 {
-    time_t curTime = time(NULL);
+    time_t curTime = time(nullptr);
     time_t infTime = curTime + infinityCooldownDelayCheck;
 
     uint16 spellCount = 0;
@@ -3867,7 +3867,7 @@ void Player::_SaveSpellCooldowns()
     }
 }
 
-void Player::updateResetTalentsMultiplier()
+void Player::updateResetTalentsMultiplier() const
 {
     time_t months = (sWorld.GetGameTime() - m_resetTalentsTime) / MONTH;
 
@@ -3892,7 +3892,7 @@ void Player::updateResetTalentsMultiplier()
     }
 }
 
-uint32 Player::resetTalentsCost()
+uint32 Player::resetTalentsCost() const
 {
     // decay respec cost
     if (!sWorld.getConfig(CONFIG_BOOL_NO_RESPEC_PRICE_DECAY) || (sWorld.GetWowPatch() >= WOW_PATCH_111))
@@ -6020,7 +6020,7 @@ void Player::SaveRecallPosition()
     m_recallO = GetOrientation();
 }
 
-void Player::SendMessageToSet(WorldPacket *data, bool self)
+void Player::SendMessageToSet(WorldPacket *data, bool self) const
 {
     if (IsInWorld())
         GetMap()->MessageBroadcast(this, data, false);
@@ -6031,7 +6031,7 @@ void Player::SendMessageToSet(WorldPacket *data, bool self)
         GetSession()->SendPacket(data);
 }
 
-void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
+void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self) const
 {
     if (IsInWorld())
         GetMap()->MessageDistBroadcast(this, data, dist, false);
@@ -6040,7 +6040,7 @@ void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self)
         GetSession()->SendPacket(data);
 }
 
-void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, bool own_team_only)
+void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, bool own_team_only) const
 {
     if (IsInWorld())
         GetMap()->MessageDistBroadcast(this, data, dist, false, own_team_only);
@@ -6049,7 +6049,7 @@ void Player::SendMessageToSetInRange(WorldPacket *data, float dist, bool self, b
         GetSession()->SendPacket(data);
 }
 
-void Player::SendDirectMessage(WorldPacket *data)
+void Player::SendDirectMessage(WorldPacket *data) const
 {
     GetSession()->SendPacket(data);
 }
@@ -7470,7 +7470,7 @@ void Player::RemovedInsignia(Player* looterPlr, Corpse *corpse)
     sObjectAccessor.ConvertCorpseForPlayer(GetObjectGuid(), looterPlr);
 }
 
-void Player::SendLootRelease(ObjectGuid guid)
+void Player::SendLootRelease(ObjectGuid guid) const
 {
     WorldPacket data(SMSG_LOOT_RELEASE_RESPONSE, (8 + 1));
     data << guid;
@@ -7925,20 +7925,20 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
         SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_LOOTING);
 }
 
-void Player::SendNotifyLootMoneyRemoved()
+void Player::SendNotifyLootMoneyRemoved() const
 {
     WorldPacket data(SMSG_LOOT_CLEAR_MONEY, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendNotifyLootItemRemoved(uint8 lootSlot)
+void Player::SendNotifyLootItemRemoved(uint8 lootSlot) const
 {
     WorldPacket data(SMSG_LOOT_REMOVED, 1);
     data << uint8(lootSlot);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendUpdateWorldState(uint32 Field, uint32 Value)
+void Player::SendUpdateWorldState(uint32 Field, uint32 Value) const
 {
     WorldPacket data(SMSG_UPDATE_WORLD_STATE, 8);
     data << Field;
@@ -8062,7 +8062,7 @@ static WorldStatePair def_world_states[] =
 
 
 
-void Player::SendInitWorldStates(uint32 zoneid)
+void Player::SendInitWorldStates(uint32 zoneid) const
 {
     uint32 mapid = GetMapId();
 
@@ -8158,7 +8158,7 @@ void Player::SetBindPoint(ObjectGuid guid)
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendTalentWipeConfirm(ObjectGuid guid)
+void Player::SendTalentWipeConfirm(ObjectGuid guid) const
 {
     WorldPacket data(MSG_TALENT_WIPE_CONFIRM, (8 + 4));
     data << ObjectGuid(guid);
@@ -8166,7 +8166,7 @@ void Player::SendTalentWipeConfirm(ObjectGuid guid)
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendPetSkillWipeConfirm()
+void Player::SendPetSkillWipeConfirm() const
 {
     Pet* pet = GetPet();
     if (!pet)
@@ -11500,7 +11500,7 @@ void Player::SendEquipError(InventoryResult msg, Item* pItem, Item *pItem2, uint
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendOpenContainer()
+void Player::SendOpenContainer() const
 {
     DEBUG_LOG("WORLD: Sent SMSG_OPEN_CONTAINER");
     WorldPacket data(SMSG_OPEN_CONTAINER, 8);   // opens the main bag in the UI
@@ -11508,7 +11508,7 @@ void Player::SendOpenContainer()
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 /*param*/)
+void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint32 /*param*/) const
 {
     DEBUG_LOG("WORLD: Sent SMSG_BUY_FAILED");
     WorldPacket data(SMSG_BUY_FAILED, (8 + 4 + 1));
@@ -11520,7 +11520,7 @@ void Player::SendBuyError(BuyResult msg, Creature* pCreature, uint32 item, uint3
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 /*param*/)
+void Player::SendSellError(SellResult msg, Creature* pCreature, ObjectGuid itemGuid, uint32 /*param*/) const
 {
     DEBUG_LOG("WORLD: Sent SMSG_SELL_ITEM");
     WorldPacket data(SMSG_SELL_ITEM, (8 + 8 + /*(param ? 4 : 0) +*/ 1)); // last check [ZERO]
@@ -11835,13 +11835,13 @@ void Player::ApplyEnchantment(Item *item, EnchantmentSlot slot, bool apply, bool
     }
 }
 
-void Player::SendEnchantmentDurations()
+void Player::SendEnchantmentDurations() const
 {
     for (EnchantDurationList::const_iterator itr = m_enchantDuration.begin(); itr != m_enchantDuration.end(); ++itr)
         GetSession()->SendItemEnchantTimeUpdate(GetObjectGuid(), itr->item->GetObjectGuid(), itr->slot, uint32(itr->leftduration) / 1000);
 }
 
-void Player::SendItemDurations()
+void Player::SendItemDurations() const
 {
     for (ItemDurationList::const_iterator itr = m_itemDuration.begin(); itr != m_itemDuration.end(); ++itr)
         (*itr)->SendTimeUpdate(this);
@@ -12735,7 +12735,7 @@ uint32 Player::CountFreeInventorySlots() const
     return freeSlots;
 }
 
-void Player::SendPetTameFailure(PetTameFailureReason reason)
+void Player::SendPetTameFailure(PetTameFailureReason reason) const
 {
     WorldPacket data(SMSG_PET_TAME_FAILURE, 1);
     data << uint8(reason);
@@ -14174,7 +14174,7 @@ bool Player::HasQuestForItem(uint32 itemid) const
 }
 
 // Used for quests having some event (explore, escort, "external event") as quest objective.
-void Player::SendQuestCompleteEvent(uint32 quest_id)
+void Player::SendQuestCompleteEvent(uint32 quest_id) const
 {
     if (quest_id)
     {
@@ -14185,7 +14185,7 @@ void Player::SendQuestCompleteEvent(uint32 quest_id)
     }
 }
 
-void Player::SendQuestReward(Quest const *pQuest, uint32 XP, Object * questGiver)
+void Player::SendQuestReward(Quest const *pQuest, uint32 XP, Object * questGiver) const
 {
     uint32 questid = pQuest->GetQuestId();
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_COMPLETE quest = %u", questid);
@@ -14230,7 +14230,7 @@ void Player::SendQuestFailedAtTaker(uint32 quest_id, uint32 reason) const
     }
 }
 
-void Player::SendQuestFailed(uint32 quest_id)
+void Player::SendQuestFailed(uint32 quest_id) const
 {
     if (quest_id)
     {
@@ -14241,7 +14241,7 @@ void Player::SendQuestFailed(uint32 quest_id)
     }
 }
 
-void Player::SendQuestTimerFailed(uint32 quest_id)
+void Player::SendQuestTimerFailed(uint32 quest_id) const
 {
     if (quest_id)
     {
@@ -14260,7 +14260,7 @@ void Player::SendCanTakeQuestResponse(uint32 msg) const
     DEBUG_LOG("WORLD: Sent SMSG_QUESTGIVER_QUEST_INVALID");
 }
 
-void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver)
+void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver) const
 {
     if (pReceiver)
     {
@@ -14287,7 +14287,7 @@ void Player::SendQuestConfirmAccept(const Quest* pQuest, Player* pReceiver)
     }
 }
 
-void Player::SendPushToPartyResponse(Player *pPlayer, uint8 msg)
+void Player::SendPushToPartyResponse(Player *pPlayer, uint8 msg) const
 {
     if (pPlayer)
     {
@@ -14299,7 +14299,7 @@ void Player::SendPushToPartyResponse(Player *pPlayer, uint8 msg)
     }
 }
 
-void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32 count)
+void Player::SendQuestUpdateAddItem(Quest const* pQuest, uint32 item_idx, uint32 count) const
 {
     DEBUG_LOG("WORLD: Sent SMSG_QUESTUPDATE_ADD_ITEM");
     WorldPacket data(SMSG_QUESTUPDATE_ADD_ITEM, (4 + 4));
@@ -15812,7 +15812,7 @@ DungeonPersistentState* Player::GetBoundInstanceSaveForSelfOrGroup(uint32 mapid)
     return state;
 }
 
-void Player::SendRaidInfo()
+void Player::SendRaidInfo() const
 {
     uint32 counter = 0;
 
@@ -15821,7 +15821,7 @@ void Player::SendRaidInfo()
     size_t p_counter = data.wpos();
     data << uint32(counter);                                // placeholder
 
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
 
     for (BoundInstancesMap::const_iterator itr = m_boundInstances.begin(); itr != m_boundInstances.end(); ++itr)
     {
@@ -15847,7 +15847,7 @@ void Player::SendRaidInfo()
 /*
 - called on every successful teleportation to a map
 */
-void Player::SendSavedInstances()
+void Player::SendSavedInstances() const
 {
     bool hasBeenSaved = false;
     WorldPacket data;
@@ -16664,12 +16664,6 @@ bool Player::CanSpeak() const
 /***              LOW LEVEL FUNCTIONS:Notifiers        ***/
 /*********************************************************/
 
-void Player::SendAttackSwingNotInRange()
-{
-    WorldPacket data(SMSG_ATTACKSWING_NOTINRANGE, 0);
-    GetSession()->SendPacket(&data);
-}
-
 void Player::SavePositionInDB(ObjectGuid guid, uint32 mapid, float x, float y, float z, float o, uint32 zone)
 {
     std::ostringstream ss;
@@ -16681,43 +16675,55 @@ void Player::SavePositionInDB(ObjectGuid guid, uint32 mapid, float x, float y, f
     CharacterDatabase.Execute(ss.str().c_str());
 }
 
-void Player::SendAttackSwingDeadTarget()
+void Player::SendAttackSwingNotInRange() const
+{
+    WorldPacket data(SMSG_ATTACKSWING_NOTINRANGE, 0);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendAttackSwingNotStanding() const
+{
+    WorldPacket data(SMSG_ATTACKSWING_NOTSTANDING, 0);
+    GetSession()->SendPacket(&data);
+}
+
+void Player::SendAttackSwingDeadTarget() const
 {
     WorldPacket data(SMSG_ATTACKSWING_DEADTARGET, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendAttackSwingCantAttack()
+void Player::SendAttackSwingCantAttack() const
 {
     WorldPacket data(SMSG_ATTACKSWING_CANT_ATTACK, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendAttackSwingCancelAttack()
+void Player::SendAttackSwingCancelAttack() const
 {
     WorldPacket data(SMSG_CANCEL_COMBAT, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendAttackSwingBadFacingAttack()
+void Player::SendAttackSwingBadFacingAttack() const
 {
     WorldPacket data(SMSG_ATTACKSWING_BADFACING, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendAutoRepeatCancel()
+void Player::SendAutoRepeatCancel() const
 {
     WorldPacket data(SMSG_CANCEL_AUTO_REPEAT, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendFeignDeathResisted()
+void Player::SendFeignDeathResisted() const
 {
     WorldPacket data(SMSG_FEIGN_DEATH_RESISTED, 0);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
+void Player::SendExplorationExperience(uint32 Area, uint32 Experience) const
 {
     WorldPacket data(SMSG_EXPLORATION_EXPERIENCE, 8);
     data << uint32(Area);
@@ -16725,7 +16731,7 @@ void Player::SendExplorationExperience(uint32 Area, uint32 Experience)
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendFactionAtWar(uint32 reputationId, bool apply)
+void Player::SendFactionAtWar(uint32 reputationId, bool apply) const
 {
     WorldPacket data(SMSG_SET_FACTION_ATWAR, 4 + 1);
     data << uint32(reputationId);
@@ -16781,14 +16787,14 @@ void Player::ResetInstances(InstanceResetMethod method)
     }
 }
 
-void Player::SendResetInstanceSuccess(uint32 MapId)
+void Player::SendResetInstanceSuccess(uint32 MapId) const
 {
     WorldPacket data(SMSG_INSTANCE_RESET, 4);
     data << uint32(MapId);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
+void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId) const
 {
     // reason: see enum InstanceResetFailReason
     WorldPacket data(SMSG_INSTANCE_RESET_FAILED, 8);
@@ -16798,12 +16804,12 @@ void Player::SendResetInstanceFailed(uint32 reason, uint32 MapId)
 }
 
 /** Implementation of hourly maximum instances per account */
-bool Player::CheckInstanceCount(uint32 instanceId)
+bool Player::CheckInstanceCount(uint32 instanceId) const
 {
     return isGameMaster() || sAccountMgr.CheckInstanceCount(GetSession()->GetAccountId(), instanceId, MAX_INSTANCE_PER_ACCOUNT_PER_HOUR);
 }
 
-void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime)
+void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const
 {
     sAccountMgr.AddInstanceEnterTime(GetSession()->GetAccountId(), instanceId, enterTime);
 }
@@ -16912,7 +16918,7 @@ void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string
     Player::BuildPlayerChat(GetObjectGuid(), chatTag(), data, msgtype, text, language);
 }
 
-void Player::Say(const std::string& text, const uint32 language)
+void Player::Say(const std::string& text, const uint32 language) const
 {
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_SAY, text, language);
@@ -16934,14 +16940,14 @@ float Player::GetYellRange() const
     return range;
 }
 
-void Player::Yell(const std::string& text, const uint32 language)
+void Player::Yell(const std::string& text, const uint32 language) const
 {
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_YELL, text, language);
     SendMessageToSetInRange(&data, GetYellRange(), true);
 }
 
-void Player::TextEmote(const std::string& text)
+void Player::TextEmote(const std::string& text) const
 {
     WorldPacket data(SMSG_MESSAGECHAT, 100);
     BuildPlayerChat(&data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL);
@@ -17084,7 +17090,7 @@ void Player::RemovePetActionBar()
     SendDirectMessage(&data);
 }
 
-bool Player::HasInstantCastingSpellMod(SpellEntry const *spellInfo)
+bool Player::HasInstantCastingSpellMod(SpellEntry const *spellInfo) const
 {
     for (const auto& mod : m_spellMods[SPELLMOD_CASTING_TIME])
     {
@@ -17094,7 +17100,7 @@ bool Player::HasInstantCastingSpellMod(SpellEntry const *spellInfo)
     return false;
 }
 
-bool Player::IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mod, Spell* spell)
+bool Player::IsAffectedBySpellmod(SpellEntry const *spellInfo, SpellModifier *mod, Spell* spell) const
 {
     if (!mod || !spellInfo)
         return false;
@@ -17127,7 +17133,7 @@ void Player::AddSpellMod(SpellModifier* mod, bool apply)
         delete mod;
 }
 
-void Player::SendSpellMod(SpellModifier const* mod)
+void Player::SendSpellMod(SpellModifier const* mod) const
 {
     uint16 Opcode = (mod->type == SPELLMOD_FLAT) ? SMSG_SET_FLAT_SPELL_MODIFIER : SMSG_SET_PCT_SPELL_MODIFIER;
 
@@ -17267,7 +17273,7 @@ void Player::DropModCharge(SpellModifier* mod, Spell* spell)
 }
 
 // send Proficiency
-void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask)
+void Player::SendProficiency(ItemClass itemClass, uint32 itemSubclassMask) const
 {
     WorldPacket data(SMSG_SET_PROFICIENCY, 1 + 4);
     data << uint8(itemClass) << uint32(itemSubclassMask);
@@ -17729,14 +17735,14 @@ void Player::Unmount(bool from_aura)
     SendDismountResult(DISMOUNTRESULT_OK);
 }
 
-void Player::SendMountResult(PlayerMountResult result)
+void Player::SendMountResult(PlayerMountResult result) const
 {
     WorldPacket data(SMSG_MOUNTRESULT, 4);
     data << uint32(result);
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendDismountResult(PlayerDismountResult result)
+void Player::SendDismountResult(PlayerDismountResult result) const
 {
     WorldPacket data(SMSG_DISMOUNTRESULT, 4);
     data << uint32(result);
@@ -18503,14 +18509,14 @@ void Player::SendUpdateToOutOfRangeGroupMembers()
         pet->ResetAuraUpdateMask();
 }
 
-void Player::SendTransferAborted(uint8 reason)
+void Player::SendTransferAborted(uint8 reason) const
 {
     WorldPacket data(SMSG_TRANSFER_ABORTED, 1);
     data << uint8(reason);                                  // transfer abort reason
     GetSession()->SendPacket(&data);
 }
 
-void Player::SendInstanceResetWarning(uint32 mapid, uint32 _time)
+void Player::SendInstanceResetWarning(uint32 mapid, uint32 _time) const
 {
     // type of warning, based on the time remaining until reset
     uint32 type;
@@ -19476,7 +19482,7 @@ void Player::UpdateCorpseReclaimDelay()
         m_deathExpireTime = now + DEATH_EXPIRE_STEP;
 }
 
-void Player::SendCorpseReclaimDelay(bool load)
+void Player::SendCorpseReclaimDelay(bool load) const
 {
     Corpse* corpse = GetCorpse();
     if (!corpse)
@@ -19503,7 +19509,7 @@ void Player::SendCorpseReclaimDelay(bool load)
 
         time_t expected_time = corpse->GetGhostTime() + copseReclaimDelay[count];
 
-        time_t now = time(NULL);
+        time_t now = time(nullptr);
         if (now >= expected_time)
             return;
 
@@ -20180,7 +20186,7 @@ void Player::RemoveAtLoginFlag(AtLoginFlags f, bool in_db_also /*= false*/)
         CharacterDatabase.PExecute("UPDATE characters set at_login = at_login & ~ %u WHERE guid ='%u'", uint32(f), GetGUIDLow());
 }
 
-void Player::SendClearCooldown(uint32 spell_id, Unit* target)
+void Player::SendClearCooldown(uint32 spell_id, Unit* target) const
 {
     WorldPacket data(SMSG_CLEAR_COOLDOWN, 4 + 8);
     data << uint32(spell_id);
@@ -20188,7 +20194,7 @@ void Player::SendClearCooldown(uint32 spell_id, Unit* target)
     SendDirectMessage(&data);
 }
 
-void Player::SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target)
+void Player::SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const
 {
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 4 + 4);
     data << target;
@@ -20303,7 +20309,7 @@ void Player::SetRestType(RestType n_r_type, uint32 areaTriggerId /*= 0*/)
     }
 }
 
-void Player::SendDuelCountdown(uint32 counter)
+void Player::SendDuelCountdown(uint32 counter) const
 {
     WorldPacket data(SMSG_DUEL_COUNTDOWN, 4);
     data << uint32(counter);                                // seconds

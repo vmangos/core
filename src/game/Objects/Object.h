@@ -420,7 +420,6 @@ class MANGOS_DLL_SPEC Object
 
         void ApplyModUInt32Value(uint16 index, int32 val, bool apply);
         void ApplyModInt32Value(uint16 index, int32 val, bool apply);
-        void ApplyModUInt64Value(uint16 index, int32 val, bool apply);
         void ApplyModPositiveFloatValue( uint16 index, float val, bool apply);
         void ApplyModSignedFloatValue( uint16 index, float val, bool apply);
 
@@ -625,8 +624,8 @@ class MANGOS_DLL_SPEC Object
 
         // for output helpfull error messages from ASSERTs
         bool PrintIndexError(uint32 index, bool set) const;
-        Object(const Object&);                              // prevent generation copy constructor
-        Object& operator=(Object const&);                   // prevent generation assigment operator
+        Object(const Object&) = delete;                     // prevent generation copy constructor
+        Object& operator=(Object const&) = delete;          // prevent generation assigment operator
 };
 
 struct WorldObjectChangeAccumulator;
@@ -659,7 +658,7 @@ m_obj->m_updateTracker.Reset();
 
             private:
                 UpdateHelper(const UpdateHelper&);
-                UpdateHelper& operator=(const UpdateHelper&);
+                UpdateHelper& operator=(const UpdateHelper&) = delete;
 
                 WorldObject * const m_obj;
         };
@@ -806,37 +805,37 @@ m_obj->m_updateTracker.Reset();
         virtual void CleanupsBeforeDelete();                // used in destructor or explicitly before mass creature delete to remove cross-references to already deleted units
 
         // Send to players
-        virtual void SendMessageToSet(WorldPacket *data, bool self);
+        virtual void SendMessageToSet(WorldPacket *data, bool self) const;
         // Send to players who have object at client
-        void SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject* except = nullptr);
-        void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject* except = nullptr);
+        void SendObjectMessageToSet(WorldPacket *data, bool self, WorldObject const* except = nullptr) const;
+        void SendMovementMessageToSet(WorldPacket data, bool self, WorldObject const* except = nullptr);
 
-        virtual void SendMessageToSetInRange(WorldPacket *data, float dist, bool self);
-        void SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver);
+        virtual void SendMessageToSetInRange(WorldPacket *data, float dist, bool self) const;
+        void SendMessageToSetExcept(WorldPacket *data, Player const* skipped_receiver) const;
         void DirectSendPublicValueUpdate(uint32 index);
 
-        void PlayDistanceSound(uint32 sound_id, Player* target = nullptr);
-        void PlayDirectSound(uint32 sound_id, Player* target = nullptr);
-        void PlayDirectMusic(uint32 music_id, Player* target = nullptr);
+        void PlayDistanceSound(uint32 sound_id, Player const* target = nullptr) const;
+        void PlayDirectSound(uint32 sound_id, Player const* target = nullptr) const;
+        void PlayDirectMusic(uint32 music_id, Player const* target = nullptr) const;
 
-        void PMonsterSay(const char* text, ...);
+        void PMonsterSay(const char* text, ...) const;
         void PMonsterSay(int32 text, ...) const;
-        void PMonsterYell(const char* text, ...);
+        void PMonsterYell(const char* text, ...) const;
         void PMonsterYell(int32 text, ...) const;
 
-        void MonsterSay(const char* text, uint32 language = 0, Unit* target = nullptr);
-        void MonsterYell(const char* text, uint32 language = 0, Unit* target = nullptr);
-        void MonsterTextEmote(const char* text, Unit* target = nullptr, bool IsBossEmote = false);
-        void MonsterWhisper(const char* text, Unit* target = nullptr, bool IsBossWhisper = false) const;
-        void MonsterSay(int32 textId, uint32 language = 0, Unit* target = nullptr) const;
-        void MonsterYell(int32 textId, uint32 language = 0, Unit* target = nullptr) const;
-        void MonsterTextEmote(int32 textId, Unit* target = nullptr, bool IsBossEmote = false) const;
-        void MonsterWhisper(int32 textId, Unit* receiver, bool IsBossWhisper = false) const;
-        void MonsterYellToZone(int32 textId, uint32 language = 0, Unit* target = nullptr) const;
-        void MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language = 0, Unit* target = nullptr) const;
+        void MonsterSay(const char* text, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterYell(const char* text, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterTextEmote(const char* text, Unit const* target = nullptr, bool IsBossEmote = false) const;
+        void MonsterWhisper(const char* text, Unit const* target = nullptr, bool IsBossWhisper = false) const;
+        void MonsterSay(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterYell(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterTextEmote(int32 textId, Unit const* target = nullptr, bool IsBossEmote = false) const;
+        void MonsterWhisper(int32 textId, Unit const* receiver, bool IsBossWhisper = false) const;
+        void MonsterYellToZone(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
+        void MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language = 0, Unit const* target = nullptr) const;
         static void BuildWorldObjectChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid);
 
-        void SendObjectDeSpawnAnim(ObjectGuid guid);
+        void SendObjectDeSpawnAnim(ObjectGuid guid) const;
 
         virtual bool IsHostileTo(Unit const* unit) const =0;
         virtual bool IsFriendlyTo(Unit const* unit) const =0;
