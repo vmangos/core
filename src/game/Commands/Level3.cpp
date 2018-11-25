@@ -3228,7 +3228,7 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
     ObjectMgr::QuestMap const& qTemplates = sObjectMgr.GetQuestTemplates();
     for (ObjectMgr::QuestMap::const_iterator iter = qTemplates.begin(); iter != qTemplates.end(); ++iter)
     {
-        Quest * qinfo = iter->second;
+        const auto& qinfo = iter->second;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)

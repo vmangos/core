@@ -1027,7 +1027,7 @@ public:
     }
 };
 
-char* const World::GetPatchName() const
+char const* World::GetPatchName() const
 {
     switch(GetWowPatch())
     {
