@@ -1103,12 +1103,6 @@ Motd = "Welcome to World of Warcraft!"
 #        Default: 0 (Not allowed)
 #                 1 (Allowed)
 #
-#    TalentsInspecting
-#        Allow other players see character talents in inspect dialog (Characters in Gamemaster mode can
-#        inspect talents always)
-#        Default: 1 (allow)
-#                 0 (not allow)
-#
 ###################################################################################################################
 
 AllowTwoSide.Accounts = 0
@@ -1122,7 +1116,6 @@ AllowTwoSide.Interaction.Auction = 0
 AllowTwoSide.Interaction.Mail = 0
 AllowTwoSide.WhoList = 0
 AllowTwoSide.AddFriend = 0
-TalentsInspecting = 1
 
 ###################################################################################################################
 # CREATURE AND GAMEOBJECT SETTINGS
