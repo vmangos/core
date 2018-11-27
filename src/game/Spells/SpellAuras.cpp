@@ -3878,16 +3878,6 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
     Unit *target = GetTarget();
 
     // when removing flag aura, handle flag drop
-    if (!apply && target->GetTypeId() == TYPEID_PLAYER
-            && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
-    {
-        // En CM, si un ennemi nous met un boubou, on ne doit pas perdre le flag.
-        if (!target->HasAuraType(SPELL_AURA_MOD_POSSESS))
-            if (BattleGround *bg = ((Player*)target)->GetBattleGround())
-                bg->EventPlayerDroppedFlag(((Player*)target));
-    }
-
-    // when removing flag aura, handle flag drop
     if (target->IsPlayer() && !target->HasAuraType(SPELL_AURA_MOD_POSSESS) && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
     {
         Player* player = static_cast<Player*>(target);
