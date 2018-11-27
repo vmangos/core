@@ -361,7 +361,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     if (player.m_taxi.empty())
     {
         player.getHostileRefManager().setOnlineOfflineState(true);
-        if (player.pvpInfo.inHostileArea) 
+        if (player.pvpInfo.inPvPEnforcedArea)
         {
             player.CastSpell(&player, 2479, true);
             if (!player.IsPvP())

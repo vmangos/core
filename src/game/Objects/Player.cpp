@@ -566,8 +566,6 @@ Player::Player(WorldSession *session) : Unit(),
     m_summon_y = 0.0f;
     m_summon_z = 0.0f;
 
-    m_contestedPvPTimer = 0;
-
     m_lastFallTime = 0;
     m_lastFallZ = 0;
 
@@ -1192,15 +1190,15 @@ void Player::Update(uint32 update_diff, uint32 p_time)
 
     time_t now = time(NULL);
 
-    UpdatePvPFlag(now);
+    UpdatePvPFlagTimer(update_diff);
 
-    UpdateContestedPvP(update_diff);
+    UpdatePvPContestedFlagTimer(update_diff);
 
     // Delay delete duel
     if (duel && duel->finished)
     {
         delete duel;
-        duel = NULL;
+        duel = nullptr;
     }
     UpdateDuelFlag(now);
 
@@ -1247,17 +1245,9 @@ void Player::Update(uint32 update_diff, uint32 p_time)
     {
         UpdateMeleeAttackingState();
 
-        Unit *pVictim = getVictim();
+        Unit const* pVictim = getVictim();
         if (pVictim && !IsNonMeleeSpellCasted(false) && CanReachWithMeleeAttack(pVictim))
-        {
-            Player *vOwner = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
-            if ((vOwner && vOwner->IsPvP() && !IsInDuelWith(vOwner)) ||  // PvP flagged players
-                (pVictim->IsCreature() && pVictim->IsPvP()))             // PvP flagged creatures
-            {
-                UpdatePvP(true);
-                RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
-            }
-        }
+            TogglePlayerPvPFlagOnAttackVictim(pVictim);
     }
 
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING))
@@ -1592,7 +1582,7 @@ void Player::SetDeathState(DeathState s)
         //clear aura case after resurrection by another way (spells will be applied before next death)
         SetUInt32Value(PLAYER_SELF_RES_SPELL, 0);
 
-        ResetContestedPvP();
+        UpdatePvPContested(false, true);
     }
 }
 
@@ -2039,7 +2029,7 @@ bool Player::ExecuteTeleportFar(ScheduledTeleportData *data)
 
         SetSelectionGuid(ObjectGuid());
         CombatStop();
-        ResetContestedPvP();
+        UpdatePvPContested(false, true);
         RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_TELEPORTED);
 
         // reset extraAttack counter
@@ -2563,7 +2553,7 @@ void Player::SetGameMaster(bool on)
         CallForAllControlledUnits(SetGameMasterOnHelper(), CONTROLLED_PET | CONTROLLED_TOTEMS | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
 
         SetFFAPvP(false);
-        ResetContestedPvP();
+        UpdatePvPContested(false, true);
 
         getHostileRefManager().setOnlineOfflineState(false);
         CombatStopWithPets();
@@ -6570,32 +6560,24 @@ void Player::UpdateZone(uint32 newZone, uint32 newArea)
     switch (zoneEntry->Team)
     {
         case AREATEAM_ALLY:
-            pvpInfo.inHostileArea = GetTeam() != ALLIANCE && (sWorld.IsPvPRealm() || zoneEntry->Flags & AREA_FLAG_CAPITAL);
+            pvpInfo.inPvPEnforcedArea = GetTeam() != ALLIANCE && (sWorld.IsPvPRealm() || zoneEntry->Flags & AREA_FLAG_CAPITAL);
             break;
         case AREATEAM_HORDE:
-            pvpInfo.inHostileArea = GetTeam() != HORDE && (sWorld.IsPvPRealm() || zoneEntry->Flags & AREA_FLAG_CAPITAL);
+            pvpInfo.inPvPEnforcedArea = GetTeam() != HORDE && (sWorld.IsPvPRealm() || zoneEntry->Flags & AREA_FLAG_CAPITAL);
             break;
         case AREATEAM_NONE:
             // overwrite for battlegrounds, maybe batter some zone flags but current known not 100% fit to this
-            pvpInfo.inHostileArea = sWorld.IsPvPRealm() || InBattleGround();
+            pvpInfo.inPvPEnforcedArea = sWorld.IsPvPRealm() || InBattleGround();
             break;
         default:                                            // 6 in fact
-            pvpInfo.inHostileArea = false;
+            pvpInfo.inPvPEnforcedArea = false;
             break;
     }
 
-    if (pvpInfo.inHostileArea)                              // in hostile area
-    {
-        if ((!IsPvP() && !IsTaxiFlying()) || pvpInfo.endTimer != 0)
-            UpdatePvP(true, true);
-    }
-    else                                                    // in friendly area
-    {
-        if (IsPvP() && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) && pvpInfo.endTimer == 0)
-            pvpInfo.endTimer = time(NULL);                     // start toggle-off
-    }
+    if (pvpInfo.inPvPEnforcedArea && !IsTaxiFlying()) // in hostile area
+        UpdatePvP(true);
 
-    if (zoneEntry->Flags & AREA_FLAG_CAPITAL && !pvpInfo.inHostileArea)     // in capital city
+    if (zoneEntry->Flags & AREA_FLAG_CAPITAL)     // in capital city
         SetRestType(REST_TYPE_IN_CITY);
     else if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_RESTING) && GetRestType() != REST_TYPE_IN_TAVERN)
         // resting and not in tavern (leave city then); tavern leave handled in CheckAreaExploreAndOutdoor
@@ -6674,7 +6656,7 @@ void Player::CheckDuelDistance(time_t currTime)
 bool Player::IsOutdoorPvPActive()
 {
     return (isAlive() && !HasInvisibilityAura() && !HasStealthAura() &&
-            (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP) || sWorld.IsPvPRealm()) && !IsTaxiFlying());
+            (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED) || sWorld.IsPvPRealm()) && !IsTaxiFlying());
 }
 
 void Player::DuelComplete(DuelCompleteType type)
@@ -14550,12 +14532,10 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 
     SetUInt32Value(PLAYER_FLAGS, fields[11].GetUInt32());
 
-    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
+    if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED))
     {
-        SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
-        if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_TIMER))
-            pvpInfo.endTimer = time(NULL);
-        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP);
+        UpdatePvP(true);
+        RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED);
     }
 
     SetInt32Value(PLAYER_FIELD_WATCHED_FACTION_INDEX, fields[45].GetInt32());
@@ -16071,12 +16051,10 @@ void Player::SaveToDB(bool online, bool force)
     uberInsert.addUInt32(GetUInt32Value(PLAYER_BYTES));
     uberInsert.addUInt32(GetUInt32Value(PLAYER_BYTES_2));
 
-    // Nostalrius: fix retrait flag PvP a la deco reco.
-    uint32 playerFlags = GetUInt32Value(PLAYER_FLAGS) & ~(PLAYER_FLAGS_IN_PVP | PLAYER_FLAGS_PVP_TIMER);
+    // Nostalrius: Fix toggled PvP flag after relog.
+    uint32 playerFlags = GetUInt32Value(PLAYER_FLAGS) & ~(PLAYER_FLAGS_PVP_DESIRED);
     if (IsPvP())
-        playerFlags |= PLAYER_FLAGS_IN_PVP;
-    if (pvpInfo.endTimer)
-        playerFlags |= PLAYER_FLAGS_PVP_TIMER;
+        playerFlags |= PLAYER_FLAGS_PVP_DESIRED;
     uberInsert.addUInt32(playerFlags);
 
     if (!IsBeingTeleported())
@@ -16818,24 +16796,24 @@ void Player::AddInstanceEnterTime(uint32 instanceId, time_t enterTime) const
 /***              Update timers                        ***/
 /*********************************************************/
 
-void Player::UpdateContestedPvP(uint32 diff)
+void Player::UpdatePvPFlagTimer(uint32 diff)
 {
-    if (!m_contestedPvPTimer || isInCombat())
-        return;
-    if (m_contestedPvPTimer <= diff)
-        ResetContestedPvP();
-    else
-        m_contestedPvPTimer -= diff;
+    // Freeze flag timer while participating in PvP combat, in pvp enforced zone, in capture points, when carrying flag or on player preference
+    if (!pvpInfo.inPvPCombat && !pvpInfo.inPvPEnforcedArea && !pvpInfo.inPvPCapturePoint && !pvpInfo.isPvPFlagCarrier && !HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_PVP_DESIRED))
+        pvpInfo.timerPvPRemaining -= std::min(pvpInfo.timerPvPRemaining, diff);
+
+    // Timer tries to drop flag if all conditions are met and time has passed
+    UpdatePvP(false);
 }
 
-void Player::UpdatePvPFlag(time_t currTime)
+void Player::UpdatePvPContestedFlagTimer(uint32 diff)
 {
-    if (!IsPvP())
-        return;
-    if (pvpInfo.endTimer == 0 || currTime < (pvpInfo.endTimer + 300) || pvpInfo.inHostileArea || HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_IN_PVP))
-        return;
+    // Freeze flag timer while participating in PvP combat
+    if (!pvpInfo.inPvPCombat)
+        pvpInfo.timerPvPContestedRemaining -= std::min(pvpInfo.timerPvPContestedRemaining, diff);
 
-    UpdatePvP(false);
+    // Timer tries to drop flag if all conditions are met and time has passed
+    UpdatePvPContested(false);
 }
 
 void Player::SetFFAPvP(bool state)
@@ -17995,19 +17973,62 @@ void Player::UpdateHomebindTime(uint32 time)
     }
 }
 
-void Player::UpdatePvP(bool state, bool ovrride)
+void Player::UpdatePvP(bool state, bool overriding)
 {
-    if (!state || ovrride)
+    if (!state || overriding)
     {
-        SetPvP(state);
-        pvpInfo.endTimer = 0;
+        // Updating into unset state or overriding anything
+        if (!pvpInfo.timerPvPRemaining || overriding)
+        {
+            if (IsPvP() != state)
+            {
+                SetPvP(state);
+                pvpInfo.timerPvPRemaining = 0;
+            }
+        }
     }
     else
     {
-        pvpInfo.endTimer = time(NULL);
-        SetPvP(state);
+        // Updating into set state
+        if (!IsPvP())
+            SetPvP(state);
+
+        // Refresh timer
+        pvpInfo.timerPvPRemaining = 300000;
     }
 }
+
+void Player::UpdatePvPContested(bool state, bool overriding)
+{
+    if (!state || overriding)
+    {
+        // Updating into unset state or overriding anything
+        if (!pvpInfo.timerPvPContestedRemaining || overriding)
+        {
+            if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP) != state)
+            {
+                SetPvPContested(state);
+                pvpInfo.timerPvPContestedRemaining = 0;
+            }
+        }
+    }
+    else
+    {
+        // Updating into set state
+        if (!HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP))
+        {
+            SetPvPContested(state);
+
+            // Legacy way of calling MoveInLineOfSight for nearby contested guards
+            // TODO: Find a better way to do this, needs marking for a delayed reaction update
+            UpdateVisibilityAndView();
+        }
+
+        // Refresh timer
+        pvpInfo.timerPvPContestedRemaining = 30000;
+    }
+}
+
 void Player::SetBattleGroundEntryPoint(uint32 mapId, float x, float y, float z, float o)
 {
     m_bgData.joinPos = WorldLocation(mapId, x, y, z, o);
@@ -20236,7 +20257,7 @@ void Player::SetHomebindToLocation(WorldLocation const& loc, uint32 area_id)
 
 bool Player::TeleportToHomebind(uint32 options, bool hearthCooldown) 
 {
-    ResetContestedPvP();
+    UpdatePvPContested(false, true);
     if (hearthCooldown)
     {
         // Initiate hearthstone cooldown

@@ -178,9 +178,9 @@ inline void MaNGOS::DynamicObjectUpdater::VisitHelper(Unit* target)
     {
         if (CreatureAI* pAi = target->AI())
             pAi->AttackedBy(i_check);
-        i_check->SetInCombatWith(target);
-        target->SetInCombatWith(i_check);
-        i_check->SetContestedPvP(target);
+
+        target->SetInCombatWithAggressor(i_check);
+        i_check->SetInCombatWithVictim(target);
     }
     // Check target immune to spell or aura
     if (target->IsImmuneToSpell(spellInfo, false) || target->IsImmuneToSpellEffect(spellInfo, eff_index, false))

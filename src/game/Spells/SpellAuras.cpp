@@ -3887,6 +3887,22 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
                 bg->EventPlayerDroppedFlag(((Player*)target));
     }
 
+    // when removing flag aura, handle flag drop
+    if (target->IsPlayer() && !target->HasAuraType(SPELL_AURA_MOD_POSSESS) && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+    {
+        Player* player = static_cast<Player*>(target);
+
+        if (apply)
+            player->pvpInfo.isPvPFlagCarrier = true;
+        else
+        {
+            player->pvpInfo.isPvPFlagCarrier = false;
+
+            if (BattleGround* bg = player->GetBattleGround())
+                bg->EventPlayerDroppedFlag(player);
+        }
+    }
+
     target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, m_modifier.m_miscvalue, apply);
 }
 

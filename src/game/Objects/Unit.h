@@ -384,7 +384,7 @@ enum UnitState
 {
     // persistent state (applied by aura/etc until expire)
     UNIT_STAT_MELEE_ATTACKING = 0x00000001,                     // unit is melee attacking someone Unit::Attack
-    UNIT_STAT_ATTACK_PLAYER   = 0x00000002,                     // unit attack player or player's controlled unit and have contested pvpv timer setup, until timer expire, combat end and etc
+    //UNIT_STAT_ATTACK_PLAYER = 0x00000002,                     // (Deprecated) unit attack player or player's controlled unit and have contested pvpv timer setup, until timer expire, combat end and etc
     UNIT_STAT_DIED            = 0x00000004,                     // Unit::SetFeignDeath
     UNIT_STAT_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
     UNIT_STAT_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
@@ -1195,9 +1195,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // Returns the Unit::m_attackers, that stores the units that are attacking you
         AttackerSet const& getAttackers() const { return m_attackers; }
 
-        // Returns if this unit is attacking a player (or this unit's minions/pets are attacking a player)
-        bool isAttackingPlayer() const;
-
         // Returns the victim that this unit is currently attacking
         Unit* getVictim() const { return m_attacking; }
 
@@ -1307,6 +1304,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         }
         bool IsPvP() const { return HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP); }
         void SetPvP(bool state);
+        bool IsPvPContested() const;
+        void SetPvPContested(bool state);
+
         uint32 GetCreatureType() const;
         uint32 GetCreatureTypeMask() const
         {
@@ -1404,6 +1404,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetInCombatState(bool PvP, Unit* enemy = nullptr);
         void SetInCombatWith(Unit* enemy);
         void ClearInCombat();
+        void SetInCombatWithAssisted(Unit* assisted);
+        void SetInCombatWithAggressor(Unit* aggressor, bool touchOnly = false);
+        inline void SetOutOfCombatWithAggressor(Unit* aggressor) { SetInCombatWithAggressor(aggressor, true); }
+        void SetInCombatWithVictim(Unit* victim, bool touchOnly = false);
+        inline void SetOutOfCombatWithVictim(Unit* victim) { SetInCombatWithVictim(victim, true); }
+        void TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly = false);
         uint32 GetCombatTimer() const { return m_CombatTimer; }
         void SetCombatTimer(uint32 t) { m_CombatTimer = t; }
 
@@ -1873,8 +1879,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         void SetLastManaUse() { m_lastManaUseTimer = 5000; }
         bool IsUnderLastManaUseEffect() const { return m_lastManaUseTimer; }
-
-        void SetContestedPvP(Unit *attackedUnit = nullptr);
 
         void ApplySpellImmune(uint32 spellId, uint32 op, uint32 type, bool apply);
         void ApplySpellDispelImmunity(const SpellEntry * spellProto, DispelType type, bool apply);
