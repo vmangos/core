@@ -451,6 +451,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGameObjectResetCommand(char* args);
         bool HandleGameObjectSelectCommand(char* args);
         bool HandleGameObjectRespawnCommand(char* args);
+        bool HandleGameObjectInfoCommand(char* args);
         GameObject* getSelectedGameObject();
 
         bool HandleGMCommand(char* args);
@@ -708,8 +709,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleReloadReservedNameCommand(char* args);
         bool HandleReloadReputationRewardRateCommand(char* args);
         bool HandleReloadReputationSpilloverTemplateCommand(char* args);
-        bool HandleReloadSkillDiscoveryTemplateCommand(char* args);
-        bool HandleReloadSkillExtraItemTemplateCommand(char* args);
         bool HandleReloadSkillFishingBaseLevelCommand(char* args);
         bool HandleReloadSpellAffectCommand(char* args);
         bool HandleReloadSpellAreaCommand(char* args);

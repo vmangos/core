@@ -994,9 +994,14 @@ bool ChatHandler::HandleModifySpeedCommand(char* args)
 
     if (m_session->IsReplaying())
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         WorldPacket dataForMe(SMSG_FORCE_RUN_SPEED_CHANGE, 18);
         dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
         dataForMe << uint32(0);
+#else
+        WorldPacket dataForMe(SMSG_FORCE_RUN_SPEED_CHANGE, 14);
+        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
+#endif
         dataForMe << float(7 * modSpeed);
         m_session->SendPacket(&dataForMe);
         return true;
@@ -1052,9 +1057,15 @@ bool ChatHandler::HandleModifySwimCommand(char* args)
 
     if (m_session->IsReplaying())
     {
+        
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         WorldPacket dataForMe(SMSG_FORCE_SWIM_SPEED_CHANGE, 18);
         dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
         dataForMe << uint32(0);
+#else
+        WorldPacket dataForMe(SMSG_FORCE_SWIM_SPEED_CHANGE, 14);
+        dataForMe << m_session->GetRecorderGuid().WriteAsPacked();
+#endif
         dataForMe << float(4.722222f * modSpeed);
         m_session->SendPacket(&dataForMe);
         return true;
@@ -1470,15 +1481,26 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
     chr->SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP);
     chr->Mount(mId);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, (8 + 4 + 4));
     data << chr->GetPackGUID();
     data << (uint32)0;
+#else
+    WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, (8 + 4));
+    data << chr->GetPackGUID();
+#endif
     data << float(speed);
     chr->SendMessageToSet(&data, true);
 
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, (8 + 4 + 4));
     data << chr->GetPackGUID();
     data << (uint32)0;
+#else
+    data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, (8 + 4));
+    data << chr->GetPackGUID();
+#endif
     data << float(speed);
     chr->SendMessageToSet(&data, true);
 
@@ -1700,29 +1722,27 @@ bool ChatHandler::HandleLookupSoundCommand(char* args)
 
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
-    for (uint32 id = 0; id < sObjectMgr.GetMaxSoundId(); ++id)
+    for (auto const& itr : sObjectMgr.GetSoundEntriesMap())
     {
-        SoundEntriesEntry const *soundEntry = sObjectMgr.GetSoundEntry(id);
-        if (soundEntry)
-        {
-            int loc = GetSessionDbcLocale();
-            std::string name = soundEntry->Name;
+        uint32 id = itr.first;
+        SoundEntriesEntry const& soundEntry = itr.second;
+        int loc = GetSessionDbcLocale();
+        std::string name = soundEntry.Name;
 
-            if (name.empty())
-                continue;
+        if (name.empty())
+            continue;
 
-            strToLower(name);
+        strToLower(name);
 
-            if (name.find(namepart) == std::string::npos)
-                continue;
+        if (name.find(namepart) == std::string::npos)
+            continue;
 
-            if (m_session)
-                PSendSysMessage(LANG_COMMAND_SOUND_LIST, id, id, soundEntry->Name.c_str());
-            else
-                PSendSysMessage("%u - %s", id, soundEntry->Name.c_str());
+        if (m_session)
+            PSendSysMessage(LANG_COMMAND_SOUND_LIST, id, id, soundEntry.Name.c_str());
+        else
+            PSendSysMessage("%u - %s", id, soundEntry.Name.c_str());
 
-            counter++;
-        }
+        counter++;
     }
 
     if (counter == 0)

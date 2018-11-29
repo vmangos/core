@@ -38,7 +38,7 @@ GuardAI::GuardAI(Creature *c) : CreatureAI(c)
 // Returns whether the Unit is currently attacking other players or friendly npcs.
 bool GuardAI::IsAttackingPlayerOrFriendly(const Unit* pWho) const
 {
-    if (pWho->isAttackingPlayer())
+    if (pWho->IsPvPContested())
         return true;
 
     if (Unit* pVictim = pWho->getVictim())

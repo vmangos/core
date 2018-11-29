@@ -331,6 +331,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "near",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectNearCommand,      "", nullptr },
         { NODE, "target",         SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectTargetCommand,    "", nullptr },
         { NODE, "turn",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectTurnCommand,      "", nullptr },
+        { NODE, "info",           SEC_GAMEMASTER,     false, &ChatHandler::HandleGameObjectInfoCommand,      "", nullptr },
         { NODE, "select",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleGameObjectSelectCommand,    "", nullptr },
         { NODE, "despawn",        SEC_ADMINISTRATOR,  false, &ChatHandler::HandleGameObjectDespawnCommand,   "", nullptr },
         { NODE, "toggle",         SEC_ADMINISTRATOR,  false, &ChatHandler::HandleGameObjectToggleCommand,    "", nullptr },
@@ -658,8 +659,6 @@ ChatCommand * ChatHandler::getCommandTable()
         { MSTR, "reserved_name",               SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReservedNameCommand,            "", nullptr },
         { MSTR, "reputation_reward_rate",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadReputationRewardRateCommand,    "", nullptr },
         { MSTR, "reputation_spillover_template", SEC_ADMINISTRATOR, true, &ChatHandler::HandleReloadReputationSpilloverTemplateCommand, "", nullptr },
-        { MSTR, "skill_discovery_template",    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillDiscoveryTemplateCommand,  "", nullptr },
-        { MSTR, "skill_extra_item_template",   SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillExtraItemTemplateCommand,  "", nullptr },
         { MSTR, "skill_fishing_base_level",    SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSkillFishingBaseLevelCommand,   "", nullptr },
         { MSTR, "skinning_loot_template",      SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadLootTemplatesSkinningCommand,   "", nullptr },
         { MSTR, "spell_affect",                SEC_ADMINISTRATOR, true,  &ChatHandler::HandleReloadSpellAffectCommand,             "", nullptr },
@@ -2139,7 +2138,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                                     for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
                                     {
                                         std::string expectedName = linkedItem->Name1;
-                                        Item::GetNameWithSuffix(expectedName, linkedItem, iProp, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                        Item::GetLocalizedNameWithSuffix(expectedName, linkedItem, iProp, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
                                         if (expectedName == buffer)
                                         {
                                             hasValidRandomProperty = true;
@@ -2172,7 +2171,7 @@ bool ChatHandler::isValidChatMessage(const char* message)
                             for (int localeIndex = DB_LOCALE_enUS; localeIndex <= DB_LOCALE_ruRU; ++localeIndex)
                             {
                                 std::string expectedName = linkedItem->Name1;
-                                Item::GetNameWithSuffix(expectedName, linkedItem, nullptr, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
+                                Item::GetLocalizedNameWithSuffix(expectedName, linkedItem, nullptr, localeIndex, GetDbcLocaleFromDbLocale(DBLocaleConstant(localeIndex)));
                                 if (expectedName == buffer)
                                 {
                                     validName = true;

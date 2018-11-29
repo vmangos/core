@@ -1,5 +1,5 @@
 #ifndef MYSQL_PLUGIN_AUTH_COMMON_INCLUDED
-/* Copyright (c) 2010, 2015, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2010, Oracle and/or its affiliates. All rights reserved.
 
    This program is free software; you can redistribute it and/or modify
    it under the terms of the GNU General Public License as published by
@@ -23,33 +23,12 @@
 #define MYSQL_PLUGIN_AUTH_COMMON_INCLUDED
 
 /** the max allowed length for a user name */
-#define MYSQL_USERNAME_LENGTH 96
+#define MYSQL_USERNAME_LENGTH 48
 
 /**
   return values of the plugin authenticate_user() method.
 */
 
-/**
-  Authentication failed, plugin internal error.
-  An error occurred in the authentication plugin itself.
-  These errors are reported in table performance_schema.host_cache,
-  column COUNT_AUTH_PLUGIN_ERRORS.
-*/
-#define CR_AUTH_PLUGIN_ERROR 3
-/**
-  Authentication failed, client server handshake.
-  An error occurred during the client server handshake.
-  These errors are reported in table performance_schema.host_cache,
-  column COUNT_HANDSHAKE_ERRORS.
-*/
-#define CR_AUTH_HANDSHAKE 2
-/**
-  Authentication failed, user credentials.
-  For example, wrong passwords.
-  These errors are reported in table performance_schema.host_cache,
-  column COUNT_AUTHENTICATION_ERRORS.
-*/
-#define CR_AUTH_USER_CREDENTIALS 1
 /**
   Authentication failed. Additionally, all other CR_xxx values
   (libmysql error code) can be used too.
@@ -82,23 +61,6 @@
   or not.
 */
 #define CR_OK_HANDSHAKE_COMPLETE -2
-
-/**
-Flag to be passed back to server from authentication plugins via
-authenticated_as when proxy mapping should be done by the server.
-*/
-#define PROXY_FLAG 0
-
-/*
-  We need HANDLE definition if on Windows. Define WIN32_LEAN_AND_MEAN (if
-  not already done) to minimize amount of imported declarations.
-*/
-#ifdef _WIN32
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif
-#include <windows.h>
-#endif
 
 typedef struct st_plugin_vio_info
 {

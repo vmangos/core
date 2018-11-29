@@ -174,36 +174,48 @@ uint32 AccountMgr::GetId(std::string username)
 void AccountMgr::Load()
 {
     _accountSecurity.clear();
-    QueryResult *result = LoginDatabase.PQuery("SELECT id, gmlevel FROM account_access WHERE (RealmID = '%u' OR RealmID='-1')", realmID);
-    if (result)
+
+    std::unique_ptr<QueryResult> result(LoginDatabase.PQuery("SELECT `id`, `gmlevel` FROM `account_access` WHERE (`RealmID` = '%u' OR `RealmID`='-1')", realmID));
+
+    if (!result)
     {
-        Field *fields = NULL;
-        do
-        {
-            fields = result->Fetch();
-            uint32 accountId = fields[0].GetUInt32();
-            AccountTypes secu = AccountTypes(fields[1].GetUInt32());
-            switch (secu)
-            {
-                case SEC_PLAYER:
-                    break;
-                case SEC_MODERATOR:
-                case SEC_MODERATOR_CONF:
-                case SEC_GAMEMASTER:
-                case SEC_BASIC_ADMIN:
-                case SEC_DEVELOPPER:
-                case SEC_ADMINISTRATOR:
-                    // Peut etre deja dans la liste ? On prend le plus haut gmlevel.
-                    if (_accountSecurity.find(accountId) == _accountSecurity.end() ||
-                            _accountSecurity[accountId] < secu)
-                        _accountSecurity[accountId] = secu;
-                    break;
-            }
-        }
-        while (result->NextRow());
-        delete result;
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded 0 GM ranks");
+        return;
     }
+
+    Field *fields = nullptr;
+    BarGoLink bar(result->GetRowCount());
+    do
+    {
+        bar.step();
+        fields = result->Fetch();
+        uint32 accountId = fields[0].GetUInt32();
+        AccountTypes secu = AccountTypes(fields[1].GetUInt32());
+        switch (secu)
+        {
+        case SEC_PLAYER:
+            break;
+        case SEC_MODERATOR:
+        case SEC_MODERATOR_CONF:
+        case SEC_GAMEMASTER:
+        case SEC_BASIC_ADMIN:
+        case SEC_DEVELOPPER:
+        case SEC_ADMINISTRATOR:
+            // Peut etre deja dans la liste ? On prend le plus haut gmlevel.
+            if (_accountSecurity.find(accountId) == _accountSecurity.end() ||
+                _accountSecurity[accountId] < secu)
+                _accountSecurity[accountId] = secu;
+            break;
+        }
+    } while (result->NextRow());
+
+    sLog.outString();
     sLog.outString(">> %u GM ranks loaded for realm %u", _accountSecurity.size(), realmID);
+    sLog.outString();
     LoadAccountBanList();
     LoadIPBanList();
 }
@@ -318,24 +330,41 @@ void AccountMgr::LoadIPBanList(bool silent)
 {
     if (!silent)
         sLog.outString("Loading ip_banned ...");
-    QueryResult *banresult = LoginDatabase.PQuery("SELECT ip, unbandate, bandate FROM ip_banned WHERE (unbandate > UNIX_TIMESTAMP() OR bandate = unbandate)");
-    if (banresult)
+
+    std::unique_ptr<QueryResult> banresult(LoginDatabase.PQuery("SELECT `ip`, `unbandate`, `bandate` FROM `ip_banned` WHERE (`unbandate` > UNIX_TIMESTAMP() OR `bandate` = `unbandate`)"));
+    
+    if (!banresult)
     {
-        _ipBanned.clear();
-        Field *fields = NULL;
-        do
-        {
-            Field *fields = banresult->Fetch();
-            uint32 unbandate = fields[1].GetUInt32();
-            uint32 bandate = fields[2].GetUInt32();
-            if (unbandate == bandate)
-                unbandate = 0xFFFFFFFF;
-            _ipBanned[fields[0].GetString()] = unbandate;
-        }
-        while (banresult->NextRow());
-        delete banresult;
         if (!silent)
-            sLog.outString(">> Loaded %u account ban", _ipBanned.size());
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString();
+            sLog.outString(">> Loaded 0 ip bans");
+        }
+        return;
+    }
+
+    _ipBanned.clear();
+    Field *fields = nullptr;
+    std::unique_ptr<BarGoLink> bar = silent ? nullptr : std::make_unique<BarGoLink>(banresult->GetRowCount());
+    do
+    {
+        if (bar)
+            bar->step();
+        Field *fields = banresult->Fetch();
+        uint32 unbandate = fields[1].GetUInt32();
+        uint32 bandate = fields[2].GetUInt32();
+        if (unbandate == bandate)
+            unbandate = 0xFFFFFFFF;
+        _ipBanned[fields[0].GetString()] = unbandate;
+    } while (banresult->NextRow());
+
+    if (!silent)
+    {
+        sLog.outString();
+        sLog.outString(">> Loaded %u ip bans", _ipBanned.size());
     }
 }
 
@@ -343,24 +372,41 @@ void AccountMgr::LoadAccountBanList(bool silent)
 {
     if (!silent)
         sLog.outString("Loading account_banned ...");
-    QueryResult *banresult = LoginDatabase.PQuery("SELECT id, unbandate, bandate FROM account_banned WHERE active = 1 AND (unbandate > UNIX_TIMESTAMP() OR bandate = unbandate)");
-    if (banresult)
+
+    std::unique_ptr<QueryResult> banresult(LoginDatabase.PQuery("SELECT `id`, `unbandate`, `bandate` FROM `account_banned` WHERE `active` = 1 AND (`unbandate` > UNIX_TIMESTAMP() OR `bandate` = `unbandate`)"));
+    
+    if (!banresult)
     {
-        _accountBanned.clear();
-        Field *fields = NULL;
-        do
-        {
-            Field *fields = banresult->Fetch();
-            uint32 unbandate = fields[1].GetUInt32();
-            uint32 bandate = fields[2].GetUInt32();
-            if (unbandate == bandate)
-                unbandate = 0xFFFFFFFF;
-            _accountBanned[fields[0].GetUInt32()] = unbandate;
-        }
-        while (banresult->NextRow());
-        delete banresult;
         if (!silent)
-            sLog.outString(">> Loaded %u account ban", _accountBanned.size());
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString();
+            sLog.outString(">> Loaded 0 account bans");
+        }
+        return;
+    }
+
+    _accountBanned.clear();
+    Field *fields = nullptr;
+    std::unique_ptr<BarGoLink> bar = silent ? nullptr : std::make_unique<BarGoLink>(banresult->GetRowCount());
+    do
+    {
+        if (bar)
+            bar->step();
+        Field *fields = banresult->Fetch();
+        uint32 unbandate = fields[1].GetUInt32();
+        uint32 bandate = fields[2].GetUInt32();
+        if (unbandate == bandate)
+            unbandate = 0xFFFFFFFF;
+        _accountBanned[fields[0].GetUInt32()] = unbandate;
+    } while (banresult->NextRow());
+
+    if (!silent)
+    {
+        sLog.outString();
+        sLog.outString(">> Loaded %u account bans", _accountBanned.size());
     }
 }
 

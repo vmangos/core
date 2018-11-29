@@ -50,6 +50,7 @@ static RealmBuildInfo ExpectedRealmdClientBuilds[] = {
     {5875,  1, 12, 1, ' '},
     {5464,  1, 11, 2, ' '},
     {5302,  1, 10, 2, ' '},
+    {5086,  1, 9, 4, ' ' },
     {0,     0, 0, 0, ' '}                                   // terminator
 };
 

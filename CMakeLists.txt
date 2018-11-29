@@ -26,6 +26,7 @@ set(CMAKE_MODULE_PATH
 )
 
 option(DEBUG "Debug mode" 0)
+set(SUPPORTED_CLIENT_BUILD "CLIENT_BUILD_1_12_1" CACHE STRING "Client version the core will support")
 option(USE_STD_MALLOC "Use standard malloc instead of TBB" 0)
 option(TBB_DEBUG "Use TBB debug librairies" 0)
 option(USE_ANTICHEAT "Use anticheat" 0)
@@ -246,11 +247,15 @@ else()
   configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/revision.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/revision.h)
 endif()
 
+set(supported_build ${SUPPORTED_CLIENT_BUILD})
+configure_file(${CMAKE_CURRENT_SOURCE_DIR}/cmake/Progression.h.cmake ${CMAKE_CURRENT_SOURCE_DIR}/src/shared/Progression.h)
+
 # Generate migrations list
 include(cmake/migrations.cmake)
 
 message(STATUS "")
 message(STATUS "Core revision: ${rev_hash} ${rev_date} ")
+message(STATUS "Supported version: ${supported_build}")
 message(STATUS "Install server to: ${CMAKE_INSTALL_PREFIX}")
 message(STATUS "")
 

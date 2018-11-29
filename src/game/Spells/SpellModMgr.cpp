@@ -32,8 +32,6 @@
 INSTANTIATE_SINGLETON_1(SpellModMgr);
 
 #define ENABLE_INSERT_NEW_SPELLS
-#define OUT_LOG sLog.outString
-#define OUT_ERR sLog.outError
 
 SpellModMgr::SpellModMgr()
 {
@@ -67,29 +65,35 @@ inline void ModFloatValueIfExplicit(Field &f, float &value)
 
 void SpellModMgr::LoadSpellMods()
 {
-    OUT_LOG();
-    OUT_LOG("Loading spell mods ...");
+    sLog.outString();
+    sLog.outString("Loading spell mods ...");
 
     // 1 : Table spell_mod
-    QueryResult* result = WorldDatabase.Query(
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query(
                               "SELECT Id, procChance, procFlags, Custom, DurationIndex, "
                               "Category, CastingTimeIndex, StackAmount, SpellIconID, activeIconID, manaCost, "
                               "Attributes, AttributesEx, AttributesEx2, AttributesEx3, AttributesEx4, "
                               "InterruptFlags, AuraInterruptFlags, ChannelInterruptFlags, Dispel, "
                               "Stances, StancesNot, SpellVisual, ManaCostPercentage, StartRecoveryCategory, StartRecoveryTime, MaxTargetLevel, MaxAffectedTargets, DmgClass, "
                               "rangeIndex, RecoveryTime, CategoryRecoveryTime, procCharges, SpellFamilyName, SpellFamilyFlags, Mechanic, EquippedItemClass "
-                              "FROM spell_mod");
+                              "FROM spell_mod"));
     uint32 total_count = 0;
     if (!result)
     {
-        OUT_LOG();
-        OUT_LOG(">> Loaded %u spell modifications. Table spell_mod is empty.", total_count);
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString();
+        sLog.outString(">> Loaded %u spell modifications. Table spell_mod is empty.", total_count);
     }
     else
     {
         Field* fields;
+        BarGoLink bar(result->GetRowCount());
         do
         {
+            bar.step();
             fields = result->Fetch();
             uint32 const spellid = fields[0].GetUInt32();
 
@@ -98,7 +102,7 @@ void SpellModMgr::LoadSpellMods()
             {
                 if (!sSpellMgr.OverwriteSpellEntry(spellid))
                 {
-                    OUT_ERR("Unable to create spell %u, skipping.", spellid);
+                    sLog.outError("Unable to create spell %u, skipping.", spellid);
                     continue;
                 }
             }
@@ -107,7 +111,7 @@ void SpellModMgr::LoadSpellMods()
             if (!spell)
             {
                 if (!sSpellMgr.IsExistingSpellId(spellid))
-                    OUT_ERR("Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
+                    sLog.outError("Spell entry %u from `spell_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
 
@@ -178,33 +182,37 @@ void SpellModMgr::LoadSpellMods()
             ++total_count;
         }
         while (result->NextRow());
-        delete result;
-        OUT_LOG();
-        OUT_LOG(">> Loaded %u spell modifications.", total_count);
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u spell modifications.", total_count);
     }
 
     // 2 : Table spell_effect_mod
-    OUT_LOG();
-    OUT_LOG("Loading spell effect mods ...");
-    result = WorldDatabase.Query(
+    sLog.outString("Loading spell effect mods ...");
+    result.reset(WorldDatabase.Query(
                  "SELECT Id, EffectIndex, Effect, EffectApplyAuraName, EffectMechanic, EffectImplicitTargetA, EffectImplicitTargetB, "
                  "EffectRadiusIndex, EffectItemType, EffectMiscValue, EffectTriggerSpell, "
                  "EffectDieSides, EffectBaseDice, EffectBasePoints, EffectAmplitude, EffectChainTarget, " // Int
                  "EffectDicePerLevel, EffectRealPointsPerLevel, EffectPointsPerComboPoint, EffectMultipleValue " // Float
                  "FROM spell_effect_mod"
-             );
+                ));
     total_count = 0;
 
     if (!result)
     {
-        OUT_LOG();
-        OUT_LOG(">> Loaded %u spell effect modifications. Table spell_effect_mod is empty.", total_count);
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u spell effect modifications. Table spell_effect_mod is empty.", total_count);
     }
     else
     {
         Field* fields;
+        BarGoLink bar(result->GetRowCount());
         do
         {
+            bar.step();
             fields = result->Fetch();
             uint32 spellid = fields[0].GetUInt32();
             uint32 effect_idx = fields[1].GetUInt32();
@@ -212,12 +220,12 @@ void SpellModMgr::LoadSpellMods()
             if (!spell)
             {
                 if (!sSpellMgr.IsExistingSpellId(spellid))
-                    OUT_ERR("Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
+                    sLog.outError("Spell entry %u from `spell_effect_mod` doesn't exist, ignoring.", spellid);
                 continue;
             }
             if (effect_idx >= MAX_EFFECT_INDEX)
             {
-                OUT_ERR("Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
+                sLog.outError("Spell %u has a modification for effect %u, but the maximum effect id is %u.", spellid, effect_idx, (MAX_EFFECT_INDEX - 1));
                 continue;
             }
             // 0   1            2       3                    4               5                      6
@@ -253,9 +261,9 @@ void SpellModMgr::LoadSpellMods()
             ++total_count;
         }
         while (result->NextRow());
-        delete result;
-        OUT_LOG();
-        OUT_LOG(">> Loaded %u spell effect modifications.", total_count);
+
+        sLog.outString();
+        sLog.outString(">> Loaded %u spell effect modifications.", total_count);
     }
 
     // Other modifications (no 'speed' field in spell_mod)

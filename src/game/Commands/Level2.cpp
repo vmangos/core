@@ -250,9 +250,9 @@ bool ChatHandler::HandleTriggerCommand(char* args)
         Player* pl = m_session->GetPlayer();
 
         // Search triggers
-        for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+        for (auto const itr : sObjectMgr.GetAreaTriggersMap())
         {
-            AreaTriggerEntry const *atTestEntry = sObjectMgr.GetAreaTrigger(id);
+            AreaTriggerEntry const *atTestEntry = &itr.second;
             if (!atTestEntry)
                 continue;
 
@@ -322,9 +322,9 @@ bool ChatHandler::HandleTriggerActiveCommand(char* /*args*/)
     Player* pl = m_session->GetPlayer();
 
     // Search in AreaTable.dbc
-    for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = sObjectMgr.GetAreaTrigger(id);
+        AreaTriggerEntry const *atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -351,9 +351,9 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     Player* pl = m_session->GetPlayer();
 
     // Search triggers
-    for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = sObjectMgr.GetAreaTrigger(id);
+        AreaTriggerEntry const *atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -372,9 +372,9 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     }
 
     // Search trigger targets
-    for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = sObjectMgr.GetAreaTrigger(id);
+        AreaTriggerEntry const *atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -999,6 +999,35 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleGameObjectInfoCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* pGameObject = nullptr;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!pGameObject)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    
+    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
+    SendSysMessage(pGameObject->isSpawned() ? "Object is spawned." : "Not spawned.");
+
+    return true;
+}
+
 //move selected object
 bool ChatHandler::HandleGameObjectMoveCommand(char* args)
 {
@@ -1400,9 +1429,9 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
 
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
-    for (uint32 id = 0; id < sObjectMgr.GetMaxFactionId(); ++id)
+    for (auto const& itr : sObjectMgr.GetFactionMap())
     {
-        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(id);
+        FactionEntry const *factionEntry = &itr.second;
         if (factionEntry)
         {
             int loc = GetSessionDbcLocale();
@@ -2056,12 +2085,11 @@ bool ChatHandler::HandleNpcFactionIdCommand(char* args)
     // update in memory
     if (CreatureInfo const *cinfo = pCreature->GetCreatureInfo())
     {
-        const_cast<CreatureInfo*>(cinfo)->faction_A = factionId;
-        const_cast<CreatureInfo*>(cinfo)->faction_H = factionId;
+        const_cast<CreatureInfo*>(cinfo)->faction = factionId;
     }
 
     // and DB
-    WorldDatabase.PExecuteLog("UPDATE creature_template SET faction_A = '%u', faction_H = '%u' WHERE entry = '%u'", factionId, factionId, pCreature->GetEntry());
+    WorldDatabase.PExecuteLog("UPDATE creature_template SET faction = '%u' WHERE entry = '%u'", factionId, pCreature->GetEntry());
 
     return true;
 }

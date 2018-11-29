@@ -18,8 +18,6 @@
 #include "Weather.h"
 #include "PointMovementGenerator.h"
 #include "TargetedMovementGenerator.h"
-#include "SkillDiscovery.h"
-#include "SkillExtraItems.h"
 #include "SystemConfig.h"
 #include "Config/Config.h"
 #include "Util.h"
@@ -272,13 +270,13 @@ bool ChatHandler::HandleCinematicAddWpCommand(char *args)
 
     Player* me = m_session->GetPlayer();
     WorldDatabase.PExecute(
-        "INSERT INTO cinematic_waypoints (cinematic, timer, posx, posy, posz, comment) VALUES "
+        "INSERT INTO `cinematic_waypoints` (`cinematic`, `timer`, `position_x`, `position_y`, `position_z`, `comment`) VALUES "
         "(%u, %u, %f, %f, %f, '%s')",
         cinematic_id, timer,
         ceil(me->GetPositionX()), ceil(me->GetPositionY()), ceil(me->GetPositionZ()), comment
     );
 
-    PSendSysMessage("Localisation ajoute a la %ueme ms de la cinematique %u", timer, cinematic_id);
+    PSendSysMessage("Added new waypoint at %u ms for cinematic %u.", timer, cinematic_id);
     sObjectMgr.LoadCinematicsWaypoints();
     return true;
 }
@@ -667,7 +665,11 @@ bool ChatHandler::HandleGoForwardCommand(char* args)
     if (Player* pPlayer = m_session->GetPlayer())
     {
         pPlayer->GetRelativePositions(add, 0.0f, 0.0f, x, y, z);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         pPlayer->NearLandTo(x, y, z, pPlayer->GetOrientation());
+#else
+        pPlayer->NearTeleportTo(x, y, z, pPlayer->GetOrientation());
+#endif
     }
     return true;
 }
@@ -680,7 +682,11 @@ bool ChatHandler::HandleGoUpCommand(char* args)
     if (Player* pPlayer = m_session->GetPlayer())
     {
         pPlayer->GetRelativePositions(0.0f, 0.0f, add_z, x, y, z);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         pPlayer->NearLandTo(x, y, z, pPlayer->GetOrientation());
+#else
+        pPlayer->NearTeleportTo(x, y, z, pPlayer->GetOrientation());
+#endif
     }
     return true;
 }
@@ -694,7 +700,11 @@ bool ChatHandler::HandleGoRelativeCommand(char* args)
     {
         pPlayer->GetRelativePositions(avantArriere, gaucheDroite, hautBas, x, y, z);
         PSendSysMessage("Teleportation : Avant %f Gauche %f Haut %f", avantArriere, gaucheDroite, hautBas);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         pPlayer->NearLandTo(x, y, z, pPlayer->GetOrientation());
+#else
+        pPlayer->NearTeleportTo(x, y, z, pPlayer->GetOrientation());
+#endif
     }
     return true;
 }
@@ -1117,8 +1127,8 @@ bool ChatHandler::HandleNpcGroupLinkCommand(char * args)
         return false;
     }
     
-    WorldDatabase.PExecute("DELETE FROM creature_linking WHERE guid=%u", target->GetGUIDLow());
-        WorldDatabase.PExecute("INSERT INTO creature_linking SET guid=%u, master_guid=%u, flag='%u'",
+    WorldDatabase.PExecute("DELETE FROM `creature_linking` WHERE `guid`=%u", target->GetGUIDLow());
+        WorldDatabase.PExecute("INSERT INTO `creature_linking` SET `guid`=%u, `master_guid`=%u, `flag`='%u'",
             target->GetGUIDLow(), leaderGuidCounter, options);
 
     PSendSysMessage("creature_link for creature %u. Leader %u", target->GetGUIDLow(), leader->GetGUIDLow());

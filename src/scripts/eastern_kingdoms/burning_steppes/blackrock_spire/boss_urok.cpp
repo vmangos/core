@@ -22,38 +22,6 @@ enum
     SPELL_ARCANE_BOLT       = 15979
 };
 
-/**
-Description rapide :
-GO_AUTEL_OFFRANDES est spawn.
-Utiliser 'SPELL_DECLENCHER_DEFIS' le remplace par 'GO_CHALLENGE_UROK'.
-Utiliser 'GO_CHALLENGE_UROK' lance l'event.
-Des vagues de monstres pop. Pendant cette phase, on peut clic-droit sur
-le pic pour lancer 'SPELL_KILL_UROK_ADD' sur l'ogre le plus proche (cooldown de 30 sec).
-*/
-/*
-SQL:
-UPDATE gameobject_template SET ScriptName="go_autel_offrande" WHERE entry=175621;
-UPDATE gameobject_template SET ScriptName="go_urok_challenge" WHERE entry=175584;
-*/
-
-/// Script du GameObject d'invocation (GO_AUTEL_OFFRANDES)
-struct go_autel_offrandeAI: public GameObjectAI
-{
-    go_autel_offrandeAI(GameObject* go) : GameObjectAI(go) {}
-
-    bool OnUse(Unit* user)
-    {
-        me->SummonGameObject(GO_CHALLENGE_UROK, me->GetPositionX(), me->GetPositionY(), me->GetPositionZ(), me->GetOrientation(), 0, 0, 0, 0, 0);
-        me->AddObjectToRemoveList();
-        return true;
-    }
-};
-
-GameObjectAI* GetAIgo_autel_offrande(GameObject *go)
-{
-    return new go_autel_offrandeAI(go);
-}
-
 void DefineGoChallenge(Creature * crea, uint64 gobjGUID);
 
 /// Script du GameObject de challenge (GO_CHALLENGE_UROK)
@@ -397,10 +365,6 @@ void DefineGoChallenge(Creature * crea, uint64 gobjGUID)
 void AddSC_boss_urok() // Permet l'intégration dans la DB.
 {
     Script *newscript;
-    newscript = new Script;
-    newscript->Name = "go_autel_offrande";
-    newscript->GOGetAI = &GetAIgo_autel_offrande;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "go_urok_challenge";

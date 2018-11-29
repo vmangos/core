@@ -1128,6 +1128,20 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                 }
                 break;
             }
+            case SCRIPT_COMMAND_SUMMON_OBJECT:
+            {
+                if (!ObjectMgr::GetGameObjectInfo(tmp.summonObject.gameobject_entry))
+                {
+                    if (!sObjectMgr.IsExistingGameObjectId(tmp.summonObject.gameobject_entry))
+                    {
+                        sLog.outErrorDb("Table `%s` has datalong = %u for script id %u, but this gameobject_template does not exist.", tablename, tmp.summonObject.gameobject_entry, tmp.id);
+                        continue;
+                    }
+                    else
+                        DisableScriptAction(tmp);
+                }
+                break;
+            }
         }
 
         if (scripts.find(tmp.id) == scripts.end())
@@ -1447,8 +1461,6 @@ void ScriptMgr::LoadScriptNames()
                               "UNION "
                               "SELECT DISTINCT(ScriptName) FROM gameobject_template WHERE ScriptName <> '' "
                               "UNION "
-                              "SELECT DISTINCT(ScriptName) FROM item_template WHERE ScriptName <> '' "
-                              "UNION "
                               "SELECT DISTINCT(ScriptName) FROM scripted_areatrigger WHERE ScriptName <> '' "
                               "UNION "
                               "SELECT DISTINCT(ScriptName) FROM scripted_event_id WHERE ScriptName <> '' "
@@ -1645,18 +1657,6 @@ bool ScriptMgr::OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest co
     return pTempScript->pGOQuestAccept(pPlayer, pGameObject, pQuest);
 }
 
-bool ScriptMgr::OnQuestAccept(Player* pPlayer, Item* pItem, Quest const* pQuest)
-{
-    Script* pTempScript = m_scripts[pItem->GetProto()->ScriptId];
-
-    if (!pTempScript || !pTempScript->pItemHello)
-        return false;
-
-    pPlayer->PlayerTalkClass->ClearMenus();
-
-    return pTempScript->pItemHello(pPlayer, pItem, pQuest);
-}
-
 bool ScriptMgr::OnQuestRewarded(Player* pPlayer, Creature* pCreature, Quest const* pQuest)
 {
     Script* pTempScript = m_scripts[pCreature->GetScriptId()];
@@ -1727,16 +1727,6 @@ bool ScriptMgr::OnGameObjectUse(Player* pPlayer, GameObject* pGameObject)
     return pTempScript->pGOHello(pPlayer, pGameObject);
 }
 
-bool ScriptMgr::OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets)
-{
-    Script* pTempScript = m_scripts[pItem->GetProto()->ScriptId];
-
-    if (!pTempScript || !pTempScript->pItemUse)
-        return false;
-
-    return pTempScript->pItemUse(pPlayer, pItem, targets);
-}
-
 bool ScriptMgr::OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry)
 {
     Script* pTempScript = m_scripts[GetAreaTriggerScriptId(atEntry->id)];
@@ -1776,16 +1766,6 @@ bool ScriptMgr::OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex ef
         return false;
 
     return pTempScript->pEffectDummyGameObj(pCaster, spellId, effIndex, pTarget);
-}
-
-bool ScriptMgr::OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, Item* pTarget)
-{
-    Script* pTempScript = m_scripts[pTarget->GetProto()->ScriptId];
-
-    if (!pTempScript || !pTempScript->pEffectDummyItem)
-        return false;
-
-    return pTempScript->pEffectDummyItem(pCaster, spellId, effIndex, pTarget);
 }
 
 bool ScriptMgr::OnAuraDummy(Aura const* pAura, bool apply)

@@ -723,8 +723,17 @@ bool ConditionEntry::IsValid()
         {
             if (!sSpellMgr.GetSpellEntry(m_value1))
             {
-                sLog.outErrorDb("Aura condition (entry %u, type %u) requires to have non existing spell (Id: %d), skipped", m_entry, m_condition, m_value1);
-                return false;
+                if (!sSpellMgr.IsExistingSpellId(m_value1))
+                {
+                    sLog.outErrorDb("Aura condition (entry %u, type %u) requires to have non existing spell (Id: %d), skipped", m_entry, m_condition, m_value1);
+                    return false;
+                }
+                else
+                {
+                    m_condition = CONDITION_NONE;
+                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    return true;
+                }
             }
             if (m_value2 >= MAX_EFFECT_INDEX)
             {
@@ -928,8 +937,17 @@ bool ConditionEntry::IsValid()
         {
             if (!sSpellMgr.GetSpellEntry(m_value1))
             {
-                sLog.outErrorDb("Spell condition (entry %u, type %u) requires to have non existing spell (Id: %d), skipped", m_entry, m_condition, m_value1);
-                return false;
+                if (!sSpellMgr.IsExistingSpellId(m_value1))
+                {
+                    sLog.outErrorDb("Spell condition (entry %u, type %u) requires to have non existing spell (Id: %d), skipped", m_entry, m_condition, m_value1);
+                    return false;
+                }
+                else
+                {
+                    m_condition = CONDITION_NONE;
+                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    return true;
+                }
             }
 
             if (m_value2 > 1)

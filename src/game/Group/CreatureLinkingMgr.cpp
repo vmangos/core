@@ -71,13 +71,14 @@ void CreatureLinkingMgr::LoadFromDB()
     // Load `creature_linking_template`
     sLog.outString("> Loading table `creature_linking_template`");
     uint32 count = 0;
-    QueryResult* result = WorldDatabase.Query("SELECT entry, map, master_entry, flag, search_range FROM creature_linking_template");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `map`, `master_entry`, `flag`, `search_range` FROM `creature_linking_template`"));
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
-        sLog.outString(">> Table creature_linking_template is empty.");
+
         sLog.outString();
+        sLog.outString(">> Table creature_linking_template is empty.");
     }
     else
     {
@@ -85,8 +86,8 @@ void CreatureLinkingMgr::LoadFromDB()
         do
         {
             bar.step();
-
             Field* fields = result->Fetch();
+
             CreatureLinkingInfo tmp;
 
             uint32 entry = fields[0].GetUInt32();
@@ -108,24 +109,21 @@ void CreatureLinkingMgr::LoadFromDB()
             m_eventTriggers.insert(tmp.masterId);
         } while (result->NextRow());
 
-        sLog.outString(">> Loaded creature linking for %u creature-entries", count);
         sLog.outString();
-
-        delete result;
+        sLog.outString(">> Loaded creature linking for %u creature-entries", count);
     }
 
     // Load `creature_linking`
     sLog.outString("> Loading table `creature_linking`");
     count = 0;
-    result = WorldDatabase.Query("SELECT guid, master_guid, flag FROM creature_linking");
+    result.reset(WorldDatabase.Query("SELECT `guid`, `master_guid`, `flag` FROM `creature_linking`"));
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
 
-        sLog.outString(">> Table creature_linking is empty.");
         sLog.outString();
-
+        sLog.outString(">> Table creature_linking is empty.");
         return;
     }
 
@@ -156,10 +154,8 @@ void CreatureLinkingMgr::LoadFromDB()
         m_eventGuidTriggers.insert(tmp.masterId);
     } while (result->NextRow());
 
-    sLog.outString(">> Loaded creature linking for %u creature-Guids", count);
     sLog.outString();
-
-    delete result;
+    sLog.outString(">> Loaded creature linking for %u creature-Guids", count);
 }
 
 /** This function is used to check if a DB-Entry is valid

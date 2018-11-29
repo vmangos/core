@@ -1731,6 +1731,9 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
     {
         if (IsQuestTameSpell(GetId()) && target->isAlive())
         {
+            if (m_removeMode != AURA_REMOVE_BY_CHANNEL)
+                return;
+
             Unit* caster = GetCaster();
             if (!caster || !caster->isAlive())
                 return;
@@ -2256,7 +2259,6 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         return;
     }
 
-    // remove polymorph before changing display id to keep new display id
     switch (form)
     {
         case FORM_CAT:
@@ -2267,30 +2269,8 @@ void Aura::HandleAuraModShapeshift(bool apply, bool Real)
         case FORM_DIREBEAR:
         case FORM_MOONKIN:
         {
-            // remove movement affects
-            target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT, GetHolder());
-            Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
-            for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
-            {
-                SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
-
-                uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
-
-                // If spell that caused this aura has Croud Control or Daze effect
-                if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
-                        // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
-                        (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
-                        (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
-                {
-                    ++iter;
-                    continue;
-                }
-
-                // All OK, remove aura now
-                target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
-                iter = slowingAuras.begin();
-            }
-
+            // Cast Shapeshift Form Effect to remove slows and roots.
+            target->CastSpell(target, 9033, true);
             break;
         }
         case FORM_BERSERKERSTANCE:
@@ -3123,16 +3103,18 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
         target->AttackStop();
         target->InterruptNonMeleeSpells(false);
-        if (caster->GetTypeId() == TYPEID_PLAYER) // Units will make the controlled player attack (MoveChase)
+
+        if (caster->IsPlayer()) // Units will make the controlled player attack (MoveChase)
             target->GetMotionMaster()->MoveFollow(caster, PET_FOLLOW_DIST, PET_FOLLOW_ANGLE);
 
-        if (Creature* pCreaTarget = target->ToCreature())
+        if (Creature* pCreatureTarget = target->ToCreature())
         {
-            if (pCreaTarget->AI() && pCreaTarget->AI()->SwitchAiAtControl())
-                pCreaTarget->AIM_Initialize();
-            if (caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK)
+            if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
+                pCreatureTarget->AIM_Initialize();
+
+            if (caster->IsPlayer() && caster->getClass() == CLASS_WARLOCK)
             {
-                CreatureInfo const *cinfo = ((Creature*)target)->GetCreatureInfo();
+                CreatureInfo const *cinfo = pCreatureTarget->GetCreatureInfo();
                 if (cinfo && cinfo->type == CREATURE_TYPE_DEMON)
                 {
                     // creature with pet number expected have class set
@@ -3155,7 +3137,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         }
         else if (Player* pPlayer = target->ToPlayer())
         {
-            if (caster->GetTypeId() == TYPEID_UNIT)
+            if (caster->IsCreature())
             {
                 pPlayer->SetControlledBy(caster);
                 if (pPlayer->i_AI && m_spellAuraHolder->GetId() == 28410)
@@ -3169,30 +3151,34 @@ void Aura::HandleModCharm(bool apply, bool Real)
             }
         }
         target->UpdateControl();
-        if (caster->GetTypeId() == TYPEID_PLAYER)
-            ((Player*)caster)->CharmSpellInitialize();
+
+        if (caster->IsPlayer())
+            static_cast<Player*>(caster)->CharmSpellInitialize();
     }
     else
     {
+        Creature* pCreatureTarget = target->ToCreature();
+        Player* pPlayerTarget = target->ToPlayer();
+
         target->SetCharmerGuid(ObjectGuid());
 
-        if(target->GetTypeId() != TYPEID_PLAYER)
+        if (pCreatureTarget)
         {
-            CreatureInfo const *cinfo = ((Creature*)target)->GetCreatureInfo();
+            CreatureInfo const *cinfo = pCreatureTarget->GetCreatureInfo();
 
             // restore faction
-            if (((Creature*)target)->IsPet())
+            if (target->IsPet())
             {
                 if (Unit* owner = target->GetOwner())
                     target->setFaction(owner->getFaction());
                 else if (cinfo)
-                    target->setFaction(cinfo->faction_A);
+                    target->setFaction(cinfo->faction);
             }
             else if (cinfo)                             // normal creature
-                target->setFaction(cinfo->faction_A);
+                target->setFaction(cinfo->faction);
 
             // restore UNIT_FIELD_BYTES_0
-            if (cinfo && caster && caster->GetTypeId() == TYPEID_PLAYER && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
+            if (cinfo && caster && caster->IsPlayer() && caster->getClass() == CLASS_WARLOCK && cinfo->type == CREATURE_TYPE_DEMON)
             {
                 // DB must have proper class set in field at loading, not req. restore, including workaround case at apply
                 // target->SetByteValue(UNIT_FIELD_BYTES_0, 1, cinfo->unit_class);
@@ -3207,45 +3193,31 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (caster)
         {
             caster->SetCharm(nullptr);
-            if (caster->GetTypeId() == TYPEID_PLAYER)
-                ((Player*)caster)->RemovePetActionBar();
+            if (caster->IsPlayer())
+                static_cast<Player*>(caster)->RemovePetActionBar();
         }
         
         target->UpdateControl();
 
-        if (target->GetTypeId() == TYPEID_PLAYER)
+        if (pPlayerTarget)
+            pPlayerTarget->setFactionForRace(target->getRace());
+
+        if (pPlayerTarget && pPlayerTarget->isAlive() && caster->isAlive() && caster->isInCombat())
         {
-            Player* pPlayer = target->ToPlayer();
-            ((Player*)target)->setFactionForRace(target->getRace());
-        }
-        // this should possibly be the case for other spells too...
-        // why on earth remove player from combat if, for example, its a boss casting it
-        if (m_spellAuraHolder->GetId() == 28410 && target->GetTypeId() == TYPEID_PLAYER)
-        {
-            if (caster->isAlive() && caster->isInCombat())
-            {
-                if (target->GetTypeId() == TYPEID_PLAYER)
-                    ((Player*)target)->SendAttackSwingCancelAttack();
+            pPlayerTarget->SendAttackSwingCancelAttack();
 
-                if (target->IsNonMeleeSpellCasted(false))
-                    target->InterruptNonMeleeSpells(false);
+            if (target->IsNonMeleeSpellCasted(false))
+                target->InterruptNonMeleeSpells(false);
 
-                target->AttackStop();
-                target->RemoveAllAttackers();
-                target->DeleteThreatList();
-                target->getHostileRefManager().deleteReferences();
+            target->AttackStop();
+            target->RemoveAllAttackers();
+            target->DeleteThreatList();
+            target->getHostileRefManager().deleteReferences();
 
-                caster->SetInCombatWith(target);
-                target->SetInCombatWith(caster);
-                
-                target->SetInCombatState(false, caster);
-            }
-            else
-            {
-                target->CombatStop(true);
-                target->DeleteThreatList();
-                target->getHostileRefManager().deleteReferences();
-            }
+            caster->SetInCombatWith(target);
+            target->SetInCombatWith(caster);
+
+            target->SetInCombatState(false, caster);
         }
         else
         {
@@ -3259,22 +3231,27 @@ void Aura::HandleModCharm(bool apply, bool Real)
         target->GetMotionMaster()->Clear(false);
         target->GetMotionMaster()->MoveIdle();
 
-        if (Creature* pTargetCrea = target->ToCreature())
+        if (pCreatureTarget)
         {
-            if (pTargetCrea->AI() && pTargetCrea->AI()->SwitchAiAtControl())
-                pTargetCrea->AIM_Initialize();
-            if (caster)
-                pTargetCrea->AttackedBy(caster);
+            if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
+                pCreatureTarget->AIM_Initialize();
+
+            // For some charm spells, the creature should despawn when the aura is removed.
+            // This is the case for the Taming the Beast hunter quest https://youtu.be/OJ0oPzP0k-A?t=474
+            // Only the charm spells used for those quests have EffectBasePoints = 11 (+1).
+            if (GetBasePoints() == 12)
+                pCreatureTarget->DespawnOrUnsummon();
+            else if (caster)
+                pCreatureTarget->AttackedBy(caster);
         }
-        else if (Player* pPlayer = target->ToPlayer())
+        else if (pPlayerTarget)
         {
-            pPlayer->RemoveAI();
+            pPlayerTarget->RemoveAI();
 
             // Charmed players are seen as hostile and not in the group for other clients, restore
             // group upon charm end
-            pPlayer->setFactionForRace(target->getRace());
-            if(pPlayer->GetGroup())
-                pPlayer->GetGroup()->BroadcastGroupUpdate();
+            if(pPlayerTarget->GetGroup())
+                pPlayerTarget->GetGroup()->BroadcastGroupUpdate();
         }
     }
 }
@@ -3872,10 +3849,6 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
     if (apply && GetSpellProto()->AttributesEx & SPELL_ATTR_EX_DISPEL_AURAS_ON_IMMUNITY)
         target->RemoveAurasAtMechanicImmunity(1 << (misc - 1), GetId());
 
-    // Transfert ne doit pas appliquer d'immunite pendant 1sec, mais simplement dispel
-    if (GetSpellProto()->DurationIndex == 36)
-        return;
-
     target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, misc, apply);
 
     // re-apply Fear Ward if it was not wasted during Bersereker Rage
@@ -3905,13 +3878,19 @@ void Aura::HandleAuraModEffectImmunity(bool apply, bool /*Real*/)
     Unit *target = GetTarget();
 
     // when removing flag aura, handle flag drop
-    if (!apply && target->GetTypeId() == TYPEID_PLAYER
-            && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
+    if (target->IsPlayer() && !target->HasAuraType(SPELL_AURA_MOD_POSSESS) && (GetSpellProto()->AuraInterruptFlags & AURA_INTERRUPT_FLAG_IMMUNE_OR_LOST_SELECTION))
     {
-        // En CM, si un ennemi nous met un boubou, on ne doit pas perdre le flag.
-        if (!target->HasAuraType(SPELL_AURA_MOD_POSSESS))
-            if (BattleGround *bg = ((Player*)target)->GetBattleGround())
-                bg->EventPlayerDroppedFlag(((Player*)target));
+        Player* player = static_cast<Player*>(target);
+
+        if (apply)
+            player->pvpInfo.isPvPFlagCarrier = true;
+        else
+        {
+            player->pvpInfo.isPvPFlagCarrier = false;
+
+            if (BattleGround* bg = player->GetBattleGround())
+                bg->EventPlayerDroppedFlag(player);
+        }
     }
 
     target->ApplySpellImmune(GetId(), IMMUNITY_EFFECT, m_modifier.m_miscvalue, apply);
@@ -4816,11 +4795,13 @@ void Aura::HandleAuraModAttackPowerPercent(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     if ((GetTarget()->getClassMask() & CLASSMASK_WAND_USERS) != 0)
         return;
 
     //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
     GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, float(m_modifier.m_amount), apply);
+#endif
 }
 
 /********************************/

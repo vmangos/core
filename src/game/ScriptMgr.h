@@ -311,7 +311,10 @@ enum eScriptCommand
                                                             // datalong2 = flags
     SCRIPT_COMMAND_ADD_THREAT               = 75,           // source = Creature
                                                             // target = Unit
-    
+    SCRIPT_COMMAND_SUMMON_OBJECT            = 76,           // source = WorldObject
+                                                            // datalong = gameobject_entry
+                                                            // datalong2 = respawn_time
+                                                            // x/y/z/o = coordinates
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -955,6 +958,13 @@ struct ScriptInfo
         } addAura;
 
                                                             // SCRIPT_COMMAND_ADD_THREAT (75)
+
+        struct                                              // SCRIPT_COMMAND_SUMMON_OBJECT (76)
+        {
+            uint32 gameobject_entry;                        // datalong
+            uint32 respawn_time;                            // datalong2
+        } summonObject;
+
         struct
         {
             uint32 data[9];
@@ -1294,19 +1304,16 @@ class ScriptMgr
         bool OnGossipSelect(Player* pPlayer, GameObject* pGameObject, uint32 sender, uint32 action, const char* code);
         bool OnQuestAccept(Player* pPlayer, Creature* pCreature, Quest const* pQuest);
         bool OnQuestAccept(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest);
-        bool OnQuestAccept(Player* pPlayer, Item* pItem, Quest const* pQuest);
         bool OnQuestRewarded(Player* pPlayer, Creature* pCreature, Quest const* pQuest);
         bool OnQuestRewarded(Player* pPlayer, GameObject* pGameObject, Quest const* pQuest);
         uint32 GetDialogStatus(Player* pPlayer, Creature* pCreature);
         uint32 GetDialogStatus(Player* pPlayer, GameObject* pGameObject);
         bool OnGameObjectUse(Player* pPlayer, GameObject* pGameObject);
         bool OnGameObjectOpen(Player* pPlayer, GameObject* pGameObject);
-        bool OnItemUse(Player* pPlayer, Item* pItem, SpellCastTargets const& targets);
         bool OnAreaTrigger(Player* pPlayer, AreaTriggerEntry const* atEntry);
         bool OnProcessEvent(uint32 eventId, Object* pSource, Object* pTarget, bool isStart);
         bool OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, Creature* pTarget);
         bool OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, GameObject* pTarget);
-        bool OnEffectDummy(Unit* pCaster, uint32 spellId, SpellEffectIndex effIndex, Item* pTarget);
         bool OnAuraDummy(Aura const* pAura, bool apply);
 
     private:

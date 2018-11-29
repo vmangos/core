@@ -784,12 +784,9 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
             }
             if (damagetype != DOT)
             {
-                SetInCombatWith(pVictim);
-                pVictim->SetInCombatWith(this);
+                SetInCombatWithVictim(pVictim);
+                pVictim->SetInCombatWithAggressor(this);
             }
-
-            //PMonsterSay("-> Absorb %5u | Resist %5u. AttackType %u", cleanDamage->absorb, cleanDamage->resist, cleanDamage->hitOutCome);
-            SetContestedPvP(pVictim);
         }
         return 0;
     }
@@ -867,12 +864,10 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
     if ((pVictim != this) && (damagetype != DOT) &&
             (!spellProto || !spellProto->IsAuraAddedBySpell(SPELL_AURA_DAMAGE_SHIELD)))
     {
-        SetInCombatWith(pVictim);
-        pVictim->SetInCombatWith(this);
+        SetInCombatWithVictim(pVictim);
+        pVictim->SetInCombatWithAggressor(this);
         if (GetTypeId() == TYPEID_PLAYER && pVictim->GetTypeId() == TYPEID_UNIT)
-            pVictim->ToCreature()->ResetLastDamageTakenTime();
-
-        SetContestedPvP(pVictim);
+            pVictim->ToCreature()->ResetLastDamageTakenTime();;
     }
     if (pVictim->GetTypeId() == TYPEID_UNIT)
         pVictim->ToCreature()->CountDamageTaken(damage, GetCharmerOrOwnerOrOwnGuid().IsPlayer() || pVictim == this);
@@ -5976,23 +5971,6 @@ void Unit::CombatStopWithPets(bool includingCast)
     CallForAllControlledUnits(CombatStopWithPetsHelper(includingCast), CONTROLLED_PET | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
 }
 
-struct IsAttackingPlayerHelper
-{
-    explicit IsAttackingPlayerHelper() {}
-    bool operator()(Unit const* unit) const
-    {
-        return unit->isAttackingPlayer();
-    }
-};
-
-bool Unit::isAttackingPlayer() const
-{
-    if (hasUnitState(UNIT_STAT_ATTACK_PLAYER))
-        return true;
-
-    return CheckAllControlledUnits(IsAttackingPlayerHelper(), CONTROLLED_PET | CONTROLLED_TOTEMS | CONTROLLED_GUARDIANS | CONTROLLED_CHARM);
-}
-
 void Unit::RemoveAllAttackers()
 {
     while (!m_attackers.empty())
@@ -6163,25 +6141,6 @@ void Unit::RemoveCharmAuras()
     RemoveSpellsCausingAura(SPELL_AURA_AOE_CHARM);
 }
 
-float Unit::GetCombatDistance(const Unit* target) const
-{
-    float radius = target->GetFloatValue(UNIT_FIELD_COMBATREACH) + GetFloatValue(UNIT_FIELD_COMBATREACH);
-    float dx = GetPositionX() - target->GetPositionX();
-    float dy = GetPositionY() - target->GetPositionY();
-    float dz = GetPositionZ() - target->GetPositionZ();
-    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz)) - radius;
-    return (dist > 0 ? dist : 0);
-}
-
-float Unit::GetDistanceToCenter(const Unit* target) const
-{
-    float dx = GetPositionX() - target->GetPositionX();
-    float dy = GetPositionY() - target->GetPositionY();
-    float dz = GetPositionZ() - target->GetPositionZ();
-    float dist = sqrt((dx * dx) + (dy * dy) + (dz * dz));
-    return (dist > 0 ? dist : 0);
-}
-
 float Unit::GetLeewayBonusRange(const Unit* target) const
 {
     if (IsPlayer() && GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED && target && target->GetXZFlagBasedSpeed() > LEEWAY_MIN_MOVE_SPEED)
@@ -6218,10 +6177,7 @@ void Unit::RestoreFaction()
     else
     {
         if (CreatureInfo const *cinfo = ((Creature*)this)->GetCreatureInfo())  // normal creature
-        {
-            FactionTemplateEntry const *faction = getFactionTemplateEntry();
-            setFaction((faction && faction->friendlyMask & 0x004) ? cinfo->faction_H : cinfo->faction_A);
-        }
+            setFaction(cinfo->faction);
     }
 }
 
@@ -7468,31 +7424,11 @@ bool Unit::IsInDisallowedMountForm() const
     return false;
 }
 
-void Unit::SetInCombatWith(Unit* enemy)
+void Unit::SetInCombatWith(Unit* pEnemy)
 {
-    ASSERT(enemy);
-    Unit* eOwner = enemy->GetCharmerOrOwnerOrSelf();
-    ASSERT(eOwner);
-    if (eOwner->IsPvP())
-    {
-        SetInCombatState(true, enemy);
-        return;
-    }
+    ASSERT(pEnemy);
 
-    //check for duel
-    if (eOwner->GetTypeId() == TYPEID_PLAYER && ((Player*)eOwner)->duel)
-    {
-        if (Player const* myOwner = GetCharmerOrOwnerPlayerOrPlayerItself())
-        {
-            if (myOwner->IsInDuelWith((Player const*)eOwner))
-            {
-                SetInCombatState(true, enemy);
-                return;
-            }
-        }
-    }
-
-    SetInCombatState(false, enemy);
+    SetInCombatState(pEnemy->GetCharmerOrOwnerPlayerOrPlayerItself(), pEnemy);
 }
 
 void Unit::SetInCombatState(bool PvP, Unit* enemy)
@@ -7548,16 +7484,111 @@ void Unit::SetInCombatState(bool PvP, Unit* enemy)
     }
 }
 
+void Unit::SetInCombatWithAggressor(Unit* pAggressor, bool touchOnly/* = false*/)
+{
+    // This is a wrapper for SetInCombatWith initially created to improve PvP timers responsiveness. Can be extended in the future for broader use.
+
+    if (!pAggressor)
+        return;
+
+    // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the victim)
+    if (pAggressor->IsPvP())
+    {
+        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            if (Player const* pAggressorPlayer = pAggressor->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (pThisPlayer != pAggressorPlayer && !pThisPlayer->IsInDuelWith(pAggressorPlayer) && !(pThisPlayer->IsFFAPvP() && pAggressorPlayer->IsFFAPvP()))
+                {
+                    pThisPlayer->pvpInfo.inPvPCombat = (pThisPlayer->pvpInfo.inPvPCombat || !touchOnly);
+                    pThisPlayer->UpdatePvP(true);
+                    pThisPlayer->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+                }
+            }
+        }
+    }
+
+    if (!touchOnly)
+        SetInCombatWith(pAggressor);
+}
+
+void Unit::SetInCombatWithAssisted(Unit* pAssisted)
+{
+    // This is a wrapper for SetInCombatWith initially created to improve PvP timers responsiveness. Can be extended in the future for broader use.
+
+    if (!pAssisted)
+        return;
+
+    // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the assister)
+    if (pAssisted->IsPvP())
+    {
+        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            if (Player const* pAssistedPlayer = pAssisted->GetCharmerOrOwnerPlayerOrPlayerItself())
+            {
+                if (pThisPlayer != pAssistedPlayer)
+                {
+                    if (pAssistedPlayer->pvpInfo.inPvPCombat)
+                        pThisPlayer->pvpInfo.inPvPCombat = true;
+
+                    pThisPlayer->UpdatePvP(true);
+                    pThisPlayer->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+
+                    if (pAssistedPlayer->IsPvPContested())
+                        pThisPlayer->UpdatePvPContested(true);
+                }
+            }
+        }
+    }
+
+    SetInCombatState(pAssisted->GetCombatTimer() > 0);
+}
+
+void Unit::TogglePlayerPvPFlagOnAttackVictim(Unit const* pVictim, bool touchOnly/* = false*/)
+{
+    // PvP combat participation pulse: refresh pvp timers on pvp combat (we are the aggressor)
+    if (pVictim->IsPvP())
+    {
+        if (Player* pThisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        {
+            Player const* pVictimPlayer = pVictim->GetCharmerOrOwnerPlayerOrPlayerItself();
+
+            if (!pVictimPlayer || ((pThisPlayer != pVictimPlayer) && !pThisPlayer->IsInDuelWith(pVictimPlayer) && !(pThisPlayer->IsFFAPvP() && pVictimPlayer->IsFFAPvP())))
+            {
+                pThisPlayer->pvpInfo.inPvPCombat = (pThisPlayer->pvpInfo.inPvPCombat || !touchOnly);
+                pThisPlayer->UpdatePvP(true);
+
+                if (pVictimPlayer)
+                    pThisPlayer->UpdatePvPContested(true);
+
+                pThisPlayer->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
+            }
+        }
+    }
+}
+
+void Unit::SetInCombatWithVictim(Unit* victim, bool touchOnly/* = false*/)
+{
+    // This is a wrapper for SetInCombatWith initially created to improve PvP timers responsiveness. Can be extended in the future for broader use.
+
+    if (!victim)
+        return;
+
+    TogglePlayerPvPFlagOnAttackVictim(victim, touchOnly);
+
+    if (!touchOnly)
+        SetInCombatWith(victim);
+}
+
+
 void Unit::ClearInCombat()
 {
     m_CombatTimer = 0;
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IN_COMBAT);
-
-    // Player's state will be cleared in Player::UpdateContestedPvP
-    if (GetTypeId() != TYPEID_PLAYER)
-        clearUnitState(UNIT_STAT_ATTACK_PLAYER);
-
     RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PET_IN_COMBAT);
+
+    if (GetTypeId() == TYPEID_PLAYER)
+        static_cast<Player*>(this)->pvpInfo.inPvPCombat = false;
 }
 
 bool Unit::isTargetableForAttack(bool inverseAlive /*=false*/, bool isAttackerPlayer /*=false*/) const
@@ -7653,6 +7684,9 @@ bool Unit::IsValidAttackTarget(Unit const* target) const
 
         if (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP
                 && playerAffectingTarget->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_FFA_PVP)
+            return true;
+
+        if (playerAffectingAttacker->IsFFAPvP() && playerAffectingTarget->IsFFAPvP())
             return true;
 
         return (playerAffectingAttacker->GetByteValue(UNIT_FIELD_BYTES_2, 1) & UNIT_BYTE2_FLAG_UNK1)
@@ -8198,9 +8232,14 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
         {
             if (Player* me = GetAffectingPlayer())
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 18);
                 dataForMe << GetPackGUID();
                 dataForMe << uint32(0);
+#else
+                WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 14);
+                dataForMe << GetPackGUID();
+#endif
                 dataForMe << float(GetSpeed(mtype));
                 me->GetSession()->SendPacket(&dataForMe);
                 me->GetCheatData()->OrderSent(&dataForMe);
@@ -8940,7 +8979,11 @@ float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
         int32 ap = GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER) + GetInt32Value(UNIT_FIELD_RANGED_ATTACK_POWER_MODS);
         if (ap < 0)
             return 0.0f;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         return ap * (1.0f + GetFloatValue(UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER));
+#else
+        return ap;
+#endif
     }
     else
     {
@@ -10299,34 +10342,6 @@ Aura* Unit::GetDummyAura(uint32 spell_id) const
     return nullptr;
 }
 
-void Unit::SetContestedPvP(Unit *attackedUnit)
-{
-    Player* player = GetCharmerOrOwnerPlayerOrPlayerItself();
-
-    if (!player || (attackedUnit && attackedUnit->IsPlayer() && (attackedUnit == player || player->IsInDuelWith(attackedUnit->ToPlayer()))))
-        return;
-
-    if (attackedUnit && attackedUnit->GetTypeId() == TYPEID_UNIT && !attackedUnit->IsPvP())
-        return;
-
-    player->SetContestedPvPTimer(30000);
-
-    if (!player->hasUnitState(UNIT_STAT_ATTACK_PLAYER))
-    {
-        player->addUnitState(UNIT_STAT_ATTACK_PLAYER);
-        player->SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
-        // call MoveInLineOfSight for nearby contested guards
-        UpdateVisibilityAndView();
-    }
-
-    if (!hasUnitState(UNIT_STAT_ATTACK_PLAYER))
-    {
-        addUnitState(UNIT_STAT_ATTACK_PLAYER);
-        // call MoveInLineOfSight for nearby contested guards
-        UpdateVisibilityAndView();
-    }
-}
-
 void Unit::AddPetAura(PetAura const* petSpell)
 {
     m_petAuras.insert(petSpell);
@@ -10434,7 +10449,7 @@ void Unit::TeleportPositionRelocation(float x, float y, float z, float orientati
         if (old_zone != newzone)
             player->UpdateZone(newzone, newarea);
         // honorless target
-        if (!player->pvpInfo.inHostileArea)
+        if (!player->pvpInfo.inPvPEnforcedArea)
             player->RemoveDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
     }
     else if (crea)
@@ -10512,6 +10527,24 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         SendMovementMessageToSet(std::move(data), true);
 
         ToPlayer()->GetCheatData()->KnockBack(horizontalSpeed, verticalSpeed, vcos, vsin);
+    }
+}
+
+bool Unit::IsPvPContested() const
+{
+    if (const Player* thisPlayer = GetCharmerOrOwnerPlayerOrPlayerItself())
+        return thisPlayer->HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+    return false;
+}
+
+void Unit::SetPvPContested(bool state)
+{
+    if (GetTypeId() == TYPEID_PLAYER)
+    {
+        if (state)
+            SetFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
+        else
+            RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_CONTESTED_PVP);
     }
 }
 
@@ -11037,56 +11070,6 @@ bool Unit::IsCaster()
             return true; // Pas en changeforme, on suppose qu'il est casteur.
         default:
             return false;
-    }
-}
-
-void Unit::EnterVanish()
-{
-    SetVisibility(VISIBILITY_OFF);
-    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
-    InterruptSpellsCastedOnMe(true);
-    InterruptAttacksOnMe();
-    AttackStop();
-    InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
-    // DoResetThreat :
-    if (Creature* pCrea = ToCreature())
-    {
-        if (!pCrea->CanHaveThreatList() || pCrea->getThreatManager().isThreatListEmpty())
-            return;
-
-        ThreatList const& tList = pCrea->getThreatManager().getThreatList();
-        for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
-        {
-            Unit* pUnit = pCrea->GetMap()->GetUnit((*itr)->getUnitGuid());
-
-            if (pUnit && pCrea->getThreatManager().getThreat(pUnit))
-                pCrea->getThreatManager().modifyThreatPercent(pUnit, -100);
-        }
-    }
-}
-
-void Unit::LeaveVanish()
-{
-    SetVisibility(VISIBILITY_ON);
-    RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FIELD_FLAGS);
-}
-
-void Unit::Ambush(Unit* pNewVictim, uint32 embushSpellId)
-{
-    if (!pNewVictim)
-        return;
-    if (Creature* pCrea = ToCreature())
-    {
-        // Se position derriere
-        float x, y, z;
-        pNewVictim->GetRelativePositions(-4.0f, 0.0f, 0.0f, x, y, z);
-        pCrea->NearTeleportTo(x, y, z, 0.0f);
-        pCrea->SetFacingToObject(pNewVictim);
-        // Embush
-        if (embushSpellId)
-            pCrea->CastSpell(pNewVictim, embushSpellId, true);
-        if (pCrea->AI())
-            pCrea->AI()->AttackStart(pNewVictim);
     }
 }
 

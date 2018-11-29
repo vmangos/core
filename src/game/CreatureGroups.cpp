@@ -172,14 +172,14 @@ void CreatureGroup::RemoveMember(ObjectGuid guid)
 
 void CreatureGroup::DeleteFromDb()
 {
-    WorldDatabase.PExecute("DELETE FROM creature_groups WHERE leaderGUID=%u", _leaderGuid.GetCounter());
+    WorldDatabase.PExecute("DELETE FROM creature_groups WHERE leader_guid=%u", _leaderGuid.GetCounter());
 }
 
 void CreatureGroup::SaveToDb()
 {
     DeleteFromDb();
     for (const auto& itr : _members)
-        WorldDatabase.PExecute("INSERT INTO creature_groups SET leaderGUID=%u, memberGUID=%u, dist='%f', angle='%f', flags=%u",
+        WorldDatabase.PExecute("INSERT INTO creature_groups SET leader_guid=%u, member_guid=%u, dist='%f', angle='%f', flags=%u",
                                _leaderGuid.GetCounter(), itr.first.GetCounter(), itr.second->followDistance, itr.second->followAngle, itr.second->memberFlags);
 }
 
@@ -213,21 +213,26 @@ void CreatureGroupsManager::Load()
     // Memory leak, but we cannot delete the loaded groups, since pointer may be present at loaded creatures
     _groups.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT leaderGUID, memberGUID, dist, angle, flags FROM creature_groups ORDER BY leaderGUID");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `leader_guid`, `member_guid`, `dist`, `angle`, `flags` FROM `creature_groups` ORDER BY `leader_guid`"));
 
     if (!result)
     {
-        sLog.outErrorDb(">>  Loaded 0 creature groups. DB table `creature_groups` is empty!");
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
+        sLog.outErrorDb(">>  Loaded 0 creature groups. DB table `creature_groups` is empty!");
         return;
     }
 
     uint32 count = 0;
     Field *fields;
     CreatureGroup *currentGroup = nullptr;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         //Load group member data
@@ -255,10 +260,9 @@ void CreatureGroupsManager::Load()
         }
     }
     while (result->NextRow());
-    delete result;
 
-    sLog.outString(">> Loaded %u creature groups in %u ms", count, WorldTimer::getMSTime() - oldMSTime);
     sLog.outString();
+    sLog.outString(">> Loaded %u creature groups in %u ms", count, WorldTimer::getMSTime() - oldMSTime);
 }
 
 void CreatureGroupsManager::LoadCreatureGroup(Creature* creature, CreatureGroup*& group)

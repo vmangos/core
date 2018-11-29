@@ -105,7 +105,7 @@ LanguageDesc const* GetLanguageDescByID(uint32 lang)
             return &lang_description[i];
     }
 
-    return NULL;
+    return nullptr;
 }
 
 template<typename T>
@@ -136,31 +136,28 @@ ObjectMgr::ObjectMgr() :
 
 ObjectMgr::~ObjectMgr()
 {
-    for (QuestMap::iterator i = mQuestTemplates.begin(); i != mQuestTemplates.end(); ++i)
-        delete i->second;
-
-    for (PetLevelInfoMap::iterator i = petInfo.begin(); i != petInfo.end(); ++i)
+    for (PetLevelInfoMap::iterator i = m_PetInfoMap.begin(); i != m_PetInfoMap.end(); ++i)
         delete[] i->second;
 
     // free only if loaded
     for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
-        delete[] playerClassInfo[class_].levelInfo;
+        delete[] m_PlayerClassInfo[class_].levelInfo;
 
     for (int race = 0; race < MAX_RACES; ++race)
         for (int class_ = 0; class_ < MAX_CLASSES; ++class_)
-            delete[] playerInfo[race][class_].levelInfo;
+            delete[] m_PlayerInfo[race][class_].levelInfo;
 
     // free objects
-    for (GroupMap::iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
+    for (GroupMap::iterator itr = m_GroupMap.begin(); itr != m_GroupMap.end(); ++itr)
         delete itr->second;
 
-    for (CacheVendorItemMap::iterator itr = m_mCacheVendorTemplateItemMap.begin(); itr != m_mCacheVendorTemplateItemMap.end(); ++itr)
+    for (CacheVendorItemMap::iterator itr = m_CacheVendorTemplateItemMap.begin(); itr != m_CacheVendorTemplateItemMap.end(); ++itr)
         itr->second.Clear();
 
-    for (CacheVendorItemMap::iterator itr = m_mCacheVendorItemMap.begin(); itr != m_mCacheVendorItemMap.end(); ++itr)
+    for (CacheVendorItemMap::iterator itr = m_CacheVendorItemMap.begin(); itr != m_CacheVendorItemMap.end(); ++itr)
         itr->second.Clear();
 
-    for (CacheTrainerSpellMap::iterator itr = m_mCacheTrainerSpellMap.begin(); itr != m_mCacheTrainerSpellMap.end(); ++itr)
+    for (CacheTrainerSpellMap::iterator itr = m_CacheTrainerSpellMap.begin(); itr != m_CacheTrainerSpellMap.end(); ++itr)
         itr->second.Clear();
 
     for (PlayerCacheDataMap::iterator itr = m_playerCacheData.begin(); itr != m_playerCacheData.end(); ++itr)
@@ -172,7 +169,7 @@ void ObjectMgr::LoadAllIdentifiers()
     m_ItemIdSet.clear();
 
     Field* fields;
-    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT entry FROM item_template");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `item_template`"));
 
     if (result)
     {
@@ -182,11 +179,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_ItemIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
     
     m_QuestIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM quest_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `quest_template`"));
 
     if (result)
     {
@@ -196,11 +192,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_QuestIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_CreatureIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM creature_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_template`"));
 
     if (result)
     {
@@ -210,11 +205,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_CreatureIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_GameObjectIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM gameobject_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `gameobject_template`"));
 
     if (result)
     {
@@ -224,11 +218,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_GameObjectIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_CreatureGuidSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT guid FROM creature");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `guid` FROM `creature`"));
 
     if (result)
     {
@@ -238,11 +231,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_CreatureGuidSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_GameObjectGuidSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT guid FROM gameobject");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `guid` FROM `gameobject`"));
 
     if (result)
     {
@@ -252,11 +244,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_GameObjectGuidSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_AreaTriggerIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT ID FROM areatrigger_template");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `id` FROM `areatrigger_template`"));
 
     if (result)
     {
@@ -266,11 +257,10 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_AreaTriggerIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     m_CreatureSpellsIdSet.clear();
-    result = WorldDatabase.Query("SELECT DISTINCT entry FROM creature_spells");
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `creature_spells`"));
 
     if (result)
     {
@@ -280,7 +270,6 @@ void ObjectMgr::LoadAllIdentifiers()
             uint32 id = fields[0].GetUInt32();
             m_CreatureSpellsIdSet.insert(id);
         } while (result->NextRow());
-        delete result;
     }
 
     sSpellMgr.LoadExistingSpellIds();
@@ -291,21 +280,27 @@ void ObjectMgr::LoadSpellDisabledEntrys()
 {
     m_DisabledSpells.clear();                                // need for reload case
 
-    QueryResult* result = WorldDatabase.Query("SELECT entry FROM spell_disabled");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry` FROM `spell_disabled`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u disabled spells", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         uint32 spellid = fields[0].GetUInt32();
         if (!sSpellMgr.GetSpellEntry(spellid))
         {
@@ -319,35 +314,33 @@ void ObjectMgr::LoadSpellDisabledEntrys()
 
     sLog.outString();
     sLog.outString(">> Loaded %u disabled spells from `spell_disabled`", total_count);
-    delete result;
 }
-/*
-DROP TABLE IF EXISTS map_loot_disabled;
-CREATE TABLE `map_loot_disabled` (
-  `mapid` int(11) default 0,
-  `comment` varchar(255),
-  PRIMARY KEY (`mapid`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-*/
+
 void ObjectMgr::LoadMapLootDisabled()
 {
     m_DisabledMapLoots.clear();                                // need for reload case
 
-    QueryResult* result = WorldDatabase.Query("SELECT mapid FROM map_loot_disabled");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `map_id` FROM `map_loot_disabled`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
-        sLog.outString(">> Loaded %u disabled maps loot", total_count);
+        sLog.outString(">> Loaded %u maps with disabled loot", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         uint32 mapid = fields[0].GetUInt32();
         m_DisabledMapLoots.insert(mapid);
         ++total_count;
@@ -355,29 +348,34 @@ void ObjectMgr::LoadMapLootDisabled()
     while (result->NextRow());
 
     sLog.outString();
-    sLog.outString(">> Loaded %u disabled spells from `map_loot_disabled`", total_count);
-    delete result;
+    sLog.outString(">> Loaded %u maps with disabled loot from `map_loot_disabled`", total_count);
 }
 
 void ObjectMgr::LoadCinematicsWaypoints()
 {
     m_CinematicWaypoints.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT cinematic,timer,posx,posy,posz FROM cinematic_waypoints");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `cinematic`, `timer`, `position_x`, `position_y`, `position_z` FROM `cinematic_waypoints`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
-        sLog.outString(">> Loaded %u disabled cinematic Waypoints", total_count);
+        sLog.outString(">> Loaded %u cinematic waypoints", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         CinematicWaypointEntry tmp;
 
         tmp.cinematic_id = fields[0].GetUInt32();
@@ -390,19 +388,18 @@ void ObjectMgr::LoadCinematicsWaypoints()
         ++total_count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
-    sLog.outString(">> Loaded %u cinematic Waypoints from `cinematic_waypoints`", total_count);
+    sLog.outString(">> Loaded %u cinematic waypoints from `cinematic_waypoints`", total_count);
 }
 
 Position const* ObjectMgr::GetCinematicPosition(uint32 cinematicId, uint32 elapsed_time)
 {
-    // On cherche un waypoint :
-    // 1- Qui correspond a la cinematic_id
-    // 2- Qui soit le plus grand possible
-    // 3- Avec un time < elapsed_time (sinon on reste toujours au meme)
-    Position const* tmpBestPos = NULL;
+    // We are looking for a waypoint :
+    // 1- corresponds to the cinematic_id
+    // 2- biggest possible
+    // 3- With a time < elapsed_time (otherwise we always stay at the same)
+    Position const* tmpBestPos = nullptr;
     uint32 tmpBestTimer  = 0;
     std::vector<CinematicWaypointEntry>::const_iterator it;
     for (it = m_CinematicWaypoints.begin(); it != m_CinematicWaypoints.end(); ++it)
@@ -433,32 +430,37 @@ Position const* ObjectMgr::GetCinematicInitialPosition(uint32 cinematicId)
                 return &(it->position);
         }
     }
-    // Non trouve
-    sLog.outError("Impossible de trouver le point de depart de la cinematique %u", cinematicId);
-    return NULL;
+    // Not found
+    sLog.outError("Can not find the starting point of cinematic %u", cinematicId);
+    return nullptr;
 }
 
-// Systeme de phasing
+// Phasing system
 // ALTER TABLE characters ADD COLUMN world_phase_mask int(11) unsigned not null default 0;
 void ObjectMgr::LoadPlayerPhaseFromDb()
 {
     m_PlayerPhases.clear();
 
-    QueryResult* result = CharacterDatabase.Query("SELECT guid, world_phase_mask FROM characters");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT guid, world_phase_mask FROM characters"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u characters phases", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
         uint32 mask = fields[1].GetUInt32();
@@ -469,7 +471,6 @@ void ObjectMgr::LoadPlayerPhaseFromDb()
 
     sLog.outString();
     sLog.outString(">> Loaded %u character phases", total_count);
-    delete result;
 }
 
 uint32 ObjectMgr::GetPlayerWorldMaskByGUID(const uint64 guid)
@@ -484,15 +485,7 @@ void ObjectMgr::SetPlayerWorldMask(const uint64 guid, uint32 newWorldMask)
     m_PlayerPhases[GUID_LOPART(guid)] = newWorldMask;
     //CharacterDatabase.PQuery("UPDATE characters SET world_phase_mask = %u WHERE guid = %u", newWorldMask, GUID_LOPART(guid));
 }
-/*
-# Pour le moment dans la DB World. Il serait plus judicieux de la deplacer dans characters ... ?
-CREATE TABLE `variables` (
-  `index` int(10) unsigned NOT NULL default '0',
-  `value` int(10) unsigned NOT NULL default '0',
-  `comment` varchar(255),
-  PRIMARY KEY  (`index`)
-) ENGINE=MyISAM DEFAULT CHARSET=latin1;
-*/
+
 uint32 ObjectMgr::GetSavedVariable(uint32 index, uint32 defaultValue, bool *exist)
 {
     SavedVariablesVector::iterator it;
@@ -534,7 +527,7 @@ void ObjectMgr::_SaveVariable(const SavedVariable& toSave)
 void ObjectMgr::InitSavedVariable(uint32 index, uint32 value)
 {
     SavedVariablesVector::iterator it;
-    // Deja enregistree ?
+    // Already registered?
     for (it = m_SavedVariables.begin(); it != m_SavedVariables.end(); ++it)
         if (it->uiIndex == index)
             return;
@@ -550,7 +543,7 @@ void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
     {
         if (it->uiIndex == index)
         {
-            // Si la valeur n'a pas change
+            // If the value has not changed.
             if (it->uiValue == value)
                 return;
 
@@ -562,7 +555,7 @@ void ObjectMgr::SetSavedVariable(uint32 index, uint32 value, bool autoSave)
             return;
         }
     }
-    // Si on est la, c'est que la variable n'existe pas.
+    // If we are here, it means that the variable does not exist.
     SavedVariable& variable = _InsertVariable(index, value, autoSave);
     if (autoSave)
         _SaveVariable(variable);
@@ -596,21 +589,26 @@ void ObjectMgr::LoadSavedVariable()
 {
     m_SavedVariables.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT `index`,`value` FROM variables");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `index`, `value` FROM `variables`"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u saved variables", total_count);
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
         _InsertVariable(fields[0].GetUInt32(), fields[1].GetUInt32(), true);
         ++total_count;
     }
@@ -618,32 +616,37 @@ void ObjectMgr::LoadSavedVariable()
 
     sLog.outString();
     sLog.outString(">> Loaded %u saved variables", total_count);
-    delete result;
 }
 
-// Mise en cache de donnees des joueurs
+// Caching player data
 void ObjectMgr::LoadPlayerCacheData()
 {
     m_playerCacheData.clear();
     m_playerNameToGuid.clear();
 
-    QueryResult* result = CharacterDatabase.Query(
-        //      0     1     2      3       4        5     6      7     8    9           10          11          12           13
-        "SELECT guid, race, class, gender, account, name, level, zone, map, position_x, position_y, position_z, orientation, taxi_path FROM characters;");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query(
+        //       0       1       2        3         4          5       6        7       8      9             10            11            12             13
+        "SELECT `guid`, `race`, `class`, `gender`, `account`, `name`, `level`, `zone`, `map`, `position_x`, `position_y`, `position_z`, `orientation`, `taxi_path` FROM `characters`;"));
 
     uint32 total_count = 0;
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
-        sLog.outString(">> 0 cached player data ...");
+        sLog.outString(">> Loaded 0 cached player data ...");
         return;
     }
 
-    Field* fields;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        Field* fields = result->Fetch();
+
         // guid, race, class, gender, account, name
         std::string name = fields[5].GetCppString();
         if (normalizePlayerName(name))
@@ -660,7 +663,6 @@ void ObjectMgr::LoadPlayerCacheData()
 
     sLog.outString();
     sLog.outString(">> Loaded %u players in cache.", total_count);
-    delete result;
 }
 
 PlayerCacheData* ObjectMgr::GetPlayerDataByGUID(uint32 guidLow) const
@@ -709,7 +711,7 @@ Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
 
 uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
 {
-    // prevent DB access for online player
+    // Prevent DB access for online player.
     if (Player* player = GetPlayer(guid))
     {
         return player->getClass();
@@ -723,12 +725,11 @@ uint8 ObjectMgr::GetPlayerClassByGUID(ObjectGuid guid) const
     }
     else
     {
-        QueryResult* result = CharacterDatabase.PQuery("SELECT class FROM characters WHERE guid = '%u'", lowguid);
+        std::unique_ptr<QueryResult> result(CharacterDatabase.PQuery("SELECT `class` FROM `characters` WHERE `guid` = '%u'", lowguid));
 
         if (result)
         {
             uint8 pClass = (*result)[0].GetUInt8();
-            delete result;
             return pClass;
         }
     }
@@ -872,19 +873,19 @@ void ObjectMgr::GetPlayerDataForAccount(uint32 accountId, std::list<PlayerCacheD
 
 Group* ObjectMgr::GetGroupById(uint32 id) const
 {
-    GroupMap::const_iterator itr = mGroupMap.find(id);
-    if (itr != mGroupMap.end())
+    GroupMap::const_iterator itr = m_GroupMap.find(id);
+    if (itr != m_GroupMap.end())
         return itr->second;
 
-    return NULL;
+    return nullptr;
 }
 
 Group* ObjectMgr::GetGroupByMember(ObjectGuid memberGuid)
 {
-    for (GroupMap::const_iterator itr = mGroupMap.begin(); itr != mGroupMap.end(); ++itr)
+    for (GroupMap::const_iterator itr = m_GroupMap.begin(); itr != m_GroupMap.end(); ++itr)
         if (itr->second->IsMember(memberGuid))
             return itr->second;
-    return NULL;
+    return nullptr;
 }
 
 CreatureInfo const* ObjectMgr::GetCreatureTemplate(uint32 id)
@@ -894,14 +895,13 @@ CreatureInfo const* ObjectMgr::GetCreatureTemplate(uint32 id)
 
 void ObjectMgr::LoadCreatureLocales()
 {
-    mCreatureLocaleMap.clear();                              // need for reload case
+    m_CreatureLocaleMap.clear();                              // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,name_loc1,subname_loc1,name_loc2,subname_loc2,name_loc3,subname_loc3,name_loc4,subname_loc4,name_loc5,subname_loc5,name_loc6,subname_loc6,name_loc7,subname_loc7,name_loc8,subname_loc8 FROM locales_creature");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `subname_loc1`, `name_loc2`, `subname_loc2`, `name_loc3`, `subname_loc3`, `name_loc4`, `subname_loc4`, `name_loc5`, `subname_loc5`, `name_loc6`, `subname_loc6`, `name_loc7`, `subname_loc7`, `name_loc8`, `subname_loc8` FROM `locales_creature`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -913,8 +913,8 @@ void ObjectMgr::LoadCreatureLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -924,7 +924,7 @@ void ObjectMgr::LoadCreatureLocales()
             continue;
         }
 
-        CreatureLocale& data = mCreatureLocaleMap[entry];
+        CreatureLocale& data = m_CreatureLocaleMap[entry];
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -956,27 +956,24 @@ void ObjectMgr::LoadCreatureLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu creature locale strings", (unsigned long)mCreatureLocaleMap.size());
+    sLog.outString(">> Loaded %lu creature locale strings", (unsigned long)m_CreatureLocaleMap.size());
 }
 
 void ObjectMgr::LoadGossipMenuItemsLocales()
 {
-    mGossipMenuItemsLocaleMap.clear();                      // need for reload case
+    m_GossipMenuItemsLocaleMap.clear();                      // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT menu_id,id,"
-                          "option_text_loc1,box_text_loc1,option_text_loc2,box_text_loc2,"
-                          "option_text_loc3,box_text_loc3,option_text_loc4,box_text_loc4,"
-                          "option_text_loc5,box_text_loc5,option_text_loc6,box_text_loc6,"
-                          "option_text_loc7,box_text_loc7,option_text_loc8,box_text_loc8 "
-                          "FROM locales_gossip_menu_option");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `menu_id`, `id`,"
+                          "`option_text_loc1`, `box_text_loc1`, `option_text_loc2`, `box_text_loc2`,"
+                          "`option_text_loc3`, `box_text_loc3`, `option_text_loc4`, `box_text_loc4`,"
+                          "`option_text_loc5`, `box_text_loc5`, `option_text_loc6`, `box_text_loc6`,"
+                          "`option_text_loc7`, `box_text_loc7`, `option_text_loc8`, `box_text_loc8` "
+                          "FROM `locales_gossip_menu_option`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -988,8 +985,8 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint16 menuId   = fields[0].GetUInt16();
         uint16 id       = fields[1].GetUInt16();
@@ -1015,7 +1012,7 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
             continue;
         }
 
-        GossipMenuItemsLocale& data = mGossipMenuItemsLocaleMap[MAKE_PAIR32(menuId, id)];
+        GossipMenuItemsLocale& data = m_GossipMenuItemsLocaleMap[MAKE_PAIR32(menuId, id)];
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -1047,22 +1044,19 @@ void ObjectMgr::LoadGossipMenuItemsLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu gossip_menu_option locale strings", (unsigned long)mGossipMenuItemsLocaleMap.size());
+    sLog.outString(">> Loaded %lu gossip_menu_option locale strings", (unsigned long)m_GossipMenuItemsLocaleMap.size());
 }
 
 void ObjectMgr::LoadPointOfInterestLocales()
 {
-    mPointOfInterestLocaleMap.clear();                              // need for reload case
+    m_PointOfInterestLocaleMap.clear();                              // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,icon_name_loc1,icon_name_loc2,icon_name_loc3,icon_name_loc4,icon_name_loc5,icon_name_loc6,icon_name_loc7,icon_name_loc8 FROM locales_points_of_interest");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `icon_name_loc1`, `icon_name_loc2`, `icon_name_loc3`, `icon_name_loc4`, `icon_name_loc5`, `icon_name_loc6`, `icon_name_loc7`, `icon_name_loc8` FROM `locales_points_of_interest`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString("");
@@ -1074,8 +1068,8 @@ void ObjectMgr::LoadPointOfInterestLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -1085,7 +1079,7 @@ void ObjectMgr::LoadPointOfInterestLocales()
             continue;
         }
 
-        PointOfInterestLocale& data = mPointOfInterestLocaleMap[entry];
+        PointOfInterestLocale& data = m_PointOfInterestLocaleMap[entry];
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -1105,10 +1099,8 @@ void ObjectMgr::LoadPointOfInterestLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %u points_of_interest locale strings", mPointOfInterestLocaleMap.size());
+    sLog.outString(">> Loaded %u points_of_interest locale strings", m_PointOfInterestLocaleMap.size());
 }
 
 struct SQLCreatureLoader : public SQLStorageLoaderBase<SQLCreatureLoader, SQLStorage>
@@ -1140,13 +1132,9 @@ void ObjectMgr::CheckCreatureTemplates()
         if (!cInfo)
             continue;
 
-        FactionTemplateEntry const* factionTemplate = GetFactionTemplateEntry(cInfo->faction_A);
+        FactionTemplateEntry const* factionTemplate = GetFactionTemplateEntry(cInfo->faction);
         if (!factionTemplate)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction_A template (%u)", cInfo->Entry, cInfo->faction_A);
-
-        factionTemplate = GetFactionTemplateEntry(cInfo->faction_H);
-        if (!factionTemplate)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction_H template (%u)", cInfo->Entry, cInfo->faction_H);
+            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction template (%u)", cInfo->Entry, cInfo->faction);
 
         for (int k = 0; k < MAX_KILL_CREDIT; ++k)
         {
@@ -1162,7 +1150,7 @@ void ObjectMgr::CheckCreatureTemplates()
         }
 
         // used later for scale
-        CreatureDisplayInfoEntry const* displayScaleEntry = NULL;
+        CreatureDisplayInfoEntry const* displayScaleEntry = nullptr;
 
         for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
         {
@@ -1356,7 +1344,7 @@ void ObjectMgr::ConvertCreatureAddonAuras(CreatureDataAddon* addon, char const* 
     // empty list
     if (val.empty())
     {
-        addon->auras = NULL;
+        addon->auras = nullptr;
         return;
     }
 
@@ -1440,7 +1428,7 @@ void ObjectMgr::LoadCreatureAddons()
     // check entry ids
     for (uint32 i = 1; i < sCreatureDataAddonStorage.GetMaxEntry(); ++i)
         if (CreatureDataAddon const* addon = sCreatureDataAddonStorage.LookupEntry<CreatureDataAddon>(i))
-            if (mCreatureDataMap.find(addon->guidOrEntry) == mCreatureDataMap.end())
+            if (m_CreatureDataMap.find(addon->guidOrEntry) == m_CreatureDataMap.end())
                 if (!sObjectMgr.IsExistingCreatureGuid(addon->guidOrEntry))
                     sLog.outErrorDb("Creature (GUID: %u) does not exist but has a record in `creature_addon`", addon->guidOrEntry);
 }
@@ -1513,7 +1501,7 @@ CreatureModelInfo const* ObjectMgr::GetCreatureModelRandomGender(uint32 display_
 {
     CreatureModelInfo const *minfo = GetCreatureModelInfo(display_id);
     if (!minfo)
-        return NULL;
+        return nullptr;
 
     // If a model for another gender exists, 50% chance to use it
     if (minfo->modelid_other_gender != 0 && urand(0, 1) == 0)
@@ -1647,7 +1635,7 @@ void ObjectMgr::LoadCreatureSpells()
     // First we need to collect all script ids.
     std::set<uint32> spellScriptSet;
 
-    QueryResult *result = WorldDatabase.Query("SELECT id FROM creature_spells_scripts");
+    std::unique_ptr<QueryResult> result (WorldDatabase.Query("SELECT `id` FROM `creature_spells_scripts`"));
     
     if (result)
     {
@@ -1657,37 +1645,35 @@ void ObjectMgr::LoadCreatureSpells()
             uint32 id = fields[0].GetUInt32();;
             spellScriptSet.insert(id);
         } while (result->NextRow());
-
-        delete result;
     }
 
     std::set<uint32> spellScriptSetFull = spellScriptSet;
 
     // Now we load creature_spells.
-    mCreatureSpellsMap.clear(); // for reload case
+    m_CreatureSpellsMap.clear(); // for reload case
 
-                                 //       0       1           2               3              4               5              6               7                  8                  9                10             11
-    result = WorldDatabase.Query("SELECT entry, spellId_1, probability_1, castTarget_1, targetParam1_1, targetParam2_1, castFlags_1, delayInitialMin_1, delayInitialMax_1, delayRepeatMin_1, delayRepeatMax_1, scriptId_1, "
-                                 //               12          13              14             15              16             17              18                 19                 20               21             22
-                                               "spellId_2, probability_2, castTarget_2, targetParam1_2, targetParam2_2, castFlags_2, delayInitialMin_2, delayInitialMax_2, delayRepeatMin_2, delayRepeatMax_2, scriptId_2, "
-                                 //               23          24              25             26              27             28              29                 30                 31               32             33
-                                               "spellId_3, probability_3, castTarget_3, targetParam1_3, targetParam2_3, castFlags_3, delayInitialMin_3, delayInitialMax_3, delayRepeatMin_3, delayRepeatMax_3, scriptId_3, "
-                                 //               34          35              36             37              38             39              40                 41                 42               43             44
-                                               "spellId_4, probability_4, castTarget_4, targetParam1_4, targetParam2_4, castFlags_4, delayInitialMin_4, delayInitialMax_4, delayRepeatMin_4, delayRepeatMax_4, scriptId_4, "
-                                 //               45          46              47             48              49             50              51                 52                 53               54             55
-                                               "spellId_5, probability_5, castTarget_5, targetParam1_5, targetParam2_5, castFlags_5, delayInitialMin_5, delayInitialMax_5, delayRepeatMin_5, delayRepeatMax_5, scriptId_5, "
-                                 //               56          57              58             59              60             61              62                 63                 64               65             66
-                                               "spellId_6, probability_6, castTarget_6, targetParam1_6, targetParam2_6, castFlags_6, delayInitialMin_6, delayInitialMax_6, delayRepeatMin_6, delayRepeatMax_6, scriptId_6, "
-                                 //               67          68              69             70              71             72              73                 74                 75               76             77
-                                               "spellId_7, probability_7, castTarget_7, targetParam1_7, targetParam2_7, castFlags_7, delayInitialMin_7, delayInitialMax_7, delayRepeatMin_7, delayRepeatMax_7, scriptId_7, "
-                                 //               78          79              80             81              82             83              84                 85                 86               87             88
-                                               "spellId_8, probability_8, castTarget_8, targetParam1_8, targetParam2_8, castFlags_8, delayInitialMin_8, delayInitialMax_8, delayRepeatMin_8, delayRepeatMax_8, scriptId_8 FROM creature_spells");
+                                     //       0        1            2                3               4                 5                 6              7                    8                    9                   10                  11
+    result.reset(WorldDatabase.Query("SELECT `entry`, `spellId_1`, `probability_1`, `castTarget_1`, `targetParam1_1`, `targetParam2_1`, `castFlags_1`, `delayInitialMin_1`, `delayInitialMax_1`, `delayRepeatMin_1`, `delayRepeatMax_1`, `scriptId_1`, "
+                                      //               12           13               14              15                16                17             18                   19                   20                  21                  22
+                                                     "`spellId_2`, `probability_2`, `castTarget_2`, `targetParam1_2`, `targetParam2_2`, `castFlags_2`, `delayInitialMin_2`, `delayInitialMax_2`, `delayRepeatMin_2`, `delayRepeatMax_2`, `scriptId_2`, "
+                                     //                23           24               25              26                27                28             29                   30                   31                  32                  33
+                                                     "`spellId_3`, `probability_3`, `castTarget_3`, `targetParam1_3`, `targetParam2_3`, `castFlags_3`, `delayInitialMin_3`, `delayInitialMax_3`, `delayRepeatMin_3`, `delayRepeatMax_3`, `scriptId_3`, "
+                                     //                34           35               36              37                38                39             40                   41                   42                  43                  44
+                                                     "`spellId_4`, `probability_4`, `castTarget_4`, `targetParam1_4`, `targetParam2_4`, `castFlags_4`, `delayInitialMin_4`, `delayInitialMax_4`, `delayRepeatMin_4`, `delayRepeatMax_4`, `scriptId_4`, "
+                                     //                45           46               47              48                49                50             51                   52                   53                  54                  55
+                                                     "`spellId_5`, `probability_5`, `castTarget_5`, `targetParam1_5`, `targetParam2_5`, `castFlags_5`, `delayInitialMin_5`, `delayInitialMax_5`, `delayRepeatMin_5`, `delayRepeatMax_5`, `scriptId_5`, "
+                                     //                56           57               58              59                60                61             62                   63                   64                  65                  66
+                                                     "`spellId_6`, `probability_6`, `castTarget_6`, `targetParam1_6`, `targetParam2_6`, `castFlags_6`, `delayInitialMin_6`, `delayInitialMax_6`, `delayRepeatMin_6`, `delayRepeatMax_6`, `scriptId_6`, "
+                                     //                67           68               69              70                71                72             73                   74                   75                  76                  77
+                                                     "`spellId_7`, `probability_7`, `castTarget_7`, `targetParam1_7`, `targetParam2_7`, `castFlags_7`, `delayInitialMin_7`, `delayInitialMax_7`, `delayRepeatMin_7`, `delayRepeatMax_7`, `scriptId_7`, "
+                                     //                78           79               80              81                82                83             84                   85                   86                  87                  88
+                                                     "`spellId_8`, `probability_8`, `castTarget_8`, `targetParam1_8`, `targetParam2_8`, `castFlags_8`, `delayInitialMin_8`, `delayInitialMax_8`, `delayRepeatMin_8`, `delayRepeatMax_8`, `scriptId_8` FROM `creature_spells`"));
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
+        sLog.outString();
         sLog.outString(">> Loaded 0 creature spell templates. DB table `creature_spells` is empty.");
         return;
     }
@@ -1697,8 +1683,8 @@ void ObjectMgr::LoadCreatureSpells()
 
     do
     {
-        Field* fields = result->Fetch();
         bar.step();
+        Field* fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();;
 
@@ -1768,39 +1754,36 @@ void ObjectMgr::LoadCreatureSpells()
         }
 
         if (!spellsTemplate.empty())
-            mCreatureSpellsMap.insert(CreatureSpellsMap::value_type(entry, spellsTemplate));
+            m_CreatureSpellsMap.insert(CreatureSpellsMap::value_type(entry, spellsTemplate));
 
     } while (result->NextRow());
-
-    delete result;
 
     for (std::set<uint32>::const_iterator itr = spellScriptSet.begin(); itr != spellScriptSet.end(); ++itr)
         sLog.outErrorDb("Table `creature_spells_scripts` contains unused script, id %u.", *itr);
 
-    sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)mCreatureSpellsMap.size());
     sLog.outString();
+    sLog.outString(">> Loaded %lu creature spell templates.", (unsigned long)m_CreatureSpellsMap.size());
 }
 
 void ObjectMgr::LoadCreatures(bool reload)
 {
     uint32 count = 0;
-    //                                                0                       1   2    3
-    QueryResult *result = WorldDatabase.Query("SELECT creature.guid, creature.id, map, modelid,"
-                          //   4             5           6           7            8               9                10            11            12
-                          "equipment_id, position_x, position_y, position_z, orientation, spawntimesecsmin, spawntimesecsmax, spawndist, currentwaypoint,"
-                          //   13         14       15          16          17
-                          "curhealth, curmana, DeathState, MovementType, event,"
-                          //   18                        19                                 20          21                  22                 23
-                          "pool_creature.pool_entry, pool_creature_template.pool_entry, spawnFlags, visibilitymod, creature.patch_min, creature.patch_max  "
-                          "FROM creature "
-                          "LEFT OUTER JOIN game_event_creature ON creature.guid = game_event_creature.guid "
-                          "LEFT OUTER JOIN pool_creature ON creature.guid = pool_creature.guid "
-                          "LEFT OUTER JOIN pool_creature_template ON creature.id = pool_creature_template.id");
+    //                                                                          0                  1     2      3
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature`.`guid`, `creature`.`id`, `map`, `modelid`,"
+    //                      4               5             6             7             8              9                   10                  11           12
+                          "`equipment_id`, `position_x`, `position_y`, `position_z`, `orientation`, `spawntimesecsmin`, `spawntimesecsmax`, `spawndist`, `currentwaypoint`,"
+    //                      13           14         15            16              17
+                          "`curhealth`, `curmana`, `DeathState`, `MovementType`, `event`,"
+    //                                      18                                     19            20            21                          22                      23
+                          "`pool_creature`.`pool_entry`, `pool_creature_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `creature`.`patch_min`, `creature`.`patch_max`  "
+                          "FROM `creature` "
+                          "LEFT OUTER JOIN `game_event_creature` ON `creature`.`guid` = `game_event_creature`.`guid` "
+                          "LEFT OUTER JOIN `pool_creature` ON `creature`.`guid` = `pool_creature`.`guid` "
+                          "LEFT OUTER JOIN `pool_creature_template` ON `creature`.`id` = `pool_creature_template`.`id`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -1808,14 +1791,12 @@ void ObjectMgr::LoadCreatures(bool reload)
         return;
     }
 
-    // build single time for check creature data
-
     BarGoLink bar(result->GetRowCount());
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
@@ -1845,8 +1826,8 @@ void ObjectMgr::LoadCreatures(bool reload)
             continue;
         }
 
-        bool alreadyPresent = reload && mCreatureDataMap.find(guid) != mCreatureDataMap.end();
-        CreatureData& data = mCreatureDataMap[guid];
+        bool alreadyPresent = reload && m_CreatureDataMap.find(guid) != m_CreatureDataMap.end();
+        CreatureData& data = m_CreatureDataMap[guid];
 
         data.id                 = entry;
         data.mapid              = fields[ 2].GetUInt32();
@@ -1965,10 +1946,8 @@ void ObjectMgr::LoadCreatures(bool reload)
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu creatures", (unsigned long)mCreatureDataMap.size());
+    sLog.outString(">> Loaded %lu creatures", (unsigned long)m_CreatureDataMap.size());
 }
 
 void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
@@ -1976,8 +1955,8 @@ void ObjectMgr::AddCreatureToGrid(uint32 guid, CreatureData const* data)
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
-    CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
+    std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
     cell_guids.creatures.insert(guid);
 }
 
@@ -1986,8 +1965,8 @@ void ObjectMgr::RemoveCreatureFromGrid(uint32 guid, CreatureData const* data)
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
-    CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
+    std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
     cell_guids.creatures.erase(guid);
 }
 
@@ -1995,21 +1974,20 @@ void ObjectMgr::LoadGameobjects(bool reload)
 {
     uint32 count = 0;
 
-    //                                                0                           1   2    3           4           5           6
-    QueryResult *result = WorldDatabase.Query("SELECT gameobject.guid, gameobject.id, map, position_x, position_y, position_z, orientation,"
-                          //   7          8          9          10            11                12              13       14      15
-                          "rotation0, rotation1, rotation2, rotation3, spawntimesecsmin, spawntimesecsmax, animprogress, state, event, "
-                          //   16                          17                                   18          19                20                     21
-                          "pool_gameobject.pool_entry, pool_gameobject_template.pool_entry, spawnFlags, visibilitymod, gameobject.patch_min, gameobject.patch_max "
-                          "FROM gameobject "
-                          "LEFT OUTER JOIN game_event_gameobject ON gameobject.guid = game_event_gameobject.guid "
-                          "LEFT OUTER JOIN pool_gameobject ON gameobject.guid = pool_gameobject.guid "
-                          "LEFT OUTER JOIN pool_gameobject_template ON gameobject.id = pool_gameobject_template.id");
+    //                                                                            0                    1     2      3             4             5             6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `gameobject`.`guid`, `gameobject`.`id`, `map`, `position_x`, `position_y`, `position_z`, `orientation`,"
+    //                      7            8            9            10           11                12              13       14      15
+                          "`rotation0`, `rotation1`, `rotation2`, `rotation3`, `spawntimesecsmin`, `spawntimesecsmax`, `animprogress`, `state`, `event`, "
+    //                                        16                                       17            18            19                            20                        21
+                          "`pool_gameobject`.`pool_entry`, `pool_gameobject_template`.`pool_entry`, `spawnFlags`, `visibilitymod`, `gameobject`.`patch_min`, `gameobject`.`patch_max` "
+                          "FROM `gameobject` "
+                          "LEFT OUTER JOIN `game_event_gameobject` ON `gameobject`.`guid` = `game_event_gameobject`.`guid` "
+                          "LEFT OUTER JOIN `pool_gameobject` ON `gameobject`.`guid` = `pool_gameobject`.`guid` "
+                          "LEFT OUTER JOIN `pool_gameobject_template` ON `gameobject`.`id` = `pool_gameobject_template`.`id`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -2021,8 +1999,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 guid         = fields[ 0].GetUInt32();
         uint32 entry        = fields[ 1].GetUInt32();
@@ -2054,8 +2032,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
             continue;
         }
 
-        bool alreadyPresent = reload && mGameObjectDataMap.find(guid) != mGameObjectDataMap.end();
-        GameObjectData& data = mGameObjectDataMap[guid];
+        bool alreadyPresent = reload && m_GameObjectDataMap.find(guid) != m_GameObjectDataMap.end();
+        GameObjectData& data = m_GameObjectDataMap[guid];
 
         data.id               = entry;
         data.mapid            = fields[ 2].GetUInt32();
@@ -2142,10 +2120,8 @@ void ObjectMgr::LoadGameobjects(bool reload)
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu gameobjects", (unsigned long)mGameObjectDataMap.size());
+    sLog.outString(">> Loaded %lu gameobjects", (unsigned long)m_GameObjectDataMap.size());
 }
 
 void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
@@ -2153,8 +2129,8 @@ void ObjectMgr::AddGameobjectToGrid(uint32 guid, GameObjectData const* data)
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
-    CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
+    std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
     cell_guids.gameobjects.insert(guid);
 }
 
@@ -2163,191 +2139,1066 @@ void ObjectMgr::RemoveGameobjectFromGrid(uint32 guid, GameObjectData const* data
     CellPair cell_pair = MaNGOS::ComputeCellPair(data->posX, data->posY);
     uint32 cell_id = (cell_pair.y_coord * TOTAL_NUMBER_OF_CELLS_PER_MAP) + cell_pair.x_coord;
 
-    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
-    CellObjectGuids& cell_guids = mMapObjectGuids[data->mapid][cell_id];
+    std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
+    CellObjectGuids& cell_guids = m_MapObjectGuids[data->mapid][cell_id];
     cell_guids.gameobjects.erase(guid);
 }
 
-// name must be checked to correctness (if received) before call this function
-/*
-ObjectGuid ObjectMgr::GetPlayerGuidByName(std::string name) const
+// In order to keep database item template data correct for each patch, fix changed spell effects used by some items here.
+// For cases where the spell data itself changed and we need to use a substitute spell id in later clients to recreate old item version.
+void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
 {
-    ObjectGuid guid;
-
-    CharacterDatabase.escape_string(name);
-
-    // Player name safe to sending to DB (checked at login) and this function using
-    QueryResult *result = CharacterDatabase.PQuery("SELECT guid FROM characters WHERE name = '%s'", name.c_str());
-    if (result)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    // Blade of Eternal Darkness
+    // The spell data was changed, and the trigger became On Equip instead of On Use in 1.10.
+    if ((itemSpell.SpellId == 21978) && (itemSpell.SpellTrigger == 0))
+        itemSpell.SpellTrigger = 1;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    // Rhok\'delar, Longbow of the Ancient Keepers
+    // The spell data was changed and the spell id removed from this item in 1.8.
+    if ((itemSpell.SpellId == 23193) && (itemId == 18713))
+        itemSpell.SpellId = 0;
+    // Lok\'delar, Stave of the Ancient Keepers
+    // The spell data was changed and the spell id removed from this item in 1.8.
+    if ((itemSpell.SpellId == 23194) && (itemId == 18715))
+        itemSpell.SpellId = 0;
+#endif
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    // Bonereaver's Edge
+    // The spell data was changed in 1.10, so use a substitute spell id before content patch 1.10 when playing with a newer client.
+    if ((itemSpell.SpellId == 21153) && (itemId == 17076) && (sWorld.GetWowPatch() < WOW_PATCH_110))
+        itemSpell.SpellId = 15280;
+#endif
+    // Substitute spell power spells that were changed in the 1.4 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
+    if (sWorld.GetWowPatch() < WOW_PATCH_104)
     {
-        guid = ObjectGuid(HIGHGUID_PLAYER, (*result)[0].GetUInt32());
-
-        delete result;
-    }
-
-    return guid;
-}
-
-bool ObjectMgr::GetPlayerNameByGUID(ObjectGuid guid, std::string &name) const
-{
-    // prevent DB access for online player
-    if(Player* player = GetPlayer(guid))
-    {
-        name = player->GetName();
-        return true;
-    }
-
-    uint32 lowguid = guid.GetCounter();
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT name FROM characters WHERE guid = '%u'", lowguid);
-
-    if(result)
-    {
-        name = (*result)[0].GetCppString();
-        delete result;
-        return true;
-    }
-
-    return false;
-}
-
-Team ObjectMgr::GetPlayerTeamByGUID(ObjectGuid guid) const
-{
-    // prevent DB access for online player
-    if (Player* player = GetPlayer(guid))
-        return Player::TeamForRace(player->getRace());
-
-    uint32 lowguid = guid.GetCounter();
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT race FROM characters WHERE guid = '%u'", lowguid);
-
-    if (result)
-    {
-        uint8 race = (*result)[0].GetUInt8();
-        delete result;
-        return Player::TeamForRace(race);
-    }
-
-    return TEAM_NONE;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByGUID(ObjectGuid guid) const
-{
-    // prevent DB access for online player
-    if(Player* player = GetPlayer(guid))
-        return player->GetSession()->GetAccountId();
-
-    uint32 lowguid = guid.GetCounter();
-
-    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE guid = '%u'", lowguid);
-    if (result)
-    {
-        uint32 acc = (*result)[0].GetUInt32();
-        delete result;
-        return acc;
-    }
-
-    return 0;
-}
-
-uint32 ObjectMgr::GetPlayerAccountIdByPlayerName(const std::string& name) const
-{
-    QueryResult *result = CharacterDatabase.PQuery("SELECT account FROM characters WHERE name = '%s'", name.c_str());
-    if(result)
-    {
-        uint32 acc = (*result)[0].GetUInt32();
-        delete result;
-        return acc;
-    }
-
-    return 0;
-}*/
-
-void ObjectMgr::LoadItemLocales()
-{
-    mItemLocaleMap.clear();                                 // need for reload case
-
-    QueryResult *result = WorldDatabase.Query("SELECT entry,name_loc1,description_loc1,name_loc2,description_loc2,name_loc3,description_loc3,name_loc4,description_loc4,name_loc5,description_loc5,name_loc6,description_loc6,name_loc7,description_loc7,name_loc8,description_loc8 FROM locales_item");
-
-    if (!result)
-    {
-        BarGoLink bar(1);
-
-        bar.step();
-
-        sLog.outString();
-        sLog.outString(">> Loaded 0 Item locale strings. DB table `locales_item` is empty.");
-        return;
-    }
-
-    BarGoLink bar(result->GetRowCount());
-
-    do
-    {
-        Field *fields = result->Fetch();
-        bar.step();
-
-        uint32 entry = fields[0].GetUInt32();
-
-        if (!GetItemPrototype(entry))
+        switch (itemSpell.SpellId)
         {
-            ERROR_DB_STRICT_LOG("Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
-            continue;
-        }
-
-        ItemLocale& data = mItemLocaleMap[entry];
-
-        for (int i = 1; i < MAX_LOCALE; ++i)
-        {
-            std::string str = fields[1 + 2 * (i - 1)].GetCppString();
-            if (!str.empty())
-            {
-                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
-                if (idx >= 0)
-                {
-                    if ((int32)data.Name.size() <= idx)
-                        data.Name.resize(idx + 1);
-
-                    data.Name[idx] = str;
-                }
-            }
-
-            str = fields[1 + 2 * (i - 1) + 1].GetCppString();
-            if (!str.empty())
-            {
-                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
-                if (idx >= 0)
-                {
-                    if ((int32)data.Description.size() <= idx)
-                        data.Description.resize(idx + 1);
-
-                    data.Description[idx] = str;
-                }
-            }
+            case 7678: // Increase Healing 8 (OLD) to Increase Healing 7 (NEW)
+                itemSpell.SpellId = 7677;
+                return;
+            case 7679: // Increase Healing 10 (OLD) to Increase Healing 9 (NEW)
+                itemSpell.SpellId = 7678;
+                return;
+            case 7680: // Increase Healing 12 (OLD) to Increase Healing 11 (NEW)
+                itemSpell.SpellId = 7679;
+                return;
+            case 7681: // Increase Healing 14 (OLD) to Increase Healing 13 (NEW)
+                itemSpell.SpellId = 7680;
+                return;
+            case 7684: // Increase Fire Dam 2 (OLD) to Increase Fire Dam 1 (NEW)
+                itemSpell.SpellId = 7683;
+                return;
+            case 7685: // Increase Fire Dam 3 (OLD) to Increase Fire Dam 3 (NEW)
+                itemSpell.SpellId = 7684;
+                return;
+            case 7686: // Increase Fire Dam 4 (OLD) to Increase Fire Dam 4 (NEW)
+            case 7687: // Increase Fire Dam 5 (OLD) to Increase Fire Dam 4 (NEW)
+                itemSpell.SpellId = 7685;
+                return;
+            case 7688: // Increase Fire Dam 6 (OLD) to Increase Fire Dam 6 (NEW)
+                itemSpell.SpellId = 7686;
+                return;
+            case 7689: // Increase Fire Dam 7 (OLD) to Increase Fire Dam 7 (NEW)
+                itemSpell.SpellId = 7687;
+                return;
+            case 7691: // Increase Nature Dam 2 (OLD) to Increase Nature Dam 1 (NEW)
+                itemSpell.SpellId = 7690;
+                return;
+            case 7692: // Increase Nature Dam 3 (OLD) to Increase Nature Dam 3 (NEW)
+                itemSpell.SpellId = 7691;
+                return;
+            case 7693: // Increase Nature Dam 4 (OLD) to Increase Nature Dam 4 (NEW)
+            case 7694: // Increase Nature Dam 5 (OLD) to Increase Nature Dam 4 (NEW)
+                itemSpell.SpellId = 7692;
+                return;
+            case 7695: // Increase Nature Dam 6 (OLD) to Increase Nature Dam 6 (NEW)
+                itemSpell.SpellId = 7693;
+                return;
+            case 7696: // Increase Nature Dam 7 (OLD) to Increase Nature Dam 7 (NEW)
+                itemSpell.SpellId = 7694;
+                return;
+            case 7698: // Increase Frost Dam 2 (OLD) to Increase Frost Dam 1 (NEW)
+                itemSpell.SpellId = 7697;
+                return;
+            case 7699: // Increase Frost Dam 3 (OLD) to Increase Frost Dam 3 (NEW)
+                itemSpell.SpellId = 7698;
+                return;
+            case 7700: // Increase Frost Dam 4 (OLD) to Increase Frost Dam 4 (NEW)
+            case 7701: // Increase Frost Dam 5 (OLD) to Increase Frost Dam 4 (NEW)
+                itemSpell.SpellId = 7699;
+                return;
+            case 7702: // Increase Frost Dam 6 (OLD) to Increase Frost Dam 6 (NEW)
+                itemSpell.SpellId = 7700;
+                return;
+            case 7703: // Increase Frost Dam 7 (OLD) to Increase Frost Dam 7 (NEW)
+                itemSpell.SpellId = 7701;
+                return;
+            case 7705: // Increase Shadow Dam 2 (OLD) to Increase Shadow Dam 1 (NEW)
+                itemSpell.SpellId = 7704;
+                return;
+            case 7706: // Increase Shadow Dam 3 (OLD) to Increase Shadow Dam 3 (NEW)
+                itemSpell.SpellId = 7705;
+                return;
+            case 7707: // Increase Shadow Dam 4 (OLD) to Increase Shadow Dam 4 (NEW)
+                itemSpell.SpellId = 7706;
+                return;
+            case 7708: // Increase Shadow Dam 5 (OLD) to Increase Shadow Dam 4 (NEW)
+                itemSpell.SpellId = 7706;
+                return;
+            case 7709: // Increase Shadow Dam 7 (OLD) to Increase Shadow Dam 7 (NEW)
+                itemSpell.SpellId = 7708;
+                return;
+            case 7710: // Increase Shadow Dam 6 (OLD) to Increase Shadow Dam 6 (NEW)
+                itemSpell.SpellId = 7707;
+                return;
+            case 9294: // Increase Fire Dam 11 (OLD) to Increase Fire Dam 11 (NEW)
+            case 9295: // Increase Fire Dam 12 (OLD) to Increase Fire Dam 11 (NEW)
+                itemSpell.SpellId = 9399;
+                return;
+            case 9296: // Increase Fire Dam 13 (OLD) to Increase Fire Dam 13 (NEW)
+                itemSpell.SpellId = 9400;
+                return;
+            case 9297: // Increase Fire Dam 14 (OLD) to Increase Fire Dam 14 (NEW)
+            case 9298: // Increase Fire Dam 15 (OLD) to Increase Fire Dam 14 (NEW)
+                itemSpell.SpellId = 9401;
+                return;
+            case 9304: // Increase Frost Dam 11 (OLD) to Increase Frost Dam 11 (NEW)
+            case 9305: // Increase Frost Dam 12 (OLD) to Increase Frost Dam 11 (NEW)
+                itemSpell.SpellId = 9402;
+                return;
+            case 9306: // Increase Frost Dam 13 (OLD) to Increase Frost Dam 13 (NEW)
+                itemSpell.SpellId = 9403;
+                return;
+            case 9307: // Increase Frost Dam 14 (OLD) to Increase Frost Dam 14 (NEW)
+            case 9308: // Increase Frost Dam 15 (OLD) to Increase Frost Dam 14 (NEW)
+                itemSpell.SpellId = 9404;
+                return;
+            case 9314: // Increase Healing 22 (OLD) to Increase Healing 22 (NEW)
+                itemSpell.SpellId = 9408;
+                return;
+            case 9315: // Increase Healing 24 (OLD) to Increase Healing 24 (NEW)
+                itemSpell.SpellId = 9314;
+                return;
+            case 9316: // Increase Healing 26 (OLD) to Increase Healing 26 (NEW)
+            case 9317: // Increase Healing 28 (OLD) to Increase Healing 26 (NEW)
+                itemSpell.SpellId = 9315;
+                return;
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+            case 9318: // Increase Healing 30 (OLD) to Increase Healing 30 (NEW)
+                itemSpell.SpellId = 25067;
+                return;
+    #else
+            case 9318: // Increase Healing 30 (OLD) to Increase Healing 29 (NEW)
+                itemSpell.SpellId = 9316;
+                return;
+    #endif
+            case 9324: // Increase Shadow Dam 11 (OLD) to Increase Shadow Dam 11 (NEW)
+            case 9325: // Increase Shadow Dam 12 (OLD) to Increase Shadow Dam 11 (NEW)
+                itemSpell.SpellId = 9412;
+                return;
+            case 9326: // Increase Shadow Dam 13 (OLD) to Increase Shadow Dam 13 (NEW)
+                itemSpell.SpellId = 9413;
+                return;
+            case 9327: // Increase Shadow Dam 14 (OLD) to Increase Shadow Dam 14 (NEW)
+            case 9328: // Increase Shadow Dam 15 (OLD) to Increase Shadow Dam 14 (NEW)
+                itemSpell.SpellId = 9414;
+                return;
+            case 9342: // Increase Spell Dam 7 (OLD) to Increase Spell Dam 7 (NEW)
+                itemSpell.SpellId = 9397;
+                return;
+            case 9343: // Increase Spell Dam 8 (OLD) to Increase Spell Dam 8 (NEW)
+                itemSpell.SpellId = 9398;
+                return;
+            case 9344: // Increase Spell Dam 9 (OLD) to Increase Spell Dam 9 (NEW)
+            case 9345: // Increase Spell Dam 9 (OLD) to Increase Spell Dam 9 (NEW)
+            case 9346: // Increase Spell Dam 10 (OLD) to Increase Spell Dam 9 (NEW)
+                itemSpell.SpellId = 9415;
+                return;
+            case 9357: // Increase Nature Dam 11 (OLD) to Increase Nature Dam 11 (NEW)
+            case 9358: // Increase Nature Dam 12 (OLD) to Increase Nature Dam 11 (NEW)
+                itemSpell.SpellId = 9409;
+                return;
+            case 9359: // Increase Nature Dam 13 (OLD) to Increase Nature Dam 13 (NEW)
+                itemSpell.SpellId = 9410;
+                return;
+            case 9360: // Increase Nature Dam 14 (OLD) to Increase Nature Dam 14 (NEW)
+            case 9361: // Increase Nature Dam 15 (OLD) to Increase Nature Dam 14 (NEW)
+                itemSpell.SpellId = 9411;
+                return;
+            case 9393: // Increase Spell Dam 1 (OLD) to Increase Spell Dam 1 (NEW)
+                itemSpell.SpellId = 9392;
+                return;
+            case 9394: // Increase Spell Dam 2 (OLD) to Increase Spell Dam 2 (NEW)
+                itemSpell.SpellId = 9393;
+                return;
+            case 9395: // Increase Spell Dam 2 (OLD) to Increase Spell Dam 2 (NEW)
+            case 9396: // Increase Spell Dam 3 (OLD) to Increase Spell Dam 2 (NEW)
+                itemSpell.SpellId = 9393;
+                return;
+            case 9397: // Increase Spell Dam 4 (OLD) to Increase Spell Dam 4 (NEW)
+            case 9398: // Increase Spell Dam 4 (OLD) to Increase Spell Dam 4 (NEW)
+                itemSpell.SpellId = 9394;
+                return;
+            case 9399: // Increase Fire Dam 8 (OLD) to Increase Fire Dam 7 (NEW)
+                itemSpell.SpellId = 7687;
+                return;
+            case 9400: // Increase Fire Dam 9 (OLD) to Increase Fire Dam 9 (NEW)
+                itemSpell.SpellId = 7688;
+                return;
+            case 9401: // Increase Fire Dam 10 (OLD) to Increase Fire Dam 10 (NEW)
+                itemSpell.SpellId = 7689;
+                return;
+            case 9402: // Increase Frost Dam 8 (OLD) to Increase Frost Dam 7 (NEW)
+                itemSpell.SpellId = 7701;
+                return;
+            case 9403: // Increase Frost Dam 9 (OLD) to Increase Frost Dam 9 (NEW)
+                itemSpell.SpellId = 7702;
+                return;
+            case 9404: // Increase Frost Dam 10 (OLD) to Increase Frost Dam 10 (NEW)
+                itemSpell.SpellId = 7703;
+                return;
+            case 9406: // Increase Healing 16 (OLD) to Increase Healing 15 (NEW)
+                itemSpell.SpellId = 7681;
+                return;
+            case 9407: // Increase Healing 18 (OLD) to Increase Healing 18 (NEW)
+                itemSpell.SpellId = 9406;
+                return;
+            case 9408: // Increase Healing 20 (OLD) to Increase Healing 20 (NEW)
+                itemSpell.SpellId = 9407;
+                return;
+            case 9409: // Increase Nature Dam 8 (OLD) to Increase Nature Dam 7 (NEW)
+                itemSpell.SpellId = 7694;
+                return;
+            case 9411: // Increase Nature Dam 10 (OLD) to Increase Nature Dam 10 (NEW)
+                itemSpell.SpellId = 7696;
+                return;
+            case 9412: // Increase Shadow Dam 8 (OLD) to Increase Shadow Dam 7 (NEW)
+                itemSpell.SpellId = 7708;
+                return;
+            case 9413: // Increase Shadow Dam 9 (OLD) to Increase Shadow Dam 9 (NEW)
+                itemSpell.SpellId = 7710;
+                return;
+            case 9414: // Increase Shadow Dam 10 (OLD) to Increase Shadow Dam 10 (NEW)
+                itemSpell.SpellId = 7709;
+                return;
+            case 9415: // Increase Spell Dam 5 (OLD) to Increase Spell Dam 5 (NEW)
+                itemSpell.SpellId = 9395;
+                return;
+            case 9416: // Increase Spell Dam 6 (OLD) to Increase Spell Dam 6 (NEW)
+                itemSpell.SpellId = 9396;
+                return;
+            case 9417: // Increase Spell Dam 7 (OLD) to Increase Spell Dam 7 (NEW)
+                itemSpell.SpellId = 9397;
+                return;
+            case 12019: // Increase Spell Dam 18 Random (OLD) to Increase Spell Dam 9 (NEW)
+                itemSpell.SpellId = 9415;
+                return;
+            case 13591: // Increase Arcane Dam 2 (OLD) to Increase Arcane Dam 1 (NEW)
+                itemSpell.SpellId = 13590;
+                return;
+            case 13592: // Increase Arcane Dam 3 (OLD) to Increase Arcane Dam 3 (NEW)
+                itemSpell.SpellId = 13591;
+                return;
+            case 13593: // Increase Arcane Dam 4 (OLD) to Increase Arcane Dam 4 (NEW)
+            case 13594: // Increase Arcane Dam 5 (OLD) to Increase Arcane Dam 4 (NEW)
+                itemSpell.SpellId = 13592;
+                return;
+            case 13595: // Increase Arcane Dam 6 (OLD) to Increase Arcane Dam 6 (NEW)
+                itemSpell.SpellId = 13593;
+                return;
+            case 13596: // Increase Arcane Dam 7 (OLD) to Increase Arcane Dam 7 (NEW)
+            case 13597: // Increase Arcane Dam 8 (OLD) to Increase Arcane Dam 7 (NEW)
+                itemSpell.SpellId = 13594;
+                return;
+            case 13598: // Increase Arcane Dam 9 (OLD) to Increase Arcane Dam 9 (NEW)
+                itemSpell.SpellId = 13595;
+                return;
+            case 13599: // Increase Arcane Dam 10 (OLD) to Increase Arcane Dam 10 (NEW)
+                itemSpell.SpellId = 13596;
+                return;
+            case 13601: // Increase Arcane Dam 11 (OLD) to Increase Arcane Dam 11 (NEW)
+            case 13602: // Increase Arcane Dam 12 (OLD) to Increase Arcane Dam 11 (NEW)
+                itemSpell.SpellId = 13597;
+                return;
+            case 13603: // Increase Arcane Dam 13 (OLD) to Increase Arcane Dam 13 (NEW)
+                itemSpell.SpellId = 13598;
+                return;
+            case 13604: // Increase Arcane Dam 14 (OLD) to Increase Arcane Dam 14 (NEW)
+            case 13605: // Increase Arcane Dam 15 (OLD) to Increase Arcane Dam 14 (NEW)
+                itemSpell.SpellId = 13599;
+                return;
+            case 13830: // Increase Fire Dam 22 (OLD) to Increase Fire Dam 21 (NEW)
+                itemSpell.SpellId = 9298;
+                return;
+            case 13831: // Increase Frost Dam 22 (OLD) to Increase Frost Dam 21 (NEW)
+                itemSpell.SpellId = 9308;
+                return;
+            case 13881: // Increase Spell Dam 22 (OLD) to Increase Spell Dam 22 (NEW)
+                itemSpell.SpellId = 15714;
+                return;
+            case 14047: // Increase Spell Dam 15 (OLD) to Increase Spell Dam 15 (NEW)
+                itemSpell.SpellId = 9344;
+                return;
+            case 14054: // Increase Spell Dam 19 (OLD) to Increase Spell Dam 19 (NEW)
+                itemSpell.SpellId = 14254;
+                return;
+            case 14055: // Increase Spell Dam 29 (OLD) to Increase Spell Dam 29 (NEW)
+                itemSpell.SpellId = 13881;
+                return;
+            case 14127: // Increase Spell Dam 21 (OLD) to Increase Spell Dam 21 (NEW)
+                itemSpell.SpellId = 14248;
+                return;
+            case 14248: // Increase Spell Dam 12 (OLD) to Increase Spell Dam 12 (NEW)
+                itemSpell.SpellId = 9417;
+                return;
+            case 14254: // Increase Spell Dam 11 (OLD) to Increase Spell Dam 11 (NEW)
+                itemSpell.SpellId = 9416;
+                return;
+            case 14793: // Increase Shadow Dam 16 (OLD) to Increase Shadow Dam 16 (NEW)
+                itemSpell.SpellId = 9324;
+                return;
+            case 14794: // Increase Shadow Dam 17 (OLD) to Increase Shadow Dam 17 (NEW)
+                itemSpell.SpellId = 9325;
+                return;
+            case 14798: // Increase Spell Dam 23 (OLD) to Increase Spell Dam 23 (NEW)
+                itemSpell.SpellId = 14047;
+                return;
+            case 14799: // Increase Spell Dam 11 (OLD) to Increase Spell Dam 11 (NEW)
+                itemSpell.SpellId = 9416;
+                return;
+            case 15696: // Increase Healing 48 (OLD) to Increase Healing 48 (NEW)
+                itemSpell.SpellId = 18034;
+                return;
+            case 15714: // Increase Spell Dam 14 (OLD) to Increase Spell Dam 14 (NEW)
+                itemSpell.SpellId = 9343;
+                return;
+            case 15715: // Increase Spell Dam 16 (OLD) to Increase Spell Dam 16 (NEW)
+                itemSpell.SpellId = 9345;
+                return;
+            case 16638: // Increase Nature Dam 30 (OLD) to Increase Nature Dam 30 (NEW)
+                itemSpell.SpellId = 17991;
+                return;
+            case 17280: // Increase Spell Dam 39 (OLD) to Increase Spell Dam 39 (NEW)
+                itemSpell.SpellId = 18055;
+                return;
+            case 17320: // Increase Healing 76 (OLD) to Increase Healing 75 (NEW)
+                itemSpell.SpellId = 18045;
+                return;
+            case 17367: // Increase Spell Dam 25 (OLD) to Increase Spell Dam 25 (NEW)
+                itemSpell.SpellId = 15715;
+                return;
+            case 17371: // Increase Healing 40 (OLD) to Increase Healing 40 (NEW)
+                itemSpell.SpellId = 18031;
+                return;
+            case 17493: // Increase Spell Dam 40 (OLD) to Increase Spell Dam 40 (NEW)
+                itemSpell.SpellId = 18056;
+                return;
+            case 17684: // Increase Fire Dam 36 (OLD) to Increase Fire Dam 36 (NEW)
+                itemSpell.SpellId = 17873;
+                return;
+            case 17747: // Increase Fire Dam 16 (OLD) to Increase Fire Dam 16 (NEW)
+                itemSpell.SpellId = 9294;
+                return;
+            case 17819: // Increase Nature Dam 22 (OLD) to Increase Nature Dam 21 (NEW)
+                itemSpell.SpellId = 9361;
+                return;
+            case 17821: // Increase Arcane Dam 16 (OLD) to Increase Arcane Dam 16 (NEW)
+                itemSpell.SpellId = 13601;
+                return;
+            case 17823: // Increase Arcane Dam 18 (OLD) to Increase Arcane Dam 17 (NEW)
+                itemSpell.SpellId = 13602;
+                return;
+            case 17824: // Increase Arcane Dam 20 (OLD) to Increase Arcane Dam 20 (NEW)
+                itemSpell.SpellId = 13604;
+                return;
+            case 17825: // Increase Arcane Dam 22 (OLD) to Increase Arcane Dam 21 (NEW)
+                itemSpell.SpellId = 13605;
+                return;
+            case 17826: // Increase Arcane Dam 24 (OLD) to Increase Arcane Dam 24 (NEW)
+                itemSpell.SpellId = 17822;
+                return;
+            case 17827: // Increase Arcane Dam 26 (OLD) to Increase Arcane Dam 26 (NEW)
+                itemSpell.SpellId = 17823;
+                return;
+            case 17828: // Increase Arcane Dam 28 (OLD) to Increase Arcane Dam 27 (NEW)
+                itemSpell.SpellId = 17824;
+                return;
+            case 17829: // Increase Arcane Dam 30 (OLD) to Increase Arcane Dam 30 (NEW)
+                itemSpell.SpellId = 17826;
+                return;
+            case 17830: // Increase Arcane Dam 32 (OLD) to Increase Arcane Dam 31 (NEW)
+                itemSpell.SpellId = 17827;
+                return;
+            case 17832: // Increase Arcane Dam 34 (OLD) to Increase Arcane Dam 34 (NEW)
+                itemSpell.SpellId = 17829;
+                return;
+            case 17837: // Increase Arcane Dam 36 (OLD) to Increase Arcane Dam 36 (NEW)
+                itemSpell.SpellId = 17830;
+                return;
+            case 17838: // Increase Arcane Dam 38 (OLD) to Increase Arcane Dam 37 (NEW)
+                itemSpell.SpellId = 17832;
+                return;
+            case 17839: // Increase Arcane Dam 40 (OLD) to Increase Arcane Dam 40 (NEW)
+                itemSpell.SpellId = 17838;
+                return;
+            case 17840: // Increase Arcane Dam 42 (OLD) to Increase Arcane Dam 41 (NEW)
+                itemSpell.SpellId = 17839;
+                return;
+            case 17844: // Increase Arcane Dam 48 (OLD) to Increase Arcane Dam 47 (NEW)
+                itemSpell.SpellId = 17844;
+                return;
+            case 17845: // Increase Arcane Dam 50 (OLD) to Increase Arcane Dam 50 (NEW)
+                itemSpell.SpellId = 17846;
+                return;
+            case 17846: // Increase Arcane Dam 52 (OLD) to Increase Arcane Dam 51 (NEW)
+                itemSpell.SpellId = 17847;
+                return;
+            case 17847: // Increase Arcane Dam 54 (OLD) to Increase Arcane Dam 54 (NEW)
+                itemSpell.SpellId = 17849;
+                return;
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            case 17848: // Increase Arcane Dam 56 (OLD) to Increase Arcane Dam 56 (NEW)
+                itemSpell.SpellId = 26704;
+                return;
+    #endif
+            case 17866: // Increase Fire Dam 17 (OLD) to Increase Fire Dam 17 (NEW)
+            case 17867: // Increase Fire Dam 18 (OLD) to Increase Fire Dam 17 (NEW)
+                itemSpell.SpellId = 9295;
+                return;
+            case 17868: // Increase Fire Dam 20 (OLD) to Increase Fire Dam 20 (NEW)
+                itemSpell.SpellId = 9297;
+                return;
+            case 17869: // Increase Fire Dam 24 (OLD) to Increase Fire Dam 24 (NEW)
+                itemSpell.SpellId = 17866;
+                return;
+            case 17870: // Increase Fire Dam 26 (OLD) to Increase Fire Dam 26 (NEW)
+                itemSpell.SpellId = 17867;
+                return;
+            case 17871: // Increase Fire Dam 28 (OLD) to Increase Fire Dam 27 (NEW)
+                itemSpell.SpellId = 17868;
+                return;
+            case 17872: // Increase Fire Dam 30 (OLD) to Increase Fire Dam 30 (NEW)
+                itemSpell.SpellId = 17869;
+                return;
+            case 17873: // Increase Fire Dam 32 (OLD) to Increase Fire Dam 31 (NEW)
+                itemSpell.SpellId = 17870;
+                return;
+            case 17874: // Increase Fire Dam 34 (OLD) to Increase Fire Dam 34 (NEW)
+                itemSpell.SpellId = 17872;
+                return;
+            case 17875: // Increase Fire Dam 38 (OLD) to Increase Fire Dam 37 (NEW)
+                itemSpell.SpellId = 17874;
+                return;
+            case 17876: // Increase Fire Dam 40 (OLD) to Increase Fire Dam 40 (NEW)
+                itemSpell.SpellId = 17875;
+                return;
+            case 17878: // Increase Fire Dam 42 (OLD) to Increase Fire Dam 41 (NEW)
+                itemSpell.SpellId = 17876;
+                return;
+            case 17881: // Increase Fire Dam 48 (OLD) to Increase Fire Dam 47 (NEW)
+                itemSpell.SpellId = 17881;
+                return;
+            case 17882: // Increase Fire Dam 50 (OLD) to Increase Fire Dam 50 (NEW)
+                itemSpell.SpellId = 17884;
+                return;
+            case 17884: // Increase Fire Dam 52 (OLD) to Increase Fire Dam 51 (NEW)
+                itemSpell.SpellId = 17885;
+                return;
+            case 17885: // Increase Fire Dam 54 (OLD) to Increase Fire Dam 54 (NEW)
+            case 17886: // Increase Fire Dam 56 (OLD) to Increase Fire Dam 54 (NEW)
+                itemSpell.SpellId = 17887;
+                return;
+            case 17889: // Increase Frost Dam 16 (OLD) to Increase Frost Dam 16 (NEW)
+                itemSpell.SpellId = 9304;
+                return;
+            case 17890: // Increase Frost Dam 17 (OLD) to Increase Frost Dam 17 (NEW)
+            case 17891: // Increase Frost Dam 18 (OLD) to Increase Frost Dam 17 (NEW)
+                itemSpell.SpellId = 9305;
+                return;
+            case 17892: // Increase Frost Dam 20 (OLD) to Increase Frost Dam 20 (NEW)
+                itemSpell.SpellId = 9307;
+                return;
+            case 17893: // Increase Frost Dam 24 (OLD) to Increase Frost Dam 24 (NEW)
+                itemSpell.SpellId = 17890;
+                return;
+            case 17894: // Increase Frost Dam 26 (OLD) to Increase Frost Dam 26 (NEW)
+                itemSpell.SpellId = 17891;
+                return;
+            case 17895: // Increase Frost Dam 28 (OLD) to Increase Frost Dam 27 (NEW)
+                itemSpell.SpellId = 17892;
+                return;
+            case 17896: // Increase Frost Dam 30 (OLD) to Increase Frost Dam 30 (NEW)
+                itemSpell.SpellId = 17893;
+                return;
+            case 17897: // Increase Frost Dam 32 (OLD) to Increase Frost Dam 31 (NEW)
+                itemSpell.SpellId = 17894;
+                return;
+            case 17898: // Increase Frost Dam 34 (OLD) to Increase Frost Dam 34 (NEW)
+                itemSpell.SpellId = 17896;
+                return;
+            case 17899: // Increase Frost Dam 36 (OLD) to Increase Frost Dam 36 (NEW)
+                itemSpell.SpellId = 17897;
+                return;
+            case 17900: // Increase Frost Dam 38 (OLD) to Increase Frost Dam 37 (NEW)
+                itemSpell.SpellId = 17898;
+                return;
+            case 17901: // Increase Frost Dam 40 (OLD) to Increase Frost Dam 40 (NEW)
+                itemSpell.SpellId = 17900;
+                return;
+            case 17902: // Increase Frost Dam 42 (OLD) to Increase Frost Dam 41 (NEW)
+                itemSpell.SpellId = 17901;
+                return;
+            case 17906: // Increase Frost Dam 48 (OLD) to Increase Frost Dam 47 (NEW)
+                itemSpell.SpellId = 17906;
+                return;
+            case 17907: // Increase Frost Dam 50 (OLD) to Increase Frost Dam 50 (NEW)
+                itemSpell.SpellId = 17908;
+                return;
+            case 17908: // Increase Frost Dam 52 (OLD) to Increase Frost Dam 51 (NEW)
+                itemSpell.SpellId = 17909;
+                return;
+            case 17909: // Increase Frost Dam 54 (OLD) to Increase Frost Dam 54 (NEW)
+                itemSpell.SpellId = 17911;
+                return;
+            case 17987: // Increase Nature Dam 16 (OLD) to Increase Nature Dam 16 (NEW)
+                itemSpell.SpellId = 9357;
+                return;
+            case 17988: // Increase Nature Dam 17 (OLD) to Increase Nature Dam 17 (NEW)
+                itemSpell.SpellId = 9358;
+                return;
+            case 17989: // Increase Nature Dam 18 (OLD) to Increase Nature Dam 17 (NEW)
+                itemSpell.SpellId = 9358;
+                return;
+            case 17990: // Increase Nature Dam 20 (OLD) to Increase Nature Dam 20 (NEW)
+                itemSpell.SpellId = 9360;
+                return;
+            case 17991: // Increase Nature Dam 24 (OLD) to Increase Nature Dam 24 (NEW)
+                itemSpell.SpellId = 17988;
+                return;
+            case 17993: // Increase Nature Dam 28 (OLD) to Increase Nature Dam 27 (NEW)
+                itemSpell.SpellId = 17990;
+                return;
+            case 17994: // Increase Nature Dam 32 (OLD) to Increase Nature Dam 33 (NEW)
+                itemSpell.SpellId = 17993;
+                return;
+            case 17995: // Increase Nature Dam 34 (OLD) to Increase Nature Dam 34 (NEW)
+                itemSpell.SpellId = 16638;
+                return;
+            case 17996: // Increase Nature Dam 36 (OLD) to Increase Nature Dam 36 (NEW)
+                itemSpell.SpellId = 17994;
+                return;
+            case 17997: // Increase Nature Dam 38 (OLD) to Increase Nature Dam 37 (NEW)
+                itemSpell.SpellId = 17995;
+                return;
+            case 17998: // Increase Nature Dam 40 (OLD) to Increase Nature Dam 40 (NEW)
+                itemSpell.SpellId = 17997;
+                return;
+            case 17999: // Increase Nature Dam 42 (OLD) to Increase Nature Dam 41 (NEW)
+                itemSpell.SpellId = 17998;
+                return;
+            case 18002: // Increase Nature Dam 48 (OLD) to Increase Nature Dam 47 (NEW)
+                itemSpell.SpellId = 18002;
+                return;
+            case 18003: // Increase Nature Dam 50 (OLD) to Increase Nature Dam 50 (NEW)
+                itemSpell.SpellId = 18004;
+                return;
+            case 18004: // Increase Nature Dam 52 (OLD) to Increase Nature Dam 51 (NEW)
+                itemSpell.SpellId = 18005;
+                return;
+            case 18005: // Increase Nature Dam 54 (OLD) to Increase Nature Dam 54 (NEW)
+                itemSpell.SpellId = 18007;
+                return;
+            case 18006: // Increase Nature Dam 56 (OLD) to Increase Nature Dam 54 (NEW)
+                itemSpell.SpellId = 18007;
+                return;
+            case 18008: // Increase Shadow Dam 18 (OLD) to Increase Shadow Dam 17 (NEW)
+                itemSpell.SpellId = 9325;
+                return;
+            case 18009: // Increase Shadow Dam 20 (OLD) to Increase Shadow Dam 20 (NEW)
+                itemSpell.SpellId = 9327;
+                return;
+            case 18010: // Increase Shadow Dam 22 (OLD) to Increase Shadow Dam 21 (NEW)
+                itemSpell.SpellId = 9328;
+                return;
+            case 18011: // Increase Shadow Dam 24 (OLD) to Increase Shadow Dam 24 (NEW)
+                itemSpell.SpellId = 14794;
+                return;
+            case 18012: // Increase Shadow Dam 26 (OLD) to Increase Shadow Dam 26 (NEW)
+                itemSpell.SpellId = 18008;
+                return;
+            case 18013: // Increase Shadow Dam 28 (OLD) to Increase Shadow Dam 27 (NEW)
+                itemSpell.SpellId = 18009;
+                return;
+            case 18014: // Increase Shadow Dam 30 (OLD) to Increase Shadow Dam 30 (NEW)
+                itemSpell.SpellId = 18011;
+                return;
+            case 18015: // Increase Shadow Dam 32 (OLD) to Increase Shadow Dam 31 (NEW)
+                itemSpell.SpellId = 18012;
+                return;
+            case 18016: // Increase Shadow Dam 34 (OLD) to Increase Shadow Dam 34 (NEW)
+                itemSpell.SpellId = 18014;
+                return;
+            case 18017: // Increase Shadow Dam 36 (OLD) to Increase Shadow Dam 36 (NEW)
+                itemSpell.SpellId = 18015;
+                return;
+            case 18018: // Increase Shadow Dam 38 (OLD) to Increase Shadow Dam 37 (NEW)
+                itemSpell.SpellId = 18016;
+                return;
+            case 18019: // Increase Shadow Dam 40 (OLD) to Increase Shadow Dam 40 (NEW)
+                itemSpell.SpellId = 18018;
+                return;
+            case 18020: // Increase Shadow Dam 42 (OLD) to Increase Shadow Dam 41 (NEW)
+                itemSpell.SpellId = 18019;
+                return;
+            case 18023: // Increase Shadow Dam 48 (OLD) to Increase Shadow Dam 47 (NEW)
+                itemSpell.SpellId = 18023;
+                return;
+            case 18024: // Increase Shadow Dam 50 (OLD) to Increase Shadow Dam 50 (NEW)
+                itemSpell.SpellId = 18025;
+                return;
+            case 18025: // Increase Shadow Dam 52 (OLD) to Increase Shadow Dam 51 (NEW)
+                itemSpell.SpellId = 18026;
+                return;
+            case 18026: // Increase Shadow Dam 54 (OLD) to Increase Shadow Dam 54 (NEW)
+                itemSpell.SpellId = 18028;
+                return;
+    #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            case 18027: // Increase Shadow Dam 56 (OLD) to Increase Shadow Dam 56 (NEW)
+                itemSpell.SpellId = 26728;
+                return;
+            case 18028: // Increase Shadow Dam 58 (OLD) to Increase Shadow Dam 57 (NEW)
+                itemSpell.SpellId = 26729;
+                return;
+    #else
+            case 18027: // Increase Shadow Dam 56 (OLD) to Increase Shadow Dam 54 (NEW)
+                itemSpell.SpellId = 18028;
+                return;
+    #endif
+            case 18029: // Increase Healing 32 (OLD) to Increase Healing 31 (NEW)
+                itemSpell.SpellId = 9317;
+                return;
+            case 18030: // Increase Healing 34 (OLD) to Increase Healing 33 (NEW)
+                itemSpell.SpellId = 9318;
+                return;
+            case 18031: // Increase Healing 36 (OLD) to Increase Healing 35 (NEW)
+                itemSpell.SpellId = 18029;
+                return;
+            case 18032: // Increase Healing 38 (OLD) to Increase Healing 37 (NEW)
+                itemSpell.SpellId = 18030;
+                return;
+            case 18033: // Increase Healing 42 (OLD) to Increase Healing 42 (NEW)
+                itemSpell.SpellId = 18032;
+                return;
+            case 18034: // Increase Healing 44 (OLD) to Increase Healing 44 (NEW)
+                itemSpell.SpellId = 17371;
+                return;
+            case 18035: // Increase Healing 46 (OLD) to Increase Healing 46 (NEW)
+                itemSpell.SpellId = 18033;
+                return;
+            case 18036: // Increase Healing 50 (OLD) to Increase Healing 48 (NEW)
+                itemSpell.SpellId = 18034;
+                return;
+            case 18037: // Increase Healing 52 (OLD) to Increase Healing 51 (NEW)
+                itemSpell.SpellId = 18035;
+                return;
+            case 18038: // Increase Healing 54 (OLD) to Increase Healing 53 (NEW)
+                itemSpell.SpellId = 15696;
+                return;
+            case 18039: // Increase Healing 56 (OLD) to Increase Healing 55 (NEW)
+                itemSpell.SpellId = 18036;
+                return;
+            case 18040: // Increase Healing 58 (OLD) to Increase Healing 57 (NEW)
+                itemSpell.SpellId = 18037;
+                return;
+            case 18041: // Increase Healing 60 (OLD) to Increase Healing 59 (NEW)
+                itemSpell.SpellId = 18038;
+                return;
+            case 18042: // Increase Healing 62 (OLD) to Increase Healing 62 (NEW)
+                itemSpell.SpellId = 18039;
+                return;
+            case 18043: // Increase Healing 64 (OLD) to Increase Healing 64 (NEW)
+                itemSpell.SpellId = 18040;
+                return;
+            case 18044: // Increase Healing 66 (OLD) to Increase Healing 66 (NEW)
+                itemSpell.SpellId = 18041;
+                return;
+            case 18045: // Increase Healing 68 (OLD) to Increase Healing 68 (NEW)
+                itemSpell.SpellId = 18042;
+                return;
+            case 18046: // Increase Healing 70 (OLD) to Increase Healing 70 (NEW)
+                itemSpell.SpellId = 18043;
+                return;
+            case 18047: // Increase Healing 72 (OLD) to Increase Healing 70 (NEW)
+                itemSpell.SpellId = 18043;
+                return;
+            case 18048: // Increase Healing 74 (OLD) to Increase Healing 73 (NEW)
+                itemSpell.SpellId = 18044;
+                return;
+            case 18049: // Increase Spell Dam 18 (OLD) to Increase Spell Dam 18 (NEW)
+                itemSpell.SpellId = 9346;
+                return;
+            case 18050: // Increase Spell Dam 26 (OLD) to Increase Spell Dam 26 (NEW)
+                itemSpell.SpellId = 18049;
+                return;
+            case 18052: // Increase Spell Dam 28 (OLD) to Increase Spell Dam 28 (NEW)
+                itemSpell.SpellId = 14127;
+                return;
+            case 18053: // Increase Spell Dam 30 (OLD) to Increase Spell Dam 30 (NEW)
+                itemSpell.SpellId = 14798;
+                return;
+            case 18054: // Increase Spell Dam 32 (OLD) to Increase Spell Dam 32 (NEW)
+                itemSpell.SpellId = 17367;
+                return;
+            case 18055: // Increase Spell Dam 33 (OLD) to Increase Spell Dam 33 (NEW)
+                itemSpell.SpellId = 18050;
+                return;
+            case 18056: // Increase Spell Dam 35 (OLD) to Increase Spell Dam 35 (NEW)
+                itemSpell.SpellId = 14055;
+                return;
+            case 18057: // Increase Spell Dam 36 (OLD) to Increase Spell Dam 36 (NEW)
+                itemSpell.SpellId = 18053;
+                return;
+            case 18058: // Increase Spell Dam 37 (OLD) to Increase Spell Dam 37 (NEW)
+                itemSpell.SpellId = 18054;
+                return;
+            case 21500: // Increase Holy Dam 2 (OLD) to Increase Holy Dam 1 (NEW)
+                itemSpell.SpellId = 21499;
+                return;
+            case 21501: // Increase Holy Dam 3 (OLD) to Increase Holy Dam 3 (NEW)
+                itemSpell.SpellId = 21500;
+                return;
+            case 21502: // Increase Holy Dam 4 (OLD) to Increase Holy Dam 4 (NEW)
+            case 21503: // Increase Holy Dam 5 (OLD) to Increase Holy Dam 4 (NEW)
+                itemSpell.SpellId = 21501;
+                return;
+            case 21504: // Increase Holy Dam 6 (OLD) to Increase Holy Dam 6 (NEW)
+                itemSpell.SpellId = 21502;
+                return;
+            case 21505: // Increase Holy Dam 7 (OLD) to Increase Holy Dam 7 (NEW)
+            case 21506: // Increase Holy Dam 8 (OLD) to Increase Holy Dam 7 (NEW)
+                itemSpell.SpellId = 21503;
+                return;
+            case 21507: // Increase Holy Dam 9 (OLD) to Increase Holy Dam 9 (NEW)
+                itemSpell.SpellId = 21504;
+                return;
+            case 21508: // Increase Holy Dam 10 (OLD) to Increase Holy Dam 10 (NEW)
+                itemSpell.SpellId = 21505;
+                return;
+            case 21509: // Increase Holy Dam 11 (OLD) to Increase Holy Dam 11 (NEW)
+            case 21510: // Increase Holy Dam 12 (OLD) to Increase Holy Dam 11 (NEW)
+                itemSpell.SpellId = 21506;
+                return;
+            case 21511: // Increase Holy Dam 13 (OLD) to Increase Holy Dam 13 (NEW)
+                itemSpell.SpellId = 21507;
+                return;
+            case 21512: // Increase Holy Dam 14 (OLD) to Increase Holy Dam 14 (NEW)
+            case 21513: // Increase Holy Dam 15 (OLD) to Increase Holy Dam 14 (NEW)
+                itemSpell.SpellId = 21508;
+                return;
+            case 21514: // Increase Holy Dam 16 (OLD) to Increase Holy Dam 16 (NEW)
+                itemSpell.SpellId = 21509;
+                return;
+            case 21515: // Increase Holy Dam 17 (OLD) to Increase Holy Dam 17 (NEW)
+            case 21516: // Increase Holy Dam 18 (OLD) to Increase Holy Dam 17 (NEW)
+                itemSpell.SpellId = 21510;
+                return;
+            case 21517: // Increase Holy Dam 20 (OLD) to Increase Holy Dam 20 (NEW)
+                itemSpell.SpellId = 21512;
+                return;
+            case 21518: // Increase Holy Dam 22 (OLD) to Increase Holy Dam 21 (NEW)
+                itemSpell.SpellId = 21513;
+                return;
+            case 21519: // Increase Holy Dam 24 (OLD) to Increase Holy Dam 24 (NEW)
+                itemSpell.SpellId = 21515;
+                return;
+            case 21520: // Increase Holy Dam 26 (OLD) to Increase Holy Dam 26 (NEW)
+                itemSpell.SpellId = 21516;
+                return;
+            case 21521: // Increase Holy Dam 28 (OLD) to Increase Holy Dam 27 (NEW)
+                itemSpell.SpellId = 21517;
+                return;
+            case 21522: // Increase Holy Dam 30 (OLD) to Increase Holy Dam 30 (NEW)
+                itemSpell.SpellId = 21519;
+                return;
+            case 21523: // Increase Holy Dam 32 (OLD) to Increase Holy Dam 31 (NEW)
+                itemSpell.SpellId = 21520;
+                return;
+            case 21524: // Increase Holy Dam 34 (OLD) to Increase Holy Dam 34 (NEW)
+                itemSpell.SpellId = 21522;
+                return;
+            case 21525: // Increase Holy Dam 36 (OLD) to Increase Holy Dam 36 (NEW)
+                itemSpell.SpellId = 21523;
+                return;
+            case 21526: // Increase Holy Dam 38 (OLD) to Increase Holy Dam 37 (NEW)
+                itemSpell.SpellId = 21524;
+                return;
+            case 21527: // Increase Holy Dam 40 (OLD) to Increase Holy Dam 40 (NEW)
+                itemSpell.SpellId = 21526;
+                return;
+            case 21528: // Increase Holy Dam 42 (OLD) to Increase Holy Dam 41 (NEW)
+                itemSpell.SpellId = 21527;
+                return;
+            case 21531: // Increase Holy Dam 48 (OLD) to Increase Holy Dam 47 (NEW)
+                itemSpell.SpellId = 21531;
+                return;
+            case 21532: // Increase Holy Dam 50 (OLD) to Increase Holy Dam 50 (NEW)
+                itemSpell.SpellId = 21533;
+                return;
+            case 21533: // Increase Holy Dam 52 (OLD) to Increase Holy Dam 51 (NEW)
+                itemSpell.SpellId = 21534;
+                return;
+            case 21534: // Increase Holy Dam 54 (OLD) to Increase Holy Dam 54 (NEW)
+            case 21535: // Increase Holy Dam 56 (OLD) to Increase Holy Dam 54 (NEW)
+                itemSpell.SpellId = 21536;
+                return;
+            case 22747: // Increase Spell Dam 22 (OLD) to Increase Spell Dam 22 (NEW)
+                itemSpell.SpellId = 15714;
+                return;
+            case 22748: // Increase Healing 50 (OLD) to Increase Healing 51 (NEW)
+                itemSpell.SpellId = 18035;
+                return;
         }
     }
-    while (result->NextRow());
-
-    delete result;
-
-    sLog.outString();
-    sLog.outString(">> Loaded %lu Item locale strings", (unsigned long)mItemLocaleMap.size());
-}
-
-struct SQLItemLoader : public SQLStorageLoaderBase<SQLItemLoader, SQLStorage>
-{
-    template<class D>
-    void convert_from_str(uint32 /*field_pos*/, char const* src, D& dst)
+#endif
+    // Substitute Increased Defense spells that were changed in the 1.7 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+    if (sWorld.GetWowPatch() < WOW_PATCH_107)
     {
-        dst = D(sScriptMgr.GetScriptId(src));
+        switch (itemSpell.SpellId)
+        {
+            case 7513: // Increased Defense 2 (OLD) to Increased Defense 2 (NEW)
+                itemSpell.SpellId = 7514;
+                return;
+            case 7514: // Increased Defense 3 (OLD) to Increased Defense 3 (NEW)
+                itemSpell.SpellId = 7515;
+                return;
+            case 7515: // Increased Defense 4 (OLD) to Increased Defense 4 (NEW)
+                itemSpell.SpellId = 7517;
+                return;
+            case 7516: // Increased Defense 5 (OLD) to Increased Defense 5 (NEW)
+                itemSpell.SpellId = 7518;
+                return;
+            case 7517: // Increased Defense 6 (OLD) to Increased Defense 6 (NEW)
+                itemSpell.SpellId = 13384;
+                return;
+            case 7518: // Increased Defense 7 (OLD) to Increased Defense 7 (NEW)
+                itemSpell.SpellId = 13385;
+                return;
+            case 13383: // Increased Defense 8 (OLD) to Increased Defense 8 (NEW)
+                itemSpell.SpellId = 13387;
+                return;
+            case 13384: // Increased Defense 9 (OLD) to Increased Defense 9 (NEW)
+                itemSpell.SpellId = 13388;
+                return;
+            case 13385: // Increased Defense 10 (OLD) to Increased Defense 10 (NEW)
+                itemSpell.SpellId = 13390;
+                return;
+            case 13386: // Increased Defense 11 (OLD) to Increased Defense 11 (NEW)
+                itemSpell.SpellId = 18185;
+                return;
+            case 13387: // Increased Defense 12 (OLD) to Increased Defense 12 (NEW)
+                itemSpell.SpellId = 21408;
+                return;
+            case 13388: // Increased Defense 13 (OLD) to Increased Defense 13 (NEW)
+                itemSpell.SpellId = 14249;
+                return;
+            case 13389: // Increased Defense 25 (OLD) to Increased Defense 25 (NEW)
+                itemSpell.SpellId = 21422;
+                return;
+            case 13390: // Increased Defense 15 (OLD) to Increased Defense 15 (NEW)
+                itemSpell.SpellId = 18196;
+                return;
+            case 14249: // Increased Defense 20 (OLD) to Increased Defense 20 (NEW)
+                itemSpell.SpellId = 21416;
+                return;
+            case 15804: // Increased Defense 100 (OLD) to Increased Defense 80 (NEW)
+                itemSpell.SpellId = 24775;
+                return;
+            case 17513: // Increased Defense 32 (OLD) to Increased Defense 25 (NEW)
+                itemSpell.SpellId = 21423;
+                return;
+            case 18185: // Increased Defense 16 (OLD) to Increased Defense 16 (NEW)
+                itemSpell.SpellId = 21412;
+                return;
+            case 18196: // Increased Defense 22 (OLD) to Increased Defense 22 (NEW)
+                itemSpell.SpellId = 21418;
+                return;
+            case 18369: // Increased Defense 14 (OLD) to Increased Defense 14 (NEW)
+                itemSpell.SpellId = 21410;
+                return;
+            case 21407: // Increased Defense 17 (OLD) to Increased Defense 17 (NEW)
+                itemSpell.SpellId = 13389;
+                return;
+            case 21408: // Increased Defense 18 (OLD) to Increased Defense 18 (NEW)
+                itemSpell.SpellId = 21413;
+                return;
+            case 21409: // Increased Defense 19 (OLD) to Increased Defense 19 (NEW)
+                itemSpell.SpellId = 21414;
+                return;
+            case 21410: // Increased Defense 21 (OLD) to Increased Defense 21 (NEW)
+                itemSpell.SpellId = 17513;
+                return;
+            case 21411: // Increased Defense 23 (OLD) to Increased Defense 23 (NEW)
+                itemSpell.SpellId = 21419;
+                return;
+            case 21412: // Increased Defense 24 (OLD) to Increased Defense 24 (NEW)
+                itemSpell.SpellId = 21421;
+                return;
+            case 21413: // Increased Defense 27 (OLD) to Increased Defense 25 (NEW)
+            case 21414: // Increased Defense 28 (OLD) to Increased Defense 25 (NEW)
+            case 21415: // Increased Defense 29 (OLD) to Increased Defense 25 (NEW)
+            case 21416: // Increased Defense 30 (OLD) to Increased Defense 25 (NEW)
+            case 21417: // Increased Defense 31 (OLD) to Increased Defense 25 (NEW)
+            case 21418: // Increased Defense 33 (OLD) to Increased Defense 25 (NEW)
+            case 21419: // Increased Defense 34 (OLD) to Increased Defense 25 (NEW)
+            case 21420: // Increased Defense 35 (OLD) to Increased Defense 25 (NEW)
+            case 21421: // Increased Defense 36 (OLD) to Increased Defense 25 (NEW)
+            case 21422: // Increased Defense 37 (OLD) to Increased Defense 25 (NEW)
+            case 21423: // Increased Defense 38 (OLD) to Increased Defense 25 (NEW)
+            case 21424: // Increased Defense 26 (OLD) to Increased Defense 25 (NEW)
+                itemSpell.SpellId = 21423;
+                return;
+        }
     }
-};
+#endif
+    // Substitute Vitality spells that were changed in the 1.8 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_7_1
+    if (sWorld.GetWowPatch() < WOW_PATCH_108)
+    {
+        switch (itemSpell.SpellId)
+        {
+            case 20969: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21168: // Vitality 1
+                itemSpell.SpellId = 21587;
+                return;
+        }
+    }
+#endif
+    // Substitute Vitality spells that were changed in the 1.10 client.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+    if (sWorld.GetWowPatch() < WOW_PATCH_110)
+    {
+        switch (itemSpell.SpellId)
+        {
+            case 20885: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21109: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21345: // Vitality 1
+                itemSpell.SpellId = 21587;
+                return;
+            case 21347: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21348: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21349: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21350: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21590: // Vitality 1
+                itemSpell.SpellId = 21587;
+                return;
+            case 21592: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21593: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21594: // Vitality 2
+                itemSpell.SpellId = 21345;
+                return;
+            case 21595: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21596: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21597: // Vitality 3
+                itemSpell.SpellId = 21168;
+                return;
+            case 21598: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21599: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21600: // Vitality 4
+                itemSpell.SpellId = 21347;
+                return;
+            case 21601: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21602: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21603: // Vitality 5
+                itemSpell.SpellId = 20969;
+                return;
+            case 21604: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21605: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21606: // Vitality 6
+                itemSpell.SpellId = 21348;
+                return;
+            case 21607: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21608: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21609: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21610: // Vitality 7
+                itemSpell.SpellId = 21600;
+                return;
+            case 21611: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21612: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21613: // Vitality 8
+                itemSpell.SpellId = 20885;
+                return;
+            case 21614: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21615: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21616: // Vitality 9
+                itemSpell.SpellId = 21604;
+                return;
+            case 21617: // Vitality 10
+                itemSpell.SpellId = 21349;
+                return;
+            case 23210: // Vitality 14
+                itemSpell.SpellId = 21350;
+                return;
+        }
+    }
+#endif
+}
 
 void ObjectMgr::LoadItemPrototypes()
 {
-    SQLItemLoader loader;
-    loader.LoadProgressive(sItemStorage, sWorld.GetWowPatch());
-    mQuestStartingItems.clear();
+    sItemStorage.LoadProgressive(sWorld.GetWowPatch());
+    m_QuestStartingItemsMap.clear();
     sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();
 
@@ -2500,8 +3351,11 @@ void ObjectMgr::LoadItemPrototypes()
 
         // normal spell list
         {
-            for (int j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
+            for (uint8 j = 0; j < MAX_ITEM_PROTO_SPELLS; ++j)
             {
+                if (proto->Spells[j].SpellId)
+                    CorrectItemEffects(proto->ItemId, const_cast<ItemPrototype*>(proto)->Spells[j]);
+                
                 if (proto->Spells[j].SpellTrigger >= MAX_ITEM_SPELLTRIGGER)
                 {
                     sLog.outErrorDb("Item (Entry: %u) has wrong item spell trigger value in spelltrigger_%d (%u)", i, j + 1, proto->Spells[j].SpellTrigger);
@@ -2625,8 +3479,8 @@ void ObjectMgr::LoadItemPrototypes()
         if (proto->StartQuest > 0)
         // Item starts a quest, insert it into the quest->startItem map
         {
-            if (mQuestStartingItems.find(proto->StartQuest) == mQuestStartingItems.end())
-                mQuestStartingItems.insert( std::pair<uint32, uint32>(proto->StartQuest, proto->ItemId) );
+            if (m_QuestStartingItemsMap.find(proto->StartQuest) == m_QuestStartingItemsMap.end())
+                m_QuestStartingItemsMap.insert( std::pair<uint32, uint32>(proto->StartQuest, proto->ItemId) );
             else
                 sLog.outErrorDb("Item #%u also starts quest #%u.", i, proto->StartQuest);
         }
@@ -2656,22 +3510,19 @@ void ObjectMgr::LoadItemPrototypes()
         sLog.outErrorDb("Item (Entry: %u) not exist in `item_template` but referenced in `CharStartOutfit.dbc`", *itr);
 }
 
-void ObjectMgr::LoadItemRequiredTarget()
+void ObjectMgr::LoadItemLocales()
 {
-    m_ItemRequiredTarget.clear();                           // needed for reload case
+    m_ItemLocaleMap.clear();                                 // need for reload case
 
-    uint32 count = 0;
-
-    QueryResult *result = WorldDatabase.Query("SELECT entry,type,targetEntry FROM item_required_target");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `description_loc1`, `name_loc2`, `description_loc2`, `name_loc3`, `description_loc3`, `name_loc4`, `description_loc4`, `name_loc5`, `description_loc5`, `name_loc6`, `description_loc6`, `name_loc7`, `description_loc7`, `name_loc8`, `description_loc8` FROM `locales_item`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
-        sLog.outErrorDb(">> Loaded 0 ItemRequiredTarget. DB table `item_required_target` is empty.");
+        sLog.outString(">> Loaded 0 item locale strings. DB table `locales_item` is empty.");
         return;
     }
 
@@ -2679,8 +3530,78 @@ void ObjectMgr::LoadItemRequiredTarget()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
+
+        uint32 entry = fields[0].GetUInt32();
+
+        if (!GetItemPrototype(entry))
+        {
+            ERROR_DB_STRICT_LOG("Table `locales_item` has data for nonexistent item entry %u, skipped.", entry);
+            continue;
+        }
+
+        ItemLocale& data = m_ItemLocaleMap[entry];
+
+        for (int i = 1; i < MAX_LOCALE; ++i)
+        {
+            std::string str = fields[1 + 2 * (i - 1)].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    if ((int32)data.Name.size() <= idx)
+                        data.Name.resize(idx + 1);
+
+                    data.Name[idx] = str;
+                }
+            }
+
+            str = fields[1 + 2 * (i - 1) + 1].GetCppString();
+            if (!str.empty())
+            {
+                int idx = GetOrNewIndexForLocale(LocaleConstant(i));
+                if (idx >= 0)
+                {
+                    if ((int32)data.Description.size() <= idx)
+                        data.Description.resize(idx + 1);
+
+                    data.Description[idx] = str;
+                }
+            }
+        }
+    }
+    while (result->NextRow());
+
+    sLog.outString();
+    sLog.outString(">> Loaded %lu item locale strings", (unsigned long)m_ItemLocaleMap.size());
+}
+
+void ObjectMgr::LoadItemRequiredTarget()
+{
+    m_ItemRequiredTarget.clear();                           // needed for reload case
+
+    uint32 count = 0;
+
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `target_entry` FROM `item_required_target`"));
+
+    if (!result)
+    {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
+        sLog.outErrorDb(">> Loaded 0 item targets. DB table `item_required_target` is empty.");
+        return;
+    }
+
+    BarGoLink bar(result->GetRowCount());
+
+    do
+    {
+        bar.step();
+        Field *fields = result->Fetch();
 
         uint32 uiItemId      = fields[0].GetUInt32();
         uint32 uiType        = fields[1].GetUInt32();
@@ -2755,18 +3676,15 @@ void ObjectMgr::LoadItemRequiredTarget()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u Item required targets", count);
 }
 
 void ObjectMgr::LoadPetLevelInfo()
 {
-    // Loading levels data
     {
-        //                                                 0               1      2   3     4    5    6    7     8    9
-        QueryResult *result  = WorldDatabase.Query("SELECT creature_entry, level, hp, mana, str, agi, sta, inte, spi, armor FROM pet_levelstats");
+        //                                                               0                 1        2     3       4      5      6      7       8      9
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_entry`, `level`, `hp`, `mana`, `str`, `agi`, `sta`, `inte`, `spi`, `armor` FROM `pet_levelstats`"));
 
         uint32 count = 0;
 
@@ -2785,6 +3703,7 @@ void ObjectMgr::LoadPetLevelInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 creature_id = fields[0].GetUInt32();
@@ -2813,9 +3732,9 @@ void ObjectMgr::LoadPetLevelInfo()
                 continue;
             }
 
-            PetLevelInfo*& pInfoMapEntry = petInfo[creature_id];
+            PetLevelInfo*& pInfoMapEntry = m_PetInfoMap[creature_id];
 
-            if (pInfoMapEntry == NULL)
+            if (pInfoMapEntry == nullptr)
                 pInfoMapEntry =  new PetLevelInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)];
 
             // data for level 1 stored in [0] array element, ...
@@ -2828,19 +3747,16 @@ void ObjectMgr::LoadPetLevelInfo()
             for (int i = 0; i < MAX_STATS; i++)
                 pLevelInfo->stats[i] = fields[i + 4].GetUInt16();
 
-            bar.step();
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u level pet stats definitions", count);
     }
 
     // Fill gaps and check integrity
-    for (PetLevelInfoMap::iterator itr = petInfo.begin(); itr != petInfo.end(); ++itr)
+    for (PetLevelInfoMap::iterator itr = m_PetInfoMap.begin(); itr != m_PetInfoMap.end(); ++itr)
     {
         PetLevelInfo* pInfo = itr->second;
 
@@ -2869,25 +3785,26 @@ PetLevelInfo const* ObjectMgr::GetPetLevelInfo(uint32 creature_id, uint32 level)
     if (level > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         level = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
 
-    PetLevelInfoMap::const_iterator itr = petInfo.find(creature_id);
-    if (itr == petInfo.end())
-        return NULL;
+    PetLevelInfoMap::const_iterator itr = m_PetInfoMap.find(creature_id);
+    if (itr == m_PetInfoMap.end())
+        return nullptr;
 
     return &itr->second[level - 1];                         // data for level 1 stored in [0] array element, ...
 }
 
 void ObjectMgr::LoadPlayerInfo()
 {
-    // Load playercreate
+    // Load playercreateinfo
     {
-        //                                                0     1      2    3     4           5           6
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, map, zone, position_x, position_y, position_z, orientation FROM playercreateinfo");
+        //                                                               0       1        2      3       4             5             6             7
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `map`, `zone`, `position_x`, `position_y`, `position_z`, `orientation` FROM `playercreateinfo`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create definitions", count);
@@ -2900,6 +3817,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_race  = fields[0].GetUInt32();
@@ -2938,7 +3856,7 @@ void ObjectMgr::LoadPlayerInfo()
                 continue;
             }
 
-            PlayerInfo* pInfo = &playerInfo[current_race][current_class];
+            PlayerInfo* pInfo = &m_PlayerInfo[current_race][current_class];
 
             pInfo->mapId       = mapId;
             pInfo->areaId      = areaId;
@@ -2949,29 +3867,25 @@ void ObjectMgr::LoadPlayerInfo()
 
             pInfo->displayId_m = rEntry->model_m;
             pInfo->displayId_f = rEntry->model_f;
-
-            bar.step();
+            
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u player create definitions", count);
     }
 
-    // Load playercreate items
+    // Load playercreateinfo_item
     {
-        //                                                0     1      2       3
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, itemid, amount FROM playercreateinfo_item");
+        //                                                               0       1        2         3
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `itemid`, `amount` FROM `playercreateinfo_item`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
-
             bar.step();
 
             sLog.outString();
@@ -2983,6 +3897,7 @@ void ObjectMgr::LoadPlayerInfo()
 
             do
             {
+                bar.step();
                 Field* fields = result->Fetch();
 
                 uint32 current_race = fields[0].GetUInt32();
@@ -3002,7 +3917,7 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                PlayerInfo* pInfo = &playerInfo[current_race][current_class];
+                PlayerInfo* pInfo = &m_PlayerInfo[current_race][current_class];
 
                 uint32 item_id = fields[2].GetUInt32();
 
@@ -3022,28 +3937,26 @@ void ObjectMgr::LoadPlayerInfo()
 
                 pInfo->item.push_back(PlayerCreateInfoItem(item_id, amount));
 
-                bar.step();
                 ++count;
             }
             while (result->NextRow());
-
-            delete result;
 
             sLog.outString();
             sLog.outString(">> Loaded %u custom player create items", count);
         }
     }
 
-    // Load playercreate spells
+    // Load playercreateinfo_spell
     {
-        //                                                0     1      2
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, Spell FROM playercreateinfo_spell");
+        //                                                                0       1        2
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `race`, `class`, `spell` FROM `playercreateinfo_spell` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create spells", count);
@@ -3055,6 +3968,7 @@ void ObjectMgr::LoadPlayerInfo()
 
             do
             {
+                bar.step();
                 Field* fields = result->Fetch();
 
                 uint32 current_race = fields[0].GetUInt32();
@@ -3081,31 +3995,29 @@ void ObjectMgr::LoadPlayerInfo()
                     continue;
                 }
 
-                PlayerInfo* pInfo = &playerInfo[current_race][current_class];
+                PlayerInfo* pInfo = &m_PlayerInfo[current_race][current_class];
                 pInfo->spell.push_back(spell_id);
 
-                bar.step();
                 ++count;
             }
             while (result->NextRow());
-
-            delete result;
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create spells", count);
         }
     }
 
-    // Load playercreate actions
+    // Load playercreateinfo_action
     {
-        //                                                0     1      2       3       4
-        QueryResult *result = WorldDatabase.Query("SELECT race, class, button, action, type FROM playercreateinfo_action");
+        //                                                               0       1        2         3         4
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `button`, `action`, `type` FROM `playercreateinfo_action`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create actions", count);
@@ -3117,6 +4029,7 @@ void ObjectMgr::LoadPlayerInfo()
 
             do
             {
+                bar.step();
                 Field* fields = result->Fetch();
 
                 uint32 current_race = fields[0].GetUInt32();
@@ -3140,18 +4053,15 @@ void ObjectMgr::LoadPlayerInfo()
                 uint32 action = fields[3].GetUInt32();
                 uint8 action_type = fields[4].GetUInt8();
 
-                if (!Player::IsActionButtonDataValid(action_button, action, action_type, NULL))
+                if (!Player::IsActionButtonDataValid(action_button, action, action_type, nullptr))
                     continue;
 
-                PlayerInfo* pInfo = &playerInfo[current_race][current_class];
+                PlayerInfo* pInfo = &m_PlayerInfo[current_race][current_class];
                 pInfo->action.push_back(PlayerCreateInfoAction(action_button, action, action_type));
 
-                bar.step();
                 ++count;
             }
             while (result->NextRow());
-
-            delete result;
 
             sLog.outString();
             sLog.outString(">> Loaded %u player create actions", count);
@@ -3160,14 +4070,15 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Loading levels data (class only dependent)
     {
-        //                                                 0      1      2       3
-        QueryResult *result  = WorldDatabase.Query("SELECT class, level, basehp, basemana FROM player_classlevelstats");
+        //                                                               0        1        2         3
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `class`, `level`, `basehp`, `basemana` FROM `player_classlevelstats`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u level health/mana definitions", count);
@@ -3180,6 +4091,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_class = fields[0].GetUInt32();
@@ -3207,7 +4119,7 @@ void ObjectMgr::LoadPlayerInfo()
                 continue;
             }
 
-            PlayerClassInfo* pClassInfo = &playerClassInfo[current_class];
+            PlayerClassInfo* pClassInfo = &m_PlayerClassInfo[current_class];
 
             if (!pClassInfo->levelInfo)
                 pClassInfo->levelInfo = new PlayerClassLevelInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)];
@@ -3217,12 +4129,9 @@ void ObjectMgr::LoadPlayerInfo()
             pClassLevelInfo->basehealth = fields[2].GetUInt16();
             pClassLevelInfo->basemana   = fields[3].GetUInt16();
 
-            bar.step();
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u level health/mana definitions", count);
@@ -3235,7 +4144,7 @@ void ObjectMgr::LoadPlayerInfo()
         if (!sChrClassesStore.LookupEntry(class_))
             continue;
 
-        PlayerClassInfo* pClassInfo = &playerClassInfo[class_];
+        PlayerClassInfo* pClassInfo = &m_PlayerClassInfo[class_];
 
         // fatal error if no level 1 data
         if (!pClassInfo->levelInfo || pClassInfo->levelInfo[0].basehealth == 0)
@@ -3258,14 +4167,15 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Loading levels data (class/race dependent)
     {
-        //                                                 0     1      2      3    4    5    6    7
-        QueryResult *result  = WorldDatabase.Query("SELECT race, class, level, str, agi, sta, inte, spi FROM player_levelstats");
+        //                                                               0       1        2        3      4      5      6       7
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `race`, `class`, `level`, `str`, `agi`, `sta`, `inte`, `spi` FROM `player_levelstats`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u level stats definitions", count);
@@ -3278,6 +4188,7 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_race = fields[0].GetUInt32();
@@ -3310,7 +4221,7 @@ void ObjectMgr::LoadPlayerInfo()
                 continue;
             }
 
-            PlayerInfo* pInfo = &playerInfo[current_race][current_class];
+            PlayerInfo* pInfo = &m_PlayerInfo[current_race][current_class];
 
             if (!pInfo->levelInfo)
                 pInfo->levelInfo = new PlayerLevelInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)];
@@ -3320,12 +4231,9 @@ void ObjectMgr::LoadPlayerInfo()
             for (int i = 0; i < MAX_STATS; ++i)
                 pLevelInfo->stats[i] = fields[i + 3].GetUInt8();
 
-            bar.step();
             ++count;
         }
         while (result->NextRow());
-
-        delete result;
 
         sLog.outString();
         sLog.outString(">> Loaded %u level stats definitions", count);
@@ -3344,7 +4252,7 @@ void ObjectMgr::LoadPlayerInfo()
             if (!((1 << (class_ - 1)) & CLASSMASK_ALL_PLAYABLE) || !sChrClassesStore.LookupEntry(class_))
                 continue;
 
-            PlayerInfo* pInfo = &playerInfo[race][class_];
+            PlayerInfo* pInfo = &m_PlayerInfo[race][class_];
 
             // skip non loaded combinations
             if (!pInfo->displayId_m || !pInfo->displayId_f)
@@ -3372,18 +4280,19 @@ void ObjectMgr::LoadPlayerInfo()
 
     // Loading xp per level data
     {
-        mPlayerXPperLevel.resize(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL));
-        for (uint32 level = 0; level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
-            mPlayerXPperLevel[level] = 0;
+        m_PlayerXPperLevel.resize(sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL)+1);
+        for (uint32 level = 0; level <= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
+            m_PlayerXPperLevel[level] = 0;
 
-        //                                                 0    1
-        QueryResult *result  = WorldDatabase.Query("SELECT lvl, xp_for_next_level FROM player_xp_for_level");
+        //                                                               0      1
+        std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `lvl`, `xp_for_next_level` FROM `player_xp_for_level`"));
 
         uint32 count = 0;
 
         if (!result)
         {
             BarGoLink bar(1);
+            bar.step();
 
             sLog.outString();
             sLog.outString(">> Loaded %u xp for level definitions", count);
@@ -3396,12 +4305,13 @@ void ObjectMgr::LoadPlayerInfo()
 
         do
         {
+            bar.step();
             Field* fields = result->Fetch();
 
             uint32 current_level = fields[0].GetUInt32();
             uint32 current_xp    = fields[1].GetUInt32();
 
-            if (current_level >= sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
+            if (current_level > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
             {
                 if (current_level > STRONG_MAX_LEVEL)       // hardcoded level maximum
                     sLog.outErrorDb("Wrong (> %u) level %u in `player_xp_for_level` table, ignoring.", STRONG_MAX_LEVEL, current_level);
@@ -3413,13 +4323,10 @@ void ObjectMgr::LoadPlayerInfo()
                 continue;
             }
             //PlayerXPperLevel
-            mPlayerXPperLevel[current_level] = current_xp;
-            bar.step();
+            m_PlayerXPperLevel[current_level] = current_xp;
             ++count;
         }
-        while (result->NextRow());
-
-        delete result;
+        while (result->NextRow());;
 
         sLog.outString();
         sLog.outString(">> Loaded %u xp for level definitions", count);
@@ -3428,10 +4335,10 @@ void ObjectMgr::LoadPlayerInfo()
     // fill level gaps
     for (uint32 level = 1; level < sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL); ++level)
     {
-        if (mPlayerXPperLevel[level] == 0)
+        if (m_PlayerXPperLevel[level] == 0)
         {
             sLog.outErrorDb("Level %i does not have XP for level data. Using data of level [%i] + 100.", level + 1, level);
-            mPlayerXPperLevel[level] = mPlayerXPperLevel[level - 1] + 100;
+            m_PlayerXPperLevel[level] = m_PlayerXPperLevel[level - 1] + 100;
         }
     }
 }
@@ -3441,7 +4348,7 @@ void ObjectMgr::GetPlayerClassLevelInfo(uint32 class_, uint32 level, PlayerClass
     if (level < 1 || class_ >= MAX_CLASSES)
         return;
 
-    PlayerClassInfo const* pInfo = &playerClassInfo[class_];
+    PlayerClassInfo const* pInfo = &m_PlayerClassInfo[class_];
 
     if (level > sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL))
         level = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL);
@@ -3454,7 +4361,7 @@ void ObjectMgr::GetPlayerLevelInfo(uint32 race, uint32 class_, uint32 level, Pla
     if (level < 1 || race   >= MAX_RACES || class_ >= MAX_CLASSES)
         return;
 
-    PlayerInfo const* pInfo = &playerInfo[race][class_];
+    PlayerInfo const* pInfo = &m_PlayerInfo[race][class_];
     if (pInfo->displayId_m == 0 || pInfo->displayId_f == 0)
         return;
 
@@ -3467,7 +4374,7 @@ void ObjectMgr::GetPlayerLevelInfo(uint32 race, uint32 class_, uint32 level, Pla
 void ObjectMgr::BuildPlayerLevelInfo(uint8 race, uint8 _class, uint8 level, PlayerLevelInfo* info) const
 {
     // base data (last known level)
-    *info = playerInfo[race][_class].levelInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) - 1];
+    *info = m_PlayerInfo[race][_class].levelInfo[sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) - 1];
 
     for (int lvl = sWorld.getConfig(CONFIG_UINT32_MAX_PLAYER_LEVEL) - 1; lvl < level; ++lvl)
     {
@@ -3543,13 +4450,12 @@ void ObjectMgr::LoadGroups()
 {
     // -- loading groups --
     uint32 count = 0;
-    //                                                    0         1              2           3           4              5      6      7      8      9      10     11     12     13      14          15
-    QueryResult *result = CharacterDatabase.Query("SELECT mainTank, mainAssistant, lootMethod, looterGuid, lootThreshold, icon1, icon2, icon3, icon4, icon5, icon6, icon7, icon8, isRaid, leaderGuid, groupId FROM groups");
+    //                                                                   0           1                2             3             4                5        6        7        8        9        10       11       12       13        14            15
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `mainTank`, `mainAssistant`, `lootMethod`, `looterGuid`, `lootThreshold`, `icon1`, `icon2`, `icon3`, `icon4`, `icon5`, `icon6`, `icon7`, `icon8`, `isRaid`, `leaderGuid`, `groupId` FROM `groups`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -3575,15 +4481,14 @@ void ObjectMgr::LoadGroups()
     }
     while (result->NextRow());
 
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u group definitions", count);
 
     // -- loading members --
     count = 0;
-    //                                       0           1          2         3
-    result = CharacterDatabase.Query("SELECT memberGuid, assistant, subgroup, groupId FROM group_member ORDER BY groupId");
+    //                                            0             1            2           3
+    result.reset(CharacterDatabase.Query("SELECT `memberGuid`, `assistant`, `subgroup`, `groupId` FROM `group_member` ORDER BY `groupId`"));
     if (!result)
     {
         BarGoLink bar2(1);
@@ -3591,7 +4496,7 @@ void ObjectMgr::LoadGroups()
     }
     else
     {
-        Group* group = NULL;                                // used as cached pointer for avoid relookup group for each member
+        Group* group = nullptr;                                // used as cached pointer for avoid relookup group for each member
 
         BarGoLink bar2(result->GetRowCount());
         do
@@ -3625,18 +4530,17 @@ void ObjectMgr::LoadGroups()
             }
         }
         while (result->NextRow());
-        delete result;
     }
 
     // clean groups
     // TODO: maybe delete from the DB before loading in this case
-    for (GroupMap::iterator itr = mGroupMap.begin(); itr != mGroupMap.end();)
+    for (GroupMap::iterator itr = m_GroupMap.begin(); itr != m_GroupMap.end();)
     {
         if (itr->second->GetMembersCount() < 2)
         {
             itr->second->Disband();
             delete itr->second;
-            mGroupMap.erase(itr++);
+            m_GroupMap.erase(itr++);
         }
         else
             ++itr;
@@ -3644,15 +4548,15 @@ void ObjectMgr::LoadGroups()
 
     // -- loading instances --
     count = 0;
-    result = CharacterDatabase.Query(
-                 //      0                          1    2         3          4
-                 "SELECT group_instance.leaderGuid, map, instance, permanent, resettime, "
+    result.reset(CharacterDatabase.Query(
+                 //                        0             1      2           3            4
+                 "SELECT `group_instance`.`leaderGuid`, `map`, `instance`, `permanent`, `resettime`, "
                  // 5
-                 "(SELECT COUNT(*) FROM character_instance WHERE guid = group_instance.leaderGuid AND instance = group_instance.instance AND permanent = 1 LIMIT 1), "
+                 "(SELECT COUNT(*) FROM `character_instance` WHERE `guid` = `group_instance`.`leaderGuid` AND `instance` = `group_instance`.`instance` AND `permanent` = 1 LIMIT 1), "
                  // 6
-                 " groups.groupId "
-                 "FROM group_instance LEFT JOIN instance ON instance = id LEFT JOIN groups ON groups.leaderGUID = group_instance.leaderGUID ORDER BY leaderGuid"
-             );
+                 " `groups`.`groupId` "
+                 "FROM `group_instance` LEFT JOIN `instance` ON `instance` = `id` LEFT JOIN `groups` ON `groups`.`leaderGUID` = `group_instance`.`leaderGUID` ORDER BY `leaderGuid`"
+             ));
 
     if (!result)
     {
@@ -3661,7 +4565,7 @@ void ObjectMgr::LoadGroups()
     }
     else
     {
-        Group* group = NULL;                                // used as cached pointer for avoid relookup group for each member
+        Group* group = nullptr;                                // used as cached pointer for avoid relookup group for each member
 
         BarGoLink bar2(result->GetRowCount());
         do
@@ -3696,7 +4600,6 @@ void ObjectMgr::LoadGroups()
             group->BindToInstance(state, fields[3].GetBool(), true);
         }
         while (result->NextRow());
-        delete result;
     }
 
     sLog.outString();
@@ -3709,48 +4612,45 @@ void ObjectMgr::LoadGroups()
 void ObjectMgr::LoadQuests()
 {
     // For reload case
-    for (QuestMap::const_iterator itr = mQuestTemplates.begin(); itr != mQuestTemplates.end(); ++itr)
-        delete itr->second;
-
-    mQuestTemplates.clear();
+    m_QuestTemplatesMap.clear();
 
     m_ExclusiveQuestGroups.clear();
 
-    //                                                0      1       2           3         4           5     6                7              8              9
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, Method, ZoneOrSort, MinLevel, QuestLevel, Type, RequiredClasses, RequiredRaces, RequiredSkill, RequiredSkillValue,"
-                          //   10                   11                 12                     13                   14                     15                   16                17
-                          "RepObjectiveFaction, RepObjectiveValue, RequiredMinRepFaction, RequiredMinRepValue, RequiredMaxRepFaction, RequiredMaxRepValue, SuggestedPlayers, LimitTime,"
-                          //   18          19            20           21           22              23                24         25            26
-                          "QuestFlags, SpecialFlags, PrevQuestId, NextQuestId, ExclusiveGroup, NextQuestInChain, SrcItemId, SrcItemCount, SrcSpell,"
-                          //   27     28       29          30               31                32       33              34              35              36
-                          "Title, Details, Objectives, OfferRewardText, RequestItemsText, EndText, ObjectiveText1, ObjectiveText2, ObjectiveText3, ObjectiveText4,"
-                          //   37          38          39          40          41             42             43             44
-                          "ReqItemId1, ReqItemId2, ReqItemId3, ReqItemId4, ReqItemCount1, ReqItemCount2, ReqItemCount3, ReqItemCount4,"
-                          //   45            46            47            48            49               50               51               52
-                          "ReqSourceId1, ReqSourceId2, ReqSourceId3, ReqSourceId4, ReqSourceCount1, ReqSourceCount2, ReqSourceCount3, ReqSourceCount4,"
-                          //   53                  54                  55                  56                  57                     58                     59                     60
-                          "ReqCreatureOrGOId1, ReqCreatureOrGOId2, ReqCreatureOrGOId3, ReqCreatureOrGOId4, ReqCreatureOrGOCount1, ReqCreatureOrGOCount2, ReqCreatureOrGOCount3, ReqCreatureOrGOCount4,"
-                          //   61             62             63             64
-                          "ReqSpellCast1, ReqSpellCast2, ReqSpellCast3, ReqSpellCast4,"
-                          //   65                66                67                68                69                70
-                          "RewChoiceItemId1, RewChoiceItemId2, RewChoiceItemId3, RewChoiceItemId4, RewChoiceItemId5, RewChoiceItemId6,"
-                          //   71                   72                   73                   74                   75                   76
-                          "RewChoiceItemCount1, RewChoiceItemCount2, RewChoiceItemCount3, RewChoiceItemCount4, RewChoiceItemCount5, RewChoiceItemCount6,"
-                          //   77          78          79          80          81             82             83             84
-                          "RewItemId1, RewItemId2, RewItemId3, RewItemId4, RewItemCount1, RewItemCount2, RewItemCount3, RewItemCount4,"
-                          //   85              86              87              88              89              90            91            92            93            94
-                          "RewRepFaction1, RewRepFaction2, RewRepFaction3, RewRepFaction4, RewRepFaction5, RewRepValue1, RewRepValue2, RewRepValue3, RewRepValue4, RewRepValue5,"
-                          //   95             96                97        98            99                 100               101         102     103     104
-                          "RewOrReqMoney, RewMoneyMaxLevel, RewSpell, RewSpellCast, RewMailTemplateId, RewMailDelaySecs, PointMapId, PointX, PointY, PointOpt,"
-                          //   105            106            107            108            109                 110                 111                 112
-                          "DetailsEmote1, DetailsEmote2, DetailsEmote3, DetailsEmote4, DetailsEmoteDelay1, DetailsEmoteDelay2, DetailsEmoteDelay3, DetailsEmoteDelay4,"
-                          //   113              114            115                116                117                118
-                          "IncompleteEmote, CompleteEmote, OfferRewardEmote1, OfferRewardEmote2, OfferRewardEmote3, OfferRewardEmote4,"
-                          //   119                     120                     121                     122
-                          "OfferRewardEmoteDelay1, OfferRewardEmoteDelay2, OfferRewardEmoteDelay3, OfferRewardEmoteDelay4,"
-                          //   123          124         125
-                          "StartScript, CompleteScript, MaxLevel"
-                          " FROM quest_template t1 WHERE patch=(SELECT max(patch) FROM quest_template t2 WHERE t1.entry=t2.entry && patch <= %u)", sWorld.GetWowPatch());
+    //                                                                0        1         2             3           4             5       6                  7                8                9
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `Method`, `ZoneOrSort`, `MinLevel`, `QuestLevel`, `Type`, `RequiredClasses`, `RequiredRaces`, `RequiredSkill`, `RequiredSkillValue`,"
+    //                      10                     11                   12                       13                     14                       15                     16                  17
+                          "`RepObjectiveFaction`, `RepObjectiveValue`, `RequiredMinRepFaction`, `RequiredMinRepValue`, `RequiredMaxRepFaction`, `RequiredMaxRepValue`, `SuggestedPlayers`, `LimitTime`,"
+    //                      18            19              20             21             22                23                  24           25              26
+                          "`QuestFlags`, `SpecialFlags`, `PrevQuestId`, `NextQuestId`, `ExclusiveGroup`, `NextQuestInChain`, `SrcItemId`, `SrcItemCount`, `SrcSpell`,"
+    //                      27       28         29            30                 31                  32         33                34                35                36
+                          "`Title`, `Details`, `Objectives`, `OfferRewardText`, `RequestItemsText`, `EndText`, `ObjectiveText1`, `ObjectiveText2`, `ObjectiveText3`, `ObjectiveText4`,"
+    //                      37            38            39            40            41               42               43               44
+                          "`ReqItemId1`, `ReqItemId2`, `ReqItemId3`, `ReqItemId4`, `ReqItemCount1`, `ReqItemCount2`, `ReqItemCount3`, `ReqItemCount4`,"
+    //                      45              46              47              48              49                 50                 51                 52
+                          "`ReqSourceId1`, `ReqSourceId2`, `ReqSourceId3`, `ReqSourceId4`, `ReqSourceCount1`, `ReqSourceCount2`, `ReqSourceCount3`, `ReqSourceCount4`,"
+    //                      53                    54                    55                    56                    57                       58                       59                       60
+                          "`ReqCreatureOrGOId1`, `ReqCreatureOrGOId2`, `ReqCreatureOrGOId3`, `ReqCreatureOrGOId4`, `ReqCreatureOrGOCount1`, `ReqCreatureOrGOCount2`, `ReqCreatureOrGOCount3`, `ReqCreatureOrGOCount4`,"
+    //                      61               62               63               64
+                          "`ReqSpellCast1`, `ReqSpellCast2`, `ReqSpellCast3`, `ReqSpellCast4`,"
+    //                      65                  66                  67                  68                  69                  70
+                          "`RewChoiceItemId1`, `RewChoiceItemId2`, `RewChoiceItemId3`, `RewChoiceItemId4`, `RewChoiceItemId5`, `RewChoiceItemId6`,"
+    //                      71                     72                     73                     74                     75                     76
+                          "`RewChoiceItemCount1`, `RewChoiceItemCount2`, `RewChoiceItemCount3`, `RewChoiceItemCount4`, `RewChoiceItemCount5`, `RewChoiceItemCount6`,"
+    //                      77            78            79            80            81               82               83               84
+                          "`RewItemId1`, `RewItemId2`, `RewItemId3`, `RewItemId4`, `RewItemCount1`, `RewItemCount2`, `RewItemCount3`, `RewItemCount4`,"
+    //                      85                86                87                88                89                90              91              92              93              94
+                          "`RewRepFaction1`, `RewRepFaction2`, `RewRepFaction3`, `RewRepFaction4`, `RewRepFaction5`, `RewRepValue1`, `RewRepValue2`, `RewRepValue3`, `RewRepValue4`, `RewRepValue5`,"
+    //                      95               96                  97          98              99                   100                 101           102       103       104
+                          "`RewOrReqMoney`, `RewMoneyMaxLevel`, `RewSpell`, `RewSpellCast`, `RewMailTemplateId`, `RewMailDelaySecs`, `PointMapId`, `PointX`, `PointY`, `PointOpt`,"
+    //                      105              106              107              108              109                   110                   111                   112
+                          "`DetailsEmote1`, `DetailsEmote2`, `DetailsEmote3`, `DetailsEmote4`, `DetailsEmoteDelay1`, `DetailsEmoteDelay2`, `DetailsEmoteDelay3`, `DetailsEmoteDelay4`,"
+    //                      113                114              115                  116                  117                  118
+                          "`IncompleteEmote`, `CompleteEmote`, `OfferRewardEmote1`, `OfferRewardEmote2`, `OfferRewardEmote3`, `OfferRewardEmote4`,"
+    //                      119                       120                       121                       122
+                          "`OfferRewardEmoteDelay1`, `OfferRewardEmoteDelay2`, `OfferRewardEmoteDelay3`, `OfferRewardEmoteDelay4`,"
+    //                      123            124               125
+                          "`StartScript`, `CompleteScript`, `MaxLevel`"
+                          " FROM `quest_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `quest_template` t2 WHERE t1.`entry`=t2.`entry` && `patch` <= %u)", sWorld.GetWowPatch()));
     if (!result)
     {
         BarGoLink bar(1);
@@ -3766,25 +4666,24 @@ void ObjectMgr::LoadQuests()
     // some quests can have many previous maps set by NextQuestId in previous quest
     // for example set of race quests can lead to single not race specific quest
     BarGoLink bar(result->GetRowCount());
+
     do
     {
         bar.step();
         Field *fields = result->Fetch();
 
-        Quest * newQuest = new Quest(fields);
-        mQuestTemplates[newQuest->GetQuestId()] = newQuest;
+        std::unique_ptr<Quest> newQuest = std::make_unique<Quest>(fields);
+        m_QuestTemplatesMap[newQuest->GetQuestId()] = std::move(newQuest);
     }
     while (result->NextRow());
-
-    delete result;
 
     // Post processing
 
     std::map<uint32, uint32> usedMailTemplates;
 
-    for (QuestMap::iterator iter = mQuestTemplates.begin(); iter != mQuestTemplates.end(); ++iter)
+    for (QuestMap::iterator iter = m_QuestTemplatesMap.begin(); iter != m_QuestTemplatesMap.end(); ++iter)
     {
-        Quest * qinfo = iter->second;
+        const auto& qinfo = iter->second;
 
         // additional quest integrity checks (GO, creature_template and item_template must be loaded already)
 
@@ -4059,7 +4958,7 @@ void ObjectMgr::LoadQuests()
                             sLog.outErrorDb("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE or SPELL_EFFECT_SEND_EVENT for quest %u and ReqCreatureOrGOId%d = 0, but quest not have flag QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT. Quest flags or ReqCreatureOrGOId%d must be fixed, quest modified to enable objective.", spellInfo->Id, qinfo->QuestId, j + 1, j + 1);
 
                             // this will prevent quest completing without objective
-                            const_cast<Quest*>(qinfo)->SetSpecialFlag(QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT);
+                            const_cast<std::unique_ptr<Quest>&>(qinfo)->SetSpecialFlag(QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT);
                         }
                     }
                     else
@@ -4249,6 +5148,7 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->RewMailTemplateId)
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             if (!sMailTemplateStore.LookupEntry(qinfo->RewMailTemplateId))
             {
                 sLog.outErrorDb("Quest %u has `RewMailTemplateId` = %u but mail template  %u does not exist, quest will not have a mail reward.",
@@ -4266,12 +5166,15 @@ void ObjectMgr::LoadQuests()
             }
             else
                 usedMailTemplates[qinfo->RewMailTemplateId] = qinfo->GetQuestId();
+#else
+            qinfo->RewMailTemplateId = 0;
+#endif
         }
 
         if (qinfo->NextQuestInChain)
         {
-            QuestMap::iterator qNextItr = mQuestTemplates.find(qinfo->NextQuestInChain);
-            if (qNextItr == mQuestTemplates.end())
+            QuestMap::iterator qNextItr = m_QuestTemplatesMap.find(qinfo->NextQuestInChain);
+            if (qNextItr == m_QuestTemplatesMap.end())
             {
                 sLog.outErrorDb("Quest %u has `NextQuestInChain` = %u but quest %u does not exist, quest chain will not work.",
                                 qinfo->GetQuestId(), qinfo->NextQuestInChain , qinfo->NextQuestInChain);
@@ -4284,7 +5187,7 @@ void ObjectMgr::LoadQuests()
         // fill additional data stores
         if (qinfo->PrevQuestId)
         {
-            if (mQuestTemplates.find(abs(qinfo->GetPrevQuestId())) == mQuestTemplates.end())
+            if (m_QuestTemplatesMap.find(abs(qinfo->GetPrevQuestId())) == m_QuestTemplatesMap.end())
                 sLog.outErrorDb("Quest %d has PrevQuestId %i, but no such quest", qinfo->GetQuestId(), qinfo->GetPrevQuestId());
             else
                 qinfo->prevQuests.push_back(qinfo->PrevQuestId);
@@ -4292,8 +5195,8 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->NextQuestId)
         {
-            QuestMap::iterator qNextItr = mQuestTemplates.find(abs(qinfo->GetNextQuestId()));
-            if (qNextItr == mQuestTemplates.end())
+            QuestMap::iterator qNextItr = m_QuestTemplatesMap.find(abs(qinfo->GetNextQuestId()));
+            if (qNextItr == m_QuestTemplatesMap.end())
                 sLog.outErrorDb("Quest %d has NextQuestId %i, but no such quest", qinfo->GetQuestId(), qinfo->GetNextQuestId());
             else
             {
@@ -4343,14 +5246,14 @@ void ObjectMgr::LoadQuests()
     }
 
     sLog.outString();
-    sLog.outString(">> Loaded %lu quests definitions", (unsigned long)mQuestTemplates.size());
+    sLog.outString(">> Loaded %lu quests definitions", (unsigned long)m_QuestTemplatesMap.size());
 }
 
 uint32 ObjectMgr::GetQuestStartingItemID(uint32 quest_id) const
 {
-    auto questItemPair = mQuestStartingItems.find(quest_id);
+    auto questItemPair = m_QuestStartingItemsMap.find(quest_id);
 
-    if (questItemPair != mQuestStartingItems.end())
+    if (questItemPair != m_QuestStartingItemsMap.end())
         return questItemPair->second;
 
     return 0;
@@ -4358,28 +5261,27 @@ uint32 ObjectMgr::GetQuestStartingItemID(uint32 quest_id) const
 
 void ObjectMgr::LoadQuestLocales()
 {
-    mQuestLocaleMap.clear();                                // need for reload case
+    m_QuestLocaleMap.clear();                                // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,"
-                          "Title_loc1,Details_loc1,Objectives_loc1,OfferRewardText_loc1,RequestItemsText_loc1,EndText_loc1,ObjectiveText1_loc1,ObjectiveText2_loc1,ObjectiveText3_loc1,ObjectiveText4_loc1,"
-                          "Title_loc2,Details_loc2,Objectives_loc2,OfferRewardText_loc2,RequestItemsText_loc2,EndText_loc2,ObjectiveText1_loc2,ObjectiveText2_loc2,ObjectiveText3_loc2,ObjectiveText4_loc2,"
-                          "Title_loc3,Details_loc3,Objectives_loc3,OfferRewardText_loc3,RequestItemsText_loc3,EndText_loc3,ObjectiveText1_loc3,ObjectiveText2_loc3,ObjectiveText3_loc3,ObjectiveText4_loc3,"
-                          "Title_loc4,Details_loc4,Objectives_loc4,OfferRewardText_loc4,RequestItemsText_loc4,EndText_loc4,ObjectiveText1_loc4,ObjectiveText2_loc4,ObjectiveText3_loc4,ObjectiveText4_loc4,"
-                          "Title_loc5,Details_loc5,Objectives_loc5,OfferRewardText_loc5,RequestItemsText_loc5,EndText_loc5,ObjectiveText1_loc5,ObjectiveText2_loc5,ObjectiveText3_loc5,ObjectiveText4_loc5,"
-                          "Title_loc6,Details_loc6,Objectives_loc6,OfferRewardText_loc6,RequestItemsText_loc6,EndText_loc6,ObjectiveText1_loc6,ObjectiveText2_loc6,ObjectiveText3_loc6,ObjectiveText4_loc6,"
-                          "Title_loc7,Details_loc7,Objectives_loc7,OfferRewardText_loc7,RequestItemsText_loc7,EndText_loc7,ObjectiveText1_loc7,ObjectiveText2_loc7,ObjectiveText3_loc7,ObjectiveText4_loc7,"
-                          "Title_loc8,Details_loc8,Objectives_loc8,OfferRewardText_loc8,RequestItemsText_loc8,EndText_loc8,ObjectiveText1_loc8,ObjectiveText2_loc8,ObjectiveText3_loc8,ObjectiveText4_loc8"
-                          " FROM locales_quest"
-                                             );
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`,"
+                          "`Title_loc1`, `Details_loc1`, `Objectives_loc1`, `OfferRewardText_loc1`, `RequestItemsText_loc1`, `EndText_loc1`, `ObjectiveText1_loc1`, `ObjectiveText2_loc1`, `ObjectiveText3_loc1`, `ObjectiveText4_loc1`,"
+                          "`Title_loc2`, `Details_loc2`, `Objectives_loc2`, `OfferRewardText_loc2`, `RequestItemsText_loc2`, `EndText_loc2`, `ObjectiveText1_loc2`, `ObjectiveText2_loc2`, `ObjectiveText3_loc2`, `ObjectiveText4_loc2`,"
+                          "`Title_loc3`, `Details_loc3`, `Objectives_loc3`, `OfferRewardText_loc3`, `RequestItemsText_loc3`, `EndText_loc3`, `ObjectiveText1_loc3`, `ObjectiveText2_loc3`, `ObjectiveText3_loc3`, `ObjectiveText4_loc3`,"
+                          "`Title_loc4`, `Details_loc4`, `Objectives_loc4`, `OfferRewardText_loc4`, `RequestItemsText_loc4`, `EndText_loc4`, `ObjectiveText1_loc4`, `ObjectiveText2_loc4`, `ObjectiveText3_loc4`, `ObjectiveText4_loc4`,"
+                          "`Title_loc5`, `Details_loc5`, `Objectives_loc5`, `OfferRewardText_loc5`, `RequestItemsText_loc5`, `EndText_loc5`, `ObjectiveText1_loc5`, `ObjectiveText2_loc5`, `ObjectiveText3_loc5`, `ObjectiveText4_loc5`,"
+                          "`Title_loc6`, `Details_loc6`, `Objectives_loc6`, `OfferRewardText_loc6`, `RequestItemsText_loc6`, `EndText_loc6`, `ObjectiveText1_loc6`, `ObjectiveText2_loc6`, `ObjectiveText3_loc6`, `ObjectiveText4_loc6`,"
+                          "`Title_loc7`, `Details_loc7`, `Objectives_loc7`, `OfferRewardText_loc7`, `RequestItemsText_loc7`, `EndText_loc7`, `ObjectiveText1_loc7`, `ObjectiveText2_loc7`, `ObjectiveText3_loc7`, `ObjectiveText4_loc7`,"
+                          "`Title_loc8`, `Details_loc8`, `Objectives_loc8`, `OfferRewardText_loc8`, `RequestItemsText_loc8`, `EndText_loc8`, `ObjectiveText1_loc8`, `ObjectiveText2_loc8`, `ObjectiveText3_loc8`, `ObjectiveText4_loc8`"
+                          " FROM `locales_quest`"
+                                             ));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
-        sLog.outString(">> Loaded 0 Quest locale strings. DB table `locales_quest` is empty.");
+        sLog.outString(">> Loaded 0 quest locale strings. DB table `locales_quest` is empty.");
         return;
     }
 
@@ -4387,8 +5289,8 @@ void ObjectMgr::LoadQuestLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -4398,7 +5300,7 @@ void ObjectMgr::LoadQuestLocales()
             continue;
         }
 
-        QuestLocale& data = mQuestLocaleMap[entry];
+        QuestLocale& data = m_QuestLocaleMap[entry];
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -4493,15 +5395,13 @@ void ObjectMgr::LoadQuestLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu Quest locale strings", (unsigned long)mQuestLocaleMap.size());
+    sLog.outString(">> Loaded %lu quest locale strings", (unsigned long)m_QuestLocaleMap.size());
 }
 
 void ObjectMgr::LoadPetCreateSpells()
 {
-    QueryResult *result = WorldDatabase.Query("SELECT entry, Spell1, Spell2, Spell3, Spell4 FROM petcreateinfo_spell");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `spell1`, `spell2`, `spell3`, `spell4` FROM `petcreateinfo_spell`"));
     if (!result)
     {
         BarGoLink bar(1);
@@ -4509,20 +5409,17 @@ void ObjectMgr::LoadPetCreateSpells()
 
         sLog.outString();
         sLog.outString(">> Loaded 0 pet create spells");
-        //sLog.outErrorDb("`petcreateinfo_spell` table is empty!");
         return;
     }
 
     uint32 count = 0;
-
     BarGoLink bar(result->GetRowCount());
-
-    mPetCreateSpell.clear();
+    m_PetCreateSpellMap.clear();
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 creature_id = fields[0].GetUInt32();
 
@@ -4539,7 +5436,7 @@ void ObjectMgr::LoadPetCreateSpells()
             continue;
         }
 
-        if (CreatureSpellDataEntry const* petSpellEntry = cInfo->PetSpellDataId ? sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId) : NULL)
+        if (CreatureSpellDataEntry const* petSpellEntry = cInfo->PetSpellDataId ? sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId) : nullptr)
         {
             sLog.outErrorDb("Creature id %u listed in `petcreateinfo_spell` have set `PetSpellDataId` field and will use its instead, skip.", creature_id);
             continue;
@@ -4578,12 +5475,10 @@ void ObjectMgr::LoadPetCreateSpells()
         if (!have_spell)
             continue;
 
-        mPetCreateSpell[creature_id] = PetCreateSpell;
+        m_PetCreateSpellMap[creature_id] = PetCreateSpell;
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     // cache spell->learn spell map for use in next loop
     std::map<uint32, uint32> learnCache;
@@ -4610,7 +5505,7 @@ void ObjectMgr::LoadPetCreateSpells()
         if (!cInfo)
             continue;
 
-        CreatureSpellDataEntry const* petSpellEntry = cInfo->PetSpellDataId ? sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId) : NULL;
+        CreatureSpellDataEntry const* petSpellEntry = cInfo->PetSpellDataId ? sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId) : nullptr;
         if (!petSpellEntry)
             continue;
 
@@ -4629,7 +5524,7 @@ void ObjectMgr::LoadPetCreateSpells()
             PetCreateSpell.spellid[i] = petspell_id;
         }
 
-        mPetCreateSpell[cr_id] = PetCreateSpell;
+        m_PetCreateSpellMap[cr_id] = PetCreateSpell;
         ++dcount;
     }
 
@@ -4639,7 +5534,7 @@ void ObjectMgr::LoadPetCreateSpells()
 
 void ObjectMgr::LoadItemTexts()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT id, text FROM item_text");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `text` FROM `item_text`"));
 
     uint32 count = 0;
 
@@ -4655,21 +5550,17 @@ void ObjectMgr::LoadItemTexts()
 
     BarGoLink bar(result->GetRowCount());
 
-    Field* fields;
     do
     {
         bar.step();
+        Field* fields = result->Fetch();
 
-        fields = result->Fetch();
-
-        mItemTexts[ fields[0].GetUInt32() ] = fields[1].GetCppString();
+        m_ItemTextsMap[ fields[0].GetUInt32() ] = fields[1].GetCppString();
 
         ++count;
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u item texts", count);
@@ -4719,14 +5610,13 @@ void ObjectMgr::LoadPageTexts()
 
 void ObjectMgr::LoadPageTextLocales()
 {
-    mPageTextLocaleMap.clear();                             // need for reload case
+    m_PageTextLocaleMap.clear();                             // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,text_loc1,text_loc2,text_loc3,text_loc4,text_loc5,text_loc6,text_loc7,text_loc8 FROM locales_page_text");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_loc1`, `text_loc2`, `text_loc3`, `text_loc4`, `text_loc5`, `text_loc6`, `text_loc7`, `text_loc8` FROM `locales_page_text`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -4738,8 +5628,8 @@ void ObjectMgr::LoadPageTextLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -4749,7 +5639,7 @@ void ObjectMgr::LoadPageTextLocales()
             continue;
         }
 
-        PageTextLocale& data = mPageTextLocaleMap[entry];
+        PageTextLocale& data = m_PageTextLocaleMap[entry];
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -4770,10 +5660,8 @@ void ObjectMgr::LoadPageTextLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu PageText locale strings", (unsigned long)mPageTextLocaleMap.size());
+    sLog.outString(">> Loaded %lu PageText locale strings", (unsigned long)m_PageTextLocaleMap.size());
 }
 
 struct SQLMapLoader : public SQLStorageLoaderBase<SQLMapLoader, SQLStorage>
@@ -4859,12 +5747,12 @@ struct SQLWorldLoader : public SQLStorageLoaderBase<SQLWorldLoader, SQLStorage>
 
 void ObjectMgr::LoadNPCText()
 {
-    mNpcTextMap.clear();                           // need for reload case
+    m_NpcTextMap.clear();                           // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT ID, "
-        "Probability0, Probability1, Probability2, Probability3, Probability4, Probability5, Probability6, Probability7, "
-        "BroadcastTextID0, BroadcastTextID1, BroadcastTextID2, BroadcastTextID3, BroadcastTextID4, BroadcastTextID5, BroadcastTextID6, BroadcastTextID7"
-        " FROM npc_text");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `ID`, "
+        "`Probability0`, `Probability1`, `Probability2`, `Probability3`, `Probability4`, `Probability5`, `Probability6`, `Probability7`, "
+        "`BroadcastTextID0`, `BroadcastTextID1`, `BroadcastTextID2`, `BroadcastTextID3`, `BroadcastTextID4`, `BroadcastTextID5`, `BroadcastTextID6`, `BroadcastTextID7`"
+        " FROM `npc_text`"));
 
     int count = 0;
     if (!result)
@@ -4882,10 +5770,8 @@ void ObjectMgr::LoadNPCText()
     do
     {
         ++count;
-
-        Field *fields = result->Fetch();
-
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 textID = fields[0].GetUInt32();
         if (!textID)
@@ -4894,7 +5780,7 @@ void ObjectMgr::LoadNPCText()
             continue;
         }
 
-        NpcText& npcText = mNpcTextMap[textID];
+        NpcText& npcText = m_NpcTextMap[textID];
 
         for (uint8 i = 0; i < MAX_NPC_TEXT_OPTIONS; ++i)
         {
@@ -4927,7 +5813,6 @@ void ObjectMgr::LoadNPCText()
 
     sLog.outString();
     sLog.outString(">> Loaded %u npc texts", count);
-    delete result;
 }
 
 class SingleMailReturner
@@ -4957,24 +5842,24 @@ public:
                 // mail open and then not returned
                 if (item_guid)
                 {
-                    CharacterDatabase.PExecute("DELETE FROM item_instance WHERE guid = '%u'", item_guid);
-                    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE mail_id = '%u'", messageID);
+                    CharacterDatabase.PExecute("DELETE FROM `item_instance` WHERE `guid` = '%u'", item_guid);
+                    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `mail_id` = '%u'", messageID);
                 }
                 if (itemTextId)
-                    CharacterDatabase.PExecute("DELETE FROM item_text WHERE id = '%u'", itemTextId);
+                    CharacterDatabase.PExecute("DELETE FROM `item_text` WHERE `id` = '%u'", itemTextId);
 
-                CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", messageID);
+                CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `id` = '%u'", messageID);
             }
             else                // Return to sender
             {
                 // mail will be returned:
-                CharacterDatabase.PExecute("UPDATE mail SET sender = '%u', receiver = '%u', expire_time = '" UI64FMTD "', deliver_time = '" UI64FMTD "',cod = '0', checked = '%u' WHERE id = '%u'",
+                CharacterDatabase.PExecute("UPDATE `mail` SET `sender` = '%u', `receiver` = '%u', `expire_time` = '" UI64FMTD "', `deliver_time` = '" UI64FMTD "', `cod` = '0', `checked` = '%u' WHERE `id` = '%u'",
                                            receiverGuid.GetCounter(), returnToLowGuid, (uint64)(basetime + 30 * DAY), (uint64)basetime, MAIL_CHECK_MASK_RETURNED, messageID);
                 if (item_guid)
                 {
                     // update receiver in mail items for its proper delivery, and in instance_item for avoid lost item at sender delete
-                    CharacterDatabase.PExecute("UPDATE mail_items SET receiver = %u WHERE item_guid = '%u'", returnToLowGuid, item_guid);
-                    CharacterDatabase.PExecute("UPDATE item_instance SET owner_guid = %u WHERE guid = '%u'", returnToLowGuid, item_guid);
+                    CharacterDatabase.PExecute("UPDATE `mail_items` SET `receiver` = %u WHERE `item_guid` = '%u'", returnToLowGuid, item_guid);
+                    CharacterDatabase.PExecute("UPDATE `item_instance` SET `owner_guid` = %u WHERE `guid` = '%u'", returnToLowGuid, item_guid);
                 }
             }
         }
@@ -4995,8 +5880,6 @@ public:
             sObjectMgr.ResetOldMailCounter();
             if (!serverUp)
             {
-                BarGoLink bar(1);
-                bar.step();
                 sLog.outString();
                 sLog.outString(">> Only expired mails (need to be return or delete) or DB table `mail` is empty.");
             }
@@ -5004,15 +5887,12 @@ public:
             return;                                             // any mails need to be returned or deleted
         }
 
-        BarGoLink bar(result->GetRowCount());
         uint32 skippedCount = 0;
-        Field *fields;
 
         do
         {
-            bar.step();
+            Field * fields = result->Fetch();
 
-            fields = result->Fetch();
             Mail *m = new Mail;
             m->messageID = fields[0].GetUInt32();
             m->messageType = fields[1].GetUInt8();
@@ -5047,17 +5927,17 @@ public:
                 returner->receiverGuid = m->receiverGuid;
                 returner->itemTextId = m->itemTextId;
                 returner->messageID = m->messageID;
-                CharacterDatabase.AsyncPQueryUnsafe(returner, &SingleMailReturner::Callback, "SELECT item_guid FROM mail_items WHERE mail_id='%u'", m->messageID);
+                CharacterDatabase.AsyncPQueryUnsafe(returner, &SingleMailReturner::Callback, "SELECT `item_guid` FROM `mail_items` WHERE `mail_id`='%u'", m->messageID);
                 delete m;
                 continue;
             }
 
             if (m->itemTextId)
-                CharacterDatabase.PExecute("DELETE FROM item_text WHERE id = '%u'", m->itemTextId);
+                CharacterDatabase.PExecute("DELETE FROM `item_text` WHERE `id` = '%u'", m->itemTextId);
 
             // deletemail = true;
             // delmails << m->messageID << ", ";
-            CharacterDatabase.PExecute("DELETE FROM mail WHERE id = '%u'", m->messageID);
+            CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `id` = '%u'", m->messageID);
             delete m;
             
         }
@@ -5071,81 +5951,67 @@ public:
 //not very fast function but it is called only once a day, or on starting-up
 void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 {
-    time_t basetime = time(NULL);
+    time_t basetime = time(nullptr);
     DEBUG_LOG("Returning mails current time: hour: %d, minute: %d, second: %d ", localtime(&basetime)->tm_hour, localtime(&basetime)->tm_min, localtime(&basetime)->tm_sec);
     //delete all old mails without item and without body immediately, if starting server
     if (!serverUp)
-        CharacterDatabase.PExecute("DELETE FROM mail WHERE expire_time < '" UI64FMTD "' AND has_items = '0' AND itemTextId = 0", (uint64)basetime);
+        CharacterDatabase.PExecute("DELETE FROM `mail` WHERE `expire_time` < '" UI64FMTD "' AND `has_items` = '0' AND `itemTextId` = 0", (uint64)basetime);
     OldMailsReturner* cb = new OldMailsReturner();
     cb->serverUp = serverUp;
     cb->basetime = basetime;
     uint32 limit = serverUp ? 5 : 1000;
-    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT id,messageType,sender,receiver,itemTextId,has_items,expire_time,cod,checked,mailTemplateId FROM mail WHERE expire_time < '" UI64FMTD "' ORDER BY expire_time LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
+    CharacterDatabase.AsyncPQueryUnsafe(cb, &OldMailsReturner::Callback, "SELECT `id`, `messageType`, `sender`, `receiver`, `itemTextId`, `has_items`, `expire_time`, `cod`, `checked`, `mailTemplateId` FROM `mail` WHERE `expire_time` < '" UI64FMTD "' ORDER BY `expire_time` LIMIT %u,%u", (uint64)basetime, m_OldMailCounter, limit);
 }
 
 void ObjectMgr::LoadAreaTriggers()
 {
-    sLog.outString("Loading area triggers ...");
-
-    // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM areatrigger_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `areatrigger_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 area triggers. DB table `areatrigger_template` is empty.");
         return;
     }
 
-    auto fields = result->Fetch();
-    uint32 maxAreaTriggerEntry = fields[0].GetUInt32() + 1;
-    delete result;
-
-    // Actually loading the area triggers.
-    result = WorldDatabase.PQuery("SELECT * FROM areatrigger_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 area triggers. DB table `areatrigger_template` is empty.");
-        return;
-    }
-
-    mAreaTriggers.resize(maxAreaTriggerEntry);
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        auto fields = result->Fetch();
 
-        std::unique_ptr<AreaTriggerEntry> areaTrigger = std::make_unique<AreaTriggerEntry>();
+        AreaTriggerEntry areaTrigger;
 
         uint32 triggerId = fields[0].GetUInt32();
 
-        areaTrigger->id = triggerId;
-        areaTrigger->mapid = fields[2].GetUInt32();
-        areaTrigger->x = fields[3].GetFloat();
-        areaTrigger->y = fields[4].GetFloat();
-        areaTrigger->z = fields[5].GetFloat();
-        areaTrigger->radius = fields[6].GetFloat();
-        areaTrigger->box_x = fields[7].GetFloat();
-        areaTrigger->box_y = fields[8].GetFloat();
-        areaTrigger->box_z = fields[9].GetFloat();
-        areaTrigger->box_orientation = fields[10].GetFloat();
+        areaTrigger.id = triggerId;
+        areaTrigger.mapid = fields[2].GetUInt32();
+        areaTrigger.x = fields[3].GetFloat();
+        areaTrigger.y = fields[4].GetFloat();
+        areaTrigger.z = fields[5].GetFloat();
+        areaTrigger.radius = fields[6].GetFloat();
+        areaTrigger.box_x = fields[7].GetFloat();
+        areaTrigger.box_y = fields[8].GetFloat();
+        areaTrigger.box_z = fields[9].GetFloat();
+        areaTrigger.box_orientation = fields[10].GetFloat();
 
 
-        mAreaTriggers[triggerId] = std::move(areaTrigger);
+        m_AreaTriggersMap[triggerId] = areaTrigger;
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %u area triggers.", maxAreaTriggerEntry);
+    sLog.outString(">> Loaded %u area triggers.", (uint32)m_AreaTriggersMap.size());
 }
 
 void ObjectMgr::LoadQuestAreaTriggers()
 {
-    mQuestAreaTriggerMap.clear();                           // need for reload case
+    m_QuestAreaTriggerMap.clear();                           // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT id,quest FROM areatrigger_involvedrelation");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `quest` FROM `areatrigger_involvedrelation`"));
 
     uint32 count = 0;
 
@@ -5165,7 +6031,6 @@ void ObjectMgr::LoadQuestAreaTriggers()
     {
         ++count;
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 trigger_ID = fields[0].GetUInt32();
@@ -5196,12 +6061,10 @@ void ObjectMgr::LoadQuestAreaTriggers()
             // continue; - quest modified to required objective and trigger can be allowed.
         }
 
-        mQuestAreaTriggerMap[trigger_ID] = quest_ID;
+        m_QuestAreaTriggerMap[trigger_ID] = quest_ID;
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u quest trigger points", count);
@@ -5209,9 +6072,9 @@ void ObjectMgr::LoadQuestAreaTriggers()
 
 void ObjectMgr::LoadTavernAreaTriggers()
 {
-    mTavernAreaTriggerSet.clear();                          // need for reload case
+    m_TavernAreaTriggerSet.clear();                          // need for reload case
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id FROM areatrigger_tavern WHERE patch_min <= %u", sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id` FROM `areatrigger_tavern` WHERE `patch_min` <= %u", sWorld.GetWowPatch()));
 
     uint32 count = 0;
 
@@ -5231,7 +6094,6 @@ void ObjectMgr::LoadTavernAreaTriggers()
     {
         ++count;
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 Trigger_ID      = fields[0].GetUInt32();
@@ -5243,11 +6105,9 @@ void ObjectMgr::LoadTavernAreaTriggers()
             continue;
         }
 
-        mTavernAreaTriggerSet.insert(Trigger_ID);
+        m_TavernAreaTriggerSet.insert(Trigger_ID);
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u tavern triggers", count);
@@ -5255,17 +6115,16 @@ void ObjectMgr::LoadTavernAreaTriggers()
 
 void ObjectMgr::LoadBattlegroundEntranceTriggers()
 {
-    mBGEntranceTriggers.clear();                                  // need for reload case
+    m_BGEntranceTriggersMap.clear();                                  // need for reload case
 
     uint32 count = 0;
 
-    //                                                0   1     2            3         4                5                6                7
-    QueryResult *result = WorldDatabase.Query("SELECT id, team, bg_template, exit_map, exit_position_x, exit_position_y, exit_position_z, exit_orientation FROM areatrigger_bg_entrance");
+    //                                                               0     1       2              3           4                  5                  6                  7
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `team`, `bg_template`, `exit_map`, `exit_position_x`, `exit_position_y`, `exit_position_z`, `exit_orientation` FROM `areatrigger_bg_entrance`"));
     if (!result)
     {
 
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -5277,11 +6136,9 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
 
     do
     {
-        Field *fields = result->Fetch();
-
-        bar.step();
-
         ++count;
+        bar.step();
+        Field *fields = result->Fetch();
 
         uint32 Trigger_ID = fields[0].GetUInt32();
 
@@ -5331,12 +6188,9 @@ void ObjectMgr::LoadBattlegroundEntranceTriggers()
             continue;
         }
 
-        mBGEntranceTriggers[Trigger_ID] = bget;
-
+        m_BGEntranceTriggersMap[Trigger_ID] = bget;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u battleground entrance area trigger definitions", count);
@@ -5445,9 +6299,9 @@ uint32 ObjectMgr::GetTaxiMountDisplayId(uint32 id, Team team, bool allowed_alt_t
 
 void ObjectMgr::LoadGraveyardZones()
 {
-    mGraveYardMap.clear();                                  // need for reload case
+    m_GraveYardMap.clear();                                  // need for reload case
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id, ghost_zone, faction FROM game_graveyard_zone WHERE build_min <= %u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `ghost_zone`, `faction` FROM `game_graveyard_zone` WHERE `build_min` <= %u", SUPPORTED_CLIENT_BUILD));
 
     uint32 count = 0;
 
@@ -5467,7 +6321,6 @@ void ObjectMgr::LoadGraveyardZones()
     {
         ++count;
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 safeLocId = fields[0].GetUInt32();
@@ -5505,8 +6358,6 @@ void ObjectMgr::LoadGraveyardZones()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u graveyard-zone links", count);
 }
@@ -5523,7 +6374,7 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
     //     then check faction
     //   if mapId != graveyard.mapId (ghost in instance) and search any graveyard associated
     //     then check faction
-    GraveYardMapBounds bounds = mGraveYardMap.equal_range(zoneId);
+    GraveYardMapBounds bounds = m_GraveYardMap.equal_range(zoneId);
 
     if (bounds.first == bounds.second)
         return nullptr;
@@ -5623,7 +6474,7 @@ WorldSafeLocsEntry const *ObjectMgr::GetClosestGraveYard(float x, float y, float
 
 GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId) const
 {
-    GraveYardMapBounds bounds = mGraveYardMap.equal_range(zoneId);
+    GraveYardMapBounds bounds = m_GraveYardMap.equal_range(zoneId);
 
     for (GraveYardMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
     {
@@ -5631,7 +6482,7 @@ GraveYardData const* ObjectMgr::FindGraveYardData(uint32 id, uint32 zoneId) cons
             return &itr->second;
     }
 
-    return NULL;
+    return nullptr;
 }
 
 bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
@@ -5644,12 +6495,12 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
     data.safeLocId = id;
     data.team = team;
 
-    mGraveYardMap.insert(GraveYardMap::value_type(zoneId, data));
+    m_GraveYardMap.insert(GraveYardMap::value_type(zoneId, data));
 
     // add link to DB
     if (inDB)
     {
-        WorldDatabase.PExecuteLog("INSERT INTO game_graveyard_zone ( id,ghost_zone,faction) "
+        WorldDatabase.PExecuteLog("INSERT INTO `game_graveyard_zone` (`id`, `ghost_zone`, `faction`) "
                                   "VALUES ('%u', '%u','%u')", id, zoneId, uint32(team));
     }
 
@@ -5658,23 +6509,23 @@ bool ObjectMgr::AddGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
 
 void ObjectMgr::LoadAreaTriggerTeleports()
 {
-    mAreaTriggerTeleports.clear();                                  // need for reload case
+    m_AreaTriggerTeleportMap.clear();                                  // need for reload case
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery(
-        //      0   1               2              3               4                    5
-        "SELECT id, required_level, required_item, required_item2, required_quest_done, required_failed_text, "
-        //  6                    7                     8           9                  10            11
-        "target_map, target_position_x, target_position_y, target_position_z, target_orientation, required_event, "
-        //  12                  13
-        "required_pvp_rank, required_team "
-        "FROM areatrigger_teleport t1 WHERE patch=(SELECT max(patch) FROM areatrigger_teleport t2 WHERE t1.id=t2.id && patch <= %u)", sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery(
+    //           0     1                 2                3                 4                      5
+        "SELECT `id`, `required_level`, `required_item`, `required_item2`, `required_quest_done`, `required_failed_text`, "
+    //    6             7                    8                    9                    10                    11
+        "`target_map`, `target_position_x`, `target_position_y`, `target_position_z`, `target_orientation`, `required_event`, "
+    //    12                   13
+        "`required_pvp_rank`, `required_team` "
+        "FROM `areatrigger_teleport` t1 WHERE `patch`=(SELECT max(`patch`) FROM `areatrigger_teleport` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
+    
     if (!result)
     {
 
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -5686,11 +6537,9 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
     do
     {
-        Field *fields = result->Fetch();
-
-        bar.step();
-
         ++count;
+        bar.step();
+        Field *fields = result->Fetch();
 
         uint32 Trigger_ID = fields[0].GetUInt32();
 
@@ -5747,8 +6596,8 @@ void ObjectMgr::LoadAreaTriggerTeleports()
 
         if (at.requiredQuest)
         {
-            QuestMap::iterator qReqItr = mQuestTemplates.find(at.requiredQuest);
-            if (qReqItr == mQuestTemplates.end())
+            QuestMap::iterator qReqItr = m_QuestTemplatesMap.find(at.requiredQuest);
+            if (qReqItr == m_QuestTemplatesMap.end())
             {
                 sLog.outErrorDb("Table `areatrigger_teleport` has nonexistent required quest %u for trigger %u, remove quest done requirement.", at.requiredQuest, Trigger_ID);
                 at.requiredQuest = 0;
@@ -5768,12 +6617,10 @@ void ObjectMgr::LoadAreaTriggerTeleports()
             continue;
         }
 
-        mAreaTriggerTeleports[Trigger_ID] = at;
+        m_AreaTriggerTeleportMap[Trigger_ID] = at;
 
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u area trigger teleport definitions", count);
@@ -5788,7 +6635,7 @@ AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
     if (!mapEntry || !mapEntry->IsDungeon())
         return nullptr;
 
-    for (AreaTriggerTeleportMap::const_iterator itr = mAreaTriggerTeleports.begin(); itr != mAreaTriggerTeleports.end(); ++itr)
+    for (AreaTriggerTeleportMap::const_iterator itr = m_AreaTriggerTeleportMap.begin(); itr != m_AreaTriggerTeleportMap.end(); ++itr)
     {
         if (itr->second.target_mapId == uint32(mapEntry->ghostEntranceMap))
         {
@@ -5805,7 +6652,7 @@ AreaTriggerTeleport const* ObjectMgr::GetGoBackTrigger(uint32 map_id) const
  */
 AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
 {
-    for (AreaTriggerTeleportMap::const_iterator itr = mAreaTriggerTeleports.begin(); itr != mAreaTriggerTeleports.end(); ++itr)
+    for (AreaTriggerTeleportMap::const_iterator itr = m_AreaTriggerTeleportMap.begin(); itr != m_AreaTriggerTeleportMap.end(); ++itr)
     {
         if (itr->second.target_mapId == Map)
         {
@@ -5814,7 +6661,7 @@ AreaTriggerTeleport const* ObjectMgr::GetMapEntranceTrigger(uint32 Map) const
                 return &itr->second;
         }
     }
-    return NULL;
+    return nullptr;
 }
 
 void ObjectMgr::PackGroupIds()
@@ -5827,7 +6674,7 @@ void ObjectMgr::PackGroupIds()
     // all valid ids are in the instance table
     // any associations to ids not in this table are assumed to be
     // cleaned already in CleanupInstances
-    QueryResult *result = CharacterDatabase.Query("SELECT groupId FROM groups ORDER BY groupId ASC");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `groupId` FROM `groups` ORDER BY `groupId` ASC"));
     if (result)
     {
         do
@@ -5839,8 +6686,8 @@ void ObjectMgr::PackGroupIds()
             if (id == 0)
             {
                 CharacterDatabase.BeginTransaction();
-                CharacterDatabase.PExecute("DELETE FROM groups WHERE groupId = '%u'", id);
-                CharacterDatabase.PExecute("DELETE FROM group_member WHERE groupId = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM `groups` WHERE `groupId` = '%u'", id);
+                CharacterDatabase.PExecute("DELETE FROM `group_member` WHERE `groupId` = '%u'", id);
                 CharacterDatabase.CommitTransaction();
                 continue;
             }
@@ -5848,7 +6695,6 @@ void ObjectMgr::PackGroupIds()
             groupIds.insert(id);
         }
         while (result->NextRow());
-        delete result;
     }
 
     BarGoLink bar(groupIds.size() + 1);
@@ -5862,8 +6708,8 @@ void ObjectMgr::PackGroupIds()
         {
             // remap group id
             CharacterDatabase.BeginTransaction();
-            CharacterDatabase.PExecute("UPDATE groups SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
-            CharacterDatabase.PExecute("UPDATE group_member SET groupId = '%u' WHERE groupId = '%u'", groupId, *i);
+            CharacterDatabase.PExecute("UPDATE `groups` SET `groupId` = '%u' WHERE `groupId` = '%u'", groupId, *i);
+            CharacterDatabase.PExecute("UPDATE `group_member` SET `groupId` = '%u' WHERE `groupId` = '%u'", groupId, *i);
             CharacterDatabase.CommitTransaction();
         }
 
@@ -5873,48 +6719,36 @@ void ObjectMgr::PackGroupIds()
 
     m_GroupIds.Set(groupId);
 
-    sLog.outString(">> Group Ids remapped, next group id is %u", groupId);
     sLog.outString();
+    sLog.outString(">> Group Ids remapped, next group id is %u", groupId);
 }
 
 void ObjectMgr::SetHighestGuids()
 {
-    QueryResult *result = CharacterDatabase.Query("SELECT MAX(guid) FROM characters");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `characters`"));
     if (result)
-    {
         m_CharGuids.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM creature");
+    result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `creature`"));
     if (result)
-    {
         m_FirstTemporaryCreatureGuid = (*result)[0].GetUInt32() + 1;
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM item_instance");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `item_instance`"));
     if (result)
-    {
         m_ItemGuids.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
     // Cleanup other tables from nonexistent guids (>=m_hiItemGuid)
     CharacterDatabase.BeginTransaction();
-    CharacterDatabase.PExecute("DELETE FROM character_inventory WHERE item >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.PExecute("DELETE FROM mail_items WHERE item_guid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
-    CharacterDatabase.PExecute("DELETE FROM auction WHERE itemguid >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `character_inventory` WHERE `item` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `mail_items` WHERE `item_guid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
+    CharacterDatabase.PExecute("DELETE FROM `auction` WHERE `itemguid` >= '%u'", m_ItemGuids.GetNextAfterMaxUsed());
     CharacterDatabase.CommitTransaction();
 
-    result = WorldDatabase.Query("SELECT MAX(guid) FROM gameobject");
+    result.reset(WorldDatabase.Query("SELECT MAX(`guid`) FROM `gameobject`"));
     if (result)
-    {
         m_FirstTemporaryGameObjectGuid = (*result)[0].GetUInt32() + 1;
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT id FROM auction");
+    result.reset(CharacterDatabase.Query("SELECT `id` FROM `auction`"));
     if (result)
     {
         do
@@ -5922,51 +6756,32 @@ void ObjectMgr::SetHighestGuids()
             Field* fields = result->Fetch();
             m_AuctionsIds.insert(fields[0].GetUInt32());
         } while (result->NextRow());
-        delete result;
     }
     m_NextAuctionId = 1;
 
-    result = CharacterDatabase.Query("SELECT MAX(id) FROM mail");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`id`) FROM `mail`"));
     if (result)
-    {
         m_MailIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(id) FROM item_text");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`id`) FROM `item_text`"));
     if (result)
-    {
         m_ItemTextIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(guid) FROM corpse");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guid`) FROM `corpse`"));
     if (result)
-    {
         m_CorpseGuids.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(guildid) FROM guild");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`guildid`) FROM `guild`"));
     if (result)
-    {
         m_GuildIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(groupId) FROM groups");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`groupId`) FROM `groups`"));
     if (result)
-    {
         m_GroupIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
-    result = CharacterDatabase.Query("SELECT MAX(petitionguid) FROM petition");
+    result.reset(CharacterDatabase.Query("SELECT MAX(`petitionguid`) FROM `petition`"));
     if (result)
-    {
         m_PetitionIds.Set((*result)[0].GetUInt32() + 1);
-        delete result;
-    }
 
     // setup reserved ranges for static guids spawn
     m_StaticCreatureGuids.Set(m_FirstTemporaryCreatureGuid);
@@ -5980,27 +6795,25 @@ uint32 ObjectMgr::CreateItemText(std::string text)
 {
     uint32 newItemTextId = GenerateItemTextID();
     //insert new itempage to container
-    mItemTexts[ newItemTextId ] = text;
+    m_ItemTextsMap[ newItemTextId ] = text;
     //save new itempage
     CharacterDatabase.escape_string(text);
     //any Delete query needed, itemTextId is maximum of all ids
     std::ostringstream query;
-    query << "INSERT INTO item_text (id,text) VALUES ( '" << newItemTextId << "', '" << text << "')";
+    query << "INSERT INTO `item_text` (`id`, `text`) VALUES ( '" << newItemTextId << "', '" << text << "')";
     CharacterDatabase.Execute(query.str().c_str());         //needs to be run this way, because mail body may be more than 1024 characters
     return newItemTextId;
 }
 
 void ObjectMgr::LoadGameObjectLocales()
 {
-    mGameObjectLocaleMap.clear();                           // need for reload case
+    m_GameObjectLocaleMap.clear();                           // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,"
-                          "name_loc1,name_loc2,name_loc3,name_loc4,name_loc5,name_loc6,name_loc7,name_loc8 FROM locales_gameobject");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `name_loc1`, `name_loc2`, `name_loc3`, `name_loc4`, `name_loc5`, `name_loc6`, `name_loc7`, `name_loc8` FROM `locales_gameobject`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6012,8 +6825,8 @@ void ObjectMgr::LoadGameObjectLocales()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 entry = fields[0].GetUInt32();
 
@@ -6023,7 +6836,7 @@ void ObjectMgr::LoadGameObjectLocales()
             continue;
         }
 
-        GameObjectLocale& data = mGameObjectLocaleMap[entry];
+        GameObjectLocale& data = m_GameObjectLocaleMap[entry];
 
         for (int i = 1; i < MAX_LOCALE; ++i)
         {
@@ -6044,10 +6857,8 @@ void ObjectMgr::LoadGameObjectLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %lu gameobject locale strings", (unsigned long)mGameObjectLocaleMap.size());
+    sLog.outString(">> Loaded %lu gameobject locale strings", (unsigned long)m_GameObjectLocaleMap.size());
 }
 
 struct SQLGameObjectLoader : public SQLStorageLoaderBase<SQLGameObjectLoader, SQLHashStorage>
@@ -6294,13 +7105,12 @@ void ObjectMgr::CheckGameObjectInfos()
 void ObjectMgr::LoadGameobjectsRequirements()
 {
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT guid, reqType, reqGuid FROM gameobject_requirement");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `guid`, `reqType`, `reqGuid` FROM `gameobject_requirement`"));
     _gobjRequirements.clear();
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6313,8 +7123,8 @@ void ObjectMgr::LoadGameobjectsRequirements()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
+
         uint32 guid = fields[0].GetUInt32();
         if (!GetGOData(guid))
         {
@@ -6355,7 +7165,6 @@ void ObjectMgr::LoadGameobjectsRequirements()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u GameObjects requirements", count);
@@ -6366,18 +7175,17 @@ GameObjectUseRequirement const* ObjectMgr::GetGameObjectUseRequirement(ObjectGui
     std::map<uint32, GameObjectUseRequirement>::const_iterator it = _gobjRequirements.find(guid.GetCounter());
     if (it != _gobjRequirements.end())
         return &it->second;
-    return NULL;
+    return nullptr;
 }
 
 void ObjectMgr::LoadExplorationBaseXP()
 {
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT level,basexp FROM exploration_basexp");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `level`, `basexp` FROM `exploration_basexp`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6389,17 +7197,15 @@ void ObjectMgr::LoadExplorationBaseXP()
 
     do
     {
+        ++count;
         bar.step();
-
         Field *fields = result->Fetch();
+
         uint32 level  = fields[0].GetUInt32();
         uint32 basexp = fields[1].GetUInt32();
-        mBaseXPTable[level] = basexp;
-        ++count;
+        m_BaseXPMap[level] = basexp;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u BaseXP definitions", count);
@@ -6407,26 +7213,26 @@ void ObjectMgr::LoadExplorationBaseXP()
 
 uint32 ObjectMgr::GetBaseXP(uint32 level) const
 {
-    BaseXPMap::const_iterator itr = mBaseXPTable.find(level);
-    return itr != mBaseXPTable.end() ? itr->second : 0;
+    BaseXPMap::const_iterator itr = m_BaseXPMap.find(level);
+    return itr != m_BaseXPMap.end() ? itr->second : 0;
 }
 
 uint32 ObjectMgr::GetXPForLevel(uint32 level) const
 {
-    if (level < mPlayerXPperLevel.size())
-        return mPlayerXPperLevel[level];
-    return 0;
+    if (m_PlayerXPperLevel.empty())
+        return 0;
+
+    return m_PlayerXPperLevel[std::min(level, uint32(m_PlayerXPperLevel.size() - 1))];
 }
 
 void ObjectMgr::LoadPetNames()
 {
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT word,entry,half FROM pet_name_generation");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `word`, `entry`, `half` FROM `pet_name_generation`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6438,20 +7244,19 @@ void ObjectMgr::LoadPetNames()
 
     do
     {
+        ++count;
         bar.step();
-
         Field *fields = result->Fetch();
+
         std::string word = fields[0].GetString();
         uint32 entry     = fields[1].GetUInt32();
         bool   half      = fields[2].GetBool();
         if (half)
-            PetHalfName1[entry].push_back(word);
+            m_PetHalfNameMap1[entry].push_back(word);
         else
-            PetHalfName0[entry].push_back(word);
-        ++count;
+            m_PetHalfNameMap0[entry].push_back(word);
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u pet name parts", count);
@@ -6470,8 +7275,8 @@ uint32 ObjectMgr::GeneratePetNumber()
 
 std::string ObjectMgr::GeneratePetName(uint32 entry)
 {
-    std::vector<std::string> & list0 = PetHalfName0[entry];
-    std::vector<std::string> & list1 = PetHalfName1[entry];
+    std::vector<std::string> & list0 = m_PetHalfNameMap0[entry];
+    std::vector<std::string> & list1 = m_PetHalfNameMap1[entry];
 
     if (list0.empty() || list1.empty())
     {
@@ -6488,17 +7293,16 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
 void ObjectMgr::LoadCorpses()
 {
     uint32 count = 0;
-    //                                                    0            1       2                  3                  4                  5                   6
-    QueryResult *result = CharacterDatabase.Query("SELECT corpse.guid, player, corpse.position_x, corpse.position_y, corpse.position_z, corpse.orientation, corpse.map, "
-                          //   7     8            9     10      11    12     13           14            15              16       17
-                          "time, corpse_type, instance, gender, race, class, playerBytes, playerBytes2, equipmentCache, guildId, playerFlags FROM corpse "
-                          "JOIN characters ON player = characters.guid "
-                          "LEFT JOIN guild_member ON player=guild_member.guid WHERE corpse_type <> 0");
+    //                                                                            0       1                  2                      3                      4                      5                       6
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `corpse`.`guid`, `player`, `corpse`.`position_x`, `corpse`.`position_y`, `corpse`.`position_z`, `corpse`.`orientation`, `corpse`.`map`, "
+    //                      7       8              9           10        11      12       13             14              15                16         17
+                          "`time`, `corpse_type`, `instance`, `gender`, `race`, `class`, `playerBytes`, `playerBytes2`, `equipmentCache`, `guildId`, `playerFlags` FROM `corpse` "
+                          "JOIN `characters` ON `player` = `characters`.`guid` "
+                          "LEFT JOIN `guild_member` ON `player`=`guild_member`.`guid` WHERE `corpse_type` <> 0"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6511,7 +7315,6 @@ void ObjectMgr::LoadCorpses()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 guid = fields[0].GetUInt32();
@@ -6528,7 +7331,6 @@ void ObjectMgr::LoadCorpses()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u corpses", count);
@@ -6536,135 +7338,121 @@ void ObjectMgr::LoadCorpses()
 
 void ObjectMgr::LoadFactions()
 {
-    sLog.outString("Loading factions ...");
-
-    // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM faction WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
     {
-        sLog.outString(">> Loaded 0 factions. DB table `faction` is empty.");
-        return;
+        m_FactionsMap.clear();
+        sLog.outString("Loading factions ...");
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString();
+            sLog.outString(">> Loaded 0 factions. DB table `faction` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            FactionEntry faction;
+
+            uint32 factionId = fields[0].GetUInt32();
+
+            faction.ID = factionId;
+            faction.reputationListID = fields[2].GetInt32();
+            faction.BaseRepRaceMask[0] = fields[3].GetUInt32();
+            faction.BaseRepRaceMask[1] = fields[4].GetUInt32();
+            faction.BaseRepRaceMask[2] = fields[5].GetUInt32();
+            faction.BaseRepRaceMask[3] = fields[6].GetUInt32();
+            faction.BaseRepClassMask[0] = fields[7].GetUInt32();
+            faction.BaseRepClassMask[1] = fields[8].GetUInt32();
+            faction.BaseRepClassMask[2] = fields[9].GetUInt32();
+            faction.BaseRepClassMask[3] = fields[10].GetUInt32();
+            faction.BaseRepValue[0] = fields[11].GetInt32();
+            faction.BaseRepValue[1] = fields[12].GetInt32();
+            faction.BaseRepValue[2] = fields[13].GetInt32();
+            faction.BaseRepValue[3] = fields[14].GetInt32();
+            faction.ReputationFlags[0] = fields[15].GetUInt32();
+            faction.ReputationFlags[1] = fields[16].GetUInt32();
+            faction.ReputationFlags[2] = fields[17].GetUInt32();
+            faction.ReputationFlags[3] = fields[18].GetUInt32();
+            faction.team = fields[19].GetUInt32();
+            faction.name[0] = new char[strlen(fields[20].GetString()) + 1];
+            strcpy(faction.name[0], fields[20].GetString());
+            faction.name[1] = new char[strlen(fields[21].GetString()) + 1];
+            strcpy(faction.name[1], fields[21].GetString());
+            faction.name[2] = new char[strlen(fields[22].GetString()) + 1];
+            strcpy(faction.name[2], fields[22].GetString());
+            faction.name[3] = new char[strlen(fields[23].GetString()) + 1];
+            strcpy(faction.name[3], fields[23].GetString());
+            faction.name[4] = new char[strlen(fields[24].GetString()) + 1];
+            strcpy(faction.name[4], fields[24].GetString());
+            faction.name[5] = new char[strlen(fields[25].GetString()) + 1];
+            strcpy(faction.name[5], fields[25].GetString());
+            faction.name[6] = new char[strlen(fields[26].GetString()) + 1];
+            strcpy(faction.name[6], fields[26].GetString());
+            faction.name[7] = new char[strlen(fields[27].GetString()) + 1];
+            strcpy(faction.name[7], fields[27].GetString());
+
+            m_FactionsMap[factionId] = faction;
+
+        } while (result->NextRow());
     }
-    auto fields = result->Fetch();
-    uint32 maxFactionEntry = fields[0].GetUInt32() + 1;
-    delete result;
-
-    // Actually loading the factions.
-    result = WorldDatabase.PQuery("SELECT * FROM faction WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 factions. DB table `faction` is empty.");
-        return;
-    }
-
-    mFactions.resize(maxFactionEntry);
-
-    do
-    {
-        fields = result->Fetch();
-
-        std::unique_ptr<FactionEntry> faction = std::make_unique<FactionEntry>();
-
-        uint32 factionId = fields[0].GetUInt32();
-
-        faction->ID = factionId;
-        faction->reputationListID = fields[2].GetInt32();
-        faction->BaseRepRaceMask[0] = fields[3].GetUInt32();
-        faction->BaseRepRaceMask[1] = fields[4].GetUInt32();
-        faction->BaseRepRaceMask[2] = fields[5].GetUInt32();
-        faction->BaseRepRaceMask[3] = fields[6].GetUInt32();
-        faction->BaseRepClassMask[0] = fields[7].GetUInt32();
-        faction->BaseRepClassMask[1] = fields[8].GetUInt32();
-        faction->BaseRepClassMask[2] = fields[9].GetUInt32();
-        faction->BaseRepClassMask[3] = fields[10].GetUInt32();
-        faction->BaseRepValue[0] = fields[11].GetInt32();
-        faction->BaseRepValue[1] = fields[12].GetInt32();
-        faction->BaseRepValue[2] = fields[13].GetInt32();
-        faction->BaseRepValue[3] = fields[14].GetInt32();
-        faction->ReputationFlags[0] = fields[15].GetUInt32();
-        faction->ReputationFlags[1] = fields[16].GetUInt32();
-        faction->ReputationFlags[2] = fields[17].GetUInt32();
-        faction->ReputationFlags[3] = fields[18].GetUInt32();
-        faction->team = fields[19].GetUInt32();
-        faction->name[0] = new char[strlen(fields[20].GetString()) + 1];
-        strcpy(faction->name[0], fields[20].GetString());
-        faction->name[1] = new char[strlen(fields[21].GetString()) + 1];
-        strcpy(faction->name[1], fields[21].GetString());
-        faction->name[2] = new char[strlen(fields[22].GetString()) + 1];
-        strcpy(faction->name[2], fields[22].GetString());
-        faction->name[3] = new char[strlen(fields[23].GetString()) + 1];
-        strcpy(faction->name[3], fields[23].GetString());
-        faction->name[4] = new char[strlen(fields[24].GetString()) + 1];
-        strcpy(faction->name[4], fields[24].GetString());
-        faction->name[5] = new char[strlen(fields[25].GetString()) + 1];
-        strcpy(faction->name[5], fields[25].GetString());
-        faction->name[6] = new char[strlen(fields[26].GetString()) + 1];
-        strcpy(faction->name[6], fields[26].GetString());
-        faction->name[7] = new char[strlen(fields[27].GetString()) + 1];
-        strcpy(faction->name[7], fields[27].GetString());
-
-        mFactions[factionId] = std::move(faction);
-
-    } while (result->NextRow());
-
-    delete result;
-
-    // Getting the maximum ID.
-    result = WorldDatabase.PQuery("SELECT MAX(ID) FROM faction_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 faction templates. DB table `faction_template` is empty.");
-        return;
-    }
-    fields = result->Fetch();
-    uint32 maxFactionTemplateEntry = fields[0].GetUInt32() + 1;
-    delete result;
-
-    // Actually loading the faction templates.
-    result = WorldDatabase.PQuery("SELECT * FROM faction_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
-
-    if (!result)
-    {
-        sLog.outString(">> Loaded 0 faction templates. DB table `faction_template` is empty.");
-        return;
-    }
-
-    mFactionTemplates.resize(maxFactionTemplateEntry);
-
-    do
-    {
-        fields = result->Fetch();
-
-        std::unique_ptr<FactionTemplateEntry> faction = std::make_unique<FactionTemplateEntry>();
-
-        uint32 factionId = fields[0].GetUInt32();
-
-        faction->ID = factionId;
-        faction->faction = fields[2].GetUInt32();
-        faction->factionFlags = fields[3].GetUInt32();
-        faction->ourMask = fields[4].GetUInt32();
-        faction->friendlyMask = fields[5].GetUInt32();
-        faction->hostileMask = fields[6].GetUInt32();
-        faction->enemyFaction[0] = fields[7].GetUInt32();
-        faction->enemyFaction[1] = fields[8].GetUInt32();
-        faction->enemyFaction[2] = fields[9].GetUInt32();
-        faction->enemyFaction[3] = fields[10].GetUInt32();
-        faction->friendFaction[0] = fields[11].GetInt32();
-        faction->friendFaction[1] = fields[12].GetInt32();
-        faction->friendFaction[2] = fields[13].GetInt32();
-        faction->friendFaction[3] = fields[14].GetInt32();
-
-        mFactionTemplates[factionId] = std::move(faction);
-
-    } while (result->NextRow());
-
-    delete result;
-
+    sLog.outString(">> Loaded %u factions.", m_FactionsMap.size());
     sLog.outString();
-    sLog.outString(">> Loaded %u factions and %u faction templates.", maxFactionEntry, maxFactionTemplateEntry);
+    {
+        m_FactionTemplatesMap.clear();
+        sLog.outString("Loading faction tamplates ...");
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+
+        if (!result)
+        {
+            BarGoLink bar(1);
+            bar.step();
+
+            sLog.outString();
+            sLog.outString(">> Loaded 0 faction templates. DB table `faction_template` is empty.");
+            return;
+        }
+
+        BarGoLink bar(result->GetRowCount());
+
+        do
+        {
+            bar.step();
+            auto fields = result->Fetch();
+
+            FactionTemplateEntry faction;
+
+            uint32 factionId = fields[0].GetUInt32();
+
+            faction.ID = factionId;
+            faction.faction = fields[2].GetUInt32();
+            faction.factionFlags = fields[3].GetUInt32();
+            faction.ourMask = fields[4].GetUInt32();
+            faction.friendlyMask = fields[5].GetUInt32();
+            faction.hostileMask = fields[6].GetUInt32();
+            faction.enemyFaction[0] = fields[7].GetUInt32();
+            faction.enemyFaction[1] = fields[8].GetUInt32();
+            faction.enemyFaction[2] = fields[9].GetUInt32();
+            faction.enemyFaction[3] = fields[10].GetUInt32();
+            faction.friendFaction[0] = fields[11].GetInt32();
+            faction.friendFaction[1] = fields[12].GetInt32();
+            faction.friendFaction[2] = fields[13].GetInt32();
+            faction.friendFaction[3] = fields[14].GetInt32();
+
+            m_FactionTemplatesMap[factionId] = faction;
+
+        } while (result->NextRow());
+    }
+    sLog.outString(">> Loaded %u faction templates.", m_FactionTemplatesMap.size());
+    sLog.outString();
 }
 
 void ObjectMgr::LoadReputationRewardRate()
@@ -6672,12 +7460,11 @@ void ObjectMgr::LoadReputationRewardRate()
     m_RepRewardRateMap.clear();                             // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT faction, quest_rate, creature_rate, spell_rate FROM reputation_reward_rate");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `faction`, `quest_rate`, `creature_rate`, `spell_rate` FROM `reputation_reward_rate`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6690,7 +7477,6 @@ void ObjectMgr::LoadReputationRewardRate()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 factionId        = fields[0].GetUInt32();
@@ -6732,8 +7518,6 @@ void ObjectMgr::LoadReputationRewardRate()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u reputation_reward_rate", count);
 }
@@ -6742,16 +7526,15 @@ void ObjectMgr::LoadReputationOnKill()
 {
     uint32 count = 0;
 
-    //                                                0            1                     2
-    QueryResult *result = WorldDatabase.Query("SELECT creature_id, RewOnKillRepFaction1, RewOnKillRepFaction2,"
-                          //   3             4             5                   6             7             8                   9
-                          "IsTeamAward1, MaxStanding1, RewOnKillRepValue1, IsTeamAward2, MaxStanding2, RewOnKillRepValue2, TeamDependent "
-                          "FROM creature_onkill_reputation");
+    //                                                               0              1                       2
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`,"
+    //                      3               4               5                     6               7               8                     9
+                          "`IsTeamAward1`, `MaxStanding1`, `RewOnKillRepValue1`, `IsTeamAward2`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent` "
+                          "FROM `creature_onkill_reputation`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6763,8 +7546,8 @@ void ObjectMgr::LoadReputationOnKill()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 creature_id = fields[0].GetUInt32();
 
@@ -6806,13 +7589,11 @@ void ObjectMgr::LoadReputationOnKill()
             }
         }
 
-        mRepOnKill[creature_id] = repOnKill;
+        m_RepOnKillMap[creature_id] = repOnKill;
 
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u creature award reputation definitions", count);
@@ -6823,12 +7604,11 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     m_RepSpilloverTemplateMap.clear();                      // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT faction, faction1, rate_1, rank_1, faction2, rate_2, rank_2, faction3, rate_3, rank_3, faction4, rate_4, rank_4 FROM reputation_spillover_template");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `faction`, `faction1`, `rate_1`, `rank_1`, `faction2`, `rate_2`, `rank_2`, `faction3`, `rate_3`, `rank_3`, `faction4`, `rate_4`, `rank_4` FROM `reputation_spillover_template`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6841,7 +7621,6 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 factionId                = fields[0].GetUInt32();
@@ -6926,25 +7705,22 @@ void ObjectMgr::LoadReputationSpilloverTemplate()
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u reputation_spillover_template", count);
 }
 
 void ObjectMgr::LoadPointsOfInterest()
 {
-    mPointsOfInterest.clear();                              // need for reload case
+    m_PointsOfInterestMap.clear();                              // need for reload case
 
     uint32 count = 0;
 
-    //                                                0      1  2  3      4     5
-    QueryResult *result = WorldDatabase.Query("SELECT entry, x, y, icon, flags, data, icon_name FROM points_of_interest");
+    //                                                               0        1    2    3       4        5       6
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `x`, `y`, `icon`, `flags`, `data`, `icon_name` FROM `points_of_interest`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -6956,8 +7732,8 @@ void ObjectMgr::LoadPointsOfInterest()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 point_id = fields[0].GetUInt32();
 
@@ -6975,13 +7751,11 @@ void ObjectMgr::LoadPointsOfInterest()
             continue;
         }
 
-        mPointsOfInterest[point_id] = POI;
+        m_PointsOfInterestMap[point_id] = POI;
 
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u Points of Interest definitions", count);
@@ -6994,7 +7768,7 @@ void ObjectMgr::DeleteCreatureData(uint32 guid)
     if (data)
         RemoveCreatureFromGrid(guid, data);
 
-    mCreatureDataMap.erase(guid);
+    m_CreatureDataMap.erase(guid);
 }
 
 void ObjectMgr::DeleteGOData(uint32 guid)
@@ -7004,21 +7778,21 @@ void ObjectMgr::DeleteGOData(uint32 guid)
     if (data)
         RemoveGameobjectFromGrid(guid, data);
 
-    mGameObjectDataMap.erase(guid);
+    m_GameObjectDataMap.erase(guid);
 }
 
 void ObjectMgr::AddCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid, uint32 instance)
 {
     // corpses are always added to spawn mode 0 and they are spawned by their instance id
-    std::unique_lock<std::mutex> lock(mMapObjectGuids_lock);
-    CellObjectGuids& cell_guids = mMapObjectGuids[mapid][cellid];
+    std::unique_lock<std::mutex> lock(m_MapObjectGuids_lock);
+    CellObjectGuids& cell_guids = m_MapObjectGuids[mapid][cellid];
     cell_guids.corpses[player_guid] = instance;
 }
 
 void ObjectMgr::DeleteCorpseCellData(uint32 mapid, uint32 cellid, uint32 player_guid)
 {
     // corpses are always added to spawn mode 0 and they are spawned by their instance id
-    CellObjectGuids& cell_guids = mMapObjectGuids[mapid][cellid];
+    CellObjectGuids& cell_guids = m_MapObjectGuids[mapid][cellid];
     cell_guids.corpses.erase(player_guid);
 }
 
@@ -7028,12 +7802,11 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT id,quest FROM %s WHERE %u BETWEEN patch_min AND patch_max", table, sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `quest` FROM %s WHERE %u BETWEEN `patch_min` AND `patch_max`", table, sWorld.GetWowPatch()));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7045,13 +7818,13 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 id    = fields[0].GetUInt32();
         uint32 quest = fields[1].GetUInt32();
 
-        if (mQuestTemplates.find(quest) == mQuestTemplates.end())
+        if (m_QuestTemplatesMap.find(quest) == m_QuestTemplatesMap.end())
         {
             sLog.outErrorDb("Table `%s: Quest %u listed for entry %u does not exist.", table, quest, id);
             continue;
@@ -7062,8 +7835,6 @@ void ObjectMgr::LoadQuestRelationsHelper(QuestRelationsMap& map, char const* tab
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u quest relations from %s", count, table);
@@ -7127,34 +7898,41 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
 
 void ObjectMgr::LoadTaxiNodes()
 {
-    sLog.outString("Loading taxi nodes ...");
-
     // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.PQuery("SELECT MAX(ID) FROM taxi_nodes WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT MAX(`id`) FROM `taxi_nodes` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 taxi nodes. DB table `taxi_nodes` is empty.");
         return;
     }
 
     auto fields = result->Fetch();
     uint32 maxTaxiNodeEntry = fields[0].GetUInt32() + 1;
-    delete result;
 
     // Actually loading the taxi nodes.
-    result = WorldDatabase.PQuery("SELECT * FROM taxi_nodes WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `taxi_nodes` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 taxi nodes. DB table `taxi_nodes` is empty.");
         return;
     }
 
+    BarGoLink bar(result->GetRowCount());
     m_TaxiNodes.resize(maxTaxiNodeEntry);
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         std::unique_ptr<TaxiNodesEntry> taxiNode = std::make_unique<TaxiNodesEntry>();
@@ -7181,8 +7959,6 @@ void ObjectMgr::LoadTaxiNodes()
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u taxi nodes.", maxTaxiNodeEntry);
 }
@@ -7193,7 +7969,7 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
     uint32 count = 0;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT inPath, outPath, inNode, outNode FROM taxi_path_transitions WHERE build_min <= %u", SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `in_path`, `out_path`, `in_node`, `out_node` FROM `taxi_path_transitions` WHERE `build_min` <= %u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -7209,8 +7985,8 @@ void ObjectMgr::LoadTaxiPathTransitions()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 inPath = fields[0].GetUInt32();
         uint32 outPath = fields[1].GetUInt32();
@@ -7260,8 +8036,6 @@ void ObjectMgr::LoadTaxiPathTransitions()
         ++count;
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u taxi path transitions", count);
 }
@@ -7270,7 +8044,7 @@ void ObjectMgr::LoadReservedPlayersNames()
 {
     m_ReservedNames.clear();                                // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT name FROM reserved_name");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `name` FROM `reserved_name`"));
 
     uint32 count = 0;
 
@@ -7286,13 +8060,12 @@ void ObjectMgr::LoadReservedPlayersNames()
 
     BarGoLink bar(result->GetRowCount());
 
-    Field* fields;
     do
     {
         bar.step();
-        fields = result->Fetch();
-        std::string name = fields[0].GetCppString();
+        Field* fields = result->Fetch();
 
+        std::string name = fields[0].GetCppString();
         std::wstring wstr;
         if (!Utf8toWStr(name, wstr))
         {
@@ -7306,8 +8079,6 @@ void ObjectMgr::LoadReservedPlayersNames()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u reserved player names", count);
@@ -7490,12 +8261,13 @@ int ObjectMgr::GetOrNewIndexForLocale(LocaleConstant loc)
 
 void ObjectMgr::LoadGameObjectForQuests()
 {
-    mGameObjectForQuestSet.clear();                         // need for reload case
+    m_GameObjectForQuestSet.clear();                         // need for reload case
 
     if (!sGOStorage.GetMaxEntry())
     {
         BarGoLink bar(1);
         bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded 0 GameObjects for quests");
         return;
@@ -7516,7 +8288,7 @@ void ObjectMgr::LoadGameObjectForQuests()
                 if (m_GOQuestRelations.find(itr->id) != m_GOQuestRelations.end() ||
                         m_GOQuestInvolvedRelations.find(itr->id) != m_GOQuestInvolvedRelations.end())
                 {
-                    mGameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(itr->id);
                     ++count;
                 }
 
@@ -7530,7 +8302,7 @@ void ObjectMgr::LoadGameObjectForQuests()
                 // always activate to quest, GO may not have loot, OR find if GO has loot for quest.
                 if (itr->chest.questId || LootTemplates_Gameobject.HaveQuestLootFor(loot_id))
                 {
-                    mGameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(itr->id);
                     ++count;
                 }
                 break;
@@ -7539,7 +8311,7 @@ void ObjectMgr::LoadGameObjectForQuests()
             {
                 if (itr->_generic.questID)               // quest related objects, has visual effects
                 {
-                    mGameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(itr->id);
                     count++;
                 }
                 break;
@@ -7548,7 +8320,7 @@ void ObjectMgr::LoadGameObjectForQuests()
             {
                 if (itr->spellFocus.questID)             // quest related objects, has visual effect
                 {
-                    mGameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(itr->id);
                     count++;
                 }
                 break;
@@ -7557,7 +8329,7 @@ void ObjectMgr::LoadGameObjectForQuests()
             {
                 if (itr->goober.questId)                 //quests objects
                 {
-                    mGameObjectForQuestSet.insert(itr->id);
+                    m_GameObjectForQuestSet.insert(itr->id);
                     count++;
                 }
                 break;
@@ -7573,33 +8345,38 @@ void ObjectMgr::LoadGameObjectForQuests()
 
 void ObjectMgr::LoadSkillLineAbility()
 {
-    sLog.outString("Loading skill line abilities ...");
-
     // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM skill_line_ability");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`id`) FROM `skill_line_ability`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 skill line abilities. DB table `skill_line_ability` is empty.");
         return;
     }
     auto fields = result->Fetch();
     uint32 maxSkillLineAbilityId = fields[0].GetUInt32() + 1;
-    delete result;
 
     // Actually loading the sounds.
-    result = WorldDatabase.Query("SELECT * FROM skill_line_ability");
+    result.reset(WorldDatabase.Query("SELECT * FROM skill_line_ability"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 skill line abilities. DB table `skill_line_ability` is empty.");
         return;
     }
 
-    mSkillLineAbilities.resize(maxSkillLineAbilityId);
+    BarGoLink bar(result->GetRowCount());
+    m_SkillLineAbilities.resize(maxSkillLineAbilityId);
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         std::unique_ptr<SkillLineAbilityEntry> skill = std::make_unique<SkillLineAbilityEntry>();
@@ -7617,11 +8394,9 @@ void ObjectMgr::LoadSkillLineAbility()
         skill->min_value = fields[10].GetUInt32();
         skill->reqtrainpoints = fields[11].GetUInt32();
 
-        mSkillLineAbilities[id] = std::move(skill);
+        m_SkillLineAbilities[id] = std::move(skill);
 
     } while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u skill line abilities.", maxSkillLineAbilityId);
@@ -7629,67 +8404,60 @@ void ObjectMgr::LoadSkillLineAbility()
 
 void ObjectMgr::LoadSoundEntries()
 {
-    sLog.outString("Loading sounds ...");
-
-    // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM sound_entries");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT * FROM `sound_entries`"));
 
     if (!result)
     {
-        sLog.outString(">> Loaded 0 sounds. DB table `sound_entries` is empty.");
-        return;
-    }
-    auto fields = result->Fetch();
-    uint32 maxSoundEntry = fields[0].GetUInt32() + 1;
-    delete result;
+        BarGoLink bar(1);
+        bar.step();
 
-    // Actually loading the sounds.
-    result = WorldDatabase.Query("SELECT * FROM sound_entries");
-
-    if (!result)
-    {
         sLog.outString(">> Loaded 0 sounds. DB table `sound_entries` is empty.");
         return;
     }
 
-    mSoundEntries.resize(maxSoundEntry);
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
-        fields = result->Fetch();
+        bar.step();
+        auto fields = result->Fetch();
 
-        std::unique_ptr<SoundEntriesEntry> sound = std::make_unique<SoundEntriesEntry>();
+        SoundEntriesEntry sound;
         uint32 soundId = fields[0].GetUInt32();
 
-        sound->Id = soundId;
-        sound->Name = fields[1].GetCppString();
+        sound.Id = soundId;
+        sound.Name = fields[1].GetCppString();
 
-        mSoundEntries[soundId] = std::move(sound);
+        m_SoundEntriesMap[soundId] = sound;
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
-    sLog.outString(">> Loaded %u sound entries.", maxSoundEntry);
+    sLog.outString(">> Loaded %u sound entries.", (uint32)m_SoundEntriesMap.size());
 }
 
 void ObjectMgr::LoadBroadcastTexts()
 {
-    mBroadcastTextLocaleMap.clear(); // for reload case
+    m_BroadcastTextLocaleMap.clear(); // for reload case
 
-                                 //                    0     1         2         3      4        5        6         7         8          9            10           11
-    QueryResult *result = WorldDatabase.Query("SELECT ID, MaleText, FemaleText, Sound, Type, Language, EmoteId0, EmoteId1, EmoteId2, EmoteDelay0, EmoteDelay1, EmoteDelay2 FROM broadcast_text");
+    //                                                               0     1           2             3        4       5           6           7           8           9              10             11
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `ID`, `MaleText`, `FemaleText`, `Sound`, `Type`, `Language`, `EmoteId0`, `EmoteId1`, `EmoteId2`, `EmoteDelay0`, `EmoteDelay1`, `EmoteDelay2` FROM `broadcast_text`"));
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 broadcast texts. DB table `broadcast_text` is empty.");
         return;
     }
 
-    mBroadcastTextLocaleMap.rehash(result->GetRowCount());
+    m_BroadcastTextLocaleMap.rehash(result->GetRowCount());
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field* fields = result->Fetch();
 
         BroadcastText bct;
@@ -7766,41 +8534,45 @@ void ObjectMgr::LoadBroadcastTexts()
             }
         }
 
-        mBroadcastTextLocaleMap[bct.Id] = bct;
+        m_BroadcastTextLocaleMap[bct.Id] = bct;
     } while (result->NextRow());
 
-    sLog.outString(">> Loaded %lu broadcast texts.", (unsigned long)mBroadcastTextLocaleMap.size());
     sLog.outString();
-    delete result;
+    sLog.outString(">> Loaded %lu broadcast texts.", (uint32)m_BroadcastTextLocaleMap.size());
 }
 
 void ObjectMgr::LoadBroadcastTextLocales()
 {
-    //                                                 0        1              2              3              4              5              6              7              8              9                10               11               12               13               14               15               16
-    QueryResult *result = WorldDatabase.Query("SELECT Id, MaleText_loc1, MaleText_loc2, MaleText_loc3, MaleText_loc4, MaleText_loc5, MaleText_loc6, MaleText_loc7, MaleText_loc8, FemaleText_loc1, FemaleText_loc2, FemaleText_loc3, FemaleText_loc4, FemaleText_loc5, FemaleText_loc6, FemaleText_loc7, FemaleText_loc8 FROM locales_broadcast_text");
+    //                                                               0     1                2                3                4                5                6                7                8                9                  10                 11                 12                 13                 14                 15                 16
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Id`, `MaleText_loc1`, `MaleText_loc2`, `MaleText_loc3`, `MaleText_loc4`, `MaleText_loc5`, `MaleText_loc6`, `MaleText_loc7`, `MaleText_loc8`, `FemaleText_loc1`, `FemaleText_loc2`, `FemaleText_loc3`, `FemaleText_loc4`, `FemaleText_loc5`, `FemaleText_loc6`, `FemaleText_loc7`, `FemaleText_loc8` FROM `locales_broadcast_text`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString(">> Loaded 0 broadcast text locales. DB table `locales_broadcast_text` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field* fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
-        BroadcastTextLocaleMap::iterator bct = mBroadcastTextLocaleMap.find(id);
+        BroadcastTextLocaleMap::iterator bct = m_BroadcastTextLocaleMap.find(id);
 
-        if (bct == mBroadcastTextLocaleMap.end())
+        if (bct == m_BroadcastTextLocaleMap.end())
         {
             sLog.outErrorDb("BroadcastText (Id: %u) in table `locales_broadcast_text` does not exist. Skipped!", id);
             continue;
         }
 
-        BroadcastText& data = mBroadcastTextLocaleMap[id];
+        BroadcastText& data = m_BroadcastTextLocaleMap[id];
 
         // Load MaleText
         for (int i = 1; i < MAX_LOCALE; ++i)
@@ -7857,7 +8629,6 @@ void ObjectMgr::LoadBroadcastTextLocales()
 
     sLog.outString();
     sLog.outString(">> Loaded %u broadcast text locales.", count);
-    delete result;
 }
 
 const char *ObjectMgr::GetBroadcastText(uint32 id, int locale_index, uint8 gender, bool forceGender) const
@@ -7912,20 +8683,19 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     }
 
     // cleanup affected map part for reloading case
-    for (MangosStringLocaleMap::iterator itr = mMangosStringLocaleMap.begin(); itr != mMangosStringLocaleMap.end();)
+    for (MangosStringLocaleMap::iterator itr = m_MangosStringLocaleMap.begin(); itr != m_MangosStringLocaleMap.end();)
     {
         if (itr->first >= start_value && itr->first < end_value)
-            mMangosStringLocaleMap.erase(itr++);
+            m_MangosStringLocaleMap.erase(itr++);
         else
             ++itr;
     }
 
-    QueryResult *result = db.PQuery("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8 %s FROM %s", extra_content ? ",sound,type,language,emote" : "", table);
+    std::unique_ptr<QueryResult> result(db.PQuery("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` %s FROM %s", extra_content ? ", `sound`, `type`, `language`, `emote`" : "", table));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -7937,13 +8707,12 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     }
 
     uint32 count = 0;
-
     BarGoLink bar(result->GetRowCount());
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         int32 entry = fields[0].GetInt32();
 
@@ -7958,7 +8727,7 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
             continue;
         }
 
-        MangosStringLocale& data = mMangosStringLocaleMap[entry];
+        MangosStringLocale& data = m_MangosStringLocaleMap[entry];
 
         if (data.Content.size() > 0)
         {
@@ -8025,8 +8794,6 @@ bool ObjectMgr::LoadMangosStrings(DatabaseType& db, char const* table, int32 min
     }
     while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     if (min_value == MIN_MANGOS_STRING_ID)
         sLog.outString(">> Loaded %u MaNGOS strings from table %s", count, table);
@@ -8058,21 +8825,28 @@ const char *ObjectMgr::GetMangosString(int32 entry, int locale_idx) const
 bool ObjectMgr::LoadQuestGreetings()
 {
     for (uint32 i = 0; i < QUESTGIVER_TYPE_MAX; i++)
-        mQuestGreetingLocaleMap[i].clear(); // need for reload case
+        m_QuestGreetingLocaleMap[i].clear(); // need for reload case
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,type,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8,Emote,EmoteDelay FROM quest_greeting");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `type`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8`, `Emote`, `EmoteDelay` FROM `quest_greeting`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 quest greetings. DB table `quest_greeting` is empty.");
         return false;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
+
         uint32 entry = fields[0].GetUInt32();
         uint8 type = fields[1].GetUInt8();
 
@@ -8103,7 +8877,7 @@ bool ObjectMgr::LoadQuestGreetings()
             }
         }
 
-        QuestGreetingLocale& data = mQuestGreetingLocaleMap[type][entry];
+        QuestGreetingLocale& data = m_QuestGreetingLocaleMap[type][entry];
 
         data.Content.resize(1);
         ++count;
@@ -8138,8 +8912,6 @@ bool ObjectMgr::LoadQuestGreetings()
         }
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u quest greetings.", count);
 
@@ -8148,20 +8920,26 @@ bool ObjectMgr::LoadQuestGreetings()
 
 bool ObjectMgr::LoadTrainerGreetings()
 {
-    mTrainerGreetingLocaleMap.clear();
+    m_TrainerGreetingLocaleMap.clear();
 
-    QueryResult *result = WorldDatabase.Query("SELECT entry,content_default,content_loc1,content_loc2,content_loc3,content_loc4,content_loc5,content_loc6,content_loc7,content_loc8 FROM npc_trainer_greeting");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `content_default`, `content_loc1`, `content_loc2`, `content_loc3`, `content_loc4`, `content_loc5`, `content_loc6`, `content_loc7`, `content_loc8` FROM `npc_trainer_greeting`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 npc trainer greetings. DB table `npc_trainer_greeting` is empty.");
         return false;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
         uint32 entry = fields[0].GetUInt32();
 
@@ -8172,7 +8950,7 @@ bool ObjectMgr::LoadTrainerGreetings()
             continue;
         }
 
-        TrainerGreetingLocale& data = mTrainerGreetingLocaleMap[entry];
+        TrainerGreetingLocale& data = m_TrainerGreetingLocaleMap[entry];
 
         data.Content.resize(1);
         ++count;
@@ -8199,8 +8977,6 @@ bool ObjectMgr::LoadTrainerGreetings()
 
     } while (result->NextRow());
 
-    delete result;
-
     sLog.outString();
     sLog.outString(">> Loaded %u trainer greetings.", count);
 
@@ -8209,15 +8985,14 @@ bool ObjectMgr::LoadTrainerGreetings()
 
 void ObjectMgr::LoadFishingBaseSkillLevel()
 {
-    mFishingBaseForArea.clear();                            // for reload case
+    m_FishingBaseSkillMap.clear();                            // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT entry,skill FROM skill_fishing_base_level");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `skill` FROM `skill_fishing_base_level`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8230,8 +9005,8 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
+
         uint32 entry  = fields[0].GetUInt32();
         int32 skill   = fields[1].GetInt32();
 
@@ -8242,12 +9017,10 @@ void ObjectMgr::LoadFishingBaseSkillLevel()
             continue;
         }
 
-        mFishingBaseForArea[entry] = skill;
+        m_FishingBaseSkillMap[entry] = skill;
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u areas for fishing base skill level", count);
@@ -8291,12 +9064,11 @@ void ObjectMgr::LoadGameTele()
     m_GameTeleMap.clear();                                  // for reload case
 
     uint32 count = 0;
-    QueryResult *result = WorldDatabase.Query("SELECT id, position_x, position_y, position_z, orientation, map, name FROM game_tele");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name` FROM `game_tele`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8309,11 +9081,9 @@ void ObjectMgr::LoadGameTele()
     do
     {
         bar.step();
-
         Field *fields = result->Fetch();
 
         uint32 id         = fields[0].GetUInt32();
-
         GameTele gt;
 
         gt.position_x     = fields[1].GetFloat();
@@ -8342,7 +9112,6 @@ void ObjectMgr::LoadGameTele()
         ++count;
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u GameTeleports", count);
@@ -8353,17 +9122,17 @@ GameTele const* ObjectMgr::GetGameTele(const std::string& name) const
     // explicit name case
     std::wstring wname;
     if (!Utf8toWStr(name, wname))
-        return NULL;
+        return nullptr;
 
     // converting string that we try to find to lower case
     wstrToLower(wname);
 
     // Alternative first GameTele what contains wnameLow as substring in case no GameTele location found
-    const GameTele* alt = NULL;
+    const GameTele* alt = nullptr;
     for (GameTeleMap::const_iterator itr = m_GameTeleMap.begin(); itr != m_GameTeleMap.end(); ++itr)
         if (itr->second.wnameLow == wname)
             return &itr->second;
-        else if (alt == NULL && itr->second.wnameLow.find(wname) != std::wstring::npos)
+        else if (alt == nullptr && itr->second.wnameLow.find(wname) != std::wstring::npos)
             alt = &itr->second;
 
     return alt;
@@ -8387,7 +9156,7 @@ bool ObjectMgr::AddGameTele(GameTele& tele)
 
     m_GameTeleMap[new_id] = tele;
 
-    return WorldDatabase.PExecuteLog("INSERT INTO game_tele (id,position_x,position_y,position_z,orientation,map,name) VALUES (%u,%f,%f,%f,%f,%u,'%s')",
+    return WorldDatabase.PExecuteLog("INSERT INTO `game_tele` (`id`, `position_x`, `position_y`, `position_z`, `orientation`, `map`, `name`) VALUES (%u,%f,%f,%f,%f,%u,'%s')",
                                      new_id, tele.position_x, tele.position_y, tele.position_z, tele.orientation, tele.mapId, tele.name.c_str());
 }
 
@@ -8405,7 +9174,7 @@ bool ObjectMgr::DeleteGameTele(const std::string& name)
     {
         if (itr->second.wnameLow == wname)
         {
-            WorldDatabase.PExecuteLog("DELETE FROM game_tele WHERE name = '%s'", itr->second.name.c_str());
+            WorldDatabase.PExecuteLog("DELETE FROM `game_tele` WHERE `name` = '%s'", itr->second.name.c_str());
             m_GameTeleMap.erase(itr);
             return true;
         }
@@ -8416,7 +9185,7 @@ bool ObjectMgr::DeleteGameTele(const std::string& name)
 
 void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 {
-    CacheTrainerSpellMap& trainerList = isTemplates ? m_mCacheTrainerTemplateSpellMap : m_mCacheTrainerSpellMap;
+    CacheTrainerSpellMap& trainerList = isTemplates ? m_CacheTrainerTemplateSpellMap : m_CacheTrainerSpellMap;
 
     // For reload case
     for (CacheTrainerSpellMap::iterator itr = trainerList.begin(); itr != trainerList.end(); ++itr)
@@ -8425,12 +9194,11 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
     std::set<uint32> skip_trainers;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, spell,spellcost,reqskill,reqskillvalue,reqlevel FROM %s WHERE %u BETWEEN build_min AND build_max", tableName, SUPPORTED_CLIENT_BUILD);
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `spell`, `spellcost`, `reqskill`, `reqskillvalue`, `reqlevel` FROM %s WHERE %u BETWEEN `build_min` AND `build_max`", tableName, SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8439,14 +9207,12 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
     }
 
     BarGoLink bar(result->GetRowCount());
-
     std::set<uint32> talentIds;
 
     uint32 count = 0;
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         uint32 entry  = fields[0].GetUInt32();
@@ -8512,7 +9278,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
                 continue;
             }
 
-            if (TrainerSpellData const* tSpells = cInfo->trainerId ? GetNpcTrainerTemplateSpells(cInfo->trainerId) : NULL)
+            if (TrainerSpellData const* tSpells = cInfo->trainerId ? GetNpcTrainerTemplateSpells(cInfo->trainerId) : nullptr)
             {
                 if (tSpells->spellList.find(spell) != tSpells->spellList.end())
                 {
@@ -8546,7 +9312,6 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
 
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %d trainer %sspells", count, isTemplates ? "template " : "");
@@ -8559,12 +9324,12 @@ void ObjectMgr::LoadTrainerTemplates()
     // post loading check
     std::set<uint32> trainer_ids;
 
-    for (CacheTrainerSpellMap::const_iterator tItr = m_mCacheTrainerTemplateSpellMap.begin(); tItr != m_mCacheTrainerTemplateSpellMap.end(); ++tItr)
+    for (CacheTrainerSpellMap::const_iterator tItr = m_CacheTrainerTemplateSpellMap.begin(); tItr != m_CacheTrainerTemplateSpellMap.end(); ++tItr)
         trainer_ids.insert(tItr->first);
 
     // We need to use a query to get all used trainer ids because of progression.
     // It might be used by a creature that is not loaded in this patch.
-    QueryResult* result = WorldDatabase.Query("SELECT entry, patch, trainer_id FROM creature_template WHERE trainer_id != 0");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `patch`, `trainer_id` FROM `creature_template` WHERE `trainer_id` != 0"));
 
     if (result)
     {
@@ -8575,12 +9340,11 @@ void ObjectMgr::LoadTrainerTemplates()
             uint32 creature_id = fields[0].GetUInt32();
             uint32 patch = fields[1].GetUInt32();
             uint32 trainer_id = fields[2].GetUInt32();
-            if (m_mCacheTrainerTemplateSpellMap.find(trainer_id) != m_mCacheTrainerTemplateSpellMap.end())
+            if (m_CacheTrainerTemplateSpellMap.find(trainer_id) != m_CacheTrainerTemplateSpellMap.end())
                 trainer_ids.erase(trainer_id);
             else if (patch <= sWorld.GetWowPatch())
                 sLog.outErrorDb("Creature (Entry: %u) has trainer_id = %u for nonexistent trainer template", creature_id, trainer_id);
         } while (result->NextRow());
-        delete result;
     }
 
     for (std::set<uint32>::const_iterator tItr = trainer_ids.begin(); tItr != trainer_ids.end(); ++tItr)
@@ -8589,7 +9353,7 @@ void ObjectMgr::LoadTrainerTemplates()
 
 void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
 {
-    CacheVendorItemMap& vendorList = isTemplates ? m_mCacheVendorTemplateItemMap : m_mCacheVendorItemMap;
+    CacheVendorItemMap& vendorList = isTemplates ? m_CacheVendorTemplateItemMap : m_CacheVendorItemMap;
 
     // For reload case
     for (CacheVendorItemMap::iterator itr = vendorList.begin(); itr != vendorList.end(); ++itr)
@@ -8598,11 +9362,10 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
 
     std::set<uint32> skip_vendors;
 
-    QueryResult *result = WorldDatabase.PQuery("SELECT entry, item, maxcount, incrtime, itemflags FROM %s WHERE (item NOT IN (SELECT entry FROM forbidden_items WHERE (AfterOrBefore = 0 && patch <= %u) || (AfterOrBefore = 1 && patch >= %u)))", tableName, sWorld.GetWowPatch(), sWorld.GetWowPatch());
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `entry`, `item`, `maxcount`, `incrtime`, `itemflags` FROM %s WHERE (`item` NOT IN (SELECT `entry` FROM `forbidden_items` WHERE (`after_or_before` = 0 && `patch` <= %u) || (`after_or_before` = 1 && `patch` >= %u)))", tableName, sWorld.GetWowPatch(), sWorld.GetWowPatch()));
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8610,9 +9373,9 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
         return;
     }
 
-    BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
+    
     do
     {
         bar.step();
@@ -8624,7 +9387,7 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
         uint32 incrtime     = fields[3].GetUInt32();
         uint32 itemflags    = fields[4].GetUInt32();
 
-        if (!IsVendorItemValid(isTemplates, tableName, entry, item_id, maxcount, incrtime, NULL, &skip_vendors))
+        if (!IsVendorItemValid(isTemplates, tableName, entry, item_id, maxcount, incrtime, nullptr, &skip_vendors))
             continue;
 
         VendorItemData& vList = vendorList[entry];
@@ -8634,7 +9397,6 @@ void ObjectMgr::LoadVendors(char const* tableName, bool isTemplates)
 
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u vendor %sitems", count, isTemplates ? "template " : "");
@@ -8648,12 +9410,12 @@ void ObjectMgr::LoadVendorTemplates()
     // post loading check
     std::set<uint32> vendor_ids;
 
-    for (CacheVendorItemMap::const_iterator vItr = m_mCacheVendorTemplateItemMap.begin(); vItr != m_mCacheVendorTemplateItemMap.end(); ++vItr)
+    for (CacheVendorItemMap::const_iterator vItr = m_CacheVendorTemplateItemMap.begin(); vItr != m_CacheVendorTemplateItemMap.end(); ++vItr)
         vendor_ids.insert(vItr->first);
 
     // We need to use a query to get all used vendor ids because of progression.
     // It might be used by a creature that is not loaded in this patch.
-    QueryResult* result = WorldDatabase.Query("SELECT entry, patch, vendor_id FROM creature_template WHERE vendor_id != 0");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `patch`, `vendor_id` FROM `creature_template` WHERE `vendor_id` != 0"));
 
     if (result)
     {
@@ -8664,12 +9426,11 @@ void ObjectMgr::LoadVendorTemplates()
             uint32 creature_id = fields[0].GetUInt32();
             uint32 patch = fields[1].GetUInt32();
             uint32 vendor_id = fields[2].GetUInt32();
-            if (m_mCacheVendorTemplateItemMap.find(vendor_id) != m_mCacheVendorTemplateItemMap.end())
+            if (m_CacheVendorTemplateItemMap.find(vendor_id) != m_CacheVendorTemplateItemMap.end())
                 vendor_ids.erase(vendor_id);
             else if (patch <= sWorld.GetWowPatch())
                 sLog.outErrorDb("Creature (Entry: %u) has vendor_id = %u for nonexistent vendor template", creature_id, vendor_id);
         } while (result->NextRow());
-        delete result;
     }
 
     for (std::set<uint32>::const_iterator vItr = vendor_ids.begin(); vItr != vendor_ids.end(); ++vItr)
@@ -8678,14 +9439,12 @@ void ObjectMgr::LoadVendorTemplates()
 
 void ObjectMgr::LoadNpcGossips()
 {
+    m_CacheNpcTextIdMap.clear();
 
-    m_mCacheNpcTextIdMap.clear();
-
-    QueryResult* result = WorldDatabase.Query("SELECT npc_guid, textid FROM npc_gossip");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `npc_guid`, `textid` FROM `npc_gossip`"));
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8693,14 +9452,13 @@ void ObjectMgr::LoadNpcGossips()
         return;
     }
 
-    BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
     uint32 guid, textid;
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         guid   = fields[0].GetUInt32();
@@ -8718,12 +9476,11 @@ void ObjectMgr::LoadNpcGossips()
             continue;
         }
 
-        m_mCacheNpcTextIdMap[guid] = textid ;
+        m_CacheNpcTextIdMap[guid] = textid ;
         ++count;
 
     }
     while (result->NextRow());
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %d NpcTextId ", count);
@@ -8731,15 +9488,14 @@ void ObjectMgr::LoadNpcGossips()
 
 void ObjectMgr::LoadGossipMenu()
 {
-    m_mGossipMenusMap.clear();
+    m_GossipMenusMap.clear();
 
-    //                                                0      1        2
-    QueryResult* result = WorldDatabase.Query("SELECT entry, text_id, condition_id FROM gossip_menu");
+    //                                                               0        1          2
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `entry`, `text_id`, `condition_id` FROM `gossip_menu`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8747,14 +9503,12 @@ void ObjectMgr::LoadGossipMenu()
         return;
     }
 
-    BarGoLink bar(result->GetRowCount());
-
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         GossipMenus gMenu;
@@ -8779,13 +9533,11 @@ void ObjectMgr::LoadGossipMenu()
             }
         }
 
-        m_mGossipMenusMap.insert(GossipMenusMap::value_type(gMenu.entry, gMenu));
+        m_GossipMenusMap.insert(GossipMenusMap::value_type(gMenu.entry, gMenu));
 
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u gossip_menu entries", count);
@@ -8794,29 +9546,28 @@ void ObjectMgr::LoadGossipMenu()
     for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
             if (cInfo->GossipMenuId)
-                if (m_mGossipMenusMap.find(cInfo->GossipMenuId) == m_mGossipMenusMap.end())
+                if (m_GossipMenusMap.find(cInfo->GossipMenuId) == m_GossipMenusMap.end())
                     sLog.outErrorDb("Creature (Entry: %u) has gossip_menu_id = %u for nonexistent menu", cInfo->Entry, cInfo->GossipMenuId);
 
     for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
         if (uint32 menuid = itr->GetGossipMenuId())
-            if (m_mGossipMenusMap.find(menuid) == m_mGossipMenusMap.end())
+            if (m_GossipMenusMap.find(menuid) == m_GossipMenusMap.end())
                 ERROR_DB_STRICT_LOG("Gameobject (Entry: %u) has gossip_menu_id = %u for nonexistent menu", itr->id, menuid);
 }
 
 void ObjectMgr::LoadGossipMenuItems()
 {
-    m_mGossipMenuItemsMap.clear();
+    m_GossipMenuItemsMap.clear();
 
-    QueryResult* result = WorldDatabase.Query(
-                              "SELECT menu_id, id, option_icon, option_text, OptionBroadcastTextID, option_id, npc_option_npcflag, "
-                              "action_menu_id, action_poi_id, action_script_id, box_coded, box_money, box_text, BoxBroadcastTextID, "
-                              "condition_id "
-                              "FROM gossip_menu_option ORDER BY menu_id, id");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query(
+                              "SELECT `menu_id`, `id`, `option_icon`, `option_text`, `OptionBroadcastTextID`, `option_id`, `npc_option_npcflag`, "
+                              "`action_menu_id`, `action_poi_id`, `action_script_id`, `box_coded`, `box_money`, `box_text`, `BoxBroadcastTextID`, "
+                              "`condition_id` "
+                              "FROM `gossip_menu_option` ORDER BY `menu_id`, `id`"));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -8828,7 +9579,7 @@ void ObjectMgr::LoadGossipMenuItems()
     std::set<uint32> menu_ids;                              // for later integrity check
     if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))   // check unused menu ids only in strict mode
     {
-        for (GossipMenusMap::const_iterator itr = m_mGossipMenusMap.begin(); itr != m_mGossipMenusMap.end(); ++itr)
+        for (GossipMenusMap::const_iterator itr = m_GossipMenusMap.begin(); itr != m_GossipMenusMap.end(); ++itr)
             if (itr->first)
                 menu_ids.insert(itr->first);
 
@@ -8858,7 +9609,6 @@ void ObjectMgr::LoadGossipMenuItems()
     do
     {
         bar.step();
-
         Field* fields = result->Fetch();
 
         GossipMenuItems gMenuItem;
@@ -8883,7 +9633,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
         if (gMenuItem.menu_id)                              // == 0 id is special and not have menu_id data
         {
-            if (m_mGossipMenusMap.find(gMenuItem.menu_id) == m_mGossipMenusMap.end())
+            if (m_GossipMenusMap.find(gMenuItem.menu_id) == m_GossipMenusMap.end())
             {
                 sLog.outErrorDb("Gossip menu option (MenuId: %u) for nonexistent menu", gMenuItem.menu_id);
                 continue;
@@ -8892,7 +9642,7 @@ void ObjectMgr::LoadGossipMenuItems()
 
         if ((gMenuItem.option_id == GOSSIP_OPTION_GOSSIP) && (gMenuItem.action_menu_id > 0))
         {
-            if (m_mGossipMenusMap.find(gMenuItem.action_menu_id) == m_mGossipMenusMap.end())
+            if (m_GossipMenusMap.find(gMenuItem.action_menu_id) == m_GossipMenusMap.end())
                 sLog.outErrorDb("Gossip menu option (MenuId: %u Id: %u) have action_menu_id = %u for nonexistent menu", gMenuItem.menu_id, gMenuItem.id, gMenuItem.action_menu_id);
             else if (!sLog.HasLogFilter(LOG_FILTER_DB_STRICTED_CHECK))
                 menu_ids.erase(gMenuItem.action_menu_id);
@@ -8986,14 +9736,12 @@ void ObjectMgr::LoadGossipMenuItems()
             }
         }
 
-        m_mGossipMenuItemsMap.insert(GossipMenuItemsMap::value_type(gMenuItem.menu_id, gMenuItem));
+        m_GossipMenuItemsMap.insert(GossipMenuItemsMap::value_type(gMenuItem.menu_id, gMenuItem));
 
         ++count;
 
     }
     while (result->NextRow());
-
-    delete result;
 
     for (std::set<uint32>::const_iterator itr = gossipScriptSet.begin(); itr != gossipScriptSet.end(); ++itr)
         sLog.outErrorDb("Table `gossip_scripts` contain unused script, id %u.", *itr);
@@ -9010,30 +9758,30 @@ void ObjectMgr::LoadGossipMenuItems()
 
 void ObjectMgr::AddVendorItem(uint32 entry, uint32 item, uint32 maxcount, uint32 incrtime, uint32 itemflags)
 {
-    VendorItemData& vList = m_mCacheVendorItemMap[entry];
+    VendorItemData& vList = m_CacheVendorItemMap[entry];
     vList.AddItem(item, maxcount, incrtime, itemflags);
 
-    WorldDatabase.PExecuteLog("INSERT INTO npc_vendor (entry,item,maxcount,incrtime,itemflags) VALUES('%u','%u','%u','%u','%u')", entry, item, maxcount, incrtime, itemflags);
+    WorldDatabase.PExecuteLog("INSERT INTO `npc_vendor` (`entry`, `item`, `maxcount`, `incrtime`, `itemflags`) VALUES('%u','%u','%u','%u','%u')", entry, item, maxcount, incrtime, itemflags);
 }
 
 bool ObjectMgr::RemoveVendorItem(uint32 entry, uint32 item)
 {
-    CacheVendorItemMap::iterator  iter = m_mCacheVendorItemMap.find(entry);
-    if (iter == m_mCacheVendorItemMap.end())
+    CacheVendorItemMap::iterator  iter = m_CacheVendorItemMap.find(entry);
+    if (iter == m_CacheVendorItemMap.end())
         return false;
 
     if (!iter->second.FindItem(item))
         return false;
 
     iter->second.RemoveItem(item);
-    WorldDatabase.PExecuteLog("DELETE FROM npc_vendor WHERE entry='%u' AND item='%u'", entry, item);
+    WorldDatabase.PExecuteLog("DELETE FROM `npc_vendor` WHERE `entry`='%u' AND `item`='%u'", entry, item);
     return true;
 }
 
 bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32 vendor_entry, uint32 item_id, uint32 maxcount, uint32 incrtime, Player* pl, std::set<uint32>* skip_vendors) const
 {
     char const* idStr = isTemplate ? "vendor template" : "vendor";
-    CreatureInfo const* cInfo = NULL;
+    CreatureInfo const* cInfo = nullptr;
 
     if (!isTemplate)
     {
@@ -9093,7 +9841,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     }
 
     VendorItemData const* vItems = isTemplate ? GetNpcVendorTemplateItemList(vendor_entry) : GetNpcVendorItemList(vendor_entry);
-    VendorItemData const* tItems = isTemplate ? NULL : GetNpcVendorTemplateItemList(vendor_entry);
+    VendorItemData const* tItems = isTemplate ? nullptr : GetNpcVendorTemplateItemList(vendor_entry);
 
     if (!vItems && !tItems)
         return true;                                        // later checks for non-empty lists
@@ -9147,12 +9895,12 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
 
 void ObjectMgr::AddGroup(Group* group)
 {
-    mGroupMap[group->GetId()] = group ;
+    m_GroupMap[group->GetId()] = group ;
 }
 
 void ObjectMgr::RemoveGroup(Group* group)
 {
-    mGroupMap.erase(group->GetId());
+    m_GroupMap.erase(group->GetId());
 }
 
 // Functions for scripting access
@@ -9414,8 +10162,8 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
 
 void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, Team team, bool inDB)
 {
-    GraveYardMap::iterator graveLow  = mGraveYardMap.lower_bound(zoneId);
-    GraveYardMap::iterator graveUp   = mGraveYardMap.upper_bound(zoneId);
+    GraveYardMap::iterator graveLow  = m_GraveYardMap.lower_bound(zoneId);
+    GraveYardMap::iterator graveUp   = m_GraveYardMap.upper_bound(zoneId);
     if (graveLow == graveUp)
     {
         //sLog.outErrorDb("Table `game_graveyard_zone` incomplete: Zone %u Team %u does not have a linked graveyard.",zoneId,team);
@@ -9448,11 +10196,11 @@ void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, Team team, bool in
         return;
 
     // remove from links
-    mGraveYardMap.erase(itr);
+    m_GraveYardMap.erase(itr);
 
     // remove link from DB
     if (inDB)
-        WorldDatabase.PExecute("DELETE FROM game_graveyard_zone WHERE id = '%u' AND ghost_zone = '%u' AND faction = '%u'", id, zoneId, team);
+        WorldDatabase.PExecute("DELETE FROM `game_graveyard_zone` WHERE `id` = '%u' AND `ghost_zone` = '%u' AND `faction` = '%u'", id, zoneId, team);
 
     return;
 }
@@ -9460,18 +10208,24 @@ void ObjectMgr::RemoveGraveYardLink(uint32 id, uint32 zoneId, Team team, bool in
 void ObjectMgr::LoadFactionChangeReputations()
 {
     factionchange_reputations.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_reputations");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_reputations`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 faction change reputation pairs. DB table `player_factionchange_reputations` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -9479,7 +10233,7 @@ void ObjectMgr::LoadFactionChangeReputations()
 
         if (!GetFactionEntry(alliance) || !GetFactionEntry(horde))
         {
-            sLog.outErrorDb("Couple %u/%u erreur. Sort inexistant. Supprime de la DB", alliance, horde);
+            sLog.outErrorDb("Faction change reputation pair %u/%u does not exist.", alliance, horde);
         }
         else
             factionchange_reputations[alliance] = horde;
@@ -9488,26 +10242,32 @@ void ObjectMgr::LoadFactionChangeReputations()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> Loaded %u reputations changes.", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change reputation pairs.", count);
 }
 
 
 void ObjectMgr::LoadFactionChangeSpells()
 {
     factionchange_spells.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_spells");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_spells`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 faction change spell pairs. DB table `player_factionchange_spells` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -9515,7 +10275,7 @@ void ObjectMgr::LoadFactionChangeSpells()
 
         if (!sSpellMgr.GetSpellEntry(alliance) || !sSpellMgr.GetSpellEntry(horde))
         {
-            sLog.outErrorDb("Couple %u/%u erreur. Sort inexistant. Supprime de la DB", alliance, horde);
+            sLog.outErrorDb("Faction change spell pair %u/%u does not exist.", alliance, horde);
         }
         else
             factionchange_spells[alliance] = horde;
@@ -9524,26 +10284,32 @@ void ObjectMgr::LoadFactionChangeSpells()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u equivalences de sorts Alliance/Horde chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change spell pairs.", count);
 }
 
 
 void ObjectMgr::LoadFactionChangeItems()
 {
     factionchange_items.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_items");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_items`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 faction change item pairs. DB table `player_factionchange_spells` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -9552,7 +10318,7 @@ void ObjectMgr::LoadFactionChangeItems()
         if (!GetItemPrototype(alliance) || !GetItemPrototype(horde))
         {
             if (!IsExistingItemId(alliance) || !IsExistingItemId(horde))
-                sLog.outErrorDb("Couple %u/%u erreur. Item inexistant. Supprime de la DB", alliance, horde);
+                sLog.outErrorDb("Faction change item pair %u/%u does not exist", alliance, horde);
         }
         else
             factionchange_items[alliance] = horde;
@@ -9561,25 +10327,31 @@ void ObjectMgr::LoadFactionChangeItems()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u equivalences d'items Alliance/Horde chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change item pairs.", count);
 }
 
 void ObjectMgr::LoadFactionChangeQuests()
 {
     factionchange_quests.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT alliance_id, horde_id FROM player_factionchange_quests");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `alliance_id`, `horde_id` FROM `player_factionchange_quests`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 change quests pairs. DB table `player_factionchange_quests` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 alliance = fields[0].GetUInt32();
@@ -9588,7 +10360,7 @@ void ObjectMgr::LoadFactionChangeQuests()
         if (!GetQuestTemplate(alliance) || !GetQuestTemplate(horde))
         {
             if (!IsExistingQuestId(alliance) || !IsExistingQuestId(horde))
-                sLog.outErrorDb("Couple %u/%u erreur. Quete inexistante. Supprime de la DB", alliance, horde);
+                sLog.outErrorDb("Faction change quest pair %u/%u does not exist.", alliance, horde);
         }
         else
             factionchange_quests[alliance] = horde;
@@ -9597,25 +10369,31 @@ void ObjectMgr::LoadFactionChangeQuests()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u equivalences de quetes Alliance/Horde chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change quest pairs.", count);
 }
 
 void ObjectMgr::LoadFactionChangeMounts()
 {
     factionchange_mounts.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT RaceId, MountNum, ItemEntry FROM player_factionchange_mounts");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `RaceId`, `MountNum`, `ItemEntry` FROM `player_factionchange_mounts`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outErrorDb(">> Loaded 0 entries. The table `player_factionchange_mounts` is empty.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint8 RaceId     = fields[0].GetUInt8();
@@ -9625,7 +10403,7 @@ void ObjectMgr::LoadFactionChangeMounts()
         if (!GetItemPrototype(ItemEntry))
         {
             if (!IsExistingItemId(ItemEntry))
-                sLog.outErrorDb("Couple %u/%u/%u erreur. Quete inexistante. Supprime de la DB", RaceId, MountNum, ItemEntry);
+                sLog.outErrorDb("Faction change mount replacement %u/%u/%u is invalid. The item does not exist.", RaceId, MountNum, ItemEntry);
         }
         else
         {
@@ -9639,24 +10417,29 @@ void ObjectMgr::LoadFactionChangeMounts()
     }
     while (result->NextRow());
 
-    delete result;
-    sLog.outString(">> %u montures de races chargees", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u faction change mount relacements.", count);
 }
 void ObjectMgr::RestoreDeletedItems()
 {
-    QueryResult* result = CharacterDatabase.Query("SELECT id, player_guid, item_entry, stack_count FROM character_deleted_items");
+    std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT `id`, `player_guid`, `item_entry`, `stack_count` FROM `character_deleted_items`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Restored 0 prevously deleted items.");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 id = fields[0].GetUInt32();
@@ -9684,14 +10467,13 @@ void ObjectMgr::RestoreDeletedItems()
                     .AddItem(restoredItem)
                     .SendMailTo(MailReceiver(memberGuid), MailSender(MAIL_NORMAL, memberGuid.GetCounter(), MAIL_STATIONERY_GM), MAIL_CHECK_MASK_COPIED, 0, 30 * DAY);
 
-                CharacterDatabase.PExecute("DELETE FROM character_deleted_items WHERE id = %u", id);
+                CharacterDatabase.PExecute("DELETE FROM `character_deleted_items` WHERE `id` = %u", id);
 
                 count++;
             }
         }
     } while (result->NextRow());
 
-    delete result;
     sLog.outString();
     sLog.outString(">> Restored %u previously deleted items to players.", count);
 }
@@ -9873,14 +10655,15 @@ void ObjectMgr::LoadAreaTemplate()
 
 void ObjectMgr::LoadAreaLocales()
 {
-    mAreaLocaleMap.clear();
+    m_AreaLocaleMap.clear();
 
-    QueryResult* result = WorldDatabase.Query("SELECT Entry, NameLoc1, NameLoc2, NameLoc3, NameLoc4, NameLoc5, NameLoc6, NameLoc7, NameLoc8 FROM locales_area");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `Entry`, `NameLoc1`, `NameLoc2`, `NameLoc3`, `NameLoc4`, `NameLoc5`, `NameLoc6`, `NameLoc7`, `NameLoc8` FROM `locales_area`"));
 
     if (!result)
     {
         BarGoLink bar(1);
         bar.step();
+
         sLog.outString(">> Loaded 0 area locale strings. DB table `locales_area` is empty.");
         return;
     }
@@ -9889,8 +10672,8 @@ void ObjectMgr::LoadAreaLocales()
 
     do
     {
-        auto fields = result->Fetch();
         bar.step();
+        auto fields = result->Fetch();
 
         auto entry = fields[0].GetUInt32();
 
@@ -9900,7 +10683,7 @@ void ObjectMgr::LoadAreaLocales()
             continue;
         }
 
-        AreaLocale& data = mAreaLocaleMap[entry];
+        AreaLocale& data = m_AreaLocaleMap[entry];
 
         for (uint8 i = 1; i < MAX_LOCALE; ++i)
         {
@@ -9920,9 +10703,7 @@ void ObjectMgr::LoadAreaLocales()
     }
     while (result->NextRow());
 
-    delete result;
-
-    sLog.outString(">> Loaded " SIZEFMTD " area locale strings", mAreaLocaleMap.size());
+    sLog.outString(">> Loaded " SIZEFMTD " area locale strings", m_AreaLocaleMap.size());
     sLog.outString();
 }
 

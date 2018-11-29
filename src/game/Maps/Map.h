@@ -365,10 +365,10 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         void UpdateSessionsMovementAndSpellsIfNeeded();
         void ProcessSessionPackets(PacketProcessing type);
 
-        void MessageBroadcast(Player*, WorldPacket*, bool to_self);
-        void MessageBroadcast(WorldObject*, WorldPacket*);
-        void MessageDistBroadcast(Player*, WorldPacket*, float dist, bool to_self, bool own_team_only = false);
-        void MessageDistBroadcast(WorldObject*, WorldPacket*, float dist);
+        void MessageBroadcast(Player const*, WorldPacket*, bool to_self);
+        void MessageBroadcast(WorldObject const*, WorldPacket*);
+        void MessageDistBroadcast(Player const*, WorldPacket*, float dist, bool to_self, bool own_team_only = false);
+        void MessageDistBroadcast(WorldObject const*, WorldPacket*, float dist);
 
         float GetVisibilityDistance() const { return m_VisibleDistance; }
         float GetGridActivationDistance() const { return m_GridActivationDistance; }
@@ -538,9 +538,9 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         InstanceData const* GetInstanceData() const { return i_data; }
         uint32 GetScriptId() const { return i_script_id; }
 
-        void MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit* target);
-        void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid = 0);
-        void PlayDirectSoundToMap(uint32 soundId);
+        void MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit const* target) const;
+        void MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit const* target, uint32 senderLowGuid = 0) const;
+        void PlayDirectSoundToMap(uint32 soundId, uint32 zoneId = 0) const;
 
         // GameObjectCollision
         float GetHeight(float x, float y, float z, bool vmap = true, float maxSearchDist = DEFAULT_HEIGHT_SEARCH) const;
@@ -822,6 +822,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
         bool ScriptCommand_CombatStop(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_AddAura(const ScriptInfo& script, WorldObject* source, WorldObject* target);
         bool ScriptCommand_AddThreat(const ScriptInfo& script, WorldObject* source, WorldObject* target);
+        bool ScriptCommand_SummonObject(const ScriptInfo& script, WorldObject* source, WorldObject* target);
 
         // Add any new script command functions to the array.
         const ScriptCommandFunction m_ScriptCommands[SCRIPT_COMMAND_MAX] =
@@ -902,6 +903,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>
             &Map::ScriptCommand_CombatStop,             // 73
             &Map::ScriptCommand_AddAura,                // 74
             &Map::ScriptCommand_AddThreat,              // 75
+            &Map::ScriptCommand_SummonObject,           // 76
         };
 
     public:

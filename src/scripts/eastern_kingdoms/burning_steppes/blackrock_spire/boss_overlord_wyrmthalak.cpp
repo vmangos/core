@@ -53,7 +53,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
     uint32 m_uiCleaveTimer;
     uint32 m_uiKnockawayTimer;
     bool m_bSummoned;
-
+    bool m_bPulledByPet;
     uint32 m_uiLeashCheckTimer;
 
     void Reset()
@@ -63,6 +63,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         m_uiCleaveTimer    = 6000;
         m_uiKnockawayTimer = 12000;
         m_bSummoned = false;
+        m_bPulledByPet = false;
 
         m_uiLeashCheckTimer = 5000;
     }
@@ -79,6 +80,16 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
         }
     }
 
+    void EnterCombat(Unit* pUnit) override
+    {
+        // Prevent exploit where pet can run through the wall and pull the boss.
+        if (Unit* pOwner = pUnit->GetOwner())
+            if (!pOwner->IsWithinLOSInMap(m_creature))
+                m_bPulledByPet = true;
+
+        ScriptedAI::EnterCombat(pUnit);
+    }
+
     void LeashIfOutOfCombatArea(uint32 uiDiff)
     {
         if (m_uiLeashCheckTimer < uiDiff)
@@ -89,7 +100,7 @@ struct boss_overlordwyrmthalakAI : public ScriptedAI
             return;
         }
 
-        if (m_creature->GetPositionZ() > 100.0f)
+        if (m_bPulledByPet || (m_creature->GetPositionZ() > 100.0f))
             EnterEvadeMode();
     } 
 

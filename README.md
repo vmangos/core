@@ -7,6 +7,7 @@ This project is an independent continuation of the Elysium / LightsHope codebase
 - 1.12.1.5875+
 - 1.11.2.5464
 - 1.10.2.5302
+- 1.9.4.5086
 
 ### Project guidelines
 - Accuracy: The point of an emulator is to recreate the functionality of that which it is emulating as closely as possible. Therefore any custom behaviour should be behind a config option and off by default.

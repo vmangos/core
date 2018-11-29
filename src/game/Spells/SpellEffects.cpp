@@ -29,7 +29,6 @@
 #include "ObjectMgr.h"
 #include "SpellMgr.h"
 #include "Player.h"
-#include "SkillExtraItems.h"
 #include "Unit.h"
 #include "Spell.h"
 #include "DynamicObject.h"
@@ -574,6 +573,13 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                                 pObject->AddObjectToRemoveList();
                         }
                     }
+
+                    return;
+                }
+                case 19614: // Despawn Caster
+                {
+                    if (Creature* pCreature = ToCreature(unitTarget))
+                        pCreature->DespawnOrUnsummon();
 
                     return;
                 }
@@ -1987,8 +1993,6 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, eff_idx, gameObjTarget);
     else if (unitTarget && unitTarget->GetTypeId() == TYPEID_UNIT)
         sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, eff_idx, (Creature*)unitTarget);
-    else if (itemTarget)
-        sScriptMgr.OnEffectDummy(m_caster, m_spellInfo->Id, eff_idx, itemTarget);
 }
 
 void Spell::EffectTriggerSpell(SpellEffectIndex eff_idx)
@@ -2548,17 +2552,6 @@ void Spell::DoCreateItem(SpellEffectIndex eff_idx, uint32 itemtype)
 
     // init items_count to 1, since 1 item will be created regardless of specialization
     int items_count = 1;
-    // the chance to create additional items
-    float additionalCreateChance = 0.0f;
-    // the maximum number of created additional items
-    uint8 additionalMaxNum = 0;
-    // get the chance and maximum number for creating extra items
-    if (canCreateExtraItems(player, m_spellInfo->Id, additionalCreateChance, additionalMaxNum))
-    {
-        // roll with this chance till we roll not to create or we create the max num
-        while (roll_chance_f(additionalCreateChance) && items_count <= additionalMaxNum)
-            ++items_count;
-    }
 
     // really will be created more items
     num_to_add *= items_count;
@@ -4978,6 +4971,39 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
                     DoCreateItem(eff_idx, itemtype);
                     return;
                 }
+            }
+            break;
+        }
+        case SPELLFAMILY_DRUID:
+        {
+            // Shapeshift Form Effect
+            if (m_spellInfo->Id == 9033)
+            {
+                // remove movement affects
+                Unit* target = unitTarget ? unitTarget : m_caster;
+                target->RemoveSpellsCausingAura(SPELL_AURA_MOD_ROOT);
+                Unit::AuraList const& slowingAuras = target->GetAurasByType(SPELL_AURA_MOD_DECREASE_SPEED);
+                for (Unit::AuraList::const_iterator iter = slowingAuras.begin(); iter != slowingAuras.end();)
+                {
+                    SpellEntry const* aurSpellInfo = (*iter)->GetSpellProto();
+
+                    uint32 aurMechMask = aurSpellInfo->GetAllSpellMechanicMask();
+
+                    // If spell that caused this aura has Croud Control or Daze effect
+                    if ((aurMechMask & MECHANIC_NOT_REMOVED_BY_SHAPESHIFT) ||
+                        // some Daze spells have these parameters instead of MECHANIC_DAZE (skip snare spells)
+                        (aurSpellInfo->SpellIconID == 15 && aurSpellInfo->Dispel == 0 &&
+                        (aurMechMask & (1 << (MECHANIC_SNARE - 1))) == 0))
+                    {
+                        ++iter;
+                        continue;
+                    }
+
+                    // All OK, remove aura now
+                    target->RemoveAurasDueToSpellByCancel(aurSpellInfo->Id);
+                    iter = slowingAuras.begin();
+                }
+                return;
             }
             break;
         }

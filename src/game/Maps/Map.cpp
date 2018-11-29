@@ -488,7 +488,7 @@ void Map::Add(Transport* obj)
     return;
 }
 
-void Map::MessageBroadcast(Player *player, WorldPacket *msg, bool to_self)
+void Map::MessageBroadcast(Player const* player, WorldPacket *msg, bool to_self)
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
 
@@ -509,7 +509,7 @@ void Map::MessageBroadcast(Player *player, WorldPacket *msg, bool to_self)
     cell.Visit(p, message, *this, *player, GetVisibilityDistance());
 }
 
-void Map::MessageBroadcast(WorldObject *obj, WorldPacket *msg)
+void Map::MessageBroadcast(WorldObject const* obj, WorldPacket *msg)
 {
     CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
 
@@ -532,7 +532,7 @@ void Map::MessageBroadcast(WorldObject *obj, WorldPacket *msg)
     cell.Visit(p, message, *this, *obj, GetVisibilityDistance());
 }
 
-void Map::MessageDistBroadcast(Player *player, WorldPacket *msg, float dist, bool to_self, bool own_team_only)
+void Map::MessageDistBroadcast(Player const* player, WorldPacket *msg, float dist, bool to_self, bool own_team_only)
 {
     CellPair p = MaNGOS::ComputeCellPair(player->GetPositionX(), player->GetPositionY());
 
@@ -553,7 +553,7 @@ void Map::MessageDistBroadcast(Player *player, WorldPacket *msg, float dist, boo
     cell.Visit(p, message, *this, *player, dist);
 }
 
-void Map::MessageDistBroadcast(WorldObject *obj, WorldPacket *msg, float dist)
+void Map::MessageDistBroadcast(WorldObject const* obj, WorldPacket *msg, float dist)
 {
     CellPair p = MaNGOS::ComputeCellPair(obj->GetPositionX(), obj->GetPositionY());
 
@@ -2949,7 +2949,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
 class StaticMonsterChatBuilder
 {
 public:
-    StaticMonsterChatBuilder(CreatureInfo const* cInfo, ChatMsg msgtype, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid = 0)
+    StaticMonsterChatBuilder(CreatureInfo const* cInfo, ChatMsg msgtype, int32 textId, uint32 language, Unit const* target, uint32 senderLowGuid = 0)
         : i_cInfo(cInfo), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target)
     {
         // 0 lowguid not used in core, but accepted fine in this case by client
@@ -2982,7 +2982,7 @@ private:
     ChatMsg i_msgtype;
     int32 i_textId;
     uint32 i_language;
-    Unit* i_target;
+    Unit const* i_target;
 };
 
 
@@ -2994,7 +2994,7 @@ private:
  * @param language language of the text
  * @param target, can be NULL
  */
-void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit* target)
+void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit const* target) const
 {
     if (guid.IsAnyTypeCreature())
     {
@@ -3025,7 +3025,7 @@ void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit*
  * @param senderLowGuid provide way proper show yell for near spawned creature with known lowguid,
  *        0 accepted by client else if this not important
  */
-void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit* target, uint32 senderLowGuid /*= 0*/)
+void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit const* target, uint32 senderLowGuid /*= 0*/) const
 {
     StaticMonsterChatBuilder say_build(cinfo, CHAT_MSG_MONSTER_YELL, textId, language, target, senderLowGuid);
     MaNGOS::LocalizedPacketDo<StaticMonsterChatBuilder> say_do(say_build);
@@ -3036,18 +3036,20 @@ void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 langu
 }
 
 /**
- * Function to play sound to all players in map
- *
- * @param soundId Played Sound
- */
-void Map::PlayDirectSoundToMap(uint32 soundId)
+* Function to play sound to all players in map
+*
+* @param soundId Played Sound
+* @param zoneId Id of the Zone to which the sound should be restricted
+*/
+void Map::PlayDirectSoundToMap(uint32 soundId, uint32 zoneId /*=0*/) const
 {
     WorldPacket data(SMSG_PLAY_SOUND, 4);
     data << uint32(soundId);
 
     Map::PlayerList const& pList = GetPlayers();
-    for (PlayerList::const_iterator itr = pList.begin(); itr != pList.end(); ++itr)
-        itr->getSource()->SendDirectMessage(&data);
+    for (const auto& itr : pList)
+        if (!zoneId || itr.getSource()->GetZoneId() == zoneId)
+            itr.getSource()->SendDirectMessage(&data);
 }
 
 

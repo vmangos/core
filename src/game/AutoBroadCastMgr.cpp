@@ -21,26 +21,31 @@ AutoBroadCastMgr::~AutoBroadCastMgr()
 void AutoBroadCastMgr::load()
 {
     entries.clear();
-    QueryResult* result = WorldDatabase.Query("SELECT delay, stringId FROM autobroadcast");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `delay`, `string_id` FROM `autobroadcast`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded 0 AutoBroadCast message");
         return;
     }
 
     uint32 count = 0;
+    BarGoLink bar(result->GetRowCount());
 
     Field *fields;
     do
     {
+        bar.step();
         AutoBroadCastEntry e;
         fields = result->Fetch();
 
         e.delay = fields[0].GetUInt32();
         e.stringId = fields[1].GetInt32();
-        e.lastAnnounce = time(NULL);
+        e.lastAnnounce = time(nullptr);
 
         entries.push_back(e);
         ++count;
@@ -54,7 +59,7 @@ void AutoBroadCastMgr::load()
 
 void AutoBroadCastMgr::update(uint32 diff)
 {
-    time_t now = time(NULL);
+    time_t now = time(nullptr);
     std::vector<AutoBroadCastEntry>::iterator iter;
     for (iter = entries.begin(); iter != entries.end(); ++iter)
     {

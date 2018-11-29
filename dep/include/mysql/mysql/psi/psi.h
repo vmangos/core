@@ -1,4 +1,4 @@
-/* Copyright (c) 2008, 2015, Oracle and/or its affiliates. All rights reserved.
+/* Copyright (c) 2008, 2010, Oracle and/or its affiliates. All rights reserved.
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -16,11 +16,7 @@
 #ifndef MYSQL_PERFORMANCE_SCHEMA_INTERFACE_H
 #define MYSQL_PERFORMANCE_SCHEMA_INTERFACE_H
 
-#ifdef EMBEDDED_LIBRARY
-#define DISABLE_ALL_PSI
-#endif /* EMBEDDED_LIBRARY */
-
-#ifndef MY_GLOBAL_INCLUDED
+#ifndef _global_h
 /*
   Make sure a .c or .cc file contains an include to my_global.h first.
   When this include is missing, all the #ifdef HAVE_XXX have no effect,
@@ -31,51 +27,7 @@
 #error "You must include my_global.h in the code for the build to be correct."
 #endif
 
-#include "psi_base.h"
-#include "psi_memory.h"
-
-/*
-  MAINTAINER:
-  The following pattern:
-    typedef struct XYZ XYZ;
-  is not needed in C++, but required for C.
-*/
-
 C_MODE_START
-
-/** @sa MDL_key. */
-struct MDL_key;
-typedef struct MDL_key MDL_key;
-
-/** @sa enum_mdl_type. */
-typedef int opaque_mdl_type;
-
-/** @sa enum_mdl_duration. */
-typedef int opaque_mdl_duration;
-
-/** @sa MDL_wait::enum_wait_status. */
-typedef int opaque_mdl_status;
-
-/** @sa enum_vio_type. */
-typedef int opaque_vio_type;
-
-struct TABLE_SHARE;
-
-struct sql_digest_storage;
-
-#ifdef __cplusplus
-  class THD;
-#else
-  /*
-    Phony declaration when compiling C code.
-    This is ok, because the C code will never have a THD anyway.
-  */
-  struct opaque_THD
-  {
-    int dummy;
-  };
-  typedef struct opaque_THD THD;
-#endif
 
 /**
   @file mysql/psi/psi.h
@@ -91,182 +43,42 @@ struct sql_digest_storage;
   This is an opaque structure.
 */
 struct PSI_mutex;
-typedef struct PSI_mutex PSI_mutex;
 
 /**
   Interface for an instrumented rwlock.
   This is an opaque structure.
 */
 struct PSI_rwlock;
-typedef struct PSI_rwlock PSI_rwlock;
 
 /**
   Interface for an instrumented condition.
   This is an opaque structure.
 */
 struct PSI_cond;
-typedef struct PSI_cond PSI_cond;
 
 /**
   Interface for an instrumented table share.
   This is an opaque structure.
 */
 struct PSI_table_share;
-typedef struct PSI_table_share PSI_table_share;
 
 /**
   Interface for an instrumented table handle.
   This is an opaque structure.
 */
 struct PSI_table;
-typedef struct PSI_table PSI_table;
 
 /**
   Interface for an instrumented thread.
   This is an opaque structure.
 */
 struct PSI_thread;
-typedef struct PSI_thread PSI_thread;
 
 /**
   Interface for an instrumented file handle.
   This is an opaque structure.
 */
 struct PSI_file;
-typedef struct PSI_file PSI_file;
-
-/**
-  Interface for an instrumented socket descriptor.
-  This is an opaque structure.
-*/
-struct PSI_socket;
-typedef struct PSI_socket PSI_socket;
-
-/**
-  Interface for an instrumented prepared statement.
-  This is an opaque structure.
-*/
-struct PSI_prepared_stmt;
-typedef struct PSI_prepared_stmt PSI_prepared_stmt;
-
-/**
-  Interface for an instrumented table operation.
-  This is an opaque structure.
-*/
-struct PSI_table_locker;
-typedef struct PSI_table_locker PSI_table_locker;
-
-/**
-  Interface for an instrumented statement.
-  This is an opaque structure.
-*/
-struct PSI_statement_locker;
-typedef struct PSI_statement_locker PSI_statement_locker;
-
-/**
-  Interface for an instrumented transaction.
-  This is an opaque structure.
-*/
-struct PSI_transaction_locker;
-typedef struct PSI_transaction_locker PSI_transaction_locker;
-
-/**
-  Interface for an instrumented idle operation.
-  This is an opaque structure.
-*/
-struct PSI_idle_locker;
-typedef struct PSI_idle_locker PSI_idle_locker;
-
-/**
-  Interface for an instrumented statement digest operation.
-  This is an opaque structure.
-*/
-struct PSI_digest_locker;
-typedef struct PSI_digest_locker PSI_digest_locker;
-
-/**
-  Interface for an instrumented stored procedure share.
-  This is an opaque structure.
-*/
-struct PSI_sp_share;
-typedef struct PSI_sp_share PSI_sp_share;
-
-/**
-  Interface for an instrumented stored program.
-  This is an opaque structure.
-*/
-struct PSI_sp_locker;
-typedef struct PSI_sp_locker PSI_sp_locker;
-
-/**
-  Interface for an instrumented metadata lock.
-  This is an opaque structure.
-*/
-struct PSI_metadata_lock;
-typedef struct PSI_metadata_lock PSI_metadata_lock;
-
-/**
-  Interface for an instrumented stage progress.
-  This is a public structure, for efficiency.
-*/
-struct PSI_stage_progress
-{
-  ulonglong m_work_completed;
-  ulonglong m_work_estimated;
-};
-typedef struct PSI_stage_progress PSI_stage_progress;
-
-/** IO operation performed on an instrumented table. */
-enum PSI_table_io_operation
-{
-  /** Row fetch. */
-  PSI_TABLE_FETCH_ROW= 0,
-  /** Row write. */
-  PSI_TABLE_WRITE_ROW= 1,
-  /** Row update. */
-  PSI_TABLE_UPDATE_ROW= 2,
-  /** Row delete. */
-  PSI_TABLE_DELETE_ROW= 3
-};
-typedef enum PSI_table_io_operation PSI_table_io_operation;
-
-/**
-  State data storage for @c start_table_io_wait_v1_t,
-  @c start_table_lock_wait_v1_t.
-  This structure provide temporary storage to a table locker.
-  The content of this structure is considered opaque,
-  the fields are only hints of what an implementation
-  of the psi interface can use.
-  This memory is provided by the instrumented code for performance reasons.
-  @sa start_table_io_wait_v1_t
-  @sa start_table_lock_wait_v1_t
-*/
-struct PSI_table_locker_state
-{
-  /** Internal state. */
-  uint m_flags;
-  /** Current io operation. */
-  enum PSI_table_io_operation m_io_operation;
-  /** Current table handle. */
-  struct PSI_table *m_table;
-  /** Current table share. */
-  struct PSI_table_share *m_table_share;
-  /** Current thread. */
-  struct PSI_thread *m_thread;
-  /** Timer start. */
-  ulonglong m_timer_start;
-  /** Timer function. */
-  ulonglong (*m_timer)(void);
-  /** Internal data. */
-  void *m_wait;
-  /**
-    Implementation specific.
-    For table io, the table io index.
-    For table lock, the lock type.
-  */
-  uint m_index;
-};
-typedef struct PSI_table_locker_state PSI_table_locker_state;
 
 /** Entry point for the performance schema interface. */
 struct PSI_bootstrap
@@ -286,257 +98,8 @@ struct PSI_bootstrap
   */
   void* (*get_interface)(int version);
 };
-typedef struct PSI_bootstrap PSI_bootstrap;
 
 #ifdef HAVE_PSI_INTERFACE
-
-#ifdef DISABLE_ALL_PSI
-
-#ifndef DISABLE_PSI_THREAD
-#define DISABLE_PSI_THREAD
-#endif
-
-#ifndef DISABLE_PSI_MUTEX
-#define DISABLE_PSI_MUTEX
-#endif
-
-#ifndef DISABLE_PSI_RWLOCK
-#define DISABLE_PSI_RWLOCK
-#endif
-
-#ifndef DISABLE_PSI_COND
-#define DISABLE_PSI_COND
-#endif
-
-#ifndef DISABLE_PSI_FILE
-#define DISABLE_PSI_FILE
-#endif
-
-#ifndef DISABLE_PSI_TABLE
-#define DISABLE_PSI_TABLE
-#endif
-
-#ifndef DISABLE_PSI_SOCKET
-#define DISABLE_PSI_SOCKET
-#endif
-
-#ifndef DISABLE_PSI_STAGE
-#define DISABLE_PSI_STAGE
-#endif
-
-#ifndef DISABLE_PSI_STATEMENT
-#define DISABLE_PSI_STATEMENT
-#endif
-
-#ifndef DISABLE_PSI_SP
-#define DISABLE_PSI_SP
-#endif
-
-#ifndef DISABLE_PSI_IDLE
-#define DISABLE_PSI_IDLE
-#endif
-
-#ifndef DISABLE_PSI_STATEMENT_DIGEST
-#define DISABLE_PSI_STATEMENT_DIGEST
-#endif
-
-#ifndef DISABLE_PSI_METADATA
-#define DISABLE_PSI_METADATA
-#endif
-
-#ifndef DISABLE_PSI_MEMORY
-#define DISABLE_PSI_MEMORY
-#endif
-
-#ifndef DISABLE_PSI_TRANSACTION
-#define DISABLE_PSI_TRANSACTION
-#endif
-
-#ifndef DISABLE_PSI_SP
-#define DISABLE_PSI_SP
-#endif
-
-#ifndef DISABLE_PSI_PS
-#define DISABLE_PSI_PS
-#endif
-
-#endif
-
-/**
-  @def DISABLE_PSI_MUTEX
-  Compiling option to disable the mutex instrumentation.
-  This option is mostly intended to be used during development,
-  when doing special builds with only a subset of the performance schema instrumentation,
-  for code analysis / profiling / performance tuning of a specific instrumentation alone.
-  @sa DISABLE_PSI_RWLOCK
-  @sa DISABLE_PSI_COND
-  @sa DISABLE_PSI_FILE
-  @sa DISABLE_PSI_THREAD
-  @sa DISABLE_PSI_TABLE
-  @sa DISABLE_PSI_STAGE
-  @sa DISABLE_PSI_STATEMENT
-  @sa DISABLE_PSI_SP
-  @sa DISABLE_PSI_STATEMENT_DIGEST
-  @sa DISABLE_PSI_SOCKET
-  @sa DISABLE_PSI_MEMORY
-  @sa DISABLE_PSI_IDLE
-  @sa DISABLE_PSI_METADATA
-  @sa DISABLE PSI_TRANSACTION
-*/
-
-#ifndef DISABLE_PSI_MUTEX
-#define HAVE_PSI_MUTEX_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_RWLOCK
-  Compiling option to disable the rwlock instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_RWLOCK
-#define HAVE_PSI_RWLOCK_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_COND
-  Compiling option to disable the cond instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_COND
-#define HAVE_PSI_COND_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_FILE
-  Compiling option to disable the file instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_FILE
-#define HAVE_PSI_FILE_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_THREAD
-  Compiling option to disable the thread instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-#ifndef DISABLE_PSI_THREAD
-#define HAVE_PSI_THREAD_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_TABLE
-  Compiling option to disable the table instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_TABLE
-#define HAVE_PSI_TABLE_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_STAGE
-  Compiling option to disable the stage instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_STAGE
-#define HAVE_PSI_STAGE_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_STATEMENT
-  Compiling option to disable the statement instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_STATEMENT
-#define HAVE_PSI_STATEMENT_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_SP
-  Compiling option to disable the stored program instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-#ifndef DISABLE_PSI_SP
-#define HAVE_PSI_SP_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_PS
-  Compiling option to disable the prepared statement instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-#ifndef DISABLE_PSI_STATEMENT
-#ifndef DISABLE_PSI_PS
-#define HAVE_PSI_PS_INTERFACE
-#endif
-#endif
-
-/**
-  @def DISABLE_PSI_STATEMENT_DIGEST
-  Compiling option to disable the statement digest instrumentation.
-*/
-
-#ifndef DISABLE_PSI_STATEMENT
-#ifndef DISABLE_PSI_STATEMENT_DIGEST
-#define HAVE_PSI_STATEMENT_DIGEST_INTERFACE
-#endif
-#endif
-
-/**
-  @def DISABLE_PSI_TRANSACTION
-  Compiling option to disable the transaction instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_TRANSACTION
-#define HAVE_PSI_TRANSACTION_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_SOCKET
-  Compiling option to disable the statement instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_SOCKET
-#define HAVE_PSI_SOCKET_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_MEMORY
-  Compiling option to disable the memory instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_MEMORY
-#define HAVE_PSI_MEMORY_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_IDLE
-  Compiling option to disable the idle instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_IDLE
-#define HAVE_PSI_IDLE_INTERFACE
-#endif
-
-/**
-  @def DISABLE_PSI_METADATA
-  Compiling option to disable the metadata instrumentation.
-  @sa DISABLE_PSI_MUTEX
-*/
-
-#ifndef DISABLE_PSI_METADATA
-#define HAVE_PSI_METADATA_INTERFACE
-#endif
 
 /**
   @def PSI_VERSION_1
@@ -570,42 +133,25 @@ typedef struct PSI_bootstrap PSI_bootstrap;
   This is an opaque structure.
 */
 struct PSI_mutex_locker;
-typedef struct PSI_mutex_locker PSI_mutex_locker;
 
 /**
   Interface for an instrumented rwlock operation.
   This is an opaque structure.
 */
-struct PSI_rwlock_locker;
-typedef struct PSI_rwlock_locker PSI_rwlock_locker;
 
+struct PSI_rwlock_locker;
 /**
   Interface for an instrumented condition operation.
   This is an opaque structure.
 */
+
 struct PSI_cond_locker;
-typedef struct PSI_cond_locker PSI_cond_locker;
 
 /**
   Interface for an instrumented file operation.
   This is an opaque structure.
 */
 struct PSI_file_locker;
-typedef struct PSI_file_locker PSI_file_locker;
-
-/**
-  Interface for an instrumented socket operation.
-  This is an opaque structure.
-*/
-struct PSI_socket_locker;
-typedef struct PSI_socket_locker PSI_socket_locker;
-
-/**
-  Interface for an instrumented MDL operation.
-  This is an opaque structure.
-*/
-struct PSI_metadata_locker;
-typedef struct PSI_metadata_locker PSI_metadata_locker;
 
 /** Operation performed on an instrumented mutex. */
 enum PSI_mutex_operation
@@ -615,14 +161,8 @@ enum PSI_mutex_operation
   /** Lock attempt. */
   PSI_MUTEX_TRYLOCK= 1
 };
-typedef enum PSI_mutex_operation PSI_mutex_operation;
 
-/**
-  Operation performed on an instrumented rwlock.
-  For basic READ / WRITE lock,
-  operations are "READ" or "WRITE".
-  For SX-locks, operations are "SHARED", "SHARED-EXCLUSIVE" or "EXCLUSIVE".
-*/
+/** Operation performed on an instrumented rwlock. */
 enum PSI_rwlock_operation
 {
   /** Read lock. */
@@ -632,23 +172,8 @@ enum PSI_rwlock_operation
   /** Read lock attempt. */
   PSI_RWLOCK_TRYREADLOCK= 2,
   /** Write lock attempt. */
-  PSI_RWLOCK_TRYWRITELOCK= 3,
-
-  /** Shared lock. */
-  PSI_RWLOCK_SHAREDLOCK= 4,
-  /** Shared Exclusive lock. */
-  PSI_RWLOCK_SHAREDEXCLUSIVELOCK= 5,
-  /** Exclusive lock. */
-  PSI_RWLOCK_EXCLUSIVELOCK= 6,
-  /** Shared lock attempt. */
-  PSI_RWLOCK_TRYSHAREDLOCK= 7,
-  /** Shared Exclusive lock attempt. */
-  PSI_RWLOCK_TRYSHAREDEXCLUSIVELOCK= 8,
-  /** Exclusive lock attempt. */
-  PSI_RWLOCK_TRYEXCLUSIVELOCK= 9
-
+  PSI_RWLOCK_TRYWRITELOCK= 3
 };
-typedef enum PSI_rwlock_operation PSI_rwlock_operation;
 
 /** Operation performed on an instrumented condition. */
 enum PSI_cond_operation
@@ -658,7 +183,6 @@ enum PSI_cond_operation
   /** Wait, with timeout. */
   PSI_COND_TIMEDWAIT= 1
 };
-typedef enum PSI_cond_operation PSI_cond_operation;
 
 /** Operation performed on an instrumented file. */
 enum PSI_file_operation
@@ -704,63 +228,12 @@ enum PSI_file_operation
   /** File sync, as in @c fsync() or @c my_sync(). */
   PSI_FILE_SYNC= 16
 };
-typedef enum PSI_file_operation PSI_file_operation;
 
-/** Lock operation performed on an instrumented table. */
-enum PSI_table_lock_operation
-{
-  /** Table lock, in the server layer. */
-  PSI_TABLE_LOCK= 0,
-  /** Table lock, in the storage engine layer. */
-  PSI_TABLE_EXTERNAL_LOCK= 1
-};
-typedef enum PSI_table_lock_operation PSI_table_lock_operation;
-
-/** State of an instrumented socket. */
-enum PSI_socket_state
-{
-  /** Idle, waiting for the next command. */
-  PSI_SOCKET_STATE_IDLE= 1,
-  /** Active, executing a command. */
-  PSI_SOCKET_STATE_ACTIVE= 2
-};
-typedef enum PSI_socket_state PSI_socket_state;
-
-/** Operation performed on an instrumented socket. */
-enum PSI_socket_operation
-{
-  /** Socket creation, as in @c socket() or @c socketpair(). */
-  PSI_SOCKET_CREATE= 0,
-  /** Socket connection, as in @c connect(), @c listen() and @c accept(). */
-  PSI_SOCKET_CONNECT= 1,
-  /** Socket bind, as in @c bind(), @c getsockname() and @c getpeername(). */
-  PSI_SOCKET_BIND= 2,
-  /** Socket close, as in @c shutdown(). */
-  PSI_SOCKET_CLOSE= 3,
-  /** Socket send, @c send(). */
-  PSI_SOCKET_SEND= 4,
-  /** Socket receive, @c recv(). */
-  PSI_SOCKET_RECV= 5,
-  /** Socket send, @c sendto(). */
-  PSI_SOCKET_SENDTO= 6,
-  /** Socket receive, @c recvfrom). */
-  PSI_SOCKET_RECVFROM= 7,
-  /** Socket send, @c sendmsg(). */
-  PSI_SOCKET_SENDMSG= 8,
-  /** Socket receive, @c recvmsg(). */
-  PSI_SOCKET_RECVMSG= 9,
-  /** Socket seek, such as @c fseek() or @c seek(). */
-  PSI_SOCKET_SEEK= 10,
-  /** Socket options, as in @c getsockopt() and @c setsockopt(). */
-  PSI_SOCKET_OPT= 11,
-  /** Socket status, as in @c sockatmark() and @c isfdtype(). */
-  PSI_SOCKET_STAT= 12,
-  /** Socket shutdown, as in @c shutdown(). */
-  PSI_SOCKET_SHUTDOWN= 13,
-  /** Socket select, as in @c select() and @c poll(). */
-  PSI_SOCKET_SELECT= 14
-};
-typedef enum PSI_socket_operation PSI_socket_operation;
+/**
+  Interface for an instrumented table operation.
+  This is an opaque structure.
+*/
+struct PSI_table_locker;
 
 /**
   Instrumented mutex key.
@@ -798,31 +271,38 @@ typedef unsigned int PSI_thread_key;
   To instrument a file, a file key must be obtained using @c register_file.
   Using a zero key always disable the instrumentation.
 */
-#ifndef PSI_FILE_KEY_DEFINED
 typedef unsigned int PSI_file_key;
-#define PSI_FILE_KEY_DEFINED
+
+/**
+  @def USE_PSI_1
+  Define USE_PSI_1 to use the interface version 1.
+*/
+
+/**
+  @def USE_PSI_2
+  Define USE_PSI_2 to use the interface version 2.
+*/
+
+/**
+  @def HAVE_PSI_1
+  Define HAVE_PSI_1 if the interface version 1 needs to be compiled in.
+*/
+
+/**
+  @def HAVE_PSI_2
+  Define HAVE_PSI_2 if the interface version 2 needs to be compiled in.
+*/
+
+/**
+  Global flag.
+  This flag indicate that an instrumentation point is a global variable,
+  or a singleton.
+*/
+#define PSI_FLAG_GLOBAL (1 << 0)
+
+#ifdef USE_PSI_1
+#define HAVE_PSI_1
 #endif
-
-/**
-  Instrumented stage key.
-  To instrument a stage, a stage key must be obtained using @c register_stage.
-  Using a zero key always disable the instrumentation.
-*/
-typedef unsigned int PSI_stage_key;
-
-/**
-  Instrumented statement key.
-  To instrument a statement, a statement key must be obtained using @c register_statement.
-  Using a zero key always disable the instrumentation.
-*/
-typedef unsigned int PSI_statement_key;
-
-/**
-  Instrumented socket key.
-  To instrument a socket, a socket key must be obtained using @c register_socket.
-  Using a zero key always disable the instrumentation.
-*/
-typedef unsigned int PSI_socket_key;
 
 #ifdef HAVE_PSI_1
 
@@ -853,7 +333,6 @@ struct PSI_mutex_info_v1
   */
   int m_flags;
 };
-typedef struct PSI_mutex_info_v1 PSI_mutex_info_v1;
 
 /**
   Rwlock information.
@@ -876,7 +355,6 @@ struct PSI_rwlock_info_v1
   */
   int m_flags;
 };
-typedef struct PSI_rwlock_info_v1 PSI_rwlock_info_v1;
 
 /**
   Condition information.
@@ -899,7 +377,6 @@ struct PSI_cond_info_v1
   */
   int m_flags;
 };
-typedef struct PSI_cond_info_v1 PSI_cond_info_v1;
 
 /**
   Thread instrument information.
@@ -922,7 +399,6 @@ struct PSI_thread_info_v1
   */
   int m_flags;
 };
-typedef struct PSI_thread_info_v1 PSI_thread_info_v1;
 
 /**
   File instrument information.
@@ -945,102 +421,20 @@ struct PSI_file_info_v1
   */
   int m_flags;
 };
-typedef struct PSI_file_info_v1 PSI_file_info_v1;
 
 /**
-  Stage instrument information.
-  @since PSI_VERSION_1
-  This structure is used to register an instrumented stage.
-*/
-struct PSI_stage_info_v1
-{
-  /** The registered stage key. */
-  PSI_stage_key m_key;
-  /** The name of the stage instrument to register. */
-  const char *m_name;
-  /** The flags of the stage instrument to register. */
-  int m_flags;
-};
-typedef struct PSI_stage_info_v1 PSI_stage_info_v1;
-
-/**
-  Statement instrument information.
-  @since PSI_VERSION_1
-  This structure is used to register an instrumented statement.
-*/
-struct PSI_statement_info_v1
-{
-  /** The registered statement key. */
-  PSI_statement_key m_key;
-  /** The name of the statement instrument to register. */
-  const char *m_name;
-  /** The flags of the statement instrument to register. */
-  int m_flags;
-};
-typedef struct PSI_statement_info_v1 PSI_statement_info_v1;
-
-/**
-  Socket instrument information.
-  @since PSI_VERSION_1
-  This structure is used to register an instrumented socket.
-*/
-struct PSI_socket_info_v1
-{
-  /**
-    Pointer to the key assigned to the registered socket.
-  */
-  PSI_socket_key *m_key;
-  /**
-    The name of the socket instrument to register.
-  */
-  const char *m_name;
-  /**
-    The flags of the socket instrument to register.
-    @sa PSI_FLAG_GLOBAL
-  */
-  int m_flags;
-};
-typedef struct PSI_socket_info_v1 PSI_socket_info_v1;
-
-/**
-  State data storage for @c start_idle_wait_v1_t.
-  This structure provide temporary storage to an idle locker.
-  The content of this structure is considered opaque,
-  the fields are only hints of what an implementation
-  of the psi interface can use.
-  This memory is provided by the instrumented code for performance reasons.
-  @sa start_idle_wait_v1_t.
-*/
-struct PSI_idle_locker_state_v1
-{
-  /** Internal state. */
-  uint m_flags;
-  /** Current thread. */
-  struct PSI_thread *m_thread;
-  /** Timer start. */
-  ulonglong m_timer_start;
-  /** Timer function. */
-  ulonglong (*m_timer)(void);
-  /** Internal data. */
-  void *m_wait;
-};
-typedef struct PSI_idle_locker_state_v1 PSI_idle_locker_state_v1;
-
-/**
-  State data storage for @c start_mutex_wait_v1_t.
+  State data storage for @c get_thread_mutex_locker_v1_t.
   This structure provide temporary storage to a mutex locker.
   The content of this structure is considered opaque,
   the fields are only hints of what an implementation
   of the psi interface can use.
   This memory is provided by the instrumented code for performance reasons.
-  @sa start_mutex_wait_v1_t
+  @sa get_thread_mutex_locker_v1_t
 */
 struct PSI_mutex_locker_state_v1
 {
   /** Internal state. */
   uint m_flags;
-  /** Current operation. */
-  enum PSI_mutex_operation m_operation;
   /** Current mutex. */
   struct PSI_mutex *m_mutex;
   /** Current thread. */
@@ -1049,27 +443,29 @@ struct PSI_mutex_locker_state_v1
   ulonglong m_timer_start;
   /** Timer function. */
   ulonglong (*m_timer)(void);
+  /** Current operation. */
+  enum PSI_mutex_operation m_operation;
+  /** Source file. */
+  const char* m_src_file;
+  /** Source line number. */
+  int m_src_line;
   /** Internal data. */
   void *m_wait;
 };
-typedef struct PSI_mutex_locker_state_v1 PSI_mutex_locker_state_v1;
 
 /**
-  State data storage for @c start_rwlock_rdwait_v1_t, @c start_rwlock_wrwait_v1_t.
+  State data storage for @c get_thread_rwlock_locker_v1_t.
   This structure provide temporary storage to a rwlock locker.
   The content of this structure is considered opaque,
   the fields are only hints of what an implementation
   of the psi interface can use.
   This memory is provided by the instrumented code for performance reasons.
-  @sa start_rwlock_rdwait_v1_t
-  @sa start_rwlock_wrwait_v1_t
+  @sa get_thread_rwlock_locker_v1_t
 */
 struct PSI_rwlock_locker_state_v1
 {
   /** Internal state. */
   uint m_flags;
-  /** Current operation. */
-  enum PSI_rwlock_operation m_operation;
   /** Current rwlock. */
   struct PSI_rwlock *m_rwlock;
   /** Current thread. */
@@ -1078,26 +474,29 @@ struct PSI_rwlock_locker_state_v1
   ulonglong m_timer_start;
   /** Timer function. */
   ulonglong (*m_timer)(void);
+  /** Current operation. */
+  enum PSI_rwlock_operation m_operation;
+  /** Source file. */
+  const char* m_src_file;
+  /** Source line number. */
+  int m_src_line;
   /** Internal data. */
   void *m_wait;
 };
-typedef struct PSI_rwlock_locker_state_v1 PSI_rwlock_locker_state_v1;
 
 /**
-  State data storage for @c start_cond_wait_v1_t.
+  State data storage for @c get_thread_cond_locker_v1_t.
   This structure provide temporary storage to a condition locker.
   The content of this structure is considered opaque,
   the fields are only hints of what an implementation
   of the psi interface can use.
   This memory is provided by the instrumented code for performance reasons.
-  @sa start_cond_wait_v1_t
+  @sa get_thread_cond_locker_v1_t
 */
 struct PSI_cond_locker_state_v1
 {
   /** Internal state. */
   uint m_flags;
-  /** Current operation. */
-  enum PSI_cond_operation m_operation;
   /** Current condition. */
   struct PSI_cond *m_cond;
   /** Current mutex. */
@@ -1108,10 +507,15 @@ struct PSI_cond_locker_state_v1
   ulonglong m_timer_start;
   /** Timer function. */
   ulonglong (*m_timer)(void);
+  /** Current operation. */
+  enum PSI_cond_operation m_operation;
+  /** Source file. */
+  const char* m_src_file;
+  /** Source line number. */
+  int m_src_line;
   /** Internal data. */
   void *m_wait;
 };
-typedef struct PSI_cond_locker_state_v1 PSI_cond_locker_state_v1;
 
 /**
   State data storage for @c get_thread_file_name_locker_v1_t.
@@ -1128,184 +532,8 @@ struct PSI_file_locker_state_v1
 {
   /** Internal state. */
   uint m_flags;
-  /** Current operation. */
-  enum PSI_file_operation m_operation;
   /** Current file. */
   struct PSI_file *m_file;
-  /** Current file name. */
-  const char *m_name;
-  /** Current file class. */
-  void *m_class;
-  /** Current thread. */
-  struct PSI_thread *m_thread;
-  /** Operation number of bytes. */
-  size_t m_number_of_bytes;
-  /** Timer start. */
-  ulonglong m_timer_start;
-  /** Timer function. */
-  ulonglong (*m_timer)(void);
-  /** Internal data. */
-  void *m_wait;
-};
-typedef struct PSI_file_locker_state_v1 PSI_file_locker_state_v1;
-
-/**
-  State data storage for @c start_metadata_wait_v1_t.
-  This structure provide temporary storage to a metadata locker.
-  The content of this structure is considered opaque,
-  the fields are only hints of what an implementation
-  of the psi interface can use.
-  This memory is provided by the instrumented code for performance reasons.
-  @sa start_metadata_wait_v1_t
-*/
-struct PSI_metadata_locker_state_v1
-{
-  /** Internal state. */
-  uint m_flags;
-  /** Current metadata lock. */
-  struct PSI_metadata_lock *m_metadata_lock;
-  /** Current thread. */
-  struct PSI_thread *m_thread;
-  /** Timer start. */
-  ulonglong m_timer_start;
-  /** Timer function. */
-  ulonglong (*m_timer)(void);
-  /** Internal data. */
-  void *m_wait;
-};
-typedef struct PSI_metadata_locker_state_v1 PSI_metadata_locker_state_v1;
-
-/* Duplicate of NAME_LEN, to avoid dependency on mysql_com.h */
-#define PSI_SCHEMA_NAME_LEN (64 * 3)
-
-/**
-  State data storage for @c get_thread_statement_locker_v1_t,
-  @c get_thread_statement_locker_v1_t.
-  This structure provide temporary storage to a statement locker.
-  The content of this structure is considered opaque,
-  the fields are only hints of what an implementation
-  of the psi interface can use.
-  This memory is provided by the instrumented code for performance reasons.
-  @sa get_thread_statement_locker_v1_t
-*/
-struct PSI_statement_locker_state_v1
-{
-  /** Discarded flag. */
-  my_bool m_discarded;
-  /** In prepare flag. */
-  my_bool m_in_prepare;
-  /** Metric, no index used flag. */
-  uchar m_no_index_used;
-  /** Metric, no good index used flag. */
-  uchar m_no_good_index_used;
-  /** Internal state. */
-  uint m_flags;
-  /** Instrumentation class. */
-  void *m_class;
-  /** Current thread. */
-  struct PSI_thread *m_thread;
-  /** Timer start. */
-  ulonglong m_timer_start;
-  /** Timer function. */
-  ulonglong (*m_timer)(void);
-  /** Internal data. */
-  void *m_statement;
-  /** Locked time. */
-  ulonglong m_lock_time;
-  /** Rows sent. */
-  ulonglong m_rows_sent;
-  /** Rows examined. */
-  ulonglong m_rows_examined;
-  /** Metric, temporary tables created on disk. */
-  ulong m_created_tmp_disk_tables;
-  /** Metric, temporary tables created. */
-  ulong m_created_tmp_tables;
-  /** Metric, number of select full join. */
-  ulong m_select_full_join;
-  /** Metric, number of select full range join. */
-  ulong m_select_full_range_join;
-  /** Metric, number of select range. */
-  ulong m_select_range;
-  /** Metric, number of select range check. */
-  ulong m_select_range_check;
-  /** Metric, number of select scan. */
-  ulong m_select_scan;
-  /** Metric, number of sort merge passes. */
-  ulong m_sort_merge_passes;
-  /** Metric, number of sort merge. */
-  ulong m_sort_range;
-  /** Metric, number of sort rows. */
-  ulong m_sort_rows;
-  /** Metric, number of sort scans. */
-  ulong m_sort_scan;
-  /** Statement digest. */
-  const struct sql_digest_storage *m_digest;
-  /** Current schema name. */
-  char m_schema_name[PSI_SCHEMA_NAME_LEN];
-  /** Length in bytes of @c m_schema_name. */
-  uint m_schema_name_length;
-  /** Statement character set number. */
-  uint m_cs_number;
-  PSI_sp_share *m_parent_sp_share;
-  PSI_prepared_stmt *m_parent_prepared_stmt;
-};
-typedef struct PSI_statement_locker_state_v1 PSI_statement_locker_state_v1;
-
-/**
-  State data storage for @c get_thread_transaction_locker_v1_t,
-  @c get_thread_transaction_locker_v1_t.
-  This structure provide temporary storage to a transaction locker.
-  The content of this structure is considered opaque,
-  the fields are only hints of what an implementation
-  of the psi interface can use.
-  This memory is provided by the instrumented code for performance reasons.
-  @sa get_thread_transaction_locker_v1_t
-*/
-struct PSI_transaction_locker_state_v1
-{
-  /** Internal state. */
-  uint m_flags;
-  /** Instrumentation class. */
-  void *m_class;
-  /** Current thread. */
-  struct PSI_thread *m_thread;
-  /** Timer start. */
-  ulonglong m_timer_start;
-  /** Timer function. */
-  ulonglong (*m_timer)(void);
-  /** Internal data. */
-  void *m_transaction;
-  /** True if read-only transaction, false if read-write. */
-  my_bool m_read_only;
-  /** True if transaction is autocommit. */
-  my_bool m_autocommit;
-  /** Number of statements. */
-  ulong m_statement_count;
-  /** Total number of savepoints. */
-  ulong m_savepoint_count;
-  /** Number of rollback_to_savepoint. */
-  ulong m_rollback_to_savepoint_count;
-  /** Number of release_savepoint. */
-  ulong m_release_savepoint_count;
-};
-
-typedef struct PSI_transaction_locker_state_v1 PSI_transaction_locker_state_v1;
-
-/**
-  State data storage for @c start_socket_wait_v1_t.
-  This structure provide temporary storage to a socket locker.
-  The content of this structure is considered opaque,
-  the fields are only hints of what an implementation
-  of the psi interface can use.
-  This memory is provided by the instrumented code for performance reasons.
-  @sa start_socket_wait_v1_t
-*/
-struct PSI_socket_locker_state_v1
-{
-  /** Internal state. */
-  uint m_flags;
-  /** Current socket. */
-  struct PSI_socket *m_socket;
   /** Current thread. */
   struct PSI_thread *m_thread;
   /** Operation number of bytes. */
@@ -1315,7 +543,7 @@ struct PSI_socket_locker_state_v1
   /** Timer function. */
   ulonglong (*m_timer)(void);
   /** Current operation. */
-  enum PSI_socket_operation m_operation;
+  enum PSI_file_operation m_operation;
   /** Source file. */
   const char* m_src_file;
   /** Source line number. */
@@ -1323,22 +551,45 @@ struct PSI_socket_locker_state_v1
   /** Internal data. */
   void *m_wait;
 };
-typedef struct PSI_socket_locker_state_v1 PSI_socket_locker_state_v1;
 
-struct PSI_sp_locker_state_v1
+/**
+  State data storage for @c get_thread_table_locker_v1_t.
+  This structure provide temporary storage to a table locker.
+  The content of this structure is considered opaque,
+  the fields are only hints of what an implementation
+  of the psi interface can use.
+  This memory is provided by the instrumented code for performance reasons.
+  @sa get_thread_table_locker_v1_t
+*/
+struct PSI_table_locker_state_v1
 {
   /** Internal state. */
   uint m_flags;
+  /** Current table handle. */
+  struct PSI_table *m_table;
+  /** Current table share. */
+  struct PSI_table_share *m_table_share;
+  /** Instrumentation class. */
+  void *m_class;
   /** Current thread. */
   struct PSI_thread *m_thread;
   /** Timer start. */
   ulonglong m_timer_start;
   /** Timer function. */
   ulonglong (*m_timer)(void);
-  /** Stored Procedure share. */
-  PSI_sp_share* m_sp_share;
+  /* Current operation (waiting for WL#4895). */
+  /* enum PSI_table_operation m_operation; */
+  /** Current table io index. */
+  uint m_index;
+  /** Current table lock index. */
+  uint m_lock_index;
+  /** Source file. */
+  const char* m_src_file;
+  /** Source line number. */
+  int m_src_line;
+  /** Internal data. */
+  void *m_wait;
 };
-typedef struct PSI_sp_locker_state_v1 PSI_sp_locker_state_v1;
 
 /* Using typedef to make reuse between PSI_v1 and PSI_v2 easier later. */
 
@@ -1388,33 +639,6 @@ typedef void (*register_file_v1_t)
   (const char *category, struct PSI_file_info_v1 *info, int count);
 
 /**
-  Stage registration API.
-  @param category a category name
-  @param info an array of stage info to register
-  @param count the size of the info array
-*/
-typedef void (*register_stage_v1_t)
-  (const char *category, struct PSI_stage_info_v1 **info, int count);
-
-/**
-  Statement registration API.
-  @param category a category name
-  @param info an array of stage info to register
-  @param count the size of the info array
-*/
-typedef void (*register_statement_v1_t)
-  (const char *category, struct PSI_statement_info_v1 *info, int count);
-
-/**
-  Socket registration API.
-  @param category a category name (typically a plugin name)
-  @param info an array of socket info to register
-  @param count the size of the info array
-*/
-typedef void (*register_socket_v1_t)
-  (const char *category, struct PSI_socket_info_v1 *info, int count);
-
-/**
   Mutex instrumentation initialisation API.
   @param key the registered mutex key
   @param identity the address of the mutex itself
@@ -1460,49 +684,23 @@ typedef struct PSI_cond* (*init_cond_v1_t)
 typedef void (*destroy_cond_v1_t)(struct PSI_cond *cond);
 
 /**
-  Socket instrumentation initialisation API.
-  @param key the registered mutex key
-  @param socket descriptor
-  @param addr the socket ip address
-  @param addr_len length of socket ip address
-  @return an instrumented socket
-*/
-typedef struct PSI_socket* (*init_socket_v1_t)
-  (PSI_socket_key key, const my_socket *fd,
-  const struct sockaddr *addr, socklen_t addr_len);
-
-/**
-  socket instrumentation destruction API.
-  @param socket the socket to destroy
-*/
-typedef void (*destroy_socket_v1_t)(struct PSI_socket *socket);
-
-/**
-  Acquire a table share instrumentation.
-  @param temporary True for temporary tables
-  @param share The SQL layer table share
-  @return a table share instrumentation, or NULL
+  Acquire a table info by name.
+  @param schema_name name of the table schema
+  @param schema_name_length length of schema_name
+  @param table_name name of the table
+  @param table_name_length length of table_name
+  @param identity table identity pointer, typically the table share
+  @return a table info, or NULL if the table is not instrumented
 */
 typedef struct PSI_table_share* (*get_table_share_v1_t)
-  (my_bool temporary, struct TABLE_SHARE *share);
+  (const char *schema_name, int schema_name_length, const char *table_name,
+   int table_name_length, const void *identity);
 
 /**
   Release a table share.
   @param info the table share to release
 */
 typedef void (*release_table_share_v1_t)(struct PSI_table_share *share);
-
-/**
-  Drop a table share.
-  @param temporary True for temporary tables
-  @param schema_name the table schema name
-  @param schema_name_length the table schema name length
-  @param table_name the table name
-  @param table_name_length the table name length
-*/
-typedef void (*drop_table_share_v1_t)
-  (my_bool temporary, const char *schema_name, int schema_name_length,
-   const char *table_name, int table_name_length);
 
 /**
   Open an instrumentation table handle.
@@ -1514,29 +712,11 @@ typedef struct PSI_table* (*open_table_v1_t)
   (struct PSI_table_share *share, const void *identity);
 
 /**
-  Unbind a table handle from the current thread.
-  This operation happens when an opened table is added to the open table cache.
-  @param table the table to unbind
-*/
-typedef void (*unbind_table_v1_t)
-  (struct PSI_table *table);
-
-/**
-  Rebind a table handle to the current thread.
-  This operation happens when a table from the open table cache
-  is reused for a thread.
-  @param table the table to unbind
-*/
-typedef PSI_table* (*rebind_table_v1_t)
-  (PSI_table_share *share, const void *identity, PSI_table *table);
-
-/**
   Close an instrumentation table handle.
   Note that the table handle is invalid after this call.
   @param table the table handle to close
 */
-typedef void (*close_table_v1_t)(struct TABLE_SHARE *server_share,
-                                 struct PSI_table *table);
+typedef void (*close_table_v1_t)(struct PSI_table *table);
 
 /**
   Create a file instrumentation for a created file.
@@ -1559,8 +739,8 @@ typedef void (*create_file_v1_t)(PSI_file_key key, const char *name,
   @param arg the thread start routine argument
 */
 typedef int (*spawn_thread_v1_t)(PSI_thread_key key,
-                                 my_thread_handle *thread,
-                                 const my_thread_attr_t *attr,
+                                 pthread_t *thread,
+                                 const pthread_attr_t *attr,
                                  void *(*start_routine)(void*), void *arg);
 
 /**
@@ -1570,15 +750,7 @@ typedef int (*spawn_thread_v1_t)(PSI_thread_key key,
   @return an instrumented thread
 */
 typedef struct PSI_thread* (*new_thread_v1_t)
-  (PSI_thread_key key, const void *identity, ulonglong thread_id);
-
-/**
-  Assign a THD to an instrumented thread.
-  @param thread the instrumented thread
-  @param THD the sql layer THD to assign
-*/
-typedef void (*set_thread_THD_v1_t)(struct PSI_thread *thread,
-                                    THD *thd);
+  (PSI_thread_key key, const void *identity, ulong thread_id);
 
 /**
   Assign an id to an instrumented thread.
@@ -1586,14 +758,7 @@ typedef void (*set_thread_THD_v1_t)(struct PSI_thread *thread,
   @param id the id to assign
 */
 typedef void (*set_thread_id_v1_t)(struct PSI_thread *thread,
-                                   ulonglong id);
-
-/**
-  Assign the current operating system thread id to an instrumented thread.
-  The operating system task id is obtained from @c gettid()
-  @param thread the instrumented thread
-*/
-typedef void (*set_thread_os_id_v1_t)(struct PSI_thread *thread);
+                                   unsigned long id);
 
 /**
   Get the instrumentation for the running thread.
@@ -1603,62 +768,6 @@ typedef void (*set_thread_os_id_v1_t)(struct PSI_thread *thread);
   @return the instrumentation for the running thread
 */
 typedef struct PSI_thread* (*get_thread_v1_t)(void);
-
-/**
-  Assign a user name to the instrumented thread.
-  @param user the user name
-  @param user_len the user name length
-*/
-typedef void (*set_thread_user_v1_t)(const char *user, int user_len);
-
-/**
-  Assign a user name and host name to the instrumented thread.
-  @param user the user name
-  @param user_len the user name length
-  @param host the host name
-  @param host_len the host name length
-*/
-typedef void (*set_thread_account_v1_t)(const char *user, int user_len,
-                                        const char *host, int host_len);
-
-/**
-  Assign a current database to the instrumented thread.
-  @param db the database name
-  @param db_len the database name length
-*/
-typedef void (*set_thread_db_v1_t)(const char* db, int db_len);
-
-/**
-  Assign a current command to the instrumented thread.
-  @param command the current command
-*/
-typedef void (*set_thread_command_v1_t)(int command);
-
-/**
-  Assign a connection type to the instrumented thread.
-  @param conn_type the connection type
-*/
-typedef void (*set_connection_type_v1_t)(opaque_vio_type conn_type);
-
-
-/**
-  Assign a start time to the instrumented thread.
-  @param start_time the thread start time
-*/
-typedef void (*set_thread_start_time_v1_t)(time_t start_time);
-
-/**
-  Assign a state to the instrumented thread.
-  @param state the thread state
-*/
-typedef void (*set_thread_state_v1_t)(const char* state);
-
-/**
-  Assign a process info to the instrumented thread.
-  @param info the process into string
-  @param info_len the process into string length
-*/
-typedef void (*set_thread_info_v1_t)(const char* info, uint info_len);
 
 /**
   Attach a thread instrumentation to the running thread.
@@ -1676,6 +785,50 @@ typedef void (*delete_current_thread_v1_t)(void);
 
 /** Delete a thread instrumentation. */
 typedef void (*delete_thread_v1_t)(struct PSI_thread *thread);
+
+/**
+  Get a mutex instrumentation locker.
+  @param state data storage for the locker
+  @param mutex the instrumented mutex to lock
+  @return a mutex locker, or NULL
+*/
+typedef struct PSI_mutex_locker* (*get_thread_mutex_locker_v1_t)
+  (struct PSI_mutex_locker_state_v1 *state,
+   struct PSI_mutex *mutex,
+   enum PSI_mutex_operation op);
+
+/**
+  Get a rwlock instrumentation locker.
+  @param state data storage for the locker
+  @param rwlock the instrumented rwlock to lock
+  @return a rwlock locker, or NULL
+*/
+typedef struct PSI_rwlock_locker* (*get_thread_rwlock_locker_v1_t)
+  (struct PSI_rwlock_locker_state_v1 *state,
+   struct PSI_rwlock *rwlock,
+   enum PSI_rwlock_operation op);
+
+/**
+  Get a cond instrumentation locker.
+  @param state data storage for the locker
+  @param cond the instrumented condition to wait on
+  @param mutex the instrumented mutex associated with the condition
+  @return a condition locker, or NULL
+*/
+typedef struct PSI_cond_locker* (*get_thread_cond_locker_v1_t)
+  (struct PSI_cond_locker_state_v1 *state,
+   struct PSI_cond *cond, struct PSI_mutex *mutex,
+   enum PSI_cond_operation op);
+
+/**
+  Get a table instrumentation locker.
+  @param state data storage for the locker
+  @param table the instrumented table to lock
+  @return a table locker, or NULL
+*/
+typedef struct PSI_table_locker* (*get_thread_table_locker_v1_t)
+  (struct PSI_table_locker_state_v1 *state,
+   struct PSI_table *table);
 
 /**
   Get a file instrumentation locker, for opening or creating a file.
@@ -1742,36 +895,11 @@ typedef void (*broadcast_cond_v1_t)
   (struct PSI_cond *cond);
 
 /**
-  Record an idle instrumentation wait start event.
-  @param state data storage for the locker
-  @param file the source file name
-  @param line the source line number
-  @return an idle locker, or NULL
-*/
-typedef struct PSI_idle_locker* (*start_idle_wait_v1_t)
-  (struct PSI_idle_locker_state_v1 *state, const char *src_file, uint src_line);
-
-/**
-  Record an idle instrumentation wait end event.
+  Record a mutex instrumentation wait start event.
   @param locker a thread locker for the running thread
 */
-typedef void (*end_idle_wait_v1_t)
-  (struct PSI_idle_locker *locker);
-
-/**
-  Record a mutex instrumentation wait start event.
-  @param state data storage for the locker
-  @param mutex the instrumented mutex to lock
-  @param op the operation to perform
-  @param file the source file name
-  @param line the source line number
-  @return a mutex locker, or NULL
-*/
-typedef struct PSI_mutex_locker* (*start_mutex_wait_v1_t)
-  (struct PSI_mutex_locker_state_v1 *state,
-   struct PSI_mutex *mutex,
-   enum PSI_mutex_operation op,
-   const char *src_file, uint src_line);
+typedef void (*start_mutex_wait_v1_t)
+  (struct PSI_mutex_locker *locker, const char *src_file, uint src_line);
 
 /**
   Record a mutex instrumentation wait end event.
@@ -1786,11 +914,8 @@ typedef void (*end_mutex_wait_v1_t)
   @param locker a thread locker for the running thread
   @param must must block: 1 for lock, 0 for trylock
 */
-typedef struct PSI_rwlock_locker* (*start_rwlock_rdwait_v1_t)
-  (struct PSI_rwlock_locker_state_v1 *state,
-   struct PSI_rwlock *rwlock,
-   enum PSI_rwlock_operation op,
-   const char *src_file, uint src_line);
+typedef void (*start_rwlock_rdwait_v1_t)
+  (struct PSI_rwlock_locker *locker, const char *src_file, uint src_line);
 
 /**
   Record a rwlock instrumentation read wait end event.
@@ -1805,11 +930,8 @@ typedef void (*end_rwlock_rdwait_v1_t)
   @param locker a thread locker for the running thread
   @param must must block: 1 for lock, 0 for trylock
 */
-typedef struct PSI_rwlock_locker* (*start_rwlock_wrwait_v1_t)
-  (struct PSI_rwlock_locker_state_v1 *state,
-   struct PSI_rwlock *rwlock,
-   enum PSI_rwlock_operation op,
-   const char *src_file, uint src_line);
+typedef void (*start_rwlock_wrwait_v1_t)
+  (struct PSI_rwlock_locker *locker, const char *src_file, uint src_line);
 
 /**
   Record a rwlock instrumentation write wait end event.
@@ -1824,12 +946,8 @@ typedef void (*end_rwlock_wrwait_v1_t)
   @param locker a thread locker for the running thread
   @param must must block: 1 for wait, 0 for timedwait
 */
-typedef struct PSI_cond_locker* (*start_cond_wait_v1_t)
-  (struct PSI_cond_locker_state_v1 *state,
-   struct PSI_cond *cond,
-   struct PSI_mutex *mutex,
-   enum PSI_cond_operation op,
-   const char *src_file, uint src_line);
+typedef void (*start_cond_wait_v1_t)
+  (struct PSI_cond_locker *locker, const char *src_file, uint src_line);
 
 /**
   Record a condition instrumentation wait end event.
@@ -1840,47 +958,19 @@ typedef void (*end_cond_wait_v1_t)
   (struct PSI_cond_locker *locker, int rc);
 
 /**
-  Record a table instrumentation io wait start event.
+  Record a table instrumentation wait start event.
   @param locker a table locker for the running thread
   @param file the source file name
   @param line the source line number
 */
-typedef struct PSI_table_locker* (*start_table_io_wait_v1_t)
-  (struct PSI_table_locker_state *state,
-   struct PSI_table *table,
-   enum PSI_table_io_operation op,
-   uint index,
-   const char *src_file, uint src_line);
+typedef void (*start_table_wait_v1_t)
+  (struct PSI_table_locker *locker, const char *src_file, uint src_line);
 
 /**
-  Record a table instrumentation io wait end event.
-  @param locker a table locker for the running thread
-  @param numrows the number of rows involved in io
-*/
-typedef void (*end_table_io_wait_v1_t)
-  (struct PSI_table_locker *locker,
-   ulonglong numrows);
-
-/**
-  Record a table instrumentation lock wait start event.
-  @param locker a table locker for the running thread
-  @param file the source file name
-  @param line the source line number
-*/
-typedef struct PSI_table_locker* (*start_table_lock_wait_v1_t)
-  (struct PSI_table_locker_state *state,
-   struct PSI_table *table,
-   enum PSI_table_lock_operation op,
-   ulong flags,
-   const char *src_file, uint src_line);
-
-/**
-  Record a table instrumentation lock wait end event.
+  Record a table instrumentation wait end event.
   @param locker a table locker for the running thread
 */
-typedef void (*end_table_lock_wait_v1_t)(struct PSI_table_locker *locker);
-
-typedef void (*unlock_table_v1_t)(struct PSI_table *table);
+typedef void (*end_table_wait_v1_t)(struct PSI_table_locker *locker);
 
 /**
   Start a file instrumentation open operation.
@@ -1888,18 +978,16 @@ typedef void (*unlock_table_v1_t)(struct PSI_table *table);
   @param op the operation to perform
   @param src_file the source file name
   @param src_line the source line number
+  @return an instrumented file handle
 */
-typedef void (*start_file_open_wait_v1_t)
+typedef struct PSI_file* (*start_file_open_wait_v1_t)
   (struct PSI_file_locker *locker, const char *src_file, uint src_line);
 
 /**
   End a file instrumentation open operation, for file streams.
   @param locker the file locker.
-  @param result the opened file (NULL indicates failure, non NULL success).
-  @return an instrumented file handle
 */
-typedef struct PSI_file* (*end_file_open_wait_v1_t)
-  (struct PSI_file_locker *locker, void *result);
+typedef void (*end_file_open_wait_v1_t)(struct PSI_file_locker *locker);
 
 /**
   End a file instrumentation open operation, for non stream files.
@@ -1908,15 +996,6 @@ typedef struct PSI_file* (*end_file_open_wait_v1_t)
 */
 typedef void (*end_file_open_wait_and_bind_to_descriptor_v1_t)
   (struct PSI_file_locker *locker, File file);
-
-/**
-  End a file instrumentation open operation, for non stream temporary files.
-  @param locker the file locker.
-  @param file the file number assigned by open() or create() for this file.
-  @param filename the file name generated during temporary file creation.
-*/
-typedef void (*end_temp_file_open_wait_and_bind_to_descriptor_v1_t)
-  (struct PSI_file_locker *locker, File file, const char *filename);
 
 /**
   Record a file instrumentation start event.
@@ -1946,484 +1025,6 @@ typedef void (*end_file_wait_v1_t)
   (struct PSI_file_locker *locker, size_t count);
 
 /**
-  Start a file instrumentation close operation.
-  @param locker the file locker
-  @param op the operation to perform
-  @param src_file the source file name
-  @param src_line the source line number
-*/
-typedef void (*start_file_close_wait_v1_t)
-  (struct PSI_file_locker *locker, const char *src_file, uint src_line);
-
-/**
-  End a file instrumentation close operation.
-  @param locker the file locker.
-  @param rc the close operation return code (0 for success).
-  @return an instrumented file handle
-*/
-typedef void (*end_file_close_wait_v1_t)
-  (struct PSI_file_locker *locker, int rc);
-
-/**
-  Start a new stage, and implicitly end the previous stage.
-  @param key the key of the new stage
-  @param src_file the source file name
-  @param src_line the source line number
-  @return the new stage progress
-*/
-typedef PSI_stage_progress* (*start_stage_v1_t)
-  (PSI_stage_key key, const char *src_file, int src_line);
-
-typedef PSI_stage_progress* (*get_current_stage_progress_v1_t)(void);
-
-/** End the current stage. */
-typedef void (*end_stage_v1_t) (void);
-
-/**
-  Get a statement instrumentation locker.
-  @param state data storage for the locker
-  @param key the statement instrumentation key
-  @param charset client character set
-  @return a statement locker, or NULL
-*/
-typedef struct PSI_statement_locker* (*get_thread_statement_locker_v1_t)
-  (struct PSI_statement_locker_state_v1 *state,
-   PSI_statement_key key, const void *charset, PSI_sp_share *sp_share);
-
-/**
-  Refine a statement locker to a more specific key.
-  Note that only events declared mutable can be refined.
-  @param the statement locker for the current event
-  @param key the new key for the event
-  @sa PSI_FLAG_MUTABLE
-*/
-typedef struct PSI_statement_locker* (*refine_statement_v1_t)
-  (struct PSI_statement_locker *locker,
-   PSI_statement_key key);
-
-/**
-  Start a new statement event.
-  @param locker the statement locker for this event
-  @param db the active database name for this statement
-  @param db_length the active database name length for this statement
-  @param src_file source file name
-  @param src_line source line number
-*/
-typedef void (*start_statement_v1_t)
-  (struct PSI_statement_locker *locker,
-   const char *db, uint db_length,
-   const char *src_file, uint src_line);
-
-/**
-  Set the statement text for a statement event.
-  @param locker the current statement locker
-  @param text the statement text
-  @param text_len the statement text length
-*/
-typedef void (*set_statement_text_v1_t)
-  (struct PSI_statement_locker *locker,
-   const char *text, uint text_len);
-
-/**
-  Set a statement event lock time.
-  @param locker the statement locker
-  @param lock_time the locked time, in microseconds
-*/
-typedef void (*set_statement_lock_time_t)
-  (struct PSI_statement_locker *locker, ulonglong lock_time);
-
-/**
-  Set a statement event rows sent metric.
-  @param locker the statement locker
-  @param count the number of rows sent
-*/
-typedef void (*set_statement_rows_sent_t)
-  (struct PSI_statement_locker *locker, ulonglong count);
-
-/**
-  Set a statement event rows examined metric.
-  @param locker the statement locker
-  @param count the number of rows examined
-*/
-typedef void (*set_statement_rows_examined_t)
-  (struct PSI_statement_locker *locker, ulonglong count);
-
-/**
-  Increment a statement event "created tmp disk tables" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_created_tmp_disk_tables_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "created tmp tables" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_created_tmp_tables_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "select full join" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_select_full_join_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "select full range join" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_select_full_range_join_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "select range join" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_select_range_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "select range check" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_select_range_check_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "select scan" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_select_scan_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "sort merge passes" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_sort_merge_passes_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "sort range" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_sort_range_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "sort rows" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_sort_rows_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Increment a statement event "sort scan" metric.
-  @param locker the statement locker
-  @param count the metric increment value
-*/
-typedef void (*inc_statement_sort_scan_t)
-  (struct PSI_statement_locker *locker, ulong count);
-
-/**
-  Set a statement event "no index used" metric.
-  @param locker the statement locker
-  @param count the metric value
-*/
-typedef void (*set_statement_no_index_used_t)
-  (struct PSI_statement_locker *locker);
-
-/**
-  Set a statement event "no good index used" metric.
-  @param locker the statement locker
-  @param count the metric value
-*/
-typedef void (*set_statement_no_good_index_used_t)
-  (struct PSI_statement_locker *locker);
-
-/**
-  End a statement event.
-  @param locker the statement locker
-  @param stmt_da the statement diagnostics area.
-  @sa Diagnostics_area
-*/
-typedef void (*end_statement_v1_t)
-  (struct PSI_statement_locker *locker, void *stmt_da);
-
-/**
-  Get a transaction instrumentation locker.
-  @param state data storage for the locker
-  @param xid the xid for this transaction
-  @param trxid the InnoDB transaction id
-  @param iso_level isolation level for this transaction
-  @param read_only true if transaction access mode is read-only
-  @param autocommit true if transaction is autocommit
-  @return a transaction locker, or NULL
-*/
-typedef struct PSI_transaction_locker* (*get_thread_transaction_locker_v1_t)
-  (struct PSI_transaction_locker_state_v1 *state, const void *xid,
-   const ulonglong *trxid, int isolation_level, my_bool read_only,
-   my_bool autocommit);
-
-/**
-  Start a new transaction event.
-  @param locker the transaction locker for this event
-  @param src_file source file name
-  @param src_line source line number
-*/
-typedef void (*start_transaction_v1_t)
-  (struct PSI_transaction_locker *locker,
-   const char *src_file, uint src_line);
-
-/**
-  Set the transaction xid.
-  @param locker the transaction locker for this event
-  @param xid the id of the XA transaction
-  #param xa_state is the state of the XA transaction
-*/
-typedef void (*set_transaction_xid_v1_t)
-  (struct PSI_transaction_locker *locker,
-   const void *xid, int xa_state);
-
-/**
-  Set the state of the XA transaction.
-  @param locker the transaction locker for this event
-  @param xa_state the new state of the xa transaction
-*/
-typedef void (*set_transaction_xa_state_v1_t)
-  (struct PSI_transaction_locker *locker,
-   int xa_state);
-
-/**
-  Set the transaction gtid.
-  @param locker the transaction locker for this event
-  @param sid the source id for the transaction, mapped from sidno
-  @param gtid_spec the gtid specifier for the transaction
-*/
-typedef void (*set_transaction_gtid_v1_t)
-  (struct PSI_transaction_locker *locker,
-   const void *sid, const void *gtid_spec);
-
-/**
-  Set the transaction trx_id.
-  @param locker the transaction locker for this event
-  @param trxid the storage engine transaction ID
-*/
-typedef void (*set_transaction_trxid_v1_t)
-  (struct PSI_transaction_locker *locker,
-   const ulonglong *trxid);
-
-/**
-  Increment a transaction event savepoint count.
-  @param locker the transaction locker
-  @param count the increment value
-*/
-typedef void (*inc_transaction_savepoints_v1_t)
-  (struct PSI_transaction_locker *locker, ulong count);
-
-/**
-  Increment a transaction event rollback to savepoint count.
-  @param locker the transaction locker
-  @param count the increment value
-*/
-typedef void (*inc_transaction_rollback_to_savepoint_v1_t)
-  (struct PSI_transaction_locker *locker, ulong count);
-
-/**
-  Increment a transaction event release savepoint count.
-  @param locker the transaction locker
-  @param count the increment value
-*/
-typedef void (*inc_transaction_release_savepoint_v1_t)
-  (struct PSI_transaction_locker *locker, ulong count);
-
-/**
-  Commit or rollback the transaction.
-  @param locker the transaction locker for this event
-  @param commit true if transaction was committed, false if rolled back
-*/
-typedef void (*end_transaction_v1_t)
-  (struct PSI_transaction_locker *locker,
-   my_bool commit);
-
-/**
-  Record a socket instrumentation start event.
-  @param locker a socket locker for the running thread
-  @param op socket operation to be performed
-  @param count the number of bytes requested, or 0 if not applicable
-  @param src_file the source file name
-  @param src_line the source line number
-*/
-typedef struct PSI_socket_locker* (*start_socket_wait_v1_t)
-  (struct PSI_socket_locker_state_v1 *state,
-   struct PSI_socket *socket,
-   enum PSI_socket_operation op,
-   size_t count,
-   const char *src_file, uint src_line);
-
-/**
-  Record a socket instrumentation end event.
-  Note that for socket close operations, the instrumented socket handle
-  associated with the socket (which was provided to obtain a locker)
-  is invalid after this call.
-  @param locker a socket locker for the running thread
-  @param count the number of bytes actually used in the operation,
-  or 0 if not applicable, or -1 if the operation failed
-  @sa get_thread_socket_locker
-*/
-typedef void (*end_socket_wait_v1_t)
-  (struct PSI_socket_locker *locker, size_t count);
-
-/**
-  Set the socket state for an instrumented socket.
-    @param socket the instrumented socket
-    @param state socket state
-  */
-typedef void (*set_socket_state_v1_t)(struct PSI_socket *socket,
-                                      enum PSI_socket_state state);
-
-/**
-  Set the socket info for an instrumented socket.
-  @param socket the instrumented socket
-  @param fd the socket descriptor
-  @param addr the socket ip address
-  @param addr_len length of socket ip address
-  @param thread_id associated thread id
-*/
-typedef void (*set_socket_info_v1_t)(struct PSI_socket *socket,
-                                     const my_socket *fd,
-                                     const struct sockaddr *addr,
-                                     socklen_t addr_len);
-
-/**
-  Bind a socket to the thread that owns it.
-  @param socket instrumented socket
-*/
-typedef void (*set_socket_thread_owner_v1_t)(struct PSI_socket *socket);
-
-/**
-  Get a prepare statement.
-  @param locker a statement locker for the running thread.
-*/
-typedef PSI_prepared_stmt* (*create_prepared_stmt_v1_t)
-  (void *identity, uint stmt_id, PSI_statement_locker *locker,
-   const char *stmt_name, size_t stmt_name_length,
-   const char *name, size_t length);
-
-/**
-  destroy a prepare statement.
-  @param prepared_stmt prepared statement.
-*/
-typedef void (*destroy_prepared_stmt_v1_t)
-  (PSI_prepared_stmt *prepared_stmt);
-
-/**
-  repreare a prepare statement.
-  @param prepared_stmt prepared statement.
-*/
-typedef void (*reprepare_prepared_stmt_v1_t)
-  (PSI_prepared_stmt *prepared_stmt);
-
-/**
-  Record a prepare statement instrumentation execute event.
-  @param locker a statement locker for the running thread.
-  @param prepared_stmt prepared statement.
-*/
-typedef void (*execute_prepared_stmt_v1_t)
-  (PSI_statement_locker *locker, PSI_prepared_stmt* prepared_stmt);
-
-/**
-  Get a digest locker for the current statement.
-  @param locker a statement locker for the running thread
-*/
-typedef struct PSI_digest_locker * (*digest_start_v1_t)
-  (struct PSI_statement_locker *locker);
-
-/**
-  Add a token to the current digest instrumentation.
-  @param locker a digest locker for the current statement
-  @param token the lexical token to add
-  @param yylval the lexical token attributes
-*/
-typedef void (*digest_end_v1_t)
-  (struct PSI_digest_locker *locker, const struct sql_digest_storage *digest);
-
-typedef PSI_sp_locker* (*start_sp_v1_t)
-  (struct PSI_sp_locker_state_v1 *state, struct PSI_sp_share* sp_share);
-
-typedef void (*end_sp_v1_t)
-  (struct PSI_sp_locker *locker);
-
-typedef void (*drop_sp_v1_t)
-  (uint object_type,
-   const char *schema_name, uint schema_name_length,
-   const char *object_name, uint object_name_length);
-
-/**
-  Acquire a sp share instrumentation.
-  @param type of stored program
-  @param schema name of stored program
-  @param name of stored program
-  @return a stored program share instrumentation, or NULL
-*/
-typedef struct PSI_sp_share* (*get_sp_share_v1_t)
-  (uint object_type,
-   const char *schema_name, uint schema_name_length,
-   const char *object_name, uint object_name_length);
-
-/**
-  Release a stored program share.
-  @param info the stored program share to release
-*/
-typedef void (*release_sp_share_v1_t)(struct PSI_sp_share *share);
-
-typedef PSI_metadata_lock* (*create_metadata_lock_v1_t)
-  (void *identity,
-   const MDL_key *key,
-   opaque_mdl_type mdl_type,
-   opaque_mdl_duration mdl_duration,
-   opaque_mdl_status mdl_status,
-   const char *src_file,
-   uint src_line);
-
-typedef void (*set_metadata_lock_status_v1_t)(PSI_metadata_lock *lock,
-                                              opaque_mdl_status mdl_status);
-
-typedef void (*destroy_metadata_lock_v1_t)(PSI_metadata_lock *lock);
-
-typedef struct PSI_metadata_locker* (*start_metadata_wait_v1_t)
-  (struct PSI_metadata_locker_state_v1 *state,
-   struct PSI_metadata_lock *mdl,
-   const char *src_file, uint src_line);
-
-typedef void (*end_metadata_wait_v1_t)
-  (struct PSI_metadata_locker *locker, int rc);
-
-/**
-  Stores an array of connection attributes
-  @param buffer         char array of length encoded connection attributes
-                        in network format
-  @param length         length of the data in buffer
-  @param from_cs        charset in which @c buffer is encoded
-  @return state
-    @retval  non_0    attributes truncated
-    @retval  0        stored the attribute
-*/
-typedef int (*set_thread_connect_attrs_v1_t)(const char *buffer, uint length,
-                                             const void *from_cs);
-
-/**
   Performance Schema Interface, version 1.
   @since PSI_VERSION_1
 */
@@ -2439,12 +1040,6 @@ struct PSI_v1
   register_thread_v1_t register_thread;
   /** @sa register_file_v1_t. */
   register_file_v1_t register_file;
-  /** @sa register_stage_v1_t. */
-  register_stage_v1_t register_stage;
-  /** @sa register_statement_v1_t. */
-  register_statement_v1_t register_statement;
-  /** @sa register_socket_v1_t. */
-  register_socket_v1_t register_socket;
   /** @sa init_mutex_v1_t. */
   init_mutex_v1_t init_mutex;
   /** @sa destroy_mutex_v1_t. */
@@ -2457,23 +1052,12 @@ struct PSI_v1
   init_cond_v1_t init_cond;
   /** @sa destroy_cond_v1_t. */
   destroy_cond_v1_t destroy_cond;
-  /** @sa init_socket_v1_t. */
-  init_socket_v1_t init_socket;
-  /** @sa destroy_socket_v1_t. */
-  destroy_socket_v1_t destroy_socket;
-
   /** @sa get_table_share_v1_t. */
   get_table_share_v1_t get_table_share;
   /** @sa release_table_share_v1_t. */
   release_table_share_v1_t release_table_share;
-  /** @sa drop_table_share_v1_t. */
-  drop_table_share_v1_t drop_table_share;
   /** @sa open_table_v1_t. */
   open_table_v1_t open_table;
-  /** @sa unbind_table_v1_t. */
-  unbind_table_v1_t unbind_table;
-  /** @sa rebind_table_v1_t. */
-  rebind_table_v1_t rebind_table;
   /** @sa close_table_v1_t. */
   close_table_v1_t close_table;
   /** @sa create_file_v1_t. */
@@ -2484,34 +1068,22 @@ struct PSI_v1
   new_thread_v1_t new_thread;
   /** @sa set_thread_id_v1_t. */
   set_thread_id_v1_t set_thread_id;
-  /** @sa set_thread_THD_v1_t. */
-  set_thread_THD_v1_t set_thread_THD;
-  /** @sa set_thread_os_id_v1_t. */
-  set_thread_os_id_v1_t set_thread_os_id;
   /** @sa get_thread_v1_t. */
   get_thread_v1_t get_thread;
-  /** @sa set_thread_user_v1_t. */
-  set_thread_user_v1_t set_thread_user;
-  /** @sa set_thread_account_v1_t. */
-  set_thread_account_v1_t set_thread_account;
-  /** @sa set_thread_db_v1_t. */
-  set_thread_db_v1_t set_thread_db;
-  /** @sa set_thread_command_v1_t. */
-  set_thread_command_v1_t set_thread_command;
-  /** @sa set_connection_type_v1_t. */
-  set_connection_type_v1_t set_connection_type;
-  /** @sa set_thread_start_time_v1_t. */
-  set_thread_start_time_v1_t set_thread_start_time;
-  /** @sa set_thread_state_v1_t. */
-  set_thread_state_v1_t set_thread_state;
-  /** @sa set_thread_info_v1_t. */
-  set_thread_info_v1_t set_thread_info;
   /** @sa set_thread_v1_t. */
   set_thread_v1_t set_thread;
   /** @sa delete_current_thread_v1_t. */
   delete_current_thread_v1_t delete_current_thread;
   /** @sa delete_thread_v1_t. */
   delete_thread_v1_t delete_thread;
+  /** @sa get_thread_mutex_locker_v1_t. */
+  get_thread_mutex_locker_v1_t get_thread_mutex_locker;
+  /** @sa get_thread_rwlock_locker_v1_t. */
+  get_thread_rwlock_locker_v1_t get_thread_rwlock_locker;
+  /** @sa get_thread_cond_locker_v1_t. */
+  get_thread_cond_locker_v1_t get_thread_cond_locker;
+  /** @sa get_thread_table_locker_v1_t. */
+  get_thread_table_locker_v1_t get_thread_table_locker;
   /** @sa get_thread_file_name_locker_v1_t. */
   get_thread_file_name_locker_v1_t get_thread_file_name_locker;
   /** @sa get_thread_file_stream_locker_v1_t. */
@@ -2526,10 +1098,6 @@ struct PSI_v1
   signal_cond_v1_t signal_cond;
   /** @sa broadcast_cond_v1_t. */
   broadcast_cond_v1_t broadcast_cond;
-  /** @sa start_idle_wait_v1_t. */
-  start_idle_wait_v1_t start_idle_wait;
-  /** @sa end_idle_wait_v1_t. */
-  end_idle_wait_v1_t end_idle_wait;
   /** @sa start_mutex_wait_v1_t. */
   start_mutex_wait_v1_t start_mutex_wait;
   /** @sa end_mutex_wait_v1_t. */
@@ -2546,14 +1114,10 @@ struct PSI_v1
   start_cond_wait_v1_t start_cond_wait;
   /** @sa end_cond_wait_v1_t. */
   end_cond_wait_v1_t end_cond_wait;
-  /** @sa start_table_io_wait_v1_t. */
-  start_table_io_wait_v1_t start_table_io_wait;
-  /** @sa end_table_io_wait_v1_t. */
-  end_table_io_wait_v1_t end_table_io_wait;
-  /** @sa start_table_lock_wait_v1_t. */
-  start_table_lock_wait_v1_t start_table_lock_wait;
-  /** @sa end_table_lock_wait_v1_t. */
-  end_table_lock_wait_v1_t end_table_lock_wait;
+  /** @sa start_table_wait_v1_t. */
+  start_table_wait_v1_t start_table_wait;
+  /** @sa end_table_wait_v1_t. */
+  end_table_wait_v1_t end_table_wait;
   /** @sa start_file_open_wait_v1_t. */
   start_file_open_wait_v1_t start_file_open_wait;
   /** @sa end_file_open_wait_v1_t. */
@@ -2561,138 +1125,10 @@ struct PSI_v1
   /** @sa end_file_open_wait_and_bind_to_descriptor_v1_t. */
   end_file_open_wait_and_bind_to_descriptor_v1_t
     end_file_open_wait_and_bind_to_descriptor;
-  /** @sa end_temp_file_open_wait_and_bind_to_descriptor_v1_t. */
-  end_temp_file_open_wait_and_bind_to_descriptor_v1_t
-    end_temp_file_open_wait_and_bind_to_descriptor;
   /** @sa start_file_wait_v1_t. */
   start_file_wait_v1_t start_file_wait;
   /** @sa end_file_wait_v1_t. */
   end_file_wait_v1_t end_file_wait;
-  /** @sa start_file_close_wait_v1_t. */
-  start_file_close_wait_v1_t start_file_close_wait;
-  /** @sa end_file_close_wait_v1_t. */
-  end_file_close_wait_v1_t end_file_close_wait;
-  /** @sa start_stage_v1_t. */
-  start_stage_v1_t start_stage;
-  /** @sa get_current_stage_progress_v1_t. */
-  get_current_stage_progress_v1_t get_current_stage_progress;
-  /** @sa end_stage_v1_t. */
-  end_stage_v1_t end_stage;
-  /** @sa get_thread_statement_locker_v1_t. */
-  get_thread_statement_locker_v1_t get_thread_statement_locker;
-  /** @sa refine_statement_v1_t. */
-  refine_statement_v1_t refine_statement;
-  /** @sa start_statement_v1_t. */
-  start_statement_v1_t start_statement;
-  /** @sa set_statement_text_v1_t. */
-  set_statement_text_v1_t set_statement_text;
-  /** @sa set_statement_lock_time_t. */
-  set_statement_lock_time_t set_statement_lock_time;
-  /** @sa set_statement_rows_sent_t. */
-  set_statement_rows_sent_t set_statement_rows_sent;
-  /** @sa set_statement_rows_examined_t. */
-  set_statement_rows_examined_t set_statement_rows_examined;
-  /** @sa inc_statement_created_tmp_disk_tables. */
-  inc_statement_created_tmp_disk_tables_t inc_statement_created_tmp_disk_tables;
-  /** @sa inc_statement_created_tmp_tables. */
-  inc_statement_created_tmp_tables_t inc_statement_created_tmp_tables;
-  /** @sa inc_statement_select_full_join. */
-  inc_statement_select_full_join_t inc_statement_select_full_join;
-  /** @sa inc_statement_select_full_range_join. */
-  inc_statement_select_full_range_join_t inc_statement_select_full_range_join;
-  /** @sa inc_statement_select_range. */
-  inc_statement_select_range_t inc_statement_select_range;
-  /** @sa inc_statement_select_range_check. */
-  inc_statement_select_range_check_t inc_statement_select_range_check;
-  /** @sa inc_statement_select_scan. */
-  inc_statement_select_scan_t inc_statement_select_scan;
-  /** @sa inc_statement_sort_merge_passes. */
-  inc_statement_sort_merge_passes_t inc_statement_sort_merge_passes;
-  /** @sa inc_statement_sort_range. */
-  inc_statement_sort_range_t inc_statement_sort_range;
-  /** @sa inc_statement_sort_rows. */
-  inc_statement_sort_rows_t inc_statement_sort_rows;
-  /** @sa inc_statement_sort_scan. */
-  inc_statement_sort_scan_t inc_statement_sort_scan;
-  /** @sa set_statement_no_index_used. */
-  set_statement_no_index_used_t set_statement_no_index_used;
-  /** @sa set_statement_no_good_index_used. */
-  set_statement_no_good_index_used_t set_statement_no_good_index_used;
-  /** @sa end_statement_v1_t. */
-  end_statement_v1_t end_statement;
-  /** @sa get_thread_transaction_locker_v1_t. */
-  get_thread_transaction_locker_v1_t get_thread_transaction_locker;
-  /** @sa start_transaction_v1_t. */
-  start_transaction_v1_t start_transaction;
-  /** @sa set_transaction_xid_v1_t. */
-  set_transaction_xid_v1_t set_transaction_xid;
-  /** @sa set_transaction_xa_state_v1_t. */
-  set_transaction_xa_state_v1_t set_transaction_xa_state;
-  /** @sa set_transaction_gtid_v1_t. */
-  set_transaction_gtid_v1_t set_transaction_gtid;
-  /** @sa set_transaction_trxid_v1_t. */
-  set_transaction_trxid_v1_t set_transaction_trxid;
-  /** @sa inc_transaction_savepoints_v1_t. */
-  inc_transaction_savepoints_v1_t inc_transaction_savepoints;
-  /** @sa inc_transaction_rollback_to_savepoint_v1_t. */
-  inc_transaction_rollback_to_savepoint_v1_t inc_transaction_rollback_to_savepoint;
-  /** @sa inc_transaction_release_savepoint_v1_t. */
-  inc_transaction_release_savepoint_v1_t inc_transaction_release_savepoint;
-  /** @sa end_transaction_v1_t. */
-  end_transaction_v1_t end_transaction;
-  /** @sa start_socket_wait_v1_t. */
-  start_socket_wait_v1_t start_socket_wait;
-  /** @sa end_socket_wait_v1_t. */
-  end_socket_wait_v1_t end_socket_wait;
-  /** @sa set_socket_state_v1_t. */
-  set_socket_state_v1_t set_socket_state;
-  /** @sa set_socket_info_v1_t. */
-  set_socket_info_v1_t set_socket_info;
-  /** @sa set_socket_thread_owner_v1_t. */
-  set_socket_thread_owner_v1_t set_socket_thread_owner;
-  /** @sa create_prepared_stmt_v1_t. */
-  create_prepared_stmt_v1_t create_prepared_stmt;
-  /** @sa destroy_prepared_stmt_v1_t. */
-  destroy_prepared_stmt_v1_t destroy_prepared_stmt;
-  /** @sa reprepare_prepared_stmt_v1_t. */
-  reprepare_prepared_stmt_v1_t reprepare_prepared_stmt;
-  /** @sa execute_prepared_stmt_v1_t. */
-  execute_prepared_stmt_v1_t execute_prepared_stmt;
-  /** @sa digest_start_v1_t. */
-  digest_start_v1_t digest_start;
-  /** @sa digest_end_v1_t. */
-  digest_end_v1_t digest_end;
-  /** @sa set_thread_connect_attrs_v1_t. */
-  set_thread_connect_attrs_v1_t set_thread_connect_attrs;
-  /** @sa start_sp_v1_t. */
-  start_sp_v1_t start_sp;
-  /** @sa start_sp_v1_t. */
-  end_sp_v1_t end_sp;
-  /** @sa drop_sp_v1_t. */
-  drop_sp_v1_t drop_sp;
-  /** @sa get_sp_share_v1_t. */
-  get_sp_share_v1_t get_sp_share;
-  /** @sa release_sp_share_v1_t. */
-  release_sp_share_v1_t release_sp_share;
-  /** @sa register_memory_v1_t. */
-  register_memory_v1_t register_memory;
-  /** @sa memory_alloc_v1_t. */
-  memory_alloc_v1_t memory_alloc;
-  /** @sa memory_realloc_v1_t. */
-  memory_realloc_v1_t memory_realloc;
-  /** @sa memory_claim_v1_t. */
-  memory_claim_v1_t memory_claim;
-  /** @sa memory_free_v1_t. */
-  memory_free_v1_t memory_free;
-
-  unlock_table_v1_t unlock_table;
-
-  create_metadata_lock_v1_t create_metadata_lock;
-  set_metadata_lock_status_v1_t set_metadata_lock_status;
-  destroy_metadata_lock_v1_t destroy_metadata_lock;
-
-  start_metadata_wait_v1_t start_metadata_wait;
-  end_metadata_wait_v1_t end_metadata_wait;
 };
 
 /** @} (end of group Group_PSI_v1) */
@@ -2758,85 +1194,33 @@ struct PSI_file_info_v2
   int placeholder;
 };
 
-/** Placeholder */
-struct PSI_stage_info_v2
-{
-  /** Placeholder */
-  int placeholder;
-};
-
-/** Placeholder */
-struct PSI_statement_info_v2
-{
-  /** Placeholder */
-  int placeholder;
-};
-
-/** Placeholder */
-struct PSI_transaction_info_v2
-{
-  /** Placeholder */
-  int placeholder;
-};
-
-/** Placeholder */
-struct PSI_idle_locker_state_v2
-{
-  /** Placeholder */
-  int placeholder;
-};
-
-/** Placeholder */
 struct PSI_mutex_locker_state_v2
 {
   /** Placeholder */
   int placeholder;
 };
 
-/** Placeholder */
 struct PSI_rwlock_locker_state_v2
 {
   /** Placeholder */
   int placeholder;
 };
 
-/** Placeholder */
 struct PSI_cond_locker_state_v2
 {
   /** Placeholder */
   int placeholder;
 };
 
-/** Placeholder */
 struct PSI_file_locker_state_v2
 {
   /** Placeholder */
   int placeholder;
 };
 
-/** Placeholder */
-struct PSI_statement_locker_state_v2
+struct PSI_table_locker_state_v2
 {
   /** Placeholder */
-  int placeholder;
-};
-
-/** Placeholder */
-struct PSI_transaction_locker_state_v2
-{
-  /** Placeholder */
-  int placeholder;
-};
-
-/** Placeholder */
-struct PSI_socket_locker_state_v2
-{
-  /** Placeholder */
-  int placeholder;
-};
-
-struct PSI_metadata_locker_state_v2
-{
   int placeholder;
 };
 
@@ -2883,20 +1267,11 @@ typedef struct PSI_rwlock_info_v1 PSI_rwlock_info;
 typedef struct PSI_cond_info_v1 PSI_cond_info;
 typedef struct PSI_thread_info_v1 PSI_thread_info;
 typedef struct PSI_file_info_v1 PSI_file_info;
-typedef struct PSI_stage_info_v1 PSI_stage_info;
-typedef struct PSI_statement_info_v1 PSI_statement_info;
-typedef struct PSI_transaction_info_v1 PSI_transaction_info;
-typedef struct PSI_socket_info_v1 PSI_socket_info;
-typedef struct PSI_idle_locker_state_v1 PSI_idle_locker_state;
 typedef struct PSI_mutex_locker_state_v1 PSI_mutex_locker_state;
 typedef struct PSI_rwlock_locker_state_v1 PSI_rwlock_locker_state;
 typedef struct PSI_cond_locker_state_v1 PSI_cond_locker_state;
 typedef struct PSI_file_locker_state_v1 PSI_file_locker_state;
-typedef struct PSI_statement_locker_state_v1 PSI_statement_locker_state;
-typedef struct PSI_transaction_locker_state_v1 PSI_transaction_locker_state;
-typedef struct PSI_socket_locker_state_v1 PSI_socket_locker_state;
-typedef struct PSI_sp_locker_state_v1 PSI_sp_locker_state;
-typedef struct PSI_metadata_locker_state_v1 PSI_metadata_locker_state;
+typedef struct PSI_table_locker_state_v1 PSI_table_locker_state;
 #endif
 
 #ifdef USE_PSI_2
@@ -2906,20 +1281,11 @@ typedef struct PSI_rwlock_info_v2 PSI_rwlock_info;
 typedef struct PSI_cond_info_v2 PSI_cond_info;
 typedef struct PSI_thread_info_v2 PSI_thread_info;
 typedef struct PSI_file_info_v2 PSI_file_info;
-typedef struct PSI_stage_info_v2 PSI_stage_info;
-typedef struct PSI_statement_info_v2 PSI_statement_info;
-typedef struct PSI_transaction_info_v2 PSI_transaction_info;
-typedef struct PSI_socket_info_v2 PSI_socket_info;
-typedef struct PSI_idle_locker_state_v2 PSI_idle_locker_state;
 typedef struct PSI_mutex_locker_state_v2 PSI_mutex_locker_state;
 typedef struct PSI_rwlock_locker_state_v2 PSI_rwlock_locker_state;
 typedef struct PSI_cond_locker_state_v2 PSI_cond_locker_state;
 typedef struct PSI_file_locker_state_v2 PSI_file_locker_state;
-typedef struct PSI_statement_locker_state_v2 PSI_statement_locker_state;
-typedef struct PSI_transaction_locker_state_v2 PSI_transaction_locker_state;
-typedef struct PSI_socket_locker_state_v2 PSI_socket_locker_state;
-typedef struct PSI_sp_locker_state_v2 PSI_sp_locker_state;
-typedef struct PSI_metadata_locker_state_v2 PSI_metadata_locker_state;
+typedef struct PSI_table_locker_state_v2 PSI_table_locker_state;
 #endif
 
 #else /* HAVE_PSI_INTERFACE */
@@ -2935,43 +1301,9 @@ struct PSI_none
 };
 typedef struct PSI_none PSI;
 
-/**
-  Stage instrument information.
-  @since PSI_VERSION_1
-  This structure is used to register an instrumented stage.
-*/
-struct PSI_stage_info_none
-{
-  /** Unused stage key. */
-  unsigned int m_key;
-  /** The name of the stage instrument. */
-  const char *m_name;
-  /** Unused stage flags. */
-  int m_flags;
-};
-
-/**
-  The stage instrumentation has to co exist with the legacy
-  THD::set_proc_info instrumentation.
-  To avoid duplication of the instrumentation in the server,
-  the common PSI_stage_info structure is used,
-  so we export it here, even when not building
-  with HAVE_PSI_INTERFACE.
-*/
-typedef struct PSI_stage_info_none PSI_stage_info;
-
 #endif /* HAVE_PSI_INTERFACE */
 
 extern MYSQL_PLUGIN_IMPORT PSI *PSI_server;
-
-/*
-  Allow to override PSI_XXX_CALL at compile time
-  with more efficient implementations, if available.
-  If nothing better is available,
-  make a dynamic call using the PSI_server function pointer.
-*/
-
-#define PSI_DYNAMIC_CALL(M) PSI_server->M
 
 /** @} */
 
