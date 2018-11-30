@@ -519,6 +519,12 @@ include_directories(
   ${ACE_INCLUDE_DIR}
 )
 
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/dep/include-windows
+  )
+endif()
+
 source_group("Object"
   REGULAR_EXPRESSION .*
 )

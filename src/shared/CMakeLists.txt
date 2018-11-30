@@ -40,7 +40,6 @@ set (shared_SRCS
 	Auth/Hmac.h
 	Auth/HMACSHA1.h
 	Auth/md5.h
-	Auth/SARC4.h
 	Auth/Sha1.h
 	Config/Config.h
 	Config/ConfigEnv.h
@@ -77,7 +76,6 @@ set (shared_SRCS
 	Auth/BigNumber.cpp
 	Auth/Hmac.cpp
 	Auth/HMACSHA1.cpp
-	Auth/SARC4.cpp
 	Auth/Sha1.cpp
 	Config/Config.cpp
 	Database/Database.cpp
@@ -155,6 +153,12 @@ include_directories(
   ${ACE_INCLUDE_DIR}
   ${MYSQL_INCLUDE_DIR}
 )
+
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/dep/include-windows
+  )
+endif()
 
 add_library(shared STATIC
   ${shared_SRCS}
