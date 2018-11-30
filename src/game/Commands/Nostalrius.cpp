@@ -270,13 +270,13 @@ bool ChatHandler::HandleCinematicAddWpCommand(char *args)
 
     Player* me = m_session->GetPlayer();
     WorldDatabase.PExecute(
-        "INSERT INTO cinematic_waypoints (cinematic, timer, posx, posy, posz, comment) VALUES "
+        "INSERT INTO `cinematic_waypoints` (`cinematic`, `timer`, `position_x`, `position_y`, `position_z`, `comment`) VALUES "
         "(%u, %u, %f, %f, %f, '%s')",
         cinematic_id, timer,
         ceil(me->GetPositionX()), ceil(me->GetPositionY()), ceil(me->GetPositionZ()), comment
     );
 
-    PSendSysMessage("Localisation ajoute a la %ueme ms de la cinematique %u", timer, cinematic_id);
+    PSendSysMessage("Added new waypoint at %u ms for cinematic %u.", timer, cinematic_id);
     sObjectMgr.LoadCinematicsWaypoints();
     return true;
 }
@@ -1127,8 +1127,8 @@ bool ChatHandler::HandleNpcGroupLinkCommand(char * args)
         return false;
     }
     
-    WorldDatabase.PExecute("DELETE FROM creature_linking WHERE guid=%u", target->GetGUIDLow());
-        WorldDatabase.PExecute("INSERT INTO creature_linking SET guid=%u, master_guid=%u, flag='%u'",
+    WorldDatabase.PExecute("DELETE FROM `creature_linking` WHERE `guid`=%u", target->GetGUIDLow());
+        WorldDatabase.PExecute("INSERT INTO `creature_linking` SET `guid`=%u, `master_guid`=%u, `flag`='%u'",
             target->GetGUIDLow(), leaderGuidCounter, options);
 
     PSendSysMessage("creature_link for creature %u. Leader %u", target->GetGUIDLow(), leader->GetGUIDLow());

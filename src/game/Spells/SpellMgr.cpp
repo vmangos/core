@@ -1695,15 +1695,20 @@ void SpellMgr::LoadSpellGroups()
     QueryResult* result = WorldDatabase.PQuery("SELECT group_id, spell_id FROM spell_group WHERE %u BETWEEN build_min AND build_max ORDER BY group_id, group_spell_id, spell_id", SUPPORTED_CLIENT_BUILD);
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u spell group definitions", count);
         return;
     }
 
     std::set<uint32> groups;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
         uint32 group_id = fields[0].GetUInt32();
         int32 spell_id = fields[1].GetInt32();
@@ -1772,13 +1777,19 @@ void SpellMgr::LoadSpellGroupStackRules()
     QueryResult* result = WorldDatabase.PQuery("SELECT group_id, stack_rule FROM spell_group_stack_rules t1 WHERE build=(SELECT max(build) FROM spell_group_stack_rules t2 WHERE t1.group_id=t2.group_id && build <= %u)", SUPPORTED_CLIENT_BUILD);
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
         sLog.outString();
         sLog.outString(">> Loaded %u spell group stack rules", count);
         return;
     }
 
+    BarGoLink bar(result->GetRowCount());
+
     do
     {
+        bar.step();
         Field *fields = result->Fetch();
 
         uint32 group_id = fields[0].GetUInt32();
@@ -4558,33 +4569,41 @@ void SpellMgr::AssignInternalSpellFlags()
 void SpellMgr::LoadSpells()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
-    sLog.outString("Loading spells ...");
 
     // Getting the maximum ID.
-    QueryResult* result = WorldDatabase.Query("SELECT MAX(ID) FROM spell_template");
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`ID`) FROM `spell_template`"));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 spells. DB table `spell_template` is empty.");
         return;
     }
     auto fields = result->Fetch();
     uint32 maxEntry = fields[0].GetUInt32() + 1;
-    delete result;
 
     // Actually loading the spells.
-    result = WorldDatabase.PQuery("SELECT * FROM spell_template WHERE build=%u", SUPPORTED_CLIENT_BUILD);
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `spell_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
+        BarGoLink bar(1);
+        bar.step();
+
+        sLog.outString();
         sLog.outString(">> Loaded 0 spells. DB table `spell_template` is empty.");
         return;
     }
     
     mSpellEntryMap.resize(maxEntry);
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         std::unique_ptr<SpellEntry> spell = std::make_unique<SpellEntry>();
@@ -4798,7 +4817,6 @@ void SpellMgr::LoadSpells()
 
     } while (result->NextRow());
 
-    delete result;
-
+    sLog.outString();
     sLog.outString(">> Loaded %u spells in %ums.", mSpellEntryMap.size(), WorldTimer::getMSTimeDiffToNow(oldMSTime));
 }

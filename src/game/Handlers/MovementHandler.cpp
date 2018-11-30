@@ -197,7 +197,7 @@ void WorldSession::HandleMoveWorldportAckOpcode()
         _player->RemoveSpellsCausingAura(SPELL_AURA_MOUNTED);
 
     // honorless target
-    if (!GetPlayer()->pvpInfo.inHostileArea)
+    if (!GetPlayer()->pvpInfo.inPvPEnforcedArea)
         GetPlayer()->RemoveDelayedOperation(DELAYED_CAST_HONORLESS_TARGET);
 
     // resummon pet

@@ -393,3 +393,47 @@ void ScriptedAI::DoTeleportAll(float fX, float fY, float fZ, float fO)
             if (i_pl->isAlive())
                 i_pl->TeleportTo(me->GetMapId(), fX, fY, fZ, fO, TELE_TO_NOT_LEAVE_COMBAT);
 }
+
+void ScriptedAI::EnterVanish()
+{
+    m_creature->SetVisibility(VISIBILITY_OFF);
+    m_creature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FLAG_NON_ATTACKABLE);
+    m_creature->InterruptSpellsCastedOnMe(true);
+    m_creature->InterruptAttacksOnMe();
+    m_creature->AttackStop();
+    m_creature->InterruptSpell(CURRENT_AUTOREPEAT_SPELL);
+    // DoResetThreat :
+    if (!m_creature->CanHaveThreatList() || m_creature->getThreatManager().isThreatListEmpty())
+        return;
+
+    ThreatList const& tList = m_creature->getThreatManager().getThreatList();
+    for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
+    {
+        Unit* pUnit = m_creature->GetMap()->GetUnit((*itr)->getUnitGuid());
+
+        if (pUnit && m_creature->getThreatManager().getThreat(pUnit))
+            m_creature->getThreatManager().modifyThreatPercent(pUnit, -100);
+    }
+}
+
+void ScriptedAI::LeaveVanish()
+{
+    m_creature->SetVisibility(VISIBILITY_ON);
+    m_creature->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NOT_SELECTABLE | UNIT_FIELD_FLAGS);
+}
+
+void ScriptedAI::Ambush(Unit* pNewVictim, uint32 embushSpellId)
+{
+    if (!pNewVictim)
+        return;
+    // Se position derriere
+    float x, y, z;
+    pNewVictim->GetRelativePositions(-4.0f, 0.0f, 0.0f, x, y, z);
+    m_creature->NearTeleportTo(x, y, z, 0.0f);
+    m_creature->SetFacingToObject(pNewVictim);
+    // Embush
+    if (embushSpellId)
+        m_creature->CastSpell(pNewVictim, embushSpellId, true);
+    if (m_creature->AI())
+        m_creature->AI()->AttackStart(pNewVictim);
+}

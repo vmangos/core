@@ -250,9 +250,9 @@ bool ChatHandler::HandleTriggerCommand(char* args)
         Player* pl = m_session->GetPlayer();
 
         // Search triggers
-        for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+        for (auto const itr : sObjectMgr.GetAreaTriggersMap())
         {
-            AreaTriggerEntry const *atTestEntry = sObjectMgr.GetAreaTrigger(id);
+            AreaTriggerEntry const *atTestEntry = &itr.second;
             if (!atTestEntry)
                 continue;
 
@@ -322,9 +322,9 @@ bool ChatHandler::HandleTriggerActiveCommand(char* /*args*/)
     Player* pl = m_session->GetPlayer();
 
     // Search in AreaTable.dbc
-    for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = sObjectMgr.GetAreaTrigger(id);
+        AreaTriggerEntry const *atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -351,9 +351,9 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     Player* pl = m_session->GetPlayer();
 
     // Search triggers
-    for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = sObjectMgr.GetAreaTrigger(id);
+        AreaTriggerEntry const *atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -372,9 +372,9 @@ bool ChatHandler::HandleTriggerNearCommand(char* args)
     }
 
     // Search trigger targets
-    for (uint32 id = 0; id < sObjectMgr.GetMaxAreaTriggerId(); ++id)
+    for (auto const itr : sObjectMgr.GetAreaTriggersMap())
     {
-        AreaTriggerEntry const *atEntry = sObjectMgr.GetAreaTrigger(id);
+        AreaTriggerEntry const *atEntry = &itr.second;
         if (!atEntry)
             continue;
 
@@ -1429,9 +1429,9 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
 
     uint32 counter = 0;                                     // Counter for figure out that we found smth.
 
-    for (uint32 id = 0; id < sObjectMgr.GetMaxFactionId(); ++id)
+    for (auto const& itr : sObjectMgr.GetFactionMap())
     {
-        FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(id);
+        FactionEntry const *factionEntry = &itr.second;
         if (factionEntry)
         {
             int loc = GetSessionDbcLocale();

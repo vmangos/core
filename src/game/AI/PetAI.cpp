@@ -582,16 +582,10 @@ void PetAI::DoAttack(Unit* target, bool chase)
         }
 
         // Flag owner for PvP if owner is player and target is flagged
-        Unit* owner = m_creature->GetCharmerOrOwner();
-        if (owner && owner->IsPlayer() && !owner->IsPvP())
+        Unit* pOwner = m_creature->GetCharmerOrOwner();
+        if (pOwner && pOwner->IsPlayer() && !pOwner->IsPvP())
         {
-            Player* pOwner = owner->ToPlayer();
-            if ((target->IsPlayer() && target->IsPvP() && !pOwner->IsInDuelWith((Player*)target)) || // PvP flagged players
-                (target->IsCreature() && target->IsPvP()))                                           // PvP flagged creatures
-            {
-                pOwner->UpdatePvP(true);
-                pOwner->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ENTER_PVP_COMBAT);
-            }
+            pOwner->TogglePlayerPvPFlagOnAttackVictim(target);
         }
     }
 }

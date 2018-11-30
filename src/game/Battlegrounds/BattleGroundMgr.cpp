@@ -1257,13 +1257,12 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 {
     uint32 count = 0;
 
-    //                                                 0           1                 2           3      4           5                 6              7              8               9              10            11           12    
-    QueryResult *result = WorldDatabase.PQuery("SELECT id, MinPlayersPerTeam,MaxPlayersPerTeam,MinLvl,MaxLvl,AllianceWinSpell,AllianceLoseSpell,HordeWinSpell,HordeLoseSpell,AllianceStartLoc,AllianceStartO,HordeStartLoc,HordeStartO FROM battleground_template t1 WHERE patch=(SELECT max(patch) FROM battleground_template t2 WHERE t1.id=t2.id && patch <= %u)", sWorld.GetWowPatch());
+    //                                                                0     1                       2                       3            4            5                     6                      7                  8                   9                          10                  11                      12    
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `id`, `min_players_per_team`, `max_players_per_team`, `min_level`, `max_level`, `alliance_win_spell`, `alliance_lose_spell`, `horde_win_spell`, `horde_lose_spell`, `alliance_start_location`, `alliance_start_o`, `horde_start_location`, `horde_start_o` FROM `battleground_template` t1 WHERE `patch`=(SELECT max(`patch`) FROM `battleground_template` t2 WHERE t1.`id`=t2.`id` && `patch` <= %u)", sWorld.GetWowPatch()));
 
     if (!result)
     {
         BarGoLink bar(1);
-
         bar.step();
 
         sLog.outString();
@@ -1275,8 +1274,8 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
 
     do
     {
-        Field *fields = result->Fetch();
         bar.step();
+        Field *fields = result->Fetch();
 
         uint32 bgTypeID_ = fields[0].GetUInt32();
 
@@ -1344,8 +1343,6 @@ void BattleGroundMgr::CreateInitialBattleGrounds()
         ++count;
     }
     while (result->NextRow());
-
-    delete result;
 
     sLog.outString();
     sLog.outString(">> Loaded %u battlegrounds", count);
