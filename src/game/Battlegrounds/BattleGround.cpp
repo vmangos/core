@@ -74,7 +74,7 @@ private:
         data << ObjectGuid(targetGuid);             // there 0 for BG messages
         data << uint32(strlen(text) + 1);
         data << text;
-        data << uint8(i_source ? i_source->chatTag() : uint8(0));
+        data << uint8(i_source ? i_source->GetChatTag() : uint8(0));
     }
 
     ChatMsg i_msgtype;
@@ -150,7 +150,7 @@ public:
         data << ObjectGuid(targetGuid);             // there 0 for BG messages
         data << uint32(strlen(str) + 1);
         data << str;
-        data << uint8(i_source ? i_source->chatTag() : uint8(0));
+        data << uint8(i_source ? i_source->GetChatTag() : uint8(0));
     }
 private:
 
@@ -1004,7 +1004,7 @@ void BattleGround::StartBattleGround()
 void BattleGround::AddPlayer(Player *plr)
 {
     // remove afk from player
-    if (plr->isAFK())
+    if (plr->IsAFK())
         plr->ToggleAFK();
 
     // score struct must be created in inherited class
@@ -1355,7 +1355,7 @@ void BattleGround::ReturnPlayersToHomeGY()
     {
         auto player = sObjectMgr.GetPlayer(itr->first);
 
-        if (!player || player->isGameMaster())
+        if (!player || player->IsGameMaster())
             continue;
 
         float x, y, z, o;

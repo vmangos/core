@@ -467,7 +467,7 @@ bool GossipHello_boss_vael(Player* pPlayer, Creature* pCreature)
     if (nullptr == m_pInstance)
         return false;
 
-    if (m_pInstance->GetData(TYPE_RAZORGORE) != DONE && !pPlayer->isGameMaster())
+    if (m_pInstance->GetData(TYPE_RAZORGORE) != DONE && !pPlayer->IsGameMaster())
         return false;
 
     if (pCreature->isQuestGiver())

@@ -236,7 +236,7 @@ struct boss_ouroAI : public Scripted_NoMovementAI
     {
         // at first we check for the current player-type target
         Unit* pMainTarget = m_creature->getVictim();
-        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() &&
+        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->IsGameMaster() &&
             m_creature->IsWithinMeleeRange(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
         {
             return true;
@@ -459,7 +459,7 @@ struct npc_ouro_spawnerAI : public Scripted_NoMovementAI
     void MoveInLineOfSight(Unit* pWho) override
     {
         // Spawn Ouro on LoS check
-        if (!m_bHasSummoned && pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->isGameMaster() && m_creature->IsWithinDistInMap(pWho, 25.0f))
+        if (!m_bHasSummoned && pWho->GetTypeId() == TYPEID_PLAYER && !((Player*)pWho)->IsGameMaster() && m_creature->IsWithinDistInMap(pWho, 25.0f))
         {
             if (DoCastSpellIfCan(m_creature, SPELL_SUMMON_OURO) == CAST_OK)
             {

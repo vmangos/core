@@ -77,7 +77,7 @@ bool PlayerBotAI::SpawnNewPlayer(WorldSession* sess, uint8 class_, uint32 race_,
     newChar->SetLocationInstanceId(instanceId);
     newChar->SetAutoInstanceSwitch(false);
     newChar->GetMotionMaster()->Initialize();
-    newChar->setCinematic(1);
+    newChar->SetCinematic(1);
     // Set instance
     if (instanceId && mapId > 1) // Not a continent
     {

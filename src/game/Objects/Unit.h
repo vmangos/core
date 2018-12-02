@@ -1827,7 +1827,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveAllGameObjects();
 
         uint32 CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0);
-        float GetAPMultiplier(WeaponAttackType attType, bool normalized);
+        float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
         void ModifyAuraState(AuraState flag, bool apply);
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)); }
         void UnsummonAllTotems();

@@ -250,7 +250,7 @@ CreatureAI* GetAI_npc_saean(Creature* pCreature)
 bool AreaTrigger_at_huldar_miran(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
     // If player is dead, GM mode is ON, quest complete or no quest
-    if (!pPlayer->isAlive() || pPlayer->isGameMaster() ||
+    if (!pPlayer->isAlive() || pPlayer->IsGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_RESUPPLYING_THE_EXCAVATION) == QUEST_STATUS_NONE)
     return false;

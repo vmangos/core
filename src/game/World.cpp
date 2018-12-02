@@ -1968,7 +1968,7 @@ void World::SendGMTicketText(const char* text)
             !itr->second->GetPlayer() ||
             !itr->second->GetPlayer()->IsInWorld() ||
             itr->second->GetSecurity() == SEC_PLAYER ||
-            !itr->second->GetPlayer()->isAcceptTickets())
+            !itr->second->GetPlayer()->IsAcceptTickets())
             continue;
 
         ChatHandler(itr->second->GetPlayer()).SendSysMessage(text);
@@ -1988,7 +1988,7 @@ void World::SendGMTicketText(int32 string_id, ...)
             !itr->second->GetPlayer() ||
             !itr->second->GetPlayer()->IsInWorld() ||
             itr->second->GetSecurity() == SEC_PLAYER ||
-            !itr->second->GetPlayer()->isAcceptTickets())
+            !itr->second->GetPlayer()->IsAcceptTickets())
             continue;
 
         wt_do(itr->second->GetPlayer());

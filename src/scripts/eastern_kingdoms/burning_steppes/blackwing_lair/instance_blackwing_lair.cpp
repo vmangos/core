@@ -1002,7 +1002,7 @@ struct go_engin_suppressionAI: public GameObjectAI
         for (Map::PlayerList::const_iterator i = liste.begin(); i != liste.end(); ++i)
         {
             if (me->GetDistance(i->getSource()) <= 15.0f)
-                if (!i->getSource()->HasStealthAura() && i->getSource()->isAlive() && !i->getSource()->isGameMaster())
+                if (!i->getSource()->HasStealthAura() && i->getSource()->isAlive() && !i->getSource()->IsGameMaster())
                     i->getSource()->AddAura(SPELL_SUPPRESSION_AURA);
         }
     }
@@ -1063,7 +1063,7 @@ bool AreaTrigger_at_enter_vael_room(Player *pPlayer, const AreaTriggerEntry* pAt
 {
     if (pAt->id == AT_ENTER_VAEL_ROOM)
     {
-        if (pPlayer->isGameMaster())
+        if (pPlayer->IsGameMaster())
             return false;
 
         if (ScriptedInstance* pInstance = (ScriptedInstance*)pPlayer->GetMap()->GetInstanceData())

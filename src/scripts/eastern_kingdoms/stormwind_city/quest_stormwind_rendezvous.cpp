@@ -982,7 +982,7 @@ bool AreaTrigger_at_stormwind_gates(Player* pPlayer, AreaTriggerEntry const* /*p
         return false;
 
     // If player is dead, GM mode is ON, quest complete or no quest.
-    if (!pPlayer || !pPlayer->isAlive() || pPlayer->isGameMaster() ||
+    if (!pPlayer || !pPlayer->isAlive() || pPlayer->IsGameMaster() ||
         !(pPlayer->IsCurrentQuest(QUEST_STORMWIND_RENDEZVOUS) || (pPlayer->GetQuestRewardStatus(QUEST_STORMWIND_RENDEZVOUS) && !pPlayer->GetQuestRewardStatus(QUEST_THE_GREAT_MASQUERADE) && !pPlayer->IsCurrentQuest(QUEST_THE_GREAT_MASQUERADE))))
         return false;
 

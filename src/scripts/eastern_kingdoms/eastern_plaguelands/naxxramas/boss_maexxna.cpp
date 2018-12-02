@@ -251,7 +251,7 @@ struct boss_maexxnaAI : public ScriptedAI
 
             // todo: verify that IsWithinLOSInMap does not screw anyting up. Afaik there should be nowhere
             // to los in maexxnas room, so would only stop us from selecting players outside the room, which is good.
-            if (pPlayer->isAlive() && !pPlayer->isGameMaster()
+            if (pPlayer->isAlive() && !pPlayer->IsGameMaster()
                 && m_creature->IsWithinLOSInMap(pPlayer)        // Only players in the room
                 && !pPlayer->HasAura(SPELL_WEBWRAP))            // Don't retarget players who are still wrapped
             {

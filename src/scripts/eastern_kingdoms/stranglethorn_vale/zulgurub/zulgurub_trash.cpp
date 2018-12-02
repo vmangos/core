@@ -368,7 +368,7 @@ struct go_pile_dechetsAI: public GameObjectAI
                 {
                     Player* pPlayer = itr->getSource();
                     if (pPlayer && pPlayer->isAlive() && pUser->IsWithinDistInMap(pPlayer, 60.0f) && pUser->IsWithinLOSInMap(pPlayer) &&
-                            pPlayer != pUser->ToPlayer() && !pPlayer->isGameMaster())
+                            pPlayer != pUser->ToPlayer() && !pPlayer->IsGameMaster())
                     {
                         Guru->AddThreat(pPlayer);
                         Guru->SetInCombatWith(pPlayer);

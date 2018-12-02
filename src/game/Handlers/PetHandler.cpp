@@ -590,7 +590,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
         return;
     }
 
-    uint32 cost = pet->resetTalentsCost();
+    uint32 cost = pet->GetResetTalentsCost();
 
     if (GetPlayer()->GetMoney() < cost)
     {
@@ -600,7 +600,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 
     for (PetSpellMap::iterator itr = pet->m_petSpells.begin(); itr != pet->m_petSpells.end();)
     {
-        uint32 spell_id = itr->first;                       // Pet::removeSpell can invalidate iterator at erase NEW spell
+        uint32 spell_id = itr->first;                       // Pet::RemoveSpel can invalidate iterator at erase NEW spell
         ++itr;
         pet->unlearnSpell(spell_id, false);
     }

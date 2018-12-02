@@ -100,7 +100,7 @@ enum QuestStatus
     MAX_QUEST_STATUS
 };
 
-inline char* QuestStatusToString(QuestStatus status)
+inline char const* QuestStatusToString(QuestStatus status)
 {
     switch (status)
     {

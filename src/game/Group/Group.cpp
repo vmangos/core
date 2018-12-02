@@ -55,9 +55,9 @@ GroupMemberStatus GetGroupMemberStatus(const Player *member = nullptr)
             flags |= MEMBER_STATUS_GHOST;
         if (member->IsFFAPvP())
             flags |= MEMBER_STATUS_PVP_FFA;
-        if (member->isAFK())
+        if (member->IsAFK())
             flags |= MEMBER_STATUS_AFK;
-        if (member->isDND())
+        if (member->IsDND())
             flags |= MEMBER_STATUS_DND;
     }
     return GroupMemberStatus(flags);
@@ -2067,7 +2067,7 @@ void Group::UnbindInstance(uint32 mapid, bool unload)
 
 void Group::_homebindIfInstance(Player *player)
 {
-    if (player && !player->isGameMaster())
+    if (player && !player->IsGameMaster())
     {
         Map* map = player->GetMap();
         if (map->IsDungeon())

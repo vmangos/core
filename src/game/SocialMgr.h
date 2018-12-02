@@ -127,8 +127,8 @@ class PlayerSocial
         void SendFriendList();
         void SendIgnoreList();
         // Misc
-        bool HasFriend(ObjectGuid friend_guid);
-        bool HasIgnore(ObjectGuid ignore_guid);
+        bool HasFriend(ObjectGuid friend_guid) const;
+        bool HasIgnore(ObjectGuid ignore_guid) const;
         void SetPlayerGuid(ObjectGuid guid) { m_playerLowGuid = guid.GetCounter(); }
         uint32 GetNumberOfSocialsWithFlag(SocialFlag flag);
         void SetMasterPlayer(MasterPlayer* m) { m_masterPlayer = m; }

@@ -1010,7 +1010,7 @@ bool ChatHandler::HandleAccountSetLockedCommand(char* args)
 
 bool ChatHandler::HandleMaxSkillCommand(char* /*args*/)
 {
-    Player* SelectedPlayer = getSelectedPlayer();
+    Player* SelectedPlayer = GetSelectedPlayer();
     if (!SelectedPlayer)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1025,7 +1025,7 @@ bool ChatHandler::HandleMaxSkillCommand(char* /*args*/)
 
 bool ChatHandler::HandleSetSkillCommand(char* args)
 {
-    Player * target = getSelectedPlayer();
+    Player * target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1122,7 +1122,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
 
     if (player)
     {
-        player->removeSpell(it->second, false, false);
+        player->RemoveSpel(it->second, false, false);
         player->SaveToDB(); // make sure we don't lose this change if the world crashes
     }
     else
@@ -1288,7 +1288,7 @@ bool ChatHandler::HandleUnLearnCommand(char* args)
     if (!allRanks && *args)                                 // can be fail also at syntax error
         return false;
 
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1300,7 +1300,7 @@ bool ChatHandler::HandleUnLearnCommand(char* args)
         spell_id = sSpellMgr.GetFirstSpellInChain(spell_id);
 
     if (target->HasSpell(spell_id))
-        target->removeSpell(spell_id, false, !allRanks);
+        target->RemoveSpel(spell_id, false, !allRanks);
     else
         SendSysMessage(LANG_FORGET_SPELL);
 
@@ -1309,7 +1309,7 @@ bool ChatHandler::HandleUnLearnCommand(char* args)
 
 bool ChatHandler::HandleCooldownCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -1965,7 +1965,7 @@ bool ChatHandler::HandleLearnAllCommand(char* /*args*/)
             continue;
         }
 
-        m_session->GetPlayer()->learnSpell(spell, false);
+        m_session->GetPlayer()->LearnSpell(spell, false);
     }
 
     SendSysMessage(LANG_COMMAND_LEARN_MANY_SPELLS);
@@ -2005,7 +2005,7 @@ bool ChatHandler::HandleLearnAllGMCommand(char* /*args*/)
             continue;
         }
 
-        m_session->GetPlayer()->learnSpell(spell, false);
+        m_session->GetPlayer()->LearnSpell(spell, false);
     }
 
     SendSysMessage(LANG_LEARNING_GM_SKILLS);
@@ -2057,7 +2057,7 @@ bool ChatHandler::HandleLearnAllMySpellsCommand(char* /*args*/)
         if (!SpellMgr::IsSpellValid(spellInfo, m_session->GetPlayer(), false))
             continue;
 
-        m_session->GetPlayer()->learnSpell(spellInfo->Id, false);
+        m_session->GetPlayer()->LearnSpell(spellInfo->Id, false);
     }
 
     SendSysMessage(LANG_COMMAND_LEARN_CLASS_SPELLS);
@@ -2102,7 +2102,7 @@ bool ChatHandler::HandleLearnAllMyTalentsCommand(char* /*args*/)
             continue;
 
         // learn highest rank of talent and learn all non-talent spell ranks (recursive by tree)
-        player->learnSpellHighRank(spellid);
+        player->LearnSpellHighRank(spellid);
     }
 
     SendSysMessage(LANG_COMMAND_LEARN_CLASS_TALENTS);
@@ -2123,7 +2123,7 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
                 if (CreatureDataPair const* dataPair = worker.GetResult())
                     if (CreatureData const* data = &dataPair->second)
                         if (uint32 taxiNode = sObjectMgr.GetNearestTaxiNode(data->posX, data->posY, data->posZ, data->mapid, player->GetTeam()))
-                            if (player->m_taxi.SetTaximaskNode(taxiNode))
+                            if (player->GetTaxi().SetTaximaskNode(taxiNode))
                             {
                                 WorldPacket msg(SMSG_NEW_TAXI_PATH, 0);
                                 GetSession()->SendPacket(&msg);
@@ -2138,7 +2138,7 @@ bool ChatHandler::HandleLearnAllLangCommand(char* /*args*/)
 {
     // skipping UNIVERSAL language (0)
     for (int i = 1; i < LANGUAGES_COUNT; ++i)
-        m_session->GetPlayer()->learnSpell(lang_description[i].spell_id, false);
+        m_session->GetPlayer()->LearnSpell(lang_description[i].spell_id, false);
 
     SendSysMessage(LANG_COMMAND_LEARN_ALL_LANG);
     return true;
@@ -2150,8 +2150,8 @@ bool ChatHandler::HandleLearnAllDefaultCommand(char* args)
     if (!ExtractPlayerTarget(&args, &target))
         return false;
 
-    target->learnDefaultSpells();
-    target->learnQuestRewardedSpells();
+    target->LearnDefaultSpells();
+    target->LearnQuestRewardedSpells();
 
     PSendSysMessage(LANG_COMMAND_LEARN_ALL_DEFAULT_AND_QUEST, GetNameLink(target).c_str());
     return true;
@@ -2159,7 +2159,7 @@ bool ChatHandler::HandleLearnAllDefaultCommand(char* args)
 
 bool ChatHandler::HandleLearnCommand(char* args)
 {
-    Player* targetPlayer = getSelectedPlayer();
+    Player* targetPlayer = GetSelectedPlayer();
 
     if (!targetPlayer)
     {
@@ -2196,9 +2196,9 @@ bool ChatHandler::HandleLearnCommand(char* args)
     }
 
     if (allRanks)
-        targetPlayer->learnSpellHighRank(spell);
+        targetPlayer->LearnSpellHighRank(spell);
     else
-        targetPlayer->learnSpell(spell, false);
+        targetPlayer->LearnSpell(spell, false);
 
     return true;
 }
@@ -2230,7 +2230,7 @@ bool ChatHandler::HandleAddItemCommand(char* args)
         return false;
 
     Player* pl = m_session->GetPlayer();
-    Player* plTarget = getSelectedPlayer();
+    Player* plTarget = GetSelectedPlayer();
     if (!plTarget)
         plTarget = pl;
 
@@ -2460,7 +2460,7 @@ bool ChatHandler::HandleAddItemSetCommand(char* args)
     }
 
     Player* pl = m_session->GetPlayer();
-    Player* plTarget = getSelectedPlayer();
+    Player* plTarget = GetSelectedPlayer();
     if (!plTarget)
         plTarget = pl;
 
@@ -2990,7 +2990,7 @@ bool ChatHandler::HandleLookupSkillCommand(char* args)
         return false;
 
     // can be NULL in console call
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
     std::wstring wnamepart;
@@ -3115,7 +3115,7 @@ bool ChatHandler::HandleLookupSpellCommand(char* args)
         return false;
 
     // can be NULL at console call
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
     std::wstring wnamepart;
@@ -3212,7 +3212,7 @@ bool ChatHandler::HandleLookupQuestCommand(char* args)
         return false;
 
     // can be NULL at console call
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
 
     std::string namepart = args;
     std::wstring wnamepart;
@@ -3829,7 +3829,7 @@ bool ChatHandler::HandleGetDistanceCommand(char* args)
     }
     else
     {
-        obj = getSelectedUnit();
+        obj = GetSelectedUnit();
 
         if (!obj)
         {
@@ -3869,7 +3869,7 @@ bool ChatHandler::HandleGetAngleCommand(char* args)
     }
     else
     {
-        obj = getSelectedUnit();
+        obj = GetSelectedUnit();
 
         if (!obj)
         {
@@ -3888,7 +3888,7 @@ bool ChatHandler::HandleGetAngleCommand(char* args)
 
 bool ChatHandler::HandleDieCommand(char* /*args*/)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
 
     if (!target || !m_session->GetPlayer()->GetSelectionGuid())
     {
@@ -3921,7 +3921,7 @@ bool ChatHandler::HandleDieCommand(char* /*args*/)
 
 bool ChatHandler::HandleFearCommand(char* /*args*/)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
 
     if (!target || !m_session->GetPlayer()->GetSelectionGuid())
     {
@@ -3971,7 +3971,7 @@ bool ChatHandler::HandleDamageCommand(char* args)
     if (!*args)
         return false;
 
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
 
     if (!target || !m_session->GetPlayer()->GetSelectionGuid())
     {
@@ -4070,7 +4070,7 @@ bool ChatHandler::HandleReviveCommand(char* args)
 
 bool ChatHandler::HandleAuraCommand(char* args)
 {
-    Unit *target = getSelectedUnit();
+    Unit *target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -4122,7 +4122,7 @@ bool ChatHandler::HandleAuraCommand(char* args)
 
 bool ChatHandler::HandleUnAuraCommand(char* args)
 {
-    Unit *target = getSelectedUnit();
+    Unit *target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -4285,7 +4285,7 @@ bool ChatHandler::HandleNpcChangeEntryCommand(char *args)
     if (!newEntryNum)
         return false;
 
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit || unit->GetTypeId() != TYPEID_UNIT)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -4302,7 +4302,7 @@ bool ChatHandler::HandleNpcChangeEntryCommand(char *args)
 
 bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
 {
-    Creature* target = getSelectedCreature();
+    Creature* target = GetSelectedCreature();
 
     if (!target)
     {
@@ -4355,7 +4355,7 @@ bool ChatHandler::HandleNpcPlayEmoteCommand(char* args)
 {
     uint32 emote = atoi(args);
 
-    Creature* target = getSelectedCreature();
+    Creature* target = GetSelectedCreature();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -4446,7 +4446,7 @@ bool ChatHandler::HandleExploreCheatCommand(char* args)
 
     int flag = atoi(args);
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4617,7 +4617,7 @@ bool ChatHandler::HandleShowAreaCommand(char* args)
     if (!*args)
         return false;
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4648,7 +4648,7 @@ bool ChatHandler::HandleHideAreaCommand(char* args)
     if (!*args)
         return false;
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4809,7 +4809,7 @@ bool ChatHandler::HandleTeleDelCommand(char* args)
 
 bool ChatHandler::HandleListAurasCommand(char* /*args*/)
 {
-    Unit *unit = getSelectedUnit();
+    Unit *unit = GetSelectedUnit();
     if (!unit)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -4891,7 +4891,7 @@ bool ChatHandler::HandleListAurasCommand(char* /*args*/)
 
 bool ChatHandler::HandleListTalentsCommand(char* /*args*/)
 {
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
     if (!player)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -4954,7 +4954,7 @@ static bool HandleResetStatsOrLevelHelper(Player* player)
     player->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, DEFAULT_WORLD_OBJECT_SIZE);
     player->SetFloatValue(UNIT_FIELD_COMBATREACH, 1.5f);
 
-    player->setFactionForRace(player->getRace());
+    player->SetFactionForRace(player->getRace());
 
     player->SetByteValue(UNIT_FIELD_BYTES_0, 3, powertype);
 
@@ -5027,7 +5027,7 @@ bool ChatHandler::HandleResetSpellsCommand(char* args)
 
     if (target)
     {
-        target->resetSpells();
+        target->ResetSpells();
 
         ChatHandler(target).SendSysMessage(LANG_RESET_SPELLS);
         if (!m_session || m_session->GetPlayer() != target)
@@ -5052,7 +5052,7 @@ bool ChatHandler::HandleResetTalentsCommand(char* args)
 
     if (target)
     {
-        target->resetTalents(true);
+        target->ResetTalents(true);
 
         ChatHandler(target).SendSysMessage(LANG_RESET_TALENTS);
         if (!m_session || m_session->GetPlayer() != target)
@@ -5263,18 +5263,7 @@ bool ChatHandler::HandleQuestRemoveCommand(char* args)
         return false;
     }
 
-    // remove all quest entries for 'entry' from quest log
-    for (uint8 slot = 0; slot < MAX_QUEST_LOG_SIZE; ++slot)
-    {
-        uint32 quest = player->GetQuestSlotQuestId(slot);
-        if (quest == entry)
-        {
-            player->SetQuestSlot(slot, 0);
-
-            // we ignore unequippable quest items in this case, its' still be equipped
-            player->TakeOrReplaceQuestStartItems(quest, false, true);
-        }
-    }
+    player->RemoveQuest(entry);
 
     // set quest status to not started (will updated in DB at next save)
     player->SetQuestStatus(entry, QUEST_STATUS_NONE);
@@ -6018,7 +6007,7 @@ bool ChatHandler::HandleRespawnCommand(char* /*args*/)
     Player* pl = m_session->GetPlayer();
 
     // accept only explicitly selected target (not implicitly self targeting case)
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (pl->GetSelectionGuid() && target)
     {
         if (target->GetTypeId() != TYPEID_UNIT)
@@ -6049,7 +6038,7 @@ bool ChatHandler::HandleGMFlyCommand(char* args)
         return false;
     }
 
-    Player *target = getSelectedPlayer();
+    Player *target = GetSelectedPlayer();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -6219,7 +6208,7 @@ bool ChatHandler::HandlePDumpWriteCommand(char *args)
 
 bool ChatHandler::HandleMovegensCommand(char* /*args*/)
 {
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -6377,7 +6366,7 @@ bool ChatHandler::HandleCastCommand(char* args)
     if (!*args)
         return false;
 
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
 
     if (!target)
     {
@@ -6413,7 +6402,7 @@ bool ChatHandler::HandleCastCommand(char* args)
 
 bool ChatHandler::HandleCastBackCommand(char* args)
 {
-    Unit* caster = getSelectedUnit();
+    Unit* caster = GetSelectedUnit();
 
     if (!caster)
     {
@@ -6477,7 +6466,7 @@ bool ChatHandler::HandleCastDistCommand(char* args)
 
 bool ChatHandler::HandleCastTargetCommand(char* args)
 {
-    Creature* caster = getSelectedCreature();
+    Creature* caster = GetSelectedCreature();
 
     if (!caster)
     {
@@ -6516,7 +6505,7 @@ when attempting to use the PointMovementGenerator
 */
 bool ChatHandler::HandleComeToMeCommand(char *args)
 {
-    Creature* caster = getSelectedCreature();
+    Creature* caster = GetSelectedCreature();
 
     if (!caster)
     {
@@ -6536,7 +6525,7 @@ bool ChatHandler::HandleCastSelfCommand(char* args)
     if (!*args)
         return false;
 
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
 
     if (!target)
     {
@@ -6572,7 +6561,7 @@ bool ChatHandler::HandleCastSelfCommand(char* args)
 
 bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
 {
-    Player* player = getSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player) player = m_session->GetPlayer();
     uint32 counter = 0;
 
@@ -6633,7 +6622,7 @@ bool ChatHandler::HandleInstanceUnbindCommand(char* args)
     if (!*args)
         return false;
 
-    Player* player = getSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player || GetAccessLevel() < SEC_BASIC_ADMIN)
         player = m_session->GetPlayer();
     uint32 counter = 0;
@@ -7092,7 +7081,7 @@ bool ChatHandler::HandleModifyCrCommand(char *args)
     if (!*args)
         return false;
 
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target) return false;
     float f;
     if (!ExtractFloat(&args, f))
@@ -7107,7 +7096,7 @@ bool ChatHandler::HandleModifyBrCommand(char *args)
     if (!*args)
         return false;
 
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target) return false;
     float f;
     if (!ExtractFloat(&args, f))
@@ -7122,7 +7111,7 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7183,7 +7172,7 @@ bool ChatHandler::HandleModifyStrengthCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7219,7 +7208,7 @@ bool ChatHandler::HandleModifyAgilityCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7255,7 +7244,7 @@ bool ChatHandler::HandleModifyStaminaCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7294,7 +7283,7 @@ bool ChatHandler::HandleModifyIntellectCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7330,7 +7319,7 @@ bool ChatHandler::HandleModifySpiritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7366,7 +7355,7 @@ bool ChatHandler::HandleModifyArmorCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7401,7 +7390,7 @@ bool ChatHandler::HandleModifyHolyCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7436,7 +7425,7 @@ bool ChatHandler::HandleModifyFireCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7471,7 +7460,7 @@ bool ChatHandler::HandleModifyNatureCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7506,7 +7495,7 @@ bool ChatHandler::HandleModifyFrostCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7541,7 +7530,7 @@ bool ChatHandler::HandleModifyShadowCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7576,7 +7565,7 @@ bool ChatHandler::HandleModifyArcaneCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7611,7 +7600,7 @@ bool ChatHandler::HandleModifyMeleeApCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7648,7 +7637,7 @@ bool ChatHandler::HandleModifyRangedApCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7684,7 +7673,7 @@ bool ChatHandler::HandleModifySpellPowerCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7721,7 +7710,7 @@ bool ChatHandler::HandleModifyMeleeCritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7756,7 +7745,7 @@ bool ChatHandler::HandleModifyRangedCritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7791,7 +7780,7 @@ bool ChatHandler::HandleModifySpellCritCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7811,13 +7800,13 @@ bool ChatHandler::HandleModifySpellCritCommand(char *args)
         return false;
     }
 
-    player->m_SpellCritPercentage[SPELL_SCHOOL_NORMAL] = amount;
-    player->m_SpellCritPercentage[SPELL_SCHOOL_HOLY] = amount;
-    player->m_SpellCritPercentage[SPELL_SCHOOL_FIRE] = amount;
-    player->m_SpellCritPercentage[SPELL_SCHOOL_NATURE] = amount;
-    player->m_SpellCritPercentage[SPELL_SCHOOL_FROST] = amount;
-    player->m_SpellCritPercentage[SPELL_SCHOOL_SHADOW] = amount;
-    player->m_SpellCritPercentage[SPELL_SCHOOL_ARCANE] = amount;
+    player->SetSpellCritPercent(SPELL_SCHOOL_NORMAL, amount);
+    player->SetSpellCritPercent(SPELL_SCHOOL_HOLY, amount);
+    player->SetSpellCritPercent(SPELL_SCHOOL_FIRE, amount);
+    player->SetSpellCritPercent(SPELL_SCHOOL_NATURE, amount);
+    player->SetSpellCritPercent(SPELL_SCHOOL_FROST, amount);
+    player->SetSpellCritPercent(SPELL_SCHOOL_SHADOW, amount);
+    player->SetSpellCritPercent(SPELL_SCHOOL_ARCANE, amount);
 
     PSendSysMessage(LANG_YOU_CHANGE_SCRIT, player->GetName(), amount);
 
@@ -7832,7 +7821,7 @@ bool ChatHandler::HandleModifyMainSpeedCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7867,7 +7856,7 @@ bool ChatHandler::HandleModifyOffSpeedCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7902,7 +7891,7 @@ bool ChatHandler::HandleModifyRangedSpeedCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7937,7 +7926,7 @@ bool ChatHandler::HandleModifyCastSpeedCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -7977,7 +7966,7 @@ bool ChatHandler::HandleModifyBlockCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -8012,7 +8001,7 @@ bool ChatHandler::HandleModifyDodgeCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -8047,7 +8036,7 @@ bool ChatHandler::HandleModifyParryCommand(char *args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {
@@ -8079,7 +8068,7 @@ bool ChatHandler::HandleModifyParryCommand(char *args)
 
 bool ChatHandler::HandleDebugMoveCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     uint32 movetype = 0;
 
     if (!target || !ExtractUInt32(&args, movetype))

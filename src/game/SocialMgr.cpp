@@ -155,7 +155,7 @@ void PlayerSocial::SendIgnoreList()
     DEBUG_LOG("WORLD: Sent SMSG_IGNORE_LIST");
 }
 
-bool PlayerSocial::HasFriend(ObjectGuid friend_guid)
+bool PlayerSocial::HasFriend(ObjectGuid friend_guid) const
 {
     PlayerSocialMap::const_iterator itr = m_playerSocialMap.find(friend_guid.GetCounter());
     if (itr != m_playerSocialMap.end())
@@ -163,7 +163,7 @@ bool PlayerSocial::HasFriend(ObjectGuid friend_guid)
     return false;
 }
 
-bool PlayerSocial::HasIgnore(ObjectGuid ignore_guid)
+bool PlayerSocial::HasIgnore(ObjectGuid ignore_guid) const
 {
     PlayerSocialMap::const_iterator itr = m_playerSocialMap.find(ignore_guid.GetCounter());
     if (itr != m_playerSocialMap.end())
@@ -204,9 +204,9 @@ void SocialMgr::GetFriendInfo(MasterPlayer* player, uint32 friend_lowguid, Frien
                 pFriend->IsVisibleGloballyFor(player))
         {
             friendInfo.Status = FRIEND_STATUS_ONLINE;
-            if (pFriend->isAFK())
+            if (pFriend->IsAFK())
                 friendInfo.Status = FRIEND_STATUS_AFK;
-            if (pFriend->isDND())
+            if (pFriend->IsDND())
                 friendInfo.Status = FRIEND_STATUS_DND;
             friendInfo.Area = pFriend->GetZoneId();
             friendInfo.Level = pFriend->getLevel();

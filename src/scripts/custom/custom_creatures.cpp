@@ -831,7 +831,7 @@ void LearnSkillRecipesHelper(Player *player, uint32 skill_id)
         if (!spellEntry || !SpellMgr::IsSpellValid(spellEntry, player, false))
             continue;
 
-        player->learnSpell(skillLine->spellId, false);
+        player->LearnSpell(skillLine->spellId, false);
     }
 }
 bool LearnAllRecipesInProfession(Player *pPlayer, SkillType skill)

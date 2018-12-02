@@ -47,9 +47,7 @@ void MasterPlayer::LoadPlayer(Player* player)
     level = player->getLevel();
     guildId = player->GetGuildId();
     m_team = player->GetTeam();
-    m_chatTag = player->chatTag();
-    afkMsg = player->afkMsg;
-    dndMsg = player->dndMsg;
+    m_chatTag = player->GetChatTag();
     m_gmInvisibilityLevel = player->GetGMInvisibilityLevel();
     guildRank = player->GetRank();
     m_ExtraFlags = player->GetExtraFlags();

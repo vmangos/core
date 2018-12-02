@@ -802,6 +802,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool HasQuest(uint32 quest_id) const override;
         bool HasInvolvedQuest(uint32 quest_id)  const override;
 
+        uint32 GetDefaultGossipMenuId() const override { return GetCreatureInfo()->GossipMenuId; }
+
         GridReference<Creature> &GetGridRef() { return m_gridRef; }
         bool IsRegeneratingHealth() const { return m_regenHealth; }
         virtual uint8 GetPetAutoSpellSize() const { return CREATURE_MAX_SPELLS; }

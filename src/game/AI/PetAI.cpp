@@ -674,7 +674,7 @@ bool PetAI::CanAttack(Unit* target)
         if (owner)
         {
             if (Player* playerOwner = owner->ToPlayer())
-                ownerTarget = playerOwner->getSelectedUnit();
+                ownerTarget = playerOwner->GetSelectedUnit();
             else
                 ownerTarget = owner->getVictim();
         }

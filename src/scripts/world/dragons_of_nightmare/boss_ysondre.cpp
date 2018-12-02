@@ -62,7 +62,7 @@ bool boss_ysondreAI::DoSpecialAbility()
     for (auto itr = attackers.begin(); itr != attackers.end(); ++itr)
     {
         Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-        if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
+        if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster())
             ++attackersCount;
     }
 

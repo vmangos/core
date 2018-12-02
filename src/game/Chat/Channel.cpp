@@ -621,7 +621,7 @@ void Channel::Say(ObjectGuid p, const char *what, uint32 lang, bool skipCheck)
         data << ObjectGuid(p);
         data << uint32(messageLength);
         data << what;
-        data << uint8(plr ? plr->chatTag() : 0);
+        data << uint8(plr ? plr->GetChatTag() : 0);
 
         if (!skipCheck && plr &&
             plr->GetSession()->GetAccountFlags() & ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS &&

@@ -438,7 +438,7 @@ bool OnGossipHello_go_table_madness(Player* pPlayer, GameObject* pGo)
     //Check if the player has the alchemist skill at 300 and if he doesn't know yet Mojo Madness recipe
     if(pPlayer->HasSkill(171) && !pPlayer->HasSpell(24266))
         if(pPlayer->GetSkillValue(171) >= 300)    
-            pPlayer->learnSpell(TABLET_ALCHEMIST_SPELL,false);
+            pPlayer->LearnSpell(TABLET_ALCHEMIST_SPELL,false);
 
     ScriptedInstance* m_pInstance = (ScriptedInstance*)pGo->GetInstanceData();
     if(!m_pInstance)

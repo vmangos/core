@@ -55,7 +55,7 @@ bool ChatHandler::HandleNpcSayCommand(char* args)
     if (!*args)
         return false;
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
     if (!pCreature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -73,7 +73,7 @@ bool ChatHandler::HandleNpcYellCommand(char* args)
     if (!*args)
         return false;
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
     if (!pCreature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -92,7 +92,7 @@ bool ChatHandler::HandleNpcTextEmoteCommand(char* args)
     if (!*args)
         return false;
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
     {
@@ -163,7 +163,7 @@ bool ChatHandler::HandleGMCommand(char* args)
 {
     if (!*args)
     {
-        if (m_session->GetPlayer()->isGameMaster())
+        if (m_session->GetPlayer()->IsGameMaster())
             m_session->SendNotification(LANG_GM_ON);
         else
             m_session->SendNotification(LANG_GM_OFF);
@@ -197,7 +197,7 @@ bool ChatHandler::HandleGMChatCommand(char* args)
 {
     if (!*args)
     {
-        if (m_session->GetPlayer()->isGMChat())
+        if (m_session->GetPlayer()->IsGMChat())
             m_session->SendNotification(LANG_GM_CHAT_ON);
         else
             m_session->SendNotification(LANG_GM_CHAT_OFF);
@@ -231,7 +231,7 @@ bool ChatHandler::HandleGMVisibleCommand(char* args)
 {
     if (!*args)
     {
-        bool visible = GetSession()->GetPlayer()->isGMVisible();
+        bool visible = GetSession()->GetPlayer()->IsGMVisible();
         uint32 visibilityLevel = visible ? 0 : GetSession()->GetPlayer()->GetGMInvisibilityLevel();
         PSendSysMessage(LANG_YOU_ARE, visible ? GetMangosString(LANG_VISIBLE) : GetMangosString(LANG_INVISIBLE), visibilityLevel);
         return true;
@@ -285,7 +285,7 @@ bool ChatHandler::HandleGPSCommand(char* args)
     }
     else
     {
-        obj = getSelectedUnit();
+        obj = GetSelectedUnit();
 
         if (!obj)
         {
@@ -430,7 +430,7 @@ bool ChatHandler::HandleNamegoCommand(char* args)
         if (target->IsTaxiFlying())
         {
             target->GetMotionMaster()->MovementExpired();
-            target->m_taxi.ClearTaxiDestinations();
+            target->GetTaxi().ClearTaxiDestinations();
         }
         // save only in non-flight case
         else
@@ -565,7 +565,7 @@ bool ChatHandler::HandleGonameCommand(char* args)
         if (_player->IsTaxiFlying())
         {
             _player->GetMotionMaster()->MovementExpired();
-            _player->m_taxi.ClearTaxiDestinations();
+            _player->GetTaxi().ClearTaxiDestinations();
         }
         // save only in non-flight case
         else
@@ -638,7 +638,10 @@ bool ChatHandler::HandleRecallCommand(char* args)
         return false;
     }
 
-    return HandleGoHelper(target, target->m_recallMap, target->m_recallX, target->m_recallY, &target->m_recallZ, &target->m_recallO);
+    uint32 mapId;
+    float x, y, z, o;
+    target->GetRecallPosition(mapId, x, y, z, o);
+    return HandleGoHelper(target, mapId, x, y, &z, &o);
 }
 
 //Edit Player HP
@@ -662,7 +665,7 @@ bool ChatHandler::HandleModifyHPCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -705,7 +708,7 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
         return false;
     }
 
-    Unit *chr = getSelectedUnit();
+    Unit *chr = GetSelectedUnit();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -743,7 +746,7 @@ bool ChatHandler::HandleModifyEnergyCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (!chr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -783,7 +786,7 @@ bool ChatHandler::HandleModifyRageCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -808,7 +811,7 @@ bool ChatHandler::HandleModifyRageCommand(char* args)
 //Edit Player Faction
 bool ChatHandler::HandleModifyFactionCommand(char* args)
 {
-    Creature* chr = getSelectedCreature();
+    Creature* chr = GetSelectedCreature();
     if (!chr)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -879,7 +882,7 @@ bool ChatHandler::HandleModifyTalentCommand(char* args)
     if (tp < 0)
         return false;
 
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -906,7 +909,7 @@ bool ChatHandler::HandleTaxiCheatCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (!chr)
         chr = m_session->GetPlayer();
     // check online security
@@ -949,7 +952,7 @@ bool ChatHandler::HandleModifyASpeedCommand(char* args)
         return false;
     }
 
-    Unit *chr = getSelectedUnit();
+    Unit *chr = GetSelectedUnit();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1014,7 +1017,7 @@ bool ChatHandler::HandleModifySpeedCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1077,7 +1080,7 @@ bool ChatHandler::HandleModifySwimCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1125,7 +1128,7 @@ bool ChatHandler::HandleModifyBWalkCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1170,7 +1173,7 @@ bool ChatHandler::HandleModifyFlyCommand(char* args)
         return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (!chr)
         chr = m_session->GetPlayer();
     if (!chr)
@@ -1213,7 +1216,7 @@ bool ChatHandler::HandleModifyScaleCommand(char* args)
         return false;
     }
 
-    Unit *target = getSelectedUnit();
+    Unit *target = GetSelectedUnit();
     if (target == NULL)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1462,7 +1465,7 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
             return false;
     }
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (!chr)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1513,7 +1516,7 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     if (!*args)
         return false;
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1882,7 +1885,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
     if (!*args)
         return false;
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
     if (!player)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);
@@ -1940,7 +1943,7 @@ bool ChatHandler::HandleTeleGroupCommand(char * args)
         if (pl->IsTaxiFlying())
         {
             pl->GetMotionMaster()->MovementExpired();
-            pl->m_taxi.ClearTaxiDestinations();
+            pl->GetTaxi().ClearTaxiDestinations();
         }
         // save only in non-flight case
         else
@@ -2029,7 +2032,7 @@ bool ChatHandler::HandleGroupgoCommand(char* args)
         if (pl->IsTaxiFlying())
         {
             pl->GetMotionMaster()->MovementExpired();
-            pl->m_taxi.ClearTaxiDestinations();
+            pl->GetTaxi().ClearTaxiDestinations();
         }
         // save only in non-flight case
         else
@@ -2082,7 +2085,7 @@ bool ChatHandler::HandleGoHelper(Player* player, uint32 mapid, float x, float y,
     if (player->IsTaxiFlying())
     {
         player->GetMotionMaster()->MovementExpired();
-        player->m_taxi.ClearTaxiDestinations();
+        player->GetTaxi().ClearTaxiDestinations();
     }
     // save only in non-flight case
     else
@@ -2095,7 +2098,7 @@ bool ChatHandler::HandleGoHelper(Player* player, uint32 mapid, float x, float y,
 
 bool ChatHandler::HandleGoTargetCommand(char* /*args*/)
 {
-    Unit* pTarget = getSelectedUnit();
+    Unit* pTarget = GetSelectedUnit();
 
     if (!pTarget || !m_session->GetPlayer()->GetSelectionGuid() || !m_session->GetPlayer()->IsInMap(pTarget))
     {
@@ -2334,7 +2337,7 @@ bool ChatHandler::HandleModifyDrunkCommand(char* args)
 
 bool ChatHandler::HandleSetViewCommand(char* /*args*/)
 {
-    if (Unit* unit = getSelectedUnit())
+    if (Unit* unit = GetSelectedUnit())
         m_session->GetPlayer()->GetCamera().SetView(unit);
     else
     {

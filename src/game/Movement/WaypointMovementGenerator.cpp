@@ -358,7 +358,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
     player.RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_DISABLE_MOVE | UNIT_FLAG_TAXI_FLIGHT);
     player.TaxiStepFinished();
 
-    if (player.m_taxi.empty())
+    if (player.GetTaxi().empty())
     {
         player.getHostileRefManager().setOnlineOfflineState(true);
         if (player.pvpInfo.inPvPEnforcedArea)
@@ -372,7 +372,7 @@ void FlightPathMovementGenerator::Finalize(Player & player)
         // this prevent cheating with landing  point at lags
         // when client side flight end early in comparison server side
         player.StopMoving();
-        player.m_taxi.ClearTaxiDestinations();
+        player.GetTaxi().ClearTaxiDestinations();
     }
 }
 
@@ -413,8 +413,8 @@ bool FlightPathMovementGenerator::Update(Player &player, const uint32 &diff)
         ++i_currentNode;
         if (MovementInProgress() && (*i_path)[i_currentNode + 1].path != (*i_path)[i_currentNode].path)
         {
-            player.m_taxi.NextTaxiDestination();
-            player.ModifyMoney(-(int32)player.m_taxi.GetCurrentTaxiCost());
+            player.GetTaxi().NextTaxiDestination();
+            player.ModifyMoney(-(int32)player.GetTaxi().GetCurrentTaxiCost());
         }
     }
 

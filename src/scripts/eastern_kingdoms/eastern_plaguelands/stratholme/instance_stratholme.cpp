@@ -704,7 +704,7 @@ struct instance_stratholme : public ScriptedInstance
              |->x    /------------/
                     ^x1             ^x3
             */
-            if (itr->getSource()->isAlive() && !itr->getSource()->isGameMaster() && itr->getSource()->isGMVisible())
+            if (itr->getSource()->isAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible())
             {
                 //hauteur corect ?
                 if (itr->getSource()->GetPositionZ() < 135 && itr->getSource()->GetPositionZ() > 130)
@@ -726,7 +726,7 @@ struct instance_stratholme : public ScriptedInstance
         Map::PlayerList const &listeJoueur = instance->GetPlayers();
         for (Map::PlayerList::const_iterator itr = listeJoueur.begin(); itr != listeJoueur.end(); ++itr)
         {
-            if (itr->getSource()->isAlive() && !itr->getSource()->isGameMaster() && itr->getSource()->isGMVisible() &&
+            if (itr->getSource()->isAlive() && !itr->getSource()->IsGameMaster() && itr->getSource()->IsGMVisible() &&
                     itr->getSource()->GetPositionX() < 3621.32 && itr->getSource()->GetPositionX() > 3603.18 &&
                     itr->getSource()->GetPositionY() < -3335 && itr->getSource()->GetPositionY() > -3340.46 &&
                     itr->getSource()->GetPositionZ() < 130 && itr->getSource()->GetPositionZ() > 123)

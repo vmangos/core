@@ -998,7 +998,7 @@ bool GameObject::isVisibleForInState(Player const* u, WorldObject const* viewPoi
         return true;
 
     // quick check visibility false cases for non-GM-mode
-    if (!u->isGameMaster())
+    if (!u->IsGameMaster())
     {
         if (!IsVisible())
             return false;
@@ -1992,7 +1992,7 @@ void GameObject::UpdateRotationFields(float rotation2 /*=0.0f*/, float rotation3
 bool GameObject::IsHostileTo(Unit const* unit) const
 {
     // always non-hostile to GM in GM mode
-    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
+    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->IsGameMaster())
         return false;
 
     // test owner instead if have
@@ -2035,7 +2035,7 @@ bool GameObject::IsHostileTo(Unit const* unit) const
 bool GameObject::IsFriendlyTo(Unit const* unit) const
 {
     // always friendly to GM in GM mode
-    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->isGameMaster())
+    if (unit->GetTypeId() == TYPEID_PLAYER && ((Player const*)unit)->IsGameMaster())
         return true;
 
     // test owner instead if have
@@ -2098,7 +2098,7 @@ bool GameObject::IsUseRequirementMet() const
 
 bool GameObject::PlayerCanUse(Player* pl)
 {
-    if (pl->isGameMaster())
+    if (pl->IsGameMaster())
         return true;
 
     if (!IsVisible())

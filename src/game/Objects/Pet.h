@@ -230,10 +230,10 @@ class MANGOS_DLL_SPEC Pet : public Creature
         void _LoadSpells();
         void _SaveSpells();
 
-        bool addSpell(uint32 spell_id,ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
-        bool learnSpell(uint32 spell_id);
+        bool AddSpell(uint32 spell_id,ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
+        bool LearnSpell(uint32 spell_id);
         bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
-        bool removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
+        bool RemoveSpel(uint32 spell_id, bool learn_prev, bool clear_ab = true);
         void CleanupActionBar();
 
         PetSpellMap     m_petSpells;
@@ -242,7 +242,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
 
         void InitPetCreateSpells();
         void CheckLearning(uint32 spellid);
-        uint32 resetTalentsCost() const;
+        uint32 GetResetTalentsCost() const;
 
         void  SetTP(int32 TP);
         int32 GetDispTP() const;

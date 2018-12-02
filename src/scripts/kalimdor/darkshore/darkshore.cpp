@@ -1485,7 +1485,7 @@ bool at_murloc_camp(Player* pPlayer, AreaTriggerEntry const *pAt)
 {
     if (pAt->id == AREATRIGGER_MURKDEEP)
     {
-        if (pPlayer->isGameMaster() || pPlayer->isDead())
+        if (pPlayer->IsGameMaster() || pPlayer->isDead())
             return false;
 
         if (pPlayer && pPlayer->GetQuestStatus(QUEST_WANTED_MURKDEEP) == QUEST_STATUS_INCOMPLETE)

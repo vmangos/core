@@ -386,7 +386,7 @@ struct boss_mandokirAI : public ScriptedAI
             return;
 
         if (Player* pPlayer = pWho->ToPlayer())
-            if (!pPlayer->isGameMaster())
+            if (!pPlayer->IsGameMaster())
                 if (pPlayer->GetDistance(m_creature) < 40.0f)
                     if (m_VilebranchDead)
                         AttackStart(pWho);
@@ -422,7 +422,7 @@ struct boss_mandokirAI : public ScriptedAI
         {
             if (Player* killedPlayer = m_creature->GetMap()->GetPlayer(m_uiPlayerToRez))
             {
-                if (killedPlayer->getDeathState() == CORPSE && !killedPlayer->isRessurectRequested())
+                if (killedPlayer->getDeathState() == CORPSE && !killedPlayer->IsRessurectRequested())
                 {
                     // Find nearest spirit ready to resurrect
                     Creature* spirit = NULL;
@@ -783,7 +783,7 @@ struct mob_chainedSpiritsAI : public ScriptedAI
             {
                 // Attempt to rez player
                 Player* target = m_creature->GetMap()->GetPlayer(m_uiTargetRezGUID);
-                if (target && target->getDeathState() == CORPSE && !target->isRessurectRequested())
+                if (target && target->getDeathState() == CORPSE && !target->IsRessurectRequested())
                     m_creature->CastSpell(target, SPELL_REVIVE, true); // Will despawn at SpellHit
                 else
                     m_creature->AddObjectToRemoveList();

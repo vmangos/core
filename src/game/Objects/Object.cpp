@@ -507,7 +507,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     {
         if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
-            if (((GameObject*)this)->ActivateToQuest(target) || target->isGameMaster())
+            if (((GameObject*)this)->ActivateToQuest(target) || target->IsGameMaster())
                 IsActivateToQuest = true;
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
@@ -519,7 +519,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
     {
         if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {
-            if (((GameObject*)this)->ActivateToQuest(target) || target->isGameMaster())
+            if (((GameObject*)this)->ActivateToQuest(target) || target->IsGameMaster())
                 IsActivateToQuest = true;
 
             updateMask->SetBit(GAMEOBJECT_DYN_FLAGS);
@@ -613,7 +613,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                 else if (index == UNIT_FIELD_FLAGS && target->HasOption(PLAYER_VIDEO_MODE) && target != this)
                     *data << (m_uint32Values[index] | UNIT_FLAG_NOT_SELECTABLE);
                 // Gamemasters should be always able to select units and view auras
-                else if (index == UNIT_FIELD_FLAGS && target->isGameMaster())
+                else if (index == UNIT_FIELD_FLAGS && target->IsGameMaster())
                     *data << ((m_uint32Values[index] | UNIT_FLAG_AURAS_VISIBLE) & ~UNIT_FLAG_NOT_SELECTABLE);
                 // hide lootable animation for unallowed players
                 else if (index == UNIT_DYNAMIC_FLAGS)
@@ -646,7 +646,7 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
                             dynamicFlags &= ~UNIT_DYNFLAG_TAPPED_BY_PLAYER;
                         }
 
-                        if (!target->isAllowedToLoot(creature))
+                        if (!target->IsAllowedToLoot(creature))
                             dynamicFlags &= ~UNIT_DYNFLAG_LOOTABLE;
                     }
                     *data << dynamicFlags;
@@ -2428,7 +2428,7 @@ bool WorldObject::CanSeeInWorld(WorldObject const* other) const
 {
     // Les GMs voient tout
     if (GetTypeId() == TYPEID_PLAYER &&
-            ((Player*)this)->isGameMaster())
+            ((Player*)this)->IsGameMaster())
         return true;
     if (GetGUID() == other->GetGUID())
         return true;
@@ -2439,7 +2439,7 @@ bool WorldObject::CanSeeInWorld(uint32 otherPhaseMask) const
 {
     // Les GMs voient tout
     if (GetTypeId() == TYPEID_PLAYER &&
-            ((Player*)this)->isGameMaster())
+            ((Player*)this)->IsGameMaster())
         return true;
     // Un monde en commun ?
     if (worldMask & otherPhaseMask)

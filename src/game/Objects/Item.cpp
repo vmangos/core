@@ -45,11 +45,11 @@ void AddItemsSetItem(Player* player, Item* item)
 
     ItemSetEffect* eff = NULL;
 
-    for (size_t x = 0; x < player->ItemSetEff.size(); ++x)
+    for (size_t x = 0; x < player->m_ItemSetEff.size(); ++x)
     {
-        if (player->ItemSetEff[x] && player->ItemSetEff[x]->setid == setid)
+        if (player->m_ItemSetEff[x] && player->m_ItemSetEff[x]->setid == setid)
         {
-            eff = player->ItemSetEff[x];
+            eff = player->m_ItemSetEff[x];
             break;
         }
     }
@@ -61,14 +61,14 @@ void AddItemsSetItem(Player* player, Item* item)
         eff->setid = setid;
 
         size_t x = 0;
-        for (; x < player->ItemSetEff.size(); x++)
-            if (!player->ItemSetEff[x])
+        for (; x < player->m_ItemSetEff.size(); x++)
+            if (!player->m_ItemSetEff[x])
                 break;
 
-        if (x < player->ItemSetEff.size())
-            player->ItemSetEff[x] = eff;
+        if (x < player->m_ItemSetEff.size())
+            player->m_ItemSetEff[x] = eff;
         else
-            player->ItemSetEff.push_back(eff);
+            player->m_ItemSetEff.push_back(eff);
     }
 
     ++eff->item_count;
@@ -124,11 +124,11 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
 
     ItemSetEffect* eff = NULL;
     size_t setindex = 0;
-    for (; setindex < player->ItemSetEff.size(); setindex++)
+    for (; setindex < player->m_ItemSetEff.size(); setindex++)
     {
-        if (player->ItemSetEff[setindex] && player->ItemSetEff[setindex]->setid == setid)
+        if (player->m_ItemSetEff[setindex] && player->m_ItemSetEff[setindex]->setid == setid)
         {
-            eff = player->ItemSetEff[setindex];
+            eff = player->m_ItemSetEff[setindex];
             break;
         }
     }
@@ -162,9 +162,9 @@ void RemoveItemsSetItem(Player* player, ItemPrototype const* proto)
 
     if (!eff->item_count)                                    // all items of a set were removed
     {
-        MANGOS_ASSERT(eff == player->ItemSetEff[setindex]);
+        MANGOS_ASSERT(eff == player->m_ItemSetEff[setindex]);
         delete eff;
-        player->ItemSetEff[setindex] = NULL;
+        player->m_ItemSetEff[setindex] = NULL;
     }
 }
 

@@ -1634,7 +1634,7 @@ void Pet::_LoadSpells()
         for (PetSpells::iterator it = m_pTmpCache->spells.begin(); it != m_pTmpCache->spells.end(); ++it)
         {
             //Field *fields = result->Fetch();
-            addSpell(it->spell, ActiveStates(it->active), PETSPELL_UNCHANGED);
+            AddSpell(it->spell, ActiveStates(it->active), PETSPELL_UNCHANGED);
         }
         //while( result->NextRow() );
         //delete result;
@@ -1892,7 +1892,7 @@ void Pet::_SaveAuras()
     }
 }
 
-bool Pet::addSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpellState state /*= PETSPELL_NEW*/, PetSpellType type /*= PETSPELL_NORMAL*/)
+bool Pet::AddSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpellState state /*= PETSPELL_NEW*/, PetSpellType type /*= PETSPELL_NORMAL*/)
 {
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
     if (!spellInfo)
@@ -1900,11 +1900,11 @@ bool Pet::addSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
         // do pet spell book cleanup
         if (state == PETSPELL_UNCHANGED)                    // spell load case
         {
-            sLog.outError("Pet::addSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spell_id);
+            sLog.outError("Pet::AddSpell: nonexistent in SpellStore spell #%u request, deleting for all pets in `pet_spell`.", spell_id);
             CharacterDatabase.PExecute("DELETE FROM pet_spell WHERE spell = '%u'", spell_id);
         }
         else
-            sLog.outError("Pet::addSpell: nonexistent in SpellStore spell #%u request.", spell_id);
+            sLog.outError("Pet::AddSpell: nonexistent in SpellStore spell #%u request.", spell_id);
 
         return false;
     }
@@ -1989,10 +1989,10 @@ bool Pet::addSpell(uint32 spell_id, ActiveStates active /*= ACT_DECIDE*/, PetSpe
     return true;
 }
 
-bool Pet::learnSpell(uint32 spell_id)
+bool Pet::LearnSpell(uint32 spell_id)
 {
     // prevent duplicated entires in spell book
-    if (!addSpell(spell_id))
+    if (!AddSpell(spell_id))
         return false;
 
     if (!m_loading)
@@ -2006,12 +2006,12 @@ bool Pet::learnSpell(uint32 spell_id)
 
 bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
-    if (removeSpell(spell_id, learn_prev, clear_ab))
+    if (RemoveSpel(spell_id, learn_prev, clear_ab))
         return true;
     return false;
 }
 
-bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
+bool Pet::RemoveSpel(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
     auto itr = m_petSpells.find(spell_id);
     if (itr == m_petSpells.end())
@@ -2030,7 +2030,7 @@ bool Pet::removeSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
     if (learn_prev)
     {
         if (uint32 prev_id = sSpellMgr.GetPrevSpellInChain(spell_id))
-            learnSpell(prev_id);
+            LearnSpell(prev_id);
         else
             learn_prev = false;
     }
@@ -2088,7 +2088,7 @@ void Pet::InitPetCreateSpells()
                 if (p_owner && !p_owner->HasSpell(learn_spellproto->Id))
                 {
                     if (IsPassiveSpell(petspellid))         //learn passive skills when tamed, not sure if thats right
-                        p_owner->learnSpell(learn_spellproto->Id, false);
+                        p_owner->LearnSpell(learn_spellproto->Id, false);
                     else
                         AddTeachSpell(learn_spellproto->EffectTriggerSpell[0], learn_spellproto->Id);
                 }
@@ -2096,7 +2096,7 @@ void Pet::InitPetCreateSpells()
             else
                 petspellid = learn_spellproto->Id;
 
-            addSpell(petspellid);
+            AddSpell(petspellid);
 
             SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(learn_spellproto->EffectTriggerSpell[0]);
 
@@ -2132,12 +2132,12 @@ void Pet::CheckLearning(uint32 spellid)
 
     if (urand(0, 100) < 10)
     {
-        ((Player*)owner)->learnSpell(itr->second, false);
+        ((Player*)owner)->LearnSpell(itr->second, false);
         m_teachspells.erase(itr);
     }
 }
 
-uint32 Pet::resetTalentsCost() const
+uint32 Pet::GetResetTalentsCost() const
 {
     uint32 days = uint32(sWorld.GetGameTime() - m_resetTalentsTime) / DAY;
 
@@ -2267,7 +2267,7 @@ void Pet::LearnPetPassives()
     if (petStore != sPetFamilySpellsStore.end())
     {
         for (PetFamilySpellsSet::const_iterator petSet = petStore->second.begin(); petSet != petStore->second.end(); ++petSet)
-            addSpell(*petSet, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
+            AddSpell(*petSet, ACT_DECIDE, PETSPELL_NEW, PETSPELL_FAMILY);
     }
 }
 

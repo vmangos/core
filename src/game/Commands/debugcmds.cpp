@@ -145,7 +145,7 @@ bool ChatHandler::HandleSendSpellChannelVisualCommand(char *args)
 bool ChatHandler::HandleDebugSendPoiCommand(char* args)
 {
     Player *pPlayer = m_session->GetPlayer();
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -197,7 +197,7 @@ bool ChatHandler::HandleDebugSendBuyErrorCommand(char* args)
 
 bool ChatHandler::HandleDebugSendOpenBagCommand(char *args)
 {
-    Player *pTarget = getSelectedPlayer();
+    Player *pTarget = GetSelectedPlayer();
     if (!pTarget)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -211,7 +211,7 @@ bool ChatHandler::HandleDebugSendOpenBagCommand(char *args)
 
 bool ChatHandler::HandleDebugSendOpcodeCommand(char* /*args*/)
 {
-    Unit *unit = getSelectedUnit();
+    Unit *unit = GetSelectedUnit();
     if (!unit || (unit->GetTypeId() != TYPEID_PLAYER))
         unit = m_session->GetPlayer();
 
@@ -338,7 +338,7 @@ bool ChatHandler::HandleDebugPlaySoundCommand(char* args)
         return false;
     }
 
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -400,7 +400,7 @@ bool ChatHandler::HandleDebugPlayScriptText(char* args)
     if (!ExtractInt32(&args, textId))
         return false;
 
-    Unit* pSource = getSelectedUnit();
+    Unit* pSource = GetSelectedUnit();
     Unit* pTarget = m_session->GetPlayer();
 
     if (pSource && pTarget)
@@ -416,7 +416,7 @@ bool ChatHandler::HandleDebugConditionCommand(char* args)
     if (!ExtractInt32(&args, conditionId))
         return false;
 
-    Unit* pSource = getSelectedUnit();
+    Unit* pSource = GetSelectedUnit();
     Unit* pTarget = m_session->GetPlayer();
 
     if (pSource && pTarget)
@@ -477,7 +477,7 @@ bool ChatHandler::HandleDebugSendQuestPartyMsgCommand(char* args)
 
 bool ChatHandler::HandleDebugGetLootRecipientCommand(char* /*args*/)
 {
-    Creature* target = getSelectedCreature();
+    Creature* target = GetSelectedCreature();
     if (!target)
         return false;
 
@@ -538,7 +538,7 @@ bool ChatHandler::HandleDebugGetItemStateCommand(char* args)
     else
         return false;
 
-    Player* player = getSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player) player = m_session->GetPlayer();
 
     if (!list_queue && !check_all)
@@ -843,7 +843,7 @@ bool ChatHandler::HandleDebugSetAuraStateCommand(char* args)
     if (!ExtractInt32(&args, state))
         return false;
 
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -939,7 +939,7 @@ bool ChatHandler::HandleDebugSetItemValueCommand(char* args)
 
 bool ChatHandler::HandleDebugSetValueCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1047,7 +1047,7 @@ bool ChatHandler::HandleDebugGetItemValueCommand(char* args)
 
 bool ChatHandler::HandleDebugGetValueCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1172,7 +1172,7 @@ bool ChatHandler::HandleDebugModItemValueCommand(char* args)
 
 bool ChatHandler::HandleDebugModValueCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1272,7 +1272,7 @@ bool ChatHandler::HandleDebugSpellModsCommand(char* args)
     if (!ExtractInt32(&args, value))
         return false;
 
-    Player *chr = getSelectedPlayer();
+    Player *chr = GetSelectedPlayer();
     if (chr == NULL)
     {
         SendSysMessage(LANG_NO_CHAR_SELECTED);

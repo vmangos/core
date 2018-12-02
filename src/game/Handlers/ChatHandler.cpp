@@ -137,7 +137,7 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
     else
     {
         // send in universal language if player in .gmon mode (ignore spell effects)
-        if (_player && _player->isGameMaster())
+        if (_player && _player->IsGameMaster())
             lang = LANG_UNIVERSAL;
         else
         {
@@ -413,12 +413,12 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
             if (Player* toPlayer = player->GetSession()->GetPlayer())
             {
-                bool allowIgnoreAntispam = toPlayer->isAllowedWhisperFrom(masterPlr->GetObjectGuid());
+                bool allowIgnoreAntispam = toPlayer->IsAllowedWhisperFrom(masterPlr->GetObjectGuid());
                 bool allowSendWhisper = allowIgnoreAntispam;
-                if (!sWorld.getConfig(CONFIG_BOOL_WHISPER_RESTRICTION) || !toPlayer->isEnabledWhisperRestriction())
+                if (!sWorld.getConfig(CONFIG_BOOL_WHISPER_RESTRICTION) || !toPlayer->IsEnabledWhisperRestriction())
                     allowSendWhisper = true;
 
-                if (masterPlr->isGameMaster() || allowSendWhisper)
+                if (masterPlr->IsGameMaster() || allowSendWhisper)
                     masterPlr->Whisper(msg, lang, player);
 
                 if (lang != LANG_ADDON)
@@ -569,17 +569,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
             if(_player && _player->isInCombat())
                 break;
 
-            // Move this masterside ?
-            if(!msg.empty() || !_player->isAFK())
+            if(!msg.empty() || !_player->IsAFK())
             {
-                _player->afkMsg = msg;
+                if (MasterPlayer* masterPlr = GetMasterPlayer())
+                    masterPlr->afkMsg = msg;
             }
 
-            if(msg.empty() || !_player->isAFK())
+            if(msg.empty() || !_player->IsAFK())
             {
                 _player->ToggleAFK();
 
-                if(_player->isAFK() && _player->isDND())
+                if(_player->IsAFK() && _player->IsDND())
                     _player->ToggleDND();
             }
         }
@@ -588,17 +588,17 @@ void WorldSession::HandleMessagechatOpcode(WorldPacket & recv_data)
 
         case CHAT_MSG_DND:
         {
-            // Move this masterside ?
-            if(!msg.empty() || !_player->isDND())
+            if(!msg.empty() || !_player->IsDND())
             {
-                _player->dndMsg = msg;
+                if (MasterPlayer* masterPlr = GetMasterPlayer())
+                    masterPlr->dndMsg = msg;
             }
 
-            if(msg.empty() || !_player->isDND())
+            if(msg.empty() || !_player->IsDND())
             {
                 _player->ToggleDND();
 
-                if(_player->isDND() && _player->isAFK())
+                if(_player->IsDND() && _player->IsAFK())
                     _player->ToggleAFK();
             }
         }
