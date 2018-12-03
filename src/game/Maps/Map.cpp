@@ -2897,7 +2897,7 @@ void Map::UpdateVisibilityForRelocations()
     f();
     if (job.valid())
         job.wait();
-    if (ait > i_unitsRelocated.size()) //ait is increased before checks, so max value is `objectsCount + threads`
+    if (ait >= i_unitsRelocated.size()) //ait is increased before checks, so max value is `objectsCount + threads`
         i_unitsRelocated.clear();
     else
         i_unitsRelocated.erase(t.front(), t[ait]);
