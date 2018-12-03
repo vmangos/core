@@ -1683,26 +1683,14 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss)
 //TODO for melee need create structure as in
 void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *damageInfo, WeaponAttackType attackType)
 {
+    damageInfo->attacker = this;
+    damageInfo->target = pVictim;
+    damageInfo->attackType = attackType;
+
     if (!pVictim)
         return;
     if (!isAlive() || !pVictim->isAlive())
         return;
-
-    damageInfo->attacker         = this;
-    damageInfo->target           = pVictim;
-    damageInfo->attackType       = attackType;
-    damageInfo->totalDamage      = 0;
-    damageInfo->cleanDamage      = 0;
-    damageInfo->totalAbsorb      = 0;
-    damageInfo->totalResist      = 0;
-    damageInfo->blocked_amount   = 0;
-
-    damageInfo->TargetState      = VICTIMSTATE_UNAFFECTED;
-    damageInfo->HitInfo          = HITINFO_NORMALSWING;
-    damageInfo->procAttacker     = PROC_FLAG_NONE;
-    damageInfo->procVictim       = PROC_FLAG_NONE;
-    damageInfo->procEx           = PROC_EX_NONE;
-    damageInfo->hitOutCome       = MELEE_HIT_EVADE;
 
     // Select HitInfo/procAttacker/procVictim flag based on attack type
     switch (attackType)
@@ -2551,6 +2539,9 @@ void Unit::CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damage
 
 void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool checkLoS, bool extra)
 {
+    if (!pVictim->isAlive())
+        return;
+
     if (!extra && IsNonMeleeSpellCasted(false))
         return;
 

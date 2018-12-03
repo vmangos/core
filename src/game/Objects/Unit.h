@@ -642,23 +642,23 @@ struct SubDamageInfo
 // Need create structure like in SMSG_ATTACKERSTATEUPDATE opcode
 struct CalcDamageInfo
 {
-    Unit  *attacker;             // Attacker
-    Unit  *target;               // Target for damage
-    uint32 totalDamage;
-    uint32 totalAbsorb;
-    uint32 totalResist;
-    SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES];
-    uint32 blocked_amount;
-    uint32 HitInfo;
-    uint32 TargetState;
+    Unit  *attacker = nullptr;             // Attacker
+    Unit  *target = nullptr;               // Target for damage
+    uint32 totalDamage = 0;
+    uint32 totalAbsorb = 0;
+    uint32 totalResist = 0;
+    SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES] = {};
+    uint32 blocked_amount = 0;
+    uint32 HitInfo = HITINFO_NORMALSWING;
+    uint32 TargetState = VICTIMSTATE_UNAFFECTED;
 
     // Helper
-    WeaponAttackType attackType;
-    uint32 procAttacker;
-    uint32 procVictim;
-    uint32 procEx;
-    uint32 cleanDamage;          // Used only for rage calculation
-    MeleeHitOutcome hitOutCome;  // TODO: remove this field (need use TargetState)
+    WeaponAttackType attackType = BASE_ATTACK;
+    uint32 procAttacker = 0;
+    uint32 procVictim = 0;
+    uint32 procEx = 0;
+    uint32 cleanDamage = 0;                        // Used only for rage calculation
+    MeleeHitOutcome hitOutCome = MELEE_HIT_EVADE;  // TODO: remove this field (need use TargetState)
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
