@@ -8576,22 +8576,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
         value += (int32)(comboDamage * comboPoints);
 
     if (Player* modOwner = GetSpellModOwner())
-    {
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_ALL_EFFECTS, value, spell);
-
-        switch (effect_index)
-        {
-            case EFFECT_INDEX_0:
-                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT1, value, spell);
-                break;
-            case EFFECT_INDEX_1:
-                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT2, value, spell);
-                break;
-            case EFFECT_INDEX_2:
-                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT3, value, spell);
-                break;
-        }
-    }
 
     if (spellProto->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION && spellProto->spellLevel &&
             spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&

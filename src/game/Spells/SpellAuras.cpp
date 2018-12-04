@@ -977,6 +977,9 @@ void Aura::ReapplyAffectedPassiveAuras()
         case SPELLMOD_COST:
         case SPELLMOD_ACTIVATION_TIME:
         case SPELLMOD_CASTING_TIME_OLD:
+        case SPELLMOD_SPEED:
+        case SPELLMOD_HASTE:
+        case SPELLMOD_ATTACK_POWER:
             return;
     }
 
@@ -1008,37 +1011,6 @@ void Aura::HandleAddModifier(bool apply, bool Real)
                 GetHolder()->SetAuraCharges(1);
                 break;
         }
-
-        // In pre-TBC wrong spellmods in DBC
-        // Nostalrius: fix dans spell_effect_mod (EffectMiscValue)
-        /*
-        switch (GetSpellProto()->SpellIconID)
-        {
-            case 143:       // Permafrost Speed Decrease
-                if (GetEffIndex() == EFFECT_INDEX_1)
-                    m_modifier.m_miscvalue = SPELLMOD_EFFECT1;
-                break;
-            case 228:       // Improved Curse of Exhaustion Speed Decrease
-                if (GetEffIndex() == EFFECT_INDEX_0)
-                    m_modifier.m_miscvalue = SPELLMOD_EFFECT1;
-                break;
-            case 250:       // Camouflage Speed Decrease (13975, 14062, 14063, 14064, 14065)
-                if (GetEffIndex() == EFFECT_INDEX_0)
-                    m_modifier.m_miscvalue = SPELLMOD_EFFECT3;
-                break;
-            case 1181:       // Pathfinding Speed Increase (ID = 19560)
-                if (GetEffIndex() == EFFECT_INDEX_0)
-                    m_modifier.m_miscvalue = SPELLMOD_EFFECT1;
-                break;
-            case 1494:       // Amplify Curse Speed Decrease (18310, 18311, 18312, 18313)
-                if (GetEffIndex() == EFFECT_INDEX_0)
-                    m_modifier.m_miscvalue = SPELLMOD_EFFECT1;
-                break;
-            case 1563:       // Cheetah Sprint (ID = 24348)
-                if (GetEffIndex() == EFFECT_INDEX_0)
-                    m_modifier.m_miscvalue = SPELLMOD_EFFECT1;
-                break;
-        }*/
 
         m_spellmod = new SpellModifier(
             SpellModOp(m_modifier.m_miscvalue),
@@ -2038,29 +2010,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
                     return;
                 }
-            }
-            // Improved Weapon Totems
-            if (GetSpellProto()->SpellIconID == 57 && target->GetTypeId() == TYPEID_PLAYER)
-            {
-                if (apply)
-                {
-                    switch (m_effIndex)
-                    {
-                        case 0:
-                            // Windfury Totem
-                            m_spellmod = new SpellModifier(SPELLMOD_EFFECT1, SPELLMOD_PCT, m_modifier.m_amount, GetId(), UI64LIT(0x00200000000));
-                            break;
-                        case 1:
-                            // Flametongue Totem
-                            m_spellmod = new SpellModifier(SPELLMOD_EFFECT1, SPELLMOD_PCT, m_modifier.m_amount, GetId(), UI64LIT(0x00400000000));
-                            break;
-                        default:
-                            return;
-                    }
-                }
-
-                ((Player*)target)->AddSpellMod(m_spellmod, apply);
-                return;
             }
             break;
         }
@@ -3792,6 +3741,10 @@ void Aura::HandleAuraModIncreaseSpeed(bool apply, bool Real)
     if (!Real)
         return;
 
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_SPEED, m_modifier.m_amount);
+
     GetTarget()->UpdateSpeed(MOVE_RUN, true);
 }
 
@@ -3818,6 +3771,10 @@ void Aura::HandleAuraModDecreaseSpeed(bool apply, bool Real)
     // all applied/removed only at real aura add/remove
     if (!Real)
         return;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_SPEED, m_modifier.m_amount);
 
     Unit* target = GetTarget();
 
@@ -4732,15 +4689,27 @@ void Aura::HandleModSpellCritChanceShool(bool /*apply*/, bool Real)
 
 void Aura::HandleModCastingSpeed(bool apply, bool /*Real*/)
 {
-    GetTarget()->ApplyCastTimePercentMod(float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+
+    GetTarget()->ApplyCastTimePercentMod(amount, apply);
 }
 
 void Aura::HandleModAttackSpeed(bool apply, bool /*Real*/)
 {
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+
     Unit *target = GetTarget();
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, float(m_modifier.m_amount), apply);
-    target->ApplyAttackTimePercentMod(OFF_ATTACK, float(m_modifier.m_amount), apply);
-    target->ApplyAttackTimePercentMod(RANGED_ATTACK, float(m_modifier.m_amount), apply);
+    target->ApplyAttackTimePercentMod(BASE_ATTACK, amount, apply);
+    target->ApplyAttackTimePercentMod(OFF_ATTACK, amount, apply);
+    target->ApplyAttackTimePercentMod(RANGED_ATTACK, amount, apply);
 
     // Seal of the Crusader damage reduction
     // SoC increases attack speed but reduces damage to maintain the same DPS
@@ -4753,21 +4722,40 @@ void Aura::HandleModAttackSpeed(bool apply, bool /*Real*/)
 
 void Aura::HandleModMeleeSpeedPct(bool apply, bool /*Real*/)
 {
-    Unit *target = GetTarget();
-    target->ApplyAttackTimePercentMod(BASE_ATTACK, float(m_modifier.m_amount), apply);
-    target->ApplyAttackTimePercentMod(OFF_ATTACK, float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+
+    Unit* target = GetTarget();
+    target->ApplyAttackTimePercentMod(BASE_ATTACK, amount, apply);
+    target->ApplyAttackTimePercentMod(OFF_ATTACK, amount, apply);
 }
 
 void Aura::HandleAuraModRangedHaste(bool apply, bool /*Real*/)
 {
-    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+
+    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, amount, apply);
 }
 
 void Aura::HandleRangedAmmoHaste(bool apply, bool /*Real*/)
 {
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
-    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, float(m_modifier.m_amount), apply);
+
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_HASTE, amount);
+
+    GetTarget()->ApplyAttackTimePercentMod(RANGED_ATTACK, amount, apply);
 }
 
 /********************************/
@@ -4776,7 +4764,13 @@ void Aura::HandleRangedAmmoHaste(bool apply, bool /*Real*/)
 
 void Aura::HandleAuraModAttackPower(bool apply, bool /*Real*/)
 {
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
+
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, amount, apply);
 }
 
 void Aura::HandleAuraModRangedAttackPower(bool apply, bool /*Real*/)
@@ -4784,13 +4778,25 @@ void Aura::HandleAuraModRangedAttackPower(bool apply, bool /*Real*/)
     if ((GetTarget()->getClassMask() & CLASSMASK_WAND_USERS) != 0)
         return;
 
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
+
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_VALUE, amount, apply);
 }
 
 void Aura::HandleAuraModAttackPowerPercent(bool apply, bool /*Real*/)
 {
-    //UNIT_FIELD_ATTACK_POWER_MULTIPLIER = multiplier - 1
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
+
+    // UNIT_FIELD_ATTACK_POWER_MULTIPLIER = multiplier - 1
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_PCT, amount, apply);
 }
 
 void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
@@ -4799,8 +4805,14 @@ void Aura::HandleAuraModRangedAttackPowerPercent(bool apply, bool /*Real*/)
     if ((GetTarget()->getClassMask() & CLASSMASK_WAND_USERS) != 0)
         return;
 
-    //UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
-    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, float(m_modifier.m_amount), apply);
+    float amount = m_modifier.m_amount;
+
+    if (Unit* caster = GetCaster())
+        if (Player* modOwner = caster->GetSpellModOwner())
+            modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
+
+    // UNIT_FIELD_RANGED_ATTACK_POWER_MULTIPLIER = multiplier - 1
+    GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER_RANGED, TOTAL_PCT, amount, apply);
 #endif
 }
 
@@ -6452,7 +6464,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
                     {
                         // reflection chance (effect 1) of Frost Ward, applied in dummy effect
-                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_EFFECT2, GetId()))
+                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_RESIST_MISS_CHANCE, GetId()))
                             ((Player*)m_target)->AddSpellMod(mod, false);
                     }
                     return;
@@ -6463,7 +6475,7 @@ void SpellAuraHolder::HandleSpellSpecificBoosts(bool apply)
                     if (m_target->GetTypeId() == TYPEID_PLAYER && !apply)
                     {
                         // reflection chance (effect 1) of Fire Ward, applied in dummy effect
-                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_EFFECT2, GetId()))
+                        if (SpellModifier *mod = ((Player*)m_target)->GetSpellMod(SPELLMOD_RESIST_MISS_CHANCE, GetId()))
                             ((Player*)m_target)->AddSpellMod(mod, false);
                     }
                     return;

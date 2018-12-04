@@ -1618,8 +1618,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    // increase reflaction chanced (effect 1) of Frost Ward, removed in aura boosts
-                    SpellModifier *mod = new SpellModifier(SPELLMOD_EFFECT2, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000100));
+                    // increase reflection chance (effect 1) of Frost Ward, removed in aura boosts
+                    SpellModifier* mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, damage, m_spellInfo->Id, uint64(0x0000000000000100));
                     ((Player*)unitTarget)->AddSpellMod(mod, true);
                     break;
                 }
@@ -1629,8 +1629,8 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (!unitTarget || unitTarget->GetTypeId() != TYPEID_PLAYER)
                         return;
 
-                    // increase reflaction chanced (effect 1) of Fire Ward, removed in aura boosts
-                    SpellModifier *mod = new SpellModifier(SPELLMOD_EFFECT2, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000008));
+                    // increase reflection chance (effect 1) of Fire Ward, removed in aura boosts
+                    SpellModifier *mod = new SpellModifier(SPELLMOD_RESIST_MISS_CHANCE, SPELLMOD_FLAT, damage, m_spellInfo->Id, UI64LIT(0x0000000000000008));
                     ((Player*)unitTarget)->AddSpellMod(mod, true);
                     break;
                 }
