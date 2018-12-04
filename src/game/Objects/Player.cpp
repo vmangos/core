@@ -1777,20 +1777,15 @@ bool Player::ToggleDND()
 
 uint8 Player::GetChatTag() const
 {
-    // it's bitmask
-    // 0x3 - gm
-    // 0x2 - dnd
-    // 0x1 - afk
     if (IsGMChat())
-        return 3;
+        return CHAT_TAG_GM;
     if (IsDND())
-        return 2;
+        return CHAT_TAG_DND;
     if (IsAFK())
-        return 1;
+        return CHAT_TAG_AFK;
     
-    return 0;
+    return CHAT_TAG_NONE;
 }
-
 
 bool Player::SwitchInstance(uint32 newInstanceId)
 {
