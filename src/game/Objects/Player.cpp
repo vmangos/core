@@ -3310,7 +3310,7 @@ bool Player::AddSpell(uint32 spell_id, bool active, bool learning, bool dependen
                     if (!rankSpellId || rankSpellId == spell_id)
                         continue;
 
-                    RemoveSpel(rankSpellId, false, false);
+                    RemoveSpell(rankSpellId, false, false);
                 }
             }
         }
@@ -3540,7 +3540,7 @@ void Player::LearnSpell(uint32 spell_id, bool dependent)
     }
 }
 
-void Player::RemoveSpel(uint32 spell_id, bool disabled, bool learn_low_rank)
+void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
     if (itr == m_spells.end())
@@ -3553,7 +3553,7 @@ void Player::RemoveSpel(uint32 spell_id, bool disabled, bool learn_low_rank)
     SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
     for (SpellChainMapNext::const_iterator itr2 = nextMap.lower_bound(spell_id); itr2 != nextMap.upper_bound(spell_id); ++itr2)
         if (HasSpell(itr2->second) && !GetTalentSpellPos(itr2->second))
-            RemoveSpel(itr2->second, disabled, false);
+            RemoveSpell(itr2->second, disabled, false);
 
     // re-search, it can be corrupted in prev loop
     itr = m_spells.find(spell_id);
@@ -3682,7 +3682,7 @@ void Player::RemoveSpel(uint32 spell_id, bool disabled, bool learn_low_rank)
     SpellLearnSpellMapBounds spell_bounds = sSpellMgr.GetSpellLearnSpellMapBounds(spell_id);
 
     for (SpellLearnSpellMap::const_iterator itr2 = spell_bounds.first; itr2 != spell_bounds.second; ++itr2)
-        RemoveSpel(itr2->second.spell, disabled);
+        RemoveSpell(itr2->second.spell, disabled);
 
     // activate lesser rank in spellbook/action bar, and cast it if need
     bool prev_activate = false;
@@ -3950,7 +3950,7 @@ bool Player::ResetTalents(bool no_cost)
                         RemoveAurasDueToSpell(pInfos->EffectTriggerSpell[eff]);
 
             if (talentInfo->RankID[j])
-                RemoveSpel(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
+                RemoveSpell(talentInfo->RankID[j], !IsPassiveSpell(talentInfo->RankID[j]), false);
         }
     }
 
@@ -5728,7 +5728,7 @@ void Player::SetSkill(uint16 id, uint16 currVal, uint16 maxVal, uint16 step /*=0
             for (uint32 j = 0; j < sObjectMgr.GetMaxSkillLineAbilityId(); ++j)
                 if (SkillLineAbilityEntry const *pAbility = sObjectMgr.GetSkillLineAbility(j))
                     if (pAbility->skillId == id)
-                        RemoveSpel(sSpellMgr.GetFirstSpellInChain(pAbility->spellId));
+                        RemoveSpell(sSpellMgr.GetFirstSpellInChain(pAbility->spellId));
             // remove all quests related to this skill (else the spell will be automatically learned at next login, cf Player::LearnQuestRewardedSpells)
             for (QuestStatusMap::iterator itr = mQuestStatus.begin(); itr != mQuestStatus.end(); ++itr)
                 if (Quest const* quest = sObjectMgr.GetQuestTemplate(itr->first))
@@ -18524,7 +18524,7 @@ void Player::ResetSpells()
     PlayerSpellMap smap = GetSpellMap();
 
     for (PlayerSpellMap::const_iterator iter = smap.begin(); iter != smap.end(); ++iter)
-        RemoveSpel(iter->first, false, false);             // only iter->first can be accessed, object by iter->second can be deleted already
+        RemoveSpell(iter->first, false, false);             // only iter->first can be accessed, object by iter->second can be deleted already
 
     LearnDefaultSpells();
     LearnQuestRewardedSpells();
@@ -18656,7 +18656,7 @@ void Player::LearnSkillRewardedSpells(uint32 skill_id, uint32 skill_value)
         {
             // need unlearn spell
             if (skill_value < pAbility->req_skill_value)
-                RemoveSpel(pAbility->spellId);
+                RemoveSpell(pAbility->spellId);
             // need learn
             else if (!IsInWorld())
                 AddSpell(pAbility->spellId, true, true, true, false);
@@ -20392,7 +20392,7 @@ bool Player::ConvertSpell(uint32 oldSpellId, uint32 newSpellId)
     if (mySpells_itr != m_spells.end() && mySpells_itr->second.state != PLAYERSPELL_REMOVED)
     {
         CHANGERACE_LOG("Changement sort %u -> %u", oldSpellId, newSpellId);
-        RemoveSpel(oldSpellId, false, false);
+        RemoveSpell(oldSpellId, false, false);
         if (newSpellId > 0)
             LearnSpell(newSpellId, false);
     }

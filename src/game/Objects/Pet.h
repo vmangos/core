@@ -233,7 +233,7 @@ class MANGOS_DLL_SPEC Pet : public Creature
         bool AddSpell(uint32 spell_id,ActiveStates active = ACT_DECIDE, PetSpellState state = PETSPELL_NEW, PetSpellType type = PETSPELL_NORMAL);
         bool LearnSpell(uint32 spell_id);
         bool unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
-        bool RemoveSpel(uint32 spell_id, bool learn_prev, bool clear_ab = true);
+        bool RemoveSpell(uint32 spell_id, bool learn_prev, bool clear_ab = true);
         void CleanupActionBar();
 
         PetSpellMap     m_petSpells;

@@ -1405,7 +1405,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
 
         void LearnSpell(uint32 spell_id, bool dependent);
-        void RemoveSpel(uint32 spell_id, bool disabled = false, bool learn_low_rank = true);
+        void RemoveSpell(uint32 spell_id, bool disabled = false, bool learn_low_rank = true);
         void ResetSpells();
         void LearnDefaultSpells();
         void LearnQuestRewardedSpells();

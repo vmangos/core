@@ -1122,7 +1122,7 @@ bool ChatHandler::HandleRemoveRidingCommand(char* args)
 
     if (player)
     {
-        player->RemoveSpel(it->second, false, false);
+        player->RemoveSpell(it->second, false, false);
         player->SaveToDB(); // make sure we don't lose this change if the world crashes
     }
     else
@@ -1300,7 +1300,7 @@ bool ChatHandler::HandleUnLearnCommand(char* args)
         spell_id = sSpellMgr.GetFirstSpellInChain(spell_id);
 
     if (target->HasSpell(spell_id))
-        target->RemoveSpel(spell_id, false, !allRanks);
+        target->RemoveSpell(spell_id, false, !allRanks);
     else
         SendSysMessage(LANG_FORGET_SPELL);
 

@@ -2006,12 +2006,12 @@ bool Pet::LearnSpell(uint32 spell_id)
 
 bool Pet::unlearnSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
-    if (RemoveSpel(spell_id, learn_prev, clear_ab))
+    if (RemoveSpell(spell_id, learn_prev, clear_ab))
         return true;
     return false;
 }
 
-bool Pet::RemoveSpel(uint32 spell_id, bool learn_prev, bool clear_ab)
+bool Pet::RemoveSpell(uint32 spell_id, bool learn_prev, bool clear_ab)
 {
     auto itr = m_petSpells.find(spell_id);
     if (itr == m_petSpells.end())

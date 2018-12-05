@@ -600,7 +600,7 @@ void WorldSession::HandlePetUnlearnOpcode(WorldPacket& recvPacket)
 
     for (PetSpellMap::iterator itr = pet->m_petSpells.begin(); itr != pet->m_petSpells.end();)
     {
-        uint32 spell_id = itr->first;                       // Pet::RemoveSpel can invalidate iterator at erase NEW spell
+        uint32 spell_id = itr->first;                       // Pet::RemoveSpell can invalidate iterator at erase NEW spell
         ++itr;
         pet->unlearnSpell(spell_id, false);
     }
