@@ -161,26 +161,26 @@ class Channel
         void SetSecurityLevel(uint8 sec) { m_securityLevel = sec; }
         uint8 GetSecurityLevel() const { return m_securityLevel; }
 
-        void Join(ObjectGuid p, const char *pass);
-        void Leave(ObjectGuid p, bool send = true);
-        void KickOrBan(ObjectGuid good, const char *badname, bool ban);
-        void Kick(ObjectGuid good, const char *badname) { KickOrBan(good, badname, false); }
-        void Ban(ObjectGuid good, const char *badname) { KickOrBan(good, badname, true); }
-        void UnBan(ObjectGuid good, const char *badname);
-        void Password(ObjectGuid p, const char *pass);
-        void SetMode(ObjectGuid p, const char *p2n, bool mod, bool set);
-        void SetOwner(ObjectGuid p, bool exclaim = true);
-        void SetOwner(ObjectGuid p, const char *newname);
-        void SendWhoOwner(ObjectGuid p);
-        void SetModerator(ObjectGuid p, const char *newname) { SetMode(p, newname, true, true); }
-        void UnsetModerator(ObjectGuid p, const char *newname) { SetMode(p, newname, true, false); }
-        void SetMute(ObjectGuid p, const char *newname) { SetMode(p, newname, false, true); }
-        void UnsetMute(ObjectGuid p, const char *newname) { SetMode(p, newname, false, false); }
-        void List(PlayerPointer p);
-        void Announce(ObjectGuid p);
-        void Moderate(ObjectGuid p);
-        void Say(ObjectGuid p, const char *what, uint32 lang = LANG_UNIVERSAL, bool skipCheck = false);
-        void Invite(ObjectGuid p, const char *newp);
+        void Join(ObjectGuid guid, const char *password);
+        void Leave(ObjectGuid guid, bool send = true);
+        void KickOrBan(ObjectGuid guid, const char *targetName, bool ban);
+        void Kick(ObjectGuid guid, const char *targetName) { KickOrBan(guid, targetName, false); }
+        void Ban(ObjectGuid guid, const char *targetName) { KickOrBan(guid, targetName, true); }
+        void UnBan(ObjectGuid guid, const char *targetName);
+        void Password(ObjectGuid guid, const char *pass);
+        void SetMode(ObjectGuid guid, const char *p2n, bool mod, bool set);
+        void SetOwner(ObjectGuid guid, bool exclaim = true);
+        void SetOwner(ObjectGuid guid, const char *newname);
+        void SendWhoOwner(ObjectGuid guid);
+        void SetModerator(ObjectGuid guid, const char *newname) { SetMode(guid, newname, true, true); }
+        void UnsetModerator(ObjectGuid guid, const char *newname) { SetMode(guid, newname, true, false); }
+        void SetMute(ObjectGuid guid, const char *newname) { SetMode(guid, newname, false, true); }
+        void UnsetMute(ObjectGuid guid, const char *newname) { SetMode(guid, newname, false, false); }
+        void List(PlayerPointer guid);
+        void Announce(ObjectGuid guid);
+        void Moderate(ObjectGuid guid);
+        void Say(ObjectGuid guid, const char *what, uint32 lang = LANG_UNIVERSAL, bool skipCheck = false);
+        void Invite(ObjectGuid guid, const char *newp);
         void Voice(ObjectGuid guid1, ObjectGuid guid2);
         void DeVoice(ObjectGuid guid1, ObjectGuid guid2);
         void JoinNotify(ObjectGuid guid);                                       // invisible notify
@@ -213,11 +213,11 @@ class Channel
         void MakeModerationOn(WorldPacket *data, ObjectGuid guid);              //+ 0x0F
         void MakeModerationOff(WorldPacket *data, ObjectGuid guid);             //+ 0x10
         void MakeMuted(WorldPacket *data);                                      //? 0x11
-        void MakePlayerKicked(WorldPacket *data, ObjectGuid bad, ObjectGuid good);//? 0x12
+        void MakePlayerKicked(WorldPacket *data, ObjectGuid target, ObjectGuid source);//? 0x12
         void MakeBanned(WorldPacket *data);                                     //? 0x13
-        void MakePlayerBanned(WorldPacket *data, ObjectGuid bad, ObjectGuid good);//? 0x14
-        void MakePlayerUnbanned(WorldPacket *data, ObjectGuid bad, ObjectGuid good);//? 0x15
-        void MakePlayerNotBanned(WorldPacket *data, ObjectGuid guid);           //? 0x16
+        void MakePlayerBanned(WorldPacket *data, ObjectGuid target, ObjectGuid source);//? 0x14
+        void MakePlayerUnbanned(WorldPacket *data, ObjectGuid target, ObjectGuid source);//? 0x15
+        void MakePlayerNotBanned(WorldPacket *data, const std::string& name);   //? 0x16
         void MakePlayerAlreadyMember(WorldPacket *data, ObjectGuid guid);       //+ 0x17
         void MakeInvite(WorldPacket *data, ObjectGuid guid);                    //? 0x18
         void MakeInviteWrongFaction(WorldPacket *data);                         //? 0x19
@@ -225,46 +225,46 @@ class Channel
         void MakeInvalidName(WorldPacket *data);                                //? 0x1B
         void MakeNotModerated(WorldPacket *data);                               //? 0x1C
         void MakePlayerInvited(WorldPacket *data, const std::string& name);     //+ 0x1D
-        void MakePlayerInviteBanned(WorldPacket *data, ObjectGuid guid);        //? 0x1E
+        void MakePlayerInviteBanned(WorldPacket *data, const std::string& name);//? 0x1E
         void MakeThrottled(WorldPacket *data);                                  //? 0x1F
 
-        void SendToAll(WorldPacket *data, ObjectGuid p = ObjectGuid());
+        void SendToAll(WorldPacket *data, ObjectGuid guid = ObjectGuid());
         void SendToOne(WorldPacket *data, ObjectGuid who);
 
         bool IsOn(ObjectGuid who) const { return m_players.find(who) != m_players.end(); }
         bool IsBanned(ObjectGuid guid) const { return m_banned.find(guid) != m_banned.end(); }
 
-        uint8 GetPlayerFlags(ObjectGuid p) const
+        uint8 GetPlayerFlags(ObjectGuid guid) const
         {
-            PlayerList::const_iterator p_itr = m_players.find(p);
+            PlayerList::const_iterator p_itr = m_players.find(guid);
             if (p_itr == m_players.end())
                 return 0;
 
             return p_itr->second.flags;
         }
 
-        void SetModerator(ObjectGuid p, bool set)
+        void SetModerator(ObjectGuid guid, bool set)
         {
-            if (m_players[p].IsModerator() != set)
+            if (m_players[guid].IsModerator() != set)
             {
-                uint8 oldFlag = GetPlayerFlags(p);
-                m_players[p].SetModerator(set);
+                uint8 oldFlag = GetPlayerFlags(guid);
+                m_players[guid].SetModerator(set);
 
                 WorldPacket data;
-                MakeModeChange(&data, p, oldFlag);
+                MakeModeChange(&data, guid, oldFlag);
                 SendToAll(&data);
             }
         }
 
-        void SetMute(ObjectGuid p, bool set)
+        void SetMute(ObjectGuid guid, bool set)
         {
-            if (m_players[p].IsMuted() != set)
+            if (m_players[guid].IsMuted() != set)
             {
-                uint8 oldFlag = GetPlayerFlags(p);
-                m_players[p].SetMuted(set);
+                uint8 oldFlag = GetPlayerFlags(guid);
+                m_players[guid].SetMuted(set);
 
                 WorldPacket data;
-                MakeModeChange(&data, p, oldFlag);
+                MakeModeChange(&data, guid, oldFlag);
                 SendToAll(&data);
             }
         }
