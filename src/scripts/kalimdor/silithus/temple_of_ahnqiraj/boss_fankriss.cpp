@@ -427,7 +427,7 @@ struct boss_fankrissAI : public ScriptedAI
             for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
             {
                 Player* pPlayer = itr->getSource();
-                if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
+                if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster())
                 {
                     // cheap way of quickly disgarding the check most of the time. No point 
                     // where he can be pulled should be higher than this point (he is at roughly -100)

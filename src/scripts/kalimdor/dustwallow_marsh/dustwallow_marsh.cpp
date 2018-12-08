@@ -949,7 +949,7 @@ CreatureAI* GetAI_npc_archmage_tervosh(Creature* pCreature)
 
 bool AreaTrigger_at_sentry_point(Player* pPlayer, AreaTriggerEntry const* /*pAt*/)
 {
-    if (!pPlayer || !pPlayer->isAlive() || pPlayer->isGameMaster() ||
+    if (!pPlayer || !pPlayer->isAlive() || pPlayer->IsGameMaster() ||
         pPlayer->GetQuestStatus(QUEST_MISSING_DIPLO_PT14) == QUEST_STATUS_COMPLETE ||
         pPlayer->GetQuestStatus(QUEST_MISSING_DIPLO_PT14) == QUEST_STATUS_NONE)
         return false;

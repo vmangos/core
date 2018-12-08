@@ -799,7 +799,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
 
     void MoveInLineOfSight(Unit* who)
     {
-        if (who->GetTypeId() != TYPEID_PLAYER || who->ToPlayer()->isGameMaster())
+        if (who->GetTypeId() != TYPEID_PLAYER || who->ToPlayer()->IsGameMaster())
             return;
 
         if (!who->isAlive())
@@ -815,7 +815,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->isGameMaster())
+            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
                 ++var;
 
             if (var > 1)
@@ -830,7 +830,7 @@ struct npc_resonating_CrystalAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = players.begin(); itr != players.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->isGameMaster())
+            if (pPlayer && pPlayer->isAlive() && m_creature->IsWithinDistInMap(pPlayer, MAX_SIGHT_DISTANCE) && !pPlayer->IsGameMaster())
             {
                 m_creature->AddThreat(pPlayer);
                 m_creature->SetInCombatWith(pPlayer);

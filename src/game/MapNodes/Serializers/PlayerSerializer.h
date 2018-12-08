@@ -145,14 +145,14 @@ void Player::Serialize(OP& buf)
     if (buf.IsRead())
     {
         InitPlayerDisplayIds();
-        setFactionForRace(getRace());
+        SetFactionForRace(getRace());
         SetCharm(NULL);
     }
 
     if (buf.IsRead())
     {
         InitTalentForLevel();
-        learnDefaultSpells();
+        LearnDefaultSpells();
 
         SetMap(sMapMgr.CreateMap(GetMapId(), this));
     }
@@ -399,7 +399,7 @@ void Player::SerializeSpells(MaNGOS::Serializer::ReadSerializer& buf)
 
         buf(is_spell_active);
         buf(is_spell_disabled);
-        addSpell(spell_id, is_spell_active, false, false, is_spell_disabled);
+        AddSpell(spell_id, is_spell_active, false, false, is_spell_disabled);
     }
 }
 
@@ -542,7 +542,7 @@ void Player::SerializeQuestStatus(OP& buf)
             }
 
             if (questStatusData.m_rewarded)
-                learnQuestRewardedSpells(pQuest);
+                LearnQuestRewardedSpells(pQuest);
         }
     }
 }

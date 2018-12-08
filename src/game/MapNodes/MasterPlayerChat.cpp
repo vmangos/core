@@ -44,29 +44,29 @@ void MasterPlayer::Whisper(const std::string& text, uint32 language, MasterPlaye
         language = LANG_UNIVERSAL;                          // whispers should always be readable
 
     WorldPacket data(SMSG_MESSAGECHAT, 100);
-    Player::BuildPlayerChat(GetObjectGuid(), chatTag(), &data, CHAT_MSG_WHISPER, text, language);
+    Player::BuildPlayerChat(GetObjectGuid(), GetChatTag(), &data, CHAT_MSG_WHISPER, text, language);
     receiver->GetSession()->SendPacket(&data);
 
     // not send confirmation for addon messages
     if (language != LANG_ADDON)
     {
         data.Initialize(SMSG_MESSAGECHAT, 100);
-        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->chatTag(), &data, CHAT_MSG_WHISPER_INFORM, text, language);
+        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->GetChatTag(), &data, CHAT_MSG_WHISPER_INFORM, text, language);
         GetSession()->SendPacket(&data);
     }
 
     ALL_SESSION_SCRIPTS(receiver->GetSession(), OnWhispered(GetObjectGuid()));
 
-    if (receiver->isDND())
+    if (receiver->IsDND())
     {
         data.Initialize(SMSG_MESSAGECHAT, 100);
-        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->chatTag(), &data, CHAT_MSG_DND, receiver->dndMsg, language);
+        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->GetChatTag(), &data, CHAT_MSG_DND, receiver->dndMsg, language);
         GetSession()->SendPacket(&data);
     } 
-    else if (receiver->isAFK())
+    else if (receiver->IsAFK())
     {
         data.Initialize(SMSG_MESSAGECHAT, 100);
-        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->chatTag(), &data, CHAT_MSG_AFK, receiver->afkMsg, language);
+        Player::BuildPlayerChat(receiver->GetObjectGuid(), receiver->GetChatTag(), &data, CHAT_MSG_AFK, receiver->afkMsg, language);
         GetSession()->SendPacket(&data);
     }
 

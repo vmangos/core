@@ -57,7 +57,7 @@ public:
         {
             SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
             if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())
-                player->learnSpell(id, false);
+                player->LearnSpell(id, false);
         }
     }
 
@@ -1057,41 +1057,41 @@ public:
         switch (player->getClass())
         {
         case CLASS_WARRIOR:
-            player->learnSpell(12294, false);
-            player->learnSpell(5308, false);
+            player->LearnSpell(12294, false);
+            player->LearnSpell(5308, false);
             break;
         case CLASS_PALADIN:
-            player->learnSpell(24274, false);
-            player->learnSpell(20271, false);
-            player->learnSpell(879, false);
+            player->LearnSpell(24274, false);
+            player->LearnSpell(20271, false);
+            player->LearnSpell(879, false);
             break;
         case CLASS_HUNTER:
-            player->learnSpell(3674, false);
-            player->learnSpell(1499, false);
+            player->LearnSpell(3674, false);
+            player->LearnSpell(1499, false);
             break;
         case CLASS_ROGUE:
-            player->learnSpell(8676, false);
-            player->learnSpell(16511, false);
+            player->LearnSpell(8676, false);
+            player->LearnSpell(16511, false);
             break;
         case CLASS_PRIEST:
-            player->learnSpell(605, false);
-            player->learnSpell(8092, false);
+            player->LearnSpell(605, false);
+            player->LearnSpell(8092, false);
             break;
         case CLASS_MAGE:
-            player->learnSpell(11366, false);
-            player->learnSpell(10, false);
+            player->LearnSpell(11366, false);
+            player->LearnSpell(10, false);
             break;
         case CLASS_WARLOCK:
-            player->learnSpell(980, false);
-            player->learnSpell(6353, false);
+            player->LearnSpell(980, false);
+            player->LearnSpell(6353, false);
             break;
         case CLASS_DRUID:
-            player->learnSpell(8921, false);
-            player->learnSpell(16914, false);
+            player->LearnSpell(8921, false);
+            player->LearnSpell(16914, false);
             break;
         case CLASS_SHAMAN:
-            player->learnSpell(1064, false);
-            player->learnSpell(421, false);
+            player->LearnSpell(1064, false);
+            player->LearnSpell(421, false);
             break;
         }
     }
@@ -1314,41 +1314,41 @@ public:
         switch (player->getClass())
         {
         case CLASS_WARRIOR:
-            player->learnSpell(12294, false);
-            player->learnSpell(5308, false);
+            player->LearnSpell(12294, false);
+            player->LearnSpell(5308, false);
             break;
         case CLASS_PALADIN:
-            player->learnSpell(24274, false);
-            player->learnSpell(20271, false);
-            player->learnSpell(879, false);
+            player->LearnSpell(24274, false);
+            player->LearnSpell(20271, false);
+            player->LearnSpell(879, false);
             break;
         case CLASS_HUNTER:
-            player->learnSpell(3674, false);
-            player->learnSpell(1499, false);
+            player->LearnSpell(3674, false);
+            player->LearnSpell(1499, false);
             break;
         case CLASS_ROGUE:
-            player->learnSpell(8676, false);
-            player->learnSpell(16511, false);
+            player->LearnSpell(8676, false);
+            player->LearnSpell(16511, false);
             break;
         case CLASS_PRIEST:
-            player->learnSpell(605, false);
-            player->learnSpell(8092, false);
+            player->LearnSpell(605, false);
+            player->LearnSpell(8092, false);
             break;
         case CLASS_MAGE:
-            player->learnSpell(11366, false);
-            player->learnSpell(10, false);
+            player->LearnSpell(11366, false);
+            player->LearnSpell(10, false);
             break;
         case CLASS_WARLOCK:
-            player->learnSpell(980, false);
-            player->learnSpell(6353, false);
+            player->LearnSpell(980, false);
+            player->LearnSpell(6353, false);
             break;
         case CLASS_DRUID:
-            player->learnSpell(8921, false);
-            player->learnSpell(16914, false);
+            player->LearnSpell(8921, false);
+            player->LearnSpell(16914, false);
             break;
         case CLASS_SHAMAN:
-            player->learnSpell(1064, false);
-            player->learnSpell(421, false);
+            player->LearnSpell(1064, false);
+            player->LearnSpell(421, false);
             break;
         }
     }
@@ -1599,41 +1599,41 @@ public:
         switch (player->getClass())
         {
         case CLASS_WARRIOR:
-            player->learnSpell(12294, false);
-            player->learnSpell(5308, false);
+            player->LearnSpell(12294, false);
+            player->LearnSpell(5308, false);
             break;
         case CLASS_PALADIN:
-            player->learnSpell(24274, false);
-            player->learnSpell(20271, false);
-            player->learnSpell(879, false);
+            player->LearnSpell(24274, false);
+            player->LearnSpell(20271, false);
+            player->LearnSpell(879, false);
             break;
         case CLASS_HUNTER:
-            player->learnSpell(3674, false);
-            player->learnSpell(1499, false);
+            player->LearnSpell(3674, false);
+            player->LearnSpell(1499, false);
             break;
         case CLASS_ROGUE:
-            player->learnSpell(8676, false);
-            player->learnSpell(16511, false);
+            player->LearnSpell(8676, false);
+            player->LearnSpell(16511, false);
             break;
         case CLASS_PRIEST:
-            player->learnSpell(605, false);
-            player->learnSpell(8092, false);
+            player->LearnSpell(605, false);
+            player->LearnSpell(8092, false);
             break;
         case CLASS_MAGE:
-            player->learnSpell(11366, false);
-            player->learnSpell(10, false);
+            player->LearnSpell(11366, false);
+            player->LearnSpell(10, false);
             break;
         case CLASS_WARLOCK:
-            player->learnSpell(980, false);
-            player->learnSpell(6353, false);
+            player->LearnSpell(980, false);
+            player->LearnSpell(6353, false);
             break;
         case CLASS_DRUID:
-            player->learnSpell(8921, false);
-            player->learnSpell(16914, false);
+            player->LearnSpell(8921, false);
+            player->LearnSpell(16914, false);
             break;
         case CLASS_SHAMAN:
-            player->learnSpell(1064, false);
-            player->learnSpell(421, false);
+            player->LearnSpell(1064, false);
+            player->LearnSpell(421, false);
             break;
         }
     }

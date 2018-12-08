@@ -708,11 +708,11 @@ void WorldSession::HandleResurrectResponseOpcode(WorldPacket & recv_data)
 
     if (status == 0)
     {
-        GetPlayer()->clearResurrectRequestData();           // reject
+        GetPlayer()->ClearResurrectRequestData();           // reject
         return;
     }
 
-    if (!GetPlayer()->isRessurectRequestedBy(guid))
+    if (!GetPlayer()->IsRessurectRequestedBy(guid))
         return;
 
     GetPlayer()->ResurectUsingRequestData();                // will call spawncorpsebones
@@ -825,7 +825,7 @@ void WorldSession::HandleAreaTriggerOpcode(WorldPacket & recv_data)
         GetPlayer()->GetHonorMgr().GetRank().visualRank
         : GetPlayer()->GetHonorMgr().GetHighestRank().visualRank;
 
-    if (!pl->isGameMaster())
+    if (!pl->IsGameMaster())
     {
         bool missingRank = false;
         if (at->required_pvp_rank)

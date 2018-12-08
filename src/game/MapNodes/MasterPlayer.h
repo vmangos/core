@@ -94,7 +94,7 @@ public:
     uint32 GetRank() const { return guildRank; }
 
     // GM SYSTEMS
-    bool isAcceptTickets() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
+    bool IsAcceptTickets() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
     void SetAcceptTicket(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_GM_ACCEPT_TICKETS; else m_ExtraFlags &= ~PLAYER_EXTRA_GM_ACCEPT_TICKETS; }
 
     bool IsAcceptWhispers() const { return m_ExtraFlags & PLAYER_EXTRA_ACCEPT_WHISPERS; }
@@ -103,7 +103,7 @@ public:
     void ClearAllowedWhisperers() { m_allowedWhispers.clear(); }
     void SetAcceptWhispers(bool on) { if(on) m_ExtraFlags |= PLAYER_EXTRA_ACCEPT_WHISPERS; else m_ExtraFlags &= ~PLAYER_EXTRA_ACCEPT_WHISPERS; }
 
-    bool isGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
+    bool IsGameMaster() const { return m_ExtraFlags & PLAYER_EXTRA_GM_ON; }
 
     //
     bool IsVisibleGloballyFor(MasterPlayer* player) const;
@@ -115,9 +115,9 @@ public:
     uint8 getClass() const { return classId; }
     uint8 getRace() const { return raceId; }
     uint32 getLevel() const { return level; }
-    bool isAFK() const { return chatTag() == 1; }
-    bool isDND() const { return chatTag() == 2; }
-    uint8 chatTag() const { return m_chatTag; }
+    bool IsAFK() const { return GetChatTag() == 1; }
+    bool IsDND() const { return GetChatTag() == 2; }
+    uint8 GetChatTag() const { return m_chatTag; }
 
     ObjectGuid guid;
     std::string name;

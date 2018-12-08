@@ -364,7 +364,7 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
     }
 }
 
-void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage, uint8 index)
+void Player::CalculateMinMaxDamage(WeaponAttackType attType, bool normalized, float& min_damage, float& max_damage, uint8 index) const
 {
     UnitMods unitMod;
 
@@ -632,7 +632,7 @@ void Player::UpdateManaRegen()
 {
     // Mana regen from spirit
     // Nostalrius - Fix mana regen (diviser par 2)
-    float power_regen = OCTRegenMPPerSpirit() / 2.0f;
+    float power_regen = GetRegenMPPerSpirit() / 2.0f;
     // Apply PCT bonus from SPELL_AURA_MOD_POWER_REGEN_PERCENT aura on spirit base regen
     power_regen *= GetTotalAuraMultiplierByMiscValue(SPELL_AURA_MOD_POWER_REGEN_PERCENT, POWER_MANA);
 

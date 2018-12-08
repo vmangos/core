@@ -122,7 +122,7 @@ bool ChatHandler::HandleReloadMapLootDisabledCommand(char *args)
 bool ChatHandler::HandleWorldUpdateCommand(char *args)
 {
     bool modify = true;
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -153,7 +153,7 @@ bool ChatHandler::HandleWorldUpdateCommand(char *args)
 
 bool ChatHandler::HandleWorldTestCommand(char *args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     Player* me = m_session->GetPlayer();
     if (!target)
     {
@@ -169,7 +169,7 @@ bool ChatHandler::HandleWorldTestCommand(char *args)
 
 bool ChatHandler::HandleWorldDetailCommand(char *args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -188,7 +188,7 @@ bool ChatHandler::HandleWorldDetailCommand(char *args)
 
 bool ChatHandler::HandlePossessCommand(char *args)
 {
-    Unit *tar = getSelectedUnit();
+    Unit *tar = GetSelectedUnit();
     if (!tar)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -200,7 +200,7 @@ bool ChatHandler::HandlePossessCommand(char *args)
 
 bool ChatHandler::HandleDebugForceUpdateCommand(char *args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -327,7 +327,7 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
         return false; // must exist as normal creature in mangos.sql 'creature_template'
 
     const CreatureInfo *cInfo = nullptr;
-    const Creature *pCreature = getSelectedCreature();
+    const Creature *pCreature = GetSelectedCreature();
     uint32 cr_id;
 
     // optional number or [name] Shift-click form |color|Hcreature_entry:creature_id|h[name]|h|r
@@ -433,7 +433,7 @@ bool ChatHandler::HandleEscortAddWpCommand(char *args)
     sscanf(args, "%u %u %u", &creatureEntry, &waittime, &waypointId);
     if (creatureEntry == 0)
     {
-        Creature* target = getSelectedCreature();
+        Creature* target = GetSelectedCreature();
         if (target)
             creatureEntry = target->GetEntry();
     }
@@ -590,7 +590,7 @@ bool ChatHandler::HandleReloadVariablesCommand(char*)
 
 bool ChatHandler::HandleDebugLoSCommand(char*)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage("Rien de selectionne");
@@ -613,7 +613,7 @@ bool ChatHandler::HandleDebugLoSCommand(char*)
 
 bool ChatHandler::HandleDebugLoSAllowCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     bool value;
     if (!target || !ExtractOnOff(&args, value))
         return false;
@@ -881,7 +881,7 @@ std::string GetCustomFlagName(customFlag flagId)
 
 bool ChatHandler::HandleCharacterChangeRaceCommand(char* args)
 {
-    if (Player* pPlayer = getSelectedPlayer())
+    if (Player* pPlayer = GetSelectedPlayer())
     {
         uint8 newRaceId = 0;
 
@@ -902,7 +902,7 @@ bool ChatHandler::HandleCharacterChangeRaceCommand(char* args)
 
 bool ChatHandler::HandleCharacterCopySkinCommand(char* args)
 {
-    if (Player* target = getSelectedPlayer())
+    if (Player* target = GetSelectedPlayer())
     {
         std::string plName(args);
         CharacterDatabase.escape_string(plName); // No SQL injection
@@ -930,12 +930,12 @@ bool ChatHandler::HandleCharacterCopySkinCommand(char* args)
 
 bool ChatHandler::HandleCharacterFillFlysCommand(char* args)
 {
-    if (Player* player = getSelectedPlayer())
+    if (Player* player = GetSelectedPlayer())
     {
         if (player->GetTeam() == ALLIANCE)
-            player->m_taxi.LoadTaxiMask("3456411898 2148078928 49991 0 0 0 0 0 ");
+            player->GetTaxi().LoadTaxiMask("3456411898 2148078928 49991 0 0 0 0 0 ");
         else
-            player->m_taxi.LoadTaxiMask("561714688 282102432 52408 0 0 0 0 0 ");
+            player->GetTaxi().LoadTaxiMask("561714688 282102432 52408 0 0 0 0 0 ");
         PSendSysMessage("Fly paths unlocked for %s.", player->GetName());
         return true;
     }
@@ -944,7 +944,7 @@ bool ChatHandler::HandleCharacterFillFlysCommand(char* args)
 
 bool ChatHandler::HandleCharacterFlagsCommand(char *args)
 {
-    if (Player* pPlayer = getSelectedPlayer())
+    if (Player* pPlayer = GetSelectedPlayer())
     {
         uint32 newCustomFlags = 0;
 
@@ -981,7 +981,7 @@ bool ChatHandler::HandleNpcGroupAddCommand(char* args)
     if (!*args)
         return false;
 
-    Creature* target = getSelectedCreature();
+    Creature* target = GetSelectedCreature();
     SetSentErrorMessage(true);
 
     if (!target)
@@ -1030,7 +1030,7 @@ bool ChatHandler::HandleNpcGroupAddRelCommand(char* args)
     if (!*args)
         return false;
 
-    Creature* target = getSelectedCreature();
+    Creature* target = GetSelectedCreature();
     SetSentErrorMessage(true);
 
     if (!target)
@@ -1076,7 +1076,7 @@ bool ChatHandler::HandleNpcGroupAddRelCommand(char* args)
 
 bool ChatHandler::HandleNpcGroupDelCommand(char *args)
 {
-    Creature *target = getSelectedCreature();
+    Creature *target = GetSelectedCreature();
     SetSentErrorMessage(true);
 
     if (!target || !target->HasStaticDBSpawnData())
@@ -1104,7 +1104,7 @@ bool ChatHandler::HandleNpcGroupLinkCommand(char * args)
     if (!*args)
         return false;
 
-    Creature* target = getSelectedCreature();
+    Creature* target = GetSelectedCreature();
     SetSentErrorMessage(true);
 
     if (!target)
@@ -1144,7 +1144,7 @@ bool ChatHandler::HandleReloadCreatureGroupsCommand(char *args)
 
 bool ChatHandler::HandleSendSpellVisualCommand(char *args)
 {
-    Unit *pTarget = getSelectedUnit();
+    Unit *pTarget = GetSelectedUnit();
     if (!pTarget)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1182,7 +1182,7 @@ bool ChatHandler::HandleSendSpellVisualCommand(char *args)
 
 bool ChatHandler::HandleSendSpellImpactCommand(char *args)
 {
-    Unit *pTarget = getSelectedUnit();
+    Unit *pTarget = GetSelectedUnit();
     if (!pTarget)
     {
         SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
@@ -1477,7 +1477,7 @@ bool ChatHandler::HandleSpellSearchCommand(char *args)
 bool ChatHandler::HandleDebugMoveToCommand(char* args)
 {
     Player* player = m_session->GetPlayer();
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!player || !target || player == target)
     {
         PSendSysMessage("Invalid target/source selection.");
@@ -1494,7 +1494,7 @@ bool ChatHandler::HandleDebugMoveToCommand(char* args)
 
 bool ChatHandler::HandleGodCommand(char* args)
 {
-    Player *pPlayer = getSelectedPlayer();
+    Player *pPlayer = GetSelectedPlayer();
     if (!pPlayer)
         pPlayer = m_session->GetPlayer();
 
@@ -1518,7 +1518,7 @@ bool ChatHandler::HandleGodCommand(char* args)
 
 bool ChatHandler::HandleDebugPvPCreditCommand(char *args)
 {
-    Unit* pSelection = getSelectedUnit();
+    Unit* pSelection = GetSelectedUnit();
     if (!pSelection)
         pSelection = m_session->GetPlayer();
 
@@ -1740,7 +1740,7 @@ bool ChatHandler::HandleMmapPathCommand(char* args)
 
     // units
     Player* player = m_session->GetPlayer();
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!player || !target)
     {
         PSendSysMessage("Invalid target/source selection.");
@@ -1800,7 +1800,7 @@ bool ChatHandler::HandleMmapLocCommand(char* /*args*/)
     SendSysMessage("mmap tileloc:");
 
     // grid tile location
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     dtQueryFilter filter = dtQueryFilter();
     float closestPoint[3] = {0.0f, 0.0f, 0.0f}; // Y, Z, X
     float x, y, z;
@@ -2009,7 +2009,7 @@ bool ChatHandler::HandleGMOptionsCommand(char* args)
     if (sArgs.find("video") != std::string::npos || sArgs.find("VIDEO") != std::string::npos)
         flags |= PLAYER_VIDEO_MODE;
 
-    Player* pTarget = getSelectedPlayer();
+    Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
         pTarget = m_session->GetPlayer();
     PSendSysMessage("%s des flags 0x%x de `%s`.", enable ? "Ajout" : "Suppressions", flags, pTarget->GetName());
@@ -2033,7 +2033,7 @@ bool ChatHandler::HandleGMOptionsCommand(char* args)
 
 bool ChatHandler::HandleFreezCommand(char* args)
 {
-    Unit* pTarget = getSelectedUnit();
+    Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
     pTarget->CastSpell(pTarget, 29826, true);
@@ -2052,7 +2052,7 @@ bool ChatHandler::HandleSpellIconFixCommand(char *args)
 
 bool ChatHandler::HandleUnitStatCommand(char *args)
 {
-    Unit* pTarget = getSelectedUnit();
+    Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
     uint32 unitStat = 0x0;
@@ -2071,7 +2071,7 @@ bool ChatHandler::HandleUnitStatCommand(char *args)
 
 bool ChatHandler::HandleDebugControlCommand(char *args)
 {
-    Player* pTarget = getSelectedPlayer();
+    Player* pTarget = GetSelectedPlayer();
     if (!pTarget)
         return false;
     bool control = false;
@@ -2083,7 +2083,7 @@ bool ChatHandler::HandleDebugControlCommand(char *args)
 
 bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
 {
-    Unit* pTarget = getSelectedUnit();
+    Unit* pTarget = GetSelectedUnit();
     if (!pTarget)
         return false;
     for (uint8 i = 0; i < 0xFF; ++i)
@@ -2113,7 +2113,7 @@ bool ChatHandler::HandleDebugMonsterChatCommand(char* args)
 
 bool ChatHandler::HandleDebugUnitCommand(char* args)
 {
-    Unit* target = getSelectedUnit();
+    Unit* target = GetSelectedUnit();
     if (!target)
         return false;
     uint32 flags = 0;
@@ -2147,7 +2147,7 @@ bool ChatHandler::HandleDebugTimeCommand(char* args)
 
 bool ChatHandler::HandleDebugMoveFlagsCommand(char* args)
 {
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit)
         return false;
     uint32 flags = MOVEFLAG_NONE;
@@ -2166,7 +2166,7 @@ bool ChatHandler::HandleDebugMoveFlagsCommand(char* args)
 
 bool ChatHandler::HandleDebugMoveSplineCommand(char* args)
 {
-    Unit* unit = getSelectedUnit();
+    Unit* unit = GetSelectedUnit();
     if (!unit)
         return false;
     PSendSysMessage("Target: %s", unit->GetGuidStr().c_str());
@@ -2246,7 +2246,7 @@ protected:
 
 bool ChatHandler::HandleWardenReadCommand(char* args)
 {
-    /*Player* player = getSelectedPlayer();
+    /*Player* player = GetSelectedPlayer();
     if (!player)
         return false;
 
@@ -2266,7 +2266,7 @@ bool ChatHandler::HandleWardenReadCommand(char* args)
 
 bool ChatHandler::HandleListAddonsCommand(char* args)
 {
-    Player* player = getSelectedPlayer();
+    Player* player = GetSelectedPlayer();
     if (!player)
         return false;
 
@@ -2345,7 +2345,7 @@ bool ChatHandler::HandleReplayPlayCommand(char* c)
     if (!c || !*c || strchr(c, '/') != NULL || strchr(c, '.') != NULL)
         return false;
     WorldSession* sess = m_session;
-    if (Player* player = getSelectedPlayer())
+    if (Player* player = GetSelectedPlayer())
         sess = player->GetSession();
     std::string filename = "replays/";
     filename += c;
@@ -2360,7 +2360,7 @@ bool ChatHandler::HandleReplayPlayCommand(char* c)
 bool ChatHandler::HandleDebugRecvPacketDumpWrite(char* c)
 {
     WorldSession* sess = m_session;
-    if (Player* player = getSelectedPlayer())
+    if (Player* player = GetSelectedPlayer())
         sess = player->GetSession();
     PSendSysMessage("Starting replay recording for %s", playerLink(sess->GetPlayerName()).c_str());
     sess->SetDumpRecvPackets(c);
@@ -2413,7 +2413,7 @@ bool ChatHandler::HandleReplayStopCommand(char* c)
 bool ChatHandler::HandleReplayRecordCommand(char* c)
 {
     WorldSession* sess = m_session;
-    if (Player* player = getSelectedPlayer())
+    if (Player* player = GetSelectedPlayer())
         sess = player->GetSession();
     PSendSysMessage("Starting replay recording for %s", playerLink(sess->GetPlayerName()).c_str());
     sess->SetDumpPacket(c);
@@ -2501,7 +2501,7 @@ bool ChatHandler::HandleFactionChangeItemsCommand(char* c)
 // Character recovery
 bool ChatHandler::HandleRecupCommand(char* c)
 {
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target || !c)
         return false;
     uint32 recupId = uint32(atoi(c));
@@ -2588,7 +2588,7 @@ bool ChatHandler::HandleDebugExp(char*)
     const float retournementRayon = 2.0f;
     const float moveSpeed = 6.0f;
     std::list<Creature*> targets;
-    Unit* selection = getSelectedUnit();
+    Unit* selection = GetSelectedUnit();
     if (!selection)
     {
         SendSysMessage("Selectionner une cible");
@@ -2641,7 +2641,7 @@ bool ChatHandler::HandleVideoTurn(char*)
     const float angleEnd = 10 * M_PI_F;
     const float moveSpeed = 30.0f;
     std::list<Creature*> targets;
-    Unit* selection = getSelectedUnit();
+    Unit* selection = GetSelectedUnit();
     if (!selection)
     {
         SendSysMessage("Selectionner une cible");
@@ -2782,7 +2782,7 @@ bool ChatHandler::HandleReloadGameObjectCommand(char* /*args*/)
 bool ChatHandler::HandleInstanceSwitchCommand(char* args)
 {
     uint32 newInstanceId = 0;
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
         return false;
     if (!ExtractUInt32(&args, newInstanceId))
@@ -2796,7 +2796,7 @@ bool ChatHandler::HandleInstanceSwitchCommand(char* args)
 
 bool ChatHandler::HandleInstanceContinentsCommand(char*)
 {
-    if (Player* target = getSelectedPlayer())
+    if (Player* target = GetSelectedPlayer())
         PSendSysMessage("Target: %s, map %u instance %u", target->GetName(), target->GetMapId(), target->GetInstanceId());
 
     for (int mapId = 0; mapId < 2; ++mapId)
@@ -2918,7 +2918,7 @@ bool ChatHandler::HandleDebugLootTableCommand(char* args)
         return false;
     }
 
-    Player* lootOwner = getSelectedPlayer();
+    Player* lootOwner = GetSelectedPlayer();
 
     std::map<uint32, uint32> lootChances;
     if (checkItem)

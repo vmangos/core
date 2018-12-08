@@ -1617,7 +1617,7 @@ void ChatHandler::ExecuteCommand(const char* text)
             {
                 if (m_session && command->Flags & COMMAND_FLAGS_CRITICAL)
                 {
-                    if (Unit* target = getSelectedUnit())
+                    if (Unit* target = GetSelectedUnit())
                         sLog.out(LOG_GM_CRITICAL, "%s: %s. Selected %s. Map %u", m_session->GetUsername().c_str(), realCommandFull.c_str(), target->GetObjectGuid().GetString().c_str(), target->GetMapId());
                     else
                         sLog.out(LOG_GM_CRITICAL, "%s: %s.", m_session->GetUsername().c_str(), realCommandFull.c_str());
@@ -2286,12 +2286,12 @@ void ChatHandler::FillMessageData(WorldPacket *data, WorldSession* session, uint
     *data << uint32(messageLength);
     *data << message;
     if (session != nullptr && type != CHAT_MSG_REPLY && type != CHAT_MSG_DND && type != CHAT_MSG_AFK)
-        *data << uint8(session->GetPlayer()->chatTag());
+        *data << uint8(session->GetPlayer()->GetChatTag());
     else
         *data << uint8(0);
 }
 
-Player * ChatHandler::getSelectedPlayer()
+Player * ChatHandler::GetSelectedPlayer()
 {
     if (!m_session)
         return nullptr;
@@ -2304,7 +2304,7 @@ Player * ChatHandler::getSelectedPlayer()
     return sObjectMgr.GetPlayer(guid);
 }
 
-Unit* ChatHandler::getSelectedUnit()
+Unit* ChatHandler::GetSelectedUnit()
 {
     if (!m_session)
         return nullptr;
@@ -2318,7 +2318,7 @@ Unit* ChatHandler::getSelectedUnit()
     return ObjectAccessor::GetUnit(*m_session->GetPlayer(), guid);
 }
 
-Creature* ChatHandler::getSelectedCreature()
+Creature* ChatHandler::GetSelectedCreature()
 {
     if (!m_session)
         return nullptr;
@@ -3430,7 +3430,7 @@ bool ChatHandler::ExtractPlayerTarget(char** args, Player** player /*= NULL*/, O
     }
     else
     {
-        Player* pl = getSelectedPlayer();
+        Player* pl = GetSelectedPlayer();
         // if allowed player pointer
         if (player)
             *player = pl;
@@ -3475,7 +3475,7 @@ uint32 ChatHandler::ExtractAccountId(char** args, std::string* accountName /*= N
             return 0;
 
         /// only target player different from self allowed (if targetPlayer!=NULL then not console)
-        Player* targetPlayer = getSelectedPlayer();
+        Player* targetPlayer = GetSelectedPlayer();
         if (!targetPlayer)
             return 0;
 

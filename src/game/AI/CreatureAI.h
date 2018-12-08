@@ -86,7 +86,7 @@ class MANGOS_DLL_SPEC CreatureAI
         ///== Reactions At =================================
 
         // Called when an unit moves within visibility distance
-        virtual void MoveInLineOfSight(Unit *) {}
+        virtual void MoveInLineOfSight(Unit*) {}
 
         // Called for reaction at enter to combat if not in combat yet (enemy can be NULL)
         virtual void EnterCombat(Unit* /*enemy*/) {}
@@ -101,18 +101,18 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void JustReachedHome() {}
 
         // Called at any heal cast/item used (call non implemented)
-        virtual void HealedBy(Unit * /*healer*/, uint32& /*amount_healed*/) {}
+        virtual void HealedBy(Unit* /*healer*/, uint32& /*amount_healed*/) {}
 
         // Called at any Damage to any victim (before damage apply)
-        virtual void DamageDeal(Unit * /*done_to*/, uint32 & /*damage*/) {}
+        virtual void DamageDeal(Unit* /*done_to*/, uint32 & /*damage*/) {}
 
         // Called at any Damage from any attacker (before damage apply)
         // Note: it for recalculation damage or special reaction at damage
         // for attack reaction use AttackedBy called for not DOT damage in Unit::DealDamage also
-        virtual void DamageTaken(Unit * /*done_by*/, uint32 & /*damage*/) {}
+        virtual void DamageTaken(Unit* /*done_by*/, uint32 & /*damage*/) {}
 
         // Called when the creature is killed
-        virtual void JustDied(Unit *) {}
+        virtual void JustDied(Unit*) {}
 
         // Called when the creature summon is killed
         virtual void SummonedCreatureJustDied(Creature* /*unit*/) {}
@@ -121,16 +121,16 @@ class MANGOS_DLL_SPEC CreatureAI
         virtual void GroupMemberJustDied(Creature* /*unit*/, bool /*isLeader*/) {}
 
         // Called when the creature kills a unit
-        virtual void KilledUnit(Unit *) {}
+        virtual void KilledUnit(Unit*) {}
 
         // Called when owner of m_creature (if m_creature is PROTECTOR_PET) kills a unit
-        virtual void OwnerKilledUnit(Unit *) {}
+        virtual void OwnerKilledUnit(Unit*) {}
 
         // Called when the creature summon successfully other creature
-        virtual void JustSummoned(Creature* ) {}
+        virtual void JustSummoned(Creature*) {}
 
         // Called when the creature summon successfully a gameobject
-        virtual void JustSummoned(GameObject* ) {}
+        virtual void JustSummoned(GameObject*) {}
 
         // Called when the creature summon despawn
         virtual void SummonedCreatureDespawn(Creature* /*unit*/) {}
@@ -164,7 +164,7 @@ class MANGOS_DLL_SPEC CreatureAI
 
         // Called when creature attack expected (if creature can and no have current victim)
         // Note: for reaction at hostile action must be called AttackedBy function.
-        virtual void AttackStart(Unit *) {}
+        virtual void AttackStart(Unit*) {}
 
         // Called at World update tick
         virtual void UpdateAI(const uint32 /*diff*/) {}
@@ -200,7 +200,7 @@ class MANGOS_DLL_SPEC CreatureAI
         void DoCastAOE(uint32 spellId, bool triggered = false);
         bool UpdateVictim();
         bool UpdateVictimWithGaze();
-        void SetGazeOn(Unit *target);
+        void SetGazeOn(Unit* target);
 
         ///== Helper functions =============================
 
@@ -211,14 +211,14 @@ class MANGOS_DLL_SPEC CreatureAI
         CanCastResult DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags = 0, ObjectGuid uiOriginalCasterGUID = ObjectGuid());
 
         // Helper functions for cast spell
-        virtual CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry *pSpell, bool isTriggered);
+        virtual CanCastResult CanCastSpell(Unit* pTarget, const SpellEntry* pSpell, bool isTriggered);
 
         // Clears any group/raid icons this creature may have
         void ClearTargetIcon();
 
         // Assigns a creature_spells template to the AI.
         void SetSpellsTemplate(uint32 entry);
-        void SetSpellsTemplate(const CreatureSpellsTemplate *SpellsTemplate);
+        void SetSpellsTemplate(const CreatureSpellsTemplate* SpellsTemplate);
 
         // Goes through the creature_spells template to update timers and cast spells.
         void DoSpellTemplateCasts(const uint32 uiDiff);
@@ -244,17 +244,17 @@ class MANGOS_DLL_SPEC CreatureAI
 
 struct SelectableAI : FactoryHolder<CreatureAI>, Permissible<Creature>
 {
-    explicit SelectableAI(const char *id) : FactoryHolder<CreatureAI>(id) {}
+    explicit SelectableAI(const char* id) : FactoryHolder<CreatureAI>(id) {}
 };
 
 template<class REAL_AI>
 struct CreatureAIFactory : SelectableAI
 {
-    explicit CreatureAIFactory(const char *name) : SelectableAI(name) {}
+    explicit CreatureAIFactory(const char* name) : SelectableAI(name) {}
 
-    CreatureAI* Create(void *) const override;
+    CreatureAI* Create(void*) const override;
 
-    int Permit(const Creature *c) const override { return REAL_AI::Permissible(c); }
+    int Permit(const Creature* c) const override { return REAL_AI::Permissible(c); }
 };
 
 enum Permitions

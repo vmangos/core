@@ -59,7 +59,7 @@ void CinematicStuff::AddSpells(Player* player)
     {
         SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(id);
         if (spellInfo && spellInfo->SpellFamilyName == familyName && spellInfo->spellLevel <= player->getLevel())
-            player->learnSpell(id, false);
+            player->LearnSpell(id, false);
     }
 }
 

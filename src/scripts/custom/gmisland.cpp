@@ -59,7 +59,7 @@ struct boss_gmislandAI : public ScriptedAI
         if (who->GetTypeId() == TYPEID_PLAYER)
         {
             Player* plr = ((Player*)who);
-            if (plr->isGameMaster())
+            if (plr->IsGameMaster())
             {
                 if (uiGmRefreshTimer > 1500)
                 {

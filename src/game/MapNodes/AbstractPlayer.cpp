@@ -19,13 +19,13 @@ uint8 PlayerWrapper<T>::getRace() const { return player.getRace(); }
 template <typename T>
 uint32 PlayerWrapper<T>::getLevel() const { return player.getLevel(); }
 template <typename T>
-bool PlayerWrapper<T>::isAFK() const { return player.isAFK(); }
+bool PlayerWrapper<T>::IsAFK() const { return player.IsAFK(); }
 template <typename T>
-bool PlayerWrapper<T>::isDND() const { return player.isDND(); }
+bool PlayerWrapper<T>::IsDND() const { return player.IsDND(); }
 template <typename T>
-bool PlayerWrapper<T>::isGameMaster() const { return player.isGameMaster(); }
+bool PlayerWrapper<T>::IsGameMaster() const { return player.IsGameMaster(); }
 template <typename T>
-uint8 PlayerWrapper<T>::chatTag() const { return player.chatTag(); }
+uint8 PlayerWrapper<T>::GetChatTag() const { return player.GetChatTag(); }
 template <typename T>
 uint32 PlayerWrapper<T>::GetGuildId() const { return player.GetGuildId(); }
 template <typename T>

@@ -1683,26 +1683,14 @@ void Unit::DealSpellDamage(SpellNonMeleeDamage *damageInfo, bool durabilityLoss)
 //TODO for melee need create structure as in
 void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *damageInfo, WeaponAttackType attackType)
 {
+    damageInfo->attacker = this;
+    damageInfo->target = pVictim;
+    damageInfo->attackType = attackType;
+
     if (!pVictim)
         return;
     if (!isAlive() || !pVictim->isAlive())
         return;
-
-    damageInfo->attacker         = this;
-    damageInfo->target           = pVictim;
-    damageInfo->attackType       = attackType;
-    damageInfo->totalDamage      = 0;
-    damageInfo->cleanDamage      = 0;
-    damageInfo->totalAbsorb      = 0;
-    damageInfo->totalResist      = 0;
-    damageInfo->blocked_amount   = 0;
-
-    damageInfo->TargetState      = VICTIMSTATE_UNAFFECTED;
-    damageInfo->HitInfo          = HITINFO_NORMALSWING;
-    damageInfo->procAttacker     = PROC_FLAG_NONE;
-    damageInfo->procVictim       = PROC_FLAG_NONE;
-    damageInfo->procEx           = PROC_EX_NONE;
-    damageInfo->hitOutCome       = MELEE_HIT_EVADE;
 
     // Select HitInfo/procAttacker/procVictim flag based on attack type
     switch (attackType)
@@ -2551,6 +2539,9 @@ void Unit::CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damage
 
 void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool checkLoS, bool extra)
 {
+    if (!pVictim->isAlive())
+        return;
+
     if (!extra && IsNonMeleeSpellCasted(false))
         return;
 
@@ -5386,9 +5377,8 @@ void Unit::HandleTriggers(Unit *pVictim, uint32 procExtra, uint32 amount, SpellE
             continue;
         }
 
-        // For players set spell cooldown if need
         uint32 cooldown = 0;
-        if (triggeredByHolder->GetTarget()->GetTypeId() == TYPEID_PLAYER && spellProcEvent && spellProcEvent->cooldown)
+        if (spellProcEvent && spellProcEvent->cooldown)
             cooldown = spellProcEvent->cooldown;
 
         for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
@@ -5632,7 +5622,7 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
     // check forced reputation to support SPELL_AURA_FORCE_REACTION
     if (selfPlayerOwner)
     {
-        if (selfPlayerOwner->isGameMaster())
+        if (selfPlayerOwner->IsGameMaster())
             return REP_NEUTRAL;
         if (FactionTemplateEntry const* targetFactionTemplateEntry = target->getFactionTemplateEntry())
             if (ReputationRank const* repRank = selfPlayerOwner->GetReputationMgr().GetForcedRankIfAny(targetFactionTemplateEntry))
@@ -5640,7 +5630,7 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
     }
     else if (targetPlayerOwner)
     {
-        if (targetPlayerOwner->isGameMaster())
+        if (targetPlayerOwner->IsGameMaster())
             return REP_NEUTRAL;
         if (FactionTemplateEntry const* selfFactionTemplateEntry = getFactionTemplateEntry())
             if (ReputationRank const* repRank = targetPlayerOwner->GetReputationMgr().GetForcedRankIfAny(selfFactionTemplateEntry))
@@ -5813,7 +5803,7 @@ bool Unit::Attack(Unit *victim, bool meleeAttack)
     // nobody can attack GM in GM-mode
     if (victim->GetTypeId() == TYPEID_PLAYER)
     {
-        if (((Player*)victim)->isGameMaster())
+        if (((Player*)victim)->IsGameMaster())
             return false;
     }
     else
@@ -6173,7 +6163,7 @@ void Unit::SetCharm(Unit* pet)
 void Unit::RestoreFaction()
 {
     if (GetTypeId() == TYPEID_PLAYER)
-        ((Player*)this)->setFactionForRace(getRace());
+        ((Player*)this)->SetFactionForRace(getRace());
     else
     {
         if (CreatureInfo const *cinfo = ((Creature*)this)->GetCreatureInfo())  // normal creature
@@ -6694,7 +6684,7 @@ bool Unit::IsSpellCrit(Unit *pVictim, SpellEntry const *spellProto, SpellSchoolM
                     crit_chance = 0.0f;
                 // For other schools
                 else if (GetTypeId() == TYPEID_PLAYER)
-                    crit_chance = ((Player*)this)->m_SpellCritPercentage[GetFirstSchoolInMask(schoolMask)];
+                    crit_chance = ((Player*)this)->GetSpellCritPercent(GetFirstSchoolInMask(schoolMask));
                 else
                 {
                     crit_chance = float(m_baseSpellCritChance);
@@ -7596,7 +7586,7 @@ bool Unit::isTargetableForAttack(bool inverseAlive /*=false*/, bool isAttackerPl
     if (!CanBeDetected())
         return false;
 
-    if (GetTypeId() == TYPEID_PLAYER && (((Player *)this)->isGameMaster() || ((Player*)this)->watching_cinematic_entry != 0))
+    if (GetTypeId() == TYPEID_PLAYER && (((Player *)this)->IsGameMaster() || ((Player*)this)->watching_cinematic_entry != 0))
         return false;
 
     if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_NON_ATTACKABLE | UNIT_FLAG_NOT_SELECTABLE))
@@ -7628,7 +7618,7 @@ bool Unit::IsValidAttackTarget(Unit const* target) const
         return false;
 
     // can't attack unattackable units or GMs
-    if (target->GetTypeId() == TYPEID_PLAYER && target->ToPlayer()->isGameMaster())
+    if (target->GetTypeId() == TYPEID_PLAYER && target->ToPlayer()->IsGameMaster())
         return false;
 
     // check flags
@@ -7808,7 +7798,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
     // unit is also invisible for alive.. if an isinvisibleforalive unit dies we
     // should be able to see it too
     if (u->isAlive() && isAlive() && isInvisibleForAlive() != u->isInvisibleForAlive())
-        if (!isTargetPlayer || !pPlayerTarget->isGameMaster())
+        if (!isTargetPlayer || !pPlayerTarget->IsGameMaster())
             return false;
 
     // redundant phasing
@@ -7820,7 +7810,7 @@ bool Unit::isVisibleForOrDetect(Unit const* u, WorldObject const* viewPoint, boo
         return true;
 
     // GMs see any players, not higher GMs and all units
-    if (isTargetPlayer && pPlayerTarget->isGameMaster())
+    if (isTargetPlayer && pPlayerTarget->IsGameMaster())
     {
         if (GetTypeId() == TYPEID_PLAYER)
             return ToPlayer()->GetGMInvisibilityLevel() <= uint8(pPlayerTarget->GetSession()->GetSecurity());
@@ -8377,7 +8367,7 @@ void Unit::TauntApply(Unit* taunter)
 {
     MANGOS_ASSERT(GetTypeId() == TYPEID_UNIT);
 
-    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
+    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->IsGameMaster()))
         return;
 
     if (!CanHaveThreatList())
@@ -8406,7 +8396,7 @@ void Unit::TauntFadeOut(Unit *taunter)
 {
     MANGOS_ASSERT(GetTypeId() == TYPEID_UNIT);
 
-    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->isGameMaster()))
+    if (!taunter || (taunter->GetTypeId() == TYPEID_PLAYER && ((Player*)taunter)->IsGameMaster()))
         return;
 
     if (!CanHaveThreatList())
@@ -8586,22 +8576,7 @@ int32 Unit::CalculateSpellDamage(Unit const* target, SpellEntry const* spellProt
         value += (int32)(comboDamage * comboPoints);
 
     if (Player* modOwner = GetSpellModOwner())
-    {
         modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_ALL_EFFECTS, value, spell);
-
-        switch (effect_index)
-        {
-            case EFFECT_INDEX_0:
-                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT1, value, spell);
-                break;
-            case EFFECT_INDEX_1:
-                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT2, value, spell);
-                break;
-            case EFFECT_INDEX_2:
-                modOwner->ApplySpellMod(spellProto->Id, SPELLMOD_EFFECT3, value, spell);
-                break;
-        }
-    }
 
     if (spellProto->Attributes & SPELL_ATTR_LEVEL_DAMAGE_CALCULATION && spellProto->spellLevel &&
             spellProto->Effect[effect_index] != SPELL_EFFECT_WEAPON_PERCENT_DAMAGE &&
@@ -10307,7 +10282,7 @@ void Unit::UpdateAuraForGroup(uint8 slot)
     }
 }
 
-float Unit::GetAPMultiplier(WeaponAttackType attType, bool normalized)
+float Unit::GetAPMultiplier(WeaponAttackType attType, bool normalized) const
 {
     if (!normalized || GetTypeId() != TYPEID_PLAYER)
         return float(GetAttackTime(attType)) / 1000.0f;
@@ -11084,7 +11059,7 @@ bool Unit::isAttackableByAOE(bool requireDeadTarget, bool isCasterPlayer) const
     if (isCasterPlayer && HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_IMMUNE_TO_PLAYER))
         return false;
 
-    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->isGameMaster())
+    if (GetTypeId() == TYPEID_PLAYER && ToPlayer()->IsGameMaster())
         return false;
 
     return true;

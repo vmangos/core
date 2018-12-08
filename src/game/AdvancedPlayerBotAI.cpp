@@ -370,7 +370,7 @@ void AdvancedPlayerBotAI::GatherConditions()
     Conditions.IsDead = me->isDead();
     if (Conditions.IsDead) 
     {
-        Conditions.IsResurrectRequested = me->isRessurectRequested();
+        Conditions.IsResurrectRequested = me->IsRessurectRequested();
         return;
     }
 

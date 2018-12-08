@@ -163,9 +163,9 @@ public:
 
     bool isDirty() const { return iDirty; }
 
-    bool empty() const { return(iThreatList.empty()); }
+    bool empty() const { return iThreatList.empty(); }
 
-    HostileReference* getMostHated() { return iThreatList.empty() ? NULL : iThreatList.front(); }
+    HostileReference* getMostHated() { return iThreatList.empty() ? nullptr : iThreatList.front(); }
 
     HostileReference* getReferenceByTarget(Unit* pVictim);
 

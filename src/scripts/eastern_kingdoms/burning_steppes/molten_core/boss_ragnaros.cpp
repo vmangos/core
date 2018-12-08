@@ -489,7 +489,7 @@ struct boss_ragnarosAI : ScriptedAI
             for (ThreatList::const_iterator itr = tList.begin(); itr != tList.end(); ++itr)
             {
                 Player* pPlayer = m_creature->GetMap()->GetPlayer((*itr)->getUnitGuid());
-                if (pPlayer && pPlayer->isAlive() && pPlayer->getPowerType() == POWER_MANA && !pPlayer->isGameMaster())
+                if (pPlayer && pPlayer->isAlive() && pPlayer->getPowerType() == POWER_MANA && !pPlayer->IsGameMaster())
                     manaPlayers.push_back(pPlayer);
             }
             if (!manaPlayers.empty())
@@ -561,7 +561,7 @@ struct boss_ragnarosAI : ScriptedAI
     {
         // at first we check for the current player-type target
         Unit* pMainTarget = m_creature->getVictim();
-        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->isGameMaster() && 
+        if (pMainTarget->GetTypeId() == TYPEID_PLAYER && !pMainTarget->ToPlayer()->IsGameMaster() && 
             m_creature->IsWithinMeleeRange(pMainTarget) && m_creature->IsWithinLOSInMap(pMainTarget))
         {
             m_bInMelee = true;

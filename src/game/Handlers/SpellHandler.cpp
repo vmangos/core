@@ -366,7 +366,7 @@ void WorldSession::HandleCancelAuraOpcode(WorldPacket& recvPacket)
     recvPacket >> spellId;
 
     // Buff MJ '.gm visible off'.
-    if (spellId == 16380 && !_player->isGMVisible())
+    if (spellId == 16380 && !_player->IsGMVisible())
         return;
 
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);

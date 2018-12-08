@@ -91,17 +91,21 @@ typedef std::unordered_map<Player*, UpdateData> UpdateDataMapType;
 
 struct Position
 {
-    Position() : x(0.0f), y(0.0f), z(0.0f), o(0.0f) {}
-    float x, y, z, o;
+    Position() = default;
+    Position(float position_x, float position_y, float position_z, float orientation) : x(position_x), y(position_y), z(position_z), o(orientation) {}
+    float x = 0.0f;
+    float y = 0.0f;
+    float z = 0.0f;
+    float o = 0.0f;
 };
 
 struct WorldLocation
 {
-    uint32 mapid;
-    float coord_x;
-    float coord_y;
-    float coord_z;
-    float orientation;
+    uint32 mapid = 0;
+    float coord_x = 0.0f;
+    float coord_y = 0.0f;
+    float coord_z = 0.0f;
+    float orientation = 0.0f;
     explicit WorldLocation(uint32 _mapid = 0, float _x = 0, float _y = 0, float _z = 0, float _o = 0)
         : mapid(_mapid), coord_x(_x), coord_y(_y), coord_z(_z), orientation(_o) {}
     WorldLocation(WorldLocation const &loc)
@@ -725,6 +729,8 @@ m_obj->m_updateTracker.Reset();
 
         virtual const char* GetNameForLocaleIdx(int32 /*locale_idx*/) const { return GetName(); }
         virtual uint8 getGender() const { return 0; } // used in chat builder
+
+        virtual uint32 GetDefaultGossipMenuId() const { return 0; }
 
         float GetCombatDistance(const WorldObject* target) const;
         float GetDistanceToCenter(const WorldObject* target) const;

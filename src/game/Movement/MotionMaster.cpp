@@ -554,7 +554,7 @@ void MotionMaster::MoveTaxiFlight()
 {
     if (m_owner->GetTypeId() == TYPEID_PLAYER)
     {
-        TaxiPathNodeList const& path = m_owner->ToPlayer()->m_taxi.GetTaxiPath();
+        TaxiPathNodeList const& path = m_owner->ToPlayer()->GetTaxi().GetTaxiPath();
         if (path.size())
         {
             uint32 foundPath = 0;

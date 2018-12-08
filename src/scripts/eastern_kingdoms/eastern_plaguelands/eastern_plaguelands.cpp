@@ -584,7 +584,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 Player* currPlayer =  it->getSource();
                 if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
                 {
-                    if (currPlayer->isGameMaster())
+                    if (currPlayer->IsGameMaster())
                         continue;
 
                     if (currPlayer->isAlive() && questPlayer != currPlayer)
@@ -614,7 +614,7 @@ struct npc_eris_havenfireAI : public ScriptedAI
                 {
                     Player* currPlayer =  it->getSource();
                     if (currPlayer && m_creature->GetAreaId() == myArea && m_creature->IsWithinDist(currPlayer, 80.0f, false))
-                        if (player && player != currPlayer && currPlayer->isAlive() && !currPlayer->isGameMaster())
+                        if (player && player != currPlayer && currPlayer->isAlive() && !currPlayer->IsGameMaster())
                             Crea->AddThreat(currPlayer, 1000.0f);
                 }
             }
@@ -1151,7 +1151,7 @@ struct npc_darrowshire_triggerAI : public ScriptedAI
             for (Map::PlayerList::const_iterator it = pl.begin(); it != pl.end(); ++it)
             {
                 Player* pPlayer =  it->getSource();
-                if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
+                if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster() && m_creature->IsWithinDist(pPlayer, 20.0f, false))
                 {
                     if (pPlayer->GetQuestStatus(QUEST_BATTLE_DARROWSHIRE) == QUEST_STATUS_INCOMPLETE)
                     {

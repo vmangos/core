@@ -1416,7 +1416,7 @@ bool ChatHandler::HandleLookupFactionCommand(char* args)
         return false;
 
     // Can be NULL at console call
-    Player *target = getSelectedPlayer();
+    Player *target = GetSelectedPlayer();
 
     std::string namepart = args;
     std::wstring wnamepart;
@@ -1476,7 +1476,7 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
         return false;
 
     Player* target = NULL;
-    target = getSelectedPlayer();
+    target = GetSelectedPlayer();
 
     if (!target)
     {
@@ -1664,7 +1664,7 @@ bool ChatHandler::HandleNpcAddVendorItemCommand(char* args)
     if (!ExtractOptUInt32(&args, itemflags, 0))
         return false;
 
-    Creature* vendor = getSelectedCreature();
+    Creature* vendor = GetSelectedCreature();
 
     uint32 vendor_entry = vendor ? vendor->GetEntry() : 0;
 
@@ -1688,7 +1688,7 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
     if (!*args)
         return false;
 
-    Creature* vendor = getSelectedCreature();
+    Creature* vendor = GetSelectedCreature();
     if (!vendor || !vendor->isVendor())
     {
         SendSysMessage(LANG_COMMAND_VENDORSELECTION);
@@ -1720,7 +1720,7 @@ bool ChatHandler::HandleNpcDelVendorItemCommand(char* args)
 //show info about AI
 bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
 {
-    Creature* pTarget = getSelectedCreature();
+    Creature* pTarget = GetSelectedCreature();
 
     if (!pTarget)
     {
@@ -1760,7 +1760,7 @@ bool ChatHandler::HandleNpcChangeLevelCommand(char* args)
         return false;
     }
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
     if (!pCreature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -1791,7 +1791,7 @@ bool ChatHandler::HandleNpcFlagCommand(char* args)
 
     uint32 npcFlags = (uint32) atoi(args);
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
     {
@@ -1827,7 +1827,7 @@ bool ChatHandler::HandleNpcDeleteCommand(char* args)
             unit = m_session->GetPlayer()->GetMap()->GetCreature(data->GetObjectGuid(lowguid));
     }
     else
-        unit = getSelectedCreature();
+        unit = GetSelectedCreature();
 
     if (!unit)
     {
@@ -1873,7 +1873,7 @@ bool ChatHandler::HandleNpcMoveCommand(char* args)
 {
     uint32 lowguid = 0;
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
     {
@@ -1957,7 +1957,7 @@ bool ChatHandler::HandleNpcSetMoveTypeCommand(char* args)
     Creature* pCreature;
     if (!ExtractUInt32(&args, lowguid))                     // case .setmovetype $move_type (with selected creature)
     {
-        pCreature = getSelectedCreature();
+        pCreature = GetSelectedCreature();
         if (!pCreature || !pCreature->HasStaticDBSpawnData())
             return false;
         lowguid = pCreature->GetGUIDLow();
@@ -2037,7 +2037,7 @@ bool ChatHandler::HandleNpcSetModelCommand(char* args)
 
     uint32 displayId = (uint32) atoi(args);
 
-    Creature *pCreature = getSelectedCreature();
+    Creature *pCreature = GetSelectedCreature();
 
     if (!pCreature || pCreature->IsPet())
     {
@@ -2069,7 +2069,7 @@ bool ChatHandler::HandleNpcFactionIdCommand(char* args)
         return false;
     }
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
 
     if (!pCreature)
     {
@@ -2110,7 +2110,7 @@ bool ChatHandler::HandleNpcSpawnDistCommand(char* args)
     if (option > 0.0f)
         mtype = RANDOM_MOTION_TYPE;
 
-    Creature *pCreature = getSelectedCreature();
+    Creature *pCreature = GetSelectedCreature();
     uint32 u_guidlow = 0;
 
     if (pCreature)
@@ -2138,7 +2138,7 @@ bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
     if (!ExtractUInt32(&args, stime))
         return false;
 
-    Creature *pCreature = getSelectedCreature();
+    Creature *pCreature = GetSelectedCreature();
     if (!pCreature)
     {
         PSendSysMessage(LANG_SELECT_CREATURE);
@@ -2158,7 +2158,7 @@ bool ChatHandler::HandleNpcSpawnTimeCommand(char* args)
 bool ChatHandler::HandleNpcFollowCommand(char* /*args*/)
 {
     Player *player = m_session->GetPlayer();
-    Creature *creature = getSelectedCreature();
+    Creature *creature = GetSelectedCreature();
 
     if (!creature)
     {
@@ -2177,7 +2177,7 @@ bool ChatHandler::HandleNpcFollowCommand(char* /*args*/)
 bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
 {
     Player *player = m_session->GetPlayer();
-    Creature *creature = getSelectedCreature();
+    Creature *creature = GetSelectedCreature();
 
     if (!creature)
     {
@@ -2213,7 +2213,7 @@ bool ChatHandler::HandleNpcUnFollowCommand(char* /*args*/)
 //npc tame handling
 bool ChatHandler::HandleNpcTameCommand(char* /*args*/)
 {
-    Creature *creatureTarget = getSelectedCreature();
+    Creature *creatureTarget = GetSelectedCreature();
 
     if (!creatureTarget || creatureTarget->IsPet())
     {
@@ -2246,7 +2246,7 @@ bool ChatHandler::HandleNpcSetDeathStateCommand(char* args)
         return false;
     }
 
-    Creature* pCreature = getSelectedCreature();
+    Creature* pCreature = GetSelectedCreature();
     if (!pCreature || !pCreature->HasStaticDBSpawnData())
     {
         SendSysMessage(LANG_SELECT_CREATURE);
@@ -2399,7 +2399,7 @@ bool ChatHandler::HandleItemMoveCommand(char* args)
 //demorph player or unit
 bool ChatHandler::HandleDeMorphCommand(char* /*args*/)
 {
-    Unit *target = getSelectedUnit();
+    Unit *target = GetSelectedUnit();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -2421,7 +2421,7 @@ bool ChatHandler::HandleModifyMorphCommand(char* args)
 
     uint16 display_id = (uint16)atoi(args);
 
-    Unit *target = getSelectedUnit();
+    Unit *target = GetSelectedUnit();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -2597,7 +2597,7 @@ bool ChatHandler::HandleWpAddCommand(char* args)
     if (!waypointInfo || waypointInfo->GetHighGuid() != HIGHGUID_UNIT)
         return false;                                       // must exist as normal creature in mangos.sql 'creature_template'
 
-    Creature* targetCreature = getSelectedCreature();
+    Creature* targetCreature = GetSelectedCreature();
     WaypointPathOrigin wpDestination = PATH_NO_PATH;        ///< into which storage
     int32 wpPathId = 0;                                     ///< along which path
     uint32 wpPointId = 0;                                   ///< pointId if a waypoint was selected, in this case insert after
@@ -2794,7 +2794,7 @@ bool ChatHandler::HandleWpModifyCommand(char* args)
     // Next arg is: <GUID> <WPNUM> <ARGUMENT>
 
     // Did user provide a GUID or did the user select a creature?
-    Creature* targetCreature = getSelectedCreature();       // Expect a visual waypoint to be selected
+    Creature* targetCreature = GetSelectedCreature();       // Expect a visual waypoint to be selected
     Creature* wpOwner;                               // Who moves along the waypoint
     uint32 wpId = 0;
     WaypointPathOrigin wpSource = PATH_NO_PATH;
@@ -3008,7 +3008,7 @@ bool ChatHandler::HandleWpShowCommand(char* args)
     WaypointPathOrigin wpOrigin = PATH_NO_PATH;
 
     // User selected an npc?
-    Creature* targetCreature = getSelectedCreature();
+    Creature* targetCreature = GetSelectedCreature();
     if (targetCreature)
     {
         if (ExtractOptInt32(&args, wpPathId, 0))            // Fill path-id and source
@@ -3204,7 +3204,7 @@ bool ChatHandler::HandleWpExportCommand(char* args)
     WaypointPathOrigin wpOrigin = PATH_NO_PATH;
     int32 wpPathId = 0;
 
-    if (Creature* targetCreature = getSelectedCreature())
+    if (Creature* targetCreature = GetSelectedCreature())
     {
         // Check if the user did specify a visual waypoint
         if (targetCreature->GetEntry() == VISUAL_WAYPOINT && targetCreature->GetSubtype() == CREATURE_SUBTYPE_TEMPORARY_SUMMON)
@@ -3466,7 +3466,7 @@ bool ChatHandler::HandleModifyStandStateCommand(char* args)
 
 bool ChatHandler::HandleHonorShow(char* /*args*/)
 {
-    Player *target = getSelectedPlayer();
+    Player *target = GetSelectedPlayer();
     if (!target)
         target = m_session->GetPlayer();
 
@@ -3571,7 +3571,7 @@ bool ChatHandler::HandleHonorAddCommand(char* args)
     if (!*args)
         return false;
 
-    Player *target = getSelectedPlayer();
+    Player *target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -3590,7 +3590,7 @@ bool ChatHandler::HandleHonorAddCommand(char* args)
 
 bool ChatHandler::HandleHonorAddKillCommand(char* /*args*/)
 {
-    Unit *target = getSelectedUnit();
+    Unit *target = GetSelectedUnit();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -3610,7 +3610,7 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
     if (!*args)
         return false;
 
-    Player *target = getSelectedPlayer();
+    Player *target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -3668,7 +3668,7 @@ bool ChatHandler::HandleModifyHonorCommand(char* args)
 
 bool ChatHandler::HandleHonorResetCommand(char* /*args*/)
 {
-    Player *target = getSelectedPlayer();
+    Player *target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -4019,7 +4019,7 @@ void ChatHandler::HandleLearnSkillRecipesHelper(Player* player, uint32 skill_id)
         if (!spellInfo || !SpellMgr::IsSpellValid(spellInfo, player, false))
             continue;
 
-        player->learnSpell(skillLine->spellId, false);
+        player->LearnSpell(skillLine->spellId, false);
     }
 }
 
@@ -4044,7 +4044,7 @@ bool ChatHandler::HandleLearnAllRecipesCommand(char* args)
     //  Learns all recipes of specified profession and sets skill to max
     //  Example: .learn all_recipes enchanting
 
-    Player* target = getSelectedPlayer();
+    Player* target = GetSelectedPlayer();
     if (!target)
     {
         SendSysMessage(LANG_PLAYER_NOT_FOUND);
@@ -4686,7 +4686,7 @@ bool ChatHandler::HandleWaterwalkCommand(char* args)
         return false;
     }
 
-    Player *player = getSelectedPlayer();
+    Player *player = GetSelectedPlayer();
 
     if (!player)
     {

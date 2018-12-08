@@ -507,7 +507,7 @@ void BattleGroundAB::EndBattleGround(Team winner)
 WorldSafeLocsEntry const* BattleGroundAB::GetClosestGraveYard(Player* player)
 {
     // repop players at the entrance GY if BG is not started yet
-    if (GetStatus() != STATUS_IN_PROGRESS && !player->isGameMaster())
+    if (GetStatus() != STATUS_IN_PROGRESS && !player->IsGameMaster())
     {
         if (WorldSafeLocsEntry const* gEntry = sWorldSafeLocsStore.LookupEntry(player->GetTeam() == ALLIANCE ? 890 : 889))
             return gEntry;

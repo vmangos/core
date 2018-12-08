@@ -42,10 +42,10 @@ public:
     virtual uint8 getRace() const = 0;
     virtual uint32 getLevel() const = 0;
     virtual uint32 GetGuildId() const = 0;
-    virtual bool isAFK() const = 0;
-    virtual bool isDND() const = 0;
-    virtual bool isGameMaster() const = 0;
-    virtual uint8 chatTag() const = 0;
+    virtual bool IsAFK() const = 0;
+    virtual bool IsDND() const = 0;
+    virtual bool IsGameMaster() const = 0;
+    virtual uint8 GetChatTag() const = 0;
     virtual WorldSession* GetSession() const = 0;
     virtual PlayerSocial* GetSocial() const = 0;
 
@@ -75,10 +75,10 @@ public:
     virtual uint8 getRace() const;
     virtual uint32 getLevel() const;
     virtual uint32 GetGuildId() const;
-    virtual bool isAFK() const;
-    virtual bool isDND() const;
-    virtual bool isGameMaster() const;
-    virtual uint8 chatTag() const;
+    virtual bool IsAFK() const;
+    virtual bool IsDND() const;
+    virtual bool IsGameMaster() const;
+    virtual uint8 GetChatTag() const;
     virtual WorldSession* GetSession() const;
     virtual PlayerSocial* GetSocial() const;
 

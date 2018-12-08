@@ -1426,7 +1426,7 @@ void instance_naxxramas::onNaxxramasAreaTrigger(Player* pPlayer, const AreaTrigg
 
 bool AreaTrigger_at_naxxramas(Player* pPlayer, const AreaTriggerEntry* pAt)
 {
-    if (pPlayer->isGameMaster() || !pPlayer->isAlive())
+    if (pPlayer->IsGameMaster() || !pPlayer->isAlive())
         return false;
 
     if (instance_naxxramas* pInstance = (instance_naxxramas*)pPlayer->GetInstanceData())

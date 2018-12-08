@@ -215,7 +215,7 @@ bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
         for (HashMapHolder<Player>::MapType::const_iterator itr = m.begin(); itr != m.end(); ++itr)
         {
             AccountTypes itr_sec = itr->second->GetSession()->GetSecurity();
-            if ((itr->second->isGameMaster() || (itr_sec > SEC_PLAYER && itr_sec <= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_GM_LIST))) &&
+            if ((itr->second->IsGameMaster() || (itr_sec > SEC_PLAYER && itr_sec <= (AccountTypes)sWorld.getConfig(CONFIG_UINT32_GM_LEVEL_IN_GM_LIST))) &&
                     (!m_session || itr->second->IsVisibleGloballyFor(m_session->GetPlayer())))
                 names.push_back(std::make_pair<std::string, bool>(GetNameLink(itr->second), itr->second->IsAcceptWhispers()));
         }
@@ -337,7 +337,7 @@ bool ChatHandler::HandleWhisperRestrictionCommand(char* args)
 {
     if (!*args)
     {
-        PSendSysMessage("Whisper restriction is %s", GetSession()->GetPlayer()->isEnabledWhisperRestriction() ? "ON" : "OFF");
+        PSendSysMessage("Whisper restriction is %s", GetSession()->GetPlayer()->IsEnabledWhisperRestriction() ? "ON" : "OFF");
         return true;
     }
 
@@ -349,7 +349,7 @@ bool ChatHandler::HandleWhisperRestrictionCommand(char* args)
         return false;
     }
 
-    GetSession()->GetPlayer()->setWhisperRestriction(value);
+    GetSession()->GetPlayer()->SetWhisperRestriction(value);
     PSendSysMessage("Whisper restriction is %s", value ? "ON" : "OFF");
     return false;
 }

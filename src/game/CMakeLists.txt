@@ -520,6 +520,12 @@ include_directories(
   ${CMAKE_SOURCE_DIR}/dep/recastnavigation/Detour/Include
 )
 
+if(WIN32)
+  include_directories(
+    ${CMAKE_SOURCE_DIR}/dep/include-windows
+  )
+endif()
+
 source_group("Object"
   REGULAR_EXPRESSION .*
 )

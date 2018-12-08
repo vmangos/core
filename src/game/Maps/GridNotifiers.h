@@ -1327,7 +1327,7 @@ namespace MaNGOS
             bool operator() (Player* pPlayer)
             {
                 //No threat list check, must be done explicit if expected to be in combat with creature
-                if (!pPlayer->isGameMaster() && pPlayer->isAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false))
+                if (!pPlayer->IsGameMaster() && pPlayer->isAlive() && !pUnit->IsWithinDist(pPlayer,fRange,false))
                     return true;
 
                 return false;

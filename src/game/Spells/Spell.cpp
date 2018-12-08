@@ -4896,8 +4896,6 @@ void Spell::TakeReagents()
         return;
 
     Player* p_caster = (Player*)m_caster;
-    if (p_caster->CanNoReagentCast(m_spellInfo))
-        return;
 
     for (uint32 x = 0; x < MAX_SPELL_REAGENTS; ++x)
     {
@@ -5245,7 +5243,7 @@ SpellCastResult Spell::CheckCast(bool strict)
         }
     }
 
-    if (m_caster->GetTypeId() == TYPEID_PLAYER && !((Player*)m_caster)->isGameMaster() &&
+    if (m_caster->GetTypeId() == TYPEID_PLAYER && !((Player*)m_caster)->IsGameMaster() &&
             sWorld.getConfig(CONFIG_BOOL_VMAP_INDOOR_CHECK) &&
             VMAP::VMapFactory::createOrGetVMapManager()->isLineOfSightCalcEnabled())
     {
@@ -6131,7 +6129,7 @@ SpellCastResult Spell::CheckCast(bool strict)
                         return SPELL_FAILED_TRY_AGAIN;
 
                     // Prevent looting chests while totally immune
-                    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && m_caster->ToPlayer()->isTotalImmune())
+                    if (go->GetGoType() == GAMEOBJECT_TYPE_CHEST && m_caster->ToPlayer()->IsTotalImmune())
                         return SPELL_FAILED_DAMAGE_IMMUNE;
                 }
                 else if (Item* item = m_targets.getItemTarget())
@@ -7223,7 +7221,6 @@ SpellCastResult Spell::CheckItems()
     // check reagents (ignore triggered spells with reagents processed by original spell) and special reagent ignore case.
     if (!IgnoreItemRequirements())
     {
-        if (!p_caster->CanNoReagentCast(m_spellInfo))
         {
             for (uint32 i = 0; i < MAX_SPELL_REAGENTS; ++i)
             {
@@ -7274,27 +7271,6 @@ SpellCastResult Spell::CheckItems()
 
         if (totems != 0)
             return SPELL_FAILED_ITEM_GONE;                      //[-ZERO] not sure of it
-
-        /*[-ZERO] to rewrite?
-        // Check items for TotemCategory  (items presence in inventory)
-        uint32 TotemCategory = MAX_SPELL_TOTEM_CATEGORIES;
-        for(int i= 0; i < MAX_SPELL_TOTEM_CATEGORIES; ++i)
-        {
-            if (m_spellInfo->TotemCategory[i] != 0)
-            {
-                if (p_caster->HasItemTotemCategory(m_spellInfo->TotemCategory[i]))
-                {
-                    TotemCategory -= 1;
-                    continue;
-                }
-            }
-            else
-                TotemCategory -= 1;
-        }
-
-        if (TotemCategory != 0)
-            return SPELL_FAILED_TOTEM_CATEGORY;                 //0x7B
-        */
     }
 
     switch (m_spellInfo->Id)
@@ -7711,7 +7687,7 @@ bool Spell::CheckTarget(Unit* target, SpellEffectIndex eff)
         if (((Player*)target)->GetVisibility() == VISIBILITY_OFF)
             return false;
 
-        if (((Player*)target)->isGameMaster() && !IsPositiveSpell(m_spellInfo))
+        if (((Player*)target)->IsGameMaster() && !IsPositiveSpell(m_spellInfo))
             return false;
     }
 

@@ -234,7 +234,7 @@ struct go_pierre_ventsAI: public GameObjectAI
     bool CheckPlayerHasAura(uint32 uiReqAura, Player *pUser, uint32 itemToDelete = 0)
     {
         if (uiReqAura && !pUser->HasAura(uiReqAura))
-            if (!pUser->isGameMaster())
+            if (!pUser->IsGameMaster())
                 return false;
         return true;
     }
@@ -349,7 +349,7 @@ struct go_pierre_ventsAI: public GameObjectAI
             return true;
 
         ///- Destroy required items.
-        if (!player->ToPlayer()->isGameMaster())
+        if (!player->ToPlayer()->IsGameMaster())
         {
             switch (stoneType)
             {

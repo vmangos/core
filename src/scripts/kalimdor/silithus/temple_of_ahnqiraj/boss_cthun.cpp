@@ -235,7 +235,7 @@ static Player* SelectRandomAliveNotStomach(instance_temple_of_ahnqiraj* instance
         {
             if (Player* player = itr->getSource())
             {
-                if (!player->isDead() && !player->isGameMaster() && player->isInCombat() && !instance->PlayerInStomach(player)) {
+                if (!player->isDead() && !player->IsGameMaster() && player->isInCombat() && !instance->PlayerInStomach(player)) {
                     temp.push_back(player);
                 }
             }
@@ -1576,7 +1576,7 @@ struct cthunAI : public ScriptedAI
         for (Map::PlayerList::const_iterator itr = PlayerList.begin(); itr != PlayerList.end(); ++itr)
         {
             Player* pPlayer = itr->getSource();
-            if (pPlayer && pPlayer->isAlive() && !pPlayer->isGameMaster())
+            if (pPlayer && pPlayer->isAlive() && !pPlayer->IsGameMaster())
             {
                 if (UnitShouldPull(pPlayer)) {
                     AttackStart(pPlayer);

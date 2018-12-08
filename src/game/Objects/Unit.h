@@ -110,7 +110,7 @@ enum SpellModOp
     SPELLMOD_DAMAGE                 = 0,
     SPELLMOD_DURATION               = 1,
     SPELLMOD_THREAT                 = 2,
-    SPELLMOD_EFFECT1                = 3,
+    SPELLMOD_ATTACK_POWER           = 3,
     SPELLMOD_CHARGES                = 4,
     SPELLMOD_RANGE                  = 5,
     SPELLMOD_RADIUS                 = 6,
@@ -119,8 +119,7 @@ enum SpellModOp
     SPELLMOD_NOT_LOSE_CASTING_TIME  = 9,
     SPELLMOD_CASTING_TIME           = 10,
     SPELLMOD_COOLDOWN               = 11,
-    //SPELLMOD_EFFECT2                = 12, // BC et Wotlk
-    SPELLMOD_EFFECT3                = 12,
+    SPELLMOD_SPEED                  = 12,
     SPELLMOD_COST                   = 14,
     SPELLMOD_CRIT_DAMAGE_BONUS      = 15,
     SPELLMOD_RESIST_MISS_CHANCE     = 16,
@@ -130,10 +129,8 @@ enum SpellModOp
     SPELLMOD_EFFECT_PAST_FIRST      = 20,
     SPELLMOD_CASTING_TIME_OLD       = 21,
     SPELLMOD_DOT                    = 22,
-    SPELLMOD_EFFECT2                = 23, // EFFECT3 a BC et Wotlk
+    SPELLMOD_HASTE                  = 23,
     SPELLMOD_SPELL_BONUS_DAMAGE     = 24,
-    // spellmod 25 unused
-    //SPELLMOD_FREQUENCY_OF_SUCCESS   = 26,                 // not used in 2.4.3
     SPELLMOD_MULTIPLE_VALUE         = 27,
     SPELLMOD_RESIST_DISPEL_CHANCE   = 28,
     MAX_SPELLMOD                    = 29,
@@ -467,8 +464,6 @@ enum UnitMoveType
 
 #define MAX_MOVE_TYPE 6
 
-extern float baseMoveSpeed[MAX_MOVE_TYPE];
-
 /// internal used flags for marking special auras - for example some dummy-auras
 enum UnitAuraFlags
 {
@@ -642,23 +637,23 @@ struct SubDamageInfo
 // Need create structure like in SMSG_ATTACKERSTATEUPDATE opcode
 struct CalcDamageInfo
 {
-    Unit  *attacker;             // Attacker
-    Unit  *target;               // Target for damage
-    uint32 totalDamage;
-    uint32 totalAbsorb;
-    uint32 totalResist;
-    SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES];
-    uint32 blocked_amount;
-    uint32 HitInfo;
-    uint32 TargetState;
+    Unit  *attacker = nullptr;             // Attacker
+    Unit  *target = nullptr;               // Target for damage
+    uint32 totalDamage = 0;
+    uint32 totalAbsorb = 0;
+    uint32 totalResist = 0;
+    SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES] = {};
+    uint32 blocked_amount = 0;
+    uint32 HitInfo = HITINFO_NORMALSWING;
+    uint32 TargetState = VICTIMSTATE_UNAFFECTED;
 
     // Helper
-    WeaponAttackType attackType;
-    uint32 procAttacker;
-    uint32 procVictim;
-    uint32 procEx;
-    uint32 cleanDamage;          // Used only for rage calculation
-    MeleeHitOutcome hitOutCome;  // TODO: remove this field (need use TargetState)
+    WeaponAttackType attackType = BASE_ATTACK;
+    uint32 procAttacker = 0;
+    uint32 procVictim = 0;
+    uint32 procEx = 0;
+    uint32 cleanDamage = 0;                        // Used only for rage calculation
+    MeleeHitOutcome hitOutCome = MELEE_HIT_EVADE;  // TODO: remove this field (need use TargetState)
 };
 
 // Spell damage info structure based on structure sending in SMSG_SPELLNONMELEEDAMAGELOG opcode
@@ -1827,7 +1822,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void RemoveAllGameObjects();
 
         uint32 CalculateDamage(WeaponAttackType attType, bool normalized, uint8 index = 0);
-        float GetAPMultiplier(WeaponAttackType attType, bool normalized);
+        float GetAPMultiplier(WeaponAttackType attType, bool normalized) const;
         void ModifyAuraState(AuraState flag, bool apply);
         bool HasAuraState(AuraState flag) const { return HasFlag(UNIT_FIELD_AURASTATE, 1<<(flag-1)); }
         void UnsummonAllTotems();
