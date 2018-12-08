@@ -2576,12 +2576,12 @@ void Map::ScriptsProcess()
         if (scriptResultOk)
             scriptResultOk = (this->*(m_ScriptCommands[step.script->command]))(*step.script, source, target);
 
+        lock.lock();
         // Command returns true if we should abort script.
         if (scriptResultOk)
             TerminateScript(step);
         else
         {
-            lock.lock();
             iter = m_scriptSchedule.begin();
 
             if (iter->second.script == step.script)
