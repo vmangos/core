@@ -25,7 +25,7 @@ UPDATE `creature_template` SET `gossip_menu_id`=6201, `npcflag` = 1 WHERE `entry
 UPDATE `creature_template` SET `npcflag` = 257 WHERE `entry` IN (2455, 2456, 2457, 3318, 3320);
 UPDATE `creature_template` SET `npcflag` = 259 WHERE `entry` IN (4155, 3309);
 UPDATE `creature_template` SET `gossip_menu_id`=1623 WHERE `entry` IN (3318, 3320, 3309);
-DELETE FROM `npc_gossip` WHERE `npc_guid` IN (4653, 4655, 6598)
+DELETE FROM `npc_gossip` WHERE `npc_guid` IN (4653, 4655, 6598);
 
 
 -- End of migration.
