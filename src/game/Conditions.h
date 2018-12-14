@@ -33,19 +33,19 @@ enum ConditionType
     CONDITION_AURA                  = 1,                    // spell_id     effindex
     CONDITION_ITEM                  = 2,                    // item_id      count   check present req. amount items in inventory
     CONDITION_ITEM_EQUIPPED         = 3,                    // item_id      0
-    CONDITION_AREAID                = 4,                    // area_id      0, 1 (0: in (sub)area, 1: not in (sub)area)
+    CONDITION_AREAID                = 4,                    // area_id      0
     CONDITION_REPUTATION_RANK_MIN   = 5,                    // faction_id   min_rank
     CONDITION_TEAM                  = 6,                    // player_team  0,      (469 - Alliance 67 - Horde)
     CONDITION_SKILL                 = 7,                    // skill_id     skill_value
     CONDITION_QUESTREWARDED         = 8,                    // quest_id     0
     CONDITION_QUESTTAKEN            = 9,                    // quest_id     0,1,2   for condition true while quest active (0 any state, 1 if quest incomplete, 2 if quest completed).
     CONDITION_AD_COMMISSION_AURA    = 10,                   // 0            0,      for condition true while one from AD commission aura active
-    CONDITION_WAR_EFFORT_STAGE      = 11,                   // value1: the stage                      value2: 0 : >=, 1: ==, 2 <=
+    CONDITION_WAR_EFFORT_STAGE      = 11,                   // value1: the stage                      value2: 0 : ==, 1: >= 2 <=
     CONDITION_ACTIVE_GAME_EVENT     = 12,                   // event_id     0
-    CONDITION_AREA_FLAG             = 13,                   // area_flag    area_flag_not
+    CONDITION_CANT_PATH_TO_VICTIM   = 13,                   // 0
     CONDITION_RACE_CLASS            = 14,                   // race_mask    class_mask
     CONDITION_LEVEL                 = 15,                   // player_level 0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
-    CONDITION_SOURCE_ENTRY          = 16,                   // value1: the entry to check     2: 0 (not equal), 1 (equal)
+    CONDITION_SOURCE_ENTRY          = 16,                   // entry
     CONDITION_SPELL                 = 17,                   // spell_id     0, 1 (0: has spell, 1: hasn't spell)
     CONDITION_INSTANCE_SCRIPT       = 18,                   // map_id       instance_condition_id (instance script specific enum)
     CONDITION_QUESTAVAILABLE        = 19,                   // quest_id     0       for case when loot/gossip possible only if player can start quest
@@ -58,17 +58,14 @@ enum ConditionType
     CONDITION_ESCORT                = 25,                   // value1: eEscortConditionFlags value2: distance
                                                             // value2: if != 0 only consider players in range of this value
     CONDITION_ACTIVE_HOLIDAY        = 26,                   // holiday_id   0       preferred use instead CONDITION_ACTIVE_GAME_EVENT when possible
-    CONDITION_TARGET_GENDER         = 27,                   // 0=male, 1=female, 2=none (see enum Gender)
-    CONDITION_LEARNABLE_ABILITY     = 28,                   // spell_id     0 or item_id
-                                                            // True when player can learn ability (using min skill value from SkillLineAbility).
-                                                            // Item_id can be defined in addition, to check if player has one (1) item in inventory or bank.
-                                                            // When player has spell or has item (when defined), condition return false.
+    CONDITION_GENDER         		= 27,                   // 0=male, 1=female, 2=none (see enum Gender)
+    CONDITION_IS_PLAYER             = 28,                   // 0       
     CONDITION_SKILL_BELOW           = 29,                   // skill_id     skill_value
                                                             // True if player has skill skill_id and skill less than (and not equal) skill_value (for skill_value > 1)
                                                             // If skill_value == 1, then true if player has not skill skill_id
     CONDITION_REPUTATION_RANK_MAX   = 30,                   // faction_id   max_rank
     CONDITION_HAS_FLAG              = 31,                   // field_id     flag
-    CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 = exact, 1: wp <= waypointId, 2: wp > waypointId  Use to check what waypoint was last reached
+    CONDITION_LAST_WAYPOINT         = 32,                   // waypointId   0 : ==, 1: >= 2 <=
     CONDITION_MAP_ID                = 33,                   // map_id
     CONDITION_INSTANCE_DATA         = 34,                   // index        data        0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
     CONDITION_MAP_EVENT_DATA        = 35,                   // event_id     index       data       0, 1 or 2 (0: equal to, 1: equal or higher than, 2: equal or less than)
@@ -84,10 +81,8 @@ enum ConditionType
     CONDITION_IS_IN_GROUP           = 45,                   // 0            0
     CONDITION_IS_ALIVE              = 46,                   // 0            0
     CONDITION_MAP_EVENT_TARGETS     = 47,                   // event_id     cond_id
-    CONDITION_CANT_PATH_TO_VICTIM   = 48,                   // 0            0
-    CONDITION_IS_PLAYER             = 49,                   // 0            0
-    CONDITION_OBJECT_IS_SPAWNED     = 50,                   // 0            0
-    CONDITION_OBJECT_LOOT_STATE     = 51,                   // state        0
+    CONDITION_OBJECT_IS_SPAWNED     = 48,                   // 0            0
+    CONDITION_OBJECT_LOOT_STATE     = 49,                   // state        0
 };
 
 enum ConditionFlags

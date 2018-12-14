@@ -32,11 +32,12 @@ char const* conditionSourceToStr[] =
     "referencing loot",
     "gossip menu",
     "gossip menu option",
-    "event AI",
+    "EventAI",
     "hardcoded",
-    "vendor's item check",
-    "spell_area check",
-    "DBScript engine"
+    "vendor",
+    "spell_area",
+    "scripted map event",
+    "script action"
 };
 
 // Stores what params need to be provided to each condition type.
@@ -59,7 +60,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_PLAYER,      //  10
     CONDITION_REQ_NONE,               //  11
     CONDITION_REQ_NONE,               //  12
-    CONDITION_REQ_ANY_WORLDOBJECT,    //  13
+    CONDITION_REQ_SOURCE_CREATURE,    //  13
     CONDITION_REQ_TARGET_PLAYER,      //  14
     CONDITION_REQ_TARGET_UNIT,        //  15
     CONDITION_REQ_SOURCE_WORLDOBJECT, //  16
@@ -74,7 +75,7 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_NONE,               //  25
     CONDITION_REQ_NONE,               //  26
     CONDITION_REQ_TARGET_WORLDOBJECT, //  27
-    CONDITION_REQ_TARGET_PLAYER,      //  28
+    CONDITION_REQ_TARGET_WORLDOBJECT, //  28
     CONDITION_REQ_TARGET_PLAYER,      //  29
     CONDITION_REQ_TARGET_PLAYER,      //  30
     CONDITION_REQ_SOURCE_WORLDOBJECT, //  31
@@ -94,10 +95,8 @@ uint8 const ConditionTargetsInternal[] =
     CONDITION_REQ_TARGET_PLAYER,      //  45
     CONDITION_REQ_TARGET_UNIT,        //  46
     CONDITION_REQ_MAP_OR_WORLDOBJECT, //  47
-    CONDITION_REQ_SOURCE_CREATURE,    //  48
-    CONDITION_REQ_TARGET_WORLDOBJECT, //  49
-    CONDITION_REQ_TARGET_GAMEOBJECT,  //  50
-    CONDITION_REQ_TARGET_GAMEOBJECT,  //  51
+    CONDITION_REQ_TARGET_GAMEOBJECT,  //  48
+    CONDITION_REQ_TARGET_GAMEOBJECT,  //  49
 };
 
 // Starts from 4th element so that -3 will return first element.
@@ -168,7 +167,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             uint32 zone, area;
             WorldObject const* searcher = source ? source : target;
             searcher->GetZoneAndAreaId(zone, area);
-            return ((zone == m_value1 || area == m_value1) == (m_value2 == 0));
+            return (zone == m_value1 || area == m_value1);
         }
         case CONDITION_REPUTATION_RANK_MIN:
         {
@@ -206,9 +205,9 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             switch (m_value2)
             {
                 case 0:
-                    return stage >= m_value1;
-                case 1:
                     return stage == m_value1;
+                case 1:
+                    return stage >= m_value1;
                 case 2:
                     return stage <= m_value1;
             }
@@ -217,14 +216,6 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_ACTIVE_GAME_EVENT:
         {
             return sGameEventMgr.IsActiveEvent(m_value1);
-        }
-        case CONDITION_AREA_FLAG:
-        {
-            WorldObject const* searcher = source ? source : target;
-            if (const auto *pAreaEntry = AreaEntry::GetById(searcher->GetAreaId()))
-                if ((!m_value1 || (pAreaEntry->Flags & m_value1)) && (!m_value2 || !(pAreaEntry->Flags & m_value2)))
-                    return true;
-            return false;
         }
         case CONDITION_RACE_CLASS:
         {
@@ -249,14 +240,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         }
         case CONDITION_SOURCE_ENTRY:
         {
-            switch (m_value2)
-            {
-                case 0:
-                    return source->GetEntry() != m_value1;
-                case 1:
-                    return source->GetEntry() == m_value1;
-            }
-            return false;
+            return source->GetEntry() == m_value1;
         }
         case CONDITION_SPELL:
         {
@@ -339,62 +323,9 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         {
             return sGameEventMgr.IsActiveHoliday(HolidayIds(m_value1));
         }
-        case CONDITION_TARGET_GENDER:
+        case CONDITION_GENDER:
         {
             return target->getGender() == m_value1;
-        }
-        case CONDITION_LEARNABLE_ABILITY:
-        {
-            Player const* pPlayer = target->ToPlayer();
-            // Already know the spell
-            if (pPlayer->HasSpell(m_value1))
-                return false;
-
-            // If item defined, check if player has the item already.
-            if (m_value2)
-            {
-                // Hard coded item count. This should be ok, since the intention with this condition is to have
-                // a all-in-one check regarding items that learn some ability (primary/secondary tradeskills).
-                // Commonly, items like this is unique and/or are not expected to be obtained more than once.
-                if (pPlayer->HasItemCount(m_value2, 1, true))
-                    return false;
-            }
-
-            bool isSkillOk = false;
-
-            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(m_value1);
-
-            for (SkillLineAbilityMap::const_iterator itr = bounds.first; itr != bounds.second; ++itr)
-            {
-                const SkillLineAbilityEntry* skillInfo = itr->second;
-
-                if (!skillInfo)
-                    continue;
-
-                // doesn't have skill
-                if (!pPlayer->HasSkill(skillInfo->skillId))
-                    return false;
-
-                // doesn't match class
-                if (skillInfo->classmask && (skillInfo->classmask & pPlayer->getClassMask()) == 0)
-                    return false;
-
-                // doesn't match race
-                if (skillInfo->racemask && (skillInfo->racemask & pPlayer->getRaceMask()) == 0)
-                    return false;
-
-                // skill level too low
-                if (skillInfo->min_value > pPlayer->GetSkillValue(skillInfo->skillId))
-                    return false;
-
-                isSkillOk = true;
-                break;
-            }
-
-            if (isSkillOk)
-                return true;
-
-            return false;
         }
         case CONDITION_SKILL_BELOW:
         {
@@ -427,9 +358,9 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
                 case 0:
                     return m_value1 == lastReachedWp;
                 case 1:
-                    return m_value1 <= lastReachedWp;
+                    return m_value1 >= lastReachedWp;
                 case 2:
-                    return m_value1 > lastReachedWp;
+                    return m_value1 <= lastReachedWp;
             }
             return false;
         }
@@ -795,12 +726,6 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("Zone condition (entry %u, type %u) requires to be in non existing area (%u), skipped", m_entry, m_condition, m_value1);
                 return false;
             }
-
-            if (m_value2 > 1)
-            {
-                sLog.outErrorDb("Zone condition (entry %u, type %u) has invalid argument %u (must be 0..1), skipped", m_entry, m_condition, m_value2);
-                return false;
-            }
             break;
         }
         case CONDITION_REPUTATION_RANK_MIN:
@@ -883,15 +808,6 @@ bool ConditionEntry::IsValid()
             if (!sGameEventMgr.IsValidEvent(m_value1))
             {
                 sLog.outErrorDb("(Not)Active event condition (entry %u, type %u) requires existing event id (%u), skipped", m_entry, m_condition, m_value1);
-                return false;
-            }
-            break;
-        }
-        case CONDITION_AREA_FLAG:
-        {
-            if (!m_value1 && !m_value2)
-            {
-                sLog.outErrorDb("Area flag condition (entry %u, type %u) has both values like 0, skipped", m_entry, m_condition);
                 return false;
             }
             break;
@@ -1000,37 +916,6 @@ bool ConditionEntry::IsValid()
                 sLog.outErrorDb("Nearby gameobject condition (entry %u, type %u) used without search radius (%u)!", m_entry, m_condition, m_value2);
             break;
         }
-        case CONDITION_LEARNABLE_ABILITY:
-        {
-            SkillLineAbilityMapBounds bounds = sSpellMgr.GetSkillLineAbilityMapBounds(m_value1);
-
-            if (bounds.first == bounds.second)
-            {
-                sLog.outErrorDb("Learnable ability conditon (entry %u, type %u) has spell id %u defined, but this spell is not listed in SkillLineAbility and can not be used, skipping.", m_entry, m_condition, m_value1);
-                return false;
-            }
-
-            if (m_value2)
-            {
-                ItemPrototype const* proto = ObjectMgr::GetItemPrototype(m_value2);
-                if (!proto)
-                {
-                    if (!sObjectMgr.IsExistingItemId(m_value2))
-                    {
-                        sLog.outErrorDb("Learnable ability conditon (entry %u, type %u) has item entry %u defined but item does not exist, skipping.", m_entry, m_condition, m_value2);
-                        return false;
-                    }
-                    else
-                    {
-                        m_condition = CONDITION_NONE;
-                        m_flags = CONDITION_FLAG_REVERSE_RESULT;
-                        return true;
-                    }
-                }
-            }
-
-            break;
-        }
         case CONDITION_LAST_WAYPOINT:
         {
             if (m_value2 > 2)
@@ -1040,7 +925,7 @@ bool ConditionEntry::IsValid()
             }
             break;
         }
-        case CONDITION_TARGET_GENDER:
+        case CONDITION_GENDER:
         {
             if (m_value1 >= GENDER_NONE)
             {
@@ -1202,7 +1087,6 @@ bool ConditionEntry::CanBeUsedWithoutPlayer(uint32 entry)
     return false;
 }
 
-// Check if a player meets condition conditionId
 bool IsConditionSatisfied(uint32 conditionId, WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType)
 {
     if (const ConditionEntry* condition = sConditionStorage.LookupEntry<ConditionEntry>(conditionId))
