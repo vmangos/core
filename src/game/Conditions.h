@@ -58,7 +58,7 @@ enum ConditionType
     CONDITION_ESCORT                = 25,                   // value1: eEscortConditionFlags value2: distance
                                                             // value2: if != 0 only consider players in range of this value
     CONDITION_ACTIVE_HOLIDAY        = 26,                   // holiday_id   0       preferred use instead CONDITION_ACTIVE_GAME_EVENT when possible
-    CONDITION_GENDER         		= 27,                   // 0=male, 1=female, 2=none (see enum Gender)
+    CONDITION_GENDER                = 27,                   // 0=male, 1=female, 2=none (see enum Gender)
     CONDITION_IS_PLAYER             = 28,                   // 0       
     CONDITION_SKILL_BELOW           = 29,                   // skill_id     skill_value
                                                             // True if player has skill skill_id and skill less than (and not equal) skill_value (for skill_value > 1)
