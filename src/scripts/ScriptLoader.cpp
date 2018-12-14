@@ -128,7 +128,6 @@ void AddSC_boss_interrogator_vishas();
 void AddSC_boss_mograine_and_whitemane();
 void AddSC_instance_scarlet_monastery();
 void AddSC_boss_darkmaster_gandling();               //scholomance
-void AddSC_boss_death_knight_darkreaver();
 void AddSC_boss_theolenkrastinov();
 void AddSC_boss_illuciabarov();
 void AddSC_boss_instructormalicia();
@@ -392,7 +391,6 @@ void AddScripts()
     AddSC_boss_mograine_and_whitemane();
     AddSC_instance_scarlet_monastery();
     AddSC_boss_darkmaster_gandling();                       //scholomance
-    AddSC_boss_death_knight_darkreaver();
     AddSC_boss_theolenkrastinov();
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
