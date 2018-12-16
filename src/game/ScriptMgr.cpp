@@ -2094,42 +2094,79 @@ void ScriptMgr::LoadEscortData()
 
 void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
 {
-    // Load all possible script entries from gameobjects.
-    for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
-    {
-        switch (itr->type)
-        {
-            case GAMEOBJECT_TYPE_GOOBER:
-                eventIds.insert(itr->goober.eventId);
-                break;
-            case GAMEOBJECT_TYPE_CHEST:
-                eventIds.insert(itr->chest.eventId);
-                break;
-            case GAMEOBJECT_TYPE_CAMERA:
-                eventIds.insert(itr->camera.eventID);
-                break;
-            case GAMEOBJECT_TYPE_CAPTURE_POINT:
-                eventIds.insert(itr->capturePoint.neutralEventID1);
-                eventIds.insert(itr->capturePoint.neutralEventID2);
-                eventIds.insert(itr->capturePoint.contestedEventID1);
-                eventIds.insert(itr->capturePoint.contestedEventID2);
-                eventIds.insert(itr->capturePoint.progressEventID1);
-                eventIds.insert(itr->capturePoint.progressEventID2);
-                eventIds.insert(itr->capturePoint.winEventID1);
-                eventIds.insert(itr->capturePoint.winEventID2);
-                break;
-            default:
-                break;
-        }
-    }
 
-    QueryResult* result;
+    // Load all possible script entries from gameobjects.
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `data2` FROM `gameobject_template` WHERE `type`=10 && `data2` > 0"));
     Field* fields;
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 eventId = fields[0].GetUInt32();
+            if (eventId)
+                eventIds.insert(eventId);
+        } while (result->NextRow());
+    }
+    result.reset(WorldDatabase.Query("SELECT `data6` FROM `gameobject_template` WHERE `type`=3 && `data6` > 0"));
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 eventId = fields[0].GetUInt32();
+            if (eventId)
+                eventIds.insert(eventId);
+        } while (result->NextRow());
+    }
+    result.reset(WorldDatabase.Query("SELECT `data2` FROM `gameobject_template` WHERE `type`=13 && `data2` > 0"));
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 eventId = fields[0].GetUInt32();
+            if (eventId)
+                eventIds.insert(eventId);
+        } while (result->NextRow());
+    }
+    result.reset(WorldDatabase.Query("SELECT `data4`, `data5`, `data6`, `data7`, `data8`, `data9`, `data10`, `data11` FROM `gameobject_template` WHERE `type`=29"));
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 data4 = fields[0].GetUInt32();
+            if (data4)
+                eventIds.insert(data4);
+            uint32 data5 = fields[1].GetUInt32();
+            if (data5)
+                eventIds.insert(data5);
+            uint32 data6 = fields[2].GetUInt32();
+            if (data6)
+                eventIds.insert(data6);
+            uint32 data7 = fields[3].GetUInt32();
+            if (data7)
+                eventIds.insert(data7);
+            uint32 data8 = fields[4].GetUInt32();
+            if (data8)
+                eventIds.insert(data8);
+            uint32 data9 = fields[5].GetUInt32();
+            if (data9)
+                eventIds.insert(data9);
+            uint32 data10 = fields[6].GetUInt32();
+            if (data10)
+                eventIds.insert(data10);
+            uint32 data11 = fields[7].GetUInt32();
+            if (data11)
+                eventIds.insert(data11);
+        } while (result->NextRow());
+    }
 
     // Load all possible script entries from spells.
     for (uint32 i = 1; i < 4; ++i)
     {
-        result = WorldDatabase.PQuery("SELECT effectMiscValue%u FROM spell_template WHERE effect%u=61", i, i);
+        result.reset(WorldDatabase.PQuery("SELECT `effectMiscValue%u` FROM `spell_template` WHERE `effect%u`=61", i, i));
 
         if (result)
         {
@@ -2140,7 +2177,6 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 if (eventId)
                     eventIds.insert(eventId);
             } while (result->NextRow());
-            delete result;
         }
     }
 
@@ -2177,7 +2213,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
     for (uint8 i = 0; i < 9; i++)
     {
         // From SCRIPT_COMMAND_START_SCRIPT.
-        result = WorldDatabase.PQuery("SELECT datalong, datalong2, datalong3, datalong4 FROM %s WHERE command=39", script_tables[i]);
+        result.reset(WorldDatabase.PQuery("SELECT `datalong`, `datalong2`, `datalong3`, `datalong4` FROM `%s` WHERE `command`=39", script_tables[i]));
 
         if (result)
         {
@@ -2197,11 +2233,10 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 if (event4)
                     eventIds.insert(event4);
             } while (result->NextRow());
-            delete result;
         }
 
         // From SCRIPT_COMMAND_TEMP_SUMMON_CREATURE.
-        result = WorldDatabase.PQuery("SELECT dataint2 FROM %s WHERE command=10 && dataint2!=0", script_tables[i]);
+        result.reset(WorldDatabase.PQuery("SELECT `dataint2` FROM `%s` WHERE `command`=10 && `dataint2`!=0", script_tables[i]));
 
         if (result)
         {
@@ -2212,11 +2247,10 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 if (event1)
                     eventIds.insert(event1);
             } while (result->NextRow());
-            delete result;
         }
 
         // From SCRIPT_COMMAND_START_SCRIPT_FOR_ALL.
-        result = WorldDatabase.PQuery("SELECT datalong FROM %s WHERE command=68", script_tables[i]);
+        result.reset(WorldDatabase.PQuery("SELECT `datalong` FROM `%s` WHERE `command`=68", script_tables[i]));
 
         if (result)
         {
@@ -2227,11 +2261,10 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 if (event1)
                     eventIds.insert(event1);
             } while (result->NextRow());
-            delete result;
         }
 
         // From SCRIPT_COMMAND_START_MAP_EVENT, SCRIPT_COMMAND_ADD_MAP_EVENT_TARGET and SCRIPT_COMMAND_EDIT_MAP_EVENT.
-        result = WorldDatabase.PQuery("SELECT dataint2, dataint4 FROM %s WHERE command IN (61, 63, 69)", script_tables[i]);
+        result.reset(WorldDatabase.PQuery("SELECT `dataint2`, `dataint4` FROM `%s` WHERE `command` IN (61, 63, 69)", script_tables[i]));
 
         if (result)
         {
@@ -2245,7 +2278,6 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
                 if (event2)
                     eventIds.insert(event2);
             } while (result->NextRow());
-            delete result;
         }
     }
 }

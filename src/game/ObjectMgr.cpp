@@ -272,6 +272,19 @@ void ObjectMgr::LoadAllIdentifiers()
         } while (result->NextRow());
     }
 
+    m_VendorTemplateIdSet.clear();
+    result.reset(WorldDatabase.Query("SELECT DISTINCT `entry` FROM `npc_vendor_template`"));
+
+    if (result)
+    {
+        do
+        {
+            fields = result->Fetch();
+            uint32 id = fields[0].GetUInt32();
+            m_VendorTemplateIdSet.insert(id);
+        } while (result->NextRow());
+    }
+
     sSpellMgr.LoadExistingSpellIds();
 }
 
@@ -9433,7 +9446,7 @@ void ObjectMgr::LoadVendorTemplates()
             uint32 vendor_id = fields[2].GetUInt32();
             if (m_CacheVendorTemplateItemMap.find(vendor_id) != m_CacheVendorTemplateItemMap.end())
                 vendor_ids.erase(vendor_id);
-            else if (patch <= sWorld.GetWowPatch())
+            else if ((patch <= sWorld.GetWowPatch()) && !IsExistingVendorTemplateId(vendor_id))
                 sLog.outErrorDb("Creature (Entry: %u) has vendor_id = %u for nonexistent vendor template", creature_id, vendor_id);
         } while (result->NextRow());
     }
