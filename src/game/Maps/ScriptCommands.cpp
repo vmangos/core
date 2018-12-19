@@ -805,11 +805,11 @@ bool Map::ScriptCommand_SetFaction(const ScriptInfo& script, WorldObject* source
 // SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (23)
 bool Map::ScriptCommand_Morph(const ScriptInfo& script, WorldObject* source, WorldObject* target)
 {
-    Creature* pSource;
+    Unit* pSource;
 
-    if (!((pSource = ToCreature(source)) || (pSource = ToCreature(target))))
+    if (!((pSource = ToUnit(source)) || (pSource = ToUnit(target))))
     {
-        sLog.outError("SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (script id %u) call for a NULL or non-creature source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
+        sLog.outError("SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL (script id %u) call for a NULL or non-unit source and target (TypeIdSource: %u)(TypeIdTarget: %u), skipping.", script.id, source ? source->GetTypeId() : 0, target ? target->GetTypeId() : 0);
         return ShouldAbortScript(script);
     }
 

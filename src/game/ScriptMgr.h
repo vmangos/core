@@ -145,7 +145,7 @@ enum eScriptCommand
     SCRIPT_COMMAND_SET_FACTION              = 22,           // source = Creature
                                                             // datalong = faction_Id,
                                                             // datalong2 = see enum TemporaryFactionFlags
-    SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // source = Creature
+    SCRIPT_COMMAND_MORPH_TO_ENTRY_OR_MODEL  = 23,           // source = Unit
                                                             // datalong = creature entry/modelid (depend on datalong2)
                                                             // datalong2 = (bool) is_display_id
     SCRIPT_COMMAND_MOUNT_TO_ENTRY_OR_MODEL  = 24,           // source = Creature
