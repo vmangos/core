@@ -1640,6 +1640,15 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         }
                         return;
                     }
+                    case 6758:                              // Party Fever
+                    {
+                        if (Player* pPlayer = ToPlayer(target))
+                        {
+                            if (!pPlayer->isInCombat())
+                                pPlayer->HandleEmoteCommand(EMOTE_STATE_DANCE);
+                        }
+                        return;
+                    }
                     case 10255:                             // Stoned
                     {
                         if (Unit* caster = GetCaster())
