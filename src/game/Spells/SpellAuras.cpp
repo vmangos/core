@@ -1669,6 +1669,12 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         GetHolder()->SetAuraDuration(0); // Remove aura (else stays for ever, and casts at login)
                         return;
                     }
+                    case 16336: // Haunting Phantoms
+                    {
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = urand(30, 90) * IN_MILLISECONDS;;
+                        return;
+                    }
                     case 26234:                             // Ragnaros Submerge Visual
                     {
                         if (Unit* caster = GetCaster())
@@ -5917,6 +5923,14 @@ void Aura::PeriodicDummyTick()
                     if (roll_chance_i(33))
                         target->CastSpell(target, m_modifier.m_amount, true, nullptr, this);
                     return;
+                case 16336:                                 // Haunting Phantoms
+                {
+                    if (urand(0,1))
+                        target->CastSpell(target, 16334, true); // Summon Spiteful Phantom
+                    else
+                        target->CastSpell(target, 16335, true); // Summon Wrath Phantom
+                    return;
+                }
                 case 24596:                                 // Intoxicating Venom
                     if (target->isInCombat())
                     {
