@@ -644,6 +644,24 @@ bool ChatHandler::HandleRecallCommand(char* args)
     return HandleGoHelper(target, mapId, x, y, &z, &o);
 }
 
+bool ChatHandler::HandleReplenishCommand(char* args)
+{
+    Unit *pUnit = GetSelectedUnit();
+    if (!pUnit || !pUnit->isAlive())
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    pUnit->SetHealth(pUnit->GetMaxHealth());
+
+    if (pUnit->getPowerType() == POWER_MANA)
+        pUnit->SetPower(POWER_MANA, pUnit->GetMaxPower(POWER_MANA));
+
+    return true;
+}
+
 //Edit Player HP
 bool ChatHandler::HandleModifyHPCommand(char* args)
 {
