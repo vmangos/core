@@ -107,9 +107,15 @@ void WorldSession::HandleUseItemOpcode(WorldPacket& recvPacket)
         }
     }
 
+    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+    // - Stealth and Invisibility effects will now be canceled at the
+    //   beginning of an action(spellcast, ability use etc...), rather than
+    //   at the completion of the action.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     // Remove invisibility except Gnomish Cloaking Device, since evidence suggests
     // it remains until cast finish
     _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
+#endif
 
     // check also  BIND_WHEN_PICKED_UP and BIND_QUEST_ITEM for .additem or .additemset case by GM (not binded at adding to inventory)
     if (pItem->GetProto()->Bonding == BIND_WHEN_USE || pItem->GetProto()->Bonding == BIND_WHEN_PICKED_UP || pItem->GetProto()->Bonding == BIND_QUEST_ITEM)
@@ -314,9 +320,15 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
     }
 
+    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+    // - Stealth and Invisibility effects will now be canceled at the
+    //   beginning of an action(spellcast, ability use etc...), rather than
+    //   at the completion of the action.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     // Remove invisibility except Gnomish Cloaking Device, since evidence suggests
     // it remains until cast finish
     _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
+#endif
 
     // client provided targets
     SpellCastTargets targets;

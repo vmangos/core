@@ -3302,8 +3302,15 @@ SpellCastResult Spell::prepare(Aura* triggeredByAura, uint32 chance)
 
         // If timer = 0, it's an instant cast spell and will be casted on the next tick.
         // Cast completion will remove all any stealth/invis auras
-        if (m_timer) {
+        if (m_timer)
+        {
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - Stealth and Invisibility effects will now be canceled at the
+            //   beginning of an action(spellcast, ability use etc...), rather than
+            //   at the completion of the action.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             RemoveStealthAuras();
+#endif
             
             // If using a game object we need to remove any remaining invis auras. Should only
             // ever be Gnomish Cloaking Device, since it's a special case and not removed on
