@@ -661,8 +661,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -686,8 +685,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -711,8 +709,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -785,8 +782,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -860,8 +856,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -885,8 +880,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -906,8 +900,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }
@@ -963,8 +956,7 @@ bool ConditionEntry::IsValid()
                 }
                 else
                 {
-                    m_condition = CONDITION_NONE;
-                    m_flags = CONDITION_FLAG_REVERSE_RESULT;
+                    DisableCondition();
                     return true;
                 }
             }

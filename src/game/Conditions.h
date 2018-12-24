@@ -153,6 +153,7 @@ class ConditionEntry
             return m_condition == CONDITION_TEAM ? Team(m_value1) : TEAM_CROSSFACTION;
         }
     private:
+        bool DisableCondition() { m_condition = CONDITION_NONE; m_flags ^= CONDITION_FLAG_REVERSE_RESULT; }
         bool CheckParamRequirements(WorldObject const* target, Map const* map, WorldObject const* source) const;
         bool inline Evaluate(WorldObject const* target, Map const* map, WorldObject const* source, ConditionSource conditionSourceType) const;
         uint32 m_entry;                                     // entry of the condition

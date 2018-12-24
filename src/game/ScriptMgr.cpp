@@ -64,7 +64,8 @@ ScriptMgr::~ScriptMgr()
 void ScriptMgr::DisableScriptAction(ScriptInfo& script)
 {
     script.command = SCRIPT_COMMAND_DISABLED;
-    script.target_param1 = 0;
+    script.target_type = TARGET_T_PROVIDED_TARGET;
+    script.raw.data[4] = 0;
     script.condition = 0;
 }
 
