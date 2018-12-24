@@ -969,10 +969,10 @@ UPDATE `creature_template` SET `lootid`=0 WHERE `entry`=416;
 DELETE FROM `creature_loot_template` WHERE `item`=21174;
 
 -- Gameobject added in 1.9.
-UPDATE `pool_gameobject` SET `patch_min`=7 WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE (`patch_min` < 7) && `id` IN (180661, 180666, 180655, 180662, 180685, 180691, 180690, 180184, 180582, 180656, 180657, 180658, 180663, 180664, 180682, 180683, 180684, 180750, 180752, 180900, 180902, 180248, 180751, 180901, 180667, 180665));
-UPDATE `gameobject` SET `patch_min`=7 WHERE (`patch_min` < 7) && `id` IN (180661, 180666, 180655, 180662, 180685, 180691, 180690, 180184, 180582, 180656, 180657, 180658, 180663, 180664, 180682, 180683, 180684, 180750, 180752, 180900, 180902, 180248, 180751, 180901, 180667, 180665);
-UPDATE `gameobject_template` SET `patch`=7 WHERE (`patch` < 7) && `entry` IN (180661, 180666, 180655, 180662, 180685, 180691, 180690, 180184, 180582, 180656, 180657, 180658, 180663, 180664, 180682, 180683, 180684, 180750, 180752, 180900, 180902, 180248, 180751, 180901, 180667, 180665);
-UPDATE `gameobject_loot_template` SET `patch_min`=7 WHERE (`patch_min` < 7) && `entry` IN (10000, 17441, 17498, 17518, 17280, 17440, 17494, 17496, 17497, 17500, 17502, 17519, 17520, 17521, 17537, 17537, 17538, 17538, 17534, 10001, 10002, 17533, 17532);
+UPDATE `pool_gameobject` SET `patch_min`=7 WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE (`patch_min` < 7) && `id` IN (180661, 180666, 180655, 180662, 180685, 180691, 180690, 180184, 180582, 180656, 180657, 180658, 180663, 180664, 180682, 180683, 180684, 180750, 180752, 180900, 180902, 180751, 180901, 180667, 180665));
+UPDATE `gameobject` SET `patch_min`=7 WHERE (`patch_min` < 7) && `id` IN (180661, 180666, 180655, 180662, 180685, 180691, 180690, 180184, 180582, 180656, 180657, 180658, 180663, 180664, 180682, 180683, 180684, 180750, 180752, 180900, 180902, 180751, 180901, 180667, 180665);
+UPDATE `gameobject_template` SET `patch`=7 WHERE (`patch` < 7) && `entry` IN (180661, 180666, 180655, 180662, 180685, 180691, 180690, 180184, 180582, 180656, 180657, 180658, 180663, 180664, 180682, 180683, 180684, 180750, 180752, 180900, 180902, 180751, 180901, 180667, 180665);
+UPDATE `gameobject_loot_template` SET `patch_min`=7 WHERE (`patch_min` < 7) && `entry` IN (10000, 17441, 17498, 17518, 17440, 17494, 17496, 17497, 17500, 17502, 17519, 17520, 17521, 17537, 17537, 17538, 17538, 17534, 10001, 10002, 17533, 17532);
 
 -- Gameobjects added in 1.8.
 UPDATE `gameobject` SET `patch_min`=6 WHERE (`patch_min` < 6) && `id` IN (180905, 180754, 180654, 180435, 300203, 180436, 180501);
@@ -980,9 +980,10 @@ UPDATE `gameobject_template` SET `patch`=6 WHERE (`patch` < 6) && `entry` IN (18
 UPDATE `gameobject_loot_template` SET `patch_min`=6 WHERE (`patch_min` < 6) && `entry` IN (17540, 17685, 17489, 17349, 17378, 17350);
 
 -- Gameobjects added in 1.7.
-UPDATE `gameobject` SET `patch_min`=5 WHERE (`patch_min` < 5) && `id` IN (180217, 180216, 180371, 180370, 180372, 180373, 180374, 180215, 180392);
-UPDATE `gameobject_template` SET `patch`=5 WHERE (`patch` < 5) && `entry` IN (180217, 180216, 180371, 180370, 180372, 180373, 180374, 180215, 180392);
-UPDATE `gameobject_loot_template` SET `patch_min`=5 WHERE (`patch_min` < 5) && `entry` IN (17299, 17324, 17323, 17325, 17326, 17241, 17331);
+UPDATE `pool_gameobject` SET `patch_min`=5 WHERE `guid` IN (SELECT `guid` FROM `gameobject` WHERE (`patch_min` < 5) && `id` IN (180248));
+UPDATE `gameobject` SET `patch_min`=5 WHERE (`patch_min` < 5) && `id` IN (180248, 180217, 180216, 180371, 180370, 180372, 180373, 180374, 180215, 180392);
+UPDATE `gameobject_template` SET `patch`=5 WHERE (`patch` < 5) && `entry` IN (180248, 180217, 180216, 180371, 180370, 180372, 180373, 180374, 180215, 180392);
+UPDATE `gameobject_loot_template` SET `patch_min`=5 WHERE (`patch_min` < 5) && `entry` IN (17280, 17299, 17324, 17323, 17325, 17326, 17241, 17331);
 
 -- Gameobjects added in 1.5.
 UPDATE `gameobject` SET `patch_min`=3 WHERE (`patch_min` < 3) && `id` IN (179828, 179922, 178784, 178786, 178787, 178785, 178788, 178789, 179024, 179025, 179908, 179914, 179915, 300000);
