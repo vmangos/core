@@ -839,7 +839,6 @@ m_obj->m_updateTracker.Reset();
         void MonsterWhisper(int32 textId, Unit const* receiver, bool IsBossWhisper = false) const;
         void MonsterYellToZone(int32 textId, uint32 language = 0, Unit const* target = nullptr) const;
         void MonsterScriptToZone(int32 textId, ChatMsg type, uint32 language = 0, Unit const* target = nullptr) const;
-        static void BuildWorldObjectChat(WorldPacket *data, ObjectGuid senderGuid, uint8 msgtype, char const* text, uint32 language, char const* name, ObjectGuid targetGuid);
 
         void SendObjectDeSpawnAnim(ObjectGuid guid) const;
 

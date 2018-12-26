@@ -24,6 +24,7 @@
 #include "World.h"
 #include "SocialMgr.h"
 #include "MasterPlayer.h"
+#include "Chat.h"
 
 Channel::Channel(const std::string& name)
     : m_announce(true), m_moderate(false), m_name(name), m_flags(0), m_channelId(0),
@@ -625,50 +626,43 @@ void Channel::Say(ObjectGuid guid, const char *text, uint32 lang, bool skipCheck
     if (!text)
         return;
 
-    uint32 sec = 0;
     PlayerPointer pPlayer = GetPlayer(guid);
-    if (pPlayer)
-        sec = pPlayer->GetSession()->GetSecurity();
+    uint32 const sec = pPlayer ? pPlayer->GetSession()->GetSecurity() : 0;
+    uint8  const honor_rank = pPlayer ? pPlayer->ToPlayer()->GetHonorMgr().GetCurrentHonorRank() : 0;
 
-    if (!skipCheck && !IsOn(guid))
+    if (!skipCheck)
     {
-        WorldPacket data;
-        MakeNotMember(&data);
-        SendToOne(&data, guid);
-        return;
-    }
+        if (!IsOn(guid))
+        {
+            WorldPacket data;
+            MakeNotMember(&data);
+            SendToOne(&data, guid);
+            return;
+        }
 
-    if (!skipCheck && m_players[guid].IsMuted())
-    {
-        WorldPacket data;
-        MakeMuted(&data);
-        SendToOne(&data, guid);
-        return;
-    }
+        if (m_players[guid].IsMuted() || ((GetChannelId() == CHANNEL_ID_WORLD_DEFENSE) && (honor_rank < 15)))
+        {
+            WorldPacket data;
+            MakeMuted(&data);
+            SendToOne(&data, guid);
+            return;
+        }
 
-    if (!skipCheck && m_moderate && !m_players[guid].IsModerator() && sec < SEC_GAMEMASTER)
-    {
-        WorldPacket data;
-        MakeNotModerator(&data);
-        SendToOne(&data, guid);
-        return;
+        if (m_moderate && !m_players[guid].IsModerator() && sec < SEC_GAMEMASTER)
+        {
+            WorldPacket data;
+            MakeNotModerator(&data);
+            SendToOne(&data, guid);
+            return;
+        }
     }
 
     // send channel message
     if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHANNEL))
         lang = LANG_UNIVERSAL;
 
-    uint32 messageLength = strlen(text) + 1;
-
-    WorldPacket data(SMSG_MESSAGECHAT, 1 + 4 + 8 + 4 + m_name.size() + 1 + 8 + 4 + messageLength + 1);
-    data << uint8(CHAT_MSG_CHANNEL);
-    data << uint32(lang);
-    data << m_name;
-    data << uint32(0);
-    data << ObjectGuid(guid);
-    data << uint32(messageLength);
-    data << text;
-    data << uint8(pPlayer ? pPlayer->GetChatTag() : 0);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_CHANNEL, text, Language(lang), pPlayer ? pPlayer->GetChatTag() : 0, guid, nullptr, ObjectGuid(), "", m_name.c_str(), honor_rank);
 
     if (!skipCheck && pPlayer &&
         pPlayer->GetSession()->GetAccountFlags() & ACCOUNT_FLAG_MUTED_FROM_PUBLIC_CHANNELS &&

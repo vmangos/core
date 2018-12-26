@@ -55,8 +55,6 @@
 #include "world/world_event_wareffort.h"
 #include "LFGMgr.h"
 
-#define MAX_GRID_LOAD_TIME      50
-
 Map::~Map()
 {
     UnloadAll(true);
@@ -3039,7 +3037,7 @@ uint32 Map::GenerateLocalLowGuid(HighGuid guidhigh)
 class StaticMonsterChatBuilder
 {
 public:
-    StaticMonsterChatBuilder(CreatureInfo const* cInfo, ChatMsg msgtype, int32 textId, uint32 language, Unit const* target, uint32 senderLowGuid = 0)
+    StaticMonsterChatBuilder(CreatureInfo const* cInfo, ChatMsg msgtype, int32 textId, Language language, Unit const* target, uint32 senderLowGuid = 0)
         : i_cInfo(cInfo), i_msgtype(msgtype), i_textId(textId), i_language(language), i_target(target)
     {
         // 0 lowguid not used in core, but accepted fine in this case by client
@@ -3063,7 +3061,8 @@ public:
         if (nameForLocale.empty())
             nameForLocale = i_cInfo->Name;
 
-        WorldObject::BuildWorldObjectChat(&data, i_senderGuid, i_msgtype, text, i_language, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid());
+        ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_senderGuid, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid(),
+            i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");
     }
 
 private:
@@ -3071,7 +3070,7 @@ private:
     CreatureInfo const* i_cInfo;
     ChatMsg i_msgtype;
     int32 i_textId;
-    uint32 i_language;
+    Language i_language;
     Unit const* i_target;
 };
 
@@ -3084,7 +3083,7 @@ private:
  * @param language language of the text
  * @param target, can be NULL
  */
-void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit const* target) const
+void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, Language language, Unit const* target) const
 {
     if (guid.IsAnyTypeCreature())
     {
@@ -3115,7 +3114,7 @@ void Map::MonsterYellToMap(ObjectGuid guid, int32 textId, uint32 language, Unit 
  * @param senderLowGuid provide way proper show yell for near spawned creature with known lowguid,
  *        0 accepted by client else if this not important
  */
-void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, uint32 language, Unit const* target, uint32 senderLowGuid /*= 0*/) const
+void Map::MonsterYellToMap(CreatureInfo const* cinfo, int32 textId, Language language, Unit const* target, uint32 senderLowGuid /*= 0*/) const
 {
     StaticMonsterChatBuilder say_build(cinfo, CHAT_MSG_MONSTER_YELL, textId, language, target, senderLowGuid);
     MaNGOS::LocalizedPacketDo<StaticMonsterChatBuilder> say_do(say_build);

@@ -16813,29 +16813,10 @@ Pet* Player::GetMiniPet() const
     return GetMap()->GetPet(m_miniPetGuid);
 }
 
-void Player::BuildPlayerChat(ObjectGuid senderGuid, uint8 senderChatTag, WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language)
-{
-    *data << uint8(msgtype);
-    *data << uint32(language);
-
-    if (msgtype == CHAT_MSG_SAY || msgtype == CHAT_MSG_YELL || msgtype == CHAT_MSG_PARTY)
-        *data << senderGuid;
-
-    *data << senderGuid;
-    *data << uint32(text.length() + 1);
-    *data << text;
-    *data << uint8(senderChatTag);
-}
-
-void Player::BuildPlayerChat(WorldPacket *data, uint8 msgtype, const std::string& text, uint32 language) const
-{
-    Player::BuildPlayerChat(GetObjectGuid(), GetChatTag(), data, msgtype, text, language);
-}
-
 void Player::Say(const std::string& text, const uint32 language) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    BuildPlayerChat(&data, CHAT_MSG_SAY, text, language);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SAY, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
     float range = std::min(sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_SAY), GetYellRange());
     SendMessageToSetInRange(&data, range, true);
 }
@@ -16856,15 +16837,15 @@ float Player::GetYellRange() const
 
 void Player::Yell(const std::string& text, const uint32 language) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    BuildPlayerChat(&data, CHAT_MSG_YELL, text, language);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_YELL, text.c_str(), Language(language), GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, GetYellRange(), true);
 }
 
 void Player::TextEmote(const std::string& text) const
 {
-    WorldPacket data(SMSG_MESSAGECHAT, 100);
-    BuildPlayerChat(&data, CHAT_MSG_EMOTE, text, LANG_UNIVERSAL);
+    WorldPacket data;
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_EMOTE, text.c_str(), LANG_UNIVERSAL, GetChatTag(), GetObjectGuid(), GetName());
     SendMessageToSetInRange(&data, sWorld.getConfig(CONFIG_FLOAT_LISTEN_RANGE_TEXTEMOTE), true, !sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_CHAT));
 }
 

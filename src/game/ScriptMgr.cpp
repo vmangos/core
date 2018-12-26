@@ -2467,9 +2467,9 @@ void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map*
         pMap->PlayDirectSoundToMap(SoundId);
 
     if (pCreatureSource)                                // If provided pointer for sayer, use direct version
-        pMap->MonsterYellToMap(pCreatureSource->GetObjectGuid(), iTextEntry, LanguageId, pTarget);
+        pMap->MonsterYellToMap(pCreatureSource->GetObjectGuid(), iTextEntry, Language(LanguageId), pTarget);
     else                                                // Simulate yell
-        pMap->MonsterYellToMap(pInfo, iTextEntry, LanguageId, pTarget);
+        pMap->MonsterYellToMap(pInfo, iTextEntry, Language(LanguageId), pTarget);
 }
 
 void Script::RegisterSelf(bool bReportError)

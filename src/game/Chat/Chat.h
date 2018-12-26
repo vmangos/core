@@ -94,23 +94,6 @@ class MANGOS_DLL_SPEC ChatHandler
         explicit ChatHandler(Player* player);
         virtual ~ChatHandler();
 
-        static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, ObjectGuid targetGuid, const char *message, Unit *speaker);
-
-        static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, ObjectGuid targetGuid, const char* message)
-        {
-            FillMessageData( data, session, type, language, nullptr, targetGuid, message, nullptr);
-        }
-
-        static void FillMessageData( WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char* message)
-        {
-            FillMessageData( data, session, type, language, nullptr, ObjectGuid(), message, nullptr);
-        }
-
-        void FillSystemMessageData( WorldPacket *data, const char* message )
-        {
-            FillMessageData( data, m_session, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, ObjectGuid(), message );
-        }
-
         static char* LineFromMessage(char*& pos) { char* start = strtok(pos,"\n"); pos = nullptr; return start; }
 
         // function with different implementation for chat/console
@@ -138,6 +121,32 @@ class MANGOS_DLL_SPEC ChatHandler
         WorldSession* GetSession() { return m_session; }
 
         void SendBanResult(BanMode mode, BanReturn result, std::string& banTarget, uint32 duration_secs, std::string& reason);
+
+        /**
+        * \brief Prepare SMSG_GM_MESSAGECHAT/SMSG_MESSAGECHAT
+        *
+        * Method:    BuildChatPacket build message chat packet generic way
+        * FullName:  ChatHandler::BuildChatPacket
+        * Access:    public static
+        * Returns:   void
+        *
+        * \param WorldPacket& data             : Provided packet will be filled with requested info
+        * \param ChatMsg msgtype               : Message type from ChatMsg enum from SharedDefines.h
+        * \param uint32 chatTag                : Chat tag from PlayerChatTag in Chat.h
+        * \param char const* message           : Message to send
+        * \param Language language             : Language from Language enum in SharedDefines.h
+        * \param ObjectGuid const& senderGuid  : May be null in some case but often required for ignore list
+        * \param char const* senderName        : Required for type *MONSTER* or *BATTLENET, but also if GM is true
+        * \param ObjectGuid const& targetGuid  : Often null, but needed for type *MONSTER* or *BATTLENET or *BATTLEGROUND* or *ACHIEVEMENT
+        * \param char const* targetName        : Often null, but needed for type *MONSTER* or *BATTLENET or *BATTLEGROUND*
+        * \param char const* channelName       : Required only for CHAT_MSG_CHANNEL
+        * \param uint8 playerRank              : Used only for Defensive Channels (Value over 0 will show rank name before character name in channel)
+        **/
+        static void BuildChatPacket(
+            WorldPacket& data, ChatMsg msgtype, char const* message, Language language = LANG_UNIVERSAL, uint32 chatTag = CHAT_TAG_NONE,
+            ObjectGuid const& senderGuid = ObjectGuid(), char const* senderName = nullptr,
+            ObjectGuid const& targetGuid = ObjectGuid(), char const* targetName = nullptr,
+            char const* channelName = nullptr, uint8 playerRank = 0);
     protected:
         explicit ChatHandler() : m_session(nullptr), sentErrorMessage(false), m_cluster_is_master(true), m_cluster_is_node(true) {}      // for CLI subclass
 

@@ -2149,8 +2149,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void Say(const std::string& text, const uint32 language) const;
         void Yell(const std::string& text, const uint32 language) const;
         void TextEmote(const std::string& text) const;
-        void BuildPlayerChat(WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language) const;
-        static void BuildPlayerChat(ObjectGuid senderGuid, uint8 senderChatTag, WorldPacket* data, uint8 msgtype, const std::string& text, uint32 language);
 
         /*********************************************************/
         /***                   FACTION SYSTEM                  ***/

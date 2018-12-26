@@ -70,6 +70,17 @@ enum ChatNotify
     CHAT_THROTTLED_NOTICE             = 0x1F,               //+ "[%s] The number of messages that can be sent to this channel is limited, please wait to send another message.";
 };
 
+// DBC Channel ID
+enum ChannelId
+{
+    CHANNEL_ID_GENERAL              = 1,
+    CHANNEL_ID_TRADE                = 2,
+    CHANNEL_ID_LOCAL_DEFENSE        = 22,
+    CHANNEL_ID_WORLD_DEFENSE        = 23,
+    CHANNEL_ID_GUILD_RECRUITMENT    = 25,
+    CHANNEL_ID_LOOKING_FOR_GROUP    = 26
+};
+
 class Channel
 {
     public:

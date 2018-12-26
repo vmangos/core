@@ -1284,7 +1284,7 @@ void ChatHandler::SendSysMessage(const char *str)
 
     while (char* line = LineFromMessage(pos))
     {
-        FillSystemMessageData(&data, line);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, line, LANG_UNIVERSAL, CHAT_TAG_NONE, m_session->GetPlayer()->GetObjectGuid());
         m_session->SendPacket(&data);
     }
 
@@ -1300,10 +1300,11 @@ void ChatHandler::SendGlobalSysMessage(const char *str)
     // need copy to prevent corruption by strtok call in LineFromMessage original string
     char* buf = mangos_strdup(str);
     char* pos = buf;
+    ObjectGuid guid = m_session ? m_session->GetPlayer()->GetObjectGuid() : ObjectGuid();
 
     while (char* line = LineFromMessage(pos))
     {
-        FillSystemMessageData(&data, line);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, line, LANG_UNIVERSAL, CHAT_TAG_NONE, guid);
         sWorld.SendGlobalMessage(&data);
     }
 
@@ -2206,90 +2207,59 @@ bool ChatHandler::isValidChatMessage(const char* message)
     return validSequence == validSequenceIterator;
 }
 
-//Note: target_guid used only in CHAT_MSG_WHISPER_INFORM mode (in this case channelName ignored)
-void ChatHandler::FillMessageData(WorldPacket *data, WorldSession* session, uint8 type, uint32 language, const char *channelName, ObjectGuid targetGuid, const char *message, Unit *speaker)
+void ChatHandler::BuildChatPacket(WorldPacket& data, ChatMsg msgtype, char const* message, Language language /*= LANG_UNIVERSAL*/, uint32 chatTag /*= CHAT_TAG_NONE*/,
+                                  ObjectGuid const& senderGuid /*= ObjectGuid()*/, char const* senderName /*= nullptr*/,
+                                  ObjectGuid const& targetGuid /*= ObjectGuid()*/, char const* targetName /*= nullptr*/,
+                                  char const* channelName /*= nullptr*/, uint8 playerRank /*= 0*/)
 {
-    uint32 messageLength = (message ? strlen(message) : 0) + 1;
+    data.Initialize(SMSG_MESSAGECHAT);
+    data << uint8(msgtype);
+    data << uint32(language);
 
-    data->Initialize(SMSG_MESSAGECHAT, 100);                // guess size
-    *data << uint8(type);
-    if ((type != CHAT_MSG_CHANNEL && type != CHAT_MSG_WHISPER) || language == LANG_ADDON)
-        *data << uint32(language);
-    else
-        *data << uint32(LANG_UNIVERSAL);
-
-    if (type == CHAT_MSG_CHANNEL)
+    switch (msgtype)
     {
-        MANGOS_ASSERT(channelName);
-        *data << channelName;
-    }
+        case CHAT_MSG_MONSTER_WHISPER:
+        //case CHAT_MSG_RAID_BOSS_WHISPER:
+        case CHAT_MSG_RAID_BOSS_EMOTE:
+        case CHAT_MSG_MONSTER_EMOTE:
+            MANGOS_ASSERT(senderName);
+            data << uint32(strlen(senderName) + 1);
+            data << senderName;
+            data << ObjectGuid(targetGuid);
+            break;
 
-    switch (type)
-    {
         case CHAT_MSG_SAY:
         case CHAT_MSG_PARTY:
-        case CHAT_MSG_RAID:
-        case CHAT_MSG_GUILD:
-        case CHAT_MSG_OFFICER:
         case CHAT_MSG_YELL:
-        case CHAT_MSG_WHISPER:
-        case CHAT_MSG_CHANNEL:
-        case CHAT_MSG_RAID_LEADER:
-        case CHAT_MSG_RAID_WARNING:
-        case CHAT_MSG_BG_SYSTEM_NEUTRAL:
-        case CHAT_MSG_BG_SYSTEM_ALLIANCE:
-        case CHAT_MSG_BG_SYSTEM_HORDE:
-        case CHAT_MSG_BATTLEGROUND:
-        case CHAT_MSG_BATTLEGROUND_LEADER:
-            targetGuid = session ? session->GetPlayer()->GetObjectGuid() : ObjectGuid();
+            data << ObjectGuid(senderGuid);
+            data << ObjectGuid(senderGuid);
             break;
+
         case CHAT_MSG_MONSTER_SAY:
-        case CHAT_MSG_MONSTER_PARTY:
         case CHAT_MSG_MONSTER_YELL:
-        case CHAT_MSG_MONSTER_WHISPER:
-        case CHAT_MSG_MONSTER_EMOTE:
-//        case CHAT_MSG_RAID_BOSS_WHISPER: // Nostalrius : Pas en 1.12
-        case CHAT_MSG_RAID_BOSS_EMOTE:
-        {
-            // Nostalrius : fix structure
-            switch (type)
-            {
-                case CHAT_MSG_MONSTER_EMOTE:
-                case CHAT_MSG_RAID_BOSS_EMOTE:
-                case CHAT_MSG_MONSTER_WHISPER:
-                    break;
-                default:
-                    *data << ObjectGuid(speaker->GetObjectGuid());
-            }
-            *data << uint32(strlen(speaker->GetName()) + 1);
-            *data << speaker->GetName();
-            ObjectGuid listener_guid;
-            *data << listener_guid;
-            if (listener_guid && !listener_guid.IsPlayer())
-            {
-                *data << uint32(1);                         // string listener_name_length
-                *data << uint8(0);                          // string listener_name
-            }
-            *data << uint32(messageLength);
-            *data << message;
-            *data << uint8(0);
-            return;
-        }
+            MANGOS_ASSERT(senderName);
+            data << ObjectGuid(senderGuid);
+            data << uint32(strlen(senderName) + 1);
+            data << senderName;
+            data << ObjectGuid(targetGuid);
+            break;
+
+        case CHAT_MSG_CHANNEL:
+            MANGOS_ASSERT(channelName);
+            data << channelName;
+            data << uint32(playerRank);
+            data << ObjectGuid(senderGuid);
+            break;
+
         default:
-            if (type != CHAT_MSG_REPLY && type != CHAT_MSG_IGNORED && type != CHAT_MSG_DND && type != CHAT_MSG_AFK)
-                targetGuid.Clear();                         // only for CHAT_MSG_WHISPER_INFORM used original value target_guid
+            data << ObjectGuid(senderGuid);
             break;
     }
 
-    *data << ObjectGuid(targetGuid);                        // there 0 for BG messages
-    if (type == CHAT_MSG_SAY || type == CHAT_MSG_YELL || type == CHAT_MSG_PARTY)
-        *data << ObjectGuid(targetGuid);
-    *data << uint32(messageLength);
-    *data << message;
-    if (session != nullptr && type != CHAT_MSG_REPLY && type != CHAT_MSG_DND && type != CHAT_MSG_AFK)
-        *data << uint8(session->GetPlayer()->GetChatTag());
-    else
-        *data << uint8(0);
+    MANGOS_ASSERT(message);
+    data << uint32(strlen(message) + 1);
+    data << message;
+    data << uint8(chatTag);
 }
 
 Player * ChatHandler::GetSelectedPlayer()

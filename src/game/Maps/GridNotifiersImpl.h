@@ -567,25 +567,22 @@ template<class Builder>
 void MaNGOS::LocalizedPacketDo<Builder>::operator()( Player* p )
 {
     int32 loc_idx = p->GetSession()->GetSessionDbLocaleIndex();
-    uint32 cache_idx = loc_idx+1;
-    WorldPacket* data;
+    uint32 cache_idx = loc_idx + 1;
 
     // create if not cached yet
-    if (i_data_cache.size() < cache_idx+1 || !i_data_cache[cache_idx])
+    if (i_data_cache.size() < cache_idx + 1 || !i_data_cache[cache_idx])
     {
-        if (i_data_cache.size() < cache_idx+1)
-            i_data_cache.resize(cache_idx+1);
+        if (i_data_cache.size() < cache_idx + 1)
+            i_data_cache.resize(cache_idx + 1);
 
-        data = new WorldPacket(SMSG_MESSAGECHAT, 200);
+        auto data = std::unique_ptr<WorldPacket>(new WorldPacket());
 
         i_builder(*data, loc_idx);
 
-        i_data_cache[cache_idx] = data;
+        i_data_cache[cache_idx] = std::move(data);
     }
-    else
-        data = i_data_cache[cache_idx];
 
-    p->SendDirectMessage(data);
+    p->SendDirectMessage(i_data_cache[cache_idx].get());
 }
 
 template<class Builder>

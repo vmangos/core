@@ -1916,17 +1916,7 @@ private:
         while (char* line = lineFromMessage(pos))
         {
             WorldPacket* data = new WorldPacket();
-
-            uint32 lineLength = (line ? strlen(line) : 0) + 1;
-
-            data->Initialize(SMSG_MESSAGECHAT, 100);                // guess size
-            *data << uint8(CHAT_MSG_SYSTEM);
-            *data << uint32(LANG_UNIVERSAL);
-            *data << uint64(0);
-            *data << uint32(lineLength);
-            *data << line;
-            *data << uint8(0);
-
+            ChatHandler::BuildChatPacket(*data, CHAT_MSG_SYSTEM, line);
             data_list.push_back(data);
         }
     }
@@ -2021,7 +2011,7 @@ void World::SendGlobalText(const char* text, WorldSession *self)
 
     while (char* line = ChatHandler::LineFromMessage(pos))
     {
-        ChatHandler::FillMessageData(&data, nullptr, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, line);
+        ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, line);
         SendGlobalMessage(&data, self);
     }
 
@@ -2048,7 +2038,7 @@ void World::SendZoneMessage(uint32 zone, WorldPacket *packet, WorldSession *self
 void World::SendZoneText(uint32 zone, const char* text, WorldSession *self, uint32 team)
 {
     WorldPacket data;
-    ChatHandler::FillMessageData(&data, nullptr, CHAT_MSG_SYSTEM, LANG_UNIVERSAL, text);
+    ChatHandler::BuildChatPacket(data, CHAT_MSG_SYSTEM, text);
     SendZoneMessage(zone, &data, self, team);
 }
 
