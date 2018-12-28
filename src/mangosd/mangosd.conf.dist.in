@@ -402,6 +402,12 @@ Anticrash.Rearm.Timer = 60000
 #        spells which had effects added or removed which still exist in the game client.
 #        Default: 1
 #
+#    Progression.RestoreDeletedItems
+#        Whether to automatically restore items which were previously deleted because no item template with
+#        this entry existed on that content patch. Players will receive the item in the mail once it has been
+#        added to the game.
+#        Default: 1
+#
 #    Progression.NoRespecPriceDecay
 #        If set, the talent respec cost will not decay until patch 1.11 when the monthly reduction was added.
 #        Default: 1
@@ -426,6 +432,7 @@ PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
 
+Progression.RestoreDeletedItems = 1
 Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
