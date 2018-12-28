@@ -948,10 +948,7 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_SMARTLOG_SCRIPTINFO, "Smartlog.ScriptInfo", 1);
     setConfig(CONFIG_UINT32_LONGCOMBAT, "Smartlog.LongCombatDuration", 30 * MINUTE);
 
-
-    
     setConfig(CONFIG_UINT32_ITEM_INSTANTSAVE_QUALITY, "Item.InstantSave.Quality", ITEM_QUALITY_ARTIFACT);
-
 
     setConfig(CONFIG_UINT32_MAILSPAM_EXPIRE_SECS, "MailSpam.ExpireSecs", 0);
     setConfig(CONFIG_UINT32_MAILSPAM_MAX_MAILS, "MailSpam.MaxMails", 2);

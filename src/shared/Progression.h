@@ -60,7 +60,7 @@
 #define EXPECTED_MANGOSD_CLIENT_BUILD        { 4222, 0}
 #endif
 
-// Content patches, used for loading of DB data.
+// Content patches, used for loading DB data.
 enum WowPatch
 {
     WOW_PATCH_102 = 0,
