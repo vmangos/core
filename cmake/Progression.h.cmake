@@ -17,7 +17,7 @@
 #ifndef MANGOSSERVER_PROGRESSION_H
 #define MANGOSSERVER_PROGRESSION_H
 
-// Game client builds
+// Game client builds.
 #define CLIENT_BUILD_1_2_4 4222
 #define CLIENT_BUILD_1_3_1 4297
 #define CLIENT_BUILD_1_4_2 4375
@@ -29,8 +29,52 @@
 #define CLIENT_BUILD_1_10_2 5302
 #define CLIENT_BUILD_1_11_2 5464
 #define CLIENT_BUILD_1_12_1 5875
-// Change this to define which version players can use
+
+// Change this to define which build of the game to emulate.
+// Has an effect on things such as core gameplay mechanics,
+// loading of client data, and network packets structure.
 #define SUPPORTED_CLIENT_BUILD @supported_build@
+
+// This defines which client builds the world server will accept.
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 5875, 6005, 6141, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_11_2
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 5464, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_10_2
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 5302, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_9_4
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 5086, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_8_4
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4878, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_7_1
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4695, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_6_1
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4544, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_5_1
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4449, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_4_2
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4375, 0}
+#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_3_1
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4297, 0}
+#else
+#define EXPECTED_MANGOSD_CLIENT_BUILD        { 4222, 0}
+#endif
+
+// Content patches, used for loading DB data.
+enum WowPatch
+{
+    WOW_PATCH_102 = 0,
+    WOW_PATCH_103 = 1,
+    WOW_PATCH_104 = 2,
+    WOW_PATCH_105 = 3,
+    WOW_PATCH_106 = 4,
+    WOW_PATCH_107 = 5,
+    WOW_PATCH_108 = 6,
+    WOW_PATCH_109 = 7,
+    WOW_PATCH_110 = 8,
+    WOW_PATCH_111 = 9,
+    WOW_PATCH_112 = 10
+};
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
 #define MAX_CONTENT_PATCH 10

@@ -271,22 +271,6 @@ enum eConfigUInt32Values
     CONFIG_UINT32_VALUE_COUNT
 };
 
-// Content patches, used for loading DB data.
-enum WowPatch
-{
-    WOW_PATCH_102  = 0,
-    WOW_PATCH_103  = 1,
-    WOW_PATCH_104  = 2,
-    WOW_PATCH_105  = 3,
-    WOW_PATCH_106  = 4,
-    WOW_PATCH_107  = 5,
-    WOW_PATCH_108  = 6,
-    WOW_PATCH_109  = 7,
-    WOW_PATCH_110  = 8,
-    WOW_PATCH_111  = 9,
-    WOW_PATCH_112  = 10
-};
-
 enum
 {
     ANTICRASH_OPTION_ANNOUNCE_PLAYERS   = 0x01,

@@ -2923,18 +2923,6 @@ enum TradeStatus
     TRADE_STATUS_ONLY_CONJURED  = 22                        // You can only trade conjured items... (cross realm BG related).
 };
 
-// This defines which client builds the world server will accept.
-// Change the supported client build in Common.h before compiling.
-#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5875, 6005, 6141, 0}
-#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_11_2
-    #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5464, 0}
-#elif SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_10_2
-    #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5302, 0}
-#else
-    #define EXPECTED_MANGOSD_CLIENT_BUILD        { 5086, 0}
-#endif
-
 // TrinityCore
 #define MAKE_NEW_GUID(l, e, h)   uint64(uint64(l) | (uint64(e) << 24) | (uint64(h) << 48))
 enum TeamId
