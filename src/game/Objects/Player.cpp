@@ -14925,9 +14925,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
     CreatePacketBroadcaster();
 
-    // Note, if not using accurate mounts be sure to update all trainer spells in the
-    // database or players will be stuck with the old skill system
-    if (sWorld.GetWowPatch() >= WOW_PATCH_112 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_MOUNTS))
+    if (sWorld.GetWowPatch() >= WOW_PATCH_112)
         UpdateOldRidingSkillToNew(has_epic_mount);
 
     return true;

@@ -984,7 +984,6 @@ void World::LoadConfigSettings(bool reload)
     setConfig(CONFIG_BOOL_ENABLE_DK, "PvP.DishonorableKills", true);
 
     // Progression settings
-    setConfig(CONFIG_BOOL_ACCURATE_MOUNTS, "Progression.AccurateMountSkillTraining", true);
     setConfig(CONFIG_BOOL_ACCURATE_PETS, "Progression.AccuratePetStatistics", true);
     setConfig(CONFIG_BOOL_ACCURATE_LFG, "Progression.AccurateLFGAvailability", true);
     setConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS, "Progression.AccuratePVEEvents", true);

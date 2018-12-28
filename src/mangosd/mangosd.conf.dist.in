@@ -383,12 +383,6 @@ Anticrash.Rearm.Timer = 60000
 #        Whether to give dishonorable kills to players who kill civilians.
 #        Default: 1
 #
-#    Progression.AccurateMountSkillTraining
-#        Whether to use Blizzlike mount skill training.
-#        Before 1.12, players had to acquire individual skills per mount type and the training was the
-#        cheap part. After 1.12, it was homogenized to a single skill.
-#        Default: 1
-#
 #    Progression.AccuratePetStatistics
 #        Whether to allow Blizzlike pet statistic (damage, speed, resists) progression.
 #        Default: 1
@@ -432,7 +426,6 @@ PvP.AccurateTimeline = 1
 PvP.AccurateRewards = 1
 PvP.DishonorableKills = 1
 
-Progression.AccurateMountSkillTraining = 1
 Progression.AccuratePetStatistics = 1
 Progression.AccurateLFGAvailability = 1
 Progression.AccuratePVEEvents = 1
