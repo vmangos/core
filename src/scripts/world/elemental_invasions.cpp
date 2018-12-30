@@ -72,8 +72,14 @@ public:
         }
 
         invader->SetHomePosition(x, y, z, frand(0, 2 * M_PI_F));
-        invader->SetRespawnRadius(20.0f);
-        invader->GetMotionMaster()->MoveTargetedHome();
+        invader->SetRespawnRadius(30.f);
+        invader->SetDefaultMovementType(RANDOM_MOTION_TYPE);
+
+        if (!invader->isInCombat())
+        {
+            invader->GetMotionMaster()->Clear(false, true);
+            invader->GetMotionMaster()->MoveRandom(true, 30.0f);
+        }
 
         m_uiInvadersGuid[index] = invader->GetObjectGuid();
         return true;
@@ -168,9 +174,6 @@ struct npc_invaderAI : ScriptedAI
 {
     explicit npc_invaderAI(Creature* pCreature, uint32 eventIndex) : ScriptedAI(pCreature), m_uiEventIndex(eventIndex)
     {
-        m_creature->SetRespawnRadius(30.f);
-        m_creature->GetMotionMaster()->Clear(false, true);
-        m_creature->GetMotionMaster()->MoveRandom(true, 30.0f);
         npc_invaderAI::Reset();
     }
 
@@ -190,12 +193,6 @@ struct npc_invaderAI : ScriptedAI
         m_uiWhirlwindTimer = urand(100, 500);
         m_uiBlastWaveTimer = urand(1000, 5000);
         m_uiShieldTimer = urand(100, 200);
-    }
-
-    void JustReachedHome() override
-    {
-        m_creature->GetMotionMaster()->Clear();
-        m_creature->SetDefaultMovementType(RANDOM_MOTION_TYPE);
     }
 
     void JustDied(Unit* /*pKiller*/) override
