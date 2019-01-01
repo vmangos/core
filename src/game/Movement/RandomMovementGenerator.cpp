@@ -26,6 +26,10 @@
 
 void RandomMovementGenerator::_setRandomLocation(Creature &creature)
 {
+    // Don't move if invalid coordinates have been set somehow.
+    if (i_positionX == 0.0f && i_positionY == 0.0f)
+        return;
+
     if (creature.CanFly())
     {
         //typedef std::vector<Vector3> PointsArray;
