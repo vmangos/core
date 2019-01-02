@@ -3623,8 +3623,8 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
 
     uint32 creatureEntry = m_spellInfo->EffectMiscValue[eff_idx];
 
-    Creature* newUnit = pCaster->SummonPossessedMinion(m_spellInfo->EffectMiscValue[eff_idx], m_spellInfo->Id, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
-    if (!newUnit)
+    Creature* pMinion = pCaster->SummonPossessedMinion(creatureEntry, m_spellInfo->Id, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
+    if (!pMinion)
     {
         sLog.outError("Spell::EffectSummonPossessed: creature entry %u for spell %u could not be summoned.", creatureEntry, m_spellInfo->Id);
         return;
@@ -3632,7 +3632,7 @@ void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
 
     // Notify Summoner
     if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->AI())
-        m_originalCaster->AI()->JustSummoned(newUnit);
+        m_originalCaster->AI()->JustSummoned(pMinion);
 }
 
 void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx)

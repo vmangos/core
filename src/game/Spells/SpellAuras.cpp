@@ -2980,6 +2980,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
 
     Unit *target = GetTarget();
 
+    if (!target)
+        return;
+
     // not charm yourself
     if (GetCasterGuid() == target->GetObjectGuid())
         return;
@@ -3126,7 +3129,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
         if (pPlayerTarget)
             pPlayerTarget->SetFactionForRace(target->getRace());
 
-        if (pPlayerTarget && pPlayerTarget->isAlive() && caster->isAlive() && caster->isInCombat())
+        if (pPlayerTarget && pPlayerTarget->isAlive() && caster && caster->isAlive() && caster->isInCombat())
         {
             pPlayerTarget->SendAttackSwingCancelAttack();
 
