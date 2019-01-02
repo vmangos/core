@@ -1360,6 +1360,10 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void PossessSpellInitialize();
         void RemovePetActionBar();
 
+        // Take possession of a new spawned creature
+        Creature* SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang);
+        void UnsummonPossessedMinion();
+
         uint32 m_stableSlots;
         uint32 m_petEntry;
         uint32 m_petSpell;

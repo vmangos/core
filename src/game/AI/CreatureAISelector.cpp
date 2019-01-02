@@ -37,7 +37,7 @@ namespace FactorySelector
 CreatureAI* selectAI(Creature *creature)
 {
     // Vide: un joueur CM un mob.
-    if (!creature->IsPet() && creature->GetCharmGuid().IsPlayer() && creature->hasUnitState(UNIT_FLAG_PLAYER_CONTROLLED))
+    if (!creature->IsPet() && creature->GetCharmGuid().IsPlayer() && creature->hasUnitState(UNIT_FLAG_POSSESSED))
         return new NullCreatureAI(creature);
 
     // Allow scripting AI for normal creatures and not controlled pets (guardians and mini-pets)

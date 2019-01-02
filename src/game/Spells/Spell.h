@@ -260,6 +260,7 @@ class Spell
         void EffectAddFarsight(SpellEffectIndex eff_idx);
         void EffectSummonWild(SpellEffectIndex eff_idx);
         void EffectSummonGuardian(SpellEffectIndex eff_idx);
+        void EffectSummonPossessed(SpellEffectIndex eff_idx);
         void EffectHealMechanical(SpellEffectIndex eff_idx);
         void EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx);
         void EffectLearnSkill(SpellEffectIndex eff_idx);

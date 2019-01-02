@@ -134,7 +134,7 @@ pEffect SpellEffects[TOTAL_SPELL_EFFECTS] =
     &Spell::EffectPull,                                     // 70 SPELL_EFFECT_PULL                     one spell: Distract Move
     &Spell::EffectPickPocket,                               // 71 SPELL_EFFECT_PICKPOCKET
     &Spell::EffectAddFarsight,                              // 72 SPELL_EFFECT_ADD_FARSIGHT
-    &Spell::EffectSummonGuardian,                           // 73 SPELL_EFFECT_SUMMON_POSSESSED
+    &Spell::EffectSummonPossessed,                          // 73 SPELL_EFFECT_SUMMON_POSSESSED
     &Spell::EffectSummonTotem,                              // 74 SPELL_EFFECT_SUMMON_TOTEM
     &Spell::EffectHealMechanical,                           // 75 SPELL_EFFECT_HEAL_MECHANICAL          one spell: Mechanical Patch Kit
     &Spell::EffectSummonObjectWild,                         // 76 SPELL_EFFECT_SUMMON_OBJECT_WILD
@@ -3562,27 +3562,6 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
 
         switch (m_spellInfo->Id)
         {
-            case 126: // Eye of Kilrogg
-            {
-                spawnCreature->SetWalk(false);
-                if (Player* p = m_caster->ToPlayer())
-                {
-                    // Stealth
-                    spawnCreature->CastSpell(spawnCreature, 2585, true);
-                    p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
-                }
-                break;
-            }
-            case 11403: // Elixir of Dream Vision
-            {
-                spawnCreature->SetWalk(false);
-                if (Player* p = m_caster->ToPlayer())
-                {
-                    spawnCreature->CastSpell(spawnCreature, 27986, true); // Levitate
-                    p->ModPossessPet(spawnCreature, true, AURA_REMOVE_BY_DEFAULT);
-                }
-                break;
-            }
             case 17166: // Release Umi's Yeti - Quest Are We There, Yeti? Part 3
             {
                 spawnCreature->MonsterTextEmote(-1900169);
@@ -3634,6 +3613,26 @@ void Spell::EffectSummonGuardian(SpellEffectIndex eff_idx)
         if (count == 0)
             AddExecuteLogInfo(eff_idx, ExecuteLogInfo(spawnCreature->GetObjectGuid()));
     }
+}
+
+void Spell::EffectSummonPossessed(SpellEffectIndex eff_idx)
+{
+    Player* pCaster = m_caster->ToPlayer();
+    if (!pCaster)
+        return;
+
+    uint32 creatureEntry = m_spellInfo->EffectMiscValue[eff_idx];
+
+    Creature* newUnit = pCaster->SummonPossessedMinion(m_spellInfo->EffectMiscValue[eff_idx], m_spellInfo->Id, m_targets.m_destX, m_targets.m_destY, m_targets.m_destZ, m_caster->GetOrientation());
+    if (!newUnit)
+    {
+        sLog.outError("Spell::EffectSummonPossessed: creature entry %u for spell %u could not be summoned.", creatureEntry, m_spellInfo->Id);
+        return;
+    }
+
+    // Notify Summoner
+    if (m_originalCaster && m_originalCaster != m_caster && m_originalCaster->AI())
+        m_originalCaster->AI()->JustSummoned(newUnit);
 }
 
 void Spell::EffectTeleUnitsFaceCaster(SpellEffectIndex eff_idx)
@@ -5486,7 +5485,7 @@ void Spell::EffectSummonTotem(SpellEffectIndex eff_idx)
     pTotem->SetUInt32Value(UNIT_CREATED_BY_SPELL, m_spellInfo->Id);
 
     if (m_caster->GetTypeId() == TYPEID_PLAYER)
-        pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+        pTotem->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     if (m_caster->IsPvP())
         pTotem->SetPvP(true);

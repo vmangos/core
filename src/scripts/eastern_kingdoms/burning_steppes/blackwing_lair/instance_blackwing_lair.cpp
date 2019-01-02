@@ -902,7 +902,7 @@ bool GOHello_go_orbe_domination(Player* pPlayer, GameObject* pGo)
             if (Creature* pCreature = pGo->GetMap()->GetCreature(pInstance->GetData64(DATA_RAZORGORE_GUID)))
             {
                 // Deja CM ?
-                if (pCreature->hasUnitState(UNIT_STAT_CONTROLLED))
+                if (pCreature->hasUnitState(UNIT_STAT_POSSESSED))
                     return true;
                 if (pCreature->isInCombat() && pInstance->GetData64(DATA_EGG) != DONE)
                 {

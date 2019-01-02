@@ -704,7 +704,7 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
         SetByteValue(UNIT_FIELD_BYTES_1, 1, 0xEE);
 
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_UNK3 | UNIT_BYTE2_FLAG_UNK5 | UNIT_BYTE2_FLAG_PVP);
-    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);
+    SetUInt32Value(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
 
     // fix cast time showed in spell tooltip on client
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
@@ -3043,7 +3043,7 @@ void Player::InitStatsForLevel(bool reapplyMods)
                UNIT_FLAG_STUNNED        | UNIT_FLAG_IN_COMBAT    | UNIT_FLAG_DISARMED         |
                UNIT_FLAG_CONFUSED       | UNIT_FLAG_FLEEING      | UNIT_FLAG_NOT_SELECTABLE   |
                UNIT_FLAG_SKINNABLE      | UNIT_FLAG_AURAS_VISIBLE        | UNIT_FLAG_TAXI_FLIGHT);
-    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE);    // must be set
+    SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);    // must be set
 
     // cleanup player flags (will be re-applied if need at aura load), to avoid have ghost flag without ghost aura, for example.
     RemoveFlag(PLAYER_FLAGS, PLAYER_FLAGS_AFK | PLAYER_FLAGS_DND | PLAYER_FLAGS_GM | PLAYER_FLAGS_GHOST | PLAYER_FLAGS_FFA_PVP);
@@ -16983,6 +16983,66 @@ void Player::RemovePetActionBar()
     SendDirectMessage(&data);
 }
 
+// This will create a new creature and set the current unit as the controller of that new creature
+Creature* Player::SummonPossessedMinion(uint32 creatureId, uint32 spellId, float x, float y, float z, float ang)
+{
+    // Possess is a unique advertised charm, another advertised charm already exists: we should get rid of it first
+    if (!GetCharmGuid().IsEmpty())
+        return nullptr;
+
+    Creature* pCreature = SummonCreature(creatureId, x, y, z, ang, TEMPSUMMON_CORPSE_TIMED_DESPAWN, 5000);
+
+    if (!pCreature)
+        return nullptr;
+
+    pCreature->SetFactionTemporary(getFaction(), TEMPFACTION_NONE);     // set same faction than player
+    pCreature->SetCharmerGuid(GetObjectGuid());                         // save guid of the charmer
+    pCreature->SetPossesorGuid(GetObjectGuid());
+    pCreature->SetUInt32Value(UNIT_CREATED_BY_SPELL, spellId);          // set the spell id used to create this
+    pCreature->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);          // set flag for client that mean this unit is controlled by a player
+    pCreature->addUnitState(UNIT_STAT_POSSESSED);                       // also set internal unit state flag
+    pCreature->SetLevel(getLevel());                                    // set level to same level than summoner TODO:: not sure its always the case...
+    pCreature->SetWalk(IsWalking(), true);                              // sync the walking state with the summoner
+    SetCharmGuid(pCreature->GetObjectGuid());                           // save guid of charmed creature
+
+    UnsummonPetTemporaryIfAny();
+
+    GetCamera().SetView(pCreature);                         // modify camera view to the creature view
+    pCreature->UpdateControl();                             // transfer client control to the creature after altering flags
+    SetMover(pCreature);                                    // set mover so now we know that creature is "moved" by this unit
+    SendForcedObjectUpdate();
+
+    // Initialize pet bar
+    if (CharmInfo* charmInfo = pCreature->InitCharmInfo(pCreature))
+        charmInfo->InitPossessCreateSpells();
+
+    PossessSpellInitialize();
+
+    return pCreature;
+}
+
+void Player::UnsummonPossessedMinion()
+{
+    Unit* pMinion = GetCharm();
+
+    SetCharm(nullptr);
+    SetMover(nullptr);
+    UpdateControl();
+    GetCamera().ResetView();
+    RemovePetActionBar();
+    SendForcedObjectUpdate();
+
+    if (!pMinion)
+        return;
+
+    SetClientControl(pMinion, false);
+    pMinion->SetCharmerGuid(ObjectGuid());
+    pMinion->SetPossesorGuid(ObjectGuid());
+    pMinion->clearUnitState(UNIT_STAT_POSSESSED);
+    pMinion->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
+    pMinion->DoKillUnit();
+}
+
 bool Player::HasInstantCastingSpellMod(SpellEntry const *spellInfo) const
 {
     for (const auto& mod : m_spellMods[SPELLMOD_CASTING_TIME])
@@ -19339,7 +19399,7 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
 bool Player::IsAllowedToMove(Unit* unit) const
 {
     if (unit == this)
-        return !hasUnitState(UNIT_STAT_CONTROLLED | UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
+        return !hasUnitState(UNIT_STAT_POSSESSED | UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
     return !unit->hasUnitState(UNIT_STAT_FLEEING | UNIT_FLAG_CONFUSED);
 }
 

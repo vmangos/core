@@ -1774,11 +1774,11 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
 
         switch (GetId())
         {
-            case 126: // Kilrogg eye
-                if (Unit* caster = GetCaster())
-                    if (Player* casterPlayer = caster->ToPlayer())
-                        if (Pet* guardian = caster->FindGuardianWithEntry(4277))
-                            guardian->DisappearAndDie(); // Removes mod posses
+            case 126:   // Kilrogg eye
+            case 6272:  // Eye of Yesmur
+            case 11403: // Dream Vision
+                if (Player* pCaster = ToPlayer(GetCaster()))
+                    pCaster->UnsummonPossessedMinion();
                 return;
             case 10255:                                     // Stoned
             {
@@ -1791,13 +1791,6 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                 }
                 return;
             }
-            case 11403: // Dream Vision
-                if (Unit* caster = GetCaster())
-                    if (Player* casterPlayer = caster->ToPlayer())
-                        if (Pet* guardian = caster->FindGuardianWithEntry(7863))
-                            guardian->DisappearAndDie();
-
-                return;
             case 11826:
                 if (m_removeMode != AURA_REMOVE_BY_EXPIRE)
                     return;
@@ -2768,49 +2761,6 @@ void Aura::HandleModPossess(bool apply, bool Real)
     if (!caster || !target)
         return;
 
-    // HACK: Prevent crash when target is controlling summoned unit (Eye of Kilrog)
-    if (apply && target->GetCharmGuid())
-    {
-        Unit::SpellAuraHolderMap& uAuras = target->GetSpellAuraHolderMap();
-        for (Unit::SpellAuraHolderMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
-        {
-            SpellAuraHolder *holder = itr->second;
-            const SpellEntry* pSpellEntry = holder->GetSpellProto();
-            if (IsSpellHaveEffect(pSpellEntry, SPELL_EFFECT_SUMMON_POSSESSED))
-            {
-                holder->SetRemoveMode(AURA_REMOVE_BY_DELETE);
-                holder->UnregisterSingleCastHolder();
-                for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-                {
-                    if (Aura *aura = holder->m_auras[i])
-                        target->RemoveAura(aura, AURA_REMOVE_BY_DELETE);
-                }
-                holder->_RemoveSpellAuraHolder();
-                target->DeleteAuraHolder(holder);
-                uAuras.erase(itr);
-                if (Player* player = target->ToPlayer())
-                {
-                    Unit* possessed = player->GetCharm();
-                    player->SetCharm(nullptr);
-                    if (possessed)
-                        player->SetClientControl(possessed, 0);
-                    player->SetMover(nullptr);
-                    player->GetCamera().ResetView();
-                    player->RemovePetActionBar();
-                    if (possessed)
-                    {
-                        possessed->clearUnitState(UNIT_STAT_CONTROLLED);
-                        possessed->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-                        possessed->SetCharmerGuid(ObjectGuid());
-                        if (possessed->GetUInt32Value(UNIT_CREATED_BY_SPELL) == pSpellEntry->Id && possessed->GetTypeId() == TYPEID_UNIT)
-                            ((Creature*)possessed)->DespawnOrUnsummon();
-                    }
-                }
-                break;
-            }
-        }
-    }
-
     caster->ModPossess(target, apply, m_removeMode);
     target->AddThreat(caster,target->GetHealth(), false, GetSpellSchoolMask(GetSpellProto()));
 
@@ -2842,10 +2792,15 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
     if (apply)
     {
-        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
-        target->addUnitState(UNIT_STAT_CONTROLLED);
+        // Remove dummy auras from spells with EffectSummonPossessed
+        target->RemoveAurasDueToSpell(126);
+        target->RemoveAurasDueToSpell(6272);
+        target->RemoveAurasDueToSpell(11403);
 
-        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
+        target->addUnitState(UNIT_STAT_POSSESSED);
+
+        target->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
         target->SetCharmerGuid(caster->GetObjectGuid());
         target->setFaction(caster->getFaction());
 
@@ -2906,9 +2861,9 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         if (m_removeMode == AURA_REMOVE_BY_DELETE)
             return;
 
-        target->clearUnitState(UNIT_STAT_CONTROLLED);
+        target->clearUnitState(UNIT_STAT_POSSESSED);
 
-        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        target->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
 
         target->SetCharmerGuid(ObjectGuid());
 
@@ -2975,7 +2930,7 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
 
     if (apply)
     {
-        pet->addUnitState(UNIT_STAT_CONTROLLED);
+        pet->addUnitState(UNIT_STAT_POSSESSED);
 
         // target should became visible at SetView call(if not visible before):
         // otherwise client\p_caster will ignore packets from the target(SetClientControl for example)
@@ -2984,7 +2939,7 @@ void Player::ModPossessPet(Pet* pet, bool apply, AuraRemoveMode m_removeMode)
         p_caster->SetCharm(pet);
         p_caster->SetMover(pet);
 
-        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+        pet->SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
         pet->SetCharmerGuid(p_caster->GetObjectGuid());
         pet->SetPossesorGuid(p_caster->GetObjectGuid());
 
@@ -3037,6 +2992,11 @@ void Aura::HandleModCharm(bool apply, bool Real)
             return;
 
         FactionTemplateEntry const* origFactionTemplate = target->getFactionTemplateEntry();
+
+        // Remove dummy auras from spells with EffectSummonPossessed
+        target->RemoveAurasDueToSpell(126);
+        target->RemoveAurasDueToSpell(6272);
+        target->RemoveAurasDueToSpell(11403);
 
         // is it really need after spell check checks?
         target->RemoveSpellsCausingAura(SPELL_AURA_MOD_CHARM, GetHolder());

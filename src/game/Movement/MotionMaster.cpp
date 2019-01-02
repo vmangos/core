@@ -53,7 +53,7 @@ void MotionMaster::Initialize()
     Clear(false, true);
 
     // set new default movement generator
-    if (m_owner->GetTypeId() == TYPEID_UNIT && !m_owner->hasUnitState(UNIT_STAT_CONTROLLED))
+    if (m_owner->GetTypeId() == TYPEID_UNIT && !m_owner->hasUnitState(UNIT_STAT_POSSESSED))
     {
         MovementGenerator* movement = FactorySelector::selectMovementGenerator(static_cast<Creature*>(m_owner));
         push(movement == nullptr ? &si_idleMovement : movement);
@@ -104,7 +104,7 @@ void MotionMaster::InitializeNewDefault(bool alwaysReplace)
     if (alwaysReplace || (curr->GetMovementGeneratorType() != new_default))
     {
         // Set new default movement generator
-        if (!m_owner->hasUnitState(UNIT_STAT_CONTROLLED))
+        if (!m_owner->hasUnitState(UNIT_STAT_POSSESSED))
         {
             MovementGenerator* movement = FactorySelector::selectMovementGenerator(pCreature);
             push(movement == nullptr ? &si_idleMovement : movement);

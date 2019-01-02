@@ -386,7 +386,7 @@ enum UnitState
     UNIT_STAT_STUNNED         = 0x00000008,                     // Aura::HandleAuraModStun
     UNIT_STAT_ROOT            = 0x00000010,                     // Aura::HandleAuraModRoot
     UNIT_STAT_ISOLATED        = 0x00000020,                     // area auras do not affect other players, Aura::HandleAuraModSchoolImmunity
-    UNIT_STAT_CONTROLLED      = 0x00000040,                     // Aura::HandleAuraModPossess
+    UNIT_STAT_POSSESSED       = 0x00000040,                     // Aura::HandleAuraModPossess
 
     // persistent movement generator state (all time while movement generator applied to unit (independent from top state of movegen)
     UNIT_STAT_TAXI_FLIGHT     = 0x00000080,                     // player is in flight mode (in fact interrupted at far teleport until next map telport landing)
@@ -438,7 +438,7 @@ enum UnitState
                                 UNIT_STAT_CONFUSED | UNIT_STAT_FLEEING,
 
     // AI disabled by some reason
-    UNIT_STAT_LOST_CONTROL    = UNIT_STAT_FLEEING | UNIT_STAT_CONTROLLED,
+    UNIT_STAT_LOST_CONTROL    = UNIT_STAT_FLEEING | UNIT_STAT_POSSESSED,
 
     // above 2 state cases
     UNIT_STAT_CAN_NOT_REACT_OR_LOST_CONTROL  = UNIT_STAT_CAN_NOT_REACT | UNIT_STAT_LOST_CONTROL,
@@ -488,7 +488,7 @@ enum UnitFlags
     UNIT_FLAG_UNK_0                 = 0x00000001,
     UNIT_FLAG_NON_ATTACKABLE        = 0x00000002,           // not attackable
     UNIT_FLAG_DISABLE_MOVE          = 0x00000004,
-    UNIT_FLAG_PVP_ATTACKABLE        = 0x00000008,           // allow apply pvp rules to attackable state in addition to faction dependent state, UNIT_FLAG_UNKNOWN1 in pre-bc mangos
+    UNIT_FLAG_PLAYER_CONTROLLED     = 0x00000008,           // players, pets, totems, guardians, companions, charms, any units associated with players
     UNIT_FLAG_PET_RENAME            = 0x00000010,           // Old pet rename: moved to UNIT_FIELD_BYTES_2,2 in TBC+
     UNIT_FLAG_PET_ABANDON           = 0x00000020,           // Old pet abandon: moved to UNIT_FIELD_BYTES_2,2 in TBC+
     UNIT_FLAG_UNK_6                 = 0x00000040,
@@ -510,7 +510,7 @@ enum UnitFlags
     UNIT_FLAG_NO_KILL_REWARD        = 0x80000000,           // Unit should yield no reward (Honor/XP/Rep) on kill
 
     // [-ZERO] TBC enumerations [?]
-    UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // ?? (UNIT_FLAG_PVP_ATTACKABLE | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE
+    UNIT_FLAG_NOT_ATTACKABLE_1      = 0x00000080,           // ?? (UNIT_FLAG_PLAYER_CONTROLLED | UNIT_FLAG_NOT_ATTACKABLE_1) is NON_PVP_ATTACKABLE
     UNIT_FLAG_LOOTING               = 0x00000400,           // loot animation
     UNIT_FLAG_PET_IN_COMBAT         = 0x00000800,           // in combat?, 2.0.8
     UNIT_FLAG_STUNNED               = 0x00040000,           // stunned, 2.1.1
@@ -518,7 +518,7 @@ enum UnitFlags
     UNIT_FLAG_DISARMED              = 0x00200000,           // disable melee spells casting..., "Required melee weapon" added to melee spells tooltip.
     UNIT_FLAG_CONFUSED              = 0x00400000,
     UNIT_FLAG_FLEEING               = 0x00800000,
-    UNIT_FLAG_PLAYER_CONTROLLED     = 0x01000000,           // used in spell Eyes of the Beast for pet... let attack by controlled creature
+    UNIT_FLAG_POSSESSED             = 0x01000000,           // Unit is under remote control by another unit, movement checks disabled, paired with loss of client control packet. New master is allowed to use melee attack and can't select this unit via mouse in the world (as if it was own character).
 
     UNIT_FLAG_UNK_28                = 0x10000000,
     UNIT_FLAG_UNK_29                = 0x20000000,           // used in Feing Death spell
@@ -1534,7 +1534,6 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         bool isCharmedOwnedByPlayerOrPlayer() const { return GetCharmerOrOwnerOrOwnGuid().IsPlayer(); }
 
         Player* GetSpellModOwner() const;
-
         Unit* GetOwner() const;
         Pet* GetPet() const;
         Unit* GetCharmer() const;

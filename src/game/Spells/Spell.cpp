@@ -3482,7 +3482,7 @@ void Spell::cast(bool skipCheck)
     }
 
     // Ivina <Nostalrius> : Added the case when caster is charmed and not controlled.
-    if ((m_caster->GetTypeId() != TYPEID_PLAYER) || ((m_caster->GetCharmerGuid()) && (!m_caster->hasUnitState(UNIT_STAT_CONTROLLED))))
+    if ((m_caster->GetTypeId() != TYPEID_PLAYER) || ((m_caster->GetCharmerGuid()) && (!m_caster->hasUnitState(UNIT_STAT_POSSESSED))))
     {
         if (m_targets.getUnitTarget() && m_targets.getUnitTarget() != m_caster)
             m_caster->SetInFront(m_targets.getUnitTarget());
@@ -4656,8 +4656,8 @@ void Spell::SendChannelUpdate(uint32 time)
 
             if (possessed)
             {
-                possessed->clearUnitState(UNIT_STAT_CONTROLLED);
-                possessed->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
+                possessed->clearUnitState(UNIT_STAT_POSSESSED);
+                possessed->RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED);
                 possessed->SetCharmerGuid(ObjectGuid());
                 // TODO - Requires more specials for target?
 
@@ -5160,7 +5160,7 @@ SpellCastResult Spell::CheckCast(bool strict)
     //   m_spellInfo->Id, strict ? "[strict]" : "", m_IsTriggeredSpell ? "[triggered]" : "", m_triggeredByAuraSpell ? "[triggeredByAura]" : "", m_targets.getUnitTargetGuid().GetString().c_str());
 
     // Quel sort peut-on faire lancer a un mob que l'on CM ?
-    if (m_caster->hasUnitState(UNIT_STAT_CONTROLLED))
+    if (m_caster->hasUnitState(UNIT_STAT_POSSESSED))
     {
         if (m_spellInfo->Category == 21) // Enrager
             return SPELL_FAILED_NOT_READY;

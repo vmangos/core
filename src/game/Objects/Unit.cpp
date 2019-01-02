@@ -5637,9 +5637,9 @@ ReputationRank Unit::GetReactionTo(Unit const* target) const
                 return *repRank;
     }
 
-    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+    if (HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
     {
-        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+        if (target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
         {
             if (selfPlayerOwner && targetPlayerOwner)
             {
@@ -7629,7 +7629,7 @@ bool Unit::IsValidAttackTarget(Unit const* target) const
         return false;
 
     // CvC case - can attack each other only when one of them is hostile
-    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE))
+    if (!HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) && !target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
         return GetReactionTo(target) <= REP_HOSTILE || target->GetReactionTo(this) <= REP_HOSTILE;
 
     // PvP, PvC, CvP case
@@ -7638,8 +7638,8 @@ bool Unit::IsValidAttackTarget(Unit const* target) const
             || target->GetReactionTo(this) > REP_NEUTRAL)
         return false;
 
-    Player const* playerAffectingAttacker = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) ? GetAffectingPlayer() : nullptr;
-    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PVP_ATTACKABLE) ? target->GetAffectingPlayer() : nullptr;
+    Player const* playerAffectingAttacker = HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) ? GetAffectingPlayer() : nullptr;
+    Player const* playerAffectingTarget = target->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED) ? target->GetAffectingPlayer() : nullptr;
 
     // Not all neutral creatures can be attacked
     if (GetReactionTo(target) == REP_NEUTRAL &&
@@ -9467,7 +9467,7 @@ bool CharmInfo::IsCommandFollow()
 void CharmInfo::SaveStayPosition()
 {
     // No Unit::StopMoving while possessed
-    if (m_unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED))
+    if (m_unit->HasFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_POSSESSED))
         m_unit->GetPosition(_stayX, _stayY, _stayZ);
     else //! At this point a new spline destination is enabled because of Unit::StopMoving()
     {
@@ -11610,7 +11610,7 @@ void Unit::UpdateControl()
                 mePlayer->SetClientControl(possessed, !possessed->hasUnitState(UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED));
                 return;
             }
-        mePlayer->SetClientControl(mePlayer, !hasUnitState(UNIT_STAT_CONTROLLED | UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED) && !GetCharmerGuid());
+        mePlayer->SetClientControl(mePlayer, !hasUnitState(UNIT_STAT_POSSESSED | UNIT_STAT_FLEEING | UNIT_STAT_CONFUSED) && !GetCharmerGuid());
     }
 }
 
