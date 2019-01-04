@@ -19,7 +19,7 @@ INSERT INTO `conditions` (`condition_entry`, `type`, `value1`, `value2`, `value3
 -- Waypoints
 DELETE FROM `script_waypoint` WHERE `entry`=11856;
 INSERT INTO `creature_movement_special` (`id`, `point`, `position_x`, `position_y`, `position_z`, `waittime`, `script_id`, `textid1`, `textid2`, `textid3`, `textid4`, `textid5`, `emote`, `spell`, `orientation`, `model1`, `model2`) VALUES 
-(11856, 1, 113.91, -350.13, 4.55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
+(11856, 1, 113.91, -350.13, 4.55, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (11856, 2, 109.54, -350.08, 3.74, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (11856, 3, 106.95, -353.4, 3.6, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
 (11856, 4, 100.28, -338.89, 2.97, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0),
