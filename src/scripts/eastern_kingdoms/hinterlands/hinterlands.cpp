@@ -22,112 +22,11 @@ SDCategory: The Hinterlands
 EndScriptData */
 
 /* ContentData
-npc_00x09hl
 npc_rinji
 go_lards_picnic_basket
 EndContentData */
 
 #include "scriptPCH.h"
-
-/*######
-## npc_00x09hl
-######*/
-
-enum
-{
-    SAY_OOX_START           = -1000287,
-    SAY_OOX_AGGRO1          = -1000288,
-    SAY_OOX_AGGRO2          = -1000289,
-    SAY_OOX_AMBUSH          = -1000290,
-    SAY_OOX_END             = -1000292,
-
-    QUEST_RESQUE_OOX_09     = 836,
-
-    NPC_MARAUDING_OWL       = 7808,
-    NPC_VILE_AMBUSHER       = 7809
-};
-
-struct npc_00x09hlAI : public npc_escortAI
-{
-    npc_00x09hlAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        Reset();
-    }
-
-    void Reset() { }
-
-    void WaypointReached(uint32 uiPointId)
-    {
-        switch (uiPointId)
-        {
-            case 26:
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    float fX, fY, fZ;
-                    m_creature->GetRandomPoint(147.927444f, -3851.513428f, 130.893f, 7.0f, fX, fY, fZ);
-
-                    m_creature->SummonCreature(NPC_MARAUDING_OWL, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
-                }
-                break;
-            case 43:
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
-                for (uint8 i = 0; i < 3; ++i)
-                {
-                    float fX, fY, fZ;
-                    m_creature->GetRandomPoint(-141.151581f, -4291.213867f, 120.130f, 7.0f, fX, fY, fZ);
-
-                    m_creature->SummonCreature(NPC_VILE_AMBUSHER, fX, fY, fZ, 0.0f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 25000);
-                }
-                break;
-            case 64:
-                DoScriptText(SAY_OOX_END, m_creature);
-                if (Player* pPlayer = GetPlayerForEscort())
-                    pPlayer->GroupEventHappens(QUEST_RESQUE_OOX_09, m_creature);
-                break;
-        }
-    }
-
-    void Aggro(Unit* pWho)
-    {
-        if (pWho->GetEntry() == NPC_MARAUDING_OWL || pWho->GetEntry() == NPC_VILE_AMBUSHER)
-            return;
-
-        if (urand(0, 1))
-            DoScriptText(SAY_OOX_AGGRO1, m_creature);
-        else
-            DoScriptText(SAY_OOX_AGGRO2, m_creature);
-    }
-
-    void JustSummoned(Creature* pSummoned)
-    {
-        pSummoned->GetMotionMaster()->MovePoint(0, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ());
-    }
-};
-
-bool QuestAccept_npc_00x09hl(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_RESQUE_OOX_09)
-    {
-        pCreature->SetStandState(UNIT_STAND_STATE_STAND);
-
-        if (pPlayer->GetTeam() == ALLIANCE)
-            pCreature->setFaction(FACTION_ESCORT_A_PASSIVE);
-        else if (pPlayer->GetTeam() == HORDE)
-            pCreature->setFaction(FACTION_ESCORT_H_PASSIVE);
-
-        DoScriptText(SAY_OOX_START, pCreature, pPlayer);
-
-        if (npc_00x09hlAI* pEscortAI = dynamic_cast<npc_00x09hlAI*>(pCreature->AI()))
-            pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
-    }
-    return true;
-}
-
-CreatureAI* GetAI_npc_00x09hl(Creature* pCreature)
-{
-    return new npc_00x09hlAI(pCreature);
-}
 
 /*######
 ## npc_rinji
@@ -393,12 +292,6 @@ bool GOHello_go_lards_picnic_basket(Player* pPlayer, GameObject* pGO)
 void AddSC_hinterlands()
 {
     Script* newscript;
-
-    newscript = new Script;
-    newscript->Name = "npc_00x09hl";
-    newscript->GetAI = &GetAI_npc_00x09hl;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_00x09hl;
-    newscript->RegisterSelf();
 
     newscript = new Script;
     newscript->Name = "npc_rinji";
