@@ -3366,6 +3366,7 @@ void Spell::EffectSummonWild(SpellEffectIndex eff_idx)
                 case 4071:
                 case 4072:
                 case 19805:
+                    summon->SetFactionTemporary(m_caster->getFaction(), TEMPFACTION_NONE);
                     summon->lootForCreator = true;
                     summon->SetCreatorGuid(m_caster->GetObjectGuid());
                     summon->SetLootRecipient(m_caster);
