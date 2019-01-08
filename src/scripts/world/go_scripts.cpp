@@ -115,7 +115,7 @@ bool GOHello_go_barov_journal(Player* pPlayer, GameObject* pGo)
 {
     if (sWorld.GetWowPatch() > WOW_PATCH_108 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PVE_EVENTS))
     {
-        if (pPlayer->HasSkill(SKILL_TAILORING) && pPlayer->GetBaseSkillValue(SKILL_TAILORING) >= 285)
+        if (pPlayer->HasSkill(SKILL_TAILORING) && pPlayer->GetSkillValueBase(SKILL_TAILORING) >= 285)
         {
             if (!pPlayer->HasSpell(26086))
             {
@@ -201,7 +201,7 @@ bool GOHello_go_greater_moonlight(Player* pPlayer, GameObject* pGo) {
 
 bool GOHello_go_field_repair_bot_74A(Player* pPlayer, GameObject* pGo)
 {
-    if (pPlayer->HasSkill(SKILL_ENGINEERING) && pPlayer->GetBaseSkillValue(SKILL_ENGINEERING) >= 300 && !pPlayer->HasSpell(22704))
+    if (pPlayer->HasSkill(SKILL_ENGINEERING) && pPlayer->GetSkillValueBase(SKILL_ENGINEERING) >= 300 && !pPlayer->HasSpell(22704))
         pPlayer->CastSpell(pPlayer, 22864, false);
     return true;
 }

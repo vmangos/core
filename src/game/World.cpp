@@ -1157,8 +1157,8 @@ void World::SetInitialWorldSettings()
     sSpellModMgr.LoadSpellMods();
     sSpellMgr.AssignInternalSpellFlags();
 
-    sLog.outString("Loading SkillLineAbilityMultiMap Data...");
-    sSpellMgr.LoadSkillLineAbilityMap();
+    sLog.outString("Loading SkillLineAbilityMultiMaps Data...");
+    sSpellMgr.LoadSkillLineAbilityMaps();
 
     sLog.outString("Loading SkillRaceClassInfoMultiMap Data...");
     sSpellMgr.LoadSkillRaceClassInfoMap();

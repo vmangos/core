@@ -2614,21 +2614,18 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    uint32 prot = GetSpellProto()->EffectMiscValue[m_effIndex];
+    Player* target = static_cast<Player*>(GetTarget());
 
-    // Can't modify an unknown skill
-    if (!GetTarget()->ToPlayer()->HasSkill(prot))
+    Modifier const* mod = GetModifier();
+    const uint16 skillId = uint16(GetSpellProto()->EffectMiscValue[m_effIndex]);
+    const int16 amount = int16(mod->m_amount);
+    const bool permanent = (mod->m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
+
+    if (target->ModifySkillBonus(skillId, (apply ? amount : -amount), permanent))
     {
-        // Revert m_applied assigned in Aura::ApplyModidier
-        m_applied = !apply;
-        return;
+        if (skillId == SKILL_DEFENSE)
+            target->UpdateDefenseBonusesMod();
     }
-
-    int32 points = GetModifier()->m_amount;
-
-    ((Player*)GetTarget())->ModifySkillBonus(prot, (apply ? points : -points), m_modifier.m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
-    if (prot == SKILL_DEFENSE)
-        ((Player*)GetTarget())->UpdateDefenseBonusesMod();
 }
 void Aura::HandleChannelDeathItem(bool apply, bool Real)
 {

@@ -181,7 +181,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
         case CONDITION_SKILL:
         {
             Player const* pPlayer = target->ToPlayer();
-            return (pPlayer->HasSkill(m_value1) && pPlayer->GetBaseSkillValue(m_value1) >= m_value2);
+            return (pPlayer->HasSkill(m_value1) && pPlayer->GetSkillValueBase(m_value1) >= m_value2);
         }
         case CONDITION_QUESTREWARDED:
         {
@@ -333,7 +333,7 @@ bool inline ConditionEntry::Evaluate(WorldObject const* target, Map const* map, 
             if (m_value2 == 1)
                 return !pPlayer->HasSkill(m_value1);
             else
-                return pPlayer->HasSkill(m_value1) && pPlayer->GetBaseSkillValue(m_value1) < m_value2;
+                return pPlayer->HasSkill(m_value1) && pPlayer->GetSkillValueBase(m_value1) < m_value2;
         }
         case CONDITION_REPUTATION_RANK_MAX:
         {
