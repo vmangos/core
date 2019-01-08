@@ -17,14 +17,13 @@
 /* ScriptData
 SDName: Tanaris
 SD%Complete: 80
-SDComment: Quest support: 648, 1560, 2954, 4005, 10277, 10279(Special flight path), 2882. Noggenfogger vendor
+SDComment: Quest support: 1560, 2954, 4005, 10277, 10279(Special flight path), 2882. Noggenfogger vendor
 SDCategory: Tanaris
 EndScriptData */
 
 /* ContentData
 mob_aquementas
 npc_marin_noggenfogger
-npc_oox17tn
 npc_stone_watcher_of_norgannon
 npc_tooga
 go_inconspicuous_landmark
@@ -248,115 +247,6 @@ struct npc_custodian_of_timeAI : public npc_escortAI
 CreatureAI* GetAI_npc_custodian_of_time(Creature* pCreature)
 {
     return new npc_custodian_of_timeAI(pCreature);
-}
-
-/*######
-## npc_oox17tn
-######*/
-
-enum
-{
-    SAY_OOX_START           = -1000287,
-    SAY_OOX_AGGRO1          = -1000288,
-    SAY_OOX_AGGRO2          = -1000289,
-    SAY_OOX_AMBUSH          = -1000290,
-    SAY_OOX17_AMBUSH_REPLY  = -1000291,
-    SAY_OOX_END             = -1000292,
-
-    QUEST_RESCUE_OOX_17TN   = 648,
-
-    NPC_SCORPION            = 7803,
-    NPC_SCOFFLAW            = 7805,
-    NPC_SHADOW_MAGE         = 5617
-};
-
-struct npc_oox17tnAI : npc_escortAI
-{
-    explicit npc_oox17tnAI(Creature* pCreature) : npc_escortAI(pCreature)
-    {
-        npc_oox17tnAI::Reset();
-    }
-
-    void WaypointReached(uint32 i) override
-    {
-        Player* pPlayer = GetPlayerForEscort();
-
-        if (!pPlayer)
-            return;
-
-        switch (i)
-        {
-            //1. Ambush: 3 scorpions
-            case 22:
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
-                m_creature->SummonCreature(NPC_SCORPION, -8340.70f, -4448.17f, 9.17f, 3.10f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3 * MINUTE*IN_MILLISECONDS);
-                m_creature->SummonCreature(NPC_SCORPION, -8343.18f, -4444.35f, 9.44f, 2.35f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3 * MINUTE*IN_MILLISECONDS);
-                m_creature->SummonCreature(NPC_SCORPION, -8348.70f, -4457.80f, 9.58f, 2.02f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3 * MINUTE*IN_MILLISECONDS);
-                break;
-            //2. Ambush: 2 Rogues & 1 Shadow Mage
-            case 32:
-                DoScriptText(SAY_OOX_AMBUSH, m_creature);
-
-                m_creature->SummonCreature(NPC_SCOFFLAW, -7488.02f, -4786.56f, 10.67f, 3.74f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3 * MINUTE*IN_MILLISECONDS);
-                m_creature->SummonCreature(NPC_SHADOW_MAGE, -7486.41f, -4791.55f, 10.54f, 3.26f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3 * MINUTE*IN_MILLISECONDS);
-
-                if (Creature* pCreature = m_creature->SummonCreature(NPC_SCOFFLAW, -7488.47f, -4800.77f, 9.77f, 2.50f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 3 * MINUTE*IN_MILLISECONDS))
-                    DoScriptText(SAY_OOX17_AMBUSH_REPLY, pCreature);
-
-                break;
-            case 44:
-                DoScriptText(SAY_OOX_END, m_creature);
-                // Award quest credit
-                pPlayer->GroupEventHappens(QUEST_RESCUE_OOX_17TN, m_creature);
-                break;
-        }
-    }
-
-    void Reset() override { }
-
-    void Aggro(Unit* /*who*/) override
-    {
-        //For an small probability he say something when it aggros
-        switch (urand(0, 9))
-        {
-            case 0:
-                DoScriptText(SAY_OOX_AGGRO1, m_creature);
-                break;
-            case 1:
-                DoScriptText(SAY_OOX_AGGRO2, m_creature);
-                break;
-        }
-    }
-
-    void JustSummoned(Creature* summoned) override
-    {
-        summoned->AI()->AttackStart(m_creature);
-    }
-};
-
-CreatureAI* GetAI_npc_oox17tn(Creature* pCreature)
-{
-    return new npc_oox17tnAI(pCreature);
-}
-
-bool QuestAccept_npc_oox17tn(Player* pPlayer, Creature* pCreature, const Quest* pQuest)
-{
-    if (pQuest->GetQuestId() == QUEST_RESCUE_OOX_17TN)
-    {
-        DoScriptText(SAY_OOX_START, pCreature);
-
-        pCreature->SetStandState(UNIT_STAND_STATE_STAND);
-
-        if (pPlayer->GetTeam() == ALLIANCE)
-            pCreature->setFaction(FACTION_ESCORT_A_PASSIVE);
-
-        if (pPlayer->GetTeam() == HORDE)
-            pCreature->setFaction(FACTION_ESCORT_H_PASSIVE);
-
-        if (auto pEscortAI = dynamic_cast<npc_oox17tnAI*>(pCreature->AI()))
-            pEscortAI->Start(false, pPlayer->GetGUID(), pQuest);
-    }
-    return true;
 }
 
 /*######
@@ -836,12 +726,6 @@ void AddSC_tanaris()
     newscript = new Script;
     newscript->Name = "mob_aquementas";
     newscript->GetAI = &GetAI_mob_aquementas;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_oox17tn";
-    newscript->GetAI = &GetAI_npc_oox17tn;
-    newscript->pQuestAcceptNPC = &QuestAccept_npc_oox17tn;
     newscript->RegisterSelf();
 
     newscript = new Script;
