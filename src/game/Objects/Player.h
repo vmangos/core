@@ -597,6 +597,7 @@ enum PlayerLoginQueryIndex
     PLAYER_LOGIN_QUERY_LOADMAILS,
     PLAYER_LOGIN_QUERY_LOADMAILEDITEMS,
     PLAYER_LOGIN_QUERY_BATTLEGROUND_DATA,
+    PLAYER_LOGIN_QUERY_FORGOTTEN_SKILLS,
 
     MAX_PLAYER_LOGIN_QUERY
 };
@@ -1297,6 +1298,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void _LoadQuestStatus(QueryResult* result);
         void _LoadGroup(QueryResult* result);
         void _LoadSkills(QueryResult* result);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        void _LoadForgottenSkills(QueryResult* result);
+#endif
         void LoadSkillsFromFields();
         void _LoadSpells(QueryResult* result);
         bool _LoadHomeBind(QueryResult* result);
@@ -1587,6 +1591,9 @@ class MANGOS_DLL_SPEC Player final: public Unit
         void UpdateOldRidingSkillToNew(bool has_epic_mount);
         void UpdateSkillsForLevel();
         SkillStatusMap mSkillStatus;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
+        std::unordered_map<uint16, uint16> m_mForgottenSkills;
+#endif
     public:
         uint32 GetFreePrimaryProfessionPoints() const { return GetUInt32Value(PLAYER_CHARACTER_POINTS2); }
         void SetFreePrimaryProfessions(uint16 profs) { SetUInt32Value(PLAYER_CHARACTER_POINTS2, profs); }
