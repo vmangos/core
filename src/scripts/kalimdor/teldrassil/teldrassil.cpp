@@ -135,7 +135,10 @@ bool QuestAccept_npc_mist(Player* pPlayer, Creature* pCreature, const Quest* pQu
     if (pQuest->GetQuestId() == QUEST_MIST)
     {
         if (npc_mistAI* pMistAI = dynamic_cast<npc_mistAI*>(pCreature->AI()))
+        {
+            pCreature->SetFactionTemporary(FACTION_DARNASSUS, TEMPFACTION_RESTORE_RESPAWN);
             pMistAI->StartFollow(pPlayer, FACTION_DARNASSUS, pQuest);
+        } 
     }
 
     return true;
