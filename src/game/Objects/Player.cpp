@@ -6305,7 +6305,12 @@ int32 Player::CalculateReputationGain(ReputationSource source, int32 rep, int32 
 //Calculates how many reputation points player gains in victim's enemy factions
 void Player::RewardReputation(Unit *pVictim, float rate)
 {
-    if (!pVictim || pVictim->GetTypeId() == TYPEID_PLAYER)
+    if (!pVictim || pVictim->IsPlayer())
+        return;
+
+    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+    // - Pets no longer modify your reputation if you kill them.
+    if (pVictim->IsPet() && sWorld.GetWowPatch() >= WOW_PATCH_110)
         return;
 
     ReputationOnKillEntry const* Rep = sObjectMgr.GetReputationOnKillEntry(((Creature*)pVictim)->GetEntry());
