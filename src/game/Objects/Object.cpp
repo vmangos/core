@@ -2630,17 +2630,17 @@ void WorldObject::GetFirstCollision(float dist, float angle, float &x, float &y,
 
 bool Object::IsPet() const
 {
-    return IsCreature() && ToCreature()->IsPet();
+    return IsCreature() && static_cast<Creature const*>(this)->IsPet();
 }
 
 Pet const* Object::ToPet() const
 {
-    return IsPet() ? (Pet const*)this : NULL;
+    return IsPet() ? static_cast<Pet const*>(this) : nullptr;
 }
 
 Pet* Object::ToPet()
 {
-    return IsPet() ? (Pet*)this : NULL;
+    return IsPet() ? static_cast<Pet*>(this) : nullptr;
 }
 
 bool WorldObject::PrintCoordinatesError(float x, float y, float z, char const* descr) const
