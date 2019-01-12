@@ -5179,7 +5179,7 @@ SpellCastResult Spell::CheckCast(bool strict)
      */
 
     uint32 spellCat = m_spellInfo->Category;
-    if (m_IsCastByItem)
+    if (m_CastItem))
     {
         // Find correct item category matching the current spell on item
         // used when item spells have custom categories due to wrong category
