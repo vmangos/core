@@ -822,6 +822,7 @@ class MANGOS_DLL_SPEC WorldSession
         void HandleQuestPushResult(WorldPacket& recvPacket);
 
         bool ProcessChatMessageAfterSecurityCheck(std::string&, uint32, uint32);
+        static bool IsLanguageAllowedForChatType(uint32 lang, uint32 msgType);
         void SendPlayerNotFoundNotice(std::string name);
         void SendWrongFactionNotice();
         void SendChatRestrictedNotice();
