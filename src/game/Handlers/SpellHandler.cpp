@@ -314,6 +314,24 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         }
     }
 
+    // client provided targets
+    SpellCastTargets targets;
+
+    recvPacket >> targets.ReadForCaster(_player);
+
+    // auto-selection buff level base at target level (in spellInfo)
+    if (Unit* target = targets.getUnitTarget())
+    {
+        // Cannot cast negative spells on yourself. Handle it here since casting negative
+        // spells on yourself is frequently used within the core itself for certain mechanics.
+        if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !IsPositiveSpell(spellInfo, _player, target))
+            return;
+
+        // if rank not found then function return NULL but in explicit cast case original spell can be casted and later failed with appropriate error message
+        if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->getLevel()))
+            spellInfo = actualSpellInfo;
+    }
+
     // World of Warcraft Client Patch 1.10.0 (2006-03-28)
     // - Stealth and Invisibility effects will now be canceled at the
     //   beginning of an action(spellcast, ability use etc...), rather than
@@ -323,19 +341,6 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
     // it remains until cast finish
     _player->RemoveAurasWithInterruptFlags(AURA_INTERRUPT_FLAG_ON_CAST_SPELL, 4079);
 #endif
-
-    // client provided targets
-    SpellCastTargets targets;
-
-    recvPacket >> targets.ReadForCaster(_player);
-
-    // auto-selection buff level base at target level (in spellInfo)
-    if (Unit* target = targets.getUnitTarget())
-    {
-        // if rank not found then function return NULL but in explicit cast case original spell can be casted and later failed with appropriate error message
-        if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->getLevel()))
-            spellInfo = actualSpellInfo;
-    }
 
     _player->m_castingSpell = spellId;
     if (spellInfo->SpellFamilyName == SPELLFAMILY_ROGUE)
