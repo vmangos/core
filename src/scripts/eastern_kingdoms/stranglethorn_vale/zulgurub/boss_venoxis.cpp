@@ -123,19 +123,30 @@ struct boss_venoxisAI : public ScriptedAI
             m_pInstance->SetData(TYPE_VENOXIS, IN_PROGRESS);
     }
 
+    void EnterEvadeMode()
+    {
+        // Despawn snakes immediately when we're running home.
+        std::list<Creature*> cobras;
+        GetCreatureListWithEntryInGrid(cobras, m_creature, NPC_RAZZASHI_COBRA, DEFAULT_VISIBILITY_INSTANCE);
+        for (auto it = cobras.cbegin(); it != cobras.cend(); ++it)
+            (*it)->ForcedDespawn();
+        
+        ScriptedAI::EnterEvadeMode();
+    }
+
     void JustReachedHome()
     {
-        std::list<Creature*> m_lCobras;
-        GetCreatureListWithEntryInGrid(m_lCobras, m_creature, NPC_RAZZASHI_COBRA, DEFAULT_VISIBILITY_INSTANCE);
+        // Respawn snakes
+        std::list<Creature*> cobras;
+        GetCreatureListWithEntryInGrid(cobras, m_creature, NPC_RAZZASHI_COBRA, DEFAULT_VISIBILITY_INSTANCE);
 
-        if (m_lCobras.empty())
-            sLog.outDebug("boss_venoxis, no Cobras with the entry %u were found", NPC_RAZZASHI_COBRA);
-        else
+        if (!cobras.empty())
         {
-            for (std::list<Creature*>::iterator iter = m_lCobras.begin(); iter != m_lCobras.end(); ++iter)
+            for (auto iter = cobras.cbegin(); iter != cobras.cend(); ++iter)
             {
-                if ((*iter) && !(*iter)->isAlive())
-                    (*iter)->Respawn();
+                auto cobra = *iter;
+                if (cobra && !cobra->isAlive())
+                    cobra->Respawn();
             }
         }
 
@@ -148,7 +159,7 @@ struct boss_venoxisAI : public ScriptedAI
         DoScriptText(SAY_DEATH, m_creature);
         m_creature->CastSpell(m_creature, SPELL_POISON_CLOUD, true);
 
-        m_creature->SetRespawnDelay(432000);
+        m_creature->SetFloatValue(OBJECT_FIELD_SCALE_X, m_fDefaultSize);
 
         if (m_pInstance)
             m_pInstance->SetData(TYPE_VENOXIS, DONE);
@@ -165,15 +176,7 @@ struct boss_venoxisAI : public ScriptedAI
         if (m_creature->GetPositionZ() > 43.0f || m_creature->GetPositionZ() < 27.0f)
         {
             EnterEvadeMode();
-
-            std::list<Creature*> m_CobraList;
-            GetCreatureListWithEntryInGrid(m_CobraList, m_creature, 11373, 300.0f);
-            for (std::list<Creature*>::iterator it = m_CobraList.begin(); it != m_CobraList.end(); ++it)
-                (*it)->ForcedDespawn();
-            m_CobraList.clear();
-
-            m_creature->ForcedDespawn();
-            m_creature->SetRespawnDelay(300);
+            return;
         }
 
         // Handle phase change
@@ -280,10 +283,11 @@ struct boss_venoxisAI : public ScriptedAI
         }
 
         // FRENZY
-        if (!bFrenzy)
-            if (m_creature->GetHealthPercent() < 20.0f)
-                if (DoCastSpellIfCan(m_creature, SPELL_FRENZY, CF_AURA_NOT_PRESENT) == CAST_OK)
-                    bFrenzy = true;
+        if (!bFrenzy && m_creature->GetHealthPercent() < 20.0f)
+        {
+            if (DoCastSpellIfCan(m_creature, SPELL_FRENZY, CF_AURA_NOT_PRESENT) == CAST_OK)
+                bFrenzy = true;
+        }
 
         DoMeleeAttackIfReady();
     }
