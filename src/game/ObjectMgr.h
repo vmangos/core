@@ -488,7 +488,7 @@ enum PermVariables
     VAR_PERM_4      = 30007,
 
     DEF_ALIVE_COUNT = 4,        // default alive dragons count for VAR_ALIVE_COUNT
-    DEF_STOP_DELAY  = 5,        // default times event check will not stop the event
+    DEF_STOP_DELAY  = 20,       // default times event check will not stop the event
 
     NPC_YSONDRE     = 14887,
     NPC_LETHON      = 14888,
