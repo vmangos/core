@@ -528,7 +528,15 @@ class MANGOS_DLL_SPEC Creature : public Unit
         bool IsCivilian() const { return GetCreatureInfo()->civilian; }
         bool IsTrigger() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INVISIBLE; }
         bool IsGuard() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_GUARD; }
+
+        // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+        // - Area effect spells and abilities will no longer consider totems as
+        //   valid targets.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         bool IsImmuneToAoe() const { return IsTotem() || GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_IMMUNE_AOE; }
+#else
+        bool IsImmuneToAoe() const { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_IMMUNE_AOE; }
+#endif
 
         bool CanWalk() const override { return GetCreatureInfo()->InhabitType & INHABIT_GROUND; }
         bool CanSwim() const override { return IsPet() || GetCreatureInfo()->InhabitType & INHABIT_WATER; }
