@@ -536,6 +536,7 @@ class MANGOS_DLL_SPEC Aura
         void PeriodicTick(SpellEntry const* sProto = nullptr, AuraType auraType = SPELL_AURA_NONE, uint32 data = 0);
         void PeriodicDummyTick();
 
+        uint32 CalculateDotDamage() const;
         void ReapplyAffectedPassiveAuras();
 
         Modifier m_modifier;

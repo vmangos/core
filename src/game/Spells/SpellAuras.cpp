@@ -4019,6 +4019,76 @@ void Aura::HandlePeriodicHeal(bool apply, bool /*Real*/)
     }
 }
 
+uint32 Aura::CalculateDotDamage() const
+{
+    Unit* target = GetTarget();
+    Unit* caster = GetCaster();
+    SpellEntry const* spellProto = GetSpellProto();
+
+    uint32 damage = m_modifier.m_amount;
+
+    switch (spellProto->SpellFamilyName)
+    {
+        case SPELLFAMILY_DRUID:
+        {
+            // Rip
+            if (spellProto->IsFitToFamilyMask<CF_DRUID_RIP_BITE>())
+            {
+                // $AP * min(0.06*$cp, 0.24)/6 [Yes, there is no difference, whether 4 or 5 CPs are being used]
+                if (caster->GetTypeId() == TYPEID_PLAYER)
+                {
+                    uint8 cp = ((Player*)caster)->GetComboPoints();
+
+                    if (cp > 4) cp = 4;
+                    damage += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100);
+                }
+            }
+            break;
+        }
+        case SPELLFAMILY_ROGUE:
+        {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
+            // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+            // - Rupture: Rupture now increases in potency with greater attack power.
+            if (spellProto->IsFitToFamilyMask<CF_ROGUE_RUPTURE>())
+            {
+                // Dmg/tick = $AP*min(0.01*$cp, 0.03) [Like Rip: only the first three CP increase the contribution from AP]
+                if (caster->GetTypeId() == TYPEID_PLAYER)
+                {
+                    uint8 cp = ((Player*)caster)->GetComboPoints();
+                    if (cp > 3) cp = 3;
+                    damage += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100);
+                }
+            }
+#elif SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
+            // World of Warcraft Client Patch 1.12.0 (2006-08-22)
+            // - Garrote: The damage from this ability has been increased. In
+            //   addition, Garrote now increases in potency with greater attack power.
+            if (spellProto->IsFitToFamilyMask<CF_ROGUE_GARROTE>())
+                return damage;
+#endif
+            break;
+        }
+        default:
+            break;
+    }
+
+    if (m_modifier.m_auraname == SPELL_AURA_PERIODIC_DAMAGE)
+    {
+        // SpellDamageBonusDone for magic spells
+        if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
+            damage = caster->SpellDamageBonusDone(target, GetSpellProto(), damage, DOT, GetStackAmount());
+        // MeleeDamagebonusDone for weapon based spells
+        else
+        {
+            WeaponAttackType attackType = GetWeaponAttackType(GetSpellProto());
+            damage = caster->MeleeDamageBonusDone(target, damage, attackType, GetSpellProto(), DOT, GetStackAmount());
+        }
+    }
+
+    return damage;
+}
+
 void Aura::HandlePeriodicDamage(bool apply, bool Real)
 {
     // spells required only Real aura add/remove
@@ -4027,6 +4097,10 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
 
     m_isPeriodic = apply;
 
+    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+    // - Damage over time spells are no longer affected by changes in
+    //   equipment after the cast.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     Unit *target = GetTarget();
     SpellEntry const* spellProto = GetSpellProto();
 
@@ -4039,69 +4113,12 @@ void Aura::HandlePeriodicDamage(bool apply, bool Real)
         if (loading)
             return;
 
-        Unit *caster = GetCaster();
-        if (!caster)
+        if (!GetCaster())
             return;
 
-        switch (spellProto->SpellFamilyName)
-        {
-            case SPELLFAMILY_DRUID:
-            {
-                // Rip
-                if (spellProto->IsFitToFamilyMask<CF_DRUID_RIP_BITE>())
-                {
-                    // $AP * min(0.06*$cp, 0.24)/6 [Yes, there is no difference, whether 4 or 5 CPs are being used]
-                    if (caster->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        uint8 cp = ((Player*)caster)->GetComboPoints();
-
-                        if (cp > 4) cp = 4;
-                        m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100);
-                    }
-                }
-                break;
-            }
-            case SPELLFAMILY_ROGUE:
-            {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_11_2
-                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
-                // - Rupture: Rupture now increases in potency with greater attack power.
-                if (spellProto->IsFitToFamilyMask<CF_ROGUE_RUPTURE>())
-                {
-                    // Dmg/tick = $AP*min(0.01*$cp, 0.03) [Like Rip: only the first three CP increase the contribution from AP]
-                    if (caster->GetTypeId() == TYPEID_PLAYER)
-                    {
-                        uint8 cp = ((Player*)caster)->GetComboPoints();
-                        if (cp > 3) cp = 3;
-                        m_modifier.m_amount += int32(caster->GetTotalAttackPowerValue(BASE_ATTACK) * cp / 100);
-                    }
-                }
-#elif SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_11_2
-                // World of Warcraft Client Patch 1.12.0 (2006-08-22)
-                // - Garrote: The damage from this ability has been increased. In
-                //   addition, Garrote now increases in potency with greater attack power.
-                if (spellProto->IsFitToFamilyMask<CF_ROGUE_GARROTE>())
-                    return;
-#endif
-                break;
-            }
-            default:
-                break;
-        }
-
-        if (m_modifier.m_auraname == SPELL_AURA_PERIODIC_DAMAGE)
-        {
-            // SpellDamageBonusDone for magic spells
-            if (spellProto->DmgClass == SPELL_DAMAGE_CLASS_NONE || spellProto->DmgClass == SPELL_DAMAGE_CLASS_MAGIC)
-                m_modifier.m_amount = caster->SpellDamageBonusDone(target, GetSpellProto(), m_modifier.m_amount, DOT, GetStackAmount());
-            // MeleeDamagebonusDone for weapon based spells
-            else
-            {
-                WeaponAttackType attackType = GetWeaponAttackType(GetSpellProto());
-                m_modifier.m_amount = caster->MeleeDamageBonusDone(target, m_modifier.m_amount, attackType, GetSpellProto(), DOT, GetStackAmount());
-            }
-        }
+        m_modifier.m_amount = CalculateDotDamage();
     }
+#endif
 }
 
 void Aura::HandlePeriodicDamagePCT(bool apply, bool /*Real*/)
@@ -5321,30 +5338,26 @@ void Aura::PeriodicTick(SpellEntry const* sProto, AuraType auraType, uint32 data
 
             uint32 absorb = 0;
             uint32 resist = 0;
-            CleanDamage cleanDamage = CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
-
-            // ignore non positive values (can be result apply spellmods to aura damage
-            uint32 amount = 0;
-            if (!sProto)
-                amount = m_modifier.m_amount > 0 ? m_modifier.m_amount : 0;
-            else
-                amount = data;
-
             uint32 pdamage;
+            CleanDamage cleanDamage = CleanDamage(0, BASE_ATTACK, MELEE_HIT_NORMAL, 0, 0);
 
             if (sProto)
             {
                 if (auraType == SPELL_AURA_PERIODIC_DAMAGE)
-                    pdamage = amount;
+                    pdamage = data;
                 else
-                    pdamage = uint32(target->GetMaxHealth() * amount / 100);
+                    pdamage = uint32(target->GetMaxHealth() * data / 100);
             }
             else
             {
                 if (m_modifier.m_auraname == SPELL_AURA_PERIODIC_DAMAGE)
-                    pdamage = amount;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+                    pdamage = (m_modifier.m_amount > 0 ? m_modifier.m_amount : 0);
+#else
+                    pdamage = CalculateDotDamage();
+#endif
                 else
-                    pdamage = uint32(target->GetMaxHealth() * amount / 100);
+                    pdamage = uint32(target->GetMaxHealth() * (m_modifier.m_amount > 0 ? m_modifier.m_amount : 0) / 100);
             }
 
             // Consecration: recalculate the damage on each tick
