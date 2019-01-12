@@ -1104,9 +1104,12 @@ void Pet::Unsummon(PetSaveMode mode, Unit* owner /*= NULL*/)
         }
     }
 
-    // If we're being charmed, remove the charm
-    if (Unit* charmer = GetUnit(*this, GetCharmerGuid()))
-        charmer->RemoveCharmAuras();
+    // If we're being charmed, remove the charm. Note that we remove the
+    // charm on us, not the charmer. The charmer may in fact be under a
+    // charm themselves, and in cancelling this charm calling this method.
+    // Cancelling the parent charm = crash.
+    if (GetCharmerGuid())
+        RemoveCharmAuras();
 
     // If we're being possessed, remove the possesion. If we don't, and the caster
     // is a player, they are left with a dangling pointer for Player::m_mover
