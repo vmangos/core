@@ -2614,10 +2614,18 @@ void Aura::HandleAuraModSkill(bool apply, bool /*Real*/)
     if (GetTarget()->GetTypeId() != TYPEID_PLAYER)
         return;
 
-    Player* target = static_cast<Player*>(GetTarget());
-
-    Modifier const* mod = GetModifier();
     const uint16 skillId = uint16(GetSpellProto()->EffectMiscValue[m_effIndex]);
+
+    // Can't modify an unknown skill
+    if (!GetTarget()->ToPlayer()->HasSkill(skillId))
+    {
+        // Revert m_applied assigned in Aura::ApplyModidier
+        m_applied = !apply;
+        return;
+    }
+
+    Player* target = static_cast<Player*>(GetTarget());
+    Modifier const* mod = GetModifier();
     const int16 amount = int16(mod->m_amount);
     const bool permanent = (mod->m_auraname == SPELL_AURA_MOD_SKILL_TALENT);
 
