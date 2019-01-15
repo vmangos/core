@@ -25,10 +25,10 @@
 #include "CreatureAI.h"
 #include "ObjectGuid.h"
 #include "Timer.h"
+#include "Totem.h"
 
 class Creature;
 class Totem;
-enum TotemType;
 
 enum
 {
