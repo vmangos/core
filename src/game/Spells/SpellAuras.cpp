@@ -3790,16 +3790,6 @@ void Aura::HandleModMechanicImmunity(bool apply, bool /*Real*/)
         target->RemoveAurasAtMechanicImmunity(1 << (misc - 1), GetId());
 
     target->ApplySpellImmune(GetId(), IMMUNITY_MECHANIC, misc, apply);
-
-    // re-apply Fear Ward if it was not wasted during Bersereker Rage
-    if (!apply && GetSpellProto()->IsFitToFamily<SPELLFAMILY_WARRIOR, CF_WARRIOR_BERSERKER_RAGE>())
-    {
-        if (target->HasAura(6346))
-        {
-            auto aura = target->GetAura(6346, EFFECT_INDEX_0);
-            aura->HandleModMechanicImmunity(true, true);
-        }
-    }
 }
 
 void Aura::HandleModMechanicImmunityMask(bool apply, bool /*Real*/)

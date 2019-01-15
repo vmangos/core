@@ -344,8 +344,22 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
             return false;
         }
     }
+
     // Get proc Event Entry
     spellProcEvent = sSpellMgr.GetSpellProcEvent(spellProto->Id);
+
+    // Custom hard-coded cases which depend on the proc event for firing...
+    if (procSpell)
+    {
+        // Fear Ward always procs on any Fear
+        if (spellProto->Id == 6346)
+        {
+            if (procSpell->Mechanic == MECHANIC_FEAR)
+                return true;
+
+            return false;
+        }
+    }
 
     // Get EventProcFlag
     uint32 EventProcFlag;
