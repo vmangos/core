@@ -29,8 +29,7 @@
 #include "GridNotifiersImpl.h"
 #include "CellImpl.h"
 
-int
-TotemAI::Permissible(const Creature *creature)
+int TotemAI::Permissible(const Creature *creature)
 {
     if (creature->IsTotem())
         return PERMIT_BASE_PROACTIVE;
@@ -41,72 +40,69 @@ TotemAI::Permissible(const Creature *creature)
 TotemAI::TotemAI(Creature *c) : CreatureAI(c)
 {
     c->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+
+    if (Totem const* pTotem = c->ToTotem())
+    {
+        m_spellId = pTotem->GetSpell();
+        m_totemType = pTotem->GetTotemType();
+    }  
+    else
+    {
+        m_spellId = m_creature->GetCreatureInfo()->spells[0];
+        SpellEntry const* totemSpell = sSpellMgr.GetSpellEntry(m_spellId);
+        if (totemSpell && GetSpellCastTime(totemSpell))
+            m_totemType = TOTEM_ACTIVE;
+        else
+        {
+            m_totemType = TOTEM_PASSIVE;
+
+            if (totemSpell && IsSpellAppliesAura(totemSpell))
+                c->CastSpell(c, totemSpell, true);
+        }
+            
+    }
 }
 
-void
-TotemAI::MoveInLineOfSight(Unit *)
+void TotemAI::UpdateAI(const uint32 /*diff*/)
 {
-}
-
-void
-TotemAI::UpdateAI(const uint32 /*diff*/)
-{
-    if (getTotem().GetTotemType() != TOTEM_ACTIVE)
+    if (m_totemType != TOTEM_ACTIVE)
         return;
 
     if (!m_creature->isAlive() || m_creature->IsNonMeleeSpellCasted(false))
         return;
 
-    // Search spell
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(getTotem().GetSpell());
+    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(m_spellId);
     if (!spellInfo)
         return;
 
-    // Get spell rangy
     SpellRangeEntry const* srange = sSpellRangeStore.LookupEntry(spellInfo->rangeIndex);
     float max_range = GetSpellMaxRange(srange);
 
-    // SPELLMOD_RANGE not applied in this place just because nonexistent range mods for attacking totems
-
-    // pointer to appropriate target if found any
-    Unit* victim = m_creature->GetMap()->GetUnit(i_victimGuid);
+    Unit* victim = m_creature->GetMap()->GetUnit(m_victimGuid);
     Unit* owner = m_creature->GetCharmerOrOwner();
 
-    // Check owner's attackers for victims
+    // Check owner's attackers for targets.
     if (!victim && owner)
         victim = owner->getAttackerForHelper();
 
-    // Search victim if no, not attackable, or out of range, or friendly (possible in case duel end)
+    // Search for another target if current is invalid.
     if (!victim || !m_creature->IsWithinDistInMap(victim, max_range) ||
             !m_creature->IsValidAttackTarget(victim) || !victim->isVisibleForOrDetect(m_creature, m_creature, false))
     {
-        victim = NULL;
+        victim = nullptr;
 
         MaNGOS::NearestAttackableUnitInObjectRangeCheck u_check(m_creature, m_creature, owner, max_range);
         MaNGOS::UnitLastSearcher<MaNGOS::NearestAttackableUnitInObjectRangeCheck> checker(victim, u_check);
         Cell::VisitAllObjects(m_creature, checker, max_range);
     }
 
-    // If have target
     if (victim)
     {
-        // remember
-        i_victimGuid = victim->GetObjectGuid();
+        m_victimGuid = victim->GetObjectGuid();
 
-        // attack
         m_creature->SetInFront(victim);                      // client change orientation by self
-        m_creature->CastSpell(victim, getTotem().GetSpell(), false);
+        m_creature->CastSpell(victim, m_spellId, false);
     }
     else
-        i_victimGuid.Clear();
-}
-
-void
-TotemAI::AttackStart(Unit *)
-{
-}
-
-Totem& TotemAI::getTotem()
-{
-    return static_cast<Totem&>(*m_creature);
+        m_victimGuid.Clear();
 }
