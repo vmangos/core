@@ -37,11 +37,11 @@ int TotemAI::Permissible(const Creature *creature)
     return PERMIT_BASE_NO;
 }
 
-TotemAI::TotemAI(Creature *c) : CreatureAI(c)
+TotemAI::TotemAI(Creature *pCreature) : CreatureAI(pCreature)
 {
-    c->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
+    pCreature->addUnitState(UNIT_STAT_IGNORE_MOVE_LOS);
 
-    if (Totem const* pTotem = c->ToTotem())
+    if (Totem const* pTotem = pCreature->ToTotem())
     {
         m_spellId = pTotem->GetSpell();
         m_totemType = pTotem->GetTotemType();
@@ -57,7 +57,7 @@ TotemAI::TotemAI(Creature *c) : CreatureAI(c)
             m_totemType = TOTEM_PASSIVE;
 
             if (totemSpell && IsSpellAppliesAura(totemSpell))
-                c->CastSpell(c, totemSpell, true);
+                pCreature->CastSpell(pCreature, totemSpell, true);
         }
             
     }
