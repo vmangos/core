@@ -17049,6 +17049,7 @@ void Player::UnsummonPossessedMinion()
     GetCamera().ResetView();
     RemovePetActionBar();
     SendForcedObjectUpdate();
+    ResummonPetTemporaryUnSummonedIfAny();
 
     if (!pMinion)
         return;
