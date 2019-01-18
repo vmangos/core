@@ -325,7 +325,14 @@ void WorldSession::HandleCastSpellOpcode(WorldPacket& recvPacket)
         // Cannot cast negative spells on yourself. Handle it here since casting negative
         // spells on yourself is frequently used within the core itself for certain mechanics.
         if (target == _player && IsExplicitlySelectedUnitTarget(spellInfo->EffectImplicitTargetA[0]) && !IsPositiveSpell(spellInfo, _player, target))
+        {
+            WorldPacket data(SMSG_CAST_RESULT, (4 + 1 + 1));
+            data << uint32(spellId);
+            data << uint8(2); // status = fail
+            data << uint8(SPELL_FAILED_BAD_TARGETS);
+            SendPacket(&data);
             return;
+        }
 
         // if rank not found then function return NULL but in explicit cast case original spell can be casted and later failed with appropriate error message
         if (SpellEntry const *actualSpellInfo = sSpellMgr.SelectAuraRankForLevel(spellInfo, target->getLevel()))
