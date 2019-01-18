@@ -3448,7 +3448,7 @@ bool Player::IsNeedCastPassiveLikeSpellAtLearn(SpellEntry const* spellInfo) cons
     return need_cast && (!spellInfo->CasterAuraState || HasAuraState(AuraState(spellInfo->CasterAuraState)));
 }
 
-void Player::LearnSpell(uint32 spell_id, bool dependent)
+void Player::LearnSpell(uint32 spell_id, bool dependent, bool talent)
 {
     PlayerSpellMap::iterator itr = m_spells.find(spell_id);
 
@@ -3465,14 +3465,14 @@ void Player::LearnSpell(uint32 spell_id, bool dependent)
         GetSession()->SendPacket(&data);
     }
 
-    // learn all disabled higher ranks (recursive)
-    if (disabled)
+    // learn all disabled higher ranks (recursive) - skip for talent spells
+    if (disabled || talent)
     {
         SpellChainMapNext const& nextMap = sSpellMgr.GetSpellChainNext();
         for (SpellChainMapNext::const_iterator i = nextMap.lower_bound(spell_id); i != nextMap.upper_bound(spell_id); ++i)
         {
             PlayerSpellMap::iterator iter = m_spells.find(i->second);
-            if (disabled && iter != m_spells.end() && iter->second.disabled)
+            if (iter != m_spells.end() && iter->second.disabled)
                 LearnSpell(i->second, false);
         }
     }
@@ -3557,7 +3557,7 @@ void Player::RemoveSpell(uint32 spell_id, bool disabled, bool learn_low_rank)
             SetFreePrimaryProfessions(freeProfs);
     }
 
-    // remove dependent skill
+    // remove dependent skills
     UpdateSpellTrainedSkills(spell_id, false);
 
     // activate lesser rank in spellbook/action bar, and cast it if need
@@ -20004,7 +20004,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
     // Check if it requires another talent
     if (talentInfo->DependsOn > 0)
     {
-        if (TalentEntry const *depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
+        if (TalentEntry const* depTalentInfo = sTalentStore.LookupEntry(talentInfo->DependsOn))
         {
             bool hasEnoughRank = false;
             for (int i = talentInfo->DependsOnRank; i < MAX_TALENT_RANK; ++i)
@@ -20033,7 +20033,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         for (unsigned int i = 0; i < numRows; ++i)          // Loop through all talents.
         {
             // Someday, someone needs to revamp
-            const TalentEntry *tmpTalent = sTalentStore.LookupEntry(i);
+            const TalentEntry* tmpTalent = sTalentStore.LookupEntry(i);
             if (tmpTalent)                                  // the way talents are tracked
             {
                 if (tmpTalent->TalentTab == tTab)
@@ -20068,7 +20068,7 @@ void Player::LearnTalent(uint32 talentId, uint32 talentRank)
         return;
 
     // learn! (other talent ranks will unlearned at learning)
-    LearnSpell(spellid, false);
+    LearnSpell(spellid, false, true);
     DETAIL_LOG("TalentID: %u Rank: %u Spell: %u\n", talentId, talentRank, spellid);
 }
 
