@@ -662,6 +662,7 @@ class MANGOS_DLL_SPEC Map : public GridRefManager<NGridType>, public MaNGOS::Obj
         GameObject* SummonGameObject(uint32 entry, float x, float y, float z, float ang, float rotation0, float rotation1, float rotation2, float rotation3, uint32 respawnTime, uint32 worldMask);
 
         bool ShouldUpdateMap(uint32 now, uint32 inactiveTimeLimit);
+        void RemoveBones(Corpse* corpse);
 
     private:
         void LoadMapAndVMap(int gx, int gy);
