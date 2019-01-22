@@ -123,6 +123,11 @@ ConfVersion=2010062001
 #        Blocks account logins when a change in geographical location is detected
 #        Default: 0
 #
+#    StrictVersionCheck
+#        Description: Prevent modified clients from connnecting
+#        Default: 1 - (Enabled)
+#                 0 - (Disabled)
+#
 #    SendMail
 #        Whether the server is allowed to send emails
 #        The server must have been compiled with USE_SENDGRID
@@ -170,6 +175,7 @@ WrongPass.BanType = 0
 ReqEmailVerification = 0
 ReqEmailSince = 0
 GeoLocking = 0
+StrictVersionCheck = 1
 SendMail = 0
 MailFrom = ""
 MailCertChecks = 1

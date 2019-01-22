@@ -129,7 +129,7 @@ typedef struct AUTH_LOGON_PROOF_S
     uint8   M2[20];
     uint32  accountFlags;                                   // see enum AccountFlags
     uint32  surveyId;                                       // SurveyId
-    uint16  unkFlags;                                       // some flags (AccountMsgAvailable = 0x01)
+    uint16  LoginFlags;                                     // some flags (AccountMsgAvailable = 0x01)
 } sAuthLogonProof_S;
 
 typedef struct AUTH_LOGON_PROOF_S_BUILD_6005
@@ -175,6 +175,8 @@ typedef struct AuthHandler
 #endif
 
 #define AUTH_TOTAL_COMMANDS sizeof(table)/sizeof(AuthHandler)
+
+std::array<uint8, 16> VersionChallenge = { { 0xBA, 0xA3, 0x1E, 0x99, 0xA0, 0x0B, 0x21, 0x57, 0xFC, 0x37, 0x3F, 0xB3, 0x69, 0xCD, 0xD2, 0xF1 } };
 
 /// Constructor - set the N and g values for SRP6
 AuthSocket::AuthSocket() : gridSeed(0), promptPin(false), _accountId(0), _lastRealmListRequest(0),
@@ -337,7 +339,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
             proof.error = 0;
             proof.accountFlags = ACCOUNT_FLAG_PROPASS;
             proof.surveyId = 0x00000000;
-            proof.unkFlags = 0x0000;
+            proof.LoginFlags = 0x0000;
 
             send((char *)&proof, sizeof(proof));
             break;
@@ -528,9 +530,6 @@ bool AuthSocket::_HandleLogonChallenge()
 
                     MANGOS_ASSERT(gmod.GetNumBytes() <= 32);
 
-                    BigNumber unk3;
-                    unk3.SetRand(16 * 8);
-
                     ///- Fill the response packet with the result
                     pkt << uint8(WOW_SUCCESS);
 
@@ -541,7 +540,7 @@ bool AuthSocket::_HandleLogonChallenge()
                     pkt << uint8(32);
                     pkt.append(N.AsByteArray(32));
                     pkt.append(s.AsByteArray());        // 32 bytes
-                    pkt.append(unk3.AsByteArray(16));
+                    pkt.append(VersionChallenge.data(), VersionChallenge.size());
 
                     // figure out whether we need to display the PIN grid
                     promptPin = locked; // always prompt if the account is IP locked & 2FA is enabled
@@ -801,12 +800,16 @@ bool AuthSocket::_HandleLogonProof()
         }
     }
 
-    // reject credentials on unexpected build to confuse custom client authors
-    auto const approvedBuild = (_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX);
-
     ///- Check if SRP6 results match (password is correct), else send an error
-    if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult && approvedBuild)
+    if (!memcmp(M.AsByteArray().data(), lp.M1, 20) && pinResult)
     {
+        if (!VerifyVersion(lp.A, sizeof(lp.A), lp.crc_hash, false))
+        {
+            char data[2] = { CMD_AUTH_LOGON_PROOF, WOW_FAIL_VERSION_INVALID };
+            send(data, sizeof(data));
+            return true;
+        }
+
         // Geolocking checks must be done after an otherwise successful login to prevent lockout attacks
         if (_geoUnlockPIN) // remove the PIN to unlock the account since login succeeded
         {
@@ -1007,7 +1010,7 @@ bool AuthSocket::_HandleReconnectChallenge()
     pkt << (uint8)  0x00;
     _reconnectProof.SetRand(16 * 8);
     pkt.append(_reconnectProof.AsByteArray(16));            // 16 bytes random
-    pkt << (uint64) 0x00 << (uint64) 0x00;                  // 16 bytes zeros
+    pkt.append(VersionChallenge.data(), VersionChallenge.size());
     send((char const*)pkt.contents(), pkt.size());
     return true;
 }
@@ -1038,10 +1041,19 @@ bool AuthSocket::_HandleReconnectProof()
 
     if (!memcmp(sha.GetDigest(), lp.R2, SHA_DIGEST_LENGTH))
     {
+        if (!VerifyVersion(lp.R1, sizeof(lp.R1), lp.R3, true))
+        {
+            ByteBuffer pkt;
+            pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
+            pkt << uint8(WOW_FAIL_VERSION_INVALID);
+            send((char const*)pkt.contents(), pkt.size());
+            return true;
+        }
+
         ///- Sending response
         ByteBuffer pkt;
-        pkt << (uint8)  CMD_AUTH_RECONNECT_PROOF;
-        pkt << (uint8)  0x00;
+        pkt << uint8(CMD_AUTH_RECONNECT_PROOF);
+        pkt << uint8(WOW_SUCCESS);
         send((char const*)pkt.contents(), pkt.size());
 
         ///- Set _status to authed!
@@ -1504,4 +1516,42 @@ bool AuthSocket::GeographicalLockCheck()
     {
         return country_geoname_id != prev_country_geoname_id;
     }
+}
+
+bool AuthSocket::VerifyVersion(uint8 const* a, int32 aLength, uint8 const* versionProof, bool isReconnect)
+{
+    if (!sConfig.GetBoolDefault("StrictVersionCheck", false))
+        return true;
+
+    std::array<uint8, 20> zeros = { {} };
+    std::array<uint8, 20> const* versionHash = nullptr;
+    if (!isReconnect)
+    {
+        if (!((_platform == X86 || _platform == PPC) && (_os == Win || _os == OSX)))
+            return false;
+
+        RealmBuildInfo const* buildInfo = FindBuildInfo(_build);
+        if (!buildInfo)
+            return false;
+
+        if (_os == Win)
+            versionHash = &buildInfo->WindowsHash;
+        else if (_os == OSX)
+            versionHash = &buildInfo->MacHash;
+
+        if (!versionHash)
+            return false;
+
+        if (!memcmp(versionHash->data(), zeros.data(), zeros.size()))
+            return true;                                                            // not filled serverside
+    }
+    else
+        versionHash = &zeros;
+
+    Sha1Hash version;
+    version.UpdateData(a, aLength);
+    version.UpdateData(versionHash->data(), versionHash->size());
+    version.Finalize();
+
+    return memcmp(versionProof, version.GetDigest(), version.GetLength()) == 0;
 }
