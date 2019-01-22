@@ -963,7 +963,7 @@ struct npc_training_dummyAI : ScriptedAI
     }
 
     uint32 m_uiCombatTimer;
-    std::unordered_map<Unit*, time_t> attackers;
+    std::unordered_map<ObjectGuid, time_t> attackers;
 
     void Reset() override
     {
@@ -980,14 +980,14 @@ struct npc_training_dummyAI : ScriptedAI
 
     void AddAttackerToList(Unit* pWho)
     {
-        auto itr = attackers.find(pWho);
+        auto itr = attackers.find(pWho->GetObjectGuid());
         if (itr != attackers.end())
         {
             itr->second = std::time(nullptr);
         }
         else
         {
-            attackers.emplace(pWho, std::time(nullptr));
+            attackers.emplace(pWho->GetObjectGuid(), std::time(nullptr));
         }
     }
 
@@ -1011,15 +1011,17 @@ struct npc_training_dummyAI : ScriptedAI
             {
                 for (auto itr = attackers.begin(); itr != attackers.end();)
                 {
-                    if (!itr->first || !itr->first->IsInWorld())
+                    Unit* pAttacker = m_creature->GetMap()->GetUnit(itr->first);
+
+                    if (!pAttacker || !pAttacker->IsInWorld())
                     {
                         itr = attackers.erase(itr);
                         continue;
                     }
                     if (itr->second + 10 < std::time(nullptr))
                     {
-                        m_creature->_removeAttacker(itr->first);
-                        m_creature->getThreatManager().modifyThreatPercent(itr->first, -101.0f);
+                        m_creature->_removeAttacker(pAttacker);
+                        m_creature->getThreatManager().modifyThreatPercent(pAttacker, -101.0f);
                         itr = attackers.erase(itr);
                         continue;
                     }
