@@ -3050,7 +3050,7 @@ public:
         std::string nameForLocale = "";
         if (loc_idx >= 0)
         {
-            CreatureLocale const *cl = sObjectMgr.GetCreatureLocale(i_cInfo->Entry);
+            CreatureLocale const *cl = sObjectMgr.GetCreatureLocale(i_cInfo->entry);
             if (cl)
             {
                 if (cl->Name.size() > (size_t)loc_idx && !cl->Name[loc_idx].empty())
@@ -3059,7 +3059,7 @@ public:
         }
 
         if (nameForLocale.empty())
-            nameForLocale = i_cInfo->Name;
+            nameForLocale = i_cInfo->name;
 
         ChatHandler::BuildChatPacket(data, i_msgtype, text, i_language, CHAT_TAG_NONE, i_senderGuid, nameForLocale.c_str(), i_target ? i_target->GetObjectGuid() : ObjectGuid(),
             i_target ? i_target->GetNameForLocaleIdx(loc_idx) : "");

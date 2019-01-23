@@ -173,8 +173,8 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
     {
 
         std::string Name, SubName;
-        Name = ci->Name;
-        SubName = ci->SubName;
+        Name = ci->name;
+        SubName = ci->subname;
 
         int loc_idx = GetSessionDbLocaleIndex();
         if (loc_idx >= 0)
@@ -188,7 +188,7 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
                     SubName = cl->SubName[loc_idx];
             }
         }
-        DETAIL_LOG("WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->Name, entry);
+        DETAIL_LOG("WORLD: CMSG_CREATURE_QUERY '%s' - Entry: %u.", ci->name, entry);
         // guess size
         WorldPacket data(SMSG_CREATURE_QUERY_RESPONSE, 100);
         data << uint32(entry);                              // creature entry
@@ -196,19 +196,19 @@ void WorldSession::HandleCreatureQueryOpcode(WorldPacket & recv_data)
         data << uint8(0) << uint8(0) << uint8(0);           // name2, name3, name4, always empty
         data << SubName;
         data << uint32(ci->type_flags);                     // flags
-        data << uint32(ci->type); // Nostalrius : fix pets des chasseurs non consideres comme betes.
+        data << uint32(ci->type);
 
-        data << uint32(ci->family);                         // CreatureFamily.dbc
+        data << uint32(ci->beast_family);                   // CreatureFamily.dbc
         data << uint32(ci->rank);                           // Creature Rank (elite, boss, etc)
         data << uint32(0);                                  // unknown        wdbFeild11
-        data << uint32(ci->PetSpellDataId);                 // Id from CreatureSpellData.dbc    wdbField12
+        data << uint32(ci->pet_spell_list_id);              // Id from CreatureSpellData.dbc    wdbField12
         if (unit)
             data << unit->GetUInt32Value(UNIT_FIELD_DISPLAYID); //DisplayID      wdbFeild13
         else
             data << uint32(Creature::ChooseDisplayId(ci));  // workaround, way to manage models must be fixed
 
         data << uint8(ci->civilian);                       //wdbFeild14
-        data << uint8(ci->RacialLeader);
+        data << uint8(ci->racial_leader);
         SendPacket(&data);
         DEBUG_LOG("WORLD: Sent SMSG_CREATURE_QUERY_RESPONSE");
     }

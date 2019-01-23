@@ -68,7 +68,7 @@ class MANGOS_DLL_SPEC CreatureAI
     public:
         explicit CreatureAI(Creature* creature) : m_creature(creature), m_bUseAiAtControl(false), m_uLastAlertTime(0), m_bMeleeAttack(true), m_bCombatMovement(true)
         {
-            SetSpellsTemplate(creature->GetCreatureInfo()->spells_template);
+            SetSpellsList(creature->GetCreatureInfo()->spell_list_id);
         }
 
         virtual ~CreatureAI();
@@ -216,12 +216,12 @@ class MANGOS_DLL_SPEC CreatureAI
         // Clears any group/raid icons this creature may have
         void ClearTargetIcon();
 
-        // Assigns a creature_spells template to the AI.
-        void SetSpellsTemplate(uint32 entry);
-        void SetSpellsTemplate(const CreatureSpellsTemplate* SpellsTemplate);
+        // Assigns a creature_spells list to the AI.
+        void SetSpellsList(uint32 entry);
+        void SetSpellsList(const CreatureSpellsList* pSpellsList);
 
-        // Goes through the creature_spells template to update timers and cast spells.
-        void DoSpellTemplateCasts(const uint32 uiDiff);
+        // Goes through the creature's spells list to update timers and cast spells.
+        void DoSpellsListCasts(const uint32 uiDiff);
 
         // Enables or disables melee attacks.
         void SetMeleeAttack(bool enabled);

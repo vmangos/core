@@ -2116,9 +2116,9 @@ bool ChatHandler::HandleLearnAllMyTaxisCommand(char* /*args*/)
     for (uint32 i = 0; i < sCreatureStorage.GetMaxEntry(); ++i)
     {
         if (const CreatureInfo *cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-            if (cInfo->npcflag & UNIT_NPC_FLAG_FLIGHTMASTER)
+            if (cInfo->npc_flags & UNIT_NPC_FLAG_FLIGHTMASTER)
             {
-                FindCreatureData worker(cInfo->Entry, player);
+                FindCreatureData worker(cInfo->entry, player);
                 sObjectMgr.DoCreatureData(worker);
                 if (CreatureDataPair const* dataPair = worker.GetResult())
                     if (CreatureData const* data = &dataPair->second)
@@ -2820,9 +2820,9 @@ bool ChatHandler::HandleListCreatureCommand(char* args)
             int mapid = fields[4].GetUInt16();
 
             if (m_session)
-                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->Name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CHAT, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), guid, cInfo->name, x, y, z, mapid);
             else
-                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->Name, x, y, z, mapid);
+                PSendSysMessage(LANG_CREATURE_LIST_CONSOLE, guid, PrepareStringNpcOrGoSpawnInformation<Creature>(guid).c_str(), cInfo->name, x, y, z, mapid);
         }
         while (result->NextRow());
 
@@ -3312,7 +3312,7 @@ bool ChatHandler::HandleLookupCreatureCommand(char* args)
             }
         }
 
-        std::string name = cInfo->Name;
+        std::string name = cInfo->name;
         if (name.empty())
             continue;
 
@@ -3399,8 +3399,8 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
             uint32 foundModelCounter = 0;
             uint32 totalModelCounter = 0;
             for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
-                if (cInfo->ModelId[i])
-                    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[i]))
+                if (cInfo->display_id[i])
+                    if (CreatureDisplayInfoEntry const* display = sCreatureDisplayInfoStore.LookupEntry(cInfo->display_id[i]))
                     {
                         if (display->ModelId)
                             totalModelCounter++;
@@ -3409,19 +3409,19 @@ bool ChatHandler::HandleLookupCreatureModelCommand(char* args)
                             if (!foundModelCounter)
                             {
                                 // Custom filter
-                                //if (cInfo->InhabitType & INHABIT_WATER)
+                                //if (cInfo->inhabit_type & INHABIT_WATER)
                                 {
                                     creatureCounter++;
                                     if (fileExport)
-                                        toExport << id << ", /* " << cInfo->Name << " */\n";
-                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, cInfo->Name);
+                                        toExport << id << ", /* " << cInfo->name << " */\n";
+                                    PSendSysMessage(LANG_CREATURE_ENTRY_LIST_CHAT, id, id, cInfo->name);
                                 }
                             }
                             foundModelCounter++;
                         }
                     }
             if (fileExport && foundModelCounter && totalModelCounter != foundModelCounter)
-                toExport << "-- WARNING " << id << " " << cInfo->Name << " uses more than one model !\n";
+                toExport << "-- WARNING " << id << " " << cInfo->name << " uses more than one model !\n";
         }
         modelId = 0;
     }
@@ -4330,10 +4330,10 @@ bool ChatHandler::HandleNpcInfoCommand(char* /*args*/)
     PSendSysMessage(LANG_NPCINFO_HEALTH, target->GetCreateHealth(), target->GetMaxHealth(), target->GetHealth());
     if (target->getPowerType() == POWER_MANA)
         PSendSysMessage(LANG_NPCINFO_MANA, target->GetCreateMana(), target->GetMaxPower(POWER_MANA), target->GetPower(POWER_MANA));
-    PSendSysMessage(LANG_NPCINFO_INHABIT_TYPE, cInfo->InhabitType);
+    PSendSysMessage(LANG_NPCINFO_INHABIT_TYPE, cInfo->inhabit_type);
     PSendSysMessage(LANG_NPCINFO_FLAGS, target->GetUInt32Value(UNIT_FIELD_FLAGS), target->GetUInt32Value(UNIT_DYNAMIC_FLAGS), target->getFaction());
     PSendSysMessage(LANG_COMMAND_RAWPAWNTIMES, defRespawnDelayStr.c_str(), curRespawnDelayStr.c_str());
-    PSendSysMessage(LANG_NPCINFO_LOOT, cInfo->lootid, cInfo->pickpocketLootId, cInfo->SkinLootId);
+    PSendSysMessage(LANG_NPCINFO_LOOT, cInfo->loot_id, cInfo->pickpocket_loot_id, cInfo->skinning_loot_id);
     PSendSysMessage(LANG_NPCINFO_ARMOR, target->GetArmor());
     PSendSysMessage(LANG_NPCINFO_DUNGEON_ID, target->GetInstanceId());
     PSendSysMessage(LANG_NPCINFO_POSITION, float(target->GetPositionX()), float(target->GetPositionY()), float(target->GetPositionZ()));

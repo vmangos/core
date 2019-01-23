@@ -388,7 +388,7 @@ bool GossipSelect_npc_plucky_johnson(Player* pPlayer, Creature* pCreature, uint3
 
 /*
 [SQL]
-UPDATE gameobject_template SET ScriptName="go_panther_cage" WHERE entry=176195;
+UPDATE gameobject_template SET script_name="go_panther_cage" WHERE entry=176195;
 */
 
 enum ePantherCage

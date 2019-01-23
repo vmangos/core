@@ -2512,7 +2512,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
                 // creature case, need to update equipment
                 if (ci && target->GetTypeId() == TYPEID_UNIT)
-                    ((Creature*)target)->LoadEquipment(ci->equipmentId, true);
+                    ((Creature*)target)->LoadEquipment(ci->equipment_id, true);
             }
 
             if (model_id)
@@ -2534,7 +2534,7 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
             // apply default equipment for creature case
             if (target->GetTypeId() == TYPEID_UNIT)
-                ((Creature*)target)->LoadEquipment(((Creature*)target)->GetCreatureInfo()->equipmentId, true);
+                ((Creature*)target)->LoadEquipment(((Creature*)target)->GetCreatureInfo()->equipment_id, true);
 
 
             // re-apply some from still active with preference negative cases
@@ -3053,9 +3053,9 @@ void Aura::HandleModCharm(bool apply, bool Real)
                     if (target->GetByteValue(UNIT_FIELD_BYTES_0, 1) == 0)
                     {
                         if (cinfo->unit_class == 0)
-                            sLog.outErrorDb("Creature (Entry: %u) have unit_class = 0 but used in charmed spell, that will be result client crash.", cinfo->Entry);
+                            sLog.outErrorDb("Creature (Entry: %u) have unit_class = 0 but used in charmed spell, that will be result client crash.", cinfo->entry);
                         else
-                            sLog.outError("Creature (Entry: %u) have unit_class = %u but at charming have class 0!!! that will be result client crash.", cinfo->Entry, cinfo->unit_class);
+                            sLog.outError("Creature (Entry: %u) have unit_class = %u but at charming have class 0!!! that will be result client crash.", cinfo->entry, cinfo->unit_class);
 
                         target->SetByteValue(UNIT_FIELD_BYTES_0, 1, CLASS_MAGE);
                     }

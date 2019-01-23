@@ -322,7 +322,7 @@ struct urokOgreMagusAI : public urokUnderlingAI
     void abilityCombatUpdate(uint32 uiDiff)
     {
         if (!m_CreatureSpells.empty())
-            DoSpellTemplateCasts(uiDiff);
+            DoSpellsListCasts(uiDiff);
 
         DoMeleeAttackIfReady();
     }

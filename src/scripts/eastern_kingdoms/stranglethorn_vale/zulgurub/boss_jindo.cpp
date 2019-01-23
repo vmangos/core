@@ -414,7 +414,7 @@ CreatureAI* GetAI_mob_brain_wash(Creature* pCreature)
     return new mob_brain_wash_totemAI(pCreature);
 }
 
-// UPDATE `creature_template` SET `AIName` = '', `ScriptName` = 'mob_brain_wash' WHERE `entry` = 15112;
+// UPDATE `creature_template` SET `ai_name` = '', `script_name` = 'mob_brain_wash' WHERE `entry` = 15112;
 void AddSC_boss_jindo()
 {
     Script *newscript;

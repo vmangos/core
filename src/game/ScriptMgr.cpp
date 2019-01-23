@@ -924,14 +924,14 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                         sLog.outErrorDb("Table `%s` has dataint%u with negative chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.id);
                         break;
                     }
-                    else if (tmp.creatureSpells.spellTemplate[i])
+                    else if (tmp.creatureSpells.spellListId[i])
                     {
-                        if (!sObjectMgr.GetCreatureSpellsTemplate(tmp.creatureSpells.spellTemplate[i]))
+                        if (!sObjectMgr.GetCreatureSpellsList(tmp.creatureSpells.spellListId[i]))
                         {
-                            if (!sObjectMgr.IsExistingCreatureSpellsId(tmp.creatureSpells.spellTemplate[i]))
+                            if (!sObjectMgr.IsExistingCreatureSpellsId(tmp.creatureSpells.spellListId[i]))
                             {
                                 abort = true;
-                                sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellTemplate[i], tmp.id);
+                                sLog.outErrorDb("Table `%s` has datalong%u=%u for a non-existent creature spells template in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellListId[i], tmp.id);
                             }
                             else
                                 DisableScriptAction(tmp);
@@ -940,7 +940,7 @@ void ScriptMgr::LoadScripts(ScriptMapMap& scripts, const char* tablename)
                         if (!tmp.creatureSpells.chance[i])
                         {
                             abort = true;
-                            sLog.outErrorDb("Table `%s` has datalong%u=%u with 0%% chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellTemplate[i], tmp.id);
+                            sLog.outErrorDb("Table `%s` has datalong%u=%u with 0%% chance in SCRIPT_COMMAND_CREATURE_SPELLS for script id %u.", tablename, i, tmp.creatureSpells.spellListId[i], tmp.id);
                             break;
                         }
                     }
@@ -1363,7 +1363,7 @@ void ScriptMgr::CheckScriptTexts(ScriptMapMap const& scripts)
 void ScriptMgr::LoadAreaTriggerScripts()
 {
     m_AreaTriggerScripts.clear();                           // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT entry, ScriptName FROM scripted_areatrigger");
+    QueryResult *result = WorldDatabase.Query("SELECT entry, script_name FROM scripted_areatrigger");
 
     uint32 count = 0;
 
@@ -1409,7 +1409,7 @@ void ScriptMgr::LoadAreaTriggerScripts()
 void ScriptMgr::LoadEventIdScripts()
 {
     m_EventIdScripts.clear();                           // need for reload case
-    QueryResult *result = WorldDatabase.Query("SELECT id, ScriptName FROM scripted_event_id");
+    QueryResult *result = WorldDatabase.Query("SELECT id, script_name FROM scripted_event_id");
 
     uint32 count = 0;
 
@@ -1458,15 +1458,15 @@ void ScriptMgr::LoadScriptNames()
 {
     m_scriptNames.push_back("");
     QueryResult *result = WorldDatabase.Query(
-                              "SELECT DISTINCT(ScriptName) FROM creature_template WHERE ScriptName <> '' "
+                              "SELECT DISTINCT(script_name) FROM creature_template WHERE script_name <> '' "
                               "UNION "
-                              "SELECT DISTINCT(ScriptName) FROM gameobject_template WHERE ScriptName <> '' "
+                              "SELECT DISTINCT(script_name) FROM gameobject_template WHERE script_name <> '' "
                               "UNION "
-                              "SELECT DISTINCT(ScriptName) FROM scripted_areatrigger WHERE ScriptName <> '' "
+                              "SELECT DISTINCT(script_name) FROM scripted_areatrigger WHERE script_name <> '' "
                               "UNION "
-                              "SELECT DISTINCT(ScriptName) FROM scripted_event_id WHERE ScriptName <> '' "
+                              "SELECT DISTINCT(script_name) FROM scripted_event_id WHERE script_name <> '' "
                               "UNION "
-                              "SELECT DISTINCT(ScriptName) FROM map_template WHERE ScriptName <> ''");
+                              "SELECT DISTINCT(script_name) FROM map_template WHERE script_name <> ''");
 
     if (!result)
     {
@@ -1823,7 +1823,7 @@ void ScriptMgr::Initialize()
     for (uint32 i = 1; i < GetScriptIdsCount(); ++i)
     {
         if (!m_scripts[i])
-            sLog.outError("No script found for ScriptName '%s'.", GetScriptName(i));
+            sLog.outError("No script found for script_name '%s'.", GetScriptName(i));
     }
 
     sLog.outString(">> Loaded %i C++ Scripts.", num_sc_scripts);
@@ -2007,8 +2007,8 @@ void ScriptMgr::LoadScriptWaypoints()
                 continue;
             }
 
-            if (!pCInfo->ScriptID)
-                sLog.outErrorDb("DB table script_waypoint has waypoint for creature entry %u, but creature does not have ScriptName defined and then useless.", pTemp.uiCreatureEntry);
+            if (!pCInfo->script_id)
+                sLog.outErrorDb("DB table script_waypoint has waypoint for creature entry %u, but creature does not have script_name defined and then useless.", pTemp.uiCreatureEntry);
 
             m_mPointMoveMap[uiEntry].push_back(pTemp);
             ++uiNodeCount;
@@ -2058,8 +2058,8 @@ void ScriptMgr::LoadEscortData()
                 continue;
             }
 
-            if (!pCInfo->ScriptID)
-                sLog.outErrorDb("DB table script_escort_data has data for creature entry %u, but creature does not have ScriptName defined and then useless.", pTemp.uiCreatureEntry);
+            if (!pCInfo->script_id)
+                sLog.outErrorDb("DB table script_escort_data has data for creature entry %u, but creature does not have script_name defined and then useless.", pTemp.uiCreatureEntry);
 
             // Calcul de uiLastWaypointEntry, et mise en "cache"
             std::vector<ScriptPointMove> const points = GetPointMoveList(pTemp.uiCreatureEntry);
@@ -2483,7 +2483,7 @@ void Script::RegisterSelf(bool bReportError)
     {
         // Don't report unused generic scripts
         if (bReportError)
-            sLog.outError("Script registering but ScriptName %s is not assigned in database. Script will not be used.", Name.c_str());
+            sLog.outError("Script registering but script_name %s is not assigned in database. Script will not be used.", Name.c_str());
 
         delete this;
     }

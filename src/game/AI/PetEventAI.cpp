@@ -186,7 +186,7 @@ void PetEventAI::UpdateAI(const uint32 uiDiff)
     if (bHasVictim)
     {
         if (!m_CreatureSpells.empty())
-            DoSpellTemplateCasts(uiDiff);
+            DoSpellsListCasts(uiDiff);
 
         DoMeleeAttackIfReady();
     }

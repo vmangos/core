@@ -133,8 +133,8 @@ enum
 };
 /*
 [SQL]
--- ScriptName
-UPDATE creature_template SET ScriptName="npc_etendard" WHERE entry IN
+-- script_name
+UPDATE creature_template SET script_name="npc_etendard" WHERE entry IN
 (
 -- Alliance Alterac
 14752,

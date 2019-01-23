@@ -745,7 +745,7 @@ void CreatureEventAI::UpdateAI(const uint32 diff)
     if (Combat)
     {
         if (!m_CreatureSpells.empty())
-            DoSpellTemplateCasts(diff);
+            DoSpellsListCasts(diff);
 
         DoMeleeAttackIfReady();
     }

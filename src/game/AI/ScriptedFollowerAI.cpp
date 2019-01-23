@@ -204,7 +204,7 @@ void FollowerAI::EnterEvadeMode()
     }
 
     // Reset back to default spells template. This also resets timers.
-    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+    SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     Reset();
 }
@@ -285,7 +285,7 @@ void FollowerAI::UpdateFollowerAI(const uint32 uiDiff)
         return;
 
     if (!m_CreatureSpells.empty())
-        DoSpellTemplateCasts(uiDiff);
+        DoSpellsListCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }

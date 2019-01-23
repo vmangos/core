@@ -309,8 +309,8 @@ bool GOHello_go_silithyste(Player* pPlayer, GameObject* pGo)
 ######
 SQL :
 UPDATE quest_template SET QuestFlags = QuestFlags | 2, SpecialFlags = SpecialFlags | 2 WHERE entry = 3821;
-UPDATE gameobject_template SET ScriptName="go_restes_sha_ni" WHERE entry=160445;
-UPDATE creature_template SET npcflag = 0 WHERE entry=9136;
+UPDATE gameobject_template SET script_name="go_restes_sha_ni" WHERE entry=160445;
+UPDATE creature_template SET npc_flags = 0 WHERE entry=9136;
 */
 
 bool GOHello_go_restes_sha_ni(Player* pPlayer, GameObject* pGo)

@@ -1663,7 +1663,7 @@ bool Player::BuildEnumData(QueryResult * result, WorldPacket * p_data)
             {
                 petDisplayId = fields[17].GetUInt32();
                 petLevel     = fields[18].GetUInt32();
-                petFamily    = cInfo->family;
+                petFamily    = cInfo->beast_family;
             }
         }
 
@@ -7671,7 +7671,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
             if (loot_type == LOOT_PICKPOCKETING)
             {
 
-                uint32 lootid = creature->GetCreatureInfo()->pickpocketLootId;
+                uint32 lootid = creature->GetCreatureInfo()->pickpocket_loot_id;
 
                 if (!creature->lootForPickPocketed)
                 {
@@ -7755,7 +7755,7 @@ void Player::SendLoot(ObjectGuid guid, LootType loot_type, Player* pVictim)
                     {
                         creature->lootForSkin = true;
                         loot->clear();
-                        loot->FillLoot(creature->GetCreatureInfo()->SkinLootId, LootTemplates_Skinning, this, false);
+                        loot->FillLoot(creature->GetCreatureInfo()->skinning_loot_id, LootTemplates_Skinning, this, false);
 
                         // let reopen skinning loot if will closed.
                         if (!loot->empty())
@@ -13712,12 +13712,8 @@ void Player::ItemRemovedQuestCheck(uint32 entry, uint32 count)
 
 void Player::KilledMonster(CreatureInfo const* cInfo, ObjectGuid guid)
 {
-    if (cInfo->Entry)
-        KilledMonsterCredit(cInfo->Entry, guid);
-
-    for (int i = 0; i < MAX_KILL_CREDIT; ++i)
-        if (cInfo->KillCredit[i])
-            KilledMonsterCredit(cInfo->KillCredit[i], guid);
+    if (cInfo->entry)
+        KilledMonsterCredit(cInfo->entry, guid);
 }
 
 void Player::KilledMonsterCredit(uint32 entry, ObjectGuid guid)

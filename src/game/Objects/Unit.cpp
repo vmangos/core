@@ -826,7 +826,7 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
         {
             creature->DeleteThreatList();
             if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
-                if (cinfo->lootid || cinfo->maxgold > 0)
+                if (cinfo->loot_id || cinfo->gold_max > 0)
                     creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
         // some critters required for quests
@@ -1190,14 +1190,14 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
             loot->clear();
             if (!(creature->AI() && creature->AI()->FillLoot(loot, looter)))
             {
-                if (uint32 lootid = creature->GetCreatureInfo()->lootid)
+                if (uint32 lootid = creature->GetCreatureInfo()->loot_id)
                 {
                     loot->SetTeam(group_tap ? group_tap->GetTeam() : looter->GetTeam());
                     loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature);
                 }
             }
 
-            loot->generateMoneyLoot(creature->GetCreatureInfo()->mingold, creature->GetCreatureInfo()->maxgold);
+            loot->generateMoneyLoot(creature->GetCreatureInfo()->gold_min, creature->GetCreatureInfo()->gold_max);
         }
 
         if (group_tap)
@@ -1323,7 +1323,7 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 
             creature->DeleteThreatList();
             if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
-                if (cinfo->lootid || cinfo->maxgold > 0)
+                if (cinfo->loot_id || cinfo->gold_max > 0)
                     creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
@@ -5525,7 +5525,7 @@ void Unit::SetInitCreaturePowerType()
         return;
 
     // a bit wrong, but have to follow the dirty database values
-    if (pCreature->GetCreatureInfo()->minmana > 0)
+    if (pCreature->GetCreatureInfo()->mana_min > 0)
         SetByteValue(UNIT_FIELD_BYTES_0, 3, POWER_MANA);
     else
     {

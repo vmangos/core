@@ -80,7 +80,7 @@ void ScriptedAI::UpdateAI(const uint32 uiDiff)
     m_creature->SelectHostileTarget();
 
     if (!m_CreatureSpells.empty() && m_creature->isInCombat())
-        DoSpellTemplateCasts(uiDiff);
+        DoSpellsListCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }
@@ -100,7 +100,7 @@ void ScriptedAI::EnterEvadeMode()
         m_creature->SetLootRecipient(nullptr);
 
     // Reset back to default spells template. This also resets timers.
-    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+    SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     Reset();
 }
@@ -256,7 +256,7 @@ void ScriptedAI::SetEquipmentSlots(bool bLoadDefault, int32 uiMainHand, int32 ui
 {
     if (bLoadDefault)
     {
-        m_creature->LoadEquipment(m_creature->GetCreatureInfo()->equipmentId,true);
+        m_creature->LoadEquipment(m_creature->GetCreatureInfo()->equipment_id,true);
         return;
     }
 

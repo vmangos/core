@@ -43,7 +43,6 @@ set (SCRIPTS_SRCS
     custom/event_attack_city.cpp
     custom/gmisland.cpp
     custom/npc_escort.cpp
-    custom/npc_gobj_spawner.cpp
     custom/zero_creatures.cpp
     custom/npc_j_eevee.cpp
     eastern_kingdoms/alterac_mountains/alterac_mountains.cpp

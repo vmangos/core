@@ -160,9 +160,9 @@ struct CreatureSpellsEntry
     CreatureSpellsEntry(uint16 Id, uint8 Probability, uint8 CastTarget, uint32 TargetParam1, uint32 TargetParam2, uint8 CastFlags, uint32 InitialMin, uint32 InitialMax, uint32 RepeatMin, uint32 RepeatMax, uint32 ScriptId) : spellId(Id), probability(Probability), castTarget(CastTarget), targetParam1(TargetParam1), targetParam2(TargetParam2), castFlags(CastFlags), delayInitialMin(InitialMin), delayInitialMax(InitialMax), delayRepeatMin(RepeatMin), delayRepeatMax(RepeatMax), scriptId(ScriptId) {}
 };
 
-typedef std::vector<CreatureSpellsEntry> CreatureSpellsTemplate;
+typedef std::vector<CreatureSpellsEntry> CreatureSpellsList;
 
-typedef std::unordered_map<uint32, CreatureSpellsTemplate> CreatureSpellsMap;
+typedef std::unordered_map<uint32, CreatureSpellsList> CreatureSpellsMap;
 
 typedef std::map<uint32/*player guid*/,uint32/*instance*/> CellCorpseSet;
 struct CellObjectGuids
@@ -962,7 +962,7 @@ class ObjectMgr
             return &itr->second;
         }
 
-        CreatureSpellsTemplate const* GetCreatureSpellsTemplate(uint32 entry) const
+        CreatureSpellsList const* GetCreatureSpellsList(uint32 entry) const
         {
             auto itr = m_CreatureSpellsMap.find(entry);
             if (itr == m_CreatureSpellsMap.end()) return nullptr;

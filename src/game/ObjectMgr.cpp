@@ -1147,111 +1147,98 @@ void ObjectMgr::CheckCreatureTemplates()
 
         FactionTemplateEntry const* factionTemplate = GetFactionTemplateEntry(cInfo->faction);
         if (!factionTemplate)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction template (%u)", cInfo->Entry, cInfo->faction);
-
-        for (int k = 0; k < MAX_KILL_CREDIT; ++k)
-        {
-            if (cInfo->KillCredit[k])
-            {
-                if (!GetCreatureTemplate(cInfo->KillCredit[k]))
-                {
-                    sLog.outErrorDb("Creature (Entry: %u) has nonexistent creature entry in `KillCredit%d` (%u)", cInfo->Entry, k + 1, cInfo->KillCredit[k]);
-                    sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `KillCredit%d`=0 WHERE entry=%u;", k + 1, cInfo->Entry);
-                    const_cast<CreatureInfo*>(cInfo)->KillCredit[k] = 0;
-                }
-            }
-        }
+            sLog.outErrorDb("Creature (Entry: %u) has nonexistent faction template (%u)", cInfo->entry, cInfo->faction);
 
         // used later for scale
         CreatureDisplayInfoEntry const* displayScaleEntry = nullptr;
 
         for (int i = 0; i < MAX_CREATURE_MODEL; ++i)
         {
-            if (cInfo->ModelId[i])
+            if (cInfo->display_id[i])
             {
-                CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->ModelId[i]);
+                CreatureDisplayInfoEntry const* displayEntry = sCreatureDisplayInfoStore.LookupEntry(cInfo->display_id[i]);
                 if (!displayEntry)
                 {
-                    sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_%d (%u), can crash client", cInfo->Entry, i + 1, cInfo->ModelId[i]);
-                    sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `modelid_%d`=0 WHERE entry=%u;", i + 1, cInfo->Entry);
-                    const_cast<CreatureInfo*>(cInfo)->ModelId[i] = 0;
+                    sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid_%d (%u), can crash client", cInfo->entry, i + 1, cInfo->display_id[i]);
+                    sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `modelid_%d`=0 WHERE entry=%u;", i + 1, cInfo->entry);
+                    const_cast<CreatureInfo*>(cInfo)->display_id[i] = 0;
                 }
                 else if (!displayScaleEntry)
                     displayScaleEntry = displayEntry;
 
-                CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->ModelId[i]);
+                CreatureModelInfo const* minfo = sCreatureModelStorage.LookupEntry<CreatureModelInfo>(cInfo->display_id[i]);
                 if (!minfo)
-                    sLog.outErrorDb("Creature (Entry: %u) are using modelid_%d (%u), but creature_model_info are missing for this model.", cInfo->Entry, i + 1, cInfo->ModelId[i]);
+                    sLog.outErrorDb("Creature (Entry: %u) are using modelid_%d (%u), but creature_model_info are missing for this model.", cInfo->entry, i + 1, cInfo->display_id[i]);
             }
         }
 
         if (!displayScaleEntry)
-            sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid in modelid_1/modelid_2", cInfo->Entry);
+            sLog.outErrorDb("Creature (Entry: %u) has nonexistent modelid in modelid_1/modelid_2", cInfo->entry);
 
         // use below code for 0-checks for unit_class
         if (!cInfo->unit_class)
-            ERROR_DB_STRICT_LOG("Creature (Entry: %u) not has proper unit_class(%u) for creature_template", cInfo->Entry, cInfo->unit_class);
+            ERROR_DB_STRICT_LOG("Creature (Entry: %u) not has proper unit_class(%u) for creature_template", cInfo->entry, cInfo->unit_class);
         else if (((1 << (cInfo->unit_class - 1)) & CLASSMASK_ALL_CREATURES) == 0)
-            sLog.outErrorDb("Creature (Entry: %u) has invalid unit_class(%u) for creature_template", cInfo->Entry, cInfo->unit_class);
+            sLog.outErrorDb("Creature (Entry: %u) has invalid unit_class(%u) for creature_template", cInfo->entry, cInfo->unit_class);
 
-        if (cInfo->dmgschool >= MAX_SPELL_SCHOOL)
+        if (cInfo->dmg_school >= MAX_SPELL_SCHOOL)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has invalid spell school value (%u) in `dmgschool`", cInfo->Entry, cInfo->dmgschool);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `dmgschool`=%u WHERE entry=%u;", SPELL_SCHOOL_NORMAL, cInfo->Entry);
-            const_cast<CreatureInfo*>(cInfo)->dmgschool = SPELL_SCHOOL_NORMAL;
+            sLog.outErrorDb("Creature (Entry: %u) has invalid spell school value (%u) in `dmgschool`", cInfo->entry, cInfo->dmg_school);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `dmgschool`=%u WHERE entry=%u;", SPELL_SCHOOL_NORMAL, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->dmg_school = SPELL_SCHOOL_NORMAL;
         }
 
-        if (cInfo->baseattacktime == 0)
+        if (cInfo->base_attack_time == 0)
         {
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `baseattacktime`=%u WHERE entry=%u;", BASE_ATTACK_TIME, cInfo->Entry);
-            const_cast<CreatureInfo*>(cInfo)->baseattacktime  = BASE_ATTACK_TIME;
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `base_attack_time`=%u WHERE entry=%u;", BASE_ATTACK_TIME, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->base_attack_time  = BASE_ATTACK_TIME;
         }
 
-        if (cInfo->rangeattacktime == 0)
+        if (cInfo->ranged_attack_time == 0)
         {
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `rangeattacktime`=%u WHERE entry=%u;", BASE_ATTACK_TIME, cInfo->Entry);
-            const_cast<CreatureInfo*>(cInfo)->rangeattacktime = BASE_ATTACK_TIME;
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `ranged_attack_time`=%u WHERE entry=%u;", BASE_ATTACK_TIME, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->ranged_attack_time = BASE_ATTACK_TIME;
         }
 
-        if ((cInfo->npcflag & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
-            sLog.outErrorDb("Creature (Entry: %u) has wrong trainer type %u", cInfo->Entry, cInfo->trainer_type);
+        if ((cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER) && cInfo->trainer_type >= MAX_TRAINER_TYPE)
+            sLog.outErrorDb("Creature (Entry: %u) has wrong trainer type %u", cInfo->entry, cInfo->trainer_type);
 
         if (cInfo->type && !sCreatureTypeStore.LookupEntry(cInfo->type))
         {
-            sLog.outErrorDb("Creature (Entry: %u) has invalid creature type (%u) in `type`", cInfo->Entry, cInfo->type);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `type`=%u WHERE entry=%u;", CREATURE_TYPE_HUMANOID, cInfo->Entry);
+            sLog.outErrorDb("Creature (Entry: %u) has invalid creature type (%u) in `type`", cInfo->entry, cInfo->type);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `type`=%u WHERE entry=%u;", CREATURE_TYPE_HUMANOID, cInfo->entry);
             const_cast<CreatureInfo*>(cInfo)->type = CREATURE_TYPE_HUMANOID;
         }
 
         // must exist or used hidden but used in data horse case
-        if (cInfo->family && !sCreatureFamilyStore.LookupEntry(cInfo->family) && cInfo->family != CREATURE_FAMILY_HORSE_CUSTOM)
+        if (cInfo->beast_family && !sCreatureFamilyStore.LookupEntry(cInfo->beast_family) && cInfo->beast_family != CREATURE_FAMILY_HORSE_CUSTOM)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has invalid creature family (%u) in `family`", cInfo->Entry, cInfo->family);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `family`=%u WHERE entry=%u;", 0, cInfo->Entry);
-            const_cast<CreatureInfo*>(cInfo)->family = 0;
+            sLog.outErrorDb("Creature (Entry: %u) has invalid creature family (%u) in `family`", cInfo->entry, cInfo->beast_family);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `family`=%u WHERE entry=%u;", 0, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->beast_family = 0;
         }
 
-        if (cInfo->InhabitType <= 0 || cInfo->InhabitType > INHABIT_ANYWHERE)
+        if (cInfo->inhabit_type <= 0 || cInfo->inhabit_type > INHABIT_ANYWHERE)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has wrong value (%u) in `InhabitType`, creature will not correctly walk/swim", cInfo->Entry, cInfo->InhabitType);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `InhabitType`=%u WHERE entry=%u;", INHABIT_ANYWHERE, cInfo->Entry);
-            const_cast<CreatureInfo*>(cInfo)->InhabitType = INHABIT_ANYWHERE;
+            sLog.outErrorDb("Creature (Entry: %u) has wrong value (%u) in `InhabitType`, creature will not correctly walk/swim", cInfo->entry, cInfo->inhabit_type);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `InhabitType`=%u WHERE entry=%u;", INHABIT_ANYWHERE, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->inhabit_type = INHABIT_ANYWHERE;
         }
 
-        if (cInfo->PetSpellDataId)
+        if (cInfo->pet_spell_list_id)
         {
-            CreatureSpellDataEntry const* spellDataId = sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId);
+            CreatureSpellDataEntry const* spellDataId = sCreatureSpellDataStore.LookupEntry(cInfo->pet_spell_list_id);
             if (!spellDataId)
-                sLog.outErrorDb("Creature (Entry: %u) has non-existing PetSpellDataId (%u)", cInfo->Entry, cInfo->PetSpellDataId);
+                sLog.outErrorDb("Creature (Entry: %u) has non-existing pet_spell_list_id (%u)", cInfo->entry, cInfo->pet_spell_list_id);
         }
 
-        if (cInfo->spells_template)
+        if (cInfo->spell_list_id)
         {
-            CreatureSpellsTemplate const* spellsTemplate = GetCreatureSpellsTemplate((cInfo->spells_template));
-            if (!spellsTemplate)
+            CreatureSpellsList const* spellsList = GetCreatureSpellsList((cInfo->spell_list_id));
+            if (!spellsList)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has non-existing spells template (%u)", cInfo->Entry, cInfo->spells_template);
-                const_cast<CreatureInfo*>(cInfo)->spells_template = 0;
+                sLog.outErrorDb("Creature (Entry: %u) has non-existing spells template (%u)", cInfo->entry, cInfo->spell_list_id);
+                const_cast<CreatureInfo*>(cInfo)->spell_list_id = 0;
             }
         }
 
@@ -1259,33 +1246,33 @@ void ObjectMgr::CheckCreatureTemplates()
         {
             if (cInfo->spells[j] && !sSpellMgr.GetSpellEntry(cInfo->spells[j]))
             {
-                sLog.outErrorDb("Creature (Entry: %u) has non-existing Spell%d (%u), set to 0", cInfo->Entry, j + 1, cInfo->spells[j]);
-                sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `spell%u`=0 WHERE entry=%u;", j + 1, cInfo->Entry);
+                sLog.outErrorDb("Creature (Entry: %u) has non-existing Spell%d (%u), set to 0", cInfo->entry, j + 1, cInfo->spells[j]);
+                sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `spell%u`=0 WHERE entry=%u;", j + 1, cInfo->entry);
                 const_cast<CreatureInfo*>(cInfo)->spells[j] = 0;
             }
         }
 
-        if (cInfo->MovementType >= MAX_DB_MOTION_TYPE)
+        if (cInfo->movement_type >= MAX_DB_MOTION_TYPE)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has wrong movement generator type (%u), ignore and set to IDLE.", cInfo->Entry, cInfo->MovementType);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `MovementType`=%u WHERE entry=%u;", IDLE_MOTION_TYPE, cInfo->Entry);
-            const_cast<CreatureInfo*>(cInfo)->MovementType = IDLE_MOTION_TYPE;
+            sLog.outErrorDb("Creature (Entry: %u) has wrong movement generator type (%u), ignore and set to IDLE.", cInfo->entry, cInfo->movement_type);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `MovementType`=%u WHERE entry=%u;", IDLE_MOTION_TYPE, cInfo->entry);
+            const_cast<CreatureInfo*>(cInfo)->movement_type = IDLE_MOTION_TYPE;
         }
 
-        if (cInfo->equipmentId > 0)                         // 0 no equipment
+        if (cInfo->equipment_id > 0)                         // 0 no equipment
         {
-            if (!GetEquipmentInfo(cInfo->equipmentId))
+            if (!GetEquipmentInfo(cInfo->equipment_id))
             {
-                sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", cInfo->Entry, cInfo->equipmentId);
-                sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `equipment_id`=0 WHERE entry=%u;", cInfo->Entry);
-                const_cast<CreatureInfo*>(cInfo)->equipmentId = 0;
+                sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with equipment_id %u not found in table `creature_equip_template`, set to no equipment.", cInfo->entry, cInfo->equipment_id);
+                sLog.out(LOG_DBERRFIX, "UPDATE creature_template SET `equipment_id`=0 WHERE entry=%u;", cInfo->entry);
+                const_cast<CreatureInfo*>(cInfo)->equipment_id = 0;
             }
         }
 
-        if (cInfo->vendorId > 0)
+        if (cInfo->vendor_id > 0)
         {
-            if (!(cInfo->npcflag & UNIT_NPC_FLAG_VENDOR))
-                sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with vendor_id %u but not have flag UNIT_NPC_FLAG_VENDOR (%u), vendor items will ignored.", cInfo->Entry, cInfo->vendorId, UNIT_NPC_FLAG_VENDOR);
+            if (!(cInfo->npc_flags & UNIT_NPC_FLAG_VENDOR))
+                sLog.outErrorDb("Table `creature_template` have creature (Entry: %u) with vendor_id %u but not have flag UNIT_NPC_FLAG_VENDOR (%u), vendor items will ignored.", cInfo->entry, cInfo->vendor_id, UNIT_NPC_FLAG_VENDOR);
         }
 
         /// if not set custom creature scale then load scale from CreatureDisplayInfo.dbc
@@ -1297,35 +1284,35 @@ void ObjectMgr::CheckCreatureTemplates()
                 const_cast<CreatureInfo*>(cInfo)->scale = DEFAULT_OBJECT_SCALE;
         }
 
-        if (cInfo->ExperienceMultiplier < 0.0f)
+        if (cInfo->xp_multiplier < 0.0f)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has negative experience multiplier (%f)", cInfo->Entry, cInfo->ExperienceMultiplier);
-            const_cast<CreatureInfo*>(cInfo)->ExperienceMultiplier = 1.0f;
+            sLog.outErrorDb("Creature (Entry: %u) has negative experience multiplier (%f)", cInfo->entry, cInfo->xp_multiplier);
+            const_cast<CreatureInfo*>(cInfo)->xp_multiplier = 1.0f;
         }
 
-        if (cInfo->Detection < 0.0f)
+        if (cInfo->detection_range < 0.0f)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has negative detection distance (%f)", cInfo->Entry, cInfo->Detection);
-            const_cast<CreatureInfo*>(cInfo)->Detection = 20.0f;
+            sLog.outErrorDb("Creature (Entry: %u) has negative detection distance (%f)", cInfo->entry, cInfo->detection_range);
+            const_cast<CreatureInfo*>(cInfo)->detection_range = 20.0f;
         }
 
-        if (cInfo->CallForHelp < 0.0f)
+        if (cInfo->call_for_help_range < 0.0f)
         {
-            sLog.outErrorDb("Creature (Entry: %u) has negative call for help radius (%f)", cInfo->Entry, cInfo->CallForHelp);
-            const_cast<CreatureInfo*>(cInfo)->CallForHelp = 5.0f;
+            sLog.outErrorDb("Creature (Entry: %u) has negative call for help radius (%f)", cInfo->entry, cInfo->call_for_help_range);
+            const_cast<CreatureInfo*>(cInfo)->call_for_help_range = 5.0f;
         }
 
-        if (cInfo->Leash)
+        if (cInfo->leash_range)
         {
-            if (cInfo->Leash < 0.0f)
+            if (cInfo->leash_range < 0.0f)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has negative leash distance (%f)", cInfo->Entry, cInfo->Leash);
-                const_cast<CreatureInfo*>(cInfo)->Leash = 0.0f;
+                sLog.outErrorDb("Creature (Entry: %u) has negative leash distance (%f)", cInfo->entry, cInfo->leash_range);
+                const_cast<CreatureInfo*>(cInfo)->leash_range = 0.0f;
             }
-            else if (cInfo->Leash < cInfo->Detection)
+            else if (cInfo->leash_range < cInfo->detection_range)
             {
-                sLog.outErrorDb("Creature (Entry: %u) has leash distance below detection distance (%f)", cInfo->Entry, cInfo->Leash);
-                const_cast<CreatureInfo*>(cInfo)->Leash = 0.0f;
+                sLog.outErrorDb("Creature (Entry: %u) has leash distance below detection distance (%f)", cInfo->entry, cInfo->leash_range);
+                const_cast<CreatureInfo*>(cInfo)->leash_range = 0.0f;
             }
         }
     }
@@ -1701,7 +1688,7 @@ void ObjectMgr::LoadCreatureSpells()
 
         uint32 entry = fields[0].GetUInt32();;
 
-        CreatureSpellsTemplate spellsTemplate;
+        CreatureSpellsList spellsList;
 
         for (uint8 i = 0; i < CREATURE_SPELLS_MAX_SPELLS; i++)
         {
@@ -1762,12 +1749,12 @@ void ObjectMgr::LoadCreatureSpells()
                         spellScriptSet.erase(scriptId);
                 }
 
-                spellsTemplate.emplace_back(spellId, probability, castTarget, targetParam1, targetParam2, castFlags, delayInitialMin, delayInitialMax, delayRepeatMin, delayRepeatMax, scriptId);
+                spellsList.emplace_back(spellId, probability, castTarget, targetParam1, targetParam2, castFlags, delayInitialMin, delayInitialMax, delayRepeatMin, delayRepeatMax, scriptId);
             }
         }
 
-        if (!spellsTemplate.empty())
-            m_CreatureSpellsMap.insert(CreatureSpellsMap::value_type(entry, spellsTemplate));
+        if (!spellsList.empty())
+            m_CreatureSpellsMap.insert(CreatureSpellsMap::value_type(entry, spellsList));
 
     } while (result->NextRow());
 
@@ -1899,11 +1886,11 @@ void ObjectMgr::LoadCreatures(bool reload)
             }
         }
 
-        if (cInfo->RegenHealth && data.curhealth < cInfo->minhealth)
+        if (cInfo->regeneration && data.curhealth < cInfo->health_min)
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`RegenHealth`=1 and low current health (%u), `creature_template`.`minhealth`=%u.", guid, data.id, data.curhealth, cInfo->minhealth);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=%u WHERE guid=%u AND id=%u;", cInfo->minhealth, guid, data.id);
-            data.curhealth = cInfo->minhealth;
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with `creature_template`.`RegenHealth`=1 and low current health (%u), `creature_template`.`minhealth`=%u.", guid, data.id, data.curhealth, cInfo->health_min);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curhealth=%u WHERE guid=%u AND id=%u;", cInfo->health_min, guid, data.id);
+            data.curhealth = cInfo->health_min;
         }
 
         if (cInfo->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND)
@@ -1920,11 +1907,11 @@ void ObjectMgr::LoadCreatures(bool reload)
                                 guid, data.id, CREATURE_FLAG_EXTRA_AGGRO_ZONE);
         }
 
-        if (data.curmana < cInfo->minmana)
+        if (data.curmana < cInfo->mana_min)
         {
-            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with low current mana (%u), `creature_template`.`minmana`=%u.", guid, data.id, data.curmana, cInfo->minmana);
-            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=%u WHERE guid=%u AND id=%u;", cInfo->minmana, guid, data.id);
-            data.curmana = cInfo->minmana;
+            sLog.outErrorDb("Table `creature` have creature (GUID: %u Entry: %u) with low current mana (%u), `creature_template`.`minmana`=%u.", guid, data.id, data.curmana, cInfo->mana_min);
+            sLog.out(LOG_DBERRFIX, "UPDATE creature SET curmana=%u WHERE guid=%u AND id=%u;", cInfo->mana_min, guid, data.id);
+            data.curmana = cInfo->mana_min;
         }
 
         if (data.spawndist < 0.0f)
@@ -5430,9 +5417,9 @@ void ObjectMgr::LoadPetCreateSpells()
             continue;
         }
 
-        if (CreatureSpellDataEntry const* petSpellEntry = cInfo->PetSpellDataId ? sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId) : nullptr)
+        if (CreatureSpellDataEntry const* petSpellEntry = cInfo->pet_spell_list_id ? sCreatureSpellDataStore.LookupEntry(cInfo->pet_spell_list_id) : nullptr)
         {
-            sLog.outErrorDb("Creature id %u listed in `petcreateinfo_spell` have set `PetSpellDataId` field and will use its instead, skip.", creature_id);
+            sLog.outErrorDb("Creature id %u listed in `petcreateinfo_spell` have set `pet_spell_list_id` field and will use its instead, skip.", creature_id);
             continue;
         }
 
@@ -5499,7 +5486,7 @@ void ObjectMgr::LoadPetCreateSpells()
         if (!cInfo)
             continue;
 
-        CreatureSpellDataEntry const* petSpellEntry = cInfo->PetSpellDataId ? sCreatureSpellDataStore.LookupEntry(cInfo->PetSpellDataId) : nullptr;
+        CreatureSpellDataEntry const* petSpellEntry = cInfo->pet_spell_list_id ? sCreatureSpellDataStore.LookupEntry(cInfo->pet_spell_list_id) : nullptr;
         if (!petSpellEntry)
             continue;
 
@@ -7275,9 +7262,9 @@ std::string ObjectMgr::GeneratePetName(uint32 entry)
     if (list0.empty() || list1.empty())
     {
         CreatureInfo const *cinfo = GetCreatureTemplate(entry);
-        char const* petname = GetPetName(cinfo->family, sWorld.GetDefaultDbcLocale());
+        char const* petname = GetPetName(cinfo->beast_family, sWorld.GetDefaultDbcLocale());
         if (!petname)
-            petname = cinfo->Name;
+            petname = cinfo->name;
         return std::string(petname);
     }
 
@@ -7872,8 +7859,8 @@ void ObjectMgr::LoadCreatureQuestRelations()
         CreatureInfo const* cInfo = GetCreatureTemplate(itr->first);
         if (!cInfo)
             sLog.outErrorDb("Table `creature_questrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr->first, itr->second);
-        else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.outDetail("Table `creature_questrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
+        else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
+            sLog.outDetail("Table `creature_questrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
     }
 }
 
@@ -7886,8 +7873,8 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
         CreatureInfo const* cInfo = GetCreatureTemplate(itr->first);
         if (!cInfo)
             sLog.outErrorDb("Table `creature_involvedrelation` have data for nonexistent creature entry (%u) and existing quest %u", itr->first, itr->second);
-        else if (!(cInfo->npcflag & UNIT_NPC_FLAG_QUESTGIVER))
-            sLog.outDetail("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npcflag does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
+        else if (!(cInfo->npc_flags & UNIT_NPC_FLAG_QUESTGIVER))
+            sLog.outDetail("Table `creature_involvedrelation` has creature entry (%u) for quest %u, but npc_flags does not include UNIT_NPC_FLAG_QUESTGIVER", itr->first, itr->second);
     }
 }
 
@@ -9263,7 +9250,7 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
                 continue;
             }
 
-            if (!(cInfo->npcflag & UNIT_NPC_FLAG_TRAINER))
+            if (!(cInfo->npc_flags & UNIT_NPC_FLAG_TRAINER))
             {
                 if (skip_trainers.find(entry) == skip_trainers.end())
                 {
@@ -9273,11 +9260,11 @@ void ObjectMgr::LoadTrainers(char const* tableName, bool isTemplates)
                 continue;
             }
 
-            if (TrainerSpellData const* tSpells = cInfo->trainerId ? GetNpcTrainerTemplateSpells(cInfo->trainerId) : nullptr)
+            if (TrainerSpellData const* tSpells = cInfo->trainer_id ? GetNpcTrainerTemplateSpells(cInfo->trainer_id) : nullptr)
             {
                 if (tSpells->spellList.find(spell) != tSpells->spellList.end())
                 {
-                    sLog.outErrorDb("Table `%s` (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell, cInfo->trainerId);
+                    sLog.outErrorDb("Table `%s` (Entry: %u) has spell %u listed in trainer template %u, ignore", tableName, entry, spell, cInfo->trainer_id);
                     continue;
                 }
             }
@@ -9540,9 +9527,9 @@ void ObjectMgr::LoadGossipMenu()
     // post loading tests
     for (uint32 i = 1; i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-            if (cInfo->GossipMenuId)
-                if (m_GossipMenusMap.find(cInfo->GossipMenuId) == m_GossipMenusMap.end())
-                    sLog.outErrorDb("Creature (Entry: %u) has gossip_menu_id = %u for nonexistent menu", cInfo->Entry, cInfo->GossipMenuId);
+            if (cInfo->gossip_menu_id)
+                if (m_GossipMenusMap.find(cInfo->gossip_menu_id) == m_GossipMenusMap.end())
+                    sLog.outErrorDb("Creature (Entry: %u) has gossip_menu_id = %u for nonexistent menu", cInfo->entry, cInfo->gossip_menu_id);
 
     for (auto itr = sGOStorage.begin<GameObjectInfo>(); itr < sGOStorage.end<GameObjectInfo>(); ++itr)
         if (uint32 menuid = itr->GetGossipMenuId())
@@ -9598,8 +9585,8 @@ void ObjectMgr::LoadGossipMenuItems()
     Menu2CInfoMap menu2CInfoMap;
     for (uint32 i = 1;  i < sCreatureStorage.GetMaxEntry(); ++i)
         if (CreatureInfo const* cInfo = sCreatureStorage.LookupEntry<CreatureInfo>(i))
-            if (cInfo->GossipMenuId)
-                menu2CInfoMap.insert(Menu2CInfoMap::value_type(cInfo->GossipMenuId, cInfo));
+            if (cInfo->gossip_menu_id)
+                menu2CInfoMap.insert(Menu2CInfoMap::value_type(cInfo->gossip_menu_id, cInfo));
 
     do
     {
@@ -9686,7 +9673,7 @@ void ObjectMgr::LoadGossipMenuItems()
                 found_menu_uses = true;
 
                 // some from creatures with gossip menu can use gossip option base at npc_flags
-                if (gMenuItem.npc_option_npcflag & cInfo->npcflag)
+                if (gMenuItem.npc_option_npcflag & cInfo->npc_flags)
                     found_flags_uses = true;
 
                 // unused check data preparing part
@@ -9695,7 +9682,7 @@ void ObjectMgr::LoadGossipMenuItems()
             }
 
             if (found_menu_uses && !found_flags_uses)
-                sLog.outDetail("Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding`npcflag`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
+                sLog.outDetail("Table gossip_menu_option for menu %u, id %u has `npc_option_npcflag` = %u but creatures using this menu does not have corresponding `npc_flags`. Option will not accessible in game.", gMenuItem.menu_id, gMenuItem.id, gMenuItem.npc_option_npcflag);
         }
 
         if (gMenuItem.action_poi_id && !GetPointOfInterest(gMenuItem.action_poi_id))
@@ -9790,7 +9777,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
             return false;
         }
 
-        if (!(cInfo->npcflag & UNIT_NPC_FLAG_VENDOR))
+        if (!(cInfo->npc_flags & UNIT_NPC_FLAG_VENDOR))
         {
             if (!skip_vendors || skip_vendors->count(vendor_entry) == 0)
             {
@@ -9861,12 +9848,12 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
                 ChatHandler(pl).PSendSysMessage(LANG_ITEM_ALREADY_IN_LIST, item_id);
             else
             {
-                if (!cInfo->vendorId)
+                if (!cInfo->vendor_id)
                     sLog.outErrorDb("Table `%s` has duplicate items %u for %s %u, ignoring",
                                     tableName, item_id, idStr, vendor_entry);
                 else
                     sLog.outErrorDb("Table `%s` has duplicate items %u for %s %u (or possible in vendor template %u), ignoring",
-                                    tableName, item_id, idStr, vendor_entry, cInfo->vendorId);
+                                    tableName, item_id, idStr, vendor_entry, cInfo->vendor_id);
             }
             return false;
         }
@@ -10114,13 +10101,13 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
     if (!map)
         return 0;
 
-    uint32 level = cInfo->minlevel == cInfo->maxlevel ? cInfo->minlevel : urand(cInfo->minlevel, cInfo->maxlevel); // Only used for extracting creature base stats
+    uint32 level = cInfo->level_min == cInfo->level_max ? cInfo->level_min : urand(cInfo->level_min, cInfo->level_max); // Only used for extracting creature base stats
 
     uint32 guid = map->GenerateLocalLowGuid(HIGHGUID_UNIT);
     CreatureData& data = NewOrExistCreatureData(guid);
     data.id = entry;
     data.mapid = mapId;
-    data.equipmentId = cInfo->equipmentId;
+    data.equipmentId = cInfo->equipment_id;
     data.posX = x;
     data.posY = y;
     data.posZ = z;
@@ -10129,10 +10116,10 @@ uint32 ObjectMgr::AddCreData(uint32 entry, uint32 /*team*/, uint32 mapId, float 
     data.spawntimesecsmax = spawntimedelay;
     data.spawndist = 0;
     data.currentwaypoint = 0;
-    data.curhealth = cInfo->maxhealth;
-    data.curmana = cInfo->maxmana;
+    data.curhealth = cInfo->health_max;
+    data.curmana = cInfo->mana_max;
     data.is_dead = false;
-    data.movementType = cInfo->MovementType;
+    data.movementType = cInfo->movement_type;
 
 
     AddCreatureToGrid(guid, &data);

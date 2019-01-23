@@ -33,7 +33,7 @@ CreatureAI::~CreatureAI()
 void CreatureAI::JustRespawned()
 {
     // Reset spells template to default on respawn.
-    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+    SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     // Reset combat movement and melee attack.
     m_bCombatMovement = true;
@@ -163,27 +163,27 @@ CanCastResult CreatureAI::DoCastSpellIfCan(Unit* pTarget, uint32 uiSpell, uint32
     return CAST_FAIL_IS_CASTING;
 }
 
-void CreatureAI::SetSpellsTemplate(uint32 entry)
+void CreatureAI::SetSpellsList(uint32 entry)
 {
     if (entry == 0)
         m_CreatureSpells.clear();
-    else if (const CreatureSpellsTemplate* pSpellsTemplate = sObjectMgr.GetCreatureSpellsTemplate(entry))
-        SetSpellsTemplate(pSpellsTemplate);
+    else if (const CreatureSpellsList* pSpellsTemplate = sObjectMgr.GetCreatureSpellsList(entry))
+        SetSpellsList(pSpellsTemplate);
     else
         sLog.outError("CreatureAI: Attempt to set spells template of creature %u to non-existent entry %u.", m_creature->GetEntry(), entry);
 }
 
-void CreatureAI::SetSpellsTemplate(const CreatureSpellsTemplate *SpellsTemplate)
+void CreatureAI::SetSpellsList(const CreatureSpellsList *pSpellsList)
 {
     m_CreatureSpells.clear();
-    for (const auto & entry : *SpellsTemplate)
+    for (const auto & entry : *pSpellsList)
     {
         m_CreatureSpells.push_back(CreatureAISpellsEntry(entry));
     }
     m_CreatureSpells.shrink_to_fit();
 }
 
-void CreatureAI::DoSpellTemplateCasts(const uint32 uiDiff)
+void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
 {
     bool bDontCast = false;
     for (auto & spell : m_CreatureSpells)
@@ -412,7 +412,7 @@ void CreatureAI::SetCombatMovement(bool enabled)
 void CreatureAI::OnCombatStop()
 {
     // Reset back to default spells template. This also resets timers.
-    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+    SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     // Reset combat movement and melee attack.
     m_bCombatMovement = true;

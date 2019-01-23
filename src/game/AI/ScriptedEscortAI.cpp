@@ -205,7 +205,7 @@ void npc_escortAI::EnterEvadeMode()
         ResetCreature();
 
     // Reset back to default spells template. This also resets timers.
-    SetSpellsTemplate(m_creature->GetCreatureInfo()->spells_template);
+    SetSpellsList(m_creature->GetCreatureInfo()->spell_list_id);
 
     ReturnToCombatStartPosition();
     Reset();
@@ -347,7 +347,7 @@ void npc_escortAI::UpdateEscortAI(const uint32 uiDiff)
         return;
 
     if (!m_CreatureSpells.empty())
-        DoSpellTemplateCasts(uiDiff);
+        DoSpellsListCasts(uiDiff);
 
     DoMeleeAttackIfReady();
 }

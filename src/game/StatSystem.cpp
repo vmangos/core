@@ -804,9 +804,9 @@ void Creature::UpdateDamagePhysical(WeaponAttackType attType)
      * ie if AP is reduced to 0, attack will be reduced of 30%
      * We have to ignore creatures that don't have AP set in database (we would divide by 0)
      */
-    if (GetCreatureInfo()->attackpower)
+    if (GetCreatureInfo()->attack_power)
     {
-        float databaseAttackPower = GetCreatureInfo()->attackpower;
+        float databaseAttackPower = GetCreatureInfo()->attack_power;
         float attackPowerNow = GetTotalAttackPowerValue(attType);
         weapon_mindamage = weapon_mindamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);
         weapon_maxdamage = weapon_maxdamage * (0.7f + 0.3f * attackPowerNow / databaseAttackPower);

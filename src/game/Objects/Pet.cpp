@@ -1233,7 +1233,7 @@ bool Pet::CreateBaseAtCreature(Creature* creature)
     SetUInt32Value(UNIT_FIELD_PETNEXTLEVELEXP, sObjectMgr.GetXPForPetLevel(creature->getLevel()));
     SetUInt32Value(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_NONE);
 
-    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family))
+    if (CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->beast_family))
         SetName(cFamily->Name[sWorld.GetDefaultDbcLocale()]);
     else
         SetName(creature->GetNameForLocaleIdx(sObjectMgr.GetDBCLocaleIndex()));
@@ -1269,12 +1269,12 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
         owner = GetOwner();
         if (!owner)
         {
-            sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->Entry);
+            sLog.outError("attempt to summon pet (Entry %u) without owner! Attempt terminated.", cinfo->entry);
             return false;
         }
     }
 
-    uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->Entry;
+    uint32 creature_ID = (getPetType() == HUNTER_PET) ? 1 : cinfo->entry;
 
     switch (getPetType())
     {
@@ -1300,22 +1300,22 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     // Before 1.9 pets retain their wild damage type
     if (sWorld.GetWowPatch() < WOW_PATCH_109 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS))
-        SetMeleeDamageSchool(SpellSchools(cinfo->dmgschool));
+        SetMeleeDamageSchool(SpellSchools(cinfo->dmg_school));
     else
         SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
 
     SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
 
     // Nostalrius: pre-2.0: normalisation de la vitesse d'attaque des pets.
-    SetAttackTime(BASE_ATTACK, cinfo->baseattacktime); //BASE_ATTACK_TIME);
-    SetAttackTime(OFF_ATTACK, cinfo->baseattacktime); //BASE_ATTACK_TIME);
-    SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime); //BASE_ATTACK_TIME);
+    SetAttackTime(BASE_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
+    SetAttackTime(OFF_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
+    SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time); //BASE_ATTACK_TIME);
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SetFloatValue(UNIT_MOD_CAST_SPEED, 1.0f);
 #else
     SetInt32Value(UNIT_MOD_CAST_SPEED, 0);
 #endif
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cinfo->beast_family);
     if (cFamily && cFamily->minScale > 0.0f && getPetType() == HUNTER_PET)
     {
         float scale;
@@ -1338,12 +1338,12 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     // TODO: Do we keep it or remove it?
     if (getPetType() != HUNTER_PET || (sWorld.GetWowPatch() < WOW_PATCH_103 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS)))
     {
-        createResistance[SPELL_SCHOOL_HOLY]   = cinfo->resistance1;
-        createResistance[SPELL_SCHOOL_FIRE]   = cinfo->resistance2;
-        createResistance[SPELL_SCHOOL_NATURE] = cinfo->resistance3;
-        createResistance[SPELL_SCHOOL_FROST]  = cinfo->resistance4;
-        createResistance[SPELL_SCHOOL_SHADOW] = cinfo->resistance5;
-        createResistance[SPELL_SCHOOL_ARCANE] = cinfo->resistance6;
+        createResistance[SPELL_SCHOOL_HOLY]   = cinfo->holy_res;
+        createResistance[SPELL_SCHOOL_FIRE]   = cinfo->fire_res;
+        createResistance[SPELL_SCHOOL_NATURE] = cinfo->nature_res;
+        createResistance[SPELL_SCHOOL_FROST]  = cinfo->frost_res;
+        createResistance[SPELL_SCHOOL_SHADOW] = cinfo->shadow_res;
+        createResistance[SPELL_SCHOOL_ARCANE] = cinfo->arcane_res;
     }
 
     switch (getPetType())
@@ -1354,7 +1354,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, float((petlevel * 1.15 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
             SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, float((petlevel * 1.45 * 1.05) * (float)GetAttackTime(BASE_ATTACK) / 2000));
 
-            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+            //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
             PetLevelInfo const* pInfo = sObjectMgr.GetPetLevelInfo(creature_ID, petlevel);
             if (pInfo)                                      // exist in DB
@@ -1372,11 +1372,11 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             {
                 // Erreur qui se declanche quand un mob invoque un add (squelette par exemple), et qui n'a
                 // donc pas de stats de pet.
-                DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->Entry);
+                DEBUG_LOG("Summoned pet (Entry: %u) not have pet stats data in DB", cinfo->entry);
 
                 // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->maxhealth) / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
-                SetCreateMana(uint32(((float(cinfo->maxmana)   / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateMana(uint32(((float(cinfo->mana_max)   / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1399,7 +1399,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             {
                 SetCreateHealth(pInfo->health);
                 SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
-                //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attackpower));
+                //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
                 for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)
                     SetCreateStat(Stats(i),  float(pInfo->stats[i]));
@@ -1409,7 +1409,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 sLog.outErrorDb("Hunter pet levelstats missing in DB");
 
                 // remove elite bonuses included in DB values
-                SetCreateHealth(uint32(((float(cinfo->maxhealth) / cinfo->maxlevel) / (1 + 2 * cinfo->rank)) * petlevel));
+                SetCreateHealth(uint32(((float(cinfo->health_max) / cinfo->level_max) / (1 + 2 * cinfo->rank)) * petlevel));
 
                 SetCreateStat(STAT_STRENGTH, 22);
                 SetCreateStat(STAT_AGILITY, 22);
@@ -1426,15 +1426,15 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
             SetUInt32Value(UNIT_FIELD_FLAGS, cinfo->unit_flags);
 
-            SetCreateMana(cinfo->maxmana);
-            SetCreateHealth(cinfo->maxhealth);
+            SetCreateMana(cinfo->mana_max);
+            SetCreateHealth(cinfo->health_max);
 
-            SetAttackTime(BASE_ATTACK, cinfo->baseattacktime);
-            SetAttackTime(OFF_ATTACK, cinfo->baseattacktime);
-            SetAttackTime(RANGED_ATTACK, cinfo->rangeattacktime);
+            SetAttackTime(BASE_ATTACK, cinfo->base_attack_time);
+            SetAttackTime(OFF_ATTACK, cinfo->base_attack_time);
+            SetAttackTime(RANGED_ATTACK, cinfo->ranged_attack_time);
 
-            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->mindmg);
-            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->maxdmg);
+            SetBaseWeaponDamage(BASE_ATTACK, MINDAMAGE, cinfo->dmg_min);
+            SetBaseWeaponDamage(BASE_ATTACK, MAXDAMAGE, cinfo->dmg_max);
             break;
         }
         default:
@@ -1480,7 +1480,7 @@ bool Pet::HaveInDiet(ItemPrototype const* item) const
     if (!cInfo)
         return false;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->beast_family);
     if (!cFamily)
         return false;
 
@@ -2230,9 +2230,9 @@ bool Pet::Create(uint32 guidlow, CreatureCreatePos& cPos, CreatureInfo const* ci
 
     Object::_Create(guidlow, pet_number, HIGHGUID_PET);
 
-    m_originalEntry = cinfo->Entry;
+    m_originalEntry = cinfo->entry;
 
-    if (!InitEntry(cinfo->Entry))
+    if (!InitEntry(cinfo->entry))
         return false;
 
     cPos.SelectFinalPoint(this);
@@ -2262,7 +2262,7 @@ void Pet::LearnPetPassives()
     if (!cInfo)
         return;
 
-    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->family);
+    CreatureFamilyEntry const* cFamily = sCreatureFamilyStore.LookupEntry(cInfo->beast_family);
     if (!cFamily)
         return;
 

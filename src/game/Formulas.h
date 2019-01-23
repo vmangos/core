@@ -106,7 +106,7 @@ namespace MaNGOS
                     pCreature->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
                     pCreature->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
                     pCreature->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
-                    pCreature->GetCreatureInfo()->minhealth > 50;
+                    pCreature->GetCreatureInfo()->health_min > 50;
 
                 if (pCreature->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet)
                     return 0;
@@ -127,7 +127,7 @@ namespace MaNGOS
                 if (isPet)
                     xp_gain *= 0.75f;
 
-                xp_gain *= pCreature->GetCreatureInfo()->ExperienceMultiplier;
+                xp_gain *= pCreature->GetCreatureInfo()->xp_multiplier;
                 xp_gain *= pCreature->GetXPModifierDueToDamageOrigin();
 
                 return (uint32)(xp_gain*sWorld.getConfig(CONFIG_FLOAT_RATE_XP_KILL));
@@ -142,7 +142,7 @@ namespace MaNGOS
                 ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_CRITTER &&
                 ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_NOT_SPECIFIED &&
                 ((Creature*)u)->GetCreatureInfo()->type != CREATURE_TYPE_TOTEM &&
-                ((Creature*)u)->GetCreatureInfo()->minhealth > 50;
+                ((Creature*)u)->GetCreatureInfo()->health_min > 50;
 
             if(u->GetTypeId()==TYPEID_UNIT && (
                 (u->GetUInt32Value(UNIT_CREATED_BY_SPELL) && !isPet) ||

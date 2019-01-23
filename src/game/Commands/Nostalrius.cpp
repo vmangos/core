@@ -350,11 +350,11 @@ bool ChatHandler::HandleEscortShowWpCommand(char *args)
     const auto pPlayer = m_session->GetPlayer();
     auto map = pPlayer->GetMap();
 
-    auto &scriptPoints = sScriptMgr.GetPointMoveList(cInfo->Entry);
+    auto &scriptPoints = sScriptMgr.GetPointMoveList(cInfo->entry);
 
     if (scriptPoints.empty())
     {
-        PSendSysMessage(LANG_WAYPOINT_NOTFOUND, cInfo->Entry);
+        PSendSysMessage(LANG_WAYPOINT_NOTFOUND, cInfo->entry);
         SetSentErrorMessage(true);
         return false;
     }

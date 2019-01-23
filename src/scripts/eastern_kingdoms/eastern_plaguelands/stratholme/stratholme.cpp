@@ -677,7 +677,7 @@ struct npc_auriusAI : public ScriptedAI
     {
         if (!m_pInstance)
             return;
-        ui_entry = (m_creature->GetCreatureInfo()->Entry);
+        ui_entry = (m_creature->GetCreatureInfo()->entry);
         if (ui_entry == NPC_AURIUS_1)
             m_pInstance->SetData(TYPE_EVENT_AURIUS, NOT_STARTED);
         bIsFakeDead = false;

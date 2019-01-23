@@ -818,7 +818,7 @@ struct ScriptInfo
 
         struct                                              // SCRIPT_COMMAND_CREATURE_SPELLS (55)
         {
-            uint32 spellTemplate[4];                        // datalong to datalong4
+            uint32 spellListId[4];                          // datalong to datalong4
             uint32 unused;                                  // data_flags
             int32 chance[4];                                // dataint to dataint4
         } creatureSpells;

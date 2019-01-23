@@ -661,7 +661,7 @@ bool Map::ScriptCommand_SetEquipment(const ScriptInfo& script, WorldObject* sour
 
     if (script.setEquipment.resetDefault)
     {
-        pSource->LoadEquipment(pSource->GetCreatureInfo()->equipmentId, true);
+        pSource->LoadEquipment(pSource->GetCreatureInfo()->equipment_id, true);
         return false;
     }
 
@@ -1558,7 +1558,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
 
     for (int i = 0; i < 4; i++)
     {
-        const uint32 currentId = script.creatureSpells.spellTemplate[i];
+        const uint32 currentId = script.creatureSpells.spellListId[i];
         const uint32 currentChance = script.creatureSpells.chance[i];
 
         if (!currentChance)
@@ -1574,7 +1574,7 @@ bool Map::ScriptCommand_CreatureSpells(const ScriptInfo& script, WorldObject* so
     }
 
     if (pSource->AI())
-        pSource->AI()->SetSpellsTemplate(chosenId);
+        pSource->AI()->SetSpellsList(chosenId);
     else
         return ShouldAbortScript(script);
 
