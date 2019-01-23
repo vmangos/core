@@ -63,7 +63,7 @@ ALTER TABLE `creature_template`
 	CHANGE COLUMN `RacialLeader` `racial_leader` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `civilian`,
 	CHANGE COLUMN `RegenHealth` `regeneration` TINYINT(3) UNSIGNED NOT NULL DEFAULT '1' AFTER `racial_leader`,
 	CHANGE COLUMN `MechanicImmuneMask` `mechanic_immune_mask` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `vendor_id`,
-	CHANGE COLUMN `SchoolImmuneMask` `school_immune_max` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `mechanic_immune_mask`,
+	CHANGE COLUMN `SchoolImmuneMask` `school_immune_mask` INT(10) UNSIGNED NOT NULL DEFAULT '0' AFTER `mechanic_immune_mask`,
 	CHANGE COLUMN `ScriptName` `script_name` CHAR(64) NOT NULL DEFAULT '' AFTER `flags_extra`;
 ALTER TABLE `gameobject_template`
 	CHANGE COLUMN `ScriptName` `script_name` VARCHAR(64) NOT NULL DEFAULT '' AFTER `maxgold`;
