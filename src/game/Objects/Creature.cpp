@@ -483,7 +483,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     SetSheath(SHEATH_STATE_MELEE);
     SetByteValue(UNIT_FIELD_BYTES_2, 1, UNIT_BYTE2_FLAG_AURAS);
 
-    SelectLevel(GetCreatureInfo(), preserveHPAndPower ? GetHealthPercent() : 100.0f, 100.0f);
+    SelectLevel(GetCreatureInfo(), preserveHPAndPower ? GetHealthPercent() : 100.0f, preserveHPAndPower ? GetPowerPercent(POWER_MANA) : 100.0f);
 
     setFaction(GetCreatureInfo()->faction);
 
@@ -1420,6 +1420,9 @@ void Creature::SaveToDB(uint32 mapid)
                         ? IDLE_MOTION_TYPE : GetDefaultMovementType();
     data.spawnFlags = m_isActiveObject ? SPAWN_FLAG_ACTIVE : 0;
 
+    float const spawndist = GetDefaultMovementType() == RANDOM_MOTION_TYPE ? m_respawnradius : 0.0f;
+    float const curmana = GetMaxPower(POWER_MANA) ? GetPowerPercent(POWER_MANA) : 0.0f;
+
     // updated in DB
     WorldDatabase.BeginTransaction();
 
@@ -1438,16 +1441,16 @@ void Creature::SaveToDB(uint32 mapid)
        << GetOrientation() << ","
        << data.spawntimesecsmin << ","                     // respawn time minimum
        << data.spawntimesecsmax << ","                     // respawn time maximum
-       << (float) m_respawnradius << ","                   //spawn distance (float)
-       << (uint32)(0) << ","                               //currentwaypoint
-       << GetHealth() << ","                               //curhealth
-       << GetPower(POWER_MANA) << ","                      //curmana
-       << (m_isDeadByDefault ? 1 : 0) << ","               //is_dead
-       << GetDefaultMovementType() << ","                 //default movement generator type
+       << spawndist << ","                                 // spawn distance
+       << (uint32)(0) << ","                               // currentwaypoint
+       << GetHealthPercent() << ","                        // curhealth
+       << curmana << ","                                   // curmana
+       << (m_isDeadByDefault ? 1 : 0) << ","               // is_dead
+       << GetDefaultMovementType() << ","                  // default movement generator type
        << m_isActiveObject << ","
        << m_visibilityModifier << ","
-       << "0,"                                             //patch_min
-       << "10)";                                           //patch_max
+       << "0,"                                             // patch_min
+       << "10)";                                           // patch_max
 
     WorldDatabase.PExecuteLog("%s", ss.str().c_str());
 
@@ -1487,10 +1490,12 @@ void Creature::SelectLevel(const CreatureInfo *cinfo, float percentHealth, float
     uint32 mana = minmana + uint32(rellevel * (maxmana - minmana));
 
     SetCreateMana(mana);
-    SetMaxPower(POWER_MANA, mana);                          //MAX Mana
-    SetPower(POWER_MANA, mana);
+    SetMaxPower(POWER_MANA, mana);
 
-    // TODO: set UNIT_FIELD_POWER*, for some creature class case (energy, etc)
+    if (percentMana == 100.0f)
+        SetPower(POWER_MANA, mana);
+    else
+        SetPowerPercent(POWER_MANA, percentMana);
 
     SetModifierValue(UNIT_MOD_HEALTH, BASE_VALUE, float(health));
     SetModifierValue(UNIT_MOD_MANA, BASE_VALUE, float(mana));

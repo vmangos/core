@@ -9034,6 +9034,12 @@ void Unit::SetHealthPercent(float percent)
     SetHealth(newHealth);
 }
 
+void Unit::SetPowerPercent(Powers power, float percent)
+{
+    uint32 newMana = GetMaxPower(power) * percent / 100.0f;
+    SetPower(power, newMana);
+}
+
 void Unit::SetPower(Powers power, uint32 val)
 {
     if (GetPower(power) == val)

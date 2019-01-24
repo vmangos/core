@@ -1258,9 +1258,10 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetInitCreaturePowerType();
         uint32 GetPower(   Powers power) const { return GetUInt32Value(UNIT_FIELD_POWER1   +power); }
         uint32 GetMaxPower(Powers power) const { return GetUInt32Value(UNIT_FIELD_MAXPOWER1+power); }
-        float GetPowerPercent(Powers power) const { return (GetPower(power)*100.0f) / GetMaxPower(power); }
+        float GetPowerPercent(Powers power) const { return GetMaxPower(power) ? ((GetPower(power)*100.0f) / GetMaxPower(power)) : 100.0f; }
         void SetPower(   Powers power, uint32 val);
         void SetMaxPower(Powers power, uint32 val);
+        void SetPowerPercent(Powers power, float percent);
         int32 ModifyPower(Powers power, int32 val);
         void ApplyPowerMod(Powers power, uint32 val, bool apply);
         void ApplyMaxPowerMod(Powers power, uint32 val, bool apply);

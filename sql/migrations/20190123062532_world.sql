@@ -88,6 +88,9 @@ ALTER TABLE `map_template`
 ALTER TABLE `creature_template`
 	CHANGE COLUMN `regeneration` `regeneration` TINYINT(3) UNSIGNED NOT NULL DEFAULT '3' AFTER `racial_leader`;
 UPDATE `creature_template` SET `regeneration`=3 WHERE `regeneration`=1;
+ALTER TABLE `creature_template`
+	CHANGE COLUMN `dmg_school` `dmg_school` TINYINT(4) UNSIGNED NOT NULL DEFAULT '0' AFTER `dmg_max`,
+	CHANGE COLUMN `movement_type` `movement_type` TINYINT(3) UNSIGNED NOT NULL DEFAULT '0' AFTER `ai_name`;
 
 
 -- End of migration.
