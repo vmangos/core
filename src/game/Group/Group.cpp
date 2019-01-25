@@ -2088,18 +2088,20 @@ static void RewardGroupAtKill_helper(Player* pGroupGuy, Unit* pVictim, uint32 co
     {
         pGroupGuy->RewardHonor(pVictim, count);
 
-        if (pGroupGuy->GetBattleGround() && pGroupGuy->GetBattleGround()->GetTypeID() == BATTLEGROUND_AV) // Ivina < Nostalrius > HK in AV also reward 1 rep point.
+        // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+        // - Frostwolf and Stormpike faction will now be gained by killing
+        //   players of the opposite faction.
+        if (pGroupGuy->GetBattleGround() && (pGroupGuy->GetBattleGround()->GetTypeID() == BATTLEGROUND_AV) && (sWorld.GetWowPatch() >= WOW_PATCH_110))
         {
-            if (pVictim && pVictim->GetTypeId() == TYPEID_PLAYER)
+            if (Player* pPlayerVictim = ToPlayer(pVictim))
             {
-                Player *pPVictim = (Player *)pVictim;
-                if ((pGroupGuy->GetTeam() == ALLIANCE) && (pPVictim->GetTeam() == HORDE))
+                if ((pGroupGuy->GetTeam() == ALLIANCE) && (pPlayerVictim->GetTeam() == HORDE))
                 {
                     FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(730);
                     if (factionEntry)
                         pGroupGuy->GetReputationMgr().ModifyReputation(factionEntry, 1);
                 }
-                if ((pGroupGuy->GetTeam() == HORDE) && (pPVictim->GetTeam() == ALLIANCE))
+                if ((pGroupGuy->GetTeam() == HORDE) && (pPlayerVictim->GetTeam() == ALLIANCE))
                 {
                     FactionEntry const* factionEntry = sObjectMgr.GetFactionEntry(729);
                     if (factionEntry)
