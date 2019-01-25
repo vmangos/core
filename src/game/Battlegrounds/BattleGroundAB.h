@@ -149,10 +149,14 @@ enum BG_AB_NodeOccupiedCredit
 };
 
 // [-PROGRESSIVE] Patch 1.9 and less code:
-#define BG_AB_NotABBGWeekendHonorTicks      330
-#define BG_AB_ABBGWeekendHonorTicks         200
-#define BG_AB_NotABBGWeekendReputationTicks 200
-#define BG_AB_ABBGWeekendReputationTicks    150
+#define AB_NORMAL_HONOR_INTERVAL                   330
+#define AB_WEEKEND_HONOR_INTERVAL                  200
+#define AB_NORMAL_REPUTATION_INTERVAL_PRE_1_10     330
+#define AB_WEEKEND_REPUTATION_INTERVAL_PRE_1_10    200
+#define AB_NORMAL_REPUTATION_INTERVAL_POST_1_10    200
+#define AB_WEEKEND_REPUTATION_INTERVAL_POST_1_10   150
+#define GET_AB_NORMAL_REP_INTERVAL (sWorld.GetWowPatch() > WOW_PATCH_109 ? AB_NORMAL_REPUTATION_INTERVAL_POST_1_10 : AB_NORMAL_REPUTATION_INTERVAL_PRE_1_10)
+#define GET_AB_WEEKEND_REP_INTERVAL (sWorld.GetWowPatch() > WOW_PATCH_109 ? AB_WEEKEND_REPUTATION_INTERVAL_POST_1_10 : AB_WEEKEND_REPUTATION_INTERVAL_PRE_1_10)
 
 // Tick intervals and given points: case 0,1,2,3,4,5 captured nodes
 const uint32 BG_AB_TickIntervals[6] = {0, 12000, 9000, 6000, 3000, 1000};
