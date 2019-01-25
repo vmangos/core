@@ -9262,17 +9262,27 @@ void CharmInfo::InitEmptyActionBar()
 
 void CharmInfo::InitPossessCreateSpells()
 {
-    InitEmptyActionBar();                                   //charm action bar
+    InitEmptyActionBar();
 
-    if (m_unit->GetTypeId() == TYPEID_PLAYER)               //possessed players don't have spells, keep the action bar empty
+    // possessed players don't have spells, keep the action bar empty
+    Creature* pCreature = m_unit->ToCreature();
+    if (!pCreature)                                         
         return;
 
     for (uint32 x = 0; x < CREATURE_MAX_SPELLS; ++x)
     {
-        if (IsPassiveSpell(((Creature*)m_unit)->m_spells[x]))
-            m_unit->CastSpell(m_unit, ((Creature*)m_unit)->m_spells[x], true);
-        else
-            AddSpellToActionBar(((Creature*)m_unit)->m_spells[x], ACT_PASSIVE);
+        if (IsPassiveSpell(pCreature->m_spells[x]))
+            m_unit->CastSpell(m_unit, pCreature->m_spells[x], true);
+        else if (SpellEntry const* pSpellEntry = sSpellMgr.GetSpellEntry(pCreature->m_spells[x]))
+
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - Charm spells on charmed creatures are no longer available to the
+            //   players that charm them.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            if (!IsCharmSpell(pSpellEntry))
+#endif
+
+                AddSpellToActionBar(pCreature->m_spells[x], ACT_PASSIVE);
     }
 }
 
@@ -9308,12 +9318,22 @@ void CharmInfo::InitCharmCreateSpells()
 
             ActiveStates newstate;
             bool onlyselfcast = true;
-            SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellId);
+            SpellEntry const *pSpellEntry = sSpellMgr.GetSpellEntry(spellId);
 
-            if (!spellInfo) onlyselfcast = false;
+            if (!pSpellEntry)
+                onlyselfcast = false;
+
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - Charm spells on charmed creatures are no longer available to the
+            //   players that charm them.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
+            else if (IsCharmSpell(pSpellEntry))
+                continue;
+#endif
+
             for (uint32 i = 0; i < 3 && onlyselfcast; ++i)  //nonexistent spell will not make any problems as onlyselfcast would be false -> break right away
             {
-                if (spellInfo->EffectImplicitTargetA[i] != TARGET_SELF && spellInfo->EffectImplicitTargetA[i] != 0)
+                if (pSpellEntry->EffectImplicitTargetA[i] != TARGET_SELF && pSpellEntry->EffectImplicitTargetA[i] != 0)
                     onlyselfcast = false;
             }
 
