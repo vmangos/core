@@ -24,6 +24,7 @@
 
 #include "Common.h"
 #include "BattleGround.h"
+#include "World.h"
 
 enum BG_AB_WorldStates
 {
