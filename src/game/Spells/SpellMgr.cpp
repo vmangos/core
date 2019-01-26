@@ -1631,7 +1631,7 @@ bool SpellMgr::IsSpellProcEventCanTriggeredBy(SpellProcEventEntry const * spellP
         return false;
 
     // Always trigger for this
-    if (EventProcFlag & (PROC_FLAG_KILLED | PROC_FLAG_KILL | PROC_FLAG_ON_TRAP_ACTIVATION))
+    if (EventProcFlag & (PROC_FLAG_HEARTBEAT | PROC_FLAG_KILL | PROC_FLAG_ON_TRAP_ACTIVATION))
         return true;
 
     if (spellProcEvent)     // Exist event data
@@ -4529,6 +4529,164 @@ void SpellMgr::AssignInternalSpellFlags()
     }
 }
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+enum OldProcFlags
+{
+    OLD_PROC_FLAG_DONE_MELEE_HIT      = 0x00000001,   // New value - 20
+    OLD_PROC_FLAG_TAKEN_MELEE_HIT     = 0x00000002,   // New value - 40
+    OLD_PROC_FLAG_KILL                = 0x00000004,   // New value - 2
+    OLD_PROC_FLAG_HEARTBEAT             = 0x00000008,   // New value - 1
+    OLD_PROC_FLAG_DODGE               = 0x00000010,   // New value - 40
+    OLD_PROC_FLAG_PARRY               = 0x00000020,   // New value - 40
+    OLD_PROC_FLAG_BLOCK               = 0x00000040,   // New value - 40
+    OLD_PROC_FLAG_ON_SWING            = 0x00000080,   // New value - 4
+    OLD_PROC_FLAG_MAGIC_SPELL_CAST    = 0x00000100,   // New value - 81920
+    OLD_PROC_FLAG_TAKEN_NON_MELEE_HIT = 0x00000400,   // New value - 139904
+    OLD_PROC_FLAG_TAKEN_HIT           = 0x00000800,   // New value - 139936
+    OLD_PROC_FLAG_DONE_MELEE_CRIT     = 0x00001000,   // New value - 4
+    OLD_PROC_FLAG_TAKEN_MELEE_CRIT    = 0x00002000,   // New value - 8
+    OLD_PROC_FLAG_DONE_ANY_NOT_SWING  = 0x00004000,   // New value - 87376
+    OLD_PROC_FLAG_TAKEN_ANY_DAMAGE    = 0x00008000,   // New value - 1048576
+    OLD_PROC_FLAG_DONE_SPELL_CRIT     = 0x00010000,   // New value - 87376
+    OLD_PROC_FLAG_DONE_SPELL_HIT      = 0x00020000,   // New value - 87376
+    OLD_PROC_FLAG_TAKEN_RANGED_CRIT   = 0x00040000,   // New value - 139936
+    OLD_PROC_FLAG_DONE_RANGED_HIT     = 0x00080000,   // New value - 320
+    OLD_PROC_FLAG_TAKEN_RANGED_HIT    = 0x00100000,   // New value - 640
+};
+
+uint32 ReplaceOldSpellProcFlags(uint32 oldFlags)
+{
+    uint32 newFlags = 0;
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_MELEE_HIT)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_MELEE_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_KILL)
+        newFlags |= PROC_FLAG_KILL;
+
+    if (oldFlags & OLD_PROC_FLAG_HEARTBEAT)
+        newFlags |= PROC_FLAG_HEARTBEAT;
+
+    if (oldFlags & OLD_PROC_FLAG_DODGE)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_PARRY)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_BLOCK)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_ON_SWING)
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+
+    if (oldFlags & OLD_PROC_FLAG_MAGIC_SPELL_CAST)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_NON_MELEE_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_MELEE_CRIT)
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_HIT;
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_MELEE_CRIT)
+        newFlags |= PROC_FLAG_TAKEN_MELEE_HIT;
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_ANY_NOT_SWING)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_ANY_DAMAGE)
+        newFlags |= PROC_FLAG_TAKEN_ANY_DAMAGE;
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_SPELL_CRIT)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_SPELL_HIT)
+    {
+        //newFlags |= PROC_FLAG_SUCCESSFUL_MELEE_SPELL_HIT;
+        //newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_POSITIVE_SPELL;
+        newFlags |= PROC_FLAG_SUCCESSFUL_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_RANGED_CRIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_MELEE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NONE_SPELL_HIT;
+        newFlags |= PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_DONE_RANGED_HIT)
+    {
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_HIT;
+        newFlags |= PROC_FLAG_SUCCESSFUL_RANGED_SPELL_HIT;
+    }
+
+    if (oldFlags & OLD_PROC_FLAG_TAKEN_RANGED_HIT)
+    {
+        newFlags |= PROC_FLAG_TAKEN_RANGED_HIT;
+        newFlags |= PROC_FLAG_TAKEN_RANGED_SPELL_HIT;
+    }
+
+    return newFlags;
+}
+#endif
+
 void SpellMgr::LoadSpells()
 {
     uint32 oldMSTime = WorldTimer::getMSTime();
@@ -4773,6 +4931,10 @@ void SpellMgr::LoadSpells()
             if (IsEffectAppliesAura(spell->Effect[i]) && (spell->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED))
                 spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
         }
+#endif
+        // Before 1.10, the spell proc flags had completely different meanings.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        spell->procFlags = ReplaceOldSpellProcFlags(spell->procFlags);
 #endif
 
         spell->InitCachedValues();

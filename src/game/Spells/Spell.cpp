@@ -692,9 +692,11 @@ void Spell::prepareDataForTriggerSystem()
                 // Seal of Command (example Vengeance proc) | SPELLFAMILY_PALADIN override in spell_mod
                 if (m_spellInfo->Id == 20424)
                     m_canTrigger = true;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
                 // Seal of Righteousness
                 else if (!m_spellInfo->SpellFamilyFlags && m_spellInfo->SpellIconID == 25)
                     m_canTrigger = true;
+#endif
                 // Holy Shock
                 else if (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_HOLY_SHOCK>())
                     m_canTrigger = true;

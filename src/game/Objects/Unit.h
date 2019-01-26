@@ -230,7 +230,11 @@ enum HitInfo
     HITINFO_MISS                = 0x00000010,
     HITINFO_ABSORB              = 0x00000020,               // plays absorb sound
     HITINFO_RESIST              = 0x00000040,               // resisted atleast some damage
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     HITINFO_CRITICALHIT         = 0x00000080,
+#else
+    HITINFO_CRITICALHIT         = 0x00000008,
+#endif
     HITINFO_UNK8                = 0x00000100,               // wotlk?
     HITINFO_UNK9                = 0x00002000,               // wotlk?
     HITINFO_GLANCING            = 0x00004000,

@@ -609,7 +609,7 @@ enum ProcFlags
 {
     PROC_FLAG_NONE                           = 0x00000000,
 
-    PROC_FLAG_KILLED                         = 0x00000001,   // 00 Killed by aggressor
+    PROC_FLAG_HEARTBEAT                      = 0x00000001,   // 00 On Tick
     PROC_FLAG_KILL                           = 0x00000002,   // 01 Kill target (in most cases need XP/Honor reward, see Unit::IsTriggeredAtSpellProcEvent for additinoal check)
 
     PROC_FLAG_SUCCESSFUL_MELEE_HIT           = 0x00000004,   // 02 Successful melee auto attack
