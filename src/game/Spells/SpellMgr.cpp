@@ -4535,7 +4535,7 @@ enum OldProcFlags
     OLD_PROC_FLAG_DONE_MELEE_HIT      = 0x00000001,   // New value - 20
     OLD_PROC_FLAG_TAKEN_MELEE_HIT     = 0x00000002,   // New value - 40
     OLD_PROC_FLAG_KILL                = 0x00000004,   // New value - 2
-    OLD_PROC_FLAG_HEARTBEAT             = 0x00000008,   // New value - 1
+    OLD_PROC_FLAG_HEARTBEAT           = 0x00000008,   // New value - 1
     OLD_PROC_FLAG_DODGE               = 0x00000010,   // New value - 40
     OLD_PROC_FLAG_PARRY               = 0x00000020,   // New value - 40
     OLD_PROC_FLAG_BLOCK               = 0x00000040,   // New value - 40
