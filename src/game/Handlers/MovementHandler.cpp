@@ -349,41 +349,21 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
     if (opcode == MSG_MOVE_FALL_LAND)
     {
+        uint16 opcode2 = 0;
         if (!movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
-        {
-            WorldPacket data(MSG_MOVE_STOP, recv_data.size());
-            data << _clientMoverGuid.WriteAsPacked();             // write guid
-            movementInfo.Write(data);                             // write data
-
-            mover->SendMovementMessageToSet(std::move(data), true, _player);
-        }
+            opcode2 = MSG_MOVE_STOP;
         else if (movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
-        {
-            WorldPacket data(MSG_MOVE_START_BACKWARD, recv_data.size());
-            data << _clientMoverGuid.WriteAsPacked();             // write guid
-            movementInfo.Write(data);                             // write data
-
-            mover->SendMovementMessageToSet(std::move(data), true, _player);
-        }
+            opcode2 = MSG_MOVE_START_BACKWARD;
         else if (movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
-        {
-            WorldPacket data(MSG_MOVE_START_FORWARD, recv_data.size());
-            data << _clientMoverGuid.WriteAsPacked();             // write guid
-            movementInfo.Write(data);                             // write data
-
-            mover->SendMovementMessageToSet(std::move(data), true, _player);
-        }
+            opcode2 = MSG_MOVE_START_FORWARD;
         else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
-        {
-            WorldPacket data(MSG_MOVE_START_STRAFE_LEFT, recv_data.size());
-            data << _clientMoverGuid.WriteAsPacked();             // write guid
-            movementInfo.Write(data);                             // write data
-
-            mover->SendMovementMessageToSet(std::move(data), true, _player);
-        }
+            opcode2 = MSG_MOVE_START_STRAFE_LEFT;
         else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
+            opcode2 = MSG_MOVE_START_STRAFE_RIGHT;
+
+        if (opcode2)
         {
-            WorldPacket data(MSG_MOVE_START_STRAFE_RIGHT, recv_data.size());
+            WorldPacket data(opcode2, recv_data.size());
             data << _clientMoverGuid.WriteAsPacked();             // write guid
             movementInfo.Write(data);                             // write data
 
