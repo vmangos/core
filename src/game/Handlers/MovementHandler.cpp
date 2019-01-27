@@ -347,13 +347,48 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
     // forward on other people's screen. Once he moves for real, they will see him
     // teleport back to where he was standing after he jumped.
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
-    if ((opcode == MSG_MOVE_FALL_LAND) && !movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING_OR_TURN))
+    if (opcode == MSG_MOVE_FALL_LAND)
     {
-        WorldPacket data(MSG_MOVE_STOP, recv_data.size());
-        data << _clientMoverGuid.WriteAsPacked();             // write guid
-        movementInfo.Write(data);                             // write data
+        if (!movementInfo.HasMovementFlag(MOVEFLAG_MASK_MOVING))
+        {
+            WorldPacket data(MSG_MOVE_STOP, recv_data.size());
+            data << _clientMoverGuid.WriteAsPacked();             // write guid
+            movementInfo.Write(data);                             // write data
 
-        mover->SendMovementMessageToSet(std::move(data), true, _player);
+            mover->SendMovementMessageToSet(std::move(data), true, _player);
+        }
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_BACKWARD))
+        {
+            WorldPacket data(MSG_MOVE_START_BACKWARD, recv_data.size());
+            data << _clientMoverGuid.WriteAsPacked();             // write guid
+            movementInfo.Write(data);                             // write data
+
+            mover->SendMovementMessageToSet(std::move(data), true, _player);
+        }
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_FORWARD))
+        {
+            WorldPacket data(MSG_MOVE_START_FORWARD, recv_data.size());
+            data << _clientMoverGuid.WriteAsPacked();             // write guid
+            movementInfo.Write(data);                             // write data
+
+            mover->SendMovementMessageToSet(std::move(data), true, _player);
+        }
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_LEFT))
+        {
+            WorldPacket data(MSG_MOVE_START_STRAFE_LEFT, recv_data.size());
+            data << _clientMoverGuid.WriteAsPacked();             // write guid
+            movementInfo.Write(data);                             // write data
+
+            mover->SendMovementMessageToSet(std::move(data), true, _player);
+        }
+        else if (movementInfo.HasMovementFlag(MOVEFLAG_STRAFE_RIGHT))
+        {
+            WorldPacket data(MSG_MOVE_START_STRAFE_RIGHT, recv_data.size());
+            data << _clientMoverGuid.WriteAsPacked();             // write guid
+            movementInfo.Write(data);                             // write data
+
+            mover->SendMovementMessageToSet(std::move(data), true, _player);
+        }
     }
 #endif
 }
