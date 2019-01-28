@@ -4531,11 +4531,14 @@ void ObjectMgr::LoadGroups()
         while (result->NextRow());
     }
 
+    sLog.outString();
+    sLog.outString(">> Loaded %u group members total", count);
+
     // clean groups
     // TODO: maybe delete from the DB before loading in this case
     for (GroupMap::iterator itr = m_GroupMap.begin(); itr != m_GroupMap.end();)
     {
-        if (itr->second->GetMembersCount() < 2)
+        if ((itr->second->GetMembersCount() < 2) || (itr->second->GetMembersCount() > 40))
         {
             itr->second->Disband();
             delete itr->second;
@@ -4603,9 +4606,6 @@ void ObjectMgr::LoadGroups()
 
     sLog.outString();
     sLog.outString(">> Loaded %u group-instance binds total", count);
-
-    sLog.outString();
-    sLog.outString(">> Loaded %u group members total", count);
 }
 
 void ObjectMgr::LoadQuests()
