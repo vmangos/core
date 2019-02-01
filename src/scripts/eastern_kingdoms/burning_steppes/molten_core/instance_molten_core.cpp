@@ -333,7 +333,7 @@ struct instance_molten_core : ScriptedInstance
             case TYPE_MAJORDOMO:
                 m_auiEncounter[TYPE_MAJORDOMO] = uiData;
                 if (uiData == DONE)
-                    DoRespawnGameObject(m_uiFirelordCacheGUID);
+                    DoRespawnGameObject(m_uiFirelordCacheGUID, HOUR);
                 break;
             case TYPE_RAGNAROS:
                 m_auiEncounter[9] = uiData;
