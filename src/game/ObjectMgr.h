@@ -824,6 +824,7 @@ class ObjectMgr
         void LoadGameobjects(bool reload = false);
         void LoadItemPrototypes();
         void CorrectItemEffects(uint32, _ItemSpell&);
+        void CorrectItemModels(uint32, uint32&);
         void LoadItemRequiredTarget();
         void LoadItemLocales();
         void LoadQuestLocales();

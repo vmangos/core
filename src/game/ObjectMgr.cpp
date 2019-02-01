@@ -3217,6 +3217,21 @@ void ObjectMgr::CorrectItemEffects(uint32 itemId, _ItemSpell& itemSpell)
 #endif
 }
 
+void ObjectMgr::CorrectItemModels(uint32 itemId, uint32& displayId)
+{
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_5_1
+    // Spry Boots
+    if ((itemId == 18411) && (displayId == 31712) && (sWorld.GetWowPatch() == WOW_PATCH_105))
+        displayId = 31732;
+    // Boots of Prophecy
+    if ((itemId == 16811) && (displayId == 31692) && (sWorld.GetWowPatch() == WOW_PATCH_105))
+        displayId = 31718;
+    // Bloodseeker
+    if ((itemId == 19107) && (displayId == 31713) && (sWorld.GetWowPatch() == WOW_PATCH_105))
+        displayId = 32146;
+#endif
+}
+
 void ObjectMgr::LoadItemPrototypes()
 {
     sItemStorage.LoadProgressive(sWorld.GetWowPatch());
@@ -3230,6 +3245,8 @@ void ObjectMgr::LoadItemPrototypes()
         ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(i);
         if (!proto)
             continue;
+
+        CorrectItemModels(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);
 
         if (proto->Class >= MAX_ITEM_CLASS)
         {
