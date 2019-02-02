@@ -639,16 +639,13 @@ void BattleGround::EndBattleGround(Team winner)
             plr->getHostileRefManager().deleteReferences();
         }
 
-        //this line is obsolete - team is set ALWAYS
-        //if(!team) team = plr->GetTeam();
-
         if (team == winner)
-        {
-            RewardMark(plr, ITEM_WINNER_COUNT);
-            //RewardQuestComplete(plr);
-        }
-        else
-            RewardMark(plr, ITEM_LOSER_COUNT);
+            RewardMark(plr, true);
+        // World of Warcraft Client Patch 1.8.4 (2005-12-06)
+        // - Battles must now last at least ten minutes after the start of the 
+        //   battle in order for the losing team to receive a Mark of Honor.
+        else if (GetStartTime() > 10 * MINUTE * IN_MILLISECONDS)
+            RewardMark(plr, false);
 
         plr->CombatStopWithPets(true);
 
@@ -722,9 +719,9 @@ uint32 BattleGround::GetBattlemasterEntry() const
     }
 }
 
-void BattleGround::RewardMark(Player *plr, uint32 count)
+void BattleGround::RewardMark(Player *plr, bool winner)
 {
-    if (count == ITEM_WINNER_COUNT)
+    if (winner)
         RewardSpellCast(plr, plr->GetTeamId() ? GetHordeWinSpell() : GetAllianceWinSpell());
     else
         RewardSpellCast(plr, plr->GetTeamId() ? GetHordeLoseSpell() : GetAllianceLoseSpell());
@@ -738,7 +735,7 @@ void BattleGround::RewardSpellCast(Player *plr, uint32 spell_id)
     SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spell_id);
     if (!spellInfo)
     {
-        sLog.outError("Battleground reward casting spell %u not exist.", spell_id);
+        sLog.outError("Battleground reward spell %u does not exist.", spell_id);
         return;
     }
 
