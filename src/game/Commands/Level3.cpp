@@ -4261,6 +4261,7 @@ bool ChatHandler::HandleNearGraveCommand(char* args)
 }
 
 //-----------------------Npc Commands-----------------------
+
 bool ChatHandler::HandleNpcAllowMovementCommand(char* /*args*/)
 {
     if (sWorld.getAllowMovement())
@@ -4297,6 +4298,23 @@ bool ChatHandler::HandleNpcChangeEntryCommand(char *args)
         SendSysMessage(LANG_DONE);
     else
         SendSysMessage(LANG_ERROR);
+    return true;
+}
+
+bool ChatHandler::HandleNpcEvadeCommand(char* /*args*/)
+{
+    Creature* pTarget = GetSelectedCreature();
+
+    if (!pTarget)
+    {
+        SendSysMessage(LANG_SELECT_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (pTarget->AI())
+        pTarget->AI()->EnterEvadeMode();
+
     return true;
 }
 
@@ -4368,73 +4386,43 @@ bool ChatHandler::HandleNpcPlayEmoteCommand(char* args)
     return true;
 }
 
-//TODO: NpcCommands that needs to be fixed :
-
-bool ChatHandler::HandleNpcAddWeaponCommand(char* /*args*/)
+bool ChatHandler::HandleNpcAddWeaponCommand(char* args)
 {
-    /*if (!*args)
-    return false;
+    Creature* pCreature = GetSelectedCreature();
 
-    ObjectGuid guid = m_session->GetPlayer()->GetSelectionGuid();
-    if (guid.IsEmpty())
-    {
-        SendSysMessage(LANG_NO_SELECTION);
-        return true;
-    }
-
-    Creature *pCreature = ObjectAccessor::GetCreature(*m_session->GetPlayer(), guid);
-
-    if(!pCreature)
+    if (!pCreature)
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         return true;
     }
 
-    char* pSlotID = strtok((char*)args, " ");
-    if (!pSlotID)
+    uint32 uiItemId = 0;
+
+    if (!ExtractUInt32(&args, uiItemId))
         return false;
 
-    char* pItemID = strtok(NULL, " ");
-    if (!pItemID)
+    uint32 uiSlotId = 0;
+
+    if (!ExtractUInt32(&args, uiSlotId))
         return false;
+    
+    ItemPrototype const* pItemProto = ObjectMgr::GetItemPrototype(uiItemId);
 
-    uint32 ItemID = atoi(pItemID);
-    uint32 SlotID = atoi(pSlotID);
-
-    ItemPrototype* tmpItem = ObjectMgr::GetItemPrototype(ItemID);
-
-    bool added = false;
-    if(tmpItem)
+    if (!pItemProto)
     {
-        switch(SlotID)
-        {
-            case 1:
-                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY, ItemID);
-                added = true;
-                break;
-            case 2:
-                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY_01, ItemID);
-                added = true;
-                break;
-            case 3:
-                pCreature->SetUInt32Value(UNIT_VIRTUAL_ITEM_SLOT_DISPLAY_02, ItemID);
-                added = true;
-                break;
-            default:
-                PSendSysMessage(LANG_ITEM_SLOT_NOT_EXIST,SlotID);
-                added = false;
-                break;
-        }
-
-        if(added)
-            PSendSysMessage(LANG_ITEM_ADDED_TO_SLOT,ItemID,tmpItem->Name1,SlotID);
-    }
-    else
-    {
-        PSendSysMessage(LANG_ITEM_NOT_FOUND,ItemID);
+        PSendSysMessage(LANG_ITEM_NOT_FOUND, uiItemId);
         return true;
     }
-    */
+
+    if (uiSlotId > VIRTUAL_ITEM_SLOT_2)
+    {
+        PSendSysMessage(LANG_ITEM_SLOT_NOT_EXIST, uiSlotId);
+        return true;
+    }
+
+    pCreature->SetVirtualItem(VirtualItemSlot(uiSlotId), uiItemId);
+    PSendSysMessage(LANG_ITEM_ADDED_TO_SLOT, uiItemId, pItemProto->Name1, uiSlotId);
+
     return true;
 }
 //----------------------------------------------------------

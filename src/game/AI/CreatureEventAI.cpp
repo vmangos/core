@@ -62,8 +62,6 @@ int CreatureEventAI::Permissible(const Creature *creature)
 void CreatureEventAI::GetAIInformation(ChatHandler& reader)
 {
     reader.PSendSysMessage(LANG_NPC_EVENTAI_PHASE, (uint32)m_Phase);
-    reader.PSendSysMessage(LANG_NPC_EVENTAI_MOVE, reader.GetOnOffStr(m_bCombatMovement));
-    reader.PSendSysMessage(LANG_NPC_EVENTAI_COMBAT, reader.GetOnOffStr(m_bMeleeAttack));
 }
 
 CreatureEventAI::CreatureEventAI(Creature *c) : CreatureAI(c)

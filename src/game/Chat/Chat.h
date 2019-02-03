@@ -609,6 +609,7 @@ class MANGOS_DLL_SPEC ChatHandler
 
         //-----------------------Npc Commands-----------------------
         bool HandleNpcAddCommand(char* args);
+        bool HandleNpcAddWeaponCommand(char* args);
         bool HandleNpcSummonCommand(char* args);
         bool HandleNpcAddVendorItemCommand(char* args);
         bool HandleNpcAIInfoCommand(char* args);
@@ -617,6 +618,7 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcChangeLevelCommand(char* args);
         bool HandleNpcDeleteCommand(char* args);
         bool HandleNpcDelVendorItemCommand(char* args);
+        bool HandleNpcEvadeCommand(char* args);
         bool HandleNpcFactionIdCommand(char* args);
         bool HandleNpcFlagCommand(char* args);
         bool HandleNpcFollowCommand(char* args);
@@ -636,7 +638,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcYellCommand(char* args);
 
         //TODO: NpcCommands that needs to be fixed :
-        bool HandleNpcAddWeaponCommand(char* args);
         bool HandleNpcNameCommand(char* args);
         bool HandleNpcSubNameCommand(char* args);
         //----------------------------------------------------------

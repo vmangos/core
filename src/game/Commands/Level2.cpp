@@ -1722,7 +1722,7 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
 {
     Creature* pTarget = GetSelectedCreature();
 
-    if (!pTarget)
+    if (!pTarget || !pTarget->AI())
     {
         SendSysMessage(LANG_SELECT_CREATURE);
         SetSentErrorMessage(true);
@@ -1739,9 +1739,10 @@ bool ChatHandler::HandleNpcAIInfoCommand(char* /*args*/)
                     strAI.empty() ? " - " : strAI.c_str(),
                     cstrAIClass ? cstrAIClass : " - ",
                     strScript.empty() ? " - " : strScript.c_str());
-
-    if (pTarget->AI())
-        pTarget->AI()->GetAIInformation(*this);
+    PSendSysMessage(LANG_NPC_AI_MOVE, GetOnOffStr(pTarget->AI()->IsCombatMovementEnabled()));
+    PSendSysMessage(LANG_NPC_AI_ATTACK, GetOnOffStr(pTarget->AI()->IsMeleeAttackEnabled()));
+    PSendSysMessage(LANG_NPC_MOTION_TYPE, pTarget->GetMotionMaster()->GetCurrentMovementGeneratorType());
+    pTarget->AI()->GetAIInformation(*this);
 
     return true;
 }
@@ -2054,6 +2055,7 @@ bool ChatHandler::HandleNpcSetModelCommand(char* args)
 
     return true;
 }
+
 //set faction of creature
 bool ChatHandler::HandleNpcFactionIdCommand(char* args)
 {
