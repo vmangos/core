@@ -1491,8 +1491,11 @@ void Map::UnloadAll(bool pForce)
         Remove<Transport>(transport, true);
     }
 
-    // Bones are already added to the grid, and hence deleted when unloading
-    _bones.clear();
+    // Bones list should be empty at this point.
+    if (!_bones.empty()) {
+        sLog.outError("Non empty bones list, probably leaking. Please report.");
+        _bones.clear();
+    }
 }
 
 bool Map::CheckGridIntegrity(Creature* c, bool moved) const
@@ -3492,6 +3495,15 @@ void Map::AddCorpseToRemove(Corpse* corpse, ObjectGuid looter_guid)
 {
     ACE_Guard<MapMutexType> guard(_corpseRemovalLock);
     _corpseToRemove.emplace_back(corpse, looter_guid);
+}
+
+/**
+* Remove bones from the list. Called from Corpse destructor.
+*/
+void Map::RemoveBones(Corpse* corpse)
+{
+    ACE_Guard<MapMutexType> guard(_bonesLock);
+    _bones.remove(corpse);
 }
 
 /**
