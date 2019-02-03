@@ -45,7 +45,9 @@ enum
     EMOTE_FRENZY        =   -1000002,
 
     NPC_ANU_WARRIOR     =   15537,
-    NPC_ANU_SWARM       =   15538
+    NPC_ANU_SWARM       =   15538,
+
+    OBJ_SMALL_OBSIDIAN_CHUNK = 181068
 };
 
 struct mob_anubisath_guardianAI : public ScriptedAI
@@ -92,12 +94,8 @@ struct mob_anubisath_guardianAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        GameObject *pObsidian = m_creature->SummonGameObject(181068,
-                                m_creature->GetPositionX(),
-                                m_creature->GetPositionY(),
-                                m_creature->GetPositionZ(),
-                                0, 0, 0, 0, 0, -1, false);
-        pObsidian->SetRespawnTime(345600);
+        if (GameObject *pObsidian = m_creature->SummonGameObject(OBJ_SMALL_OBSIDIAN_CHUNK, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 0, 0, 0, 0, -1, false))
+            pObsidian->SetRespawnTime(345600);
     }
 
     void Aggro(Unit* pWho)
@@ -421,12 +419,8 @@ struct ObsidianDestroyerAI : public ScriptedAI
 
     void JustDied(Unit* pKiller)
     {
-        GameObject *pObsidian = m_creature->SummonGameObject(181068,
-                                m_creature->GetPositionX(),
-                                m_creature->GetPositionY(),
-                                m_creature->GetPositionZ(),
-                                0, 0, 0, 0, 0, -1, false);
-        pObsidian->SetRespawnTime(345600);
+        if (GameObject *pObsidian = m_creature->SummonGameObject(OBJ_SMALL_OBSIDIAN_CHUNK, m_creature->GetPositionX(), m_creature->GetPositionY(), m_creature->GetPositionZ(), 0, 0, 0, 0, 0, -1, false))
+            pObsidian->SetRespawnTime(345600);
     }
 
     void FillPlayerList()
