@@ -92,7 +92,6 @@ class Corpse : public WorldObject
         bool IsExpired(time_t t) const;
         void SetFactionTemplate(FactionTemplateEntry const* entry) { m_faction = entry; }
         FactionTemplateEntry const* GetFactionTemplate() { return m_faction; }
-        bool m_bRemoveFromBonesList = true;
     private:
         GridReference<Corpse> m_gridRef;
         FactionTemplateEntry const* m_faction;

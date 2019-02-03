@@ -3611,7 +3611,6 @@ void Map::RemoveOldBones(const uint32 diff)
         Corpse* bones = *iter;
         if (bones->IsExpired(now))
         {
-            bones->m_bRemoveFromBonesList = false;
             Remove(bones, true);
             iter = _bones.erase(iter);
         }

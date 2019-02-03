@@ -47,7 +47,7 @@ Corpse::Corpse(CorpseType type) : WorldObject(), loot(NULL), lootRecipient(NULL)
 
 Corpse::~Corpse()
 {
-    if (m_bRemoveFromBonesList && (GetType() == CORPSE_BONES))
+    if (m_currMap && (GetType() == CORPSE_BONES))
         GetMap()->RemoveBones(this);
 }
 
