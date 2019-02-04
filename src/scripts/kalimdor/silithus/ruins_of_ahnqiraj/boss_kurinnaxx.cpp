@@ -36,7 +36,7 @@ enum
     SPELL_TRASH             =   3391,
     SPELL_INVOCATION        =   26446,
 
-    SAY_BREACHED            =   -1509022
+    SAY_BREACHED            =   11720
 };
 
 struct boss_kurinnaxxAI : public ScriptedAI
@@ -82,14 +82,7 @@ struct boss_kurinnaxxAI : public ScriptedAI
         if (!m_pInstance)
             return;
 
-        //tempsummon since ossirian is not created when this event occurs
-        if (Unit* pOssirian = m_creature->SummonCreature(NPC_OSSIRIAN,
-                              m_creature->GetPositionX(),
-                              m_creature->GetPositionY(),
-                              m_creature->GetPositionZ() - 40.0f,
-                              0,
-                              TEMPSUMMON_TIMED_DESPAWN, 1000))
-            DoScriptText(SAY_BREACHED, pOssirian);
+        DoOrSimulateScriptTextForMap(SAY_BREACHED, NPC_OSSIRIAN, m_creature->GetMap());  
 
         m_pInstance->SetData(TYPE_KURINNAXX, DONE);
     }
