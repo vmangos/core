@@ -1884,54 +1884,6 @@ bool QuestAccept_npc_GorShak(Player* pPlayer, Creature* pCreature, const Quest* 
     return true;
 }
 
-// FIN Nostalrius : Ivina
-//ALITA
-enum
-{
-    GOUTTE_DE_FLAMMES   = 15529,
-    SAOUL_EFFET_VISUEL  = 15533, //turns you black
-    ROOT                = 23973 //in DB
-};
-
-struct npc_ironhand_guardianAI : public ScriptedAI
-{
-    npc_ironhand_guardianAI(Creature* pCreature) : ScriptedAI(pCreature)
-    {
-        GoutteDeFlammes_Timer = 10000;
-        Saoul_Timer = 1000;
-        Reset();
-    }
-
-    uint32 GoutteDeFlammes_Timer;
-    uint32 Saoul_Timer;
-
-    void Reset()  {    }
-
-    void UpdateAI(const uint32 diff)
-    {
-        if (GoutteDeFlammes_Timer < diff)
-        {
-            DoCastSpellIfCan(m_creature, GOUTTE_DE_FLAMMES);
-            GoutteDeFlammes_Timer = 16000;
-        }
-        else GoutteDeFlammes_Timer -= diff;
-
-        if (Saoul_Timer < 30000) //test une seule fois. <= mwai.
-        {
-            if (Saoul_Timer < diff) //en fait je vois pas à quoi ca sert, et puisque ça interomp....
-            {
-                DoCastSpellIfCan(m_creature, SAOUL_EFFET_VISUEL);
-                Saoul_Timer = 40000;
-            }
-            else Saoul_Timer -= diff;
-        }
-    }
-};
-CreatureAI* GetAI_npc_ironhand_guardian(Creature* pCreature)
-{
-    return new npc_ironhand_guardianAI(pCreature);
-}
-
 /*######
 ## at_shadowforge_bridge
 ######*/
@@ -2912,11 +2864,6 @@ void AddSC_blackrock_depths()
     newscript->Name = "npc_GorShak";
     newscript->GetAI = &GetAI_npc_GorShak;
     newscript->pQuestAcceptNPC = &QuestAccept_npc_GorShak;
-    newscript->RegisterSelf();
-
-    newscript = new Script;
-    newscript->Name = "npc_ironhand_guardian";
-    newscript->GetAI = &GetAI_npc_ironhand_guardian;
     newscript->RegisterSelf();
 
     newscript = new Script;
