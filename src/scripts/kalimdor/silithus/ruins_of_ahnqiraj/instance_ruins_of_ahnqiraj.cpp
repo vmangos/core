@@ -442,7 +442,13 @@ void instance_ruins_of_ahnqiraj::SetData(uint32 uiType, uint32 uiData)
                 if (Creature* pAndorov = instance->GetCreature(m_uiAndorovGUID))
                 {
                     pAndorov->RemoveFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_GOSSIP);
-                    pAndorov->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
+
+                    // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+                    // - Lieutenant General Andorov will now offer supplies if kept alive
+                    //   through the battle.
+                    if (sWorld.GetWowPatch() >= WOW_PATCH_110)
+                        pAndorov->SetFlag(UNIT_NPC_FLAGS, UNIT_NPC_FLAG_VENDOR);
+
                     pAndorov->SetRespawnTime(AQ_RESPAWN_FOUR_DAYS);
                 }
                 ForceAndorovSquadDespawn(120000); // Andorov disapears 2 minutes after end of combat

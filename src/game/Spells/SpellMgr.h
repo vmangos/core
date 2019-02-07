@@ -50,7 +50,7 @@ enum SpellAttributeCustom
     SPELL_CUSTOM_NEGATIVE                   = 0x002,
     SPELL_CUSTOM_POSITIVE                   = 0x004,
     SPELL_CUSTOM_CHAN_NO_DIST_LIMIT         = 0x008,
-    SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,
+    SPELL_CUSTOM_FIXED_DAMAGE               = 0x010,     // Not affected by damage/healing done bonus
     SPELL_CUSTOM_IGNORE_ARMOR               = 0x020,
     SPELL_CUSTOM_FROM_BEHIND                = 0x040,     // For spells that require the caster to be behind the target
     SPELL_CUSTOM_FROM_FRONT                 = 0x080,     // For spells that require the target to be in front of the caster

@@ -6472,6 +6472,9 @@ uint32 Unit::SpellDamageBonusDone(Unit *pVictim, SpellEntry const *spellProto, u
     if (!spellProto || !pVictim || damagetype == DIRECT_DAMAGE)
         return pdamage;
 
+    if (spellProto->Custom & SPELL_CUSTOM_FIXED_DAMAGE)
+        return pdamage;
+
     // Ignite damage already includes modifiers
     if (spellProto->IsFitToFamily<SPELLFAMILY_MAGE, CF_MAGE_IGNITE>())
         return pdamage;
