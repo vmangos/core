@@ -5981,7 +5981,7 @@ void ObjectMgr::ReturnOrDeleteOldMails(bool serverUp)
 
 void ObjectMgr::LoadAreaTriggers()
 {
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `areatrigger_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `areatrigger_template` t1 WHERE `build`=(SELECT max(`build`) FROM `areatrigger_template` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -7357,7 +7357,7 @@ void ObjectMgr::LoadFactions()
     {
         m_FactionsMap.clear();
         sLog.outString("Loading factions ...");
-        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction` t1 WHERE `build`=(SELECT max(`build`) FROM `faction` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
         if (!result)
         {
@@ -7425,7 +7425,7 @@ void ObjectMgr::LoadFactions()
     {
         m_FactionTemplatesMap.clear();
         sLog.outString("Loading faction tamplates ...");
-        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+        std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT * FROM `faction_template` t1 WHERE `build`=(SELECT max(`build`) FROM `faction_template` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
         if (!result)
         {
@@ -7916,7 +7916,7 @@ void ObjectMgr::LoadCreatureInvolvedRelations()
 void ObjectMgr::LoadTaxiNodes()
 {
     // Getting the maximum ID.
-    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT MAX(`id`) FROM `taxi_nodes` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT MAX(`id`) FROM `taxi_nodes` t1 WHERE `build`=(SELECT max(`build`) FROM `taxi_nodes` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -7932,7 +7932,7 @@ void ObjectMgr::LoadTaxiNodes()
     uint32 maxTaxiNodeEntry = fields[0].GetUInt32() + 1;
 
     // Actually loading the taxi nodes.
-    result.reset(WorldDatabase.PQuery("SELECT * FROM `taxi_nodes` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `taxi_nodes` t1 WHERE `build`=(SELECT max(`build`) FROM `taxi_nodes` t2 WHERE t1.`id`=t2.`id` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -8363,7 +8363,7 @@ void ObjectMgr::LoadGameObjectForQuests()
 void ObjectMgr::LoadSkillLineAbility()
 {
     // Getting the maximum ID.
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`id`) FROM `skill_line_ability`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT MAX(`id`) FROM `skill_line_ability` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {
@@ -8376,8 +8376,8 @@ void ObjectMgr::LoadSkillLineAbility()
     auto fields = result->Fetch();
     uint32 maxSkillLineAbilityId = fields[0].GetUInt32() + 1;
 
-    // Actually loading the sounds.
-    result.reset(WorldDatabase.Query("SELECT * FROM skill_line_ability"));
+    // Actually loading the skills.
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `skill_line_ability` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {

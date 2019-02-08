@@ -4310,7 +4310,7 @@ void SpellMgr::LoadExistingSpellIds()
     mExistingSpellsSet.clear();
 
     Field* fields;
-    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT ID FROM spell_template");
+    QueryResult* result = WorldDatabase.Query("SELECT DISTINCT `entry` FROM `spell_template`");
 
     if (result)
     {
@@ -4692,7 +4692,7 @@ void SpellMgr::LoadSpells()
     uint32 oldMSTime = WorldTimer::getMSTime();
 
     // Getting the maximum ID.
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`ID`) FROM `spell_template`"));
+    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT MAX(`entry`) FROM `spell_template`"));
 
     if (!result)
     {
@@ -4707,7 +4707,7 @@ void SpellMgr::LoadSpells()
     uint32 maxEntry = fields[0].GetUInt32() + 1;
 
     // Actually loading the spells.
-    result.reset(WorldDatabase.PQuery("SELECT * FROM `spell_template` WHERE `build`=%u", SUPPORTED_CLIENT_BUILD));
+    result.reset(WorldDatabase.PQuery("SELECT * FROM `spell_template` t1 WHERE `build`=(SELECT max(`build`) FROM `spell_template` t2 WHERE t1.`entry`=t2.`entry` && `build` <= %u)", SUPPORTED_CLIENT_BUILD));
 
     if (!result)
     {

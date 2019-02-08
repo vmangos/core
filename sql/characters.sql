@@ -262,6 +262,18 @@ CREATE TABLE IF NOT EXISTS `character_duplicate_account` (
 -- Data exporting was unselected.
 
 
+-- Dumping structure for table characters.character_forgotten_skills
+DROP TABLE IF EXISTS `character_forgotten_skills`;
+CREATE TABLE IF NOT EXISTS `character_forgotten_skills` (
+  `guid` int(11) unsigned NOT NULL COMMENT 'Global Unique Identifier',
+  `skill` mediumint(9) unsigned NOT NULL,
+  `value` mediumint(9) unsigned NOT NULL,
+  PRIMARY KEY (`guid`,`skill`)
+) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC COMMENT='Player System';
+
+-- Data exporting was unselected.
+
+
 -- Dumping structure for table characters.character_gifts
 DROP TABLE IF EXISTS `character_gifts`;
 CREATE TABLE IF NOT EXISTS `character_gifts` (
