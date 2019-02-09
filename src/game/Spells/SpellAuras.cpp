@@ -3168,12 +3168,7 @@ void Aura::HandleModCharm(bool apply, bool Real)
             if (pCreatureTarget->AI() && pCreatureTarget->AI()->SwitchAiAtControl())
                 pCreatureTarget->AIM_Initialize();
 
-            // For some charm spells, the creature should despawn when the aura is removed.
-            // This is the case for the Taming the Beast hunter quest https://youtu.be/OJ0oPzP0k-A?t=474
-            // Only the charm spells used for those quests have EffectBasePoints = 11 (+1).
-            if (GetBasePoints() == 12)
-                pCreatureTarget->DespawnOrUnsummon();
-            else if (caster)
+            if (caster)
                 pCreatureTarget->AttackedBy(caster);
         }
         else if (pPlayerTarget)
