@@ -1595,8 +1595,8 @@ void World::SetInitialWorldSettings()
         sLog.outString("Loading auto broadcast");
         sAutoBroadCastMgr.load();
 
-        sLog.outString("Loading AH bot (obsolete)");
-        sAuctionHouseBotMgr.load();
+        sLog.outString("Loading AH bot");
+        sAuctionHouseBotMgr.Load();
 
         sLog.outString("Caching player phases (obsolete)");
         sObjectMgr.LoadPlayerPhaseFromDb();
@@ -1740,7 +1740,7 @@ void World::Update(uint32 diff)
     {
         m_timers[WUPDATE_AUCTIONS].Reset();
 
-        sAuctionHouseBotMgr.update();
+        sAuctionHouseBotMgr.Update();
         ///- Handle expired auctions
         sAuctionMgr.Update();
     }
