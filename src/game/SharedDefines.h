@@ -632,541 +632,173 @@ enum SpellEffects
 enum SpellCastResult
 {
     SPELL_FAILED_AFFECTING_COMBAT               = 0x00, // You are in combat
-    SPELL_FAILED_ALREADY_AT_FULL_HEALTH         = 0x01, // You are already at full Health.
-    SPELL_FAILED_ALREADY_AT_FULL_POWER          = 0x02, // You are already at full %s.
-    SPELL_FAILED_ALREADY_BEING_TAMED            = 0x03, // That creature is already being tamed
-    SPELL_FAILED_ALREADY_HAVE_CHARM             = 0x04, // You already control a charmed creature
-    SPELL_FAILED_ALREADY_HAVE_SUMMON            = 0x05, // You already control a summoned creature
-    SPELL_FAILED_ALREADY_OPEN                   = 0x06, // Already open
-    SPELL_FAILED_AURA_BOUNCED                   = 0x07, // A more powerful spell is already active
-    // SPELL_FAILED_AUTOTRACK_INTERRUPTED       = 0x08, // Message is hidden/unused
-    SPELL_FAILED_BAD_IMPLICIT_TARGETS           = 0x09, // You have no target.
-    SPELL_FAILED_BAD_TARGETS                    = 0x0A, // Invalid target
-    SPELL_FAILED_CANT_BE_CHARMED                = 0x0B, // Target can't be charmed
-    SPELL_FAILED_CANT_BE_DISENCHANTED           = 0x0C, // Item cannot be disenchanted
+    SPELL_FAILED_ALREADY_AT_FULL_HEALTH               , // You are already at full Health.
+    SPELL_FAILED_ALREADY_AT_FULL_POWER                , // You are already at full %s.
+    SPELL_FAILED_ALREADY_BEING_TAMED                  , // That creature is already being tamed
+    SPELL_FAILED_ALREADY_HAVE_CHARM                   , // You already control a charmed creature
+    SPELL_FAILED_ALREADY_HAVE_SUMMON                  , // You already control a summoned creature
+    SPELL_FAILED_ALREADY_OPEN                         , // Already open
+    SPELL_FAILED_AURA_BOUNCED                         , // A more powerful spell is already active
+    SPELL_FAILED_AUTOTRACK_INTERRUPTED                , // Message is hidden/unused
+    SPELL_FAILED_BAD_IMPLICIT_TARGETS                 , // You have no target.
+    SPELL_FAILED_BAD_TARGETS                          , // Invalid target
+    SPELL_FAILED_CANT_BE_CHARMED                      , // Target can't be charmed
+    SPELL_FAILED_CANT_BE_DISENCHANTED                 , // Item cannot be disenchanted
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
-    SPELL_FAILED_CANT_BE_PROSPECTED             = 0x0D, // There are no gems in this
-    SPELL_FAILED_CANT_CAST_ON_TAPPED            = 0x0E, // Target is tapped
-    SPELL_FAILED_CANT_DUEL_WHILE_INVISIBLE      = 0x0F, // You can't start a duel while invisible
-    SPELL_FAILED_CANT_DUEL_WHILE_STEALTHED      = 0x10, // You can't start a duel while stealthed
-    SPELL_FAILED_CANT_STEALTH                   = 0x11, // You are too close to enemies
-    SPELL_FAILED_CASTER_AURASTATE               = 0x12, // You can't do that yet
-    SPELL_FAILED_CASTER_DEAD                    = 0x13, // You are dead
-    SPELL_FAILED_CHARMED                        = 0x14, // Can't do that while charmed
-    SPELL_FAILED_CHEST_IN_USE                   = 0x15, // That is already being used
-    SPELL_FAILED_CONFUSED                       = 0x16, // Can't do that while confused
-    SPELL_FAILED_DONT_REPORT                    = 0x17, // Message is hidden/unused
-    SPELL_FAILED_EQUIPPED_ITEM                  = 0x18, // Must have the proper item equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS            = 0x19, // Must have a %s equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND   = 0x1A, // Must have a %s equipped in the main hand
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND    = 0x1B, // Must have a %s equipped in the offhand
-    SPELL_FAILED_ERROR                          = 0x1C, // Internal error
-    SPELL_FAILED_FIZZLE                         = 0x1D, // Fizzled
-    SPELL_FAILED_FLEEING                        = 0x1E, // Can't do that while fleeing
-    SPELL_FAILED_FOOD_LOWLEVEL                  = 0x1F, // That food's level is not high enough for your pet
-    SPELL_FAILED_HIGHLEVEL                      = 0x20, // Target is too high level
-    SPELL_FAILED_HUNGER_SATIATED                = 0x21, // Message is hidden/unused
-    SPELL_FAILED_IMMUNE                         = 0x22, // Immune
-    SPELL_FAILED_INTERRUPTED                    = 0x23, // Interrupted
-    SPELL_FAILED_INTERRUPTED_COMBAT             = 0x24, // Interrupted
-    SPELL_FAILED_ITEM_ALREADY_ENCHANTED         = 0x25, // Item is already enchanted
-    SPELL_FAILED_ITEM_GONE                      = 0x26, // Item is gone
-    SPELL_FAILED_ITEM_NOT_FOUND                 = 0x27, // Tried to enchant an item that didn't exist
-    SPELL_FAILED_ITEM_NOT_READY                 = 0x28, // Item is not ready yet.
-    SPELL_FAILED_LEVEL_REQUIREMENT              = 0x29, // You are not high enough level
-    SPELL_FAILED_LINE_OF_SIGHT                  = 0x2A, // Target not in line of sight
-    SPELL_FAILED_LOWLEVEL                       = 0x2B, // Target is too low level
-    SPELL_FAILED_LOW_CASTLEVEL                  = 0x2C, // Skill not high enough
-    SPELL_FAILED_MAINHAND_EMPTY                 = 0x2D, // Your weapon hand is empty
-    SPELL_FAILED_MOVING                         = 0x2E, // Can't do that while moving
-    SPELL_FAILED_NEED_AMMO                      = 0x2F, // Ammo needs to be in the paper doll ammo slot before it can be fired
-    SPELL_FAILED_NEED_AMMO_POUCH                = 0x30, // Requires: %s
-    SPELL_FAILED_NEED_EXOTIC_AMMO               = 0x31, // Requires exotic ammo: %s
-    SPELL_FAILED_NOPATH                         = 0x32, // No path available
-    SPELL_FAILED_NOT_BEHIND                     = 0x33, // You must be behind your target
-    SPELL_FAILED_NOT_FISHABLE                   = 0x34, // Your cast didn't land in fishable water
-    SPELL_FAILED_NOT_HERE                       = 0x35, // You can't use that here
-    SPELL_FAILED_NOT_INFRONT                    = 0x36, // You must be in front of your target
-    SPELL_FAILED_NOT_IN_CONTROL                 = 0x37, // You are not in control of your actions
-    SPELL_FAILED_NOT_KNOWN                      = 0x38, // Spell not learned
-    SPELL_FAILED_NOT_MOUNTED                    = 0x39, // You are mounted
-    SPELL_FAILED_NOT_ON_TAXI                    = 0x3A, // You are in flight
-    SPELL_FAILED_NOT_ON_TRANSPORT               = 0x3B, // You are on a transport
-    SPELL_FAILED_NOT_READY                      = 0x3C, // Spell is not ready yet.
-    SPELL_FAILED_NOT_SHAPESHIFT                 = 0x3D, // You are in shapeshift form
-    SPELL_FAILED_NOT_STANDING                   = 0x3E, // You must be standing to do that
-    SPELL_FAILED_NOT_TRADEABLE                  = 0x3F, // You can only use this on an object you own
-    SPELL_FAILED_NOT_TRADING                    = 0x40, // Tried to enchant a trade item, but not trading
-    SPELL_FAILED_NOT_UNSHEATHED                 = 0x41, // You have to be unsheathed to do that!
-    SPELL_FAILED_NOT_WHILE_GHOST                = 0x42, // Can't cast as ghost
-    SPELL_FAILED_NO_AMMO                        = 0x43, // Out of ammo
-    SPELL_FAILED_NO_CHARGES_REMAIN              = 0x44, // No charges remain
-    SPELL_FAILED_NO_CHAMPION                    = 0x45, // You haven't selected a champion
-    SPELL_FAILED_NO_COMBO_POINTS                = 0x46, // That ability requires combo points
-    SPELL_FAILED_NO_DUELING                     = 0x47, // Dueling isn't allowed here
-    SPELL_FAILED_NO_ENDURANCE                   = 0x48, // Not enough endurance
-    SPELL_FAILED_NO_FISH                        = 0x49, // There aren't any fish here
-    SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED    = 0x4A, // Can't use items while shapeshifted
-    SPELL_FAILED_NO_MOUNTS_ALLOWED              = 0x4B, // You can't mount here
-    SPELL_FAILED_NO_PET                         = 0x4C, // You do not have a pet
-    SPELL_FAILED_NO_POWER                       = 0x4D, // Dynamic pre-defined messages, no args: Not enough mana, Not enough rage, etc
-    SPELL_FAILED_NOTHING_TO_DISPEL              = 0x4E, // Nothing to dispel
-    SPELL_FAILED_NOTHING_TO_STEAL               = 0x4F, // Nothing to steal
-    SPELL_FAILED_ONLY_ABOVEWATER                = 0x50, // Cannot use while swimming
-    SPELL_FAILED_ONLY_DAYTIME                   = 0x51, // Can only use during the day
-    SPELL_FAILED_ONLY_INDOORS                   = 0x52, // Can only use indoors
-    SPELL_FAILED_ONLY_MOUNTED                   = 0x53, // Can only use while mounted
-    SPELL_FAILED_ONLY_NIGHTTIME                 = 0x54, // Can only use during the night
-    SPELL_FAILED_ONLY_OUTDOORS                  = 0x55, // Can only use outside
-    SPELL_FAILED_ONLY_SHAPESHIFT                = 0x56, // Must be in %s
-    SPELL_FAILED_ONLY_STEALTHED                 = 0x57, // You must be in stealth mode
-    SPELL_FAILED_ONLY_UNDERWATER                = 0x58, // Can only use while swimming
-    SPELL_FAILED_OUT_OF_RANGE                   = 0x59, // Out of range.
-    SPELL_FAILED_PACIFIED                       = 0x5A, // Can't use that ability while pacified
-    SPELL_FAILED_POSSESSED                      = 0x5B, // You are possessed
-    // SPELL_FAILED_REAGENTS                    = 0x5C, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_REQUIRES_AREA                  = 0x5D, // You need to be in %s
-    SPELL_FAILED_REQUIRES_SPELL_FOCUS           = 0x5E, // Requires %s
-    SPELL_FAILED_ROOTED                         = 0x5F, // You are unable to move
-    SPELL_FAILED_SILENCED                       = 0x60, // Can't do that while silenced
-    SPELL_FAILED_SPELL_IN_PROGRESS              = 0x61, // Another action is in progress
-    SPELL_FAILED_SPELL_LEARNED                  = 0x62, // You have already learned the spell
-    SPELL_FAILED_SPELL_UNAVAILABLE              = 0x63, // The spell is not available to you
-    SPELL_FAILED_STUNNED                        = 0x64, // Can't do that while stunned
-    SPELL_FAILED_TARGETS_DEAD                   = 0x65, // Your target is dead
-    SPELL_FAILED_TARGET_AFFECTING_COMBAT        = 0x66, // Target is in combat
-    SPELL_FAILED_TARGET_AURASTATE               = 0x67, // You can't do that yet
-    SPELL_FAILED_TARGET_DUELING                 = 0x68, // Target is currently dueling
-    SPELL_FAILED_TARGET_ENEMY                   = 0x69, // Target is hostile
-    SPELL_FAILED_TARGET_ENRAGED                 = 0x6A, // Target is too enraged to be charmed
-    SPELL_FAILED_TARGET_FRIENDLY                = 0x6B, // Target is friendly
-    SPELL_FAILED_TARGET_IN_COMBAT               = 0x6C, // The target can't be in combat
-    SPELL_FAILED_TARGET_IS_PLAYER               = 0x6D, // Can't target players
-    SPELL_FAILED_TARGET_NOT_DEAD                = 0x6E, // Target is alive
-    SPELL_FAILED_TARGET_NOT_IN_PARTY            = 0x6F, // Target is not in your party
-    SPELL_FAILED_TARGET_NOT_LOOTED              = 0x70, // Creature must be looted first
-    SPELL_FAILED_TARGET_NOT_PLAYER              = 0x71, // Target is not a player
-    SPELL_FAILED_TARGET_NO_POCKETS              = 0x72, // No pockets to pick
-    SPELL_FAILED_TARGET_NO_WEAPONS              = 0x73, // Target has no weapons equipped
-    SPELL_FAILED_TARGET_UNSKINNABLE             = 0x74, // Creature is not skinnable
-    SPELL_FAILED_THIRST_SATIATED                = 0x75, // Message is hidden/unused
-    SPELL_FAILED_TOO_CLOSE                      = 0x76, // Target too close
-    SPELL_FAILED_TOO_MANY_OF_ITEM               = 0x77, // You have too many of that item already
-    // SPELL_FAILED_TOTEMS                      = 0x78, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_TRAINING_POINTS                = 0x79, // Not enough training points
-    SPELL_FAILED_TRY_AGAIN                      = 0x7A, // Failed attempt
-    SPELL_FAILED_UNIT_NOT_BEHIND                = 0x7B, // Target needs to be behind you
-    SPELL_FAILED_UNIT_NOT_INFRONT               = 0x7C, // Target needs to be in front of you
-    SPELL_FAILED_WRONG_PET_FOOD                 = 0x7D, // Your pet doesn't like that food
-    SPELL_FAILED_NOT_WHILE_FATIGUED             = 0x7E, // Can't cast while fatigued
-    SPELL_FAILED_TARGET_NOT_IN_INSTANCE         = 0x7F, // Target must be in this instance
-    SPELL_FAILED_NOT_WHILE_TRADING              = 0x80, // Can't cast while trading
-    SPELL_FAILED_TARGET_NOT_IN_RAID             = 0x81, // Target is not in your party or raid group
-    SPELL_FAILED_DISENCHANT_WHILE_LOOTING       = 0x82, // Cannot disenchant while looting
-    SPELL_FAILED_PROSPECT_WHILE_LOOTING         = 0x83, // Cannot prospect while looting
-    // SPELL_FAILED_PROSPECT_NEED_MORE          = 0x84, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_TARGET_FREEFORALL              = 0x85, // Target is currently in free-for-all PvP combat
-    SPELL_FAILED_NO_EDIBLE_CORPSES              = 0x86, // There are no nearby corpses to eat
-    SPELL_FAILED_ONLY_BATTLEGROUNDS             = 0x87, // Can only use in battlegrounds
-    SPELL_FAILED_TARGET_NOT_GHOST               = 0x88, // Target is not a ghost
-    SPELL_FAILED_TOO_MANY_SKILLS                = 0x89, // Your pet can't learn any more skills
-    SPELL_FAILED_TRANSFORM_UNUSABLE             = 0x8A, // You can't use the new item
-    SPELL_FAILED_WRONG_WEATHER                  = 0x8B, // The weather isn't right for that
-    SPELL_FAILED_DAMAGE_IMMUNE                  = 0x8C, // You can't do that while you are immune
-    SPELL_FAILED_PREVENTED_BY_MECHANIC          = 0x8D, // Can't do that while %s
-    SPELL_FAILED_PLAY_TIME                      = 0x8E, // Maximum play time exceeded
-    SPELL_FAILED_REPUTATION                     = 0x8F, // Your reputation isn't high enough
-    SPELL_FAILED_MIN_SKILL                      = 0x90, // Your skill is not high enough.  Requires %s (%d).
-    SPELL_FAILED_UNKNOWN                        = 0x91, // Generic out of bounds response:  Unknown reason
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_10_2
-    SPELL_FAILED_CANT_CAST_ON_TAPPED            = 0x0D, // Target is tapped
-    SPELL_FAILED_CANT_DUEL_WHILE_INVISIBLE      = 0x0E, // You can't start a duel while invisible
-    SPELL_FAILED_CANT_DUEL_WHILE_STEALTHED      = 0x0F, // You can't start a duel while stealthed
-    SPELL_FAILED_CANT_STEALTH                   = 0x10, // You are too close to enemies
-    SPELL_FAILED_CASTER_AURASTATE               = 0x11, // You can't do that yet
-    SPELL_FAILED_CASTER_DEAD                    = 0x12, // You are dead
-    SPELL_FAILED_CHARMED                        = 0x13, // Can't do that while charmed
-    SPELL_FAILED_CHEST_IN_USE                   = 0x14, // That is already being used
-    SPELL_FAILED_CONFUSED                       = 0x15, // Can't do that while confused
-    SPELL_FAILED_DONT_REPORT                    = 0x16, // Message is hidden/unused
-    SPELL_FAILED_EQUIPPED_ITEM                  = 0x17, // Must have the proper item equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS            = 0x18, // Must have a %s equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND   = 0x19, // Must have a %s equipped in the main hand
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND    = 0x1A, // Must have a %s equipped in the offhand
-    SPELL_FAILED_ERROR                          = 0x1B, // Internal error
-    SPELL_FAILED_FIZZLE                         = 0x1C, // Fizzled
-    SPELL_FAILED_FLEEING                        = 0x1D, // Can't do that while fleeing
-    SPELL_FAILED_FOOD_LOWLEVEL                  = 0x1E, // That food's level is not high enough for your pet
-    SPELL_FAILED_HIGHLEVEL                      = 0x1F, // Target is too high level
-    SPELL_FAILED_HUNGER_SATIATED                = 0x20, // Message is hidden/unused
-    SPELL_FAILED_IMMUNE                         = 0x21, // Immune
-    SPELL_FAILED_INTERRUPTED                    = 0x22, // Interrupted
-    SPELL_FAILED_INTERRUPTED_COMBAT             = 0x23, // Interrupted
-    SPELL_FAILED_ITEM_ALREADY_ENCHANTED         = 0x24, // Item is already enchanted
-    SPELL_FAILED_ITEM_GONE                      = 0x25, // Item is gone
-    SPELL_FAILED_ITEM_NOT_FOUND                 = 0x26, // Tried to enchant an item that didn't exist
-    SPELL_FAILED_ITEM_NOT_READY                 = 0x27, // Item is not ready yet.
-    SPELL_FAILED_LEVEL_REQUIREMENT              = 0x28, // You are not high enough level
-    SPELL_FAILED_LINE_OF_SIGHT                  = 0x29, // Target not in line of sight
-    SPELL_FAILED_LOWLEVEL                       = 0x2A, // Target is too low level
-    SPELL_FAILED_LOW_CASTLEVEL                  = 0x2B, // Skill not high enough
-    SPELL_FAILED_MAINHAND_EMPTY                 = 0x2C, // Your weapon hand is empty
-    SPELL_FAILED_MOVING                         = 0x2D, // Can't do that while moving
-    SPELL_FAILED_NEED_AMMO                      = 0x2E, // Ammo needs to be in the paper doll ammo slot before it can be fired
-    SPELL_FAILED_NEED_AMMO_POUCH                = 0x2F, // Requires: %s
-    SPELL_FAILED_NEED_EXOTIC_AMMO               = 0x30, // Requires exotic ammo: %s
-    SPELL_FAILED_NOPATH                         = 0x31, // No path available
-    SPELL_FAILED_NOT_BEHIND                     = 0x32, // You must be behind your target
-    SPELL_FAILED_NOT_FISHABLE                   = 0x33, // Your cast didn't land in fishable water
-    SPELL_FAILED_NOT_HERE                       = 0x34, // You can't use that here
-    SPELL_FAILED_NOT_INFRONT                    = 0x35, // You must be in front of your target
-    SPELL_FAILED_NOT_IN_CONTROL                 = 0x36, // You are not in control of your actions
-    SPELL_FAILED_NOT_KNOWN                      = 0x37, // Spell not learned
-    SPELL_FAILED_NOT_MOUNTED                    = 0x38, // You are mounted
-    SPELL_FAILED_NOT_ON_TAXI                    = 0x39, // You are in flight
-    SPELL_FAILED_NOT_ON_TRANSPORT               = 0x3A, // You are on a transport
-    SPELL_FAILED_NOT_READY                      = 0x3B, // Spell is not ready yet.
-    SPELL_FAILED_NOT_SHAPESHIFT                 = 0x3C, // You are in shapeshift form
-    SPELL_FAILED_NOT_STANDING                   = 0x3D, // You must be standing to do that
-    SPELL_FAILED_NOT_TRADEABLE                  = 0x3E, // You can only use this on an object you own
-    SPELL_FAILED_NOT_TRADING                    = 0x3F, // Tried to enchant a trade item, but not trading
-    SPELL_FAILED_NOT_UNSHEATHED                 = 0x40, // You have to be unsheathed to do that!
-    SPELL_FAILED_NOT_WHILE_GHOST                = 0x41, // Can't cast as ghost
-    SPELL_FAILED_NO_AMMO                        = 0x42, // Out of ammo
-    SPELL_FAILED_NO_CHARGES_REMAIN              = 0x43, // No charges remain
-    SPELL_FAILED_NO_CHAMPION                    = 0x44, // You haven't selected a champion
-    SPELL_FAILED_NO_COMBO_POINTS                = 0x45, // That ability requires combo points
-    SPELL_FAILED_NO_DUELING                     = 0x46, // Dueling isn't allowed here
-    SPELL_FAILED_NO_ENDURANCE                   = 0x47, // Not enough endurance
-    SPELL_FAILED_NO_FISH                        = 0x48, // There aren't any fish here
-    SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED    = 0x49, // Can't use items while shapeshifted
-    SPELL_FAILED_NO_MOUNTS_ALLOWED              = 0x4A, // You can't mount here
-    SPELL_FAILED_NO_PET                         = 0x4B, // You do not have a pet
-    SPELL_FAILED_NO_POWER                       = 0x4C, // Dynamic pre-defined messages, no args: Not enough mana, Not enough rage, etc
-    SPELL_FAILED_NOTHING_TO_DISPEL              = 0x4D, // Nothing to dispel
-    SPELL_FAILED_ONLY_ABOVEWATER                = 0x4E, // Cannot use while swimming
-    SPELL_FAILED_ONLY_DAYTIME                   = 0x4F, // Can only use during the day
-    SPELL_FAILED_ONLY_INDOORS                   = 0x50, // Can only use indoors
-    SPELL_FAILED_ONLY_MOUNTED                   = 0x51, // Can only use while mounted
-    SPELL_FAILED_ONLY_NIGHTTIME                 = 0x52, // Can only use during the night
-    SPELL_FAILED_ONLY_OUTDOORS                  = 0x53, // Can only use outside
-    SPELL_FAILED_ONLY_SHAPESHIFT                = 0x54, // Must be in %s
-    SPELL_FAILED_ONLY_STEALTHED                 = 0x55, // You must be in stealth mode
-    SPELL_FAILED_ONLY_UNDERWATER                = 0x56, // Can only use while swimming
-    SPELL_FAILED_OUT_OF_RANGE                   = 0x57, // Out of range.
-    SPELL_FAILED_PACIFIED                       = 0x58, // Can't use that ability while pacified
-    SPELL_FAILED_POSSESSED                      = 0x59, // You are possessed
-    // SPELL_FAILED_REAGENTS                    = 0x5A, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_REQUIRES_AREA                  = 0x5B, // You need to be in %s
-    SPELL_FAILED_REQUIRES_SPELL_FOCUS           = 0x5C, // Requires %s
-    SPELL_FAILED_ROOTED                         = 0x5D, // You are unable to move
-    SPELL_FAILED_SILENCED                       = 0x5E, // Can't do that while silenced
-    SPELL_FAILED_SPELL_IN_PROGRESS              = 0x5F, // Another action is in progress
-    SPELL_FAILED_SPELL_LEARNED                  = 0x60, // You have already learned the spell
-    SPELL_FAILED_SPELL_UNAVAILABLE              = 0x61, // The spell is not available to you
-    SPELL_FAILED_STUNNED                        = 0x62, // Can't do that while stunned
-    SPELL_FAILED_TARGETS_DEAD                   = 0x63, // Your target is dead
-    SPELL_FAILED_TARGET_AFFECTING_COMBAT        = 0x64, // Target is in combat
-    SPELL_FAILED_TARGET_AURASTATE               = 0x65, // You can't do that yet
-    SPELL_FAILED_TARGET_DUELING                 = 0x66, // Target is currently dueling
-    SPELL_FAILED_TARGET_ENEMY                   = 0x67, // Target is hostile
-    SPELL_FAILED_TARGET_ENRAGED                 = 0x68, // Target is too enraged to be charmed
-    SPELL_FAILED_TARGET_FRIENDLY                = 0x69, // Target is friendly
-    SPELL_FAILED_TARGET_IN_COMBAT               = 0x6A, // The target can't be in combat
-    SPELL_FAILED_TARGET_IS_PLAYER               = 0x6B, // Can't target players
-    SPELL_FAILED_TARGET_NOT_DEAD                = 0x6C, // Target is alive
-    SPELL_FAILED_TARGET_NOT_IN_PARTY            = 0x6D, // Target is not in your party
-    SPELL_FAILED_TARGET_NOT_LOOTED              = 0x6E, // Creature must be looted first
-    SPELL_FAILED_TARGET_NOT_PLAYER              = 0x6F, // Target is not a player
-    SPELL_FAILED_TARGET_NO_POCKETS              = 0x70, // No pockets to pick
-    SPELL_FAILED_TARGET_NO_WEAPONS              = 0x71, // Target has no weapons equipped
-    SPELL_FAILED_TARGET_UNSKINNABLE             = 0x72, // Creature is not skinnable
-    SPELL_FAILED_THIRST_SATIATED                = 0x73, // Message is hidden/unused
-    SPELL_FAILED_TOO_CLOSE                      = 0x74, // Target too close
-    SPELL_FAILED_TOO_MANY_OF_ITEM               = 0x75, // You have too many of that item already
-    // SPELL_FAILED_TOTEMS                      = 0x76, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_TRAINING_POINTS                = 0x77, // Not enough training points
-    SPELL_FAILED_TRY_AGAIN                      = 0x78, // Failed attempt
-    SPELL_FAILED_UNIT_NOT_BEHIND                = 0x79, // Target needs to be behind you
-    SPELL_FAILED_UNIT_NOT_INFRONT               = 0x7A, // Target needs to be in front of you
-    SPELL_FAILED_WRONG_PET_FOOD                 = 0x7B, // Your pet doesn't like that food
-    SPELL_FAILED_NOT_WHILE_FATIGUED             = 0x7C, // Can't cast while fatigued
-    SPELL_FAILED_TARGET_NOT_IN_INSTANCE         = 0x7D, // Target must be in this instance
-    SPELL_FAILED_NOT_WHILE_TRADING              = 0x7E, // Can't cast while trading
-    SPELL_FAILED_TARGET_NOT_IN_RAID             = 0x7F, // Target is not in your party or raid group
-    SPELL_FAILED_DISENCHANT_WHILE_LOOTING       = 0x80, // Cannot disenchant while looting
-    SPELL_FAILED_TARGET_FREEFORALL              = 0x81, // Target is currently in free-for-all PvP combat
-    SPELL_FAILED_NO_EDIBLE_CORPSES              = 0x82, // There are no nearby corpses to eat
-    SPELL_FAILED_ONLY_BATTLEGROUNDS             = 0x83, // Can only use in battlegrounds
-    SPELL_FAILED_TARGET_NOT_GHOST               = 0x84, // Target is not a ghost
-    SPELL_FAILED_TOO_MANY_SKILLS                = 0x85, // Your pet can't learn any more skills
-    SPELL_FAILED_TRANSFORM_UNUSABLE             = 0x86, // You can't use the new item
-    SPELL_FAILED_WRONG_WEATHER                  = 0x87, // The weather isn't right for that
-    SPELL_FAILED_DAMAGE_IMMUNE                  = 0x88, // You can't do that while you are immune
-    SPELL_FAILED_PREVENTED_BY_MECHANIC          = 0x89, // Can't do that while %s
-    SPELL_FAILED_PLAY_TIME                      = 0x8A, // Maximum play time exceeded
-    SPELL_FAILED_REPUTATION                     = 0x8B, // Your reputation isn't high enough
-    SPELL_FAILED_UNKNOWN                        = 0x8C, // Generic out of bounds response:  Unknown reason
-#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
-    SPELL_FAILED_CANT_CAST_ON_TAPPED            = 0x0D, // Target is tapped
-    SPELL_FAILED_CANT_DUEL_WHILE_INVISIBLE      = 0x0E, // You can't start a duel while invisible
-    SPELL_FAILED_CANT_DUEL_WHILE_STEALTHED      = 0x0F, // You can't start a duel while stealthed
-    SPELL_FAILED_CANT_STEALTH                   = 0x10, // You are too close to enemies
-    SPELL_FAILED_CASTER_AURASTATE               = 0x11, // You can't do that yet
-    SPELL_FAILED_CASTER_DEAD                    = 0x12, // You are dead
-    //SPELL_FAILED_CHARMED                        = 0x13, // Can't do that while charmed
-    SPELL_FAILED_CHARMED                        = 0x11, // This reason does not exist, replace with another.
-    SPELL_FAILED_CHEST_IN_USE                   = 0x13, // That is already being used
-    SPELL_FAILED_CONFUSED                       = 0x14, // Can't do that while confused
-    SPELL_FAILED_DONT_REPORT                    = 0x15, // Message is hidden/unused
-    SPELL_FAILED_EQUIPPED_ITEM                  = 0x16, // Must have the proper item equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS            = 0x17, // Must have a %s equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND   = 0x18, // Must have a %s equipped in the main hand
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND    = 0x19, // Must have a %s equipped in the offhand
-    SPELL_FAILED_ERROR                          = 0x1A, // Internal error
-    SPELL_FAILED_FIZZLE                         = 0x1B, // Fizzled
-    SPELL_FAILED_FLEEING                        = 0x1C, // Can't do that while fleeing
-    SPELL_FAILED_FOOD_LOWLEVEL                  = 0x1D, // That food's level is not high enough for your pet
-    SPELL_FAILED_HIGHLEVEL                      = 0x1E, // Target is too high level
-    SPELL_FAILED_HUNGER_SATIATED                = 0x1F, // Message is hidden/unused
-    SPELL_FAILED_IMMUNE                         = 0x20, // Immune
-    SPELL_FAILED_INTERRUPTED                    = 0x21, // Interrupted
-    SPELL_FAILED_INTERRUPTED_COMBAT             = 0x22, // Interrupted
-    SPELL_FAILED_ITEM_ALREADY_ENCHANTED         = 0x23, // Item is already enchanted
-    SPELL_FAILED_ITEM_GONE                      = 0x24, // Item is gone
-    SPELL_FAILED_ITEM_NOT_FOUND                 = 0x25, // Tried to enchant an item that didn't exist
-    SPELL_FAILED_ITEM_NOT_READY                 = 0x26, // Item is not ready yet.
-    SPELL_FAILED_LEVEL_REQUIREMENT              = 0x27, // You are not high enough level
-    SPELL_FAILED_LINE_OF_SIGHT                  = 0x28, // Target not in line of sight
-    SPELL_FAILED_LOWLEVEL                       = 0x29, // Target is too low level
-    SPELL_FAILED_LOW_CASTLEVEL                  = 0x2A, // Skill not high enough
-    SPELL_FAILED_MAINHAND_EMPTY                 = 0x2B, // Your weapon hand is empty
-    SPELL_FAILED_MOVING                         = 0x2C, // Can't do that while moving
-    SPELL_FAILED_NEED_AMMO                      = 0x2D, // Ammo needs to be in the paper doll ammo slot before it can be fired
-    SPELL_FAILED_NEED_AMMO_POUCH                = 0x2E, // Requires: %s
-    SPELL_FAILED_NEED_EXOTIC_AMMO               = 0x2F, // Requires exotic ammo: %s
-    SPELL_FAILED_NOPATH                         = 0x30, // No path available
-    SPELL_FAILED_NOT_BEHIND                     = 0x31, // You must be behind your target
-    SPELL_FAILED_NOT_FISHABLE                   = 0x32, // Your cast didn't land in fishable water
-    SPELL_FAILED_NOT_HERE                       = 0x33, // You can't use that here
-    SPELL_FAILED_NOT_INFRONT                    = 0x34, // You must be in front of your target
-    SPELL_FAILED_NOT_IN_CONTROL                 = 0x35, // You are not in control of your actions
-    SPELL_FAILED_NOT_KNOWN                      = 0x36, // Spell not learned
-    SPELL_FAILED_NOT_MOUNTED                    = 0x37, // You are mounted
-    SPELL_FAILED_NOT_ON_TAXI                    = 0x38, // You are in flight
-    SPELL_FAILED_NOT_ON_TRANSPORT               = 0x39, // You are on a transport
-    SPELL_FAILED_NOT_READY                      = 0x3A, // Spell is not ready yet.
-    SPELL_FAILED_NOT_SHAPESHIFT                 = 0x3B, // You are in shapeshift form
-    SPELL_FAILED_NOT_STANDING                   = 0x3C, // You must be standing to do that
-    SPELL_FAILED_NOT_TRADEABLE                  = 0x3D, // You can only use this on an object you own
-    SPELL_FAILED_NOT_TRADING                    = 0x3E, // Tried to enchant a trade item, but not trading
-    SPELL_FAILED_NOT_UNSHEATHED                 = 0x3F, // You have to be unsheathed to do that!
-    SPELL_FAILED_NOT_WHILE_GHOST                = 0x40, // Can't cast as ghost
-    SPELL_FAILED_NO_AMMO                        = 0x41, // Out of ammo
-    SPELL_FAILED_NO_CHARGES_REMAIN              = 0x42, // No charges remain
-    SPELL_FAILED_NO_CHAMPION                    = 0x43, // You haven't selected a champion
-    SPELL_FAILED_NO_COMBO_POINTS                = 0x44, // That ability requires combo points
-    SPELL_FAILED_NO_DUELING                     = 0x45, // Dueling isn't allowed here
-    SPELL_FAILED_NO_ENDURANCE                   = 0x46, // Not enough endurance
-    SPELL_FAILED_NO_FISH                        = 0x47, // There aren't any fish here
-    SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED    = 0x48, // Can't use items while shapeshifted
-    SPELL_FAILED_NO_MOUNTS_ALLOWED              = 0x49, // You can't mount here
-    SPELL_FAILED_NO_PET                         = 0x4A, // You do not have a pet
-    SPELL_FAILED_NO_POWER                       = 0x4B, // Dynamic pre-defined messages, no args: Not enough mana, Not enough rage, etc
-    SPELL_FAILED_NOTHING_TO_DISPEL              = 0x4C, // Nothing to dispel
-    SPELL_FAILED_ONLY_ABOVEWATER                = 0x4D, // Cannot use while swimming
-    SPELL_FAILED_ONLY_DAYTIME                   = 0x4E, // Can only use during the day
-    SPELL_FAILED_ONLY_INDOORS                   = 0x4F, // Can only use indoors
-    SPELL_FAILED_ONLY_MOUNTED                   = 0x50, // Can only use while mounted
-    SPELL_FAILED_ONLY_NIGHTTIME                 = 0x51, // Can only use during the night
-    SPELL_FAILED_ONLY_OUTDOORS                  = 0x52, // Can only use outside
-    SPELL_FAILED_ONLY_SHAPESHIFT                = 0x53, // Must be in %s
-    SPELL_FAILED_ONLY_STEALTHED                 = 0x54, // You must be in stealth mode
-    SPELL_FAILED_ONLY_UNDERWATER                = 0x55, // Can only use while swimming
-    SPELL_FAILED_OUT_OF_RANGE                   = 0x56, // Out of range.
-    SPELL_FAILED_PACIFIED                       = 0x57, // Can't use that ability while pacified
-    SPELL_FAILED_POSSESSED                      = 0x58, // You are possessed
-    // SPELL_FAILED_REAGENTS                    = 0x59, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_REQUIRES_AREA                  = 0x5A, // You need to be in %s
-    SPELL_FAILED_REQUIRES_SPELL_FOCUS           = 0x5B, // Requires %s
-    SPELL_FAILED_ROOTED                         = 0x5C, // You are unable to move
-    SPELL_FAILED_SILENCED                       = 0x5D, // Can't do that while silenced
-    SPELL_FAILED_SPELL_IN_PROGRESS              = 0x5E, // Another action is in progress
-    SPELL_FAILED_SPELL_LEARNED                  = 0x5F, // You have already learned the spell
-    SPELL_FAILED_SPELL_UNAVAILABLE              = 0x60, // The spell is not available to you
-    SPELL_FAILED_STUNNED                        = 0x61, // Can't do that while stunned
-    SPELL_FAILED_TARGETS_DEAD                   = 0x62, // Your target is dead
-    SPELL_FAILED_TARGET_AFFECTING_COMBAT        = 0x63, // Target is in combat
-    SPELL_FAILED_TARGET_AURASTATE               = 0x64, // You can't do that yet
-    SPELL_FAILED_TARGET_DUELING                 = 0x65, // Target is currently dueling
-    SPELL_FAILED_TARGET_ENEMY                   = 0x66, // Target is hostile
-    SPELL_FAILED_TARGET_ENRAGED                 = 0x67, // Target is too enraged to be charmed
-    SPELL_FAILED_TARGET_FRIENDLY                = 0x68, // Target is friendly
-    SPELL_FAILED_TARGET_IN_COMBAT               = 0x69, // The target can't be in combat
-    SPELL_FAILED_TARGET_IS_PLAYER               = 0x6A, // Can't target players
-    SPELL_FAILED_TARGET_NOT_DEAD                = 0x6B, // Target is alive
-    SPELL_FAILED_TARGET_NOT_IN_PARTY            = 0x6C, // Target is not in your party
-    SPELL_FAILED_TARGET_NOT_LOOTED              = 0x6D, // Creature must be looted first
-    SPELL_FAILED_TARGET_NOT_PLAYER              = 0x6E, // Target is not a player
-    SPELL_FAILED_TARGET_NO_POCKETS              = 0x6F, // No pockets to pick
-    SPELL_FAILED_TARGET_NO_WEAPONS              = 0x70, // Target has no weapons equipped
-    SPELL_FAILED_TARGET_UNSKINNABLE             = 0x71, // Creature is not skinnable
-    SPELL_FAILED_THIRST_SATIATED                = 0x72, // Message is hidden/unused
-    SPELL_FAILED_TOO_CLOSE                      = 0x73, // Target too close
-    SPELL_FAILED_TOO_MANY_OF_ITEM               = 0x74, // You have too many of that item already
-    // SPELL_FAILED_TOTEMS                      = 0x75, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_TRAINING_POINTS                = 0x76, // Not enough training points
-    SPELL_FAILED_TRY_AGAIN                      = 0x77, // Failed attempt
-    SPELL_FAILED_UNIT_NOT_BEHIND                = 0x78, // Target needs to be behind you
-    SPELL_FAILED_UNIT_NOT_INFRONT               = 0x79, // Target needs to be in front of you
-    SPELL_FAILED_WRONG_PET_FOOD                 = 0x7A, // Your pet doesn't like that food
-    SPELL_FAILED_NOT_WHILE_FATIGUED             = 0x7B, // Can't cast while fatigued
-    SPELL_FAILED_TARGET_NOT_IN_INSTANCE         = 0x7C, // Target must be in this instance
-    SPELL_FAILED_NOT_WHILE_TRADING              = 0x7D, // Can't cast while trading
-    SPELL_FAILED_TARGET_NOT_IN_RAID             = 0x7E, // Target is not in your party or raid group
-    SPELL_FAILED_DISENCHANT_WHILE_LOOTING       = 0x7F, // Cannot disenchant while looting
-    SPELL_FAILED_TARGET_FREEFORALL              = 0x80, // Target is currently in free-for-all PvP combat
-    SPELL_FAILED_NO_EDIBLE_CORPSES              = 0x81, // There are no nearby corpses to eat
-    SPELL_FAILED_ONLY_BATTLEGROUNDS             = 0x82, // Can only use in battlegrounds
-    SPELL_FAILED_TARGET_NOT_GHOST               = 0x83, // Target is not a ghost
-    SPELL_FAILED_TOO_MANY_SKILLS                = 0x84, // Your pet can't learn any more skills
-    SPELL_FAILED_TRANSFORM_UNUSABLE             = 0x85, // You can't use the new item
-    SPELL_FAILED_WRONG_WEATHER                  = 0x86, // The weather isn't right for that
-    SPELL_FAILED_DAMAGE_IMMUNE                  = 0x87, // You can't do that while you are immune
-    SPELL_FAILED_PREVENTED_BY_MECHANIC          = 0x88, // Can't do that while %s
-    SPELL_FAILED_PLAY_TIME                      = 0x89, // Maximum play time exceeded
-    SPELL_FAILED_REPUTATION                     = 0x8A, // Your reputation isn't high enough
-    SPELL_FAILED_UNKNOWN                        = 0x8B, // Generic out of bounds response:  Unknown reason
-#else
-    SPELL_FAILED_CANT_CAST_ON_TAPPED            = 0x0D, // Target is tapped
-    SPELL_FAILED_CANT_DUEL_WHILE_INVISIBLE      = 0x0E, // You can't start a duel while invisible
-    SPELL_FAILED_CANT_DUEL_WHILE_STEALTHED      = 0x0F, // You can't start a duel while stealthed
-    SPELL_FAILED_CANT_STEALTH                   = 0x10, // You are too close to enemies
-    SPELL_FAILED_CASTER_AURASTATE               = 0x11, // You can't do that yet
-    SPELL_FAILED_CASTER_DEAD                    = 0x12, // You are dead
-    //SPELL_FAILED_CHARMED                        = 0x13, // Can't do that while charmed
-    SPELL_FAILED_CHARMED                        = 0x11, // This reason does not exist, replace with another.
-    SPELL_FAILED_CHEST_IN_USE                   = 0x13, // That is already being used
-    SPELL_FAILED_CONFUSED                       = 0x14, // Can't do that while confused
-    SPELL_FAILED_DONT_REPORT                    = 0x15, // Message is hidden/unused
-    SPELL_FAILED_EQUIPPED_ITEM                  = 0x16, // Must have the proper item equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS            = 0x17, // Must have a %s equipped
-    SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND   = 0x18, // Must have a %s equipped in the main hand
-    SPELL_FAILED_ERROR                          = 0x19, // Internal error
-    SPELL_FAILED_FIZZLE                         = 0x1A, // Fizzled
-    SPELL_FAILED_FLEEING                        = 0x1B, // Can't do that while fleeing
-    SPELL_FAILED_FOOD_LOWLEVEL                  = 0x1C, // That food's level is not high enough for your pet
-    SPELL_FAILED_HIGHLEVEL                      = 0x1D, // Target is too high level
-    SPELL_FAILED_HUNGER_SATIATED                = 0x1E, // Message is hidden/unused
-    SPELL_FAILED_IMMUNE                         = 0x1F, // Immune
-    SPELL_FAILED_INTERRUPTED                    = 0x20, // Interrupted
-    SPELL_FAILED_INTERRUPTED_COMBAT             = 0x21, // Interrupted
-    SPELL_FAILED_ITEM_ALREADY_ENCHANTED         = 0x22, // Item is already enchanted
-    SPELL_FAILED_ITEM_GONE                      = 0x23, // Item is gone
-    SPELL_FAILED_ITEM_NOT_FOUND                 = 0x24, // Tried to enchant an item that didn't exist
-    SPELL_FAILED_ITEM_NOT_READY                 = 0x25, // Item is not ready yet.
-    SPELL_FAILED_LEVEL_REQUIREMENT              = 0x26, // You are not high enough level
-    SPELL_FAILED_LINE_OF_SIGHT                  = 0x27, // Target not in line of sight
-    SPELL_FAILED_LOWLEVEL                       = 0x28, // Target is too low level
-    SPELL_FAILED_LOW_CASTLEVEL                  = 0x29, // Skill not high enough
-    SPELL_FAILED_MAINHAND_EMPTY                 = 0x2A, // Your weapon hand is empty
-    SPELL_FAILED_MOVING                         = 0x2B, // Can't do that while moving
-    SPELL_FAILED_NEED_AMMO                      = 0x2C, // Ammo needs to be in the paper doll ammo slot before it can be fired
-    SPELL_FAILED_NEED_AMMO_POUCH                = 0x2D, // Requires: %s
-    SPELL_FAILED_NEED_EXOTIC_AMMO               = 0x2E, // Requires exotic ammo: %s
-    SPELL_FAILED_NOPATH                         = 0x2F, // No path available
-    SPELL_FAILED_NOT_BEHIND                     = 0x30, // You must be behind your target
-    SPELL_FAILED_NOT_FISHABLE                   = 0x31, // Your cast didn't land in fishable water
-    SPELL_FAILED_NOT_HERE                       = 0x32, // You can't use that here
-    SPELL_FAILED_NOT_INFRONT                    = 0x33, // You must be in front of your target
-    SPELL_FAILED_NOT_IN_CONTROL                 = 0x34, // You are not in control of your actions
-    SPELL_FAILED_NOT_KNOWN                      = 0x35, // Spell not learned
-    SPELL_FAILED_NOT_MOUNTED                    = 0x36, // You are mounted
-    SPELL_FAILED_NOT_ON_TAXI                    = 0x37, // You are in flight
-    SPELL_FAILED_NOT_ON_TRANSPORT               = 0x38, // You are on a transport
-    SPELL_FAILED_NOT_READY                      = 0x39, // Spell is not ready yet.
-    SPELL_FAILED_NOT_SHAPESHIFT                 = 0x3A, // You are in shapeshift form
-    SPELL_FAILED_NOT_STANDING                   = 0x3B, // You must be standing to do that
-    SPELL_FAILED_NOT_TRADEABLE                  = 0x3C, // You can only use this on an object you own
-    SPELL_FAILED_NOT_TRADING                    = 0x3D, // Tried to enchant a trade item, but not trading
-    SPELL_FAILED_NOT_UNSHEATHED                 = 0x3E, // You have to be unsheathed to do that!
-    SPELL_FAILED_NOT_WHILE_GHOST                = 0x3F, // Can't cast as ghost
-    SPELL_FAILED_NO_AMMO                        = 0x40, // Out of ammo
-    SPELL_FAILED_NO_CHARGES_REMAIN              = 0x41, // No charges remain
-    SPELL_FAILED_NO_COMBO_POINTS                = 0x42, // That ability requires combo points
-    SPELL_FAILED_NO_DUELING                     = 0x43, // Dueling isn't allowed here
-    SPELL_FAILED_NO_ENDURANCE                   = 0x44, // Not enough endurance
-    SPELL_FAILED_NO_FISH                        = 0x45, // There aren't any fish here
-    SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED    = 0x46, // Can't use items while shapeshifted
-    SPELL_FAILED_NO_MOUNTS_ALLOWED              = 0x47, // You can't mount here
-    SPELL_FAILED_NO_PET                         = 0x48, // You do not have a pet
-    SPELL_FAILED_NO_POWER                       = 0x49, // Dynamic pre-defined messages, no args: Not enough mana, Not enough rage, etc
-    SPELL_FAILED_ONLY_ABOVEWATER                = 0x4A, // Cannot use while swimming
-    SPELL_FAILED_ONLY_DAYTIME                   = 0x4B, // Can only use during the day
-    SPELL_FAILED_ONLY_INDOORS                   = 0x4C, // Can only use indoors
-    SPELL_FAILED_ONLY_MOUNTED                   = 0x4D, // Can only use while mounted
-    SPELL_FAILED_ONLY_NIGHTTIME                 = 0x4E, // Can only use during the night
-    SPELL_FAILED_ONLY_OUTDOORS                  = 0x4F, // Can only use outside
-    SPELL_FAILED_ONLY_SHAPESHIFT                = 0x50, // Must be in %s
-    SPELL_FAILED_ONLY_STEALTHED                 = 0x51, // You must be in stealth mode
-    SPELL_FAILED_ONLY_UNDERWATER                = 0x52, // Can only use while swimming
-    SPELL_FAILED_OUT_OF_RANGE                   = 0x53, // Out of range.
-    SPELL_FAILED_PACIFIED                       = 0x54, // Can't use that ability while pacified
-    SPELL_FAILED_POSSESSED                      = 0x55, // You are possessed
-    // SPELL_FAILED_REAGENTS                    = 0x56, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_REQUIRES_AREA                  = 0x57, // You need to be in %s
-    SPELL_FAILED_REQUIRES_SPELL_FOCUS           = 0x58, // Requires %s
-    SPELL_FAILED_ROOTED                         = 0x59, // You are unable to move
-    SPELL_FAILED_SILENCED                       = 0x5A, // Can't do that while silenced
-    SPELL_FAILED_SPELL_IN_PROGRESS              = 0x5B, // Another action is in progress
-    SPELL_FAILED_SPELL_LEARNED                  = 0x5C, // You have already learned the spell
-    SPELL_FAILED_SPELL_UNAVAILABLE              = 0x5D, // The spell is not available to you
-    SPELL_FAILED_STUNNED                        = 0x5E, // Can't do that while stunned
-    SPELL_FAILED_TARGETS_DEAD                   = 0x5F, // Your target is dead
-    SPELL_FAILED_TARGET_AFFECTING_COMBAT        = 0x60, // Target is in combat
-    SPELL_FAILED_TARGET_AURASTATE               = 0x61, // You can't do that yet
-    SPELL_FAILED_TARGET_DUELING                 = 0x62, // Target is currently dueling
-    SPELL_FAILED_TARGET_ENEMY                   = 0x63, // Target is hostile
-    SPELL_FAILED_TARGET_ENRAGED                 = 0x64, // Target is too enraged to be charmed
-    SPELL_FAILED_TARGET_FRIENDLY                = 0x65, // Target is friendly
-    SPELL_FAILED_TARGET_IN_COMBAT               = 0x66, // The target can't be in combat
-    SPELL_FAILED_TARGET_IS_PLAYER               = 0x67, // Can't target players
-    SPELL_FAILED_TARGET_NOT_DEAD                = 0x68, // Target is alive
-    SPELL_FAILED_TARGET_NOT_IN_PARTY            = 0x69, // Target is not in your party
-    SPELL_FAILED_TARGET_NOT_LOOTED              = 0x6A, // Creature must be looted first
-    SPELL_FAILED_TARGET_NOT_PLAYER              = 0x6B, // Target is not a player
-    SPELL_FAILED_TARGET_NO_POCKETS              = 0x6C, // No pockets to pick
-    SPELL_FAILED_TARGET_NO_WEAPONS              = 0x6D, // Target has no weapons equipped
-    SPELL_FAILED_TARGET_UNSKINNABLE             = 0x6E, // Creature is not skinnable
-    SPELL_FAILED_THIRST_SATIATED                = 0x6F, // Message is hidden/unused
-    SPELL_FAILED_TOO_CLOSE                      = 0x70, // Target too close
-    SPELL_FAILED_TOO_MANY_OF_ITEM               = 0x71, // You have too many of that item already
-    // SPELL_FAILED_TOTEMS                      = 0x72, // Message is hidden/unused, supposedly implemented client-side only
-    SPELL_FAILED_TRAINING_POINTS                = 0x73, // Not enough training points
-    SPELL_FAILED_TRY_AGAIN                      = 0x74, // Failed attempt
-    SPELL_FAILED_UNIT_NOT_BEHIND                = 0x75, // Target needs to be behind you
-    SPELL_FAILED_UNIT_NOT_INFRONT               = 0x76, // Target needs to be in front of you
-    SPELL_FAILED_WRONG_PET_FOOD                 = 0x77, // Your pet doesn't like that food
-    SPELL_FAILED_NOT_WHILE_FATIGUED             = 0x78, // Can't cast while fatigued
-    SPELL_FAILED_TARGET_NOT_IN_INSTANCE         = 0x79, // Target must be in this instance
-    SPELL_FAILED_NOT_WHILE_TRADING              = 0x7A, // Can't cast while trading
-    SPELL_FAILED_TARGET_NOT_IN_RAID             = 0x7B, // Target is not in your party or raid group
-    SPELL_FAILED_DISENCHANT_WHILE_LOOTING       = 0x7C, // Cannot disenchant while looting
-    SPELL_FAILED_TARGET_FREEFORALL              = 0x7D, // Target is currently in free-for-all PvP combat
-    SPELL_FAILED_NO_EDIBLE_CORPSES              = 0x7E, // There are no nearby corpses to eat
-    SPELL_FAILED_ONLY_BATTLEGROUNDS             = 0x7F, // Can only use in battlegrounds
-    SPELL_FAILED_TARGET_NOT_GHOST               = 0x80, // Target is not a ghost
-    SPELL_FAILED_TOO_MANY_SKILLS                = 0x81, // Your pet can't learn any more skills
-    SPELL_FAILED_TRANSFORM_UNUSABLE             = 0x82, // You can't use the new item
-    SPELL_FAILED_WRONG_WEATHER                  = 0x83, // The weather isn't right for that
-    SPELL_FAILED_DAMAGE_IMMUNE                  = 0x84, // You can't do that while you are immune
-    SPELL_FAILED_PREVENTED_BY_MECHANIC          = 0x85, // Can't do that while %s
-    SPELL_FAILED_PLAY_TIME                      = 0x86, // Maximum play time exceeded
-    SPELL_FAILED_REPUTATION                     = 0x87, // Your reputation isn't high enough
-    SPELL_FAILED_UNKNOWN                        = 0x88, // Generic out of bounds response:  Unknown reason
+    SPELL_FAILED_CANT_BE_PROSPECTED                   , // There are no gems in this
+#endif
+    SPELL_FAILED_CANT_CAST_ON_TAPPED                  , // Target is tapped
+    SPELL_FAILED_CANT_DUEL_WHILE_INVISIBLE            , // You can't start a duel while invisible
+    SPELL_FAILED_CANT_DUEL_WHILE_STEALTHED            , // You can't start a duel while stealthed
+    SPELL_FAILED_CANT_STEALTH                         , // You are too close to enemies
+    SPELL_FAILED_CASTER_AURASTATE                     , // You can't do that yet
+    SPELL_FAILED_CASTER_DEAD                          , // You are dead
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
+    SPELL_FAILED_CHARMED                              , // Can't do that while charmed
+#endif
+    SPELL_FAILED_CHEST_IN_USE                         , // That is already being used
+    SPELL_FAILED_CONFUSED                             , // Can't do that while confused
+    SPELL_FAILED_DONT_REPORT                          , // Message is hidden/unused
+    SPELL_FAILED_EQUIPPED_ITEM                        , // Must have the proper item equipped
+    SPELL_FAILED_EQUIPPED_ITEM_CLASS                  , // Must have a %s equipped
+    SPELL_FAILED_EQUIPPED_ITEM_CLASS_MAINHAND         , // Must have a %s equipped in the main hand
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+    SPELL_FAILED_EQUIPPED_ITEM_CLASS_OFFHAND          , // Must have a %s equipped in the offhand
+#endif
+    SPELL_FAILED_ERROR                                , // Internal error
+    SPELL_FAILED_FIZZLE                               , // Fizzled
+    SPELL_FAILED_FLEEING                              , // Can't do that while fleeing
+    SPELL_FAILED_FOOD_LOWLEVEL                        , // That food's level is not high enough for your pet
+    SPELL_FAILED_HIGHLEVEL                            , // Target is too high level
+    SPELL_FAILED_HUNGER_SATIATED                      , // Message is hidden/unused
+    SPELL_FAILED_IMMUNE                               , // Immune
+    SPELL_FAILED_INTERRUPTED                          , // Interrupted
+    SPELL_FAILED_INTERRUPTED_COMBAT                   , // Interrupted
+    SPELL_FAILED_ITEM_ALREADY_ENCHANTED               , // Item is already enchanted
+    SPELL_FAILED_ITEM_GONE                            , // Item is gone
+    SPELL_FAILED_ITEM_NOT_FOUND                       , // Tried to enchant an item that didn't exist
+    SPELL_FAILED_ITEM_NOT_READY                       , // Item is not ready yet.
+    SPELL_FAILED_LEVEL_REQUIREMENT                    , // You are not high enough level
+    SPELL_FAILED_LINE_OF_SIGHT                        , // Target not in line of sight
+    SPELL_FAILED_LOWLEVEL                             , // Target is too low level
+    SPELL_FAILED_LOW_CASTLEVEL                        , // Skill not high enough
+    SPELL_FAILED_MAINHAND_EMPTY                       , // Your weapon hand is empty
+    SPELL_FAILED_MOVING                               , // Can't do that while moving
+    SPELL_FAILED_NEED_AMMO                            , // Ammo needs to be in the paper doll ammo slot before it can be fired
+    SPELL_FAILED_NEED_AMMO_POUCH                      , // Requires: %s
+    SPELL_FAILED_NEED_EXOTIC_AMMO                     , // Requires exotic ammo: %s
+    SPELL_FAILED_NOPATH                               , // No path available
+    SPELL_FAILED_NOT_BEHIND                           , // You must be behind your target
+    SPELL_FAILED_NOT_FISHABLE                         , // Your cast didn't land in fishable water
+    SPELL_FAILED_NOT_HERE                             , // You can't use that here
+    SPELL_FAILED_NOT_INFRONT                          , // You must be in front of your target
+    SPELL_FAILED_NOT_IN_CONTROL                       , // You are not in control of your actions
+    SPELL_FAILED_NOT_KNOWN                            , // Spell not learned
+    SPELL_FAILED_NOT_MOUNTED                          , // You are mounted
+    SPELL_FAILED_NOT_ON_TAXI                          , // You are in flight
+    SPELL_FAILED_NOT_ON_TRANSPORT                     , // You are on a transport
+    SPELL_FAILED_NOT_READY                            , // Spell is not ready yet.
+    SPELL_FAILED_NOT_SHAPESHIFT                       , // You are in shapeshift form
+    SPELL_FAILED_NOT_STANDING                         , // You must be standing to do that
+    SPELL_FAILED_NOT_TRADEABLE                        , // You can only use this on an object you own
+    SPELL_FAILED_NOT_TRADING                          , // Tried to enchant a trade item, but not trading
+    SPELL_FAILED_NOT_UNSHEATHED                       , // You have to be unsheathed to do that!
+    SPELL_FAILED_NOT_WHILE_GHOST                      , // Can't cast as ghost
+    SPELL_FAILED_NO_AMMO                              , // Out of ammo
+    SPELL_FAILED_NO_CHARGES_REMAIN                    , // No charges remain
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+    SPELL_FAILED_NO_CHAMPION                          , // You haven't selected a champion
+#endif
+    SPELL_FAILED_NO_COMBO_POINTS                      , // That ability requires combo points
+    SPELL_FAILED_NO_DUELING                           , // Dueling isn't allowed here
+    SPELL_FAILED_NO_ENDURANCE                         , // Not enough endurance
+    SPELL_FAILED_NO_FISH                              , // There aren't any fish here
+    SPELL_FAILED_NO_ITEMS_WHILE_SHAPESHIFTED          , // Can't use items while shapeshifted
+    SPELL_FAILED_NO_MOUNTS_ALLOWED                    , // You can't mount here
+    SPELL_FAILED_NO_PET                               , // You do not have a pet
+    SPELL_FAILED_NO_POWER                             , // Dynamic pre-defined messages, no args: Not enough mana, Not enough rage, etc
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_10_2
+    SPELL_FAILED_NOTHING_TO_DISPEL                    , // Nothing to dispel
+#endif
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+    SPELL_FAILED_NOTHING_TO_STEAL                     , // Nothing to steal
+#endif
+    SPELL_FAILED_ONLY_ABOVEWATER                      , // Cannot use while swimming
+    SPELL_FAILED_ONLY_DAYTIME                         , // Can only use during the day
+    SPELL_FAILED_ONLY_INDOORS                         , // Can only use indoors
+    SPELL_FAILED_ONLY_MOUNTED                         , // Can only use while mounted
+    SPELL_FAILED_ONLY_NIGHTTIME                       , // Can only use during the night
+    SPELL_FAILED_ONLY_OUTDOORS                        , // Can only use outside
+    SPELL_FAILED_ONLY_SHAPESHIFT                      , // Must be in %s
+    SPELL_FAILED_ONLY_STEALTHED                       , // You must be in stealth mode
+    SPELL_FAILED_ONLY_UNDERWATER                      , // Can only use while swimming
+    SPELL_FAILED_OUT_OF_RANGE                         , // Out of range.
+    SPELL_FAILED_PACIFIED                             , // Can't use that ability while pacified
+    SPELL_FAILED_POSSESSED                            , // You are possessed
+    SPELL_FAILED_REAGENTS                             , // Message is hidden/unused, supposedly implemented client-side only
+    SPELL_FAILED_REQUIRES_AREA                        , // You need to be in %s
+    SPELL_FAILED_REQUIRES_SPELL_FOCUS                 , // Requires %s
+    SPELL_FAILED_ROOTED                               , // You are unable to move
+    SPELL_FAILED_SILENCED                             , // Can't do that while silenced
+    SPELL_FAILED_SPELL_IN_PROGRESS                    , // Another action is in progress
+    SPELL_FAILED_SPELL_LEARNED                        , // You have already learned the spell
+    SPELL_FAILED_SPELL_UNAVAILABLE                    , // The spell is not available to you
+    SPELL_FAILED_STUNNED                              , // Can't do that while stunned
+    SPELL_FAILED_TARGETS_DEAD                         , // Your target is dead
+    SPELL_FAILED_TARGET_AFFECTING_COMBAT              , // Target is in combat
+    SPELL_FAILED_TARGET_AURASTATE                     , // You can't do that yet
+    SPELL_FAILED_TARGET_DUELING                       , // Target is currently dueling
+    SPELL_FAILED_TARGET_ENEMY                         , // Target is hostile
+    SPELL_FAILED_TARGET_ENRAGED                       , // Target is too enraged to be charmed
+    SPELL_FAILED_TARGET_FRIENDLY                      , // Target is friendly
+    SPELL_FAILED_TARGET_IN_COMBAT                     , // The target can't be in combat
+    SPELL_FAILED_TARGET_IS_PLAYER                     , // Can't target players
+    SPELL_FAILED_TARGET_NOT_DEAD                      , // Target is alive
+    SPELL_FAILED_TARGET_NOT_IN_PARTY                  , // Target is not in your party
+    SPELL_FAILED_TARGET_NOT_LOOTED                    , // Creature must be looted first
+    SPELL_FAILED_TARGET_NOT_PLAYER                    , // Target is not a player
+    SPELL_FAILED_TARGET_NO_POCKETS                    , // No pockets to pick
+    SPELL_FAILED_TARGET_NO_WEAPONS                    , // Target has no weapons equipped
+    SPELL_FAILED_TARGET_UNSKINNABLE                   , // Creature is not skinnable
+    SPELL_FAILED_THIRST_SATIATED                      , // Message is hidden/unused
+    SPELL_FAILED_TOO_CLOSE                            , // Target too close
+    SPELL_FAILED_TOO_MANY_OF_ITEM                     , // You have too many of that item already
+    SPELL_FAILED_TOTEMS                               , // Message is hidden/unused, supposedly implemented client-side only
+    SPELL_FAILED_TRAINING_POINTS                      , // Not enough training points
+    SPELL_FAILED_TRY_AGAIN                            , // Failed attempt
+    SPELL_FAILED_UNIT_NOT_BEHIND                      , // Target needs to be behind you
+    SPELL_FAILED_UNIT_NOT_INFRONT                     , // Target needs to be in front of you
+    SPELL_FAILED_WRONG_PET_FOOD                       , // Your pet doesn't like that food
+    SPELL_FAILED_NOT_WHILE_FATIGUED                   , // Can't cast while fatigued
+    SPELL_FAILED_TARGET_NOT_IN_INSTANCE               , // Target must be in this instance
+    SPELL_FAILED_NOT_WHILE_TRADING                    , // Can't cast while trading
+    SPELL_FAILED_TARGET_NOT_IN_RAID                   , // Target is not in your party or raid group
+    SPELL_FAILED_DISENCHANT_WHILE_LOOTING             , // Cannot disenchant while looting
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+    SPELL_FAILED_PROSPECT_WHILE_LOOTING               , // Cannot prospect while looting
+    SPELL_FAILED_PROSPECT_NEED_MORE                   , // Message is hidden/unused, supposedly implemented client-side only
+#endif
+    SPELL_FAILED_TARGET_FREEFORALL                    , // Target is currently in free-for-all PvP combat
+    SPELL_FAILED_NO_EDIBLE_CORPSES                    , // There are no nearby corpses to eat
+    SPELL_FAILED_ONLY_BATTLEGROUNDS                   , // Can only use in battlegrounds
+    SPELL_FAILED_TARGET_NOT_GHOST                     , // Target is not a ghost
+    SPELL_FAILED_TOO_MANY_SKILLS                      , // Your pet can't learn any more skills
+    SPELL_FAILED_TRANSFORM_UNUSABLE                   , // You can't use the new item
+    SPELL_FAILED_WRONG_WEATHER                        , // The weather isn't right for that
+    SPELL_FAILED_DAMAGE_IMMUNE                        , // You can't do that while you are immune
+    SPELL_FAILED_PREVENTED_BY_MECHANIC                , // Can't do that while %s
+    SPELL_FAILED_PLAY_TIME                            , // Maximum play time exceeded
+    SPELL_FAILED_REPUTATION                           , // Your reputation isn't high enough
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
+    SPELL_FAILED_MIN_SKILL                            , // Your skill is not high enough.  Requires %s (%d).
+#endif
+    SPELL_FAILED_UNKNOWN                              , // Generic out of bounds response:  Unknown reason
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
+    SPELL_FAILED_CHARMED = SPELL_FAILED_CASTER_AURASTATE,
 #endif
 
-    SPELL_CAST_OK                               = 0xFF      // custom value, don't must be send to client
+    SPELL_CAST_OK                               = 0xFF  // custom value, must not be send to client
 };
 
 // Spell aura states
