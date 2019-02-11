@@ -185,13 +185,25 @@ void SpellCastTargets::read(ByteBuffer& data, Unit *caster)
 
     // TARGET_FLAG_UNK2 is used for non-combat pets, maybe other?
     if (m_targetMask & (TARGET_FLAG_UNIT | TARGET_FLAG_UNK2))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_unitTargetGUID.ReadAsPacked();
+#else
+        data >> m_unitTargetGUID;
+#endif
 
     if (m_targetMask & (TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_GOTargetGUID.ReadAsPacked();
+#else
+        data >> m_GOTargetGUID;
+#endif
 
     if ((m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM)) && caster->GetTypeId() == TYPEID_PLAYER)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_itemTargetGUID.ReadAsPacked();
+#else
+        data >> m_itemTargetGUID;
+#endif
 
     if (m_targetMask & TARGET_FLAG_SOURCE_LOCATION)
     {
@@ -211,7 +223,11 @@ void SpellCastTargets::read(ByteBuffer& data, Unit *caster)
         data >> m_strTarget;
 
     if (m_targetMask & (TARGET_FLAG_CORPSE | TARGET_FLAG_PVP_CORPSE))
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data >> m_CorpseTargetGUID.ReadAsPacked();
+#else
+        data >> m_CorpseTargetGUID;
+#endif
 
     // find real units/GOs
     Update(caster);
@@ -226,14 +242,22 @@ void SpellCastTargets::write(ByteBuffer& data) const
         if (m_targetMask & TARGET_FLAG_UNIT)
         {
             if (m_unitTarget)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 data << m_unitTarget->GetPackGUID();
+#else
+                data << m_unitTarget->GetGUID();
+#endif
             else
                 data << uint8(0);
         }
         else if (m_targetMask & (TARGET_FLAG_OBJECT | TARGET_FLAG_OBJECT_UNK))
         {
             if (m_GOTarget)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 data << m_GOTarget->GetPackGUID();
+#else
+                data << m_GOTarget->GetGUID();
+#endif
             else
                 data << uint8(0);
         }
@@ -246,7 +270,11 @@ void SpellCastTargets::write(ByteBuffer& data) const
     if (m_targetMask & (TARGET_FLAG_ITEM | TARGET_FLAG_TRADE_ITEM))
     {
         if (m_itemTarget)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             data << m_itemTarget->GetPackGUID();
+#else
+            data << m_itemTarget->GetGUID();
+#endif
         else
             data << uint8(0);
     }
@@ -4348,11 +4376,19 @@ void Spell::SendSpellStart()
 
     WorldPacket data(SMSG_SPELL_START, (8 + 8 + 4 + 2 + 4));
     if (m_CastItem)
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << m_CastItem->GetPackGUID();
     else
         data << m_caster->GetPackGUID();
 
     data << m_caster->GetPackGUID();
+#else
+        data << m_CastItem->GetGUID();
+    else
+        data << m_caster->GetGUID();
+
+    data << m_caster->GetGUID();
+#endif
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags
     data << uint32(m_timer);                                // delay?
@@ -4377,18 +4413,32 @@ void Spell::SendSpellGo(bool bSendToCaster)
 
     WorldPacket data(SMSG_SPELL_GO, 53);                    // guess size
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (m_CastItem)
         data << m_CastItem->GetPackGUID();
     else
         data << m_caster->GetPackGUID();
+#else
+    if (m_CastItem)
+        data << m_CastItem->GetGUID();
+    else
+        data << m_caster->GetGUID();
+#endif
 
     // (HACK) Don't display cast animation for Flametongue Weapon proc
     // TODO - figure out the rule for why some procs should or should not have cast animations
     // e.g. rogue poison proc should have animation
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (m_spellInfo->Id == 10444)
         data << PackedGuid();
      else
         data << m_caster->GetPackGUID();
+#else
+    if (m_spellInfo->Id == 10444)
+        data << uint64();
+    else
+        data << m_caster->GetGUID();
+#endif
     data << uint32(m_spellInfo->Id);                        // spellId
     data << uint16(castFlags);                              // cast flags
 
@@ -4524,7 +4574,12 @@ void Spell::SendLogExecute()
 {
     WorldPacket data(SMSG_SPELLLOGEXECUTE, (8 + 4 + 4 + 4 + 4 + 8));
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << m_caster->GetPackGUID();
+#else
+    data << m_caster->GetGUID();
+#endif
+
     data << uint32(m_spellInfo->Id);
 
     uint32 effectCount = 0;
@@ -6467,13 +6522,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 if (m_caster->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (!m_targets.getUnitTarget())
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_targets.getUnitTarget()->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (m_spellInfo->Id != 530) // Spell for ".possess" command.
                     if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
@@ -6493,13 +6556,21 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 if (m_caster->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (!m_targets.getUnitTarget())
                     return SPELL_FAILED_BAD_IMPLICIT_TARGETS;
 
                 if (m_targets.getUnitTarget()->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 if (int32(m_targets.getUnitTarget()->getLevel()) > CalculateDamage(SpellEffectIndex(i), m_targets.getUnitTarget()))
                     return SPELL_FAILED_HIGHLEVEL;
@@ -6521,14 +6592,22 @@ SpellCastResult Spell::CheckCast(bool strict)
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;
 
                 if (m_caster->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 Pet* pet = m_caster->GetPet();
                 if (!pet)
                     return SPELL_FAILED_NO_PET;
 
                 if (pet->GetCharmerGuid())
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_11_2
                     return SPELL_FAILED_CHARMED;
+#else
+                    return SPELL_FAILED_FIZZLE;
+#endif
 
                 break;
             }

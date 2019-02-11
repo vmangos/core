@@ -1705,8 +1705,25 @@ void Aura::HandleAuraDummy(bool apply, bool Real)
                         Unit* caster = GetCaster();
                         if (!caster) break;
                         caster->HandleEmote(EMOTE_STATE_SUBMERGED);
+                        break;
                     }
                 }
+                break;
+            }
+            case SPELLFAMILY_PALADIN:
+            {
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+                // Judgement of Command
+                if (GetSpellProto()->SpellIconID == 561)
+                {
+                    if (GetCaster() != GetTarget())
+                    {
+                        m_isPeriodic = true;
+                        m_modifier.periodictime = 2000; // guess
+                    }
+                    return;
+                }
+#endif
                 break;
             }
             case SPELLFAMILY_SHAMAN:
@@ -5908,6 +5925,45 @@ void Aura::PeriodicDummyTick()
                     }
                     return;
             }
+            break;
+        }
+
+        case SPELLFAMILY_PALADIN:
+        {
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+            // Judgement of Command
+            if (spell->SpellIconID == 561)
+            {
+                if (target && target->hasUnitState(UNIT_STAT_STUNNED))
+                {
+                    if (Unit* pCaster = GetCaster())
+                    {
+                        uint32 spellId = 0;
+                        switch (spell->Id)
+                        {
+                            case 20425: // Rank 1
+                                spellId = 20467;
+                                break;
+                            case 20962: // Rank 2
+                                spellId = 20963;
+                                break;
+                            case 20961: // Rank 3
+                                spellId = 20964;
+                                break;
+                            case 20967: // Rank 4
+                                spellId = 20965;
+                                break;
+                            case 20968: // Rank 5
+                                spellId = 20966;
+                                break;
+                        }
+                        if (spellId)
+                            pCaster->CastSpell(target, spellId, true);
+                    }
+                }
+                return;
+            }
+#endif
             break;
         }
         default:

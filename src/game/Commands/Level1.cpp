@@ -1506,9 +1506,12 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
     WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, (8 + 4 + 4));
     data << chr->GetPackGUID();
     data << (uint32)0;
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, (8 + 4));
     data << chr->GetPackGUID();
+#else
+    WorldPacket data(SMSG_FORCE_RUN_SPEED_CHANGE, (8 + 4));
+    data << chr->GetGUID();
 #endif
     data << float(speed);
     chr->SendMessageToSet(&data, true);
@@ -1518,9 +1521,12 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
     data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, (8 + 4 + 4));
     data << chr->GetPackGUID();
     data << (uint32)0;
-#else
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, (8 + 4));
     data << chr->GetPackGUID();
+#else
+    data.Initialize(SMSG_FORCE_SWIM_SPEED_CHANGE, (8 + 4));
+    data << chr->GetGUID();
 #endif
     data << float(speed);
     chr->SendMessageToSet(&data, true);

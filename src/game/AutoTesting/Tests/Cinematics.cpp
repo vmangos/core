@@ -276,8 +276,12 @@ public:
         MovementInfo mi;
         mi.moveFlags = MOVEFLAG_JUMPING;
         WorldPacket data(MSG_MOVE_JUMP, 50);
-        data << p->GetPackGUID();             // write guid
-        mi.Write(data);                               // write data
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+        data << p->GetPackGUID();
+#else
+        data << p->GetGUID();
+#endif
+        mi.Write(data);
         p->SendObjectMessageToSet(&data, true, p);
     }
 };

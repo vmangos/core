@@ -186,8 +186,6 @@ Creature::Creature(CreatureSubtype subtype) :
 
     for (int i = 0; i < CREATURE_MAX_SPELLS; ++i)
         m_spells[i] = 0;
-
-    SetWalk(true, true);
 }
 
 Creature::~Creature()
@@ -1578,6 +1576,8 @@ bool Creature::CreateFromProto(uint32 guidlow, CreatureInfo const* cinfo, Team t
     m_originalEntry = cinfo->entry;
 
     Object::_Create(guidlow, cinfo->entry, cinfo->GetHighGuid());
+
+    SetWalk(true, true);
 
     if (!UpdateEntry(cinfo->entry, team, data, eventData, false))
         return false;
@@ -3954,7 +3954,11 @@ void Creature::SetFeatherFall(bool enable)
 {
     Unit::SetFeatherFall(enable);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(enable ? SMSG_SPLINE_MOVE_FEATHER_FALL : SMSG_SPLINE_MOVE_NORMAL_FALL);
+#else
+    WorldPacket data(enable ? SMSG_MOVE_FEATHER_FALL : SMSG_MOVE_NORMAL_FALL);
+#endif
     data << GetPackGUID();
     SendMessageToSet(&data, true);
 }
@@ -3963,8 +3967,14 @@ void Creature::SetHover(bool enable)
 {
     Unit::SetHover(enable);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_HOVER : SMSG_SPLINE_MOVE_UNSET_HOVER, 9);
     data << GetPackGUID();
+#else
+    WorldPacket data(enable ? SMSG_MOVE_SET_HOVER : SMSG_MOVE_UNSET_HOVER, 9);
+    data << GetGUID();
+#endif
+
     SendMessageToSet(&data, false);
 }
 
@@ -3972,7 +3982,13 @@ void Creature::SetWaterWalk(bool enable)
 {
     Unit::SetWaterWalk(enable);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(enable ? SMSG_SPLINE_MOVE_WATER_WALK : SMSG_SPLINE_MOVE_LAND_WALK, 9);
     data << GetPackGUID();
+#else
+    WorldPacket data(enable ? SMSG_MOVE_WATER_WALK : SMSG_MOVE_LAND_WALK, 9);
+    data << GetGUID();
+#endif
+
     SendMessageToSet(&data, true);
 }

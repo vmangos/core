@@ -981,13 +981,17 @@ void BattleGroundMgr::BuildBattleGroundStatusPacket(WorldPacket *data, BattleGro
     if (StatusID == 0 || !bg)
     {
         data->Initialize(SMSG_BATTLEFIELD_STATUS, 4 * 2);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         *data << uint32(QueueSlot);                         // queue id (0...2)
+#endif
         *data << uint32(0);
         return;
     }
 
     data->Initialize(SMSG_BATTLEFIELD_STATUS, (4 + 1 + 1 + 4 + 2 + 4 + 1 + 4 + 4 + 4));
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     *data << uint32(QueueSlot);                             // queue id (0...2) - player can be in 3 queues in time
+#endif
     // uint64 in client
     *data << uint32(bg->GetMapId());                        // MapID
     *data << uint8(0);                                      // Unknown

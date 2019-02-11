@@ -788,15 +788,13 @@ enum SpellCastResult
     SPELL_FAILED_DAMAGE_IMMUNE                        , // You can't do that while you are immune
     SPELL_FAILED_PREVENTED_BY_MECHANIC                , // Can't do that while %s
     SPELL_FAILED_PLAY_TIME                            , // Maximum play time exceeded
+#if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_9_4
     SPELL_FAILED_REPUTATION                           , // Your reputation isn't high enough
+#endif
 #if SUPPORTED_CLIENT_BUILD >= CLIENT_BUILD_1_12_1
     SPELL_FAILED_MIN_SKILL                            , // Your skill is not high enough.  Requires %s (%d).
 #endif
     SPELL_FAILED_UNKNOWN                              , // Generic out of bounds response:  Unknown reason
-
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
-    SPELL_FAILED_CHARMED = SPELL_FAILED_CASTER_AURASTATE,
-#endif
 
     SPELL_CAST_OK                               = 0xFF  // custom value, must not be send to client
 };

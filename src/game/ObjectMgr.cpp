@@ -3471,12 +3471,14 @@ void ObjectMgr::LoadItemPrototypes()
                 const_cast<ItemPrototype*>(proto)->BagFamily = 0;
 #endif
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             ItemBagFamilyEntry const* bf = sItemBagFamilyStore.LookupEntry(proto->BagFamily);
             if (!bf)
             {
                 sLog.outErrorDb("Item (Entry: %u) has bag family %u not listed in ItemBagFamily.dbc, setted it to 0", i, proto->BagFamily);
                 const_cast<ItemPrototype*>(proto)->BagFamily = 0;
             }
+#endif
         }
 
         if (proto->DisenchantID)

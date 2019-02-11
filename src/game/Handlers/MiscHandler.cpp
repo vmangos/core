@@ -301,6 +301,15 @@ void WorldSession::HandleWhoOpcode(WorldPacket & recv_data)
     sWorld.AddAsyncTask(task);
 }
 
+void WorldSession::HandleLFGOpcode(WorldPacket & recv_data)
+{
+    DEBUG_LOG("WORLD: Recvd MSG_LOOKING_FOR_GROUP Message");
+    
+    WorldPacket data(MSG_LOOKING_FOR_GROUP, 4);
+    data << uint32(0);
+    SendPacket(&data);
+}
+
 void WorldSession::HandleLogoutRequestOpcode(WorldPacket & /*recv_data*/)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_LOGOUT_REQUEST Message, security - %u", GetSecurity());

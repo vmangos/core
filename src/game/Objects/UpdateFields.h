@@ -62,8 +62,12 @@ enum EContainerFields
     CONTAINER_FIELD_NUM_SLOTS                  = ITEM_END + 0x00, // Size:1
     CONTAINER_ALIGN_PAD                        = ITEM_END + 0x01, // Size:1
     CONTAINER_FIELD_SLOT_1                     = ITEM_END + 0x02, // count=72
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x48,
-    CONTAINER_END                              = ITEM_END + 0x4A,
+#else
+    CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x29,
+#endif
+    CONTAINER_END,
 };
 
 enum EUnitFields
@@ -166,12 +170,20 @@ enum EUnitFields
     UNIT_FIELD_RESISTANCES_04,
     UNIT_FIELD_RESISTANCES_05,
     UNIT_FIELD_RESISTANCES_06,
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     UNIT_FIELD_BASE_MANA,                      // Size:1
     UNIT_FIELD_BASE_HEALTH,                    // Size:1
     UNIT_FIELD_BYTES_2,                        // Size:1
     UNIT_FIELD_ATTACK_POWER,                   // Size:1
     UNIT_FIELD_ATTACK_POWER_MODS,              // Size:1
     UNIT_FIELD_ATTACK_POWER_MULTIPLIER,        // Size:1
+#else
+    UNIT_FIELD_ATTACK_POWER,                   // Size:1
+    UNIT_FIELD_BASE_MANA,                      // Size:1
+    UNIT_FIELD_BASE_HEALTH,                    // Size:1
+    UNIT_FIELD_ATTACK_POWER_MODS,              // Size:1
+    UNIT_FIELD_BYTES_2,                        // Size:1
+#endif
     UNIT_FIELD_RANGED_ATTACK_POWER,            // Size:1
     UNIT_FIELD_RANGED_ATTACK_POWER_MODS,       // Size:1
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
@@ -194,7 +206,7 @@ enum EUnitFields
     UNIT_FIELD_POWER_COST_MULTIPLIER_05,
     UNIT_FIELD_POWER_COST_MULTIPLIER_06,
     UNIT_FIELD_PADDING,
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_9_4
     UNIT_FIELD_PADDING_2,
 #endif
     UNIT_END,

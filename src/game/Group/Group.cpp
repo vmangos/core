@@ -1143,11 +1143,13 @@ void Group::SetTargetIcon(uint8 id, ObjectGuid targetGuid)
 
     m_targetIcons[id] = targetGuid;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + 1 + 8));
     data << uint8(0); // 1 - full icon list, 0 - delta update
     data << uint8(id);
     data << targetGuid;
     BroadcastPacket(&data, true);
+#endif
 }
 
 void Group::ClearTargetIcon(ObjectGuid targetGuid)
@@ -1203,7 +1205,7 @@ void Group::SendTargetIconList(WorldSession *session)
 {
     if (!session)
         return;
-
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(MSG_RAID_TARGET_UPDATE, (1 + TARGET_ICON_COUNT * 9));
     data << uint8(1); // 1 - full icon list, 0 - delta update
 
@@ -1217,6 +1219,7 @@ void Group::SendTargetIconList(WorldSession *session)
     }
 
     session->SendPacket(&data);
+#endif
 }
 
 void Group::SendUpdate()

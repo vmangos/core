@@ -336,11 +336,15 @@ int WorldSocket::HandleAuthSession(WorldPacket& recvPacket)
 int WorldSocket::HandlePing(WorldPacket& recvPacket)
 {
     uint32 ping;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint32 latency;
+#endif
 
     // Get the ping packet content
     recvPacket >> ping;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     recvPacket >> latency;
+#endif
 
     if (m_LastPingTime == ACE_Time_Value::zero)
         m_LastPingTime = ACE_OS::gettimeofday();  // for 1st ping
@@ -379,9 +383,13 @@ int WorldSocket::HandlePing(WorldPacket& recvPacket)
     {
         ACE_GUARD_RETURN(LockType, Guard, m_SessionLock, -1);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         if (m_Session)
             m_Session->SetLatency(latency);
         else
+#else
+        if (!m_Session)
+#endif
         {
             sLog.outError("WorldSocket::HandlePing: peer sent CMSG_PING, "
                           "but is not authenticated or got recently kicked,"

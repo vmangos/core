@@ -337,8 +337,13 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
         plMover->UpdateFallInformationIfNeed(movementInfo, opcode);
 
     WorldPacket data(opcode, recv_data.size());
-    data << _clientMoverGuid.WriteAsPacked();             // write guid
-    movementInfo.Write(data);                             // write data
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    data << _clientMoverGuid.WriteAsPacked();
+#else
+    data << _clientMoverGuid.GetRawValue();
+#endif
+    movementInfo.Write(data);
 
     mover->SendMovementMessageToSet(std::move(data), true, _player);
 
@@ -346,7 +351,7 @@ void WorldSession::HandleMovementOpcodes(WorldPacket & recv_data)
     // and then lets go of the key while in the air, he appears to continue moving
     // forward on other people's screen. Once he moves for real, they will see him
     // teleport back to where he was standing after he jumped.
-#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+#if SUPPORTED_CLIENT_BUILD == CLIENT_BUILD_1_9_4
     if (opcode == MSG_MOVE_FALL_LAND)
     {
         uint16 opcode2 = 0;
@@ -439,6 +444,7 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
     // Daemon TODO: enregistrement de cette position ?
     // Daemon: mise a jour de la vitesse pour les joueurs a cote.
     // Cf Unit::SetSpeedRate pour plus d'infos.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][3] =
     {
         {MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE,       SMSG_SPLINE_SET_WALK_SPEED},
@@ -448,13 +454,28 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         {MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  SMSG_SPLINE_SET_SWIM_BACK_SPEED},
         {MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        SMSG_SPLINE_SET_TURN_RATE},
     };
+#else
+    const uint16 SetSpeed2Opc_table[MAX_MOVE_TYPE][3] =
+    {
+        { MSG_MOVE_SET_WALK_SPEED,       SMSG_FORCE_WALK_SPEED_CHANGE,       MSG_MOVE_SET_WALK_SPEED },
+        { MSG_MOVE_SET_RUN_SPEED,        SMSG_FORCE_RUN_SPEED_CHANGE,        MSG_MOVE_SET_RUN_SPEED },
+        { MSG_MOVE_SET_RUN_BACK_SPEED,   SMSG_FORCE_RUN_BACK_SPEED_CHANGE,   MSG_MOVE_SET_RUN_BACK_SPEED },
+        { MSG_MOVE_SET_SWIM_SPEED,       SMSG_FORCE_SWIM_SPEED_CHANGE,       MSG_MOVE_SET_SWIM_SPEED },
+        { MSG_MOVE_SET_SWIM_BACK_SPEED,  SMSG_FORCE_SWIM_BACK_SPEED_CHANGE,  MSG_MOVE_SET_SWIM_BACK_SPEED },
+        { MSG_MOVE_SET_TURN_RATE,        SMSG_FORCE_TURN_RATE_CHANGE,        MSG_MOVE_SET_TURN_RATE },
+    };
+#endif
 
     if (!_player->IsTaxiFlying()) 
     {
         // Maybe update movespeed using the spline packet. works for move splines
         // and normal movement, but reverted due to issues in same changeset
         WorldPacket data(SetSpeed2Opc_table[move_type][0], 31);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << _player->GetMover()->GetPackGUID();
+#else
+        data << _player->GetMover()->GetGUID();
+#endif
         data << movementInfo;
         data << float(newspeed);
         _player->SendMovementMessageToSet(std::move(data), false);
@@ -462,7 +483,11 @@ void WorldSession::HandleForceSpeedChangeAckOpcodes(WorldPacket &recv_data)
         if (!_player->GetMover()->movespline->Finalized())
         {
             WorldPacket splineData(SMSG_MONSTER_MOVE, 31);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             splineData << _player->GetMover()->GetPackGUID();
+#else
+            splineData << _player->GetMover()->GetGUID();
+#endif
             Movement::PacketBuilder::WriteMonsterMove(*(_player->GetMover()->movespline), splineData);
             _player->SendMovementMessageToSet(std::move(splineData), false);
         }
@@ -805,6 +830,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
         tr->SendOutOfRangeUpdateToPlayer(pl);
         tr->SendCreateUpdateToPlayer(pl);
     }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     else
     {
         WorldPacket data(MSG_MOVE_TIME_SKIPPED, 12);
@@ -812,6 +838,7 @@ void WorldSession::HandleMoveTimeSkippedOpcode(WorldPacket & recv_data)
         data << lag;
         pl->SendMovementMessageToSet(std::move(data), false);
     }
+#endif
 }
 
 void WorldSession::HandleFeatherFallAck(WorldPacket &recv_data)
@@ -876,7 +903,11 @@ void WorldSession::HandleMoveUnRootAck(WorldPacket& recv_data)
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
 
     WorldPacket data(MSG_MOVE_UNROOT, recv_data.size());
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << _player->GetPackGUID();
+#else
+    data << _player->GetGUID();
+#endif
     movementInfo.Write(data);
     _player->SendMovementMessageToSet(std::move(data), true, _player);
     
@@ -914,7 +945,11 @@ void WorldSession::HandleMoveRootAck(WorldPacket& recv_data)
     _player->UpdateFallInformationIfNeed(movementInfo, recv_data.GetOpcode());
     
     WorldPacket data(MSG_MOVE_ROOT, recv_data.size());
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << _player->GetPackGUID();
+#else
+    data << _player->GetGUID();
+#endif
     movementInfo.Write(data);
     _player->SendMovementMessageToSet(std::move(data), true, _player);
     

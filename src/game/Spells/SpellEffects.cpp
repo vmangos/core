@@ -306,10 +306,12 @@ void Spell::EffectInstaKill(SpellEffectIndex /*eff_idx*/)
 
     WorldObject* caster = GetCastingObject();               // we need the original casting object
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_SPELLINSTAKILLLOG, (8 + 4));
     data << unitTarget->GetObjectGuid();                    // Victim GUID
     data << uint32(m_spellInfo->Id);
     m_caster->SendMessageToSet(&data, true);
+#endif
 
     m_caster->DealDamage(unitTarget, unitTarget->GetHealth(), nullptr, DIRECT_DAMAGE, SPELL_SCHOOL_MASK_NORMAL, nullptr, false);
 }
@@ -1204,7 +1206,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     DEBUG_LOG("AddObject at SpellEfects.cpp EffectDummy");
                     map->Add(pGameObj);
 
-                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
+                    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
                     data << ObjectGuid(pGameObj->GetObjectGuid());
                     m_caster->SendMessageToSet(&data, true);
 
@@ -1839,6 +1841,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
         }
         case SPELLFAMILY_PALADIN:
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             switch (m_spellInfo->SpellIconID)
             {
                 case 156:                                   // Holy Shock
@@ -1889,6 +1892,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     return;
                 }
             }
+#endif
             break;
         }
         case SPELLFAMILY_SHAMAN:
@@ -3161,8 +3165,13 @@ void Spell::EffectDispel(SpellEffectIndex eff_idx)
         {
             int32 count = success_list.size();
             WorldPacket data(SMSG_SPELLDISPELLOG, 8 + 8 + 4 + count * 4);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             data << unitTarget->GetPackGUID();              // Victim GUID
             data << m_caster->GetPackGUID();                // Caster GUID
+#else
+            data << unitTarget->GetGUID();              // Victim GUID
+            data << m_caster->GetGUID();                // Caster GUID
+#endif
             data << uint32(count);
             for (std::list<std::pair<SpellAuraHolder* , uint32> >::iterator j = success_list.begin(); j != success_list.end(); ++j)
             {
@@ -5730,7 +5739,7 @@ void Spell::EffectSummonObject(SpellEffectIndex eff_idx)
     m_caster->AddGameObject(pGameObj);
 
     map->Add(pGameObj);
-    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM_OBSOLETE, 8);
+    WorldPacket data(SMSG_GAMEOBJECT_SPAWN_ANIM, 8);
     data << ObjectGuid(pGameObj->GetObjectGuid());
     m_caster->SendMessageToSet(&data, true);
 

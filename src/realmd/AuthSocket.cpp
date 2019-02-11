@@ -309,6 +309,7 @@ void AuthSocket::SendProof(Sha1Hash sha)
 {
     switch(_build)
     {
+        case 4878:                                          // 1.8.4
         case 5086:                                          // 1.9.4
         case 5302:                                          // 1.10.2
         case 5464:                                          // 1.11.2
@@ -1117,6 +1118,7 @@ void AuthSocket::LoadRealmlist(ByteBuffer &pkt)
 {
     switch(_build)
     {
+        case 4878:                                          // 1.8.4
         case 5086:                                          // 1.9.4
         case 5302:                                          // 1.10.2
         case 5464:                                          // 1.11.2

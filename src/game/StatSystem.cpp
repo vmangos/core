@@ -226,7 +226,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     uint16 index = UNIT_FIELD_ATTACK_POWER;
     uint16 index_mod = UNIT_FIELD_ATTACK_POWER_MODS;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
+#endif
 
     if (ranged)
     {
@@ -351,7 +353,9 @@ void Player::UpdateAttackPowerAndDamage(bool ranged)
 
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
     SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
+#endif
 
     //automatically update weapon damage after attack power modification
     if (ranged)
@@ -750,7 +754,9 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 
     uint16 index = UNIT_FIELD_ATTACK_POWER;
     uint16 index_mod = UNIT_FIELD_ATTACK_POWER_MODS;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint16 index_mult = UNIT_FIELD_ATTACK_POWER_MULTIPLIER;
+#endif
 
     if (ranged)
     {
@@ -767,7 +773,9 @@ void Creature::UpdateAttackPowerAndDamage(bool ranged)
 
     SetInt32Value(index, (uint32)base_attPower);            //UNIT_FIELD_(RANGED)_ATTACK_POWER field
     SetInt32Value(index_mod, (uint32)attPowerMod);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(index_mult, attPowerMultiplier);          //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
+#endif
 
     if (ranged)
         return;
@@ -955,7 +963,9 @@ void Pet::UpdateAttackPowerAndDamage(bool ranged)
     //UNIT_FIELD_(RANGED)_ATTACK_POWER_MODS field
     SetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS, (int32)attPowerMod);
     //UNIT_FIELD_(RANGED)_ATTACK_POWER_MULTIPLIER field
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     SetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER, attPowerMultiplier);
+#endif
 
     //automatically update weapon damage after attack power modification
     UpdateDamagePhysical(BASE_ATTACK);

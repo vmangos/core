@@ -1196,10 +1196,12 @@ bool ChatHandler::HandleSendSpellImpactCommand(char *args)
         uiPlayId = uint32(atoi(playIdStr));
     PSendSysMessage("Spell %u impact on target '%s'.", uiPlayId, pTarget->GetName());
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_PLAY_SPELL_IMPACT, 8 + 4);
     data << uint64(pTarget->GetGUID());
     data << uint32(uiPlayId);                                // spell visual id?
     pTarget->SendMessageToSet(&data, true);
+#endif
     return true;
 }
 

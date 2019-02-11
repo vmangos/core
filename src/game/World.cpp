@@ -2697,9 +2697,11 @@ bool World::configNoReload(bool reload, eConfigBoolValues index, char const* fie
 
 void World::InvalidatePlayerDataToAllClient(ObjectGuid guid)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_INVALIDATE_PLAYER, 8);
     data << guid;
     SendGlobalMessage(&data);
+#endif
 }
 
 void World::SetSessionDisconnected(WorldSession* sess)

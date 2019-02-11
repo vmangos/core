@@ -283,6 +283,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
 
     if (updateFlags & UPDATEFLAG_HAS_POSITION)
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         // UPDATETYPE_CREATE_OBJECT2 dynamic objects, corpses...
         if (isType(TYPEMASK_DYNAMICOBJECT) || isType(TYPEMASK_CORPSE) || isType(TYPEMASK_PLAYER))
             updatetype = UPDATETYPE_CREATE_OBJECT2;
@@ -290,6 +291,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
         // UPDATETYPE_CREATE_OBJECT2 for pets...
         if (target->GetPetGuid() == GetObjectGuid())
             updatetype = UPDATETYPE_CREATE_OBJECT2;
+#endif
 
         // UPDATETYPE_CREATE_OBJECT2 for some gameobject types...
         if (isType(TYPEMASK_GAMEOBJECT))
@@ -304,12 +306,14 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
                             (go->isSpawned() && !go->GetRespawnDelay()))
                         break;
                 }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 case GAMEOBJECT_TYPE_TRAP:
                 case GAMEOBJECT_TYPE_DUEL_ARBITER:
                 case GAMEOBJECT_TYPE_FLAGSTAND:
                 case GAMEOBJECT_TYPE_FLAGDROP:
                     updatetype = UPDATETYPE_CREATE_OBJECT2;
                     break;
+#endif
                 case GAMEOBJECT_TYPE_TRANSPORT:
                     updateFlags |= UPDATEFLAG_TRANSPORT;
                     break;
@@ -321,10 +325,21 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
 
     ByteBuffer buf(500);
     buf << (uint8)updatetype;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
+#else
+    buf << GetGUID();
+#endif
     buf << uint8(m_objectTypeId);
-
+    
     BuildMovementUpdate(&buf, updateFlags);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    buf << uint32(target == this ? 1 : 0); // Flags, 1 - Active Player
+    buf << uint32(0); // AttackCycle
+    buf << uint32(0); // TimerId
+    buf << uint64(0); // VictimGuid
+#endif
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
@@ -351,7 +366,11 @@ void WorldObject::DirectSendPublicValueUpdate(uint32 index)
     UpdateData data;
     ByteBuffer buf(50);
     buf << uint8(UPDATETYPE_VALUES);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
+#else
+    buf << GetGUID();
+#endif
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
@@ -372,7 +391,11 @@ void Object::BuildValuesUpdateBlockForPlayer(UpdateData *data, Player *target) c
     ByteBuffer buf(500);
 
     buf << uint8(UPDATETYPE_VALUES);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     buf << GetPackGUID();
+#else
+    buf << GetGUID();
+#endif
 
     UpdateMask updateMask;
     updateMask.SetCount(m_valuesCount);
@@ -408,6 +431,7 @@ void Object::DestroyForPlayer(Player *target) const
 
 void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     *data << uint8(updateFlags);                            // update flags
 
     if (updateFlags & UPDATEFLAG_LIVING)
@@ -492,6 +516,61 @@ void Object::BuildMovementUpdate(ByteBuffer * data, uint8 updateFlags) const
         else
             *data << uint32(WorldTimer::getMSTime());           // ms time
     }
+#else
+    Unit const* unit = ToUnit();
+    if (updateFlags & UPDATEFLAG_LIVING)
+    {
+        ASSERT(unit);
+        WorldObject const* wobject = (WorldObject*)this;
+        MovementInfo m = wobject->m_movementInfo;
+        if (!m.ctime)
+        {
+            m.time = WorldTimer::getMSTime() + 1000;
+            m.ChangePosition(wobject->GetPositionX(), wobject->GetPositionY(), wobject->GetPositionZ(), wobject->GetOrientation());
+        }
+        if (unit->IsCreature())
+            m.moveFlags = m.moveFlags & ~MOVEFLAG_ROOT;
+        *data << m;
+    }
+    else
+    {
+        *data << uint32(0); // movement flags
+        *data << uint32(WorldTimer::getMSTime());
+        if (updateFlags & UPDATEFLAG_HAS_POSITION)                     // 0x40
+        {
+            WorldObject* object = ((WorldObject*)this);
+
+            *data << float(object->GetPositionX());
+            *data << float(object->GetPositionY());
+            *data << float(object->GetPositionZ());
+            *data << float(object->GetOrientation());
+        }
+        else
+        {
+            *data << float(0); // x
+            *data << float(0); // y
+            *data << float(0); // z
+            *data << float(0); // o
+        }
+        *data << float(0); // unk
+    }
+    
+    if (unit)
+    {
+        *data << float(unit->GetSpeed(MOVE_WALK));
+        *data << float(unit->GetSpeed(MOVE_RUN));
+        *data << float(unit->GetSpeed(MOVE_RUN_BACK));
+        *data << float(unit->GetSpeed(MOVE_SWIM));
+        *data << float(unit->GetSpeed(MOVE_SWIM_BACK));
+        *data << float(unit->GetSpeed(MOVE_TURN_RATE));
+        // Send current movement informations
+        if (unit->m_movementInfo.moveFlags & MOVEFLAG_SPLINE_ENABLED)
+            Movement::PacketBuilder::WriteCreate(*(unit->movespline), *data);
+    }
+    else
+        for (int i = 0; i < MAX_MOVE_TYPE; ++i)
+            *data << float(1.0f);
+#endif
 }
 
 void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *updateMask, Player *target) const
@@ -503,7 +582,11 @@ void Object::BuildValuesUpdate(uint8 updatetype, ByteBuffer * data, UpdateMask *
 
     bool IsActivateToQuest = false;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     if (updatetype == UPDATETYPE_CREATE_OBJECT || updatetype == UPDATETYPE_CREATE_OBJECT2)
+#else
+    if (updatetype == UPDATETYPE_CREATE_OBJECT)
+#endif
     {
         if (isType(TYPEMASK_GAMEOBJECT) && !((GameObject*)this)->IsTransport())
         {

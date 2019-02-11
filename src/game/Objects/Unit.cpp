@@ -503,8 +503,13 @@ void Unit::SendHeartBeat(bool includingSelf)
 {
     //m_movementInfo.ChangePosition(GetPositionX(), GetPositionY(), GetPositionZ(), GetOrientation());
     m_movementInfo.UpdateTime(WorldTimer::getMSTime());
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(MSG_MOVE_HEARTBEAT, 31);
     data << GetPackGUID();
+#else
+    WorldPacket data(MSG_MOVE_HEARTBEAT);
+    data << GetGUID();
+#endif
     data << m_movementInfo;
     SendMovementMessageToSet(std::move(data), includingSelf);
 }
@@ -2878,8 +2883,13 @@ void Unit::SendMeleeAttackStop(Unit* victim)
         return;
 
     WorldPacket data(SMSG_ATTACKSTOP, (8 + 8 + 4));         // guess size, max is 9+9+4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
     data << victim->GetPackGUID();                          // can be 0x00...
+#else
+    data << GetGUID();
+    data << victim->GetGUID();                          // can be 0x00...
+#endif
     data << uint32(0);                                      // can be 0x1
     SendObjectMessageToSet(&data, true);
     DETAIL_FILTER_LOG(LOG_FILTER_COMBAT, "%s %u stopped attacking %s %u", (GetTypeId() == TYPEID_PLAYER ? "player" : "creature"), GetGUIDLow(), (victim->GetTypeId() == TYPEID_PLAYER ? "player" : "creature"), victim->GetGUIDLow());
@@ -5234,8 +5244,13 @@ void Unit::RemoveAllGameObjects()
 void Unit::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log)
 {
     WorldPacket data(SMSG_SPELLNONMELEEDAMAGELOG, (16 + 4 + 4 + 1 + 4 + 4 + 1 + 1 + 4 + 4 + 1)); // we guess size
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << log->target->GetPackGUID();
     data << log->attacker->GetPackGUID();
+#else
+    data << log->target->GetGUID();
+    data << log->attacker->GetGUID();
+#endif
     data << uint32(log->SpellID);
     data << uint32(log->damage);                            // damage amount
     data << uint8(log->school);                              // damage school
@@ -5272,8 +5287,13 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo, AuraType auraTyp
     AuraType auraType = auraTypeOverride ? auraTypeOverride : mod->m_auraname;
 
     WorldPacket data(SMSG_PERIODICAURALOG, 30);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << aura->GetTarget()->GetPackGUID();
     data << aura->GetCasterGuid().WriteAsPacked();
+#else
+    data << aura->GetTarget()->GetGUID();
+    data << aura->GetCasterGuid().GetRawValue();
+#endif
     data << uint32(aura->GetId());                          // spellId
     data << uint32(1);                                      // count
     data << uint32(auraType);                               // auraId
@@ -5468,8 +5488,13 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
     WorldPacket data(SMSG_ATTACKERSTATEUPDATE, (16 + 45));  // we guess size
 
     data << uint32(damageInfo->HitInfo);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
     data << damageInfo->target->GetPackGUID();
+#else
+    data << GetGUID();
+    data << damageInfo->target->GetGUID();
+#endif
     data << uint32(damageInfo->totalDamage);    // Total damage
 
     data << uint8(m_weaponDamageCount[damageInfo->attackType]);         // Sub damage count
@@ -6370,9 +6395,15 @@ Unit* Unit::SelectMagnetTarget(Unit *victim, Spell* spell, SpellEffectIndex eff)
 void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool critical)
 {
     // we guess size
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_SPELLHEALLOG, (8 + 8 + 4 + 4 + 1));
     data << pVictim->GetPackGUID();
     data << GetPackGUID();
+#else
+    WorldPacket data(SMSG_HEALSPELL_ON_PLAYER_OBSOLETE, (8 + 8 + 4 + 4 + 1));
+    data << pVictim->GetGUID();
+    data << GetGUID();
+#endif
     data << uint32(SpellID);
     data << uint32(Damage);
     data << uint8(critical ? 1 : 0);
@@ -6382,6 +6413,7 @@ void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool c
 
 void Unit::SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_SPELLENERGIZELOG, (8 + 8 + 4 + 4 + 4 + 1));
     data << pVictim->GetPackGUID();
     data << GetPackGUID();
@@ -6389,6 +6421,7 @@ void Unit::SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, Po
     data << uint32(powertype);
     data << uint32(Damage);
     SendMessageToSet(&data, true);
+#endif
 }
 
 void Unit::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
@@ -8219,7 +8252,11 @@ void Unit::SetSpeedRate(UnitMoveType mtype, float rate, bool forced)
                 dataForMe << uint32(0);
 #else
                 WorldPacket dataForMe(SetSpeed2Opc_table[mtype][1], 14);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 dataForMe << GetPackGUID();
+#else
+                dataForMe << GetGUID();
+#endif
 #endif
                 dataForMe << float(GetSpeed(mtype));
                 me->GetSession()->SendPacket(&dataForMe);
@@ -8956,7 +8993,11 @@ float Unit::GetTotalAttackPowerValue(WeaponAttackType attType) const
         int32 ap = GetInt32Value(UNIT_FIELD_ATTACK_POWER) + GetInt32Value(UNIT_FIELD_ATTACK_POWER_MODS);
         if (ap < 0)
             return 0.0f;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         return ap * (1.0f + GetFloatValue(UNIT_FIELD_ATTACK_POWER_MULTIPLIER));
+#else
+        return ap;
+#endif
     }
 }
 
@@ -9746,6 +9787,7 @@ void Unit::SendPetActionFeedback(uint8 msg)
 
 void Unit::SendPetTalk(uint32 pettalk)
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     Unit* owner = GetOwner();
     if (!owner || owner->GetTypeId() != TYPEID_PLAYER)
         return;
@@ -9754,6 +9796,7 @@ void Unit::SendPetTalk(uint32 pettalk)
     data << GetObjectGuid();
     data << uint32(pettalk);
     ((Player*)owner)->GetSession()->SendPacket(&data);
+#endif
 }
 
 void Unit::SendPetAIReaction()
@@ -10407,7 +10450,11 @@ void Unit::NearLandTo(float x, float y, float z, float orientation)
     m_movementInfo.ctime = 0; // Not a client packet. Pauses interpolation.
 
     WorldPacket data(MSG_MOVE_FALL_LAND, 41);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
+#else
+    data << GetGUID();
+#endif
     data << m_movementInfo;
     SendMovementMessageToSet(std::move(data), true);
     TeleportPositionRelocation(x, y, z, orientation);
@@ -10510,7 +10557,11 @@ void Unit::KnockBack(float angle, float horizontalSpeed, float verticalSpeed)
         float vsin = sin(angle);
         float vcos = cos(angle);
         WorldPacket data(SMSG_MOVE_KNOCK_BACK, 8 + 4 + 4 + 4 + 4 + 4);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << GetPackGUID();
+#else
+        data << GetGUID();
+#endif
         data << uint32(0);                                  // Sequence
         data << float(vcos);                                // x direction
         data << float(vsin);                                // y direction
@@ -11285,7 +11336,11 @@ void Unit::UpdateSplineMovement(uint32 t_diff)
     else if (!movespline->isCyclic() && movespline->getLastPointSent() >= 0 && movespline->getLastPointSent() < (movespline->currentPathIdx() + 3))
     {
         WorldPacket data(SMSG_MONSTER_MOVE, 64);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         data << GetPackGUID();
+#else
+        data << GetGUID();
+#endif
         movespline->setLastPointSent(Movement::PacketBuilder::WriteMonsterMove(*movespline, data, movespline->getLastPointSent() + 1));
         SendMovementMessageToSet(std::move(data), true);
     }
@@ -11332,8 +11387,13 @@ void Unit::SetWalk(bool enable, bool asDefault)
     else
         m_movementInfo.RemoveMovementFlag(MOVEFLAG_WALK_MODE);
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(enable ? SMSG_SPLINE_MOVE_SET_WALK_MODE : SMSG_SPLINE_MOVE_SET_RUN_MODE, 9);
+#else
+    WorldPacket data(enable ? MSG_MOVE_SET_WALK_MODE : MSG_MOVE_SET_RUN_MODE, 9);
+#endif
     data << GetPackGUID();
+
     if (Player* me = ToPlayer())
         me->GetSession()->SendPacket(&data);
     else
@@ -11395,9 +11455,13 @@ void Unit::SendSpellGo(Unit* target, uint32 spellId)
     targets.setUnitTarget(target);
 
     WorldPacket data(SMSG_SPELL_GO, 53);
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
-
     data << GetPackGUID();
+#else
+    data << GetGUID();
+    data << GetGUID();
+#endif
     data << uint32(spellId);
     data << uint16(CAST_FLAG_UNKNOWN9);
 
@@ -11521,6 +11585,7 @@ void Unit::SetMovement(UnitMovementType pType)
         MovementData mvtData(this);
         switch (pType)
         {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             case MOVE_ROOT:
                 mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_ROOT, GetObjectGuid());
                 return;
@@ -11533,6 +11598,20 @@ void Unit::SetMovement(UnitMovementType pType)
             case MOVE_LAND_WALK:
                 mvtData.SetSplineOpcode(SMSG_SPLINE_MOVE_LAND_WALK, GetObjectGuid());
                 break;
+#else
+            case MOVE_ROOT:
+                mvtData.SetSplineOpcode(MSG_MOVE_ROOT, GetObjectGuid());
+                return;
+            case MOVE_UNROOT:
+                mvtData.SetSplineOpcode(MSG_MOVE_UNROOT, GetObjectGuid());
+                break;
+            case MOVE_WATER_WALK:
+                mvtData.SetSplineOpcode(SMSG_MOVE_WATER_WALK, GetObjectGuid());
+                break;
+            case MOVE_LAND_WALK:
+                mvtData.SetSplineOpcode(SMSG_MOVE_LAND_WALK, GetObjectGuid());
+                break;
+#endif
         }
         return;
     }
@@ -11548,6 +11627,7 @@ void Unit::SetMovement(UnitMovementType pType)
 
     switch (pType)
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         case MOVE_ROOT:
             data.Initialize(SMSG_FORCE_MOVE_ROOT,   GetPackGUID().size() + 4);
             break;
@@ -11560,11 +11640,29 @@ void Unit::SetMovement(UnitMovementType pType)
         case MOVE_LAND_WALK:
             data.Initialize(SMSG_MOVE_LAND_WALK,    GetPackGUID().size() + 4);
             break;
+#else
+        case MOVE_ROOT:
+            data.Initialize(SMSG_FORCE_MOVE_ROOT,   8 + 4);
+            break;
+        case MOVE_UNROOT:
+            data.Initialize(SMSG_FORCE_MOVE_UNROOT, 8 + 4);
+            break;
+        case MOVE_WATER_WALK:
+            data.Initialize(SMSG_MOVE_WATER_WALK,   8 + 4);
+            break;
+        case MOVE_LAND_WALK:
+            data.Initialize(SMSG_MOVE_LAND_WALK,    8 + 4);
+            break;
+#endif
         default:
             sLog.outError("Player::SetMovement: Unsupported move type (%d), data not sent to client.", pType);
             return;
     }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     data << GetPackGUID();
+#else
+    data << GetGUID();
+#endif
     data << uint32(WorldTimer::getMSTime()); // Peut etre msTime : WorldTimer::getMSTime() ?
     if (mePlayer)
     {

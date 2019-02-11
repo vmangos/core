@@ -775,6 +775,8 @@ void WorldSession::SendWrongFactionNotice()
 
 void WorldSession::SendChatRestrictedNotice()
 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     WorldPacket data(SMSG_CHAT_RESTRICTED, 0);
     SendPacket(&data);
+#endif
 }
