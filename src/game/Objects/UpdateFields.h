@@ -61,11 +61,13 @@ enum EContainerFields
 {
     CONTAINER_FIELD_NUM_SLOTS                  = ITEM_END + 0x00, // Size:1
     CONTAINER_ALIGN_PAD                        = ITEM_END + 0x01, // Size:1
-    CONTAINER_FIELD_SLOT_1                     = ITEM_END + 0x02, // count=72
+    CONTAINER_FIELD_SLOT_1                     = ITEM_END + 0x02,
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x48,
+    CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x48, // count=72
+    CONTAINER_FIELD_SLOT_END,
 #else
-    CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x29,
+    CONTAINER_FIELD_SLOT_LAST                  = ITEM_END + 0x28, // count=40
+    CONTAINER_FIELD_SLOT_END,
 #endif
     CONTAINER_END,
 };
