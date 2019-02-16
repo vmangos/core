@@ -2094,8 +2094,15 @@ enum CorpseDynFlags
 // Passive Spell codes explicit used in code
 #define SPELL_ID_PASSIVE_BATTLE_STANCE          2457
 #define SPELL_ID_PASSIVE_RESURRECTION_SICKNESS  15007
+
+// The weapon swap cooldown spells changed in 1.9.
+// The first version was added in 1.7.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
 #define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s    6119
 #define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_0s    6123
+#elif SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
+#define SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s    7155
+#endif
 
 enum WeatherType
 {

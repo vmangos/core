@@ -332,10 +332,14 @@ void WorldSession::HandleBattlefieldListOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEFIELD_LIST Message");
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     uint32 mapId;
     recv_data >> mapId;
 
     BattleGroundTypeId bgTypeId = GetBattleGroundTypeIdByMapId(mapId);
+#else
+    BattleGroundTypeId bgTypeId = BattleGroundTypeId(_player->GetQueuedBattleground());
+#endif
 
     if (bgTypeId == BATTLEGROUND_TYPE_NONE)
     {
@@ -352,8 +356,8 @@ void WorldSession::HandleBattleFieldPortOpcode(WorldPacket &recv_data)
 {
     DEBUG_LOG("WORLD: Recvd CMSG_BATTLEFIELD_PORT Message");
 
-    uint8 action;                                           // enter battle 0x1, leave queue 0x0
-    uint32 mapId;
+    uint8 action = 0; // enter battle 0x1, leave queue 0x0
+    uint32 mapId = 0;
 
 #if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     recv_data >> mapId >> action;

@@ -728,9 +728,11 @@ void Spell::prepareDataForTriggerSystem()
                 // Holy Shock
                 else if (m_spellInfo->IsFitToFamilyMask<CF_PALADIN_HOLY_SHOCK>())
                     m_canTrigger = true;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 // Eye for an Eye triggered spell
                 else if (m_spellInfo->Id == 25997)
                     m_canTrigger = true;
+#endif
                 break;
             case SPELLFAMILY_PRIEST:
                 // Touch of Weakness / Devouring Plague
@@ -2302,6 +2304,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
         {
             FillAreaTargets(targetUnitMap, radius, PUSH_DEST_CENTER, SPELL_TARGETS_AOE_DAMAGE);
             float minDist = -1;
+
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             switch (m_spellInfo->Id)
             {
                 // Shadow Storm
@@ -2311,6 +2315,8 @@ void Spell::SetTargetMap(SpellEffectIndex effIndex, uint32 targetMode, UnitList&
                     minDist = 20.0f;
                     break;
             }
+#endif
+
             if (minDist > 0)
             {
                 for (UnitList::iterator itr = targetUnitMap.begin(), next; itr != targetUnitMap.end(); itr = next)

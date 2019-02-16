@@ -1988,13 +1988,15 @@ bool Creature::IsImmuneToSpell(SpellEntry const *spellInfo, bool castOnSelf)
         if (spellInfo->IsFitToFamily<SPELLFAMILY_HUNTER, CF_HUNTER_SCORPID_STING>())
             return true;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         switch (spellInfo->Id)
         {
-        case 67:              // Vindication
-        case 26017:
-        case 26018:
-            return true;
+            case 67:              // Vindication
+            case 26017:
+            case 26018:
+                return true;
         }
+#endif
     }
 
     return Unit::IsImmuneToSpell(spellInfo, castOnSelf);

@@ -3250,51 +3250,6 @@ CreatureAI* GetAI_npc_Shai(Creature* pCreature)
     return new npc_ShaiAI(pCreature);
 }
 
-
-//=====================------------------------------------
-//Alita <Nostalrius>
-// PNJ tp AQ20, AQ40.
-//====================
-enum
-{
-    CHRIS = 56000 //notre pnj de tp.
-};
-bool GossipHello_npc_chris_starlightshadow(Player* pPlayer, Creature* pCreature)
-{
-
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Guide me to the Ruins of Ahn'Qiraj", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 1);
-    pPlayer->ADD_GOSSIP_ITEM(GOSSIP_ICON_CHAT, "Guide me to the Temple of Ahn'Qiraj", GOSSIP_SENDER_MAIN, GOSSIP_ACTION_INFO_DEF + 2);
-    pPlayer->SEND_GOSSIP_MENU(pPlayer->GetGossipTextId(pCreature), pCreature->GetGUID());
-
-    return true;
-}
-
-bool GossipSelect_npc_chris_starlightshadow(Player* pPlayer, Creature* pCreature, uint32 uiSender, uint32 uiAction)
-{
-    if (uiAction == GOSSIP_ACTION_INFO_DEF + 1)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (pPlayer->TeleportTo(509, -8429.74f, 1512.14f, 31.9074f, 2.56f))
-            if (!pPlayer->isAlive())
-            {
-                pPlayer->ResurrectPlayer(0.5f, false);
-                pPlayer->SpawnCorpseBones();
-            }
-    }
-    else if (uiAction == GOSSIP_ACTION_INFO_DEF + 2)
-    {
-        pPlayer->CLOSE_GOSSIP_MENU();
-        if (pPlayer->TeleportTo(531, -8231.330078f, 2010.6f, 129.33051f, 0.95f))
-            if (!pPlayer->isAlive())
-            {
-                pPlayer->ResurrectPlayer(0.5f, false);
-                pPlayer->SpawnCorpseBones();
-            }
-    }
-
-    return true;
-}
-
 /** EVENT NOSTALRIUS VAM ,SAND PRINCE */
 
 enum
@@ -3447,14 +3402,6 @@ void AddSC_silithus()
     pNewScript->Name = "npc_Shai";
     pNewScript->GetAI = &GetAI_npc_Shai;
     pNewScript->RegisterSelf();
-
-    //--Alita------
-    pNewScript = new Script;
-    pNewScript->Name = "npc_chris_starlightshadow";
-    pNewScript->pGossipHello =  &GossipHello_npc_chris_starlightshadow;
-    pNewScript->pGossipSelect = &GossipSelect_npc_chris_starlightshadow;
-    pNewScript->RegisterSelf();
-    //------------
 
     /** Event Nostalrius */
     pNewScript = new Script;

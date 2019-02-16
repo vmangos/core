@@ -3195,7 +3195,7 @@ void SpellMgr::LoadSpellScriptTarget()
     std::set<uint32> conditions;
 
     // Load existing condition Ids so we can check for wrong condition Id later.
-    QueryResult *result = WorldDatabase.Query("SELECT condition_entry FROM conditions");
+    QueryResult *result = WorldDatabase.Query("SELECT `condition_entry` FROM `conditions`");
 
     if (result)
     {
@@ -3215,7 +3215,7 @@ void SpellMgr::LoadSpellScriptTarget()
 
     uint32 count = 0;
 
-    result = WorldDatabase.Query("SELECT entry, type, targetEntry, conditionId FROM spell_script_target");
+    result = WorldDatabase.PQuery("SELECT `entry`, `type`, `targetEntry`, `conditionId` FROM `spell_script_target` WHERE %u BETWEEN `build_min` AND `build_max`", SUPPORTED_CLIENT_BUILD);
 
     if (!result)
     {

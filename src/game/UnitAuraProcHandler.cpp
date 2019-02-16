@@ -259,13 +259,19 @@ bool Unit::IsTriggeredAtSpellProcEvent(Unit *pVictim, SpellAuraHolder* holder, S
     /// Delete all these spells, and manage it via the DB (spell_proc_event)
     if (procSpell)
     {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
         // Eye for an Eye
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
         if (spellProto->SpellIconID == 1820)
+#else
+        if (spellProto->SpellIconID == 1799)
+#endif
         {
             if (procFlag & PROC_FLAG_TAKEN_NEGATIVE_SPELL_HIT && procExtra & PROC_EX_CRITICAL_HIT)
                 return true;
             return false;
         }
+#endif
         // Improved Lay on Hands
         if (spellProto->SpellIconID == 79 && spellProto->SpellFamilyName == SPELLFAMILY_PALADIN)
         {
@@ -467,6 +473,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
         {
             switch (dummySpell->Id)
             {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 // Eye for an Eye
                 case 9799:
                 case 25988:
@@ -483,6 +490,7 @@ SpellAuraProcResult Unit::HandleDummyAuraProc(Unit *pVictim, uint32 damage, Aura
                     triggered_spell_id = 25997;
                     break;
                 }
+#endif
                 // Sweeping Strikes
                 case 12292:
                 case 18765:

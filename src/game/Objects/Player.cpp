@@ -10224,13 +10224,21 @@ Item* Player::EquipItem(uint16 pos, Item *pItem, bool update)
 
             _ApplyItemMods(pItem, slot, true);
 
+            // World of Warcraft Client Patch 1.7.0 (2005-09-13)
+            // - Switching weapons in combat triggers a 1 second global cooldown for
+            //   all abilities for rogues and a 1.5 second global cooldown for
+            //   everyone else.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_6_1
             // Weapons and also Totem/Relic/Sigil/etc
             if (pProto && isInCombat() && (pProto->Class == ITEM_CLASS_WEAPON || pProto->InventoryType == INVTYPE_RELIC) && m_weaponChangeTimer == 0)
             {
                 uint32 cooldownSpell = SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_5s;
 
+                // There doesn't appear to be a 1 sec combat swap cd spell before 1.9.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 if (getClass() == CLASS_ROGUE)
                     cooldownSpell = SPELL_ID_WEAPON_SWITCH_COOLDOWN_1_0s;
+#endif
 
                 SpellEntry const* spellProto = sSpellMgr.GetSpellEntry(cooldownSpell);
 
@@ -10238,10 +10246,15 @@ Item* Player::EquipItem(uint16 pos, Item *pItem, bool update)
                     sLog.outError("Weapon switch cooldown spell %u couldn't be found in Spell.dbc", cooldownSpell);
                 else
                 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     m_weaponChangeTimer = spellProto->StartRecoveryTime;
+#else
+                    m_weaponChangeTimer = (getClass() == CLASS_ROGUE) ? 1000 : spellProto->StartRecoveryTime;
+#endif
                     SendSpellCooldown(cooldownSpell, 0, GetObjectGuid());
                 }
             }
+#endif
         }
 
         if (IsInWorld() && update)

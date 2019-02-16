@@ -1395,6 +1395,7 @@ void Aura::TriggerSpell()
                 if (urand(0, 20 * 5 - 1) != 0)
                     return;
                 break;
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             case 9347:                                      // Mortal Strike
             {
                 // expected selection current fight target
@@ -1410,6 +1411,7 @@ void Aura::TriggerSpell()
 
                 break;
             }
+#endif
             case 1010:                                      // Curse of Idiocy
             {
                 // TODO: spell casted by result in correct way mostly

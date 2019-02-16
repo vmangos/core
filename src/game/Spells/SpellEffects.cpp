@@ -343,6 +343,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
             {
                 switch (m_spellInfo->Id)                    // better way to check unknown
                 {
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     // Meteor like spells (divided damage to targets)
                     case 24340:
                     case 26558:
@@ -357,6 +358,7 @@ void Spell::EffectSchoolDMG(SpellEffectIndex effect_idx)
                         damage /= count;                    // divide to all targets
                         break;
                     }
+#endif
                     // percent from health with min
                     case 25599:                             // Thundercrash
                     {
@@ -1107,6 +1109,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     unitTarget->CastSpell(unitTarget, 20494, true);
                     return;
                 }
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                 case 19593:                                // Egg Explosion (Buru)
                 {
                     if (!unitTarget)
@@ -1139,6 +1142,7 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     }
                     return;
                 }
+#endif
                 case 20572:                                 // Blood Fury
                 {
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
