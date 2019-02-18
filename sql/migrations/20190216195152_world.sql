@@ -538,7 +538,7 @@ INSERT INTO `npc_trainer` (`entry`, `spell`, `spellcost`, `reqskill`, `reqskillv
 UPDATE `spell_chain` SET `build_min`=5086 WHERE `spell_id` IN (20925, 20927, 20928);
 UPDATE `spell_proc_event` SET `build_min`=5086 WHERE `entry`=20925;
 INSERT INTO `spell_proc_event` (`entry`, `SchoolMask`, `SpellFamilyName`, `SpellFamilyMask0`, `SpellFamilyMask1`, `SpellFamilyMask2`, `procFlags`, `procEx`, `ppmRate`, `CustomChance`, `Cooldown`, `build_min`, `build_max`) VALUES (20169, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 0, 4878);
-UPDATE `spell_bonus_Data` SET `build_min`=5086 WHERE `entry`=20925;
+UPDATE `spell_bonus_data` SET `build_min`=5086 WHERE `entry`=20925;
 INSERT INTO `spell_bonus_data` (`entry`, `direct_bonus`, `dot_bonus`, `ap_bonus`, `ap_dot_bonus`, `comments`, `build_min`, `build_max`) VALUES (20169, 0.05, 0, 0, 0, 'Paladin - Holy Shield', 0, 4878);
 INSERT INTO `spell_threat` (`entry`, `Threat`, `multiplier`, `ap_bonus`, `build_min`, `build_max`) VALUES (20169, 10, 1, 0, 0, 4878);
 INSERT INTO `spell_chain` (`spell_id`, `prev_spell`, `first_spell`, `rank`, `req_spell`, `build_min`, `build_max`) VALUES (20169, 0, 20169, 1, 0, 0, 4878);
