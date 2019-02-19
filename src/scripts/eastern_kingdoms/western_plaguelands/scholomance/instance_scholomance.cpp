@@ -147,6 +147,7 @@ struct instance_scholomance : public ScriptedInstance
     }
     void OnCreatureDeath(Creature *who)
     {
+		/*
         switch (who->GetEntry())
         {
             case NPC_KIRTONOS:
@@ -155,6 +156,7 @@ struct instance_scholomance : public ScriptedInstance
                         DoUseDoorOrButton(m_uiGateKirtonosGUID);
                 break;
         }
+		*/
     }
 
     void SetData(uint32 uiType, uint32 uiData)
@@ -187,6 +189,7 @@ struct instance_scholomance : public ScriptedInstance
                 break;
             case TYPE_KIRTONOS:
                 m_auiEncounter[TYPE_KIRTONOS] = uiData;
+				/*
                 if (uiData == IN_PROGRESS)
                     DoUseDoorOrButton(m_uiGateKirtonosGUID);
                 else if (uiData == FAIL)
@@ -195,6 +198,7 @@ struct instance_scholomance : public ScriptedInstance
                         if (pGo->GetGoState() != GO_STATE_ACTIVE) // fermée
                             DoUseDoorOrButton(m_uiGateKirtonosGUID);
                 }
+				*/
                 break;
             case TYPE_ALEXEIBAROV:
             case TYPE_THEOLEN:
@@ -369,13 +373,16 @@ bool GOOpen_brazier_herald(Player* pUser, GameObject *pGo)
 {
     if (InstanceData* pInst = pGo->GetInstanceData())
     {
-        // Verif pour voir si le boss est deja SPAWN
+		/*
         if (pInst->GetData(TYPE_KIRTONOS) != NOT_STARTED)
             return false;
+		*/
         pInst->SetData(TYPE_KIRTONOS, IN_PROGRESS);
-        Creature* kirtonos = pUser->SummonCreature(NPC_KIRTONOS, 309.65f, 93.47f, 101.66f, 0.03f, TEMPSUMMON_TIMED_OR_DEAD_DESPAWN, 1800000);
+		pGo->PlayDirectSound(SOUND_SCREECH, 0); // Kirtonos cry sound
+		Creature* kirtonos = pUser->SummonCreature(NPC_KIRTONOS, 315.028f, 70.53845f, 102.1496f, 0.3859715f, TEMPSUMMON_DEAD_DESPAWN, 900000);
+		kirtonos->MonsterTextEmote("%s lets out a shrill cry.", NULL); // can be done per Database?
         if (kirtonos && kirtonos->AI())
-            kirtonos->AI()->AttackStart(pUser);
+			kirtonos->AI()->JustSummoned(kirtonos);
     }
 
     return true;

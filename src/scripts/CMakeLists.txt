@@ -187,6 +187,7 @@ set (SCRIPTS_SRCS
     eastern_kingdoms/western_plaguelands/scholomance/boss_illucia_barov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_instructor_malicia.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_jandice_barov.cpp
+    eastern_kingdoms/western_plaguelands/scholomance/boss_kirtonos_the_herald.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_kormok.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_lord_alexei_barov.cpp
     eastern_kingdoms/western_plaguelands/scholomance/boss_lord_blackwood.cpp
