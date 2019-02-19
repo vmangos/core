@@ -8,7 +8,7 @@
 enum
 {
     GO_GATE_KIRTONOS        = 175570,
-	GO_BRAZIER_KIRTONOS		= 175564,
+    GO_BRAZIER_KIRTONOS     = 175564,
     GO_GATE_GANDLING        = 177374,
     GO_GATE_MALICIA         = 177375,
     GO_GATE_THEOLEN         = 177377,
@@ -18,7 +18,7 @@ enum
     GO_GATE_ILLUCIA         = 177371,
     GO_VIEWING_ROOM_DOOR    = 175167,
 
-	SOUND_SCREECH			= 557,
+    SOUND_SCREECH           = 557,
 
     NPC_KIRTONOS            = 10506,
     NPC_GANDLING            = 1853,

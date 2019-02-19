@@ -396,7 +396,7 @@ void AddScripts()
     AddSC_boss_illuciabarov();
     AddSC_boss_instructormalicia();
     AddSC_boss_jandicebarov();
-	AddSC_boss_kirtonos_the_herald();
+    AddSC_boss_kirtonos_the_herald();
     //AddSC_boss_kormok();
     AddSC_boss_lordalexeibarov();
     AddSC_boss_lorekeeperpolkelt();
