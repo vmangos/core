@@ -2531,7 +2531,11 @@ void Aura::HandleAuraTransform(bool apply, bool Real)
 
                 // creature case, need to update equipment
                 if (ci && target->GetTypeId() == TYPEID_UNIT)
+                {
                     ((Creature*)target)->LoadEquipment(ci->equipment_id, true);
+                    mod_x = ci->scale;
+                }
+                    
             }
 
             if (model_id)

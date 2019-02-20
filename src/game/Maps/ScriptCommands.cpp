@@ -2122,3 +2122,19 @@ bool Map::ScriptCommand_SummonObject(const ScriptInfo& script, WorldObject* sour
 
     return false;
 }
+
+// SCRIPT_COMMAND_SET_FLY (77)
+bool Map::ScriptCommand_SetFly(const ScriptInfo& script, WorldObject* source, WorldObject* target)
+{
+    Unit* pSource = ToUnit(source);
+
+    if (!pSource)
+    {
+        sLog.outError("SCRIPT_COMMAND_SET_FLY (script id %u) call for a NULL or non-unit source (TypeId: %u), skipping.", script.id, source ? source->GetTypeId() : 0);
+        return ShouldAbortScript(script);
+    }
+
+    pSource->SetFly(script.setFly.enabled);
+
+    return false;
+}

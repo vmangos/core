@@ -315,6 +315,8 @@ enum eScriptCommand
                                                             // datalong = gameobject_entry
                                                             // datalong2 = respawn_time
                                                             // x/y/z/o = coordinates
+    SCRIPT_COMMAND_SET_FLY                  = 77,           // source = Unit
+                                                            // datalong = (bool) 0 = off, 1 = on
     SCRIPT_COMMAND_MAX,
 
     SCRIPT_COMMAND_DISABLED                 = 9999          // Script action was disabled during loading.
@@ -964,6 +966,11 @@ struct ScriptInfo
             uint32 gameobject_entry;                        // datalong
             uint32 respawn_time;                            // datalong2
         } summonObject;
+
+        struct                                              // SCRIPT_COMMAND_SET_FLY (77)
+        {
+            uint32 enabled;                                 // datalong
+        } setFly;
 
         struct
         {
