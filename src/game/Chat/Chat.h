@@ -305,8 +305,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleDebugAssertFalseCommand(char* args);
         bool HandleDebugPvPCreditCommand(char* args);
         bool HandleDebugMonsterChatCommand(char *args);
-        // Need reimplement.
-        bool HandleDebugUpdateCommand(char *args) { return true; }
         // Formations
         bool HandleNpcGroupAddCommand(char *args);
         bool HandleNpcGroupAddRelCommand(char *args);
@@ -331,7 +329,8 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleSpellInfosCommand(char *args);
         bool HandleSpellSearchCommand(char *args);
         // Other
-        bool HandleFreezCommand(char *args);
+        bool HandleFreezeCommand(char *args);
+        bool HandleUnfreezeCommand(char *args);
         bool HandleSpellIconFixCommand(char *args);
         bool HandleUnitStatCommand(char *args);
         bool HandleDebugControlCommand(char *args);

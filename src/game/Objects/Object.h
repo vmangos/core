@@ -778,7 +778,7 @@ m_obj->m_updateTracker.Reset();
         bool isInBack(WorldObject const* target, float distance, float arc = M_PI) const;
 
         // Gestion des positions
-        void GetRelativePositions(float avantArriere, float gaucheDroite, float hautBas, float &x, float &y, float &z);
+        void GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z);
         void GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o);
         void GetNearRandomPositions(float distance, float &x, float &y, float &z);
         void GetFirstCollision(float dist, float angle, float &x, float &y, float &z);

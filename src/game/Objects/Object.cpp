@@ -2627,19 +2627,19 @@ void WorldObject::GetCreatureListWithEntryInGrid(std::list<Creature*>& lList, ui
 }
 
 
-void WorldObject::GetRelativePositions(float avantArriere, float gaucheDroite, float hautBas, float &x, float &y, float &z)
+void WorldObject::GetRelativePositions(float fForwardBackward, float fLeftRight, float fUpDown, float &x, float &y, float &z)
 {
     float orientation = GetOrientation() + M_PI / 2.0f;
 
     float x_coef = cos(orientation);
     float y_coef = sin(orientation);
 
-    float x_range_add = cos(GetOrientation()) * avantArriere;
-    float y_range_add = sin(GetOrientation()) * avantArriere;
+    float x_range_add = cos(GetOrientation()) * fForwardBackward;
+    float y_range_add = sin(GetOrientation()) * fForwardBackward;
 
-    x = GetPositionX() + x_coef * gaucheDroite + x_range_add;
-    y = GetPositionY() + y_coef * gaucheDroite + y_range_add;
-    z = GetPositionZ() + hautBas;
+    x = GetPositionX() + x_coef * fLeftRight + x_range_add;
+    y = GetPositionY() + y_coef * fLeftRight + y_range_add;
+    z = GetPositionZ() + fUpDown;
 }
 
 void WorldObject::GetInCirclePositions(float dist, uint32 curr, uint32 total, float &x, float &y, float &z, float &o)
