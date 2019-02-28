@@ -23,6 +23,7 @@
 #define _AUCTION_HOUSE_MGR_H
 
 #include <vector>
+#include <memory>
 
 #include "Common.h"
 #include "SharedDefines.h"
