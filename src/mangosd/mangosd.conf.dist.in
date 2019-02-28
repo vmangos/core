@@ -416,6 +416,10 @@ Anticrash.Rearm.Timer = 60000
 #        If set, quest xp gained at max level will not be converted to gold until patch 1.10 when the feature was added.
 #        Default: 1
 #
+#    Progression.UnlinkedAuctionHouses
+#        If set, every auction house is separate until patch 1.9. Does not apply to goblin auction houses.
+#        Default: 1
+#
 #    DebuffLimit
 #        How many debuffs can be present on a target simultaneously
 #        Default: 0  - Decide automatically based on patch
@@ -439,6 +443,7 @@ Progression.AccuratePVEEvents = 1
 Progression.AccurateSpellEffects = 1
 Progression.NoRespecPriceDecay = 1
 Progression.NoQuestXpToGold = 1
+Progression.UnlinkedAuctionHouses = 1
 DebuffLimit = 0
 
 ###################################################################################################################

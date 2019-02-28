@@ -175,6 +175,7 @@ class AuctionHouseMgr
         void SendAuctionExpiredMail( AuctionEntry * auction );
         static uint32 GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem);
 
+        static uint32 GetAuctionHouseId(uint32 factionTemplateId);
         static uint32 GetAuctionHouseTeam(AuctionHouseEntry const* house);
         static AuctionHouseEntry const* GetAuctionHouseEntry(Unit* unit);
         static AuctionHouseEntry const* GetAuctionHouseEntry(uint32 factionId);
@@ -183,6 +184,7 @@ class AuctionHouseMgr
         //load first auction items, because of check if item exists, when loading
         void LoadAuctionItems();
         void LoadAuctions();
+        void LoadAuctionHouses();
 
         void AddAItem(Item* it);
         bool RemoveAItem(uint32 id);
@@ -190,9 +192,9 @@ class AuctionHouseMgr
         void Update();
 
     private:
-        AuctionHouseObject  mHordeAuctions;
-        AuctionHouseObject  mAllianceAuctions;
-        AuctionHouseObject  mNeutralAuctions;
+        AuctionHouseObject* MakeNewAuctionHouseObject();
+        std::unordered_map<uint32, AuctionHouseObject*> m_mAuctionHouses;
+        std::vector<std::unique_ptr<AuctionHouseObject>> m_vRealAuctionHouses;
 
         ItemMap             mAitems;
 };

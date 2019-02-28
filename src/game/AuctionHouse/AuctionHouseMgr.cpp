@@ -84,25 +84,17 @@ AuctionHouseMgr::AuctionHouseMgr()
 
 AuctionHouseMgr::~AuctionHouseMgr()
 {
-    for (ItemMap::const_iterator itr = mAitems.begin(); itr != mAitems.end(); ++itr)
-        delete itr->second;
+    for (const auto itr : mAitems)
+        delete itr.second;
 }
 
 AuctionHouseObject * AuctionHouseMgr::GetAuctionsMap(AuctionHouseEntry const* house)
 {
-    if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
-        return &mNeutralAuctions;
+    auto itr = m_mAuctionHouses.find(house->houseId);
+    if (itr != m_mAuctionHouses.end())
+        return itr->second;
 
-    // team have linked auction houses
-    switch (GetAuctionHouseTeam(house))
-    {
-        case ALLIANCE:
-            return &mAllianceAuctions;
-        case HORDE:
-            return &mHordeAuctions;
-        default:
-            return &mNeutralAuctions;
-    }
+    return nullptr;
 }
 
 uint32 AuctionHouseMgr::GetAuctionDeposit(AuctionHouseEntry const* entry, uint32 time, Item *pItem)
@@ -289,6 +281,69 @@ void AuctionHouseMgr::SendAuctionExpiredMail(AuctionEntry * auction)
     }
 }
 
+AuctionHouseObject* AuctionHouseMgr::MakeNewAuctionHouseObject()
+{
+    m_vRealAuctionHouses.push_back(std::make_unique<AuctionHouseObject>());
+    return m_vRealAuctionHouses.back().get();
+}
+
+void AuctionHouseMgr::LoadAuctionHouses()
+{
+    // Cross Faction - Single AH for all
+    if (sWorld.getConfig(CONFIG_BOOL_ALLOW_TWO_SIDE_INTERACTION_AUCTION))
+    {
+        AuctionHouseObject* CrossFactionAuctionHouse = MakeNewAuctionHouseObject();
+
+        for (uint32 i = 0; i < sAuctionHouseStore.GetNumRows(); i++)
+        {
+            AuctionHouseEntry const* houseEntry = sAuctionHouseStore.LookupEntry(i);
+            if (!houseEntry)
+                continue;
+
+            m_mAuctionHouses.insert(std::make_pair(houseEntry->houseId, CrossFactionAuctionHouse));
+        }
+    }
+    // Non-Linked Auction Houses - Separate AH for every DBC entry
+    else if (sWorld.getConfig(CONFIG_BOOL_UNLINKED_AUCTION_HOUSES) && (sWorld.GetWowPatch() < WOW_PATCH_109))
+    {
+        for (uint32 i = 0; i < sAuctionHouseStore.GetNumRows(); i++)
+        {
+            AuctionHouseEntry const* houseEntry = sAuctionHouseStore.LookupEntry(i);
+            if (!houseEntry)
+                continue;
+
+            m_mAuctionHouses.insert(std::make_pair(houseEntry->houseId, MakeNewAuctionHouseObject()));
+        }
+    }
+    // Linked Auction Houses - One per faction
+    else
+    {
+        AuctionHouseObject* AllianceAuctionHouse = MakeNewAuctionHouseObject();
+        AuctionHouseObject* HordeAuctionHouse = MakeNewAuctionHouseObject();
+        AuctionHouseObject* NeutralAuctionHouse = MakeNewAuctionHouseObject();
+
+        for (uint32 i = 0; i < sAuctionHouseStore.GetNumRows(); i++)
+        {
+            AuctionHouseEntry const* houseEntry = sAuctionHouseStore.LookupEntry(i);
+            if (!houseEntry)
+                continue;
+
+            switch (GetAuctionHouseTeam(houseEntry))
+            {
+                case ALLIANCE:
+                    m_mAuctionHouses.insert(std::make_pair(houseEntry->houseId, AllianceAuctionHouse));
+                    break;
+                case HORDE:
+                    m_mAuctionHouses.insert(std::make_pair(houseEntry->houseId, HordeAuctionHouse));
+                    break;
+                default:
+                    m_mAuctionHouses.insert(std::make_pair(houseEntry->houseId, NeutralAuctionHouse));
+                    break;
+            }
+        }
+    }
+}
+
 void AuctionHouseMgr::LoadAuctionItems()
 {
     //               0                1      2         3        4      5             6                 7           8           9       10       11
@@ -464,9 +519,8 @@ bool AuctionHouseMgr::RemoveAItem(uint32 id)
 
 void AuctionHouseMgr::Update()
 {
-    mHordeAuctions.Update();
-    mAllianceAuctions.Update();
-    mNeutralAuctions.Update();
+    for (const auto& itr : m_vRealAuctionHouses)
+        itr->Update();
 }
 
 uint32 AuctionHouseMgr::GetAuctionHouseTeam(AuctionHouseEntry const* house)
@@ -490,6 +544,64 @@ uint32 AuctionHouseMgr::GetAuctionHouseTeam(AuctionHouseEntry const* house)
     }
 }
 
+uint32 AuctionHouseMgr::GetAuctionHouseId(uint32 factionTemplateId)
+{
+    uint32 houseid = 1;
+    switch (factionTemplateId)
+    {
+        case   11:
+        case   12:
+            houseid = 1; // Human
+            break;
+        case   29:
+        case   85:
+            houseid = 6; // Orc
+            break;
+        case   55:
+        case   57:
+            houseid = 2; // Dwarf
+            break;
+        case   68:
+        case   71:
+            houseid = 4; // Undead
+            break;
+        case   79:
+        case   80:
+            houseid = 3; // Night Elf
+            break;
+        case  104:
+        case  105:
+            houseid = 5; // Tauren
+            break;
+        case  120:
+            houseid = 7; // Booty Bay
+            break;
+        case  474:
+            houseid = 7; // Gadgetzan
+            break;
+        case  534:
+            houseid = 2; // Alliance Generic
+            break;
+        case  855:
+            houseid = 7; // Everlook
+            break;
+        default:                                    // for unknown case
+        {
+            FactionTemplateEntry const* u_entry = sObjectMgr.GetFactionTemplateEntry(factionTemplateId);
+            if (!u_entry)
+                houseid = 7;                        // goblin auction house
+            else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
+                houseid = 1;                        // human auction house
+            else if (u_entry->ourMask & FACTION_MASK_HORDE)
+                houseid = 6;                        // orc auction house
+            else
+                houseid = 7;                        // goblin auction house
+            break;
+        }
+    }
+    return houseid;
+}
+
 AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
 {
     uint32 houseid = 1;                                     // dwarf auction house (used for normal cut/etc percents)
@@ -501,53 +613,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
             // FIXME: found way for proper auctionhouse selection by another way
             // AuctionHouse.dbc have faction field with _player_ factions associated with auction house races.
             // but no easy way convert creature faction to player race faction for specific city
-            uint32 factionTemplateId = unit->getFaction();
-            switch (factionTemplateId)
-            {
-                case   12:
-                    houseid = 1;
-                    break;              // human
-                case   29:
-                    houseid = 6;
-                    break;              // orc, and generic for horde
-                case   55:
-                    houseid = 2;
-                    break;              // dwarf/gnome, and generic for alliance
-                case   68:
-                    houseid = 4;
-                    break;              // undead
-                case   80:
-                    houseid = 3;
-                    break;              // n-elf
-                case  104:
-                    houseid = 5;
-                    break;              // trolls
-                case  120:
-                    houseid = 7;
-                    break;              // booty bay, neutral
-                case  474:
-                    houseid = 7;
-                    break;              // gadgetzan, neutral
-                case  534:
-                    houseid = 2;
-                    break;              // Alliance Generic
-                case  855:
-                    houseid = 7;
-                    break;              // everlook, neutral
-                default:                                    // for unknown case
-                {
-                    FactionTemplateEntry const* u_entry = sObjectMgr.GetFactionTemplateEntry(factionTemplateId);
-                    if (!u_entry)
-                        houseid = 7;                        // goblin auction house
-                    else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
-                        houseid = 1;                        // human auction house
-                    else if (u_entry->ourMask & FACTION_MASK_HORDE)
-                        houseid = 6;                        // orc auction house
-                    else
-                        houseid = 7;                        // goblin auction house
-                    break;
-                }
-            }
+            houseid = GetAuctionHouseId(unit->getFaction());
         }
         else
         {
@@ -574,54 +640,7 @@ AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(Unit* unit)
 
 AuctionHouseEntry const* AuctionHouseMgr::GetAuctionHouseEntry(uint32 factionTemplateId)
 {
-    uint32 houseid = 1;                                     // dwarf auction house (used for normal cut/etc percents)
-
-    switch (factionTemplateId)
-    {
-        case   12:
-            houseid = 1;
-            break;              // human
-        case   29:
-            houseid = 6;
-            break;              // orc, and generic for horde
-        case   55:
-            houseid = 2;
-            break;              // dwarf/gnome, and generic for alliance
-        case   68:
-            houseid = 4;
-            break;              // undead
-        case   80:
-            houseid = 3;
-            break;              // n-elf
-        case  104:
-            houseid = 5;
-            break;              // trolls
-        case  120:
-            houseid = 7;
-            break;              // booty bay, neutral
-        case  474:
-            houseid = 7;
-            break;              // gadgetzan, neutral
-        case  534:
-            houseid = 2;
-            break;              // Alliance Generic
-        case  855:
-            houseid = 7;
-            break;              // everlook, neutral
-        default:                                    // for unknown case
-        {
-            FactionTemplateEntry const* u_entry = sObjectMgr.GetFactionTemplateEntry(factionTemplateId);
-            if (!u_entry)
-                houseid = 7;                        // goblin auction house
-            else if (u_entry->ourMask & FACTION_MASK_ALLIANCE)
-                houseid = 1;                        // human auction house
-            else if (u_entry->ourMask & FACTION_MASK_HORDE)
-                houseid = 6;                        // orc auction house
-            else
-                houseid = 7;                        // goblin auction house
-            break;
-        }
-    }
+    uint32 houseid = GetAuctionHouseId(factionTemplateId);
 
     return sAuctionHouseStore.LookupEntry(houseid);
 }
