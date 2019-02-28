@@ -643,7 +643,10 @@ bool Map::ScriptCommand_DespawnCreature(const ScriptInfo& script, WorldObject* s
         return ShouldAbortScript(script);
     }
 
-    pSource->DespawnOrUnsummon(script.despawn.despawnDelay);
+    // Fix possible crash due to double aura deletion when creature is despawned on death.
+    uint32 const despawnDelay = !pSource->isAlive() && (script.despawn.despawnDelay == 0) ? 1 : script.despawn.despawnDelay;
+
+    pSource->DespawnOrUnsummon(despawnDelay);
 
     return false;
 }

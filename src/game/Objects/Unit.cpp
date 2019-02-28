@@ -1083,135 +1083,132 @@ uint32 Unit::DealDamage(Unit *pVictim, uint32 damage, CleanDamage const* cleanDa
 void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss)
 {
     // find player: owner of controlled `this` or `this` itself maybe
-    // for loot will be sued only if group_tap==NULL
-    Player *player_tap = GetCharmerOrOwnerPlayerOrPlayerItself();
-    Creature* creature = pVictim->ToCreature();
-    Group *group_tap = nullptr;
+    // for loot will be sued only if pGroupTap == nullptr
+    Player *pPlayerTap = GetCharmerOrOwnerPlayerOrPlayerItself();
+    Creature* pCreatureVictim = pVictim->ToCreature();
+    Player* pPlayerVictim = pVictim->ToPlayer();
+    Group *pGroupTap = nullptr;
 
-    // find owner of pVictim, used for creature cases, AI calls
-    Unit* pOwner = pVictim->GetCharmerOrOwner();
-
-    // in creature kill case group/player tap stored for creature
-    if (creature)
+    // in creature kill case group/player tap stored for pCreatureVictim
+    if (pCreatureVictim)
     {
-        if (creature->IsLootAllowedDueToDamageOrigin())
+        if (pCreatureVictim->IsLootAllowedDueToDamageOrigin())
         {
-            group_tap = creature->GetGroupLootRecipient();
+            pGroupTap = pCreatureVictim->GetGroupLootRecipient();
 
-            if (Player* recipient = creature->GetOriginalLootRecipient())
-                player_tap = recipient;
-            else if (ObjectGuid recipient = creature->GetLootRecipientGuid())
+            if (Player* recipient = pCreatureVictim->GetOriginalLootRecipient())
+                pPlayerTap = recipient;
+            else if (ObjectGuid recipient = pCreatureVictim->GetLootRecipientGuid())
                 if (recipient.IsPet())
-                    player_tap = nullptr;
-            // Set correct group_tap if player entered a group
-            if (player_tap && !group_tap)
-                group_tap = player_tap->GetGroup();
+                    pPlayerTap = nullptr;
+            // Set correct pGroupTap if player entered a group
+            if (pPlayerTap && !pGroupTap)
+                pGroupTap = pPlayerTap->GetGroup();
         }
-        else if (creature->lootForCreator && creature->GetCreatorGuid())
+        else if (pCreatureVictim->lootForCreator && pCreatureVictim->GetCreatorGuid())
         {
-            Unit* creator = GetUnit(*this, creature->GetCreatorGuid());
-            if (creator->IsPlayer())
-                player_tap = (Player*)creator;
+            if (Player* pCreator = ::ToPlayer(GetUnit(*this, pCreatureVictim->GetCreatorGuid())))
+                pPlayerTap = pCreator;
         }
         else
-            creature->SetLootRecipient(nullptr);
+            pCreatureVictim->SetLootRecipient(nullptr);
     }
-    // in player kill case group tap selected by player_tap (killer-player itself, or charmer, or owner, etc)
+    // in player kill case group tap selected by pPlayerTap (killer-player itself, or charmer, or owner, etc)
     else
     {
-        if (player_tap)
-            group_tap = player_tap->GetGroup();
+        if (pPlayerTap)
+            pGroupTap = pPlayerTap->GetGroup();
     }
 
     // Nostalrius: Loots desactives / map (retire ici l'XP et les reputs)
     bool allowLoot = !sObjectMgr.IsMapLootDisabled(GetMapId());
     // call kill spell proc event (before real die and combat stop to triggering auras removed at death/combat stop)
-    if (allowLoot && player_tap && player_tap != pVictim)
+    if (allowLoot && pPlayerTap && pPlayerTap != pVictim)
     {
         WorldPacket data(SMSG_PARTYKILLLOG, (8 + 8));   //send event PARTY_KILL
-        data << player_tap->GetObjectGuid();            //player with killing blow
+        data << pPlayerTap->GetObjectGuid();            //player with killing blow
         data << pVictim->GetObjectGuid();              //victim
 
-        Player* looter = player_tap;
-        if (group_tap)
+        Player* looter = pPlayerTap;
+        if (pGroupTap)
         {
-            group_tap->BroadcastPacket(&data, false, group_tap->GetMemberGroup(player_tap->GetObjectGuid()), player_tap->GetObjectGuid());
+            pGroupTap->BroadcastPacket(&data, false, pGroupTap->GetMemberGroup(pPlayerTap->GetObjectGuid()), pPlayerTap->GetObjectGuid());
 
-            if (creature)
+            if (pCreatureVictim)
             {
-                group_tap->UpdateLooterGuid(creature, true);
-                if (group_tap->GetLooterGuid())
+                pGroupTap->UpdateLooterGuid(pCreatureVictim, true);
+                if (pGroupTap->GetLooterGuid())
                 {
-                    looter = ObjectAccessor::FindPlayer(group_tap->GetLooterGuid());
+                    looter = ObjectAccessor::FindPlayer(pGroupTap->GetLooterGuid());
 
                     // Master looter offline or on loading screen
-                    if (!looter && group_tap->GetLootMethod() == MASTER_LOOT)
+                    if (!looter && pGroupTap->GetLootMethod() == MASTER_LOOT)
                     {
                         // give master looter to the leader / assistants if possible, otherwise switch to group loot
-                        for (Group::member_citerator itr = group_tap->GetMemberSlots().begin(); itr != group_tap->GetMemberSlots().end(); ++itr)
+                        for (Group::member_citerator itr = pGroupTap->GetMemberSlots().begin(); itr != pGroupTap->GetMemberSlots().end(); ++itr)
                         {
-                            if (itr->guid != group_tap->GetLooterGuid() && (itr->guid == group_tap->GetLeaderGuid() || itr->assistant))
+                            if (itr->guid != pGroupTap->GetLooterGuid() && (itr->guid == pGroupTap->GetLeaderGuid() || itr->assistant))
                                 if (looter = ObjectAccessor::FindPlayer(itr->guid))
                                     break;
                         }
 
                         if (!looter)
                         {
-                            group_tap->SetLootMethod(GROUP_LOOT);
-                            group_tap->SetLootThreshold(ITEM_QUALITY_UNCOMMON);
-                            group_tap->UpdateLooterGuid(creature);
-                            looter = ObjectAccessor::FindPlayer(group_tap->GetLooterGuid());
+                            pGroupTap->SetLootMethod(GROUP_LOOT);
+                            pGroupTap->SetLootThreshold(ITEM_QUALITY_UNCOMMON);
+                            pGroupTap->UpdateLooterGuid(pCreatureVictim);
+                            looter = ObjectAccessor::FindPlayer(pGroupTap->GetLooterGuid());
                         }
                         else
                         {
-                            group_tap->SetLooterGuid(looter->GetGUID());
-                            group_tap->SendUpdate();
+                            pGroupTap->SetLooterGuid(looter->GetGUID());
+                            pGroupTap->SendUpdate();
                         }
                     }
                     
                     if (looter)
                     {
-                        creature->SetLootRecipient(looter);   // update creature loot recipient to the allowed looter.
-                        group_tap->SendLooter(creature, looter);
+                        pCreatureVictim->SetLootRecipient(looter);   // update pCreatureVictim loot recipient to the allowed looter.
+                        pGroupTap->SendLooter(pCreatureVictim, looter);
                     }
                     else
-                        group_tap->SendLooter(creature, nullptr);
+                        pGroupTap->SendLooter(pCreatureVictim, nullptr);
                 }
                 else
-                    group_tap->SendLooter(creature, nullptr);
+                    pGroupTap->SendLooter(pCreatureVictim, nullptr);
 
-                group_tap->UpdateLooterGuid(creature);
+                pGroupTap->UpdateLooterGuid(pCreatureVictim);
             }
         }
 
-        player_tap->SendDirectMessage(&data);
+        pPlayerTap->SendDirectMessage(&data);
 
-        if (creature)
+        if (pCreatureVictim)
         {
-            Loot* loot = &creature->loot;
-            if (creature->lootForPickPocketed)
-                creature->lootForPickPocketed = false;
+            Loot* loot = &pCreatureVictim->loot;
+            if (pCreatureVictim->lootForPickPocketed)
+                pCreatureVictim->lootForPickPocketed = false;
 
             loot->clear();
-            if (!(creature->AI() && creature->AI()->FillLoot(loot, looter)))
+            if (!(pCreatureVictim->AI() && pCreatureVictim->AI()->FillLoot(loot, looter)))
             {
-                if (uint32 lootid = creature->GetCreatureInfo()->loot_id)
+                if (uint32 lootid = pCreatureVictim->GetCreatureInfo()->loot_id)
                 {
-                    loot->SetTeam(group_tap ? group_tap->GetTeam() : looter->GetTeam());
-                    loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, creature);
+                    loot->SetTeam(pGroupTap ? pGroupTap->GetTeam() : looter->GetTeam());
+                    loot->FillLoot(lootid, LootTemplates_Creature, looter, false, false, pCreatureVictim);
                 }
             }
 
-            loot->generateMoneyLoot(creature->GetCreatureInfo()->gold_min, creature->GetCreatureInfo()->gold_max);
+            loot->generateMoneyLoot(pCreatureVictim->GetCreatureInfo()->gold_min, pCreatureVictim->GetCreatureInfo()->gold_max);
         }
 
-        if (group_tap)
-            group_tap->RewardGroupAtKill(pVictim, player_tap);
-        else if (player_tap)
-            player_tap->RewardSinglePlayerAtKill(pVictim);
+        if (pGroupTap)
+            pGroupTap->RewardGroupAtKill(pVictim, pPlayerTap);
+        else if (pPlayerTap)
+            pPlayerTap->RewardSinglePlayerAtKill(pVictim);
     }
-    if (Player* playerVictim = pVictim->ToPlayer())
-        playerVictim->RewardHonorOnDeath();
+    if (pPlayerVictim)
+        pPlayerVictim->RewardHonorOnDeath();
 
     // To be replaced if possible using ProcDamageAndSpell
     if (pVictim != this) // The one who has the fatal blow
@@ -1230,10 +1227,9 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
 
     // if talent known but not triggered (check priest class for speedup check)
     bool spiritOfRedemtionTalentImmune = false;
-    if (pVictim->GetTypeId() == TYPEID_PLAYER && pVictim->getClass() == CLASS_PRIEST)
+    if (pPlayerVictim && pVictim->getClass() == CLASS_PRIEST)
     {
-        if (!damageFromSpiritOfRedemtionTalent &&           // not called from SPELL_AURA_SPIRIT_OF_REDEMPTION
-                pVictim->GetTypeId() == TYPEID_PLAYER && pVictim->getClass() == CLASS_PRIEST)
+        if (!damageFromSpiritOfRedemtionTalent)           // not called from SPELL_AURA_SPIRIT_OF_REDEMPTION
         {
             AuraList const& vDummyAuras = pVictim->GetAurasByType(SPELL_AURA_DUMMY);
             for (AuraList::const_iterator itr = vDummyAuras.begin(); itr != vDummyAuras.end(); ++itr)
@@ -1257,16 +1253,17 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "SET JUST_DIED");
         pVictim->SetDeathState(JUST_DIED);
         // Nostalrius: Instantly send values update for health
-        if (pVictim->ToPlayer() && pVictim->GetUInt32Value(PLAYER_SELF_RES_SPELL))
+        if (pPlayerVictim && pVictim->GetUInt32Value(PLAYER_SELF_RES_SPELL))
             pVictim->DirectSendPublicValueUpdate(PLAYER_SELF_RES_SPELL);
         pVictim->DirectSendPublicValueUpdate(UNIT_FIELD_HEALTH);
     }
 
     // outdoor pvp things, do these after setting the death state, else the player activity notify won't work... doh...
     // handle player kill only if not suicide (spirit of redemption for example)
-    if (GetTypeId() == TYPEID_PLAYER && this != pVictim)
-        if (ZoneScript * pZoneScript = ((Player*)this)->GetZoneScript())
-            pZoneScript->HandleKill((Player*)this, pVictim);
+    if (this != pVictim)
+        if (Player* pPlayer = ToPlayer())
+            if (ZoneScript * pZoneScript = pPlayer->GetZoneScript())
+                pZoneScript->HandleKill(pPlayer, pVictim);
 
     DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamageHealth1");
 
@@ -1287,110 +1284,107 @@ void Unit::Kill(Unit* pVictim, SpellEntry const *spellProto, bool durabilityLoss
         pVictim->AddAura(27827, ADD_AURA_NO_OPTION, pVictim);
         pVictim->InterruptNonMeleeSpells(false);
     }
-    else
-        pVictim->SetHealth(0);
 
     // remember victim PvP death for corpse type and corpse reclaim delay
     // at original death (not at SpiritOfRedemtionTalent timeout)
-    if (pVictim->GetTypeId() == TYPEID_PLAYER && !damageFromSpiritOfRedemtionTalent)
-        ((Player*)pVictim)->SetPvPDeath(player_tap != nullptr);
+    if (pPlayerVictim && !damageFromSpiritOfRedemtionTalent)
+        pPlayerVictim->SetPvPDeath(pPlayerTap != nullptr);
 
     // Call KilledUnit for creatures
-    if (GetTypeId() == TYPEID_UNIT && ((Creature*)this)->AI())
-        ((Creature*)this)->AI()->KilledUnit(pVictim);
+    if (Creature* pThisCreature = ToCreature())
+        if (pThisCreature->AI())
+            pThisCreature->AI()->KilledUnit(pVictim);
 
     // Call AI OwnerKilledUnit (for any current summoned minipet/guardian/protector)
     PetOwnerKilledUnit(pVictim);
 
     // 10% durability loss on death
     // clean InHateListOf
-    if (pVictim->GetTypeId() == TYPEID_PLAYER)
+    if (pPlayerVictim)
     {
         // only if not player and not controlled by player pet. And not at BG
-        if (durabilityLoss && !player_tap && !((Player*)pVictim)->InBattleGround())
+        if (durabilityLoss && !pPlayerTap && !pPlayerVictim->InBattleGround())
         {
             DEBUG_LOG("We are dead, loosing 10 percents durability");
-            ((Player*)pVictim)->DurabilityLossAll(0.10f, false);
+            pPlayerVictim->DurabilityLossAll(0.10f, false);
             // durability lost message
             WorldPacket data(SMSG_DURABILITY_DAMAGE_DEATH, 0);
-            ((Player*)pVictim)->GetSession()->SendPacket(&data);
+            pPlayerVictim->GetSession()->SendPacket(&data);
         }
     }
     else                                                // creature died
     {
         DEBUG_FILTER_LOG(LOG_FILTER_DAMAGE, "DealDamageNotPlayer");
 
-        if (!creature->IsPet())
+        if (!pCreatureVictim->IsPet())
         {
-            creature->LogDeath(this);
-            creature->UpdateCombatState(false);
-            creature->UpdateCombatWithZoneState(false);
+            pCreatureVictim->LogDeath(this);
+            pCreatureVictim->UpdateCombatState(false);
+            pCreatureVictim->UpdateCombatWithZoneState(false);
 
-            creature->DeleteThreatList();
-            if (CreatureInfo const *cinfo = creature->GetCreatureInfo())
+            pCreatureVictim->DeleteThreatList();
+            if (CreatureInfo const *cinfo = pCreatureVictim->GetCreatureInfo())
                 if (cinfo->loot_id || cinfo->gold_max > 0)
-                    creature->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
+                    pCreatureVictim->SetFlag(UNIT_DYNAMIC_FLAGS, UNIT_DYNFLAG_LOOTABLE);
         }
 
-        if (creature->AI())
-            creature->AI()->JustDied(this);
+        if (pCreatureVictim->AI())
+            pCreatureVictim->AI()->JustDied(this);
 
-        if (CreatureGroup* group = creature->GetCreatureGroup())
-            group->OnMemberDied(creature);
+        if (CreatureGroup* group = pCreatureVictim->GetCreatureGroup())
+            group->OnMemberDied(pCreatureVictim);
 
-        if (creature->IsTemporarySummon())
+        if (TemporarySummon* pSummon = pCreatureVictim->IsTemporarySummon() ? static_cast<TemporarySummon*>(pCreatureVictim) : nullptr)
         {
-            TemporarySummon* pSummon = (TemporarySummon*)creature;
             if (pSummon->GetSummonerGuid().IsCreature())
-                if (Creature* pSummoner = creature->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
+                if (Creature* pSummoner = pCreatureVictim->GetMap()->GetCreature(pSummon->GetSummonerGuid()))
                     if (pSummoner->AI())
-                        pSummoner->AI()->SummonedCreatureJustDied(creature);
+                        pSummoner->AI()->SummonedCreatureJustDied(pCreatureVictim);
         }
-        else if (pOwner && pOwner->GetTypeId() == TYPEID_UNIT)
+        else if (Creature* pOwnerCreature = ::ToCreature(pVictim->GetCharmerOrOwner()))
         {
-            if (((Creature*)pOwner)->AI())
-                ((Creature*)pOwner)->AI()->SummonedCreatureJustDied(creature);
+            if (pOwnerCreature->AI())
+                pOwnerCreature->AI()->SummonedCreatureJustDied(pCreatureVictim);
         }
 
-        if (ZoneScript* pScript = creature->GetZoneScript())
-            pScript->OnCreatureDeath(creature);
+        if (ZoneScript* pScript = pCreatureVictim->GetZoneScript())
+            pScript->OnCreatureDeath(pCreatureVictim);
 
         // Dungeon specific stuff, only applies to players killing creatures
-        if (creature->GetInstanceId() && creature->GetMapId() > 1)
+        if (pCreatureVictim->GetInstanceId() && pCreatureVictim->GetMapId() > 1)
         {
             Player* playerKiller = GetCharmerOrOwnerPlayerOrPlayerItself();
 
-            if (!playerKiller && this == creature && player_tap)
-                playerKiller = player_tap;
+            if (!playerKiller && this == pCreatureVictim && pPlayerTap)
+                playerKiller = pPlayerTap;
 
             if (playerKiller)
-                creature->GetMap()->BindToInstanceOrRaid(playerKiller, creature->GetRespawnTimeEx(), creature->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
+                pCreatureVictim->GetMap()->BindToInstanceOrRaid(playerKiller, pCreatureVictim->GetRespawnTimeEx(), pCreatureVictim->GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_INSTANCE_BIND);
         }
     }
 
-    // If we're in a dungeon, the killer is a creature and the victim is a player
-    if (GetInstanceId() && GetMapId() > 1 && this->IsCreature() && pVictim && pVictim->IsPlayer())
+    // If we're in a dungeon, the killer is a pCreatureVictim and the victim is a player
+    if (GetInstanceId() && GetMapId() > 1 && this->IsCreature() && pPlayerVictim)
     {
-        sInstanceStatistics.IncrementKillCounter(this->ToCreature(), pVictim->ToPlayer(), spellProto);
+        sInstanceStatistics.IncrementKillCounter(this->ToCreature(), pPlayerVictim, spellProto);
     }
 
     // battleground things (do this at the end, so the death state flag will be properly set to handle in the bg->handlekill)
-    if (pVictim->GetTypeId() == TYPEID_PLAYER && ((Player*)pVictim)->InBattleGround())
+    if (pPlayerVictim && pPlayerVictim->InBattleGround())
     {
-        Player *killed = ((Player*)pVictim);
-        if (BattleGround *bg = killed->GetBattleGround())
-            bg->HandleKillPlayer(killed, player_tap);
+        if (BattleGround *bg = pPlayerVictim->GetBattleGround())
+            bg->HandleKillPlayer(pPlayerVictim, pPlayerTap);
     }
-    else if (pVictim->GetTypeId() == TYPEID_UNIT)
+    else if (pCreatureVictim)
     {
-        if (player_tap)
-            if (BattleGround *bg = player_tap->GetBattleGround())
-                bg->HandleKillUnit((Creature*)pVictim, player_tap);
+        if (pPlayerTap)
+            if (BattleGround *bg = pPlayerTap->GetBattleGround())
+                bg->HandleKillUnit(pCreatureVictim, pPlayerTap);
     }
     // Nostalrius: interrupt non melee spell casted
     pVictim->InterruptSpellsCastedOnMe(false, true);
-    if (player_tap)
-        ALL_SESSION_SCRIPTS(player_tap->GetSession(), OnUnitKilled(pVictim->GetObjectGuid()));
+    if (pPlayerTap)
+        ALL_SESSION_SCRIPTS(pPlayerTap->GetSession(), OnUnitKilled(pVictim->GetObjectGuid()));
 }
 
 struct PetOwnerKilledUnitHelper
