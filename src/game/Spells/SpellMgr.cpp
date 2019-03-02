@@ -4924,12 +4924,38 @@ void SpellMgr::LoadSpells()
         //spell->RequiredAuraVision = fields[173].GetUInt32();
         spell->Custom = fields[174].GetUInt32();
 
-        // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
+        
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_10_2
         for (int i = EFFECT_INDEX_0; i <= EFFECT_INDEX_2; ++i)
         {
-            if (IsEffectAppliesAura(spell->Effect[i]) && (spell->EffectApplyAuraName[i] == SPELL_AURA_MOD_DECREASE_SPEED))
-                spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
+            if (IsEffectAppliesAura(spell->Effect[i]))
+            {
+                switch (spell->EffectApplyAuraName[i])
+                {
+                    // Before 1.11, the spell data specifies TO what percent the speed is reduced, not BY what percent.
+                    case SPELL_AURA_MOD_DECREASE_SPEED:
+                    {
+                        spell->EffectBasePoints[i] = -(100 - spell->EffectBasePoints[i]);
+                        break;
+                    }
+                    
+#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_9_4
+                    // Before 1.9, the school is not a mask.
+                    case SPELL_AURA_MOD_RESISTANCE:
+                    case SPELL_AURA_MOD_BASE_RESISTANCE:
+                    case SPELL_AURA_MOD_RESISTANCE_PCT:
+                    case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
+                    case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
+                    {
+                        if (spell->EffectMiscValue[i] == -1)
+                            spell->EffectMiscValue[i] = 126; // all magic resists
+                        else
+                            spell->EffectMiscValue[i] = 1 << spell->EffectMiscValue[i];
+                        break;
+                    }
+#endif
+                }
+            }
         }
 #endif
         // Before 1.10, the spell proc flags had completely different meanings.

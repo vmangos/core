@@ -517,19 +517,9 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
         float(GetCreatureInfo()->arcane_res)
     };
 
-    // set spell school immunity if resistance to that element = -1 in db
-    m_spellImmune[IMMUNITY_SCHOOL].clear();
     for (int i = 0; i < 6; ++i)
     {
-        if (resistances[i] < 0)
-        {
-            SpellImmune immune;
-            immune.type = (1 << (i + 1));
-            immune.spellId = 642; // Any positive spell, for Unit::IsImmuneToSpell
-            m_spellImmune[IMMUNITY_SCHOOL].push_back(immune);
-        }
-        else
-            SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, resistances[i]);
+        SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, resistances[i]);
     }
 
     SetFly(CanFly());

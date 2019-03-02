@@ -619,14 +619,14 @@ enum MeleeHitOutcome
 
 struct CleanDamage
 {
-    CleanDamage(uint32 _damage, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome, uint32 _Absorb, uint32 _Resist) :
+    CleanDamage(uint32 _damage, WeaponAttackType _attackType, MeleeHitOutcome _hitOutCome, uint32 _Absorb, int32 _Resist) :
     damage(_damage), attackType(_attackType), hitOutCome(_hitOutCome), absorb(_Absorb), resist(_Resist) {}
 
     uint32 damage;
     WeaponAttackType attackType;
     MeleeHitOutcome hitOutCome;
     uint32 absorb;
-    uint32 resist;
+    int32 resist;
 };
 
 struct SubDamageInfo
@@ -634,7 +634,7 @@ struct SubDamageInfo
     SpellSchoolMask damageSchoolMask = SPELL_SCHOOL_MASK_NORMAL;
     uint32 damage = 0;
     uint32 absorb = 0;
-    uint32 resist = 0;
+    int32 resist = 0;
 };
 
 // Struct for use in Unit::CalculateMeleeDamage
@@ -645,7 +645,7 @@ struct CalcDamageInfo
     Unit  *target = nullptr;               // Target for damage
     uint32 totalDamage = 0;
     uint32 totalAbsorb = 0;
-    uint32 totalResist = 0;
+    int32 totalResist = 0;
     SubDamageInfo subDamage[MAX_ITEM_PROTO_DAMAGES] = {};
     uint32 blocked_amount = 0;
     uint32 HitInfo = HITINFO_NORMALSWING;
@@ -673,7 +673,7 @@ struct SpellNonMeleeDamage{
     uint32 damage;
     SpellSchools school;
     uint32 absorb;
-    uint32 resist;
+    int32 resist;
     bool   periodicLog;
     bool   unused;
     uint32 blocked;
@@ -683,13 +683,13 @@ struct SpellNonMeleeDamage{
 
 struct SpellPeriodicAuraLogInfo
 {
-    SpellPeriodicAuraLogInfo(Aura *_aura, uint32 _damage, uint32 _absorb, uint32 _resist, float _multiplier)
+    SpellPeriodicAuraLogInfo(Aura *_aura, uint32 _damage, uint32 _absorb, int32 _resist, float _multiplier)
         : aura(_aura), damage(_damage), absorb(_absorb), resist(_resist), multiplier(_multiplier) {}
 
     Aura   *aura;
     uint32 damage;
     uint32 absorb;
-    uint32 resist;
+    int32 resist;
     float  multiplier;
 };
 
@@ -1235,12 +1235,12 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
 
         float GetStat(Stats stat) const { return float(GetUInt32Value(UNIT_FIELD_STAT0+stat)); }
         void SetStat(Stats stat, int32 val) { SetStatInt32Value(UNIT_FIELD_STAT0+stat, val); }
-        uint32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL) ; }
-        void SetArmor(int32 val) { SetResistance(SPELL_SCHOOL_NORMAL, val); }
 
-        uint32 GetResistance(SpellSchools school) const { return GetUInt32Value(UNIT_FIELD_RESISTANCES+school); }
-        void SetResistance(SpellSchools school, int32 val) { SetStatInt32Value(UNIT_FIELD_RESISTANCES+school, school == SPELL_SCHOOL_HOLY ? 0 : val); }
-                                                                                                           // override attempts to increase Holy resistance
+        inline int32 GetArmor() const { return GetResistance(SPELL_SCHOOL_NORMAL); }
+        inline void SetArmor(int32 val) { SetStatInt32Value(UNIT_FIELD_RESISTANCES, val); }
+
+        inline int32 GetResistance(SpellSchools school) const { return GetInt32Value(UNIT_FIELD_RESISTANCES + school); }
+        inline void SetResistance(SpellSchools school, int32 val) { SetInt32Value(UNIT_FIELD_RESISTANCES + school, val); }
 
         uint32 GetHealth()    const { return GetUInt32Value(UNIT_FIELD_HEALTH); }
         uint32 GetMaxHealth() const { return GetUInt32Value(UNIT_FIELD_MAXHEALTH); }
@@ -1462,6 +1462,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool critical = false);
         void SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage,Powers powertype);
         void EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype);
+        void SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const;
         uint32 SpellNonMeleeDamageLog(Unit *pVictim, uint32 spellID, uint32 damage);
         void CastSpell(Unit* Victim, uint32 spellId, bool triggered, Item *castItem = nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
         void CastSpell(Unit* Victim,SpellEntry const *spellInfo, bool triggered, Item *castItem= nullptr, Aura* triggeredByAura = nullptr, ObjectGuid originalCaster = ObjectGuid(), SpellEntry const* triggeredBy = nullptr, SpellEntry const* triggeredByParent = nullptr);
@@ -1475,10 +1476,9 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void DeMorph();
 
         void SendAttackStateUpdate(CalcDamageInfo *damageInfo);
-
-        void SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount);
+        void SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 SwingType, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount);
         void SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log);
-        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, uint32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
+        void SendSpellNonMeleeDamageLog(Unit *target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit = false, bool split = false);
         void SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo, AuraType auraTypeOverride = SPELL_AURA_NONE);
         void SendSpellMiss(Unit *target, uint32 spellID, SpellMissInfo missInfo);
 
@@ -1885,10 +1885,11 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         virtual bool IsImmuneToDamage(SpellSchoolMask meleeSchoolMask, SpellEntry const* spellInfo = nullptr);
         virtual bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
 
-        float GetSpellResistChance(Unit* victim, uint32 schoolMask, bool innateResists) const;
+        float GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const;
         uint32 CalcArmorReducedDamage(Unit* pVictim, const uint32 damage);
-        void CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
+        void CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, int32 *resist, SpellEntry const* spellProto = nullptr, Spell* spell = nullptr);
         void CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damageInfo, SpellEntry const* spellProto, WeaponAttackType attType = BASE_ATTACK, Spell* spell = nullptr);
+        float RollMagicResistanceMultiplierOutcomeAgainst(const Unit* pCaster, SpellSchoolMask schoolMask, DamageEffectType dmgType, SpellEntry const* spellProto) const;
 
         void  UpdateSpeed(UnitMoveType mtype, bool forced, float ratio = 1.0f);
         float GetSpeed(UnitMoveType mtype) const;

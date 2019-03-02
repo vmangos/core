@@ -1976,8 +1976,23 @@ void Unit::CalculateMeleeDamage(Unit *pVictim, uint32 damage, CalcDamageInfo *da
             SubDamageInfo *subDamage = &damageInfo->subDamage[i];
 
             damageInfo->target->CalculateDamageAbsorbAndResist(this, subDamage->damageSchoolMask, DIRECT_DAMAGE, subDamage->damage, &subDamage->absorb, &subDamage->resist, nullptr);
-            damageInfo->totalDamage -= subDamage->absorb + subDamage->resist;
-            subDamage->damage -= subDamage->absorb + subDamage->resist;
+
+            const uint32 bonus = (subDamage->resist < 0 ? uint32(std::abs(subDamage->resist)) : 0);
+            subDamage->damage += bonus;
+            damageInfo->totalDamage += bonus;
+
+            const uint32 malus = (subDamage->resist > 0 ? (subDamage->absorb + uint32(subDamage->resist)) : subDamage->absorb);
+
+            if (subDamage->damage <= malus)
+            {
+                damageInfo->totalDamage -= subDamage->damage;
+                subDamage->damage = 0;
+            }
+            else
+            {
+                damageInfo->totalDamage -= malus;
+                subDamage->damage -= malus;
+            }
 
             damageInfo->totalAbsorb += subDamage->absorb;
             damageInfo->totalResist += subDamage->resist;
@@ -2250,7 +2265,7 @@ static ResistanceValues resistValues[] =
     {25, 55, 16, 3, 1, 75} // 300
 };
 
-void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, uint32 *resist, SpellEntry const* spellProto, Spell* spell)
+void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, const uint32 damage, uint32 *absorb, int32 *resist, SpellEntry const* spellProto, Spell* spell)
 {
     if (!pCaster || !isAlive() || !damage)
         return;
@@ -2264,11 +2279,8 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
         (*absorb) = damage;
         return;
     }
-    /*
-    if ((IsPlayer() && ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)) ||
-        (pCaster->IsPlayer() && pCaster->ToPlayer()->HasOption(PLAYER_CHEAT_UNRANDOMIZE)))
-        return;
-    */
+
+    int32 RemainingDamage = int32(damage);
 
     // Magic damage, check for resists
     bool canResist = (schoolMask & SPELL_SCHOOL_MASK_NORMAL) == 0;
@@ -2283,71 +2295,12 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
 
     if (canResist)
     {
-        float resistanceChance = pCaster->GetSpellResistChance(this, schoolMask, true);
-        resistanceChance *= 100.0f;
-
-        // DoTs
-        // The mechanic for this is strange in classic - most dots can be seen exhibiting partial resists in videos, but only very rarely,
-        // and almost never more than 25% resists. How this should work exactly is somewhat a guess.
-        // Kalgan post-2.0 dot nerf: "Previously, dots in general were 1/10th as likely to be resisted as normal spells."
-        // http://web.archive.org/web/20080601184008/http://forums.worldofwarcraft.com/thread.html?topicId=65457765&pageNo=18&sid=1#348
-        if (damagetype == DOT && spellProto)
-        {
-            switch (spellProto->Id)
-            {
-                // NOSTALRIUS: Some DoTs follow normal resist rules. Need to find which ones, why and how.
-                // We have a video proof for the following ones.
-                case 23461:     // Vaelastrasz's Flame Breath
-                case 24818:     // Nightmare Dragon's Noxious Breath
-                case 25812:     // Lord Kri's Toxic Volley
-                case 28531:     // Sapphiron's Frost Aura
-                    break;
-                default:
-                    resistanceChance *= 0.1f;
-            }
-        }
-
-        ResistanceValues* prev = nullptr;
-        ResistanceValues* next = nullptr;
-        for (int i = 1; i < 31; ++i)
-        {
-            // On depasse la valeur cherchee.
-            if (resistValues[i].chanceResist >= resistanceChance)
-            {
-                prev = &resistValues[i - 1];
-                next = &resistValues[i];
-                break;
-            }
-        }
-        ASSERT(next && prev);
-        float coeff = float(resistanceChance - prev->chanceResist) / float(next->chanceResist - prev->chanceResist);
-        float resist0 = prev->resist0 + (next->resist0 - prev->resist0) * coeff;
-        float resist25 = prev->resist25 + (next->resist25 - prev->resist25) * coeff;
-        float resist50 = prev->resist50 + (next->resist50 - prev->resist50) * coeff;
-        float resist75 = prev->resist75 + (next->resist75 - prev->resist75) * coeff;
-        float resist100 = prev->resist100 + (next->resist100 - prev->resist100) * coeff;
-        uint32 ran = urand(0, 99);
-        float resistCnt = 0.0f;
-        // Players CANNOT resist 100% of damage, it is always rounded down to 75%, despite what Blizzard's table sugests.
-        // The true magic damage resist cap is therefore actually ~68-70% because of this mechanic.
-        // http://web.archive.org/web/20110808083353/http://elitistjerks.com/f15/t10712-resisting_magical_damage_its_relation_resistance_levels/p4/
-        if (ran < resist100 + resist75)
-            resistCnt = 0.75f;
-        else if (ran < resist100 + resist75 + resist50)
-            resistCnt = 0.5f;
-        else if (ran < resist100 + resist75 + resist50 + resist25)
-            resistCnt = 0.25f;
-
-        DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "Partial resist : chances %.2f:%.2f:%.2f:%.2f:%.2f. Hit resist chance %f",
-              resist0, resist25, resist50, resist75, resist100, resistanceChance);
-        *resist += uint32(damage * resistCnt);
-        if (*resist > damage)
-            *resist = damage;
+        const float multiplier = RollMagicResistanceMultiplierOutcomeAgainst(pCaster, schoolMask, damagetype, spellProto);
+        *resist = int32(int64(damage) * multiplier);
+        RemainingDamage -= *resist;
     }
     else
         *resist = 0;
-
-    int32 RemainingDamage = damage - *resist;
 
     // Need remove expired auras after
     bool existExpired = false;
@@ -2467,7 +2420,8 @@ void Unit::CalculateDamageAbsorbAndResist(Unit *pCaster, SpellSchoolMask schoolM
         uint32 splitted = currentAbsorb;
         uint32 splitted_absorb = 0;
         // Nostalrius : la reflection (bene de sacrifice par exemple) ne fait pas forcement des degats (si pala sous bouclier divin)
-        uint32 reflectAbsorb = 0, reflectResist = 0;
+        uint32 reflectAbsorb = 0;
+        int32 reflectResist = 0;
         // On evite une boucle infinie
         if (!reflectTo->HasAuraType(SPELL_AURA_SPLIT_DAMAGE_FLAT))
             reflectTo->CalculateDamageAbsorbAndResist(pCaster, schoolMask, DOT, splitted, &reflectAbsorb, &reflectResist, spellProto);
@@ -2531,9 +2485,12 @@ void Unit::CalculateAbsorbResistBlock(Unit *pCaster, SpellNonMeleeDamage *damage
             damageInfo->blocked = damageInfo->damage;
         damageInfo->damage -= damageInfo->blocked;
     }
-
+    
     CalculateDamageAbsorbAndResist(pCaster, GetSpellSchoolMask(spellProto), SPELL_DIRECT_DAMAGE, damageInfo->damage, &damageInfo->absorb, &damageInfo->resist, spellProto, spell);
-    damageInfo->damage -= damageInfo->absorb + damageInfo->resist;
+    const uint32 bonus = (damageInfo->resist < 0 ? uint32(std::abs(damageInfo->resist)) : 0);
+    damageInfo->damage += bonus;
+    const uint32 malus = (damageInfo->resist > 0 ? (damageInfo->absorb + uint32(damageInfo->resist)) : damageInfo->absorb);
+    damageInfo->damage = (damageInfo->damage <= malus ? 0 : (damageInfo->damage - malus));
 }
 
 void Unit::AttackerStateUpdate(Unit *pVictim, WeaponAttackType attType, bool checkLoS, bool extra)
@@ -3090,15 +3047,92 @@ SpellMissInfo Unit::MagicSpellHitResult(Unit *pVictim, SpellEntry const *spell, 
     return SPELL_MISS_NONE;
 }
 
-float Unit::GetSpellResistChance(Unit* victim, uint32 schoolMask, bool innateResists) const
+float Unit::RollMagicResistanceMultiplierOutcomeAgainst(const Unit *pCaster, SpellSchoolMask schoolMask, DamageEffectType damagetype, SpellEntry const* spellProto) const
+{
+    float resistanceChance = pCaster->GetSpellResistChance(this, schoolMask, true);
+
+    // Magic vulnerability instead of magic resistance:
+    if (resistanceChance < 0)
+        return resistanceChance;
+
+    resistanceChance *= 100.0f;
+
+    // DoTs
+    // The mechanic for this is strange in classic - most dots can be seen exhibiting partial resists in videos, but only very rarely,
+    // and almost never more than 25% resists. How this should work exactly is somewhat a guess.
+    // Kalgan post-2.0 dot nerf: "Previously, dots in general were 1/10th as likely to be resisted as normal spells."
+    // http://web.archive.org/web/20080601184008/http://forums.worldofwarcraft.com/thread.html?topicId=65457765&pageNo=18&sid=1#348
+    if (damagetype == DOT && spellProto)
+    {
+        switch (spellProto->Id)
+        {
+            // NOSTALRIUS: Some DoTs follow normal resist rules. Need to find which ones, why and how.
+            // We have a video proof for the following ones.
+        case 23461:     // Vaelastrasz's Flame Breath
+        case 24818:     // Nightmare Dragon's Noxious Breath
+        case 25812:     // Lord Kri's Toxic Volley
+        case 28531:     // Sapphiron's Frost Aura
+            break;
+        default:
+            resistanceChance *= 0.1f;
+        }
+    }
+
+    ResistanceValues* prev = nullptr;
+    ResistanceValues* next = nullptr;
+    for (int i = 1; i < 31; ++i)
+    {
+        // On depasse la valeur cherchee.
+        if (resistValues[i].chanceResist >= resistanceChance)
+        {
+            prev = &resistValues[i - 1];
+            next = &resistValues[i];
+            break;
+        }
+    }
+    ASSERT(next && prev);
+    float coeff = float(resistanceChance - prev->chanceResist) / float(next->chanceResist - prev->chanceResist);
+    float resist0 = prev->resist0 + (next->resist0 - prev->resist0) * coeff;
+    float resist25 = prev->resist25 + (next->resist25 - prev->resist25) * coeff;
+    float resist50 = prev->resist50 + (next->resist50 - prev->resist50) * coeff;
+    float resist75 = prev->resist75 + (next->resist75 - prev->resist75) * coeff;
+    float resist100 = prev->resist100 + (next->resist100 - prev->resist100) * coeff;
+    uint32 ran = urand(0, 99);
+    float resistCnt = 0.0f;
+    // Players CANNOT resist 100% of damage, it is always rounded down to 75%, despite what Blizzard's table sugests.
+    // The true magic damage resist cap is therefore actually ~68-70% because of this mechanic.
+    // http://web.archive.org/web/20110808083353/http://elitistjerks.com/f15/t10712-resisting_magical_damage_its_relation_resistance_levels/p4/
+    if (ran < resist100 + resist75)
+        resistCnt = 0.75f;
+    else if (ran < resist100 + resist75 + resist50)
+        resistCnt = 0.5f;
+    else if (ran < resist100 + resist75 + resist50 + resist25)
+        resistCnt = 0.25f;
+
+    DEBUG_UNIT(this, DEBUG_SPELL_COMPUTE_RESISTS, "Partial resist : chances %.2f:%.2f:%.2f:%.2f:%.2f. Hit resist chance %f",
+        resist0, resist25, resist50, resist75, resist100, resistanceChance);
+
+    return resistCnt;
+}
+
+float Unit::GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool innateResists) const
 {
     // Get base victim resistance for school
-    float resistModHitChance = victim->GetResistance(GetFirstSchoolInMask(SpellSchoolMask(schoolMask)));
-    // Ignore resistance by self SPELL_AURA_MOD_TARGET_RESISTANCE aura
-    resistModHitChance += GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask);
-    // No "negative" resist chance. Applied before innate resists.
+    float const baseResistance = victim->GetResistance(GetFirstSchoolInMask(SpellSchoolMask(schoolMask)));
+    // Get attacker spell penetration from SPELL_AURA_MOD_TARGET_RESISTANCE aura
+    float const selfResistance = GetTotalAuraModifierByMiscMask(SPELL_AURA_MOD_TARGET_RESISTANCE, schoolMask);
+
+    float resistModHitChance = baseResistance + selfResistance;
+
+    // Magic vulnerability calculation
     if (resistModHitChance < 0)
-        resistModHitChance = 0.0f;
+    {
+        // Victim's level based skill, penalize when calculating for low levels (< 20):
+        const float skill = std::max(GetSkillMaxForLevel(victim), uint16(100));
+        // Convert resistance value to vulnerability percentage through comparision with skill
+        resistModHitChance = (float(resistModHitChance) / skill) * 100;
+        return (resistModHitChance * 0.01f);
+    }
 
     // Computing innate resists, resistance bonus when attacking a creature higher level. Not affected by modifiers.
     if (innateResists && victim->GetTypeId() == TYPEID_UNIT)
@@ -5247,9 +5281,9 @@ void Unit::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log)
 #endif
     data << uint32(log->SpellID);
     data << uint32(log->damage);                            // damage amount
-    data << uint8(log->school);                              // damage school
+    data << uint8(log->school);                             // damage school
     data << uint32(log->absorb);                            // AbsorbedDamage
-    data << uint32(log->resist);                            // resist
+    data << int32(log->resist);                             // resist
     data << uint8(log->periodicLog);                        // if 1, then client show spell name (example: %s's ranged shot hit %s for %u school or %s suffers %u school damage from %s's spell_name
     data << uint8(log->unused);                             // unused
     data << uint32(log->blocked);                           // blocked
@@ -5258,10 +5292,12 @@ void Unit::SendSpellNonMeleeDamageLog(SpellNonMeleeDamage *log)
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendSpellNonMeleeDamageLog(Unit* target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, uint32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split)
+void Unit::SendSpellNonMeleeDamageLog(Unit* target, uint32 spellID, uint32 damage, SpellSchoolMask damageSchoolMask, uint32 absorbedDamage, int32 resist, bool isPeriodic, uint32 blocked, bool criticalHit, bool split)
 {
     SpellNonMeleeDamage log(this, target, spellID, GetFirstSchoolInMask(damageSchoolMask));
-    log.damage = damage - absorbedDamage - resist - blocked;
+    log.damage = damage;
+    log.damage += (resist < 0 ? uint32(std::abs(resist)) : 0);
+    log.damage -= (absorbedDamage + (resist > 0 ? uint32(resist) : 0) + blocked);
     log.absorb = absorbedDamage;
     log.resist = resist;
     log.periodicLog = isPeriodic;
@@ -5298,7 +5334,7 @@ void Unit::SendPeriodicAuraLog(SpellPeriodicAuraLogInfo *pInfo, AuraType auraTyp
             data << uint32(pInfo->damage);                  // damage
             data << uint32(aura->GetSpellProto()->School);
             data << uint32(pInfo->absorb);                  // absorb
-            data << uint32(pInfo->resist);                  // resist
+            data << int32(pInfo->resist);                   // resist
             break;
         case SPELL_AURA_PERIODIC_HEAL:
         case SPELL_AURA_OBS_MOD_HEALTH:
@@ -5502,7 +5538,7 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
         data << float(subDamage->damage)/ float(damageInfo->totalDamage);        // Float coefficient of sub damage
         data << uint32(subDamage->damage);
         data << uint32(subDamage->absorb);
-        data << uint32(subDamage->resist);
+        data << int32(subDamage->resist);
     }
     data << uint32(damageInfo->TargetState);
     data << uint32(0);
@@ -5513,14 +5549,16 @@ void Unit::SendAttackStateUpdate(CalcDamageInfo *damageInfo)
     SendMessageToSet(&data, true);
 }
 
-void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 /*SwingType*/, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, uint32 Resist, VictimState TargetState, uint32 BlockedAmount)
+void Unit::SendAttackStateUpdate(uint32 HitInfo, Unit *target, uint8 /*SwingType*/, SpellSchoolMask damageSchoolMask, uint32 Damage, uint32 AbsorbDamage, int32 Resist, VictimState TargetState, uint32 BlockedAmount)
 {
     CalcDamageInfo dmgInfo;
     dmgInfo.HitInfo = HitInfo;
     dmgInfo.attacker = this;
     dmgInfo.target = target;
     dmgInfo.attackType = BASE_ATTACK;
-    dmgInfo.totalDamage = Damage - AbsorbDamage - Resist - BlockedAmount;
+    dmgInfo.totalDamage = Damage;
+    dmgInfo.totalDamage += (Resist < 0 ? uint32(std::abs(Resist)) : 0);
+    dmgInfo.totalDamage -= (AbsorbDamage + (Resist > 0 ? uint32(Resist) : 0) + BlockedAmount);
     dmgInfo.totalAbsorb = AbsorbDamage;
     dmgInfo.totalResist = Resist;
     dmgInfo.subDamage[0].damage = dmgInfo.totalDamage;
@@ -6423,6 +6461,17 @@ void Unit::EnergizeBySpell(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers 
     SendEnergizeSpellLog(pVictim, SpellID, Damage, powertype);
     // needs to be called after sending spell log
     pVictim->ModifyPower(powertype, Damage);
+}
+
+void Unit::SendEnvironmentalDamageLog(uint8 type, uint32 damage, uint32 absorb, int32 resist) const
+{
+    WorldPacket data(SMSG_ENVIRONMENTALDAMAGELOG, (8 + 1 + 4 + 4 + 4));
+    data << GetObjectGuid();
+    data << uint8(type != DAMAGE_FALL_TO_VOID ? type : DAMAGE_FALL);
+    data << uint32(damage);
+    data << uint32(absorb);
+    data << int32(resist);
+    SendMessageToSet(&data, true);
 }
 
 int32 Unit::SpellBonusWithCoeffs(SpellEntry const *spellProto, int32 total, int32 benefit, int32 ap_benefit,  DamageEffectType damagetype, bool donePart, Unit *pCaster, Spell* spell)
@@ -8883,6 +8932,19 @@ float Unit::GetTotalAuraModValue(UnitMods unitMod) const
     value *= m_auraModifiersGroup[unitMod][BASE_PCT];
     value += m_auraModifiersGroup[unitMod][TOTAL_VALUE];
     value *= m_auraModifiersGroup[unitMod][TOTAL_PCT];
+
+    // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+    // - Curse of Shadow and Curse of the Elements - These curses can no 
+    //   longer cause resistance to become negative.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    // Auras can't cause resistances to dip below 0 since early vanilla
+    // PS: Actually, they can, but only visually advertised in the fields, calculations ignore it, we limit both
+    if ((unitMod >= UNIT_MOD_RESISTANCE_START) && (unitMod < UNIT_MOD_RESISTANCE_END) && 
+        (value < 0.0f) && (m_auraModifiersGroup[unitMod][BASE_VALUE] >= 0.0f))
+    {
+        value = 0.0f;
+    }
+#endif
 
     return value;
 }

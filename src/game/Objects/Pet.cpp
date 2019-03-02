@@ -1452,15 +1452,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
 
     for (int i = 0; i < 6; ++i)
     {
-        if (createResistance[i] < 0)
-        {
-            SpellImmune immune;
-            immune.type = (1 << (i + 1));
-            immune.spellId = 642; // Any positive spell, for Unit::IsImmuneToSpell
-            m_spellImmune[IMMUNITY_SCHOOL].push_back(immune);
-        }
-        else
-            SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, createResistance[i]);
+        SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, createResistance[i]);
     }
 
     UpdateAllStats();
