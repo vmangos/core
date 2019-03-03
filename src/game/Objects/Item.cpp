@@ -255,6 +255,8 @@ bool Item::Create(uint32 guidlow, uint32 itemid, ObjectGuid ownerGuid)
 
     SetUInt32Value(ITEM_FIELD_DURATION, itemProto->Duration);
 
+    itemProto->m_bObtained = true;
+
     return true;
 }
 

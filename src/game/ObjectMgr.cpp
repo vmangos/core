@@ -3233,6 +3233,50 @@ void ObjectMgr::CorrectItemModels(uint32 itemId, uint32& displayId)
 #endif
 }
 
+void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
+{
+    // These are all the items that have been obtained by players.
+    {
+        std::unique_ptr<QueryResult> result(CharacterDatabase.Query("SELECT DISTINCT `itemEntry` FROM `item_instance`"));
+        if (result)
+        {
+            do
+            {
+                Field *fields = result->Fetch();
+                uint32 itemId = fields[0].GetUInt32();
+                obtainedItems.insert(itemId);
+            } while (result->NextRow());
+        }
+    }
+    // Items used by spells need to be marked as obtained too.
+    {
+        for (uint32 spellId = 1; spellId < sSpellMgr.GetMaxSpellId(); ++spellId)
+        {
+            SpellEntry const *pSpellProto = sSpellMgr.GetSpellEntry(spellId);
+            if (!pSpellProto)
+                continue;
+
+            for (int i = 0; i < MAX_SPELL_TOTEMS; i++)
+            {
+                if (pSpellProto->Totem[i])
+                    obtainedItems.insert(pSpellProto->Totem[i]);
+            }
+
+            for (int i = 0; i < MAX_SPELL_REAGENTS; i++)
+            {
+                if (pSpellProto->Reagent[i])
+                    obtainedItems.insert(pSpellProto->Reagent[i]);
+            }
+            
+            for (int i = 0; i < MAX_SPELL_EFFECTS; i++)
+            {
+                if (pSpellProto->Effect[i] == SPELL_EFFECT_CREATE_ITEM)
+                    obtainedItems.insert(pSpellProto->EffectItemType[i]);
+            }
+        }
+    }
+}
+
 void ObjectMgr::LoadItemPrototypes()
 {
     sItemStorage.LoadProgressive(sWorld.GetWowPatch());
@@ -3240,12 +3284,19 @@ void ObjectMgr::LoadItemPrototypes()
     sLog.outString(">> Loaded %u item prototypes", sItemStorage.GetRecordCount());
     sLog.outString();
 
+    // Load all currently obtained items by players.
+    std::set<uint32> obtainedItems;
+    FillObtainedItemsList(obtainedItems);
+
     // check data correctness
     for (uint32 i = 1; i < sItemStorage.GetMaxEntry(); ++i)
     {
         ItemPrototype const* proto = sItemStorage.LookupEntry<ItemPrototype >(i);
         if (!proto)
             continue;
+
+        if (obtainedItems.find(i) != obtainedItems.end())
+            proto->m_bObtained = true;
 
         CorrectItemModels(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);
 
@@ -4858,17 +4909,21 @@ void ObjectMgr::LoadQuests()
 
         if (qinfo->SrcItemId)
         {
-            if (!sItemStorage.LookupEntry<ItemPrototype>(qinfo->SrcItemId))
+            if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(qinfo->SrcItemId))
+            {
+                pItemProto->m_bObtained = true; // all quest items count as obtained
+                if (qinfo->SrcItemCount == 0)
+                {
+                    sLog.outErrorDb("Quest %u has `SrcItemId` = %u but `SrcItemCount` = 0, set to 1 but need fix in DB.",
+                        qinfo->GetQuestId(), qinfo->SrcItemId);
+                    qinfo->SrcItemCount = 1;                    // update to 1 for allow quest work for backward compatibility with DB
+                }
+            }
+            else
             {
                 sLog.outErrorDb("Quest %u has `SrcItemId` = %u but item with entry %u does not exist, quest can't be done.",
                                 qinfo->GetQuestId(), qinfo->SrcItemId, qinfo->SrcItemId);
                 qinfo->SrcItemId = 0;                       // quest can't be done for this requirement
-            }
-            else if (qinfo->SrcItemCount == 0)
-            {
-                sLog.outErrorDb("Quest %u has `SrcItemId` = %u but `SrcItemCount` = 0, set to 1 but need fix in DB.",
-                                qinfo->GetQuestId(), qinfo->SrcItemId);
-                qinfo->SrcItemCount = 1;                    // update to 1 for allow quest work for backward compatibility with DB
             }
         }
         else if (qinfo->SrcItemCount > 0)
@@ -4908,7 +4963,9 @@ void ObjectMgr::LoadQuests()
 
                 qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER);
 
-                if (!sItemStorage.LookupEntry<ItemPrototype>(id))
+                if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
+                    pItemProto->m_bObtained = true;
+                else
                 {
                     sLog.outErrorDb("Quest %u has `ReqItemId%d` = %u but item with entry %u does not exist, quest can't be done.",
                                     qinfo->GetQuestId(), j + 1, id, id);
@@ -4927,7 +4984,9 @@ void ObjectMgr::LoadQuests()
         {
             if (uint32 id = qinfo->ReqSourceId[j])
             {
-                if (!sItemStorage.LookupEntry<ItemPrototype>(id))
+                if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
+                    pItemProto->m_bObtained = true;
+                else
                 {
                     sLog.outErrorDb("Quest %u has `ReqSourceId%d` = %u but item with entry %u does not exist, quest can't be done.",
                                     qinfo->GetQuestId(), j + 1, id, id);
@@ -5033,14 +5092,17 @@ void ObjectMgr::LoadQuests()
         {
             if (uint32 id = qinfo->RewChoiceItemId[j])
             {
-                if (!sItemStorage.LookupEntry<ItemPrototype>(id))
+                if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
+                {
+                    choice_found = true;
+                    pItemProto->m_bObtained = true;
+                }
+                else
                 {
                     sLog.outErrorDb("Quest %u has `RewChoiceItemId%d` = %u but item with entry %u does not exist, quest will not reward this item.",
                                     qinfo->GetQuestId(), j + 1, id, id);
                     qinfo->RewChoiceItemId[j] = 0;          // no changes, quest will not reward this
                 }
-                else
-                    choice_found = true;
 
                 if (!qinfo->RewChoiceItemCount[j])
                 {
@@ -5069,7 +5131,9 @@ void ObjectMgr::LoadQuests()
         {
             if (uint32 id = qinfo->RewItemId[j])
             {
-                if (!sItemStorage.LookupEntry<ItemPrototype>(id))
+                if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
+                    pItemProto->m_bObtained = true;
+                else
                 {
                     sLog.outErrorDb("Quest %u has `RewItemId%d` = %u but item with entry %u does not exist, quest will not reward this item.",
                                     qinfo->GetQuestId(), j + 1, id, id);
@@ -5254,12 +5318,6 @@ void ObjectMgr::LoadQuests()
             if (!quest->HasSpecialFlag(QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT))
             {
                 sLog.outDetail("Spell (id: %u) have SPELL_EFFECT_QUEST_COMPLETE for quest %u , but quest does not have SpecialFlags QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT (2) set. Quest SpecialFlags should be corrected to enable this objective.", spellInfo->Id, quest_id);
-
-                // The below forced alteration has been disabled because of spell 33824 / quest 10162.
-                // A startup error will still occur with proper data in quest_template, but it will be possible to sucessfully complete the quest with the expected data.
-
-                // this will prevent quest completing without objective
-                // const_cast<Quest*>(quest)->SetSpecialFlag(QUEST_SPECIAL_FLAG_EXPLORATION_OR_EVENT);
             }
         }
     }
@@ -9831,7 +9889,9 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
         }
     }
 
-    if (!GetItemPrototype(item_id))
+    if (ItemPrototype const* pItemProto = GetItemPrototype(item_id))
+        pItemProto->m_bObtained = true; // all vendor items count as obtained
+    else
     {
         if (pl)
             ChatHandler(pl).PSendSysMessage(LANG_ITEM_NOT_FOUND, item_id);

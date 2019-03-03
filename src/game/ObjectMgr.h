@@ -823,6 +823,7 @@ class ObjectMgr
         void LoadGameObjectLocales();
         void LoadGameobjects(bool reload = false);
         void LoadItemPrototypes();
+        void FillObtainedItemsList(std::set<uint32>&);
         void CorrectItemEffects(uint32, _ItemSpell&);
         void CorrectItemModels(uint32, uint32&);
         void LoadItemRequiredTarget();

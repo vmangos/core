@@ -456,6 +456,10 @@ LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Play
 // Inserts the item into the loot (called by LootTemplate processors)
 void Loot::AddItem(LootStoreItem const & item)
 {
+    ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
+    if (proto && !proto->m_bObtained)
+        proto->m_bObtained = true;
+
     if (item.needs_quest)                                   // Quest drop
     {
         if (m_questItems.size() < MAX_NR_QUEST_ITEMS)
@@ -470,7 +474,6 @@ void Loot::AddItem(LootStoreItem const & item)
         // non-ffa conditionals are counted in FillNonQuestNonFFAConditionalLoot()
         if (!item.conditionId)
         {
-            ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
             if (!proto || !(proto->Flags & ITEM_FLAG_PARTY_LOOT))
                 ++unlootedCount;
         }

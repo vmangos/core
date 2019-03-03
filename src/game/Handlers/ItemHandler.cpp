@@ -303,7 +303,7 @@ void WorldSession::HandleItemQuerySingleOpcode(WorldPacket & recv_data)
     DETAIL_LOG("STORAGE: Item Query = %u", item);
 
     ItemPrototype const *pProto = ObjectMgr::GetItemPrototype(item);
-    if (pProto)
+    if (pProto && (pProto->m_bObtained || (GetSecurity() > SEC_PLAYER) || !sWorld.getConfig(CONFIG_BOOL_PREVENT_ITEM_DATAMINING)))
     {
         std::string Name        = pProto->Name1;
         std::string Description = pProto->Description;

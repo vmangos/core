@@ -892,9 +892,14 @@ PerformanceLog.SlowPacketBroadcast      = 0
 #        Default: 1800000 (miliseconds, i.e 30 minutes)
 #                 0 (instance maps are kept in memory until they are reset)
 #
-#    Item.InstantSave.Quality
+#    Item.InstantSaveQuality
 #        Save character inventory instantly on receiving item of this quality or higher.
 #        Default: 6 - Artifact
+#
+#    Item.PreventDataMining
+#        Forbid querying information about items that have never been obtained.
+#        Default: 1 (true)
+#                 0 (false)
 #
 #    Quests.LowLevelHideDiff
 #        Quest level difference to hide for player low level quests:
@@ -1051,7 +1056,8 @@ Instance.IgnoreLevel = 0
 Instance.IgnoreRaid = 0
 Instance.ResetTimeHour = 4
 Instance.UnloadDelay = 1800000
-Item.InstantSave.Quality = 6
+Item.InstantSaveQuality = 6
+Item.PreventDataMining = 1
 Quests.LowLevelHideDiff = 4
 Quests.HighLevelHideDiff = 7
 Quests.IgnoreRaid = 0

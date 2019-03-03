@@ -494,6 +494,9 @@ struct ItemPrototype
     uint32 MinMoneyLoot;
     uint32 MaxMoneyLoot;
     uint32 ExtraFlags;                                      // see ItemExtraFlags
+    uint32 OtherTeamEntry;
+
+    mutable bool m_bObtained = false;                       // has item been obtained by players
 
     // helpers
     bool CanChangeEquipStateInCombat() const
