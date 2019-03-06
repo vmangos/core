@@ -457,8 +457,8 @@ LootSlotType LootItem::GetSlotTypeForSharedLoot(PermissionTypes permission, Play
 void Loot::AddItem(LootStoreItem const & item)
 {
     ItemPrototype const* proto = ObjectMgr::GetItemPrototype(item.itemid);
-    if (proto && !proto->m_bObtained)
-        proto->m_bObtained = true;
+    if (proto && !proto->m_bDiscovered)
+        proto->m_bDiscovered = true;
 
     if (item.needs_quest)                                   // Quest drop
     {

@@ -497,7 +497,7 @@ struct ItemPrototype
     uint32 ExtraFlags;                                      // see ItemExtraFlags
     uint32 OtherTeamEntry;
 
-    mutable bool m_bObtained = false;                       // has item been obtained by players
+    mutable bool m_bDiscovered = false;                     // has item been discovered by players
 
     // helpers
     bool CanChangeEquipStateInCombat() const

@@ -3248,7 +3248,7 @@ void ObjectMgr::FillObtainedItemsList(std::set<uint32>& obtainedItems)
             } while (result->NextRow());
         }
     }
-    // Items used by spells need to be marked as obtained too.
+    // Items used by spells need to be marked as discovered too.
     {
         for (uint32 spellId = 1; spellId < sSpellMgr.GetMaxSpellId(); ++spellId)
         {
@@ -3296,7 +3296,7 @@ void ObjectMgr::LoadItemPrototypes()
             continue;
 
         if (obtainedItems.find(i) != obtainedItems.end())
-            proto->m_bObtained = true;
+            proto->m_bDiscovered = true;
 
         CorrectItemModels(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);
 
@@ -4911,7 +4911,7 @@ void ObjectMgr::LoadQuests()
         {
             if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(qinfo->SrcItemId))
             {
-                pItemProto->m_bObtained = true; // all quest items count as obtained
+                pItemProto->m_bDiscovered = true; // all quest items count as discovered
                 if (qinfo->SrcItemCount == 0)
                 {
                     sLog.outErrorDb("Quest %u has `SrcItemId` = %u but `SrcItemCount` = 0, set to 1 but need fix in DB.",
@@ -4964,7 +4964,7 @@ void ObjectMgr::LoadQuests()
                 qinfo->SetSpecialFlag(QUEST_SPECIAL_FLAG_DELIVER);
 
                 if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
-                    pItemProto->m_bObtained = true;
+                    pItemProto->m_bDiscovered = true;
                 else
                 {
                     sLog.outErrorDb("Quest %u has `ReqItemId%d` = %u but item with entry %u does not exist, quest can't be done.",
@@ -4985,7 +4985,7 @@ void ObjectMgr::LoadQuests()
             if (uint32 id = qinfo->ReqSourceId[j])
             {
                 if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
-                    pItemProto->m_bObtained = true;
+                    pItemProto->m_bDiscovered = true;
                 else
                 {
                     sLog.outErrorDb("Quest %u has `ReqSourceId%d` = %u but item with entry %u does not exist, quest can't be done.",
@@ -5095,7 +5095,7 @@ void ObjectMgr::LoadQuests()
                 if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
                 {
                     choice_found = true;
-                    pItemProto->m_bObtained = true;
+                    pItemProto->m_bDiscovered = true;
                 }
                 else
                 {
@@ -5132,7 +5132,7 @@ void ObjectMgr::LoadQuests()
             if (uint32 id = qinfo->RewItemId[j])
             {
                 if (ItemPrototype const* pItemProto = sItemStorage.LookupEntry<ItemPrototype>(id))
-                    pItemProto->m_bObtained = true;
+                    pItemProto->m_bDiscovered = true;
                 else
                 {
                     sLog.outErrorDb("Quest %u has `RewItemId%d` = %u but item with entry %u does not exist, quest will not reward this item.",
@@ -9890,7 +9890,7 @@ bool ObjectMgr::IsVendorItemValid(bool isTemplate, char const* tableName, uint32
     }
 
     if (ItemPrototype const* pItemProto = GetItemPrototype(item_id))
-        pItemProto->m_bObtained = true; // all vendor items count as obtained
+        pItemProto->m_bDiscovered = true; // all vendor items count as discovered
     else
     {
         if (pl)
