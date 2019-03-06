@@ -58,6 +58,7 @@
 #include "CreatureLinkingMgr.h"
 #include "TemporarySummon.h"
 #include "ScriptedEscortAI.h"
+#include "GuardMgr.h"
 
 // apply implementation of the singletons
 #include "Policies/SingletonImp.h"
@@ -3263,6 +3264,9 @@ void Creature::OnEnterCombat(Unit* pWho, bool notInCombat)
                 if (pPlayer->GetReputationMgr().SetAtWar(GetReputationId(), true))
                     pPlayer->SendFactionAtWar(GetReputationId(), true);
         }
+
+        if (pWho->IsPlayer() && CanSummonGuards())
+            sGuardMgr.SummonGuard(this, static_cast<Player*>(pWho));
     }
 }
 
@@ -3574,6 +3578,25 @@ Unit* Creature::DoFindFriendlyCC(float range) const
     Cell::VisitGridObjects(this, searcher, range);
 
     return pUnit;
+}
+
+Creature* Creature::GetNearestGuard(float range) const
+{
+    Creature* pGuard = nullptr;
+
+    MaNGOS::NearestFriendlyGuardInRangeCheck u_check(this, range);
+    MaNGOS::CreatureLastSearcher<MaNGOS::NearestFriendlyGuardInRangeCheck> searcher(pGuard, u_check);
+
+    Cell::VisitGridObjects(this, searcher, range);
+
+    return pGuard;
+}
+
+void Creature::CallNearestGuard(Unit* pEnemy) const
+{
+    if (Creature* pGuard = GetNearestGuard(50.0f))
+        if (pGuard->AI() && pGuard->IsValidAttackTarget(pEnemy))
+            pGuard->AI()->AttackStart(pEnemy);
 }
 
 SpellCastResult Creature::TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags, uint8 uiChance)

@@ -52,7 +52,7 @@ enum CreatureFlagsExtra
     CREATURE_FLAG_EXTRA_INSTANCE_BIND                = 0x00000001,       // creature kill bind instance with killer and killer's group
     CREATURE_FLAG_EXTRA_NO_AGGRO                     = 0x00000002,       // not aggro (ignore faction/reputation hostility)
     CREATURE_FLAG_EXTRA_NO_PARRY                     = 0x00000004,       // creature can't parry
-    CREATURE_FLAG_EXTRA_NO_PARRY_HASTEN              = 0x00000008,       // creature can't counter-attack at parry
+    CREATURE_FLAG_EXTRA_SUMMON_GUARD                 = 0x00000008,       // creature summons a guard if an opposite faction player gets near or attacks
     CREATURE_FLAG_EXTRA_NO_BLOCK                     = 0x00000010,       // creature can't block
     CREATURE_FLAG_EXTRA_NO_CRUSH                     = 0x00000020,       // creature can't do crush attacks
     CREATURE_FLAG_EXTRA_NO_XP_AT_KILL                = 0x00000040,       // creature kill not provide XP
@@ -764,6 +764,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
         Unit* DoSelectLowestHpFriendly(float fRange, uint32 uiMinHPDiff = 1, bool bPercent = false, Unit* except = nullptr) const;
         Unit* DoFindFriendlyMissingBuff(float range, uint32 spellid, Unit* except = nullptr) const;
         Unit* DoFindFriendlyCC(float range) const;
+        Creature* GetNearestGuard(float range) const;
+        void CallNearestGuard(Unit* pEnemy) const;
 
         // Used by Creature Spells system to always know result of cast
         SpellCastResult TryToCast(Unit* pTarget, uint32 uiSpell, uint32 uiCastFlags, uint8 uiChance);
@@ -918,6 +920,8 @@ class MANGOS_DLL_SPEC Creature : public Unit
 
         void SetEscortable(bool escortable) { _isEscortable = escortable; }
         bool IsEscortable() const { return _isEscortable; }
+
+        bool CanSummonGuards() { return GetCreatureInfo()->flags_extra & CREATURE_FLAG_EXTRA_SUMMON_GUARD; }
 
     protected:
         bool MeetsSelectAttackingRequirement(Unit* pTarget, SpellEntry const* pSpellInfo, uint32 selectFlags) const;

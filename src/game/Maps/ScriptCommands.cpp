@@ -60,7 +60,7 @@ bool Map::ScriptCommand_Talk(const ScriptInfo& script, WorldObject* source, Worl
         textId = script.talk.textId[rand() % i];
     }
 
-    DoScriptText(textId, pSource, unitTarget, script.talk.chatType);
+    DoScriptText(textId, pSource, unitTarget, script.talk.chatType > 0 ? script.talk.chatType : -1);
 
     return false;
 }

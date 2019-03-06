@@ -25,6 +25,7 @@ set (game_SRCS
     Conditions.cpp
     CreatureGroups.cpp
     GameEventMgr.cpp
+    GuardMgr.cpp
     GMTicketMgr.cpp
     GossipDef.cpp
     HardcodedEvents.cpp
@@ -236,6 +237,7 @@ set (game_SRCS
     CreatureGroups.h
     Formulas.h
     GameEventMgr.h
+    GuardMgr.h
     GMTicketMgr.h
     GossipDef.h
     HardcodedEvents.h

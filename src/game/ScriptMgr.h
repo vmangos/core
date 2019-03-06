@@ -1121,7 +1121,7 @@ enum ScriptTarget
 };
 
 //Generic scripting functions
-void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, uint32 chatTypeOverride = 0);
+void DoScriptText(int32 textEntry, WorldObject* pSource, Unit* target = nullptr, int32 chatTypeOverride = -1);
 void DoOrSimulateScriptTextForMap(int32 iTextEntry, uint32 uiCreatureEntry, Map* pMap, Creature* pCreatureSource = nullptr, Unit* pTarget = nullptr);
 
 // Returns a target based on the type specified.

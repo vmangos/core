@@ -81,6 +81,7 @@
 #include "Anticheat/Anticheat.h"
 #include "AuraRemovalMgr.h"
 #include "InstanceStatistics.h"
+#include "GuardMgr.h"
 
 #include <chrono>
 
@@ -1776,6 +1777,7 @@ void World::Update(uint32 diff)
     sMapMgr.Update(diff);
     sBattleGroundMgr.Update(diff);
     sLFGMgr.Update(diff);
+    sGuardMgr.Update(diff);
     sZoneScriptMgr.Update(diff);
     sAutoTestingMgr->Update(diff);
     sNodesMgr->OnWorldUpdate(diff);

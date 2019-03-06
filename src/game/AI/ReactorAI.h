@@ -28,13 +28,18 @@ class MANGOS_DLL_DECL ReactorAI : public CreatureAI
 {
     public:
 
-        explicit ReactorAI(Creature *c) : CreatureAI(c) {}
+        explicit ReactorAI(Creature* c) : CreatureAI(c), m_bCanSummonGuards(c->CanSummonGuards()) {}
 
-        void MoveInLineOfSight(Unit *) override { };
-        void AttackStart(Unit *) override;
+        void MoveInLineOfSight(Unit*) override;
+        void AttackStart(Unit*) override;
         void UpdateAI(const uint32) override;
+        void JustRespawned() override;
 
-        static int Permissible(const Creature *);
+        bool CanSummonGuards() const { return m_bCanSummonGuards; }
+
+        static int Permissible(const Creature*);
+    private:
+        bool m_bCanSummonGuards;
 };
 
 #endif

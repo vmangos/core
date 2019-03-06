@@ -2335,7 +2335,7 @@ void ScriptMgr::CollectPossibleEventIds(std::set<uint32>& eventIds)
     }
 }
 
-void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, uint32 chatTypeOverride)
+void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, int32 chatTypeOverride)
 {
     if (!pSource)
     {
@@ -2379,7 +2379,7 @@ void DoScriptText(int32 iTextEntry, WorldObject* pSource, Unit* pTarget, uint32 
         }
     }
 
-    if (chatTypeOverride)
+    if (chatTypeOverride >= 0)
         Type = chatTypeOverride;
 
     DEBUG_LOG("DoScriptText: text entry=%i, Sound=%u, Type=%u, Language=%u, Emote=%u",
