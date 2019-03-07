@@ -30,11 +30,9 @@ class Player;
 
 struct AreaGuardInfo
 {
-    AreaGuardInfo(uint32 creature_id_ally, uint32 creature_id_horde, uint32 text_id_alliance, uint32 text_id_horde) : creatureIdAlliance(creature_id_ally), creatureIdHorde(creature_id_horde), textIdAlliance(text_id_alliance), textIdHorde(text_id_horde), cooldown(0), charges(GUARD_POST_MAX_CHARGES) {}
+    AreaGuardInfo(uint32 creature_id_ally, uint32 creature_id_horde) : creatureIdAlliance(creature_id_ally), creatureIdHorde(creature_id_horde), cooldown(0), charges(GUARD_POST_MAX_CHARGES) {}
     uint32 const creatureIdAlliance;
     uint32 const creatureIdHorde;
-    uint32 const textIdAlliance;
-    uint32 const textIdHorde;
     uint32 cooldown;
     uint32 charges;
 };
@@ -45,6 +43,7 @@ class GuardMgr
         GuardMgr();
         ~GuardMgr() {}
         void Update(uint32 diff);
+        uint32 GetTextId(uint32 factionTemplateId, uint32 areaId) const;
         bool SummonGuard(Creature* pCivilian, Player* pEnemy);
     private:
         std::unordered_map<uint32, AreaGuardInfo> m_mAreaGuardInfo;
