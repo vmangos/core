@@ -3295,7 +3295,8 @@ void ObjectMgr::LoadItemPrototypes()
         if (!proto)
             continue;
 
-        if (obtainedItems.find(i) != obtainedItems.end())
+        if ((obtainedItems.find(i) != obtainedItems.end()) ||
+            (proto->ExtraFlags & ITEM_EXTRA_MAIL_STATIONERY))
             proto->m_bDiscovered = true;
 
         CorrectItemModels(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);
