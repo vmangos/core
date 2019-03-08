@@ -3300,7 +3300,8 @@ void ObjectMgr::LoadItemPrototypes()
             continue;
 
         if ((obtainedItems.find(i) != obtainedItems.end()) ||
-            (proto->ExtraFlags & ITEM_EXTRA_MAIL_STATIONERY))
+            (proto->ExtraFlags & ITEM_EXTRA_MAIL_STATIONERY) ||
+            !sWorld.getConfig(CONFIG_BOOL_PREVENT_ITEM_DATAMINING))
             proto->m_bDiscovered = true;
 
         CorrectItemModels(i, const_cast<ItemPrototype*>(proto)->DisplayInfoID);

@@ -55,7 +55,7 @@ void utf8print(void* arg, const char* str)
         wtemp_buf.push_back('\0');
         temp_buf.resize(wtemp_buf.size());
         CharToOemBuffW(&wtemp_buf[0], &temp_buf[0], wtemp_buf.size());
-}
+    }
 
     printf("%s", temp_buf.c_str());
 #else
