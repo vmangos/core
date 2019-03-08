@@ -288,15 +288,16 @@ bool AccountMgr::CheckPassword(uint32 accid, std::string passwd, std::string use
 
 bool AccountMgr::normalizeString(std::string& utf8str)
 {
-    wchar_t wstr_buf[MAX_ACCOUNT_STR + 1];
-
-    size_t wstr_len = MAX_ACCOUNT_STR;
-    if (!Utf8toWStr(utf8str, wstr_buf, wstr_len))
+    std::wstring wstr_buf;
+    if (!Utf8toWStr(utf8str, wstr_buf))
         return false;
 
-    std::transform(&wstr_buf[0], wstr_buf + wstr_len, &wstr_buf[0], wcharToUpperOnlyLatin);
+    if (wstr_buf.size() > MAX_ACCOUNT_STR)
+        return false;
 
-    return WStrToUtf8(wstr_buf, wstr_len, utf8str);
+    std::transform(wstr_buf.begin(), wstr_buf.end(), wstr_buf.begin(), wcharToUpperOnlyLatin);
+
+    return WStrToUtf8(wstr_buf, utf8str);
 }
 
 std::string AccountMgr::CalculateShaPassHash(std::string& name, std::string& password)

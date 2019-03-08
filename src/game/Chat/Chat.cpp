@@ -269,6 +269,7 @@ ChatCommand * ChatHandler::getCommandTable()
         { NODE, "movemotion",     SEC_DEVELOPPER,     false, &ChatHandler::HandleDebugMoveCommand,                "", nullptr },
         { NODE, "factionchange_items", SEC_ADMINISTRATOR, true, &ChatHandler::HandleFactionChangeItemsCommand,    "", nullptr },
         { NODE, "loottable",      SEC_DEVELOPPER,     true,  &ChatHandler::HandleDebugLootTableCommand,           "", nullptr },
+        { NODE, "utf8overflow",   SEC_ADMINISTRATOR,  true,  &ChatHandler::HandleDebugOverflowCommand,            "", nullptr },
         { MSTR,  nullptr,         0,                  false, nullptr,                                             "", nullptr }
     };
 
