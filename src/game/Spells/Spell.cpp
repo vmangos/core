@@ -6295,18 +6295,9 @@ SpellCastResult Spell::CheckCast(bool strict)
                 break;
             case SPELL_EFFECT_SUMMON_PET:
             {
-                if (m_caster->GetPetGuid())                 // let warlock do a replacement summon
-                {
-                    if (m_caster->GetTypeId() == TYPEID_PLAYER && m_caster->getClass() == CLASS_WARLOCK)
-                    {
-                        Pet* pet = ((Player*)m_caster)->GetPet();
-                        // Nostalrius : Fix spellId (celui de MaNGOS est post-BC)
-                        if (strict && pet)                //starting cast, trigger pet stun (cast by pet so it doesn't attack player)
-                            pet->CastSpell(pet, 29825, true, nullptr, nullptr, pet->GetObjectGuid());
-                    }
-                    else
-                        return SPELL_FAILED_ALREADY_HAVE_SUMMON;
-                }
+                // In Vanilla old pets were unsummoned as soon as you began summoning a new one.
+                if (!m_caster->UnsummonOldPetBeforeNewSummon(m_spellInfo->EffectMiscValue[i]))
+                    return SPELL_FAILED_ALREADY_HAVE_SUMMON;
 
                 if (m_caster->GetCharmGuid())
                     return SPELL_FAILED_ALREADY_HAVE_CHARM;

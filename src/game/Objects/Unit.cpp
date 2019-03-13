@@ -6363,6 +6363,34 @@ void Unit::UnsummonAllTotems()
             totem->UnSummon();
 }
 
+bool Unit::UnsummonOldPetBeforeNewSummon(uint32 newPetEntry)
+{
+    Pet *OldSummon = GetPet();
+
+    // if pet requested type already exist
+    if (OldSummon)
+    {
+        if (newPetEntry == 0 || OldSummon->GetEntry() == newPetEntry)
+        {
+            if (OldSummon->isDead())
+            {
+                if (newPetEntry) // warlock pet
+                    OldSummon->Unsummon(PET_SAVE_NOT_IN_SLOT);
+                else
+                    return false; // pet in corpse state can't be unsummoned
+            }
+            else
+                OldSummon->GetMap()->Remove((Creature*)OldSummon, false);
+        }
+        else if (IsPlayer())
+            OldSummon->Unsummon(OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, this);
+        else
+            return false;
+    }
+
+    return true;
+}
+
 int32 Unit::DealHeal(Unit *pVictim, uint32 addhealth, SpellEntry const *spellProto, bool critical)
 {
     // Script Event HealedBy

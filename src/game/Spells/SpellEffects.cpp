@@ -3892,28 +3892,8 @@ void Spell::EffectSummonPet(SpellEffectIndex eff_idx)
 
 ObjectGuid Unit::EffectSummonPet(uint32 spellId, uint32 petEntry, uint32 petLevel)
 {
-    Pet *OldSummon = GetPet();
-
-    // if pet requested type already exist
-    if (OldSummon)
-    {
-        if (petEntry == 0 || OldSummon->GetEntry() == petEntry)
-        {
-            if (OldSummon->isDead())
-            {
-                if (petEntry) // Warlock pet
-                    OldSummon->Unsummon(PET_SAVE_NOT_IN_SLOT);
-                else
-                    return ObjectGuid(); // pet in corpse state can't be summoned
-            }
-            else
-                OldSummon->GetMap()->Remove((Creature*)OldSummon, false);
-        }
-        else if (GetTypeId() == TYPEID_PLAYER)
-            OldSummon->Unsummon(OldSummon->getPetType() == HUNTER_PET ? PET_SAVE_AS_DELETED : PET_SAVE_NOT_IN_SLOT, this);
-        else
-            return ObjectGuid();
-    }
+    if (!UnsummonOldPetBeforeNewSummon(petEntry))
+        return ObjectGuid();
 
     CreatureInfo const* cInfo = petEntry ? sCreatureStorage.LookupEntry<CreatureInfo>(petEntry) : NULL;
 
