@@ -40,7 +40,8 @@
 #include "BattleGroundMgr.h"
 #include "MapManager.h"
 #include "SocialMgr.h"
-
+#include "WardenWin.h"
+#include "WardenMac.h"
 #include "PlayerBotMgr.h"
 #include "Anticheat.h"
 #include "Language.h"
@@ -1113,9 +1114,18 @@ void WorldSession::SetDumpRecvPackets(const char* file)
         fprintf(_pcktRecvDump, "#Begin packet dump on %s [account %s]\n", GetPlayerName(), GetUsername().c_str());
 }
 
-void WorldSession::InitWarden(BigNumber* K)
+void WorldSession::InitWarden(BigNumber* k)
 {
-    m_warden = sAnticheatLib->CreateWardenFor(this, K);
+    ClientOSType os = GetOS();
+
+    if (os == CLIENT_OS_WIN && sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED)) {
+        m_warden = new WardenWin();
+        m_warden->Init(this, k);
+    }
+    else if (os == CLIENT_OS_MAC && sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED)) {
+        m_warden = new WardenMac();
+        m_warden->Init(this, k);
+    }
 }
 
 void WorldSession::ProcessAnticheatAction(const char* detector, const char* reason, uint32 cheatAction, uint32 banSeconds)

@@ -35,6 +35,7 @@ set (shared_SRCS
     Util.h
     WheatyExceptionReport.h
     WorldPacket.h
+    Auth/ARC4.h
     Auth/AuthCrypt.h
     Auth/base32.h
     Auth/BigNumber.h
@@ -72,6 +73,7 @@ set (shared_SRCS
     Util.cpp
     Duration.h
     WheatyExceptionReport.cpp
+    Auth/ARC4.cpp
     Auth/AuthCrypt.cpp
     Auth/base32.cpp
     Auth/BigNumber.cpp

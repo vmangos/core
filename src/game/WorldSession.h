@@ -51,11 +51,11 @@ class LoginQueryHolder;
 class CharacterHandler;
 class MovementInfo;
 class WorldSession;
-class WardenInterface;
 class BigNumber;
 class BehaviorAnalyzer;
 class NodeSession;
 class MasterPlayer;
+class Warden;
 
 struct OpcodeHandler;
 struct PlayerBotEntry;
@@ -499,7 +499,7 @@ class MANGOS_DLL_SPEC WorldSession
         void ComputeClientHash();
         bool IsClientHashComputed() const { return _clientHashComputeStep != HASH_NOT_COMPUTED; }
 
-        WardenInterface* GetWarden() const { return m_warden; }
+        Warden* GetWarden() const { return m_warden; }
 
         void AddScript(std::string name, WorldSessionScript* script)
         {
@@ -943,7 +943,7 @@ class MANGOS_DLL_SPEC WorldSession
         ACE_Based::LockedQueue<WorldPacket*, ACE_Thread_Mutex> _recvQueue[PACKET_PROCESS_MAX_TYPE];
         bool _receivedPacketType[PACKET_PROCESS_MAX_TYPE];
 
-        WardenInterface* m_warden;
+        Warden* m_warden;
         std::string m_username;
         uint32 _floodPacketsCount[FLOOD_MAX_OPCODES_TYPE];
         PlayerBotEntry* m_bot;

@@ -1271,14 +1271,3 @@ void WorldSession::HandleRequestPetInfoOpcode(WorldPacket & /*recv_data */)
     else if (_player->GetCharm())
         _player->CharmSpellInitialize();
 }
-
-void WorldSession::HandleWardenDataOpcode(WorldPacket & recv_data)
-{
-    if (!m_warden)
-    {
-        sLog.outWarden("HandleWardenDataOpcode: warden interface not found!");
-        return;
-    }
-
-    m_warden->HandleWardenDataOpcode(recv_data);
-}
