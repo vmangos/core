@@ -55,16 +55,16 @@ void WardenMac::Init(WorldSession* pClient, BigNumber* K)
 
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
-    sLog.outWarden("Server side Mac warden for client %u (build %u) initializing...", pClient->GetAccountId(), _session->GetGameBuild());
-    sLog.outWarden("C->S Key: %s", ByteArrayToHexStr(_inputKey, 16).c_str());
-    sLog.outWarden("S->C Key: %s", ByteArrayToHexStr(_outputKey, 16).c_str());
-    sLog.outWarden("  Seed: %s", ByteArrayToHexStr(_seed, 16).c_str());
-    sLog.outWarden("Loading Module...");
+    sLog.outWardenDebug("Server side Mac warden for client %u (build %u) initializing...", pClient->GetAccountId(), _session->GetGameBuild());
+    sLog.outWardenDebug("C->S Key: %s", ByteArrayToHexStr(_inputKey, 16).c_str());
+    sLog.outWardenDebug("S->C Key: %s", ByteArrayToHexStr(_outputKey, 16).c_str());
+    sLog.outWardenDebug("  Seed: %s", ByteArrayToHexStr(_seed, 16).c_str());
+    sLog.outWardenDebug("Loading Module...");
 
     _module = GetModuleForClient();
 
-    sLog.outWarden("Module Key: %s", ByteArrayToHexStr(_module->Key, 16).c_str());
-    sLog.outWarden("Module ID: %s", ByteArrayToHexStr(_module->Id, 16).c_str());
+    sLog.outWardenDebug("Module Key: %s", ByteArrayToHexStr(_module->Key, 16).c_str());
+    sLog.outWardenDebug("Module ID: %s", ByteArrayToHexStr(_module->Id, 16).c_str());
     RequestModule();
 }
 
@@ -91,7 +91,7 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 
 void WardenMac::InitializeModule()
 {
-    sLog.outWarden("Initialize module");
+    sLog.outWardenDebug("Initialize module");
     Warden::InitializeModule();
 }
 
@@ -148,13 +148,11 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
     // Verify key
     if (memcmp(buff.contents() + 1, sha1.GetDigest(), 20) != 0)
     {
-        sLog.outWarden("%s failed hash reply. Action: %s", _session->GetPlayerName(), Penalty().c_str());
-        if (sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_FAIL_ACTION) > uint32(WARDEN_ACTION_LOG))
-            _session->KickPlayer();
+        ApplyPenalty("failed hash reply");
         return;
     }
 
-    sLog.outWarden("Request hash reply: succeed");
+    sLog.outWardenDebug("Request hash reply: succeed");
 
     // client 7F96EEFDA5B63D20A4DF8E00CBF48304
     //const uint8 client_key[16] = { 0x7F, 0x96, 0xEE, 0xFD, 0xA5, 0xB6, 0x3D, 0x20, 0xA4, 0xDF, 0x8E, 0x00, 0xCB, 0xF4, 0x83, 0x04 };
@@ -174,7 +172,7 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
 
 void WardenMac::RequestData()
 {
-    sLog.outWarden("Request data");
+    sLog.outWardenDebug("Request data");
 
     ByteBuffer buff;
     buff << uint8(WARDEN_SMSG_CHEAT_CHECKS_REQUEST);
@@ -198,22 +196,10 @@ void WardenMac::RequestData()
 
 void WardenMac::HandleData(ByteBuffer &buff)
 {
-    sLog.outWarden("Handle data");
-
-    //uint16 Length;
-    //buff >> Length;
-    //uint32 Checksum;
-    //buff >> Checksum;
-
-    //if (!IsValidCheckSum(Checksum, buff.contents() + buff.rpos(), Length))
-    //{
-    //    buff.rpos(buff.wpos());
-    //    if (sWorld->getBoolConfig(CONFIG_BOOL_WARDEN_KICK))
-    //        Client->KickPlayer();
-    //    return;
-    //}
+    sLog.outWardenDebug("Handle data");
 
     bool found = false;
+    std::string reason;
 
     std::string str = "Test string!";
 
@@ -228,7 +214,7 @@ void WardenMac::HandleData(ByteBuffer &buff)
 
     if (memcmp(sha1Hash, sha1.GetDigest(), 20) != 0)
     {
-        sLog.outWarden("Handle data failed: SHA1 hash is wrong!");
+        reason = "sent wrong SHA1 hash";
         found = true;
     }
 
@@ -243,14 +229,14 @@ void WardenMac::HandleData(ByteBuffer &buff)
 
     if (memcmp(ourMD5Hash, theirsMD5Hash, 16) != 0)
     {
-        sLog.outWarden("Handle data failed: MD5 hash is wrong!");
+        reason = "sent wrong MD5 hash";
         found = true;
     }
 
-    if (found && sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_FAIL_ACTION) > uint32(WARDEN_ACTION_LOG))
-        _session->KickPlayer();
+    if (found)
+        ApplyPenalty(reason);
     else
-        sLog.outWarden("SHA1 and MD5 hash verified. Handle data passed.");
+        sLog.outWardenDebug("SHA1 and MD5 hash verified. Handle data passed.");
 
     Warden::HandleData(buff);
 }

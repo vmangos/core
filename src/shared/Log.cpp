@@ -57,7 +57,7 @@ LogFilterData logFilterData[LOG_FILTER_COUNT] =
 
 Log::Log() :
     logfile(nullptr), gmLogfile(nullptr), dberLogfile(nullptr),
-    wardenLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_includeTime(false), m_gmlog_per_account(false)
+    wardenLogfile(nullptr), honorLogfile(nullptr), m_colored(false), m_wardenDebug(false), m_includeTime(false), m_gmlog_per_account(false)
 {
     for (int i = 0; i < LOG_MAX_FILES; ++i)
     {
@@ -315,6 +315,7 @@ void Log::Initialize()
     timestampPrefix[LOG_DBERRFIX] = false;
 
     // Main log file settings
+    m_wardenDebug  = sConfig.GetBoolDefault("Warden.DebugLog", false);
     m_includeTime  = sConfig.GetBoolDefault("LogTime", false);
     m_logLevel     = LogLevel(sConfig.GetIntDefault("LogLevel", 0));
     m_logFileLevel = LogLevel(sConfig.GetIntDefault("LogFileLevel", 0));
@@ -788,6 +789,9 @@ void Log::outWarden(const char *wrd, ...)
     if (m_includeTime)
         outTime(stdout);
 
+    // Append tag to console warden messages.
+    printf("[Warden] ");
+
     va_list ap;
     va_start(ap, wrd);
     vutf8printf(stdout, wrd, &ap);
@@ -801,6 +805,51 @@ void Log::outWarden(const char *wrd, ...)
     if (wardenLogfile)
     {
         outTimestamp(wardenLogfile);
+        fprintf(wardenLogfile, "[Warden] ");
+
+        va_list ap;
+        va_start(ap, wrd);
+        vfprintf(wardenLogfile, wrd, ap);
+        va_end(ap);
+
+        fprintf(wardenLogfile, "\n");
+        fflush(wardenLogfile);
+    }
+
+    fflush(stdout);
+}
+
+void Log::outWardenDebug(const char *wrd, ...)
+{
+    if (!m_wardenDebug)
+        return;
+
+    if (!wrd)
+        return;
+
+    if (m_colored)
+        SetColor(true, m_colors[LogWarden]);
+
+    if (m_includeTime)
+        outTime(stdout);
+
+    // Append tag to console warden messages.
+    printf("[Warden] ");
+
+    va_list ap;
+    va_start(ap, wrd);
+    vutf8printf(stdout, wrd, &ap);
+    va_end(ap);
+
+    if (m_colored)
+        ResetColor(true);
+
+    printf("\n");
+
+    if (wardenLogfile)
+    {
+        outTimestamp(wardenLogfile);
+        fprintf(wardenLogfile, "[Warden] ");
 
         va_list ap;
         va_start(ap, wrd);

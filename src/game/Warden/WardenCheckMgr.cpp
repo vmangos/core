@@ -45,23 +45,31 @@ void WardenCheckMgr::LoadWardenChecks()
     // Check if Warden is enabled by config before loading anything
     if (!sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED))
     {
-        sLog.outBasic(">> Warden disabled, loading checks skipped.");
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString();
+        sLog.outString(">> Warden disabled, loading checks skipped.");
         return;
     }
-                                                  //  0   1      2     3     4       5        6       7    8
-    QueryResult *result = WorldDatabase.Query("SELECT id, build, type, data, result, address, length, str, comment FROM warden ORDER BY build ASC, id ASC");
+    //                                                                0     1        2       3       4         5          6         7      8          9
+    std::unique_ptr<QueryResult> result (WorldDatabase.Query("SELECT `id`, `build`, `type`, `data`, `result`, `address`, `length`, `str`, `penalty`, `comment` FROM `warden_checks` ORDER BY `build` ASC, `id` ASC"));
 
     if (!result)
     {
-        sLog.outBasic("[Warden]: >> Loaded 0 warden data and results");
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString();
+        sLog.outString(">> Loaded 0 warden data and results");
         return;
     }
 
     uint32 count = 0;
     Field* fields;
+    BarGoLink bar(result->GetRowCount());
 
     do
     {
+        bar.step();
         fields = result->Fetch();
 
         uint16 id               = fields[0].GetUInt16();
@@ -72,14 +80,18 @@ void WardenCheckMgr::LoadWardenChecks()
         uint32 address          = fields[5].GetUInt32();
         uint8 length            = fields[6].GetUInt8();
         std::string str         = fields[7].GetString();
-        std::string comment     = fields[8].GetString();
+        int8 penalty            = fields[8].GetUInt8();
+        std::string comment     = fields[9].GetString();
 
         WardenCheck* wardenCheck = new WardenCheck();
         wardenCheck->Type = checkType;
         wardenCheck->CheckId = id;
 
+        if (penalty < WARDEN_ACTION_LOG || penalty >= WARDEN_ACTION_MAX)
+            penalty = sWorld.getConfig(CONFIG_UINT32_WARDEN_DEFAULT_PENALTY);
+
         // Initialize action with default action from config
-        wardenCheck->Action = WardenActions(sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_FAIL_ACTION));
+        wardenCheck->Action = WardenActions(penalty);
 
         if (checkType == PAGE_CHECK_A || checkType == PAGE_CHECK_B || checkType == DRIVER_CHECK)
         {
@@ -134,67 +146,13 @@ void WardenCheckMgr::LoadWardenChecks()
         ++count;
     } while (result->NextRow());
 
-    sLog.outBasic(">> Loaded %u warden checks.", count);
-
-    delete result;
-}
-
-void WardenCheckMgr::LoadWardenOverrides()
-{
-    // Check if Warden is enabled by config before loading anything
-    if (!sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED))
-    {
-        sLog.outBasic(">> Warden disabled, loading check overrides skipped.");
-        return;
-    }
-
-    //                                                    0         1
-    QueryResult* result = CharacterDatabase.Query("SELECT wardenId, action FROM warden_action");
-
-    if (!result)
-    {
-        sLog.outBasic(">> Loaded 0 Warden action overrides. DB table `warden_action` is empty!");
-        return;
-    }
-
-    uint32 count = 0;
-
-    WriteGuard guard(m_lock);
-
-    do
-    {
-        Field* fields = result->Fetch();
-
-        uint16 checkId = fields[0].GetUInt16();
-        uint8  action  = fields[1].GetUInt8();
-
-        // Check if action value is in range (0-2, see WardenActions enum)
-        if (action > WARDEN_ACTION_BAN)
-            sLog.outWarden("Warden check override action out of range (ID: %u, action: %u)", checkId, action);
-        else 
-        {
-            bool found = false;
-            for (CheckMap::iterator it = CheckStore.begin(); it != CheckStore.end(); ++it)
-            {
-                if (it->second->CheckId == checkId)
-                {
-                    it->second->Action = WardenActions(action);
-                    ++count;
-                    found = true;
-                }
-            }
-            if (!found)
-                sLog.outWarden("Warden check action override for non-existing check (ID: %u, action: %u), skipped", checkId, action);
-        }
-    }
-    while (result->NextRow());
-
-    sLog.outBasic(">> Loaded %u warden action overrides.", count);
+    sLog.outString();
+    sLog.outString(">> Loaded %u warden checks.", count);
 }
 
 WardenCheck* WardenCheckMgr::GetWardenDataById(uint16 build, uint16 id)
 {
-    WardenCheck* result = NULL;
+    WardenCheck* result = nullptr;
 
     ReadGuard guard(m_lock);
     for (CheckMap::iterator it = CheckStore.lower_bound(build); it != CheckStore.upper_bound(build); ++it)
@@ -208,7 +166,7 @@ WardenCheck* WardenCheckMgr::GetWardenDataById(uint16 build, uint16 id)
 
 WardenCheckResult* WardenCheckMgr::GetWardenResultById(uint16 build, uint16 id)
 {
-    WardenCheckResult* result = NULL;
+    WardenCheckResult* result = nullptr;
 
     ReadGuard guard(m_lock);
     for (CheckResultMap::iterator it = CheckResultStore.lower_bound(build); it != CheckResultStore.upper_bound(build); ++it)
@@ -222,7 +180,7 @@ WardenCheckResult* WardenCheckMgr::GetWardenResultById(uint16 build, uint16 id)
 
 void WardenCheckMgr::GetWardenCheckIds(bool isMemCheck, uint16 build, std::list<uint16>& idl)
 {
-    idl.clear(); //just to be sure
+    idl.clear(); // just to be sure
 
     ReadGuard guard(m_lock);
     for (CheckMap::iterator it = CheckStore.lower_bound(build); it != CheckStore.upper_bound(build); ++it)

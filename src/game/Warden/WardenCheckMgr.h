@@ -27,7 +27,8 @@ enum WardenActions
 {
     WARDEN_ACTION_LOG,
     WARDEN_ACTION_KICK,
-    WARDEN_ACTION_BAN
+    WARDEN_ACTION_BAN,
+    WARDEN_ACTION_MAX
 };
 
 struct WardenCheck
@@ -66,7 +67,6 @@ class WardenCheckMgr
         void GetWardenCheckIds(bool isMemCheck /* true = MEM */, uint16 build, std::list<uint16>& list);
 
         void LoadWardenChecks();
-        void LoadWardenOverrides();
 
     private:
         typedef std::multimap< uint16, WardenCheck* > CheckMap;

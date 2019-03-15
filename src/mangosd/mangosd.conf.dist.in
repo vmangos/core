@@ -507,6 +507,15 @@ DebuffLimit = 0
 #        Default: 0 - include in log if log level permit
 #                 1 - not include with any log level
 #
+#    WardenLogFile
+#        Log file for warden check results
+#        Default: "world.log"
+#
+#    WardenLogTimestamp
+#        Logfile with timestamp of server start in name
+#        Default: 0 - no timestamp in name
+#                 1 - add timestamp in name in form Logname_YYYY-MM-DD_HH-MM-SS.Ext for Logname.Ext
+#
 #    WorldLogFile
 #        Packet logging file for the worldserver
 #        Default: "world.log"
@@ -642,6 +651,8 @@ LogFilter_SpellCast = 0
 LogFilter_DbStrictedCheck = 1
 LogFilter_Pathfinding = 0
 LogFilter_Honor = 1
+WardenLogFile = "warden.log"
+WardenLogTimestamp = 0
 WorldLogFile = ""
 WorldLogTimestamp = 0
 HonorLogFile = ""
@@ -1410,6 +1421,79 @@ WhisperRestriction = 0
 SayMinLevel = 0;
 SayEmoteMinLevel = 0;
 Antiflood.Sanction = 4
+
+###################################################################################################
+# WARDEN SETTINGS
+#
+#    Warden.WinEnabled
+#        Description: Enables Warden checks for Windows clients.
+#        Default:     1 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Warden.OSXEnabled
+#        Description: Enables Warden checks for OSX clients.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+#    Warden.NumMemChecks
+#        Description: Number of Warden memory checks that are sent to the client each cycle.
+#        Default:     3 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Warden.NumOtherChecks
+#        Description: Number of Warden checks other than memory checks that are added to request
+#                     each checking cycle.
+#        Default:     7 - (Enabled)
+#                     0 - (Disabled)
+#
+#    Warden.ClientResponseDelay
+#        Description: Time (in seconds) before client is getting disconnecting for not responding.
+#        Default:     120 - (2 Minutes)
+#                     0 - (Disabled, client won't be kicked)
+#
+#    Warden.ClientCheckHoldOff
+#        Description: Time (in seconds) to wait before sending the next check request to the client.
+#                     A low number increases traffic and load on client and server side.
+#        Default:     30 - (30 Seconds)
+#                     0  - (Send check as soon as possible)
+#
+#    Warden.DefaultPenalty
+#        Description: Default action being taken if a client check failed. Penalties can be
+#                     customized per check id in the warden_checks table.
+#        Default:     1 - (Kick)
+#                     0 - (Disabled, Logging only)
+#                     2 - (Ban)
+#
+#    Warden.BanDuration
+#        Description: Time (in seconds) an account will be banned if Penalty is set
+#                     to ban.
+#        Default:     86400 - (24 hours)
+#                     0     - (Permanent ban)
+#
+#    Warden.DebugLog
+#        Description: Prints additional information about every check performed.
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
+#
+#    Warden.DBLogLevel
+#        Description: The minimal WardenActions value of Warden check to be logged into realmd.warden_log table.
+#                     WardenActions: 0 - log, 1 - kick, 2 - ban
+#
+#        Deafult:     0 - (Logging any failed check)
+#                     3 - (Disable DB logging)
+#
+###################################################################################################
+
+Warden.WinEnabled            = 1
+Warden.OSXEnabled            = 0
+Warden.NumMemChecks          = 3
+Warden.NumOtherChecks        = 7
+Warden.ClientResponseDelay   = 120
+Warden.ClientCheckHoldOff    = 30
+Warden.DefaultPenalty        = 1
+Warden.BanDuration           = 86400
+Warden.DebugLog              = 0
+Warden.DBLogLevel            = 0
 
 ###################################################################################################################
 # GAME MASTER SETTINGS

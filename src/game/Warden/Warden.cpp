@@ -28,6 +28,7 @@
 #include "Util.h"
 #include "Warden.h"
 #include "AccountMgr.h"
+#include "Language.h"
 
 Warden::Warden() : _session(nullptr), _inputCrypto(16), _outputCrypto(16), _checkTimer(10000/*10 sec*/), _clientResponseTimer(0),
                    _state(WardenState::STATE_INITIAL), _module(nullptr)
@@ -52,7 +53,7 @@ void Warden::InitializeModule()
 
 void Warden::RequestHash()
 {
-    sLog.outWarden("Request hash");
+    sLog.outWardenDebug("Requesting hash");
 
     // Create packet structure
     WardenHashRequest Request;
@@ -71,7 +72,7 @@ void Warden::RequestHash()
 
 void Warden::SendModuleToClient()
 {
-    sLog.outWarden("Send module to client");
+    sLog.outWardenDebug("Sending module to client");
 
     // Create packet structure
     WardenModuleTransfer packet;
@@ -99,7 +100,7 @@ void Warden::SendModuleToClient()
 
 void Warden::RequestModule()
 {
-    sLog.outWarden("Request module");
+    sLog.outWardenDebug("Requesting module");
 
     // Create packet structure
     WardenModuleUse request;
@@ -141,8 +142,8 @@ void Warden::Update()
                 // Kick player if client response delays more than set in config
                 if (_clientResponseTimer > maxClientResponseDelay * IN_MILLISECONDS)
                 {
-                    sLog.outWarden("%s (latency: %u, IP: %s) exceeded Warden module response delay on state %s for more than %s - disconnecting client",
-                                   _session->GetPlayerName(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), WardenState::to_string(_state), secsToTimeString(maxClientResponseDelay, true).c_str());
+                    sLog.outWarden("Account %u (latency: %u, IP: %s) exceeded Warden module response delay on state %s for more than %s - disconnecting client",
+                                   _session->GetAccountId(), _session->GetLatency(), _session->GetRemoteAddress().c_str(), WardenState::to_string(_state), secsToTimeString(maxClientResponseDelay, true).c_str());
                     _session->KickPlayer();
                 }
                 else
@@ -184,19 +185,19 @@ void Warden::EncryptData(uint8* buffer, uint32 length)
 
 void Warden::SetNewState(WardenState::Value state)
 {
-    //if we pass all initial checks, allow change
+    // if we pass all initial checks, allow change
     if (state < WardenState::STATE_REQUESTED_DATA)
     {
         if (state < _state)
         {
-            sLog.outWarden("Warden Error: jump from %s to %s which is lower by initialization routine", WardenState::to_string(_state), WardenState::to_string(state));
+            sLog.outWarden("Jump from %s to %s which is lower by initialization routine", WardenState::to_string(_state), WardenState::to_string(state));
             return;
         }
     }
 
     _state = state;
 
-    //Reset timers
+    // Reset timers
     // Set hold off timer, minimum timer should at least be 1 second
     uint32 holdOff = sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_CHECK_HOLDOFF);
     _checkTimer = (holdOff < 1 ? 1 : holdOff) * IN_MILLISECONDS;
@@ -210,12 +211,12 @@ bool Warden::IsValidCheckSum(uint32 checksum, const uint8* data, const uint16 le
 
     if (checksum != newChecksum)
     {
-        sLog.outWarden("CHECKSUM IS NOT VALID");
+        sLog.outWardenDebug("CHECKSUM IS NOT VALID");
         return false;
     }
     else
     {
-        sLog.outWarden("CHECKSUM IS VALID");
+        sLog.outWardenDebug("CHECKSUM IS VALID");
         return true;
     }
 }
@@ -246,29 +247,27 @@ uint32 Warden::BuildChecksum(const uint8* data, uint32 length)
     return checkSum;
 }
 
-std::string Warden::Penalty(WardenCheck* check /*= NULL*/)
+void Warden::ApplyPenalty(std::string message, WardenCheck* check)
 {
     WardenActions action;
 
     if (check)
         action = check->Action;
     else
-        action = WardenActions(sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_FAIL_ACTION));
+        action = WardenActions(sWorld.getConfig(CONFIG_UINT32_WARDEN_DEFAULT_PENALTY));
+
+    std::string playerName = _session->GetPlayerName();
+    std::string accountName = std::to_string(_session->GetAccountId());
+    sAccountMgr.GetName(_session->GetAccountId(), accountName);
 
     switch (action)
     {
-        case WARDEN_ACTION_LOG:
-            return "None";
-            break;
         case WARDEN_ACTION_KICK:
             _session->KickPlayer();
-            return "Kick";
             break;
         case WARDEN_ACTION_BAN:
             {
                 std::stringstream duration;
-                std::string accountName;
-                sAccountMgr.GetName(_session->GetAccountId(), accountName);
                 std::stringstream banReason;
                 banReason << "Warden Anticheat Violation";
                 // Check can be NULL, for example if the client sent a wrong signature in the warden packet (CHECKSUM FAIL)
@@ -276,13 +275,16 @@ std::string Warden::Penalty(WardenCheck* check /*= NULL*/)
                     banReason << ": " << (check->Comment.empty() ? std::string("Undocumented Check") : check->Comment) << " (CheckId: " << check->CheckId << ")";
 
                 sWorld.BanAccount(BAN_ACCOUNT, accountName, sWorld.getConfig(CONFIG_UINT32_WARDEN_CLIENT_BAN_DURATION), banReason.str(), "Warden");
-
-                return "Ban";
             }
         default:
             break;
     }
-    return "Undefined";
+
+    // Append names to message.
+    message = "Player " + playerName + " (Account " + accountName + ") " + message;
+
+    sLog.outWarden(message.c_str());
+    sWorld.SendGMText(LANG_GM_ANNOUNCE_COLOR, "WardenAlert", message.c_str());
 }
 
 void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
@@ -293,7 +295,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
     m_warden->DecryptData(const_cast<uint8*>(recvData.contents()), recvData.size());
     uint8 opcode;
     recvData >> opcode;
-    sLog.outWarden("Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
+    sLog.outWardenDebug("Got packet, opcode %02X, size %u", opcode, uint32(recvData.size()));
     recvData.hexlike();
 
     switch (opcode)
@@ -315,7 +317,7 @@ void WorldSession::HandleWardenDataOpcode(WorldPacket& recvData)
             m_warden->InitializeModule();
             break;
         case WARDEN_CMSG_MODULE_FAILED:
-            sLog.outWarden("NYI WARDEN_CMSG_MODULE_FAILED received!");
+            m_warden->ApplyPenalty("sent module failed opcode", nullptr);
             break;
         default:
             sLog.outWarden("Got unknown warden opcode %02X of size %u.", opcode, uint32(recvData.size() - 1));
@@ -343,7 +345,7 @@ void Warden::LogPositiveToDB(WardenCheck* check)
 
     static SqlStatementID insWardenPositive;
 
-    SqlStatement stmt = LoginDatabase.CreateStatement(insWardenPositive, "INSERT INTO warden_log (`check`, `action`, `account`, `guid`, `map`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+    SqlStatement stmt = LogsDatabase.CreateStatement(insWardenPositive, "INSERT INTO `logs_warden` (`check`, `action`, `account`, `guid`, `map`, `position_x`, `position_y`, `position_z`) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
 
     stmt.addUInt16(check->CheckId);
     stmt.addInt8(check->Action);

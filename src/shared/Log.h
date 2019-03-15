@@ -179,6 +179,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
                                                             // log level >= 3
         void outDebug( const char * str, ... )       ATTR_PRINTF(2,3);
         void outWarden(const char * wrd, ...)        ATTR_PRINTF(2,3);
+        void outWardenDebug(const char * wrd, ...)   ATTR_PRINTF(2,3);
 
         void outErrorDb();                                  // any log level
                                                             // any log level
@@ -227,6 +228,7 @@ class Log : public MaNGOS::Singleton<Log, MaNGOS::ClassLevelLockable<Log, ACE_Th
         LogLevel m_logFileLevel;
         bool m_colored;
         bool m_includeTime;
+        bool m_wardenDebug;
         Color m_colors[LOG_TYPE_MAX];
         uint32 m_logFilter;
 

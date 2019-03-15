@@ -9,8 +9,8 @@ INSERT INTO `migrations` VALUES ('20190314171530');
 -- Add your query below.
 
 
-DROP TABLE IF EXISTS `warden_log`;
-CREATE TABLE `warden_log` (
+DROP TABLE IF EXISTS `logs_warden`;
+CREATE TABLE `logs_warden` (
   `entry` int(11) unsigned NOT NULL AUTO_INCREMENT COMMENT 'Log entry ID',
   `check` smallint(5) unsigned NOT NULL COMMENT 'Failed Warden check ID',
   `action` tinyint(3) unsigned NOT NULL DEFAULT '0' COMMENT 'Action taken (enum WardenActions)',
