@@ -31,6 +31,13 @@ enum WardenActions
     WARDEN_ACTION_MAX
 };
 
+enum
+{
+    WARDEN_SIGNATURE_SIZE   = 264,
+    WARDEN_KEY_SIZE         = 16,
+    WARDEN_SCAN_TYPES_COUNT = 9,
+};
+
 struct WardenCheck
 {
     uint8 Type;
@@ -47,6 +54,25 @@ struct WardenCheckResult
 {
     uint16 Id;
     BigNumber Result;                                       // MEM_CHECK
+};
+
+#pragma pack(push, 1)
+struct ChallengeResponseEntry
+{
+    uint8 seed[16];
+    uint8 reply[20];
+    uint8 clientKey[16];
+    uint8 serverKey[16];
+};
+#pragma pack(pop)
+
+struct WardenModule
+{
+    std::vector<uint8> binaryData;
+    std::vector<uint8> binaryHash;
+    std::array<uint8, WARDEN_KEY_SIZE> moduleKey;
+    std::array<uint8, WARDEN_SCAN_TYPES_COUNT> scanTypes;
+    std::vector<ChallengeResponseEntry> challengeData;
 };
 
 class WardenCheckMgr
@@ -66,7 +92,11 @@ class WardenCheckMgr
         WardenCheckResult* GetWardenResultById(uint16 /*build*/, uint16 /*id*/);
         void GetWardenCheckIds(bool isMemCheck /* true = MEM */, uint16 build, std::list<uint16>& list);
 
+        WardenModule* GetRandomWardenModule(bool windows);
+
         void LoadWardenChecks();
+        void LoadWardenModules();
+        void LoadWardenModule(std::string module_name);
 
     private:
         typedef std::multimap< uint16, WardenCheck* > CheckMap;
@@ -78,7 +108,8 @@ class WardenCheckMgr
         std::mutex     m_lock;
         CheckMap       CheckStore;
         CheckResultMap CheckResultStore;
-
+        std::vector<WardenModule> m_vWindowsModules;
+        std::vector<WardenModule> m_vMacModules;
 };
 
 #define sWardenCheckMgr WardenCheckMgr::instance()

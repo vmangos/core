@@ -47,7 +47,9 @@ void WardenWin::Init(WorldSession* session, BigNumber* k)
     WK.Generate(_inputKey, 16);
     WK.Generate(_outputKey, 16);
 
-    memcpy(_seed, Module.Seed, 16);
+    m_selectedModule = sWardenCheckMgr->GetRandomWardenModule(true);
+    
+    memcpy(_seed, m_selectedModule->challengeData[0].seed, 16);
 
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
@@ -68,19 +70,14 @@ ClientWardenModule* WardenWin::GetModuleForClient()
 {
     ClientWardenModule *mod = new ClientWardenModule;
 
-    uint32 length = sizeof(Module.Module);
+    uint32 length = m_selectedModule->binaryData.size();
 
     // data assign
     mod->CompressedSize = length;
     mod->CompressedData = new uint8[length];
-    memcpy(mod->CompressedData, Module.Module, length);
-    memcpy(mod->Key, Module.ModuleKey, 16);
-
-    // md5 hash
-    MD5_CTX ctx;
-    MD5_Init(&ctx);
-    MD5_Update(&ctx, mod->CompressedData, length);
-    MD5_Final((uint8*)&mod->Id, &ctx);
+    memcpy(mod->CompressedData, m_selectedModule->binaryData.data(), length);
+    memcpy(mod->Key, m_selectedModule->moduleKey.data(), 16);
+    memcpy(mod->Id, m_selectedModule->binaryHash.data(), m_selectedModule->binaryHash.size());
 
     return mod;
 }
@@ -136,7 +133,7 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
     buff.rpos(buff.wpos());
 
     // Verify key
-    if (memcmp(buff.contents() + 1, Module.ClientKeySeedHash, sizeof(Module.ClientKeySeedHash)) != 0)
+    if (memcmp(buff.contents() + 1, m_selectedModule->challengeData[0].reply, sizeof(m_selectedModule->challengeData[0].reply)) != 0)
     {
         ApplyPenalty("failed hash reply");
         return;
@@ -145,8 +142,8 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
     sLog.outWardenDebug("Request hash reply: succeed");
 
     // Change keys here
-    memcpy(_inputKey, Module.ClientKeySeed, 16);
-    memcpy(_outputKey, Module.ServerKeySeed, 16);
+    memcpy(_inputKey, m_selectedModule->challengeData[0].clientKey, 16);
+    memcpy(_outputKey, m_selectedModule->challengeData[0].serverKey, 16);
 
     _inputCrypto.Init(_inputKey);
     _outputCrypto.Init(_outputKey);
@@ -160,7 +157,6 @@ void WardenWin::RequestData()
 
     uint16 build = _session->GetGameBuild();
     uint16 id = 0;
-    uint8 type = 0;
     WardenCheck* wd = nullptr;
 
     // If all checks were done, fill the todo list again
@@ -228,17 +224,17 @@ void WardenWin::RequestData()
 
     // Add TIMING_CHECK
     buff << uint8(0x00);
-    buff << uint8(TIMING_CHECK ^ xorByte);
-
+    buff << uint8(m_selectedModule->scanTypes[TIMING_CHECK] ^ xorByte);
+    
     uint8 index = 1;
 
     for (std::list<uint16>::iterator itr = _currentChecks.begin(); itr != _currentChecks.end(); ++itr)
     {
         wd = sWardenCheckMgr->GetWardenDataById(build, *itr);
-
-        type = wd->Type;
-        buff << uint8(type ^ xorByte);
-        switch (type)
+        
+        uint8 scanOpcode = m_selectedModule->scanTypes[wd->Type];
+        buff << uint8(scanOpcode ^ xorByte);
+        switch (wd->Type)
         {
             case MEM_CHECK:
             {

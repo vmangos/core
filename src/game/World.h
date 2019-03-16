@@ -738,6 +738,7 @@ class World
         static uint32 GetRelocationAINotifyDelay()          { return m_relocation_ai_notify_delay; }
 
         static uint32 GetCreatureSummonCountLimit()         { return m_creatureSummonCountLimit; }
+        std::string const& GetWardenModuleDirectory() const { return m_wardenModuleDirectory; }
 
         void ProcessCliCommands();
         void QueueCliCommand(CliCommandHolder* commandHolder) { cliCmdQueue.add(commandHolder); }
@@ -861,6 +862,7 @@ class World
         bool m_allowMovement;
         std::string m_motd;
         std::string m_dataPath;
+        std::string m_wardenModuleDirectory;
 
         // for max speed access
         static float m_MaxVisibleDistanceOnContinents;

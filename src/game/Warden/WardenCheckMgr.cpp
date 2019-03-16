@@ -25,6 +25,8 @@
 #include "WardenCheckMgr.h"
 #include "Warden.h"
 #include <mutex>
+#include <ace/OS_NS_dirent.h>
+#include <openssl/md5.h>
 
 WardenCheckMgr::WardenCheckMgr() : CheckStore(), CheckResultStore() { }
 
@@ -51,6 +53,7 @@ void WardenCheckMgr::LoadWardenChecks()
         sLog.outString(">> Warden disabled, loading checks skipped.");
         return;
     }
+
     //                                                                0     1        2       3       4         5          6         7      8          9
     std::unique_ptr<QueryResult> result (WorldDatabase.Query("SELECT `id`, `build`, `type`, `data`, `result`, `address`, `length`, `str`, `penalty`, `comment` FROM `warden_checks` ORDER BY `build` ASC, `id` ASC"));
 
@@ -150,6 +153,149 @@ void WardenCheckMgr::LoadWardenChecks()
     sLog.outString(">> Loaded %u warden checks.", count);
 }
 
+void WardenCheckMgr::LoadWardenModules()
+{
+    // Check if Warden is enabled by config before loading anything
+    if (!sWorld.getConfig(CONFIG_BOOL_WARDEN_WIN_ENABLED) && !sWorld.getConfig(CONFIG_BOOL_WARDEN_OSX_ENABLED))
+    {
+        BarGoLink bar(1);
+        bar.step();
+        sLog.outString();
+        sLog.outString(">> Warden disabled, loading modules skipped.");
+        return;
+    }
+
+    BarGoLink bar(1);
+    std::string moduleDirectory = sWorld.GetWardenModuleDirectory();
+    ACE_DIR *pDirectory = ACE_OS::opendir(ACE_TEXT(moduleDirectory.c_str()));
+
+    if (pDirectory)
+    {
+        ACE_DIRENT *pFile;
+
+        while (!!(pFile = ACE_OS::readdir(pDirectory)))
+            if (!memcmp(&pFile->d_name[strlen(pFile->d_name) - 4], ".bin", 4))
+                LoadWardenModule(moduleDirectory + "/" + pFile->d_name);
+        
+        //ACE_OS::closedir(pDirectory);
+    }
+    bar.step();
+
+    sLog.outString();
+    sLog.outString(">> Loaded %u windows and %u mac modules.", m_vWindowsModules.size(), m_vMacModules.size());
+}
+
+void WardenCheckMgr::LoadWardenModule(std::string module_name)
+{
+    printf("Loading %s\n", module_name.c_str());
+    WardenModule module;
+
+    FILE * pBinFile = fopen(module_name.c_str(), "rb");
+    if (pBinFile == 0)
+    {
+        sLog.outError("Failed to load warden module binary: %s", module_name.c_str());
+        return;
+    }
+
+    // Check size of module.
+    fseek(pBinFile, 0, SEEK_END);
+    uint32 len = ftell(pBinFile);
+    fseek(pBinFile, 0, SEEK_SET);
+
+    if (len < WARDEN_SIGNATURE_SIZE)
+    {
+        sLog.outError("Warden module binary too small: %s", module_name.c_str());
+        fclose(pBinFile);
+        return;
+    }
+
+    // Read data from module.
+    module.binaryData.resize(len);
+    fread(module.binaryData.data(), len, 1, pBinFile);
+
+    // Calculate MD5 hash.
+    MD5_CTX ctx;
+    MD5_Init(&ctx);
+    MD5_Update(&ctx, module.binaryData.data(), len);
+    module.binaryHash.resize(MD5_DIGEST_LENGTH);
+    MD5_Final(&module.binaryHash[0], &ctx);
+
+    fclose(pBinFile);
+
+    // Name of key file.
+    module_name = module_name.substr(0, module_name.length() - 4);
+    module_name += ".key";
+
+    FILE * pKeyFile = fopen(module_name.c_str(), "rb");
+    if (pKeyFile == 0)
+    {
+        sLog.outError("Failed to load warden module key: %s", module_name.c_str());
+        return;
+    }
+
+    fseek(pKeyFile, 0, SEEK_END);
+    len = ftell(pKeyFile);
+    fseek(pKeyFile, 0, SEEK_SET);
+
+    if (len != WARDEN_KEY_SIZE)
+    {
+        sLog.outError("Warden module key too small: %s", module_name.c_str());
+        fclose(pBinFile);
+        return;
+    }
+
+    // Read the key.
+    fread(module.moduleKey.data(), 16, 1, pKeyFile);
+    fclose(pKeyFile);
+
+    // Name of challenge and response file.
+    module_name = module_name.substr(0, module_name.length() - 4);
+    module_name += ".cr";
+
+    FILE * pCRFile = fopen(module_name.c_str(), "rb");
+    if (pCRFile == 0)
+    {
+        sLog.outError("Failed to load warden module challenge and response data: %s", module_name.c_str());
+        return;
+    }
+
+    fseek(pKeyFile, 0, SEEK_END);
+    len = ftell(pKeyFile);
+    fseek(pKeyFile, 0, SEEK_SET);
+
+    auto const crSize = len - WARDEN_SCAN_TYPES_COUNT;
+
+    if (!!(crSize % sizeof(ChallengeResponseEntry)))
+    {
+        sLog.outError("Invalid warden module challenge and response data: %s", module_name.c_str());
+        fclose(pCRFile);
+        return;
+    }
+
+    module.challengeData.resize(crSize / sizeof(ChallengeResponseEntry));
+
+    fread(module.scanTypes.data(), WARDEN_SCAN_TYPES_COUNT, 1, pCRFile);
+    fread(module.challengeData.data(), crSize, 1, pCRFile);
+
+    bool isWindowsModule = false;
+
+    for (auto i = 0; i < WARDEN_SCAN_TYPES_COUNT; ++i)
+    {
+        if (module.scanTypes[i] != 0)
+        {
+            isWindowsModule = true;
+            break;
+        }
+    }
+
+    fclose(pCRFile);
+
+    if (isWindowsModule)
+        m_vWindowsModules.push_back(module);
+    else
+        m_vMacModules.push_back(module);
+}
+
 WardenCheck* WardenCheckMgr::GetWardenDataById(uint16 build, uint16 id)
 {
     WardenCheck* result = nullptr;
@@ -193,4 +339,12 @@ void WardenCheckMgr::GetWardenCheckIds(bool isMemCheck, uint16 build, std::list<
         else
             idl.push_back(it->second->CheckId);
     }
+}
+
+WardenModule* WardenCheckMgr::GetRandomWardenModule(bool windows)
+{
+    if (windows)
+        return &m_vWindowsModules[urand(0, m_vWindowsModules.size())];
+    else
+        return &m_vMacModules[urand(0, m_vMacModules.size())];
 }

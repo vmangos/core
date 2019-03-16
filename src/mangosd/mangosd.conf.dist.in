@@ -1471,7 +1471,7 @@ Antiflood.Sanction = 4
 #                     0     - (Permanent ban)
 #
 #    Warden.DebugLog
-#        Description: Prints additional information about every check performed.
+#        Description: Prints additional information about performed checks.
 #        Default:     0 - (Disabled)
 #                     1 - (Enabled)
 #
