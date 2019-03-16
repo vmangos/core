@@ -40,7 +40,7 @@ void WardenMac::Init(WorldSession* pClient, BigNumber* K)
     WK.Generate(m_inputKey, 16);
     WK.Generate(m_outputKey, 16);
 
-    m_selectedModule = sWardenMgr->GetRandomWardenModule(true);
+    m_selectedModule = sWardenMgr->GetRandomWardenModule(false);
 
     uint8 mod_seed[16] = { 0x4D, 0x80, 0x8D, 0x2C, 0x77, 0xD9, 0x05, 0xC4, 0x1A, 0x63, 0x80, 0xEC, 0x08, 0x58, 0x6A, 0xFE };
 
