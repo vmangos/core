@@ -1427,8 +1427,8 @@ Antiflood.Sanction = 4
 #
 #    Warden.WinEnabled
 #        Description: Enables Warden checks for Windows clients.
-#        Default:     1 - (Enabled)
-#                     0 - (Disabled)
+#        Default:     0 - (Disabled)
+#                     1 - (Enabled)
 #
 #    Warden.OSXEnabled
 #        Description: Enables Warden checks for OSX clients.
@@ -1460,9 +1460,9 @@ Antiflood.Sanction = 4
 #    Warden.DefaultPenalty
 #        Description: Default action being taken if a client check failed. Penalties can be
 #                     customized per check id in the warden_checks table.
-#        Default:     1 - (Kick)
+#        Default:     2 - (Ban)
 #                     0 - (Disabled, Logging only)
-#                     2 - (Ban)
+#                     1 - (Kick)
 #
 #    Warden.BanDuration
 #        Description: Time (in seconds) an account will be banned if Penalty is set
@@ -1482,18 +1482,23 @@ Antiflood.Sanction = 4
 #        Deafult:     0 - (Logging any failed check)
 #                     3 - (Disable DB logging)
 #
+#    Warden.ModuleDir
+#        Description: Directory where warden modules are stored.
+#        Default: "warden_modules"
+#
 ###################################################################################################
 
-Warden.WinEnabled            = 1
+Warden.WinEnabled            = 0
 Warden.OSXEnabled            = 0
 Warden.NumMemChecks          = 3
 Warden.NumOtherChecks        = 7
 Warden.ClientResponseDelay   = 120
 Warden.ClientCheckHoldOff    = 30
-Warden.DefaultPenalty        = 1
+Warden.DefaultPenalty        = 2
 Warden.BanDuration           = 86400
 Warden.DebugLog              = 0
 Warden.DBLogLevel            = 0
+Warden.ModuleDir             = "warden_modules"
 
 ###################################################################################################################
 # GAME MASTER SETTINGS

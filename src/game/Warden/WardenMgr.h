@@ -1,6 +1,4 @@
 /*
- * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -75,16 +73,16 @@ struct WardenModule
     std::vector<ChallengeResponseEntry> challengeData;
 };
 
-class WardenCheckMgr
+class WardenMgr
 {
     private:
-        WardenCheckMgr();
-        ~WardenCheckMgr();
+        WardenMgr();
+        ~WardenMgr();
 
     public:
-        static WardenCheckMgr* instance()
+        static WardenMgr* instance()
         {
-            static WardenCheckMgr instance;
+            static WardenMgr instance;
             return &instance;
         }
 
@@ -112,6 +110,6 @@ class WardenCheckMgr
         std::vector<WardenModule> m_vMacModules;
 };
 
-#define sWardenCheckMgr WardenCheckMgr::instance()
+#define sWardenMgr WardenMgr::instance()
 
 #endif

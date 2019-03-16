@@ -230,7 +230,7 @@ set (game_SRCS
     vmap/VMapManager2.cpp
     vmap/WorldModel.cpp
     Warden/Warden.cpp
-    Warden/WardenCheckMgr.cpp
+    Warden/WardenMgr.cpp
     Warden/WardenMac.cpp
     Warden/WardenWin.cpp
     AccountMgr.h
@@ -430,12 +430,10 @@ set (game_SRCS
     vmap/VMapTools.h
     vmap/WorldModel.h
     Warden/Warden.h
-    Warden/WardenCheckMgr.h
+    Warden/WardenMgr.h
     Warden/WardenKeyGen.h
     Warden/WardenMac.h
     Warden/WardenWin.h
-    Warden/Modules/WardenModuleMac.h
-    Warden/Modules/WardenModuleWin.h
 
 )
 

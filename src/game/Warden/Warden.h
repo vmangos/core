@@ -1,6 +1,4 @@
 /*
- * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -23,7 +21,7 @@
 #include "Auth/ARC4.h"
 #include "Auth/BigNumber.h"
 #include "ByteBuffer.h"
-#include "WardenCheckMgr.h"
+#include "WardenMgr.h"
 #include "Database/DatabaseEnv.h"
 
 class Object;
@@ -175,18 +173,18 @@ class Warden
     protected:
         void LogPositiveToDB(WardenCheck* check);
 
-        WorldSession* _session;
-        uint8 _inputKey[16];
-        uint8 _outputKey[16];
-        uint8 _seed[16];
-        ARC4 _inputCrypto;
-        ARC4 _outputCrypto;
-        uint32 _checkTimer;                          // Timer for sending check requests
-        uint32 _clientResponseTimer;                 // Timer for client response delay
-        uint32 _previousTimestamp;
-        ClientWardenModule* _module;
+        WorldSession* m_session;
+        uint8 m_inputKey[16];
+        uint8 m_outputKey[16];
+        uint8 m_seed[16];
+        ARC4 m_inputCrypto;
+        ARC4 m_outputCrypto;
+        uint32 m_checkTimer;                          // Timer for sending check requests
+        uint32 m_clientResponseTimer;                 // Timer for client response delay
+        uint32 m_previousTimestamp;
+        ClientWardenModule* m_module;
         WardenModule* m_selectedModule;
-        WardenState::Value _state;
+        WardenState::Value m_state;
 };
 
 #endif

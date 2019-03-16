@@ -1,6 +1,4 @@
 /*
- * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -28,7 +26,6 @@
 #include "Player.h"
 #include "Util.h"
 #include "WardenMac.h"
-#include "Modules/WardenModuleMac.h"
 
 WardenMac::WardenMac() : Warden() { }
 
@@ -36,35 +33,31 @@ WardenMac::~WardenMac() { }
 
 void WardenMac::Init(WorldSession* pClient, BigNumber* K)
 {
-    _session = pClient;
+    m_session = pClient;
     // Generate Warden Key
     auto kBytes = K->AsByteArray();
     SHA1Randx WK(kBytes.data(), kBytes.size());
-    WK.Generate(_inputKey, 16);
-    WK.Generate(_outputKey, 16);
-    /*
-    Seed: 4D808D2C77D905C41A6380EC08586AFE (0x05 packet)
-    Hash: <?> (0x04 packet)
-    Module MD5: 0DBBF209A27B1E279A9FEC5C168A15F7
-    New Client Key: <?>
-    New Cerver Key: <?>
-    */
+    WK.Generate(m_inputKey, 16);
+    WK.Generate(m_outputKey, 16);
+
+    m_selectedModule = sWardenMgr->GetRandomWardenModule(true);
+
     uint8 mod_seed[16] = { 0x4D, 0x80, 0x8D, 0x2C, 0x77, 0xD9, 0x05, 0xC4, 0x1A, 0x63, 0x80, 0xEC, 0x08, 0x58, 0x6A, 0xFE };
 
-    memcpy(_seed, mod_seed, 16);
+    memcpy(m_seed, mod_seed, 16);
 
-    _inputCrypto.Init(_inputKey);
-    _outputCrypto.Init(_outputKey);
-    sLog.outWardenDebug("Server side Mac warden for client %u (build %u) initializing...", pClient->GetAccountId(), _session->GetGameBuild());
-    sLog.outWardenDebug("C->S Key: %s", ByteArrayToHexStr(_inputKey, 16).c_str());
-    sLog.outWardenDebug("S->C Key: %s", ByteArrayToHexStr(_outputKey, 16).c_str());
-    sLog.outWardenDebug("  Seed: %s", ByteArrayToHexStr(_seed, 16).c_str());
+    m_inputCrypto.Init(m_inputKey);
+    m_outputCrypto.Init(m_outputKey);
+    sLog.outWardenDebug("Server side Mac warden for client %u (build %u) initializing...", pClient->GetAccountId(), m_session->GetGameBuild());
+    sLog.outWardenDebug("C->S Key: %s", ByteArrayToHexStr(m_inputKey, 16).c_str());
+    sLog.outWardenDebug("S->C Key: %s", ByteArrayToHexStr(m_outputKey, 16).c_str());
+    sLog.outWardenDebug("  Seed: %s", ByteArrayToHexStr(m_seed, 16).c_str());
     sLog.outWardenDebug("Loading Module...");
 
-    _module = GetModuleForClient();
+    m_module = GetModuleForClient();
 
-    sLog.outWardenDebug("Module Key: %s", ByteArrayToHexStr(_module->Key, 16).c_str());
-    sLog.outWardenDebug("Module ID: %s", ByteArrayToHexStr(_module->Id, 16).c_str());
+    sLog.outWardenDebug("Module Key: %s", ByteArrayToHexStr(m_module->Key, 16).c_str());
+    sLog.outWardenDebug("Module ID: %s", ByteArrayToHexStr(m_module->Id, 16).c_str());
     RequestModule();
 }
 
@@ -72,13 +65,13 @@ ClientWardenModule* WardenMac::GetModuleForClient()
 {
     ClientWardenModule *mod = new ClientWardenModule;
 
-    uint32 len = sizeof(Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data);
+    uint32 len = m_selectedModule->binaryData.size();
 
     // data assign
     mod->CompressedSize = len;
     mod->CompressedData = new uint8[len];
-    memcpy(mod->CompressedData, Module_0DBBF209A27B1E279A9FEC5C168A15F7_Data, len);
-    memcpy(mod->Key, Module_0DBBF209A27B1E279A9FEC5C168A15F7_Key, 16);
+    memcpy(mod->CompressedData, m_selectedModule->binaryData.data(), len);
+    memcpy(mod->Key, m_selectedModule->moduleKey.data(), 16);
 
     // md5 hash
     MD5_CTX ctx;
@@ -161,13 +154,13 @@ void WardenMac::HandleHashResult(ByteBuffer &buff)
     //const uint8 server_key[16] = { 0xC2, 0xB7, 0xAD, 0xED, 0xFC, 0xCC, 0xA9, 0xC2, 0xBF, 0xB3, 0xF8, 0x56, 0x02, 0xBA, 0x80, 0x9B };
 
     // change keys here
-    memcpy(_inputKey, keyIn, 16);
-    memcpy(_outputKey, keyOut, 16);
+    memcpy(m_inputKey, keyIn, 16);
+    memcpy(m_outputKey, keyOut, 16);
 
-    _inputCrypto.Init(_inputKey);
-    _outputCrypto.Init(_outputKey);
+    m_inputCrypto.Init(m_inputKey);
+    m_outputCrypto.Init(m_outputKey);
 
-    _previousTimestamp = WorldTimer::getMSTime();
+    m_previousTimestamp = WorldTimer::getMSTime();
 }
 
 void WardenMac::RequestData()
@@ -189,7 +182,7 @@ void WardenMac::RequestData()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
-    _session->SendPacket(&pkt);
+    m_session->SendPacket(&pkt);
 
     Warden::RequestData();
 }

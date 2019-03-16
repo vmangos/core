@@ -1,6 +1,4 @@
 /*
- * This file is part of the CMaNGOS Project. See AUTHORS file for Copyright information
- *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
  * the Free Software Foundation; either version 2 of the License, or
@@ -30,8 +28,7 @@
 #include "Player.h"
 #include "Util.h"
 #include "WardenWin.h"
-#include "Modules/WardenModuleWin.h"
-#include "WardenCheckMgr.h"
+#include "WardenMgr.h"
 
 WardenWin::WardenWin() : Warden(), _serverTicks(0) {}
 
@@ -39,30 +36,30 @@ WardenWin::~WardenWin() { }
 
 void WardenWin::Init(WorldSession* session, BigNumber* k)
 {
-    _session = session;
+    m_session = session;
 
     // Generate Warden Key
     auto kBytes = k->AsByteArray();
     SHA1Randx WK(kBytes.data(), kBytes.size());
-    WK.Generate(_inputKey, 16);
-    WK.Generate(_outputKey, 16);
+    WK.Generate(m_inputKey, 16);
+    WK.Generate(m_outputKey, 16);
 
-    m_selectedModule = sWardenCheckMgr->GetRandomWardenModule(true);
+    m_selectedModule = sWardenMgr->GetRandomWardenModule(true);
     
-    memcpy(_seed, m_selectedModule->challengeData[0].seed, 16);
+    memcpy(m_seed, m_selectedModule->challengeData[0].seed, 16);
 
-    _inputCrypto.Init(_inputKey);
-    _outputCrypto.Init(_outputKey);
-    sLog.outWardenDebug("Server side warden for client %u (build %u) initializing...", session->GetAccountId(), _session->GetGameBuild());
-    sLog.outWardenDebug("C->S Key: %s", ByteArrayToHexStr(_inputKey, 16).c_str());
-    sLog.outWardenDebug("S->C Key: %s", ByteArrayToHexStr(_outputKey, 16).c_str());
-    sLog.outWardenDebug("  Seed: %s", ByteArrayToHexStr(_seed, 16).c_str());
+    m_inputCrypto.Init(m_inputKey);
+    m_outputCrypto.Init(m_outputKey);
+    sLog.outWardenDebug("Server side warden for client %u (build %u) initializing...", session->GetAccountId(), m_session->GetGameBuild());
+    sLog.outWardenDebug("C->S Key: %s", ByteArrayToHexStr(m_inputKey, 16).c_str());
+    sLog.outWardenDebug("S->C Key: %s", ByteArrayToHexStr(m_outputKey, 16).c_str());
+    sLog.outWardenDebug("  Seed: %s", ByteArrayToHexStr(m_seed, 16).c_str());
     sLog.outWardenDebug("Loading Module...");
 
-    _module = GetModuleForClient();
+    m_module = GetModuleForClient();
 
-    sLog.outWardenDebug("Module Key: %s", ByteArrayToHexStr(_module->Key, 16).c_str());
-    sLog.outWardenDebug("Module ID: %s", ByteArrayToHexStr(_module->Id, 16).c_str());
+    sLog.outWardenDebug("Module Key: %s", ByteArrayToHexStr(m_module->Key, 16).c_str());
+    sLog.outWardenDebug("Module ID: %s", ByteArrayToHexStr(m_module->Id, 16).c_str());
     RequestModule();
 }
 
@@ -123,7 +120,7 @@ void WardenWin::InitializeModule()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, sizeof(WardenInitModuleRequest));
     pkt.append((uint8*)&Request, sizeof(WardenInitModuleRequest));
-    _session->SendPacket(&pkt);
+    m_session->SendPacket(&pkt);
 
     Warden::InitializeModule();
 }
@@ -142,29 +139,29 @@ void WardenWin::HandleHashResult(ByteBuffer &buff)
     sLog.outWardenDebug("Request hash reply: succeed");
 
     // Change keys here
-    memcpy(_inputKey, m_selectedModule->challengeData[0].clientKey, 16);
-    memcpy(_outputKey, m_selectedModule->challengeData[0].serverKey, 16);
+    memcpy(m_inputKey, m_selectedModule->challengeData[0].clientKey, 16);
+    memcpy(m_outputKey, m_selectedModule->challengeData[0].serverKey, 16);
 
-    _inputCrypto.Init(_inputKey);
-    _outputCrypto.Init(_outputKey);
+    m_inputCrypto.Init(m_inputKey);
+    m_outputCrypto.Init(m_outputKey);
 
-    _previousTimestamp = WorldTimer::getMSTime();
+    m_previousTimestamp = WorldTimer::getMSTime();
 }
 
 void WardenWin::RequestData()
 {
     sLog.outWardenDebug("Request data");
 
-    uint16 build = _session->GetGameBuild();
+    uint16 build = m_session->GetGameBuild();
     uint16 id = 0;
     WardenCheck* wd = nullptr;
 
     // If all checks were done, fill the todo list again
     if (_memChecksTodo.empty())
-        sWardenCheckMgr->GetWardenCheckIds(true, build, _memChecksTodo);
+        sWardenMgr->GetWardenCheckIds(true, build, _memChecksTodo);
 
     if (_otherChecksTodo.empty())
-        sWardenCheckMgr->GetWardenCheckIds(false, build, _otherChecksTodo);
+        sWardenMgr->GetWardenCheckIds(false, build, _otherChecksTodo);
 
     _serverTicks = WorldTimer::getMSTime();
 
@@ -203,7 +200,7 @@ void WardenWin::RequestData()
 
         // if we are here, the function is guaranteed to not return NULL
         // but ... who knows
-        wd = sWardenCheckMgr->GetWardenDataById(build, id);
+        wd = sWardenMgr->GetWardenDataById(build, id);
         if (wd)
         {
             switch (wd->Type)
@@ -220,7 +217,7 @@ void WardenWin::RequestData()
         }
     }
 
-    uint8 xorByte = _inputKey[0];
+    uint8 xorByte = m_inputKey[0];
 
     // Add TIMING_CHECK
     buff << uint8(0x00);
@@ -230,7 +227,7 @@ void WardenWin::RequestData()
 
     for (std::list<uint16>::iterator itr = _currentChecks.begin(); itr != _currentChecks.end(); ++itr)
     {
-        wd = sWardenCheckMgr->GetWardenDataById(build, *itr);
+        wd = sWardenMgr->GetWardenDataById(build, *itr);
         
         uint8 scanOpcode = m_selectedModule->scanTypes[wd->Type];
         buff << uint8(scanOpcode ^ xorByte);
@@ -275,7 +272,8 @@ void WardenWin::RequestData()
             }
             /*case PROC_CHECK:
             {
-                buff.append(wd->i.AsByteArray(0, false).get(), wd->i.GetNumBytes());
+                auto data = wd->Data.AsByteArray(0, false);
+                buff.append(data);
                 buff << uint8(index++);
                 buff << uint8(index++);
                 buff << uint32(wd->Address);
@@ -294,7 +292,7 @@ void WardenWin::RequestData()
 
     WorldPacket pkt(SMSG_WARDEN_DATA, buff.size());
     pkt.append(buff);
-    _session->SendPacket(&pkt);
+    m_session->SendPacket(&pkt);
 
     std::stringstream stream;
     stream << "Sent check id's: ";
@@ -351,8 +349,8 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
     for (std::list<uint16>::iterator itr = _currentChecks.begin(); itr != _currentChecks.end(); ++itr)
     {
-        rd = sWardenCheckMgr->GetWardenDataById(_session->GetGameBuild(), *itr);
-        rs = sWardenCheckMgr->GetWardenResultById(_session->GetGameBuild(), *itr);
+        rd = sWardenMgr->GetWardenDataById(m_session->GetGameBuild(), *itr);
+        rs = sWardenMgr->GetWardenResultById(m_session->GetGameBuild(), *itr);
 
         type = rd->Type;
         switch (type)
@@ -364,20 +362,20 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Mem_Result != 0)
                 {
-                    sLog.outWardenDebug("RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT MEM_CHECK not 0x00, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     checkFailed = *itr;
                     continue;
                 }
                 if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).data(), rd->Length) != 0)
                 {
-                    sLog.outWardenDebug("RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT MEM_CHECK fail CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     checkFailed = *itr;
                     buff.rpos(buff.rpos() + rd->Length);
                     continue;
                 }
 
                 buff.rpos(buff.rpos() + rd->Length);
-                sLog.outWardenDebug("RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                sLog.outWardenDebug("RESULT MEM_CHECK passed CheckId %u account Id %u", *itr, m_session->GetAccountId());
                 break;
             }
             case PAGE_CHECK_A:
@@ -389,11 +387,11 @@ void WardenWin::HandleData(ByteBuffer &buff)
                 if (memcmp(buff.contents() + buff.rpos(), &byte, sizeof(uint8)) != 0)
                 {
                     if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-                        sLog.outWardenDebug("RESULT PAGE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog.outWardenDebug("RESULT PAGE_CHECK fail, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     if (type == MODULE_CHECK)
-                        sLog.outWardenDebug("RESULT MODULE_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog.outWardenDebug("RESULT MODULE_CHECK fail, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     if (type == DRIVER_CHECK)
-                        sLog.outWardenDebug("RESULT DRIVER_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                        sLog.outWardenDebug("RESULT DRIVER_CHECK fail, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     checkFailed = *itr;
                     buff.rpos(buff.rpos() + 1);
                     continue;
@@ -401,11 +399,11 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 buff.rpos(buff.rpos() + 1);
                 if (type == PAGE_CHECK_A || type == PAGE_CHECK_B)
-                    sLog.outWardenDebug("RESULT PAGE_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT PAGE_CHECK passed CheckId %u account Id %u", *itr, m_session->GetAccountId());
                 else if (type == MODULE_CHECK)
-                    sLog.outWardenDebug("RESULT MODULE_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT MODULE_CHECK passed CheckId %u account Id %u", *itr, m_session->GetAccountId());
                 else if (type == DRIVER_CHECK)
-                    sLog.outWardenDebug("RESULT DRIVER_CHECK passed CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT DRIVER_CHECK passed CheckId %u account Id %u", *itr, m_session->GetAccountId());
                 break;
             }
             case LUA_STR_CHECK:
@@ -415,7 +413,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Lua_Result != 0)
                 {
-                    sLog.outWardenDebug("RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT LUA_STR_CHECK fail, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     checkFailed = *itr;
                     continue;
                 }
@@ -432,7 +430,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
                     delete[] str;
                 }
                 buff.rpos(buff.rpos() + luaStrLen);         // Skip string
-                sLog.outWardenDebug("RESULT LUA_STR_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                sLog.outWardenDebug("RESULT LUA_STR_CHECK passed, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                 break;
             }
             case MPQ_CHECK:
@@ -442,21 +440,21 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
                 if (Mpq_Result != 0)
                 {
-                    sLog.outWardenDebug("RESULT MPQ_CHECK not 0x00 account id %u", _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT MPQ_CHECK not 0x00 account id %u", m_session->GetAccountId());
                     checkFailed = *itr;
                     continue;
                 }
 
                 if (memcmp(buff.contents() + buff.rpos(), rs->Result.AsByteArray(0, false).data(), 20) != 0) // SHA1
                 {
-                    sLog.outWardenDebug("RESULT MPQ_CHECK fail, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                    sLog.outWardenDebug("RESULT MPQ_CHECK fail, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                     checkFailed = *itr;
                     buff.rpos(buff.rpos() + 20);            // 20 bytes SHA1
                     continue;
                 }
 
                 buff.rpos(buff.rpos() + 20);                // 20 bytes SHA1
-                sLog.outWardenDebug("RESULT MPQ_CHECK passed, CheckId %u account Id %u", *itr, _session->GetAccountId());
+                sLog.outWardenDebug("RESULT MPQ_CHECK passed, CheckId %u account Id %u", *itr, m_session->GetAccountId());
                 break;
             }
             default:                                        // Should never happen
@@ -466,7 +464,7 @@ void WardenWin::HandleData(ByteBuffer &buff)
 
     if (checkFailed > 0)
     {
-        WardenCheck* check = sWardenCheckMgr->GetWardenDataById(_session->GetGameBuild(), checkFailed);   //note it IS NOT NULL here
+        WardenCheck* check = sWardenMgr->GetWardenDataById(m_session->GetGameBuild(), checkFailed);   //note it IS NOT NULL here
         ApplyPenalty(std::string("failed Warden check ") + std::to_string(checkFailed), check);
         LogPositiveToDB(check);
     }
