@@ -18,6 +18,8 @@
 #include "World.h"
 #include "WorldPacket.h"
 #include "WorldSession.h"
+#include "ProgressBar.h"
+#include "Util.h"
 #include "Log.h"
 #include "Database/DatabaseEnv.h"
 #include "WardenMgr.h"
