@@ -4496,7 +4496,7 @@ void Aura::HandleAuraModIncreaseHealth(bool apply, bool Real)
                 {
                     if (int32(target->GetHealth()) > m_modifier.m_amount)
                         target->ModifyHealth(-m_modifier.m_amount);
-                    else
+                    else if (target->isAlive())
                         target->SetHealth(1);
                     target->HandleStatModifier(UNIT_MOD_HEALTH, TOTAL_VALUE, float(m_modifier.m_amount), apply);
                 }
