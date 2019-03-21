@@ -508,7 +508,7 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     uint32 dynFlags = GetUInt32Value(UNIT_DYNAMIC_FLAGS);
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynFlags ? dynFlags : GetCreatureInfo()->dynamic_flags);
 
-    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(GetCreatureInfo()->armor));
+    SetCreateResistance(SPELL_SCHOOL_NORMAL, GetCreatureInfo()->armor);
     SetCreateResistance(SPELL_SCHOOL_HOLY, GetCreatureInfo()->holy_res);
     SetCreateResistance(SPELL_SCHOOL_FIRE, GetCreatureInfo()->fire_res);
     SetCreateResistance(SPELL_SCHOOL_NATURE, GetCreatureInfo()->nature_res);
