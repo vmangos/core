@@ -1304,7 +1304,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     else
         SetMeleeDamageSchool(SPELL_SCHOOL_NORMAL);
 
-    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(petlevel * 50));
+    SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(petlevel * 50));
 
     // Nostalrius: pre-2.0: normalisation de la vitesse d'attaque des pets.
     SetAttackTime(BASE_ATTACK, cinfo->base_attack_time); //BASE_ATTACK_TIME);
@@ -1338,12 +1338,12 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     // TODO: Do we keep it or remove it?
     if (getPetType() != HUNTER_PET || (sWorld.GetWowPatch() < WOW_PATCH_103 && sWorld.getConfig(CONFIG_BOOL_ACCURATE_PETS)))
     {
-        createResistance[SPELL_SCHOOL_HOLY]   = cinfo->holy_res;
-        createResistance[SPELL_SCHOOL_FIRE]   = cinfo->fire_res;
-        createResistance[SPELL_SCHOOL_NATURE] = cinfo->nature_res;
-        createResistance[SPELL_SCHOOL_FROST]  = cinfo->frost_res;
-        createResistance[SPELL_SCHOOL_SHADOW] = cinfo->shadow_res;
-        createResistance[SPELL_SCHOOL_ARCANE] = cinfo->arcane_res;
+        SetCreateResistance(SPELL_SCHOOL_HOLY, cinfo->holy_res);
+        SetCreateResistance(SPELL_SCHOOL_FIRE, cinfo->fire_res);
+        SetCreateResistance(SPELL_SCHOOL_NATURE, cinfo->nature_res);
+        SetCreateResistance(SPELL_SCHOOL_FROST, cinfo->frost_res);
+        SetCreateResistance(SPELL_SCHOOL_SHADOW, cinfo->shadow_res);
+        SetCreateResistance(SPELL_SCHOOL_ARCANE, cinfo->arcane_res);
     }
 
     switch (getPetType())
@@ -1363,7 +1363,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
                 SetCreateMana(pInfo->mana);
 
                 if (pInfo->armor > 0)
-                    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
+                    SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
 
                 for (int stat = 0; stat < MAX_STATS; ++stat)
                     SetCreateStat(Stats(stat), float(pInfo->stats[stat]));
@@ -1398,7 +1398,7 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             if (pInfo)                                      // exist in DB
             {
                 SetCreateHealth(pInfo->health);
-                SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(pInfo->armor));
+                SetCreateResistance(SPELL_SCHOOL_NORMAL, int32(pInfo->armor));
                 //SetModifierValue(UNIT_MOD_ATTACK_POWER, BASE_VALUE, float(cinfo->attack_power));
 
                 for (int i = STAT_STRENGTH; i < MAX_STATS; ++i)

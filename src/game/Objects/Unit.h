@@ -1649,6 +1649,8 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 GetCreateMana() const { return GetUInt32Value(UNIT_FIELD_BASE_MANA); }
         uint32 GetCreatePowers(Powers power) const;
         float GetCreateStat(Stats stat) const { return m_createStats[stat]; }
+        void SetCreateResistance(SpellSchools school, int32 val) { m_createResistances[school] = val; }
+        int32 GetCreateResistance(SpellSchools school) const { return m_createResistances[school]; }
 
         void SetCurrentCastedSpell(Spell * pSpell);
         bool IsSpellProhibited(SpellEntry const* pSpell);
@@ -1710,6 +1712,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         void SetModifierValue(UnitMods unitMod, UnitModifierType modifierType, float value) { m_auraModifiersGroup[unitMod][modifierType] = value; }
         float GetModifierValue(UnitMods unitMod, UnitModifierType modifierType) const;
         float GetTotalStatValue(Stats stat) const;
+        int32 GetTotalResistanceValue(SpellSchools school) const;
         float GetTotalAuraModValue(UnitMods unitMod) const;
         SpellSchools GetSpellSchoolByAuraGroup(UnitMods unitMod) const;
         Stats GetStatByAuraGroup(UnitMods unitMod) const;
@@ -2098,6 +2101,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         uint32 m_attackTimer[MAX_ATTACK];
 
         float m_createStats[MAX_STATS];
+        int32 m_createResistances[MAX_SPELL_SCHOOL];
 
         AttackerSet m_attackers;
         Unit* m_attacking;

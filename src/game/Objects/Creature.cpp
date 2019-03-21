@@ -507,21 +507,14 @@ bool Creature::UpdateEntry(uint32 Entry, Team team, const CreatureData *data /*=
     // preserve all current dynamic flags if exist
     uint32 dynFlags = GetUInt32Value(UNIT_DYNAMIC_FLAGS);
     SetUInt32Value(UNIT_DYNAMIC_FLAGS, dynFlags ? dynFlags : GetCreatureInfo()->dynamic_flags);
-    SetModifierValue(UNIT_MOD_ARMOR,             BASE_VALUE, float(GetCreatureInfo()->armor));
 
-    float resistances[] = {
-        float(GetCreatureInfo()->holy_res),
-        float(GetCreatureInfo()->fire_res),
-        float(GetCreatureInfo()->nature_res),
-        float(GetCreatureInfo()->frost_res),
-        float(GetCreatureInfo()->shadow_res),
-        float(GetCreatureInfo()->arcane_res)
-    };
-
-    for (int i = 0; i < 6; ++i)
-    {
-        SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, resistances[i]);
-    }
+    SetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE, float(GetCreatureInfo()->armor));
+    SetCreateResistance(SPELL_SCHOOL_HOLY, GetCreatureInfo()->holy_res);
+    SetCreateResistance(SPELL_SCHOOL_FIRE, GetCreatureInfo()->fire_res);
+    SetCreateResistance(SPELL_SCHOOL_NATURE, GetCreatureInfo()->nature_res);
+    SetCreateResistance(SPELL_SCHOOL_FROST, GetCreatureInfo()->frost_res);
+    SetCreateResistance(SPELL_SCHOOL_SHADOW, GetCreatureInfo()->shadow_res);
+    SetCreateResistance(SPELL_SCHOOL_ARCANE, GetCreatureInfo()->arcane_res);
 
     SetFly(CanFly());
     SetMeleeDamageSchool(SpellSchools(GetCreatureInfo()->dmg_school));
