@@ -1331,8 +1331,6 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
     }
     m_bonusdamage = 0;
 
-    int32 createResistance[MAX_SPELL_SCHOOL] = {0, 0, 0, 0, 0, 0, 0};
-
     // http://wowwiki.wikia.com/wiki/Patch_1.3.0
     // Before 1.3 pets retain their wild resistances, however it is mentioned as a bug.
     // TODO: Do we keep it or remove it?
@@ -1448,11 +1446,6 @@ bool Pet::InitStatsForLevel(uint32 petlevel, Unit* owner)
             SetFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
         else
             RemoveFlag(UNIT_FIELD_FLAGS, UNIT_FLAG_PLAYER_CONTROLLED);
-    }
-
-    for (int i = 0; i < 6; ++i)
-    {
-        SetModifierValue(UnitMods(UNIT_MOD_RESISTANCE_HOLY + i), BASE_VALUE, createResistance[i]);
     }
 
     UpdateAllStats();
