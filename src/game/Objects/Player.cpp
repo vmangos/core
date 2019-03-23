@@ -19360,6 +19360,33 @@ void Player::SetClientControl(Unit* target, uint8 allowMove)
 #endif
 }
 
+bool Player::IsMoverOf(Object const* pObject) const
+{
+    if (Player const* pPlayer = pObject->ToPlayer())
+    {
+        if (GetMover() == pPlayer)
+            return true;
+    }
+
+    return false;
+}
+
+bool Player::HasSelfMovementControl() const
+{
+    // Using Mind Vision
+    if (GetUInt64Value(PLAYER_FARSIGHT))
+        return false;
+
+    // Using Far Sight
+    if (m_longSightSpell)
+        return false;
+
+    if (hasUnitState(UNIT_STAT_LOST_CONTROL | UNIT_STAT_CONFUSED | UNIT_STAT_TAXI_FLIGHT))
+        return false;
+
+    return true;
+}
+
 bool Player::IsAllowedToMove(Unit* unit) const
 {
     if (unit == this)

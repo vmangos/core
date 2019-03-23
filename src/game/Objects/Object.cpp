@@ -335,7 +335,7 @@ void Object::BuildCreateUpdateBlockForPlayer(UpdateData *data, Player *target) c
     BuildMovementUpdate(&buf, updateFlags);
 
 #if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
-    buf << uint32(target == this ? 1 : 0); // Flags, 1 - Active Player
+    buf << uint32(target->IsMoverOf(this) ? 1 : 0); // Flags, 1 - Active Player
     buf << uint32(0); // AttackCycle
     buf << uint32(0); // TimerId
     buf << uint64(0); // VictimGuid

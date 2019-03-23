@@ -501,7 +501,15 @@ void WorldSession::HandleSetActiveMoverOpcode(WorldPacket &recv_data)
     ObjectGuid guid;
     recv_data >> guid;
 
-    if (_player->GetMover() && _player->GetMover()->GetObjectGuid() != guid)
+    ObjectGuid serverMoverGuid = _player->GetMover()->GetObjectGuid();
+
+    // Before 1.10, client sends 0 as guid if it has no control.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    if ((serverMoverGuid == _player->GetObjectGuid()) && !_player->HasSelfMovementControl())
+        serverMoverGuid = ObjectGuid();
+#endif
+
+    if (serverMoverGuid != guid)
     {
         sLog.outError("HandleSetActiveMoverOpcode: incorrect mover guid: mover is %s and should be %s",
                       _player->GetMover()->GetGuidStr().c_str(), guid.GetString().c_str());

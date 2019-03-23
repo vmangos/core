@@ -2808,14 +2808,10 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
 
     Unit* caster = this;
 
-    Player* p_caster = nullptr;
-    if (caster->IsCreature() && target->IsPlayer())
-    {
-        // Creature cast CM sur Joueur
-    }
-    else if (caster->IsPlayer())
-        p_caster = (Player*)caster;
-    else
+    Player* pPlayerCaster = caster->ToPlayer();
+    Player* pPlayerTarget = target->ToPlayer();
+
+    if (!pPlayerCaster && !pPlayerTarget)
         return;
 
     if (apply)
@@ -2833,11 +2829,11 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         target->setFaction(caster->getFaction());
 
         // target should became visible at SetView call(if not visible before):
-        // otherwise client\p_caster will ignore packets from the target(SetClientControl for example)
-        p_caster->GetCamera().SetView(target);
+        // otherwise client\pPlayerCaster will ignore packets from the target(SetClientControl for example)
+        pPlayerCaster->GetCamera().SetView(target);
 
         caster->SetCharm(target);
-        p_caster->SetMover(target);
+        pPlayerCaster->SetMover(target);
 
         target->CombatStop(true);
 
@@ -2849,15 +2845,15 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
             charmInfo->SetOriginalFactionTemplate(origFactionTemplate);
         }
 
-        p_caster->PossessSpellInitialize();
+        pPlayerCaster->PossessSpellInitialize();
 
         if (Creature* pTargetCrea = target->ToCreature())
             if (!pTargetCrea->hasUnitState(UNIT_STAT_CAN_NOT_REACT))
                 if (pTargetCrea->AI()->SwitchAiAtControl())
                     pTargetCrea->AIM_Initialize();
 
-        if (target->IsPlayer() && !caster->IsPlayer())
-                target->ToPlayer()->SetControlledBy(caster);
+        if (pPlayerTarget && !pPlayerCaster)
+            pPlayerTarget->SetControlledBy(caster);
         // Les mobs doivent attaquer celui qui est CM.
         // On appelle donc 'MoveInLineOfSight' pour les mobs a cote.
         target->ScheduleAINotify(0);
@@ -2865,7 +2861,7 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         if (target->hasUnitState(UNIT_STAT_STUNNED | UNIT_STAT_PENDING_STUNNED | UNIT_STAT_ROOT | UNIT_STAT_PENDING_ROOT))
             target->SetMovement(MOVE_ROOT);
         target->StopMoving();
-        target->SetWalk(p_caster->IsWalking());
+        target->SetWalk(pPlayerCaster->IsWalking());
     }
     else
     {
@@ -2875,15 +2871,14 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         // spell is interrupted on channeled aura removal, don't need to interrupt here
         //caster->InterruptSpell(CURRENT_CHANNELED_SPELL);
 
-        p_caster->SetMover(nullptr);
-
+        pPlayerCaster->SetMover(nullptr);
         caster->SetCharm(nullptr);
         caster->UpdateControl();
 
-        // there is a possibility that target became invisible for client\p_caster at ResetView call:
+        // there is a possibility that target became invisible for client\pPlayerCaster at ResetView call:
         // it must be called after movement control unapplying, not before! the reason is same as at aura applying
-        p_caster->GetCamera().ResetView();
-        p_caster->RemovePetActionBar();
+        pPlayerCaster->GetCamera().ResetView();
+        pPlayerCaster->RemovePetActionBar();
 
         // on delete only do caster related effects
         if (m_removeMode == AURA_REMOVE_BY_DELETE)
@@ -2930,6 +2925,11 @@ void Unit::ModPossess(Unit* target, bool apply, AuraRemoveMode m_removeMode)
         }
     }
     target->SetUnitMovementFlags(MOVEFLAG_NONE);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    if (pPlayerCaster && pPlayerTarget)
+        pPlayerTarget->SendCreateUpdateToPlayer(pPlayerCaster);
+#endif
 }
 
 void Aura::HandleModPossessPet(bool apply, bool Real)
