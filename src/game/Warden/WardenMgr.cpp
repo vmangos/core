@@ -353,7 +353,7 @@ void WardenMgr::GetWardenCheckIds(bool isMemCheck, uint16 build, std::list<uint1
 WardenModule* WardenMgr::GetRandomWardenModule(bool windows)
 {
     if (windows)
-        return &m_vWindowsModules[urand(0, m_vWindowsModules.size())];
+        return &m_vWindowsModules[urand(0, m_vWindowsModules.size() - 1)];
     else
-        return &m_vMacModules[urand(0, m_vMacModules.size())];
+        return &m_vMacModules[urand(0, m_vMacModules.size() - 1)];
 }
