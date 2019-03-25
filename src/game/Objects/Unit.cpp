@@ -3127,8 +3127,13 @@ float Unit::GetSpellResistChance(Unit const* victim, uint32 schoolMask, bool inn
 
     float resistModHitChance = baseResistance + selfResistance;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+    if ((resistModHitChance < 0.0f) && (baseResistance >= 0.0f))
+        resistModHitChance = 0.0f;
+#endif
+
     // Magic vulnerability calculation
-    if (resistModHitChance < 0)
+    if (resistModHitChance < 0.0f)
     {
         // Victim's level based skill, penalize when calculating for low levels (< 20):
         const float skill = std::max(GetSkillMaxForLevel(victim), uint16(100));
