@@ -140,9 +140,7 @@ void Player::UpdateArmor()
         }
     }
 
-    m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += dynamic;
-    int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
-
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
     // Add dummy effects from spells (check class and other conditions first for optimization)
     if (getClass() == CLASS_DRUID)
     {
@@ -158,12 +156,16 @@ void Player::UpdateArmor()
                     float enrageModifier = 0.0f;
                     enrageModifier = GetModifierValue(UNIT_MOD_ARMOR, BASE_VALUE);
                     enrageModifier *= (*itr)->GetModifier()->m_amount / 100.0f;
-                    value += enrageModifier;
+                    dynamic += enrageModifier;
                     break;
                 }
             }
         }
     }
+#endif
+
+    m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] += dynamic;
+    int32 value = GetTotalResistanceValue(SPELL_SCHOOL_NORMAL);
 
     SetArmor(value);
     m_auraModifiersGroup[UNIT_MOD_ARMOR][TOTAL_VALUE] -= dynamic;

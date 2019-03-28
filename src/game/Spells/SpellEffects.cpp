@@ -2399,7 +2399,7 @@ void Spell::EffectPowerBurn(SpellEffectIndex eff_idx)
     m_damage += new_damage;
 }
 
-void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectHeal(SpellEffectIndex eff_idx)
 {
     if (unitTarget && unitTarget->isAlive() && damage >= 0)
     {
@@ -2461,6 +2461,13 @@ void Spell::EffectHeal(SpellEffectIndex /*eff_idx*/)
 
         addhealth = caster->SpellHealingBonusDone(unitTarget, m_spellInfo, addhealth, HEAL, 1, this);
         addhealth = unitTarget->SpellHealingBonusTaken(caster, m_spellInfo, addhealth, HEAL, 1, this);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+        ExecuteLogInfo info(unitTarget->GetObjectGuid());
+        info.heal.amount = addhealth;
+        info.heal.critical = 0;
+        AddExecuteLogInfo(eff_idx, info);
+#endif
 
         m_healing += addhealth;
     }
@@ -2667,6 +2674,13 @@ void Spell::EffectEnergize(SpellEffectIndex eff_idx)
 
     if (m_spellInfo->Id == 2687)
         unitTarget->SetInCombatState(false, nullptr);
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    ExecuteLogInfo info(unitTarget->GetObjectGuid());
+    info.energize.amount = damage;
+    info.energize.powerType = power;
+    AddExecuteLogInfo(eff_idx, info);
+#endif
 
     m_caster->EnergizeBySpell(unitTarget, m_spellInfo->Id, damage, power);
 }
@@ -4234,7 +4248,7 @@ void Spell::EffectThreat(SpellEffectIndex eff_idx)
     AddExecuteLogInfo(eff_idx, ExecuteLogInfo(unitTarget->GetObjectGuid()));
 }
 
-void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
+void Spell::EffectHealMaxHealth(SpellEffectIndex eff_idx)
 {
     if (!unitTarget)
         return;
@@ -4263,6 +4277,13 @@ void Spell::EffectHealMaxHealth(SpellEffectIndex /*eff_idx*/)
         TakenTotalMod *= (100.0f + maxval) / 100.0f;
 
     heal *= TakenTotalMod;
+
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_9_4
+    ExecuteLogInfo info(unitTarget->GetObjectGuid());
+    info.heal.amount = heal;
+    info.heal.critical = 0;
+    AddExecuteLogInfo(eff_idx, info);
+#endif
 
     m_healing += heal;
 }
@@ -5048,6 +5069,15 @@ void Spell::EffectScriptEffect(SpellEffectIndex eff_idx)
 
                 m_caster->CastSpell(unitTarget, spellId2, true);
                 return;
+            }
+            // Seal of Fury proc
+            else if (m_spellInfo->SpellFamilyFlags == 4096)
+            {
+                if (!unitTarget || !unitTarget->CanHaveThreatList())
+                    return;
+                
+                if (unitTarget->getThreatManager().getThreat(m_caster))
+                    unitTarget->getThreatManager().addThreat(m_caster, damage * m_caster->GetAttackTime(BASE_ATTACK) / 1000);
             }
             break;
         }

@@ -7610,10 +7610,10 @@ void ObjectMgr::LoadReputationOnKill()
     uint32 count = 0;
 
     //                                                               0              1                       2
-    std::unique_ptr<QueryResult> result(WorldDatabase.Query("SELECT `creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`,"
+    std::unique_ptr<QueryResult> result(WorldDatabase.PQuery("SELECT `creature_id`, `RewOnKillRepFaction1`, `RewOnKillRepFaction2`,"
     //                      3               4               5                     6               7               8                     9
                           "`IsTeamAward1`, `MaxStanding1`, `RewOnKillRepValue1`, `IsTeamAward2`, `MaxStanding2`, `RewOnKillRepValue2`, `TeamDependent` "
-                          "FROM `creature_onkill_reputation`"));
+                          "FROM `creature_onkill_reputation` t1 WHERE `patch`=(SELECT max(`patch`) FROM `creature_onkill_reputation` t2 WHERE t1.`creature_id`=t2.`creature_id` && `patch` <= %u)", sWorld.GetWowPatch()));
 
     if (!result)
     {

@@ -1616,6 +1616,31 @@ SpellAuraProcResult Unit::HandleProcTriggerDamageAuraProc(Unit *pVictim, uint32 
     SpellEntry const *spellInfo = triggeredByAura->GetSpellProto();
     DEBUG_FILTER_LOG(LOG_FILTER_SPELL_CAST, "ProcDamageAndSpell: doing %u damage from spell id %u (triggered by auratype %u of spell %u)",
                      triggeredByAura->GetModifier()->m_amount, spellInfo->Id, triggeredByAura->GetModifier()->m_auraname, triggeredByAura->GetId());
+    
+    // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+    // - Seal of Righteousness - Now does holy damage on every swing.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    if (spellInfo->IsFitToFamilyMask<CF_PALADIN_SEALS>())
+    {
+        switch (spellInfo->Id)
+        {
+            case 21084: // Rank 1
+            case 20287: // Rank 2
+            case 20288: // Rank 3
+            case 20289: // Rank 4
+            case 20290: // Rank 5
+            case 20291: // Rank 6
+            case 20292: // Rank 7
+            case 20293: // Rank 8
+            {
+                if (!roll_chance_i(75)) // made up value
+                    return SPELL_AURA_PROC_FAILED;
+            }
+            break; 
+        }
+    }
+#endif
+
     SpellNonMeleeDamage damageInfo(this, pVictim, spellInfo->Id, SpellSchools(spellInfo->School));
     damageInfo.damage = CalculateSpellDamage(pVictim, spellInfo, triggeredByAura->GetEffIndex());
     damageInfo.damage = SpellDamageBonusDone(pVictim, spellInfo, damageInfo.damage, SPELL_DIRECT_DAMAGE);

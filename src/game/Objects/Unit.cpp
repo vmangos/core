@@ -6471,27 +6471,13 @@ void Unit::SendHealSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, bool c
     data << uint32(Damage);
     data << uint8(critical ? 1 : 0);
     // data << uint8(0);                                    // [-ZERO]
-#else
-    // Probably not correct way to show healing numbers, but it works.
-    WorldPacket data(SMSG_PERIODICAURALOG, 30);
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
-    data << pVictim->GetPackGUID();
-    data << GetPackGUID();
-#else
-    data << pVictim->GetGUID();
-    data << GetGUID();
-#endif
-    data << uint32(SpellID);                                // spellId
-    data << uint32(1);                                      // count
-    data << uint32(SPELL_AURA_PERIODIC_HEAL);               // auraId
-    data << uint32(Damage);                                 // damage
-#endif
     SendMessageToSet(&data, true);
+#endif
 }
 
 void Unit::SendEnergizeSpellLog(Unit *pVictim, uint32 SpellID, uint32 Damage, Powers powertype)
 {
-#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
     WorldPacket data(SMSG_SPELLENERGIZELOG, (8 + 8 + 4 + 4 + 4 + 1));
     data << pVictim->GetPackGUID();
     data << GetPackGUID();
