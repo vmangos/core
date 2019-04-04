@@ -213,6 +213,9 @@ public:
             data << uint32(race);                               // player race
             data << uint32(pzoneid);                            // player zone id
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+            data << uint32(0);                                  // unknown
+#endif
             // 50 is maximum player count sent to client
             if ((++clientcount) == 49)
                 break;
