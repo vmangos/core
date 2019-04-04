@@ -710,7 +710,7 @@ class Spell
                 struct
                 {
                     uint32 amount;
-                    uint32 critical;
+                    uint8 critical;
                 } heal;
 
                 struct
