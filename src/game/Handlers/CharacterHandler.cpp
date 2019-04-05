@@ -659,7 +659,11 @@ void WorldSession::HandlePlayerLogin(LoginQueryHolder *holder)
     // friend status
     // TODO: Call it when node finished loading also
     if (GetMasterPlayer())
+    {
+        GetMasterPlayer()->areaId = pCurrChar->GetCachedAreaId();
+        GetMasterPlayer()->zoneId = pCurrChar->GetCachedZoneId();
         sSocialMgr.SendFriendStatus(GetMasterPlayer(), FRIEND_ONLINE, GetMasterPlayer()->GetObjectGuid(), true);
+    }
 
     if (!alreadyOnline)
     {
