@@ -911,7 +911,7 @@ enum ReactiveType
 {
     REACTIVE_DEFENSE      = 1,
     REACTIVE_HUNTER_PARRY = 2,
-    //REACTIVE_CRIT         = 3,
+    REACTIVE_CRIT         = 3,
     //REACTIVE_HUNTER_CRIT  = 4,
     REACTIVE_OVERPOWER    = 5
 };
@@ -1951,7 +1951,7 @@ class MANGOS_DLL_SPEC Unit : public WorldObject
         // reactive attacks
         void ClearAllReactives();
         void StartReactiveTimer(ReactiveType reactive, ObjectGuid target) { m_reactiveTimer[reactive] = REACTIVE_TIMER_START; m_reactiveTarget[reactive] = target; }
-        ObjectGuid const& GetReactiveTraget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
+        ObjectGuid const& GetReactiveTarget(ReactiveType reactive) const { return m_reactiveTarget[reactive]; }
         void UpdateReactives(uint32 p_time);
 
         // group updates

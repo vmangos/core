@@ -2028,8 +2028,6 @@ void Unit::DealMeleeDamage(CalcDamageInfo *damageInfo, bool durabilityLoss)
     // Hmmmm dont like this emotes client must by self do all animations
     if (damageInfo->HitInfo & HITINFO_CRITICALHIT)
         pVictim->HandleEmoteCommand(EMOTE_ONESHOT_WOUNDCRITICAL);
-    if (damageInfo->blocked_amount && damageInfo->TargetState != VICTIMSTATE_BLOCKS)
-        pVictim->HandleEmoteCommand(EMOTE_ONESHOT_PARRYSHIELD);
 
     if (damageInfo->TargetState == VICTIMSTATE_PARRY)
     {
@@ -6077,18 +6075,22 @@ void Unit::ModifyAuraState(AuraState flag, bool apply)
         {
             RemoveFlag(UNIT_FIELD_AURASTATE, 1 << (flag - 1));
 
-            Unit::SpellAuraHolderMap& tAuras = GetSpellAuraHolderMap();
-            for (Unit::SpellAuraHolderMap::iterator itr = tAuras.begin(); itr != tAuras.end();)
+            if (flag != AURA_STATE_BERSERKING)
             {
-                SpellEntry const* spellProto = (*itr).second->GetSpellProto();
-                if (spellProto->CasterAuraState == flag)
+                Unit::SpellAuraHolderMap& tAuras = GetSpellAuraHolderMap();
+                for (Unit::SpellAuraHolderMap::iterator itr = tAuras.begin(); itr != tAuras.end();)
                 {
-                    RemoveSpellAuraHolder(itr->second);
-                    itr = tAuras.begin();
+                    SpellEntry const* spellProto = (*itr).second->GetSpellProto();
+                    if (spellProto->CasterAuraState == flag)
+                    {
+                        RemoveSpellAuraHolder(itr->second);
+                        itr = tAuras.begin();
+                    }
+                    else
+                        ++itr;
                 }
-                else
-                    ++itr;
             }
+            
             if (GetTypeId() == TYPEID_UNIT)
             {
                 switch (flag) 
@@ -9763,7 +9765,15 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
             // for victim
             if (isVictim)
             {
-                // if victim and dodge attack
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+                // if victim and got critted
+                if (procExtra & PROC_EX_CRITICAL_HIT)
+                {
+                    ModifyAuraState(AURA_STATE_BERSERKING, true);
+                    StartReactiveTimer(REACTIVE_CRIT, GetObjectGuid());
+                }
+#endif
+                // if victim and dodged attack
                 if (procExtra & PROC_EX_DODGE)
                 {
                     //Update AURA_STATE on dodge
@@ -9773,7 +9783,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
                         StartReactiveTimer(REACTIVE_DEFENSE, pTarget->GetObjectGuid());
                     }
                 }
-                // if victim and parry attack
+                // if victim and parried attack
                 if (procExtra & PROC_EX_PARRY)
                 {
                     // For Hunters only Counterattack (skip Mongoose bite)
@@ -9791,7 +9801,7 @@ void Unit::ProcDamageAndSpellFor(bool isVictim, Unit* pTarget, uint32 procFlag, 
                         StartReactiveTimer(REACTIVE_DEFENSE, pTarget->GetObjectGuid());
                     }
                 }
-                // if and victim block attack
+                // if victim and blocked attack
                 if (procExtra & PROC_EX_BLOCK)
                 {
                     ModifyAuraState(AURA_STATE_DEFENSE, true);
@@ -10218,6 +10228,11 @@ void Unit::ClearAllReactives()
         m_reactiveTarget[i].Clear();
     }
 
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    if (HasAuraState(AURA_STATE_BERSERKING))
+        ModifyAuraState(AURA_STATE_BERSERKING, false);
+#endif
+
     if (HasAuraState(AURA_STATE_DEFENSE))
         ModifyAuraState(AURA_STATE_DEFENSE, false);
     if (getClass() == CLASS_HUNTER && HasAuraState(AURA_STATE_HUNTER_PARRY))
@@ -10243,6 +10258,12 @@ void Unit::UpdateReactives(uint32 p_time)
 
             switch (reactive)
             {
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+                case REACTIVE_CRIT:
+                    if (HasAuraState(AURA_STATE_BERSERKING))
+                        ModifyAuraState(AURA_STATE_BERSERKING, false);
+                    break;
+#endif
                 case REACTIVE_DEFENSE:
                     if (HasAuraState(AURA_STATE_DEFENSE))
                         ModifyAuraState(AURA_STATE_DEFENSE, false);

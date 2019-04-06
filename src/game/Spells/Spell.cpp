@@ -5387,14 +5387,14 @@ SpellCastResult Spell::CheckCast(bool strict)
             case 14269:
             case 14270:
             case 14271:
-                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTraget(REACTIVE_DEFENSE))
+                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTarget(REACTIVE_DEFENSE))
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             // Contre-attaque
             case 19306:
             case 20909:
             case 20910:
-                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTraget(REACTIVE_HUNTER_PARRY))
+                if (m_targets.getUnitTargetGuid() != m_caster->GetReactiveTarget(REACTIVE_HUNTER_PARRY))
                     return SPELL_FAILED_BAD_TARGETS;
                 break;
             // Reindeer Transformation only castable while mounted
