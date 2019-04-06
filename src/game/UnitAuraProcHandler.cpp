@@ -82,9 +82,9 @@ pAuraProcHandler AuraProcHandler[TOTAL_AURAS] =
     &Unit::HandleProcTriggerDamageAuraProc,                 // 43 SPELL_AURA_PROC_TRIGGER_DAMAGE
     &Unit::HandleNULLProc,                                  // 44 SPELL_AURA_TRACK_CREATURES
     &Unit::HandleNULLProc,                                  // 45 SPELL_AURA_TRACK_RESOURCES
-    &Unit::HandleNULLProc,                                  // 46 SPELL_AURA_46
+    &Unit::HandleNULLProc,                                  // 46 SPELL_AURA_MOD_PARRY_SKILL
     &Unit::HandleNULLProc,                                  // 47 SPELL_AURA_MOD_PARRY_PERCENT
-    &Unit::HandleNULLProc,                                  // 48 SPELL_AURA_48
+    &Unit::HandleNULLProc,                                  // 48 SPELL_AURA_MOD_DODGE_SKILL
     &Unit::HandleNULLProc,                                  // 49 SPELL_AURA_MOD_DODGE_PERCENT
     &Unit::HandleNULLProc,                                  // 50 SPELL_AURA_MOD_BLOCK_SKILL    obsolete?
     &Unit::HandleNULLProc,                                  // 51 SPELL_AURA_MOD_BLOCK_PERCENT

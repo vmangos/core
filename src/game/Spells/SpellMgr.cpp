@@ -4939,16 +4939,49 @@ void SpellMgr::LoadSpells()
                         break;
                     }
                     
-#if SUPPORTED_CLIENT_BUILD < CLIENT_BUILD_1_9_4
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+                    // Before 1.9, the creature family is not a mask.
+                    case SPELL_AURA_MOD_DAMAGE_DONE_CREATURE:
+                    {
+                        spell->EffectMiscValue[i] = 1 << (spell->EffectMiscValue[i] - 1);
+                        break;
+                    }
+                    // Before 1.9, value 0 means all schools.
+                    case SPELL_AURA_MOD_THREAT:
+                    {
+                        if (spell->EffectMiscValue[i] == 0)
+                            spell->EffectMiscValue[i] = 127;
+                        break;
+                    }
                     // Before 1.9, the school is not a mask.
+                    case SPELL_AURA_MOD_DAMAGE_DONE:
+                    case SPELL_AURA_MOD_DAMAGE_TAKEN:
                     case SPELL_AURA_MOD_RESISTANCE:
+                    case SPELL_AURA_SCHOOL_IMMUNITY:
+                    case SPELL_AURA_DAMAGE_IMMUNITY:
+                    case SPELL_AURA_SCHOOL_ABSORB:
+                    case SPELL_AURA_MOD_SPELL_CRIT_CHANCE_SCHOOL:
+                    case SPELL_AURA_MOD_POWER_COST_SCHOOL_PCT:
+                    case SPELL_AURA_MOD_POWER_COST_SCHOOL:
+                    case SPELL_AURA_REFLECT_SPELLS_SCHOOL:
+                    case SPELL_AURA_MOD_DAMAGE_PERCENT_DONE:
+                    case SPELL_AURA_SPLIT_DAMAGE_PCT:
                     case SPELL_AURA_MOD_BASE_RESISTANCE:
+                    case SPELL_AURA_MOD_DAMAGE_PERCENT_TAKEN:
                     case SPELL_AURA_MOD_RESISTANCE_PCT:
+                    case SPELL_AURA_MOD_RANGED_DAMAGE_TAKEN:
+                    case SPELL_AURA_MOD_HEALING:
+                    case SPELL_AURA_MOD_HEALING_PCT:
+                    case SPELL_AURA_MOD_HEALING_DONE:
+                    case SPELL_AURA_MOD_HEALING_DONE_PERCENT:
                     case SPELL_AURA_MOD_BASE_RESISTANCE_PCT:
                     case SPELL_AURA_MOD_RESISTANCE_EXCLUSIVE:
+                    case SPELL_AURA_SPLIT_DAMAGE_FLAT:
                     {
-                        if (spell->EffectMiscValue[i] == -1)
-                            spell->EffectMiscValue[i] = 126; // all magic resists
+                        if (spell->EffectMiscValue[i] == -2)
+                            spell->EffectMiscValue[i] = 127; // all schools
+                        else if (spell->EffectMiscValue[i] == -1)
+                            spell->EffectMiscValue[i] = 126; // all magic schools
                         else
                             spell->EffectMiscValue[i] = 1 << spell->EffectMiscValue[i];
                         break;
