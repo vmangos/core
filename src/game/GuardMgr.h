@@ -43,7 +43,7 @@ class GuardMgr
         GuardMgr();
         ~GuardMgr() {}
         void Update(uint32 diff);
-        uint32 GetTextId(uint32 factionTemplateId, uint32 areaId) const;
+        uint32 GetTextId(uint32 factionTemplateId, uint32 areaId, uint32 displayId) const;
         bool SummonGuard(Creature* pCivilian, Player* pEnemy);
     private:
         std::unordered_map<uint32, AreaGuardInfo> m_mAreaGuardInfo;

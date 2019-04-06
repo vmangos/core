@@ -17,6 +17,7 @@
 #include "GuardMgr.h"
 #include "Creature.h"
 #include "CreatureAI.h"
+#include "DBCStores.h"
 #include "Log.h"
 #include "Policies/SingletonImp.h"
 
@@ -24,6 +25,26 @@ INSTANTIATE_SINGLETON_1(GuardMgr);
 
 #define GUARD_POST_USE_COOLDOWN  10000
 #define GUARD_POST_RECHARGE_TIME 60000
+
+enum ModelIds
+{
+    MODEL_HUMAN_MALE    = 49,
+    MODEL_HUMAN_FEMALE  = 50,
+    MODEL_ORC_MALE      = 51,
+    MODEL_ORC_FEMALE    = 52,
+    MODEL_DWARF_MALE    = 53,
+    MODEL_DWARF_FEMALE  = 54,
+    MODEL_NELF_MALE     = 55,
+    MODEL_NELF_FEMALE   = 56,
+    MODEL_UNDEAD_MALE   = 57,
+    MODEL_UNDEAD_FEMALE = 58,
+    MODEL_TAUREN_MALE   = 59,
+    MODEL_TAUREN_FEMALE = 60,
+    MODEL_GNOME_MALE    = 182,
+    MODEL_GNOME_FEMALE  = 183,
+    MODEL_TROLL_MALE    = 185,
+    MODEL_TROLL_FEMALE  = 186,
+};
 
 enum GuardAreas
 {
@@ -242,13 +263,47 @@ void GuardMgr::Update(uint32 diff)
     }
 }
 
-uint32 GuardMgr::GetTextId(uint32 factionTemplateId, uint32 areaId) const
+uint32 GuardMgr::GetTextId(uint32 factionTemplateId, uint32 areaId, uint32 displayId) const
 {
     // Do only Razor Hill npcs use this text?
     // https://youtu.be/jkBYnb0EBXU?t=63
     // https://www.youtube.com/watch?v=r7aveH_fyTw
     if (areaId == AREA_RAZOR_HILL)
         return TEXT_GUARD_ORC_2;
+
+    // It appears the text used depends on the model, not faction?
+    // Night Elf and Human NPC with same faction say different texts.
+    // https://youtu.be/LEmiZsv78Bo?t=107
+    if (CreatureDisplayInfoEntry const* pDisplayInfo = sCreatureDisplayInfoStore.LookupEntry(displayId))
+    {
+        switch (pDisplayInfo->ModelId)
+        {
+            case MODEL_HUMAN_MALE:
+            case MODEL_HUMAN_FEMALE:
+                return TEXT_GUARD_HUMAN;
+            case MODEL_ORC_MALE:
+            case MODEL_ORC_FEMALE:
+                return TEXT_GUARD_ORC;
+            case MODEL_DWARF_MALE:
+            case MODEL_DWARF_FEMALE:
+                return TEXT_GUARD_DWARF;
+            case MODEL_NELF_MALE:
+            case MODEL_NELF_FEMALE:
+                return TEXT_GUARD_NIGHT_ELF;
+            case MODEL_UNDEAD_MALE:
+            case MODEL_UNDEAD_FEMALE:
+                return TEXT_GUARD_UNDEAD;
+            case MODEL_TAUREN_MALE:
+            case MODEL_TAUREN_FEMALE:
+                return TEXT_GUARD_TAUREN;
+            case MODEL_GNOME_MALE:
+            case MODEL_GNOME_FEMALE:
+                return TEXT_GUARD_GNOME;
+            case MODEL_TROLL_MALE:
+            case MODEL_TROLL_FEMALE:
+                return TEXT_GUARD_TROLL;
+        }
+    }
 
     switch (factionTemplateId)
     {
@@ -378,7 +433,7 @@ bool GuardMgr::SummonGuard(Creature* pCivilian, Player* pEnemy)
     guardInfo.charges--;
     guardInfo.cooldown = GUARD_POST_USE_COOLDOWN;
 
-    if (uint32 textId = GetTextId(pCivilian->getFaction(), areaId))
+    if (uint32 textId = GetTextId(pCivilian->getFaction(), areaId, pCivilian->GetDisplayId()))
         DoScriptText(textId, pCivilian, pEnemy, CHAT_TYPE_SAY);
 
     if (uint32 creatureId = pEnemy->GetTeamId() == TEAM_ALLIANCE ? guardInfo.creatureIdHorde : guardInfo.creatureIdAlliance)

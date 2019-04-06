@@ -48,8 +48,7 @@ void ReactorAI::MoveInLineOfSight(Unit* pWho)
         return;
 
     if (m_creature->IsHostileTo(pWho) && pWho->isTargetableForAttack() && m_creature->IsWithinLOSInMap(pWho))
-        if (sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho)))
-            m_bCanSummonGuards = false;
+        m_bCanSummonGuards = !sGuardMgr.SummonGuard(m_creature, static_cast<Player*>(pWho));
 }
 
 void ReactorAI::AttackStart(Unit *p)
