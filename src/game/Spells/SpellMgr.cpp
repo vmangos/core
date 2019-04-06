@@ -570,6 +570,10 @@ SpellSpecific GetSpellSpecific(uint32 spellId)
             if ((spellInfo->IsFitToFamilyMask(UI64LIT(0x0000000020180400))) && spellInfo->baseLevel != 0)
                 return SPELL_JUDGEMENT;
 
+            // Old Judgement of Command
+            if (spellInfo->SpellIconID == 561 && spellInfo->SpellVisual == 5652)
+                return SPELL_JUDGEMENT;
+
             for (int i = 0; i < 3; ++i)
             {
                 // only paladin auras have this
