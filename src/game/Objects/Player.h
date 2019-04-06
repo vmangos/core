@@ -1411,6 +1411,7 @@ class MANGOS_DLL_SPEC Player final: public Unit
         bool IsImmuneToSpellEffect(SpellEntry const* spellInfo, SpellEffectIndex index, bool castOnSelf) const;
         virtual void ProhibitSpellSchool(SpellSchoolMask idSchoolMask, uint32 unTimeMs);
         void SendClearCooldown(uint32 spell_id, Unit* target) const;
+        void SendClearAllCooldowns(Unit* target) const;
         void SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const;
         void SendSpellRemoved(uint32 spell_id) const;
 

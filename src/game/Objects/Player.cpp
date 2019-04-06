@@ -20201,6 +20201,13 @@ void Player::SendClearCooldown(uint32 spell_id, Unit* target) const
     SendDirectMessage(&data);
 }
 
+void Player::SendClearAllCooldowns(Unit* target) const
+{
+    WorldPacket data(SMSG_COOLDOWN_CHEAT, 8);
+    data << target->GetObjectGuid();
+    SendDirectMessage(&data);
+}
+
 void Player::SendSpellCooldown(uint32 spellId, uint32 cooldown, ObjectGuid target) const
 {
     WorldPacket data(SMSG_SPELL_COOLDOWN, 8 + 4 + 4);

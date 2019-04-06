@@ -11947,9 +11947,8 @@ void Unit::RemoveAllSpellCooldown()
 {
     if (!m_spellCooldowns.empty())
     {
-        if (Player* player = GetAffectingPlayer())
-            for (SpellCooldowns::const_iterator itr = m_spellCooldowns.begin(); itr != m_spellCooldowns.end(); ++itr)
-                player->SendClearCooldown(itr->first, this);
+        if (Player* pPlayer = GetAffectingPlayer())
+            pPlayer->SendClearAllCooldowns(this);
 
         m_spellCooldowns.clear();
     }
