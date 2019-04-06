@@ -99,9 +99,13 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
         }
         case SPELLFAMILY_HUNTER:
         {
+            // World of Warcraft Client Patch 1.10.0 (2006-03-28)
+            // - Freezing Traps are now affected by diminishing returns.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_9_4
             // Freezing trap
             if (IsFitToFamilyMask<CF_HUNTER_FREEZING_TRAP_EFFECT>())
                 return DIMINISHING_FREEZE;
+#endif
             break;
         }
         case SPELLFAMILY_WARLOCK:
@@ -109,9 +113,15 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
             // Fear
             if (IsFitToFamilyMask<CF_WARLOCK_MISC_DEBUFFS>() && Mechanic == MECHANIC_FEAR)
                 return DIMINISHING_WARLOCK_FEAR;
+
+            // World of Warcraft Client Patch 1.4.0 (2005-04-19)
+            // - Seduction (Succubus) - Is now considered a Fear effect for purposes 
+            //   of diminishing returns.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
             // Seduction
             if (Id == 6358)
                 return DIMINISHING_WARLOCK_FEAR;
+#endif
             // Curses/etc
             if (IsFitToFamilyMask<CF_WARLOCK_MISC_DEBUFFS>())
                 return DIMINISHING_LIMITONLY;
@@ -126,9 +136,14 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
         }
         case SPELLFAMILY_SHAMAN:
         {
+            // World of Warcraft Client Patch 1.4.0 (2005-04-19)
+            // - Frost Shock - Now subject to diminishing returns in PvP. This is 
+            //   considered a slowing effect.
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1
             // Frost Shock
             if (IsFitToFamilyMask<CF_SHAMAN_FROST_SHOCK>())
                 return DIMINISHING_CONTROL_ROOT;
+#endif
             break;
         }
         case SPELLFAMILY_MAGE:
@@ -140,26 +155,50 @@ DiminishingGroup SpellEntry::GetDiminishingReturnsGroup(bool triggered) const
         }
         case SPELLFAMILY_GENERIC:
         {
+            // World of Warcraft Client Patch 1.9.0 (2006-01-03)
+            // - Pyroclasm - The stun effect's duration no longer diminishes or is 
+            //   diminished by controlled stun abilities and spells(e.g.Cheap Shot,
+            //   Hammer of Justice, Charge, etc).
+            // - Impact - The stun effect's duration no longer diminishes or is 
+            //   diminished by controlled stun abilities and spells(e.g.Cheap Shot,
+            //   Hammer of Justice, Charge etc.).
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
             // Impact
             if (Id == 12355)
-                return DIMINISHING_TRIGGER_STUN; // avant 'DIMINISHING_NONE' (MaNGOSZero)
+                return DIMINISHING_TRIGGER_STUN;
             // Pyroclasm
             if (Id == 18093)
-                return DIMINISHING_NONE; // No diminishing returns (Patch 1.9)
+                return DIMINISHING_TRIGGER_STUN;
+#endif
+            // World of Warcraft Client Patch 1.8.0 (2005-10-11)
+            // - Gnomish Mind Control Cap - Is now subject to diminishing returns in 
+            //   the Charm category.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_7_1
+            // Gnomish Mind Control Cap
+            if (Id == 13181)
+                return DIMINISHING_NONE;
+#endif
             break;
         }
+
         default:
             break;
     }
 
-    // Ces sorts sont 'triggered' mais ne doivent pas avoir un DR de type 'proc'.
+    // No distinction between triggered and controlled CC before 1.9.
+#if SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4
+    triggered = false;
+#endif
+
+    // These spells are 'triggered' but must not have a proc type DR.
     switch (Id)
     {
-        case 7922: // Stun de charge.
-        // Stun de interception
-        case 20253: // Rang 1
-        case 20614: // Rang 2
-        case 20615: // Rang 3
+        // Charge Stun
+        case 7922:
+        // Intercept Stun
+        case 20253: // Rank 1
+        case 20614: // Rank 2
+        case 20615: // Rank 3
             return DIMINISHING_CONTROL_STUN;
     }
 
