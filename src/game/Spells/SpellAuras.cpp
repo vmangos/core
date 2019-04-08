@@ -4821,6 +4821,16 @@ void Aura::HandleAuraModAttackPower(bool apply, bool /*Real*/)
             modOwner->ApplySpellMod(GetSpellProto()->Id, SPELLMOD_ATTACK_POWER, amount);
 
     GetTarget()->HandleStatModifier(UNIT_MOD_ATTACK_POWER, TOTAL_VALUE, amount, apply);
+
+#if (SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_3_1) && (SUPPORTED_CLIENT_BUILD <= CLIENT_BUILD_1_8_4)
+    // Blood Fury- Add aura to decrease attack power on remove
+    if (!apply && GetId() == 23234)
+    {
+        int32 attackPower = -25 * (GetTarget()->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
+        if (attackPower < 0)
+            GetTarget()->CastCustomSpell(GetTarget(), 23230, &attackPower, nullptr, nullptr, true, nullptr, this);
+    }
+#endif
 }
 
 void Aura::HandleAuraModRangedAttackPower(bool apply, bool /*Real*/)

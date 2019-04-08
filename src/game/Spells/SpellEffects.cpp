@@ -1148,7 +1148,9 @@ void Spell::EffectDummy(SpellEffectIndex eff_idx)
                     if (m_caster->GetTypeId() != TYPEID_PLAYER)
                         return;
 
+#if SUPPORTED_CLIENT_BUILD > CLIENT_BUILD_1_8_4
                     m_caster->CastSpell(m_caster, 23230, true);
+#endif
 
                     damage = damage * (m_caster->GetInt32Value(UNIT_FIELD_ATTACK_POWER)) / 100;
                     if (damage > 0)
