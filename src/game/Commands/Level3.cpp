@@ -4578,28 +4578,48 @@ bool ChatHandler::HandleLevelUpCommand(char* args)
         }
     }
 
-    Player* target;
-    ObjectGuid target_guid;
-    std::string target_name;
-    if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
-        return false;
+	if (Creature* pCreature = GetSelectedCreature())
+	{
+		int32 newlevel = pCreature->getLevel() + addlevel;
 
-    int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromDB(target_guid);
-    int32 newlevel = oldlevel + addlevel;
+		if (newlevel < 1)
+			newlevel = 1;
 
-    if (newlevel < 1)
-        newlevel = 1;
+		if (newlevel > STRONG_MAX_LEVEL)
+			newlevel = STRONG_MAX_LEVEL;
 
-    if (newlevel > STRONG_MAX_LEVEL)                        // hardcoded maximum level
-        newlevel = STRONG_MAX_LEVEL;
+		if (pCreature->IsPet())
+			((Pet*)pCreature)->GivePetLevel(newlevel);
+		else
+			pCreature->SetLevel(newlevel);
 
-    HandleCharacterLevel(target, target_guid, oldlevel, newlevel);
+		PSendSysMessage(LANG_YOU_CHANGE_LVL, pCreature->GetName(), newlevel);
+	}
+	else
+	{
+		Player* target;
+		ObjectGuid target_guid;
+		std::string target_name;
+		if (!ExtractPlayerTarget(&nameStr, &target, &target_guid, &target_name))
+			return false;
 
-    if (!m_session || m_session->GetPlayer() != target)     // including chr==NULL
-    {
-        std::string nameLink = playerLink(target_name);
-        PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
-    }
+		int32 oldlevel = target ? target->getLevel() : Player::GetLevelFromDB(target_guid);
+		int32 newlevel = oldlevel + addlevel;
+
+		if (newlevel < 1)
+			newlevel = 1;
+
+		if (newlevel > STRONG_MAX_LEVEL)                        // hardcoded maximum level
+			newlevel = STRONG_MAX_LEVEL;
+
+		HandleCharacterLevel(target, target_guid, oldlevel, newlevel);
+
+		if (!m_session || m_session->GetPlayer() != target)     // including chr==NULL
+		{
+			std::string nameLink = playerLink(target_name);
+			PSendSysMessage(LANG_YOU_CHANGE_LVL, nameLink.c_str(), newlevel);
+		}
+	}
 
     return true;
 }
