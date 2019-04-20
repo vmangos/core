@@ -48,16 +48,16 @@ public:
     Color4(const Any& any);
     
     /** Converts the Color4 to an Any. */
-    operator Any() const;
+    Any toAny() const;
 
     /**
-     * Does not initialize fields.
+     Initializes to all zero
      */
-    Color4 ();
+    Color4() : r(0), g(0), b(0), a(0) {}
 
     Color4(const Color3& c3, float a = 1.0);
 
-    Color4(const class Color4uint8& c);
+    Color4(const class Color4unorm8& c);
 
     Color4(class BinaryInput& bi);
 
@@ -117,9 +117,18 @@ public:
     Color4 operator+ (const Color4& rkVector) const;
     Color4 operator- (const Color4& rkVector) const;
     Color4 operator* (float fScalar) const;
-    inline Color4 operator* (const Color4& k) const {
+    Color4 operator* (const Color4& k) const {
         return Color4(r*k.r, g*k.g, b*k.b, a * k.a); 
     }
+
+    Color4& operator*= (const Color4& c) {
+        r *= c.r;
+        g *= c.g;
+        b *= c.b;
+        a *= c.a;
+        return *this;
+    }
+
     Color4 operator/ (float fScalar) const;
     Color4 operator- () const;
     friend Color4 operator* (double fScalar, const Color4& rkVector);
@@ -182,12 +191,6 @@ inline Color4 operator*(const Color3& c3, const Color4& c4) {
 
 //----------------------------------------------------------------------------
 
-inline Color4::Color4 () {
-    // For efficiency in construction of large arrays of vectors, the
-    // default constructor does not initialize the vector.
-}
-
-//----------------------------------------------------------------------------
 
 inline Color4::Color4(const Color3& c3, float a) {
     r = c3.r;

@@ -3,9 +3,9 @@
 
   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   @created 2003-09-14
-  @edited  2009-04-26
+  @edited  2010-04-26
 
-  Copyright 2000-2009, Morgan McGuire.
+  Copyright 2000-2012, Morgan McGuire.
   All rights reserved.
 
  */
@@ -15,6 +15,7 @@
 #include "G3D/Set.h"
 #include "G3D/Stopwatch.h"
 #include "G3D/SmallArray.h"
+#include "G3D/AreaMemoryManager.h"
 
 namespace G3D {
 
@@ -42,6 +43,11 @@ private:
     ET                   table;
 
 public:
+
+    MeshEdgeTable() {
+        AreaMemoryManager::Ref mm = AreaMemoryManager::create();
+        table.clearAndSetMemoryManager(mm);
+    }
 
     void clear() {
         table.clear();
@@ -119,6 +125,11 @@ public:
             return *this;
         }
 
+        bool isValid() const {
+            return ! m_end;
+        }
+
+        /** @deprecated  Use isValid */
         bool hasMore() const {
             return ! m_end;
         }
@@ -248,7 +259,7 @@ void MeshAlg::computeAdjacency(
     MeshEdgeTable::Iterator cur = edgeTable.begin();
 
     Array<Edge> tempEdgeArray;
-    while (cur.hasMore()) {
+    while (cur.isValid()) {
         MeshEdgeTable::FaceIndexArray& faceIndexArray = cur.faceIndex();
 
         // Process this edge
@@ -614,7 +625,7 @@ void MeshAlg::weldAdjacency(
     Array<Face>&          faceArray,
     Array<Edge>&          edgeArray,
     Array<Vertex>&        vertexArray,
-    double                radius) {
+    float                 radius) {
 
     // Num vertices
     const int n = originalGeometry.size();

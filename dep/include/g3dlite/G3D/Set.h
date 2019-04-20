@@ -57,9 +57,12 @@ public:
 
     /**
      Inserts into the table if not already present.
+     Returns true if this is the first time the element was added.
      */
-    void insert(const T& member) {
-        memberTable.set(member, true);
+    bool insert(const T& member) {
+        bool isNew = false;
+        memberTable.getCreate(member, isNew) = true;
+        return isNew;
     }
 
     /**
@@ -122,8 +125,13 @@ public:
             return !(*this == other);
         }
 
+        bool isValid() const {
+            return it.isValid();
+        }
+
+        /** @deprecated  Use isValid */
         bool hasMore() const {
-            return it.hasMore();
+            return it.isValid();
         }
         
         bool operator==(const Iterator& other) const {

@@ -1,12 +1,12 @@
 /**
-  @file Quat.h
+  \file G3D/Quat.h
  
   Quaternion
   
-  @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+  \maintainer Morgan McGuire, http://graphics.cs.williams.edu
   
-  @created 2002-01-23
-  @edited  2009-05-10
+  \created 2002-01-23
+  \edited  2011-05-10
  */
 
 #ifndef G3D_Quat_h
@@ -21,7 +21,9 @@
 namespace G3D {
 
 /**
-  Unit quaternions are used in computer graphics to represent
+  Arbitrary quaternion (not necessarily unit).
+
+  Unit quaternions (aka versors) are used in computer graphics to represent
   rotation about an axis.  Any 3x3 rotation matrix can
   be stored as a quaternion.
 
@@ -42,7 +44,7 @@ namespace G3D {
   Do not subclass.
 
   <B>BETA API -- subject to change</B>
-  @cite Erik B. Dam, Martin Koch, Martin Lillholm, Quaternions, Interpolation and Animation.  Technical Report DIKU-TR-98/5, Department of Computer Science, University of Copenhagen, Denmark.  1998.
+  \cite Erik B. Dam, Martin Koch, Martin Lillholm, Quaternions, Interpolation and Animation.  Technical Report DIKU-TR-98/5, Department of Computer Science, University of Copenhagen, Denmark.  1998.
  */
 class Quat {
 private:
@@ -63,29 +65,106 @@ public:
     float x, y, z, w;
 
     /**
-     Initializes to a zero degree rotation.
+     Initializes to a zero degree rotation, (0,0,0,1)
      */
-    inline Quat() : x(0), y(0), z(0), w(1) {}
+    Quat() : x(0), y(0), z(0), w(1) {}
 
-    Quat(
-        const Matrix3& rot);
+    /** Expects "Quat(x,y,z,w)" or a Matrix3 constructor. */
+    Quat(const class Any& a);
 
-    inline Quat(float _x, float _y, float _z, float _w) :
+    Any toAny() const;
+
+    Quat(const Matrix3& rot);
+
+    Quat(float _x, float _y, float _z, float _w) :
         x(_x), y(_y), z(_z), w(_w) {}
 
     /** Defaults to a pure vector quaternion */
-    inline Quat(const Vector3& v, float _w = 0) : x(v.x), y(v.y), z(v.z), w(_w) {
+    Quat(const Vector3& v, float _w = 0) : x(v.x), y(v.y), z(v.z), w(_w) {
     }
 
+    /** True if the components are exactly equal.  Note that two quaternations may
+        be unequal but map to the same rotation. */
+    bool operator==(const Quat& q) const {
+        return x == q.x && y == q.y && z == q.z && w == q.w;
+    }
+    
     /**
      The real part of the quaternion.
      */
-    inline const float& real() const {
+    const float& real() const {
         return w;
     }
 
-    inline float& real() {
+    float& real() {
         return w;
+    }
+
+    Quat operator-() const {
+        return Quat(-x, -y, -z, -w);
+    }
+
+    Quat operator-(const Quat& other) const {
+        return Quat(x - other.x, y - other.y, z - other.z, w - other.w);
+    }
+
+    Quat& operator-=(const Quat& q) {
+        x -= q.x;
+        y -= q.y;
+        z -= q.z;
+        w -= q.w;
+        return *this;
+    }
+
+    Quat operator+(const Quat& q) const {
+        return Quat(x + q.x, y + q.y, z + q.z, w + q.w);
+    }
+    
+    Quat& operator+=(const Quat& q) {
+        x += q.x;
+        y += q.y;
+        z += q.z;
+        w += q.w;
+        return *this;
+    }
+
+    /**
+     Negates the imaginary part.
+     */
+    Quat conj() const {
+        return Quat(-x, -y, -z, w);
+    }
+
+    float sum() const {
+        return x + y + z + w;
+    }
+
+    float average() const {
+        return sum() / 4.0f;
+    }
+
+    Quat operator*(float s) const {
+        return Quat(x * s, y * s, z * s, w * s);
+    }
+
+    Quat& operator*=(float s) {
+        x *= s;
+        y *= s;
+        z *= s;
+        w *= s;
+        return *this;
+    }
+
+
+    /** @cite Based on Watt & Watt, page 360 */
+    friend Quat operator* (float s, const Quat& q);
+
+    inline Quat operator/(float s) const {
+        return Quat(x / s, y / s, z / s, w / s);
+    }
+
+    float dot(const Quat& other) const {
+        return (x * other.x) + (y * other.y) + (z * other.z) + (w * other.w);
     }
 
     /** Note: two quats can represent the Quat::sameRotation and not be equal. */
@@ -100,18 +179,14 @@ public:
         return fuzzyEq(q) || fuzzyEq(-q);
     }
 
-	inline Quat operator-() const {
-		return Quat(-x, -y, -z, -w);
-	}
-
     /**
      Returns the imaginary part (x, y, z)
      */
-    inline const Vector3& imag() const {
+    const Vector3& imag() const {
         return *(reinterpret_cast<const Vector3*>(this));
     }
 
-    inline Vector3& imag() {
+    Vector3& imag() {
         return *(reinterpret_cast<Vector3*>(this));
     }
 
@@ -129,82 +204,75 @@ public:
     void toAxisAngleRotation(
         Vector3&            axis,
         float&              angle) const {
-		double d;
-		toAxisAngleRotation(axis, d);
-		angle = (float)d;
-	}
+        double d;
+        toAxisAngleRotation(axis, d);
+        angle = (float)d;
+    }
 
     Matrix3 toRotationMatrix() const;
 
     void toRotationMatrix(
         Matrix3&            rot) const;
     
+private:
+    /**  \param maxAngle Maximum angle of rotation allowed.  If a larger rotation is required, the angle of rotation applied is clamped to maxAngle */
+    Quat slerp
+       (const Quat&         other,
+        float               alpha,
+        float               threshold,
+        float               maxAngle) const;
+public:
+
     /**
      Spherical linear interpolation: linear interpolation along the 
      shortest (3D) great-circle route between two quaternions.
 
+     Assumes that both arguments are unit quaternions.
+
      Note: Correct rotations are expected between 0 and PI in the right order.
 
-     @cite Based on Game Physics -- David Eberly pg 538-540
-     @param threshold Critical angle between between rotations at which
-	        the algorithm switches to normalized lerp, which is more
-			numerically stable in those situations. 0.0 will always slerp. 
+     \cite Based on Game Physics -- David Eberly pg 538-540
+     
+     \param threshold Critical angle between between rotations (in radians) at which
+            the algorithm switches to normalized lerp, which is more
+            numerically stable in those situations. 0.0 will always slerp.
+
      */
-    Quat slerp(
-        const Quat&         other,
+    Quat slerp
+       (const Quat&         other,
         float               alpha,
-        float               threshold = 0.05f) const;
-
-	/** Normalized linear interpolation of quaternion components. */
-	Quat nlerp(const Quat& other, float alpha) const;
-
-    /**
-     Negates the imaginary part.
-     */
-    inline Quat conj() const {
-        return Quat(-x, -y, -z, w);
+        float               threshold = 0.05f) const {
+        return slerp(other, alpha, threshold, finf());
     }
 
-    inline float sum() const {
-        return x + y + z + w;
+    /** Rotates towards \a other by at most \a maxAngle. */
+    Quat movedTowards
+       (const Quat&         other,
+        float               maxAngle) const {
+        return slerp(other, 1.0f, 0.05f, maxAngle);
+    }
+    
+    /** Rotates towards \a other by at most \a maxAngle. */
+    void moveTowards
+       (const Quat&         other,
+        float               maxAngle) {
+        *this = movedTowards(other, maxAngle);
     }
 
-    inline float average() const {
-        return sum() / 4.0f;
-    }
+    /** Returns the angle in radians between this and other, assuming both are unit quaternions. 
+    
+      \returns On the range [0, pif()]*/
+    float angleBetween(const Quat& other) const;
 
-    inline Quat operator*(float s) const {
-        return Quat(x * s, y * s, z * s, w * s);
-    }
-
-    inline Quat& operator*=(float s) {
-        x *= s;
-        y *= s;
-        z *= s;
-        w *= s;
-        return *this;
-    }
-
-	/** @cite Based on Watt & Watt, page 360 */
-    friend Quat operator* (float s, const Quat& q);
-
-    inline Quat operator/(float s) const {
-        return Quat(x / s, y / s, z / s, w / s);
-    }
-
-    inline float dot(const Quat& other) const {
-        return (x * other.x) + (y * other.y) + (z * other.z) + (w * other.w);
-    }
+    /** Normalized linear interpolation of quaternion components. */
+    Quat nlerp(const Quat& other, float alpha) const;
+    
 
     /** Note that q<SUP>-1</SUP> = q.conj() for a unit quaternion. 
         @cite Dam99 page 13 */
     inline Quat inverse() const {
         return conj() / dot(*this);
     }
-
-    Quat operator-(const Quat& other) const;
-
-    Quat operator+(const Quat& other) const;
 
     /**
      Quaternion multiplication (composition of rotations).
@@ -217,18 +285,16 @@ public:
         return (*this) * other.inverse();
     }
 
-
     /** Is the magnitude nearly 1.0? */
-    inline bool isUnit(float tolerance = 1e-5) const {
+    bool isUnit(float tolerance = 1e-5) const {
         return abs(dot(*this) - 1.0f) < tolerance;
-    }
-    
+    }    
 
-    inline float magnitude() const {
+    float magnitude() const {
         return sqrtf(dot(*this));
     }
 
-    inline Quat log() const {
+    Quat log() const {
         if ((x == 0) && (y == 0) && (z == 0)) {
             if (w > 0) {
                 return Quat(0, 0, 0, ::logf(w));
@@ -249,22 +315,6 @@ public:
             return Quat(t * x, t * y, t * z, ::logf(len));
         }
     }
-    /** log q = [Av, 0] where q = [sin(A) * v, cos(A)].
-        Only for unit quaternions 
-        debugAssertM(isUnit(), "Log only defined for unit quaternions");
-        // Solve for A in q = [sin(A)*v, cos(A)]
-        Vector3 u(x, y, z);
-        double len = u.magnitude();
-
-        if (len == 0.0) {
-            return 
-        }
-        double A = atan2((double)w, len);
-        Vector3 v = u / len;
-        
-        return Quat(v * A, 0);
-    }
-    */
 
     /** exp q = [sin(A) * v, cos(A)] where q = [Av, 0].
         Only defined for pure-vector quaternions */
@@ -285,25 +335,23 @@ public:
      Note that q.pow(a).pow(b) == q.pow(a + b)
      @cite Dam98 pg 21
      */
-    inline Quat pow(float x) const {
-        return (log() * x).exp();
+    inline Quat pow(float r) const {
+        return (log() * r).exp();
     }
 
-    inline void unitize() {
-        float mag2 = dot(*this);
-        if (! G3D::fuzzyEq(mag2, 1.0f)) {
-            *this *= rsq(mag2);
-        }
+    /** Make unit length in place */
+    void unitize() {
+        *this *= rsq(dot(*this));
     }
 
     /**
      Returns a unit quaterion obtained by dividing through by
      the magnitude.
      */
-    inline Quat toUnit() const {
-        Quat x = *this;
-        x.unitize();
-        return x;
+    Quat toUnit() const {
+        Quat copyOfThis = *this;
+        copyOfThis.unitize();
+        return copyOfThis;
     }
 
     /**
@@ -312,7 +360,7 @@ public:
      n(q) value used in Eberly's 1999 paper, which is the square of the
      norm.
      */
-    inline float norm() const {
+    float norm() const {
         return magnitude();
     }
 
@@ -325,7 +373,7 @@ public:
     float& operator[] (int i);
 
     /** Generate uniform random unit quaternion (i.e. random "direction") 
-	@cite From "Uniform Random Rotations", Ken Shoemake, Graphics Gems III.
+    @cite From "Uniform Random Rotations", Ken Shoemake, Graphics Gems III.
    */
     static Quat unitRandom();
 
@@ -706,13 +754,6 @@ inline const float& Quat::operator[] (int i) const {
     return ((float*)this)[i];
 }
 
-inline Quat Quat::operator-(const Quat& other) const {
-    return Quat(x - other.x, y - other.y, z - other.z, w - other.w);
-}
-
-inline Quat Quat::operator+(const Quat& other) const {
-    return Quat(x + other.x, y + other.y, z + other.z, w + other.w);
-}
 
 } // Namespace G3D
 
