@@ -34,7 +34,7 @@
 #include "Mail.h"
 #include "MassMailMgr.h"
 #include "InstanceData.h"
-#include "BattlegroundMgr.h"
+#include "BattleGroundMgr.h"
 
 bool ChatHandler::HandleHelpCommand(char* args)
 {
