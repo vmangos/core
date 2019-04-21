@@ -18,7 +18,6 @@
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
@@ -39,6 +38,30 @@
 #include "AuraRemovalMgr.h"
 #include "AutoBroadCastMgr.h"
 #include "SpellModMgr.h"
+
+bool ChatHandler::HandleAnnounceCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    sWorld.SendWorldText(LANG_SYSTEMMESSAGE, args);
+    return true;
+}
+
+bool ChatHandler::HandleNotifyCommand(char* args)
+{
+    if (!*args)
+        return false;
+
+    std::string str = GetMangosString(LANG_GLOBAL_NOTIFY);
+    str += args;
+
+    WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
+    data << str;
+    sWorld.SendGlobalMessage(&data);
+
+    return true;
+}
 
 bool ChatHandler::HandleVariableCommand(char *args)
 {
@@ -109,23 +132,6 @@ bool ChatHandler::HandleSaveAllCommand(char* /*args*/)
     SendSysMessage(LANG_PLAYERS_SAVED);
     return true;
 }
-
-bool ChatHandler::HandleViewLogCommand(char* args)
-{
-    uint32 logId;
-    if (!ExtractUInt32(&args, logId))
-        return false;
-    World::ArchivedLogMessage* msg = sWorld.GetLog(logId, GetAccessLevel());
-    if (!msg)
-    {
-        PSendSysMessage("Log #%u not found.", logId);
-        SetSentErrorMessage(true);
-        return false;
-    }
-    SendSysMessage(msg->msg.c_str());
-    return true;
-}
-
 
 bool ChatHandler::HandleAntiSpamAdd(char* args)
 {
@@ -505,6 +511,22 @@ bool ChatHandler::HandleServerExitCommand(char* /*args*/)
 {
     SendSysMessage(LANG_COMMAND_EXIT);
     World::StopNow(SHUTDOWN_EXIT_CODE);
+    return true;
+}
+
+bool ChatHandler::HandleViewLogCommand(char* args)
+{
+    uint32 logId;
+    if (!ExtractUInt32(&args, logId))
+        return false;
+    World::ArchivedLogMessage* msg = sWorld.GetLog(logId, GetAccessLevel());
+    if (!msg)
+    {
+        PSendSysMessage("Log #%u not found.", logId);
+        SetSentErrorMessage(true);
+        return false;
+    }
+    SendSysMessage(msg->msg.c_str());
     return true;
 }
 

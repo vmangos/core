@@ -19,13 +19,11 @@
 #include "Database/DatabaseImpl.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
 #include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -268,7 +266,6 @@ bool ChatHandler::HandleAccountCreateCommand(char* args)
 
     return true;
 }
-
 
 /// Delete a user account and all associated characters in this realm
 /// \todo This function has to be enhanced to respect the login/realm split (delete char, delete account chars in realm, delete account chars in realm then delete account

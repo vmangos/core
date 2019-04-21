@@ -19,13 +19,10 @@
 #include "Database/DatabaseImpl.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "Chat.h"
-#include "ObjectAccessor.h"
 #include "Language.h"
 #include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "GuildMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
@@ -991,7 +988,6 @@ bool ChatHandler::HandleLookupAccountNameCommand(char* args)
 
     return true;
 }
-
 
 bool ChatHandler::HandleLookupPlayerIpCommand(char* args)
 {

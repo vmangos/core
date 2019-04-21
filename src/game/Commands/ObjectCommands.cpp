@@ -18,13 +18,10 @@
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
-#include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -152,10 +149,9 @@ bool ChatHandler::HandleGameObjectTargetCommand(char* args)
     return true;
 }
 
-//delete object by selection or guid
-bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
+bool ChatHandler::HandleGameObjectInfoCommand(char* args)
 {
-    // number or [name] Shift-click form |color|Hgameobject:go_guid|h[name]|h|r
+    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
     uint32 lowguid;
     if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
         return false;
@@ -163,42 +159,25 @@ bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
     if (!lowguid)
         return false;
 
-    GameObject* obj = NULL;
+    GameObject* pGameObject = nullptr;
 
     // by DB guid
     if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
-        obj = GetGameObjectWithGuid(lowguid, go_data->id);
+        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
 
-    if (!obj)
+    if (!pGameObject)
     {
         PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
         SetSentErrorMessage(true);
         return false;
     }
-
-    if (ObjectGuid ownerGuid = obj->GetOwnerGuid())
-    {
-        Unit* owner = ObjectAccessor::GetUnit(*m_session->GetPlayer(), ownerGuid);
-        if (!owner || !ownerGuid.IsPlayer())
-        {
-            PSendSysMessage(LANG_COMMAND_DELOBJREFERCREATURE, obj->GetGUIDLow(), ownerGuid.GetString().c_str());
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        owner->RemoveGameObject(obj, false);
-    }
-
-    obj->SetRespawnTime(0);                                 // not save respawn time
-    obj->Delete();
-    obj->DeleteFromDB();
-
-    PSendSysMessage(LANG_COMMAND_DELOBJMESSAGE, obj->GetGUIDLow());
+    
+    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
+    SendSysMessage(pGameObject->isSpawned() ? "Object is spawned." : "Not spawned.");
 
     return true;
 }
 
-//turn selected object
 bool ChatHandler::HandleGameObjectTurnCommand(char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
@@ -242,36 +221,6 @@ bool ChatHandler::HandleGameObjectTurnCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleGameObjectInfoCommand(char* args)
-{
-    // number or [name] Shift-click form |color|Hgameobject:go_id|h[name]|h|r
-    uint32 lowguid;
-    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
-        return false;
-
-    if (!lowguid)
-        return false;
-
-    GameObject* pGameObject = nullptr;
-
-    // by DB guid
-    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
-        pGameObject = GetGameObjectWithGuid(lowguid, go_data->id);
-
-    if (!pGameObject)
-    {
-        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
-        SetSentErrorMessage(true);
-        return false;
-    }
-    
-    PSendSysMessage("Entry: %u, GUID: %u\nName: %s\nType: %u, Display Id: %u\nGO State: %u, Loot State: %u", pGameObject->GetEntry(), pGameObject->GetGUIDLow(), pGameObject->GetGOInfo()->name, pGameObject->GetGoType(), pGameObject->GetDisplayId(), pGameObject->GetGoState(), pGameObject->getLootState());
-    SendSysMessage(pGameObject->isSpawned() ? "Object is spawned." : "Not spawned.");
-
-    return true;
-}
-
-//move selected object
 bool ChatHandler::HandleGameObjectMoveCommand(char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject:go_guid|h[name]|h|r
@@ -349,7 +298,51 @@ bool ChatHandler::HandleGameObjectMoveCommand(char* args)
     return true;
 }
 
-//spawn go
+bool ChatHandler::HandleGameObjectDeleteCommand(char* args)
+{
+    // number or [name] Shift-click form |color|Hgameobject:go_guid|h[name]|h|r
+    uint32 lowguid;
+    if (!ExtractUint32KeyFromLink(&args, "Hgameobject", lowguid))
+        return false;
+
+    if (!lowguid)
+        return false;
+
+    GameObject* obj = NULL;
+
+    // by DB guid
+    if (GameObjectData const* go_data = sObjectMgr.GetGOData(lowguid))
+        obj = GetGameObjectWithGuid(lowguid, go_data->id);
+
+    if (!obj)
+    {
+        PSendSysMessage(LANG_COMMAND_OBJNOTFOUND, lowguid);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    if (ObjectGuid ownerGuid = obj->GetOwnerGuid())
+    {
+        Unit* owner = ObjectAccessor::GetUnit(*m_session->GetPlayer(), ownerGuid);
+        if (!owner || !ownerGuid.IsPlayer())
+        {
+            PSendSysMessage(LANG_COMMAND_DELOBJREFERCREATURE, obj->GetGUIDLow(), ownerGuid.GetString().c_str());
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        owner->RemoveGameObject(obj, false);
+    }
+
+    obj->SetRespawnTime(0);                                 // not save respawn time
+    obj->Delete();
+    obj->DeleteFromDB();
+
+    PSendSysMessage(LANG_COMMAND_DELOBJMESSAGE, obj->GetGUIDLow());
+
+    return true;
+}
+
 bool ChatHandler::HandleGameObjectAddCommand(char* args)
 {
     // number or [name] Shift-click form |color|Hgameobject_entry:go_id|h[name]|h|r
@@ -569,6 +562,18 @@ bool ChatHandler::HandleGameObjectDespawnCommand(char*)
     return true;
 }
 
+bool ChatHandler::HandleGameObjectRespawnCommand(char*)
+{
+    GameObject* go = getSelectedGameObject();
+    if (!go)
+    {
+        SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
+        return false;
+    }
+    go->Respawn();
+    return true;
+}
+
 bool ChatHandler::HandleGameObjectToggleCommand(char* args)
 {
     uint32 lowguid;
@@ -616,17 +621,5 @@ bool ChatHandler::HandleGameObjectResetCommand(char*)
         return false;
     }
     go->ResetDoorOrButton();
-    return true;
-}
-
-bool ChatHandler::HandleGameObjectRespawnCommand(char*)
-{
-    GameObject* go = getSelectedGameObject();
-    if (!go)
-    {
-        SendSysMessage(LANG_COMMAND_NOGAMEOBJECTFOUND);
-        return false;
-    }
-    go->Respawn();
     return true;
 }

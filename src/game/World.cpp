@@ -115,7 +115,6 @@ World& GetSWorld()
 World::World()
 {
     m_playerLimit = 0;
-    m_allowMovement = true;
     m_ShutdownMask = 0;
     m_ShutdownTimer = 0;
     m_gameTime = time(nullptr);

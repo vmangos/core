@@ -18,13 +18,10 @@
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
-#include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -102,6 +99,174 @@ bool ChatHandler::HandleTeleDelCommand(char* args)
     }
 
     SendSysMessage(LANG_COMMAND_TP_DELETED);
+    return true;
+}
+
+//Teleport group to given game_tele.entry
+bool ChatHandler::HandleTeleGroupCommand(char * args)
+{
+    if (!*args)
+        return false;
+
+    Player *player = GetSelectedPlayer();
+    if (!player)
+    {
+        SendSysMessage(LANG_NO_CHAR_SELECTED);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // check online security
+    if (HasLowerSecurity(player))
+        return false;
+
+    // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
+    GameTele const* tele = ExtractGameTeleFromLink(&args);
+    if (!tele)
+    {
+        SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::string nameLink = GetNameLink(player);
+
+    Group *grp = player->GetGroup();
+    if (!grp)
+    {
+        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+    {
+        Player *pl = itr->getSource();
+
+        if (!pl || !pl->GetSession())
+            continue;
+
+        // check online security
+        if (HasLowerSecurity(pl))
+            return false;
+
+        std::string plNameLink = GetNameLink(pl);
+
+        if (pl->IsBeingTeleported())
+        {
+            PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
+            continue;
+        }
+
+        PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name.c_str());
+        if (needReportToTarget(pl))
+            ChatHandler(pl).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
+
+        // stop flight if need
+        if (pl->IsTaxiFlying())
+        {
+            pl->GetMotionMaster()->MovementExpired();
+            pl->GetTaxi().ClearTaxiDestinations();
+        }
+        // save only in non-flight case
+        else
+            pl->SaveRecallPosition();
+
+        pl->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
+    }
+
+    return true;
+}
+
+//Summon group of player
+bool ChatHandler::HandleGroupgoCommand(char* args)
+{
+    Player* target;
+    if (!ExtractPlayerTarget(&args, &target))
+        return false;
+
+    // check online security
+    if (HasLowerSecurity(target))
+        return false;
+
+    Group *grp = target->GetGroup();
+
+    std::string nameLink = GetNameLink(target);
+
+    if (!grp)
+    {
+        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    Map* gmMap = m_session->GetPlayer()->GetMap();
+    bool to_instance =  gmMap->Instanceable();
+
+    // we are in instance, and can summon only player in our group with us as lead
+    if (to_instance && (
+                !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
+                (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid())))
+        // the last check is a bit excessive, but let it be, just in case
+    {
+        SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
+    {
+        Player *pl = itr->getSource();
+
+        if (!pl || pl == m_session->GetPlayer() || !pl->GetSession())
+            continue;
+
+        // check online security
+        if (HasLowerSecurity(pl))
+            return false;
+
+        std::string plNameLink = GetNameLink(pl);
+
+        if (pl->IsBeingTeleported() == true)
+        {
+            PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
+            SetSentErrorMessage(true);
+            return false;
+        }
+
+        if (to_instance)
+        {
+            Map* plMap = pl->GetMap();
+
+            if (plMap->Instanceable() && plMap->GetInstanceId() != gmMap->GetInstanceId())
+            {
+                // cannot summon from instance to instance
+                PSendSysMessage(LANG_CANNOT_SUMMON_TO_INST, plNameLink.c_str());
+                SetSentErrorMessage(true);
+                return false;
+            }
+        }
+
+        PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
+        if (needReportToTarget(pl))
+            ChatHandler(pl).PSendSysMessage(LANG_SUMMONED_BY, nameLink.c_str());
+
+        // stop flight if need
+        if (pl->IsTaxiFlying())
+        {
+            pl->GetMotionMaster()->MovementExpired();
+            pl->GetTaxi().ClearTaxiDestinations();
+        }
+        // save only in non-flight case
+        else
+            pl->SaveRecallPosition();
+
+        // before GM
+        float x, y, z;
+        m_session->GetPlayer()->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
+        pl->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, pl->GetOrientation());
+    }
+
     return true;
 }
 
@@ -544,174 +709,6 @@ bool ChatHandler::HandleTeleNameCommand(char* args)
         PSendSysMessage(LANG_TELEPORTING_TO, nameLink.c_str(), GetMangosString(LANG_OFFLINE), tele->name.c_str());
         Player::SavePositionInDB(target_guid, tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation,
                                  sTerrainMgr.GetZoneId(tele->mapId, tele->position_x, tele->position_y, tele->position_z));
-    }
-
-    return true;
-}
-
-//Teleport group to given game_tele.entry
-bool ChatHandler::HandleTeleGroupCommand(char * args)
-{
-    if (!*args)
-        return false;
-
-    Player *player = GetSelectedPlayer();
-    if (!player)
-    {
-        SendSysMessage(LANG_NO_CHAR_SELECTED);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // check online security
-    if (HasLowerSecurity(player))
-        return false;
-
-    // id, or string, or [name] Shift-click form |color|Htele:id|h[name]|h|r
-    GameTele const* tele = ExtractGameTeleFromLink(&args);
-    if (!tele)
-    {
-        SendSysMessage(LANG_COMMAND_TELE_NOTFOUND);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    std::string nameLink = GetNameLink(player);
-
-    Group *grp = player->GetGroup();
-    if (!grp)
-    {
-        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
-    {
-        Player *pl = itr->getSource();
-
-        if (!pl || !pl->GetSession())
-            continue;
-
-        // check online security
-        if (HasLowerSecurity(pl))
-            return false;
-
-        std::string plNameLink = GetNameLink(pl);
-
-        if (pl->IsBeingTeleported())
-        {
-            PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
-            continue;
-        }
-
-        PSendSysMessage(LANG_TELEPORTING_TO, plNameLink.c_str(), "", tele->name.c_str());
-        if (needReportToTarget(pl))
-            ChatHandler(pl).PSendSysMessage(LANG_TELEPORTED_TO_BY, nameLink.c_str());
-
-        // stop flight if need
-        if (pl->IsTaxiFlying())
-        {
-            pl->GetMotionMaster()->MovementExpired();
-            pl->GetTaxi().ClearTaxiDestinations();
-        }
-        // save only in non-flight case
-        else
-            pl->SaveRecallPosition();
-
-        pl->TeleportTo(tele->mapId, tele->position_x, tele->position_y, tele->position_z, tele->orientation);
-    }
-
-    return true;
-}
-
-//Summon group of player
-bool ChatHandler::HandleGroupgoCommand(char* args)
-{
-    Player* target;
-    if (!ExtractPlayerTarget(&args, &target))
-        return false;
-
-    // check online security
-    if (HasLowerSecurity(target))
-        return false;
-
-    Group *grp = target->GetGroup();
-
-    std::string nameLink = GetNameLink(target);
-
-    if (!grp)
-    {
-        PSendSysMessage(LANG_NOT_IN_GROUP, nameLink.c_str());
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    Map* gmMap = m_session->GetPlayer()->GetMap();
-    bool to_instance =  gmMap->Instanceable();
-
-    // we are in instance, and can summon only player in our group with us as lead
-    if (to_instance && (
-                !m_session->GetPlayer()->GetGroup() || (grp->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid()) ||
-                (m_session->GetPlayer()->GetGroup()->GetLeaderGuid() != m_session->GetPlayer()->GetObjectGuid())))
-        // the last check is a bit excessive, but let it be, just in case
-    {
-        SendSysMessage(LANG_CANNOT_SUMMON_TO_INST);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    for (GroupReference *itr = grp->GetFirstMember(); itr != NULL; itr = itr->next())
-    {
-        Player *pl = itr->getSource();
-
-        if (!pl || pl == m_session->GetPlayer() || !pl->GetSession())
-            continue;
-
-        // check online security
-        if (HasLowerSecurity(pl))
-            return false;
-
-        std::string plNameLink = GetNameLink(pl);
-
-        if (pl->IsBeingTeleported() == true)
-        {
-            PSendSysMessage(LANG_IS_TELEPORTED, plNameLink.c_str());
-            SetSentErrorMessage(true);
-            return false;
-        }
-
-        if (to_instance)
-        {
-            Map* plMap = pl->GetMap();
-
-            if (plMap->Instanceable() && plMap->GetInstanceId() != gmMap->GetInstanceId())
-            {
-                // cannot summon from instance to instance
-                PSendSysMessage(LANG_CANNOT_SUMMON_TO_INST, plNameLink.c_str());
-                SetSentErrorMessage(true);
-                return false;
-            }
-        }
-
-        PSendSysMessage(LANG_SUMMONING, plNameLink.c_str(), "");
-        if (needReportToTarget(pl))
-            ChatHandler(pl).PSendSysMessage(LANG_SUMMONED_BY, nameLink.c_str());
-
-        // stop flight if need
-        if (pl->IsTaxiFlying())
-        {
-            pl->GetMotionMaster()->MovementExpired();
-            pl->GetTaxi().ClearTaxiDestinations();
-        }
-        // save only in non-flight case
-        else
-            pl->SaveRecallPosition();
-
-        // before GM
-        float x, y, z;
-        m_session->GetPlayer()->GetClosePoint(x, y, z, pl->GetObjectBoundingRadius());
-        pl->TeleportTo(m_session->GetPlayer()->GetMapId(), x, y, z, pl->GetOrientation());
     }
 
     return true;

@@ -22,9 +22,7 @@
 #include "Chat.h"
 #include "ObjectAccessor.h"
 #include "Language.h"
-#include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
@@ -97,33 +95,6 @@ bool ChatHandler::HandleBankCommand(char* /*args*/)
 bool ChatHandler::HandleStableCommand(char* /*args*/)
 {
     m_session->SendStablePet(m_session->GetPlayer()->GetObjectGuid());
-
-    return true;
-}
-
-
-// global announce
-bool ChatHandler::HandleAnnounceCommand(char* args)
-{
-    if (!*args)
-        return false;
-
-    sWorld.SendWorldText(LANG_SYSTEMMESSAGE, args);
-    return true;
-}
-
-//notification player at the screen
-bool ChatHandler::HandleNotifyCommand(char* args)
-{
-    if (!*args)
-        return false;
-
-    std::string str = GetMangosString(LANG_GLOBAL_NOTIFY);
-    str += args;
-
-    WorldPacket data(SMSG_NOTIFICATION, (str.size() + 1));
-    data << str;
-    sWorld.SendGlobalMessage(&data);
 
     return true;
 }
@@ -252,7 +223,6 @@ bool ChatHandler::HandleSetViewCommand(char* /*args*/)
     return true;
 }
 
-
 bool ChatHandler::HandleGMOptionsCommand(char* args)
 {
     if (!args)
@@ -334,7 +304,6 @@ bool ChatHandler::HandleGMListFullCommand(char* /*args*/)
     return true;
 }
 
-
 bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 {
     std::list< std::pair<std::string, bool> > names;
@@ -365,7 +334,6 @@ bool ChatHandler::HandleGMListIngameCommand(char* /*args*/)
 
     return true;
 }
-
 
 bool ChatHandler::HandleGMFlyCommand(char* args)
 {
@@ -697,7 +665,6 @@ bool ChatHandler::HandleInstanceSwitchCommand(char* args)
     return true;
 }
 
-
 bool ChatHandler::HandleInstanceContinentsCommand(char*)
 {
     if (Player* target = GetSelectedPlayer())
@@ -746,7 +713,6 @@ bool ChatHandler::HandleInstancePerfInfosCommand(char* args)
     PSendSysMessage("Units in client: %u pl, %u gobj, %u crea, %u corpses", playersInClient, gobjsInClient, unitsInClient, corpsesInClient);
     return true;
 }
-
 
 bool ChatHandler::HandleInstanceListBindsCommand(char* /*args*/)
 {
@@ -934,8 +900,6 @@ bool ChatHandler::HandleSendMassMailCommand(char* args)
     PSendSysMessage(LANG_MAIL_SENT, name);
     return true;
 }
-
-
 
 bool ChatHandler::HandleSendItemsHelper(MailDraft& draft, char* args)
 {

@@ -612,12 +612,6 @@ class World
         bool RemoveQueuedSession(WorldSession* session);
         int32 GetQueuedSessionPos(WorldSession*);
 
-        /// \todo Actions on m_allowMovement still to be implemented
-        /// Is movement allowed?
-        bool getAllowMovement() const { return m_allowMovement; }
-        /// Allow/Disallow object movements
-        void SetAllowMovement(bool allow) { m_allowMovement = allow; }
-
         /// Set a new Message of the Day
         void SetMotd(const std::string& motd) { m_motd = motd; }
         /// Get the current Message of the Day

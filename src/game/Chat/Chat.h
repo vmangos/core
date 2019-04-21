@@ -459,7 +459,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGameObjectDeleteCommand(char* args);
         bool HandleGameObjectMoveCommand(char* args);
         bool HandleGameObjectNearCommand(char* args);
-        bool HandleGameObjectPhaseCommand(char* args);
         bool HandleGameObjectTargetCommand(char* args);
         bool HandleGameObjectTurnCommand(char* args);
         bool HandleGameObjectDespawnCommand(char* args);
@@ -612,8 +611,10 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcAddVendorItemCommand(char* args);
         bool HandleNpcAIInfoCommand(char* args);
         bool HandleNpcAllowMovementCommand(char* args);
+        bool HandleNpcAllowAttackCommand(char* args);
         bool HandleNpcChangeEntryCommand(char* args);
         bool HandleNpcChangeLevelCommand(char* args);
+        bool HandleNpcDespawnCommand(char* args);
         bool HandleNpcDeleteCommand(char* args);
         bool HandleNpcDelVendorItemCommand(char* args);
         bool HandleNpcEvadeCommand(char* args);
@@ -888,9 +889,6 @@ class MANGOS_DLL_SPEC ChatHandler
         //! Development Commands
         bool HandleSaveAllCommand(char* args);
         bool HandleDebugMoveCommand(char* args);
-
-        //#INFO: Giperion was here
-        bool HandleDebugShowNearestGOInfo(char* args);
 
         Player*   GetSelectedPlayer();
         Creature* GetSelectedCreature();

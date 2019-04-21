@@ -968,7 +968,6 @@ bool ChatHandler::HandleDebugSpellCheckCommand(char* /*args*/)
     return true;
 }
 
-//show animation
 bool ChatHandler::HandleDebugAnimCommand(char* args)
 {
     uint32 emote_id;
@@ -1505,13 +1504,6 @@ bool ChatHandler::HandleDebugLoSAllowCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleDebugAssertFalseCommand(char*)
-{
-    ASSERT(false);
-    return false;
-}
-
-
 bool ChatHandler::HandleSendSpellVisualCommand(char *args)
 {
     Unit *pTarget = GetSelectedUnit();
@@ -1575,41 +1567,18 @@ bool ChatHandler::HandleSendSpellImpactCommand(char *args)
     return true;
 }
 
+bool ChatHandler::HandleDebugAssertFalseCommand(char*)
+{
+    ASSERT(false);
+    return false;
+}
+
 bool ChatHandler::HandleDebugChatFreezeCommand(char* args)
 {
     std::string message("| |01");
 
     auto master = GetSession()->GetMasterPlayer();
     master->Whisper(message, LANG_UNIVERSAL, master);
-
-    return true;
-}
-
-//#UNDONE !!!
-bool ChatHandler::HandleDebugShowNearestGOInfo(char* args)
-{
-    if (WorldSession* PlayerSession = GetSession())
-    {
-        if (Player* pl = PlayerSession->GetPlayer())
-        {
-            Map* CurrentMap = pl->GetMap();
-            if (CurrentMap == nullptr) return true;
-
-            float PlayerPosX = 0.0f;
-            float PlayerPosY = 0.0f;
-            float PlayerPosZ = 0.0f;
-            pl->GetPosition(PlayerPosX, PlayerPosY, PlayerPosZ);
-
-
-        }
-        else
-        {
-            PSendSysMessage("ERROR: Session without player!");
-        }
-    }
-
-
-    PSendSysMessage("Command must be executed in game!");
 
     return true;
 }
@@ -2053,10 +2022,10 @@ bool ChatHandler::HandleDebugUnitCommand(char* args)
 
     PSendSysMessage("Debugs on target [%s]%s", target->GetName(), (target->GetDebuggerGuid() == m_session->GetPlayer()->GetObjectGuid()) ? " ATTACHE" : "");
 #define HANDLE_DEBUG(flag, nom) PSendSysMessage("[%s] %6u \"" nom "\"", (target->GetDebugFlags() & flag) ? "ON" : "OFF", flag);
-    HANDLE_DEBUG(DEBUG_SPELL_COMPUTE_RESISTS, "Calculs des resists des sorts");
-    HANDLE_DEBUG(DEBUG_PACKETS_RECV, "Paquets recus par le serveur");
-    HANDLE_DEBUG(DEBUG_PACKETS_SEND, "Paquets envoyes par le serveur");
-    HANDLE_DEBUG(DEBUG_AI, "Divers debugs de l'AI");
+    HANDLE_DEBUG(DEBUG_SPELL_COMPUTE_RESISTS, "Spell Resist Calculations");
+    HANDLE_DEBUG(DEBUG_PACKETS_RECV, "Packet received by the server");
+    HANDLE_DEBUG(DEBUG_PACKETS_SEND, "Packets send by the server");
+    HANDLE_DEBUG(DEBUG_AI, "Various AI debug");
     HANDLE_DEBUG(DEBUG_DR, "Diminishing returns");
     HANDLE_DEBUG(DEBUG_CHEAT, "Anticheat");
     HANDLE_DEBUG(DEBUG_PROCS, "Proc system");
@@ -2130,7 +2099,6 @@ bool ChatHandler::HandleUnitStatCommand(char *args)
     return true;
 }
 
-
 bool ChatHandler::HandleDebugPvPCreditCommand(char *args)
 {
     Unit* pSelection = GetSelectedUnit();
@@ -2176,7 +2144,7 @@ bool ChatHandler::HandleDebugMoveToCommand(char* args)
         return true;
     }
 
-    // Determination des flags
+    // Determination of flags
     uint32 flags = 0;
     sscanf(args, "%x", &flags);
     player->GetMotionMaster()->MovePoint(0, target->GetPositionX(), target->GetPositionY(), target->GetPositionZ(), flags);
@@ -2337,7 +2305,6 @@ bool ChatHandler::HandleMmapTestArea(char* args)
 
     return true;
 }
-
 
 bool ChatHandler::HandleMmapPathCommand(char* args)
 {

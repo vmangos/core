@@ -18,110 +18,15 @@
 #include "Database/DatabaseEnv.h"
 #include "World.h"
 #include "Player.h"
-#include "Opcodes.h"
 #include "Chat.h"
-#include "ObjectAccessor.h"
 #include "Language.h"
-#include "AccountMgr.h"
 #include "ObjectMgr.h"
-#include "ScriptMgr.h"
 #include "SystemConfig.h"
 #include "revision.h"
 #include "Util.h"
 #include "SpellAuras.h"
 #include "TargetedMovementGenerator.h"
 #include "CellImpl.h"
-
-bool ChatHandler::HandlePossessCommand(char *args)
-{
-    Unit *tar = GetSelectedUnit();
-    if (!tar)
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        return false;
-    }
-    m_session->GetPlayer()->CastSpell(tar, 530, true);
-    return true;
-}
-
-bool ChatHandler::HandleAuraCommand(char* args)
-{
-    Unit *target = GetSelectedUnit();
-    if (!target)
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-    uint32 spellID = ExtractSpellIdFromLink(&args);
-
-    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellID);
-    if (!spellInfo)
-        return false;
-
-    if (!IsSpellAppliesAura(spellInfo, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
-        !IsSpellHaveEffect(spellInfo, SPELL_EFFECT_PERSISTENT_AREA_AURA))
-    {
-        PSendSysMessage(LANG_SPELL_NO_HAVE_AURAS, spellID);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer());
-
-    // Aura duration in seconds
-    int32 duration = 0;
-    ExtractInt32(&args, duration);
-    if (duration > 0)
-        holder->SetAuraDuration(duration * IN_MILLISECONDS);
-
-    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-    {
-        uint8 eff = spellInfo->Effect[i];
-        if (eff >= TOTAL_SPELL_EFFECTS)
-            continue;
-        if (IsAreaAuraEffect(eff) ||
-            eff == SPELL_EFFECT_APPLY_AURA ||
-            eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
-        {
-            Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, target);
-            holder->AddAura(aur, SpellEffectIndex(i));
-        }
-    }
-    if (!target->AddSpellAuraHolder(holder))
-        holder = nullptr;
-
-    return true;
-}
-
-bool ChatHandler::HandleUnAuraCommand(char* args)
-{
-    Unit *target = GetSelectedUnit();
-    if (!target)
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    std::string argstr = args;
-    if (argstr == "all")
-    {
-        target->RemoveAllAuras();
-        return true;
-    }
-
-    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
-    uint32 spellID = ExtractSpellIdFromLink(&args);
-    if (!spellID)
-        return false;
-
-    target->RemoveAurasDueToSpell(spellID);
-
-    return true;
-}
 
 bool ChatHandler::HandleGUIDCommand(char* /*args*/)
 {
@@ -252,6 +157,243 @@ bool ChatHandler::HandleGPSCommand(char* args)
     return true;
 }
 
+bool ChatHandler::HandleGetDistanceCommand(char* args)
+{
+    WorldObject* obj = nullptr;
+
+    if (*args)
+    {
+        if (ObjectGuid guid = ExtractGuidFromLink(&args))
+            obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
+
+        if (!obj)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        obj = GetSelectedUnit();
+
+        if (!obj)
+        {
+            SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    Player* player = m_session->GetPlayer();
+    // Calculate point-to-point distance
+    float dx, dy, dz;
+    dx = player->GetPositionX() - obj->GetPositionX();
+    dy = player->GetPositionY() - obj->GetPositionY();
+    dz = player->GetPositionZ() - obj->GetPositionZ();
+
+    PSendSysMessage(LANG_DISTANCE, player->GetDistance(obj), player->GetDistance2d(obj), sqrt(dx * dx + dy * dy + dz * dz));
+
+    return true;
+}
+
+bool ChatHandler::HandleGetAngleCommand(char* args)
+{
+    WorldObject* obj = nullptr;
+
+    if (*args)
+    {
+        if (ObjectGuid guid = ExtractGuidFromLink(&args))
+            obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
+
+        if (!obj)
+        {
+            SendSysMessage(LANG_PLAYER_NOT_FOUND);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+    else
+    {
+        obj = GetSelectedUnit();
+
+        if (!obj)
+        {
+            SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+            SetSentErrorMessage(true);
+            return false;
+        }
+    }
+
+    Player* player = m_session->GetPlayer();
+    float angle = player->GetAngle(obj);
+    PSendSysMessage("You are at a %f angle to %s.", angle, obj->GetName());
+
+    return true;
+}
+
+bool ChatHandler::HandleFreezeCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget)
+        return false;
+    pTarget->CastSpell(pTarget, 29826, true);
+    return true;
+}
+
+bool ChatHandler::HandleUnfreezeCommand(char* args)
+{
+    Unit* pTarget = GetSelectedUnit();
+    if (!pTarget)
+        return false;
+    pTarget->RemoveAurasDueToSpell(29826);
+    return true;
+}
+
+bool ChatHandler::HandlePossessCommand(char *args)
+{
+    Unit *tar = GetSelectedUnit();
+    if (!tar)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        return false;
+    }
+    m_session->GetPlayer()->CastSpell(tar, 530, true);
+    return true;
+}
+
+bool ChatHandler::HandleAuraCommand(char* args)
+{
+    Unit *target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+    uint32 spellID = ExtractSpellIdFromLink(&args);
+
+    SpellEntry const *spellInfo = sSpellMgr.GetSpellEntry(spellID);
+    if (!spellInfo)
+        return false;
+
+    if (!IsSpellAppliesAura(spellInfo, (1 << EFFECT_INDEX_0) | (1 << EFFECT_INDEX_1) | (1 << EFFECT_INDEX_2)) &&
+        !IsSpellHaveEffect(spellInfo, SPELL_EFFECT_PERSISTENT_AREA_AURA))
+    {
+        PSendSysMessage(LANG_SPELL_NO_HAVE_AURAS, spellID);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    SpellAuraHolder *holder = CreateSpellAuraHolder(spellInfo, target, m_session->GetPlayer());
+
+    // Aura duration in seconds
+    int32 duration = 0;
+    ExtractInt32(&args, duration);
+    if (duration > 0)
+        holder->SetAuraDuration(duration * IN_MILLISECONDS);
+
+    for (uint32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+    {
+        uint8 eff = spellInfo->Effect[i];
+        if (eff >= TOTAL_SPELL_EFFECTS)
+            continue;
+        if (IsAreaAuraEffect(eff) ||
+            eff == SPELL_EFFECT_APPLY_AURA ||
+            eff == SPELL_EFFECT_PERSISTENT_AREA_AURA)
+        {
+            Aura *aur = CreateAura(spellInfo, SpellEffectIndex(i), NULL, holder, target);
+            holder->AddAura(aur, SpellEffectIndex(i));
+        }
+    }
+    if (!target->AddSpellAuraHolder(holder))
+        holder = nullptr;
+
+    return true;
+}
+
+bool ChatHandler::HandleUnAuraCommand(char* args)
+{
+    Unit *target = GetSelectedUnit();
+    if (!target)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    std::string argstr = args;
+    if (argstr == "all")
+    {
+        target->RemoveAllAuras();
+        return true;
+    }
+
+    // number or [name] Shift-click form |color|Hspell:spell_id|h[name]|h|r or Htalent form
+    uint32 spellID = ExtractSpellIdFromLink(&args);
+    if (!spellID)
+        return false;
+
+    target->RemoveAurasDueToSpell(spellID);
+
+    return true;
+}
+
+bool ChatHandler::HandleListAurasCommand(char* /*args*/)
+{
+    Unit *unit = GetSelectedUnit();
+    if (!unit)
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
+        return false;
+    }
+
+    char const* talentStr = GetMangosString(LANG_TALENT);
+    char const* passiveStr = GetMangosString(LANG_PASSIVE);
+
+    Unit::SpellAuraHolderMap const& uAuras = unit->GetSpellAuraHolderMap();
+    PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, uAuras.size());
+    for (Unit::SpellAuraHolderMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
+    {
+        bool talent = GetTalentSpellCost(itr->second->GetId()) > 0;
+
+        SpellAuraHolder *holder = itr->second;
+        char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()].c_str();
+
+        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
+        {
+            Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
+            if (!aur)
+                continue;
+
+            if (m_session)
+            {
+                std::ostringstream ss_name;
+                ss_name << "|cffffffff|Hspell:" << itr->second->GetId() << "|h[" << name << "]|h|r";
+
+                PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
+                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),
+                    ss_name.str().c_str(),
+                    (holder->IsPassive() ? passiveStr : ""), (talent ? talentStr : ""),
+                    holder->GetCasterGuid().GetString().c_str());
+            }
+            else
+            {
+                PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
+                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),
+                    name,
+                    (holder->IsPassive() ? passiveStr : ""), (talent ? talentStr : ""),
+                    holder->GetCasterGuid().GetString().c_str());
+            }
+        }
+    }
+
+    return true;
+}
+
 bool ChatHandler::HandleCastCommand(char* args)
 {
     if (!*args)
@@ -357,7 +499,7 @@ bool ChatHandler::HandleCastDistCommand(char* args)
 
 bool ChatHandler::HandleCastTargetCommand(char* args)
 {
-    Creature* caster = GetSelectedCreature();
+    Unit* caster = GetSelectedUnit();
 
     if (!caster)
     {
@@ -388,7 +530,6 @@ bool ChatHandler::HandleCastTargetCommand(char* args)
 
     return true;
 }
-
 
 bool ChatHandler::HandleCastSelfCommand(char* args)
 {
@@ -428,60 +569,6 @@ bool ChatHandler::HandleCastSelfCommand(char* args)
 
     return true;
 }
-
-bool ChatHandler::HandleListAurasCommand(char* /*args*/)
-{
-    Unit *unit = GetSelectedUnit();
-    if (!unit)
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    char const* talentStr = GetMangosString(LANG_TALENT);
-    char const* passiveStr = GetMangosString(LANG_PASSIVE);
-
-    Unit::SpellAuraHolderMap const& uAuras = unit->GetSpellAuraHolderMap();
-    PSendSysMessage(LANG_COMMAND_TARGET_LISTAURAS, uAuras.size());
-    for (Unit::SpellAuraHolderMap::const_iterator itr = uAuras.begin(); itr != uAuras.end(); ++itr)
-    {
-        bool talent = GetTalentSpellCost(itr->second->GetId()) > 0;
-
-        SpellAuraHolder *holder = itr->second;
-        char const* name = holder->GetSpellProto()->SpellName[GetSessionDbcLocale()].c_str();
-
-        for (int32 i = 0; i < MAX_EFFECT_INDEX; ++i)
-        {
-            Aura *aur = holder->GetAuraByEffectIndex(SpellEffectIndex(i));
-            if (!aur)
-                continue;
-
-            if (m_session)
-            {
-                std::ostringstream ss_name;
-                ss_name << "|cffffffff|Hspell:" << itr->second->GetId() << "|h[" << name << "]|h|r";
-
-                PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
-                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),
-                    ss_name.str().c_str(),
-                    (holder->IsPassive() ? passiveStr : ""), (talent ? talentStr : ""),
-                    holder->GetCasterGuid().GetString().c_str());
-            }
-            else
-            {
-                PSendSysMessage(LANG_COMMAND_TARGET_AURADETAIL, holder->GetId(), aur->GetEffIndex(),
-                    aur->GetModifier()->m_auraname, aur->GetAuraDuration(), aur->GetAuraMaxDuration(),
-                    name,
-                    (holder->IsPassive() ? passiveStr : ""), (talent ? talentStr : ""),
-                    holder->GetCasterGuid().GetString().c_str());
-            }
-        }
-    }
-
-    return true;
-}
-
 
 bool ChatHandler::HandleModifyStrengthCommand(char *args)
 {
@@ -1021,37 +1108,6 @@ bool ChatHandler::HandleModifySpellPowerCommand(char *args)
     return true;
 }
 
-bool ChatHandler::HandleModifyCrCommand(char *args)
-{
-    if (!*args)
-        return false;
-
-    Unit* target = GetSelectedUnit();
-    if (!target) return false;
-    float f;
-    if (!ExtractFloat(&args, f))
-        return false;
-
-    target->SetFloatValue(UNIT_FIELD_COMBATREACH, f);
-    return true;
-}
-
-bool ChatHandler::HandleModifyBrCommand(char *args)
-{
-    if (!*args)
-        return false;
-
-    Unit* target = GetSelectedUnit();
-    if (!target) return false;
-    float f;
-    if (!ExtractFloat(&args, f))
-        return false;
-
-    target->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, f);
-    return true;
-}
-
-
 bool ChatHandler::HandleModifyMainSpeedCommand(char *args)
 {
     if (!*args)
@@ -1197,14 +1253,41 @@ bool ChatHandler::HandleModifyCastSpeedCommand(char *args)
     return true;
 }
 
-//demorph player or unit
+bool ChatHandler::HandleModifyCrCommand(char *args)
+{
+    if (!*args)
+        return false;
+
+    Unit* target = GetSelectedUnit();
+    if (!target) return false;
+    float f;
+    if (!ExtractFloat(&args, f))
+        return false;
+
+    target->SetFloatValue(UNIT_FIELD_COMBATREACH, f);
+    return true;
+}
+
+bool ChatHandler::HandleModifyBrCommand(char *args)
+{
+    if (!*args)
+        return false;
+
+    Unit* target = GetSelectedUnit();
+    if (!target) return false;
+    float f;
+    if (!ExtractFloat(&args, f))
+        return false;
+
+    target->SetFloatValue(UNIT_FIELD_BOUNDINGRADIUS, f);
+    return true;
+}
+
 bool ChatHandler::HandleDeMorphCommand(char* /*args*/)
 {
     Unit *target = GetSelectedUnit();
     if (!target)
         target = m_session->GetPlayer();
-
-
     // check online security
     else if (target->GetTypeId() == TYPEID_PLAYER && HasLowerSecurity((Player*)target))
         return false;
@@ -1214,7 +1297,6 @@ bool ChatHandler::HandleDeMorphCommand(char* /*args*/)
     return true;
 }
 
-//morph creature or player
 bool ChatHandler::HandleModifyMorphCommand(char* args)
 {
     if (!*args)
@@ -1235,7 +1317,6 @@ bool ChatHandler::HandleModifyMorphCommand(char* args)
     return true;
 }
 
-//change standstate
 bool ChatHandler::HandleModifyStandStateCommand(char* args)
 {
     Unit* pTarget = GetSelectedUnit();
@@ -1402,24 +1483,6 @@ bool ChatHandler::HandleModifyScaleCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleReplenishCommand(char* args)
-{
-    Unit *pUnit = GetSelectedUnit();
-    if (!pUnit || !pUnit->isAlive())
-    {
-        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-        SetSentErrorMessage(true);
-        return false;
-    }
-
-    pUnit->SetHealth(pUnit->GetMaxHealth());
-
-    if (pUnit->getPowerType() == POWER_MANA)
-        pUnit->SetPower(POWER_MANA, pUnit->GetMaxPower(POWER_MANA));
-
-    return true;
-}
-
 bool ChatHandler::HandleModifyHPCommand(char* args)
 {
     if (!*args)
@@ -1504,23 +1567,24 @@ bool ChatHandler::HandleModifyManaCommand(char* args)
     return true;
 }
 
-bool ChatHandler::HandleFreezeCommand(char* args)
+bool ChatHandler::HandleReplenishCommand(char* args)
 {
-    Unit* pTarget = GetSelectedUnit();
-    if (!pTarget)
+    Unit *pUnit = GetSelectedUnit();
+    if (!pUnit || !pUnit->isAlive())
+    {
+        SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
+        SetSentErrorMessage(true);
         return false;
-    pTarget->CastSpell(pTarget, 29826, true);
+    }
+
+    pUnit->SetHealth(pUnit->GetMaxHealth());
+
+    if (pUnit->getPowerType() == POWER_MANA)
+        pUnit->SetPower(POWER_MANA, pUnit->GetMaxPower(POWER_MANA));
+
     return true;
 }
 
-bool ChatHandler::HandleUnfreezeCommand(char* args)
-{
-    Unit* pTarget = GetSelectedUnit();
-    if (!pTarget)
-        return false;
-    pTarget->RemoveAurasDueToSpell(29826);
-    return true;
-}
 bool ChatHandler::HandleDamageCommand(char* args)
 {
     if (!*args)
@@ -1728,81 +1792,6 @@ bool ChatHandler::HandleCooldownCommand(char* args)
         target->RemoveSpellCooldown(spell_id, true);
         PSendSysMessage(LANG_REMOVE_COOLDOWN, spell_id, target == m_session->GetPlayer() ? GetMangosString(LANG_YOU) : tNameLink.c_str());
     }
-    return true;
-}
-
-bool ChatHandler::HandleGetDistanceCommand(char* args)
-{
-    WorldObject* obj = nullptr;
-
-    if (*args)
-    {
-        if (ObjectGuid guid = ExtractGuidFromLink(&args))
-            obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
-
-        if (!obj)
-        {
-            SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            SetSentErrorMessage(true);
-            return false;
-        }
-    }
-    else
-    {
-        obj = GetSelectedUnit();
-
-        if (!obj)
-        {
-            SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            SetSentErrorMessage(true);
-            return false;
-        }
-    }
-
-    Player* player = m_session->GetPlayer();
-    // Calculate point-to-point distance
-    float dx, dy, dz;
-    dx = player->GetPositionX() - obj->GetPositionX();
-    dy = player->GetPositionY() - obj->GetPositionY();
-    dz = player->GetPositionZ() - obj->GetPositionZ();
-
-    PSendSysMessage(LANG_DISTANCE, player->GetDistance(obj), player->GetDistance2d(obj), sqrt(dx * dx + dy * dy + dz * dz));
-
-    return true;
-}
-
-bool ChatHandler::HandleGetAngleCommand(char* args)
-{
-    WorldObject* obj = nullptr;
-
-    if (*args)
-    {
-        if (ObjectGuid guid = ExtractGuidFromLink(&args))
-            obj = (WorldObject*)m_session->GetPlayer()->GetObjectByTypeMask(guid, TYPEMASK_CREATURE_OR_GAMEOBJECT);
-
-        if (!obj)
-        {
-            SendSysMessage(LANG_PLAYER_NOT_FOUND);
-            SetSentErrorMessage(true);
-            return false;
-        }
-    }
-    else
-    {
-        obj = GetSelectedUnit();
-
-        if (!obj)
-        {
-            SendSysMessage(LANG_SELECT_CHAR_OR_CREATURE);
-            SetSentErrorMessage(true);
-            return false;
-        }
-    }
-
-    Player* player = m_session->GetPlayer();
-    float angle = player->GetAngle(obj);
-    PSendSysMessage("You are at a %f angle to %s.", angle, obj->GetName());
-
     return true;
 }
 
