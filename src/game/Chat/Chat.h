@@ -182,8 +182,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleGodCommand(char *);
         bool HandleGMOptionsCommand(char *);
         bool HandleAnticheatCommand(char *);
-        bool HandleWardenCommand(char *);
-        bool HandleWardenReadCommand(char *);
         bool HandleClientInfosCommand(char* );
         bool HandleClientSearchCommand(char* );
         bool HandleReloadAnticheatCommand(char*);
@@ -502,7 +500,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleHonorShow(char* args);
         bool HandleHonorAddCommand(char* args);
         bool HandleHonorAddKillCommand(char* args);
-        bool HandleHonorDebugScoresCommand(char*args);
         bool HandleHonorSetRPCommand(char*args);
         bool HandleHonorResetCommand(char*args);
 
@@ -638,9 +635,6 @@ class MANGOS_DLL_SPEC ChatHandler
         bool HandleNpcWhisperCommand(char* args);
         bool HandleNpcYellCommand(char* args);
 
-        //TODO: NpcCommands that needs to be fixed :
-        bool HandleNpcNameCommand(char* args);
-        bool HandleNpcSubNameCommand(char* args);
         //----------------------------------------------------------
 
         bool HandlePDumpLoadCommand(char* args);

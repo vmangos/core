@@ -182,7 +182,7 @@ enum AccountTypes
 {
     SEC_PLAYER         = 0,
     SEC_MODERATOR      = 1,
-    SEC_MODERATOR_CONF = 2,
+    SEC_TICKETMASTER   = 2,
     SEC_GAMEMASTER     = 3,
     SEC_BASIC_ADMIN    = 4,
     SEC_DEVELOPPER     = 5,
