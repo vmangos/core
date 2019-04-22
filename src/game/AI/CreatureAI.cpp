@@ -181,6 +181,23 @@ void CreatureAI::SetSpellsList(const CreatureSpellsList *pSpellsList)
         m_CreatureSpells.push_back(CreatureAISpellsEntry(entry));
     }
     m_CreatureSpells.shrink_to_fit();
+    m_uiCastingDelay = 0;
+}
+
+// Creature spell lists should be updated every 1.2 seconds according to research.
+// https://www.reddit.com/r/wowservers/comments/834nt5/felmyst_ai_system_research/
+#define CREATURE_CASTING_DELAY 1200
+
+void CreatureAI::UpdateSpellsList(const uint32 uiDiff)
+{
+    if (m_uiCastingDelay <= uiDiff)
+    {
+        uint32 const uiDesync = (uiDiff - m_uiCastingDelay);
+        DoSpellsListCasts(CREATURE_CASTING_DELAY + uiDesync);
+        m_uiCastingDelay = uiDesync < CREATURE_CASTING_DELAY ? CREATURE_CASTING_DELAY - uiDesync : 0;
+    }
+    else
+        m_uiCastingDelay -= uiDiff;
 }
 
 void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
@@ -190,14 +207,14 @@ void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
     {
         if (spell.cooldown <= uiDiff)
         {
-            // Prevent casting multiple spells in the same update. Only update timers.
-            if (bDontCast)
-                continue;
+            // Cooldown has expired.
+            spell.cooldown = 0;
 
-            if (m_creature->IsNonMeleeSpellCasted(false) && !(spell.castFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS)))
+            // Prevent casting multiple spells in the same update. Only update timers.
+            if (!(spell.castFlags & (CF_TRIGGERED | CF_INTERRUPT_PREVIOUS)))
             {
-                spell.cooldown = 200;
-                continue;
+                if (bDontCast || m_creature->IsNonMeleeSpellCasted(false))
+                    continue;
             } 
 
             // Checked on startup.
@@ -211,7 +228,7 @@ void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
             {
                 case SPELL_CAST_OK:
                 {
-                    bDontCast = true;
+                    bDontCast = !(spell.castFlags & CF_TRIGGERED);
                     spell.cooldown = urand(spell.delayRepeatMin, spell.delayRepeatMax);
 
                     if (spell.castFlags & CF_MAIN_RANGED_SPELL)
@@ -248,7 +265,6 @@ void CreatureAI::DoSpellsListCasts(const uint32 uiDiff)
                 default:
                 {
                     // other error
-                    spell.cooldown = 500;
                     if (spell.castFlags & CF_MAIN_RANGED_SPELL)
                     {
                         SetCombatMovement(true);

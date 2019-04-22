@@ -80,7 +80,7 @@ void ScriptedAI::UpdateAI(const uint32 uiDiff)
     m_creature->SelectHostileTarget();
 
     if (!m_CreatureSpells.empty() && m_creature->isInCombat())
-        DoSpellsListCasts(uiDiff);
+        UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
 }

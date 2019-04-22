@@ -76,7 +76,7 @@ void ReactorAI::UpdateAI(const uint32 uiDiff)
         return;
 
     if (!m_CreatureSpells.empty())
-        DoSpellsListCasts(uiDiff);
+        UpdateSpellsList(uiDiff);
 
     DoMeleeAttackIfReady();
 }
