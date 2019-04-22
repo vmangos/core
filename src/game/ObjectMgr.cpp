@@ -3563,15 +3563,6 @@ void ObjectMgr::LoadItemPrototypes()
         {
             if (proto->ExtraFlags & ~ITEM_EXTRA_ALL)
                 sLog.outErrorDb("Item (Entry: %u) has wrong ExtraFlags (%u) with unused bits set", i, proto->ExtraFlags);
-
-            if (proto->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION)
-            {
-                if (proto->Duration == 0)
-                {
-                    sLog.outErrorDb("Item (Entry: %u) has redundant real-time duration flag in ExtraFlags, item not have duration", i);
-                    const_cast<ItemPrototype*>(proto)->ExtraFlags &= ~ITEM_EXTRA_REAL_TIME_DURATION;
-                }
-            }
         }
 
 

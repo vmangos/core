@@ -11464,7 +11464,7 @@ void Player::UpdateItemDuration(uint32 time, bool realtimeonly)
         Item* item = *itr;
         ++itr;                                              // current element can be erased in UpdateDuration
 
-        if (!realtimeonly || (item->GetProto()->ExtraFlags & ITEM_EXTRA_REAL_TIME_DURATION))
+        if (!realtimeonly || (item->GetProto()->Flags & ITEM_FLAG_REAL_DURATION))
             item->UpdateDuration(this, time);
     }
 }

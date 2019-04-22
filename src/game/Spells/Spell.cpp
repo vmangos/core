@@ -7534,8 +7534,9 @@ SpellCastResult Spell::CheckItems()
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
 
                 // must have disenchant loot (other static req. checked at item prototype loading)
-                if (!itemProto->DisenchantID)
+                if (!itemProto->DisenchantID || (itemProto->Flags & ITEM_FLAG_NO_DISENCHANT))
                     return SPELL_FAILED_CANT_BE_DISENCHANTED;
+
                 break;
             }
             case SPELL_EFFECT_WEAPON_DAMAGE:
