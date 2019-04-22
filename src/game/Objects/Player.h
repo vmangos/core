@@ -2060,7 +2060,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
         time_t m_deathExpireTime;
         ObjectGuid     m_selectedGobj; // For GM commands
         ObjectGuid m_escortingGuid;
-        uint32 customFlags;
 
         void SendMountResult(PlayerMountResult result) const;
         void SendDismountResult(PlayerDismountResult result) const;
@@ -2110,14 +2109,6 @@ class MANGOS_DLL_SPEC Player final: public Unit
 
         // Nostalrius : Phasing
         virtual void SetWorldMask(uint32 newMask);
-
-        // Custom Flags
-        void LoadCustomFlags();
-        uint32 GetCustomFlags() { return customFlags; }
-        inline void SetCustomFlags(uint32 newFlags) { customFlags = newFlags; }
-        inline bool HasCustomFlag(uint32 flag) { return (customFlags & flag); }
-        inline void AddCustomFlag(uint32 flag) { customFlags |= flag; }
-        inline void RemoveCustomFlag(uint32 flag) { customFlags &= ~flag; }
 
         void RemoveDelayedOperation(uint32 operation)
         {

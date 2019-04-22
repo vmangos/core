@@ -801,7 +801,6 @@ bool Player::Create(uint32 guidlow, const std::string& name, uint8 race, uint8 c
 
     // Phasing
     SetWorldMask(WORLD_DEFAULT_CHAR);
-    SetCustomFlags(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_FROM_NOSTALRIUS_3);
 
     return true;
 }
@@ -14292,62 +14291,6 @@ void Player::_LoadIntoDataField(const char* data, uint32 startOffset, uint32 cou
         m_uint32Values[startOffset + index] = atol((*iter).c_str());
 }
 
-void Player::LoadCustomFlags()
-{
-    RemoveCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS | CUSTOM_FLAG_FROM_BLACKROCK | CUSTOM_FLAG_FROM_NOSTALRIUS_2
-                     | CUSTOM_FLAG_FROM_PRISMATIA | CUSTOM_FLAG_FROM_NOSTALRIUS_3 | CUSTOM_FLAG_PRISMATIA_BETA);
-
-    uint32 guidLow = GetGUIDLow();
-    // Sur quel royaume / Quand le perso a-t-il été créé ?
-    if (guidLow < 10000)
-        AddCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS);
-    else if (guidLow <= 13350)
-        AddCustomFlag(CUSTOM_FLAG_FROM_BLACKROCK);
-    else if (guidLow < 20000)
-        AddCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS_2);
-    else if (guidLow <= 29375)
-        AddCustomFlag(CUSTOM_FLAG_FROM_PRISMATIA);
-    else
-        AddCustomFlag(CUSTOM_FLAG_FROM_NOSTALRIUS_3);
-    // Beta testeur ?
-    if (HasItemCount(50001, 1))
-        AddCustomFlag(CUSTOM_FLAG_PRISMATIA_BETA);
-    // Load des 'phases'
-    // -- Pex termine
-    if (HasItemCount(19160, 1))
-    {
-        AddCustomFlag(CUSTOM_FLAG_HL | CUSTOM_FLAG_PEX_FINISHED);
-        RemoveCustomFlag(CUSTOM_FLAG_IN_PEX);
-    }
-    // -- Pas eu de pex
-    //else if (getLevel() > 56 && !HasCustomFlag(CUSTOM_FLAG_FROM_BLACKROCK))
-    //{
-    //    AddCustomFlag(CUSTOM_FLAG_HL);
-    //    RemoveCustomFlag(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_PEX_FINISHED);
-    //}
-    // -- En cours de pex
-    if ((getLevel() < 55 && !HasCustomFlag(CUSTOM_FLAG_FROM_PRISMATIA)) ||
-            getLevel() < 40)
-    {
-        AddCustomFlag(CUSTOM_FLAG_IN_PEX);
-        RemoveCustomFlag(CUSTOM_FLAG_PEX_FINISHED | CUSTOM_FLAG_HL);
-    }
-    // Et finalement les autres
-    if (!HasCustomFlag(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_PEX_FINISHED | CUSTOM_FLAG_HL | CUSTOM_FLAG_INSTANT60))
-    {
-        sLog.outInfo("[CustomFlag] Joueur %u (guid %u) flags inconnu ...", GetName(), GetGUIDLow());
-        AddCustomFlag(CUSTOM_FLAG_HL);
-    }
-    // Derniere verification pour ceux qui auraient exploit bug :
-    // 3 jours de /played mini pour upper
-    if (m_Played_time[PLAYED_TIME_TOTAL] < (60 * 60 * 24 * 3) && HasCustomFlag(CUSTOM_FLAG_PEX_FINISHED))
-    {
-        sLog.outInfo("[CustomFlag] Joueur %s en pex finished mais avec %u totaltime", GetName(), m_Played_time[PLAYED_TIME_TOTAL]);
-        AddCustomFlag(CUSTOM_FLAG_HL);
-        RemoveCustomFlag(CUSTOM_FLAG_IN_PEX | CUSTOM_FLAG_PEX_FINISHED);
-    }
-}
-
 bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
 {
     //       0     1        2     3     4      5       6      7   8      9            10            11
@@ -14361,7 +14304,7 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     // 45               46     47      48      49      50      51      52      53             54              55      56
     //"watchedFaction,  drunk, health, power1, power2, power3, power4, power5, exploredZones, equipmentCache, ammoId, actionBars,"
     // 57                58
-    //"world_phase_mask, customFlags FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
+    //"world_phase_mask FROM characters WHERE guid = '%u'", GUID_LOPART(m_guid));
 
     QueryResult *result = holder->GetResult(PLAYER_LOGIN_QUERY_LOADFROM);
 
@@ -14636,10 +14579,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     if (HasFlag(PLAYER_FLAGS, PLAYER_FLAGS_GM))
         SetUInt32Value(PLAYER_FLAGS, 0 | old_safe_flags);
 
-
-    uint32 loadedCustomFlags = fields[58].GetUInt32();
-    SetCustomFlags(loadedCustomFlags);
-
     m_taxi.LoadTaxiMask(fields[17].GetString());
 
     uint32 extraflags = fields[31].GetUInt32();
@@ -14890,7 +14829,6 @@ bool Player::LoadFromDB(ObjectGuid guid, SqlQueryHolder *holder)
     if (extraflags & PLAYER_EXTRA_WHISP_RESTRICTION)
         SetWhisperRestriction(true);
 
-    LoadCustomFlags();
     sBattleGroundMgr.PlayerLoggedIn(this); // Add to BG queue if needed
     CreatePacketBroadcaster();
 
@@ -15932,7 +15870,7 @@ void Player::SaveToDB(bool online, bool force)
                               "honorRankPoints, honorHighestRank, honorStanding, honorLastWeekHK, honorLastWeekCP, honorStoredHK, honorStoredDK, "
                               "watchedFaction, drunk, health, power1, power2, power3, "
                               "power4, power5, exploredZones, equipmentCache, ammoId, actionBars, "
-                              "area, world_phase_mask, customFlags) "
+                              "area, world_phase_mask) "
                               "VALUES ( ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?,"
                               "?, ?, ?, ?, ?, "
                               "?, ?, ?, "
@@ -15942,7 +15880,7 @@ void Player::SaveToDB(bool online, bool force)
                               "?, ?, ?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, ?, "
                               "?, ?, ?, ?, ?, ?, "
-                              "?, ?, ?) ");
+                              "?, ?) ");
 
     uberInsert.addUInt32(GetGUIDLow());
     uberInsert.addUInt32(GetSession()->GetAccountId());
@@ -16061,7 +15999,6 @@ void Player::SaveToDB(bool online, bool force)
     // Nostalrius
     uberInsert.addUInt32(GetAreaId());
     uberInsert.addUInt32(GetWorldMask());
-    uberInsert.addUInt32(customFlags);
     uberInsert.Execute();
 
     _SaveBGData();

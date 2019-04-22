@@ -619,7 +619,6 @@ bool ChatHandler::HandleGroupInfoCommand(char* args)
     return true;
 }
 
-//show info of player
 bool ChatHandler::HandlePInfoCommand(char* args)
 {
     Player* target;
@@ -1270,7 +1269,6 @@ bool ChatHandler::HandleCleanCharactersItemsCommand(char* args)
     return true;
 }
 
-
 void ChatHandler::HandleCharacterLevel(Player* player, ObjectGuid player_guid, uint32 oldlevel, uint32 newlevel)
 {
     if (player)
@@ -1344,8 +1342,6 @@ bool ChatHandler::HandleCharacterLevelCommand(char* args)
     return true;
 }
 
-
-//rename characters
 bool ChatHandler::HandleCharacterRenameCommand(char* args)
 {
     Player* target;
@@ -1446,53 +1442,6 @@ bool ChatHandler::HandleCharacterHasItemCommand(char* args)
     return true;
 }
 
-
-std::string GetCustomFlagName(customFlag flagId)
-{
-    switch (flagId)
-    {
-        case CUSTOM_FLAG_IN_PEX:
-            return "Pex en cours";
-            break;
-        case CUSTOM_FLAG_PEX_FINISHED:
-            return "Pex termine";
-            break;
-        case CUSTOM_FLAG_HL:
-            return "Haut niveau";
-            break;
-        case CUSTOM_FLAG_SPEECH_OK:
-            return "Speech pnj bienvenue ok";
-            break;
-        case CUSTOM_FLAG_TRANSITION_HL:
-            return "Transition vers chef de faction pour up";
-            break;
-
-        case CUSTOM_FLAG_FROM_NOSTALRIUS:
-            return "Nostalrius avant fusion Blackrock";
-            break;
-        case CUSTOM_FLAG_FROM_BLACKROCK:
-            return "Blackrock";
-            break;
-        case CUSTOM_FLAG_FROM_NOSTALRIUS_2:
-            return "Nostalrius apres fusion Blackrock";
-            break;
-        case CUSTOM_FLAG_FROM_PRISMATIA:
-            return "Prismatia";
-            break;
-        case CUSTOM_FLAG_FROM_NOSTALRIUS_3:
-            return "Apres fusion Prismatia-Nostalrius";
-            break;
-
-        case CUSTOM_FLAG_PRISMATIA_BETA:
-            return "Prismatia Beta-Testeur";
-            break;
-
-        default:
-            return "INEXISTANT_FLAG";
-            break;
-    }
-}
-
 bool ChatHandler::HandleCharacterChangeRaceCommand(char* args)
 {
     if (Player* pPlayer = GetSelectedPlayer())
@@ -1553,125 +1502,6 @@ bool ChatHandler::HandleCharacterFillFlysCommand(char* args)
     }
     return false;
 }
-
-bool ChatHandler::HandleCharacterFlagsCommand(char *args)
-{
-    if (Player* pPlayer = GetSelectedPlayer())
-    {
-        uint32 newCustomFlags = 0;
-
-        char* newCustomFlagsStr = strtok(args, " ");
-        if (newCustomFlagsStr)
-        {
-            newCustomFlags = uint32(atoi(newCustomFlagsStr));
-            pPlayer->AddCustomFlag(newCustomFlags);
-            std::string flagName = GetCustomFlagName(customFlag(newCustomFlags));
-            PSendSysMessage("'%s' customFlags changed to %u", pPlayer->GetName(), pPlayer->GetCustomFlags());
-            PSendSysMessage("Added: %s (0x%x)", flagName.c_str(), newCustomFlags);
-            return true;
-        }
-        else
-        {
-            uint32 flags = pPlayer->GetCustomFlags();
-            PSendSysMessage("CustomFlags = 0x%x (%u)", flags, flags);
-            for (uint32 i = 1; i <= flags; i = i * 2)
-            {
-                if (flags & i)
-                {
-                    std::string flagName = GetCustomFlagName(customFlag(i));
-                    PSendSysMessage("-> Flag 0x%x (%s)", i, flagName.c_str());
-                }
-            }
-            return true;
-        }
-    }
-    return false;
-}
-
-
-// Character recovery
-bool ChatHandler::HandleRecupCommand(char* c)
-{
-    Player* target = GetSelectedPlayer();
-    if (!target || !c)
-        return false;
-    uint32 recupId = uint32(atoi(c));
-    if (!recupId)
-        return false;
-    SetSentErrorMessage(true);
-
-    /// GENERAL
-    QueryResult* recups = CharacterDatabase.PQuery("SELECT level, lifeTimeHK, lifetimeHighestRank, currentRank, currentRankProgress, money "
-                          "FROM recups WHERE recupId=%u", recupId);
-    PSendSysMessage("* Recovery ID %u on player #%u", recupId, target->GetGUIDLow());
-    if (!recups)
-    {
-        SendSysMessage("-> Recovery data not found.");
-        return false;
-    }
-    Field *fields = recups->Fetch();
-    // Level
-    target->GiveLevel(fields[0].GetUInt32());
-    // ... (Honor ?)
-    // Money
-    target->SetMoney(fields[5].GetUInt32());
-
-    /// REPUTATIONS
-    QueryResult* recupReputations = CharacterDatabase.PQuery("SELECT faction, standing "
-                                    "FROM recup_reputations WHERE recupId=%u", recupId);
-    if (recupReputations)
-    {
-        do
-        {
-            fields = recupReputations->Fetch();
-            uint32 faction  = fields[0].GetUInt32();
-            uint32 standing  = fields[1].GetUInt32();
-            FactionEntry const *factionEntry = sObjectMgr.GetFactionEntry(faction);
-            if (!factionEntry)
-                continue;
-            if (factionEntry->reputationListID < 0)
-                continue;
-            target->GetReputationMgr().SetReputation(factionEntry, standing);
-        }
-        while (recupReputations->NextRow());
-    }
-
-    /// ITEMS
-    QueryResult* recupItems = CharacterDatabase.PQuery("SELECT item, quantity "
-                              "FROM recup_items WHERE recupId=%u", recupId);
-    if (recupItems)
-    {
-        do
-        {
-            fields = recupItems->Fetch();
-            uint32 itemId  = fields[0].GetUInt32();
-            uint32 quantity  = fields[1].GetUInt32();
-            ItemPrototype const* item_proto = ObjectMgr::GetItemPrototype(itemId);
-            if (!item_proto)
-            {
-                PSendSysMessage("Item %u not found.", itemId);
-                continue;
-            }
-            Item* item = Item::CreateItem(itemId, quantity, target);
-            if (!item)
-            {
-                PSendSysMessage("Item %u x %u impossible to create.", itemId, quantity);
-                continue;
-            }
-            item->SaveToDB();
-
-            MailDraft draft;
-            draft.SetSubjectAndBody("Character import", "Welcome to our server.");
-            draft.AddItem(item);
-            MailSender sender(MAIL_NORMAL, m_session->GetPlayer()->GetObjectGuid().GetCounter(), MAIL_STATIONERY_GM);
-            draft.SendMailTo(MailReceiver(target, target->GetObjectGuid()),  m_session->GetPlayer());
-        }
-        while (recupItems->NextRow());
-    }
-    target->SaveToDB();
-    return true;
-}
-
 
 bool ChatHandler::HandleHonorShow(char* /*args*/)
 {
@@ -2884,7 +2714,6 @@ bool ChatHandler::HandleLearnCommand(char* args)
     return true;
 }
 
-//move item to other slot
 bool ChatHandler::HandleItemMoveCommand(char* args)
 {
     if (!*args)
@@ -3845,7 +3674,6 @@ bool ChatHandler::HandleModifySpellCritCommand(char *args)
     return true;
 }
 
-
 bool ChatHandler::HandleModifyGenderCommand(char *args)
 {
     if (!*args)
@@ -3909,7 +3737,17 @@ bool ChatHandler::HandleModifyGenderCommand(char *args)
 
 bool ChatHandler::HandleModifyDrunkCommand(char* args)
 {
-    if (!*args)    return false;
+    if (!*args)
+        return false;
+
+    Player* target =  GetSelectedPlayer();
+
+    if (!target)
+    {
+        SendSysMessage(LANG_PLAYER_NOT_FOUND);
+        SetSentErrorMessage(true);
+        return false;
+    }
 
     uint32 drunklevel = (uint32)atoi(args);
     if (drunklevel > 100)
@@ -3917,7 +3755,7 @@ bool ChatHandler::HandleModifyDrunkCommand(char* args)
 
     uint16 drunkMod = drunklevel * 0xFFFF / 100;
 
-    m_session->GetPlayer()->SetDrunkValue(drunkMod);
+    target->SetDrunkValue(drunkMod);
 
     return true;
 }
@@ -3933,8 +3771,7 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
     if (!*args)
         return false;
 
-    Player* target = NULL;
-    target = GetSelectedPlayer();
+    Player* target = GetSelectedPlayer();
 
     if (!target)
     {
@@ -4025,7 +3862,6 @@ bool ChatHandler::HandleModifyRepCommand(char* args)
     return true;
 }
 
-//Enable Player mount
 bool ChatHandler::HandleModifyMountCommand(char* args)
 {
     if (!*args)
@@ -4300,7 +4136,6 @@ bool ChatHandler::HandleModifyMountCommand(char* args)
     return true;
 }
 
-//Edit Player money
 bool ChatHandler::HandleModifyMoneyCommand(char* args)
 {
     if (!*args)
@@ -4363,7 +4198,6 @@ bool ChatHandler::HandleModifyMoneyCommand(char* args)
     return true;
 }
 
-//Edit Player TP
 bool ChatHandler::HandleModifyTalentCommand(char* args)
 {
     if (!*args)
@@ -4389,8 +4223,6 @@ bool ChatHandler::HandleModifyTalentCommand(char* args)
     return true;
 }
 
-
-//Edit Player Speed
 bool ChatHandler::HandleModifySpeedCommand(char* args)
 {
     if (!*args)
@@ -4453,7 +4285,6 @@ bool ChatHandler::HandleModifySpeedCommand(char* args)
     return true;
 }
 
-//Edit Player Swim Speed
 bool ChatHandler::HandleModifySwimCommand(char* args)
 {
     if (!*args)
@@ -4516,7 +4347,6 @@ bool ChatHandler::HandleModifySwimCommand(char* args)
     return true;
 }
 
-//Edit Player Walk Speed
 bool ChatHandler::HandleModifyBWalkCommand(char* args)
 {
     if (!*args)
@@ -4564,7 +4394,6 @@ bool ChatHandler::HandleModifyBWalkCommand(char* args)
     return true;
 }
 
-//Edit Player Fly Speed, works only while taxi flying
 bool ChatHandler::HandleModifyFlyCommand(char* args)
 {
     if (!*args)
@@ -4910,7 +4739,6 @@ bool ChatHandler::HandleQuestRemoveCommand(char* args)
     return true;
 }
 
-// WTB std::optional
 QuestStatusData HandleQuestStatusCommandHelper(uint32 quest_id, const Player* player,
     const ObjectGuid* guid)
 {
