@@ -1,10 +1,10 @@
 /** 
-  @file SmallArray.h
+  \file G3D/SmallArray.h
   
-  @created 2009-04-26
-  @edited  2009-04-26
+  \created 2009-04-26
+  \edited  2012-07-23
 
-  Copyright 2000-2009, Morgan McGuire, http://graphics.cs.williams.edu
+  Copyright 2000-2012, Morgan McGuire, http://graphics.cs.williams.edu
   All rights reserved.
  */
 #ifndef G3D_SmallArray_h
@@ -12,6 +12,7 @@
 
 #include "G3D/platform.h"
 #include "G3D/Array.h"
+#include "G3D/MemoryManager.h"
 
 namespace G3D {
 
@@ -46,6 +47,11 @@ public:
         resize(0, shrinkIfNecessary);
     }
 
+    void clearAndSetMemoryManager(MemoryManager::Ref& m) {
+        clear();
+        m_rest.clearAndSetMemoryManager(m);
+    }
+
     inline T& operator[](int i) {
         debugAssert(i < m_size && i >= 0);
         if (i < N) {
@@ -77,7 +83,36 @@ public:
         push(v);
     }
 
-    void fastRemove(int i) {
+    inline void append(const T& v, const T& v2) {
+        push(v);
+        push(v2);
+    }
+
+    inline void append(const T& v, const T& v2, const T& v3) {
+        push(v);
+        push(v2);
+        push(v3);
+    }
+
+    inline void append(const T& v, const T& v2, const T& v3, const T& v4) {
+        push(v);
+        push(v2);
+        push(v3);
+        push(v4);
+    }
+
+    /** Find the index of \a v or -1 if not found */
+    int findIndex(const T& v) {
+        for (int i = 0; i < N; ++i) {
+            if (m_embedded[i] == v) {
+                return i;
+            }
+        }
+
+        return m_rest.findIndex(v) + N;
+    }
+
+    void fastRemove(int i, bool shrinkIfNecessary = false) {
         debugAssert(i < m_size && i >= 0);
         if (i < N) {
             if (m_size <= N) {
@@ -89,7 +124,7 @@ public:
             }
         } else {
             // Removing from the rest array
-            m_rest.fastRemove(i - N);
+            m_rest.fastRemove(i - N, shrinkIfNecessary);
         }
         --m_size;
     }
@@ -133,8 +168,8 @@ public:
         return m_rest.contains(value);
     }
 
-    template<int MIN_ELEMENTS, int MIN_BYTES>
-    SmallArray<T, N>& operator=(const Array<T, MIN_ELEMENTS, MIN_BYTES>& src) {
+    template<int MIN_ELEMENTS>
+    SmallArray<T, N>& operator=(const Array<T, MIN_ELEMENTS>& src) {
         resize(src.size());
         for (int i = 0; i < src.size(); ++i) {
             (*this)[i] = src[i];
@@ -142,13 +177,13 @@ public:
         return *this;
     }
 
-	inline const T& last() const {
-		return (*this)[size() - 1];
-	}
+    inline const T& last() const {
+        return (*this)[size() - 1];
+    }
 
-	inline T& last() {
-		return (*this)[size() - 1];
-	}
+    inline T& last() {
+        return (*this)[size() - 1];
+    }
 };
 
 }

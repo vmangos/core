@@ -3,7 +3,7 @@
 
   @maintainer Morgan McGuire, http://graphics.cs.williams.edu
   @created 2001-08-04
-  @edited  2009-01-15
+  @edited  2010-01-15
  */
 
 #include "G3D/platform.h"
@@ -11,9 +11,10 @@
 #include "G3D/format.h"
 #include "G3D/Array.h"
 #include "G3D/fileutils.h"
+#include "G3D/FileSystem.h"
 #include <time.h>
 
-#ifdef G3D_WIN32
+#ifdef G3D_WINDOWS
     #include <imagehlp.h>
 #else
     #include <stdarg.h>
@@ -22,16 +23,16 @@
 namespace G3D {
 
 void logPrintf(const char* fmt, ...) {
-	va_list arg_list;
-	va_start(arg_list, fmt);
+    va_list arg_list;
+    va_start(arg_list, fmt);
     Log::common()->vprintf(fmt, arg_list);
     va_end(arg_list);
 }
 
 
 void logLazyPrintf(const char* fmt, ...) {
-	va_list arg_list;
-	va_start(arg_list, fmt);
+    va_list arg_list;
+    va_start(arg_list, fmt);
     Log::common()->lazyvprintf(fmt, arg_list);
     va_end(arg_list);
 }
@@ -43,7 +44,7 @@ Log::Log(const std::string& filename, int stripFromStackBottom) :
 
     this->filename = filename;
 
-    logFile = fopen(filename.c_str(), "w");
+    logFile = FileSystem::fopen(filename.c_str(), "w");
 
     if (logFile == NULL) {
         std::string drive, base, ext;
@@ -52,13 +53,13 @@ Log::Log(const std::string& filename, int stripFromStackBottom) :
         std::string logName = base + ((ext != "") ? ("." + ext) : ""); 
 
         // Write time is greater than 1ms.  This may be a network drive.... try another file.
-        #ifdef G3D_WIN32
+        #ifdef G3D_WINDOWS
             logName = std::string(std::getenv("TEMP")) + logName;
         #else
             logName = std::string("/tmp/") + logName;
         #endif
 
-        logFile = fopen(logName.c_str(), "w");
+        logFile = FileSystem::fopen(logName.c_str(), "w");
     }
 
     // Use a large buffer (although we flush in logPrintf)
@@ -85,7 +86,9 @@ Log::~Log() {
         Log::commonLog = NULL;
     }
 
-    fclose(logFile);
+    if (logFile) {
+        FileSystem::fclose(logFile);
+    }
 }
 
 

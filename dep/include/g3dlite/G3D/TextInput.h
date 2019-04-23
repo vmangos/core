@@ -1,16 +1,16 @@
 /**
- @file TextInput.h
+ \file G3D/TextInput.h
 
  Simple text lexer/tokenizer.
 
- @maintainer Morgan McGuire, http://graphics.cs.williams.edu
+ \maintainer Morgan McGuire, http://graphics.cs.williams.edu
 
- @cite Based on a lexer written by Aaron Orenstein. 
+ \cite Based on a lexer written by Aaron Orenstein. 
 
- @created 2002-11-27
- @edited  2009-11-24
+ \created 2002-11-27
+ \edited  2013-03-25
 
- Copyright 2000-2009, Morgan McGuire.
+ Copyright 2000-2013, Morgan McGuire.
  All rights reserved.
  */
 
@@ -76,6 +76,7 @@ private:
     bool                    _bool;
     int                     _line;
     int                     _character;
+    uint64                  _bytePosition;
     Type                    _type;
     ExtendedType            _extendedType;
 
@@ -86,14 +87,15 @@ public:
         _bool(false),
         _line(0), 
         _character(0), 
+        _bytePosition(0),
         _type(END), 
         _extendedType(END_TYPE) {}
 
-    Token(Type t, ExtendedType e, const std::string& s, int L, int c)
-        : _string(s), _bool(false), _line(L), _character(c), _type(t), _extendedType(e) {}
+    Token(Type t, ExtendedType e, const std::string& s, int L, int c, uint64 byte)
+        : _string(s), _bool(false), _line(L), _character(c), _bytePosition(byte), _type(t), _extendedType(e) {}
 
-    Token(Type t, ExtendedType e, const std::string& s, bool b, int L, int c)
-        : _string(s), _bool(b), _line(L), _character(c), _type(t), _extendedType(e) {}
+    Token(Type t, ExtendedType e, const std::string& s, bool b, int L, int c, uint64 byte)
+        : _string(s), _bool(b), _line(L), _character(c), _bytePosition(byte), _type(t), _extendedType(e) {}
 
     Type type() const {
         return _type;
@@ -132,6 +134,12 @@ public:
         return _character;
     }
 
+    /** Number of bytes from the beginning of the buffer that this token was parsed from. 
+      Begins at 0 */
+    uint64 bytePosition() const {
+        return _bytePosition;
+    }
+
     /** Return the numeric value for a number type, or zero if this is
         not a number type.
     */
@@ -140,7 +148,9 @@ public:
 
 
 /**
- A simple style tokenizer for reading text files.  TextInput handles a
+ \brief A simple tokenizer for parsing text files.  
+ 
+ TextInput handles a
  superset of C++,Java, Matlab, and Bash code text including single
  line comments, block comments, quoted strings with escape sequences,
  and operators.  TextInput recognizes several categories of tokens,
@@ -183,7 +193,7 @@ public:
 
   <B>Examples</B>
 
-  <PRE>
+  \code
   TextInput ti(TextInput::FROM_STRING, "name = \"Max\", height = 6");
 
   Token t;
@@ -198,20 +208,26 @@ public:
 
   std::string name = ti.read().sval;
   ti.read();
-  </PRE>
+  \endcode
 
-  <PRE>
+  \code
   TextInput ti(TextInput::FROM_STRING, "name = \"Max\", height = 6");
   ti.readSymbols("name", "=");
   std::string name = ti.readString();
   ti.readSymbols(",", "height", "=");
   double height = ti. readNumber();
-  </PRE>
+  \endcode
 
  Assumes that the file is not modified once opened.
  */
 class TextInput {
 public:
+    /** Includes MSVC specials parsing */
+    static double parseNumber(const std::string& _string);
+
+    /** toLower(_string) == "true" */
+    static bool parseBoolean(const std::string& _string);
+
 
     /** Tokenizer configuration options.  */
     class Settings {
@@ -315,13 +331,15 @@ public:
         int                 startingLineNumberOffset;
 
         /** 
-          Parse -1.#IND00 as the floating point number returned by
-          nan(), -1.#INF00 as -inf(), and 1.#INF00 as inf().  Note
-          that the C99 standard specifies that a variety of formats
-          like "NaN" and "nan" are to be used; these are easier to
-          parse yourself and not currently supported by readNumber.
+          Parse "-1.#IND00" as the floating point number returned by
+          G3D::nan(), "-1.#INF00" as - G3D::inf(), and "1.#INF00" as G3D::inf().  
 
-          An alternative to specifying msvcSpecials is to read numbers as:
+          Note that the C99 standard specifies that a variety of formats
+          like "nan" are to be used; these are supported by 
+          G3D::TextInput::Settings::simpleFloatSpecials.
+
+          An alternative to specifying msvcFloatSpecials is to read numbers as:
+          \htmlonly
           <pre>
             Token x = t.read();
             Token y = t.peek();
@@ -334,15 +352,20 @@ public:
             }
             // ... similar cases for inf
           </pre>
+          \endhtmlonly
 
           If the single-comment character was #, the floating point
           special format overrides the comment and will be parsed
           instead.
 
-          If signedNumbers is false msvcSpecials will not be parsed.
+          If signedNumbers is false msvcFloatSpecials will not be parsed.
 
           Default is true. */
-        bool                msvcSpecials;
+        bool                msvcFloatSpecials;
+
+        /** Parses "+inf', "-inf", "inf", "nan" as floats instead of symbols. 
+            Defaults to true.*/
+        bool                simpleFloatSpecials;
 
         /**
          Parse the following set of useful proof symbols:
@@ -362,7 +385,7 @@ public:
         bool                proofSymbols;
 
         /**
-         When parsing booleans and msvcSpecials, is case significant?
+         When parsing booleans and msvcFloatSpecials, is case significant?
          Default is {true}
         */
         bool                caseSensitive;
@@ -379,8 +402,11 @@ public:
 
         Settings();
     };
-	
+    
 private:
+
+    /** \sa pushSettings / popSettings */
+    Array<Settings>         settingsStack;
 
     std::deque<Token>       stack;
 
@@ -458,7 +484,7 @@ private:
      Read the next token, returning an END token if no more input is
      available.
      */
-    Token nextToken();
+    void nextToken(Token& t);
 
     /**
        Helper for nextToken.  Appends characters to t._string until the end
@@ -468,6 +494,8 @@ private:
        first character after the opening delimiter character.
     */
     void parseQuotedString(unsigned char delimiter, Token& t);
+
+    void initFromString(const char* str, int len, const Settings& settings);
 
 public:
 
@@ -550,8 +578,24 @@ public:
     */
     TextInput(FS fs, const std::string& str, const Settings& settings = Settings());
 
+    /** Creates input directly from a fixed-length, non-NULL terminated string.  The first argument must be
+        TextInput::FROM_STRING.
+    */
+    TextInput(FS fs, const char* str, size_t strLen, const Settings& settings = Settings());
+
     /** Returns true while there are tokens remaining. */
     bool hasMore();
+
+    /** Temporarily switch parsing to use \a settings.  Note that this will override the currently recorded sourceFilename unless you explicitly set it back.
+    \sa popSettings */
+    void pushSettings(const Settings& settings) {
+        settingsStack.push(options);
+        options = settings;
+    }
+
+    void popSettings() {
+        options = settingsStack.pop();
+    }
 
     /** Read the next token (which will be the END token if ! hasMore()).
     
@@ -570,10 +614,13 @@ public:
     */
     Token read();
 
+    /** Avoids the copy of read() */
+    void read(Token& t);
+
     /** Calls read() until the result is not a newline or comment */
     Token readSignificant();
 
-    /** Read one token (or possibly two) as a number or throws
+    /** Read one token (or possibly two, for minus sign) as a number or throws
         WrongTokenType, and returns the number.
 
         If the first token in the input is a number, it is returned directly.
@@ -588,6 +635,10 @@ public:
         tokens are consumed.
     */
     double readNumber();
+
+    /** Reads a number that must be in C integer format: 
+      <code> [ '+' | '-' ] #+  |  '0x'#+</code>  */
+    int readInteger();
 
     bool readBoolean();
 
@@ -623,8 +674,22 @@ public:
         is not a string.  WrongString will be thrown if the next token in the
         input stream is a string but does not match the @p s parameter.  When
         an exception is thrown, no tokens are consumed.
+
+        \sa readString(), readStringToken(), readUntilNewlineAsString(), readUntilDelimiterAsString()
       */
     void readString(const std::string& s);
+
+    /** Read from the beginning of the next token until the following newline 
+      and return the result as a string, ignoring all parsing in between. The newline 
+      is not returned in the string, and the following token read will be a newline or
+      end of file token (if they are enabled for parsing).*/
+    std::string readUntilNewlineAsString();
+
+    /** Read from the beginning of the next token until the following delimiter character 
+      and return the result as a string, ignoring all parsing in between. The delimiter 
+      is not returned in the string, and the following token read will begin at the delimiter or
+      end of file token (if they are enabled for parsing).*/
+    std::string readUntilDelimiterAsString(const char delimiter1, const char delimiter2 = '\0');
 
     /** Reads a comment token or throws WrongTokenType, and returns the token.
 
@@ -707,6 +772,9 @@ public:
     */
     Token readSymbolToken();
 
+    /** Avoids the copy of readSymbolToken() */
+    void readSymbolToken(Token& t);
+
     /** Like readSymbolToken, but returns the token's string.
 
         Use this method (rather than readSymbolToken) if you want the token's
@@ -733,13 +801,13 @@ public:
 
 
     /** Read a series of two specific symbols.  See readSymbol.  */
-    inline void readSymbols(const std::string& s1, const std::string& s2) {
+    void readSymbols(const std::string& s1, const std::string& s2) {
         readSymbol(s1);
         readSymbol(s2);
     }
 
     /** Read a series of three specific symbols.  See readSymbol.  */
-    inline void readSymbols(
+    void readSymbols(
         const std::string& s1, 
         const std::string& s2, 
         const std::string& s3) {
@@ -749,7 +817,7 @@ public:
     }
 
     /** Read a series of four specific symbols.  See readSymbol.  */
-    inline void readSymbols(
+    void readSymbols(
         const std::string& s1, 
         const std::string& s2, 
         const std::string& s3,     
