@@ -3450,7 +3450,7 @@ void Map::AddCorpseToRemove(Corpse* corpse, ObjectGuid looter_guid)
 */
 void Map::RemoveBones(Corpse* corpse)
 {
-    ACE_Guard<MapMutexType> guard(_bonesLock);
+    std::unique_lock<MapMutexType> guard(_bonesLock);
     _bones.remove(corpse);
 }
 
